@@ -8,8 +8,6 @@
     <string name="prolite_account">Pro Lite</string>
     <!-- Name of the MEGA PDF Viewer. Keep uppercase. -->
     <string name="pdf_app_name">Visor de PDF MEGA</string>
-    <!-- Showing progress of elements. Example: 2 of 10. -->
-    <string name="general_x_of_x">de</string>
     <!-- Answer for confirmation dialog. -->
     <string name="general_yes">Sí</string>
     <!-- Answer for confirmation dialog. -->
@@ -579,8 +577,6 @@
     <string name="number_contact_not_removed">No se han podido eliminar %d contactos</string>
     <!-- success message when sharing a file with multiple contacts -->
     <string name="number_contact_file_shared_correctly">Se ha compartido la carpeta con %d contactos</string>
-    <!-- error message when sharing a file with multiple contacts -->
-    <string name="number_contact_file_not_shared_">No se puede compartir el archivo con %d contactos</string>
     <!-- success message when sharing multiple files -->
     <string name="number_correctly_shared">Se han compartido %d carpetas</string>
     <!-- error message when sharing multiple files -->
@@ -659,7 +655,7 @@
     <!-- error message while browsing the local filesystem -->
     <string name="error_io_problem">Error en el sistema de archivos</string>
     <!-- error message while browsing the local filesystem -->
-    <string name="general_error">No se han podido explorar los archivos locales.</string>
+    <string name="general_error">Error en el sistema de archivos</string>
     <!-- title of the image gallery -->
     <string name="full_screen_image_viewer_label">Visor de imágenes</string>
     <!-- Headline for the amount of storage space is used -->
@@ -1126,7 +1122,7 @@
     <!-- Message to promote PRO accounts -->
     <string name="get_pro_account">Aumenta la capacidad de tu nube. [A]Obtén más espacio y más cuota de transferencia con una cuenta Pro.</string>
     <!-- success message when the MasterKey file has been downloaded -->
-    <string name="toast_master_key">Se ha realizado una copia de seguridad de la Clave de recuperación en: %1s.[A] Encontrarás el archivo con la Clave de recuperación en la sección Sin conexión.[A]Aviso: Si cierras la sesión, la Clave se eliminará, por lo tanto tienes que guardarla en un lugar seguro fuera de tu cuenta MEGA.</string>
+    <string name="toast_master_key">Se ha realizado una copia de seguridad de la Clave de recuperación en: %1s.[A] Encontrarás el archivo con la Clave de recuperación en la sección Sin conexión.[/A] Aviso: Si cierras la sesión, la Clave se eliminará, por lo tanto tienes que guardarla en un lugar seguro fuera de tu cuenta de MEGA.</string>
     <!-- Error shown when the user tries to change his mail to one that is already used -->
     <string name="mail_already_used">Este correo electrónico ya está asociado a una cuenta de MEGA. Por favor usa otra dirección de correo electrónico.</string>
     <!-- Error shown when the user tries to change his mail while the user has already requested a confirmation link for that email address -->
@@ -1488,7 +1484,7 @@
     <string name="title_message_uploading_options">Subiendo adjunto</string>
     <!-- message shown when a chat has no messages -->
     <string name="no_conversation_history">No hay historial</string>
-    <!-- title of confirmation alert before removing a contact, Plural -->
+    <!-- Text to indicate that one participant is typing or multiple participants are typing at the same time in a chat room. The "%1$s" placeholder is to put the name(s) of the participant(s). The [A][/A] format marks are to put the text in a different color. -->
     <plurals name="user_typing">
         <item quantity="one">%1$s [A]está escribiendo&#8230;[/A]</item>
         <item quantity="other">%1$s [A]están escribiendo&#8230;[/A]</item>
@@ -1918,13 +1914,11 @@
     <string name="title_regitration">Bono por registro de cuenta</string>
     <!-- title of the section for install a mobile app bonuses in achivements section (maximum 24 chars) -->
     <string name="title_install_desktop">Instala la app de escritorio</string>
-    <!-- title of the section for base quota in achivements section -->
-    <string name="title_base_quota">Cuota base de la cuenta</string>
     <!-- Text that indicates that no pictures have been uploaded to the Camera Uploads section -->
     <string name="camera_uploads_empty">No hay archivos en Subidas de la cámara</string>
     <!-- indicates the number of days left related to a achievement -->
     <string name="general_num_days_left">Quedan %1$d d</string>
-    <!-- State to indicate something has expired (achivements of business status account for instance) -->
+    <!-- State to indicate an achievement has expired -->
     <string name="expired_label">Caducado</string>
     <!-- title of the advanced setting to choose the use of https -->
     <string name="setting_title_use_https_only">No usar HTTP</string>
@@ -2278,10 +2272,12 @@
     <string name="settings_video_upload_quality">Calidad de vídeo</string>
     <!-- Text shown when the user refuses to permit the storage permission when enable camera upload -->
     <string name="on_refuse_storage_permission">Subidas de la cámara necesita acceder a tus fotos y otros archivos multimedia del dispositivo. Ve a los ajustes y permite el acceso.</string>
-    <!-- the options for the option on setting to set up the quality of multimedia files uploaded to the chat, the options of medium quality multimedia file to  upload. -->
+    <!-- Available options for the setting to set up the quality of multimedia files uploaded to the chat or the Camera Uploads -->
     <string-array name="settings_chat_upload_quality_entries">
-        <item>Calidad original</item>
-        <item>Calidad media</item>
+        <item>Baja</item>
+        <item>Media</item>
+        <item>Alta</item>
+        <item>Original</item>
     </string-array>
     <!-- Title of the notification for a missed call -->
     <string name="missed_call_notification_title">Llamada perdida</string>
@@ -2579,11 +2575,6 @@
     <string name="context_no_restored">El elemento no se ha podido restaurar.</string>
     <!-- menu item from contact section to send a message to a contact -->
     <string name="context_send_message">Enviar mensaje</string>
-    <!-- Message shown when a contact is successfully sent to several chats, more contacts -->
-    <plurals name="plural_contact_sent_to_chats">
-        <item quantity="one">Contacto enviado a los chats</item>
-        <item quantity="other">Contactos enviado a los chats</item>
-    </plurals>
     <!-- Error message on opening a MEGAdrop folder link -->
     <string name="error_MEGAdrop_not_supported">Las carpetas de MEGAdrop aún no están soportadas</string>
     <!-- Pre overquota error dialog when trying to copy or import a file -->
@@ -3462,7 +3453,7 @@
     <!-- Text informing user that their account has been suspended -->
     <string name="account_temporarily_suspended">Tu cuenta ha sido bloqueada temporalmente por seguridad.</string>
     <!-- Text informing user has to follow the steps of an email to unlock their account -->
-    <string name="verify_email_and_follow_steps">[A]Verifica tu dirección de correo electrónico[/A] y sigue los pasos en el correo de MEGA que te envíamos para desbloquear tu cuenta.</string>
+    <string name="verify_email_and_follow_steps">Sigue los pasos que te enviamos en el [A]correo electrónico de verificación[/A] para desbloquear tu cuenta.</string>
     <!-- Question which takes the user to a help screen -->
     <string name="why_am_i_seeing_this">¿Por qué estoy viendo esto?</string>
     <!-- Label of a button which action is resend an email -->
@@ -3573,7 +3564,7 @@
     <string name="label_verify_credentials">Verificar credenciales</string>
     <!-- Label to indicate that contact’s credentials are not verified. -->
     <string name="label_not_verified">No verificadas</string>
-    <!-- Action indicating something was verified. -->
+    <!-- Label indicating the authenticity credentials of a contact have been verified -->
     <string name="label_verified">Verificado</string>
     <!-- ”Verify user” dialog title -->
     <string name="authenticity_credentials_label">Credenciales de autenticidad</string>
@@ -3660,7 +3651,7 @@
     <!-- Shows the error when the limit of reactions per message is reached and a user tries to add one more. Keep the placeholder because is to show limit number in runtime. -->
     <string name="limit_reaction_per_message">Este mensaje ha alcanzado el límite máximo de %d reacciones.</string>
     <!-- System message displayed to all chat participants when one of them enables retention history -->
-    <string name="retention_history_changed_by">[A]%1$s[/A][B] ha cambiado el tiempo de limpieza de mensajes a [/B][A] %2$s[/A][B].[/B]</string>
+    <string name="retention_history_changed_by">[A]%1$s[/A][B] ha cambiado el tiempo de limpieza de mensajes a [/B][A]%2$s[/A][B].[/B]</string>
     <!-- Title of the section to clear the chat content in the Manage chat history screen -->
     <string name="title_properties_clear_chat_history">Limpiar historial del chat</string>
     <!-- System message that is shown to all chat participants upon disabling the Retention history -->
@@ -3729,7 +3720,7 @@
     <!-- Title indicating the select mode is enabled and ready to select transfers on Transfers section, In progress tab -->
     <string name="title_select_transfers">Seleccionar transferencias</string>
     <!-- Error shown to inform the priority change of a transfer failed. Please don’t remove the place holder, it’s to set the name of the transfer. Example: The priority change of the transfer “video.mp4” failed. -->
-    <string name="change_of_transfer_priority_failed">Ha habido un error en el cambio de prioridad de la transferencia ”%1$s”.</string>
+    <string name="change_of_transfer_priority_failed">No se ha podido cambiar la prioridad de la transferencia “%1$s”</string>
     <!-- Title option to send separated the link and decryption key -->
     <string name="option_send_decryption_key_separately">Envíar la clave de cifrado por separado</string>
     <!-- Explanation option to send separated the link and decryption key -->
@@ -4045,6 +4036,8 @@
         <item quantity="one">Obtener enlace</item>
         <item quantity="other">Obtener enlaces</item>
     </plurals>
+    <!-- Ask for confirmation before clear offline files -->
+    <string name="clear_offline_confirmation">¿Eliminar todos los archivos sin conexión?</string>
     <!-- Banner text when the call is in progress and I'm the only participant. -->
     <string name="banner_alone_on_the_call">Solo estás tú aquí</string>
     <!-- Item menu option upon right click on meeting. -->
@@ -4096,15 +4089,15 @@
     <!-- Pin the participant to speaker view in the meeting-->
     <string name="pin_to_speaker">Mostrar en la vista principal</string>
     <!-- Make the participant as moderator in the meeting-->
-    <string name="make_moderator">Designar como moderador</string>
+    <string name="make_moderator">Establecer como moderador</string>
     <!-- The title of dialog for end meeting confirmation-->
-    <string name="title_end_meeting">¿ Quieres salir de la reunión?</string>
+    <string name="title_end_meeting">¿Quieres salir de la reunión?</string>
     <!-- no moderator when the moderator leave meeting-->
     <string name="no_moderator">No hay moderadores</string>
     <!-- assign moderator message when the moderator leave meeting-->
     <string name="assign_moderator_message">Antes de irte, designa uno o más moderadores para la reunión.</string>
     <!-- assign moderator option when the moderator leave meeting-->
-    <string name="assign_moderator">Designar como moderador</string>
+    <string name="assign_moderator">Establecer como moderador</string>
     <!-- leave anyway option when the moderator leave meeting-->
     <string name="leave_anyway">Abandonar de todos modos</string>
     <!-- The message alert user to pick new moderator on assign moderator page-->
@@ -4179,4 +4172,6 @@
     <string name="meeting_me_text_bracket">%1s[A](yo)[/A]</string>
     <!-- Menu item to change from thumbnail view to main view in meeting-->
     <string name="main_view">Vista principal</string>
+    <!-- Warning in Offline section alerting all the Offline files will be deleted after logout. -->
+    <string name="offline_warning">Si cierras sesión, el contenido sin conexión será eliminado.</string>
 </resources>

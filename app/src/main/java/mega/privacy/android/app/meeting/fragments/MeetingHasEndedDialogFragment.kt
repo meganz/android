@@ -2,7 +2,6 @@ package mega.privacy.android.app.meeting.fragments
 
 import android.app.Dialog
 import android.os.Bundle
-import android.util.Log
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.DialogFragment
 import com.google.android.material.dialog.MaterialAlertDialogBuilder

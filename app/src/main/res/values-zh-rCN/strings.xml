@@ -8,8 +8,6 @@
     <string name="prolite_account">Pro Lite</string>
     <!-- Name of the MEGA PDF Viewer. Keep uppercase. -->
     <string name="pdf_app_name">MEGA PDF 查看器</string>
-    <!-- Showing progress of elements. Example: 2 of 10. -->
-    <string name="general_x_of_x">的</string>
     <!-- Answer for confirmation dialog. -->
     <string name="general_yes">是</string>
     <!-- Answer for confirmation dialog. -->
@@ -570,8 +568,6 @@
     <string name="number_contact_not_removed">%d联系人尚未删除</string>
     <!-- success message when sharing a file with multiple contacts -->
     <string name="number_contact_file_shared_correctly">已成功与%d 联系人分享文件夹</string>
-    <!-- error message when sharing a file with multiple contacts -->
-    <string name="number_contact_file_not_shared_">无法与%d位联系人共享文件</string>
     <!-- success message when sharing multiple files -->
     <string name="number_correctly_shared">%d文件夹共享成功</string>
     <!-- error message when sharing multiple files -->
@@ -627,7 +623,7 @@
     <!-- upload to. Then choose an Image file -->
     <string name="upload_to_image">图片</string>
     <!-- upload to. Then choose an Audio file -->
-    <string name="upload_to_audio">语音</string>
+    <string name="upload_to_audio">音乐</string>
     <!-- Title of the button in the contact info screen to start a video call -->
     <string name="upload_to_video">视频</string>
     <!-- upload to. Then choose to browse the file system to choose a file -->
@@ -649,7 +645,7 @@
     <!-- error message while browsing the local filesystem -->
     <string name="error_io_problem">文件系统问题</string>
     <!-- error message while browsing the local filesystem -->
-    <string name="general_error">浏览本地文件时发生错误。</string>
+    <string name="general_error">执行操作时出错</string>
     <!-- title of the image gallery -->
     <string name="full_screen_image_viewer_label">图像浏览器</string>
     <!-- Headline for the amount of storage space is used -->
@@ -1114,7 +1110,7 @@
     <!-- Message to promote PRO accounts -->
     <string name="get_pro_account">升级您的云盘。[A]购买Pro会员帐户获得更多存储空间和传输流量。</string>
     <!-- success message when the MasterKey file has been downloaded -->
-    <string name="toast_master_key">MEGA帐户的恢复密钥已保存到：%1s。[A]您可以在离线里找到您的恢复密钥文件。[A]请注意：当您登出帐户时，您的恢复密钥文件将被删除，因此请将其保存在您MEGA帐户以外的安全位置。</string>
+    <string name="toast_master_key">MEGA帐户恢复密钥已保存到：%1s。[A]您可以在离线中找到您的恢复密钥文件。[/A]请注意：登出帐户后，您的恢复密钥文件将被删除，因此请将其保存在您MEGA帐户以外的安全位置。</string>
     <!-- Error shown when the user tries to change his mail to one that is already used -->
     <string name="mail_already_used">该电子邮件地址已被占用。请使用另一个电子邮件地址。</string>
     <!-- Error shown when the user tries to change his mail while the user has already requested a confirmation link for that email address -->
@@ -1467,7 +1463,7 @@
     <string name="title_message_uploading_options">正在上传附件</string>
     <!-- message shown when a chat has no messages -->
     <string name="no_conversation_history">没有对话历史记录</string>
-    <!-- title of confirmation alert before removing a contact, Plural -->
+    <!-- Text to indicate that one participant is typing or multiple participants are typing at the same time in a chat room. The "%1$s" placeholder is to put the name(s) of the participant(s). The [A][/A] format marks are to put the text in a different color. -->
     <plurals name="user_typing">
         <item quantity="other">%1$s [A]正在输入&#8230;[/A]</item>
     </plurals>
@@ -1876,13 +1872,11 @@
     <string name="title_regitration">注册奖励</string>
     <!-- title of the section for install a mobile app bonuses in achivements section (maximum 24 chars) -->
     <string name="title_install_desktop">安装MEGA桌面App</string>
-    <!-- title of the section for base quota in achivements section -->
-    <string name="title_base_quota">帐户基础配额</string>
     <!-- Text that indicates that no pictures have been uploaded to the Camera Uploads section -->
     <string name="camera_uploads_empty">相机上传中无文件</string>
     <!-- indicates the number of days left related to a achievement -->
     <string name="general_num_days_left">剩余%1$d d</string>
-    <!-- State to indicate something has expired (achivements of business status account for instance) -->
+    <!-- State to indicate an achievement has expired -->
     <string name="expired_label">已过期</string>
     <!-- title of the advanced setting to choose the use of https -->
     <string name="setting_title_use_https_only">不使用HTTP</string>
@@ -2230,10 +2224,12 @@
     <string name="settings_video_upload_quality">视频画质</string>
     <!-- Text shown when the user refuses to permit the storage permission when enable camera upload -->
     <string name="on_refuse_storage_permission">相机上传需要访问您设备上的照片和其他媒体内容。请转至设置页面开启权限。</string>
-    <!-- the options for the option on setting to set up the quality of multimedia files uploaded to the chat, the options of medium quality multimedia file to  upload. -->
+    <!-- Available options for the setting to set up the quality of multimedia files uploaded to the chat or the Camera Uploads -->
     <string-array name="settings_chat_upload_quality_entries">
-        <item>原始画质</item>
-        <item>中等画质</item>
+        <item>低</item>
+        <item>中</item>
+        <item>高</item>
+        <item>原版的</item>
     </string-array>
     <!-- Title of the notification for a missed call -->
     <string name="missed_call_notification_title">未接来电</string>
@@ -2523,10 +2519,6 @@
     <string name="context_no_restored">发生错误。项目未还原。</string>
     <!-- menu item from contact section to send a message to a contact -->
     <string name="context_send_message">发送信息</string>
-    <!-- Message shown when a contact is successfully sent to several chats, more contacts -->
-    <plurals name="plural_contact_sent_to_chats">
-        <item quantity="other">联系人已成功发送至聊天</item>
-    </plurals>
     <!-- Error message on opening a MEGAdrop folder link -->
     <string name="error_MEGAdrop_not_supported">尚不支持MEGAdrop文件夹</string>
     <!-- Pre overquota error dialog when trying to copy or import a file -->
@@ -3384,7 +3376,7 @@
     <!-- Text informing user that their account has been suspended -->
     <string name="account_temporarily_suspended">为了确保安全，您的帐户已被暂时锁定。</string>
     <!-- Text informing user has to follow the steps of an email to unlock their account -->
-    <string name="verify_email_and_follow_steps">[A]请验证您的电子邮箱[/A]并按照MEGA邮件中的步骤解锁您的帐户。</string>
+    <string name="verify_email_and_follow_steps">请按照[A]验证电子邮件[/A]中的步骤解锁您的帐户。</string>
     <!-- Question which takes the user to a help screen -->
     <string name="why_am_i_seeing_this">为什么我的帐户被停用？</string>
     <!-- Label of a button which action is resend an email -->
@@ -3493,7 +3485,7 @@
     <string name="label_verify_credentials">验证凭证</string>
     <!-- Label to indicate that contact’s credentials are not verified. -->
     <string name="label_not_verified">未验证</string>
-    <!-- Action indicating something was verified. -->
+    <!-- Label indicating the authenticity credentials of a contact have been verified -->
     <string name="label_verified">已验证</string>
     <!-- ”Verify user” dialog title -->
     <string name="authenticity_credentials_label">授权认证</string>
@@ -3550,7 +3542,7 @@
     <!-- Text that indicates that there’s no document to show -->
     <string name="homepage_empty_hint_documents">无文档</string>
     <!-- Text that indicates that there’s no audio to show -->
-    <string name="homepage_empty_hint_audio">无语音文件</string>
+    <string name="homepage_empty_hint_audio">无音频文件</string>
     <!-- Text that indicates that there’s no video to show -->
     <string name="homepage_empty_hint_video">无视频</string>
     <!-- Title of the screen to attach GIFs -->
@@ -3642,7 +3634,7 @@
     <!-- Title indicating the select mode is enabled and ready to select transfers on Transfers section, In progress tab -->
     <string name="title_select_transfers">选择传输</string>
     <!-- Error shown to inform the priority change of a transfer failed. Please don’t remove the place holder, it’s to set the name of the transfer. Example: The priority change of the transfer “video.mp4” failed. -->
-    <string name="change_of_transfer_priority_failed">传输”%1$s”的优先级更改失败。</string>
+    <string name="change_of_transfer_priority_failed">无法更改传输“%1$s”的先后顺序</string>
     <!-- Title option to send separated the link and decryption key -->
     <string name="option_send_decryption_key_separately">单独发送解密密钥</string>
     <!-- Explanation option to send separated the link and decryption key -->
@@ -3949,6 +3941,8 @@
     <plurals name="get_links">
         <item quantity="other">获取链接</item>
     </plurals>
+    <!-- Ask for confirmation before clear offline files -->
+    <string name="clear_offline_confirmation">清除所有离线文件？</string>
     <!-- Banner text when the call is in progress and I'm the only participant. -->
     <string name="banner_alone_on_the_call">只有您一人</string>
     <!-- Item menu option upon right click on meeting. -->
@@ -4083,4 +4077,6 @@
     <string name="meeting_me_text_bracket">%1s[A](我)[/A]</string>
     <!-- Menu item to change from thumbnail view to main view in meeting-->
     <string name="main_view">主视图</string>
+    <!-- Warning in Offline section alerting all the Offline files will be deleted after logout. -->
+    <string name="offline_warning">登出帐户后，您保存在离线的内容将被删除。</string>
 </resources>

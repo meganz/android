@@ -8,8 +8,6 @@
     <string name="prolite_account">Pro Lite</string>
     <!-- Name of the MEGA PDF Viewer. Keep uppercase. -->
     <string name="pdf_app_name">ดูไฟล์ PDF ด้วย MEGA</string>
-    <!-- Showing progress of elements. Example: 2 of 10. -->
-    <string name="general_x_of_x">จาก</string>
     <!-- Answer for confirmation dialog. -->
     <string name="general_yes">ใช่</string>
     <!-- Answer for confirmation dialog. -->
@@ -570,8 +568,6 @@
     <string name="number_contact_not_removed">ไม่ได้นำรายชื่อติดต่อของ %d ออก</string>
     <!-- success message when sharing a file with multiple contacts -->
     <string name="number_contact_file_shared_correctly">โฟลเดอร์แชร์ด้วย %d รายชื่อผู้ติดต่อเรียบร้อยแล้ว</string>
-    <!-- error message when sharing a file with multiple contacts -->
-    <string name="number_contact_file_not_shared_">ไม่สามารถแชร์ไฟล์กับผู้ติดต่อ %d ได้</string>
     <!-- success message when sharing multiple files -->
     <string name="number_correctly_shared">โฟลเดอร์ %d แชร์สำเร็จแล้ว</string>
     <!-- error message when sharing multiple files -->
@@ -649,7 +645,7 @@
     <!-- error message while browsing the local filesystem -->
     <string name="error_io_problem">มีปัญหาของระบบไฟล์</string>
     <!-- error message while browsing the local filesystem -->
-    <string name="general_error">พบข้อผิดพลาดขณะเรียกดูไฟล์ในเครื่อง</string>
+    <string name="general_error">มีข้อผิดพลาดเกิดขึ้นเมื่อกำลังดำเนินการ</string>
     <!-- title of the image gallery -->
     <string name="full_screen_image_viewer_label">ดูตัวอย่างภาพ</string>
     <!-- Headline for the amount of storage space is used -->
@@ -1114,7 +1110,7 @@
     <!-- Message to promote PRO accounts -->
     <string name="get_pro_account">ขยับขยายคลาวด์ของคุณ[A]รับพื้นที่เก็บข้อมูลที่เพิ่มขึ้นและโควต้าการถ่ายโอนด้วยบัญชี Pro</string>
     <!-- success message when the MasterKey file has been downloaded -->
-    <string name="toast_master_key">บันทึกคีย์การกู้คืนบัญชี MEGA ไปที่: %1s.[A]คุณสามารถค้นหาไฟล์โดยการใช้คีย์การกู้คืนของคุณที่บันทึกไว้ในส่วนออฟไลน์[A]หมายเหตุ: เมื่อคุณออกจากระบบไฟล์ที่มีคีย์การกู้คืนของคุณจะถูกลบออกด้วยเช่นกัน กรุณาเก็บไฟล์ดังกล่าวนอกเหนือจากในบัญชี MEGA ของคุณไว้ในที่ปลอดภัย</string>
+    <string name="toast_master_key">บันทึกคีย์การกู้คืนบัญชี MEGA ไปที่: %1s [A]คุณสามารถค้นหาไฟล์โดยการใช้คีย์การกู้คืนของคุณที่บันทึกไว้ในส่วนออฟไลน์[/A] หมายเหตุ: เมื่อคุณออกจากระบบไฟล์ที่มีคีย์การกู้คืนของคุณจะถูกลบออกด้วยเช่นกัน กรุณาเก็บไฟล์ดังกล่าวนอกเหนือจากในบัญชี MEGA ของคุณไว้ในที่ปลอดภัย</string>
     <!-- Error shown when the user tries to change his mail to one that is already used -->
     <string name="mail_already_used">อีเมลนี้ได้ถูกใช้งานไปแล้ว กรุณาใช้อีเมลอันอื่น</string>
     <!-- Error shown when the user tries to change his mail while the user has already requested a confirmation link for that email address -->
@@ -1467,7 +1463,7 @@
     <string name="title_message_uploading_options">อัปโหลดเอกสารแนบ</string>
     <!-- message shown when a chat has no messages -->
     <string name="no_conversation_history">ไม่มีประวัติการสนทนา</string>
-    <!-- title of confirmation alert before removing a contact, Plural -->
+    <!-- Text to indicate that one participant is typing or multiple participants are typing at the same time in a chat room. The "%1$s" placeholder is to put the name(s) of the participant(s). The [A][/A] format marks are to put the text in a different color. -->
     <plurals name="user_typing">
         <item quantity="other">%1$s [A]กำลังพิมพ์&#8230;[/A]</item>
     </plurals>
@@ -1876,13 +1872,11 @@
     <string name="title_regitration">โบนัสการลงทะเบียน</string>
     <!-- title of the section for install a mobile app bonuses in achivements section (maximum 24 chars) -->
     <string name="title_install_desktop">รับแอป MEGA เดสก์ทอป</string>
-    <!-- title of the section for base quota in achivements section -->
-    <string name="title_base_quota">โควต้าบัญชีเริ่มต้น</string>
     <!-- Text that indicates that no pictures have been uploaded to the Camera Uploads section -->
     <string name="camera_uploads_empty">ไม่มีไฟล์ในการอัปโหลดจากกล้อง</string>
     <!-- indicates the number of days left related to a achievement -->
     <string name="general_num_days_left">เหลืออีก %1$d วัน</string>
-    <!-- State to indicate something has expired (achivements of business status account for instance) -->
+    <!-- State to indicate an achievement has expired -->
     <string name="expired_label">หมดอายุแล้ว</string>
     <!-- title of the advanced setting to choose the use of https -->
     <string name="setting_title_use_https_only">อย่าใช้ HTTP</string>
@@ -2230,10 +2224,12 @@
     <string name="settings_video_upload_quality">คุณภาพวีดีโอ</string>
     <!-- Text shown when the user refuses to permit the storage permission when enable camera upload -->
     <string name="on_refuse_storage_permission">การอัปโหลดจากกล้องจำเป็นต้องเข้าถึงภาพถ่ายและสื่ออื่น ๆ บนอุปกรณ์ของคุณ กรุณาไปที่หน้าการตั้งค่าและการให้สิทธิ์</string>
-    <!-- the options for the option on setting to set up the quality of multimedia files uploaded to the chat, the options of medium quality multimedia file to  upload. -->
+    <!-- Available options for the setting to set up the quality of multimedia files uploaded to the chat or the Camera Uploads -->
     <string-array name="settings_chat_upload_quality_entries">
-        <item>คุณภาพดั้งเดิม</item>
-        <item>คุณภาพปานกลาง</item>
+        <item>ต่ำ</item>
+        <item>ปานกลาง</item>
+        <item>สูง</item>
+        <item>ต้นฉบับ</item>
     </string-array>
     <!-- Title of the notification for a missed call -->
     <string name="missed_call_notification_title">สายที่ไม่ได้รับ</string>
@@ -2523,10 +2519,6 @@
     <string name="context_no_restored">พบข้อผิดพลาด ไม่สามารถกู้คืนได้</string>
     <!-- menu item from contact section to send a message to a contact -->
     <string name="context_send_message">ส่งข้อความ</string>
-    <!-- Message shown when a contact is successfully sent to several chats, more contacts -->
-    <plurals name="plural_contact_sent_to_chats">
-        <item quantity="other">ผู้ติดต่อส่งถึงแชทสำเร็จแล้ว</item>
-    </plurals>
     <!-- Error message on opening a MEGAdrop folder link -->
     <string name="error_MEGAdrop_not_supported">โฟลเดอร์ MEGAdrop ยังไม่ได้รับการสนับสนุน</string>
     <!-- Pre overquota error dialog when trying to copy or import a file -->
@@ -3384,7 +3376,7 @@
     <!-- Text informing user that their account has been suspended -->
     <string name="account_temporarily_suspended">บัญชีถูกล็อกชั่วคราวเพื่อความปลอดภัยของคุณ</string>
     <!-- Text informing user has to follow the steps of an email to unlock their account -->
-    <string name="verify_email_and_follow_steps">[A]กรุณาตรวจสอบอีเมล[/A]และทำตามขั้นตอนในอีเมลของ MEGA เพื่อปลดล็อกบัญชีของคุณ</string>
+    <string name="verify_email_and_follow_steps">กรุณาทำตามขั้นตอนใน[A]อีเมลยืนยัน[/A]เพื่อปลดล็อกบัญชีของคุณ</string>
     <!-- Question which takes the user to a help screen -->
     <string name="why_am_i_seeing_this">ทำไมฉันเห็นสิ่งนี้</string>
     <!-- Label of a button which action is resend an email -->
@@ -3493,7 +3485,7 @@
     <string name="label_verify_credentials">ตรวจสอบข้อมูลประจำตัว</string>
     <!-- Label to indicate that contact’s credentials are not verified. -->
     <string name="label_not_verified">ไม่ผ่านการตรวจสอบ</string>
-    <!-- Action indicating something was verified. -->
+    <!-- Label indicating the authenticity credentials of a contact have been verified -->
     <string name="label_verified">ตรวจสอบแล้ว</string>
     <!-- ”Verify user” dialog title -->
     <string name="authenticity_credentials_label">ความถูกต้องของข้อมูลประจำตัว</string>
@@ -3574,13 +3566,13 @@
     <!-- Message showing when enable the mode for showing the special information in the chat messages. This action is performed from the settings section, clicking 5 times on the App version option -->
     <string name="show_info_chat_msg_enabled">เปิดใช้งานข้อมูลการดีบักข้อความแชท</string>
     <!-- Message showing when disable the mode for showing the special information in the chat messages.. This action is performed from the settings section, clicking 5 times on the App version option -->
-    <string name="show_info_chat_msg_disabled">ข้อมูลการดีบักข้อความแชทถูกปิดใช้งาน</string>
+    <string name="show_info_chat_msg_disabled">ปิดใช้งานข้อมูลการดีบักข้อความแชท</string>
     <!-- Shows the error when the limit of reactions per user is reached and the user tries to add one more. Keep the placeholder because is to show limit number in runtime. -->
     <string name="limit_reaction_per_user">คุณแสดงความรู้ถึงขีดจำกัดสูงสุด %d ครั้งแล้ว</string>
     <!-- Shows the error when the limit of reactions per message is reached and a user tries to add one more. Keep the placeholder because is to show limit number in runtime. -->
     <string name="limit_reaction_per_message">ข้อความนี้แสดงความรู้สึกถึงขีดจำกัดสูงสุด %d ครั้งแล้ว</string>
     <!-- System message displayed to all chat participants when one of them enables retention history -->
-    <string name="retention_history_changed_by">[A]%1$s[/A][B] เปลี่ยนเวลาล้างข้อความเป็น[/B][A] %2$s[/A][B][/B]</string>
+    <string name="retention_history_changed_by">[A]%1$s[/A][B] เปลี่ยนเวลาล้างข้อความเป็น [/B][A]%2$s[/A][B][/B]</string>
     <!-- Title of the section to clear the chat content in the Manage chat history screen -->
     <string name="title_properties_clear_chat_history">ล้างประวัติการแชท</string>
     <!-- System message that is shown to all chat participants upon disabling the Retention history -->
@@ -3642,7 +3634,7 @@
     <!-- Title indicating the select mode is enabled and ready to select transfers on Transfers section, In progress tab -->
     <string name="title_select_transfers">เลือกการถ่ายโอน</string>
     <!-- Error shown to inform the priority change of a transfer failed. Please don’t remove the place holder, it’s to set the name of the transfer. Example: The priority change of the transfer “video.mp4” failed. -->
-    <string name="change_of_transfer_priority_failed">เปลี่ยนลำดับความสำคัญการถ่ายโอน “%1$s” ไม่สำเร็จ</string>
+    <string name="change_of_transfer_priority_failed">ไม่สามารถเปลี่ยนลำดับความสำคัญการถ่ายโอน “%1$s” ได้</string>
     <!-- Title option to send separated the link and decryption key -->
     <string name="option_send_decryption_key_separately">ส่งคีย์ถอดรหัสลับแยกต่างหาก</string>
     <!-- Explanation option to send separated the link and decryption key -->
@@ -3949,6 +3941,8 @@
     <plurals name="get_links">
         <item quantity="other">รับลิงก์</item>
     </plurals>
+    <!-- Ask for confirmation before clear offline files -->
+    <string name="clear_offline_confirmation">ล้างไฟล์ออฟไลน์ทั้งหมดหรือไม่</string>
     <!-- Banner text when the call is in progress and I'm the only participant. -->
     <string name="banner_alone_on_the_call">มีคุณคนเดียวที่อยู่ที่นี่</string>
     <!-- Item menu option upon right click on meeting. -->
@@ -4083,4 +4077,6 @@
     <string name="meeting_me_text_bracket">%1s [A](ฉัน)[/A]</string>
     <!-- Menu item to change from thumbnail view to main view in meeting-->
     <string name="main_view">มุมมองหลัก</string>
+    <!-- Warning in Offline section alerting all the Offline files will be deleted after logout. -->
+    <string name="offline_warning">การออกจากระบบจะเป็นการลบเนื้อหาออฟไลน์ของคุณออก</string>
 </resources>

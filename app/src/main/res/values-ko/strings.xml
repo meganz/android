@@ -8,8 +8,6 @@
     <string name="prolite_account">Pro Lite</string>
     <!-- Name of the MEGA PDF Viewer. Keep uppercase. -->
     <string name="pdf_app_name">MEGA PDF 뷰어</string>
-    <!-- Showing progress of elements. Example: 2 of 10. -->
-    <string name="general_x_of_x">개째 진행중. 전체:</string>
     <!-- Answer for confirmation dialog. -->
     <string name="general_yes">예</string>
     <!-- Answer for confirmation dialog. -->
@@ -570,8 +568,6 @@
     <string name="number_contact_not_removed">%d개의 연락처가 제거되지 않았습니다</string>
     <!-- success message when sharing a file with multiple contacts -->
     <string name="number_contact_file_shared_correctly">%d개의 연락처와 폴더를 공유하였습니다</string>
-    <!-- error message when sharing a file with multiple contacts -->
-    <string name="number_contact_file_not_shared_">%d개의 연락처와 파일을 공유할 수 없습니다.</string>
     <!-- success message when sharing multiple files -->
     <string name="number_correctly_shared">%d개의 폴더가 잘 공유되었습니다</string>
     <!-- error message when sharing multiple files -->
@@ -649,7 +645,7 @@
     <!-- error message while browsing the local filesystem -->
     <string name="error_io_problem">파일 시스템 문제</string>
     <!-- error message while browsing the local filesystem -->
-    <string name="general_error">로컬 파일을 탐색하던 중 오류 발생</string>
+    <string name="general_error">행동 실행 중 오류가 발생했습니다</string>
     <!-- title of the image gallery -->
     <string name="full_screen_image_viewer_label">이미지 뷰어</string>
     <!-- Headline for the amount of storage space is used -->
@@ -1114,7 +1110,7 @@
     <!-- Message to promote PRO accounts -->
     <string name="get_pro_account">클라우드를 키우세요.[A]Pro 계정으로 증가된 저장소와 전송 할당량을 받으세요.</string>
     <!-- success message when the MasterKey file has been downloaded -->
-    <string name="toast_master_key">MEGA 계정 복구 키는 다음에 저장되었습니다: %1s.[A]오프라인용으로 저장됨 섹션에서 복구 키 파일을 찾을 수 있습니다.[A]참고: 로그아웃 하면 복구 키가 담긴 파일이 삭제되니, MEGA 계정 밖의 안전한 곳에 보관하세요.</string>
+    <string name="toast_master_key">MEGA 계정 복구 키는 다음에 저장되었습니다: %1s.[A]오프라인용으로 저장됨 섹션에서 복구 키 파일을 찾을 수 있습니다.[/A] 참고: 로그아웃 하면 복구 키가 담긴 파일이 삭제되니, MEGA 계정 밖의 안전한 곳에 보관하세요.</string>
     <!-- Error shown when the user tries to change his mail to one that is already used -->
     <string name="mail_already_used">이 이메일 주소는 이미 사용 중입니다. 다른 이메일 주소를 사용하세요.</string>
     <!-- Error shown when the user tries to change his mail while the user has already requested a confirmation link for that email address -->
@@ -1440,7 +1436,7 @@
     <!-- success alert when the user copy some messages to the clipboard -->
     <string name="messages_copied_clipboard">클립보드에 복사됨</string>
     <!-- Title of the error dialog when opening a chat -->
-    <string name="chat_error_open_title">대화 오류!</string>
+    <string name="chat_error_open_title">대화 오류</string>
     <!-- Message of the error dialog when opening a chat -->
     <string name="chat_error_open_message">대화가 올바르게 열리지 않았습니다</string>
     <!-- Menu option to add a contact to your contact list. -->
@@ -1467,7 +1463,7 @@
     <string name="title_message_uploading_options">첨부물 업로드중</string>
     <!-- message shown when a chat has no messages -->
     <string name="no_conversation_history">대화 기록 없음</string>
-    <!-- title of confirmation alert before removing a contact, Plural -->
+    <!-- Text to indicate that one participant is typing or multiple participants are typing at the same time in a chat room. The "%1$s" placeholder is to put the name(s) of the participant(s). The [A][/A] format marks are to put the text in a different color. -->
     <plurals name="user_typing">
         <item quantity="other">%1$s님이 [A]입력중&#8230;[/A]</item>
     </plurals>
@@ -1876,13 +1872,11 @@
     <string name="title_regitration">가입 보너스</string>
     <!-- title of the section for install a mobile app bonuses in achivements section (maximum 24 chars) -->
     <string name="title_install_desktop">MEGA 데스크톱 앱 받기</string>
-    <!-- title of the section for base quota in achivements section -->
-    <string name="title_base_quota">계정 기본 할당량</string>
     <!-- Text that indicates that no pictures have been uploaded to the Camera Uploads section -->
     <string name="camera_uploads_empty">카메라 업로드에 파일 없음</string>
     <!-- indicates the number of days left related to a achievement -->
     <string name="general_num_days_left">%1$d일 남음</string>
-    <!-- State to indicate something has expired (achivements of business status account for instance) -->
+    <!-- State to indicate an achievement has expired -->
     <string name="expired_label">만료됨</string>
     <!-- title of the advanced setting to choose the use of https -->
     <string name="setting_title_use_https_only">HTTP 사용 안함</string>
@@ -2230,10 +2224,12 @@
     <string name="settings_video_upload_quality">동영상 품질</string>
     <!-- Text shown when the user refuses to permit the storage permission when enable camera upload -->
     <string name="on_refuse_storage_permission">카메라 업로드는 당신의 기기의 사진과 다른 미디어에 대한 접근을 필요로 합니다. 설정 페이지에 가서 권한을 부여해주세요.</string>
-    <!-- the options for the option on setting to set up the quality of multimedia files uploaded to the chat, the options of medium quality multimedia file to  upload. -->
+    <!-- Available options for the setting to set up the quality of multimedia files uploaded to the chat or the Camera Uploads -->
     <string-array name="settings_chat_upload_quality_entries">
-        <item>원본 품질</item>
-        <item>중간 품질</item>
+        <item>낮음</item>
+        <item>중간</item>
+        <item>높음</item>
+        <item>원본</item>
     </string-array>
     <!-- Title of the notification for a missed call -->
     <string name="missed_call_notification_title">부재중 전화</string>
@@ -2523,10 +2519,6 @@
     <string name="context_no_restored">오류가 발생하였습니다. 항목이 복원되지 않았습니다.</string>
     <!-- menu item from contact section to send a message to a contact -->
     <string name="context_send_message">메시지 보내기</string>
-    <!-- Message shown when a contact is successfully sent to several chats, more contacts -->
-    <plurals name="plural_contact_sent_to_chats">
-        <item quantity="other">연락처들이 성공적으로 대화에 전송됨</item>
-    </plurals>
     <!-- Error message on opening a MEGAdrop folder link -->
     <string name="error_MEGAdrop_not_supported">MEGAdrop 폴더는 아직 지원되지 않습니다</string>
     <!-- Pre overquota error dialog when trying to copy or import a file -->
@@ -3384,7 +3376,7 @@
     <!-- Text informing user that their account has been suspended -->
     <string name="account_temporarily_suspended">당신의 안전을 위해 계정을 일시적으로 잠갔습니다.</string>
     <!-- Text informing user has to follow the steps of an email to unlock their account -->
-    <string name="verify_email_and_follow_steps">계정을 잠금 해제하려면 [A]이메일을 인증[/A]하고 절차를 수행하세요.</string>
+    <string name="verify_email_and_follow_steps">계정을 잠금 해제하려면 [A]인증 메일[/A]의 절차를 따라주세요.</string>
     <!-- Question which takes the user to a help screen -->
     <string name="why_am_i_seeing_this">이게 왜 보여지나요?</string>
     <!-- Label of a button which action is resend an email -->
@@ -3493,7 +3485,7 @@
     <string name="label_verify_credentials">자격 증명 인증 중</string>
     <!-- Label to indicate that contact’s credentials are not verified. -->
     <string name="label_not_verified">인증되지 않음</string>
-    <!-- Action indicating something was verified. -->
+    <!-- Label indicating the authenticity credentials of a contact have been verified -->
     <string name="label_verified">확인됨</string>
     <!-- ”Verify user” dialog title -->
     <string name="authenticity_credentials_label">진위 증명</string>
@@ -3642,7 +3634,7 @@
     <!-- Title indicating the select mode is enabled and ready to select transfers on Transfers section, In progress tab -->
     <string name="title_select_transfers">전송 선택</string>
     <!-- Error shown to inform the priority change of a transfer failed. Please don’t remove the place holder, it’s to set the name of the transfer. Example: The priority change of the transfer “video.mp4” failed. -->
-    <string name="change_of_transfer_priority_failed">전송 ‘%1$s’의 우선 순위 변경을 실패하였습니다.</string>
+    <string name="change_of_transfer_priority_failed">전송 ”%1$s”의 우선순위를 바꿀 수 없습니다</string>
     <!-- Title option to send separated the link and decryption key -->
     <string name="option_send_decryption_key_separately">복호화 키 따로 보내기</string>
     <!-- Explanation option to send separated the link and decryption key -->
@@ -3949,6 +3941,8 @@
     <plurals name="get_links">
         <item quantity="other">링크 얻기</item>
     </plurals>
+    <!-- Ask for confirmation before clear offline files -->
+    <string name="clear_offline_confirmation">모든 오프라인 파일을 삭제할까요?</string>
     <!-- Banner text when the call is in progress and I'm the only participant. -->
     <string name="banner_alone_on_the_call">현재 혼자 뿐입니다.</string>
     <!-- Item menu option upon right click on meeting. -->
@@ -3970,15 +3964,15 @@
     <!-- General label for microphone -->
     <string name="general_mic">마이크</string>
     <!-- General label for microphone muted -->
-    <string name="general_mic_mute">마이크가 꺼져 있습니다</string>
+    <string name="general_mic_mute">마이크 꺼짐</string>
     <!-- General label for microphone unmuted -->
-    <string name="general_mic_unmute">마이크가 켜져 있습니다</string>
+    <string name="general_mic_unmute">마이크 켜짐</string>
     <!-- General label for camera -->
     <string name="general_camera">카메라</string>
     <!-- General label for camera enable -->
-    <string name="general_camera_enable">카메라가 켜져 있습니다.</string>
+    <string name="general_camera_enable">카메라 켜짐</string>
     <!-- General label for camera disable -->
-    <string name="general_camera_disable">카메라가 꺼져 있습니다.</string>
+    <string name="general_camera_disable">카메라 꺼짐</string>
     <!-- Label for hold meeting -->
     <string name="meeting_hold">보류</string>
     <!-- General label for speaker -->
@@ -3986,11 +3980,11 @@
     <!-- General label for headphone-->
     <string name="general_headphone">헤드폰</string>
     <!-- General label for headphone on-->
-    <string name="general_headphone_on">헤드폰이 활성화 되었습니다</string>
+    <string name="general_headphone_on">헤드폰 켜짐</string>
     <!-- General label for speaker on-->
-    <string name="general_speaker_on">스피커가 켜져 있습니다</string>
+    <string name="general_speaker_on">스피커 켜짐</string>
     <!-- General label for speaker off-->
-    <string name="general_speaker_off">스피커가 꺼져 있습니다</string>
+    <string name="general_speaker_off">스피커 꺼짐</string>
     <!-- Label for end meeting-->
     <string name="meeting_end">종료</string>
     <!-- Invite contacts as participants of the meeting-->
@@ -4048,7 +4042,7 @@
     <!-- the content of tips when the user uses the meeting first time-->
     <string name="tip_invite_more_participants">회의에 더 많은 참가자를 초대합니다. 초대하려면 위로 올리세요.</string>
     <!-- the content of tips when the user enters recent chat page first time-->
-    <string name="tip_create_meeting">새 회의를 만들려면 탭 하세요</string>
+    <string name="tip_create_meeting">새 회의를 만들려면 탭하세요</string>
     <!-- the content of tips when the user enters start conversation page first time-->
     <string name="tip_setup_meeting">우리의 새 암호화 회의 기능으로 MEGA 회의를 빠르게 설정하세요</string>
     <!-- the content of snack bar when the user be the new moderator-->
@@ -4083,4 +4077,6 @@
     <string name="meeting_me_text_bracket">%1s [A](나)[/A]</string>
     <!-- Menu item to change from thumbnail view to main view in meeting-->
     <string name="main_view">메인 보기</string>
+    <!-- Warning in Offline section alerting all the Offline files will be deleted after logout. -->
+    <string name="offline_warning">로그아웃 하면 오프라인 항목이 삭제됩니다.</string>
 </resources>

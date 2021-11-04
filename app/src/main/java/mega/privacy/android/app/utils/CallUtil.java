@@ -8,7 +8,6 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.SystemClock;
@@ -19,7 +18,6 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.preference.PreferenceManager;
 
@@ -87,8 +85,7 @@ public class CallUtil {
      * @param link        Meeting's link
      */
     public static void openMeetingToJoin(Context context, long chatId, String meetingName, String link, long publicChatHandle, boolean isRejoin) {
-        logDebug("Open join a meeting screen:: chatId = "+chatId);
-        MegaApplication.getPasscodeManagement().setShowPasscodeScreen(false);
+        logDebug("Open join a meeting screen. Chat id is " + chatId);
         MegaApplication.getChatManagement().setOpeningMeetingLink(chatId, true);
         Intent meetingIntent = new Intent(context, MeetingActivity.class);
         if (isRejoin) {
@@ -110,8 +107,7 @@ public class CallUtil {
      * @param chatId      chat ID
      */
     public static void openMeetingToStart(Context context, long chatId) {
-        logDebug("Open join a meeting screen");
-        MegaApplication.getPasscodeManagement().setShowPasscodeScreen(false);
+        logDebug("Open a call in progress. Chat id is " + chatId);
         Intent meetingIntent = new Intent(context, MeetingActivity.class);
         meetingIntent.setAction(MEETING_ACTION_START);
         meetingIntent.putExtra(MEETING_CHAT_ID, chatId);
@@ -125,8 +121,7 @@ public class CallUtil {
      * @param chatId  chat ID
      */
     public static void openMeetingRinging(Context context, long chatId) {
-        logDebug("Open incoming call screen");
-        MegaApplication.getPasscodeManagement().setShowPasscodeScreen(false);
+        logDebug("Open incoming call screen. Chat id is " + chatId);
         MegaApplication.getInstance().openCallService(chatId);
         Intent meetingIntent = new Intent(context, MeetingActivity.class);
         meetingIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
@@ -142,8 +137,7 @@ public class CallUtil {
      * @param chatId  chat ID
      */
     public static void openMeetingInProgress(Context context, long chatId, boolean isNewTask) {
-        logDebug("Open in progress call screen");
-        MegaApplication.getPasscodeManagement().setShowPasscodeScreen(false);
+        logDebug("Open in progress call screen. Chat id is " + chatId);
         if (isNewTask) {
             MegaApplication.getInstance().openCallService(chatId);
         }
@@ -169,8 +163,7 @@ public class CallUtil {
      * @param isVideoEnable it the video is ON
      */
     public static void openMeetingWithAudioOrVideo(Context context, long chatId, boolean isAudioEnable, boolean isVideoEnable) {
-        logDebug("Open call with audio or video");
-        MegaApplication.getPasscodeManagement().setShowPasscodeScreen(false);
+        logDebug("Open call with audio or video. Chat id is " + chatId);
         MegaApplication.getInstance().openCallService(chatId);
         Intent meetingIntent = new Intent(context, MeetingActivity.class);
         meetingIntent.setAction(MEETING_ACTION_IN);
@@ -190,8 +183,7 @@ public class CallUtil {
      * @param link        Meeting's link
      */
     public static void openMeetingGuestMode(Context context, String meetingName, long chatId, String link) {
-        logDebug("Open meeting in guest mode");
-        MegaApplication.getPasscodeManagement().setShowPasscodeScreen(false);
+        logDebug("Open meeting in guest mode. Chat id is " + chatId);
         MegaApplication.getChatManagement().setOpeningMeetingLink(chatId, true);
         MegaApplication.getInstance().setIsLoggingRunning(true);
 
@@ -666,6 +658,54 @@ public class CallUtil {
                 return "SESSION_STATUS_DESTROYED";
             default:
                 return String.valueOf(status);
+        }
+    }
+
+    /**
+     * Method for showing the appropriate string depending on the value of termination code for the call
+     *
+     * @param termCode The termination code
+     * @return The appropriate string
+     */
+    public static String terminationCodeForCallToString(int termCode) {
+        switch (termCode) {
+            case MegaChatCall.TERM_CODE_INVALID:
+                return "TERM_CODE_INVALID";
+            case MegaChatCall.TERM_CODE_HANGUP:
+                return "TERM_CODE_HANGUP";
+            case MegaChatCall.TERM_CODE_TOO_MANY_PARTICIPANTS:
+                return "TERM_CODE_TOO_MANY_PARTICIPANTS";
+            case MegaChatCall.TERM_CODE_ERROR:
+                return "TERM_CODE_ERROR";
+            case MegaChatCall.TERM_CODE_REJECT:
+                return "TERM_CODE_REJECT";
+            default:
+                return String.valueOf(termCode);
+        }
+    }
+
+    /**
+     * Method for showing the appropriate string depending on the value of end call reason
+     *
+     * @param endCallReason The end call reason
+     * @return The appropriate string
+     */
+    public static String endCallReasonToString(int endCallReason) {
+        switch (endCallReason) {
+            case MegaChatCall.END_CALL_REASON_INVALID:
+                return "END_CALL_REASON_INVALID";
+            case MegaChatCall.END_CALL_REASON_ENDED:
+                return "END_CALL_REASON_ENDED";
+            case MegaChatCall.END_CALL_REASON_REJECTED:
+                return "END_CALL_REASON_REJECTED";
+            case MegaChatCall.END_CALL_REASON_NO_ANSWER:
+                return "END_CALL_REASON_NO_ANSWER";
+            case MegaChatCall.END_CALL_REASON_FAILED:
+                return "END_CALL_REASON_FAILED";
+            case MegaChatCall.END_CALL_REASON_CANCELLED:
+                return "END_CALL_REASON_CANCELLED";
+            default:
+                return String.valueOf(endCallReason);
         }
     }
 

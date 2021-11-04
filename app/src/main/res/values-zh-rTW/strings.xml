@@ -8,8 +8,6 @@
     <string name="prolite_account">Pro Lite</string>
     <!-- Name of the MEGA PDF Viewer. Keep uppercase. -->
     <string name="pdf_app_name">MEGA PDF檢視器</string>
-    <!-- Showing progress of elements. Example: 2 of 10. -->
-    <string name="general_x_of_x">之</string>
     <!-- Answer for confirmation dialog. -->
     <string name="general_yes">是</string>
     <!-- Answer for confirmation dialog. -->
@@ -570,8 +568,6 @@
     <string name="number_contact_not_removed">未能移除%d個聯絡人</string>
     <!-- success message when sharing a file with multiple contacts -->
     <string name="number_contact_file_shared_correctly">已成功與%d聯絡人共享資料夾</string>
-    <!-- error message when sharing a file with multiple contacts -->
-    <string name="number_contact_file_not_shared_">未能共享檔案給%d個聯絡人</string>
     <!-- success message when sharing multiple files -->
     <string name="number_correctly_shared">已成功共享%d個資料夾</string>
     <!-- error message when sharing multiple files -->
@@ -649,7 +645,7 @@
     <!-- error message while browsing the local filesystem -->
     <string name="error_io_problem">檔案系統問題</string>
     <!-- error message while browsing the local filesystem -->
-    <string name="general_error">瀏覽本機檔案時發生錯誤。</string>
+    <string name="general_error">執行操作時發生錯誤</string>
     <!-- title of the image gallery -->
     <string name="full_screen_image_viewer_label">圖片檢視器</string>
     <!-- Headline for the amount of storage space is used -->
@@ -1114,7 +1110,7 @@
     <!-- Message to promote PRO accounts -->
     <string name="get_pro_account">加大您的雲端空間。[A]訂閱Pro方案帳戶以獲得更大儲存空間和傳輸配額。</string>
     <!-- success message when the MasterKey file has been downloaded -->
-    <string name="toast_master_key">MEGA帳戶還原金鑰已儲存到：%1s。[A]您可以在儲存為離線存取區中找到包含您的還原金鑰的檔案。[A]注意：當您登出時，包含您還原金鑰的檔案將被刪除，因此請將它保存至您帳戶之外的安全地方。</string>
+    <string name="toast_master_key">MEGA帳戶還原金鑰已儲存到：%1s。[A]您可以在儲存為離線存取區中找到您的還原金鑰檔案。[/A]注意：當您登出時，您的還原金鑰檔案將被刪除，因此請將它保存至您帳戶以外的安全地方。</string>
     <!-- Error shown when the user tries to change his mail to one that is already used -->
     <string name="mail_already_used">這個電子郵件地址已被使用。請改用其它電子郵件地址。</string>
     <!-- Error shown when the user tries to change his mail while the user has already requested a confirmation link for that email address -->
@@ -1467,7 +1463,7 @@
     <string name="title_message_uploading_options">上傳附件</string>
     <!-- message shown when a chat has no messages -->
     <string name="no_conversation_history">沒有對話記錄</string>
-    <!-- title of confirmation alert before removing a contact, Plural -->
+    <!-- Text to indicate that one participant is typing or multiple participants are typing at the same time in a chat room. The "%1$s" placeholder is to put the name(s) of the participant(s). The [A][/A] format marks are to put the text in a different color. -->
     <plurals name="user_typing">
         <item quantity="other">%1$s [A]正在打字&#8230;[/A]</item>
     </plurals>
@@ -1876,13 +1872,11 @@
     <string name="title_regitration">註冊獎勵</string>
     <!-- title of the section for install a mobile app bonuses in achivements section (maximum 24 chars) -->
     <string name="title_install_desktop">安裝MEGA桌面應用程式</string>
-    <!-- title of the section for base quota in achivements section -->
-    <string name="title_base_quota">帳戶基本配額</string>
     <!-- Text that indicates that no pictures have been uploaded to the Camera Uploads section -->
     <string name="camera_uploads_empty">相機上傳中沒有檔案</string>
     <!-- indicates the number of days left related to a achievement -->
     <string name="general_num_days_left">還剩%1$d天</string>
-    <!-- State to indicate something has expired (achivements of business status account for instance) -->
+    <!-- State to indicate an achievement has expired -->
     <string name="expired_label">過期</string>
     <!-- title of the advanced setting to choose the use of https -->
     <string name="setting_title_use_https_only">不使用HTTP</string>
@@ -2230,10 +2224,12 @@
     <string name="settings_video_upload_quality">影片品質</string>
     <!-- Text shown when the user refuses to permit the storage permission when enable camera upload -->
     <string name="on_refuse_storage_permission">相機上傳需存取您裝置裡的相片與其他媒體內容，請到設定頁面並且允許其權限。</string>
-    <!-- the options for the option on setting to set up the quality of multimedia files uploaded to the chat, the options of medium quality multimedia file to  upload. -->
+    <!-- Available options for the setting to set up the quality of multimedia files uploaded to the chat or the Camera Uploads -->
     <string-array name="settings_chat_upload_quality_entries">
-        <item>原始品質</item>
-        <item>中等品質</item>
+        <item>低</item>
+        <item>普通</item>
+        <item>高</item>
+        <item>原始的</item>
     </string-array>
     <!-- Title of the notification for a missed call -->
     <string name="missed_call_notification_title">未接來電</string>
@@ -2523,10 +2519,6 @@
     <string name="context_no_restored">發生錯誤。項目無法還原。</string>
     <!-- menu item from contact section to send a message to a contact -->
     <string name="context_send_message">發送訊息</string>
-    <!-- Message shown when a contact is successfully sent to several chats, more contacts -->
-    <plurals name="plural_contact_sent_to_chats">
-        <item quantity="other">聯絡人資料已成功發送到對話室中</item>
-    </plurals>
     <!-- Error message on opening a MEGAdrop folder link -->
     <string name="error_MEGAdrop_not_supported">尚不支援MEGAdrop資料夾</string>
     <!-- Pre overquota error dialog when trying to copy or import a file -->
@@ -3384,7 +3376,7 @@
     <!-- Text informing user that their account has been suspended -->
     <string name="account_temporarily_suspended">為了安全起見，您的帳戶已暫時被封鎖。</string>
     <!-- Text informing user has to follow the steps of an email to unlock their account -->
-    <string name="verify_email_and_follow_steps">[A]請驗證您的電子郵件[/A]，並按照MEGA信件裡的步驟解鎖您的帳戶。</string>
+    <string name="verify_email_and_follow_steps">請按照[A]驗證電子郵件[/A]中的步驟解鎖您的帳戶。</string>
     <!-- Question which takes the user to a help screen -->
     <string name="why_am_i_seeing_this">為什麼我會看到這個？</string>
     <!-- Label of a button which action is resend an email -->
@@ -3493,7 +3485,7 @@
     <string name="label_verify_credentials">驗證憑證</string>
     <!-- Label to indicate that contact’s credentials are not verified. -->
     <string name="label_not_verified">未驗證</string>
-    <!-- Action indicating something was verified. -->
+    <!-- Label indicating the authenticity credentials of a contact have been verified -->
     <string name="label_verified">已驗證</string>
     <!-- ”Verify user” dialog title -->
     <string name="authenticity_credentials_label">授權認證</string>
@@ -3642,7 +3634,7 @@
     <!-- Title indicating the select mode is enabled and ready to select transfers on Transfers section, In progress tab -->
     <string name="title_select_transfers">選擇傳輸</string>
     <!-- Error shown to inform the priority change of a transfer failed. Please don’t remove the place holder, it’s to set the name of the transfer. Example: The priority change of the transfer “video.mp4” failed. -->
-    <string name="change_of_transfer_priority_failed">傳輸 “%1$s” 的優先變更失敗。</string>
+    <string name="change_of_transfer_priority_failed">無法更改傳輸”%1$s”的優先順序</string>
     <!-- Title option to send separated the link and decryption key -->
     <string name="option_send_decryption_key_separately">各別發送解密金鑰</string>
     <!-- Explanation option to send separated the link and decryption key -->
@@ -3949,6 +3941,8 @@
     <plurals name="get_links">
         <item quantity="other">取得連結</item>
     </plurals>
+    <!-- Ask for confirmation before clear offline files -->
+    <string name="clear_offline_confirmation">清除所有離線存取檔案？</string>
     <!-- Banner text when the call is in progress and I'm the only participant. -->
     <string name="banner_alone_on_the_call">這裡只有你一人</string>
     <!-- Item menu option upon right click on meeting. -->
@@ -3972,7 +3966,7 @@
     <!-- General label for microphone muted -->
     <string name="general_mic_mute">您的麥克風已靜音</string>
     <!-- General label for microphone unmuted -->
-    <string name="general_mic_unmute">您的麥克風已靜音</string>
+    <string name="general_mic_unmute">您的麥克風已取消靜音</string>
     <!-- General label for camera -->
     <string name="general_camera">相機</string>
     <!-- General label for camera enable -->
@@ -3980,7 +3974,7 @@
     <!-- General label for camera disable -->
     <string name="general_camera_disable">您的相機己關閉。</string>
     <!-- Label for hold meeting -->
-    <string name="meeting_hold">等待</string>
+    <string name="meeting_hold">保留</string>
     <!-- General label for speaker -->
     <string name="general_speaker">喇叭</string>
     <!-- General label for headphone-->
@@ -4002,7 +3996,7 @@
     <!-- Make the participant as moderator in the meeting-->
     <string name="make_moderator">設為主持人</string>
     <!-- The title of dialog for end meeting confirmation-->
-    <string name="title_end_meeting">現在要離開會議嗎？</string>
+    <string name="title_end_meeting">現在離開會議嗎？</string>
     <!-- no moderator when the moderator leave meeting-->
     <string name="no_moderator">沒有主持人</string>
     <!-- assign moderator message when the moderator leave meeting-->
@@ -4012,7 +4006,7 @@
     <!-- leave anyway option when the moderator leave meeting-->
     <string name="leave_anyway">無論如何還是離開</string>
     <!-- The message alert user to pick new moderator on assign moderator page-->
-    <string name="pick_new_moderator_message">請指定一個或多個為新的主持人。</string>
+    <string name="pick_new_moderator_message">請指定一位或多位新的主持人。</string>
     <!-- The title of dialog for changing meeting name-->
     <string name="change_meeting_name">更改會議名稱</string>
     <!-- The number of participants in the meeting on meeting info page-->
@@ -4022,13 +4016,13 @@
     <!-- The literal meeting link text-->
     <string name="meeting_link">會議連結</string>
     <!-- Subtitle of the meeting screen-->
-    <string name="duration_meeting">持續時間</string>
+    <string name="duration_meeting">通話時間</string>
     <!-- The question in on-boarding screen asking if the user is going to join meeting as guest-->
     <string name="join_meeting_as_guest">以訪客身份加入</string>
     <!-- The title of the paste meeting link dialog for guest-->
     <string name="paste_meeting_link_guest_dialog_title">您受邀參加會議。</string>
     <!-- Tell the guest to paste the meeting link in the edit box-->
-    <string name="paste_meeting_link_guest_instruction">點擊發送給您的會議連結或將它貼上在此</string>
+    <string name="paste_meeting_link_guest_instruction">點擊發送給您的會議連結或將它貼上此處</string>
     <!-- Banner text to indicate poor network quality-->
     <string name="slow_connection_meeting">連線品質不良</string>
     <!-- the message in the alert dialog for notifying the meeting has ended-->
@@ -4042,13 +4036,13 @@
     <!-- Button to confirm the action of restarting one transfer-->
     <string name="button_permission_info">知道了</string>
     <!-- Warning show to the user when the app needs permissions to get the best meeting experience and the user has denied them.-->
-    <string name="meeting_required_permissions_warning">請至設定並允許MEGA存取您的相機與麥克風權限。</string>
+    <string name="meeting_required_permissions_warning">請至設定來允許MEGA存取您的相機與麥克風權限。</string>
     <!-- The button text in the meeting ended alert dialog. Click the button to open the group chat screen of the meeting-->
     <string name="view_meeting_chat">檢視會議對話</string>
     <!-- the content of tips when the user uses the meeting first time-->
     <string name="tip_invite_more_participants">邀請更多與會者加入會議。向上滑動可邀請。</string>
     <!-- the content of tips when the user enters recent chat page first time-->
-    <string name="tip_create_meeting">點擊發起新會議</string>
+    <string name="tip_create_meeting">點擊建立一場新會議</string>
     <!-- the content of tips when the user enters start conversation page first time-->
     <string name="tip_setup_meeting">使用我們新的加密會議功能快速發起MEGA會議</string>
     <!-- the content of snack bar when the user be the new moderator-->
@@ -4056,7 +4050,7 @@
     <!-- the content of snack bar when copied meeting link-->
     <string name="copied_meeting_link">複製會議連結。</string>
     <!-- Title of the layout to join a meeting from the chat screen. The placeholder indicates the user who initiated the meeting -->
-    <string name="join_meeting_layout_in_group_call">%s發起新會議。點擊加入。</string>
+    <string name="join_meeting_layout_in_group_call">%s發起一場會議。點擊加入。</string>
     <!-- Title of fifth tour screen -->
     <string name="title_tour_five">MEGA會議</string>
     <!-- Content of fourth tour screen -->
@@ -4066,7 +4060,7 @@
     <!-- Guest leave call-->
     <string name="more_than_meeting">不僅僅是會議</string>
     <!-- the title of join without account on left meeting page-->
-    <string name="left_meeting_join_title">您的隱私很重要</string>
+    <string name="left_meeting_join_title">您的隱私非常重要</string>
     <!-- the content of join without account on left meeting page-->
     <string name="left_meeting_join_content">加入世界上最大的安全雲端空間與協作平台。</string>
     <!-- the bonus title of join without account on left meeting page-->
@@ -4074,13 +4068,15 @@
     <!-- the bonus content of join without account on left meeting page-->
     <string name="left_meeting_bonus_content">立即註冊並免費享有進階的協作功能。</string>
     <!-- Content of ongoing call for MaterialAlertDialog-->
-    <string name="ongoing_call_content">另一個通話正在進行中。請先結束目前通話，才能撥打另一通。</string>
+    <string name="ongoing_call_content">另一個通話正在進行中。請先結束目前通話才能撥打另一通。</string>
     <!-- The hint text when changing meeting name-->
     <string name="new_meeting_name">沒有會議名稱</string>
     <!-- The content of dialog when failed for creating meeting-->
-    <string name="meeting_is_failed_content">發起會議失敗。</string>
+    <string name="meeting_is_failed_content">建立會議失敗。</string>
     <!-- Word next to own user’s name on participant list -->
     <string name="meeting_me_text_bracket">%1s[A]（我）[/A]</string>
     <!-- Menu item to change from thumbnail view to main view in meeting-->
     <string name="main_view">主視圖檢視</string>
+    <!-- Warning in Offline section alerting all the Offline files will be deleted after logout. -->
+    <string name="offline_warning">登出會刪除您的離線內容。</string>
 </resources>

@@ -16,7 +16,6 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModel
 import com.jeremyliao.liveeventbus.LiveEventBus
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
 import mega.privacy.android.app.components.twemoji.EmojiTextView
@@ -76,7 +75,7 @@ class InMeetingViewModel @ViewModelInject constructor(
 
     // Chat title
     private val _chatTitle: MutableLiveData<String> =
-        MutableLiveData<String>(inMeetingRepository.getInitialMeetingName())
+        MutableLiveData<String>(" ")
     val chatTitle: LiveData<String> = _chatTitle
 
     // List of participants in the meeting
@@ -901,7 +900,6 @@ class InMeetingViewModel @ViewModelInject constructor(
      * @param list list of participants
      * @param status if it's grid view or speaker view
      */
-    @ExperimentalCoroutinesApi
     fun createCurrentParticipants(list: MegaHandleList?, status: String) {
         list?.let { listParticipants ->
             if (listParticipants.size() > 0) {
@@ -927,7 +925,6 @@ class InMeetingViewModel @ViewModelInject constructor(
      * @param session MegaChatSession of a participant
      * @return the position of the participant
      */
-    @ExperimentalCoroutinesApi
     fun addParticipant(session: MegaChatSession, status: String): Int? {
         createParticipant(session, status)?.let { participantCreated ->
             participants.value?.add(participantCreated)
@@ -946,7 +943,6 @@ class InMeetingViewModel @ViewModelInject constructor(
      * @param session MegaChatSession of a participant
      * @return the position of the participant
      */
-    @ExperimentalCoroutinesApi
     private fun createParticipant(session: MegaChatSession, status: String): Participant? {
         inMeetingRepository.getChatRoom(currentChatId)?.let {
             participants.value?.let { listParticipants ->
@@ -1144,7 +1140,6 @@ class InMeetingViewModel @ViewModelInject constructor(
      * @param status if it's grid view or speaker view
      * @return True, if should be high. False, otherwise
      */
-    @ExperimentalCoroutinesApi
     private fun needHiRes(status: String): Boolean =
         participants.value?.let { status != TYPE_IN_SPEAKER_VIEW } ?: false
 
@@ -1533,7 +1528,6 @@ class InMeetingViewModel @ViewModelInject constructor(
      *
      * @param status if it's Speaker view or Grid view
      */
-    @ExperimentalCoroutinesApi
     fun updateParticipantResolution(status: String) {
         logDebug("Changing the resolution of participants when the UI changes")
         participants.value?.let { listParticipants ->
@@ -1800,7 +1794,7 @@ class InMeetingViewModel @ViewModelInject constructor(
      */
     fun isLinkVisible(): Boolean {
         getCall()?.let {
-            return isChatRoomPublic() && getOwnPrivileges() == MegaChatRoom.PRIV_MODERATOR && it.status == MegaChatCall.CALL_STATUS_IN_PROGRESS
+            return isChatRoomPublic() && getOwnPrivileges() == MegaChatRoom.PRIV_MODERATOR && it.status == CALL_STATUS_IN_PROGRESS
         }
 
         return false

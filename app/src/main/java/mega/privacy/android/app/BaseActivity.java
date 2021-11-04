@@ -1173,12 +1173,12 @@ public class BaseActivity extends AppCompatActivity implements ActivityLauncher,
     }
 
     /**
-     * Checks if should refresh session due to megaApi.
+     * Checks if should refresh session due to megaApi is null.
      *
      * @return True if should refresh session, false otherwise.
      */
-    protected boolean shouldRefreshSessionDueToSDK() {
-        if (megaApi == null || megaApi.getRootNode() == null) {
+    protected boolean shouldRefreshSessionDueToMegaApiIsNull() {
+        if (megaApi == null) {
             logWarning("Refresh session - sdk");
             refreshSession();
             return true;
@@ -1188,15 +1188,49 @@ public class BaseActivity extends AppCompatActivity implements ActivityLauncher,
     }
 
     /**
-     * Checks if should refresh session due to karere.
+     * Checks if should refresh session due to megaApi.
      *
      * @return True if should refresh session, false otherwise.
      */
+    protected boolean shouldRefreshSessionDueToSDK() {
+        if (shouldRefreshSessionDueToMegaApiIsNull()) {
+            return true;
+        }
+
+        if (megaApi.getRootNode() == null) {
+            logWarning("Refresh session - sdk");
+            refreshSession();
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * Checks if should refresh session due to karere or init megaChatAp if the init state is not
+     * the right one.
+     *
+     * @return True if should refresh session or megaChatApi cannot be recovered, false otherwise.
+     */
     protected boolean shouldRefreshSessionDueToKarere() {
-        if (megaChatApi == null || megaChatApi.getInitState() == MegaChatApi.INIT_ERROR) {
+        if (megaChatApi == null) {
             logWarning("Refresh session - karere");
             refreshSession();
             return true;
+        }
+
+        int state = megaChatApi.getInitState();
+        if (state == MegaChatApi.INIT_ERROR || state == MegaChatApi.INIT_NOT_DONE) {
+            logWarning("MegaChatApi state: " + state);
+            UserCredentials credentials = dbH.getCredentials();
+            state = megaChatApi.init(credentials == null ? null : credentials.getSession());
+            logDebug("result of init ---> " + state);
+
+            if (state == MegaChatApi.INIT_ERROR) {
+                // The megaChatApi cannot be recovered, then logout
+                megaChatApi.logout(new ChatLogoutListener(this));
+                return true;
+            }
         }
 
         return false;

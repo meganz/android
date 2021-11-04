@@ -5,19 +5,23 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.os.Bundle;
-import android.text.Html;
 import android.text.Spanned;
 import android.util.DisplayMetrics;
 import android.view.Display;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
+import android.widget.ScrollView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.constraintlayout.widget.ConstraintSet;
+import androidx.core.text.HtmlCompat;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
@@ -33,7 +37,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import kotlin.Pair;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MegaContactAdapter;
 import mega.privacy.android.app.MegaContactDB;
@@ -43,12 +46,10 @@ import mega.privacy.android.app.RecentsItem;
 import mega.privacy.android.app.components.HeaderItemDecoration;
 import mega.privacy.android.app.components.TopSnappedStickyLayoutManager;
 import mega.privacy.android.app.components.scrollBar.FastScroller;
-import mega.privacy.android.app.interfaces.Scrollable;
 import mega.privacy.android.app.lollipop.FullScreenImageViewerLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.PdfViewerActivityLollipop;
 import mega.privacy.android.app.lollipop.adapters.RecentsAdapter;
-import mega.privacy.android.app.utils.ColorUtils;
 import mega.privacy.android.app.utils.StringResourcesUtils;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaNode;
@@ -58,16 +59,22 @@ import nz.mega.sdk.MegaUser;
 
 import static mega.privacy.android.app.components.dragger.DragToExitSupport.observeDragSupportEvents;
 import static mega.privacy.android.app.components.dragger.DragToExitSupport.putThumbnailLocation;
+import static mega.privacy.android.app.constants.EventConstants.EVENT_UPDATE_HIDE_RECENT_ACTIVITY;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.ContactUtil.*;
 import static mega.privacy.android.app.utils.FileUtil.*;
 import static mega.privacy.android.app.utils.MegaApiUtils.*;
 import static mega.privacy.android.app.utils.MegaNodeUtil.manageTextFileIntent;
 import static mega.privacy.android.app.utils.MegaNodeUtil.manageURLNode;
+import static mega.privacy.android.app.utils.SharedPreferenceConstants.HIDE_RECENT_ACTIVITY;
+import static mega.privacy.android.app.utils.SharedPreferenceConstants.USER_INTERFACE_PREFERENCES;
+import static mega.privacy.android.app.utils.TextUtil.formatEmptyScreenText;
 import static mega.privacy.android.app.utils.Util.getMediaIntent;
 
 
-public class RecentsFragment extends Fragment implements StickyHeaderHandler, Scrollable {
+public class RecentsFragment extends Fragment implements StickyHeaderHandler {
+
+    private static final int LANDSCAPE_EMPTY_IMAGE_MARGIN = 60;
 
     private Context context;
     private DisplayMetrics outMetrics;
@@ -80,9 +87,11 @@ public class RecentsFragment extends Fragment implements StickyHeaderHandler, Sc
     private ArrayList<RecentsItem> recentsItems;
     private RecentsAdapter adapter;
 
-    private RelativeLayout emptyLayout;
-    private ImageView emptyImage;
+    private ScrollView emptyLayout;
     private TextView emptyText;
+    private Button showActivityButton;
+    private Spanned emptySpanned;
+    private Spanned activityHiddenSpanned;
 
     private StickyLayoutManager stickyLayoutManager;
     private RecyclerView listView;
@@ -134,36 +143,38 @@ public class RecentsFragment extends Fragment implements StickyHeaderHandler, Sc
 
         emptyLayout = v.findViewById(R.id.empty_state_recents);
 
-        emptyImage = v.findViewById(R.id.empty_image_recents);
+        ImageView emptyImage = v.findViewById(R.id.empty_image_recents);
+
+        ConstraintLayout emptyView = v.findViewById(R.id.empty_layout);
+        ConstraintSet constraintSet = new ConstraintSet();
+        constraintSet.clone(emptyView);
+
+        if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
+            emptyImage.setImageResource(R.drawable.empty_recents_landscape);
+            constraintSet.connect(R.id.empty_image_recents, ConstraintSet.TOP, R.id.parent, ConstraintSet.TOP, LANDSCAPE_EMPTY_IMAGE_MARGIN);
+        } else {
+            emptyImage.setImageResource(R.drawable.empty_recents_portrait);
+            constraintSet.connect(R.id.empty_image_recents, ConstraintSet.TOP, R.id.guideline, ConstraintSet.BOTTOM, 0);
+        }
+
+        constraintSet.applyTo(emptyView);
 
         emptyText = v.findViewById(R.id.empty_text_recents);
 
-        if (context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
-            emptyImage.setImageResource(R.drawable.empty_recents_landscape);
-        } else {
-            emptyImage.setImageResource(R.drawable.empty_recents_portrait);
-        }
+        showActivityButton = v.findViewById(R.id.show_activity_button);
+        showActivityButton.setOnClickListener(v1 -> showRecentActivity());
 
-        String textToShow = StringResourcesUtils.getString(R.string.context_empty_recents);
+        String emptyString = formatEmptyScreenText(requireContext(),
+                StringResourcesUtils.getString(R.string.context_empty_recents));
 
-        try {
-            textToShow = textToShow.replace("[A]","<font color=\'"
-                    + ColorUtils.getColorHexString(context, R.color.grey_900_grey_100)
-                    + "\'>");
-            textToShow = textToShow.replace("[/A]","</font>");
-            textToShow = textToShow.replace("[B]","<font color=\'"
-                    + ColorUtils.getColorHexString(context, R.color.grey_300_grey_600)
-                    + "\'>");
-            textToShow = textToShow.replace("[/B]","</font>");
-        } catch (Exception e) {
-        }
-        Spanned result = null;
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
-            result = Html.fromHtml(textToShow, Html.FROM_HTML_MODE_LEGACY);
-        } else {
-            result = Html.fromHtml(textToShow);
-        }
-        emptyText.setText(result);
+        emptySpanned = HtmlCompat.fromHtml(emptyString, HtmlCompat.FROM_HTML_MODE_LEGACY);
+
+        String activityHiddenString = formatEmptyScreenText(requireContext(),
+                StringResourcesUtils.getString(R.string.recents_activity_hidden));
+
+        activityHiddenSpanned =
+                HtmlCompat.fromHtml(activityHiddenString, HtmlCompat.FROM_HTML_MODE_LEGACY);
+
 
         listView = v.findViewById(R.id.list_view_recents);
         fastScroller = v.findViewById(R.id.fastscroll);
@@ -172,13 +183,7 @@ public class RecentsFragment extends Fragment implements StickyHeaderHandler, Sc
         listView.setLayoutManager(stickyLayoutManager);
         listView.setClipToPadding(false);
         listView.setItemAnimator(new DefaultItemAnimator());
-        listView.addOnScrollListener(new RecyclerView.OnScrollListener() {
-            @Override
-            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
-                super.onScrolled(recyclerView, dx, dy);
-                checkScroll();
-            }
-        });
+
         fillRecentItems(buckets);
         setRecentsView();
         return v;
@@ -188,6 +193,9 @@ public class RecentsFragment extends Fragment implements StickyHeaderHandler, Sc
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         LiveEventBus.get(EVENT_NODES_CHANGE, Boolean.class).observeForever(nodeChangeObserver);
+        LiveEventBus.get(EVENT_UPDATE_HIDE_RECENT_ACTIVITY, Boolean.class)
+                .observe(getViewLifecycleOwner(), this::setRecentsView);
+
         selectedBucketModel = new ViewModelProvider(requireActivity()).get(SelectedBucketViewModel.class);
 
         observeDragSupportEvents(getViewLifecycleOwner(), listView, VIEWER_FROM_RECETS);
@@ -243,10 +251,39 @@ public class RecentsFragment extends Fragment implements StickyHeaderHandler, Sc
     }
 
     private void setRecentsView() {
+        boolean hideRecentActivity = requireContext()
+                .getSharedPreferences(USER_INTERFACE_PREFERENCES, Context.MODE_PRIVATE)
+                .getBoolean(HIDE_RECENT_ACTIVITY, false);
+
+        setRecentsView(hideRecentActivity);
+        ((ManagerActivityLollipop) context).setToolbarTitle();
+    }
+
+    /**
+     * Sets the recent view. Hide it if the setting to hide it is enabled, and shows it if the
+     * setting is disabled.
+     *
+     * @param hideRecentActivity True if the setting to hide the recent activity is enabled,
+     *                           false otherwise.
+     */
+    private void setRecentsView(boolean hideRecentActivity) {
+        if (hideRecentActivity) {
+            hideRecentActivity();
+        } else {
+            showActivity();
+        }
+    }
+
+    /**
+     * Shows the recent activity.
+     */
+    private void showActivity() {
         if (buckets == null || buckets.isEmpty()) {
             emptyLayout.setVisibility(View.VISIBLE);
             listView.setVisibility(View.GONE);
             fastScroller.setVisibility(View.GONE);
+            showActivityButton.setVisibility(View.GONE);
+            emptyText.setText(emptySpanned);
         } else {
             emptyLayout.setVisibility(View.GONE);
             listView.setVisibility(View.VISIBLE);
@@ -257,16 +294,26 @@ public class RecentsFragment extends Fragment implements StickyHeaderHandler, Sc
                 fastScroller.setVisibility(View.VISIBLE);
             }
         }
-        ((ManagerActivityLollipop) context).setToolbarTitle();
-        checkScroll();
     }
 
-    @Override
-    public void checkScroll() {
-        if (listView == null) return;
-        LiveEventBus.get(EVENT_SCROLLING_CHANGE, Pair.class)
-                .post(new Pair<>(this, listView.canScrollVertically(-1)
-                        && listView.getVisibility() == View.VISIBLE));
+    /**
+     * Hides the recent activity.
+     */
+    private void hideRecentActivity() {
+        emptyLayout.setVisibility(View.VISIBLE);
+        listView.setVisibility(View.GONE);
+        fastScroller.setVisibility(View.GONE);
+        showActivityButton.setVisibility(View.VISIBLE);
+        emptyText.setText(activityHiddenSpanned);
+    }
+
+    /**
+     * Disables the setting to hide recent activity and updates the UI by showing it.
+     */
+    private void showRecentActivity() {
+        LiveEventBus.get(EVENT_UPDATE_HIDE_RECENT_ACTIVITY, Boolean.class).post(false);
+        requireContext().getSharedPreferences(USER_INTERFACE_PREFERENCES, Context.MODE_PRIVATE)
+                .edit().putBoolean(HIDE_RECENT_ACTIVITY, false).apply();
     }
 
     public String findUserName(String mail) {

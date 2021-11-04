@@ -451,6 +451,8 @@ public class AppRTCAudioManager {
 
     public void unregisterProximitySensor() {
         if (proximitySensor == null) return;
+
+        logDebug("Stopping proximity sensor");
         proximitySensor.stop();
         proximitySensor = null;
     }

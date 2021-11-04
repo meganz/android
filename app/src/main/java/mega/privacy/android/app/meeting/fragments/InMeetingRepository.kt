@@ -4,7 +4,6 @@ import android.content.Context
 import android.graphics.Bitmap
 import dagger.hilt.android.qualifiers.ApplicationContext
 import mega.privacy.android.app.MegaApplication
-import mega.privacy.android.app.R
 import mega.privacy.android.app.di.MegaApi
 import mega.privacy.android.app.listeners.ChatConnectionListener
 import mega.privacy.android.app.lollipop.controllers.ChatController
@@ -25,17 +24,6 @@ class InMeetingRepository @Inject constructor(
     private val megaChatApi: MegaChatApiAndroid,
     @ApplicationContext private val context: Context
 ) {
-
-    /**
-     * Get the initial name of the meeting created
-     *
-     * @return String meeting's name
-     */
-    fun getInitialMeetingName(): String {
-        return StringResourcesUtils.getString(
-            R.string.type_meeting_name, megaChatApi.myFullname
-        )
-    }
 
     /**
      * Set a title for a chat
@@ -427,12 +415,16 @@ class InMeetingRepository @Inject constructor(
         lastName: String,
         listener: MegaRequestListenerInterface
     ) {
-        val initResult = megaChatApi.init(null)
-
-        if (initResult == INIT_WAITING_NEW_SESSION) {
-            megaApi.createEphemeralAccountPlusPlus(firstName, lastName, listener)
-        } else {
-            logWarning("Init chat failed, result: $initResult")
+        val ret = megaChatApi.initState
+        if (ret == MegaChatApi.INIT_NOT_DONE || ret == MegaChatApi.INIT_ERROR) {
+            logDebug("INIT STATE: $ret")
+            val initResult = megaChatApi.init(null)
+            logDebug("result of init ---> $initResult")
+            if (initResult == INIT_WAITING_NEW_SESSION) {
+                megaApi.createEphemeralAccountPlusPlus(firstName, lastName, listener)
+            } else {
+                logWarning("Init chat failed, result: $initResult")
+            }
         }
     }
 

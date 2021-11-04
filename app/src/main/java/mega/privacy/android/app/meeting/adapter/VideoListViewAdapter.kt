@@ -21,7 +21,7 @@ class VideoListViewAdapter(
     override fun onViewRecycled(holder: VideoMeetingViewHolder) {
         super.onViewRecycled(holder)
 
-        if (holder.adapterPosition == INVALID_POSITION)
+        if (holder.bindingAdapterPosition == INVALID_POSITION)
             return
 
         val manager: RecyclerView.LayoutManager? = listView.layoutManager
@@ -32,7 +32,7 @@ class VideoListViewAdapter(
                 val iterator = currentList.iterator()
                 iterator.forEach { participant ->
                     val position = getParticipantPosition(participant.peerId, participant.clientId)
-                    if (position == holder.adapterPosition) {
+                    if (position == holder.bindingAdapterPosition) {
                         if (position < firstPositionVisible || position > lastPositionVisible) {
                             holder.onRecycle()
                             return@forEach

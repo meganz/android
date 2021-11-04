@@ -55,7 +55,7 @@ public class OnDragTouchListener implements View.OnTouchListener {
         maxLeft = 0;
         maxRight = maxLeft + mParent.getWidth();
 
-        maxTop = 0 + toolbarHeight;
+        maxTop = toolbarHeight;
         maxBottom = (bottomSheetHeight > 0) ? bottomSheetHeight : mParent.getHeight();
     }
 
@@ -112,16 +112,15 @@ public class OnDragTouchListener implements View.OnTouchListener {
             }
             return true;
         } else {
-            switch (event.getAction()) {
-                case MotionEvent.ACTION_DOWN:
-                    if (mOnDragActionListener != null) {
-                        mOnDragActionListener.onDragStart(mView);
-                    }
-                    isDragging = true;
-                    updateBounds();
-                    dX = v.getX() - event.getRawX();
-                    dY = v.getY() - event.getRawY();
-                    return true;
+            if (event.getAction() == MotionEvent.ACTION_DOWN) {
+                if (mOnDragActionListener != null) {
+                    mOnDragActionListener.onDragStart(mView);
+                }
+                isDragging = true;
+                updateBounds();
+                dX = v.getX() - event.getRawX();
+                dY = v.getY() - event.getRawY();
+                return true;
             }
         }
         return false;

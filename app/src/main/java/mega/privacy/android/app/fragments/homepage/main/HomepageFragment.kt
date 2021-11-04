@@ -5,15 +5,13 @@ import android.animation.AnimatorListenerAdapter
 import android.animation.AnimatorSet
 import android.animation.ObjectAnimator
 import android.annotation.SuppressLint
-import android.content.BroadcastReceiver
-import android.content.Context
-import android.content.Intent
-import android.content.IntentFilter
+import android.content.*
 import android.graphics.Color
 import android.os.Bundle
 import android.view.*
 import android.view.View.OnClickListener
 import android.view.ViewTreeObserver.OnGlobalLayoutListener
+import androidx.appcompat.app.AlertDialog
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
@@ -21,6 +19,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.viewpager2.widget.ViewPager2
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
@@ -30,27 +29,27 @@ import com.zhpan.bannerview.constants.IndicatorGravity
 import com.zhpan.bannerview.utils.BannerUtils
 import com.zhpan.indicator.enums.IndicatorStyle
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.android.synthetic.main.fragment_homepage.*
-import kotlinx.android.synthetic.main.fragment_homepage.view.*
-import kotlinx.android.synthetic.main.homepage_bottom_sheet.view.*
-import kotlinx.android.synthetic.main.homepage_fabs.view.*
 import mega.privacy.android.app.R
 import mega.privacy.android.app.components.search.FloatingSearchView
 import mega.privacy.android.app.constants.BroadcastConstants.ACTION_TYPE
 import mega.privacy.android.app.databinding.FabMaskLayoutBinding
 import mega.privacy.android.app.databinding.FragmentHomepageBinding
-import mega.privacy.android.app.interfaces.Scrollable
 import mega.privacy.android.app.fragments.homepage.banner.BannerAdapter
 import mega.privacy.android.app.fragments.homepage.banner.BannerClickHandler
+import mega.privacy.android.app.fragments.settingsFragments.startSceen.util.StartScreenUtil.notAlertAnymoreAboutStartScreen
+import mega.privacy.android.app.fragments.settingsFragments.startSceen.util.StartScreenUtil.shouldShowStartScreenDialog
 import mega.privacy.android.app.lollipop.AddContactActivityLollipop
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop
+import mega.privacy.android.app.utils.AlertDialogUtil.isAlertDialogShown
 import mega.privacy.android.app.utils.ColorUtils
 import mega.privacy.android.app.utils.ColorUtils.getThemeColor
 import mega.privacy.android.app.utils.Constants.*
 import mega.privacy.android.app.utils.RunOnUIThreadUtils.post
 import mega.privacy.android.app.utils.RunOnUIThreadUtils.runDelay
+import mega.privacy.android.app.utils.StringResourcesUtils
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.Util.isOnline
+import mega.privacy.android.app.utils.callManager
 import nz.mega.sdk.MegaBanner
 import nz.mega.sdk.MegaChatApi
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
@@ -58,6 +57,22 @@ import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
 
 @AndroidEntryPoint
 class HomepageFragment : Fragment() {
+
+    companion object {
+        private const val FAB_ANIM_DURATION = 200L
+        private const val FAB_MASK_OUT_DELAY = 200L
+        private const val ALPHA_TRANSPARENT = 0f
+        private const val ALPHA_OPAQUE = 1f
+        private const val FAB_DEFAULT_ANGEL = 0f
+        private const val FAB_ROTATE_ANGEL = 135f
+        private const val SLIDE_OFFSET_CHANGE_BACKGROUND = 0.8f
+        private const val KEY_CONTACT_TYPE = "contactType"
+        private const val KEY_IS_FAB_EXPANDED = "isFabExpanded"
+        const val BOTTOM_SHEET_ELEVATION = 2f    // 2dp, for the overlay opacity is 7%
+        private const val BOTTOM_SHEET_CORNER_SIZE = 8f  // 8dp
+        private const val KEY_IS_BOTTOM_SHEET_EXPANDED = "isBottomSheetExpanded"
+        private const val START_SCREEN_DIALOG_SHOWN = "START_SCREEN_DIALOG_SHOWN"
+    }
 
     private val viewModel: HomePageViewModel by viewModels()
 
@@ -77,7 +92,7 @@ class HomepageFragment : Fragment() {
     private lateinit var fabMaskMain: FloatingActionButton
 
     /** The layout for showing the full screen grey mask at FAB expanded state */
-    private lateinit var fabMaskLayout: View
+    private lateinit var fabMaskLayoutDataBinding: FabMaskLayoutBinding
 
     /** The view pager in the bottom sheet, containing 2 pages: Recents and Offline */
     private lateinit var viewPager: ViewPager2
@@ -92,17 +107,11 @@ class HomepageFragment : Fragment() {
 
     private var windowContent: ViewGroup? = null
 
+    private var startScreenDialog: AlertDialog? = null
+
     private val homepageVisibilityChangeObserver = androidx.lifecycle.Observer<Boolean> {
         if (it) {
             post { setBottomSheetMaxHeight() }
-        }
-    }
-
-    private val fabChangeObserver = androidx.lifecycle.Observer<Boolean> {
-        if (it) {
-            showFabButton()
-        } else {
-            hideFabButton()
         }
     }
 
@@ -148,9 +157,6 @@ class HomepageFragment : Fragment() {
         LiveEventBus.get(EVENT_HOMEPAGE_VISIBILITY, Boolean::class.java)
             .observeForever(homepageVisibilityChangeObserver)
 
-        LiveEventBus.get(EVENT_FAB_CHANGE, Boolean::class.java)
-            .observeForever(fabChangeObserver)
-
         isFabExpanded = savedInstanceState?.getBoolean(KEY_IS_FAB_EXPANDED) ?: false
 
         // Fully expand the BottomSheet if it had been, e.g. rotate screen
@@ -187,6 +193,10 @@ class HomepageFragment : Fragment() {
         requireContext().registerReceiver(
             networkReceiver, IntentFilter(BROADCAST_ACTION_INTENT_CONNECTIVITY_CHANGE)
         )
+
+        if (savedInstanceState?.getBoolean(START_SCREEN_DIALOG_SHOWN, false) == true) {
+            showChooseStartScreenDialog()
+        }
     }
 
     override fun onResume() {
@@ -199,6 +209,12 @@ class HomepageFragment : Fragment() {
         // Retrieve the banners from the server again, for the banners are possibly varied
         // while the app is on the background
         viewModel.getBanners()
+
+        callManager { manager ->
+            if (manager.isInMainHomePage && shouldShowStartScreenDialog(requireContext())) {
+                showChooseStartScreenDialog()
+            }
+        }
     }
 
     override fun onDestroyView() {
@@ -210,8 +226,7 @@ class HomepageFragment : Fragment() {
         LiveEventBus.get(EVENT_HOMEPAGE_VISIBILITY, Boolean::class.java)
             .removeObserver(homepageVisibilityChangeObserver)
 
-        LiveEventBus.get(EVENT_FAB_CHANGE, Boolean::class.java)
-            .removeObserver(fabChangeObserver)
+        startScreenDialog?.dismiss()
     }
 
     /**
@@ -221,8 +236,8 @@ class HomepageFragment : Fragment() {
         if (viewModel.isRootNodeNull()) return
 
         viewPager.isUserInputEnabled = true
-        rootView.category.isVisible = true
-        rootView.banner_view.isVisible = true
+        viewDataBinding.category.root.isVisible = true
+        viewDataBinding.bannerView.isVisible = true
 
         fullyCollapseBottomSheet()
         bottomSheetBehavior.isDraggable = true
@@ -241,8 +256,8 @@ class HomepageFragment : Fragment() {
         // we have to post to end of UI thread.
         post {
             viewPager.setCurrentItem(BottomSheetPagerAdapter.OFFLINE_INDEX, false)
-            rootView.category.isVisible = false
-            rootView.banner_view.isVisible = false
+            viewDataBinding.category.root.isVisible = false
+            viewDataBinding.bannerView.isVisible = false
             fullyExpandBottomSheet()
             bottomSheetBehavior.isDraggable = false
         }
@@ -336,6 +351,7 @@ class HomepageFragment : Fragment() {
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
 
+        outState.putBoolean(START_SCREEN_DIALOG_SHOWN, isAlertDialogShown(startScreenDialog))
         outState.putBoolean(KEY_IS_FAB_EXPANDED, isFabExpanded)
         if (this::bottomSheetBehavior.isInitialized) {
             outState.putBoolean(
@@ -349,13 +365,13 @@ class HomepageFragment : Fragment() {
      * Set up the view pager, tab layout and fragments contained in the Homepage main bottom sheet
      */
     private fun setupBottomSheetUI() {
-        viewPager = rootView.view_pager
+        viewPager = viewDataBinding.homepageBottomSheet.viewPager
         val adapter = BottomSheetPagerAdapter(this)
         // By setting this will make BottomSheetPagerAdapter create all the fragments on initialization.
         viewPager.offscreenPageLimit = adapter.itemCount
         viewPager.adapter = adapter
         // Attach the view pager to the tab layout
-        tabLayout = rootView.tab_layout
+        tabLayout = viewDataBinding.homepageBottomSheet.tabLayout
         val mediator = TabLayoutMediator(tabLayout, viewPager) { tab, position ->
             tab.text = getTabTitle(position)
         }
@@ -371,16 +387,8 @@ class HomepageFragment : Fragment() {
                     // ViewPager2 has fragments tagged as fX (e.g. f0,f1) that X is the page
                     currentSelectedTabFragment?.view
                 )
-
-                (currentSelectedTabFragment as? Scrollable)?.checkScroll()
             }
         })
-
-        viewModel.isScrolling.observe(viewLifecycleOwner) {
-            if (it.first == currentSelectedTabFragment) {
-                changeTabElevation(it.second)
-            }
-        }
 
         setupBottomSheetBackground()
     }
@@ -392,7 +400,7 @@ class HomepageFragment : Fragment() {
         val elevationPx = Util.dp2px(BOTTOM_SHEET_ELEVATION, resources.displayMetrics).toFloat()
         val cornerSizePx = Util.dp2px(BOTTOM_SHEET_CORNER_SIZE, resources.displayMetrics).toFloat()
 
-        viewDataBinding.root.homepage_bottom_sheet.background =
+        viewDataBinding.homepageBottomSheet.root.background =
             ColorUtils.getShapeDrawableForElevation(
                 requireContext(),
                 elevationPx,
@@ -441,7 +449,7 @@ class HomepageFragment : Fragment() {
      */
     private fun setupMask() {
         windowContent = activity?.window?.findViewById(Window.ID_ANDROID_CONTENT)
-        fabMaskLayout = FabMaskLayoutBinding.inflate(layoutInflater, windowContent, false).root
+        fabMaskLayoutDataBinding = FabMaskLayoutBinding.inflate(layoutInflater, windowContent, false)
     }
 
     /**
@@ -480,22 +488,16 @@ class HomepageFragment : Fragment() {
      * Set the initial height of the bottom sheet. The top is just below the banner view.
      */
     private fun setBottomSheetPeekHeight() {
-        rootView.viewTreeObserver.addOnGlobalLayoutListener(object :
-            OnGlobalLayoutListener {
-            override fun onGlobalLayout() {
-                if (category == null) {
-                    return
-                }
-
-                if (bannerViewPager.data.isNotEmpty()) {
-                    bottomSheetBehavior.peekHeight = rootView.height - bannerViewPager.bottom
-                } else {
-                    bottomSheetBehavior.peekHeight = rootView.height - category.bottom
-                }
-
-                setBottomSheetMaxHeight()
+        rootView.viewTreeObserver.addOnGlobalLayoutListener {
+            if (bannerViewPager.data.isNotEmpty()) {
+                bottomSheetBehavior.peekHeight = rootView.height - bannerViewPager.bottom
+            } else {
+                bottomSheetBehavior.peekHeight =
+                    rootView.height - viewDataBinding.category.root.bottom
             }
-        })
+
+            setBottomSheetMaxHeight()
+        }
     }
 
     /**
@@ -550,25 +552,11 @@ class HomepageFragment : Fragment() {
     }
 
     /**
-     * Elevate the tab or not based on the scrolling in Recents/Offline fragments.
-     *
-     *
-     * @param withElevation elevate the tab if true, false otherwise
-     */
-    private fun changeTabElevation(withElevation: Boolean) {
-        tabLayout.elevation = if (withElevation) {
-            Util.dp2px(4f).toFloat()
-        } else {
-            0f
-        }
-    }
-
-    /**
      * Set up the Fab and Fabs in the expanded status
      */
     private fun setupFabs() {
-        fabMain = rootView.fab_home_main
-        fabMaskMain = fabMaskLayout.fab_main
+        fabMain = viewDataBinding.fabHomeMain
+        fabMaskMain = fabMaskLayoutDataBinding.fabsInMask.fabMain
 
         fabMain.setOnClickListener {
             fabMainClickCallback()
@@ -578,32 +566,32 @@ class HomepageFragment : Fragment() {
             fabMainClickCallback()
         }
 
-        fabMaskLayout.setOnClickListener {
+        fabMaskLayoutDataBinding.root.setOnClickListener {
             fabMainClickCallback()
         }
 
-        fabMaskLayout.fab_chat.setOnClickListener {
-            fabMainClickCallback()
-            runDelay(FAB_MASK_OUT_DELAY) {
-                openNewChatActivity()
-            }
-        }
-
-        fabMaskLayout.text_chat.setOnClickListener {
+        fabMaskLayoutDataBinding.fabsInMask.fabChat.setOnClickListener {
             fabMainClickCallback()
             runDelay(FAB_MASK_OUT_DELAY) {
                 openNewChatActivity()
             }
         }
 
-        fabMaskLayout.fab_upload.setOnClickListener {
+        fabMaskLayoutDataBinding.fabsInMask.textChat.setOnClickListener {
+            fabMainClickCallback()
+            runDelay(FAB_MASK_OUT_DELAY) {
+                openNewChatActivity()
+            }
+        }
+
+        fabMaskLayoutDataBinding.fabsInMask.fabUpload.setOnClickListener {
             fabMainClickCallback()
             runDelay(FAB_MASK_OUT_DELAY) {
                 showUploadPanel()
             }
         }
 
-        fabMaskLayout.text_upload.setOnClickListener {
+        fabMaskLayoutDataBinding.fabsInMask.textUpload.setOnClickListener {
             fabMainClickCallback()
             runDelay(FAB_MASK_OUT_DELAY) {
                 showUploadPanel()
@@ -676,10 +664,10 @@ class HomepageFragment : Fragment() {
     fun collapseFab() {
         rotateFab(false)
         showOut(
-            fabMaskLayout.fab_chat,
-            fabMaskLayout.fab_upload,
-            fabMaskLayout.text_chat,
-            fabMaskLayout.text_upload
+            fabMaskLayoutDataBinding.fabsInMask.fabChat,
+            fabMaskLayoutDataBinding.fabsInMask.fabUpload,
+            fabMaskLayoutDataBinding.fabsInMask.textChat,
+            fabMaskLayoutDataBinding.fabsInMask.textUpload
         )
         // After animation completed, then remove mask.
         runDelay(FAB_MASK_OUT_DELAY) {
@@ -696,10 +684,10 @@ class HomepageFragment : Fragment() {
         post {
             rotateFab(true)
             showIn(
-                fabMaskLayout.fab_chat,
-                fabMaskLayout.fab_upload,
-                fabMaskLayout.text_chat,
-                fabMaskLayout.text_upload
+                fabMaskLayoutDataBinding.fabsInMask.fabChat,
+                fabMaskLayoutDataBinding.fabsInMask.fabUpload,
+                fabMaskLayoutDataBinding.fabsInMask.textChat,
+                fabMaskLayoutDataBinding.fabsInMask.textUpload
             )
             isFabExpanded = true
         }
@@ -746,14 +734,14 @@ class HomepageFragment : Fragment() {
      * Showing the full screen mask by adding the mask layout to the window content
      */
     private fun addMask() {
-        windowContent?.addView(fabMaskLayout)
+        windowContent?.addView(fabMaskLayoutDataBinding.root)
     }
 
     /**
      * Removing the full screen mask
      */
     private fun removeMask() {
-        windowContent?.removeView(fabMaskLayout)
+        windowContent?.removeView(fabMaskLayoutDataBinding.root)
     }
 
     /**
@@ -789,7 +777,7 @@ class HomepageFragment : Fragment() {
     /**
      * Hides the fabButton
      */
-    private fun hideFabButton() {
+    fun hideFabButton() {
         fabMain.hide()
         fabMaskMain.hide()
     }
@@ -797,23 +785,27 @@ class HomepageFragment : Fragment() {
     /**
      * Shows the fabButton
      */
-    private fun showFabButton() {
+    fun showFabButton() {
         fabMain.show()
         fabMaskMain.show()
     }
 
-    companion object {
-        private const val FAB_ANIM_DURATION = 200L
-        private const val FAB_MASK_OUT_DELAY = 200L
-        private const val ALPHA_TRANSPARENT = 0f
-        private const val ALPHA_OPAQUE = 1f
-        private const val FAB_DEFAULT_ANGEL = 0f
-        private const val FAB_ROTATE_ANGEL = 135f
-        private const val SLIDE_OFFSET_CHANGE_BACKGROUND = 0.8f
-        private const val KEY_CONTACT_TYPE = "contactType"
-        private const val KEY_IS_FAB_EXPANDED = "isFabExpanded"
-        const val BOTTOM_SHEET_ELEVATION = 2f    // 2dp, for the overlay opacity is 7%
-        private const val BOTTOM_SHEET_CORNER_SIZE = 8f  // 8dp
-        private const val KEY_IS_BOTTOM_SHEET_EXPANDED = "isBottomSheetExpanded"
+    /**
+     * Shows the dialog which informs the start screen can be changed.
+     */
+    private fun showChooseStartScreenDialog() {
+        startScreenDialog = MaterialAlertDialogBuilder(requireContext())
+            .setView(R.layout.dialog_choose_start_screen)
+            .setPositiveButton(StringResourcesUtils.getString(R.string.change_setting_action)) { _, _ ->
+                callManager { manager -> manager.moveToSettingsSectionStartScreen() }
+                notAlertAnymoreAboutStartScreen(requireContext())
+            }
+            .setNegativeButton(StringResourcesUtils.getString(R.string.general_dismiss)) { _, _ ->
+                notAlertAnymoreAboutStartScreen(requireContext())
+            }
+            .show().apply {
+                setCancelable(false)
+                setCanceledOnTouchOutside(false)
+            }
     }
 }

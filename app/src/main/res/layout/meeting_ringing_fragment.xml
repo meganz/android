@@ -41,7 +41,6 @@
             app:layout_constraintHorizontal_bias="0.5"
             app:layout_constraintHorizontal_chainStyle="spread"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/fourth_arrow_call"
             app:pressedTranslationZ="12dp"
             app:tint="@null"
             tools:ignore="ContentDescription" />
@@ -57,49 +56,6 @@
             app:layout_constraintStart_toStartOf="@id/answer_audio_fab"
             app:layout_constraintTop_toBottomOf="@id/answer_audio_fab" />
 
-        <ImageView
-            android:id="@+id/first_arrow_call"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:src="@drawable/ic_expand"
-            app:layout_constraintBottom_toTopOf="@id/second_arrow_call"
-            app:layout_constraintEnd_toEndOf="@id/answer_video_fab"
-            app:layout_constraintStart_toStartOf="@id/answer_video_fab"
-            tools:ignore="ContentDescription" />
-
-        <ImageView
-            android:id="@+id/second_arrow_call"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="15dp"
-            android:src="@drawable/ic_expand"
-            app:layout_constraintBottom_toTopOf="@id/third_arrow_call"
-            app:layout_constraintEnd_toEndOf="@id/answer_video_fab"
-            app:layout_constraintStart_toStartOf="@id/answer_video_fab"
-            tools:ignore="ContentDescription" />
-
-        <ImageView
-            android:id="@+id/third_arrow_call"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="15dp"
-            android:src="@drawable/ic_expand"
-            app:layout_constraintBottom_toTopOf="@id/fourth_arrow_call"
-            app:layout_constraintEnd_toEndOf="@id/answer_video_fab"
-            app:layout_constraintStart_toStartOf="@id/answer_video_fab"
-            tools:ignore="ContentDescription" />
-
-        <ImageView
-            android:id="@+id/fourth_arrow_call"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="15dp"
-            android:src="@drawable/ic_expand"
-            app:layout_constraintBottom_toTopOf="@id/answer_video_fab"
-            app:layout_constraintEnd_toEndOf="@id/answer_video_fab"
-            app:layout_constraintStart_toStartOf="@id/answer_video_fab"
-            tools:ignore="ContentDescription" />
-
         <com.google.android.material.floatingactionbutton.FloatingActionButton
             android:id="@+id/answer_video_fab"
             android:layout_width="@dimen/meeting_bottom_floating_panel_fab_size"
@@ -107,11 +63,11 @@
             android:src="@drawable/ic_videocam_white"
             app:backgroundTint="@color/teal_300"
             app:fabCustomSize="@dimen/meeting_bottom_floating_panel_fab_size"
+            app:layout_constraintBottom_toBottomOf="@id/guideline_bottom"
             app:layout_constraintEnd_toStartOf="@+id/reject_fab"
             app:layout_constraintHorizontal_bias="0.5"
             app:layout_constraintHorizontal_chainStyle="spread"
             app:layout_constraintStart_toEndOf="@id/answer_audio_fab"
-            app:layout_constraintTop_toBottomOf="@id/fourth_arrow_call"
             app:pressedTranslationZ="12dp"
             app:tint="@null"
             tools:ignore="ContentDescription" />
@@ -140,7 +96,6 @@
             app:layout_constraintHorizontal_bias="0.5"
             app:layout_constraintHorizontal_chainStyle="spread"
             app:layout_constraintStart_toEndOf="@id/answer_video_fab"
-            app:layout_constraintTop_toBottomOf="@id/fourth_arrow_call"
             app:pressedTranslationZ="12dp"
             app:tint="@null"
             tools:ignore="ContentDescription" />

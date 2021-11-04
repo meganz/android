@@ -22,7 +22,7 @@ class AssignParticipantViewHolder(
         }
 
         binding.assignLayout.setOnClickListener {
-            select.invoke(adapterPosition)
+            select.invoke(bindingAdapterPosition)
         }
     }
 }

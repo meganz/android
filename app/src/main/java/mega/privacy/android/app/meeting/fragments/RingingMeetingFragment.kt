@@ -8,24 +8,17 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.view.animation.*
-import android.widget.ImageView
 import android.widget.TextView
-import androidx.core.view.isVisible
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import com.jeremyliao.liveeventbus.LiveEventBus
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.android.synthetic.main.activity_meeting.*
-import kotlinx.android.synthetic.main.meeting_ringing_fragment.*
 import mega.privacy.android.app.BaseActivity
 import mega.privacy.android.app.R
-import mega.privacy.android.app.components.OnSwipeTouchListener
 import mega.privacy.android.app.components.twemoji.EmojiTextView
 import mega.privacy.android.app.constants.EventConstants.EVENT_CALL_ANSWERED_IN_ANOTHER_CLIENT
 import mega.privacy.android.app.constants.EventConstants.EVENT_CALL_STATUS_CHANGE
 import mega.privacy.android.app.databinding.MeetingRingingFragmentBinding
-import mega.privacy.android.app.meeting.AnimationTool.clearAnimationAndGone
 import mega.privacy.android.app.meeting.activity.MeetingActivity
 import mega.privacy.android.app.meeting.activity.MeetingActivity.Companion.MEETING_ACTION_RINGING_VIDEO_OFF
 import mega.privacy.android.app.meeting.activity.MeetingActivity.Companion.MEETING_ACTION_RINGING_VIDEO_ON
@@ -40,12 +33,10 @@ import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.Constants.AVATAR_SIZE
 import mega.privacy.android.app.utils.LogUtil.logDebug
 import mega.privacy.android.app.utils.RunOnUIThreadUtils
-import mega.privacy.android.app.utils.RunOnUIThreadUtils.runDelay
 import mega.privacy.android.app.utils.StringResourcesUtils
 import mega.privacy.android.app.utils.permission.permissionsBuilder
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
 import nz.mega.sdk.MegaChatCall
-import nz.mega.sdk.MegaChatError
 import java.util.*
 
 
@@ -82,8 +73,8 @@ class RingingMeetingFragment : MeetingBaseFragment(),
         savedInstanceState: Bundle?
     ): View {
         (requireActivity() as MeetingActivity).let {
-            toolbarTitle = it.title_toolbar
-            toolbarSubtitle = it.subtitle_toolbar
+            toolbarTitle = it.binding.titleToolbar
+            toolbarSubtitle = it.binding.subtitleToolbar
         }
 
         binding = MeetingRingingFragmentBinding.inflate(inflater, container, false)
@@ -104,25 +95,15 @@ class RingingMeetingFragment : MeetingBaseFragment(),
         // Always be 'calling'.
         toolbarSubtitle.text = StringResourcesUtils.getString(R.string.outgoing_call_starting)
 
-        binding.answerVideoFab.startAnimation(
-            AnimationUtils.loadAnimation(
-                meetingActivity,
-                R.anim.shake
-            )
-        )
-        binding.answerAudioFab.setOnClickListener {
+        binding.answerVideoFab.setOnClickListener {
             inMeetingViewModel.checkAnotherCallsInProgress(inMeetingViewModel.currentChatId)
-
-            answerCall(enableVideo = false)
+            answerCall(enableVideo = true)
         }
 
-        binding.answerVideoFab.setOnTouchListener(object : OnSwipeTouchListener(meetingActivity) {
-
-            override fun onSwipeTop() {
-                binding.answerVideoFab.clearAnimation()
-                animationButtons()
-            }
-        })
+        binding.answerAudioFab.setOnClickListener {
+            inMeetingViewModel.checkAnotherCallsInProgress(inMeetingViewModel.currentChatId)
+            answerCall(enableVideo = false)
+        }
 
         binding.rejectFab.setOnClickListener {
             inMeetingViewModel.removeIncomingCallNotification(chatId)
@@ -134,65 +115,6 @@ class RingingMeetingFragment : MeetingBaseFragment(),
             }
             requireActivity().finish()
         }
-
-        animationAlphaArrows(binding.fourthArrowCall)
-        runDelay(ALPHA_ANIMATION_DELAY) {
-            animationAlphaArrows(binding.thirdArrowCall)
-            runDelay(ALPHA_ANIMATION_DELAY) {
-                animationAlphaArrows(binding.secondArrowCall)
-                runDelay(ALPHA_ANIMATION_DELAY) {
-                    animationAlphaArrows(binding.firstArrowCall)
-                }
-            }
-        }
-    }
-
-    /**
-     * Let the button execute fade out animation.
-     * Go up then disappear.
-     */
-    private fun animationButtons() {
-        val translateAnim = TranslateAnimation(0f, 0f, 0f, DELTA_Y).apply {
-            duration = TRANSLATE_DURATION
-            fillAfter = true
-            fillBefore = true
-            repeatCount = 0
-            setAnimationListener(object : Animation.AnimationListener {
-
-                override fun onAnimationStart(animation: Animation) {
-                    binding.rejectFab.isEnabled = false
-                }
-
-                override fun onAnimationRepeat(animation: Animation) {}
-
-                override fun onAnimationEnd(animation: Animation) {
-                    binding.videoLabel.isVisible = false
-                    binding.answerVideoFab.hide()
-                    inMeetingViewModel.checkAnotherCallsInProgress(inMeetingViewModel.currentChatId)
-
-                    answerCall(enableVideo = true)
-                }
-            })
-        }
-
-        val alphaAnim = AlphaAnimation(1.0f, 0.0f).apply {
-            duration = DISAPPEAR_DURATION
-            fillAfter = true
-            fillBefore = true
-            repeatCount = 0
-        }
-
-        //false means don't share interpolator
-        val s = AnimationSet(false)
-        s.addAnimation(translateAnim)
-        s.addAnimation(alphaAnim)
-
-        binding.answerVideoFab.startAnimation(s)
-
-        binding.firstArrowCall.clearAnimationAndGone()
-        binding.secondArrowCall.clearAnimationAndGone()
-        binding.thirdArrowCall.clearAnimationAndGone()
-        binding.fourthArrowCall.clearAnimationAndGone()
     }
 
     /**
@@ -210,22 +132,6 @@ class RingingMeetingFragment : MeetingBaseFragment(),
         }
     }
 
-    /**
-     * Let the arrow icon execute alpha animation. Disappear then appear.
-     *
-     * @param arrow The arrow image view that will execute the animation.
-     */
-    private fun animationAlphaArrows(arrow: ImageView) {
-        logDebug("animationAlphaArrows")
-        val alphaAnimArrows = AlphaAnimation(1.0f, 0.0f).apply {
-            duration = ALPHA_ANIMATION_DURATION
-            fillAfter = true
-            fillBefore = true
-            repeatCount = Animation.INFINITE
-        }
-
-        arrow.startAnimation(alphaAnimArrows)
-    }
 
     /**
      * Initialize ViewModel
@@ -261,7 +167,7 @@ class RingingMeetingFragment : MeetingBaseFragment(),
                 )
             }
 
-            avatar.setImageBitmap(bitmap)
+            binding.avatar.setImageBitmap(bitmap)
         }
 
         LiveEventBus.get(EVENT_CALL_ANSWERED_IN_ANOTHER_CLIENT, Long::class.java)
@@ -343,14 +249,6 @@ class RingingMeetingFragment : MeetingBaseFragment(),
         super.onDestroy()
     }
 
-    companion object {
-        private const val ALPHA_ANIMATION_DURATION = 1000L
-        private const val ALPHA_ANIMATION_DELAY = 250L
-        private const val DELTA_Y = -380f
-        private const val TRANSLATE_DURATION = 500L
-        private const val DISAPPEAR_DURATION = 600L
-    }
-
     override fun onCallAnswered(chatId: Long, flag: Boolean) {
         val actionString = if (flag) {
             logDebug("Call answered with video ON and audio ON")
@@ -370,11 +268,6 @@ class RingingMeetingFragment : MeetingBaseFragment(),
     override fun onErrorAnsweredCall(errorCode: Int) {
         logDebug("Error answering the call")
         inMeetingViewModel.removeIncomingCallNotification(chatId)
-        binding.answerVideoFab.clearAnimation()
-        binding.firstArrowCall.clearAnimationAndGone()
-        binding.secondArrowCall.clearAnimationAndGone()
-        binding.thirdArrowCall.clearAnimationAndGone()
-        binding.fourthArrowCall.clearAnimationAndGone()
         requireActivity().finish()
     }
 }

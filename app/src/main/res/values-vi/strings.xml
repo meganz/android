@@ -8,8 +8,6 @@
     <string name="prolite_account">Pro Lite</string>
     <!-- Name of the MEGA PDF Viewer. Keep uppercase. -->
     <string name="pdf_app_name">MEGA Xem PDF</string>
-    <!-- Showing progress of elements. Example: 2 of 10. -->
-    <string name="general_x_of_x">trong tổng</string>
     <!-- Answer for confirmation dialog. -->
     <string name="general_yes">Có</string>
     <!-- Answer for confirmation dialog. -->
@@ -570,8 +568,6 @@
     <string name="number_contact_not_removed">%d tên liên lạc chưa được xóa</string>
     <!-- success message when sharing a file with multiple contacts -->
     <string name="number_contact_file_shared_correctly">Đã gửi thư mục chia sẻ đến %d tên liên lạc thành công</string>
-    <!-- error message when sharing a file with multiple contacts -->
-    <string name="number_contact_file_not_shared_">File cannot be shared with %d contacts</string>
     <!-- success message when sharing multiple files -->
     <string name="number_correctly_shared">%d thư mục đã được chia sẻ thành công</string>
     <!-- error message when sharing multiple files -->
@@ -649,7 +645,7 @@
     <!-- error message while browsing the local filesystem -->
     <string name="error_io_problem">File system có vấn đề</string>
     <!-- error message while browsing the local filesystem -->
-    <string name="general_error">An error occurred when browsing local files.</string>
+    <string name="general_error">Lỗi phát sinh khi thi hành tác vụ</string>
     <!-- title of the image gallery -->
     <string name="full_screen_image_viewer_label">Trang xem ảnh</string>
     <!-- Headline for the amount of storage space is used -->
@@ -1114,7 +1110,7 @@
     <!-- Message to promote PRO accounts -->
     <string name="get_pro_account">Grow your cloud.[A]Get increased storage and transfer quotas with a Pro account.</string>
     <!-- success message when the MasterKey file has been downloaded -->
-    <string name="toast_master_key">The MEGA account Recovery Key has been saved to: %1s.[A]You can find the file with your Recovery Key in the Saved for Offline section.[A]Note: as the file with your Recovery Key will be deleted when you log out, please store it in a safe place outside your MEGA account.</string>
+    <string name="toast_master_key">The MEGA account Recovery Key has been saved to: %1s. [A]You can find the file with your Recovery Key in the Saved for Offline section.[/A] Note: as the file with your Recovery Key will be deleted when you log out, please store it in a safe place outside your MEGA account.</string>
     <!-- Error shown when the user tries to change his mail to one that is already used -->
     <string name="mail_already_used">This email address is already in use. Please use another email address.</string>
     <!-- Error shown when the user tries to change his mail while the user has already requested a confirmation link for that email address -->
@@ -1467,7 +1463,7 @@
     <string name="title_message_uploading_options">Đăng tải tệp đính kèm</string>
     <!-- message shown when a chat has no messages -->
     <string name="no_conversation_history">Không có lịch sử trò chuyện</string>
-    <!-- title of confirmation alert before removing a contact, Plural -->
+    <!-- Text to indicate that one participant is typing or multiple participants are typing at the same time in a chat room. The "%1$s" placeholder is to put the name(s) of the participant(s). The [A][/A] format marks are to put the text in a different color. -->
     <plurals name="user_typing">
         <item quantity="other">%1$s [A]đang viết tin nhắn&#8230;[/A]</item>
     </plurals>
@@ -1865,7 +1861,7 @@
     <!-- title of the section for unlocked rewards -->
     <string name="unlocked_rewards_title">Phần thưởng đã nhận</string>
     <!-- title of the section for unlocked storage quota -->
-    <string name="unlocked_storage_title">Storage quota</string>
+    <string name="unlocked_storage_title">Mức lưu trữ</string>
     <!-- title of the section for referral bonuses in achivements section (maximum 24 chars) -->
     <string name="title_referral_bonuses">Invitation bonuses</string>
     <!-- Title of the section for install a mobile app in achivements section (maximum 31 chars) -->
@@ -1876,13 +1872,11 @@
     <string name="title_regitration">Thưởng tài khoản mới</string>
     <!-- title of the section for install a mobile app bonuses in achivements section (maximum 24 chars) -->
     <string name="title_install_desktop">Get a MEGA Desktop App</string>
-    <!-- title of the section for base quota in achivements section -->
-    <string name="title_base_quota">Account base quota</string>
     <!-- Text that indicates that no pictures have been uploaded to the Camera Uploads section -->
     <string name="camera_uploads_empty">Không có nội dung nào trong Camera Uploads</string>
     <!-- indicates the number of days left related to a achievement -->
     <string name="general_num_days_left">còn lại %1$d ngày</string>
-    <!-- State to indicate something has expired (achivements of business status account for instance) -->
+    <!-- State to indicate an achievement has expired -->
     <string name="expired_label">Hết</string>
     <!-- title of the advanced setting to choose the use of https -->
     <string name="setting_title_use_https_only">Không dùng HTTP</string>
@@ -2231,10 +2225,12 @@
     <string name="settings_video_upload_quality">Chất Lượng Video</string>
     <!-- Text shown when the user refuses to permit the storage permission when enable camera upload -->
     <string name="on_refuse_storage_permission">Camera Uploads cần quyền truy cập vào hình ảnh và các nội dung đa phương tiện khác trên thiết bị. Xin đi vào phần cài đặt và cấp quyền truy cập cho MEGA.</string>
-    <!-- the options for the option on setting to set up the quality of multimedia files uploaded to the chat, the options of medium quality multimedia file to  upload. -->
+    <!-- Available options for the setting to set up the quality of multimedia files uploaded to the chat or the Camera Uploads -->
     <string-array name="settings_chat_upload_quality_entries">
-        <item>Chất lượng nguyên gốc</item>
-        <item>Chất lượng trung bình</item>
+        <item>Thấp</item>
+        <item>Thường</item>
+        <item>Cao</item>
+        <item>Nguyên gốc</item>
     </string-array>
     <!-- Title of the notification for a missed call -->
     <string name="missed_call_notification_title">Cuộc gọi nhỡ</string>
@@ -2524,10 +2520,6 @@
     <string name="context_no_restored">An error occurred. Item not restored.</string>
     <!-- menu item from contact section to send a message to a contact -->
     <string name="context_send_message">Gửi Tin Nhắn</string>
-    <!-- Message shown when a contact is successfully sent to several chats, more contacts -->
-    <plurals name="plural_contact_sent_to_chats">
-        <item quantity="other">Thông tin tên liên lạc đã được gửi đến cuộc chát thành công</item>
-    </plurals>
     <!-- Error message on opening a MEGAdrop folder link -->
     <string name="error_MEGAdrop_not_supported">MEGAdrop chưa được hỗ trợ</string>
     <!-- Pre overquota error dialog when trying to copy or import a file -->
@@ -2537,9 +2529,9 @@
     <!-- Text of the option to show the arhived chat, it shows the number of archived chats -->
     <string name="archived_chats_show_option">Số cuộc chát được bảo lưu (%d)</string>
     <!-- Title of the option on the chat list to archive a chat -->
-    <string name="archive_chat_option">Archive chat</string>
+    <string name="archive_chat_option">Bảo lưu cuộc chát</string>
     <!-- Title of the option on the chat list to unarchive a chat -->
-    <string name="unarchive_chat_option">Unarchive chat</string>
+    <string name="unarchive_chat_option">Bỏ bảo lưu cuộc chát</string>
     <!-- Confirmation button of the dialog to archive a chat -->
     <string name="general_archive">Chuyển Vào Bảo Lưu</string>
     <!-- Confirmation button of the dialog to unarchive a chat -->
@@ -3494,7 +3486,7 @@
     <string name="label_verify_credentials">Kiểm tra chứng thực</string>
     <!-- Label to indicate that contact’s credentials are not verified. -->
     <string name="label_not_verified">Chưa có xác thực</string>
-    <!-- Action indicating something was verified. -->
+    <!-- Label indicating the authenticity credentials of a contact have been verified -->
     <string name="label_verified">Đã xác thực</string>
     <!-- ”Verify user” dialog title -->
     <string name="authenticity_credentials_label">Công Nhận Chứng Thực</string>
@@ -3575,13 +3567,13 @@
     <!-- Message showing when enable the mode for showing the special information in the chat messages. This action is performed from the settings section, clicking 5 times on the App version option -->
     <string name="show_info_chat_msg_enabled">Debugging info for chat messages enabled</string>
     <!-- Message showing when disable the mode for showing the special information in the chat messages.. This action is performed from the settings section, clicking 5 times on the App version option -->
-    <string name="show_info_chat_msg_disabled">Debugging info for chat messages is disabled</string>
+    <string name="show_info_chat_msg_disabled">Debugging info for chat messages disabled</string>
     <!-- Shows the error when the limit of reactions per user is reached and the user tries to add one more. Keep the placeholder because is to show limit number in runtime. -->
     <string name="limit_reaction_per_user">Bạn đã đạt giới hạn bày tỏ tối đa %d cảm xúc.</string>
     <!-- Shows the error when the limit of reactions per message is reached and a user tries to add one more. Keep the placeholder because is to show limit number in runtime. -->
     <string name="limit_reaction_per_message">Tin nhắn này đã đạt giới hạn bày tỏ tối đa %d cảm xúc.</string>
     <!-- System message displayed to all chat participants when one of them enables retention history -->
-    <string name="retention_history_changed_by">[A]%1$s[/A][B] đã thay đổi thời gian tự động xóa tin nhắn đã có lâu là[/B][A] %2$s[/A][B].[/B]</string>
+    <string name="retention_history_changed_by">[A]%1$s[/A][B] đã thay đổi thời gian tự động xóa tin nhắn đã có lâu là [/B][A]%2$s[/A][B].[/B]</string>
     <!-- Title of the section to clear the chat content in the Manage chat history screen -->
     <string name="title_properties_clear_chat_history">Xóa lịch sử nội dung chát</string>
     <!-- System message that is shown to all chat participants upon disabling the Retention history -->
@@ -3954,6 +3946,8 @@
         <item quantity="one">Get Link</item>
         <item quantity="other">Get Links</item>
     </plurals>
+    <!-- Ask for confirmation before clear offline files -->
+    <string name="clear_offline_confirmation">Clear all offline files?</string>
     <!-- Banner text when the call is in progress and I'm the only participant. -->
     <string name="banner_alone_on_the_call">Bạn là người duy nhất ở đây</string>
     <!-- Item menu option upon right click on meeting. -->
@@ -4088,4 +4082,6 @@
     <string name="meeting_me_text_bracket">%1s [A](tôi)[/A]</string>
     <!-- Menu item to change from thumbnail view to main view in meeting-->
     <string name="main_view">Kiểu xem chính</string>
+    <!-- Warning in Offline section alerting all the Offline files will be deleted after logout. -->
+    <string name="offline_warning">Đăng xuất tài khoản sẽ xóa các mục đã được lưu về ngoại tuyến.</string>
 </resources>
