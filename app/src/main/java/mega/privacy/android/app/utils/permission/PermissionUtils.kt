@@ -192,7 +192,7 @@ object PermissionUtils {
                     if (!Environment.isExternalStorageManager()) {
                         return false
                     }
-                } else if (permission?.let {
+                } else if (permission.let {
                         ContextCompat.checkSelfPermission(
                             context,
                             it

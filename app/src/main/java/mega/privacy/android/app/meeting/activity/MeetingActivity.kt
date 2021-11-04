@@ -10,6 +10,7 @@ import androidx.navigation.NavGraph
 import androidx.navigation.fragment.NavHostFragment
 import com.jeremyliao.liveeventbus.LiveEventBus
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import mega.privacy.android.app.BaseActivity
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
@@ -22,6 +23,7 @@ import mega.privacy.android.app.utils.PasscodeUtil
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
 import javax.inject.Inject
 
+@ExperimentalCoroutinesApi
 @AndroidEntryPoint
 class MeetingActivity : BaseActivity() {
 

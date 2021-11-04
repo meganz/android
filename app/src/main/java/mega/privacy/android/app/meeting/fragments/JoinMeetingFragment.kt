@@ -16,10 +16,10 @@ import mega.privacy.android.app.utils.StringResourcesUtils
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
 import nz.mega.sdk.MegaChatRoom
 
+@ExperimentalCoroutinesApi
 @AndroidEntryPoint
 class JoinMeetingFragment : AbstractMeetingOnBoardingFragment() {
 
-    @ExperimentalCoroutinesApi
     override fun onMeetingButtonClick() {
         if (chatId == MEGACHAT_INVALID_HANDLE) {
             logError("Chat Id is invalid when join meeting")
@@ -70,7 +70,6 @@ class JoinMeetingFragment : AbstractMeetingOnBoardingFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         initRTCAudioManager()
-        TODO("Not yet implemented")
         binding.btnStartJoinMeeting.text = StringResourcesUtils.getString(R.string.join_meeting)
         binding.typeMeetingEditText.visibility = View.GONE
     }
