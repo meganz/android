@@ -5502,20 +5502,20 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 				if (mHomepageSearchable != null) {
 					searchMenuItem.setVisible(mHomepageSearchable.shouldShowSearchMenu());
 
-                    if (mHomepageScreen == HomepageScreen.IMAGES) {
-                        zoomOutMenuItem.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
-                        zoomInMenuItem.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
-
-                        if (currentZoom == ZOOM_OUT_2X) {
-                            ZoomUtil.INSTANCE.disableButton(this, zoomOutMenuItem);
-                        }
-
-                        if (currentZoom == ZOOM_IN_1X) {
-                            ZoomUtil.INSTANCE.disableButton(this, zoomInMenuItem);
-                        }
-
-                        updatePhotosFragmentOptionsMenu();
-                    }
+//                    if (mHomepageScreen == HomepageScreen.IMAGES) {
+//                        zoomOutMenuItem.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+//                        zoomInMenuItem.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+//
+//                        if (currentZoom == ZOOM_OUT_2X) {
+//                            ZoomUtil.INSTANCE.disableButton(this, zoomOutMenuItem);
+//                        }
+//
+//                        if (currentZoom == ZOOM_IN_1X) {
+//                            ZoomUtil.INSTANCE.disableButton(this, zoomInMenuItem);
+//                        }
+//
+//                        updatePhotosFragmentOptionsMenu();
+//                    }
 				}
 			}
 		}
@@ -5608,18 +5608,6 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
             zoomOutMenuItem.setVisible(visible);
             zoomInMenuItem.setVisible(visible);
         }
-    }
-
-    public void updatePhotosFragmentOptionsMenu() {
-//        if (zoomOutMenuItem == null || zoomInMenuItem == null) {
-//            return;
-//        }
-//
-//		Images1Fragment imagesFragment = getFragmentByType(Images1Fragment.class);
-//        boolean shouldShow = imagesFragment.shouldShowZoomMenuItem();
-//
-//        zoomOutMenuItem.setVisible(shouldShow);
-//        zoomInMenuItem.setVisible(shouldShow);
     }
 
 	private void setGridListIcon() {

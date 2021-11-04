@@ -5,6 +5,7 @@ import androidx.lifecycle.MutableLiveData
 import mega.privacy.android.app.utils.ZoomUtil.ZOOM_DEFAULT
 import mega.privacy.android.app.utils.ZoomUtil.ZOOM_IN_1X
 import mega.privacy.android.app.utils.ZoomUtil.ZOOM_OUT_2X
+import javax.inject.Singleton
 
 class ZoomManager {
 

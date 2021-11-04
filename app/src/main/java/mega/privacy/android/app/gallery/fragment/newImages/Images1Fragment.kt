@@ -156,6 +156,14 @@ class Images1Fragment : BaseBindingFragmentKt<NewImagesViewModel, FragmentImages
         menuItem.isEnabled = isEnable
     }
 
+
+    private fun handleZoomOptionsMenuUpdate() {
+        val toolbar = binding.layoutTitleBar.toolbar
+        val shouldShow = shouldShowZoomMenuItem()
+        toolbar.menu.findItem(R.id.action_zoom_in).isVisible = shouldShow
+        toolbar.menu.findItem(R.id.action_zoom_out).isVisible = shouldShow
+    }
+
     override fun subscribeObservers() {
 
         viewModel.getZoom().observe(viewLifecycleOwner, { zoom: Int ->
@@ -195,9 +203,6 @@ class Images1Fragment : BaseBindingFragmentKt<NewImagesViewModel, FragmentImages
         override fun onCardClicked(position: Int, @NonNull card: CUCard) {
             when (selectedView) {
                 PhotosFragment.DAYS_VIEW -> {
-//                    callManager {
-//                        it.restoreDefaultZoom()
-//                    }
                     viewModel.zoomManager.restoreDefaultZoom()
                     newViewClicked(PhotosFragment.ALL_VIEW)
                     val photoPosition = browseAdapter.getNodePosition(card.node.handle)
@@ -331,7 +336,7 @@ class Images1Fragment : BaseBindingFragmentKt<NewImagesViewModel, FragmentImages
             else -> {
             }
         }
-
+        handleZoomOptionsMenuUpdate()
         updateViewSelected()
 
         // If selected view is not all view, add layout param behaviour, so that button panel will go off when scroll.
@@ -444,7 +449,7 @@ class Images1Fragment : BaseBindingFragmentKt<NewImagesViewModel, FragmentImages
 
                 if (actionMode == null) {
                     callManager { manager ->
-                        //manager.hideKeyboardSearch()
+                        manager.hideKeyboardSearch()
                     }
 
                     actionMode = (activity as AppCompatActivity).startSupportActionMode(
@@ -494,25 +499,14 @@ class Images1Fragment : BaseBindingFragmentKt<NewImagesViewModel, FragmentImages
             it.forEach { pos ->
                 listView.findViewHolderForAdapterPosition(pos)?.let { viewHolder ->
                     val itemView = viewHolder.itemView
+                    // Draw the green outline for the thumbnail view at once
+                    val thumbnailView =
+                        itemView.findViewById<SimpleDraweeView>(R.id.thumbnail)
+                    thumbnailView.hierarchy.roundingParams = getRoundingParams(context)
 
-                    val imageView = if (viewModel.searchMode) {
-                        itemView.setBackgroundColor(
-                            ContextCompat.getColor(
-                                context,
-                                R.color.new_multiselect_color
-                            )
-                        )
-                        itemView.findViewById(R.id.thumbnail)
-                    } else {
-                        // Draw the green outline for the thumbnail view at once
-                        val thumbnailView =
-                            itemView.findViewById<SimpleDraweeView>(R.id.thumbnail)
-                        thumbnailView.hierarchy.roundingParams = getRoundingParams(context)
-
-                        itemView.findViewById<ImageView>(
-                            R.id.icon_selected
-                        )
-                    }
+                    val imageView = itemView.findViewById<ImageView>(
+                        R.id.icon_selected
+                    )
 
                     imageView?.run {
                         setImageResource(R.drawable.ic_select_folder)
@@ -577,7 +571,7 @@ class Images1Fragment : BaseBindingFragmentKt<NewImagesViewModel, FragmentImages
         listView.switchBackToGrid()
 
         if (selectedView == PhotosFragment.ALL_VIEW) {
-            if (!this::browseAdapter.isInitialized){
+            if (!this::browseAdapter.isInitialized) {
                 browseAdapter =
                     ImagesBrowseAdapter(actionModeViewModel, itemOperationViewModel, currentZoom)
             }

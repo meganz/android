@@ -233,9 +233,9 @@ class ImagesFragment : BaseFragment(), HomepageSearchable {
             else -> setViewTypeButtonStyle(allButton, true)
         }
 
-        callManager {
-            it.updatePhotosFragmentOptionsMenu()
-        }
+//        callManager {
+//            it.updatePhotosFragmentOptionsMenu()
+//        }
     }
 
     private fun updateFastScrollerVisibility() {
