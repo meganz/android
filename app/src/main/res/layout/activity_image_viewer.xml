@@ -5,7 +5,6 @@
     android:id="@+id/motion"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:fitsSystemWindows="true"
     app:layoutDescription="@xml/scene_image_viewer"
     tools:context=".imageviewer.ImageViewerActivity"
     tools:showPaths="true">
@@ -22,10 +21,10 @@
     <com.google.android.material.appbar.MaterialToolbar
         android:id="@+id/toolbar"
         android:layout_width="0dp"
-        android:layout_height="?attr/actionBarSize"
+        android:layout_height="wrap_content"
         android:backgroundTint="@color/white_alpha_070_grey_alpha_070"
         android:elevation="0dp"
-        android:fitsSystemWindows="true"
+        android:minHeight="?attr/actionBarSize"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
@@ -71,5 +70,6 @@
         app:layout_constraintEnd_toEndOf="@id/bg_bottom"
         app:layout_constraintStart_toStartOf="@id/bg_bottom"
         app:layout_constraintTop_toBottomOf="@id/txt_title"
+        app:layout_constraintVertical_chainStyle="packed"
         tools:text="7 of 100" />
 </androidx.constraintlayout.motion.widget.MotionLayout>

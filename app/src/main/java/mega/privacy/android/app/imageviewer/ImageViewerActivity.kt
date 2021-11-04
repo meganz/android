@@ -6,10 +6,10 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
-import android.view.WindowManager
+import android.view.ViewGroup
 import androidx.activity.viewModels
-import androidx.core.view.isInvisible
-import androidx.core.view.isVisible
+import androidx.constraintlayout.widget.ConstraintSet
+import androidx.core.view.*
 import androidx.viewpager2.widget.ViewPager2
 import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.BaseActivity
@@ -24,25 +24,20 @@ import mega.privacy.android.app.interfaces.SnackbarShower
 import mega.privacy.android.app.interfaces.showSnackbar
 import mega.privacy.android.app.usecase.data.MegaNodeItem
 import mega.privacy.android.app.utils.AlertsAndWarnings.showSaveToDeviceConfirmDialog
-import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_ARRAY_OFFLINE
-import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_HANDLE
-import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_OFFLINE_HANDLE
-import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_ORDER_GET_CHILDREN
-import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_PARENT_NODE_HANDLE
-import mega.privacy.android.app.utils.Constants.NODE_HANDLES
+import mega.privacy.android.app.utils.Constants.*
 import mega.privacy.android.app.utils.LinksUtil
 import mega.privacy.android.app.utils.LogUtil.logError
 import mega.privacy.android.app.utils.LogUtil.logWarning
 import mega.privacy.android.app.utils.MegaNodeDialogUtil.showRenameNodeDialog
 import mega.privacy.android.app.utils.NetworkUtil.isOnline
 import mega.privacy.android.app.utils.StringResourcesUtils.getQuantityString
-import mega.privacy.android.app.utils.ViewUtils.setStatusBarTransparent
 import mega.privacy.android.app.utils.ViewUtils.waitForLayout
 import nz.mega.documentscanner.utils.IntentUtils.extra
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 import nz.mega.sdk.MegaApiJava.ORDER_PHOTO_ASC
 import nz.mega.sdk.MegaNode
 import java.lang.ref.WeakReference
+
 
 @AndroidEntryPoint
 class ImageViewerActivity : BaseActivity(), PermissionRequester, SnackbarShower {
@@ -139,6 +134,8 @@ class ImageViewerActivity : BaseActivity(), PermissionRequester, SnackbarShower 
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        WindowCompat.setDecorFitsSystemWindows(window, false)
+
         binding = ActivityImageViewerBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
@@ -166,13 +163,34 @@ class ImageViewerActivity : BaseActivity(), PermissionRequester, SnackbarShower 
 
     @SuppressLint("WrongConstant")
     private fun setupView() {
-        setStatusBarTransparent()
         setSupportActionBar(binding.toolbar)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
         binding.viewPager.apply {
             adapter = pagerAdapter
             offscreenPageLimit = OFFSCREEN_PAGE_LIMIT
+        }
+
+        // Apply statusBar top inset as padding for toolbar
+        ViewCompat.setOnApplyWindowInsetsListener(binding.toolbar) { view, windowInsets ->
+            val topInset = windowInsets.getInsets(WindowInsetsCompat.Type.statusBars()).top
+            view.updatePadding(0, topInset, 0, 0)
+            WindowInsetsCompat.CONSUMED
+        }
+
+        // Apply navigationBar bottom inset as margin for txtPageCount
+        ViewCompat.setOnApplyWindowInsetsListener(binding.txtPageCount) { view, windowInsets ->
+            val bottomInset = windowInsets.getInsets(WindowInsetsCompat.Type.navigationBars()).bottom
+            view.updateLayoutParams<ViewGroup.MarginLayoutParams> { bottomMargin = bottomInset }
+
+            binding.motion.apply { // Needs to also update margins on MotionsLayout's Scene
+                constraintSetIds.forEach { id ->
+                    getConstraintSet(id).apply {
+                        setMargin(view.id, ConstraintSet.BOTTOM, bottomInset)
+                    }
+                }
+            }
+            WindowInsetsCompat.CONSUMED
         }
     }
 

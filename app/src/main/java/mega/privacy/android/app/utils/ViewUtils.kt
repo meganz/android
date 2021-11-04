@@ -69,10 +69,7 @@ object ViewUtils {
                 SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN or
                 View.SYSTEM_UI_FLAG_IMMERSIVE
         window.statusBarColor = Color.TRANSPARENT
-        val layoutRoot = getLayoutRoot()
-        if (layoutRoot != null) {
-            layoutRoot.fitsSystemWindows = false
-        }
+        getLayoutRoot()?.fitsSystemWindows = false
     }
 
     /**

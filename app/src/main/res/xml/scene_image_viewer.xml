@@ -4,8 +4,8 @@
 
     <Transition
         android:id="@+id/transition"
-        app:constraintSetEnd="@+id/end"
         app:constraintSetStart="@+id/start"
+        app:constraintSetEnd="@+id/end"
         app:duration="250" />
 
     <ConstraintSet android:id="@+id/start">
