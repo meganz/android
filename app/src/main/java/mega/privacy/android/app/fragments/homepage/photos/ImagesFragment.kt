@@ -540,24 +540,11 @@ class ImagesFragment : BaseFragment(), HomepageSearchable {
                 browseAdapter =
                     PhotosBrowseAdapter(actionModeViewModel, itemOperationViewModel, currentZoom)
 
-                if (currentZoom == ZOOM_IN_1X) {
-                    params.rightMargin = 0
-                    params.leftMargin = 0
-                } else {
-                    val margin = ZoomUtil.getMargin(context, currentZoom)
-                    params.leftMargin = margin
-                    params.rightMargin = margin
-                }
+                ZoomUtil.setMargin(context, params, currentZoom)
 
                 gridLayoutManager.apply {
-                    val imageMargin = ZoomUtil.getMargin(context, currentZoom)
                     spanSizeLookup = browseAdapter.getSpanSizeLookup(spanCount)
-
-                    val itemDimen = if (currentZoom == ZOOM_IN_1X) {
-                        outMetrics.widthPixels
-                    } else {
-                        ((outMetrics.widthPixels - imageMargin * spanCount * 2) - imageMargin * 2) / spanCount
-                    }
+                    val itemDimen = ZoomUtil.getItemWidth(context, outMetrics, currentZoom, spanCount)
                     browseAdapter.setItemDimen(itemDimen)
                 }
 
@@ -610,31 +597,12 @@ class ImagesFragment : BaseFragment(), HomepageSearchable {
         if (!viewModel.searchMode) return
 
         listView.switchBackToGrid()
-        configureGridLayoutManager()
         listView.adapter = browseAdapter
         listView.removeItemDecoration(itemDecoration)
 
         viewModel.searchMode = false
         viewModel.searchQuery = ""
         viewModel.refreshUi()
-    }
-
-    private fun configureGridLayoutManager() {
-        val isPortrait = resources.configuration.orientation == Configuration.ORIENTATION_PORTRAIT
-        val spanCount = getSpanCount(isPortrait)
-        gridLayoutManager = GridLayoutManager(context, spanCount)
-        listView.switchBackToGrid()
-
-        gridLayoutManager.apply {
-            val imageMargin = ZoomUtil.getMargin(context, currentZoom)
-            spanSizeLookup = browseAdapter.getSpanSizeLookup(spanCount)
-            val itemDimen = if (currentZoom == ZOOM_IN_1X) {
-                outMetrics.widthPixels
-            } else {
-                ((outMetrics.widthPixels - imageMargin * spanCount * 2) - imageMargin * 2) / spanCount
-            }
-            browseAdapter.setItemDimen(itemDimen)
-        }
     }
 
     /**

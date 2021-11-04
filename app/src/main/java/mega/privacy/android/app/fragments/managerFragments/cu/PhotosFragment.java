@@ -344,16 +344,8 @@ public class PhotosFragment extends BaseFragment implements CUGridViewAdapter.Li
 
         if (selectedView == ALL_VIEW) {
             int imageMargin = ZoomUtil.INSTANCE.getMargin(context, currentZoom);
-
-            int gridWidth;
-
-            if (currentZoom == ZOOM_IN_1X) {
-                gridWidth = outMetrics.widthPixels;
-                params.leftMargin = params.rightMargin = 0;
-            } else {
-                gridWidth = ((outMetrics.widthPixels - imageMargin * spanCount * 2) - imageMargin * 2) / spanCount;
-                params.leftMargin = params.rightMargin = imageMargin;
-            }
+            ZoomUtil.INSTANCE.setMargin(context, params, currentZoom);
+            int gridWidth = ZoomUtil.INSTANCE.getItemWidth(context, outMetrics, currentZoom, spanCount);
 
             int icSelectedWidth = ZoomUtil.INSTANCE.getSelectedFrameWidth(context, currentZoom);
 

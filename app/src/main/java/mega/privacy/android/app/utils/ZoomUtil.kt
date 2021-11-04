@@ -1,7 +1,9 @@
 package mega.privacy.android.app.utils
 
 import android.content.Context
+import android.util.DisplayMetrics
 import android.view.MenuItem
+import android.view.ViewGroup
 import androidx.core.content.ContextCompat
 import androidx.core.graphics.drawable.DrawableCompat
 import mega.privacy.android.app.R
@@ -82,4 +84,25 @@ object ZoomUtil {
     fun needReload(currentZoom: Int, zoom: Int): Boolean {
         return if (currentZoom == ZOOM_OUT_2X || currentZoom == ZOOM_IN_1X) true else zoom == ZOOM_OUT_2X || zoom == ZOOM_IN_1X
     }
+
+    fun setMargin(context: Context, params: ViewGroup.MarginLayoutParams, zoom: Int) {
+        if (zoom == ZOOM_IN_1X) {
+            params.rightMargin = 0
+            params.leftMargin = 0
+        } else {
+            val margin = getMargin(context, zoom)
+            params.leftMargin = margin
+            params.rightMargin = margin
+        }
+    }
+
+    fun getItemWidth(context: Context, outMetrics: DisplayMetrics, zoom: Int, spanCount: Int) =
+        if (zoom == ZOOM_IN_1X) {
+            outMetrics.widthPixels
+        } else {
+            ((outMetrics.widthPixels - getMargin(
+                context,
+                zoom
+            ) * spanCount * 2) - getMargin(context, zoom) * 2) / spanCount
+        }
 }
