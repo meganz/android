@@ -27,6 +27,9 @@ public class CameraUploadsPreferencesActivity extends PreferencesBaseActivity {
     private SettingsCameraUploadsFragment sttCameraUploads;
     private AlertDialog businessCUAlert;
 
+    // During camera uploads setting, this variable should be set to true
+    private static boolean bInCameraUploadsSetting = false;
+
     private BroadcastReceiver networkReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -56,7 +59,10 @@ public class CameraUploadsPreferencesActivity extends PreferencesBaseActivity {
                     break;
 
                 case ACTION_REFRESH_CAMERA_UPLOADS_MEDIA_SETTING:
-//                    sttCameraUploads.shouldDisableMediaUploadUIProcess();
+                    if(sttCameraUploads.isVisible()){
+                        return;
+                    }
+                    sttCameraUploads.disableMediaUploadUIProcess();
                     break;
             }
         }
@@ -121,6 +127,7 @@ public class CameraUploadsPreferencesActivity extends PreferencesBaseActivity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        bInCameraUploadsSetting = true;
 
         setTitle(R.string.section_photo_sync);
         sttCameraUploads = new SettingsCameraUploadsFragment();
@@ -165,6 +172,14 @@ public class CameraUploadsPreferencesActivity extends PreferencesBaseActivity {
     }
 
     /**
+     * Check if camera uploads setting is in progress
+     * @return true - During camera uploads setting / false - not in camera uploads setting
+     */
+    static public boolean isInCameraUploadsSetting(){
+        return bInCameraUploadsSetting;
+    }
+
+    /**
      * Method for enabling Camera Uploads.
      */
     private void enableCU() {
@@ -195,6 +210,7 @@ public class CameraUploadsPreferencesActivity extends PreferencesBaseActivity {
             sttCameraUploads.startCU();
         }
     }
+
     /**
      * Method to check if Business alert needs to be displayed before enabling Camera Uploads.
      */
@@ -228,6 +244,7 @@ public class CameraUploadsPreferencesActivity extends PreferencesBaseActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        bInCameraUploadsSetting = false;
         unregisterReceiver(networkReceiver);
         unregisterReceiver(cameraUploadDestinationReceiver);
         unregisterReceiver(enableDisableCameraUploadReceiver);

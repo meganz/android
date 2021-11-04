@@ -5,7 +5,6 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
-import android.os.Handler;
 import android.text.InputType;
 import android.text.TextUtils;
 import android.util.DisplayMetrics;

@@ -47,6 +47,7 @@ import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.UserCredentials;
 import mega.privacy.android.app.VideoCompressor;
+import mega.privacy.android.app.activities.settingsActivities.CameraUploadsPreferencesActivity;
 import mega.privacy.android.app.listeners.CreateFolderListener;
 import mega.privacy.android.app.listeners.GetCuAttributeListener;
 import mega.privacy.android.app.listeners.SetAttrUserListener;
@@ -987,6 +988,11 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
 
         if (isDeviceLowOnBattery(batteryIntent)) {
             return BATTERY_STATE_LOW;
+        }
+
+        if (CameraUploadsPreferencesActivity.isInCameraUploadsSetting()){
+            logWarning("Camera uploads setting is in progress");
+            return SHOULD_RUN_STATE_FAILED;
         }
 
         prefs = dbH.getPreferences();
