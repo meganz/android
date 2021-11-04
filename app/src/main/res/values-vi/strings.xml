@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <!-- Full description text of the app in the Google Play page of the app (character limit 4000) -->
-    <string name="full_description_text">MEGA provides user controlled encrypted cloud storage and chat through standard web browsers, together with dedicated apps for mobile devices. Unlike other cloud storage providers, your data is encrypted and decrypted by your client devices only and never by us.\n\nUpload your files from your smartphone or tablet then search, store, download, stream, view, share, rename or delete your files any time, from any device, anywhere. Share folders with your contacts and see their updates in real time. The encryption process means we cannot access or reset your password so you MUST remember it (unless you have your Recovery Key backed up) or you will lose access to your stored files.\n\nEnd-to-end user encrypted MEGA video chat allows for total privacy, and has been available in web browsers since 2016. It has been extended to the Mega Mobile App, with chat history accessible across multiple devices. Users can also easily add files to a chat from their MEGA Cloud Drive.\n\nMEGA offers a generous 20 GB free storage for all registered users with bonus achievements, and offers paid plans with much higher limits:\n\n\nPro Lite subscription: 4.99 € per month or 49.99 € per year gives you 400 GB of storage space and 1 TB of transfer quota per month.\nPro I subscription: 9.99 € per month or 99.99 € per year gives you 2 TB of storage space and 2 TB of transfer quota per month.\nPro II subscription: 19.99 € per month or 199.99 € per year gives you 8 TB of storage space and 8 TB of transfer quota per month.\nPro III subscription: 29.99 € per month or 299.99 € per year gives you 16 TB of storage space and 16 TB of transfer quota per month.\n\nSubscriptions are renewed automatically for successive periods of the same duration, at the same price as the initial period chosen. To manage your subscriptions, simply tap the Play Store icon on your mobile device, sign in with your Google ID (if you haven’t already done so). Then tap on the MEGA app. You’ll be able to manage your subscription there.\n\nApp Permissions:\nWRITE_EXTERNAL_STORAGE -&gt; Download your files from MEGA to your device and upload files from your device to MEGA\nCAMERA -&gt; Take a picture and upload your photos to MEGA\nREAD_CONTACTS -&gt; Easily add contacts from your device as MEGA contacts\nRECORD_AUDIO and CAPTURE_VIDEO_OUTPUT (mic and camera) -&gt; MEGA provides for end-to-end encrypted audio/video calls\n\n\nTo enhance users’ confidence in the MEGA system, all of the client-side code is published, so interested security researchers can evaluate the encryption process. The code of our mobile app is located on: https://github.com/meganz/android \n\nFor more info, please check our website:\nSee https://mega.nz/terms \n\n\nDesktop - https://mega.nz/</string>
+    <string name="full_description_text">MEGA cung cấp không gian lưu trữ điện toán đám mây với công nghệ mã hoá đầu-cuối được điều hành bởi người sử dụng, cùng với dịch vụ chat thông qua trình duyệt web và các ứng dụng cho điện thoại di động. Không như các hãng khác, dữ liệu không thể bị giải mã bởi máy chủ, chỉ có thể thực hiện bởi người dùng trên chính chương trình được sử dụng.\n\nTải lên tệp tin từ smartphone hay máy tính bảng và quản lý bằng cách lưu trữ, tải về, truyền tải, chia sẻ, đổi tên, hay xóa bỏ dữ liệu vào bất cứ thời điểm, thiết bị muốn sử dụng ở bất cứ đâu. Chia sẻ thư mục với tên liên lạc và xem tương tác được cập nhật ngay tức thì. Bảo mật đầu-cuối mang nghĩa rằng mật khẩu BẮT BUỘC phải nhớ (hay cần phải có lưu lại Mã Phục Hồi) không thì sẽ mất toàn quyền truy cập vào tài khoản và mất hết dữ liệu.\n\nCông nghệ mã hóa đầu-cuối điều hành bởi người dùng cho phép thực hiện gọi video một cách bảo mật, và được hỗ trợ từ năm 2016 cho trình duyệt nay đã sử dụng được trên App MEGA cho Di Động, cùng với lịch sử cuộc trò chuyện có thể được xem trên nhiều thiết bị khác nhau. Nguời sử dụng còn có thể chia sẻ tệp tin từ Ổ Mây MEGA của mình vào cuộc chát.\n\nMEGA cung cấp cho mọi tài khoản không gian lưu trữ miễn phí lên đến 20 GB với các nhiệm vụ thưởng để mở rộng thêm không gian cùng các thuê bao trả phí như:\n\n\nGói Pro Lite: €4.99 (US$4.99) mỗi tháng hay €49.99 (US$49.99) mỗi năm cung cấp cho bạn 400 GB không gian lưu trữ và 1 TB cho băng thông truyền tải mỗi tháng.\nGói Pro I: €9.99 (US$9.99) mỗi tháng hay €99.99 (US$99.99) mỗi năm cung cấp cho bạn 2 TB không gian lưu trữ và 2 TB cho băng thông truyền tải mỗi tháng.\nGói Pro II: €19.99 (US$19.99) mỗi tháng hay €199.99 (US$199.99) mỗi năm cung cấp cho bạn 8 TB không gian lưu trữ và 8 TB cho băng thông truyền tải mỗi tháng.\nGói Pro III: €29.99 (US$29.99) mỗi tháng hay €299.99 (US$299.99) mỗi năm cung cấp cho bạn 16 TB không gian lưu trữ và 16 TB cho băng thông truyền tải mỗi tháng. tải mỗi tháng.\n\nGói thuê bao trả phí sẽ tự động mua chu kỳ mới vào ngày cuối hạn với cùng giá và thời hạn như thời kỳ ban đầu. Để quản lý việc mua gói cước, xin vào CH Play trên điện thoại, đăng nhập vào Gmail/Google ID (nếu chưa làm) và tìm đến app MEGA. Từ đó xem, quản lý, mua, hay hủy gói thuê bao.\n\nCấp Quyền Ứng Dụng:\nWRITE_EXTERNAL_STORAGE -&gt; Tải về tệp tin từ MEGA vào trong điện thoại và để lấy tệp tin trong máy tải lên MEGA\nCAMERA -&gt; Chụp ảnh và đăng tải lên MEGA\nREAD_CONTACTS -&gt; Để dễ dàng tìm các tên liên lạc có sử dụng MEGA\nRECORD_AUDIO và CAPTURE_VIDEO_OUTPUT (micrô và camera) -&gt; MEGA cung cấp tính năng bảo mật đầu-cuối và cần dùng để thực hiện các cuộc gọi thoại/video\n\n\nĐể tăng cường sự tin cậy của người sử dụng, tất cả mã nguồn dùng cho phía máy khách đề được công bố, các lập trình viên và khảo sát an ninh mạng có thể vào xem và đánh giá. Mã nguồn xây dựng ứng dụng di động: https://github.com/meganz/android \n\nXem thêm tại website:\nVào https://mega.nz/terms \n\n\nDesktop - https://mega.nz/</string>
     <!-- Short description text of the app in the Google Play page of the app (character limit 80) -->
-    <string name="short_description_text">MEGA is Cloud Storage with secure always-on privacy.</string>
+    <string name="short_description_text">MEGA - Lưu Trữ Điện Toán Đám Mây với bảo mật luôn luôn duy trì.</string>
     <!-- PRO Lite account -->
     <string name="prolite_account">Pro Lite</string>
     <!-- Name of the MEGA PDF Viewer. Keep uppercase. -->
@@ -113,7 +113,7 @@
     <!-- Select country page title -->
     <string name="action_search_country">Chọn quốc gia</string>
     <!-- Alternative text or description text for the “Play” button -->
-    <string name="action_play">Play</string>
+    <string name="action_play">Phát</string>
     <!-- Search button -->
     <string name="action_pause">Tạm dừng</string>
     <!-- Menu item -->
@@ -307,13 +307,13 @@
     <!-- Title of the share with file explorer -->
     <string name="title_incoming_shares_with_explorer">Mục chia sẻ nhận được từ</string>
     <!-- message when there are no files in the Cloud drive -->
-    <string name="file_browser_empty_cloud_drive">Cloud Drive của bạn không có tập tin.</string>
+    <string name="file_browser_empty_cloud_drive">Không có tệp tin nào trong Ổ Mây</string>
     <!-- Text that indicates that a folder is currently empty -->
     <string name="file_browser_empty_folder">Thư Mục Rỗng</string>
     <!-- Title of the fragment Choose Account -->
     <string name="choose_account_fragment">CHỌN TÀI KHOẢN</string>
     <!-- The file are available “offline” (without a network Wi-Fi mobile data connection) -->
-    <string name="file_properties_available_offline">Được lưu ngoại tuyến</string>
+    <string name="file_properties_available_offline">Lưu Ngoại Tuyến</string>
     <!-- category in sort by action -->
     <string name="file_properties_info_size_file">Kích cỡ</string>
     <!-- When the file/folder was last modified -->
@@ -323,7 +323,7 @@
     <!-- the label when a folder can be accesed by public users -->
     <string name="file_properties_shared_folder_public_link">Đường liên kết công khai</string>
     <!-- Item menu option upon clicking on a file folder. Refers to the permissions of a file folder in the file manager. -->
-    <string name="file_properties_shared_folder_permissions">Cấp phép</string>
+    <string name="file_properties_shared_folder_permissions">Quyền hạn</string>
     <!-- Title of the dialog to choose permissions when sharing. -->
     <string name="dialog_select_permissions">Quyền Hạn Được Chia Sẻ</string>
     <!-- menu item -->
@@ -579,7 +579,7 @@
     <!-- error message when removing all the contacts of a shared folder -->
     <string name="context_no_removed_sharing_contacts">An error occurred. The folder is still shared with another contact</string>
     <!-- option available for just one file -->
-    <string name="context_select_one_file">Chọn đúng một mục</string>
+    <string name="context_select_one_file">Chọn ra một mục</string>
     <!-- success message when emptying the RB -->
     <string name="rubbish_bin_emptied">Thùng Rác đã được dọn sạch sẽ</string>
     <!-- error message when emptying the RB -->
@@ -667,7 +667,7 @@
     <!-- when changing the password or creating the account, the password is required twice and check that both times are the same -->
     <string name="my_account_change_password_dont_match">Hai mật khẩu này không trùng khớp</string>
     <!-- title of the selection of the pro account wanted -->
-    <string name="upgrade_select_pricing">Select plan</string>
+    <string name="upgrade_select_pricing">Chọn gói</string>
     <!-- the user has to decide the way of payment -->
     <string name="select_membership_1">Chọn hằng tháng hoặc hằng năm</string>
     <!-- choose the payment method option when no method is available -->
@@ -829,7 +829,7 @@
     <!-- the options of how to upload, but in an array. needed for the settings, how to upload the camera images. only when Wi-Fi connected -->
     <string-array name="settings_camera_upload_how_to_entries">
         <item>Dùng Wi-Fi hay mạng di động</item>
-        <item>Chỉ lúc dùng Wi-Fi</item>
+        <item>Chỉ khi dùng Wi-Fi</item>
     </string-array>
     <!-- What kind of files are going to be uploaded: images, videos or both -->
     <string name="settings_camera_upload_what_to_upload">Tải lên Tệp Tin</string>
@@ -862,7 +862,7 @@
     <!-- what kind of file are going to be uploaded. Needed for the settings summary -->
     <string name="settings_camera_upload_photos_and_videos">Hình ảnh và video</string>
     <!-- status text when no custom photo sync folder has been set -->
-    <string name="settings_pin_lock_code_not_set">Chưa chỉnh</string>
+    <string name="settings_pin_lock_code_not_set">Chưa đặt</string>
     <!-- Settings of the Passcode -->
     <string name="settings_passcode_lock_switch">Khóa bằng Mã Số</string>
     <!-- Settings option to change Passcode. -->
@@ -942,9 +942,9 @@
     <!-- title of the My Account screen -->
     <string name="my_account_title">Hạng Tài Khoản</string>
     <!-- Label to indicate the date when the current subscription renews -->
-    <string name="renews_on">Renews on&#160;</string>
+    <string name="renews_on">Ngày tự gia hạn&#160;</string>
     <!-- title of the Expiration Date -->
-    <string name="expires_on">Expires on&#160;</string>
+    <string name="expires_on">Thời điểm hết hạn&#160;</string>
     <!--  -->
     <string name="free_account">Miễn phí</string>
     <!-- info message shown to the user when the Camera Uploads folder has been created -->
@@ -1190,7 +1190,7 @@
     <!-- Error message when the credentials to login are incorrect. -->
     <string name="error_incorrect_email_or_password">Sai email hay/và mật khẩu. Xin thử lại.</string>
     <!-- Error message when trying to login and the account is suspended. -->
-    <string name="error_account_suspended">Tài khoản bị đình chỉ do vi phạm Điều Khoản Dịch Vụ. Xin liên hệ support&#64;mega.co.nz để được giải quyết.</string>
+    <string name="error_account_suspended">Tài khoản bị đình chỉ do vi phạm Điều Khoản Dịch Vụ. Xin liên hệ support&#64;mega.nz để được giải quyết.</string>
     <!-- Error message when to many attempts to login. -->
     <string name="too_many_attempts_login">Đăng nhập sai quá nhiều lần, xin chờ một tiếng đồng hồ rồi thử lại.</string>
     <!-- Error message when trying to login to an account not validated. -->
@@ -1436,7 +1436,7 @@
     <!-- success alert when the user copy some messages to the clipboard -->
     <string name="messages_copied_clipboard">Đã lưu vào bộ ghi nhớ</string>
     <!-- Title of the error dialog when opening a chat -->
-    <string name="chat_error_open_title">Chát Lỗi!</string>
+    <string name="chat_error_open_title">Chát lỗi</string>
     <!-- Message of the error dialog when opening a chat -->
     <string name="chat_error_open_message">Lỗi. Không mở được cuộc chát</string>
     <!-- Menu option to add a contact to your contact list. -->
@@ -1871,7 +1871,7 @@
     <!-- title of the section for install megasync in achivements section (maximum 24 chars) -->
     <string name="title_regitration">Thưởng tài khoản mới</string>
     <!-- title of the section for install a mobile app bonuses in achivements section (maximum 24 chars) -->
-    <string name="title_install_desktop">Get a MEGA Desktop App</string>
+    <string name="title_install_desktop">Cài đặt App MEGA cho Máy Tính</string>
     <!-- Text that indicates that no pictures have been uploaded to the Camera Uploads section -->
     <string name="camera_uploads_empty">Không có nội dung nào trong Camera Uploads</string>
     <!-- indicates the number of days left related to a achievement -->
@@ -1929,7 +1929,7 @@
     <!-- Settings preference title for help centre -->
     <string name="settings_help_centre">Thư Viện Hướng Dẫn</string>
     <!-- Settings preference title for send feedback -->
-    <string name="settings_help_preference">Send feedback</string>
+    <string name="settings_help_preference">Gửi phản hồi</string>
     <!-- mail subject -->
     <string name="setting_feedback_subject">Phản hồi từ thiết bị Android</string>
     <!-- mail body -->
@@ -1986,8 +1986,7 @@
     <string name="invalid_characters_defined">Các ký tự không được phép sử dụng: ” * / : &lt; &gt; ? \ |</string>
     <!-- Warning show to the user after try to import files to MEGA with empty names. Plural. When more than one file name have this error. -->
     <plurals name="empty_names">
-        <item quantity="one">File name cannot be empty.</item>
-        <item quantity="other">File names cannot be empty.</item>
+        <item quantity="other">Tên tệp tin không được để trống.</item>
     </plurals>
     <!-- Label shown when audio file is playing -->
     <string name="audio_play">Tệp Âm Thanh</string>
@@ -2040,7 +2039,7 @@
     <!-- Title of QR code scan section -->
     <string name="section_scan_code">Quét mã</string>
     <!-- Title of QR code settings that permits or not contacts that scan my QR code will be automatically added to my contact list -->
-    <string name="settings_qrcode_autoaccept">Auto-accept</string>
+    <string name="settings_qrcode_autoaccept">Tự động chấp nhận</string>
     <!-- Subtitle of QR code settings auto-accept -->
     <string name="setting_subtitle_qrcode_autoccept">Bất cứ ai có tài khoản MEGA quét mã ảnh QR này sẽ được tự động thêm vào danh sách tên liên lạc của bạn.</string>
     <!-- Subtitle of QR code settings that reset the code -->
@@ -2475,7 +2474,7 @@
     <!-- error message when importing multiple files from chat -->
     <string name="number_no_imported_from_chat">Chia sẻ %d tệp tin chưa được hoàn tất</string>
     <!-- button’s text to open a full screen image -->
-    <string name="preview_content">Preview content</string>
+    <string name="preview_content">Xem trước nội dung</string>
     <!-- message shown when the user clicks on media file chat message, there is no network connection and the file is not been downloaded -->
     <string name="no_network_connection_on_play_file">Không có kết nối mạng. Tệp tin chưa được tải về và không thể truyền được.</string>
     <!-- message shown when the user open a file, the file is not been opened due to unknown reason -->
@@ -2951,7 +2950,7 @@
     <!-- Title of the screen asking permissions for files -->
     <string name="allow_acces_media_title">Cho phép truy cập vào hình ảnh, đa phương tiện và tệp tin.</string>
     <!-- Subtitle of the screen asking permissions for files -->
-    <string name="allow_acces_media_subtitle">MEGA needs your permission to access files for sharing.</string>
+    <string name="allow_acces_media_subtitle">MEGA cần phải có sự cấp phép của bạn để truy cập và chia sẻ tệp tin.</string>
     <!-- Title of the screen asking permissions for camera -->
     <string name="allow_acces_camera_title">Truy cập camera</string>
     <!-- Subtitle of the screen asking permissions for camera -->
@@ -2959,7 +2958,7 @@
     <!-- Title of the screen asking permissions for microphone and write in log calls -->
     <string name="allow_acces_calls_title">Thực hiện cuộc gọi</string>
     <!-- Title of the screen asking permissions for contacts -->
-    <string name="allow_acces_contact_title">Grant access to your address book</string>
+    <string name="allow_acces_contact_title">Cấp quyền cho phép truy cập vào sổ danh bạ</string>
     <!-- Subtitle of the screen asking permissions for contacts -->
     <string name="allow_acces_contact_subtitle">Dễ dàng tìm thêm người để kết nối trên MEGA từ sổ danh bạ của bạn.</string>
     <!-- Explanation under the subtitle of asking permissions for contacts to explain that MEGA will never use the address book data for any other purpose -->
@@ -2967,7 +2966,7 @@
     <!-- Subtitle of the screen asking permissions for microphone -->
     <string name="allow_acces_calls_subtitle_microphone">Cho phép ứng dụng MEGA sử dụng micrôphone của điện thoại để thực hiện cuộc gọi khi bạn yêu cầu.</string>
     <!-- General enable access -->
-    <string name="general_enable_access">Grant access</string>
+    <string name="general_enable_access">Cấp quyền</string>
     <!-- Title of the option on chat info screen to list all the files sent to the chat -->
     <string name="title_chat_shared_files_info">Chia sẻ tệp tin</string>
     <!-- Error mesage when trying to remove an uploading attachment that has already finished -->
@@ -3916,8 +3915,7 @@
     <string name="title_user_purchased_subscription">Đang chờ việc xác nhận</string>
     <!-- Number of social connections, showing the number of contacts the user has. E.g.: 37 connections -->
     <plurals name="my_account_connections">
-        <item quantity="one">1 connection</item>
-        <item quantity="other">%1$d connections</item>
+        <item quantity="other">%1$dtên liên lạc</item>
     </plurals>
     <!-- Section name for the “Recently Added Contacts” section. Preferably one word. -->
     <string name="section_recently_added">Mới Thêm Gần Đây</string>
@@ -3943,11 +3941,10 @@
     </plurals>
     <!-- Plural string used as button label or title of the screen to get only one or several links at the same time. -->
     <plurals name="get_links">
-        <item quantity="one">Get Link</item>
-        <item quantity="other">Get Links</item>
+        <item quantity="other">Lấy Liên Kết</item>
     </plurals>
     <!-- Ask for confirmation before clear offline files -->
-    <string name="clear_offline_confirmation">Clear all offline files?</string>
+    <string name="clear_offline_confirmation">Dọn tất cả các tệp ngoại tuyến?</string>
     <!-- Banner text when the call is in progress and I'm the only participant. -->
     <string name="banner_alone_on_the_call">Bạn là người duy nhất ở đây</string>
     <!-- Item menu option upon right click on meeting. -->
@@ -4084,4 +4081,30 @@
     <string name="main_view">Kiểu xem chính</string>
     <!-- Warning in Offline section alerting all the Offline files will be deleted after logout. -->
     <string name="offline_warning">Đăng xuất tài khoản sẽ xóa các mục đã được lưu về ngoại tuyến.</string>
+    <!-- Settings category which contains all preferences related to user interface. -->
+    <string name="user_interface_setting">Giao diện sử dụng</string>
+    <!-- Setting which allows to choose the start screen. -->
+    <string name="start_screen_setting">Màn hình khởi đầu</string>
+    <!-- Setting which allows to hide or show the recent activity. -->
+    <string name="hide_recent_setting">Ẩn hoạt động gần đây</string>
+    <!-- Context of a setting which allows to hide or show the recent activity. -->
+    <string name="hide_recent_setting_context">Ẩn đi lịch sử động gần đây trong phần Trang Chủ.</string>
+    <!-- Title of a dialog informing the start screen can be modified. -->
+    <string name="choose_start_screen_title">Chọn màn hình khởi đầu</string>
+    <!-- Test of a dialog informing the start screen can be modified. -->
+    <string name="choose_start_screen_text">Thay đổi thiết đặt để chọn ra trang muốn hiển thị mỗi khi khởi động app MEGA.</string>
+    <!-- Action button which allows to change a setting. -->
+    <string name="change_setting_action">Thay đổi thiết đặt</string>
+    <!-- Subtitle of the settings page where the start screen can be chosen. -->
+    <string name="configure_start_screen">Tùy chọn trang mặc định cho màn hình khởi đầu</string>
+    <!-- Homepage section. -->
+    <string name="home_section">Trang Chủ</string>
+    <!-- Action button which allows to show the recent activity. -->
+    <string name="show_activity_action">Hiện hoạt động</string>
+    <!-- Text informing the recent activity is hidden. -->
+    <string name="recents_activity_hidden">Hoạt động [B]gần đây[/B] bị ẩn</string>
+    <!-- Alert informing the user can choose the video quality for Camera Uploads Videos -->
+    <string name="video_quality_info">You can save space by decreasing the video quality in Camera Uploads settings.</string>
+    <!-- Label indicating video original quality -->
+    <string name="original_quality">Chất lượng nguyên gốc</string>
 </resources>

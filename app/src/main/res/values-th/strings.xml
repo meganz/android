@@ -3266,7 +3266,7 @@
     <!-- Title of the create account screen -->
     <string name="create_account_title">สร้างบัญชี MEGA ของคุณ</string>
     <!-- Label to reference a recents section -->
-    <string name="recents_label">เมื่อเร็ว ๆ นี้</string>
+    <string name="recents_label">ล่าสุด</string>
     <!-- Label to reference a chats section -->
     <string name="chats_label">แชท</string>
     <!-- Text of the empty screen when there are not elements in Recents -->
@@ -4079,4 +4079,30 @@
     <string name="main_view">มุมมองหลัก</string>
     <!-- Warning in Offline section alerting all the Offline files will be deleted after logout. -->
     <string name="offline_warning">การออกจากระบบจะเป็นการลบเนื้อหาออฟไลน์ของคุณออก</string>
+    <!-- Settings category which contains all preferences related to user interface. -->
+    <string name="user_interface_setting">ส่วนติดต่อผู้ใช้</string>
+    <!-- Setting which allows to choose the start screen. -->
+    <string name="start_screen_setting">หน้าจอเริ่มต้น</string>
+    <!-- Setting which allows to hide or show the recent activity. -->
+    <string name="hide_recent_setting">ซ่อนกิจกรรมล่าสุด</string>
+    <!-- Context of a setting which allows to hide or show the recent activity. -->
+    <string name="hide_recent_setting_context">ซ่อนกิจกรรมล่าสุดในส่วนของหน้าแรก</string>
+    <!-- Title of a dialog informing the start screen can be modified. -->
+    <string name="choose_start_screen_title">เลือกหน้าจอเริ่มต้นของคุณ</string>
+    <!-- Test of a dialog informing the start screen can be modified. -->
+    <string name="choose_start_screen_text">เปลี่ยนการตั้งค่าเพื่อเลือกหน้าจอที่จะแสดงเป็นหน้าแรกเมื่อคุณเปิดแอป MEGA ครั้งถัดไป</string>
+    <!-- Action button which allows to change a setting. -->
+    <string name="change_setting_action">เปลี่ยนการตั้งค่า</string>
+    <!-- Subtitle of the settings page where the start screen can be chosen. -->
+    <string name="configure_start_screen">กำหนดค่าหน้าจอเพื่อแสดงเป็นหน้าแรก</string>
+    <!-- Homepage section. -->
+    <string name="home_section">หน้าแรก</string>
+    <!-- Action button which allows to show the recent activity. -->
+    <string name="show_activity_action">แสดงกิจกรรม</string>
+    <!-- Text informing the recent activity is hidden. -->
+    <string name="recents_activity_hidden">มีกิจกรรม[B]ล่าสุด[/B]ที่ซ่อนอยู่</string>
+    <!-- Alert informing the user can choose the video quality for Camera Uploads Videos -->
+    <string name="video_quality_info">คุณสามารถประหยัดพื้นที่ได้ด้วยการลดคุณภาพวิดีโอลงโดยการตั้งค่าการอัปโหลดจากกล้อง</string>
+    <!-- Label indicating video original quality -->
+    <string name="original_quality">คุณภาพดั้งเดิม</string>
 </resources>
