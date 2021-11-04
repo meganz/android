@@ -2,14 +2,18 @@ package mega.privacy.android.app.modalbottomsheet
 
 import android.content.Intent
 import android.content.res.Configuration
+import android.graphics.Point
+import android.os.Build
 import android.os.Bundle
 import android.view.View
 import android.view.ViewGroup
+import android.view.WindowInsets
 import android.widget.LinearLayout
 import android.widget.RadioGroup
 import android.widget.RelativeLayout
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat.getColor
+import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.isVisible
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
@@ -19,7 +23,6 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.di.MegaApi
 import mega.privacy.android.app.interfaces.ActivityLauncher
 import mega.privacy.android.app.utils.Constants.INVALID_VALUE
-import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.Util.*
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaChatApiAndroid
@@ -77,8 +80,12 @@ open class BaseBottomSheetDialogFragment : BottomSheetDialogFragment(), Activity
 
     private var savedState = INVALID_VALUE
 
+    private val maxHeight by lazy { getRealHeight() }
+    private var statusBarColor: Int = 0
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        statusBarColor = requireActivity().window.statusBarColor
         savedState = savedInstanceState?.getInt(STATE, INVALID_VALUE) ?: INVALID_VALUE
         view.post { setBottomSheetBehavior() }
     }
@@ -104,19 +111,22 @@ open class BaseBottomSheetDialogFragment : BottomSheetDialogFragment(), Activity
 
         // In landscape mode, we need limit the bottom sheet dialog width.
         if (resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE) {
-            val displayMetrics = resources.displayMetrics
-            val maxSize = displayMetrics.heightPixels
-            window.setLayout(maxSize, ViewGroup.LayoutParams.MATCH_PARENT)
+            window.setLayout(maxHeight, ViewGroup.LayoutParams.MATCH_PARENT)
         }
 
         // But `setLayout` causes navigation buttons almost invisible in light mode,
         // in this case we set navigation bar background with light grey to make
         // navigation buttons visible.
-        if (!Util.isDarkMode(requireContext())) {
+        if (!isDarkMode(requireContext())) {
             // Only set navigation bar elements colour, View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR = 0x00000010
             @Suppress("DEPRECATION")
             window.decorView.systemUiVisibility = 0x00000010
         }
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        requireActivity().window.statusBarColor = statusBarColor
     }
 
     /**
@@ -143,22 +153,20 @@ open class BaseBottomSheetDialogFragment : BottomSheetDialogFragment(), Activity
             addBottomSheetCallback(object : BottomSheetBehavior.BottomSheetCallback() {
                 override fun onStateChanged(bottomSheet: View, newState: Int) {
                     when (newState) {
-                        BottomSheetBehavior.STATE_HIDDEN -> dismissAllowingStateLoss()
+                        BottomSheetBehavior.STATE_HIDDEN -> {
+                            dismissAllowingStateLoss()
+                        }
                         BottomSheetBehavior.STATE_EXPANDED -> {
                             if (resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE) {
                                 return
                             }
 
-                            val screenHeight =
-                                resources.displayMetrics.heightPixels - getStatusBarHeight()
-
-                            if (isDarkMode(requireContext()) && bottomSheet.height >= screenHeight) {
+                            if (isDarkMode(requireContext()) && bottomSheet.height >= maxHeight) {
                                 requireActivity().window.statusBarColor =
                                     getColor(requireContext(), R.color.grey_010_alpha_049)
                             }
                         }
-                        else -> requireActivity().window.statusBarColor =
-                            getColor(requireContext(), android.R.color.transparent)
+                        else -> requireActivity().window.statusBarColor = statusBarColor
                     }
                 }
 
@@ -185,7 +193,7 @@ open class BaseBottomSheetDialogFragment : BottomSheetDialogFragment(), Activity
      * @return The initial height of a BottomSheet.
      */
     private fun getCustomPeekHeight(): Int {
-        val halfHeightDisplay = resources.displayMetrics.heightPixels / 2
+        val halfHeightDisplay = maxHeight / 2
         val contentViewHeight = contentView.height
 
         if (contentViewHeight <= halfHeightDisplay) {
@@ -205,7 +213,7 @@ open class BaseBottomSheetDialogFragment : BottomSheetDialogFragment(), Activity
             else -> 0
         }
 
-        val heightSeparator by lazy { Util.dp2px(HEIGHT_SEPARATOR) }
+        val heightSeparator by lazy { dp2px(HEIGHT_SEPARATOR) }
 
         val childCount = when (itemsLayout) {
             is LinearLayout -> (itemsLayout as LinearLayout).childCount
@@ -242,6 +250,44 @@ open class BaseBottomSheetDialogFragment : BottomSheetDialogFragment(), Activity
         }
 
         return peekHeight
+    }
+
+    /**
+     * Gets the real height of the screen, without the status bar and navigation bar,
+     * since resources.displayMetrics.heightPixels does not do it in all cases.
+     *
+     * @return The real height of the screen.
+     */
+    private fun getRealHeight(): Int =
+        when {
+            Build.VERSION.SDK_INT >= Build.VERSION_CODES.R -> {
+                val metrics = requireActivity().windowManager.currentWindowMetrics
+                val insets = metrics.windowInsets.getInsets(WindowInsets.Type.systemBars())
+
+                metrics.bounds.height() - insets.bottom - insets.top
+            }
+            Build.VERSION.SDK_INT >= Build.VERSION_CODES.M -> {
+                val windowInsetsCompat = WindowInsetsCompat
+                    .toWindowInsetsCompat(requireActivity().window.decorView.rootWindowInsets)
+
+                val insets = windowInsetsCompat.systemWindowInsets
+
+                getRealScreenSize().y - insets.bottom - insets.top
+            }
+            else -> getRealScreenSize().y - getStatusBarHeight() - getNavigationBarHeight()
+        }
+
+    /**
+     * Gets the real size of the screen.
+     *
+     * @return A Point object with the real screen dimensions.
+     */
+    @Suppress("DEPRECATION")
+    private fun getRealScreenSize(): Point {
+        val size = Point()
+        requireActivity().windowManager.defaultDisplay.getRealSize(size)
+
+        return size
     }
 
     override fun launchActivity(intent: Intent) {
