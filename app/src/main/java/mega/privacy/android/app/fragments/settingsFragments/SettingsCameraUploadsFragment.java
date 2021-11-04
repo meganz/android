@@ -203,8 +203,8 @@ public class SettingsCameraUploadsFragment extends SettingsBaseFragment {
                 int quality;
 
                 if (uploadQuality == null || uploadQuality.isEmpty()) {
-                    dbH.setCameraUploadVideoQuality(VIDEO_QUALITY_MEDIUM);
-                    quality = VIDEO_QUALITY_MEDIUM;
+                    dbH.setCameraUploadVideoQuality(VIDEO_QUALITY_ORIGINAL);
+                    quality = VIDEO_QUALITY_ORIGINAL;
                 } else {
                     quality = Integer.parseInt(uploadQuality);
                 }
@@ -767,10 +767,9 @@ public class SettingsCameraUploadsFragment extends SettingsBaseFragment {
         String uploadQuality = prefs.getUploadVideoQuality();
 
         if (TextUtils.isEmpty(uploadQuality)) {
-            prefs.setUploadVideoQuality(String.valueOf(VIDEO_QUALITY_MEDIUM));
-            dbH.setCameraUploadVideoQuality(VIDEO_QUALITY_MEDIUM);
-            videoQuality.setValueIndex(VIDEO_QUALITY_MEDIUM);
-            enableChargingSettings();
+            prefs.setUploadVideoQuality(String.valueOf(VIDEO_QUALITY_ORIGINAL));
+            dbH.setCameraUploadVideoQuality(VIDEO_QUALITY_ORIGINAL);
+            videoQuality.setValueIndex(VIDEO_QUALITY_ORIGINAL);
         } else {
             int quality = Integer.parseInt(uploadQuality);
             videoQuality.setValueIndex(quality);
