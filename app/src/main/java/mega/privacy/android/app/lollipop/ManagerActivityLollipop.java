@@ -131,6 +131,7 @@ import mega.privacy.android.app.Product;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.GestureScaleListener;
 import mega.privacy.android.app.fragments.homepage.documents.DocumentsFragment;
+import mega.privacy.android.app.fragments.homepage.photos.ImagesFragment;
 import mega.privacy.android.app.fragments.managerFragments.cu.PhotosFragment;
 import mega.privacy.android.app.gallery.fragment.newImages.Images1Fragment;
 import mega.privacy.android.app.generalusecase.FilePrepareUseCase;
@@ -1529,14 +1530,14 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
                 }
             }
 
-//            if (drawerItem == DrawerItem.HOMEPAGE && mHomepageScreen == HomepageScreen.IMAGES) {
-//                ImagesFragment imagesFragment = getFragmentByType(ImagesFragment.class);
-//                imagesFragment.refreshSelf();
-//
-//                if (needReload) {
-//                    imagesFragment.loadPhotos();
-//                }
-//            }
+            if (drawerItem == DrawerItem.HOMEPAGE && mHomepageScreen == HomepageScreen.IMAGES) {
+                ImagesFragment imagesFragment = getFragmentByType(ImagesFragment.class);
+                imagesFragment.refreshSelf();
+
+                if (needReload) {
+                    imagesFragment.loadPhotos();
+                }
+            }
         });
 
         dbH = DatabaseHandler.getDbHandler(getApplicationContext());
@@ -3702,7 +3703,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 	 */
 	public void setToolbarVisibility(){
     	if(mHomepageScreen == HomepageScreen.IMAGES){
-			toolbar.setVisibility(View.GONE);
+			toolbar.setVisibility(View.VISIBLE);
 		}else{
 			toolbar.setVisibility(View.VISIBLE);
 		}
@@ -5502,20 +5503,20 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 				if (mHomepageSearchable != null) {
 					searchMenuItem.setVisible(mHomepageSearchable.shouldShowSearchMenu());
 
-//                    if (mHomepageScreen == HomepageScreen.IMAGES) {
-//                        zoomOutMenuItem.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
-//                        zoomInMenuItem.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
-//
-//                        if (currentZoom == ZOOM_OUT_2X) {
-//                            ZoomUtil.INSTANCE.disableButton(this, zoomOutMenuItem);
-//                        }
-//
-//                        if (currentZoom == ZOOM_IN_1X) {
-//                            ZoomUtil.INSTANCE.disableButton(this, zoomInMenuItem);
-//                        }
-//
-//                        updatePhotosFragmentOptionsMenu();
-//                    }
+                    if (mHomepageScreen == HomepageScreen.IMAGES) {
+                        zoomOutMenuItem.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+                        zoomInMenuItem.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+
+                        if (currentZoom == ZOOM_OUT_2X) {
+                            ZoomUtil.INSTANCE.disableButton(this, zoomOutMenuItem);
+                        }
+
+                        if (currentZoom == ZOOM_IN_1X) {
+                            ZoomUtil.INSTANCE.disableButton(this, zoomInMenuItem);
+                        }
+
+                        updatePhotosFragmentOptionsMenu();
+                    }
 				}
 			}
 		}
@@ -5608,6 +5609,18 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
             zoomOutMenuItem.setVisible(visible);
             zoomInMenuItem.setVisible(visible);
         }
+    }
+
+    public void updatePhotosFragmentOptionsMenu() {
+        if (zoomOutMenuItem == null || zoomInMenuItem == null) {
+            return;
+        }
+
+        ImagesFragment imagesFragment = getFragmentByType(ImagesFragment.class);
+        boolean shouldShow = imagesFragment.shouldShowZoomMenuItem();
+
+        zoomOutMenuItem.setVisible(shouldShow);
+        zoomInMenuItem.setVisible(shouldShow);
     }
 
 	private void setGridListIcon() {

@@ -7,7 +7,6 @@ import android.content.res.Configuration;
 import android.os.Bundle;
 import android.os.Handler;
 import android.view.LayoutInflater;
-import android.view.ScaleGestureDetector;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
@@ -34,11 +33,11 @@ import dagger.hilt.android.AndroidEntryPoint;
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
-import mega.privacy.android.app.components.GestureScaleListener;
 import mega.privacy.android.app.components.ListenScrollChangesHelper;
 import mega.privacy.android.app.databinding.FragmentPhotosBinding;
 import mega.privacy.android.app.databinding.FragmentPhotosFirstLoginBinding;
 import mega.privacy.android.app.fragments.BaseFragment;
+import mega.privacy.android.app.fragments.homepage.photos.ScaleGestureHandler;
 import mega.privacy.android.app.globalmanagement.SortOrderManagement;
 import mega.privacy.android.app.lollipop.FullScreenImageViewerLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
@@ -328,14 +327,7 @@ public class PhotosFragment extends BaseFragment implements CUGridViewAdapter.Li
             }
         });
 
-        ScaleGestureDetector scaleDetector = new ScaleGestureDetector(mManagerActivity, new GestureScaleListener(mManagerActivity));
-        binding.cuList.setOnTouchListener((v, event) -> {
-            if(event.getPointerCount() == 2) {
-                return scaleDetector.onTouchEvent(event);
-            } else {
-                return false;
-            }
-        });
+        binding.cuList.setOnTouchListener(new ScaleGestureHandler(context, mManagerActivity));
 
         setGridView();
     }

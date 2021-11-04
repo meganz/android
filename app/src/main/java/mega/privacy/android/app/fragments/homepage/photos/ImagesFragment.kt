@@ -8,7 +8,6 @@ import android.content.Intent
 import android.content.res.Configuration
 import android.os.Bundle
 import android.view.LayoutInflater
-import android.view.ScaleGestureDetector
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
@@ -80,7 +79,6 @@ class ImagesFragment : BaseFragment(), HomepageSearchable {
 
     private lateinit var gridLayoutManager: GridLayoutManager
     private var linearLayoutManager: LinearLayoutManager? = null
-
     private var actionMode: ActionMode? = null
     private lateinit var actionModeCallback: ActionModeCallback
 
@@ -162,7 +160,7 @@ class ImagesFragment : BaseFragment(), HomepageSearchable {
         viewModel.dateCards.observe(viewLifecycleOwner, ::showCards)
 
         viewModel.refreshCards.observe(viewLifecycleOwner) {
-            if(it && selectedView != ALL_VIEW) {
+            if (it && selectedView != ALL_VIEW) {
                 viewModel.refreshing()
                 showCards(viewModel.dateCards.value)
             }
@@ -233,9 +231,9 @@ class ImagesFragment : BaseFragment(), HomepageSearchable {
             else -> setViewTypeButtonStyle(allButton, true)
         }
 
-//        callManager {
-//            it.updatePhotosFragmentOptionsMenu()
-//        }
+        callManager {
+            it.updatePhotosFragmentOptionsMenu()
+        }
     }
 
     private fun updateFastScrollerVisibility() {
@@ -361,18 +359,12 @@ class ImagesFragment : BaseFragment(), HomepageSearchable {
         listView.clipToPadding = false
         listView.setHasFixedSize(true)
 
-        val scaleDetector = ScaleGestureDetector(activity, GestureScaleListener(activity as? GestureScaleListener.GestureScaleCallback))
-        callManager {
-
-        }
-
-        listView.setOnTouchListener { _, event ->
-
-            when (event.pointerCount) {
-                2 -> scaleDetector.onTouchEvent(event)
-                else -> false
-            }
-        }
+        listView.setOnTouchListener(
+            ScaleGestureHandler(
+                context,
+                activity as? GestureScaleListener.GestureScaleCallback
+            )
+        )
     }
 
     private fun setupActionMode() {
@@ -663,8 +655,8 @@ class ImagesFragment : BaseFragment(), HomepageSearchable {
             resources.getDimensionPixelSize(R.dimen.cu_view_type_button_vertical_margin)
         )
         viewTypePanel.animate().translationY(0f).setDuration(175)
-            .withStartAction{ viewTypePanel.visibility = View.VISIBLE }
-            .withEndAction{ viewTypePanel.layoutParams = params }.start()
+            .withStartAction { viewTypePanel.visibility = View.VISIBLE }
+            .withEndAction { viewTypePanel.layoutParams = params }.start()
     }
 
     override fun searchQuery(query: String) {
@@ -717,14 +709,14 @@ class ImagesFragment : BaseFragment(), HomepageSearchable {
      *          The third element is the cards of years.
      */
     private fun showCards(dateCards: List<List<CUCard>?>?) {
-        val index = when(selectedView) {
+        val index = when (selectedView) {
             DAYS_VIEW -> 0
             MONTHS_VIEW -> 1
             YEARS_VIEW -> 2
             else -> -1
         }
 
-        if(index != -1) {
+        if (index != -1) {
             cardAdapter.submitList(dateCards?.get(index))
         }
 
@@ -751,7 +743,8 @@ class ImagesFragment : BaseFragment(), HomepageSearchable {
      * Shows or hides the bottom view and animates the transition.
      */
     fun animateBottomView() {
-        val deltaY = viewTypePanel.height.toFloat() + resources.getDimensionPixelSize(R.dimen.cu_view_type_button_vertical_margin)
+        val deltaY =
+            viewTypePanel.height.toFloat() + resources.getDimensionPixelSize(R.dimen.cu_view_type_button_vertical_margin)
 
         if (viewTypePanel.isVisible) {
             viewTypePanel
