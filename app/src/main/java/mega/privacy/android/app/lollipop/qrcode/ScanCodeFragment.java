@@ -211,7 +211,9 @@ public class ScanCodeFragment extends Fragment implements /*ZXingScannerView.Res
         }
 
         if(aB!=null){
-            aB.setTitle(getString(R.string.section_qr_code));
+            aB.setTitle(StringResourcesUtils.getString(R.string.section_qr_code)
+                    .toUpperCase(Locale.getDefault()));
+
             aB.setHomeButtonEnabled(true);
             aB.setDisplayHomeAsUpEnabled(true);
         }

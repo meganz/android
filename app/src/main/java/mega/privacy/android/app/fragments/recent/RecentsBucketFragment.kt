@@ -148,7 +148,7 @@ class RecentsBucketFragment : BaseFragment() {
 
     private fun setupToolbar() {
         (activity as ManagerActivityLollipop).setToolbarTitle(
-            "${viewModel.items.value?.size} ${getString(R.string.general_files).toUpperCase(Locale.ROOT)}"
+            "${viewModel.items.value?.size} ${getString(R.string.general_files)}"
         )
     }
 

@@ -221,7 +221,8 @@ public class ZipBrowserActivityLollipop extends PasscodeActivity {
 		if(aB != null) {
 			aB.setHomeButtonEnabled(true);
 			aB.setDisplayHomeAsUpEnabled(true);
-			aB.setTitle(getString(R.string.zip_browser_activity));
+			aB.setTitle(StringResourcesUtils.getString(R.string.zip_browser_activity)
+					.toUpperCase(Locale.getDefault()));
 		}
 		zipLayout = findViewById(R.id.zip_layout);
 		recyclerView = findViewById(R.id.zip_list_view_browser);
