@@ -360,7 +360,7 @@ public class FileInfoActivityLollipop extends PasscodeActivity implements OnClic
         node = megaApi.getNodeByHandle(node.getHandle());
 
         if (node != null && collapsingToolbar != null) {
-            collapsingToolbar.setTitle(node.getName().toUpperCase());
+            collapsingToolbar.setTitle(node.getName());
         }
     }
 
@@ -668,7 +668,7 @@ public class FileInfoActivityLollipop extends PasscodeActivity implements OnClic
 
             String name = node.getName();
 
-            collapsingToolbar.setTitle(name.toUpperCase());
+            collapsingToolbar.setTitle(name);
             if (nC == null) {
                 nC = new NodeController(this);
             }

@@ -16,11 +16,13 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.ArrayList;
+import java.util.Locale;
 
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.SimpleDividerItemDecoration;
 import mega.privacy.android.app.fragments.BaseFragment;
 import mega.privacy.android.app.listeners.GetAchievementsListener;
+import mega.privacy.android.app.utils.StringResourcesUtils;
 
 import static mega.privacy.android.app.lollipop.megaachievements.AchievementsActivity.sFetcher;
 import static mega.privacy.android.app.utils.LogUtil.logDebug;
@@ -60,7 +62,8 @@ public class ReferralBonusesFragment extends BaseFragment implements OnClickList
 		if (mActivity != null) {
 			ActionBar actionBar = ((AppCompatActivity) mActivity).getSupportActionBar();
 			if (actionBar != null) {
-				actionBar.setTitle(getString(R.string.title_referral_bonuses));
+				actionBar.setTitle(StringResourcesUtils.getString(R.string.title_referral_bonuses)
+						.toUpperCase(Locale.getDefault()));
 			}
 		}
 
