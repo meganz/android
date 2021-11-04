@@ -22,6 +22,7 @@ import mega.privacy.android.app.DatabaseHandler
 import mega.privacy.android.app.R
 import mega.privacy.android.app.di.MegaApi
 import mega.privacy.android.app.interfaces.ActivityLauncher
+import mega.privacy.android.app.utils.ColorUtils.setStatusBarTextColor
 import mega.privacy.android.app.utils.Constants.INVALID_VALUE
 import mega.privacy.android.app.utils.Util.*
 import nz.mega.sdk.MegaApiAndroid
@@ -80,12 +81,14 @@ open class BaseBottomSheetDialogFragment : BottomSheetDialogFragment(), Activity
 
     private var savedState = INVALID_VALUE
 
+    private val isLandscape by lazy { resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE }
+    private val isDarkMode by lazy { isDarkMode(requireContext()) }
     private val maxHeight by lazy { getRealHeight() }
     private var statusBarColor: Int = 0
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        statusBarColor = requireActivity().window.statusBarColor
+        statusBarColor = dialog?.window?.statusBarColor ?: android.R.color.transparent
         savedState = savedInstanceState?.getInt(STATE, INVALID_VALUE) ?: INVALID_VALUE
         view.post { setBottomSheetBehavior() }
     }
@@ -117,16 +120,11 @@ open class BaseBottomSheetDialogFragment : BottomSheetDialogFragment(), Activity
         // But `setLayout` causes navigation buttons almost invisible in light mode,
         // in this case we set navigation bar background with light grey to make
         // navigation buttons visible.
-        if (!isDarkMode(requireContext())) {
+        if (!isDarkMode) {
             // Only set navigation bar elements colour, View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR = 0x00000010
             @Suppress("DEPRECATION")
             window.decorView.systemUiVisibility = 0x00000010
         }
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        requireActivity().window.statusBarColor = statusBarColor
     }
 
     /**
@@ -157,16 +155,33 @@ open class BaseBottomSheetDialogFragment : BottomSheetDialogFragment(), Activity
                             dismissAllowingStateLoss()
                         }
                         BottomSheetBehavior.STATE_EXPANDED -> {
-                            if (resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE) {
+                            if (isLandscape) {
                                 return
                             }
 
-                            if (isDarkMode(requireContext()) && bottomSheet.height >= maxHeight) {
-                                requireActivity().window.statusBarColor =
-                                    getColor(requireContext(), R.color.grey_010_alpha_049)
+                            if (bottomSheet.height >= maxHeight) {
+                                dialog?.window?.statusBarColor = getColor(
+                                    requireContext(),
+                                    if (isDarkMode) R.color.grey_700_alpha_065
+                                    else R.color.white
+                                )
+
+                                if (!isDarkMode) {
+                                    setStatusBarTextColor(requireContext(), dialog?.window)
+                                }
                             }
                         }
-                        else -> requireActivity().window.statusBarColor = statusBarColor
+                        else -> {
+                            if (isLandscape) {
+                                return
+                            }
+
+                            dialog?.window?.statusBarColor = statusBarColor
+
+                            if (!isDarkMode) {
+                                setStatusBarTextColor(requireContext(), dialog?.window)
+                            }
+                        }
                     }
                 }
 
@@ -267,12 +282,16 @@ open class BaseBottomSheetDialogFragment : BottomSheetDialogFragment(), Activity
                 metrics.bounds.height() - insets.bottom - insets.top
             }
             Build.VERSION.SDK_INT >= Build.VERSION_CODES.M -> {
-                val windowInsetsCompat = WindowInsetsCompat
-                    .toWindowInsetsCompat(requireActivity().window.decorView.rootWindowInsets)
+                val windowInsets = requireActivity().window.decorView.rootWindowInsets
 
-                val insets = windowInsetsCompat.systemWindowInsets
+                if (windowInsets != null) {
+                    val insets =
+                        WindowInsetsCompat.toWindowInsetsCompat(windowInsets).systemWindowInsets
 
-                getRealScreenSize().y - insets.bottom - insets.top
+                    getRealScreenSize().y - insets.bottom - insets.top
+                } else {
+                    getRealScreenSize().y - getStatusBarHeight() - getNavigationBarHeight()
+                }
             }
             else -> getRealScreenSize().y - getStatusBarHeight() - getNavigationBarHeight()
         }
