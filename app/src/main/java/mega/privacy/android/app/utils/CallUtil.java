@@ -10,12 +10,14 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.net.Uri;
+import android.os.Build;
 import android.os.SystemClock;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Chronometer;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
+import android.widget.RemoteViews;
 import android.widget.TextView;
 
 import androidx.core.content.ContextCompat;
@@ -52,12 +54,16 @@ import nz.mega.sdk.MegaHandleList;
 import nz.mega.sdk.MegaUser;
 
 import static android.content.Context.NOTIFICATION_SERVICE;
+import static android.view.View.GONE;
 import static mega.privacy.android.app.meeting.activity.MeetingActivity.*;
 import static mega.privacy.android.app.utils.AvatarUtil.*;
+import static mega.privacy.android.app.utils.ChatUtil.getStatusBitmap;
+import static mega.privacy.android.app.utils.ChatUtil.getTitleChat;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.ContactUtil.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.PermissionUtils.*;
+import static mega.privacy.android.app.utils.StringResourcesUtils.getString;
 import static mega.privacy.android.app.utils.TextUtil.isTextEmpty;
 import static mega.privacy.android.app.utils.Util.*;
 import static nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE;
@@ -1271,26 +1277,27 @@ public class CallUtil {
     /**
      * Method that performs the necessary actions when there is an incoming call.
      *
-     * @param listAllCalls List of all current calls
-     * @param chatId       Chat ID
-     * @param callStatus   Call Status
+     * @param listAllCalls       List of all current calls
+     * @param incomingCallChatId Chat ID of incoming call
+     * @param callStatus         Call Status
      */
-    public static void incomingCall(MegaHandleList listAllCalls, long chatId, int callStatus) {
-        if (!MegaApplication.getInstance().getMegaApi().isChatNotifiable(chatId) ||
-                MegaApplication.getChatManagement().isNotificationShown(chatId)){
+    public static void incomingCall(MegaHandleList listAllCalls, long incomingCallChatId, int callStatus) {
+        logDebug("Chat ID of incoming call is " + incomingCallChatId);
+        if (!MegaApplication.getInstance().getMegaApi().isChatNotifiable(incomingCallChatId) ||
+                MegaApplication.getChatManagement().isNotificationShown(incomingCallChatId)){
             logDebug("The chat is not notifiable or the notification is already being displayed");
             return;
         }
 
-        MegaChatRoom chatRoom = MegaApplication.getInstance().getMegaChatApi().getChatRoom(chatId);
+        MegaChatRoom chatRoom = MegaApplication.getInstance().getMegaChatApi().getChatRoom(incomingCallChatId);
         if (chatRoom == null) {
             logError("The chat does not exist");
             return;
         }
 
-        if (!chatRoom.isMeeting() || !MegaApplication.getChatManagement().isOpeningMeetingLink(chatId)) {
-            MegaApplication.getInstance().createOrUpdateAudioManager(false, AUDIO_MANAGER_CALL_RINGING);
-            controlNumberOfCalls(listAllCalls, callStatus, chatId);
+        if (!chatRoom.isMeeting() || !MegaApplication.getChatManagement().isOpeningMeetingLink(incomingCallChatId)) {
+            logError("It is necessary to check the number of current calls");
+            controlNumberOfCalls(listAllCalls, callStatus, incomingCallChatId);
         }
     }
 
@@ -1326,12 +1333,69 @@ public class CallUtil {
      *
      * @param listAllCalls List of all current calls
      * @param callStatus   Call Status
+     * @param incomingCallChatId Chat ID of incoming call
      */
-    private static void controlNumberOfCalls(MegaHandleList listAllCalls, int callStatus, long currentChatId) {
+    private static void controlNumberOfCalls(MegaHandleList listAllCalls, int callStatus, long incomingCallChatId) {
         if (listAllCalls.size() == 1) {
-            MegaApplication.getInstance().checkOneCall(currentChatId);
+            MegaApplication.getInstance().checkOneCall(incomingCallChatId);
         } else {
-            MegaApplication.getInstance().checkSeveralCall(listAllCalls, callStatus, true, currentChatId);
+            MegaApplication.getInstance().checkSeveralCall(listAllCalls, callStatus, true, incomingCallChatId);
         }
+    }
+
+    /**
+     * Check if an incoming call is a one-to-one call
+     *
+     * @param chatRoom MegaChatRoom of the call
+     * @return True, if it is a one-to-one call. False, if it is a group call or meeting
+     */
+    public static boolean isOneToOneCall(MegaChatRoom chatRoom) {
+        return !chatRoom.isGroup() && !chatRoom.isMeeting();
+    }
+
+    /**
+     * Get incoming call notification title
+     *
+     * @param chatRoom MegaChatRoom of the call
+     * @return Notification title
+     */
+    public static String getIncomingCallNotificationTitle(MegaChatRoom chatRoom) {
+        return getString(isOneToOneCall(chatRoom)
+                ? R.string.title_notification_incoming_individual_audio_call
+                : R.string.title_notification_incoming_group_call);
+    }
+
+    /**
+     * Method to create collapsed or expanded remote views for a customised incoming call notification.
+     *
+     * @param layoutId     ID of layout
+     * @param chatToAnswer MegaChatRoom of the call
+     * @param avatarIcon   Bitmap with the chat Avatar
+     * @return The RemoteViews created
+     */
+    public static RemoteViews collapsedAndExpandedIncomingCallNotification(Context context, int layoutId, MegaChatRoom chatToAnswer, Bitmap avatarIcon) {
+        Bitmap statusIcon = CallUtil.isOneToOneCall(chatToAnswer) ? getStatusBitmap(MegaApplication.getInstance().getMegaChatApi().getUserOnlineStatus(chatToAnswer.getPeerHandle(0))) : null;
+        String titleChat = getTitleChat(chatToAnswer);
+        String titleCall = CallUtil.getIncomingCallNotificationTitle(chatToAnswer);
+
+        RemoteViews views = new RemoteViews(context.getPackageName(), layoutId);
+        views.setTextViewText(R.id.chat_title, titleChat);
+        views.setTextViewText(R.id.call_title, titleCall);
+
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O || avatarIcon == null) {
+            views.setViewVisibility(R.id.avatar_layout, GONE);
+        } else {
+            views.setImageViewBitmap(R.id.avatar_image, avatarIcon);
+            views.setViewVisibility(R.id.avatar_layout, View.VISIBLE);
+        }
+
+        if (statusIcon != null) {
+            views.setImageViewBitmap(R.id.chat_status, statusIcon);
+            views.setViewVisibility(R.id.chat_status, View.VISIBLE);
+        } else {
+            views.setViewVisibility(R.id.chat_status, GONE);
+        }
+
+        return views;
     }
 }

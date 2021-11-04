@@ -48,6 +48,7 @@ import com.jeremyliao.liveeventbus.LiveEventBus;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 
 import mega.privacy.android.app.MegaApplication;
@@ -55,6 +56,7 @@ import mega.privacy.android.app.R;
 import mega.privacy.android.app.activities.PasscodeActivity;
 import mega.privacy.android.app.components.EditTextPIN;
 import mega.privacy.android.app.utils.ColorUtils;
+import mega.privacy.android.app.utils.StringResourcesUtils;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaError;
@@ -174,10 +176,13 @@ public class TwoFactorAuthenticationActivity extends PasscodeActivity implements
         tB.setVisibility(View.VISIBLE);
         setSupportActionBar(tB);
         aB = getSupportActionBar();
-        aB.setHomeButtonEnabled(true);
-        aB.setDisplayHomeAsUpEnabled(true);
-        tB.setTitle(getString(R.string.settings_2fa));
-        setTitle(getString(R.string.settings_2fa));
+
+        if (aB != null) {
+            aB.setHomeButtonEnabled(true);
+            aB.setDisplayHomeAsUpEnabled(true);
+            aB.setTitle(StringResourcesUtils.getString(R.string.settings_2fa)
+                    .toUpperCase(Locale.getDefault()));
+        }
 
         if (savedInstanceState != null){
             logDebug("savedInstanceState No null");

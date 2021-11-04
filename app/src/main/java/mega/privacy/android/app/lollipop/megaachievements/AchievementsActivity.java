@@ -22,6 +22,7 @@ import mega.privacy.android.app.R;
 import mega.privacy.android.app.activities.PasscodeActivity;
 import mega.privacy.android.app.listeners.GetAchievementsListener;
 import mega.privacy.android.app.lollipop.InviteContactActivity;
+import mega.privacy.android.app.utils.StringResourcesUtils;
 import mega.privacy.android.app.utils.Util;
 
 import static mega.privacy.android.app.utils.Constants.ACHIEVEMENTS_FRAGMENT;
@@ -31,6 +32,8 @@ import static mega.privacy.android.app.utils.Constants.INVITE_FRIENDS_FRAGMENT;
 import static mega.privacy.android.app.utils.Constants.REQUEST_CODE_GET_CONTACTS;
 import static mega.privacy.android.app.utils.LogUtil.logDebug;
 import static mega.privacy.android.app.utils.Util.hideKeyboard;
+
+import java.util.Locale;
 
 public class AchievementsActivity extends PasscodeActivity {
     private static final String TAG_ACHIEVEMENTS = "achievementsFragment";
@@ -116,7 +119,9 @@ public class AchievementsActivity extends PasscodeActivity {
         switch (fragmentName) {
             case ACHIEVEMENTS_FRAGMENT:
                 hideKeyboard(this, InputMethodManager.HIDE_NOT_ALWAYS);
-                aB.setTitle(getString(R.string.achievements_title));
+                aB.setTitle(StringResourcesUtils.getString(R.string.achievements_title)
+                        .toUpperCase(Locale.getDefault()));
+
                 fragment = new AchievementsFragment();
                 tag = "achievementsFragment";
                 break;

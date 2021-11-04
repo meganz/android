@@ -8,8 +8,6 @@
     <string name="prolite_account">Pro Lite</string>
     <!-- Name of the MEGA PDF Viewer. Keep uppercase. -->
     <string name="pdf_app_name">MEGA PDF檢視器</string>
-    <!-- Showing progress of elements. Example: 2 of 10. -->
-    <string name="general_x_of_x">之</string>
     <!-- Answer for confirmation dialog. -->
     <string name="general_yes">是</string>
     <!-- Answer for confirmation dialog. -->
@@ -2226,10 +2224,12 @@
     <string name="settings_video_upload_quality">影片品質</string>
     <!-- Text shown when the user refuses to permit the storage permission when enable camera upload -->
     <string name="on_refuse_storage_permission">相機上傳需存取您裝置裡的相片與其他媒體內容，請到設定頁面並且允許其權限。</string>
-    <!-- the options for the option on setting to set up the quality of multimedia files uploaded to the chat, the options of medium quality multimedia file to  upload. -->
+    <!-- Available options for the setting to set up the quality of multimedia files uploaded to the chat or the Camera Uploads -->
     <string-array name="settings_chat_upload_quality_entries">
-        <item>原始品質</item>
-        <item>中等品質</item>
+        <item>低</item>
+        <item>普通</item>
+        <item>高</item>
+        <item>原始的</item>
     </string-array>
     <!-- Title of the notification for a missed call -->
     <string name="missed_call_notification_title">未接來電</string>
@@ -3376,7 +3376,7 @@
     <!-- Text informing user that their account has been suspended -->
     <string name="account_temporarily_suspended">為了安全起見，您的帳戶已暫時被封鎖。</string>
     <!-- Text informing user has to follow the steps of an email to unlock their account -->
-    <string name="verify_email_and_follow_steps">[A]請驗證您的電子郵件[/A]，並按照MEGA信件裡的步驟解鎖您的帳戶。</string>
+    <string name="verify_email_and_follow_steps">請按照[A]驗證電子郵件[/A]中的步驟解鎖您的帳戶。</string>
     <!-- Question which takes the user to a help screen -->
     <string name="why_am_i_seeing_this">為什麼我會看到這個？</string>
     <!-- Label of a button which action is resend an email -->
@@ -3634,7 +3634,7 @@
     <!-- Title indicating the select mode is enabled and ready to select transfers on Transfers section, In progress tab -->
     <string name="title_select_transfers">選擇傳輸</string>
     <!-- Error shown to inform the priority change of a transfer failed. Please don’t remove the place holder, it’s to set the name of the transfer. Example: The priority change of the transfer “video.mp4” failed. -->
-    <string name="change_of_transfer_priority_failed">傳輸 “%1$s” 的優先變更失敗。</string>
+    <string name="change_of_transfer_priority_failed">無法更改傳輸”%1$s”的優先順序</string>
     <!-- Title option to send separated the link and decryption key -->
     <string name="option_send_decryption_key_separately">各別發送解密金鑰</string>
     <!-- Explanation option to send separated the link and decryption key -->

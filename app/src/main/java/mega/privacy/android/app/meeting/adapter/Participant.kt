@@ -2,7 +2,6 @@ package mega.privacy.android.app.meeting.adapter
 
 import android.content.Context
 import android.graphics.Bitmap
-import androidx.annotation.StringRes
 import androidx.core.text.HtmlCompat
 import androidx.recyclerview.widget.DiffUtil
 import mega.privacy.android.app.R

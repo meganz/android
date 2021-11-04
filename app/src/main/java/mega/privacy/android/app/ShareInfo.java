@@ -67,6 +67,10 @@ public class ShareInfo implements Serializable {
 		}
 		return info;
 	}
+
+	public String getOriginalFileName() {
+		return file.getName();
+	}
 	
 	public String getFileAbsolutePath() {
 		return file.getAbsolutePath();

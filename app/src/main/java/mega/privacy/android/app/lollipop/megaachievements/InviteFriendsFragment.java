@@ -18,6 +18,7 @@ import mega.privacy.android.app.fragments.BaseFragment;
 import mega.privacy.android.app.listeners.GetAchievementsListener;
 import mega.privacy.android.app.lollipop.InviteContactActivity;
 import mega.privacy.android.app.utils.ColorUtils;
+import mega.privacy.android.app.utils.StringResourcesUtils;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaAchievementsDetails;
 
@@ -25,6 +26,8 @@ import static mega.privacy.android.app.lollipop.megaachievements.AchievementsAct
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.LogUtil.logDebug;
 import static mega.privacy.android.app.utils.Util.getSizeString;
+
+import java.util.Locale;
 
 public class InviteFriendsFragment extends BaseFragment implements OnClickListener
 		, GetAchievementsListener.DataCallback{
@@ -64,7 +67,8 @@ public class InviteFriendsFragment extends BaseFragment implements OnClickListen
 		if (mActivity != null) {
 			ActionBar actionBar = ((AppCompatActivity) mActivity).getSupportActionBar();
 			if (actionBar != null) {
-				actionBar.setTitle(getString(R.string.title_referral_bonuses));
+				actionBar.setTitle(StringResourcesUtils.getString(R.string.title_referral_bonuses)
+						.toUpperCase(Locale.getDefault()));
 			}
 		}
 

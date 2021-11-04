@@ -48,4 +48,12 @@
 		<item>dark</item>
 		<item>default</item>
 	</string-array>
+
+	<string-array name="settings_start_screen">
+		<item>@string/section_cloud_drive</item>
+		<item>@string/section_photo_sync</item>
+		<item>@string/home_section</item>
+		<item>@string/section_chat</item>
+		<item>@string/title_shared_items</item>
+	</string-array>
 </resources>

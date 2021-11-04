@@ -93,7 +93,6 @@ import nz.mega.sdk.*
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
 import java.lang.Integer.min
 
-@ExperimentalCoroutinesApi
 @AndroidEntryPoint
 class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, SnackbarShower,
     StartChatCallListener.StartChatCallCallback, AnswerChatCallListener.OnCallAnsweredCallback,
@@ -150,7 +149,6 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
     private var lastTouch: Long = 0
     private lateinit var dragTouchListener: OnDragTouchListener
     private var bannerShouldBeShown = false
-    private var yBias = 0f // Recode the y bias of floating window
 
     // For snack bar
     private var shiftY = -1f // Record the shift of floatingWindowFragment to Snackbar
@@ -319,7 +317,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
                 showMeetingInfoFragment()
             }
         }
-        bottomFloatingPanelViewHolder.updateMeetingType(!inMeetingViewModel.isOneToOneCall())
+        bottomFloatingPanelViewHolder.updateMeetingType()
     }
 
     private val callCompositionObserver = Observer<MegaChatCall> {
@@ -615,7 +613,6 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
         MegaApplication.getInstance().startProximitySensor()
         initToolbar()
         initFloatingWindowContainerDragListener(view)
-        initFloatingPanel()
 
         var chatId: Long? =
             arguments?.getLong(MeetingActivity.MEETING_CHAT_ID, MEGACHAT_INVALID_HANDLE)
@@ -637,6 +634,8 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
                 }
             }
         }
+
+        initFloatingPanel()
 
         val meetingName: String = args.meetingName
         meetingName.let {
@@ -1235,7 +1234,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
     private fun onConfigurationChangedOfFloatingWindow(outMetrics: DisplayMetrics ) {
         floatingWindowContainer.post {
             previousY = -1f
-            var dx = outMetrics.widthPixels - floatingWindowContainer.width
+            val dx = outMetrics.widthPixels - floatingWindowContainer.width
             var dy = outMetrics.heightPixels - floatingWindowContainer.height
 
             if (BottomSheetBehavior.STATE_COLLAPSED == bottomFloatingPanelViewHolder.getState() && floatingBottomSheet.isVisible) {
@@ -2033,8 +2032,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
             BottomFloatingPanelViewHolder(
                 inMeetingViewModel,
                 binding,
-                this,
-                !inMeetingViewModel.isOneToOneCall()
+                this
             )
 
         updatePanelParticipantList()
@@ -2584,10 +2582,10 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
         if (inMeetingViewModel.isOneToOneCall() || inMeetingViewModel.isGroupCall()) {
             logDebug("End the one to one or group call")
             leaveMeeting()
-            checkIfAnotherCallShouldBeShown()
         } else if (inMeetingViewModel.shouldAssignModerator()) {
             EndMeetingBottomSheetDialogFragment.newInstance(inMeetingViewModel.getChatId())
                 .run {
+                    setLeaveMeetingCallBack(leaveMeetingModerator)
                     setAssignCallBack(showAssignModeratorFragment)
                     show(
                         this@InMeetingFragment.childFragmentManager,
@@ -2599,11 +2597,12 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
         }
     }
 
+    private val leaveMeetingModerator = fun() {
+        leaveMeeting()
+    }
+
     private val showAssignModeratorFragment = fun() {
-        val callback = fun() {
-            leaveMeeting()
-        }
-        AssignModeratorBottomFragment.newInstance(callback).let {
+        AssignModeratorBottomFragment.newInstance(leaveMeetingModerator).let {
             it.show(childFragmentManager, it.tag)
         }
     }
@@ -2909,14 +2908,10 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
      * Check if exists another call in progress or on hold
      */
     private fun checkIfAnotherCallShouldBeShown() {
-        val anotherCall = inMeetingViewModel.getAnotherCall()
-        if (anotherCall != null) {
+        inMeetingViewModel.getAnotherCall()?.let {
             logDebug("Show another call")
-            CallUtil.openMeetingInProgress(requireContext(), anotherCall.chatid, false)
+            CallUtil.openMeetingInProgress(requireContext(), it.chatid, false)
         }
-
-        logDebug("Finish current call")
-        finishActivity()
     }
 
     /**

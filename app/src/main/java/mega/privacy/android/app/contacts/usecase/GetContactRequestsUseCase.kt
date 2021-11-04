@@ -11,6 +11,8 @@ import androidx.core.net.toUri
 import dagger.hilt.android.qualifiers.ApplicationContext
 import io.reactivex.rxjava3.core.BackpressureStrategy
 import io.reactivex.rxjava3.core.Flowable
+import io.reactivex.rxjava3.core.Single
+import io.reactivex.rxjava3.kotlin.blockingSubscribeBy
 import io.reactivex.rxjava3.kotlin.subscribeBy
 import mega.privacy.android.app.R
 import mega.privacy.android.app.contacts.requests.data.ContactRequestItem
@@ -49,7 +51,7 @@ class GetContactRequestsUseCase @Inject constructor(
 
     fun get(): Flowable<List<ContactRequestItem>> =
         Flowable.create({ emitter ->
-            val requests = arrayListOf<MegaContactRequest>().apply {
+            val requests = mutableListOf<MegaContactRequest>().apply {
                 addAll(megaApi.incomingContactRequests)
                 addAll(megaApi.outgoingContactRequests)
             }
@@ -141,13 +143,15 @@ class GetContactRequestsUseCase @Inject constructor(
         }, BackpressureStrategy.LATEST)
 
     /**
-     * Get current number of incoming contact requests
+     * Get updated number of incoming contact requests
      *
      * @return  Flowable with the number of requests
      */
     fun getIncomingRequestsSize(): Flowable<Int> =
         Flowable.create({ emitter ->
-            emitter.onNext(megaApi.incomingContactRequests.size)
+            getRequestsSize().blockingSubscribeBy(onSuccess = { requestsSize ->
+                emitter.onNext(requestsSize.first)
+            })
 
             val globalSubscription = getGlobalChangesUseCase.get().subscribeBy(
                 onNext = { change ->
@@ -163,6 +167,17 @@ class GetContactRequestsUseCase @Inject constructor(
                 globalSubscription.dispose()
             }
         }, BackpressureStrategy.LATEST)
+
+    /**
+     * Get current number of incoming/outgoing contact requests
+     *
+     * @return  Single Pair<Int,Int> object with the number of contact requests,
+     *          being the first item the number of incoming and the second one the outgoing.
+     */
+    fun getRequestsSize(): Single<Pair<Int, Int>> =
+        Single.fromCallable {
+            Pair(megaApi.incomingContactRequests.size, megaApi.outgoingContactRequests.size)
+        }
 
     /**
      * Build ContactRequestItem from MegaContactRequest object
