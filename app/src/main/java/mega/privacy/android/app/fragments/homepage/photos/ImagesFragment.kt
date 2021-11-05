@@ -56,6 +56,8 @@ class ImagesFragment : BaseBindingFragmentKt<ImagesViewModel, FragmentImagesBind
 
     private lateinit var listView: RecyclerView
 
+    private lateinit var scaleGestureHandler: ScaleGestureHandler
+
     private lateinit var viewTypePanel: View
     private lateinit var yearsButton: TextView
     private lateinit var monthsButton: TextView
@@ -176,7 +178,7 @@ class ImagesFragment : BaseBindingFragmentKt<ImagesViewModel, FragmentImagesBind
         viewModel.dateCards.observe(viewLifecycleOwner, ::showCards)
 
         viewModel.refreshCards.observe(viewLifecycleOwner) {
-            if (it && selectedView != PhotosFragment.ALL_VIEW) {
+            if (it && selectedView != ALL_VIEW) {
                 viewModel.refreshing()
                 showCards(viewModel.dateCards.value)
             }
@@ -193,9 +195,9 @@ class ImagesFragment : BaseBindingFragmentKt<ImagesViewModel, FragmentImagesBind
 
         override fun onCardClicked(position: Int, @NonNull card: CUCard) {
             when (selectedView) {
-                PhotosFragment.DAYS_VIEW -> {
+                DAYS_VIEW -> {
                     viewModel.zoomManager.restoreDefaultZoom()
-                    newViewClicked(PhotosFragment.ALL_VIEW)
+                    newViewClicked(ALL_VIEW)
                     val photoPosition = browseAdapter.getNodePosition(card.node.handle)
                     gridLayoutManager.scrollToPosition(photoPosition)
 
@@ -206,12 +208,12 @@ class ImagesFragment : BaseBindingFragmentKt<ImagesViewModel, FragmentImagesBind
                         }
                     }
                 }
-                PhotosFragment.MONTHS_VIEW -> {
-                    newViewClicked(PhotosFragment.DAYS_VIEW)
+                MONTHS_VIEW -> {
+                    newViewClicked(DAYS_VIEW)
                     gridLayoutManager.scrollToPosition(viewModel.monthClicked(position, card))
                 }
-                PhotosFragment.YEARS_VIEW -> {
-                    newViewClicked(PhotosFragment.MONTHS_VIEW)
+                YEARS_VIEW -> {
+                    newViewClicked(MONTHS_VIEW)
                     gridLayoutManager.scrollToPosition(viewModel.yearClicked(position, card))
                 }
             }
@@ -230,22 +232,22 @@ class ImagesFragment : BaseBindingFragmentKt<ImagesViewModel, FragmentImagesBind
     private fun setupTimePanel() {
         yearsButton = binding.photosViewType.yearsButton.apply {
             setOnClickListener {
-                newViewClicked(PhotosFragment.YEARS_VIEW)
+                newViewClicked(YEARS_VIEW)
             }
         }
         monthsButton = binding.photosViewType.monthsButton.apply {
             setOnClickListener {
-                newViewClicked(PhotosFragment.MONTHS_VIEW)
+                newViewClicked(MONTHS_VIEW)
             }
         }
         daysButton = binding.photosViewType.daysButton.apply {
             setOnClickListener {
-                newViewClicked(PhotosFragment.DAYS_VIEW)
+                newViewClicked(DAYS_VIEW)
             }
         }
         allButton = binding.photosViewType.allButton.apply {
             setOnClickListener {
-                newViewClicked(PhotosFragment.ALL_VIEW)
+                newViewClicked(ALL_VIEW)
             }
         }
 
@@ -269,18 +271,18 @@ class ImagesFragment : BaseBindingFragmentKt<ImagesViewModel, FragmentImagesBind
         setViewTypeButtonStyle(yearsButton, false)
 
         when (selectedView) {
-            PhotosFragment.DAYS_VIEW -> setViewTypeButtonStyle(daysButton, true)
-            PhotosFragment.MONTHS_VIEW -> setViewTypeButtonStyle(monthsButton, true)
-            PhotosFragment.YEARS_VIEW -> setViewTypeButtonStyle(yearsButton, true)
+            DAYS_VIEW -> setViewTypeButtonStyle(daysButton, true)
+            MONTHS_VIEW -> setViewTypeButtonStyle(monthsButton, true)
+            YEARS_VIEW -> setViewTypeButtonStyle(yearsButton, true)
             else -> setViewTypeButtonStyle(allButton, true)
         }
     }
 
     private fun updateFastScrollerVisibility() {
-        val gridView = selectedView == PhotosFragment.ALL_VIEW
+        val gridView = selectedView == ALL_VIEW
 
         binding.scroller.visibility =
-            if (!gridView && cardAdapter.itemCount >= Constants.MIN_ITEMS_SCROLLBAR)
+            if (!gridView && cardAdapter.itemCount >= MIN_ITEMS_SCROLLBAR)
                 View.VISIBLE
             else
                 View.GONE
@@ -314,6 +316,7 @@ class ImagesFragment : BaseBindingFragmentKt<ImagesViewModel, FragmentImagesBind
      *
      * @param selectedView The selected view.
      */
+    @SuppressLint("ClickableViewAccessibility")
     private fun newViewClicked(selectedView: Int) {
         if (this.selectedView == selectedView) return
 
@@ -321,10 +324,15 @@ class ImagesFragment : BaseBindingFragmentKt<ImagesViewModel, FragmentImagesBind
         setupListAdapter(currentZoom)
 
         when (selectedView) {
-            PhotosFragment.DAYS_VIEW, PhotosFragment.MONTHS_VIEW, PhotosFragment.YEARS_VIEW -> showCards(
-                viewModel.dateCards.value
-            )
+            DAYS_VIEW, MONTHS_VIEW, YEARS_VIEW -> {
+                showCards(
+                    viewModel.dateCards.value
+                )
+
+                listView.setOnTouchListener(null)
+            }
             else -> {
+                listView.setOnTouchListener(scaleGestureHandler)
             }
         }
         handleZoomOptionsMenuUpdate()
@@ -333,7 +341,7 @@ class ImagesFragment : BaseBindingFragmentKt<ImagesViewModel, FragmentImagesBind
         // If selected view is not all view, add layout param behaviour, so that button panel will go off when scroll.
         val params = viewTypePanel.layoutParams as CoordinatorLayout.LayoutParams
         params.behavior =
-            if (selectedView != PhotosFragment.ALL_VIEW) CustomHideBottomViewOnScrollBehaviour<LinearLayout>() else null
+            if (selectedView != ALL_VIEW) CustomHideBottomViewOnScrollBehaviour<LinearLayout>() else null
         viewTypePanel.layoutParams = params
     }
 
@@ -388,6 +396,7 @@ class ImagesFragment : BaseBindingFragmentKt<ImagesViewModel, FragmentImagesBind
 
     @SuppressLint("ClickableViewAccessibility")
     private fun setupListView() {
+        selectedView = viewModel.selectedViewType
         listView = binding.photoList
         listView.itemAnimator = Util.noChangeRecyclerViewItemAnimator()
         elevateToolbarWhenScrolling()
@@ -397,12 +406,11 @@ class ImagesFragment : BaseBindingFragmentKt<ImagesViewModel, FragmentImagesBind
         listView.clipToPadding = false
         listView.setHasFixedSize(true)
 
-        listView.setOnTouchListener(
-            ScaleGestureHandler(
-                context,
-                this
-            )
+        scaleGestureHandler = ScaleGestureHandler(
+            context,
+            this
         )
+        listView.setOnTouchListener(scaleGestureHandler)
     }
 
     private fun setupActionMode() {
@@ -527,8 +535,8 @@ class ImagesFragment : BaseBindingFragmentKt<ImagesViewModel, FragmentImagesBind
      * @param isPortrait true, on portrait mode, false otherwise.
      */
     private fun getSpanCount(isPortrait: Boolean): Int {
-        return if (selectedView != PhotosFragment.ALL_VIEW) {
-            if (isPortrait) PhotosFragment.SPAN_CARD_PORTRAIT else PhotosFragment.SPAN_CARD_LANDSCAPE
+        return if (selectedView != ALL_VIEW) {
+            if (isPortrait) SPAN_CARD_PORTRAIT else SPAN_CARD_LANDSCAPE
         } else {
             ZoomUtil.getSpanCount(isPortrait, currentZoom)
         }
@@ -555,7 +563,7 @@ class ImagesFragment : BaseBindingFragmentKt<ImagesViewModel, FragmentImagesBind
         gridLayoutManager = GridLayoutManager(context, spanCount)
         listView.switchBackToGrid()
 
-        if (selectedView == PhotosFragment.ALL_VIEW) {
+        if (selectedView == ALL_VIEW) {
             if (!this::browseAdapter.isInitialized) {
                 browseAdapter =
                     PhotosBrowseAdapter(actionModeViewModel, itemOperationViewModel, currentZoom)
@@ -595,7 +603,7 @@ class ImagesFragment : BaseBindingFragmentKt<ImagesViewModel, FragmentImagesBind
      *
      * @return true, current view is all view should show the menu items, false, otherwise.
      */
-    fun shouldShowZoomMenuItem() = selectedView == PhotosFragment.ALL_VIEW
+    fun shouldShowZoomMenuItem() = selectedView == ALL_VIEW
 
     /**
      * Display the view type buttons panel with animation effect, after a card is clicked.
@@ -659,9 +667,9 @@ class ImagesFragment : BaseBindingFragmentKt<ImagesViewModel, FragmentImagesBind
      */
     private fun showCards(dateCards: List<List<CUCard>?>?) {
         val index = when (selectedView) {
-            PhotosFragment.DAYS_VIEW -> 0
-            PhotosFragment.MONTHS_VIEW -> 1
-            PhotosFragment.YEARS_VIEW -> 2
+            DAYS_VIEW -> 0
+            MONTHS_VIEW -> 1
+            YEARS_VIEW -> 2
             else -> -1
         }
 
@@ -716,6 +724,7 @@ class ImagesFragment : BaseBindingFragmentKt<ImagesViewModel, FragmentImagesBind
         super.onSaveInstanceState(outState)
 
         viewModel.skipNextAutoScroll = true
+        viewModel.selectedViewType = selectedView
     }
 
     override fun zoomIn() {

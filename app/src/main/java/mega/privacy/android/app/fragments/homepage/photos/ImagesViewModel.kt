@@ -6,6 +6,7 @@ import com.jeremyliao.liveeventbus.LiveEventBus
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.fragments.homepage.TypedFilesRepository
 import mega.privacy.android.app.fragments.managerFragments.cu.CUCard
+import mega.privacy.android.app.fragments.managerFragments.cu.PhotosFragment
 import mega.privacy.android.app.utils.Constants.EVENT_NODES_CHANGE
 import mega.privacy.android.app.utils.Constants.INVALID_POSITION
 import mega.privacy.android.app.utils.TextUtil
@@ -20,6 +21,7 @@ class ImagesViewModel @ViewModelInject constructor(
 
     var searchQuery = ""
     var skipNextAutoScroll = false
+    var selectedViewType = PhotosFragment.ALL_VIEW
 
     private var forceUpdate = false
 
