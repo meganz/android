@@ -22,7 +22,6 @@ import androidx.core.graphics.drawable.DrawableCompat
 import androidx.core.view.isVisible
 import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.GridLayoutManager
-import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.facebook.drawee.view.SimpleDraweeView
 import com.google.android.material.appbar.MaterialToolbar
@@ -55,6 +54,9 @@ class ImagesFragment : BaseBindingFragmentKt<ImagesViewModel, FragmentImagesBind
     private val itemOperationViewModel by viewModels<ItemOperationViewModel>()
 
     private lateinit var listView: RecyclerView
+    private lateinit var browseAdapter: PhotosBrowseAdapter
+    private lateinit var gridLayoutManager: GridLayoutManager
+    private lateinit var cardAdapter: CUCardViewAdapter
 
     private lateinit var scaleGestureHandler: ScaleGestureHandler
 
@@ -63,12 +65,6 @@ class ImagesFragment : BaseBindingFragmentKt<ImagesViewModel, FragmentImagesBind
     private lateinit var monthsButton: TextView
     private lateinit var daysButton: TextView
     private lateinit var allButton: TextView
-
-    private lateinit var browseAdapter: PhotosBrowseAdapter
-    private lateinit var cardAdapter: CUCardViewAdapter
-
-    private lateinit var gridLayoutManager: GridLayoutManager
-    private var linearLayoutManager: LinearLayoutManager? = null
 
     private var actionMode: ActionMode? = null
     private lateinit var actionModeCallback: ActionModeCallback
@@ -161,7 +157,7 @@ class ImagesFragment : BaseBindingFragmentKt<ImagesViewModel, FragmentImagesBind
     override fun subscribeObservers() {
 
         viewModel.getZoom().observe(viewLifecycleOwner, { zoom: Int ->
-            // Out 3X: organize by year, In 1X: oragnize by day, both need to reload nodes.
+            // Out 3X: organize by year, In 1X: organize by day, both need to reload nodes.
             val needReload = ZoomUtil.needReload(currentZoom, zoom)
             viewModel.zoomManager.setCurrentZoom(zoom)
             handleZoomAdapterLayoutChange(zoom)
@@ -187,7 +183,7 @@ class ImagesFragment : BaseBindingFragmentKt<ImagesViewModel, FragmentImagesBind
         DragToExitSupport.observeDragSupportEvents(
             viewLifecycleOwner,
             listView,
-            Constants.VIEWER_FROM_PHOTOS
+            VIEWER_FROM_PHOTOS
         )
     }
 
@@ -353,7 +349,7 @@ class ImagesFragment : BaseBindingFragmentKt<ImagesViewModel, FragmentImagesBind
 
             activity.hideKeyboardSearch()  // Make the snack bar visible to the user
             activity.showSnackbar(
-                Constants.SNACKBAR_TYPE,
+                SNACKBAR_TYPE,
                 context.getString(R.string.error_server_connection_problem),
                 MegaChatApiJava.MEGACHAT_INVALID_HANDLE
             )
@@ -561,7 +557,7 @@ class ImagesFragment : BaseBindingFragmentKt<ImagesViewModel, FragmentImagesBind
         val spanCount = getSpanCount(isPortrait)
         val params = listView.layoutParams as CoordinatorLayout.LayoutParams
         gridLayoutManager = GridLayoutManager(context, spanCount)
-        listView.switchBackToGrid()
+        listView.layoutManager = gridLayoutManager
 
         if (selectedView == ALL_VIEW) {
             if (!this::browseAdapter.isInitialized) {
@@ -627,19 +623,19 @@ class ImagesFragment : BaseBindingFragmentKt<ImagesViewModel, FragmentImagesBind
         )?.also {
             val intent = Intent(context, FullScreenImageViewerLollipop::class.java)
 
-            intent.putExtra(Constants.INTENT_EXTRA_KEY_POSITION, nodeItem.photoIndex)
+            intent.putExtra(INTENT_EXTRA_KEY_POSITION, nodeItem.photoIndex)
             intent.putExtra(
-                Constants.INTENT_EXTRA_KEY_ORDER_GET_CHILDREN,
+                INTENT_EXTRA_KEY_ORDER_GET_CHILDREN,
                 MegaApiJava.ORDER_MODIFICATION_DESC
             )
 
             intent.putExtra(
-                Constants.INTENT_EXTRA_KEY_ADAPTER_TYPE,
-                Constants.PHOTOS_BROWSE_ADAPTER
+                INTENT_EXTRA_KEY_ADAPTER_TYPE,
+                PHOTOS_BROWSE_ADAPTER
             )
 
             intent.putExtra(
-                Constants.INTENT_EXTRA_KEY_HANDLE,
+                INTENT_EXTRA_KEY_HANDLE,
                 nodeItem.node?.handle ?: MegaApiJava.INVALID_HANDLE
             )
             (listView.adapter as? DragThumbnailGetter)?.let {
@@ -647,7 +643,7 @@ class ImagesFragment : BaseBindingFragmentKt<ImagesViewModel, FragmentImagesBind
                     intent,
                     listView,
                     nodeItem.index,
-                    Constants.VIEWER_FROM_PHOTOS,
+                    VIEWER_FROM_PHOTOS,
                     it
                 )
             }
@@ -681,22 +677,6 @@ class ImagesFragment : BaseBindingFragmentKt<ImagesViewModel, FragmentImagesBind
     }
 
     /**
-     * Set LinearLayoutManager for the list view.
-     */
-    private fun RecyclerView.switchToLinear() {
-        linearLayoutManager = LinearLayoutManager(context)
-        listView.layoutManager = linearLayoutManager
-    }
-
-    /**
-     * Set GridLayoutManager for the list view.
-     */
-    private fun RecyclerView.switchBackToGrid() {
-        linearLayoutManager = null
-        layoutManager = gridLayoutManager
-    }
-
-    /**
      * Shows or hides the bottom view and animates the transition.
      */
     fun animateBottomView() {
@@ -707,14 +687,14 @@ class ImagesFragment : BaseBindingFragmentKt<ImagesViewModel, FragmentImagesBind
             viewTypePanel
                 .animate()
                 .translationYBy(deltaY)
-                .setDuration(Constants.ANIMATION_DURATION)
+                .setDuration(ANIMATION_DURATION)
                 .withEndAction { viewTypePanel.visibility = View.GONE }
                 .start()
         } else {
             viewTypePanel
                 .animate()
                 .translationYBy(-deltaY)
-                .setDuration(Constants.ANIMATION_DURATION)
+                .setDuration(ANIMATION_DURATION)
                 .withStartAction { viewTypePanel.visibility = View.VISIBLE }
                 .start()
         }
@@ -723,7 +703,6 @@ class ImagesFragment : BaseBindingFragmentKt<ImagesViewModel, FragmentImagesBind
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
 
-        viewModel.skipNextAutoScroll = true
         viewModel.selectedViewType = selectedView
     }
 
@@ -737,8 +716,8 @@ class ImagesFragment : BaseBindingFragmentKt<ImagesViewModel, FragmentImagesBind
         handleZoomMenuItemStatus()
     }
 
-    override fun bindToolbar(): MaterialToolbar? = binding.layoutTitleBar.toolbar
+    override fun bindToolbar(): MaterialToolbar = binding.layoutTitleBar.toolbar
 
-    override fun bindTitle(): Int? = R.string.section_images
+    override fun bindTitle(): Int = R.string.section_images
 
 }

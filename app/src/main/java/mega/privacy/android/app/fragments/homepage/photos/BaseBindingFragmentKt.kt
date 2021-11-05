@@ -10,6 +10,7 @@ import androidx.navigation.fragment.findNavController
 import com.google.android.material.appbar.MaterialToolbar
 import mega.privacy.android.app.R
 import mega.privacy.android.app.fragments.BaseFragment
+import mega.privacy.android.app.utils.StringResourcesUtils
 
 abstract class BaseBindingFragmentKt<VM : ViewModel, VB : ViewDataBinding> : BaseFragment() {
 
@@ -58,7 +59,7 @@ abstract class BaseBindingFragmentKt<VM : ViewModel, VB : ViewDataBinding> : Bas
         return if (resTitle == null) {
             ""
         } else {
-            getString(resTitle)
+            StringResourcesUtils.getString(resTitle)
         }
     }
 

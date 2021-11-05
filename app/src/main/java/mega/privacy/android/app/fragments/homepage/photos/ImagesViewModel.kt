@@ -16,11 +16,12 @@ class ImagesViewModel @ViewModelInject constructor(
     private val repository: TypedFilesRepository,
 ) : ViewModel() {
 
-    private var _query = MutableLiveData<String>()
+    /**
+     * Empty live data, used to switch to LiveData<List<PhotoNodeItem>>.
+     */
+    private var liveDataRoot = MutableLiveData<Unit>()
     val zoomManager = ZoomManager()
 
-    var searchQuery = ""
-    var skipNextAutoScroll = false
     var selectedViewType = PhotosFragment.ALL_VIEW
 
     private var forceUpdate = false
@@ -38,7 +39,7 @@ class ImagesViewModel @ViewModelInject constructor(
         _refreshCards.value = false
     }
 
-    val items: LiveData<List<PhotoNodeItem>> = _query.switchMap {
+    val items: LiveData<List<PhotoNodeItem>> = liveDataRoot.switchMap {
         if (forceUpdate) {
             viewModelScope.launch {
                 repository.getFiles(
@@ -57,23 +58,13 @@ class ImagesViewModel @ViewModelInject constructor(
         val items = it as List<PhotoNodeItem>
         var index = 0
         var photoIndex = 0
-        var filteredNodes = items
 
-        if (!TextUtil.isTextEmpty(_query.value)) {
-            filteredNodes = items.filter {
-                it.node?.name?.contains(
-                    _query.value!!,
-                    true
-                ) ?: false
-            }
-        }
-
-        filteredNodes.forEach {
+        items.forEach {
             it.index = index++
             if (it.type == PhotoNodeItem.TYPE_PHOTO) it.photoIndex = photoIndex++
         }
 
-        filteredNodes
+        items
     }
 
     val dateCards: LiveData<List<List<CUCard>>> = items.map {
@@ -149,7 +140,6 @@ class ImagesViewModel @ViewModelInject constructor(
     /**
      * Load photos by calling Mega Api or just filter loaded nodes
      * @param forceUpdate True if retrieve all nodes by calling API
-     * , false if filter current nodes by searchQuery
      */
     fun loadPhotos(forceUpdate: Boolean = false) {
         this.forceUpdate = forceUpdate
@@ -159,7 +149,8 @@ class ImagesViewModel @ViewModelInject constructor(
         } else {
             pendingLoad = false
             loadInProgress = true
-            _query.value = searchQuery
+            // Trigger data load.
+            liveDataRoot.value = liveDataRoot.value
         }
     }
 
@@ -167,7 +158,7 @@ class ImagesViewModel @ViewModelInject constructor(
      * Make the list adapter to rebind all item views with data since
      * the underlying meta data of items may have been changed.
      */
-    fun refreshUi() {
+    private fun refreshUi() {
         items.value?.forEach { item ->
             item.uiDirty = true
         }
@@ -181,8 +172,6 @@ class ImagesViewModel @ViewModelInject constructor(
 
         return 0
     }
-
-    fun shouldShowSearchMenu() = items.value?.isNotEmpty() ?: false
 
     fun getItemPositionByHandle(handle: Long) =
         items.value?.find { it.node?.handle == handle }?.index ?: INVALID_POSITION
