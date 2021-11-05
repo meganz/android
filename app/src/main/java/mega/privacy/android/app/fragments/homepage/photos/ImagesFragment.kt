@@ -90,7 +90,6 @@ class ImagesFragment : BaseBindingFragmentKt<ImagesViewModel, FragmentImagesBind
         setupListView()
         setupTimePanel()
         setupListAdapter(currentZoom)
-        setupFastScroller()
         setupActionMode()
         setupNavigation()
     }
@@ -523,8 +522,6 @@ class ImagesFragment : BaseBindingFragmentKt<ImagesViewModel, FragmentImagesBind
             animateBottomView()
         })
 
-    private fun setupFastScroller() = binding.scroller.setRecyclerView(listView)
-
     /**
      * Get how many items will be shown per row, depends on screen direction and zoom level if all view is selected.
      *
@@ -591,6 +588,9 @@ class ImagesFragment : BaseBindingFragmentKt<ImagesViewModel, FragmentImagesBind
 
             listView.layoutParams = params
         }
+
+        // Set fast scroller after adapter is set.
+        binding.scroller.setRecyclerView(listView)
     }
 
     /**
