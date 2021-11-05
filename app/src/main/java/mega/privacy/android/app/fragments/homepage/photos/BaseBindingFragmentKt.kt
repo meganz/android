@@ -1,4 +1,4 @@
-package mega.privacy.android.app.gallery.fragment.newImages
+package mega.privacy.android.app.fragments.homepage.photos
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -7,7 +7,6 @@ import android.view.ViewGroup
 import androidx.databinding.ViewDataBinding
 import androidx.lifecycle.ViewModel
 import androidx.navigation.fragment.findNavController
-import androidx.viewbinding.ViewBinding
 import com.google.android.material.appbar.MaterialToolbar
 import mega.privacy.android.app.R
 import mega.privacy.android.app.fragments.BaseFragment

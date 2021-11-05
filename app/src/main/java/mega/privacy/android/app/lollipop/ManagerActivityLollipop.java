@@ -133,7 +133,6 @@ import mega.privacy.android.app.components.GestureScaleListener;
 import mega.privacy.android.app.fragments.homepage.documents.DocumentsFragment;
 import mega.privacy.android.app.fragments.homepage.photos.ImagesFragment;
 import mega.privacy.android.app.fragments.managerFragments.cu.PhotosFragment;
-import mega.privacy.android.app.gallery.fragment.newImages.Images1Fragment;
 import mega.privacy.android.app.generalusecase.FilePrepareUseCase;
 import mega.privacy.android.app.smsVerification.SMSVerificationActivity;
 import mega.privacy.android.app.ShareInfo;
@@ -1527,15 +1526,6 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 
                 if (needReload) {
                     refreshCUNodes();
-                }
-            }
-
-            if (drawerItem == DrawerItem.HOMEPAGE && mHomepageScreen == HomepageScreen.IMAGES) {
-                ImagesFragment imagesFragment = getFragmentByType(ImagesFragment.class);
-                imagesFragment.refreshSelf();
-
-                if (needReload) {
-                    imagesFragment.loadPhotos();
                 }
             }
         });
@@ -3703,7 +3693,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 	 */
 	public void setToolbarVisibility(){
     	if(mHomepageScreen == HomepageScreen.IMAGES){
-			toolbar.setVisibility(View.VISIBLE);
+			toolbar.setVisibility(View.GONE);
 		}else{
 			toolbar.setVisibility(View.VISIBLE);
 		}
@@ -5502,21 +5492,6 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 			} else {
 				if (mHomepageSearchable != null) {
 					searchMenuItem.setVisible(mHomepageSearchable.shouldShowSearchMenu());
-
-                    if (mHomepageScreen == HomepageScreen.IMAGES) {
-                        zoomOutMenuItem.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
-                        zoomInMenuItem.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
-
-                        if (currentZoom == ZOOM_OUT_2X) {
-                            ZoomUtil.INSTANCE.disableButton(this, zoomOutMenuItem);
-                        }
-
-                        if (currentZoom == ZOOM_IN_1X) {
-                            ZoomUtil.INSTANCE.disableButton(this, zoomInMenuItem);
-                        }
-
-                        updatePhotosFragmentOptionsMenu();
-                    }
 				}
 			}
 		}

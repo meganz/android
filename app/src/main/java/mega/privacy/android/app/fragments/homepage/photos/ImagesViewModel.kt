@@ -9,17 +9,15 @@ import mega.privacy.android.app.fragments.managerFragments.cu.CUCard
 import mega.privacy.android.app.utils.Constants.EVENT_NODES_CHANGE
 import mega.privacy.android.app.utils.Constants.INVALID_POSITION
 import mega.privacy.android.app.utils.TextUtil
-import mega.privacy.android.app.viewmodel.ZoomViewModel
 import nz.mega.sdk.MegaApiJava.*
 
 class ImagesViewModel @ViewModelInject constructor(
     private val repository: TypedFilesRepository,
-    private val zoomViewModel: ZoomViewModel
 ) : ViewModel() {
 
     private var _query = MutableLiveData<String>()
+    val zoomManager = ZoomManager()
 
-    var searchMode = false
     var searchQuery = ""
     var skipNextAutoScroll = false
 
@@ -32,7 +30,7 @@ class ImagesViewModel @ViewModelInject constructor(
     private var pendingLoad = false
 
     private val _refreshCards = MutableLiveData(false)
-    val refreshCards: LiveData<Boolean> = _refreshCards
+    val refreshCards : LiveData<Boolean> = _refreshCards
 
     fun refreshing() {
         _refreshCards.value = false
@@ -44,7 +42,7 @@ class ImagesViewModel @ViewModelInject constructor(
                 repository.getFiles(
                     FILE_TYPE_PHOTO,
                     ORDER_MODIFICATION_DESC,
-                    zoomViewModel.zoom.value!!
+                    zoomManager.zoom.value!!
                 )
             }
         } else {
@@ -58,12 +56,6 @@ class ImagesViewModel @ViewModelInject constructor(
         var index = 0
         var photoIndex = 0
         var filteredNodes = items
-
-        if (searchMode) {
-            filteredNodes = filteredNodes.filter {
-                it.type == PhotoNodeItem.TYPE_PHOTO
-            }
-        }
 
         if (!TextUtil.isTextEmpty(_query.value)) {
             filteredNodes = items.filter {
@@ -96,7 +88,6 @@ class ImagesViewModel @ViewModelInject constructor(
 
         listOf(cardsProvider.getDays(), cardsProvider.getMonths(), cardsProvider.getYears())
     }
-
     /**
      * Checks the clicked year card and gets the month card to show after click on a year card.
      *
@@ -207,4 +198,8 @@ class ImagesViewModel @ViewModelInject constructor(
             .removeObserver(nodesChangeObserver)
         items.removeObserver(loadFinishedObserver)
     }
+
+    /**********zoom*************/
+    fun setZoom(currentZoom:Int) = zoomManager.setZoom(currentZoom)
+    fun getZoom() = zoomManager.zoom
 }
