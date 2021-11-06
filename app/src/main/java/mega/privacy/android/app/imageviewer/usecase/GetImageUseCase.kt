@@ -30,12 +30,17 @@ class GetImageUseCase @Inject constructor(
         fullSize: Boolean = false,
         highPriority: Boolean = false
     ): Flowable<ImageItem> =
-        Flowable.create({ emitter ->
-            val node = megaApi.getNodeByHandle(nodeHandle)
+        get(megaApi.getNodeByHandle(nodeHandle), fullSize, highPriority)
 
+    fun get(
+        node: MegaNode?,
+        fullSize: Boolean = false,
+        highPriority: Boolean = false
+    ): Flowable<ImageItem> =
+        Flowable.create({ emitter ->
             when {
                 node == null -> {
-                    emitter.onError(IllegalArgumentException("Node doesn't exist"))
+                    emitter.onError(IllegalArgumentException("Node is null"))
                 }
                 !node.isFile -> {
                     emitter.onError(IllegalArgumentException("Node is not a file"))

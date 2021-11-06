@@ -4,7 +4,6 @@ import android.app.Activity
 import androidx.hilt.lifecycle.ViewModelInject
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.Transformations
 import androidx.lifecycle.map
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.core.Completable
@@ -23,7 +22,6 @@ import mega.privacy.android.app.usecase.data.MegaNodeItem
 import mega.privacy.android.app.utils.Constants.INVALID_POSITION
 import mega.privacy.android.app.utils.LogUtil.logError
 import mega.privacy.android.app.utils.LogUtil.logWarning
-import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 
 class ImageViewerViewModel @ViewModelInject constructor(
     private val getImageUseCase: GetImageUseCase,
@@ -38,9 +36,7 @@ class ImageViewerViewModel @ViewModelInject constructor(
     private val switchToolbar = MutableLiveData<Unit>()
 
     fun getCurrentImage(): LiveData<MegaNodeItem?> =
-        Transformations.switchMap(currentPosition) { currentPosition ->
-            images.value?.getOrNull(currentPosition)?.let { getNode(it.handle) }
-        }
+        currentPosition.map { images.value?.getOrNull(it)?.nodeItem }
 
     fun getImagesHandle(): LiveData<List<Long>?> =
         images.map { items -> items?.map(ImageItem::handle) }
@@ -49,9 +45,7 @@ class ImageViewerViewModel @ViewModelInject constructor(
         images.map { items -> items?.firstOrNull { it.handle == nodeHandle } }
 
     fun getCurrentPosition(): LiveData<Pair<Int, Int>> =
-        currentPosition.map { position ->
-            Pair(position, images.value?.size ?: 0)
-        }
+        currentPosition.map { position -> Pair(position, images.value?.size ?: 0) }
 
     fun getCurrentNodeHandle(): Long? =
         currentPosition.value?.let { images.value?.getOrNull(it)?.handle }
@@ -99,7 +93,14 @@ class ImageViewerViewModel @ViewModelInject constructor(
     }
 
     fun loadSingleImage(nodeHandle: Long, fullSize: Boolean, highPriority: Boolean) {
-        getImageUseCase.get(nodeHandle, fullSize, highPriority)
+        val existingNode = images.value?.find { it.handle == nodeHandle }?.nodeItem?.node
+        val subscription = if (existingNode != null) {
+            getImageUseCase.get(existingNode, fullSize, highPriority)
+        } else {
+            getImageUseCase.get(nodeHandle, fullSize, highPriority)
+        }
+
+        subscription
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeBy(
@@ -110,6 +111,10 @@ class ImageViewerViewModel @ViewModelInject constructor(
                         if (index != INVALID_POSITION) {
                             currentImages[index] = imageItem
                             images.value = currentImages.toList()
+
+                            if (index == currentPosition.value) {
+                                updateCurrentPosition(index, true)
+                            }
                         } else {
                             logWarning("Image ${imageItem.handle} was not found")
                         }
@@ -122,24 +127,6 @@ class ImageViewerViewModel @ViewModelInject constructor(
                 }
             )
             .addTo(composite)
-    }
-
-    fun getNode(nodeHandle: Long): LiveData<MegaNodeItem?> {
-        val result = MutableLiveData<MegaNodeItem?>()
-        getNodeUseCase.getNodeItem(nodeHandle)
-            .subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribeBy(
-                onSuccess = { item ->
-                    result.value = item
-                },
-                onError = { error ->
-                    logError(error.stackTraceToString())
-                    result.value = null
-                }
-            )
-            .addTo(composite)
-        return result
     }
 
     fun markNodeAsFavorite(nodeHandle: Long, isFavorite: Boolean) {

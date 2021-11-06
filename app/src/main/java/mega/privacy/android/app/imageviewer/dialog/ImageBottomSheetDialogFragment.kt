@@ -17,13 +17,13 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.databinding.BottomSheetImageOptionsBinding
 import mega.privacy.android.app.imageviewer.ImageViewerActivity
 import mega.privacy.android.app.imageviewer.ImageViewerViewModel
+import mega.privacy.android.app.imageviewer.data.ImageItem
 import mega.privacy.android.app.interfaces.showSnackbar
 import mega.privacy.android.app.lollipop.FileExplorerActivityLollipop
 import mega.privacy.android.app.lollipop.FileInfoActivityLollipop
 import mega.privacy.android.app.modalbottomsheet.BaseBottomSheetDialogFragment
 import mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil
 import mega.privacy.android.app.modalbottomsheet.nodelabel.NodeLabelBottomSheetDialogFragment
-import mega.privacy.android.app.usecase.data.MegaNodeItem
 import mega.privacy.android.app.utils.*
 import mega.privacy.android.app.utils.Constants.*
 import mega.privacy.android.app.utils.ExtraUtils.extraNotNull
@@ -74,27 +74,28 @@ class ImageBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        viewModel.getNode(imageNodeHandle).observe(viewLifecycleOwner, ::showNodeData)
-        viewModel.getImage(imageNodeHandle).observe(viewLifecycleOwner) { imageItem ->
-            binding.imgThumbnail.setImageURI(imageItem?.getLowestResolutionAvailableUri())
-        }
+        viewModel.getImage(imageNodeHandle).observe(viewLifecycleOwner, ::showNodeData)
         super.onViewCreated(view, savedInstanceState)
     }
 
     @SuppressLint("SetTextI18n")
-    private fun showNodeData(item: MegaNodeItem?) {
-        if (item?.node == null) {
+    private fun showNodeData(imageItem: ImageItem?) {
+        if (imageItem?.nodeItem == null) {
             logError("Image node is null")
             (activity as? ImageViewerActivity?)?.showSnackbar(getString(R.string.error_fail_to_open_file_general))
             dismiss()
             return
         }
 
-        binding.apply {
-            txtName.text = item.node.name
-            txtInfo.text = item.infoText
+        val node = imageItem.nodeItem.node
+        val nodeItem = imageItem.nodeItem
+        binding.imgThumbnail.setImageURI(imageItem.getLowestResolutionAvailableUri())
 
-            if (item.hasVersions) {
+        binding.apply {
+            txtName.text = node.name
+            txtInfo.text = nodeItem.infoText
+
+            if (nodeItem.hasVersions) {
                 txtInfo.setCompoundDrawablesRelativeWithIntrinsicBounds(
                     R.drawable.ic_baseline_history,
                     0,
@@ -106,26 +107,26 @@ class ImageBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
             // File Info
             optionInfo.setOnClickListener {
                 val intent = Intent(context, FileInfoActivityLollipop::class.java).apply {
-                    putExtra(HANDLE, item.node.handle)
-                    putExtra(NAME, item.node.name)
+                    putExtra(HANDLE, node.handle)
+                    putExtra(NAME, node.name)
                 }
 
                 startActivity(intent)
             }
 
             // Favorite
-            val favoriteText = if (item.node.isFavourite) R.string.file_properties_unfavourite else R.string.file_properties_favourite
-            val favoriteDrawable = if (!item.node.isFavourite) R.drawable.ic_add_favourite else R.drawable.ic_remove_favourite
+            val favoriteText = if (node.isFavourite) R.string.file_properties_unfavourite else R.string.file_properties_favourite
+            val favoriteDrawable = if (!node.isFavourite) R.drawable.ic_add_favourite else R.drawable.ic_remove_favourite
             optionFavorite.setText(favoriteText)
-            optionFavorite.isVisible = !item.isFromRubbishBin && item.hasFullAccess
+            optionFavorite.isVisible = !nodeItem.isFromRubbishBin && nodeItem.hasFullAccess
             optionFavorite.setCompoundDrawablesWithIntrinsicBounds(favoriteDrawable, 0, 0, 0)
             optionFavorite.setOnClickListener {
-                viewModel.markNodeAsFavorite(item.node.handle, !item.node.isFavourite)
+                viewModel.markNodeAsFavorite(node.handle, !node.isFavourite)
             }
 
             // Label
-            val labelColor = ResourcesCompat.getColor(resources, getNodeLabelColor(item.node.label), null)
-            val labelDrawable = getNodeLabelDrawable(item.node.label, resources)
+            val labelColor = ResourcesCompat.getColor(resources, getNodeLabelColor(node.label), null)
+            val labelDrawable = getNodeLabelDrawable(node.label, resources)
             optionLabelCurrent.setCompoundDrawablesRelativeWithIntrinsicBounds(
                 null,
                 null,
@@ -133,105 +134,105 @@ class ImageBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
                 null
             )
             optionLabelCurrent.setTextColor(labelColor)
-            optionLabelCurrent.text = getNodeLabelText(item.node.label)
-            optionLabelCurrent.isVisible = item.node.label != MegaNode.NODE_LBL_UNKNOWN
-            optionLabelLayout.isVisible = !item.isFromRubbishBin && item.hasFullAccess
+            optionLabelCurrent.text = getNodeLabelText(node.label)
+            optionLabelCurrent.isVisible = node.label != MegaNode.NODE_LBL_UNKNOWN
+            optionLabelLayout.isVisible = !nodeItem.isFromRubbishBin && nodeItem.hasFullAccess
             optionLabelLayout.setOnClickListener {
-                NodeLabelBottomSheetDialogFragment.newInstance(item.node.handle)
+                NodeLabelBottomSheetDialogFragment.newInstance(node.handle)
                     .show(childFragmentManager, TAG)
             }
 
             // Open with
-            optionOpenWith.isVisible = !item.isFromRubbishBin
+            optionOpenWith.isVisible = !nodeItem.isFromRubbishBin
             optionOpenWith.setOnClickListener {
-                ModalBottomSheetUtil.openWith(requireContext(), item.node)
+                ModalBottomSheetUtil.openWith(requireContext(), node)
             }
 
             // Download
-            optionDownload.isVisible = !item.isFromRubbishBin
+            optionDownload.isVisible = !nodeItem.isFromRubbishBin
             optionDownload.setOnClickListener {
-                (activity as? ImageViewerActivity?)?.saveNode(item.node.handle, false)
+                (activity as? ImageViewerActivity?)?.saveNode(node.handle, false)
                 dismiss()
             }
 
             // Save to Gallery
-            optionGallery.isVisible = !item.isFromRubbishBin
+            optionGallery.isVisible = !nodeItem.isFromRubbishBin
             optionGallery.setOnClickListener {
-                (activity as? ImageViewerActivity?)?.saveNode(item.node.handle, true)
+                (activity as? ImageViewerActivity?)?.saveNode(node.handle, true)
                 dismiss()
             }
 
             // Offline
-            optionOfflineLayout.isVisible = !item.isFromRubbishBin
-            switchOffline.isChecked = item.isAvailableOffline
+            optionOfflineLayout.isVisible = !nodeItem.isFromRubbishBin
+            switchOffline.isChecked = nodeItem.isAvailableOffline
             switchOffline.setOnCheckedChangeListener { _, _ ->
                 viewModel.setNodeAvailableOffline(
                     requireActivity(),
-                    item.node.handle,
-                    !item.isAvailableOffline
+                    node.handle,
+                    !nodeItem.isAvailableOffline
                 )
                 dismiss()
             }
             optionOfflineLayout.setOnClickListener {
                 viewModel.setNodeAvailableOffline(
                     requireActivity(),
-                    item.node.handle,
-                    !item.isAvailableOffline
+                    node.handle,
+                    !nodeItem.isAvailableOffline
                 )
                 dismiss()
             }
 
             // Links
-            if (item.node.isExported) {
+            if (node.isExported) {
                 optionManageLink.setText(R.string.edit_link_option)
             } else {
                 optionManageLink.text = resources.getQuantityString(R.plurals.get_links, 1)
             }
             optionManageLink.setOnClickListener {
-                LinksUtil.showGetLinkActivity(this@ImageBottomSheetDialogFragment, item.node.handle)
+                LinksUtil.showGetLinkActivity(this@ImageBottomSheetDialogFragment, node.handle)
             }
             optionRemoveLink.setOnClickListener {
                 MaterialAlertDialogBuilder(requireContext())
                     .setMessage(resources.getQuantityString(R.plurals.remove_links_warning_text, 1))
                     .setPositiveButton(R.string.general_remove) { _, _ ->
-                        (activity as? ImageViewerActivity?)?.removeLink(item.node.handle) ?: run {
-                            viewModel.removeLink(item.node.handle)
+                        (activity as? ImageViewerActivity?)?.removeLink(node.handle) ?: run {
+                            viewModel.removeLink(node.handle)
                         }
                     }
                     .setNegativeButton(R.string.general_cancel, null)
                     .show()
             }
-            optionManageLink.isVisible = item.hasFullAccess && !item.isFromRubbishBin
-            optionRemoveLink.isVisible = item.node.isExported
+            optionManageLink.isVisible = nodeItem.hasFullAccess && !nodeItem.isFromRubbishBin
+            optionRemoveLink.isVisible = node.isExported
 
             // Send to contact
-            optionSendToContact.isVisible = item.hasFullAccess && !item.isFromRubbishBin
+            optionSendToContact.isVisible = nodeItem.hasFullAccess && !nodeItem.isFromRubbishBin
             optionSendToContact.setOnClickListener {
-                (activity as? ImageViewerActivity?)?.attachNode(item.node.handle)
+                (activity as? ImageViewerActivity?)?.attachNode(node.handle)
                 dismiss()
             }
 
             // Share
-            optionShare.isVisible = item.hasFullAccess && !item.isFromRubbishBin
+            optionShare.isVisible = nodeItem.hasFullAccess && !nodeItem.isFromRubbishBin
             optionShare.setOnClickListener {
-                viewModel.shareNode(item.node.handle).observe(viewLifecycleOwner) { link ->
+                viewModel.shareNode(node.handle).observe(viewLifecycleOwner) { link ->
                     MegaNodeUtil.startShareIntent(requireContext(), Intent(Intent.ACTION_SEND), link)
                     dismiss()
                 }
             }
 
             // Rename
-            optionRename.isVisible = item.hasFullAccess && !item.isFromRubbishBin
+            optionRename.isVisible = nodeItem.hasFullAccess && !nodeItem.isFromRubbishBin
             optionRename.setOnClickListener {
-                (activity as? ImageViewerActivity?)?.showRenameDialog(item.node)
+                (activity as? ImageViewerActivity?)?.showRenameDialog(node)
             }
 
             // Move
-            optionMove.isVisible = item.hasFullAccess && !item.isFromRubbishBin
+            optionMove.isVisible = nodeItem.hasFullAccess && !nodeItem.isFromRubbishBin
             optionMove.setOnClickListener {
                 val intent = Intent(context, FileExplorerActivityLollipop::class.java).apply {
                     action = FileExplorerActivityLollipop.ACTION_PICK_MOVE_FOLDER
-                    putExtra(INTENT_EXTRA_KEY_MOVE_FROM, longArrayOf(item.node.handle))
+                    putExtra(INTENT_EXTRA_KEY_MOVE_FROM, longArrayOf(node.handle))
                 }
 
                 startActivityForResult(intent, REQUEST_CODE_SELECT_FOLDER_TO_MOVE)
@@ -239,11 +240,11 @@ class ImageBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
             }
 
             // Copy
-            optionCopy.isVisible = !item.isFromRubbishBin
+            optionCopy.isVisible = !nodeItem.isFromRubbishBin
             optionCopy.setOnClickListener {
                 val intent = Intent(context, FileExplorerActivityLollipop::class.java).apply {
                     action = FileExplorerActivityLollipop.ACTION_PICK_COPY_FOLDER
-                    putExtra(INTENT_EXTRA_KEY_COPY_FROM, longArrayOf(item.node.handle))
+                    putExtra(INTENT_EXTRA_KEY_COPY_FROM, longArrayOf(node.handle))
                 }
 
                 startActivityForResult(intent, REQUEST_CODE_SELECT_FOLDER_TO_COPY)
@@ -251,14 +252,14 @@ class ImageBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
             }
 
             // Restore
-            optionRestore.isVisible = item.isFromRubbishBin && item.node.restoreHandle != INVALID_HANDLE
+            optionRestore.isVisible = nodeItem.isFromRubbishBin && node.restoreHandle != INVALID_HANDLE
             optionRestore.setOnClickListener {
-                viewModel.moveNode(item.node.handle, item.node.restoreHandle)
+                viewModel.moveNode(node.handle, node.restoreHandle)
                 dismiss()
             }
 
             // Rubbish bin
-            if (item.isFromRubbishBin) {
+            if (nodeItem.isFromRubbishBin) {
                 optionRubbishBin.setText(R.string.general_remove)
             } else {
                 optionRubbishBin.setText(R.string.context_move_to_trash)
@@ -267,7 +268,7 @@ class ImageBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
                 val buttonText: Int
                 val messageText: Int
 
-                if (item.isFromRubbishBin) {
+                if (nodeItem.isFromRubbishBin) {
                     buttonText = R.string.general_remove
                     messageText = R.string.confirmation_delete_from_mega
                 } else {
@@ -278,10 +279,10 @@ class ImageBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
                 MaterialAlertDialogBuilder(requireContext())
                     .setMessage(messageText)
                     .setPositiveButton(buttonText) { _, _ ->
-                        if (item.isFromRubbishBin) {
-                            viewModel.removeNode(item.node.handle)
+                        if (nodeItem.isFromRubbishBin) {
+                            viewModel.removeNode(node.handle)
                         } else {
-                            viewModel.moveNodeToRubbishBin(item.node.handle)
+                            viewModel.moveNodeToRubbishBin(node.handle)
                         }
                         dismiss()
                     }

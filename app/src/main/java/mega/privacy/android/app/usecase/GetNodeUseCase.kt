@@ -10,14 +10,9 @@ import mega.privacy.android.app.di.MegaApi
 import mega.privacy.android.app.errors.BusinessAccountOverdueMegaError
 import mega.privacy.android.app.listeners.OptionalMegaRequestListenerInterface
 import mega.privacy.android.app.usecase.data.MegaNodeItem
-import mega.privacy.android.app.utils.Constants
+import mega.privacy.android.app.utils.*
 import mega.privacy.android.app.utils.ErrorUtils.toThrowable
-import mega.privacy.android.app.utils.FileUtil
 import mega.privacy.android.app.utils.MegaNodeUtil.getRootParentNode
-import mega.privacy.android.app.utils.OfflineUtils
-import mega.privacy.android.app.utils.TextUtil
-import mega.privacy.android.app.utils.TimeUtils
-import mega.privacy.android.app.utils.Util
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaNode
@@ -32,13 +27,13 @@ class GetNodeUseCase @Inject constructor(
 ) {
 
     fun get(nodeHandle: Long): Single<MegaNode> =
-        Single.fromCallable {
-            megaApi.getNodeByHandle(nodeHandle)
-        }
+        Single.fromCallable { megaApi.getNodeByHandle(nodeHandle) }
 
     fun getNodeItem(nodeHandle: Long): Single<MegaNodeItem> =
+        getNodeItem(megaApi.getNodeByHandle(nodeHandle))
+
+    fun getNodeItem(node: MegaNode?): Single<MegaNodeItem> =
         Single.fromCallable {
-            val node = megaApi.getNodeByHandle(nodeHandle)
             requireNotNull(node)
 
             val nodeSizeText = Util.getSizeString(node.size)
@@ -48,7 +43,7 @@ class GetNodeUseCase @Inject constructor(
             val nodeAccess = megaApi.getAccess(node)
             val hasFullAccess = nodeAccess == MegaShare.ACCESS_OWNER || nodeAccess == MegaShare.ACCESS_FULL
 
-            val isAvailableOffline = isNodeAvailableOffline(nodeHandle).blockingGet()
+            val isAvailableOffline = isNodeAvailableOffline(node.handle).blockingGet()
             val hasVersions = megaApi.hasVersions(node)
 
             var isFromRubbishBin = false
@@ -70,6 +65,23 @@ class GetNodeUseCase @Inject constructor(
                 isAvailableOffline,
                 hasVersions
             )
+        }
+
+    fun getPublicNode(nodeFileLink: String): Single<MegaNode> =
+        Single.create { emitter ->
+            megaApi.getPublicNode(nodeFileLink, OptionalMegaRequestListenerInterface(
+                onRequestFinish = { request, error ->
+                    if (error.errorCode == MegaError.API_OK) {
+                        if (!request.flag) {
+                            emitter.onSuccess(request.publicNode)
+                        } else {
+                            emitter.onError(IllegalStateException("Invalid key for public node"))
+                        }
+                    } else {
+                        emitter.onError(error.toThrowable())
+                    }
+                }
+            ))
         }
 
     fun markAsFavorite(nodeHandle: Long, isFavorite: Boolean): Completable =
