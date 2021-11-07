@@ -75,6 +75,7 @@ import mega.privacy.android.app.meeting.CallService;
 import mega.privacy.android.app.meeting.listeners.MeetingListener;
 import mega.privacy.android.app.objects.PasscodeManagement;
 import mega.privacy.android.app.receivers.NetworkStateReceiver;
+import mega.privacy.android.app.service.crashreporter.CrashReporterImpl;
 import mega.privacy.android.app.utils.CUBackupInitializeChecker;
 import mega.privacy.android.app.utils.CallUtil;
 import mega.privacy.android.app.utils.ThemeHelper;
@@ -718,12 +719,12 @@ public class MegaApplication extends MultiDexApplication implements Application.
 		ThemeHelper.INSTANCE.initTheme(this);
 
 		// Setup handler for uncaught exceptions.
-		Thread.setDefaultUncaughtExceptionHandler(new Thread.UncaughtExceptionHandler() {
-			@Override
-			public void uncaughtException(Thread thread, Throwable e) {
-				handleUncaughtException(thread, e);
-			}
-		});
+        Thread.setDefaultUncaughtExceptionHandler((thread, e) -> {
+            handleUncaughtException(thread, e);
+
+            // Send the crash info manually.
+            new CrashReporterImpl().report(e);
+        });
 
 		registerActivityLifecycleCallbacks(this);
 
