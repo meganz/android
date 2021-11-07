@@ -41,7 +41,7 @@ import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
  * E.g. Turn on/off mic/camera/speaker buttons, self video preview,
  * click the big bottom button to move forward, etc.
  */
-@ExperimentalCoroutinesApi
+
 abstract class AbstractMeetingOnBoardingFragment : BaseFragment() {
 
     protected lateinit var binding: MeetingOnBoardingFragmentBinding

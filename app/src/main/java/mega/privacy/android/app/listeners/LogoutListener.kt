@@ -3,7 +3,6 @@ package mega.privacy.android.app.listeners
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import mega.privacy.android.app.R
 import mega.privacy.android.app.lollipop.LoginActivityLollipop
 import mega.privacy.android.app.lollipop.controllers.AccountController
@@ -17,7 +16,6 @@ import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
 import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaRequest
 
-@ExperimentalCoroutinesApi
 class LogoutListener(context: Context) : BaseListener(context) {
 
     override fun onRequestFinish(api: MegaApiJava, request: MegaRequest, e: MegaError) {

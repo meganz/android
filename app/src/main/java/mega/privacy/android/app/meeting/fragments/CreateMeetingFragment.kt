@@ -14,7 +14,6 @@ import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import com.google.android.material.appbar.MaterialToolbar
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import mega.privacy.android.app.R
 import mega.privacy.android.app.meeting.activity.MeetingActivity
 import mega.privacy.android.app.meeting.activity.MeetingActivity.Companion.MEETING_ACTION_CREATE
@@ -30,7 +29,6 @@ import mega.privacy.android.app.utils.permission.PermissionUtils.TYPE_REQUIRE_PE
 import nz.mega.sdk.MegaChatRoom
 import java.util.*
 
-@ExperimentalCoroutinesApi
 @AndroidEntryPoint
 class CreateMeetingFragment : AbstractMeetingOnBoardingFragment() {
 

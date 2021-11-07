@@ -9,7 +9,6 @@ import androidx.constraintlayout.widget.ConstraintSet
 import androidx.core.content.ContextCompat
 import androidx.navigation.fragment.findNavController
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import mega.privacy.android.app.R
 import mega.privacy.android.app.meeting.activity.MeetingActivity
 import mega.privacy.android.app.utils.LogUtil
@@ -17,8 +16,6 @@ import mega.privacy.android.app.utils.LogUtil.logDebug
 import mega.privacy.android.app.utils.Util
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
 
-
-@ExperimentalCoroutinesApi
 @AndroidEntryPoint
 class JoinMeetingAsGuestFragment : AbstractMeetingOnBoardingFragment() {
 

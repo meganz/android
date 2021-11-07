@@ -8,7 +8,6 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.lifecycle.Observer
 import androidx.viewpager2.widget.ViewPager2
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import mega.privacy.android.app.databinding.GridViewCallFragmentBinding
 import mega.privacy.android.app.fragments.BaseFragment
 import mega.privacy.android.app.meeting.activity.MeetingActivity
@@ -16,7 +15,6 @@ import mega.privacy.android.app.meeting.adapter.*
 import mega.privacy.android.app.utils.LogUtil.logDebug
 import nz.mega.sdk.MegaChatSession
 
-@ExperimentalCoroutinesApi
 class GridViewCallFragment : BaseFragment() {
 
     private lateinit var viewDataBinding: GridViewCallFragmentBinding

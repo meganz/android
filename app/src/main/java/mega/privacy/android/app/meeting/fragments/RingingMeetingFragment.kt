@@ -16,7 +16,6 @@ import androidx.navigation.fragment.findNavController
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.jeremyliao.liveeventbus.LiveEventBus
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import mega.privacy.android.app.BaseActivity
 import mega.privacy.android.app.R
 import mega.privacy.android.app.components.twemoji.EmojiTextView
@@ -36,7 +35,6 @@ import mega.privacy.android.app.utils.AvatarUtil.getSpecificAvatarColor
 import mega.privacy.android.app.utils.CallUtil.getDefaultAvatarCall
 import mega.privacy.android.app.utils.CallUtil.getImageAvatarCall
 import mega.privacy.android.app.utils.ChatUtil.getTitleChat
-import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.Constants.*
 import mega.privacy.android.app.utils.LogUtil.logDebug
 import mega.privacy.android.app.utils.RunOnUIThreadUtils
@@ -50,7 +48,6 @@ import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
 import nz.mega.sdk.MegaChatCall
 import java.util.*
 
-@ExperimentalCoroutinesApi
 @AndroidEntryPoint
 class RingingMeetingFragment : BaseFragment(),
     AnswerChatCallListener.OnCallAnsweredCallback {
@@ -182,7 +179,7 @@ class RingingMeetingFragment : BaseFragment(),
                 }
             } else {
                 bitmap = getDefaultAvatar(
-                    getSpecificAvatarColor(Constants.AVATAR_GROUP_CHAT_COLOR),
+                    getSpecificAvatarColor(AVATAR_GROUP_CHAT_COLOR),
                     getTitleChat(it),
                     AVATAR_SIZE,
                     true,
