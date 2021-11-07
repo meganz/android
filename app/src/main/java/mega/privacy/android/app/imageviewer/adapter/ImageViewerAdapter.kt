@@ -11,4 +11,7 @@ class ImageViewerAdapter(activity: FragmentActivity) :
 
     override fun createFragment(position: Int): Fragment =
         ImageViewerPageFragment.newInstance(getItem(position))
+
+    override fun getItemId(position: Int): Long =
+        getItem(position)
 }
