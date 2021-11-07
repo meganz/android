@@ -6,6 +6,8 @@ import android.content.Intent;
 import android.content.res.Configuration;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Parcelable;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -33,6 +35,7 @@ import dagger.hilt.android.AndroidEntryPoint;
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
+import mega.privacy.android.app.components.GestureScaleListener;
 import mega.privacy.android.app.components.ListenScrollChangesHelper;
 import mega.privacy.android.app.databinding.FragmentPhotosBinding;
 import mega.privacy.android.app.databinding.FragmentPhotosFirstLoginBinding;
@@ -42,6 +45,7 @@ import mega.privacy.android.app.globalmanagement.SortOrderManagement;
 import mega.privacy.android.app.lollipop.FullScreenImageViewerLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.repo.MegaNodeRepo;
+import mega.privacy.android.app.utils.ColorUtils;
 import mega.privacy.android.app.utils.StringResourcesUtils;
 import mega.privacy.android.app.utils.ZoomUtil;
 import nz.mega.sdk.MegaNode;
@@ -73,7 +77,7 @@ import static mega.privacy.android.app.utils.ZoomUtil.*;
 import static nz.mega.sdk.MegaApiJava.INVALID_HANDLE;
 
 @AndroidEntryPoint
-public class PhotosFragment extends BaseFragment implements CUGridViewAdapter.Listener,
+public class PhotosFragment extends BaseZoomFragment implements CUGridViewAdapter.Listener,
         CUCardViewAdapter.Listener {
 
     private static final String SELECTED_VIEW = "SELECTED_VIEW";
@@ -107,8 +111,6 @@ public class PhotosFragment extends BaseFragment implements CUGridViewAdapter.Li
     private GridLayoutManager layoutManager;
 
     private int selectedView = ALL_VIEW;
-
-    private int currentZoom;
 
     public int getItemCount() {
         return gridAdapter == null ? 0 : gridAdapter.getItemCount();
@@ -195,7 +197,8 @@ public class PhotosFragment extends BaseFragment implements CUGridViewAdapter.Li
         }, 1000);
     }
 
-    @Override public void onCreate(@Nullable Bundle savedInstanceState) {
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         if (savedInstanceState != null) {
@@ -210,13 +213,13 @@ public class PhotosFragment extends BaseFragment implements CUGridViewAdapter.Li
         viewModel = new ViewModelProvider(this, viewModelFactory).get(CuViewModel.class);
     }
 
-    @Nullable @Override
+    @Nullable
+    @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
-            @Nullable Bundle savedInstanceState) {
+                             @Nullable Bundle savedInstanceState) {
 
         if (mManagerActivity.getFirstLogin() || viewModel.isEnableCUShown()) {
             viewModel.setEnableCUShown(true);
-            mManagerActivity.updateCuFragmentOptionsMenu();
             return createCameraUploadsViewForFirstLogin(inflater, container);
         } else {
             binding = FragmentPhotosBinding.inflate(inflater, container, false);
@@ -231,7 +234,7 @@ public class PhotosFragment extends BaseFragment implements CUGridViewAdapter.Li
     }
 
     private View createCameraUploadsViewForFirstLogin(@NonNull LayoutInflater inflater,
-            @Nullable ViewGroup container) {
+                                                      @Nullable ViewGroup container) {
         viewModel.setInitialPreferences();
 
         mFirstLoginBinding =
@@ -243,7 +246,7 @@ public class PhotosFragment extends BaseFragment implements CUGridViewAdapter.Li
 
         mFirstLoginBinding.enableButton.setOnClickListener(v -> {
             MegaApplication.getInstance().sendSignalPresenceActivity();
-            String[] permissions = { android.Manifest.permission.READ_EXTERNAL_STORAGE };
+            String[] permissions = {android.Manifest.permission.READ_EXTERNAL_STORAGE};
             if (hasPermissions(context, permissions)) {
                 mManagerActivity.checkIfShouldShowBusinessCUAlert();
             } else {
@@ -254,7 +257,8 @@ public class PhotosFragment extends BaseFragment implements CUGridViewAdapter.Li
         return mFirstLoginBinding.getRoot();
     }
 
-    @Override public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
         if (viewModel.isEnableCUShown()) {
@@ -263,8 +267,7 @@ public class PhotosFragment extends BaseFragment implements CUGridViewAdapter.Li
             return;
         }
 
-        currentZoom = mManagerActivity.getCurrentZoom();
-        viewModel.setZoom(currentZoom);
+        viewModel.setZoom(getCurrentZoom());
         viewModel.resetOpenedNode();
         mManagerActivity.updateCUViewTypes(View.VISIBLE);
         setupRecyclerView();
@@ -327,7 +330,7 @@ public class PhotosFragment extends BaseFragment implements CUGridViewAdapter.Li
             }
         });
 
-        binding.cuList.setOnTouchListener(new ScaleGestureHandler(context, mManagerActivity));
+        binding.cuList.setOnTouchListener(new ScaleGestureHandler(context, this));
 
         setGridView();
     }
@@ -337,31 +340,36 @@ public class PhotosFragment extends BaseFragment implements CUGridViewAdapter.Li
 
         boolean isPortrait = getResources().getConfiguration().orientation == ORIENTATION_PORTRAIT;
         int spanCount = getSpanCount(isPortrait);
+
         layoutManager = new GridLayoutManager(context, spanCount);
         binding.cuList.setLayoutManager(layoutManager);
         binding.cuList.setPadding(0, 0, 0, getResources().getDimensionPixelSize(R.dimen.cu_margin_bottom));
         RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) binding.cuList.getLayoutParams();
 
         if (selectedView == ALL_VIEW) {
-            int imageMargin = ZoomUtil.INSTANCE.getMargin(context, currentZoom);
-            ZoomUtil.INSTANCE.setMargin(context, params, currentZoom);
-            int gridWidth = ZoomUtil.INSTANCE.getItemWidth(context, outMetrics, currentZoom, spanCount);
+            int imageMargin = ZoomUtil.INSTANCE.getMargin(context, getCurrentZoom());
+            ZoomUtil.INSTANCE.setMargin(context, params, getCurrentZoom());
+            int gridWidth = ZoomUtil.INSTANCE.getItemWidth(context, outMetrics, getCurrentZoom(), spanCount);
 
-            int icSelectedWidth = ZoomUtil.INSTANCE.getSelectedFrameWidth(context, currentZoom);
+            int icSelectedWidth = ZoomUtil.INSTANCE.getSelectedFrameWidth(context, getCurrentZoom());
 
-            int icSelectedMargin = ZoomUtil.INSTANCE.getSelectedFrameMargin(context, currentZoom);
+            int icSelectedMargin = ZoomUtil.INSTANCE.getSelectedFrameMargin(context, getCurrentZoom());
 
-            CuItemSizeConfig itemSizeConfig = new CuItemSizeConfig(currentZoom, gridWidth,
+            CuItemSizeConfig itemSizeConfig = new CuItemSizeConfig(getCurrentZoom(), gridWidth,
                     icSelectedWidth, imageMargin,
                     getResources().getDimensionPixelSize(R.dimen.cu_fragment_selected_padding),
                     icSelectedMargin,
                     getResources().getDimensionPixelSize(
                             R.dimen.cu_fragment_selected_round_corner_radius));
-
-            gridAdapter = new CUGridViewAdapter(this, spanCount, itemSizeConfig);
-            gridAdapter.setHasStableIds(true);
+            if (gridAdapter == null) {
+                gridAdapter = new CUGridViewAdapter(this, spanCount, itemSizeConfig);
+            }else{
+                gridAdapter.setSpanCount(spanCount);
+                gridAdapter.setCuItemSizeConfig(itemSizeConfig);
+            }
             layoutManager.setSpanSizeLookup(new GridLayoutManager.SpanSizeLookup() {
-                @Override public int getSpanSize(int position) {
+                @Override
+                public int getSpanSize(int position) {
                     return gridAdapter.getSpanSize(position);
                 }
             });
@@ -392,7 +400,8 @@ public class PhotosFragment extends BaseFragment implements CUGridViewAdapter.Li
         if (selectedView != ALL_VIEW) {
             return isPortrait ? SPAN_CARD_PORTRAIT : SPAN_CARD_LANDSCAPE;
         } else {
-            return ZoomUtil.INSTANCE.getSpanCount(isPortrait, currentZoom);
+
+            return ZoomUtil.INSTANCE.getSpanCount(isPortrait, getCurrentZoom());
         }
     }
 
@@ -413,7 +422,6 @@ public class PhotosFragment extends BaseFragment implements CUGridViewAdapter.Li
         if (this.selectedView == selectedView) {
             return;
         }
-
         this.selectedView = selectedView;
         setGridView();
 
@@ -433,13 +441,13 @@ public class PhotosFragment extends BaseFragment implements CUGridViewAdapter.Li
             default:
                 gridAdapter.setNodes(viewModel.getCUNodes());
         }
-
+        handleZoomOptionsMenuUpdate(shouldShowFullInfoAndOptions());
         updateViewSelected();
     }
 
     public void enableCUClick() {
         ((MegaApplication) ((Activity) context).getApplication()).sendSignalPresenceActivity();
-        String[] permissions = { android.Manifest.permission.READ_EXTERNAL_STORAGE };
+        String[] permissions = {android.Manifest.permission.READ_EXTERNAL_STORAGE};
 
         if (hasPermissions(context, permissions)) {
             viewModel.setEnableCUShown(true);
@@ -451,7 +459,7 @@ public class PhotosFragment extends BaseFragment implements CUGridViewAdapter.Li
 
     private void observeLiveData() {
         viewModel.cuNodes().observe(getViewLifecycleOwner(), nodes -> {
-            boolean showScroller = nodes.size() >= (currentZoom < ZOOM_DEFAULT? MIN_ITEMS_SCROLLBAR_GRID : MIN_ITEMS_SCROLLBAR);
+            boolean showScroller = nodes.size() >= (getCurrentZoom() < ZOOM_DEFAULT ? MIN_ITEMS_SCROLLBAR_GRID : MIN_ITEMS_SCROLLBAR);
             binding.scroller.setVisibility(showScroller ? View.VISIBLE : View.GONE);
 
             if (gridAdapter != null) {
@@ -459,7 +467,6 @@ public class PhotosFragment extends BaseFragment implements CUGridViewAdapter.Li
             }
 
             updateEnableCUButtons(viewModel.isCUEnabled());
-            mManagerActivity.updateCuFragmentOptionsMenu();
 
             binding.emptyHint.setVisibility(nodes.isEmpty() ? View.VISIBLE : View.GONE);
             binding.cuList.setVisibility(nodes.isEmpty() ? View.GONE : View.VISIBLE);
@@ -551,7 +558,7 @@ public class PhotosFragment extends BaseFragment implements CUGridViewAdapter.Li
 
     private void showMonthCards(List<CUCard> monthCards) {
         if (selectedView == MONTHS_VIEW) {
-             cardAdapter.submitList(monthCards);
+            cardAdapter.submitList(monthCards);
         }
     }
 
@@ -593,13 +600,15 @@ public class PhotosFragment extends BaseFragment implements CUGridViewAdapter.Li
         binding = null;
     }
 
-    @Override public void onNodeClicked(int position, CuNode node) {
+    @Override
+    public void onNodeClicked(int position, CuNode node) {
         viewModel.onNodeClicked(position, node);
     }
 
-    @Override public void onNodeLongClicked(int position, CuNode node) {
+    @Override
+    public void onNodeLongClicked(int position, CuNode node) {
         // Multiple selection only avaiable for zoom default(3 items per row) or zoom out 1x(5 items per row).
-        if(currentZoom == ZOOM_DEFAULT || currentZoom == ZOOM_OUT_1X) {
+        if (getCurrentZoom() == ZOOM_DEFAULT || getCurrentZoom() == ZOOM_OUT_1X) {
             viewModel.onNodeLongClicked(position, node);
         }
     }
@@ -641,7 +650,6 @@ public class PhotosFragment extends BaseFragment implements CUGridViewAdapter.Li
 
         updateFastScrollerVisibility();
         mManagerActivity.enableHideBottomViewOnScroll(selectedView != ALL_VIEW);
-        mManagerActivity.updateCuFragmentOptionsMenu();
         mManagerActivity.updateEnableCUButton(selectedView == ALL_VIEW
                 && (gridAdapter != null && gridAdapter.getItemCount() > 0)
                 && (viewModel != null && !viewModel.isCUEnabled())
@@ -681,7 +689,7 @@ public class PhotosFragment extends BaseFragment implements CUGridViewAdapter.Li
      * Apply selected/unselected style for the TextView button.
      *
      * @param textView The TextView button to be applied with the style.
-     * @param enabled true, apply selected style; false, apply unselected style.
+     * @param enabled  true, apply selected style; false, apply unselected style.
      */
     private void setViewTypeButtonStyle(TextView textView, boolean enabled) {
         if (textView == null) {
@@ -702,7 +710,7 @@ public class PhotosFragment extends BaseFragment implements CUGridViewAdapter.Li
     public void onCardClicked(int position, @NonNull CUCard card) {
         switch (selectedView) {
             case DAYS_VIEW:
-                mManagerActivity.restoreDefaultZoom();
+                getZoomViewModel().restoreDefaultZoom();
                 card = viewModel.dayClicked(position, card);
                 newViewClicked(ALL_VIEW);
                 int cuNodePosition = gridAdapter.getNodePosition(card.getNode().getHandle());
@@ -720,7 +728,6 @@ public class PhotosFragment extends BaseFragment implements CUGridViewAdapter.Li
                 layoutManager.scrollToPosition(viewModel.yearClicked(position, card));
                 break;
         }
-
         mManagerActivity.showBottomView();
     }
 
@@ -736,5 +743,24 @@ public class PhotosFragment extends BaseFragment implements CUGridViewAdapter.Li
 
     public void setDefaultView() {
         newViewClicked(ALL_VIEW);
+    }
+
+    @Override
+    public void handleZoomChange(int zoom) {
+        boolean needReload = ZoomUtil.INSTANCE.needReload(getCurrentZoom(), zoom);
+        handleZoomAdapterLayoutChange(zoom);
+        if (needReload) {
+            reloadNodes();
+        }
+
+    }
+
+    private void handleZoomAdapterLayoutChange(int zoom) {
+        viewModel.setZoom(zoom);
+        Parcelable state = layoutManager.onSaveInstanceState();
+        setGridView();
+        layoutManager.onRestoreInstanceState(state);
+
+
     }
 }

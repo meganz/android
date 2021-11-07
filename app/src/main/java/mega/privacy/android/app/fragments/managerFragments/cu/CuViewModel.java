@@ -95,7 +95,6 @@ class CuViewModel extends BaseRxViewModel {
 
     private Set<Long> thumbnailHandle = new HashSet<>();
     private Set<Long> previewHandle = new HashSet<>();
-
     private int mZoom;
 
     public boolean isEnableCUShown() {

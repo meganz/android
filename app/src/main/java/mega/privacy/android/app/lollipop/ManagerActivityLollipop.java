@@ -131,7 +131,6 @@ import mega.privacy.android.app.Product;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.GestureScaleListener;
 import mega.privacy.android.app.fragments.homepage.documents.DocumentsFragment;
-import mega.privacy.android.app.fragments.homepage.photos.ImagesFragment;
 import mega.privacy.android.app.fragments.managerFragments.cu.PhotosFragment;
 import mega.privacy.android.app.generalusecase.FilePrepareUseCase;
 import mega.privacy.android.app.smsVerification.SMSVerificationActivity;
@@ -231,9 +230,7 @@ import mega.privacy.android.app.utils.TextUtil;
 import mega.privacy.android.app.utils.ThumbnailUtilsLollipop;
 import mega.privacy.android.app.utils.Util;
 import mega.privacy.android.app.utils.TimeUtils;
-import mega.privacy.android.app.utils.ZoomUtil;
 import mega.privacy.android.app.utils.contacts.MegaContactGetter;
-import mega.privacy.android.app.viewmodel.ZoomViewModel;
 import nz.mega.documentscanner.DocumentScannerActivity;
 import nz.mega.sdk.MegaAccountDetails;
 import nz.mega.sdk.MegaAchievementsDetails;
@@ -299,9 +296,6 @@ import static mega.privacy.android.app.utils.ChatUtil.*;
 import static mega.privacy.android.app.utils.ColorUtils.tintIcon;
 import static mega.privacy.android.app.utils.PermissionUtils.*;
 import static mega.privacy.android.app.utils.TextUtil.isTextEmpty;
-import static mega.privacy.android.app.utils.ZoomUtil.ZOOM_DEFAULT;
-import static mega.privacy.android.app.utils.ZoomUtil.ZOOM_IN_1X;
-import static mega.privacy.android.app.utils.ZoomUtil.ZOOM_OUT_2X;
 import static mega.privacy.android.app.utils.billing.PaymentUtils.*;
 import static mega.privacy.android.app.lollipop.FileInfoActivityLollipop.NODE_HANDLE;
 import static mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil.isBottomSheetDialogShown;
@@ -330,7 +324,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 		MegaGlobalListenerInterface, MegaTransferListenerInterface, OnClickListener,
 		BottomNavigationView.OnNavigationItemSelectedListener, UploadBottomSheetDialogActionListener,
 		ChatManagementCallback, ActionNodeCallback, SnackbarShower,
-		MeetingBottomSheetDialogActionListener, LoadPreviewListener.OnPreviewLoadedCallback, GestureScaleListener.GestureScaleCallback {
+		MeetingBottomSheetDialogActionListener, LoadPreviewListener.OnPreviewLoadedCallback{
 
 	private static final String TRANSFER_OVER_QUOTA_SHOWN = "TRANSFER_OVER_QUOTA_SHOWN";
 
@@ -474,7 +468,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 	private boolean isFromMeeting = false;
 
 	public enum FragmentTag {
-		CLOUD_DRIVE, HOMEPAGE, PHOTOS, INBOX, INCOMING_SHARES, OUTGOING_SHARES, SETTINGS, SEARCH,TRANSFERS, COMPLETED_TRANSFERS,
+		CLOUD_DRIVE, HOMEPAGE, CAMERA_UPLOADS, INBOX, INCOMING_SHARES, OUTGOING_SHARES, SETTINGS, SEARCH,TRANSFERS, COMPLETED_TRANSFERS,
 		RECENT_CHAT, RUBBISH_BIN, NOTIFICATIONS, TURN_ON_NOTIFICATIONS, PERMISSIONS, SMS_VERIFICATION,
 		LINKS;
 
@@ -483,7 +477,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 				case CLOUD_DRIVE: return "fbFLol";
 				case HOMEPAGE: return "fragmentHomepage";
 				case RUBBISH_BIN: return "rubbishBinFLol";
-				case PHOTOS: return "cuFLol";
+				case CAMERA_UPLOADS: return "cuFLol";
 				case INBOX: return "iFLol";
 				case INCOMING_SHARES: return "isF";
 				case OUTGOING_SHARES: return "osF";
@@ -653,8 +647,6 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 	private AlertDialog newTextFileDialog;
 
 	private MenuItem searchMenuItem;
-	private MenuItem zoomOutMenuItem;
-	private MenuItem zoomInMenuItem;
 	private MenuItem addContactMenuItem;
 	private MenuItem addMenuItem;
 	private MenuItem createFolderMenuItem;
@@ -717,10 +709,6 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 
 	private boolean onAskingPermissionsFragment = false;
 	public boolean onAskingSMSVerificationFragment = false;
-
-	@Inject
-	ZoomViewModel zoomViewModel;
-    private int currentZoom = ZOOM_DEFAULT;
 
 	private View mNavHostView;
 	private NavController mNavController;
@@ -1325,7 +1313,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 		outState.putBoolean(KEY_IS_FAB_EXPANDED, isFabExpanded);
 
 		if (getCameraUploadFragment() != null) {
-			getSupportFragmentManager().putFragment(outState, FragmentTag.PHOTOS.getTag(), cuFragment);
+			getSupportFragmentManager().putFragment(outState, FragmentTag.CAMERA_UPLOADS.getTag(), cuFragment);
 		}
 
 		checkNewTextFileDialogState(newTextFileDialog, outState);
@@ -1515,20 +1503,6 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 		aC = new AccountController(this);
 
         createCacheFolders(this);
-
-        zoomViewModel.getZoom().observe(this, zoom -> {
-            // Out 3X: organize by year, In 1X: oragnize by day, both need to reload nodes.
-            boolean needReload = ZoomUtil.INSTANCE.needReload(currentZoom, zoom);
-            currentZoom = zoom;
-
-            if (drawerItem == DrawerItem.PHOTOS) {
-                refreshFragment(FragmentTag.PHOTOS.getTag());
-
-                if (needReload) {
-                    refreshCUNodes();
-                }
-            }
-        });
 
         dbH = DatabaseHandler.getDbHandler(getApplicationContext());
 
@@ -4628,11 +4602,11 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 				if (getCameraUploadFragment() == null) {
 					cuFragment = new PhotosFragment();
 				} else {
-					refreshFragment(FragmentTag.PHOTOS.getTag());
+					refreshFragment(FragmentTag.CAMERA_UPLOADS.getTag());
 				}
 
 				cuFragment.setViewTypes(cuViewTypes, cuYearsButton, cuMonthsButton, cuDaysButton, cuAllButton);
-				replaceFragment(cuFragment, FragmentTag.PHOTOS.getTag());
+				replaceFragment(cuFragment, FragmentTag.CAMERA_UPLOADS.getTag());
 				setToolbarTitle();
 				supportInvalidateOptionsMenu();
 				showFabButton();
@@ -5278,8 +5252,6 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 			}
 		});
 
-		zoomOutMenuItem = menu.findItem(R.id.action_zoom_out);
-		zoomInMenuItem = menu.findItem(R.id.action_zoom_in);
 		addContactMenuItem = menu.findItem(R.id.action_add_contact);
 		addMenuItem = menu.findItem(R.id.action_add);
 		createFolderMenuItem = menu.findItem(R.id.action_new_folder);
@@ -5358,18 +5330,6 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 					}
 					break;
 				case PHOTOS:
-                    zoomOutMenuItem.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
-                    zoomInMenuItem.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
-
-                    if (currentZoom == ZOOM_OUT_2X) {
-                        ZoomUtil.INSTANCE.disableButton(this, zoomOutMenuItem);
-                    }
-
-                    if (currentZoom == ZOOM_IN_1X) {
-                        ZoomUtil.INSTANCE.disableButton(this, zoomInMenuItem);
-                    }
-
-					updateCuFragmentOptionsMenu();
 					break;
 
 				case INBOX:
@@ -5571,31 +5531,6 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
         }
 
         return null;
-    }
-
-    public void updateCuFragmentOptionsMenu() {
-        if (selectMenuItem == null || sortByMenuItem == null || zoomOutMenuItem == null || zoomInMenuItem == null) {
-            return;
-        }
-
-        if (drawerItem == DrawerItem.PHOTOS && getCameraUploadFragment() != null && cuFragment.getItemCount() > 0) {
-            boolean visible = cuFragment.shouldShowFullInfoAndOptions();
-            sortByMenuItem.setVisible(visible);
-            zoomOutMenuItem.setVisible(visible);
-            zoomInMenuItem.setVisible(visible);
-        }
-    }
-
-    public void updatePhotosFragmentOptionsMenu() {
-        if (zoomOutMenuItem == null || zoomInMenuItem == null) {
-            return;
-        }
-
-        ImagesFragment imagesFragment = getFragmentByType(ImagesFragment.class);
-        boolean shouldShow = imagesFragment.shouldShowZoomMenuItem();
-
-        zoomOutMenuItem.setVisible(shouldShow);
-        zoomInMenuItem.setVisible(shouldShow);
     }
 
 	private void setGridListIcon() {
@@ -5915,19 +5850,6 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 
 	        	return true;
 	        }
-            case R.id.action_zoom_out: {
-                if (drawerItem == DrawerItem.PHOTOS || (drawerItem == DrawerItem.HOMEPAGE && mHomepageScreen == HomepageScreen.IMAGES)) {
-                    zoomOut();
-                }
-                return true;
-            }
-            case R.id.action_zoom_in: {
-                if (drawerItem == DrawerItem.PHOTOS || (drawerItem == DrawerItem.HOMEPAGE && mHomepageScreen == HomepageScreen.IMAGES)) {
-                    zoomIn();
-                }
-
-                return true;
-            }
             case R.id.action_grid: {
                 logDebug("action_grid selected");
 
@@ -6008,36 +5930,6 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 		}
 	}
 
-    public void zoomIn() {
-        if (currentZoom < ZOOM_IN_1X) {
-            // Don't use currentZoom++, shouldn't change the value of currentZoom here.
-            zoomViewModel.setZoom(currentZoom + 1);
-            ZoomUtil.INSTANCE.enableButton(this, zoomOutMenuItem);
-        }
-
-        if (currentZoom == ZOOM_IN_1X) {
-            ZoomUtil.INSTANCE.disableButton(this, zoomInMenuItem);
-        }
-    }
-
-    public void zoomOut() {
-        if (currentZoom > ZOOM_OUT_2X) {
-            // Don't use currentZoom--, shouldn't change the value of currentZoom here.
-            zoomViewModel.setZoom(currentZoom - 1);
-            ZoomUtil.INSTANCE.enableButton(this, zoomInMenuItem);
-        }
-
-        if (currentZoom == ZOOM_OUT_2X) {
-            ZoomUtil.INSTANCE.disableButton(this, zoomOutMenuItem);
-        }
-    }
-
-    public void restoreDefaultZoom() {
-        zoomViewModel.setZoom(ZOOM_DEFAULT);
-		ZoomUtil.INSTANCE.enableButton(this, zoomInMenuItem);
-		ZoomUtil.INSTANCE.enableButton(this, zoomOutMenuItem);
-    }
-
 	private void hideItemsWhenSearchSelected() {
         textSubmitted = false;
         if (createFolderMenuItem != null) {
@@ -6056,8 +5948,6 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
             importLinkMenuItem.setVisible(false);
             takePicture.setVisible(false);
             helpMenuItem.setVisible(false);
-            zoomOutMenuItem.setVisible(false);
-            zoomInMenuItem.setVisible(false);
             inviteMenuItem.setVisible(false);
             selectMenuItem.setVisible(false);
             thumbViewMenuItem.setVisible(false);
@@ -7596,7 +7486,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 		drawerItem = DrawerItem.PHOTOS;
 		setBottomNavigationMenuItemChecked(CAMERA_UPLOADS_BNV);
 		setToolbarTitle();
-		refreshFragment(FragmentTag.PHOTOS.getTag());
+		refreshFragment(FragmentTag.CAMERA_UPLOADS.getTag());
 	}
 
 	/**
@@ -11824,7 +11714,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 
 	private PhotosFragment getCameraUploadFragment() {
 		return cuFragment = (PhotosFragment) getSupportFragmentManager()
-				.findFragmentByTag(FragmentTag.PHOTOS.getTag());
+				.findFragmentByTag(FragmentTag.CAMERA_UPLOADS.getTag());
 	}
 
 	private InboxFragmentLollipop getInboxFragment() {
@@ -11967,9 +11857,5 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 
     public void hideTransferWidget() {
         transfersWidget.hide();
-    }
-
-    public int getCurrentZoom() {
-        return currentZoom;
     }
 }
