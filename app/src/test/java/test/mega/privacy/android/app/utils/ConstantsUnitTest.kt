@@ -1,4 +1,4 @@
-package mega.privacy.android.app.utils
+package test.mega.privacy.android.app.utils
 
 import com.google.common.truth.Truth.assertThat
 import mega.privacy.android.app.utils.Constants.*
