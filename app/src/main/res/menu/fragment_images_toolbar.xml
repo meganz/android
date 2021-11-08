@@ -19,11 +19,11 @@
         app:iconTint="?attr/colorControlNormal"
         app:showAsAction="ifRoom" />
 
-    <item
-        android:id="@+id/action_menu_sort_by"
-        android:icon="@drawable/ic_action_bar_null"
-        android:orderInCategory="115"
-        android:title="@string/action_sort_by"
-        android:visible="false"
-        app:showAsAction="never" />
+<!--    <item-->
+<!--        android:id="@+id/action_menu_sort_by"-->
+<!--        android:icon="@drawable/ic_action_bar_null"-->
+<!--        android:orderInCategory="115"-->
+<!--        android:title="@string/action_sort_by"-->
+<!--        android:visible="false"-->
+<!--        app:showAsAction="never" />-->
 </menu>

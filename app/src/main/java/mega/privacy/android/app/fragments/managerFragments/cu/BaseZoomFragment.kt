@@ -25,6 +25,8 @@ abstract class BaseZoomFragment : BaseFragment(), GestureScaleCallback {
 
     abstract fun handleZoomChange(zoom:Int)
 
+    abstract fun handleOnCreateOptionsMenu()
+
     fun subscribeObservers() {
         zoomViewModel.zoom.observe(viewLifecycleOwner, { zoom: Int ->
             handleZoomChange(zoom)
@@ -45,6 +47,7 @@ abstract class BaseZoomFragment : BaseFragment(), GestureScaleCallback {
 
         inflater.inflate(R.menu.fragment_images_toolbar, menu)
         this.menu = menu
+        handleOnCreateOptionsMenu()
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {

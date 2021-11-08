@@ -561,7 +561,6 @@ public class PhotosFragment extends BaseZoomFragment implements CUGridViewAdapte
     }
 
     private boolean isShowMenu() {
-        boolean cuEnabled = viewModel.isCUEnabled();
         boolean emptyAdapter = gridAdapter == null || gridAdapter.getItemCount() <= 0;
         if (emptyAdapter || mActionMode != null || selectedView != ALL_VIEW){
             return false;
@@ -783,4 +782,8 @@ public class PhotosFragment extends BaseZoomFragment implements CUGridViewAdapte
         }
     }
 
+    @Override
+    public void handleOnCreateOptionsMenu() {
+        handleOptionsMenuUpdate(isShowMenu());
+    }
 }

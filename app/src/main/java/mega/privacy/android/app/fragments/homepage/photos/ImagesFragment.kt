@@ -7,9 +7,7 @@ import android.annotation.SuppressLint
 import android.content.Intent
 import android.content.res.Configuration
 import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
@@ -85,18 +83,19 @@ class ImagesFragment : BaseBindingFragmentKt<ImagesViewModel, FragmentImagesBind
     }
 
     override fun init() {
-        setToolbarMenu()
         setupEmptyHint()
         setupListView()
         setupTimePanel()
         setupListAdapter(currentZoom)
         setupActionMode()
         setupNavigation()
+        setToolbarMenu()
     }
 
     private fun setToolbarMenu() {
         binding.layoutTitleBar.toolbar.apply {
             inflateMenu(R.menu.fragment_images_toolbar)
+            handleZoomOptionsMenuUpdate()
             setOnMenuItemClickListener {
                 when (it.itemId) {
                     R.id.action_zoom_in -> {
