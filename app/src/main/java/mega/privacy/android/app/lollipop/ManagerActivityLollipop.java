@@ -468,7 +468,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 	private boolean isFromMeeting = false;
 
 	public enum FragmentTag {
-		CLOUD_DRIVE, HOMEPAGE, CAMERA_UPLOADS, INBOX, INCOMING_SHARES, OUTGOING_SHARES, SETTINGS, SEARCH,TRANSFERS, COMPLETED_TRANSFERS,
+		CLOUD_DRIVE, HOMEPAGE, PHOTOS, INBOX, INCOMING_SHARES, OUTGOING_SHARES, SETTINGS, SEARCH,TRANSFERS, COMPLETED_TRANSFERS,
 		RECENT_CHAT, RUBBISH_BIN, NOTIFICATIONS, TURN_ON_NOTIFICATIONS, PERMISSIONS, SMS_VERIFICATION,
 		LINKS;
 
@@ -477,7 +477,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 				case CLOUD_DRIVE: return "fbFLol";
 				case HOMEPAGE: return "fragmentHomepage";
 				case RUBBISH_BIN: return "rubbishBinFLol";
-				case CAMERA_UPLOADS: return "cuFLol";
+				case PHOTOS: return "cuFLol";
 				case INBOX: return "iFLol";
 				case INCOMING_SHARES: return "isF";
 				case OUTGOING_SHARES: return "osF";
@@ -1313,7 +1313,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 		outState.putBoolean(KEY_IS_FAB_EXPANDED, isFabExpanded);
 
 		if (getCameraUploadFragment() != null) {
-			getSupportFragmentManager().putFragment(outState, FragmentTag.CAMERA_UPLOADS.getTag(), cuFragment);
+			getSupportFragmentManager().putFragment(outState, FragmentTag.PHOTOS.getTag(), cuFragment);
 		}
 
 		checkNewTextFileDialogState(newTextFileDialog, outState);
@@ -4602,11 +4602,11 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 				if (getCameraUploadFragment() == null) {
 					cuFragment = new PhotosFragment();
 				} else {
-					refreshFragment(FragmentTag.CAMERA_UPLOADS.getTag());
+					refreshFragment(FragmentTag.PHOTOS.getTag());
 				}
 
 				cuFragment.setViewTypes(cuViewTypes, cuYearsButton, cuMonthsButton, cuDaysButton, cuAllButton);
-				replaceFragment(cuFragment, FragmentTag.CAMERA_UPLOADS.getTag());
+				replaceFragment(cuFragment, FragmentTag.PHOTOS.getTag());
 				setToolbarTitle();
 				supportInvalidateOptionsMenu();
 				showFabButton();
@@ -7486,7 +7486,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 		drawerItem = DrawerItem.PHOTOS;
 		setBottomNavigationMenuItemChecked(CAMERA_UPLOADS_BNV);
 		setToolbarTitle();
-		refreshFragment(FragmentTag.CAMERA_UPLOADS.getTag());
+		refreshFragment(FragmentTag.PHOTOS.getTag());
 	}
 
 	/**
@@ -11717,7 +11717,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 
 	private PhotosFragment getCameraUploadFragment() {
 		return cuFragment = (PhotosFragment) getSupportFragmentManager()
-				.findFragmentByTag(FragmentTag.CAMERA_UPLOADS.getTag());
+				.findFragmentByTag(FragmentTag.PHOTOS.getTag());
 	}
 
 	private InboxFragmentLollipop getInboxFragment() {

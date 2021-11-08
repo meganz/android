@@ -1,7 +1,6 @@
 package mega.privacy.android.app.fragments.managerFragments.cu
 
 import android.os.Bundle
-import android.util.Log
 import android.view.Menu
 import android.view.MenuInflater
 import android.view.MenuItem
@@ -13,6 +12,7 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.components.GestureScaleListener.GestureScaleCallback
 import mega.privacy.android.app.fragments.BaseFragment
 import mega.privacy.android.app.fragments.homepage.photos.ZoomViewModel
+import mega.privacy.android.app.lollipop.ManagerActivityLollipop
 import mega.privacy.android.app.utils.ColorUtils
 
 abstract class BaseZoomFragment : BaseFragment(), GestureScaleCallback {
@@ -39,7 +39,11 @@ abstract class BaseZoomFragment : BaseFragment(), GestureScaleCallback {
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         super.onCreateOptionsMenu(menu, inflater)
-        inflater.inflate(R.menu.fragment_images_toolbar, menu);
+        if((activity as ManagerActivityLollipop).drawerItem != ManagerActivityLollipop.DrawerItem.PHOTOS) {
+            return
+        }
+
+        inflater.inflate(R.menu.fragment_images_toolbar, menu)
         this.menu = menu
         this.menu.findItem(R.id.action_menu_sort_by).isVisible = true
     }
@@ -49,15 +53,13 @@ abstract class BaseZoomFragment : BaseFragment(), GestureScaleCallback {
             R.id.action_zoom_in -> {
                 zoomViewModel.zoomIn()
                 handleZoomMenuItemStatus()
-                true
             }
             R.id.action_zoom_out -> {
                 zoomOut()
                 handleZoomMenuItemStatus()
-                true
             }
         }
-        return super.onOptionsItemSelected(item);
+        return super.onOptionsItemSelected(item)
     }
 
     private fun handleZoomMenuItemStatus() {
@@ -91,16 +93,14 @@ abstract class BaseZoomFragment : BaseFragment(), GestureScaleCallback {
 
 
     fun handleZoomOptionsMenuUpdate(shouldShow:Boolean) {
-        this.menu.findItem(R.id.action_zoom_in).isVisible = shouldShow
-        this.menu.findItem(R.id.action_zoom_out).isVisible = shouldShow
+        menu.findItem(R.id.action_zoom_in).isVisible = shouldShow
+        menu.findItem(R.id.action_zoom_out).isVisible = shouldShow
     }
 
-    fun handleOptionsMenuUpdate(shouldShow:Boolean) {
-        if (this.menu!=null){
-            this.menu.findItem(R.id.action_zoom_in).isVisible = shouldShow
-            this.menu.findItem(R.id.action_zoom_out).isVisible = shouldShow
-            this.menu.findItem(R.id.action_menu_sort_by).isVisible = shouldShow
-        }
+    fun handleOptionsMenuUpdate(shouldShow: Boolean) {
+        menu.findItem(R.id.action_zoom_in)?.isVisible = shouldShow
+        menu.findItem(R.id.action_zoom_out)?.isVisible = shouldShow
+        menu.findItem(R.id.action_menu_sort_by)?.isVisible = shouldShow
     }
 
     override fun zoomIn() {
@@ -115,13 +115,5 @@ abstract class BaseZoomFragment : BaseFragment(), GestureScaleCallback {
 
     protected fun getCurrentZoom():Int{
         return zoomViewModel.getCurrentZoom()
-    }
-
-    override fun onStart() {
-        super.onStart()
-    }
-
-    override fun onStop() {
-        super.onStop()
     }
 }
