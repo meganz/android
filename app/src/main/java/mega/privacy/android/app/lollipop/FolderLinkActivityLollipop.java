@@ -49,6 +49,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Stack;
+import java.util.function.ToLongFunction;
+import java.util.stream.LongStream;
 
 import javax.inject.Inject;
 
@@ -1258,10 +1260,10 @@ public class FolderLinkActivityLollipop extends TransfersManagementActivity impl
 			}
 			else{
 				if (MimeTypeList.typeForName(nodes.get(position).getName()).isImage()) {
-					Intent intent = ImageViewerActivity.getIntentForParentNode(
+					long[] children = nodes.stream().mapToLong(MegaNode::getHandle).toArray();
+					Intent intent = ImageViewerActivity.getIntentForChildren(
 							this,
-							megaApiFolder.getParentNode(nodes.get(position)).getHandle(),
-							orderGetChildren,
+							children,
 							nodes.get(position).getHandle()
 					);
 					startActivity(intent);

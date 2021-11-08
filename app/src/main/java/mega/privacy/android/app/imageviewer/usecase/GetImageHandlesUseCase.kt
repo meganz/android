@@ -9,6 +9,7 @@ import io.reactivex.rxjava3.kotlin.subscribeBy
 import mega.privacy.android.app.DatabaseHandler
 import mega.privacy.android.app.MimeTypeList
 import mega.privacy.android.app.di.MegaApi
+import mega.privacy.android.app.di.MegaApiFolder
 import mega.privacy.android.app.imageviewer.data.ImageItem
 import mega.privacy.android.app.usecase.GetGlobalChangesUseCase
 import mega.privacy.android.app.usecase.GetNodeUseCase
@@ -27,6 +28,7 @@ import javax.inject.Inject
 class GetImageHandlesUseCase @Inject constructor(
     @ApplicationContext private val context: Context,
     @MegaApi private val megaApi: MegaApiAndroid,
+    @MegaApiFolder private val megaApiFolder: MegaApiAndroid,
     private val databaseHandler: DatabaseHandler,
     private val getGlobalChangesUseCase: GetGlobalChangesUseCase,
     private val getNodeUseCase: GetNodeUseCase,
@@ -43,7 +45,7 @@ class GetImageHandlesUseCase @Inject constructor(
             val items = mutableListOf<ImageItem>()
             when {
                 parentNodeHandle != null && parentNodeHandle != INVALID_HANDLE -> {
-                    val parentNode = megaApi.getNodeByHandle(parentNodeHandle)
+                    val parentNode = parentNodeHandle.getMegaNode()
                     if (parentNode != null && megaApi.hasChildren(parentNode)) {
                         items.addChildrenNodes(parentNode, sortOrder ?: ORDER_PHOTO_ASC)
                     } else {
@@ -94,9 +96,8 @@ class GetImageHandlesUseCase @Inject constructor(
                                         changedNode.parentHandle == parentNodeHandle
                                     }
                                     items.isNotEmpty() -> {
-                                        val sampleNodeHandle = items.first().handle
-                                        val sampleParentHandle = megaApi.getNodeByHandle(sampleNodeHandle)?.parentHandle
-                                        changedNode.parentHandle == sampleParentHandle
+                                        val sampleNodeParentHandle = items[0].handle.getMegaNode()!!.parentHandle
+                                        changedNode.parentHandle == sampleNodeParentHandle
                                     }
                                     else -> false
                                 }
@@ -131,7 +132,7 @@ class GetImageHandlesUseCase @Inject constructor(
 
     private fun MutableList<ImageItem>.addNodeHandles(nodeHandles: LongArray) {
         nodeHandles.forEach { nodeHandle ->
-            val node = megaApi.getNodeByHandle(nodeHandle)
+            val node = nodeHandle.getMegaNode()
             if (node?.isValidForImageViewer() == true) {
                 this.add(node.toImageItem())
             }
@@ -168,6 +169,10 @@ class GetImageHandlesUseCase @Inject constructor(
                 }
         }
     }
+
+    private fun Long.getMegaNode(): MegaNode? =
+        megaApi.getNodeByHandle(this)
+            ?: megaApiFolder.authorizeNode(megaApiFolder.getNodeByHandle(this))
 
     private fun MegaNode.toImageItem(): ImageItem =
         ImageItem(
