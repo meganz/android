@@ -674,7 +674,7 @@ public class FileStorageActivityLollipop extends PasscodeActivity implements OnC
 	 * Changes the path shown in the screen or finish the activity if the current one is not valid.
 	 */
 	private void checkPath() {
-		if (path == null){
+		if (path == null || path.getAbsolutePath() == null) {
 			logError("Current path is not valid (null)");
 			showErrorAlertDialog(getString(R.string.error_io_problem),
 					true, this);
