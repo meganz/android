@@ -112,6 +112,8 @@ public class PhotosFragment extends BaseZoomFragment implements CUGridViewAdapte
 
     private GridLayoutManager layoutManager;
 
+    private ScaleGestureHandler scaleGestureHandler;
+
     private int selectedView = ALL_VIEW;
 
     public int getItemCount() {
@@ -331,7 +333,8 @@ public class PhotosFragment extends BaseZoomFragment implements CUGridViewAdapte
             }
         });
 
-        binding.cuList.setOnTouchListener(new ScaleGestureHandler(context, this));
+        scaleGestureHandler = new ScaleGestureHandler(context, this);
+        binding.cuList.setOnTouchListener(scaleGestureHandler);
 
         setGridView();
     }
@@ -419,6 +422,7 @@ public class PhotosFragment extends BaseZoomFragment implements CUGridViewAdapte
      *
      * @param selectedView The selected view.
      */
+    @SuppressLint("ClickableViewAccessibility")
     private void newViewClicked(int selectedView) {
         if (this.selectedView == selectedView) {
             return;
@@ -429,18 +433,22 @@ public class PhotosFragment extends BaseZoomFragment implements CUGridViewAdapte
         switch (selectedView) {
             case DAYS_VIEW:
                 showDayCards(viewModel.getDayCards());
+                binding.cuList.setOnTouchListener(null);
                 break;
 
             case MONTHS_VIEW:
                 showMonthCards(viewModel.getMonthCards());
+                binding.cuList.setOnTouchListener(null);
                 break;
 
             case YEARS_VIEW:
                 showYearCards(viewModel.getYearCards());
+                binding.cuList.setOnTouchListener(null);
                 break;
 
             default:
                 gridAdapter.setNodes(viewModel.getCUNodes());
+                binding.cuList.setOnTouchListener(scaleGestureHandler);
         }
         handleZoomOptionsMenuUpdate(shouldShowFullInfoAndOptions());
         updateViewSelected();
