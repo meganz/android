@@ -14,6 +14,8 @@ import mega.privacy.android.app.fragments.BaseFragment
 import mega.privacy.android.app.fragments.homepage.photos.ZoomViewModel
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop
 import mega.privacy.android.app.utils.ColorUtils
+import mega.privacy.android.app.utils.ZoomUtil
+import mega.privacy.android.app.utils.ZoomUtil.needReload
 
 abstract class BaseZoomFragment : BaseFragment(), GestureScaleCallback {
 
@@ -25,8 +27,6 @@ abstract class BaseZoomFragment : BaseFragment(), GestureScaleCallback {
 
     fun subscribeObservers() {
         zoomViewModel.zoom.observe(viewLifecycleOwner, { zoom: Int ->
-            zoomViewModel.setCurrentZoom(zoom)
-           // Out 3X: organize by year, In 1X: oragnize by day, both need to reload nodes.
             handleZoomChange(zoom)
        })
    }

@@ -767,6 +767,7 @@ public class PhotosFragment extends BaseZoomFragment implements CUGridViewAdapte
     @Override
     public void handleZoomChange(int zoom) {
         boolean needReload = ZoomUtil.INSTANCE.needReload(getCurrentZoom(), zoom);
+        getZoomViewModel().setCurrentZoom(zoom);
         handleZoomAdapterLayoutChange(zoom);
         if (needReload) {
             reloadNodes();
