@@ -45,7 +45,6 @@ abstract class BaseZoomFragment : BaseFragment(), GestureScaleCallback {
 
         inflater.inflate(R.menu.fragment_images_toolbar, menu)
         this.menu = menu
-        this.menu.findItem(R.id.action_menu_sort_by).isVisible = true
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -91,16 +90,12 @@ abstract class BaseZoomFragment : BaseFragment(), GestureScaleCallback {
         menuItem.isEnabled = isEnable
     }
 
-
-    fun handleZoomOptionsMenuUpdate(shouldShow:Boolean) {
-        menu.findItem(R.id.action_zoom_in).isVisible = shouldShow
-        menu.findItem(R.id.action_zoom_out).isVisible = shouldShow
-    }
-
     fun handleOptionsMenuUpdate(shouldShow: Boolean) {
-        menu.findItem(R.id.action_zoom_in)?.isVisible = shouldShow
-        menu.findItem(R.id.action_zoom_out)?.isVisible = shouldShow
-        menu.findItem(R.id.action_menu_sort_by)?.isVisible = shouldShow
+        if (this::menu.isInitialized) {
+            menu.findItem(R.id.action_zoom_in)?.isVisible = shouldShow
+            menu.findItem(R.id.action_zoom_out)?.isVisible = shouldShow
+            menu.findItem(R.id.action_menu_sort_by)?.isVisible = shouldShow
+        }
     }
 
     override fun zoomIn() {

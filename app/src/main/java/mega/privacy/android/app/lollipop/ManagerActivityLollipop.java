@@ -11042,6 +11042,62 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 				mElevationCause > 0 && !isInMainHomePage());
 	}
 
+	/**
+	 * This method is used to change the elevation of the AppBarLayout when
+	 * scrolling the RecyclerView
+	 * @param withElevation true if need elevation, false otherwise
+	 */
+	public void changeAppBarElevation(boolean withElevation,MaterialToolbar toolbar,AppBarLayout abL) {
+		changeAppBarElevation(withElevation, ELEVATION_SCROLL,toolbar,abL);
+	}
+
+	/**
+	 * This method is used to change the elevation of the AppBarLayout for some reason
+	 *
+	 * @param withElevation true if need elevation, false otherwise
+	 * @param cause for what cause adding/removing elevation. Only if mElevationCause(cause bitmap)
+	 *              is zero will the elevation being eliminated
+	 */
+	public void changeAppBarElevation(boolean withElevation, int cause,MaterialToolbar toolbar,AppBarLayout abL) {
+		if (withElevation) {
+			mElevationCause |= cause;
+		} else if ((mElevationCause & cause) > 0) {
+			mElevationCause ^= cause;
+		}
+
+		// In landscape mode, if no call in progress layout ("Tap to return call"), then don't show elevation
+		if (mElevationCause == ELEVATION_CALL_IN_PROGRESS && callInProgressLayout.getVisibility() != View.VISIBLE) return;
+
+		// If any Tablayout is visible, set the background of the toolbar to transparent (or its elevation
+		// overlay won't be correctly set via AppBarLayout) and then set the elevation of AppBarLayout,
+		// in this way, both Toolbar and TabLayout would have expected elevation overlay.
+		// If TabLayout is invisible, directly set toolbar's color for the elevation effect. Set AppBarLayout
+		// elevation in this case, a crack would appear between toolbar and ChatRecentFragment's Appbarlayout, for example.
+		float elevation = getResources().getDimension(R.dimen.toolbar_elevation);
+		int toolbarElevationColor = ColorUtils.getColorForElevation(this, elevation);
+		int transparentColor = ContextCompat.getColor(this, android.R.color.transparent);
+		boolean onlySetToolbar = Util.isDarkMode(this) && !mShowAnyTabLayout;
+		boolean enableCUVisible = cuLayout.getVisibility() == View.VISIBLE;
+
+		if (mElevationCause > 0) {
+			if (onlySetToolbar) {
+				toolbar.setBackgroundColor(toolbarElevationColor);
+				if (enableCUVisible) cuLayout.setBackgroundColor(toolbarElevationColor);
+			} else {
+				toolbar.setBackgroundColor(transparentColor);
+				if (enableCUVisible) cuLayout.setBackground(null);
+				abL.setElevation(elevation);
+			}
+		} else {
+			toolbar.setBackgroundColor(transparentColor);
+			if (enableCUVisible) cuLayout.setBackground(null);
+			abL.setElevation(0);
+		}
+
+		ColorUtils.changeStatusBarColorForElevation(this,
+				mElevationCause > 0 && !isInMainHomePage());
+	}
+
 	public long getParentHandleInbox() {
 		return parentHandleInbox;
 	}

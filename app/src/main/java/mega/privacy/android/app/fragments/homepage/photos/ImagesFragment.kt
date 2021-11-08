@@ -385,7 +385,7 @@ class ImagesFragment : BaseBindingFragmentKt<ImagesViewModel, FragmentImagesBind
         listView
     ) { v: View?, _, _, _, _ ->
         callManager {
-            it.changeAppBarElevation(v!!.canScrollVertically(-1))
+            it.changeAppBarElevation(v!!.canScrollVertically(-1),binding.layoutTitleBar.toolbar,binding.layoutTitleBar.layoutAppBar)
         }
     }
 

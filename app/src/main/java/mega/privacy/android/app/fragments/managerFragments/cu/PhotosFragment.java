@@ -450,7 +450,7 @@ public class PhotosFragment extends BaseZoomFragment implements CUGridViewAdapte
                 gridAdapter.setNodes(viewModel.getCUNodes());
                 binding.cuList.setOnTouchListener(scaleGestureHandler);
         }
-        handleZoomOptionsMenuUpdate(shouldShowFullInfoAndOptions());
+        handleOptionsMenuUpdate(shouldShowFullInfoAndOptions());
         updateViewSelected();
     }
 
