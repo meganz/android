@@ -363,7 +363,7 @@ public class PhotosFragment extends BaseZoomFragment implements CUGridViewAdapte
                             R.dimen.cu_fragment_selected_round_corner_radius));
             if (gridAdapter == null) {
                 gridAdapter = new CUGridViewAdapter(this, spanCount, itemSizeConfig);
-            }else{
+            } else {
                 gridAdapter.setSpanCount(spanCount);
                 gridAdapter.setCuItemSizeConfig(itemSizeConfig);
             }
@@ -756,11 +756,11 @@ public class PhotosFragment extends BaseZoomFragment implements CUGridViewAdapte
     }
 
     private void handleZoomAdapterLayoutChange(int zoom) {
-        viewModel.setZoom(zoom);
-        Parcelable state = layoutManager.onSaveInstanceState();
-        setGridView();
-        layoutManager.onRestoreInstanceState(state);
-
-
+        if (layoutManager != null) {
+            viewModel.setZoom(zoom);
+            Parcelable state = layoutManager.onSaveInstanceState();
+            setGridView();
+            layoutManager.onRestoreInstanceState(state);
+        }
     }
 }
