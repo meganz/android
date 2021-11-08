@@ -40,6 +40,7 @@ class SortOrderManagement @Inject constructor(
         orderCloud = ORDER_DEFAULT_ASC
         orderOthers = ORDER_DEFAULT_ASC
         orderCamera = ORDER_MODIFICATION_DESC
+        orderOffline = ORDER_DEFAULT_ASC
     }
 
     fun getOrderCloud(): Int = orderCloud
