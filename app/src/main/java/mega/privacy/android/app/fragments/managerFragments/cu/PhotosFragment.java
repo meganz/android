@@ -9,6 +9,8 @@ import android.os.Handler;
 import android.os.Parcelable;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
@@ -260,7 +262,6 @@ public class PhotosFragment extends BaseZoomFragment implements CUGridViewAdapte
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-
         if (viewModel.isEnableCUShown()) {
             mManagerActivity.updateCULayout(View.GONE);
             mManagerActivity.updateCUViewTypes(View.GONE);
@@ -276,6 +277,13 @@ public class PhotosFragment extends BaseZoomFragment implements CUGridViewAdapte
         observeLiveData();
         viewModel.getCards();
         viewModel.getCUNodes();
+//        updateEnableCUButtons(viewModel.isCUEnabled());
+    }
+
+    @Override
+    public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
+        super.onCreateOptionsMenu(menu, inflater);
+        handleOptionsMenuUpdate(viewModel.isCUEnabled());
     }
 
     public void setViewTypes(LinearLayout cuViewTypes, TextView cuYearsButton,
@@ -752,11 +760,10 @@ public class PhotosFragment extends BaseZoomFragment implements CUGridViewAdapte
         if (needReload) {
             reloadNodes();
         }
-
     }
 
     private void handleZoomAdapterLayoutChange(int zoom) {
-        if (layoutManager != null) {
+        if (!viewModel.isEnableCUShown()) {
             viewModel.setZoom(zoom);
             Parcelable state = layoutManager.onSaveInstanceState();
             setGridView();
