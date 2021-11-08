@@ -5,7 +5,10 @@ import mega.privacy.android.app.utils.Constants.*
 import mega.privacy.android.app.utils.Util.matchRegexs
 import org.junit.Test
 
-class ConstantsTest {
+/**
+ * Unit tests for Constants class.
+ */
+class ConstantsUnitTest {
 
     /**
      * test Regex of Constants.MEGA_REGEXS
@@ -23,6 +26,9 @@ class ConstantsTest {
         assertThat(matchRegexs("https://mega.nz", MEGA_REGEXS)).isFalse()
     }
 
+    /**
+     * test Regex of Constants.FILE_LINK_REGEXS
+     */
     @Test
     fun test_Constants_FILE_LINK_REGEXS() {
         assertThat(matchRegexs("https://mega.co.nz/abc#!def", FILE_LINK_REGEXS)).isTrue()
@@ -34,6 +40,9 @@ class ConstantsTest {
         assertThat(matchRegexs("https://mega.nz/file/abc#!def", FILE_LINK_REGEXS)).isTrue()
     }
 
+    /**
+     * test Regex of Constants.CONFIRMATION_LINK_REGEXS
+     */
     @Test
     fun test_Constants_CONFIRMATION_LINK_REGEXS() {
         // test "^https://mega\\.co\\.nz/.*#confirm.+$"
@@ -67,6 +76,9 @@ class ConstantsTest {
         assertThat(matchRegexs("", CONFIRMATION_LINK_REGEXS)).isFalse()
     }
 
+    /**
+     * test Regex of Constants.ACCOUNT_INVITATION_LINK_REGEXS
+     */
     @Test
     fun test_Constants_ACCOUNT_INVITATION_LINK_REGEXS() {
         // test "^https://mega\\.co\\.nz/.*#newsignup.+$"
@@ -100,6 +112,9 @@ class ConstantsTest {
         assertThat(matchRegexs("", ACCOUNT_INVITATION_LINK_REGEXS)).isFalse()
     }
 
+    /**
+     * test Regex of Constants.NEW_MESSAGE_CHAT_LINK_REGEXS
+     */
     @Test
     fun test_Constants_NEW_MESSAGE_CHAT_LINK_REGEXS() {
         // test "^https://mega\\.co\\.nz/.*#fm/chat"
@@ -131,6 +146,9 @@ class ConstantsTest {
         assertThat(matchRegexs("", NEW_MESSAGE_CHAT_LINK_REGEXS)).isFalse()
     }
 
+    /**
+     * test Regex of Constants.CANCEL_ACCOUNT_LINK_REGEXS
+     */
     @Test
     fun test_Constants_CANCEL_ACCOUNT_LINK_REGEXS() {
         // test "^https://mega\\.co\\.nz/.*#cancel.+$"
@@ -166,6 +184,9 @@ class ConstantsTest {
         assertThat(matchRegexs("", CANCEL_ACCOUNT_LINK_REGEXS)).isFalse()
     }
 
+    /**
+     * test Regex of Constants.VERIFY_CHANGE_MAIL_LINK_REGEXS
+     */
     @Test
     fun test_Constants_VERIFY_CHANGE_MAIL_LINK_REGEXS() {
         // test "^https://mega\\.co\\.nz/.*#verify.+$"
@@ -199,6 +220,9 @@ class ConstantsTest {
         assertThat(matchRegexs("", VERIFY_CHANGE_MAIL_LINK_REGEXS)).isFalse()
     }
 
+    /**
+     * test Regex of Constants.RESET_PASSWORD_LINK_REGEXS
+     */
     @Test
     fun test_Constants_RESET_PASSWORD_LINK_REGEXS() {
         // test "^https://mega\\.co\\.nz/.*#recover.+$"
@@ -232,6 +256,9 @@ class ConstantsTest {
         assertThat(matchRegexs("", RESET_PASSWORD_LINK_REGEXS)).isFalse()
     }
 
+    /**
+     * test Regex of Constants.PENDING_CONTACTS_LINK_REGEXS
+     */
     @Test
     fun test_Constants_PENDING_CONTACTS_LINK_REGEXS() {
         // test "^https://mega\\.co\\.nz/.*#fm/ipc"
@@ -265,6 +292,9 @@ class ConstantsTest {
         assertThat(matchRegexs("", PENDING_CONTACTS_LINK_REGEXS)).isFalse()
     }
 
+    /**
+     * test Regex of Constants.EMAIL_VERIFY_LINK_REGEXS
+     */
     @Test
     fun test_Constants_EMAIL_VERIFY_LINK_REGEXS() {
         // test "^https://mega\\.co\\.nz/#emailverify.+$"
@@ -298,6 +328,9 @@ class ConstantsTest {
         assertThat(matchRegexs("", EMAIL_VERIFY_LINK_REGEXS)).isFalse()
     }
 
+    /**
+     * test Regex of Constants.BUSINESS_INVITE_LINK_REGEXS
+     */
     @Test
     fun test_Constants_BUSINESS_INVITE_LINK_REGEXS() {
 
