@@ -105,9 +105,23 @@ public class MapHandlerImpl extends AbstractMapHandler implements OnMapReadyCall
         // Don't create MapView for HMS, use the existing HuaweiMap object to create snapshot.
         mMap.setOnMapLoadedCallback(() -> mMap.snapshot((snapshot) -> {
             if (snapshot == null) return;
-            // crop the snapshot.
-            snapshot = Bitmap.createBitmap(snapshot, (snapshot.getWidth() - mapWidth) / 2,
-                    (snapshot.getHeight() - mapWidth) / 2, mapWidth, mapWidth);
+
+            // Cut out the middile part of the original snapshot.
+            int x = 0, y = 0;
+            int w = snapshot.getWidth();
+            int h = snapshot.getHeight();
+
+            if(w > SNAPSHOT_SIZE) {
+                x = (w - SNAPSHOT_SIZE) / 2;
+                w = SNAPSHOT_SIZE;
+            }
+
+            if(h > SNAPSHOT_SIZE) {
+                y = (h - SNAPSHOT_SIZE) / 2;
+                h = SNAPSHOT_SIZE;
+            }
+
+            snapshot = Bitmap.createBitmap(snapshot, x, y, w, h);
 
             ByteArrayOutputStream stream = new ByteArrayOutputStream();
             int quality = 100;
