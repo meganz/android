@@ -4200,4 +4200,18 @@
     <string name="video_quality_info">You can save space by decreasing the video quality in Camera Uploads settings.</string>
     <!-- Label indicating video original quality -->
     <string name="original_quality">Original quality</string>
+    <!-- If users want to delete the root backup folder, all backups underneath it are disabled. Warning dialog will show to confirm -->
+    <string name="backup_move_root_folder">You are changing a default backup folder loacation. This may affect your ability to find your backup folder in the future. Please remember where it is located so that you can find it in the future.</string>
+    <!-- If users want to delete the root backup folder, all backups underneath it are disabled. Warning dialog will show to confirm -->
+    <string name="backup_remove_root_folder">You are deleting your backups folder. This will remove all the backups you have set. Are you sure you want to do this?</string>
+    <!-- The title of warning dialog for moving -->
+    <string name="backup_move_root_folder_title">Move \"%1s\"</string>
+    <!-- The title of warning dialog for deleting -->
+    <string name="backup_remove_root_folder_title">Move \"%1s\" to Rubbish Bin</string>
+    <!-- The confirm information of warning dialog for deleting -->
+    <string name="backup_remove_confirm">Please type \"Disable backup\" to confirm this action</string>
+    <!-- Confirm text for removing -->
+    <string name="backup_disable_confirm_text">Disable backup</string>
+    <!-- when checking the input -->
+    <string name="error_backup_confirm_dont_match">text entered does not match</string>
 </resources>

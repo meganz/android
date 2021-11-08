@@ -95,6 +95,8 @@ import android.widget.TextView;
 import android.widget.TextView.OnEditorActionListener;
 import android.widget.Toast;
 
+import com.google.android.material.textfield.TextInputEditText;
+import com.google.android.material.textfield.TextInputLayout;
 import com.ittianyu.bottomnavigationviewex.BottomNavigationViewEx;
 import com.jeremyliao.liveeventbus.LiveEventBus;
 
@@ -109,6 +111,7 @@ import java.util.Calendar;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Locale;
+import java.util.Objects;
 
 import javax.inject.Inject;
 
@@ -6658,6 +6661,167 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 			return;
 		}
 
+	}
+
+	public void askConfirmationMoveBackupToRubbish(final ArrayList<Long> handleList){
+		logDebug("askConfirmationMoveBackupToRubbish");
+		isClearRubbishBin=false;
+		backupMoveTips(handleList, true, true);
+	}
+
+	private String checkBackupNodeByHandle(ArrayList<Long> handleList) {
+		if(handleList!=null){
+			if (handleList.size() > 0) {
+				for(Long handle: handleList){
+					MegaNode p = megaApi.getNodeByHandle(handle);
+					if(p.getHandle() == myBackupHandle){
+						return p.getName();
+					}
+				}
+
+			}
+		}
+		return "";
+	}
+
+	private void backupMoveTips(final ArrayList<Long> handleList, boolean isBackup, boolean toRubbish) {
+
+		DialogInterface.OnClickListener dialogClickListener = (dialog, which) -> {
+			switch (which){
+				case DialogInterface.BUTTON_POSITIVE:
+					if(isBackup) {
+						ConfirmationMove(handleList, isBackup, toRubbish);
+					} else {
+						nC.moveToTrash(handleList, moveToRubbish);
+					}
+					break;
+
+				case DialogInterface.BUTTON_NEGATIVE:
+					//No button clicked
+					break;
+			}
+		};
+
+		if(handleList!=null){
+			String nodeName = checkBackupNodeByHandle(handleList);
+			String displayName = StringResourcesUtils.getString(R.string.backup_remove_root_folder_title, nodeName);
+			if (handleList.size() > 0){
+				Long handle = handleList.get(0);
+				MegaNode p = megaApi.getNodeByHandle(handle);
+				while (megaApi.getParentNode(p) != null){
+					p = megaApi.getParentNode(p);
+				}
+				if (p.getHandle() != megaApi.getRubbishNode().getHandle()){
+					setMoveToRubbish(true);
+
+					if(isBackup){
+						LayoutInflater layout = getLayoutInflater();
+						View view = layout.inflate(R.layout.dialog_backup_remove_tip, null);
+						TextView tvTitle = view.findViewById(R.id.title);
+						tvTitle.setText(displayName);
+						MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this)
+								.setView(view)
+								.setPositiveButton(StringResourcesUtils.getString(R.string.button_continue), dialogClickListener)
+								.setNegativeButton(StringResourcesUtils.getString(R.string.general_cancel),dialogClickListener);
+						AlertDialog dialog = builder.show();
+						dialog.setCancelable(false);
+						dialog.setCanceledOnTouchOutside(false);
+					}
+				}
+				else{
+					setMoveToRubbish(false);
+
+					MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this);
+					builder.setMessage(getResources().getString(R.string.confirmation_delete_from_mega));
+
+					builder.setPositiveButton(R.string.context_remove, dialogClickListener);
+					builder.setNegativeButton(R.string.general_cancel, dialogClickListener);
+					builder.show();
+				}
+			}
+		}
+		else{
+			logWarning("handleList NULL");
+		}
+	}
+
+	private void ConfirmationMove(final ArrayList<Long> handleList, boolean isBackup, boolean toRubbish) {
+
+		DialogInterface.OnClickListener dialogClickListener = (dialog, which) -> {
+			switch (which){
+				case DialogInterface.BUTTON_POSITIVE:
+					nC.moveToTrash(handleList, moveToRubbish);
+					break;
+
+				case DialogInterface.BUTTON_NEGATIVE:
+					break;
+			}
+		};
+
+		if(handleList!=null){
+			String nodeName = checkBackupNodeByHandle(handleList);
+			String displayName = StringResourcesUtils.getString(R.string.backup_remove_root_folder_title, nodeName);
+			if(isBackup){
+				LayoutInflater layout = getLayoutInflater();
+				View view = layout.inflate(R.layout.dialog_backup_remove_confirm, null);
+				TextView tvTitle = view.findViewById(R.id.title);
+				TextInputLayout editTextLayout = view.findViewById(R.id.confirm_text_layout);
+				TextInputEditText editText = view.findViewById(R.id.confirm_text);
+				editText.addTextChangedListener(new TextWatcher() {
+					@Override
+					public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+					}
+
+					@Override
+					public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+					}
+
+					@Override
+					public void afterTextChanged(Editable editable) {
+						editTextLayout.setError(null);
+						editTextLayout.setHintTextAppearance(R.style.TextAppearance_Design_Hint);
+					}
+				});
+
+				tvTitle.setText(displayName);
+				MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this)
+						.setView(view)
+						.setPositiveButton(StringResourcesUtils.getString(R.string.general_move), null)
+						.setNegativeButton(StringResourcesUtils.getString(R.string.general_cancel),dialogClickListener);
+				final AlertDialog dialog = builder.create();
+				dialog.setOnShowListener(new DialogInterface.OnShowListener() {
+					@Override
+					public void onShow(DialogInterface dialogInterface) {
+						Button button = ((AlertDialog) dialog).getButton(AlertDialog.BUTTON_POSITIVE);
+						button.setOnClickListener(new View.OnClickListener() {
+
+							@Override
+							public void onClick(View view) {
+								String strEditText = Objects.requireNonNull(editText.getText()).toString();
+								if(StringResourcesUtils.getString(R.string.backup_disable_confirm_text).equals(strEditText)){
+									nC.moveToTrash(handleList, moveToRubbish);
+									//Dismiss once everything is OK.
+									dialog.dismiss();
+								}
+								else {
+									editText.requestFocus();
+									editTextLayout.setError(StringResourcesUtils.getString(R.string.error_backup_confirm_dont_match));
+									editTextLayout.setHintTextAppearance(R.style.TextAppearance_InputHint_Error);
+								}
+							}
+						});
+					}
+				});
+				dialog.show();
+				dialog.setCancelable(false);
+				dialog.setCanceledOnTouchOutside(false);
+			}
+		}
+		else{
+			logWarning("handleList NULL");
+		}
 	}
 
 	public void askConfirmationDeleteAccount(){
