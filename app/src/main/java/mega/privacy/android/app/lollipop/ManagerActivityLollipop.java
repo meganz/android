@@ -5101,7 +5101,6 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 
 	@Override
     public boolean onCreateOptionsMenu(Menu menu) {
-		menu.clear();
 		logDebug("onCreateOptionsMenuLollipop");
 		// Force update the toolbar title to make the the tile length to be updated
 		setToolbarTitle();
