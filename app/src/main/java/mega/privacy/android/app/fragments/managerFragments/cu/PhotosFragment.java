@@ -277,13 +277,6 @@ public class PhotosFragment extends BaseZoomFragment implements CUGridViewAdapte
         observeLiveData();
         viewModel.getCards();
         viewModel.getCUNodes();
-//        updateEnableCUButtons(viewModel.isCUEnabled());
-    }
-
-    @Override
-    public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
-        super.onCreateOptionsMenu(menu, inflater);
-        handleOptionsMenuUpdate(viewModel.isCUEnabled());
     }
 
     public void setViewTypes(LinearLayout cuViewTypes, TextView cuYearsButton,
@@ -475,6 +468,7 @@ public class PhotosFragment extends BaseZoomFragment implements CUGridViewAdapte
             }
 
             updateEnableCUButtons(viewModel.isCUEnabled());
+            handleOptionsMenuUpdate(isShowMenu());
 
             binding.emptyHint.setVisibility(nodes.isEmpty() ? View.VISIBLE : View.GONE);
             binding.cuList.setVisibility(nodes.isEmpty() ? View.GONE : View.VISIBLE);
@@ -556,6 +550,15 @@ public class PhotosFragment extends BaseZoomFragment implements CUGridViewAdapte
         if (!cuEnabled) {
             hideCUProgress();
         }
+    }
+
+    private boolean isShowMenu() {
+        boolean cuEnabled = viewModel.isCUEnabled();
+        boolean emptyAdapter = gridAdapter == null || gridAdapter.getItemCount() <= 0;
+        if (emptyAdapter || mActionMode != null || selectedView != ALL_VIEW){
+            return false;
+        }
+        return true;
     }
 
     private void showDayCards(List<CUCard> dayCards) {
@@ -770,4 +773,5 @@ public class PhotosFragment extends BaseZoomFragment implements CUGridViewAdapte
             layoutManager.onRestoreInstanceState(state);
         }
     }
+
 }

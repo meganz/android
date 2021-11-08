@@ -96,9 +96,11 @@ abstract class BaseZoomFragment : BaseFragment(), GestureScaleCallback {
     }
 
     fun handleOptionsMenuUpdate(shouldShow:Boolean) {
-        this.menu.findItem(R.id.action_zoom_in).isVisible = shouldShow
-        this.menu.findItem(R.id.action_zoom_out).isVisible = shouldShow
-        this.menu.findItem(R.id.action_menu_sort_by).isVisible = shouldShow
+        if (this.menu!=null){
+            this.menu.findItem(R.id.action_zoom_in).isVisible = shouldShow
+            this.menu.findItem(R.id.action_zoom_out).isVisible = shouldShow
+            this.menu.findItem(R.id.action_menu_sort_by).isVisible = shouldShow
+        }
     }
 
     override fun zoomIn() {
@@ -115,4 +117,11 @@ abstract class BaseZoomFragment : BaseFragment(), GestureScaleCallback {
         return zoomViewModel.getCurrentZoom()
     }
 
+    override fun onStart() {
+        super.onStart()
+    }
+
+    override fun onStop() {
+        super.onStop()
+    }
 }
