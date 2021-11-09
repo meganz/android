@@ -89,7 +89,7 @@ class ImageBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
 
         val node = imageItem.nodeItem.node
         val nodeItem = imageItem.nodeItem
-        binding.imgThumbnail.setImageURI(imageItem.getLowestResolutionAvailableUri())
+        binding.imgThumbnail.setImageURI(imageItem.imageResult?.getLowestResolutionAvailableUri())
 
         binding.apply {
             txtName.text = node.name

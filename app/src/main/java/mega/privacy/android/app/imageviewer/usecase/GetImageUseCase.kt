@@ -8,9 +8,10 @@ import io.reactivex.rxjava3.core.Flowable
 import mega.privacy.android.app.MimeTypeList
 import mega.privacy.android.app.di.MegaApi
 import mega.privacy.android.app.errors.BusinessAccountOverdueMegaError
-import mega.privacy.android.app.imageviewer.data.ImageItem
+import mega.privacy.android.app.imageviewer.data.ImageResult
 import mega.privacy.android.app.listeners.OptionalMegaRequestListenerInterface
 import mega.privacy.android.app.listeners.OptionalMegaTransferListenerInterface
+import mega.privacy.android.app.usecase.GetNodeUseCase
 import mega.privacy.android.app.utils.CacheFolderManager.*
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.ErrorUtils.toThrowable
@@ -22,29 +23,26 @@ import javax.inject.Inject
 
 class GetImageUseCase @Inject constructor(
     @MegaApi private val megaApi: MegaApiAndroid,
-    @ApplicationContext private val context: Context
+    @ApplicationContext private val context: Context,
+    private val getNodeUseCase: GetNodeUseCase
 ) {
 
     fun get(
         nodeHandle: Long,
         fullSize: Boolean = false,
         highPriority: Boolean = false
-    ): Flowable<ImageItem> =
-        get(megaApi.getNodeByHandle(nodeHandle), fullSize, highPriority)
+    ): Flowable<ImageResult> =
+        getNodeUseCase.get(nodeHandle).flatMapPublisher { get(it, fullSize, highPriority) }
 
     fun get(
         node: MegaNode?,
         fullSize: Boolean = false,
         highPriority: Boolean = false
-    ): Flowable<ImageItem> =
+    ): Flowable<ImageResult> =
         Flowable.create({ emitter ->
             when {
-                node == null -> {
-                    emitter.onError(IllegalArgumentException("Node is null"))
-                }
-                !node.isFile -> {
-                    emitter.onError(IllegalArgumentException("Node is not a file"))
-                }
+                node == null -> emitter.onError(IllegalArgumentException("Node is null"))
+                !node.isFile -> emitter.onError(IllegalArgumentException("Node is not a file"))
                 else -> {
                     val fileExtension = ".${MimeTypeList.typeForName(node.name).extension}"
                     val thumbnailFile = if (node.hasThumbnail()) buildThumbnailFile(context, node.base64Handle + fileExtension) else null
@@ -52,22 +50,20 @@ class GetImageUseCase @Inject constructor(
                     val fullFile = buildTempFile(context, node.base64Handle + fileExtension)
                     val isFullSizeRequired = fullSize || node.isGif() || node.isVideo()
 
-                    val imageItem = ImageItem(
-                        node.handle,
-                        node.name,
-                        node.isVideo(),
+                    val image = ImageResult(
+                        isVideo = node.isVideo(),
                         thumbnailUri = if (thumbnailFile?.exists() == true) thumbnailFile.toUri() else null,
                         previewUri = if (previewFile?.exists() == true) previewFile.toUri() else null,
                         fullSizeUri = if (fullFile?.exists() == true) fullFile.toUri() else null
                     )
 
                     if (fullFile?.exists() == true || (!isFullSizeRequired && previewFile?.exists() == true)) {
-                        imageItem.isFullyLoaded = true
-                        emitter.onNext(imageItem)
+                        image.fullyLoaded = true
+                        emitter.onNext(image)
                         emitter.onComplete()
                         return@create
                     } else {
-                        emitter.onNext(imageItem)
+                        emitter.onNext(image)
                     }
 
                     if (thumbnailFile != null && !thumbnailFile.exists()) {
@@ -77,8 +73,8 @@ class GetImageUseCase @Inject constructor(
                             OptionalMegaRequestListenerInterface(
                                 onRequestFinish = { _: MegaRequest, error: MegaError ->
                                     if (error.errorCode == API_OK) {
-                                        imageItem.thumbnailUri = thumbnailFile.toUri()
-                                        emitter.onNext(imageItem)
+                                        image.thumbnailUri = thumbnailFile.toUri()
+                                        emitter.onNext(image)
                                     }
                                 }
                             ))
@@ -91,12 +87,12 @@ class GetImageUseCase @Inject constructor(
                             OptionalMegaRequestListenerInterface(
                                 onRequestFinish = { _: MegaRequest, error: MegaError ->
                                     if (error.errorCode == API_OK) {
-                                        imageItem.previewUri = previewFile.toUri()
+                                        image.previewUri = previewFile.toUri()
                                         if (isFullSizeRequired) {
-                                            emitter.onNext(imageItem)
+                                            emitter.onNext(image)
                                         } else {
-                                            imageItem.isFullyLoaded = true
-                                            emitter.onNext(imageItem)
+                                            image.fullyLoaded = true
+                                            emitter.onNext(image)
                                             emitter.onComplete()
                                         }
                                     } else if (!isFullSizeRequired) {
@@ -109,18 +105,18 @@ class GetImageUseCase @Inject constructor(
                     if (isFullSizeRequired && !fullFile.exists()) {
                         val listener = OptionalMegaTransferListenerInterface(
                             onTransferStart = { transfer ->
-                                imageItem.transferTag = transfer.tag
-                                emitter.onNext(imageItem)
+                                image.transferTag = transfer.tag
+                                emitter.onNext(image)
                             },
                             onTransferFinish = { _: MegaTransfer, error: MegaError ->
                                 if (emitter.isCancelled) return@OptionalMegaTransferListenerInterface
 
                                 when (error.errorCode) {
                                     API_OK -> {
-                                        imageItem.fullSizeUri = fullFile.toUri()
-                                        imageItem.transferTag = null
-                                        imageItem.isFullyLoaded = true
-                                        emitter.onNext(imageItem)
+                                        image.fullSizeUri = fullFile.toUri()
+                                        image.transferTag = null
+                                        image.fullyLoaded = true
+                                        emitter.onNext(image)
                                         emitter.onComplete()
                                     }
                                     API_EBUSINESSPASTDUE ->

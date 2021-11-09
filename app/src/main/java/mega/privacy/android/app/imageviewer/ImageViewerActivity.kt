@@ -270,17 +270,17 @@ class ImageViewerActivity : BaseActivity(), PermissionRequester, SnackbarShower 
 
             binding.txtTitle.text = item.node.name
             binding.toolbar.menu?.apply {
-                if (isOnline() && !item.isFromRubbishBin) {
-                    findItem(R.id.action_download)?.isVisible = true
-                    findItem(R.id.action_save_gallery)?.isVisible = true
-                    findItem(R.id.action_get_link)?.isVisible = item.hasFullAccess
-                    findItem(R.id.action_chat)?.isVisible = true
-                } else {
-                    findItem(R.id.action_download)?.isVisible = false
-                    findItem(R.id.action_save_gallery)?.isVisible = false
-                    findItem(R.id.action_get_link)?.isVisible = false
-                    findItem(R.id.action_chat)?.isVisible = false
-                }
+                findItem(R.id.action_download)?.isVisible =
+                    isOnline() && item.hasFullAccess && !item.isFromRubbishBin
+
+                findItem(R.id.action_save_gallery)?.isVisible =
+                    isOnline() && !item.isFromRubbishBin
+
+                findItem(R.id.action_get_link)?.isVisible =
+                    isOnline() && item.hasFullAccess && !item.isFromRubbishBin
+
+                findItem(R.id.action_chat)?.isVisible =
+                    isOnline() && item.hasFullAccess && !item.isFromRubbishBin
             }
         } else {
             logWarning("Null image item")

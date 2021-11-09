@@ -7,12 +7,14 @@ import io.reactivex.rxjava3.core.Completable
 import io.reactivex.rxjava3.core.Single
 import mega.privacy.android.app.DatabaseHandler
 import mega.privacy.android.app.di.MegaApi
+import mega.privacy.android.app.di.MegaApiFolder
 import mega.privacy.android.app.errors.BusinessAccountOverdueMegaError
 import mega.privacy.android.app.listeners.OptionalMegaRequestListenerInterface
 import mega.privacy.android.app.usecase.data.MegaNodeItem
 import mega.privacy.android.app.utils.*
 import mega.privacy.android.app.utils.ErrorUtils.toThrowable
 import mega.privacy.android.app.utils.MegaNodeUtil.getRootParentNode
+import mega.privacy.android.app.utils.RxUtil.blockingGetOrNull
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaNode
@@ -23,14 +25,15 @@ import javax.inject.Inject
 class GetNodeUseCase @Inject constructor(
     @ApplicationContext private val context: Context,
     @MegaApi private val megaApi: MegaApiAndroid,
+    @MegaApiFolder private val megaApiFolder: MegaApiAndroid,
     private val databaseHandler: DatabaseHandler
 ) {
 
     fun get(nodeHandle: Long): Single<MegaNode> =
-        Single.fromCallable { megaApi.getNodeByHandle(nodeHandle) }
+        Single.fromCallable { nodeHandle.getMegaNode() }
 
     fun getNodeItem(nodeHandle: Long): Single<MegaNodeItem> =
-        getNodeItem(megaApi.getNodeByHandle(nodeHandle))
+        get(nodeHandle).flatMap(::getNodeItem)
 
     fun getNodeItem(node: MegaNode?): Single<MegaNodeItem> =
         Single.fromCallable {
@@ -43,7 +46,7 @@ class GetNodeUseCase @Inject constructor(
             val nodeAccess = megaApi.getAccess(node)
             val hasFullAccess = nodeAccess == MegaShare.ACCESS_OWNER || nodeAccess == MegaShare.ACCESS_FULL
 
-            val isAvailableOffline = isNodeAvailableOffline(node.handle).blockingGet()
+            val isAvailableOffline = isNodeAvailableOffline(node.handle).blockingGetOrNull() ?: false
             val hasVersions = megaApi.hasVersions(node)
 
             var isFromRubbishBin = false
@@ -69,13 +72,18 @@ class GetNodeUseCase @Inject constructor(
 
     fun getPublicNode(nodeFileLink: String): Single<MegaNode> =
         Single.create { emitter ->
+            if (nodeFileLink.isBlank()) {
+                emitter.onError(IllegalArgumentException("Invalid megaFileLink"))
+                return@create
+            }
+
             megaApi.getPublicNode(nodeFileLink, OptionalMegaRequestListenerInterface(
                 onRequestFinish = { request, error ->
                     if (error.errorCode == MegaError.API_OK) {
                         if (!request.flag) {
                             emitter.onSuccess(request.publicNode)
                         } else {
-                            emitter.onError(IllegalStateException("Invalid key for public node"))
+                            emitter.onError(IllegalArgumentException("Invalid key for public node"))
                         }
                     } else {
                         emitter.onError(error.toThrowable())
@@ -86,19 +94,20 @@ class GetNodeUseCase @Inject constructor(
 
     fun markAsFavorite(nodeHandle: Long, isFavorite: Boolean): Completable =
         Completable.fromCallable {
-            val node = megaApi.getNodeByHandle(nodeHandle)
+            val node = nodeHandle.getMegaNode()
+            requireNotNull(node)
+
             megaApi.setNodeFavourite(node, isFavorite)
         }
 
     fun isNodeAvailableOffline(nodeHandle: Long): Single<Boolean> =
         Single.fromCallable {
-            val node = megaApi.getNodeByHandle(nodeHandle)
-
             if (databaseHandler.exists(nodeHandle)) {
                 databaseHandler.findByHandle(nodeHandle)?.let { offlineNode ->
                     val offlineFile = OfflineUtils.getOfflineFile(context, offlineNode)
                     val isFileAvailable = FileUtil.isFileAvailable(offlineFile)
-                    val isFileDownloadedLatest = FileUtil.isFileDownloadedLatest(offlineFile, node)
+                    val isFileDownloadedLatest = nodeHandle.getMegaNode()
+                        ?.let { FileUtil.isFileDownloadedLatest(offlineFile, it) } ?: false
                     return@fromCallable isFileAvailable && isFileDownloadedLatest
                 }
             }
@@ -116,7 +125,9 @@ class GetNodeUseCase @Inject constructor(
 
             if (setAvailableOffline) {
                 if (!isCurrentlyAvailable) {
-                    val node = megaApi.getNodeByHandle(nodeHandle)
+                    val node = nodeHandle.getMegaNode()
+                    requireNotNull(node)
+
                     val offlineParent = OfflineUtils.getOfflineParentFile(activity, Constants.FROM_OTHERS, node, megaApi)
                     if (FileUtil.isFileAvailable(offlineParent)) {
                         val parentName = OfflineUtils.getOfflineParentFileName(activity, node).absolutePath + File.separator
@@ -134,8 +145,14 @@ class GetNodeUseCase @Inject constructor(
 
     fun copyNode(nodeHandle: Long, newParentHandle: Long): Completable =
         Completable.create { emitter ->
-            val currentNode = megaApi.getNodeByHandle(nodeHandle)
-            val newParentNode = megaApi.getNodeByHandle(newParentHandle)
+            val currentNode = nodeHandle.getMegaNode()
+            val newParentNode = newParentHandle.getMegaNode()
+
+            if (currentNode == null || newParentNode == null) {
+                emitter.onError(IllegalArgumentException("Null nodes"))
+                return@create
+            }
+
             megaApi.copyNode(currentNode, newParentNode, OptionalMegaRequestListenerInterface(
                 onRequestFinish = { _, error ->
                     when (error.errorCode) {
@@ -152,8 +169,14 @@ class GetNodeUseCase @Inject constructor(
 
     fun moveNode(nodeHandle: Long, newParentHandle: Long): Completable =
         Completable.create { emitter ->
-            val currentNode = megaApi.getNodeByHandle(nodeHandle)
-            val newParentNode = megaApi.getNodeByHandle(newParentHandle)
+            val currentNode = nodeHandle.getMegaNode()
+            val newParentNode = newParentHandle.getMegaNode()
+
+            if (currentNode == null || newParentNode == null) {
+                emitter.onError(IllegalArgumentException("Null node"))
+                return@create
+            }
+
             megaApi.moveNode(currentNode, newParentNode, OptionalMegaRequestListenerInterface(
                 onRequestFinish = { _, error ->
                     when (error.errorCode) {
@@ -173,7 +196,12 @@ class GetNodeUseCase @Inject constructor(
 
     fun removeNode(nodeHandle: Long): Completable =
         Completable.create { emitter ->
-            val node = megaApi.getNodeByHandle(nodeHandle)
+            val node = nodeHandle.getMegaNode()
+            if (node == null) {
+                emitter.onError(IllegalArgumentException("Null node"))
+                return@create
+            }
+
             megaApi.remove(node, OptionalMegaRequestListenerInterface(
                 onRequestFinish = { _, error ->
                     when (error.errorCode) {
@@ -187,4 +215,8 @@ class GetNodeUseCase @Inject constructor(
                 }
             ))
         }
+
+    private fun Long.getMegaNode(): MegaNode? =
+        megaApi.getNodeByHandle(this)
+            ?: megaApiFolder.authorizeNode(megaApiFolder.getNodeByHandle(this))
 }

@@ -104,19 +104,21 @@ class ImageViewerViewModel @ViewModelInject constructor(
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeBy(
-                onNext = { imageItem ->
+                onNext = { imageResult ->
                     val currentImages = images.value?.toMutableList()
                     if (!currentImages.isNullOrEmpty()) {
                         val index = currentImages.indexOfFirst { it.handle == nodeHandle }
                         if (index != INVALID_POSITION) {
-                            currentImages[index] = imageItem
+                            currentImages[index] = currentImages[index].copy(
+                                imageResult = imageResult
+                            )
                             images.value = currentImages.toList()
 
                             if (index == currentPosition.value) {
                                 updateCurrentPosition(index, true)
                             }
                         } else {
-                            logWarning("Image ${imageItem.handle} was not found")
+                            logWarning("Image $nodeHandle was not found")
                         }
                     } else {
                         logWarning("Images are null")
@@ -200,8 +202,8 @@ class ImageViewerViewModel @ViewModelInject constructor(
     }
 
     fun stopImageLoading(nodeHandle: Long) {
-        images.value?.find { nodeHandle == it.handle }?.transferTag?.let { transferTag ->
-            cancelTransferUseCase.cancel(transferTag)
+        images.value?.find { nodeHandle == it.handle }?.imageResult?.transferTag?.let { tag ->
+            cancelTransferUseCase.cancel(tag)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeBy(
@@ -257,7 +259,11 @@ class ImageViewerViewModel @ViewModelInject constructor(
                                     currentItemPosition
                             }
 
-                            images.value = imageItems.toList()
+                            images.value = imageItems.map { item ->
+                                item.copy(
+                                    imageResult = images.value?.find { it.handle == item.handle }?.imageResult
+                                )
+                            }
                             updateCurrentPosition(newPosition, true)
                         }
                     }

@@ -8,21 +8,18 @@ import android.view.*
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
-import com.facebook.common.util.UriUtil
 import com.facebook.drawee.backends.pipeline.Fresco
 import com.facebook.drawee.controller.BaseControllerListener
 import com.facebook.imagepipeline.image.ImageInfo
 import com.facebook.imagepipeline.request.ImageRequest
 import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.MimeTypeList
-import mega.privacy.android.app.R
 import mega.privacy.android.app.constants.SettingsConstants
 import mega.privacy.android.app.databinding.PageImageViewerBinding
 import mega.privacy.android.app.imageviewer.data.ImageItem
 import mega.privacy.android.app.mediaplayer.VideoPlayerActivity
 import mega.privacy.android.app.utils.Constants.*
 import mega.privacy.android.app.utils.LogUtil.logError
-import mega.privacy.android.app.utils.LogUtil.logWarning
 import mega.privacy.android.app.utils.NetworkUtil.isMeteredConnection
 import mega.privacy.android.app.utils.view.MultiTapGestureListener
 import nz.mega.documentscanner.utils.IntentUtils.extraNotNull
@@ -107,20 +104,21 @@ class ImageViewerPageFragment : Fragment() {
     }
 
     private fun showItem(item: ImageItem?) {
-        if (item != null) {
+        if (item?.imageResult != null) {
+            val imageResult = item.imageResult
             when {
-                item.fullSizeUri != null && item.isVideo ->
-                    showImageUris(item.fullSizeUri!!, null)
-                item.fullSizeUri != null ->
-                    showImageUris(item.fullSizeUri!!, item.previewUri ?: item.thumbnailUri)
-                item.previewUri != null && !item.isVideo ->
-                    showImageUris(item.previewUri!!, item.thumbnailUri)
-                item.thumbnailUri != null && !item.isVideo ->
-                    showImageUris(item.thumbnailUri!!)
+                imageResult.fullSizeUri != null && imageResult.isVideo ->
+                    showImageUris(imageResult.fullSizeUri!!, null)
+                imageResult.fullSizeUri != null ->
+                    showImageUris(imageResult.fullSizeUri!!, imageResult.previewUri ?: imageResult.thumbnailUri)
+                imageResult.previewUri != null && !imageResult.isVideo ->
+                    showImageUris(imageResult.previewUri!!, imageResult.thumbnailUri)
+                imageResult.thumbnailUri != null && !imageResult.isVideo ->
+                    showImageUris(imageResult.thumbnailUri!!)
             }
 
-            if (item.isFullyLoaded) {
-                if (item.isVideo) {
+            if (imageResult.fullyLoaded) {
+                if (imageResult.isVideo) {
                     binding.btnVideo.setOnClickListener { launchVideoScreen(item) }
                     binding.image.apply {
                         setZoomingEnabled(false)
@@ -133,15 +131,10 @@ class ImageViewerPageFragment : Fragment() {
                         })
                     }
                 }
-                binding.btnVideo.isVisible = item.isVideo
+                binding.btnVideo.isVisible = imageResult.isVideo
             }
-        } else {
-            logWarning("Null image item")
-            binding.image.controller = Fresco.newDraweeControllerBuilder()
-                .setUri(UriUtil.getUriForResourceId(R.drawable.ic_error))
-                .build()
+            binding.progress.hide()
         }
-        binding.progress.hide()
     }
 
     private fun showImageUris(mainImageUri: Uri, lowResImageUri: Uri? = null) {
@@ -169,7 +162,7 @@ class ImageViewerPageFragment : Fragment() {
     }
 
     private fun launchVideoScreen(item: ImageItem) {
-        val fileUri = item.getHighestResolutionAvailableUri()
+        val fileUri = item.imageResult?.getHighestResolutionAvailableUri()
         val intent = Intent(context, VideoPlayerActivity::class.java).apply {
             setDataAndType(fileUri, MimeTypeList.typeForName(item.name).type)
             putExtra(INTENT_EXTRA_KEY_HANDLE, item.handle)
