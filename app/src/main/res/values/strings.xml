@@ -4182,4 +4182,14 @@
     <string name="video_quality_info">You can save space by decreasing the video quality in Camera Uploads settings.</string>
     <!-- Label indicating video original quality -->
     <string name="original_quality">Original quality</string>
+    <!-- Settings label which allows to enable or disable fingerprint unlock. -->
+    <string name="setting_fingerprint">Fingerprint ID</string>
+    <!-- Title of the dialog which allows to enable the fingerprint unlock. -->
+    <string name="title_enable_fingerprint">Confirm your fingerprint to unlock</string>
+    <!-- Title of the dialog which allows to unlock the app with the fingerprint. -->
+    <string name="title_unlock_fingerprint">Unlock using your fingerprint</string>
+    <!-- Button of the dialog which allows to unlock the app with the fingerprint. Gives the option to unlock with the passcode instead -->
+    <string name="action_use_passcode">Use passcode</string>
+    <!-- Message informing the fingerprint was enabled successfully -->
+    <string name="confirmation_fingerprint_enabled">Your fingerprint is confirmed</string>
 </resources>

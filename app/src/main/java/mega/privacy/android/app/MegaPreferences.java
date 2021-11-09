@@ -42,7 +42,6 @@ public class MegaPreferences{
 	private String removeGPS;
 	String chargingOnSize = "";
 	String shouldClearCameraSyncRecords;
-
 	String isAutoPlayEnabled = "";
 	private String showInviteBanner = "";
 	String sdCardUri = "";
@@ -50,8 +49,8 @@ public class MegaPreferences{
 	private String askForSetDownloadLocation;
 	private String mediaSDCardUri;
 	private String isMediaOnSDCard;
-
 	private String passcodeLockRequireTime;
+	private String fingerprintLock;
 
 	public final static int ONLY_PHOTOS = 1001;
 	public final static int ONLY_VIDEOS = 1002;
@@ -75,7 +74,8 @@ public class MegaPreferences{
 					String secVideoSyncTimeStamp, String isAutoPlayEnabled, String removeGPS,
 					String showInviteBanner, String preferredSortCameraUpload, String sdCardUri,
 					String askForDisplayOver, String askForSetDownloadLocation,
-					String mediaSDCardUri, String isMediaOnSDCard, String passcodeLockRequireTime) {
+					String mediaSDCardUri, String isMediaOnSDCard, String passcodeLockRequireTime,
+					String fingerprintLock) {
 		this.firstTime = firstTime;
 		this.camSyncWifi = camSyncWifi;
 		this.camSyncEnabled = camSyncEnabled;
@@ -122,6 +122,7 @@ public class MegaPreferences{
 		this.mediaSDCardUri = mediaSDCardUri;
 		this.isMediaOnSDCard = isMediaOnSDCard;
 		this.passcodeLockRequireTime = passcodeLockRequireTime;
+		this.fingerprintLock = fingerprintLock;
 	}
 
 	public String getFirstTime (){
@@ -497,6 +498,10 @@ public class MegaPreferences{
 
 	public void setPasscodeLockRequireTime(String passcodeLockRequireTime) {
 		this.passcodeLockRequireTime = passcodeLockRequireTime;
+	}
+
+	public String getFingerprintLock() {
+		return fingerprintLock;
 	}
 
     @Override
