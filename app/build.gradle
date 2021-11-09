@@ -51,6 +51,8 @@ android {
         resValue ("string", "app_version", "\"${versionName}\"")
         resValue ("string", "sdk_version", "\"${getSdkGitHash()}\"")
         resValue ("string", "karere_version", "\"${getKarereGitHash()}\"")
+
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
 
     sourceSets.main {
@@ -238,6 +240,11 @@ dependencies {
     // Play Core
     implementation("com.google.android.play:core:1.10.0")
     implementation("com.google.android.play:core-ktx:1.8.1")
+
+    // Testing dependencies
+    testImplementation "junit:junit:$junitVersion"
+    testImplementation "com.google.truth:truth:$truthVersion"
+    androidTestImplementation "androidx.test.ext:junit:$androidxTestExtVersion"
 }
 
 def taskRequests = gradle.getStartParameter().getTaskRequests().toString()
