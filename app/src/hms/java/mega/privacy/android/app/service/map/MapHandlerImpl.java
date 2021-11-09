@@ -106,7 +106,7 @@ public class MapHandlerImpl extends AbstractMapHandler implements OnMapReadyCall
         mMap.setOnMapLoadedCallback(() -> mMap.snapshot((snapshot) -> {
             if (snapshot == null) return;
 
-            // Cut out the middile part of the original snapshot.
+            // Cut out the middle part of the original snapshot.
             int x = 0, y = 0;
             int w = snapshot.getWidth();
             int h = snapshot.getHeight();
@@ -188,7 +188,9 @@ public class MapHandlerImpl extends AbstractMapHandler implements OnMapReadyCall
     @Override
     public void removeMarker() {
         try {
-            fullScreenMarker.remove();
+            if (fullScreenMarker != null) {
+                fullScreenMarker.remove();
+            }
         } catch (Exception e) {
             logError(e.getMessage(), e);
             e.printStackTrace();
