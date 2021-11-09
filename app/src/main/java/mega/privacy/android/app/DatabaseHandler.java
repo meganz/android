@@ -384,9 +384,60 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 				+ KEY_ASK_SET_DOWNLOAD_LOCATION + " BOOLEAN,"																	//43
 				+ KEY_URI_MEDIA_EXTERNAL_SD_CARD + " TEXT,"																		//44
 				+ KEY_MEDIA_FOLDER_EXTERNAL_SD_CARD + " BOOLEAN," 																//45
-				+ KEY_PASSCODE_LOCK_REQUIRE_TIME + " TEXT DEFAULT '" + encrypt("" + (REQUIRE_PASSCODE_INVALID)) + "')";	//46
+				+ KEY_PASSCODE_LOCK_REQUIRE_TIME + " TEXT DEFAULT '" + encrypt("" + (REQUIRE_PASSCODE_INVALID)) + "')";	        //46
 
         db.execSQL(CREATE_PREFERENCES_TABLE);
+        // Insert a row with default values into the table once the it is created, otherwise, "getPreference" may return null.
+        // If default value is needed, set here and make sure the order is correct.
+        // eg: VIDEO_QUALITY_ORIGINAL column in the table is 32, but in MegaPreference object, it's 31.
+        setPreferences(db, new MegaPreferences(
+                null, // 1
+                null, // 2
+                null, // 3
+                null, // 4
+                null, // 5
+                null, // 6
+                null, // 7
+                null, // 8
+                null, // 9
+                null, // 10
+                null, // 11
+                null, // 12
+                null, // 13
+                null, // 14
+                null, // 15
+                null, // 16
+                null, // 17
+                null, // 18
+                null, // 19
+                null, // 20
+                null, // 21
+                null, // 22
+                null, // 23
+                null, // 24
+                null, // 25
+                null, // 26
+                null, // 27
+                null, // 28
+                null, // 29
+                null, // 30
+                String.valueOf(VIDEO_QUALITY_ORIGINAL), // 31
+                null, // 32
+                null, // 33
+                null, // 34
+                null, // 35
+                null, // 36
+                null, // 37
+                null, // 38
+                null, // 39
+                null, // 40
+                null, // 41
+                null, // 42
+                null, // 43
+                null, // 44
+                null, // 45
+                String.valueOf(REQUIRE_PASSCODE_INVALID)  // 46
+        ));
 
 		String CREATE_ATTRIBUTES_TABLE = "CREATE TABLE IF NOT EXISTS " + TABLE_ATTRIBUTES + "("
 				+ KEY_ID + " INTEGER PRIMARY KEY, "                                                                                         //0
