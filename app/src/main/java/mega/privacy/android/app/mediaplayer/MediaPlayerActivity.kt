@@ -69,6 +69,7 @@ import mega.privacy.android.app.utils.RunOnUIThreadUtils.post
 import mega.privacy.android.app.utils.RunOnUIThreadUtils.runDelay
 import nz.mega.sdk.*
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
+import java.util.*
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -310,6 +311,7 @@ abstract class MediaPlayerActivity : PasscodeActivity(), SnackbarShower, Activit
                 }
                 R.id.track_info -> {
                     actionBar.title = StringResourcesUtils.getString(R.string.audio_track_info)
+                        .toUpperCase(Locale.getDefault())
 
                     if (args != null) {
                         viewingTrackInfo = TrackInfoFragmentArgs.fromBundle(args)
