@@ -3,6 +3,7 @@ package mega.privacy.android.app.lollipop.managerSections;
 import android.app.Activity;
 import android.app.ActivityManager;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.net.Uri;
@@ -65,6 +66,7 @@ import mega.privacy.android.app.components.NewGridRecyclerView;
 import mega.privacy.android.app.components.SimpleDividerItemDecoration;
 import mega.privacy.android.app.components.scrollBar.FastScroller;
 import mega.privacy.android.app.globalmanagement.SortOrderManagement;
+import mega.privacy.android.app.interfaces.ActionBackupNodeCallback;
 import mega.privacy.android.app.lollipop.FullScreenImageViewerLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.PdfViewerActivityLollipop;
@@ -86,11 +88,17 @@ import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.FileUtil.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.MegaApiUtils.*;
+import static mega.privacy.android.app.utils.MegaNodeDialogUtil.showConfirmDialogWithBackup;
+import static mega.privacy.android.app.utils.MegaNodeDialogUtil.showTipDialogWithBackup;
 import static mega.privacy.android.app.utils.MegaNodeUtil.allHaveOwnerAccess;
+import static mega.privacy.android.app.utils.MegaNodeUtil.checkBackupNodeByHandle;
+import static mega.privacy.android.app.utils.MegaNodeUtil.checkSubBackupNodeByHandle;
 import static mega.privacy.android.app.utils.MegaNodeUtil.manageTextFileIntent;
 import static mega.privacy.android.app.utils.MegaNodeUtil.manageURLNode;
 import static mega.privacy.android.app.utils.TimeUtils.*;
 import static mega.privacy.android.app.utils.Util.*;
+
+import org.jetbrains.annotations.NotNull;
 
 @AndroidEntryPoint
 public class FileBrowserFragmentLollipop extends RotatableFragment{
@@ -189,14 +197,24 @@ public class FileBrowserFragmentLollipop extends RotatableFragment{
 				}
 				case R.id.cab_menu_move:{
 					ArrayList<Long> handleList = new ArrayList<Long>();
-					for (int i=0;i<documents.size();i++){
+					for (int i = 0; i < documents.size(); i++) {
 						handleList.add(documents.get(i).getHandle());
 					}
-
-					NodeController nC = new NodeController(context);
-					nC.chooseLocationToMoveNodes(handleList);
-					clearSelections();
-					hideMultipleSelect();
+					MegaNode pNode = checkBackupNodeByHandle(megaApi, handleList);
+					boolean isSubBackup = checkSubBackupNodeByHandle(megaApi, handleList);
+					// Show the warning dialog if the list including Backup node
+					if(pNode != null){
+						showWarningOfMove(handleList, pNode, true, false);
+					} else if(isSubBackup){
+						Long handle = handleList.get(0);
+						MegaNode p = megaApi.getNodeByHandle(handle);
+						showWarningOfMove(handleList, p, false, false);
+					} else {
+						NodeController nC = new NodeController(context);
+						nC.chooseLocationToMoveNodes(handleList);
+						clearSelections();
+						hideMultipleSelect();
+					}
 					break;
 				}
 				case R.id.cab_menu_share_folder:{
@@ -1275,5 +1293,83 @@ public class FileBrowserFragmentLollipop extends RotatableFragment{
 	private void hideTransferOverQuotaBanner() {
 		MegaApplication.getTransfersManagement().setTransferOverQuotaBannerShown(false);
 		setTransferOverQuotaBannerVisibility();
+	}
+
+	/**
+	 * Show the warning dialog for moving or deleting "My backup" folder or sub folders
+	 *
+	 * @param handleList handleList handles list of the nodes that selected
+	 * @param pNodeBackup the node of "My backup"
+	 * @param isRootBackup true - "My backup" folder / false - sub folders or files
+	 * @param toRubbish true - delete / false - move
+	 */
+	private void showWarningOfMove(final ArrayList<Long> handleList, MegaNode pNodeBackup, boolean isRootBackup, boolean toRubbish) {
+		showTipDialogWithBackup(mActivity, new ActionBackupNodeCallback() {
+
+					@Override
+					public void actionCancel(@Nullable DialogInterface dialog) {
+						clearSelections();
+						hideMultipleSelect();
+					}
+
+					@Override
+					public void actionExecute(@NotNull ArrayList<Long> handleList, @NotNull MegaNode pNodeBackup, boolean isRootBackup, boolean toRubbish) {
+
+					}
+
+					@Override
+					public void actionConfirmed(@NonNull ArrayList<Long> handleList, @NonNull MegaNode pNodeBackup, boolean isRootBackup, boolean toRubbish) {
+						confirmationMove(handleList, pNodeBackup, isRootBackup, toRubbish);
+					}
+				},
+				handleList,
+				pNodeBackup,
+				isRootBackup,
+				toRubbish
+		);
+	}
+
+	/**
+	 * Show the confirm dialog for moving or deleting "My backup" folder or sub folders
+	 *
+	 * @param handleList handleList handles list of the nodes that selected
+	 * @param pNodeBackup the node of "My backup"
+	 * @param isRootBackup true - "My backup" folder / false - sub folders or files
+	 * @param toRubbish true - delete / false - move
+	 */
+	private void confirmationMove(final ArrayList<Long> handleList, MegaNode pNodeBackup, boolean isRootBackup, boolean toRubbish) {
+		if (handleList != null && pNodeBackup != null) {
+			showConfirmDialogWithBackup(this.mActivity, new ActionBackupNodeCallback() {
+						@Override
+						public void actionCancel(@Nullable DialogInterface dialog) {
+							clearSelections();
+							hideMultipleSelect();
+						}
+
+						@Override
+						public void actionExecute(@NotNull ArrayList<Long> handleList, @NotNull MegaNode pNodeBackup, boolean isRootBackup, boolean toRubbish) {
+							if (toRubbish) {
+								return;
+							} else {
+								NodeController nC = new NodeController(context);
+								nC.chooseLocationToMoveNodes(handleList);
+								clearSelections();
+								hideMultipleSelect();
+							}
+						}
+
+						@Override
+						public void actionConfirmed(@NonNull ArrayList<Long> handleList, @NonNull MegaNode pNodeBackup, boolean isRootBackup, boolean toRubbish) {
+
+						}
+					},
+					handleList,
+					pNodeBackup,
+					isRootBackup,
+					toRubbish
+			);
+		} else {
+			logWarning("handleList NULL");
+		}
 	}
 }

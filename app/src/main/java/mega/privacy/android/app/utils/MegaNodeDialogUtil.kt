@@ -3,9 +3,14 @@ package mega.privacy.android.app.utils
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Context
+import android.content.DialogInterface
+import android.content.DialogInterface.BUTTON_NEGATIVE
 import android.content.DialogInterface.BUTTON_POSITIVE
 import android.content.Intent
 import android.os.Bundle
+import android.text.Editable
+import android.text.TextWatcher
+import android.view.LayoutInflater
 import android.view.View.GONE
 import android.view.View.VISIBLE
 import android.view.inputmethod.EditorInfo
@@ -14,10 +19,13 @@ import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
 import androidx.core.widget.doAfterTextChanged
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.google.android.material.textfield.TextInputEditText
+import com.google.android.material.textfield.TextInputLayout
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.MimeTypeList
 import mega.privacy.android.app.R
 import mega.privacy.android.app.components.twemoji.EmojiEditText
+import mega.privacy.android.app.interfaces.ActionBackupNodeCallback
 import mega.privacy.android.app.interfaces.ActionNodeCallback
 import mega.privacy.android.app.interfaces.SnackbarShower
 import mega.privacy.android.app.interfaces.showSnackbar
@@ -613,7 +621,10 @@ object MegaNodeDialogUtil {
             MaterialAlertDialogBuilder(activity, R.style.ThemeOverlay_Mega_MaterialAlertDialog)
                 .setMessage(getString(R.string.confirmation_move_to_rubbish))
                 .setPositiveButton(getString(R.string.general_move)) { _, _ ->
-                    val progress = MegaProgressDialogUtil.createProgressDialog(activity,getString(R.string.context_move_to_trash))
+                    val progress = MegaProgressDialogUtil.createProgressDialog(
+                        activity,
+                        getString(R.string.context_move_to_trash)
+                    )
 
                     megaApi.moveNode(
                         node, rubbishNode,
@@ -622,7 +633,9 @@ object MegaNodeDialogUtil {
 
                             when {
                                 success -> activity.finish()
-                                isForeignOverQuota -> showForeignStorageOverQuotaWarningDialog(activity)
+                                isForeignOverQuota -> showForeignStorageOverQuotaWarningDialog(
+                                    activity
+                                )
                                 else -> snackbarShower.showSnackbar(getString(R.string.context_no_moved))
                             }
                         })
@@ -635,7 +648,10 @@ object MegaNodeDialogUtil {
             MaterialAlertDialogBuilder(activity, R.style.ThemeOverlay_Mega_MaterialAlertDialog)
                 .setMessage(getString(R.string.confirmation_delete_from_mega))
                 .setPositiveButton(getString(R.string.general_remove)) { _, _ ->
-                    val progress = MegaProgressDialogUtil.createProgressDialog(activity, getString(R.string.context_delete_from_mega))
+                    val progress = MegaProgressDialogUtil.createProgressDialog(
+                        activity,
+                        getString(R.string.context_delete_from_mega)
+                    )
 
                     megaApi.remove(node, RemoveListener {
                         progress.dismiss()
@@ -685,5 +701,185 @@ object MegaNodeDialogUtil {
         }
 
         return existingNode != null
+    }
+
+    /**
+     * Show the warning dialog when moving or deleting folders with "My backup" folder
+     *
+     * @param activity Android activity
+     * @param actionBackupNodeCallback Callback to finish the node action if needed, null otherwise.
+     * @param handleList handleList handles list of the nodes that selected
+     * @param pNodeBackup the node of "My backup"
+     * @param isRootBackup true - "My backup" folder / false - sub folders or files
+     * @param toRubbish true - delete / false - move
+     */
+    @JvmStatic
+    fun showTipDialogWithBackup(
+        activity: Activity,
+        actionBackupNodeCallback: ActionBackupNodeCallback,
+        handleList: ArrayList<Long>,
+        pNodeBackup: MegaNode,
+        isRootBackup: Boolean,
+        toRubbish: Boolean
+    ) {
+        val dialogClickListener =
+            DialogInterface.OnClickListener { dialog: DialogInterface?, which: Int ->
+                when (which) {
+                    BUTTON_POSITIVE -> {
+                        actionBackupNodeCallback.actionConfirmed(
+                            handleList,
+                            pNodeBackup,
+                            isRootBackup,
+                            toRubbish
+                        )
+                    }
+                    BUTTON_NEGATIVE -> {
+                        actionBackupNodeCallback.actionCancel(dialog)
+                    }
+                }
+            }
+        val layout: LayoutInflater = activity.layoutInflater
+        val view = layout.inflate(R.layout.dialog_backup_operate_tip, null)
+        val tvTitle = view.findViewById<TextView>(R.id.title)
+        val tvContent = view.findViewById<TextView>(R.id.backup_tip_content)
+        val nodeName = pNodeBackup.name
+        if (isRootBackup) {
+            // Root folder of backup
+            if (toRubbish) {
+                // Move to rubbish bin
+                val displayName = getString(R.string.backup_remove_folder_title, nodeName)
+                tvTitle.text = displayName
+                tvContent.setText(R.string.backup_remove_root_folder)
+            } else {
+                // Move
+                val displayName = getString(R.string.backup_move_folder_title, nodeName)
+                tvTitle.text = displayName
+                tvContent.setText(R.string.backup_move_root_folder)
+            }
+        } else {
+            // Sub folder of backup
+            if (toRubbish) {
+                // Move to rubbish bin
+                tvTitle.text  = if(handleList.size == 1) {
+                    getString(R.string.backup_remove_folder_title, nodeName)
+                } else {
+                    getString(R.string.backup_remove_multiple_folder_title)
+                }
+                tvContent.setText(R.string.backup_remove_sub_folder)
+            } else {
+                // Move
+                tvTitle.text  = if(handleList.size == 1) {
+                    getString(R.string.backup_move_folder_title, nodeName)
+                } else {
+                    getString(R.string.backup_move_multiple_folder_title)
+                }
+                tvContent.setText(R.string.backup_move_sub_folder)
+            }
+        }
+        val builder = MaterialAlertDialogBuilder(activity)
+            .setView(view)
+            .setPositiveButton(getString(R.string.button_continue), dialogClickListener)
+            .setNegativeButton(getString(R.string.general_cancel), dialogClickListener)
+        val dialog = builder.show()
+        dialog.setCancelable(false)
+        dialog.setCanceledOnTouchOutside(false)
+    }
+
+    /**
+     * Show the confirm dialog when moving or deleting folders with "My backup" folder
+     * @param handleList handleList handles list of the nodes that selected
+     * @param pNodeBackup the node of "My backup"
+     * @param isRootBackup true - "My backup" folder / false - sub folders or files
+     * @param toRubbish true - delete / false - move
+     */
+    @JvmStatic
+    fun showConfirmDialogWithBackup(activity: Activity,
+                         actionBackupNodeCallback: ActionBackupNodeCallback,
+                         handleList: ArrayList<Long>,
+                         pNodeBackup: MegaNode,
+                         isRootBackup: Boolean,
+                         toRubbish: Boolean)
+    {
+        val layout: LayoutInflater = activity.layoutInflater
+        val view = layout.inflate(R.layout.dialog_backup_remove_confirm, null)
+        val tvTitle = view.findViewById<TextView>(R.id.title)
+        val editTextLayout: TextInputLayout = view.findViewById(R.id.confirm_text_layout)
+        val editText: TextInputEditText = view.findViewById(R.id.confirm_text)
+        editText.addTextChangedListener(object : TextWatcher {
+            override fun beforeTextChanged(charSequence: CharSequence, i: Int, i1: Int, i2: Int) {}
+            override fun onTextChanged(charSequence: CharSequence, i: Int, i1: Int, i2: Int) {}
+            override fun afterTextChanged(editable: Editable) {
+                editTextLayout.error = null
+                editTextLayout.setHintTextAppearance(R.style.TextAppearance_Design_Hint)
+            }
+        })
+
+        val nodeName = pNodeBackup.name
+        if (isRootBackup) {
+            // Root folder of backup
+            if (toRubbish) {
+                // Move to rubbish bin
+                tvTitle.text = getString(R.string.backup_remove_folder_title, nodeName)
+            } else {
+                // Move
+                tvTitle.text = getString(R.string.backup_move_folder_title, nodeName)
+            }
+        } else {
+            // Sub folder of backup
+            if (toRubbish) {
+                // Move to rubbish bin
+                tvTitle.text  = if(handleList.size == 1) {
+                    getString(R.string.backup_remove_folder_title, nodeName)
+                } else {
+                    getString(R.string.backup_remove_multiple_folder_title)
+                }
+            } else {
+                // Move
+                tvTitle.text  = if(handleList.size == 1) {
+                    getString(R.string.backup_move_folder_title, nodeName)
+                } else {
+                    getString(R.string.backup_move_multiple_folder_title)
+                }
+            }
+        }
+
+        val builder = MaterialAlertDialogBuilder(activity)
+            .setView(view)
+            .setPositiveButton(getString(R.string.general_move), null)
+            .setNegativeButton(getString(R.string.general_cancel), null)
+        val dialog = builder.create()
+        dialog.setOnShowListener {
+            val button =
+                dialog.getButton(BUTTON_POSITIVE)
+            button.setOnClickListener {
+                val strEditText =
+                    Objects.requireNonNull(editText.text)
+                        .toString()
+                if (getString(R.string.backup_disable_confirm_text) == strEditText) {
+                    actionBackupNodeCallback.actionExecute(handleList,
+                        pNodeBackup,
+                        isRootBackup,
+                        toRubbish)
+                    //Dismiss once everything is OK.
+                    dialog.dismiss()
+                } else {
+                    editText.requestFocus()
+                    editTextLayout.error =
+                        getString(R.string.error_backup_confirm_dont_match)
+                    editTextLayout.setHintTextAppearance(R.style.TextAppearance_InputHint_Error)
+                }
+            }
+
+            val buttonCancel =
+                dialog.getButton(BUTTON_NEGATIVE)
+            buttonCancel.setOnClickListener {
+                actionBackupNodeCallback.actionCancel(dialog)
+                dialog.dismiss()
+            }
+            
+        }
+        dialog.show()
+        dialog.setCancelable(false)
+        dialog.setCanceledOnTouchOutside(false)
     }
 }

@@ -4202,12 +4202,20 @@
     <string name="original_quality">Original quality</string>
     <!-- If users want to delete the root backup folder, all backups underneath it are disabled. Warning dialog will show to confirm -->
     <string name="backup_move_root_folder">You are changing a default backup folder loacation. This may affect your ability to find your backup folder in the future. Please remember where it is located so that you can find it in the future.</string>
+    <!-- If users want to delete the sub backup folder, all backups underneath it are disabled. Warning dialog will show to confirm -->
+    <string name="backup_move_sub_folder">Moving this folder changes the backup destination. The backup will be turned off for safety. Is this what you want to do? Backups can be re-enable with the MEGA Desktop App.</string>
     <!-- If users want to delete the root backup folder, all backups underneath it are disabled. Warning dialog will show to confirm -->
     <string name="backup_remove_root_folder">You are deleting your backups folder. This will remove all the backups you have set. Are you sure you want to do this?</string>
-    <!-- The title of warning dialog for moving -->
-    <string name="backup_move_root_folder_title">Move \"%1s\"</string>
-    <!-- The title of warning dialog for deleting -->
-    <string name="backup_remove_root_folder_title">Move \"%1s\" to Rubbish Bin</string>
+    <!-- If users want to delete the sub backup folder, all backups underneath it are disabled. Warning dialog will show to confirm -->
+    <string name="backup_remove_sub_folder">Are you sure you want to delete your backup folder and disable backup you set?</string>
+    <!-- The title of warning dialog for single folder moving -->
+    <string name="backup_move_folder_title">Move \"%1s\"</string>
+    <!-- The title of warning dialog for single folder deleting -->
+    <string name="backup_remove_folder_title">Move \"%1s\" to Rubbish Bin</string>
+    <!-- The title of warning dialog for multi-folder moving -->
+    <string name="backup_move_multiple_folder_title">Move backup folders</string>
+    <!-- The title of warning dialog for single folder deleting -->
+    <string name="backup_remove_multiple_folder_title">Move backup folders to Rubbish Bin</string>
     <!-- The confirm information of warning dialog for deleting -->
     <string name="backup_remove_confirm">Please type \"Disable backup\" to confirm this action</string>
     <!-- Confirm text for removing -->

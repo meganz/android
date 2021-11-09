@@ -324,8 +324,13 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
                     optionGallery.setVisibility(View.GONE);
                 }
 
+                // Check if sub folder of "My Backup"
+                ArrayList<Long> handleList = new ArrayList<>();
+                handleList.add(node.getHandle());
+                boolean isSubBackup = checkSubBackupNodeByHandle(megaApi, handleList);
                 if(node.isFolder() && (node.getHandle() == myBackupHandle || node.getParentHandle() == myBackupHandle)
-                || !isTextEmpty(node.getDeviceId())) {
+                || !isTextEmpty(node.getDeviceId())
+                || isSubBackup) {
                     counterModify--;
                     optionRename.setVisibility(View.GONE);
                     counterModify--;
@@ -1118,8 +1123,12 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
                 break;
 
             case R.id.move_option:
-            case R.id.option_backup_move_layout:
                 nC.chooseLocationToMoveNodes(handleList);
+                dismissAllowingStateLoss();
+                break;
+
+            case R.id.option_backup_move_layout:
+                ((ManagerActivityLollipop) requireActivity()).chooseLocationToMoveNodes(handleList);
                 dismissAllowingStateLoss();
                 break;
 
@@ -1131,11 +1140,10 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
 
             case R.id.rubbish_bin_option:
             case R.id.remove_option:
+            case R.id.option_backup_rubbish_bin_layout:
                 ((ManagerActivityLollipop) requireActivity()).askConfirmationMoveToRubbish(handleList);
                 break;
-            case R.id.option_backup_rubbish_bin_layout:
-                ((ManagerActivityLollipop) requireActivity()).askConfirmationMoveBackupToRubbish(handleList);
-                break;
+
             case R.id.open_folder_option:
                 nC.openFolderFromSearch(node.getHandle());
                 dismissAllowingStateLoss();

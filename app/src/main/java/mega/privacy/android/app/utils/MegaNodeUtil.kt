@@ -1724,4 +1724,50 @@ object MegaNodeUtil {
                 }
             )
     }
+
+    /**
+     * Check the folder of My Backup and get the folder name
+     *
+     * @param megaApi MegaApiAndroid instance to use.
+     * @param handleList handles list of the nodes that selected
+     */
+    @JvmStatic
+    fun checkBackupNodeByHandle(megaApi: MegaApiAndroid, handleList: ArrayList<Long>?): MegaNode? {
+        if (handleList != null) {
+            if (handleList.size > 0) {
+                for (handle in handleList) {
+                    val p: MegaNode = megaApi.getNodeByHandle(handle)
+                    if (p.handle == myBackupHandle) {
+                        return p
+                    }
+                }
+            }
+        }
+        return null
+    }
+
+    /**
+     * Check the sub folder of My Backup
+     *
+     * @param megaApi MegaApiAndroid instance to use.
+     * @param handleList handles list of the nodes that selected
+     * @return true - Sub folder of My Backup / false - Not the sub folder of My Backup
+     */
+    @JvmStatic
+    fun checkSubBackupNodeByHandle(megaApi: MegaApiAndroid, handleList: ArrayList<Long>?): Boolean{
+        if(handleList != null) {
+            if (handleList.size > 0) {
+                val handle: Long = handleList[0]
+                var p: MegaNode = megaApi.getNodeByHandle(handle)
+                while (megaApi.getParentNode(p) != null) {
+                    p = megaApi.getParentNode(p)
+                    if(p.handle == myBackupHandle){
+                        return true
+                    }
+                }
+                return false
+            }
+        }
+        return false
+    }
 }

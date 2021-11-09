@@ -101,6 +101,7 @@ import com.ittianyu.bottomnavigationviewex.BottomNavigationViewEx;
 import com.jeremyliao.liveeventbus.LiveEventBus;
 
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -134,6 +135,7 @@ import mega.privacy.android.app.Product;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.fragments.homepage.documents.DocumentsFragment;
 import mega.privacy.android.app.generalusecase.FilePrepareUseCase;
+import mega.privacy.android.app.interfaces.ActionBackupNodeCallback;
 import mega.privacy.android.app.smsVerification.SMSVerificationActivity;
 import mega.privacy.android.app.ShareInfo;
 import mega.privacy.android.app.TransfersManagementActivity;
@@ -287,7 +289,9 @@ import static mega.privacy.android.app.utils.MegaNodeDialogUtil.IS_NEW_TEXT_FILE
 import static mega.privacy.android.app.utils.MegaNodeDialogUtil.NEW_TEXT_FILE_TEXT;
 import static mega.privacy.android.app.utils.MegaNodeDialogUtil.checkNewTextFileDialogState;
 import static mega.privacy.android.app.utils.ConstantsUrl.RECOVERY_URL;
+import static mega.privacy.android.app.utils.MegaNodeDialogUtil.showConfirmDialogWithBackup;
 import static mega.privacy.android.app.utils.MegaNodeDialogUtil.showRenameNodeDialog;
+import static mega.privacy.android.app.utils.MegaNodeDialogUtil.showTipDialogWithBackup;
 import static mega.privacy.android.app.utils.MegaProgressDialogUtil.createProgressDialog;
 import static mega.privacy.android.app.utils.MegaProgressDialogUtil.showProcessFileDialog;
 import static mega.privacy.android.app.utils.OfflineUtils.*;
@@ -6598,23 +6602,46 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 		this.restoreFromRubbish = value;
 	}
 
+	/**
+	 * Move folders or files that included "My backup"
+	 *
+	 * @param handleList handleList handles list of the nodes that selected
+	 */
+	public void chooseLocationToMoveNodes(final ArrayList<Long> handleList){
+		if(handleList!=null){
+			MegaNode pNode = checkBackupNodeByHandle(megaApi, handleList);
+			boolean isSubBackup = checkSubBackupNodeByHandle(megaApi, handleList);
+			// Show the warning dialog if the list including Backup node
+			if(isSubBackup){
+				Long handle = handleList.get(0);
+				MegaNode p = megaApi.getNodeByHandle(handle);
+				moveWithBackupTips(handleList, p, false, false);
+			}
+			if(pNode != null){
+				moveWithBackupTips(handleList, pNode,true, false);
+			}
+		}
+	}
+
+	/**
+	 * Delete folders or files that included "My backup"
+	 *
+	 * @param handleList handleList handles list of the nodes that selected
+	 */
 	public void askConfirmationMoveToRubbish(final ArrayList<Long> handleList){
 		logDebug("askConfirmationMoveToRubbish");
 		isClearRubbishBin=false;
 
-		DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
-			@Override
-			public void onClick(DialogInterface dialog, int which) {
-				switch (which){
-					case DialogInterface.BUTTON_POSITIVE:
-						//TODO remove the outgoing shares
-						nC.moveToTrash(handleList, moveToRubbish);
-						break;
+		DialogInterface.OnClickListener dialogClickListener = (dialog, which) -> {
+			switch (which){
+				case DialogInterface.BUTTON_POSITIVE:
+					//TODO remove the outgoing shares
+					nC.moveToTrash(handleList, moveToRubbish);
+					break;
 
-					case DialogInterface.BUTTON_NEGATIVE:
-						//No button clicked
-						break;
-				}
+				case DialogInterface.BUTTON_NEGATIVE:
+					//No button clicked
+					break;
 			}
 		};
 
@@ -6627,7 +6654,19 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 					p = megaApi.getParentNode(p);
 				}
 				if (p.getHandle() != megaApi.getRubbishNode().getHandle()){
-
+					MegaNode pNode = checkBackupNodeByHandle(megaApi, handleList);
+					boolean isSubBackup = checkSubBackupNodeByHandle(megaApi, handleList);
+					// Show the warning dialog if the list including Backup node
+					if(isSubBackup){
+						Long subHandle = handleList.get(0);
+						MegaNode pSubNode = megaApi.getNodeByHandle(subHandle);
+						moveWithBackupTips(handleList, pSubNode,false, true);
+						return;
+					}
+					if(pNode != null){
+						moveWithBackupTips(handleList, pNode,true, true);
+						return;
+					}
 					setMoveToRubbish(true);
 
 					MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this);
@@ -6658,168 +6697,93 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 		}
 		else{
 			logWarning("handleList NULL");
-			return;
 		}
 
 	}
 
-	public void askConfirmationMoveBackupToRubbish(final ArrayList<Long> handleList){
-		logDebug("askConfirmationMoveBackupToRubbish");
-		isClearRubbishBin=false;
-		backupMoveTips(handleList, true, true);
-	}
-
-	private String checkBackupNodeByHandle(ArrayList<Long> handleList) {
-		if(handleList!=null){
+	/**
+	 * Show the warning dialog when moving or deleting folders with "My backup" folder
+	 * @param handleList handleList handles list of the nodes that selected
+	 * @param pNodeBackup the node of "My backup"
+	 * @param isRootBackup true - "My backup" folder / false - sub folders or files
+	 * @param toRubbish true - delete / false - move
+	 */
+	private void moveWithBackupTips(final ArrayList<Long> handleList, MegaNode pNodeBackup, boolean isRootBackup, boolean toRubbish) {
+		if (handleList != null && pNodeBackup != null) {
 			if (handleList.size() > 0) {
-				for(Long handle: handleList){
-					MegaNode p = megaApi.getNodeByHandle(handle);
-					if(p.getHandle() == myBackupHandle){
-						return p.getName();
-					}
-				}
-
-			}
-		}
-		return "";
-	}
-
-	private void backupMoveTips(final ArrayList<Long> handleList, boolean isBackup, boolean toRubbish) {
-
-		DialogInterface.OnClickListener dialogClickListener = (dialog, which) -> {
-			switch (which){
-				case DialogInterface.BUTTON_POSITIVE:
-					if(isBackup) {
-						ConfirmationMove(handleList, isBackup, toRubbish);
-					} else {
-						nC.moveToTrash(handleList, moveToRubbish);
-					}
-					break;
-
-				case DialogInterface.BUTTON_NEGATIVE:
-					//No button clicked
-					break;
-			}
-		};
-
-		if(handleList!=null){
-			String nodeName = checkBackupNodeByHandle(handleList);
-			String displayName = StringResourcesUtils.getString(R.string.backup_remove_root_folder_title, nodeName);
-			if (handleList.size() > 0){
-				Long handle = handleList.get(0);
-				MegaNode p = megaApi.getNodeByHandle(handle);
-				while (megaApi.getParentNode(p) != null){
-					p = megaApi.getParentNode(p);
-				}
-				if (p.getHandle() != megaApi.getRubbishNode().getHandle()){
+				if(toRubbish) {
 					setMoveToRubbish(true);
-
-					if(isBackup){
-						LayoutInflater layout = getLayoutInflater();
-						View view = layout.inflate(R.layout.dialog_backup_remove_tip, null);
-						TextView tvTitle = view.findViewById(R.id.title);
-						tvTitle.setText(displayName);
-						MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this)
-								.setView(view)
-								.setPositiveButton(StringResourcesUtils.getString(R.string.button_continue), dialogClickListener)
-								.setNegativeButton(StringResourcesUtils.getString(R.string.general_cancel),dialogClickListener);
-						AlertDialog dialog = builder.show();
-						dialog.setCancelable(false);
-						dialog.setCanceledOnTouchOutside(false);
-					}
 				}
-				else{
-					setMoveToRubbish(false);
+				showTipDialogWithBackup(this, new ActionBackupNodeCallback() {
 
-					MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this);
-					builder.setMessage(getResources().getString(R.string.confirmation_delete_from_mega));
+							@Override
+							public void actionCancel(@Nullable DialogInterface dialog) {
+							}
 
-					builder.setPositiveButton(R.string.context_remove, dialogClickListener);
-					builder.setNegativeButton(R.string.general_cancel, dialogClickListener);
-					builder.show();
-				}
+							@Override
+							public void actionExecute(@NotNull ArrayList<Long> handleList, @NotNull MegaNode pNodeBackup, boolean isRootBackup, boolean toRubbish) {
+
+							}
+
+							@Override
+							public void actionConfirmed(@NonNull ArrayList<Long> handleList, @NonNull MegaNode pNodeBackup, boolean isRootBackup, boolean toRubbish) {
+								if (pNodeBackup != null) {
+									ConfirmationMove(handleList, pNodeBackup, isRootBackup, toRubbish);
+								} else {
+									if(toRubbish) {
+										nC.moveToTrash(handleList, moveToRubbish);
+									} else {
+										nC.chooseLocationToMoveNodes(handleList);
+									}
+								}
+							}
+						},
+						handleList,
+						pNodeBackup,
+						isRootBackup,
+						toRubbish
+				);
 			}
-		}
-		else{
+		} else {
 			logWarning("handleList NULL");
 		}
 	}
 
-	private void ConfirmationMove(final ArrayList<Long> handleList, boolean isBackup, boolean toRubbish) {
+	/**
+	 * Show the confirm dialog when moving or deleting folders with "My backup" folder
+	 * @param handleList handleList handles list of the nodes that selected
+	 * @param pNodeBackup the node of "My backup"
+	 * @param isRootBackup true - "My backup" folder / false - sub folders or files
+	 * @param toRubbish true - delete / false - move
+	 */
+	private void ConfirmationMove(final ArrayList<Long> handleList, MegaNode pNodeBackup, boolean isRootBackup, boolean toRubbish) {
+		if (handleList != null && pNodeBackup != null) {
+			showConfirmDialogWithBackup(this, new ActionBackupNodeCallback() {
+						@Override
+						public void actionCancel(@Nullable DialogInterface dialog) {
 
-		DialogInterface.OnClickListener dialogClickListener = (dialog, which) -> {
-			switch (which){
-				case DialogInterface.BUTTON_POSITIVE:
-					nC.moveToTrash(handleList, moveToRubbish);
-					break;
+						}
 
-				case DialogInterface.BUTTON_NEGATIVE:
-					break;
-			}
-		};
-
-		if(handleList!=null){
-			String nodeName = checkBackupNodeByHandle(handleList);
-			String displayName = StringResourcesUtils.getString(R.string.backup_remove_root_folder_title, nodeName);
-			if(isBackup){
-				LayoutInflater layout = getLayoutInflater();
-				View view = layout.inflate(R.layout.dialog_backup_remove_confirm, null);
-				TextView tvTitle = view.findViewById(R.id.title);
-				TextInputLayout editTextLayout = view.findViewById(R.id.confirm_text_layout);
-				TextInputEditText editText = view.findViewById(R.id.confirm_text);
-				editText.addTextChangedListener(new TextWatcher() {
-					@Override
-					public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-
-					}
-
-					@Override
-					public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-
-					}
-
-					@Override
-					public void afterTextChanged(Editable editable) {
-						editTextLayout.setError(null);
-						editTextLayout.setHintTextAppearance(R.style.TextAppearance_Design_Hint);
-					}
-				});
-
-				tvTitle.setText(displayName);
-				MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this)
-						.setView(view)
-						.setPositiveButton(StringResourcesUtils.getString(R.string.general_move), null)
-						.setNegativeButton(StringResourcesUtils.getString(R.string.general_cancel),dialogClickListener);
-				final AlertDialog dialog = builder.create();
-				dialog.setOnShowListener(new DialogInterface.OnShowListener() {
-					@Override
-					public void onShow(DialogInterface dialogInterface) {
-						Button button = ((AlertDialog) dialog).getButton(AlertDialog.BUTTON_POSITIVE);
-						button.setOnClickListener(new View.OnClickListener() {
-
-							@Override
-							public void onClick(View view) {
-								String strEditText = Objects.requireNonNull(editText.getText()).toString();
-								if(StringResourcesUtils.getString(R.string.backup_disable_confirm_text).equals(strEditText)){
-									nC.moveToTrash(handleList, moveToRubbish);
-									//Dismiss once everything is OK.
-									dialog.dismiss();
-								}
-								else {
-									editText.requestFocus();
-									editTextLayout.setError(StringResourcesUtils.getString(R.string.error_backup_confirm_dont_match));
-									editTextLayout.setHintTextAppearance(R.style.TextAppearance_InputHint_Error);
-								}
+						@Override
+						public void actionExecute(@NotNull ArrayList<Long> handleList, @NotNull MegaNode pNodeBackup, boolean isRootBackup, boolean toRubbish) {
+							if (toRubbish) {
+								nC.moveToTrash(handleList, moveToRubbish);
+							} else {
+								nC.chooseLocationToMoveNodes(handleList);
 							}
-						});
-					}
-				});
-				dialog.show();
-				dialog.setCancelable(false);
-				dialog.setCanceledOnTouchOutside(false);
-			}
-		}
-		else{
+						}
+
+						@Override
+						public void actionConfirmed(@NonNull ArrayList<Long> handleList, @NonNull MegaNode pNodeBackup, boolean isRootBackup, boolean toRubbish) {
+
+						}
+					},
+					handleList,
+					pNodeBackup,
+					isRootBackup,
+					toRubbish
+			);
+		} else {
 			logWarning("handleList NULL");
 		}
 	}

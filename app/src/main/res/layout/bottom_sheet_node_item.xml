@@ -361,9 +361,9 @@
                     android:id="@+id/backup_move_option"
                     style="@style/BottomSheetOption.Red"
                     android:layout_width="wrap_content"
-                    android:text="@string/general_move_to"
                     android:layout_alignParentStart="true"
-                    app:drawableStartCompat="@drawable/ic_move"/>
+                    android:text="@string/general_move_to"
+                    app:drawableStartCompat="@drawable/ic_move" />
 
                 <ImageView
                     android:id="@+id/backup_move_warn"
@@ -394,7 +394,7 @@
                     android:layout_width="wrap_content"
                     android:text="@string/context_move_to_trash"
                     android:layout_alignParentStart="true"
-                    app:drawableStartCompat="@drawable/ic_rubbish_bin"/>
+                    app:drawableStartCompat="@drawable/ic_remove"/>
 
                 <ImageView
                     android:id="@+id/backup_rubbish_bin_warn"
