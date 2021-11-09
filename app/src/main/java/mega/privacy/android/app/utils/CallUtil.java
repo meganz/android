@@ -87,7 +87,7 @@ public class CallUtil {
      * @param passcodeManagement To disable passcode.
      */
     public static void openMeetingToJoin(Context context, long chatId, String meetingName, String link, long publicChatHandle, boolean isRejoin, PasscodeManagement passcodeManagement) {
-        logDebug("Open join a meeting screen:: chatId = "+chatId);
+        logDebug("Open join a meeting screen:: chatId = " + chatId);
         passcodeManagement.setShowPasscodeScreen(false);
         MegaApplication.getChatManagement().setOpeningMeetingLink(chatId, true);
         Intent meetingIntent = new Intent(context, MeetingActivity.class);
@@ -111,7 +111,7 @@ public class CallUtil {
      * @param passcodeManagement To disable passcode.
      */
     public static void openMeetingToStart(Context context, long chatId, PasscodeManagement passcodeManagement) {
-        logDebug("Open join a meeting screen");
+        logDebug("Open join a meeting screen. Chat id is " + chatId);
         passcodeManagement.setShowPasscodeScreen(false);
         Intent meetingIntent = new Intent(context, MeetingActivity.class);
         meetingIntent.setAction(MEETING_ACTION_START);
@@ -127,7 +127,7 @@ public class CallUtil {
      * @param passcodeManagement To disable passcode.
      */
     public static void openMeetingRinging(Context context, long chatId, PasscodeManagement passcodeManagement) {
-        logDebug("Open incoming call screen");
+        logDebug("Open incoming call screen. Chat id is " + chatId);
         passcodeManagement.setShowPasscodeScreen(false);
         MegaApplication.getInstance().openCallService(chatId);
         Intent meetingIntent = new Intent(context, MeetingActivity.class);
@@ -145,7 +145,7 @@ public class CallUtil {
      * @param passcodeManagement To disable passcode.
      */
     public static void openMeetingInProgress(Context context, long chatId, boolean isNewTask, PasscodeManagement passcodeManagement) {
-        logDebug("Open in progress call screen");
+        logDebug("Open in progress call screen. Chat id is " + chatId);
         passcodeManagement.setShowPasscodeScreen(false);
         if (isNewTask) {
             MegaApplication.getInstance().openCallService(chatId);
@@ -173,7 +173,7 @@ public class CallUtil {
      * @param passcodeManagement To disable passcode.
      */
     public static void openMeetingWithAudioOrVideo(Context context, long chatId, boolean isAudioEnable, boolean isVideoEnable, PasscodeManagement passcodeManagement) {
-        logDebug("Open call with audio or video");
+        logDebug("Open call with audio or video. Chat id is " + chatId);
         passcodeManagement.setShowPasscodeScreen(false);
         MegaApplication.getInstance().openCallService(chatId);
         Intent meetingIntent = new Intent(context, MeetingActivity.class);
@@ -195,7 +195,7 @@ public class CallUtil {
      * @param passcodeManagement To disable passcode.
      */
     public static void openMeetingGuestMode(Context context, String meetingName, long chatId, String link, PasscodeManagement passcodeManagement) {
-        logDebug("Open meeting in guest mode");
+        logDebug("Open meeting in guest mode. Chat id is " + chatId);
         passcodeManagement.setShowPasscodeScreen(false);
         MegaApplication.getChatManagement().setOpeningMeetingLink(chatId, true);
         MegaApplication.getInstance().setIsLoggingRunning(true);
