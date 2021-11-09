@@ -698,7 +698,9 @@ public class Constants {
 
     public static final String[] CONFIRMATION_LINK_REGEXS = {
             "^https://mega\\.co\\.nz/.*#confirm.+$",
-            "^https://mega\\.nz/.*#confirm.+$"
+            "^https://mega\\.co\\.nz/.*confirm.+$",
+            "^https://mega\\.nz/.*#confirm.+$",
+            "^https://mega\\.nz/.*confirm.+$"
     };
 
     public static final String[] FOLDER_LINK_REGEXS = {
@@ -720,7 +722,9 @@ public class Constants {
 
     public static final String[] ACCOUNT_INVITATION_LINK_REGEXS = {
             "^https://mega\\.co\\.nz/.*#newsignup.+$",
-            "^https://mega\\.nz/.*#newsignup.+$"
+            "^https://mega\\.co\\.nz/.*newsignup.+$",
+            "^https://mega\\.nz/.*#newsignup.+$",
+            "^https://mega\\.nz/.*newsignup.+$"
     };
 
     public static final String[] EXPORT_MASTER_KEY_LINK_REGEXS = {
@@ -730,27 +734,37 @@ public class Constants {
 
     public static final String[] NEW_MESSAGE_CHAT_LINK_REGEXS = {
             "^https://mega\\.co\\.nz/.*#fm/chat",
-            "^https://mega\\.nz/.*#fm/chat"
+            "^https://mega\\.co\\.nz/.*fm/chat",
+            "^https://mega\\.nz/.*#fm/chat",
+            "^https://mega\\.nz/.*fm/chat"
     };
 
     public static final String[] CANCEL_ACCOUNT_LINK_REGEXS = {
             "^https://mega\\.co\\.nz/.*#cancel.+$",
-            "^https://mega\\.nz/.*#cancel.+$"
+            "^https://mega\\.co\\.nz/.*cancel.+$",
+            "^https://mega\\.nz/.*#cancel.+$",
+            "^https://mega\\.nz/.*cancel.+$"
     };
 
     public static final String[] VERIFY_CHANGE_MAIL_LINK_REGEXS = {
             "^https://mega\\.co\\.nz/.*#verify.+$",
-            "^https://mega\\.nz/.*#verify.+$"
+            "^https://mega\\.co\\.nz/.*verify.+$",
+            "^https://mega\\.nz/.*#verify.+$",
+            "^https://mega\\.nz/.*verify.+$"
     };
 
     public static final String[] RESET_PASSWORD_LINK_REGEXS = {
             "^https://mega\\.co\\.nz/.*#recover.+$",
-            "^https://mega\\.nz/.*#recover.+$"
+            "^https://mega\\.co\\.nz/.*recover.+$",
+            "^https://mega\\.nz/.*#recover.+$",
+            "^https://mega\\.nz/.*recover.+$"
     };
 
     public static final String[] PENDING_CONTACTS_LINK_REGEXS = {
             "^https://mega\\.co\\.nz/.*#fm/ipc",
-            "^https://mega\\.nz/.*#fm/ipc"
+            "^https://mega\\.co\\.nz/.*fm/ipc",
+            "^https://mega\\.nz/.*#fm/ipc",
+            "^https://mega\\.nz/.*fm/ipc"
     };
 
     public static final String[] HANDLE_LINK_REGEXS = {
@@ -786,7 +800,9 @@ public class Constants {
 
     public static final String[] EMAIL_VERIFY_LINK_REGEXS = {
             "^https://mega\\.co\\.nz/#emailverify.+$",
-            "^https://mega\\.nz/#emailverify.+$"
+            "^https://mega\\.co\\.nz/emailverify.+$",
+            "^https://mega\\.nz/#emailverify.+$",
+            "^https://mega\\.nz/emailverify.+$"
     };
 
     public static final String[] WEB_SESSION_LINK_REGEXS = {
@@ -796,7 +812,9 @@ public class Constants {
 
     public static final String[] BUSINESS_INVITE_LINK_REGEXS = {
             "^https://mega\\.co\\.nz/#businessinvite.+$",
-            "^https://mega\\.nz/#businessinvite.+$"
+            "^https://mega\\.co\\.nz/businessinvite.+$",
+            "^https://mega\\.nz/#businessinvite.+$",
+            "^https://mega\\.nz/businessinvite.+$"
     };
 
     //Types of blocked accounts

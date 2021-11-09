@@ -53,6 +53,7 @@ import mega.privacy.android.app.notifications.TransferOverQuotaNotification;
 import mega.privacy.android.app.objects.SDTransfer;
 import mega.privacy.android.app.service.iar.RatingHandlerImpl;
 import mega.privacy.android.app.utils.SDCardOperator;
+import mega.privacy.android.app.utils.StringResourcesUtils;
 import mega.privacy.android.app.utils.ThumbnailUtilsLollipop;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
@@ -1195,9 +1196,9 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 						: totalTransfers - pendingTransfers + 1;
 
 				if (megaApi.areTransfersPaused(MegaTransfer.TYPE_DOWNLOAD)) {
-					message = getResources().getQuantityString(R.plurals.download_service_paused_notification, totalTransfers, inProgress, totalTransfers);
+					message = StringResourcesUtils.getString(R.string.download_service_notification_paused, inProgress, totalTransfers);
 				} else {
-					message = getResources().getQuantityString(R.plurals.download_service_notification, totalTransfers, inProgress, totalTransfers);
+					message = StringResourcesUtils.getString(R.string.download_service_notification, inProgress, totalTransfers);
 				}
 			}
 
