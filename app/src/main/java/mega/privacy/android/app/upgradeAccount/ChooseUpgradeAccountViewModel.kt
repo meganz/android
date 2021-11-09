@@ -54,19 +54,22 @@ class ChooseUpgradeAccountViewModel @ViewModelInject constructor(
     }
 
     /**
-     * Asks for account info if needed.
+     * Asks for account info if needed: Pricing and payment methods.
      */
     fun refreshAccountInfo() {
-        logDebug("Check the last call to callToPricing")
-        if (callToPricing()) {
-            logDebug("megaApi.getPricing SEND")
-            MegaApplication.getInstance().askForPricing()
-        }
+        refreshPricing()
 
-        logDebug("Check the last call to callToPaymentMethods")
         if (callToPaymentMethods()) {
-            logDebug("megaApi.getPaymentMethods SEND")
             MegaApplication.getInstance().askForPaymentMethods()
+        }
+    }
+
+    /**
+     * Asks for pricing if needed.
+     */
+    fun refreshPricing() {
+        if (callToPricing()) {
+            MegaApplication.getInstance().askForPricing()
         }
     }
 

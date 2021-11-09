@@ -178,7 +178,7 @@ open class ChooseAccountActivity : PasscodeActivity(), Scrollable {
 
         if (productAccounts == null) {
             LogUtil.logDebug("productAccounts == null")
-            app.askForPricing()
+            viewModel.refreshPricing()
             return
         }
 

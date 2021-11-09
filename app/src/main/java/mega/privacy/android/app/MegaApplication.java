@@ -855,7 +855,6 @@ public class MegaApplication extends MultiDexApplication implements Application.
 	}
 
 	public void askForPricing(){
-
 		megaApi.getPricing(null);
 	}
 
