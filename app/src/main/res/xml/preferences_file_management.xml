@@ -8,6 +8,7 @@
         android:key="setting_mobile_data_high_resolution"
         android:summary="@string/settings_mobile_data_resoluton_summary"
         android:title="@string/settings_mobile_data_resoluton_title"
+        app:singleLineTitle="false"
         app:defaultValue="true"
         app:allowDividerAbove="true"
         app:allowDividerBelow="true"
