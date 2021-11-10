@@ -232,9 +232,10 @@ dependencies {
     gmsImplementation 'com.google.firebase:firebase-crashlytics-ndk'
     gmsImplementation 'com.google.firebase:firebase-analytics-ktx'
     //HMS
+    hmsImplementation "com.huawei.agconnect:agconnect-core:$huaweiServicesVersion"
     hmsImplementation 'com.huawei.hms:push:4.0.2.300'
-    hmsImplementation 'com.huawei.hms:location:4.0.2.300'
-    hmsImplementation 'com.huawei.hms:maps:4.0.1.301'
+    hmsImplementation 'com.huawei.hms:location:6.2.0.300'
+    hmsImplementation 'com.huawei.hms:maps:6.0.1.304'
     hmsImplementation 'com.huawei.hms:iap:4.0.2.300'
 
     // Play Core
