@@ -4,6 +4,7 @@ import android.os.Bundle
 import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.BaseActivity
 import mega.privacy.android.app.MegaApplication
+import mega.privacy.android.app.objects.PasscodeManagement
 import mega.privacy.android.app.utils.JobUtil
 import mega.privacy.android.app.utils.PasscodeUtil
 import mega.privacy.android.app.utils.Util.setAppFontSize
@@ -18,6 +19,8 @@ open class PasscodeActivity : BaseActivity() {
 
     @Inject
     lateinit var passcodeUtil: PasscodeUtil
+    @Inject
+    lateinit var passcodeManagement: PasscodeManagement
     private var lastStart = 0L
 
     /**
@@ -70,9 +73,9 @@ open class PasscodeActivity : BaseActivity() {
 
         setAppFontSize(this)
 
-        if (isScreenRotation) {
+        if (isScreenRotation && !passcodeManagement.needsOpenAgain) {
             isScreenRotation = false
-        } else if (MegaApplication.getPasscodeManagement().showPasscodeScreen) {
+        } else if (passcodeManagement.showPasscodeScreen) {
             passcodeUtil.resume()
         }
 
