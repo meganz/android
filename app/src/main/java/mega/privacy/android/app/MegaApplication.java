@@ -216,6 +216,7 @@ public class MegaApplication extends MultiDexApplication implements Application.
 	private static boolean isWaitingForCall = false;
 	public static boolean isSpeakerOn = false;
 	private static boolean areAdvertisingCookiesEnabled = false;
+	public static boolean areAnalyticsCookiesEnabled = false;
 	private static long userWaitingForCall = MEGACHAT_INVALID_HANDLE;
 
 	private static boolean verifyingCredentials;
@@ -723,8 +724,12 @@ public class MegaApplication extends MultiDexApplication implements Application.
         Thread.setDefaultUncaughtExceptionHandler((thread, e) -> {
             handleUncaughtException(thread, e);
 
-            // Send the crash info manually.
-            new CrashReporterImpl().report(e);
+            // Only collect and upload crash information to Firebase/HMS if cookie option accepted.
+            if(areAnalyticsCookiesEnabled) {
+                logDebug("Report crash info, " + e.getMessage());
+                // Send the crash info manually.
+                new CrashReporterImpl().report(e);
+            }
         });
 
 		registerActivityLifecycleCallbacks(this);
@@ -1010,6 +1015,7 @@ public class MegaApplication extends MultiDexApplication implements Application.
 				.subscribe((cookies, throwable) -> {
 					if (throwable == null) {
 						setAdvertisingCookiesEnabled(cookies.contains(CookieType.ADVERTISEMENT));
+                        setAnalyticsCookiesEnabled(cookies.contains(CookieType.ANALYTICS));
 					}
 				});
 	}
@@ -1962,4 +1968,8 @@ public class MegaApplication extends MultiDexApplication implements Application.
 	public static void setAdvertisingCookiesEnabled(boolean enabled) {
 		areAdvertisingCookiesEnabled = enabled;
 	}
+
+    public static void setAnalyticsCookiesEnabled(boolean enabled) {
+        areAnalyticsCookiesEnabled = enabled;
+    }
 }
