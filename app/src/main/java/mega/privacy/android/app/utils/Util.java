@@ -1565,8 +1565,8 @@ public class Util {
 
         MegaPreferences preferences = dbH.getPreferences();
 
-        boolean askMe = false;
-        if (preferences != null) {
+        boolean askMe = true;
+        if (preferences != null && preferences.getStorageAskAlways() != null) {
             askMe = Boolean.parseBoolean(preferences.getStorageAskAlways());
         }
 
