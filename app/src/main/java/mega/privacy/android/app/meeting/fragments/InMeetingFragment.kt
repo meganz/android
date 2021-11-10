@@ -148,8 +148,6 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
     private var gridViewCallFragment: GridViewCallFragment? = null
     private var speakerViewCallFragment: SpeakerViewCallFragment? = null
 
-    private var status = NOT_TYPE
-
     // For internal UI/UX use
     private var previousY = -1f
     private var lastTouch: Long = 0
@@ -404,8 +402,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
                         logDebug("Session in progress, clientID = ${callAndSession.second.clientid}")
                         val position =
                             inMeetingViewModel.addParticipant(
-                                callAndSession.second,
-                                status
+                                callAndSession.second
                             )
                         position?.let {
                             if (position != INVALID_POSITION) {
@@ -1473,7 +1470,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
     private fun checkCurrentParticipants() {
         inMeetingViewModel.getCall()?.let {
             logDebug("Check current call participants")
-            inMeetingViewModel.createCurrentParticipants(it.sessionsClientid, status)
+            inMeetingViewModel.createCurrentParticipants(it.sessionsClientid)
         }
     }
 
@@ -1557,11 +1554,11 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
      * Show reconnecting UI
      */
     private fun reconnecting() {
-        logDebug("Show reconnecting UI")
-        if (status == NOT_TYPE)
+        logDebug("Show reconnecting UI, the current status is ${inMeetingViewModel.status}")
+        if (inMeetingViewModel.status == NOT_TYPE)
             return
 
-        status = NOT_TYPE
+        inMeetingViewModel.status = NOT_TYPE
 
         removeListenersAndFragments()
         binding.reconnecting.isVisible = true
@@ -1572,11 +1569,11 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
      * Remove fragments
      */
     fun removeUI() {
-        logDebug("Removing call UI, the current status is $status")
-        if (status == NOT_TYPE)
+        logDebug("Removing call UI, the current status is ${inMeetingViewModel.status}")
+        if (inMeetingViewModel.status == NOT_TYPE)
             return
 
-        status = NOT_TYPE
+        inMeetingViewModel.status = NOT_TYPE
 
         removeListenersAndFragments()
     }
@@ -1613,7 +1610,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
      * Show one to one call UI
      */
     private fun initOneToOneCall() {
-        if (status == TYPE_IN_ONE_TO_ONE) return
+        if (inMeetingViewModel.status == TYPE_IN_ONE_TO_ONE) return
 
         removeListenersAndFragments()
 
@@ -1622,7 +1619,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
             val session = inMeetingViewModel.getSessionOneToOneCall(currentCall)
             session?.let { userSession ->
                 logDebug("Show one to one call UI")
-                status = TYPE_IN_ONE_TO_ONE
+                inMeetingViewModel.status = TYPE_IN_ONE_TO_ONE
                 checkInfoBanner(TYPE_SINGLE_PARTICIPANT)
 
                 logDebug("Create fragment")
@@ -1651,10 +1648,10 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
      * @param chatId ID of chat
      */
     private fun waitingForConnection(chatId: Long) {
-        if (status == TYPE_WAITING_CONNECTION) return
+        if (inMeetingViewModel.status == TYPE_WAITING_CONNECTION) return
 
         logDebug("Show waiting for connection call UI")
-        status = TYPE_WAITING_CONNECTION
+        inMeetingViewModel.status = TYPE_WAITING_CONNECTION
         checkInfoBanner(TYPE_SINGLE_PARTICIPANT)
 
         removeListenersAndFragments()
@@ -1721,10 +1718,10 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
      * Method to display the speaker view UI
      */
     private fun initSpeakerViewMode() {
-        if (status == TYPE_IN_SPEAKER_VIEW) return
+        if (inMeetingViewModel.status == TYPE_IN_SPEAKER_VIEW) return
 
         logDebug("Show group call - Speaker View UI")
-        status = TYPE_IN_SPEAKER_VIEW
+        inMeetingViewModel.status = TYPE_IN_SPEAKER_VIEW
         checkInfoBanner(TYPE_SINGLE_PARTICIPANT)
         inMeetingViewModel.removeAllParticipantVisible()
 
@@ -1753,7 +1750,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
             )
         }
 
-        inMeetingViewModel.updateParticipantResolution(status)
+        inMeetingViewModel.updateParticipantResolution()
         checkGridSpeakerViewMenuItemVisibility()
     }
 
@@ -1761,10 +1758,10 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
      * Method to display the grid view UI
      */
     private fun initGridViewMode() {
-        if (status == TYPE_IN_GRID_VIEW) return
+        if (inMeetingViewModel.status == TYPE_IN_GRID_VIEW) return
 
         logDebug("Show group call - Grid View UI")
-        status = TYPE_IN_GRID_VIEW
+        inMeetingViewModel.status = TYPE_IN_GRID_VIEW
         checkInfoBanner(TYPE_SINGLE_PARTICIPANT)
 
         inMeetingViewModel.removeAllParticipantVisible()
@@ -1794,7 +1791,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
             )
         }
 
-        inMeetingViewModel.updateParticipantResolution(status)
+        inMeetingViewModel.updateParticipantResolution()
         checkGridSpeakerViewMenuItemVisibility()
     }
 
@@ -1804,7 +1801,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
      * @param chatId the chat ID
      */
     private fun initGroupCall(chatId: Long) {
-        if (status != TYPE_IN_GRID_VIEW && status != TYPE_IN_SPEAKER_VIEW) {
+        if (inMeetingViewModel.status != TYPE_IN_GRID_VIEW && inMeetingViewModel.status != TYPE_IN_SPEAKER_VIEW) {
             individualCallFragment?.let {
                 if (it.isAdded) {
                     it.removeChatVideoListener()
@@ -1827,7 +1824,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
                     }
                 }
             }
-            status == TYPE_IN_SPEAKER_VIEW -> {
+            inMeetingViewModel.status == TYPE_IN_SPEAKER_VIEW -> {
                 logDebug("Manual mode - Speaker view")
                 initSpeakerViewMode()
             }
@@ -1997,7 +1994,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
             }
         }
 
-        when (status) {
+        when (inMeetingViewModel.status) {
             TYPE_IN_GRID_VIEW -> {
                 gridViewMenuItem?.let {
                     it.isVisible = false
@@ -2087,6 +2084,8 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
         //Observer the participant List
         inMeetingViewModel.participants.observe(viewLifecycleOwner) { participants ->
             participants?.let {
+                logDebug("****************** InMeetingFragment:: inMeetingViewModel.participants.observe:: participants ${participants.size}")
+
                 updatePanelParticipantList(it.toMutableList())
 
                 // Check current the count of participants
@@ -2513,7 +2512,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
             }
         }
 
-        inMeetingViewModel.updateParticipantResolution(status)
+        inMeetingViewModel.updateParticipantResolution()
     }
 
     /**
@@ -2772,7 +2771,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
             MeetingParticipantBottomSheetDialogFragment.newInstance(
                 inMeetingViewModel.amIAGuest(),
                 inMeetingViewModel.isModerator(),
-                status == TYPE_IN_SPEAKER_VIEW,
+                inMeetingViewModel.status == TYPE_IN_SPEAKER_VIEW,
                 participant
             )
         participantBottomSheet.show(childFragmentManager, participantBottomSheet.tag)

@@ -2,6 +2,7 @@ package mega.privacy.android.app.meeting.fragments
 
 import android.graphics.Color
 import android.os.Bundle
+import android.util.Pair
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -32,6 +33,7 @@ import mega.privacy.android.app.utils.StringResourcesUtils
 import mega.privacy.android.app.utils.Util
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
 import nz.mega.sdk.MegaChatCall
+import nz.mega.sdk.MegaChatSession
 import org.jetbrains.anko.displayMetrics
 import java.util.*
 import javax.inject.Inject
@@ -68,6 +70,22 @@ class MakeModeratorFragment : MeetingBaseFragment() {
             }
         }
     }
+
+    private val sessionStatusObserver =
+        Observer<Pair<Long, MegaChatSession>> { callAndSession ->
+            if (inMeetingViewModel.isSameCall(callAndSession.first) && !inMeetingViewModel.isOneToOneCall()) {
+                when (callAndSession.second.status) {
+                    MegaChatSession.SESSION_STATUS_IN_PROGRESS -> {
+                        logDebug("Session in progress, clientID = ${callAndSession.second.clientid}")
+                        inMeetingViewModel.addParticipant(callAndSession.second)
+                    }
+                    MegaChatSession.SESSION_STATUS_DESTROYED -> {
+                        logDebug("Session destroyed, clientID = ${callAndSession.second.clientid}")
+                        inMeetingViewModel.removeParticipant(callAndSession.second)
+                    }
+                }
+            }
+        }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -106,6 +124,11 @@ class MakeModeratorFragment : MeetingBaseFragment() {
      * Method for initialising UI elements
      */
     private fun initLiveEvent() {
+        //Sessions Level
+        @Suppress("UNCHECKED_CAST")
+        LiveEventBus.get(EventConstants.EVENT_SESSION_STATUS_CHANGE)
+            .observe(this, sessionStatusObserver as Observer<Any>)
+
         LiveEventBus.get(EventConstants.EVENT_CALL_STATUS_CHANGE, MegaChatCall::class.java)
             .observe(this, callStatusObserver)
     }
@@ -251,8 +274,6 @@ class MakeModeratorFragment : MeetingBaseFragment() {
      */
     fun update(participantsList: MutableList<Participant>) {
         // Get the current selected id
-        logDebug("************ participants.observe participantsList ${participantsList.size}")
-
         participants = participantsList
         val oldSelect = selectedParticipants.map { it.peerId }
         participants.forEach {

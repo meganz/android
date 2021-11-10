@@ -48,6 +48,8 @@ class InMeetingViewModel @ViewModelInject constructor(
 ) : ViewModel(), EditChatRoomNameListener.OnEditedChatRoomNameCallback,
     HangChatCallListener.OnCallHungUpCallback, GetUserEmailListener.OnUserEmailUpdateCallback {
 
+    var status = InMeetingFragment.NOT_TYPE
+
     var currentChatId: Long = MEGACHAT_INVALID_HANDLE
     var previousState: Int = CALL_STATUS_INITIAL
 
@@ -900,15 +902,14 @@ class InMeetingViewModel @ViewModelInject constructor(
      * Method for creating participants already on the call
      *
      * @param list list of participants
-     * @param status if it's grid view or speaker view
      */
-    fun createCurrentParticipants(list: MegaHandleList?, status: String) {
+    fun createCurrentParticipants(list: MegaHandleList?) {
         list?.let { listParticipants ->
             if (listParticipants.size() > 0) {
                 _callLiveData.value = inMeetingRepository.getMeeting(currentChatId)
                 for (i in 0 until list.size()) {
                     getSession(list[i])?.let { session ->
-                        createParticipant(session, status)?.let { participantCreated ->
+                        createParticipant(session)?.let { participantCreated ->
                             logDebug("Adding current participant... ${participantCreated.clientId}")
                             participants.value?.add(participantCreated)
                         }
@@ -927,8 +928,8 @@ class InMeetingViewModel @ViewModelInject constructor(
      * @param session MegaChatSession of a participant
      * @return the position of the participant
      */
-    fun addParticipant(session: MegaChatSession, status: String): Int? {
-        createParticipant(session, status)?.let { participantCreated ->
+    fun addParticipant(session: MegaChatSession): Int? {
+        createParticipant(session)?.let { participantCreated ->
             participants.value?.add(participantCreated)
             logDebug("Adding participant... ${participantCreated.clientId}")
             participants.value = participants.value
@@ -945,7 +946,7 @@ class InMeetingViewModel @ViewModelInject constructor(
      * @param session MegaChatSession of a participant
      * @return the position of the participant
      */
-    private fun createParticipant(session: MegaChatSession, status: String): Participant? {
+    private fun createParticipant(session: MegaChatSession): Participant? {
         inMeetingRepository.getChatRoom(currentChatId)?.let {
             participants.value?.let { listParticipants ->
                 val peer = listParticipants.filter { participant ->
@@ -1527,10 +1528,8 @@ class InMeetingViewModel @ViewModelInject constructor(
      *
      * In Speaker view, the list of participants should have low res
      * In Grid view, if there is more than 4, low res. Hi res in the opposite case
-     *
-     * @param status if it's Speaker view or Grid view
      */
-    fun updateParticipantResolution(status: String) {
+    fun updateParticipantResolution() {
         logDebug("Changing the resolution of participants when the UI changes")
         participants.value?.let { listParticipants ->
             val iterator = listParticipants.iterator()
