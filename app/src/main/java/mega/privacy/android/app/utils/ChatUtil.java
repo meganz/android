@@ -17,6 +17,7 @@ import android.content.pm.ActivityInfo;
 import android.content.res.Resources;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.widget.SwitchCompat;
+import androidx.core.content.ContextCompat;
 
 import android.media.AudioAttributes;
 import android.media.AudioFocusRequest;
@@ -109,6 +110,7 @@ public class ChatUtil {
     private static final int RETENTION_TIME_DIALOG_OPTION_WEEK = 2;
     private static final int RETENTION_TIME_DIALOG_OPTION_MONTH = 3;
     private static final int RETENTION_TIME_DIALOG_OPTION_CUSTOM = 4;
+    private static final int PADDING_CONTACT_STATUS_ICON = 2;
 
     /**
      * Where is the status icon placed, according to the design,
@@ -570,6 +572,57 @@ public class ChatUtil {
             contactStateIcon.setImageResource(statusImageResId);
         }
     }
+
+    /**
+     * Sets the contact status icon and status text
+     *
+     * @param userStatus       contact's status
+     * @param participantName  view with participant's name
+     * @param contactStateText view in which the status text has to be set
+     * @param where            The status icon image resource is different based on the place where it's placed.
+     * @param outMetrics       DisplayMetrics
+     */
+    public static void setContactStatusParticipantList(int userStatus, TextView participantName, TextView contactStateText, StatusIconLocation where, DisplayMetrics outMetrics) {
+        MegaApplication app = MegaApplication.getInstance();
+
+        int statusImageResId = getIconResourceIdByLocation(app.getApplicationContext(), userStatus, where);
+        if (statusImageResId == 0) {
+            participantName.setCompoundDrawablesWithIntrinsicBounds(null, null, null, null);
+        } else {
+            Drawable drawable = ContextCompat.getDrawable(participantName.getContext(), statusImageResId);
+            participantName.setCompoundDrawablesWithIntrinsicBounds(null, null, drawable, null);
+            participantName.setCompoundDrawablePadding(dp2px(PADDING_CONTACT_STATUS_ICON, outMetrics));
+        }
+
+        if (contactStateText == null) {
+            return;
+        }
+
+        contactStateText.setVisibility(View.VISIBLE);
+
+        switch (userStatus) {
+            case MegaChatApi.STATUS_ONLINE:
+                contactStateText.setText(app.getString(R.string.online_status));
+                break;
+
+            case MegaChatApi.STATUS_AWAY:
+                contactStateText.setText(app.getString(R.string.away_status));
+                break;
+
+            case MegaChatApi.STATUS_BUSY:
+                contactStateText.setText(app.getString(R.string.busy_status));
+                break;
+
+            case MegaChatApi.STATUS_OFFLINE:
+                contactStateText.setText(app.getString(R.string.offline_status));
+                break;
+
+            case MegaChatApi.STATUS_INVALID:
+            default:
+                contactStateText.setVisibility(View.GONE);
+        }
+    }
+
 
     /**
      * Get status icon image resource id by display mode and where the icon is placed.

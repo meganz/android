@@ -325,6 +325,7 @@ public class Constants {
     public static final String INTENT_EXTRA_KEY_CHAT = "chat";
     public static final String INTENT_EXTRA_KEY_TOOL_BAR_TITLE = "aBtitle";
     public static final String INTENT_EXTRA_IS_FROM_MEETING = "extra_is_from_meeting";
+    public static final String INTENT_EXTRA_MEETING_PARTICIPANTS = "participants_in_a_meeting";
 
     public static final int FILE_BROWSER_ADAPTER = 2000;
     public static final int CONTACT_FILE_ADAPTER = 2001;

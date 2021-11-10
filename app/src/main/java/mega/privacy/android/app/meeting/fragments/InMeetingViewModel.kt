@@ -24,12 +24,14 @@ import mega.privacy.android.app.constants.EventConstants.EVENT_UPDATE_CALL
 import mega.privacy.android.app.fragments.homepage.Event
 import mega.privacy.android.app.listeners.EditChatRoomNameListener
 import mega.privacy.android.app.listeners.GetUserEmailListener
+import mega.privacy.android.app.lollipop.controllers.AccountController
 import mega.privacy.android.app.lollipop.controllers.ChatController
 import mega.privacy.android.app.lollipop.listeners.CreateGroupChatWithPublicLink
 import mega.privacy.android.app.meeting.adapter.Participant
 import mega.privacy.android.app.meeting.fragments.InMeetingFragment.Companion.TYPE_IN_GRID_VIEW
 import mega.privacy.android.app.meeting.fragments.InMeetingFragment.Companion.TYPE_IN_SPEAKER_VIEW
 import mega.privacy.android.app.meeting.listeners.*
+import mega.privacy.android.app.objects.PasscodeManagement
 import mega.privacy.android.app.utils.CallUtil
 import mega.privacy.android.app.utils.ChatUtil.getTitleChat
 import mega.privacy.android.app.utils.Constants.*
@@ -1855,19 +1857,6 @@ class InMeetingViewModel @ViewModelInject constructor(
         getOwnPrivileges() == MegaChatRoom.PRIV_MODERATOR
 
     /**
-     * Method for updating a participant's permissions
-     *
-     * @param peerId User handle of a participant
-     * @param listener MegaChatRequestListenerInterface
-     */
-    fun updateChatPermissions(
-        peerId: Long,
-        listener: MegaChatRequestListenerInterface? = null
-    ) {
-        inMeetingRepository.updateChatPermissions(currentChatId, peerId, listener)
-    }
-
-    /**
      * Method for obtaining the bitmap of a participant's avatar
      *
      * @param peerId User handle of a participant
@@ -2001,7 +1990,7 @@ class InMeetingViewModel @ViewModelInject constructor(
             .filter { it.isModerator && it.name.isNotEmpty() }
             .map { it.name }
             .forEach {
-                nameList = if (nameList.isNotEmpty()) "$nameList, $it" else "$it"
+                nameList = if (nameList.isNotEmpty()) "$nameList, $it" else it
             }
 
         return nameList
@@ -2201,5 +2190,52 @@ class InMeetingViewModel @ViewModelInject constructor(
         }
 
         return null
+    }
+
+    /**
+     * Perform the necessary actions when the call is over.
+     * Check if exists another call in progress or on hold
+     */
+    fun checkIfAnotherCallShouldBeShown(passcodeManagement: PasscodeManagement): Boolean {
+        getAnotherCall()?.let {
+            logDebug("Show another call")
+            CallUtil.openMeetingInProgress(
+                MegaApplication.getInstance().applicationContext,
+                it.chatid,
+                false,
+                passcodeManagement
+            )
+            return true
+        }
+
+        return false
+    }
+
+    /**
+     * Method to know if local video is activated
+     *
+     * @return True, if it's on. False, if it's off
+     */
+    fun isLocalCameraOn(): Boolean {
+        getCall()?.let {
+            if (it.hasLocalVideo()) return true
+        }
+        return false
+    }
+
+    /**
+     * Method to control when I am a guest and my participation in the meeting ends
+     */
+    fun finishActivityAsGuest(meetingActivity: Context) {
+        val chatId = getChatId()
+        val callId = getCall()?.callId
+        logDebug("Finishing the activity as guest: chatId $chatId, callId $callId")
+        if (chatId != MEGACHAT_INVALID_HANDLE && callId != MEGACHAT_INVALID_HANDLE) {
+            MegaApplication.getChatManagement().controlCallFinished(callId!!, chatId)
+        }
+        AccountController.logout(
+            meetingActivity,
+            MegaApplication.getInstance().megaApi
+        )
     }
 }

@@ -545,4 +545,30 @@ class MeetingActivityViewModel @ViewModelInject constructor(
     fun showSnackBar(content: String) {
         _snackBarLiveData.value = content
     }
+
+    /**
+     * Method for obtaining the bitmap of a participant's avatar
+     *
+     * @param peerId User handle of a participant
+     * @return The bitmap of a participant's avatar
+     */
+    fun getAvatarBitmapByPeerId(peerId: Long): Bitmap? {
+        return meetingActivityRepository.getAvatarBitmapByPeerId(peerId)
+    }
+
+    /**
+     * Method for updating a participant's permissions
+     *
+     * @param userHandle User handle of a participant
+     * @param listener MegaChatRequestListenerInterface
+     */
+    fun updateChatPermissions(
+        userHandle: Long,
+        listener: MegaChatRequestListenerInterface? = null
+    ) {
+        currentChatId.value?.let {
+            meetingActivityRepository.updateChatPermissions(it, userHandle, listener)
+
+        }
+    }
 }

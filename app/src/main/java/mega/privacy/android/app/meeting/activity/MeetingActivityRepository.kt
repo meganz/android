@@ -9,11 +9,11 @@ import kotlinx.coroutines.withContext
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.di.MegaApi
 import mega.privacy.android.app.listeners.BaseListener
+import mega.privacy.android.app.lollipop.controllers.ChatController
 import mega.privacy.android.app.lollipop.megachat.AppRTCAudioManager
 import mega.privacy.android.app.meeting.listeners.IndividualCallVideoListener
-import mega.privacy.android.app.utils.AvatarUtil
-import mega.privacy.android.app.utils.CacheFolderManager
-import mega.privacy.android.app.utils.Constants
+import mega.privacy.android.app.meeting.listeners.MeetingAvatarListener
+import mega.privacy.android.app.utils.*
 import mega.privacy.android.app.utils.FileUtil.JPG_EXTENSION
 import mega.privacy.android.app.utils.LogUtil.logDebug
 import nz.mega.sdk.*
@@ -202,4 +202,62 @@ class MeetingActivityRepository @Inject constructor(
             else -> megaChatApi.getChatRoom(chatId)
         }
     }
+
+    /**
+     * Method for getting a participant's avatar
+     *
+     * @param peerId user handle of participant
+     */
+    fun getAvatarBitmapByPeerId(peerId: Long): Bitmap? {
+        var bitmap: Bitmap?
+        val mail = ChatController(context).getParticipantEmail(peerId)
+
+        val userHandleString = MegaApiAndroid.userHandleToBase64(peerId)
+        val myUserHandleEncoded = MegaApiAndroid.userHandleToBase64(megaApi.myUserHandleBinary)
+        bitmap = if (userHandleString == myUserHandleEncoded) {
+            AvatarUtil.getAvatarBitmap(mail)
+        } else {
+            if (TextUtil.isTextEmpty(mail)) AvatarUtil.getAvatarBitmap(userHandleString) else AvatarUtil.getUserAvatar(
+                userHandleString,
+                mail
+            )
+        }
+
+        if (bitmap == null) {
+            megaApi.getUserAvatar(
+                mail,
+                CacheFolderManager.buildAvatarFile(
+                    context,
+                    mail + JPG_EXTENSION
+                ).absolutePath, MeetingAvatarListener(context, peerId)
+            )
+            bitmap = CallUtil.getDefaultAvatarCall(
+                MegaApplication.getInstance().applicationContext,
+                peerId
+            )
+        }
+
+        return bitmap
+    }
+
+    /**
+     * Give moderator permissions to a call participant.
+     *
+     * @param chatId Chat ID of the call
+     * @param userHandle user handle of a participant
+     * @param listener MegaChatRequestListenerInterface
+     */
+    fun updateChatPermissions(
+        chatId: Long,
+        userHandle: Long,
+        listener: MegaChatRequestListenerInterface?
+    ) {
+        megaChatApi.updateChatPermissions(
+            chatId,
+            userHandle,
+            MegaChatRoom.PRIV_MODERATOR,
+            listener
+        )
+    }
+
 }
