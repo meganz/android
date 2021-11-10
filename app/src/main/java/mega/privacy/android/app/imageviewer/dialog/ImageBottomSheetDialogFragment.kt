@@ -113,6 +113,7 @@ class ImageBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
 
                 startActivity(intent)
             }
+            optionInfo.isVisible = !node.isPublic
 
             // Favorite
             val favoriteText = if (node.isFavourite) R.string.file_properties_unfavourite else R.string.file_properties_favourite
@@ -143,7 +144,7 @@ class ImageBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
             }
 
             // Open with
-            optionOpenWith.isVisible = !nodeItem.isFromRubbishBin
+            optionOpenWith.isVisible = !nodeItem.isFromRubbishBin && !node.isPublic
             optionOpenWith.setOnClickListener {
                 ModalBottomSheetUtil.openWith(requireContext(), node)
             }
@@ -163,7 +164,7 @@ class ImageBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
             }
 
             // Offline
-            optionOfflineLayout.isVisible = !nodeItem.isFromRubbishBin
+            optionOfflineLayout.isVisible = !nodeItem.isFromRubbishBin && !node.isPublic
             switchOffline.isChecked = nodeItem.isAvailableOffline
             switchOffline.setOnCheckedChangeListener { _, _ ->
                 viewModel.setNodeAvailableOffline(
@@ -213,7 +214,7 @@ class ImageBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
             }
 
             // Share
-            optionShare.isVisible = nodeItem.hasFullAccess && !nodeItem.isFromRubbishBin
+            optionShare.isVisible = !nodeItem.isFromRubbishBin
             optionShare.setOnClickListener {
                 viewModel.shareNode(node.handle).observe(viewLifecycleOwner) { link ->
                     MegaNodeUtil.startShareIntent(requireContext(), Intent(Intent.ACTION_SEND), link)
@@ -236,7 +237,6 @@ class ImageBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
                 }
 
                 startActivityForResult(intent, REQUEST_CODE_SELECT_FOLDER_TO_MOVE)
-                dismiss()
             }
 
             // Copy
@@ -248,7 +248,6 @@ class ImageBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
                 }
 
                 startActivityForResult(intent, REQUEST_CODE_SELECT_FOLDER_TO_COPY)
-                dismiss()
             }
 
             // Restore
@@ -291,6 +290,7 @@ class ImageBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
             }
 
             // Separators
+            separatorOpen.isVisible = optionOpenWith.isVisible
             separatorLabel.isVisible = optionLabelLayout.isVisible
             separatorOpen.isVisible = optionOpenWith.isVisible
             separatorOffline.isVisible = optionOfflineLayout.isVisible

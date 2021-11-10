@@ -1709,6 +1709,14 @@ object MegaNodeUtil {
         this.isFile && (MimeTypeList.typeForName(name).isVideoReproducible ||
                 MimeTypeList.typeForName(name).isMp4Video)
 
+    fun MegaNode.getLastAvailableTime(): Long =
+        when {
+            creationTime > 1 -> creationTime
+            modificationTime > 1 -> modificationTime
+            publicLinkCreationTime > 1 -> publicLinkCreationTime
+            else -> INVALID_VALUE.toLong()
+        }
+
     @JvmStatic
     fun MegaNode.isValidForImageViewer(): Boolean =
         isImage() || isGif() || isVideo()

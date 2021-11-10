@@ -13,6 +13,7 @@ import mega.privacy.android.app.listeners.OptionalMegaRequestListenerInterface
 import mega.privacy.android.app.usecase.data.MegaNodeItem
 import mega.privacy.android.app.utils.*
 import mega.privacy.android.app.utils.ErrorUtils.toThrowable
+import mega.privacy.android.app.utils.MegaNodeUtil.getLastAvailableTime
 import mega.privacy.android.app.utils.MegaNodeUtil.getRootParentNode
 import mega.privacy.android.app.utils.RxUtil.blockingGetOrNull
 import nz.mega.sdk.MegaApiAndroid
@@ -40,7 +41,7 @@ class GetNodeUseCase @Inject constructor(
             requireNotNull(node)
 
             val nodeSizeText = Util.getSizeString(node.size)
-            val nodeDateText = TimeUtils.formatLongDateTime(node.creationTime)
+            val nodeDateText = TimeUtils.formatLongDateTime(node.getLastAvailableTime())
             val infoText = TextUtil.getFileInfo(nodeSizeText, nodeDateText)
 
             val nodeAccess = megaApi.getAccess(node)
