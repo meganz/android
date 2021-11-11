@@ -17,15 +17,51 @@ class MediaMegaPlayer(player: ExoPlayer) : ForwardingPlayer(player) {
      */
     private var initRepeatMode = true
 
-    override fun seekTo(windowIndex: Int, positionMs: Long) {
+    override fun play() {
         if (canProceed()) {
-            super.seekTo(windowIndex, positionMs)
+            super.play()
         }
     }
 
     override fun setPlayWhenReady(playWhenReady: Boolean) {
         if (canProceed()) {
             super.setPlayWhenReady(playWhenReady)
+        }
+    }
+
+    override fun seekTo(positionMs: Long) {
+        if (canProceed()) {
+            super.seekTo(positionMs)
+        }
+    }
+
+    override fun seekTo(windowIndex: Int, positionMs: Long) {
+        if (canProceed()) {
+            super.seekTo(windowIndex, positionMs)
+        }
+    }
+
+    override fun seekBack() {
+        if (canProceed()) {
+            super.seekBack()
+        }
+    }
+
+    override fun seekForward() {
+        if (canProceed()) {
+            super.seekForward()
+        }
+    }
+
+    override fun seekToPrevious() {
+        if (canProceed()) {
+            super.seekToPrevious()
+        }
+    }
+
+    override fun seekToNext() {
+        if (canProceed()) {
+            super.seekToNext()
         }
     }
 
