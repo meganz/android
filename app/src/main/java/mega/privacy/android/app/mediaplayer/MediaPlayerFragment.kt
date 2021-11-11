@@ -153,7 +153,7 @@ class MediaPlayerFragment : Fragment() {
     override fun onDestroy() {
         super.onDestroy()
 
-        playerService?.exoPlayer?.removeListener(playerListener)
+        playerService?.player?.removeListener(playerListener)
         playerService = null
         requireContext().unbindService(connection)
     }
@@ -206,7 +206,7 @@ class MediaPlayerFragment : Fragment() {
         if (MediaPlayerActivity.isAudioPlayer(activity?.intent)) {
             val viewHolder = audioPlayerVH ?: return
 
-            setupPlayerView(service.exoPlayer, viewHolder.binding.playerView, false)
+            setupPlayerView(service.player, viewHolder.binding.playerView, false)
             viewHolder.layoutArtwork()
             service.metadata.observe(viewLifecycleOwner, viewHolder::displayMetadata)
 
@@ -216,7 +216,7 @@ class MediaPlayerFragment : Fragment() {
         } else {
             val viewHolder = videoPlayerVH ?: return
 
-            setupPlayerView(service.exoPlayer, viewHolder.binding.playerView, true)
+            setupPlayerView(service.player, viewHolder.binding.playerView, true)
             service.metadata.observe(viewLifecycleOwner, viewHolder::displayMetadata)
 
             // we need setup control buttons again, because reset player would reset
@@ -267,7 +267,7 @@ class MediaPlayerFragment : Fragment() {
         }
 
         updateLoadingAnimation(player.playbackState)
-        player.addListener(playerListener)
+        player.wrappedPlayer.addListener(playerListener)
     }
 
     private fun updateLoadingAnimation(@Player.State playbackState: Int) {

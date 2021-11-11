@@ -58,7 +58,7 @@ open class MediaPlayerService : LifecycleService(), LifecycleObserver {
     lateinit var viewModel: MediaPlayerServiceViewModel
 
     private lateinit var trackSelector: DefaultTrackSelector
-    lateinit var exoPlayer: MediaMegaPlayer
+    lateinit var player: MediaMegaPlayer
         private set
     private var playerNotificationManager: PlayerNotificationManager? = null
     private var notificationDismissed = false
@@ -90,7 +90,7 @@ open class MediaPlayerService : LifecycleService(), LifecycleObserver {
         OnAudioFocusChangeListener { focusChange ->
             when (focusChange) {
                 AudioManager.AUDIOFOCUS_LOSS, AudioManager.AUDIOFOCUS_LOSS_TRANSIENT -> {
-                    if (exoPlayer.playWhenReady) {
+                    if (player.playWhenReady) {
                         setPlayWhenReady(false)
                         needPlayWhenGoForeground = false
                         needPlayWhenReceiveResumeCommand = false
@@ -117,90 +117,94 @@ open class MediaPlayerService : LifecycleService(), LifecycleObserver {
         trackSelector = DefaultTrackSelector(this)
         val renderersFactory = DefaultRenderersFactory(this)
             .setExtensionRendererMode(DefaultRenderersFactory.EXTENSION_RENDERER_MODE_ON)
-        exoPlayer = MediaMegaPlayer(
-            SimpleExoPlayer.Builder(this, renderersFactory)
-                .setTrackSelector(trackSelector)
-                .setSeekBackIncrementMs(INCREMENT_TIME_IN_MS)
-        )
 
-        exoPlayer.addListener(MetadataExtractor(trackSelector) { title, artist, album ->
-            val nodeName =
-                viewModel.getPlaylistItem(exoPlayer.currentMediaItem?.mediaId)?.nodeName ?: ""
-            _metadata.value = Metadata(title, artist, album, nodeName)
+        val exoPlayer = ExoPlayer.Builder(this, renderersFactory)
+            .setTrackSelector(trackSelector)
+            .setSeekBackIncrementMs(INCREMENT_TIME_IN_MS)
+            .build().apply {
+                addListener(MetadataExtractor { title, artist, album ->
+                    val nodeName =
+                        viewModel.getPlaylistItem(player.currentMediaItem?.mediaId)?.nodeName
+                            ?: ""
+                    _metadata.value = Metadata(title, artist, album, nodeName)
 
-            playerNotificationManager?.invalidate()
-        })
+                    playerNotificationManager?.invalidate()
+                })
 
-        exoPlayer.shuffleModeEnabled = viewModel.shuffleEnabled()
-        exoPlayer.repeatMode = viewModel.repeatMode()
+                shuffleModeEnabled = viewModel.shuffleEnabled()
+                repeatMode = viewModel.repeatMode()
 
-        exoPlayer.addListener(object : Player.Listener {
-            override fun onMediaItemTransition(mediaItem: MediaItem?, reason: Int) {
-                val handle = mediaItem?.mediaId ?: return
-                viewModel.playingHandle = handle.toLong()
+                addListener(object : Player.Listener {
+                    override fun onMediaItemTransition(mediaItem: MediaItem?, reason: Int) {
+                        val handle = mediaItem?.mediaId ?: return
+                        viewModel.playingHandle = handle.toLong()
 
-                if (reason != Player.MEDIA_ITEM_TRANSITION_REASON_PLAYLIST_CHANGED) {
-                    val nodeName = viewModel.getPlaylistItem(handle)?.nodeName ?: ""
-                    _metadata.value = Metadata(null, null, null, nodeName)
-                }
-            }
-
-            override fun onShuffleModeEnabledChanged(shuffleModeEnabled: Boolean) {
-                viewModel.setShuffleEnabled(shuffleModeEnabled)
-
-                if (shuffleModeEnabled) {
-                    exoPlayer.setShuffleOrder(viewModel.newShuffleOrder())
-                }
-            }
-
-            override fun onRepeatModeChanged(repeatMode: Int) {
-                viewModel.setRepeatMode(repeatMode)
-            }
-
-            override fun onPlayWhenReadyChanged(playWhenReady: Boolean, reason: Int) {
-                viewModel.paused = !playWhenReady
-
-                if (playWhenReady && notificationDismissed) {
-                    playerNotificationManager?.setPlayer(exoPlayer)
-                    notificationDismissed = false
-                }
-
-                if (playWhenReady) {
-                    if (viewModel.audioPlayer) {
-                        pauseVideoPlayer(this@MediaPlayerService)
-                    } else {
-                        pauseAudioPlayer(this@MediaPlayerService)
+                        if (reason != Player.MEDIA_ITEM_TRANSITION_REASON_PLAYLIST_CHANGED) {
+                            val nodeName = viewModel.getPlaylistItem(handle)?.nodeName ?: ""
+                            _metadata.value = Metadata(null, null, null, nodeName)
+                        }
                     }
-                }
-            }
 
-            override fun onPlaybackStateChanged(state: Int) {
-                when {
-                    state == Player.STATE_ENDED && !viewModel.paused -> {
-                        viewModel.paused = true
+                    override fun onShuffleModeEnabledChanged(shuffleModeEnabled: Boolean) {
+                        viewModel.setShuffleEnabled(shuffleModeEnabled)
+
+                        if (shuffleModeEnabled) {
+                            setShuffleOrder(viewModel.newShuffleOrder())
+                        }
                     }
-                    state == Player.STATE_READY && viewModel.paused && exoPlayer.playWhenReady -> {
-                        viewModel.paused = false
+
+                    override fun onRepeatModeChanged(repeatMode: Int) {
+                        viewModel.setRepeatMode(repeatMode)
                     }
-                }
+
+                    override fun onPlayWhenReadyChanged(playWhenReady: Boolean, reason: Int) {
+                        viewModel.paused = !playWhenReady
+
+                        if (playWhenReady && notificationDismissed) {
+                            playerNotificationManager?.setPlayer(player)
+                            notificationDismissed = false
+                        }
+
+                        if (playWhenReady) {
+                            if (viewModel.audioPlayer) {
+                                pauseVideoPlayer(this@MediaPlayerService)
+                            } else {
+                                pauseAudioPlayer(this@MediaPlayerService)
+                            }
+                        }
+                    }
+
+                    override fun onPlaybackStateChanged(state: Int) {
+                        when {
+                            state == Player.STATE_ENDED && !viewModel.paused -> {
+                                viewModel.paused = true
+                            }
+                            state == Player.STATE_READY && viewModel.paused && player.playWhenReady -> {
+                                viewModel.paused = false
+                            }
+                        }
+                    }
+
+                    override fun onPlayerError(error: PlaybackException) {
+                        viewModel.onPlayerError()
+                    }
+                })
+
+                addAnalyticsListener(object :
+                    EventLogger(this@MediaPlayerService.trackSelector, "MediaPlayer") {
+                    override fun logd(msg: String) {
+                        logDebug(msg)
+                    }
+
+                    override fun loge(msg: String) {
+                        logError(msg)
+                    }
+                })
+
+                setShuffleOrder(viewModel.shuffleOrder)
             }
 
-            override fun onPlayerError(error: PlaybackException) {
-                viewModel.onPlayerError()
-            }
-        })
-
-        exoPlayer.addAnalyticsListener(object : EventLogger(trackSelector, "MediaPlayer") {
-            override fun logd(msg: String) {
-                logDebug(msg)
-            }
-
-            override fun loge(msg: String) {
-                logError(msg)
-            }
-        })
-
-        exoPlayer.setShuffleOrder(viewModel.shuffleOrder)
+        player = MediaMegaPlayer(exoPlayer)
     }
 
     private fun createPlayerControlNotification() {
@@ -273,7 +277,7 @@ open class MediaPlayerService : LifecycleService(), LifecycleObserver {
             setUseNextActionInCompactView(true)
             setUsePreviousActionInCompactView(true)
 
-            setPlayer(exoPlayer)
+            setPlayer(player)
         }
     }
 
@@ -327,14 +331,14 @@ open class MediaPlayerService : LifecycleService(), LifecycleObserver {
         viewModel.playerSource.observe(this, Observer { playSource(it.first, it.second, it.third) })
 
         viewModel.mediaItemToRemove.observe(this, Observer {
-            if (it < exoPlayer.mediaItemCount) {
-                val nextIndex = exoPlayer.nextWindowIndex
+            if (it < player.mediaItemCount) {
+                val nextIndex = player.nextMediaItemIndex
                 if (nextIndex != C.INDEX_UNSET) {
-                    val nextItem = exoPlayer.getMediaItemAt(nextIndex)
+                    val nextItem = player.getMediaItemAt(nextIndex)
                     val nodeName = viewModel.getPlaylistItem(nextItem.mediaId)?.nodeName ?: ""
                     _metadata.value = Metadata(null, null, null, nodeName)
                 }
-                exoPlayer.removeMediaItem(it)
+                player.removeMediaItem(it)
             }
         })
 
@@ -348,8 +352,8 @@ open class MediaPlayerService : LifecycleService(), LifecycleObserver {
         })
 
         viewModel.retry.observe(this, Observer {
-            if (it && exoPlayer.playbackState == Player.STATE_IDLE) {
-                exoPlayer.prepare()
+            if (it && player.playbackState == Player.STATE_IDLE) {
+                player.prepare()
             }
         })
     }
@@ -374,22 +378,22 @@ open class MediaPlayerService : LifecycleService(), LifecycleObserver {
         }
 
         if (newIndexForCurrentItem == INVALID_VALUE) {
-            exoPlayer.setMediaItems(mediaItems)
+            player.setMediaItems(mediaItems)
         } else {
-            val oldIndexForCurrentItem = exoPlayer.currentWindowIndex
-            val oldItemsCount = exoPlayer.mediaItemCount
+            val oldIndexForCurrentItem = player.currentMediaItemIndex
+            val oldItemsCount = player.mediaItemCount
             if (oldIndexForCurrentItem != oldItemsCount - 1) {
-                exoPlayer.removeMediaItems(oldIndexForCurrentItem + 1, oldItemsCount)
+                player.removeMediaItems(oldIndexForCurrentItem + 1, oldItemsCount)
             }
             if (oldIndexForCurrentItem != 0) {
-                exoPlayer.removeMediaItems(0, oldIndexForCurrentItem)
+                player.removeMediaItems(0, oldIndexForCurrentItem)
             }
 
             if (newIndexForCurrentItem != 0) {
-                exoPlayer.addMediaItems(0, mediaItems.subList(0, newIndexForCurrentItem))
+                player.addMediaItems(0, mediaItems.subList(0, newIndexForCurrentItem))
             }
             if (newIndexForCurrentItem != mediaItems.size - 1) {
-                exoPlayer.addMediaItems(
+                player.addMediaItems(
                     mediaItems.subList(newIndexForCurrentItem + 1, mediaItems.size)
                 )
             }
@@ -399,7 +403,7 @@ open class MediaPlayerService : LifecycleService(), LifecycleObserver {
             setPlayWhenReady(true)
         }
 
-        exoPlayer.prepare()
+        player.prepare()
     }
 
     override fun onDestroy() {
@@ -416,7 +420,7 @@ open class MediaPlayerService : LifecycleService(), LifecycleObserver {
         }
 
         playerNotificationManager?.setPlayer(null)
-        exoPlayer.release()
+        player.release()
     }
 
     fun mainPlayerUIClosed() {
@@ -426,7 +430,7 @@ open class MediaPlayerService : LifecycleService(), LifecycleObserver {
     }
 
     fun stopAudioPlayer() {
-        exoPlayer.stop()
+        player.stop()
 
         if (viewModel.audioPlayer) {
             MiniAudioPlayerController.notifyAudioPlayerPlaying(false)
@@ -437,17 +441,17 @@ open class MediaPlayerService : LifecycleService(), LifecycleObserver {
 
     fun setPlayWhenReady(playWhenReady: Boolean) {
         if (!playWhenReady) {
-            exoPlayer.playWhenReady = false
+            player.playWhenReady = false
         } else if (CallUtil.participatingInACall()) {
             LiveEventBus.get(EVENT_NOT_ALLOW_PLAY, Boolean::class.java)
                 .post(true)
         } else {
-            exoPlayer.playWhenReady = true
+            player.playWhenReady = true
         }
     }
 
     fun seekTo(index: Int) {
-        exoPlayer.seekTo(index, 0)
+        player.seekTo(index, 0)
         viewModel.resetRetryState()
     }
 
@@ -467,7 +471,7 @@ open class MediaPlayerService : LifecycleService(), LifecycleObserver {
         }
     }
 
-    fun playing() = exoPlayer.playWhenReady && exoPlayer.playbackState != Player.STATE_ENDED
+    fun playing() = player.playWhenReady && player.playbackState != Player.STATE_ENDED
 
     companion object {
         private const val INCREMENT_TIME_IN_MS = 15000L

@@ -54,7 +54,7 @@ class MiniAudioPlayerController constructor(
             if (service is MediaPlayerServiceBinder) {
                 playerService = service.service
 
-                setupPlayerView(service.service.exoPlayer)
+                setupPlayerView(service.service.player)
                 service.service.metadata.observeForever(metadataObserver)
 
                 if (visible()) {
@@ -107,7 +107,7 @@ class MiniAudioPlayerController constructor(
     fun onResume() {
         val service = playerService
         if (service != null) {
-            setupPlayerView(service.exoPlayer)
+            setupPlayerView(service.player)
         }
         playerView.onResume()
     }

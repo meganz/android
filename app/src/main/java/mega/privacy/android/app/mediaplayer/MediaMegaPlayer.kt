@@ -1,7 +1,8 @@
 package mega.privacy.android.app.mediaplayer
 
+import com.google.android.exoplayer2.ExoPlayer
+import com.google.android.exoplayer2.ForwardingPlayer
 import com.google.android.exoplayer2.Player
-import com.google.android.exoplayer2.SimpleExoPlayer
 import com.jeremyliao.liveeventbus.LiveEventBus
 import mega.privacy.android.app.utils.CallUtil
 import mega.privacy.android.app.utils.Constants.EVENT_NOT_ALLOW_PLAY
@@ -9,7 +10,7 @@ import mega.privacy.android.app.utils.Constants.EVENT_NOT_ALLOW_PLAY
 /**
  * Player which customized some behaviours in relation to the app needs.
  */
-class MediaMegaPlayer(builder: Builder) : SimpleExoPlayer(builder) {
+class MediaMegaPlayer(player: ExoPlayer) : ForwardingPlayer(player) {
 
     /**
      * Used to identify the first initialization of repeatMode.

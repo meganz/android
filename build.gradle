@@ -86,4 +86,5 @@ ext {
     truthVersion = '1.1.3'
     androidxTestExtVersion = '1.1.3'
     biometricVersion = '1.1.0'
+    exoPlayerVersion = '2.16.0'
 }

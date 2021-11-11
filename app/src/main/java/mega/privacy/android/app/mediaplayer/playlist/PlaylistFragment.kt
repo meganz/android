@@ -45,7 +45,7 @@ class PlaylistFragment : Fragment(), PlaylistItemOperation {
                 playerService = service.service
 
                 if (service.service.viewModel.audioPlayer) {
-                    setupPlayerView(service.service.exoPlayer)
+                    setupPlayerView(service.service.player)
                 } else {
                     binding.playerView.isVisible = false
 

@@ -1,37 +1,27 @@
 package mega.privacy.android.app.mediaplayer.service
 
 import com.google.android.exoplayer2.Player
+import com.google.android.exoplayer2.TracksInfo
 import com.google.android.exoplayer2.metadata.Metadata
 import com.google.android.exoplayer2.metadata.id3.TextInformationFrame
-import com.google.android.exoplayer2.source.TrackGroupArray
-import com.google.android.exoplayer2.trackselection.MappingTrackSelector
-import com.google.android.exoplayer2.trackselection.TrackSelectionArray
 
 /**
  * This class will receive metadata from ExoPlayer.
  * */
 class MetadataExtractor(
-    private val trackSelector: MappingTrackSelector,
     private val callback: (String?, String?, String?) -> Unit
 ) : Player.Listener {
-    override fun onTracksChanged(
-        trackGroups: TrackGroupArray,
-        trackSelections: TrackSelectionArray
-    ) {
-        super.onTracksChanged(trackGroups, trackSelections)
 
-        val mappedTrackInfo = trackSelector.currentMappedTrackInfo ?: return
+    override fun onTracksInfoChanged(tracksInfo: TracksInfo) {
+        super.onTracksInfoChanged(tracksInfo)
 
-        for (rendererIndex in 0 until mappedTrackInfo.rendererCount) {
-            val trackSelection = trackSelections[rendererIndex] ?: continue
 
-            for (selectionIndex in 0 until trackSelection.length()) {
-                val metadata = trackSelection.getFormat(selectionIndex).metadata
+        for (trackGroupInfo in tracksInfo.trackGroupInfos) {
+            for (i in 0 until trackGroupInfo.trackGroup.length) {
+                val metadata = trackGroupInfo.trackGroup.getFormat(i).metadata ?: continue
 
-                if (metadata != null) {
-                    extractMetadata(metadata)
-                    return
-                }
+                extractMetadata(metadata)
+                return
             }
         }
 
