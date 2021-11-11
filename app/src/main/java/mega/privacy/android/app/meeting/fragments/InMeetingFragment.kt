@@ -2084,8 +2084,6 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
         //Observer the participant List
         inMeetingViewModel.participants.observe(viewLifecycleOwner) { participants ->
             participants?.let {
-                logDebug("****************** InMeetingFragment:: inMeetingViewModel.participants.observe:: participants ${participants.size}")
-
                 updatePanelParticipantList(it.toMutableList())
 
                 // Check current the count of participants
