@@ -88,6 +88,8 @@ import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.FileUtil.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.MegaApiUtils.*;
+import static mega.privacy.android.app.utils.MegaNodeDialogUtil.ACTION_BACKUP_MOVE;
+import static mega.privacy.android.app.utils.MegaNodeDialogUtil.ACTION_BACKUP_REMOVE;
 import static mega.privacy.android.app.utils.MegaNodeDialogUtil.showConfirmDialogWithBackup;
 import static mega.privacy.android.app.utils.MegaNodeDialogUtil.showTipDialogWithBackup;
 import static mega.privacy.android.app.utils.MegaNodeUtil.allHaveOwnerAccess;
@@ -95,6 +97,7 @@ import static mega.privacy.android.app.utils.MegaNodeUtil.checkBackupNodeByHandl
 import static mega.privacy.android.app.utils.MegaNodeUtil.checkSubBackupNodeByHandle;
 import static mega.privacy.android.app.utils.MegaNodeUtil.manageTextFileIntent;
 import static mega.privacy.android.app.utils.MegaNodeUtil.manageURLNode;
+import static mega.privacy.android.app.utils.MegaNodeUtil.myBackupHandle;
 import static mega.privacy.android.app.utils.TimeUtils.*;
 import static mega.privacy.android.app.utils.Util.*;
 
@@ -204,11 +207,11 @@ public class FileBrowserFragmentLollipop extends RotatableFragment{
 					boolean isSubBackup = checkSubBackupNodeByHandle(megaApi, handleList);
 					// Show the warning dialog if the list including Backup node
 					if(pNode != null){
-						showWarningOfMove(handleList, pNode, true, false);
+						showWarningOfMove(handleList, pNode, true, ACTION_BACKUP_MOVE);
 					} else if(isSubBackup){
 						Long handle = handleList.get(0);
 						MegaNode p = megaApi.getNodeByHandle(handle);
-						showWarningOfMove(handleList, p, false, false);
+						showWarningOfMove(handleList, p, false, ACTION_BACKUP_MOVE);
 					} else {
 						NodeController nC = new NodeController(context);
 						nC.chooseLocationToMoveNodes(handleList);
@@ -1301,9 +1304,9 @@ public class FileBrowserFragmentLollipop extends RotatableFragment{
 	 * @param handleList handleList handles list of the nodes that selected
 	 * @param pNodeBackup the node of "My backup"
 	 * @param isRootBackup true - "My backup" folder / false - sub folders or files
-	 * @param toRubbish true - delete / false - move
+	 * @param actionType Indicates the action (move / remove/ add / new folder / new file)
 	 */
-	private void showWarningOfMove(final ArrayList<Long> handleList, MegaNode pNodeBackup, boolean isRootBackup, boolean toRubbish) {
+	private void showWarningOfMove(final ArrayList<Long> handleList, MegaNode pNodeBackup, boolean isRootBackup, int actionType) {
 		showTipDialogWithBackup(mActivity, new ActionBackupNodeCallback() {
 
 					@Override
@@ -1313,19 +1316,19 @@ public class FileBrowserFragmentLollipop extends RotatableFragment{
 					}
 
 					@Override
-					public void actionExecute(@NotNull ArrayList<Long> handleList, @NotNull MegaNode pNodeBackup, boolean isRootBackup, boolean toRubbish) {
+					public void actionExecute(@NotNull ArrayList<Long> handleList, @NotNull MegaNode pNodeBackup, boolean isRootBackup, int actionType) {
 
 					}
 
 					@Override
-					public void actionConfirmed(@NonNull ArrayList<Long> handleList, @NonNull MegaNode pNodeBackup, boolean isRootBackup, boolean toRubbish) {
-						confirmationMove(handleList, pNodeBackup, isRootBackup, toRubbish);
+					public void actionConfirmed(@org.jetbrains.annotations.Nullable ArrayList<Long> handleList, @NotNull MegaNode pNodeBackup, boolean isRootBackup, int actionType) {
+						confirmationMove(handleList, pNodeBackup, isRootBackup, actionType);
 					}
 				},
 				handleList,
 				pNodeBackup,
 				isRootBackup,
-				toRubbish
+				actionType
 		);
 	}
 
@@ -1335,9 +1338,9 @@ public class FileBrowserFragmentLollipop extends RotatableFragment{
 	 * @param handleList handleList handles list of the nodes that selected
 	 * @param pNodeBackup the node of "My backup"
 	 * @param isRootBackup true - "My backup" folder / false - sub folders or files
-	 * @param toRubbish true - delete / false - move
+	 * @param actionType Indicates the action (move / remove/ add / new folder / new file)
 	 */
-	private void confirmationMove(final ArrayList<Long> handleList, MegaNode pNodeBackup, boolean isRootBackup, boolean toRubbish) {
+	private void confirmationMove(final ArrayList<Long> handleList, MegaNode pNodeBackup, boolean isRootBackup, int actionType) {
 		if (handleList != null && pNodeBackup != null) {
 			showConfirmDialogWithBackup(this.mActivity, new ActionBackupNodeCallback() {
 						@Override
@@ -1347,8 +1350,8 @@ public class FileBrowserFragmentLollipop extends RotatableFragment{
 						}
 
 						@Override
-						public void actionExecute(@NotNull ArrayList<Long> handleList, @NotNull MegaNode pNodeBackup, boolean isRootBackup, boolean toRubbish) {
-							if (toRubbish) {
+						public void actionExecute( ArrayList<Long> handleList, @NotNull MegaNode pNodeBackup, boolean isRootBackup, int actionType) {
+							if (actionType == ACTION_BACKUP_REMOVE) {
 								return;
 							} else {
 								NodeController nC = new NodeController(context);
@@ -1359,17 +1362,39 @@ public class FileBrowserFragmentLollipop extends RotatableFragment{
 						}
 
 						@Override
-						public void actionConfirmed(@NonNull ArrayList<Long> handleList, @NonNull MegaNode pNodeBackup, boolean isRootBackup, boolean toRubbish) {
+						public void actionConfirmed( ArrayList<Long> handleList, @NotNull MegaNode pNodeBackup, boolean isRootBackup, int actionType) {
 
 						}
 					},
 					handleList,
 					pNodeBackup,
 					isRootBackup,
-					toRubbish
+			 		actionType
 			);
 		} else {
 			logWarning("handleList NULL");
 		}
+	}
+
+	public boolean checkSubBackupNode() {
+		if(nodes != null && nodes.size()>0){
+			MegaNode p = nodes.get(0);
+			while (megaApi.getParentNode(p) != null) {
+				p = megaApi.getParentNode(p);
+				if(p.getHandle() == myBackupHandle){
+					return true;
+				}
+			}
+		}
+		return false;
+	}
+
+	public MegaNode getSubBackupParentNode() {
+		if(nodes != null && nodes.size()>0){
+			MegaNode p = nodes.get(0);
+			p = megaApi.getParentNode(p);
+			return p;
+		}
+		return null;
 	}
 }

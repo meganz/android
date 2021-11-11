@@ -11,20 +11,20 @@ interface ActionBackupNodeCallback {
      * Makes the necessary UI changes after confirm the action.
      */
     fun actionConfirmed(
-        handleList: ArrayList<Long>,
+        handleList: ArrayList<Long>?,
         pNodeBackup: MegaNode,
         isRootBackup: Boolean,
-        toRubbish: Boolean
+        actionType: Int
     )
 
     /**
      * Makes the necessary UI changes after execute the action.
      */
     fun actionExecute(
-        handleList: ArrayList<Long>,
+        handleList: ArrayList<Long>?,
         pNodeBackup: MegaNode,
         isRootBackup: Boolean,
-        toRubbish: Boolean
+        actionType: Int
     )
     /**
      * Makes the necessary UI changes after cancel the action.

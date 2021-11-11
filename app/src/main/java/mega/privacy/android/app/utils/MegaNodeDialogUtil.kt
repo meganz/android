@@ -63,6 +63,14 @@ object MegaNodeDialogUtil {
     private const val ERROR_DIFFERENT_EXTENSION = "ERROR_DIFFERENT_EXTENSION"
     private const val NO_ERROR = "NO_ERROR"
 
+    // For backup node actions
+    const val ACTION_BACK_NONE = -1
+    const val ACTION_BACKUP_MOVE = 0
+    const val ACTION_BACKUP_REMOVE = 1
+    const val ACTION_BACKUP_FAB = 2
+    const val ACTION_BACKUP_ADD = 3
+    const val ACTION_BACKUP_TAKE_PICTURE = 4
+    const val ACTION_BACKUP_NEW_FOLDER = 5
     /**
      * Creates and shows a TYPE_RENAME dialog to rename a node.
      *
@@ -711,16 +719,16 @@ object MegaNodeDialogUtil {
      * @param handleList handleList handles list of the nodes that selected
      * @param pNodeBackup the node of "My backup"
      * @param isRootBackup true - "My backup" folder / false - sub folders or files
-     * @param toRubbish true - delete / false - move
+     * @param actionType Indicates the action (move / remove/ add / new folder / new file)
      */
     @JvmStatic
     fun showTipDialogWithBackup(
         activity: Activity,
         actionBackupNodeCallback: ActionBackupNodeCallback,
-        handleList: ArrayList<Long>,
+        handleList: ArrayList<Long>?,
         pNodeBackup: MegaNode,
         isRootBackup: Boolean,
-        toRubbish: Boolean
+        actionType: Int
     ) {
         val dialogClickListener =
             DialogInterface.OnClickListener { dialog: DialogInterface?, which: Int ->
@@ -730,7 +738,7 @@ object MegaNodeDialogUtil {
                             handleList,
                             pNodeBackup,
                             isRootBackup,
-                            toRubbish
+                            actionType
                         )
                     }
                     BUTTON_NEGATIVE -> {
@@ -743,37 +751,47 @@ object MegaNodeDialogUtil {
         val tvTitle = view.findViewById<TextView>(R.id.title)
         val tvContent = view.findViewById<TextView>(R.id.backup_tip_content)
         val nodeName = pNodeBackup.name
-        if (isRootBackup) {
-            // Root folder of backup
-            if (toRubbish) {
-                // Move to rubbish bin
-                val displayName = getString(R.string.backup_remove_folder_title, nodeName)
-                tvTitle.text = displayName
-                tvContent.setText(R.string.backup_remove_root_folder)
-            } else {
-                // Move
-                val displayName = getString(R.string.backup_move_folder_title, nodeName)
-                tvTitle.text = displayName
-                tvContent.setText(R.string.backup_move_root_folder)
+        when (actionType) {
+            ACTION_BACKUP_NEW_FOLDER, ACTION_BACKUP_TAKE_PICTURE, ACTION_BACKUP_ADD, ACTION_BACKUP_FAB -> {
+                tvTitle.text = getString(R.string.backup_add_item_title)
+                tvContent.setText(R.string.backup_add_item_text)
             }
-        } else {
-            // Sub folder of backup
-            if (toRubbish) {
-                // Move to rubbish bin
-                tvTitle.text  = if(handleList.size == 1) {
-                    getString(R.string.backup_remove_folder_title, nodeName)
+            ACTION_BACKUP_MOVE -> {
+                if (isRootBackup) {
+                    // Move root folder of backup
+                    val displayName = getString(R.string.backup_move_folder_title, nodeName)
+                    tvTitle.text = displayName
+                    tvContent.setText(R.string.backup_move_root_folder)
+
                 } else {
-                    getString(R.string.backup_remove_multiple_folder_title)
+                    // Move sub folder of backup
+                    if (handleList != null) {
+                        tvTitle.text = if (handleList.size == 1) {
+                            getString(R.string.backup_move_folder_title, nodeName)
+                        } else {
+                            getString(R.string.backup_move_multiple_folder_title)
+                        }
+                    }
+                    tvContent.setText(R.string.backup_move_sub_folder)
                 }
-                tvContent.setText(R.string.backup_remove_sub_folder)
-            } else {
-                // Move
-                tvTitle.text  = if(handleList.size == 1) {
-                    getString(R.string.backup_move_folder_title, nodeName)
+            }
+            ACTION_BACKUP_REMOVE -> {
+                if (isRootBackup) {
+                    // Move root folder of backup to rubbish bin
+                    val displayName = getString(R.string.backup_remove_folder_title, nodeName)
+                    tvTitle.text = displayName
+                    tvContent.setText(R.string.backup_remove_root_folder)
                 } else {
-                    getString(R.string.backup_move_multiple_folder_title)
+                    // Move sub folder of backup to rubbish bin
+                    if (handleList != null) {
+                        tvTitle.text = if (handleList.size == 1) {
+                            getString(R.string.backup_remove_folder_title, nodeName)
+                        } else {
+                            getString(R.string.backup_remove_multiple_folder_title)
+                        }
+                    }
+                    tvContent.setText(R.string.backup_remove_sub_folder)
                 }
-                tvContent.setText(R.string.backup_move_sub_folder)
             }
         }
         val builder = MaterialAlertDialogBuilder(activity)
@@ -790,16 +808,17 @@ object MegaNodeDialogUtil {
      * @param handleList handleList handles list of the nodes that selected
      * @param pNodeBackup the node of "My backup"
      * @param isRootBackup true - "My backup" folder / false - sub folders or files
-     * @param toRubbish true - delete / false - move
+     * @param actionType Indicates the action (move / remove/ add / new folder / new file)
      */
     @JvmStatic
-    fun showConfirmDialogWithBackup(activity: Activity,
-                         actionBackupNodeCallback: ActionBackupNodeCallback,
-                         handleList: ArrayList<Long>,
-                         pNodeBackup: MegaNode,
-                         isRootBackup: Boolean,
-                         toRubbish: Boolean)
-    {
+    fun showConfirmDialogWithBackup(
+        activity: Activity,
+        actionBackupNodeCallback: ActionBackupNodeCallback,
+        handleList: ArrayList<Long>?,
+        pNodeBackup: MegaNode,
+        isRootBackup: Boolean,
+        actionType: Int
+    ) {
         val layout: LayoutInflater = activity.layoutInflater
         val view = layout.inflate(R.layout.dialog_backup_remove_confirm, null)
         val tvTitle = view.findViewById<TextView>(R.id.title)
@@ -815,30 +834,41 @@ object MegaNodeDialogUtil {
         })
 
         val nodeName = pNodeBackup.name
-        if (isRootBackup) {
-            // Root folder of backup
-            if (toRubbish) {
-                // Move to rubbish bin
-                tvTitle.text = getString(R.string.backup_remove_folder_title, nodeName)
-            } else {
-                // Move
-                tvTitle.text = getString(R.string.backup_move_folder_title, nodeName)
+
+        when (actionType) {
+            ACTION_BACKUP_NEW_FOLDER, ACTION_BACKUP_TAKE_PICTURE, ACTION_BACKUP_ADD, ACTION_BACKUP_FAB -> {
+                // Add
+                tvTitle.text = getString(R.string.backup_add_confirm_title, nodeName)
             }
-        } else {
-            // Sub folder of backup
-            if (toRubbish) {
-                // Move to rubbish bin
-                tvTitle.text  = if(handleList.size == 1) {
-                    getString(R.string.backup_remove_folder_title, nodeName)
+            ACTION_BACKUP_MOVE -> {
+                if (isRootBackup) {
+                    // Move root folder of backup
+                    tvTitle.text = getString(R.string.backup_move_folder_title, nodeName)
+
                 } else {
-                    getString(R.string.backup_remove_multiple_folder_title)
+                    // Move sub folder of backup
+                    if (handleList != null) {
+                        tvTitle.text = if (handleList.size == 1) {
+                            getString(R.string.backup_move_folder_title, nodeName)
+                        } else {
+                            getString(R.string.backup_move_multiple_folder_title)
+                        }
+                    }
                 }
-            } else {
-                // Move
-                tvTitle.text  = if(handleList.size == 1) {
-                    getString(R.string.backup_move_folder_title, nodeName)
+            }
+            ACTION_BACKUP_REMOVE -> {
+                if (isRootBackup) {
+                    // Move root folder of backup to rubbish bin
+                    tvTitle.text = getString(R.string.backup_remove_folder_title, nodeName)
                 } else {
-                    getString(R.string.backup_move_multiple_folder_title)
+                    // Move sub folder of backup to rubbish bin
+                    if (handleList != null) {
+                        tvTitle.text = if (handleList.size == 1) {
+                            getString(R.string.backup_remove_folder_title, nodeName)
+                        } else {
+                            getString(R.string.backup_remove_multiple_folder_title)
+                        }
+                    }
                 }
             }
         }
@@ -847,6 +877,12 @@ object MegaNodeDialogUtil {
             .setView(view)
             .setPositiveButton(getString(R.string.general_move), null)
             .setNegativeButton(getString(R.string.general_cancel), null)
+
+        if (handleList == null) {
+            builder.setPositiveButton(getString(R.string.general_add), null)
+        } else {
+            builder.setPositiveButton(getString(R.string.general_move), null)
+        }
         val dialog = builder.create()
         dialog.setOnShowListener {
             val button =
@@ -856,10 +892,12 @@ object MegaNodeDialogUtil {
                     Objects.requireNonNull(editText.text)
                         .toString()
                 if (getString(R.string.backup_disable_confirm_text) == strEditText) {
-                    actionBackupNodeCallback.actionExecute(handleList,
+                    actionBackupNodeCallback.actionExecute(
+                        handleList,
                         pNodeBackup,
                         isRootBackup,
-                        toRubbish)
+                        actionType
+                    )
                     //Dismiss once everything is OK.
                     dialog.dismiss()
                 } else {
@@ -876,7 +914,7 @@ object MegaNodeDialogUtil {
                 actionBackupNodeCallback.actionCancel(dialog)
                 dialog.dismiss()
             }
-            
+
         }
         dialog.show()
         dialog.setCancelable(false)
