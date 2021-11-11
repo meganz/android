@@ -1560,7 +1560,13 @@ public class Util {
      */
     public static void storeDownloadLocationIfNeeded(String downloadLocation) {
         DatabaseHandler dbH = MegaApplication.getInstance().getDbH();
-        boolean askMe = Boolean.parseBoolean(dbH.getPreferences().getStorageAskAlways());
+
+        MegaPreferences preferences = dbH.getPreferences();
+
+        boolean askMe = true;
+        if (preferences != null && preferences.getStorageAskAlways() != null) {
+            askMe = Boolean.parseBoolean(preferences.getStorageAskAlways());
+        }
 
         // Should set as default download location.
         if (!askMe) {

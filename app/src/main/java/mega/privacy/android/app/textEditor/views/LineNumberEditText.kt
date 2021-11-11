@@ -3,11 +3,23 @@ package mega.privacy.android.app.textEditor.views
 import android.content.Context
 import android.graphics.Canvas
 import android.graphics.Paint
+import android.os.Bundle
 import android.util.AttributeSet
+import android.view.inputmethod.EditorInfo
+import android.view.inputmethod.InputConnection
 import androidx.appcompat.widget.AppCompatEditText
 import mega.privacy.android.app.textEditor.views.LineNumberViewUtils.addExtraOnDrawBehaviour
 import mega.privacy.android.app.textEditor.views.LineNumberViewUtils.initTextPaint
 import mega.privacy.android.app.textEditor.views.LineNumberViewUtils.updatePaddingsAndView
+import android.widget.Toast
+
+import androidx.core.view.inputmethod.InputConnectionCompat
+
+import androidx.core.view.inputmethod.EditorInfoCompat
+import androidx.core.view.inputmethod.InputContentInfoCompat
+import mega.privacy.android.app.R
+import mega.privacy.android.app.utils.StringResourcesUtils.getString
+
 
 class LineNumberEditText : AppCompatEditText {
 
@@ -51,5 +63,30 @@ class LineNumberEditText : AppCompatEditText {
     fun setText(text: CharSequence?, firstLineNumber: Int) {
         this.firstLineNumber = firstLineNumber
         setText(text)
+    }
+
+    /**
+     * Rename this in this way to avoid enter any type of image in the text editor and redirect
+     * the user to the import screen.
+     */
+    override fun onCreateInputConnection(editorInfo: EditorInfo?): InputConnection {
+        val inputConnection = super.onCreateInputConnection(editorInfo)
+        val editor: EditorInfo = editorInfo ?: return inputConnection
+
+        EditorInfoCompat.setContentMimeTypes(
+            editor,
+            arrayOf("image/*", "image/png", "image/gif", "image/jpeg")
+        )
+
+        return InputConnectionCompat.createWrapper(
+            inputConnection, editor
+        ) { _: InputContentInfoCompat?, _: Int, _: Bundle? ->
+            Toast.makeText(
+                context,
+                getString(R.string.image_insertion_not_allowed),
+                Toast.LENGTH_SHORT
+            ).show()
+            true
+        }
     }
 }

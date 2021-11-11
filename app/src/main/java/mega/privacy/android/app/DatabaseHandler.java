@@ -1760,6 +1760,15 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 			logError("Exception opening or managing DB cursor", e);
 		}
 
+        // Insert a row with default values into the table.
+        if (prefs == null) {
+            logWarning("Preference is null, insert row with default values.");
+            prefs = new MegaPreferences();
+
+            // Insert this row.
+            setPreferences(db, prefs);
+        }
+
 		return prefs;
 	}
 
