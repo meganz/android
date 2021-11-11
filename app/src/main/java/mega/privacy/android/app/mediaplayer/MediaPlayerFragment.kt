@@ -58,7 +58,7 @@ class MediaPlayerFragment : Fragment() {
             }
         }
     }
-    private val playerListener = object : Player.EventListener {
+    private val playerListener = object : Player.Listener {
         override fun onPlaybackStateChanged(state: Int) {
             if (isResumed) {
                 updateLoadingAnimation(state)

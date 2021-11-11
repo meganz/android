@@ -13,7 +13,7 @@ import com.google.android.exoplayer2.trackselection.TrackSelectionArray
 class MetadataExtractor(
     private val trackSelector: MappingTrackSelector,
     private val callback: (String?, String?, String?) -> Unit
-) : Player.EventListener {
+) : Player.Listener {
     override fun onTracksChanged(
         trackGroups: TrackGroupArray,
         trackSelections: TrackSelectionArray

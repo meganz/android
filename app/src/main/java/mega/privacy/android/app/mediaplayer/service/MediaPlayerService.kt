@@ -131,7 +131,7 @@ open class MediaPlayerService : LifecycleService(), LifecycleObserver {
         exoPlayer.shuffleModeEnabled = viewModel.shuffleEnabled()
         exoPlayer.repeatMode = viewModel.repeatMode()
 
-        exoPlayer.addListener(object : Player.EventListener {
+        exoPlayer.addListener(object : Player.Listener {
             override fun onMediaItemTransition(mediaItem: MediaItem?, reason: Int) {
                 val handle = mediaItem?.mediaId ?: return
                 viewModel.playingHandle = handle.toLong()
@@ -201,9 +201,10 @@ open class MediaPlayerService : LifecycleService(), LifecycleObserver {
     }
 
     private fun createPlayerControlNotification() {
-        playerNotificationManager = PlayerNotificationManager.createWithNotificationChannel(
-            applicationContext, NOTIFICATION_CHANNEL_AUDIO_PLAYER_ID,
-            R.string.audio_player_notification_channel_name, 0, PLAYBACK_NOTIFICATION_ID,
+        playerNotificationManager = PlayerNotificationManager.Builder(
+            applicationContext,
+            PLAYBACK_NOTIFICATION_ID,
+            NOTIFICATION_CHANNEL_AUDIO_PLAYER_ID,
             object : PlayerNotificationManager.MediaDescriptionAdapter {
                 override fun getCurrentContentTitle(player: Player): String {
                     val meta = _metadata.value ?: return ""
@@ -220,7 +221,7 @@ open class MediaPlayerService : LifecycleService(), LifecycleObserver {
                 }
 
                 @Nullable
-                override fun getCurrentContentText(player: Player): String? {
+                override fun getCurrentContentText(player: Player): String {
                     val meta = _metadata.value ?: return ""
                     return meta.artist ?: ""
                 }
@@ -239,40 +240,32 @@ open class MediaPlayerService : LifecycleService(), LifecycleObserver {
                     }
                     return BitmapFactory.decodeFile(thumbnail.absolutePath, BitmapFactory.Options())
                 }
-            },
-            object : PlayerNotificationManager.NotificationListener {
-                override fun onNotificationStarted(
-                    notificationId: Int,
-                    notification: Notification
-                ) {
+            }
+        ).setNotificationListener(object : PlayerNotificationManager.NotificationListener {
+            override fun onNotificationPosted(
+                notificationId: Int,
+                notification: Notification,
+                ongoing: Boolean
+            ) {
+                if (ongoing) {
+                    // Make sure the service will not get destroyed while playing media.
                     startForeground(notificationId, notification)
-                }
-
-                override fun onNotificationPosted(
-                    notificationId: Int,
-                    notification: Notification,
-                    ongoing: Boolean
-                ) {
-                    if (ongoing) {
-                        // Make sure the service will not get destroyed while playing media.
-                        startForeground(notificationId, notification)
-                    } else {
-                        // Make notification cancellable.
-                        stopForeground(false)
-                    }
-                }
-
-                override fun onNotificationCancelled(
-                    notificationId: Int,
-                    dismissedByUser: Boolean
-                ) {
-                    if (dismissedByUser) {
-                        playerNotificationManager?.setPlayer(null)
-                        notificationDismissed = true
-                    }
+                } else {
+                    // Make notification cancellable.
+                    stopForeground(false)
                 }
             }
-        ).apply {
+
+            override fun onNotificationCancelled(
+                notificationId: Int,
+                dismissedByUser: Boolean
+            ) {
+                if (dismissedByUser) {
+                    playerNotificationManager?.setPlayer(null)
+                    notificationDismissed = true
+                }
+            }
+        }).build().apply {
             setSmallIcon(R.drawable.ic_stat_notify)
             setUseChronometer(false)
             setUseNextActionInCompactView(true)
