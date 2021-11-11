@@ -42,6 +42,11 @@ open class PasscodeActivity : BaseActivity() {
      */
     private var isDisabled = false
 
+    /**
+     * Used to ignore onPause when it is opening a chat message notification.
+     */
+    private var ignoringDueToChatNotification = false
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -60,7 +65,8 @@ open class PasscodeActivity : BaseActivity() {
     override fun onPause() {
         super.onPause()
 
-        if (isDisabled || shouldIgnoreDueToChatNotification()) {
+        if (isDisabled || ignoringDueToChatNotification) {
+            ignoringDueToChatNotification = false
             return
         }
 
@@ -71,7 +77,9 @@ open class PasscodeActivity : BaseActivity() {
     override fun onResume() {
         super.onResume()
 
-        if (isDisabled || shouldIgnoreDueToChatNotification()) {
+        ignoringDueToChatNotification = shouldIgnoreDueToChatNotification()
+
+        if (isDisabled || ignoringDueToChatNotification) {
             return
         }
 
