@@ -14,7 +14,6 @@ import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import com.google.android.exoplayer2.Player
-import com.google.android.exoplayer2.SimpleExoPlayer
 import com.google.android.exoplayer2.ui.PlayerView
 import com.google.android.exoplayer2.util.RepeatModeUtil
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
@@ -236,7 +235,7 @@ class MediaPlayerFragment : Fragment() {
     }
 
     private fun setupPlayerView(
-        player: SimpleExoPlayer,
+        player: MediaMegaPlayer,
         playerView: PlayerView,
         videoPlayer: Boolean
     ) {
@@ -256,8 +255,6 @@ class MediaPlayerFragment : Fragment() {
         playerView.setShowShuffleButton(!videoPlayer)
 
         playerView.showController()
-
-        playerView.setControlDispatcher(CallAwareControlDispatcher(player.repeatMode))
 
         playerView.setOnClickListener {
             if (toolbarVisible) {

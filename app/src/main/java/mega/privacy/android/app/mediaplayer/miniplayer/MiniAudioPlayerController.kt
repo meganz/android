@@ -9,10 +9,10 @@ import android.widget.ImageButton
 import android.widget.TextView
 import androidx.core.view.isVisible
 import androidx.lifecycle.*
-import com.google.android.exoplayer2.SimpleExoPlayer
 import com.google.android.exoplayer2.ui.PlayerView
 import mega.privacy.android.app.R
 import mega.privacy.android.app.mediaplayer.AudioPlayerActivity
+import mega.privacy.android.app.mediaplayer.MediaMegaPlayer
 import mega.privacy.android.app.mediaplayer.service.*
 import mega.privacy.android.app.utils.CallUtil
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_REBUILD_PLAYLIST
@@ -150,7 +150,7 @@ class MiniAudioPlayerController constructor(
         onPlayerVisibilityChanged?.invoke()
     }
 
-    private fun setupPlayerView(player: SimpleExoPlayer) {
+    private fun setupPlayerView(player: MediaMegaPlayer) {
         updatePlayerViewVisibility()
         playerView.player = player
 
@@ -159,8 +159,6 @@ class MiniAudioPlayerController constructor(
         playerView.controllerHideOnTouch = false
 
         playerView.showController()
-
-        playerView.setControlDispatcher(CallAwareControlDispatcher(player.repeatMode))
     }
 
     companion object {

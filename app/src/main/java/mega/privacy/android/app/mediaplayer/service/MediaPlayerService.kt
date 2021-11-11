@@ -27,6 +27,7 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.di.MegaApi
 import mega.privacy.android.app.di.MegaApiFolder
 import mega.privacy.android.app.mediaplayer.AudioPlayerActivity
+import mega.privacy.android.app.mediaplayer.MediaMegaPlayer
 import mega.privacy.android.app.mediaplayer.MediaPlayerActivity
 import mega.privacy.android.app.mediaplayer.miniplayer.MiniAudioPlayerController
 import mega.privacy.android.app.utils.CallUtil
@@ -57,7 +58,7 @@ open class MediaPlayerService : LifecycleService(), LifecycleObserver {
     lateinit var viewModel: MediaPlayerServiceViewModel
 
     private lateinit var trackSelector: DefaultTrackSelector
-    lateinit var exoPlayer: SimpleExoPlayer
+    lateinit var exoPlayer: MediaMegaPlayer
         private set
     private var playerNotificationManager: PlayerNotificationManager? = null
     private var notificationDismissed = false
@@ -116,9 +117,11 @@ open class MediaPlayerService : LifecycleService(), LifecycleObserver {
         trackSelector = DefaultTrackSelector(this)
         val renderersFactory = DefaultRenderersFactory(this)
             .setExtensionRendererMode(DefaultRenderersFactory.EXTENSION_RENDERER_MODE_ON)
-        exoPlayer = SimpleExoPlayer.Builder(this, renderersFactory)
-            .setTrackSelector(trackSelector)
-            .build()
+        exoPlayer = MediaMegaPlayer(
+            SimpleExoPlayer.Builder(this, renderersFactory)
+                .setTrackSelector(trackSelector)
+                .setSeekBackIncrementMs(INCREMENT_TIME_IN_MS)
+        )
 
         exoPlayer.addListener(MetadataExtractor(trackSelector) { title, artist, album ->
             val nodeName =
@@ -182,7 +185,7 @@ open class MediaPlayerService : LifecycleService(), LifecycleObserver {
                 }
             }
 
-            override fun onPlayerError(error: ExoPlaybackException) {
+            override fun onPlayerError(error: PlaybackException) {
                 viewModel.onPlayerError()
             }
         })
@@ -204,44 +207,43 @@ open class MediaPlayerService : LifecycleService(), LifecycleObserver {
         playerNotificationManager = PlayerNotificationManager.Builder(
             applicationContext,
             PLAYBACK_NOTIFICATION_ID,
-            NOTIFICATION_CHANNEL_AUDIO_PLAYER_ID,
-            object : PlayerNotificationManager.MediaDescriptionAdapter {
-                override fun getCurrentContentTitle(player: Player): String {
-                    val meta = _metadata.value ?: return ""
-                    return meta.title ?: meta.nodeName
-                }
-
-                @Nullable
-                override fun createCurrentContentIntent(player: Player): PendingIntent? {
-                    val intent = Intent(applicationContext, AudioPlayerActivity::class.java)
-                    intent.putExtra(INTENT_EXTRA_KEY_REBUILD_PLAYLIST, false)
-                    return PendingIntent.getActivity(
-                        applicationContext, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT
-                    )
-                }
-
-                @Nullable
-                override fun getCurrentContentText(player: Player): String {
-                    val meta = _metadata.value ?: return ""
-                    return meta.artist ?: ""
-                }
-
-                @Nullable
-                override fun getCurrentLargeIcon(
-                    player: Player,
-                    callback: PlayerNotificationManager.BitmapCallback
-                ): Bitmap? {
-                    val thumbnail = viewModel.playingThumbnail.value
-                    if (thumbnail == null || !thumbnail.exists()) {
-                        return ContextCompat.getDrawable(
-                            this@MediaPlayerService,
-                            R.drawable.ic_default_audio_cover
-                        )?.toBitmap()
-                    }
-                    return BitmapFactory.decodeFile(thumbnail.absolutePath, BitmapFactory.Options())
-                }
+            NOTIFICATION_CHANNEL_AUDIO_PLAYER_ID
+        ).setMediaDescriptionAdapter(object : PlayerNotificationManager.MediaDescriptionAdapter {
+            override fun getCurrentContentTitle(player: Player): String {
+                val meta = _metadata.value ?: return ""
+                return meta.title ?: meta.nodeName
             }
-        ).setNotificationListener(object : PlayerNotificationManager.NotificationListener {
+
+            @Nullable
+            override fun createCurrentContentIntent(player: Player): PendingIntent? {
+                val intent = Intent(applicationContext, AudioPlayerActivity::class.java)
+                intent.putExtra(INTENT_EXTRA_KEY_REBUILD_PLAYLIST, false)
+                return PendingIntent.getActivity(
+                    applicationContext, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT
+                )
+            }
+
+            @Nullable
+            override fun getCurrentContentText(player: Player): String {
+                val meta = _metadata.value ?: return ""
+                return meta.artist ?: ""
+            }
+
+            @Nullable
+            override fun getCurrentLargeIcon(
+                player: Player,
+                callback: PlayerNotificationManager.BitmapCallback
+            ): Bitmap? {
+                val thumbnail = viewModel.playingThumbnail.value
+                if (thumbnail == null || !thumbnail.exists()) {
+                    return ContextCompat.getDrawable(
+                        this@MediaPlayerService,
+                        R.drawable.ic_default_audio_cover
+                    )?.toBitmap()
+                }
+                return BitmapFactory.decodeFile(thumbnail.absolutePath, BitmapFactory.Options())
+            }
+        }).setNotificationListener(object : PlayerNotificationManager.NotificationListener {
             override fun onNotificationPosted(
                 notificationId: Int,
                 notification: Notification,
@@ -272,9 +274,6 @@ open class MediaPlayerService : LifecycleService(), LifecycleObserver {
             setUsePreviousActionInCompactView(true)
 
             setPlayer(exoPlayer)
-            setControlDispatcher(
-                CallAwareControlDispatcher(exoPlayer.repeatMode)
-            )
         }
     }
 
@@ -471,6 +470,8 @@ open class MediaPlayerService : LifecycleService(), LifecycleObserver {
     fun playing() = exoPlayer.playWhenReady && exoPlayer.playbackState != Player.STATE_ENDED
 
     companion object {
+        private const val INCREMENT_TIME_IN_MS = 15000L
+
         private const val PLAYBACK_NOTIFICATION_ID = 1
 
         private const val INTENT_EXTRA_KEY_COMMAND = "command"
