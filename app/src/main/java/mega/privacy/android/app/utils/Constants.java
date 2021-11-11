@@ -305,6 +305,7 @@ public class Constants {
     public static final String INTENT_EXTRA_KEY_REBUILD_PLAYLIST = "REBUILD_PLAYLIST";
     public static final String INTENT_EXTRA_KEY_FROM = "from";
     public static final String INTENT_EXTRA_KEY_COPY_FROM = "COPY_FROM";
+    public static final String INTENT_EXTRA_KEY_IMPORT_CHAT = "HANDLES_IMPORT_CHAT";
     public static final String INTENT_EXTRA_KEY_MOVE_FROM = "MOVE_FROM";
     public static final String INTENT_EXTRA_KEY_MOVE_HANDLES = "MOVE_HANDLES";
     public static final String INTENT_EXTRA_KEY_MOVE_TO = "MOVE_TO";

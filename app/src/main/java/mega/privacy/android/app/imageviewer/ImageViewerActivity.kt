@@ -296,7 +296,7 @@ class ImageViewerActivity : BaseActivity(), PermissionRequester, SnackbarShower 
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        val currentNodeHandle = viewModel.getCurrentNodeHandle() ?: return true
+        val currentNode = viewModel.getCurrentNode() ?: return true
 
         return when (item.itemId) {
             android.R.id.home -> {
@@ -304,23 +304,23 @@ class ImageViewerActivity : BaseActivity(), PermissionRequester, SnackbarShower 
                 true
             }
             R.id.action_download -> {
-                saveNode(currentNodeHandle, false)
+                saveNode(currentNode, false)
                 true
             }
             R.id.action_save_gallery -> {
-                saveNode(currentNodeHandle, true)
+                saveNode(currentNode, true)
                 true
             }
             R.id.action_get_link -> {
-                LinksUtil.showGetLinkActivity(this, currentNodeHandle)
+                LinksUtil.showGetLinkActivity(this, currentNode.handle)
                 true
             }
             R.id.action_chat -> {
-                attachNode(currentNodeHandle)
+                attachNode(currentNode)
                 true
             }
             R.id.action_more -> {
-                bottomSheet = ImageBottomSheetDialogFragment.newInstance(currentNodeHandle).apply {
+                bottomSheet = ImageBottomSheetDialogFragment.newInstance(currentNode.handle).apply {
                     show(supportFragmentManager)
                 }
                 true
@@ -329,9 +329,9 @@ class ImageViewerActivity : BaseActivity(), PermissionRequester, SnackbarShower 
         }
     }
 
-    fun saveNode(nodeHandle: Long, downloadToGallery: Boolean) {
-        nodeSaver.get()?.saveHandle(
-            nodeHandle,
+    fun saveNode(node: MegaNode, downloadToGallery: Boolean) {
+        nodeSaver.get()?.saveNode(
+            node,
             highPriority = false,
             isFolderLink = false,
             fromMediaViewer = true,
@@ -340,8 +340,8 @@ class ImageViewerActivity : BaseActivity(), PermissionRequester, SnackbarShower 
         )
     }
 
-    fun attachNode(nodeHandle: Long) {
-        nodeAttacher.get()?.attachNode(nodeHandle)
+    fun attachNode(node: MegaNode) {
+        nodeAttacher.get()?.attachNode(node)
     }
 
     fun removeLink(nodeHandle: Long) {
@@ -372,4 +372,6 @@ class ImageViewerActivity : BaseActivity(), PermissionRequester, SnackbarShower 
     override fun showSnackbar(type: Int, content: String?, chatId: Long) {
         showSnackbar(type, binding.root, content, chatId)
     }
+
+    override fun shouldSetStatusBarTextColor(): Boolean = false
 }

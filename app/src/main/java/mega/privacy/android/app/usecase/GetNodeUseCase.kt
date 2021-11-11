@@ -94,10 +94,11 @@ class GetNodeUseCase @Inject constructor(
         }
 
     fun markAsFavorite(nodeHandle: Long, isFavorite: Boolean): Completable =
-        Completable.fromCallable {
-            val node = nodeHandle.getMegaNode()
-            requireNotNull(node)
+        get(nodeHandle).flatMapCompletable { markAsFavorite(it, isFavorite) }
 
+    fun markAsFavorite(node: MegaNode?, isFavorite: Boolean): Completable =
+        Completable.fromCallable {
+            requireNotNull(node)
             megaApi.setNodeFavourite(node, isFavorite)
         }
 
@@ -117,44 +118,60 @@ class GetNodeUseCase @Inject constructor(
         }
 
     fun setNodeAvailableOffline(
-        activity: Activity,
         nodeHandle: Long,
-        setAvailableOffline: Boolean
+        availableOffline: Boolean,
+        activity: Activity
+    ): Completable =
+        get(nodeHandle).flatMapCompletable { setNodeAvailableOffline(it, availableOffline, activity) }
+
+    fun setNodeAvailableOffline(
+        node: MegaNode?,
+        availableOffline: Boolean,
+        activity: Activity
     ): Completable =
         Completable.fromCallable {
-            val isCurrentlyAvailable = isNodeAvailableOffline(nodeHandle).blockingGet()
+            requireNotNull(node)
+            val isCurrentlyAvailable = isNodeAvailableOffline(node.handle).blockingGet()
 
-            if (setAvailableOffline) {
+            if (availableOffline) {
                 if (!isCurrentlyAvailable) {
-                    val node = nodeHandle.getMegaNode()
-                    requireNotNull(node)
-
                     val offlineParent = OfflineUtils.getOfflineParentFile(activity, Constants.FROM_OTHERS, node, megaApi)
                     if (FileUtil.isFileAvailable(offlineParent)) {
                         val parentName = OfflineUtils.getOfflineParentFileName(activity, node).absolutePath + File.separator
                         val offlineNode = databaseHandler.findbyPathAndName(parentName, node.name)
                         OfflineUtils.removeOffline(offlineNode, databaseHandler, activity)
                     }
-
                     OfflineUtils.saveOffline(offlineParent, node, activity)
                 }
             } else if (isCurrentlyAvailable) {
-                val offlineNode = databaseHandler.findByHandle(nodeHandle)
+                val offlineNode = databaseHandler.findByHandle(node.handle)
                 OfflineUtils.removeOffline(offlineNode, databaseHandler, activity)
             }
         }
 
-    fun copyNode(nodeHandle: Long, newParentHandle: Long): Completable =
-        Completable.create { emitter ->
-            val currentNode = nodeHandle.getMegaNode()
-            val newParentNode = newParentHandle.getMegaNode()
 
-            if (currentNode == null || newParentNode == null) {
+    fun copyNode(
+        nodeHandle: Long? = null,
+        toParentHandle: Long? = null,
+        node: MegaNode? = null,
+        toParentNode: MegaNode? = null
+    ): Completable =
+        Completable.fromCallable {
+            require((node != null || nodeHandle != null) && (toParentNode != null || toParentHandle != null))
+            copyNode(
+                node ?: nodeHandle?.getMegaNode(),
+                toParentNode ?: toParentHandle?.getMegaNode()
+            ).blockingAwait()
+        }
+
+    fun copyNode(currentNode: MegaNode?, toParentNode: MegaNode?): Completable =
+        Completable.create { emitter ->
+            if (currentNode == null || toParentNode == null) {
                 emitter.onError(IllegalArgumentException("Null nodes"))
                 return@create
             }
 
-            megaApi.copyNode(currentNode, newParentNode, OptionalMegaRequestListenerInterface(
+            megaApi.copyNode(currentNode, toParentNode, OptionalMegaRequestListenerInterface(
                 onRequestFinish = { _, error ->
                     when (error.errorCode) {
                         MegaError.API_OK ->
@@ -168,17 +185,19 @@ class GetNodeUseCase @Inject constructor(
             ))
         }
 
-    fun moveNode(nodeHandle: Long, newParentHandle: Long): Completable =
-        Completable.create { emitter ->
-            val currentNode = nodeHandle.getMegaNode()
-            val newParentNode = newParentHandle.getMegaNode()
+    fun moveNode(nodeHandle: Long, toParentHandle: Long): Completable =
+        Completable.fromCallable {
+            moveNode(nodeHandle.getMegaNode(), toParentHandle.getMegaNode()).blockingAwait()
+        }
 
-            if (currentNode == null || newParentNode == null) {
+    fun moveNode(currentNode: MegaNode?, toParentNode: MegaNode?): Completable =
+        Completable.create { emitter ->
+            if (currentNode == null || toParentNode == null) {
                 emitter.onError(IllegalArgumentException("Null node"))
                 return@create
             }
 
-            megaApi.moveNode(currentNode, newParentNode, OptionalMegaRequestListenerInterface(
+            megaApi.moveNode(currentNode, toParentNode, OptionalMegaRequestListenerInterface(
                 onRequestFinish = { _, error ->
                     when (error.errorCode) {
                         MegaError.API_OK ->
@@ -193,11 +212,17 @@ class GetNodeUseCase @Inject constructor(
         }
 
     fun moveToRubbishBin(nodeHandle: Long): Completable =
-        moveNode(nodeHandle, megaApi.rubbishNode.handle)
+        Completable.fromCallable {
+            moveNode(nodeHandle, megaApi.rubbishNode.handle).blockingAwait()
+        }
 
     fun removeNode(nodeHandle: Long): Completable =
+        Completable.fromCallable {
+            removeNode(nodeHandle.getMegaNode()).blockingAwait()
+        }
+
+    fun removeNode(node: MegaNode?): Completable =
         Completable.create { emitter ->
-            val node = nodeHandle.getMegaNode()
             if (node == null) {
                 emitter.onError(IllegalArgumentException("Null node"))
                 return@create

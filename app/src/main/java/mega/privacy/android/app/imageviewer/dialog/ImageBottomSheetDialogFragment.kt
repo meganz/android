@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -20,6 +21,8 @@ import mega.privacy.android.app.imageviewer.ImageViewerViewModel
 import mega.privacy.android.app.imageviewer.data.ImageItem
 import mega.privacy.android.app.interfaces.showSnackbar
 import mega.privacy.android.app.lollipop.FileExplorerActivityLollipop
+import mega.privacy.android.app.lollipop.FileExplorerActivityLollipop.ACTION_PICK_COPY_FOLDER
+import mega.privacy.android.app.lollipop.FileExplorerActivityLollipop.ACTION_PICK_IMPORT_FOLDER
 import mega.privacy.android.app.lollipop.FileInfoActivityLollipop
 import mega.privacy.android.app.modalbottomsheet.BaseBottomSheetDialogFragment
 import mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil
@@ -152,14 +155,14 @@ class ImageBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
             // Download
             optionDownload.isVisible = !nodeItem.isFromRubbishBin
             optionDownload.setOnClickListener {
-                (activity as? ImageViewerActivity?)?.saveNode(node.handle, false)
+                (activity as? ImageViewerActivity?)?.saveNode(node, false)
                 dismiss()
             }
 
             // Save to Gallery
-            optionGallery.isVisible = !nodeItem.isFromRubbishBin
+            optionGallery.isVisible = !nodeItem.isFromRubbishBin && !node.isPublic
             optionGallery.setOnClickListener {
-                (activity as? ImageViewerActivity?)?.saveNode(node.handle, true)
+                (activity as? ImageViewerActivity?)?.saveNode(node, true)
                 dismiss()
             }
 
@@ -207,29 +210,28 @@ class ImageBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
             optionRemoveLink.isVisible = node.isExported
 
             // Send to contact
-            optionSendToContact.isVisible = nodeItem.hasFullAccess && !nodeItem.isFromRubbishBin
             optionSendToContact.setOnClickListener {
-                (activity as? ImageViewerActivity?)?.attachNode(node.handle)
+                (activity as? ImageViewerActivity?)?.attachNode(node)
                 dismiss()
             }
+            optionSendToContact.isVisible = nodeItem.hasFullAccess && !nodeItem.isFromRubbishBin
 
             // Share
-            optionShare.isVisible = !nodeItem.isFromRubbishBin
             optionShare.setOnClickListener {
                 viewModel.shareNode(node.handle).observe(viewLifecycleOwner) { link ->
                     MegaNodeUtil.startShareIntent(requireContext(), Intent(Intent.ACTION_SEND), link)
                     dismiss()
                 }
             }
+            optionShare.isVisible = !nodeItem.isFromRubbishBin && !node.isPublic
 
             // Rename
-            optionRename.isVisible = nodeItem.hasFullAccess && !nodeItem.isFromRubbishBin
             optionRename.setOnClickListener {
                 (activity as? ImageViewerActivity?)?.showRenameDialog(node)
             }
+            optionRename.isVisible = nodeItem.hasFullAccess && !nodeItem.isFromRubbishBin
 
             // Move
-            optionMove.isVisible = nodeItem.hasFullAccess && !nodeItem.isFromRubbishBin
             optionMove.setOnClickListener {
                 val intent = Intent(context, FileExplorerActivityLollipop::class.java).apply {
                     action = FileExplorerActivityLollipop.ACTION_PICK_MOVE_FOLDER
@@ -238,24 +240,30 @@ class ImageBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
 
                 startActivityForResult(intent, REQUEST_CODE_SELECT_FOLDER_TO_MOVE)
             }
+            optionMove.isVisible = nodeItem.hasFullAccess && !nodeItem.isFromRubbishBin
 
             // Copy
-            optionCopy.isVisible = !nodeItem.isFromRubbishBin
             optionCopy.setOnClickListener {
                 val intent = Intent(context, FileExplorerActivityLollipop::class.java).apply {
-                    action = FileExplorerActivityLollipop.ACTION_PICK_COPY_FOLDER
-                    putExtra(INTENT_EXTRA_KEY_COPY_FROM, longArrayOf(node.handle))
+                    if (node.isPublic) {
+                        action = ACTION_PICK_IMPORT_FOLDER
+                        putExtra(INTENT_EXTRA_KEY_IMPORT_CHAT, longArrayOf(node.handle))
+                    } else {
+                        action = ACTION_PICK_COPY_FOLDER
+                        putExtra(INTENT_EXTRA_KEY_COPY_FROM, longArrayOf(node.handle))
+                    }
                 }
-
                 startActivityForResult(intent, REQUEST_CODE_SELECT_FOLDER_TO_COPY)
             }
+            optionCopy.setText(if (node.isPublic) R.string.general_import else R.string.context_copy)
+            optionCopy.isVisible = !nodeItem.isFromRubbishBin
 
             // Restore
-            optionRestore.isVisible = nodeItem.isFromRubbishBin && node.restoreHandle != INVALID_HANDLE
             optionRestore.setOnClickListener {
                 viewModel.moveNode(node.handle, node.restoreHandle)
                 dismiss()
             }
+            optionRestore.isVisible = nodeItem.isFromRubbishBin && node.restoreHandle != INVALID_HANDLE
 
             // Rubbish bin
             if (nodeItem.isFromRubbishBin) {
@@ -302,7 +310,7 @@ class ImageBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
         when (requestCode) {
             REQUEST_CODE_SELECT_FOLDER_TO_MOVE -> {
                 if (resultCode == Activity.RESULT_OK) {
-                    val moveHandle = data?.getLongArrayExtra(INTENT_EXTRA_KEY_MOVE_HANDLES)?.get(0) ?: INVALID_HANDLE
+                    val moveHandle = data?.getLongArrayExtra(INTENT_EXTRA_KEY_MOVE_HANDLES)?.firstOrNull() ?: INVALID_HANDLE
                     val toHandle = data?.getLongExtra(INTENT_EXTRA_KEY_MOVE_TO, INVALID_HANDLE) ?: INVALID_HANDLE
                     if (moveHandle != INVALID_HANDLE && toHandle != INVALID_HANDLE) {
                         viewModel.moveNode(moveHandle, toHandle)
@@ -311,8 +319,16 @@ class ImageBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
             }
             REQUEST_CODE_SELECT_FOLDER_TO_COPY -> {
                 if (resultCode == Activity.RESULT_OK) {
-                    val copyHandle = data?.getLongArrayExtra(INTENT_EXTRA_KEY_COPY_HANDLES)?.get(0) ?: INVALID_HANDLE
-                    val toHandle = data?.getLongExtra(INTENT_EXTRA_KEY_COPY_TO, INVALID_HANDLE) ?: INVALID_HANDLE
+                    val copyHandle =
+                        data?.getLongArrayExtra(INTENT_EXTRA_KEY_COPY_HANDLES)?.firstOrNull()
+                            ?: data?.getLongArrayExtra(INTENT_EXTRA_KEY_IMPORT_CHAT)?.firstOrNull()
+                            ?: INVALID_HANDLE
+
+                    val toHandle =
+                        data?.getLongExtra(INTENT_EXTRA_KEY_COPY_TO, INVALID_HANDLE)
+                            ?: data?.getLongExtra(INTENT_EXTRA_KEY_IMPORT_TO, INVALID_HANDLE)
+                            ?: INVALID_HANDLE
+
                     if (copyHandle != INVALID_HANDLE && toHandle != INVALID_HANDLE) {
                         viewModel.copyNode(copyHandle, toHandle)
                     }

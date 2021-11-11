@@ -22,6 +22,7 @@ import mega.privacy.android.app.usecase.data.MegaNodeItem
 import mega.privacy.android.app.utils.Constants.INVALID_POSITION
 import mega.privacy.android.app.utils.LogUtil.logError
 import mega.privacy.android.app.utils.LogUtil.logWarning
+import nz.mega.sdk.MegaNode
 
 class ImageViewerViewModel @ViewModelInject constructor(
     private val getImageUseCase: GetImageUseCase,
@@ -47,8 +48,8 @@ class ImageViewerViewModel @ViewModelInject constructor(
     fun getCurrentPosition(): LiveData<Pair<Int, Int>> =
         currentPosition.map { position -> Pair(position, images.value?.size ?: 0) }
 
-    fun getCurrentNodeHandle(): Long? =
-        currentPosition.value?.let { images.value?.getOrNull(it)?.handle }
+    fun getCurrentNode(): MegaNode? =
+        currentPosition.value?.let { images.value?.getOrNull(it)?.nodeItem?.node }
 
     fun onSwitchToolbar(): LiveData<Unit> = switchToolbar
 
@@ -93,7 +94,7 @@ class ImageViewerViewModel @ViewModelInject constructor(
     }
 
     fun loadSingleImage(nodeHandle: Long, fullSize: Boolean, highPriority: Boolean) {
-        val existingNode = images.value?.find { it.handle == nodeHandle }?.nodeItem?.node
+        val existingNode = getExistingNode(nodeHandle)
         val subscription = if (existingNode != null) {
             getImageUseCase.get(existingNode, fullSize, highPriority)
         } else {
@@ -141,7 +142,7 @@ class ImageViewerViewModel @ViewModelInject constructor(
         nodeHandle: Long,
         setAvailableOffline: Boolean
     ) {
-        getNodeUseCase.setNodeAvailableOffline(activity, nodeHandle, setAvailableOffline)
+        getNodeUseCase.setNodeAvailableOffline(nodeHandle, setAvailableOffline, activity)
             .subscribeAndComplete()
     }
 
@@ -182,8 +183,11 @@ class ImageViewerViewModel @ViewModelInject constructor(
     }
 
     fun copyNode(nodeHandle: Long, newParentHandle: Long) {
-        getNodeUseCase.copyNode(nodeHandle, newParentHandle)
-            .subscribeAndComplete()
+        getNodeUseCase.copyNode(
+            node = getExistingNode(nodeHandle),
+            nodeHandle = nodeHandle,
+            toParentHandle = newParentHandle
+        ).subscribeAndComplete()
     }
 
     fun moveNode(nodeHandle: Long, newParentHandle: Long) {
@@ -224,6 +228,9 @@ class ImageViewerViewModel @ViewModelInject constructor(
         switchToolbar.value = Unit
     }
 
+    private fun getExistingNode(nodeHandle: Long): MegaNode? =
+        images.value?.find { it.handle == nodeHandle }?.nodeItem?.node
+
     private fun Flowable<List<ImageItem>>.subscribeAndUpdateImages(currentNodeHandle: Long? = null) {
         subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
@@ -245,7 +252,7 @@ class ImageViewerViewModel @ViewModelInject constructor(
                             }
                         }
                         else -> {
-                            val actualNodeHandle = getCurrentNodeHandle()
+                            val actualNodeHandle = getCurrentNode()?.handle
                             val currentItemPosition = currentPosition.value ?: 0
                             val foundIndex = imageItems.indexOfFirst { it.handle == actualNodeHandle }
                             val newPosition = when {

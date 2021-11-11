@@ -5,9 +5,11 @@ import io.reactivex.rxjava3.core.Single
 import mega.privacy.android.app.di.MegaApi
 import mega.privacy.android.app.errors.BusinessAccountOverdueMegaError
 import mega.privacy.android.app.listeners.OptionalMegaRequestListenerInterface
+import mega.privacy.android.app.usecase.GetNodeUseCase
 import mega.privacy.android.app.utils.ErrorUtils.toThrowable
-import mega.privacy.android.app.utils.LogUtil.logError
+import mega.privacy.android.app.utils.RxUtil.blockingGetOrNull
 import nz.mega.sdk.MegaApiAndroid
+import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaNode
 import javax.inject.Inject
@@ -18,91 +20,106 @@ import javax.inject.Inject
  * @property megaApi MegaApiAndroid instance to use.
  */
 class ExportNodeUseCase @Inject constructor(
-    @MegaApi private val megaApi: MegaApiAndroid
+    @MegaApi private val megaApi: MegaApiAndroid,
+    private val getNodeUseCase: GetNodeUseCase
 ) {
+
     /**
-     * Launches a request to export a node.
+     * Generate a temporary public link of a file/folder node.
      *
      * @param nodeHandle MegaNode handle to export.
+     * @param expireTime The time to set as expiry date.
      * @return Single<String> The link if the request finished with success, error if not.
      */
-    fun export(nodeHandle: Long): Single<String> =
-        Single.create { emitter ->
-            val node = megaApi.getNodeByHandle(nodeHandle)
-            megaApi.exportNode(node, OptionalMegaRequestListenerInterface(
-                onRequestFinish = { request, error ->
-                    if (error.errorCode == MegaError.API_OK) {
-                        emitter.onSuccess(request.link)
-                    } else {
-                        emitter.onError(error.toThrowable())
-                    }
-                }
-            ))
-        }
+    fun export(nodeHandle: Long, expireTime: Int? = null): Single<String> =
+        getNodeUseCase.get(nodeHandle).flatMap { export(it, expireTime) }
 
     /**
-     * Launches a request to get the link of a node with an expiry date.
-     *
-     * @param node       MegaNode to export.
-     * @param expiryTime The time to set as expiry date.
-     * @return Single<String> The link if the request finished with success, error if not.
-     */
-    fun exportWithTimestamp(node: MegaNode, expiryTime: Int): Single<String> =
-        Single.create { emitter ->
-            megaApi.exportNode(node, expiryTime, OptionalMegaRequestListenerInterface(
-                onRequestFinish = { request, error ->
-                    if (error.errorCode == MegaError.API_OK) {
-                        emitter.onSuccess(request.link)
-                    } else {
-                        emitter.onError(error.toThrowable())
-                    }
-                }
-            ))
-        }
-
-    /**
-     * Launches a request to export a list of nodes.
+     * Generate temporary public links for a list of file/folder nodes.
      *
      * @param nodes List of nodes to export.
      * @return Single<String> The links if the request finished with success, error if not.
      */
     fun export(nodes: List<MegaNode>): Single<HashMap<Long, String>> =
+        Single.fromCallable {
+            val result = hashMapOf<Long, String>()
+            nodes.forEach { node ->
+                result[node.handle] = export(node).blockingGet()
+            }
+            result
+        }
+
+    /**
+     * Generate a temporary public link of a file/folder node.
+     *
+     * @param node MegaNode to export.
+     * @param expireTime The time to set as expiry date.
+     * @return Single<String> The link if the request finished with success, error if not.
+     */
+    fun export(node: MegaNode?, expireTime: Int? = null): Single<String> =
         Single.create { emitter ->
-            val exported = HashMap<Long, String>()
-            var pending = nodes.size
+            if (node == null) {
+                emitter.onError(IllegalArgumentException("Null node"))
+                return@create
+            }
 
-            for (node in nodes) {
-                megaApi.exportNode(node, OptionalMegaRequestListenerInterface(
-                    onRequestFinish = { request, error ->
-                        pending--
-
-                        if (error.errorCode == MegaError.API_OK) {
-                            exported[request.nodeHandle] = request.link
-                        } else {
-                            logError("Error exporting ${node.handle}")
-                        }
-
-                        if (pending == 0) {
-                            if (exported.isNotEmpty()) {
-                                emitter.onSuccess(exported)
-                            } else {
-                                emitter.onError(error.toThrowable())
-                            }
-                        }
+            val listener = OptionalMegaRequestListenerInterface(
+                onRequestFinish = { request, error ->
+                    when (error.errorCode) {
+                        MegaError.API_OK ->
+                            emitter.onSuccess(request.link)
+                        MegaError.API_EBUSINESSPASTDUE ->
+                            emitter.onError(BusinessAccountOverdueMegaError())
+                        else ->
+                            emitter.onError(error.toThrowable())
                     }
-                ))
+                }
+            )
+
+            if (expireTime != null && expireTime > 0) {
+                megaApi.exportNode(node, expireTime, listener)
+            } else {
+                megaApi.exportNode(node, listener)
             }
         }
 
     /**
      * Launches a request to stop sharing a file/folder
      *
-     * @param nodeHandle    MegaNode to stop sharing
+     * @param nodeHandle    MegaNode handle to stop sharing
      * @return              Completable subscription
      */
     fun disableExport(nodeHandle: Long): Completable =
+        getNodeUseCase.get(nodeHandle).flatMapCompletable(::disableExport)
+
+    /**
+     * Search nodes on public links containing a search string in their name
+     *
+     * @param query         Search string. The search is case-insensitive
+     * @param order         Order for the returned list
+     * @return              Single containing the resulting list of Nodes
+     */
+    fun searchPublicLink(
+        query: String,
+        order: Int = MegaApiJava.ORDER_NONE
+    ): Single<List<MegaNode>> =
+        Single.fromCallable {
+            megaApi.searchOnPublicLinks(query, null, order)
+        }
+
+    /**
+     * Launches a request to stop sharing a file/folder
+     *
+     * @param node          MegaNode to stop sharing
+     * @return              Completable subscription
+     */
+    fun disableExport(node: MegaNode?): Completable =
         Completable.create { emitter ->
-            val node = megaApi.getNodeByHandle(nodeHandle)
+            if (node == null) {
+                emitter.onError(IllegalArgumentException("Null node"))
+                return@create
+            }
+
             megaApi.disableExport(node, OptionalMegaRequestListenerInterface(
                 onRequestFinish = { _, error ->
                     when (error.errorCode) {
