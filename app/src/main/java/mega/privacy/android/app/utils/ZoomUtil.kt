@@ -10,6 +10,10 @@ import mega.privacy.android.app.R
 
 object ZoomUtil {
 
+    @JvmStatic
+    var PHOTO_ZOOM_LEVEL = 0 //ZOOM_DEFAULT
+    @JvmStatic
+    var IMAGES_ZOOM_LEVEL = 0 //ZOOM_DEFAULT
     // Zoom level
     const val ZOOM_OUT_2X = -2
     const val ZOOM_OUT_1X = -1

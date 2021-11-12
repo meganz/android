@@ -37,17 +37,14 @@ import dagger.hilt.android.AndroidEntryPoint;
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
-import mega.privacy.android.app.components.GestureScaleListener;
 import mega.privacy.android.app.components.ListenScrollChangesHelper;
 import mega.privacy.android.app.databinding.FragmentPhotosBinding;
 import mega.privacy.android.app.databinding.FragmentPhotosFirstLoginBinding;
-import mega.privacy.android.app.fragments.BaseFragment;
 import mega.privacy.android.app.fragments.homepage.photos.ScaleGestureHandler;
 import mega.privacy.android.app.globalmanagement.SortOrderManagement;
 import mega.privacy.android.app.lollipop.FullScreenImageViewerLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.repo.MegaNodeRepo;
-import mega.privacy.android.app.utils.ColorUtils;
 import mega.privacy.android.app.utils.StringResourcesUtils;
 import mega.privacy.android.app.utils.ZoomUtil;
 import nz.mega.sdk.MegaNode;
@@ -269,8 +266,10 @@ public class PhotosFragment extends BaseZoomFragment implements CUGridViewAdapte
             mManagerActivity.updateCUViewTypes(View.GONE);
             return;
         }
-
-        viewModel.setZoom(getCurrentZoom());
+        int currentZoom = ZoomUtil.getPHOTO_ZOOM_LEVEL();
+        getZoomViewModel().setCurrentZoom(currentZoom);
+        getZoomViewModel().setZoom(currentZoom);
+        viewModel.setZoom(currentZoom);
         viewModel.resetOpenedNode();
         mManagerActivity.updateCUViewTypes(View.VISIBLE);
         setupRecyclerView();
@@ -776,6 +775,7 @@ public class PhotosFragment extends BaseZoomFragment implements CUGridViewAdapte
     private void handleZoomAdapterLayoutChange(int zoom) {
         if (!viewModel.isEnableCUShown()) {
             viewModel.setZoom(zoom);
+            ZoomUtil.setPHOTO_ZOOM_LEVEL(zoom);
             Parcelable state = layoutManager.onSaveInstanceState();
             setGridView();
             layoutManager.onRestoreInstanceState(state);

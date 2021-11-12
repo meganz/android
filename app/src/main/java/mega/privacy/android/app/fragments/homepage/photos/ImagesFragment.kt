@@ -83,6 +83,9 @@ class ImagesFragment : BaseBindingFragmentKt<ImagesViewModel, FragmentImagesBind
     }
 
     override fun init() {
+        currentZoom = ZoomUtil.IMAGES_ZOOM_LEVEL
+        viewModel.zoomManager.setCurrentZoom(currentZoom)
+        viewModel.setZoom(currentZoom)
         setupEmptyHint()
         setupListView()
         setupTimePanel()
@@ -96,6 +99,7 @@ class ImagesFragment : BaseBindingFragmentKt<ImagesViewModel, FragmentImagesBind
         binding.layoutTitleBar.toolbar.apply {
             inflateMenu(R.menu.fragment_images_toolbar)
             handleZoomOptionsMenuUpdate()
+            handleZoomMenuItemStatus()
             setOnMenuItemClickListener {
                 when (it.itemId) {
                     R.id.action_zoom_in -> {
@@ -145,9 +149,11 @@ class ImagesFragment : BaseBindingFragmentKt<ImagesViewModel, FragmentImagesBind
     }
 
 
-    private fun handleZoomOptionsMenuUpdate() {
+    private fun handleZoomOptionsMenuUpdate(mShouldShow: Boolean? = null) {
+        var shouldShow = mShouldShow
+        if (shouldShow == null)
+            shouldShow = shouldShowZoomMenuItem()
         val toolbar = binding.layoutTitleBar.toolbar
-        val shouldShow = shouldShowZoomMenuItem()
         toolbar.menu.findItem(R.id.action_zoom_in).isVisible = shouldShow
         toolbar.menu.findItem(R.id.action_zoom_out).isVisible = shouldShow
     }
@@ -158,6 +164,7 @@ class ImagesFragment : BaseBindingFragmentKt<ImagesViewModel, FragmentImagesBind
             // Out 3X: organize by year, In 1X: organize by day, both need to reload nodes.
             val needReload = ZoomUtil.needReload(currentZoom, zoom)
             viewModel.zoomManager.setCurrentZoom(zoom)
+            ZoomUtil.IMAGES_ZOOM_LEVEL = zoom
             handleZoomAdapterLayoutChange(zoom)
             if (needReload) {
                 loadPhotos()
@@ -167,6 +174,13 @@ class ImagesFragment : BaseBindingFragmentKt<ImagesViewModel, FragmentImagesBind
 
         viewModel.items.observe(viewLifecycleOwner) {
             actionModeViewModel.setNodesData(it.filter { nodeItem -> nodeItem.type == PhotoNodeItem.TYPE_PHOTO })
+            if (it.isEmpty()) {
+                handleZoomOptionsMenuUpdate(false)
+                viewTypePanel.visibility = View.GONE
+            } else {
+                handleZoomOptionsMenuUpdate()
+                viewTypePanel.visibility = View.VISIBLE
+            }
         }
 
         viewModel.dateCards.observe(viewLifecycleOwner, ::showCards)
@@ -384,7 +398,11 @@ class ImagesFragment : BaseBindingFragmentKt<ImagesViewModel, FragmentImagesBind
         listView
     ) { v: View?, _, _, _, _ ->
         callManager {
-            it.changeAppBarElevation(v!!.canScrollVertically(-1),binding.layoutTitleBar.toolbar,binding.layoutTitleBar.layoutAppBar)
+            it.changeAppBarElevation(
+                v!!.canScrollVertically(-1),
+                binding.layoutTitleBar.toolbar,
+                binding.layoutTitleBar.layoutAppBar
+            )
         }
     }
 

@@ -48,6 +48,7 @@ abstract class BaseZoomFragment : BaseFragment(), GestureScaleCallback {
         inflater.inflate(R.menu.fragment_images_toolbar, menu)
         this.menu = menu
         handleOnCreateOptionsMenu()
+        handleZoomMenuItemStatus()
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -81,6 +82,8 @@ abstract class BaseZoomFragment : BaseFragment(), GestureScaleCallback {
     }
 
     private fun handleEnableToolbarMenuIcon(menuItemId: Int, isEnable: Boolean) {
+        if (!this::menu.isInitialized)
+            return
         val menuItem = this.menu.findItem(menuItemId)
         var colorRes = ColorUtils.getThemeColor(context, R.attr.colorControlNormal)
         if (!isEnable) {
