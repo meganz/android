@@ -154,6 +154,7 @@ import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.MessageNot
 import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.PendingMessageBottomSheetDialogFragment;
 import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.SendAttachmentChatBottomSheetDialogFragment;
 import mega.privacy.android.app.objects.GifData;
+import mega.privacy.android.app.objects.PasscodeManagement;
 import mega.privacy.android.app.utils.AlertsAndWarnings;
 import mega.privacy.android.app.utils.CallUtil;
 import mega.privacy.android.app.utils.ChatUtil;
@@ -325,6 +326,8 @@ public class ChatActivityLollipop extends PasscodeActivity
 
     @Inject
     FilePrepareUseCase filePrepareUseCase;
+    @Inject
+    PasscodeManagement passcodeManagement;
 
     private int currentRecordButtonState;
     private String mOutputFilePath;
@@ -679,7 +682,7 @@ public class ChatActivityLollipop extends PasscodeActivity
     public void onCallAnswered(long chatId, boolean flag) {
         logDebug("The call has been answered success");
         callInProgressLayout.setEnabled(true);
-        openMeetingInProgress(this, chatId, true);
+        openMeetingInProgress(this, chatId, true, passcodeManagement);
     }
 
     @Override
@@ -708,7 +711,7 @@ public class ChatActivityLollipop extends PasscodeActivity
     public void onCallStarted(long chatId, boolean enableVideo, int enableAudio) {
         if (idChat == chatId) {
             // In this case, the callMenuItem will be reset to enabled after resuming this activity (it calls invalidateOptionMenu())
-            openMeetingWithAudioOrVideo(this, idChat, enableAudio == START_CALL_AUDIO_ENABLE, enableVideo);
+            openMeetingWithAudioOrVideo(this, idChat, enableAudio == START_CALL_AUDIO_ENABLE, enableVideo, passcodeManagement);
         } else {
             enableCallMenuItems(true);
         }
@@ -744,7 +747,7 @@ public class ChatActivityLollipop extends PasscodeActivity
                 }).show(getSupportFragmentManager(),
                         MeetingHasEndedDialogFragment.TAG);
             } else  {
-                CallUtil.checkMeetingInProgress(ChatActivityLollipop.this, ChatActivityLollipop.this, chatId, isFromOpenChatPreview, link, request.getMegaHandleList(), request.getText(), alreadyExist, request.getUserHandle());
+                CallUtil.checkMeetingInProgress(ChatActivityLollipop.this, ChatActivityLollipop.this, chatId, isFromOpenChatPreview, link, request.getMegaHandleList(), request.getText(), alreadyExist, request.getUserHandle(), passcodeManagement);
             }
         } else {
             logDebug("It's a chat link");
@@ -3151,7 +3154,7 @@ public class ChatActivityLollipop extends PasscodeActivity
                 if (callInThisChat.isOnHold() ||
                         (currentCallInProgress != null && currentCallInProgress.getChatid() == chatRoom.getChatId())) {
                     logDebug("I'm participating in the call of this chat");
-                    returnCall(this, chatRoom.getChatId());
+                    returnCall(this, chatRoom.getChatId(), passcodeManagement);
                     return;
                 }
 
@@ -3353,7 +3356,7 @@ public class ChatActivityLollipop extends PasscodeActivity
 
     public void disablePinScreen(){
         logDebug("disablePinScreen");
-        MegaApplication.getPasscodeManagement().setShowPasscodeScreen(false);
+        passcodeManagement.setShowPasscodeScreen(false);
     }
 
     public void showProgressForwarding(){
@@ -3890,7 +3893,7 @@ public class ChatActivityLollipop extends PasscodeActivity
 
                 if (callInThisChat.getStatus() == MegaChatCall.CALL_STATUS_IN_PROGRESS) {
                     if (callInThisChat.isOnHold()) {
-                        returnCall(this, chatRoom.getChatId());
+                        returnCall(this, chatRoom.getChatId(), passcodeManagement);
                     }
 
                 } else if (chatRoom.isGroup()) {
@@ -3934,7 +3937,7 @@ public class ChatActivityLollipop extends PasscodeActivity
                         startCall();
                     }
                 } else {
-                    returnCall(this, chatIdBanner);
+                    returnCall(this, chatIdBanner, passcodeManagement);
                 }
                 break;
 
@@ -8469,7 +8472,7 @@ public class ChatActivityLollipop extends PasscodeActivity
 
             setNodeAttachmentVisible();
 
-            MegaApplication.getPasscodeManagement().setShowPasscodeScreen(true);
+            passcodeManagement.setShowPasscodeScreen(true);
             MegaApplication.setOpenChatId(idChat);
             supportInvalidateOptionsMenu();
 

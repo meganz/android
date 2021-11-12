@@ -443,7 +443,7 @@ public class OpenLinkActivity extends PasscodeActivity implements MegaRequestLis
 	}
 
 	private void goToMeetingActivity(long chatId, String meetingName) {
-		CallUtil.openMeetingGuestMode(this, meetingName, chatId, url);
+		CallUtil.openMeetingGuestMode(this, meetingName, chatId, url, passcodeManagement);
 		finish();
 	}
 

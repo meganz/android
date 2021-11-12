@@ -12,12 +12,13 @@ import mega.privacy.android.app.activities.PasscodeActivity
 import mega.privacy.android.app.constants.EventConstants.EVENT_UPDATE_SCROLL
 import mega.privacy.android.app.databinding.ActivitySettingsBinding
 import mega.privacy.android.app.fragments.settingsFragments.SettingsBaseFragment
+import mega.privacy.android.app.interfaces.SimpleSnackbarCallBack
 import mega.privacy.android.app.utils.ColorUtils
 import mega.privacy.android.app.utils.StringResourcesUtils
 import mega.privacy.android.app.utils.Util
 import java.util.*
 
-open class PreferencesBaseActivity : PasscodeActivity() {
+open class PreferencesBaseActivity : PasscodeActivity(), SimpleSnackbarCallBack {
 
     protected lateinit var binding: ActivitySettingsBinding
 
@@ -91,5 +92,9 @@ open class PreferencesBaseActivity : PasscodeActivity() {
         )
 
         binding.appBarLayoutSettings.elevation = if (withElevation && !isDark) elevation else 0F
+    }
+
+    override fun showSnackbar(message: String?) {
+        super.showSnackbar(binding.root, message)
     }
 }

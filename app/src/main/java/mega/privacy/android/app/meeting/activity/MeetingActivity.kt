@@ -10,19 +10,18 @@ import androidx.navigation.NavGraph
 import androidx.navigation.fragment.NavHostFragment
 import com.jeremyliao.liveeventbus.LiveEventBus
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import mega.privacy.android.app.BaseActivity
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
 import mega.privacy.android.app.constants.EventConstants.EVENT_ENTER_IN_MEETING
 import mega.privacy.android.app.databinding.ActivityMeetingBinding
 import mega.privacy.android.app.meeting.fragments.*
+import mega.privacy.android.app.objects.PasscodeManagement
 import mega.privacy.android.app.utils.Constants.REQUIRE_PASSCODE_INVALID
 import mega.privacy.android.app.utils.PasscodeUtil
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
 import javax.inject.Inject
 
-@ExperimentalCoroutinesApi
 @AndroidEntryPoint
 class MeetingActivity : BaseActivity() {
 
@@ -51,6 +50,8 @@ class MeetingActivity : BaseActivity() {
 
     @Inject
     lateinit var passcodeUtil: PasscodeUtil
+    @Inject
+    lateinit var passcodeManagement: PasscodeManagement
 
     lateinit var binding: ActivityMeetingBinding
     private val meetingViewModel: MeetingActivityViewModel by viewModels()
@@ -69,9 +70,18 @@ class MeetingActivity : BaseActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        if (shouldRefreshSessionDueToSDK() || shouldRefreshSessionDueToKarere()) {
-            if (intent != null) {
-                intent.getLongExtra(MEETING_CHAT_ID, MEGACHAT_INVALID_HANDLE).let { chatId ->
+        intent?.let {
+            isGuest = intent.getBooleanExtra(
+                MEETING_IS_GUEST,
+                false
+            )
+        }
+
+        if ((isGuest && shouldRefreshSessionDueToMegaApiIsNull()) ||
+            (!isGuest && shouldRefreshSessionDueToSDK()) || shouldRefreshSessionDueToKarere()
+        ) {
+            intent?.let {
+                it.getLongExtra(MEETING_CHAT_ID, MEGACHAT_INVALID_HANDLE).let { chatId ->
                     if (chatId != MEGACHAT_INVALID_HANDLE) {
                         //Notification of this call should be displayed again
                         MegaApplication.getChatManagement().removeNotificationShown(chatId)
@@ -242,8 +252,7 @@ class MeetingActivity : BaseActivity() {
         val timeRequired = passcodeUtil.timeRequiredForPasscode()
         if (timeRequired != REQUIRE_PASSCODE_INVALID) {
             if (isLockingEnabled) {
-                MegaApplication.getPasscodeManagement().lastPause =
-                    System.currentTimeMillis() - timeRequired
+                passcodeManagement.lastPause = System.currentTimeMillis() - timeRequired
             } else {
                 passcodeUtil.pauseUpdate()
             }

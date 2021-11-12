@@ -145,7 +145,6 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 	@Override
 	public void onCreate() {
 		super.onCreate();
-		logDebug("onCreate");
 
 		app = (MegaApplication)getApplication();
 
@@ -775,11 +774,10 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 			int videosCompressed = getVideosCompressed();
 
 			if (megaApi.areTransfersPaused(MegaTransfer.TYPE_UPLOAD)) {
-				message = StringResourcesUtils.getQuantityString(R.plurals.upload_service_paused_notification,
-						totalUploads, inProgress, totalUploads);
+				message = StringResourcesUtils.getString(R.string.upload_service_notification_paused,
+						inProgress, totalUploads);
 			} else if (thereAreChatUploads() || videosCompressed == mapVideoDownsampling.size()) {
-				message = StringResourcesUtils.getQuantityString(R.plurals.upload_service_notification,
-						totalUploads, inProgress, totalUploads);
+				message = StringResourcesUtils.getString(R.string.upload_service_notification, inProgress, totalUploads);
 			} else {
 				message = StringResourcesUtils.getString(R.string.title_compress_video,
 						videosCompressed + 1, mapVideoDownsampling.size());
@@ -1216,21 +1214,23 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 
 		String fingerprint = megaApi.getFingerprint(transfer.getPath());
 
+		boolean msgNotFound = true;
 		for (PendingMessageSingle pendMsg : pendingMessages) {
 			if (pendMsg.getId() == id || pendMsg.getFingerprint().equals(fingerprint)) {
 				attach(pendMsg, transfer);
-				return;
+				msgNotFound = false;
 			}
 		}
 
-		//Message not found, try to attach from DB
-		attachMessageFromDB(id, transfer);
+		if (msgNotFound) {
+			//Message not found, try to attach from DB
+			attachMessageFromDB(id, transfer);
+		}
 	}
 
 	public void attach (PendingMessageSingle pendMsg, MegaTransfer transfer) {
 		if (megaChatApi != null) {
 			logDebug("attach");
-
 			requestSent++;
 			pendMsg.setNodeHandle(transfer.getNodeHandle());
 			pendMsg.setState(PendingMessageSingle.STATE_ATTACHING);

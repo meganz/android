@@ -19,6 +19,7 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 
 import java.util.ArrayList;
+import java.util.Locale;
 
 import mega.privacy.android.app.MegaContactDB;
 import mega.privacy.android.app.R;
@@ -29,6 +30,7 @@ import mega.privacy.android.app.lollipop.controllers.ContactController;
 import mega.privacy.android.app.lollipop.megachat.chatAdapters.MegaContactsAttachedLollipopAdapter;
 import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.ContactAttachmentBottomSheetDialogFragment;
 import mega.privacy.android.app.utils.ContactUtil;
+import mega.privacy.android.app.utils.StringResourcesUtils;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaChatApiJava;
 import nz.mega.sdk.MegaChatError;
@@ -149,7 +151,8 @@ public class ContactAttachmentActivityLollipop extends PasscodeActivity implemen
 		aB = getSupportActionBar();
 		aB.setDisplayHomeAsUpEnabled(true);
 		aB.setDisplayShowHomeEnabled(true);
-		aB.setTitle(getString(R.string.activity_title_contacts_attached));
+		aB.setTitle(StringResourcesUtils.getString(R.string.activity_title_contacts_attached)
+				.toUpperCase(Locale.getDefault()));
 
 		aB.setSubtitle(message.getMessage().getUserHandle() == megaChatApi.getMyUserHandle() ? megaChatApi.getMyFullname()
 				: cC.getParticipantFullName(message.getMessage().getUserHandle()));

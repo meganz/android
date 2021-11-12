@@ -83,6 +83,7 @@ import mega.privacy.android.app.meeting.fragments.InMeetingViewModel.Companion.S
 import mega.privacy.android.app.meeting.listeners.AnswerChatCallListener
 import mega.privacy.android.app.meeting.listeners.BottomFloatingPanelListener
 import mega.privacy.android.app.meeting.listeners.StartChatCallListener
+import mega.privacy.android.app.objects.PasscodeManagement
 import mega.privacy.android.app.utils.*
 import mega.privacy.android.app.utils.ChatUtil.*
 import mega.privacy.android.app.utils.Constants.*
@@ -92,12 +93,15 @@ import mega.privacy.android.app.utils.permission.permissionsBuilder
 import nz.mega.sdk.*
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
 import java.lang.Integer.min
+import javax.inject.Inject
 
-@ExperimentalCoroutinesApi
 @AndroidEntryPoint
 class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, SnackbarShower,
     StartChatCallListener.StartChatCallCallback, AnswerChatCallListener.OnCallAnsweredCallback,
     AutoJoinPublicChatListener.OnJoinedChatCallback {
+
+    @Inject
+    lateinit var passcodeManagement: PasscodeManagement
 
     private var bCountDownTimerStart: Boolean = false
     private var bInviteSent: Boolean = false
@@ -1346,7 +1350,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
         val anotherCall = inMeetingViewModel.getAnotherCall()
         if (anotherCall != null) {
             logDebug("Return to another call")
-            CallUtil.openMeetingInProgress(requireContext(), anotherCall.chatid, false)
+            CallUtil.openMeetingInProgress(requireContext(), anotherCall.chatid, false, passcodeManagement)
         }
     }
 
@@ -2543,7 +2547,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
                 logDebug("Change of status on hold and switch of call")
                 inMeetingViewModel.setCallOnHold(true)
                 inMeetingViewModel.setAnotherCallOnHold(anotherCall.chatid, false)
-                CallUtil.openMeetingInProgress(requireContext(), anotherCall.chatid, false)
+                CallUtil.openMeetingInProgress(requireContext(), anotherCall.chatid, false, passcodeManagement)
             }
             inMeetingViewModel.isCallOnHold() -> {
                 logDebug("Change of status on hold")
@@ -2911,7 +2915,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
     private fun checkIfAnotherCallShouldBeShown() {
         inMeetingViewModel.getAnotherCall()?.let {
             logDebug("Show another call")
-            CallUtil.openMeetingInProgress(requireContext(), it.chatid, false)
+            CallUtil.openMeetingInProgress(requireContext(), it.chatid, false, passcodeManagement)
         }
     }
 
