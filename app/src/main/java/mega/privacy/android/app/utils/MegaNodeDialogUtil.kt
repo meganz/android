@@ -71,6 +71,10 @@ object MegaNodeDialogUtil {
     const val ACTION_BACKUP_ADD = 3
     const val ACTION_BACKUP_TAKE_PICTURE = 4
     const val ACTION_BACKUP_NEW_FOLDER = 5
+    const val ACTION_BACKUP_SHARE_FOLDER = 6
+    const val ACTION_BACKUP_SHARE = 7
+    const val ACTION_BACKUP_SHARE_CHAT = 8
+    const val ACTION_BACKUP_GET_LINK = 9
     /**
      * Creates and shows a TYPE_RENAME dialog to rename a node.
      *
@@ -734,15 +738,26 @@ object MegaNodeDialogUtil {
             DialogInterface.OnClickListener { dialog: DialogInterface?, which: Int ->
                 when (which) {
                     BUTTON_POSITIVE -> {
-                        actionBackupNodeCallback.actionConfirmed(
-                            handleList,
-                            pNodeBackup,
-                            isRootBackup,
-                            actionType
-                        )
+                        if(actionType == ACTION_BACKUP_SHARE_FOLDER
+                            || actionType == ACTION_BACKUP_SHARE
+                            || actionType == ACTION_BACKUP_SHARE_CHAT
+                            || actionType == ACTION_BACKUP_GET_LINK ) {
+                            actionBackupNodeCallback.actionExecute(
+                                handleList,
+                                pNodeBackup,
+                                isRootBackup,
+                                actionType)
+                        } else {
+                            actionBackupNodeCallback.actionConfirmed(
+                                handleList,
+                                pNodeBackup,
+                                isRootBackup,
+                                actionType
+                            )
+                        }
                     }
                     BUTTON_NEGATIVE -> {
-                        actionBackupNodeCallback.actionCancel(dialog)
+                        actionBackupNodeCallback.actionCancel(dialog, actionType)
                     }
                 }
             }
@@ -793,11 +808,31 @@ object MegaNodeDialogUtil {
                     tvContent.setText(R.string.backup_remove_sub_folder)
                 }
             }
+            ACTION_BACKUP_GET_LINK, ACTION_BACKUP_SHARE_CHAT, ACTION_BACKUP_SHARE, ACTION_BACKUP_SHARE_FOLDER -> {
+                tvTitle.setText(R.string.backup_share_permission_title)
+                tvContent.setText(R.string.backup_share_permission_text)
+            }
         }
         val builder = MaterialAlertDialogBuilder(activity)
             .setView(view)
-            .setPositiveButton(getString(R.string.button_continue), dialogClickListener)
-            .setNegativeButton(getString(R.string.general_cancel), dialogClickListener)
+        when (actionType) {
+            ACTION_BACKUP_GET_LINK, ACTION_BACKUP_SHARE_CHAT, ACTION_BACKUP_SHARE, ACTION_BACKUP_SHARE_FOLDER -> {
+                builder.setPositiveButton(
+                    getString(R.string.button_permission_info),
+                    dialogClickListener
+                )
+            }
+            else -> {
+                builder.setPositiveButton(
+                    getString(R.string.button_continue),
+                    dialogClickListener
+                )
+                builder.setNegativeButton(
+                    getString(R.string.general_cancel),
+                    dialogClickListener
+                )
+            }
+        }
         val dialog = builder.show()
         dialog.setCancelable(false)
         dialog.setCanceledOnTouchOutside(false)
@@ -911,7 +946,7 @@ object MegaNodeDialogUtil {
             val buttonCancel =
                 dialog.getButton(BUTTON_NEGATIVE)
             buttonCancel.setOnClickListener {
-                actionBackupNodeCallback.actionCancel(dialog)
+                actionBackupNodeCallback.actionCancel(dialog, actionType)
                 dialog.dismiss()
             }
 

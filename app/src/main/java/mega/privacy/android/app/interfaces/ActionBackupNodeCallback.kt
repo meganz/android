@@ -29,5 +29,5 @@ interface ActionBackupNodeCallback {
     /**
      * Makes the necessary UI changes after cancel the action.
      */
-    fun actionCancel(dialog: DialogInterface?)
+    fun actionCancel(dialog: DialogInterface?, actionType: Int)
 }

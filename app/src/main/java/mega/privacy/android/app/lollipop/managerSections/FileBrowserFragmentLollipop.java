@@ -40,17 +40,10 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Stack;
 
 import javax.inject.Inject;
@@ -88,8 +81,12 @@ import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.FileUtil.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.MegaApiUtils.*;
+import static mega.privacy.android.app.utils.MegaNodeDialogUtil.ACTION_BACKUP_GET_LINK;
 import static mega.privacy.android.app.utils.MegaNodeDialogUtil.ACTION_BACKUP_MOVE;
 import static mega.privacy.android.app.utils.MegaNodeDialogUtil.ACTION_BACKUP_REMOVE;
+import static mega.privacy.android.app.utils.MegaNodeDialogUtil.ACTION_BACKUP_SHARE;
+import static mega.privacy.android.app.utils.MegaNodeDialogUtil.ACTION_BACKUP_SHARE_CHAT;
+import static mega.privacy.android.app.utils.MegaNodeDialogUtil.ACTION_BACKUP_SHARE_FOLDER;
 import static mega.privacy.android.app.utils.MegaNodeDialogUtil.showConfirmDialogWithBackup;
 import static mega.privacy.android.app.utils.MegaNodeDialogUtil.showTipDialogWithBackup;
 import static mega.privacy.android.app.utils.MegaNodeUtil.allHaveOwnerAccess;
@@ -168,6 +165,7 @@ public class FileBrowserFragmentLollipop extends RotatableFragment{
 		public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
 			logDebug("onActionItemClicked");
 			List<MegaNode> documents = adapter.getSelectedNodes();
+			ArrayList<Long> handleList = new ArrayList<>();
 			switch(item.getItemId()){
 				case R.id.cab_menu_download:{
 					((ManagerActivityLollipop) context).saveNodesToDevice(
@@ -187,7 +185,6 @@ public class FileBrowserFragmentLollipop extends RotatableFragment{
 					break;
 				}
 				case R.id.cab_menu_copy:{
-					ArrayList<Long> handleList = new ArrayList<Long>();
 					for (int i=0;i<documents.size();i++){
 						handleList.add(documents.get(i).getHandle());
 					}
@@ -199,7 +196,6 @@ public class FileBrowserFragmentLollipop extends RotatableFragment{
 					break;
 				}
 				case R.id.cab_menu_move:{
-					ArrayList<Long> handleList = new ArrayList<Long>();
 					for (int i = 0; i < documents.size(); i++) {
 						handleList.add(documents.get(i).getHandle());
 					}
@@ -207,37 +203,59 @@ public class FileBrowserFragmentLollipop extends RotatableFragment{
 					boolean isSubBackup = checkSubBackupNodeByHandle(megaApi, handleList);
 					// Show the warning dialog if the list including Backup node
 					if(pNode != null){
-						showWarningOfMove(handleList, pNode, true, ACTION_BACKUP_MOVE);
+						actWithBackupTips(handleList, pNode, true, ACTION_BACKUP_MOVE);
 					} else if(isSubBackup){
 						Long handle = handleList.get(0);
 						MegaNode p = megaApi.getNodeByHandle(handle);
-						showWarningOfMove(handleList, p, false, ACTION_BACKUP_MOVE);
+						actWithBackupTips(handleList, p, false, ACTION_BACKUP_MOVE);
 					} else {
 						NodeController nC = new NodeController(context);
 						nC.chooseLocationToMoveNodes(handleList);
-						clearSelections();
-						hideMultipleSelect();
 					}
+					clearSelections();
+					hideMultipleSelect();
 					break;
 				}
 				case R.id.cab_menu_share_folder:{
 					//Check that all the selected options are folders
-					ArrayList<Long> handleList = new ArrayList<Long>();
 					for (int i=0;i<documents.size();i++){
 						if(documents.get(i).isFolder()){
 							handleList.add(documents.get(i).getHandle());
 						}
 					}
-
-					NodeController nC = new NodeController(context);
-					nC.selectContactToShareFolders(handleList);
-
+					MegaNode pNode = checkBackupNodeByHandle(megaApi, handleList);
+					boolean isSubBackup = checkSubBackupNodeByHandle(megaApi, handleList);
+					// Show the warning dialog if the list including Backup node
+					if(pNode != null){
+						actWithBackupTips(handleList, pNode, true, ACTION_BACKUP_SHARE_FOLDER);
+					} else if(isSubBackup){
+						Long handle = handleList.get(0);
+						MegaNode p = megaApi.getNodeByHandle(handle);
+						actWithBackupTips(handleList, p, false, ACTION_BACKUP_SHARE_FOLDER);
+					} else {
+						NodeController nC = new NodeController(context);
+						nC.selectContactToShareFolders(handleList);
+					}
 					clearSelections();
 					hideMultipleSelect();
 					break;
 				}
 				case R.id.cab_menu_share_out: {
-					MegaNodeUtil.shareNodes(context, documents);
+					for (int i=0;i<documents.size();i++){
+						handleList.add(documents.get(i).getHandle());
+					}
+					MegaNode pNode = checkBackupNodeByHandle(megaApi, handleList);
+					boolean isSubBackup = checkSubBackupNodeByHandle(megaApi, handleList);
+
+					if(pNode != null){
+						actWithBackupTips(handleList, pNode, true, ACTION_BACKUP_SHARE);
+					} else if(isSubBackup){
+						Long handle = handleList.get(0);
+						MegaNode p = megaApi.getNodeByHandle(handle);
+						actWithBackupTips(handleList, p, false, ACTION_BACKUP_SHARE);
+					} else {
+						MegaNodeUtil.shareNodes(context, documents);
+					}
 					clearSelections();
 					hideMultipleSelect();
 					break;
@@ -276,7 +294,6 @@ public class FileBrowserFragmentLollipop extends RotatableFragment{
 					break;
 				}
 				case R.id.cab_menu_trash:{
-					ArrayList<Long> handleList = new ArrayList<Long>();
 					for (int i=0;i<documents.size();i++){
 						handleList.add(documents.get(i).getHandle());
 					}
@@ -1306,22 +1323,50 @@ public class FileBrowserFragmentLollipop extends RotatableFragment{
 	 * @param isRootBackup true - "My backup" folder / false - sub folders or files
 	 * @param actionType Indicates the action (move / remove/ add / new folder / new file)
 	 */
-	private void showWarningOfMove(final ArrayList<Long> handleList, MegaNode pNodeBackup, boolean isRootBackup, int actionType) {
+	private void actWithBackupTips(final ArrayList<Long> handleList, MegaNode pNodeBackup, boolean isRootBackup, int actionType) {
 		showTipDialogWithBackup(mActivity, new ActionBackupNodeCallback() {
 
 					@Override
-					public void actionCancel(@Nullable DialogInterface dialog) {
-						clearSelections();
-						hideMultipleSelect();
+					public void actionCancel(@Nullable DialogInterface dialog, int actionType) {
+						switch (actionType){
+							case ACTION_BACKUP_SHARE_FOLDER:
+							case ACTION_BACKUP_SHARE_CHAT:
+							case ACTION_BACKUP_SHARE:
+							case ACTION_BACKUP_GET_LINK:
+							case ACTION_BACKUP_MOVE:
+							case ACTION_BACKUP_REMOVE:
+							default:
+								break;
+						}
 					}
 
 					@Override
-					public void actionExecute(@NotNull ArrayList<Long> handleList, @NotNull MegaNode pNodeBackup, boolean isRootBackup, int actionType) {
+					public void actionExecute(ArrayList<Long> handleList, @NotNull MegaNode pNodeBackup, boolean isRootBackup, int actionType) {
+						switch (actionType){
+							case ACTION_BACKUP_SHARE_FOLDER:
+								NodeController nC = new NodeController(context);
+								nC.selectContactToShareFolders(handleList);
 
+								clearSelections();
+								hideMultipleSelect();
+								break;
+							case  ACTION_BACKUP_SHARE:
+								if(handleList!= null){
+									List<MegaNode> documents = new ArrayList<>();
+									for (int i = 0;i < handleList.size();i++) {
+										MegaNode p  = megaApi.getNodeByHandle(handleList.get(i));
+										documents.add(p);
+									}
+									MegaNodeUtil.shareNodes(context, documents);
+								}
+								break;
+							default:
+								break;
+						}
 					}
 
 					@Override
-					public void actionConfirmed(@org.jetbrains.annotations.Nullable ArrayList<Long> handleList, @NotNull MegaNode pNodeBackup, boolean isRootBackup, int actionType) {
+					public void actionConfirmed(ArrayList<Long> handleList, @NotNull MegaNode pNodeBackup, boolean isRootBackup, int actionType) {
 						confirmationMove(handleList, pNodeBackup, isRootBackup, actionType);
 					}
 				},
@@ -1344,20 +1389,41 @@ public class FileBrowserFragmentLollipop extends RotatableFragment{
 		if (handleList != null && pNodeBackup != null) {
 			showConfirmDialogWithBackup(this.mActivity, new ActionBackupNodeCallback() {
 						@Override
-						public void actionCancel(@Nullable DialogInterface dialog) {
-							clearSelections();
-							hideMultipleSelect();
+						public void actionCancel(@Nullable DialogInterface dialog, int actionType) {
+							switch (actionType){
+								case ACTION_BACKUP_SHARE_FOLDER:
+								case ACTION_BACKUP_MOVE:
+								case ACTION_BACKUP_REMOVE:
+									clearSelections();
+									hideMultipleSelect();
+									break;
+								default:
+									break;
+							}
 						}
 
 						@Override
 						public void actionExecute( ArrayList<Long> handleList, @NotNull MegaNode pNodeBackup, boolean isRootBackup, int actionType) {
-							if (actionType == ACTION_BACKUP_REMOVE) {
-								return;
-							} else {
-								NodeController nC = new NodeController(context);
-								nC.chooseLocationToMoveNodes(handleList);
-								clearSelections();
-								hideMultipleSelect();
+							switch (actionType) {
+								case ACTION_BACKUP_REMOVE:
+									break;
+								case ACTION_BACKUP_MOVE: {
+									NodeController nC = new NodeController(context);
+									nC.chooseLocationToMoveNodes(handleList);
+									clearSelections();
+									hideMultipleSelect();
+									break;
+								}
+								case ACTION_BACKUP_SHARE_FOLDER: {
+									NodeController nC = new NodeController(context);
+									nC.selectContactToShareFolders(handleList);
+
+									clearSelections();
+									hideMultipleSelect();
+									break;
+								}
+								default:
+									break;
 							}
 						}
 

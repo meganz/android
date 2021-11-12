@@ -284,9 +284,13 @@ import static mega.privacy.android.app.utils.AlertsAndWarnings.askForCustomizedP
 import static mega.privacy.android.app.utils.AlertsAndWarnings.showForeignStorageOverQuotaWarningDialog;
 import static mega.privacy.android.app.utils.MegaNodeDialogUtil.ACTION_BACKUP_ADD;
 import static mega.privacy.android.app.utils.MegaNodeDialogUtil.ACTION_BACKUP_FAB;
+import static mega.privacy.android.app.utils.MegaNodeDialogUtil.ACTION_BACKUP_GET_LINK;
 import static mega.privacy.android.app.utils.MegaNodeDialogUtil.ACTION_BACKUP_MOVE;
 import static mega.privacy.android.app.utils.MegaNodeDialogUtil.ACTION_BACKUP_NEW_FOLDER;
 import static mega.privacy.android.app.utils.MegaNodeDialogUtil.ACTION_BACKUP_REMOVE;
+import static mega.privacy.android.app.utils.MegaNodeDialogUtil.ACTION_BACKUP_SHARE;
+import static mega.privacy.android.app.utils.MegaNodeDialogUtil.ACTION_BACKUP_SHARE_CHAT;
+import static mega.privacy.android.app.utils.MegaNodeDialogUtil.ACTION_BACKUP_SHARE_FOLDER;
 import static mega.privacy.android.app.utils.MegaNodeDialogUtil.ACTION_BACKUP_TAKE_PICTURE;
 import static mega.privacy.android.app.utils.MegaNodeDialogUtil.IS_NEW_TEXT_FILE_SHOWN;
 import static mega.privacy.android.app.utils.MegaNodeDialogUtil.NEW_TEXT_FILE_TEXT;
@@ -6576,7 +6580,23 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 			handles[i] = node.getHandle();
 		}
 
-		LinksUtil.showGetLinkActivity(this, handles);
+		//Check backup
+		ArrayList<Long> handleList = new ArrayList<>();
+		for (int i=0;i<handles.length;i++){
+			handleList.add(handles[i]);
+		}
+		MegaNode pNode = checkBackupNodeByHandle(megaApi, handleList);
+		boolean isSubBackup = checkSubBackupNodeByHandle(megaApi, handleList);
+
+		if(pNode != null){
+			actWithBackupTips(handleList, pNode, true, ACTION_BACKUP_GET_LINK);
+		} else if(isSubBackup){
+			Long handle = handleList.get(0);
+			MegaNode p = megaApi.getNodeByHandle(handle);
+			actWithBackupTips(handleList, p, false, ACTION_BACKUP_GET_LINK);
+		} else {
+			LinksUtil.showGetLinkActivity(this, handles);
+		}
 	}
 
 	public void showGetLinkActivity(long handle){
@@ -6587,14 +6607,24 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 			return;
 		}
 
-
 		if (showTakenDownNodeActionNotAvailableDialog(node, this)) {
 			return;
 		}
 
-		LinksUtil.showGetLinkActivity(this, handle);
+		ArrayList<Long> handleList = new ArrayList<>();
+		handleList.add(handle);
 
-		refreshAfterMovingToRubbish();
+		MegaNode pNode = checkBackupNodeByHandle(megaApi, handleList);
+		boolean isSubBackup = checkSubBackupNodeByHandle(megaApi, handleList);
+
+		if(pNode != null){
+			actWithBackupTips(handleList, pNode, true, ACTION_BACKUP_GET_LINK);
+		} else if(isSubBackup){
+			MegaNode p = megaApi.getNodeByHandle(handle);
+			actWithBackupTips(handleList, p, false, ACTION_BACKUP_GET_LINK);
+		} else {
+			LinksUtil.showGetLinkActivity(this, handle);
+		}
 	}
 
 	/*
@@ -6722,6 +6752,11 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 
 	}
 
+	public void showWarningDialogOfShare(final MegaNode p, boolean isRootBackup, int actionType){
+		logDebug("showWarningDialogOfShareFolder");
+		actWithBackupTips(null, p, isRootBackup, actionType);
+	}
+
 	/**
 	 * Show the warning dialog when acting with "My backup" folder
 	 * @param handleList handleList handles list of the nodes that selected
@@ -6736,12 +6771,39 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 		showTipDialogWithBackup(this, new ActionBackupNodeCallback() {
 
 					@Override
-					public void actionCancel(@Nullable DialogInterface dialog) {
+					public void actionCancel(@Nullable DialogInterface dialog, int actionType) {
 					}
 
 					@Override
 					public void actionExecute(ArrayList<Long> handleList, @NotNull MegaNode pNodeBackup, boolean isRootBackup, int actionType) {
-
+						switch (actionType){
+							case ACTION_BACKUP_SHARE_FOLDER:
+								if (isOutShare(pNodeBackup)) {
+									Intent i = new Intent(ManagerActivityLollipop.this, FileContactListActivityLollipop.class);
+									i.putExtra(NAME, pNodeBackup.getHandle());
+									startActivity(i);
+								} else {
+									nC.selectContactToShareFolder(pNodeBackup);
+								}
+								break;
+							case ACTION_BACKUP_SHARE:
+								shareNode(ManagerActivityLollipop.this, pNodeBackup);
+								break;
+							case ACTION_BACKUP_SHARE_CHAT:
+								attachNodeToChats(pNodeBackup);
+								break;
+							case ACTION_BACKUP_GET_LINK:
+								if(handleList!= null) {
+									long[] handles = new long[handleList.size()];
+									for (int i = 0; i < handleList.size(); i++) {
+										handles[i] = handleList.get(i);
+									}
+									LinksUtil.showGetLinkActivity(ManagerActivityLollipop.this, handles);
+								}
+								break;
+							default:
+								break;
+						}
 					}
 
 					@Override
@@ -6767,7 +6829,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 		if (pNodeBackup != null) {
 			showConfirmDialogWithBackup(this, new ActionBackupNodeCallback() {
 						@Override
-						public void actionCancel(@Nullable DialogInterface dialog) {
+						public void actionCancel(@Nullable DialogInterface dialog, int actionType) {
 							switch (actionType) {
 								case ACTION_BACKUP_REMOVE:
 									break;

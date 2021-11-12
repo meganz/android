@@ -44,6 +44,9 @@ import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.FileUtil.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.MegaApiUtils.*;
+import static mega.privacy.android.app.utils.MegaNodeDialogUtil.ACTION_BACKUP_SHARE;
+import static mega.privacy.android.app.utils.MegaNodeDialogUtil.ACTION_BACKUP_SHARE_CHAT;
+import static mega.privacy.android.app.utils.MegaNodeDialogUtil.ACTION_BACKUP_SHARE_FOLDER;
 import static mega.privacy.android.app.utils.MegaNodeUtil.*;
 import static mega.privacy.android.app.utils.OfflineUtils.*;
 import static mega.privacy.android.app.utils.StringResourcesUtils.getQuantityString;
@@ -1091,14 +1094,19 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
                 break;
 
             case R.id.share_folder_option:
-                if (isOutShare(node)) {
-                    i = new Intent(requireContext(), FileContactListActivityLollipop.class);
-                    i.putExtra(NAME, node.getHandle());
-                    startActivity(i);
+                if(node.getHandle() == myBackupHandle){
+                    ((ManagerActivityLollipop) requireActivity()).showWarningDialogOfShare(node, true, ACTION_BACKUP_SHARE_FOLDER);
+                } else if(checkSubBackupNodeByHandle(megaApi, node)){
+                    ((ManagerActivityLollipop) requireActivity()).showWarningDialogOfShare(node, false, ACTION_BACKUP_SHARE_FOLDER);
                 } else {
-                    nC.selectContactToShareFolder(node);
+                    if (isOutShare(node)) {
+                        i = new Intent(requireContext(), FileContactListActivityLollipop.class);
+                        i.putExtra(NAME, node.getHandle());
+                        startActivity(i);
+                    } else {
+                        nC.selectContactToShareFolder(node);
+                    }
                 }
-
                 dismissAllowingStateLoss();
                 break;
 
@@ -1113,7 +1121,13 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
                 break;
 
             case R.id.send_chat_option:
-                ((ManagerActivityLollipop) requireActivity()).attachNodeToChats(node);
+                if(node.getHandle() == myBackupHandle){
+                    ((ManagerActivityLollipop) requireActivity()).showWarningDialogOfShare(node, true, ACTION_BACKUP_SHARE_CHAT);
+                } else if(checkSubBackupNodeByHandle(megaApi, node)){
+                    ((ManagerActivityLollipop) requireActivity()).showWarningDialogOfShare(node, false, ACTION_BACKUP_SHARE_CHAT);
+                } else {
+                    ((ManagerActivityLollipop) requireActivity()).attachNodeToChats(node);
+                }
                 dismissAllowingStateLoss();
                 break;
 
@@ -1158,7 +1172,13 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
                 break;
 
             case R.id.share_option:
-                shareNode(requireActivity(), node);
+                if(node.getHandle() == myBackupHandle){
+                    ((ManagerActivityLollipop) requireActivity()).showWarningDialogOfShare(node, true, ACTION_BACKUP_SHARE);
+                } else if(checkSubBackupNodeByHandle(megaApi, node)){
+                    ((ManagerActivityLollipop) requireActivity()).showWarningDialogOfShare(node, false, ACTION_BACKUP_SHARE);
+                } else {
+                    shareNode(requireActivity(), node);
+                }
                 break;
 
             case R.id.edit_file_option:

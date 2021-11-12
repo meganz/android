@@ -1770,4 +1770,26 @@ object MegaNodeUtil {
         }
         return false
     }
+
+    /**
+     * Check the sub folder of My Backup
+     *
+     * @param megaApi MegaApiAndroid instance to use.
+     * @param handleList handles list of the nodes that selected
+     * @return true - Sub folder of My Backup / false - Not the sub folder of My Backup
+     */
+    @JvmStatic
+    fun checkSubBackupNodeByHandle(megaApi: MegaApiAndroid, node: MegaNode?): Boolean{
+        if(node != null) {
+            var p: MegaNode = node
+            while (megaApi.getParentNode(p) != null) {
+                p = megaApi.getParentNode(p)
+                if(p.handle == myBackupHandle){
+                    return true
+                }
+            }
+            return false
+        }
+        return false
+    }
 }

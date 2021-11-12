@@ -4226,6 +4226,10 @@
     <string name="backup_add_confirm_title">Add item to \"%1s\"</string>
     <!-- The title of warning dialog for adding item to "My backup" -->
     <string name="backup_add_item_title">Setup backup</string>
-    <!-- If users want to add tiems to the "My backup" folder, Warning dialog will show to confirm -->
+    <!-- If users want to add items to the "My backup" folder, Warning dialog will show to confirm -->
     <string name="backup_add_item_text">To ensure this items added to your backup folder are automatically synchronised to the MEGA Cloud, please setup on desktop app.</string>
+    <!-- If users want to share items in the "My backup" folder, Warning dialog will show to confirm -->
+    <string name="backup_share_permission_title">Read-only</string>
+    <!-- If users want to share items in the "My backup" folder, Warning dialog will show to confirm -->
+    <string name="backup_share_permission_text">This folder can only be shared as read-only, as this is a backup folder, any changes to its content could disable the backup.</string>
 </resources>
