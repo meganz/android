@@ -1324,7 +1324,7 @@ public class FileExplorerActivityLollipop extends TransfersManagementActivity
 									setRootTitle();
 									aB.setSubtitle(R.string.general_select_to_download);
 								} else {
-									aB.setTitle(megaApi.getNodeByHandle(cDriveExplorer.getParentHandle()).getName().toUpperCase());
+									aB.setTitle(megaApi.getNodeByHandle(cDriveExplorer.getParentHandle()).getName());
 								}
 							}
 							break;
@@ -1399,7 +1399,7 @@ public class FileExplorerActivityLollipop extends TransfersManagementActivity
 						setRootTitle();
 					}
 					else{
-						aB.setTitle(megaApi.getNodeByHandle(((CloudDriveExplorerFragmentLollipop)f).getParentHandle()).getName().toUpperCase());
+						aB.setTitle(megaApi.getNodeByHandle(((CloudDriveExplorerFragmentLollipop)f).getParentHandle()).getName());
 					}
 				}
 				showFabButton(false);

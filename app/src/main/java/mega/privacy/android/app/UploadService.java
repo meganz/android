@@ -727,16 +727,16 @@ public class UploadService extends Service implements MegaTransferListenerInterf
             if (isFolderUpload) {
                 filesProgress = totalFolderUploadsCompleted + 1 > totalFolderUploads ? totalFolderUploads : totalFolderUploadsCompleted + 1;
                 if (megaApi.areTransfersPaused(MegaTransfer.TYPE_UPLOAD)) {
-                    message = getResources().getQuantityString(R.plurals.folder_upload_service_paused_notification, totalFolderUploads, filesProgress, totalFolderUploads);
+                    message = StringResourcesUtils.getString(R.string.folder_upload_service_notification_paused, filesProgress, totalFolderUploads);
                 } else {
-                    message = getResources().getQuantityString(R.plurals.folder_upload_service_notification, totalFolderUploads, filesProgress, totalFolderUploads);
+                    message = StringResourcesUtils.getString(R.string.folder_upload_service_notification, filesProgress, totalFolderUploads);
                 }
             } else {
                 filesProgress = totalFileUploadsCompleted + 1 > totalFileUploads ? totalFileUploads : totalFileUploadsCompleted + 1;
                 if (megaApi.areTransfersPaused(MegaTransfer.TYPE_UPLOAD)) {
-                    message = getResources().getQuantityString(R.plurals.upload_service_paused_notification, totalFileUploads, filesProgress, totalFileUploads);
+                    message = StringResourcesUtils.getString(R.string.upload_service_notification_paused, filesProgress, totalFileUploads);
                 } else {
-                    message = getResources().getQuantityString(R.plurals.upload_service_notification, totalFileUploads, filesProgress, totalFileUploads);
+                    message = StringResourcesUtils.getString(R.string.upload_service_notification, filesProgress, totalFileUploads);
                 }
             }
         }

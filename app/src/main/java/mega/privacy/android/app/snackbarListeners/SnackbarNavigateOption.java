@@ -50,6 +50,11 @@ public class SnackbarNavigateOption implements View.OnClickListener {
     public void onClick(View v) {
         //Intent to Settings
 
+        if (type == DISMISS_ACTION_SNACKBAR) {
+            //Do nothing, only dismiss
+            return;
+        }
+
         if (context instanceof ManagerActivityLollipop) {
             if (type == MUTE_NOTIFICATIONS_SNACKBAR_TYPE) {
                 MegaApplication.getPushNotificationSettingManagement().controlMuteNotifications(context, NOTIFICATIONS_ENABLED, null);

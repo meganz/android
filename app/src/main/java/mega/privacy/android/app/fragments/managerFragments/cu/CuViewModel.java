@@ -49,7 +49,7 @@ import nz.mega.sdk.MegaRequestListenerInterface;
 import static java.time.format.DateTimeFormatter.ofPattern;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static mega.privacy.android.app.constants.SettingsConstants.DEFAULT_CONVENTION_QUEUE_SIZE;
-import static mega.privacy.android.app.constants.SettingsConstants.VIDEO_QUALITY_MEDIUM;
+import static mega.privacy.android.app.constants.SettingsConstants.VIDEO_QUALITY_ORIGINAL;
 import static mega.privacy.android.app.utils.Constants.GET_THUMBNAIL_THROTTLE_MS;
 import static mega.privacy.android.app.utils.Constants.INVALID_POSITION;
 import static mega.privacy.android.app.utils.FileUtil.JPG_EXTENSION;
@@ -374,7 +374,7 @@ class CuViewModel extends BaseRxViewModel {
                             syncVideo ? MegaPreferences.PHOTOS_AND_VIDEOS
                                     : MegaPreferences.ONLY_PHOTOS);
 
-                    mDbHandler.setCameraUploadVideoQuality(VIDEO_QUALITY_MEDIUM);
+                    mDbHandler.setCameraUploadVideoQuality(VIDEO_QUALITY_ORIGINAL);
                     mDbHandler.setConversionOnCharging(true);
                     mDbHandler.setChargingOnSize(DEFAULT_CONVENTION_QUEUE_SIZE);
                     // After target and local folder setup, then enable CU.

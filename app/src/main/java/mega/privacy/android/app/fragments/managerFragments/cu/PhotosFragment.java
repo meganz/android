@@ -54,6 +54,7 @@ import static mega.privacy.android.app.components.dragger.DragToExitSupport.obse
 import static mega.privacy.android.app.components.dragger.DragToExitSupport.putThumbnailLocation;
 import static mega.privacy.android.app.utils.ColorUtils.DARK_IMAGE_ALPHA;
 import static mega.privacy.android.app.utils.ColorUtils.setImageViewAlphaIfDark;
+import static mega.privacy.android.app.utils.Constants.DISMISS_ACTION_SNACKBAR;
 import static mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_ADAPTER_TYPE;
 import static mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_HANDLE;
 import static mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_ORDER_GET_CHILDREN;
@@ -74,6 +75,7 @@ import static mega.privacy.android.app.utils.TextUtil.formatEmptyScreenText;
 import static mega.privacy.android.app.utils.Util.showSnackbar;
 import static mega.privacy.android.app.utils.ZoomUtil.*;
 import static nz.mega.sdk.MegaApiJava.INVALID_HANDLE;
+import static nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE;
 
 @AndroidEntryPoint
 public class PhotosFragment extends BaseZoomFragment implements CUGridViewAdapter.Listener,
@@ -264,6 +266,16 @@ public class PhotosFragment extends BaseZoomFragment implements CUGridViewAdapte
         if (viewModel.isEnableCUShown()) {
             mManagerActivity.updateCULayout(View.GONE);
             mManagerActivity.updateCUViewTypes(View.GONE);
+
+            mFirstLoginBinding.uploadVideosSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
+                if (isChecked) {
+                    mManagerActivity.showSnackbar(DISMISS_ACTION_SNACKBAR,
+                            StringResourcesUtils.getString(R.string.video_quality_info),
+                            MEGACHAT_INVALID_HANDLE);
+                }
+
+                mFirstLoginBinding.qualityText.setVisibility(isChecked ? View.VISIBLE : View.GONE);
+            });
             return;
         }
         int currentZoom = ZoomUtil.getPHOTO_ZOOM_LEVEL();
