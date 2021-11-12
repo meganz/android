@@ -85,7 +85,6 @@ import dagger.hilt.android.AndroidEntryPoint;
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
 import io.reactivex.rxjava3.schedulers.Schedulers;
 import mega.privacy.android.app.BuildConfig;
-import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
@@ -168,7 +167,6 @@ import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaChatApi;
-import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaChatApiJava;
 import nz.mega.sdk.MegaChatCall;
 import nz.mega.sdk.MegaChatContainsMeta;
@@ -5477,6 +5475,28 @@ public class ChatActivityLollipop extends PasscodeActivity
             }
         }else{
             logDebug("DO NOTHING: Position (" + positionInMessages + ") is more than size in messages (size: " + messages.size() + ")");
+        }
+    }
+
+    /**
+     * Opens a contact link message.
+     *
+     * @param contactLinkResult All the data of the contact link.
+     */
+    public void openContactLinkMessage(InviteContactUseCase.ContactLinkResult contactLinkResult) {
+        String email = contactLinkResult.getEmail();
+        MegaUser contact = megaApi.getContact(email);
+
+        if (contact == null || contact.getHandle() == megaChatApi.getMyUserHandle()) {
+            logDebug("Contact is null or is my own contact");
+            return;
+        }
+
+        if (contact.getVisibility() == MegaUser.VISIBILITY_VISIBLE) {
+            ContactUtil.openContactInfoActivity(this, email);
+        } else {
+            String text = getString(R.string.user_is_not_contact, converterShortCodes(contactLinkResult.getFullName()));
+            showSnackbar(INVITE_CONTACT_TYPE, text, MEGACHAT_INVALID_HANDLE, contactLinkResult.getFullName());
         }
     }
 

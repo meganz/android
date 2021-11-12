@@ -7720,7 +7720,12 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                 int[] screenPosition = new int[2];
                 int [] dimens = new int[4];
                 checkItem(v, holder, screenPosition, dimens);
-                ((ChatActivityLollipop) context).itemClick(currentPositionInAdapter, dimens);
+
+                if (holder.contactLinkResult != null) {
+                    ((ChatActivityLollipop) context).openContactLinkMessage(holder.contactLinkResult);
+                } else {
+                    ((ChatActivityLollipop) context).itemClick(currentPositionInAdapter, dimens);
+                }
 
                 break;
 
