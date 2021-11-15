@@ -144,20 +144,37 @@ public class AndroidMegaRichLinkMessage {
     }
 
     /**
-     * Checks if a String is a contact link and if so, gets its handle.
+     * Extracts a contact link from a chat messages if exists.
      *
-     * @param content String to check.
-     * @return The user handle if is a contact link, INVALID_HANDLE otherwise.
+     * @param content Text of the chat message.
+     * @return The contact link if exists.
      */
-    public static long getContactLinkHandle(String content) {
-        boolean isContactLink = isContactLink(content);
+    public static String extractContactLink(String content) {
+        Matcher m = Patterns.WEB_URL.matcher(content);
 
-        if (isContactLink) {
-            String[] s = content.split("C!");
-            return MegaApiAndroid.base64ToHandle(s[1].trim());
+        while (m.find()) {
+            String url = decodeURL(m.group());
+
+            if (isContactLink(url)) {
+                return url;
+            }
         }
 
-        return INVALID_HANDLE;
+        return null;
+    }
+
+    /**
+     * Gets the user handle of a contact link.
+     *
+     * @param link Contact link to check.
+     * @return The user handle.
+     */
+    public static long getContactLinkHandle(String link) {
+        String[] s = link.split("C!");
+
+        return s.length > 0
+                ? MegaApiAndroid.base64ToHandle(s[1].trim())
+                : INVALID_HANDLE;
     }
 
     public boolean isChat() {

@@ -34,6 +34,7 @@ import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaNodeList;
 import nz.mega.sdk.MegaUser;
 
+import static mega.privacy.android.app.lollipop.megachat.AndroidMegaRichLinkMessage.extractContactLink;
 import static mega.privacy.android.app.lollipop.megachat.AndroidMegaRichLinkMessage.getContactLinkHandle;
 import static mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil.*;
 import static mega.privacy.android.app.utils.ChatUtil.*;
@@ -153,7 +154,11 @@ public class GeneralChatMessageBottomSheet extends BaseBottomSheetDialogFragment
         long contactLinkHandle = INVALID_HANDLE;
 
         if (message != null && message.getMessage() != null) {
-            contactLinkHandle = getContactLinkHandle(message.getMessage().getContent());
+            String contactLink = extractContactLink(message.getMessage().getContent());
+
+            if (contactLink != null) {
+                contactLinkHandle = getContactLinkHandle(contactLink);
+            }
         }
 
         if (shouldReactionOptionBeVisible) {
