@@ -43,8 +43,7 @@
                     android:layout_height="wrap_content"
                     android:ellipsize="middle"
                     android:singleLine="true"
-                    android:textAppearance="?attr/textAppearanceSubtitle1"
-                    android:letterSpacing="0" />
+                    style="@style/textAppearanceSubtitle1" />
 
                 <RelativeLayout
                     android:id="@+id/node_relative_layout_icon"
