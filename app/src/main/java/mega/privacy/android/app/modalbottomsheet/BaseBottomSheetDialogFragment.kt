@@ -152,13 +152,19 @@ open class BaseBottomSheetDialogFragment : BottomSheetDialogFragment(), Activity
                             val screenHeight =
                                 resources.displayMetrics.heightPixels - getStatusBarHeight()
 
-                            if (isDarkMode(requireContext()) && bottomSheet.height >= screenHeight) {
+                            if (shouldSetStatusBarColor() && isDarkMode(requireContext())
+                                && bottomSheet.height >= screenHeight
+                            ) {
                                 requireActivity().window.statusBarColor =
                                     getColor(requireContext(), R.color.grey_010_alpha_049)
                             }
                         }
-                        else -> requireActivity().window.statusBarColor =
-                            getColor(requireContext(), android.R.color.transparent)
+                        else -> {
+                            if (shouldSetStatusBarColor()) {
+                                requireActivity().window.statusBarColor =
+                                    getColor(requireContext(), android.R.color.transparent)
+                            }
+                        }
                     }
                 }
 
@@ -251,4 +257,6 @@ open class BaseBottomSheetDialogFragment : BottomSheetDialogFragment(), Activity
     override fun launchActivityForResult(intent: Intent, requestCode: Int) {
         startActivityForResult(intent, requestCode)
     }
+
+    protected open fun shouldSetStatusBarColor(): Boolean = true
 }
