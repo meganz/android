@@ -84,6 +84,7 @@ import mega.privacy.android.app.lollipop.adapters.ShareContactsAdapter;
 import mega.privacy.android.app.lollipop.adapters.ShareContactsHeaderAdapter;
 import mega.privacy.android.app.lollipop.controllers.ContactController;
 import mega.privacy.android.app.lollipop.qrcode.QRCodeActivity;
+import mega.privacy.android.app.utils.CallUtil;
 import mega.privacy.android.app.utils.ColorUtils;
 import mega.privacy.android.app.utils.HighLightHintHelper;
 import nz.mega.sdk.MegaApiJava;
@@ -3019,12 +3020,16 @@ public class AddContactActivityLollipop extends PasscodeActivity implements View
         startActivityForResult(in, REQUEST_INVITE_CONTACT_FROM_DEVICE);
     }
 
-    private void toStartMeeting(){
-        Intent intent = new Intent();
-        intent.putExtra(EXTRA_MEETING, true);
-        setResult(RESULT_OK, intent);
-        hideKeyboard(addContactActivityLollipop, 0);
-        finish();
+    private void toStartMeeting() {
+        if (CallUtil.participatingInACall()) {
+            showConfirmationInACall(this);
+        } else {
+            Intent intent = new Intent();
+            intent.putExtra(EXTRA_MEETING, true);
+            setResult(RESULT_OK, intent);
+            hideKeyboard(addContactActivityLollipop, 0);
+            finish();
+        }
     }
 
     @Override

@@ -111,6 +111,7 @@ public class ParticipantBottomSheetDialogFragment extends BaseBottomSheetDialogF
         optionEditProfileChat.setOnClickListener(this);
         optionLeaveChat.setOnClickListener(this);
         optionInvite.setOnClickListener(this);
+        optionStartCall.setOnClickListener(this);
         optionStartCall.setVisibility(View.GONE);
         View separatorInfo = contentView.findViewById(R.id.separator_info);
         View separatorChat = contentView.findViewById(R.id.separator_chat);
@@ -183,7 +184,6 @@ public class ParticipantBottomSheetDialogFragment extends BaseBottomSheetDialogF
                 optionContactInfoChat.setVisibility(View.VISIBLE);
                 optionStartConversationChat.setVisibility(View.VISIBLE);
                 optionStartCall.setVisibility(View.VISIBLE);
-                optionStartCall.setOnClickListener(participatingInACall() ? null : this);
                 optionInvite.setVisibility(View.GONE);
 
                 titleMailContactChatPanel.setText(email);
@@ -241,9 +241,11 @@ public class ParticipantBottomSheetDialogFragment extends BaseBottomSheetDialogF
                 break;
 
             case R.id.contact_list_option_call_layout:
-                startNewCall((GroupChatInfoActivityLollipop) requireActivity(),
-                        (SnackbarShower) requireActivity(),
-                        megaApi.getContact(chatC.getParticipantEmail(participantHandle)), passcodeManagement);
+                if (canCallBeStartedFromContactOption((GroupChatInfoActivityLollipop) requireActivity())) {
+                    startNewCall((GroupChatInfoActivityLollipop) requireActivity(),
+                            (SnackbarShower) requireActivity(),
+                            megaApi.getContact(chatC.getParticipantEmail(participantHandle)), passcodeManagement);
+                }
                 break;
 
             case R.id.change_permissions_group_participants_chat_layout:

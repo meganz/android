@@ -1100,14 +1100,8 @@ public class ContactInfoActivityLollipop extends PasscodeActivity
 	}
 
 	private void startingACall(boolean withVideo) {
-
-		if (app.getStorageState() == STORAGE_STATE_PAYWALL) {
-			showOverDiskQuotaPaywallWarning();
-			return;
-		}
-
 		startVideo = withVideo;
-		if (checkPermissionsCall(this, INVALID_TYPE_PERMISSIONS)) {
+		if (canCallBeStartedFromContactOption(this)) {
 			startCall();
 		}
 	}
@@ -1141,11 +1135,7 @@ public class ContactInfoActivityLollipop extends PasscodeActivity
 
 			case R.id.chat_contact_properties_chat_video_layout:
 			case R.id.chat_contact_properties_chat_call_layout:
-				if (isCallOptionEnabled()) {
-					startingACall(v.getId() == R.id.chat_contact_properties_chat_video_layout);
-				} else {
-					showSnackbar(SNACKBAR_TYPE, getString(R.string.not_allowed_to_start_call), MEGACHAT_INVALID_HANDLE);
-				}
+				startingACall(v.getId() == R.id.chat_contact_properties_chat_video_layout);
 				break;
 
 			case R.id.chat_contact_properties_share_contact_layout: {

@@ -24,7 +24,6 @@ import androidx.core.content.ContextCompat;
 import androidx.preference.PreferenceManager;
 
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
-
 import java.util.ArrayList;
 
 import mega.privacy.android.app.MegaApplication;
@@ -57,6 +56,7 @@ import nz.mega.sdk.MegaUser;
 import static android.content.Context.NOTIFICATION_SERVICE;
 import static android.view.View.GONE;
 import static mega.privacy.android.app.meeting.activity.MeetingActivity.*;
+import static mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuotaPaywallWarning;
 import static mega.privacy.android.app.utils.AvatarUtil.*;
 import static mega.privacy.android.app.utils.ChatUtil.getStatusBitmap;
 import static mega.privacy.android.app.utils.ChatUtil.getTitleChat;
@@ -67,6 +67,7 @@ import static mega.privacy.android.app.utils.PermissionUtils.*;
 import static mega.privacy.android.app.utils.StringResourcesUtils.getString;
 import static mega.privacy.android.app.utils.TextUtil.isTextEmpty;
 import static mega.privacy.android.app.utils.Util.*;
+import static nz.mega.sdk.MegaApiJava.STORAGE_STATE_PAYWALL;
 import static nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE;
 import static nz.mega.sdk.MegaChatCall.CALL_STATUS_USER_NO_PRESENT;
 
@@ -224,10 +225,12 @@ public class CallUtil {
      */
     public static boolean participatingInACall() {
         MegaChatApiAndroid megaChatApi = MegaApplication.getInstance().getMegaChatApi();
+        MegaHandleList listCallsInitial = megaChatApi.getChatCalls(MegaChatCall.CALL_STATUS_INITIAL);
         MegaHandleList listCallsConnecting = megaChatApi.getChatCalls(MegaChatCall.CALL_STATUS_CONNECTING);
         MegaHandleList listCallsJoining = megaChatApi.getChatCalls(MegaChatCall.CALL_STATUS_JOINING);
         MegaHandleList listCallsInProgress = megaChatApi.getChatCalls(MegaChatCall.CALL_STATUS_IN_PROGRESS);
-        return listCallsConnecting.size() > 0 || listCallsJoining.size() > 0 || listCallsInProgress.size() > 0;
+
+        return listCallsInitial.size() > 0 || listCallsConnecting.size() > 0 || listCallsJoining.size() > 0 || listCallsInProgress.size() > 0;
     }
 
     /**
@@ -1069,6 +1072,7 @@ public class CallUtil {
 
         MegaChatPeerList peers = MegaChatPeerList.createInstance();
         if (chat == null) {
+            logDebug("Chat doesn't exist");
             ArrayList<MegaChatRoom> chats = new ArrayList<>();
             ArrayList<MegaUser> usersNoChat = new ArrayList<>();
             usersNoChat.add(user);
@@ -1080,8 +1084,10 @@ public class CallUtil {
                 megaChatApi.createChat(false, peers, listener);
             }
         } else if (megaChatApi.getChatCall(chat.getChatId()) != null) {
+            logDebug("There is a call, open it");
             openMeetingInProgress(activity, chat.getChatId(), true, passcodeManagement);
         } else if (isStatusConnected(activity, chat.getChatId())) {
+            logDebug("There is no call, start it");
             MegaApplication.setUserWaitingForCall(user.getHandle());
             startCallWithChatOnline(activity, chat);
         }
@@ -1415,5 +1421,25 @@ public class CallUtil {
         }
 
         return views;
+    }
+
+    /**
+     * Method to control when an attempt is made to initiate a call from a contact option
+     *
+     * @param context The Activity context
+     * @return True, if the call can be started. False, otherwise.
+     */
+    public static boolean canCallBeStartedFromContactOption(Activity context) {
+        if (MegaApplication.getInstance().getStorageState() == STORAGE_STATE_PAYWALL) {
+            showOverDiskQuotaPaywallWarning();
+            return false;
+        }
+
+        if (CallUtil.participatingInACall()) {
+            showConfirmationInACall(context);
+            return false;
+        }
+
+        return checkPermissionsCall(context, INVALID_TYPE_PERMISSIONS);
     }
 }

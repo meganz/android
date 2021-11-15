@@ -2787,12 +2787,6 @@ public class ChatActivityLollipop extends PasscodeActivity
         return super.onOptionsItemSelected(item);
     }
 
-    private void showMeetingOptionsPanel(){
-        if (isBottomSheetDialogShown(bottomSheetDialogFragment)) return;
-        bottomSheetDialogFragment = new MeetingBottomSheetDialogFragment();
-        bottomSheetDialogFragment.show(getSupportFragmentManager(), bottomSheetDialogFragment.getTag());
-    }
-
     /*
      *Prepare recording
      */

@@ -7715,8 +7715,12 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 	}
 
 	public void showMeetingOptionsPanel(){
-		bottomSheetDialogFragment = new MeetingBottomSheetDialogFragment();
-		bottomSheetDialogFragment.show(getSupportFragmentManager(), MeetingBottomSheetDialogFragment.TAG);
+		if (CallUtil.participatingInACall()) {
+			showConfirmationInACall(this);
+		} else {
+			bottomSheetDialogFragment = new MeetingBottomSheetDialogFragment();
+			bottomSheetDialogFragment.show(getSupportFragmentManager(), MeetingBottomSheetDialogFragment.TAG);
+		}
 	}
 
 	/**
