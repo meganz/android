@@ -1266,7 +1266,9 @@ public class FolderLinkActivityLollipop extends TransfersManagementActivity impl
 							children,
 							nodes.get(position).getHandle()
 					);
+					putThumbnailLocation(intent, listView, position, VIEWER_FROM_FOLDER_LINK, adapterList);
 					startActivity(intent);
+					overridePendingTransition(0,0);
 				}
 				else if (MimeTypeList.typeForName(nodes.get(position).getName()).isVideoReproducible() || MimeTypeList.typeForName(nodes.get(position).getName()).isAudio() ){
 					MegaNode file = nodes.get(position);

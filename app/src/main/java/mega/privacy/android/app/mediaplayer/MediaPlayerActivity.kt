@@ -174,8 +174,7 @@ abstract class MediaPlayerActivity : PasscodeActivity(), SnackbarShower, Activit
 
             MediaPlayerService.pauseAudioPlayer(this)
 
-            dragToExit.viewerFrom = intent.getIntExtra(INTENT_EXTRA_KEY_VIEWER_FROM, INVALID_VALUE)
-            dragToExit.observeThumbnailLocation(this)
+            dragToExit.observeThumbnailLocation(this, intent)
         }
 
         toolbar.setBackgroundColor(Color.TRANSPARENT)

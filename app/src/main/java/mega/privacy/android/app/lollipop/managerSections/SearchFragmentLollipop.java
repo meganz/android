@@ -759,7 +759,9 @@ public class SearchFragmentLollipop extends RotatableFragment implements SearchA
 							sortOrderManagement.getOrderCloud(),
 							node.getHandle()
 					);
+					putThumbnailLocation(intent, recyclerView, position, VIEWER_FROM_SEARCH, adapter);
 					startActivity(intent);
+					((ManagerActivityLollipop) context).overridePendingTransition(0,0);
 				}
 				else if (MimeTypeList.typeForName(nodes.get(position).getName()).isVideoReproducible() || MimeTypeList.typeForName(nodes.get(position).getName()).isAudio() ){
 					MegaNode file = nodes.get(position);

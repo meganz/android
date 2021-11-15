@@ -177,7 +177,7 @@ class RecentsBucketFragment : BaseFragment() {
 
         when {
             mime.isImage -> {
-                openImage(node)
+                openImage(index, node)
             }
             FileUtil.isAudioOrVideo(node) -> {
                 openAudioVideo(index, node, isMedia, localPath)
@@ -280,7 +280,10 @@ class RecentsBucketFragment : BaseFragment() {
         }
     }
 
-    private fun openImage(node: MegaNode) {
+    private fun openImage(
+        index: Int,
+        node: MegaNode
+    ) {
         val handles = getNodesHandles(true)
         val intent = if (handles != null && handles.isNotEmpty()) {
             ImageViewerActivity.getIntentForChildren(
@@ -294,7 +297,9 @@ class RecentsBucketFragment : BaseFragment() {
                 node.handle
             )
         }
+        putThumbnailLocation(intent, listView, index, VIEWER_FROM_RECETS_BUCKET, adapter!!)
         startActivity(intent)
+        activity?.overridePendingTransition(0, 0)
     }
 
     private fun download(handle: Long) {

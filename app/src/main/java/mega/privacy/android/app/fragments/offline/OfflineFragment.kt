@@ -558,7 +558,9 @@ class OfflineFragment : Fragment(), ActionMode.Callback, Scrollable {
                     handles,
                     node.node.handle.toLongOrNull()
                 )
+                putThumbnailLocation(intent, recyclerView!!, position, VIEWER_FROM_OFFLINE, adapter!!)
                 startActivity(intent)
+                requireActivity().overridePendingTransition(0, 0)
             }
             mime.isVideoReproducible || mime.isAudio -> {
                 logDebug("Video/Audio file")

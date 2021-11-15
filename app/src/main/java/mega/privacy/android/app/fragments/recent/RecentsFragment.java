@@ -396,7 +396,9 @@ public class RecentsFragment extends Fragment implements StickyHeaderHandler {
                 );
             }
 
+            putThumbnailLocation(intent, listView, index, VIEWER_FROM_RECETS, adapter);
             startActivity(intent);
+            ((ManagerActivityLollipop) context).overridePendingTransition(0, 0);
             return;
         }
 

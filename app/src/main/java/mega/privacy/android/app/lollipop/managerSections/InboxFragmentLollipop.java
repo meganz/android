@@ -539,7 +539,9 @@ public class InboxFragmentLollipop extends RotatableFragment{
 					sortOrderManagement.getOrderCloud(),
 					node.getHandle()
 			);
+			putThumbnailLocation(intent, recyclerView, position, VIEWER_FROM_INBOX, adapter);
 			startActivity(intent);
+			((ManagerActivityLollipop) context).overridePendingTransition(0, 0);
 		} else if (MimeTypeList.typeForName(node.getName()).isVideoReproducible() || MimeTypeList.typeForName(node.getName()).isAudio()) {
 			MegaNode file = node;
 

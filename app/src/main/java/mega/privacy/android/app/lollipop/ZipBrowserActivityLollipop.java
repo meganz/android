@@ -374,7 +374,9 @@ public class ZipBrowserActivityLollipop extends PasscodeActivity {
 					this,
 					name.hashCode()
 			);
+			putThumbnailLocation(intent, recyclerView, position, VIEWER_FROM_ZIP_BROWSER, adapterList);
 			startActivity(intent);
+			overridePendingTransition(0,0);
 		}
 		else if (MimeTypeList.typeForName(currentFile.getName()).isVideoReproducible() || MimeTypeList.typeForName(currentFile.getName()).isAudio()) {
             logDebug("Video file");

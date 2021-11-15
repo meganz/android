@@ -581,7 +581,9 @@ public class CameraUploadsFragment extends BaseFragment implements CUGridViewAda
                 sortOrderManagement.getOrderCamera(),
                 node.getHandle()
         );
+        putThumbnailLocation(intent, binding.cuList, position, VIEWER_FROM_CUMU, gridAdapter);
         startActivity(intent);
+        requireActivity().overridePendingTransition(0, 0);
     }
 
     @Override

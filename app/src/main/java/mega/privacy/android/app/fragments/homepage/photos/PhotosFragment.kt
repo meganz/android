@@ -21,6 +21,8 @@ import mega.privacy.android.app.components.CustomizedGridLayoutManager
 import mega.privacy.android.app.components.ListenScrollChangesHelper
 import mega.privacy.android.app.components.NewGridRecyclerView
 import mega.privacy.android.app.components.SimpleDividerItemDecoration
+import mega.privacy.android.app.components.dragger.DragThumbnailGetter
+import mega.privacy.android.app.components.dragger.DragToExitSupport
 import mega.privacy.android.app.components.dragger.DragToExitSupport.Companion.observeDragSupportEvents
 import mega.privacy.android.app.databinding.FragmentPhotosBinding
 import mega.privacy.android.app.fragments.BaseFragment
@@ -365,7 +367,11 @@ class PhotosFragment : BaseFragment(), HomepageSearchable {
                 childrenHandles = viewModel.getHandlesOfPhotos()!!,
                 currentNodeHandle = nodeItem.node?.handle
             )
+            (listView.adapter as? DragThumbnailGetter)?.let {
+                DragToExitSupport.putThumbnailLocation(intent, listView, nodeItem.index, VIEWER_FROM_PHOTOS, it)
+            }
             startActivity(intent)
+            requireActivity().overridePendingTransition(0, 0)
         }
     }
 

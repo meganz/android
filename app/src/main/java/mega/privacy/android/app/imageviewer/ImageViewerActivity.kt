@@ -15,6 +15,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.BaseActivity
 import mega.privacy.android.app.R
 import mega.privacy.android.app.components.attacher.MegaAttacher
+import mega.privacy.android.app.components.dragger.DragToExitSupport
 import mega.privacy.android.app.components.saver.NodeSaver
 import mega.privacy.android.app.databinding.ActivityImageViewerBinding
 import mega.privacy.android.app.imageviewer.adapter.ImageViewerAdapter
@@ -139,6 +140,14 @@ class ImageViewerActivity : BaseActivity(), PermissionRequester, SnackbarShower 
             )
         )
     }
+    private val dragToExit by lazy {
+        WeakReference(
+            DragToExitSupport(this, null) {
+                finish()
+                overridePendingTransition(0, android.R.anim.fade_out)
+            }
+        )
+    }
 
     private lateinit var binding: ActivityImageViewerBinding
 
@@ -146,12 +155,16 @@ class ImageViewerActivity : BaseActivity(), PermissionRequester, SnackbarShower 
         super.onCreate(savedInstanceState)
         WindowCompat.setDecorFitsSystemWindows(window, false)
 
-        binding = ActivityImageViewerBinding.inflate(layoutInflater)
-        setContentView(binding.root)
-
         pageCallbackSet = savedInstanceState?.getBoolean(STATE_PAGE_CALLBACK_SET) ?: pageCallbackSet
+        binding = ActivityImageViewerBinding.inflate(layoutInflater)
+        setContentView(dragToExit.get()?.wrapContentView(binding.root))
+
         setupView()
         setupObservers()
+
+        if (savedInstanceState == null) {
+            dragToExit.get()?.runEnterAnimation(intent, binding.root, null)
+        }
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
@@ -168,6 +181,8 @@ class ImageViewerActivity : BaseActivity(), PermissionRequester, SnackbarShower 
         binding.viewPager.unregisterOnPageChangeCallback(pageChangeCallback)
         nodeAttacher.clear()
         nodeSaver.clear()
+        if (isFinishing) dragToExit.get()?.showPreviousHiddenThumbnail()
+        dragToExit.clear()
         super.onDestroy()
     }
 

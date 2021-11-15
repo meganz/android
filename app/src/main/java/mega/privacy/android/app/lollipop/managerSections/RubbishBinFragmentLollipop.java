@@ -630,7 +630,9 @@ public class RubbishBinFragmentLollipop extends Fragment{
 							sortOrderManagement.getOrderCloud(),
 							nodes.get(position).getHandle()
 					);
+					putThumbnailLocation(intent, recyclerView, position, VIEWER_FROM_RUBBISH_BIN, adapter);
 					startActivity(intent);
+					((ManagerActivityLollipop) context).overridePendingTransition(0,0);
 				}
 				else if (MimeTypeList.typeForName(nodes.get(position).getName()).isVideoReproducible() || MimeTypeList.typeForName(nodes.get(position).getName()).isAudio() ){
 					MegaNode file = nodes.get(position);

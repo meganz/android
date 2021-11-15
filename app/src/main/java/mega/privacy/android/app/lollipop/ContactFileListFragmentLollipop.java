@@ -574,7 +574,9 @@ public class ContactFileListFragmentLollipop extends ContactFileBaseFragment {
 							orderGetChildren,
 							contactNodes.get(position).getHandle()
 					);
+					putThumbnailLocation(intent, listView, position, VIEWER_FROM_CONTACT_FILE_LIST, adapter);
 					startActivity(intent);
+					((ContactFileListActivityLollipop) context).overridePendingTransition(0,0);
 				}
 				else if (MimeTypeList.typeForName(contactNodes.get(position).getName()).isVideoReproducible()	|| MimeTypeList.typeForName(contactNodes.get(position).getName()).isAudio()) {
 					MegaNode file = contactNodes.get(position);

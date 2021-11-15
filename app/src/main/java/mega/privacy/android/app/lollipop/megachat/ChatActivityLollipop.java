@@ -5514,6 +5514,7 @@ public class ChatActivityLollipop extends PasscodeActivity
                 currentNodeHandle
         );
         startActivity(intent);
+        overridePendingTransition(0,0);
 
         if (adapter !=  null) {
             adapter.setNodeAttachmentVisibility(false, holder_imageDrag, position);
