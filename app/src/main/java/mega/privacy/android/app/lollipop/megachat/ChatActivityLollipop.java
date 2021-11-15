@@ -3489,15 +3489,14 @@ public class ChatActivityLollipop extends PasscodeActivity
         else if (requestCode == REQUEST_SEND_CONTACTS && resultCode == RESULT_OK) {
             final ArrayList<String> contactsData = intent.getStringArrayListExtra(AddContactActivityLollipop.EXTRA_CONTACTS);
             if (contactsData != null) {
-                MegaHandleList handleList = MegaHandleList.createInstance();
-                for(int i=0; i<contactsData.size();i++){
+                for (int i = 0; i < contactsData.size(); i++) {
                     MegaUser user = megaApi.getContact(contactsData.get(i));
                     if (user != null) {
+                        MegaHandleList handleList = MegaHandleList.createInstance();
                         handleList.addMegaHandle(user.getHandle());
-
+                        retryContactAttachment(handleList);
                     }
                 }
-                retryContactAttachment(handleList);
             }
         }
         else if (requestCode == REQUEST_CODE_SELECT_FILE && resultCode == RESULT_OK) {

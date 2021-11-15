@@ -153,7 +153,8 @@ public class GeneralChatMessageBottomSheet extends BaseBottomSheetDialogFragment
 
         long contactLinkHandle = INVALID_HANDLE;
 
-        if (message != null && message.getMessage() != null) {
+        if (message != null && message.getMessage() != null
+                && message.getMessage().getType() == MegaChatMessage.TYPE_NORMAL) {
             String contactLink = extractContactLink(message.getMessage().getContent());
 
             if (contactLink != null) {
