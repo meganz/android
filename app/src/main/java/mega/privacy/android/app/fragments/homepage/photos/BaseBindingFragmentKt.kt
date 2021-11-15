@@ -17,6 +17,7 @@ import mega.privacy.android.app.utils.ColorUtils.changeStatusBarColorForElevatio
 import mega.privacy.android.app.utils.ColorUtils.getColorForElevation
 import mega.privacy.android.app.utils.StringResourcesUtils
 import mega.privacy.android.app.utils.Util
+import java.util.*
 
 abstract class BaseBindingFragmentKt<VM : ViewModel, VB : ViewDataBinding> : BaseFragment() {
 
@@ -79,7 +80,7 @@ abstract class BaseBindingFragmentKt<VM : ViewModel, VB : ViewDataBinding> : Bas
         val resNavigationIcon = bindToolbarNavigationIcon()
         bindToolbar()
         toolbar?.let {
-            it.title = getToolbarNavigationTitle(resTitle)
+            it.title = getToolbarNavigationTitle(resTitle).toUpperCase(Locale.ROOT)
             it.setNavigationIcon(getToolbarNavigationIcon(resNavigationIcon))
             it.setNavigationOnClickListener {
                 goBack()

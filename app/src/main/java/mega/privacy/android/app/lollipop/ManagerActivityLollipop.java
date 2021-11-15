@@ -3669,7 +3669,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 	 * compatible with independent all the toolbar
 	 */
 	public void setToolbarVisibility(){
-    	if(mHomepageScreen == HomepageScreen.IMAGES){
+    	if(mHomepageScreen == HomepageScreen.IMAGES&&drawerItem == DrawerItem.HOMEPAGE){
 			toolbar.setVisibility(View.GONE);
 		}else{
 			toolbar.setVisibility(View.VISIBLE);
