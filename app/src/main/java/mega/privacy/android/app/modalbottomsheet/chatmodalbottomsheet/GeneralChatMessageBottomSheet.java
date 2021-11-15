@@ -14,9 +14,11 @@ import com.google.android.material.switchmaterial.SwitchMaterial;
 import java.util.ArrayList;
 import java.util.Collections;
 
+import dagger.hilt.android.AndroidEntryPoint;
 import mega.privacy.android.app.MegaOffline;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
+import mega.privacy.android.app.contacts.usecase.InviteContactUseCase;
 import mega.privacy.android.app.lollipop.controllers.ChatController;
 import mega.privacy.android.app.lollipop.controllers.ContactController;
 import mega.privacy.android.app.lollipop.megachat.AndroidMegaChatMessage;
@@ -32,6 +34,7 @@ import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaNodeList;
 import nz.mega.sdk.MegaUser;
 
+import static mega.privacy.android.app.lollipop.megachat.AndroidMegaRichLinkMessage.getContactLinkHandle;
 import static mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil.*;
 import static mega.privacy.android.app.utils.ChatUtil.*;
 import static mega.privacy.android.app.utils.Constants.*;
@@ -44,7 +47,13 @@ import static nz.mega.sdk.MegaApiJava.INVALID_HANDLE;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+import javax.inject.Inject;
+
+@AndroidEntryPoint
 public class GeneralChatMessageBottomSheet extends BaseBottomSheetDialogFragment implements View.OnClickListener {
+
+    @Inject
+    InviteContactUseCase inviteContactUseCase;
 
     private MegaNode node;
     private MegaNodeList nodeList;
@@ -140,6 +149,12 @@ public class GeneralChatMessageBottomSheet extends BaseBottomSheetDialogFragment
         boolean shouldReactionOptionBeVisible = chatRoom != null && message != null &&
                 requireActivity() instanceof ChatActivityLollipop && shouldReactionBeClicked(chatRoom) &&
                 !isRemovedOrPendingMsg && !message.isUploading();
+
+        long contactLinkHandle = INVALID_HANDLE;
+
+        if (message != null && message.getMessage() != null) {
+            contactLinkHandle = getContactLinkHandle(message.getMessage().getContent());
+        }
 
         if (shouldReactionOptionBeVisible) {
             reactionsFragment.init(requireActivity(), this, chatId, messageId, positionMessage);

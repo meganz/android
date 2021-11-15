@@ -121,7 +121,7 @@ import nz.mega.sdk.MegaUtilsAndroid;
 
 
 import static mega.privacy.android.app.activities.GiphyPickerActivity.GIF_DATA;
-import static mega.privacy.android.app.lollipop.megachat.AndroidMegaRichLinkMessage.isContactLink;
+import static mega.privacy.android.app.lollipop.megachat.AndroidMegaRichLinkMessage.getContactLinkHandle;
 import static mega.privacy.android.app.utils.AvatarUtil.*;
 import static mega.privacy.android.app.components.textFormatter.TextFormatterViewCompat.getFormattedText;
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
@@ -1730,13 +1730,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             case MegaChatMessage.TYPE_NORMAL: {
                 logDebug("TYPE_NORMAL");
                 String content = androidMessage.getMessage().getContent();
-                boolean isContactLink = isContactLink(content);
-                long contactLinkHandle = INVALID_HANDLE;
-
-                if (isContactLink) {
-                    String[] s = content.split("C!");
-                    contactLinkHandle = MegaApiAndroid.base64ToHandle(s[1].trim());
-                }
+                long contactLinkHandle = getContactLinkHandle(content);
 
                 if (androidMessage.getRichLinkMessage() != null) {
                     bindMegaLinkMessage((ViewHolderMessageChat) holder, androidMessage, position);

@@ -68,7 +68,7 @@ import nz.mega.sdk.MegaChatListItem;
 import nz.mega.sdk.MegaChatMessage;
 import nz.mega.sdk.MegaChatRoom;
 
-import static mega.privacy.android.app.lollipop.megachat.AndroidMegaRichLinkMessage.isContactLink;
+import static mega.privacy.android.app.lollipop.megachat.AndroidMegaRichLinkMessage.getContactLinkHandle;
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
 import static mega.privacy.android.app.utils.ChatUtil.*;
 import static mega.privacy.android.app.utils.CallUtil.*;
@@ -79,7 +79,7 @@ import static mega.privacy.android.app.utils.TimeUtils.*;
 import static mega.privacy.android.app.utils.Util.*;
 import static mega.privacy.android.app.utils.AvatarUtil.*;
 import static mega.privacy.android.app.utils.TextUtil.*;
-import static nz.mega.sdk.MegaChatCall.CALL_STATUS_DESTROYED;
+import static nz.mega.sdk.MegaApiJava.INVALID_HANDLE;
 import static nz.mega.sdk.MegaChatCall.CALL_STATUS_IN_PROGRESS;
 import static nz.mega.sdk.MegaChatCall.CALL_STATUS_JOINING;
 import static nz.mega.sdk.MegaChatCall.CALL_STATUS_TERMINATING_USER_PARTICIPATION;
@@ -2259,12 +2259,9 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 
 				}
 
-				boolean isContactLink = isContactLink(lastMessageString);
+				long contactLinkHandle = getContactLinkHandle(lastMessageString);
 
-				if (isContactLink) {
-					String[] s = lastMessageString.split("C!");
-					long contactLinkHandle = MegaApiAndroid.base64ToHandle(s[1].trim());
-
+				if (contactLinkHandle != INVALID_HANDLE) {
 					ViewHolderChatList finalHolder = holder;
 					inviteContactUseCase.getContactLink(contactLinkHandle)
 							.subscribeOn(Schedulers.io())

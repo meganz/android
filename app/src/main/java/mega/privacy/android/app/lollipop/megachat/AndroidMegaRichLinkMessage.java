@@ -9,11 +9,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
 
+import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaNode;
 
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.Util.*;
+import static nz.mega.sdk.MegaApiJava.INVALID_HANDLE;
 
 public class AndroidMegaRichLinkMessage {
 
@@ -139,6 +141,23 @@ public class AndroidMegaRichLinkMessage {
 
     public static boolean isContactLink(String url) {
         return matchRegexs(url, CONTACT_LINK_REGEXS);
+    }
+
+    /**
+     * Checks if a String is a contact link and if so, gets its handle.
+     *
+     * @param content String to check.
+     * @return The user handle if is a contact link, INVALID_HANDLE otherwise.
+     */
+    public static long getContactLinkHandle(String content) {
+        boolean isContactLink = isContactLink(content);
+
+        if (isContactLink) {
+            String[] s = content.split("C!");
+            return MegaApiAndroid.base64ToHandle(s[1].trim());
+        }
+
+        return INVALID_HANDLE;
     }
 
     public boolean isChat() {
