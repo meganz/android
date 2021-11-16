@@ -12,8 +12,10 @@ object ZoomUtil {
 
     @JvmStatic
     var PHOTO_ZOOM_LEVEL = 0 //ZOOM_DEFAULT
+
     @JvmStatic
     var IMAGES_ZOOM_LEVEL = 0 //ZOOM_DEFAULT
+
     // Zoom level
     const val ZOOM_OUT_2X = -2
     const val ZOOM_OUT_1X = -1
@@ -73,13 +75,13 @@ object ZoomUtil {
         }
     }
 
-    fun getSelectedFrameWidth(context: Context, zoom: Int) = when(zoom) {
+    fun getSelectedFrameWidth(context: Context, zoom: Int) = when (zoom) {
         ZOOM_DEFAULT -> context.resources.getDimensionPixelSize(R.dimen.cu_fragment_ic_selected_size_large)
         ZOOM_OUT_1X -> context.resources.getDimensionPixelSize(R.dimen.cu_fragment_ic_selected_size_small)
         else -> 0
     }
 
-    fun getSelectedFrameMargin(context: Context, zoom: Int) = when(zoom) {
+    fun getSelectedFrameMargin(context: Context, zoom: Int) = when (zoom) {
         ZOOM_DEFAULT -> context.resources.getDimensionPixelSize(R.dimen.cu_fragment_ic_selected_margin_large)
         ZOOM_OUT_1X -> context.resources.getDimensionPixelSize(R.dimen.cu_fragment_ic_selected_margin_small)
         else -> 0
@@ -109,4 +111,9 @@ object ZoomUtil {
                 zoom
             ) * spanCount * 2) - getMargin(context, zoom) * 2) / spanCount
         }
+
+    fun resetZoomLevel() {
+        PHOTO_ZOOM_LEVEL = 0
+        IMAGES_ZOOM_LEVEL = 0
+    }
 }
