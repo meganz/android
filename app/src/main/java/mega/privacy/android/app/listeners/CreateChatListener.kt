@@ -1,11 +1,14 @@
 package mega.privacy.android.app.listeners
 
 import android.content.Context
+import android.content.Intent
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
 import mega.privacy.android.app.interfaces.SnackbarShower
 import mega.privacy.android.app.interfaces.showSnackbar
 import mega.privacy.android.app.lollipop.listeners.MultipleForwardChatProcessor
+import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop
+import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.StringResourcesUtils.getQuantityString
 import mega.privacy.android.app.utils.StringResourcesUtils.getString
 import nz.mega.sdk.*
@@ -35,10 +38,18 @@ class CreateChatListener(
 
     constructor(
         action: Int,
+        context: Context,
+        snackbarShower: SnackbarShower
+    ) : this(context, action, 0, snackbarShower, null, null) {
+        initFields(chats, usersNoChat)
+    }
+
+    constructor(
+        action: Int,
         chats: List<MegaChatRoom>,
         usersNoChat: List<MegaUser>,
         context: Context,
-        snackbarShower: SnackbarShower
+        snackbarShower: SnackbarShower,
     ) : this(context, action, usersNoChat.size + chats.size, snackbarShower, null, null) {
         initFields(chats, usersNoChat)
     }
@@ -82,6 +93,18 @@ class CreateChatListener(
     override fun onRequestFinish(api: MegaChatApiJava, request: MegaChatRequest, e: MegaChatError) {
         if (request.type != TYPE_CREATE_CHATROOM) {
             return
+        }
+
+        if (action == OPEN_CHAT_ROOM) {
+            if (e.errorCode == API_OK) {
+                val intent = Intent(context, ChatActivityLollipop::class.java).apply {
+                    action = Constants.ACTION_CHAT_SHOW_MESSAGES
+                    putExtra(Constants.CHAT_ID, request.chatHandle)
+                }
+                context.startActivity(intent)
+            } else {
+                snackbarShower?.showSnackbar(getString(R.string.create_chat_error))
+            }
         }
 
         if (action == ATTACH) {
@@ -179,5 +202,6 @@ class CreateChatListener(
         const val SEND_MESSAGES = 6
         const val SEND_FILE_EXPLORER_CONTENT = 7
         const val CONFIGURE_DND = 9
+        const val OPEN_CHAT_ROOM = 10
     }
 }

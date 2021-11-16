@@ -84,10 +84,17 @@ class ContactGroupsFragment : Fragment() {
         binding.listScroller.setRecyclerView(binding.list)
 
         binding.btnCreateGroup.setOnClickListener {
-            startActivity(Intent(requireContext(), AddContactActivityLollipop::class.java).apply {
+            val intent = Intent(
+                (activity as ContactsActivity?),
+                AddContactActivityLollipop::class.java
+            ).apply {
                 putExtra(AddContactActivityLollipop.EXTRA_CONTACT_TYPE, Constants.CONTACT_TYPE_MEGA)
                 putExtra(AddContactActivityLollipop.EXTRA_ONLY_CREATE_GROUP, true)
-            })
+            }
+            (activity as ContactsActivity?)?.startActivityForResult(
+                intent,
+                Constants.REQUEST_CREATE_CHAT
+            )
         }
 
         binding.viewEmpty.text = binding.viewEmpty.text.toString()

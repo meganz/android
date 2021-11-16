@@ -1,5 +1,6 @@
 package mega.privacy.android.app.contacts
 
+import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
@@ -15,9 +16,15 @@ import mega.privacy.android.app.activities.PasscodeActivity
 import mega.privacy.android.app.contacts.requests.ContactRequestsFragment
 import mega.privacy.android.app.databinding.ActivityContactsBinding
 import mega.privacy.android.app.interfaces.SnackbarShower
+import mega.privacy.android.app.listeners.CreateChatListener
+import mega.privacy.android.app.listeners.CreateChatListener.Companion.OPEN_CHAT_ROOM
+import mega.privacy.android.app.lollipop.AddContactActivityLollipop
+import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.ExtraUtils.extraNotNull
+import mega.privacy.android.app.utils.LogUtil
 import mega.privacy.android.app.utils.StringResourcesUtils
 import mega.privacy.android.app.utils.Util
+import nz.mega.sdk.MegaChatPeerList
 import java.util.*
 
 /**
@@ -96,6 +103,41 @@ class ContactsActivity : PasscodeActivity(), SnackbarShower {
         setContentView(binding.root)
         setSupportActionBar(binding.toolbar)
         setupNavigation()
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, intent: Intent?) {
+        super.onActivityResult(requestCode, resultCode, intent)
+        when (requestCode) {
+            Constants.REQUEST_CREATE_CHAT -> {
+                if (resultCode == Activity.RESULT_OK && intent != null) {
+                    val contactsData =
+                        intent.getStringArrayListExtra(AddContactActivityLollipop.EXTRA_CONTACTS)
+
+                    val isGroup =
+                        intent.getBooleanExtra(AddContactActivityLollipop.EXTRA_GROUP_CHAT, false)
+
+                    if (contactsData != null && isGroup) {
+                        val peers = MegaChatPeerList.createInstance()
+                        for (i in contactsData.indices) {
+                            val user = megaApi.getContact(contactsData[i])
+                            if (user != null) {
+                                peers.addPeer(user.handle, MegaChatPeerList.PRIV_STANDARD)
+                            }
+                        }
+
+                        val chatTitle =
+                            intent.getStringExtra(AddContactActivityLollipop.EXTRA_CHAT_TITLE)
+                        megaChatApi.createPublicChat(
+                            peers,
+                            chatTitle,
+                            CreateChatListener(OPEN_CHAT_ROOM, this, this)
+                        )
+                    }
+                } else {
+                    LogUtil.logWarning("Error creating chat")
+                }
+            }
+        }
     }
 
     private fun setupNavigation() {
