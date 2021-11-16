@@ -87,11 +87,15 @@ import static mega.privacy.android.app.utils.MegaNodeDialogUtil.ACTION_BACKUP_RE
 import static mega.privacy.android.app.utils.MegaNodeDialogUtil.ACTION_BACKUP_SHARE;
 import static mega.privacy.android.app.utils.MegaNodeDialogUtil.ACTION_BACKUP_SHARE_CHAT;
 import static mega.privacy.android.app.utils.MegaNodeDialogUtil.ACTION_BACKUP_SHARE_FOLDER;
+import static mega.privacy.android.app.utils.MegaNodeDialogUtil.BACKUP_DEVICE;
+import static mega.privacy.android.app.utils.MegaNodeDialogUtil.BACKUP_NONE;
+import static mega.privacy.android.app.utils.MegaNodeDialogUtil.BACKUP_ROOT;
+import static mega.privacy.android.app.utils.MegaNodeDialogUtil.BACKUP_SUBFOLDER;
 import static mega.privacy.android.app.utils.MegaNodeDialogUtil.showConfirmDialogWithBackup;
 import static mega.privacy.android.app.utils.MegaNodeDialogUtil.showTipDialogWithBackup;
 import static mega.privacy.android.app.utils.MegaNodeUtil.allHaveOwnerAccess;
 import static mega.privacy.android.app.utils.MegaNodeUtil.checkBackupNodeByHandle;
-import static mega.privacy.android.app.utils.MegaNodeUtil.checkSubBackupNodeByHandle;
+import static mega.privacy.android.app.utils.MegaNodeUtil.checkBackupNodeTypeByHandle;
 import static mega.privacy.android.app.utils.MegaNodeUtil.manageTextFileIntent;
 import static mega.privacy.android.app.utils.MegaNodeUtil.manageURLNode;
 import static mega.privacy.android.app.utils.MegaNodeUtil.myBackupHandle;
@@ -166,6 +170,8 @@ public class FileBrowserFragmentLollipop extends RotatableFragment{
 			logDebug("onActionItemClicked");
 			List<MegaNode> documents = adapter.getSelectedNodes();
 			ArrayList<Long> handleList = new ArrayList<>();
+			int nodeType = BACKUP_NONE;
+
 			switch(item.getItemId()){
 				case R.id.cab_menu_download:{
 					((ManagerActivityLollipop) context).saveNodesToDevice(
@@ -199,19 +205,22 @@ public class FileBrowserFragmentLollipop extends RotatableFragment{
 					for (int i = 0; i < documents.size(); i++) {
 						handleList.add(documents.get(i).getHandle());
 					}
+
 					MegaNode pNode = checkBackupNodeByHandle(megaApi, handleList);
-					boolean isSubBackup = checkSubBackupNodeByHandle(megaApi, handleList);
+					nodeType = checkBackupNodeTypeByHandle(megaApi, handleList);
+
 					// Show the warning dialog if the list including Backup node
-					if(pNode != null){
-						actWithBackupTips(handleList, pNode, true, ACTION_BACKUP_MOVE);
-					} else if(isSubBackup){
+					if (nodeType == BACKUP_ROOT) {
+						actWithBackupTips(handleList, pNode, nodeType, ACTION_BACKUP_MOVE);
+					} else if (nodeType == BACKUP_DEVICE || nodeType == BACKUP_SUBFOLDER) {
 						Long handle = handleList.get(0);
 						MegaNode p = megaApi.getNodeByHandle(handle);
-						actWithBackupTips(handleList, p, false, ACTION_BACKUP_MOVE);
+						actWithBackupTips(handleList, p, nodeType, ACTION_BACKUP_MOVE);
 					} else {
 						NodeController nC = new NodeController(context);
 						nC.chooseLocationToMoveNodes(handleList);
 					}
+
 					clearSelections();
 					hideMultipleSelect();
 					break;
@@ -223,19 +232,22 @@ public class FileBrowserFragmentLollipop extends RotatableFragment{
 							handleList.add(documents.get(i).getHandle());
 						}
 					}
+
 					MegaNode pNode = checkBackupNodeByHandle(megaApi, handleList);
-					boolean isSubBackup = checkSubBackupNodeByHandle(megaApi, handleList);
+					nodeType = checkBackupNodeTypeByHandle(megaApi, handleList);
+
 					// Show the warning dialog if the list including Backup node
-					if(pNode != null){
-						actWithBackupTips(handleList, pNode, true, ACTION_BACKUP_SHARE_FOLDER);
-					} else if(isSubBackup){
+					if (nodeType == BACKUP_ROOT) {
+						actWithBackupTips(handleList, pNode, nodeType, ACTION_BACKUP_SHARE_FOLDER);
+					} else if (nodeType == BACKUP_DEVICE || nodeType == BACKUP_SUBFOLDER) {
 						Long handle = handleList.get(0);
 						MegaNode p = megaApi.getNodeByHandle(handle);
-						actWithBackupTips(handleList, p, false, ACTION_BACKUP_SHARE_FOLDER);
+						actWithBackupTips(handleList, p, nodeType, ACTION_BACKUP_SHARE_FOLDER);
 					} else {
 						NodeController nC = new NodeController(context);
 						nC.selectContactToShareFolders(handleList);
 					}
+
 					clearSelections();
 					hideMultipleSelect();
 					break;
@@ -244,18 +256,20 @@ public class FileBrowserFragmentLollipop extends RotatableFragment{
 					for (int i=0;i<documents.size();i++){
 						handleList.add(documents.get(i).getHandle());
 					}
-					MegaNode pNode = checkBackupNodeByHandle(megaApi, handleList);
-					boolean isSubBackup = checkSubBackupNodeByHandle(megaApi, handleList);
 
-					if(pNode != null){
-						actWithBackupTips(handleList, pNode, true, ACTION_BACKUP_SHARE);
-					} else if(isSubBackup){
+					MegaNode pNode = checkBackupNodeByHandle(megaApi, handleList);
+					nodeType = checkBackupNodeTypeByHandle(megaApi, handleList);
+
+					if (nodeType == BACKUP_ROOT) {
+						actWithBackupTips(handleList, pNode, nodeType, ACTION_BACKUP_SHARE);
+					} else if (nodeType == BACKUP_DEVICE || nodeType == BACKUP_SUBFOLDER) {
 						Long handle = handleList.get(0);
 						MegaNode p = megaApi.getNodeByHandle(handle);
-						actWithBackupTips(handleList, p, false, ACTION_BACKUP_SHARE);
+						actWithBackupTips(handleList, p, nodeType, ACTION_BACKUP_SHARE);
 					} else {
 						MegaNodeUtil.shareNodes(context, documents);
 					}
+
 					clearSelections();
 					hideMultipleSelect();
 					break;
@@ -1320,10 +1334,10 @@ public class FileBrowserFragmentLollipop extends RotatableFragment{
 	 *
 	 * @param handleList handleList handles list of the nodes that selected
 	 * @param pNodeBackup the node of "My backup"
-	 * @param isRootBackup true - "My backup" folder / false - sub folders or files
+	 * @param nodeType the type of the backup node - BACKUP_NONE / BACKUP_ROOT / BACKUP_DEVICE / BACKUP_SUBFOLDER
 	 * @param actionType Indicates the action (move / remove/ add / new folder / new file)
 	 */
-	private void actWithBackupTips(final ArrayList<Long> handleList, MegaNode pNodeBackup, boolean isRootBackup, int actionType) {
+	private void actWithBackupTips(final ArrayList<Long> handleList, MegaNode pNodeBackup, int nodeType, int actionType) {
 		showTipDialogWithBackup(mActivity, new ActionBackupNodeCallback() {
 
 					@Override
@@ -1341,7 +1355,7 @@ public class FileBrowserFragmentLollipop extends RotatableFragment{
 					}
 
 					@Override
-					public void actionExecute(ArrayList<Long> handleList, @NotNull MegaNode pNodeBackup, boolean isRootBackup, int actionType) {
+					public void actionExecute(ArrayList<Long> handleList, @NotNull MegaNode pNodeBackup, int nodeType, int actionType) {
 						switch (actionType){
 							case ACTION_BACKUP_SHARE_FOLDER:
 								NodeController nC = new NodeController(context);
@@ -1366,13 +1380,13 @@ public class FileBrowserFragmentLollipop extends RotatableFragment{
 					}
 
 					@Override
-					public void actionConfirmed(ArrayList<Long> handleList, @NotNull MegaNode pNodeBackup, boolean isRootBackup, int actionType) {
-						confirmationMove(handleList, pNodeBackup, isRootBackup, actionType);
+					public void actionConfirmed(ArrayList<Long> handleList, @NotNull MegaNode pNodeBackup, int nodeType, int actionType) {
+						confirmationMove(handleList, pNodeBackup, nodeType, actionType);
 					}
 				},
 				handleList,
 				pNodeBackup,
-				isRootBackup,
+				nodeType,
 				actionType
 		);
 	}
@@ -1382,10 +1396,10 @@ public class FileBrowserFragmentLollipop extends RotatableFragment{
 	 *
 	 * @param handleList handleList handles list of the nodes that selected
 	 * @param pNodeBackup the node of "My backup"
-	 * @param isRootBackup true - "My backup" folder / false - sub folders or files
+	 * @param nodeType the type of the backup node - BACKUP_NONE / BACKUP_ROOT / BACKUP_DEVICE / BACKUP_SUBFOLDER
 	 * @param actionType Indicates the action (move / remove/ add / new folder / new file)
 	 */
-	private void confirmationMove(final ArrayList<Long> handleList, MegaNode pNodeBackup, boolean isRootBackup, int actionType) {
+	private void confirmationMove(final ArrayList<Long> handleList, MegaNode pNodeBackup, int nodeType, int actionType) {
 		if (handleList != null && pNodeBackup != null) {
 			showConfirmDialogWithBackup(this.mActivity, new ActionBackupNodeCallback() {
 						@Override
@@ -1403,7 +1417,7 @@ public class FileBrowserFragmentLollipop extends RotatableFragment{
 						}
 
 						@Override
-						public void actionExecute( ArrayList<Long> handleList, @NotNull MegaNode pNodeBackup, boolean isRootBackup, int actionType) {
+						public void actionExecute( ArrayList<Long> handleList, @NotNull MegaNode pNodeBackup, int nodeType, int actionType) {
 							switch (actionType) {
 								case ACTION_BACKUP_REMOVE:
 									break;
@@ -1428,13 +1442,13 @@ public class FileBrowserFragmentLollipop extends RotatableFragment{
 						}
 
 						@Override
-						public void actionConfirmed( ArrayList<Long> handleList, @NotNull MegaNode pNodeBackup, boolean isRootBackup, int actionType) {
+						public void actionConfirmed( ArrayList<Long> handleList, @NotNull MegaNode pNodeBackup, int nodeType, int actionType) {
 
 						}
 					},
 					handleList,
 					pNodeBackup,
-					isRootBackup,
+					nodeType,
 			 		actionType
 			);
 		} else {
@@ -1442,17 +1456,23 @@ public class FileBrowserFragmentLollipop extends RotatableFragment{
 		}
 	}
 
-	public boolean checkSubBackupNode() {
+	public int checkSubBackupNode() {
 		if(nodes != null && nodes.size()>0){
+			for(int i = 0; i< nodes.size(); i++){
+				MegaNode p = nodes.get(i);
+				if(p.getParentHandle() == myBackupHandle){
+					return BACKUP_DEVICE;
+				}
+			}
 			MegaNode p = nodes.get(0);
 			while (megaApi.getParentNode(p) != null) {
 				p = megaApi.getParentNode(p);
 				if(p.getHandle() == myBackupHandle){
-					return true;
+					return BACKUP_SUBFOLDER;
 				}
 			}
 		}
-		return false;
+		return BACKUP_NONE;
 	}
 
 	public MegaNode getSubBackupParentNode() {

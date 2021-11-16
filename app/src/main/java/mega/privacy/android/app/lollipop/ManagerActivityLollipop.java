@@ -292,6 +292,11 @@ import static mega.privacy.android.app.utils.MegaNodeDialogUtil.ACTION_BACKUP_SH
 import static mega.privacy.android.app.utils.MegaNodeDialogUtil.ACTION_BACKUP_SHARE_CHAT;
 import static mega.privacy.android.app.utils.MegaNodeDialogUtil.ACTION_BACKUP_SHARE_FOLDER;
 import static mega.privacy.android.app.utils.MegaNodeDialogUtil.ACTION_BACKUP_TAKE_PICTURE;
+import static mega.privacy.android.app.utils.MegaNodeDialogUtil.ACTION_MOVE_TO_BACKUP;
+import static mega.privacy.android.app.utils.MegaNodeDialogUtil.BACKUP_DEVICE;
+import static mega.privacy.android.app.utils.MegaNodeDialogUtil.BACKUP_NONE;
+import static mega.privacy.android.app.utils.MegaNodeDialogUtil.BACKUP_ROOT;
+import static mega.privacy.android.app.utils.MegaNodeDialogUtil.BACKUP_SUBFOLDER;
 import static mega.privacy.android.app.utils.MegaNodeDialogUtil.IS_NEW_TEXT_FILE_SHOWN;
 import static mega.privacy.android.app.utils.MegaNodeDialogUtil.NEW_TEXT_FILE_TEXT;
 import static mega.privacy.android.app.utils.MegaNodeDialogUtil.checkNewTextFileDialogState;
@@ -5707,12 +5712,11 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 
 				if (hasStoragePermission && hasCameraPermission) {
 					if (drawerItem == DrawerItem.CLOUD_DRIVE) {
-						boolean isSubBackup = fbFLol.checkSubBackupNode();
-						if(isSubBackup){
+						int nodeType = fbFLol.checkSubBackupNode();
+						if (nodeType == BACKUP_DEVICE || nodeType == BACKUP_SUBFOLDER) {
 							MegaNode parentNode = fbFLol.getSubBackupParentNode();
-							this.actWithBackupTips(null, parentNode, false, ACTION_BACKUP_TAKE_PICTURE);
-						}
-						else {
+							this.actWithBackupTips(null, parentNode, nodeType, ACTION_BACKUP_TAKE_PICTURE);
+						} else {
 							checkTakePicture(this, TAKE_PHOTO_CODE);
 						}
 					} else {
@@ -5774,10 +5778,10 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 
 	        case R.id.action_new_folder:{
 	        	if (drawerItem == DrawerItem.CLOUD_DRIVE){
-					boolean isSubBackup = fbFLol.checkSubBackupNode();
-					if(isSubBackup){
+					int nodeType = fbFLol.checkSubBackupNode();
+					if (nodeType == BACKUP_DEVICE || nodeType == BACKUP_SUBFOLDER) {
 						MegaNode parentNode = fbFLol.getSubBackupParentNode();
-						this.actWithBackupTips(null, parentNode, false, ACTION_BACKUP_NEW_FOLDER);
+						this.actWithBackupTips(null, parentNode, nodeType, ACTION_BACKUP_NEW_FOLDER);
 					} else {
 						showNewFolderDialog();
 					}
@@ -6586,14 +6590,14 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 			handleList.add(handles[i]);
 		}
 		MegaNode pNode = checkBackupNodeByHandle(megaApi, handleList);
-		boolean isSubBackup = checkSubBackupNodeByHandle(megaApi, handleList);
+		int nodeType = checkBackupNodeTypeByHandle(megaApi, handleList);
 
-		if(pNode != null){
-			actWithBackupTips(handleList, pNode, true, ACTION_BACKUP_GET_LINK);
-		} else if(isSubBackup){
+		if (nodeType == BACKUP_ROOT) {
+			actWithBackupTips(handleList, pNode, nodeType, ACTION_BACKUP_GET_LINK);
+		} else if (nodeType == BACKUP_DEVICE || nodeType == BACKUP_SUBFOLDER) {
 			Long handle = handleList.get(0);
 			MegaNode p = megaApi.getNodeByHandle(handle);
-			actWithBackupTips(handleList, p, false, ACTION_BACKUP_GET_LINK);
+			actWithBackupTips(handleList, p, nodeType, ACTION_BACKUP_GET_LINK);
 		} else {
 			LinksUtil.showGetLinkActivity(this, handles);
 		}
@@ -6615,13 +6619,13 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 		handleList.add(handle);
 
 		MegaNode pNode = checkBackupNodeByHandle(megaApi, handleList);
-		boolean isSubBackup = checkSubBackupNodeByHandle(megaApi, handleList);
+		int nodeType = checkBackupNodeTypeByHandle(megaApi, handleList);
 
-		if(pNode != null){
-			actWithBackupTips(handleList, pNode, true, ACTION_BACKUP_GET_LINK);
-		} else if(isSubBackup){
+		if (nodeType == BACKUP_ROOT) {
+			actWithBackupTips(handleList, pNode, nodeType, ACTION_BACKUP_GET_LINK);
+		} else if (nodeType == BACKUP_DEVICE || nodeType == BACKUP_SUBFOLDER) {
 			MegaNode p = megaApi.getNodeByHandle(handle);
-			actWithBackupTips(handleList, p, false, ACTION_BACKUP_GET_LINK);
+			actWithBackupTips(handleList, p, nodeType, ACTION_BACKUP_GET_LINK);
 		} else {
 			LinksUtil.showGetLinkActivity(this, handle);
 		}
@@ -6661,15 +6665,15 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 	public void chooseLocationToMoveNodes(final ArrayList<Long> handleList){
 		if(handleList!=null){
 			MegaNode pNode = checkBackupNodeByHandle(megaApi, handleList);
-			boolean isSubBackup = checkSubBackupNodeByHandle(megaApi, handleList);
+			int nodeType = checkBackupNodeTypeByHandle(megaApi, handleList);
 			// Show the warning dialog if the list including Backup node
-			if(isSubBackup){
+			if(nodeType == BACKUP_DEVICE || nodeType == BACKUP_SUBFOLDER){
 				Long handle = handleList.get(0);
 				MegaNode p = megaApi.getNodeByHandle(handle);
-				actWithBackupTips(handleList, p, false, ACTION_BACKUP_MOVE);
+				actWithBackupTips(handleList, p, nodeType, ACTION_BACKUP_MOVE);
 			}
-			if(pNode != null){
-				actWithBackupTips(handleList, pNode,true, ACTION_BACKUP_MOVE);
+			if(nodeType == BACKUP_ROOT){
+				actWithBackupTips(handleList, pNode,nodeType, ACTION_BACKUP_MOVE);
 			}
 		}
 	}
@@ -6706,16 +6710,16 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 				}
 				if (p.getHandle() != megaApi.getRubbishNode().getHandle()){
 					MegaNode pNode = checkBackupNodeByHandle(megaApi, handleList);
-					boolean isSubBackup = checkSubBackupNodeByHandle(megaApi, handleList);
+					int nodeType = checkBackupNodeTypeByHandle(megaApi, handleList);
 					// Show the warning dialog if the list including Backup node
-					if(isSubBackup){
+					if(nodeType == BACKUP_DEVICE || nodeType == BACKUP_SUBFOLDER){
 						Long subHandle = handleList.get(0);
 						MegaNode pSubNode = megaApi.getNodeByHandle(subHandle);
-						actWithBackupTips(handleList, pSubNode,false, ACTION_BACKUP_REMOVE);
+						actWithBackupTips(handleList, pSubNode,nodeType, ACTION_BACKUP_REMOVE);
 						return;
 					}
-					if(pNode != null){
-						actWithBackupTips(handleList, pNode,true, ACTION_BACKUP_REMOVE);
+					if(nodeType == BACKUP_ROOT){
+						actWithBackupTips(handleList, pNode,nodeType, ACTION_BACKUP_REMOVE);
 						return;
 					}
 					setMoveToRubbish(true);
@@ -6752,19 +6756,19 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 
 	}
 
-	public void showWarningDialogOfShare(final MegaNode p, boolean isRootBackup, int actionType){
+	public void showWarningDialogOfShare(final MegaNode p, int nodeType, int actionType){
 		logDebug("showWarningDialogOfShareFolder");
-		actWithBackupTips(null, p, isRootBackup, actionType);
+		actWithBackupTips(null, p, nodeType, actionType);
 	}
 
 	/**
 	 * Show the warning dialog when acting with "My backup" folder
 	 * @param handleList handleList handles list of the nodes that selected
 	 * @param pNodeBackup the node of "My backup"
-	 * @param isRootBackup true - "My backup" folder / false - sub folders or files
+	 * @param nodeType the type of the backup node - BACKUP_NONE / BACKUP_ROOT / BACKUP_DEVICE / BACKUP_SUBFOLDER
 	 * @param actionType Indicates the action (move / remove/ add / new folder / new file)
 	 */
-	private void actWithBackupTips(ArrayList<Long> handleList, MegaNode pNodeBackup, boolean isRootBackup, int actionType) {
+	private void actWithBackupTips(ArrayList<Long> handleList, MegaNode pNodeBackup, int nodeType, int actionType) {
 		if (actionType == ACTION_BACKUP_REMOVE && handleList != null) {
 			setMoveToRubbish(true);
 		}
@@ -6775,7 +6779,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 					}
 
 					@Override
-					public void actionExecute(ArrayList<Long> handleList, @NotNull MegaNode pNodeBackup, boolean isRootBackup, int actionType) {
+					public void actionExecute(ArrayList<Long> handleList, @NotNull MegaNode pNodeBackup, int nodeType, int actionType) {
 						switch (actionType){
 							case ACTION_BACKUP_SHARE_FOLDER:
 								if (isOutShare(pNodeBackup)) {
@@ -6807,13 +6811,13 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 					}
 
 					@Override
-					public void actionConfirmed(ArrayList<Long> handleList, @NotNull MegaNode pNodeBackup, boolean isRootBackup, int actionType) {
-						ConfirmAction(null, pNodeBackup, isRootBackup, actionType);
+					public void actionConfirmed(ArrayList<Long> handleList, @NotNull MegaNode pNodeBackup, int nodeType, int actionType) {
+						ConfirmAction(handleList, pNodeBackup, nodeType, actionType);
 					}
 				},
 				handleList,
 				pNodeBackup,
-				isRootBackup,
+				nodeType,
 				actionType
 		);
 	}
@@ -6822,30 +6826,38 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 	 * Show the confirm dialog when moving or deleting folders with "My backup" folder
 	 * @param handleList handleList handles list of the nodes that selected
 	 * @param pNodeBackup the node of "My backup"
-	 * @param isRootBackup true - "My backup" folder / false - sub folders or files
+	 * @param nodeType the type of the backup node - BACKUP_NONE / BACKUP_ROOT / BACKUP_DEVICE / BACKUP_SUBFOLDER
 	 * @param actionType Indicates the action (move / remove/ add / new folder / new file)
 	 */
-	private void ConfirmAction(ArrayList<Long> handleList, MegaNode pNodeBackup, boolean isRootBackup, int actionType) {
+	private void ConfirmAction(ArrayList<Long> handleList, MegaNode pNodeBackup, int nodeType, int actionType) {
 		if (pNodeBackup != null) {
 			showConfirmDialogWithBackup(this, new ActionBackupNodeCallback() {
 						@Override
 						public void actionCancel(@Nullable DialogInterface dialog, int actionType) {
 							switch (actionType) {
 								case ACTION_BACKUP_REMOVE:
-									break;
 								case ACTION_BACKUP_MOVE:
-									break;
-
 								case ACTION_BACKUP_FAB:
+								default:
 									break;
 							}
 						}
 
 						@Override
-						public void actionExecute(ArrayList<Long> handleList, @NotNull MegaNode pNodeBackup, boolean isRootBackup, int actionType) {
+						public void actionExecute(ArrayList<Long> handleList, @NotNull MegaNode pNodeBackup, int nodeType, int actionType) {
 							switch (actionType) {
 								case ACTION_BACKUP_REMOVE:
 									nC.moveToTrash(handleList, moveToRubbish);
+									break;
+
+								case ACTION_MOVE_TO_BACKUP:
+									if(handleList!= null) {
+										long[] handles = new long[handleList.size()];
+										for (int i = 0; i < handleList.size(); i++) {
+											handles[i] = handleList.get(i);
+										}
+										nC.moveNodes(handles, pNodeBackup.getHandle());
+									}
 									break;
 
 								case ACTION_BACKUP_MOVE:
@@ -6870,13 +6882,13 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 						}
 
 						@Override
-						public void actionConfirmed(@Nullable ArrayList<Long> handleList, @NotNull MegaNode pNodeBackup, boolean isRootBackup, int actionType) {
+						public void actionConfirmed(@Nullable ArrayList<Long> handleList, @NotNull MegaNode pNodeBackup, int nodeType, int actionType) {
 
 						}
 					},
 					handleList,
 					pNodeBackup,
-					isRootBackup,
+					nodeType,
 					actionType
 			);
 		} else {
@@ -7980,10 +7992,10 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 			return;
 		}
 		// isInBackup Indicates if the current node is under "My backup"
-		boolean isInBackup = fbFLol.checkSubBackupNode();
-		if(isInBackup){
+		int nodeType = fbFLol.checkSubBackupNode();
+		if (nodeType == BACKUP_DEVICE || nodeType == BACKUP_SUBFOLDER) {
 			MegaNode parentNode = fbFLol.getSubBackupParentNode();
-			actWithBackupTips(null, parentNode, false, actionType);
+			actWithBackupTips(null, parentNode, nodeType, actionType);
 		} else {
 			showUploadPanel(uploadType);
 		}
@@ -8636,6 +8648,29 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 
 			final long[] moveHandles = intent.getLongArrayExtra("MOVE_HANDLES");
 			final long toHandle = intent.getLongExtra("MOVE_TO", 0);
+			// Check the original path
+			ArrayList<Long> origtHandleList = new ArrayList<>();
+			if(moveHandles != null){
+				for(int i = 0; i < moveHandles.length; i++){
+					origtHandleList.add(moveHandles[i]);
+				}
+			}
+
+			MegaNode pNode = checkBackupNodeByHandle(megaApi, origtHandleList);
+			if(pNode == null) {
+				int origNodeType = checkBackupNodeTypeByHandle(megaApi, origtHandleList);
+				if(origNodeType == BACKUP_NONE){
+					// Check the destination path
+					ArrayList<Long> destHandleList = new ArrayList<>();
+					destHandleList.add(toHandle);
+					int destNodeType = checkBackupNodeTypeByHandle(megaApi, destHandleList);
+					if(destNodeType != BACKUP_NONE){
+						// Warning tips
+						actWithBackupTips(origtHandleList, megaApi.getNodeByHandle(toHandle), destNodeType, ACTION_MOVE_TO_BACKUP);
+						return;
+					}
+				}
+			}
 
 			nC.moveNodes(moveHandles, toHandle);
 

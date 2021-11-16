@@ -47,6 +47,10 @@ import static mega.privacy.android.app.utils.MegaApiUtils.*;
 import static mega.privacy.android.app.utils.MegaNodeDialogUtil.ACTION_BACKUP_SHARE;
 import static mega.privacy.android.app.utils.MegaNodeDialogUtil.ACTION_BACKUP_SHARE_CHAT;
 import static mega.privacy.android.app.utils.MegaNodeDialogUtil.ACTION_BACKUP_SHARE_FOLDER;
+import static mega.privacy.android.app.utils.MegaNodeDialogUtil.BACKUP_DEVICE;
+import static mega.privacy.android.app.utils.MegaNodeDialogUtil.BACKUP_NONE;
+import static mega.privacy.android.app.utils.MegaNodeDialogUtil.BACKUP_ROOT;
+import static mega.privacy.android.app.utils.MegaNodeDialogUtil.BACKUP_SUBFOLDER;
 import static mega.privacy.android.app.utils.MegaNodeUtil.*;
 import static mega.privacy.android.app.utils.OfflineUtils.*;
 import static mega.privacy.android.app.utils.StringResourcesUtils.getQuantityString;
@@ -330,10 +334,8 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
                 // Check if sub folder of "My Backup"
                 ArrayList<Long> handleList = new ArrayList<>();
                 handleList.add(node.getHandle());
-                boolean isSubBackup = checkSubBackupNodeByHandle(megaApi, handleList);
-                if(node.isFolder() && (node.getHandle() == myBackupHandle || node.getParentHandle() == myBackupHandle)
-                || !isTextEmpty(node.getDeviceId())
-                || isSubBackup) {
+                int nodeType = checkBackupNodeTypeByHandle(megaApi, handleList);
+                if(nodeType != BACKUP_NONE) {
                     counterModify--;
                     optionRename.setVisibility(View.GONE);
                     counterModify--;
@@ -1020,6 +1022,7 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
         handleList.add(node.getHandle());
 
         Intent i;
+        int nodeType;
 
         switch (v.getId()) {
             case R.id.download_option:
@@ -1094,10 +1097,9 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
                 break;
 
             case R.id.share_folder_option:
-                if(node.getHandle() == myBackupHandle){
-                    ((ManagerActivityLollipop) requireActivity()).showWarningDialogOfShare(node, true, ACTION_BACKUP_SHARE_FOLDER);
-                } else if(checkSubBackupNodeByHandle(megaApi, node)){
-                    ((ManagerActivityLollipop) requireActivity()).showWarningDialogOfShare(node, false, ACTION_BACKUP_SHARE_FOLDER);
+                nodeType = checkBackupNodeTypeByHandle(megaApi, node);
+                if (nodeType != BACKUP_NONE) {
+                    ((ManagerActivityLollipop) requireActivity()).showWarningDialogOfShare(node, nodeType, ACTION_BACKUP_SHARE_FOLDER);
                 } else {
                     if (isOutShare(node)) {
                         i = new Intent(requireContext(), FileContactListActivityLollipop.class);
@@ -1121,10 +1123,9 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
                 break;
 
             case R.id.send_chat_option:
-                if(node.getHandle() == myBackupHandle){
-                    ((ManagerActivityLollipop) requireActivity()).showWarningDialogOfShare(node, true, ACTION_BACKUP_SHARE_CHAT);
-                } else if(checkSubBackupNodeByHandle(megaApi, node)){
-                    ((ManagerActivityLollipop) requireActivity()).showWarningDialogOfShare(node, false, ACTION_BACKUP_SHARE_CHAT);
+                nodeType = checkBackupNodeTypeByHandle(megaApi, node);
+                if (nodeType != BACKUP_NONE) {
+                    ((ManagerActivityLollipop) requireActivity()).showWarningDialogOfShare(node, nodeType, ACTION_BACKUP_SHARE_CHAT);
                 } else {
                     ((ManagerActivityLollipop) requireActivity()).attachNodeToChats(node);
                 }
@@ -1172,10 +1173,9 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
                 break;
 
             case R.id.share_option:
-                if(node.getHandle() == myBackupHandle){
-                    ((ManagerActivityLollipop) requireActivity()).showWarningDialogOfShare(node, true, ACTION_BACKUP_SHARE);
-                } else if(checkSubBackupNodeByHandle(megaApi, node)){
-                    ((ManagerActivityLollipop) requireActivity()).showWarningDialogOfShare(node, false, ACTION_BACKUP_SHARE);
+                nodeType = checkBackupNodeTypeByHandle(megaApi, node);
+                if (nodeType != BACKUP_NONE) {
+                    ((ManagerActivityLollipop) requireActivity()).showWarningDialogOfShare(node, nodeType, ACTION_BACKUP_SHARE);
                 } else {
                     shareNode(requireActivity(), node);
                 }

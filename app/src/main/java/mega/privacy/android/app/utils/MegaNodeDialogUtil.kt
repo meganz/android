@@ -40,6 +40,7 @@ import mega.privacy.android.app.utils.AlertsAndWarnings.showForeignStorageOverQu
 import mega.privacy.android.app.utils.ColorUtils.setErrorAwareInputAppearance
 import mega.privacy.android.app.utils.Constants.*
 import mega.privacy.android.app.utils.FileUtil.TXT_EXTENSION
+import mega.privacy.android.app.utils.LogUtil.logDebug
 import mega.privacy.android.app.utils.MegaNodeUtil.getRootParentNode
 import mega.privacy.android.app.utils.RunOnUIThreadUtils.runDelay
 import mega.privacy.android.app.utils.StringResourcesUtils.getString
@@ -63,6 +64,12 @@ object MegaNodeDialogUtil {
     private const val ERROR_DIFFERENT_EXTENSION = "ERROR_DIFFERENT_EXTENSION"
     private const val NO_ERROR = "NO_ERROR"
 
+    // Backup node type
+    const val BACKUP_NONE = -1
+    const val BACKUP_ROOT = 0
+    const val BACKUP_DEVICE = 1
+    const val BACKUP_SUBFOLDER = 2
+
     // For backup node actions
     const val ACTION_BACK_NONE = -1
     const val ACTION_BACKUP_MOVE = 0
@@ -75,6 +82,7 @@ object MegaNodeDialogUtil {
     const val ACTION_BACKUP_SHARE = 7
     const val ACTION_BACKUP_SHARE_CHAT = 8
     const val ACTION_BACKUP_GET_LINK = 9
+    const val ACTION_MOVE_TO_BACKUP = 10
     /**
      * Creates and shows a TYPE_RENAME dialog to rename a node.
      *
@@ -722,7 +730,7 @@ object MegaNodeDialogUtil {
      * @param actionBackupNodeCallback Callback to finish the node action if needed, null otherwise.
      * @param handleList handleList handles list of the nodes that selected
      * @param pNodeBackup the node of "My backup"
-     * @param isRootBackup true - "My backup" folder / false - sub folders or files
+     * @param nodeType the type of the backup node - BACKUP_NONE / BACKUP_ROOT / BACKUP_DEVICE / BACKUP_SUBFOLDER
      * @param actionType Indicates the action (move / remove/ add / new folder / new file)
      */
     @JvmStatic
@@ -731,7 +739,7 @@ object MegaNodeDialogUtil {
         actionBackupNodeCallback: ActionBackupNodeCallback,
         handleList: ArrayList<Long>?,
         pNodeBackup: MegaNode,
-        isRootBackup: Boolean,
+        nodeType: Int,
         actionType: Int
     ) {
         val dialogClickListener =
@@ -745,13 +753,13 @@ object MegaNodeDialogUtil {
                             actionBackupNodeCallback.actionExecute(
                                 handleList,
                                 pNodeBackup,
-                                isRootBackup,
+                                nodeType,
                                 actionType)
                         } else {
                             actionBackupNodeCallback.actionConfirmed(
                                 handleList,
                                 pNodeBackup,
-                                isRootBackup,
+                                nodeType,
                                 actionType
                             )
                         }
@@ -768,17 +776,33 @@ object MegaNodeDialogUtil {
         val nodeName = pNodeBackup.name
         when (actionType) {
             ACTION_BACKUP_NEW_FOLDER, ACTION_BACKUP_TAKE_PICTURE, ACTION_BACKUP_ADD, ACTION_BACKUP_FAB -> {
-                tvTitle.text = getString(R.string.backup_add_item_title)
-                tvContent.setText(R.string.backup_add_item_text)
+                if(nodeType == BACKUP_DEVICE) {
+                    tvTitle.text = getString(R.string.backup_add_item_title)
+                    tvContent.setText(R.string.backup_add_item_to_root_text)
+                } else {
+                    val displayName = getString(R.string.backup_add_confirm_title, nodeName)
+                    tvTitle.text = displayName
+                    tvContent.setText(R.string.backup_add_item_text)
+                }
+            }
+            ACTION_MOVE_TO_BACKUP -> {
+                if (nodeType == BACKUP_ROOT) {
+                    tvTitle.text = getString(R.string.backup_add_item_title)
+                    tvContent.setText(R.string.backup_add_item_to_root_text)
+                } else {
+                    val displayName = getString(R.string.backup_add_confirm_title, nodeName)
+                    tvTitle.text = displayName
+                    tvContent.setText(R.string.backup_add_item_text)
+                }
             }
             ACTION_BACKUP_MOVE -> {
-                if (isRootBackup) {
+                if (nodeType == BACKUP_ROOT) {
                     // Move root folder of backup
                     val displayName = getString(R.string.backup_move_folder_title, nodeName)
                     tvTitle.text = displayName
                     tvContent.setText(R.string.backup_move_root_folder)
 
-                } else {
+                } else if (nodeType == BACKUP_DEVICE || nodeType == BACKUP_SUBFOLDER) {
                     // Move sub folder of backup
                     if (handleList != null) {
                         tvTitle.text = if (handleList.size == 1) {
@@ -788,15 +812,17 @@ object MegaNodeDialogUtil {
                         }
                     }
                     tvContent.setText(R.string.backup_move_sub_folder)
+                } else {
+                    logDebug("Not in the backup folder")
                 }
             }
             ACTION_BACKUP_REMOVE -> {
-                if (isRootBackup) {
+                if (nodeType == BACKUP_ROOT) {
                     // Move root folder of backup to rubbish bin
                     val displayName = getString(R.string.backup_remove_folder_title, nodeName)
                     tvTitle.text = displayName
                     tvContent.setText(R.string.backup_remove_root_folder)
-                } else {
+                } else if (nodeType == BACKUP_DEVICE || nodeType == BACKUP_SUBFOLDER) {
                     // Move sub folder of backup to rubbish bin
                     if (handleList != null) {
                         tvTitle.text = if (handleList.size == 1) {
@@ -806,6 +832,8 @@ object MegaNodeDialogUtil {
                         }
                     }
                     tvContent.setText(R.string.backup_remove_sub_folder)
+                } else {
+                    logDebug("Not in the backup folder")
                 }
             }
             ACTION_BACKUP_GET_LINK, ACTION_BACKUP_SHARE_CHAT, ACTION_BACKUP_SHARE, ACTION_BACKUP_SHARE_FOLDER -> {
@@ -842,7 +870,7 @@ object MegaNodeDialogUtil {
      * Show the confirm dialog when moving or deleting folders with "My backup" folder
      * @param handleList handleList handles list of the nodes that selected
      * @param pNodeBackup the node of "My backup"
-     * @param isRootBackup true - "My backup" folder / false - sub folders or files
+     * @param nodeType the type of the backup node - BACKUP_NONE / BACKUP_ROOT / BACKUP_DEVICE / BACKUP_SUBFOLDER
      * @param actionType Indicates the action (move / remove/ add / new folder / new file)
      */
     @JvmStatic
@@ -851,7 +879,7 @@ object MegaNodeDialogUtil {
         actionBackupNodeCallback: ActionBackupNodeCallback,
         handleList: ArrayList<Long>?,
         pNodeBackup: MegaNode,
-        isRootBackup: Boolean,
+        nodeType: Int,
         actionType: Int
     ) {
         val layout: LayoutInflater = activity.layoutInflater
@@ -871,16 +899,16 @@ object MegaNodeDialogUtil {
         val nodeName = pNodeBackup.name
 
         when (actionType) {
-            ACTION_BACKUP_NEW_FOLDER, ACTION_BACKUP_TAKE_PICTURE, ACTION_BACKUP_ADD, ACTION_BACKUP_FAB -> {
+            ACTION_MOVE_TO_BACKUP, ACTION_BACKUP_NEW_FOLDER, ACTION_BACKUP_TAKE_PICTURE, ACTION_BACKUP_ADD, ACTION_BACKUP_FAB -> {
                 // Add
                 tvTitle.text = getString(R.string.backup_add_confirm_title, nodeName)
             }
             ACTION_BACKUP_MOVE -> {
-                if (isRootBackup) {
+                if (nodeType == BACKUP_ROOT) {
                     // Move root folder of backup
                     tvTitle.text = getString(R.string.backup_move_folder_title, nodeName)
 
-                } else {
+                } else if (nodeType == BACKUP_DEVICE || nodeType == BACKUP_SUBFOLDER) {
                     // Move sub folder of backup
                     if (handleList != null) {
                         tvTitle.text = if (handleList.size == 1) {
@@ -889,13 +917,15 @@ object MegaNodeDialogUtil {
                             getString(R.string.backup_move_multiple_folder_title)
                         }
                     }
+                } else {
+                    logDebug("Not in the backup folder")
                 }
             }
             ACTION_BACKUP_REMOVE -> {
-                if (isRootBackup) {
+                if (nodeType == BACKUP_ROOT) {
                     // Move root folder of backup to rubbish bin
                     tvTitle.text = getString(R.string.backup_remove_folder_title, nodeName)
-                } else {
+                } else if (nodeType == BACKUP_DEVICE || nodeType == BACKUP_SUBFOLDER) {
                     // Move sub folder of backup to rubbish bin
                     if (handleList != null) {
                         tvTitle.text = if (handleList.size == 1) {
@@ -904,6 +934,8 @@ object MegaNodeDialogUtil {
                             getString(R.string.backup_remove_multiple_folder_title)
                         }
                     }
+                } else {
+                    logDebug("Not in the backup folder")
                 }
             }
         }
@@ -930,7 +962,7 @@ object MegaNodeDialogUtil {
                     actionBackupNodeCallback.actionExecute(
                         handleList,
                         pNodeBackup,
-                        isRootBackup,
+                        nodeType,
                         actionType
                     )
                     //Dismiss once everything is OK.

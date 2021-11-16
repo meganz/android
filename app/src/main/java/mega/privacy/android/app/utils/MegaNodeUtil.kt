@@ -53,6 +53,10 @@ import mega.privacy.android.app.utils.FileUtil.*
 import mega.privacy.android.app.utils.LogUtil.logDebug
 import mega.privacy.android.app.utils.LogUtil.logWarning
 import mega.privacy.android.app.utils.MegaApiUtils.isIntentAvailable
+import mega.privacy.android.app.utils.MegaNodeDialogUtil.BACKUP_DEVICE
+import mega.privacy.android.app.utils.MegaNodeDialogUtil.BACKUP_NONE
+import mega.privacy.android.app.utils.MegaNodeDialogUtil.BACKUP_ROOT
+import mega.privacy.android.app.utils.MegaNodeDialogUtil.BACKUP_SUBFOLDER
 import mega.privacy.android.app.utils.StringResourcesUtils.getQuantityString
 import mega.privacy.android.app.utils.StringResourcesUtils.getString
 import mega.privacy.android.app.utils.TextUtil.isTextEmpty
@@ -1754,21 +1758,30 @@ object MegaNodeUtil {
      * @return true - Sub folder of My Backup / false - Not the sub folder of My Backup
      */
     @JvmStatic
-    fun checkSubBackupNodeByHandle(megaApi: MegaApiAndroid, handleList: ArrayList<Long>?): Boolean{
+    fun checkBackupNodeTypeByHandle(megaApi: MegaApiAndroid, handleList: ArrayList<Long>?): Int{
         if(handleList != null) {
             if (handleList.size > 0) {
                 val handle: Long = handleList[0]
                 var p: MegaNode = megaApi.getNodeByHandle(handle)
+
+                if(p.handle == myBackupHandle){
+                    return BACKUP_ROOT
+                }
+
+                p = megaApi.getParentNode(p)
+                if(p.handle == myBackupHandle){
+                    return BACKUP_DEVICE
+                }
                 while (megaApi.getParentNode(p) != null) {
                     p = megaApi.getParentNode(p)
                     if(p.handle == myBackupHandle){
-                        return true
+                        return BACKUP_SUBFOLDER
                     }
                 }
-                return false
+                return BACKUP_NONE
             }
         }
-        return false
+        return BACKUP_NONE
     }
 
     /**
@@ -1779,17 +1792,24 @@ object MegaNodeUtil {
      * @return true - Sub folder of My Backup / false - Not the sub folder of My Backup
      */
     @JvmStatic
-    fun checkSubBackupNodeByHandle(megaApi: MegaApiAndroid, node: MegaNode?): Boolean{
+    fun checkBackupNodeTypeByHandle(megaApi: MegaApiAndroid, node: MegaNode?): Int{
         if(node != null) {
             var p: MegaNode = node
+            if(p.handle == myBackupHandle){
+                return BACKUP_ROOT
+            }
+            p = megaApi.getParentNode(p)
+            if(p.handle == myBackupHandle){
+                return BACKUP_DEVICE
+            }
             while (megaApi.getParentNode(p) != null) {
                 p = megaApi.getParentNode(p)
                 if(p.handle == myBackupHandle){
-                    return true
+                    return BACKUP_SUBFOLDER
                 }
             }
-            return false
+            return BACKUP_NONE
         }
-        return false
+        return BACKUP_NONE
     }
 }
