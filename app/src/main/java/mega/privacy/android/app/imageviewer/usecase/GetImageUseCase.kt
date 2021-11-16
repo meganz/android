@@ -5,28 +5,48 @@ import androidx.core.net.toUri
 import dagger.hilt.android.qualifiers.ApplicationContext
 import io.reactivex.rxjava3.core.BackpressureStrategy
 import io.reactivex.rxjava3.core.Flowable
+import io.reactivex.rxjava3.kotlin.blockingSubscribeBy
 import mega.privacy.android.app.MimeTypeList
 import mega.privacy.android.app.di.MegaApi
 import mega.privacy.android.app.errors.BusinessAccountOverdueMegaError
+import mega.privacy.android.app.errors.QuotaOverdueMegaError
 import mega.privacy.android.app.imageviewer.data.ImageResult
 import mega.privacy.android.app.listeners.OptionalMegaRequestListenerInterface
 import mega.privacy.android.app.listeners.OptionalMegaTransferListenerInterface
+import mega.privacy.android.app.usecase.CancelTransferUseCase
 import mega.privacy.android.app.usecase.GetNodeUseCase
 import mega.privacy.android.app.utils.CacheFolderManager.*
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.ErrorUtils.toThrowable
+import mega.privacy.android.app.utils.LogUtil.logError
 import mega.privacy.android.app.utils.MegaNodeUtil.isGif
 import mega.privacy.android.app.utils.MegaNodeUtil.isVideo
 import nz.mega.sdk.*
 import nz.mega.sdk.MegaError.*
 import javax.inject.Inject
 
+/**
+ * Use case to retrieve a single image
+ *
+ * @property megaApi        MegaAPI required for node requests
+ * @property context        Context required to build files
+ * @property getNodeUseCase NodeUseCase required to retrieve node information
+ */
 class GetImageUseCase @Inject constructor(
     @MegaApi private val megaApi: MegaApiAndroid,
     @ApplicationContext private val context: Context,
-    private val getNodeUseCase: GetNodeUseCase
+    private val getNodeUseCase: GetNodeUseCase,
+    private val cancelTransferUseCase: CancelTransferUseCase
 ) {
 
+    /**
+     * Get an image given a Node handle.
+     *
+     * @param nodeHandle    Image Node handle to request.
+     * @param fullSize      Flag to request full size image.
+     * @param highPriority  Flag to request full image with high priority.
+     * @return              Flowable which emits Uri for every image, from low to high resolution.
+     */
     fun get(
         nodeHandle: Long,
         fullSize: Boolean = false,
@@ -34,6 +54,14 @@ class GetImageUseCase @Inject constructor(
     ): Flowable<ImageResult> =
         getNodeUseCase.get(nodeHandle).flatMapPublisher { get(it, fullSize, highPriority) }
 
+    /**
+     * Get an image given a Node.
+     *
+     * @param node          Image Node to request.
+     * @param fullSize      Flag to request full size image.
+     * @param highPriority  Flag to request full image with high priority.
+     * @return              Flowable which emits Uri for every image, from low to high resolution.
+     */
     fun get(
         node: MegaNode?,
         fullSize: Boolean = false,
@@ -105,8 +133,17 @@ class GetImageUseCase @Inject constructor(
                     if (isFullSizeRequired && !fullFile.exists()) {
                         val listener = OptionalMegaTransferListenerInterface(
                             onTransferStart = { transfer ->
+                                if (emitter.isCancelled) return@OptionalMegaTransferListenerInterface
+
                                 image.transferTag = transfer.tag
                                 emitter.onNext(image)
+
+                                emitter.setCancellable {
+                                    cancelTransferUseCase.cancel(transfer.tag)
+                                        .blockingSubscribeBy(onError = { error ->
+                                            logError(error.stackTraceToString())
+                                        })
+                                }
                             },
                             onTransferFinish = { _: MegaTransfer, error: MegaError ->
                                 if (emitter.isCancelled) return@OptionalMegaTransferListenerInterface
@@ -121,9 +158,13 @@ class GetImageUseCase @Inject constructor(
                                     }
                                     API_EBUSINESSPASTDUE ->
                                         emitter.onError(BusinessAccountOverdueMegaError())
+                                    API_EOVERQUOTA ->
+                                        emitter.onError(QuotaOverdueMegaError())
                                     else ->
                                         emitter.onError(error.toThrowable())
                                 }
+
+                                emitter.setCancellable(null)
                             }
                         )
 

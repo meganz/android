@@ -485,7 +485,7 @@ abstract class MediaPlayerActivity : PasscodeActivity(), SnackbarShower, Activit
                     return
                 }
 
-                if (adapterType == FOLDER_LINK_ADAPTER) {
+                if (adapterType == FOLDER_LINK_ADAPTER || adapterType == FROM_IMAGE_VIEWER) {
                     menu.toggleAllMenuItemsVisibility(false)
 
                     menu.findItem(R.id.save_to_device).isVisible = true

@@ -6,6 +6,9 @@ import mega.privacy.android.app.imageviewer.ImageViewerPageFragment
 import mega.privacy.android.app.utils.HandleDiffCallback
 import mega.privacy.android.app.utils.view.DiffFragmentStateAdapter
 
+/**
+ * Image Viewer adapter based on a list of image node handles that creates a Fragment per handle.
+ */
 class ImageViewerAdapter(activity: FragmentActivity) :
     DiffFragmentStateAdapter<Long>(activity, HandleDiffCallback()) {
 

@@ -24,6 +24,15 @@ import nz.mega.sdk.MegaNode
 import nz.mega.sdk.MegaNode.*
 import javax.inject.Inject
 
+/**
+ * Use case to retrieve image node handles given different sources
+ *
+ * @property context                    Context to retrieve offline nodes
+ * @property megaApi                    MegaAPI required for node requests
+ * @property databaseHandler            DatabaseHandler required for offline nodes
+ * @property getGlobalChangesUseCase    GlobalChangesUseCase required to update nodes in realtime
+ * @property getNodeUseCase             NodeUseCase required to retrieve node information
+ */
 class GetImageHandlesUseCase @Inject constructor(
     @ApplicationContext private val context: Context,
     @MegaApi private val megaApi: MegaApiAndroid,
@@ -32,6 +41,16 @@ class GetImageHandlesUseCase @Inject constructor(
     private val getNodeUseCase: GetNodeUseCase,
 ) {
 
+    /**
+     * Use case to retrieve image node handles given different sources
+     *
+     * @param nodeHandles       Image node handles
+     * @param parentNodeHandle  Parent node to retrieve every other child
+     * @param nodeFileLink      Node public link
+     * @param sortOrder         Node search order
+     * @param isOffline         Flag to check if it's offline node
+     * @return                  Flowable with up-todate image nodes
+     */
     fun get(
         nodeHandles: LongArray? = null,
         parentNodeHandle: Long? = null,

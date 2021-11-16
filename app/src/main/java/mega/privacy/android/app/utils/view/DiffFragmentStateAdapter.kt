@@ -8,6 +8,15 @@ import androidx.recyclerview.widget.AsyncListDiffer
 import androidx.recyclerview.widget.DiffUtil
 import androidx.viewpager2.adapter.FragmentStateAdapter
 
+/**
+ * FragmentStateAdapter with DiffUtil implementation for ViewPager2.
+ * This class is a convenience wrapper around AsyncListDiffer that implements
+ * Adapter common default behavior for item access and counting.
+ *
+ * Took from: https://gist.github.com/Gnzlt/7e8a23ba0c3b046ed33c824b284d7270
+ *
+ * @param T     Type of the Lists this Adapter will receive.
+ */
 abstract class DiffFragmentStateAdapter<T> : FragmentStateAdapter {
 
     private val differ: AsyncListDiffer<T>

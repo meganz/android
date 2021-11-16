@@ -43,7 +43,7 @@
         android:icon="@drawable/ic_dots_vertical_white"
         android:orderInCategory="140"
         android:title="@string/label_more"
-        android:visible="true"
+        android:visible="false"
         app:iconTint="?attr/colorControlNormal"
         app:showAsAction="always" />
 </menu>

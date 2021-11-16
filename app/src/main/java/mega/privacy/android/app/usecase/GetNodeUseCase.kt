@@ -23,6 +23,14 @@ import nz.mega.sdk.MegaShare
 import java.io.File
 import javax.inject.Inject
 
+/**
+ * Main use case to retrieve Mega Node information.
+ *
+ * @property context            Context needed to get offline node files.
+ * @property megaApi            Mega API needed to call node information.
+ * @property megaApiFolder      Mega API folder needed to authorize node.
+ * @property databaseHandler    Database Handler needed to retrieve offline nodes.
+ */
 class GetNodeUseCase @Inject constructor(
     @ApplicationContext private val context: Context,
     @MegaApi private val megaApi: MegaApiAndroid,

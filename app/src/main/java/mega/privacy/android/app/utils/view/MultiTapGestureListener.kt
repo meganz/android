@@ -4,6 +4,13 @@ import android.view.MotionEvent
 import com.facebook.samples.zoomable.DoubleTapGestureListener
 import com.facebook.samples.zoomable.ZoomableDraweeView
 
+/**
+ * Custom tap gesture listener for double tap to zoom / unzoom, double-tap-and-drag to zoom,
+ * single taps and combined zoom.
+ *
+ * @property onSingleTapCallback    Callback to be called when single tap is triggered.
+ * @property onZoomCallback         Callback to be called when any zoom action is triggered.
+ */
 class MultiTapGestureListener constructor(
     zoomableDraweeView: ZoomableDraweeView,
     private val onSingleTapCallback: () -> Unit,

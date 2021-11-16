@@ -27,6 +27,9 @@ import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 import nz.mega.sdk.MegaApiJava.ORDER_DEFAULT_ASC
 import javax.inject.Inject
 
+/**
+ * Image Viewer page that shows an individual image within a list of image items
+ */
 @AndroidEntryPoint
 class ImageViewerPageFragment : Fragment() {
 
@@ -137,6 +140,13 @@ class ImageViewerPageFragment : Fragment() {
         }
     }
 
+    /**
+     * Show a pair of Image Uris on the current DraweeView.
+     * Using a lower res image to preload the next one.
+     *
+     * @param mainImageUri      Higher resolution Image uri to show
+     * @param lowResImageUri    Lower resolution Image uri to show
+     */
     private fun showImageUris(mainImageUri: Uri, lowResImageUri: Uri? = null) {
         val controller = Fresco.newDraweeControllerBuilder()
             .setAutoPlayAnimations(true)
@@ -167,8 +177,7 @@ class ImageViewerPageFragment : Fragment() {
             setDataAndType(fileUri, MimeTypeList.typeForName(item.name).type)
             putExtra(INTENT_EXTRA_KEY_HANDLE, item.handle)
             putExtra(INTENT_EXTRA_KEY_FILE_NAME, item.name)
-            putExtra(INTENT_EXTRA_KEY_IS_PLAYLIST, false)
-            putExtra(INTENT_EXTRA_KEY_ADAPTER_TYPE, INBOX_ADAPTER)
+            putExtra(INTENT_EXTRA_KEY_ADAPTER_TYPE, FROM_IMAGE_VIEWER)
             putExtra(INTENT_EXTRA_KEY_POSITION, 0)
             putExtra(INTENT_EXTRA_KEY_PARENT_NODE_HANDLE, INVALID_HANDLE)
             putExtra(INTENT_EXTRA_KEY_ORDER_GET_CHILDREN, ORDER_DEFAULT_ASC)

@@ -39,7 +39,9 @@ import nz.mega.sdk.MegaApiJava.ORDER_PHOTO_ASC
 import nz.mega.sdk.MegaNode
 import java.lang.ref.WeakReference
 
-
+/**
+ * Entry point to show an image based on an existing Node.
+ */
 @AndroidEntryPoint
 class ImageViewerActivity : BaseActivity(), PermissionRequester, SnackbarShower {
 
@@ -47,6 +49,13 @@ class ImageViewerActivity : BaseActivity(), PermissionRequester, SnackbarShower 
         private const val OFFSCREEN_PAGE_LIMIT = 3
         private const val STATE_PAGE_CALLBACK_SET = "STATE_PAGE_CALLBACK_SET"
 
+        /**
+         * Get Image Viewer intent to show a single image node.
+         *
+         * @param context       Required to build the Intent.
+         * @param nodeHandle    Node handle to request image from.
+         * @return              Image Viewer Intent.
+         */
         @JvmStatic
         fun getIntentForSingleNode(
             context: Context,
@@ -56,6 +65,13 @@ class ImageViewerActivity : BaseActivity(), PermissionRequester, SnackbarShower 
                 putExtra(INTENT_EXTRA_KEY_HANDLE, nodeHandle)
             }
 
+        /**
+         * Get Image Viewer intent to show a single image node.
+         *
+         * @param context       Required to build the Intent.
+         * @param nodeFileLink  Public link to a file in MEGA.
+         * @return              Image Viewer Intent.
+         */
         @JvmStatic
         fun getIntentForSingleNode(
             context: Context,
@@ -65,6 +81,13 @@ class ImageViewerActivity : BaseActivity(), PermissionRequester, SnackbarShower 
                 putExtra(EXTRA_LINK, nodeFileLink)
             }
 
+        /**
+         * Get Image Viewer intent to show a single image node.
+         *
+         * @param context       Required to build the Intent.
+         * @param nodeHandle    Offline node handle to request image from.
+         * @return              Image Viewer Intent.
+         */
         @JvmStatic
         fun getIntentForSingleOfflineNode(
             context: Context,
@@ -74,6 +97,15 @@ class ImageViewerActivity : BaseActivity(), PermissionRequester, SnackbarShower 
                 putExtra(INTENT_EXTRA_KEY_OFFLINE_HANDLE, nodeHandle)
             }
 
+        /**
+         * Get Image Viewer intent to show a list of image nodes.
+         *
+         * @param context           Required to build the Intent.
+         * @param parentNodeHandle  Parent node to retrieve every other child.
+         * @param childOrder        Node search order.
+         * @param currentNodeHandle Current node handle to show.
+         * @return                  Image Viewer Intent.
+         */
         @JvmStatic
         @JvmOverloads
         fun getIntentForParentNode(
@@ -88,6 +120,14 @@ class ImageViewerActivity : BaseActivity(), PermissionRequester, SnackbarShower 
                 putExtra(INTENT_EXTRA_KEY_HANDLE, currentNodeHandle)
             }
 
+        /**
+         * Get Image Viewer intent to show a list of image nodes.
+         *
+         * @param context           Required to build the Intent.
+         * @param childrenHandles   Child image nodes to retrieve.
+         * @param currentNodeHandle Current node handle to show.
+         * @return                  Image Viewer Intent.
+         */
         @JvmStatic
         @JvmOverloads
         fun getIntentForChildren(
@@ -100,6 +140,14 @@ class ImageViewerActivity : BaseActivity(), PermissionRequester, SnackbarShower 
                 putExtra(INTENT_EXTRA_KEY_HANDLE, currentNodeHandle)
             }
 
+        /**
+         * Get Image Viewer intent to show a list of image nodes.
+         *
+         * @param context           Required to build the Intent.
+         * @param childrenHandles   Offline child image nodes to retrieve.
+         * @param currentNodeHandle Current node handle to show.
+         * @return                  Image Viewer Intent.
+         */
         @JvmStatic
         fun getIntentForOfflineChildren(
             context: Context,
@@ -158,8 +206,6 @@ class ImageViewerActivity : BaseActivity(), PermissionRequester, SnackbarShower 
         binding = ActivityImageViewerBinding.inflate(layoutInflater)
         setContentView(dragToExit.get()?.wrapContentView(binding.root))
 
-        pageCallbackSet = savedInstanceState?.getBoolean(STATE_PAGE_CALLBACK_SET) ?: pageCallbackSet
-
         setupView()
         setupObservers()
 
@@ -171,11 +217,6 @@ class ImageViewerActivity : BaseActivity(), PermissionRequester, SnackbarShower 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         menuInflater.inflate(R.menu.activity_image_viewer, menu)
         return true
-    }
-
-    override fun onSaveInstanceState(outState: Bundle) {
-        outState.putBoolean(STATE_PAGE_CALLBACK_SET, pageCallbackSet)
-        super.onSaveInstanceState(outState)
     }
 
     override fun onDestroy() {
@@ -282,6 +323,11 @@ class ImageViewerActivity : BaseActivity(), PermissionRequester, SnackbarShower 
         }
     }
 
+    /**
+     * Populate current image information to bottom texts and toolbar options.
+     *
+     * @param item  Image item to show
+     */
     private fun showCurrentImageInfo(item: MegaNodeItem?) {
         if (item != null) {
             bottomSheet?.dismiss()
@@ -299,12 +345,17 @@ class ImageViewerActivity : BaseActivity(), PermissionRequester, SnackbarShower 
 
                 findItem(R.id.action_chat)?.isVisible =
                     isOnline() && item.hasFullAccess && !item.isFromRubbishBin
+
+                findItem(R.id.action_more)?.isVisible = true
             }
         } else {
             logWarning("Null image item")
         }
     }
 
+    /**
+     * Show/hide toolbar and bottom bar with animation.
+     */
     private fun switchToolbarVisibility() {
         if (binding.motion.currentState == R.id.start) {
             binding.motion.transitionToEnd()

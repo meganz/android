@@ -24,6 +24,18 @@ import mega.privacy.android.app.utils.LogUtil.logError
 import mega.privacy.android.app.utils.LogUtil.logWarning
 import nz.mega.sdk.MegaNode
 
+/**
+ * Main ViewModel to handle all logic related to the ImageViewer.
+ * This is shared between {@link ImageViewerActivity} behaving as the main container and
+ * each individual {@link ImageViewerPageFragment} representing a single image within the ViewPager.
+ *
+ * @property getImageUseCase        Needed to retrieve each individual image based on a node.
+ * @property getImageHandlesUseCase Needed to retrieve node handles given sent params.
+ * @property getNodeUseCase         Needed to retrieve each individual node based on a node handle,
+ *                                  as well as each individual node action required by the menu.
+ * @property exportNodeUseCase      Needed to export image node on demand.
+ * @property cancelTransferUseCase  Needed to cancel current full image transfer if needed.
+ */
 class ImageViewerViewModel @ViewModelInject constructor(
     private val getImageUseCase: GetImageUseCase,
     private val getImageHandlesUseCase: GetImageHandlesUseCase,
@@ -93,6 +105,13 @@ class ImageViewerViewModel @ViewModelInject constructor(
             .subscribeAndUpdateImages(currentNodeHandle)
     }
 
+    /**
+     * Main method to load an image given a Node Handle.
+     *
+     * @param nodeHandle    Image node handle to be loaded.
+     * @param fullSize      Flag to request full size image.
+     * @param highPriority  Flag to request full image with high priority.
+     */
     fun loadSingleImage(nodeHandle: Long, fullSize: Boolean, highPriority: Boolean) {
         val existingNode = getExistingNode(nodeHandle)
         val subscription = if (existingNode != null) {
@@ -231,6 +250,12 @@ class ImageViewerViewModel @ViewModelInject constructor(
     private fun getExistingNode(nodeHandle: Long): MegaNode? =
         images.value?.find { it.handle == nodeHandle }?.nodeItem?.node
 
+    /**
+     * Reused Extension Function to subscribe to a Flowable<List<ImageItem>> and update each
+     * individual ImageItem in the list with the new changes.
+     *
+     * @param currentNodeHandle Node handle to be shown on first load.
+     */
     private fun Flowable<List<ImageItem>>.subscribeAndUpdateImages(currentNodeHandle: Long? = null) {
         subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())

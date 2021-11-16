@@ -8,10 +8,21 @@ import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaError
 import javax.inject.Inject
 
+/**
+ * Use case to cancel an existing Mega Transfer.
+ *
+ * @property megaApi    Mega API needed to cancel transfer.
+ */
 class CancelTransferUseCase @Inject constructor(
     @MegaApi private val megaApi: MegaApiAndroid
 ) {
 
+    /**
+     * Cancel an existing Mega Transfer given a transfer tag.
+     *
+     * @param transferTag   Tag that identifies the transfer.
+     * @return              Completable.
+     */
     fun cancel(transferTag: Int): Completable =
         Completable.create { emitter ->
             megaApi.cancelTransferByTag(transferTag, OptionalMegaRequestListenerInterface(
