@@ -5,7 +5,13 @@ import mega.privacy.android.app.middlelayer.crashreporter.CrashReporter
 
 class CrashReporterImpl : CrashReporter {
 
+    private val agConnectCrash = AGConnectCrash.getInstance()
+
     override fun report(e: Throwable) {
-        AGConnectCrash.getInstance().recordException(e)
+        agConnectCrash.recordException(e)
+    }
+
+    override fun setEnabled(enabled: Boolean) {
+        agConnectCrash.enableCrashCollection(enabled)
     }
 }
