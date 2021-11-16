@@ -155,9 +155,10 @@ class ImageViewerActivity : BaseActivity(), PermissionRequester, SnackbarShower 
         super.onCreate(savedInstanceState)
         WindowCompat.setDecorFitsSystemWindows(window, false)
 
-        pageCallbackSet = savedInstanceState?.getBoolean(STATE_PAGE_CALLBACK_SET) ?: pageCallbackSet
         binding = ActivityImageViewerBinding.inflate(layoutInflater)
         setContentView(dragToExit.get()?.wrapContentView(binding.root))
+
+        pageCallbackSet = savedInstanceState?.getBoolean(STATE_PAGE_CALLBACK_SET) ?: pageCallbackSet
 
         setupView()
         setupObservers()
@@ -192,6 +193,7 @@ class ImageViewerActivity : BaseActivity(), PermissionRequester, SnackbarShower 
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
         binding.viewPager.apply {
+            isSaveEnabled = false
             adapter = pagerAdapter
             offscreenPageLimit = OFFSCREEN_PAGE_LIMIT
         }
@@ -240,7 +242,7 @@ class ImageViewerActivity : BaseActivity(), PermissionRequester, SnackbarShower 
 
         viewModel.getImagesHandle().observe(this) { items ->
             if (items.isNullOrEmpty()) {
-                logError("Null image items")
+                logError("Null or empty image items")
                 finish()
             } else {
                 val sizeDifference = pagerAdapter.itemCount != items.size
@@ -250,6 +252,7 @@ class ImageViewerActivity : BaseActivity(), PermissionRequester, SnackbarShower 
                     }
                 }
             }
+            binding.progress.hide()
         }
         viewModel.getCurrentImage().observe(this, ::showCurrentImageInfo)
         viewModel.onSwitchToolbar().observe(this) { switchToolbarVisibility() }
