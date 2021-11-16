@@ -51,6 +51,8 @@ android {
         resValue ("string", "app_version", "\"${versionName}\"")
         resValue ("string", "sdk_version", "\"${getSdkGitHash()}\"")
         resValue ("string", "karere_version", "\"${getKarereGitHash()}\"")
+
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
 
     sourceSets.main {
@@ -217,6 +219,8 @@ dependencies {
 
     implementation "com.jeremyliao:live-event-bus-x:$liveEventBus"
 
+    implementation "androidx.biometric:biometric:$biometricVersion"
+
     //GMS
     gmsImplementation 'com.google.firebase:firebase-core:18.0.0'
     gmsImplementation 'com.google.firebase:firebase-messaging:21.0.1'
@@ -228,9 +232,10 @@ dependencies {
     gmsImplementation 'com.google.firebase:firebase-crashlytics-ndk'
     gmsImplementation 'com.google.firebase:firebase-analytics-ktx'
     //HMS
+    hmsImplementation "com.huawei.agconnect:agconnect-core:$huaweiServicesVersion"
     hmsImplementation 'com.huawei.hms:push:4.0.2.300'
-    hmsImplementation 'com.huawei.hms:location:4.0.2.300'
-    hmsImplementation 'com.huawei.hms:maps:4.0.1.301'
+    hmsImplementation 'com.huawei.hms:location:6.2.0.300'
+    hmsImplementation 'com.huawei.hms:maps:6.0.1.304'
     hmsImplementation 'com.huawei.hms:iap:4.0.2.300'
     hmsImplementation 'com.huawei.hms:hianalytics:5.2.0.301'
     hmsImplementation 'com.huawei.agconnect:agconnect-crash:1.5.1.300'
@@ -238,6 +243,11 @@ dependencies {
     // Play Core
     implementation("com.google.android.play:core:1.10.0")
     implementation("com.google.android.play:core-ktx:1.8.1")
+
+    // Testing dependencies
+    testImplementation "junit:junit:$junitVersion"
+    testImplementation "com.google.truth:truth:$truthVersion"
+    androidTestImplementation "androidx.test.ext:junit:$androidxTestExtVersion"
 }
 
 def taskRequests = gradle.getStartParameter().getTaskRequests().toString()
