@@ -41,6 +41,7 @@ if [ ! -d "${JAVA_HOME}" ]; then
     exit 1
 fi
 
+#This is only for support to build using Mac M1. Please remove this once NDK provides support to M1.
 if [[ `uname -m` == 'arm64' ]]; then
     NDK_BUILD="arch -x86_64 ${NDK_ROOT}/ndk-build"
 else
