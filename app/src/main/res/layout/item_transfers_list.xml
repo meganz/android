@@ -31,7 +31,7 @@
         android:layout_toEndOf="@id/transfers_list_thumbnail"
         android:ellipsize="middle"
         android:singleLine="true"
-        android:textAppearance="?attr/textAppearanceSubtitle1" />
+        style="@style/textAppearanceSubtitle1" />
 
     <ImageView
         android:id="@+id/transfers_list_completed_image"
