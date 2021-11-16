@@ -68,7 +68,6 @@ class UpgradeAccountActivity : ChooseAccountActivity() {
 
         setAccountDetails()
         showAvailableAccount()
-        setPricingInfo()
     }
 
     private fun setupObservers() {
