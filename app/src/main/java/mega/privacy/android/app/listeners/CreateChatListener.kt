@@ -49,7 +49,7 @@ class CreateChatListener(
         chats: List<MegaChatRoom>,
         usersNoChat: List<MegaUser>,
         context: Context,
-        snackbarShower: SnackbarShower,
+        snackbarShower: SnackbarShower
     ) : this(context, action, usersNoChat.size + chats.size, snackbarShower, null, null) {
         initFields(chats, usersNoChat)
     }
@@ -105,6 +105,8 @@ class CreateChatListener(
             } else {
                 snackbarShower?.showSnackbar(getString(R.string.create_chat_error))
             }
+
+            return
         }
 
         if (action == ATTACH) {
