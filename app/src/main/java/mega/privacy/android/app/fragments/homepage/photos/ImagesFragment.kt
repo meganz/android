@@ -137,29 +137,22 @@ class ImagesFragment : BaseBindingFragmentKt<ImagesViewModel, FragmentImagesBind
     private fun handleEnableToolbarMenuIcon(menuItemId: Int, isEnable: Boolean) {
         val toolbar = binding.layoutTitleBar.toolbar
         val menuItem = toolbar.menu.findItem(menuItemId)
-        var colorRes = ColorUtils.getThemeColor(context, R.attr.colorControlNormal)
-        if (!isEnable) {
-            colorRes = ContextCompat.getColor(context, R.color.grey_038_white_038)
-        }
-        DrawableCompat.setTint(
-            menuItem.icon,
-            colorRes
-        )
+        val colorRes =
+            if (isEnable) ColorUtils.getThemeColor(context, R.attr.colorControlNormal)
+            else ContextCompat.getColor(context, R.color.grey_038_white_038)
+
+        DrawableCompat.setTint(menuItem.icon, colorRes)
         menuItem.isEnabled = isEnable
     }
 
-
     private fun handleZoomOptionsMenuUpdate(mShouldShow: Boolean? = null) {
-        var shouldShow = mShouldShow
-        if (shouldShow == null)
-            shouldShow = shouldShowZoomMenuItem()
+        val shouldShow = mShouldShow ?: shouldShowZoomMenuItem()
         val toolbar = binding.layoutTitleBar.toolbar
         toolbar.menu.findItem(R.id.action_zoom_in).isVisible = shouldShow
         toolbar.menu.findItem(R.id.action_zoom_out).isVisible = shouldShow
     }
 
     override fun subscribeObservers() {
-
         viewModel.getZoom().observe(viewLifecycleOwner, { zoom: Int ->
             // Out 3X: organize by year, In 1X: organize by day, both need to reload nodes.
             val needReload = ZoomUtil.needReload(currentZoom, zoom)

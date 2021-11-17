@@ -8,19 +8,26 @@ import androidx.core.content.ContextCompat
 import androidx.core.graphics.drawable.DrawableCompat
 import mega.privacy.android.app.R
 
+/**
+ * a kt class to maintain the zoom constants and zoom basic reused operations.
+ */
 object ZoomUtil {
-
-    @JvmStatic
-    var PHOTO_ZOOM_LEVEL = 0 //ZOOM_DEFAULT
-
-    @JvmStatic
-    var IMAGES_ZOOM_LEVEL = 0 //ZOOM_DEFAULT
 
     // Zoom level
     const val ZOOM_OUT_2X = -2
     const val ZOOM_OUT_1X = -1
     const val ZOOM_DEFAULT = 0
     const val ZOOM_IN_1X = 1
+
+    @JvmStatic
+    var PHOTO_ZOOM_LEVEL = ZOOM_DEFAULT //ZOOM_DEFAULT
+
+    @JvmStatic
+    var IMAGES_ZOOM_LEVEL = ZOOM_DEFAULT //ZOOM_DEFAULT
+
+    const val DAYS_INDEX = 0
+    const val MONTHS_INDEX = 1
+    const val YEARS_INDEX = 2
 
     // Span count portrait
     private const val SPAN_COUNT_PORTRAIT_OUT_2X = 12
@@ -113,7 +120,7 @@ object ZoomUtil {
         }
 
     fun resetZoomLevel() {
-        PHOTO_ZOOM_LEVEL = 0
-        IMAGES_ZOOM_LEVEL = 0
+        PHOTO_ZOOM_LEVEL = ZOOM_DEFAULT
+        IMAGES_ZOOM_LEVEL = ZOOM_DEFAULT
     }
 }

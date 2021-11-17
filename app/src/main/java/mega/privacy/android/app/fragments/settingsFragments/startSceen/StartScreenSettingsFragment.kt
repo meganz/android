@@ -9,7 +9,7 @@ import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import mega.privacy.android.app.databinding.FragmentStartScreenSettingsBinding
-import mega.privacy.android.app.fragments.settingsFragments.startSceen.util.StartScreenUtil.CAMERA_UPLOADS_BNV
+import mega.privacy.android.app.fragments.settingsFragments.startSceen.util.StartScreenUtil.PHOTOS_BNV
 import mega.privacy.android.app.fragments.settingsFragments.startSceen.util.StartScreenUtil.CHAT_BNV
 import mega.privacy.android.app.fragments.settingsFragments.startSceen.util.StartScreenUtil.CLOUD_DRIVE_BNV
 import mega.privacy.android.app.fragments.settingsFragments.startSceen.util.StartScreenUtil.HOME_BNV
@@ -48,7 +48,7 @@ class StartScreenSettingsFragment : Fragment() {
         hideChecks()
 
         binding.cloudLayout.setOnClickListener { viewModel.newScreenClicked(CLOUD_DRIVE_BNV) }
-        binding.cuLayout.setOnClickListener { viewModel.newScreenClicked(CAMERA_UPLOADS_BNV) }
+        binding.cuLayout.setOnClickListener { viewModel.newScreenClicked(PHOTOS_BNV) }
         binding.homeLayout.setOnClickListener { viewModel.newScreenClicked(HOME_BNV) }
         binding.chatLayout.setOnClickListener { viewModel.newScreenClicked(CHAT_BNV) }
         binding.sharedLayout.setOnClickListener { viewModel.newScreenClicked(SHARED_ITEMS_BNV) }
@@ -76,7 +76,7 @@ class StartScreenSettingsFragment : Fragment() {
 
         when (screenChecked) {
             CLOUD_DRIVE_BNV -> binding.cloudCheck.isVisible = true
-            CAMERA_UPLOADS_BNV -> binding.cuCheck.isVisible = true
+            PHOTOS_BNV -> binding.cuCheck.isVisible = true
             HOME_BNV -> binding.homeCheck.isVisible = true
             CHAT_BNV -> binding.chatCheck.isVisible = true
             SHARED_ITEMS_BNV -> binding.sharedCheck.isVisible = true

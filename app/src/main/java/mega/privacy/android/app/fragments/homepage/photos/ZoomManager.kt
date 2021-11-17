@@ -7,6 +7,9 @@ import mega.privacy.android.app.utils.ZoomUtil.ZOOM_IN_1X
 import mega.privacy.android.app.utils.ZoomUtil.ZOOM_OUT_2X
 import javax.inject.Singleton
 
+/**
+ * ZoomManager is used for encapsulate zoom functions by a composition way
+ */
 class ZoomManager {
 
     private var currentZoom = ZOOM_DEFAULT

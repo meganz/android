@@ -40,7 +40,7 @@ class CUCardViewHolder(
     fun bind(position: Int, card: CUCard, listener: CUCardViewAdapter.Listener) {
         itemView.setOnClickListener { listener.onCardClicked(position, card) }
 
-        var date = when (viewType) {
+        val date = when (viewType) {
             YEARS_VIEW -> Pair(card.year, "")
             MONTHS_VIEW -> if (card.year == null) Pair(card.month, "") else Pair("", getString(
                 R.string.cu_month_year_date,

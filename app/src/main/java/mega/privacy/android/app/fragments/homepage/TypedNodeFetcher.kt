@@ -3,17 +3,14 @@ package mega.privacy.android.app.fragments.homepage
 import android.content.Context
 import android.os.Handler
 import android.os.Looper
-import android.text.Spanned
 import androidx.lifecycle.MutableLiveData
 import kotlinx.coroutines.delay
-import mega.privacy.android.app.R
 import mega.privacy.android.app.fragments.homepage.photos.PhotoNodeItem
 import mega.privacy.android.app.listeners.BaseListener
+import mega.privacy.android.app.listeners.OptionalMegaRequestListenerInterface
 import mega.privacy.android.app.utils.*
-import mega.privacy.android.app.utils.StringUtils.toSpannedHtmlText
 import nz.mega.sdk.*
 import java.io.File
-import java.lang.Exception
 import java.time.LocalDate
 import java.time.Year
 import java.time.YearMonth
@@ -246,13 +243,9 @@ class TypedNodesFetcher(
             megaApi.getPreview(
                 item.key,
                 item.value,
-                object : BaseListener(context) {
-                    override fun onRequestFinish(
-                        api: MegaApiJava,
-                        request: MegaRequest,
-                        e: MegaError
-                    ) {
-                        if (e.errorCode != MegaError.API_OK) return
+                OptionalMegaRequestListenerInterface(
+                    onRequestFinish = { request, error ->
+                        if (error.errorCode != MegaError.API_OK) return@OptionalMegaRequestListenerInterface
 
                         request.let {
                             fileNodesMap[it.nodeHandle]?.apply {
@@ -263,7 +256,7 @@ class TypedNodesFetcher(
 
                         refreshCallback.invoke()
                     }
-                })
+                ))
 
             // Throttle the getThumbnail call, or the UI would be non-responsive
             delay(GET_THUMBNAIL_THROTTLE)

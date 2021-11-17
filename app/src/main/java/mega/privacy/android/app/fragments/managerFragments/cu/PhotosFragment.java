@@ -636,7 +636,7 @@ public class PhotosFragment extends BaseZoomFragment implements CUGridViewAdapte
 
     @Override
     public void onNodeLongClicked(int position, CuNode node) {
-        // Multiple selection only avaiable for zoom default(3 items per row) or zoom out 1x(5 items per row).
+        // Multiple selection only available for zoom default (3 items per row) or zoom out 1x (5 items per row).
         if (getCurrentZoom() == ZOOM_DEFAULT || getCurrentZoom() == ZOOM_OUT_1X) {
             viewModel.onNodeLongClicked(position, node);
         }

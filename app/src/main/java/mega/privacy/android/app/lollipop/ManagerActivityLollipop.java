@@ -129,7 +129,6 @@ import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.OpenPasswordLinkActivity;
 import mega.privacy.android.app.Product;
 import mega.privacy.android.app.R;
-import mega.privacy.android.app.components.GestureScaleListener;
 import mega.privacy.android.app.objects.PasscodeManagement;
 import mega.privacy.android.app.fragments.homepage.documents.DocumentsFragment;
 import mega.privacy.android.app.fragments.managerFragments.cu.PhotosFragment;
@@ -265,7 +264,7 @@ import nz.mega.sdk.MegaUser;
 import nz.mega.sdk.MegaUserAlert;
 
 import static mega.privacy.android.app.constants.EventConstants.*;
-import static mega.privacy.android.app.fragments.settingsFragments.startSceen.util.StartScreenUtil.CAMERA_UPLOADS_BNV;
+import static mega.privacy.android.app.fragments.settingsFragments.startSceen.util.StartScreenUtil.PHOTOS_BNV;
 import static mega.privacy.android.app.fragments.settingsFragments.startSceen.util.StartScreenUtil.CHAT_BNV;
 import static mega.privacy.android.app.fragments.settingsFragments.startSceen.util.StartScreenUtil.CLOUD_DRIVE_BNV;
 import static mega.privacy.android.app.fragments.settingsFragments.startSceen.util.StartScreenUtil.HOME_BNV;
@@ -480,7 +479,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 				case CLOUD_DRIVE: return "fbFLol";
 				case HOMEPAGE: return "fragmentHomepage";
 				case RUBBISH_BIN: return "rubbishBinFLol";
-				case PHOTOS: return "cuFLol";
+				case PHOTOS: return "photosF";
 				case INBOX: return "iFLol";
 				case INCOMING_SHARES: return "isF";
 				case OUTGOING_SHARES: return "osF";
@@ -3375,7 +3374,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 					break;
 
 				case PHOTOS: {
-					setBottomNavigationMenuItemChecked(CAMERA_UPLOADS_BNV);
+					setBottomNavigationMenuItemChecked(PHOTOS_BNV);
 					break;
 				}
 				case NOTIFICATIONS: {
@@ -3666,10 +3665,10 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
     }
 
 	/**
-	 * compatible with independent all the toolbar
+	 * compatible with Images independent toolbar, will remove this after lower coupling the activity toolbar
 	 */
 	public void setToolbarVisibility(){
-    	if(mHomepageScreen == HomepageScreen.IMAGES&&drawerItem == DrawerItem.HOMEPAGE){
+    	if(isInImagesPage()){
 			toolbar.setVisibility(View.GONE);
 		}else{
 			toolbar.setVisibility(View.VISIBLE);
@@ -4107,7 +4106,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 					break;
 				}
 				case PHOTOS:{
-					setBottomNavigationMenuItemChecked(CAMERA_UPLOADS_BNV);
+					setBottomNavigationMenuItemChecked(PHOTOS_BNV);
 					break;
 				}
 				case SHARED_ITEMS:{
@@ -4306,7 +4305,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 			}
 		}
 
-		boolean isCameraUploadItem = item == CAMERA_UPLOADS_BNV;
+		boolean isCameraUploadItem = item == PHOTOS_BNV;
 		updateMiniAudioPlayerVisibility(!isCameraUploadItem);
 	}
 
@@ -4616,9 +4615,9 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 				showHideBottomNavigationView(false);
                 refreshCUNodes();
 				if (!comesFromNotifications) {
-					bottomNavigationCurrentItem = CAMERA_UPLOADS_BNV;
+					bottomNavigationCurrentItem = PHOTOS_BNV;
 				}
-				setBottomNavigationMenuItemChecked(CAMERA_UPLOADS_BNV);
+				setBottomNavigationMenuItemChecked(PHOTOS_BNV);
 
 				break;
     		}
@@ -6340,7 +6339,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
     			fbFLol.setTransferOverQuotaBannerVisibility();
 			}
 		}
-		else if (item == CAMERA_UPLOADS_BNV) {
+		else if (item == PHOTOS_BNV) {
 			drawerItem = DrawerItem.PHOTOS;
 		}
 		else if (item == CHAT_BNV) {
@@ -6422,7 +6421,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 				// if pre fragment is the same one, do nothing.
 				if(oldDrawerItem != DrawerItem.PHOTOS) {
 					drawerItem = DrawerItem.PHOTOS;
-					setBottomNavigationMenuItemChecked(CAMERA_UPLOADS_BNV);
+					setBottomNavigationMenuItemChecked(PHOTOS_BNV);
 				}
 				break;
 			}
@@ -7475,7 +7474,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 	public void cameraUploadsClicked(){
 		logDebug("cameraUplaodsClicked");
 		drawerItem = DrawerItem.PHOTOS;
-		setBottomNavigationMenuItemChecked(CAMERA_UPLOADS_BNV);
+		setBottomNavigationMenuItemChecked(PHOTOS_BNV);
 		selectDrawerItemLollipop(drawerItem);
 	}
 
@@ -7487,7 +7486,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 
 	public void refreshCameraUpload(){
 		drawerItem = DrawerItem.PHOTOS;
-		setBottomNavigationMenuItemChecked(CAMERA_UPLOADS_BNV);
+		setBottomNavigationMenuItemChecked(PHOTOS_BNV);
 		setToolbarTitle();
 		refreshFragment(FragmentTag.PHOTOS.getTag());
 	}
@@ -7531,9 +7530,6 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 	 */
 	public void updateEnableCUButton(int visibility) {
 		if (enableCUButton.getVisibility() == visibility) {
-			if (enableCUButton.getVisibility() == View.VISIBLE){
-				updateCULayout(visibility);
-			}
 			return;
 		}
 
@@ -11046,6 +11042,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 	}
 
 	/**
+	 * A workaround for those fragments that have independent toolbar but still have to use the Elevations
 	 * This method is used to change the elevation of the AppBarLayout when
 	 * scrolling the RecyclerView
 	 * @param withElevation true if need elevation, false otherwise
@@ -11055,6 +11052,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 	}
 
 	/**
+	 * A workaround for those fragments that have independent toolbar but still have to use the Elevations
 	 * This method is used to change the elevation of the AppBarLayout for some reason
 	 *
 	 * @param withElevation true if need elevation, false otherwise

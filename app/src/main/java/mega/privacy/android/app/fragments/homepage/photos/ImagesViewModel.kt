@@ -9,7 +9,9 @@ import mega.privacy.android.app.fragments.managerFragments.cu.CUCard
 import mega.privacy.android.app.fragments.managerFragments.cu.PhotosFragment
 import mega.privacy.android.app.utils.Constants.EVENT_NODES_CHANGE
 import mega.privacy.android.app.utils.Constants.INVALID_POSITION
-import mega.privacy.android.app.utils.TextUtil
+import mega.privacy.android.app.utils.ZoomUtil.DAYS_INDEX
+import mega.privacy.android.app.utils.ZoomUtil.MONTHS_INDEX
+import mega.privacy.android.app.utils.ZoomUtil.YEARS_INDEX
 import nz.mega.sdk.MegaApiJava.*
 
 class ImagesViewModel @ViewModelInject constructor(
@@ -92,8 +94,8 @@ class ImagesViewModel @ViewModelInject constructor(
     fun yearClicked(position: Int, card: CUCard) = CardClickHandler.yearClicked(
         position,
         card,
-        dateCards.value?.get(1),
-        dateCards.value?.get(2)
+        dateCards.value?.get(MONTHS_INDEX),
+        dateCards.value?.get(YEARS_INDEX)
     )
 
     /**
@@ -107,8 +109,8 @@ class ImagesViewModel @ViewModelInject constructor(
     fun monthClicked(position: Int, card: CUCard) = CardClickHandler.monthClicked(
         position,
         card,
-        dateCards.value?.get(0),
-        dateCards.value?.get(1)
+        dateCards.value?.get(DAYS_INDEX),
+        dateCards.value?.get(MONTHS_INDEX)
     )
 
     private val nodesChangeObserver = Observer<Boolean> {
@@ -190,7 +192,6 @@ class ImagesViewModel @ViewModelInject constructor(
         items.removeObserver(loadFinishedObserver)
     }
 
-    /**********zoom*************/
     fun setZoom(currentZoom:Int) = zoomManager.setZoom(currentZoom)
     fun getZoom() = zoomManager.zoom
 }

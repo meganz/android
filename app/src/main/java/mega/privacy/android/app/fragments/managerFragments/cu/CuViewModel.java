@@ -1,5 +1,22 @@
 package mega.privacy.android.app.fragments.managerFragments.cu;
 
+import static java.time.format.DateTimeFormatter.ofPattern;
+import static java.util.concurrent.TimeUnit.MILLISECONDS;
+import static mega.privacy.android.app.constants.SettingsConstants.DEFAULT_CONVENTION_QUEUE_SIZE;
+import static mega.privacy.android.app.constants.SettingsConstants.VIDEO_QUALITY_ORIGINAL;
+import static mega.privacy.android.app.utils.Constants.GET_THUMBNAIL_THROTTLE_MS;
+import static mega.privacy.android.app.utils.Constants.INVALID_POSITION;
+import static mega.privacy.android.app.utils.FileUtil.JPG_EXTENSION;
+import static mega.privacy.android.app.utils.FileUtil.buildDefaultDownloadDir;
+import static mega.privacy.android.app.utils.FileUtil.isVideoFile;
+import static mega.privacy.android.app.utils.LogUtil.logDebug;
+import static mega.privacy.android.app.utils.PreviewUtils.getPreviewFolder;
+import static mega.privacy.android.app.utils.RxUtil.IGNORE;
+import static mega.privacy.android.app.utils.RxUtil.logErr;
+import static mega.privacy.android.app.utils.ThumbnailUtilsLollipop.getThumbFolder;
+import static mega.privacy.android.app.utils.Util.fromEpoch;
+import static nz.mega.sdk.MegaApiJava.ORDER_MODIFICATION_DESC;
+
 import android.content.Context;
 import android.os.Environment;
 import android.util.Pair;
@@ -45,23 +62,6 @@ import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
-
-import static java.time.format.DateTimeFormatter.ofPattern;
-import static java.util.concurrent.TimeUnit.MILLISECONDS;
-import static mega.privacy.android.app.constants.SettingsConstants.DEFAULT_CONVENTION_QUEUE_SIZE;
-import static mega.privacy.android.app.constants.SettingsConstants.VIDEO_QUALITY_ORIGINAL;
-import static mega.privacy.android.app.utils.Constants.GET_THUMBNAIL_THROTTLE_MS;
-import static mega.privacy.android.app.utils.Constants.INVALID_POSITION;
-import static mega.privacy.android.app.utils.FileUtil.JPG_EXTENSION;
-import static mega.privacy.android.app.utils.FileUtil.buildDefaultDownloadDir;
-import static mega.privacy.android.app.utils.FileUtil.isVideoFile;
-import static mega.privacy.android.app.utils.LogUtil.logDebug;
-import static mega.privacy.android.app.utils.PreviewUtils.getPreviewFolder;
-import static mega.privacy.android.app.utils.RxUtil.IGNORE;
-import static mega.privacy.android.app.utils.RxUtil.logErr;
-import static mega.privacy.android.app.utils.ThumbnailUtilsLollipop.getThumbFolder;
-import static mega.privacy.android.app.utils.Util.fromEpoch;
-import static nz.mega.sdk.MegaApiJava.ORDER_MODIFICATION_DESC;
 
 class CuViewModel extends BaseRxViewModel {
     private final MegaApiAndroid mMegaApi;

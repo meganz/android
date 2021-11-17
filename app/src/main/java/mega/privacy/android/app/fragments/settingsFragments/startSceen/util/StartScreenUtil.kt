@@ -14,7 +14,7 @@ import mega.privacy.android.app.utils.SharedPreferenceConstants.USER_INTERFACE_P
 object StartScreenUtil {
 
     const val CLOUD_DRIVE_BNV = 0
-    const val CAMERA_UPLOADS_BNV = 1
+    const val PHOTOS_BNV = 1
     const val HOME_BNV = 2
     const val CHAT_BNV = 3
     const val SHARED_ITEMS_BNV = 4
@@ -33,7 +33,7 @@ object StartScreenUtil {
         when (context.getSharedPreferences(USER_INTERFACE_PREFERENCES, Context.MODE_PRIVATE)
             .getInt(PREFERRED_START_SCREEN, HOME_BNV)) {
             CLOUD_DRIVE_BNV -> DrawerItem.CLOUD_DRIVE
-            CAMERA_UPLOADS_BNV -> DrawerItem.PHOTOS
+            PHOTOS_BNV -> DrawerItem.PHOTOS
             CHAT_BNV -> DrawerItem.CHAT
             SHARED_ITEMS_BNV -> DrawerItem.SHARED_ITEMS
             else -> DrawerItem.HOMEPAGE
@@ -61,7 +61,7 @@ object StartScreenUtil {
     @JvmStatic
     fun shouldCloseApp(startItem: Int, drawerItem: DrawerItem): Boolean =
         (drawerItem == DrawerItem.CLOUD_DRIVE && startItem == CLOUD_DRIVE_BNV)
-                || (drawerItem == DrawerItem.PHOTOS && startItem == CAMERA_UPLOADS_BNV)
+                || (drawerItem == DrawerItem.PHOTOS && startItem == PHOTOS_BNV)
                 || (drawerItem == DrawerItem.CHAT && startItem == CHAT_BNV)
                 || (drawerItem == DrawerItem.SHARED_ITEMS && startItem == SHARED_ITEMS_BNV)
                 || (drawerItem == DrawerItem.HOMEPAGE && startItem == HOME_BNV)

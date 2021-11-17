@@ -1,20 +1,15 @@
 package mega.privacy.android.app.fragments.homepage.photos
 
-import android.content.res.Configuration
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.core.content.ContextCompat
 import androidx.databinding.ViewDataBinding
 import androidx.lifecycle.ViewModel
 import androidx.navigation.fragment.findNavController
 import com.google.android.material.appbar.MaterialToolbar
 import mega.privacy.android.app.R
 import mega.privacy.android.app.fragments.BaseFragment
-import mega.privacy.android.app.lollipop.ManagerActivityLollipop
-import mega.privacy.android.app.utils.ColorUtils.changeStatusBarColorForElevation
-import mega.privacy.android.app.utils.ColorUtils.getColorForElevation
 import mega.privacy.android.app.utils.StringResourcesUtils
 import mega.privacy.android.app.utils.Util
 import java.util.*
