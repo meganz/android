@@ -241,7 +241,7 @@ public class ParticipantBottomSheetDialogFragment extends BaseBottomSheetDialogF
                 break;
 
             case R.id.contact_list_option_call_layout:
-                if (canCallBeStartedFromContactOption((GroupChatInfoActivityLollipop) requireActivity())) {
+                if (canCallBeStartedFromContactOption((GroupChatInfoActivityLollipop) requireActivity(), passcodeManagement)) {
                     startNewCall((GroupChatInfoActivityLollipop) requireActivity(),
                             (SnackbarShower) requireActivity(),
                             megaApi.getContact(chatC.getParticipantEmail(participantHandle)), passcodeManagement);

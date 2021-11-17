@@ -545,7 +545,7 @@ public class OpenLinkActivity extends PasscodeActivity implements MegaRequestLis
 		if (type == LINK_IS_FOR_MEETING) {
 			logDebug("It's a meeting link");
 			if (CallUtil.participatingInACall()) {
-				showConfirmationInACall(this);
+				showConfirmationInACall(this, passcodeManagement);
 			} else {
 				if (CallUtil.isMeetingEnded(request.getMegaHandleList())) {
 					logDebug("Meeting has ended, open dialog");

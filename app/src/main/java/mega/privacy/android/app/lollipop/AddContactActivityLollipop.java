@@ -3022,7 +3022,7 @@ public class AddContactActivityLollipop extends PasscodeActivity implements View
 
     private void toStartMeeting() {
         if (CallUtil.participatingInACall()) {
-            showConfirmationInACall(this);
+            showConfirmationInACall(this, passcodeManagement);
         } else {
             Intent intent = new Intent();
             intent.putExtra(EXTRA_MEETING, true);

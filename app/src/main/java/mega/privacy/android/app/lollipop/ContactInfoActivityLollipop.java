@@ -1101,7 +1101,7 @@ public class ContactInfoActivityLollipop extends PasscodeActivity
 
 	private void startingACall(boolean withVideo) {
 		startVideo = withVideo;
-		if (canCallBeStartedFromContactOption(this)) {
+		if (canCallBeStartedFromContactOption(this, passcodeManagement)) {
 			startCall();
 		}
 	}

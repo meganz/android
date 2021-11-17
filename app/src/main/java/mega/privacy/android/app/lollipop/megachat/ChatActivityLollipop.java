@@ -2711,7 +2711,7 @@ public class ChatActivityLollipop extends PasscodeActivity
                 if(recordView.isRecordingNow()) break;
 
                 if(participatingInACall()){
-                    showConfirmationInACall(this);
+                    showConfirmationInACall(this, passcodeManagement);
                     break;
                 }
 
@@ -2726,7 +2726,7 @@ public class ChatActivityLollipop extends PasscodeActivity
                 if(recordView.isRecordingNow()) break;
 
                 if(CallUtil.participatingInACall()){
-                    showConfirmationInACall(this);
+                    showConfirmationInACall(this, passcodeManagement);
                     break;
                 }
 

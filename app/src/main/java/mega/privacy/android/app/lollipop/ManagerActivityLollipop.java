@@ -7334,7 +7334,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 	@Override
 	public void onJoinMeeting() {
 		if(CallUtil.participatingInACall()){
-			showConfirmationInACall(this);
+			showConfirmationInACall(this, passcodeManagement);
 		} else {
 			showOpenLinkDialog();
 		}
@@ -7343,7 +7343,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 	@Override
 	public void onCreateMeeting() {
 		if(CallUtil.participatingInACall()){
-			showConfirmationInACall(this);
+			showConfirmationInACall(this, passcodeManagement);
 		} else {
 			openMeetingToCreate(this);
 		}
@@ -7716,7 +7716,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 
 	public void showMeetingOptionsPanel(){
 		if (CallUtil.participatingInACall()) {
-			showConfirmationInACall(this);
+			showConfirmationInACall(this, passcodeManagement);
 		} else {
 			bottomSheetDialogFragment = new MeetingBottomSheetDialogFragment();
 			bottomSheetDialogFragment.show(getSupportFragmentManager(), MeetingBottomSheetDialogFragment.TAG);

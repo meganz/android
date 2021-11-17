@@ -161,7 +161,7 @@ class ContactBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
         }
 
         binding.optionCall.setOnClickListener {
-            if (CallUtil.canCallBeStartedFromContactOption(requireActivity())) {
+            if (CallUtil.canCallBeStartedFromContactOption(requireActivity(), passcodeManagement)) {
                 CallUtil.startNewCall(
                     activity,
                     activity as SnackbarShower,
