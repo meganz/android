@@ -57,6 +57,7 @@ import static mega.privacy.android.app.utils.MegaNodeUtil.*;
 import static mega.privacy.android.app.utils.TimeUtils.*;
 import static mega.privacy.android.app.utils.Util.*;
 import static mega.privacy.android.app.utils.ContactUtil.*;
+import static nz.mega.sdk.MegaApiJava.INVALID_HANDLE;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -148,7 +149,7 @@ public class MegaExplorerLollipopAdapter extends RecyclerView.Adapter<MegaExplor
             binding.setSortByHeaderViewModel(sortByHeaderViewModel);
             binding.setOrderNameStringId(sortByHeaderViewModel.getOrderMap()
                     .get(fragment instanceof IncomingSharesExplorerFragmentLollipop
-                            && parentHandle == -1
+                            && parentHandle == INVALID_HANDLE
                             ? sortByHeaderViewModel.getOrder().getSecond()
                             : sortByHeaderViewModel.getOrder().getFirst()));
         }
