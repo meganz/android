@@ -68,10 +68,12 @@ import mega.privacy.android.app.globalmanagement.SortOrderManagement;
 import mega.privacy.android.app.lollipop.FullScreenImageViewerLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.PdfViewerActivityLollipop;
+import mega.privacy.android.app.lollipop.ZipBrowserActivityLollipop;
 import mega.privacy.android.app.lollipop.adapters.MegaNodeAdapter;
 import mega.privacy.android.app.lollipop.controllers.NodeController;
 import mega.privacy.android.app.utils.CloudStorageOptionControlUtil;
 import mega.privacy.android.app.utils.ColorUtils;
+import mega.privacy.android.app.utils.FileUtil;
 import mega.privacy.android.app.utils.MegaNodeUtil;
 import mega.privacy.android.app.utils.StringResourcesUtils;
 import nz.mega.sdk.MegaApiAndroid;
@@ -837,13 +839,33 @@ public class FileBrowserFragmentLollipop extends RotatableFragment{
 			((ManagerActivityLollipop) context).overridePendingTransition(0, 0);
 		} else if (MimeTypeList.typeForName(node.getName()).isOpenableTextFile(node.getSize())) {
 			manageTextFileIntent(context, node, FILE_BROWSER_ADAPTER);
-		} else {
-			logDebug("itemClick:isFile:otherOption");
-			((ManagerActivityLollipop) context).saveNodesToDevice(
-					Collections.singletonList(node),
-					true, false, false, false);
-		}
-	}
+        } else {
+            logDebug("itemClick:isFile:otherOption");
+            String possibleLocalFile = FileUtil.getLocalFile(node);
+
+            if (possibleLocalFile != null) {
+                logDebug("The node is already downloaded, found in local.");
+
+                if (MimeTypeList.typeForName(node.getName()).isZip()) {
+                    logDebug("The file is zip, open in-app.");
+
+                    Intent intentZip = new Intent(context, ZipBrowserActivityLollipop.class);
+                    intentZip.setAction(ZipBrowserActivityLollipop.ACTION_OPEN_ZIP_FILE);
+                    intentZip.putExtra(ZipBrowserActivityLollipop.EXTRA_PATH_ZIP, possibleLocalFile);
+                    intentZip.putExtra(ZipBrowserActivityLollipop.EXTRA_HANDLE_ZIP, node.getHandle());
+
+                    startActivity(intentZip);
+                } else {
+                    logDebug("The file cannot be opened in-app.");
+                    MegaNodeUtil.launchActionView(context, node.getName(), possibleLocalFile, (ManagerActivityLollipop) context, (ManagerActivityLollipop) context);
+                }
+            } else {
+                ((ManagerActivityLollipop) context).saveNodesToDevice(
+                        Collections.singletonList(node),
+                        true, false, false, false);
+            }
+        }
+    }
 
     public void itemClick(int position) {
 		logDebug("item click position: " + position);

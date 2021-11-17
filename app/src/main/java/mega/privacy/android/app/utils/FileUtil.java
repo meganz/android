@@ -330,16 +330,15 @@ public class FileUtil {
             return null;
         }
 
-        String path;
         Context context = MegaApplication.getInstance();
+        MegaApiJava megaApiJava = MegaApplication.getInstance().getMegaApi();
+
         String data = MediaStore.Files.FileColumns.DATA;
         final String[] projection = {data};
-        final String selection = MediaStore.Files.FileColumns.DISPLAY_NAME + " = ? AND "
-                + MediaStore.Files.FileColumns.SIZE + " = ? AND "
+        final String selection = MediaStore.Files.FileColumns.SIZE + " = ? AND "
                 + MediaStore.Files.FileColumns.DATE_MODIFIED + " = ?";
 
         final String[] selectionArgs = {
-                node.getName(),
                 String.valueOf(node.getSize()),
                 String.valueOf(node.getModificationTime())};
 
@@ -348,13 +347,22 @@ public class FileUtil {
                     MediaStore.Files.getContentUri(VOLUME_EXTERNAL), projection, selection,
                     selectionArgs, null);
 
-            path = checkFileInStorage(cursor, data);
+            List<String> candidates = checkFileInStorage(cursor, data, node.getName());
 
-            if (path == null) {
+            if (candidates.isEmpty()) {
                 cursor = context.getContentResolver().query(
                         MediaStore.Files.getContentUri(VOLUME_INTERNAL), projection, selection,
                         selectionArgs, null);
-                path = checkFileInStorage(cursor, data);
+                candidates.addAll(checkFileInStorage(cursor, data, node.getName()));
+            }
+
+            for(String path : candidates) {
+                File file = new File(path);
+
+                // Double check fingerprint.
+                if(isFileAvailable(file) && node.getFingerprint().equals(megaApiJava.getFingerprint(path))) {
+                    return path;
+                }
             }
         } catch (SecurityException e) {
             // Workaround: devices with system below Android 10 cannot execute the query without storage permission.
@@ -362,32 +370,34 @@ public class FileUtil {
             return null;
         }
 
-        return path;
+        return null;
     }
 
     /**
      * Searches in the correspondent storage established if the file exists
      *
      * @param cursor Cursor which contains all the requirements to find the file
-     * @param data   Column name in which search
-     * @return The path of the file if exists
+     * @param columnName   Column name in which search
+     * @param fileName Name of the searching node.
+     * @return A list of file path that may be the path of the searching file.
      */
-    private static String checkFileInStorage(Cursor cursor, String data) {
-        if (cursor != null && cursor.moveToFirst()) {
-            int dataColumn = cursor.getColumnIndexOrThrow(data);
+    private static List<String> checkFileInStorage(Cursor cursor, String columnName, String fileName) {
+        List<String> candidates = new ArrayList<>();
+
+        while (cursor != null && cursor.moveToNext()) {
+            int dataColumn = cursor.getColumnIndexOrThrow(columnName);
             String path = cursor.getString(dataColumn);
-            cursor.close();
-            cursor = null;
-            if (new File(path).exists()) {
-                return path;
+
+            if (path.endsWith(fileName)) {
+                candidates.add(path);
             }
         }
 
-        if (cursor != null) {
+        if(cursor != null) {
             cursor.close();
         }
 
-        return null;
+        return candidates;
     }
 
     /*

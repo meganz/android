@@ -1478,32 +1478,71 @@ object MegaNodeUtil {
                     if (isIntentAvailable(context, mediaIntent)) {
                         activityLauncher.launchActivity(mediaIntent)
                     } else {
-                        sendFile(context, autoPlayInfo, activityLauncher, snackbarShower)
+                        sendFile(
+                            context,
+                            autoPlayInfo.nodeName,
+                            autoPlayInfo.localPath,
+                            activityLauncher,
+                            snackbarShower
+                        )
                     }
                 }
             }
             else -> {
-                try {
-                    val viewIntent = Intent(Intent.ACTION_VIEW)
-
-                    if (!setLocalIntentParams(
-                            context, autoPlayInfo.nodeName, viewIntent,
-                            autoPlayInfo.localPath, false, snackbarShower
-                        )
-                    ) {
-                        return
-                    }
-
-                    viewIntent.flags = Intent.FLAG_GRANT_READ_URI_PERMISSION
-                    if (isIntentAvailable(context, viewIntent)) {
-                        activityLauncher.launchActivity(viewIntent)
-                    } else {
-                        sendFile(context, autoPlayInfo, activityLauncher, snackbarShower)
-                    }
-                } catch (e: Exception) {
-                    snackbarShower.showSnackbar(getString(R.string.general_already_downloaded))
-                }
+                launchActionView(
+                    context,
+                    autoPlayInfo.nodeName,
+                    autoPlayInfo.localPath,
+                    activityLauncher,
+                    snackbarShower
+                )
             }
+        }
+    }
+
+    /**
+     * For the node that cannot be opened in-app.
+     * Launch an intent with ACTION_VIEW and let user choose to use which app to open it.
+     *
+     * @param context Android context
+     * @param nodeName Name of the node.
+     * @param localPath Local path of the node.
+     * @param activityLauncher interface to launch activity
+     * @param snackbarShower interface to show snackbar
+     */
+    @JvmStatic
+    fun launchActionView(
+        context: Context,
+        nodeName: String,
+        localPath: String,
+        activityLauncher: ActivityLauncher,
+        snackbarShower: SnackbarShower
+    ) {
+        try {
+            val viewIntent = Intent(Intent.ACTION_VIEW)
+
+            if (!setLocalIntentParams(
+                    context, nodeName, viewIntent,
+                    localPath, false, snackbarShower
+                )
+            ) {
+                return
+            }
+
+            viewIntent.flags = Intent.FLAG_GRANT_READ_URI_PERMISSION
+            if (isIntentAvailable(context, viewIntent)) {
+                activityLauncher.launchActivity(viewIntent)
+            } else {
+                sendFile(
+                    context,
+                    nodeName,
+                    localPath,
+                    activityLauncher,
+                    snackbarShower
+                )
+            }
+        } catch (e: Exception) {
+            snackbarShower.showSnackbar(getString(R.string.general_already_downloaded))
         }
     }
 
@@ -1511,21 +1550,23 @@ object MegaNodeUtil {
      * Create an Intent with ACTION_SEND for an auto play file.
      *
      * @param context Android context
-     * @param autoPlayInfo auto play file info
+     * @param nodeName Name of the node.
+     * @param localPath Local path of the node.
      * @param activityLauncher interface to launch activity
      * @param snackbarShower interface to show snackbar
      */
     private fun sendFile(
         context: Context,
-        autoPlayInfo: AutoPlayInfo,
+        nodeName: String,
+        localPath: String,
         activityLauncher: ActivityLauncher,
         snackbarShower: SnackbarShower
     ) {
         val intentShare = Intent(Intent.ACTION_SEND)
 
         if (!setLocalIntentParams(
-                context, autoPlayInfo.nodeName, intentShare,
-                autoPlayInfo.localPath, false, snackbarShower
+                context, nodeName, intentShare,
+                localPath, false, snackbarShower
             )
         ) {
             return
