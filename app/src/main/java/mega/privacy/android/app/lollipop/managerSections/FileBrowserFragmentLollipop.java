@@ -848,13 +848,7 @@ public class FileBrowserFragmentLollipop extends RotatableFragment{
 
                 if (MimeTypeList.typeForName(node.getName()).isZip()) {
                     logDebug("The file is zip, open in-app.");
-
-                    Intent intentZip = new Intent(context, ZipBrowserActivityLollipop.class);
-                    intentZip.setAction(ZipBrowserActivityLollipop.ACTION_OPEN_ZIP_FILE);
-                    intentZip.putExtra(ZipBrowserActivityLollipop.EXTRA_PATH_ZIP, possibleLocalFile);
-                    intentZip.putExtra(ZipBrowserActivityLollipop.EXTRA_HANDLE_ZIP, node.getHandle());
-
-                    startActivity(intentZip);
+                    MegaNodeUtil.openZip(context, (ManagerActivityLollipop) context, possibleLocalFile, node.getHandle());
                 } else {
                     logDebug("The file cannot be opened in-app.");
                     MegaNodeUtil.launchActionView(context, node.getName(), possibleLocalFile, (ManagerActivityLollipop) context, (ManagerActivityLollipop) context);

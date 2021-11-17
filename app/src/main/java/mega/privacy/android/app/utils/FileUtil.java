@@ -656,7 +656,8 @@ public class FileUtil {
         Intent shareIntent = new Intent(android.content.Intent.ACTION_SEND);
         shareIntent.setType(MimeTypeList.typeForName(file.getName()).getType() + "/*");
         shareIntent.putExtra(Intent.EXTRA_STREAM, getUriForFile(context, file));
-        shareIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+        // To avoid java.lang.SecurityException: Permission Denial
+        shareIntent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION | Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
         context.startActivity(Intent.createChooser(shareIntent, getString(R.string.context_share)));
     }
 
@@ -671,7 +672,8 @@ public class FileUtil {
         Intent shareIntent = new Intent(android.content.Intent.ACTION_SEND);
         shareIntent.setType(MimeTypeList.typeForName(name).getType() + "/*");
         shareIntent.putExtra(Intent.EXTRA_STREAM, uri);
-        shareIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+        // To avoid java.lang.SecurityException: Permission Denial
+        shareIntent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION | Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
         context.startActivity(Intent.createChooser(shareIntent, context.getString(R.string.context_share)));
     }
 

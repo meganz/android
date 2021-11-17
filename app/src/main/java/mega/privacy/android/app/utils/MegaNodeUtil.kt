@@ -1407,17 +1407,7 @@ object MegaNodeUtil {
         val mime = MimeTypeList.typeForName(autoPlayInfo.nodeName)
         when {
             mime.isZip -> {
-                val zipFile = File(autoPlayInfo.localPath)
-
-                val intentZip = Intent(context, ZipBrowserActivityLollipop::class.java)
-                intentZip.putExtra(
-                    ZipBrowserActivityLollipop.EXTRA_PATH_ZIP, zipFile.absolutePath
-                )
-                intentZip.putExtra(
-                    ZipBrowserActivityLollipop.EXTRA_HANDLE_ZIP, autoPlayInfo.nodeHandle
-                )
-
-                activityLauncher.launchActivity(intentZip)
+                openZip(context, activityLauncher, autoPlayInfo.localPath, autoPlayInfo.nodeHandle)
             }
             mime.isPdf -> {
                 val pdfIntent = Intent(context, PdfViewerActivityLollipop::class.java)
@@ -1498,6 +1488,32 @@ object MegaNodeUtil {
                 )
             }
         }
+    }
+
+    /**
+     * Launch ZipBrowserActivityLollipop to preview a zip file.
+     *
+     * @param context Android context.
+     * @param activityLauncher interface to launch activity.
+     * @param zipFilePath The local path of the zip file.
+     * @param nodeHandle The handle of the corresponding node.
+     */
+    @JvmStatic
+    fun openZip(
+        context: Context,
+        activityLauncher: ActivityLauncher,
+        zipFilePath: String,
+        nodeHandle: Long
+    ) {
+        val intentZip = Intent(context, ZipBrowserActivityLollipop::class.java)
+        intentZip.putExtra(
+            ZipBrowserActivityLollipop.EXTRA_PATH_ZIP, zipFilePath
+        )
+        intentZip.putExtra(
+            ZipBrowserActivityLollipop.EXTRA_HANDLE_ZIP, nodeHandle
+        )
+
+        activityLauncher.launchActivity(intentZip)
     }
 
     /**

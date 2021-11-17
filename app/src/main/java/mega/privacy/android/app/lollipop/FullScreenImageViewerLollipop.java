@@ -261,7 +261,7 @@ public class FullScreenImageViewerLollipop extends PasscodeActivity
 			fromIncoming = nC.nodeComesFromIncoming(megaApi.getNodeByHandle(imageHandles.get(positionG)));
 		}
 
-		if(adapterType != OFFLINE_ADAPTER) {
+		if(adapterType != OFFLINE_ADAPTER && adapterType != ZIP_ADAPTER) {
             shareIcon.setVisible(showShareOption(adapterType, isFolderLink, imageHandles.get(positionG)));
         }
 
@@ -287,7 +287,7 @@ public class FullScreenImageViewerLollipop extends PasscodeActivity
 			removeIcon.setVisible(false);
 			chatIcon.setVisible(false);
 		} else if (adapterType == RUBBISH_BIN_ADAPTER
-				|| megaApi.isInRubbish(megaApi.getNodeByHandle(imageHandles.get(positionG)))){
+				|| (!imageHandles.isEmpty() && megaApi.isInRubbish(megaApi.getNodeByHandle(imageHandles.get(positionG))))){
 			renameIcon.setVisible(false);
 			moveIcon.setVisible(false);
 			copyIcon .setVisible(false);
@@ -654,7 +654,7 @@ public class FullScreenImageViewerLollipop extends PasscodeActivity
 				if (adapterType == OFFLINE_ADAPTER) {
 					shareFile(this, getOfflineFile(this, mOffListImages.get(positionG)));
 				} else if (adapterType == ZIP_ADAPTER) {
-					shareFile(this, zipFiles.get(positionG));
+					shareFile(this, new File(paths.get(positionG)));
 				} else if (adapterType == FILE_LINK_ADAPTER) {
 					shareLink(this, url);
 				} else {
@@ -928,15 +928,6 @@ public class FullScreenImageViewerLollipop extends PasscodeActivity
 			for (int i=0; i<fList.length; i++) {
 				zipFiles.add(fList[i]);
 			}
-			Collections.sort(zipFiles, (z1, z2) -> {
-				String name1 = z1.getName();
-				String name2 = z2.getName();
-				int res = String.CASE_INSENSITIVE_ORDER.compare(name1, name2);
-				if (res == 0) {
-					res = name1.compareTo(name2);
-				}
-				return res;
-			});
 
 			logDebug("SIZE: " + zipFiles.size());
 			for (File f : zipFiles){
@@ -1029,7 +1020,7 @@ public class FullScreenImageViewerLollipop extends PasscodeActivity
 			getImageHandles(nodes, savedInstanceState);
 		}
 
-		if (adapterType == OFFLINE_ADAPTER) {
+		if (adapterType == OFFLINE_ADAPTER || adapterType == ZIP_ADAPTER) {
 			viewPager.setAdapter(adapterOffline);
 		}
 		else {
