@@ -40,17 +40,17 @@
                     android:id="@+id/node_name_text"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:ellipsize="middle"
                     android:singleLine="true"
+                    android:ellipsize="middle"
                     style="@style/textAppearanceSubtitle1" />
 
                 <RelativeLayout
                     android:id="@+id/node_relative_layout_icon"
                     android:layout_width="14dp"
                     android:layout_height="14dp"
-                    android:layout_centerVertical="true"
-                    android:layout_marginStart="6dp"
                     android:layout_marginTop="3dp"
+                    android:layout_marginStart="6dp"
+                    android:layout_centerVertical="true"
                     android:layout_toEndOf="@id/node_name_text">
 
                     <ImageView
@@ -73,10 +73,10 @@
                     android:id="@+id/node_info_versions_icon"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_centerVertical="true"
-                    android:layout_marginEnd="8dp"
-                    android:background="@null"
                     android:src="@drawable/ic_versions_small"
+                    android:background="@null"
+                    android:layout_marginEnd="8dp"
+                    android:layout_centerVertical="true"
                     android:visibility="visible"
                     app:tint="?android:attr/textColorSecondary" />
 
@@ -84,9 +84,9 @@
                     android:id="@+id/node_info_text"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:singleLine="true"
                     android:layout_toEndOf="@id/node_info_versions_icon"
                     android:ellipsize="middle"
-                    android:singleLine="true"
                     android:textAppearance="@style/TextAppearance.Mega.Body2.Secondary.Variant" />
             </RelativeLayout>
 
