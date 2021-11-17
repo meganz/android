@@ -10,7 +10,7 @@ import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.di.MegaApi
 import mega.privacy.android.app.listeners.BaseListener
 import mega.privacy.android.app.lollipop.megachat.AppRTCAudioManager
-import mega.privacy.android.app.meeting.listeners.MeetingVideoListener
+import mega.privacy.android.app.meeting.listeners.IndividualCallVideoListener
 import mega.privacy.android.app.utils.AvatarUtil
 import mega.privacy.android.app.utils.CacheFolderManager
 import mega.privacy.android.app.utils.Constants
@@ -129,9 +129,9 @@ class MeetingActivityRepository @Inject constructor(
      * Method of obtaining the local video
      *
      * @param chatId Chat ID
-     * @param listener MeetingVideoListener
+     * @param listener IndividualCallVideoListener
      */
-    fun addLocalVideo(chatId: Long, listener: MeetingVideoListener) {
+    fun addLocalVideo(chatId: Long, listener: IndividualCallVideoListener) {
         logDebug("Add Chat video listener")
         megaChatApi.addChatLocalVideoListener(chatId, listener)
     }
@@ -140,9 +140,9 @@ class MeetingActivityRepository @Inject constructor(
      * Method of remove the local video
      *
      * @param chatId Chat ID
-     * @param listener MeetingVideoListener
+     * @param listener IndividualCallVideoListener
      */
-    fun removeLocalVideo(chatId: Long, listener: MeetingVideoListener) {
+    fun removeLocalVideo(chatId: Long, listener: IndividualCallVideoListener) {
         logDebug("Removed Chat video listener")
         megaChatApi.removeChatVideoListener(chatId, MEGACHAT_INVALID_HANDLE, true, listener)
     }

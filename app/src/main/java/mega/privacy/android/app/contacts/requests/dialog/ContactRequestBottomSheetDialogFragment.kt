@@ -9,19 +9,17 @@ import androidx.core.view.isVisible
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.viewModels
 import com.facebook.imagepipeline.request.ImageRequest
-import com.google.android.material.bottomsheet.BottomSheetBehavior
-import com.google.android.material.bottomsheet.BottomSheetDialog
-import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.contacts.requests.ContactRequestsViewModel
 import mega.privacy.android.app.databinding.BottomSheetContactRequestBinding
+import mega.privacy.android.app.modalbottomsheet.BaseBottomSheetDialogFragment
 import mega.privacy.android.app.utils.ExtraUtils.extraNotNull
 
 /**
  * Bottom Sheet Dialog that represents the UI for a dialog containing contact request information.
  */
 @AndroidEntryPoint
-class ContactRequestBottomSheetDialogFragment : BottomSheetDialogFragment() {
+class ContactRequestBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
 
     companion object {
         private const val TAG = "ContactRequestBottomSheetDialogFragment"
@@ -46,17 +44,13 @@ class ContactRequestBottomSheetDialogFragment : BottomSheetDialogFragment() {
         savedInstanceState: Bundle?
     ): View {
         binding = BottomSheetContactRequestBinding.inflate(inflater, container, false)
+        contentView = binding.root
+        itemsLayout = binding.itemsLayout
         binding.header.btnMore.isVisible = false
         return binding.root
     }
 
-    override fun onCreateDialog(savedInstanceState: Bundle?): Dialog =
-        (super.onCreateDialog(savedInstanceState) as BottomSheetDialog).apply {
-            behavior.state = BottomSheetBehavior.STATE_EXPANDED
-        }
-
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
         viewModel.getContactRequest(requestHandle).observe(viewLifecycleOwner) { item ->
             requireNotNull(item) { "Contact request not found" }
 
@@ -89,6 +83,8 @@ class ContactRequestBottomSheetDialogFragment : BottomSheetDialogFragment() {
                 dismiss()
             }
         }
+
+        super.onViewCreated(view, savedInstanceState)
     }
 
     /**

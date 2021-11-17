@@ -8,8 +8,6 @@
     <string name="prolite_account">Pro Lite</string>
     <!-- Name of the MEGA PDF Viewer. Keep uppercase. -->
     <string name="pdf_app_name">MEGA PDF檢視器</string>
-    <!-- Showing progress of elements. Example: 2 of 10. -->
-    <string name="general_x_of_x">之</string>
     <!-- Answer for confirmation dialog. -->
     <string name="general_yes">是</string>
     <!-- Answer for confirmation dialog. -->
@@ -570,8 +568,6 @@
     <string name="number_contact_not_removed">未能移除%d個聯絡人</string>
     <!-- success message when sharing a file with multiple contacts -->
     <string name="number_contact_file_shared_correctly">已成功與%d聯絡人共享資料夾</string>
-    <!-- error message when sharing a file with multiple contacts -->
-    <string name="number_contact_file_not_shared_">未能共享檔案給%d個聯絡人</string>
     <!-- success message when sharing multiple files -->
     <string name="number_correctly_shared">已成功共享%d個資料夾</string>
     <!-- error message when sharing multiple files -->
@@ -649,7 +645,7 @@
     <!-- error message while browsing the local filesystem -->
     <string name="error_io_problem">檔案系統問題</string>
     <!-- error message while browsing the local filesystem -->
-    <string name="general_error">瀏覽本機檔案時發生錯誤。</string>
+    <string name="general_error">執行操作時發生錯誤</string>
     <!-- title of the image gallery -->
     <string name="full_screen_image_viewer_label">圖片檢視器</string>
     <!-- Headline for the amount of storage space is used -->
@@ -1114,7 +1110,7 @@
     <!-- Message to promote PRO accounts -->
     <string name="get_pro_account">加大您的雲端空間。[A]訂閱Pro方案帳戶以獲得更大儲存空間和傳輸配額。</string>
     <!-- success message when the MasterKey file has been downloaded -->
-    <string name="toast_master_key">MEGA帳戶還原金鑰已儲存到：%1s。[A]您可以在離線存取中找到您還原金鑰的檔案。[A]注意：當您登出時，您還原金鑰的檔案將被刪除，因此請將它儲存在您MEGA帳戶以外的安全地方。</string>
+    <string name="toast_master_key">MEGA帳戶還原金鑰已儲存到：%1s。[A]您可以在儲存為離線存取區中找到您的還原金鑰檔案。[/A]注意：當您登出時，您的還原金鑰檔案將被刪除，因此請將它保存至您帳戶以外的安全地方。</string>
     <!-- Error shown when the user tries to change his mail to one that is already used -->
     <string name="mail_already_used">這個電子郵件地址已被使用。請改用其它電子郵件地址。</string>
     <!-- Error shown when the user tries to change his mail while the user has already requested a confirmation link for that email address -->
@@ -1467,7 +1463,7 @@
     <string name="title_message_uploading_options">上傳附件</string>
     <!-- message shown when a chat has no messages -->
     <string name="no_conversation_history">沒有對話記錄</string>
-    <!-- title of confirmation alert before removing a contact, Plural -->
+    <!-- Text to indicate that one participant is typing or multiple participants are typing at the same time in a chat room. The "%1$s" placeholder is to put the name(s) of the participant(s). The [A][/A] format marks are to put the text in a different color. -->
     <plurals name="user_typing">
         <item quantity="other">%1$s [A]正在打字&#8230;[/A]</item>
     </plurals>
@@ -1876,8 +1872,6 @@
     <string name="title_regitration">註冊獎勵</string>
     <!-- title of the section for install a mobile app bonuses in achivements section (maximum 24 chars) -->
     <string name="title_install_desktop">安裝MEGA桌面應用程式</string>
-    <!-- title of the section for base quota in achivements section -->
-    <string name="title_base_quota">帳戶基本配額</string>
     <!-- Text that indicates that no pictures have been uploaded to the Camera Uploads section -->
     <string name="camera_uploads_empty">相機上傳中沒有檔案</string>
     <!-- indicates the number of days left related to a achievement -->
@@ -2230,10 +2224,12 @@
     <string name="settings_video_upload_quality">影片品質</string>
     <!-- Text shown when the user refuses to permit the storage permission when enable camera upload -->
     <string name="on_refuse_storage_permission">相機上傳需存取您裝置裡的相片與其他媒體內容，請到設定頁面並且允許其權限。</string>
-    <!-- the options for the option on setting to set up the quality of multimedia files uploaded to the chat, the options of medium quality multimedia file to  upload. -->
+    <!-- Available options for the setting to set up the quality of multimedia files uploaded to the chat or the Camera Uploads -->
     <string-array name="settings_chat_upload_quality_entries">
-        <item>原始品質</item>
-        <item>中等品質</item>
+        <item>低</item>
+        <item>普通</item>
+        <item>高</item>
+        <item>原始的</item>
     </string-array>
     <!-- Title of the notification for a missed call -->
     <string name="missed_call_notification_title">未接來電</string>
@@ -2523,10 +2519,6 @@
     <string name="context_no_restored">發生錯誤。項目無法還原。</string>
     <!-- menu item from contact section to send a message to a contact -->
     <string name="context_send_message">發送訊息</string>
-    <!-- Message shown when a contact is successfully sent to several chats, more contacts -->
-    <plurals name="plural_contact_sent_to_chats">
-        <item quantity="other">聯絡人資料已成功發送到對話室中</item>
-    </plurals>
     <!-- Error message on opening a MEGAdrop folder link -->
     <string name="error_MEGAdrop_not_supported">尚不支援MEGAdrop資料夾</string>
     <!-- Pre overquota error dialog when trying to copy or import a file -->
@@ -3384,7 +3376,7 @@
     <!-- Text informing user that their account has been suspended -->
     <string name="account_temporarily_suspended">為了安全起見，您的帳戶已暫時被封鎖。</string>
     <!-- Text informing user has to follow the steps of an email to unlock their account -->
-    <string name="verify_email_and_follow_steps">[A]請驗證您的電子郵件[/A]，並按照MEGA信件裡的步驟解鎖您的帳戶。</string>
+    <string name="verify_email_and_follow_steps">請按照[A]驗證電子郵件[/A]中的步驟解鎖您的帳戶。</string>
     <!-- Question which takes the user to a help screen -->
     <string name="why_am_i_seeing_this">為什麼我會看到這個？</string>
     <!-- Label of a button which action is resend an email -->
@@ -3493,7 +3485,7 @@
     <string name="label_verify_credentials">驗證憑證</string>
     <!-- Label to indicate that contact’s credentials are not verified. -->
     <string name="label_not_verified">未驗證</string>
-    <!-- Action indicating something was verified. -->
+    <!-- Label indicating the authenticity credentials of a contact have been verified -->
     <string name="label_verified">已驗證</string>
     <!-- ”Verify user” dialog title -->
     <string name="authenticity_credentials_label">授權認證</string>
@@ -3642,7 +3634,7 @@
     <!-- Title indicating the select mode is enabled and ready to select transfers on Transfers section, In progress tab -->
     <string name="title_select_transfers">選擇傳輸</string>
     <!-- Error shown to inform the priority change of a transfer failed. Please don’t remove the place holder, it’s to set the name of the transfer. Example: The priority change of the transfer “video.mp4” failed. -->
-    <string name="change_of_transfer_priority_failed">傳輸 “%1$s” 的優先變更失敗。</string>
+    <string name="change_of_transfer_priority_failed">無法更改傳輸”%1$s”的優先順序</string>
     <!-- Title option to send separated the link and decryption key -->
     <string name="option_send_decryption_key_separately">各別發送解密金鑰</string>
     <!-- Explanation option to send separated the link and decryption key -->
@@ -3949,6 +3941,8 @@
     <plurals name="get_links">
         <item quantity="other">取得連結</item>
     </plurals>
+    <!-- Ask for confirmation before clear offline files -->
+    <string name="clear_offline_confirmation">清除所有離線存取檔案？</string>
     <!-- Banner text when the call is in progress and I'm the only participant. -->
     <string name="banner_alone_on_the_call">這裡只有你一人</string>
     <!-- Item menu option upon right click on meeting. -->
@@ -4083,4 +4077,6 @@
     <string name="meeting_me_text_bracket">%1s[A]（我）[/A]</string>
     <!-- Menu item to change from thumbnail view to main view in meeting-->
     <string name="main_view">主視圖檢視</string>
+    <!-- Warning in Offline section alerting all the Offline files will be deleted after logout. -->
+    <string name="offline_warning">登出會刪除您的離線內容。</string>
 </resources>

@@ -28,6 +28,7 @@ import mega.privacy.android.app.lollipop.controllers.ContactController
 import mega.privacy.android.app.lollipop.controllers.NodeController
 import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop
 import mega.privacy.android.app.modalbottomsheet.BaseBottomSheetDialogFragment
+import mega.privacy.android.app.objects.PasscodeManagement
 import mega.privacy.android.app.utils.CallUtil
 import mega.privacy.android.app.utils.Constants.ACTION_CHAT_SHOW_MESSAGES
 import mega.privacy.android.app.utils.Constants.CHAT_ID
@@ -38,6 +39,7 @@ import mega.privacy.android.app.utils.Constants.SELECTED_CONTACTS
 import mega.privacy.android.app.utils.ContactUtil
 import mega.privacy.android.app.utils.ExtraUtils.extraNotNull
 import nz.mega.sdk.MegaUser
+import javax.inject.Inject
 
 /**
  * Bottom Sheet Dialog that represents the UI for a dialog containing contact information.
@@ -67,6 +69,9 @@ class ContactBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
             }
     }
 
+    @Inject
+    lateinit var passcodeManagement: PasscodeManagement
+
     private val viewModel by viewModels<ContactListViewModel>({ requireParentFragment() })
     private val userHandle by extraNotNull<Long>(USER_HANDLE)
     private var removeContactDialog: AlertDialog? = null
@@ -83,8 +88,7 @@ class ContactBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
     ): View {
         binding = BottomSheetContactDetailBinding.inflate(inflater, container, false)
         contentView = binding.root
-        mainLinearLayout = binding.layoutRoot
-        items_layout = binding.layoutItems
+        itemsLayout = binding.layoutItems
 
         binding.header.btnMore.isVisible = false
         binding.header.divider.isVisible = false
@@ -92,9 +96,6 @@ class ContactBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-        view.post { setBottomSheetBehavior(HEIGHT_HEADER_LARGE, true) }
-
         viewModel.getContact(userHandle).observe(viewLifecycleOwner, ::showContactInfo)
         viewModel.getMegaUser(userHandle).observe(viewLifecycleOwner) { megaUser ->
             setupButtons(megaUser)
@@ -109,6 +110,8 @@ class ContactBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
                 showNodePermissionsDialog()
             }
         }
+
+        super.onViewCreated(view, savedInstanceState)
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
@@ -158,7 +161,7 @@ class ContactBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
         }
 
         binding.optionCall.setOnClickListener {
-            CallUtil.startNewCall(activity, activity as SnackbarShower, megaUser)
+            CallUtil.startNewCall(activity, activity as SnackbarShower, megaUser, passcodeManagement)
             dismiss()
         }
 
@@ -199,7 +202,7 @@ class ContactBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
     private fun showRemoveContactDialog(megaUser: MegaUser) {
         if (removeContactDialog?.isShowing == true) removeContactDialog?.dismiss()
 
-        removeContactDialog = MaterialAlertDialogBuilder(context)
+        removeContactDialog = MaterialAlertDialogBuilder(requireContext())
             .setTitle(resources.getQuantityString(R.plurals.title_confirmation_remove_contact, 1))
             .setMessage(resources.getQuantityString(R.plurals.confirmation_remove_contact, 1))
             .setNegativeButton(R.string.general_cancel, null)

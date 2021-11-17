@@ -9,11 +9,12 @@ import androidx.appcompat.app.AlertDialog
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import dagger.hilt.android.qualifiers.ActivityContext
 import mega.privacy.android.app.DatabaseHandler
-import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.settingsActivities.PasscodeLockActivity
+import mega.privacy.android.app.objects.PasscodeManagement
 import mega.privacy.android.app.utils.AlertDialogUtil.enableOrDisableDialogButton
 import mega.privacy.android.app.utils.Constants.INVALID_POSITION
+import mega.privacy.android.app.utils.Constants.REQUIRE_PASSCODE_INVALID
 import mega.privacy.android.app.utils.LogUtil.logDebug
 import mega.privacy.android.app.utils.StringResourcesUtils.getQuantityString
 import mega.privacy.android.app.utils.StringResourcesUtils.getString
@@ -24,11 +25,11 @@ import javax.inject.Inject
 
 class PasscodeUtil @Inject constructor(
     @ActivityContext private val context: Context,
-    private val dbH: DatabaseHandler
+    private val dbH: DatabaseHandler,
+    private val passcodeManagement: PasscodeManagement
 ) {
 
     companion object {
-        const val REQUIRE_PASSCODE_INVALID = -1
         const val REQUIRE_PASSCODE_IMMEDIATE = 500
         const val REQUIRE_PASSCODE_AFTER_5S = 5 * 1000
         const val REQUIRE_PASSCODE_AFTER_10S = 10 * 1000
@@ -268,11 +269,28 @@ class PasscodeUtil @Inject constructor(
     }
 
     /**
+     * Method to get the time set for passcode lock
+     *
+     * @return time set for passcode lock
+     */
+    fun timeRequiredForPasscode(): Int {
+        val prefs = dbH.preferences
+
+        return if (prefs != null
+            && !isTextEmpty(prefs.passcodeLockEnabled)
+            && prefs.passcodeLockEnabled.toBoolean()
+            && !isTextEmpty(prefs.passcodeLockCode)
+        ) {
+            prefs.passcodeLockRequireTime.toInt()
+        } else REQUIRE_PASSCODE_INVALID
+    }
+
+    /**
      * Checks if should lock the app and show the passcode screen.
      *
      * @return True if should lock the app, false otherwise.
      */
-    private fun shouldLock(): Boolean {
+    fun shouldLock(): Boolean {
         val prefs = dbH.preferences
 
         return if (prefs != null
@@ -282,7 +300,7 @@ class PasscodeUtil @Inject constructor(
             && prefs.passcodeLockRequireTime.toInt() != REQUIRE_PASSCODE_INVALID
         ) {
             val currentTime = System.currentTimeMillis()
-            val lastPaused = MegaApplication.getPasscodeManagement().lastPause
+            val lastPaused = passcodeManagement.lastPause
 
             logDebug("Time: $currentTime lastPause: $lastPaused")
 
@@ -303,11 +321,11 @@ class PasscodeUtil @Inject constructor(
      * Called when some activity is paused to update the lastPause value.
      */
     fun pauseUpdate() {
-        MegaApplication.getPasscodeManagement().lastPause = System.currentTimeMillis()
+        passcodeManagement.lastPause = System.currentTimeMillis()
     }
 
     /**
-     * Launches an intent to show passcode screen when the app is locked.
+     * Launches an intent to show passcode screen when the app is locked
      */
     private fun showLockScreen() {
         context.startActivity(

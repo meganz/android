@@ -749,6 +749,9 @@ public class BaseActivity extends AppCompatActivity implements ActivityLauncher,
                 case SNACKBAR_IMCOMPATIBILITY_TYPE:
                     snackbar = Snackbar.make(view, !isTextEmpty(s) ? s : getString(R.string.sent_as_message), Snackbar.LENGTH_INDEFINITE);
                     break;
+                case DISMISS_ACTION_SNACKBAR:
+                    snackbar = Snackbar.make(view, s, Snackbar.LENGTH_INDEFINITE);
+                    break;
                 default:
                     snackbar = Snackbar.make(view, s, Snackbar.LENGTH_LONG);
                     break;
@@ -810,6 +813,11 @@ public class BaseActivity extends AppCompatActivity implements ActivityLauncher,
                 snackbar.show();
                 break;
             }
+
+            case DISMISS_ACTION_SNACKBAR:
+                snackbar.setAction(R.string.general_ok, new SnackbarNavigateOption(view.getContext(), type));
+                snackbar.show();
+                break;
         }
     }
 
@@ -1173,12 +1181,31 @@ public class BaseActivity extends AppCompatActivity implements ActivityLauncher,
     }
 
     /**
+     * Checks if should refresh session due to megaApi is null.
+     *
+     * @return True if should refresh session, false otherwise.
+     */
+    protected boolean shouldRefreshSessionDueToMegaApiIsNull() {
+        if (megaApi == null) {
+            logWarning("Refresh session - sdk");
+            refreshSession();
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
      * Checks if should refresh session due to megaApi.
      *
      * @return True if should refresh session, false otherwise.
      */
     protected boolean shouldRefreshSessionDueToSDK() {
-        if (megaApi == null || megaApi.getRootNode() == null) {
+        if (shouldRefreshSessionDueToMegaApiIsNull()) {
+            return true;
+        }
+
+        if (megaApi.getRootNode() == null) {
             logWarning("Refresh session - sdk");
             refreshSession();
             return true;

@@ -658,6 +658,34 @@
         <item name="drawableTint">@color/grey_100_grey_600</item>
     </style>
 
+    <style name="StartScreenIcon">
+        <item name="android:layout_width">24dp</item>
+        <item name="android:layout_height">24dp</item>
+        <item name="android:layout_alignParentStart">true</item>
+        <item name="android:layout_centerVertical">true</item>
+        <item name="android:layout_marginStart">18dp</item>
+        <item name="tint">@color/grey_054_white_054</item>
+    </style>
+
+    <style name="StartScreenText">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_alignParentStart">true</item>
+        <item name="android:layout_centerVertical">true</item>
+        <item name="android:layout_marginStart">72dp</item>
+        <item name="android:textAppearance">@style/TextAppearance.Mega.Subtitle1.Medium.Grey87White87</item>
+    </style>.
+
+    <style name="StartScreenCheck">
+        <item name="android:layout_width">24dp</item>
+        <item name="android:layout_height">24dp</item>
+        <item name="android:layout_alignParentEnd">true</item>
+        <item name="android:layout_centerVertical">true</item>
+        <item name="android:layout_marginStart">20dp</item>
+        <item name="android:layout_marginEnd">20dp</item>
+        <item name="android:src">@drawable/ic_check</item>
+    </style>
+
     <style name="textAppearanceSubtitle1">
         <item name="android:textAppearance">?attr/textAppearanceSubtitle1</item>
         <item name="android:letterSpacing">0.0004</item>

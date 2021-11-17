@@ -8,8 +8,6 @@
     <string name="prolite_account">Pro Lite</string>
     <!-- Name of the MEGA PDF Viewer. Keep uppercase. -->
     <string name="pdf_app_name">Просмотр PDF MEGA</string>
-    <!-- Showing progress of elements. Example: 2 of 10. -->
-    <string name="general_x_of_x">из</string>
     <!-- Answer for confirmation dialog. -->
     <string name="general_yes">Да</string>
     <!-- Answer for confirmation dialog. -->
@@ -597,8 +595,6 @@
     <string name="number_contact_not_removed">Контакты не удалены (%d)</string>
     <!-- success message when sharing a file with multiple contacts -->
     <string name="number_contact_file_shared_correctly">Доступ к папке успешно открыт %d контактам.</string>
-    <!-- error message when sharing a file with multiple contacts -->
-    <string name="number_contact_file_not_shared_">Доступ к файлу не может быть открыт контактам (%d)</string>
     <!-- success message when sharing multiple files -->
     <string name="number_correctly_shared">Доступ к папкам успешно открыт (%d)</string>
     <!-- error message when sharing multiple files -->
@@ -679,7 +675,7 @@
     <!-- error message while browsing the local filesystem -->
     <string name="error_io_problem">Ошибка файловой системы</string>
     <!-- error message while browsing the local filesystem -->
-    <string name="general_error">Произошла ошибка при просмотре локальных файлов.</string>
+    <string name="general_error">При выполнении произошла ошибка</string>
     <!-- title of the image gallery -->
     <string name="full_screen_image_viewer_label">Просмотр изображений</string>
     <!-- Headline for the amount of storage space is used -->
@@ -1150,7 +1146,7 @@
     <!-- Message to promote PRO accounts -->
     <string name="get_pro_account">Увеличьте своё облако.[A]Получите больше пространства и квоты передач с Pro-аккаунтом.</string>
     <!-- success message when the MasterKey file has been downloaded -->
-    <string name="toast_master_key">Ключ восстановления аккаунта MEGA был сохранён в: %1s. [A]Вы можете найти файл с ним в разделе «Локальные». [A]Примечание: поскольку файл с вашим ключом восстановления будет удалён при выходе из системы, сохраните его в безопасном месте за пределами аккаунта MEGA.</string>
+    <string name="toast_master_key">Ключ восстановления аккаунта MEGA был сохранён в: %1s. [A]Вы можете найти файл с ним в разделе «Сохранено локально». [/A]Примечание: поскольку файл с вашим ключом восстановления будет удалён при выходе из системы, храните его в безопасном месте за пределами аккаунта MEGA.</string>
     <!-- Error shown when the user tries to change his mail to one that is already used -->
     <string name="mail_already_used">Этот адрес электронной почты уже используется. Пожалуйста, используйте другой адрес.</string>
     <!-- Error shown when the user tries to change his mail while the user has already requested a confirmation link for that email address -->
@@ -1530,7 +1526,7 @@
     <string name="title_message_uploading_options">Загрузка вложения</string>
     <!-- message shown when a chat has no messages -->
     <string name="no_conversation_history">Нет истории разговора</string>
-    <!-- title of confirmation alert before removing a contact, Plural -->
+    <!-- Text to indicate that one participant is typing or multiple participants are typing at the same time in a chat room. The "%1$s" placeholder is to put the name(s) of the participant(s). The [A][/A] format marks are to put the text in a different color. -->
     <plurals name="user_typing">
         <item quantity="one">%1$s [A]печатает&#8230;[/A]</item>
         <item quantity="few">%1$s [A]печатают&#8230;[/A]</item>
@@ -2002,8 +1998,6 @@
     <string name="title_regitration">Бонусы за регистрацию</string>
     <!-- title of the section for install a mobile app bonuses in achivements section (maximum 24 chars) -->
     <string name="title_install_desktop">Установить MEGA на ПК</string>
-    <!-- title of the section for base quota in achivements section -->
-    <string name="title_base_quota">Базовая квота</string>
     <!-- Text that indicates that no pictures have been uploaded to the Camera Uploads section -->
     <string name="camera_uploads_empty">В «Загрузках камеры» нет файлов</string>
     <!-- indicates the number of days left related to a achievement -->
@@ -2374,10 +2368,12 @@
     <string name="settings_video_upload_quality">Качество видео</string>
     <!-- Text shown when the user refuses to permit the storage permission when enable camera upload -->
     <string name="on_refuse_storage_permission">Для загрузок из камеры требуется доступ к фотографиям и другим медиафайлам на устройстве. Пожалуйста, перейдите в настройки и дайте разрешение.</string>
-    <!-- the options for the option on setting to set up the quality of multimedia files uploaded to the chat, the options of medium quality multimedia file to  upload. -->
+    <!-- Available options for the setting to set up the quality of multimedia files uploaded to the chat or the Camera Uploads -->
     <string-array name="settings_chat_upload_quality_entries">
-        <item>Оригинальное качество</item>
-        <item>Среднее качество</item>
+        <item>Низкое</item>
+        <item>Среднее</item>
+        <item>Высокое</item>
+        <item>Оригинал</item>
     </string-array>
     <!-- Title of the notification for a missed call -->
     <string name="missed_call_notification_title">Пропущенный звонок</string>
@@ -2691,13 +2687,6 @@
     <string name="context_no_restored">Произошла ошибка. Элемент не восстановлен.</string>
     <!-- menu item from contact section to send a message to a contact -->
     <string name="context_send_message">Отправить cообщение</string>
-    <!-- Message shown when a contact is successfully sent to several chats, more contacts -->
-    <plurals name="plural_contact_sent_to_chats">
-        <item quantity="one">Контакт отправлен в чат</item>
-        <item quantity="few">Контакты отправлены в чат</item>
-        <item quantity="many">Контакты отправлены в чат</item>
-        <item quantity="other">Контакты отправлены в чат</item>
-    </plurals>
     <!-- Error message on opening a MEGAdrop folder link -->
     <string name="error_MEGAdrop_not_supported">Папки MEGAdrop ещё не поддерживаются</string>
     <!-- Pre overquota error dialog when trying to copy or import a file -->
@@ -3618,7 +3607,7 @@
     <!-- Text informing user that their account has been suspended -->
     <string name="account_temporarily_suspended">Ваш аккаунт был временно заблокирован для вашей безопасности.</string>
     <!-- Text informing user has to follow the steps of an email to unlock their account -->
-    <string name="verify_email_and_follow_steps">[A]Пожалуйста, подтвердите адрес электронной почты[/A] и следуйте инструкциям, чтобы разблокировать аккаунт.</string>
+    <string name="verify_email_and_follow_steps">Пожалуйста, следуйте инструкциям в [A]письме с подтверждением[/A], чтобы разблокировать аккаунт.</string>
     <!-- Question which takes the user to a help screen -->
     <string name="why_am_i_seeing_this">Почему я это вижу?</string>
     <!-- Label of a button which action is resend an email -->
@@ -3733,7 +3722,7 @@
     <string name="label_verify_credentials">Подтвердить учётные данные</string>
     <!-- Label to indicate that contact’s credentials are not verified. -->
     <string name="label_not_verified">Не подтверждено</string>
-    <!-- Action indicating something was verified. -->
+    <!-- Label indicating the authenticity credentials of a contact have been verified -->
     <string name="label_verified">Проверен</string>
     <!-- ”Verify user” dialog title -->
     <string name="authenticity_credentials_label">Подлинность учётных данных</string>
@@ -3820,7 +3809,7 @@
     <!-- Shows the error when the limit of reactions per message is reached and a user tries to add one more. Keep the placeholder because is to show limit number in runtime. -->
     <string name="limit_reaction_per_message">Достигнуто максимальное количество реакций на это сообщение: %d.</string>
     <!-- System message displayed to all chat participants when one of them enables retention history -->
-    <string name="retention_history_changed_by">[A]%1$s[/A][B] изменил время очистки сообщения на[/B][A] %2$s[/A][B].[/B]</string>
+    <string name="retention_history_changed_by">[A]%1$s[/A][B] изменил время очистки сообщения на [/B][A]%2$s[/A][B].[/B]</string>
     <!-- Title of the section to clear the chat content in the Manage chat history screen -->
     <string name="title_properties_clear_chat_history">Очистить историю чата</string>
     <!-- System message that is shown to all chat participants upon disabling the Retention history -->
@@ -3903,7 +3892,7 @@
     <!-- Title indicating the select mode is enabled and ready to select transfers on Transfers section, In progress tab -->
     <string name="title_select_transfers">Выбрать передачи</string>
     <!-- Error shown to inform the priority change of a transfer failed. Please don’t remove the place holder, it’s to set the name of the transfer. Example: The priority change of the transfer “video.mp4” failed. -->
-    <string name="change_of_transfer_priority_failed">Не удалось изменить приоритет передачи «%1$s».</string>
+    <string name="change_of_transfer_priority_failed">Невозможно изменить приоритет передачи «%1$s»</string>
     <!-- Title option to send separated the link and decryption key -->
     <string name="option_send_decryption_key_separately">Отправить ключ дешифрования отдельно</string>
     <!-- Explanation option to send separated the link and decryption key -->
@@ -4237,6 +4226,8 @@
         <item quantity="many">Получить ссылки</item>
         <item quantity="other">Получить ссылки</item>
     </plurals>
+    <!-- Ask for confirmation before clear offline files -->
+    <string name="clear_offline_confirmation">Очистить все локальные файлы?</string>
     <!-- Banner text when the call is in progress and I'm the only participant. -->
     <string name="banner_alone_on_the_call">Здесь только вы</string>
     <!-- Item menu option upon right click on meeting. -->
@@ -4371,4 +4362,6 @@
     <string name="meeting_me_text_bracket">%1s [A](я)[/A]</string>
     <!-- Menu item to change from thumbnail view to main view in meeting-->
     <string name="main_view">Общий вид</string>
+    <!-- Warning in Offline section alerting all the Offline files will be deleted after logout. -->
+    <string name="offline_warning">Выход из системы удалит локальный контент.</string>
 </resources>

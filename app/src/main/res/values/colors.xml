@@ -50,6 +50,7 @@
     <color name="grey_800">#2E2E2E</color>
     <color name="grey_900">#212121</color>
 
+    <color name="grey_010_alpha_049">#7DFAFAFA</color>
     <color name="grey_100_alpha_060">#99E0E0E0</color>
     <color name="grey_300_alpha_026">#429E9E9E</color>
     <color name="grey_600_alpha_085">#D96C6C6C</color>
@@ -164,7 +165,7 @@
     <!-- For fast scroller -->
     <color name="scroll_bubble">#90727272</color>
 
-    <color name="scroll_handle">@color/grey_010</color>
+    <color name="scroll_handle">@color/white</color>
 
     <color name="scroll_bubble_text_color">@color/grey_alpha_050</color>
     <!-- ======================== Color pair: light_dark ================== -->

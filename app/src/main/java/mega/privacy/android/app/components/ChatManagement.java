@@ -55,6 +55,12 @@ public class ChatManagement {
     private final ArrayList<Long> currentActiveGroupChat = new ArrayList<>();
     // List of calls for which an incoming call notification has already been shown
     private final ArrayList<Long> notificationShown = new ArrayList<>();
+    // List of pending messages ids in which its transfer is to be cancelled
+    private final HashMap<Integer, Long> hashMapPendingMsgsToBeCancelled = new HashMap<>();
+    // List of messages id to delete
+    private final ArrayList<Long> msgsToBeDeleted = new ArrayList<>();
+
+
     // If this has a valid value, means there is a pending chat link to join.
     private String pendingJoinLink;
 
@@ -151,6 +157,46 @@ public class ChatManagement {
 
     public void setVideoStatus(long chatId, boolean videoStatus) {
         hashMapVideo.put(chatId, videoStatus);
+    }
+
+    public void setPendingMessageToBeCancelled(int tag, long chatId) {
+        if (getPendingMsgIdToBeCancelled(tag) == MEGACHAT_INVALID_HANDLE) {
+            hashMapPendingMsgsToBeCancelled.put(tag, chatId);
+        }
+    }
+
+    public long getPendingMsgIdToBeCancelled(int tag) {
+        boolean entryExists = hashMapPendingMsgsToBeCancelled.containsKey(tag);
+        if (entryExists) {
+            return hashMapPendingMsgsToBeCancelled.get(tag);
+        }
+
+        return MEGACHAT_INVALID_HANDLE;
+    }
+
+    public void removePendingMsgToBeCancelled(int tag) {
+        if (getPendingMsgIdToBeCancelled(tag) != MEGACHAT_INVALID_HANDLE) {
+            hashMapPendingMsgsToBeCancelled.remove(tag);
+        }
+    }
+
+    public void addMsgToBeDelete(long pMsgId) {
+        if (!isMsgToBeDelete(pMsgId)) {
+            msgsToBeDeleted.add(pMsgId);
+        }
+    }
+
+    public boolean isMsgToBeDelete(long pMsgId) {
+        if (msgsToBeDeleted.isEmpty())
+            return false;
+
+        return msgsToBeDeleted.contains(pMsgId);
+    }
+
+    public void removeMsgToDelete(long pMsgId) {
+        if (isMsgToBeDelete(pMsgId)) {
+            msgsToBeDeleted.remove(pMsgId);
+        }
     }
 
     public boolean isOpeningMeetingLink(long chatId) {
@@ -278,20 +324,19 @@ public class ChatManagement {
     /**
      * Method to control whether or not to display the incoming call notification when I am added to a group and a call is in progress.
      *
-     * @param item MegaChatListItem of the new group chat
+     * @param chatId Chat ID of the new group chat
      */
-    public void checkActiveGroupChat(MegaChatListItem item) {
-        if (currentActiveGroupChat.isEmpty() || !currentActiveGroupChat.contains(item.getChatId())) {
-            currentActiveGroupChat.add(item.getChatId());
-            
-            MegaChatCall call = app.getMegaChatApi().getChatCall(item.getChatId());
+    public void checkActiveGroupChat(Long chatId) {
+        if (currentActiveGroupChat.isEmpty() || !currentActiveGroupChat.contains(chatId)) {
+            MegaChatCall call = app.getMegaChatApi().getChatCall(chatId);
             if (call == null) {
                 logError("Call is null");
                 return;
             }
 
             if(call.getStatus() == CALL_STATUS_USER_NO_PRESENT){
-                checkToShowIncomingGroupCallNotification(call, item.getChatId());
+                addCurrentGroupChat(chatId);
+                checkToShowIncomingGroupCallNotification(call, chatId);
             }
         }
     }
@@ -320,7 +365,7 @@ public class ChatManagement {
         }
 
         logDebug("Show incoming call notification");
-        app.showGroupCallNotification(chatId);
+        app.showOneCallNotification(call);
     }
 
     public void registerScreenReceiver(){

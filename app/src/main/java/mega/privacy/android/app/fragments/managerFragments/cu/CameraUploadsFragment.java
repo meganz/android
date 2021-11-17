@@ -17,7 +17,6 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.view.ActionMode;
-import androidx.core.app.ActivityCompat;
 import androidx.core.text.HtmlCompat;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.GridLayoutManager;
@@ -49,6 +48,7 @@ import static mega.privacy.android.app.components.dragger.DragToExitSupport.obse
 import static mega.privacy.android.app.components.dragger.DragToExitSupport.putThumbnailLocation;
 import static mega.privacy.android.app.utils.ColorUtils.DARK_IMAGE_ALPHA;
 import static mega.privacy.android.app.utils.ColorUtils.setImageViewAlphaIfDark;
+import static mega.privacy.android.app.utils.Constants.DISMISS_ACTION_SNACKBAR;
 import static mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_ADAPTER_TYPE;
 import static mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_HANDLE;
 import static mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_ORDER_GET_CHILDREN;
@@ -68,6 +68,7 @@ import static mega.privacy.android.app.utils.StyleUtils.setTextStyle;
 import static mega.privacy.android.app.utils.TextUtil.formatEmptyScreenText;
 import static mega.privacy.android.app.utils.Util.showSnackbar;
 import static nz.mega.sdk.MegaApiJava.INVALID_HANDLE;
+import static nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE;
 
 @AndroidEntryPoint
 public class CameraUploadsFragment extends BaseFragment implements CUGridViewAdapter.Listener,
@@ -125,7 +126,8 @@ public class CameraUploadsFragment extends BaseFragment implements CUGridViewAda
         }
 
         boolean isScrolled = binding.cuList.canScrollVertically(SCROLLING_UP_DIRECTION);
-        mManagerActivity.changeAppBarElevation(viewModel.isSelecting() || isScrolled);
+        mManagerActivity.changeAppBarElevation(binding.uploadProgress.getVisibility() == View.VISIBLE
+                || viewModel.isSelecting() || isScrolled);
     }
 
     public void selectAll() {
@@ -259,6 +261,16 @@ public class CameraUploadsFragment extends BaseFragment implements CUGridViewAda
         if (viewModel.isEnableCUShown()) {
             mManagerActivity.updateCULayout(View.GONE);
             mManagerActivity.updateCUViewTypes(View.GONE);
+
+            mFirstLoginBinding.uploadVideosSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
+                if (isChecked) {
+                    mManagerActivity.showSnackbar(DISMISS_ACTION_SNACKBAR,
+                            StringResourcesUtils.getString(R.string.video_quality_info),
+                            MEGACHAT_INVALID_HANDLE);
+                }
+
+                mFirstLoginBinding.qualityText.setVisibility(isChecked ? View.VISIBLE : View.GONE);
+            });
             return;
         }
 
@@ -530,7 +542,7 @@ public class CameraUploadsFragment extends BaseFragment implements CUGridViewAda
                 : View.GONE);
 
         if (!cuEnabled) {
-            mManagerActivity.hideCUProgress();
+            hideCUProgress();
         }
     }
 
@@ -633,9 +645,18 @@ public class CameraUploadsFragment extends BaseFragment implements CUGridViewAda
                 : View.GONE);
 
         if (selectedView != ALL_VIEW) {
-            mManagerActivity.hideCUProgress();
+            hideCUProgress();
             binding.uploadProgress.setVisibility(View.GONE);
         }
+    }
+
+    /**
+     * Hides CU progress bar and checks the scroll
+     * in order to hide elevation if the list is not scrolled.
+     */
+    private void hideCUProgress() {
+        mManagerActivity.hideCUProgress();
+        checkScroll();
     }
 
     private void updateFastScrollerVisibility() {
@@ -693,7 +714,11 @@ public class CameraUploadsFragment extends BaseFragment implements CUGridViewAda
     }
 
     public void updateProgress(int visibility, int pending) {
-        binding.uploadProgress.setVisibility(visibility);
+        if (binding.uploadProgress.getVisibility() != visibility) {
+            binding.uploadProgress.setVisibility(visibility);
+            checkScroll();
+        }
+
         binding.uploadProgress.setText(StringResourcesUtils
                 .getQuantityString(R.plurals.cu_upload_progress, pending, pending));
     }

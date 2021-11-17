@@ -44,6 +44,7 @@
     <uses-permission
         android:name="android.permission.MANAGE_EXTERNAL_STORAGE"
         tools:ignore="ScopedStorage" />
+    <uses-permission android:name="android.permission.USE_BIOMETRIC" />
 
     <!--<uses-permission android:name="android.permission.READ_CALL_LOG"/>-->
     <!--<uses-permission android:name="android.permission.WRITE_CALL_LOG"/>-->
@@ -57,7 +58,17 @@
         <!-- Content opened outside the app -->
         <intent>
             <action android:name="android.intent.action.VIEW" />
-            <data android:mimeType="application/*"/>
+            <data android:mimeType="application/*" />
+        </intent>
+
+        <!-- URLs opened outside the app -->
+        <intent>
+            <action android:name="android.intent.action.VIEW" />
+            <category android:name="android.intent.category.BROWSABLE" />
+            <data
+                android:host="*"
+                android:mimeType="application/*"
+                android:scheme="https" />
         </intent>
     </queries>
 
@@ -685,6 +696,12 @@
             android:name=".activities.AskForDisplayOverActivity"
             android:theme="@android:style/Theme.Translucent.NoTitleBar.Fullscreen"
             android:launchMode="singleTask"/>
+
+        <activity
+            android:name="mega.privacy.android.app.activities.settingsActivities.StartScreenPreferencesActivity"
+            android:label="@string/start_screen_setting"
+            android:launchMode="singleTop">
+        </activity>
 
     </application>
 

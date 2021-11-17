@@ -129,6 +129,8 @@ import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.OpenPasswordLinkActivity;
 import mega.privacy.android.app.Product;
 import mega.privacy.android.app.R;
+import mega.privacy.android.app.objects.PasscodeManagement;
+import mega.privacy.android.app.fragments.homepage.documents.DocumentsFragment;
 import mega.privacy.android.app.generalusecase.FilePrepareUseCase;
 import mega.privacy.android.app.smsVerification.SMSVerificationActivity;
 import mega.privacy.android.app.ShareInfo;
@@ -262,6 +264,16 @@ import nz.mega.sdk.MegaUser;
 import nz.mega.sdk.MegaUserAlert;
 
 import static mega.privacy.android.app.constants.EventConstants.*;
+import static mega.privacy.android.app.fragments.settingsFragments.startSceen.util.StartScreenUtil.CAMERA_UPLOADS_BNV;
+import static mega.privacy.android.app.fragments.settingsFragments.startSceen.util.StartScreenUtil.CHAT_BNV;
+import static mega.privacy.android.app.fragments.settingsFragments.startSceen.util.StartScreenUtil.CLOUD_DRIVE_BNV;
+import static mega.privacy.android.app.fragments.settingsFragments.startSceen.util.StartScreenUtil.HOME_BNV;
+import static mega.privacy.android.app.fragments.settingsFragments.startSceen.util.StartScreenUtil.NO_BNV;
+import static mega.privacy.android.app.fragments.settingsFragments.startSceen.util.StartScreenUtil.SHARED_ITEMS_BNV;
+import static mega.privacy.android.app.fragments.settingsFragments.startSceen.util.StartScreenUtil.getStartBottomNavigationItem;
+import static mega.privacy.android.app.fragments.settingsFragments.startSceen.util.StartScreenUtil.getStartDrawerItem;
+import static mega.privacy.android.app.fragments.settingsFragments.startSceen.util.StartScreenUtil.setStartScreenTimeStamp;
+import static mega.privacy.android.app.fragments.settingsFragments.startSceen.util.StartScreenUtil.shouldCloseApp;
 import static mega.privacy.android.app.lollipop.PermissionsFragment.PERMISSIONS_FRAGMENT;
 import static mega.privacy.android.app.modalbottomsheet.UploadBottomSheetDialogFragment.GENERAL_UPLOAD;
 import static mega.privacy.android.app.modalbottomsheet.UploadBottomSheetDialogFragment.HOMEPAGE_UPLOAD;
@@ -341,12 +353,6 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 	public static final int PENDING_TAB = 0;
 	public static final int COMPLETED_TAB = 1;
 
-	private static final int CLOUD_DRIVE_BNV = 0;
-	private static final int CAMERA_UPLOADS_BNV = 1;
-	private static final int HOMEPAGE_BNV = 2;
-	private static final int CHAT_BNV = 3;
-	private static final int SHARED_BNV = 4;
-	private static final int HIDDEN_BNV = 5;
 	// 8dp + 56dp(Fab's size) + 8dp
     public static final int TRANSFER_WIDGET_MARGIN_BOTTOM = 72;
 
@@ -372,6 +378,8 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 	InviteContactUseCase inviteContactUseCase;
 	@Inject
 	FilePrepareUseCase filePrepareUseCase;
+	@Inject
+	PasscodeManagement passcodeManagement;
 
 	public ArrayList<Integer> transfersInProgress;
 	public MegaTransferData transferData;
@@ -435,6 +443,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 
     public boolean openFolderRefresh = false;
 
+    public boolean openSettingsStartScreen;
     public boolean openSettingsStorage = false;
     public boolean openSettingsQR = false;
 	boolean newAccount = false;
@@ -461,17 +470,6 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 
 	// Determine if open this activity from meeting page, if true, will finish this activity when user click back icon
 	private boolean isFromMeeting = false;
-
-	private Boolean initFabButtonShow = false;
-	private Observer<Boolean> fabChangeObserver  = isShow -> {
-		if(initFabButtonShow) {
-			if (isShow) {
-				showFabButtonAfterScrolling();
-			} else {
-				hideFabButtonWhenScrolling();
-			}
-		}
-	};
 
 	public enum FragmentTag {
 		CLOUD_DRIVE, HOMEPAGE, CAMERA_UPLOADS, INBOX, INCOMING_SHARES, OUTGOING_SHARES, SETTINGS, SEARCH,TRANSFERS, COMPLETED_TRANSFERS,
@@ -722,6 +720,22 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 	private View mNavHostView;
 	private NavController mNavController;
 	private HomepageSearchable mHomepageSearchable;
+
+	private Boolean initFabButtonShow = false;
+
+	private Observer<Boolean> fabChangeObserver  = isShow -> {
+		if (drawerItem == DrawerItem.HOMEPAGE) {
+			controlFabInHomepage(isShow);
+		} else {
+			if (initFabButtonShow) {
+				if (isShow) {
+					showFabButtonAfterScrolling();
+				} else {
+					hideFabButtonWhenScrolling();
+				}
+			}
+		}
+	};
 
 	private final Observer<Boolean> refreshAddPhoneNumberButtonObserver = new Observer<Boolean>() {
 		@Override
@@ -1184,7 +1198,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 		if (checkPermissionsCall(this, typesCameraPermission)) {
 			switch (typesCameraPermission) {
 				case RETURN_CALL_PERMISSIONS:
-					returnActiveCall(this);
+					returnActiveCall(this, passcodeManagement);
 					break;
 
 				case START_CALL_PERMISSIONS:
@@ -1594,6 +1608,11 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 				isSmallGridCameraUploads = dbH.isSmallGridCamera();
 			}
 		}
+
+		if (firstTimeAfterInstallation) {
+			setStartScreenTimeStamp(this);
+		}
+
 		logDebug("Preferred View List: " + isList);
 
 		LiveEventBus.get(EVENT_LIST_GRID_CHANGE, Boolean.class).post(isList);
@@ -1900,7 +1919,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
         if (!isOnline(this)){
 			logDebug("No network -> SHOW OFFLINE MODE");
 
-			if(drawerItem==null){
+			if (drawerItem == null) {
 				drawerItem = DrawerItem.HOMEPAGE;
 			}
 
@@ -2405,7 +2424,8 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 			setNotificationsTitleSection();
 
 			if (drawerItem == null) {
-	        	drawerItem = DrawerItem.HOMEPAGE;
+	        	drawerItem = getStartDrawerItem(this);
+
 	        	Intent intent = getIntent();
 	        	if (intent != null){
 	        		boolean upgradeAccount = getIntent().getBooleanExtra(EXTRA_UPGRADE_ACCOUNT, false);
@@ -3331,7 +3351,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 	    		}
 	    		case SHARED_ITEMS:{
 					logDebug("Case SHARED ITEMS");
-					setBottomNavigationMenuItemChecked(SHARED_BNV);
+					setBottomNavigationMenuItemChecked(SHARED_ITEMS_BNV);
 					try {
 						NotificationManager notificationManager =
 								(NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
@@ -3346,11 +3366,16 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 	    		}
 				case SETTINGS:{
 					setToolbarTitle();
-					setBottomNavigationMenuItemChecked(HIDDEN_BNV);
+					setBottomNavigationMenuItemChecked(NO_BNV);
 					break;
 				}
 				case SEARCH:{
-					setBottomNavigationMenuItemChecked(HIDDEN_BNV);
+					if (searchExpand) {
+						textsearchQuery = false;
+						break;
+					}
+
+					setBottomNavigationMenuItemChecked(NO_BNV);
 					setToolbarTitle();
 					break;
 				}
@@ -3376,7 +3401,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 				}
 				case HOMEPAGE:
 				default:
-					setBottomNavigationMenuItemChecked(HOMEPAGE_BNV);
+					setBottomNavigationMenuItemChecked(HOME_BNV);
 					break;
     		}
     	}
@@ -4038,14 +4063,15 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 			logDebug("DrawerItem on start offline: " + drawerItem);
 			if (drawerItem == null) {
 				logWarning("drawerItem == null --> On start OFFLINE MODE");
-				drawerItem = DrawerItem.HOMEPAGE;
+				drawerItem = getStartDrawerItem(this);
+
 				if (bNV != null) {
 					Menu bNVMenu = bNV.getMenu();
 					if (bNVMenu != null) {
 						disableNavigationViewMenu(bNVMenu);
 					}
 				}
-				setBottomNavigationMenuItemChecked(HOMEPAGE_BNV);
+
 				selectDrawerItemLollipop(drawerItem);
 			} else {
 				if (bNV != null) {
@@ -4080,7 +4106,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 					break;
 				}
 				case HOMEPAGE: {
-					setBottomNavigationMenuItemChecked(HOMEPAGE_BNV);
+					setBottomNavigationMenuItemChecked(HOME_BNV);
 					break;
 				}
 				case CAMERA_UPLOADS:{
@@ -4088,7 +4114,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 					break;
 				}
 				case SHARED_ITEMS:{
-					setBottomNavigationMenuItemChecked(SHARED_BNV);
+					setBottomNavigationMenuItemChecked(SHARED_ITEMS_BNV);
 					break;
 				}
 				case CHAT:{
@@ -4100,7 +4126,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 				case TRANSFERS:
 				case NOTIFICATIONS:
 				case INBOX:{
-					setBottomNavigationMenuItemChecked(HIDDEN_BNV);
+					setBottomNavigationMenuItemChecked(NO_BNV);
 					break;
 				}
 			}
@@ -4188,7 +4214,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 
 		drawerItem = DrawerItem.NOTIFICATIONS;
 
-		setBottomNavigationMenuItemChecked(HIDDEN_BNV);
+		setBottomNavigationMenuItemChecked(NO_BNV);
 
 		notificFragment = (NotificationsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.NOTIFICATIONS.getTag());
 		if (notificFragment == null){
@@ -4213,7 +4239,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 
 		drawerItem = DrawerItem.TRANSFERS;
 
-		setBottomNavigationMenuItemChecked(HIDDEN_BNV);
+		setBottomNavigationMenuItemChecked(NO_BNV);
 
 		if (mTabsAdapterTransfers == null) {
 			mTabsAdapterTransfers = new TransfersPageAdapter(getSupportFragmentManager(), this);
@@ -4274,7 +4300,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 
 	public void setBottomNavigationMenuItemChecked(int item) {
 		if (bNV != null) {
-			if (item == HIDDEN_BNV) {
+			if (item == NO_BNV) {
 				showHideBottomNavigationView(true);
 			} else if (bNV.getMenu().getItem(item) != null) {
 				if (!bNV.getMenu().getItem(item).isChecked()) {
@@ -4422,7 +4448,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 				// Showing the bottom navigation view immediately because the initial dimension
 				// of Homepage bottom sheet is calculated based on it
 				showBNVImmediate();
-				if (bottomNavigationCurrentItem == HOMEPAGE_BNV) {
+				if (bottomNavigationCurrentItem == HOME_BNV) {
 					abL.setVisibility(View.GONE);
 				}
 				setDrawerLockMode(false);
@@ -4528,7 +4554,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 					rubbishBinFLol = RubbishBinFragmentLollipop.newInstance();
 				}
 
-				setBottomNavigationMenuItemChecked(HIDDEN_BNV);
+				setBottomNavigationMenuItemChecked(NO_BNV);
 
 				replaceFragment(rubbishBinFLol, FragmentTag.RUBBISH_BIN.getTag());
 
@@ -4555,10 +4581,10 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
                     showHideBottomNavigationView(true);
 				}
 
-				setBottomNavigationMenuItemChecked(HOMEPAGE_BNV);
+				setBottomNavigationMenuItemChecked(HOME_BNV);
 
 				if (!comesFromNotifications) {
-					bottomNavigationCurrentItem = HOMEPAGE_BNV;
+					bottomNavigationCurrentItem = HOME_BNV;
 				}
 
 				showGlobalAlertDialogsIfNeeded();
@@ -4620,9 +4646,9 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 				showFabButton();
 				showHideBottomNavigationView(false);
 				if (!comesFromNotifications) {
-					bottomNavigationCurrentItem = SHARED_BNV;
+					bottomNavigationCurrentItem = SHARED_ITEMS_BNV;
 				}
-				setBottomNavigationMenuItemChecked(SHARED_BNV);
+				setBottomNavigationMenuItemChecked(SHARED_ITEMS_BNV);
     			break;
     		}
 			case NOTIFICATIONS:{
@@ -4643,16 +4669,16 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 
     			supportInvalidateOptionsMenu();
 
-    			if (getSettingsFragment() != null){
-					if (openSettingsStorage){
+				if (getSettingsFragment() != null) {
+					if (openSettingsStorage) {
 						sttFLol.goToCategoryStorage();
-					}
-					else if (openSettingsQR){
-						logDebug ("goToCategoryQR");
+					} else if (openSettingsQR) {
+						logDebug("goToCategoryQR");
 						sttFLol.goToCategoryQR();
+					} else if (openSettingsStartScreen) {
+						sttFLol.goToSectionStartScreen();
 					}
-				}
-				else {
+				} else {
 					sttFLol = new SettingsFragmentLollipop();
 				}
 
@@ -4670,7 +4696,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
     		case SEARCH:{
 				showHideBottomNavigationView(true);
 
-				setBottomNavigationMenuItemChecked(HIDDEN_BNV);
+				setBottomNavigationMenuItemChecked(NO_BNV);
 
     			drawerItem = DrawerItem.SEARCH;
 				if (getSearchFragment() == null) {
@@ -4732,7 +4758,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
     	fullscreenOfflineFragment = fragment;
 
 		showFabButton();
-		setBottomNavigationMenuItemChecked(HOMEPAGE_BNV);
+		setBottomNavigationMenuItemChecked(HOME_BNV);
 		abL.setVisibility(View.VISIBLE);
 		setToolbarTitle();
 		supportInvalidateOptionsMenu();
@@ -4958,21 +4984,36 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 		isEnable2FADialogShown = true;
 	}
 
-	public void moveToSettingsSection(){
-		drawerItem=DrawerItem.SETTINGS;
+	/**
+	 * Opens the settings section.
+	 */
+	public void moveToSettingsSection() {
+		drawerItem = DrawerItem.SETTINGS;
 		selectDrawerItemLollipop(drawerItem);
 	}
 
-	public void moveToSettingsSectionStorage(){
+	/**
+	 * Opens the settings section and scrolls to storage category.
+	 */
+	public void moveToSettingsSectionStorage() {
 		openSettingsStorage = true;
-		drawerItem=DrawerItem.SETTINGS;
-		selectDrawerItemLollipop(drawerItem);
+		moveToSettingsSection();
 	}
 
+	/**
+	 * Opens the settings section and scrolls to QR setting.
+	 */
 	public void moveToSettingsSectionQR(){
 		openSettingsQR = true;
-		drawerItem=DrawerItem.SETTINGS;
-		selectDrawerItemLollipop(drawerItem);
+		moveToSettingsSection();
+	}
+
+	/**
+	 * Opens the settings section and scrolls to start screen setting.
+	 */
+	public void moveToSettingsSectionStartScreen() {
+		openSettingsStartScreen = true;
+		moveToSettingsSection();
 	}
 
 	/**
@@ -4981,6 +5022,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 	public void resetSettingsScrollIfNecessary() {
 		openSettingsStorage = false;
 		openSettingsQR = false;
+		openSettingsStartScreen = false;
 
 		if (getSettingsFragment() != null) {
 			sttFLol.goToFirstCategory();
@@ -5241,7 +5283,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 			Menu bNVMenu = bNV.getMenu();
 			if (bNVMenu != null) {
 				if (drawerItem == null) {
-					drawerItem = DrawerItem.CLOUD_DRIVE;
+					drawerItem = getStartDrawerItem(this);
 				}
 
 				if (drawerItem == DrawerItem.CLOUD_DRIVE) {
@@ -5605,9 +5647,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 		    			}
 		    		}
 		    		else if (drawerItem == DrawerItem.TRANSFERS){
-
-						drawerItem = DrawerItem.CLOUD_DRIVE;
-						setBottomNavigationMenuItemChecked(CLOUD_DRIVE_BNV);
+						drawerItem = getStartDrawerItem(this);
 						selectDrawerItemLollipop(drawerItem);
 						return true;
 		    		} else if (drawerItem == DrawerItem.HOMEPAGE) {
@@ -5963,7 +6003,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 
 	private void returnCallWithPermissions() {
 		if (checkPermissionsCall(this, RETURN_CALL_PERMISSIONS)) {
-			returnActiveCall(this);
+			returnActiveCall(this, passcodeManagement);
 		}
 	}
 
@@ -6207,7 +6247,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 
 		if (drawerItem == DrawerItem.CLOUD_DRIVE) {
 		    if (!isCloudAdded() || fbFLol.onBackPressed() == 0) {
-				backToDrawerItem(-1);
+		    	performOnBack();
 			}
 		} else if (drawerItem == DrawerItem.RUBBISH_BIN) {
 			rubbishBinFLol = (RubbishBinFragmentLollipop) getSupportFragmentManager()
@@ -6237,32 +6277,32 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 			switch (getTabItemShares()) {
 				case INCOMING_TAB:
 					if (!isIncomingAdded() || inSFLol.onBackPressed() == 0) {
-						backToDrawerItem(-1);
+						performOnBack();
 					}
 					break;
 				case OUTGOING_TAB:
 					if (!isOutgoingAdded() || outSFLol.onBackPressed() == 0) {
-						backToDrawerItem(-1);
+						performOnBack();
 					}
 					break;
 				case LINKS_TAB:
 					if (!isLinksAdded() || lF.onBackPressed() == 0) {
-						backToDrawerItem(-1);
+						performOnBack();
 					}
 					break;
 				default:
-					backToDrawerItem(-1);
+					performOnBack();
 					break;
 			}
         } else if (drawerItem == DrawerItem.CHAT) {
 			if (getChatsFragment() != null && isFabExpanded) {
                 collapseFab();
             } else {
-                backToDrawerItem(-1);
+				performOnBack();
             }
 		} else if (drawerItem == DrawerItem.CAMERA_UPLOADS) {
 			if (getCameraUploadFragment() == null || cuFragment.onBackPressed() == 0){
-				backToDrawerItem(-1);
+				performOnBack();
 			}
     	} else if (drawerItem == DrawerItem.SEARCH) {
 			if (getSearchFragment() == null || sFLol.onBackPressed() == 0) {
@@ -6273,13 +6313,27 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
             if(fragment != null && fragment.isFabExpanded()) {
                 fragment.collapseFab();
             } else {
-            	// The Psa requires the activity to load the new PSA even though the app
-				// is on the background. So don't call super.onBackPressed() since it will destroy
-				// this activity and its embedded web browser fragment.
-				moveTaskToBack(false);
-            }
+				performOnBack();
+			}
         } else {
 			handleBackPressIfFullscreenOfflineFragmentOpened();
+		}
+	}
+
+	/**
+	 * Closes the app if the current DrawerItem is the same as the preferred one.
+	 * If not, sets the current DrawerItem as the preferred one.
+	 */
+	private void performOnBack() {
+		int startItem = getStartBottomNavigationItem(this);
+
+		if (shouldCloseApp(startItem, drawerItem)) {
+			// The Psa requires the activity to load the new PSA even though the app is on the
+			// background. So don't call super.onBackPressed() since it will destroy this activity
+			// and its embedded web browser fragment.
+			moveTaskToBack(false);
+		} else {
+			backToDrawerItem(startItem);
 		}
 	}
 
@@ -6288,7 +6342,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 			// workaround for flicker of AppBarLayout: if we go back to homepage from fullscreen
 			// offline, and hide AppBarLayout when immediately on go back, we will see the flicker
 			// of AppBarLayout, hide AppBarLayout when fullscreen offline is closed is better.
-			if (bottomNavigationCurrentItem != HOMEPAGE_BNV) {
+			if (bottomNavigationCurrentItem != HOME_BNV) {
 				backToDrawerItem(bottomNavigationCurrentItem);
 			} else {
 				drawerItem = DrawerItem.HOMEPAGE;
@@ -6334,10 +6388,10 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 		else if (item == CHAT_BNV) {
 			drawerItem = DrawerItem.CHAT;
 		}
-		else if (item == SHARED_BNV) {
+		else if (item == SHARED_ITEMS_BNV) {
 			drawerItem = DrawerItem.SHARED_ITEMS;
 		}
-		else if (item == HOMEPAGE_BNV || item == -1) {
+		else if (item == HOME_BNV || item == -1) {
 			drawerItem = DrawerItem.HOMEPAGE;
 		}
 
@@ -6402,7 +6456,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 					super.onBackPressed();
 					return true;
 				} else {
-					setBottomNavigationMenuItemChecked(HOMEPAGE_BNV);
+					setBottomNavigationMenuItemChecked(HOME_BNV);
 				}
 				break;
 			}
@@ -6430,7 +6484,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 					refreshSharesPageAdapter();
 				} else {
 					drawerItem = DrawerItem.SHARED_ITEMS;
-					setBottomNavigationMenuItemChecked(SHARED_BNV);
+					setBottomNavigationMenuItemChecked(SHARED_ITEMS_BNV);
 				}
 				break;
 			}
@@ -7469,8 +7523,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 
 	public void skipInitialCUSetup() {
 		setFirstLogin(false);
-		drawerItem = DrawerItem.HOMEPAGE;
-		setBottomNavigationMenuItemChecked(HOMEPAGE_BNV);
+		drawerItem = getStartDrawerItem(this);
 		selectDrawerItemLollipop(drawerItem);
 	}
 
@@ -7564,7 +7617,10 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 			cuFragment.updateProgress(visibility, pending);
 		}
 
-		cuProgressBar.setVisibility(visibility);
+		if (cuProgressBar.getVisibility() != visibility) {
+			cuProgressBar.setVisibility(visibility);
+		}
+
 		cuProgressBar.setProgress(progress);
 	}
 
@@ -11533,7 +11589,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 
 			if (transfer.getIsOfflineFile()) {
 				File offlineFile = new File(transfer.getOriginalPath());
-				saveOffline(offlineFile.getParentFile(), node, this, ManagerActivityLollipop.this);
+				saveOffline(offlineFile.getParentFile(), node, ManagerActivityLollipop.this);
 			} else {
 				nodeSaver.saveNode(node, transfer.getPath());
 			}
@@ -11725,6 +11781,35 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 		return pF = (PermissionsFragment) getSupportFragmentManager().findFragmentByTag(FragmentTag.PERMISSIONS.getTag());
 	}
 
+	/**
+	 * Checks whether the current screen is the main of Homepage or Documents.
+	 * Video / Audio / Photos do not need Fab button
+	 * @param isShow  True if Fab button should be display, False if Fab button should be hidden
+	 */
+	private void controlFabInHomepage(Boolean isShow) {
+		if (mHomepageScreen == HomepageScreen.HOMEPAGE){
+			// Control the Fab in homepage
+			HomepageFragment fragment = getFragmentByType(HomepageFragment.class);
+			if(fragment != null) {
+				if (isShow) {
+					fragment.showFabButton();
+				} else {
+					fragment.hideFabButton();
+				}
+			}
+		} else if(mHomepageScreen == HomepageScreen.DOCUMENTS){
+			// Control the Fab in documents
+			DocumentsFragment docFragment = getFragmentByType(DocumentsFragment.class);
+			if(docFragment != null) {
+				if (isShow) {
+					docFragment.showFabButton();
+				} else {
+					docFragment.hideFabButton();
+				}
+			}
+		}
+	}
+
 	@Override
 	public void finishRenameActionWithSuccess(@NonNull String newName) {
 		switch (drawerItem) {
@@ -11784,7 +11869,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 				}).show(getSupportFragmentManager(),
 						MeetingHasEndedDialogFragment.TAG);
 			} else {
-				CallUtil.checkMeetingInProgress(ManagerActivityLollipop.this, ManagerActivityLollipop.this, chatId, isFromOpenChatPreview, link, request.getMegaHandleList(), request.getText(), alreadyExist, request.getUserHandle());
+				CallUtil.checkMeetingInProgress(ManagerActivityLollipop.this, ManagerActivityLollipop.this, chatId, isFromOpenChatPreview, link, request.getMegaHandleList(), request.getText(), alreadyExist, request.getUserHandle(), passcodeManagement);
 			}
 		} else {
 			logDebug("It's a chat");

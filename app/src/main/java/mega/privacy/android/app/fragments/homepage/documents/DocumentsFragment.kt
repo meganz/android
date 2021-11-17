@@ -489,14 +489,14 @@ class DocumentsFragment : Fragment(), HomepageSearchable {
     /**
      * Hides the fabButton
      */
-    private fun hideFabButton() {
+    fun hideFabButton() {
         binding.addFabButton.hide()
     }
 
     /**
      * Shows the fabButton
      */
-    private fun showFabButton() {
+    fun showFabButton() {
         binding.addFabButton.show()
     }
 

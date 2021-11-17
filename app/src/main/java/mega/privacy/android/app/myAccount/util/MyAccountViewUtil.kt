@@ -73,6 +73,8 @@ object MyAccountViewUtil {
                 viewModel.getTotalTransfer()
             )
         }
+
+        root.post { checkImagesOrProgressBarVisibility(viewModel.isFreeAccount()) }
     }
 
     /**
@@ -97,6 +99,8 @@ object MyAccountViewUtil {
         transferProgress.text =
             if (viewModel.getUsedTransfer().isEmpty()) gettingInfo
             else viewModel.getUsedTransfer()
+
+        root.post { checkImagesOrProgressBarVisibility(false) }
     }
 
     /**
@@ -214,4 +218,25 @@ object MyAccountViewUtil {
             )
         }
     }
+
+    /**
+     * Checks if should show the images of storage and transfer in case of business accounts
+     * and the ProgressBars in case of non business accounts.
+     * If some of the text storageProgress, storageLabel, transferProgress or transferLabel
+     * occupies more than one line, then they should be hidden.
+     *
+     * @param isFreeAccount True if is a free account, false otherwise.
+     */
+    private fun MyAccountUsageContainerBinding.checkImagesOrProgressBarVisibility(isFreeAccount: Boolean){
+        val visible = when {
+            isFreeAccount -> storageProgress.lineCount == 1 && storageLabel.lineCount == 1
+            else -> storageProgress.lineCount == 1 && storageLabel.lineCount == 1
+                    && transferProgress.lineCount == 1 && transferLabel.lineCount == 1
+        }
+
+        storageProgressLayout.isVisible = visible
+        transferProgressLayout.isVisible = visible
+    }
+
+
 }

@@ -8,8 +8,6 @@
     <string name="prolite_account">Pro Lite</string>
     <!-- Name of the MEGA PDF Viewer. Keep uppercase. -->
     <string name="pdf_app_name">Penampil MEGA PDF</string>
-    <!-- Showing progress of elements. Example: 2 of 10. -->
-    <string name="general_x_of_x">dari</string>
     <!-- Answer for confirmation dialog. -->
     <string name="general_yes">Ya</string>
     <!-- Answer for confirmation dialog. -->
@@ -570,8 +568,6 @@
     <string name="number_contact_not_removed">%d kontak tidak dihapus</string>
     <!-- success message when sharing a file with multiple contacts -->
     <string name="number_contact_file_shared_correctly">Folder berhasil dibagikan dengan %d kontak</string>
-    <!-- error message when sharing a file with multiple contacts -->
-    <string name="number_contact_file_not_shared_">File tidak dapat dibagikan dengan %d kontak</string>
     <!-- success message when sharing multiple files -->
     <string name="number_correctly_shared">%d folder berhasil dibagikan</string>
     <!-- error message when sharing multiple files -->
@@ -649,7 +645,7 @@
     <!-- error message while browsing the local filesystem -->
     <string name="error_io_problem">Masalah file system</string>
     <!-- error message while browsing the local filesystem -->
-    <string name="general_error">Terjadi kesalahan saat menelusuri file lokal.</string>
+    <string name="general_error">Terjadi error saat menjalankan aksi</string>
     <!-- title of the image gallery -->
     <string name="full_screen_image_viewer_label">Penampil gambar</string>
     <!-- Headline for the amount of storage space is used -->
@@ -1114,7 +1110,7 @@
     <!-- Message to promote PRO accounts -->
     <string name="get_pro_account">Kembangkan cloud Anda.[A]Dapatkan peningkatan penyimpanan dan kuota transfer dengan akun Pro.</string>
     <!-- success message when the MasterKey file has been downloaded -->
-    <string name="toast_master_key">Kunci Pemulihan akun MEGA telah disimpan ke: %1s.[A] Anda dapat menemukan file dengan Kunci Pemulihan anda di bagian Offline.[A]Catatan: karena file dengan Kunci Pemulihan anda akan dihapus saat anda logout, harap simpan di tempat yang aman di luar akun MEGA anda.</string>
+    <string name="toast_master_key">Kunci Pemulihan akun MEGA telah disimpan ke: %1s. [A]Anda dapat menemukan file dengan Kunci Pemulihan anda di bagian Disimpan untuk Offline.[/A]Catatan: karena file dengan Kunci Pemulihan anda akan dihapus saat anda keluar, harap simpan di tempat yang aman di luar akun MEGA anda .</string>
     <!-- Error shown when the user tries to change his mail to one that is already used -->
     <string name="mail_already_used">Alamat e-mail ini telah digunakan. Silakan gunakan alamat email lain.</string>
     <!-- Error shown when the user tries to change his mail while the user has already requested a confirmation link for that email address -->
@@ -1467,7 +1463,7 @@
     <string name="title_message_uploading_options">Mengunggah lampiran</string>
     <!-- message shown when a chat has no messages -->
     <string name="no_conversation_history">Tidak ada riwayat percakapan</string>
-    <!-- title of confirmation alert before removing a contact, Plural -->
+    <!-- Text to indicate that one participant is typing or multiple participants are typing at the same time in a chat room. The "%1$s" placeholder is to put the name(s) of the participant(s). The [A][/A] format marks are to put the text in a different color. -->
     <plurals name="user_typing">
         <item quantity="other">%1$s [A]sedang mengetik..[/A]</item>
     </plurals>
@@ -1876,8 +1872,6 @@
     <string name="title_regitration">Bonus pendaftaran</string>
     <!-- title of the section for install a mobile app bonuses in achivements section (maximum 24 chars) -->
     <string name="title_install_desktop">Dapatkan Aplikasi Desktop MEGA</string>
-    <!-- title of the section for base quota in achivements section -->
-    <string name="title_base_quota">Kuota dasar akun</string>
     <!-- Text that indicates that no pictures have been uploaded to the Camera Uploads section -->
     <string name="camera_uploads_empty">Tidak ada media pada Upload Kamera</string>
     <!-- indicates the number of days left related to a achievement -->
@@ -2230,10 +2224,12 @@
     <string name="settings_video_upload_quality">Kualitas video</string>
     <!-- Text shown when the user refuses to permit the storage permission when enable camera upload -->
     <string name="on_refuse_storage_permission">Unggah Kamera perlu mengakses foto dan media lain di perangkat Anda.  Silakan buka halaman pengaturan dan berikan izin.</string>
-    <!-- the options for the option on setting to set up the quality of multimedia files uploaded to the chat, the options of medium quality multimedia file to  upload. -->
+    <!-- Available options for the setting to set up the quality of multimedia files uploaded to the chat or the Camera Uploads -->
     <string-array name="settings_chat_upload_quality_entries">
-        <item>Kualitas asli</item>
-        <item>Kualitas menengah</item>
+        <item>Rendah</item>
+        <item>Menengah</item>
+        <item>Tinggi</item>
+        <item>Original</item>
     </string-array>
     <!-- Title of the notification for a missed call -->
     <string name="missed_call_notification_title">Panggilan tidak terjawab</string>
@@ -2523,10 +2519,6 @@
     <string name="context_no_restored">Terjadi kesalahan. Barang tidak dipulihkan.</string>
     <!-- menu item from contact section to send a message to a contact -->
     <string name="context_send_message">Kirim Pesan</string>
-    <!-- Message shown when a contact is successfully sent to several chats, more contacts -->
-    <plurals name="plural_contact_sent_to_chats">
-        <item quantity="other">Kontak yang dikirim ke obrolan berhasil</item>
-    </plurals>
     <!-- Error message on opening a MEGAdrop folder link -->
     <string name="error_MEGAdrop_not_supported">Folder MEGAdrop belum didukung</string>
     <!-- Pre overquota error dialog when trying to copy or import a file -->
@@ -3384,7 +3376,7 @@
     <!-- Text informing user that their account has been suspended -->
     <string name="account_temporarily_suspended">Akun anda telah dikunci sementara untuk keselamatan anda.</string>
     <!-- Text informing user has to follow the steps of an email to unlock their account -->
-    <string name="verify_email_and_follow_steps">[A]Harap verifikasi alamat email anda[/A] dan ikuti langkah-langkah  dalam email MEGA untuk membuka kunci akun anda.</string>
+    <string name="verify_email_and_follow_steps">Silakan ikuti langkah-langkah di [A]email verifikasi[/A]untuk membuka kunci akun anda .</string>
     <!-- Question which takes the user to a help screen -->
     <string name="why_am_i_seeing_this">Mengapa saya melihat ini?</string>
     <!-- Label of a button which action is resend an email -->
@@ -3493,7 +3485,7 @@
     <string name="label_verify_credentials">Verifikasi kredential</string>
     <!-- Label to indicate that contact’s credentials are not verified. -->
     <string name="label_not_verified">Tidak diverifikasi</string>
-    <!-- Action indicating something was verified. -->
+    <!-- Label indicating the authenticity credentials of a contact have been verified -->
     <string name="label_verified">Ter-verifikasi</string>
     <!-- ”Verify user” dialog title -->
     <string name="authenticity_credentials_label">Kredensial Autentikasi</string>
@@ -3580,7 +3572,7 @@
     <!-- Shows the error when the limit of reactions per message is reached and a user tries to add one more. Keep the placeholder because is to show limit number in runtime. -->
     <string name="limit_reaction_per_message">Pesan ini telah mencapai batas maksimum %d reaksi.</string>
     <!-- System message displayed to all chat participants when one of them enables retention history -->
-    <string name="retention_history_changed_by">[A]%1$s[/A][B] mengubah waktu pembersihan pesan menjadi [/B][A]  %2$s[/A][B]. [/B]</string>
+    <string name="retention_history_changed_by">[A]%1$s[/A][B] mengubah waktu pembersihan pesan menjadi [/B][A]%2$s[/A][B].[/B]</string>
     <!-- Title of the section to clear the chat content in the Manage chat history screen -->
     <string name="title_properties_clear_chat_history">Hapus riwayat ngobrol</string>
     <!-- System message that is shown to all chat participants upon disabling the Retention history -->
@@ -3642,7 +3634,7 @@
     <!-- Title indicating the select mode is enabled and ready to select transfers on Transfers section, In progress tab -->
     <string name="title_select_transfers">Pilih transfer</string>
     <!-- Error shown to inform the priority change of a transfer failed. Please don’t remove the place holder, it’s to set the name of the transfer. Example: The priority change of the transfer “video.mp4” failed. -->
-    <string name="change_of_transfer_priority_failed">Perubahan prioritas transfer ”%1$s” gagal.</string>
+    <string name="change_of_transfer_priority_failed">Tidak dapat mengubah prioritas transfer “%1$s”</string>
     <!-- Title option to send separated the link and decryption key -->
     <string name="option_send_decryption_key_separately">Kirim kunci dekripsi secara terpisah</string>
     <!-- Explanation option to send separated the link and decryption key -->
@@ -3949,6 +3941,8 @@
     <plurals name="get_links">
         <item quantity="other">Dapatkan Tautan</item>
     </plurals>
+    <!-- Ask for confirmation before clear offline files -->
+    <string name="clear_offline_confirmation">Hapus semua file offline?</string>
     <!-- Banner text when the call is in progress and I'm the only participant. -->
     <string name="banner_alone_on_the_call">Anda sendirian di sini</string>
     <!-- Item menu option upon right click on meeting. -->
@@ -4083,4 +4077,6 @@
     <string name="meeting_me_text_bracket">%1s [A](saya)[/A]</string>
     <!-- Menu item to change from thumbnail view to main view in meeting-->
     <string name="main_view">Tampilan utama</string>
+    <!-- Warning in Offline section alerting all the Offline files will be deleted after logout. -->
+    <string name="offline_warning">Keluar akan menghapus konten offline anda.</string>
 </resources>

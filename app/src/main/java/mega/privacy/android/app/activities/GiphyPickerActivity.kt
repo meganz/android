@@ -18,7 +18,6 @@ import androidx.core.text.HtmlCompat
 import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
-import kotlinx.android.synthetic.main.bottom_sheet_upload.*
 import mega.privacy.android.app.R
 import mega.privacy.android.app.adapters.GiphyAdapter
 import mega.privacy.android.app.databinding.ActivityGiphyBinding
@@ -41,6 +40,8 @@ import mega.privacy.android.app.utils.Util.*
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
+import java.util.*
+import kotlin.collections.ArrayList
 
 class GiphyPickerActivity : PasscodeActivity(), GiphyInterface {
 
@@ -89,9 +90,13 @@ class GiphyPickerActivity : PasscodeActivity(), GiphyInterface {
         setContentView(binding.root)
 
         setSupportActionBar(binding.giphyToolbar)
-        val actionBar = supportActionBar
-        actionBar?.setDisplayHomeAsUpEnabled(true)
-        binding.giphyToolbar.title = getString(R.string.search_giphy_title)
+
+        supportActionBar?.apply {
+            setDisplayHomeAsUpEnabled(true)
+            title = StringResourcesUtils.getString(R.string.search_giphy_title)
+                .toUpperCase(Locale.getDefault())
+        }
+
         binding.giphyToolbar.setOnClickListener { searchMenuItem?.expandActionView() }
 
         screenOrientation = resources.configuration.orientation
