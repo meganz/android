@@ -212,7 +212,9 @@ open class MediaPlayerService : LifecycleService(), LifecycleObserver {
             applicationContext,
             PLAYBACK_NOTIFICATION_ID,
             NOTIFICATION_CHANNEL_AUDIO_PLAYER_ID
-        ).setMediaDescriptionAdapter(object : PlayerNotificationManager.MediaDescriptionAdapter {
+        ).setChannelNameResourceId(R.string.audio_player_notification_channel_name)
+            .setChannelDescriptionResourceId(0)
+            .setMediaDescriptionAdapter(object : PlayerNotificationManager.MediaDescriptionAdapter {
             override fun getCurrentContentTitle(player: Player): String {
                 val meta = _metadata.value ?: return ""
                 return meta.title ?: meta.nodeName
