@@ -5,6 +5,7 @@ import android.content.Intent
 interface ActivityLauncher {
     fun launchActivity(intent: Intent)
 
+    @Deprecated("Migrate to registerForActivityResult()")
     fun launchActivityForResult(intent: Intent, requestCode: Int)
 
     companion object {

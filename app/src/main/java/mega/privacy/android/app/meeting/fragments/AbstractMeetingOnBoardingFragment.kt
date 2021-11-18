@@ -169,6 +169,7 @@ abstract class AbstractMeetingOnBoardingFragment : MeetingBaseFragment() {
         binding.btnStartJoinMeeting.layoutParams = layoutParams
     }
 
+    @Suppress("deprecation") // TODO Migrate to registerForActivityResult()
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
         binding.sharedviewmodel = sharedModel
