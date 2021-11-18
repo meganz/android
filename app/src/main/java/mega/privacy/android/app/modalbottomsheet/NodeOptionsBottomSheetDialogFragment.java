@@ -44,13 +44,12 @@ import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.FileUtil.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.MegaApiUtils.*;
+import static mega.privacy.android.app.utils.MegaNodeDialogUtil.ACTION_BACKUP_COPY;
+import static mega.privacy.android.app.utils.MegaNodeDialogUtil.ACTION_BACKUP_MOVE;
 import static mega.privacy.android.app.utils.MegaNodeDialogUtil.ACTION_BACKUP_SHARE;
 import static mega.privacy.android.app.utils.MegaNodeDialogUtil.ACTION_BACKUP_SHARE_CHAT;
 import static mega.privacy.android.app.utils.MegaNodeDialogUtil.ACTION_BACKUP_SHARE_FOLDER;
-import static mega.privacy.android.app.utils.MegaNodeDialogUtil.BACKUP_DEVICE;
 import static mega.privacy.android.app.utils.MegaNodeDialogUtil.BACKUP_NONE;
-import static mega.privacy.android.app.utils.MegaNodeDialogUtil.BACKUP_ROOT;
-import static mega.privacy.android.app.utils.MegaNodeDialogUtil.BACKUP_SUBFOLDER;
 import static mega.privacy.android.app.utils.MegaNodeUtil.*;
 import static mega.privacy.android.app.utils.OfflineUtils.*;
 import static mega.privacy.android.app.utils.StringResourcesUtils.getQuantityString;
@@ -1143,7 +1142,7 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
                 break;
 
             case R.id.option_backup_move_layout:
-                ((ManagerActivityLollipop) requireActivity()).chooseLocationToMoveNodes(handleList);
+                ((ManagerActivityLollipop) requireActivity()).chooseLocationToPutNodes(handleList, ACTION_BACKUP_MOVE);
                 dismissAllowingStateLoss();
                 break;
 

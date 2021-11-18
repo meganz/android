@@ -57,6 +57,7 @@ import mega.privacy.android.app.utils.MegaNodeDialogUtil.BACKUP_DEVICE
 import mega.privacy.android.app.utils.MegaNodeDialogUtil.BACKUP_NONE
 import mega.privacy.android.app.utils.MegaNodeDialogUtil.BACKUP_ROOT
 import mega.privacy.android.app.utils.MegaNodeDialogUtil.BACKUP_SUBFOLDER
+import mega.privacy.android.app.utils.MegaNodeDialogUtil.BACKUP_SUB_DEVICE_FOLDER
 import mega.privacy.android.app.utils.StringResourcesUtils.getQuantityString
 import mega.privacy.android.app.utils.StringResourcesUtils.getString
 import mega.privacy.android.app.utils.TextUtil.isTextEmpty
@@ -513,7 +514,10 @@ object MegaNodeUtil {
             R.drawable.backup
         } else if (node.parentHandle == myBackupHandle) {
             getMyBackupSubFolderIcon(node)
-        } else {
+        } else if (BACKUP_SUBFOLDER == checkBackupNodeTypeByHandle(MegaApplication.getInstance().megaApi,node)
+            || BACKUP_SUB_DEVICE_FOLDER == checkBackupNodeTypeByHandle(MegaApplication.getInstance().megaApi,node)) {
+            R.drawable.ic_folder_outgoing
+        } else{
             R.drawable.ic_folder_list
         }
     }
@@ -1763,7 +1767,6 @@ object MegaNodeUtil {
             if (handleList.size > 0) {
                 val handle: Long = handleList[0]
                 var p: MegaNode = megaApi.getNodeByHandle(handle)
-
                 if(p.handle == myBackupHandle){
                     return BACKUP_ROOT
                 }
@@ -1772,9 +1775,16 @@ object MegaNodeUtil {
                 if(p.handle == myBackupHandle){
                     return BACKUP_DEVICE
                 }
+
+                var index = 0
                 while (megaApi.getParentNode(p) != null) {
                     p = megaApi.getParentNode(p)
+                    index ++
+
                     if(p.handle == myBackupHandle){
+                        if(index == 1){
+                            return BACKUP_SUB_DEVICE_FOLDER
+                        }
                         return BACKUP_SUBFOLDER
                     }
                 }
@@ -1798,13 +1808,21 @@ object MegaNodeUtil {
             if(p.handle == myBackupHandle){
                 return BACKUP_ROOT
             }
+
             p = megaApi.getParentNode(p)
             if(p.handle == myBackupHandle){
                 return BACKUP_DEVICE
             }
+
+            var index = 0
             while (megaApi.getParentNode(p) != null) {
                 p = megaApi.getParentNode(p)
+                index ++
+
                 if(p.handle == myBackupHandle){
+                    if(index == 1){
+                        return BACKUP_SUB_DEVICE_FOLDER
+                    }
                     return BACKUP_SUBFOLDER
                 }
             }

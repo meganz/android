@@ -4217,9 +4217,11 @@
     <!-- The title of warning dialog for single folder deleting -->
     <string name="backup_remove_multiple_folder_title">Move backup folders to Rubbish Bin</string>
     <!-- The confirm information of warning dialog for deleting -->
-    <string name="backup_remove_confirm">Please type \"Disable backup\" to confirm this action</string>
-    <!-- Confirm text for removing -->
-    <string name="backup_disable_confirm_text">Disable backup</string>
+    <string name="backup_disable_confirm">Disable backup</string>
+    <!-- The confirm information of warning dialog for moving "My backup" -->
+    <string name="backup_move_confirm">Move backup</string>
+    <!-- The confirm information of warning dialog for deleting -->
+    <string name="backup_action_confirm">Please type \"%1s\" to confirm this action</string>
     <!-- when checking the input -->
     <string name="error_backup_confirm_dont_match">text entered does not match</string>
     <!-- The title of confirm dialog for adding item to "My backup" -->

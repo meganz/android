@@ -36,6 +36,7 @@
             android:src="@drawable/il_serious_warning" />
 
         <TextView
+            android:id="@+id/confirm_string"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
@@ -43,7 +44,7 @@
             android:lineSpacingMultiplier="1.27"
             android:paddingStart="10dp"
             android:paddingEnd="10dp"
-            android:text="@string/backup_remove_confirm"
+            android:text=""
             android:textAlignment="textStart"
             android:textColor="@color/grey_087_white_087"
             android:textSize="16sp" />
@@ -53,7 +54,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="44dp"
-            android:hint="@string/backup_disable_confirm_text"
+            android:hint="@string/backup_disable_confirm"
             android:theme="@style/Widget.Mega.TextInputLayout"
             app:errorEnabled="true">
 
