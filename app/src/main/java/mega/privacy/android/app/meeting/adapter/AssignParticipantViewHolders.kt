@@ -10,11 +10,19 @@ import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.utils.Util
 import org.jetbrains.anko.displayMetrics
 
+/**
+ * The view holder for the participant view on the Make moderator screen.
+ *
+ * @param sharedModel   MeetingActivityViewModel, the activity view model related to meetings
+ * @param select        Callback to be called when participant item is clicked
+ * @param binding       ItemParticipantChatListBinding
+ */
 class AssignParticipantViewHolder(
     private val sharedModel: MeetingActivityViewModel,
     private val select: ((Int) -> Unit),
     private val binding: ItemParticipantChatListBinding
 ) : RecyclerView.ViewHolder(binding.root) {
+
     fun bind(participant: Participant) {
         binding.participantListName.text = participant.name
 
@@ -49,6 +57,9 @@ class AssignParticipantViewHolder(
     }
 }
 
+/*
+ * This class is in charge of managing the participants that are selected to change their permissions to MODERATOR.
+ */
 class SelectedParticipantViewHolder(
     private val sharedModel: MeetingActivityViewModel,
     private val delete: (Participant) -> Unit,

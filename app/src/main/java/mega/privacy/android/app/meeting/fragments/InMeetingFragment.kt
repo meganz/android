@@ -2819,12 +2819,8 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
         super.onDestroy()
 
         bannerAnotherCallLayout.isVisible = false
-        bannerParticipant?.let {
-            it.isVisible = false
-        }
-        bannerInfo?.let {
-            it.isVisible = false
-        }
+        bannerParticipant?.isVisible = false
+        bannerInfo?.isVisible = false
         bannerMuteLayout.isVisible = false
 
         removeUI()

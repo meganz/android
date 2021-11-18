@@ -2215,12 +2215,7 @@ class InMeetingViewModel @ViewModelInject constructor(
      *
      * @return True, if it's on. False, if it's off
      */
-    fun isLocalCameraOn(): Boolean {
-        getCall()?.let {
-            if (it.hasLocalVideo()) return true
-        }
-        return false
-    }
+    fun isLocalCameraOn(): Boolean = getCall()?.hasLocalVideo() ?: false
 
     /**
      * Method to control when I am a guest and my participation in the meeting ends

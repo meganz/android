@@ -105,7 +105,7 @@ class MeetingParticipantBottomSheetDialogFragment : BaseBottomSheetDialogFragmen
 
         listenAction(binding.makeModerator) {
             // Make moderator
-            sharedViewModel.updateChatPermissions(
+            sharedViewModel.giveModeratorPermissions(
                 participantItem.peerId
             )
         }

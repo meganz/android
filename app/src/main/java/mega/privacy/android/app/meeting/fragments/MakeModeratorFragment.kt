@@ -91,11 +91,7 @@ class MakeModeratorFragment : MeetingBaseFragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        setupView()
-
         binding = MakeModeratorFragmentBinding.inflate(layoutInflater)
-        binding.btCancel.setOnClickListener { cancel() }
-        binding.btOk.setOnClickListener { makeModerators() }
         return binding.root
     }
 
@@ -108,6 +104,8 @@ class MakeModeratorFragment : MeetingBaseFragment() {
                 chatId = it
             }
         }
+
+        setupView()
         initLiveEvent()
 
         inMeetingViewModel.participants.observe(viewLifecycleOwner) { participants ->
@@ -117,7 +115,6 @@ class MakeModeratorFragment : MeetingBaseFragment() {
                     .toMutableList())
             }
         }
-        initRecyclerview()
     }
 
     /**
@@ -137,6 +134,9 @@ class MakeModeratorFragment : MeetingBaseFragment() {
      * Method for initialising UI elements
      */
     private fun setupView() {
+        binding.btCancel.setOnClickListener { cancel() }
+        binding.btOk.setOnClickListener { makeModerators() }
+
         val root = meetingActivity.binding.root
         root.apply {
             setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.white_black))
@@ -180,6 +180,7 @@ class MakeModeratorFragment : MeetingBaseFragment() {
         }
 
         setHasOptionsMenu(true)
+        initRecyclerview()
     }
 
     private fun initRecyclerview() {
@@ -303,7 +304,7 @@ class MakeModeratorFragment : MeetingBaseFragment() {
     private fun makeModerators() {
         // Get the list and assign the user in the list to moderator
         selectedParticipants.forEach {
-            sharedModel.updateChatPermissions(it.peerId)
+            sharedModel.giveModeratorPermissions(it.peerId)
         }
 
         disableLocalCamera()

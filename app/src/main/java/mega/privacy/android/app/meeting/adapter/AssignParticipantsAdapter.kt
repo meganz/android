@@ -6,6 +6,12 @@ import androidx.recyclerview.widget.ListAdapter
 import mega.privacy.android.app.databinding.ItemParticipantChatListBinding
 import mega.privacy.android.app.meeting.activity.MeetingActivityViewModel
 
+/**
+ * RecyclerView's ListAdapter to show participants list.
+ *
+ * @property sharedModel  MeetingActivityViewModel, the activity view model related to meetings
+ * @property select       Callback to be called when participant item is clicked
+ */
 class AssignParticipantsAdapter(
     private val sharedModel: MeetingActivityViewModel,
     private val select: ((Int) -> Unit)

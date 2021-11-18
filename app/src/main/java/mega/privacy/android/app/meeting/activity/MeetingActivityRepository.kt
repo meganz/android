@@ -209,15 +209,15 @@ class MeetingActivityRepository @Inject constructor(
      * @param peerId user handle of participant
      */
     fun getAvatarBitmapByPeerId(peerId: Long): Bitmap? {
-        var bitmap: Bitmap?
         val mail = ChatController(context).getParticipantEmail(peerId)
-
         val userHandleString = MegaApiAndroid.userHandleToBase64(peerId)
         val myUserHandleEncoded = MegaApiAndroid.userHandleToBase64(megaApi.myUserHandleBinary)
-        bitmap = if (userHandleString == myUserHandleEncoded) {
-            AvatarUtil.getAvatarBitmap(mail)
-        } else {
-            if (TextUtil.isTextEmpty(mail)) AvatarUtil.getAvatarBitmap(userHandleString) else AvatarUtil.getUserAvatar(
+        var bitmap = when {
+            userHandleString == myUserHandleEncoded -> {
+                AvatarUtil.getAvatarBitmap(mail)
+            }
+            TextUtil.isTextEmpty(mail) -> AvatarUtil.getAvatarBitmap(userHandleString)
+            else -> AvatarUtil.getUserAvatar(
                 userHandleString,
                 mail
             )
@@ -247,7 +247,7 @@ class MeetingActivityRepository @Inject constructor(
      * @param userHandle user handle of a participant
      * @param listener MegaChatRequestListenerInterface
      */
-    fun updateChatPermissions(
+    fun giveModeratorPermissions(
         chatId: Long,
         userHandle: Long,
         listener: MegaChatRequestListenerInterface?
