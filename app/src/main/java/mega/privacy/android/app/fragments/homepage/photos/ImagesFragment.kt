@@ -118,6 +118,9 @@ class ImagesFragment : BaseBindingFragmentKt<ImagesViewModel, FragmentImagesBind
         }
     }
 
+    /**
+     * handle the zoom menu item status, which enable/disable and color
+     */
     private fun handleZoomMenuItemStatus() {
         val canZoomOut = viewModel.zoomManager.canZoomOut()
         val canZoomIn = viewModel.zoomManager.canZoomIn()
@@ -134,6 +137,9 @@ class ImagesFragment : BaseBindingFragmentKt<ImagesViewModel, FragmentImagesBind
         }
     }
 
+    /**
+     * handle toolbar menu icon is enable, [menuItemId] is the menuItem id,[isEnable] `true` is enable, `false` is disable.
+     */
     private fun handleEnableToolbarMenuIcon(menuItemId: Int, isEnable: Boolean) {
         val toolbar = binding.layoutTitleBar.toolbar
         val menuItem = toolbar.menu.findItem(menuItemId)
@@ -145,6 +151,10 @@ class ImagesFragment : BaseBindingFragmentKt<ImagesViewModel, FragmentImagesBind
         menuItem.isEnabled = isEnable
     }
 
+    /**
+     * handle zoom menu item icons showing status, [mShouldShow] `true` is showing, `false` is hiding,
+     * `null` will invoke fun shouldShowZoomMenuItem to check is should showing
+     */
     private fun handleZoomOptionsMenuUpdate(mShouldShow: Boolean? = null) {
         val shouldShow = mShouldShow ?: shouldShowZoomMenuItem()
         val toolbar = binding.layoutTitleBar.toolbar

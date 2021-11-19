@@ -571,6 +571,11 @@ public class PhotosFragment extends BaseZoomFragment implements CUGridViewAdapte
         }
     }
 
+    /**
+     * this method handle is show menu.
+     * @return false, when no photo here or in the action mode or not in all view, then will hide the menu.
+     * Otherwise, true, show menu.
+     */
     private boolean isShowMenu() {
         boolean emptyAdapter = gridAdapter == null || gridAdapter.getItemCount() <= 0;
         if (emptyAdapter || mActionMode != null || selectedView != ALL_VIEW){
