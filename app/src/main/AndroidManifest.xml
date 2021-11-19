@@ -131,7 +131,9 @@
             android:name="OpenLinkActivity"
             android:launchMode="singleTask"
             android:screenOrientation="portrait"
-            android:exported="true">
+            android:exported="true"
+            android:autoVerify="true">
+
             <intent-filter android:autoVerify="true">
                 <action android:name="android.intent.action.VIEW" />
 
@@ -153,7 +155,8 @@
 
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
-                <data android:host="mega.nz" android:scheme="https" > </data>
+                <data android:scheme="https"/>
+                <data android:host="mega.nz"/>
             </intent-filter>
 
             <intent-filter android:autoVerify="true">
