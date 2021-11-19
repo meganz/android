@@ -516,7 +516,7 @@ object MegaNodeUtil {
             getMyBackupSubFolderIcon(node)
         } else if (BACKUP_SUBFOLDER == checkBackupNodeTypeByHandle(MegaApplication.getInstance().megaApi,node)
             || BACKUP_SUB_DEVICE_FOLDER == checkBackupNodeTypeByHandle(MegaApplication.getInstance().megaApi,node)) {
-            R.drawable.ic_folder_outgoing
+            R.drawable.ic_folder_backup
         } else{
             R.drawable.ic_folder_list
         }
