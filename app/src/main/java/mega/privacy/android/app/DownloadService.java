@@ -25,20 +25,17 @@ import android.os.PowerManager.WakeLock;
 import android.widget.Toast;
 import androidx.core.app.NotificationCompat;
 import androidx.core.content.ContextCompat;
-import androidx.core.content.FileProvider;
 import android.widget.RemoteViews;
 
 import io.reactivex.rxjava3.core.Single;
 import io.reactivex.rxjava3.disposables.CompositeDisposable;
 import io.reactivex.rxjava3.schedulers.Schedulers;
-import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -47,8 +44,6 @@ import mega.privacy.android.app.components.transferWidget.TransfersManagement;
 import mega.privacy.android.app.fragments.offline.OfflineFragment;
 import mega.privacy.android.app.lollipop.LoginActivityLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
-import mega.privacy.android.app.lollipop.PdfViewerActivityLollipop;
-import mega.privacy.android.app.lollipop.ZipBrowserActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.ChatSettings;
 import mega.privacy.android.app.notifications.TransferOverQuotaNotification;
 import mega.privacy.android.app.objects.SDTransfer;
@@ -107,6 +102,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 	public static final String EXTRA_ZIP_FILE_TO_OPEN = "FILE_TO_OPEN";
 	public static final String EXTRA_OPEN_FILE = "OPEN_FILE";
 	public static final String EXTRA_CONTENT_URI = "CONTENT_URI";
+	public static final String EXTRA_DOWNLOAD_BY_TAP = "EXTRA_DOWNLOAD_BY_TAP";
 
 	private static int errorEBloqued = 0;
 	private int errorCount = 0;
@@ -115,8 +111,8 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 	private boolean isForeground = false;
 	private boolean canceled;
 
-	private String pathFileToOpen;
 	private boolean openFile = true;
+	private boolean downloadByTap;
 	private String type = "";
 	private boolean isOverquota = false;
 	private long downloadedBytesToOverquota = 0;
@@ -341,6 +337,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
         String url = intent.getStringExtra(EXTRA_URL);
         boolean isFolderLink = intent.getBooleanExtra(EXTRA_FOLDER_LINK, false);
         openFile = intent.getBooleanExtra(EXTRA_OPEN_FILE, true);
+        downloadByTap = intent.getBooleanExtra(EXTRA_DOWNLOAD_BY_TAP, false);
 		type = intent.getStringExtra(EXTRA_TRANSFER_TYPE);
 
 		Uri contentUri = null;
@@ -419,13 +416,6 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 		} else {
 			currentDocument = megaApi.getNodeByHandle(hash);
 		}
-
-        if(intent.getStringExtra(EXTRA_ZIP_FILE_TO_OPEN)!=null){
-            pathFileToOpen = intent.getStringExtra(EXTRA_ZIP_FILE_TO_OPEN);
-        }
-        else{
-            pathFileToOpen=null;
-        }
 
         if(url != null){
 			logDebug("Public node");
@@ -573,7 +563,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 		if(total <= 0){
 			logDebug("onQueueComplete: reset total downloads");
 			// When download a single file by tapping it, and auto play is enabled.
-            if (megaApi.getTotalDownloads() == 1 && Boolean.parseBoolean(dbH.getAutoPlayEnabled()) && autoPlayInfo != null) {
+            if (megaApi.getTotalDownloads() == 1 && Boolean.parseBoolean(dbH.getAutoPlayEnabled()) && autoPlayInfo != null && downloadByTap) {
                 sendBroadcast(new Intent(BROADCAST_ACTION_INTENT_SHOWSNACKBAR_TRANSFERS_FINISHED)
                         .putExtra(TRANSFER_TYPE, DOWNLOAD_TRANSFER_OPEN)
                         .putExtra(NODE_NAME, autoPlayInfo.getNodeName())
@@ -720,17 +710,10 @@ public class DownloadService extends Service implements MegaTransferListenerInte
                     autoPlayInfo = new AutoPlayInfo(currentDocument.getName(), currentDocument.getHandle(), currentFile.getAbsolutePath(), true);
 
 					logDebug("Both openFile and autoPlayEnabled are true");
-					Boolean externalFile;
-					if (!currentFile.getAbsolutePath().contains(Environment.getExternalStorageDirectory().getPath())){
-						externalFile = true;
-					}
-					else {
-						externalFile = false;
-					}
-
 					boolean fromMV = false;
 					if (fromMediaViewers.containsKey(handle)){
-						fromMV = fromMediaViewers.get(handle);
+						Boolean result = fromMediaViewers.get(handle);
+						fromMV = result != null && result;
 					}
 
 

@@ -854,9 +854,7 @@ public class FileBrowserFragmentLollipop extends RotatableFragment{
                     MegaNodeUtil.launchActionView(context, node.getName(), possibleLocalFile, (ManagerActivityLollipop) context, (ManagerActivityLollipop) context);
                 }
             } else {
-                ((ManagerActivityLollipop) context).saveNodesToDevice(
-                        Collections.singletonList(node),
-                        true, false, false, false);
+                ((ManagerActivityLollipop) context).saveNodeByTap(Collections.singletonList(node));
             }
         }
     }

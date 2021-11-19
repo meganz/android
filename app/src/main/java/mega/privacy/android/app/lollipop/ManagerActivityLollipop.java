@@ -7393,6 +7393,16 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 		nodeSaver.saveNodes(nodes, highPriority, isFolderLink, fromMediaViewer, fromChat);
 	}
 
+    /**
+     * Upon a node is tapped, if it cannot be previewed in-app,
+     * then download it first, this download will be marked as "download by tap".
+     *
+     * @param nodes A list only has one node.
+     */
+    public void saveNodeByTap(List<MegaNode> nodes) {
+        nodeSaver.saveNodes(nodes, false, false, false, false, false, true);
+    }
+
 	/**
 	 * Save nodes to gallery.
 	 *
