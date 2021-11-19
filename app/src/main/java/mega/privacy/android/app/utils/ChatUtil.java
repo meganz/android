@@ -110,7 +110,7 @@ public class ChatUtil {
     private static final int RETENTION_TIME_DIALOG_OPTION_WEEK = 2;
     private static final int RETENTION_TIME_DIALOG_OPTION_MONTH = 3;
     private static final int RETENTION_TIME_DIALOG_OPTION_CUSTOM = 4;
-    private static final int PADDING_CONTACT_STATUS_ICON = 2;
+    private static final int PADDING_CONTACT_STATUS_ICON = 10;
 
     /**
      * Where is the status icon placed, according to the design,
@@ -582,7 +582,7 @@ public class ChatUtil {
      * @param where            The status icon image resource is different based on the place where it's placed.
      * @param outMetrics       DisplayMetrics
      */
-    public static void setContactStatusParticipantList(int userStatus, TextView participantName, TextView contactStateText, StatusIconLocation where, DisplayMetrics outMetrics) {
+    public static void setContactStatusParticipantList(int userStatus, final EmojiTextView participantName, TextView contactStateText, StatusIconLocation where, DisplayMetrics outMetrics) {
         MegaApplication app = MegaApplication.getInstance();
 
         int statusImageResId = getIconResourceIdByLocation(app.getApplicationContext(), userStatus, where);

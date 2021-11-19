@@ -46,9 +46,8 @@
         android:id="@+id/participant_list_permissions"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="12dp"
+        android:visibility="visible"
         android:layout_marginEnd="12dp"
-        android:background="@null"
         android:src="@drawable/ic_permissions_full_access"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@id/participant_list_three_dots"
@@ -59,10 +58,10 @@
         android:id="@+id/participant_list_audio"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="10dp"
         android:layout_marginEnd="6dp"
         android:background="@null"
         android:visibility="gone"
+        android:src="@drawable/ic_mic_off_grey_red"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@id/participant_list_video"
         app:layout_constraintTop_toTopOf="parent" />
@@ -76,6 +75,7 @@
         android:background="@null"
         android:src="@drawable/ic_video"
         android:visibility="gone"
+        app:layout_goneMarginStart="13dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@id/participant_list_three_dots"
         app:layout_constraintTop_toTopOf="parent" />
@@ -95,9 +95,10 @@
             android:id="@+id/participant_list_name"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginEnd="2dp"
-            android:ellipsize="middle"
+            android:layout_marginEnd="3dp"
+            android:ellipsize="end"
             android:singleLine="true"
+            app:showIcon="true"
             android:textAppearance="?attr/textAppearanceSubtitle1" />
 
         <mega.privacy.android.app.components.MarqueeTextView
