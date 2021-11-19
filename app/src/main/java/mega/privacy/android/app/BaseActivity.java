@@ -47,9 +47,11 @@ import javax.inject.Inject;
 
 import dagger.hilt.android.AndroidEntryPoint;
 import kotlin.Pair;
+import mega.privacy.android.app.components.saver.AutoPlayInfo;
 import mega.privacy.android.app.globalmanagement.MyAccountInfo;
 import mega.privacy.android.app.interfaces.ActivityLauncher;
 import mega.privacy.android.app.interfaces.PermissionRequester;
+import mega.privacy.android.app.interfaces.SnackbarShower;
 import mega.privacy.android.app.listeners.ChatLogoutListener;
 import mega.privacy.android.app.lollipop.LoginActivityLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
@@ -64,6 +66,7 @@ import mega.privacy.android.app.service.iab.BillingManagerImpl;
 import mega.privacy.android.app.service.iar.RatingHandlerImpl;
 import mega.privacy.android.app.smsVerification.SMSVerificationActivity;
 import mega.privacy.android.app.snackbarListeners.SnackbarNavigateOption;
+import mega.privacy.android.app.utils.MegaNodeUtil;
 import mega.privacy.android.app.utils.PermissionUtils;
 import mega.privacy.android.app.utils.ColorUtils;
 import mega.privacy.android.app.utils.StringResourcesUtils;
@@ -95,7 +98,7 @@ import static nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE;
 import java.util.List;
 
 @AndroidEntryPoint
-public class BaseActivity extends AppCompatActivity implements ActivityLauncher, PermissionRequester,
+public class BaseActivity extends AppCompatActivity implements ActivityLauncher, PermissionRequester, SnackbarShower,
         BillingUpdatesListener {
 
     private static final String EXPIRED_BUSINESS_ALERT_SHOWN = "EXPIRED_BUSINESS_ALERT_SHOWN";
@@ -130,6 +133,11 @@ public class BaseActivity extends AppCompatActivity implements ActivityLauncher,
     private boolean isGeneralTransferOverQuotaWarningShown;
     private AlertDialog transferGeneralOverQuotaWarning;
     private Snackbar snackbar;
+
+    /**
+     * Contains the info of a node that to be opened in-app.
+     */
+    private AutoPlayInfo autoPlayInfo;
 
     /**
      * Load the psa in the web browser fragment if the psa is a web one and this activity
@@ -462,22 +470,35 @@ public class BaseActivity extends AppCompatActivity implements ActivityLauncher,
                 return;
             }
 
-            String message = null;
             int numTransfers = intent.getIntExtra(NUMBER_FILES, 1);
+            String message = getResources().getQuantityString(R.plurals.download_finish, numTransfers, numTransfers);
 
             switch (intent.getStringExtra(TRANSFER_TYPE)) {
                 case DOWNLOAD_TRANSFER:
-                    message = getResources().getQuantityString(R.plurals.download_finish, numTransfers, numTransfers);
+                    Util.showSnackbar(baseActivity, message);
                     break;
 
                 case UPLOAD_TRANSFER:
                     message = getResources().getQuantityString(R.plurals.upload_finish, numTransfers, numTransfers);
+                    Util.showSnackbar(baseActivity, message);
+                    break;
+
+                case DOWNLOAD_TRANSFER_OPEN:
+                    autoPlayInfo = new AutoPlayInfo(intent.getStringExtra(NODE_NAME), intent.getLongExtra(NODE_HANDLE, INVALID_VALUE), intent.getStringExtra(NODE_LOCAL_PATH), true);
+                    showSnackbar(OPEN_FILE_SNACKBAR_TYPE, message, MEGACHAT_INVALID_HANDLE);
                     break;
             }
-
-            Util.showSnackbar(baseActivity, message);
         }
     };
+
+    /**
+     * Open the downloaded file.
+     */
+    private void openDownloadedFile() {
+        if(autoPlayInfo != null) {
+            MegaNodeUtil.autoPlayNode(BaseActivity.this, autoPlayInfo, BaseActivity.this,BaseActivity.this);
+        }
+    }
 
     private BroadcastReceiver showSnackbarReceiver = new BroadcastReceiver() {
         @Override
@@ -818,6 +839,14 @@ public class BaseActivity extends AppCompatActivity implements ActivityLauncher,
                 snackbar.setAction(R.string.general_ok, new SnackbarNavigateOption(view.getContext(), type));
                 snackbar.show();
                 break;
+
+            case OPEN_FILE_SNACKBAR_TYPE: {
+                snackbar.setAction(R.string.action_see, (v) -> {
+                    openDownloadedFile();
+                });
+                snackbar.show();
+                break;
+            }
         }
     }
 
@@ -1395,5 +1424,11 @@ public class BaseActivity extends AppCompatActivity implements ActivityLauncher,
 
         updateAccountInfo(this, purchases, myAccountInfo);
         updateSubscriptionLevel(myAccountInfo, dbH, megaApi);
+    }
+
+    @Override
+    public void showSnackbar(int type, @Nullable String content, long chatId) {
+        View rootView = getRootViewFromContext(this);
+        showSnackbar(type, rootView, content, chatId);
     }
 }

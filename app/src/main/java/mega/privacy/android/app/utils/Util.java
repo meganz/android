@@ -1205,7 +1205,7 @@ public class Util {
 		}
 	}
 
-    private static View getRootViewFromContext(Context context) {
+    public static View getRootViewFromContext(Context context) {
         BaseActivity activity = (BaseActivity)context;
         View rootView = null;
         try {
