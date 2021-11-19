@@ -1709,8 +1709,6 @@ public class MegaApplication extends MultiDexApplication implements Application.
 					// Other StrictMode checks that you've previously added.
 					.detectUnsafeIntentLaunch()
 					.penaltyLog()
-					// Consider also adding
-					.penaltyDeath()
 					.build());
 		}
 	}
