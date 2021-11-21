@@ -11046,6 +11046,8 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 	 * This method is used to change the elevation of the AppBarLayout when
 	 * scrolling the RecyclerView
 	 * @param withElevation true if need elevation, false otherwise
+	 * @param toolbar fragment toolbar
+	 * @param abL fragment toolbar layout
 	 */
 	public void changeAppBarElevation(boolean withElevation,MaterialToolbar toolbar,AppBarLayout abL) {
 		changeAppBarElevation(withElevation, ELEVATION_SCROLL,toolbar,abL);
@@ -11058,6 +11060,8 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 	 * @param withElevation true if need elevation, false otherwise
 	 * @param cause for what cause adding/removing elevation. Only if mElevationCause(cause bitmap)
 	 *              is zero will the elevation being eliminated
+	 * @param toolbar fragment toolbar
+	 * @param abL fragment toolbar layout
 	 */
 	public void changeAppBarElevation(boolean withElevation, int cause,MaterialToolbar toolbar,AppBarLayout abL) {
 		if (withElevation) {

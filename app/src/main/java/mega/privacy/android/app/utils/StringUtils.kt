@@ -63,12 +63,12 @@ object StringUtils {
      * @param date String pair, which contains the whole date string.
      * @return Formatted Spanned can be set to TextView.
      */
-    fun formatDateTitle(date: Pair<String?, String?>) : Spanned {
+    fun  Pair<String?, String?>.formatDateTitle() : Spanned {
         var dateText =
-            if (TextUtil.isTextEmpty(date.second)) "[B]" + date.first + "[/B]" else StringResourcesUtils.getString(
+            if (TextUtil.isTextEmpty(this.second)) "[B]" + this.first + "[/B]" else StringResourcesUtils.getString(
                 R.string.cu_month_year_date,
-                date.first,
-                date.second
+                this.first,
+                this.second
             )
         try {
             dateText = dateText.replace("[B]", "<font face=\"sans-serif-medium\">")

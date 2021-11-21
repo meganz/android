@@ -14,14 +14,11 @@ import mega.privacy.android.app.fragments.BaseFragment
 import mega.privacy.android.app.fragments.homepage.photos.ZoomViewModel
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop
 import mega.privacy.android.app.utils.ColorUtils
-import mega.privacy.android.app.utils.ZoomUtil
-import mega.privacy.android.app.utils.ZoomUtil.needReload
 
 abstract class BaseZoomFragment : BaseFragment(), GestureScaleCallback {
 
     protected lateinit var menu: Menu
     protected val zoomViewModel by viewModels<ZoomViewModel>()
-
 
     abstract fun handleZoomChange(zoom:Int)
 
@@ -68,17 +65,9 @@ abstract class BaseZoomFragment : BaseFragment(), GestureScaleCallback {
     private fun handleZoomMenuItemStatus() {
         val canZoomOut = zoomViewModel.canZoomOut()
         val canZoomIn = zoomViewModel.canZoomIn()
-        if (!canZoomIn && canZoomOut) {
-            handleEnableToolbarMenuIcon(R.id.action_zoom_in, false)
-            handleEnableToolbarMenuIcon(R.id.action_zoom_out, true)
-        } else if (canZoomIn && !canZoomOut) {
-            handleEnableToolbarMenuIcon(R.id.action_zoom_in, true)
-            handleEnableToolbarMenuIcon(R.id.action_zoom_out, false)
-        } else {
-            //canZoomOut && canZoomIn
-            handleEnableToolbarMenuIcon(R.id.action_zoom_in, true)
-            handleEnableToolbarMenuIcon(R.id.action_zoom_out, true)
-        }
+        //handle can zoom in then handle can zoom out
+        handleEnableToolbarMenuIcon(R.id.action_zoom_in, canZoomIn)
+        handleEnableToolbarMenuIcon(R.id.action_zoom_out, canZoomOut)
     }
 
     private fun handleEnableToolbarMenuIcon(menuItemId: Int, isEnable: Boolean) {

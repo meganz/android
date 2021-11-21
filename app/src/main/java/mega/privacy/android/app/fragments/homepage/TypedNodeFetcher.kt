@@ -9,6 +9,7 @@ import mega.privacy.android.app.fragments.homepage.photos.PhotoNodeItem
 import mega.privacy.android.app.listeners.BaseListener
 import mega.privacy.android.app.listeners.OptionalMegaRequestListenerInterface
 import mega.privacy.android.app.utils.*
+import mega.privacy.android.app.utils.StringUtils.formatDateTitle
 import nz.mega.sdk.*
 import java.io.File
 import java.time.LocalDate
@@ -203,7 +204,7 @@ class TypedNodesFetcher(
             null,
             -1,
             dateString,
-            StringUtils.formatDateTitle(date),
+            date.formatDateTitle(),
             null,
             false
         )

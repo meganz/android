@@ -14,7 +14,7 @@ import mega.privacy.android.app.utils.StringResourcesUtils
 import mega.privacy.android.app.utils.Util
 import java.util.*
 
-abstract class BaseBindingFragmentKt<VM : ViewModel, VB : ViewDataBinding> : BaseFragment() {
+abstract class ImagesBindingFragment<VM : ViewModel, VB : ViewDataBinding> : BaseFragment() {
 
     protected abstract val viewModel: VM
 
@@ -26,10 +26,11 @@ abstract class BaseBindingFragmentKt<VM : ViewModel, VB : ViewDataBinding> : Bas
         super.onCreate(savedInstanceState)
         setHasOptionsMenu(true)
     }
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         setDefaultToolBar()
-        init()
+        initViewCreated()
         subscribeObservers()
     }
 
@@ -92,7 +93,7 @@ abstract class BaseBindingFragmentKt<VM : ViewModel, VB : ViewDataBinding> : Bas
         savedInstanceState: Bundle?
     ): VB
 
-    abstract fun init()
+    abstract fun initViewCreated()
 
     protected fun goBack() {
         findNavController().popBackStack()

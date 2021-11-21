@@ -5,7 +5,6 @@ import androidx.lifecycle.MutableLiveData
 import mega.privacy.android.app.utils.ZoomUtil.ZOOM_DEFAULT
 import mega.privacy.android.app.utils.ZoomUtil.ZOOM_IN_1X
 import mega.privacy.android.app.utils.ZoomUtil.ZOOM_OUT_2X
-import javax.inject.Singleton
 
 /**
  * ZoomManager is used for encapsulate zoom functions by a composition way
@@ -26,12 +25,10 @@ class ZoomManager {
         this.currentZoom = currentZoom
     }
 
-    fun getCurrentZoom(): Int {
-        return currentZoom
-    }
-
     /**
-     * return a Boolean [true] indicate can zoom in, so we can from this flag to handle UI logic, otherwise, false.
+     * Applies a zoom in and checks if can zoom in after it.
+     *
+     * @return True if can zoom in, false otherwise.
      */
     fun zoomIn(): Boolean {
         if (currentZoom < ZOOM_IN_1X) {
@@ -42,7 +39,9 @@ class ZoomManager {
     }
 
     /**
-     * return a Boolean [true] indicate can zoom in, otherwise, false.
+     * Check can zoom in.
+     *
+     * @return True if can zoom in, false otherwise.
      */
     fun canZoomIn(): Boolean {
         return currentZoom != ZOOM_IN_1X
@@ -50,7 +49,9 @@ class ZoomManager {
 
 
     /**
-     * return a Boolean [true] Zoom in the max, otherwise, false.
+     * Applies a zoom out and checks if can zoom out after it.
+     *
+     * @return True if can zoom out, false otherwise.
      */
     fun zoomOut(): Boolean {
         if (currentZoom > ZOOM_OUT_2X) {
@@ -61,7 +62,9 @@ class ZoomManager {
     }
 
     /**
-     * return a Boolean [true] indicate can zoom out, so we can from this flag to handle UI logic, otherwise, false.
+     * Check can zoom out.
+     *
+     * @return True if can zoom out, false otherwise.
      */
     fun canZoomOut(): Boolean {
         return currentZoom != ZOOM_OUT_2X

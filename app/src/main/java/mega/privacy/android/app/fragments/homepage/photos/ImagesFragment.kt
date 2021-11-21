@@ -44,7 +44,7 @@ import nz.mega.sdk.MegaChatApiJava
 import java.util.*
 
 @AndroidEntryPoint
-class ImagesFragment : BaseBindingFragmentKt<ImagesViewModel, FragmentImagesBinding>(),
+class ImagesFragment : ImagesBindingFragment<ImagesViewModel, FragmentImagesBinding>(),
     GestureScaleListener.GestureScaleCallback {
 
     override val viewModel by viewModels<ImagesViewModel>()
@@ -82,7 +82,7 @@ class ImagesFragment : BaseBindingFragmentKt<ImagesViewModel, FragmentImagesBind
         viewTypePanel = photosViewType.root
     }
 
-    override fun init() {
+    override fun initViewCreated() {
         currentZoom = ZoomUtil.IMAGES_ZOOM_LEVEL
         viewModel.zoomManager.setCurrentZoom(currentZoom)
         viewModel.setZoom(currentZoom)
@@ -138,7 +138,8 @@ class ImagesFragment : BaseBindingFragmentKt<ImagesViewModel, FragmentImagesBind
     }
 
     /**
-     * handle toolbar menu icon is enable, [menuItemId] is the menuItem id,[isEnable] `true` is enable, `false` is disable.
+     * handle toolbar menu icon is enable,
+     * @param [menuItemId] is the menuItem id,[isEnable] `true` is enable, `false` is disable.
      */
     private fun handleEnableToolbarMenuIcon(menuItemId: Int, isEnable: Boolean) {
         val toolbar = binding.layoutTitleBar.toolbar
@@ -152,7 +153,8 @@ class ImagesFragment : BaseBindingFragmentKt<ImagesViewModel, FragmentImagesBind
     }
 
     /**
-     * handle zoom menu item icons showing status, [mShouldShow] `true` is showing, `false` is hiding,
+     * handle zoom menu item icons showing status,
+     * @param [mShouldShow] `true` is showing, `false` is hiding,
      * `null` will invoke fun shouldShowZoomMenuItem to check is should showing
      */
     private fun handleZoomOptionsMenuUpdate(mShouldShow: Boolean? = null) {

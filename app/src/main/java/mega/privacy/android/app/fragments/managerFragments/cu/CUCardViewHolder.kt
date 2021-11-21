@@ -8,10 +8,8 @@ import androidx.recyclerview.widget.RecyclerView
 import mega.privacy.android.app.R
 import mega.privacy.android.app.databinding.ItemCuCardBinding
 import mega.privacy.android.app.fragments.managerFragments.cu.PhotosFragment.*
-import mega.privacy.android.app.utils.LogUtil
 import mega.privacy.android.app.utils.StringResourcesUtils.getString
-import mega.privacy.android.app.utils.StringUtils
-import mega.privacy.android.app.utils.StringUtils.toSpannedHtmlText
+import mega.privacy.android.app.utils.StringUtils.formatDateTitle
 
 /**
  * Holder representing a card view.
@@ -57,7 +55,7 @@ class CUCardViewHolder(
             else -> Pair("", "")
         }
 
-        binding.dateText.text = StringUtils.formatDateTitle(date)
+        binding.dateText.text = date.formatDateTitle()
 
         val numItems = card.numItems
 
