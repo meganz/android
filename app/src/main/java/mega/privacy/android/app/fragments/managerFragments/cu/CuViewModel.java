@@ -46,6 +46,7 @@ import io.reactivex.rxjava3.core.Single;
 import io.reactivex.rxjava3.schedulers.Schedulers;
 import io.reactivex.rxjava3.subjects.PublishSubject;
 import io.reactivex.rxjava3.subjects.Subject;
+import kotlin.Unit;
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.arch.BaseRxViewModel;
@@ -54,6 +55,7 @@ import mega.privacy.android.app.fragments.homepage.photos.CardClickHandler;
 import mega.privacy.android.app.fragments.homepage.photos.DateCardsProvider;
 import mega.privacy.android.app.globalmanagement.SortOrderManagement;
 import mega.privacy.android.app.listeners.BaseListener;
+import mega.privacy.android.app.listeners.OptionalMegaRequestListenerInterface;
 import mega.privacy.android.app.repo.MegaNodeRepo;
 import mega.privacy.android.app.utils.ZoomUtil;
 import nz.mega.sdk.MegaApiAndroid;
@@ -131,14 +133,13 @@ class CuViewModel extends BaseRxViewModel {
             }
         };
 
-        mCreatePreviewForCardRequest = new BaseListener(mAppContext) {
-            @Override
-            public void onRequestFinish(@NotNull MegaApiJava api, @NotNull MegaRequest request, @NotNull MegaError e) {
-                if (e.getErrorCode() == MegaError.API_OK) {
-                    mCreatePreviewForCardFinished.onNext(true);
-                }
-            }
-        };
+        mCreatePreviewForCardRequest = new OptionalMegaRequestListenerInterface(null, null, null,
+                (MegaRequest request, MegaError e) -> {
+                    if (e.getErrorCode() == MegaError.API_OK) {
+                        mCreatePreviewForCardFinished.onNext(true);
+                    }
+                    return Unit.INSTANCE;
+                });
 
         loadNodes();
         getCards();
@@ -405,7 +406,7 @@ class CuViewModel extends BaseRxViewModel {
     /**
      * Gets CU and MU content as CUNode objects.
      * Content means images and videos which are located on CU and MU folders.
-     *
+     * <p>
      * Also requests needed thumbnails to show in holders if not exist yet.
      *
      * @return The list of CUNode objects.
@@ -433,20 +434,20 @@ class CuViewModel extends BaseRxViewModel {
                     dateString,
                     mSelectedNodes.containsKey(node.getHandle()));
 
-            if(mZoom == ZoomUtil.ZOOM_OUT_2X) {
+            if (mZoom == ZoomUtil.ZOOM_OUT_2X) {
                 if (lastYearDate == null || !Year.from(lastYearDate).equals(Year.from(modifyDate))) {
                     lastYearDate = modifyDate;
                     String date = ofPattern("yyyy").format(modifyDate);
                     nodes.add(new CuNode(date, new Pair<>(date, "")));
                 }
-            } else if(mZoom == ZoomUtil.ZOOM_IN_1X) {
+            } else if (mZoom == ZoomUtil.ZOOM_IN_1X) {
                 if (lastDayDate == null || lastDayDate.getDayOfYear() != modifyDate.getDayOfYear()) {
                     lastDayDate = modifyDate;
                     nodes.add(new CuNode(dateString, new Pair<>(ofPattern("dd MMMM").format(modifyDate),
                             sameYear ? "" : ofPattern("yyyy").format(modifyDate))));
                 }
                 // For zoom in 1X, use preview file as thumbnail to avoid blur.
-                cuNode.setThumbnail(preview );
+                cuNode.setThumbnail(preview);
             } else {
                 if (lastMonthDate == null
                         || !YearMonth.from(lastMonthDate).equals(YearMonth.from(modifyDate))) {
@@ -462,7 +463,7 @@ class CuViewModel extends BaseRxViewModel {
                 nodesWithoutThumbnail.add(node);
             }
 
-            if(!preview.exists() && mZoom == ZoomUtil.ZOOM_IN_1X) {
+            if (!preview.exists() && mZoom == ZoomUtil.ZOOM_IN_1X) {
                 nodesWithoutPreview.add(node);
             }
         }
@@ -475,12 +476,12 @@ class CuViewModel extends BaseRxViewModel {
                         (node, interval) -> node)
                 .observeOn(Schedulers.computation())
                 .subscribe(node -> {
-                    if(!thumbnailHandle.contains(node.getHandle())) {
+                    if (!thumbnailHandle.contains(node.getHandle())) {
                         thumbnailHandle.add(node.getHandle());
 
                         File thumbnail =
                                 new File(getThumbFolder(mAppContext), node.getBase64Handle() + JPG_EXTENSION);
-                        if(!thumbnail.exists()) {
+                        if (!thumbnail.exists()) {
                             mMegaApi.getThumbnail(node, thumbnail.getAbsolutePath(), mCreateThumbnailRequest);
                         }
                     }
@@ -512,7 +513,7 @@ class CuViewModel extends BaseRxViewModel {
      * - Day cards:   Content organized by days.
      * - Month cards: Content organized by months.
      * - Year cards:  Content organized by years.
-     *
+     * <p>
      * Also requests needed previews to show in cards if not exist yet.
      */
     public void getCards() {
@@ -526,7 +527,7 @@ class CuViewModel extends BaseRxViewModel {
                 .observeOn(Schedulers.computation())
                 .subscribe(node -> {
                     File preview = new File(getPreviewFolder(mAppContext), node.getBase64Handle() + JPG_EXTENSION);
-                    if(!preview.exists()) {
+                    if (!preview.exists()) {
                         mMegaApi.getPreview(node, preview.getAbsolutePath(), mCreatePreviewForCardRequest);
                     }
                 }, logErr("CuViewModel getPreview")));
@@ -556,7 +557,7 @@ class CuViewModel extends BaseRxViewModel {
      * the closest day to the current.
      */
     public int monthClicked(int position, CUCard card) {
-        return CardClickHandler.INSTANCE.monthClicked(position, card , getDayCards(), getMonthCards());
+        return CardClickHandler.INSTANCE.monthClicked(position, card, getDayCards(), getMonthCards());
     }
 
     /**
@@ -568,7 +569,7 @@ class CuViewModel extends BaseRxViewModel {
      * the closest month to the current.
      */
     public int yearClicked(int position, CUCard card) {
-        return CardClickHandler.INSTANCE.yearClicked(position, card , getMonthCards(), getYearCards());
+        return CardClickHandler.INSTANCE.yearClicked(position, card, getMonthCards(), getYearCards());
     }
 
     public void setZoom(int zoom) {
