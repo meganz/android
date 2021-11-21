@@ -15,17 +15,13 @@ import androidx.annotation.NonNull
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.view.ActionMode
 import androidx.coordinatorlayout.widget.CoordinatorLayout
-import androidx.core.content.ContextCompat
-import androidx.core.graphics.drawable.DrawableCompat
 import androidx.core.view.isVisible
 import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.facebook.drawee.view.SimpleDraweeView
-import com.google.android.material.appbar.MaterialToolbar
 import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.R
-import mega.privacy.android.app.components.GestureScaleListener
 import mega.privacy.android.app.components.ListenScrollChangesHelper
 import mega.privacy.android.app.components.SimpleDividerItemDecoration
 import mega.privacy.android.app.components.dragger.DragThumbnailGetter
@@ -44,10 +40,9 @@ import nz.mega.sdk.MegaChatApiJava
 import java.util.*
 
 @AndroidEntryPoint
-class ImagesFragment : ImagesBindingFragment<ImagesViewModel, FragmentImagesBinding>(),
-    GestureScaleListener.GestureScaleCallback {
+class ImagesFragment : BaseZoomFragment(){
 
-    override val viewModel by viewModels<ImagesViewModel>()
+    private val viewModel by viewModels<ImagesViewModel>()
     private val actionModeViewModel by viewModels<ActionModeViewModel>()
     private val itemOperationViewModel by viewModels<ItemOperationViewModel>()
 
@@ -69,22 +64,32 @@ class ImagesFragment : ImagesBindingFragment<ImagesViewModel, FragmentImagesBind
 
     private lateinit var itemDecoration: SimpleDividerItemDecoration
 
-    private var currentZoom = ZoomUtil.ZOOM_DEFAULT
-
     private var selectedView = ALL_VIEW
+    private lateinit var binding:FragmentImagesBinding
 
-    override fun initBinding(
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        initViewCreated()
+        subscribeObservers()
+    }
+
+    override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): FragmentImagesBinding = FragmentImagesBinding.inflate(inflater, container, false).apply {
-        viewModel = this@ImagesFragment.viewModel
-        viewTypePanel = photosViewType.root
+    ): View {
+        binding = FragmentImagesBinding.inflate(inflater, container, false).apply {
+            viewModel = this@ImagesFragment.viewModel
+        }
+        binding.lifecycleOwner = viewLifecycleOwner
+        viewTypePanel = binding.photosViewType.root
+        return binding.root
     }
 
-    override fun initViewCreated() {
-        currentZoom = ZoomUtil.IMAGES_ZOOM_LEVEL
-        viewModel.zoomManager.setCurrentZoom(currentZoom)
+    private fun initViewCreated() {
+        val currentZoom = ZoomUtil.IMAGES_ZOOM_LEVEL
+        zoomViewModel.setCurrentZoom(currentZoom)
+        zoomViewModel.setZoom(currentZoom)
         viewModel.setZoom(currentZoom)
         setupEmptyHint()
         setupListView()
@@ -92,100 +97,32 @@ class ImagesFragment : ImagesBindingFragment<ImagesViewModel, FragmentImagesBind
         setupListAdapter(currentZoom)
         setupActionMode()
         setupNavigation()
-        setToolbarMenu()
     }
 
-    private fun setToolbarMenu() {
-        binding.layoutTitleBar.toolbar.apply {
-            inflateMenu(R.menu.fragment_images_toolbar)
-            handleZoomOptionsMenuUpdate()
-            handleZoomMenuItemStatus()
-            setOnMenuItemClickListener {
-                when (it.itemId) {
-                    R.id.action_zoom_in -> {
-                        zoomIn()
-                        handleZoomMenuItemStatus()
-                        true
-                    }
-                    R.id.action_zoom_out -> {
-                        zoomOut()
-                        handleZoomMenuItemStatus()
-                        true
-                    }
-                    else -> false
-                }
-            }
+    override fun handleZoomChange(zoom: Int,needReload:Boolean) {
+        ZoomUtil.IMAGES_ZOOM_LEVEL = zoom
+        handleZoomAdapterLayoutChange(zoom)
+        if (needReload) {
+            loadPhotos()
         }
     }
 
-    /**
-     * handle the zoom menu item status, which enable/disable and color
-     */
-    private fun handleZoomMenuItemStatus() {
-        val canZoomOut = viewModel.zoomManager.canZoomOut()
-        val canZoomIn = viewModel.zoomManager.canZoomIn()
-        if (!canZoomIn && canZoomOut) {
-            handleEnableToolbarMenuIcon(R.id.action_zoom_in, false)
-            handleEnableToolbarMenuIcon(R.id.action_zoom_out, true)
-        } else if (canZoomIn && !canZoomOut) {
-            handleEnableToolbarMenuIcon(R.id.action_zoom_in, true)
-            handleEnableToolbarMenuIcon(R.id.action_zoom_out, false)
-        } else {
-            //canZoomOut && canZoomIn
-            handleEnableToolbarMenuIcon(R.id.action_zoom_in, true)
-            handleEnableToolbarMenuIcon(R.id.action_zoom_out, true)
-        }
+    override fun handleOnCreateOptionsMenu() {
+        handleOptionsMenuUpdate(shouldShowZoomMenuItem())
+        handleSortByMenuIcon(false)
     }
 
-    /**
-     * handle toolbar menu icon is enable,
-     * @param [menuItemId] is the menuItem id,[isEnable] `true` is enable, `false` is disable.
-     */
-    private fun handleEnableToolbarMenuIcon(menuItemId: Int, isEnable: Boolean) {
-        val toolbar = binding.layoutTitleBar.toolbar
-        val menuItem = toolbar.menu.findItem(menuItemId)
-        val colorRes =
-            if (isEnable) ColorUtils.getThemeColor(context, R.attr.colorControlNormal)
-            else ContextCompat.getColor(context, R.color.grey_038_white_038)
-
-        DrawableCompat.setTint(menuItem.icon, colorRes)
-        menuItem.isEnabled = isEnable
-    }
-
-    /**
-     * handle zoom menu item icons showing status,
-     * @param [mShouldShow] `true` is showing, `false` is hiding,
-     * `null` will invoke fun shouldShowZoomMenuItem to check is should showing
-     */
-    private fun handleZoomOptionsMenuUpdate(mShouldShow: Boolean? = null) {
-        val shouldShow = mShouldShow ?: shouldShowZoomMenuItem()
-        val toolbar = binding.layoutTitleBar.toolbar
-        toolbar.menu.findItem(R.id.action_zoom_in).isVisible = shouldShow
-        toolbar.menu.findItem(R.id.action_zoom_out).isVisible = shouldShow
-    }
-
-    override fun subscribeObservers() {
-        viewModel.getZoom().observe(viewLifecycleOwner, { zoom: Int ->
-            // Out 3X: organize by year, In 1X: organize by day, both need to reload nodes.
-            val needReload = ZoomUtil.needReload(currentZoom, zoom)
-            viewModel.zoomManager.setCurrentZoom(zoom)
-            ZoomUtil.IMAGES_ZOOM_LEVEL = zoom
-            handleZoomAdapterLayoutChange(zoom)
-            if (needReload) {
-                loadPhotos()
-            }
-        })
-
-
+    private fun subscribeObservers() {
         viewModel.items.observe(viewLifecycleOwner) {
             actionModeViewModel.setNodesData(it.filter { nodeItem -> nodeItem.type == PhotoNodeItem.TYPE_PHOTO })
             if (it.isEmpty()) {
-                handleZoomOptionsMenuUpdate(false)
+                handleOptionsMenuUpdate(false)
                 viewTypePanel.visibility = View.GONE
             } else {
-                handleZoomOptionsMenuUpdate()
+                handleOptionsMenuUpdate(true)
                 viewTypePanel.visibility = View.VISIBLE
             }
+            handleSortByMenuIcon(false)
         }
 
         viewModel.dateCards.observe(viewLifecycleOwner, ::showCards)
@@ -209,7 +146,7 @@ class ImagesFragment : ImagesBindingFragment<ImagesViewModel, FragmentImagesBind
         override fun onCardClicked(position: Int, @NonNull card: CUCard) {
             when (selectedView) {
                 DAYS_VIEW -> {
-                    viewModel.zoomManager.restoreDefaultZoom()
+                    zoomViewModel.restoreDefaultZoom()
                     newViewClicked(ALL_VIEW)
                     val photoPosition = browseAdapter.getNodePosition(card.node.handle)
                     gridLayoutManager.scrollToPosition(photoPosition)
@@ -278,50 +215,13 @@ class ImagesFragment : ImagesBindingFragment<ImagesViewModel, FragmentImagesBind
      * then apply selected style for the selected button regarding to the selected view.
      */
     private fun updateViewSelected() {
-        setViewTypeButtonStyle(allButton, false)
-        setViewTypeButtonStyle(daysButton, false)
-        setViewTypeButtonStyle(monthsButton, false)
-        setViewTypeButtonStyle(yearsButton, false)
-
-        when (selectedView) {
-            DAYS_VIEW -> setViewTypeButtonStyle(daysButton, true)
-            MONTHS_VIEW -> setViewTypeButtonStyle(monthsButton, true)
-            YEARS_VIEW -> setViewTypeButtonStyle(yearsButton, true)
-            else -> setViewTypeButtonStyle(allButton, true)
-        }
+       super.updateViewSelected(allButton,daysButton,monthsButton,yearsButton,selectedView)
     }
 
     private fun updateFastScrollerVisibility() {
-        val gridView = selectedView == ALL_VIEW
-
-        binding.scroller.visibility =
-            if (!gridView && cardAdapter.itemCount >= MIN_ITEMS_SCROLLBAR)
-                View.VISIBLE
-            else
-                View.GONE
-    }
-
-    /**
-     * Apply selected/unselected style for the TextView button.
-     *
-     * @param textView The TextView button to be applied with the style.
-     * @param enabled true, apply selected style; false, apply unselected style.
-     */
-    private fun setViewTypeButtonStyle(textView: TextView, enabled: Boolean) {
-        textView.setBackgroundResource(
-            if (enabled)
-                R.drawable.background_18dp_rounded_selected_button
-            else
-                R.drawable.background_18dp_rounded_unselected_button
-        )
-
-        StyleUtils.setTextStyle(
-            context,
-            textView,
-            if (enabled) R.style.TextAppearance_Mega_Subtitle2_Medium_WhiteGrey87 else R.style.TextAppearance_Mega_Subtitle2_Normal_Grey87White87,
-            if (enabled) R.color.white_grey_087 else R.color.grey_087_white_087,
-            false
-        )
+        if (!this::cardAdapter.isInitialized)
+            return
+       super.updateFastScrollerVisibility(selectedView,binding.scroller,cardAdapter.itemCount)
     }
 
     /**
@@ -334,7 +234,7 @@ class ImagesFragment : ImagesBindingFragment<ImagesViewModel, FragmentImagesBind
         if (this.selectedView == selectedView) return
 
         this.selectedView = selectedView
-        setupListAdapter(currentZoom)
+        setupListAdapter(getCurrentZoom())
 
         when (selectedView) {
             DAYS_VIEW, MONTHS_VIEW, YEARS_VIEW -> {
@@ -348,7 +248,8 @@ class ImagesFragment : ImagesBindingFragment<ImagesViewModel, FragmentImagesBind
                 listView.setOnTouchListener(scaleGestureHandler)
             }
         }
-        handleZoomOptionsMenuUpdate()
+        handleOptionsMenuUpdate(shouldShowZoomMenuItem())
+        handleSortByMenuIcon(false)
         updateViewSelected()
 
         // If selected view is not all view, add layout param behaviour, so that button panel will go off when scroll.
@@ -404,9 +305,7 @@ class ImagesFragment : ImagesBindingFragment<ImagesViewModel, FragmentImagesBind
     ) { v: View?, _, _, _, _ ->
         callManager {
             it.changeAppBarElevation(
-                v!!.canScrollVertically(-1),
-                binding.layoutTitleBar.toolbar,
-                binding.layoutTitleBar.layoutAppBar
+                v!!.canScrollVertically(-1)
             )
         }
     }
@@ -442,7 +341,7 @@ class ImagesFragment : ImagesBindingFragment<ImagesViewModel, FragmentImagesBind
 
     private fun observeItemLongClick() =
         actionModeViewModel.longClick.observe(viewLifecycleOwner, EventObserver {
-            if (currentZoom == ZoomUtil.ZOOM_DEFAULT || currentZoom == ZoomUtil.ZOOM_OUT_1X) {
+            if (zoomViewModel.getCurrentZoom() == ZoomUtil.ZOOM_DEFAULT || zoomViewModel.getCurrentZoom() == ZoomUtil.ZOOM_OUT_1X) {
                 doIfOnline { actionModeViewModel.enterActionMode(it) }
                 animateBottomView()
             }
@@ -550,26 +449,23 @@ class ImagesFragment : ImagesBindingFragment<ImagesViewModel, FragmentImagesBind
      * @param isPortrait true, on portrait mode, false otherwise.
      */
     private fun getSpanCount(isPortrait: Boolean): Int {
-        return if (selectedView != ALL_VIEW) {
-            if (isPortrait) SPAN_CARD_PORTRAIT else SPAN_CARD_LANDSCAPE
-        } else {
-            ZoomUtil.getSpanCount(isPortrait, currentZoom)
-        }
+        return super.getSpanCount(selectedView,isPortrait)
     }
 
     private fun handleZoomAdapterLayoutChange(zoom: Int) {
         val state = listView.layoutManager?.onSaveInstanceState()
         setupListAdapter(zoom)
+        viewModel.setZoom(zoom)
         listView.layoutManager?.onRestoreInstanceState(state)
     }
 
     /**
      * Set recycle view and its inner layout depends on card view selected and zoom level.
      *
-     * @param zoom Zoom level.
+     * @param currentZoom Zoom level.
      */
-    fun setupListAdapter(zoom: Int) {
-        currentZoom = zoom
+    fun setupListAdapter(currentZoom: Int) {
+        // currentZoom = zoom
 
         val isPortrait =
             resources.configuration.orientation == Configuration.ORIENTATION_PORTRAIT
@@ -621,7 +517,7 @@ class ImagesFragment : ImagesBindingFragment<ImagesViewModel, FragmentImagesBind
      *
      * @return true, current view is all view should show the menu items, false, otherwise.
      */
-    fun shouldShowZoomMenuItem() = selectedView == ALL_VIEW
+    private fun shouldShowZoomMenuItem() = selectedView == ALL_VIEW
 
     /**
      * Display the view type buttons panel with animation effect, after a card is clicked.
@@ -724,22 +620,13 @@ class ImagesFragment : ImagesBindingFragment<ImagesViewModel, FragmentImagesBind
 
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
-
         viewModel.selectedViewType = selectedView
     }
 
-    override fun zoomIn() {
-        viewModel.zoomManager.zoomIn()
-        handleZoomMenuItemStatus()
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+        if (activity as ManagerActivityLollipop? != null && (activity as ManagerActivityLollipop?)!!.drawerItem != ManagerActivityLollipop.DrawerItem.HOMEPAGE) {
+            return
+        }
+        super.onCreateOptionsMenu(menu, inflater)
     }
-
-    override fun zoomOut() {
-        viewModel.zoomManager.zoomOut()
-        handleZoomMenuItemStatus()
-    }
-
-    override fun bindToolbar(): MaterialToolbar = binding.layoutTitleBar.toolbar
-
-    override fun bindTitle(): Int = R.string.section_images
-
 }

@@ -9,6 +9,7 @@ import mega.privacy.android.app.fragments.managerFragments.cu.CUCard
 import mega.privacy.android.app.fragments.managerFragments.cu.PhotosFragment
 import mega.privacy.android.app.utils.Constants.EVENT_NODES_CHANGE
 import mega.privacy.android.app.utils.Constants.INVALID_POSITION
+import mega.privacy.android.app.utils.ZoomUtil
 import mega.privacy.android.app.utils.ZoomUtil.DAYS_INDEX
 import mega.privacy.android.app.utils.ZoomUtil.MONTHS_INDEX
 import mega.privacy.android.app.utils.ZoomUtil.YEARS_INDEX
@@ -22,7 +23,6 @@ class ImagesViewModel @ViewModelInject constructor(
      * Empty live data, used to switch to LiveData<List<PhotoNodeItem>>.
      */
     private var liveDataRoot = MutableLiveData<Unit>()
-    val zoomManager = ZoomManager()
 
     var selectedViewType = PhotosFragment.ALL_VIEW
 
@@ -35,7 +35,13 @@ class ImagesViewModel @ViewModelInject constructor(
     private var pendingLoad = false
 
     private val _refreshCards = MutableLiveData(false)
-    val refreshCards : LiveData<Boolean> = _refreshCards
+    val refreshCards: LiveData<Boolean> = _refreshCards
+
+    private var _mZoom: Int = ZoomUtil.IMAGES_ZOOM_LEVEL
+
+    fun setZoom(zoom: Int) {
+        _mZoom = zoom
+    }
 
     fun refreshing() {
         _refreshCards.value = false
@@ -47,7 +53,7 @@ class ImagesViewModel @ViewModelInject constructor(
                 repository.getFiles(
                     FILE_TYPE_PHOTO,
                     ORDER_MODIFICATION_DESC,
-                    zoomManager.zoom.value!!
+                    _mZoom
                 )
             }
         } else {
@@ -83,6 +89,7 @@ class ImagesViewModel @ViewModelInject constructor(
 
         listOf(cardsProvider.getDays(), cardsProvider.getMonths(), cardsProvider.getYears())
     }
+
     /**
      * Checks the clicked year card and gets the month card to show after click on a year card.
      *
@@ -191,7 +198,4 @@ class ImagesViewModel @ViewModelInject constructor(
             .removeObserver(nodesChangeObserver)
         items.removeObserver(loadFinishedObserver)
     }
-
-    fun setZoom(currentZoom:Int) = zoomManager.setZoom(currentZoom)
-    fun getZoom() = zoomManager.zoom
 }

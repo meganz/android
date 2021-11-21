@@ -412,12 +412,7 @@ public class PhotosFragment extends BaseZoomFragment implements CUGridViewAdapte
      * @param isPortrait true, on portrait mode, false otherwise.
      */
     private int getSpanCount(boolean isPortrait) {
-        if (selectedView != ALL_VIEW) {
-            return isPortrait ? SPAN_CARD_PORTRAIT : SPAN_CARD_LANDSCAPE;
-        } else {
-
-            return ZoomUtil.INSTANCE.getSpanCount(isPortrait, getCurrentZoom());
-        }
+        return super.getSpanCount(selectedView,isPortrait);
     }
 
     private void setupOtherViews() {
@@ -573,15 +568,13 @@ public class PhotosFragment extends BaseZoomFragment implements CUGridViewAdapte
 
     /**
      * this method handle is show menu.
+     *
      * @return false, when no photo here or in the action mode or not in all view, then will hide the menu.
      * Otherwise, true, show menu.
      */
     private boolean isShowMenu() {
         boolean emptyAdapter = gridAdapter == null || gridAdapter.getItemCount() <= 0;
-        if (emptyAdapter || mActionMode != null || selectedView != ALL_VIEW){
-            return false;
-        }
-        return true;
+        return !emptyAdapter && mActionMode == null && selectedView == ALL_VIEW;
     }
 
     private void showDayCards(List<CUCard> dayCards) {
@@ -660,27 +653,7 @@ public class PhotosFragment extends BaseZoomFragment implements CUGridViewAdapte
      * then apply selected style for the selected button regarding to the selected view.
      */
     private void updateViewSelected() {
-        setViewTypeButtonStyle(allButton, false);
-        setViewTypeButtonStyle(daysButton, false);
-        setViewTypeButtonStyle(monthsButton, false);
-        setViewTypeButtonStyle(yearsButton, false);
-
-        switch (selectedView) {
-            case DAYS_VIEW:
-                setViewTypeButtonStyle(daysButton, true);
-                break;
-
-            case MONTHS_VIEW:
-                setViewTypeButtonStyle(monthsButton, true);
-                break;
-
-            case YEARS_VIEW:
-                setViewTypeButtonStyle(yearsButton, true);
-                break;
-
-            default:
-                setViewTypeButtonStyle(allButton, true);
-        }
+        super.updateViewSelected(allButton,daysButton,monthsButton,yearsButton,selectedView);
 
         updateFastScrollerVisibility();
         mManagerActivity.enableHideBottomViewOnScroll(selectedView != ALL_VIEW);
@@ -706,38 +679,10 @@ public class PhotosFragment extends BaseZoomFragment implements CUGridViewAdapte
     }
 
     private void updateFastScrollerVisibility() {
-        if (binding == null) {
+        if (binding == null || cardAdapter == null) {
             return;
         }
-
-        boolean gridView = selectedView == ALL_VIEW;
-        int visibility = (gridView && gridAdapter != null && gridAdapter.getItemCount() >= MIN_ITEMS_SCROLLBAR)
-                || (!gridView && cardAdapter != null && cardAdapter.getItemCount() >= MIN_ITEMS_SCROLLBAR)
-                ? View.VISIBLE
-                : View.GONE;
-
-        binding.scroller.setVisibility(visibility);
-    }
-
-    /**
-     * Apply selected/unselected style for the TextView button.
-     *
-     * @param textView The TextView button to be applied with the style.
-     * @param enabled  true, apply selected style; false, apply unselected style.
-     */
-    private void setViewTypeButtonStyle(TextView textView, boolean enabled) {
-        if (textView == null) {
-            return;
-        }
-
-        textView.setBackgroundResource(enabled
-                ? R.drawable.background_18dp_rounded_selected_button
-                : R.drawable.background_18dp_rounded_unselected_button);
-
-        setTextStyle(context, textView, enabled
-                        ? R.style.TextAppearance_Mega_Subtitle2_Medium_WhiteGrey87
-                        : R.style.TextAppearance_Mega_Subtitle2_Normal_Grey87White87,
-                enabled ? R.color.white_grey_087 : R.color.grey_087_white_087, false);
+        super.updateFastScrollerVisibility(selectedView, binding.scroller, cardAdapter.getItemCount());
     }
 
     @Override
@@ -780,9 +725,7 @@ public class PhotosFragment extends BaseZoomFragment implements CUGridViewAdapte
     }
 
     @Override
-    public void handleZoomChange(int zoom) {
-        boolean needReload = ZoomUtil.INSTANCE.needReload(getCurrentZoom(), zoom);
-        getZoomViewModel().setCurrentZoom(zoom);
+    public void handleZoomChange(int zoom, boolean needReload) {
         handleZoomAdapterLayoutChange(zoom);
         if (needReload) {
             reloadNodes();
@@ -802,5 +745,13 @@ public class PhotosFragment extends BaseZoomFragment implements CUGridViewAdapte
     @Override
     public void handleOnCreateOptionsMenu() {
         handleOptionsMenuUpdate(isShowMenu());
+    }
+
+    @Override
+    public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
+        if ((ManagerActivityLollipop) getActivity() != null && ((ManagerActivityLollipop) getActivity()).getDrawerItem() != ManagerActivityLollipop.DrawerItem.PHOTOS) {
+            return;
+        }
+        super.onCreateOptionsMenu(menu, inflater);
     }
 }
