@@ -147,6 +147,7 @@ class ImagesFragment : BaseZoomFragment(){
             when (selectedView) {
                 DAYS_VIEW -> {
                     zoomViewModel.restoreDefaultZoom()
+                    handleZoomMenuItemStatus()
                     newViewClicked(ALL_VIEW)
                     val photoPosition = browseAdapter.getNodePosition(card.node.handle)
                     gridLayoutManager.scrollToPosition(photoPosition)

@@ -690,6 +690,7 @@ public class PhotosFragment extends BaseZoomFragment implements CUGridViewAdapte
         switch (selectedView) {
             case DAYS_VIEW:
                 getZoomViewModel().restoreDefaultZoom();
+                handleZoomMenuItemStatus();
                 card = viewModel.dayClicked(position, card);
                 newViewClicked(ALL_VIEW);
                 int cuNodePosition = gridAdapter.getNodePosition(card.getNode().getHandle());
