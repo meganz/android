@@ -11,6 +11,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
@@ -754,5 +755,13 @@ public class PhotosFragment extends BaseZoomFragment implements CUGridViewAdapte
             return;
         }
         super.onCreateOptionsMenu(menu, inflater);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        if ((ManagerActivityLollipop) getActivity() != null && ((ManagerActivityLollipop) getActivity()).getDrawerItem() != ManagerActivityLollipop.DrawerItem.PHOTOS) {
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
     }
 }

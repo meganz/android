@@ -630,4 +630,11 @@ class ImagesFragment : BaseZoomFragment(){
         }
         super.onCreateOptionsMenu(menu, inflater)
     }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        if (activity as ManagerActivityLollipop? != null && (activity as ManagerActivityLollipop?)!!.drawerItem != ManagerActivityLollipop.DrawerItem.HOMEPAGE) {
+            return true
+        }
+        return super.onOptionsItemSelected(item)
+    }
 }
