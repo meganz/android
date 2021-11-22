@@ -21,6 +21,13 @@ class CreateGroupChatUseCase @Inject constructor(
     private val megaChatApi: MegaChatApiAndroid
 ) {
 
+    /**
+     * Create and get a group chat room
+     *
+     * @param contactsData  List of selected contacts
+     * @param chatTitle     Title of new chat room
+     * @return              Chat ID of the new chat room
+     */
     fun getGroupChatRoomCreated(contactsData: ArrayList<String>, chatTitle: String?): Single<Long> =
         Single.create { emitter ->
             val peerList = MegaChatPeerList.createInstance()

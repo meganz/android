@@ -84,6 +84,7 @@ class ContactGroupsViewModel @ViewModelInject constructor(
                 }
             )
             .addTo(composite)
+
         return result
     }
 }
