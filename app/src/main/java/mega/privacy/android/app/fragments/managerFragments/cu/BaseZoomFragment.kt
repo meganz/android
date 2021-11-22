@@ -74,7 +74,7 @@ abstract class BaseZoomFragment : BaseFragment(), GestureScaleCallback {
         return super.onOptionsItemSelected(item)
     }
 
-    private fun handleZoomMenuItemStatus() {
+    fun handleZoomMenuItemStatus() {
         val canZoomOut = zoomViewModel.canZoomOut()
         val canZoomIn = zoomViewModel.canZoomIn()
         //handle can zoom in then handle can zoom out
