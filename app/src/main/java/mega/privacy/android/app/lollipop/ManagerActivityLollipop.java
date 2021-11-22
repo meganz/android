@@ -283,7 +283,6 @@ import static mega.privacy.android.app.utils.AlertDialogUtil.isAlertDialogShown;
 import static mega.privacy.android.app.utils.AlertsAndWarnings.askForCustomizedPlan;
 import static mega.privacy.android.app.utils.AlertsAndWarnings.showForeignStorageOverQuotaWarningDialog;
 import static mega.privacy.android.app.utils.MegaNodeDialogUtil.ACTION_BACKUP_ADD;
-import static mega.privacy.android.app.utils.MegaNodeDialogUtil.ACTION_BACKUP_COPY;
 import static mega.privacy.android.app.utils.MegaNodeDialogUtil.ACTION_BACKUP_FAB;
 import static mega.privacy.android.app.utils.MegaNodeDialogUtil.ACTION_BACKUP_GET_LINK;
 import static mega.privacy.android.app.utils.MegaNodeDialogUtil.ACTION_BACKUP_MOVE;
@@ -293,6 +292,7 @@ import static mega.privacy.android.app.utils.MegaNodeDialogUtil.ACTION_BACKUP_SH
 import static mega.privacy.android.app.utils.MegaNodeDialogUtil.ACTION_BACKUP_SHARE_CHAT;
 import static mega.privacy.android.app.utils.MegaNodeDialogUtil.ACTION_BACKUP_SHARE_FOLDER;
 import static mega.privacy.android.app.utils.MegaNodeDialogUtil.ACTION_BACKUP_TAKE_PICTURE;
+import static mega.privacy.android.app.utils.MegaNodeDialogUtil.ACTION_BACKUP_NONE;
 import static mega.privacy.android.app.utils.MegaNodeDialogUtil.ACTION_COPY_TO_BACKUP;
 import static mega.privacy.android.app.utils.MegaNodeDialogUtil.ACTION_MOVE_TO_BACKUP;
 import static mega.privacy.android.app.utils.MegaNodeDialogUtil.BACKUP_DEVICE;
@@ -489,6 +489,9 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 
 	// Determine if open this activity from meeting page, if true, will finish this activity when user click back icon
 	private boolean isFromMeeting = false;
+
+	private int uploadTypeBackup = GENERAL_UPLOAD;
+	private int actionTypeBackup = ACTION_BACKUP_NONE;
 
 	public enum FragmentTag {
 		CLOUD_DRIVE, HOMEPAGE, CAMERA_UPLOADS, INBOX, INCOMING_SHARES, OUTGOING_SHARES, SETTINGS, SEARCH,TRANSFERS, COMPLETED_TRANSFERS,
@@ -1109,8 +1112,19 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 									Manifest.permission.WRITE_EXTERNAL_STORAGE);
 		        		}
 		        		else{
-							checkTakePicture(this, TAKE_PHOTO_CODE);
-							typesCameraPermission = INVALID_TYPE_PERMISSIONS;
+							if (drawerItem == DrawerItem.CLOUD_DRIVE) {
+								int nodeType = fbFLol.checkSubBackupNode();
+								if (nodeType == BACKUP_DEVICE || nodeType == BACKUP_SUB_DEVICE_FOLDER || nodeType == BACKUP_SUBFOLDER) {
+									MegaNode parentNode = fbFLol.getSubBackupParentNode();
+									this.actWithBackupTips(null, parentNode, nodeType, ACTION_BACKUP_TAKE_PICTURE);
+								} else {
+									checkTakePicture(this, TAKE_PHOTO_CODE);
+									typesCameraPermission = INVALID_TYPE_PERMISSIONS;
+								}
+							} else {
+								checkTakePicture(this, TAKE_PHOTO_CODE);
+								typesCameraPermission = INVALID_TYPE_PERMISSIONS;
+							}
 						}
 		        	}
 	        	} else if ((typesCameraPermission == RETURN_CALL_PERMISSIONS || typesCameraPermission == START_CALL_PERMISSIONS) &&
@@ -1121,7 +1135,11 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 	        }
 			case REQUEST_READ_WRITE_STORAGE:{
 				if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED){
-					showUploadPanel();
+					if (actionTypeBackup != ACTION_BACKUP_NONE) {
+						showUploadPanelForBackup(uploadTypeBackup, actionTypeBackup);
+					} else {
+						showUploadPanel();
+					}
 				}
 				break;
 			}
@@ -5692,7 +5710,12 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 		    }
 		    case R.id.action_take_picture:{
 		    	typesCameraPermission = TAKE_PICTURE_OPTION;
-
+				if (drawerItem == DrawerItem.CLOUD_DRIVE) {
+					int nodeType = fbFLol.checkSubBackupNode();
+					if (nodeType == BACKUP_DEVICE || nodeType == BACKUP_SUB_DEVICE_FOLDER || nodeType == BACKUP_SUBFOLDER) {
+						this.actionTypeBackup = ACTION_BACKUP_TAKE_PICTURE;
+					}
+				}
 				boolean hasStoragePermission = hasPermissions(this, Manifest.permission.WRITE_EXTERNAL_STORAGE);
 				if (!hasStoragePermission) {
 					requestPermission(this,
@@ -5716,7 +5739,8 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 				if (hasStoragePermission && hasCameraPermission) {
 					if (drawerItem == DrawerItem.CLOUD_DRIVE) {
 						int nodeType = fbFLol.checkSubBackupNode();
-						if (nodeType == BACKUP_DEVICE || nodeType == BACKUP_SUBFOLDER) {
+						if (nodeType == BACKUP_DEVICE || nodeType == BACKUP_SUB_DEVICE_FOLDER || nodeType == BACKUP_SUBFOLDER) {
+							this.actionTypeBackup = ACTION_BACKUP_NONE;
 							MegaNode parentNode = fbFLol.getSubBackupParentNode();
 							this.actWithBackupTips(null, parentNode, nodeType, ACTION_BACKUP_TAKE_PICTURE);
 						} else {
@@ -5796,6 +5820,10 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 	        }
 	        case R.id.action_add:{
 				if (!hasPermissions(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
+					if (drawerItem == DrawerItem.CLOUD_DRIVE){
+						this.uploadTypeBackup = GENERAL_UPLOAD;
+						this.actionTypeBackup = ACTION_BACKUP_ADD;
+					}
 					requestPermission(this,
 							REQUEST_READ_WRITE_STORAGE,
 							Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE);
@@ -6842,6 +6870,14 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 								showUploadPanel(GENERAL_UPLOAD);
 								break;
 
+							case ACTION_BACKUP_TAKE_PICTURE:
+								checkTakePicture(ManagerActivityLollipop.this, TAKE_PHOTO_CODE);
+								break;
+
+							case ACTION_BACKUP_NEW_FOLDER:
+								showNewFolderDialog();
+								break;
+
 							default:
 								break;
 						}
@@ -6924,6 +6960,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 
 								case ACTION_BACKUP_TAKE_PICTURE:
 									checkTakePicture(ManagerActivityLollipop.this, TAKE_PHOTO_CODE);
+									typesCameraPermission = INVALID_TYPE_PERMISSIONS;
 									break;
 
 								case ACTION_BACKUP_NEW_FOLDER:
@@ -8041,10 +8078,14 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 	 * @param actionType Indicates the action to backup folder or file (move, remove, add, create etc.)
 	 */
 	public void showUploadPanelForBackup(int uploadType, int actionType) {
+		this.uploadTypeBackup = actionType;
+		this.actionTypeBackup = actionType;
 		if (!hasPermissions(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
 			requestPermission(this, REQUEST_READ_WRITE_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE);
 			return;
 		}
+
+		this.actionTypeBackup = ACTION_BACKUP_NONE;
 		// isInBackup Indicates if the current node is under "My backup"
 		int nodeType = fbFLol.checkSubBackupNode();
 		if (nodeType != BACKUP_ROOT) {
@@ -8954,8 +8995,19 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 								if (!hasPermissions(this, Manifest.permission.CAMERA)) {
 									requestPermission(this, REQUEST_CAMERA, Manifest.permission.CAMERA);
 								} else {
-									checkTakePicture(this, TAKE_PHOTO_CODE);
-									typesCameraPermission = INVALID_TYPE_PERMISSIONS;
+									if (drawerItem == DrawerItem.CLOUD_DRIVE) {
+										int nodeType = fbFLol.checkSubBackupNode();
+										if (nodeType == BACKUP_DEVICE || nodeType == BACKUP_SUB_DEVICE_FOLDER || nodeType == BACKUP_SUBFOLDER) {
+											MegaNode parentNode = fbFLol.getSubBackupParentNode();
+											this.actWithBackupTips(null, parentNode, nodeType, ACTION_BACKUP_TAKE_PICTURE);
+										} else {
+											checkTakePicture(this, TAKE_PHOTO_CODE);
+											typesCameraPermission = INVALID_TYPE_PERMISSIONS;
+										}
+									} else {
+										checkTakePicture(this, TAKE_PHOTO_CODE);
+										typesCameraPermission = INVALID_TYPE_PERMISSIONS;
+									}
 								}
 								break;
 							}
@@ -8966,7 +9018,11 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 
 						case REQUEST_READ_WRITE_STORAGE:
 							// Upload scenario
-							new Handler(Looper.getMainLooper()).post(this::showUploadPanel);
+							if (actionTypeBackup != ACTION_BACKUP_NONE) {
+								new Handler(Looper.getMainLooper()).post(() -> showUploadPanelForBackup(uploadTypeBackup, actionTypeBackup));
+							} else {
+								new Handler(Looper.getMainLooper()).post(this::showUploadPanel);
+							}
 							break;
 					}
 				}

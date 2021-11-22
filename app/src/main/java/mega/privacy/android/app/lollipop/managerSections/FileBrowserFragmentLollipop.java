@@ -99,7 +99,6 @@ import static mega.privacy.android.app.utils.MegaNodeUtil.checkBackupNodeByHandl
 import static mega.privacy.android.app.utils.MegaNodeUtil.checkBackupNodeTypeByHandle;
 import static mega.privacy.android.app.utils.MegaNodeUtil.manageTextFileIntent;
 import static mega.privacy.android.app.utils.MegaNodeUtil.manageURLNode;
-import static mega.privacy.android.app.utils.MegaNodeUtil.myBackupHandle;
 import static mega.privacy.android.app.utils.TimeUtils.*;
 import static mega.privacy.android.app.utils.Util.*;
 
@@ -240,7 +239,7 @@ public class FileBrowserFragmentLollipop extends RotatableFragment{
 					// Show the warning dialog if the list including Backup node
 					if (nodeType == BACKUP_ROOT) {
 						actWithBackupTips(handleList, pNode, nodeType, ACTION_BACKUP_SHARE_FOLDER);
-					} else if (nodeType == BACKUP_DEVICE || nodeType == BACKUP_SUBFOLDER) {
+					} else if (nodeType == BACKUP_DEVICE || nodeType == BACKUP_SUB_DEVICE_FOLDER || nodeType == BACKUP_SUBFOLDER) {
 						Long handle = handleList.get(0);
 						MegaNode p = megaApi.getNodeByHandle(handle);
 						actWithBackupTips(handleList, p, nodeType, ACTION_BACKUP_SHARE_FOLDER);
@@ -263,7 +262,7 @@ public class FileBrowserFragmentLollipop extends RotatableFragment{
 
 					if (nodeType == BACKUP_ROOT) {
 						actWithBackupTips(handleList, pNode, nodeType, ACTION_BACKUP_SHARE);
-					} else if (nodeType == BACKUP_DEVICE || nodeType == BACKUP_SUBFOLDER) {
+					} else if (nodeType == BACKUP_DEVICE || nodeType == BACKUP_SUB_DEVICE_FOLDER || nodeType == BACKUP_SUBFOLDER) {
 						Long handle = handleList.get(0);
 						MegaNode p = megaApi.getNodeByHandle(handle);
 						actWithBackupTips(handleList, p, nodeType, ACTION_BACKUP_SHARE);
@@ -1382,7 +1381,7 @@ public class FileBrowserFragmentLollipop extends RotatableFragment{
 
 					@Override
 					public void actionConfirmed(ArrayList<Long> handleList, @NotNull MegaNode pNodeBackup, int nodeType, int actionType) {
-						confirmationMove(handleList, pNodeBackup, nodeType, actionType);
+						confirmationAction(handleList, pNodeBackup, nodeType, actionType);
 					}
 				},
 				handleList,
@@ -1400,7 +1399,7 @@ public class FileBrowserFragmentLollipop extends RotatableFragment{
 	 * @param nodeType the type of the backup node - BACKUP_NONE / BACKUP_ROOT / BACKUP_DEVICE / BACKUP_SUBFOLDER
 	 * @param actionType Indicates the action to backup folder or file (move, remove, add, create etc.)
 	 */
-	private void confirmationMove(final ArrayList<Long> handleList, MegaNode pNodeBackup, int nodeType, int actionType) {
+	private void confirmationAction(final ArrayList<Long> handleList, MegaNode pNodeBackup, int nodeType, int actionType) {
 		if (handleList != null && pNodeBackup != null) {
 			showConfirmDialogWithBackup(this.mActivity, new ActionBackupNodeCallback() {
 						@Override

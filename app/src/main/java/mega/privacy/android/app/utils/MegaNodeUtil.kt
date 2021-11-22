@@ -1766,13 +1766,15 @@ object MegaNodeUtil {
         if(handleList != null) {
             if (handleList.size > 0) {
                 val handle: Long = handleList[0]
-                var p: MegaNode = megaApi.getNodeByHandle(handle)
-                if(p.handle == myBackupHandle){
-                    return BACKUP_ROOT
+                var p: MegaNode? = megaApi.getNodeByHandle(handle)
+                if (p != null) {
+                    if(p.handle == myBackupHandle){
+                        return BACKUP_ROOT
+                    }
                 }
 
                 p = megaApi.getParentNode(p)
-                if(p.handle == myBackupHandle){
+                if(p!= null && p.handle == myBackupHandle){
                     return BACKUP_DEVICE
                 }
 
@@ -1781,7 +1783,7 @@ object MegaNodeUtil {
                     p = megaApi.getParentNode(p)
                     index ++
 
-                    if(p.handle == myBackupHandle){
+                    if(p!= null && p.handle == myBackupHandle){
                         if(index == 1){
                             return BACKUP_SUB_DEVICE_FOLDER
                         }
@@ -1804,13 +1806,15 @@ object MegaNodeUtil {
     @JvmStatic
     fun checkBackupNodeTypeByHandle(megaApi: MegaApiAndroid, node: MegaNode?): Int{
         if(node != null) {
-            var p: MegaNode = node
-            if(p.handle == myBackupHandle){
-                return BACKUP_ROOT
+            var p: MegaNode? = node
+            if (p != null) {
+                if(p.handle == myBackupHandle){
+                    return BACKUP_ROOT
+                }
             }
 
             p = megaApi.getParentNode(p)
-            if(p.handle == myBackupHandle){
+            if(p!= null && p.handle == myBackupHandle){
                 return BACKUP_DEVICE
             }
 
@@ -1819,7 +1823,7 @@ object MegaNodeUtil {
                 p = megaApi.getParentNode(p)
                 index ++
 
-                if(p.handle == myBackupHandle){
+                if(p!= null && p.handle == myBackupHandle){
                     if(index == 1){
                         return BACKUP_SUB_DEVICE_FOLDER
                     }

@@ -72,7 +72,7 @@ object MegaNodeDialogUtil {
     const val BACKUP_SUBFOLDER = 3
 
     // For backup node actions
-    const val ACTION_BACK_NONE = -1
+    const val ACTION_BACKUP_NONE = -1
     const val ACTION_BACKUP_MOVE = 0
     const val ACTION_BACKUP_REMOVE = 1
     const val ACTION_BACKUP_FAB = 2
@@ -754,10 +754,12 @@ object MegaNodeDialogUtil {
                             || actionType == ACTION_BACKUP_SHARE
                             || actionType == ACTION_BACKUP_SHARE_CHAT
                             || actionType == ACTION_BACKUP_GET_LINK
-                            || (actionType == ACTION_COPY_TO_BACKUP && nodeType != BACKUP_SUBFOLDER)
-                            || (actionType == ACTION_MOVE_TO_BACKUP && nodeType != BACKUP_SUBFOLDER)
+                            || (actionType == ACTION_COPY_TO_BACKUP && (nodeType == BACKUP_ROOT || nodeType == BACKUP_DEVICE))
+                            || (actionType == ACTION_MOVE_TO_BACKUP && (nodeType == BACKUP_ROOT || nodeType == BACKUP_DEVICE))
                             || (actionType == ACTION_BACKUP_ADD && nodeType != BACKUP_SUBFOLDER)
-                            || (actionType == ACTION_BACKUP_FAB && nodeType != BACKUP_SUBFOLDER)) {
+                            || (actionType == ACTION_BACKUP_FAB && nodeType != BACKUP_SUBFOLDER)
+                            || (actionType == ACTION_BACKUP_TAKE_PICTURE && nodeType != BACKUP_SUBFOLDER)
+                            || (actionType == ACTION_BACKUP_NEW_FOLDER && nodeType != BACKUP_SUBFOLDER)) {
                             actionBackupNodeCallback.actionExecute(
                                 handleList,
                                 pNodeBackup,
@@ -794,7 +796,7 @@ object MegaNodeDialogUtil {
                 }
             }
             ACTION_COPY_TO_BACKUP, ACTION_MOVE_TO_BACKUP -> {
-                if (nodeType == BACKUP_ROOT || nodeType == BACKUP_DEVICE) {
+                if (nodeType == BACKUP_ROOT || nodeType == BACKUP_DEVICE || nodeType == BACKUP_SUB_DEVICE_FOLDER) {
                     tvTitle.text = getString(R.string.backup_add_item_title)
                     tvContent.setText(R.string.backup_add_item_to_root_text)
                 } else {
