@@ -1463,6 +1463,15 @@ public class Util {
 		}
 	}
 
+	/**
+	 * Checks if the current Android version is Android 11 or upper.
+	 *
+	 * @return True if the current Android version is Android 11 or upper, false otherwise.
+	 */
+	public static boolean isAndroid11OrUpper() {
+		return Build.VERSION.SDK_INT >= Build.VERSION_CODES.R;
+	}
+
 	public static boolean isAndroid10() {
 		return Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q;
 	}
