@@ -31,11 +31,16 @@ class CreateGroupChatUseCase @Inject constructor(
     fun getGroupChatRoomCreated(contactsData: ArrayList<String>, chatTitle: String?): Single<Long> =
         Single.create { emitter ->
             val peerList = MegaChatPeerList.createInstance()
-            for (i in contactsData.indices) {
-                val user = megaApi.getContact(contactsData[i])
-                if (user != null) {
-                    peerList.addPeer(user.handle, MegaChatPeerList.PRIV_STANDARD)
+            contactsData.forEach { email ->
+                val contact = megaApi.getContact(email)
+                if (contact != null) {
+                    peerList.addPeer(contact.handle, MegaChatPeerList.PRIV_STANDARD)
                 }
+            }
+
+            if (peerList.size() == 0) {
+                emitter.onError(IllegalArgumentException("No contacts"))
+                return@create
             }
 
             megaChatApi.createPublicChat(peerList,

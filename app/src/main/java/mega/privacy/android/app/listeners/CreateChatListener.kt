@@ -1,14 +1,11 @@
 package mega.privacy.android.app.listeners
 
 import android.content.Context
-import android.content.Intent
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
 import mega.privacy.android.app.interfaces.SnackbarShower
 import mega.privacy.android.app.interfaces.showSnackbar
 import mega.privacy.android.app.lollipop.listeners.MultipleForwardChatProcessor
-import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop
-import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.StringResourcesUtils.getQuantityString
 import mega.privacy.android.app.utils.StringResourcesUtils.getString
 import nz.mega.sdk.*
