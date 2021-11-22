@@ -125,7 +125,7 @@ abstract class BaseZoomFragment : BaseFragment(), GestureScaleCallback {
         return zoomViewModel.getCurrentZoom()
     }
 
-    protected fun updateViewSelected(allButton:TextView,daysButton:TextView,monthsButton:TextView,yearsButton:TextView,selectedView:Int) {
+    protected fun updateViewSelected(allButton:TextView?,daysButton:TextView?,monthsButton:TextView?,yearsButton:TextView?,selectedView:Int) {
         setViewTypeButtonStyle(allButton, false)
         setViewTypeButtonStyle(daysButton, false)
         setViewTypeButtonStyle(monthsButton, false)
@@ -145,7 +145,9 @@ abstract class BaseZoomFragment : BaseFragment(), GestureScaleCallback {
      * @param textView The TextView button to be applied with the style.
      * @param enabled true, apply selected style; false, apply unselected style.
      */
-    private fun setViewTypeButtonStyle(textView: TextView, enabled: Boolean) {
+    private fun setViewTypeButtonStyle(textView: TextView?, enabled: Boolean) {
+        if (textView == null)
+            return
         textView.setBackgroundResource(
             if (enabled)
                 R.drawable.background_18dp_rounded_selected_button

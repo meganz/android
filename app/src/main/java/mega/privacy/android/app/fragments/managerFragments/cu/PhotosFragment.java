@@ -751,7 +751,7 @@ public class PhotosFragment extends BaseZoomFragment implements CUGridViewAdapte
 
     @Override
     public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
-        if ((ManagerActivityLollipop) getActivity() != null && ((ManagerActivityLollipop) getActivity()).getDrawerItem() != ManagerActivityLollipop.DrawerItem.PHOTOS) {
+        if (!isInPhotosPage()) {
             return;
         }
         super.onCreateOptionsMenu(menu, inflater);
@@ -759,9 +759,13 @@ public class PhotosFragment extends BaseZoomFragment implements CUGridViewAdapte
 
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-        if ((ManagerActivityLollipop) getActivity() != null && ((ManagerActivityLollipop) getActivity()).getDrawerItem() != ManagerActivityLollipop.DrawerItem.PHOTOS) {
+        if (!isInPhotosPage()) {
             return true;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    public boolean isInPhotosPage(){
+        return (ManagerActivityLollipop) getActivity() != null && ((ManagerActivityLollipop) getActivity()).getDrawerItem() == ManagerActivityLollipop.DrawerItem.PHOTOS;
     }
 }
