@@ -5,7 +5,6 @@ import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.ContentResolver;
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.net.Uri;
 import android.os.AsyncTask;
@@ -17,8 +16,6 @@ import android.os.Looper;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.view.ActionMode;
 import androidx.core.content.FileProvider;
@@ -512,6 +509,13 @@ public class FileStorageActivityLollipop extends PasscodeActivity implements OnC
 	 * Sets the view to pick from Internal Storage.
 	 */
 	private void openPickFromInternalStorage() {
+		if (isAndroid11OrUpper() && mode == Mode.PICK_FOLDER) {
+			path = buildDefaultDownloadDir(this);
+			path.mkdirs();
+			finishPickFolder();
+			return;
+		}
+
 		pickingFromSDCard = false;
 		root = buildExternalStorageFile("");
 

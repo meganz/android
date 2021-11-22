@@ -58,6 +58,7 @@ import static mega.privacy.android.app.utils.TextUtil.getFolderInfo;
 import static mega.privacy.android.app.utils.OfflineUtils.getOfflineFile;
 import static mega.privacy.android.app.utils.TimeUtils.formatLongDateTime;
 import static mega.privacy.android.app.utils.Util.getSizeString;
+import static mega.privacy.android.app.utils.Util.isAndroid11OrUpper;
 import static nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE;
 
 public class FileUtil {
@@ -476,6 +477,10 @@ public class FileUtil {
     }
 
     public static String getDownloadLocation() {
+        if (isAndroid11OrUpper()) {
+            return buildDefaultDownloadDir(MegaApplication.getInstance()).getAbsolutePath();
+        }
+
         DatabaseHandler dbH = DatabaseHandler.getDbHandler(MegaApplication.getInstance());
         MegaPreferences prefs = dbH.getPreferences();
 
@@ -486,7 +491,8 @@ public class FileUtil {
                 && prefs.getStorageDownloadLocation().compareTo("") != 0) {
             return prefs.getStorageDownloadLocation();
         }
-        return DOWNLOAD_DIR;
+
+        return buildDefaultDownloadDir(MegaApplication.getInstance()).getAbsolutePath();
     }
 
     public static boolean isFileAvailable(File file) {
@@ -509,7 +515,7 @@ public class FileUtil {
     }
 
     public static String getExternalStoragePath(String filePath) {
-        return Environment.getExternalStorageDirectory().getAbsolutePath() + filePath;
+        return Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).getAbsolutePath() + filePath;
     }
 
     public static File buildExternalStorageFile(String filePath) {
@@ -517,8 +523,9 @@ public class FileUtil {
     }
 
     public static File buildDefaultDownloadDir(Context context) {
-        if (Environment.getExternalStorageDirectory() != null) {
-            return buildExternalStorageFile(DOWNLOAD_DIR);
+        File downloadsDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
+        if (downloadsDir != null) {
+            return new File(downloadsDir, DOWNLOAD_DIR);
         } else {
             return context.getFilesDir();
         }
