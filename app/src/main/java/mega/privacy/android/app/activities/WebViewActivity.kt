@@ -41,7 +41,6 @@ import java.util.*
 class WebViewActivity : BaseActivity() {
 
     companion object {
-        private const val FILE_CHOOSER_RESULT_CODE = 1000
         private const val IMAGE_CONTENT_TYPE = 0
         private const val VIDEO_CONTENT_TYPE = 1
         private const val FILE = "file:"

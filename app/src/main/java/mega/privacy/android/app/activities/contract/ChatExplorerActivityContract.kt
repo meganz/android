@@ -3,7 +3,6 @@ package mega.privacy.android.app.activities.contract
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
-import android.net.Uri
 import androidx.activity.result.contract.ActivityResultContract
 import mega.privacy.android.app.lollipop.megachat.ChatExplorerActivity
 
