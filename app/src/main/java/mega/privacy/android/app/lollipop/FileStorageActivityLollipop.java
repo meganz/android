@@ -196,6 +196,7 @@ public class FileStorageActivityLollipop extends PasscodeActivity implements OnC
 	private Handler handler;
 
 	private boolean pickingFromSDCard;
+	private boolean isChoosingStorage;
 
     /**
      * Pass to exporting recovery key operation.
@@ -319,7 +320,7 @@ public class FileStorageActivityLollipop extends PasscodeActivity implements OnC
 	    getSupportActionBar().setDisplayShowCustomEnabled(true);
 	    
 	    newFolderMenuItem = menu.findItem(R.id.cab_menu_create_folder);
-        newFolderMenuItem.setVisible(mode == Mode.PICK_FOLDER);
+        newFolderMenuItem.setVisible(!isChoosingStorage && mode == Mode.PICK_FOLDER);
 	    
 	    return super.onCreateOptionsMenu(menu);
 	}
@@ -329,8 +330,8 @@ public class FileStorageActivityLollipop extends PasscodeActivity implements OnC
 		logDebug("onPrepareOptionsMenu");
 
 		menu.findItem(R.id.cab_menu_unselect_all).setVisible(false);
-		menu.findItem(R.id.cab_menu_select_all).setVisible(mode == Mode.PICK_FILE);
-		newFolderMenuItem.setVisible(mode == Mode.PICK_FOLDER);
+		menu.findItem(R.id.cab_menu_select_all).setVisible(!isChoosingStorage && mode == Mode.PICK_FILE);
+		newFolderMenuItem.setVisible(!isChoosingStorage && mode == Mode.PICK_FOLDER);
 
 		return super.onPrepareOptionsMenu(menu);
 	}
@@ -640,14 +641,18 @@ public class FileStorageActivityLollipop extends PasscodeActivity implements OnC
 	 */
 	private void showRootWithSDView(boolean show) {
 		if (show) {
+			isChoosingStorage = true;
 			contentText.setText(String.format("%s%s", SEPARATOR, getString(R.string.storage_root_label)));
 			rootLevelLayout.setVisibility(View.VISIBLE);
 			buttonsContainer.setVisibility(View.GONE);
 			showEmptyState();
 		} else {
+			isChoosingStorage = false;
 			rootLevelLayout.setVisibility(View.GONE);
 			buttonsContainer.setVisibility(View.VISIBLE);
 		}
+
+		invalidateOptionsMenu();
 	}
 
 	/**
