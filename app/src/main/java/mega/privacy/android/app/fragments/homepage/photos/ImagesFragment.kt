@@ -466,8 +466,6 @@ class ImagesFragment : BaseZoomFragment(){
      * @param currentZoom Zoom level.
      */
     fun setupListAdapter(currentZoom: Int) {
-        // currentZoom = zoom
-
         val isPortrait =
             resources.configuration.orientation == Configuration.ORIENTATION_PORTRAIT
         val spanCount = getSpanCount(isPortrait)
@@ -476,10 +474,8 @@ class ImagesFragment : BaseZoomFragment(){
         listView.layoutManager = gridLayoutManager
 
         if (selectedView == ALL_VIEW) {
-            if (!this::browseAdapter.isInitialized) {
-                browseAdapter =
-                    PhotosBrowseAdapter(actionModeViewModel, itemOperationViewModel, currentZoom)
-            }
+            browseAdapter =
+                PhotosBrowseAdapter(actionModeViewModel, itemOperationViewModel, currentZoom)
 
             ZoomUtil.setMargin(context, params, currentZoom)
 

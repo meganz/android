@@ -31,39 +31,33 @@ class ZoomViewModel @Inject constructor(): ViewModel() {
     /**
      * return a Boolean [true] indicate can zoom in, so we can from this flag to handle UI logic, otherwise, false.
      */
-    fun zoomIn(): Boolean {
+    fun zoomIn() {
         if (currentZoom < ZoomUtil.ZOOM_IN_1X) {
             // Don't use currentZoom++, shouldn't change the value of currentZoom here.
             setZoom(currentZoom + 1)
         }
-        return canZoomIn()
     }
 
     /**
      * return a Boolean [true] indicate can zoom in, otherwise, false.
      */
-    fun canZoomIn(): Boolean {
-        return currentZoom != ZoomUtil.ZOOM_IN_1X
-    }
+    fun canZoomIn() = currentZoom != ZoomUtil.ZOOM_IN_1X
 
 
     /**
      * return a Boolean [true] Zoom in the max, otherwise, false.
      */
-    fun zoomOut(): Boolean {
+    fun zoomOut() {
         if (currentZoom > ZoomUtil.ZOOM_OUT_2X) {
             // Don't use currentZoom--, shouldn't change the value of currentZoom here.
             setZoom(currentZoom - 1)
         }
-        return canZoomOut()
     }
 
     /**
      * return a Boolean [true] indicate can zoom out, so we can from this flag to handle UI logic, otherwise, false.
      */
-    fun canZoomOut(): Boolean {
-        return currentZoom != ZoomUtil.ZOOM_OUT_2X
-    }
+    fun canZoomOut() = currentZoom != ZoomUtil.ZOOM_OUT_2X
 
     fun restoreDefaultZoom() {
         setZoom(ZoomUtil.ZOOM_DEFAULT)
