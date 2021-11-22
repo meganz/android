@@ -109,6 +109,12 @@ android {
 //        compileTask -> compileTask.dependsOn megaSDK
 //    }
 
+    testOptions {
+        unitTests {
+            includeAndroidResources = true
+        }
+    }
+
     flavorDimensions "service"
     productFlavors {
         gms {
@@ -245,6 +251,14 @@ dependencies {
     // Testing dependencies
     testImplementation "junit:junit:$junitVersion"
     testImplementation "com.google.truth:truth:$truthVersion"
+    testImplementation "androidx.test.ext:truth:$androidxTestVersion"
+    testImplementation "androidx.arch.core:core-testing:$androidxArchCoreVersion"
+    testImplementation "androidx.test:core-ktx:$androidxTestVersion"
+    testImplementation "androidx.test:core:$androidxTestVersion"
+    testImplementation "org.robolectric:robolectric:$roboletricVersion"
+    testImplementation "androidx.test.ext:junit-ktx:$androidxTestExtVersion"
+    testImplementation "org.mockito:mockito-core:$mockitoVersion"
+
     androidTestImplementation "androidx.test.ext:junit:$androidxTestExtVersion"
 }
 
