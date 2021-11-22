@@ -978,6 +978,10 @@ public class FileStorageActivityLollipop extends PasscodeActivity implements OnC
 				updateActionModeTitle();
 			}
 		} else if (document.isFolder()) {
+			if (!document.getFile().canRead()) {
+				return;
+			}
+
 			lastPositionStack.push(mLayoutManager.findFirstCompletelyVisibleItemPosition());
 			changeFolder(document.getFile());
 		} else if (mode == Mode.PICK_FILE) {

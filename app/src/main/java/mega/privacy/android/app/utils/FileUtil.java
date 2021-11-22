@@ -519,7 +519,7 @@ public class FileUtil {
     }
 
     public static File buildExternalStorageFile(String filePath) {
-        return new File(getExternalStoragePath(filePath));
+        return new File(Environment.getExternalStorageDirectory().getAbsolutePath() + filePath);
     }
 
     public static File buildDefaultDownloadDir(Context context) {
