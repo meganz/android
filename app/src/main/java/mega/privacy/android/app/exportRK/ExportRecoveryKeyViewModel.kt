@@ -109,17 +109,16 @@ class ExportRecoveryKeyViewModel @ViewModelInject constructor(
      *                    (various data can be attached to Intent "extras").
      */
     fun manageActivityResult(context: Context, requestCode: Int, resultCode: Int, data: Intent?) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R && requestCode == REQUEST_WRITE_STORAGE && Environment.isExternalStorageManager()) {
-            saveRK(context as ExportRecoveryKeyActivity)
-        } else if (requestCode == REQUEST_DOWNLOAD_FOLDER && resultCode == RESULT_OK && data != null) {
-            val parentPath: String =
-                data.getStringExtra(FileStorageActivityLollipop.EXTRA_PATH) ?: return
-            val path = parentPath + File.separator + getRecoveryKeyFileName()
-            val sdCardUriString = data.getStringExtra(FileStorageActivityLollipop.EXTRA_SD_URI)
-            saveRKOnChosenPath(context, path, sdCardUriString)
-        } else {
+        if (requestCode != REQUEST_DOWNLOAD_FOLDER || resultCode != RESULT_OK || data == null) {
             logWarning("Wrong activity result.")
+            return
         }
+
+        val parentPath: String =
+            data.getStringExtra(FileStorageActivityLollipop.EXTRA_PATH) ?: return
+        val path = parentPath + File.separator + getRecoveryKeyFileName()
+        val sdCardUriString = data.getStringExtra(FileStorageActivityLollipop.EXTRA_SD_URI)
+        saveRKOnChosenPath(context, path, sdCardUriString)
     }
 
     /**
