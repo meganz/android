@@ -109,7 +109,7 @@ class ImagesFragment : BaseZoomFragment(){
 
     override fun handleOnCreateOptionsMenu() {
         handleOptionsMenuUpdate(shouldShowZoomMenuItem())
-        handleSortByMenuIcon(false)
+        removeSortByMenu()
     }
 
     private fun subscribeObservers() {
@@ -122,7 +122,7 @@ class ImagesFragment : BaseZoomFragment(){
                 handleOptionsMenuUpdate(true)
                 viewTypePanel.visibility = View.VISIBLE
             }
-            handleSortByMenuIcon(false)
+            removeSortByMenu()
         }
 
         viewModel.dateCards.observe(viewLifecycleOwner, ::showCards)
@@ -249,7 +249,7 @@ class ImagesFragment : BaseZoomFragment(){
             }
         }
         handleOptionsMenuUpdate(shouldShowZoomMenuItem())
-        handleSortByMenuIcon(false)
+        removeSortByMenu()
         updateViewSelected()
 
         // If selected view is not all view, add layout param behaviour, so that button panel will go off when scroll.

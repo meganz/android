@@ -65,12 +65,10 @@ abstract class BaseZoomFragment : BaseFragment(), GestureScaleCallback {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
             R.id.action_zoom_in -> {
-                zoomViewModel.zoomIn()
-                handleZoomMenuItemStatus()
+                zoomIn()
             }
             R.id.action_zoom_out -> {
                 zoomOut()
-                handleZoomMenuItemStatus()
             }
         }
         return super.onOptionsItemSelected(item)
@@ -107,9 +105,9 @@ abstract class BaseZoomFragment : BaseFragment(), GestureScaleCallback {
         }
     }
 
-    fun handleSortByMenuIcon(shouldShow: Boolean){
+    fun removeSortByMenu() {
         if (this::menu.isInitialized) {
-            menu.findItem(R.id.action_menu_sort_by)?.isVisible = shouldShow
+            menu.removeItem(R.id.action_menu_sort_by)
         }
     }
 
