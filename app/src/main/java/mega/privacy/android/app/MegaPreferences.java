@@ -1,14 +1,11 @@
 package mega.privacy.android.app;
 
-import static mega.privacy.android.app.constants.SettingsConstants.VIDEO_QUALITY_ORIGINAL;
-import static mega.privacy.android.app.utils.Constants.REQUIRE_PASSCODE_INVALID;
 import static mega.privacy.android.app.utils.LogUtil.*;
 
 public class MegaPreferences{
 	
 	String firstTime;
 	String camSyncWifi;
-    String camSyncCharging;
 	String camSyncEnabled;
 	String camSyncHandle;
 	String camSyncLocalPath;
@@ -38,7 +35,7 @@ public class MegaPreferences{
 	private String preferredSortCameraUpload;
 	String preferredSortOthers;
 	String firstTimeChat;
-	String uploadVideoQuality = String.valueOf(VIDEO_QUALITY_ORIGINAL);
+	String uploadVideoQuality;
 	String conversionOnCharging;
 	private String removeGPS;
 	String chargingOnSize;
@@ -50,20 +47,18 @@ public class MegaPreferences{
 	private String askForSetDownloadLocation;
 	private String mediaSDCardUri;
 	private String isMediaOnSDCard;
-	private String passcodeLockRequireTime = String.valueOf(REQUIRE_PASSCODE_INVALID);
-	private String fingerprintLock = "false";
+	private String passcodeLockRequireTime;
+	private String fingerprintLock;
 
 	public final static int ONLY_PHOTOS = 1001;
 	public final static int ONLY_VIDEOS = 1002;
 	public final static int PHOTOS_AND_VIDEOS = 1003;
 	public final static int CHARGING_ON_SIZE_DEFAULT = 200;
 
-	MegaPreferences() {}
-
 	MegaPreferences(String firstTime, String camSyncWifi, String camSyncEnabled,
 					String camSyncHandle, String camSyncLocalPath, String camSyncFileUpload,
 					String camSyncTimeStamp, String passcodeLockEnabled, String passcodeLockCode,
-					String storageAskAlways, String storageDownloadLocation, String camSyncCharging,
+					String storageAskAlways, String storageDownloadLocation,
 					String lastFolderUpload, String lastFolderCloud,
 					String secondaryMediaFolderEnabled, String localPathSecondaryFolder,
 					String megaHandleSecondaryFolder, String secSyncTimeStamp,
@@ -90,7 +85,6 @@ public class MegaPreferences{
 		this.passcodeLockCode = passcodeLockCode;
 		this.storageAskAlways = storageAskAlways;
 		this.storageDownloadLocation = storageDownloadLocation;
-        this.camSyncCharging = camSyncCharging;
 		this.lastFolderUpload = lastFolderUpload;
 		this.lastFolderCloud = lastFolderCloud;
 		this.secondaryMediaFolderEnabled = secondaryMediaFolderEnabled;

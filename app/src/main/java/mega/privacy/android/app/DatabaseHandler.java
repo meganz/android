@@ -83,7 +83,6 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     private static final String KEY_CAM_SYNC_FILE_UPLOAD = "fileUpload";
     private static final String KEY_CAM_SYNC_TIMESTAMP = "camSyncTimeStamp";
     private static final String KEY_CAM_VIDEO_SYNC_TIMESTAMP = "camVideoSyncTimeStamp";
-    private static final String KEY_CAM_SYNC_CHARGING = "camSyncCharging";
     private static final String KEY_UPLOAD_VIDEO_QUALITY = "uploadVideoQuality";
     private static final String KEY_CONVERSION_ON_CHARGING = "conversionOnCharging";
     private static final String KEY_REMOVE_GPS = "removeGPS";
@@ -350,41 +349,40 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                 + KEY_STORAGE_ASK_ALWAYS + " TEXT, "                															//9
                 + KEY_STORAGE_DOWNLOAD_LOCATION + " TEXT, "         															//10
                 + KEY_CAM_SYNC_TIMESTAMP + " TEXT, "                															//11
-                + KEY_CAM_SYNC_CHARGING + " BOOLEAN, "              															//12
-                + KEY_LAST_UPLOAD_FOLDER + " TEXT, "                															//13
-                + KEY_LAST_CLOUD_FOLDER_HANDLE + " TEXT, "          															//14
-                + KEY_SEC_FOLDER_ENABLED + " TEXT, "                															//15
-                + KEY_SEC_FOLDER_LOCAL_PATH + " TEXT, "             															//16
-                + KEY_SEC_FOLDER_HANDLE + " TEXT, "                 															//17
-                + KEY_SEC_SYNC_TIMESTAMP + " TEXT, "                															//18
-                + KEY_KEEP_FILE_NAMES + " BOOLEAN, "                															//19
-                + KEY_STORAGE_ADVANCED_DEVICES + " BOOLEAN, "       															//20
-                + KEY_PREFERRED_VIEW_LIST + " BOOLEAN, "            															//21
-                + KEY_PREFERRED_VIEW_LIST_CAMERA + " BOOLEAN, "     															//22
-                + KEY_URI_EXTERNAL_SD_CARD + " TEXT, "              															//23
-                + KEY_CAMERA_FOLDER_EXTERNAL_SD_CARD + " BOOLEAN, " 															//24
-                + KEY_PASSCODE_LOCK_TYPE + " TEXT, "                  														    //25
-                + KEY_PREFERRED_SORT_CLOUD + " TEXT, "              															//26
-                + KEY_PREFERRED_SORT_CONTACTS + " TEXT, "           															//27
-                + KEY_PREFERRED_SORT_OTHERS + " TEXT,"              															//28
-                + KEY_FIRST_LOGIN_CHAT + " BOOLEAN, "               															//29
-                + KEY_AUTO_PLAY + " BOOLEAN,"                       															//30
-                + KEY_UPLOAD_VIDEO_QUALITY + " TEXT DEFAULT '" + encrypt(String.valueOf(VIDEO_QUALITY_ORIGINAL))+ "',"			//31
-                + KEY_CONVERSION_ON_CHARGING + " BOOLEAN,"          															//32
-                + KEY_CHARGING_ON_SIZE + " TEXT,"                   															//33
-                + KEY_SHOULD_CLEAR_CAMSYNC_RECORDS + " TEXT,"       															//34
-                + KEY_CAM_VIDEO_SYNC_TIMESTAMP + " TEXT,"           															//35
-                + KEY_SEC_VIDEO_SYNC_TIMESTAMP + " TEXT,"           															//36
-                + KEY_REMOVE_GPS + " TEXT,"                         															//37
-                + KEY_SHOW_INVITE_BANNER + " TEXT,"                 															//38
-                + KEY_PREFERRED_SORT_CAMERA_UPLOAD + " TEXT,"       															//39
-				+ KEY_SD_CARD_URI + " TEXT,"                        															//40
-                + KEY_ASK_FOR_DISPLAY_OVER  + " TEXT,"																			//41
-				+ KEY_ASK_SET_DOWNLOAD_LOCATION + " BOOLEAN,"																	//42
-				+ KEY_URI_MEDIA_EXTERNAL_SD_CARD + " TEXT,"																		//43
-				+ KEY_MEDIA_FOLDER_EXTERNAL_SD_CARD + " BOOLEAN," 																//44
-				+ KEY_PASSCODE_LOCK_REQUIRE_TIME + " TEXT DEFAULT '" + encrypt("" + (REQUIRE_PASSCODE_INVALID)) + "', "	        //45
-				+ KEY_FINGERPRINT_LOCK + " BOOLEAN DEFAULT '" + encrypt("false") + "'"									        //46
+                + KEY_LAST_UPLOAD_FOLDER + " TEXT, "                															//12
+                + KEY_LAST_CLOUD_FOLDER_HANDLE + " TEXT, "          															//13
+                + KEY_SEC_FOLDER_ENABLED + " TEXT, "                															//14
+                + KEY_SEC_FOLDER_LOCAL_PATH + " TEXT, "             															//15
+                + KEY_SEC_FOLDER_HANDLE + " TEXT, "                 															//16
+                + KEY_SEC_SYNC_TIMESTAMP + " TEXT, "                															//17
+                + KEY_KEEP_FILE_NAMES + " BOOLEAN, "                															//18
+                + KEY_STORAGE_ADVANCED_DEVICES + " BOOLEAN, "       															//19
+                + KEY_PREFERRED_VIEW_LIST + " BOOLEAN, "            															//20
+                + KEY_PREFERRED_VIEW_LIST_CAMERA + " BOOLEAN, "     															//21
+                + KEY_URI_EXTERNAL_SD_CARD + " TEXT, "              															//22
+                + KEY_CAMERA_FOLDER_EXTERNAL_SD_CARD + " BOOLEAN, " 															//23
+                + KEY_PASSCODE_LOCK_TYPE + " TEXT, "                  														    //24
+                + KEY_PREFERRED_SORT_CLOUD + " TEXT, "              															//25
+                + KEY_PREFERRED_SORT_CONTACTS + " TEXT, "           															//26
+                + KEY_PREFERRED_SORT_OTHERS + " TEXT,"              															//27
+                + KEY_FIRST_LOGIN_CHAT + " BOOLEAN, "               															//28
+                + KEY_AUTO_PLAY + " BOOLEAN,"                       															//29
+                + KEY_UPLOAD_VIDEO_QUALITY + " TEXT DEFAULT '" + encrypt(String.valueOf(VIDEO_QUALITY_ORIGINAL))+ "',"			//30
+                + KEY_CONVERSION_ON_CHARGING + " BOOLEAN,"          															//31
+                + KEY_CHARGING_ON_SIZE + " TEXT,"                   															//32
+                + KEY_SHOULD_CLEAR_CAMSYNC_RECORDS + " TEXT,"       															//33
+                + KEY_CAM_VIDEO_SYNC_TIMESTAMP + " TEXT,"           															//34
+                + KEY_SEC_VIDEO_SYNC_TIMESTAMP + " TEXT,"           															//35
+                + KEY_REMOVE_GPS + " TEXT,"                         															//36
+                + KEY_SHOW_INVITE_BANNER + " TEXT,"                 															//37
+                + KEY_PREFERRED_SORT_CAMERA_UPLOAD + " TEXT,"       															//38
+				+ KEY_SD_CARD_URI + " TEXT,"                        															//39
+                + KEY_ASK_FOR_DISPLAY_OVER  + " TEXT,"																			//40
+				+ KEY_ASK_SET_DOWNLOAD_LOCATION + " BOOLEAN,"																	//41
+				+ KEY_URI_MEDIA_EXTERNAL_SD_CARD + " TEXT,"																		//42
+				+ KEY_MEDIA_FOLDER_EXTERNAL_SD_CARD + " BOOLEAN," 																//43
+				+ KEY_PASSCODE_LOCK_REQUIRE_TIME + " TEXT DEFAULT '" + encrypt("" + (REQUIRE_PASSCODE_INVALID)) + "', "	        //44
+				+ KEY_FINGERPRINT_LOCK + " BOOLEAN DEFAULT '" + encrypt("false") + "'"									        //45
 				+ ")";
 
         db.execSQL(CREATE_PREFERENCES_TABLE);
@@ -884,6 +882,9 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 				setPreferences(db, preferences);
 			}
 
+            // After re-create the table, refresh it to make sure the columns have correct index.
+            getPreferences(db);
+
 			preferencesAlreadyUpdated = true;
 		}
 
@@ -896,7 +897,11 @@ public class DatabaseHandler extends SQLiteOpenHelper {
             MegaPreferences preferences = getPreferences(db);
             db.execSQL("DROP TABLE IF EXISTS " + TABLE_PREFERENCES);
             onCreate(db);
-            setPreferences(db, preferences);
+
+            if (preferences != null) {
+                setPreferences(db, preferences);
+            }
+
             // After re-create the table, refresh it to make sure the columns have correct index.
             getPreferences(db);
         }
@@ -1637,7 +1642,6 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                 String askAlways = decrypt(cursor.getString(getColumnIndex(cursor, KEY_STORAGE_ASK_ALWAYS)));
                 String downloadLocation = decrypt(cursor.getString(getColumnIndex(cursor, KEY_STORAGE_DOWNLOAD_LOCATION)));
                 String camSyncTimeStamp = decrypt(cursor.getString(getColumnIndex(cursor, KEY_CAM_SYNC_TIMESTAMP)));
-                String camSyncCharging = decrypt(cursor.getString(getColumnIndex(cursor, KEY_CAM_SYNC_CHARGING)));
                 String lastFolderUpload = decrypt(cursor.getString(getColumnIndex(cursor, KEY_LAST_UPLOAD_FOLDER)));
                 String lastFolderCloud = decrypt(cursor.getString(getColumnIndex(cursor, KEY_LAST_CLOUD_FOLDER_HANDLE)));
                 String secondaryFolderEnabled = decrypt(cursor.getString(getColumnIndex(cursor, KEY_SEC_FOLDER_ENABLED)));
@@ -1678,7 +1682,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
 				prefs = new MegaPreferences(firstTime, wifi, camSyncEnabled, camSyncHandle,
 						camSyncLocalPath, fileUpload, camSyncTimeStamp, pinLockEnabled,
-						pinLockCode, askAlways, downloadLocation, camSyncCharging, lastFolderUpload,
+						pinLockCode, askAlways, downloadLocation, lastFolderUpload,
 						lastFolderCloud, secondaryFolderEnabled, secondaryPath, secondaryHandle,
 						secSyncTimeStamp, keepFileNames, storageAdvancedDevices, preferredViewList,
 						preferredViewListCamera, uriExternalSDCard, cameraFolderExternalSDCard,
