@@ -1927,6 +1927,9 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                 dbH.clearEphemeral();
 
                 megaApi.fetchNodes(this);
+
+                // Get cookies settings after login.
+                MegaApplication.getInstance().checkEnabledCookies();
             }
         } else if(request.getType() == MegaRequest.TYPE_LOGOUT) {
             logDebug("TYPE_LOGOUT");

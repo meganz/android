@@ -59,6 +59,7 @@ import androidx.core.content.ContextCompat;
 import androidx.core.view.MenuItemCompat;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
+import androidx.navigation.fragment.NavHostFragment;
 import androidx.viewpager.widget.ViewPager;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.appcompat.app.ActionBar;
@@ -4425,7 +4426,8 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 	 * BNV, Toolbar title, etc.
 	 */
 	private void setupNavDestListener() {
-		mNavController = Navigation.findNavController(mNavHostView);
+		NavHostFragment navHostFragment = (NavHostFragment) getSupportFragmentManager().findFragmentById(R.id.nav_host_fragment);
+		mNavController = navHostFragment.getNavController();
 
 		mNavController.addOnDestinationChangedListener((controller, destination, arguments) -> {
 			int destinationId = destination.getId();
@@ -4795,6 +4797,11 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 		updateMiniAudioPlayerVisibility(true);
 
 		bNV.setTranslationY(0);
+		bNV.animate().cancel();
+		bNV.clearAnimation();
+		if (bNV.getVisibility() != View.VISIBLE) {
+			bNV.setVisibility(View.VISIBLE);
+		}
 		bNV.setVisibility(View.VISIBLE);
 		final CoordinatorLayout.LayoutParams params = new CoordinatorLayout.LayoutParams(
 				ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);

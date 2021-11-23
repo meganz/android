@@ -731,7 +731,10 @@ public class FolderLinkActivityLollipop extends TransfersManagementActivity impl
 
 		if (request.getType() == MegaRequest.TYPE_LOGIN){
 			if (e.getErrorCode() == MegaError.API_OK){
-				megaApiFolder.fetchNodes(this);	
+				megaApiFolder.fetchNodes(this);
+
+                // Get cookies settings after login.
+                MegaApplication.getInstance().checkEnabledCookies();
 			}
 			else{
 				logWarning("Error: " + e.getErrorCode());

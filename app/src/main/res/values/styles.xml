@@ -686,4 +686,9 @@
         <item name="android:src">@drawable/ic_check</item>
     </style>
 
+    <style name="textAppearanceSubtitle1">
+        <item name="android:textAppearance">?attr/textAppearanceSubtitle1</item>
+        <item name="android:letterSpacing">0.0004</item>
+    </style>
+
 </resources>

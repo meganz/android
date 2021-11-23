@@ -2137,6 +2137,9 @@ public class FileExplorerActivityLollipop extends TransfersManagementActivity
 				logDebug("Setting account auth token for folder links.");
 				megaApiFolder.setAccountAuth(megaApi.getAccountAuth());
 				megaApi.fetchNodes(this);
+
+                // Get cookies settings after login.
+                MegaApplication.getInstance().checkEnabledCookies();
 			}
 		}
 		else if (request.getType() == MegaRequest.TYPE_FETCH_NODES){

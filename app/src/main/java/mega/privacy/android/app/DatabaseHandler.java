@@ -493,9 +493,12 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 	public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         logInfo("Database upgraded from " + oldVersion + " to " + newVersion);
 
+		//Used to identify when the Chat Settings table has been already recreated
         boolean chatSettingsAlreadyUpdated = false;
+		//Used to identify when the Attributes table has been already recreated
         boolean attributesAlreadyUpdated = false;
-        boolean preferencesAlreadyUpdated = false;
+        //Used to identify when the Preferences table has been already recreated
+		boolean preferencesAlreadyUpdated = false;
 
 		if (oldVersion <= 7){
 			db.execSQL("ALTER TABLE " + TABLE_PREFERENCES + " ADD COLUMN " + KEY_CAM_SYNC_CHARGING + " BOOLEAN;");
@@ -877,7 +880,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 			preferencesAlreadyUpdated = true;
 		}
 
-		if (oldVersion <= 63) {
+		if (oldVersion <= 63 && !preferencesAlreadyUpdated) {
 			db.execSQL("ALTER TABLE " + TABLE_PREFERENCES + " ADD COLUMN " + KEY_FINGERPRINT_LOCK + " BOOLEAN;");
 			db.execSQL("UPDATE " + TABLE_PREFERENCES + " SET " + KEY_FINGERPRINT_LOCK + " = '" + encrypt("false") + "';");
 		}
@@ -1718,7 +1721,9 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 				String mediaSDCardUri = decrypt(cursor.getString(getColumnIndex(cursor, KEY_URI_MEDIA_EXTERNAL_SD_CARD)));
 				String isMediaOnSDCard = decrypt(cursor.getString(getColumnIndex(cursor, KEY_MEDIA_FOLDER_EXTERNAL_SD_CARD)));
 				String passcodeLockRequireTime = decrypt(cursor.getString(getColumnIndex(cursor, KEY_PASSCODE_LOCK_REQUIRE_TIME)));
-				String fingerprintLock = decrypt(cursor.getString(getColumnIndex(cursor, KEY_FINGERPRINT_LOCK)));
+				String fingerprintLock = cursor.getColumnIndex(KEY_FINGERPRINT_LOCK) != INVALID_VALUE
+						? decrypt(cursor.getString(getColumnIndex(cursor, KEY_FINGERPRINT_LOCK)))
+						: "false";
 
 				prefs = new MegaPreferences(firstTime, wifi, camSyncEnabled, camSyncHandle,
 						camSyncLocalPath, fileUpload, camSyncTimeStamp, pinLockEnabled,
@@ -1736,15 +1741,6 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		} catch (Exception e) {
 			logError("Exception opening or managing DB cursor", e);
 		}
-
-        // Insert a row with default values into the table.
-        if (prefs == null) {
-            logWarning("Preference is null, insert row with default values.");
-            prefs = new MegaPreferences();
-
-            // Insert this row.
-            setPreferences(db, prefs);
-        }
 
 		return prefs;
 	}
