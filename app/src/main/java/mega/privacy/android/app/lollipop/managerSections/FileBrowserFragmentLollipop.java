@@ -75,6 +75,7 @@ import mega.privacy.android.app.utils.CloudStorageOptionControlUtil;
 import mega.privacy.android.app.utils.ColorUtils;
 import mega.privacy.android.app.utils.FileUtil;
 import mega.privacy.android.app.utils.MegaNodeUtil;
+import mega.privacy.android.app.utils.SDCardUtils;
 import mega.privacy.android.app.utils.StringResourcesUtils;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaChatApiAndroid;
@@ -846,7 +847,8 @@ public class FileBrowserFragmentLollipop extends RotatableFragment{
             if (possibleLocalFile != null) {
                 logDebug("The node is already downloaded, found in local.");
 
-                if (MimeTypeList.typeForName(node.getName()).isZip()) {
+                // ZIP file on SD card can't not be created by `new java.util.zip.ZipFile(path)`.
+                if (MimeTypeList.typeForName(node.getName()).isZip() && !SDCardUtils.isLocalFolderOnSDCard(context, possibleLocalFile)) {
                     logDebug("The file is zip, open in-app.");
                     MegaNodeUtil.openZip(context, (ManagerActivityLollipop) context, possibleLocalFile, node.getHandle());
                 } else {

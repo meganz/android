@@ -335,32 +335,33 @@ public class FileUtil {
 
         String data = MediaStore.Files.FileColumns.DATA;
         final String[] projection = {data};
-        final String selection = MediaStore.Files.FileColumns.SIZE + " = ? AND "
-                + MediaStore.Files.FileColumns.DATE_MODIFIED + " = ?";
+        // Only query file by size, then compare file name. Since modification time will changed(copy to SD card)
+        // Display name may be null in the database.
+        final String selection = MediaStore.Files.FileColumns.SIZE + " = ?";
 
         final String[] selectionArgs = {
-                String.valueOf(node.getSize()),
-                String.valueOf(node.getModificationTime())};
+                String.valueOf(node.getSize())};
 
         try {
             Cursor cursor = context.getContentResolver().query(
                     MediaStore.Files.getContentUri(VOLUME_EXTERNAL), projection, selection,
                     selectionArgs, null);
 
-            List<String> candidates = checkFileInStorage(cursor, data, node.getName());
-
-            if (candidates.isEmpty()) {
-                cursor = context.getContentResolver().query(
-                        MediaStore.Files.getContentUri(VOLUME_INTERNAL), projection, selection,
-                        selectionArgs, null);
-                candidates.addAll(checkFileInStorage(cursor, data, node.getName()));
-            }
+            List<String> candidates = checkFileInStorage(context, cursor, data, node.getName());
 
             for(String path : candidates) {
                 File file = new File(path);
 
-                // Double check fingerprint.
-                if(isFileAvailable(file) && node.getFingerprint().equals(megaApiJava.getFingerprint(path))) {
+                boolean isAvailable = isFileAvailable(file);
+
+                // Double check fingerprint for internal storage file.
+                if(isAvailable && node.getFingerprint().equals(megaApiJava.getFingerprint(path))) {
+                    return path;
+                }
+
+                // After moving to SD card, the local file's fingerprint is different, it's due to modification time changed.
+                // So here don't check fingerprint.
+                if(SDCardUtils.isLocalFolderOnSDCard(context, path) && isAvailable) {
                     return path;
                 }
             }
@@ -374,24 +375,35 @@ public class FileUtil {
     }
 
     /**
-     * Searches in the correspondent storage established if the file exists
+     * Searches in the correspondent storage established if the file exists.
+     * If a file is path is found both on internal storage and SD card,
+     * put the path on internal storage before that on SD card.
      *
+     * @param context Context object.
      * @param cursor Cursor which contains all the requirements to find the file
      * @param columnName   Column name in which search
      * @param fileName Name of the searching node.
      * @return A list of file path that may be the path of the searching file.
      */
-    private static List<String> checkFileInStorage(Cursor cursor, String columnName, String fileName) {
+    private static List<String> checkFileInStorage(Context context, Cursor cursor, String columnName, String fileName) {
         List<String> candidates = new ArrayList<>();
+        List<String> sdCandidates = new ArrayList<>();
 
         while (cursor != null && cursor.moveToNext()) {
             int dataColumn = cursor.getColumnIndexOrThrow(columnName);
             String path = cursor.getString(dataColumn);
 
+            // Check file name.
             if (path.endsWith(fileName)) {
-                candidates.add(path);
+                if(SDCardUtils.isLocalFolderOnSDCard(context, path)) {
+                    sdCandidates.add(path);
+                } else {
+                    candidates.add(path);
+                }
             }
         }
+
+        candidates.addAll(sdCandidates);
 
         if(cursor != null) {
             cursor.close();
