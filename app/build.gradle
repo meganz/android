@@ -237,6 +237,8 @@ dependencies {
     hmsImplementation 'com.huawei.hms:location:6.2.0.300'
     hmsImplementation 'com.huawei.hms:maps:6.0.1.304'
     hmsImplementation 'com.huawei.hms:iap:4.0.2.300'
+    hmsImplementation 'com.huawei.hms:hianalytics:5.2.0.301'
+    hmsImplementation 'com.huawei.agconnect:agconnect-crash:1.5.1.300'
 
     // Play Core
     implementation("com.google.android.play:core:1.10.0")

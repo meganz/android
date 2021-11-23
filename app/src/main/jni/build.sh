@@ -41,7 +41,13 @@ if [ ! -d "${JAVA_HOME}" ]; then
     exit 1
 fi
 
-NDK_BUILD=${NDK_ROOT}/ndk-build
+#This is only for support to build using Mac M1. Please remove this once NDK provides support to M1.
+if [[ `uname -m` == 'arm64' ]]; then
+    NDK_BUILD="arch -x86_64 ${NDK_ROOT}/ndk-build"
+else
+    NDK_BUILD=${NDK_ROOT}/ndk-build
+fi
+
 BASE_PATH=`pwd`
 LIBDIR=${BASE_PATH}/../obj/local/armeabi
 JAVA_OUTPUT_PATH=${BASE_PATH}/../java

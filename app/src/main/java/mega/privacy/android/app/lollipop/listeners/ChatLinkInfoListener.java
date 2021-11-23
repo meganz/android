@@ -6,6 +6,7 @@ import android.graphics.Bitmap;
 
 import java.io.File;
 
+import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.lollipop.megachat.AndroidMegaRichLinkMessage;
 import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop;
 import nz.mega.sdk.MegaApiAndroid;
@@ -98,6 +99,9 @@ public class ChatLinkInfoListener implements MegaRequestListenerInterface, MegaC
                 megaApiFolder.setAccountAuth(megaApi.getAccountAuth());
 
                 megaApiFolder.fetchNodes(this);
+
+                // Get cookies settings after login.
+                MegaApplication.getInstance().checkEnabledCookies();
             } else if (request.getType() == MegaRequest.TYPE_FETCH_NODES) {
                 MegaNode rootNode = megaApiFolder.getRootNode();
 
