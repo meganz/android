@@ -68,9 +68,9 @@ public class FileUtil {
 
     public static final String CAMERA_FOLDER = "Camera";
 
-    public static final String DOWNLOAD_DIR = MAIN_DIR + File.separator + "MEGA Downloads";
+    public static final String DOWNLOAD_DIR = "MEGA Downloads";
 
-    public static final String LOG_DIR = MAIN_DIR + File.separator + "MEGA Logs";
+    public static final String LOG_DIR = "MEGA Logs";
 
     public static final String OLD_MK_FILE = MAIN_DIR + File.separator + "MEGAMasterKey.txt";
 
@@ -513,10 +513,6 @@ public class FileUtil {
 
     public static boolean isFileDownloadedLatest(File downloadedFile, MegaNode node) {
         return downloadedFile.lastModified() - node.getModificationTime() * 1000 >= 0;
-    }
-
-    public static String getExternalStoragePath(String filePath) {
-        return Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).getAbsolutePath() + filePath;
     }
 
     public static File buildExternalStorageFile(String filePath) {
