@@ -1,7 +1,6 @@
 package mega.privacy.android.app.meeting.adapter
 
 import android.graphics.PorterDuff
-import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.RecyclerView
@@ -25,8 +24,7 @@ class ParticipantViewHolder(
         binding.verifiedIcon.isVisible = false
         binding.participantListPermissions.isVisible = false
         binding.participantListContent.isVisible = false
-        binding.participantListAudio.isVisible = true
-        binding.participantListVideo.isVisible = true
+        binding.callOptions.isVisible = true
     }
 
     fun bind(participant: Participant) {
@@ -35,14 +33,9 @@ class ParticipantViewHolder(
         binding.participantListName.text =
             participant.getDisplayName(binding.participantListName.context)
 
-        val params = binding.participantListNameRl.layoutParams as ConstraintLayout.LayoutParams
-        params.endToStart = binding.participantListAudio.id
-        params.bottomToBottom = binding.participantListItemLayout.id
-        params.topToTop = binding.participantListItemLayout.id
-        params.startToEnd = binding.participantListThumbnail.id
-        binding.participantListNameRl.requestLayout()
-
-        if (participant.isModerator) {
+        if (!participant.isModerator) {
+            binding.participantListIconEnd.isVisible = false
+        } else {
             val drawable = ContextCompat.getDrawable(
                 binding.participantListName.context,
                 R.drawable.ic_moderator
@@ -53,20 +46,7 @@ class ParticipantViewHolder(
                     R.color.teal_300_teal_200
                 )
             )
-            binding.participantListName.setCompoundDrawablesWithIntrinsicBounds(
-                null,
-                null,
-                drawable,
-                null
-            )
-            binding.participantListName.compoundDrawablePadding = 5
-        } else {
-            binding.participantListName.setCompoundDrawablesWithIntrinsicBounds(
-                null,
-                null,
-                null,
-                null
-            )
+            binding.participantListIconEnd.isVisible = true
         }
 
         if (participant.isAudioOn) {

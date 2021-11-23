@@ -106,8 +106,8 @@ public class MegaParticipantsChatLollipopAdapter extends RecyclerView.Adapter<Me
         private ImageView verifiedIcon;
         private MarqueeTextView textViewContent;
         private EmojiTextView textViewContactName;
+        private ImageView textViewContactIcon;
         private ImageView imageButtonThreeDots;
-        private ImageView statusImage;
 
         private ImageView permissionsIcon;
         private int currentPosition;
@@ -258,9 +258,9 @@ public class MegaParticipantsChatLollipopAdapter extends RecyclerView.Adapter<Me
                 holderList.verifiedIcon = v.findViewById(R.id.verified_icon);
                 holderList.textViewContactName = v.findViewById(R.id.participant_list_name);
                 holderList.textViewContent = v.findViewById(R.id.participant_list_content);
+                holderList.textViewContactIcon = v.findViewById(R.id.participant_list_icon_end);
                 holderList.imageButtonThreeDots = v.findViewById(R.id.participant_list_three_dots);
                 holderList.permissionsIcon = v.findViewById(R.id.participant_list_permissions);
-                holderList.statusImage = new ImageView(groupChatInfoActivity);
                 holderList.itemLayout.setTag(holderList);
 
                 v.setTag(holderList);
@@ -432,13 +432,12 @@ public class MegaParticipantsChatLollipopAdapter extends RecyclerView.Adapter<Me
                     holderParticipantsList.imageView.setImageBitmap(getDefaultAvatar(avatarColor, holderParticipantsList.fullName, AVATAR_SIZE, true));
                 }
 
+                holderParticipantsList.textViewContactName.setText(participant.getFullName());
                 MegaUser contact = participant.isEmpty() ? null : megaApi.getContact(participant.getEmail());
                 holderParticipantsList.verifiedIcon.setVisibility(contact != null && megaApi.areCredentialsVerified(contact) ? View.VISIBLE : View.GONE);
                 int userStatus = handle == megaChatApi.getMyUserHandle() ? megaChatApi.getOnlineStatus() : getUserStatus(handle);
-                ((ViewHolderParticipantsList) holder).textViewContactName.setTypeEllipsize(TextUtils.TruncateAt.MIDDLE);
-                setContactStatusParticipantList(userStatus, ((ViewHolderParticipantsList) holder).textViewContactName, ((ViewHolderParticipantsList) holder).textViewContent, StatusIconLocation.STANDARD, outMetrics);
+                setContactStatusParticipantList(userStatus, ((ViewHolderParticipantsList) holder).textViewContactIcon, ((ViewHolderParticipantsList) holder).textViewContent, StatusIconLocation.STANDARD);
                 setContactLastGreen(groupChatInfoActivity, userStatus, participant.getLastGreen(), ((ViewHolderParticipantsList) holder).textViewContent);
-                ((ViewHolderParticipantsList) holder).textViewContactName.setText(participant.getFullName());
 
                 if (isPreview && megaChatApi.getInitState() == INIT_ANONYMOUS) {
                     holderParticipantsList.imageButtonThreeDots.setColorFilter(ContextCompat.getColor(groupChatInfoActivity, R.color.grey_038_white_038));

@@ -110,7 +110,6 @@ public class ChatUtil {
     private static final int RETENTION_TIME_DIALOG_OPTION_WEEK = 2;
     private static final int RETENTION_TIME_DIALOG_OPTION_MONTH = 3;
     private static final int RETENTION_TIME_DIALOG_OPTION_CUSTOM = 4;
-    private static final int PADDING_CONTACT_STATUS_ICON = 10;
 
     /**
      * Where is the status icon placed, according to the design,
@@ -576,22 +575,22 @@ public class ChatUtil {
     /**
      * Sets the contact status icon and status text
      *
-     * @param userStatus       contact's status
-     * @param participantName  view with participant's name
-     * @param contactStateText view in which the status text has to be set
-     * @param where            The status icon image resource is different based on the place where it's placed.
-     * @param outMetrics       DisplayMetrics
+     * @param userStatus          contact's status
+     * @param textViewContactIcon view in which the status icon has to be set
+     * @param contactStateText    view in which the status text has to be set
+     * @param where               The status icon image resource is different based on the place where it's placed.
      */
-    public static void setContactStatusParticipantList(int userStatus, final EmojiTextView participantName, TextView contactStateText, StatusIconLocation where, DisplayMetrics outMetrics) {
+    public static void setContactStatusParticipantList(int userStatus, final ImageView textViewContactIcon, TextView contactStateText, StatusIconLocation where) {
         MegaApplication app = MegaApplication.getInstance();
+        Context context = app.getApplicationContext();
+        int statusImageResId = getIconResourceIdByLocation(context, userStatus, where);
 
-        int statusImageResId = getIconResourceIdByLocation(app.getApplicationContext(), userStatus, where);
         if (statusImageResId == 0) {
-            participantName.setCompoundDrawablesWithIntrinsicBounds(null, null, null, null);
+            textViewContactIcon.setVisibility(View.GONE);
         } else {
-            Drawable drawable = ContextCompat.getDrawable(participantName.getContext(), statusImageResId);
-            participantName.setCompoundDrawablesWithIntrinsicBounds(null, null, drawable, null);
-            participantName.setCompoundDrawablePadding(dp2px(PADDING_CONTACT_STATUS_ICON, outMetrics));
+            Drawable drawable = ContextCompat.getDrawable(MegaApplication.getInstance().getApplicationContext(), statusImageResId);
+            textViewContactIcon.setImageDrawable(drawable);
+            textViewContactIcon.setVisibility(View.VISIBLE);
         }
 
         if (contactStateText == null) {
@@ -602,19 +601,19 @@ public class ChatUtil {
 
         switch (userStatus) {
             case MegaChatApi.STATUS_ONLINE:
-                contactStateText.setText(app.getString(R.string.online_status));
+                contactStateText.setText(context.getString(R.string.online_status));
                 break;
 
             case MegaChatApi.STATUS_AWAY:
-                contactStateText.setText(app.getString(R.string.away_status));
+                contactStateText.setText(context.getString(R.string.away_status));
                 break;
 
             case MegaChatApi.STATUS_BUSY:
-                contactStateText.setText(app.getString(R.string.busy_status));
+                contactStateText.setText(context.getString(R.string.busy_status));
                 break;
 
             case MegaChatApi.STATUS_OFFLINE:
-                contactStateText.setText(app.getString(R.string.offline_status));
+                contactStateText.setText(context.getString(R.string.offline_status));
                 break;
 
             case MegaChatApi.STATUS_INVALID:
@@ -622,7 +621,6 @@ public class ChatUtil {
                 contactStateText.setVisibility(View.GONE);
         }
     }
-
 
     /**
      * Get status icon image resource id by display mode and where the icon is placed.
