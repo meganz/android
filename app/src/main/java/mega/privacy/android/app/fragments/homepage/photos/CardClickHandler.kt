@@ -20,8 +20,11 @@ object CardClickHandler {
         if (cards == null) {
             return null
         }
-        if (position < 0 || position > cards.size - 1)
+
+        if (position < 0 || position > cards.size - 1) {
             return null
+        }
+
         var card: CUCard? = cards[position]
         if (handle != card!!.node.handle) {
             card = null
