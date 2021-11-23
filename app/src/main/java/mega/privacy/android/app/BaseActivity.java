@@ -47,6 +47,7 @@ import javax.inject.Inject;
 
 import dagger.hilt.android.AndroidEntryPoint;
 import kotlin.Pair;
+import kotlin.Suppress;
 import mega.privacy.android.app.components.saver.AutoPlayInfo;
 import mega.privacy.android.app.globalmanagement.MyAccountInfo;
 import mega.privacy.android.app.interfaces.ActivityLauncher;
@@ -1284,6 +1285,7 @@ public class BaseActivity extends AppCompatActivity implements ActivityLauncher,
     }
 
     @Override
+    @SuppressWarnings("deprecation") // TODO Migrate to registerForActivityResult()
     public void launchActivityForResult(@NotNull Intent intent, int requestCode) {
         startActivityForResult(intent, requestCode);
     }
