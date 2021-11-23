@@ -91,7 +91,7 @@ class GetImageHandlesUseCase @Inject constructor(
             if (items.isNotEmpty()) {
                 emitter.onNext(items)
             } else {
-                emitter.onError(IllegalStateException("Invalid image handles"))
+                emitter.onError(IllegalArgumentException("Invalid image handles"))
                 return@create
             }
 
@@ -187,6 +187,11 @@ class GetImageHandlesUseCase @Inject constructor(
         }
     }
 
+    /**
+     * Convert {@link MegaNode} to {@link ImageItem}
+     *
+     * @return  Resulting ImageItem
+     */
     private fun MegaNode.toImageItem(): ImageItem =
         ImageItem(
             handle = handle,

@@ -7,9 +7,7 @@ import mega.privacy.android.app.errors.BusinessAccountOverdueMegaError
 import mega.privacy.android.app.listeners.OptionalMegaRequestListenerInterface
 import mega.privacy.android.app.usecase.GetNodeUseCase
 import mega.privacy.android.app.utils.ErrorUtils.toThrowable
-import mega.privacy.android.app.utils.RxUtil.blockingGetOrNull
 import nz.mega.sdk.MegaApiAndroid
-import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaNode
 import javax.inject.Inject
@@ -91,21 +89,6 @@ class ExportNodeUseCase @Inject constructor(
      */
     fun disableExport(nodeHandle: Long): Completable =
         getNodeUseCase.get(nodeHandle).flatMapCompletable(::disableExport)
-
-    /**
-     * Search nodes on public links containing a search string in their name
-     *
-     * @param query         Search string. The search is case-insensitive
-     * @param order         Order for the returned list
-     * @return              Single containing the resulting list of Nodes
-     */
-    fun searchPublicLink(
-        query: String,
-        order: Int = MegaApiJava.ORDER_NONE
-    ): Single<List<MegaNode>> =
-        Single.fromCallable {
-            megaApi.searchOnPublicLinks(query, null, order)
-        }
 
     /**
      * Launches a request to stop sharing a file/folder

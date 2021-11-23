@@ -31,6 +31,7 @@ import mega.privacy.android.app.utils.LogUtil.logError
 import mega.privacy.android.app.utils.LogUtil.logWarning
 import mega.privacy.android.app.utils.MegaNodeDialogUtil.showRenameNodeDialog
 import mega.privacy.android.app.utils.NetworkUtil.isOnline
+import mega.privacy.android.app.utils.StringResourcesUtils
 import mega.privacy.android.app.utils.StringResourcesUtils.getQuantityString
 import mega.privacy.android.app.utils.ViewUtils.waitForLayout
 import nz.mega.documentscanner.utils.IntentUtils.extra
@@ -299,7 +300,7 @@ class ImageViewerActivity : BaseActivity(), PermissionRequester, SnackbarShower 
         viewModel.onSwitchToolbar().observe(this) { switchToolbarVisibility() }
         viewModel.getCurrentPosition().observe(this) { positionPair ->
             binding.txtPageCount.apply {
-                text = getString(
+                text = StringResourcesUtils.getString(
                     R.string.wizard_steps_indicator,
                     positionPair.first + 1,
                     positionPair.second

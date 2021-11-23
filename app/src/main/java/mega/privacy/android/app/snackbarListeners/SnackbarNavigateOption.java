@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.view.View;
 
 import mega.privacy.android.app.MegaApplication;
+import mega.privacy.android.app.imageviewer.ImageViewerActivity;
 import mega.privacy.android.app.lollipop.ContactFileListActivityLollipop;
 import mega.privacy.android.app.lollipop.ContactInfoActivityLollipop;
 import mega.privacy.android.app.lollipop.FileInfoActivityLollipop;
@@ -84,7 +85,9 @@ public class SnackbarNavigateOption implements View.OnClickListener {
 
         context.startActivity(intent);
 
-        if (context instanceof PdfViewerActivityLollipop) {
+        if (context instanceof ImageViewerActivity) {
+            ((ImageViewerActivity) context).finish();
+        } else if (context instanceof PdfViewerActivityLollipop) {
             ((PdfViewerActivityLollipop) context).finish();
         } else if (context instanceof FileInfoActivityLollipop) {
             ((FileInfoActivityLollipop) context).finish();

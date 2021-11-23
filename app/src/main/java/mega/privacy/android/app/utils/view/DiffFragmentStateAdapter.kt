@@ -43,17 +43,48 @@ abstract class DiffFragmentStateAdapter<T> : FragmentStateAdapter {
         differ = AsyncListDiffer(this, diffCallback)
     }
 
+    /**
+     * Set the new list to be displayed.
+     * If a List is already being displayed, a diff will be computed on a background thread, which
+     * will dispatch Adapter.notifyItem events on the main thread.
+     * The commit callback can be used to know when the List is committed, but note that it
+     * may not be executed. If List B is submitted immediately after List A, and is
+     * committed directly, the callback associated with List A will not be run.
+     *
+     * @param list The new list to be displayed.
+     * @param commitCallback Optional runnable that is executed when the List is committed, if
+     *                       it is committed.
+     */
     @JvmOverloads
     fun submitList(list: List<T>?, commitCallback: Runnable? = null) {
         differ.submitList(list, commitCallback)
     }
 
+    /**
+     * Get the current List.
+     * If a <code>null</code> List, or no List has been submitted, an empty list will be returned.
+     * The returned list may not be mutated - mutations to content must be done through
+     * {@link #submitList(List)}.
+     *
+     * @return The list currently being displayed.
+     */
     fun getCurrentList(): List<T> =
         differ.currentList
 
+    /**
+     * Get the item at a specific position.
+     *
+     * @param position
+     * @return  The item.
+     */
     protected fun getItem(position: Int): T =
         differ.currentList[position]
 
+    /**
+     * Returns the total number of items in the data set held by the adapter.
+     *
+     * @return The total number of items in this adapter.
+     */
     override fun getItemCount(): Int =
         differ.currentList.size
 }

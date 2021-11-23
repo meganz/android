@@ -147,10 +147,15 @@ class GetImageUseCase @Inject constructor(
                                     }
                                     API_EBUSINESSPASTDUE ->
                                         emitter.onError(BusinessAccountOverdueMegaError())
-                                    API_EOVERQUOTA ->
-                                        emitter.onError(QuotaOverdueMegaError())
                                     else ->
                                         emitter.onError(error.toThrowable())
+                                }
+                            },
+                            onTransferTemporaryError = { _, error ->
+                                if (emitter.isCancelled) return@OptionalMegaTransferListenerInterface
+
+                                if (error.errorCode == API_EOVERQUOTA) {
+                                    emitter.onError(QuotaOverdueMegaError())
                                 }
                             }
                         )

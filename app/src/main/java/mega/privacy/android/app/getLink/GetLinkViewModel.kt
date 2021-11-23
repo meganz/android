@@ -118,7 +118,7 @@ class GetLinkViewModel @ViewModelInject constructor(
      * Exports the node.
      */
     fun export() {
-        exportNodeUseCase.export(node.handle)
+        exportNodeUseCase.export(node)
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeBy(
