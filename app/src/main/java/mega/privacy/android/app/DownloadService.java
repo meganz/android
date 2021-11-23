@@ -707,7 +707,15 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 			try {
                 boolean autoPlayEnabled = Boolean.parseBoolean(dbH.getAutoPlayEnabled());
                 if (openFile && autoPlayEnabled) {
-                    autoPlayInfo = new AutoPlayInfo(currentDocument.getName(), currentDocument.getHandle(), currentFile.getAbsolutePath(), true);
+                    String fileLocalPath;
+                    String path = getLocalFile(megaApi.getNodeByHandle(handle));
+                    if(path != null ) {
+                        fileLocalPath = path;
+                    } else {
+                        fileLocalPath = currentFile.getAbsolutePath();
+                    }
+
+                    autoPlayInfo = new AutoPlayInfo(currentDocument.getName(), currentDocument.getHandle(), fileLocalPath, true);
 
 					logDebug("Both openFile and autoPlayEnabled are true");
 					boolean fromMV = false;
@@ -715,7 +723,6 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 						Boolean result = fromMediaViewers.get(handle);
 						fromMV = result != null && result;
 					}
-
 
 					if (MimeTypeList.typeForName(currentFile.getName()).isPdf()){
 						logDebug("Pdf file");

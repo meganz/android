@@ -1407,7 +1407,8 @@ object MegaNodeUtil {
     ) {
         val mime = MimeTypeList.typeForName(autoPlayInfo.nodeName)
         when {
-            mime.isZip -> {
+            // // ZIP file on SD card can't not be created by `new java.util.zip.ZipFile(path)`.
+            mime.isZip && !SDCardUtils.isLocalFolderOnSDCard(context, autoPlayInfo.localPath) -> {
                 openZip(context, activityLauncher, autoPlayInfo.localPath, autoPlayInfo.nodeHandle)
             }
             mime.isPdf -> {
