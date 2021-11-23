@@ -7,6 +7,9 @@ import mega.privacy.android.app.utils.ZoomUtil
 import javax.inject.Inject
 import javax.inject.Singleton
 
+/**
+ * zoomViewModel includes some the zoom operations and zoom livedata
+ */
 @Singleton
 class ZoomViewModel @Inject constructor(): ViewModel() {
 
@@ -29,7 +32,7 @@ class ZoomViewModel @Inject constructor(): ViewModel() {
     }
 
     /**
-     * return a Boolean [true] indicate can zoom in, so we can from this flag to handle UI logic, otherwise, false.
+     * Check currentZoom if can zoom in
      */
     fun zoomIn() {
         if (currentZoom < ZoomUtil.ZOOM_IN_1X) {
@@ -39,13 +42,14 @@ class ZoomViewModel @Inject constructor(): ViewModel() {
     }
 
     /**
-     * return a Boolean [true] indicate can zoom in, otherwise, false.
+     * Check can zoom in
+     *
+     * @return a Boolean [true] indicate can zoom in, otherwise, false.
      */
     fun canZoomIn() = currentZoom != ZoomUtil.ZOOM_IN_1X
 
-
     /**
-     * return a Boolean [true] Zoom in the max, otherwise, false.
+     * Check currentZoom if can zoom out
      */
     fun zoomOut() {
         if (currentZoom > ZoomUtil.ZOOM_OUT_2X) {
@@ -55,7 +59,9 @@ class ZoomViewModel @Inject constructor(): ViewModel() {
     }
 
     /**
-     * return a Boolean [true] indicate can zoom out, so we can from this flag to handle UI logic, otherwise, false.
+     * Check can zoom out
+     *
+     * @return a Boolean [true] indicate can zoom out, so we can from this flag to handle UI logic, otherwise, false.
      */
     fun canZoomOut() = currentZoom != ZoomUtil.ZOOM_OUT_2X
 

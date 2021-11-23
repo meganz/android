@@ -16,7 +16,7 @@ import mega.privacy.android.app.utils.ZoomUtil.YEARS_INDEX
 import nz.mega.sdk.MegaApiJava.*
 
 class ImagesViewModel @ViewModelInject constructor(
-    private val repository: TypedFilesRepository,
+    private val repository: TypedFilesRepository
 ) : ViewModel() {
 
     /**

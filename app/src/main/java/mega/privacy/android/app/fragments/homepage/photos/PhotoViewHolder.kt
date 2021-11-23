@@ -16,7 +16,7 @@ import mega.privacy.android.app.utils.ZoomUtil.getMargin
 import nz.mega.sdk.MegaApiAndroid
 import javax.inject.Inject
 
-class PhotoViewHolder(val binding: ViewDataBinding, private val zoom: Int = 0) :
+class PhotoViewHolder(val binding: ViewDataBinding, private val zoom: Int = ZoomUtil.ZOOM_DEFAULT) :
     RecyclerView.ViewHolder(binding.root) {
 
     @MegaApi
