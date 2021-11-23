@@ -313,6 +313,7 @@ open class BaseBottomSheetDialogFragment : BottomSheetDialogFragment(), Activity
         startActivity(intent)
     }
 
+    @Suppress("deprecation") // TODO Migrate to registerForActivityResult()
     override fun launchActivityForResult(intent: Intent, requestCode: Int) {
         startActivityForResult(intent, requestCode)
     }

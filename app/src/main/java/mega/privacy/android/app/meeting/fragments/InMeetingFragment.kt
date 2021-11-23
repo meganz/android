@@ -2708,6 +2708,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
     /**
      * Open invite participant page
      */
+    @Suppress("deprecation") // TODO Migrate to registerForActivityResult()
     override fun onInviteParticipants() {
         logDebug("chooseAddContactDialog")
         val inviteParticipantIntent =

@@ -69,17 +69,18 @@ class LineNumberEditText : AppCompatEditText {
      * Rename this in this way to avoid enter any type of image in the text editor and redirect
      * the user to the import screen.
      */
-    override fun onCreateInputConnection(editorInfo: EditorInfo?): InputConnection {
+    override fun onCreateInputConnection(editorInfo: EditorInfo?): InputConnection? {
         val inputConnection = super.onCreateInputConnection(editorInfo)
-        val editor: EditorInfo = editorInfo ?: return inputConnection
+        if (inputConnection == null || editorInfo == null) return inputConnection
 
         EditorInfoCompat.setContentMimeTypes(
-            editor,
+            editorInfo,
             arrayOf("image/*", "image/png", "image/gif", "image/jpeg")
         )
 
         return InputConnectionCompat.createWrapper(
-            inputConnection, editor
+            inputConnection,
+            editorInfo
         ) { _: InputContentInfoCompat?, _: Int, _: Bundle? ->
             Toast.makeText(
                 context,
