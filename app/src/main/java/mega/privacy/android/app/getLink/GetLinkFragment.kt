@@ -11,6 +11,7 @@ import android.view.*
 import android.view.View.GONE
 import android.view.View.VISIBLE
 import android.widget.DatePicker
+import androidx.activity.result.ActivityResultLauncher
 import androidx.core.content.ContextCompat
 import androidx.core.content.res.ResourcesCompat
 import androidx.core.view.isVisible
@@ -21,6 +22,7 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import mega.privacy.android.app.BaseActivity
 import mega.privacy.android.app.MimeTypeList.typeForName
 import mega.privacy.android.app.R
+import mega.privacy.android.app.activities.contract.ChatExplorerActivityContract
 import mega.privacy.android.app.components.ListenScrollChangesHelper
 import mega.privacy.android.app.components.attacher.MegaAttacher
 import mega.privacy.android.app.databinding.FragmentGetLinkBinding
@@ -29,7 +31,6 @@ import mega.privacy.android.app.interfaces.ActivityLauncher
 import mega.privacy.android.app.interfaces.Scrollable
 import mega.privacy.android.app.interfaces.SnackbarShower
 import mega.privacy.android.app.interfaces.showSnackbar
-import mega.privacy.android.app.lollipop.megachat.ChatExplorerActivity
 import mega.privacy.android.app.utils.ColorUtils
 import mega.privacy.android.app.utils.Constants.*
 import mega.privacy.android.app.utils.MegaApiUtils.getMegaNodeFolderInfo
@@ -58,8 +59,24 @@ class GetLinkFragment : BaseFragment(), DatePickerDialog.OnDateSetListener, Scro
     private val viewModel: GetLinkViewModel by activityViewModels()
 
     private lateinit var binding: FragmentGetLinkBinding
+    private lateinit var chatLauncher: ActivityResultLauncher<Unit?>
 
     private var passwordVisible = false
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        chatLauncher = registerForActivityResult(ChatExplorerActivityContract()) { data ->
+            if (data != null) {
+                if (viewModel.shouldShowShareKeyOrPasswordDialog()) {
+                    showShareKeyOrPasswordDialog(SEND_TO_CHAT, data)
+                } else {
+                    viewModel.sendToChat(data, shouldAttachKeyOrPassword = false) { intent ->
+                        handleActivityResult(intent)
+                    }
+                }
+            }
+        }
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -90,28 +107,11 @@ class GetLinkFragment : BaseFragment(), DatePickerDialog.OnDateSetListener, Scro
                 }
             }
             R.id.action_chat -> {
-                startActivityForResult(
-                    Intent(requireContext(), ChatExplorerActivity::class.java),
-                    REQUEST_CODE_SEND_LINK
-                )
+                chatLauncher.launch(Unit)
             }
         }
 
         return super.onOptionsItemSelected(item)
-    }
-
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-
-        if (resultCode == BaseActivity.RESULT_OK && requestCode == REQUEST_CODE_SEND_LINK) {
-            if (viewModel.shouldShowShareKeyOrPasswordDialog()) {
-                showShareKeyOrPasswordDialog(SEND_TO_CHAT, data)
-            } else {
-                viewModel.sendToChat(data, shouldAttachKeyOrPassword = false) { intent ->
-                    handleActivityResult(intent)
-                }
-            }
-        }
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {

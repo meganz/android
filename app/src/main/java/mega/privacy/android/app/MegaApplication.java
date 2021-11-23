@@ -73,6 +73,7 @@ import mega.privacy.android.app.lollipop.megachat.AppRTCAudioManager;
 import mega.privacy.android.app.lollipop.megachat.BadgeIntentService;
 import mega.privacy.android.app.meeting.CallService;
 import mega.privacy.android.app.meeting.listeners.MeetingListener;
+import mega.privacy.android.app.middlelayer.crashreporter.CrashReporter;
 import mega.privacy.android.app.objects.PasscodeManagement;
 import mega.privacy.android.app.receivers.NetworkStateReceiver;
 import mega.privacy.android.app.service.crashreporter.CrashReporterImpl;
@@ -231,6 +232,8 @@ public class MegaApplication extends MultiDexApplication implements Application.
 
 	private MeetingListener meetingListener = new MeetingListener();
 	private GlobalChatListener globalChatListener = new GlobalChatListener(this);
+
+	private CrashReporter crashReporter;
 
     @Override
 	public void networkAvailable() {
@@ -720,12 +723,13 @@ public class MegaApplication extends MultiDexApplication implements Application.
 
 		ThemeHelper.INSTANCE.initTheme(this);
 
+		crashReporter = new CrashReporterImpl();
+
 		// Setup handler for uncaught exceptions.
         Thread.setDefaultUncaughtExceptionHandler((thread, e) -> {
             handleUncaughtException(thread, e);
 
-            // Send the crash info manually.
-            new CrashReporterImpl().report(e);
+            crashReporter.report(e);
         });
 
 		registerActivityLifecycleCallbacks(this);
@@ -1011,6 +1015,7 @@ public class MegaApplication extends MultiDexApplication implements Application.
 				.subscribe((cookies, throwable) -> {
 					if (throwable == null) {
 						setAdvertisingCookiesEnabled(cookies.contains(CookieType.ADVERTISEMENT));
+                        crashReporter.setEnabled(cookies.contains(CookieType.ANALYTICS));
 					}
 				});
 	}

@@ -1698,6 +1698,9 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 				megaApiFolder.setAccountAuth(megaApi.getAccountAuth());
 				logDebug("Fast login OK, Calling fetchNodes from CameraSyncService");
 				megaApi.fetchNodes();
+
+                // Get cookies settings after login.
+                MegaApplication.getInstance().checkEnabledCookies();
 			}
 			else{
 				logError("ERROR: " + e.getErrorString());

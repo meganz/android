@@ -7,6 +7,7 @@ import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.kotlin.addTo
 import io.reactivex.rxjava3.kotlin.subscribeBy
 import io.reactivex.rxjava3.schedulers.Schedulers
+import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.arch.BaseRxViewModel
 import mega.privacy.android.app.fragments.settingsFragments.cookie.data.CookieType
 import mega.privacy.android.app.fragments.settingsFragments.cookie.usecase.GetCookieSettingsUseCase
@@ -79,6 +80,8 @@ class CookieSettingsViewModel @ViewModelInject constructor(
                 onComplete = {
                     updateResult.value = true
                     cookiesSaved = true
+
+                    MegaApplication.getInstance().checkEnabledCookies()
                 },
                 onError = { error ->
                     logError(error.stackTraceToString())

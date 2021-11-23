@@ -1,22 +1,20 @@
 package mega.privacy.android.app.fragments.settingsFragments
 
-import android.app.Activity.RESULT_OK
-import android.content.Intent
 import android.os.Bundle
+import androidx.activity.result.ActivityResultLauncher
 import androidx.appcompat.app.AlertDialog
-import androidx.biometric.BiometricManager.*
 import androidx.biometric.BiometricManager.Authenticators.BIOMETRIC_STRONG
+import androidx.biometric.BiometricManager.BIOMETRIC_SUCCESS
+import androidx.biometric.BiometricManager.from
 import androidx.biometric.BiometricPrompt
 import androidx.core.content.ContextCompat
 import androidx.preference.Preference
 import androidx.preference.SwitchPreferenceCompat
 import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.R
-import mega.privacy.android.app.activities.settingsActivities.PasscodeLockActivity
-import mega.privacy.android.app.activities.settingsActivities.PasscodeLockActivity.Companion.ACTION_RESET_PASSCODE_LOCK
-import mega.privacy.android.app.activities.settingsActivities.PasscodeLockActivity.Companion.ACTION_SET_PASSCODE_LOCK
+import mega.privacy.android.app.activities.contract.PassCodeActivityContract
 import mega.privacy.android.app.constants.SettingsConstants.*
-import mega.privacy.android.app.utils.Constants.*
+import mega.privacy.android.app.utils.Constants.INVALID_POSITION
 import mega.privacy.android.app.utils.LogUtil.logDebug
 import mega.privacy.android.app.utils.LogUtil.logWarning
 import mega.privacy.android.app.utils.PasscodeUtil
@@ -47,6 +45,18 @@ class SettingsPasscodeLockFragment : SettingsBaseFragment() {
     private lateinit var executor: Executor
     private lateinit var biometricPrompt: BiometricPrompt
     private lateinit var promptInfo: BiometricPrompt.PromptInfo
+    private lateinit var pinLauncher: ActivityResultLauncher<Boolean>
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        pinLauncher = registerForActivityResult(PassCodeActivityContract()) { isSuccess ->
+            if (isSuccess) {
+                enablePasscode()
+            } else {
+                logWarning("Set PIN ERROR")
+            }
+        }
+    }
 
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
         addPreferencesFromResource(R.xml.preferences_passcode)
@@ -229,21 +239,7 @@ class SettingsPasscodeLockFragment : SettingsBaseFragment() {
      * Launches an Intent to open passcode screen.
      */
     private fun intentToPasscodeLock(reset: Boolean) {
-        val intent = Intent(context, PasscodeLockActivity::class.java)
-        intent.action = if (reset) ACTION_RESET_PASSCODE_LOCK else ACTION_SET_PASSCODE_LOCK
-        startActivityForResult(intent, SET_PIN)
-    }
-
-    override fun onActivityResult(requestCode: Int, resultCode: Int, intent: Intent?) {
-        when (requestCode) {
-            SET_PIN -> {
-                if (resultCode == RESULT_OK) {
-                    enablePasscode()
-                } else {
-                    logWarning("Set PIN ERROR")
-                }
-            }
-        }
+        pinLauncher.launch(reset)
     }
 
     override fun onDestroy() {

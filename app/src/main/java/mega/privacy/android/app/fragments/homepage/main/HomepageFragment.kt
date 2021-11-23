@@ -621,6 +621,7 @@ class HomepageFragment : Fragment() {
         }
     }
 
+    @Suppress("deprecation") // TODO Migrate to registerForActivityResult()
     private fun openNewChatActivity() = doIfOnline(true) {
         val intent = Intent(activity, AddContactActivityLollipop::class.java).apply {
             putExtra(KEY_CONTACT_TYPE, CONTACT_TYPE_MEGA)
