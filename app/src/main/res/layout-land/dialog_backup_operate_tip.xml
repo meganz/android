@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/background_ask_for_display_over">
+
+    <ImageView
+        android:id="@+id/image_storage_status"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerVertical="true"
+        android:layout_marginStart="20dp"
+        android:src="@drawable/il_serious_warning" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_centerVertical="true"
+        android:layout_toRightOf="@id/image_storage_status"
+        android:layout_marginStart="32dp"
+        android:layout_marginEnd="20dp"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginStart="10dp"
+            android:layout_marginTop="20dp"
+            android:layout_marginEnd="10dp"
+            android:gravity="center"
+            android:text="@string/backup_remove_folder_title"
+            android:textColor="@color/grey_087_white_087"
+            android:textSize="18sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/backup_tip_content"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:gravity="start"
+            android:layout_marginTop="30dp"
+            android:lineSpacingMultiplier="1.27"
+            android:paddingStart="10dp"
+            android:paddingEnd="10dp"
+            android:text="@string/backup_remove_root_folder"
+            android:textAlignment="textStart"
+            android:textColor="@color/grey_087_white_087"
+            android:textSize="16sp" />
+
+    </LinearLayout>
+
+</RelativeLayout>

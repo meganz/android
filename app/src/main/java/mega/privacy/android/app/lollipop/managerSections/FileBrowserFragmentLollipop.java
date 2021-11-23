@@ -13,6 +13,7 @@ import android.os.Environment;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
 import androidx.core.content.FileProvider;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
@@ -64,6 +65,7 @@ import mega.privacy.android.app.lollipop.FullScreenImageViewerLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.PdfViewerActivityLollipop;
 import mega.privacy.android.app.lollipop.adapters.MegaNodeAdapter;
+import mega.privacy.android.app.lollipop.adapters.RotatableAdapter;
 import mega.privacy.android.app.lollipop.controllers.NodeController;
 import mega.privacy.android.app.utils.CloudStorageOptionControlUtil;
 import mega.privacy.android.app.utils.ColorUtils;
@@ -87,7 +89,12 @@ import static mega.privacy.android.app.utils.MegaNodeDialogUtil.ACTION_BACKUP_RE
 import static mega.privacy.android.app.utils.MegaNodeDialogUtil.ACTION_BACKUP_SHARE;
 import static mega.privacy.android.app.utils.MegaNodeDialogUtil.ACTION_BACKUP_SHARE_CHAT;
 import static mega.privacy.android.app.utils.MegaNodeDialogUtil.ACTION_BACKUP_SHARE_FOLDER;
+import static mega.privacy.android.app.utils.MegaNodeDialogUtil.BACKUP_ACTION_TYPE;
 import static mega.privacy.android.app.utils.MegaNodeDialogUtil.BACKUP_DEVICE;
+import static mega.privacy.android.app.utils.MegaNodeDialogUtil.BACKUP_DIALOG_WARN;
+import static mega.privacy.android.app.utils.MegaNodeDialogUtil.BACKUP_HANDLED_ITEM;
+import static mega.privacy.android.app.utils.MegaNodeDialogUtil.BACKUP_HANDLED_NODE;
+import static mega.privacy.android.app.utils.MegaNodeDialogUtil.BACKUP_NODE_TYPE;
 import static mega.privacy.android.app.utils.MegaNodeDialogUtil.BACKUP_NONE;
 import static mega.privacy.android.app.utils.MegaNodeDialogUtil.BACKUP_ROOT;
 import static mega.privacy.android.app.utils.MegaNodeDialogUtil.BACKUP_SUBFOLDER;
@@ -148,6 +155,14 @@ public class FileBrowserFragmentLollipop extends RotatableFragment{
 
     private RelativeLayout transferOverQuotaBanner;
     private TextView transferOverQuotaBannerText;
+
+    // Backup warning dialog
+	private AlertDialog backupWarningDialog;
+	private ArrayList<Long> backupHandleList;
+	private int backupDialogType = -1;
+	private Long backupNodeHandle;
+	private int backupNodeType;
+	private int backupActionType;
 
 	@Override
 	protected MegaNodeAdapter getAdapter() {
@@ -1329,6 +1344,43 @@ public class FileBrowserFragmentLollipop extends RotatableFragment{
 		setTransferOverQuotaBannerVisibility();
 	}
 
+	@Override
+	public void onSaveInstanceState(Bundle outState) {
+		super.onSaveInstanceState(outState);
+
+		if(backupWarningDialog != null && backupWarningDialog.isShowing()){
+			if(backupHandleList != null) {
+				outState.putSerializable(BACKUP_HANDLED_ITEM, backupHandleList);
+			}
+			outState.putLong(BACKUP_HANDLED_NODE, backupNodeHandle);
+			outState.putInt(BACKUP_NODE_TYPE, backupNodeType);
+			outState.putInt(BACKUP_ACTION_TYPE, backupActionType);
+			outState.putInt(BACKUP_DIALOG_WARN, backupDialogType);
+			backupWarningDialog.dismiss();
+		}
+	}
+
+	@Override
+	public void onActivityCreated(Bundle savedInstanceState) {
+		super.onActivityCreated(savedInstanceState);
+
+		if (savedInstanceState != null) {
+			backupHandleList = (ArrayList<Long>) savedInstanceState.getSerializable(BACKUP_HANDLED_ITEM);
+			backupNodeHandle = savedInstanceState.getLong(BACKUP_HANDLED_NODE, -1);
+			backupNodeType = savedInstanceState.getInt(BACKUP_NODE_TYPE, -1);
+			backupActionType = savedInstanceState.getInt(BACKUP_ACTION_TYPE, -1);
+			backupDialogType = savedInstanceState.getInt(BACKUP_DIALOG_WARN, -1);
+			if (backupDialogType == 0) {
+				actWithBackupTips(backupHandleList, megaApi.getNodeByHandle(backupNodeHandle), backupNodeType, backupActionType);
+			} else if (backupDialogType == 1) {
+				confirmationAction(backupHandleList, megaApi.getNodeByHandle(backupNodeHandle), backupNodeType, backupActionType);
+			} else {
+				logDebug("Backup warning dialog is not show");
+			}
+		}
+
+	}
+
 	/**
 	 * Show the warning dialog for moving or deleting "My backup" folder or sub folders
 	 *
@@ -1338,24 +1390,23 @@ public class FileBrowserFragmentLollipop extends RotatableFragment{
 	 * @param actionType Indicates the action to backup folder or file (move, remove, add, create etc.)
 	 */
 	private void actWithBackupTips(final ArrayList<Long> handleList, MegaNode pNodeBackup, int nodeType, int actionType) {
-		showTipDialogWithBackup(mActivity, new ActionBackupNodeCallback() {
+		backupHandleList = handleList;
+		backupNodeHandle = pNodeBackup.getHandle();
+		backupNodeType = nodeType;
+		backupActionType = actionType;
+		backupDialogType = 0;
+
+		backupWarningDialog = showTipDialogWithBackup(mActivity, new ActionBackupNodeCallback() {
 
 					@Override
 					public void actionCancel(@Nullable DialogInterface dialog, int actionType) {
-						switch (actionType){
-							case ACTION_BACKUP_SHARE_FOLDER:
-							case ACTION_BACKUP_SHARE_CHAT:
-							case ACTION_BACKUP_SHARE:
-							case ACTION_BACKUP_GET_LINK:
-							case ACTION_BACKUP_MOVE:
-							case ACTION_BACKUP_REMOVE:
-							default:
-								break;
-						}
+						initBackupWarningState();
 					}
 
 					@Override
 					public void actionExecute(ArrayList<Long> handleList, @NotNull MegaNode pNodeBackup, int nodeType, int actionType) {
+						initBackupWarningState();
+
 						switch (actionType){
 							case ACTION_BACKUP_SHARE_FOLDER:
 								NodeController nC = new NodeController(context);
@@ -1401,9 +1452,17 @@ public class FileBrowserFragmentLollipop extends RotatableFragment{
 	 */
 	private void confirmationAction(final ArrayList<Long> handleList, MegaNode pNodeBackup, int nodeType, int actionType) {
 		if (handleList != null && pNodeBackup != null) {
-			showConfirmDialogWithBackup(this.mActivity, new ActionBackupNodeCallback() {
+			backupHandleList = handleList;
+			backupNodeHandle = pNodeBackup.getHandle();
+			backupNodeType = nodeType;
+			backupActionType = actionType;
+			backupDialogType = 1;
+
+			backupWarningDialog = showConfirmDialogWithBackup(this.mActivity, new ActionBackupNodeCallback() {
 						@Override
 						public void actionCancel(@Nullable DialogInterface dialog, int actionType) {
+							initBackupWarningState();
+
 							switch (actionType){
 								case ACTION_BACKUP_SHARE_FOLDER:
 								case ACTION_BACKUP_MOVE:
@@ -1418,9 +1477,9 @@ public class FileBrowserFragmentLollipop extends RotatableFragment{
 
 						@Override
 						public void actionExecute( ArrayList<Long> handleList, @NotNull MegaNode pNodeBackup, int nodeType, int actionType) {
+							initBackupWarningState();
+
 							switch (actionType) {
-								case ACTION_BACKUP_REMOVE:
-									break;
 								case ACTION_BACKUP_MOVE: {
 									NodeController nC = new NodeController(context);
 									nC.chooseLocationToMoveNodes(handleList);
@@ -1428,6 +1487,7 @@ public class FileBrowserFragmentLollipop extends RotatableFragment{
 									hideMultipleSelect();
 									break;
 								}
+
 								case ACTION_BACKUP_SHARE_FOLDER: {
 									NodeController nC = new NodeController(context);
 									nC.selectContactToShareFolders(handleList);
@@ -1436,6 +1496,7 @@ public class FileBrowserFragmentLollipop extends RotatableFragment{
 									hideMultipleSelect();
 									break;
 								}
+
 								default:
 									break;
 							}
@@ -1454,6 +1515,17 @@ public class FileBrowserFragmentLollipop extends RotatableFragment{
 		} else {
 			logWarning("handleList NULL");
 		}
+	}
+
+	/**
+	 * Initialize backup variables
+	 */
+	private void initBackupWarningState() {
+		backupHandleList = null;
+		backupNodeHandle = -1L;
+		backupNodeType = -1;
+		backupActionType = -1;
+		backupDialogType = -1;
 	}
 
 	public int checkSubBackupNode() {

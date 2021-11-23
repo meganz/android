@@ -2,6 +2,7 @@ package mega.privacy.android.app.utils
 
 import android.annotation.SuppressLint
 import android.app.Activity
+import android.app.Dialog
 import android.content.Context
 import android.content.DialogInterface
 import android.content.DialogInterface.BUTTON_NEGATIVE
@@ -64,6 +65,12 @@ object MegaNodeDialogUtil {
     private const val ERROR_DIFFERENT_EXTENSION = "ERROR_DIFFERENT_EXTENSION"
     private const val NO_ERROR = "NO_ERROR"
 
+    // Backup warning dialog
+    const val BACKUP_HANDLED_ITEM: String = "BackupHandleItem"
+    const val BACKUP_HANDLED_NODE = "BackupHandleNode"
+    const val BACKUP_NODE_TYPE = "BackupNodeType"
+    const val BACKUP_ACTION_TYPE = "BackupActionType"
+    const val BACKUP_DIALOG_WARN = "BackupDialogWarn"
     // Backup node type
     const val BACKUP_NONE = -1
     const val BACKUP_ROOT = 0
@@ -745,7 +752,7 @@ object MegaNodeDialogUtil {
         pNodeBackup: MegaNode,
         nodeType: Int,
         actionType: Int
-    ) {
+    ): AlertDialog {
         val dialogClickListener =
             DialogInterface.OnClickListener { dialog: DialogInterface?, which: Int ->
                 when (which) {
@@ -874,6 +881,7 @@ object MegaNodeDialogUtil {
         val dialog = builder.show()
         dialog.setCancelable(false)
         dialog.setCanceledOnTouchOutside(false)
+        return dialog
     }
 
     /**
@@ -891,7 +899,7 @@ object MegaNodeDialogUtil {
         pNodeBackup: MegaNode,
         nodeType: Int,
         actionType: Int
-    ) {
+    ): AlertDialog {
         val layout: LayoutInflater = activity.layoutInflater
         val view = layout.inflate(R.layout.dialog_backup_action_confirm, null)
         val tvTitle = view.findViewById<TextView>(R.id.title)
@@ -998,12 +1006,11 @@ object MegaNodeDialogUtil {
                                 )
                                 //Dismiss once everything is OK.
                                 dialog.dismiss()
+                            } else {
+                                showErrorInfo(editText, editTextLayout)
                             }
                         } else {
-                            editText.requestFocus()
-                            editTextLayout.error =
-                                getString(R.string.error_backup_confirm_dont_match)
-                            editTextLayout.setHintTextAppearance(R.style.TextAppearance_InputHint_Error)
+                            showErrorInfo(editText, editTextLayout)
                         }
                     }
                     else -> {
@@ -1017,10 +1024,7 @@ object MegaNodeDialogUtil {
                             //Dismiss once everything is OK.
                             dialog.dismiss()
                         } else {
-                            editText.requestFocus()
-                            editTextLayout.error =
-                                getString(R.string.error_backup_confirm_dont_match)
-                            editTextLayout.setHintTextAppearance(R.style.TextAppearance_InputHint_Error)
+                            showErrorInfo(editText, editTextLayout)
                         }
                     }
                 }
@@ -1037,5 +1041,16 @@ object MegaNodeDialogUtil {
         dialog.show()
         dialog.setCancelable(false)
         dialog.setCanceledOnTouchOutside(false)
+        return dialog
+    }
+
+    private fun showErrorInfo(
+        editText: TextInputEditText,
+        editTextLayout: TextInputLayout
+    ) {
+        editText.requestFocus()
+        editTextLayout.error =
+            getString(R.string.error_backup_confirm_dont_match)
+        editTextLayout.setHintTextAppearance(R.style.TextAppearance_InputHint_Error)
     }
 }

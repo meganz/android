@@ -295,7 +295,12 @@ import static mega.privacy.android.app.utils.MegaNodeDialogUtil.ACTION_BACKUP_TA
 import static mega.privacy.android.app.utils.MegaNodeDialogUtil.ACTION_BACKUP_NONE;
 import static mega.privacy.android.app.utils.MegaNodeDialogUtil.ACTION_COPY_TO_BACKUP;
 import static mega.privacy.android.app.utils.MegaNodeDialogUtil.ACTION_MOVE_TO_BACKUP;
+import static mega.privacy.android.app.utils.MegaNodeDialogUtil.BACKUP_ACTION_TYPE;
 import static mega.privacy.android.app.utils.MegaNodeDialogUtil.BACKUP_DEVICE;
+import static mega.privacy.android.app.utils.MegaNodeDialogUtil.BACKUP_DIALOG_WARN;
+import static mega.privacy.android.app.utils.MegaNodeDialogUtil.BACKUP_HANDLED_ITEM;
+import static mega.privacy.android.app.utils.MegaNodeDialogUtil.BACKUP_HANDLED_NODE;
+import static mega.privacy.android.app.utils.MegaNodeDialogUtil.BACKUP_NODE_TYPE;
 import static mega.privacy.android.app.utils.MegaNodeDialogUtil.BACKUP_NONE;
 import static mega.privacy.android.app.utils.MegaNodeDialogUtil.BACKUP_ROOT;
 import static mega.privacy.android.app.utils.MegaNodeDialogUtil.BACKUP_SUBFOLDER;
@@ -798,6 +803,15 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 	private ViewGroup windowContent;
 	private final ArrayList<View> fabs = new ArrayList<>();
 	// end for Meeting
+
+	// Backup warning dialog
+	private AlertDialog backupWarningDialog;
+	private ArrayList<Long> backupHandleList;
+	private int backupDialogType = -1;
+	private Long backupNodeHandle;
+	private int backupNodeType;
+	private int backupActionType;
+
 	/**
 	 * Broadcast to update the completed transfers tab.
 	 */
@@ -1367,6 +1381,17 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 		nodeSaver.saveState(outState);
 
 		outState.putBoolean(PROCESS_FILE_DIALOG_SHOWN, isAlertDialogShown(processFileDialog));
+
+		if(backupWarningDialog != null && backupWarningDialog.isShowing()){
+			if(backupHandleList != null) {
+				outState.putSerializable(BACKUP_HANDLED_ITEM, backupHandleList);
+			}
+			outState.putLong(BACKUP_HANDLED_NODE, backupNodeHandle);
+			outState.putInt(BACKUP_NODE_TYPE, backupNodeType);
+			outState.putInt(BACKUP_ACTION_TYPE, backupActionType);
+			outState.putInt(BACKUP_DIALOG_WARN, backupDialogType);
+			backupWarningDialog.dismiss();
+		}
 	}
 
 	@Override
@@ -1474,6 +1499,13 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 			if (savedInstanceState.getBoolean(PROCESS_FILE_DIALOG_SHOWN, false)) {
 				processFileDialog = showProcessFileDialog(this,null);
 			}
+
+			// Backup warning dialog
+			backupHandleList = (ArrayList<Long>) savedInstanceState.getSerializable(BACKUP_HANDLED_ITEM);
+			backupNodeHandle = savedInstanceState.getLong(BACKUP_HANDLED_NODE, -1);
+			backupNodeType = savedInstanceState.getInt(BACKUP_NODE_TYPE, -1);
+			backupActionType = savedInstanceState.getInt(BACKUP_ACTION_TYPE, -1);
+			backupDialogType = savedInstanceState.getInt(BACKUP_DIALOG_WARN, -1);
 		}
 		else{
 			logDebug("Bundle is NULL");
@@ -2599,6 +2631,15 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 
 		logDebug("END onCreate");
 		new RatingHandlerImpl(this).showRatingBaseOnTransaction();
+
+		// Show backup dialog
+		if (backupDialogType == 0) {
+			actWithBackupTips(backupHandleList, megaApi.getNodeByHandle(backupNodeHandle), backupNodeType, backupActionType);
+		} else if (backupDialogType == 1) {
+			ConfirmAction(backupHandleList, megaApi.getNodeByHandle(backupNodeHandle), backupNodeType, backupActionType);
+		} else {
+			logDebug("Backup warning dialog is not show");
+		}
 	}
 
 	/**
@@ -6802,17 +6843,26 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 	 * @param actionType Indicates the action to backup folder or file (move, remove, add, create etc.)
 	 */
 	private void actWithBackupTips(ArrayList<Long> handleList, MegaNode pNodeBackup, int nodeType, int actionType) {
+		backupHandleList = handleList;
+		backupNodeHandle = pNodeBackup.getHandle();
+		backupNodeType = nodeType;
+		backupActionType = actionType;
+		backupDialogType = 0;
+
 		if (actionType == ACTION_BACKUP_REMOVE && handleList != null) {
 			setMoveToRubbish(true);
 		}
-		showTipDialogWithBackup(this, new ActionBackupNodeCallback() {
+		backupWarningDialog = showTipDialogWithBackup(this, new ActionBackupNodeCallback() {
 
 					@Override
 					public void actionCancel(@Nullable DialogInterface dialog, int actionType) {
+						initBackupWarningState();
 					}
 
 					@Override
 					public void actionExecute(ArrayList<Long> handleList, @NotNull MegaNode pNodeBackup, int nodeType, int actionType) {
+						initBackupWarningState();
+
 						switch (actionType){
 							case ACTION_COPY_TO_BACKUP:
 								if(handleList!= null) {
@@ -6904,20 +6954,22 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 	 */
 	private void ConfirmAction(ArrayList<Long> handleList, MegaNode pNodeBackup, int nodeType, int actionType) {
 		if (pNodeBackup != null) {
-			showConfirmDialogWithBackup(this, new ActionBackupNodeCallback() {
+			backupHandleList = handleList;
+			backupNodeHandle = pNodeBackup.getHandle();
+			backupNodeType = nodeType;
+			backupActionType = actionType;
+			backupDialogType = 1;
+
+			backupWarningDialog = showConfirmDialogWithBackup(this, new ActionBackupNodeCallback() {
 						@Override
 						public void actionCancel(@Nullable DialogInterface dialog, int actionType) {
-							switch (actionType) {
-								case ACTION_BACKUP_REMOVE:
-								case ACTION_BACKUP_MOVE:
-								case ACTION_BACKUP_FAB:
-								default:
-									break;
-							}
+							initBackupWarningState();
 						}
 
 						@Override
 						public void actionExecute(ArrayList<Long> handleList, @NotNull MegaNode pNodeBackup, int nodeType, int actionType) {
+							initBackupWarningState();
+
 							switch (actionType) {
 								case ACTION_COPY_TO_BACKUP:
 									if(handleList!= null) {
@@ -6985,6 +7037,17 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 		} else {
 			logWarning("handleList NULL");
 		}
+	}
+
+	/**
+	 * Initialize backup variables
+	 */
+	private void initBackupWarningState() {
+		backupHandleList = null;
+		backupNodeHandle = -1L;
+		backupNodeType = -1;
+		backupActionType = -1;
+		backupDialogType = -1;
 	}
 
 	public void askConfirmationDeleteAccount(){
