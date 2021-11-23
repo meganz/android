@@ -21,7 +21,8 @@ import java.io.File
 @BindingAdapter("items")
 fun setItems(listView: RecyclerView, items: List<NodeItem>?) {
     items?.let {
-        // In photos fragment, the adapter
+        // When the list's adapter is CUCardViewAdapter, its item type is CUCard, can't cast to NodeItem.
+        // Just avoid the casting.
         if(listView.adapter !is CUCardViewAdapter) {
             (listView.adapter as ListAdapter<NodeItem, RecyclerView.ViewHolder>).submitList(it)
         }

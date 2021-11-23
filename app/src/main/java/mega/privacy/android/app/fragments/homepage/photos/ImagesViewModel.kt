@@ -43,7 +43,10 @@ class ImagesViewModel @ViewModelInject constructor(
         _mZoom = zoom
     }
 
-    fun refreshing() {
+    /**
+     * Indicate refreshing cards has finished.
+     */
+    fun refreshCompleted() {
         _refreshCards.value = false
     }
 

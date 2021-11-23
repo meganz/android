@@ -129,8 +129,8 @@ class ImagesFragment : BaseZoomFragment(){
 
         viewModel.refreshCards.observe(viewLifecycleOwner) {
             if (it && selectedView != ALL_VIEW) {
-                viewModel.refreshing()
                 showCards(viewModel.dateCards.value)
+                viewModel.refreshCompleted()
             }
         }
 
