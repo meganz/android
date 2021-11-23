@@ -15,6 +15,7 @@ import android.os.Handler;
 import android.os.Looper;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.view.ActionMode;
@@ -27,6 +28,7 @@ import androidx.appcompat.widget.Toolbar;
 
 import android.os.storage.StorageManager;
 import android.os.storage.StorageVolume;
+import android.provider.DocumentsContract;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -85,6 +87,7 @@ public class FileStorageActivityLollipop extends PasscodeActivity implements OnC
 	private static final String IS_CONFIRMATION_CHECKED = "IS_CONFIRMATION_CHECKED";
 	private static final String PATH = "PATH";
 	public static final String PICK_FOLDER_TYPE = "PICK_FOLDER_TYPE";
+	private static final int SAVE_RK = 1122;
 
 	public enum PickFolderType {
 		CU_FOLDER("CU_FOLDER"),
@@ -467,7 +470,9 @@ public class FileStorageActivityLollipop extends PasscodeActivity implements OnC
 
 		prefs = dbH.getPreferences();
 
-		if (mode == Mode.BROWSE_FILES) {
+		if (fromSaveRecoveryKey && isAndroid11OrUpper()) {
+			createRKFile();
+		} else if (mode == Mode.BROWSE_FILES) {
 			if (intent.getExtras() != null) {
 				String extraPath = intent.getExtras().getString(EXTRA_PATH);
 				if (!isTextEmpty(extraPath)) {
@@ -484,6 +489,22 @@ public class FileStorageActivityLollipop extends PasscodeActivity implements OnC
 		if (isSetDownloadLocationShown) {
 			showConfirmationSaveInSameLocation();
 		}
+	}
+
+	/**
+	 * Launches the System picker to create the Recovery Key file in the chosen path.
+	 */
+	@RequiresApi(api = Build.VERSION_CODES.O)
+	private void createRKFile() {
+		File defaultDownloadDir = buildDefaultDownloadDir(this);
+		defaultDownloadDir.mkdirs();
+		Uri initialUri = Uri.parse(defaultDownloadDir.getAbsolutePath());
+
+		startActivityForResult(new Intent(Intent.ACTION_CREATE_DOCUMENT)
+				.addCategory(Intent.CATEGORY_OPENABLE)
+				.setType(TYPE_TEXT_PLAIN)
+				.putExtra(DocumentsContract.EXTRA_INITIAL_URI, initialUri)
+				.putExtra(Intent.EXTRA_TITLE, getRecoveryKeyFileName()), SAVE_RK);
 	}
 
 	/**
@@ -1220,7 +1241,10 @@ public class FileStorageActivityLollipop extends PasscodeActivity implements OnC
 
                 finishPickFolder();
             }
-        }
+        } else if (requestCode == SAVE_RK && intent != null && resultCode == Activity.RESULT_OK) {
+			setResult(RESULT_OK, new Intent().setData(intent.getData()));
+			finish();
+		}
     }
 
 	/**

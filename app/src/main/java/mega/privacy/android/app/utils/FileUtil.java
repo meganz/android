@@ -1,9 +1,9 @@
 //copyright: https://stackoverflow.com/questions/34927748/android-5-0-documentfile-from-tree-uri/36162691#36162691
 package mega.privacy.android.app.utils;
 
-import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
 import android.app.ActivityManager;
+import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
@@ -11,6 +11,7 @@ import android.media.MediaScannerConnection;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Environment;
+import android.os.ParcelFileDescriptor;
 import android.os.storage.StorageManager;
 import android.provider.DocumentsContract;
 import android.provider.MediaStore;
@@ -1035,6 +1036,29 @@ public class FileUtil {
             out.close();
         } catch (IOException e) {
             logError("IOException saving content.", e);
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * Saves some text in a file received as content Uri.
+     *
+     * @param contentResolver Needed content resolver to open the file descriptor.
+     * @param contentUri      Content Uri in which the content has to be saved.
+     * @param content         Content text to save in the content uri.
+     * @return True if everything goes well in the save process, false otherwise.
+     */
+    public static boolean saveTextOnContentUri(ContentResolver contentResolver, Uri contentUri, String content) {
+        try {
+            ParcelFileDescriptor file =  contentResolver.openFileDescriptor(contentUri, "w");
+            FileOutputStream fileOutputStream = new FileOutputStream(file.getFileDescriptor());
+            fileOutputStream.write(content.getBytes());
+            fileOutputStream.close();
+            file.close();
+        } catch (IOException e) {
+            logError("IOException creating RK file", e);
             return false;
         }
 
