@@ -11,6 +11,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import dagger.hilt.android.AndroidEntryPoint;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.RoundedImageView;
 import mega.privacy.android.app.components.twemoji.EmojiTextView;
@@ -19,6 +20,7 @@ import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.controllers.ChatController;
 import mega.privacy.android.app.lollipop.megachat.GroupChatInfoActivityLollipop;
 import mega.privacy.android.app.modalbottomsheet.BaseBottomSheetDialogFragment;
+import mega.privacy.android.app.objects.PasscodeManagement;
 import mega.privacy.android.app.utils.ContactUtil;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaChatRoom;
@@ -36,7 +38,13 @@ import static nz.mega.sdk.MegaApiJava.INVALID_HANDLE;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+import javax.inject.Inject;
+
+@AndroidEntryPoint
 public class ParticipantBottomSheetDialogFragment extends BaseBottomSheetDialogFragment implements View.OnClickListener {
+
+    @Inject
+    PasscodeManagement passcodeManagement;
 
     private MegaChatRoom selectedChat;
     private long chatId = INVALID_HANDLE;
@@ -235,7 +243,7 @@ public class ParticipantBottomSheetDialogFragment extends BaseBottomSheetDialogF
             case R.id.contact_list_option_call_layout:
                 startNewCall((GroupChatInfoActivityLollipop) requireActivity(),
                         (SnackbarShower) requireActivity(),
-                        megaApi.getContact(chatC.getParticipantEmail(participantHandle)));
+                        megaApi.getContact(chatC.getParticipantEmail(participantHandle)), passcodeManagement);
                 break;
 
             case R.id.change_permissions_group_participants_chat_layout:

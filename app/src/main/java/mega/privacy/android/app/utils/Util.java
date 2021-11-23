@@ -1097,13 +1097,37 @@ public class Util {
 		window.setStatusBarColor(ContextCompat.getColor(activity, color));
 	}
 
+	/**
+	 * Gets the status bar height if available.
+	 *
+	 * @return The status bar height if available.
+	 */
 	public static int getStatusBarHeight() {
+		return getSystemBarHeight("status_bar_height");
+	}
+
+	/**
+	 * Gets the navigation bar height if available.
+	 *
+	 * @return The status bar height if available.
+	 */
+	public static int getNavigationBarHeight() {
+		return getSystemBarHeight("navigation_bar_height");
+	}
+
+	/**
+	 * Gets a system bar height if available.
+	 *
+	 * @param systemBarName The system bar name.
+	 * @return The system bar height if available.
+	 */
+	public static int getSystemBarHeight(String systemBarName) {
 		Context context = MegaApplication.getInstance().getBaseContext();
-		int resourceId = context.getResources().getIdentifier("status_bar_height", "dimen",
+		int resourceId = context.getResources().getIdentifier(systemBarName, "dimen",
 				"android");
 
 		return resourceId > 0 ? context.getResources().getDimensionPixelSize(resourceId)
-				: dp2px(24, context.getResources().getDisplayMetrics());
+				: 0;
 	}
 
 	public static MegaPreferences getPreferences (Context context) {
@@ -1562,7 +1586,13 @@ public class Util {
      */
     public static void storeDownloadLocationIfNeeded(String downloadLocation) {
         DatabaseHandler dbH = MegaApplication.getInstance().getDbH();
-        boolean askMe = Boolean.parseBoolean(dbH.getPreferences().getStorageAskAlways());
+
+        MegaPreferences preferences = dbH.getPreferences();
+
+        boolean askMe = true;
+        if (preferences != null && preferences.getStorageAskAlways() != null) {
+            askMe = Boolean.parseBoolean(preferences.getStorageAskAlways());
+        }
 
         // Should set as default download location.
         if (!askMe) {
