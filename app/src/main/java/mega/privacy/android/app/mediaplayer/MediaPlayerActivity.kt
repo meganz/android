@@ -552,6 +552,7 @@ abstract class MediaPlayerActivity : PasscodeActivity(), SnackbarShower, Activit
         }
     }
 
+    @Suppress("deprecation") // TODO Migrate to registerForActivityResult()
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         val service = playerService ?: return false
         val launchIntent = service.viewModel.currentIntent ?: return false
@@ -829,6 +830,7 @@ abstract class MediaPlayerActivity : PasscodeActivity(), SnackbarShower, Activit
         nodeSaver.handleRequestPermissionsResult(requestCode)
     }
 
+    @Suppress("deprecation") // TODO Migrate to registerForActivityResult()
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
 
@@ -987,6 +989,7 @@ abstract class MediaPlayerActivity : PasscodeActivity(), SnackbarShower, Activit
         stopPlayer()
     }
 
+    @Suppress("deprecation") // TODO Migrate to registerForActivityResult()
     override fun launchActivityForResult(intent: Intent, requestCode: Int) {
         startActivityForResult(intent, requestCode)
     }

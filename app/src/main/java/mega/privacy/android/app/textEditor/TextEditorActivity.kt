@@ -229,6 +229,7 @@ class TextEditorActivity : PasscodeActivity(), SnackbarShower, Scrollable {
         return super.onOptionsItemSelected(item)
     }
 
+    @Suppress("deprecation") // TODO Migrate to registerForActivityResult()
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
 
@@ -609,6 +610,7 @@ class TextEditorActivity : PasscodeActivity(), SnackbarShower, Scrollable {
     /**
      * Manages the import node action.
      */
+    @Suppress("deprecation") // TODO Migrate to registerForActivityResult()
     private fun importNode() {
         val intent = Intent(this, FileExplorerActivityLollipop::class.java)
         intent.action = FileExplorerActivityLollipop.ACTION_PICK_IMPORT_FOLDER
