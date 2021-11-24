@@ -1050,6 +1050,13 @@
                     android:id="@+id/forward_own_contact"
                     style="@style/MessageForwardIconStyleEnd"
                     android:layout_toStartOf="@id/content_own_message_contact_layout" />
+
+                <!--  Send contact link -->
+                <include
+                    layout="@layout/item_message_own_contact_link"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" />
+
             </RelativeLayout>
             <!--End RelativeLayout own content message-->
 
@@ -1836,6 +1843,13 @@
                     android:id="@+id/forward_contact_contact"
                     style="@style/MessageForwardIconStyleStart"
                     android:layout_toEndOf="@id/content_contact_message_contact_layout" />
+
+                <!--  Receive contact link -->
+                <include
+                    layout="@layout/item_message_others_contact_link"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" />
+
                 <!--End RelativeLayout contact-->
             </RelativeLayout>
 

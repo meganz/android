@@ -13,7 +13,6 @@ import android.graphics.PorterDuff;
 import android.graphics.Rect;
 import android.graphics.Typeface;
 import android.graphics.drawable.GradientDrawable;
-import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.AsyncTask;
@@ -96,7 +95,6 @@ import mega.privacy.android.app.lollipop.megachat.PendingMessageSingle;
 import mega.privacy.android.app.lollipop.megachat.RemovedMessage;
 import mega.privacy.android.app.objects.GifData;
 
-import mega.privacy.android.app.utils.ChatUtil;
 import mega.privacy.android.app.utils.ColorUtils;
 import mega.privacy.android.app.utils.StringResourcesUtils;
 import mega.privacy.android.app.utils.Util;
@@ -723,6 +721,16 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
         public EmojiTextView contentOwnMessageContactEmail;
         private ImageView forwardOwnContact;
 
+        //Own contact links
+        private RelativeLayout ownContactLinkMessage;
+        private RelativeLayout ownContactLinkTextLayout;
+        private EmojiTextView ownContactLinkText;
+        private EmojiTextView ownContactLinkName;
+        private EmojiTextView ownContactLinkSubtitle;
+        private RoundedImageView ownContactLinkAvatar;
+        private ImageView ownContactLinkForward;
+        private ImageView ownContactLinkError;
+
         ImageView iconOwnTypeDocLandPreview;
         ImageView iconOwnTypeDocPortraitPreview;
 
@@ -807,6 +815,14 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
         RoundedImageView contentContactMessageContactThumb;
         private EmojiTextView contentContactMessageContactName;
         public EmojiTextView contentContactMessageContactEmail;
+
+        //Others contact link
+        private RelativeLayout othersContactLinkMessage;
+        private EmojiTextView othersContactLinkText;
+        private EmojiTextView othersContactLinkName;
+        private EmojiTextView othersContactLinkSubtitle;
+        private RoundedImageView othersContactLinkAvatar;
+        private ImageView othersContactLinkForward;
 
         RelativeLayout contentContactMessageVoiceClipLayout;
         ImageView contentContactMessageVoiceClipPlay;
@@ -1125,6 +1141,15 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             holder.ownManagementMessageLayout = v.findViewById(R.id.own_management_message_layout);
             holder.ownManagementMessageIcon = v.findViewById(R.id.own_management_message_icon);
 
+            holder.ownContactLinkMessage = v.findViewById(R.id.own_contact_link_container);
+            holder.ownContactLinkTextLayout = v.findViewById(R.id.own_contact_link_text_layout);
+            holder.ownContactLinkText = v.findViewById(R.id.own_contact_link_text);
+            holder.ownContactLinkName = v.findViewById(R.id.own_contact_link_name);
+            holder.ownContactLinkSubtitle = v.findViewById(R.id.own_contact_link_subtitle);
+            holder.ownContactLinkAvatar = v.findViewById(R.id.own_contact_link_avatar);
+            holder.ownContactLinkForward = v.findViewById(R.id.own_contact_link_forward);
+            holder.ownContactLinkError = v.findViewById(R.id.own_contact_link_error_uploading);
+
             //Contact messages
             holder.contactMessageLayout = v.findViewById(R.id.message_chat_contact_message_layout);
             holder.titleContactMessage = v.findViewById(R.id.title_contact_message_layout);
@@ -1379,6 +1404,12 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             holder.urlContactMessageLayout.setLayoutParams(paramsContactRichLink);
             holder.ownManagementMessageText.setLayoutParams(paramsOwnManagement);
 
+            holder.othersContactLinkMessage = v.findViewById(R.id.others_contact_link_container);
+            holder.othersContactLinkText = v.findViewById(R.id.others_contact_link_text);
+            holder.othersContactLinkName = v.findViewById(R.id.others_contact_link_name);
+            holder.othersContactLinkSubtitle = v.findViewById(R.id.others_contact_link_subtitle);
+            holder.othersContactLinkAvatar = v.findViewById(R.id.others_contact_link_avatar);
+            holder.othersContactLinkForward = v.findViewById(R.id.others_contact_link_forward);
 
             v.setTag(holder);
 
@@ -1398,6 +1429,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                     isScreenInPortrait(context) ? R.drawable.loading_chat_messages : R.drawable.loading_chat_messages_landscape));
         } else {
             hideLayoutsGiphyAndGifMessages(position, (ViewHolderMessageChat) holder);
+            hideLayoutsContactLinkMessages(position, (ViewHolderMessageChat) holder);
             hideForwardOptions(position, (ViewHolderMessageChat) holder);
 
             AndroidMegaChatMessage androidMessage = messages.get(position - 1);
@@ -1743,7 +1775,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                             .subscribe((contactLinkResult, throwable) -> {
                                 if (throwable == null) {
                                     ((ViewHolderMessageChat) holder).contactLinkResult = contactLinkResult;
-                                    bindContactAttachmentMessage((ViewHolderMessageChat) holder, androidMessage, position);
+                                    bindContactLinkMessage((ViewHolderMessageChat) holder, androidMessage, position);
                                 }
                             });
                 } else {
@@ -5169,6 +5201,21 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
     }
 
     /**
+     * Hides all the layouts related to contact link messages.
+     *
+     * @param position Position of holder in adapter.
+     * @param holder   ViewHolderMessageChat from which the layouts have to be hidden.
+     */
+    private void hideLayoutsContactLinkMessages(int position, ViewHolderMessageChat holder) {
+        if (isHolderNull(position, holder)) {
+            return;
+        }
+
+        holder.ownContactLinkMessage.setVisibility(View.GONE);
+        holder.othersContactLinkMessage.setVisibility(View.GONE);
+    }
+
+    /**
      * Hides forward option in messages.
      *
      * @param position  Position of holder in adapter.
@@ -5570,6 +5617,120 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
         checkReactionsInMessage(positionInAdapter, holder, chatRoom.getChatId(), androidMessage);
     }
 
+    private void bindContactLinkMessage(ViewHolderMessageChat holder, AndroidMegaChatMessage androidMessage, int position) {
+        logDebug("bindContactLinkMessage");
+
+        MegaChatMessage message = androidMessage.getMessage();
+        boolean isLandscape = context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE;
+        boolean isOwnMessage = message.getUserHandle() == myUserHandle;
+        String contentText = converterShortCodes(message.getContent());
+
+        if (messages.get(position - 1).getInfoToShow() != INVALID_VALUE) {
+            setInfoToShow(position, holder, isOwnMessage, messages.get(position - 1).getInfoToShow(),
+                    formatDate(message.getTimestamp(), DATE_SHORT_FORMAT),
+                    formatTime(message));
+        }
+
+        if (isOwnMessage) {
+            holder.ownContactLinkMessage.setVisibility(View.VISIBLE);
+            holder.contentOwnMessageContactLayout.setVisibility(View.GONE);
+            holder.layoutAvatarMessages.setVisibility(View.GONE);
+            holder.titleOwnMessage.setGravity(Gravity.END);
+
+            holder.titleOwnMessage.setPadding(0, 0, scaleWidthPx(isLandscape
+                    ? PADDING_RIGHT_HOUR_OF_OWN_MESSAGE_LAND
+                    : PADDING_RIGHT_HOUR_OF_OWN_MESSAGE_PORT, outMetrics), 0);
+
+            holder.ownMessageLayout.setVisibility(View.VISIBLE);
+            holder.contactMessageLayout.setVisibility(View.GONE);
+            holder.contentOwnMessageLayout.setVisibility(View.VISIBLE);
+            holder.ownManagementMessageLayout.setVisibility(View.GONE);
+            holder.contentOwnMessageText.setVisibility(View.GONE);
+            holder.previewFrameLand.setVisibility(View.GONE);
+            holder.previewFramePort.setVisibility(View.GONE);
+            holder.contentOwnMessageFileLayout.setVisibility(View.GONE);
+            holder.contentOwnMessageVoiceClipLayout.setVisibility(View.GONE);
+
+//            holder.ownContactLinkTextLayout.setBackgroundResource(
+//                    isMsgRemovedOrHasRejectedOrManualSendingStatus(removedMessages, message)
+//                    ? R.drawable.light_rounded_chat_own_message
+//                    : R.drawable.dark_rounded_chat_own_message);
+
+            //Forwards element (own messages):
+            if (checkForwardVisibilityInOwnMsg(removedMessages, message, isMultipleSelect(), cC)) {
+                holder.ownContactLinkForward.setVisibility(View.VISIBLE);
+                holder.ownContactLinkForward.setOnClickListener(this);
+                holder.ownContactLinkForward.setEnabled(positionClicked == INVALID_POSITION || positionClicked != position);
+            } else {
+                holder.ownContactLinkForward.setVisibility(View.GONE);
+            }
+
+            int status = message.getStatus();
+            logDebug("Status: " + message.getStatus());
+
+            if ((status == MegaChatMessage.STATUS_SERVER_REJECTED) || (status == MegaChatMessage.STATUS_SENDING_MANUAL)) {
+                holder.ownContactLinkError.setVisibility(View.VISIBLE);
+                holder.retryAlert.setVisibility(View.VISIBLE);
+            } else if (status == MegaChatMessage.STATUS_SENDING) {
+                holder.retryAlert.setVisibility(View.GONE);
+                holder.ownContactLinkError.setVisibility(View.GONE);
+            } else {
+                holder.retryAlert.setVisibility(View.GONE);
+                holder.ownContactLinkError.setVisibility(View.GONE);
+            }
+
+            holder.ownContactLinkText.setText(contentText);
+            holder.ownContactLinkName.setText(converterShortCodes(holder.contactLinkResult.getFullName()));
+            holder.ownContactLinkSubtitle.setText(holder.contactLinkResult.getEmail());
+        } else {
+            holder.othersContactLinkMessage.setVisibility(View.VISIBLE);
+
+            long userHandle = message.getUserHandle();
+            logDebug("Contact message!!: " + userHandle);
+
+            setContactMessageName(position, holder, userHandle, true);
+
+            holder.titleContactMessage.setPadding(scaleWidthPx(isLandscape
+                    ? CONTACT_MESSAGE_LAND
+                    : CONTACT_MESSAGE_PORT, outMetrics), 0, 0, 0);
+
+            holder.ownMessageLayout.setVisibility(View.GONE);
+            holder.contactMessageLayout.setVisibility(View.VISIBLE);
+            holder.contentContactMessageLayout.setVisibility(View.VISIBLE);
+            holder.contactManagementMessageLayout.setVisibility(View.GONE);
+
+            holder.contentContactMessageVoiceClipLayout.setVisibility(View.GONE);
+
+            if (messages.get(position - 1).isShowAvatar() && !isMultipleSelect()) {
+                holder.layoutAvatarMessages.setVisibility(View.VISIBLE);
+                setContactAvatar(holder, userHandle, holder.fullNameTitle);
+            } else {
+                holder.layoutAvatarMessages.setVisibility(View.GONE);
+            }
+
+            holder.contentContactMessageText.setVisibility(View.GONE);
+            holder.contentContactMessageAttachLayout.setVisibility(View.GONE);
+            holder.urlContactMessageLayout.setVisibility(View.GONE);
+
+            //Forwards element (contact messages):
+            if (checkForwardVisibilityInContactMsg(isMultipleSelect(), cC)) {
+                holder.othersContactLinkForward.setVisibility(View.VISIBLE);
+                holder.othersContactLinkForward.setOnClickListener(this);
+                holder.othersContactLinkForward.setEnabled(positionClicked == INVALID_POSITION || positionClicked != position);
+            } else {
+                holder.othersContactLinkForward.setVisibility(View.GONE);
+            }
+
+            holder.othersContactLinkText.setText(contentText);
+            holder.othersContactLinkName.setText(converterShortCodes(holder.contactLinkResult.getFullName()));
+            holder.othersContactLinkSubtitle.setText(holder.contactLinkResult.getEmail());
+        }
+
+        setContactLinkAvatar(holder, isOwnMessage);
+        checkMultiselectionMode(position, holder, isOwnMessage, message.getMsgId());
+        checkReactionsInMessage(position, holder, chatRoom.getChatId(), androidMessage);
+    }
+
     public void bindContactAttachmentMessage(ViewHolderMessageChat holder, AndroidMegaChatMessage androidMessage, int position) {
         logDebug("bindContactAttachmentMessage");
 
@@ -5643,33 +5804,27 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                 holder.contentOwnMessageContactEmail.setMaxWidthEmojis(dp2px(MAX_WIDTH_FILENAME_PORT, outMetrics));
             }
 
-            if (holder.contactLinkResult != null) {
-                holder.contentOwnMessageContactName.setText(converterShortCodes(holder.contactLinkResult.getFullName()));
-                holder.contentOwnMessageContactEmail.setText(holder.contactLinkResult.getEmail());
-                setUserAvatar(holder, true);
-            } else {
-                long userCount = message.getUsersCount();
+            long userCount = message.getUsersCount();
 
-                if (userCount == 1) {
-                    holder.contentOwnMessageContactName.setText(converterShortCodes(getNameContactAttachment(message)));
-                    holder.contentOwnMessageContactEmail.setText(message.getUserEmail(0));
-                    setUserAvatar(holder, message);
-                } else {
-                    //Show default avatar with userCount
-                    StringBuilder name = new StringBuilder("");
-                    name.append(message.getUserName(0));
-                    for (int i = 1; i < userCount; i++) {
-                        name.append(", " + message.getUserName(i));
-                    }
-                    holder.contentOwnMessageContactEmail.setText(name);
-                    String email = context.getResources().getQuantityString(R.plurals.general_selection_num_contacts, (int) userCount, userCount);
-                    holder.contentOwnMessageContactName.setText(email);
-                    Bitmap bitmapDefaultAvatar = getDefaultAvatar(getSpecificAvatarColor(AVATAR_PRIMARY_COLOR), userCount + "", AVATAR_SIZE, true);
-                    holder.contentOwnMessageContactThumb.setImageBitmap(bitmapDefaultAvatar);
+            if (userCount == 1) {
+                holder.contentOwnMessageContactName.setText(converterShortCodes(getNameContactAttachment(message)));
+                holder.contentOwnMessageContactEmail.setText(message.getUserEmail(0));
+                setUserAvatar(holder, message);
+            } else {
+                //Show default avatar with userCount
+                StringBuilder name = new StringBuilder("");
+                name.append(message.getUserName(0));
+                for (int i = 1; i < userCount; i++) {
+                    name.append(", " + message.getUserName(i));
                 }
+                holder.contentOwnMessageContactEmail.setText(name);
+                String email = context.getResources().getQuantityString(R.plurals.general_selection_num_contacts, (int) userCount, userCount);
+                holder.contentOwnMessageContactName.setText(email);
+                Bitmap bitmapDefaultAvatar = getDefaultAvatar(getSpecificAvatarColor(AVATAR_PRIMARY_COLOR), userCount + "", AVATAR_SIZE, true);
+                holder.contentOwnMessageContactThumb.setImageBitmap(bitmapDefaultAvatar);
             }
 
-           checkMultiselectionMode(position, holder, true, message.getMsgId());
+            checkMultiselectionMode(position, holder, true, message.getMsgId());
 
         } else {
             long userHandle = message.getUserHandle();
@@ -5728,31 +5883,25 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                 holder.contentContactMessageContactEmail.setMaxWidthEmojis(dp2px(MAX_WIDTH_FILENAME_PORT, outMetrics));
             }
 
-            if (holder.contactLinkResult != null) {
-                holder.contentContactMessageContactName.setText(converterShortCodes(holder.contactLinkResult.getFullName()));
-                holder.contentContactMessageContactEmail.setText(holder.contactLinkResult.getEmail());
-                setUserAvatar(holder, false);
+            long userCount = message.getUsersCount();
+
+            if (userCount == 1) {
+                holder.contentContactMessageContactName.setText(converterShortCodes(getNameContactAttachment(message)));
+                holder.contentContactMessageContactEmail.setText(message.getUserEmail(0));
+                setUserAvatar(holder, message);
+
             } else {
-                long userCount = message.getUsersCount();
-
-                if (userCount == 1) {
-                    holder.contentContactMessageContactName.setText(converterShortCodes(getNameContactAttachment(message)));
-                    holder.contentContactMessageContactEmail.setText(message.getUserEmail(0));
-                    setUserAvatar(holder, message);
-
-                } else {
-                    //Show default avatar with userCount
-                    StringBuilder name = new StringBuilder("");
-                    name.append(converterShortCodes(message.getUserName(0)));
-                    for (int i = 1; i < userCount; i++) {
-                        name.append(", " + message.getUserName(i));
-                    }
-                    holder.contentContactMessageContactEmail.setText(name);
-                    String email = context.getResources().getQuantityString(R.plurals.general_selection_num_contacts, (int) userCount, userCount);
-                    holder.contentContactMessageContactName.setText(email);
-                    Bitmap bitmap = getDefaultAvatar(getSpecificAvatarColor(AVATAR_PRIMARY_COLOR), userCount + "", AVATAR_SIZE, true);
-                    holder.contentContactMessageContactThumb.setImageBitmap(bitmap);
+                //Show default avatar with userCount
+                StringBuilder name = new StringBuilder("");
+                name.append(converterShortCodes(message.getUserName(0)));
+                for (int i = 1; i < userCount; i++) {
+                    name.append(", " + message.getUserName(i));
                 }
+                holder.contentContactMessageContactEmail.setText(name);
+                String email = context.getResources().getQuantityString(R.plurals.general_selection_num_contacts, (int) userCount, userCount);
+                holder.contentContactMessageContactName.setText(email);
+                Bitmap bitmap = getDefaultAvatar(getSpecificAvatarColor(AVATAR_PRIMARY_COLOR), userCount + "", AVATAR_SIZE, true);
+                holder.contentContactMessageContactThumb.setImageBitmap(bitmap);
             }
 
             checkMultiselectionMode(position, holder, false, message.getMsgId());
@@ -6450,34 +6599,100 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
     }
 
     /**
-     * Sets the avatar of a MegaUser in a contact attachment message or a contact link message.
+     * Sets the avatar of a MegaUser in a contact link message.
      *
-     * @param holder            ViewHolder where the avatar has to be set.
-     * @param ownMessage        True if the message is own, false otherwise.
-     * @param name              MegaUser name.
-     * @param email             MegaUser email.
-     * @param userHandleEncoded MegaUser encoded in bas64.
+     * @param holder     ViewHolder where the avatar has to be set.
+     * @param ownMessage True if the message is own, false otherwise.
      */
-    private void setUserAvatar(ViewHolderMessageChat holder, boolean ownMessage, String name, String email, String userHandleEncoded) {
-        logDebug("setUserAvatar");
-
-        ChatAttachmentAvatarListener listener = new ChatAttachmentAvatarListener(context, holder, this, ownMessage);
-        int color = getColorAvatar(userHandleEncoded);
-        String fileName = email + JPG_EXTENSION;
-
-        Bitmap bitmapDefaultAvatar = getDefaultAvatar(color, name, AVATAR_SIZE, true);
-        if (ownMessage) {
-            holder.contentOwnMessageContactThumb.setImageBitmap(bitmapDefaultAvatar);
-        } else {
-            holder.contentContactMessageContactThumb.setImageBitmap(bitmapDefaultAvatar);
+    private void setContactLinkAvatar(ViewHolderMessageChat holder, boolean ownMessage) {
+        if (holder.contactLinkResult == null || holder.contactLinkResult.getContactLinkHandle() == null) {
+            return;
         }
 
-        File avatar = buildAvatarFile(context, fileName);
-        Bitmap bitmap;
+        long handle = holder.contactLinkResult.getContactLinkHandle();
 
+        String userHandleEncoded = MegaApiAndroid.userHandleToBase64(handle);
+        String email = holder.contactLinkResult.getEmail();
+
+        ChatAttachmentAvatarListener listener;
+        int color = getColorAvatar(userHandleEncoded);
+        Bitmap bitmapDefaultAvatar = getDefaultAvatar(color, holder.contactLinkResult.getFullName(), AVATAR_SIZE, true);
+
+        if (ownMessage) {
+            holder.ownContactLinkAvatar.setImageBitmap(bitmapDefaultAvatar);
+            listener = new ChatAttachmentAvatarListener(context, holder, this, true);
+        } else {
+            holder.othersContactLinkAvatar.setImageBitmap(bitmapDefaultAvatar);
+            listener = new ChatAttachmentAvatarListener(context, holder, this, false);
+        }
+
+        File avatar = buildAvatarFile(context, holder.contactLinkResult.getEmail() + JPG_EXTENSION);
+        Bitmap bitmap;
         if (isFileAvailable(avatar)) {
             if (avatar.length() > 0) {
                 BitmapFactory.Options bOpts = new BitmapFactory.Options();
+                bitmap = BitmapFactory.decodeFile(avatar.getAbsolutePath(), bOpts);
+
+                if (bitmap == null) {
+                    avatar.delete();
+
+                    if (megaApi == null) {
+                        logWarning("megaApi is Null in Offline mode");
+                        return;
+                    }
+
+                    megaApi.getUserAvatar(email, buildAvatarFile(context, email + JPG_EXTENSION).getAbsolutePath(), listener);
+                } else if (ownMessage) {
+                    holder.ownContactLinkAvatar.setImageBitmap(bitmap);
+                } else {
+                    holder.othersContactLinkAvatar.setImageBitmap(bitmap);
+                }
+            } else {
+                if (megaApi == null) {
+                    logWarning("megaApi is Null in Offline mode");
+                    return;
+                }
+
+                megaApi.getUserAvatar(email, buildAvatarFile(context, email + JPG_EXTENSION).getAbsolutePath(), listener);
+            }
+        } else {
+            if (megaApi == null) {
+                logWarning("megaApi is Null in Offline mode");
+                return;
+            }
+
+            megaApi.getUserAvatar(email, buildAvatarFile(context, email + JPG_EXTENSION).getAbsolutePath(), listener);
+        }
+    }
+
+    public void setUserAvatar(ViewHolderMessageChat holder, MegaChatMessage message) {
+        logDebug("setUserAvatar");
+
+        String name = message.getUserName(0);
+        if (name.trim().isEmpty()) {
+            name = message.getUserEmail(0);
+        }
+        String email = message.getUserEmail(0);
+        String userHandleEncoded = MegaApiAndroid.userHandleToBase64(message.getUserHandle(0));
+
+        ChatAttachmentAvatarListener listener;
+        int color = getColorAvatar(userHandleEncoded);
+        Bitmap bitmapDefaultAvatar = getDefaultAvatar(color, name, AVATAR_SIZE, true);
+        if (myUserHandle == message.getUserHandle()) {
+            holder.contentOwnMessageContactThumb.setImageBitmap(bitmapDefaultAvatar);
+            listener = new ChatAttachmentAvatarListener(context, holder, this, true);
+        } else {
+            holder.contentContactMessageContactThumb.setImageBitmap(bitmapDefaultAvatar);
+            listener = new ChatAttachmentAvatarListener(context, holder, this, false);
+        }
+
+        File avatar = buildAvatarFile(context, email + ".jpg");
+        Bitmap bitmap = null;
+        if (isFileAvailable(avatar)) {
+            if (avatar.length() > 0) {
+                BitmapFactory.Options bOpts = new BitmapFactory.Options();
+                bOpts.inPurgeable = true;
+                bOpts.inInputShareable = true;
                 bitmap = BitmapFactory.decodeFile(avatar.getAbsolutePath(), bOpts);
                 if (bitmap == null) {
                     avatar.delete();
@@ -6487,11 +6702,13 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                         return;
                     }
 
-                    megaApi.getUserAvatar(email, buildAvatarFile(context, fileName).getAbsolutePath(), listener);
-                } else if (ownMessage) {
-                    holder.contentOwnMessageContactThumb.setImageBitmap(bitmap);
+                    megaApi.getUserAvatar(email,buildAvatarFile(context,email + ".jpg").getAbsolutePath(),listener);
                 } else {
-                    holder.contentContactMessageContactThumb.setImageBitmap(bitmap);
+                    if (myUserHandle == message.getUserHandle()) {
+                        holder.contentOwnMessageContactThumb.setImageBitmap(bitmap);
+                    } else {
+                        holder.contentContactMessageContactThumb.setImageBitmap(bitmap);
+                    }
                 }
             } else {
                 if (megaApi == null) {
@@ -6499,7 +6716,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                     return;
                 }
 
-                megaApi.getUserAvatar(email, buildAvatarFile(context, fileName).getAbsolutePath(), listener);
+                megaApi.getUserAvatar(email,buildAvatarFile(context,email + ".jpg").getAbsolutePath(),listener);
             }
         } else {
             if (megaApi == null) {
@@ -6507,41 +6724,8 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                 return;
             }
 
-            megaApi.getUserAvatar(email, buildAvatarFile(context, fileName).getAbsolutePath(), listener);
+            megaApi.getUserAvatar(email,buildAvatarFile(context,email + ".jpg").getAbsolutePath(),listener);
         }
-    }
-
-    /**
-     * Sets the avatar of a MegaUser in a contact link message.
-     *
-     * @param holder     ViewHolder where the avatar has to be set.
-     * @param ownMessage True if the message is own, false otherwise.
-     */
-    private void setUserAvatar(ViewHolderMessageChat holder, boolean ownMessage) {
-        if (holder.contactLinkResult.getContactLinkHandle() == null) {
-            logError("Contact link handle is null");
-            return;
-        }
-
-        String userHandleEncoded = MegaApiAndroid.userHandleToBase64(holder.contactLinkResult.getContactLinkHandle());
-        setUserAvatar(holder, ownMessage, holder.contactLinkResult.getFullName(), holder.contactLinkResult.getEmail(), userHandleEncoded);
-    }
-
-    /**
-     * Sets the avatar of a MegaUser in a contact attachment message.
-     *
-     * @param holder  ViewHolder where the avatar has to be set.
-     * @param message MegaChatMessage to get the message info.
-     */
-    private void setUserAvatar(ViewHolderMessageChat holder, MegaChatMessage message) {
-        String name = message.getUserName(0);
-        if (name.trim().isEmpty()) {
-            name = message.getUserEmail(0);
-        }
-        String email = message.getUserEmail(0);
-        String userHandleEncoded = MegaApiAndroid.userHandleToBase64(message.getUserHandle(0));
-
-        setUserAvatar(holder, myUserHandle == message.getUserHandle(), name, email, userHandleEncoded);
     }
 
     private void setContactAvatar(ViewHolderMessageChat holder, long userHandle, String name) {
