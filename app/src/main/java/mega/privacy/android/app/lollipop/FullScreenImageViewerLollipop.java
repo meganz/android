@@ -1537,8 +1537,6 @@ public class FullScreenImageViewerLollipop extends PasscodeActivity
 					}
 				}
 			}
-		} else if (requestCode == REQUEST_WRITE_STORAGE) {
-			super.onActivityResult(requestCode, resultCode, intent);
 		}
 	}
 

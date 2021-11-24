@@ -87,7 +87,7 @@ public class FileStorageActivityLollipop extends PasscodeActivity implements OnC
 	private static final String IS_CONFIRMATION_CHECKED = "IS_CONFIRMATION_CHECKED";
 	private static final String PATH = "PATH";
 	public static final String PICK_FOLDER_TYPE = "PICK_FOLDER_TYPE";
-	private static final int SAVE_RK = 1122;
+	private static final int REQUEST_SAVE_RK = 1122;
 
 	public enum PickFolderType {
 		CU_FOLDER("CU_FOLDER"),
@@ -320,7 +320,7 @@ public class FileStorageActivityLollipop extends PasscodeActivity implements OnC
 	    getSupportActionBar().setDisplayShowCustomEnabled(true);
 	    
 	    newFolderMenuItem = menu.findItem(R.id.cab_menu_create_folder);
-        newFolderMenuItem.setVisible(!isChoosingStorage && mode == Mode.PICK_FOLDER);
+	    newFolderMenuItem.setVisible(!isChoosingStorage && mode == Mode.PICK_FOLDER);
 	    
 	    return super.onCreateOptionsMenu(menu);
 	}
@@ -504,7 +504,7 @@ public class FileStorageActivityLollipop extends PasscodeActivity implements OnC
 				.addCategory(Intent.CATEGORY_OPENABLE)
 				.setType(TYPE_TEXT_PLAIN)
 				.putExtra(DocumentsContract.EXTRA_INITIAL_URI, initialUri)
-				.putExtra(Intent.EXTRA_TITLE, getRecoveryKeyFileName()), SAVE_RK);
+				.putExtra(Intent.EXTRA_TITLE, getRecoveryKeyFileName()), REQUEST_SAVE_RK);
 	}
 
 	/**
@@ -1241,7 +1241,7 @@ public class FileStorageActivityLollipop extends PasscodeActivity implements OnC
 
                 finishPickFolder();
             }
-        } else if (requestCode == SAVE_RK && intent != null && resultCode == Activity.RESULT_OK) {
+        } else if (requestCode == REQUEST_SAVE_RK && intent != null && resultCode == Activity.RESULT_OK) {
 			setResult(RESULT_OK, new Intent().setData(intent.getData()));
 			finish();
 		}
