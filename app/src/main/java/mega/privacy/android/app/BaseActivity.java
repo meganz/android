@@ -498,6 +498,7 @@ public class BaseActivity extends AppCompatActivity implements ActivityLauncher,
     private void openDownloadedFile() {
         if(autoPlayInfo != null) {
             MegaNodeUtil.autoPlayNode(BaseActivity.this, autoPlayInfo, BaseActivity.this,BaseActivity.this);
+            autoPlayInfo = null;
         }
     }
 
@@ -842,9 +843,7 @@ public class BaseActivity extends AppCompatActivity implements ActivityLauncher,
                 break;
 
             case OPEN_FILE_SNACKBAR_TYPE: {
-                snackbar.setAction(R.string.action_see, (v) -> {
-                    openDownloadedFile();
-                });
+                snackbar.setAction(R.string.action_see, (v) -> openDownloadedFile());
                 snackbar.show();
                 break;
             }

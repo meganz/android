@@ -376,7 +376,7 @@ public class FileUtil {
 
     /**
      * Searches in the correspondent storage established if the file exists.
-     * If a file is path is found both on internal storage and SD card,
+     * If a file path is found both on internal storage and SD card,
      * put the path on internal storage before that on SD card.
      *
      * @param context Context object.
