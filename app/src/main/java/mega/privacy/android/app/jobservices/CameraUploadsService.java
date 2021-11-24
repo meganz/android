@@ -54,6 +54,7 @@ import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.receivers.NetworkTypeChangeReceiver;
 import mega.privacy.android.app.sync.cusync.CuSyncManager;
 import mega.privacy.android.app.utils.JobUtil;
+import mega.privacy.android.app.utils.StringResourcesUtils;
 import mega.privacy.android.app.utils.conversion.VideoCompressionCallback;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
@@ -72,7 +73,6 @@ import nz.mega.sdk.MegaTransferListenerInterface;
 
 import static mega.privacy.android.app.components.transferWidget.TransfersManagement.*;
 import static mega.privacy.android.app.constants.BroadcastConstants.*;
-import static mega.privacy.android.app.constants.SettingsConstants.VIDEO_QUALITY_MEDIUM;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.FileUtil.*;
 import static android.content.ContentResolver.QUERY_ARG_OFFSET;
@@ -1425,6 +1425,9 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
                 megaApiFolder.setAccountAuth(megaApi.getAccountAuth());
                 logDebug("Fast login OK, Calling fetchNodes from CameraSyncService");
                 megaApi.fetchNodes(this);
+
+                // Get cookies settings after login.
+                MegaApplication.getInstance().checkEnabledCookies();
             } else {
                 logError("ERROR: " + e.getErrorString());
                 setLoginState(false);
@@ -1917,9 +1920,9 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
                     .putExtra(PENDING_TRANSFERS, pendingTransfers));
 
             if (megaApi.areTransfersPaused(MegaTransfer.TYPE_UPLOAD)) {
-                message = getResources().getQuantityString(R.plurals.upload_service_paused_notification, totalTransfers, inProgress, totalTransfers);
+                message = StringResourcesUtils.getString(R.string.upload_service_notification_paused, inProgress, totalTransfers);
             } else {
-                message = getResources().getQuantityString(R.plurals.upload_service_notification, totalTransfers, inProgress, totalTransfers);
+                message = StringResourcesUtils.getString(R.string.upload_service_notification, inProgress, totalTransfers);
             }
         }
 

@@ -1,12 +1,13 @@
 package mega.privacy.android.app.contacts.list.dialog
 
-import android.app.Activity
+import android.app.Activity.RESULT_OK
 import android.content.DialogInterface
 import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.activity.result.ActivityResultLauncher
 import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
@@ -16,6 +17,9 @@ import com.facebook.imagepipeline.request.ImageRequest
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.R
+import mega.privacy.android.app.activities.contract.SelectChatsToAttachActivityContract
+import mega.privacy.android.app.activities.contract.SelectFileToShareActivityContract
+import mega.privacy.android.app.activities.contract.SelectFolderToShareActivityContract
 import mega.privacy.android.app.components.attacher.MegaAttacher
 import mega.privacy.android.app.contacts.ContactsActivity
 import mega.privacy.android.app.contacts.list.ContactListViewModel
@@ -23,21 +27,16 @@ import mega.privacy.android.app.contacts.list.data.ContactItem
 import mega.privacy.android.app.databinding.BottomSheetContactDetailBinding
 import mega.privacy.android.app.interfaces.SnackbarShower
 import mega.privacy.android.app.lollipop.FileExplorerActivityLollipop.EXTRA_SELECTED_FOLDER
-import mega.privacy.android.app.lollipop.controllers.ChatController
-import mega.privacy.android.app.lollipop.controllers.ContactController
 import mega.privacy.android.app.lollipop.controllers.NodeController
 import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop
 import mega.privacy.android.app.modalbottomsheet.BaseBottomSheetDialogFragment
+import mega.privacy.android.app.objects.PasscodeManagement
 import mega.privacy.android.app.utils.CallUtil
-import mega.privacy.android.app.utils.Constants.ACTION_CHAT_SHOW_MESSAGES
-import mega.privacy.android.app.utils.Constants.CHAT_ID
-import mega.privacy.android.app.utils.Constants.REQUEST_CODE_SELECT_CHAT
-import mega.privacy.android.app.utils.Constants.REQUEST_CODE_SELECT_FILE
-import mega.privacy.android.app.utils.Constants.REQUEST_CODE_SELECT_FOLDER
-import mega.privacy.android.app.utils.Constants.SELECTED_CONTACTS
+import mega.privacy.android.app.utils.Constants.*
 import mega.privacy.android.app.utils.ContactUtil
 import mega.privacy.android.app.utils.ExtraUtils.extraNotNull
 import nz.mega.sdk.MegaUser
+import javax.inject.Inject
 
 /**
  * Bottom Sheet Dialog that represents the UI for a dialog containing contact information.
@@ -67,14 +66,49 @@ class ContactBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
             }
     }
 
+    @Inject
+    lateinit var passcodeManagement: PasscodeManagement
+
     private val viewModel by viewModels<ContactListViewModel>({ requireParentFragment() })
     private val userHandle by extraNotNull<Long>(USER_HANDLE)
+    private val nodeAttacher: MegaAttacher by lazy { MegaAttacher(this) }
     private var removeContactDialog: AlertDialog? = null
     private var nodePermissionsDialog: AlertDialog? = null
     private var selectedContacts: ArrayList<String>? = null
     private var folderHandle: Long? = null
 
     private lateinit var binding: BottomSheetContactDetailBinding
+    private lateinit var selectFileLauncher: ActivityResultLauncher<List<MegaUser>>
+    private lateinit var selectFolderLauncher: ActivityResultLauncher<List<MegaUser>>
+    private lateinit var selectChatLauncher: ActivityResultLauncher<MegaUser>
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+
+        selectFileLauncher = registerForActivityResult(SelectFileToShareActivityContract()) { result ->
+            if (result != null) {
+                viewModel.getMegaUser(userHandle).observe(viewLifecycleOwner) { user ->
+                    nodeAttacher.handleSelectFileResult(result, user, activity as ContactsActivity)
+                    dismiss()
+                }
+            }
+        }
+
+        selectFolderLauncher = registerForActivityResult(SelectFolderToShareActivityContract()) { result ->
+            if (result != null) {
+                selectedContacts = result.getStringArrayListExtra(SELECTED_CONTACTS)
+                folderHandle = result.getLongExtra(EXTRA_SELECTED_FOLDER, 0)
+                showNodePermissionsDialog()
+            }
+        }
+
+        selectChatLauncher = registerForActivityResult(SelectChatsToAttachActivityContract()) { result ->
+            if (result != null) {
+                nodeAttacher.handleActivityResult(REQUEST_CODE_SELECT_CHAT, RESULT_OK, result, activity as ContactsActivity)
+                dismiss()
+            }
+        }
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -156,7 +190,7 @@ class ContactBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
         }
 
         binding.optionCall.setOnClickListener {
-            CallUtil.startNewCall(activity, activity as SnackbarShower, megaUser)
+            CallUtil.startNewCall(activity, activity as SnackbarShower, megaUser, passcodeManagement)
             dismiss()
         }
 
@@ -172,18 +206,15 @@ class ContactBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
         }
 
         binding.optionSendFile.setOnClickListener {
-            val intent = ContactController.getPickFileToSendIntent(requireContext(), listOf(megaUser))
-            startActivityForResult(intent, REQUEST_CODE_SELECT_FILE)
+            selectFileLauncher.launch(listOf(megaUser))
         }
 
         binding.optionShareContact.setOnClickListener {
-            val intent = ChatController.getSelectChatsToAttachContactIntent(requireContext(), megaUser)
-            startActivityForResult(intent, REQUEST_CODE_SELECT_CHAT)
+            selectChatLauncher.launch(megaUser)
         }
 
         binding.optionShareFolder.setOnClickListener {
-            val intent = ContactController.getPickFolderToShareIntent(requireContext(), listOf(megaUser))
-            startActivityForResult(intent, REQUEST_CODE_SELECT_FOLDER)
+            selectFolderLauncher.launch(listOf(megaUser))
         }
 
         binding.optionRemove.setOnClickListener { showRemoveContactDialog(megaUser) }
@@ -233,33 +264,6 @@ class ContactBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
                     dismiss()
                 }
                 .show()
-        }
-    }
-
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        when (requestCode) {
-            REQUEST_CODE_SELECT_FILE -> {
-                if (resultCode == Activity.RESULT_OK && data != null) {
-                    viewModel.getMegaUser(userHandle).observe(viewLifecycleOwner) { user ->
-                        MegaAttacher(this).handleSelectFileResult(data, user, activity as ContactsActivity)
-                        dismiss()
-                    }
-                }
-            }
-            REQUEST_CODE_SELECT_FOLDER -> {
-                if (resultCode == Activity.RESULT_OK && data?.extras != null) {
-                    selectedContacts = data.getStringArrayListExtra(SELECTED_CONTACTS)
-                    folderHandle = data.getLongExtra(EXTRA_SELECTED_FOLDER, 0)
-                    showNodePermissionsDialog()
-                }
-            }
-            REQUEST_CODE_SELECT_CHAT -> {
-                if (resultCode == Activity.RESULT_OK && data != null) {
-                    MegaAttacher(this).handleActivityResult(requestCode, resultCode, data, activity as ContactsActivity)
-                    dismiss()
-                }
-            }
-            else -> super.onActivityResult(requestCode, resultCode, data)
         }
     }
 

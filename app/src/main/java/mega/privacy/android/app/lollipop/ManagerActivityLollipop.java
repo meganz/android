@@ -59,6 +59,7 @@ import androidx.core.content.ContextCompat;
 import androidx.core.view.MenuItemCompat;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
+import androidx.navigation.fragment.NavHostFragment;
 import androidx.viewpager.widget.ViewPager;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.appcompat.app.ActionBar;
@@ -129,6 +130,7 @@ import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.OpenPasswordLinkActivity;
 import mega.privacy.android.app.Product;
 import mega.privacy.android.app.R;
+import mega.privacy.android.app.objects.PasscodeManagement;
 import mega.privacy.android.app.fragments.homepage.documents.DocumentsFragment;
 import mega.privacy.android.app.generalusecase.FilePrepareUseCase;
 import mega.privacy.android.app.smsVerification.SMSVerificationActivity;
@@ -377,6 +379,8 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 	InviteContactUseCase inviteContactUseCase;
 	@Inject
 	FilePrepareUseCase filePrepareUseCase;
+	@Inject
+	PasscodeManagement passcodeManagement;
 
 	public ArrayList<Integer> transfersInProgress;
 	public MegaTransferData transferData;
@@ -1195,7 +1199,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 		if (checkPermissionsCall(this, typesCameraPermission)) {
 			switch (typesCameraPermission) {
 				case RETURN_CALL_PERMISSIONS:
-					returnActiveCall(this);
+					returnActiveCall(this, passcodeManagement);
 					break;
 
 				case START_CALL_PERMISSIONS:
@@ -4433,7 +4437,8 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 	 * BNV, Toolbar title, etc.
 	 */
 	private void setupNavDestListener() {
-		mNavController = Navigation.findNavController(mNavHostView);
+		NavHostFragment navHostFragment = (NavHostFragment) getSupportFragmentManager().findFragmentById(R.id.nav_host_fragment);
+		mNavController = navHostFragment.getNavController();
 
 		mNavController.addOnDestinationChangedListener((controller, destination, arguments) -> {
 			int destinationId = destination.getId();
@@ -4803,6 +4808,11 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 		updateMiniAudioPlayerVisibility(true);
 
 		bNV.setTranslationY(0);
+		bNV.animate().cancel();
+		bNV.clearAnimation();
+		if (bNV.getVisibility() != View.VISIBLE) {
+			bNV.setVisibility(View.VISIBLE);
+		}
 		bNV.setVisibility(View.VISIBLE);
 		final CoordinatorLayout.LayoutParams params = new CoordinatorLayout.LayoutParams(
 				ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
@@ -6000,7 +6010,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 
 	private void returnCallWithPermissions() {
 		if (checkPermissionsCall(this, RETURN_CALL_PERMISSIONS)) {
-			returnActiveCall(this);
+			returnActiveCall(this, passcodeManagement);
 		}
 	}
 
@@ -11848,7 +11858,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 				}).show(getSupportFragmentManager(),
 						MeetingHasEndedDialogFragment.TAG);
 			} else {
-				CallUtil.checkMeetingInProgress(ManagerActivityLollipop.this, ManagerActivityLollipop.this, chatId, isFromOpenChatPreview, link, request.getMegaHandleList(), request.getText(), alreadyExist, request.getUserHandle());
+				CallUtil.checkMeetingInProgress(ManagerActivityLollipop.this, ManagerActivityLollipop.this, chatId, isFromOpenChatPreview, link, request.getMegaHandleList(), request.getText(), alreadyExist, request.getUserHandle(), passcodeManagement);
 			}
 		} else {
 			logDebug("It's a chat");
