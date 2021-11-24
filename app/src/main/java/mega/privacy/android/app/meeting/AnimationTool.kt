@@ -30,8 +30,8 @@ object AnimationTool {
         animate().y(dy).setDuration(duration).start()
     }
 
-    fun View.clearAnimationAndGone() {
-        clearAnimation().also { isVisible = false }
+    fun View.moveX(dx: Float, duration: Long = InMeetingFragment.ANIMATION_DURATION) {
+        animate().x(dx).setDuration(duration).start()
     }
 }
 

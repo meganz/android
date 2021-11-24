@@ -31,10 +31,11 @@ import mega.privacy.android.app.utils.contacts.MegaContactGetter;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaTransfer;
 
+import static mega.privacy.android.app.constants.SettingsConstants.VIDEO_QUALITY_MEDIUM;
+import static mega.privacy.android.app.constants.SettingsConstants.VIDEO_QUALITY_ORIGINAL;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.PasscodeUtil.REQUIRE_PASSCODE_IMMEDIATE;
-import static mega.privacy.android.app.utils.PasscodeUtil.REQUIRE_PASSCODE_INVALID;
 import static mega.privacy.android.app.utils.TextUtil.*;
 import static mega.privacy.android.app.utils.Util.aes_decrypt;
 import static mega.privacy.android.app.utils.Util.aes_encrypt;
@@ -42,7 +43,7 @@ import static nz.mega.sdk.MegaApiJava.*;
 
 public class DatabaseHandler extends SQLiteOpenHelper {
 
-	private static final int DATABASE_VERSION = 62;
+	private static final int DATABASE_VERSION = 64;
     private static final String DATABASE_NAME = "megapreferences";
     private static final String TABLE_PREFERENCES = "preferences";
     private static final String TABLE_CREDENTIALS = "credentials";
@@ -95,6 +96,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     private static final String KEY_PASSCODE_LOCK_TYPE = "pinlocktype";
     private static final String KEY_PASSCODE_LOCK_CODE = "pinlockcode";
 	private static final String KEY_PASSCODE_LOCK_REQUIRE_TIME = "passcodelockrequiretime";
+	private static final String KEY_FINGERPRINT_LOCK= "fingerprintlock";
     private static final String KEY_STORAGE_ASK_ALWAYS = "storageaskalways";
     private static final String KEY_STORAGE_DOWNLOAD_LOCATION = "storagedownloadlocation";
     private static final String KEY_LAST_UPLOAD_FOLDER = "lastuploadfolder";
@@ -157,7 +159,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 	private static final String KEY_CHAT_NOTIFICATIONS_ENABLED = "chatnotifications";
 	private static final String KEY_CHAT_SOUND_NOTIFICATIONS = "chatnotificationsound";
 	private static final String KEY_CHAT_VIBRATION_ENABLED = "chatvibrationenabled";
-	private static final String KEY_CHAT_SEND_ORIGINALS = "sendoriginalsattachments";
+	private static final String KEY_CHAT_VIDEO_QUALITY = "chatvideoQuality";
 
 	private static final String KEY_INVALIDATE_SDK_CACHE = "invalidatesdkcache";
 
@@ -299,6 +301,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
             + KEY_BACKUP_DEL + " BOOLEAN,"
             + KEY_BACKUP_OUTDATED + " BOOLEAN)";
 
+    private static final int OLD_VIDEO_QUALITY_ORIGINAL = 0;
+
     private static DatabaseHandler instance;
 
     private static SQLiteDatabase db;
@@ -367,7 +371,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                 + KEY_FIRST_LOGIN_CHAT + " BOOLEAN, "               															//29
                 + KEY_SMALL_GRID_CAMERA + " BOOLEAN,"               															//30
                 + KEY_AUTO_PLAY + " BOOLEAN,"                       															//31
-                + KEY_UPLOAD_VIDEO_QUALITY + " TEXT,"               															//32
+                + KEY_UPLOAD_VIDEO_QUALITY + " TEXT DEFAULT '" + encrypt(String.valueOf(VIDEO_QUALITY_ORIGINAL))+ "',"			//32
                 + KEY_CONVERSION_ON_CHARGING + " BOOLEAN,"          															//33
                 + KEY_CHARGING_ON_SIZE + " TEXT,"                   															//34
                 + KEY_SHOULD_CLEAR_CAMSYNC_RECORDS + " TEXT,"       															//35
@@ -381,7 +385,9 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 				+ KEY_ASK_SET_DOWNLOAD_LOCATION + " BOOLEAN,"																	//43
 				+ KEY_URI_MEDIA_EXTERNAL_SD_CARD + " TEXT,"																		//44
 				+ KEY_MEDIA_FOLDER_EXTERNAL_SD_CARD + " BOOLEAN," 																//45
-				+ KEY_PASSCODE_LOCK_REQUIRE_TIME + " TEXT DEFAULT '" + encrypt("" + (REQUIRE_PASSCODE_INVALID)) + "')";	//46
+				+ KEY_PASSCODE_LOCK_REQUIRE_TIME + " TEXT DEFAULT '" + encrypt("" + (REQUIRE_PASSCODE_INVALID)) + "', "	//46
+				+ KEY_FINGERPRINT_LOCK + " BOOLEAN DEFAULT '" + encrypt("false") + "'"									//47
+				+ ")";
 
         db.execSQL(CREATE_PREFERENCES_TABLE);
 
@@ -431,8 +437,12 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		db.execSQL(CREATE_NONCONTACT_TABLE);
 
 		String CREATE_CHAT_TABLE = "CREATE TABLE IF NOT EXISTS " + TABLE_CHAT_SETTINGS + "("
-				+ KEY_ID + " INTEGER PRIMARY KEY, " + KEY_CHAT_NOTIFICATIONS_ENABLED + " BOOLEAN, " + KEY_CHAT_SOUND_NOTIFICATIONS + " TEXT, "
-				+ KEY_CHAT_VIBRATION_ENABLED + " BOOLEAN, " + KEY_CHAT_SEND_ORIGINALS + " BOOLEAN" + ")";
+				+ KEY_ID + " INTEGER PRIMARY KEY, " 																//0
+				+ KEY_CHAT_NOTIFICATIONS_ENABLED + " BOOLEAN, " 													//1
+				+ KEY_CHAT_SOUND_NOTIFICATIONS + " TEXT, "															//2
+				+ KEY_CHAT_VIBRATION_ENABLED + " BOOLEAN, " 														//3
+				+ KEY_CHAT_VIDEO_QUALITY + " TEXT DEFAULT '"  + encrypt(String.valueOf(VIDEO_QUALITY_MEDIUM)) + "'"	//4
+				+ ")";
 		db.execSQL(CREATE_CHAT_TABLE);
 
 		String CREATE_COMPLETED_TRANSFER_TABLE = "CREATE TABLE IF NOT EXISTS " + TABLE_COMPLETED_TRANSFERS + "("
@@ -485,63 +495,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 	public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         logInfo("Database upgraded from " + oldVersion + " to " + newVersion);
 
-//		UserCredentials userCredentials = null;
-//
-//		String selectQueryCredentials = "SELECT  * FROM " + TABLE_CREDENTIALS;
-//		Cursor cursorCredentials = db.rawQuery(selectQueryCredentials, null);
-//		if (cursorCredentials.moveToFirst()) {
-//			int id = Integer.parseInt(cursorCredentials.getString(0));
-//			String email = decrypt(cursorCredentials.getString(1));
-//			String session = decrypt(cursorCredentials.getString(2));
-//			userCredentials = new UserCredentials(email, session);
-//		}
-//		cursorCredentials.close();
-//
-//		MegaPreferences prefs = null;
-//		String selectQueryPref = "SELECT * FROM " + TABLE_PREFERENCES;
-//		Cursor cursorPref = db.rawQuery(selectQueryPref, null);
-//		if (cursorPref.moveToFirst()){
-//			int id = Integer.parseInt(cursorPref.getString(0));
-//			String firstTime = decrypt(cursorPref.getString(1));
-//			String camSyncEnabled = decrypt(cursorPref.getString(2));
-//			String camSyncHandle = decrypt(cursorPref.getString(3));
-//			String camSyncLocalPath = decrypt(cursorPref.getString(4));
-//			String wifi = decrypt(cursorPref.getString(5));
-//			String fileUpload = decrypt(cursorPref.getString(6));
-//			String pinLockEnabled = decrypt(cursorPref.getString(7));
-//			String pinLockCode = decrypt(cursorPref.getString(8));
-//			String askAlways = decrypt(cursorPref.getString(9));
-//			String downloadLocation = decrypt(cursorPref.getString(10));
-//			String camSyncTimeStamp = decrypt(cursorPref.getString(11));
-//			prefs = new MegaPreferences(firstTime, wifi, camSyncEnabled, camSyncHandle, camSyncLocalPath, fileUpload, camSyncTimeStamp, pinLockEnabled, pinLockCode, askAlways, downloadLocation);
-//		}
-//		cursorPref.close();
-//
-//		db.execSQL("DROP TABLE IF EXISTS " + TABLE_CREDENTIALS);
-//		db.execSQL("DROP TABLE IF EXISTS " + TABLE_PREFERENCES);
-//		db.execSQL("DROP TABLE IF EXISTS " + TABLE_ATTRIBUTES);
-//		db.execSQL("DROP TABLE IF EXISTS " + TABLE_OFFLINE);
-//        onCreate(db);
-//
-//        ContentValues valuesCredentials = new ContentValues();
-//        valuesCredentials.put(KEY_EMAIL, encrypt(userCredentials.getEmail()));
-//        valuesCredentials.put(KEY_SESSION, encrypt(userCredentials.getSession()));
-//        db.insert(TABLE_CREDENTIALS, null, valuesCredentials);
-//
-//        ContentValues valuesPref = new ContentValues();
-//        valuesPref.put(KEY_FIRST_LO30GIN, encrypt(prefs.getFirstTime()));
-//        valuesPref.put(KEY_CAM_SYNC_WIFI, encrypt(prefs.getCamSyncWifi()));
-//        valuesPref.put(KEY_CAM_SYNC_ENABLED, encrypt(prefs.getCamSyncEnabled()));
-//        valuesPref.put(KEY_CAM_SYNC_HANDLE, encrypt(prefs.getCamSyncHandle()));
-//        valuesPref.put(KEY_CAM_SYNC_LOCAL_PATH, encrypt(prefs.getCamSyncLocalPath()));
-//        valuesPref.put(KEY_CAM_SYNC_FILE_UPLOAD, encrypt(prefs.getCamSyncFileUpload()));
-//        valuesPref.put(KEY_PIN_LOCK_ENABLED, encrypt(prefs.getPinLockEnabled()));
-//        valuesPref.put(KEY_PIN_LOCK_CODE, encrypt(prefs.getPinLockCode()));
-//        valuesPref.put(KEY_STORAGE_ASK_ALWAYS, encrypt(prefs.getStorageAskAlways()));
-//        valuesPref.put(KEY_STORAGE_DOWNLOAD_LOCATION, encrypt(prefs.getStorageDownloadLocation()));
-//        valuesPref.put(KEY_CAM_SYNC_TIMESTAMP, encrypt(prefs.getCamSyncTimeStamp()));
-//        valuesPref.put(KEY_CAM_SYNC_CHARGING, encrypt("false"));
-//        db.insert(TABLE_PREFERENCES, null, valuesPref);
+        //Used to identify when the Preferences table has been already recreated
+		boolean preferencesAlreadyUpdated = false;
 
 		if (oldVersion <= 7){
 			db.execSQL("ALTER TABLE " + TABLE_PREFERENCES + " ADD COLUMN " + KEY_CAM_SYNC_CHARGING + " BOOLEAN;");
@@ -768,11 +723,6 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 			db.execSQL("UPDATE " + TABLE_ATTRIBUTES + " SET " + KEY_SHOW_COPYRIGHT + " = '" + encrypt("true") + "';");
 		}
 
-		if (oldVersion <= 36){
-			db.execSQL("ALTER TABLE " + TABLE_CHAT_SETTINGS + " ADD COLUMN " + KEY_CHAT_SEND_ORIGINALS + " BOOLEAN;");
-			db.execSQL("UPDATE " + TABLE_CHAT_SETTINGS + " SET " + KEY_CHAT_SEND_ORIGINALS + " = '" + encrypt("false") + "';");
-		}
-
 		if (oldVersion <= 37){
 			db.execSQL("ALTER TABLE " + TABLE_CHAT_ITEMS + " ADD COLUMN " + KEY_CHAT_ITEM_WRITTEN_TEXT + " TEXT;");
 			db.execSQL("UPDATE " + TABLE_CHAT_ITEMS + " SET " + KEY_CHAT_ITEM_WRITTEN_TEXT + " = '" + "" + "';");
@@ -923,20 +873,34 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 			onCreate(db);
 			setAttributes(db, attr);
 		}
-	}
 
-//	public MegaOffline encrypt(MegaOffline off){
-//
-//		off.setHandle(encrypt(off.getHandle()));
-//		off.setPath(encrypt(off.getPath()));
-//		off.setName(encrypt(off.getName()));
-//		//Parent id no encrypted
-//		off.setType(encrypt(off.getType()));
-//		//incoming not encrypted
-//		off.setHandleIncoming(encrypt(off.getHandleIncoming()));
-//
-//		return off;
-//	}
+		if (oldVersion <= 62) {
+			if (oldVersion > 52) {
+				ChatSettings chatSettings = getChatSettingsFromDBv62(db);
+				db.execSQL("DROP TABLE IF EXISTS " + TABLE_CHAT_SETTINGS);
+				onCreate(db);
+				setChatSettings(db, chatSettings);
+
+				// Temporary fix to avoid wrong values in chat settings after upgrade.
+				getChatSettings(db);
+			}
+
+			MegaPreferences preferences = getPreferencesFromDBv62(db);
+			db.execSQL("DROP TABLE IF EXISTS " + TABLE_PREFERENCES);
+			onCreate(db);
+
+			if (preferences != null) {
+				setPreferences(db, preferences);
+			}
+
+			preferencesAlreadyUpdated = true;
+		}
+
+		if (oldVersion <= 63 && !preferencesAlreadyUpdated) {
+			db.execSQL("ALTER TABLE " + TABLE_PREFERENCES + " ADD COLUMN " + KEY_FINGERPRINT_LOCK + " BOOLEAN;");
+			db.execSQL("UPDATE " + TABLE_PREFERENCES + " SET " + KEY_FINGERPRINT_LOCK + " = '" + encrypt("false") + "';");
+		}
+	}
 
 	public static String encrypt(String original) {
 		if (original == null) {
@@ -1549,7 +1513,13 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         return ephemeralCredentials;
     }
 
-	public void setPreferences (MegaPreferences prefs){
+	/**
+	 * Sets preferences.
+	 *
+	 * @param db    Current DB.
+	 * @param prefs Preferences.
+	 */
+	private void setPreferences (SQLiteDatabase db, MegaPreferences prefs){
         ContentValues values = new ContentValues();
         values.put(KEY_FIRST_LOGIN, encrypt(prefs.getFirstTime()));
         values.put(KEY_CAM_SYNC_WIFI, encrypt(prefs.getCamSyncWifi()));
@@ -1583,7 +1553,20 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		values.put(KEY_FIRST_LOGIN_CHAT, encrypt(prefs.getFirstTimeChat()));
 		values.put(KEY_SMALL_GRID_CAMERA, encrypt(prefs.getSmallGridCamera()));
 		values.put(KEY_REMOVE_GPS, encrypt(prefs.getRemoveGPS()));
+		values.put(KEY_KEEP_FILE_NAMES, encrypt(prefs.getKeepFileNames()));
+		values.put(KEY_AUTO_PLAY, encrypt(prefs.isAutoPlayEnabled() + ""));
+		values.put(KEY_UPLOAD_VIDEO_QUALITY, encrypt(prefs.getUploadVideoQuality()));
+		values.put(KEY_CONVERSION_ON_CHARGING, encrypt(prefs.getConversionOnCharging()));
+		values.put(KEY_CHARGING_ON_SIZE, encrypt(prefs.getChargingOnSize()));
+		values.put(KEY_SHOULD_CLEAR_CAMSYNC_RECORDS, encrypt(prefs.getShouldClearCameraSyncRecords()));
+		values.put(KEY_SHOW_INVITE_BANNER, encrypt(prefs.getShowInviteBanner()));
+		values.put(KEY_SD_CARD_URI, encrypt(prefs.getSdCardUri()));
+		values.put(KEY_ASK_FOR_DISPLAY_OVER, encrypt(prefs.getAskForDisplayOver()));
+		values.put(KEY_ASK_SET_DOWNLOAD_LOCATION, encrypt(prefs.getAskForSetDownloadLocation()));
+		values.put(KEY_URI_MEDIA_EXTERNAL_SD_CARD, encrypt(prefs.getMediaSDCardUri()));
+		values.put(KEY_MEDIA_FOLDER_EXTERNAL_SD_CARD, encrypt(prefs.getIsMediaOnSDCard()));
 		values.put(KEY_PASSCODE_LOCK_REQUIRE_TIME, encrypt(prefs.getPasscodeLockRequireTime()));
+		values.put(KEY_FINGERPRINT_LOCK, encrypt(prefs.getFingerprintLock()));
 
         db.insert(TABLE_PREFERENCES, null, values);
 	}
@@ -1601,14 +1584,50 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         db.execSQL("UPDATE " + TABLE_PREFERENCES + " SET " + KEY_ASK_FOR_DISPLAY_OVER + " = '" + encrypt("false") + "';");
     }
 
+	/**
+	 * Gets preferences from the DB v62 (previous to add four available video qualities).
+	 *
+	 * @param db Current DB.
+	 * @return Preferences.
+	 */
+	private MegaPreferences getPreferencesFromDBv62(SQLiteDatabase db) {
+		logDebug("getPreferencesFromDBv62");
+		MegaPreferences preferences = getPreferences(db);
+
+		if (preferences != null) {
+			String uploadVideoQuality = preferences.getUploadVideoQuality();
+
+			if (!isTextEmpty(uploadVideoQuality)
+					&& Integer.parseInt(uploadVideoQuality) == OLD_VIDEO_QUALITY_ORIGINAL) {
+				preferences.setUploadVideoQuality(String.valueOf(VIDEO_QUALITY_ORIGINAL));
+			}
+		}
+
+		return preferences;
+	}
+
+	/**
+	 * Gets preferences.
+	 *
+	 * @return Preferences.
+	 */
 	public MegaPreferences getPreferences(){
         logDebug("getPreferences");
+        return getPreferences(db);
+	}
+
+	/**
+	 * Gets preferences.
+	 *
+	 * @param db Current DB.
+	 * @return Preferences.
+	 */
+	private MegaPreferences getPreferences(SQLiteDatabase db) {
 		MegaPreferences prefs = null;
 		String selectQuery = "SELECT * FROM " + TABLE_PREFERENCES;
 
 		try (Cursor cursor = db.rawQuery(selectQuery, null)) {
 			if (cursor != null && cursor.moveToFirst()) {
-				int id = Integer.parseInt(cursor.getString(0));
 				String firstTime = decrypt(cursor.getString(1));
 				String camSyncEnabled = decrypt(cursor.getString(2));
 				String camSyncHandle = decrypt(cursor.getString(3));
@@ -1650,13 +1669,27 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 				String closeInviteBanner = decrypt(cursor.getString(39));
 				String preferredSortCameraUpload = decrypt(cursor.getString(40));
 				String sdCardUri = decrypt(cursor.getString(41));
+				String askForDisplayOver = decrypt(cursor.getString(42));
+				String askForSetDownloadLocation = decrypt(cursor.getString(43));
+				String mediaSDCardUri = decrypt(cursor.getString(44));
+				String isMediaOnSDCard = decrypt(cursor.getString(45));
 				String passcodeLockRequireTime = decrypt(cursor.getString(46));
+				String fingerprintLock = cursor.getColumnIndex(KEY_FINGERPRINT_LOCK) != INVALID_VALUE
+						? decrypt(cursor.getString(47)) : "false";
 
-				prefs = new MegaPreferences(firstTime, wifi, camSyncEnabled, camSyncHandle, camSyncLocalPath, fileUpload, camSyncTimeStamp, pinLockEnabled,
-						pinLockCode, askAlways, downloadLocation, camSyncCharging, lastFolderUpload, lastFolderCloud, secondaryFolderEnabled, secondaryPath, secondaryHandle,
-						secSyncTimeStamp, keepFileNames, storageAdvancedDevices, preferredViewList, preferredViewListCamera, uriExternalSDCard, cameraFolderExternalSDCard,
-						pinLockType, preferredSortCloud, preferredSortContacts, preferredSortOthers, firstTimeChat, smallGridCamera, uploadVideoQuality, conversionOnCharging, chargingOnSize, shouldClearCameraSyncRecords, camVideoSyncTimeStamp,
-						secVideoSyncTimeStamp, isAutoPlayEnabled, removeGPS, closeInviteBanner, preferredSortCameraUpload, sdCardUri, passcodeLockRequireTime);
+				prefs = new MegaPreferences(firstTime, wifi, camSyncEnabled, camSyncHandle,
+						camSyncLocalPath, fileUpload, camSyncTimeStamp, pinLockEnabled,
+						pinLockCode, askAlways, downloadLocation, camSyncCharging, lastFolderUpload,
+						lastFolderCloud, secondaryFolderEnabled, secondaryPath, secondaryHandle,
+						secSyncTimeStamp, keepFileNames, storageAdvancedDevices, preferredViewList,
+						preferredViewListCamera, uriExternalSDCard, cameraFolderExternalSDCard,
+						pinLockType, preferredSortCloud, preferredSortContacts, preferredSortOthers,
+						firstTimeChat, smallGridCamera, uploadVideoQuality, conversionOnCharging,
+						chargingOnSize, shouldClearCameraSyncRecords, camVideoSyncTimeStamp,
+						secVideoSyncTimeStamp, isAutoPlayEnabled, removeGPS, closeInviteBanner,
+						preferredSortCameraUpload, sdCardUri, askForDisplayOver,
+						askForSetDownloadLocation, mediaSDCardUri, isMediaOnSDCard,
+						passcodeLockRequireTime, fingerprintLock);
 			}
 		} catch (Exception e) {
 			logError("Exception opening or managing DB cursor", e);
@@ -1668,6 +1701,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 	/**
 	 * Get chat settings from the DB v52 (previous to remove the setting to enable/disable the chat).
 	 * KEY_CHAT_ENABLED and KEY_CHAT_STATUS have been removed in DB v53.
+	 *
 	 * @return Chat settings.
 	 */
 	private ChatSettings getChatSettingsFromDBv52(SQLiteDatabase db){
@@ -1683,7 +1717,40 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 				String vibrationEnabled = decrypt(cursor.getString(4));
 				String chatStatus = decrypt(cursor.getString(5));
 				String sendOriginalAttachments = decrypt(cursor.getString(6));
-				chatSettings = new ChatSettings(notificationSound, vibrationEnabled, sendOriginalAttachments);
+				String videoQuality = Boolean.parseBoolean(sendOriginalAttachments)
+						? VIDEO_QUALITY_ORIGINAL + ""
+						: VIDEO_QUALITY_MEDIUM + "";
+
+				chatSettings = new ChatSettings(notificationSound, vibrationEnabled, videoQuality);
+			}
+		} catch (Exception e) {
+			logError("Exception opening or managing DB cursor", e);
+		}
+		return chatSettings;
+	}
+
+	/**
+	 * Get chat settings from the DB v62 (previous to remove the setting to enable/disable
+	 * the send original attachments and to add four available video qualities).
+	 * KEY_CHAT_SEND_ORIGINALS has been removed in DB v63.
+	 *
+	 * @return Chat settings.
+	 */
+	private ChatSettings getChatSettingsFromDBv62(SQLiteDatabase db){
+		logDebug("getChatSettings");
+		ChatSettings chatSettings = null;
+
+		String selectQuery = "SELECT * FROM " + TABLE_CHAT_SETTINGS;
+		try (Cursor cursor = db.rawQuery(selectQuery, null)) {
+			if (cursor != null && cursor.moveToFirst()) {
+				String notificationSound = decrypt(cursor.getString(2));
+				String vibrationEnabled = decrypt(cursor.getString(3));
+				String sendOriginalAttachments = decrypt(cursor.getString(4));
+				String videoQuality = Boolean.parseBoolean(sendOriginalAttachments)
+						? VIDEO_QUALITY_ORIGINAL + ""
+						: VIDEO_QUALITY_MEDIUM + "";
+
+				chatSettings = new ChatSettings(notificationSound, vibrationEnabled, videoQuality);
 			}
 		} catch (Exception e) {
 			logError("Exception opening or managing DB cursor", e);
@@ -1695,7 +1762,17 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 	 * Get chat settings from the current DB.
 	 * @return Chat settings.
 	 */
-	public ChatSettings getChatSettings(){
+	public ChatSettings getChatSettings() {
+		return getChatSettings(db);
+	}
+
+	/**
+	 * Get chat settings from the current DB.
+	 *
+	 * @param db Current DB.
+	 * @return Chat settings.
+	 */
+	private ChatSettings getChatSettings(SQLiteDatabase db) {
 		logDebug("getChatSettings");
 		ChatSettings chatSettings = null;
 
@@ -1704,8 +1781,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 			if (cursor != null && cursor.moveToFirst()) {
 				String notificationSound = decrypt(cursor.getString(2));
 				String vibrationEnabled = decrypt(cursor.getString(3));
-				String sendOriginalAttachments = decrypt(cursor.getString(4));
-				chatSettings = new ChatSettings(notificationSound, vibrationEnabled, sendOriginalAttachments);
+				String videoQuality = decrypt(cursor.getString(4));
+				chatSettings = new ChatSettings(notificationSound, vibrationEnabled, videoQuality);
 			}
 		} catch (Exception e) {
 			logError("Exception opening or managing DB cursor", e);
@@ -1737,26 +1814,31 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		values.put(KEY_CHAT_NOTIFICATIONS_ENABLED, "");
 		values.put(KEY_CHAT_SOUND_NOTIFICATIONS, encrypt(chatSettings.getNotificationsSound()));
 		values.put(KEY_CHAT_VIBRATION_ENABLED, encrypt(chatSettings.getVibrationEnabled()));
-		values.put(KEY_CHAT_SEND_ORIGINALS, encrypt(chatSettings.getSendOriginalAttachments()));
+		values.put(KEY_CHAT_VIDEO_QUALITY, encrypt(chatSettings.getVideoQuality()));
 
 		db.insert(TABLE_CHAT_SETTINGS, null, values);
 	}
 
-	public void setSendOriginalAttachments(String originalAttachments){
-        logDebug("setEnabledChat");
-		String selectQuery = "SELECT * FROM " + TABLE_CHAT_SETTINGS;
-		ContentValues values = new ContentValues();
-		try (Cursor cursor = db.rawQuery(selectQuery, null)) {
-			if (cursor != null && cursor.moveToFirst()) {
-				String UPDATE_CHAT_TABLE = "UPDATE " + TABLE_CHAT_SETTINGS + " SET " + KEY_CHAT_SEND_ORIGINALS + "= '" + encrypt(originalAttachments) + "' WHERE " + KEY_ID + " = '1'";
-				db.execSQL(UPDATE_CHAT_TABLE);
-			} else {
-				values.put(KEY_CHAT_SEND_ORIGINALS, encrypt(originalAttachments));
-				db.insert(TABLE_CHAT_SETTINGS, null, values);
-			}
-		} catch (Exception e) {
-			logError("Exception opening or managing DB cursor", e);
-		}
+	/**
+	 * Sets the chat video quality value.
+	 * There are four possible values for this setting: VIDEO_QUALITY_ORIGINAL, VIDEO_QUALITY_HIGH,
+	 * VIDEO_QUALITY_MEDIUM or VIDEO_QUALITY_LOW.
+	 *
+	 * @param chatVideoQuality The new chat video quality.
+	 */
+	public void setChatVideoQuality(int chatVideoQuality){
+        logDebug("setChatVideoQuality");
+        setIntValue(TABLE_CHAT_SETTINGS, KEY_CHAT_VIDEO_QUALITY, chatVideoQuality);
+	}
+
+	/**
+	 * Gets the chat video quality value.
+	 *
+	 * @return The chat video quality.
+	 */
+	public int getChatVideoQuality(){
+		logDebug("getChatVideoQuality");
+		return getIntValue(TABLE_CHAT_SETTINGS, KEY_CHAT_VIDEO_QUALITY, VIDEO_QUALITY_MEDIUM);
 	}
 
 	public void setNotificationSoundChat(String sound){
@@ -2050,8 +2132,6 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 	}
 
 	public void setSmallGridCamera (boolean smallGridCamera){
-		if (!MegaApplication.arePreferenceCookiesEnabled()) return;
-
         logDebug("setSmallGridCamera");
 
 		String selectQuery = "SELECT * FROM " + TABLE_PREFERENCES;
@@ -2104,7 +2184,11 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 	 * @param attr Attributes to save.
 	 */
 	private void setAttributes (SQLiteDatabase db, MegaAttributes attr) {
-		logDebug("setAttributes");
+		if (attr == null) {
+			logError("Error: Attributes are null");
+			return;
+		}
+
 		ContentValues values = new ContentValues();
 		values.put(KEY_ATTR_ONLINE, encrypt(attr.getOnline()));
 		values.put(KEY_ATTR_INTENTS, encrypt(Integer.toString(attr.getAttemps())));
@@ -2826,8 +2910,6 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 	}
 
 	public void setPreferredViewList (boolean list){
-		if (!MegaApplication.arePreferenceCookiesEnabled()) return;
-
 		String selectQuery = "SELECT * FROM " + TABLE_PREFERENCES;
         ContentValues values = new ContentValues();
 		try (Cursor cursor = db.rawQuery(selectQuery, null)) {
@@ -2845,8 +2927,6 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 	}
 
 	public void setPreferredViewListCamera (boolean list){
-		if (!MegaApplication.arePreferenceCookiesEnabled()) return;
-
 		String selectQuery = "SELECT * FROM " + TABLE_PREFERENCES;
         ContentValues values = new ContentValues();
 		try (Cursor cursor = db.rawQuery(selectQuery, null)) {
@@ -2864,8 +2944,6 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 	}
 
 	public void setPreferredSortCloud (String order){
-		if (!MegaApplication.arePreferenceCookiesEnabled()) return;
-
 		String selectQuery = "SELECT * FROM " + TABLE_PREFERENCES;
 		ContentValues values = new ContentValues();
 		try (Cursor cursor = db.rawQuery(selectQuery, null)) {
@@ -2883,8 +2961,6 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 	}
 
 	public void setPreferredSortContacts (String order){
-		if (!MegaApplication.arePreferenceCookiesEnabled()) return;
-
 		String selectQuery = "SELECT * FROM " + TABLE_PREFERENCES;
 		ContentValues values = new ContentValues();
 		try (Cursor cursor = db.rawQuery(selectQuery, null)) {
@@ -2902,15 +2978,11 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 	}
 
     public void setPreferredSortCameraUpload(String order) {
-		if (!MegaApplication.arePreferenceCookiesEnabled()) return;
-
         logDebug("set sort camera upload order: " + order);
         setStringValue(TABLE_PREFERENCES, KEY_PREFERRED_SORT_CAMERA_UPLOAD, order);
     }
 
 	public void setPreferredSortOthers (String order){
-		if (!MegaApplication.arePreferenceCookiesEnabled()) return;
-
 		String selectQuery = "SELECT * FROM " + TABLE_PREFERENCES;
 		ContentValues values = new ContentValues();
 		try (Cursor cursor = db.rawQuery(selectQuery, null)) {
@@ -3556,6 +3628,24 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 	public int getPasscodeRequiredTime() {
 		String string = getStringValue(TABLE_PREFERENCES, KEY_PASSCODE_LOCK_REQUIRE_TIME, REQUIRE_PASSCODE_INVALID + "");
 		return !isTextEmpty(string) ? Integer.parseInt(string) : REQUIRE_PASSCODE_INVALID;
+	}
+
+	/**
+	 * Sets if the fingerprint lock setting is enabled or not.
+	 *
+	 * @param enabled True if the fingerprint is enabled, false otherwise.
+	 */
+	public void setFingerprintLockEnabled(boolean enabled) {
+		setStringValue(TABLE_PREFERENCES, KEY_FINGERPRINT_LOCK, "" + enabled);
+	}
+
+	/**
+	 * Checks if the fingerprint lock setting is enabled.
+	 *
+	 * @return True if the fingerprint is enabled, false otherwise.
+	 */
+	public boolean isFingerprintLockEnabled() {
+		return getBooleanValue(TABLE_PREFERENCES, KEY_FINGERPRINT_LOCK, false);
 	}
 
 	public void setStorageAskAlways(boolean storageAskAlways) {

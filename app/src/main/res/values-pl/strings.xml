@@ -1,15 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <!-- Full description text of the app in the Google Play page of the app (character limit 4000) -->
-    <string name="full_description_text">MEGA zapewnia kontrolowane przez użytkownika szyfrowane przechowywanie w chmurze i czat poprzez standardowe przeglądarki internetowe, wraz z dedykowanymi aplikacjami na urządzenia mobilne. W przeciwieństwie do innych dostawców usług przechowywania danych w chmurze, Twoje dane są szyfrowane i odszyfrowywane wyłącznie przez Twoje urządzenia klienckie, a nigdy przez nas.\n\nPrześlij swoje pliki ze smartfona lub tabletu, a następnie wyszukaj, przechowuj, pobierz, przesyłaj strumieniowo, przeglądaj, udostępniaj, zmieniaj nazwy lub usuwaj pliki w dowolnym czasie, z dowolnego urządzenia, w dowolnym miejscu. Udostępniaj foldery swoim kontaktom i obserwuj ich aktualizacje w czasie rzeczywistym. Proces szyfrowania oznacza, że nie możemy uzyskać dostępu ani zresetować Twojego hasła, więc MUSISZ je zapamiętać (chyba, że masz kopię zapasową Recovery Key) lub stracisz dostęp do swoich przechowywanych plików.\n\nSzyfrowany end-to-end użytkownika MEGA czat wideo pozwala na całkowitą prywatność i jest dostępny przez przeglądarkę od 2016 roku. Został on rozszerzony na naszą aplikację mobilną, z historią czatu dostępną na wielu urządzeniach. Użytkownicy mogą również łatwo dodawać pliki do czatu ze swojego MEGA Cloud Drive.\n\nMEGA oferuje hojne 50 GB darmowej pamięci masowej dla wszystkich zarejestrowanych użytkowników z bonusowymi osiągnięciami, a także oferuje płatne plany ze znacznie wyższymi limitami:\n\nSubskrypcja Pro Lite: 4,99 € za miesiąc lub 49,99 € za rok daje 400 GB przestrzeni dyskowej i 1 TB limitu transferu miesięcznie.\nSubskrypcja Pro I: 9,99 € za miesiąc lub 99,99 € za rok daje 2 TB przestrzeni dyskowej i 2 TB limitu transferu miesięcznie.\nSubskrypcja Pro II: 19,99 € miesięcznie lub 199,99 € rocznie daje Ci 8 TB przestrzeni dyskowej i 8 TB transferu miesięcznie.\nAbonament Pro III: 29,99 € miesięcznie lub 299,99 € rocznie daje Ci 16 TB przestrzeni dyskowej i 16 TB transferu miesięcznie.\n\nAbonamenty odnawiają się automatycznie na kolejne okresy abonamentowe o tym samym czasie trwania i w tej samej cenie, co wybrany okres początkowy. Aby zarządzać subskrypcjami, wystarczy kliknąć na ikonę Sklepu Play na swoim urządzeniu mobilnym, zalogować się za pomocą swojego identyfikatora Google (jeśli jeszcze tego nie zrobiłeś), a następnie kliknąć na aplikację MEGA. Tam będziesz mógł zarządzać swoją subskrypcją. Br]\nUprawnienia aplikacji: \nWRITE_EXTERNAL_STORAGE -&gt; Pobieraj swoje pliki z MEGA na urządzenie i przesyłaj pliki z urządzenia do MEGA\nCAMERA -&gt; Zrób zdjęcie i prześlij swoje zdjęcia do MEGA\nREAD_CONTACTS -. &gt; Łatwo dodawaj kontakty z urządzenia jako kontakty MEGA\nRECORD_AUDIO i CAPTURE_VIDEO_OUTPUT (mikrofon i kamera) -&gt; MEGA umożliwia szyfrowane połączenia audio/wideo end-to-end\n\n\nAby zwiększyć zaufanie użytkowników” do systemu MEGA, cały kod po stronie klienta jest publikowany, dzięki czemu zainteresowani badacze bezpieczeństwa mogą ocenić proces szyfrowania. Kod naszej aplikacji mobilnej znajduje się na stronie: https://github.com/meganz/android\n\n Więcej informacji można znaleźć na naszej stronie internetowej:\n\n\nZobacz https://mega.nz/terms \n\n\nDesktop - https://mega.nz/</string>
+    <string name="full_description_text">MEGA zapewnia kontrolowane przez użytkownika szyfrowane przechowywanie w chmurze i czat poprzez standardowe przeglądarki internetowe, wraz z dedykowanymi aplikacjami dla urządzeń mobilnych. W przeciwieństwie do innych dostawców usług przechowywania danych w chmurze, Twoje dane są szyfrowane i odszyfrowywane wyłącznie przez Twoje urządzenia klienckie, a nigdy przez nas.\n\nPrześlij swoje pliki ze smartfona lub tabletu, a następnie wyszukaj, przechowuj, pobierz, przesyłaj strumieniowo, przeglądaj, udostępniaj, zmieniaj nazwy lub usuwaj pliki w dowolnym czasie, z dowolnego urządzenia, w dowolnym miejscu. Udostępniaj foldery swoim kontaktom i obserwuj ich aktualizacje w czasie rzeczywistym. Proces szyfrowania oznacza, że nie możemy uzyskać dostępu ani zresetować Twojego hasła, więc MUSISZ je zapamiętać (chyba że masz kopię zapasową Recovery Key) albo stracisz dostęp do swoich przechowywanych plików.\n\n\nSzyfrowany end-to-end użytkownika czat wideo MEGA pozwala na całkowitą prywatność i jest dostępny w przeglądarkach internetowych od 2016 roku. Został on rozszerzony na aplikację mobilną Mega, z historią czatu dostępną na wielu urządzeniach. Użytkownicy mogą również łatwo dodawać pliki do czatu ze swojego MEGA Cloud Drive.\n\nMEGA oferuje hojne 20 GB darmowej pamięci masowej dla wszystkich zarejestrowanych użytkowników z bonusowymi osiągnięciami, a także oferuje płatne plany ze znacznie wyższymi limitami:\n\nSubskrypcja Pro Lite: 4,99 € za miesiąc lub 49,99 € za rok daje 400 GB przestrzeni dyskowej i 1 TB limitu transferu miesięcznie.\nSubskrypcja Pro I: 9,99 € za miesiąc lub 99,99 € za rok daje 2 TB przestrzeni dyskowej i 2 TB limitu transferu miesięcznie.\nSubskrypcja Pro II: 19,99 € miesięcznie lub 199,99 € rocznie daje 8 TB przestrzeni dyskowej i 8 TB limitu transferu miesięcznie.\nAbonament Pro III: 29,99 € miesięcznie lub 299,99 € rocznie daje 16 TB przestrzeni dyskowej i 16 TB limitu transferu miesięcznie.\n\nAbonamenty są odnawiane automatycznie na kolejne okresy o tym samym czasie trwania, w tej samej cenie, co wybrany okres początkowy. Aby zarządzać subskrypcjami, po prostu dotknij ikony Sklepu Play na swoim urządzeniu mobilnym, zaloguj się za pomocą swojego identyfikatora Google (jeśli jeszcze tego nie zrobiłeś). Następnie stuknij w aplikację MEGA. Tam będziesz mógł zarządzać swoją subskrypcją. \n\nUprawnienia aplikacji: \nWRITE_EXTERNAL_STORAGE -&gt; Pobieraj swoje pliki z MEGA na urządzenie i przesyłaj pliki z urządzenia do MEGA\nCAMERA -&gt; Zrób zdjęcie i prześlij swoje zdjęcia do MEGA\nREAD_CONTACTS -. &gt; Łatwo dodawaj kontakty z urządzenia jako kontakty MEGA\nRECORD_AUDIO i CAPTURE_VIDEO_OUTPUT (mikrofon i kamera) -&gt; MEGA zapewnia szyfrowane połączenia audio/wideo end-to-end\n\n\nAby zwiększyć zaufanie użytkowników do systemu MEGA, cały kod po stronie klienta jest publikowany, dzięki czemu zainteresowani badacze bezpieczeństwa mogą ocenić proces szyfrowania. Kod naszej aplikacji mobilnej znajduje się na stronie: https://github.com/meganz/android \n\nWięcej informacji można znaleźć na naszej stronie internetowej:\nZobacz https://mega.nz/terms \n\n\nDesktop - https://mega.nz/</string>
     <!-- Short description text of the app in the Google Play page of the app (character limit 80) -->
-    <string name="short_description_text">MEGA jest Cloud Storage z potężną, pełną prywatnością.</string>
+    <string name="short_description_text">MEGA to dane w chmurze zawsze z bezpieczną prywatnością.</string>
     <!-- PRO Lite account -->
     <string name="prolite_account">Pro Lite</string>
     <!-- Name of the MEGA PDF Viewer. Keep uppercase. -->
     <string name="pdf_app_name">MEGA Podgląd plików PDF</string>
-    <!-- Showing progress of elements. Example: 2 of 10. -->
-    <string name="general_x_of_x">z</string>
     <!-- Answer for confirmation dialog. -->
     <string name="general_yes">Tak</string>
     <!-- Answer for confirmation dialog. -->
@@ -87,7 +85,7 @@
     <!-- Error getting the root node -->
     <string name="error_general_nodes">Błąd. Proszę spróbuj ponownie.</string>
     <!-- File name (without extension) of file exported with the recovery key -->
-    <string name="general_rk">MEGA-RECOVERYKEY</string>
+    <string name="general_rk">MEGA-KLUCZODZYSKIWANIA</string>
     <!-- Local folder error in Sync Service. There are two syncs for images and videos. This error appears when the secondary media local folder doesn’t exist -->
     <string name="secondary_media_service_error_local_folder">Kopia zapasowa katalogu nie istnieje, wybierz nowy katalog</string>
     <!-- when no external card exists -->
@@ -197,7 +195,7 @@
     <!-- when the user tries to log in to MEGA without a valid session -->
     <string name="error_server_expired_session">Zostałeś wylogowany z serwisu z innej lokalizacji</string>
     <!-- the first step when logging in is calculate the private and public encryption keys -->
-    <string name="login_generating_key">Obliczanie kluczy szyfrowania</string>
+    <string name="login_generating_key">Generowanie kluczy szyfrujących</string>
     <!-- Message displayed while the app is connecting to a MEGA server -->
     <string name="login_connecting_to_server">Trwa łączenie z serwerem</string>
     <!-- Status text when updating the file manager -->
@@ -223,7 +221,7 @@
     <!--  -->
     <string name="tour_access_title">MEGA Dostępność</string>
     <!-- Full description text of the app in the Google Play page of the app (character limit 4000) -->
-    <string name="tour_space_text">Zarejestruj się teraz i uzyskaj ponad 20 GB bezpłatnego miejsca</string>
+    <string name="tour_space_text">Zarejestruj się teraz i otrzymaj 20 GB darmowej pamięci masowej</string>
     <!--  -->
     <string name="tour_speed_text">Wgrywanie jest szybkie. Udostępniaj pliki z każdym</string>
     <!--  -->
@@ -414,7 +412,7 @@
     <string name="intent_not_available">Nie znaleziono aplikacji do otworzenia tego pliku na Twoim urządzeniu</string>
     <!-- Message when trying to open a location message but there isn’t any app that open that location. -->
     <string name="intent_not_available_location">W urządzeniu nie ma dostępnych aplikacji do otwierania tej lokalizacji</string>
-    <!-- message when trying to open file but there isn’t any app that open that file. Example: a user try to open a txt but doesn’t have any app to open txt -->
+    <!-- Message displayed when user tries to open a file with a 3rd party app using the option "Open with" but there isn't any app installed in the device which can open that file type, e.g. user tries to open a ".txt" but doesn’t have any installed 3rd party app which supports ".txt" files. -->
     <string name="intent_not_available_file">Być może nie masz zainstalowanych żadnych aplikacji obsługujących ten typ pliku.</string>
     <!-- to share an image using Facebook, Whatsapp, etc -->
     <string name="context_share_image">Udostępnij zdjęcie przez</string>
@@ -422,8 +420,6 @@
     <string name="context_get_link">Udostępnij link</string>
     <!-- Delete a link label -->
     <string name="context_delete_link">Usuń link</string>
-    <!-- Item menu option upon right click on one or multiple files. -->
-    <string name="context_get_link_menu">Pobierz link</string>
     <!-- Item menu option upon right click on one or multiple files. -->
     <string name="context_leave_menu">Anuluj</string>
     <!-- Title alert before leaving a share. -->
@@ -508,7 +504,7 @@
     <!-- success message when reinvite a contact -->
     <string name="context_contact_invitation_resent">Zgłoszenie wysłane</string>
     <!-- success message when sending a contact request -->
-    <string name="context_contact_request_sent">Zgłoszenie prawidłowo wysłane do %s. Status może być zweryfikowany w zakładce Wysłane zgłoszenia.</string>
+    <string name="context_contact_request_sent">Żądanie zostało pomyślnie wysłane do %s. Zobacz w zakładce Wysłane żądania.</string>
     <!-- success message when removing a contact -->
     <string name="context_contact_removed">Kontakt został usunięty</string>
     <!-- error message -->
@@ -549,10 +545,6 @@
     <string name="number_incorrectly_moved">%d elementów nie zostało przeniesione</string>
     <!-- success message when moving a node -->
     <string name="context_correctly_moved_to_rubbish">Przeniesiono do kosza</string>
-    <!-- success message when moving a node -->
-    <string name="number_correctly_moved_to_rubbish">%d elementów przeniesiono do kosza</string>
-    <!-- success message when moving a node -->
-    <string name="number_incorrectly_moved_to_rubbish">&#160;and %d elementów nie zostało wysłanych</string>
     <!-- error message -->
     <string name="context_no_moved">Błąd. Nie przeniesiono</string>
     <!-- success message when sharing a folder -->
@@ -603,8 +595,6 @@
     <string name="number_contact_not_removed">%d kontaktów nie zostało usunięte</string>
     <!-- success message when sharing a file with multiple contacts -->
     <string name="number_contact_file_shared_correctly">Katalog został&#160;udostępniony z %d kontaktami</string>
-    <!-- error message when sharing a file with multiple contacts -->
-    <string name="number_contact_file_not_shared_">Plik nie może być udostępniony %d kontaktom.</string>
     <!-- success message when sharing multiple files -->
     <string name="number_correctly_shared">%d katalogów zostało udostępnione</string>
     <!-- error message when sharing multiple files -->
@@ -614,13 +604,13 @@
     <!-- success message when removing all the contacts of a shared folder -->
     <string name="context_correctly_removed_sharing_contacts">Ten katalog nie jest już dostępny</string>
     <!-- error message when removing all the contacts of a shared folder -->
-    <string name="context_no_removed_sharing_contacts">Błąd, ten katalog jest wciąż udostępniony z innym kontaktem</string>
+    <string name="context_no_removed_sharing_contacts">Wystąpił błąd. Folder jest nadal współdzielony z innym kontaktem.</string>
     <!-- option available for just one file -->
     <string name="context_select_one_file">Wybierz tylko jeden plik</string>
     <!-- success message when emptying the RB -->
     <string name="rubbish_bin_emptied">Koszt został wyczyszczony</string>
     <!-- error message when emptying the RB -->
-    <string name="rubbish_bin_no_emptied">Błąd. Kosz nie został opróżniony</string>
+    <string name="rubbish_bin_no_emptied">Wystąpił błąd. Kosz na śmieci nie został opróżniony.</string>
     <!-- dialog cancel subscriptions -->
     <string name="dialog_cancel_subscriptions">Mass zamiar anulować swoją subskrypcję&#160;MEGA. Prosimy o poinformowanie nas, czy możemy jakoś pomóc i wpłynąć na zmianę Twojej decyzji.</string>
     <!-- hint cancel subscriptions dialog -->
@@ -628,11 +618,11 @@
     <!-- send cancel subscriptions dialog -->
     <string name="send_cancel_subscriptions">Wyślij</string>
     <!-- confirmation cancel subscriptions dialog -->
-    <string name="confirmation_cancel_subscriptions">Dziękujemy za opinię! Czy na pewno chcesz anulować swoja subskrypcję&#160;MEGA?</string>
+    <string name="confirmation_cancel_subscriptions">Dziękujemy za Twoją opinię. Czy na pewno chcesz zrezygnować z subskrypcji MEGA?</string>
     <!-- provide a reason to cancel subscriptions dialog -->
     <string name="reason_cancel_subscriptions">Twoja subskrypcja nie została anulowane. Prosimy o podane powodu anulowania</string>
-    <!-- welcome message after user brought subscription. placeholder 1: subscription type (Lite/Pro1 etc), placeholder 2: renewal interval (monthly/yearly) -->
-    <string name="message_user_purchased_subscription">Dziękujemy za subskrypcję %1$s %2$s!</string>
+    <!-- Confirmation message of the dialog shown when a subscription has been processed successfully -->
+    <string name="message_user_purchased_subscription">Dziękuję. Twoja płatność jest w trakcie przetwarzania. Proszę napisz do nas na adres support&#64;mega.co.nz jeśli nie otrzymałeś aktualizacji w ciągu 24 godzin.</string>
     <!-- Pop up message shows when user purchased a lower level of subscription -->
     <string name="message_user_purchased_subscription_down_grade">Twoja nowa subskrypcja wejdzie w życie po wygaśnięciu obecnej, nowa cena zostanie naliczona w tym czasie.</string>
     <!-- Pop up message shows when user purchased a subscription with a payment method that can not be processed in real time, e.g. voucher -->
@@ -685,19 +675,17 @@
     <!-- error message while browsing the local filesystem -->
     <string name="error_io_problem">Problem z systemem plików</string>
     <!-- error message while browsing the local filesystem -->
-    <string name="general_error">Wystąpił&#160;błąd podczas wykonywania operacji</string>
+    <string name="general_error">Wystąpił błąd podczas wykonywania operacji</string>
     <!-- title of the image gallery -->
     <string name="full_screen_image_viewer_label">Podgląd zdjęcia</string>
     <!-- Headline for the amount of storage space is used -->
-    <string name="my_account_used_space">Użyta pamięć</string>
+    <string name="my_account_used_space">Używana pamięć</string>
     <!-- menu item -->
     <string name="my_account_change_password">Zmień hasło</string>
     <!-- Dialog text overquota error -->
     <string name="overquota_alert_text">Przekroczyłeś dostępny limit na pliki. Czy chcesz zmienić rodzaj swojego konta?</string>
     <!-- when did the last session happen -->
     <string name="my_account_last_session">Ostatnia sesja</string>
-    <!-- header for the social connections, showing the number of contacts the user has -->
-    <string name="my_account_connections">Połączenia</string>
     <!-- message displayed while the app is changing the password -->
     <string name="my_account_changing_password">Zmiana hasła</string>
     <!-- when changing the password, the first edittext is to enter the current password -->
@@ -707,13 +695,13 @@
     <!-- when changing the password -->
     <string name="my_account_change_password_newPassword2">Potwierdź hasło</string>
     <!-- when changing the password or creating the account, the password is required twice and check that both times are the same -->
-    <string name="my_account_change_password_dont_match">Hasło nie pasuje</string>
+    <string name="my_account_change_password_dont_match">Hasła do siebie nie pasują</string>
     <!-- title of the selection of the pro account wanted -->
-    <string name="upgrade_select_pricing">Wybierz konto</string>
+    <string name="upgrade_select_pricing">Wybierz plan</string>
     <!-- the user has to decide the way of payment -->
     <string name="select_membership_1">Płatność miesięczna lub roczna</string>
     <!-- choose the payment method option when no method is available -->
-    <string name="no_available_payment_method">Na chwilę&#160;obecną, brak form płatności dla tego planu</string>
+    <string name="no_available_payment_method">Obecnie nie ma ustawionej metody płatności dla tego planu. Proszę wybrać jedną z nich.</string>
     <!-- button to decide monthly payment. The asterisk is needed -->
     <string name="upgrade_per_month">Miesięcznie*</string>
     <!-- button to decide annually payment. The asterisk is needed -->
@@ -723,7 +711,7 @@
     <!-- before sharing an image, the preview has to be downloaded -->
     <string name="full_image_viewer_not_preview">Podgląd nie został jeszcze pobrany. Prosimy czekać</string>
     <!-- due to device is low on memory, cannot load an image preview temporarily -->
-    <string name="not_load_preview_low_memory">Nie można załadować podglądu z powodu niewystarczającej ilości dostępnej pamięci. Spróbuj ponownie później.</string>
+    <string name="not_load_preview_low_memory">Za mało wolnej pamięci do wyświetlenia podglądu. Proszę spróbować ponownie później.</string>
     <!-- alert when clicking a newsignup link being logged -->
     <string name="log_out_warning">Wyloguj się przed utworzeniem konta</string>
     <!-- message shown in the screen when there are not any active transfer -->
@@ -737,9 +725,9 @@
     <!-- Dialog title, to explain why MEGA needs the ’display over other apps’ permission (Android 10) -->
     <string name="ask_for_display_over_title">Zezwalaj na powiadomienia o przychodzących połączeniach MEGA</string>
     <!-- Dialog message, to explain why MEGA needs the ’display over other apps’ permission (Android 10) -->
-    <string name="ask_for_display_over_msg">MEGA potrzebuje Twojej autoryzacji, aby interfejs wyskakiwał z tła.</string>
+    <string name="ask_for_display_over_msg">Prosimy o udzielenie MEGA pozwolenia na wyświetlanie nad innymi aplikacjami do połączeń.</string>
     <!-- Prompt text shows when the user doesn’t want to make MEGA grant the ’display over other apps’ permission for now (Android 10) -->
-    <string name="ask_for_display_over_explain">Nie martw się, nadal możesz ręcznie przyznawać uprawnienia w ustawieniach urządzenia.</string>
+    <string name="ask_for_display_over_explain">Nadal możesz ręcznie nadawać uprawnienia w Ustawieniach urządzenia.</string>
     <!-- the options of how to upload, but in an array. needed for the settings, how to upload the camera images. only when Wi-Fi connected -->
     <string name="cam_sync_wifi">Tylko Wi-Fi</string>
     <!-- the options of how to upload, but in an array. needed for the settings, how to upload the camera images. when Wi-Fi connected and using data plan -->
@@ -753,7 +741,7 @@
     <!-- title of the notification when camera upload is checking files -->
     <string name="settings_camera_notif_checking_title">Sprawdzanie plików do przesłania</string>
     <!-- title of the notification when camera upload is initializing -->
-    <string name="settings_camera_notif_initializing_title">Inicjowanie przesyłania z kamery</string>
+    <string name="settings_camera_notif_initializing_title">Inicjalizowanie obrazu z kamery</string>
     <!-- title of the notification when camera upload’s primary local folder is unavailable. -->
     <string name="camera_notif_primary_local_unavailable">Przesyłanie z kamery zostało wyłączone. Twój folder lokalny jest niedostępny.</string>
     <!-- title of the notification when camera upload’s secondary local folder is unavailable. -->
@@ -771,9 +759,9 @@
     <!-- Setting to allow the user to select the preferred passcode type -->
     <string name="settings_passcode_option">Opcje kodu dostępu</string>
     <!-- Helper text to explain why we have this `Require me to plug in` setting, placeholder - 100 to 1000 in MB -->
-    <string name="settings_camera_upload_charging_helper_label">Kompresja wideo zużywa dużo energii; MEGA będzie wymagać aktywnego ładowania urządzenia, jeśli filmy do skompresowania są większe niż %s.</string>
+    <string name="settings_camera_upload_charging_helper_label">Kompresja wideo zużywa znaczne ilości energii. Proszę podłączyć urządzenie do ładowania, jeśli kompresowane filmy są większe niż %s.</string>
     <!-- Helper text to explain the things to note if enable the feature of including GPS info -->
-    <string name="settings_camera_upload_include_gps_helper_label">Jeśli ta opcja jest włączona, prześlesz informacje o tym, gdzie zostały zrobione Twoje zdjęcia, więc zachowaj ostrożność, udostępniając je.</string>
+    <string name="settings_camera_upload_include_gps_helper_label">Jeśli funkcja ta jest włączona, informacje o lokalizacji będą dołączane do zdjęć. Zachowaj ostrożność podczas ich udostępniania.</string>
     <!-- Settings category title for cache and offline files -->
     <string name="settings_advanced_features">Zaawansowane</string>
     <!-- Settings preference title for cache -->
@@ -989,10 +977,10 @@
     <string name="zip_browser_activity">Podgląd ZIP</string>
     <!-- title of the My Account screen -->
     <string name="my_account_title">Rodzaj konta</string>
+    <!-- Label to indicate the date when the current subscription renews -->
+    <string name="renews_on">Odnawia się w dniu&#160;</string>
     <!-- title of the Expiration Date -->
-    <string name="renews_on">Odnawia się za &#160;</string>
-    <!-- title of the Expiration Date -->
-    <string name="expires_on">Wygasa w dniu &#160;</string>
+    <string name="expires_on">Wygasa z dniem&#160;</string>
     <!--  -->
     <string name="free_account">Darmowe</string>
     <!-- info message shown to the user when the Camera Uploads folder has been created -->
@@ -1027,14 +1015,6 @@
     <string name="sortby_type_photo_first">Zdjęcia</string>
     <!-- sort option, sort media files by videos first -->
     <string name="sortby_type_video_first">Filmy</string>
-    <!-- sort files by date newest first -->
-    <string name="sort_by_newest_date">Najnowsza data</string>
-    <!-- sort files by date oldest first -->
-    <string name="sort_by_oldest_date">Najstarsza data</string>
-    <!-- sort files by largest size -->
-    <string name="sort_by_largest_size">Największy rozmiar</string>
-    <!-- sort files by smallest size -->
-    <string name="sort_by_smallest_size">Najmniejszy rozmiar</string>
     <!-- Title to choose the type of Passcode -->
     <string name="pin_lock_type">Rodzaj kodu</string>
     <!-- Passcode with 4 digits -->
@@ -1120,7 +1100,7 @@
     <!-- Alert to inform the user that have to be logged in to perform the action -->
     <string name="alert_not_logged_in">Musisz się zalogować aby kontynuować.</string>
     <!-- Error message when a user attempts to change their email without an active login session. -->
-    <string name="change_email_not_logged_in">Musisz być zalogowany a dokończyć zmianę adresu email. Zaloguj się używając dotychczasowego adresu email a następnie kliknij ponownie w link.</string>
+    <string name="change_email_not_logged_in">Musisz być zalogowany, aby dokończyć zmianę adresu e-mail. Zaloguj się ponownie przy użyciu aktualnego adresu e-mail, a następnie ponownie naciśnij link potwierdzający.</string>
     <!-- Text displayed to inform that the email was successfully changed. Please keep the placeholder, it will be replaced with the new email address. -->
     <string name="email_changed">Gratulacje, twój nowy adres e-mail dla tego konta MEGA to: %1$s</string>
     <!-- Error when the user leaves empty the password field -->
@@ -1164,21 +1144,21 @@
     <!-- Button to upgrade the account to PRO account in the panel that appears randomly -->
     <string name="my_account_upgrade_pro_panel">Zmień teraz</string>
     <!-- Message to promote PRO accounts -->
-    <string name="get_pro_account">Zwiększ dostępną powierzchnię na pliki![A]Obierz więcej powierzchni i limitu na przesyłanie plików z kontami PRO!</string>
+    <string name="get_pro_account">Rozwiń swoją chmurę.[A]Uzyskaj zwiększone limity pamięci i transferu dzięki kontu Pro.</string>
     <!-- success message when the MasterKey file has been downloaded -->
-    <string name="toast_master_key">Klucz został zapisany do: %1s.[A]Podczas gdy pliki pozostają tutaj, możesz go znaleźć w Plikach Offline.[A]Pamiętaj: Plik zostanie usunięty jak tylko się wylogujesz, przechowuj go w bezpiecznym miejscu.</string>
+    <string name="toast_master_key">Klucz odzyskiwania do MEGA został zapisany w: %1s. [A]Plik z Swój klucz odzyskiwania znajdziesz w sekcji Zapisane dla Offline.[/A] Uwaga: ponieważ plik z Twoim kluczem odzyskiwania zostanie usunięty po wylogowaniu, przechowuj go w bezpiecznym miejscu poza swoim MEGAkontem.</string>
     <!-- Error shown when the user tries to change his mail to one that is already used -->
-    <string name="mail_already_used">Błąd: Ten adres email jest już używany.</string>
+    <string name="mail_already_used">Ten adres e-mail jest już używany. Proszę użyć innego adresu e-mail.</string>
     <!-- Error shown when the user tries to change his mail while the user has already requested a confirmation link for that email address -->
     <string name="mail_changed_confirm_requested">Link potwierdzający został już wygenerowany dla podanego adresu email.</string>
     <!-- Error shown when the user tries to change his mail while the email is the same as the old -->
-    <string name="mail_same_as_old">Nowy i stary adres email muszą być różne</string>
+    <string name="mail_same_as_old">Jest to Twój dotychczasowy adres e-mail.</string>
     <!-- Text shown in the last alert dialog to change the email associated to an account -->
     <string name="change_mail_text_last_step">To jest ostatni moment na zmianę adresu email. Wprowadź swoje hasło poniżej.</string>
     <!-- Title of the alert dialog to change the email associated to an account -->
     <string name="change_mail_title_last_step">Zmień email</string>
     <!-- Iitle of the warning when the user is running out of space -->
-    <string name="title_new_warning_out_space">Powoli zaczyna brakować wolnego miejsca!</string>
+    <string name="title_new_warning_out_space">Kończy Ci się miejsce na dysku.</string>
     <!-- Text of the warning when the user is running out of space -->
     <string name="new_warning_out_space">W pełni wykorzystaj swoje konto MEGA, przechodząc na wersję Pro.</string>
     <!-- Iitle of sliding panel to choose the option to edit the profile picture -->
@@ -1270,7 +1250,7 @@
     <!-- Title of the screen after creating the account. That screen asks the user to confirm the account by checking the email -->
     <string name="confirm_email_text">Oczekiwanie na potwierdzenia konta.</string>
     <!-- Text below the title that explains the user should check the email and click the link to confirm the account -->
-    <string name="confirm_email_explanation">Sprawdź pocztę i kliknij w link w celu weryfikacji.</string>
+    <string name="confirm_email_explanation">Sprawdź swoją wiadomość e-mail i kliknij link, aby potwierdzić swoje konto.</string>
     <!-- Plural of items which contains a folder. 2 items -->
     <plurals name="general_num_items">
         <item quantity="one">1 element</item>
@@ -1510,7 +1490,7 @@
     <!-- success alert when the user copy some messages to the clipboard -->
     <string name="messages_copied_clipboard">Skopiowana do schowka</string>
     <!-- Title of the error dialog when opening a chat -->
-    <string name="chat_error_open_title">Błąd czatu!</string>
+    <string name="chat_error_open_title">Błąd</string>
     <!-- Message of the error dialog when opening a chat -->
     <string name="chat_error_open_message">Ten czat nie został otwarty prawidłowo</string>
     <!-- Menu option to add a contact to your contact list. -->
@@ -1546,7 +1526,7 @@
     <string name="title_message_uploading_options">Przesyłanie załącznika</string>
     <!-- message shown when a chat has no messages -->
     <string name="no_conversation_history">Brak historii rozmowy</string>
-    <!-- title of confirmation alert before removing a contact, Plural -->
+    <!-- Text to indicate that one participant is typing or multiple participants are typing at the same time in a chat room. The "%1$s" placeholder is to put the name(s) of the participant(s). The [A][/A] format marks are to put the text in a different color. -->
     <plurals name="user_typing">
         <item quantity="one">%1$s [A]pisze&#8230;[/A]</item>
         <item quantity="few">%1$s [A]piszą&#8230;[/A]</item>
@@ -1813,8 +1793,6 @@
     <string name="general_view">Zobacz pliki</string>
     <!-- Menu option to choose to add file or folders to Cloud Drive -->
     <string name="add_to_cloud">Importuj</string>
-    <!-- Menu option to choose save to Offline section -->
-    <string name="save_for_offline">Zapisz lokalnie</string>
     <!-- Menu option to choose to add file to Cloud Drive in the chat -->
     <string name="add_to_cloud_node_chat">Dodaj do Cloud Drive</string>
     <!-- Menu option -->
@@ -1828,7 +1806,7 @@
     <!-- message when trying to invite a contact with a pending request -->
     <string name="context_contact_already_invited">%s został już zaproszony. Sprawdź oczekujące zaproszenia.</string>
     <!-- Hint text explaining that you can change the email and resend the create account link to the new email address -->
-    <string name="confirm_email_misspelled">Jeśli źle wpisałeś adres e-mail, popraw go i kliknij [A]Wyślij ponownie[A].</string>
+    <string name="confirm_email_misspelled">Jeśli adres e-mail został błędnie wpisany, popraw go i kliknij przycisk [A]Wyślij ponownie[A].</string>
     <!-- Button to resend the create account email to a new email address in case the previous email address was misspelled -->
     <string name="confirm_email_misspelled_resend">Wyślin ponownie</string>
     <!-- Text shown after the confirmation email has been sent to the new email address -->
@@ -2003,30 +1981,28 @@
     <!-- subtitle of the section for achievements -->
     <string name="achievements_subtitle">Zaproś znajomych i odbierz nagrody</string>
     <!-- title of the introduction for the achievements screen -->
-    <string name="figures_achievements_text_referrals">%1$s pamięci masowej za każdą poleconą osobę. Ważny przez 365 dni.</string>
+    <string name="figures_achievements_text_referrals">%1$s pamięci masowej za każde udane zaproszenie. Ważny przez 365 dni.</string>
     <!-- sentence to detail the figures of storage and transfer quota related to each achievement -->
     <string name="figures_achievements_text">%1$s przechowywania danych. Ważny przez 365 dni.</string>
     <!-- title of the section for unlocked rewards -->
     <string name="unlocked_rewards_title">Nagrody</string>
     <!-- title of the section for unlocked storage quota -->
-    <string name="unlocked_storage_title">Limit powierzchni</string>
+    <string name="unlocked_storage_title">Limit pamięci</string>
     <!-- title of the section for referral bonuses in achivements section (maximum 24 chars) -->
-    <string name="title_referral_bonuses">Bonusy</string>
-    <!-- title of the section for install a mobile app in achivements section (maximum 24 chars) -->
-    <string name="title_install_app">Zainstaluj aplikację&#160;mobilną</string>
-    <!-- Title of the section for add phone number in achivements section (maximum 24 chars) -->
-    <string name="title_add_phone">Dodaj telefon komórkowy</string>
+    <string name="title_referral_bonuses">Premie za zaproszenia</string>
+    <!-- Title of the section for install a mobile app in achivements section (maximum 31 chars) -->
+    <string name="title_install_app">Zainstaluj aplikację mobilną</string>
+    <!-- Title of the section for add phone number in achivements section (maximum 30 chars) -->
+    <string name="title_add_phone">Dodaj numer telefonu</string>
     <!-- title of the section for install megasync in achivements section (maximum 24 chars) -->
     <string name="title_regitration">Zarejestruj bonus</string>
     <!-- title of the section for install a mobile app bonuses in achivements section (maximum 24 chars) -->
-    <string name="title_install_desktop">Zainstaluj aplikację MEGA</string>
-    <!-- title of the section for base quota in achivements section -->
-    <string name="title_base_quota">Limit podstawowy w koncie</string>
+    <string name="title_install_desktop">Pobierz aplikację MEGA Desktop</string>
     <!-- Text that indicates that no pictures have been uploaded to the Camera Uploads section -->
     <string name="camera_uploads_empty">Brak plików w Przesyłanych z aparatu</string>
     <!-- indicates the number of days left related to a achievement -->
     <string name="general_num_days_left">%1$d d pozostało</string>
-    <!-- State to indicate something has expired (achivements of business status account for instance) -->
+    <!-- State to indicate an achievement has expired -->
     <string name="expired_label">Wygasło</string>
     <!-- title of the advanced setting to choose the use of https -->
     <string name="setting_title_use_https_only">Nie używaj HTTP</string>
@@ -2035,9 +2011,9 @@
     <!-- title of screen to invite friends and get an achievement -->
     <string name="title_achievement_invite_friends">Jak to działa</string>
     <!-- first paragraph of screen to invite friends and get an achievement -->
-    <string name="first_paragraph_achievement_invite_friends">Zaproś swoich znajomych do założenia darmowego konta MEGA i zainstalowania naszej aplikacji mobilnej. Za każdą udaną rejestrację i instalację aplikacji otrzymasz bonus w postaci dodatkowej pamięci.</string>
+    <string name="first_paragraph_achievement_invite_friends">Zaproś swoich znajomych do założenia konta MEGA Free i zainstalowania aplikacji MEGA Mobile App. Za każde pomyślne założenie konta i instalację aplikacji otrzymasz bonus w postaci darmowego miejsca do przechowywania danych.</string>
     <!-- second paragraph of screen to invite friends and get an achievement -->
-    <string name="second_paragraph_achievement_invite_friends">Nie otrzymasz bonusów za zaproszenie osób już korzystających z MEGA lub tych które już korzystały w przeszłości. Zaproszone kontakty muszą zainstalować aplikację MEGA na telefonie lub komputerze stacjonarnym.</string>
+    <string name="second_paragraph_achievement_invite_friends">Premia za bezpłatne przechowywanie dotyczy tylko nowych zaproszeń, w których zainstalowana jest aplikacja MEGA Mobile lub MEGA Desktop.</string>
     <!-- explanation of screen to invite friends and get an achievement -->
     <string name="card_title_invite_friends">Wybierz kontakty z listy w telefonie lub wpisz adresy email.</string>
     <!-- title of the dialog to confirm the contact request -->
@@ -2051,13 +2027,13 @@
     <!-- info paragraph about the achievement install megasync -->
     <string name="paragraph_info_achievement_install_desktop">Po zainstalowaniu aplikacji MEGA desktop otrzymujesz %1$s bezpłatnej przestrzeni dyskowej, ważnej przez 365 dni. Aplikacja MEGA jest dostępna dla systemów Windows, macOS i większości dystrybucji Linuksa.</string>
     <!-- info paragraph about the achievement install mobile app -->
-    <string name="paragraph_info_achievement_install_mobile_app">Po zainstalowaniu naszej aplikacji mobilnej otrzymasz %1$s bezpłatnej przestrzeni dyskowej, ważnej przez 365 dni. Oferujemy aplikacje mobilne dla systemów iOS, Android i Windows Phone.</string>
+    <string name="paragraph_info_achievement_install_mobile_app">Po zainstalowaniu aplikacji mobilnej MEGA Mobile App otrzymujesz %1$s bezpłatnej przestrzeni dyskowej, ważnej przez 365 dni. Oferujemy aplikacje mobilne dla systemów iOS i Android.</string>
     <!-- info paragraph about the achievement ‘add phone number’. Placeholder 1: bonus storage space e.g. 20GB. Placeholder 2: bonus transfer quota e.g. 50GB -->
     <string name="paragraph_info_achievement_add_phone">Po zweryfikowaniu numeru telefonu otrzymasz %1$s darmowej przestrzeni dyskowej, ważnej przez 365 dni.</string>
     <!-- info paragraph about the completed achievement install megasync -->
     <string name="result_paragraph_info_achievement_install_desktop">Otrzymałeś %1$s przestrzeni dyskowej za instalację naszej aplikacji desktopowej MEGA.</string>
     <!-- info paragraph about the completed achievement install mobile app -->
-    <string name="result_paragraph_info_achievement_install_mobile_app">Otrzymałeś %1$s przestrzeni dyskowej za zainstalowanie naszej aplikacji mobilnej.</string>
+    <string name="result_paragraph_info_achievement_install_mobile_app">Otrzymałeś %1$s przestrzeni dyskowej za instalację MEGA Mobile App.</string>
     <!-- info paragraph about the completed achievement of ‘add phone number’. Placeholder 1: bonus storage space e.g. 20GB. Placeholder 2: bonus transfer quota e.g. 50GB -->
     <string name="result_paragraph_info_achievement_add_phone">Otrzymałeś %1$s przestrzeni dyskowej za weryfikację Twojego numeru telefonu.</string>
     <!-- info paragraph about the completed achievement registration -->
@@ -2089,7 +2065,7 @@
     <!-- mail subject -->
     <string name="setting_feedback_subject">Opinia Android</string>
     <!-- mail body -->
-    <string name="setting_feedback_body">Napisz swoją opinię tutaj:</string>
+    <string name="setting_feedback_body">Prosimy o przedstawienie swoich opinii tutaj:</string>
     <!-- mail body -->
     <string name="settings_feedback_body_device_model">Model urządzenia</string>
     <!-- mail body -->
@@ -2142,10 +2118,10 @@
     <string name="invalid_characters_defined">Następujące znaki są niedozwolone: ” * / : &lt; &gt; ? \ |</string>
     <!-- Warning show to the user after try to import files to MEGA with empty names. Plural. When more than one file name have this error. -->
     <plurals name="empty_names">
-        <item quantity="one">Proszę nazwać swój plik przed kontynuowaniem</item>
-        <item quantity="few">Proszę nazwać swoje pliki przed kontynuowaniem</item>
-        <item quantity="many">Proszę nazwać swoje pliki przed kontynuowaniem</item>
-        <item quantity="other">Proszę nazwać swoje pliki przed kontynuowaniem</item>
+        <item quantity="one">Nazwa pliku nie może być pusta.</item>
+        <item quantity="few">Nazwy plików nie mogą być puste.</item>
+        <item quantity="many">Nazwy plików nie mogą być puste.</item>
+        <item quantity="other">Nazwy plików nie mogą być puste.</item>
     </plurals>
     <!-- Label shown when audio file is playing -->
     <string name="audio_play">Plik audio</string>
@@ -2164,9 +2140,9 @@
     <!-- Info label about the connectivity state of the chat -->
     <string name="invalid_connection_state">Ponowne łączenie się na czacie</string>
     <!-- Message show when a call cannot be established -->
-    <string name="call_error">Błąd. Połączenie nie może zostać nawiązane</string>
+    <string name="call_error">Wystąpił błąd i połączenie nie może zostać nawiązane.</string>
     <!-- Title of dialog to evaluate the app -->
-    <string name="title_evaluate_the_app_panel">Czy jesteś zadowolony z aplikacji?</string>
+    <string name="title_evaluate_the_app_panel">Podoba Ci się MEGA Mobile App?</string>
     <!-- Label to show rate the app -->
     <string name="rate_the_app_panel">Tak, oceń aplikację</string>
     <!-- Label to show send feedback -->
@@ -2174,7 +2150,7 @@
     <!-- title of the section advanced options on the get link screen -->
     <string name="link_advanced_options">Opcje zaawansowane</string>
     <!-- Message to show when users deny to permit the permissions to read and write on external storage on setting default download location -->
-    <string name="download_requires_permission">Typ nośnika Mega wymaga Twojej zgody na pobieranie plików</string>
+    <string name="download_requires_permission">MEGA potrzebuje uprawnień do odczytu i zapisu na zewnętrznej pamięci masowej, aby pobrać tam pliki.</string>
     <!-- Default download location is on old sd card, but currently the user installed a new SD card, need user to reset download location. -->
     <string name="old_sdcard_unavailable">Stara karta SD nie jest dostępna. Ustaw nową katalog pobierania.</string>
     <!-- Dialog title to ask download to internal storage or external storage. -->
@@ -2192,13 +2168,13 @@
     <!-- Option shown in QR code bottom sheet dialog to save QR code in Cloud Drive -->
     <string name="save_cloud_drive">Na Cloud Drive</string>
     <!-- Option shown in QR code bottom sheet dialog to save QR code in File System -->
-    <string name="save_file_system">Na dysk</string>
+    <string name="save_file_system">Do systemu plików</string>
     <!-- Title of QR code section -->
     <string name="section_my_code">Mój kod</string>
     <!-- Title of QR code scan section -->
-    <string name="section_scan_code">Zeskanuj kod</string>
+    <string name="section_scan_code">Skanuj kod</string>
     <!-- Title of QR code settings that permits or not contacts that scan my QR code will be automatically added to my contact list -->
-    <string name="settings_qrcode_autoaccept">Auto-akceptacja</string>
+    <string name="settings_qrcode_autoaccept">Automatycznie akceptuj</string>
     <!-- Subtitle of QR code settings auto-accept -->
     <string name="setting_subtitle_qrcode_autoccept">Użytkownicy MEGA, którzy skanują Twój kod QR, zostaną automatycznie dodani do Twojej listy kontaktów.</string>
     <!-- Subtitle of QR code settings that reset the code -->
@@ -2234,9 +2210,9 @@
     <!-- Text of dialog shown when a contact request has not been sent with QR code because of is already a contact -->
     <string name="invite_not_sent_text_already_contact">Zaproszenie nie zostało wysłane. %s jest już&#160;na liście Twoich kontaktów.</string>
     <!-- Text of dialog shown when a contact request has not been sent with QR code because of some error -->
-    <string name="invite_not_sent_text_error">Zaproszenie nie zostało wysłane. Wystąpił błąd podczas przetwarzania.</string>
+    <string name="invite_not_sent_text_error">Wystąpił błąd i zaproszenie nie zostało wysłane.</string>
     <!-- Text of alert dialog informing that the qr is generating -->
-    <string name="generatin_qr">Generowanie kodu QR&#8230;</string>
+    <string name="generatin_qr">Generowanie kodu QR...</string>
     <!-- Title of QR code scan menu item -->
     <string name="menu_item_scan_code">Skanowanie kodu QR</string>
     <!-- get the contact link and copy it -->
@@ -2314,7 +2290,7 @@
     <!-- Text displayed in several parts when there is a call in progress (notification, recent chats list, etc). -->
     <string name="title_notification_call_in_progress">Rozmowa w trakcie</string>
     <!-- Subtitle of the notification shown on the action bar when there is a call in progress -->
-    <string name="action_notification_call_in_progress">Kliknij aby wrócić do rozmowy</string>
+    <string name="action_notification_call_in_progress">Kliknij, aby powrócić do połączenia</string>
     <!-- Button in the notification shown on the action bar when there is a call in progress -->
     <string name="button_notification_call_in_progress">Powrót do rozmowy</string>
     <!-- When it lists contacts of MEGA, the title of list’s header -->
@@ -2324,7 +2300,7 @@
     <!-- Message error shown when trying to log in on an account has been suspended due to multiple breaches of Terms of Service -->
     <string name="account_suspended_multiple_breaches_ToS">Twoje konto zostało zawieszone ze względu na liczne naruszenia regulaminu MEGA. Sprawdź swoją skrzynkę odbiorczą.</string>
     <!-- Message error shown when trying to log in on an account has been suspended due to breach of Terms of Service -->
-    <string name="account_suspended_breache_ToS">Twoje konto zostało zawieszone ze względu na liczne naruszenia regulaminu MEGA, w postaci naruszenia praw innych osób; udostępniania lub pobierania nielegalnych danych; lub naruszenia zasobów aplikacji.</string>
+    <string name="account_suspended_breache_ToS">Twoje konto zostało zlikwidowane z powodu naruszenia warunków korzystania z usług firmy MEGA, w tym między innymi klauzuli 15.</string>
     <!-- In a chat conversation when you try to send device’s images but images are still loading -->
     <string name="file_storage_loading">Ładowanie plików</string>
     <!-- In a chat conversation when you try to send device’s images but there aren’t available images -->
@@ -2392,10 +2368,12 @@
     <string name="settings_video_upload_quality">Jakość wideo</string>
     <!-- Text shown when the user refuses to permit the storage permission when enable camera upload -->
     <string name="on_refuse_storage_permission">Przesyłanie z aparatu musi mieć dostęp do zdjęć i innych multimediów w urządzeniu. Przejdź do strony ustawień i udziel pozwolenia.</string>
-    <!-- the options for the option on setting to set up the quality of multimedia files uploaded to the chat, the options of medium quality multimedia file to  upload. -->
+    <!-- Available options for the setting to set up the quality of multimedia files uploaded to the chat or the Camera Uploads -->
     <string-array name="settings_chat_upload_quality_entries">
-        <item>Oryginalna jakość</item>
-        <item>Średniej jakości</item>
+        <item>Niska</item>
+        <item>Średnia</item>
+        <item>Wysoka</item>
+        <item>Oryginalny</item>
     </string-array>
     <!-- Title of the notification for a missed call -->
     <string name="missed_call_notification_title">Opuszczone rozmowy</string>
@@ -2615,7 +2593,7 @@
     <!-- Description of the screen shown when the user enabled correctly Two-Factor Authentication -->
     <string name="description_2fa_enabled">Gdy następnym razem zalogujesz się na swoje konto, zostaniesz poproszony o podanie 6-cyfrowego kodu podanego przez aplikację Authenticator.</string>
     <!-- Recommendation displayed after enable Two-Factor Authentication -->
-    <string name="recommendation_2fa_enabled">Rozważ wyeksportowanie klucza <b>odzyskiwania</b> na wypadek utraty dostępu do aplikacji lub wyłączenia uwierzytelniania dwuczynnikowego w przyszłości.</string>
+    <string name="recommendation_2fa_enabled">Zapisz swój <b>klucz odzwyskiwania</b> w bezpiecznym miejscu, aby uniknąć problemów w przypadku utraty dostępu do aplikacji, lub jeśli chcesz wyłączyć uwierzytelnianie dwuetapowe.</string>
     <!-- Error shown when a user tries to enable Two-Factor Authentication and introduce an invalid code -->
     <string name="pin_error_2fa">Nieprawidłowy kod</string>
     <!-- Title of screen Lost authenticator decive -->
@@ -2661,13 +2639,13 @@
     <!-- error message when importing multiple files from chat -->
     <string name="number_no_imported_from_chat">%d plików nieudostępniono</string>
     <!-- button’s text to open a full screen image -->
-    <string name="preview_content">Podgląd zawartości</string>
+    <string name="preview_content">Podgląd</string>
     <!-- message shown when the user clicks on media file chat message, there is no network connection and the file is not been downloaded -->
-    <string name="no_network_connection_on_play_file">Strumieniowania nie można wykonać, a plik nie został pobrany</string>
+    <string name="no_network_connection_on_play_file">Brak połączenia sieciowego. Plik nie został pobrany i nie może być przesyłany strumieniowo.</string>
     <!-- message shown when the user open a file, the file is not been opened due to unknown reason -->
     <string name="error_fail_to_open_file_general">Nie można otworzyć pliku.</string>
     <!-- message shown when the user open a file, there is no network connection and the file is not been downloaded -->
-    <string name="error_fail_to_open_file_no_network">Nie mogliśmy otworzyć pliku z powodu braku połączenia sieciowego.</string>
+    <string name="error_fail_to_open_file_no_network">Brak połączenia z siecią. Proszę połączyć się ponownie, aby otworzyć plik.</string>
     <!-- message when trying to save for offline a file that already exists -->
     <string name="file_already_exists">Plik już istnieje w Zapisane dla trybu offline</string>
     <!-- Error message if forwarding a message failed, many messages -->
@@ -2678,9 +2656,9 @@
         <item quantity="other">Wiadomości nie zostały przesłane</item>
     </plurals>
     <!-- Title of the dialog to disable the rich links previews on chat -->
-    <string name="title_confirmation_disable_rich_links">Zaawansowane podglądy adresów URL</string>
+    <string name="title_confirmation_disable_rich_links">Podgląd linków</string>
     <!-- Text of the dialog to disable the rich links previews on chat -->
-    <string name="text_confirmation_disable_rich_links">Podgląd linków zostanie zablokowany. Możesz to zmienić&#160;później w ustawieniach. Czy chcesz kontynuować?</string>
+    <string name="text_confirmation_disable_rich_links">Wyłączasz podgląd adresów URL. Możesz je ponownie włączyć w Ustawieniach. Czy chcesz kontynuować?</string>
     <!-- Message shown when a call ends. -->
     <string name="call_missed_messages">[A]Nieodebrane połączenie[/A]</string>
     <!-- Message shown when a call ends. -->
@@ -2692,7 +2670,7 @@
     <!-- Message shown when a call ends. -->
     <string name="call_not_answered_messages">[A]Połączenie nie zostało odebrane[/A]</string>
     <!-- Indicates that can type a contact email -->
-    <string name="contact_email">Kontaktowy adres e-mail</string>
+    <string name="contact_email">E-mail</string>
     <!-- When it tries to add a contact in a list an is already added -->
     <string name="contact_not_added">Już dodałeś ten kontakt.</string>
     <!-- Content of a normal message that cannot be recognized -->
@@ -2706,16 +2684,9 @@
     <!-- success message when a node was restore from Rubbish bin -->
     <string name="context_correctly_node_restored">Przywrócono do %s</string>
     <!-- error message when a node was restore from Rubbish bin -->
-    <string name="context_no_restored">Błąd. Nie przywrócono</string>
+    <string name="context_no_restored">Wystąpił błąd. Element nie został przywrócony.</string>
     <!-- menu item from contact section to send a message to a contact -->
     <string name="context_send_message">Wyślij wiadomość</string>
-    <!-- Message shown when a contact is successfully sent to several chats, more contacts -->
-    <plurals name="plural_contact_sent_to_chats">
-        <item quantity="one">Kontakt wysłany na czaty z powodzeniem</item>
-        <item quantity="few">Kontakty wysłane z powodzeniem na czaty</item>
-        <item quantity="many">Kontakty wysłane z powodzeniem na czaty</item>
-        <item quantity="other">Kontakty wysłane z powodzeniem na czaty</item>
-    </plurals>
     <!-- Error message on opening a MEGAdrop folder link -->
     <string name="error_MEGAdrop_not_supported">Foldery MEGAdrop nie są jeszcze obsługiwane</string>
     <!-- Pre overquota error dialog when trying to copy or import a file -->
@@ -2725,9 +2696,9 @@
     <!-- Text of the option to show the arhived chat, it shows the number of archived chats -->
     <string name="archived_chats_show_option">Zarchiwizowane rozmowy (%d)</string>
     <!-- Title of the option on the chat list to archive a chat -->
-    <string name="archive_chat_option">Archiwum czatu</string>
+    <string name="archive_chat_option">Zarchiwizuj czat</string>
     <!-- Title of the option on the chat list to unarchive a chat -->
-    <string name="unarchive_chat_option">Unarchive Chat</string>
+    <string name="unarchive_chat_option">Odarchiwizuj czat</string>
     <!-- Confirmation button of the dialog to archive a chat -->
     <string name="general_archive">Archiwizuj</string>
     <!-- Confirmation button of the dialog to unarchive a chat -->
@@ -2746,10 +2717,6 @@
     <string name="inactive_chat">Nieaktywny czat</string>
     <!-- Subtitle of chat screen when the chat is archived -->
     <string name="archived_chat">Zarchiwizowany czat</string>
-    <!-- error message when restoring several nodes from rubbish -->
-    <string name="number_incorrectly_restored_from_rubbish">Elementy %d nie zostały pomyślnie przywrócone</string>
-    <!-- success message when restoring several nodes from rubbish -->
-    <string name="number_correctly_restored_from_rubbish">%d elementy zostały pomyślnie przywrócone</string>
     <!-- Title of the layout to join a group call from the chat screen -->
     <string name="join_call_layout">Kliknij, aby dołączyć do połączenia</string>
     <!-- Label shown when the user wants to add contacts into his MEGA account -->
@@ -2902,7 +2869,7 @@
     <!-- Title of compression queue size option in settings -->
     <string name="settings_video_compression_queue_size_title">Jeśli filmy do skompresowania są większe niż</string>
     <!-- Text of the alert when a FREE user tries to disable the RB scheduler -->
-    <string name="settings_rb_scheduler_alert_disabling">To disable the Rubbish Bin Clearing Scheduler or set a longer retention period, you need to subscribe to a PRO plan.</string>
+    <string name="settings_rb_scheduler_alert_disabling">Aby wyłączyć harmonogram czyszczenia Kosza na śmieci lub ustawić dłuższy okres retencji, należy wykupić plan Pro.</string>
     <!-- Picker text to choose custom retention time. This option indicates several days -->
     <string name="hint_days">dni</string>
     <!-- Title of the option to generate a public chat link -->
@@ -3168,17 +3135,17 @@
     <!-- Title of the dialog to inform about a SSL error -->
     <string name="ssl_error_dialog_title">Błąd klucza SSL</string>
     <!-- Text of the dialog to inform about a SSL error -->
-    <string name="ssl_error_dialog_text">MEGA nie może połączyć się bezpiecznie przez SSL. Być może korzystasz z publicznej sieci Wi-Fi z dodatkowymi wymaganiami.</string>
+    <string name="ssl_error_dialog_text">MEGA nie jest w stanie nawiązać bezpiecznego połączenia za pomocą SSL. Być może jesteś w publicznej sieci Wi-Fi z dodatkowymi wymaganiami.</string>
     <!-- Text of the empty screen for the notifications section -->
     <string name="context_empty_notifications">[B]Brak [/B][A]powiadomień[/A]</string>
     <!-- Permissions screen title -->
     <string name="general_setup_mega">Skonfiguruj MEGA</string>
     <!-- Permissions screen explanation -->
-    <string name="setup_mega_explanation">MEGA potrzebuje dostępu do Twoich zdjęć, multimediów i plików, dzięki czemu możesz udostępniać je znajomym, wymieniać zaszyfrowane wiadomości i wykonywać bezpieczne połączenia.</string>
+    <string name="setup_mega_explanation">MEGA potrzebuje twojej zgody na dostęp do twoich mediów i plików w celu ich udostępnienia. Inne uprawnienia dostępu mogą być potrzebne do wymiany zaszyfrowanych wiadomości i do wykonywania bezpiecznych połączeń.</string>
     <!-- Title of the screen asking permissions for files -->
     <string name="allow_acces_media_title">Zezwalaj na dostęp do zdjęć, multimediów i plików.</string>
     <!-- Subtitle of the screen asking permissions for files -->
-    <string name="allow_acces_media_subtitle">Aby udostępnić zdjęcia, multimedia i pliki, MEGA potrzebuje twojej zgody.</string>
+    <string name="allow_acces_media_subtitle">MEGA potrzebuje Twojej zgody na dostęp do plików w celu ich udostępnienia.</string>
     <!-- Title of the screen asking permissions for camera -->
     <string name="allow_acces_camera_title">Włącz kamerę</string>
     <!-- Subtitle of the screen asking permissions for camera -->
@@ -3186,7 +3153,7 @@
     <!-- Title of the screen asking permissions for microphone and write in log calls -->
     <string name="allow_acces_calls_title">Włącz połączenia</string>
     <!-- Title of the screen asking permissions for contacts -->
-    <string name="allow_acces_contact_title">Włącz dostęp do swojej książki adresowej</string>
+    <string name="allow_acces_contact_title">Udzielanie dostępu do książki adresowej</string>
     <!-- Subtitle of the screen asking permissions for contacts -->
     <string name="allow_acces_contact_subtitle">Łatwo odkrywaj kontakty z książki adresowej na MEGA.</string>
     <!-- Explanation under the subtitle of asking permissions for contacts to explain that MEGA will never use the address book data for any other purpose -->
@@ -3194,9 +3161,9 @@
     <!-- Subtitle of the screen asking permissions for microphone -->
     <string name="allow_acces_calls_subtitle_microphone">Zezwalaj na dostęp do mikrofonu, aby wykonywać połączenia szyfrowane.</string>
     <!-- General enable access -->
-    <string name="general_enable_access">Udostępnik</string>
+    <string name="general_enable_access">Przyznaj dostęp</string>
     <!-- Title of the option on chat info screen to list all the files sent to the chat -->
-    <string name="title_chat_shared_files_info">Udostępnione pliki</string>
+    <string name="title_chat_shared_files_info">Współdzielone pliki</string>
     <!-- Error mesage when trying to remove an uploading attachment that has already finished -->
     <string name="error_message_already_sent">Załącznik już wysłany</string>
     <!-- Message shown when a group call ends. -->
@@ -3247,17 +3214,17 @@
     <!-- Text to indicate that a contact has left a group call -->
     <string name="contact_left_the_call">%1$s opuścił połączenie</string>
     <!-- Warning show when a call cannot start because there are too many participants in the group chat -->
-    <string name="call_error_too_many_participants_start">Nie możesz rozpocząć rozmowy, ponieważ został przekroczony limit uczestników.</string>
+    <string name="call_error_too_many_participants_start">Połączenie nie może się rozpocząć, ponieważ przekroczona została maksymalna liczba uczestników.</string>
     <!-- Message show when a call cannot be established because there are too many participants in the group call -->
-    <string name="call_error_too_many_participants">Nie możesz dołączyć do tej rozmowy, ponieważ osiągnęła maksymalną liczbę uczestników.</string>
+    <string name="call_error_too_many_participants">Nie można dołączyć do połączenia, ponieważ przekroczona została maksymalna liczba uczestników.</string>
     <!-- Message show when a call cannot be established because there are too many participants in the group -->
-    <string name="call_error_too_many_participants_join">Nie możesz dołączyć do tej rozmowy, ponieważ grupa osiągnęła maksymalną liczbę uczestników czatu.</string>
+    <string name="call_error_too_many_participants_join">Nie można dołączyć do połączenia grupowego z powodu osiągnięcia maksymalnej liczby uczestników</string>
     <!-- Message show when a user cannot activate the video in a group call because the max number of videos has been reached -->
-    <string name="call_error_too_many_video">Nie możesz włączyć wideo, ponieważ to połączenie osiągnęło maksymalną liczbę uczestników korzystających z wideo.</string>
+    <string name="call_error_too_many_video">Nie można dołączyć do rozmowy wideo, ponieważ przekroczona została maksymalna liczba uczestników.</string>
     <!-- Message show when a user cannot put the call on hold -->
-    <string name="call_error_call_on_hold">Nie możesz zawiesić połączenia.</string>
+    <string name="call_error_call_on_hold">Połączenie nie może zostać zawieszone.</string>
     <!-- Error message shown when a file cannot be opened by other app using the open with option menu -->
-    <string name="error_open_file_with">Błąd. Nie można otworzyć pliku.</string>
+    <string name="error_open_file_with">Wystąpił błąd i plik nie może zostać otwarty za pomocą tej aplikacji.</string>
     <!-- Subtitle of the call screen when a incoming call is just starting -->
     <string name="incoming_call_starting">Połączenie przychodzące&#8230;</string>
     <!-- Subtitle of the call screen when a outgoing call is just starting -->
@@ -3482,7 +3449,7 @@
     <!-- Text of the empty screen when there are not chat conversations -->
     <string name="recent_chat_empty_text">Zacznij czatować bezpiecznie ze swoimi kontaktami za pomocą szyfrowania end-to-end</string>
     <!-- Text sent to recipients to invite to be contact. Placeholder: contact link url. -->
-    <string name="invite_contacts_to_start_chat_text_message">Cześć! Prowadź ze mną bezpieczne rozmowy na MEGA i zyskaj do 20 GB+ darmowej przestrzeni dyskowej. %1$s</string>
+    <string name="invite_contacts_to_start_chat_text_message">Cześć. Prowadź ze mną bezpieczne rozmowy na MEGA i otrzymaj 20 GB darmowej pamięci w chmurze. %1$s</string>
     <!-- In some cases, a user may try to get the link for a chat room, but if such is not set by an operator - it would say ‘not link available’ and not auto create it. -->
     <string name="no_chat_link_available">Brak dostępnego linku do czatu.</string>
     <!-- Alert shown when it has been deleted successfully a chat link -->
@@ -3511,19 +3478,19 @@
     <string name="invite_contact_chooser_title">Zaproś znajomego przez</string>
     <!-- Action button label -->
     <string name="invite_contact_action_button">Zaproś znajomego przez&#8230;</string>
-    <!-- When a multiple download is started, some of the files could have already been downloaded before. This message shows the number of files that has already been downloaded in plural. placeholder: number of files -->
+    <!-- Message displayed when multiple download starts and all files has already been downloaded before. Placeholder: number of files -->
     <plurals name="file_already_downloaded">
-        <item quantity="one">%d plik już pobrany.&#160;</item>
-        <item quantity="few">%d plików już pobranych.&#160;</item>
-        <item quantity="many">%d plików już pobranych.&#160;</item>
-        <item quantity="other">%d plików już pobranych.&#160;</item>
+        <item quantity="one">1 plik pobrany</item>
+        <item quantity="few">%d pliki pobrane</item>
+        <item quantity="many">%d pliki pobrane</item>
+        <item quantity="other">%d pliki pobrane</item>
     </plurals>
-    <!-- When a multiple download is started, some of the files could have already been downloaded before. This message shows the number of files that are pending in plural. placeholder: number of files -->
+    <!-- When a multiple download is started, some of the files could have already been downloaded before. This message shows the number of files that are pending. Placeholder: number of files -->
     <plurals name="file_pending_download">
-        <item quantity="one">%d plik oczekuje.</item>
-        <item quantity="few">%d plików oczekuje.</item>
-        <item quantity="many">%d plików oczekuje.</item>
-        <item quantity="other">%d plików oczekuje.</item>
+        <item quantity="one">1 plik oczekujący.</item>
+        <item quantity="few">%d plików oczekujących.</item>
+        <item quantity="many">%d plików oczekujących.</item>
+        <item quantity="other">%d plików oczekujących.</item>
     </plurals>
     <!-- Title of the login screen -->
     <string name="login_to_mega">Zaloguj się do MEGA</string>
@@ -3534,7 +3501,7 @@
     <!-- Label to reference a chats section -->
     <string name="chats_label">Czaty</string>
     <!-- Text of the empty screen when there are not elements in Recents -->
-    <string name="context_empty_recents">[B]Brak plików w folderze [/B][A]Ostatnie[/A]</string>
+    <string name="context_empty_recents">[B]Brak plików w [/B][A]Recents[/A]</string>
     <!-- Title of a recents bucket -->
     <string name="title_bucket">%1$s i %2$d więcej</string>
     <!-- Title of a media recents bucket that only contains some images -->
@@ -3595,8 +3562,8 @@
     <string name="business_management_alert">Zarządzanie użytkownikami jest dostępne tylko z poziomu przeglądarki internetowej.</string>
     <!-- Title of the usage tab in My Account Section -->
     <string name="tab_my_account_usage">Zużycie</string>
-    <!-- Title of usage storage details section in Storage -->
-    <string name="usage_storage_details_label">Szczegóły użycia pamięci</string>
+    <!-- Title of usage storage details section in My Account -->
+    <string name="usage_storage_details_label">Podział wykorzystania pamięci</string>
     <!-- Title of overall usage section in Storage -->
     <string name="overall_usage_label">Ogólne wykorzystanie</string>
     <!-- Title of transfer section in Storage -->
@@ -3604,7 +3571,7 @@
     <!-- Error shown when a Business account user (sub-user or admin) tries to remove a contact which is part of the same Business account. Please, keep the placeholder, it will be replaced with the name or email of the account, for example: Jane Appleseed or ja@mega.nz -->
     <string name="error_remove_business_contact">Nie możesz usunąć %1$s jako kontaktu, ponieważ są one częścią twojego konta firmowego.</string>
     <!-- When logging in during the grace period, the administrator of the Business account will be notified that their payment is overdue, indicating that they need to access MEGA using a desktop browser for more information -->
-    <string name="grace_period_admin_alert">Wystąpił problem z ostatnią płatnością. Proszę uzyskać dostęp do MEGA za pomocą przeglądarki na pulpicie, aby uzyskać więcej informacji.</string>
+    <string name="grace_period_admin_alert">Wystąpił problem z ostatnią płatnością. Aby uzyskać więcej informacji, skorzystaj z MEGA przeglądarki na komputerze.</string>
     <!-- A dialog title shown to users when their business account is expired. -->
     <string name="expired_business_title">Konto biznesowe wygasło</string>
     <!-- Details shown when a Business account is expired due a payment issue. The account is opened in a view-only mode. -->
@@ -3612,7 +3579,7 @@
     <!-- A message which is shown to sub-users of expired business accounts. -->
     <string name="expired_user_business_text">Twoje konto jest obecnie [B]zawieszone[/B]. Możesz tylko przeglądać swoje dane.</string>
     <!-- Message shown when users with a business account (no administrators of a business account) try to enable the Camera Uploads, to advise them that the administrator do have the ability to view their data. -->
-    <string name="camera_uploads_business_alert">Chociaż MEGA nie ma dostępu do twoich danych, administrator twojego konta biznesowego ma możliwość kontrolowania i przeglądania przesłanych z aparatu na twoim koncie użytkownika</string>
+    <string name="camera_uploads_business_alert">MEGA nie ma dostępu do Państwa danych. Administrator konta biznesowego ma jednak dostęp do danych Camera Uploads.</string>
     <!-- General label to alert user that somehting went wrong -->
     <string name="general_something_went_wrong_error">Wystąpiły problemy</string>
     <!-- A dialog message which is shown to sub-users of expired business accounts. -->
@@ -3640,7 +3607,7 @@
     <!-- Text informing user that their account has been suspended -->
     <string name="account_temporarily_suspended">Twoje konto zostało tymczasowo zablokowane dla twojego bezpieczeństwa.</string>
     <!-- Text informing user has to follow the steps of an email to unlock their account -->
-    <string name="verify_email_and_follow_steps">[A]Sprawdź swój adres e-mail[/A] i postępuj zgodnie z instrukcjami w e-mailu MEGA, aby odblokować konto.</string>
+    <string name="verify_email_and_follow_steps">Proszę postępować zgodnie z krokami zawartymi w [A]emailu weryfikacyjnym[/A], aby odblokować swoje konto.</string>
     <!-- Question which takes the user to a help screen -->
     <string name="why_am_i_seeing_this">Dlaczego to widzę?</string>
     <!-- Label of a button which action is resend an email -->
@@ -3680,7 +3647,7 @@
     <!-- Error title shown when you are trying to do an action with a file or folder and you don’t have the necessary permissions -->
     <string name="permissions_error_label">Błąd uprawnień</string>
     <!-- Confirmation dialog shown to user when they try to revert a node in an incoming ReadWrite share. -->
-    <string name="alert_not_enough_permissions_revert">Nie masz uprawnień wymaganych do przywrócenia tego pliku. Aby kontynuować, możemy utworzyć nowy plik z cofniętymi danymi. Czy chcesz kontynuować?</string>
+    <string name="alert_not_enough_permissions_revert">Nie masz odpowiednich uprawnień, aby zmienić ten plik. Czy chcesz utworzyć nowy plik?</string>
     <!-- Text shown when the creation of a version as a new file was successful -->
     <string name="version_as_new_file_created">Wersja została pomyślnie utworzona jako nowy plik.</string>
     <!-- Label indicating a date. Keep the placeholder, is to set the date. -->
@@ -3710,15 +3677,15 @@
     <!-- Text warning of transfer over quota -->
     <string name="warning_transfer_over_quota">Twoje transfery zostały przerwane. Uaktualnij swoje konto lub poczekaj %s, aby kontynuować.</string>
     <!-- Label indicating transfer over quota -->
-    <string name="label_transfer_over_quota">Przenieś ponad limit</string>
+    <string name="label_transfer_over_quota">Transfer przekroczony</string>
     <!-- Label indicating storage over quota -->
-    <string name="label_storage_over_quota">Przestrzeń dyskowa przekracza limit</string>
+    <string name="label_storage_over_quota">Dostępny limit został przekroczony</string>
     <!-- Label indicating the action ‘upgrate account’ to get more transfer quota -->
     <string name="label_get_more_transfer_quota">Zwiększ swój transfer</string>
     <!-- Warning show to the user when a folder does not exist -->
     <string name="warning_folder_not_exists">Folder nie istnieje.</string>
     <!-- Warning show to the user when a node does not exist in cloud -->
-    <string name="warning_node_not_exists_in_cloud">Plik nie istnieje na Cloud Drive.</string>
+    <string name="warning_node_not_exists_in_cloud">Plik nie może być znaleziony w Twoim dysku Cloud Drive.</string>
     <!-- Header text of the Over Disk Quota Paywall warning -->
     <string name="over_disk_quota_paywall_header">Dysk pełny</string>
     <!-- Title of the Over Disk Quota Paywall warning -->
@@ -3755,7 +3722,7 @@
     <string name="label_verify_credentials">Weryfikacja uprawnień</string>
     <!-- Label to indicate that contact’s credentials are not verified. -->
     <string name="label_not_verified">Nie zweryfikowany</string>
-    <!-- Action indicating something was verified. -->
+    <!-- Label indicating the authenticity credentials of a contact have been verified -->
     <string name="label_verified">Zweryfikowany</string>
     <!-- ”Verify user” dialog title -->
     <string name="authenticity_credentials_label">Poświadczenia autentyczności</string>
@@ -3776,7 +3743,7 @@
     <!-- Text show in a snackbar when phone has successfully reset. -->
     <string name="remove_phone_number_success">Twój numer telefonu został pomyślnie usunięty.</string>
     <!-- Text show in a snackbar when reset phone number failed. -->
-    <string name="remove_phone_number_fail">Usunięcie Twojego numeru telefonu nie powiodło się.</string>
+    <string name="remove_phone_number_fail">Nie udało się usunąć Twojego numeru telefonu.</string>
     <!-- Text hint shown in the global search box which sits on the top of the Homepage screen -->
     <string name="search_hint">Szukaj w MEGA</string>
     <!-- Alert shown when a user tries to reset an account wich is bloqued. -->
@@ -3834,15 +3801,15 @@
     <!-- Indicator of the progress in a download/upload. Please, don’t remove the place holders: the first one is to set the percentage, the second one is to set the size of the file. Example 33% of 33.3 MB -->
     <string name="progress_size_indicator">%1$d%% z %2$s</string>
     <!-- Message showing when enable the mode for showing the special information in the chat messages. This action is performed from the settings section, clicking 5 times on the App version option -->
-    <string name="show_info_chat_msg_enabled">Włączona rotacja zaszyfrowanych kluczy</string>
+    <string name="show_info_chat_msg_enabled">Włączone debugowanie informacji dla wiadomości czatu</string>
     <!-- Message showing when disable the mode for showing the special information in the chat messages.. This action is performed from the settings section, clicking 5 times on the App version option -->
-    <string name="show_info_chat_msg_disabled">Wyłączono specjalne informacje dotyczące wiadomości czatu</string>
+    <string name="show_info_chat_msg_disabled">Wyłączenie informacji o debugowaniu dla wiadomości czatu</string>
     <!-- Shows the error when the limit of reactions per user is reached and the user tries to add one more. Keep the placeholder because is to show limit number in runtime. -->
     <string name="limit_reaction_per_user">Osiągnąłeś maksymalny limit %d reakcji.</string>
     <!-- Shows the error when the limit of reactions per message is reached and a user tries to add one more. Keep the placeholder because is to show limit number in runtime. -->
     <string name="limit_reaction_per_message">Ta wiadomość osiągnęła maksymalny limit %d reakcji.</string>
     <!-- System message displayed to all chat participants when one of them enables retention history -->
-    <string name="retention_history_changed_by">[A]%1$s[/A][B] zmienił czas usuwania komunikatu na[/B][A] %2$s[/A][B].[/B]</string>
+    <string name="retention_history_changed_by">[A]%1$s[/A][B] zmienił czas usuwania komunikatu na [/B][A]%2$s[/A][B].[/B]</string>
     <!-- Title of the section to clear the chat content in the Manage chat history screen -->
     <string name="title_properties_clear_chat_history">Wyczyść&#160;historię&#160;czatu</string>
     <!-- System message that is shown to all chat participants upon disabling the Retention history -->
@@ -3868,7 +3835,7 @@
     <!-- Subtitle of the dialogue to select a retention time -->
     <string name="subtitle_properties_manage_chat">Automatycznie usuwaj wiadomości starsze niż:</string>
     <!-- Text of the confirmation dialog to clear the chat history from Manage chat history section -->
-    <string name="confirmation_clear_chat_history">Wyczyścić pełną historię wiadomości dla tej rozmowy?</string>
+    <string name="confirmation_clear_chat_history">Czy na pewno chcesz usunąć pełną historię tej rozmowy?</string>
     <!-- Text on the label indicating that the oldest messages of a year will be automatically deleted. -->
     <string name="subtitle_properties_manage_chat_label_year">1 rok</string>
     <!-- Picker text to choose custom retention time. This option indicates several hours -->
@@ -3925,7 +3892,7 @@
     <!-- Title indicating the select mode is enabled and ready to select transfers on Transfers section, In progress tab -->
     <string name="title_select_transfers">Wybierz transfery</string>
     <!-- Error shown to inform the priority change of a transfer failed. Please don’t remove the place holder, it’s to set the name of the transfer. Example: The priority change of the transfer “video.mp4” failed. -->
-    <string name="change_of_transfer_priority_failed">Zmiana priorytetu transferu ”%1$s” nie powiodła się.</string>
+    <string name="change_of_transfer_priority_failed">Nie można zmienić priorytetu transferu ”%1$s”</string>
     <!-- Title option to send separated the link and decryption key -->
     <string name="option_send_decryption_key_separately">Wyślij klucz deszyfrujący osobno</string>
     <!-- Explanation option to send separated the link and decryption key -->
@@ -3940,14 +3907,10 @@
     <string name="button_copy_key">Skopiuj klucz</string>
     <!-- Button which action is copy the password of a link -->
     <string name="button_copy_password">Skopiuj hasło</string>
-    <!-- Confirmation shown informing a link it’s copied to the clipboard -->
-    <string name="link_copied_clipboard">Link skopiowany do schowka.</string>
     <!-- Confirmation shown informing a key link it’s copied to the clipboard -->
     <string name="key_copied_clipboard">Klucz skopiowany do schowka.</string>
     <!-- Confirmation shown informing a password link it’s copied to the clipboard -->
     <string name="password_copied_clipboard">Hasło skopiowane do schowka.</string>
-    <!-- Confirmation shown informing a link it’s copied to the clipboard -->
-    <string name="link_sent">Link wysłany.</string>
     <!-- Confirmation shown informing a key link it’s copied to the clipboard -->
     <string name="link_and_key_sent">Link i klucz wysłane.</string>
     <!-- Confirmation shown informing a key link it’s copied to the clipboard -->
@@ -3971,7 +3934,7 @@
     <!-- String to share a link protected with password with its password.Please keep the place holders, are to set the link and the password. Example: Link: https://mega.nz/file/kC42xRSK#Ud2QsvpIVYmCd1a9QUhk42wXv10jCSyPSWnXEwYX2VE Password: asfAFG3345g -->
     <string name="share_link_with_password">Link: %1$s\n\nHasło: %2$s</string>
     <!-- Warning show to the user when the app needs permissions to share files and the user has denied them. -->
-    <string name="files_required_permissions_warning">MEGA potrzebuje Twojej zgody, aby udostępniać pliki.</string>
+    <string name="files_required_permissions_warning">MEGA potrzebuje Twojej zgody na dostęp do Twoich plików w celu ich udostępnienia.</string>
     <!-- Context menu item. Allows user to add file/folder to favourites -->
     <string name="file_properties_favourite">Ulubione</string>
     <!-- Context menu item. Allows user to delete file/folder from favourites -->
@@ -4016,14 +3979,12 @@
     <string name="dialog_cookie_alert_unsaved">Ustawienia ciasteczek nie zapisane.</string>
     <!-- Snackbar message showed when there settings has been saved successfully. -->
     <string name="dialog_cookie_snackbar_saved">Zmiany w ustawieniach plików cookie zostały zapisane</string>
-    <!-- Cookie dialog third party title -->
-    <string name="dialog_cookie_thirdparty_title">Pliki cookie stron trzecich</string>
     <!-- Cookie dialog third party first subtitle -->
     <string name="dialog_cookie_thirdparty_subtitle1">Cookies reklamowe Google</string>
     <!-- Cookie dialog third party second subtitle -->
     <string name="dialog_cookie_thirdparty_subtitle2">Kategoria: Cookies reklamowe</string>
     <!-- Cookie dialog third party message. Please, keep the placeholders to format the string. -->
-    <string name="dialog_cookie_thirdparty_message">Używane przez Google do:\n- dostosowywania reklam wyświetlanych przez Google w naszej firmie oraz w innych usługach i witrynach internetowych, w oparciu o takie czynniki jak lokalizacja użytkownika i inne witryny, które użytkownik wcześniej odwiedził;\n- monitorowania częstotliwości wyświetlania określonych reklam;\n- zapobiegania oszustwom; oraz\n- określania, kiedy użytkownik klika na daną reklamę, a następnie śledzenia następujących działań podejmowanych w odpowiedzi na tę reklamę.\nhttps://policies.google.com/technologies/partner-sites</string>
+    <string name="dialog_cookie_thirdparty_message">Używane przez Google do:\n- dostosowywania reklam wyświetlanych przez Google w naszej witrynie oraz w innych usługach i witrynach internetowych, w oparciu o takie elementy jak lokalizacja użytkownika i inne witryny, które użytkownik wcześniej odwiedził;\n- monitorowania częstotliwości wyświetlania określonych reklam;\n- zapobiegania oszustwom; oraz\n- określania, kiedy użytkownik kliknie konkretną reklamę, a następnie śledzenia następujących działań podejmowanych w odpowiedzi na tę reklamę.\nhttps://policies.google.com/technologies/partner-sites</string>
     <!-- Preference screen item title -->
     <string name="preference_cookies_accept">Zaakceptuj pliki cookie</string>
     <!-- Preference screen item title -->
@@ -4046,10 +4007,6 @@
     <string name="preference_cookies_thirdparty_title">Pliki cookie stron trzecich</string>
     <!-- Preference screen item summary. Please, keep the placeholders to format the string. -->
     <string name="preference_cookies_thirdparty_summary">Są to pliki cookie, które są kontrolowane przez kogoś innego niż my; używamy tych plików cookie w celu zapewnienia opisanych powyżej funkcji. Brak akceptacji tych plików cookie będzie miał różne konsekwencje w zależności od rodzaju pliku cookie, jakim jest plik cookie należący do osoby trzeciej. Kliknij “Więcej informacji” poniżej, aby uzyskać szczegółowe informacje na temat wszystkich używanych przez nas plików cookie osób trzecich.</string>
-    <!-- Preference screen item action button -->
-    <string name="preference_cookies_policies_privacy">Polityka Prywatności</string>
-    <!-- Preference screen item action button -->
-    <string name="preference_cookies_policies_cookie">Polityka Cookie</string>
     <!-- Preference screen item state description -->
     <string name="preference_cookies_always_on">Zawsze włączone</string>
     <!-- Menu option that allows the user to scan document and upload it directly to MEGA. -->
@@ -4077,7 +4034,7 @@
     <!-- Label indicating a file was created successfully -->
     <string name="file_created">Plik został utworzony</string>
     <!-- Warning indicating a file was not created successfully -->
-    <string name="file_creation_failed">Tworzenie pliku nie powiodło się. Spróbuj ponownie.</string>
+    <string name="file_creation_failed">Tworzenie pliku nie powiodło się. Proszę spróbować ponownie.</string>
     <!-- Label indicating a file was saved to some folder. e.g.: File saved to Cloud Drive -->
     <string name="file_saved_to">Plik zapisany do %1$s</string>
     <!-- Warning indicating a file was not saved to some folder. e.g.: File not saved to Cloud Drive. Try again -->
@@ -4085,7 +4042,7 @@
     <!-- Label indicating a file was updated successfully -->
     <string name="file_updated">Plik został zaktualizowany</string>
     <!-- Warning indicating a file was not updated successfully -->
-    <string name="file_update_failed">Aktualizacja pliku nie powiodła się. Spróbuj ponownie.</string>
+    <string name="file_update_failed">Aktualizacja pliku nie powiodła się. Proszę spróbować ponownie.</string>
     <!-- Warning which alerts the user a file cannot be opened -->
     <string name="error_opening_file">Plik jest zbyt duży i nie można go otworzyć ani wyświetlić jego podglądu.</string>
     <!-- Error shown when the user writes a file name without extension. The placeholder shows the file extension. e. g. File without extension (.jpg)-->
@@ -4094,20 +4051,8 @@
     <string name="file_without_extension_warning">Aby kontynuować, należy wpisać rozszerzenie pliku</string>
     <!-- Title of the warning dialog indicating the renamed name file extension is not the same -->
     <string name="file_extension_change_title">Zmiana rozszerzenia pliku</string>
-    <!-- Text of the warning dialog indicating the renamed name file extension is not the same. The placeholders show the file extensions. e.g. You may not be able to access this file if you change it from ".jpg" to ".txt" -->
-    <string name="file_extension_change_warning">Możesz nie być w stanie uzyskać dostępu do tego pliku, jeśli zmienisz go z “.%1$s” na “.%2$s”</string>
-    <!-- Text of the warning dialog indicating the renamed name file extension is not the same. The placeholder shows the file extension. e.g. You may not be able to access this file if you change it from empty to ".txt" -->
-    <string name="file_extension_change_warning_old_empty">Możesz nie być w stanie uzyskać dostępu do tego pliku. jeśli zmienisz go z pustego na “.%1$s”.</string>
-    <!-- Text of the warning dialog indicating the renamed name file extension is not the same. The placeholder shows the file extension. e.g. You may not be able to access this file if you change it from ".jpg" to empty -->
-    <string name="file_extension_change_warning_new_empty">Możesz nie być w stanie uzyskać dostępu do tego pliku. jeśli zmienisz go z “.%1$s” na pusty</string>
-    <!-- Button of the warning dialog indicating the renamed name file extension is not the same to use the new extension -->
-    <string name="action_use_empty_new_extension">Usuń rozszerzenie</string>
-    <!-- Button of the warning dialog indicating the renamed name file extension is not the same to use the new extension. The placeholder shows the file extension. e.g. Use .txt -->
-    <string name="action_use_new_extension">Użyj .%1$s</string>
-    <!-- Button of the warning dialog indicating the renamed name file extension is not the same to keep the old extension -->
-    <string name="action_keep_empty_old_extension">Brak rozszerzenia</string>
-    <!-- Button of the warning dialog indicating the renamed name file extension is not the same to keep the old extension. The placeholder shows the file extension. e.g. Keep .jpg -->
-    <string name="action_keep_old_extension">Zachowaj .%1$s</string>
+    <!-- Text of the warning dialog indicating the renamed name file extension is not the same. -->
+    <string name="file_extension_change_warning">Możesz nie być w stanie otworzyć tego pliku, jeśli zmienisz jego rozszerzenie.</string>
     <!-- Warning which alerts the user a file cannot be created because there is already one with the same name-->
     <string name="same_file_name_warning">Istnieje już plik o tej samej nazwie</string>
     <!-- Warning which alerts the user an item cannot be created because there is already one with the same name -->
@@ -4145,4 +4090,278 @@
         <item quantity="many">Trwa przesyłanie, %1$d plików czeka na przesłanie.</item>
         <item quantity="other">Trwa przesyłanie, %1$d plików czeka na przesłanie.</item>
     </plurals>
+    <!-- Text to show as production api server option -->
+    <string name="production_api_server">Produkcyjny</string>
+    <!-- Title to show in a dialog to change api server -->
+    <string name="title_change_server">Inny serwer</string>
+    <!-- Show line numbers action -->
+    <string name="action_show_line_numbers">Pokaż numery linii</string>
+    <!-- Hide line numbers action -->
+    <string name="action_hide_line_numbers">Ukryj numery linii</string>
+    <!-- Indicates pagination progress. E.g.: 3/49 -->
+    <string name="pagination_progress">%1$s/%2$s</string>
+    <!-- An error shown as transfer error when uploading something to an incoming share and the owner’s account is over its storage quota. -->
+    <string name="error_share_owner_storage_quota">Właściciel przekroczył limit pamięci.</string>
+    <!-- A message shown when uploading, copying or moving something to an incoming share and the owner’s account is over its storage quota. -->
+    <string name="warning_share_owner_storage_quota">Plik nie może zostać wysłany, ponieważ użytkownik docelowy przekroczył limit pamięci.</string>
+    <!-- Content to show in a Snackbar to tip the incompatibility-->
+    <string name="version_incompatibility">Aktualizujemy MEGAchat. Twoje rozmowy mogą nie być połączone z powodu niezgodności wersji, chyba że wszystkie strony zaktualizują swoje aplikacje MEGA do najnowszej wersji.</string>
+    <!-- Message displayed when multiple download starts and 1 file has already been downloaded before and 1 file is being downloaded -->
+    <string name="file_already_downloaded_and_file_pending_download">1 plik już pobrany. 1 plik oczekujący na pobranie.</string>
+    <!-- Message displayed when multiple download starts and 1 file has already been downloaded before and multiple files are being downloaded. Placeholder: number of files -->
+    <string name="file_already_downloaded_and_files_pending_download">1 plik już pobrany. %d plików oczekujących na pobranie.</string>
+    <!-- Message displayed when multiple download starts and multiple files have already been downloaded before and 1 file is being downloaded. Placeholder: number of files -->
+    <string name="files_already_downloaded_and_file_pending_download">%d już pobrane pliki. 1 plik w toku.</string>
+    <!-- Message displayed when multiple download starts and multiple files have already been downloaded before and multiple files are being downloaded. Placeholders: number of files -->
+    <string name="files_already_downloaded_and_files_pending_download">%1$d pliki już pobrane. %2$d plików oczekujących na pobranie.</string>
+    <!-- Message displayed when 1 node (file or folder) has been successfully moved to the rubbish bin and 1 node has not been moved successfully -->
+    <string name="node_correctly_and_node_incorrectly_moved_to_rubbish">1 przedmiot został przeniesiony do kosza na śmieci i 1 przedmiot nie został wysłany.</string>
+    <!-- Message displayed when 1 node (file or folder) has been successfully moved to the rubbish bin and multiple nodes have not been moved successfully. Placeholder: number of nodes -->
+    <string name="node_correctly_and_nodes_incorrectly_moved_to_rubbish">1 element został przeniesiony do kosza, a %d elementów nie zostało wysłanych.</string>
+    <!-- Message displayed when multiple nodes (files and folders) have been successfully moved to the rubbish bin and 1 node has not been moved successfully. Placeholder: number of nodes -->
+    <string name="nodes_correctly_and_node_incorrectly_moved_to_rubbish">%d elementy zostały przeniesione do kosza i 1 element nie został wysłany.</string>
+    <!-- Message displayed when multiple nodes (files and folders) have been successfully moved to the rubbish bin and multiple nodes have not been moved successfully. Placeholders: number of nodes -->
+    <string name="nodes_correctly_and_nodes_incorrectly_moved_to_rubbish">%1$d elementy zostały przeniesione do kosza z powodzeniem, a %2$d elementów nie zostało wysłanych z powodzeniem</string>
+    <!-- Message displayed when 1 node (file or folder) has been successfully restored from the rubbish bin and 1 node has not been restored successfully -->
+    <string name="node_correctly_and_node_incorrectly_restored_from_rubbish">1 element został przywrócony pomyślnie i 1 element nie został przywrócony pomyślnie</string>
+    <!-- Message displayed when 1 node (file or folder) has been successfully restored from the rubbish bin and multiple nodes have not been restored successfully. Placeholder: number of nodes -->
+    <string name="node_correctly_and_nodes_incorrectly_restored_from_rubbish">1 element został przywrócony pomyślnie, a %d elementów nie zostało przywróconych pomyślnie</string>
+    <!-- Message displayed when multiple nodes (files and folders) have been successfully restored from the rubbish bin and 1 node has not been restored successfully. Placeholder: number of nodes -->
+    <string name="nodes_correctly_and_node_incorrectly_restored_from_rubbish">%d elementy przywrócone pomyślnie i 1 element nie został przywrócony pomyślnie</string>
+    <!-- Message displayed when multiple nodes (files and folders) have been successfully restored from the rubbish bin and multiple nodes have not been restored successfully. Placeholders: number of nodes -->
+    <string name="nodes_correctly_and_nodes_incorrectly_restored_from_rubbish">%1$d elementy zostały przywrócone pomyślnie i %2$d elementów nie zostało przywróconych pomyślnie</string>
+    <!-- Message displayed when nodes (files and folders) are being moved to the rubbish bin and all nodes have been successfully moved. Placeholder: number of nodes -->
+    <plurals name="number_correctly_moved_to_rubbish">
+        <item quantity="one">1 element przeniesiony do kosza</item>
+        <item quantity="few">%d elementy przeniesione do kosza</item>
+        <item quantity="many">%d elementy przeniesione do kosza</item>
+        <item quantity="other">%d elementy przeniesione do kosza</item>
+    </plurals>
+    <!-- Message displayed when nodes (files and folders) are being moved to the rubbish bin and all nodes have not been successfully moved. Placeholder: number of nodes -->
+    <plurals name="number_incorrectly_moved_to_rubbish">
+        <item quantity="one">1 element nie został przeniesiony do kosza</item>
+        <item quantity="few">%d elementów nie zostało przeniesionych do kosza</item>
+        <item quantity="many">%d elementów nie zostało przeniesionych do kosza</item>
+        <item quantity="other">%d elementów nie zostało przeniesionych do kosza</item>
+    </plurals>
+    <!-- Message displayed when nodes (files and folders) are being restored from the rubbish bin and all nodes have been successfully restored. Placeholder: number of nodes -->
+    <plurals name="number_correctly_restored_from_rubbish">
+        <item quantity="one">1 element przywrócony pomyślnie</item>
+        <item quantity="few">%d elementów przywróconych pomyślnie</item>
+        <item quantity="many">%d elementów przywróconych pomyślnie</item>
+        <item quantity="other">%d elementów przywróconych pomyślnie</item>
+    </plurals>
+    <!-- Message displayed when nodes (files and folders) are being restored from the rubbish bin and all nodes have not been successfully restored. Placeholder: number of nodes -->
+    <plurals name="number_incorrectly_restored_from_rubbish">
+        <item quantity="one">1 element nie został przywrócony pomyślnie</item>
+        <item quantity="few">%d elementów nie zostało przywróconych pomyślnie</item>
+        <item quantity="many">%d elementów nie zostało przywróconych pomyślnie</item>
+        <item quantity="other">%d elementów nie zostało przywróconych pomyślnie</item>
+    </plurals>
+    <!-- Button of the warning dialog indicating the renamed name file extension is not the same to confirm the change. -->
+    <string name="action_change_anyway">Dokonaj zmiany</string>
+    <!-- Snackbar text to display if the user doesn't grant the permission to access all files on a device with Android 11 or higher -->
+    <string name="snackbar_storage_permission_denied_android_11">Uprawnienia potrzebne do uzyskania dostępu do pamięci masowej.</string>
+    <!-- String to show the transfer quota and the used space in My Account section. E.g.: -->
+    <string name="used_storage_transfer">%1$s / %2$s</string>
+    <!-- String to show the transfer quota and the used space in My Account section -->
+    <string name="used_storage_transfer_percentage">%1$s%%</string>
+    <!-- Size in petabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
+    <string name="label_file_size_peta_byte">%1$s PB</string>
+    <!-- Size in exabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
+    <string name="label_file_size_exa_byte">%1$s EB</string>
+    <!-- Title of Add phone number option in My account section -->
+    <string name="add_phone_label">Dodaj swój numer telefonu</string>
+    <!-- Text of the option Backup Recovery Key in My account section -->
+    <string name="backup_recovery_key_subtitle">Czy pamiętasz swoje hasło?\nMEGA nie może zresetować Twojego hasła, jeśli je zapomnisz.</string>
+    <!-- Action to change name -->
+    <string name="change_name_action">Zmień nazwę</string>
+    <!-- Action to add photo -->
+    <string name="add_photo_action">Dodaj zdjęcie</string>
+    <!-- Action to add phone number -->
+    <string name="add_phone_number_action">Dodaj numer telefonu</string>
+    <!-- Warning indicating the app needs write permissions to do any action -->
+    <string name="denied_write_permissions">Aby kontynuować, MEGA potrzebuje uprawnień do zapisu w pamięci urządzenia.</string>
+    <!-- Date indicating is tomorrow. E.g: Tomorrow, 3 Jul 2021 -->
+    <string name="tomorrow_date">Jutro, %1$s</string>
+    <!-- Title of the confirmation dialog shown when a subscription has been processed successfully -->
+    <string name="title_user_purchased_subscription">Oczekiwanie na potwierdzenie</string>
+    <!-- Number of social connections, showing the number of contacts the user has. E.g.: 37 connections -->
+    <plurals name="my_account_connections">
+        <item quantity="one">1 połączenie</item>
+        <item quantity="few">%1$d połączeń</item>
+        <item quantity="many">%1$d połączeń</item>
+        <item quantity="other">%1$dpołączeń</item>
+    </plurals>
+    <!-- Section name for the “Recently Added Contacts” section. Preferably one word. -->
+    <string name="section_recently_added">Ostatnio dodane</string>
+    <!-- Text of the empty screen when there are not groups. No dot at the end because is for an empty state. The format placeholders are to showing it in different colors. -->
+    <string name="context_empty_groups">[B]Brak[/B][A]grup[/A]</string>
+    <!-- Section name for the “Contact Requests” section. Preferably one word. -->
+    <string name="section_requests">Zgłoszenia</string>
+    <!-- Section name for the “Groups” section. Preferably one word. -->
+    <string name="section_groups">Grupy</string>
+    <!-- Text informing links management is only available for single items. -->
+    <string name="warning_get_links">Opcje takie jak “Wyślij klucz deszyfrujący osobno”, “Ustaw datę ważności” czy “Ustaw ochronę hasłem” są dostępne tylko dla pojedynczych elementów.</string>
+    <!-- Action which allows to copy all the links showed in the list. -->
+    <string name="action_copy_all">Skopiuj wszystko</string>
+    <!-- Confirmation shown informing links have been sent to the selected chats -->
+    <plurals name="links_sent">
+        <item quantity="one">Link został pomyślnie wysłany.</item>
+        <item quantity="few">Linki zostały pomyślnie wysłane.</item>
+        <item quantity="many">Linki zostały pomyślnie wysłane.</item>
+        <item quantity="other">Linki zostały pomyślnie wysłane.</item>
+    </plurals>
+    <!-- Confirmation shown informing links have been copied to the clipboard -->
+    <plurals name="links_copied_clipboard">
+        <item quantity="one">Link skopiowany do schowka.</item>
+        <item quantity="few">Linki skopiowane do schowka.</item>
+        <item quantity="many">Linki skopiowane do schowka.</item>
+        <item quantity="other">Linki skopiowane do schowka.</item>
+    </plurals>
+    <!-- Plural string used as button label or title of the screen to get only one or several links at the same time. -->
+    <plurals name="get_links">
+        <item quantity="one">Pobierz link</item>
+        <item quantity="few">Pobierz linki</item>
+        <item quantity="many">Pobierz linki</item>
+        <item quantity="other">Pobierz linki</item>
+    </plurals>
+    <!-- Ask for confirmation before clear offline files -->
+    <string name="clear_offline_confirmation">Wyczyścić wszystkie pliki offline?</string>
+    <!-- Banner text when the call is in progress and I'm the only participant. -->
+    <string name="banner_alone_on_the_call">Jesteś aktualnie sam</string>
+    <!-- Item menu option upon right click on meeting. -->
+    <string name="context_meeting">Spotkanie</string>
+    <!-- Menu option that allows the user to start/join meeting. -->
+    <string name="start_join_meeting">Rozpocznij/dołącz do spotkania</string>
+    <!-- Label that create a meeting -->
+    <string name="new_meeting">Nowe spotkanie</string>
+    <!-- Label that join a meeting -->
+    <string name="join_meeting">Dołącz do spotkania</string>
+    <!-- Button that create a meeting -->
+    <string name="btn_start_meeting">Rozpocznij spotkanie</string>
+    <!-- Button that join a meeting as guest -->
+    <string name="btn_join_meeting_as_guest">Dołącz jako gość</string>
+    <!-- Hint shown to guide user on meeting name -->
+    <string name="type_meeting_name">%sspotkanie</string>
+    <!-- General label for reject the call. -->
+    <string name="general_reject">Rozłącz się</string>
+    <!-- General label for microphone -->
+    <string name="general_mic">Mikrofon</string>
+    <!-- General label for microphone muted -->
+    <string name="general_mic_mute">Twój mikrofon jest wyciszony</string>
+    <!-- General label for microphone unmuted -->
+    <string name="general_mic_unmute">Twój mikrofon jest nie wyciszony</string>
+    <!-- General label for camera -->
+    <string name="general_camera">Aparat</string>
+    <!-- General label for camera enable -->
+    <string name="general_camera_enable">Aparat jest włączony.</string>
+    <!-- General label for camera disable -->
+    <string name="general_camera_disable">Kamera jest wyłączona.</string>
+    <!-- Label for hold meeting -->
+    <string name="meeting_hold">Zawieś</string>
+    <!-- General label for speaker -->
+    <string name="general_speaker">Głośnik</string>
+    <!-- General label for headphone-->
+    <string name="general_headphone">Słuchawki</string>
+    <!-- General label for headphone on-->
+    <string name="general_headphone_on">Słuchawki są aktywne</string>
+    <!-- General label for speaker on-->
+    <string name="general_speaker_on">Głośnik jest włączony</string>
+    <!-- General label for speaker off-->
+    <string name="general_speaker_off">Głośnik jest wyłączony</string>
+    <!-- Label for end meeting-->
+    <string name="meeting_end">Zakończ</string>
+    <!-- Invite contacts as participants of the meeting-->
+    <string name="invite_participants">Zaproś uczestników</string>
+    <!-- The number of participants in the meeting-->
+    <string name="participants_number">Uczestnicy (%d)</string>
+    <!-- Pin the participant to speaker view in the meeting-->
+    <string name="pin_to_speaker">Wyświetl w widoku głównym</string>
+    <!-- Make the participant as moderator in the meeting-->
+    <string name="make_moderator">Zrób moderatora</string>
+    <!-- The title of dialog for end meeting confirmation-->
+    <string name="title_end_meeting">Opuścić spotkanie teraz?</string>
+    <!-- no moderator when the moderator leave meeting-->
+    <string name="no_moderator">Brak moderatora</string>
+    <!-- assign moderator message when the moderator leave meeting-->
+    <string name="assign_moderator_message">Przed wyjazdem proszę wyznaczyć jednego lub więcej nowych moderatorów spotkania</string>
+    <!-- assign moderator option when the moderator leave meeting-->
+    <string name="assign_moderator">Zrób moderatora</string>
+    <!-- leave anyway option when the moderator leave meeting-->
+    <string name="leave_anyway">Opuść</string>
+    <!-- The message alert user to pick new moderator on assign moderator page-->
+    <string name="pick_new_moderator_message">Proszę o przydzielenie jednego lub więcej nowych moderatorów.</string>
+    <!-- The title of dialog for changing meeting name-->
+    <string name="change_meeting_name">Zmień nazwę spotkania</string>
+    <!-- The number of participants in the meeting on meeting info page-->
+    <string name="info_participants_number">Uczestnicy: %d</string>
+    <!-- The name of moderators in the meeting on meeting info page-->
+    <string name="info_moderator_name">Moderator: %s</string>
+    <!-- The literal meeting link text-->
+    <string name="meeting_link">Link do spotkania</string>
+    <!-- Subtitle of the meeting screen-->
+    <string name="duration_meeting">Czas trwania</string>
+    <!-- The question in on-boarding screen asking if the user is going to join meeting as guest-->
+    <string name="join_meeting_as_guest">Dołącz do spotkania jako gość</string>
+    <!-- The title of the paste meeting link dialog for guest-->
+    <string name="paste_meeting_link_guest_dialog_title">Zostałeś zaproszony na spotkanie.</string>
+    <!-- Tell the guest to paste the meeting link in the edit box-->
+    <string name="paste_meeting_link_guest_instruction">Naciśnij na przesłany link do spotkania lub wklej go tutaj</string>
+    <!-- Banner text to indicate poor network quality-->
+    <string name="slow_connection_meeting">Niska jakość połączenia</string>
+    <!-- the message in the alert dialog for notifying the meeting has ended-->
+    <string name="meeting_has_ended">Spotkanie zakończone</string>
+    <!-- error message shown when a meeting link is not well formed-->
+    <string name="invalid_meeting_link_args">Nieprawidłowy link do spotkania</string>
+    <!-- Warning show to the user when the app needs permissions to start a meeting.-->
+    <string name="meeting_permission_info">Uprawnienia dostępu wymagane dla MEGA</string>
+    <!-- Message of a dialog to show user the permissions that needed-->
+    <string name="meeting_permission_info_message">MEGA potrzebuje dostępu do Twojego mikrofonu i kamery podczas spotkań.</string>
+    <!-- Button to confirm the action of restarting one transfer-->
+    <string name="button_permission_info">Rozumiem</string>
+    <!-- Warning show to the user when the app needs permissions to get the best meeting experience and the user has denied them.-->
+    <string name="meeting_required_permissions_warning">Przejdź do Ustawień, aby umożliwić MEGA dostęp do kamery i mikrofonu.</string>
+    <!-- The button text in the meeting ended alert dialog. Click the button to open the group chat screen of the meeting-->
+    <string name="view_meeting_chat">Wyświetl czat spotkania</string>
+    <!-- the content of tips when the user uses the meeting first time-->
+    <string name="tip_invite_more_participants">Zaproś więcej uczestników na spotkanie. Przesuń palcem w górę, aby zaprosić.</string>
+    <!-- the content of tips when the user enters recent chat page first time-->
+    <string name="tip_create_meeting">Kliknij, aby utworzyć nowe spotkanie</string>
+    <!-- the content of tips when the user enters start conversation page first time-->
+    <string name="tip_setup_meeting">Szybko zorganizuj MEGA spotkanie dzięki naszej nowej funkcji szyfrowanych spotkań</string>
+    <!-- the content of snack bar when the user be the new moderator-->
+    <string name="be_new_moderator">Jesteś nowym moderatorem.</string>
+    <!-- the content of snack bar when copied meeting link-->
+    <string name="copied_meeting_link">Skopiowany link do spotkania.</string>
+    <!-- Title of the layout to join a meeting from the chat screen. The placeholder indicates the user who initiated the meeting -->
+    <string name="join_meeting_layout_in_group_call">%s rozpoczął spotkanie. Kliknij , aby dołączyć.</string>
+    <!-- Title of fifth tour screen -->
+    <string name="title_tour_five">MEGA Meeting</string>
+    <!-- Content of fourth tour screen -->
+    <string name="content_tour_five">Spotkanie wideo szyfrowane od końca do końca</string>
+    <!-- Error shown when it tries to open an invalid meeting link and the text view is empty -->
+    <string name="invalid_meeting_link_empty">Proszę wpisać prawidłowy link spotkania</string>
+    <!-- Guest leave call-->
+    <string name="more_than_meeting">Więcej niż tylko spotkania</string>
+    <!-- the title of join without account on left meeting page-->
+    <string name="left_meeting_join_title">Twoja prywatność ma znaczenie</string>
+    <!-- the content of join without account on left meeting page-->
+    <string name="left_meeting_join_content">Dołącz do największej na świecie platformy bezpiecznego przechowywania danych i współpracy w chmurze.</string>
+    <!-- the bonus title of join without account on left meeting page-->
+    <string name="left_meeting_bonus_title">Uzyskaj 20 GB za darmo</string>
+    <!-- the bonus content of join without account on left meeting page-->
+    <string name="left_meeting_bonus_content">Zarejestruj się teraz i korzystaj z zaawansowanych funkcji współpracy za darmo.</string>
+    <!-- Content of ongoing call for MaterialAlertDialog-->
+    <string name="ongoing_call_content">Trwa inne połączenie. Proszę zakończyć bieżące połączenie przed nawiązaniem kolejnego.</string>
+    <!-- The hint text when changing meeting name-->
+    <string name="new_meeting_name">Nowa nazwa spotkania</string>
+    <!-- The content of dialog when failed for creating meeting-->
+    <string name="meeting_is_failed_content">Nie udało się utworzyć spotkania.</string>
+    <!-- Word next to own user’s name on participant list -->
+    <string name="meeting_me_text_bracket">%1s [A](ja)[/A]</string>
+    <!-- Menu item to change from thumbnail view to main view in meeting-->
+    <string name="main_view">Widok główny</string>
+    <!-- Warning in Offline section alerting all the Offline files will be deleted after logout. -->
+    <string name="offline_warning">Wylogowanie powoduje usunięcie zawartości offline.</string>
 </resources>

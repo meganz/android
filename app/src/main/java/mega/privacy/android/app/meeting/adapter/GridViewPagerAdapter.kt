@@ -1,5 +1,6 @@
 package mega.privacy.android.app.meeting.adapter
 
+import android.annotation.SuppressLint
 import android.content.res.Configuration
 import android.view.LayoutInflater
 import android.view.View
@@ -12,6 +13,7 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.components.CustomizedGridCallRecyclerView
 import mega.privacy.android.app.meeting.fragments.InMeetingViewModel
 import mega.privacy.android.app.utils.LogUtil.logDebug
+import mega.privacy.android.app.utils.Util.getCurrentOrientation
 
 class GridViewPagerAdapter(
     var data: List<List<Participant>>,
@@ -22,8 +24,6 @@ class GridViewPagerAdapter(
 ) : RecyclerView.Adapter<GridViewPagerAdapter.ViewHolder>() {
 
     class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView)
-
-    private var orientation = Configuration.ORIENTATION_PORTRAIT
 
     private val adapterList = mutableListOf<VideoGridViewAdapter?>()
 
@@ -57,7 +57,7 @@ class GridViewPagerAdapter(
                     }
                     setHasFixedSize(true)
                     setParamsForGridView(position, participantsForPage, this)
-                    setColumnWidth(position, this, participantsForPage.size, orientation)
+                    setColumnWidth(position, this, participantsForPage.size)
                 }
             }
 
@@ -67,7 +67,6 @@ class GridViewPagerAdapter(
                 maxWidth,
                 maxHeight,
                 position,
-                orientation,
                 onPageClickedCallback
             )
 
@@ -92,6 +91,7 @@ class GridViewPagerAdapter(
      *
      * @param newData Updated list of participants on each page
      */
+    @SuppressLint("NotifyDataSetChanged")
     fun setNewData(newData: List<List<Participant>>) {
         if (data.isNotEmpty()) {
             data = newData
@@ -119,6 +119,7 @@ class GridViewPagerAdapter(
      * @param currentList the current list of participants
      * @param position the position that has changed
      */
+    @SuppressLint("NotifyDataSetChanged")
     fun participantAdded(
         previousList: List<List<Participant>>,
         currentList: List<List<Participant>>,
@@ -147,20 +148,33 @@ class GridViewPagerAdapter(
                             when {
                                 it.currentList.size <= 3 -> {
                                     logDebug("Update only the adapter in the pager")
-                                    it.notifyDataSetChanged()
+                                    if (isLandscape()) {
+                                        notifyItemChanged(pageWithChange)
+                                    } else {
+                                        it.notifyDataSetChanged()
+                                    }
                                 }
                                 it.currentList.size == 4 -> {
-                                    logDebug("Update the current page, as the number of columns must be updated.")
+                                    logDebug("Update the current page, as the number of columns must be updated")
                                     notifyItemChanged(pageWithChange)
                                 }
                                 it.currentList.size == 5 -> {
                                     logDebug("Update position only")
-                                    it.notifyItemInserted(position)
+                                    if (isLandscape()) {
+                                        notifyItemChanged(pageWithChange)
+                                    } else {
+                                        it.notifyItemInserted(position)
+                                    }
                                 }
                                 else -> {
                                     logDebug("update the position and the previous position")
                                     it.notifyItemInserted(position)
-                                    it.notifyItemRangeChanged(position - 1, it.currentList.size)
+                                    if (isLandscape()) {
+                                        it.notifyItemRangeChanged(position - 2, it.currentList.size)
+                                    } else {
+                                        it.notifyItemRangeChanged(position - 1, it.currentList.size)
+                                    }
+
                                 }
                             }
                         }
@@ -223,6 +237,7 @@ class GridViewPagerAdapter(
      * @param numPage num of the page with the change
      * @param lastPage the last page
      */
+    @SuppressLint("NotifyDataSetChanged")
     private fun checkPagesToUpdate(position: Int, numPage: Int, lastPage: Int) {
         logDebug("Checking the rest of the pages to be updated ... ")
         for (i in numPage until lastPage + 1) {
@@ -249,6 +264,7 @@ class GridViewPagerAdapter(
      * @param pageWithChange num of the Page
      * @param position position of participant removed
      */
+    @SuppressLint("NotifyDataSetChanged")
     private fun updatePageWithChange(pageWithChange: Int, position: Int) {
         val participantsForPage = data[pageWithChange]
         adapterList[pageWithChange]?.let {
@@ -258,10 +274,17 @@ class GridViewPagerAdapter(
                         when {
                             it.currentList.size <= 2 -> {
                                 logDebug("Update only the adapter in the pager")
-                                it.notifyDataSetChanged()
+                                if (isLandscape()) {
+                                    notifyItemChanged(pageWithChange)
+                                } else {
+                                    it.notifyDataSetChanged()
+                                }
                             }
                             it.currentList.size == 3 -> {
                                 logDebug("Update the current page, as the number of columns must be updated.")
+                                notifyItemChanged(pageWithChange)
+                            }
+                            it.currentList.size == 4 && isLandscape() -> {
                                 notifyItemChanged(pageWithChange)
                             }
                             else -> {
@@ -273,9 +296,19 @@ class GridViewPagerAdapter(
                                     else -> {
                                         logDebug("First page, update position only")
                                         var rangeToUpdate = position
-                                        if (participantsForPage.size <= 5 && position == 5) {
-                                            rangeToUpdate = position - 1
+
+                                        if (participantsForPage.size <= 5) {
+                                            if (position == 5) {
+                                                rangeToUpdate = if (isLandscape()) {
+                                                    position - 2
+                                                } else {
+                                                    position - 1
+                                                }
+                                            } else if (position == 4 && isLandscape()) {
+                                                rangeToUpdate = position - 1
+                                            }
                                         }
+
                                         it.notifyItemRemoved(position)
                                         it.notifyItemRangeRemoved(
                                             rangeToUpdate,
@@ -330,15 +363,20 @@ class GridViewPagerAdapter(
         notifyItemChanged(currentPage)
     }
 
-
     /**
      * Update participant name
      *
-     * @param participant
+     * @param participant the target participant
      * @param currentPage the current page number
      * @param pager the ViewPager2
+     * @param typeChange the type of change, name or avatar
      */
-    fun updateParticipantName(participant: Participant, currentPage: Int, pager: ViewPager2) {
+    fun updateParticipantNameOrAvatar(
+        participant: Participant,
+        currentPage: Int,
+        pager: ViewPager2,
+        typeChange: Int
+    ) {
         val holder = getHolder(currentPage, pager)
         holder?.let {
             adapterList.let {
@@ -346,9 +384,35 @@ class GridViewPagerAdapter(
                     return
 
                 for (i in 0 until adapterList.size) {
-                    adapterList[i]?.updateParticipantName(participant)
+                    adapterList[i]?.updateParticipantNameOrAvatar(participant, typeChange)
                 }
 
+            }
+            return
+        }
+
+        notifyItemChanged(currentPage)
+    }
+
+    /**
+     * Method to control when the video listener should be added or removed.
+     *
+     * @param participant The participant whose listener of the video is to be added or deleted
+     * @param shouldAddListener True, should add the listener. False, should remove the listener
+     * @param isHiRes True, if is High resolution. False, if is Low resolution
+     * @param currentPage the current page number
+     * @param pager the ViewPager2
+     */
+    fun updateListener(
+        participant: Participant, shouldAddListener: Boolean, isHiRes: Boolean, currentPage: Int,
+        pager: ViewPager2
+    ) {
+        val holder = getHolder(currentPage, pager)
+        holder?.let {
+            adapterList.let {
+                for (i in 0 until adapterList.size) {
+                    adapterList[i]?.updateListener(participant, shouldAddListener, isHiRes)
+                }
             }
             return
         }
@@ -497,7 +561,6 @@ class GridViewPagerAdapter(
                 for (i in 0 until adapterList.size) {
                     adapterList[i]?.removeTextureView(participant)
                 }
-
             }
             return
         }
@@ -518,9 +581,9 @@ class GridViewPagerAdapter(
         val layoutParams = recyclerView.layoutParams as RecyclerView.LayoutParams
         var leftRightMargin = 0
 
-        if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
+        if (isLandscape()) {
             if (position == 0 && data.size < 4)
-                return
+                leftRightMargin = 0
 
             if (position > 0 || (position == 0 && data.size > 4))
                 leftRightMargin = maxWidth / 8
@@ -538,15 +601,13 @@ class GridViewPagerAdapter(
      * @param position Position of the participant
      * @param gridView The Recycler view
      * @param size Number of participants on a given page
-     * @param orientation The orientation of the device
      */
     private fun setColumnWidth(
         position: Int,
         gridView: CustomizedGridCallRecyclerView,
         size: Int,
-        orientation: Int
     ) {
-        if (orientation == Configuration.ORIENTATION_PORTRAIT) {
+        if (getCurrentOrientation() == Configuration.ORIENTATION_PORTRAIT) {
             if (position == 0) {
                 gridView.setColumnWidth(
                     when (size) {
@@ -577,16 +638,21 @@ class GridViewPagerAdapter(
     /**
      * Change the layout when the orientation is changing
      *
-     * @param newOrientation the new orientation
      * @param widthPixels the new width
      * @param heightPixels the new height
      */
-    fun updateOrientation(newOrientation: Int, widthPixels: Int, heightPixels: Int) {
-        orientation = newOrientation
+    @SuppressLint("NotifyDataSetChanged")
+    fun updateOrientation(widthPixels: Int, heightPixels: Int) {
         maxWidth = widthPixels
         maxHeight = heightPixels
         notifyDataSetChanged()
     }
+
+    /**
+     * Determine if current orientation is landscape
+     */
+    fun isLandscape() =
+        getCurrentOrientation() == Configuration.ORIENTATION_LANDSCAPE
 
     companion object {
         private const val PARTICIPANTS_PER_PAGE = 6

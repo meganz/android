@@ -1,79 +1,79 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-  <!-- Label to show that an SDK operation has been complete successfully. -->
-  <string name="api_ok">Brak błędów</string>
-  <!-- Label to show that an Internal error occurs during a SDK operation. -->
-  <string name="api_einternal">Błąd wewnętrztny</string>
-  <!-- Label to show that an error of Invalid argument occurs during a SDK operation. -->
-  <string name="api_eargs">Nieprawidłowy argument</string>
-  <!-- Label to show that a request error occurs during a SDK operation. -->
-  <string name="api_eagain">Żądanie nie powiodło się, ponowić próbę?</string>
-  <!-- Label to show that the rate limit has been reached during a SDK operation. -->
-  <string name="api_eratelimit">Limit został przekroczony</string>
-  <!-- Label to show that a SDK operation has failed permanently. -->
-  <string name="api_efailed">Nie powiodło się</string>
-  <!-- Error shown when terms of service are breached during download. -->
-  <string name="api_etoomany_ec_download">Naruszono warunki korzystania z usługi</string>
-  <!-- Label to show that an error for multiple concurrent connections or transfers occurs during a SDK operation. -->
-  <string name="api_etoomay">Za dużo równoległych połączeń</string>
-  <!-- Label to show that an error of Out of range occurs during a SDK operation. -->
-  <string name="api_erange">Poza zasięgiem</string>
-  <!-- State to indicate something has expired (achivements of business status account for instance) -->
-  <string name="api_eexpired">Wygasło</string>
-  <!-- Label to show that an error related with a resource Not found occurs during a SDK operation. -->
-  <string name="api_enoent">Nie znaleziono</string>
-  <!-- Label to show that an error related with a circular linkage occurs during a SDK operation. -->
-  <string name="api_ecircular">Wykryto linki rekurencyjne</string>
-  <!-- Label to show that an error related with an denied access occurs during a SDK operation. -->
-  <string name="api_eaccess">Dostęp zabroniony</string>
-  <!-- Label to show that an error related with an existent resource occurs during a SDK operation. -->
-  <string name="api_eexist">Już istnieje</string>
-  <!-- Label to show that an error related with an Incomplete SDK operation. -->
-  <string name="api_eincomplete">Nie zakończone</string>
-  <!-- Label to show that an error related with the decryption process of a node occurs during a SDK operation. -->
-  <string name="api_ekey">Błędny klucz/Błąd deszyfrowania</string>
-  <!-- Label to show that an error related with a bad session ID occurs during a SDK operation. -->
-  <string name="api_esid">Zły numer sesji</string>
-  <!-- Error shown when download a file that has violated ToS/AUP. -->
-  <string name="api_eblocked_ec_import_ec_download">Niedostępny z powodu naruszenia ToS / AUP</string>
-  <!-- Label to show that an error related with a blocked account occurs during a SDK operation. -->
-  <string name="api_eblocked">Zablokowane</string>
-  <!-- Label to show that an error related with an over quota occurs during a SDK operation. -->
-  <string name="api_eoverquota">Przekroczono limit</string>
-  <!-- Label to show that an error related with a temporary problem occurs during a SDK operation. -->
-  <string name="api_etempunavail">Chwilowo niedostępne</string>
-  <!-- Label to show that an error related with too many connections occurs during a SDK operation. -->
-  <string name="api_etoomanyconnections">Przepełnienie połączeń</string>
-  <!-- Label to show that an error related with an write error occurs during a SDK operation. -->
-  <string name="api_ewrite">Błąd zapisu</string>
-  <!-- Label to show that an error related with an read error occurs during a SDK operation. -->
-  <string name="api_eread">Błąd odczytu</string>
-  <!-- Label to show that an error related with an invalid or missing application key occurs during a SDK operation. -->
-  <string name="api_eappkey">Błędny klucz aplikacji</string>
-  <!-- Error shown when SSL check has failed -->
-  <string name="api_essl">Niepowodzenie weryfikacji SSL</string>
-  <!-- Label shown when current account does not have enough quota to complete the operation -->
-  <string name="api_egoingoverquota">Za mało miejsca</string>
-  <!-- Label to show that an error of Multi-factor authentication required occurs during a SDK operation. -->
-  <string name="api_emfarequired">Wymagane jest uwierzytelnianie dwuskładnikowe.</string>
-  <!-- Label to show that an error of Access denied for users occurs during a SDK operation. -->
-  <string name="api_emasteronly">Odmowa dostępu dla użytkowników niebędących administratorami</string>
-  <!-- A dialog title shown to users when their business account is expired. -->
-  <string name="api_ebusinesspastdue">Konto biznesowe wygasło</string>
-  <!-- Label to show that an error of Credit card rejected occurs during a SDK operation. -->
-  <string name="payment_ecard">Karta kredytowa odrzucona</string>
-  <!-- Label to show that an error of Billing failed occurs during a SDK operation. -->
-  <string name="payment_ebilling">Fakturowanie nie powiodło się</string>
-  <!-- Label to show that an error of Rejected by fraud protection occurs during a SDK operation. -->
-  <string name="payment_efraud">Odrzucony przez ochronę przed oszustwami</string>
-  <!-- Message shown when the SDK is waiting for the server to complete a request due to a rate limit (API error -4) - (String as short as possible). -->
-  <string name="payment_etoomay">Zbyt dużo zgłoszeń</string>
-  <!-- Label to show that an error of Balance occurs during a SDK operation. -->
-  <string name="payment_ebalance">Błąd rozliczenia</string>
-  <!-- Label to show that an error related with an unknown error occurs during a SDK operation. -->
-  <string name="payment_egeneric_api_error_unknown">Nieznany błąd</string>
-  <!-- Label to show that an error related with an HTTP error occurs during a SDK operation. -->
-  <string name="api_error_http">HTTP Error</string>
-  <!-- Label to show that an error related with a circular upload procedures occurs recursivity during a SDK operation -->
-  <string name="api_ecircular_ec_upload">Transfer nie powiódł się z powodu rekursywnej struktury katalogów</string>
+    <!-- Label to show that an SDK operation has been complete successfully. -->
+    <string name="api_ok">Brak błędów</string>
+    <!-- Label to show that an Internal error occurs during a SDK operation. -->
+    <string name="api_einternal">Błąd wewnętrztny</string>
+    <!-- Label to show that an error of Invalid argument occurs during a SDK operation. -->
+    <string name="api_eargs">Nieprawidłowy argument</string>
+    <!-- Label to show that a request error occurs during a SDK operation. -->
+    <string name="api_eagain">Żądanie nie powiodło się, ponowić próbę?</string>
+    <!-- Label to show that the rate limit has been reached during a SDK operation. -->
+    <string name="api_eratelimit">Limit został przekroczony</string>
+    <!-- Label to show that a SDK operation has failed permanently. -->
+    <string name="api_efailed">Nie powiodło się</string>
+    <!-- Error shown when terms of service are breached during download. -->
+    <string name="api_etoomany_ec_download">Naruszono warunki korzystania z usługi</string>
+    <!-- Label to show that an error for multiple concurrent connections or transfers occurs during a SDK operation. -->
+    <string name="api_etoomay">Za dużo równoległych połączeń</string>
+    <!-- Label to show that an error of Out of range occurs during a SDK operation. -->
+    <string name="api_erange">Poza zasięgiem</string>
+    <!-- State to indicate something has expired (achivements of business status account for instance) -->
+    <string name="api_eexpired">Wygasło</string>
+    <!-- Label to show that an error related with a resource Not found occurs during a SDK operation. -->
+    <string name="api_enoent">Nie znaleziono</string>
+    <!-- Label to show that an error related with a circular linkage occurs during a SDK operation. -->
+    <string name="api_ecircular">Wykryto linki rekurencyjne</string>
+    <!-- Label to show that an error related with an denied access occurs during a SDK operation. -->
+    <string name="api_eaccess">Dostęp zabroniony</string>
+    <!-- Label to show that an error related with an existent resource occurs during a SDK operation. -->
+    <string name="api_eexist">Już istnieje</string>
+    <!-- Label to show that an error related with an Incomplete SDK operation. -->
+    <string name="api_eincomplete">Nie zakończone</string>
+    <!-- Label to show that an error related with the decryption process of a node occurs during a SDK operation. -->
+    <string name="api_ekey">Błędny klucz/Błąd deszyfrowania</string>
+    <!-- Label to show that an error related with a bad session ID occurs during a SDK operation. -->
+    <string name="api_esid">Zły numer sesji</string>
+    <!-- Error shown when download a file that has violated ToS/AUP. -->
+    <string name="api_eblocked_ec_import_ec_download">Niedostępny z powodu naruszenia ToS / AUP</string>
+    <!-- Label to show that an error related with a blocked account occurs during a SDK operation. -->
+    <string name="api_eblocked">Zablokowane</string>
+    <!-- Label to show that an error related with an over quota occurs during a SDK operation. -->
+    <string name="api_eoverquota">Przekroczono limit</string>
+    <!-- Label to show that an error related with a temporary problem occurs during a SDK operation. -->
+    <string name="api_etempunavail">Chwilowo niedostępne</string>
+    <!-- Label to show that an error related with too many connections occurs during a SDK operation. -->
+    <string name="api_etoomanyconnections">Przepełnienie połączeń</string>
+    <!-- Label to show that an error related with an write error occurs during a SDK operation. -->
+    <string name="api_ewrite">Błąd zapisu</string>
+    <!-- Label to show that an error related with an read error occurs during a SDK operation. -->
+    <string name="api_eread">Błąd odczytu</string>
+    <!-- Label to show that an error related with an invalid or missing application key occurs during a SDK operation. -->
+    <string name="api_eappkey">Błędny klucz aplikacji</string>
+    <!-- Error shown when SSL check has failed -->
+    <string name="api_essl">Niepowodzenie weryfikacji SSL</string>
+    <!-- Label shown when current account does not have enough quota to complete the operation -->
+    <string name="api_egoingoverquota">Za mało miejsca</string>
+    <!-- Label to show that an error of Multi-factor authentication required occurs during a SDK operation. -->
+    <string name="api_emfarequired">Wymagane jest uwierzytelnianie dwuskładnikowe.</string>
+    <!-- Label to show that an error of Access denied for users occurs during a SDK operation. -->
+    <string name="api_emasteronly">Odmowa dostępu dla użytkowników niebędących administratorami</string>
+    <!-- A dialog title shown to users when their business account is expired. -->
+    <string name="api_ebusinesspastdue">Konto biznesowe wygasło</string>
+    <!-- Label to show that an error of Credit card rejected occurs during a SDK operation. -->
+    <string name="payment_ecard">Karta kredytowa odrzucona</string>
+    <!-- Label to show that an error of Billing failed occurs during a SDK operation. -->
+    <string name="payment_ebilling">Fakturowanie nie powiodło się</string>
+    <!-- Label to show that an error of Rejected by fraud protection occurs during a SDK operation. -->
+    <string name="payment_efraud">Odrzucony przez ochronę przed oszustwami</string>
+    <!-- Message shown when the SDK is waiting for the server to complete a request due to a rate limit (API error -4) - (String as short as possible). -->
+    <string name="payment_etoomay">Zbyt dużo zgłoszeń</string>
+    <!-- Label to show that an error of Balance occurs during a SDK operation. -->
+    <string name="payment_ebalance">Błąd rozliczenia</string>
+    <!-- Label to show that an error related with an unknown error occurs during a SDK operation. -->
+    <string name="payment_egeneric_api_error_unknown">Nieznany błąd</string>
+    <!-- Label to show that an error related with an HTTP error occurs during a SDK operation. -->
+    <string name="api_error_http">HTTP Error</string>
+    <!-- Label to show that a transfer error happened during a SDK operation (sync a recursive folders structure). Only can happen if user syncs a folder with recursive links (link to the parent folder). -->
+    <string name="api_ecircular_ec_upload">Transfer nie powiódł się z powodu rekursywnej struktury katalogów</string>
 </resources>

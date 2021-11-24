@@ -5,32 +5,24 @@ import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import mega.privacy.android.app.R
 import mega.privacy.android.app.databinding.ItemMeetingParticipantBinding
-import mega.privacy.android.app.meeting.fragments.InMeetingViewModel
 
 /**
  * When use DataBinding here, when user fling the RecyclerView, the bottom sheet will have
  * extra top offset. Not use DataBinding could avoid this bug.
  */
 class ParticipantViewHolder(
-    private val inMeetingViewModel: InMeetingViewModel,
     private val binding: ItemMeetingParticipantBinding,
     private val onParticipantOption: (Int) -> Unit
 ) : RecyclerView.ViewHolder(binding.root) {
 
     init {
         binding.threeDots.setOnClickListener {
-            onParticipantOption(adapterPosition)
+            onParticipantOption(bindingAdapterPosition)
         }
     }
 
     fun bind(participant: Participant) {
-
-        if (participant.avatar == null) {
-            initAvatar(participant)
-        } else {
-            binding.avatar.setImageBitmap(participant.avatar)
-        }
-
+        binding.avatar.setImageBitmap(participant.avatar)
         binding.name.text = participant.name
 
         if (participant.isModerator) {
@@ -70,9 +62,5 @@ class ParticipantViewHolder(
             binding.videoStatus.setImageResource(R.drawable.ic_video_off_grey_red)
             binding.videoStatus.colorFilter = null
         }
-    }
-
-    private fun initAvatar(participant: Participant) {
-        binding.avatar.setImageBitmap(inMeetingViewModel.getAvatarBitmapByPeerId(participant.peerId))
     }
 }

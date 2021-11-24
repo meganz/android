@@ -14,6 +14,7 @@ import mega.privacy.android.app.constants.EventConstants.EVENT_AUDIO_OUTPUT_CHAN
 import mega.privacy.android.app.constants.EventConstants.EVENT_CHAT_TITLE_CHANGE
 import mega.privacy.android.app.constants.EventConstants.EVENT_LINK_RECOVERED
 import mega.privacy.android.app.constants.EventConstants.EVENT_MEETING_CREATED
+import mega.privacy.android.app.constants.EventConstants.EVENT_MEETING_INVITE
 import mega.privacy.android.app.constants.EventConstants.EVENT_NETWORK_CHANGE
 import mega.privacy.android.app.listeners.BaseListener
 import mega.privacy.android.app.listeners.InviteToChatRoomListener
@@ -21,12 +22,13 @@ import mega.privacy.android.app.lollipop.AddContactActivityLollipop
 import mega.privacy.android.app.lollipop.listeners.CreateGroupChatWithPublicLink
 import mega.privacy.android.app.lollipop.megachat.AppRTCAudioManager
 import mega.privacy.android.app.meeting.listeners.DisableAudioVideoCallListener
-import mega.privacy.android.app.meeting.listeners.MeetingVideoListener
+import mega.privacy.android.app.meeting.listeners.IndividualCallVideoListener
 import mega.privacy.android.app.meeting.listeners.OpenVideoDeviceListener
 import mega.privacy.android.app.utils.CallUtil
-import mega.privacy.android.app.utils.ChatUtil
-import mega.privacy.android.app.utils.ChatUtil.*
-import mega.privacy.android.app.utils.Constants.*
+import mega.privacy.android.app.utils.ChatUtil.amIParticipatingInAChat
+import mega.privacy.android.app.utils.ChatUtil.getTitleChat
+import mega.privacy.android.app.utils.Constants.AUDIO_MANAGER_CREATING_JOINING_MEETING
+import mega.privacy.android.app.utils.Constants.REQUEST_ADD_PARTICIPANTS
 import mega.privacy.android.app.utils.LogUtil
 import mega.privacy.android.app.utils.LogUtil.logDebug
 import mega.privacy.android.app.utils.LogUtil.logError
@@ -58,7 +60,7 @@ class MeetingActivityViewModel @ViewModelInject constructor(
     private val _speakerLiveData: MutableLiveData<AppRTCAudioManager.AudioDevice> =
         MutableLiveData<AppRTCAudioManager.AudioDevice>().apply {
             value = if (MegaApplication.getInstance().audioManager == null) {
-                AppRTCAudioManager.AudioDevice.SPEAKER_PHONE
+                AppRTCAudioManager.AudioDevice.NONE
             } else {
                 MegaApplication.getInstance().audioManager!!.selectedAudioDevice
             }
@@ -107,7 +109,9 @@ class MeetingActivityViewModel @ViewModelInject constructor(
 
     private val audioOutputStateObserver =
         Observer<AppRTCAudioManager.AudioDevice> {
-            if (_speakerLiveData.value != it) {
+            if (_speakerLiveData.value != it && it != AppRTCAudioManager.AudioDevice.NONE) {
+                logDebug("Updating speaker $it")
+
                 _speakerLiveData.value = it
                 tips.value = when (it) {
                     AppRTCAudioManager.AudioDevice.EARPIECE -> getString(R.string.general_speaker_off)
@@ -175,6 +179,14 @@ class MeetingActivityViewModel @ViewModelInject constructor(
     private fun showDefaultAvatar() = viewModelScope.launch {
         _avatarLiveData.value = meetingActivityRepository.getDefaultAvatar()
     }
+
+    /**
+     * Method to get a specific chat
+     *
+     * @param chatId Chat ID
+     * @return MegaChatRoom
+     */
+    fun getSpecificChat(chatId: Long): MegaChatRoom? = meetingActivityRepository.getChatRoom(chatId)
 
     /**
      * Generate and show the round avatar based on the actual avatar stored in the cache folder.
@@ -306,14 +318,10 @@ class MeetingActivityViewModel @ViewModelInject constructor(
             //The chat is not yet created or the call is not yet established
             _micLiveData.value = shouldAudioBeEnabled
             logDebug("open Mic: $shouldAudioBeEnabled")
-            tips.value = when (shouldAudioBeEnabled) {
-                true -> getString(
-                    R.string.general_mic_unmute
-                )
-                false -> getString(
-                    R.string.general_mic_mute,
-                    "mute"
-                )
+            tips.value = if (shouldAudioBeEnabled) {
+                getString(R.string.general_mic_unmute)
+            } else{
+                getString(R.string.general_mic_mute)
             }
         }
     }
@@ -372,9 +380,11 @@ class MeetingActivityViewModel @ViewModelInject constructor(
     fun clickSpeaker() {
         when (_speakerLiveData.value) {
             AppRTCAudioManager.AudioDevice.SPEAKER_PHONE -> {
+                logDebug("Trying to switch to EARPIECE")
                 meetingActivityRepository.switchSpeaker(AppRTCAudioManager.AudioDevice.EARPIECE)
             }
             else -> {
+                logDebug("Trying to switch to SPEAKER_PHONE")
                 meetingActivityRepository.switchSpeaker(AppRTCAudioManager.AudioDevice.SPEAKER_PHONE)
             }
         }
@@ -402,9 +412,9 @@ class MeetingActivityViewModel @ViewModelInject constructor(
      * Method of obtaining the video
      *
      * @param chatId chatId
-     * @param listener MeetingVideoListener
+     * @param listener IndividualCallVideoListener
      */
-    fun addLocalVideo(chatId: Long, listener: MeetingVideoListener?) {
+    fun addLocalVideo(chatId: Long, listener: IndividualCallVideoListener?) {
         if (listener == null)
             return
 
@@ -416,9 +426,9 @@ class MeetingActivityViewModel @ViewModelInject constructor(
      * Method of remove the local video
      *
      * @param chatId chatId
-     * @param listener MeetingVideoListener
+     * @param listener IndividualCallVideoListener
      */
-    fun removeLocalVideo(chatId: Long, listener: MeetingVideoListener?) {
+    fun removeLocalVideo(chatId: Long, listener: IndividualCallVideoListener?) {
         if (listener == null) {
             logError("Listener is null")
             return
@@ -516,6 +526,7 @@ class MeetingActivityViewModel @ViewModelInject constructor(
             val contactsData: List<String>? =
                 intent.getStringArrayListExtra(AddContactActivityLollipop.EXTRA_CONTACTS)
             if (contactsData != null) {
+                LiveEventBus.get(EVENT_MEETING_INVITE, Boolean::class.java).post(true)
                 currentChatId.value?.let {
                     InviteToChatRoomListener(context).inviteToChat(it, contactsData)
                     _snackBarLiveData.value = getString(R.string.invite_sent)

@@ -1,7 +1,6 @@
 package mega.privacy.android.app.lollipop.qrcode;
 
 import android.app.Activity;
-import android.app.ProgressDialog;
 import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
@@ -18,6 +17,7 @@ import android.graphics.RectF;
 import android.os.Bundle;
 import android.os.Handler;
 
+import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
 import androidx.core.content.ContextCompat;
 import androidx.appcompat.app.ActionBar;
@@ -48,6 +48,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 
 import mega.privacy.android.app.DatabaseHandler;
@@ -55,7 +56,9 @@ import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.UserCredentials;
 import mega.privacy.android.app.components.ListenScrollChangesHelper;
+import mega.privacy.android.app.utils.MegaProgressDialogUtil;
 import mega.privacy.android.app.utils.ColorUtils;
+import mega.privacy.android.app.utils.StringResourcesUtils;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaError;
@@ -105,7 +108,7 @@ public class MyCodeFragment extends Fragment implements View.OnClickListener{
     private Bitmap qrCodeBitmap;
     private File qrFile = null;
 
-    public static ProgressDialog processingDialog;
+    public static AlertDialog processingDialog;
 
     private boolean copyLink = true;
     private boolean createQR = false;
@@ -191,7 +194,9 @@ public class MyCodeFragment extends Fragment implements View.OnClickListener{
         }
 
         if(aB!=null){
-            aB.setTitle(getString(R.string.section_qr_code));
+            aB.setTitle(StringResourcesUtils.getString(R.string.section_qr_code)
+                    .toUpperCase(Locale.getDefault()));
+
             aB.setHomeButtonEnabled(true);
             aB.setDisplayHomeAsUpEnabled(true);
         }
@@ -446,13 +451,13 @@ public class MyCodeFragment extends Fragment implements View.OnClickListener{
         }
         else {
             megaApi.contactLinkCreate(false, (QRCodeActivity) context);
-            ProgressDialog temp = null;
+            AlertDialog temp = null;
             try{
-                temp = new ProgressDialog(context);
-                temp.setMessage(getString(R.string.generatin_qr));
+                temp = MegaProgressDialogUtil.createProgressDialog(context, getString(R.string.generatin_qr));
                 temp.show();
             }
             catch(Exception e){
+                logError(e.getMessage());
             }
             processingDialog = temp;
         }

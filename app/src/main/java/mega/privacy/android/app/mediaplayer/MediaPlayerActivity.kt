@@ -6,13 +6,13 @@ import android.content.Intent
 import android.content.ServiceConnection
 import android.graphics.Color
 import android.graphics.PixelFormat
+import android.os.Build
 import android.os.Bundle
 import android.os.IBinder
-import android.view.Menu
-import android.view.MenuItem
-import android.view.ViewGroup
-import android.view.WindowManager
+import android.view.*
 import androidx.activity.viewModels
+import androidx.annotation.ColorInt
+import androidx.annotation.ColorRes
 import androidx.appcompat.app.ActionBar
 import androidx.appcompat.widget.SearchView
 import androidx.appcompat.widget.Toolbar
@@ -48,7 +48,7 @@ import mega.privacy.android.app.mediaplayer.service.VideoPlayerService
 import mega.privacy.android.app.mediaplayer.trackinfo.TrackInfoFragment
 import mega.privacy.android.app.mediaplayer.trackinfo.TrackInfoFragmentArgs
 import mega.privacy.android.app.utils.*
-import mega.privacy.android.app.utils.AlertsAndWarnings.Companion.showSaveToDeviceConfirmDialog
+import mega.privacy.android.app.utils.AlertsAndWarnings.showSaveToDeviceConfirmDialog
 import mega.privacy.android.app.utils.ChatUtil.removeAttachmentMessage
 import mega.privacy.android.app.utils.Constants.*
 import mega.privacy.android.app.utils.FileUtil.shareUri
@@ -69,6 +69,7 @@ import mega.privacy.android.app.utils.RunOnUIThreadUtils.post
 import mega.privacy.android.app.utils.RunOnUIThreadUtils.runDelay
 import nz.mega.sdk.*
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
+import java.util.*
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -217,12 +218,22 @@ abstract class MediaPlayerActivity : PasscodeActivity(), SnackbarShower, Activit
             }
         }
 
+        @Suppress("DEPRECATION")
         if (!isAudioPlayer) {
             window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
             window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS)
-            window.addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN)
 
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+                window?.setDecorFitsSystemWindows(false)
+            } else {
+                window.addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN)
+                window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS)
+            }
+        } else if (!Util.isDarkMode(this)) {
             window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS)
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                window.decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR
+            }
         }
 
         if (CallUtil.participatingInACall()) {
@@ -288,18 +299,7 @@ abstract class MediaPlayerActivity : PasscodeActivity(), SnackbarShower, Activit
 
     private fun setupNavDestListener() {
         navController.addOnDestinationChangedListener { _, dest, args ->
-            if (isAudioPlayer()) {
-                toolbar.elevation = 0F
-
-                val color = ContextCompat.getColor(
-                    this,
-                    if (dest.id == R.id.main_player) R.color.grey_020_grey_800 else R.color.white_dark_grey
-                )
-
-                window.statusBarColor = color
-            } else {
-                window.statusBarColor = Color.BLACK
-            }
+            setupToolbarColors()
 
             when (dest.id) {
                 R.id.main_player -> {
@@ -311,6 +311,7 @@ abstract class MediaPlayerActivity : PasscodeActivity(), SnackbarShower, Activit
                 }
                 R.id.track_info -> {
                     actionBar.title = StringResourcesUtils.getString(R.string.audio_track_info)
+                        .toUpperCase(Locale.getDefault())
 
                     if (args != null) {
                         viewingTrackInfo = TrackInfoFragmentArgs.fromBundle(args)
@@ -346,6 +347,9 @@ abstract class MediaPlayerActivity : PasscodeActivity(), SnackbarShower, Activit
         optionsMenu = menu
 
         menuInflater.inflate(R.menu.media_player, menu)
+
+        menu.findItem(R.id.get_link).title =
+            StringResourcesUtils.getQuantityString(R.plurals.get_links, 1)
 
         searchMenuItem = menu.findItem(R.id.action_search)
 
@@ -549,6 +553,7 @@ abstract class MediaPlayerActivity : PasscodeActivity(), SnackbarShower, Activit
         }
     }
 
+    @Suppress("deprecation") // TODO Migrate to registerForActivityResult()
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         val service = playerService ?: return false
         val launchIntent = service.viewModel.currentIntent ?: return false
@@ -575,6 +580,22 @@ abstract class MediaPlayerActivity : PasscodeActivity(), SnackbarShower, Activit
                         nodeSaver.saveNode(
                             node, highPriority = true, fromMediaViewer = true, needSerialize = true
                         )
+                    }
+                    FILE_LINK_ADAPTER -> {
+                        launchIntent.getStringExtra(EXTRA_SERIALIZE_STRING)?.let { serialize ->
+                            val currentDocument = MegaNode.unserialize(serialize)
+                            if (currentDocument != null) {
+                                logDebug("currentDocument NOT NULL")
+                                nodeSaver.saveNode(
+                                    currentDocument,
+                                    isFolderLink = isFolderLink,
+                                    fromMediaViewer = true,
+                                    needSerialize = true
+                                )
+                            } else {
+                                LogUtil.logWarning("currentDocument is NULL")
+                            }
+                        }
                     }
                     else -> {
                         nodeSaver.saveHandle(
@@ -810,6 +831,7 @@ abstract class MediaPlayerActivity : PasscodeActivity(), SnackbarShower, Activit
         nodeSaver.handleRequestPermissionsResult(requestCode)
     }
 
+    @Suppress("deprecation") // TODO Migrate to registerForActivityResult()
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
 
@@ -831,7 +853,7 @@ abstract class MediaPlayerActivity : PasscodeActivity(), SnackbarShower, Activit
 
             handleSelectFolderToImportResult(resultCode, toHandle, node, this, this)
         } else {
-            viewModel.handleActivityResult(requestCode, resultCode, data, this, this)
+            viewModel.handleActivityResult(this, requestCode, resultCode, data, this, this)
         }
     }
 
@@ -854,10 +876,19 @@ abstract class MediaPlayerActivity : PasscodeActivity(), SnackbarShower, Activit
             toolbar.translationY = -toolbar.measuredHeight.toFloat()
         }
 
-        if (!isAudioPlayer() && hideStatusBar) {
-            window.addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            if (!isAudioPlayer() && hideStatusBar) {
+                window?.setDecorFitsSystemWindows(false)
+            } else {
+                window?.setDecorFitsSystemWindows(true)
+            }
         } else {
-            window.clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN)
+            @Suppress("DEPRECATION")
+            if (!isAudioPlayer() && hideStatusBar) {
+                window.addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN)
+            } else {
+                window.clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN)
+            }
         }
     }
 
@@ -873,32 +904,64 @@ abstract class MediaPlayerActivity : PasscodeActivity(), SnackbarShower, Activit
         }
 
         if (!isAudioPlayer()) {
-            window.clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN)
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+                window?.setDecorFitsSystemWindows(false)
+            } else {
+                @Suppress("DEPRECATION")
+                window.clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN)
+            }
         }
     }
 
-    fun showToolbarElevation(withElevation: Boolean) {
-        // This is the actual color when using Util.changeToolBarElevation, but video player
-        // use different toolbar theme (to force dark theme), which breaks
-        // Util.changeToolBarElevation, so we just use the actual color here.
-        val darkElevationColor = Color.parseColor("#282828")
+    fun setupToolbarColors(showElevation: Boolean = false) {
+        val isDarkMode = Util.isDarkMode(this)
+        val isMainPlayer = navController.currentDestination?.id == R.id.main_player
+        @ColorRes val toolbarBackgroundColor: Int
+        @ColorInt val statusBarColor: Int
+        val toolbarElevation: Float
 
-        if (!isAudioPlayer() || Util.isDarkMode(this)) {
-            toolbar.setBackgroundColor(
-                when {
-                    withElevation -> darkElevationColor
-                    isAudioPlayer() -> Color.TRANSPARENT
-                    else -> ContextCompat.getColor(this, R.color.dark_grey)
-                }
-            )
-
-            post {
-                window.statusBarColor = if (withElevation) darkElevationColor else Color.BLACK
+        when {
+            isAudioPlayer() && isMainPlayer -> {
+                toolbarElevation = 0F
+                toolbarBackgroundColor = android.R.color.transparent
+                statusBarColor = ContextCompat.getColor(this, R.color.grey_020_grey_800)
             }
-        } else {
-            toolbar.elevation =
-                if (withElevation) resources.getDimension(R.dimen.toolbar_elevation) else 0F
+            isDarkMode -> {
+                toolbarElevation = 0F
+                toolbarBackgroundColor = if (showElevation) {
+                    R.color.action_mode_background
+                } else {
+                    R.color.dark_grey
+                }
+                statusBarColor = if (showElevation) {
+                    val elevation = resources.getDimension(R.dimen.toolbar_elevation)
+                    ColorUtils.getColorForElevation(this, elevation)
+                } else {
+                    ContextCompat.getColor(this, android.R.color.transparent)
+                }
+            }
+            else -> {
+                toolbarElevation = if (showElevation) {
+                    resources.getDimension(R.dimen.toolbar_elevation)
+                } else {
+                    0F
+                }
+                toolbarBackgroundColor = if (showElevation) {
+                    R.color.white
+                } else {
+                    android.R.color.transparent
+                }
+                statusBarColor = if (isAudioPlayer()) {
+                    ContextCompat.getColor(this, R.color.white_dark_grey)
+                } else {
+                    ContextCompat.getColor(this, R.color.black)
+                }
+            }
         }
+
+        window.statusBarColor = statusBarColor
+        toolbar.setBackgroundColor(ContextCompat.getColor(this, toolbarBackgroundColor))
+        toolbar.elevation = toolbarElevation
     }
 
     fun setDraggable(draggable: Boolean) {
@@ -927,6 +990,7 @@ abstract class MediaPlayerActivity : PasscodeActivity(), SnackbarShower, Activit
         stopPlayer()
     }
 
+    @Suppress("deprecation") // TODO Migrate to registerForActivityResult()
     override fun launchActivityForResult(intent: Intent, requestCode: Int) {
         startActivityForResult(intent, requestCode)
     }

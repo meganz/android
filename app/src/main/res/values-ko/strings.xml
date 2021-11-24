@@ -1,15 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <!-- Full description text of the app in the Google Play page of the app (character limit 4000) -->
-    <string name="full_description_text">MEGA는 휴대 기기를 위한 전용 앱과 함께, 표준 웹 브라우저를 통해 이용자 제어 암호화 클라우드 저장소와 대화를 제공합니다. 다른 클라우드 저장소 제공자들과 달리, 당신의 데이터는 우리가 아닌 당신의 클라이언트 기기에서만 암호화되고 복호화됩니다.\n\n당신의 스마트폰 또는 태블릿에서 파일을 업로드하고 언제, 어느 기기에서든, 어디서나 당신의 파일을 검색, 저장, 다운로드, 스트림, 보기, 공유, 이름 변경 또는 삭제할 수 있습니다. 당신의 지인들과 폴더를 공유하고 그들이 수정하는 것을 실시간으로 보세요. 암호화 과정은 우리가 당신의 암호에 접근하거나 재설정할 수 없다는 것을 의미하므로 반드시 기억하지 않으면 (복구 키를 백업하지 않았다면) 저장한 파일들에 대한 접근을 잃게 됩니다.\n\n종단간 이용자 임호화 MEGA 영상 통화는 완전한 개인 정보 보호를 가능하게 하며, 2016년부터 브라우저를 통해 이용 가능했습니다. 이는 우리의 모바일 앱으로 확장되어, 여러 기기에서 대화 기록에 접근할 수 있습니다. 이용자들은 MEGA 클라우드 드라이브에서 대화에 파일을 쉽게 추가할 수 있습니다.\n\nMEGA는 넉넉한 50GB 무료 공간을 보너스 도전과제와 함께 모든 가입자에게 제공하며, 더 높은 한도를 가진 유료 요금제를 제공합니다:\n\n\nPro Lite 구독: 매달 4.99 € 또는 매년 49.99 €로 매달 400GB의 저장 공간과 1TB의 전송 할당량을 받을 수 있습니다.\nPro I 구독: 매달 9.99 € 또는 매년 99.99 €로 매달 2TB의 저장 공간과 2TB의 전송 할당량을 받을 수 있습니다.\nPro II 구독: 매달 19.99 € 또는 매년 199.99 €로 매달 8TB의 저장 공간과 8TB의 전송 할당량을 받을 수 있습니다.\nPro III 구독: 매달 29.99 € 또는 매년 299.99 €로 매달 16TB의 저장 공간과 16TB의 전송 할당량을 받을 수 있습니다.\n\n구독은 처음 선택했던 기간과 동일한 기간과 동일한 요금으로 연속적으로 자동 갱신됩니다. 구독을 관리하려면, 휴대 기기에서 Play 스토어 아이콘을 클릭하고, Google ID로 로그인한 후 (아직 하지 않았다면) MEGA 앱을 클릭하세요. 그 곳에서 구독을 관리할 수 있을 것입니다.\n\n앱 권한:\n외부 저장소 쓰기 -&gt; MEGA에서 당신의 기기로 파일을 다운로드하고 당신의 기기에서 MEGA로 파일을 업로드 합니다\n카메라 -&gt; 사진을 찍고 MEGA로 사진을 업로드합니다\n연락처 읽기 -&gt; 당신의 기기에서 연락처를 MEGA 연락처로 쉽게 추가합니다\n오디오 녹음과 비디오 출력 캡처 (마이크와 카메라) -&gt; MEGA가 종단간 암호화 음성/영상 통화를 제공하는데에 필요합니다\n\n\nMEGA 시스템에 대한 이용자의 신뢰를 향상시키기 위해, 모든 클라이언트 측 코드는 공개되며, 관심 있는 보안 연구자들은 암호화 과정을 평가할 수 있습니다. 우리의 모바일 앱의 코드는 다음에 있습니다: https://github.com/meganz/android \n\n자세한 정보는, 우리의 웹사이트를 확인하세요:\nhttps://mega.nz/terms 를 확인하세요\n\n\n데스크톱 - https://mega.nz/</string>
+    <string name="full_description_text">MEGA는 휴대 기기를 위한 전용 앱과 더불어, 표준 웹 브라우저를 통해 이용자 제어 암호화 클라우드 저장소와 대화를 제공합니다. 다른 클라우드 저장소 제공자들과 달리, 당신의 데이터는 우리가 아닌 당신의 클라이언트 기기에서만 암호화되고 복호화됩니다.\n\n당신의 스마트폰 또는 태블릿에서 파일을 업로드하고 언제, 어디서나, 어느 기기에서든 당신의 파일을 검색, 저장, 다운로드, 스트림, 보기, 공유, 이름 변경 또는 삭제할 수 있습니다. 당신의 지인들과 폴더를 공유하고 그들이 수정하는 것을 실시간으로 보세요. 암호화 과정은 우리가 당신의 암호에 접근하거나 재설정할 수 없다는 것을 의미하므로 반드시 기억하지 않으면 (복구 키를 백업하지 않았다면) 저장한 파일들에 대한 접근을 잃게 됩니다.\n\n종단간 이용자 암호화 MEGA 영상 대화는 완전한 개인 정보 보호를 가능하게 하며, 2016년부터 웹 브라우저에서 사용할 수 있었습니다. 이것은 MEGA 모바일 앱으로 확장되어 여러 기기에서 대화 기록에 접근할 수 있습니다. 이용자들은 MEGA 클라우드 드라이브에서 대화로 파일을 쉽게 추가할 수 있습니다.\n\nMEGA는 보너스 도전 과제와 함께 모든 가입한 이용자에게 넉넉한 20GB의 무료 저장소를 제공하며, 더 높은 한도를 가진 유료 요금제를 제공합니다:\n\n\nPro Lite 구독: 매달 4.99 € 또는 매년 49.99 €로 매달 400GB의 저장 공간과 1TB의 전송 할당량을 받을 수 있습니다.\nPro I 구독: 매달 9.99 € 또는 매년 99.99 €로 매달 2TB의 저장 공간과 2TB의 전송 할당량을 받을 수 있습니다.\nPro II 구독: 매달 19.99 € 또는 매년 199.99 €로 매달 8TB의 저장 공간과 8TB의 전송 할당량을 받을 수 있습니다.\nPro III 구독: 매달 29.99 € 또는 매년 299.99 €로 매달 16TB의 저장 공간과 16TB의 전송 할당량을 받을 수 있습니다.\n\n구독은 처음 선택했던 기간과 같은 가격으로 자동으로 갱신됩니다. 구독을 관리하려면 휴대 기기에서 Play 스토어 아이콘을 탭한 후, Google ID로 로그인합니다(만약 아직 하지 않았다면). 그 다음 MEGA 앱을 탭하세요. 그 곳에서 구독을 관리할 수 있을 것입니다.\n\n앱 권한:\n외부 저장소 쓰기 -&gt; MEGA에서 당신의 기기로 파일을 다운로드하고 당신의 기기에서 MEGA로 파일을 업로드 합니다\n카메라 -&gt; 사진을 찍고 MEGA로 사진을 업로드합니다\n연락처 읽기 -&gt; 당신의 기기에서 연락처를 MEGA 연락처로 쉽게 추가합니다\n오디오 녹음과 비디오 출력 캡처 (마이크와 카메라) -&gt; MEGA가 종단간 암호화 음성/영상 통화를 제공하는데에 필요합니다\n\n\nMEGA 시스템에 대한 이용자의 신뢰를 향상시키기 위해, 모든 클라이언트 사이드 코드는 공개되며, 관심 있는 보안 연구자들은 암호화 과정을 평가할 수 있습니다. 우리의 모바일 앱의 코드는 다음에 있습니다: https://github.com/meganz/android \n\n자세한 정보는, 우리의 웹사이트를 확인하세요:\nhttps://mega.nz/terms \n\n\n데스크톱 - https://mega.nz/</string>
     <!-- Short description text of the app in the Google Play page of the app (character limit 80) -->
-    <string name="short_description_text">MEGA는 강력한 상시 개인 정보 보호를 가진 클라우드 저장소입니다.</string>
+    <string name="short_description_text">MEGA는 안전한 상시 개인 정보 보호를 갖춘 클라우드 저장소입니다.</string>
     <!-- PRO Lite account -->
     <string name="prolite_account">Pro Lite</string>
     <!-- Name of the MEGA PDF Viewer. Keep uppercase. -->
     <string name="pdf_app_name">MEGA PDF 뷰어</string>
-    <!-- Showing progress of elements. Example: 2 of 10. -->
-    <string name="general_x_of_x">개째 진행중. 전체:</string>
     <!-- Answer for confirmation dialog. -->
     <string name="general_yes">예</string>
     <!-- Answer for confirmation dialog. -->
@@ -191,7 +189,7 @@
     <!-- when the user tries to log in to MEGA without a valid session -->
     <string name="error_server_expired_session">다른 위치에서 이 기기를 로그아웃 하였습니다.</string>
     <!-- the first step when logging in is calculate the private and public encryption keys -->
-    <string name="login_generating_key">암호화 키 계산중</string>
+    <string name="login_generating_key">암호화 키 생성 중</string>
     <!-- Message displayed while the app is connecting to a MEGA server -->
     <string name="login_connecting_to_server">서버에 연결 중</string>
     <!-- Status text when updating the file manager -->
@@ -217,7 +215,7 @@
     <!--  -->
     <string name="tour_access_title">MEGA 접근</string>
     <!-- Full description text of the app in the Google Play page of the app (character limit 4000) -->
-    <string name="tour_space_text">지금 가입하고 20GB 이상의 무료 공간을 받으세요</string>
+    <string name="tour_space_text">지금 가입하고 20GB의 무료 공간을 받으세요</string>
     <!--  -->
     <string name="tour_speed_text">업로드는 매우 빠릅니다. 모두와 빠르게 파일을 공유하세요</string>
     <!--  -->
@@ -390,7 +388,7 @@
     <string name="intent_not_available">장치에 이 파일을 실행할 앱이 없습니다</string>
     <!-- Message when trying to open a location message but there isn’t any app that open that location. -->
     <string name="intent_not_available_location">이 위치를 열 수 있는 앱이 기기에 없습니다</string>
-    <!-- message when trying to open file but there isn’t any app that open that file. Example: a user try to open a txt but doesn’t have any app to open txt -->
+    <!-- Message displayed when user tries to open a file with a 3rd party app using the option "Open with" but there isn't any app installed in the device which can open that file type, e.g. user tries to open a ".txt" but doesn’t have any installed 3rd party app which supports ".txt" files. -->
     <string name="intent_not_available_file">이 파일 유형을 지원하는 앱을 설치하지 않은 것 같습니다</string>
     <!-- to share an image using Facebook, Whatsapp, etc -->
     <string name="context_share_image">다음을 사용하여 이미지 공유</string>
@@ -398,8 +396,6 @@
     <string name="context_get_link">링크 공유</string>
     <!-- Delete a link label -->
     <string name="context_delete_link">링크 삭제</string>
-    <!-- Item menu option upon right click on one or multiple files. -->
-    <string name="context_get_link_menu">링크 얻기</string>
     <!-- Item menu option upon right click on one or multiple files. -->
     <string name="context_leave_menu">떠나기</string>
     <!-- Title alert before leaving a share. -->
@@ -481,7 +477,7 @@
     <!-- success message when reinvite a contact -->
     <string name="context_contact_invitation_resent">요청이 재발송되었습니다</string>
     <!-- success message when sending a contact request -->
-    <string name="context_contact_request_sent">%s님께 요청이 성공적으로 전송되었습니다. 상태는 보낸 요청 탭에서 확인할 수 있습니다.</string>
+    <string name="context_contact_request_sent">%s님께 요청이 성공적으로 전송되었습니다. 보낸 요청 탭에서 보세요.</string>
     <!-- success message when removing a contact -->
     <string name="context_contact_removed">연락처가 제거되었습니다</string>
     <!-- error message -->
@@ -522,10 +518,6 @@
     <string name="number_incorrectly_moved">%d개의 항목이 성공적으로 이동되지 않았습니다</string>
     <!-- success message when moving a node -->
     <string name="context_correctly_moved_to_rubbish">휴지통으로 성공적으로 이동되었습니다</string>
-    <!-- success message when moving a node -->
-    <string name="number_correctly_moved_to_rubbish">%d개의 항목이 휴지통으로 이동되었습니다</string>
-    <!-- success message when moving a node -->
-    <string name="number_incorrectly_moved_to_rubbish">&#160;그리고 %d개의 항목이 전송되지 않았습니다</string>
     <!-- error message -->
     <string name="context_no_moved">오류. 이동되지 않았습니다</string>
     <!-- success message when sharing a folder -->
@@ -576,8 +568,6 @@
     <string name="number_contact_not_removed">%d개의 연락처가 제거되지 않았습니다</string>
     <!-- success message when sharing a file with multiple contacts -->
     <string name="number_contact_file_shared_correctly">%d개의 연락처와 폴더를 공유하였습니다</string>
-    <!-- error message when sharing a file with multiple contacts -->
-    <string name="number_contact_file_not_shared_">파일이 %d개의 연락처와 공유되지 않았습니다</string>
     <!-- success message when sharing multiple files -->
     <string name="number_correctly_shared">%d개의 폴더가 잘 공유되었습니다</string>
     <!-- error message when sharing multiple files -->
@@ -587,13 +577,13 @@
     <!-- success message when removing all the contacts of a shared folder -->
     <string name="context_correctly_removed_sharing_contacts">폴더가 더 이상 공유되지 않음</string>
     <!-- error message when removing all the contacts of a shared folder -->
-    <string name="context_no_removed_sharing_contacts">오류, 폴더가 아직 다른 연락처와 공유중입니다</string>
+    <string name="context_no_removed_sharing_contacts">오류가 발생하였습니다. 이 폴더는 아직 다른 연락처와 공유 중입니다</string>
     <!-- option available for just one file -->
     <string name="context_select_one_file">파일 하나만 선택하세요</string>
     <!-- success message when emptying the RB -->
     <string name="rubbish_bin_emptied">휴지통이 성공적으로 비워졌습니다</string>
     <!-- error message when emptying the RB -->
-    <string name="rubbish_bin_no_emptied">오류. 휴지통이 비워지지 않았습니다</string>
+    <string name="rubbish_bin_no_emptied">오류가 발생하였습니다. 휴지통이 비워지지 않았습니다</string>
     <!-- dialog cancel subscriptions -->
     <string name="dialog_cancel_subscriptions">MEGA 구독을 취소하려고 합니다. 당신의 생각을 바꾸게 하기 위해 우리가 뭘 해야할지 알려주세요.</string>
     <!-- hint cancel subscriptions dialog -->
@@ -601,11 +591,11 @@
     <!-- send cancel subscriptions dialog -->
     <string name="send_cancel_subscriptions">보내기</string>
     <!-- confirmation cancel subscriptions dialog -->
-    <string name="confirmation_cancel_subscriptions">피드백을 보내주셔서 고맙습니다! 메가 구독을 취소하시겠습니까?</string>
+    <string name="confirmation_cancel_subscriptions">피드백을 보내주셔서 고맙습니다. MEGA 구독을 정말 취소하시겠습니까?</string>
     <!-- provide a reason to cancel subscriptions dialog -->
     <string name="reason_cancel_subscriptions">당신의 구독권이 취소되지 않았습니다. 취소 사유를 입력해주세요.</string>
-    <!-- welcome message after user brought subscription. placeholder 1: subscription type (Lite/Pro1 etc), placeholder 2: renewal interval (monthly/yearly) -->
-    <string name="message_user_purchased_subscription">%1$s에 %2$s 구독해주셔서 고맙습니다!</string>
+    <!-- Confirmation message of the dialog shown when a subscription has been processed successfully -->
+    <string name="message_user_purchased_subscription">고맙습니다. 당신의 결제가 처리 중입니다. 24시간 내로 업그레이드를 받지 못 한다면 support&#64;mega.co.nz로 이메일을 보내주세요.</string>
     <!-- Pop up message shows when user purchased a lower level of subscription -->
     <string name="message_user_purchased_subscription_down_grade">새 구독은 현재 구독이 만료된 후 시작되며, 새 가격도 그 때 결제됩니다.</string>
     <!-- Pop up message shows when user purchased a subscription with a payment method that can not be processed in real time, e.g. voucher -->
@@ -659,15 +649,13 @@
     <!-- title of the image gallery -->
     <string name="full_screen_image_viewer_label">이미지 뷰어</string>
     <!-- Headline for the amount of storage space is used -->
-    <string name="my_account_used_space">사용된 공간</string>
+    <string name="my_account_used_space">사용한 저장 공간</string>
     <!-- menu item -->
     <string name="my_account_change_password">암호 변경</string>
     <!-- Dialog text overquota error -->
     <string name="overquota_alert_text">저장 공간 한도를 초과하였습니다. 계정을 업그레이드 하시겠습니까?</string>
     <!-- when did the last session happen -->
     <string name="my_account_last_session">최근 세션</string>
-    <!-- header for the social connections, showing the number of contacts the user has -->
-    <string name="my_account_connections">연결</string>
     <!-- message displayed while the app is changing the password -->
     <string name="my_account_changing_password">암호 변경중</string>
     <!-- when changing the password, the first edittext is to enter the current password -->
@@ -679,11 +667,11 @@
     <!-- when changing the password or creating the account, the password is required twice and check that both times are the same -->
     <string name="my_account_change_password_dont_match">암호가 일치하지 않습니다</string>
     <!-- title of the selection of the pro account wanted -->
-    <string name="upgrade_select_pricing">회원권 선택</string>
+    <string name="upgrade_select_pricing">요금제 선택</string>
     <!-- the user has to decide the way of payment -->
     <string name="select_membership_1">월간 또는 연간 재구독</string>
     <!-- choose the payment method option when no method is available -->
-    <string name="no_available_payment_method">지금 이 요금제를 결제할 수 있는 수단이 없습니다</string>
+    <string name="no_available_payment_method">이 요금제에 설정된 결제 수단이 없습니다. 하나를 선택하세요.</string>
     <!-- button to decide monthly payment. The asterisk is needed -->
     <string name="upgrade_per_month">월간*</string>
     <!-- button to decide annually payment. The asterisk is needed -->
@@ -691,9 +679,9 @@
     <!-- the user can get the link and it’s copied to the clipboard -->
     <string name="file_properties_get_link">링크가 클립보드로 복사되었습니다</string>
     <!-- before sharing an image, the preview has to be downloaded -->
-    <string name="full_image_viewer_not_preview">미리보기가 다운로드 되지 않았습니다. 기다려주세요.</string>
+    <string name="full_image_viewer_not_preview">미리 보기가 다운로드 되지 않았습니다. 기다려주세요.</string>
     <!-- due to device is low on memory, cannot load an image preview temporarily -->
-    <string name="not_load_preview_low_memory">사용 가능한 메모리가 부족하여 미리 보기를 이용할 수 없습니다. 나중에 다시 시도하세요.</string>
+    <string name="not_load_preview_low_memory">미리 보기를 표시할 여유 메모리가 부족합니다. 나중에 다시 시도하세요.</string>
     <!-- alert when clicking a newsignup link being logged -->
     <string name="log_out_warning">계정을 만들기 전에 로그아웃 하세요</string>
     <!-- message shown in the screen when there are not any active transfer -->
@@ -707,9 +695,9 @@
     <!-- Dialog title, to explain why MEGA needs the ’display over other apps’ permission (Android 10) -->
     <string name="ask_for_display_over_title">수신중인 MEGA 통화의 알림 허용</string>
     <!-- Dialog message, to explain why MEGA needs the ’display over other apps’ permission (Android 10) -->
-    <string name="ask_for_display_over_msg">MEGA는 백그라운드에서 통화 인터페이스를 띄우기 위해 당신의 허가가 필요합니다.</string>
+    <string name="ask_for_display_over_msg">통화를 위해 MEGA에 다른 앱 위에 표시 권한을 허용해주세요.</string>
     <!-- Prompt text shows when the user doesn’t want to make MEGA grant the ’display over other apps’ permission for now (Android 10) -->
-    <string name="ask_for_display_over_explain">걱정 마세요, 기기 설정에서 수동으로 권한을 허용할 수 있습니다.</string>
+    <string name="ask_for_display_over_explain">기기 설정에서 수동으로 권한을 허용할 수 있습니다.</string>
     <!-- the options of how to upload, but in an array. needed for the settings, how to upload the camera images. only when Wi-Fi connected -->
     <string name="cam_sync_wifi">와이파이 전용</string>
     <!-- the options of how to upload, but in an array. needed for the settings, how to upload the camera images. when Wi-Fi connected and using data plan -->
@@ -723,7 +711,7 @@
     <!-- title of the notification when camera upload is checking files -->
     <string name="settings_camera_notif_checking_title">업로드할 파일 확인중</string>
     <!-- title of the notification when camera upload is initializing -->
-    <string name="settings_camera_notif_initializing_title">카메라 업로드 초기화중</string>
+    <string name="settings_camera_notif_initializing_title">카메라 업로드 초기화 중</string>
     <!-- title of the notification when camera upload’s primary local folder is unavailable. -->
     <string name="camera_notif_primary_local_unavailable">카메라 업로드가 해제되었습니다. 로컬 폴더를 이용할 수 없습니다.</string>
     <!-- title of the notification when camera upload’s secondary local folder is unavailable. -->
@@ -741,9 +729,9 @@
     <!-- Setting to allow the user to select the preferred passcode type -->
     <string name="settings_passcode_option">암호 옵션</string>
     <!-- Helper text to explain why we have this `Require me to plug in` setting, placeholder - 100 to 1000 in MB -->
-    <string name="settings_camera_upload_charging_helper_label">동영상 압축은 전력을 많이 소모합니다, MEGA는 압축하려는 동영상이 %s보다 클 경우 기기를 충전할 것을 요구할 것입니다.</string>
+    <string name="settings_camera_upload_charging_helper_label">동영상 압축은 꽤 많은 전력을 소모합니다. 만약 압축할 동영상이 %s보다 크다면 기기를 충전할 수 있도록 연결하세요.</string>
     <!-- Helper text to explain the things to note if enable the feature of including GPS info -->
-    <string name="settings_camera_upload_include_gps_helper_label">활성화하면, 당신이 어디에서 사진을 촬영하였는지에 대한 정보가 업로드 되오니, 공유할 때 유의하시기 바랍니다.</string>
+    <string name="settings_camera_upload_include_gps_helper_label">활성화하면, 위치 정보가 사진에 포함됩니다. 공유할 때 주의하세요.</string>
     <!-- Settings category title for cache and offline files -->
     <string name="settings_advanced_features">고급</string>
     <!-- Settings preference title for cache -->
@@ -953,10 +941,10 @@
     <string name="zip_browser_activity">ZIP 브라우저</string>
     <!-- title of the My Account screen -->
     <string name="my_account_title">계정 유형</string>
-    <!-- title of the Expiration Date -->
+    <!-- Label to indicate the date when the current subscription renews -->
     <string name="renews_on">갱신일&#160;</string>
     <!-- title of the Expiration Date -->
-    <string name="expires_on">만료일 &#160;</string>
+    <string name="expires_on">만료일&#160;</string>
     <!--  -->
     <string name="free_account">무료</string>
     <!-- info message shown to the user when the Camera Uploads folder has been created -->
@@ -991,14 +979,6 @@
     <string name="sortby_type_photo_first">사진</string>
     <!-- sort option, sort media files by videos first -->
     <string name="sortby_type_video_first">동영상</string>
-    <!-- sort files by date newest first -->
-    <string name="sort_by_newest_date">최신순</string>
-    <!-- sort files by date oldest first -->
-    <string name="sort_by_oldest_date">오래된 순</string>
-    <!-- sort files by largest size -->
-    <string name="sort_by_largest_size">큰 파일 순</string>
-    <!-- sort files by smallest size -->
-    <string name="sort_by_smallest_size">작은 파일 순</string>
     <!-- Title to choose the type of Passcode -->
     <string name="pin_lock_type">암호 유형</string>
     <!-- Passcode with 4 digits -->
@@ -1084,7 +1064,7 @@
     <!-- Alert to inform the user that have to be logged in to perform the action -->
     <string name="alert_not_logged_in">이 행동을 하려면 로그인 해야합니다.</string>
     <!-- Error message when a user attempts to change their email without an active login session. -->
-    <string name="change_email_not_logged_in">이메일 변경을 완료하려면 로그인하여야 합니다. 현재 이메일 주소로 다시 로그인한 후, 확인 링크를 다시 클릭하세요.</string>
+    <string name="change_email_not_logged_in">이메일 변경을 완료하려면 로그인하여야 합니다. 현재 이메일 주소로 다시 로그인한 후, 확인 링크를 다시 탭하세요.</string>
     <!-- Text displayed to inform that the email was successfully changed. Please keep the placeholder, it will be replaced with the new email address. -->
     <string name="email_changed">축하합니다, 이 MEGA 계정에 대한 새 이메일 주소는 다음과 같습니다: %1$s</string>
     <!-- Error when the user leaves empty the password field -->
@@ -1128,21 +1108,21 @@
     <!-- Button to upgrade the account to PRO account in the panel that appears randomly -->
     <string name="my_account_upgrade_pro_panel">지금 업그레이드</string>
     <!-- Message to promote PRO accounts -->
-    <string name="get_pro_account">클라우드 용량을 늘리세요![A]Pro 계정으로 더 많은 공간과 전송 할당량을 얻으세요!</string>
+    <string name="get_pro_account">클라우드를 키우세요.[A]Pro 계정으로 증가된 저장소와 전송 할당량을 받으세요.</string>
     <!-- success message when the MasterKey file has been downloaded -->
-    <string name="toast_master_key">복구 키가 다음에 백업되었습니다: %1s.[A]파일이 이 경로에 남아있으면, 오프라인용으로 저장 섹션에서 찾을 수 있습니다.[A]참고: 로그아웃하면 삭제됩니다, 안전한 곳에 보관하세요.</string>
+    <string name="toast_master_key">MEGA 계정 복구 키는 다음에 저장되었습니다: %1s.[A]오프라인용으로 저장됨 섹션에서 복구 키 파일을 찾을 수 있습니다.[/A] 참고: 로그아웃 하면 복구 키가 담긴 파일이 삭제되니, MEGA 계정 밖의 안전한 곳에 보관하세요.</string>
     <!-- Error shown when the user tries to change his mail to one that is already used -->
-    <string name="mail_already_used">오류. 이 이메일 주소는 이미 사용중입니다.</string>
+    <string name="mail_already_used">이 이메일 주소는 이미 사용 중입니다. 다른 이메일 주소를 사용하세요.</string>
     <!-- Error shown when the user tries to change his mail while the user has already requested a confirmation link for that email address -->
     <string name="mail_changed_confirm_requested">그 이메일 주소에 대한 확인 링크를 이미 요청하였습니다.</string>
     <!-- Error shown when the user tries to change his mail while the email is the same as the old -->
-    <string name="mail_same_as_old">새 이메일과 이전 이메일이 일치하지 않아야합니다</string>
+    <string name="mail_same_as_old">이것은 현재 당신의 이메일 주소입니다.</string>
     <!-- Text shown in the last alert dialog to change the email associated to an account -->
     <string name="change_mail_text_last_step">이메일을 변경하는 마지막 단계입니다. 아래에 암호를 입력하세요.</string>
     <!-- Title of the alert dialog to change the email associated to an account -->
     <string name="change_mail_title_last_step">이메일 변경</string>
     <!-- Iitle of the warning when the user is running out of space -->
-    <string name="title_new_warning_out_space">공간이 부족합니다!</string>
+    <string name="title_new_warning_out_space">저장 공간이 부족합니다.</string>
     <!-- Text of the warning when the user is running out of space -->
     <string name="new_warning_out_space">Pro로 업그레이드하고 MEGA 계정의 모든 혜택을 누리세요.</string>
     <!-- Iitle of sliding panel to choose the option to edit the profile picture -->
@@ -1172,7 +1152,7 @@
     <!-- Title of the dialog to get link with password -->
     <string name="title_set_password_protection">암호 보호 설정</string>
     <!-- Subtitle of the dialog to get link -->
-    <string name="subtitle_set_expiry_date">(PRO 전용)</string>
+    <string name="subtitle_set_expiry_date">(Pro 전용)</string>
     <!-- Alert Dialog to get link with password -->
     <string name="set_password_protection_dialog">암호 설정</string>
     <!-- Hint of the dialog to get link with password -->
@@ -1228,7 +1208,7 @@
     <!-- Title of the screen after creating the account. That screen asks the user to confirm the account by checking the email -->
     <string name="confirm_email_text">이메일 인증 대기중</string>
     <!-- Text below the title that explains the user should check the email and click the link to confirm the account -->
-    <string name="confirm_email_explanation">당신의 이메일을 확인하고 계정 확인을 위한 링크를 클릭하세요.</string>
+    <string name="confirm_email_explanation">계정을 확인하려면 이메일을 확인하고 링크를 탭하세요.</string>
     <!-- Plural of items which contains a folder. 2 items -->
     <plurals name="general_num_items">
         <item quantity="other">%1$d개의 항목</item>
@@ -1456,7 +1436,7 @@
     <!-- success alert when the user copy some messages to the clipboard -->
     <string name="messages_copied_clipboard">클립보드에 복사됨</string>
     <!-- Title of the error dialog when opening a chat -->
-    <string name="chat_error_open_title">대화 오류!</string>
+    <string name="chat_error_open_title">대화 오류</string>
     <!-- Message of the error dialog when opening a chat -->
     <string name="chat_error_open_message">대화가 올바르게 열리지 않았습니다</string>
     <!-- Menu option to add a contact to your contact list. -->
@@ -1483,7 +1463,7 @@
     <string name="title_message_uploading_options">첨부물 업로드중</string>
     <!-- message shown when a chat has no messages -->
     <string name="no_conversation_history">대화 기록 없음</string>
-    <!-- title of confirmation alert before removing a contact, Plural -->
+    <!-- Text to indicate that one participant is typing or multiple participants are typing at the same time in a chat room. The "%1$s" placeholder is to put the name(s) of the participant(s). The [A][/A] format marks are to put the text in a different color. -->
     <plurals name="user_typing">
         <item quantity="other">%1$s님이 [A]입력중&#8230;[/A]</item>
     </plurals>
@@ -1696,8 +1676,6 @@
     <string name="general_view">파일 보기</string>
     <!-- Menu option to choose to add file or folders to Cloud Drive -->
     <string name="add_to_cloud">들여오기</string>
-    <!-- Menu option to choose save to Offline section -->
-    <string name="save_for_offline">오프라인용으로 저장</string>
     <!-- Menu option to choose to add file to Cloud Drive in the chat -->
     <string name="add_to_cloud_node_chat">클라우드 드라이브에 추가</string>
     <!-- Menu option -->
@@ -1711,7 +1689,7 @@
     <!-- message when trying to invite a contact with a pending request -->
     <string name="context_contact_already_invited">%s님이 이미 초대되었습니다. 보류중인 요청을 참조하세요.</string>
     <!-- Hint text explaining that you can change the email and resend the create account link to the new email address -->
-    <string name="confirm_email_misspelled">만약 이메일 주소를 잘못 입력하였다면, 수정하고 [A]재발송[/A]을 클릭하세요.</string>
+    <string name="confirm_email_misspelled">만약 이메일 주소를 잘못 입력하였다면, 수정하고 [A]재발송[A]을 탭하세요.</string>
     <!-- Button to resend the create account email to a new email address in case the previous email address was misspelled -->
     <string name="confirm_email_misspelled_resend">재발송</string>
     <!-- Text shown after the confirmation email has been sent to the new email address -->
@@ -1877,30 +1855,28 @@
     <!-- subtitle of the section for achievements -->
     <string name="achievements_subtitle">친구를 초대하고 보상을 받으세요</string>
     <!-- title of the introduction for the achievements screen -->
-    <string name="figures_achievements_text_referrals">각 추천인마다 %1$s의 저장소. 365일간 이용 가능</string>
+    <string name="figures_achievements_text_referrals">성공한 초대마다 %1$s의 저장소. 365일간 이용 가능.</string>
     <!-- sentence to detail the figures of storage and transfer quota related to each achievement -->
     <string name="figures_achievements_text">%1$s의 용량. 365일간 이용 가능</string>
     <!-- title of the section for unlocked rewards -->
     <string name="unlocked_rewards_title">해제된 보상</string>
     <!-- title of the section for unlocked storage quota -->
-    <string name="unlocked_storage_title">저장공간 할당량</string>
+    <string name="unlocked_storage_title">저장소 할당량</string>
     <!-- title of the section for referral bonuses in achivements section (maximum 24 chars) -->
-    <string name="title_referral_bonuses">추천 보너스</string>
-    <!-- title of the section for install a mobile app in achivements section (maximum 24 chars) -->
-    <string name="title_install_app">모바일 앱 설치</string>
-    <!-- Title of the section for add phone number in achivements section (maximum 24 chars) -->
-    <string name="title_add_phone">휴대 전화 번호 추가</string>
+    <string name="title_referral_bonuses">초대 보너스</string>
+    <!-- Title of the section for install a mobile app in achivements section (maximum 31 chars) -->
+    <string name="title_install_app">MEGA 모바일 앱 설치</string>
+    <!-- Title of the section for add phone number in achivements section (maximum 30 chars) -->
+    <string name="title_add_phone">전화 번호 추가</string>
     <!-- title of the section for install megasync in achivements section (maximum 24 chars) -->
     <string name="title_regitration">가입 보너스</string>
     <!-- title of the section for install a mobile app bonuses in achivements section (maximum 24 chars) -->
-    <string name="title_install_desktop">MEGA 데스크톱 앱 설치</string>
-    <!-- title of the section for base quota in achivements section -->
-    <string name="title_base_quota">계정 기본 할당량</string>
+    <string name="title_install_desktop">MEGA 데스크톱 앱 받기</string>
     <!-- Text that indicates that no pictures have been uploaded to the Camera Uploads section -->
     <string name="camera_uploads_empty">카메라 업로드에 파일 없음</string>
     <!-- indicates the number of days left related to a achievement -->
     <string name="general_num_days_left">%1$d일 남음</string>
-    <!-- State to indicate something has expired (achivements of business status account for instance) -->
+    <!-- State to indicate an achievement has expired -->
     <string name="expired_label">만료됨</string>
     <!-- title of the advanced setting to choose the use of https -->
     <string name="setting_title_use_https_only">HTTP 사용 안함</string>
@@ -1909,15 +1885,15 @@
     <!-- title of screen to invite friends and get an achievement -->
     <string name="title_achievement_invite_friends">작동 원리</string>
     <!-- first paragraph of screen to invite friends and get an achievement -->
-    <string name="first_paragraph_achievement_invite_friends">친구를 초대하여 무료 MEGA 계정을 만들게 하고 모바일 앱을 설치하게 하세요. 성공한 가입과 앱 설치마다 보너스 용량을 받게 됩니다.</string>
+    <string name="first_paragraph_achievement_invite_friends">친구를 초대하여 MEGA 무료 계정을 만들고 MEGA 모바일 앱을 설치하게 하세요. 성공적인 가입과 앱 설치마다 당신은 무료 저장소를 보너스로 받게 됩니다.</string>
     <!-- second paragraph of screen to invite friends and get an achievement -->
-    <string name="second_paragraph_achievement_invite_friends">MEGA를 이전에 사용했던 사람을 초대하면 보상을 받지 못하게 되며 이러한 거절은 통보되지 않습니다. 초대된 연락처는 반드시 MEGA 모바일 앱 또는 MEGA 데스크톱 앱을 기기에 설치하여야 합니다.</string>
+    <string name="second_paragraph_achievement_invite_friends">무료 저장소 보너스는 새 초대에만 적용되며 MEGA 모바일 앱 또는 MEGA 데스크톱 앱이 설치되어야 합니다.</string>
     <!-- explanation of screen to invite friends and get an achievement -->
     <string name="card_title_invite_friends">휴대 전화 연락처 목록에서 선택하거나 여러 이메일 주소를 입력하세요.</string>
     <!-- title of the dialog to confirm the contact request -->
     <string name="title_confirmation_invite_friends">MEGA에 친구 초대</string>
     <!-- Text shown when the user sends a contact invitation -->
-    <string name="subtitle_confirmation_invite_friends">초대 발송됨</string>
+    <string name="subtitle_confirmation_invite_friends">초대를 발송하였습니다</string>
     <!-- paragraph of the dialog to confirm the contact request -->
     <string name="paragraph_confirmation_invite_friends">당신의 친구들이 가입하고 MEGA 앱을 설치하도록 독려하세요. 친구들이 당신이 입력한 같은 이메일 주소를 사용하면, 당신은 전송 할당량 보상을 받게 됩니다.</string>
     <!-- Error shown when the user writes a email with an incorrect format -->
@@ -1925,13 +1901,13 @@
     <!-- info paragraph about the achievement install megasync -->
     <string name="paragraph_info_achievement_install_desktop">MEGA 데스크톱 앱을 설치하면 %1$s의 무료 저장 공간을 받게 되며, 365일간 이용 가능합니다. MEGA 데스크톱 앱은 Windows, macOS 그리고 대부분의 Linux 배포판에서 이용 가능합니다.</string>
     <!-- info paragraph about the achievement install mobile app -->
-    <string name="paragraph_info_achievement_install_mobile_app">MEGA 모바일 앱을 설치하면 %1$s의 무료 저장 공간을 받게 되며, 365일간 이용 가능합니다. 모바일 앱은 iOS, Android 그리고 Windows Phone에서 이용 가능합니다.</string>
+    <string name="paragraph_info_achievement_install_mobile_app">MEGA 모바일 앱을 설치하면 365일간 이용 가능한 %1$s의 무료 저장 공간을 받게 됩니다. iOS와 Android에서 모바일 앱을 이용할 수 있습니다.</string>
     <!-- info paragraph about the achievement ‘add phone number’. Placeholder 1: bonus storage space e.g. 20GB. Placeholder 2: bonus transfer quota e.g. 50GB -->
     <string name="paragraph_info_achievement_add_phone">휴대 전화 번호를 인증하면 %1$s의 무료 저장 공간을 받게 되며, 365일간 이용 가능합니다.</string>
     <!-- info paragraph about the completed achievement install megasync -->
     <string name="result_paragraph_info_achievement_install_desktop">MEGA 데스크톱 앱을 설치하여 %1$s의 저장 공간을 받았습니다.</string>
     <!-- info paragraph about the completed achievement install mobile app -->
-    <string name="result_paragraph_info_achievement_install_mobile_app">모바일 앱을 설치하여 %1$s의 저장 공간을 받았습니다.</string>
+    <string name="result_paragraph_info_achievement_install_mobile_app">MEGA 모바일 앱을 설치하여 저장소 공간 %1$s를 받았습니다.</string>
     <!-- info paragraph about the completed achievement of ‘add phone number’. Placeholder 1: bonus storage space e.g. 20GB. Placeholder 2: bonus transfer quota e.g. 50GB -->
     <string name="result_paragraph_info_achievement_add_phone">휴대 전화 번호를 인증하여 %1$s의 저장 공간을 받았습니다.</string>
     <!-- info paragraph about the completed achievement registration -->
@@ -2010,7 +1986,7 @@
     <string name="invalid_characters_defined">다음의 글자는 허용되지 않습니다: ” * / : &lt; &gt; ? \ |</string>
     <!-- Warning show to the user after try to import files to MEGA with empty names. Plural. When more than one file name have this error. -->
     <plurals name="empty_names">
-        <item quantity="other">진행하기 전에 파일에 이름을 지으세요</item>
+        <item quantity="other">파일 이름은 비워둘 수 없습니다.</item>
     </plurals>
     <!-- Label shown when audio file is playing -->
     <string name="audio_play">오디오 파일</string>
@@ -2029,9 +2005,9 @@
     <!-- Info label about the connectivity state of the chat -->
     <string name="invalid_connection_state">대화에 다시 연결중</string>
     <!-- Message show when a call cannot be established -->
-    <string name="call_error">오류. 통화가 성립되지 않았습니다.</string>
+    <string name="call_error">오류가 발생하여 통화를 연결할 수 없습니다.</string>
     <!-- Title of dialog to evaluate the app -->
-    <string name="title_evaluate_the_app_panel">이 앱에 만족하시나요?</string>
+    <string name="title_evaluate_the_app_panel">MEGA 모바일 앱이 좋은가요?</string>
     <!-- Label to show rate the app -->
     <string name="rate_the_app_panel">예, 앱을 평가하기</string>
     <!-- Label to show send feedback -->
@@ -2039,7 +2015,7 @@
     <!-- title of the section advanced options on the get link screen -->
     <string name="link_advanced_options">고급 설정</string>
     <!-- Message to show when users deny to permit the permissions to read and write on external storage on setting default download location -->
-    <string name="download_requires_permission">MEGA가 파일을 다운로드하려면 당신의 허락이 필요합니다.</string>
+    <string name="download_requires_permission">MEGA가 외부 저장소에 파일을 다운로드 하기 위해 외부 저장소에 읽고 쓸 수 있는 권한이 필요합니다.</string>
     <!-- Default download location is on old sd card, but currently the user installed a new SD card, need user to reset download location. -->
     <string name="old_sdcard_unavailable">이전 SD 카드를 이용할 수 없습니다. 새 다운로드 위치를 설정하세요.</string>
     <!-- Dialog title to ask download to internal storage or external storage. -->
@@ -2063,7 +2039,7 @@
     <!-- Title of QR code scan section -->
     <string name="section_scan_code">코드 스캔</string>
     <!-- Title of QR code settings that permits or not contacts that scan my QR code will be automatically added to my contact list -->
-    <string name="settings_qrcode_autoaccept">자동 승인</string>
+    <string name="settings_qrcode_autoaccept">자동 수락</string>
     <!-- Subtitle of QR code settings auto-accept -->
     <string name="setting_subtitle_qrcode_autoccept">당신의 QR 코드를 스캔한 MEGA 이용자는 자동으로 연락처 목록에 추가됩니다.</string>
     <!-- Subtitle of QR code settings that reset the code -->
@@ -2099,9 +2075,9 @@
     <!-- Text of dialog shown when a contact request has not been sent with QR code because of is already a contact -->
     <string name="invite_not_sent_text_already_contact">초대가 발송되지 않았습니다. %s님은 이미 연락처 목록에 존재합니다.</string>
     <!-- Text of dialog shown when a contact request has not been sent with QR code because of some error -->
-    <string name="invite_not_sent_text_error">초대가 발송되지 않았습니다. 처리 중에 오류가 발생했습니다.</string>
+    <string name="invite_not_sent_text_error">오류가 발생하여 초대장이 발송되지 않았습니다.</string>
     <!-- Text of alert dialog informing that the qr is generating -->
-    <string name="generatin_qr">QR 코드 생성중&#8230;</string>
+    <string name="generatin_qr">QR 코드 생성중...</string>
     <!-- Title of QR code scan menu item -->
     <string name="menu_item_scan_code">QR 코드 스캔</string>
     <!-- get the contact link and copy it -->
@@ -2179,7 +2155,7 @@
     <!-- Text displayed in several parts when there is a call in progress (notification, recent chats list, etc). -->
     <string name="title_notification_call_in_progress">진행중인 통화</string>
     <!-- Subtitle of the notification shown on the action bar when there is a call in progress -->
-    <string name="action_notification_call_in_progress">통화로 돌아가려면 클릭하세요</string>
+    <string name="action_notification_call_in_progress">통화로 돌아가려면 탭하세요</string>
     <!-- Button in the notification shown on the action bar when there is a call in progress -->
     <string name="button_notification_call_in_progress">통화로 돌아옴</string>
     <!-- When it lists contacts of MEGA, the title of list’s header -->
@@ -2189,7 +2165,7 @@
     <!-- Message error shown when trying to log in on an account has been suspended due to multiple breaches of Terms of Service -->
     <string name="account_suspended_multiple_breaches_ToS">당신의 계정은 MEGA 이용 약관을 다수 위반하여 정지되었습니다. 이메일 수신함을 확인하세요.</string>
     <!-- Message error shown when trying to log in on an account has been suspended due to breach of Terms of Service -->
-    <string name="account_suspended_breache_ToS">당신의 계정은 타인의 권리 침해, 불법 데이터의 공유 및 내보내기, 시스템 오용 등의 MEGA 이용 약관 위반으로 제거되었습니다.</string>
+    <string name="account_suspended_breache_ToS">당신의 계정은 MEGA 이용 약관 제15조를 포함한 위반 행위로 인하여 제거되었습니다.</string>
     <!-- In a chat conversation when you try to send device’s images but images are still loading -->
     <string name="file_storage_loading">파일 불러오는 중</string>
     <!-- In a chat conversation when you try to send device’s images but there aren’t available images -->
@@ -2248,10 +2224,12 @@
     <string name="settings_video_upload_quality">동영상 품질</string>
     <!-- Text shown when the user refuses to permit the storage permission when enable camera upload -->
     <string name="on_refuse_storage_permission">카메라 업로드는 당신의 기기의 사진과 다른 미디어에 대한 접근을 필요로 합니다. 설정 페이지에 가서 권한을 부여해주세요.</string>
-    <!-- the options for the option on setting to set up the quality of multimedia files uploaded to the chat, the options of medium quality multimedia file to  upload. -->
+    <!-- Available options for the setting to set up the quality of multimedia files uploaded to the chat or the Camera Uploads -->
     <string-array name="settings_chat_upload_quality_entries">
-        <item>원본 품질</item>
-        <item>중간 품질</item>
+        <item>낮음</item>
+        <item>중간</item>
+        <item>높음</item>
+        <item>원본</item>
     </string-array>
     <!-- Title of the notification for a missed call -->
     <string name="missed_call_notification_title">부재중 전화</string>
@@ -2386,7 +2364,7 @@
     <!-- label to indicate that a share is still pending on outgoing shares of a node -->
     <string name="pending_outshare_indicator">(대기중)</string>
     <!-- Title of the dialog to disable the rich links previews on chat -->
-    <string name="option_enable_chat_rich_preview">고급 URL 미리보기</string>
+    <string name="option_enable_chat_rich_preview">고급 URL 미리 보기</string>
     <!-- Button to allow the rich links previews on chat -->
     <string name="button_always_rich_links">항상 허용</string>
     <!-- Button do not allow now the rich links previews on chat -->
@@ -2394,7 +2372,7 @@
     <!-- Button do not allow the rich links previews on chat -->
     <string name="button_never_rich_links">절대 안함</string>
     <!-- Title of the dialog to enable the rich links previews on chat -->
-    <string name="title_enable_rich_links">고급 URL 미리보기 활성화</string>
+    <string name="title_enable_rich_links">고급 URL 미리 보기 활성화</string>
     <!-- Text of the dialog to enable the rich links previews on chat -->
     <string name="text_enable_rich_links">MEGAchat 경험을 향상하세요. URL 컨텐츠가 종단간 암호화 없이 수신됩니다.</string>
     <!-- Subtitle of a MEGA rich link without the decryption key -->
@@ -2450,7 +2428,7 @@
     <!-- Description of the screen shown when the user enabled correctly Two-Factor Authentication -->
     <string name="description_2fa_enabled">다음번 로그인 때 당신의 인증기 앱에서 생성된 6자리 코드를 요구합니다.</string>
     <!-- Recommendation displayed after enable Two-Factor Authentication -->
-    <string name="recommendation_2fa_enabled">나중에 앱에 대한 접근을 잃었거나 2단계 인증을 비활성화하고 싶을 때를 대비하여 <b>복구 키</b>를 내보내는 것을 고려하세요.</string>
+    <string name="recommendation_2fa_enabled">앱에 대한 접근을 잃거나, 2단계 인증을 비활성화하고 싶을 때를 대비하여, <b>복구 키</b>를 안전한 곳에 저장하세요.</string>
     <!-- Error shown when a user tries to enable Two-Factor Authentication and introduce an invalid code -->
     <string name="pin_error_2fa">잘못된 코드</string>
     <!-- Title of screen Lost authenticator decive -->
@@ -2488,7 +2466,7 @@
     <!-- Message shown to ask user if wants to open Google Play to install some authenticator app -->
     <string name="open_play_store_2fa">인증기 앱을 설치할 수 있도록 Google Play를 여시겠습니까?</string>
     <!-- Label Play Store -->
-    <string name="play_store_label">Play Store</string>
+    <string name="play_store_label">Play 스토어</string>
     <!-- Text shown in an alert explaining how to continue to enable Two-Factor Authentication -->
     <string name="text_2fa_help">MEGA에서 2단계 인증을 활성화하려면 인증기 앱이 필요합니다. 당신의 휴대 전화 또는 태블릿용 Google 인증기, Duo Mobile, Authy 또는 Microsoft 인증기 앱을 다운로드하고 설치할 수 있습니다.</string>
     <!-- success message when importing multiple files from -->
@@ -2496,13 +2474,13 @@
     <!-- error message when importing multiple files from chat -->
     <string name="number_no_imported_from_chat">%d개의 파일이 공유되지 않음</string>
     <!-- button’s text to open a full screen image -->
-    <string name="preview_content">컨텐츠 미리보기</string>
+    <string name="preview_content">컨텐츠 미리 보기</string>
     <!-- message shown when the user clicks on media file chat message, there is no network connection and the file is not been downloaded -->
-    <string name="no_network_connection_on_play_file">스트리밍을 실행할 수 없고 파일이 다운로드되지 않았습니다</string>
+    <string name="no_network_connection_on_play_file">네트워크 연결이 없습니다. 파일을 다운로드하고 스트림할 수 없습니다.</string>
     <!-- message shown when the user open a file, the file is not been opened due to unknown reason -->
     <string name="error_fail_to_open_file_general">파일을 열 수 없습니다.</string>
     <!-- message shown when the user open a file, there is no network connection and the file is not been downloaded -->
-    <string name="error_fail_to_open_file_no_network">네트워크 연결이 없어서 파일을 열 수 없습니다.</string>
+    <string name="error_fail_to_open_file_no_network">네트워크 연결이 없습니다. 파일을 열려면 다시 연결하세요.</string>
     <!-- message when trying to save for offline a file that already exists -->
     <string name="file_already_exists">파일이 이미 오프라인용으로 저장되어 있습니다</string>
     <!-- Error message if forwarding a message failed, many messages -->
@@ -2512,7 +2490,7 @@
     <!-- Title of the dialog to disable the rich links previews on chat -->
     <string name="title_confirmation_disable_rich_links">고급 URL 미리보기</string>
     <!-- Text of the dialog to disable the rich links previews on chat -->
-    <string name="text_confirmation_disable_rich_links">고급 URL 미리보기를 영구히 해제하려고 합니다. 당신은 고급 URL 미리보기를 설정에서 다시 활성화할 수 있습니다. 진행하시겠습니까?</string>
+    <string name="text_confirmation_disable_rich_links">고급 URL 미리 보기를 해제하려고 합니다. 설정에서 다시 활성화할 수 있습니다. 진행하시겠습니까?</string>
     <!-- Message shown when a call ends. -->
     <string name="call_missed_messages">[A]부재중 전화[/A]</string>
     <!-- Message shown when a call ends. -->
@@ -2524,7 +2502,7 @@
     <!-- Message shown when a call ends. -->
     <string name="call_not_answered_messages">[A]통화에 응답하지 않음[/A]</string>
     <!-- Indicates that can type a contact email -->
-    <string name="contact_email">연락처의 이메일</string>
+    <string name="contact_email">연락처 이메일</string>
     <!-- When it tries to add a contact in a list an is already added -->
     <string name="contact_not_added">당신은 이미 이 연락처를 추가했습니다</string>
     <!-- Content of a normal message that cannot be recognized -->
@@ -2538,13 +2516,9 @@
     <!-- success message when a node was restore from Rubbish bin -->
     <string name="context_correctly_node_restored">%s(으)로 되돌렸음</string>
     <!-- error message when a node was restore from Rubbish bin -->
-    <string name="context_no_restored">오류. 복원되지 않음</string>
+    <string name="context_no_restored">오류가 발생하였습니다. 항목이 복원되지 않았습니다.</string>
     <!-- menu item from contact section to send a message to a contact -->
     <string name="context_send_message">메시지 보내기</string>
-    <!-- Message shown when a contact is successfully sent to several chats, more contacts -->
-    <plurals name="plural_contact_sent_to_chats">
-        <item quantity="other">연락처들이 성공적으로 대화에 전송됨</item>
-    </plurals>
     <!-- Error message on opening a MEGAdrop folder link -->
     <string name="error_MEGAdrop_not_supported">MEGAdrop 폴더는 아직 지원되지 않습니다</string>
     <!-- Pre overquota error dialog when trying to copy or import a file -->
@@ -2575,10 +2549,6 @@
     <string name="inactive_chat">활성화되지 않은 대화</string>
     <!-- Subtitle of chat screen when the chat is archived -->
     <string name="archived_chat">보관된 대화</string>
-    <!-- error message when restoring several nodes from rubbish -->
-    <string name="number_incorrectly_restored_from_rubbish">%d개의 항목이 복원되지 않았습니다</string>
-    <!-- success message when restoring several nodes from rubbish -->
-    <string name="number_correctly_restored_from_rubbish">%d개의 항목이 성공적으로 복원되었습니다</string>
     <!-- Title of the layout to join a group call from the chat screen -->
     <string name="join_call_layout">통화에 참여하려면 탭하세요</string>
     <!-- Label shown when the user wants to add contacts into his MEGA account -->
@@ -2728,7 +2698,7 @@
     <!-- Title of compression queue size option in settings -->
     <string name="settings_video_compression_queue_size_title">압축할 비디오가 다음보다 크면</string>
     <!-- Text of the alert when a FREE user tries to disable the RB scheduler -->
-    <string name="settings_rb_scheduler_alert_disabling">휴지통 비우기 스케줄러를 해제하거나 더 긴 보유 기간을 설정하려면, PRO 요금제를 구독하여야 합니다.</string>
+    <string name="settings_rb_scheduler_alert_disabling">휴지통 비우기 스케줄러를 해제하거나 더 긴 보유 기간을 설정하려면, Pro 요금제를 구독하세요.</string>
     <!-- Picker text to choose custom retention time. This option indicates several days -->
     <string name="hint_days">일</string>
     <!-- Title of the option to generate a public chat link -->
@@ -2970,17 +2940,17 @@
     <!-- Title of the dialog to inform about a SSL error -->
     <string name="ssl_error_dialog_title">SSL 키 오류</string>
     <!-- Text of the dialog to inform about a SSL error -->
-    <string name="ssl_error_dialog_text">MEGA가 SSL을 통하여 안전하게 연결할 수 없습니다. 추가적인 요구사항이 있는 공개 와이파이에 접속했을 수 있습니다.</string>
+    <string name="ssl_error_dialog_text">MEGA가 SSL을 통한 안전한 연결을 수립할 수 없습니다. 추가적인 요구 사항이 있는 공개 Wi-Fi에 접속했을 수 있습니다.</string>
     <!-- Text of the empty screen for the notifications section -->
     <string name="context_empty_notifications">[A]알림[/A][B] 없음[/B]</string>
     <!-- Permissions screen title -->
     <string name="general_setup_mega">MEGA 설정</string>
     <!-- Permissions screen explanation -->
-    <string name="setup_mega_explanation">MEGA가 당신이 친구와 사진, 미디어와 파일을 공유하고, 암호화된 메시지를 교환하며 안전한 통화를 할 수 있도록 접근 권한이 필요합니다.</string>
+    <string name="setup_mega_explanation">공유를 하려면 MEGA에 미디어와 파일 접근 권한이 필요합니다. 암호화된 메시지를 교환하고 안전한 통화를 하려면 다른 접근 권한이 필요할 수 있습니다.</string>
     <!-- Title of the screen asking permissions for files -->
     <string name="allow_acces_media_title">사진, 미디어 그리고 파일에 대한 접근 허용</string>
     <!-- Subtitle of the screen asking permissions for files -->
-    <string name="allow_acces_media_subtitle">사진, 미디어와 파일을 공유하려면 MEGA는 당신의 허가가 필요합니다.</string>
+    <string name="allow_acces_media_subtitle">공유를 하려면 MEGA에 파일 접근 권한이 필요합니다.</string>
     <!-- Title of the screen asking permissions for camera -->
     <string name="allow_acces_camera_title">카메라 활성화</string>
     <!-- Subtitle of the screen asking permissions for camera -->
@@ -2988,7 +2958,7 @@
     <!-- Title of the screen asking permissions for microphone and write in log calls -->
     <string name="allow_acces_calls_title">통화 활성화</string>
     <!-- Title of the screen asking permissions for contacts -->
-    <string name="allow_acces_contact_title">주소록에 대한 접근 허용</string>
+    <string name="allow_acces_contact_title">주소록에 대한 접근 허가</string>
     <!-- Subtitle of the screen asking permissions for contacts -->
     <string name="allow_acces_contact_subtitle">MEGA에서 당신의 주소록에 있는 지인들을 쉽게 찾으세요.</string>
     <!-- Explanation under the subtitle of asking permissions for contacts to explain that MEGA will never use the address book data for any other purpose -->
@@ -2996,7 +2966,7 @@
     <!-- Subtitle of the screen asking permissions for microphone -->
     <string name="allow_acces_calls_subtitle_microphone">암호화된 통화를 하려면 당신의 마이크에 접근을 허용하세요.</string>
     <!-- General enable access -->
-    <string name="general_enable_access">접근 허용</string>
+    <string name="general_enable_access">접근 허가</string>
     <!-- Title of the option on chat info screen to list all the files sent to the chat -->
     <string name="title_chat_shared_files_info">공유된 파일</string>
     <!-- Error mesage when trying to remove an uploading attachment that has already finished -->
@@ -3040,17 +3010,17 @@
     <!-- Text to indicate that a contact has left a group call -->
     <string name="contact_left_the_call">%1$s님이 통화에서 떠났습니다</string>
     <!-- Warning show when a call cannot start because there are too many participants in the group chat -->
-    <string name="call_error_too_many_participants_start">참여자 수 제한을 초과하였기 때문에 통화를 시작할 수 없습니다.</string>
+    <string name="call_error_too_many_participants_start">최대 참가자 수가 초과하여 통화를 시작할 수 없습니다.</string>
     <!-- Message show when a call cannot be established because there are too many participants in the group call -->
-    <string name="call_error_too_many_participants">이 통화가 최대 참가자 수에 도달했기 때문에 참여할 수 없습니다.</string>
+    <string name="call_error_too_many_participants">최대 참가자 수가 초과하여 통화에 참가할 수 없습니다.</string>
     <!-- Message show when a call cannot be established because there are too many participants in the group -->
-    <string name="call_error_too_many_participants_join">단체 대화의 최대 참여자 수에 도달하였기 때문에 이 통화에 참여할 수 없습니다.</string>
+    <string name="call_error_too_many_participants_join">최대 참가자 수에 도달하여 단체 통화에 참가할 수 없습니다</string>
     <!-- Message show when a user cannot activate the video in a group call because the max number of videos has been reached -->
-    <string name="call_error_too_many_video">이 통화의 최대 영상 사용 참가자 수에 도달했기 때문에 영상을 활성화할 수 없습니다.</string>
+    <string name="call_error_too_many_video">최대 참가자 수가 초과하여 영상 통화에 참가할 수 없습니다.</string>
     <!-- Message show when a user cannot put the call on hold -->
-    <string name="call_error_call_on_hold">통화를 보류할 수 없습니다</string>
+    <string name="call_error_call_on_hold">통화를 보류할 수 없습니다.</string>
     <!-- Error message shown when a file cannot be opened by other app using the open with option menu -->
-    <string name="error_open_file_with">오류. 파일을 열 수 없습니다.</string>
+    <string name="error_open_file_with">오류가 발생하여 이 앱으로 파일을 열 수 없습니다.</string>
     <!-- Subtitle of the call screen when a incoming call is just starting -->
     <string name="incoming_call_starting">전화 수신중&#8230;</string>
     <!-- Subtitle of the call screen when a outgoing call is just starting -->
@@ -3254,7 +3224,7 @@
     <!-- Text of the empty screen when there are not chat conversations -->
     <string name="recent_chat_empty_text">종단간 암호화를 통하여 당신의 연락처와 안전하게 대화를 시작하세요</string>
     <!-- Text sent to recipients to invite to be contact. Placeholder: contact link url. -->
-    <string name="invite_contacts_to_start_chat_text_message">안녕하세요! 저와 MEGA에서 안전하게 대화하고 20GB 이상의 무료 저장소를 받으세요. %1$s</string>
+    <string name="invite_contacts_to_start_chat_text_message">안녕하세요! 저와 MEGA에서 안전하게 대화하고 20GB의 무료 저장소를 받으세요. %1$s</string>
     <!-- In some cases, a user may try to get the link for a chat room, but if such is not set by an operator - it would say ‘not link available’ and not auto create it. -->
     <string name="no_chat_link_available">사용 가능한 대화 링크 없음</string>
     <!-- Alert shown when it has been deleted successfully a chat link -->
@@ -3283,13 +3253,13 @@
     <string name="invite_contact_chooser_title">다음을 통해 친구 초대</string>
     <!-- Action button label -->
     <string name="invite_contact_action_button">다음을 통해 친구 초대&#8230;</string>
-    <!-- When a multiple download is started, some of the files could have already been downloaded before. This message shows the number of files that has already been downloaded in plural. placeholder: number of files -->
+    <!-- Message displayed when multiple download starts and all files has already been downloaded before. Placeholder: number of files -->
     <plurals name="file_already_downloaded">
-        <item quantity="other">%d개의 파일은 이미 다운로드 되었습니다.&#160;</item>
+        <item quantity="other">%d개의 파일이 이미 다운로드 되었습니다.</item>
     </plurals>
-    <!-- When a multiple download is started, some of the files could have already been downloaded before. This message shows the number of files that are pending in plural. placeholder: number of files -->
+    <!-- When a multiple download is started, some of the files could have already been downloaded before. This message shows the number of files that are pending. Placeholder: number of files -->
     <plurals name="file_pending_download">
-        <item quantity="other">파일 %d개 대기중.</item>
+        <item quantity="other">파일 %d개 대기 중.</item>
     </plurals>
     <!-- Title of the login screen -->
     <string name="login_to_mega">MEGA에 로그인</string>
@@ -3361,8 +3331,8 @@
     <string name="business_management_alert">이용자 관리는 데스크톱 웹 브라우저에서만 가능합니다.</string>
     <!-- Title of the usage tab in My Account Section -->
     <string name="tab_my_account_usage">사용량</string>
-    <!-- Title of usage storage details section in Storage -->
-    <string name="usage_storage_details_label">저장소 사용량 상세 정보</string>
+    <!-- Title of usage storage details section in My Account -->
+    <string name="usage_storage_details_label">저장소 사용량 명세서</string>
     <!-- Title of overall usage section in Storage -->
     <string name="overall_usage_label">전체 사용량</string>
     <!-- Title of transfer section in Storage -->
@@ -3370,7 +3340,7 @@
     <!-- Error shown when a Business account user (sub-user or admin) tries to remove a contact which is part of the same Business account. Please, keep the placeholder, it will be replaced with the name or email of the account, for example: Jane Appleseed or ja@mega.nz -->
     <string name="error_remove_business_contact">%1$s님의 연락처는 당신의 비즈니스 계정의 일부이기 때문에 삭제할 수 없습니다.</string>
     <!-- When logging in during the grace period, the administrator of the Business account will be notified that their payment is overdue, indicating that they need to access MEGA using a desktop browser for more information -->
-    <string name="grace_period_admin_alert">최근 결제에 문제가 있었습니다. 자세한 정보를 보려면 데스크톱 브라우저로 MEGA에 접속하세요.</string>
+    <string name="grace_period_admin_alert">지난 결제에 문제가 있었습니다. 자세한 정보를 보려면 데스크톱 브라우저를 이용하여 MEGA에 접속하세요.</string>
     <!-- A dialog title shown to users when their business account is expired. -->
     <string name="expired_business_title">당신의 비즈니스 계정이 만료되었습니다</string>
     <!-- Details shown when a Business account is expired due a payment issue. The account is opened in a view-only mode. -->
@@ -3378,7 +3348,7 @@
     <!-- A message which is shown to sub-users of expired business accounts. -->
     <string name="expired_user_business_text">당신의 계정은 현재 [B]정지[/B]되었습니다. 당신의 데이터를 탐색만할 수 있습니다.</string>
     <!-- Message shown when users with a business account (no administrators of a business account) try to enable the Camera Uploads, to advise them that the administrator do have the ability to view their data. -->
-    <string name="camera_uploads_business_alert">MEGA는 당신의 데이터에 접근할 수 없지만, 당신의 비즈니스 계정 관리자는 당신의 이용자 계정의 카메라 업로드를 보거나 제어할 수 있는 권한이 있습니다.</string>
+    <string name="camera_uploads_business_alert">MEGA는 당신의 데이터에 접근할 수 없습니다. 그러나 당신의 비즈니스 계정 관리자는 당신의 카메라 업로드에 접근할 수 있습니다.</string>
     <!-- General label to alert user that somehting went wrong -->
     <string name="general_something_went_wrong_error">뭔가 잘못 됐습니다</string>
     <!-- A dialog message which is shown to sub-users of expired business accounts. -->
@@ -3406,7 +3376,7 @@
     <!-- Text informing user that their account has been suspended -->
     <string name="account_temporarily_suspended">당신의 안전을 위해 계정을 일시적으로 잠갔습니다.</string>
     <!-- Text informing user has to follow the steps of an email to unlock their account -->
-    <string name="verify_email_and_follow_steps">계정을 잠금 해제하려면 [A]이메일을 인증[/A]하고 절차를 수행하세요.</string>
+    <string name="verify_email_and_follow_steps">계정을 잠금 해제하려면 [A]인증 메일[/A]의 절차를 따라주세요.</string>
     <!-- Question which takes the user to a help screen -->
     <string name="why_am_i_seeing_this">이게 왜 보여지나요?</string>
     <!-- Label of a button which action is resend an email -->
@@ -3446,7 +3416,7 @@
     <!-- Error title shown when you are trying to do an action with a file or folder and you don’t have the necessary permissions -->
     <string name="permissions_error_label">권한 오류</string>
     <!-- Confirmation dialog shown to user when they try to revert a node in an incoming ReadWrite share. -->
-    <string name="alert_not_enough_permissions_revert">이 파일을 되돌릴 권한이 없습니다. 계속하려면 되돌린 데이터로 새 파일을 만들 수 있습니다. 계속하시겠습니까?</string>
+    <string name="alert_not_enough_permissions_revert">이 파일을 수정할 수 있는 올바른 권한이 없습니다. 새 파일을 만드시겠습니까?</string>
     <!-- Text shown when the creation of a version as a new file was successful -->
     <string name="version_as_new_file_created">기록으로 새 파일을 성공적으로 생성하였습니다.</string>
     <!-- Label indicating a date. Keep the placeholder, is to set the date. -->
@@ -3484,7 +3454,7 @@
     <!-- Warning show to the user when a folder does not exist -->
     <string name="warning_folder_not_exists">폴더가 존재하지 않습니다.</string>
     <!-- Warning show to the user when a node does not exist in cloud -->
-    <string name="warning_node_not_exists_in_cloud">클라우드 드라이브에 파일이 존재하지 않습니다.</string>
+    <string name="warning_node_not_exists_in_cloud">클라우드 드라이브에서 파일을 찾을 수 없습니다.</string>
     <!-- Header text of the Over Disk Quota Paywall warning -->
     <string name="over_disk_quota_paywall_header">저장소 가득 참</string>
     <!-- Title of the Over Disk Quota Paywall warning -->
@@ -3515,7 +3485,7 @@
     <string name="label_verify_credentials">자격 증명 인증 중</string>
     <!-- Label to indicate that contact’s credentials are not verified. -->
     <string name="label_not_verified">인증되지 않음</string>
-    <!-- Action indicating something was verified. -->
+    <!-- Label indicating the authenticity credentials of a contact have been verified -->
     <string name="label_verified">확인됨</string>
     <!-- ”Verify user” dialog title -->
     <string name="authenticity_credentials_label">진위 증명</string>
@@ -3536,7 +3506,7 @@
     <!-- Text show in a snackbar when phone has successfully reset. -->
     <string name="remove_phone_number_success">전화번호가 성공적으로 삭제되었습니다.</string>
     <!-- Text show in a snackbar when reset phone number failed. -->
-    <string name="remove_phone_number_fail">전화 번호 삭제 실패</string>
+    <string name="remove_phone_number_fail">전화 번호 제거를 실패하였습니다.</string>
     <!-- Text hint shown in the global search box which sits on the top of the Homepage screen -->
     <string name="search_hint">MEGA에서 검색</string>
     <!-- Alert shown when a user tries to reset an account wich is bloqued. -->
@@ -3594,9 +3564,9 @@
     <!-- Indicator of the progress in a download/upload. Please, don’t remove the place holders: the first one is to set the percentage, the second one is to set the size of the file. Example 33% of 33.3 MB -->
     <string name="progress_size_indicator">%2$s의 %1$d%%</string>
     <!-- Message showing when enable the mode for showing the special information in the chat messages. This action is performed from the settings section, clicking 5 times on the App version option -->
-    <string name="show_info_chat_msg_enabled">대화 메시지의 특별 정보 활성화</string>
+    <string name="show_info_chat_msg_enabled">대화 메시지 디버그 정보 활성화</string>
     <!-- Message showing when disable the mode for showing the special information in the chat messages.. This action is performed from the settings section, clicking 5 times on the App version option -->
-    <string name="show_info_chat_msg_disabled">대화 메시지의 특별 정보 해제</string>
+    <string name="show_info_chat_msg_disabled">대화 메시지 디버그 정보 비활성화</string>
     <!-- Shows the error when the limit of reactions per user is reached and the user tries to add one more. Keep the placeholder because is to show limit number in runtime. -->
     <string name="limit_reaction_per_user">당신은 최대 반응 한도 %d개에 도달하였습니다.</string>
     <!-- Shows the error when the limit of reactions per message is reached and a user tries to add one more. Keep the placeholder because is to show limit number in runtime. -->
@@ -3628,7 +3598,7 @@
     <!-- Subtitle of the dialogue to select a retention time -->
     <string name="subtitle_properties_manage_chat">다음보다 오래된 메시지를 자동 삭제:</string>
     <!-- Text of the confirmation dialog to clear the chat history from Manage chat history section -->
-    <string name="confirmation_clear_chat_history">이 대화의 모든 메시지 기록을 삭제할까요?</string>
+    <string name="confirmation_clear_chat_history">이 대화의 모든 메시지 기록을 삭제하시겠습니까?</string>
     <!-- Text on the label indicating that the oldest messages of a year will be automatically deleted. -->
     <string name="subtitle_properties_manage_chat_label_year">1년</string>
     <!-- Picker text to choose custom retention time. This option indicates several hours -->
@@ -3664,7 +3634,7 @@
     <!-- Title indicating the select mode is enabled and ready to select transfers on Transfers section, In progress tab -->
     <string name="title_select_transfers">전송 선택</string>
     <!-- Error shown to inform the priority change of a transfer failed. Please don’t remove the place holder, it’s to set the name of the transfer. Example: The priority change of the transfer “video.mp4” failed. -->
-    <string name="change_of_transfer_priority_failed">전송 ‘%1$s’의 우선 순위 변경을 실패하였습니다.</string>
+    <string name="change_of_transfer_priority_failed">전송 ”%1$s”의 우선순위를 바꿀 수 없습니다</string>
     <!-- Title option to send separated the link and decryption key -->
     <string name="option_send_decryption_key_separately">복호화 키 따로 보내기</string>
     <!-- Explanation option to send separated the link and decryption key -->
@@ -3679,14 +3649,10 @@
     <string name="button_copy_key">키 복사</string>
     <!-- Button which action is copy the password of a link -->
     <string name="button_copy_password">암호 복사</string>
-    <!-- Confirmation shown informing a link it’s copied to the clipboard -->
-    <string name="link_copied_clipboard">클립보드에 링크를 복사하였습니다.</string>
     <!-- Confirmation shown informing a key link it’s copied to the clipboard -->
     <string name="key_copied_clipboard">클립보드에 키를 복사하였습니다.</string>
     <!-- Confirmation shown informing a password link it’s copied to the clipboard -->
     <string name="password_copied_clipboard">클립보드에 암호를 복사하였습니다.</string>
-    <!-- Confirmation shown informing a link it’s copied to the clipboard -->
-    <string name="link_sent">링크를 성공적으로 보냈습니다.</string>
     <!-- Confirmation shown informing a key link it’s copied to the clipboard -->
     <string name="link_and_key_sent">링크와 키를 성공적으로 보냈습니다.</string>
     <!-- Confirmation shown informing a key link it’s copied to the clipboard -->
@@ -3710,7 +3676,7 @@
     <!-- String to share a link protected with password with its password.Please keep the place holders, are to set the link and the password. Example: Link: https://mega.nz/file/kC42xRSK#Ud2QsvpIVYmCd1a9QUhk42wXv10jCSyPSWnXEwYX2VE Password: asfAFG3345g -->
     <string name="share_link_with_password">링크: %1$s\n\n암호: %2$s</string>
     <!-- Warning show to the user when the app needs permissions to share files and the user has denied them. -->
-    <string name="files_required_permissions_warning">파일을 공유하려면 권한 허용이 필요합니다.</string>
+    <string name="files_required_permissions_warning">공유를 하려면 MEGA에 파일 접근 권한이 필요합니다.</string>
     <!-- Context menu item. Allows user to add file/folder to favourites -->
     <string name="file_properties_favourite">즐겨찾기</string>
     <!-- Context menu item. Allows user to delete file/folder from favourites -->
@@ -3755,14 +3721,12 @@
     <string name="dialog_cookie_alert_unsaved">쿠키 설정이 저장되지 않았습니다.</string>
     <!-- Snackbar message showed when there settings has been saved successfully. -->
     <string name="dialog_cookie_snackbar_saved">쿠키 설정 변경 사항이 저장되었습니다</string>
-    <!-- Cookie dialog third party title -->
-    <string name="dialog_cookie_thirdparty_title">제3자 쿠키</string>
     <!-- Cookie dialog third party first subtitle -->
     <string name="dialog_cookie_thirdparty_subtitle1">구글 광고 쿠키</string>
     <!-- Cookie dialog third party second subtitle -->
     <string name="dialog_cookie_thirdparty_subtitle2">분류: 광고 쿠키</string>
     <!-- Cookie dialog third party message. Please, keep the placeholders to format the string. -->
-    <string name="dialog_cookie_thirdparty_message">이러한 이유로 Google에 의해 사용됨:\n• 당신의 위치와 당신이 이전에 방문했던 웹사이트와 같은 것들을 기반으로 우리와 다른 서비스와 웹사이트에 Google이 광고를 개인화하여 보여줍니다\n• 특정 광고를 당신이 얼마나 자주 봤는지 모니터합니다;\n• 사기 방지를 제공합니다; 그리고\n• 당신이 언제 특정한 광고를 클릭하고 그 광고에 대해 어떤 행동을 취하였는지 식별합니다.\nhttps://policies.google.com/technologies/partner-sites</string>
+    <string name="dialog_cookie_thirdparty_message">이러한 이유로 Google에 의해 사용됨:\n• 당신의 위치와 당신이 이전에 방문했던 웹사이트와 같은 것들을 기반으로 우리와 다른 서비스와 웹사이트에 Google이 광고를 개인화하여 보여줍니다\n• 특정 광고를 당신이 얼마나 자주 봤는지 모니터합니다;\n• 사기 방지를 제공합니다; 그리고\n• 당신이 언제 특정한 광고를 탭하고 그 광고에 대해 어떤 행동을 취하였는지 식별합니다.\nhttps://policies.google.com/technologies/partner-sites</string>
     <!-- Preference screen item title -->
     <string name="preference_cookies_accept">쿠키 허용</string>
     <!-- Preference screen item title -->
@@ -3784,11 +3748,7 @@
     <!-- Preference screen item title -->
     <string name="preference_cookies_thirdparty_title">제3자 쿠키</string>
     <!-- Preference screen item summary. Please, keep the placeholders to format the string. -->
-    <string name="preference_cookies_thirdparty_summary">이것들은 우리가 아닌 다른 이들에 의해 통제되는 쿠키입니다; 우리는 위에 설명한 기능 유형들을 제공하기 위해 이 쿠키를 사용합니다. 이 쿠키를 허용하지 않는다면 각 제3자 쿠키가 어떤 것인가에 따라 서로 다른 영향을 받게 됩니다. 우리가 사용하는 제3자 쿠키가 어떤 것인지 자세히 보려면 ‘자세한 정보’를 클릭하세요.</string>
-    <!-- Preference screen item action button -->
-    <string name="preference_cookies_policies_privacy">개인정보 보호정책</string>
-    <!-- Preference screen item action button -->
-    <string name="preference_cookies_policies_cookie">쿠키 정책</string>
+    <string name="preference_cookies_thirdparty_summary">이것들은 우리가 아닌 다른 이들에 의해 통제되는 쿠키입니다; 우리는 위에 설명한 기능 유형들을 제공하기 위해 이 쿠키를 사용합니다. 이 쿠키를 허용하지 않는다면 각 제3자 쿠키가 어떤 것인가에 따라 서로 다른 영향을 받게 됩니다. 우리가 사용하는 제3자 쿠키가 어떤 것인지 자세히 보려면 “자세한 정보”를 탭하세요.</string>
     <!-- Preference screen item state description -->
     <string name="preference_cookies_always_on">항상 켬</string>
     <!-- Menu option that allows the user to scan document and upload it directly to MEGA. -->
@@ -3833,20 +3793,8 @@
     <string name="file_without_extension_warning">진행하려면 파일 확장자를 입력해야 합니다</string>
     <!-- Title of the warning dialog indicating the renamed name file extension is not the same -->
     <string name="file_extension_change_title">파일 확장자 변경</string>
-    <!-- Text of the warning dialog indicating the renamed name file extension is not the same. The placeholders show the file extensions. e.g. You may not be able to access this file if you change it from ".jpg" to ".txt" -->
-    <string name="file_extension_change_warning">확장자를 “.%1$s”에서 “.%2$s”로 변경하면 이 파일에 접근하지 못할 수 있습니다</string>
-    <!-- Text of the warning dialog indicating the renamed name file extension is not the same. The placeholder shows the file extension. e.g. You may not be able to access this file if you change it from empty to ".txt" -->
-    <string name="file_extension_change_warning_old_empty">확장자를 공백에서 “.%1$s”로 변경하면 이 파일에 접근하지 못할 수 있습니다</string>
-    <!-- Text of the warning dialog indicating the renamed name file extension is not the same. The placeholder shows the file extension. e.g. You may not be able to access this file if you change it from ".jpg" to empty -->
-    <string name="file_extension_change_warning_new_empty">확장자를 “.%1$s”에서 공백으로 변경하면 이 파일에 접근하지 못할 수 있습니다</string>
-    <!-- Button of the warning dialog indicating the renamed name file extension is not the same to use the new extension -->
-    <string name="action_use_empty_new_extension">확장자 삭제</string>
-    <!-- Button of the warning dialog indicating the renamed name file extension is not the same to use the new extension. The placeholder shows the file extension. e.g. Use .txt -->
-    <string name="action_use_new_extension">.%1$s 사용</string>
-    <!-- Button of the warning dialog indicating the renamed name file extension is not the same to keep the old extension -->
-    <string name="action_keep_empty_old_extension">공백 유지</string>
-    <!-- Button of the warning dialog indicating the renamed name file extension is not the same to keep the old extension. The placeholder shows the file extension. e.g. Keep .jpg -->
-    <string name="action_keep_old_extension">.%1$s 유지</string>
+    <!-- Text of the warning dialog indicating the renamed name file extension is not the same. -->
+    <string name="file_extension_change_warning">확장자를 변경하면 파일을 열지 못할 수도 있습니다.</string>
     <!-- Warning which alerts the user a file cannot be created because there is already one with the same name-->
     <string name="same_file_name_warning">같은 이름의 파일이 존재합니다</string>
     <!-- Warning which alerts the user an item cannot be created because there is already one with the same name -->
@@ -3881,4 +3829,254 @@
     <plurals name="cu_upload_progress">
         <item quantity="other">업로드 진행 중, 파일 %1$d개 대기 중</item>
     </plurals>
+    <!-- Text to show as production api server option -->
+    <string name="production_api_server">운영</string>
+    <!-- Title to show in a dialog to change api server -->
+    <string name="title_change_server">서버 변경</string>
+    <!-- Show line numbers action -->
+    <string name="action_show_line_numbers">줄 번호 보기</string>
+    <!-- Hide line numbers action -->
+    <string name="action_hide_line_numbers">줄 번호 숨기기</string>
+    <!-- Indicates pagination progress. E.g.: 3/49 -->
+    <string name="pagination_progress">%1$s/%2$s</string>
+    <!-- An error shown as transfer error when uploading something to an incoming share and the owner’s account is over its storage quota. -->
+    <string name="error_share_owner_storage_quota">공유 소유자의 저장소 할당량 초과.</string>
+    <!-- A message shown when uploading, copying or moving something to an incoming share and the owner’s account is over its storage quota. -->
+    <string name="warning_share_owner_storage_quota">대상 이용자의 저장소 할당량이 초과되어 파일을 전송할 수 없습니다.</string>
+    <!-- Content to show in a Snackbar to tip the incompatibility-->
+    <string name="version_incompatibility">MEGAchat을 업그레이드하고 있습니다. 모든 참가자들이 MEGA 앱을 최신 버전으로 업데이트할 때까지 버전 호환성 문제로 통화가 연결되지 않을 수 있습니다.</string>
+    <!-- Message displayed when multiple download starts and 1 file has already been downloaded before and 1 file is being downloaded -->
+    <string name="file_already_downloaded_and_file_pending_download">파일 1개 이미 다운로드 됨. 파일 1개 대기 중.</string>
+    <!-- Message displayed when multiple download starts and 1 file has already been downloaded before and multiple files are being downloaded. Placeholder: number of files -->
+    <string name="file_already_downloaded_and_files_pending_download">파일 1개 이미 다운로드 됨. 파일 %d개 대기 중.</string>
+    <!-- Message displayed when multiple download starts and multiple files have already been downloaded before and 1 file is being downloaded. Placeholder: number of files -->
+    <string name="files_already_downloaded_and_file_pending_download">파일 %d개 이미 다운로드 됨. 파일 1개 대기 중.</string>
+    <!-- Message displayed when multiple download starts and multiple files have already been downloaded before and multiple files are being downloaded. Placeholders: number of files -->
+    <string name="files_already_downloaded_and_files_pending_download">파일 %1$d개 이미 다운로드 됨. 파일 %2$d개 대기 중.</string>
+    <!-- Message displayed when 1 node (file or folder) has been successfully moved to the rubbish bin and 1 node has not been moved successfully -->
+    <string name="node_correctly_and_node_incorrectly_moved_to_rubbish">항목 1개가 휴지통으로 이동 되었으며 항목 1개가 이동 되지 않았습니다</string>
+    <!-- Message displayed when 1 node (file or folder) has been successfully moved to the rubbish bin and multiple nodes have not been moved successfully. Placeholder: number of nodes -->
+    <string name="node_correctly_and_nodes_incorrectly_moved_to_rubbish">항목 1개가 휴지통으로 이동 되었으며 항목 %d개가 이동 되지 않았습니다</string>
+    <!-- Message displayed when multiple nodes (files and folders) have been successfully moved to the rubbish bin and 1 node has not been moved successfully. Placeholder: number of nodes -->
+    <string name="nodes_correctly_and_node_incorrectly_moved_to_rubbish">항목 %d개가 휴지통으로 이동 되었으며 항목 1개가 이동 되지 않았습니다</string>
+    <!-- Message displayed when multiple nodes (files and folders) have been successfully moved to the rubbish bin and multiple nodes have not been moved successfully. Placeholders: number of nodes -->
+    <string name="nodes_correctly_and_nodes_incorrectly_moved_to_rubbish">항목 %1$d개가 휴지통으로 이동 되었으며 항목 %2$d개가 이동 되지 않았습니다</string>
+    <!-- Message displayed when 1 node (file or folder) has been successfully restored from the rubbish bin and 1 node has not been restored successfully -->
+    <string name="node_correctly_and_node_incorrectly_restored_from_rubbish">항목 1개가 복원 되었으며 항목 1개가 복원 되지 않았습니다</string>
+    <!-- Message displayed when 1 node (file or folder) has been successfully restored from the rubbish bin and multiple nodes have not been restored successfully. Placeholder: number of nodes -->
+    <string name="node_correctly_and_nodes_incorrectly_restored_from_rubbish">항목 1개가 복원 되었으며 항목 %d개가 복원 되지 않았습니다</string>
+    <!-- Message displayed when multiple nodes (files and folders) have been successfully restored from the rubbish bin and 1 node has not been restored successfully. Placeholder: number of nodes -->
+    <string name="nodes_correctly_and_node_incorrectly_restored_from_rubbish">항목 %d개가 복원 되었으며 항목 1개가 복원 되지 않았습니다</string>
+    <!-- Message displayed when multiple nodes (files and folders) have been successfully restored from the rubbish bin and multiple nodes have not been restored successfully. Placeholders: number of nodes -->
+    <string name="nodes_correctly_and_nodes_incorrectly_restored_from_rubbish">항목 %1$d개가 복원 되었으며 항목 %2$d개가 복원 되지 않았습니다</string>
+    <!-- Message displayed when nodes (files and folders) are being moved to the rubbish bin and all nodes have been successfully moved. Placeholder: number of nodes -->
+    <plurals name="number_correctly_moved_to_rubbish">
+        <item quantity="other">%d개의 항목이 휴지통으로 이동 되었습니다</item>
+    </plurals>
+    <!-- Message displayed when nodes (files and folders) are being moved to the rubbish bin and all nodes have not been successfully moved. Placeholder: number of nodes -->
+    <plurals name="number_incorrectly_moved_to_rubbish">
+        <item quantity="other">%d개의 항목이 휴지통으로 이동 되지 않았습니다</item>
+    </plurals>
+    <!-- Message displayed when nodes (files and folders) are being restored from the rubbish bin and all nodes have been successfully restored. Placeholder: number of nodes -->
+    <plurals name="number_correctly_restored_from_rubbish">
+        <item quantity="other">%d개의 항목이 복원되었습니다</item>
+    </plurals>
+    <!-- Message displayed when nodes (files and folders) are being restored from the rubbish bin and all nodes have not been successfully restored. Placeholder: number of nodes -->
+    <plurals name="number_incorrectly_restored_from_rubbish">
+        <item quantity="other">%d개의 항목이 복원되지 않았습니다</item>
+    </plurals>
+    <!-- Button of the warning dialog indicating the renamed name file extension is not the same to confirm the change. -->
+    <string name="action_change_anyway">어쨌든 변경하기</string>
+    <!-- Snackbar text to display if the user doesn't grant the permission to access all files on a device with Android 11 or higher -->
+    <string name="snackbar_storage_permission_denied_android_11">저장소에 접근하려면 권한이 필요합니다.</string>
+    <!-- String to show the transfer quota and the used space in My Account section. E.g.: -->
+    <string name="used_storage_transfer">%1$s / %2$s</string>
+    <!-- String to show the transfer quota and the used space in My Account section -->
+    <string name="used_storage_transfer_percentage">%1$s%%</string>
+    <!-- Size in petabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
+    <string name="label_file_size_peta_byte">%1$sPB</string>
+    <!-- Size in exabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
+    <string name="label_file_size_exa_byte">%1$sEB</string>
+    <!-- Title of Add phone number option in My account section -->
+    <string name="add_phone_label">전화 번호 추가</string>
+    <!-- Text of the option Backup Recovery Key in My account section -->
+    <string name="backup_recovery_key_subtitle">비밀번호를 기억하나요?\nMEGA는 당신이 비밀번호를 잊으면 재설정해드릴 수 없습니다.</string>
+    <!-- Action to change name -->
+    <string name="change_name_action">이름 변경</string>
+    <!-- Action to add photo -->
+    <string name="add_photo_action">사진 추가</string>
+    <!-- Action to add phone number -->
+    <string name="add_phone_number_action">전화번호 추가</string>
+    <!-- Warning indicating the app needs write permissions to do any action -->
+    <string name="denied_write_permissions">진행하려면 MEGA에 기기 저장소에 쓰기 권한이 필요합니다.</string>
+    <!-- Date indicating is tomorrow. E.g: Tomorrow, 3 Jul 2021 -->
+    <string name="tomorrow_date">내일, %1$s</string>
+    <!-- Title of the confirmation dialog shown when a subscription has been processed successfully -->
+    <string name="title_user_purchased_subscription">승인 대기중</string>
+    <!-- Number of social connections, showing the number of contacts the user has. E.g.: 37 connections -->
+    <plurals name="my_account_connections">
+        <item quantity="other">%1$d개</item>
+    </plurals>
+    <!-- Section name for the “Recently Added Contacts” section. Preferably one word. -->
+    <string name="section_recently_added">최근 추가됨</string>
+    <!-- Text of the empty screen when there are not groups. No dot at the end because is for an empty state. The format placeholders are to showing it in different colors. -->
+    <string name="context_empty_groups">[A]그룹[/A] [B]없음[/B]</string>
+    <!-- Section name for the “Contact Requests” section. Preferably one word. -->
+    <string name="section_requests">요청</string>
+    <!-- Section name for the “Groups” section. Preferably one word. -->
+    <string name="section_groups">그룹</string>
+    <!-- Text informing links management is only available for single items. -->
+    <string name="warning_get_links">“해독 키 따로 보내기”, “만료일 설정” 또는 “비밀번호 보호 설정”과 같은 옵션은 단일 항목에서만 이용 가능합니다.</string>
+    <!-- Action which allows to copy all the links showed in the list. -->
+    <string name="action_copy_all">모두 복사</string>
+    <!-- Confirmation shown informing links have been sent to the selected chats -->
+    <plurals name="links_sent">
+        <item quantity="other">링크가 정상적으로 전송되었습니다.</item>
+    </plurals>
+    <!-- Confirmation shown informing links have been copied to the clipboard -->
+    <plurals name="links_copied_clipboard">
+        <item quantity="other">클립보드에 링크가 복사되었습니다.</item>
+    </plurals>
+    <!-- Plural string used as button label or title of the screen to get only one or several links at the same time. -->
+    <plurals name="get_links">
+        <item quantity="other">링크 얻기</item>
+    </plurals>
+    <!-- Ask for confirmation before clear offline files -->
+    <string name="clear_offline_confirmation">모든 오프라인 파일을 삭제할까요?</string>
+    <!-- Banner text when the call is in progress and I'm the only participant. -->
+    <string name="banner_alone_on_the_call">현재 혼자 뿐입니다.</string>
+    <!-- Item menu option upon right click on meeting. -->
+    <string name="context_meeting">회의</string>
+    <!-- Menu option that allows the user to start/join meeting. -->
+    <string name="start_join_meeting">회의 시작/참가</string>
+    <!-- Label that create a meeting -->
+    <string name="new_meeting">새 회의</string>
+    <!-- Label that join a meeting -->
+    <string name="join_meeting">회의 참가</string>
+    <!-- Button that create a meeting -->
+    <string name="btn_start_meeting">회의 시작</string>
+    <!-- Button that join a meeting as guest -->
+    <string name="btn_join_meeting_as_guest">손님으로 참가</string>
+    <!-- Hint shown to guide user on meeting name -->
+    <string name="type_meeting_name">%s님의 회의</string>
+    <!-- General label for reject the call. -->
+    <string name="general_reject">종료</string>
+    <!-- General label for microphone -->
+    <string name="general_mic">마이크</string>
+    <!-- General label for microphone muted -->
+    <string name="general_mic_mute">마이크 꺼짐</string>
+    <!-- General label for microphone unmuted -->
+    <string name="general_mic_unmute">마이크 켜짐</string>
+    <!-- General label for camera -->
+    <string name="general_camera">카메라</string>
+    <!-- General label for camera enable -->
+    <string name="general_camera_enable">카메라 켜짐</string>
+    <!-- General label for camera disable -->
+    <string name="general_camera_disable">카메라 꺼짐</string>
+    <!-- Label for hold meeting -->
+    <string name="meeting_hold">보류</string>
+    <!-- General label for speaker -->
+    <string name="general_speaker">스피커</string>
+    <!-- General label for headphone-->
+    <string name="general_headphone">헤드폰</string>
+    <!-- General label for headphone on-->
+    <string name="general_headphone_on">헤드폰 켜짐</string>
+    <!-- General label for speaker on-->
+    <string name="general_speaker_on">스피커 켜짐</string>
+    <!-- General label for speaker off-->
+    <string name="general_speaker_off">스피커 꺼짐</string>
+    <!-- Label for end meeting-->
+    <string name="meeting_end">종료</string>
+    <!-- Invite contacts as participants of the meeting-->
+    <string name="invite_participants">참가자 초대</string>
+    <!-- The number of participants in the meeting-->
+    <string name="participants_number">참가자 (%d)</string>
+    <!-- Pin the participant to speaker view in the meeting-->
+    <string name="pin_to_speaker">메인 보기에 표시</string>
+    <!-- Make the participant as moderator in the meeting-->
+    <string name="make_moderator">중재자 임명</string>
+    <!-- The title of dialog for end meeting confirmation-->
+    <string name="title_end_meeting">회의를 떠날까요?</string>
+    <!-- no moderator when the moderator leave meeting-->
+    <string name="no_moderator">중재자 없음</string>
+    <!-- assign moderator message when the moderator leave meeting-->
+    <string name="assign_moderator_message">떠나기 전에, 회의에 1명 이상의 중재자를 임명하세요.</string>
+    <!-- assign moderator option when the moderator leave meeting-->
+    <string name="assign_moderator">중재자 임명</string>
+    <!-- leave anyway option when the moderator leave meeting-->
+    <string name="leave_anyway">어쨌든 떠나기</string>
+    <!-- The message alert user to pick new moderator on assign moderator page-->
+    <string name="pick_new_moderator_message">1명 이상의 중재자를 임명하세요.</string>
+    <!-- The title of dialog for changing meeting name-->
+    <string name="change_meeting_name">회의 이름 변경</string>
+    <!-- The number of participants in the meeting on meeting info page-->
+    <string name="info_participants_number">참가자: %d</string>
+    <!-- The name of moderators in the meeting on meeting info page-->
+    <string name="info_moderator_name">중재자: %s</string>
+    <!-- The literal meeting link text-->
+    <string name="meeting_link">회의 링크</string>
+    <!-- Subtitle of the meeting screen-->
+    <string name="duration_meeting">시간</string>
+    <!-- The question in on-boarding screen asking if the user is going to join meeting as guest-->
+    <string name="join_meeting_as_guest">손님으로 회의에 참가</string>
+    <!-- The title of the paste meeting link dialog for guest-->
+    <string name="paste_meeting_link_guest_dialog_title">회의에 초대 되었습니다.</string>
+    <!-- Tell the guest to paste the meeting link in the edit box-->
+    <string name="paste_meeting_link_guest_instruction">받은 회의 링크를 탭하거나 여기에 붙여넣으세요.</string>
+    <!-- Banner text to indicate poor network quality-->
+    <string name="slow_connection_meeting">안 좋은 연결 품질</string>
+    <!-- the message in the alert dialog for notifying the meeting has ended-->
+    <string name="meeting_has_ended">회의가 종료되었습니다</string>
+    <!-- error message shown when a meeting link is not well formed-->
+    <string name="invalid_meeting_link_args">잘못된 회의 링크</string>
+    <!-- Warning show to the user when the app needs permissions to start a meeting.-->
+    <string name="meeting_permission_info">MEGA에 접근 권한이 필요합니다</string>
+    <!-- Message of a dialog to show user the permissions that needed-->
+    <string name="meeting_permission_info_message">회의를 하려면 MEGA에 마이크와 카메라에 접근 권한이 필요합니다.</string>
+    <!-- Button to confirm the action of restarting one transfer-->
+    <string name="button_permission_info">알겠습니다</string>
+    <!-- Warning show to the user when the app needs permissions to get the best meeting experience and the user has denied them.-->
+    <string name="meeting_required_permissions_warning">설정에 가서 MEGA에 카메라와 마이크에 대한 접근을 허용해주세요.</string>
+    <!-- The button text in the meeting ended alert dialog. Click the button to open the group chat screen of the meeting-->
+    <string name="view_meeting_chat">회의 대화 보기</string>
+    <!-- the content of tips when the user uses the meeting first time-->
+    <string name="tip_invite_more_participants">회의에 더 많은 참가자를 초대합니다. 초대하려면 위로 올리세요.</string>
+    <!-- the content of tips when the user enters recent chat page first time-->
+    <string name="tip_create_meeting">새 회의를 만들려면 탭하세요</string>
+    <!-- the content of tips when the user enters start conversation page first time-->
+    <string name="tip_setup_meeting">우리의 새 암호화 회의 기능으로 MEGA 회의를 빠르게 설정하세요</string>
+    <!-- the content of snack bar when the user be the new moderator-->
+    <string name="be_new_moderator">당신은 새 중재자입니다.</string>
+    <!-- the content of snack bar when copied meeting link-->
+    <string name="copied_meeting_link">회의 링크 복사됨</string>
+    <!-- Title of the layout to join a meeting from the chat screen. The placeholder indicates the user who initiated the meeting -->
+    <string name="join_meeting_layout_in_group_call">%s님이 회의를 시작하였습니다. 참가하려면 탭하세요.</string>
+    <!-- Title of fifth tour screen -->
+    <string name="title_tour_five">MEGA 회의</string>
+    <!-- Content of fourth tour screen -->
+    <string name="content_tour_five">종단간 암호화 영상 회의</string>
+    <!-- Error shown when it tries to open an invalid meeting link and the text view is empty -->
+    <string name="invalid_meeting_link_empty">올바른 회의 링크를 입력하세요</string>
+    <!-- Guest leave call-->
+    <string name="more_than_meeting">회의 이상의 것</string>
+    <!-- the title of join without account on left meeting page-->
+    <string name="left_meeting_join_title">당신의 프라이버시가 중요합니다</string>
+    <!-- the content of join without account on left meeting page-->
+    <string name="left_meeting_join_content">세계에서 가장 큰 안전한 클라우드 저장소와 협업 플랫폼에 가입하세요.</string>
+    <!-- the bonus title of join without account on left meeting page-->
+    <string name="left_meeting_bonus_title">20GB를 무료로 받으세요</string>
+    <!-- the bonus content of join without account on left meeting page-->
+    <string name="left_meeting_bonus_content">지금 가입하고 고급 협업 기능을 무료로 즐기세요.</string>
+    <!-- Content of ongoing call for MaterialAlertDialog-->
+    <string name="ongoing_call_content">다른 통화가 진행 중입니다. 다른 통화를 하기 전에 현재 통화를 종료하세요.</string>
+    <!-- The hint text when changing meeting name-->
+    <string name="new_meeting_name">새 회의 이름</string>
+    <!-- The content of dialog when failed for creating meeting-->
+    <string name="meeting_is_failed_content">회의 생성 실패</string>
+    <!-- Word next to own user’s name on participant list -->
+    <string name="meeting_me_text_bracket">%1s [A](나)[/A]</string>
+    <!-- Menu item to change from thumbnail view to main view in meeting-->
+    <string name="main_view">메인 보기</string>
+    <!-- Warning in Offline section alerting all the Offline files will be deleted after logout. -->
+    <string name="offline_warning">로그아웃 하면 오프라인 항목이 삭제됩니다.</string>
 </resources>

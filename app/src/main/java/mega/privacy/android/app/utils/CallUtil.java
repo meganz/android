@@ -8,18 +8,18 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.net.Uri;
+import android.os.Build;
 import android.os.SystemClock;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Chronometer;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
+import android.widget.RemoteViews;
 import android.widget.TextView;
 
-import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.preference.PreferenceManager;
 
@@ -33,6 +33,7 @@ import mega.privacy.android.app.interfaces.SnackbarShower;
 import mega.privacy.android.app.listeners.CreateChatListener;
 import mega.privacy.android.app.listeners.LoadPreviewListener;
 import mega.privacy.android.app.lollipop.megachat.AppRTCAudioManager;
+import mega.privacy.android.app.meeting.listeners.DisableAudioVideoCallListener;
 import mega.privacy.android.app.meeting.listeners.StartChatCallListener;
 import mega.privacy.android.app.lollipop.AddContactActivityLollipop;
 import mega.privacy.android.app.lollipop.ContactInfoActivityLollipop;
@@ -41,30 +42,35 @@ import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.controllers.ChatController;
 import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop;
 import mega.privacy.android.app.meeting.activity.MeetingActivity;
+import mega.privacy.android.app.objects.PasscodeManagement;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaChatApi;
 import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaChatCall;
 import nz.mega.sdk.MegaChatPeerList;
+import nz.mega.sdk.MegaChatRequestListenerInterface;
 import nz.mega.sdk.MegaChatRoom;
 import nz.mega.sdk.MegaChatSession;
 import nz.mega.sdk.MegaHandleList;
 import nz.mega.sdk.MegaUser;
 
 import static android.content.Context.NOTIFICATION_SERVICE;
+import static android.view.View.GONE;
 import static mega.privacy.android.app.meeting.activity.MeetingActivity.*;
 import static mega.privacy.android.app.utils.AvatarUtil.*;
+import static mega.privacy.android.app.utils.ChatUtil.getStatusBitmap;
+import static mega.privacy.android.app.utils.ChatUtil.getTitleChat;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.ContactUtil.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
+import static mega.privacy.android.app.utils.PermissionUtils.*;
+import static mega.privacy.android.app.utils.StringResourcesUtils.getString;
 import static mega.privacy.android.app.utils.TextUtil.isTextEmpty;
 import static mega.privacy.android.app.utils.Util.*;
 import static nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE;
+import static nz.mega.sdk.MegaChatCall.CALL_STATUS_USER_NO_PRESENT;
 
 public class CallUtil {
-
-    public static final int MAX_PARTICIPANTS_IN_CALL = 20;
-
     /**
      * Method for opening the Meeting Activity when the meeting is outgoing or in progress call
      *
@@ -80,17 +86,23 @@ public class CallUtil {
     /**
      * Method for opening the Meeting Activity when the meeting is outgoing or in progress call
      *
-     * @param context     Context
-     * @param chatId      chat ID
-     * @param meetingName Meeting Name
-     * @param link        Meeting's link
+     * @param context            Context
+     * @param chatId             chat ID
+     * @param meetingName        Meeting Name
+     * @param link               Meeting's link
+     * @param passcodeManagement To disable passcode.
      */
-    public static void openMeetingToJoin(Context context, long chatId, String meetingName, String link) {
-        logDebug("Open join a meeting screen:: chatId = "+chatId);
-        MegaApplication.getPasscodeManagement().setShowPasscodeScreen(false);
+    public static void openMeetingToJoin(Context context, long chatId, String meetingName, String link, long publicChatHandle, boolean isRejoin, PasscodeManagement passcodeManagement) {
+        logDebug("Open join a meeting screen:: chatId = " + chatId);
+        passcodeManagement.setShowPasscodeScreen(false);
         MegaApplication.getChatManagement().setOpeningMeetingLink(chatId, true);
         Intent meetingIntent = new Intent(context, MeetingActivity.class);
-        meetingIntent.setAction(MEETING_ACTION_JOIN);
+        if (isRejoin) {
+            meetingIntent.setAction(MEETING_ACTION_JOIN);
+            meetingIntent.putExtra(MEETING_PUBLIC_CHAT_HANDLE, publicChatHandle);
+        } else {
+            meetingIntent.setAction(MEETING_ACTION_JOIN);
+        }
         meetingIntent.putExtra(MEETING_CHAT_ID, chatId);
         meetingIntent.putExtra(MEETING_NAME, meetingName);
         meetingIntent.setData(Uri.parse(link));
@@ -100,12 +112,13 @@ public class CallUtil {
     /**
      * Method for starting the Meeting Activity when the meeting is in progress call.
      *
-     * @param context     Context
-     * @param chatId      chat ID
+     * @param context            Context
+     * @param chatId             chat ID
+     * @param passcodeManagement To disable passcode.
      */
-    public static void openMeetingToStart(Context context, long chatId) {
-        logDebug("Open join a meeting screen");
-        MegaApplication.getPasscodeManagement().setShowPasscodeScreen(false);
+    public static void openMeetingToStart(Context context, long chatId, PasscodeManagement passcodeManagement) {
+        logDebug("Open join a meeting screen. Chat id is " + chatId);
+        passcodeManagement.setShowPasscodeScreen(false);
         Intent meetingIntent = new Intent(context, MeetingActivity.class);
         meetingIntent.setAction(MEETING_ACTION_START);
         meetingIntent.putExtra(MEETING_CHAT_ID, chatId);
@@ -115,12 +128,13 @@ public class CallUtil {
     /**
      * Method for opening the Meeting Activity when the meeting is outgoing or in progress call
      *
-     * @param context Context
-     * @param chatId  chat ID
+     * @param context            Context
+     * @param chatId             chat ID
+     * @param passcodeManagement To disable passcode.
      */
-    public static void openMeetingRinging(Context context, long chatId) {
-        logDebug("Open incoming call screen");
-        MegaApplication.getPasscodeManagement().setShowPasscodeScreen(false);
+    public static void openMeetingRinging(Context context, long chatId, PasscodeManagement passcodeManagement) {
+        logDebug("Open incoming call screen. Chat id is " + chatId);
+        passcodeManagement.setShowPasscodeScreen(false);
         MegaApplication.getInstance().openCallService(chatId);
         Intent meetingIntent = new Intent(context, MeetingActivity.class);
         meetingIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
@@ -132,12 +146,13 @@ public class CallUtil {
     /**
      * Method for opening the Meeting Activity when the meeting is outgoing or in progress call
      *
-     * @param context Context
-     * @param chatId  chat ID
+     * @param context            Context
+     * @param chatId             chat ID
+     * @param passcodeManagement To disable passcode.
      */
-    public static void openMeetingInProgress(Context context, long chatId, boolean isNewTask) {
-        logDebug("Open in progress call screen");
-        MegaApplication.getPasscodeManagement().setShowPasscodeScreen(false);
+    public static void openMeetingInProgress(Context context, long chatId, boolean isNewTask, PasscodeManagement passcodeManagement) {
+        logDebug("Open in progress call screen. Chat id is " + chatId);
+        passcodeManagement.setShowPasscodeScreen(false);
         if (isNewTask) {
             MegaApplication.getInstance().openCallService(chatId);
         }
@@ -157,14 +172,15 @@ public class CallUtil {
     /**
      * Method for opening the Meeting Activity when the meeting is outgoing or in progress call with audio or video enable.
      *
-     * @param context       Context
-     * @param chatId        chat ID
-     * @param isAudioEnable it the audio is ON
-     * @param isVideoEnable it the video is ON
+     * @param context            Context
+     * @param chatId             chat ID
+     * @param isAudioEnable      it the audio is ON
+     * @param isVideoEnable      it the video is ON
+     * @param passcodeManagement To disable passcode.
      */
-    public static void openMeetingWithAudioOrVideo(Context context, long chatId, boolean isAudioEnable, boolean isVideoEnable) {
-        logDebug("Open call with audio or video");
-        MegaApplication.getPasscodeManagement().setShowPasscodeScreen(false);
+    public static void openMeetingWithAudioOrVideo(Context context, long chatId, boolean isAudioEnable, boolean isVideoEnable, PasscodeManagement passcodeManagement) {
+        logDebug("Open call with audio or video. Chat id is " + chatId);
+        passcodeManagement.setShowPasscodeScreen(false);
         MegaApplication.getInstance().openCallService(chatId);
         Intent meetingIntent = new Intent(context, MeetingActivity.class);
         meetingIntent.setAction(MEETING_ACTION_IN);
@@ -178,15 +194,18 @@ public class CallUtil {
     /**
      * Method for opening the Meeting Activity in guest mode
      *
-     * @param context     Context
-     * @param meetingName Meeting Name
-     * @param chatId      chat ID
-     * @param link        Meeting's link
+     * @param context            Context
+     * @param meetingName        Meeting Name
+     * @param chatId             chat ID
+     * @param link               Meeting's link
+     * @param passcodeManagement To disable passcode.
      */
-    public static void openMeetingGuestMode(Context context, String meetingName, long chatId, String link) {
-        logDebug("Open meeting in guest mode");
-        MegaApplication.getPasscodeManagement().setShowPasscodeScreen(false);
+    public static void openMeetingGuestMode(Context context, String meetingName, long chatId, String link, PasscodeManagement passcodeManagement) {
+        logDebug("Open meeting in guest mode. Chat id is " + chatId);
+        passcodeManagement.setShowPasscodeScreen(false);
         MegaApplication.getChatManagement().setOpeningMeetingLink(chatId, true);
+        MegaApplication.getInstance().setIsLoggingRunning(true);
+
         Intent intent = new Intent(context, MeetingActivity.class);
         intent.setAction(MEETING_ACTION_GUEST);
         if (!isTextEmpty(meetingName)) {
@@ -218,7 +237,8 @@ public class CallUtil {
      */
     public static boolean existsAnOngoingOrIncomingCall() {
         MegaChatApiAndroid megaChatApi = MegaApplication.getInstance().getMegaChatApi();
-        MegaHandleList listCallsUserNoPresent = megaChatApi.getChatCalls(MegaChatCall.CALL_STATUS_USER_NO_PRESENT);
+        MegaHandleList listCallsUserNoPresent = megaChatApi.getChatCalls(CALL_STATUS_USER_NO_PRESENT);
+        MegaHandleList listCallsUserTerminatingUserParticipation = megaChatApi.getChatCalls(MegaChatCall.CALL_STATUS_TERMINATING_USER_PARTICIPATION);
         MegaHandleList listCallsDestroy = megaChatApi.getChatCalls(MegaChatCall.CALL_STATUS_DESTROYED);
         MegaHandleList listCalls = megaChatApi.getChatCalls();
 
@@ -227,38 +247,12 @@ public class CallUtil {
             return false;
         }
 
-        if ((listCalls.size() - listCallsDestroy.size()) == listCallsUserNoPresent.size()) {
+        if ((listCalls.size() - listCallsDestroy.size()) == (listCallsUserNoPresent.size() + listCallsUserTerminatingUserParticipation.size())) {
             logDebug("I'm not participating in any of the calls there");
             return false;
         }
 
         return true;
-    }
-
-    /**
-     * Retrieve the id of a chat that has a call in progress.
-     *
-     * @return A long data type. It's the id of chat.
-     */
-    public static long getChatCallInProgress() {
-        ArrayList<Long> listCalls = new ArrayList<>();
-        MegaChatApiAndroid megaChatApi = MegaApplication.getInstance().getMegaChatApi();
-        MegaHandleList listCallsInProgress = megaChatApi.getChatCalls(MegaChatCall.CALL_STATUS_IN_PROGRESS);
-        if (listCallsInProgress != null && listCallsInProgress.size() > 0) {
-            for (int i = 0; i < listCallsInProgress.size(); i++) {
-                listCalls.add(listCallsInProgress.get(i));
-            }
-        }
-
-        if (!listCalls.isEmpty()) {
-            for (Long idChat : listCalls) {
-                if (!megaChatApi.getChatCall(idChat).isOnHold()) {
-                    return idChat;
-                }
-            }
-        }
-
-        return MEGACHAT_INVALID_HANDLE;
     }
 
     /**
@@ -300,17 +294,19 @@ public class CallUtil {
     }
 
     /**
-     * Open the call that is in progress
+     * Opens the call that is in progress.
      *
-     * @param context from which the action is done
+     * @param context            From which the action is done.
+     * @param passcodeManagement To disable passcode.
      */
-    public static void returnActiveCall(Context context) {
+    public static void returnActiveCall(Context context, PasscodeManagement passcodeManagement) {
         ArrayList<Long> currentCalls = getCallsParticipating();
+
         if (currentCalls != null && !currentCalls.isEmpty()) {
             for (Long chatIdCall : currentCalls) {
                 MegaChatCall call = MegaApplication.getInstance().getMegaChatApi().getChatCall(chatIdCall);
                 if (call != null) {
-                    openMeetingInProgress(context, chatIdCall, false);
+                    openMeetingInProgress(context, chatIdCall, false, passcodeManagement);
                     break;
                 }
             }
@@ -318,22 +314,53 @@ public class CallUtil {
     }
 
     /**
-     * Open the call that is in progress
+     * Opens the call that is in progress.
      *
-     * @param context from which the action is done
-     * @param chatId  ID chat.
+     * @param context            From which the action is done.
+     * @param chatId             ID chat.
+     * @param passcodeManagement To disable passcode.
      */
-    public static void returnCall(Context context, long chatId) {
+    public static void returnCall(Context context, long chatId, PasscodeManagement passcodeManagement) {
         ArrayList<Long> currentCalls = getCallsParticipating();
         if (currentCalls == null || currentCalls.isEmpty())
             return;
 
         for (Long chatIdCall : currentCalls) {
             if (chatIdCall == chatId) {
-                openMeetingInProgress(context, chatId, false);
+                openMeetingInProgress(context, chatId, false, passcodeManagement);
                 return;
             }
         }
+    }
+
+    /**
+     * Method to know if I can join a one-to-one call
+     *
+     * @param chatId The chat id of the call I want to join
+     * @return True, if I can join. False, if not
+     */
+    public static boolean checkIfCanJoinOneToOneCall(long chatId) {
+        MegaChatRoom chatRoom = MegaApplication.getInstance().getMegaChatApi().getChatRoom(chatId);
+        MegaChatCall call = MegaApplication.getInstance().getMegaChatApi().getChatCall(chatId);
+
+        if (chatRoom == null || call == null) {
+            logError("Chat room or call is null");
+            return false;
+        }
+
+        if (!chatRoom.isGroup() && !chatRoom.isMeeting() && call.getStatus() == CALL_STATUS_USER_NO_PRESENT) {
+            MegaHandleList listPeers = call.getPeeridParticipants();
+            if (listPeers != null && listPeers.size() > 0) {
+                for (int i = 0; i < listPeers.size(); i++) {
+                    if (listPeers.get(i) == MegaApplication.getInstance().getMegaApi().getMyUserHandleBinary()) {
+                        logDebug("I am already participating in this one-to-one call");
+                        return false;
+                    }
+                }
+            }
+        }
+
+        return true;
     }
 
     /**
@@ -411,9 +438,9 @@ public class CallUtil {
             return;
         }
 
-        long chatIdInProgress = getChatCallInProgress();
-        if (chatIdInProgress != MEGACHAT_INVALID_HANDLE) {
-            createCallBanner(context, chatIdInProgress, callInProgressLayout, callInProgressChrono, callInProgressText);
+        MegaChatCall currentCallInProgress = getCallInProgress();
+        if (currentCallInProgress != null) {
+            createCallBanner(context, currentCallInProgress.getChatid(), callInProgressLayout, callInProgressChrono, callInProgressText);
             return;
         }
 
@@ -484,10 +511,9 @@ public class CallUtil {
     public static void setCallMenuItem(final MenuItem returnCallMenuItem, final LinearLayout layoutCallMenuItem, final Chronometer chronometerMenuItem) {
         Context context = MegaApplication.getInstance().getBaseContext();
         if (!isScreenInPortrait(context) && participatingInACall()) {
-            long chatIdInProgress = getChatCallInProgress();
-            if (chatIdInProgress != MEGACHAT_INVALID_HANDLE) {
-                MegaChatCall call = MegaApplication.getInstance().getMegaChatApi().getChatCall(chatIdInProgress);
-                createCallMenuItem(call, returnCallMenuItem, layoutCallMenuItem, chronometerMenuItem);
+            MegaChatCall currentCall = getCallInProgress();
+            if (currentCall != null) {
+                createCallMenuItem(currentCall, returnCallMenuItem, layoutCallMenuItem, chronometerMenuItem);
                 return;
             }
 
@@ -627,7 +653,7 @@ public class CallUtil {
         switch (status) {
             case MegaChatCall.CALL_STATUS_INITIAL:
                 return "CALL_STATUS_INITIAL";
-            case MegaChatCall.CALL_STATUS_USER_NO_PRESENT:
+            case CALL_STATUS_USER_NO_PRESENT:
                 return "CALL_STATUS_USER_NO_PRESENT";
             case MegaChatCall.CALL_STATUS_CONNECTING:
                 return "CALL_STATUS_CONNECTING";
@@ -657,6 +683,54 @@ public class CallUtil {
         }
     }
 
+    /**
+     * Method for showing the appropriate string depending on the value of termination code for the call
+     *
+     * @param termCode The termination code
+     * @return The appropriate string
+     */
+    public static String terminationCodeForCallToString(int termCode) {
+        switch (termCode) {
+            case MegaChatCall.TERM_CODE_INVALID:
+                return "TERM_CODE_INVALID";
+            case MegaChatCall.TERM_CODE_HANGUP:
+                return "TERM_CODE_HANGUP";
+            case MegaChatCall.TERM_CODE_TOO_MANY_PARTICIPANTS:
+                return "TERM_CODE_TOO_MANY_PARTICIPANTS";
+            case MegaChatCall.TERM_CODE_ERROR:
+                return "TERM_CODE_ERROR";
+            case MegaChatCall.TERM_CODE_REJECT:
+                return "TERM_CODE_REJECT";
+            default:
+                return String.valueOf(termCode);
+        }
+    }
+
+    /**
+     * Method for showing the appropriate string depending on the value of end call reason
+     *
+     * @param endCallReason The end call reason
+     * @return The appropriate string
+     */
+    public static String endCallReasonToString(int endCallReason) {
+        switch (endCallReason) {
+            case MegaChatCall.END_CALL_REASON_INVALID:
+                return "END_CALL_REASON_INVALID";
+            case MegaChatCall.END_CALL_REASON_ENDED:
+                return "END_CALL_REASON_ENDED";
+            case MegaChatCall.END_CALL_REASON_REJECTED:
+                return "END_CALL_REASON_REJECTED";
+            case MegaChatCall.END_CALL_REASON_NO_ANSWER:
+                return "END_CALL_REASON_NO_ANSWER";
+            case MegaChatCall.END_CALL_REASON_FAILED:
+                return "END_CALL_REASON_FAILED";
+            case MegaChatCall.END_CALL_REASON_CANCELLED:
+                return "END_CALL_REASON_CANCELLED";
+            default:
+                return String.valueOf(endCallReason);
+        }
+    }
+
     public static boolean isStatusConnected(Context context, long chatId) {
         MegaChatApiAndroid megaChatApi = MegaApplication.getInstance().getMegaChatApi();
         return checkConnection(context) && megaChatApi.getConnectionState() == MegaChatApi.CONNECTED && megaChatApi.getChatConnectionState(chatId) == MegaChatApi.CHAT_CONNECTION_ONLINE;
@@ -672,25 +746,54 @@ public class CallUtil {
         return true;
     }
 
-    public static void disableLocalCamera() {
-        long idCall = isNecessaryDisableLocalCamera();
-        MegaChatApiAndroid megaChatApi = MegaApplication.getInstance().getMegaChatApi();
-        if (idCall == MEGACHAT_INVALID_HANDLE) {
-            megaChatApi.releaseVideoDevice(null);
+    /**
+     * Enabling or disabling local video in a call
+     *
+     * @param isEnabled True, if video should be enabled. False, if video should be disabled.
+     * @param chatId    Chat ID of the call
+     * @param listener  MegaChatRequestListenerInterface
+     */
+    public static void enableOrDisableLocalVideo(boolean isEnabled, long chatId, MegaChatRequestListenerInterface listener) {
+        if (isEnabled) {
+            MegaApplication.getInstance().getMegaChatApi().enableVideo(chatId, listener);
         } else {
-            megaChatApi.disableVideo(idCall, null);
+            MegaApplication.getInstance().getMegaChatApi().disableVideo(chatId, listener);
         }
     }
 
+    /**
+     * Method to get the call in progress that is not on hold.
+     *
+     * @return MegaChatCall the call in progress
+     */
+    public static MegaChatCall getCallInProgress() {
+        ArrayList<Long> listCalls = CallUtil.getCallsParticipating();
+        if (listCalls != null && listCalls.size() > 0) {
+            for (Long chatId : listCalls) {
+                MegaChatCall call = MegaApplication.getInstance().getMegaChatApi().getChatCall(chatId);
+                if (call != null && !call.isOnHold()) {
+                    return call;
+                }
+            }
+        }
+
+        return null;
+    }
+
+    public static void disableLocalCamera() {
+       MegaChatCall call = getCallInProgress();
+       if(call != null){
+           enableOrDisableLocalVideo(false, call.getChatid(), new DisableAudioVideoCallListener(MegaApplication.getInstance()));
+       }
+    }
+
     public static long isNecessaryDisableLocalCamera() {
-        MegaChatApiAndroid megaChatApi = MegaApplication.getInstance().getMegaChatApi();
-        long chatIdCallInProgress = getChatCallInProgress();
-        MegaChatCall callInProgress = megaChatApi.getChatCall(chatIdCallInProgress);
-        if (callInProgress == null || !callInProgress.hasLocalVideo()) {
+        MegaChatCall call = getCallInProgress();
+        if (call == null || !call.hasLocalVideo()) {
             return MEGACHAT_INVALID_HANDLE;
         }
 
-        return chatIdCallInProgress;
+        return call.getChatid();
     }
 
     /**
@@ -951,12 +1054,13 @@ public class CallUtil {
     /**
      * Method to control when a call should be started, whether the chat room should be created or is already created.
      *
-     * @param activity       The Activity.
-     * @param snackbarShower The interface to show snackbar.
-     * @param user           The mega User.
+     * @param activity           The Activity.
+     * @param snackbarShower     The interface to show snackbar.
+     * @param user               The mega User.
+     * @param passcodeManagement To disable passcode.
      */
     public static void startNewCall(Activity activity, SnackbarShower snackbarShower,
-                                    MegaUser user) {
+                                    MegaUser user, PasscodeManagement passcodeManagement) {
         if (user == null)
             return;
 
@@ -976,7 +1080,7 @@ public class CallUtil {
                 megaChatApi.createChat(false, peers, listener);
             }
         } else if (megaChatApi.getChatCall(chat.getChatId()) != null) {
-            openMeetingInProgress(activity, chat.getChatId(), true);
+            openMeetingInProgress(activity, chat.getChatId(), true, passcodeManagement);
         } else if (isStatusConnected(activity, chat.getChatId())) {
             MegaApplication.setUserWaitingForCall(user.getHandle());
             startCallWithChatOnline(activity, chat);
@@ -1005,7 +1109,7 @@ public class CallUtil {
      * @return True, if you have both permits. False, otherwise.
      */
     public static boolean checkPermissionsCall(Activity activity, int typePermission) {
-        boolean hasCameraPermission = (ContextCompat.checkSelfPermission(MegaApplication.getInstance().getBaseContext(), Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED);
+        boolean hasCameraPermission = hasPermissions(MegaApplication.getInstance().getBaseContext(), Manifest.permission.CAMERA);
         if (!hasCameraPermission) {
             if (activity == null)
                 return false;
@@ -1013,11 +1117,11 @@ public class CallUtil {
             if (activity instanceof ManagerActivityLollipop) {
                 ((ManagerActivityLollipop) activity).setTypesCameraPermission(typePermission);
             }
-            ActivityCompat.requestPermissions(activity, new String[]{Manifest.permission.CAMERA}, REQUEST_CAMERA);
+            requestPermission(activity, REQUEST_CAMERA, Manifest.permission.CAMERA);
             return false;
         }
 
-        boolean hasRecordAudioPermission = (ContextCompat.checkSelfPermission(MegaApplication.getInstance().getBaseContext(), Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED);
+        boolean hasRecordAudioPermission = hasPermissions(MegaApplication.getInstance().getBaseContext(), Manifest.permission.RECORD_AUDIO);
         if (!hasRecordAudioPermission) {
             if (activity == null)
                 return false;
@@ -1025,64 +1129,11 @@ public class CallUtil {
             if (activity instanceof ManagerActivityLollipop) {
                 ((ManagerActivityLollipop) activity).setTypesCameraPermission(typePermission);
             }
-            ActivityCompat.requestPermissions(activity, new String[]{Manifest.permission.RECORD_AUDIO}, REQUEST_RECORD_AUDIO);
+            requestPermission(activity, REQUEST_RECORD_AUDIO, Manifest.permission.RECORD_AUDIO);
             return false;
         }
 
         return true;
-    }
-
-    /**
-     * Checks if it cannot join to call because has reached the maximum number of participants.
-     * If so, shows a snackbar with a warning.
-     *
-     * @param context current Context
-     * @param call    MegaChatCall to check
-     * @param chat    MegaChatRoom to check
-     * @return True if cannot joint to call, false otherwise
-     */
-    public static boolean canNotJoinCall(Context context, MegaChatCall call, MegaChatRoom chat) {
-        if (call == null || call.getNumParticipants() >= MAX_PARTICIPANTS_IN_CALL) {
-            showSnackbar(context, context.getString(R.string.call_error_too_many_participants));
-            return true;
-        } else if (canNotStartCall(context, chat, true)) {
-            showSnackbar(context, context.getString(R.string.call_error_too_many_participants_join));
-            return true;
-        }
-
-        return false;
-    }
-
-    /**
-     * Checks if it cannot start a call because has reached the maximum number of participants.
-     * If so, shows a snackbar with a warning.
-     *
-     * @param context current Context
-     * @param chat    MegaChatRoom to check
-     * @return True if cannot start a call, false otherwise
-     */
-    public static boolean canNotStartCall(Context context, MegaChatRoom chat) {
-        return canNotStartCall(context, chat, false);
-    }
-
-    /**
-     * Checks if it cannot start a call because has reached the maximum number of participants.
-     * If so, shows a snackbar with a warning.
-     *
-     * @param context current Context
-     * @param chat    MegaChatRoom to check
-     * @param joining true if it is related to a join request, false otherwise
-     * @return True if cannot start a call, false otherwise
-     */
-    public static boolean canNotStartCall(Context context, MegaChatRoom chat, boolean joining) {
-        if (chat == null || (chat.isPublic() && chat.getPeerCount() + 1 > MAX_PARTICIPANTS_IN_CALL)) {
-            if (!joining) {
-                showSnackbar(context, context.getString(R.string.call_error_too_many_participants_start));
-            }
-            return true;
-        }
-
-        return false;
     }
 
     public static void addChecksForACall(long chatId, boolean speakerStatus) {
@@ -1095,7 +1146,7 @@ public class CallUtil {
      * @param callIdIncomingCall The call ID
      */
     public static void clearIncomingCallNotification(long callIdIncomingCall) {
-        logDebug("Clear the notification in chat: " + callIdIncomingCall);
+        logDebug("Clear the notification in call: " + callIdIncomingCall);
         if (callIdIncomingCall == MEGACHAT_INVALID_HANDLE)
             return;
 
@@ -1187,7 +1238,7 @@ public class CallUtil {
         MegaChatCall call = MegaApplication.getInstance().getMegaChatApi().getChatCall(chatId);
         return call != null && call.getStatus() != MegaChatCall.CALL_STATUS_DESTROYED &&
                 call.getStatus() != MegaChatCall.CALL_STATUS_TERMINATING_USER_PARTICIPATION &&
-                call.getStatus() != MegaChatCall.CALL_STATUS_USER_NO_PRESENT;
+                call.getStatus() != CALL_STATUS_USER_NO_PRESENT;
     }
 
     /**
@@ -1210,49 +1261,61 @@ public class CallUtil {
      * @param link                  The meeting link
      * @param list                  The MegaHandleList with the call ID
      * @param titleChat             The title of the chat
+     * @param passcodeManagement    To disable passcode.
      */
-    public static void checkMeetingInProgress(Context context, LoadPreviewListener.OnPreviewLoadedCallback activity, long chatId, boolean isFromOpenChatPreview, String link, MegaHandleList list, String titleChat) {
+    public static void checkMeetingInProgress(Context context, LoadPreviewListener.OnPreviewLoadedCallback activity, long chatId, boolean isFromOpenChatPreview, String link, MegaHandleList list, String titleChat, boolean alreadyExist, long publicChatHandle, PasscodeManagement passcodeManagement) {
         if (amIParticipatingInThisMeeting(chatId)) {
             logDebug("I am participating in the meeting of this meeting link");
-            returnCall(context, chatId);
-        } else if (amIParticipatingInAnotherCall(chatId)) {
+            returnCall(context, chatId, passcodeManagement);
+            return;
+        }
+
+        if (amIParticipatingInAnotherCall(chatId)) {
             logDebug("I am participating in another call");
             showConfirmationInACall(context);
-        } else if (isFromOpenChatPreview) {
+            return;
+        }
+
+        if (isFromOpenChatPreview) {
             MegaChatCall call = MegaApplication.getInstance().getMegaChatApi().getChatCall(chatId);
-            if (call == null || call.getStatus() == MegaChatCall.CALL_STATUS_USER_NO_PRESENT) {
+            if (call == null || call.getStatus() == CALL_STATUS_USER_NO_PRESENT) {
                 logDebug("Call id: " + list.get(0) + ". It's a meeting, open to join");
-                CallUtil.openMeetingToJoin(context, chatId, titleChat, link);
+                CallUtil.openMeetingToJoin(context, chatId, titleChat, link, alreadyExist ? publicChatHandle : MEGACHAT_INVALID_HANDLE, alreadyExist, passcodeManagement);
             } else {
                 logDebug("Call id: " + list.get(0) + ". Return to call");
-                returnCall(context, chatId);
+                returnCall(context, chatId, passcodeManagement);
             }
-        } else {
-            logDebug("Open chat preview");
-            MegaApplication.getInstance().getMegaChatApi().openChatPreview(link, new LoadPreviewListener(context, activity, CHECK_LINK_TYPE_MEETING_LINK));
+            return;
         }
+
+        logDebug("Open chat preview");
+        MegaApplication.getInstance().getMegaChatApi().openChatPreview(link, new LoadPreviewListener(context, activity, CHECK_LINK_TYPE_MEETING_LINK));
     }
 
     /**
      * Method that performs the necessary actions when there is an incoming call.
      *
-     * @param listAllCalls List of all current calls
-     * @param chatId       Chat ID
-     * @param callStatus   Call Status
+     * @param listAllCalls       List of all current calls
+     * @param incomingCallChatId Chat ID of incoming call
+     * @param callStatus         Call Status
      */
-    public static void incomingCall(MegaHandleList listAllCalls, long chatId, int callStatus) {
-        if (!MegaApplication.getInstance().getMegaApi().isChatNotifiable(chatId))
+    public static void incomingCall(MegaHandleList listAllCalls, long incomingCallChatId, int callStatus) {
+        logDebug("Chat ID of incoming call is " + incomingCallChatId);
+        if (!MegaApplication.getInstance().getMegaApi().isChatNotifiable(incomingCallChatId) ||
+                MegaApplication.getChatManagement().isNotificationShown(incomingCallChatId)){
+            logDebug("The chat is not notifiable or the notification is already being displayed");
             return;
+        }
 
-        MegaChatRoom chatRoom = MegaApplication.getInstance().getMegaChatApi().getChatRoom(chatId);
+        MegaChatRoom chatRoom = MegaApplication.getInstance().getMegaChatApi().getChatRoom(incomingCallChatId);
         if (chatRoom == null) {
             logError("The chat does not exist");
             return;
         }
 
-        if (!chatRoom.isMeeting() || !MegaApplication.getChatManagement().isOpeningMeetingLink(chatId)) {
-            MegaApplication.getInstance().createOrUpdateAudioManager(false, AUDIO_MANAGER_CALL_RINGING);
-            controlNumberOfCalls(listAllCalls, callStatus);
+        if (!chatRoom.isMeeting() || !MegaApplication.getChatManagement().isOpeningMeetingLink(incomingCallChatId)) {
+            logError("It is necessary to check the number of current calls");
+            controlNumberOfCalls(listAllCalls, callStatus, incomingCallChatId);
         }
     }
 
@@ -1260,9 +1323,10 @@ public class CallUtil {
      * Method that performs the necessary actions when there is an outgoing call or incoming call.
      *
      * @param chatId           Chat ID
+     * @param callId           Call ID
      * @param typeAudioManager audio Manager type
      */
-    public static void ongoingCall(long chatId, int typeAudioManager) {
+    public static void ongoingCall(long chatId, long callId, int typeAudioManager) {
         AppRTCAudioManager rtcAudioManager = MegaApplication.getInstance().getAudioManager();
         if (rtcAudioManager != null && rtcAudioManager.getTypeAudioManager() == typeAudioManager)
             return;
@@ -1275,8 +1339,8 @@ public class CallUtil {
 
         logDebug("Controlling outgoing/in progress call");
         if (typeAudioManager == AUDIO_MANAGER_CALL_OUTGOING && chatRoom.isMeeting()) {
-            clearIncomingCallNotification(chatId);
-            return;
+            clearIncomingCallNotification(callId);
+            typeAudioManager = AUDIO_MANAGER_CALL_IN_PROGRESS;
         }
 
         MegaApplication.getInstance().createOrUpdateAudioManager(MegaApplication.getChatManagement().getSpeakerStatus(chatId), typeAudioManager);
@@ -1287,12 +1351,69 @@ public class CallUtil {
      *
      * @param listAllCalls List of all current calls
      * @param callStatus   Call Status
+     * @param incomingCallChatId Chat ID of incoming call
      */
-    private static void controlNumberOfCalls(MegaHandleList listAllCalls, int callStatus) {
+    private static void controlNumberOfCalls(MegaHandleList listAllCalls, int callStatus, long incomingCallChatId) {
         if (listAllCalls.size() == 1) {
-            MegaApplication.getInstance().checkOneCall(listAllCalls.get(0));
+            MegaApplication.getInstance().checkOneCall(incomingCallChatId);
         } else {
-            MegaApplication.getInstance().checkSeveralCall(listAllCalls, callStatus, true);
+            MegaApplication.getInstance().checkSeveralCall(listAllCalls, callStatus, true, incomingCallChatId);
         }
+    }
+
+    /**
+     * Check if an incoming call is a one-to-one call
+     *
+     * @param chatRoom MegaChatRoom of the call
+     * @return True, if it is a one-to-one call. False, if it is a group call or meeting
+     */
+    public static boolean isOneToOneCall(MegaChatRoom chatRoom) {
+        return !chatRoom.isGroup() && !chatRoom.isMeeting();
+    }
+
+    /**
+     * Get incoming call notification title
+     *
+     * @param chatRoom MegaChatRoom of the call
+     * @return Notification title
+     */
+    public static String getIncomingCallNotificationTitle(MegaChatRoom chatRoom) {
+        return getString(isOneToOneCall(chatRoom)
+                ? R.string.title_notification_incoming_individual_audio_call
+                : R.string.title_notification_incoming_group_call);
+    }
+
+    /**
+     * Method to create collapsed or expanded remote views for a customised incoming call notification.
+     *
+     * @param layoutId     ID of layout
+     * @param chatToAnswer MegaChatRoom of the call
+     * @param avatarIcon   Bitmap with the chat Avatar
+     * @return The RemoteViews created
+     */
+    public static RemoteViews collapsedAndExpandedIncomingCallNotification(Context context, int layoutId, MegaChatRoom chatToAnswer, Bitmap avatarIcon) {
+        Bitmap statusIcon = CallUtil.isOneToOneCall(chatToAnswer) ? getStatusBitmap(MegaApplication.getInstance().getMegaChatApi().getUserOnlineStatus(chatToAnswer.getPeerHandle(0))) : null;
+        String titleChat = getTitleChat(chatToAnswer);
+        String titleCall = CallUtil.getIncomingCallNotificationTitle(chatToAnswer);
+
+        RemoteViews views = new RemoteViews(context.getPackageName(), layoutId);
+        views.setTextViewText(R.id.chat_title, titleChat);
+        views.setTextViewText(R.id.call_title, titleCall);
+
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O || avatarIcon == null) {
+            views.setViewVisibility(R.id.avatar_layout, GONE);
+        } else {
+            views.setImageViewBitmap(R.id.avatar_image, avatarIcon);
+            views.setViewVisibility(R.id.avatar_layout, View.VISIBLE);
+        }
+
+        if (statusIcon != null) {
+            views.setImageViewBitmap(R.id.chat_status, statusIcon);
+            views.setViewVisibility(R.id.chat_status, View.VISIBLE);
+        } else {
+            views.setViewVisibility(R.id.chat_status, GONE);
+        }
+
+        return views;
     }
 }

@@ -4,21 +4,14 @@ import android.content.Context
 import android.graphics.Bitmap
 import dagger.hilt.android.qualifiers.ApplicationContext
 import mega.privacy.android.app.MegaApplication
-import mega.privacy.android.app.R
 import mega.privacy.android.app.di.MegaApi
 import mega.privacy.android.app.listeners.ChatConnectionListener
 import mega.privacy.android.app.lollipop.controllers.ChatController
 import mega.privacy.android.app.meeting.adapter.Participant
-import mega.privacy.android.app.meeting.listeners.AddContactListener
-import mega.privacy.android.app.meeting.listeners.GroupVideoListener
-import mega.privacy.android.app.meeting.listeners.MeetingVideoListener
-import mega.privacy.android.app.meeting.listeners.SetCallOnHoldListener
-import mega.privacy.android.app.utils.AvatarUtil
-import mega.privacy.android.app.utils.CallUtil
+import mega.privacy.android.app.meeting.listeners.*
+import mega.privacy.android.app.utils.*
 import mega.privacy.android.app.utils.LogUtil.logDebug
 import mega.privacy.android.app.utils.LogUtil.logWarning
-import mega.privacy.android.app.utils.StringResourcesUtils
-import mega.privacy.android.app.utils.TextUtil
 import nz.mega.sdk.*
 import nz.mega.sdk.MegaChatApi.INIT_WAITING_NEW_SESSION
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
@@ -31,17 +24,6 @@ class InMeetingRepository @Inject constructor(
     private val megaChatApi: MegaChatApiAndroid,
     @ApplicationContext private val context: Context
 ) {
-
-    /**
-     * Get the initial name of the meeting created
-     *
-     * @return String meeting's name
-     */
-    fun getInitialMeetingName(): String {
-        return StringResourcesUtils.getString(
-            R.string.type_meeting_name, megaChatApi.myFullname
-        )
-    }
 
     /**
      * Set a title for a chat
@@ -139,7 +121,6 @@ class InMeetingRepository @Inject constructor(
     fun getChatRoom(chatId: Long): MegaChatRoom? =
         if (chatId == MEGACHAT_INVALID_HANDLE) null else megaChatApi.getChatRoom(chatId)
 
-
     /**
      * Get contact name
      *
@@ -189,8 +170,6 @@ class InMeetingRepository @Inject constructor(
             return
 
         megaChatApi.setIgnoredCall(chatId)
-        MegaApplication.getInstance().stopSounds()
-        CallUtil.clearIncomingCallNotification(chatId)
     }
 
     /**
@@ -232,6 +211,8 @@ class InMeetingRepository @Inject constructor(
     fun getAvatarBitmap(chat: MegaChatRoom, peerId: Long): Bitmap? {
         var avatar = CallUtil.getImageAvatarCall(chat, peerId)
         if (avatar == null) {
+            getRemoteAvatar(peerId)
+
             avatar = CallUtil.getDefaultAvatarCall(
                 MegaApplication.getInstance().applicationContext,
                 peerId
@@ -304,15 +285,19 @@ class InMeetingRepository @Inject constructor(
      * @param chatId chat ID
      * @param clientId client ID of a participant
      * @param hiRes If it's has High resolution
-     * @param listener MeetingVideoListener
+     * @param listener MegaChatVideoListenerInterface
      */
-    fun addRemoteVideoOneToOneCall(
+    fun addChatRemoteVideoListener(
         chatId: Long,
         clientId: Long,
         hiRes: Boolean,
-        listener: MeetingVideoListener
+        listener: MegaChatVideoListenerInterface
     ) {
-        logDebug("Add Chat remote video listener of $clientId")
+        if (hiRes) {
+            logDebug("Add Chat remote video listener of client $clientId , with HiRes")
+        } else {
+            logDebug("Add Chat remote video listener of client $clientId , with LowRes")
+        }
         megaChatApi.addChatRemoteVideoListener(chatId, clientId, hiRes, listener)
     }
 
@@ -322,51 +307,19 @@ class InMeetingRepository @Inject constructor(
      * @param chatId chat ID
      * @param clientId client ID of a participant
      * @param hiRes If it's has High resolution
-     * @param listener MeetingVideoListener
+     * @param listener MegaChatVideoListenerInterface
      */
-    fun removeRemoteVideoOneToOneCall(
+    fun removeChatRemoteVideoListener(
         chatId: Long,
         clientId: Long,
         hiRes: Boolean,
-        listener: MeetingVideoListener
+        listener: MegaChatVideoListenerInterface
     ) {
-        logDebug("Remove chat video listener of $clientId")
-        megaChatApi.removeChatVideoListener(chatId, clientId, hiRes, listener)
-    }
-
-    /**
-     * Method of obtaining the remote video
-     *
-     * @param chatId chat ID
-     * @param clientId client ID of a participant
-     * @param hiRes If it's has High resolution
-     * @param listener GroupVideoListener
-     */
-    fun addRemoteVideo(
-        chatId: Long,
-        clientId: Long,
-        hiRes: Boolean,
-        listener: GroupVideoListener
-    ) {
-        logDebug("Add Chat remote video listener of client $clientId")
-        megaChatApi.addChatRemoteVideoListener(chatId, clientId, hiRes, listener)
-    }
-
-    /**
-     * Method of remove the remote video
-     *
-     * @param chatId chat ID
-     * @param clientId client ID of a participant
-     * @param hiRes If it's has High resolution
-     * @param listener GroupVideoListener
-     */
-    fun removeRemoteVideo(
-        chatId: Long,
-        clientId: Long,
-        hiRes: Boolean,
-        listener: GroupVideoListener
-    ) {
-        logDebug("Remove Chat remote video listener of client $clientId")
+        if (hiRes) {
+            logDebug("Remove Chat remote video listener of client $clientId, with HiRes")
+        } else {
+            logDebug("Remove Chat remote video listener of client $clientId, with LowRes")
+        }
         megaChatApi.removeChatVideoListener(chatId, clientId, hiRes, listener)
     }
 
@@ -435,28 +388,6 @@ class InMeetingRepository @Inject constructor(
     }
 
     /**
-     * Method of obtaining the local video
-     *
-     * @param chatId chat ID
-     * @param listener GroupVideoListener
-     */
-    fun addLocalVideoSpeaker(chatId: Long, listener: GroupVideoListener) {
-        logDebug("Add chat local video listener")
-        megaChatApi.addChatLocalVideoListener(chatId, listener)
-    }
-
-    /**
-     * Method of remove the local video
-     *
-     * @param chatId chat ID
-     * @param listener GroupVideoListener
-     */
-    fun removeLocalVideoSpeaker(chatId: Long, listener: GroupVideoListener) {
-        logDebug("Remove chat video listener")
-        megaChatApi.removeChatVideoListener(chatId, MEGACHAT_INVALID_HANDLE, false, listener)
-    }
-
-    /**
      * Method to get own privileges in a chat
      *
      * @param chatId chat ID
@@ -484,12 +415,16 @@ class InMeetingRepository @Inject constructor(
         lastName: String,
         listener: MegaRequestListenerInterface
     ) {
-        val initResult = megaChatApi.init(null)
-
-        if (initResult == INIT_WAITING_NEW_SESSION) {
-            megaApi.createEphemeralAccountPlusPlus(firstName, lastName, listener)
-        } else {
-            logWarning("Init chat failed, result: $initResult")
+        val ret = megaChatApi.initState
+        if (ret == MegaChatApi.INIT_NOT_DONE || ret == MegaChatApi.INIT_ERROR) {
+            logDebug("INIT STATE: $ret")
+            val initResult = megaChatApi.init(null)
+            logDebug("result of init ---> $initResult")
+            if (initResult == INIT_WAITING_NEW_SESSION) {
+                megaApi.createEphemeralAccountPlusPlus(firstName, lastName, listener)
+            } else {
+                logWarning("Init chat failed, result: $initResult")
+            }
         }
     }
 
@@ -504,6 +439,15 @@ class InMeetingRepository @Inject constructor(
         }
     }
 
+    fun rejoinPublicChat(
+        chatId: Long,
+        publicChatHandle: Long,
+        listener: MegaChatRequestListenerInterface
+    ) {
+        logDebug("Rejoining to public chat with ID $chatId")
+        megaChatApi.autorejoinPublicChat(chatId, publicChatHandle, listener)
+    }
+
     fun registerConnectionUpdateListener(chatId: Long, callback: () -> Unit) =
         megaChatApi.addChatListener(ChatConnectionListener(chatId, callback))
 
@@ -512,7 +456,12 @@ class InMeetingRepository @Inject constructor(
             megaApi.myUserHandleBinary,
             MEGACHAT_INVALID_HANDLE,
             megaChatApi.myFullname ?: "",
-            null, true, moderator, audio, video, isGuest = megaApi.isEphemeralPlusPlus
+            getAvatarBitmapByPeerId(megaApi.myUserHandleBinary),
+            true,
+            moderator,
+            audio,
+            video,
+            isGuest = megaApi.isEphemeralPlusPlus
         )
     }
 
@@ -549,6 +498,13 @@ class InMeetingRepository @Inject constructor(
         }
 
         if (bitmap == null) {
+            megaApi.getUserAvatar(
+                mail,
+                CacheFolderManager.buildAvatarFile(
+                    context,
+                    mail + FileUtil.JPG_EXTENSION
+                ).absolutePath, MeetingAvatarListener(context, peerId)
+            )
             bitmap = CallUtil.getDefaultAvatarCall(
                 MegaApplication.getInstance().applicationContext,
                 peerId
@@ -586,6 +542,29 @@ class InMeetingRepository @Inject constructor(
             null,
             MegaContactRequest.INVITE_ACTION_ADD,
             AddContactListener(callback)
+        )
+    }
+
+    /**
+     * Get avatar from sdk
+     *
+     * @param peerId the peerId of participant
+     */
+    fun getRemoteAvatar(peerId: Long) {
+        var email = ChatController(context).getParticipantEmail(peerId)
+
+        if (email == null) {
+            email = MegaApiJava.handleToBase64(peerId)
+        }
+
+        if (email == null) return
+
+        megaApi.getUserAvatar(
+            email,
+            CacheFolderManager.buildAvatarFile(
+                context,
+                email + FileUtil.JPG_EXTENSION
+            ).absolutePath, MeetingAvatarListener(context, peerId)
         )
     }
 }

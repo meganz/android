@@ -1,9 +1,8 @@
 package mega.privacy.android.app.lollipop;
 
+import android.annotation.SuppressLint;
 import android.app.ActivityManager;
-import android.app.ProgressDialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.graphics.Bitmap;
@@ -48,23 +47,21 @@ import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.TransfersManagementActivity;
+import mega.privacy.android.app.utils.MegaProgressDialogUtil;
 import mega.privacy.android.app.components.saver.NodeSaver;
 import mega.privacy.android.app.interfaces.SnackbarShower;
 import mega.privacy.android.app.fragments.settingsFragments.cookie.CookieDialogHandler;
 import mega.privacy.android.app.lollipop.listeners.MultipleRequestListenerLink;
 import mega.privacy.android.app.utils.AlertsAndWarnings;
 import mega.privacy.android.app.utils.ColorUtils;
-import mega.privacy.android.app.service.ads.GoogleAdsLoader;
-import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
-import nz.mega.sdk.MegaChatApi;
-import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
 
 import static mega.privacy.android.app.constants.BroadcastConstants.ACTION_CLOSE_CHAT_AFTER_IMPORT;
+import static mega.privacy.android.app.utils.AlertsAndWarnings.showForeignStorageOverQuotaWarningDialog;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.MegaApiUtils.*;
@@ -77,17 +74,14 @@ public class FileLinkActivityLollipop extends TransfersManagementActivity implem
 		SnackbarShower {
 
 	private static final String TAG_DECRYPT = "decrypt";
-	private static final String AD_SLOT = "and5";
 
 	FileLinkActivityLollipop fileLinkActivity = this;
-	MegaApiAndroid megaApi;
-	MegaChatApiAndroid megaChatApi;
 
 	Toolbar tB;
     ActionBar aB;
 	DisplayMetrics outMetrics;
 	String url;
-	ProgressDialog statusDialog;
+	AlertDialog statusDialog;
 
 	File previewFile = null;
 	Bitmap preview = null;
@@ -131,8 +125,6 @@ public class FileLinkActivityLollipop extends TransfersManagementActivity implem
 	@Inject
     CookieDialogHandler cookieDialogHandler;
 
-	private GoogleAdsLoader mAdsLoader;
-
 	@Override
 	public void onDestroy(){
 		if(megaApi != null)
@@ -155,8 +147,6 @@ public class FileLinkActivityLollipop extends TransfersManagementActivity implem
 		outMetrics = new DisplayMetrics ();
 	    display.getMetrics(outMetrics);
 
-		MegaApplication app = (MegaApplication)getApplication();
-		megaApi = app.getMegaApi();
 		dbH = DatabaseHandler.getDbHandler(getApplicationContext());
 
 		Intent intentReceived = getIntent();
@@ -164,34 +154,16 @@ public class FileLinkActivityLollipop extends TransfersManagementActivity implem
 			url = intentReceived.getDataString();
 		}
 
-		if (dbH.getCredentials() != null) {
-			if (megaApi == null || megaApi.getRootNode() == null) {
-				logDebug("Refresh session - sdk");
-				Intent intent = new Intent(this, LoginActivityLollipop.class);
-				intent.putExtra(VISIBLE_FRAGMENT, LOGIN_FRAGMENT);
-				intent.setData(Uri.parse(url));
-				intent.setAction(ACTION_OPEN_FILE_LINK_ROOTNODES_NULL);
-				intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-				startActivity(intent);
-				finish();
-				return;
-			}
-
-			if (megaChatApi == null) {
-				megaChatApi = ((MegaApplication) getApplication()).getMegaChatApi();
-			}
-
-			if (megaChatApi == null || megaChatApi.getInitState() == MegaChatApi.INIT_ERROR) {
-				logDebug("Refresh session - karere");
-				Intent intent = new Intent(this, LoginActivityLollipop.class);
-				intent.putExtra(VISIBLE_FRAGMENT, LOGIN_FRAGMENT);
-				intent.setData(Uri.parse(url));
-				intent.setAction(ACTION_OPEN_FILE_LINK_ROOTNODES_NULL);
-				intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-				startActivity(intent);
-				finish();
-				return;
-			}
+		if (dbH.getCredentials() != null && (megaApi == null || megaApi.getRootNode() == null)) {
+			logDebug("Refresh session - sdk or karere");
+			Intent intent = new Intent(this, LoginActivityLollipop.class);
+			intent.putExtra(VISIBLE_FRAGMENT, LOGIN_FRAGMENT);
+			intent.setData(Uri.parse(url));
+			intent.setAction(ACTION_OPEN_FILE_LINK_ROOTNODES_NULL);
+			intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+			startActivity(intent);
+			finish();
+			return;
 		}
 
 		if (savedInstanceState != null) {
@@ -199,10 +171,10 @@ public class FileLinkActivityLollipop extends TransfersManagementActivity implem
 		}
 
 		setContentView(R.layout.activity_file_link);
-		fragmentContainer = (CoordinatorLayout) findViewById(R.id.file_link_fragment_container);
+		fragmentContainer = findViewById(R.id.file_link_fragment_container);
 
 		appBarLayout = findViewById(R.id.app_bar);
-		collapsingToolbar = (CollapsingToolbarLayout) findViewById(R.id.file_link_info_collapse_toolbar);
+		collapsingToolbar = findViewById(R.id.file_link_info_collapse_toolbar);
 
 		if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
 			collapsingToolbar.setExpandedTitleMarginBottom(scaleHeightPx(60, outMetrics));
@@ -210,25 +182,25 @@ public class FileLinkActivityLollipop extends TransfersManagementActivity implem
 			collapsingToolbar.setExpandedTitleMarginBottom(scaleHeightPx(35, outMetrics));
 		}
 		collapsingToolbar.setExpandedTitleMarginStart((int) getResources().getDimension(R.dimen.bottom_sheet_item_divider_margin_start));
-		tB = (Toolbar) findViewById(R.id.toolbar_file_link);
+		tB = findViewById(R.id.toolbar_file_link);
 		setSupportActionBar(tB);
 		aB = getSupportActionBar();
-		aB.setDisplayShowTitleEnabled(false);
-
-		aB.setHomeButtonEnabled(true);
-		aB.setDisplayHomeAsUpEnabled(true);
-
+		if(aB != null) {
+			aB.setDisplayShowTitleEnabled(false);
+			aB.setHomeButtonEnabled(true);
+			aB.setDisplayHomeAsUpEnabled(true);
+		}
 		/*Icon & image in Toolbar*/
-		iconViewLayout = (RelativeLayout) findViewById(R.id.file_link_icon_layout);
-		iconView = (ImageView) findViewById(R.id.file_link_icon);
+		iconViewLayout = findViewById(R.id.file_link_icon_layout);
+		iconView = findViewById(R.id.file_link_icon);
 
-		imageViewLayout = (RelativeLayout) findViewById(R.id.file_info_image_layout);
-		imageView = (ImageView) findViewById(R.id.file_info_toolbar_image);
+		imageViewLayout = findViewById(R.id.file_info_image_layout);
+		imageView = findViewById(R.id.file_info_toolbar_image);
 		imageViewLayout.setVisibility(View.GONE);
 
 		/*Elements*/
-		sizeTextView = (TextView) findViewById(R.id.file_link_size);
-		buttonPreviewContent = (Button) findViewById(R.id.button_preview_content);
+		sizeTextView = findViewById(R.id.file_link_size);
+		buttonPreviewContent = findViewById(R.id.button_preview_content);
 		buttonPreviewContent.setOnClickListener(this);
 		buttonPreviewContent.setEnabled(false);
 
@@ -249,7 +221,9 @@ public class FileLinkActivityLollipop extends TransfersManagementActivity implem
 		try{
 			statusDialog.dismiss();
 		}
-		catch(Exception e){	}
+		catch(Exception e){
+			logError(e.getMessage());
+		}
 
 		if(url!=null){
 			importLink(url);
@@ -259,7 +233,6 @@ public class FileLinkActivityLollipop extends TransfersManagementActivity implem
 		}
 
 		fragmentContainer.post(() -> cookieDialogHandler.showDialogIfNeeded(this));
-		initAdsLoader();
 	}
 
 	@Override
@@ -267,17 +240,6 @@ public class FileLinkActivityLollipop extends TransfersManagementActivity implem
 		super.onConfigurationChanged(newConfig);
 
 		cookieDialogHandler.showDialogIfNeeded(this, true);
-	}
-
-	/**
-	 * Init the Ads Loader and associate it with tht Ad Slot
-	 * Add it as the fragment lifecycle observer
-	 * Set the Ads view container to the Ads Loader
-	 */
-	private void initAdsLoader() {
-		mAdsLoader = new GoogleAdsLoader(this, AD_SLOT, false);
-		getLifecycle().addObserver(mAdsLoader);
-		mAdsLoader.setAdViewContainer(findViewById(R.id.ad_view_container), getOutMetrics());
 	}
 
 	@Override
@@ -305,6 +267,7 @@ public class FileLinkActivityLollipop extends TransfersManagementActivity implem
 		return super.onCreateOptionsMenu(menu);
 	}
 
+	@SuppressLint("NonConstantResourceId")
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		logDebug("onOptionsItemSelected");
@@ -443,10 +406,9 @@ public class FileLinkActivityLollipop extends TransfersManagementActivity implem
 
 		if(this.isFinishing()) return;
 
-		ProgressDialog temp = null;
+		AlertDialog temp;
 		try {
-			temp = new ProgressDialog(this);
-			temp.setMessage(getString(R.string.general_loading));
+			temp = MegaProgressDialogUtil.createProgressDialog(this, getString(R.string.general_loading));
 			temp.show();
 		}
 		catch(Exception ex)
@@ -474,6 +436,7 @@ public class FileLinkActivityLollipop extends TransfersManagementActivity implem
 			try {
 				statusDialog.dismiss();
 			} catch (Exception ex) {
+				logError(ex.getMessage());
 			}
 
 			if (e.getErrorCode() == MegaError.API_OK) {
@@ -502,8 +465,6 @@ public class FileLinkActivityLollipop extends TransfersManagementActivity implem
 					dbH.setLastPublicHandle(handle);
 					dbH.setLastPublicHandleTimeStamp();
 					dbH.setLastPublicHandleType(MegaApiJava.AFFILIATE_TYPE_FILE_FOLDER);
-
-					mAdsLoader.queryShowOrNotByHandle(handle);
 				}
 
 //				nameView.setText(document.getName());
@@ -619,18 +580,15 @@ public class FileLinkActivityLollipop extends TransfersManagementActivity implem
 
 				try{
 					dialogBuilder.setPositiveButton(getString(android.R.string.ok),
-							new DialogInterface.OnClickListener() {
-								@Override
-								public void onClick(DialogInterface dialog, int which) {
-									dialog.dismiss();
-									boolean closedChat = MegaApplication.isClosedChat();
-									if(closedChat){
-										Intent backIntent = new Intent(fileLinkActivity, ManagerActivityLollipop.class);
-										startActivity(backIntent);
-									}
-
-									finish();
+							(dialog, which) -> {
+								dialog.dismiss();
+								boolean closedChat = MegaApplication.isClosedChat();
+								if(closedChat){
+									Intent backIntent = new Intent(fileLinkActivity, ManagerActivityLollipop.class);
+									startActivity(backIntent);
 								}
+
+								finish();
 							});
 
 					AlertDialog dialog = dialogBuilder.create();
@@ -639,8 +597,6 @@ public class FileLinkActivityLollipop extends TransfersManagementActivity implem
 				catch(Exception ex){
 					showSnackbar(SNACKBAR_TYPE, getString(R.string.general_error_file_not_found));
 				}
-
-				return;
 			}
 		}
 		else if (request.getType() == MegaRequest.TYPE_GET_ATTR_FILE){
@@ -670,13 +626,20 @@ public class FileLinkActivityLollipop extends TransfersManagementActivity implem
 			
 			try{
 				statusDialog.dismiss(); 
-			} catch(Exception ex){};
+			} catch(Exception ex){
+				logError(ex.getMessage());
+			}
 
 			if (e.getErrorCode() != MegaError.API_OK) {
 
 				logDebug("e.getErrorCode() != MegaError.API_OK");
 				
 				if(e.getErrorCode()==MegaError.API_EOVERQUOTA){
+					if (api.isForeignNode(request.getParentHandle())) {
+						showForeignStorageOverQuotaWarningDialog(this);
+						return;
+					}
+
 					logWarning("OVERQUOTA ERROR: " + e.getErrorCode());
 					Intent intent = new Intent(this, ManagerActivityLollipop.class);
 					intent.setAction(ACTION_OVERQUOTA_STORAGE);
@@ -718,6 +681,7 @@ public class FileLinkActivityLollipop extends TransfersManagementActivity implem
 		logWarning("onRequestTemporaryError: " + request.getRequestString());
 	}
 
+	@SuppressLint("NonConstantResourceId")
 	@Override
 	public void onClick(View v) {
 
@@ -921,6 +885,7 @@ public class FileLinkActivityLollipop extends TransfersManagementActivity implem
 				try {
 					statusDialog.dismiss();
 				} catch (Exception ex) {
+					logError(ex.getMessage());
 				}
 
 				showSnackbar(SNACKBAR_TYPE, getString(R.string.error_server_connection_problem));
@@ -937,8 +902,7 @@ public class FileLinkActivityLollipop extends TransfersManagementActivity implem
 				}
 			}
 
-			statusDialog = new ProgressDialog(this);
-			statusDialog.setMessage(getString(R.string.general_importing));
+			statusDialog = MegaProgressDialogUtil.createProgressDialog(this, getString(R.string.general_importing));
 			statusDialog.show();
 
 			if (document != null) {
@@ -982,7 +946,9 @@ public class FileLinkActivityLollipop extends TransfersManagementActivity implem
 
 		try{
 			statusDialog.dismiss();
-		} catch(Exception ex){}
+		} catch(Exception ex){
+			logError(ex.getMessage());
+		}
 
 		finish();
 	}

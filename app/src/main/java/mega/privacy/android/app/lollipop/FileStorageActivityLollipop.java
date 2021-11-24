@@ -77,11 +77,12 @@ import static mega.privacy.android.app.utils.FileUtil.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.MegaApiUtils.*;
 import static mega.privacy.android.app.utils.MegaNodeDialogUtil.showNewFolderDialog;
+import static mega.privacy.android.app.utils.PermissionUtils.*;
 import static mega.privacy.android.app.utils.TextUtil.*;
 import static mega.privacy.android.app.utils.Util.*;
 
 public class FileStorageActivityLollipop extends PasscodeActivity implements OnClickListener,
-		ActionNodeCallback {
+		ActionNodeCallback, CheckScrollInterface {
 
 	private static final String IS_SET_DOWNLOAD_LOCATION_SHOWN = "IS_SET_DOWNLOAD_LOCATION_SHOWN";
 	private static final String IS_CONFIRMATION_CHECKED = "IS_CONFIRMATION_CHECKED";
@@ -250,7 +251,7 @@ public class FileStorageActivityLollipop extends PasscodeActivity implements OnC
 		public boolean onCreateActionMode(ActionMode mode, Menu menu) {
 			MenuInflater inflater = mode.getMenuInflater();
 			inflater.inflate(R.menu.file_storage_action, menu);
-			tB.setElevation(getResources().getDimension(R.dimen.toolbar_elevation));
+			checkScroll();
 			return true;
 		}
 
@@ -258,7 +259,7 @@ public class FileStorageActivityLollipop extends PasscodeActivity implements OnC
 		public void onDestroyActionMode(ActionMode arg0) {
 			clearSelections();
 			adapter.setMultipleSelect(false);
-			tB.setElevation(0);
+			checkScroll();
 		}
 
 		@Override
@@ -337,13 +338,11 @@ public class FileStorageActivityLollipop extends PasscodeActivity implements OnC
 	@SuppressLint("NewApi") @Override
 	protected void onCreate(Bundle savedInstanceState) {
 		logDebug("onCreate");
-		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-			boolean hasStoragePermission = (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED);
-			if (!hasStoragePermission) {
-				ActivityCompat.requestPermissions(this,
-		                new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
-						REQUEST_WRITE_STORAGE);
-			}
+		boolean hasStoragePermission = hasPermissions(this, Manifest.permission.WRITE_EXTERNAL_STORAGE);
+		if (!hasStoragePermission) {
+			requestPermission(this,
+					REQUEST_WRITE_STORAGE,
+					Manifest.permission.WRITE_EXTERNAL_STORAGE);
 		}
 
 		requestWindowFeature(Window.FEATURE_NO_TITLE);
@@ -453,6 +452,13 @@ public class FileStorageActivityLollipop extends PasscodeActivity implements OnC
 		mLayoutManager = new LinearLayoutManager(this);
 		listView.setLayoutManager(mLayoutManager);
 		listView.setItemAnimator(noChangeRecyclerViewItemAnimator());
+		listView.addOnScrollListener(new RecyclerView.OnScrollListener() {
+			@Override
+			public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
+				super.onScrolled(recyclerView, dx, dy);
+				checkScroll();
+			}
+		});
 		
 		if (adapter == null){
 			adapter = new FileStorageLollipopAdapter(this, listView, mode);
@@ -665,11 +671,14 @@ public class FileStorageActivityLollipop extends PasscodeActivity implements OnC
 	}
 
 	/**
-	 * Changes the path shown in the screen or finish the activity it the current one is not valid.
+	 * Changes the path shown in the screen or finish the activity if the current one is not valid.
 	 */
 	private void checkPath() {
 		if (path == null){
-			finish();
+			logError("Current path is not valid (null)");
+			showErrorAlertDialog(getString(R.string.error_io_problem),
+					true, this);
+			return;
 		}
 
 		changeFolder(path);
@@ -815,8 +824,7 @@ public class FileStorageActivityLollipop extends PasscodeActivity implements OnC
 				if (mode == Mode.PICK_FOLDER) {
 					boolean isCUOrMUFolder = pickFolderType.equals(PickFolderType.CU_FOLDER) || pickFolderType.equals(PickFolderType.MU_FOLDER);
 
-					if (!isCUOrMUFolder && (prefs == null || prefs.getStorageAskAlways() == null || Boolean.parseBoolean(prefs.getStorageAskAlways()))
-							&& dbH.getAskSetDownloadLocation()) {
+					if (!isCUOrMUFolder && dbH.getCredentials() != null && dbH.getAskSetDownloadLocation()) {
 						showConfirmationSaveInSameLocation();
 					} else {
 						finishPickFolder();
@@ -1208,5 +1216,21 @@ public class FileStorageActivityLollipop extends PasscodeActivity implements OnC
 	private void onCannotWriteOnSDCard() {
 		showSnackbar(viewContainer, getString(R.string.no_external_SD_card_detected));
 		new Handler().postDelayed(this::openPickFromInternalStorage, 2000);
+	}
+
+	public void changeActionBarElevation(boolean withElevation) {
+		ColorUtils.changeStatusBarColorForElevation(this, withElevation);
+		float elevation = getResources().getDimension(R.dimen.toolbar_elevation);
+		tB.setElevation(withElevation ? elevation : 0);
+	}
+
+	@Override
+	public void checkScroll() {
+		if (listView == null) {
+			return;
+		}
+
+		changeActionBarElevation(listView.canScrollVertically(SCROLLING_UP_DIRECTION)
+				|| (adapter != null && adapter.isMultipleSelect()));
 	}
 }

@@ -1,15 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <!-- Full description text of the app in the Google Play page of the app (character limit 4000) -->
-    <string name="full_description_text">MEGA предоставляет зашифрованные, контролируемые пользователем облачное хранилище и чат в обычных веб-браузерах, а также специальных приложениях для мобильных устройств. В отличие от других облачных хранилищ, здесь данные шифруют и расшифровывают только ваши устройства, а не мы.\n\nЗагружайте файлы со смартфона или планшета, и ищите, храните, скачивайте, транслируйте, просматривайте, раздавайте, переименовывайте или удаляйте когда угодно, с любого устройства, где угодно. Делитесь папками со своими контактами и следите за изменениями в реальном времени. Процесс шифрования означает, что мы не можем получить доступ или сбросить пароль, поэтому вы ДОЛЖНЫ его запомнить (если у вас нет резервной копии ключа восстановления), иначе вы потеряете доступ к сохранённым файлам.\n\nЗащищённый сквозным пользовательским шифрованием видеочат MEGA обеспечивает максимальную приватность и доступен в браузере с 2016 года. Он был расширен для нашего мобильного приложения, и история чата доступна на нескольких устройствах. Пользователи также могут легко добавлять файлы в чат из своего облачного диска MEGA.\n\nMEGA щедро предлагает бесплатные 50 ГБ для всех зарегистрированных пользователей с бонусными достижениями и предлагает платные подписки с гораздо более высокими лимитами:\n\n\nПодписка Pro Lite: 4,99 € в месяц или 49,99 € в год предоставляет 400 ГБ дискового пространства и 1 ТБ трафика в месяц.\nПодписка Pro I: 9,99 € в месяц или 99,99 € в год предоставляет 2 ТБ дискового пространства и 2 ТБ трафика в месяц.\nПодписка Pro II: 19,99 € в месяц или 199,99 € в год предоставляет 8 ТБ дискового пространства и 8 ТБ трафика в месяц.\nПодписка Pro III: 29,99 € в месяц или 299,99 € в год предоставляет 16 ТБ дискового пространства и 16 TB ТБ трафика в месяц.\n\nПодписки продлеваются автоматически на тот же срок по такой же цене. Чтобы управлять подписками, просто нажмите на значок Play Store на своем мобильном устройстве, войдите в свой аккаунт Google (если вы ещё этого не сделали), а затем нажмите на приложение MEGA. Там вы сможете управлять подпиской.\n\nРазрешения приложений:\nWRITE_EXTERNAL_STORAGE -&gt; Скачивайте свои файлы с MEGA на устройство и загружайте файлы с устройства в MEGA\nCAMERA -&gt; Делайте снимки и загружайте фото в MEGA\nREAD_CONTACTS -&gt; Просто добавляйте контакты с устройства в свои MEGA-контакты\nRECORD_AUDIO and CAPTURE_VIDEO_OUTPUT (микрофон и камера) -&gt; MEGA предоставляет сквозные зашифрованные аудио/видео звонки\n\n\nЧтобы повысить доверие пользователей к системе MEGA, весь клиентский код публикуется, поэтому заинтересованные исследователи безопасности могут оценить процесс шифрования. Код мобильного приложения расположен здесь: https://github.com/meganz/android \n\nБольше информации на нашем сайте:\nСмотрите https://mega.nz/terms \n\n\nНастольный — https://mega.nz/</string>
+    <string name="full_description_text">MEGA предоставляет зашифрованные, контролируемые пользователем облачное хранилище и чат в обычных веб-браузерах, а также специальных приложениях для мобильных устройств. В отличие от других облачных хранилищ, здесь данные шифруют и расшифровывают только ваши устройства, а не мы.\n\nЗагружайте файлы со смартфона или планшета, и ищите, храните, скачивайте, транслируйте, просматривайте, раздавайте, переименовывайте или удаляйте когда угодно, с любого устройства, где угодно. Делитесь папками со своими контактами и следите за изменениями в реальном времени. Процесс шифрования означает, что мы не можем получить доступ или сбросить пароль, поэтому вы ДОЛЖНЫ его запомнить (если у вас нет резервной копии ключа восстановления), иначе вы потеряете доступ к сохранённым файлам.\n\nЗащищённый сквозным пользовательским шифрованием видеочат MEGA обеспечивает максимальную приватность и доступен в веб-браузерах с 2016 года. Он был расширен для мобильного приложения MEGA, и история чата стала доступна на нескольких устройствах. Пользователи также могут легко добавлять файлы в чат из своего облачного диска MEGA.\n\nMEGA щедро предлагает бесплатные 20 ГБ для всех зарегистрированных пользователей с бонусными достижениями и предлагает платные подписки с гораздо более высокими лимитами:\n\n\nПодписка Pro Lite: 4,99 € в месяц или 49,99 € в год предоставляет 400 ГБ дискового пространства и 1 ТБ трафика в месяц.\nПодписка Pro I: 9,99 € в месяц или 99,99 € в год предоставляет 2 ТБ дискового пространства и 2 ТБ трафика в месяц.\nПодписка Pro II: 19,99 € в месяц или 199,99 € в год предоставляет 8 ТБ дискового пространства и 8 ТБ трафика в месяц.\nПодписка Pro III: 29,99 € в месяц или 299,99 € в год предоставляет 16 ТБ дискового пространства и 16 TB ТБ трафика в месяц.\n\nПодписки продлеваются автоматически на тот же срок по такой же цене. Чтобы управлять подписками, просто нажмите на значок Play Store на своем мобильном устройстве, войдите в свой аккаунт Google (если вы ещё этого не сделали), а затем выберите приложение MEGA. Там вы сможете управлять подпиской.\n\nРазрешения приложений:\nWRITE_EXTERNAL_STORAGE -&gt; Скачивайте свои файлы с MEGA на устройство и загружайте файлы с устройства в MEGA\nCAMERA -&gt; Делайте снимки и загружайте фото в MEGA\nREAD_CONTACTS -&gt; Просто добавляйте контакты с устройства в свои MEGA-контакты\nRECORD_AUDIO and CAPTURE_VIDEO_OUTPUT (микрофон и камера) -&gt; MEGA предоставляет сквозные зашифрованные аудио/видео звонки\n\n\nЧтобы повысить доверие пользователей к системе MEGA, весь клиентский код публикуется, поэтому заинтересованные исследователи безопасности могут оценить процесс шифрования. Код мобильного приложения расположен здесь: https://github.com/meganz/android \n\nБольше информации на нашем сайте:\nСмотрите https://mega.nz/terms \n\n\nНастольный — https://mega.nz/</string>
     <!-- Short description text of the app in the Google Play page of the app (character limit 80) -->
-    <string name="short_description_text">MEGA — это облачное хранилище с мощной и постоянной конфиденциальностью.</string>
+    <string name="short_description_text">MEGA — это облачное хранилище с надёжной и постоянной конфиденциальностью.</string>
     <!-- PRO Lite account -->
     <string name="prolite_account">Pro Lite</string>
     <!-- Name of the MEGA PDF Viewer. Keep uppercase. -->
     <string name="pdf_app_name">Просмотр PDF MEGA</string>
-    <!-- Showing progress of elements. Example: 2 of 10. -->
-    <string name="general_x_of_x">из</string>
     <!-- Answer for confirmation dialog. -->
     <string name="general_yes">Да</string>
     <!-- Answer for confirmation dialog. -->
@@ -153,8 +151,8 @@
     <!-- General label for files -->
     <plurals name="general_num_files">
         <item quantity="one">Файл</item>
-        <item quantity="few">empty</item>
-        <item quantity="many">empty</item>
+        <item quantity="few">Файлы</item>
+        <item quantity="many">Файлы</item>
         <item quantity="other">Файлы</item>
     </plurals>
     <!-- Indicates how many contacts a folder is shared with. Plural. e.g. Shared with 7 contacts -->
@@ -197,7 +195,7 @@
     <!-- when the user tries to log in to MEGA without a valid session -->
     <string name="error_server_expired_session">Вы вышли вышли из системы на этом устройстве из другого места</string>
     <!-- the first step when logging in is calculate the private and public encryption keys -->
-    <string name="login_generating_key">Вычисление ключей шифрования</string>
+    <string name="login_generating_key">Генерация ключей шифрования</string>
     <!-- Message displayed while the app is connecting to a MEGA server -->
     <string name="login_connecting_to_server">Соединение с сервером</string>
     <!-- Status text when updating the file manager -->
@@ -223,7 +221,7 @@
     <!--  -->
     <string name="tour_access_title">MEGA-доступ</string>
     <!-- Full description text of the app in the Google Play page of the app (character limit 4000) -->
-    <string name="tour_space_text">Зарегистрируйтесь сейчас и получите 20+ ГБ свободного места</string>
+    <string name="tour_space_text">Зарегистрируйтесь сейчас и получите 20 ГБ свободного места</string>
     <!--  -->
     <string name="tour_speed_text">Быстрая загрузка в облако и обмен файлами с кем угодно</string>
     <!--  -->
@@ -400,8 +398,8 @@
     <!-- Warning shown when it tries to download some empty folders. Plural -->
     <plurals name="empty_folders">
         <item quantity="one">Папка пуста.</item>
-        <item quantity="few">empty</item>
-        <item quantity="many">empty</item>
+        <item quantity="few">Папки пусты.</item>
+        <item quantity="many">Папки пусты.</item>
         <item quantity="other">Папки пусты.</item>
     </plurals>
     <!-- Hint how to cancel the download -->
@@ -411,10 +409,10 @@
     <!-- Warning message -->
     <string name="error_file_size_greater_than_4gb">Большинство устройств не может скачивать файлы больше 4 ГБ. Возможно, скачивание не удастся</string>
     <!-- message when trying to open a downloaded file but there isn’t any app that open that file. Example: a user downloads a pdf but doesn’t have any app to read a pdf -->
-    <string name="intent_not_available">На вашем устройстве отсутствует приложение для открытия этого файла.</string>
+    <string name="intent_not_available">На вашем устройстве нет приложений для открытия этого файла</string>
     <!-- Message when trying to open a location message but there isn’t any app that open that location. -->
-    <string name="intent_not_available_location">На вашем устройстве нет доступных приложений, чтобы открыть эту папку.</string>
-    <!-- message when trying to open file but there isn’t any app that open that file. Example: a user try to open a txt but doesn’t have any app to open txt -->
+    <string name="intent_not_available_location">На вашем устройстве нет приложений, чтобы открыть эту папку</string>
+    <!-- Message displayed when user tries to open a file with a 3rd party app using the option "Open with" but there isn't any app installed in the device which can open that file type, e.g. user tries to open a ".txt" but doesn’t have any installed 3rd party app which supports ".txt" files. -->
     <string name="intent_not_available_file">Возможно, у вас не установлены приложения, поддерживающие этот тип файлов.</string>
     <!-- to share an image using Facebook, Whatsapp, etc -->
     <string name="context_share_image">Поделиться изображением, используя</string>
@@ -422,8 +420,6 @@
     <string name="context_get_link">Поделиться ссылкой</string>
     <!-- Delete a link label -->
     <string name="context_delete_link">Удалить ссылку</string>
-    <!-- Item menu option upon right click on one or multiple files. -->
-    <string name="context_get_link_menu">Получить ссылку</string>
     <!-- Item menu option upon right click on one or multiple files. -->
     <string name="context_leave_menu">Выйти</string>
     <!-- Title alert before leaving a share. -->
@@ -433,13 +429,13 @@
     <!-- Item menu option upon right click on one or multiple files. -->
     <string name="context_remove_link_menu">Удалить ссылку</string>
     <!-- Warning that appears prior to remove a link of a file. Singular. -->
-    <string name="context_remove_link_warning_text">Эта ссылка больше не будет общедоступна.</string>
+    <string name="context_remove_link_warning_text">Эта ссылка больше не будет доступна публично.</string>
     <!-- Warning that appears prior to remove links of files. Plural. -->
     <plurals name="remove_links_warning_text">
-        <item quantity="one">Эта ссылка больше не будет общедоступна.</item>
-        <item quantity="few">empty</item>
-        <item quantity="many">empty</item>
-        <item quantity="other">Эти ссылки больше не будут доступны публично.</item>
+        <item quantity="one">Эта ссылка больше не будет доступна.</item>
+        <item quantity="few">Эти ссылки больше не будут доступны.</item>
+        <item quantity="many">Эти ссылки больше не будут доступны.</item>
+        <item quantity="other">Эти ссылки больше не будут доступны.</item>
     </plurals>
     <!-- Item menu option upon right click on one or multiple files. -->
     <string name="context_rename">Переименовать</string>
@@ -508,11 +504,11 @@
     <!-- success message when reinvite a contact -->
     <string name="context_contact_invitation_resent">Запрос отправлен повторно</string>
     <!-- success message when sending a contact request -->
-    <string name="context_contact_request_sent">Запрос успешно отправлен %s. Его состояние доступно во вкладке «Отправленные запросы».</string>
+    <string name="context_contact_request_sent">Запрос успешно отправлен пользователю %s. Его можно посмотреть на вкладке «Отправленные запросы».</string>
     <!-- success message when removing a contact -->
     <string name="context_contact_removed">Контакт удалён</string>
     <!-- error message -->
-    <string name="context_contact_not_removed">Ошибка. Контакт не удален</string>
+    <string name="context_contact_not_removed">Ошибка. Контакт не удалён</string>
     <!-- success message when chaning the permissionss -->
     <string name="context_permissions_changed">Права изменены</string>
     <!-- error message -->
@@ -549,10 +545,6 @@
     <string name="number_incorrectly_moved">Элементы не были перемещены (%d)</string>
     <!-- success message when moving a node -->
     <string name="context_correctly_moved_to_rubbish">Успешно перемещено в корзину</string>
-    <!-- success message when moving a node -->
-    <string name="number_correctly_moved_to_rubbish">Успешно перемещено элементов в корзину: %d.</string>
-    <!-- success message when moving a node -->
-    <string name="number_incorrectly_moved_to_rubbish">&#160;и не были отправлены элементы (%d)</string>
     <!-- error message -->
     <string name="context_no_moved">Ошибка. Не перемещено</string>
     <!-- success message when sharing a folder -->
@@ -582,7 +574,7 @@
     <!-- Success message when left shared folders -->
     <string name="number_correctly_leaved">Папки оставлены(%d).</string>
     <!-- Message shown when a share has been left -->
-    <string name="share_left">Остался общий элемент</string>
+    <string name="share_left">Покинут общий элемент</string>
     <!-- error message when moving a node -->
     <string name="number_no_leaved">Папки не были закрыты (%d)</string>
     <!-- success message when sending multiple files -->
@@ -603,8 +595,6 @@
     <string name="number_contact_not_removed">Контакты не удалены (%d)</string>
     <!-- success message when sharing a file with multiple contacts -->
     <string name="number_contact_file_shared_correctly">Доступ к папке успешно открыт %d контактам.</string>
-    <!-- error message when sharing a file with multiple contacts -->
-    <string name="number_contact_file_not_shared_">Доступ к файлу не может быть открыт контактам (%d)</string>
     <!-- success message when sharing multiple files -->
     <string name="number_correctly_shared">Доступ к папкам успешно открыт (%d)</string>
     <!-- error message when sharing multiple files -->
@@ -614,13 +604,13 @@
     <!-- success message when removing all the contacts of a shared folder -->
     <string name="context_correctly_removed_sharing_contacts">Папка больше не доступна контактам</string>
     <!-- error message when removing all the contacts of a shared folder -->
-    <string name="context_no_removed_sharing_contacts">Ошибка, доступ к папке всё ещё открыт другому контакту.</string>
+    <string name="context_no_removed_sharing_contacts">Произошла ошибка. Папка по-прежнему доступна другому контакту</string>
     <!-- option available for just one file -->
     <string name="context_select_one_file">Выбрать только один файл</string>
     <!-- success message when emptying the RB -->
     <string name="rubbish_bin_emptied">Корзина очищена</string>
     <!-- error message when emptying the RB -->
-    <string name="rubbish_bin_no_emptied">Ошибка. Корзина не была очищена</string>
+    <string name="rubbish_bin_no_emptied">Произошла ошибка. Корзина не очищена</string>
     <!-- dialog cancel subscriptions -->
     <string name="dialog_cancel_subscriptions">Вы собираетесь отменить подписку MEGA. Пожалуйста, дайте нам знать, если можно что-нибудь сделать, чтобы вы изменили своё решение.</string>
     <!-- hint cancel subscriptions dialog -->
@@ -628,11 +618,11 @@
     <!-- send cancel subscriptions dialog -->
     <string name="send_cancel_subscriptions">Отправить</string>
     <!-- confirmation cancel subscriptions dialog -->
-    <string name="confirmation_cancel_subscriptions">Спасибо за ваш отзыв! Вы действительно хотите отменить подписку MEGA?</string>
+    <string name="confirmation_cancel_subscriptions">Спасибо за ваш отзыв. Вы действительно хотите отменить подписку на MEGA?</string>
     <!-- provide a reason to cancel subscriptions dialog -->
     <string name="reason_cancel_subscriptions">Ваша подписка не отменена. Пожалуйста, укажите причину отмены</string>
-    <!-- welcome message after user brought subscription. placeholder 1: subscription type (Lite/Pro1 etc), placeholder 2: renewal interval (monthly/yearly) -->
-    <string name="message_user_purchased_subscription">Спасибо, что подписались на %1$s %2$s!</string>
+    <!-- Confirmation message of the dialog shown when a subscription has been processed successfully -->
+    <string name="message_user_purchased_subscription">Спасибо. Ваш платёж обрабатывается. Если вы не получили улучшение в течение 24 часов, напишите нам на support&#64;mega.co.nz.</string>
     <!-- Pop up message shows when user purchased a lower level of subscription -->
     <string name="message_user_purchased_subscription_down_grade">Ваша новая подписка вступит в силу после истечения срока текущей подписки, и тогда будет взиматься новая цена.</string>
     <!-- Pop up message shows when user purchased a subscription with a payment method that can not be processed in real time, e.g. voucher -->
@@ -689,15 +679,13 @@
     <!-- title of the image gallery -->
     <string name="full_screen_image_viewer_label">Просмотр изображений</string>
     <!-- Headline for the amount of storage space is used -->
-    <string name="my_account_used_space">Занято</string>
+    <string name="my_account_used_space">Использовано места</string>
     <!-- menu item -->
     <string name="my_account_change_password">Изменить пароль</string>
     <!-- Dialog text overquota error -->
-    <string name="overquota_alert_text">Вы превысили лимит хранилища. Хотите улучшить учётную запись?</string>
+    <string name="overquota_alert_text">Вы превысили лимит хранилища. Хотите улучшить аккаунт?</string>
     <!-- when did the last session happen -->
     <string name="my_account_last_session">Последняя сессия</string>
-    <!-- header for the social connections, showing the number of contacts the user has -->
-    <string name="my_account_connections">Связи</string>
     <!-- message displayed while the app is changing the password -->
     <string name="my_account_changing_password">Смена пароля</string>
     <!-- when changing the password, the first edittext is to enter the current password -->
@@ -707,15 +695,15 @@
     <!-- when changing the password -->
     <string name="my_account_change_password_newPassword2">Подтверждение нового пароля</string>
     <!-- when changing the password or creating the account, the password is required twice and check that both times are the same -->
-    <string name="my_account_change_password_dont_match">Пароль не совпадает</string>
+    <string name="my_account_change_password_dont_match">Пароли не совпадают</string>
     <!-- title of the selection of the pro account wanted -->
-    <string name="upgrade_select_pricing">Выберите членство</string>
+    <string name="upgrade_select_pricing">Выбор плана</string>
     <!-- the user has to decide the way of payment -->
     <string name="select_membership_1">Ежемесячное или ежегодное возобновление</string>
     <!-- choose the payment method option when no method is available -->
-    <string name="no_available_payment_method">На данный момент ни один метод оплаты не доступен для данного плана</string>
+    <string name="no_available_payment_method">В настоящее время для этого плана не задан способ оплаты. Пожалуйста, выберите способ.</string>
     <!-- button to decide monthly payment. The asterisk is needed -->
-    <string name="upgrade_per_month">Ежемесячное*</string>
+    <string name="upgrade_per_month">Ежемесячно*</string>
     <!-- button to decide annually payment. The asterisk is needed -->
     <string name="upgrade_per_year">Ежегодно*</string>
     <!-- the user can get the link and it’s copied to the clipboard -->
@@ -723,7 +711,7 @@
     <!-- before sharing an image, the preview has to be downloaded -->
     <string name="full_image_viewer_not_preview">Предварительное изображение ещё не загружено. Подождите.</string>
     <!-- due to device is low on memory, cannot load an image preview temporarily -->
-    <string name="not_load_preview_low_memory">Не удаётся загрузить превью из-за недостатка доступной памяти. Пожалуйста, повторите попытку позже.</string>
+    <string name="not_load_preview_low_memory">Недостаточно свободной памяти для предварительного просмотра. Пожалуйста, повторите попытку позже.</string>
     <!-- alert when clicking a newsignup link being logged -->
     <string name="log_out_warning">Для новой регистрации выйдите из системы</string>
     <!-- message shown in the screen when there are not any active transfer -->
@@ -737,9 +725,9 @@
     <!-- Dialog title, to explain why MEGA needs the ’display over other apps’ permission (Android 10) -->
     <string name="ask_for_display_over_title">Разрешить уведомления для входящих MEGA-звонков</string>
     <!-- Dialog message, to explain why MEGA needs the ’display over other apps’ permission (Android 10) -->
-    <string name="ask_for_display_over_msg">MEGA нужна ваше разрешение, чтобы сообщение о вызове всплывало поверх экрана.</string>
+    <string name="ask_for_display_over_msg">MEGA нужно разрешение на отображение поверх других приложений для звонков.</string>
     <!-- Prompt text shows when the user doesn’t want to make MEGA grant the ’display over other apps’ permission for now (Android 10) -->
-    <string name="ask_for_display_over_explain">Не волнуйтесь, вы всё равно можете вручную давать разрешения в настройках устройства.</string>
+    <string name="ask_for_display_over_explain">Вы по-прежнему можете предоставить разрешения вручную в настройках устройства.</string>
     <!-- the options of how to upload, but in an array. needed for the settings, how to upload the camera images. only when Wi-Fi connected -->
     <string name="cam_sync_wifi">Только Wi-Fi</string>
     <!-- the options of how to upload, but in an array. needed for the settings, how to upload the camera images. when Wi-Fi connected and using data plan -->
@@ -771,9 +759,9 @@
     <!-- Setting to allow the user to select the preferred passcode type -->
     <string name="settings_passcode_option">Варианты кода</string>
     <!-- Helper text to explain why we have this `Require me to plug in` setting, placeholder - 100 to 1000 in MB -->
-    <string name="settings_camera_upload_charging_helper_label">Сжатие видео очень энергозатратно. MEGA потребует подключить зарядное устройство, если размер сжимаемых видео превышает %s.</string>
+    <string name="settings_camera_upload_charging_helper_label">Сжатие видео требует значительного количества энергии. Поставьте устройство на зарядку, если размер сжимаемых видео превышает %s.</string>
     <!-- Helper text to explain the things to note if enable the feature of including GPS info -->
-    <string name="settings_camera_upload_include_gps_helper_label">Если включено, вы будете загружать информацию о том, где были сняты ваши фотографии. Поэтому будьте осторожны, когда делитесь ими.</string>
+    <string name="settings_camera_upload_include_gps_helper_label">Если включено, информация о местоположении будет добавлена к вашим фотографиям. Пожалуйста, будьте осторожны, когда делитесь ими.</string>
     <!-- Settings category title for cache and offline files -->
     <string name="settings_advanced_features">Продвинутые</string>
     <!-- Settings preference title for cache -->
@@ -791,7 +779,7 @@
     <!-- title of the setting to set the default download location -->
     <string name="settings_storage_download_location">Папка для скачивания по умолчанию</string>
     <!-- Whether to always ask the user each time. -->
-    <string name="settings_storage_ask_me_always">Всегда выбирать папку загрузки</string>
+    <string name="settings_storage_ask_me_always">Всегда выбирать папку скачивания</string>
     <!-- Whether to enable the storage in advanced devices -->
     <string name="settings_storage_advanced_devices">Отображать дополнительные устройства (внешняя SD-карта)</string>
     <!-- Label of button on account page that ask user to add their phone number -->
@@ -920,9 +908,9 @@
     <!-- Error message when not typing the Passcode code correctly. Plural. The placeholder indicates the number of failed attempts. E.g. 7 failed passcode attempts -->
     <plurals name="passcode_lock_alert_attempts">
         <item quantity="one">1 неудачная попытка ввода пароля</item>
-        <item quantity="few">empty</item>
-        <item quantity="many">empty</item>
-        <item quantity="other">Неудачных попыток ввода: %1$d</item>
+        <item quantity="few">%1$d неудачные попытки ввода пароля</item>
+        <item quantity="many">%1$d неудачных попыток ввода пароля</item>
+        <item quantity="other">%1$d неудачные попытки ввода пароля</item>
     </plurals>
     <!-- Error message when not typing the Passcode code correctly -->
     <string name="pin_lock_alert">После 10 неудачных попыток локальные файлы будут удалены, а вы выйдете из системы</string>
@@ -931,20 +919,20 @@
     <!-- Error message when not typing the Passcode correctly and have several attempts left. The placeholder is to display the number of attempts left in runtime. -->
     <plurals name="pin_lock_incorrect_alert">
         <item quantity="one">Неправильный код, попробуйте снова. Осталась 1 попытка</item>
-        <item quantity="few">empty</item>
-        <item quantity="many">empty</item>
-        <item quantity="other">Неверный код, попробуйте снова. Осталось попыток: %2d</item>
+        <item quantity="few">Неверный код, попробуйте снова. Осталось %2d попытки</item>
+        <item quantity="many">Неверный код, попробуйте снова. Осталось %2d попыток</item>
+        <item quantity="other">Неверный код, попробуйте снова. Осталось %2d попытки</item>
     </plurals>
     <!-- Error message when not typing the Passcode correctly (two times) -->
     <string name="pin_lock_not_match">Пароли не совпадают. Попробуйте снова.</string>
     <!-- Title of the screen to unlock screen with Passcode -->
-    <string name="unlock_pin_title">Введите свой пароль</string>
+    <string name="unlock_pin_title">Введите код доступа</string>
     <!-- Title of the screen to unlock screen with Passcode in second round -->
-    <string name="unlock_pin_title_2">Повторно введите пароль</string>
+    <string name="unlock_pin_title_2">Повторно введите код доступа</string>
     <!-- Title of the screen to unlock screen with Passcode -->
-    <string name="reset_pin_title">Введите новый пароль</string>
+    <string name="reset_pin_title">Введите новый код доступа</string>
     <!-- Title of the screen to unlock screen with Passcode in second round -->
-    <string name="reset_pin_title_2">Повторно введите новый пароль</string>
+    <string name="reset_pin_title_2">Повторно введите новый код доступа</string>
     <!-- Text of the screen after 10 attemps with a wrong Passcode -->
     <string name="incorrect_pin_activity">Локальные данные будут удалены, а вы выйдете из системы через %1d сек.</string>
     <!-- Caption of a title, in the context of “About MEGA” or “About us” -->
@@ -989,10 +977,10 @@
     <string name="zip_browser_activity">Просмотр ZIP</string>
     <!-- title of the My Account screen -->
     <string name="my_account_title">Тип учётной записи</string>
+    <!-- Label to indicate the date when the current subscription renews -->
+    <string name="renews_on">Продлевается&#160;</string>
     <!-- title of the Expiration Date -->
-    <string name="renews_on">Продлевается &#160;</string>
-    <!-- title of the Expiration Date -->
-    <string name="expires_on">Истекает &#160;</string>
+    <string name="expires_on">Истекает&#160;</string>
     <!--  -->
     <string name="free_account">Бесплатно</string>
     <!-- info message shown to the user when the Camera Uploads folder has been created -->
@@ -1027,14 +1015,6 @@
     <string name="sortby_type_photo_first">Фотографии</string>
     <!-- sort option, sort media files by videos first -->
     <string name="sortby_type_video_first">Видео</string>
-    <!-- sort files by date newest first -->
-    <string name="sort_by_newest_date">От новых к старым</string>
-    <!-- sort files by date oldest first -->
-    <string name="sort_by_oldest_date">От старых к новым</string>
-    <!-- sort files by largest size -->
-    <string name="sort_by_largest_size">От больших к маленьким</string>
-    <!-- sort files by smallest size -->
-    <string name="sort_by_smallest_size">От маленьких к большим</string>
     <!-- Title to choose the type of Passcode -->
     <string name="pin_lock_type">Тип кода блокировки</string>
     <!-- Passcode with 4 digits -->
@@ -1064,7 +1044,7 @@
     <!-- Label in My Account section to show user account type -->
     <string name="my_account_pro2">Аккаунт Pro II</string>
     <!-- Label in My Account section to show user account type -->
-    <string name="my_account_pro3">Аккаунт PRO III</string>
+    <string name="my_account_pro3">Аккаунт Pro III</string>
     <!-- Type of account info added to the feedback email sent to support -->
     <string name="my_account_prolite_feedback_email">Аккаунт Pro Lite</string>
     <!--  -->
@@ -1120,7 +1100,7 @@
     <!-- Alert to inform the user that have to be logged in to perform the action -->
     <string name="alert_not_logged_in">Вы должны войти в систему для этого действия.</string>
     <!-- Error message when a user attempts to change their email without an active login session. -->
-    <string name="change_email_not_logged_in">Чтобы изменить адрес электронной почты, необходимо войти в свою учётную запись. Пожалуйста, снова войдите с текущим адресом электронной почты и затем перейдите по ссылке подтверждения.</string>
+    <string name="change_email_not_logged_in">Чтобы изменить адрес электронной почты, необходимо войти в свой аккаунт. Пожалуйста, снова войдите с текущим адресом электронной почты и затем перейдите по ссылке подтверждения.</string>
     <!-- Text displayed to inform that the email was successfully changed. Please keep the placeholder, it will be replaced with the new email address. -->
     <string name="email_changed">Поздравляем, ваш новый адрес электронной почты для этого MEGA-аккаунта: %1$s</string>
     <!-- Error when the user leaves empty the password field -->
@@ -1164,21 +1144,21 @@
     <!-- Button to upgrade the account to PRO account in the panel that appears randomly -->
     <string name="my_account_upgrade_pro_panel">Улучшить</string>
     <!-- Message to promote PRO accounts -->
-    <string name="get_pro_account">Улучшите своё облако![A]Получите больше пространства и квоты передач с PRO-аккаунтом!</string>
+    <string name="get_pro_account">Увеличьте своё облако.[A]Получите больше пространства и квоты передач с Pro-аккаунтом.</string>
     <!-- success message when the MasterKey file has been downloaded -->
-    <string name="toast_master_key">Ключ восстановления был сохранён в: %1s. [A]Пока файл хранится по этому адресу, вы найдёте его в разделе «Сохранён локально». [A]Примечание: Он будет удалён, если вы выйдете из системы, пожалуйста, сохраните его в надёжном месте.</string>
+    <string name="toast_master_key">Ключ восстановления аккаунта MEGA был сохранён в: %1s. [A]Вы можете найти файл с ним в разделе «Сохранено локально». [/A]Примечание: поскольку файл с вашим ключом восстановления будет удалён при выходе из системы, храните его в безопасном месте за пределами аккаунта MEGA.</string>
     <!-- Error shown when the user tries to change his mail to one that is already used -->
-    <string name="mail_already_used">Ошибка. Этот адрес уже используется.</string>
+    <string name="mail_already_used">Этот адрес электронной почты уже используется. Пожалуйста, используйте другой адрес.</string>
     <!-- Error shown when the user tries to change his mail while the user has already requested a confirmation link for that email address -->
     <string name="mail_changed_confirm_requested">Вы уже запрашивали ссылку подтверждения для этого адреса.</string>
     <!-- Error shown when the user tries to change his mail while the email is the same as the old -->
-    <string name="mail_same_as_old">Старый и новый адреса не должны совпадать</string>
+    <string name="mail_same_as_old">Это ваш существующий адрес электронной почты.</string>
     <!-- Text shown in the last alert dialog to change the email associated to an account -->
     <string name="change_mail_text_last_step">Остался один шаг до смены адреса электронной почты. Введите пароль.</string>
     <!-- Title of the alert dialog to change the email associated to an account -->
     <string name="change_mail_title_last_step">Смена эл. почты</string>
     <!-- Iitle of the warning when the user is running out of space -->
-    <string name="title_new_warning_out_space">У Вас закончилось свободное место!</string>
+    <string name="title_new_warning_out_space">У вас заканчивается место для хранения.</string>
     <!-- Text of the warning when the user is running out of space -->
     <string name="new_warning_out_space">Раскройте все возможности MEGA, улучшив аккаунт до Pro.</string>
     <!-- Iitle of sliding panel to choose the option to edit the profile picture -->
@@ -1238,15 +1218,15 @@
     <!-- Referring to a invitation request in the Contacts section. Plural. e.g. 5 requests -->
     <plurals name="general_num_request">
         <item quantity="one">1 запрос</item>
-        <item quantity="few">empty</item>
-        <item quantity="many">empty</item>
-        <item quantity="other">Запросы (%1$d)</item>
+        <item quantity="few">%1$d запроса</item>
+        <item quantity="many">%1$d запросов</item>
+        <item quantity="other">%1$d запроса</item>
     </plurals>
     <!-- Confirmation before removing the outgoing shares of a folder -->
     <plurals name="confirmation_remove_outgoing_shares">
-        <item quantity="one">К папке открыт доступ %1$d контактам. Закрыть доступ?</item>
-        <item quantity="few">empty</item>
-        <item quantity="many">empty</item>
+        <item quantity="one">К папке открыт доступ %1$d контакту. Закрыть доступ?</item>
+        <item quantity="few">К папке открыт доступ %1$d контактам. Закрыть доступ всем?</item>
+        <item quantity="many">К папке открыт доступ %1$d контактам. Закрыть доступ всем?</item>
         <item quantity="other">К папке открыт доступ %1$d контактам. Закрыть доступ всем?</item>
     </plurals>
     <!-- Error message when the credentials to login are incorrect. -->
@@ -1270,16 +1250,16 @@
     <!-- Title of the screen after creating the account. That screen asks the user to confirm the account by checking the email -->
     <string name="confirm_email_text">Ожидание подтверждения по электронной почте</string>
     <!-- Text below the title that explains the user should check the email and click the link to confirm the account -->
-    <string name="confirm_email_explanation">Подтвердите регистрацию, перейдя по ссылке в письме, которое придёт на ваш электронный адрес.</string>
+    <string name="confirm_email_explanation">Проверьте электронную почту и перейдите по ссылке для подтверждения аккаунта.</string>
     <!-- Plural of items which contains a folder. 2 items -->
     <plurals name="general_num_items">
         <item quantity="one">1 элемент</item>
-        <item quantity="few">empty</item>
-        <item quantity="many">empty</item>
-        <item quantity="other">%1$d элем.</item>
+        <item quantity="few">%1$d элемента</item>
+        <item quantity="many">%1$d элементов</item>
+        <item quantity="other">%1$d элемента</item>
     </plurals>
     <!-- Error message shown when opening a file or folder link which account has been removed due to ToS/AUP violation -->
-    <string name="file_link_unavaible_delete_account">Связанная учётная запись была заблокирована из-за многочисленных нарушений Условий Использования.</string>
+    <string name="file_link_unavaible_delete_account">Связанный аккаунт был заблокирован из-за многочисленных нарушений Условий Использования.</string>
     <!-- Error message shown after login into a folder link with an invalid decryption key -->
     <string name="general_error_invalid_decryption_key">Введённый вместе со ссылкой ключ дешифрирования неверен.</string>
     <!-- Title of the label in the my account section. It shows the credentials of the current user so it can be used to be verified by other contacts -->
@@ -1293,7 +1273,7 @@
     <!-- Confirmation button of the dialog to archive a chat -->
     <string name="tab_archive_chat">Архив</string>
     <!-- Message shown when the user has no recent chats -->
-    <string name="recent_chat_empty_invite">Приглашайте своих друзей в Чат и наслаждайтесь конфиденциальным и безопасным общением.</string>
+    <string name="recent_chat_empty_invite">Приглашайте своих друзей в чат и наслаждайтесь конфиденциальным и безопасным общением.</string>
     <!-- Initial of the word hour to show the duration of a video or audio call -->
     <string name="initial_hour">ч</string>
     <!-- Initial of the word minute to show the duration of a video or audio call -->
@@ -1351,15 +1331,15 @@
     <!-- Message to indicate the chat has been muted, until a specific time (24 hours format). Plural, used for any format different to 01:XX, e.g. 14:15 -->
     <plurals name="success_muting_chat_until_specific_time">
         <item quantity="one">Уведомления чата будут отключены до %1$s</item>
-        <item quantity="few">empty</item>
-        <item quantity="many">empty</item>
+        <item quantity="few">Уведомления чата будут отключены до %1$s</item>
+        <item quantity="many">Уведомления чата будут отключены до %1$s</item>
         <item quantity="other">Уведомления чата будут отключены до %1$s</item>
     </plurals>
     <!-- Message to indicate the chat has been muted, until a specific day and time (24 hours format). Plural, used for any format different to 01:XX, e.g. Chat notifications will be muted until tomorrow at 08:00 -->
     <plurals name="success_muting_chat_until_specific_date_and_time">
         <item quantity="one">Уведомления чата будут отключены до %1$s %2$s</item>
-        <item quantity="few">empty</item>
-        <item quantity="many">empty</item>
+        <item quantity="few">Уведомления чата будут отключены до %1$s %2$s</item>
+        <item quantity="many">Уведомления чата будут отключены до %1$s %2$s</item>
         <item quantity="other">Уведомления чата будут отключены до %1$s %2$s</item>
     </plurals>
     <!-- Message when select the option Do not disturb but the notifications are already muted -->
@@ -1369,8 +1349,8 @@
     <!-- String to indicate the time in 24h format until which a specific chat is muted. Plural, used for any format different to 1:XX, e.g. 14:15 -->
     <plurals name="chat_notifications_muted_until_specific_time">
         <item quantity="one">Отключены до %1$s</item>
-        <item quantity="few">empty</item>
-        <item quantity="many">empty</item>
+        <item quantity="few">Отключены до %1$s</item>
+        <item quantity="many">Отключены до %1$s</item>
         <item quantity="other">Отключены до %1$s</item>
     </plurals>
     <!-- Title of the section to enable notifications in the Contact Properties screen -->
@@ -1510,7 +1490,7 @@
     <!-- success alert when the user copy some messages to the clipboard -->
     <string name="messages_copied_clipboard">Скопировано в буфер обмена</string>
     <!-- Title of the error dialog when opening a chat -->
-    <string name="chat_error_open_title">Ошибка!</string>
+    <string name="chat_error_open_title">Ошибка</string>
     <!-- Message of the error dialog when opening a chat -->
     <string name="chat_error_open_message">Не удалось открыть чат</string>
     <!-- Menu option to add a contact to your contact list. -->
@@ -1518,24 +1498,24 @@
     <!-- Title of the contact list -->
     <plurals name="general_selection_num_contacts">
         <item quantity="one">%1$d контакт</item>
-        <item quantity="few">empty</item>
-        <item quantity="many">empty</item>
-        <item quantity="other">Контакты %1$d</item>
+        <item quantity="few">%1$d контакта</item>
+        <item quantity="many">%1$d контактов</item>
+        <item quantity="other">%1$d контакта</item>
     </plurals>
     <!-- Message shown when the folder sharing process fails -->
     <string name="error_sharing_folder">Не удалось поделиться папкой. Попробуйте ещё раз.</string>
     <!-- confirmation message before removing a contact, Plural -->
     <plurals name="confirmation_remove_contact">
         <item quantity="one">Все связанные с этим контактом данные будут утеряны безвозвратно.</item>
-        <item quantity="few">empty</item>
-        <item quantity="many">empty</item>
+        <item quantity="few">Все связанные с этими контактами данные будут утеряны безвозвратно.</item>
+        <item quantity="many">Все связанные с этими контактами данные будут утеряны безвозвратно.</item>
         <item quantity="other">Все связанные с этими контактами данные будут утеряны безвозвратно.</item>
     </plurals>
     <!-- title of confirmation alert before removing a contact, Plural -->
     <plurals name="title_confirmation_remove_contact">
         <item quantity="one">Удалить контакт?</item>
-        <item quantity="few">empty</item>
-        <item quantity="many">empty</item>
+        <item quantity="few">Удалить контакты?</item>
+        <item quantity="many">Удалить контакты?</item>
         <item quantity="other">Удалить контакты?</item>
     </plurals>
     <!-- option shown when a message could not be sent -->
@@ -1546,11 +1526,11 @@
     <string name="title_message_uploading_options">Загрузка вложения</string>
     <!-- message shown when a chat has no messages -->
     <string name="no_conversation_history">Нет истории разговора</string>
-    <!-- title of confirmation alert before removing a contact, Plural -->
+    <!-- Text to indicate that one participant is typing or multiple participants are typing at the same time in a chat room. The "%1$s" placeholder is to put the name(s) of the participant(s). The [A][/A] format marks are to put the text in a different color. -->
     <plurals name="user_typing">
         <item quantity="one">%1$s [A]печатает&#8230;[/A]</item>
-        <item quantity="few">empty</item>
-        <item quantity="many">empty</item>
+        <item quantity="few">%1$s [A]печатают&#8230;[/A]</item>
+        <item quantity="many">%1$s [A]печатают&#8230;[/A]</item>
         <item quantity="other">%1$s [A]печатают&#8230;[/A]</item>
     </plurals>
     <!-- text that appear when there are more than 2 people writing at that time in a chat. For example User1, user2 and more are typing… -->
@@ -1640,10 +1620,10 @@
     <string name="error_editing_message">Сообщение невозможно отредактировать</string>
     <!-- Label to show the number of transfers in progress, Plural -->
     <plurals name="text_number_transfers">
-        <item quantity="one">файлы: %1$d из %2$d</item>
-        <item quantity="few">empty</item>
-        <item quantity="many">empty</item>
-        <item quantity="other">файлы: %1$d из %2$d</item>
+        <item quantity="one">%1$d из %2$d файла</item>
+        <item quantity="few">%1$d из %2$d файлов</item>
+        <item quantity="many">%1$d из %2$d файлов</item>
+        <item quantity="other">%1$d из %2$d файлов</item>
     </plurals>
     <!-- Progress text shown when user stop upload/download and the app is waiting for async response -->
     <string name="label_process_finishing">Завершение процесса&#8230;</string>
@@ -1666,7 +1646,7 @@
     <!-- Dialog to confirm before removing completed transfers -->
     <string name="confirmation_to_clear_completed_transfers">Удалить все передачи?</string>
     <!-- Title of the tab section for transfers in progress -->
-    <string name="title_tab_in_progress_transfers">Выполняется</string>
+    <string name="title_tab_in_progress_transfers">В процессе</string>
     <!-- Title of the tab section for completed transfers -->
     <string name="title_tab_completed_transfers">Готово</string>
     <!-- Text shown in playlist subtitle item when a file is reproducing but it is paused -->
@@ -1674,122 +1654,122 @@
     <!-- Possible state of a transfer -->
     <string name="transfer_queued">В очереди</string>
     <!-- Possible state of a transfer. When the transfer is finishing -->
-    <string name="transfer_completing">Завершено</string>
+    <string name="transfer_completing">Завершение</string>
     <!-- Possible state of a transfer. When the transfer is retrying -->
     <string name="transfer_retrying">Повторная попытка</string>
     <!-- Possible state of a transfer. When the transfer was cancelled -->
     <string name="transfer_cancelled">Отменено</string>
     <!-- Possible state of a transfer -->
-    <string name="transfer_unknown">Неизвестный</string>
+    <string name="transfer_unknown">Неизвестно</string>
     <!-- Title of the panel where the progress of the transfers is shown -->
     <string name="paused_transfers_title">Приостановленные передачи</string>
     <!-- message shown in the screen when there are not any active transfer -->
     <string name="completed_transfers_empty">Нет завершённых передач</string>
     <!-- Text of the notification shown when the upload service is running, Plural -->
     <plurals name="upload_service_notification">
-        <item quantity="one">Загрузка файлов: %1$d из %2$d</item>
-        <item quantity="few">empty</item>
-        <item quantity="many">empty</item>
+        <item quantity="one">Загрузка файла: %1$d из %2$d</item>
+        <item quantity="few">Загрузка файлов: %1$d из %2$d</item>
+        <item quantity="many">Загрузка файлов: %1$d из %2$d</item>
         <item quantity="other">Загрузка файлов: %1$d из %2$d</item>
     </plurals>
     <!-- Text of the notification shown when the upload service is running, Plural -->
     <plurals name="upload_service_paused_notification">
         <item quantity="one">Загрузка файла: %1$d из %2$d (пауза)</item>
-        <item quantity="few">empty</item>
-        <item quantity="many">empty</item>
+        <item quantity="few">Загрузка файлов: %1$d из %2$d (пауза)</item>
+        <item quantity="many">Загрузка файлов: %1$d из %2$d (пауза)</item>
         <item quantity="other">Загрузка файлов: %1$d из %2$d (пауза)</item>
     </plurals>
     <!-- Text of the notification shown when the folder upload service is running, Text of the notification shown when the folder upload service is running - plural e.g. Uploading 1 of 2 folders -->
     <plurals name="folder_upload_service_notification">
-        <item quantity="one">Загружена папка: %1$d из %2$d</item>
-        <item quantity="few">empty</item>
-        <item quantity="many">empty</item>
-        <item quantity="other">Загружены папки: %1$d из %2$d</item>
+        <item quantity="one">Загрузка папки: %1$d из %2$d</item>
+        <item quantity="few">Загрузка папок: %1$d из %2$d</item>
+        <item quantity="many">Загрузка папок: %1$d из %2$d</item>
+        <item quantity="other">Загрузка папок: %1$d из %2$d</item>
     </plurals>
     <!-- Text of the notification shown when the folder upload service is running, Text of the notification shown when the folder upload service is running - plural e.g. Uploading 1 of 2 folders -->
     <plurals name="folder_upload_service_paused_notification">
         <item quantity="one">Загрузка папки: %1$d из %2$d (пауза)</item>
-        <item quantity="few">empty</item>
-        <item quantity="many">empty</item>
+        <item quantity="few">Загрузка папок: %1$d из %2$d (пауза)</item>
+        <item quantity="many">Загрузка папок: %1$d из %2$d (пауза)</item>
         <item quantity="other">Загрузка папок: %1$d из %2$d (пауза)</item>
     </plurals>
     <!-- Text of the notification shown when the upload service has finished, Plural -->
     <plurals name="upload_service_final_notification">
-        <item quantity="one">Загружено файлов: %1$d</item>
-        <item quantity="few">empty</item>
-        <item quantity="many">empty</item>
-        <item quantity="other">Загружено файлов: %1$d</item>
+        <item quantity="one">Загружен %1$d файл</item>
+        <item quantity="few">Загружено %1$d файла</item>
+        <item quantity="many">Загружено %1$d файлов</item>
+        <item quantity="other">Загружено %1$d файла</item>
     </plurals>
     <!-- Text of the notification shown when the upload service has finished, Plural -->
     <plurals name="upload_service_notification_already_uploaded">
-        <item quantity="one">Загружен 1 файл</item>
-        <item quantity="few">empty</item>
-        <item quantity="many">empty</item>
-        <item quantity="other">Загружены файлы (%1$d)</item>
+        <item quantity="one">1 файл уже загружен</item>
+        <item quantity="few">%1$d файла уже загружены</item>
+        <item quantity="many">%1$d файлов уже загружено</item>
+        <item quantity="other">%1$d файла уже загружено</item>
     </plurals>
     <!-- Text of the notification shown when the folder upload service has finished, Text of the notification shown when the folder upload service has finished - plural  e.g. Uploaded 2 folders -->
     <plurals name="folder_upload_service_final_notification">
         <item quantity="one">Загружена %1$d папка</item>
-        <item quantity="few">empty</item>
-        <item quantity="many">empty</item>
-        <item quantity="other">Загружены папки: %1$d</item>
+        <item quantity="few">Загружено %1$d папки</item>
+        <item quantity="many">Загружено %1$d папок</item>
+        <item quantity="other">Загружено %1$d папки</item>
     </plurals>
     <!-- label for the total file size of multiple files and/or folders (no need to put the colon punctuation in the translation) -->
     <string name="general_total_size">Полный объём: %1$s</string>
     <!-- Text of the notification shown when the upload service has finished with any transfer error, Plural -->
     <plurals name="upload_service_failed">
-        <item quantity="one">Не загружено файлов: %1$d</item>
-        <item quantity="few">empty</item>
-        <item quantity="many">empty</item>
-        <item quantity="other">Не загружено файлов: %1$d</item>
+        <item quantity="one">%1$d файл не загружен</item>
+        <item quantity="few">%1$d файла не загружено</item>
+        <item quantity="many">%1$d файлов не загружено</item>
+        <item quantity="other">%1$d файла не загружено</item>
     </plurals>
     <!-- Text of the notification shown when the upload service has finished with any copied file instead uploaded, Plural -->
     <plurals name="copied_service_upload">
         <item quantity="one">%1$d файл скопирован</item>
-        <item quantity="few">empty</item>
-        <item quantity="many">empty</item>
-        <item quantity="other">Файлы скопированы (%1$d)</item>
+        <item quantity="few">%1$d файла скопировано</item>
+        <item quantity="many">%1$d файлов скопировано</item>
+        <item quantity="other">%1$d файла скопировано</item>
     </plurals>
     <!-- Text of the notification shown when the download service do not download because the file is already on the device, Plural -->
     <plurals name="already_downloaded_service">
-        <item quantity="one">%1$d файл предварительно загружен</item>
-        <item quantity="few">empty</item>
-        <item quantity="many">empty</item>
-        <item quantity="other">Предварительно загружены файлы (%1$d)</item>
+        <item quantity="one">%1$d файл загружен ранее</item>
+        <item quantity="few">%1$d файла загружено ранее</item>
+        <item quantity="many">%1$d файлов загружено ранее</item>
+        <item quantity="other">%1$d файла загружено ранее</item>
     </plurals>
     <!-- Text of the notification shown when the download service has finished, Plural -->
     <plurals name="download_service_final_notification">
-        <item quantity="one">Скачано файлов: %1$d</item>
-        <item quantity="few">empty</item>
-        <item quantity="many">empty</item>
-        <item quantity="other">Скачано файлов: %1$d</item>
+        <item quantity="one">Скачан %1$d файл</item>
+        <item quantity="few">Скачано %1$d файла</item>
+        <item quantity="many">Скачано %1$d файлов</item>
+        <item quantity="other">Скачано %1$d файла</item>
     </plurals>
     <!-- Text of the notification shown when the download service has finished with any error, Plural -->
     <plurals name="download_service_final_notification_with_details">
-        <item quantity="one">Загружен файл (%1$d из %2$d)</item>
-        <item quantity="few">empty</item>
-        <item quantity="many">empty</item>
-        <item quantity="other">Загружены файлы (%1$d из %2$d)</item>
+        <item quantity="one">Загружено %1$d из %2$d файла</item>
+        <item quantity="few">Загружено %1$d из %2$d файлов</item>
+        <item quantity="many">Загружено %1$d из %2$d файлов</item>
+        <item quantity="other">Загружено %1$d из %2$d файлов</item>
     </plurals>
     <!-- Text of the notification shown when the download service has finished with any transfer error, Plural -->
     <plurals name="download_service_failed">
-        <item quantity="one">Не скачано файлов: %1$d</item>
-        <item quantity="few">empty</item>
-        <item quantity="many">empty</item>
-        <item quantity="other">Не скачано файлов: %1$d</item>
+        <item quantity="one">%1$d файл не скачан</item>
+        <item quantity="few">%1$d файла не скачано</item>
+        <item quantity="many">%1$d файлов не скачано</item>
+        <item quantity="other">%1$d файла не скачано</item>
     </plurals>
     <!-- Text of the notification shown when the download service is running, Plural -->
     <plurals name="download_service_notification">
-        <item quantity="one">Скачивание файлов: %1$d из %2$d</item>
-        <item quantity="few">empty</item>
-        <item quantity="many">empty</item>
-        <item quantity="other">Скачивание файлов: %1$d из %2$d</item>
+        <item quantity="one">Скачивание %1$d из %2$d файла</item>
+        <item quantity="few">Скачивание %1$d из %2$d файлов</item>
+        <item quantity="many">Скачивание %1$d из %2$d файлов</item>
+        <item quantity="other">Скачивание %1$d из %2$d файлов</item>
     </plurals>
     <!-- Text of the notification shown when the download service is paused, Plural -->
     <plurals name="download_service_paused_notification">
         <item quantity="one">Скачивание файла: %1$d из %2$d (пауза)</item>
-        <item quantity="few">empty</item>
-        <item quantity="many">empty</item>
+        <item quantity="few">Скачивание файлов: %1$d из %2$d (пауза)</item>
+        <item quantity="many">Скачивание файлов: %1$d из %2$d (пауза)</item>
         <item quantity="other">Скачивание файлов: %1$d из %2$d (пауза)</item>
     </plurals>
     <!-- Title of the alert when the transfer quota is exceeded. -->
@@ -1805,24 +1785,22 @@
     <!-- this is used for example when downloading 1 file or 2 files, Plural of file. 2 files -->
     <plurals name="new_general_num_files">
         <item quantity="one">%1$d файл</item>
-        <item quantity="few">empty</item>
-        <item quantity="many">empty</item>
-        <item quantity="other">файлы (%1$d)</item>
+        <item quantity="few">%1$d файла</item>
+        <item quantity="many">%1$d файлов</item>
+        <item quantity="other">%1$d файла</item>
     </plurals>
     <!-- Menu option -->
     <string name="general_view">Просмотр файлов</string>
     <!-- Menu option to choose to add file or folders to Cloud Drive -->
-    <string name="add_to_cloud">Импортировать</string>
-    <!-- Menu option to choose save to Offline section -->
-    <string name="save_for_offline">Сохранить локально</string>
+    <string name="add_to_cloud">Импорт</string>
     <!-- Menu option to choose to add file to Cloud Drive in the chat -->
     <string name="add_to_cloud_node_chat">Добавить на облачный диск</string>
     <!-- Menu option -->
     <string name="general_view_contacts">Просмотр контактов</string>
     <!-- Message displayed when a file has been successfully imported to Cloud Drive -->
-    <string name="import_success_message">Успешно добавлено в облачный диск</string>
+    <string name="import_success_message">Успешно добавлено на облачный диск</string>
     <!-- Menu option -->
-    <string name="import_success_error">Ошибка. Не добавлено в облачный диск</string>
+    <string name="import_success_error">Ошибка. Не добавлено на облачный диск</string>
     <!-- Label in login screen to inform about the chat initialization proccess -->
     <string name="chat_connecting">Соединение&#8230;</string>
     <!-- message when trying to invite a contact with a pending request -->
@@ -1854,16 +1832,16 @@
     </plurals>
     <!-- Error message when creating public links of nodes. Plural. -->
     <plurals name="context_link_export_error">
-        <item quantity="one">Не удалось создать несколько ссылок. Пожалуйста, попробуйте позже.</item>
-        <item quantity="few">empty</item>
-        <item quantity="many">empty</item>
+        <item quantity="one">Не удалось создать ссылку. Пожалуйста, попробуйте позже.</item>
+        <item quantity="few">Не удалось создать несколько ссылок. Пожалуйста, попробуйте позже.</item>
+        <item quantity="many">Не удалось создать несколько ссылок. Пожалуйста, попробуйте позже.</item>
         <item quantity="other">Не удалось создать несколько ссылок. Пожалуйста, попробуйте позже.</item>
     </plurals>
     <!-- Message when some public links were removed successfully. Plural. -->
     <plurals name="context_link_removal_success">
         <item quantity="one">Ссылка успешно удалена.</item>
-        <item quantity="few">empty</item>
-        <item quantity="many">empty</item>
+        <item quantity="few">Ссылки успешно удалены.</item>
+        <item quantity="many">Ссылки успешно удалены.</item>
         <item quantity="other">Ссылки успешно удалены.</item>
     </plurals>
     <!-- error message -->
@@ -1931,7 +1909,7 @@
     <!-- Refers to access rights for a file folder. (with the & needed. Don’t use the symbol itself. Use &) -->
     <string name="file_properties_shared_folder_read_write">Чтение и запись</string>
     <!-- State of an attachment message when the upload is in progress but the queue of transfers is paused. -->
-    <string name="attachment_uploading_state_paused">Передачи приостановлены!</string>
+    <string name="attachment_uploading_state_paused">Передачи приостановлены</string>
     <!-- label to indicate the state of an upload in chat -->
     <string name="attachment_uploading_state_uploading">Загрузка&#8230;</string>
     <!--  -->
@@ -2003,30 +1981,28 @@
     <!-- subtitle of the section for achievements -->
     <string name="achievements_subtitle">Приглашайте друзей и получайте награды</string>
     <!-- title of the introduction for the achievements screen -->
-    <string name="figures_achievements_text_referrals">%1$s места на диске за каждого приведённого пользователя. Действительно 365 дней.</string>
+    <string name="figures_achievements_text_referrals">%1$s места на диске за каждое успешное приглашение. Действительно 365 дней.</string>
     <!-- sentence to detail the figures of storage and transfer quota related to each achievement -->
     <string name="figures_achievements_text">%1$s места на диске. Действительно 365 дней.</string>
     <!-- title of the section for unlocked rewards -->
     <string name="unlocked_rewards_title">Разблокированные награды</string>
     <!-- title of the section for unlocked storage quota -->
-    <string name="unlocked_storage_title">Квота на свободное место</string>
+    <string name="unlocked_storage_title">Квота на хранение</string>
     <!-- title of the section for referral bonuses in achivements section (maximum 24 chars) -->
     <string name="title_referral_bonuses">Бонусы за приглашения</string>
-    <!-- title of the section for install a mobile app in achivements section (maximum 24 chars) -->
+    <!-- Title of the section for install a mobile app in achivements section (maximum 31 chars) -->
     <string name="title_install_app">Установить мобильное приложение</string>
-    <!-- Title of the section for add phone number in achivements section (maximum 24 chars) -->
+    <!-- Title of the section for add phone number in achivements section (maximum 30 chars) -->
     <string name="title_add_phone">Добавить номер телефона</string>
     <!-- title of the section for install megasync in achivements section (maximum 24 chars) -->
     <string name="title_regitration">Бонусы за регистрацию</string>
     <!-- title of the section for install a mobile app bonuses in achivements section (maximum 24 chars) -->
-    <string name="title_install_desktop">Установите MEGA на ПК</string>
-    <!-- title of the section for base quota in achivements section -->
-    <string name="title_base_quota">Базовая квота</string>
+    <string name="title_install_desktop">Установить MEGA на ПК</string>
     <!-- Text that indicates that no pictures have been uploaded to the Camera Uploads section -->
     <string name="camera_uploads_empty">В «Загрузках камеры» нет файлов</string>
     <!-- indicates the number of days left related to a achievement -->
     <string name="general_num_days_left">Осталось %1$d д</string>
-    <!-- State to indicate something has expired (achivements of business status account for instance) -->
+    <!-- State to indicate an achievement has expired -->
     <string name="expired_label">Истекло</string>
     <!-- title of the advanced setting to choose the use of https -->
     <string name="setting_title_use_https_only">Не использовать HTTP</string>
@@ -2035,9 +2011,9 @@
     <!-- title of screen to invite friends and get an achievement -->
     <string name="title_achievement_invite_friends">Как это работает</string>
     <!-- first paragraph of screen to invite friends and get an achievement -->
-    <string name="first_paragraph_achievement_invite_friends">Приглашайте друзей зарегистрироваться в MEGA и установить мобильное приложение. За каждую регистрацию и установку вы получите бонусное место на диске.</string>
+    <string name="first_paragraph_achievement_invite_friends">Приглашайте друзей зарегистрироваться бесплатно в MEGA и установить мобильное приложение. За каждую регистрацию и установку вы получите бонусное место на диске.</string>
     <!-- second paragraph of screen to invite friends and get an achievement -->
-    <string name="second_paragraph_achievement_invite_friends">Вы не получите бонус за приглашение тех, кто пользовался MEGA раньше, и вам не будет сообщено об этом. Приглашённые контакты должны установить на своих устройствах мобильное приложение MEGA или приложение для компьютера.</string>
+    <string name="second_paragraph_achievement_invite_friends">Бонус с бесплатным хранилищем применяется только за новые приглашения и установку мобильного или настольного приложения MEGA.</string>
     <!-- explanation of screen to invite friends and get an achievement -->
     <string name="card_title_invite_friends">Выберите контакты из телефонного списка контактов или введите адреса электронной почты.</string>
     <!-- title of the dialog to confirm the contact request -->
@@ -2051,31 +2027,31 @@
     <!-- info paragraph about the achievement install megasync -->
     <string name="paragraph_info_achievement_install_desktop">Установив настольное приложение MEGA, вы получите %1$s бонусного места на диске на 365 дней. Приложение MEGA для компьютера доступно на Windows, macOS и большинстве дистрибутивов Linux.</string>
     <!-- info paragraph about the achievement install mobile app -->
-    <string name="paragraph_info_achievement_install_mobile_app">Установив мобильное приложение MEGA, вы получите %1$s бонусного места на диске на 365 дней. Мы предлагаем мобильные приложения для iOS, Android и Windows Phone.</string>
+    <string name="paragraph_info_achievement_install_mobile_app">Установив мобильное приложение MEGA, вы получите %1$s бонусного места на диске на 365 дней. Мы предлагаем мобильные приложения для iOS и Android.</string>
     <!-- info paragraph about the achievement ‘add phone number’. Placeholder 1: bonus storage space e.g. 20GB. Placeholder 2: bonus transfer quota e.g. 50GB -->
     <string name="paragraph_info_achievement_add_phone">Подтвердив номер телефона, вы получите %1$s в виде бонуса на 365 дней.</string>
     <!-- info paragraph about the completed achievement install megasync -->
     <string name="result_paragraph_info_achievement_install_desktop">Вы получили %1$s места на диске за установку приложения MEGA на компьютер.</string>
     <!-- info paragraph about the completed achievement install mobile app -->
-    <string name="result_paragraph_info_achievement_install_mobile_app">Вы получили %1$s места на диске за установку мобильного приложения.</string>
+    <string name="result_paragraph_info_achievement_install_mobile_app">Вы получили %1$s места на диске за установку мобильного приложения MEGA.</string>
     <!-- info paragraph about the completed achievement of ‘add phone number’. Placeholder 1: bonus storage space e.g. 20GB. Placeholder 2: bonus transfer quota e.g. 50GB -->
     <string name="result_paragraph_info_achievement_add_phone">Вы получили %1$s места на диске за подтверждение телефонного номера.</string>
     <!-- info paragraph about the completed achievement registration -->
     <string name="result_paragraph_info_achievement_registration">При регистрации вы получаете %1$s места на диске в качестве бонуса.</string>
     <!-- info paragraph about the completed achievement registration -->
-    <string name="expiration_date_for_achievements">Бонус истекает через %1$d дн.</string>
+    <string name="expiration_date_for_achievements">Бонус истекает через %1$d д.</string>
     <!-- menu items -->
     <plurals name="context_share_folders">
-        <item quantity="one">Открыть общий доступ к папке</item>
-        <item quantity="few">empty</item>
-        <item quantity="many">empty</item>
+        <item quantity="one">Поделиться папкой</item>
+        <item quantity="few">Поделиться папками</item>
+        <item quantity="many">Поделиться папками</item>
         <item quantity="other">Поделиться папками</item>
     </plurals>
     <!-- confirmation message before leaving some incoming shared folders -->
     <plurals name="confirmation_leave_share_folder">
-        <item quantity="one">Если вы закроете папку, вы не сможете зайти в неё снова.</item>
-        <item quantity="few">empty</item>
-        <item quantity="many">empty</item>
+        <item quantity="one">Если вы покинете эту папку, вы не сможете зайти в неё снова.</item>
+        <item quantity="few">Если вы покинете эти папки, вы больше не сможете их увидеть.</item>
+        <item quantity="many">Если вы покинете эти папки, вы больше не сможете их увидеть.</item>
         <item quantity="other">Если вы покинете эти папки, вы больше не сможете их увидеть.</item>
     </plurals>
     <!-- Info of a contact if there is no folders shared with him -->
@@ -2089,7 +2065,7 @@
     <!-- mail subject -->
     <string name="setting_feedback_subject">Обратная связь по Android</string>
     <!-- mail body -->
-    <string name="setting_feedback_body">Пожалуйста, оставьте отзыв:</string>
+    <string name="setting_feedback_body">Пожалуйста, оставьте отзыв здесь:</string>
     <!-- mail body -->
     <string name="settings_feedback_body_device_model">Модель устройства</string>
     <!-- mail body -->
@@ -2142,10 +2118,10 @@
     <string name="invalid_characters_defined">Следующие символы не допускаются: ” * / : &lt; &gt; ? \ |</string>
     <!-- Warning show to the user after try to import files to MEGA with empty names. Plural. When more than one file name have this error. -->
     <plurals name="empty_names">
-        <item quantity="one">Пожалуйста, назовите файл, прежде чем продолжить</item>
-        <item quantity="few">empty</item>
-        <item quantity="many">empty</item>
-        <item quantity="other">Пожалуйста, назовите файлы, прежде чем продолжить</item>
+        <item quantity="one">Имя файла не может быть пустым.</item>
+        <item quantity="few">Имена файлов не могут быть пустыми.</item>
+        <item quantity="many">Имена файлов не могут быть пустыми.</item>
+        <item quantity="other">Имена файлов не могут быть пустыми.</item>
     </plurals>
     <!-- Label shown when audio file is playing -->
     <string name="audio_play">Аудиофайл</string>
@@ -2164,9 +2140,9 @@
     <!-- Info label about the connectivity state of the chat -->
     <string name="invalid_connection_state">Переподключение к чату</string>
     <!-- Message show when a call cannot be established -->
-    <string name="call_error">Ошибка. Звонок не может быть установлен</string>
+    <string name="call_error">Произошла ошибка, звонок не может быть соединён.</string>
     <!-- Title of dialog to evaluate the app -->
-    <string name="title_evaluate_the_app_panel">Вам нравится это приложение?</string>
+    <string name="title_evaluate_the_app_panel">Вам нравится мобильное приложение MEGA?</string>
     <!-- Label to show rate the app -->
     <string name="rate_the_app_panel">Да, оценить</string>
     <!-- Label to show send feedback -->
@@ -2174,7 +2150,7 @@
     <!-- title of the section advanced options on the get link screen -->
     <string name="link_advanced_options">Расширенные опции</string>
     <!-- Message to show when users deny to permit the permissions to read and write on external storage on setting default download location -->
-    <string name="download_requires_permission">MEGA нужно ваше разрешение на скачивание файлов</string>
+    <string name="download_requires_permission">MEGA нужны разрешения на чтение и запись в вашем внешнем хранилище для скачивания файлов.</string>
     <!-- Default download location is on old sd card, but currently the user installed a new SD card, need user to reset download location. -->
     <string name="old_sdcard_unavailable">Старая SD-карта недоступна, пожалуйста, укажите новое место для загрузки.</string>
     <!-- Dialog title to ask download to internal storage or external storage. -->
@@ -2196,7 +2172,7 @@
     <!-- Title of QR code section -->
     <string name="section_my_code">Мой код</string>
     <!-- Title of QR code scan section -->
-    <string name="section_scan_code">Скан кода</string>
+    <string name="section_scan_code">Сканировать код</string>
     <!-- Title of QR code settings that permits or not contacts that scan my QR code will be automatically added to my contact list -->
     <string name="settings_qrcode_autoaccept">Принимать автоматически</string>
     <!-- Subtitle of QR code settings auto-accept -->
@@ -2234,7 +2210,7 @@
     <!-- Text of dialog shown when a contact request has not been sent with QR code because of is already a contact -->
     <string name="invite_not_sent_text_already_contact">Приглашение не отправлено. %s уже в вашем списке контактов.</string>
     <!-- Text of dialog shown when a contact request has not been sent with QR code because of some error -->
-    <string name="invite_not_sent_text_error">Приглашение не было отправлено из-за ошибки.</string>
+    <string name="invite_not_sent_text_error">Произошла ошибка, и приглашение не было отправлено.</string>
     <!-- Text of alert dialog informing that the qr is generating -->
     <string name="generatin_qr">Создание QR-кода&#8230;</string>
     <!-- Title of QR code scan menu item -->
@@ -2314,7 +2290,7 @@
     <!-- Text displayed in several parts when there is a call in progress (notification, recent chats list, etc). -->
     <string name="title_notification_call_in_progress">Идёт вызов</string>
     <!-- Subtitle of the notification shown on the action bar when there is a call in progress -->
-    <string name="action_notification_call_in_progress">Нажмите, чтобы вернуться к вызову.</string>
+    <string name="action_notification_call_in_progress">Нажмите, чтобы вернуться к вызову</string>
     <!-- Button in the notification shown on the action bar when there is a call in progress -->
     <string name="button_notification_call_in_progress">Вернуться к вызову</string>
     <!-- When it lists contacts of MEGA, the title of list’s header -->
@@ -2324,7 +2300,7 @@
     <!-- Message error shown when trying to log in on an account has been suspended due to multiple breaches of Terms of Service -->
     <string name="account_suspended_multiple_breaches_ToS">Ваш аккаунт был заблокирован из-за многочисленных нарушений Условий предоставления услуг MEGA. Пожалуйста, проверьте свой почтовый ящик.</string>
     <!-- Message error shown when trying to log in on an account has been suspended due to breach of Terms of Service -->
-    <string name="account_suspended_breache_ToS">Ваша учетная запись была прервана из-за нарушения Условий предоставления услуг MEGA, таких как злоупотребление правами других лиц; обмен и/или импорт незаконных данных; или злоупотребление системой.</string>
+    <string name="account_suspended_breache_ToS">Ваш аккаунт был заблокирован из-за нарушения условий предоставления услуг MEGA, включая, помимо прочего, пункт 15.</string>
     <!-- In a chat conversation when you try to send device’s images but images are still loading -->
     <string name="file_storage_loading">Загрузка файлов</string>
     <!-- In a chat conversation when you try to send device’s images but there aren’t available images -->
@@ -2353,10 +2329,10 @@
     <string name="label_mega_byte">МБ</string>
     <!-- Number of versions of a file shown on the screen info of the file, version items -->
     <plurals name="number_of_versions">
-        <item quantity="one">Версия %1$d</item>
-        <item quantity="few">empty</item>
-        <item quantity="many">empty</item>
-        <item quantity="other">Версий: %1$d</item>
+        <item quantity="one">%1$d версия</item>
+        <item quantity="few">%1$d версии</item>
+        <item quantity="many">%1$d версий</item>
+        <item quantity="other">%1$d версии</item>
     </plurals>
     <!-- Title of the section Versions for files -->
     <string name="title_section_versions">Версии</string>
@@ -2365,8 +2341,8 @@
     <!--  -->
     <plurals name="header_previous_section_item">
         <item quantity="one">Предыдущая версия</item>
-        <item quantity="few">empty</item>
-        <item quantity="many">empty</item>
+        <item quantity="few">Предыдущие версии</item>
+        <item quantity="many">Предыдущие версии</item>
         <item quantity="other">Предыдущие версии</item>
     </plurals>
     <!-- option menu to revert a file version -->
@@ -2376,9 +2352,9 @@
     <!-- Title of the dialog to confirm that a version os going to be deleted, version items -->
     <plurals name="title_dialog_delete_version">
         <item quantity="one">Удалить версию?</item>
-        <item quantity="few">empty</item>
-        <item quantity="many">empty</item>
-        <item quantity="other">Удалить версию?</item>
+        <item quantity="few">Удалить версии?</item>
+        <item quantity="many">Удалить версии?</item>
+        <item quantity="other">Удалить версии?</item>
     </plurals>
     <!-- Content of the dialog to confirm that a version is going to be deleted -->
     <string name="content_dialog_delete_version">Эта версия будет безвозвратно удалена.</string>
@@ -2392,10 +2368,12 @@
     <string name="settings_video_upload_quality">Качество видео</string>
     <!-- Text shown when the user refuses to permit the storage permission when enable camera upload -->
     <string name="on_refuse_storage_permission">Для загрузок из камеры требуется доступ к фотографиям и другим медиафайлам на устройстве. Пожалуйста, перейдите в настройки и дайте разрешение.</string>
-    <!-- the options for the option on setting to set up the quality of multimedia files uploaded to the chat, the options of medium quality multimedia file to  upload. -->
+    <!-- Available options for the setting to set up the quality of multimedia files uploaded to the chat or the Camera Uploads -->
     <string-array name="settings_chat_upload_quality_entries">
-        <item>Оригинальное качество</item>
-        <item>Среднее качество</item>
+        <item>Низкое</item>
+        <item>Среднее</item>
+        <item>Высокое</item>
+        <item>Оригинал</item>
     </string-array>
     <!-- Title of the notification for a missed call -->
     <string name="missed_call_notification_title">Пропущенный звонок</string>
@@ -2407,10 +2385,10 @@
     <string name="file_properties_folder_previous_versions">Предыдущие версии</string>
     <!-- Number of versioned files inside a folder shown on the screen info of the folder, version items -->
     <plurals name="number_of_versions_inside_folder">
-        <item quantity="one">Файл с версиями: %1$d</item>
-        <item quantity="few">empty</item>
-        <item quantity="many">empty</item>
-        <item quantity="other">Файлы с версиями: %1$d</item>
+        <item quantity="one">%1$d файл с версиями</item>
+        <item quantity="few">%1$d файла с версиями</item>
+        <item quantity="many">%1$d файлов с версиями</item>
+        <item quantity="other">%1$d файла с версиями</item>
     </plurals>
     <!-- Confirmation message after forwarding one or several messages, version items -->
     <string name="messages_forwarded_success">Сообщения пересланы</string>
@@ -2419,19 +2397,19 @@
     <!-- Error message if any of the forwarded messages fails, message items -->
     <plurals name="messages_forwarded_partial_error">
         <item quantity="one">Ошибка. %1$d сообщение не было успешно отправлено</item>
-        <item quantity="few">empty</item>
-        <item quantity="many">empty</item>
-        <item quantity="other">Ошибка. Сообщения (%1$d) не были успешно отправлены</item>
+        <item quantity="few">Ошибка. %1$d сообщения не были успешно отправлены</item>
+        <item quantity="many">Ошибка. %1$d сообщений не было успешно отправлено</item>
+        <item quantity="other">Ошибка. %1$d сообщения не было успешно отправлено</item>
     </plurals>
     <!-- Error non existing resource after forwarding one or several messages to several chats, message items -->
     <plurals name="messages_forwarded_error_not_available">
         <item quantity="one">Ошибка. Ресурс больше не доступен</item>
-        <item quantity="few">empty</item>
-        <item quantity="many">empty</item>
+        <item quantity="few">Ошибка. Ресурсы больше не доступны</item>
+        <item quantity="many">Ошибка. Ресурсы больше не доступны</item>
         <item quantity="other">Ошибка. Ресурсы больше не доступны</item>
     </plurals>
     <!-- The title of fragment Turn on Notifications -->
-    <string name="turn_on_notifications_title">Включить уведомления</string>
+    <string name="turn_on_notifications_title">Включите уведомления</string>
     <!-- The subtitle of fragment Turn on Notifications -->
     <string name="turn_on_notifications_subtitle">Вы будете видеть новые сообщения\nна своём Android-устройстве сразу же.</string>
     <!-- First step to turn on notifications -->
@@ -2498,16 +2476,16 @@
     <!-- Subtitle to show the number of unread messages on a chat, unread messages -->
     <plurals name="number_unread_messages">
         <item quantity="one">%1$s непрочитанное сообщение</item>
-        <item quantity="few">empty</item>
-        <item quantity="many">empty</item>
-        <item quantity="other">Непрочитанные сообщения: %1$s</item>
+        <item quantity="few">%1$s непрочитанных сообщения</item>
+        <item quantity="many">%1$s непрочитанных сообщений</item>
+        <item quantity="other">%1$s непрочитанных сообщения</item>
     </plurals>
     <!-- Notification title to show the number of unread chats, unread messages -->
     <plurals name="plural_number_messages_chat_notification">
         <item quantity="one">%1$d непрочитанный чат</item>
-        <item quantity="few">empty</item>
-        <item quantity="many">empty</item>
-        <item quantity="other">Непрочитанные сообщения (%1$d)</item>
+        <item quantity="few">%1$d непрочитанных чата</item>
+        <item quantity="many">%1$d непрочитанных чатов</item>
+        <item quantity="other">%1$d непрочитанных чата</item>
     </plurals>
     <!-- Message shown when a chat is opened and the messages are being recovered -->
     <string name="chat_loading_messages">[A]Загрузка[/A] [B]Сообщений&#8230;[/B]</string>
@@ -2567,10 +2545,10 @@
     <string name="title_acceptance_contact_request_notification">Новый контакт</string>
     <!-- Notification title to show the number of incoming contact request, contact requests -->
     <plurals name="plural_number_contact_request_notification">
-        <item quantity="one">Неподтверждённый запрос контактов: %1$d</item>
-        <item quantity="few">empty</item>
-        <item quantity="many">empty</item>
-        <item quantity="other">Неподтверждённые запросы контактов: %1$d</item>
+        <item quantity="one">%1$d неподтверждённый запрос добавления в контакты</item>
+        <item quantity="few">%1$d неподтверждённых запроса добавления в контакты</item>
+        <item quantity="many">%1$d неподтверждённых запросов добавления в контакты</item>
+        <item quantity="other">%1$d неподтверждённых запроса добавления в контакты</item>
     </plurals>
     <!-- title of the notification for a new incoming contact request -->
     <string name="title_new_contact_request_notification">Новый контакт</string>
@@ -2615,7 +2593,7 @@
     <!-- Description of the screen shown when the user enabled correctly Two-Factor Authentication -->
     <string name="description_2fa_enabled">При следующем входе в аккаунт система запросит 6-значный код из приложения-аутентификатора.</string>
     <!-- Recommendation displayed after enable Two-Factor Authentication -->
-    <string name="recommendation_2fa_enabled">Подумайте об экспорте <b>ключа восстановления</b> на случай, если вы потеряете доступ к своему приложению или захотите отключить двухфакторную аутентификацию в будущем.</string>
+    <string name="recommendation_2fa_enabled">Пожалуйста, сохраните <b>ключ восстановления</b> в надёжном месте, чтобы избежать проблем, если вы потеряете доступ к своему приложению или захотите отключить двухфакторную аутентификацию.</string>
     <!-- Error shown when a user tries to enable Two-Factor Authentication and introduce an invalid code -->
     <string name="pin_error_2fa">Недействительный код</string>
     <!-- Title of screen Lost authenticator decive -->
@@ -2661,26 +2639,26 @@
     <!-- error message when importing multiple files from chat -->
     <string name="number_no_imported_from_chat">Не удалось импортировать файлы: %d</string>
     <!-- button’s text to open a full screen image -->
-    <string name="preview_content">Предпросмотр</string>
+    <string name="preview_content">Предварительный просмотр</string>
     <!-- message shown when the user clicks on media file chat message, there is no network connection and the file is not been downloaded -->
-    <string name="no_network_connection_on_play_file">Потоковая передача не может быть выполнена, файл не был загружен</string>
+    <string name="no_network_connection_on_play_file">Нет подключения к сети. Файл не был загружен и не может быть воспроизведён в потоковом режиме.</string>
     <!-- message shown when the user open a file, the file is not been opened due to unknown reason -->
     <string name="error_fail_to_open_file_general">Невозможно открыть файл.</string>
     <!-- message shown when the user open a file, there is no network connection and the file is not been downloaded -->
-    <string name="error_fail_to_open_file_no_network">Нам не удалось открыть файл из-за отсутствия сетевого подключения.</string>
+    <string name="error_fail_to_open_file_no_network">Нет подключения к сети. Пожалуйста, подключитесь повторно, чтобы открыть файл.</string>
     <!-- message when trying to save for offline a file that already exists -->
     <string name="file_already_exists">Файл уже сохранён локально</string>
     <!-- Error message if forwarding a message failed, many messages -->
     <plurals name="error_forwarding_messages">
         <item quantity="one">Сообщение не отправлено</item>
-        <item quantity="few">empty</item>
-        <item quantity="many">empty</item>
+        <item quantity="few">Сообщения не отправлены</item>
+        <item quantity="many">Сообщения не отправлены</item>
         <item quantity="other">Сообщения не отправлены</item>
     </plurals>
     <!-- Title of the dialog to disable the rich links previews on chat -->
     <string name="title_confirmation_disable_rich_links">Превью URL</string>
     <!-- Text of the dialog to disable the rich links previews on chat -->
-    <string name="text_confirmation_disable_rich_links">Вы отключаете превью URL насовсем. Их можно включить позже в «настройках». Продолжить</string>
+    <string name="text_confirmation_disable_rich_links">Вы отключаете превью URL. Вы можете снова включить их в настройках. Продолжить?</string>
     <!-- Message shown when a call ends. -->
     <string name="call_missed_messages">[A]Пропущенный вызов[/A]</string>
     <!-- Message shown when a call ends. -->
@@ -2692,7 +2670,7 @@
     <!-- Message shown when a call ends. -->
     <string name="call_not_answered_messages">[A]Вызов не получил ответа[/A]</string>
     <!-- Indicates that can type a contact email -->
-    <string name="contact_email">E-mail контакта</string>
+    <string name="contact_email">Эл. почта контакта</string>
     <!-- When it tries to add a contact in a list an is already added -->
     <string name="contact_not_added">Вы уже добавили этот контакт</string>
     <!-- Content of a normal message that cannot be recognized -->
@@ -2706,16 +2684,9 @@
     <!-- success message when a node was restore from Rubbish bin -->
     <string name="context_correctly_node_restored">Восстановлено в %s</string>
     <!-- error message when a node was restore from Rubbish bin -->
-    <string name="context_no_restored">Ошибка. Не восстановлено</string>
+    <string name="context_no_restored">Произошла ошибка. Элемент не восстановлен.</string>
     <!-- menu item from contact section to send a message to a contact -->
-    <string name="context_send_message">Отправить Сообщение</string>
-    <!-- Message shown when a contact is successfully sent to several chats, more contacts -->
-    <plurals name="plural_contact_sent_to_chats">
-        <item quantity="one">Контакт отправлен в чат</item>
-        <item quantity="few">empty</item>
-        <item quantity="many">empty</item>
-        <item quantity="other">Контакты отправлен в чат</item>
-    </plurals>
+    <string name="context_send_message">Отправить cообщение</string>
     <!-- Error message on opening a MEGAdrop folder link -->
     <string name="error_MEGAdrop_not_supported">Папки MEGAdrop ещё не поддерживаются</string>
     <!-- Pre overquota error dialog when trying to copy or import a file -->
@@ -2725,9 +2696,9 @@
     <!-- Text of the option to show the arhived chat, it shows the number of archived chats -->
     <string name="archived_chats_show_option">Архивированные чаты (%d)</string>
     <!-- Title of the option on the chat list to archive a chat -->
-    <string name="archive_chat_option">Архивация чата</string>
+    <string name="archive_chat_option">Архивировать чат</string>
     <!-- Title of the option on the chat list to unarchive a chat -->
-    <string name="unarchive_chat_option">Разархивация чата</string>
+    <string name="unarchive_chat_option">Разархивировать чат</string>
     <!-- Confirmation button of the dialog to archive a chat -->
     <string name="general_archive">Архив</string>
     <!-- Confirmation button of the dialog to unarchive a chat -->
@@ -2746,10 +2717,6 @@
     <string name="inactive_chat">Неактивный чат</string>
     <!-- Subtitle of chat screen when the chat is archived -->
     <string name="archived_chat">Архивный чат</string>
-    <!-- error message when restoring several nodes from rubbish -->
-    <string name="number_incorrectly_restored_from_rubbish">Элементы (%d) не были восстановлены</string>
-    <!-- success message when restoring several nodes from rubbish -->
-    <string name="number_correctly_restored_from_rubbish">Элементы (%d) успешно восстановлены</string>
     <!-- Title of the layout to join a group call from the chat screen -->
     <string name="join_call_layout">Коснитесь, чтобы присоединиться</string>
     <!-- Label shown when the user wants to add contacts into his MEGA account -->
@@ -2852,10 +2819,10 @@
     <string name="contact_info_button_more">Больше</string>
     <!-- Section title to select a file to perform an action, more files -->
     <plurals name="plural_select_file">
-        <item quantity="one">Выбрать файл</item>
-        <item quantity="few">empty</item>
-        <item quantity="many">empty</item>
-        <item quantity="other">Выбрать файлы</item>
+        <item quantity="one">Выбор файла</item>
+        <item quantity="few">Выбор файлов</item>
+        <item quantity="many">Выбор файлов</item>
+        <item quantity="other">Выбор файлов</item>
     </plurals>
     <!-- Title of confirmation dialog of sending invitation to a contact -->
     <string name="title_confirm_send_invitation">Пригласить %1$s?</string>
@@ -2902,7 +2869,7 @@
     <!-- Title of compression queue size option in settings -->
     <string name="settings_video_compression_queue_size_title">Если видео для сжатия больше</string>
     <!-- Text of the alert when a FREE user tries to disable the RB scheduler -->
-    <string name="settings_rb_scheduler_alert_disabling">Чтобы отключить очистку корзины по расписанию или установить более длительный период хранения, нужно подписаться на план PRO.</string>
+    <string name="settings_rb_scheduler_alert_disabling">Чтобы отключить очистку корзины по расписанию или выбрать более длительный период хранения, пожалуйста, подпишитесь на план Pro.</string>
     <!-- Picker text to choose custom retention time. This option indicates several days -->
     <string name="hint_days">д.</string>
     <!-- Title of the option to generate a public chat link -->
@@ -3020,9 +2987,9 @@
     <!-- Alert shown when some files were not downloaded due to ToS/AUP violation, Plural of taken down files. 2 files -->
     <plurals name="alert_taken_down_files">
         <item quantity="one">%d файл не был загружен из-за нарушения условий предоставления услуг/политики допустимого использования</item>
-        <item quantity="few">empty</item>
-        <item quantity="many">empty</item>
-        <item quantity="other">Файлы (%d) не были загружены из-за нарушения условий предоставления услуг/политики допустимого использования</item>
+        <item quantity="few">%d файла не были загружены из-за нарушения условий предоставления услуг/политики допустимого использования</item>
+        <item quantity="many">%d файлов не было загружено из-за нарушения условий предоставления услуг/политики допустимого использования</item>
+        <item quantity="other">%d файла не было загружено из-за нарушения условий предоставления услуг/политики допустимого использования</item>
     </plurals>
     <!-- Subtitle of a file takedown reinstated historic notification -->
     <string name="subtitle_file_takedown_reinstated_notification">[A]Ваш общедоступный файл [/A][B]%s[/B][C] был восстановлен.[/C]</string>
@@ -3105,22 +3072,22 @@
     <!-- on the section notifications indicates the number of files added to a shared folder, Plural of file. 2 files -->
     <plurals name="num_files_with_parameter">
         <item quantity="one">%d файл</item>
-        <item quantity="few">empty</item>
-        <item quantity="many">empty</item>
-        <item quantity="other">файлов: %d</item>
+        <item quantity="few">%d файла</item>
+        <item quantity="many">%d файлов</item>
+        <item quantity="other">%d файла</item>
     </plurals>
     <!-- on the section notifications indicates the number of folder added to a shared folder, Plural of folder/directory. 2 folders -->
     <plurals name="num_folders_with_parameter">
         <item quantity="one">%d папка</item>
-        <item quantity="few">empty</item>
-        <item quantity="many">empty</item>
-        <item quantity="other">Папок: %d</item>
+        <item quantity="few">%d папки</item>
+        <item quantity="many">%d папок</item>
+        <item quantity="other">%d папки</item>
     </plurals>
     <!-- Indicates the content of a folder is some folders and some files. Plural of files. e.g. 7 folders · 2 files. Middle height point is to separate two fragments of text and it was not to be considered a punctuation mark. -->
     <plurals name="num_folders_num_files">
         <item quantity="one">Папки: %1$d · Файлы: 1</item>
-        <item quantity="few">empty</item>
-        <item quantity="many">empty</item>
+        <item quantity="few">Папки: %1$d · Файлы: %2$d</item>
+        <item quantity="many">Папки: %1$d · Файлы: %2$d</item>
         <item quantity="other">Папки: %1$d · Файлы: %2$d</item>
     </plurals>
     <!-- Subtitle of the historic notification for new additions inside an existing shared folder. Placeholders are: email who added the folders or files, number of folders added, number of files added -->
@@ -3128,30 +3095,30 @@
     <!-- Subtitle of the historic notification for new additions inside an existing shared folder, Plural of file. 2 files -->
     <plurals name="subtitle_notification_added_files">
         <item quantity="one">[A]%1$s [/A][B]добавил %2$d файл.[/B]</item>
-        <item quantity="few">empty</item>
-        <item quantity="many">empty</item>
-        <item quantity="other">[A]%1$s [/A][B]добавил файлы (%2$d).[/B]</item>
+        <item quantity="few">[A]%1$s [/A][B]добавил %2$d файла.[/B]</item>
+        <item quantity="many">[A]%1$s [/A][B]добавил %2$d файлов.[/B]</item>
+        <item quantity="other">[A]%1$s [/A][B]добавил %2$d файла.[/B]</item>
     </plurals>
     <!-- Subtitle of the historic notification for deletions inside an existing shared folder, Plural of item. 2 items -->
     <plurals name="subtitle_notification_deleted_items">
         <item quantity="one">[A]%1$s [/A][B]удалил %2$d элемент.[/B]</item>
-        <item quantity="few">empty</item>
-        <item quantity="many">empty</item>
-        <item quantity="other">[A]%1$s [/A][B]удалил элементы (%2$d).[/B]</item>
+        <item quantity="few">[A]%1$s [/A][B]удалил %2$d элемента.[/B]</item>
+        <item quantity="many">[A]%1$s [/A][B]удалил %2$d элементов.[/B]</item>
+        <item quantity="other">[A]%1$s [/A][B]удалил %2$d элемента.[/B]</item>
     </plurals>
     <!-- Subtitle of the historic notification for new additions inside an existing shared folder, Plural of folder. 2 folders -->
     <plurals name="subtitle_notification_added_folders">
         <item quantity="one">[A]%1$s [/A][B]добавил %2$d папку.[/B]</item>
-        <item quantity="few">empty</item>
-        <item quantity="many">empty</item>
-        <item quantity="other">[A]%1$s [/A][B]добавил папки(%2$d).[/B]</item>
+        <item quantity="few">[A]%1$s [/A][B]добавил %2$d папки.[/B]</item>
+        <item quantity="many">[A]%1$s [/A][B]добавил %2$d папок.[/B]</item>
+        <item quantity="other">[A]%1$s [/A][B]добавил %2$d папки.[/B]</item>
     </plurals>
     <!-- Subtitle chat screen for groups with permissions and not archived, Plural of participant. 2 participants -->
     <plurals name="subtitle_of_group_chat">
         <item quantity="one">%d участник</item>
-        <item quantity="few">empty</item>
-        <item quantity="many">empty</item>
-        <item quantity="other">Участники (%d)</item>
+        <item quantity="few">%d участника</item>
+        <item quantity="many">%d участников</item>
+        <item quantity="other">%d участника</item>
     </plurals>
     <!--  -->
     <string name="custom_subtitle_of_group_chat">%1$s и ещё %2$d</string>
@@ -3168,17 +3135,17 @@
     <!-- Title of the dialog to inform about a SSL error -->
     <string name="ssl_error_dialog_title">Ошибка ключа SSL</string>
     <!-- Text of the dialog to inform about a SSL error -->
-    <string name="ssl_error_dialog_text">MEGA не может безопасно подключиться через SSL. Возможно, вы используете общедоступный Wi-Fi с дополнительными требованиями.</string>
+    <string name="ssl_error_dialog_text">MEGA не может установить безопасное соединение с помощью SSL. Возможно, вы подключены к общедоступной сети Wi-Fi с дополнительными требованиями.</string>
     <!-- Text of the empty screen for the notifications section -->
     <string name="context_empty_notifications">[B]Нет [/B][A]уведомлений[/A]</string>
     <!-- Permissions screen title -->
     <string name="general_setup_mega">Настроить MEGA</string>
     <!-- Permissions screen explanation -->
-    <string name="setup_mega_explanation">MEGA необходим доступ к вашим фотографиям, медиа и файлам, чтобы вы могли делиться ими с друзьями, обмениваться зашифрованными сообщениями и совершать безопасные звонки.</string>
+    <string name="setup_mega_explanation">Чтобы делиться файлами, MEGA требуется ваше разрешение на доступ к медиафайлам и файлам. Другие разрешения доступа могут потребоваться для обмена зашифрованными сообщениями и для безопасных звонков.</string>
     <!-- Title of the screen asking permissions for files -->
     <string name="allow_acces_media_title">Разрешить доступ к фотографиям, медиа и файлам.</string>
     <!-- Subtitle of the screen asking permissions for files -->
-    <string name="allow_acces_media_subtitle">Для обмена фотографиями, медиа и файлами MEGA нужно ваше разрешение.</string>
+    <string name="allow_acces_media_subtitle">Чтобы делиться файлами, MEGA требуется ваше разрешение на доступ к файлам.</string>
     <!-- Title of the screen asking permissions for camera -->
     <string name="allow_acces_camera_title">Разрешить доступ к камере</string>
     <!-- Subtitle of the screen asking permissions for camera -->
@@ -3186,7 +3153,7 @@
     <!-- Title of the screen asking permissions for microphone and write in log calls -->
     <string name="allow_acces_calls_title">Разрешить звонки</string>
     <!-- Title of the screen asking permissions for contacts -->
-    <string name="allow_acces_contact_title">Откройте доступ к вашей адресной книге</string>
+    <string name="allow_acces_contact_title">Откройте доступ к адресной книге</string>
     <!-- Subtitle of the screen asking permissions for contacts -->
     <string name="allow_acces_contact_subtitle">Легко находите контакты из своей адресной книги в MEGA.</string>
     <!-- Explanation under the subtitle of asking permissions for contacts to explain that MEGA will never use the address book data for any other purpose -->
@@ -3206,23 +3173,23 @@
     <!-- Message that shows the hours of a call when it ends, more hours -->
     <plurals name="plural_call_ended_messages_hours">
         <item quantity="one">[B]%1$s час[/B]</item>
-        <item quantity="few">empty</item>
-        <item quantity="many">empty</item>
-        <item quantity="other">[B]%1$s ч.[/B]</item>
+        <item quantity="few">[B]%1$s часа[/B]</item>
+        <item quantity="many">[B]%1$s часов[/B]</item>
+        <item quantity="other">[B]%1$s часа[/B]</item>
     </plurals>
     <!-- Message that shows the minutes of a call when it ends, more minutes -->
     <plurals name="plural_call_ended_messages_minutes">
         <item quantity="one">[B]%1$s минута[/B]</item>
-        <item quantity="few">empty</item>
-        <item quantity="many">empty</item>
-        <item quantity="other">[B]%1$s мин.[/B]</item>
+        <item quantity="few">[B]%1$s минуты[/B]</item>
+        <item quantity="many">[B]%1$s минут[/B]</item>
+        <item quantity="other">[B]%1$s минуты[/B]</item>
     </plurals>
     <!-- Message that shows the seconds of a call when it ends, more seconds -->
     <plurals name="plural_call_ended_messages_seconds">
-        <item quantity="one">[B]%1$d сек.[/B]</item>
-        <item quantity="few">empty</item>
-        <item quantity="many">empty</item>
-        <item quantity="other">[B]%1$d сек.[/B]</item>
+        <item quantity="one">[B]%1$d секунда[/B]</item>
+        <item quantity="few">[B]%1$d секунды[/B]</item>
+        <item quantity="many">[B]%1$d секунд[/B]</item>
+        <item quantity="other">[B]%1$d секунды[/B]</item>
     </plurals>
     <!-- Message to indicate a call has ended without indicate the call duration. -->
     <string name="call_ended_no_duration_message">[A]Звонок завершён[/A]</string>
@@ -3247,17 +3214,17 @@
     <!-- Text to indicate that a contact has left a group call -->
     <string name="contact_left_the_call">%1$s отключился</string>
     <!-- Warning show when a call cannot start because there are too many participants in the group chat -->
-    <string name="call_error_too_many_participants_start">Вам не разрешено начать звонок, потому что лимит участников был превышен.</string>
+    <string name="call_error_too_many_participants_start">Невозможно начать к звонок, поскольку превышено максимальное количество участников.</string>
     <!-- Message show when a call cannot be established because there are too many participants in the group call -->
-    <string name="call_error_too_many_participants">Вы не можете присоединиться к этому вызову, так как в нём максимальное количество участников.</string>
+    <string name="call_error_too_many_participants">Невозможно присоединиться к звонку, поскольку превышено максимальное количество участников.</string>
     <!-- Message show when a call cannot be established because there are too many participants in the group -->
-    <string name="call_error_too_many_participants_join">Вам не разрешено присоединиться к этому звонку, поскольку группа достигла максимального количества участников в чате.</string>
+    <string name="call_error_too_many_participants_join">Невозможно присоединиться к групповому звонку из-за максимального количества участников</string>
     <!-- Message show when a user cannot activate the video in a group call because the max number of videos has been reached -->
-    <string name="call_error_too_many_video">Вы не можете включить видео, так в этом вызове уже максимальное количество участников, использующих видео.</string>
+    <string name="call_error_too_many_video">Невозможно присоединиться к видеозвонку, поскольку превышено максимальное количество участников.</string>
     <!-- Message show when a user cannot put the call on hold -->
-    <string name="call_error_call_on_hold">Вы не можете удерживать вызов.</string>
+    <string name="call_error_call_on_hold">Звонок нельзя поставить на удержание.</string>
     <!-- Error message shown when a file cannot be opened by other app using the open with option menu -->
-    <string name="error_open_file_with">Ошибка. Файл не может быть открыт.</string>
+    <string name="error_open_file_with">Произошла ошибка, и файл не может быть открыт в этом приложении.</string>
     <!-- Subtitle of the call screen when a incoming call is just starting -->
     <string name="incoming_call_starting">Входящий вызов&#8230;</string>
     <!-- Subtitle of the call screen when a outgoing call is just starting -->
@@ -3290,9 +3257,9 @@
     <string name="explanation_for_contacts_permission">Если вы дадите MEGA доступ к адресной книге, вы сможете легче находить свои контакты. MEGA не будет использовать эти данные для каких-либо других целей и никогда не будет взаимодействовать с вашими контактами без вашего согласия.</string>
     <!-- Confirmation message after forwarding one or several messages, version items -->
     <plurals name="messages_forwarded_success_plural">
-        <item quantity="one">Сообщение отправлено</item>
-        <item quantity="few">empty</item>
-        <item quantity="many">empty</item>
+        <item quantity="one">Сообщение переслано</item>
+        <item quantity="few">Сообщения пересланы</item>
+        <item quantity="many">Сообщения пересланы</item>
         <item quantity="other">Сообщения пересланы</item>
     </plurals>
     <!-- Title of a chat message that contains geolocation info -->
@@ -3302,30 +3269,30 @@
     <!-- Alert shown when a num of files have not been sent because of any error occurs, Plural of file. 2 files -->
     <plurals name="num_files_not_send">
         <item quantity="one">%d файл не был отправлен в чаты (%d)</item>
-        <item quantity="few">empty</item>
-        <item quantity="many">empty</item>
-        <item quantity="other">Файлы (%d) не были отправлены в чаты (%d)</item>
+        <item quantity="few">%d файла не были отправлены в чаты (%d)</item>
+        <item quantity="many">%d файлов не было отправлено в чаты (%d)</item>
+        <item quantity="other">%d файла не было отправлено в чаты (%d)</item>
     </plurals>
     <!-- Alert shown when a num of contacts have not been sent because of any error occurs, Plural of file. 2 files -->
     <plurals name="num_contacts_not_send">
         <item quantity="one">%d контакт не был отправлен в чаты (%d)</item>
-        <item quantity="few">empty</item>
-        <item quantity="many">empty</item>
-        <item quantity="other">Контакты (%d) не были отправлены в чаты (%d)</item>
+        <item quantity="few">%d контакта не были отправлены в чаты (%d)</item>
+        <item quantity="many">%d контактов не было отправлено в чаты (%d)</item>
+        <item quantity="other">%d контакта не было отправлено в чаты (%d)</item>
     </plurals>
     <!-- Alert shown when a num of messages have not been sent because of any error occurs, Plural of file. 2 files -->
     <plurals name="num_messages_not_send">
         <item quantity="one">%d сообщение не было отправлено в чаты (%d)</item>
-        <item quantity="few">empty</item>
-        <item quantity="many">empty</item>
-        <item quantity="other">Сообщения (%d) не были отправлены в чаты (%d)</item>
+        <item quantity="few">%d сообщения не были отправлены в чаты (%d)</item>
+        <item quantity="many">%d сообщений не было отправлено в чаты (%d)</item>
+        <item quantity="other">%d сообщения не было отправлено в чаты (%d)</item>
     </plurals>
     <!-- How many local contacts have been on MEGA, Plural of local contact. 2 contacts -->
     <plurals name="quantity_of_local_contact">
         <item quantity="one">%d контакт найден в MEGA</item>
-        <item quantity="few">empty</item>
-        <item quantity="many">empty</item>
-        <item quantity="other">Найдено контактов в MEGA: %d</item>
+        <item quantity="few">%d контакта найдено в MEGA</item>
+        <item quantity="many">%d контактов найдено в MEGA</item>
+        <item quantity="other">%d контакта найдено в MEGA</item>
     </plurals>
     <!-- Label displayed on the top of the chat list if none of user’s phone contacts have a MEGA account. In other case here would appear all the user’s phone contacts that have a MEGA account. -->
     <string name="no_local_contacts_on_mega">Пригласить контакт сейчас?</string>
@@ -3357,20 +3324,20 @@
     <string name="version_history_deleted_erroneously">Прошлые версии не удалены.</string>
     <!-- Confirmation message after deleted file versions, version items -->
     <plurals name="versions_deleted_succesfully">
-        <item quantity="one">Версия (%d) успешно удалена</item>
-        <item quantity="few">empty</item>
-        <item quantity="many">empty</item>
-        <item quantity="other">Версии (%d) успешно удалены</item>
+        <item quantity="one">%d версия успешно удалена</item>
+        <item quantity="few">%d версии успешно удалены</item>
+        <item quantity="many">%d версий успешно удалено</item>
+        <item quantity="other">%d версии успешно удалено</item>
     </plurals>
     <!-- Alert shown when several versions are not deleted successfully -->
     <plurals name="versions_not_deleted">
-        <item quantity="one">Версия (%d) не удалена</item>
-        <item quantity="few">empty</item>
-        <item quantity="many">empty</item>
-        <item quantity="other">Версии (%d) не удалены</item>
+        <item quantity="one">%d версия не удалена</item>
+        <item quantity="few">%d версии не удалено</item>
+        <item quantity="many">%d версий не удалено</item>
+        <item quantity="other">%d версии не удалено</item>
     </plurals>
     <!-- Alert shown when the user tries to realize some action in chat and has not contacts -->
-    <string name="no_contacts_invite">У вас нет контактов MEGA. Пожалуйста, приглашайте друзей из раздела «Контакты».</string>
+    <string name="no_contacts_invite">У вас нет контактов в MEGA. Пожалуйста, пригласите друзей из раздела «Контакты».</string>
     <!-- Invite button for chat top cell -->
     <string name="invite_more">Пригласить ещё</string>
     <!-- Title of first tour screen -->
@@ -3482,7 +3449,7 @@
     <!-- Text of the empty screen when there are not chat conversations -->
     <string name="recent_chat_empty_text">Начните безопасное общение со своими контактами благодаря сквозному шифрованию.</string>
     <!-- Text sent to recipients to invite to be contact. Placeholder: contact link url. -->
-    <string name="invite_contacts_to_start_chat_text_message">Привет! Начните зашифрованное общение с помощью MEGA и получите 20+ ГБ места на диске бесплатно. %1$s</string>
+    <string name="invite_contacts_to_start_chat_text_message">Привет. Начните зашифрованное общение со мной с помощью MEGA и получите 20 ГБ на диске бесплатно. %1$s</string>
     <!-- In some cases, a user may try to get the link for a chat room, but if such is not set by an operator - it would say ‘not link available’ and not auto create it. -->
     <string name="no_chat_link_available">Нет доступной ссылки на чат</string>
     <!-- Alert shown when it has been deleted successfully a chat link -->
@@ -3511,19 +3478,19 @@
     <string name="invite_contact_chooser_title">Пригласить друзей</string>
     <!-- Action button label -->
     <string name="invite_contact_action_button">Пригласить друзей&#8230;</string>
-    <!-- When a multiple download is started, some of the files could have already been downloaded before. This message shows the number of files that has already been downloaded in plural. placeholder: number of files -->
+    <!-- Message displayed when multiple download starts and all files has already been downloaded before. Placeholder: number of files -->
     <plurals name="file_already_downloaded">
-        <item quantity="one">%d файл уже скачан.&#160;</item>
-        <item quantity="few">empty</item>
-        <item quantity="many">empty</item>
-        <item quantity="other">Файлы уже скачаны: %d.&#160;</item>
+        <item quantity="one">1 файл уже скачан.</item>
+        <item quantity="few">%d файла уже скачано.</item>
+        <item quantity="many">%d файлов уже скачано.</item>
+        <item quantity="other">%d файла уже скачано.</item>
     </plurals>
-    <!-- When a multiple download is started, some of the files could have already been downloaded before. This message shows the number of files that are pending in plural. placeholder: number of files -->
+    <!-- When a multiple download is started, some of the files could have already been downloaded before. This message shows the number of files that are pending. Placeholder: number of files -->
     <plurals name="file_pending_download">
-        <item quantity="one">Файлы в ожидании: %d.</item>
-        <item quantity="few">empty</item>
-        <item quantity="many">empty</item>
-        <item quantity="other">Файлов в ожидании: %d.</item>
+        <item quantity="one">1 файл в ожидании.</item>
+        <item quantity="few">%d файла в ожидании.</item>
+        <item quantity="many">%d файлов в ожидании.</item>
+        <item quantity="other">%d файла в ожидании.</item>
     </plurals>
     <!-- Title of the login screen -->
     <string name="login_to_mega">Вход в MEGA</string>
@@ -3595,8 +3562,8 @@
     <string name="business_management_alert">Управление пользователями доступно только из настольного веб-браузера.</string>
     <!-- Title of the usage tab in My Account Section -->
     <string name="tab_my_account_usage">Использование</string>
-    <!-- Title of usage storage details section in Storage -->
-    <string name="usage_storage_details_label">Детали использования хранилища</string>
+    <!-- Title of usage storage details section in My Account -->
+    <string name="usage_storage_details_label">Распределение использования хранилища</string>
     <!-- Title of overall usage section in Storage -->
     <string name="overall_usage_label">Общее использование</string>
     <!-- Title of transfer section in Storage -->
@@ -3604,7 +3571,7 @@
     <!-- Error shown when a Business account user (sub-user or admin) tries to remove a contact which is part of the same Business account. Please, keep the placeholder, it will be replaced with the name or email of the account, for example: Jane Appleseed or ja@mega.nz -->
     <string name="error_remove_business_contact">Вы не можете удалить %1$s как контакт, поскольку он является частью вашего бизнес-аккаунта.</string>
     <!-- When logging in during the grace period, the administrator of the Business account will be notified that their payment is overdue, indicating that they need to access MEGA using a desktop browser for more information -->
-    <string name="grace_period_admin_alert">Возникла проблема с вашим последним платежом. Пожалуйста, откройте MEGA в браузере настольного компьютера для дополнительной информации.</string>
+    <string name="grace_period_admin_alert">Возникла проблема с вашим последним платежом. Пожалуйста, войдите в MEGA с помощью настольного браузера для получения дополнительной информации.</string>
     <!-- A dialog title shown to users when their business account is expired. -->
     <string name="expired_business_title">Срок действия вашего бизнес-аккаунта истёк</string>
     <!-- Details shown when a Business account is expired due a payment issue. The account is opened in a view-only mode. -->
@@ -3612,7 +3579,7 @@
     <!-- A message which is shown to sub-users of expired business accounts. -->
     <string name="expired_user_business_text">Ваш аккаунт [B]приостановлен[/B]. Вы можете только просматривать данные.</string>
     <!-- Message shown when users with a business account (no administrators of a business account) try to enable the Camera Uploads, to advise them that the administrator do have the ability to view their data. -->
-    <string name="camera_uploads_business_alert">Несмотря на то, что у MEGA нет доступа к вашим данным, администратор вашего бизнес-аккаунта может контролировать и просматривать загрузки из камеры в вашем аккаунте.</string>
+    <string name="camera_uploads_business_alert">MEGA не может получить доступ к вашим данным. Однако администратор вашего бизнес-аккаунта может получить доступ к вашим загрузкам из камеры.</string>
     <!-- General label to alert user that somehting went wrong -->
     <string name="general_something_went_wrong_error">Что-то пошло не так</string>
     <!-- A dialog message which is shown to sub-users of expired business accounts. -->
@@ -3640,7 +3607,7 @@
     <!-- Text informing user that their account has been suspended -->
     <string name="account_temporarily_suspended">Ваш аккаунт был временно заблокирован для вашей безопасности.</string>
     <!-- Text informing user has to follow the steps of an email to unlock their account -->
-    <string name="verify_email_and_follow_steps">[A]Пожалуйста, подтвердите адрес электронной почты[/A] и следуйте инструкциям, чтобы разблокировать аккаунт.</string>
+    <string name="verify_email_and_follow_steps">Пожалуйста, следуйте инструкциям в [A]письме с подтверждением[/A], чтобы разблокировать аккаунт.</string>
     <!-- Question which takes the user to a help screen -->
     <string name="why_am_i_seeing_this">Почему я это вижу?</string>
     <!-- Label of a button which action is resend an email -->
@@ -3680,7 +3647,7 @@
     <!-- Error title shown when you are trying to do an action with a file or folder and you don’t have the necessary permissions -->
     <string name="permissions_error_label">Недостаточно прав доступа</string>
     <!-- Confirmation dialog shown to user when they try to revert a node in an incoming ReadWrite share. -->
-    <string name="alert_not_enough_permissions_revert">У вас нет прав, необходимых для восстановления этого файла. Чтобы продолжить, мы можем создать новый файл с восстановленными данными. Хотите продолжить?</string>
+    <string name="alert_not_enough_permissions_revert">У вас нет необходимых прав для изменения этого файла. Хотите создать новый файл?</string>
     <!-- Text shown when the creation of a version as a new file was successful -->
     <string name="version_as_new_file_created">Версия была успешно создана как новый файл.</string>
     <!-- Label indicating a date. Keep the placeholder, is to set the date. -->
@@ -3710,25 +3677,25 @@
     <!-- Text warning of transfer over quota -->
     <string name="warning_transfer_over_quota">Ваши передачи были прерваны. Улучшите аккаунт или подождите %s, чтобы продолжить.</string>
     <!-- Label indicating transfer over quota -->
-    <string name="label_transfer_over_quota">Превышена квота передач</string>
+    <string name="label_transfer_over_quota">Квота на передачу превышена</string>
     <!-- Label indicating storage over quota -->
-    <string name="label_storage_over_quota">Превышен лимит хранения</string>
+    <string name="label_storage_over_quota">Недостаточно места</string>
     <!-- Label indicating the action ‘upgrate account’ to get more transfer quota -->
     <string name="label_get_more_transfer_quota">Увеличить квоту на передачу</string>
     <!-- Warning show to the user when a folder does not exist -->
     <string name="warning_folder_not_exists">Папка не существует</string>
     <!-- Warning show to the user when a node does not exist in cloud -->
-    <string name="warning_node_not_exists_in_cloud">Файл не существует на облачном диске.</string>
+    <string name="warning_node_not_exists_in_cloud">Файл не может быть найден в облачном диске.</string>
     <!-- Header text of the Over Disk Quota Paywall warning -->
     <string name="over_disk_quota_paywall_header">Хранилище заполнено</string>
     <!-- Title of the Over Disk Quota Paywall warning -->
     <string name="over_disk_quota_paywall_title">Ваши данные в опасности!</string>
     <!-- Text of the Over Disk Quota Paywall warning with multiple email notification. Placeholders: 1 user email, 2 and 3 list of email notification dates, 4 number of files, 5 files size (including units) and 6 required PRO plan -->
     <plurals name="over_disk_quota_paywall_text">
-        <item quantity="one">Мы писали вам на %1$s %2$s, но у вас всё ещё остаются файлы (%3$s), занимающие %4$s в вашем MEGA-аккаунте. Для такого объёма требуется план %5$s.</item>
-        <item quantity="few">empty</item>
-        <item quantity="many">empty</item>
-        <item quantity="other">Мы писали вам на %1$s %2$s и %3$s, но у вас всё ещё остаются файлы (%4$s), занимающие %5$s в вашем MEGA-аккаунте. Для такого объёма требуется план %6$s.</item>
+        <item quantity="one">Мы писали вам на %1$s %2$s и , но у вас всё ещё остаётся %3$s файл, занимающий %4$s в вашем MEGA-аккаунте. Для такого объёма требуется план %5$s.</item>
+        <item quantity="few">Мы писали вам на %1$s %2$s и %3$s, но у вас всё ещё остаётся %4$s файла, занимающие %5$s в вашем MEGA-аккаунте. Для такого объёма требуется план %6$s.</item>
+        <item quantity="many">Мы писали вам на %1$s %2$s и %3$s, но у вас всё ещё остаётся %4$s файлов, занимающих %5$s в вашем MEGA-аккаунте. Для такого объёма требуется план %6$s.</item>
+        <item quantity="other">Мы писали вам на %1$s %2$s и %3$s, но у вас всё ещё остаётся %4$s файла, занимающих %5$s в вашем MEGA-аккаунте. Для такого объёма требуется план %6$s.</item>
     </plurals>
     <!-- Text of the Over Disk Quota Paywall warning with no email notification info. Placeholders: 1 user email, 2 number of files, 3 files size (including units) and 4 required PRO plan -->
     <string name="over_disk_quota_paywall_text_no_warning_dates_info">Мы писали вам на %1$s, но у вас всё ещё остаются файлы (%2$s), занимающие %3$s в вашем MEGA-аккаунте. Для такого объёма требуется план %4$s.</string>
@@ -3741,9 +3708,9 @@
     <!-- Time in days (plural). The placeholder is for the time value, please adjust the position based on linguistics -->
     <plurals name="label_time_in_days_full">
         <item quantity="one">1 день</item>
-        <item quantity="few">empty</item>
-        <item quantity="many">empty</item>
-        <item quantity="other">%d д.</item>
+        <item quantity="few">%d дня</item>
+        <item quantity="many">%d дней</item>
+        <item quantity="other">%d дня</item>
     </plurals>
     <!-- Time in hours. The placeholder is for the time value, please adjust the position based on linguistics -->
     <string name="label_time_in_hours">%d ч</string>
@@ -3755,7 +3722,7 @@
     <string name="label_verify_credentials">Подтвердить учётные данные</string>
     <!-- Label to indicate that contact’s credentials are not verified. -->
     <string name="label_not_verified">Не подтверждено</string>
-    <!-- Action indicating something was verified. -->
+    <!-- Label indicating the authenticity credentials of a contact have been verified -->
     <string name="label_verified">Проверен</string>
     <!-- ”Verify user” dialog title -->
     <string name="authenticity_credentials_label">Подлинность учётных данных</string>
@@ -3834,15 +3801,15 @@
     <!-- Indicator of the progress in a download/upload. Please, don’t remove the place holders: the first one is to set the percentage, the second one is to set the size of the file. Example 33% of 33.3 MB -->
     <string name="progress_size_indicator">%1$d%% из %2$s</string>
     <!-- Message showing when enable the mode for showing the special information in the chat messages. This action is performed from the settings section, clicking 5 times on the App version option -->
-    <string name="show_info_chat_msg_enabled">Включена специальная информация для сообщений чата</string>
+    <string name="show_info_chat_msg_enabled">Включена отладочная информация для сообщений чата</string>
     <!-- Message showing when disable the mode for showing the special information in the chat messages.. This action is performed from the settings section, clicking 5 times on the App version option -->
-    <string name="show_info_chat_msg_disabled">Отключена специальная информация для сообщений чата</string>
+    <string name="show_info_chat_msg_disabled">Отладочная информация для сообщений чата отключена</string>
     <!-- Shows the error when the limit of reactions per user is reached and the user tries to add one more. Keep the placeholder because is to show limit number in runtime. -->
     <string name="limit_reaction_per_user">Вы достигли максимального количества реакций: %d.</string>
     <!-- Shows the error when the limit of reactions per message is reached and a user tries to add one more. Keep the placeholder because is to show limit number in runtime. -->
     <string name="limit_reaction_per_message">Достигнуто максимальное количество реакций на это сообщение: %d.</string>
     <!-- System message displayed to all chat participants when one of them enables retention history -->
-    <string name="retention_history_changed_by">[A]%1$s[/A][B] изменил время очистки сообщения на[/B][A] %2$s[/A][B].[/B]</string>
+    <string name="retention_history_changed_by">[A]%1$s[/A][B] изменил время очистки сообщения на [/B][A]%2$s[/A][B].[/B]</string>
     <!-- Title of the section to clear the chat content in the Manage chat history screen -->
     <string name="title_properties_clear_chat_history">Очистить историю чата</string>
     <!-- System message that is shown to all chat participants upon disabling the Retention history -->
@@ -3868,64 +3835,64 @@
     <!-- Subtitle of the dialogue to select a retention time -->
     <string name="subtitle_properties_manage_chat">Автоматически удалять сообщения старше:</string>
     <!-- Text of the confirmation dialog to clear the chat history from Manage chat history section -->
-    <string name="confirmation_clear_chat_history">Очистить всю историю сообщений для этого разговора?</string>
+    <string name="confirmation_clear_chat_history">Действительно удалить всю историю этого разговора?</string>
     <!-- Text on the label indicating that the oldest messages of a year will be automatically deleted. -->
     <string name="subtitle_properties_manage_chat_label_year">1 год</string>
     <!-- Picker text to choose custom retention time. This option indicates several hours -->
     <plurals name="retention_time_picker_hours">
         <item quantity="one">час</item>
-        <item quantity="few">empty</item>
-        <item quantity="many">empty</item>
-        <item quantity="other">часы</item>
+        <item quantity="few">часа</item>
+        <item quantity="many">часов</item>
+        <item quantity="other">часа</item>
     </plurals>
     <!-- Picker text to choose custom retention time. This option indicates several days -->
     <plurals name="retention_time_picker_days">
         <item quantity="one">день</item>
-        <item quantity="few">empty</item>
-        <item quantity="many">empty</item>
-        <item quantity="other">д.</item>
+        <item quantity="few">дня</item>
+        <item quantity="many">дней</item>
+        <item quantity="other">дня</item>
     </plurals>
     <!-- Picker text to choose custom retention time. This option indicates several weeks -->
     <plurals name="retention_time_picker_weeks">
         <item quantity="one">неделя</item>
-        <item quantity="few">empty</item>
-        <item quantity="many">empty</item>
-        <item quantity="other">нед.</item>
+        <item quantity="few">недели</item>
+        <item quantity="many">недель</item>
+        <item quantity="other">недели</item>
     </plurals>
     <!-- Picker text to choose custom retention time. This option indicates several months -->
     <plurals name="retention_time_picker_months">
         <item quantity="one">месяц</item>
-        <item quantity="few">empty</item>
-        <item quantity="many">empty</item>
-        <item quantity="other">месяцев</item>
+        <item quantity="few">месяца</item>
+        <item quantity="many">месяцев</item>
+        <item quantity="other">месяца</item>
     </plurals>
     <!-- Picker text to choose custom retention time. This option indicates a year -->
     <string name="retention_time_picker_year">год</string>
     <!-- Text on the label indicating that That the oldest messages of several hours will be automatically deleted. -->
     <plurals name="subtitle_properties_manage_chat_label_hours">
         <item quantity="one">1 час</item>
-        <item quantity="few">empty</item>
-        <item quantity="many">empty</item>
-        <item quantity="other">%1$d ч.</item>
+        <item quantity="few">%1$d часа</item>
+        <item quantity="many">%1$d часов</item>
+        <item quantity="other">%1$d часа</item>
     </plurals>
     <!-- Text on the label indicating that That the oldest messages of several weeks will be automatically deleted. -->
     <plurals name="subtitle_properties_manage_chat_label_weeks">
         <item quantity="one">1 неделя</item>
-        <item quantity="few">empty</item>
-        <item quantity="many">empty</item>
-        <item quantity="other">%1$d нед.</item>
+        <item quantity="few">%1$d недели</item>
+        <item quantity="many">%1$d недель</item>
+        <item quantity="other">%1$d недели</item>
     </plurals>
     <!-- Text on the label indicating that That the oldest messages of several months will be automatically deleted. -->
     <plurals name="subtitle_properties_manage_chat_label_months">
         <item quantity="one">1 месяц</item>
-        <item quantity="few">empty</item>
-        <item quantity="many">empty</item>
-        <item quantity="other">%1$d мес.</item>
+        <item quantity="few">%1$d месяца</item>
+        <item quantity="many">%1$d месяцев</item>
+        <item quantity="other">%1$d месяца</item>
     </plurals>
     <!-- Title indicating the select mode is enabled and ready to select transfers on Transfers section, In progress tab -->
     <string name="title_select_transfers">Выбрать передачи</string>
     <!-- Error shown to inform the priority change of a transfer failed. Please don’t remove the place holder, it’s to set the name of the transfer. Example: The priority change of the transfer “video.mp4” failed. -->
-    <string name="change_of_transfer_priority_failed">Не удалось изменить приоритет передачи «%1$s».</string>
+    <string name="change_of_transfer_priority_failed">Невозможно изменить приоритет передачи «%1$s»</string>
     <!-- Title option to send separated the link and decryption key -->
     <string name="option_send_decryption_key_separately">Отправить ключ дешифрования отдельно</string>
     <!-- Explanation option to send separated the link and decryption key -->
@@ -3940,14 +3907,10 @@
     <string name="button_copy_key">Копировать ключ</string>
     <!-- Button which action is copy the password of a link -->
     <string name="button_copy_password">Копировать пароль</string>
-    <!-- Confirmation shown informing a link it’s copied to the clipboard -->
-    <string name="link_copied_clipboard">Ссылка скопирована в буфер обмена.</string>
     <!-- Confirmation shown informing a key link it’s copied to the clipboard -->
     <string name="key_copied_clipboard">Ключ скопирован в буфер обмена.</string>
     <!-- Confirmation shown informing a password link it’s copied to the clipboard -->
     <string name="password_copied_clipboard">Пароль скопирован в буфер обмена.</string>
-    <!-- Confirmation shown informing a link it’s copied to the clipboard -->
-    <string name="link_sent">Ссылка успешно отправлена.</string>
     <!-- Confirmation shown informing a key link it’s copied to the clipboard -->
     <string name="link_and_key_sent">Ссылка и ключ успешно отправлены.</string>
     <!-- Confirmation shown informing a key link it’s copied to the clipboard -->
@@ -3955,7 +3918,7 @@
     <!-- Title of a warning recommending upgrade to Pro -->
     <string name="upgrade_pro">Улучшение до Pro</string>
     <!-- Explanation of a warning recommending upgrade to Pro in relation to link available options -->
-    <string name="link_upgrade_pro_explanation">Пользователи MEGA Pro имеют эксклюзивный доступ к дополнительным функциям защиты ссылок, которые делают ваш аккаунть ещё безопаснее.</string>
+    <string name="link_upgrade_pro_explanation">Пользователи MEGA Pro имеют эксклюзивный доступ к дополнительным функциям защиты ссылок, которые делают ваш аккаунт ещё безопаснее.</string>
     <!-- Meaning of links decryption key -->
     <string name="decryption_key_explanation">Наша система сквозного шифрования требует, чтобы для этого файла автоматически генерировался уникальный ключ. Ссылка с этим ключом создается по умолчанию, но вы можете экспортировать ключ дешифрования отдельно для дополнительного уровня безопасности.</string>
     <!-- Reset password label -->
@@ -4016,8 +3979,6 @@
     <string name="dialog_cookie_alert_unsaved">Настройки куки-файлов не сохранены.</string>
     <!-- Snackbar message showed when there settings has been saved successfully. -->
     <string name="dialog_cookie_snackbar_saved">Изменения настроек куки-файлов сохранены</string>
-    <!-- Cookie dialog third party title -->
-    <string name="dialog_cookie_thirdparty_title">Сторонние куки-файлы</string>
     <!-- Cookie dialog third party first subtitle -->
     <string name="dialog_cookie_thirdparty_subtitle1">Рекламные куки-файлы Google</string>
     <!-- Cookie dialog third party second subtitle -->
@@ -4046,10 +4007,6 @@
     <string name="preference_cookies_thirdparty_title">Сторонние куки</string>
     <!-- Preference screen item summary. Please, keep the placeholders to format the string. -->
     <string name="preference_cookies_thirdparty_summary">Это куки, которые контролируются кем-то, кроме нас; мы используем эти куки для предоставления функций, описанных выше. Непринятие этих куки будет иметь различные последствия в зависимости от того, какой тип у каждого стороннего куки-файла. Нажмите «Дополнительная информация» ниже, чтобы получить подробную информацию обо всех сторонних файлах cookie, которые мы используем.</string>
-    <!-- Preference screen item action button -->
-    <string name="preference_cookies_policies_privacy">Политика конфиденциальности</string>
-    <!-- Preference screen item action button -->
-    <string name="preference_cookies_policies_cookie">Политика использования файлов cookie</string>
     <!-- Preference screen item state description -->
     <string name="preference_cookies_always_on">Всегда включены</string>
     <!-- Menu option that allows the user to scan document and upload it directly to MEGA. -->
@@ -4077,7 +4034,7 @@
     <!-- Label indicating a file was created successfully -->
     <string name="file_created">Фйал создан</string>
     <!-- Warning indicating a file was not created successfully -->
-    <string name="file_creation_failed">Не удалось создать файл. Попробуйте ещё раз.</string>
+    <string name="file_creation_failed">Не удалось создать файл. Пожалуйста, попробуйте ещё раз.</string>
     <!-- Label indicating a file was saved to some folder. e.g.: File saved to Cloud Drive -->
     <string name="file_saved_to">Файл сохранён в %1$s</string>
     <!-- Warning indicating a file was not saved to some folder. e.g.: File not saved to Cloud Drive. Try again -->
@@ -4085,7 +4042,7 @@
     <!-- Label indicating a file was updated successfully -->
     <string name="file_updated">Файл обновлён</string>
     <!-- Warning indicating a file was not updated successfully -->
-    <string name="file_update_failed">Не удалось обновить файл. Попробуйте ещё раз.</string>
+    <string name="file_update_failed">Не удалось обновить файл. Пожалуйста, попробуйте ещё раз.</string>
     <!-- Warning which alerts the user a file cannot be opened -->
     <string name="error_opening_file">Файл слишком большой, его нельзя открыть или просмотреть.</string>
     <!-- Error shown when the user writes a file name without extension. The placeholder shows the file extension. e. g. File without extension (.jpg)-->
@@ -4094,20 +4051,8 @@
     <string name="file_without_extension_warning">Чтобы продолжить, нужно ввести расширение файла</string>
     <!-- Title of the warning dialog indicating the renamed name file extension is not the same -->
     <string name="file_extension_change_title">Изменение расширения файла</string>
-    <!-- Text of the warning dialog indicating the renamed name file extension is not the same. The placeholders show the file extensions. e.g. You may not be able to access this file if you change it from ".jpg" to ".txt" -->
-    <string name="file_extension_change_warning">Возможно, вы не сможете открыть этот файл, если измените расширение с “.%1$s” на “.%2$s”</string>
-    <!-- Text of the warning dialog indicating the renamed name file extension is not the same. The placeholder shows the file extension. e.g. You may not be able to access this file if you change it from empty to ".txt" -->
-    <string name="file_extension_change_warning_old_empty">Возможно, вы не сможете открыть этот файл, если добавите расширение “.%1$s”</string>
-    <!-- Text of the warning dialog indicating the renamed name file extension is not the same. The placeholder shows the file extension. e.g. You may not be able to access this file if you change it from ".jpg" to empty -->
-    <string name="file_extension_change_warning_new_empty">Возможно, вы не сможете открыть этот файл, если удалите расширение “.%1$s”</string>
-    <!-- Button of the warning dialog indicating the renamed name file extension is not the same to use the new extension -->
-    <string name="action_use_empty_new_extension">Удалить расширение</string>
-    <!-- Button of the warning dialog indicating the renamed name file extension is not the same to use the new extension. The placeholder shows the file extension. e.g. Use .txt -->
-    <string name="action_use_new_extension">Использовать .%1$s</string>
-    <!-- Button of the warning dialog indicating the renamed name file extension is not the same to keep the old extension -->
-    <string name="action_keep_empty_old_extension">Без расширения</string>
-    <!-- Button of the warning dialog indicating the renamed name file extension is not the same to keep the old extension. The placeholder shows the file extension. e.g. Keep .jpg -->
-    <string name="action_keep_old_extension">Оставить .%1$s</string>
+    <!-- Text of the warning dialog indicating the renamed name file extension is not the same. -->
+    <string name="file_extension_change_warning">Возможно, вы не сможете открыть этот файл, если измените его расширение.</string>
     <!-- Warning which alerts the user a file cannot be created because there is already one with the same name-->
     <string name="same_file_name_warning">Уже есть файл с таким именем</string>
     <!-- Warning which alerts the user an item cannot be created because there is already one with the same name -->
@@ -4119,7 +4064,7 @@
     <!-- settings of the Media section -->
     <string name="settings_media">Медиа</string>
     <!-- settings title of the Media section -->
-    <string name="settings_media_audio_files">Audio files</string>
+    <string name="settings_media_audio_files">Аудиофайлы</string>
     <!-- Settings hint that indicates the audio will still be played in background if the app is backgrounded -->
     <string name="settings_background_play_hint">Воспроизведение в фоновом режиме</string>
     <!-- Text of the empty screen when there are no elements in Photos -->
@@ -4140,7 +4085,283 @@
     <string name="cu_day_month_year_date">[B]%1$s %2$s[/B] %3$s</string>
     <!-- Text to show on Camera Uploads section, indicating the upload progress. The placeholder %1$d is for set the number of pending uploads. E.g.: "Upload in progress, 300 files pending". -->
     <plurals name="cu_upload_progress">
-        <item quantity="one">Upload in progress, 1 file pending</item>
-        <item quantity="other">Upload in progress, %1$d files pending</item>
+        <item quantity="one">Загрузка, 1 файл ожидает обработки</item>
+        <item quantity="few">Загрузка, %1$d файла ожидает обработки</item>
+        <item quantity="many">Загрузка, %1$d файлов ожидает обработки</item>
+        <item quantity="other">Загрузка, %1$d файла ожидает обработки</item>
     </plurals>
+    <!-- Text to show as production api server option -->
+    <string name="production_api_server">Производство</string>
+    <!-- Title to show in a dialog to change api server -->
+    <string name="title_change_server">Изменение сервера</string>
+    <!-- Show line numbers action -->
+    <string name="action_show_line_numbers">Показывать номера строк</string>
+    <!-- Hide line numbers action -->
+    <string name="action_hide_line_numbers">Скрывать номера строк</string>
+    <!-- Indicates pagination progress. E.g.: 3/49 -->
+    <string name="pagination_progress">%1$s/%2$s</string>
+    <!-- An error shown as transfer error when uploading something to an incoming share and the owner’s account is over its storage quota. -->
+    <string name="error_share_owner_storage_quota">Владелец общего ресурса превысил квоту на хранение.</string>
+    <!-- A message shown when uploading, copying or moving something to an incoming share and the owner’s account is over its storage quota. -->
+    <string name="warning_share_owner_storage_quota">Файл не может быть отправлен, поскольку получатель превысил квоту на хранение.</string>
+    <!-- Content to show in a Snackbar to tip the incompatibility-->
+    <string name="version_incompatibility">Мы обновляем MEGAchat. Ваши звонки могут не быть соединены из-за несовместимости версий, пока все участники не обновят свои приложения MEGA до последней версии.</string>
+    <!-- Message displayed when multiple download starts and 1 file has already been downloaded before and 1 file is being downloaded -->
+    <string name="file_already_downloaded_and_file_pending_download">1 файл уже скачан. 1 файл в ожидании.</string>
+    <!-- Message displayed when multiple download starts and 1 file has already been downloaded before and multiple files are being downloaded. Placeholder: number of files -->
+    <string name="file_already_downloaded_and_files_pending_download">1 файл уже скачан. Файлы в ожидании: %d.</string>
+    <!-- Message displayed when multiple download starts and multiple files have already been downloaded before and 1 file is being downloaded. Placeholder: number of files -->
+    <string name="files_already_downloaded_and_file_pending_download">Файлы уже скачаны: %d. 1 файл в ожидании.</string>
+    <!-- Message displayed when multiple download starts and multiple files have already been downloaded before and multiple files are being downloaded. Placeholders: number of files -->
+    <string name="files_already_downloaded_and_files_pending_download">Файлы уже скачаны: %1$d. Файлы в ожидании: %2$d.</string>
+    <!-- Message displayed when 1 node (file or folder) has been successfully moved to the rubbish bin and 1 node has not been moved successfully -->
+    <string name="node_correctly_and_node_incorrectly_moved_to_rubbish">1 элемент успешно перемещён в корзину и 1 не удалось переместить</string>
+    <!-- Message displayed when 1 node (file or folder) has been successfully moved to the rubbish bin and multiple nodes have not been moved successfully. Placeholder: number of nodes -->
+    <string name="node_correctly_and_nodes_incorrectly_moved_to_rubbish">1 элемент успешно перемещён в корзину и %d не удалось переместить</string>
+    <!-- Message displayed when multiple nodes (files and folders) have been successfully moved to the rubbish bin and 1 node has not been moved successfully. Placeholder: number of nodes -->
+    <string name="nodes_correctly_and_node_incorrectly_moved_to_rubbish">Элементы (%d) успешно перемещены в корзину и 1 не удалось переместить</string>
+    <!-- Message displayed when multiple nodes (files and folders) have been successfully moved to the rubbish bin and multiple nodes have not been moved successfully. Placeholders: number of nodes -->
+    <string name="nodes_correctly_and_nodes_incorrectly_moved_to_rubbish">Элементы (%1$d) успешно перемещены в корзину и %2$d не удалось переместить</string>
+    <!-- Message displayed when 1 node (file or folder) has been successfully restored from the rubbish bin and 1 node has not been restored successfully -->
+    <string name="node_correctly_and_node_incorrectly_restored_from_rubbish">1 элемент успешно восстановлен и 1 не удалось восстановить</string>
+    <!-- Message displayed when 1 node (file or folder) has been successfully restored from the rubbish bin and multiple nodes have not been restored successfully. Placeholder: number of nodes -->
+    <string name="node_correctly_and_nodes_incorrectly_restored_from_rubbish">1 элемент успешно восстановлен и %d не удалось восстановить</string>
+    <!-- Message displayed when multiple nodes (files and folders) have been successfully restored from the rubbish bin and 1 node has not been restored successfully. Placeholder: number of nodes -->
+    <string name="nodes_correctly_and_node_incorrectly_restored_from_rubbish">Элементы успешно восстановлены (%d) и 1 не удалось восстановить</string>
+    <!-- Message displayed when multiple nodes (files and folders) have been successfully restored from the rubbish bin and multiple nodes have not been restored successfully. Placeholders: number of nodes -->
+    <string name="nodes_correctly_and_nodes_incorrectly_restored_from_rubbish">Элементы успешно восстановлены (%1$d) и %2$d не удалось восстановить</string>
+    <!-- Message displayed when nodes (files and folders) are being moved to the rubbish bin and all nodes have been successfully moved. Placeholder: number of nodes -->
+    <plurals name="number_correctly_moved_to_rubbish">
+        <item quantity="one">1 элемент успешно перемещён в корзину</item>
+        <item quantity="few">%d элемента успешно перемещено в корзину</item>
+        <item quantity="many">%d элементов успешно перемещено в корзину</item>
+        <item quantity="other">%d элемента успешно перемещено в корзину</item>
+    </plurals>
+    <!-- Message displayed when nodes (files and folders) are being moved to the rubbish bin and all nodes have not been successfully moved. Placeholder: number of nodes -->
+    <plurals name="number_incorrectly_moved_to_rubbish">
+        <item quantity="one">1 элемент не был перемещён в корзину</item>
+        <item quantity="few">%d элемента не были перемещены в корзину</item>
+        <item quantity="many">%d элементов не были перемещены в корзину</item>
+        <item quantity="other">%d элемента не были перемещены в корзину</item>
+    </plurals>
+    <!-- Message displayed when nodes (files and folders) are being restored from the rubbish bin and all nodes have been successfully restored. Placeholder: number of nodes -->
+    <plurals name="number_correctly_restored_from_rubbish">
+        <item quantity="one">1 элемент успешно восстановлен</item>
+        <item quantity="few">%d элемента успешно восстановлено</item>
+        <item quantity="many">%d элементов успешно восстановлено</item>
+        <item quantity="other">%d элемента успешно восстановлено</item>
+    </plurals>
+    <!-- Message displayed when nodes (files and folders) are being restored from the rubbish bin and all nodes have not been successfully restored. Placeholder: number of nodes -->
+    <plurals name="number_incorrectly_restored_from_rubbish">
+        <item quantity="one">1 элемент не был восстановлен</item>
+        <item quantity="few">%d элемента не было восстановлено</item>
+        <item quantity="many">%d элементов не было восстановлено</item>
+        <item quantity="other">%d элемента не было восстановлено</item>
+    </plurals>
+    <!-- Button of the warning dialog indicating the renamed name file extension is not the same to confirm the change. -->
+    <string name="action_change_anyway">Всё равно изменить</string>
+    <!-- Snackbar text to display if the user doesn't grant the permission to access all files on a device with Android 11 or higher -->
+    <string name="snackbar_storage_permission_denied_android_11">Требуется разрешение на доступ к памяти устройства.</string>
+    <!-- String to show the transfer quota and the used space in My Account section. E.g.: -->
+    <string name="used_storage_transfer">%1$s / %2$s</string>
+    <!-- String to show the transfer quota and the used space in My Account section -->
+    <string name="used_storage_transfer_percentage">%1$s%%</string>
+    <!-- Size in petabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
+    <string name="label_file_size_peta_byte">%1$s ПБ</string>
+    <!-- Size in exabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
+    <string name="label_file_size_exa_byte">%1$s ЭБ</string>
+    <!-- Title of Add phone number option in My account section -->
+    <string name="add_phone_label">Добавить номер телефона</string>
+    <!-- Text of the option Backup Recovery Key in My account section -->
+    <string name="backup_recovery_key_subtitle">Вы помните свой пароль?\nMEGA не сможет сбросить пароль, если вы его забудете.</string>
+    <!-- Action to change name -->
+    <string name="change_name_action">Изменить имя</string>
+    <!-- Action to add photo -->
+    <string name="add_photo_action">Добавить фото</string>
+    <!-- Action to add phone number -->
+    <string name="add_phone_number_action">Добавить номер телефона</string>
+    <!-- Warning indicating the app needs write permissions to do any action -->
+    <string name="denied_write_permissions">MEGA нужно разрешение на запись в память устройства, чтобы продолжить.</string>
+    <!-- Date indicating is tomorrow. E.g: Tomorrow, 3 Jul 2021 -->
+    <string name="tomorrow_date">Завтра, %1$s</string>
+    <!-- Title of the confirmation dialog shown when a subscription has been processed successfully -->
+    <string name="title_user_purchased_subscription">Ожидание подтверждения</string>
+    <!-- Number of social connections, showing the number of contacts the user has. E.g.: 37 connections -->
+    <plurals name="my_account_connections">
+        <item quantity="one">1 контакт</item>
+        <item quantity="few">%1$d контакта</item>
+        <item quantity="many">%1$d контактов</item>
+        <item quantity="other">%1$d контакта</item>
+    </plurals>
+    <!-- Section name for the “Recently Added Contacts” section. Preferably one word. -->
+    <string name="section_recently_added">Добавлены недавно</string>
+    <!-- Text of the empty screen when there are not groups. No dot at the end because is for an empty state. The format placeholders are to showing it in different colors. -->
+    <string name="context_empty_groups">[B]Нет [/B][A]групп[/A]</string>
+    <!-- Section name for the “Contact Requests” section. Preferably one word. -->
+    <string name="section_requests">Запросы</string>
+    <!-- Section name for the “Groups” section. Preferably one word. -->
+    <string name="section_groups">Группы</string>
+    <!-- Text informing links management is only available for single items. -->
+    <string name="warning_get_links">Такие параметры, как «Отправлять ключ дешифрования отдельно», «Задавать срок годности» или «Устанавливать защиту паролем», доступны только для отдельных элементов.</string>
+    <!-- Action which allows to copy all the links showed in the list. -->
+    <string name="action_copy_all">Копировать все</string>
+    <!-- Confirmation shown informing links have been sent to the selected chats -->
+    <plurals name="links_sent">
+        <item quantity="one">Ссылка успешно отправлена.</item>
+        <item quantity="few">Ссылки успешно отправлены.</item>
+        <item quantity="many">Ссылки успешно отправлены.</item>
+        <item quantity="other">Ссылки успешно отправлены.</item>
+    </plurals>
+    <!-- Confirmation shown informing links have been copied to the clipboard -->
+    <plurals name="links_copied_clipboard">
+        <item quantity="one">Ссылка скопирована в буфер обмена.</item>
+        <item quantity="few">Ссылки скопированы в буфер обмена.</item>
+        <item quantity="many">Ссылки скопированы в буфер обмена.</item>
+        <item quantity="other">Ссылки скопированы в буфер обмена.</item>
+    </plurals>
+    <!-- Plural string used as button label or title of the screen to get only one or several links at the same time. -->
+    <plurals name="get_links">
+        <item quantity="one">Получить ссылку</item>
+        <item quantity="few">Получить ссылки</item>
+        <item quantity="many">Получить ссылки</item>
+        <item quantity="other">Получить ссылки</item>
+    </plurals>
+    <!-- Ask for confirmation before clear offline files -->
+    <string name="clear_offline_confirmation">Очистить все локальные файлы?</string>
+    <!-- Banner text when the call is in progress and I'm the only participant. -->
+    <string name="banner_alone_on_the_call">Здесь только вы</string>
+    <!-- Item menu option upon right click on meeting. -->
+    <string name="context_meeting">Встреча</string>
+    <!-- Menu option that allows the user to start/join meeting. -->
+    <string name="start_join_meeting">Начать встречу/присоединиться</string>
+    <!-- Label that create a meeting -->
+    <string name="new_meeting">Новая встреча</string>
+    <!-- Label that join a meeting -->
+    <string name="join_meeting">Присоединиться к встрече</string>
+    <!-- Button that create a meeting -->
+    <string name="btn_start_meeting">Начать встречу</string>
+    <!-- Button that join a meeting as guest -->
+    <string name="btn_join_meeting_as_guest">Зайти как гость</string>
+    <!-- Hint shown to guide user on meeting name -->
+    <string name="type_meeting_name">Встреча пользователя %s</string>
+    <!-- General label for reject the call. -->
+    <string name="general_reject">Отклонить</string>
+    <!-- General label for microphone -->
+    <string name="general_mic">Микрофон</string>
+    <!-- General label for microphone muted -->
+    <string name="general_mic_mute">Ваш микрофон отключён</string>
+    <!-- General label for microphone unmuted -->
+    <string name="general_mic_unmute">Ваш микрофон включён</string>
+    <!-- General label for camera -->
+    <string name="general_camera">Камера</string>
+    <!-- General label for camera enable -->
+    <string name="general_camera_enable">Ваша камера включена.</string>
+    <!-- General label for camera disable -->
+    <string name="general_camera_disable">Ваша камера отключена.</string>
+    <!-- Label for hold meeting -->
+    <string name="meeting_hold">Удержать</string>
+    <!-- General label for speaker -->
+    <string name="general_speaker">Докладчик</string>
+    <!-- General label for headphone-->
+    <string name="general_headphone">Наушники</string>
+    <!-- General label for headphone on-->
+    <string name="general_headphone_on">Наушники включены</string>
+    <!-- General label for speaker on-->
+    <string name="general_speaker_on">Динамик включён</string>
+    <!-- General label for speaker off-->
+    <string name="general_speaker_off">Динамик отключён</string>
+    <!-- Label for end meeting-->
+    <string name="meeting_end">Закончить</string>
+    <!-- Invite contacts as participants of the meeting-->
+    <string name="invite_participants">Приглашение участников</string>
+    <!-- The number of participants in the meeting-->
+    <string name="participants_number">Участники (%d)</string>
+    <!-- Pin the participant to speaker view in the meeting-->
+    <string name="pin_to_speaker">Показать в главном окне</string>
+    <!-- Make the participant as moderator in the meeting-->
+    <string name="make_moderator">Сделать модератором</string>
+    <!-- The title of dialog for end meeting confirmation-->
+    <string name="title_end_meeting">Покинуть встречу</string>
+    <!-- no moderator when the moderator leave meeting-->
+    <string name="no_moderator">Нет модератора</string>
+    <!-- assign moderator message when the moderator leave meeting-->
+    <string name="assign_moderator_message">Перед тем как уйти, назначьте одного или нескольких новых модераторов для встречи.</string>
+    <!-- assign moderator option when the moderator leave meeting-->
+    <string name="assign_moderator">Сделать модератором</string>
+    <!-- leave anyway option when the moderator leave meeting-->
+    <string name="leave_anyway">Всё равно выйти</string>
+    <!-- The message alert user to pick new moderator on assign moderator page-->
+    <string name="pick_new_moderator_message">Назначьте одного или нескольких новых модераторов.</string>
+    <!-- The title of dialog for changing meeting name-->
+    <string name="change_meeting_name">Название встречи</string>
+    <!-- The number of participants in the meeting on meeting info page-->
+    <string name="info_participants_number">Участники: %d</string>
+    <!-- The name of moderators in the meeting on meeting info page-->
+    <string name="info_moderator_name">Модератор: %s</string>
+    <!-- The literal meeting link text-->
+    <string name="meeting_link">Ссылка на встречу</string>
+    <!-- Subtitle of the meeting screen-->
+    <string name="duration_meeting">Продолжительность</string>
+    <!-- The question in on-boarding screen asking if the user is going to join meeting as guest-->
+    <string name="join_meeting_as_guest">Присоединиться к встрече как гость</string>
+    <!-- The title of the paste meeting link dialog for guest-->
+    <string name="paste_meeting_link_guest_dialog_title">Вас приглашают на встречу.</string>
+    <!-- Tell the guest to paste the meeting link in the edit box-->
+    <string name="paste_meeting_link_guest_instruction">Нажмите на отправленную вам ссылку на встречу или вставьте ее сюда</string>
+    <!-- Banner text to indicate poor network quality-->
+    <string name="slow_connection_meeting">Плохое качество связи</string>
+    <!-- the message in the alert dialog for notifying the meeting has ended-->
+    <string name="meeting_has_ended">Встреча закончилась</string>
+    <!-- error message shown when a meeting link is not well formed-->
+    <string name="invalid_meeting_link_args">Недействительная ссылка на встречу</string>
+    <!-- Warning show to the user when the app needs permissions to start a meeting.-->
+    <string name="meeting_permission_info">Разрешения доступа, необходимые MEGA</string>
+    <!-- Message of a dialog to show user the permissions that needed-->
+    <string name="meeting_permission_info_message">Для встреч MEGA нужен доступ к вашему микрофону и камере.</string>
+    <!-- Button to confirm the action of restarting one transfer-->
+    <string name="button_permission_info">Понятно</string>
+    <!-- Warning show to the user when the app needs permissions to get the best meeting experience and the user has denied them.-->
+    <string name="meeting_required_permissions_warning">Перейдите в настройки, чтобы открыть MEGA доступ к камере и микрофону.</string>
+    <!-- The button text in the meeting ended alert dialog. Click the button to open the group chat screen of the meeting-->
+    <string name="view_meeting_chat">Посмотреть чат встречи</string>
+    <!-- the content of tips when the user uses the meeting first time-->
+    <string name="tip_invite_more_participants">Пригласите на встречу больше участников. Проведите вверх, чтобы пригласить.</string>
+    <!-- the content of tips when the user enters recent chat page first time-->
+    <string name="tip_create_meeting">Нажмите, чтобы создать новую встречу</string>
+    <!-- the content of tips when the user enters start conversation page first time-->
+    <string name="tip_setup_meeting">Быстро организуйте встречу в MEGA с помощью нашей новой функции зашифрованной встречи</string>
+    <!-- the content of snack bar when the user be the new moderator-->
+    <string name="be_new_moderator">Вы новый модератор.</string>
+    <!-- the content of snack bar when copied meeting link-->
+    <string name="copied_meeting_link">Ссылка на встречу скопирована.</string>
+    <!-- Title of the layout to join a meeting from the chat screen. The placeholder indicates the user who initiated the meeting -->
+    <string name="join_meeting_layout_in_group_call">%s начал встречу. Нажмите, чтобы присоединиться.</string>
+    <!-- Title of fifth tour screen -->
+    <string name="title_tour_five">MEGA-встреча</string>
+    <!-- Content of fourth tour screen -->
+    <string name="content_tour_five">Видеовстреча со сквозным шифрованием</string>
+    <!-- Error shown when it tries to open an invalid meeting link and the text view is empty -->
+    <string name="invalid_meeting_link_empty">Пожалуйста, введите действительную ссылку на встречу</string>
+    <!-- Guest leave call-->
+    <string name="more_than_meeting">Больше чем просто встречи</string>
+    <!-- the title of join without account on left meeting page-->
+    <string name="left_meeting_join_title">Ваша конфиденциальность имеет значение</string>
+    <!-- the content of join without account on left meeting page-->
+    <string name="left_meeting_join_content">Присоединяйтесь к самой крупной в мире безопасной облачной платформе хранения и совместной работы.</string>
+    <!-- the bonus title of join without account on left meeting page-->
+    <string name="left_meeting_bonus_title">Получите 20 ГБ бесплатно</string>
+    <!-- the bonus content of join without account on left meeting page-->
+    <string name="left_meeting_bonus_content">Зарегистрируйтесь сейчас и наслаждайтесь расширенными функциями совместной работы бесплатно.</string>
+    <!-- Content of ongoing call for MaterialAlertDialog-->
+    <string name="ongoing_call_content">Идёт ещё один звонок. Пожалуйста, завершите первый звонок, прежде чем сделать следующий.</string>
+    <!-- The hint text when changing meeting name-->
+    <string name="new_meeting_name">Новое название встречи</string>
+    <!-- The content of dialog when failed for creating meeting-->
+    <string name="meeting_is_failed_content">Не удалось создать встречу.</string>
+    <!-- Word next to own user’s name on participant list -->
+    <string name="meeting_me_text_bracket">%1s [A](я)[/A]</string>
+    <!-- Menu item to change from thumbnail view to main view in meeting-->
+    <string name="main_view">Общий вид</string>
+    <!-- Warning in Offline section alerting all the Offline files will be deleted after logout. -->
+    <string name="offline_warning">Выход из системы удалит локальный контент.</string>
 </resources>

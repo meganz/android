@@ -1,10 +1,9 @@
 package mega.privacy.android.app.meeting.listeners
 
 import android.content.Context
-import android.util.Log
 import mega.privacy.android.app.listeners.ChatBaseListener
-import mega.privacy.android.app.utils.LogUtil
 import mega.privacy.android.app.utils.LogUtil.logDebug
+import mega.privacy.android.app.utils.LogUtil.logError
 import nz.mega.sdk.*
 
 class RequestHiResVideoListener(context: Context?) : ChatBaseListener(context) {
@@ -15,9 +14,9 @@ class RequestHiResVideoListener(context: Context?) : ChatBaseListener(context) {
         }
 
         if (e.errorCode == MegaError.API_OK) {
-            LogUtil.logDebug("Request high res video: chatId = "+request.chatHandle+", hires? "+request.flag+", clientId = "+request.userHandle)
+            logDebug("Request high res video: chatId = "+request.chatHandle+", hires? "+request.flag+", clientId = "+request.userHandle)
         } else {
-            LogUtil.logError("Error Request high res video. Error code "+e.errorCode)
+            logError("Error Request high res video. Error code "+e.errorCode)
         }
     }
 }

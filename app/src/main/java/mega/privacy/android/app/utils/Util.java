@@ -46,6 +46,8 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.content.ContextCompat;
 import androidx.appcompat.app.ActionBar;
+
+import android.provider.Settings;
 import android.telephony.PhoneNumberUtils;
 import android.telephony.TelephonyManager;
 import androidx.core.content.FileProvider;
@@ -66,6 +68,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewParent;
 import android.view.Window;
+import android.view.WindowInsetsController;
 import android.view.animation.AlphaAnimation;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.TextView;
@@ -106,7 +109,7 @@ import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
-import mega.privacy.android.app.activities.GetLinkActivity;
+import mega.privacy.android.app.getLink.GetLinkActivity;
 import mega.privacy.android.app.lollipop.ContactFileListActivityLollipop;
 import mega.privacy.android.app.lollipop.ContactInfoActivityLollipop;
 import mega.privacy.android.app.lollipop.FileInfoActivityLollipop;
@@ -124,6 +127,8 @@ import nz.mega.sdk.MegaNode;
 
 import static android.content.Context.ACTIVITY_SERVICE;
 import static android.content.Context.INPUT_METHOD_SERVICE;
+import static android.view.WindowInsetsController.APPEARANCE_LIGHT_NAVIGATION_BARS;
+import static android.view.WindowInsetsController.APPEARANCE_LIGHT_STATUS_BARS;
 import static com.google.android.material.textfield.TextInputLayout.*;
 import static mega.privacy.android.app.utils.CallUtil.*;
 import static mega.privacy.android.app.utils.Constants.*;
@@ -133,6 +138,7 @@ import static mega.privacy.android.app.utils.ChatUtil.*;
 import static mega.privacy.android.app.utils.StringResourcesUtils.getQuantityString;
 import static nz.mega.sdk.MegaApiJava.INVALID_HANDLE;
 import static nz.mega.sdk.MegaApiJava.STORAGE_STATE_PAYWALL;
+import static nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE;
 
 public class Util {
 
@@ -159,9 +165,6 @@ public class Util {
      * Language tag for simplified Chinese.
      */
     private static final String HANS = "Hans";
-
-	// How many times the app has been launched till now
-	private final static String KEY_LAUNCHED_TIME = "launched_time";
 
     public static boolean checkFingerprint(MegaApiAndroid megaApi, MegaNode node, String localPath) {
         String nodeFingerprint = node.getFingerprint();
@@ -541,24 +544,29 @@ public class Util {
 	 * @return The speed or size string.
 	 */
 	private static String getUnitString(long unit, boolean isSpeed) {
-		Context context = MegaApplication.getInstance().getApplicationContext();
 		DecimalFormat df = new DecimalFormat("#.##");
 
 		float KB = 1024;
 		float MB = KB * 1024;
 		float GB = MB * 1024;
 		float TB = GB * 1024;
+		float PB = TB * 1024;
+		float EB = PB * 1024;
 
 		if (unit < KB) {
-			return context.getString(isSpeed ? R.string.label_file_speed_byte : R.string.label_file_size_byte, Long.toString(unit));
+			return StringResourcesUtils.getString(isSpeed ? R.string.label_file_speed_byte : R.string.label_file_size_byte, Long.toString(unit));
 		} else if (unit < MB) {
-			return context.getString(isSpeed ? R.string.label_file_speed_kilo_byte : R.string.label_file_size_kilo_byte, df.format(unit / KB));
+			return StringResourcesUtils.getString(isSpeed ? R.string.label_file_speed_kilo_byte : R.string.label_file_size_kilo_byte, df.format(unit / KB));
 		} else if (unit < GB) {
-			return context.getString(isSpeed ? R.string.label_file_speed_mega_byte : R.string.label_file_size_mega_byte, df.format(unit / MB));
+			return StringResourcesUtils.getString(isSpeed ? R.string.label_file_speed_mega_byte : R.string.label_file_size_mega_byte, df.format(unit / MB));
 		} else if (unit < TB) {
-			return context.getString(isSpeed ? R.string.label_file_speed_giga_byte : R.string.label_file_size_giga_byte, df.format(unit / GB));
+			return StringResourcesUtils.getString(isSpeed ? R.string.label_file_speed_giga_byte : R.string.label_file_size_giga_byte, df.format(unit / GB));
+		} else if (unit < PB) {
+			return StringResourcesUtils.getString(isSpeed ? R.string.label_file_speed_tera_byte : R.string.label_file_size_tera_byte, df.format(unit / TB));
+		} else if (unit < EB) {
+			return StringResourcesUtils.getString(R.string.label_file_size_peta_byte, df.format(unit / PB));
 		} else {
-			return context.getString(isSpeed ? R.string.label_file_speed_tera_byte : R.string.label_file_size_tera_byte, df.format(unit / TB));
+			return StringResourcesUtils.getString(R.string.label_file_size_exa_byte, df.format(unit / EB));
 		}
 	}
 
@@ -734,20 +742,32 @@ public class Util {
 		}
 
 	}
-	
-	/** Returns the consumer friendly device name */
-	public static String getDeviceName() {
-	    final String manufacturer = Build.MANUFACTURER;
-	    final String model = Build.MODEL;
-	    if (model.startsWith(manufacturer)) {
-	        return model;
-	    }
-	    if (manufacturer.equalsIgnoreCase("HTC")) {
-	        // make sure "HTC" is fully capitalized.
-	        return "HTC " + model;
-	    }
-	    return manufacturer + " " + model;
-	}
+
+    /**
+     * Returns the consumer friendly device name.
+     * If Android version is above 7, the name is manufacturer + custom name set by user, otherwise, will be manufacturer + model.
+     *
+     * @return Device name, always starts with manufacturer, prefer user set name.
+     */
+    public static String getDeviceName() {
+        final String manufacturer = Build.MANUFACTURER;
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N_MR1) {
+            return manufacturer + " " + Settings.Global.getString(MegaApplication.getInstance().getContentResolver(), Settings.Global.DEVICE_NAME);
+        } else {
+            final String model = Build.MODEL;
+
+            if (model.startsWith(manufacturer)) {
+                return model;
+            }
+
+            if (manufacturer.equalsIgnoreCase("HTC")) {
+                // make sure "HTC" is fully capitalized.
+                return "HTC " + model;
+            }
+            return manufacturer + " " + model;
+        }
+    }
 
 	public static BitSet convertToBitSet(long value) {
 	    BitSet bits = new BitSet();
@@ -1038,17 +1058,26 @@ public class Util {
 		}
 
 		if (drawUnderStatusBar) {
-			int visibility = View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN;
-
-			if (Util.isDarkMode(activity)) {
-				visibility |= View.SYSTEM_UI_FLAG_LAYOUT_STABLE;
+			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+				window.setDecorFitsSystemWindows(false);
+				if (!Util.isDarkMode(activity)) {
+					WindowInsetsController wic = window.getDecorView().getWindowInsetsController();
+					wic.setSystemBarsAppearance(APPEARANCE_LIGHT_STATUS_BARS, APPEARANCE_LIGHT_STATUS_BARS);
+					wic.setSystemBarsAppearance(APPEARANCE_LIGHT_NAVIGATION_BARS, APPEARANCE_LIGHT_NAVIGATION_BARS);
+				}
 			} else {
-				// View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR or View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR
-				visibility |= 0x00002000 | 0x00000010;
-			}
+				int visibility = View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN;
 
-			window.getDecorView().setSystemUiVisibility(visibility);
-			window.setStatusBarColor(Color.TRANSPARENT);
+				if (Util.isDarkMode(activity)) {
+					visibility |= View.SYSTEM_UI_FLAG_LAYOUT_STABLE;
+				} else {
+					// View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR or View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR
+					visibility |= 0x00002000 | 0x00000010;
+				}
+
+				window.getDecorView().setSystemUiVisibility(visibility);
+				window.setStatusBarColor(Color.TRANSPARENT);
+			}
 		} else {
 			ColorUtils.setStatusBarTextColor(activity);
 		}
@@ -1068,13 +1097,37 @@ public class Util {
 		window.setStatusBarColor(ContextCompat.getColor(activity, color));
 	}
 
+	/**
+	 * Gets the status bar height if available.
+	 *
+	 * @return The status bar height if available.
+	 */
 	public static int getStatusBarHeight() {
+		return getSystemBarHeight("status_bar_height");
+	}
+
+	/**
+	 * Gets the navigation bar height if available.
+	 *
+	 * @return The status bar height if available.
+	 */
+	public static int getNavigationBarHeight() {
+		return getSystemBarHeight("navigation_bar_height");
+	}
+
+	/**
+	 * Gets a system bar height if available.
+	 *
+	 * @param systemBarName The system bar name.
+	 * @return The system bar height if available.
+	 */
+	public static int getSystemBarHeight(String systemBarName) {
 		Context context = MegaApplication.getInstance().getBaseContext();
-		int resourceId = context.getResources().getIdentifier("status_bar_height", "dimen",
+		int resourceId = context.getResources().getIdentifier(systemBarName, "dimen",
 				"android");
 
 		return resourceId > 0 ? context.getResources().getDimensionPixelSize(resourceId)
-				: dp2px(24, context.getResources().getDisplayMetrics());
+				: 0;
 	}
 
 	public static MegaPreferences getPreferences (Context context) {
@@ -1373,7 +1426,7 @@ public class Util {
     }
 
 	public static void checkTakePicture(Activity activity, int option) {
-		if (isNecessaryDisableLocalCamera() != -1) {
+		if (isNecessaryDisableLocalCamera() != MEGACHAT_INVALID_HANDLE) {
 			if(option == TAKE_PHOTO_CODE) {
 				showConfirmationOpenCamera(activity, ACTION_TAKE_PICTURE, false);
 			}else if(option == TAKE_PICTURE_PROFILE_CODE){
@@ -1533,7 +1586,13 @@ public class Util {
      */
     public static void storeDownloadLocationIfNeeded(String downloadLocation) {
         DatabaseHandler dbH = MegaApplication.getInstance().getDbH();
-        boolean askMe = Boolean.parseBoolean(dbH.getPreferences().getStorageAskAlways());
+
+        MegaPreferences preferences = dbH.getPreferences();
+
+        boolean askMe = true;
+        if (preferences != null && preferences.getStorageAskAlways() != null) {
+            askMe = Boolean.parseBoolean(preferences.getStorageAskAlways());
+        }
 
         // Should set as default download location.
         if (!askMe) {
@@ -1651,4 +1710,13 @@ public class Util {
     public static boolean isSimplifiedChinese() {
         return Locale.getDefault().toLanguageTag().contains(HANS);
     }
+
+	/**
+	 * Method to know the current orientation of the device
+	 *
+	 * @return current orientation of the device
+	 */
+	public static int getCurrentOrientation() {
+		return MegaApplication.getInstance().getApplicationContext().getResources().getConfiguration().orientation;
+	}
 }

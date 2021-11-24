@@ -1,10 +1,10 @@
 package mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet;
 
-import android.annotation.SuppressLint;
-import android.app.Dialog;
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -17,7 +17,6 @@ import java.util.Collections;
 import mega.privacy.android.app.MegaOffline;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
-import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.controllers.ChatController;
 import mega.privacy.android.app.lollipop.controllers.ContactController;
 import mega.privacy.android.app.lollipop.megachat.AndroidMegaChatMessage;
@@ -25,6 +24,7 @@ import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.ChatReactionsView;
 import mega.privacy.android.app.modalbottomsheet.BaseBottomSheetDialogFragment;
 import mega.privacy.android.app.utils.ContactUtil;
+import mega.privacy.android.app.utils.StringResourcesUtils;
 import nz.mega.sdk.MegaChatContainsMeta;
 import nz.mega.sdk.MegaChatMessage;
 import nz.mega.sdk.MegaChatRoom;
@@ -41,6 +41,9 @@ import static mega.privacy.android.app.utils.OfflineUtils.removeOffline;
 import static mega.privacy.android.app.utils.Util.*;
 import static nz.mega.sdk.MegaApiJava.INVALID_HANDLE;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+
 public class GeneralChatMessageBottomSheet extends BaseBottomSheetDialogFragment implements View.OnClickListener {
 
     private MegaNode node;
@@ -56,8 +59,11 @@ public class GeneralChatMessageBottomSheet extends BaseBottomSheetDialogFragment
     private ChatReactionsView reactionsFragment;
 
     @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        contentView = View.inflate(getContext(), R.layout.bottom_sheet_general_chat_messages, null);
+        reactionsLayout = contentView.findViewById(R.id.reactions_layout);
+        reactionsFragment = contentView.findViewById(R.id.fragment_container_reactions);
+        itemsLayout = contentView.findViewById(R.id.items_layout);
 
         if (savedInstanceState != null) {
             logDebug("Bundle is NOT NULL");
@@ -66,9 +72,9 @@ public class GeneralChatMessageBottomSheet extends BaseBottomSheetDialogFragment
             positionMessage = savedInstanceState.getInt(POSITION_SELECTED_MESSAGE, INVALID_POSITION);
             handle = savedInstanceState.getLong(HANDLE, INVALID_HANDLE);
         } else {
-            chatId = ((ChatActivityLollipop) context).idChat;
-            messageId = ((ChatActivityLollipop) context).selectedMessageId;
-            positionMessage = ((ChatActivityLollipop) context).selectedPosition;
+            chatId = ((ChatActivityLollipop) requireActivity()).idChat;
+            messageId = ((ChatActivityLollipop) requireActivity()).selectedMessageId;
+            positionMessage = ((ChatActivityLollipop) requireActivity()).selectedPosition;
         }
 
         MegaChatMessage messageMega = megaChatApi.getMessage(chatId, messageId);
@@ -77,19 +83,14 @@ public class GeneralChatMessageBottomSheet extends BaseBottomSheetDialogFragment
         }
 
         chatRoom = megaChatApi.getChatRoom(chatId);
-        chatC = new ChatController(context);
+        chatC = new ChatController(requireActivity());
+
+        return contentView;
     }
 
-    @SuppressLint("RestrictedApi")
     @Override
-    public void setupDialog(final Dialog dialog, int style) {
-        super.setupDialog(dialog, style);
-
-        contentView = View.inflate(getContext(), R.layout.bottom_sheet_general_chat_messages, null);
-        reactionsLayout = contentView.findViewById(R.id.reactions_layout);
-        reactionsFragment = contentView.findViewById(R.id.fragment_container_reactions);
-        items_layout = contentView.findViewById(R.id.items_layout);
-
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        View reactionSeparator = contentView.findViewById(R.id.separator);
         RelativeLayout optionOpenWith = contentView.findViewById(R.id.open_with_layout);
         LinearLayout forwardSeparator = contentView.findViewById(R.id.forward_separator);
         RelativeLayout optionForward = contentView.findViewById(R.id.forward_layout);
@@ -133,19 +134,22 @@ public class GeneralChatMessageBottomSheet extends BaseBottomSheetDialogFragment
         optionSaveOffline.setOnClickListener(this);
         optionDelete.setOnClickListener(this);
 
+        boolean isRemovedOrPendingMsg =  message != null && message.getMessage() != null
+                && ((ChatActivityLollipop) requireActivity()).hasMessagesRemovedOrPending(message.getMessage());
+
         boolean shouldReactionOptionBeVisible = chatRoom != null && message != null &&
-                context instanceof ChatActivityLollipop && shouldReactionBeClicked(chatRoom) &&
-                !((ChatActivityLollipop) context).hasMessagesRemoved(message.getMessage()) &&
-                !message.isUploading();
+                requireActivity() instanceof ChatActivityLollipop && shouldReactionBeClicked(chatRoom) &&
+                !isRemovedOrPendingMsg && !message.isUploading();
 
         if (shouldReactionOptionBeVisible) {
-            reactionsFragment.init(context, this, chatId, messageId, positionMessage);
+            reactionsFragment.init(requireActivity(), this, chatId, messageId, positionMessage);
             reactionsLayout.setVisibility(View.VISIBLE);
         } else {
             reactionsLayout.setVisibility(View.GONE);
         }
+        reactionSeparator.setVisibility(shouldReactionOptionBeVisible ? View.VISIBLE : View.GONE);
 
-        if (message == null || message.getMessage() == null || chatRoom == null || ((ChatActivityLollipop) context).hasMessagesRemoved(message.getMessage()) || message.isUploading()) {
+        if (message == null || message.getMessage() == null || chatRoom == null || message.isUploading()) {
             optionOpenWith.setVisibility(View.GONE);
             forwardSeparator.setVisibility(View.GONE);
             optionForward.setVisibility(View.GONE);
@@ -171,7 +175,6 @@ public class GeneralChatMessageBottomSheet extends BaseBottomSheetDialogFragment
             deleteSeparator.setVisibility(View.GONE);
             optionDelete.setVisibility(View.GONE);
             return;
-
         } else {
             MegaChatMessage megaChatMessage = message.getMessage();
             int typeMessage = megaChatMessage.getType();
@@ -209,14 +212,15 @@ public class GeneralChatMessageBottomSheet extends BaseBottomSheetDialogFragment
                 optionShare.setVisibility(View.GONE);
 
             } else {
-                optionShare.setVisibility(typeMessage != MegaChatMessage.TYPE_NODE_ATTACHMENT ||
-                        !isOnline(context) || chatC.isInAnonymousMode() ?
-                        View.GONE : View.VISIBLE);
+                optionShare.setVisibility(isRemovedOrPendingMsg
+                        || typeMessage != MegaChatMessage.TYPE_NODE_ATTACHMENT
+                        || !isOnline(requireContext()) || chatC.isInAnonymousMode()
+                        ? View.GONE : View.VISIBLE);
 
-                optionForward.setVisibility(!isOnline(context) ||
-                        chatC.isInAnonymousMode() ? View.GONE : View.VISIBLE);
+                optionForward.setVisibility((isRemovedOrPendingMsg || !isOnline(requireContext())
+                        || chatC.isInAnonymousMode()) ? View.GONE : View.VISIBLE);
 
-                if (megaChatMessage.getUserHandle() != megaChatApi.getMyUserHandle() ||
+                if (isRemovedOrPendingMsg || megaChatMessage.getUserHandle() != megaChatApi.getMyUserHandle() ||
                         !megaChatMessage.isEditable() ||
                         typeMessage == MegaChatMessage.TYPE_CONTACT_ATTACHMENT) {
                     optionEdit.setVisibility(View.GONE);
@@ -225,7 +229,7 @@ public class GeneralChatMessageBottomSheet extends BaseBottomSheetDialogFragment
                             typeMessage == MegaChatMessage.TYPE_CONTAINS_META ? View.VISIBLE : View.GONE);
                 }
 
-                if (megaChatMessage.getUserHandle() != megaChatApi.getMyUserHandle() ||
+                if (isRemovedOrPendingMsg || megaChatMessage.getUserHandle() != megaChatApi.getMyUserHandle() ||
                         !megaChatMessage.isDeletable()) {
                     optionDelete.setVisibility(View.GONE);
                 } else {
@@ -241,11 +245,11 @@ public class GeneralChatMessageBottomSheet extends BaseBottomSheetDialogFragment
                 }
             }
 
-            optionOpenWith.setVisibility(typeMessage == MegaChatMessage.TYPE_NODE_ATTACHMENT ? View.VISIBLE : View.GONE);
+            optionOpenWith.setVisibility(!isRemovedOrPendingMsg && typeMessage == MegaChatMessage.TYPE_NODE_ATTACHMENT ? View.VISIBLE : View.GONE);
 
-            optionDownload.setVisibility(typeMessage == MegaChatMessage.TYPE_NODE_ATTACHMENT ? View.VISIBLE : View.GONE);
+            optionDownload.setVisibility(!isRemovedOrPendingMsg && typeMessage == MegaChatMessage.TYPE_NODE_ATTACHMENT ? View.VISIBLE : View.GONE);
 
-            if (node != null && node.isFile()) {
+            if (node != null && node.isFile() && !isRemovedOrPendingMsg) {
                 MimeTypeList nodeMime = MimeTypeList.typeForName(node.getName());
                 if (nodeMime.isImage() || nodeMime.isVideo()) {
                     optionGallery.setVisibility(View.VISIBLE);
@@ -256,10 +260,11 @@ public class GeneralChatMessageBottomSheet extends BaseBottomSheetDialogFragment
                 optionGallery.setVisibility(View.GONE);
             }
 
-            optionImport.setVisibility(typeMessage == MegaChatMessage.TYPE_NODE_ATTACHMENT && !chatC.isInAnonymousMode() ? View.VISIBLE : View.GONE);
+            optionImport.setVisibility(!isRemovedOrPendingMsg && typeMessage == MegaChatMessage.TYPE_NODE_ATTACHMENT && !chatC.isInAnonymousMode() ? View.VISIBLE : View.GONE);
             boolean shouldShowOfflineOption = typeMessage == MegaChatMessage.TYPE_NODE_ATTACHMENT && !chatC.isInAnonymousMode();
-            if (shouldShowOfflineOption) {
-                offlineSwitch.setChecked(availableOffline(context, node));
+
+            if (shouldShowOfflineOption && !isRemovedOrPendingMsg) {
+                offlineSwitch.setChecked(availableOffline(requireContext(), node));
                 optionSaveOffline.setVisibility(View.VISIBLE);
             } else {
                 optionSaveOffline.setVisibility(View.GONE);
@@ -270,24 +275,24 @@ public class GeneralChatMessageBottomSheet extends BaseBottomSheetDialogFragment
                 long userHandle = megaChatMessage.getUserHandle(0);
                 String userEmail = megaChatMessage.getUserEmail(0);
 
-                optionInfoContacts.setVisibility((userCount == 1 &&
+                optionInfoContacts.setVisibility(!isRemovedOrPendingMsg && (userCount == 1 &&
                         userHandle != megaChatApi.getMyUserHandle() &&
                         megaApi.getContact(userEmail) != null &&
                         megaApi.getContact(userEmail).getVisibility() == MegaUser.VISIBILITY_VISIBLE) ? View.VISIBLE : View.GONE);
 
-                optionViewContacts.setVisibility(userCount > 1 ? View.VISIBLE : View.GONE);
+                optionViewContacts.setVisibility(!isRemovedOrPendingMsg && userCount > 1 ? View.VISIBLE : View.GONE);
 
                 if(userCount == 1){
-                    optionInviteContact.setVisibility(userHandle != megaChatApi.getMyUserHandle() &&
+                    optionInviteContact.setVisibility(!isRemovedOrPendingMsg && userHandle != megaChatApi.getMyUserHandle() &&
                             (megaApi.getContact(userEmail) == null ||
                                     megaApi.getContact(userEmail).getVisibility() != MegaUser.VISIBILITY_VISIBLE) ? View.VISIBLE : View.GONE);
 
-                    optionStartConversation.setVisibility(userHandle != megaChatApi.getMyUserHandle() &&
+                    optionStartConversation.setVisibility(!isRemovedOrPendingMsg && userHandle != megaChatApi.getMyUserHandle() &&
                             megaApi.getContact(userEmail) != null &&
                             megaApi.getContact(userEmail).getVisibility() == MegaUser.VISIBILITY_VISIBLE &&
                             (chatRoom.isGroup() || userHandle != chatRoom.getPeerHandle(0)) ? View.VISIBLE : View.GONE);
                 } else {
-                    optionStartConversation.setVisibility(View.VISIBLE);
+                    optionStartConversation.setVisibility(!isRemovedOrPendingMsg? View.VISIBLE : View.GONE);
                     optionInviteContact.setVisibility(View.GONE);
 
                     for (int i = 0; i < userCount; i++) {
@@ -302,7 +307,6 @@ public class GeneralChatMessageBottomSheet extends BaseBottomSheetDialogFragment
                 }
             }
         }
-
 
         forwardSeparator.setVisibility(optionOpenWith.getVisibility() == View.VISIBLE &&
                 optionForward.getVisibility() == View.VISIBLE ? View.VISIBLE : View.GONE);
@@ -338,10 +342,9 @@ public class GeneralChatMessageBottomSheet extends BaseBottomSheetDialogFragment
 
         deleteSeparator.setVisibility(optionDelete.getVisibility());
 
-        offlineSwitch.setOnCheckedChangeListener((view, isChecked) -> onClick(view));
+        offlineSwitch.setOnCheckedChangeListener((v, isChecked) -> onClick(v));
 
-        dialog.setContentView(contentView);
-        setBottomSheetBehavior(HEIGHT_HEADER_LARGE, false);
+        super.onViewCreated(view, savedInstanceState);
     }
 
     public MegaNode getNodeByHandle(long handle) {
@@ -361,11 +364,6 @@ public class GeneralChatMessageBottomSheet extends BaseBottomSheetDialogFragment
             return;
         }
 
-        if (!isOnline(context)) {
-            ((ChatActivityLollipop) context).showSnackbar(SNACKBAR_TYPE, getString(R.string.error_server_connection_problem), INVALID_HANDLE);
-            return;
-        }
-
         ArrayList<AndroidMegaChatMessage> messagesSelected = new ArrayList<>();
         messagesSelected.add(message);
         Intent i;
@@ -375,22 +373,22 @@ public class GeneralChatMessageBottomSheet extends BaseBottomSheetDialogFragment
                     logWarning("The selected node is NULL");
                     return;
                 }
-                openWith(context, node);
+                openWith(requireContext(), node);
                 break;
 
             case R.id.forward_layout:
-                ((ChatActivityLollipop) context).forwardMessages(messagesSelected);
+                ((ChatActivityLollipop) requireActivity()).forwardMessages(messagesSelected);
                 break;
 
             case R.id.edit_layout:
-                ((ChatActivityLollipop) context).editMessage(messagesSelected);
+                ((ChatActivityLollipop) requireActivity()).editMessage(messagesSelected);
                 break;
 
             case R.id.copy_layout:
                 MegaChatMessage msg = message.getMessage();
                 String text = isGeolocation(msg) ? msg.getContainsMeta().getTextMessage() :
-                        ((ChatActivityLollipop) context).copyMessage(message);
-                ((ChatActivityLollipop) context).copyToClipboard(text);
+                        ((ChatActivityLollipop) requireActivity()).copyMessage(message);
+                ((ChatActivityLollipop) requireActivity()).copyToClipboard(text);
                 break;
 
             case R.id.share_layout:
@@ -399,36 +397,36 @@ public class GeneralChatMessageBottomSheet extends BaseBottomSheetDialogFragment
                     return;
                 }
 
-                shareMsgFromChat(context, message, chatId);
+                shareMsgFromChat(requireActivity(), message, chatId);
                 break;
 
             case R.id.select_layout:
-                ((ChatActivityLollipop) context).activateActionModeWithItem(positionMessage);
+                ((ChatActivityLollipop) requireActivity()).activateActionModeWithItem(positionMessage);
                 break;
 
             case R.id.option_view_layout:
                 logDebug("View option");
-                ContactUtil.openContactAttachmentActivity(context, chatId, messageId);
+                ContactUtil.openContactAttachmentActivity(requireActivity(), chatId, messageId);
                 break;
 
             case R.id.option_info_layout:
-                if (!isOnline(context)) {
-                    ((ChatActivityLollipop) context).showSnackbar(SNACKBAR_TYPE, context.getString(R.string.error_server_connection_problem), INVALID_HANDLE);
+                if (!isOnline(requireContext())) {
+                    ((ChatActivityLollipop) requireActivity()).showSnackbar(SNACKBAR_TYPE, StringResourcesUtils.getString(R.string.error_server_connection_problem), INVALID_HANDLE);
                     return;
                 }
 
                 boolean isChatRoomOpen = chatRoom != null && !chatRoom.isGroup() &&
                         message.getMessage().getUserHandle(0) == chatRoom.getPeerHandle(0);
-                ContactUtil.openContactInfoActivity(context, message.getMessage().getUserEmail(0), isChatRoomOpen);
+                ContactUtil.openContactInfoActivity(requireActivity(), message.getMessage().getUserEmail(0), isChatRoomOpen);
                 break;
 
             case R.id.option_invite_layout:
-                if (!isOnline(context)) {
-                    ((ChatActivityLollipop) context).showSnackbar(SNACKBAR_TYPE, context.getString(R.string.error_server_connection_problem), INVALID_HANDLE);
+                if (!isOnline(requireContext())) {
+                    ((ChatActivityLollipop) requireActivity()).showSnackbar(SNACKBAR_TYPE, StringResourcesUtils.getString(R.string.error_server_connection_problem), INVALID_HANDLE);
                     return;
                 }
 
-                ContactController cC = new ContactController(context);
+                ContactController cC = new ContactController(requireActivity());
                 ArrayList<String> contactEmails;
                 long usersCount = message.getMessage().getUsersCount();
 
@@ -450,7 +448,7 @@ public class GeneralChatMessageBottomSheet extends BaseBottomSheetDialogFragment
                 long numUsers = message.getMessage().getUsersCount();
 
                 if (numUsers == 1) {
-                    ((ChatActivityLollipop) context).startConversation(message.getMessage().getUserHandle(0));
+                    ((ChatActivityLollipop) requireActivity()).startConversation(message.getMessage().getUserHandle(0));
                 } else {
                     logDebug("Num users to invite: " + numUsers);
                     ArrayList<Long> contactHandles = new ArrayList<>();
@@ -459,7 +457,7 @@ public class GeneralChatMessageBottomSheet extends BaseBottomSheetDialogFragment
                         long userHandle = message.getMessage().getUserHandle(j);
                         contactHandles.add(userHandle);
                     }
-                    ((ChatActivityLollipop) context).startGroupConversation(contactHandles);
+                    ((ChatActivityLollipop) requireActivity()).startGroupConversation(contactHandles);
                 }
                 break;
 
@@ -468,7 +466,7 @@ public class GeneralChatMessageBottomSheet extends BaseBottomSheetDialogFragment
                     logWarning("The selected node is NULL");
                     return;
                 }
-                ((ChatActivityLollipop) context).downloadNodeList(nodeList);
+                ((ChatActivityLollipop) requireActivity()).downloadNodeList(nodeList);
                 break;
 
             case R.id.gallery_option:
@@ -476,7 +474,7 @@ public class GeneralChatMessageBottomSheet extends BaseBottomSheetDialogFragment
                     logWarning("The selected node is NULL");
                     return;
                 }
-                ((ChatActivityLollipop) context).saveNodesToGallery(Collections.singletonList(node));
+                ((ChatActivityLollipop) requireActivity()).saveNodesToGallery(Collections.singletonList(node));
                 break;
 
             case R.id.option_import_layout:
@@ -495,19 +493,19 @@ public class GeneralChatMessageBottomSheet extends BaseBottomSheetDialogFragment
                     return;
                 }
 
-                if (availableOffline(context, node)) {
+                if (availableOffline(requireContext(), node)) {
                     MegaOffline mOffDelete = dbH.findByHandle(node.getHandle());
-                    removeOffline(mOffDelete, dbH, context);
+                    removeOffline(mOffDelete, dbH, requireContext());
                 } else {
                     ArrayList<AndroidMegaChatMessage> messages = new ArrayList<>();
                     messages.add(message);
                     chatC.saveForOfflineWithAndroidMessages(messages,
-                            megaChatApi.getChatRoom(chatId), (ChatActivityLollipop) context);
+                            megaChatApi.getChatRoom(chatId), (ChatActivityLollipop) requireActivity());
                 }
                 break;
 
             case R.id.delete_layout:
-                ((ChatActivityLollipop) context).showConfirmationDeleteMessages(messagesSelected, chatRoom);
+                ((ChatActivityLollipop) requireActivity()).showConfirmationDeleteMessages(messagesSelected, chatRoom);
                 break;
         }
         closeDialog();

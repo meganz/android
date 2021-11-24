@@ -1,79 +1,79 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-  <!-- Label to show that an SDK operation has been complete successfully. -->
-  <string name="api_ok">無誤</string>
-  <!-- Label to show that an Internal error occurs during a SDK operation. -->
-  <string name="api_einternal">內部錯誤</string>
-  <!-- Label to show that an error of Invalid argument occurs during a SDK operation. -->
-  <string name="api_eargs">無效參數</string>
-  <!-- Label to show that a request error occurs during a SDK operation. -->
-  <string name="api_eagain">請求失敗，重試中</string>
-  <!-- Label to show that the rate limit has been reached during a SDK operation. -->
-  <string name="api_eratelimit">超過速率限制</string>
-  <!-- Label to show that a SDK operation has failed permanently. -->
-  <string name="api_efailed">永久失敗</string>
-  <!-- Error shown when terms of service are breached during download. -->
-  <string name="api_etoomany_ec_download">已違反服務條款</string>
-  <!-- Label to show that an error for multiple concurrent connections or transfers occurs during a SDK operation. -->
-  <string name="api_etoomay">並行連結或傳輸過多</string>
-  <!-- Label to show that an error of Out of range occurs during a SDK operation. -->
-  <string name="api_erange">超出範圍</string>
-  <!-- State to indicate something has expired (achivements of business status account for instance) -->
-  <string name="api_eexpired">過期</string>
-  <!-- Label to show that an error related with a resource Not found occurs during a SDK operation. -->
-  <string name="api_enoent">未找到</string>
-  <!-- Label to show that an error related with a circular linkage occurs during a SDK operation. -->
-  <string name="api_ecircular">偵測到循環連結</string>
-  <!-- Label to show that an error related with an denied access occurs during a SDK operation. -->
-  <string name="api_eaccess">存取遭拒</string>
-  <!-- Label to show that an error related with an existent resource occurs during a SDK operation. -->
-  <string name="api_eexist">已存在</string>
-  <!-- Label to show that an error related with an Incomplete SDK operation. -->
-  <string name="api_eincomplete">未完成</string>
-  <!-- Label to show that an error related with the decryption process of a node occurs during a SDK operation. -->
-  <string name="api_ekey">無效金鑰/解密錯誤</string>
-  <!-- Label to show that an error related with a bad session ID occurs during a SDK operation. -->
-  <string name="api_esid">惡意session ID</string>
-  <!-- Error shown when download a file that has violated ToS/AUP. -->
-  <string name="api_eblocked_ec_import_ec_download">由於ToS/AUP違規而無法存取</string>
-  <!-- Label to show that an error related with a blocked account occurs during a SDK operation. -->
-  <string name="api_eblocked">封鎖</string>
-  <!-- Label to show that an error related with an over quota occurs during a SDK operation. -->
-  <string name="api_eoverquota">超過配額</string>
-  <!-- Label to show that an error related with a temporary problem occurs during a SDK operation. -->
-  <string name="api_etempunavail">暫時無法取得</string>
-  <!-- Label to show that an error related with too many connections occurs during a SDK operation. -->
-  <string name="api_etoomanyconnections">連結數過量</string>
-  <!-- Label to show that an error related with an write error occurs during a SDK operation. -->
-  <string name="api_ewrite">編輯錯誤</string>
-  <!-- Label to show that an error related with an read error occurs during a SDK operation. -->
-  <string name="api_eread">讀取錯誤</string>
-  <!-- Label to show that an error related with an invalid or missing application key occurs during a SDK operation. -->
-  <string name="api_eappkey">無效應用程式金鑰</string>
-  <!-- Error shown when SSL check has failed -->
-  <string name="api_essl">SSL驗證失敗</string>
-  <!-- Label shown when current account does not have enough quota to complete the operation -->
-  <string name="api_egoingoverquota">配額不足</string>
-  <!-- Label to show that an error of Multi-factor authentication required occurs during a SDK operation. -->
-  <string name="api_emfarequired">需要雙重驗證。</string>
-  <!-- Label to show that an error of Access denied for users occurs during a SDK operation. -->
-  <string name="api_emasteronly">非管理員拒絕存取</string>
-  <!-- A dialog title shown to users when their business account is expired. -->
-  <string name="api_ebusinesspastdue">您的商業帳戶已經過期</string>
-  <!-- Label to show that an error of Credit card rejected occurs during a SDK operation. -->
-  <string name="payment_ecard">信用卡被拒絕</string>
-  <!-- Label to show that an error of Billing failed occurs during a SDK operation. -->
-  <string name="payment_ebilling">付款失敗</string>
-  <!-- Label to show that an error of Rejected by fraud protection occurs during a SDK operation. -->
-  <string name="payment_efraud">詐欺保護拒絕</string>
-  <!-- Message shown when the SDK is waiting for the server to complete a request due to a rate limit (API error -4) - (String as short as possible). -->
-  <string name="payment_etoomay">太多請求</string>
-  <!-- Label to show that an error of Balance occurs during a SDK operation. -->
-  <string name="payment_ebalance">餘額錯誤</string>
-  <!-- Label to show that an error related with an unknown error occurs during a SDK operation. -->
-  <string name="payment_egeneric_api_error_unknown">未知的錯誤</string>
-  <!-- Label to show that an error related with an HTTP error occurs during a SDK operation. -->
-  <string name="api_error_http">HTTP錯誤</string>
-  <!-- Label to show that an error related with a circular upload procedures occurs recursivity during a SDK operation -->
-  <string name="api_ecircular_ec_upload">由於遞迴目錄結構，因此傳輸失敗</string>
+    <!-- Label to show that an SDK operation has been complete successfully. -->
+    <string name="api_ok">無誤</string>
+    <!-- Label to show that an Internal error occurs during a SDK operation. -->
+    <string name="api_einternal">內部錯誤</string>
+    <!-- Label to show that an error of Invalid argument occurs during a SDK operation. -->
+    <string name="api_eargs">無效參數</string>
+    <!-- Label to show that a request error occurs during a SDK operation. -->
+    <string name="api_eagain">請求失敗，重試中</string>
+    <!-- Label to show that the rate limit has been reached during a SDK operation. -->
+    <string name="api_eratelimit">超過速率限制</string>
+    <!-- Label to show that a SDK operation has failed permanently. -->
+    <string name="api_efailed">永久失敗</string>
+    <!-- Error shown when terms of service are breached during download. -->
+    <string name="api_etoomany_ec_download">已違反服務條款</string>
+    <!-- Label to show that an error for multiple concurrent connections or transfers occurs during a SDK operation. -->
+    <string name="api_etoomay">並行連結或傳輸過多</string>
+    <!-- Label to show that an error of Out of range occurs during a SDK operation. -->
+    <string name="api_erange">超出範圍</string>
+    <!-- State to indicate something has expired (achivements of business status account for instance) -->
+    <string name="api_eexpired">過期</string>
+    <!-- Label to show that an error related with a resource Not found occurs during a SDK operation. -->
+    <string name="api_enoent">未找到</string>
+    <!-- Label to show that an error related with a circular linkage occurs during a SDK operation. -->
+    <string name="api_ecircular">偵測到循環連結</string>
+    <!-- Label to show that an error related with an denied access occurs during a SDK operation. -->
+    <string name="api_eaccess">存取遭拒</string>
+    <!-- Label to show that an error related with an existent resource occurs during a SDK operation. -->
+    <string name="api_eexist">已存在</string>
+    <!-- Label to show that an error related with an Incomplete SDK operation. -->
+    <string name="api_eincomplete">未完成</string>
+    <!-- Label to show that an error related with the decryption process of a node occurs during a SDK operation. -->
+    <string name="api_ekey">無效金鑰/解密錯誤</string>
+    <!-- Label to show that an error related with a bad session ID occurs during a SDK operation. -->
+    <string name="api_esid">惡意session ID</string>
+    <!-- Error shown when download a file that has violated ToS/AUP. -->
+    <string name="api_eblocked_ec_import_ec_download">由於ToS/AUP違規而無法存取</string>
+    <!-- Label to show that an error related with a blocked account occurs during a SDK operation. -->
+    <string name="api_eblocked">封鎖</string>
+    <!-- Label to show that an error related with an over quota occurs during a SDK operation. -->
+    <string name="api_eoverquota">超過配額</string>
+    <!-- Label to show that an error related with a temporary problem occurs during a SDK operation. -->
+    <string name="api_etempunavail">暫時無法取得</string>
+    <!-- Label to show that an error related with too many connections occurs during a SDK operation. -->
+    <string name="api_etoomanyconnections">連結數過量</string>
+    <!-- Label to show that an error related with an write error occurs during a SDK operation. -->
+    <string name="api_ewrite">編輯錯誤</string>
+    <!-- Label to show that an error related with an read error occurs during a SDK operation. -->
+    <string name="api_eread">讀取錯誤</string>
+    <!-- Label to show that an error related with an invalid or missing application key occurs during a SDK operation. -->
+    <string name="api_eappkey">無效應用程式金鑰</string>
+    <!-- Error shown when SSL check has failed -->
+    <string name="api_essl">SSL驗證失敗</string>
+    <!-- Label shown when current account does not have enough quota to complete the operation -->
+    <string name="api_egoingoverquota">配額不足</string>
+    <!-- Label to show that an error of Multi-factor authentication required occurs during a SDK operation. -->
+    <string name="api_emfarequired">需要雙重驗證。</string>
+    <!-- Label to show that an error of Access denied for users occurs during a SDK operation. -->
+    <string name="api_emasteronly">非管理員拒絕存取</string>
+    <!-- A dialog title shown to users when their business account is expired. -->
+    <string name="api_ebusinesspastdue">您的商業帳戶已經過期</string>
+    <!-- Label to show that an error of Credit card rejected occurs during a SDK operation. -->
+    <string name="payment_ecard">信用卡被拒絕</string>
+    <!-- Label to show that an error of Billing failed occurs during a SDK operation. -->
+    <string name="payment_ebilling">付款失敗</string>
+    <!-- Label to show that an error of Rejected by fraud protection occurs during a SDK operation. -->
+    <string name="payment_efraud">詐欺保護拒絕</string>
+    <!-- Message shown when the SDK is waiting for the server to complete a request due to a rate limit (API error -4) - (String as short as possible). -->
+    <string name="payment_etoomay">太多請求</string>
+    <!-- Label to show that an error of Balance occurs during a SDK operation. -->
+    <string name="payment_ebalance">餘額錯誤</string>
+    <!-- Label to show that an error related with an unknown error occurs during a SDK operation. -->
+    <string name="payment_egeneric_api_error_unknown">未知的錯誤</string>
+    <!-- Label to show that an error related with an HTTP error occurs during a SDK operation. -->
+    <string name="api_error_http">HTTP錯誤</string>
+    <!-- Label to show that a transfer error happened during a SDK operation (sync a recursive folders structure). Only can happen if user syncs a folder with recursive links (link to the parent folder). -->
+    <string name="api_ecircular_ec_upload">由於遞迴目錄結構，因此傳輸失敗</string>
 </resources>

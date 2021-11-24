@@ -2,7 +2,6 @@ package mega.privacy.android.app.meeting.adapter
 
 import android.content.Context
 import android.graphics.Bitmap
-import androidx.annotation.StringRes
 import androidx.core.text.HtmlCompat
 import androidx.recyclerview.widget.DiffUtil
 import mega.privacy.android.app.R
@@ -16,7 +15,7 @@ data class Participant(
     val peerId: Long,
     val clientId: Long,
     var name: String,
-    val avatar: Bitmap?,
+    var avatar: Bitmap?,
     val isMe: Boolean,
     var isModerator: Boolean,
     var isAudioOn: Boolean,

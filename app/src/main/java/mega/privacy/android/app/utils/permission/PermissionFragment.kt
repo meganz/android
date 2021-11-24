@@ -2,9 +2,9 @@ package mega.privacy.android.app.utils.permission
 
 import android.content.Context
 import android.os.Bundle
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
-import mega.privacy.android.app.utils.permission.PermissionUtils.verifyPermissions
 import java.util.*
 
 /**
@@ -16,7 +16,6 @@ sealed class PermissionFragment : Fragment() {
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
-        retainInstance = true
         viewModel = ViewModelProvider(requireActivity()).get(PermissionViewModel::class.java)
     }
 
@@ -30,50 +29,6 @@ sealed class PermissionFragment : Fragment() {
      * Subclass of PermissionRequestFragment
      */
     internal class NormalRequestFragment : PermissionFragment() {
-        override fun onCreate(savedInstanceState: Bundle?) {
-            super.onCreate(savedInstanceState)
-            // Get Permissions
-            val permissions = arguments?.getStringArrayList(BUNDLE_MEGA_PERMISSIONS) ?: return
-            // request permission
-            requestPermissions(permissions.toTypedArray(), requestCode)
-        }
-
-
-        override fun onRequestPermissionsResult(
-            requestCode: Int,
-            permissions: Array<out String>,
-            grantResults: IntArray
-        ) {
-            super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-            if (requestCode == this.requestCode) {
-                var i = 0
-                val map = HashMap<String, PermissionResult>()
-                while (i < grantResults.size) {
-                    if (verifyPermissions(grantResults[i])) {
-                        // All permissions are granted
-                        map[permissions[i]] = PermissionResult.GRANTED
-                    } else {
-                        val arrayListPermission = ArrayList<String>()
-                        arrayListPermission.add(permissions[i])
-                        if (!PermissionUtils.shouldShowRequestPermissionRationale(
-                                this,
-                                arrayListPermission
-                            )
-                        ) {
-                            // The user denies and tickets "Never Ask Again"
-                            map[permissions[i]] = PermissionResult.DENIED_AND_DISABLED
-                        } else {
-                            // The user denies without "Never Ask Again"
-                            map[permissions[i]] = PermissionResult.DENIED
-                        }
-                    }
-                    i++
-                }
-                viewModel.postPermissionRequestResult(map)
-            }
-            dismiss()
-        }
-
         companion object {
             const val BUNDLE_MEGA_PERMISSIONS = "mega_permissions"
 
@@ -84,6 +39,33 @@ sealed class PermissionFragment : Fragment() {
                     arguments = bundle
                 }
         }
+
+        override fun onCreate(savedInstanceState: Bundle?) {
+            super.onCreate(savedInstanceState)
+            // Get Permissions
+            val megaPermissions = arguments?.getStringArrayList(BUNDLE_MEGA_PERMISSIONS) ?: return
+
+            // Create permissions launcher
+            val permissionCaller = registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { permissions ->
+                    val permissionResults = permissions.mapValues { permission ->
+                        when (permission.value) {
+                            true -> PermissionResult.GRANTED // Permissions is granted
+                            false -> {
+                                if (shouldShowRequestPermissionRationale(permission.key)) {
+                                    PermissionResult.DENIED // The user denies without "Never Ask Again"
+                                } else {
+                                    PermissionResult.DENIED_AND_DISABLED // The user denies and tickets "Never Ask Again"
+                                }
+                            }
+                        }
+                    }
+                    viewModel.postPermissionRequestResult(permissionResults.toMutableMap())
+                    dismiss()
+                }
+
+            // Request permission
+            permissionCaller.launch(megaPermissions.toTypedArray())
+        }
     }
 
     /**
@@ -91,12 +73,8 @@ sealed class PermissionFragment : Fragment() {
      */
     internal class CheckRequestFragment : PermissionFragment() {
 
-
         companion object {
-
-            fun newInstance() =
-                CheckRequestFragment()
+            fun newInstance() = CheckRequestFragment()
         }
     }
-
 }

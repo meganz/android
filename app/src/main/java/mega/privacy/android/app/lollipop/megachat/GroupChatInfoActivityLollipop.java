@@ -54,7 +54,6 @@ import mega.privacy.android.app.listeners.GetAttrUserListener;
 import mega.privacy.android.app.listeners.GetPeerAttributesListener;
 import mega.privacy.android.app.listeners.InviteToChatRoomListener;
 import mega.privacy.android.app.lollipop.AddContactActivityLollipop;
-import mega.privacy.android.app.lollipop.LoginActivityLollipop;
 import mega.privacy.android.app.activities.PasscodeActivity;
 import mega.privacy.android.app.lollipop.controllers.ChatController;
 import mega.privacy.android.app.lollipop.controllers.ContactController;
@@ -89,6 +88,7 @@ import static mega.privacy.android.app.utils.CallUtil.*;
 import static mega.privacy.android.app.utils.AvatarUtil.getAvatarBitmap;
 import static mega.privacy.android.app.utils.CacheFolderManager.buildAvatarFile;
 import static mega.privacy.android.app.utils.ChatUtil.*;
+import static mega.privacy.android.app.utils.ColorUtils.changeStatusBarColorForElevation;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.FileUtil.JPG_EXTENSION;
 import static mega.privacy.android.app.utils.LogUtil.*;
@@ -198,13 +198,7 @@ public class GroupChatInfoActivityLollipop extends PasscodeActivity
         groupChatInfoActivity = this;
         chatC = new ChatController(this);
 
-        if (megaChatApi == null || megaChatApi.getInitState() == MegaChatApi.INIT_ERROR) {
-            logDebug("Refresh session - karere");
-            Intent intent = new Intent(this, LoginActivityLollipop.class);
-            intent.putExtra(VISIBLE_FRAGMENT, LOGIN_FRAGMENT);
-            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-            startActivity(intent);
-            finish();
+        if (shouldRefreshSessionDueToKarere()) {
             return;
         }
 
@@ -256,7 +250,11 @@ public class GroupChatInfoActivityLollipop extends PasscodeActivity
                 @Override
                 public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
                     super.onScrolled(recyclerView, dx, dy);
-                    changeViewElevation(aB, recyclerView.canScrollVertically(-1), getOutMetrics());
+                    boolean withElevation = recyclerView.canScrollVertically(SCROLLING_UP_DIRECTION);
+
+                    changeViewElevation(aB, withElevation, getOutMetrics());
+                    changeStatusBarColorForElevation(groupChatInfoActivity, withElevation);
+
                     if (recyclerView.getScrollState() == RecyclerView.SCROLL_STATE_IDLE) {
                         checkIfShouldAskForUsersAttributes(RecyclerView.SCROLL_STATE_IDLE);
                     }

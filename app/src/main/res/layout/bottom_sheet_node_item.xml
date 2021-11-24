@@ -12,7 +12,6 @@
         android:id="@+id/node_title_layout"
         android:layout_width="match_parent"
         android:layout_height="72dp"
-        android:layout_marginTop="8dp"
         android:layout_gravity="center_vertical">
 
         <ImageView
@@ -43,7 +42,7 @@
                     android:layout_height="wrap_content"
                     android:singleLine="true"
                     android:ellipsize="middle"
-                    android:textAppearance="?attr/textAppearanceSubtitle1"/>
+                    style="@style/textAppearanceSubtitle1" />
 
                 <RelativeLayout
                     android:id="@+id/node_relative_layout_icon"
@@ -59,7 +58,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:background="@null"
-                        app:tint="?android:attr/textColorSecondary"/>
+                        app:tint="?android:attr/textColorSecondary" />
 
                 </RelativeLayout>
 
@@ -103,13 +102,14 @@
             app:tint="?android:attr/textColorSecondary"
             android:background="@null"/>
 
-    </RelativeLayout>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_marginStart="16dp"
+            android:background="@color/grey_012_white_012"
+            android:layout_alignParentBottom="true"/>
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="1dp"
-        android:layout_marginStart="16dp"
-        android:background="@color/grey_012_white_012"/>
+    </RelativeLayout>
 
     <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
@@ -268,7 +268,6 @@
             <TextView
                 android:id="@+id/link_option"
                 style="@style/BottomSheetOption"
-                android:text="@string/context_get_link_menu"
                 app:drawableStartCompat="@drawable/link_ic"/>
 
             <TextView

@@ -15,6 +15,7 @@ package mega.privacy.android.app.meeting;
 
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
+import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.PorterDuff;
 import android.graphics.PorterDuffXfermode;
@@ -27,8 +28,6 @@ import android.view.SurfaceHolder.Callback;
 import android.view.SurfaceView;
 import android.view.TextureView;
 
-import org.webrtc.Logging;
-import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -39,23 +38,21 @@ import static nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE;
 
 public class MegaSurfaceRenderer implements Callback, TextureView.SurfaceTextureListener {
 
-    private final static String TAG = "WEBRTC";
     private Paint paint;
     private PorterDuffXfermode modesrcover;
     private PorterDuffXfermode modesrcin;
     private int surfaceWidth = 0;
     private int surfaceHeight = 0;
-    private static int CORNER_RADIUS = 20;
-    private static int VISIBLE = 255;
+    private static final int CORNER_RADIUS = 20;
+    private static final int VISIBLE = 255;
 
     // the bitmap used for drawing.
     private Bitmap bitmap = null;
-    private ByteBuffer byteBuffer = null;
     private SurfaceHolder surfaceHolder;
     // Rect of the source bitmap to draw
-    private Rect srcRect = new Rect();
+    private final Rect srcRect = new Rect();
     // Rect of the destination canvas to draw to
-    private Rect dstRect = new Rect();
+    private final Rect dstRect = new Rect();
     private RectF dstRectf = new RectF();
     private boolean isSmallCamera;
     private DisplayMetrics outMetrics;
@@ -172,7 +169,6 @@ public class MegaSurfaceRenderer implements Callback, TextureView.SurfaceTexture
     public void surfaceDestroyed(SurfaceHolder holder) {
         logDebug("Surface destroyed");
         bitmap = null;
-        byteBuffer = null;
         surfaceWidth = 0;
         surfaceHeight = 0;
     }
@@ -230,6 +226,50 @@ public class MegaSurfaceRenderer implements Callback, TextureView.SurfaceTexture
         }
     }
 
+    /**
+     *  Draw video frames for meeting
+     *
+     * @param isGroup Indicates if the current meeting is group meeting
+     * @param isFrontCamera Indicates if the frames are from the local camera and using the front camera.
+     */
+    public void drawBitmapForMeeting(boolean isGroup, boolean isFrontCamera) {
+        if (bitmap == null || (isGroup && myTexture == null) || (!isGroup && surfaceHolder == null))
+            return;
+
+        Canvas canvas = isGroup ? myTexture.lockCanvas() : surfaceHolder.lockCanvas();
+
+        if (canvas == null) return;
+
+        canvas.save();
+
+        if (isSmallCamera) {
+            paint.reset();
+            paint.setAlpha(alpha);
+            paint.setXfermode(modesrcover);
+            canvas.drawRoundRect(dstRectf, dp2px(CORNER_RADIUS, outMetrics), dp2px(CORNER_RADIUS, outMetrics), paint);
+            paint.setXfermode(modesrcin);
+        } else {
+            paint = null;
+        }
+
+        if (isFrontCamera) {
+            Matrix m = new Matrix();
+            m.postScale(-1, 1);
+            Bitmap newBitmap = Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), m, true);
+            canvas.drawBitmap(newBitmap, srcRect, dstRect, paint);
+        } else {
+            canvas.drawBitmap(bitmap, srcRect, dstRect, paint);
+        }
+
+        canvas.restore();
+
+        if (isGroup) {
+            myTexture.unlockCanvasAndPost(canvas);
+        } else {
+            surfaceHolder.unlockCanvasAndPost(canvas);
+        }
+    }
+
     private void notifyStateToAll() {
         for (MegaSurfaceRendererListener listener : listeners) {
             notifyState(listener);
@@ -250,8 +290,7 @@ public class MegaSurfaceRenderer implements Callback, TextureView.SurfaceTexture
     @Override
     public void onSurfaceTextureAvailable(SurfaceTexture surfaceTexture, int in_width, int in_height) {
         Bitmap textureViewBitmap = myTexture.getBitmap();
-        Canvas canvas = new Canvas(textureViewBitmap);
-        if (canvas == null) return;
+        if (textureViewBitmap == null) return;
 
         logDebug("TextureView Available");
         notifyStateToAll();
@@ -267,7 +306,6 @@ public class MegaSurfaceRenderer implements Callback, TextureView.SurfaceTexture
     public boolean onSurfaceTextureDestroyed(SurfaceTexture surfaceTexture) {
         logDebug("TextureView destroyed");
         bitmap = null;
-        byteBuffer = null;
         surfaceWidth = 0;
         surfaceHeight = 0;
         return true;
@@ -279,5 +317,23 @@ public class MegaSurfaceRenderer implements Callback, TextureView.SurfaceTexture
 
     public interface MegaSurfaceRendererListener {
         void resetSize(long peerId, long clientId);
+    }
+
+    /**
+     * Get the width of the surface view
+     *
+     * @return the width
+     */
+    public int getSurfaceWidth() {
+        return surfaceWidth;
+    }
+
+    /**
+     * Get the height of the surface view
+     *
+     * @return the height
+     */
+    public int getSurfaceHeight() {
+        return surfaceHeight;
     }
 }

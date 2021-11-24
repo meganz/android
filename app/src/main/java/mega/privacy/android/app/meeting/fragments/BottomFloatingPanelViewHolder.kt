@@ -21,9 +21,11 @@ import mega.privacy.android.app.components.OnOffFab
 import mega.privacy.android.app.components.SimpleDividerItemDecoration
 import mega.privacy.android.app.databinding.InMeetingFragmentBinding
 import mega.privacy.android.app.lollipop.megachat.AppRTCAudioManager
+import mega.privacy.android.app.meeting.LockableBottomSheetBehavior
 import mega.privacy.android.app.meeting.adapter.Participant
 import mega.privacy.android.app.meeting.adapter.ParticipantsAdapter
 import mega.privacy.android.app.meeting.listeners.BottomFloatingPanelListener
+import mega.privacy.android.app.utils.LogUtil.logDebug
 import mega.privacy.android.app.utils.StringResourcesUtils.getString
 import mega.privacy.android.app.utils.Util
 import nz.mega.sdk.MegaChatRoom
@@ -35,13 +37,11 @@ import nz.mega.sdk.MegaChatSession
  * @property inMeetingViewModel InMeetingViewModel, get some values and do some logic actions
  * @property binding  InMeetingFragmentBinding, get views from this binding
  * @property listener listen to the actions of all buttons
- * @property isGroup determine if the current chat is group
  */
 class BottomFloatingPanelViewHolder(
     private val inMeetingViewModel: InMeetingViewModel,
     private val binding: InMeetingFragmentBinding,
     private val listener: BottomFloatingPanelListener,
-    private var isGroup: Boolean = true
 ) {
     private val context = binding.root.context
     private val floatingPanelView = binding.bottomFloatingPanel
@@ -61,8 +61,8 @@ class BottomFloatingPanelViewHolder(
     private var savedMicState: Boolean = false
     private var savedCamState: Boolean = false
     private var savedSpeakerState: AppRTCAudioManager.AudioDevice =
-        AppRTCAudioManager.AudioDevice.SPEAKER_PHONE
-    private val participantsAdapter = ParticipantsAdapter(inMeetingViewModel, listener)
+        AppRTCAudioManager.AudioDevice.NONE
+    private val participantsAdapter = ParticipantsAdapter(listener)
 
     private var currentHeight = 0
 
@@ -135,7 +135,7 @@ class BottomFloatingPanelViewHolder(
      *
      * @param anchor the anchor view, the tips widow should show base on it's location
      */
-    fun initPopWindow(anchor: View) {
+    private fun initPopWindow(anchor: View) {
         if (inMeetingViewModel.isOneToOneCall()) {
             return
         }
@@ -186,7 +186,7 @@ class BottomFloatingPanelViewHolder(
             collapse()
         }
 
-        floatingPanelView.indicator.isVisible = isGroup
+        floatingPanelView.indicator.isVisible = !inMeetingViewModel.isOneToOneCall()
         updateShareAndInviteButton()
     }
 
@@ -237,6 +237,10 @@ class BottomFloatingPanelViewHolder(
      * Init the state for the Mic, Cam and End button on button bar
      */
     private fun initButtonsState() {
+        disableEnableButtons(
+            inMeetingViewModel.isCallEstablished(),
+            inMeetingViewModel.isCallOnHold()
+        )
         floatingPanelView.fabMic.isOn = savedMicState
         floatingPanelView.fabCam.isOn = savedCamState
         updateSpeakerIcon(savedSpeakerState)
@@ -268,12 +272,17 @@ class BottomFloatingPanelViewHolder(
      * Set the listener for bottom sheet behavior and property list
      */
     private fun setupBottomSheet() {
+        if (bottomSheetBehavior is LockableBottomSheetBehavior<*>) {
+            (bottomSheetBehavior as LockableBottomSheetBehavior<*>).setLocked(
+                inMeetingViewModel.isOneToOneCall()
+            )
+        }
+
         bottomSheetBehavior.addBottomSheetCallback(object :
             BottomSheetBehavior.BottomSheetCallback() {
             override fun onStateChanged(bottomSheet: View, newState: Int) {
-                Log.d("bottomSheetBehavior", "newState:$newState")
                 bottomFloatingPanelExpanded = newState == BottomSheetBehavior.STATE_EXPANDED
-                if (newState == BottomSheetBehavior.STATE_DRAGGING && !isGroup) {
+                if (newState == BottomSheetBehavior.STATE_DRAGGING && inMeetingViewModel.isOneToOneCall()) {
                     bottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
                 }
 
@@ -288,10 +297,11 @@ class BottomFloatingPanelViewHolder(
             }
 
             override fun onSlide(bottomSheet: View, slideOffset: Float) {
-                Log.d("bottomSheetBehavior", "onSlide")
-                onBottomFloatingPanelSlide(slideOffset)
-                if (slideOffset > 0.1f) {
-                    dismissPopWindow()
+                if (!inMeetingViewModel.isOneToOneCall()) {
+                    onBottomFloatingPanelSlide(slideOffset)
+                    if (slideOffset > 0.1f) {
+                        dismissPopWindow()
+                    }
                 }
             }
         })
@@ -299,6 +309,22 @@ class BottomFloatingPanelViewHolder(
         initUpdaters()
     }
 
+    /**
+     * Method that disables or enables buttons depending on whether the call is connected or not
+     *
+     * @param isCallEstablished True, if the call is connected. False, otherwise
+     * @param isHold True, if the call is on hold. False, otherwise
+     */
+    fun disableEnableButtons(isCallEstablished: Boolean, isHold: Boolean) {
+        val shouldBeEnable = !(!isCallEstablished || isHold)
+        floatingPanelView.apply {
+            fabMic.enable = shouldBeEnable
+            fabCam.enable = shouldBeEnable
+            fabHold.enable = isCallEstablished
+            fabHold.isOn = !isHold
+            fabSpeaker.enable = shouldBeEnable
+        }
+    }
 
     /**
      * Init listener for all the button
@@ -363,11 +389,8 @@ class BottomFloatingPanelViewHolder(
 
     /**
      * When the meeting change, will update the panel
-     *
-     * @param group The flag that determine if this meeting is group call
      */
-    fun updateMeetingType(group: Boolean) {
-        isGroup = group
+    fun updateMeetingType() {
         updatePanel(false)
         updatePrivilege(inMeetingViewModel.getOwnPrivileges())
     }
@@ -570,7 +593,7 @@ class BottomFloatingPanelViewHolder(
      */
     fun enableHoldIcon(isEnabled: Boolean, isHold: Boolean) {
         floatingPanelView.fabHold.enable = isEnabled
-        updateHoldIcon(isHold)
+        disableEnableButtons(inMeetingViewModel.isCallEstablished(), isHold)
     }
 
     /**
@@ -601,37 +624,37 @@ class BottomFloatingPanelViewHolder(
     }
 
     /**
-     * Method that enables or disables the mic and camera buttons when the call on hold status is changed
-     *
-     * @param isHold True, if the call is on hold. False, otherwise
-     */
-    fun updateHoldIcon(isHold: Boolean) {
-        floatingPanelView.fabHold.isOn = !isHold
-        floatingPanelView.fabMic.enable = !isHold
-        floatingPanelView.fabCam.enable = !isHold
-    }
-
-    /**
      * Method that updates the speaker icon according to the selected AudioDevice
      *
      * @param device Current device selected
      */
     fun updateSpeakerIcon(device: AppRTCAudioManager.AudioDevice) {
+        logDebug("Update speaker icon. Audio device is $device")
         when (device) {
-            AppRTCAudioManager.AudioDevice.SPEAKER_PHONE -> {
-                floatingPanelView.fabSpeaker.isOn = true
+            AppRTCAudioManager.AudioDevice.SPEAKER_PHONE ->{
                 floatingPanelView.fabSpeaker.setOnIcon(R.drawable.ic_speaker_on)
+                floatingPanelView.fabSpeaker.enable = true
+                floatingPanelView.fabSpeaker.isOn = true
                 floatingPanelView.fabSpeakerLabel.text = getString(R.string.general_speaker)
             }
             AppRTCAudioManager.AudioDevice.EARPIECE -> {
-                floatingPanelView.fabSpeaker.isOn = false
                 floatingPanelView.fabSpeaker.setOnIcon(R.drawable.ic_speaker_off)
+                floatingPanelView.fabSpeaker.enable = true
+                floatingPanelView.fabSpeaker.isOn = false
                 floatingPanelView.fabSpeakerLabel.text = getString(R.string.general_speaker)
             }
-            else -> {
-                floatingPanelView.fabSpeaker.isOn = true
+            AppRTCAudioManager.AudioDevice.WIRED_HEADSET,
+            AppRTCAudioManager.AudioDevice.BLUETOOTH -> {
                 floatingPanelView.fabSpeaker.setOnIcon(R.drawable.ic_headphone)
+                floatingPanelView.fabSpeaker.enable = true
+                floatingPanelView.fabSpeaker.isOn = true
                 floatingPanelView.fabSpeakerLabel.text = getString(R.string.general_headphone)
+            }
+            else -> {
+                floatingPanelView.fabSpeaker.setOnIcon(R.drawable.ic_speaker_on)
+                floatingPanelView.fabSpeaker.enable = false
+                floatingPanelView.fabSpeaker.isOn = true
+                floatingPanelView.fabSpeakerLabel.text = getString(R.string.general_speaker)
             }
         }
     }
@@ -682,7 +705,8 @@ class BottomFloatingPanelViewHolder(
         updateParticipantsPrivileges.forEach { participant ->
             participantsAdapter.updateParticipantPermission(
                 participant.peerId,
-                participant.clientId
+                participant.clientId,
+                inMeetingViewModel.isParticipantModerator(participant.peerId)
             )
         }
     }
@@ -753,6 +777,21 @@ class BottomFloatingPanelViewHolder(
      */
     fun updateCamPermissionWaring(isGranted: Boolean) {
         floatingPanelView.camWarning.isVisible = !isGranted
+    }
+
+    /**
+     * Method that checks if a participant's name or avatar has changed and updates the UI
+     *
+     * @param peerId user handle that has changed
+     * @param type the type of change, name or avatar
+     */
+    fun updateParticipantInfo(peerId: Long, type: Int) {
+        participantsAdapter.updateParticipantInfo(
+            peerId,
+            type,
+            inMeetingViewModel.getParticipantFullName(peerId),
+            inMeetingViewModel.getAvatarBitmap(peerId)
+        )
     }
 
     companion object {

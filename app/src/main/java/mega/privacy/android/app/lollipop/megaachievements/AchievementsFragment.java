@@ -97,14 +97,6 @@ public class AchievementsFragment extends BaseFragment implements OnClickListene
 
 	private AchievementsActivity mActivity;
 
-	private static final String AD_SLOT = "and2";
-
-	@Override
-	public void onCreate(@Nullable Bundle savedInstanceState) {
-		super.onCreate(savedInstanceState);
-		initAdsLoader(AD_SLOT, true);
-	}
-
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		logDebug("onCreateView");
@@ -198,12 +190,6 @@ public class AchievementsFragment extends BaseFragment implements OnClickListene
 		TextView textReferralBonusesStorage = (TextView) v.findViewById(R.id.unlocked_storage_title_referral);
 		textReferralBonusesStorage.setText(storageSpaceString);
 
-		TextView figureBaseQuotaStorage = (TextView) v.findViewById(R.id.figure_unlocked_storage_text_base_quota);
-		figureBaseQuotaStorage.setText(getSizeString(0));
-
-		TextView textBaseQuotaStorage = (TextView) v.findViewById(R.id.unlocked_storage_title_base_quota);
-		textBaseQuotaStorage.setText(storageQuotaString);
-
 		figureInstallAppStorage = (TextView) v.findViewById(R.id.figure_unlocked_storage_text_install_app);
 
 		figureInstallAppStorage.setText(getSizeString(0));
@@ -247,9 +233,6 @@ public class AchievementsFragment extends BaseFragment implements OnClickListene
 
 		figureUnlockedRewardStorage.setText("...");
 
-		mAdsLoader.setAdViewContainer(v.findViewById(R.id.ad_view_container),
-				mActivity.getOutMetrics());
-
 		if (Util.isDarkMode(context)) {
 			int backgroundColor = ColorUtils.getColorForElevation(context, 1f);
 			v.findViewById(R.id.unlocked_rewards_layout).setBackgroundColor(backgroundColor);
@@ -266,7 +249,8 @@ public class AchievementsFragment extends BaseFragment implements OnClickListene
 		if (mActivity != null) {
 			ActionBar actionBar = mActivity.getSupportActionBar();
 			if (actionBar != null) {
-				actionBar.setTitle(getString(R.string.achievements_title));
+				actionBar.setTitle(StringResourcesUtils.getString(R.string.achievements_title)
+						.toUpperCase(Locale.getDefault()));
 			}
 		}
 

@@ -29,12 +29,14 @@
             app:layout_constraintTop_toTopOf="parent" />
 
         <LinearLayout
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
+            android:layout_marginEnd="16dp"
             android:gravity="center_vertical"
             android:orientation="vertical"
             app:layout_constraintBottom_toTopOf="@id/divider_info"
+            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@id/avatar"
             app:layout_constraintTop_toTopOf="parent">
 
@@ -43,7 +45,6 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:ellipsize="middle"
-                android:gravity="center_vertical"
                 android:showModeratorIcon="@{participant.moderator}"
                 android:singleLine="true"
                 android:textAppearance="?attr/textAppearanceSubtitle1" />
@@ -57,6 +58,7 @@
                 android:singleLine="true"
                 android:textAppearance="@style/TextAppearance.Mega.Subtitle1.Secondary"
                 tools:text="@{viewModel.getEmail(context)}" />
+
         </LinearLayout>
 
         <View
@@ -71,6 +73,7 @@
             app:layout_constraintTop_toTopOf="parent" />
 
         <LinearLayout
+            android:id="@+id/items_layout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
@@ -139,7 +142,7 @@
                 android:show="@{viewModel.showRemoveItem()}"
                 android:text="@string/remove_participant_menu_item"
                 android:textColor="@color/red_600_red_300"
-                app:drawableStartCompat="@drawable/ic_move"
+                app:drawableStartCompat="@drawable/ic_remove"
                 app:drawableTint="@color/red_600_red_300" />
         </LinearLayout>
     </androidx.constraintlayout.widget.ConstraintLayout>

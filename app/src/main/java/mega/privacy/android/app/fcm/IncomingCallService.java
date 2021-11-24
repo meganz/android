@@ -43,6 +43,7 @@ public class IncomingCallService extends Service implements MegaRequestListenerI
     private static final int STOP_SELF_AFTER = 60 * 1000;
     MegaApplication app;
     MegaApiAndroid megaApi;
+    MegaApiAndroid megaApiFolder;
     DatabaseHandler dbH;
     MegaChatApiAndroid megaChatApi;
     ChatSettings chatSettings;
@@ -63,6 +64,7 @@ public class IncomingCallService extends Service implements MegaRequestListenerI
 
         app = (MegaApplication) getApplication();
         megaApi = app.getMegaApi();
+        megaApiFolder = app.getMegaApiFolder();
         megaChatApi = app.getMegaChatApi();
 
         dbH = DatabaseHandler.getDbHandler(getApplicationContext());
@@ -227,8 +229,13 @@ public class IncomingCallService extends Service implements MegaRequestListenerI
 
             if (e.getErrorCode() == MegaError.API_OK) {
                 logDebug("Fast login OK");
+                logDebug("Logged in. Setting account auth token for folder links.");
+                megaApiFolder.setAccountAuth(megaApi.getAccountAuth());
                 logDebug("Calling fetchNodes from MegaFireBaseMessagingService");
                 megaApi.fetchNodes(this);
+
+                // Get cookies settings after login.
+                MegaApplication.getInstance().checkEnabledCookies();
             } else {
                 logError("ERROR: " + e.getErrorString());
             }

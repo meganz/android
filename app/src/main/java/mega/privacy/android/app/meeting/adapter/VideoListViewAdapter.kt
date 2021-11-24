@@ -2,6 +2,7 @@ package mega.privacy.android.app.meeting.adapter
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import mega.privacy.android.app.databinding.ItemParticipantVideoBinding
@@ -20,10 +21,26 @@ class VideoListViewAdapter(
     override fun onViewRecycled(holder: VideoMeetingViewHolder) {
         super.onViewRecycled(holder)
 
-        if(holder.adapterPosition == INVALID_POSITION)
+        if (holder.bindingAdapterPosition == INVALID_POSITION)
             return
 
-        holder.onRecycle()
+        val manager: RecyclerView.LayoutManager? = listView.layoutManager
+        if (manager is LinearLayoutManager) {
+            val firstPositionVisible = manager.findFirstVisibleItemPosition()
+            val lastPositionVisible = manager.findLastVisibleItemPosition() + 1
+            if (!currentList.isNullOrEmpty()) {
+                val iterator = currentList.iterator()
+                iterator.forEach { participant ->
+                    val position = getParticipantPosition(participant.peerId, participant.clientId)
+                    if (position == holder.bindingAdapterPosition) {
+                        if (position < firstPositionVisible || position > lastPositionVisible) {
+                            holder.onRecycle()
+                            return@forEach
+                        }
+                    }
+                }
+            }
+        }
     }
 
     private fun getParticipantPosition(peerId: Long, clientId: Long) =
@@ -40,7 +57,6 @@ class VideoListViewAdapter(
             ItemParticipantVideoBinding.inflate(inflater, parent, false),
             0,
             0,
-            1,
             false,
             listenerRenderer,
             null
@@ -64,11 +80,15 @@ class VideoListViewAdapter(
      */
     fun updateParticipantPrivileges(participant: Participant) {
         val position = getParticipantPosition(participant.peerId, participant.clientId)
+        if (position == INVALID_POSITION)
+            return
+
         getHolder(position)?.let {
             it.updatePrivilegeIcon(participant)
             return
         }
 
+        listView.recycledViewPool.clear()
         notifyItemChanged(position)
     }
 
@@ -76,14 +96,19 @@ class VideoListViewAdapter(
      * Update participant when the name is changed
      *
      * @param participant Participant to update
+     * @param typeChange the type of change, name or avatar
      */
-    fun updateName(participant: Participant) {
+    fun updateNameOrAvatar(participant: Participant, typeChange: Int) {
         val position = getParticipantPosition(participant.peerId, participant.clientId)
+        if (position == INVALID_POSITION)
+            return
+
         getHolder(position)?.let {
-            it.updateName(participant)
+            it.updateNameOrAvatar(participant, typeChange)
             return
         }
 
+        listView.recycledViewPool.clear()
         notifyItemChanged(position)
     }
 
@@ -94,11 +119,15 @@ class VideoListViewAdapter(
      */
     fun updatePeerSelected(participant: Participant) {
         val position = getParticipantPosition(participant.peerId, participant.clientId)
+        if (position == INVALID_POSITION)
+            return
+
         getHolder(position)?.let {
             it.updatePeerSelected(participant)
             return
         }
 
+        listView.recycledViewPool.clear()
         notifyItemChanged(position)
     }
 
@@ -109,6 +138,9 @@ class VideoListViewAdapter(
      */
     fun updateParticipantAudioVideo(typeChange: Int, participant: Participant) {
         val position = getParticipantPosition(participant.peerId, participant.clientId)
+        if (position == INVALID_POSITION)
+            return
+
         getHolder(position)?.let {
             when (typeChange) {
                 Constants.TYPE_VIDEO -> it.checkVideoOn(participant)
@@ -117,6 +149,7 @@ class VideoListViewAdapter(
             return
         }
 
+        listView.recycledViewPool.clear()
         notifyItemChanged(position)
     }
 
@@ -128,11 +161,36 @@ class VideoListViewAdapter(
      */
     fun updateSessionOnHold(participant: Participant, isOnHold: Boolean) {
         val position = getParticipantPosition(participant.peerId, participant.clientId)
+        if (position == INVALID_POSITION)
+            return
+
         getHolder(position)?.let {
             it.updateSessionOnHold(participant, isOnHold)
             return
         }
 
+        listView.recycledViewPool.clear()
+        notifyItemChanged(position)
+    }
+
+    /**
+     * Method to control when the video listener should be added or removed.
+     *
+     * @param participant The participant whose listener of the video is to be added or deleted
+     * @param shouldAddListener True, should add the listener. False, should remove the listener
+     * @param isHiRes True, if is High resolution. False, if is Low resolution
+     */
+    fun updateListener(participant: Participant, shouldAddListener: Boolean, isHiRes: Boolean) {
+        val position = getParticipantPosition(participant.peerId, participant.clientId)
+        if (position == INVALID_POSITION)
+            return
+
+        getHolder(position)?.let {
+            it.updateListener(participant, shouldAddListener, isHiRes)
+            return
+        }
+
+        listView.recycledViewPool.clear()
         notifyItemChanged(position)
     }
 
@@ -144,11 +202,15 @@ class VideoListViewAdapter(
      */
     fun updateCallOnHold(participant: Participant, isOnHold: Boolean) {
         val position = getParticipantPosition(participant.peerId, participant.clientId)
+        if (position == INVALID_POSITION)
+            return
+
         getHolder(position)?.let {
             it.updateCallOnHold(participant, isOnHold)
             return
         }
 
+        listView.recycledViewPool.clear()
         notifyItemChanged(position)
     }
 
@@ -163,9 +225,9 @@ class VideoListViewAdapter(
      */
     fun removeTextureView(participant: Participant) {
         val position = getParticipantPosition(participant.peerId, participant.clientId)
-        getHolder(position)?.let { holder ->
-            holder.removeTextureView(participant)
+        if (position == INVALID_POSITION)
             return
-        }
+
+        getHolder(position)?.removeResolutionAndListener(participant)
     }
 }

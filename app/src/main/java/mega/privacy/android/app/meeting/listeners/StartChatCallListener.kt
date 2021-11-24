@@ -15,7 +15,7 @@ import nz.mega.sdk.*
 
 class StartChatCallListener(context: Context?) : ChatBaseListener(context) {
 
-    private var callback: OnCallStartedCallback? = null
+    private var callback: StartChatCallCallback? = null
     private var snackbarShower: SnackbarShower? = null
 
     constructor(
@@ -28,7 +28,7 @@ class StartChatCallListener(context: Context?) : ChatBaseListener(context) {
     constructor(
         context: Context?,
         snackbarShower: SnackbarShower,
-        callback: OnCallStartedCallback
+        callback: StartChatCallCallback
     ) : this(context) {
         this.callback = callback
         this.snackbarShower = snackbarShower
@@ -54,10 +54,13 @@ class StartChatCallListener(context: Context?) : ChatBaseListener(context) {
             LiveEventBus.get(EVENT_ERROR_STARTING_CALL,
                 Long::class.java
             ).post(request.chatHandle)
+
+            callback?.onCallFailed(request.chatHandle)
         }
     }
 
-    interface OnCallStartedCallback {
+    interface StartChatCallCallback {
         fun onCallStarted(chatId: Long, enableVideo: Boolean, enableAudio: Int)
+        fun onCallFailed(chatId: Long)
     }
 }

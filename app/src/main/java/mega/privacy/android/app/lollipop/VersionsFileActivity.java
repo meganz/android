@@ -30,7 +30,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import mega.privacy.android.app.MegaApplication;
+import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.activities.PasscodeActivity;
 import mega.privacy.android.app.components.SimpleDividerItemDecoration;
@@ -39,10 +39,7 @@ import mega.privacy.android.app.interfaces.SnackbarShower;
 import mega.privacy.android.app.lollipop.adapters.VersionsFileAdapter;
 import mega.privacy.android.app.modalbottomsheet.VersionBottomSheetDialogFragment;
 import mega.privacy.android.app.utils.AlertsAndWarnings;
-import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
-import nz.mega.sdk.MegaChatApi;
-import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaContactRequest;
 import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaEvent;
@@ -56,6 +53,7 @@ import nz.mega.sdk.MegaUserAlert;
 import static mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil.*;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
+import static mega.privacy.android.app.utils.MegaNodeUtil.manageTextFileIntent;
 import static mega.privacy.android.app.utils.Util.*;
 import static nz.mega.sdk.MegaApiJava.*;
 import static nz.mega.sdk.MegaShare.*;
@@ -67,8 +65,6 @@ public class VersionsFileActivity extends PasscodeActivity implements MegaReques
 	private static final String SELECTED_NODE_HANDLE = "SELECTED_NODE_HANDLE";
 	private static final String SELECTED_POSITION =  "SELECTED_POSITION";
 
-	MegaApiAndroid megaApi;
-	MegaChatApiAndroid megaChatApi;
 	ActionBar aB;
     MaterialToolbar tB;
 
@@ -247,32 +243,8 @@ public class VersionsFileActivity extends PasscodeActivity implements MegaReques
 	protected void onCreate(Bundle savedInstanceState) {
 		logDebug("onCreate");
 		super.onCreate(savedInstanceState);
-		
-		if (megaApi == null){
-			megaApi = ((MegaApplication) getApplication()).getMegaApi();
-		}
 
-		if(megaApi==null||megaApi.getRootNode()==null){
-			logDebug("Refresh session - sdk");
-			Intent intent = new Intent(this, LoginActivityLollipop.class);
-			intent.putExtra(VISIBLE_FRAGMENT, LOGIN_FRAGMENT);
-			intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-			startActivity(intent);
-			finish();
-			return;
-		}
-
-		if (megaChatApi == null) {
-			megaChatApi = ((MegaApplication) getApplication()).getMegaChatApi();
-		}
-
-		if (megaChatApi == null || megaChatApi.getInitState() == MegaChatApi.INIT_ERROR) {
-			logDebug("Refresh session - karere");
-			Intent intent = new Intent(this, LoginActivityLollipop.class);
-			intent.putExtra(VISIBLE_FRAGMENT, LOGIN_FRAGMENT);
-			intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-			startActivity(intent);
-			finish();
+		if(shouldRefreshSessionDueToSDK() || shouldRefreshSessionDueToKarere()) {
 			return;
 		}
 		
@@ -587,13 +559,15 @@ public class VersionsFileActivity extends PasscodeActivity implements MegaReques
 
 	public void itemClick(int position) {
 		logDebug("Position: " + position);
-		if (adapter.isMultipleSelect()){
+
+		MegaNode vNode = nodeVersions.get(position);
+		if (adapter.isMultipleSelect()) {
 			adapter.toggleSelection(position);
 			updateActionModeTitle();
-		}
-		else{
-			MegaNode n = nodeVersions.get(position);
-			showOptionsPanel(n, position);
+		} else if (MimeTypeList.typeForName(vNode.getName()).isOpenableTextFile(vNode.getSize())) {
+			manageTextFileIntent(this, vNode, VERSIONS_ADAPTER);
+		} else {
+			showOptionsPanel(vNode, position);
 		}
 	}
 	

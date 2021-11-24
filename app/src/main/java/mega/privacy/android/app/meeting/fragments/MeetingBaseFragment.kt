@@ -5,15 +5,11 @@ import android.content.Context
 import android.content.pm.PackageManager
 import androidx.fragment.app.activityViewModels
 import android.os.Bundle
-import android.view.View
-import androidx.fragment.app.Fragment
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import kotlinx.android.synthetic.main.meeting_component_onofffab.*
 import mega.privacy.android.app.R
 import mega.privacy.android.app.fragments.BaseFragment
 import mega.privacy.android.app.meeting.activity.MeetingActivity
 import mega.privacy.android.app.meeting.activity.MeetingActivityViewModel
-import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.LogUtil.logDebug
 import mega.privacy.android.app.utils.PermissionUtils
 import mega.privacy.android.app.utils.StringResourcesUtils
@@ -21,10 +17,18 @@ import mega.privacy.android.app.utils.permission.PermissionRequest
 import mega.privacy.android.app.utils.permission.PermissionType
 import mega.privacy.android.app.utils.permission.PermissionsRequester
 import mega.privacy.android.app.utils.permission.permissionsBuilder
-import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
 
 /**
- * Base fragment for meeting fragment: [CreateMeetingFragment],[JoinMeetingAsGuestFragment],[JoinMeetingFragment],[InMeetingFragment]
+ * Base fragment for meeting fragment:
+ * [AbstractMeetingOnBoardingFragment]
+ * [CreateMeetingFragment],
+ * [JoinMeetingAsGuestFragment],
+ * [JoinMeetingFragment],
+ * [InMeetingFragment],
+ * [RingingMeetingFragment],
+ * [IndividualCallFragment],
+ * [GridViewCallFragment],
+ * [SpeakerViewCallFragment]
  * include some common functions: Permissions...
  * Use shareModel to share data between sub fragments
  */
@@ -37,7 +41,7 @@ open class MeetingBaseFragment : BaseFragment() {
     protected val sharedModel: MeetingActivityViewModel by activityViewModels()
 
     // Indicate if permission has been requested. After requested, we should check "shouldShowRequestPermissionRationaleSnackBar"
-    private var bRequested = false;
+    private var bRequested = false
     private var bRefreshPermission = false
     protected var requestCode = 0
 
@@ -65,6 +69,11 @@ open class MeetingBaseFragment : BaseFragment() {
             }.build().launch(false)
     }
 
+    /**
+     * Callback function for granting permissions
+     *
+     * @param permissions permission list
+     */
     private fun onCheckRequiresPermission(permissions: ArrayList<String>) {
         permissions.forEach {
             logDebug("user check the permissions: $it")
@@ -79,6 +88,11 @@ open class MeetingBaseFragment : BaseFragment() {
         }
     }
 
+    /**
+     * Callback function for denying permissions
+     *
+     * @param permissions permission list
+     */
     private fun onCheckPermissionDenied(permissions: ArrayList<String>) {
         permissions.forEach {
             logDebug("user denies the permissions: $it")
@@ -93,7 +107,12 @@ open class MeetingBaseFragment : BaseFragment() {
         }
     }
 
-    protected fun onRequiresPermission(permissions: ArrayList<String>) {
+    /**
+     * Callback function for granting permissions for sub class
+     *
+     * @param permissions permission list
+     */
+    protected open fun onRequiresPermission(permissions: ArrayList<String>) {
         permissions.forEach {
             logDebug("user requires the permissions: $it")
             when (it) {
@@ -125,8 +144,10 @@ open class MeetingBaseFragment : BaseFragment() {
 
     /**
      * Process when the user denies the permissions
+     *
+     * @param permissions permission list
      */
-    protected fun onPermissionDenied(permissions: ArrayList<String>) {
+    protected open fun onPermissionDenied(permissions: ArrayList<String>) {
         permissions.forEach {
             logDebug("user denies the permissions: $it")
             when (it) {
@@ -140,10 +161,20 @@ open class MeetingBaseFragment : BaseFragment() {
         }
     }
 
+    /**
+     * Callback function that allow for continuation or cancellation of a permission request..
+     *
+     * @param request allow for continuation or cancellation of a permission request.
+     */
     protected fun onShowRationale(request: PermissionRequest) {
         request.proceed()
     }
 
+    /**
+     * Callback function that will be called when the user denies the permissions and tickets "Never Ask Again" after calls requestPermissions()
+     *
+     * @param permissions permission list
+     */
     protected fun onNeverAskAgain(permissions: ArrayList<String>) {
         permissions.forEach {
             logDebug("user denies and never ask for the permissions: $it")
@@ -158,35 +189,28 @@ open class MeetingBaseFragment : BaseFragment() {
         }
     }
 
+    /**
+     * Callback function that user requires the Audio permissions
+     *
+     * @param permissions permission list
+     */
     protected fun onRequiresAudioPermission(permissions: ArrayList<String>) {
-        permissions.forEach {
-            logDebug("user requires the Audio permissions: $it")
-            when (it) {
-                Manifest.permission.RECORD_AUDIO -> {
-                    sharedModel.setRecordAudioPermission(true)
-                }
-            }
-        }
-    }
-
-    protected fun onRequiresCameraPermission(permissions: ArrayList<String>) {
-        permissions.forEach {
-            logDebug("user requires the Camera permissions: $it")
-            when (it) {
-                Manifest.permission.CAMERA -> {
-                    sharedModel.setCameraPermission(true)
-                }
-            }
+        if (permissions.contains(Manifest.permission.RECORD_AUDIO)) {
+            logDebug("user requires the Audio permissions")
+            sharedModel.setRecordAudioPermission(true)
         }
     }
 
     /**
-     * Process when it switch to offline
+     * Callback function that user requires the Camera permissions
      *
-     * @param offline true if off line mode, false if on line mode
+     * @param permissions permission list
      */
-    fun processOfflineMode(offline: Boolean) {
-        logDebug("processOfflineMode:$offline")
+    protected fun onRequiresCameraPermission(permissions: ArrayList<String>) {
+        if (permissions.contains(Manifest.permission.CAMERA)) {
+            logDebug("user requires the Camera permissions")
+            sharedModel.setRecordAudioPermission(true)
+        }
     }
 
     /**
@@ -215,96 +239,7 @@ open class MeetingBaseFragment : BaseFragment() {
     }
 
     /**
-     * Check all the permissions for meeting
-     * 1. Check whether permission is granted
-     * 2. Request permission
-     * 3. Callback after requesting permission
-     * 4. Determine whether the user denies permission is to check the don't ask again option, if checked, the client needs to manually open the permission
-     *
-     * @param permissions Array of permissions
-     * @param showSnackbar a callback that display SnackBar, notify the client to manually open the permission in system setting, This only needed when {bRequested} is true
-     */
-    protected fun checkMeetingPermissions(
-        permissions: Array<String>,
-        showSnackbar: (() -> Unit)? = null
-    ) {
-        val sp = app.getSharedPreferences(MEETINGS_PREFERENCE, Context.MODE_PRIVATE)
-        val showEducation = sp.getBoolean(KEY_SHOW_EDUCATION, true)
-        val mPermissionList: MutableList<String> = ArrayList()
-        requestCode = 0
-        for (i in permissions.indices) {
-            val bPermission = PermissionUtils.hasPermissions(requireContext(), permissions[i])
-            // 1. If this permission has not been requested, the user will not necessarily refuse, so it returns false;
-            // 2. Requested but rejected, return true at this time;
-            // 3. The request for permission is forbidden, and the pop-up window is not reminded, so return false;
-            // 4. The request is allowed, so false is returned.
-            val showRequestPermission =
-                PermissionUtils.shouldShowRequestPermissionRationale(
-                    requireActivity(),
-                    permissions[i]
-                )
-            if (!bPermission && bRequested && !showRequestPermission) {
-                // The user ticket 'Don't ask again' and deny a permission request.
-                logDebug("the user ticket 'Don't ask again' and deny a permission request.")
-                bRefreshPermission = true
-                if (showSnackbar != null) {
-                    showSnackbar()
-                }
-                return
-            }
-            when (permissions[i]) {
-                Manifest.permission.CAMERA -> {
-                    sharedModel.let {
-                        it.setCameraPermission(bPermission)
-                        if (!bPermission) {
-                            requestCode += Constants.REQUEST_CAMERA
-                        }
-                    }
-                }
-                Manifest.permission.RECORD_AUDIO -> {
-                    sharedModel.let {
-                        it.setRecordAudioPermission(bPermission)
-                        if (!bPermission) {
-                            requestCode += Constants.REQUEST_RECORD_AUDIO
-                        }
-                    }
-                }
-            }
-            if (!bPermission) {
-                if (bRequested) {
-                    // If 'Don't ask again' is not selected, show the permission request dialog
-                    if (showRequestPermission) {
-                        mPermissionList.add(permissions[i])
-                    }
-                } else {
-                    // The first time, if bPermission == false, send request
-                    mPermissionList.add(permissions[i])
-                }
-            }
-        }
-        if (mPermissionList.isNotEmpty()) {
-            if (showEducation) {
-                sp.edit()
-                    .putBoolean(KEY_SHOW_EDUCATION, false).apply()
-                showPermissionsEducation(requireActivity()) {
-                    checkMeetingPermissions(
-                        permissions
-                    )
-                }
-            } else {
-                // Some permissions are not granted
-                val permissionsArr = mPermissionList.toTypedArray()
-                requestPermissions(
-                    permissionsArr,
-                    requestCode
-                )
-            }
-        }
-
-    }
-
-    /**
-     * Update the permission state of ViewModel,
+     * Update the permission state of ViewModel.
      *
      * @param permission One or more permission strings.
      */
@@ -328,6 +263,7 @@ open class MeetingBaseFragment : BaseFragment() {
         }
     }
 
+    @Suppress("deprecation") // TODO Migrate to registerForActivityResult()
     override fun onRequestPermissionsResult(
         requestCode: Int,
         permissions: Array<out String>,
@@ -357,6 +293,6 @@ open class MeetingBaseFragment : BaseFragment() {
         protected const val KEY_SHOW_EDUCATION = "show_education"
 
         // SharedPreference file name
-        protected const val MEETINGS_PREFERENCE = "meeting_prefrence"
+        protected const val MEETINGS_PREFERENCE = "meeting_preference"
     }
 }

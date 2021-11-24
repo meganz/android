@@ -20,15 +20,12 @@ import android.widget.FrameLayout;
 
 import java.util.ArrayList;
 
-import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.lollipop.AddContactActivityLollipop;
-import mega.privacy.android.app.lollipop.LoginActivityLollipop;
 import mega.privacy.android.app.activities.PasscodeActivity;
 import mega.privacy.android.app.lollipop.listeners.CreateGroupChatWithPublicLink;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaChatApi;
-import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaChatApiJava;
 import nz.mega.sdk.MegaChatError;
 import nz.mega.sdk.MegaChatListItem;
@@ -62,9 +59,6 @@ public class ChatExplorerActivity extends PasscodeActivity implements View.OnCli
     MenuItem createFolderMenuItem;
     MenuItem newChatMenuItem;
 
-    MegaApiAndroid megaApi;
-    MegaChatApiAndroid megaChatApi;
-
     DisplayMetrics outMetrics;
 
     SearchView searchView;
@@ -81,31 +75,7 @@ public class ChatExplorerActivity extends PasscodeActivity implements View.OnCli
         logDebug("onCreate first");
         super.onCreate(savedInstanceState);
 
-        if (megaApi == null){
-            megaApi = ((MegaApplication)getApplication()).getMegaApi();
-        }
-
-        if(megaApi==null||megaApi.getRootNode()==null){
-            logDebug("Refresh session - sdk");
-            Intent intent = new Intent(this, LoginActivityLollipop.class);
-            intent.putExtra(VISIBLE_FRAGMENT,  LOGIN_FRAGMENT);
-            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-            startActivity(intent);
-            finish();
-            return;
-        }
-
-        if (megaChatApi == null) {
-            megaChatApi = ((MegaApplication) getApplication()).getMegaChatApi();
-        }
-
-        if (megaChatApi == null || megaChatApi.getInitState() == MegaChatApi.INIT_ERROR) {
-            logDebug("Refresh session - karere");
-            Intent intent = new Intent(this, LoginActivityLollipop.class);
-            intent.putExtra(VISIBLE_FRAGMENT, LOGIN_FRAGMENT);
-            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-            startActivity(intent);
-            finish();
+        if(shouldRefreshSessionDueToSDK() || shouldRefreshSessionDueToKarere()){
             return;
         }
 

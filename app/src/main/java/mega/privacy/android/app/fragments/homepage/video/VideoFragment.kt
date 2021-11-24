@@ -31,6 +31,7 @@ import mega.privacy.android.app.di.MegaApi
 import mega.privacy.android.app.fragments.homepage.*
 import mega.privacy.android.app.fragments.homepage.BaseNodeItemAdapter.Companion.TYPE_HEADER
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop
+import mega.privacy.android.app.mediaplayer.miniplayer.MiniAudioPlayerController
 import mega.privacy.android.app.modalbottomsheet.NodeOptionsBottomSheetDialogFragment.MODE1
 import mega.privacy.android.app.modalbottomsheet.NodeOptionsBottomSheetDialogFragment.MODE5
 import mega.privacy.android.app.utils.*
@@ -87,6 +88,7 @@ class VideoFragment : Fragment(), HomepageSearchable {
         setupFastScroller()
         setupActionMode()
         setupNavigation()
+        setupMiniAudioPlayer()
 
         viewModel.items.observe(viewLifecycleOwner) {
             if (!viewModel.searchMode) {
@@ -357,6 +359,13 @@ class VideoFragment : Fragment(), HomepageSearchable {
             })
     }
 
+    private fun setupMiniAudioPlayer() {
+        val audioPlayerController = MiniAudioPlayerController(binding.miniAudioPlayer).apply {
+            shouldVisible = true
+        }
+        lifecycle.addObserver(audioPlayerController)
+    }
+
     private fun openNode(node: MegaNode, index: Int) {
         val file: MegaNode = node
 
@@ -383,7 +392,7 @@ class VideoFragment : Fragment(), HomepageSearchable {
             putThumbnailLocation(intent, listView, index, VIEWER_FROM_VIDEOS, it)
         }
 
-        val localPath = FileUtil.getLocalFile(context, file.name, file.size)
+        val localPath = FileUtil.getLocalFile(file)
         var paramsSetSuccessfully = if (FileUtil.isLocalFile(node, megaApi, localPath)) {
             FileUtil.setLocalIntentParams(context, node, intent, localPath, false,
                 requireActivity() as ManagerActivityLollipop)

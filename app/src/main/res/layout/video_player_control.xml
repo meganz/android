@@ -6,15 +6,6 @@
     android:layout_height="match_parent"
     android:background="@color/grey_alpha_050">
 
-    <ImageButton
-        android:id="@id/exo_prev"
-        style="@style/AudioPlayerButton"
-        android:layout_marginEnd="10dp"
-        android:src="@drawable/video_player_prev"
-        app:layout_constraintBottom_toBottomOf="@id/play_pause_placeholder"
-        app:layout_constraintEnd_toStartOf="@id/play_pause_placeholder"
-        app:layout_constraintTop_toTopOf="@id/play_pause_placeholder" />
-
     <View
         android:id="@+id/play_pause_placeholder"
         android:layout_width="64dp"
@@ -44,6 +35,24 @@
         tools:visibility="invisible" />
 
     <ImageButton
+        android:id="@id/exo_prev"
+        style="@style/AudioPlayerButton"
+        android:layout_marginEnd="10dp"
+        android:src="@drawable/video_player_prev"
+        app:layout_constraintBottom_toBottomOf="@id/play_pause_placeholder"
+        app:layout_constraintEnd_toStartOf="@id/play_pause_placeholder"
+        app:layout_constraintTop_toTopOf="@id/play_pause_placeholder" />
+
+    <ImageButton
+        android:id="@+id/exo_rew"
+        style="@style/AudioPlayerButton"
+        android:layout_marginEnd="10dp"
+        android:src="@drawable/video_player_15_minus"
+        app:layout_constraintBottom_toBottomOf="@id/exo_prev"
+        app:layout_constraintEnd_toStartOf="@id/exo_prev"
+        app:layout_constraintTop_toTopOf="@id/exo_prev" />
+
+    <ImageButton
         android:id="@id/exo_next"
         style="@style/AudioPlayerButton"
         android:layout_marginStart="10dp"
@@ -52,18 +61,25 @@
         app:layout_constraintStart_toEndOf="@id/play_pause_placeholder"
         app:layout_constraintTop_toTopOf="@id/play_pause_placeholder" />
 
+    <ImageButton
+        android:id="@+id/exo_ffwd"
+        style="@style/AudioPlayerButton"
+        android:layout_marginStart="10dp"
+        android:src="@drawable/video_player_15_plus"
+        app:layout_constraintBottom_toBottomOf="@id/exo_next"
+        app:layout_constraintStart_toEndOf="@id/exo_next"
+        app:layout_constraintTop_toTopOf="@id/exo_next" />
+
     <com.google.android.exoplayer2.ui.DefaultTimeBar
         android:id="@id/exo_progress"
         style="@style/Widget.Mega.TimeBar"
         android:layout_width="0dp"
         android:layout_height="26dp"
         android:layout_marginBottom="70dp"
-        app:buffered_color="@color/grey_300"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:scrubber_color="@color/teal_300_teal_200"
-        app:played_color="@color/teal_300_teal_200"
+        app:buffered_color="@color/grey_300"
         app:unplayed_color="@color/grey_200_grey_600" />
 
     <TextView

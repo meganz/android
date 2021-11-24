@@ -1,79 +1,79 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-  <!-- Label to show that an SDK operation has been complete successfully. -->
-  <string name="api_ok">Ошибок нет</string>
-  <!-- Label to show that an Internal error occurs during a SDK operation. -->
-  <string name="api_einternal">Внутренняя ошибка</string>
-  <!-- Label to show that an error of Invalid argument occurs during a SDK operation. -->
-  <string name="api_eargs">Неверный аргумент</string>
-  <!-- Label to show that a request error occurs during a SDK operation. -->
-  <string name="api_eagain">Не удалось выполнить запрос, повтор запроса</string>
-  <!-- Label to show that the rate limit has been reached during a SDK operation. -->
-  <string name="api_eratelimit">Превышено ограничение пропускной способности</string>
-  <!-- Label to show that a SDK operation has failed permanently. -->
-  <string name="api_efailed">Окончательная ошибка</string>
-  <!-- Error shown when terms of service are breached during download. -->
-  <string name="api_etoomany_ec_download">Нарушены условия предоставления услуг</string>
-  <!-- Label to show that an error for multiple concurrent connections or transfers occurs during a SDK operation. -->
-  <string name="api_etoomay">Слишком много одновременных соединений или передач</string>
-  <!-- Label to show that an error of Out of range occurs during a SDK operation. -->
-  <string name="api_erange">Вне диапазона</string>
-  <!-- State to indicate something has expired (achivements of business status account for instance) -->
-  <string name="api_eexpired">Истекло</string>
-  <!-- Label to show that an error related with a resource Not found occurs during a SDK operation. -->
-  <string name="api_enoent">Не найдено</string>
-  <!-- Label to show that an error related with a circular linkage occurs during a SDK operation. -->
-  <string name="api_ecircular">Обнаружена циклическая ссылка</string>
-  <!-- Label to show that an error related with an denied access occurs during a SDK operation. -->
-  <string name="api_eaccess">Доступ запрещен</string>
-  <!-- Label to show that an error related with an existent resource occurs during a SDK operation. -->
-  <string name="api_eexist">Уже существует</string>
-  <!-- Label to show that an error related with an Incomplete SDK operation. -->
-  <string name="api_eincomplete">Неполный</string>
-  <!-- Label to show that an error related with the decryption process of a node occurs during a SDK operation. -->
-  <string name="api_ekey">Неверный ключ/Ошибка расшифровки</string>
-  <!-- Label to show that an error related with a bad session ID occurs during a SDK operation. -->
-  <string name="api_esid">Неверный идентификатор сессии</string>
-  <!-- Error shown when download a file that has violated ToS/AUP. -->
-  <string name="api_eblocked_ec_import_ec_download">Недоступно из-за нарушения условий предоставления услуг/политики допустимого использования</string>
-  <!-- Label to show that an error related with a blocked account occurs during a SDK operation. -->
-  <string name="api_eblocked">Заблокировано</string>
-  <!-- Label to show that an error related with an over quota occurs during a SDK operation. -->
-  <string name="api_eoverquota">Превышена квота</string>
-  <!-- Label to show that an error related with a temporary problem occurs during a SDK operation. -->
-  <string name="api_etempunavail">Временно недоступно</string>
-  <!-- Label to show that an error related with too many connections occurs during a SDK operation. -->
-  <string name="api_etoomanyconnections">Избыток подключений</string>
-  <!-- Label to show that an error related with an write error occurs during a SDK operation. -->
-  <string name="api_ewrite">Ошибка записи</string>
-  <!-- Label to show that an error related with an read error occurs during a SDK operation. -->
-  <string name="api_eread">Ошибка чтения</string>
-  <!-- Label to show that an error related with an invalid or missing application key occurs during a SDK operation. -->
-  <string name="api_eappkey">Неверный ключ приложения</string>
-  <!-- Error shown when SSL check has failed -->
-  <string name="api_essl">Сбой проверки SSL</string>
-  <!-- Label shown when current account does not have enough quota to complete the operation -->
-  <string name="api_egoingoverquota">Недостаточно квоты</string>
-  <!-- Label to show that an error of Multi-factor authentication required occurs during a SDK operation. -->
-  <string name="api_emfarequired">Требуется двухфакторная аутентификация.</string>
-  <!-- Label to show that an error of Access denied for users occurs during a SDK operation. -->
-  <string name="api_emasteronly">Доступ закрыт для всех, кроме администраторов</string>
-  <!-- A dialog title shown to users when their business account is expired. -->
-  <string name="api_ebusinesspastdue">Срок действия вашего бизнес-аккаунта истёк</string>
-  <!-- Label to show that an error of Credit card rejected occurs during a SDK operation. -->
-  <string name="payment_ecard">Кредитная карта отклонена</string>
-  <!-- Label to show that an error of Billing failed occurs during a SDK operation. -->
-  <string name="payment_ebilling">Не удалось выставить счет</string>
-  <!-- Label to show that an error of Rejected by fraud protection occurs during a SDK operation. -->
-  <string name="payment_efraud">Отклонено защитой от мошенничества</string>
-  <!-- Message shown when the SDK is waiting for the server to complete a request due to a rate limit (API error -4) - (String as short as possible). -->
-  <string name="payment_etoomay">Слишком много запросов</string>
-  <!-- Label to show that an error of Balance occurs during a SDK operation. -->
-  <string name="payment_ebalance">Ошибка баланса</string>
-  <!-- Label to show that an error related with an unknown error occurs during a SDK operation. -->
-  <string name="payment_egeneric_api_error_unknown">Неизвестная ошибка</string>
-  <!-- Label to show that an error related with an HTTP error occurs during a SDK operation. -->
-  <string name="api_error_http">Ошибка HTTP</string>
-  <!-- Label to show that an error related with a circular upload procedures occurs recursivity during a SDK operation -->
-  <string name="api_ecircular_ec_upload">Ошибка передачи из-за рекурсивной структуры директорий</string>
+    <!-- Label to show that an SDK operation has been complete successfully. -->
+    <string name="api_ok">Ошибок нет</string>
+    <!-- Label to show that an Internal error occurs during a SDK operation. -->
+    <string name="api_einternal">Внутренняя ошибка</string>
+    <!-- Label to show that an error of Invalid argument occurs during a SDK operation. -->
+    <string name="api_eargs">Неверный аргумент</string>
+    <!-- Label to show that a request error occurs during a SDK operation. -->
+    <string name="api_eagain">Не удалось выполнить запрос, повтор запроса</string>
+    <!-- Label to show that the rate limit has been reached during a SDK operation. -->
+    <string name="api_eratelimit">Превышено ограничение пропускной способности</string>
+    <!-- Label to show that a SDK operation has failed permanently. -->
+    <string name="api_efailed">Окончательная ошибка</string>
+    <!-- Error shown when terms of service are breached during download. -->
+    <string name="api_etoomany_ec_download">Нарушены условия предоставления услуг</string>
+    <!-- Label to show that an error for multiple concurrent connections or transfers occurs during a SDK operation. -->
+    <string name="api_etoomay">Слишком много одновременных соединений или передач</string>
+    <!-- Label to show that an error of Out of range occurs during a SDK operation. -->
+    <string name="api_erange">Вне диапазона</string>
+    <!-- State to indicate something has expired (achivements of business status account for instance) -->
+    <string name="api_eexpired">Истекло</string>
+    <!-- Label to show that an error related with a resource Not found occurs during a SDK operation. -->
+    <string name="api_enoent">Не найдено</string>
+    <!-- Label to show that an error related with a circular linkage occurs during a SDK operation. -->
+    <string name="api_ecircular">Обнаружена циклическая ссылка</string>
+    <!-- Label to show that an error related with an denied access occurs during a SDK operation. -->
+    <string name="api_eaccess">Доступ запрещен</string>
+    <!-- Label to show that an error related with an existent resource occurs during a SDK operation. -->
+    <string name="api_eexist">Уже существует</string>
+    <!-- Label to show that an error related with an Incomplete SDK operation. -->
+    <string name="api_eincomplete">Неполная</string>
+    <!-- Label to show that an error related with the decryption process of a node occurs during a SDK operation. -->
+    <string name="api_ekey">Неверный ключ/Ошибка расшифровки</string>
+    <!-- Label to show that an error related with a bad session ID occurs during a SDK operation. -->
+    <string name="api_esid">Неверный идентификатор сессии</string>
+    <!-- Error shown when download a file that has violated ToS/AUP. -->
+    <string name="api_eblocked_ec_import_ec_download">Недоступно из-за нарушения условий предоставления услуг/политики допустимого использования</string>
+    <!-- Label to show that an error related with a blocked account occurs during a SDK operation. -->
+    <string name="api_eblocked">Заблокировано</string>
+    <!-- Label to show that an error related with an over quota occurs during a SDK operation. -->
+    <string name="api_eoverquota">Превышена квота</string>
+    <!-- Label to show that an error related with a temporary problem occurs during a SDK operation. -->
+    <string name="api_etempunavail">Временно недоступно</string>
+    <!-- Label to show that an error related with too many connections occurs during a SDK operation. -->
+    <string name="api_etoomanyconnections">Избыток подключений</string>
+    <!-- Label to show that an error related with an write error occurs during a SDK operation. -->
+    <string name="api_ewrite">Ошибка записи</string>
+    <!-- Label to show that an error related with an read error occurs during a SDK operation. -->
+    <string name="api_eread">Ошибка чтения</string>
+    <!-- Label to show that an error related with an invalid or missing application key occurs during a SDK operation. -->
+    <string name="api_eappkey">Неверный ключ приложения</string>
+    <!-- Error shown when SSL check has failed -->
+    <string name="api_essl">Сбой проверки SSL</string>
+    <!-- Label shown when current account does not have enough quota to complete the operation -->
+    <string name="api_egoingoverquota">Недостаточно квоты</string>
+    <!-- Label to show that an error of Multi-factor authentication required occurs during a SDK operation. -->
+    <string name="api_emfarequired">Требуется двухфакторная аутентификация.</string>
+    <!-- Label to show that an error of Access denied for users occurs during a SDK operation. -->
+    <string name="api_emasteronly">Доступ закрыт для всех, кроме администраторов</string>
+    <!-- A dialog title shown to users when their business account is expired. -->
+    <string name="api_ebusinesspastdue">Срок действия вашего бизнес-аккаунта истёк</string>
+    <!-- Label to show that an error of Credit card rejected occurs during a SDK operation. -->
+    <string name="payment_ecard">Кредитная карта отклонена</string>
+    <!-- Label to show that an error of Billing failed occurs during a SDK operation. -->
+    <string name="payment_ebilling">Не удалось выставить счет</string>
+    <!-- Label to show that an error of Rejected by fraud protection occurs during a SDK operation. -->
+    <string name="payment_efraud">Отклонено защитой от мошенничества</string>
+    <!-- Message shown when the SDK is waiting for the server to complete a request due to a rate limit (API error -4) - (String as short as possible). -->
+    <string name="payment_etoomay">Слишком много запросов</string>
+    <!-- Label to show that an error of Balance occurs during a SDK operation. -->
+    <string name="payment_ebalance">Ошибка баланса</string>
+    <!-- Label to show that an error related with an unknown error occurs during a SDK operation. -->
+    <string name="payment_egeneric_api_error_unknown">Неизвестная ошибка</string>
+    <!-- Label to show that an error related with an HTTP error occurs during a SDK operation. -->
+    <string name="api_error_http">Ошибка HTTP</string>
+    <!-- Label to show that a transfer error happened during a SDK operation (sync a recursive folders structure). Only can happen if user syncs a folder with recursive links (link to the parent folder). -->
+    <string name="api_ecircular_ec_upload">Ошибка передачи из-за рекурсивной структуры директорий</string>
 </resources>

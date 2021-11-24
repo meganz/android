@@ -840,9 +840,11 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
         holder.textViewFileName.setText(node.getName());
         holder.textViewFileSize.setText("");
 
-        holder.imageFavourite.setVisibility(type != RUBBISH_BIN_ADAPTER && node.isFavourite() ? View.VISIBLE : View.GONE);
+        holder.imageFavourite.setVisibility(type != RUBBISH_BIN_ADAPTER
+                && type != FOLDER_LINK_ADAPTER && node.isFavourite() ? View.VISIBLE : View.GONE);
 
-        if (type != RUBBISH_BIN_ADAPTER && node.getLabel() != MegaNode.NODE_LBL_UNKNOWN) {
+        if (type != RUBBISH_BIN_ADAPTER && type != FOLDER_LINK_ADAPTER
+                && node.getLabel() != MegaNode.NODE_LBL_UNKNOWN) {
             Drawable drawable = MegaNodeUtil.getNodeLabelDrawable(node.getLabel(), holder.itemView.getResources());
             holder.imageLabel.setImageDrawable(drawable);
             holder.imageLabel.setVisibility(View.VISIBLE);
@@ -884,15 +886,15 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
             holder.imageView.setLayoutParams(params);
 
             holder.textViewFileSize.setVisibility(View.VISIBLE);
-            holder.textViewFileSize.setText(getMegaNodeFolderInfo(node));
+            holder.textViewFileSize.setText(type == FOLDER_LINK_ADAPTER
+                    ? getMegaNodeFolderLinkInfo(node)
+                    : getMegaNodeFolderInfo(node));
 
             holder.versionsIcon.setVisibility(View.GONE);
 
             setFolderListSelected(holder, position, getFolderIcon(node, type == OUTGOING_SHARES_ADAPTER ? ManagerActivityLollipop.DrawerItem.SHARED_ITEMS : ManagerActivityLollipop.DrawerItem.CLOUD_DRIVE));
 
-            if (type == FOLDER_LINK_ADAPTER) {
-                holder.textViewFileSize.setText(getMegaNodeFolderInfo(node));
-            } else if (type == CONTACT_FILE_ADAPTER|| type == CONTACT_SHARED_FOLDER_ADAPTER){
+            if (type == CONTACT_FILE_ADAPTER|| type == CONTACT_SHARED_FOLDER_ADAPTER){
                 boolean firstLevel;
                 if(type == CONTACT_FILE_ADAPTER){
                     firstLevel = ((ContactFileListFragmentLollipop) fragment).isEmptyParentHandleStack();

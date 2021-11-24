@@ -1,5 +1,7 @@
 package mega.privacy.android.app;
 
+import static mega.privacy.android.app.utils.Constants.TYPE_TEXT_PLAIN;
+
 import android.annotation.SuppressLint;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -65,7 +67,7 @@ public class MimeTypeThumbnail {
 		resources.put(R.drawable.ic_numbers_thumbnail, new String[] {"numbers", });
 		resources.put(R.drawable.ic_openoffice_thumbnail, new String[] {"odp", "odt", "ods"});
 		resources.put(R.drawable.ic_sketch_thumbnail, new String[] {"sketch", });
-
+		resources.put(R.drawable.ic_url_thumbnail, new String[]{"url"});
 	}
 
 	private String type;
@@ -113,7 +115,7 @@ public class MimeTypeThumbnail {
 	}
 	
 	public boolean isDocument(){
-		boolean r = type.startsWith("application/pdf") || type.startsWith("application/msword") || type.startsWith("application/vnd.ms-excel") || type.startsWith("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet") || type.startsWith("application/vnd.openxmlformats-officedocument.wordprocessingml.document") || type.startsWith("application/rtf") || type.startsWith("text/plain");
+		boolean r = type.startsWith("application/pdf") || type.startsWith("application/msword") || type.startsWith("application/vnd.ms-excel") || type.startsWith("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet") || type.startsWith("application/vnd.openxmlformats-officedocument.wordprocessingml.document") || type.startsWith("application/rtf") || type.startsWith(TYPE_TEXT_PLAIN);
 		
 		return r;
 	}

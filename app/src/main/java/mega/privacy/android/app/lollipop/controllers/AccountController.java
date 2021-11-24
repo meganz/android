@@ -13,19 +13,14 @@ import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
-import android.os.Build;
-import android.os.StatFs;
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
+
+import androidx.preference.PreferenceManager;
 import androidx.print.PrintHelper;
 import androidx.appcompat.app.AlertDialog;
 
 import com.jeremyliao.liveeventbus.LiveEventBus;
 
-import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileWriter;
 import java.io.IOException;
 
 import mega.privacy.android.app.DatabaseHandler;
@@ -34,47 +29,42 @@ import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.OpenLinkActivity;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.UploadService;
+import mega.privacy.android.app.listeners.LogoutListener;
 import mega.privacy.android.app.mediaplayer.service.MediaPlayerService;
 import mega.privacy.android.app.mediaplayer.service.MediaPlayerServiceViewModel;
 import mega.privacy.android.app.jobservices.SyncRecord;
-import mega.privacy.android.app.listeners.LogoutListener;
 import mega.privacy.android.app.lollipop.FileStorageActivityLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
-import mega.privacy.android.app.lollipop.MyAccountInfo;
 import mega.privacy.android.app.lollipop.TestPasswordActivity;
 import mega.privacy.android.app.lollipop.TwoFactorAuthenticationActivity;
 import mega.privacy.android.app.lollipop.VerifyTwoFactorActivity;
-import mega.privacy.android.app.lollipop.managerSections.MyAccountFragmentLollipop;
 import mega.privacy.android.app.sync.BackupToolsKt;
 import mega.privacy.android.app.psa.PsaManager;
-import mega.privacy.android.app.utils.SDCardOperator;
-import mega.privacy.android.app.utils.SDCardUtils;
 import mega.privacy.android.app.utils.contacts.MegaContactGetter;
 import mega.privacy.android.app.utils.LastShowSMSDialogTimeChecker;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
-import nz.mega.sdk.MegaError;
 
-import static mega.privacy.android.app.lollipop.qrcode.MyCodeFragment.*;
+import static mega.privacy.android.app.fragments.offline.OfflineFragment.SHOW_OFFLINE_WARNING;
 import static mega.privacy.android.app.middlelayer.push.PushMessageHanlder.PUSH_TOKEN;
+import static mega.privacy.android.app.textEditor.TextEditorViewModel.SHOW_LINE_NUMBERS;
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
 import static mega.privacy.android.app.utils.CameraUploadUtil.*;
-import static mega.privacy.android.app.utils.ContactUtil.notifyFirstNameUpdate;
-import static mega.privacy.android.app.utils.ContactUtil.notifyLastNameUpdate;
 import static mega.privacy.android.app.utils.FileUtil.*;
 import static mega.privacy.android.app.utils.ChatUtil.*;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.JobUtil.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
+import static mega.privacy.android.app.utils.SharedPreferenceConstants.USER_INTERFACE_PREFERENCES;
+import static mega.privacy.android.app.utils.StorageUtils.thereIsNotEnoughFreeSpace;
+import static mega.privacy.android.app.utils.StringResourcesUtils.getString;
+import static mega.privacy.android.app.utils.PermissionUtils.*;
 import static mega.privacy.android.app.utils.Util.*;
-import static nz.mega.sdk.MegaApiJava.INVALID_HANDLE;
 
 public class AccountController {
 
     Context context;
     MegaApiAndroid megaApi;
-
-    static int count = 0;
 
     public AccountController(Context context){
         logDebug("AccountController created");
@@ -112,16 +102,6 @@ public class AccountController {
         }
     }
 
-    public void confirmDeleteAccount(String link, String pass){
-        logDebug("confirmDeleteAccount");
-        megaApi.confirmCancelAccount(link, pass, (ManagerActivityLollipop)context);
-    }
-
-    public void confirmChangeMail(String link, String pass){
-        logDebug("confirmChangeMail");
-        megaApi.confirmChangeEmail(link, pass, (ManagerActivityLollipop)context);
-    }
-
     public boolean existsAvatar() {
         File avatar = buildAvatarFile(context,megaApi.getMyEmail() + ".jpg");
         if (isFileAvailable(avatar)) {
@@ -131,33 +111,15 @@ public class AccountController {
         return false;
     }
 
-    public void removeAvatar() {
-        logDebug("removeAvatar");
-        File avatar = buildAvatarFile(context,megaApi.getMyEmail() + ".jpg");
-        File qrFile = buildQrFile(context,megaApi.getMyEmail() + QR_IMAGE_FILE_NAME);
-
-        if (isFileAvailable(avatar)) {
-            logDebug("Avatar to delete: " + avatar.getAbsolutePath());
-            avatar.delete();
-        }
-        if (isFileAvailable(qrFile)) {
-            qrFile.delete();
-        }
-        megaApi.setAvatar(null,(ManagerActivityLollipop)context);
-    }
-
     public void printRK(){
         Bitmap rKBitmap = createRkBitmap();
 
         if (rKBitmap != null){
             PrintHelper printHelper = new PrintHelper(context);
             printHelper.setScaleMode(PrintHelper.SCALE_MODE_FIT);
-            printHelper.printBitmap("rKPrint", rKBitmap, new PrintHelper.OnPrintFinishCallback() {
-                @Override
-                public void onFinish() {
-                    if (context instanceof TestPasswordActivity) {
-                        ((TestPasswordActivity) context).passwordReminderSucceeded();
-                    }
+            printHelper.printBitmap("rKPrint", rKBitmap, () -> {
+                if (context instanceof TestPasswordActivity) {
+                    ((TestPasswordActivity) context).passwordReminderSucceeded();
                 }
             });
         }
@@ -169,95 +131,41 @@ public class AccountController {
      * @param path The selected location.
      * @param sdCardUriString If the selected location is on SD card, need the uri to grant SD card write permission.
      */
-    public void exportMK(String path, String sdCardUriString){
+    public void exportMK(String path, String sdCardUriString) {
         logDebug("exportMK");
-        if (!isOnline(context)){
-            if (context instanceof ManagerActivityLollipop) {
-                ((ManagerActivityLollipop) context).showSnackbar(SNACKBAR_TYPE, context.getString(R.string.error_server_connection_problem), -1);
-            }
-            else if (context instanceof TestPasswordActivity) {
-                ((TestPasswordActivity) context).showSnackbar(context.getString(R.string.error_server_connection_problem));
-            }
+        if (isOffline(context)) {
             return;
         }
 
         String key = megaApi.exportMasterKey();
+
         if (context instanceof ManagerActivityLollipop) {
             megaApi.masterKeyExported((ManagerActivityLollipop) context);
-        }
-        else if (context instanceof TestPasswordActivity) {
+        } else if (context instanceof TestPasswordActivity) {
             ((TestPasswordActivity) context).incrementRequests();
             megaApi.masterKeyExported((TestPasswordActivity) context);
         }
 
-        BufferedWriter out;
-        try {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                if (ContextCompat.checkSelfPermission(context, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
-                    if (context instanceof ManagerActivityLollipop) {
-                        ActivityCompat.requestPermissions((ManagerActivityLollipop) context, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, REQUEST_WRITE_STORAGE);
-                    }
-                    else if (context instanceof TestPasswordActivity) {
-                        ActivityCompat.requestPermissions((TestPasswordActivity) context, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, REQUEST_WRITE_STORAGE);
-                    }
-                    return;
-                }
-            }
-
-            double availableFreeSpace = Double.MAX_VALUE;
-            try{
-                StatFs stat = new StatFs(path);
-                availableFreeSpace = (double)stat.getAvailableBlocks() * (double)stat.getBlockSize();
-            }
-            catch(Exception ex){}
-
-            File file = new File(path);
-            if(availableFreeSpace < file.length()) {
-                if (context instanceof ManagerActivityLollipop) {
-                    ((ManagerActivityLollipop) context).showSnackbar(SNACKBAR_TYPE, context.getString(R.string.error_not_enough_free_space), -1);
-                }
-                else if (context instanceof TestPasswordActivity) {
-                    ((TestPasswordActivity) context).showSnackbar(context.getString(R.string.error_not_enough_free_space));
-                }
-                return;
-            }
-
-            // If export the file to SD card.
-            if (SDCardUtils.isLocalFolderOnSDCard(context, path)) {
-                // Export to cache folder root first.
-                File temp = new File(context.getCacheDir() + File.separator + getRecoveryKeyFileName());
-                FileWriter fileWriter = new FileWriter(temp);
-                out = new BufferedWriter(fileWriter);
-                out.write(key);
-                out.close();
-
-                // Copy to target location on SD card.
-                SDCardOperator sdCardOperator = new SDCardOperator(context);
-                DatabaseHandler dbH = DatabaseHandler.getDbHandler(context);
-                // If the `sdCardUriString` is null, get SD card root uri from database.
-                sdCardOperator.initDocumentFileRoot(sdCardUriString == null ? dbH.getSDCardUri() : sdCardUriString);
-                sdCardOperator.moveFile(path.substring(0, path.lastIndexOf(File.separator)), temp);
-
-                // Delete the temp file.
-                temp.delete();
-            } else {
-                FileWriter fileWriter = new FileWriter(path);
-                out = new BufferedWriter(fileWriter);
-                out.write(key);
-                out.close();
-            }
-
+        if (!hasPermissions(context, Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
             if (context instanceof ManagerActivityLollipop) {
-                ((ManagerActivityLollipop) context).showSnackbar(SNACKBAR_TYPE, context.getString(R.string.save_MK_confirmation), -1);
+                requestPermission((ManagerActivityLollipop) context, REQUEST_WRITE_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE);
+            } else if (context instanceof TestPasswordActivity) {
+                requestPermission((TestPasswordActivity) context, REQUEST_WRITE_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE);
             }
-            else if (context instanceof TestPasswordActivity) {
-                ((TestPasswordActivity) context).showSnackbar(context.getString(R.string.save_MK_confirmation));
+            return;
+        }
+
+        if (thereIsNotEnoughFreeSpace(path)) {
+            showSnackbar(context, getString(R.string.error_not_enough_free_space));
+            return;
+        }
+
+        if (saveTextOnFile(context, key, path, sdCardUriString)) {
+            showSnackbar(context, getString(R.string.save_MK_confirmation));
+
+            if (context instanceof TestPasswordActivity) {
                 ((TestPasswordActivity) context).passwordReminderSucceeded();
             }
-
-        } catch (SDCardOperator.SDCardException | IOException e) {
-            e.printStackTrace();
-            logError("ERROR", e);
         }
     }
 
@@ -312,21 +220,12 @@ public class AccountController {
         }
     }
 
-    public void saveRkToFileSystem () {
-        logDebug("saveRkToFileSystem");
+    public static void saveRkToFileSystem(Activity activity) {
+        Intent intent = new Intent(activity, FileStorageActivityLollipop.class)
+                .setAction(FileStorageActivityLollipop.Mode.PICK_FOLDER.getAction())
+                .putExtra(FileStorageActivityLollipop.EXTRA_SAVE_RECOVERY_KEY, true);
 
-        Intent intent = new Intent(context, FileStorageActivityLollipop.class);
-        intent.setAction(FileStorageActivityLollipop.Mode.PICK_FOLDER.getAction());
-        intent.putExtra(FileStorageActivityLollipop.EXTRA_SAVE_RECOVERY_KEY, true);
-        if (context instanceof TestPasswordActivity){
-            ((TestPasswordActivity) context).startActivityForResult(intent, REQUEST_DOWNLOAD_FOLDER);
-        }
-        else if (context instanceof ManagerActivityLollipop){
-            ((ManagerActivityLollipop) context).startActivityForResult(intent, REQUEST_DOWNLOAD_FOLDER);
-        }
-        else if (context instanceof TwoFactorAuthenticationActivity){
-            ((TwoFactorAuthenticationActivity) context).startActivityForResult(intent, REQUEST_DOWNLOAD_FOLDER);
-        }
+        activity.startActivityForResult(intent, REQUEST_DOWNLOAD_FOLDER);
     }
 
     public void copyRkToClipboard () {
@@ -401,13 +300,11 @@ public class AccountController {
         builder.show();
     }
 
-    public void killAllSessions(Context context){
-        logDebug("killAllSessions");
-        megaApi.killSession(-1, (ManagerActivityLollipop) context);
-    }
+    static public void localLogoutApp(Context context) {
+        MegaApplication app = MegaApplication.getInstance();
 
-    static public void localLogoutApp(Context context){
-        logDebug("localLogoutApp");
+        logDebug("Logged out. Resetting account auth token for folder links.");
+        app.getMegaApiFolder().setAccountAuth(null);
 
         try {
             NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
@@ -489,6 +386,16 @@ public class AccountController {
         //clear push token
         context.getSharedPreferences(PUSH_TOKEN, Context.MODE_PRIVATE).edit().clear().apply();
 
+        //clear text editor preference
+        PreferenceManager.getDefaultSharedPreferences(context).edit().putBoolean(SHOW_LINE_NUMBERS, false).apply();
+
+        //clear offline warning preference
+        PreferenceManager.getDefaultSharedPreferences(context).edit().putBoolean(SHOW_OFFLINE_WARNING, true).apply();
+
+        //clear user interface preferences
+        context.getSharedPreferences(USER_INTERFACE_PREFERENCES, Context.MODE_PRIVATE)
+                .edit().clear().apply();
+
         removeEmojisSharedPreferences();
 
         new LastShowSMSDialogTimeChecker(context).reset();
@@ -498,7 +405,6 @@ public class AccountController {
         PsaManager.INSTANCE.stopChecking();
 
         //Clear MyAccountInfo
-        MegaApplication app = MegaApplication.getInstance();
         app.resetMyAccountInfo();
         app.setStorageState(MegaApiJava.STORAGE_STATE_UNKNOWN);
 
@@ -517,6 +423,8 @@ public class AccountController {
 
     static public void logout(Context context, MegaApiAndroid megaApi) {
         logDebug("logout");
+
+        MegaApplication.setLoggingOut(true);
 
         BackupToolsKt.removeBackupsBeforeLogout();
 
@@ -558,99 +466,6 @@ public class AccountController {
         for (File c : appDir.listFiles()){
             if (c.isFile()){
                 c.delete();
-            }
-        }
-    }
-
-    public int updateUserAttributes(String oldFirstName, String newFirstName, String oldLastName, String newLastName, String oldMail, String newMail){
-        logDebug("updateUserAttributes");
-        MyAccountFragmentLollipop myAccountFragmentLollipop = ((ManagerActivityLollipop)context).getMyAccountFragment();
-        if(!oldFirstName.equals(newFirstName)){
-            logDebug("Changes in first name");
-            if(myAccountFragmentLollipop!=null){
-                count++;
-                megaApi.setUserAttribute(MegaApiJava.USER_ATTR_FIRSTNAME, newFirstName, (ManagerActivityLollipop)context);
-            }
-        }
-        if(!oldLastName.equals(newLastName)){
-            logDebug("Changes in last name");
-            if(myAccountFragmentLollipop!=null){
-                count++;
-                megaApi.setUserAttribute(MegaApiJava.USER_ATTR_LASTNAME, newLastName, (ManagerActivityLollipop)context);
-            }
-        }
-        if(!oldMail.equals(newMail)){
-            logDebug("Changes in mail, new mail: " + newMail);
-            if (((ManagerActivityLollipop) context).is2FAEnabled()){
-                Intent intent = new Intent(context, VerifyTwoFactorActivity.class);
-                intent.putExtra(VerifyTwoFactorActivity.KEY_VERIFY_TYPE, CHANGE_MAIL_2FA);
-                intent.putExtra(VerifyTwoFactorActivity.KEY_NEW_EMAIL, newMail);
-
-                context.startActivity(intent);
-            }
-            else {
-                megaApi.changeEmail(newMail, (ManagerActivityLollipop)context);
-            }
-        }
-        logDebug("The number of attributes to change is: " + count);
-        return count;
-    }
-
-    public int getCount() {
-        return count;
-    }
-
-    static public void setCount(int countUa) {
-        count = countUa;
-    }
-
-    /**
-     * Updates own firstName/lastName and fullName data.
-     *
-     * @param firstName True if the update makes reference to the firstName, false it to the lastName.
-     * @param newName   New firstName/lastName text.
-     * @param e         MegaError of the request.
-     */
-    public static void updateMyData(boolean firstName, String newName, MegaError e) {
-        MegaApplication app = MegaApplication.getInstance();
-        MyAccountInfo accountInfo = app.getMyAccountInfo();
-        DatabaseHandler dbH = app.getDbH();
-        long handle = app.getMegaApi().getMyUser() != null
-                ? app.getMegaApi().getMyUser().getHandle() : INVALID_HANDLE;
-
-        if (e.getErrorCode() == MegaError.API_OK) {
-            logDebug("request.getText(): " + newName);
-
-            if (accountInfo != null) {
-                if (firstName) {
-                    accountInfo.setFirstNameText(newName);
-                } else {
-                    accountInfo.setLastNameText(newName);
-                }
-            }
-
-            if (firstName) {
-                dbH.saveMyFirstName(newName);
-
-                if (handle != INVALID_HANDLE) {
-                    notifyFirstNameUpdate(app, handle);
-                }
-            } else {
-                dbH.saveMyLastName(newName);
-
-                if (handle != INVALID_HANDLE) {
-                    notifyLastNameUpdate(app, handle);
-                }
-            }
-        } else {
-            logError("ERROR - request.getText(): " + newName);
-
-            if (accountInfo != null) {
-                if (firstName) {
-                    accountInfo.setFirstNameText("");
-                } else {
-                    accountInfo.setLastNameText("");
-                }
             }
         }
     }

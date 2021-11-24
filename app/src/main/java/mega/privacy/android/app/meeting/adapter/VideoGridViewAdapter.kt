@@ -15,7 +15,6 @@ class VideoGridViewAdapter(
     private val screenWidth: Int,
     private val screenHeight: Int,
     private var pagePosition: Int,
-    private val orientation: Int,
     private val onPageClickedCallback: () -> Unit
 ) : ListAdapter<Participant, VideoMeetingViewHolder>(ParticipantDiffCallback()) {
 
@@ -33,7 +32,6 @@ class VideoGridViewAdapter(
             ItemParticipantVideoBinding.inflate(inflater, parent, false),
             screenWidth,
             screenHeight,
-            orientation,
             true,
             null,
             onPageClickedCallback
@@ -72,14 +70,15 @@ class VideoGridViewAdapter(
      * Update participant name
      *
      * @param participant Participant to update
+     * @param typeChange the type of change, name or avatar
      */
-    fun updateParticipantName(participant: Participant) {
+    fun updateParticipantNameOrAvatar(participant: Participant, typeChange: Int) {
         val position = getParticipantPosition(participant.peerId, participant.clientId)
         if (position == INVALID_POSITION)
             return
 
         getHolderAtPosition(position)?.let {
-            it.updateName(participant)
+            it.updateNameOrAvatar(participant, typeChange)
             return
         }
 
@@ -98,7 +97,11 @@ class VideoGridViewAdapter(
             return
 
         getHolderAtPosition(position)?.let {
-            if (shouldActivate) it.checkVideoOn(participant) else it.closeVideo(participant)
+            if (shouldActivate) {
+                it.checkVideoOn(participant)
+            } else {
+                it.closeVideo(participant)
+            }
             return
         }
 
@@ -152,6 +155,26 @@ class VideoGridViewAdapter(
     }
 
     /**
+     * Method to control when the video listener should be added or removed.
+     *
+     * @param participant The participant whose listener of the video is to be added or deleted
+     * @param shouldAddListener True, should add the listener. False, should remove the listener
+     * @param isHiRes True, if is High resolution. False, if is Low resolution
+     */
+    fun updateListener(participant: Participant, shouldAddListener: Boolean, isHiRes: Boolean) {
+        val position = getParticipantPosition(participant.peerId, participant.clientId)
+        if (position == INVALID_POSITION)
+            return
+
+        getHolderAtPosition(position)?.let {
+            it.updateListener(participant, shouldAddListener, isHiRes)
+            return
+        }
+
+        notifyItemChanged(position)
+    }
+
+    /**
      * Update participant when call is on hold
      *
      * @param participant Participant to update
@@ -181,9 +204,14 @@ class VideoGridViewAdapter(
             return
 
         getHolderAtPosition(position)?.let { holder ->
-            holder.removeTextureView(participant)
+            holder.removeResolutionAndListener(participant)
             return
         }
+
+        participant.videoListener?.let {
+            inMeetingViewModel.removeResolutionAndListener(participant, it)
+        }
+        participant.videoListener = null
     }
 }
 

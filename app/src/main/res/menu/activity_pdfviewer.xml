@@ -6,7 +6,7 @@
         android:id="@+id/pdf_viewer_get_link"
         android:icon="@drawable/link_ic_white"
         android:orderInCategory="115"
-        android:title="@string/context_get_link_menu"
+        android:title="@{@plurals/get_links(one)}"
         android:visible="true"
         app:iconTint="?attr/colorControlNormal"
         app:showAsAction="always" />
@@ -104,7 +104,7 @@
         android:id="@+id/chat_pdf_viewer_save_for_offline"
         android:orderInCategory="110"
         android:icon="@drawable/ic_save_offline"
-        android:title="@string/save_for_offline"
+        android:title="@string/file_properties_available_offline"
         android:visible="true"
         app:iconTint="?attr/colorControlNormal"
         app:showAsAction="always" />

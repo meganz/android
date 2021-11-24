@@ -43,10 +43,12 @@ import com.google.zxing.MultiFormatWriter;
 import com.google.zxing.WriterException;
 import com.google.zxing.common.BitMatrix;
 import com.google.zxing.qrcode.decoder.ErrorCorrectionLevel;
+import com.jeremyliao.liveeventbus.LiveEventBus;
 
 import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 
 import mega.privacy.android.app.MegaApplication;
@@ -54,12 +56,14 @@ import mega.privacy.android.app.R;
 import mega.privacy.android.app.activities.PasscodeActivity;
 import mega.privacy.android.app.components.EditTextPIN;
 import mega.privacy.android.app.utils.ColorUtils;
+import mega.privacy.android.app.utils.StringResourcesUtils;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
 
+import static mega.privacy.android.app.constants.EventConstants.EVENT_2FA_UPDATED;
 import static mega.privacy.android.app.utils.FileUtil.*;
 import static mega.privacy.android.app.constants.IntentConstants.EXTRA_NEW_ACCOUNT;
 import static mega.privacy.android.app.utils.Constants.*;
@@ -172,10 +176,13 @@ public class TwoFactorAuthenticationActivity extends PasscodeActivity implements
         tB.setVisibility(View.VISIBLE);
         setSupportActionBar(tB);
         aB = getSupportActionBar();
-        aB.setHomeButtonEnabled(true);
-        aB.setDisplayHomeAsUpEnabled(true);
-        tB.setTitle(getString(R.string.settings_2fa));
-        setTitle(getString(R.string.settings_2fa));
+
+        if (aB != null) {
+            aB.setHomeButtonEnabled(true);
+            aB.setDisplayHomeAsUpEnabled(true);
+            aB.setTitle(StringResourcesUtils.getString(R.string.settings_2fa)
+                    .toUpperCase(Locale.getDefault()));
+        }
 
         if (savedInstanceState != null){
             logDebug("savedInstanceState No null");
@@ -612,9 +619,7 @@ public class TwoFactorAuthenticationActivity extends PasscodeActivity implements
     }
 
     void update2FASetting () {
-        Intent intent = new Intent(BROADCAST_ACTION_INTENT_UPDATE_2FA_SETTINGS);
-        intent.putExtra(INTENT_EXTRA_KEY_ENABLED, true);
-        sendBroadcast(intent);
+        LiveEventBus.get(EVENT_2FA_UPDATED, Boolean.class).post(true);
     }
 
     void pasteClipboard() {

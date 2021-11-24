@@ -43,6 +43,7 @@ import nz.mega.sdk.MegaTransfer;
 
 import static mega.privacy.android.app.constants.BroadcastConstants.*;
 import static mega.privacy.android.app.constants.IntentConstants.EXTRA_FIRST_LOGIN;
+import static mega.privacy.android.app.fragments.settingsFragments.startSceen.util.StartScreenUtil.setStartScreenTimeStamp;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.Util.*;
@@ -62,7 +63,6 @@ public class LoginActivityLollipop extends BaseActivity implements MegaRequestLi
     //Fragments
     TourFragmentLollipop tourFragment;
     LoginFragmentLollipop loginFragment;
-    ChooseAccountFragmentLollipop chooseAccountFragment;
     CreateAccountFragmentLollipop createAccountFragment;
 
     ActionBar aB;
@@ -95,20 +95,10 @@ public class LoginActivityLollipop extends BaseActivity implements MegaRequestLi
     private BroadcastReceiver updateMyAccountReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-
-            int actionType;
-
             if (intent != null) {
-                actionType = intent.getIntExtra(ACTION_TYPE, INVALID_ACTION);
+                int actionType = intent.getIntExtra(ACTION_TYPE, INVALID_ACTION);
 
-                if (actionType == UPDATE_GET_PRICING) {
-                    logDebug("BROADCAST TO UPDATE AFTER GET PRICING");
-                    //UPGRADE_ACCOUNT_FRAGMENT
-
-                    if (chooseAccountFragment != null && chooseAccountFragment.isAdded()) {
-                        chooseAccountFragment.setPricingInfo();
-                    }
-                } else if (actionType == UPDATE_PAYMENT_METHODS) {
+                if (actionType == UPDATE_PAYMENT_METHODS) {
                     logDebug("BROADCAST TO UPDATE AFTER UPDATE_PAYMENT_METHODS");
                 }
             }
@@ -238,12 +228,6 @@ public class LoginActivityLollipop extends BaseActivity implements MegaRequestLi
                         }
                         break;
                     }
-                    case CHOOSE_ACCOUNT_FRAGMENT: {
-                        if (chooseAccountFragment != null && chooseAccountFragment.isAdded()) {
-                            chooseAccountFragment.onFreeClick();
-                        }
-                        break;
-                    }
                 }
                 break;
             }
@@ -272,20 +256,6 @@ public class LoginActivityLollipop extends BaseActivity implements MegaRequestLi
 
                 FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
                 ft.replace(R.id.fragment_container_login, loginFragment);
-                ft.commitNowAllowingStateLoss();
-
-                setDrawUnderStatusBar(this, false);
-                break;
-            }
-            case CHOOSE_ACCOUNT_FRAGMENT: {
-                logDebug("Show CHOOSE_ACCOUNT_FRAGMENT");
-
-                if (chooseAccountFragment == null) {
-                    chooseAccountFragment = new ChooseAccountFragmentLollipop();
-                }
-
-                FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-                ft.replace(R.id.fragment_container_login, chooseAccountFragment);
                 ft.commitNowAllowingStateLoss();
 
                 setDrawUnderStatusBar(this, false);
@@ -402,6 +372,7 @@ public class LoginActivityLollipop extends BaseActivity implements MegaRequestLi
     public void startCameraUploadService(boolean firstTimeCam, int time) {
         logDebug("firstTimeCam: " + firstNameTemp + "time: " + time);
         if (firstTimeCam) {
+            setStartScreenTimeStamp(this);
             Intent intent = new Intent(this, ManagerActivityLollipop.class);
             intent.putExtra(EXTRA_FIRST_LOGIN, true);
             startActivity(intent);
@@ -477,18 +448,9 @@ public class LoginActivityLollipop extends BaseActivity implements MegaRequestLi
                 showFragment(TOUR_FRAGMENT);
                 break;
             }
-            case TOUR_FRAGMENT: {
-                valueReturn = 0;
-                break;
-            }
+            case TOUR_FRAGMENT:
             case CONFIRM_EMAIL_FRAGMENT: {
                 valueReturn = 0;
-                break;
-            }
-            case CHOOSE_ACCOUNT_FRAGMENT: {
-                if (chooseAccountFragment != null && chooseAccountFragment.isAdded()) {
-                    chooseAccountFragment.onFreeClick();
-                }
                 break;
             }
         }

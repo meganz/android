@@ -15,8 +15,8 @@ import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.RecyclerView
+import com.jeremyliao.liveeventbus.LiveEventBus
 import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.MimeTypeList
 import mega.privacy.android.app.R
@@ -32,11 +32,13 @@ import mega.privacy.android.app.fragments.homepage.*
 import mega.privacy.android.app.fragments.homepage.BaseNodeItemAdapter.Companion.TYPE_HEADER
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop
 import mega.privacy.android.app.lollipop.PdfViewerActivityLollipop
+import mega.privacy.android.app.mediaplayer.miniplayer.MiniAudioPlayerController
 import mega.privacy.android.app.modalbottomsheet.NodeOptionsBottomSheetDialogFragment.MODE1
 import mega.privacy.android.app.modalbottomsheet.NodeOptionsBottomSheetDialogFragment.MODE5
 import mega.privacy.android.app.modalbottomsheet.UploadBottomSheetDialogFragment.Companion.DOCUMENTS_UPLOAD
 import mega.privacy.android.app.utils.*
 import mega.privacy.android.app.utils.Constants.*
+import mega.privacy.android.app.utils.MegaNodeUtil.manageTextFileIntent
 import mega.privacy.android.app.utils.Util.noChangeRecyclerViewItemAnimator
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
@@ -68,6 +70,14 @@ class DocumentsFragment : Fragment(), HomepageSearchable {
 
     private var openingNodeHandle = INVALID_HANDLE
 
+    private val fabChangeObserver = androidx.lifecycle.Observer<Boolean> {
+        if (it && actionModeViewModel.selectedNodes.value.isNullOrEmpty()) {
+            showFabButton()
+        } else {
+            hideFabButton()
+        }
+    }
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -78,7 +88,16 @@ class DocumentsFragment : Fragment(), HomepageSearchable {
             sortByHeaderViewModel = this@DocumentsFragment.sortByHeaderViewModel
         }
 
+        LiveEventBus.get(EVENT_FAB_CHANGE, Boolean::class.java)
+            .observeForever(fabChangeObserver)
+
         return binding.root
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        LiveEventBus.get(EVENT_FAB_CHANGE, Boolean::class.java)
+            .removeObserver(fabChangeObserver)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -92,6 +111,7 @@ class DocumentsFragment : Fragment(), HomepageSearchable {
         setupActionMode()
         setupNavigation()
         setupAddFabButton()
+        setupMiniAudioPlayer()
 
         viewModel.items.observe(viewLifecycleOwner) {
             if (viewModel.searchMode) {
@@ -241,7 +261,7 @@ class DocumentsFragment : Fragment(), HomepageSearchable {
         })
 
     private fun observeSelectedItems() =
-        actionModeViewModel.selectedNodes.observe(viewLifecycleOwner, Observer {
+        actionModeViewModel.selectedNodes.observe(viewLifecycleOwner, {
             if (it.isEmpty()) {
                 actionMode?.apply {
                     finish()
@@ -269,7 +289,7 @@ class DocumentsFragment : Fragment(), HomepageSearchable {
     private fun observeAnimatedItems() {
         var animatorSet: AnimatorSet? = null
 
-        actionModeViewModel.animNodeIndices.observe(viewLifecycleOwner, Observer {
+        actionModeViewModel.animNodeIndices.observe(viewLifecycleOwner, {
             animatorSet?.run {
                 // End the started animation if any, or the view may show messy as its property
                 // would be wrongly changed by multiple animations running at the same time
@@ -419,7 +439,7 @@ class DocumentsFragment : Fragment(), HomepageSearchable {
             return
         }
 
-        val localPath = FileUtil.getLocalFile(context, node.name, node.size)
+        val localPath = FileUtil.getLocalFile(node)
 
         if (MimeTypeList.typeForName(node.name).isPdf) {
             val intent = Intent(context, PdfViewerActivityLollipop::class.java)
@@ -451,6 +471,12 @@ class DocumentsFragment : Fragment(), HomepageSearchable {
                 requireActivity().overridePendingTransition(0, 0)
                 return
             }
+        } else if (MimeTypeList.typeForName(node.name).isOpenableTextFile(node.size)) {
+            manageTextFileIntent(
+                requireContext(),
+                node,
+                if (viewModel.searchMode) DOCUMENTS_SEARCH_ADAPTER else DOCUMENTS_BROWSE_ADAPTER
+            )
         }
     }
 
@@ -458,5 +484,27 @@ class DocumentsFragment : Fragment(), HomepageSearchable {
         binding.addFabButton.setOnClickListener {
             (requireActivity() as ManagerActivityLollipop).showUploadPanel(DOCUMENTS_UPLOAD)
         }
+    }
+
+    /**
+     * Hides the fabButton
+     */
+    fun hideFabButton() {
+        binding.addFabButton.hide()
+    }
+
+    /**
+     * Shows the fabButton
+     */
+    fun showFabButton() {
+        binding.addFabButton.show()
+    }
+
+
+    private fun setupMiniAudioPlayer() {
+        val audioPlayerController = MiniAudioPlayerController(binding.miniAudioPlayer).apply {
+            shouldVisible = true
+        }
+        lifecycle.addObserver(audioPlayerController)
     }
 }

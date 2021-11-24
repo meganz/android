@@ -22,12 +22,14 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.core.content.ContextCompat;
+import androidx.core.view.ViewCompat;
 import androidx.fragment.app.Fragment;
 import androidx.viewpager.widget.ViewPager;
 
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.textfield.TextInputLayout;
 
+import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.TourImageAdapter;
 import mega.privacy.android.app.components.LoopViewPager;
@@ -35,6 +37,7 @@ import mega.privacy.android.app.meeting.fragments.MeetingHasEndedDialogFragment;
 import mega.privacy.android.app.meeting.fragments.PasteMeetingLinkGuestDialogFragment;
 import mega.privacy.android.app.utils.TextUtil;
 
+import static mega.privacy.android.app.constants.IntentConstants.EXTRA_MASTER_KEY;
 import static mega.privacy.android.app.utils.Constants.ACTION_RESET_PASS_FROM_LINK;
 import static mega.privacy.android.app.utils.Constants.ACTION_RESET_PASS_FROM_PARK_ACCOUNT;
 import static mega.privacy.android.app.utils.Constants.CREATE_ACCOUNT_FRAGMENT;
@@ -209,6 +212,11 @@ public class TourFragmentLollipop extends Fragment implements View.OnClickListen
                 showParkAccountDialog(parkAccountUrl);
             }
         }
+
+        ViewCompat.setOnApplyWindowInsetsListener(view, (v, insets) -> {
+            view.setPadding(0, 0, 0, insets.getStableInsetBottom());
+            return insets.consumeSystemWindowInsets();
+        });
     }
 
     public void showRecoveryKeyDialog(String recoveryKeyUrl) {
@@ -269,7 +277,7 @@ public class TourFragmentLollipop extends Fragment implements View.OnClickListen
         Intent intent = new Intent(context, ChangePasswordActivityLollipop.class);
         intent.setData(dataUri);
         if (key != null) {
-            intent.putExtra("MK", key);
+            intent.putExtra(EXTRA_MASTER_KEY, key);
             intent.setAction(ACTION_RESET_PASS_FROM_LINK);
         } else {
             intent.setAction(ACTION_RESET_PASS_FROM_PARK_ACCOUNT);
@@ -291,6 +299,7 @@ public class TourFragmentLollipop extends Fragment implements View.OnClickListen
                 break;
             case R.id.join_meeting_as_guest:
                 logDebug("onJoinMeetingAsGuestClick");
+                MegaApplication.setLoggingOut(false);
                 new PasteMeetingLinkGuestDialogFragment().show(getChildFragmentManager(),
                         PasteMeetingLinkGuestDialogFragment.TAG);
                 break;

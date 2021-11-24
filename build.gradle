@@ -5,7 +5,7 @@ buildscript {
     ext.navigationVersion = '2.3.5'
     ext.googleServicesVersion = '4.3.5'
     ext.hiltVersion = "2.29.1-alpha"
-    ext.huaweiServicesVersion = "1.4.1.300"
+    ext.huaweiServicesVersion = "1.5.2.300"
     ext.firebaseCrashlyticsVersion = "2.5.1"
     repositories {
         jcenter()
@@ -49,19 +49,19 @@ task clean(type: Delete) {
 // Define versions in a single place
 ext {
     // App
-    appVersion = "4.2.0"
-    versionCode = 388
+    appVersion = "5.2"
+    versionCode = 413
 
     // Sdk and tools
-    compileSdkVersion = 29
+    compileSdkVersion = 30
     minSdkVersion = 21
-    targetSdkVersion = 29
-    buildToolsVerion = '29.0.3'
+    targetSdkVersion = 30
+    buildToolsVerion = '30.0.2'
 
     // App dependencies
-    appCompatVersion = '1.2.0'
+    appCompatVersion = '1.3.1'
     daggerVersion = "2.24"
-    constraintLayoutVersion = '2.0.3'
+    constraintLayoutVersion = '2.1.1'
     coroutinesVersion = "1.4.1"
     fragmentKtxVersion = '1.2.5'
     glideVersion = '4.10.0'
@@ -69,7 +69,7 @@ ext {
     ktxVersion = '1.3.2'
     lifecycleVersion = '2.3.0'
     materialVersion = '1.3.0'
-    recyclerViewVersion = '1.1.0'
+    recyclerViewVersion = '1.2.1'
     roomVersion = '2.2.5'
     viewPagerVersion = '1.0.0'
     cardViewVersion = '1.0.0'
@@ -79,8 +79,11 @@ ext {
     rxAndroidVersion = '3.0.0'
     ankoVersion = '0.10.8'
     frescoVersion = '2.3.0'
-    playServicesAdsVersion = '19.7.0'
     bannerViewPagerVersion = '3.4.0'
     liveEventBus = '1.7.3'
     firebaseBom = '26.7.0'
+    junitVersion = '4.13.2'
+    truthVersion = '1.1.3'
+    androidxTestExtVersion = '1.1.3'
+    biometricVersion = '1.1.0'
 }

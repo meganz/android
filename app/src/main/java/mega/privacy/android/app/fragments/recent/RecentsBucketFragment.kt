@@ -28,6 +28,7 @@ import mega.privacy.android.app.utils.*
 import mega.privacy.android.app.utils.Constants.*
 import mega.privacy.android.app.utils.LogUtil.logDebug
 import mega.privacy.android.app.utils.MegaNodeUtil.manageTextFileIntent
+import mega.privacy.android.app.utils.MegaNodeUtil.manageURLNode
 import mega.privacy.android.app.utils.Util.getMediaIntent
 import mega.privacy.android.app.utils.Util.mutateIconSecondary
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
@@ -147,7 +148,7 @@ class RecentsBucketFragment : BaseFragment() {
 
     private fun setupToolbar() {
         (activity as ManagerActivityLollipop).setToolbarTitle(
-            "${viewModel.items.value?.size} ${getString(R.string.general_files).toUpperCase(Locale.ROOT)}"
+            "${viewModel.items.value?.size} ${getString(R.string.general_files)}"
         )
     }
 
@@ -171,7 +172,7 @@ class RecentsBucketFragment : BaseFragment() {
     ) {
         val mime = MimeTypeList.typeForName(node.name)
         val localPath =
-            FileUtil.getLocalFile(activity, node.name, node.size)
+            FileUtil.getLocalFile(node)
         logDebug("Open node: ${node.name} which mime is: ${mime.type}, local path is: $localPath")
 
         when {
@@ -182,7 +183,7 @@ class RecentsBucketFragment : BaseFragment() {
                 openAudioVideo(index, node, isMedia, localPath)
             }
             mime.isURL -> {
-                openURL(node, localPath)
+                manageURLNode(context, megaApi, node)
             }
             mime.isPdf -> {
                 openPdf(index, node, localPath)
@@ -215,20 +216,6 @@ class RecentsBucketFragment : BaseFragment() {
                     requireActivity() as ManagerActivityLollipop)
             }
         intent.putExtra(INTENT_EXTRA_KEY_HANDLE, node.handle)
-        openOrDownload(intent, paramsSetSuccessfully, node.handle)
-    }
-
-    private fun openURL(
-        node: MegaNode,
-        localPath: String?
-    ) {
-        val intent = Intent(Intent.ACTION_VIEW)
-        val paramsSetSuccessfully =
-            if (FileUtil.isLocalFile(node, megaApi, localPath)) {
-                FileUtil.setURLIntentParams(context, node, intent, localPath,
-                    requireActivity() as ManagerActivityLollipop)
-            } else false
-
         openOrDownload(intent, paramsSetSuccessfully, node.handle)
     }
 

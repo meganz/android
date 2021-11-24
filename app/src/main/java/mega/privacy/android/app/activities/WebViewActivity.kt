@@ -2,7 +2,6 @@ package mega.privacy.android.app.activities
 
 import android.Manifest.permission.*
 import android.annotation.SuppressLint
-import android.content.ActivityNotFoundException
 import android.content.ClipData
 import android.content.Intent
 import android.content.Intent.FLAG_GRANT_READ_URI_PERMISSION
@@ -18,6 +17,7 @@ import android.webkit.WebChromeClient
 import android.webkit.WebSettings.MIXED_CONTENT_NEVER_ALLOW
 import android.webkit.WebView
 import android.webkit.WebViewClient
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.FileProvider
 import mega.privacy.android.app.BaseActivity
 import mega.privacy.android.app.MegaApplication
@@ -30,8 +30,7 @@ import mega.privacy.android.app.utils.FileUtil.copyFileToDCIM
 import mega.privacy.android.app.utils.FileUtil.isFileAvailable
 import mega.privacy.android.app.utils.LogUtil.logError
 import mega.privacy.android.app.utils.PermissionUtils
-import mega.privacy.android.app.utils.PermissionUtils.hasPermissions
-import mega.privacy.android.app.utils.PermissionUtils.requestPermission
+import mega.privacy.android.app.utils.PermissionUtils.*
 import mega.privacy.android.app.utils.StringResourcesUtils
 import mega.privacy.android.app.utils.Util
 import java.io.File
@@ -42,7 +41,6 @@ import java.util.*
 class WebViewActivity : BaseActivity() {
 
     companion object {
-        private const val FILE_CHOOSER_RESULT_CODE = 1000
         private const val IMAGE_CONTENT_TYPE = 0
         private const val VIDEO_CONTENT_TYPE = 1
         private const val FILE = "file:"
@@ -114,7 +112,9 @@ class WebViewActivity : BaseActivity() {
                 MegaApplication.setIsWebOpenDueToEmailVerification(true)
             }
 
-            loadUrl(url)
+            if (url != null) {
+                loadUrl(url)
+            }
             binding.webProgressView.visibility = VISIBLE
             binding.webView.isEnabled = false
         }
@@ -126,23 +126,6 @@ class WebViewActivity : BaseActivity() {
     override fun onDestroy() {
         super.onDestroy()
         MegaApplication.setIsWebOpenDueToEmailVerification(false)
-    }
-
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-
-        if (requestCode != FILE_CHOOSER_RESULT_CODE) {
-            return
-        }
-
-        if (resultCode == RESULT_CANCELED) {
-            mFilePathCallback?.onReceiveValue(null)
-        } else if (resultCode == RESULT_OK && mFilePathCallback != null) {
-            manageResult(data)
-        }
-
-        pickedImage = null
-        pickedVideo = null
     }
 
     override fun onRequestPermissionsResult(
@@ -283,12 +266,18 @@ class WebViewActivity : BaseActivity() {
         chooserIntent.putExtra(Intent.EXTRA_INTENT, contentSelectionIntent)
         chooserIntent.putExtra(Intent.EXTRA_INITIAL_INTENTS, chooserArray)
 
-        try {
-            startActivityForResult(chooserIntent, FILE_CHOOSER_RESULT_CODE)
-        } catch (e: ActivityNotFoundException) {
-            logError("Error opening file chooser.", e)
-            return false
+        val chooserLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+            if (result.data == null) {
+                mFilePathCallback?.onReceiveValue(null)
+            } else if (mFilePathCallback != null) {
+                manageResult(result.data)
+            }
+
+            pickedImage = null
+            pickedVideo = null
         }
+
+        chooserLauncher.launch(chooserIntent)
 
         return true
     }

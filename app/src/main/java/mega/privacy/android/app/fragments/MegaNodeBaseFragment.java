@@ -51,8 +51,7 @@ import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.CustomizedGridLayoutManager;
-import mega.privacy.android.app.components.NewGridRecyclerView;
-import mega.privacy.android.app.components.NewHeaderItemDecoration;
+import mega.privacy.android.app.components.SimpleDividerItemDecoration;
 import mega.privacy.android.app.components.scrollBar.FastScroller;
 import mega.privacy.android.app.fragments.managerFragments.LinksFragment;
 import mega.privacy.android.app.globalmanagement.SortOrderManagement;
@@ -68,6 +67,7 @@ import mega.privacy.android.app.lollipop.managerSections.OutgoingSharesFragmentL
 import mega.privacy.android.app.lollipop.managerSections.RotatableFragment;
 import mega.privacy.android.app.utils.ColorUtils;
 import mega.privacy.android.app.utils.MegaNodeUtil;
+import mega.privacy.android.app.utils.StringResourcesUtils;
 import nz.mega.sdk.MegaNode;
 
 import static mega.privacy.android.app.components.dragger.DragToExitSupport.observeDragSupportEvents;
@@ -80,6 +80,7 @@ import static mega.privacy.android.app.utils.FileUtil.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.MegaApiUtils.*;
 import static mega.privacy.android.app.utils.MegaNodeUtil.manageTextFileIntent;
+import static mega.privacy.android.app.utils.MegaNodeUtil.manageURLNode;
 import static mega.privacy.android.app.utils.MegaNodeUtil.showConfirmationLeaveIncomingShares;
 import static mega.privacy.android.app.utils.Util.*;
 import static nz.mega.sdk.MegaApiJava.*;
@@ -87,8 +88,6 @@ import static nz.mega.sdk.MegaApiJava.*;
 @AndroidEntryPoint
 public abstract class MegaNodeBaseFragment extends RotatableFragment {
     private static int MARGIN_BOTTOM_LIST = 85;
-
-    private static final String AD_SLOT = "and4";
 
     @Inject
     protected
@@ -110,9 +109,6 @@ public abstract class MegaNodeBaseFragment extends RotatableFragment {
     protected LinearLayoutManager mLayoutManager;
     protected CustomizedGridLayoutManager gridLayoutManager;
 
-    public NewHeaderItemDecoration headerItemDecoration;
-    protected int placeholderCount;
-
     protected ImageView emptyImageView;
     protected LinearLayout emptyLinearLayout;
     protected TextView emptyTextViewFirst;
@@ -130,12 +126,6 @@ public abstract class MegaNodeBaseFragment extends RotatableFragment {
     public MegaNodeBaseFragment() {
         prefs = dbH.getPreferences();
         downloadLocationDefaultPath = getDownloadLocation();
-    }
-
-    @Override
-    public void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        initAdsLoader(AD_SLOT, true);
     }
 
     protected abstract class BaseActionBarCallBack implements ActionMode.Callback {
@@ -163,6 +153,10 @@ public abstract class MegaNodeBaseFragment extends RotatableFragment {
         @Override
         public boolean onPrepareActionMode(ActionMode actionMode, Menu menu) {
             selected = adapter.getSelectedNodes();
+
+            menu.findItem(R.id.cab_menu_share_link)
+                    .setTitle(StringResourcesUtils.getQuantityString(R.plurals.get_links, selected.size()));
+
             return false;
         }
 
@@ -416,63 +410,6 @@ public abstract class MegaNodeBaseFragment extends RotatableFragment {
         }
     }
 
-    public void addSectionTitle(List<MegaNode> nodes, int type) {
-        Map<Integer, String> sections = new HashMap<>();
-        int folderCount = 0;
-        int fileCount = 0;
-        for (MegaNode node : nodes) {
-            if (node == null) {
-                continue;
-            }
-            if (node.isFolder()) {
-                folderCount++;
-            }
-            if (node.isFile()) {
-                fileCount++;
-            }
-        }
-
-        if (type == ITEM_VIEW_TYPE_GRID) {
-            int spanCount = 2;
-            if (recyclerView instanceof NewGridRecyclerView) {
-                spanCount = ((NewGridRecyclerView) recyclerView).getSpanCount();
-            }
-            if (folderCount > 0) {
-                for (int i = 0; i < spanCount; i++) {
-                    sections.put(i, getString(R.string.general_folders));
-                }
-            }
-
-            if (fileCount > 0) {
-                placeholderCount = (folderCount % spanCount) == 0 ? 0 : spanCount - (folderCount % spanCount);
-                if (placeholderCount == 0) {
-                    for (int i = 0; i < spanCount; i++) {
-                        sections.put(folderCount + i, getString(R.string.general_files));
-                    }
-                } else {
-                    for (int i = 0; i < spanCount; i++) {
-                        sections.put(folderCount + placeholderCount + i, getString(R.string.general_files));
-                    }
-                }
-            }
-        } else {
-            placeholderCount = 0;
-            sections.put(0, getString(R.string.general_folders));
-            sections.put(folderCount, getString(R.string.general_files));
-        }
-
-        if (headerItemDecoration == null) {
-            logDebug("Create new decoration");
-            headerItemDecoration = new NewHeaderItemDecoration(context);
-        } else {
-            logDebug("Remove old decoration");
-            recyclerView.removeItemDecoration(headerItemDecoration);
-        }
-        headerItemDecoration.setType(type);
-        headerItemDecoration.setKeys(sections);
-        recyclerView.addItemDecoration(headerItemDecoration);
-    }
-
     public void checkScroll() {
         if (recyclerView != null) {
             if ((recyclerView.canScrollVertically(-1) && recyclerView.getVisibility() == View.VISIBLE) || (adapter != null && adapter.isMultipleSelect())) {
@@ -504,7 +441,7 @@ public abstract class MegaNodeBaseFragment extends RotatableFragment {
         if (mimeType.isImage()) {
             internalIntent = true;
             intent = new Intent(context, FullScreenImageViewerLollipop.class);
-            intent.putExtra("placeholder", placeholderCount);
+            intent.putExtra("placeholder", adapter.getPlaceholderCount());
             intent.putExtra("position", position);
             intent.putExtra("adapterType", fragmentAdapter);
             intent.putExtra("isFolderLink", false);
@@ -525,14 +462,14 @@ public abstract class MegaNodeBaseFragment extends RotatableFragment {
             }
 
             intent.putExtra("position", position);
-            intent.putExtra("placeholder", placeholderCount);
+            intent.putExtra("placeholder", adapter.getPlaceholderCount());
             intent.putExtra("parentNodeHandle", getParentHandle(fragmentAdapter));
             intent.putExtra("orderGetChildren", getIntentOrder(fragmentAdapter));
             intent.putExtra("adapterType", fragmentAdapter);
             intent.putExtra("HANDLE", node.getHandle());
             intent.putExtra("FILENAME", node.getName());
 
-            String localPath = getLocalFile(context, node.getName(), node.getSize());
+            String localPath = getLocalFile(node);
             if (localPath != null) {
                 File mediaFile = new File(localPath);
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
@@ -580,52 +517,8 @@ public abstract class MegaNodeBaseFragment extends RotatableFragment {
                 intent.setDataAndType(intent.getData(), "audio/*");
             }
         } else if (mimeType.isURL()) {
-            logDebug("Is URL file");
-            String localPath = getLocalFile(context, node.getName(), node.getSize());
-            
-            if (localPath != null) {
-                File f = new File(localPath);
-                InputStream instream = null;
-
-                try {
-                    // open the file for reading
-                    instream = new FileInputStream(f.getAbsolutePath());
-                    // prepare the file for reading
-                    InputStreamReader inputreader = new InputStreamReader(instream);
-                    BufferedReader buffreader = new BufferedReader(inputreader);
-
-                    String line1 = buffreader.readLine();
-                    if (line1 != null) {
-                        String line2 = buffreader.readLine();
-
-                        String url = line2.replace("URL=", "");
-
-                        logDebug("Is URL - launch browser intent");
-                        Intent i = new Intent(Intent.ACTION_VIEW);
-                        i.setData(Uri.parse(url));
-                        startActivity(i);
-                        return;
-                    }
-                } catch (Exception ex) {
-                    logError("EXCEPTION reading file", ex);
-                } finally {
-                    try {
-                        if (instream != null) {
-                            instream.close();
-                        }
-                    } catch (IOException e) {
-                        logError("EXCEPTION closing InputStream", e);
-                    }
-                }
-
-                intent = new Intent(Intent.ACTION_VIEW);
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                    intent.setDataAndType(FileProvider.getUriForFile(context, AUTHORITY_STRING_FILE_PROVIDER, f), TYPE_TEXT_PLAIN);
-                } else {
-                    intent.setDataAndType(Uri.fromFile(f), TYPE_TEXT_PLAIN);
-                }
-                intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-            }
+            manageURLNode(context, megaApi, node);
+            return;
         } else if (mimeType.isPdf()) {
             logDebug("isFile:isPdf");
             intent = new Intent(context, PdfViewerActivityLollipop.class);
@@ -633,7 +526,7 @@ public abstract class MegaNodeBaseFragment extends RotatableFragment {
             intent.putExtra("adapterType", fragmentAdapter);
             intent.putExtra("HANDLE", node.getHandle());
 
-            String localPath = getLocalFile(context, node.getName(), node.getSize());
+            String localPath = getLocalFile(node);
             if (localPath != null) {
                 File mediaFile = new File(localPath);
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
@@ -719,6 +612,7 @@ public abstract class MegaNodeBaseFragment extends RotatableFragment {
         recyclerView = v.findViewById(R.id.file_list_view_browser);
         mLayoutManager = new LinearLayoutManager(context);
         recyclerView.setLayoutManager(mLayoutManager);
+        recyclerView.addItemDecoration(new SimpleDividerItemDecoration(requireContext()));
         fastScroller = v.findViewById(R.id.fastscroll);
         setRecyclerView();
         recyclerView.setItemAnimator(noChangeRecyclerViewItemAnimator());
@@ -836,11 +730,6 @@ public abstract class MegaNodeBaseFragment extends RotatableFragment {
     @Override
     public void onViewCreated(@NonNull @NotNull View view, @Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        // Set the Ad view container to the Ads Loader,
-        // in order to let it know in where to show the Ads
-        mAdsLoader.setAdViewContainer(view.findViewById(R.id.ad_view_container),
-                managerActivity.getOutMetrics());
-
         observeDragSupportEvents(getViewLifecycleOwner(), recyclerView, viewerFrom());
     }
 }

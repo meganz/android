@@ -1,14 +1,15 @@
 package mega.privacy.android.app.meeting.adapter
 
+import android.graphics.Bitmap
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.ListAdapter
 import mega.privacy.android.app.databinding.ItemMeetingParticipantBinding
 import mega.privacy.android.app.meeting.listeners.BottomFloatingPanelListener
-import mega.privacy.android.app.meeting.fragments.InMeetingViewModel
+import mega.privacy.android.app.utils.Constants.AVATAR_CHANGE
+import mega.privacy.android.app.utils.Constants.NAME_CHANGE
 
 class ParticipantsAdapter(
-    private val inMeetingViewModel: InMeetingViewModel,
     private val listener: BottomFloatingPanelListener
 ) : ListAdapter<Participant, ParticipantViewHolder>(ParticipantDiffCallback()) {
 
@@ -19,7 +20,6 @@ class ParticipantsAdapter(
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ParticipantViewHolder {
         val inflater = LayoutInflater.from(parent.context)
         return ParticipantViewHolder(
-            inMeetingViewModel,
             ItemMeetingParticipantBinding.inflate(inflater, parent, false)
         ) {
             listener.onParticipantOption(getItem(it))
@@ -58,6 +58,39 @@ class ParticipantsAdapter(
         notifyItemChanged(index, me)
     }
 
+    /**
+     * Update the participant's name or avatar
+     *
+     * @param peerId User handle of the participant
+     * @param type the type of change, name or avatar
+     * @param newName new name
+     * @param newAvatar new avatar
+     */
+    fun updateParticipantInfo(peerId: Long, type: Int, newName: String, newAvatar: Bitmap? = null) {
+        val localList = this.currentList
+        if (localList.isNullOrEmpty()) {
+            return
+        }
+
+        val changeParticipants = this.currentList.filter { it.peerId == peerId }
+        if (changeParticipants.isNullOrEmpty()) {
+            return
+        }
+        changeParticipants.forEach { participant ->
+            val index = localList.indexOf(participant)
+            if (index < 0 || participant == null) {
+                return
+            }
+
+            when(type){
+                NAME_CHANGE -> participant.name = newName
+                AVATAR_CHANGE -> participant.avatar = newAvatar
+            }
+
+            notifyItemChanged(index)
+        }
+    }
+
 
     /**
      * Update the icon when the state of other participant's mic or cam changing
@@ -88,8 +121,9 @@ class ParticipantsAdapter(
      *
      * @param peerId   User handle of the participant
      * @param clientId Client identifier of the participant
+     * @param participantModerator new permission
      */
-    fun updateParticipantPermission(peerId: Long, clientId: Long){
+    fun updateParticipantPermission(peerId: Long, clientId: Long, participantModerator: Boolean){
         val localList = this.currentList
         if (localList.isNullOrEmpty()) {
             return
@@ -102,7 +136,7 @@ class ParticipantsAdapter(
         }
 
         val participant = participants.last()
-        participant.isModerator = inMeetingViewModel.isParticipantModerator(peerId)
+        participant.isModerator = participantModerator
         val index = localList.indexOf(participant)
         notifyItemChanged(index, participant)
     }

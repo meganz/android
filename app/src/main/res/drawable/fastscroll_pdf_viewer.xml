@@ -2,13 +2,13 @@
 <layer-list xmlns:android="http://schemas.android.com/apk/res/android" >
      <item>
         <shape android:shape="oval" android:useLevel="false">
-            <solid android:color="@color/teal_300_alpha_090"/>
+            <solid android:color="@color/scroll_handle"/>
         </shape>
     </item>
     <item
         android:drawable="@drawable/ic_scroll_white"
-        android:bottom="12dp"
+        android:bottom="10dp"
         android:left="10dp"
-        android:right="20dp"
-        android:top="12dp"/>
+        android:right="10dp"
+        android:top="10dp"/>
 </layer-list>

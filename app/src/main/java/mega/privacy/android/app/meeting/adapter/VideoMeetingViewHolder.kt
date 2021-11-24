@@ -1,22 +1,21 @@
 package mega.privacy.android.app.meeting.adapter
 
 import android.content.res.Configuration
-import android.view.TextureView
 import android.view.ViewGroup
-import android.view.ViewGroup.LayoutParams.MATCH_PARENT
-import android.widget.RelativeLayout
+import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
 import mega.privacy.android.app.databinding.ItemParticipantVideoBinding
 import mega.privacy.android.app.meeting.MegaSurfaceRenderer
 import mega.privacy.android.app.meeting.fragments.InMeetingViewModel
-import mega.privacy.android.app.meeting.listeners.GroupVideoListener
+import mega.privacy.android.app.utils.Constants.AVATAR_CHANGE
+import mega.privacy.android.app.utils.Constants.NAME_CHANGE
 import mega.privacy.android.app.utils.LogUtil.logDebug
 import mega.privacy.android.app.utils.LogUtil.logError
+import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.Util.dp2px
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
@@ -30,7 +29,6 @@ class VideoMeetingViewHolder(
     private val binding: ItemParticipantVideoBinding,
     private val screenWidth: Int,
     private val screenHeight: Int,
-    private val orientation: Int,
     private val isGrid: Boolean,
     private val listenerRenderer: MegaSurfaceRenderer.MegaSurfaceRendererListener?,
     private val onPageClickedCallback: (() -> Unit)?
@@ -66,7 +64,7 @@ class VideoMeetingViewHolder(
         if (isGrid) {
             avatarSize = BIG_AVATAR
 
-            if (orientation == Configuration.ORIENTATION_PORTRAIT) {
+            if (Util.getCurrentOrientation() == Configuration.ORIENTATION_PORTRAIT) {
                 portraitLayout(isFirstPage, itemCount)
             } else {
                 landscapeLayout(isFirstPage, itemCount)
@@ -85,19 +83,37 @@ class VideoMeetingViewHolder(
                 inMeetingViewModel.onItemClick(participant)
             }
 
+
+            (binding.muteIcon.layoutParams as ConstraintLayout.LayoutParams).apply {
+                bottomMargin = 0
+            }
+
+            (binding.moderatorIcon.layoutParams as ConstraintLayout.LayoutParams).apply {
+                bottomMargin = 0
+            }
+
             binding.name.isVisible = false
         }
-
-        initAvatar(participant)
 
         if (!isGrid) {
             inMeetingViewModel.addParticipantVisible(participant)
         }
 
+        initAvatar(participant)
+
         if (isGrid || isDrawing) {
-            logDebug("Remove the video initially")
-            inMeetingViewModel.onCloseVideo(participant)
-            removeTextureView(participant)
+            inMeetingViewModel.getSession(participant.clientId)?.let {
+                participant.videoListener?.let { listener ->
+                    logDebug("Removing listener, clientID ${participant.clientId}")
+                    inMeetingViewModel.removeChatRemoteVideoListener(
+                        listener,
+                        participant.clientId,
+                        inMeetingViewModel.getChatId(),
+                        participant.hasHiRes
+                    )
+                    removeListener(participant)
+                }
+            }
         }
 
         checkUI(participant)
@@ -118,7 +134,6 @@ class VideoMeetingViewHolder(
         paramsOnHoldIcon.width = dp2px(avatarSize.toFloat())
         paramsOnHoldIcon.height = dp2px(avatarSize.toFloat())
         binding.onHoldIcon.layoutParams = paramsOnHoldIcon
-
         binding.avatar.setImageBitmap(participant.avatar)
     }
 
@@ -152,9 +167,9 @@ class VideoMeetingViewHolder(
     private fun videoOnUI(participant: Participant) {
         if (isInvalid(participant)) return
 
-        logDebug("UI video on")
+        logDebug("UI video on for clientId ${participant.clientId}")
         hideAvatar(participant)
-        activateVideo(participant, !isGrid)
+        activateVideo(participant)
     }
 
     /**
@@ -176,29 +191,33 @@ class VideoMeetingViewHolder(
      *
      * @param participant Participant whose video is to be activated
      */
-    private fun activateVideo(participant: Participant, isSpeaker: Boolean) {
+    private fun activateVideo(participant: Participant) {
         if (isInvalid(participant)) return
 
+        if (!inMeetingViewModel.isParticipantVisible(participant)) {
+            logDebug("No activate video, the participant with clientId ${participant.clientId} is not visible")
+            return
+        }
+
+        logDebug("Activate video, the participant with clientId ${participant.clientId} is visible")
         if (participant.videoListener == null) {
-            logDebug("Active video when listener is null")
             binding.parentTextureView.removeAllViews()
-            val myTexture = TextureView(MegaApplication.getInstance().applicationContext)
-            myTexture.layoutParams = RelativeLayout.LayoutParams(MATCH_PARENT, MATCH_PARENT)
-            myTexture.alpha = AVATAR_VIDEO_VISIBLE
-            myTexture.rotation = ROTATION
+            createListener(participant)
 
-            val vListener = GroupVideoListener(
-                myTexture,
-                participant.peerId,
-                participant.clientId,
-                false
-            )
-
-            participant.videoListener = vListener
-            binding.parentTextureView.addView(participant.videoListener!!.textureView)
-            participant.videoListener!!.localRenderer?.addListener(listenerRenderer)
+            inMeetingViewModel.getSession(participant.clientId)?.let {
+                if (participant.hasHiRes && !it.canRecvVideoHiRes() && it.isHiResVideo) {
+                    logDebug("Asking for HiRes video, clientId ${participant.clientId}")
+                    inMeetingViewModel.requestHiResVideo(it, inMeetingViewModel.currentChatId)
+                } else if (!participant.hasHiRes && !it.canRecvVideoLowRes() && it.isLowResVideo) {
+                    logDebug("Asking for LowRes video, clientId ${participant.clientId}")
+                    inMeetingViewModel.requestLowResVideo(it, inMeetingViewModel.currentChatId)
+                } else {
+                    logDebug("Already have LowRes/HiRes video, clientId ${participant.clientId}")
+                    updateListener(participant, true, participant.hasHiRes)
+                }
+            }
         } else {
-            logDebug("Active video when listener is not null")
+            logDebug("Listener is not null ${participant.clientId}")
             if (binding.parentTextureView.childCount > 0) {
                 binding.parentTextureView.removeAllViews()
             }
@@ -215,8 +234,30 @@ class VideoMeetingViewHolder(
             participant.videoListener?.width = 0
         }
 
-        inMeetingViewModel.onActivateVideo(participant, isSpeaker)
         binding.parentTextureView.isVisible = true
+    }
+
+    /**
+     * Close Video of participant in a meeting. Removing resolution and listener.
+     *
+     * @param participant The participant from whom the video is to be closed
+     */
+    fun removeResolutionAndListener(participant: Participant) {
+        if (isInvalid(participant) || participant.videoListener == null) return
+
+        logDebug("Close video of ${participant.clientId}")
+        participant.videoListener?.let {
+            inMeetingViewModel.removeResolutionAndListener(participant, it)
+
+            if (binding.parentTextureView.childCount > 0) {
+                binding.parentTextureView.removeAllViews()
+                binding.parentTextureView.removeAllViewsInLayout()
+            }
+
+            removeListener(participant)
+        }
+
+        binding.parentTextureView.isVisible = false
     }
 
     /**
@@ -254,9 +295,33 @@ class VideoMeetingViewHolder(
         if (isInvalid(participant)) return
 
         logDebug("Close video of ${participant.clientId}")
+        inMeetingViewModel.removeRemoteVideoResolution(participant)
         binding.parentTextureView.isVisible = false
+    }
 
-        inMeetingViewModel.onCloseVideo(participant)
+    /**
+     * Method for creating the video listener
+     *
+     * @param participant The participant whose video listener is going to be created
+     */
+    fun createListener(participant: Participant) {
+        if (isInvalid(participant)) return
+
+        participant.videoListener =
+            inMeetingViewModel.createVideoListener(participant, AVATAR_VIDEO_VISIBLE, ROTATION)
+        participant.videoListener?.let { listener ->
+            binding.parentTextureView.addView(listener.textureView)
+            listener.localRenderer?.addListener(listenerRenderer)
+        }
+    }
+
+    /**
+     * Method for removing the video listener
+     *
+     * @param participant The participant whose video listener is going to be removed
+     */
+    fun removeListener(participant: Participant) {
+        if (isInvalid(participant)) return
 
         participant.videoListener?.let { listener ->
             listener.localRenderer?.addListener(null)
@@ -272,9 +337,41 @@ class VideoMeetingViewHolder(
                 }
             }
 
-            if (participant.videoListener != null) {
-                logDebug("Participant ${participant.clientId} video listener null")
-                participant.videoListener = null
+            logDebug("Participant ${participant.clientId} video listener null")
+            participant.videoListener = null
+        }
+    }
+
+    /**
+     * Method to add or remove video listener
+     *
+     * @param participant The participant whose listener of the video is to be added or removed
+     * @param shouldAddListener True, if the listener is to be added. False, if the listener should be removed
+     * @param isHiRes True, if it has high resolution. False, otherwise
+     */
+    fun updateListener(participant: Participant, shouldAddListener: Boolean, isHiRes: Boolean) {
+        if (isInvalid(participant)) return
+
+        if (shouldAddListener) {
+            if (participant.isVideoOn && !inMeetingViewModel.isCallOrSessionOnHold(participant.clientId)) {
+                if (participant.videoListener == null) {
+                    createListener(participant)
+                }
+
+                participant.videoListener?.let { listener ->
+                    logDebug("Adding listener, clientID ${participant.clientId}")
+                    inMeetingViewModel.addChatRemoteVideoListener(
+                        listener,
+                        participant.clientId,
+                        inMeetingViewModel.getChatId(), isHiRes
+                    )
+                }
+            }
+        } else {
+            participant.videoListener?.let { listener ->
+                logDebug("Removing listener, clientID ${participant.clientId}")
+                inMeetingViewModel.removeRemoteVideoListener(participant, listener)
+                removeListener(participant)
             }
         }
     }
@@ -344,15 +441,19 @@ class VideoMeetingViewHolder(
     }
 
     /**
-     * Update name and avatar
+     * Update name or avatar
      *
      * @param participant Participant whose name needs to be updated
+     * @param type the type of change, name or avatar
      */
-    fun updateName(participant: Participant) {
+    fun updateNameOrAvatar(participant: Participant, type: Int) {
         if (isInvalid(participant)) return
 
         logDebug("Update name")
-        binding.avatar.setImageBitmap(participant.avatar)
+        when (type) {
+            NAME_CHANGE -> binding.name.text = participant.name
+            AVATAR_CHANGE -> binding.avatar.setImageBitmap(participant.avatar)
+        }
     }
 
     /**
@@ -414,35 +515,6 @@ class VideoMeetingViewHolder(
     }
 
     /**
-     * Remove Texture view when fragment is destroyed
-     *
-     * @param participant Participant from whom the texture view is to be deleted
-     */
-    fun removeTextureView(participant: Participant) {
-        if (isInvalid(participant)) return
-
-        logDebug("Removing texture view of ${participant.clientId}")
-        if (binding.parentTextureView.childCount > 0) {
-            binding.parentTextureView.removeAllViews()
-            binding.parentTextureView.removeAllViewsInLayout()
-        }
-
-        participant.videoListener?.let { listener ->
-            listener.localRenderer?.addListener(null)
-            listener.textureView?.let { view ->
-                view.parent?.let { surfaceParent ->
-                    (surfaceParent as ViewGroup).removeView(view)
-                }
-            }
-        }
-
-        if (participant.videoListener != null) {
-            logDebug("Participant ${participant.clientId} video listener null")
-            participant.videoListener = null
-        }
-    }
-
-    /**
      * Method for controlling the UI in landscape mode
      *
      * @param isFirstPage True, if it's page 0. False, otherwise
@@ -452,7 +524,6 @@ class VideoMeetingViewHolder(
         if (!isGrid) return
 
         val borderWidth = dp2px(BORDER_WIDTH)
-
         var w = 0
         var h = 0
 
@@ -476,32 +547,92 @@ class VideoMeetingViewHolder(
                 SLOT_NUM_2 -> {
                     w = screenWidth / TWO_COLUMNS
                     h = screenHeight
+
+                    when (bindingAdapterPosition) {
+                        POSITION_0 -> {
+                            w -= borderWidth
+                        }
+                    }
                 }
                 SLOT_NUM_3 -> {
                     w = (screenWidth / THREE_COLUMNS)
                     h = (screenHeight * 0.6).toInt()
                     marginBottom = screenHeight - h
+                    when (bindingAdapterPosition) {
+                        POSITION_0, POSITION_1 -> {
+                            w -= borderWidth
+                        }
+                    }
                 }
                 SLOT_NUM_4 -> {
                     w = (screenWidth / FOUR_COLUMNS)
-                    h = (screenHeight / TWO_FILES)
+                    h = (screenHeight - borderWidth) / TWO_FILES
+                    when (bindingAdapterPosition) {
+                        POSITION_0 -> {
+                            w -= borderWidth
+                            marginBottom = borderWidth
+                        }
+                        POSITION_1 -> {
+                            marginBottom = borderWidth
+                        }
+                        POSITION_2 -> {
+                            w -= borderWidth
+                        }
+                    }
                 }
                 SLOT_NUM_5 -> {
                     w = screenWidth / FOUR_COLUMNS
-                    h = screenHeight / TWO_FILES
+                    h = (screenHeight - borderWidth) / TWO_FILES
 
-                    when (adapterPosition) {
-                        POSITION_3, POSITION_4 -> marginLeft = w / 2
+                    when (bindingAdapterPosition) {
+                        POSITION_0, POSITION_1 -> {
+                            w -= borderWidth
+                            marginBottom = borderWidth
+                        }
+                        POSITION_2 -> {
+                            marginBottom = borderWidth
+                        }
+                        POSITION_3 -> {
+                            w -= borderWidth
+                            marginLeft = w / 2
+                        }
+                        POSITION_4 -> {
+                            marginLeft = w / 2
+                        }
                     }
                 }
                 SLOT_NUM_6 -> {
-                    w = (screenWidth / FOUR_COLUMNS)
-                    h = (screenHeight / TWO_FILES)
+                    w = screenWidth / FOUR_COLUMNS
+                    h = (screenHeight - borderWidth) / TWO_FILES
+                    when (bindingAdapterPosition) {
+                        POSITION_0, POSITION_1 -> {
+                            w -= borderWidth
+                            marginBottom = borderWidth
+                        }
+                        POSITION_2 -> {
+                            marginBottom = borderWidth
+                        }
+                        POSITION_3, POSITION_4 -> {
+                            w -= borderWidth
+                        }
+                    }
                 }
             }
         } else {
-            w = (screenWidth / FOUR_COLUMNS)
-            h = (screenHeight / TWO_FILES)
+            w = screenWidth / FOUR_COLUMNS
+            h = (screenHeight - borderWidth) / TWO_FILES
+            when (bindingAdapterPosition) {
+                POSITION_0, POSITION_1 -> {
+                    w -= borderWidth
+                    marginBottom = borderWidth
+                }
+                POSITION_2 -> {
+                    marginBottom = borderWidth
+                }
+                POSITION_3, POSITION_4 -> {
+                    w -= borderWidth
+                }
+            }
         }
 
         layoutParams.setMargins(marginLeft, marginTop, marginRight, marginBottom)
@@ -520,6 +651,9 @@ class VideoMeetingViewHolder(
 
         val borderWidth = dp2px(BORDER_WIDTH)
 
+        // Margin top for the first and second items when total item count >= 4.
+        val nonZeroMarginTop = (screenHeight - screenWidth / 2 * 3) / 2
+
         var w = 0
         var h = 0
 
@@ -529,7 +663,7 @@ class VideoMeetingViewHolder(
         var marginLeft = 0
         var marginTop = 0
         var marginRight = 0
-        var marginBottom = 0
+        val marginBottom = 0
 
         if (isFirstPage) {
             when (itemCount) {
@@ -541,9 +675,8 @@ class VideoMeetingViewHolder(
                     w = screenWidth
                     h = screenHeight / TWO_FILES
 
-                    // The 0 item has a bottom border.
-                    when (adapterPosition) {
-                        POSITION_0 -> marginBottom = borderWidth
+                    when (bindingAdapterPosition) {
+                        POSITION_1 -> marginTop = borderWidth
                     }
                 }
                 SLOT_NUM_3 -> {
@@ -552,38 +685,35 @@ class VideoMeetingViewHolder(
                     marginLeft = (screenWidth - w) / 2
                     marginRight = marginLeft
 
-                    // The 0, 1 item have a bottom border.
-                    when (adapterPosition) {
-                        POSITION_0, POSITION_1 -> marginBottom = borderWidth
+                    when (bindingAdapterPosition) {
+                        POSITION_1, POSITION_2 -> marginTop = borderWidth
                     }
                 }
                 SLOT_NUM_4 -> {
                     w = screenWidth / TWO_COLUMNS
                     h = w
 
-                    when (adapterPosition) {
-                        POSITION_0, POSITION_1 -> {
-                            marginTop = ((screenHeight - screenWidth / 2 * 3) / 2)
-                            marginBottom = borderWidth
-                        }
+                    when (bindingAdapterPosition) {
+                        POSITION_0, POSITION_1 -> marginTop = nonZeroMarginTop
                     }
 
-                     when (adapterPosition) {
-                        POSITION_1, POSITION_3 -> marginLeft =borderWidth
+                    when (bindingAdapterPosition) {
+                        POSITION_2, POSITION_3 -> marginTop = borderWidth
+                    }
+
+                    when (bindingAdapterPosition) {
+                        POSITION_1, POSITION_3 -> marginLeft = borderWidth
                     }
                 }
                 SLOT_NUM_5 -> {
                     w = screenWidth / TWO_COLUMNS
                     h = w
 
-                    when (adapterPosition) {
-                        POSITION_0, POSITION_1 -> {
-                            marginTop = ((screenHeight - screenWidth / 2 * 3) / 2)
-                            marginBottom = borderWidth
-                        }
-                        POSITION_2, POSITION_3 -> {
-                            marginTop = 0
-                        }
+                    when (bindingAdapterPosition) {
+                        POSITION_0, POSITION_1 -> marginTop = nonZeroMarginTop
+
+                        POSITION_2, POSITION_3 -> marginTop = borderWidth
+
                         POSITION_4 -> {
                             marginTop = borderWidth
                             marginLeft = (screenWidth - w) / 2
@@ -591,30 +721,21 @@ class VideoMeetingViewHolder(
                         }
                     }
 
-                     when (adapterPosition) {
-                        POSITION_1, POSITION_3 -> marginLeft =borderWidth
+                    when (bindingAdapterPosition) {
+                        POSITION_1, POSITION_3 -> marginLeft = borderWidth
                     }
                 }
                 SLOT_NUM_6 -> {
                     w = screenWidth / TWO_COLUMNS
                     h = w
 
-                    when (adapterPosition) {
-                        POSITION_0, POSITION_1 -> {
-                            marginTop = ((screenHeight - screenWidth / 2 * 3) / 2)
-                            marginBottom = borderWidth
-                        }
-                        POSITION_2, POSITION_3 -> {
-                            marginTop = 0
-                            marginBottom = 0
-                        }
-                        POSITION_4, POSITION_5 -> {
-                            marginTop = borderWidth
-                            marginBottom = 0
-                        }
+                    when (bindingAdapterPosition) {
+                        POSITION_0, POSITION_1 -> marginTop = nonZeroMarginTop
+
+                        POSITION_2, POSITION_3, POSITION_4, POSITION_5 -> marginTop = borderWidth
                     }
 
-                    when (adapterPosition) {
+                    when (bindingAdapterPosition) {
                         POSITION_1, POSITION_3, POSITION_5 -> marginLeft = borderWidth
                     }
                 }
@@ -623,16 +744,16 @@ class VideoMeetingViewHolder(
             w = screenWidth / TWO_COLUMNS
             h = w
 
-            when (adapterPosition) {
-                POSITION_0, POSITION_1 -> marginTop = ((screenHeight - screenWidth / 2 * 3) / 2)
+            when (bindingAdapterPosition) {
+                POSITION_0, POSITION_1 -> marginTop = nonZeroMarginTop
+
+                POSITION_2, POSITION_3, POSITION_4, POSITION_5 -> {
+                    marginTop = borderWidth
+                }
             }
 
-            when (adapterPosition) {
-                POSITION_0, POSITION_1, POSITION_2, POSITION_3 -> marginBottom = borderWidth
-            }
-
-            when (adapterPosition) {
-                POSITION_0, POSITION_2, POSITION_4 -> marginRight = borderWidth
+            when (bindingAdapterPosition) {
+                POSITION_1, POSITION_3, POSITION_5 -> marginLeft = borderWidth
             }
         }
 
@@ -651,12 +772,14 @@ class VideoMeetingViewHolder(
         if (isGrid) return
 
         isDrawing = false
-        inMeetingViewModel.getParticipant(peerId, clientId)?.let {
-            if (it.isVideoOn) {
-                logDebug("Recycle participant in the list, participant clientId is ${it.clientId}")
-                inMeetingViewModel.removeParticipantVisible(it)
-                inMeetingViewModel.onCloseVideo(it)
-                removeTextureView(it)
+        inMeetingViewModel.getParticipant(peerId, clientId)?.let { participant ->
+            inMeetingViewModel.removeParticipantVisible(participant)
+
+            if (participant.isVideoOn) {
+                logDebug("Recycle participant in the list, participant clientId is ${participant.clientId}")
+                participant.videoListener?.let {
+                    removeResolutionAndListener(participant)
+                }
             }
         }
     }
@@ -684,7 +807,7 @@ class VideoMeetingViewHolder(
         const val TWO_FILES = 2
         const val THREE_COLUMNS = 3
         const val THREE_FILES = 3
-        const val FOUR_COLUMNS = 3
+        const val FOUR_COLUMNS = 4
         const val SLOT_NUM_1 = 1
         const val SLOT_NUM_2 = 2
         const val SLOT_NUM_3 = 3
@@ -696,6 +819,6 @@ class VideoMeetingViewHolder(
         const val POSITION_2 = 2
         const val POSITION_3 = 3
         const val POSITION_4 = 4
-        const val POSITION_5 = 6
+        const val POSITION_5 = 5
     }
 }

@@ -21,10 +21,12 @@ import androidx.annotation.Nullable;
 import androidx.core.content.FileProvider;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -317,23 +319,29 @@ public class FileUtil {
     }
 
     /**
-     * Checks if a local file exists
+     * Checks if the received MegaNode exists in local.
      *
-     * @param context  the current context
-     * @param fileName name of the file
-     * @param fileSize size of the file
-     * @return The path of the file if the local file exists, null otherwise
+     * @param node MegaNode to check.
+     * @return The path of the file if the local file exists, null otherwise.
      */
-    public static String getLocalFile(Context context, String fileName, long fileSize) {
-        if (context == null) {
-            context = MegaApplication.getInstance();
+    public static String getLocalFile(MegaNode node) {
+        if (node == null) {
+            logWarning("Node is null");
+            return null;
         }
 
+        String path;
+        Context context = MegaApplication.getInstance();
         String data = MediaStore.Files.FileColumns.DATA;
         final String[] projection = {data};
-        final String selection = MediaStore.Files.FileColumns.DISPLAY_NAME + " = ? AND " + MediaStore.Files.FileColumns.SIZE + " = ?";
-        final String[] selectionArgs = {fileName, String.valueOf(fileSize)};
-        String path;
+        final String selection = MediaStore.Files.FileColumns.DISPLAY_NAME + " = ? AND "
+                + MediaStore.Files.FileColumns.SIZE + " = ? AND "
+                + MediaStore.Files.FileColumns.DATE_MODIFIED + " = ?";
+
+        final String[] selectionArgs = {
+                node.getName(),
+                String.valueOf(node.getSize()),
+                String.valueOf(node.getModificationTime())};
 
         try {
             Cursor cursor = context.getContentResolver().query(
@@ -341,6 +349,7 @@ public class FileUtil {
                     selectionArgs, null);
 
             path = checkFileInStorage(cursor, data);
+
             if (path == null) {
                 cursor = context.getContentResolver().query(
                         MediaStore.Files.getContentUri(VOLUME_INTERNAL), projection, selection,
@@ -713,10 +722,35 @@ public class FileUtil {
         return Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && Build.VERSION.SDK_INT < Build.VERSION_CODES.Q;
     }
 
+    /**
+     * The full path of a SD card URI has two parts:
+     * 1. SD card root path, can get it from SDCardOperator. For example: /storage/2BA3-12F1.
+     * 2. User selected specific folder path on the SD card, can get it from getDocumentPathFromTreeUri.
+     *
+     * @param treeUri The URI of the selected SD card location.
+     * @param con Context object.
+     * @return Path of the selected SD card location.
+     */
     @Nullable
     public static String getFullPathFromTreeUri(@Nullable final Uri treeUri, Context con) {
         if (treeUri == null) return null;
-        String volumePath = getVolumePath(getVolumeIdFromTreeUri(treeUri), con);
+
+        String volumePath;
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            SDCardOperator operator;
+            try {
+                operator = new SDCardOperator(con);
+            } catch (SDCardOperator.SDCardException e) {
+                e.printStackTrace();
+                logError(e.getMessage(), e);
+                return null;
+            }
+
+            volumePath = operator.getSDCardRoot();
+        } else {
+            volumePath = getVolumePath(getVolumeIdFromTreeUri(treeUri), con);
+        }
+
         if (volumePath == null) return File.separator;
         if (volumePath.endsWith(File.separator))
             volumePath = volumePath.substring(0, volumePath.length() - 1);
@@ -733,10 +767,7 @@ public class FileUtil {
         } else return volumePath;
     }
 
-
-    @SuppressLint("ObsoleteSdkInt")
     private static String getVolumePath(final String volumeId, Context context) {
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) return null;
         try {
             StorageManager mStorageManager = (StorageManager) context.getSystemService(Context.STORAGE_SERVICE);
             Class<?> storageVolumeClazz = Class.forName("android.os.storage.StorageVolume");
@@ -941,6 +972,66 @@ public class FileUtil {
      */
     public static String getFileInfo(File file) {
         return TextUtil.getFileInfo(getSizeString(file.length()), formatLongDateTime(file.lastModified() / 1000));
+    }
+
+    /**
+     * Saves some text on a file.
+     *
+     * @param context         Current context.
+     * @param content         The content to store.
+     * @param path            The selected location to save the file.
+     * @param sdCardUriString If the selected location is on SD card, need the uri to grant SD card write permission.
+     * @return True if content was correctly saved, false otherwise.
+     */
+    public static boolean saveTextOnFile(Context context, String content, String path, String sdCardUriString) {
+        try {
+            // If export the file to SD card.
+            if (SDCardUtils.isLocalFolderOnSDCard(context, path)) {
+                // Export to cache folder root first.
+                File temp = new File(context.getCacheDir() + File.separator + getRecoveryKeyFileName());
+
+                if (!saveContentOnFile(content, new FileWriter(temp))){
+                    return false;
+                }
+
+                // Copy to target location on SD card.
+                SDCardOperator sdCardOperator = new SDCardOperator(context);
+                DatabaseHandler dbH = DatabaseHandler.getDbHandler(context);
+                // If the `sdCardUriString` is null, get SD card root uri from database.
+                sdCardOperator.initDocumentFileRoot(sdCardUriString == null ? dbH.getSDCardUri() : sdCardUriString);
+                sdCardOperator.moveFile(path.substring(0, path.lastIndexOf(File.separator)), temp);
+
+                // Delete the temp file.
+                temp.delete();
+            } else {
+                return saveContentOnFile(content, new FileWriter(path));
+            }
+        } catch (SDCardOperator.SDCardException | IOException e) {
+            logError("IOException saving content.", e);
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * Saves some text on a file.
+     *
+     * @param content    Text content to save.
+     * @param fileWriter The selected location to save the file.
+     * @return True if content was correctly saved, false otherwise.
+     */
+    private static boolean saveContentOnFile(String content, FileWriter fileWriter) {
+        try {
+            BufferedWriter out = new BufferedWriter(fileWriter);
+            out.write(content);
+            out.close();
+        } catch (IOException e) {
+            logError("IOException saving content.", e);
+            return false;
+        }
+
+        return true;
     }
 }
 

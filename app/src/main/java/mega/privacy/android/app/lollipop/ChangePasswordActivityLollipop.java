@@ -1,11 +1,12 @@
 package mega.privacy.android.app.lollipop;
 
 import android.annotation.SuppressLint;
-import android.app.ProgressDialog;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import com.google.android.material.textfield.TextInputLayout;
+
+import androidx.appcompat.app.AlertDialog;
 import androidx.core.content.ContextCompat;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.widget.AppCompatEditText;
@@ -26,13 +27,13 @@ import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.activities.WebViewActivity;
 import mega.privacy.android.app.activities.PasscodeActivity;
+import mega.privacy.android.app.utils.MegaProgressDialogUtil;
 import mega.privacy.android.app.lollipop.controllers.AccountController;
 import mega.privacy.android.app.utils.ColorUtils;
 import nz.mega.sdk.MegaApiAndroid;
@@ -41,6 +42,7 @@ import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
 
+import static mega.privacy.android.app.constants.IntentConstants.EXTRA_MASTER_KEY;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.ConstantsUrl.RECOVERY_URL;
 import static mega.privacy.android.app.utils.LogUtil.*;
@@ -52,7 +54,7 @@ public class ChangePasswordActivityLollipop extends PasscodeActivity implements 
 
 	public static final String KEY_IS_LOGOUT = "logout";
 
-	private ProgressDialog progress;
+	private AlertDialog progress;
 	
 	float scaleH, scaleW;
 	float density;
@@ -70,7 +72,7 @@ public class ChangePasswordActivityLollipop extends PasscodeActivity implements 
 	private AppCompatEditText newPassword2;
 	private ImageView newPassword2Error;
 	private Button changePasswordButton;
-    private RelativeLayout fragmentContainer;
+    private LinearLayout generalContainer;
 	private TextView title;
 	private String linkToReset;
 	private String mk;
@@ -99,7 +101,7 @@ public class ChangePasswordActivityLollipop extends PasscodeActivity implements 
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_change_password);
 		
-        fragmentContainer = (RelativeLayout) findViewById(R.id.fragment_container_change_pass);
+        generalContainer = findViewById(R.id.change_password_container);
 		megaApi = ((MegaApplication)getApplication()).getMegaApi();
 
 		display = getWindowManager().getDefaultDisplay();
@@ -110,19 +112,19 @@ public class ChangePasswordActivityLollipop extends PasscodeActivity implements 
 	    scaleW = getScaleW(outMetrics, density);
 	    scaleH = getScaleH(outMetrics, density);
 
-		title = (TextView) findViewById(R.id.title_change_pass);
+		TextView title = findViewById(R.id.title_change_pass);
 
 		passwdValid = false;
 
-		containerPasswdElements = (LinearLayout) findViewById(R.id.container_passwd_elements);
+		containerPasswdElements = findViewById(R.id.container_passwd_elements);
 		containerPasswdElements.setVisibility(View.GONE);
-		firstShape = (ImageView) findViewById(R.id.shape_passwd_first);
-		secondShape = (ImageView) findViewById(R.id.shape_passwd_second);
-		tirdShape = (ImageView) findViewById(R.id.shape_passwd_third);
-		fourthShape = (ImageView) findViewById(R.id.shape_passwd_fourth);
-		fifthShape = (ImageView) findViewById(R.id.shape_passwd_fifth);
-		passwdType = (TextView) findViewById(R.id.password_type);
-		passwdAdvice = (TextView) findViewById(R.id.password_advice_text);
+		firstShape = findViewById(R.id.shape_passwd_first);
+		secondShape = findViewById(R.id.shape_passwd_second);
+		tirdShape = findViewById(R.id.shape_passwd_third);
+		fourthShape = findViewById(R.id.shape_passwd_fourth);
+		fifthShape = findViewById(R.id.shape_passwd_fifth);
+		passwdType = findViewById(R.id.password_type);
+		passwdAdvice = findViewById(R.id.password_advice_text);
 
 		newPassword1Layout = findViewById(R.id.change_password_newPassword1_layout);
 		newPassword1Layout.setEndIconVisible(false);
@@ -189,8 +191,10 @@ public class ChangePasswordActivityLollipop extends PasscodeActivity implements 
 			}
 		});
 
-		changePasswordButton = (Button) findViewById(R.id.action_change_password);
+		changePasswordButton = findViewById(R.id.action_change_password);
 		changePasswordButton.setOnClickListener(this);
+
+		findViewById(R.id.action_cancel).setOnClickListener(v -> finish());
 
         TextView top = findViewById(R.id.top);
 
@@ -220,12 +224,11 @@ public class ChangePasswordActivityLollipop extends PasscodeActivity implements 
         chkTOP = findViewById(R.id.chk_top);
         chkTOP.setOnClickListener(this);
 		
-		progress = new ProgressDialog(this);
-		progress.setMessage(getString(R.string.my_account_changing_password));
+		progress = MegaProgressDialogUtil.createProgressDialog(this, getString(R.string.my_account_changing_password));
 		progress.setCancelable(false);
 		progress.setCanceledOnTouchOutside(false);
 
-		tB  =(Toolbar) findViewById(R.id.toolbar);
+		tB  = findViewById(R.id.toolbar);
 		hideAB();
 
 		imm = (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
@@ -242,7 +245,7 @@ public class ChangePasswordActivityLollipop extends PasscodeActivity implements 
 						logWarning("link is NULL - close activity");
 						finish();
 					}
-					mk = getIntent().getStringExtra("MK");
+					mk = getIntent().getStringExtra(EXTRA_MASTER_KEY);
 					if(mk==null){
 						logWarning("MK is NULL - close activity");
 						showAlert(this, getString(R.string.general_text_error), getString(R.string.general_error_word));
@@ -291,6 +294,7 @@ public class ChangePasswordActivityLollipop extends PasscodeActivity implements 
 	    return super.onOptionsItemSelected(item);
 	}
 
+	@SuppressLint("NonConstantResourceId")
 	@Override
 	public void onClick(View v) {
 		logDebug("onClick");
@@ -345,10 +349,6 @@ public class ChangePasswordActivityLollipop extends PasscodeActivity implements 
                 }
 
                 break;
-//			case R.id.cancel_change_password:{
-//				changePasswordActivity.finish();
-//				break;
-//			}
 		}
 	}
 
@@ -665,6 +665,7 @@ public class ChangePasswordActivityLollipop extends PasscodeActivity implements 
         }
 	}
 
+	@SuppressLint("NonConstantResourceId")
 	private void setError(final EditText editText, String error){
 		logDebug("setError");
 		if(error == null || error.equals("")){
@@ -688,6 +689,7 @@ public class ChangePasswordActivityLollipop extends PasscodeActivity implements 
 		}
 	}
 
+	@SuppressLint("NonConstantResourceId")
 	private void quitError(EditText editText){
 		switch (editText.getId()){
 			case R.id.change_password_newPassword1:{
@@ -728,7 +730,7 @@ public class ChangePasswordActivityLollipop extends PasscodeActivity implements 
 	}
 
 	public void showSnackbar(String s){
-		showSnackbar(fragmentContainer, s);
+		showSnackbar(generalContainer, s);
 	}
 
 	void hideAB(){

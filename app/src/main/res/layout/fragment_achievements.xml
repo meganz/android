@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/my_account_complete_relative_layout"
+    android:id="@+id/scroll_view"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/grey_020_dark_grey">
@@ -11,11 +11,6 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical">
-
-        <FrameLayout
-            android:id="@+id/ad_view_container"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
 
         <RelativeLayout
             android:id="@+id/unlocked_rewards_layout"
@@ -166,85 +161,6 @@
 
                 android:background="@color/grey_012_white_012"
                 android:orientation="horizontal" />
-
-            <RelativeLayout
-                android:id="@+id/base_quota_layout"
-                android:layout_width="match_parent"
-                android:layout_height="96dp"
-
-                android:visibility="gone">
-
-                <ImageView
-                    android:id="@+id/iv_google_wallet"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_centerVertical="true"
-                    android:src="@drawable/google_wallet_ic" />
-
-                <ImageView
-                    android:id="@+id/iv_chevron_right"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_alignParentEnd="true"
-                    android:layout_centerVertical="true"
-                    android:layout_marginEnd="13dp"
-                    android:src="@drawable/ic_chevron_right_grey"
-                    android:visibility="invisible" />
-
-                <RelativeLayout
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_centerVertical="true"
-                    android:layout_marginStart="20dp"
-                    android:layout_toStartOf="@id/iv_chevron_right"
-                    android:layout_toEndOf="@id/iv_google_wallet">
-
-                    <TextView
-                        android:id="@+id/title_base_quota"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_alignParentTop="true"
-                        android:layout_marginEnd="21dp"
-                        android:layout_marginBottom="14dp"
-                        android:text="@string/title_base_quota"
-                        android:textColor="?android:attr/textColorPrimary"
-                        android:textSize="16sp" />
-
-                    <RelativeLayout
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_below="@+id/title_base_quota">
-
-                        <TextView
-                            android:id="@+id/figure_unlocked_storage_text_base_quota"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_gravity="start"
-                            android:text="1 GB"
-                            android:textColor="@color/dark_blue_500_200"
-                            android:textSize="14sp" />
-
-                        <TextView
-                            android:id="@+id/unlocked_storage_title_base_quota"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_below="@id/figure_unlocked_storage_text_base_quota"
-                            android:text="@string/storage_space"
-                            android:textAllCaps="false"
-                            android:textColor="?android:attr/textColorSecondary"
-                            android:textSize="11sp" />
-
-                    </RelativeLayout>
-                </RelativeLayout>
-            </RelativeLayout>
-
-            <LinearLayout
-                android:id="@+id/separator_base_quota"
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:background="@color/grey_012_white_012"
-                android:orientation="horizontal"
-                android:visibility="gone" />
 
             <RelativeLayout
                 android:id="@+id/install_app_layout"

@@ -3,8 +3,10 @@ package mega.privacy.android.app.lollipop.managerSections;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.ComponentName;
+import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -27,13 +29,19 @@ import android.view.ViewGroup;
 import android.widget.CheckedTextView;
 
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
+import com.jeremyliao.liveeventbus.LiveEventBus;
 
 import java.io.File;
 
+import javax.inject.Inject;
+
+import dagger.hilt.android.AndroidEntryPoint;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MegaAttributes;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.activities.WebViewActivity;
+import mega.privacy.android.app.activities.settingsActivities.StartScreenPreferencesActivity;
+import mega.privacy.android.app.exportRK.ExportRecoveryKeyActivity;
 import mega.privacy.android.app.activities.settingsActivities.AdvancedPreferencesActivity;
 import mega.privacy.android.app.activities.settingsActivities.CameraUploadsPreferencesActivity;
 import mega.privacy.android.app.activities.settingsActivities.ChatPreferencesActivity;
@@ -42,9 +50,9 @@ import mega.privacy.android.app.activities.settingsActivities.DownloadPreference
 import mega.privacy.android.app.activities.settingsActivities.FileManagementPreferencesActivity;
 import mega.privacy.android.app.activities.settingsActivities.PasscodePreferencesActivity;
 import mega.privacy.android.app.fragments.settingsFragments.SettingsBaseFragment;
+import mega.privacy.android.app.globalmanagement.MyAccountInfo;
 import mega.privacy.android.app.lollipop.ChangePasswordActivityLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
-import mega.privacy.android.app.lollipop.MyAccountInfo;
 import mega.privacy.android.app.lollipop.TwoFactorAuthenticationActivity;
 import mega.privacy.android.app.lollipop.VerifyTwoFactorActivity;
 import mega.privacy.android.app.mediaplayer.service.AudioPlayerService;
@@ -52,19 +60,29 @@ import mega.privacy.android.app.mediaplayer.service.MediaPlayerService;
 import mega.privacy.android.app.mediaplayer.service.MediaPlayerServiceBinder;
 import mega.privacy.android.app.utils.ThemeHelper;
 
+import static mega.privacy.android.app.constants.EventConstants.EVENT_UPDATE_HIDE_RECENT_ACTIVITY;
+import static mega.privacy.android.app.constants.EventConstants.EVENT_UPDATE_START_SCREEN;
 import static mega.privacy.android.app.constants.SettingsConstants.*;
+import static mega.privacy.android.app.fragments.settingsFragments.startSceen.util.StartScreenUtil.HOME_BNV;
 import static mega.privacy.android.app.service.PlatformConstantsKt.RATE_APP_URL;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.DBUtil.callToAccountDetails;
 import static mega.privacy.android.app.utils.FileUtil.buildDefaultDownloadDir;
 import static mega.privacy.android.app.utils.LogUtil.*;
+import static mega.privacy.android.app.utils.SharedPreferenceConstants.HIDE_RECENT_ACTIVITY;
+import static mega.privacy.android.app.utils.SharedPreferenceConstants.PREFERRED_START_SCREEN;
+import static mega.privacy.android.app.utils.SharedPreferenceConstants.USER_INTERFACE_PREFERENCES;
 import static mega.privacy.android.app.utils.Util.*;
 import static nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE;
 
+@AndroidEntryPoint
 @SuppressLint("NewApi")
 public class SettingsFragmentLollipop extends SettingsBaseFragment {
 
     private static final String EVALUATE_APP_DIALOG_SHOW = "EvaluateAppDialogShow";
+
+    @Inject
+    MyAccountInfo myAccountInfo;
 
     public int numberOfClicksSDK = 0;
     public int numberOfClicksKarere = 0;
@@ -77,7 +95,6 @@ public class SettingsFragmentLollipop extends SettingsBaseFragment {
     private SwitchPreferenceCompat twoFASwitch;
     private SwitchPreferenceCompat qrCodeAutoAcceptSwitch;
     private Preference advancedPreference;
-    private RecyclerView listView;
     private boolean passcodeLock = false;
     private boolean setAutoaccept = false;
     private boolean autoAccept = true;
@@ -86,6 +103,8 @@ public class SettingsFragmentLollipop extends SettingsBaseFragment {
     private PreferenceCategory storageCategory;
     private Preference nestedDownloadLocation;
     private Preference fileManagementPrefence;
+    private Preference startScreen;
+    private SwitchPreferenceCompat hideRecentActivity;
     private Preference helpHelpCentre;
     private Preference helpSendFeedback;
     private PreferenceCategory aboutCategory;
@@ -131,6 +150,11 @@ public class SettingsFragmentLollipop extends SettingsBaseFragment {
         nestedDownloadLocation.setOnPreferenceClickListener(this);
         fileManagementPrefence = findPreference(KEY_STORAGE_FILE_MANAGEMENT);
         fileManagementPrefence.setOnPreferenceClickListener(this);
+
+        startScreen = findPreference(KEY_START_SCREEN);
+        startScreen.setOnPreferenceClickListener(this);
+        hideRecentActivity = findPreference(KEY_HIDE_RECENT_ACTIVITY);
+        hideRecentActivity.setOnPreferenceClickListener(this);
 
         securityCategory = findPreference(CATEGORY_SECURITY);
         recoveryKey = findPreference(KEY_RECOVERY_KEY);
@@ -183,6 +207,7 @@ public class SettingsFragmentLollipop extends SettingsBaseFragment {
 
         updatePasscodeLock();
         refreshCameraUploadsSettings();
+        checkUIPreferences();
         update2FAVisibility();
         setAutoaccept = false;
         autoAccept = true;
@@ -218,29 +243,65 @@ public class SettingsFragmentLollipop extends SettingsBaseFragment {
         cameraUploadsPreference.setSummary(getString(isCameraUploadOn ? R.string.mute_chat_notification_option_on : R.string.mute_chatroom_notification_option_off));
     }
 
+    /**
+     * Checks and sets the User interface setting values.
+     */
+    private void checkUIPreferences() {
+        SharedPreferences sharedPreferences = requireContext()
+                .getSharedPreferences(USER_INTERFACE_PREFERENCES, Context.MODE_PRIVATE);
+
+        updateStartScreenSetting(sharedPreferences.getInt(PREFERRED_START_SCREEN, HOME_BNV));
+        hideRecentActivity.setChecked(sharedPreferences.getBoolean(HIDE_RECENT_ACTIVITY, false));
+    }
+
+    /**
+     * Updates the start screen setting.
+     *
+     * @param newStartScreen Value to set as new start screen.
+     */
+    private void updateStartScreenSetting(int newStartScreen) {
+        String startScreenSummary =
+                getResources().getStringArray(R.array.settings_start_screen)[newStartScreen];
+
+        startScreen.setSummary(startScreenSummary);
+    }
+
+    /**
+     * Updates the hide recent activity setting.
+     *
+     * @param hide True if should enable the setting, false otherwise.
+     */
+    private void updateHideRecentActivitySetting(boolean hide) {
+        if (hide != hideRecentActivity.isChecked()) {
+            hideRecentActivity.setChecked(hide);
+        }
+    }
+
     @Override
-    public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         logDebug("onViewCreated");
+        setupObservers();
 
         // Init QR code setting
         megaApi.getContactLinksOption((ManagerActivityLollipop) context);
 
-        listView = view.findViewById(android.R.id.list);
         if (((ManagerActivityLollipop) context).openSettingsStorage) {
             goToCategoryStorage();
         } else if (((ManagerActivityLollipop) context).openSettingsQR) {
             goToCategoryQR();
+        } else if (((ManagerActivityLollipop) context).openSettingsStartScreen) {
+            goToSectionStartScreen();
         }
-        if (listView != null) {
-            listView.addOnScrollListener(new RecyclerView.OnScrollListener() {
-                @Override
-                public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
-                    super.onScrolled(recyclerView, dx, dy);
-                    checkScroll();
-                }
-            });
-        }
+
+        getListView().addOnScrollListener(new RecyclerView.OnScrollListener() {
+            @Override
+            public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
+                super.onScrolled(recyclerView, dx, dy);
+                checkScroll();
+            }
+        });
+
         Display display = getActivity().getWindowManager().getDefaultDisplay();
         outMetrics = new DisplayMetrics();
         display.getMetrics(outMetrics);
@@ -250,6 +311,14 @@ public class SettingsFragmentLollipop extends SettingsBaseFragment {
         if (bEvaluateAppDialogShow) {
             showEvaluatedAppDialog();
         }
+    }
+
+    private void setupObservers() {
+        LiveEventBus.get(EVENT_UPDATE_START_SCREEN, Integer.class)
+                .observe(getViewLifecycleOwner(), this::updateStartScreenSetting);
+
+        LiveEventBus.get(EVENT_UPDATE_HIDE_RECENT_ACTIVITY, Boolean.class)
+                .observe(getViewLifecycleOwner(), this::updateHideRecentActivitySetting);
     }
 
     @Override
@@ -264,9 +333,12 @@ public class SettingsFragmentLollipop extends SettingsBaseFragment {
      * Method for controlling whether or not to display the action bar elevation.
      */
     public void checkScroll() {
-        if (listView != null) {
-            ((ManagerActivityLollipop) context).changeAppBarElevation(listView.canScrollVertically(-1));
+        if (getListView() == null) {
+            return;
         }
+
+        ((ManagerActivityLollipop) context)
+                .changeAppBarElevation(getListView().canScrollVertically(SCROLLING_UP_DIRECTION));
     }
 
     @Override
@@ -317,7 +389,7 @@ public class SettingsFragmentLollipop extends SettingsBaseFragment {
                 break;
 
             case KEY_RECOVERY_KEY:
-                ((ManagerActivityLollipop) context).showMKLayout();
+                startActivity(new Intent(context, ExportRecoveryKeyActivity.class));
                 break;
 
             case KEY_PASSCODE_LOCK:
@@ -445,6 +517,16 @@ public class SettingsFragmentLollipop extends SettingsBaseFragment {
                     playerService.getViewModel().toggleBackgroundPlay();
                 }
                 break;
+            case KEY_START_SCREEN:
+                startActivity(new Intent(context, StartScreenPreferencesActivity.class));
+                break;
+            case KEY_HIDE_RECENT_ACTIVITY:
+                requireContext().getSharedPreferences(USER_INTERFACE_PREFERENCES, Context.MODE_PRIVATE)
+                        .edit().putBoolean(HIDE_RECENT_ACTIVITY, hideRecentActivity.isChecked()).apply();
+
+                LiveEventBus.get(EVENT_UPDATE_HIDE_RECENT_ACTIVITY, Boolean.class)
+                        .post(hideRecentActivity.isChecked());
+                break;
         }
 
         if (preference.getKey().compareTo(KEY_ABOUT_APP_VERSION) != 0) {
@@ -508,10 +590,15 @@ public class SettingsFragmentLollipop extends SettingsBaseFragment {
         scrollToPreference(qrCodeAutoAcceptSwitch);
     }
 
+    public void goToSectionStartScreen() {
+        scrollToPreference(startScreen);
+        startActivity(new Intent(context, StartScreenPreferencesActivity.class));
+        ((ManagerActivityLollipop) context).openSettingsStartScreen = false;
+    }
+
     private void refreshAccountInfo() {
         //Check if the call is recently
         logDebug("Check the last call to getAccountDetails");
-        MyAccountInfo myAccountInfo = MegaApplication.getInstance().getMyAccountInfo();
         if (callToAccountDetails() || myAccountInfo.getUsedFormatted().trim().length() <= 0) {
             ((MegaApplication) ((Activity) context).getApplication()).askForAccountDetails();
         }
@@ -589,38 +676,35 @@ public class SettingsFragmentLollipop extends SettingsBaseFragment {
             .append(getString(R.string.settings_feedback_body_android_version)).append("  ").append(Build.VERSION.RELEASE).append(" ").append(Build.DISPLAY).append("\n")
             .append(getString(R.string.user_account_feedback)).append("  ").append(megaApi.getMyEmail());
 
-            MyAccountInfo myAccountInfo = MegaApplication.getInstance().getMyAccountInfo();
-            if (myAccountInfo != null) {
-                body.append(" (");
-                switch (myAccountInfo.getAccountType()) {
-                    case FREE:
-                    default:
-                        body.append(getString(R.string.my_account_free));
-                        break;
-                    case PRO_I:
-                        body.append(getString(R.string.my_account_pro1));
-                        break;
-                    case PRO_II:
-                        body.append(getString(R.string.my_account_pro2));
-                        break;
-                    case PRO_III:
-                        body.append(getString(R.string.my_account_pro3));
-                        break;
-                    case PRO_LITE:
-                        body.append(getString(R.string.my_account_prolite_feedback_email));
-                        break;
-                    case BUSINESS:
-                        body.append(getString(R.string.business_label));
-                        break;
-                }
-                body.append(")");
+            body.append(" (");
+            switch (myAccountInfo.getAccountType()) {
+                case FREE:
+                default:
+                    body.append(getString(R.string.my_account_free));
+                    break;
+                case PRO_I:
+                    body.append(getString(R.string.my_account_pro1));
+                    break;
+                case PRO_II:
+                    body.append(getString(R.string.my_account_pro2));
+                    break;
+                case PRO_III:
+                    body.append(getString(R.string.my_account_pro3));
+                    break;
+                case PRO_LITE:
+                    body.append(getString(R.string.my_account_prolite_feedback_email));
+                    break;
+                case BUSINESS:
+                    body.append(getString(R.string.business_label));
+                    break;
             }
+            body.append(")");
 
             String versionApp = (getString(R.string.app_version));
             String subject = getString(R.string.setting_feedback_subject) + " v" + versionApp;
 
             Intent emailIntent = new Intent(Intent.ACTION_SEND);
-            emailIntent.setType("text/plain");
+            emailIntent.setType(TYPE_TEXT_PLAIN);
             emailIntent.putExtra(Intent.EXTRA_EMAIL, new String[] {MAIL_ANDROID});
             emailIntent.putExtra(Intent.EXTRA_SUBJECT, subject);
             emailIntent.putExtra(Intent.EXTRA_TEXT, body.toString());

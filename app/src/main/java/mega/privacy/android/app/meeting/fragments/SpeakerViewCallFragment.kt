@@ -1,5 +1,6 @@
 package mega.privacy.android.app.meeting.fragments
 
+import android.annotation.SuppressLint
 import android.os.Bundle
 import android.util.Pair
 import android.view.*
@@ -10,21 +11,17 @@ import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.jeremyliao.liveeventbus.LiveEventBus
-import kotlinx.android.synthetic.main.speaker_view_call_fragment.*
 import mega.privacy.android.app.components.RoundedImageView
-import mega.privacy.android.app.constants.EventConstants.EVENT_LOCAL_AUDIO_LEVEL_CHANGE
 import mega.privacy.android.app.constants.EventConstants.EVENT_REMOTE_AUDIO_LEVEL_CHANGE
 import mega.privacy.android.app.databinding.SpeakerViewCallFragmentBinding
 import mega.privacy.android.app.fragments.homepage.EventObserver
 import mega.privacy.android.app.meeting.MegaSurfaceRenderer
 import mega.privacy.android.app.meeting.adapter.Participant
 import mega.privacy.android.app.meeting.adapter.VideoListViewAdapter
-import mega.privacy.android.app.meeting.listeners.GroupVideoListener
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.LogUtil.logDebug
 import mega.privacy.android.app.utils.Util
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
-import nz.mega.sdk.MegaChatCall
 import nz.mega.sdk.MegaChatSession
 
 class SpeakerViewCallFragment : MeetingBaseFragment(),
@@ -46,35 +43,22 @@ class SpeakerViewCallFragment : MeetingBaseFragment(),
 
     private var participants: MutableList<Participant> = mutableListOf()
 
-    private var speakerUser: Participant? = null
-
     private var isFirsTime = true
-
-    private val localAudioLevelObserver = Observer<MegaChatCall> {
-        if (inMeetingViewModel.isSameCall(it.callId)) {
-            speakerUser?.let {
-                if (inMeetingViewModel.isSpeakerSelectionAutomatic) {
-                    logDebug("Received local audio level")
-                    selectSpeaker(megaApi.myUserHandleBinary, MEGACHAT_INVALID_HANDLE)
-                }
-            }
-        }
-    }
 
     private val remoteAudioLevelObserver = Observer<Pair<Long, MegaChatSession>> { callAndSession ->
         val callId = callAndSession.first
         val session = callAndSession.second
 
-        if (inMeetingViewModel.isSameCall(callId)) {
-            speakerUser?.let {
-                if (inMeetingViewModel.isSpeakerSelectionAutomatic && (it.peerId != session.peerid || it.clientId != session.clientid)) {
-
-                    logDebug("Received remote audio level with clientId ${session.clientid}")
-                    selectSpeaker(
-                        session.peerid,
-                        session.clientid
-                    )
-                }
+        if (inMeetingViewModel.isSameCall(callId) && inMeetingViewModel.isSpeakerSelectionAutomatic) {
+            val currentSpeaker = inMeetingViewModel.getCurrentSpeakerParticipant()
+            if (currentSpeaker == null || currentSpeaker.peerId != session.peerid || currentSpeaker.clientId != session.clientid) {
+                logDebug("Received remote audio level with clientId ${session.clientid}")
+                selectSpeaker(
+                    session.peerid,
+                    session.clientid
+                )
+            } else {
+                logDebug("Received remote audio level with clientId ${session.clientid}, same current speaker")
             }
         }
     }
@@ -87,7 +71,25 @@ class SpeakerViewCallFragment : MeetingBaseFragment(),
             isFirsTime = false
             adapter.submitList(null)
             adapter.submitList(participants)
-            updateVisibleParticipantsSpeakerView(participants)
+        }
+    }
+
+    private val speakerParticipantsObserver = Observer<MutableList<Participant>> {
+        val newSpeaker = inMeetingViewModel.getCurrentSpeakerParticipant()
+        if (newSpeaker == null) {
+
+            inMeetingViewModel.getFirstParticipant(
+                MEGACHAT_INVALID_HANDLE,
+                MEGACHAT_INVALID_HANDLE
+            )?.let { firstParticipant ->
+                selectSpeaker(firstParticipant.peerId, firstParticipant.clientId)
+            }
+        } else {
+            if (!newSpeaker.isVideoOn || inMeetingViewModel.isSessionOnHold(newSpeaker.clientId)) {
+                removeTextureViewOfPreviousSpeaker(newSpeaker.peerId, newSpeaker.clientId)
+                inMeetingViewModel.removePreviousSpeakers()
+            }
+            updateSpeakerUser()
         }
     }
 
@@ -134,27 +136,31 @@ class SpeakerViewCallFragment : MeetingBaseFragment(),
         logDebug("View created and participants added")
         adapter.submitList(null)
         adapter.submitList(participants)
-        updateVisibleParticipantsSpeakerView(participants)
         listView.adapter = adapter
 
         observeViewModel()
         initLiveEventBus()
 
-        //Init Speaker participant: Me
-        inMeetingViewModel.assignMeAsSpeaker()
+        if (inMeetingViewModel.getCurrentSpeakerParticipant() == null) {
+            inMeetingViewModel.getFirstParticipant(MEGACHAT_INVALID_HANDLE, MEGACHAT_INVALID_HANDLE)
+                ?.let {
+                    selectSpeaker(it.peerId, it.clientId)
+                }
+        }
     }
 
     private fun initLiveEventBus() {
         @Suppress("UNCHECKED_CAST")
         LiveEventBus.get(EVENT_REMOTE_AUDIO_LEVEL_CHANGE)
             .observeSticky(this, remoteAudioLevelObserver as Observer<Any>)
-
-        LiveEventBus.get(EVENT_LOCAL_AUDIO_LEVEL_CHANGE, MegaChatCall::class.java)
-            .observeSticky(this, localAudioLevelObserver)
     }
 
     private fun observeViewModel() {
         inMeetingViewModel.participants.observe(viewLifecycleOwner, participantsObserver)
+        inMeetingViewModel.speakerParticipants.observe(
+            viewLifecycleOwner,
+            speakerParticipantsObserver
+        )
 
         inMeetingViewModel.pinItemEvent.observe(
             viewLifecycleOwner,
@@ -164,77 +170,23 @@ class SpeakerViewCallFragment : MeetingBaseFragment(),
                 if (inMeetingViewModel.isSpeakerSelectionAutomatic) {
                     inMeetingViewModel.setSpeakerSelection(false)
                 } else {
-                    speakerUser?.let {
+                    inMeetingViewModel.getCurrentSpeakerParticipant()?.let {
                         if (it.peerId == participantClicked.peerId && it.clientId == participantClicked.clientId) {
                             inMeetingViewModel.setSpeakerSelection(true)
                         }
                     }
                 }
 
-                if (speakerUser != null && speakerUser!!.peerId == participantClicked.peerId && speakerUser!!.clientId == participantClicked.clientId) {
-                    if (participantClicked.clientId == MEGACHAT_INVALID_HANDLE) {
-                        logDebug("Same participant(Me), clientId ${speakerUser!!.clientId}")
-                    } else {
-                        logDebug("Same participant, clientId ${speakerUser!!.clientId}")
-                        adapter.updatePeerSelected(speakerUser!!)
-                    }
+                val currentSpeakerParticipant = inMeetingViewModel.getCurrentSpeakerParticipant()
+                if (currentSpeakerParticipant != null && currentSpeakerParticipant.peerId == participantClicked.peerId && currentSpeakerParticipant.clientId == participantClicked.clientId) {
+                    logDebug(" Same participant, clientId ${currentSpeakerParticipant.clientId}")
+                    adapter.updatePeerSelected(currentSpeakerParticipant)
                 } else {
                     logDebug("New speaker selected with clientId ${participantClicked.clientId}")
                     selectSpeaker(participantClicked.peerId, participantClicked.clientId)
                 }
             })
-
-        inMeetingViewModel.speakerParticipant.observe(
-            viewLifecycleOwner
-        ) {
-            if (it == null) return@observe
-
-            speakerUser?.let { currentSpeaker ->
-                if (currentSpeaker.isVideoOn) {
-                    logDebug("Close video of last speaker, is ${currentSpeaker.clientId}")
-                    closeVideo(currentSpeaker)
-                }
-            }
-
-            logDebug("Update new speaker selected with clientId ${it.clientId}")
-            speakerUser = it
-            speakerUser?.let { speaker ->
-                updateSpeakerUser(speaker)
-            }
-        }
-
-        sharedModel.cameraLiveData.observe(viewLifecycleOwner) { isOn ->
-            speakerUser?.let {
-                if (it.isMe) {
-                    it.isVideoOn = isOn
-
-                    if (isOn) {
-                        checkVideoOn(it)
-                    } else {
-                        videoOffUI(it)
-                    }
-                }
-            }
-        }
-
-        sharedModel.micLiveData.observe(viewLifecycleOwner) { isOn ->
-            speakerUser?.let {
-                if (it.isMe) {
-                    logDebug("Changes in local audio")
-                    it.isAudioOn = isOn
-                    updateAudioIcon(it)
-                }
-            }
-        }
     }
-
-    /**
-     * Method that updates the number of participants visible on the recyclerview
-     *
-     * @param list list of participants
-     */
-    private fun updateVisibleParticipantsSpeakerView(list: List<Participant>) =
-        inMeetingViewModel.updateVisibleParticipants(list)
 
     /**
      * Method for selecting a new speaker
@@ -243,12 +195,10 @@ class SpeakerViewCallFragment : MeetingBaseFragment(),
      * @param clientId Client ID of a speaker
      */
     private fun selectSpeaker(peerId: Long, clientId: Long) {
-        logDebug("Selected new speaker with clientId $clientId")
-        if (clientId == MEGACHAT_INVALID_HANDLE) {
-            inMeetingViewModel.assignMeAsSpeaker()
-        }
-        val listParticipants = inMeetingViewModel.updatePeerSelected(peerId, clientId)
+        if (clientId == MEGACHAT_INVALID_HANDLE) return
 
+        logDebug("Selected new speaker with clientId $clientId")
+        val listParticipants = inMeetingViewModel.updatePeerSelected(peerId, clientId)
         if (listParticipants.isNotEmpty()) {
             logDebug("Update the rest of participants")
             updateSpeakerPeers(listParticipants)
@@ -257,22 +207,19 @@ class SpeakerViewCallFragment : MeetingBaseFragment(),
 
     /**
      * Monitor changes when updating the speaker participant
-     *
-     * @param speaker The current participant selected as speaker
      */
-    private fun updateSpeakerUser(speaker: Participant) {
-        if (isSpeakerInvalid(speaker)) return
+    private fun updateSpeakerUser() {
+        inMeetingViewModel.getCurrentSpeakerParticipant()?.let {
+            it.avatar?.let { bitmap ->
+                speakerAvatar.setImageBitmap(bitmap)
+            }
+            updateAudioIcon(it)
 
-        speaker.avatar?.let {
-            speakerAvatar.setImageBitmap(it)
-        }
-
-        updateAudioIcon(speaker)
-
-        if (speaker.isVideoOn) {
-            checkVideoOn(speaker)
-        } else {
-            videoOffUI(speaker)
+            if (it.isVideoOn) {
+                checkVideoOn(it)
+            } else {
+                videoOffUI(it)
+            }
         }
     }
 
@@ -320,9 +267,12 @@ class SpeakerViewCallFragment : MeetingBaseFragment(),
      * @param toCheck Participant to compare
      * @return True, if different participant. False, if it is the same
      */
-    private fun isSpeakerInvalid(toCheck: Participant): Boolean =
-        if (speakerUser == null) true
-        else toCheck.peerId != speakerUser!!.peerId || toCheck.clientId != speakerUser!!.clientId
+    private fun isSpeakerInvalid(toCheck: Participant): Boolean {
+        val currentSpeakerParticipant =
+            inMeetingViewModel.getCurrentSpeakerParticipant() ?: return true
+
+        return toCheck.peerId != currentSpeakerParticipant.peerId || toCheck.clientId != currentSpeakerParticipant.clientId
+    }
 
     /**
      * Method to close Video
@@ -334,44 +284,10 @@ class SpeakerViewCallFragment : MeetingBaseFragment(),
 
         surfaceContainer.isVisible = false
 
-        if (speaker.isMe) {
-            logDebug("Close local video")
-            closeLocalVideo(speaker)
-        } else {
+        if (speaker.videoListener != null) {
             logDebug("Close remote video")
-            inMeetingViewModel.onCloseVideo(speaker)
+            inMeetingViewModel.removeRemoteVideoResolution(speaker)
         }
-
-        speaker.videoListener?.let { listener ->
-            logDebug("Removing texture view")
-            if (surfaceContainer.childCount > 0) {
-                surfaceContainer.removeAllViews()
-            }
-
-            listener.textureView?.let { view ->
-                view.parent?.let { viewParent ->
-                    (viewParent as ViewGroup).removeView(view)
-                }
-            }
-        }
-
-        logDebug("Speaker ${speaker.clientId} video listener null")
-        speaker.videoListener = null
-    }
-
-    /**
-     * Method to close local video
-     *
-     * @param speaker The current participant selected as speaker
-     */
-    private fun closeLocalVideo(speaker: Participant) {
-        if (isSpeakerInvalid(speaker)) return
-
-        logDebug("Remove local video listener")
-        inMeetingViewModel.removeLocalVideoSpeaker(
-            inMeetingViewModel.getChatId(),
-            speaker.videoListener
-        )
     }
 
     /**
@@ -383,20 +299,6 @@ class SpeakerViewCallFragment : MeetingBaseFragment(),
         if (isSpeakerInvalid(speaker)) return
 
         val isCallOnHold = inMeetingViewModel.isCallOnHold()
-
-        if (speaker.isMe) {
-            if (isCallOnHold) {
-                logDebug("Call is on hold")
-                speakerOnHoldIcon.isVisible = true
-                speakerAvatar.alpha = 0.5f
-            } else {
-                logDebug("Call is in progress")
-                speakerOnHoldIcon.isVisible = false
-                speakerAvatar.alpha = 1f
-            }
-            return
-        }
-
         val isSessionOnHold = inMeetingViewModel.isSessionOnHold(speaker.clientId)
         if (isSessionOnHold) {
             logDebug("Session is on hold ")
@@ -418,12 +320,10 @@ class SpeakerViewCallFragment : MeetingBaseFragment(),
     private fun checkVideoOn(speaker: Participant) {
         if (isSpeakerInvalid(speaker)) return
 
-        if (speaker.isVideoOn && ((speaker.isMe && !inMeetingViewModel.isCallOnHold()) ||
-                    (!speaker.isMe && !inMeetingViewModel.isCallOrSessionOnHold(
-                        speaker.clientId
-                    )))
+        if (speaker.isVideoOn && (!inMeetingViewModel.isCallOrSessionOnHold(
+                speaker.clientId
+            ))
         ) {
-
             logDebug("Video should be on")
             videoOnUI(speaker)
             return
@@ -461,51 +361,117 @@ class SpeakerViewCallFragment : MeetingBaseFragment(),
     }
 
     /**
+     * Method for adding the speaker video listener
+     *
+     * @param speaker The speaker participant
+     */
+    private fun addSpeakerVideoListener(speaker: Participant) {
+        if (speaker.isVideoOn && !inMeetingViewModel.isCallOrSessionOnHold(speaker.clientId)) {
+            if (speaker.videoListener == null) {
+                speaker.videoListener =
+                    inMeetingViewModel.createVideoListener(
+                        speaker,
+                        AVATAR_VIDEO_VISIBLE,
+                        ROTATION
+                    )
+
+                speaker.videoListener?.let { listener ->
+                    surfaceContainer.addView(listener.textureView)
+                }
+            }
+
+            speaker.videoListener?.let { listener ->
+                logDebug("Add speaker video listener clientID ${speaker.clientId}")
+                inMeetingViewModel.addChatRemoteVideoListener(
+                    listener,
+                    speaker.clientId,
+                    inMeetingViewModel.getChatId(),
+                    true
+                )
+            }
+        }
+    }
+
+    /**
+     * Method to remove from the textures view of the above speakers
+     *
+     * @param peerId Peer ID of the current speaker
+     * @param clientId Client ID of the current speaker
+     */
+    private fun removeTextureViewOfPreviousSpeaker(peerId: Long, clientId: Long) {
+        inMeetingViewModel.getPreviousSpeakers(peerId, clientId)?.let { list ->
+            val iterator = list.iterator()
+            iterator.forEach { peer ->
+                peer.videoListener?.let { listener ->
+                    surfaceContainer.removeView(listener.textureView)
+                }
+            }
+        }
+    }
+
+    /**
+     * Method to add or remove video listener
+     *
+     * @param peerId Peer ID of the participant whose listener of the video is to be added or removed
+     * @param clientId Client ID of the participant whose listener of the video is to be added or removed
+     * @param shouldAddListener True, if the listener is to be added. False, if the listener should be removed
+     */
+    fun updateListenerSpeaker(peerId: Long, clientId: Long, shouldAddListener: Boolean) {
+        inMeetingViewModel.getCurrentSpeakerParticipant()?.let { currentSpeaker ->
+            if (currentSpeaker.peerId != peerId || currentSpeaker.clientId != clientId) return
+
+            if (shouldAddListener) {
+                addSpeakerVideoListener(currentSpeaker)
+                removeTextureViewOfPreviousSpeaker(currentSpeaker.peerId, currentSpeaker.clientId)
+                inMeetingViewModel.removePreviousSpeakers()
+
+            } else {
+                currentSpeaker.videoListener?.let { listener ->
+                    logDebug("Remove speaker video listener clientID ${currentSpeaker.clientId}")
+                    inMeetingViewModel.removeChatRemoteVideoListener(
+                        listener,
+                        currentSpeaker.clientId,
+                        inMeetingViewModel.getChatId(),
+                        currentSpeaker.hasHiRes
+                    )
+
+                    removeSpeakerListener()
+                }
+            }
+        }
+    }
+
+    /**
      * Method for activating the video
      *
      * @param speaker The current participant selected as speaker
      */
     private fun activateVideo(speaker: Participant) {
         if (isSpeakerInvalid(speaker)) return
-
-        /*Video*/
         if (speaker.videoListener == null) {
             logDebug("Active video when listener is null, clientId ${speaker.clientId}")
-            surfaceContainer.removeAllViews()
+            speaker.videoListener =
+                inMeetingViewModel.createVideoListener(speaker, AVATAR_VIDEO_VISIBLE, ROTATION)
 
-            val myTexture = TextureView(requireContext())
-            myTexture.layoutParams = RelativeLayout.LayoutParams(
-                ViewGroup.LayoutParams.MATCH_PARENT,
-                ViewGroup.LayoutParams.MATCH_PARENT
-            )
-            myTexture.alpha = 1.0f
-            myTexture.rotation = 0f
+            speaker.videoListener?.let { listener ->
+                surfaceContainer.addView(listener.textureView)
+            }
 
-            val vListener = GroupVideoListener(
-                myTexture,
-                speaker.peerId,
-                speaker.clientId,
-                speaker.isMe
-            )
-
-            speaker.videoListener = vListener
-
-            surfaceContainer.addView(speaker.videoListener!!.textureView)
-
-            if (speaker.isMe) {
-                inMeetingViewModel.addLocalVideoSpeaker(
-                    inMeetingViewModel.getChatId(),
-                    vListener
-                )
-            } else {
-                inMeetingViewModel.onActivateVideo(speaker, true)
+            inMeetingViewModel.getSession(speaker.clientId)?.let { session ->
+                if (speaker.hasHiRes) {
+                    if (!session.canRecvVideoHiRes() && session.isHiResVideo) {
+                        inMeetingViewModel.requestHiResVideo(
+                            session,
+                            inMeetingViewModel.currentChatId
+                        )
+                    } else {
+                        logDebug("Already have LowRes/HiRes video, clientId ${speaker.clientId}")
+                        updateListenerSpeaker(speaker.peerId, speaker.clientId, true)
+                    }
+                }
             }
         } else {
             logDebug("Active video when listener is not null, clientId ${speaker.clientId}")
-            if (surfaceContainer.childCount > 0) {
-                surfaceContainer.removeAllViews()
-            }
-
             speaker.videoListener?.textureView?.let { textureView ->
                 textureView.parent?.let { textureViewParent ->
                     (textureViewParent as ViewGroup).removeView(textureView)
@@ -527,10 +493,13 @@ class SpeakerViewCallFragment : MeetingBaseFragment(),
      * @param isAdded True, if the participant has joined. False, if the participant has left
      * @param position The position of the change
      */
+    @SuppressLint("NotifyDataSetChanged")
     fun peerAddedOrRemoved(
         isAdded: Boolean,
         position: Int,
     ) {
+
+        listView.recycledViewPool.clear()
         adapter.submitList(participants) {
             logDebug("List updated " + adapter.currentList.size)
             if (isAdded) {
@@ -566,28 +535,6 @@ class SpeakerViewCallFragment : MeetingBaseFragment(),
     }
 
     /**
-     * Check changes in resolution
-     *
-     * @param isHiRes True, if it has high resolution. False, if low resolution
-     * @param session MegaChatSession of a participant
-     */
-    fun updateRemoteResolutionOfSpeaker(isHiRes: Boolean, session: MegaChatSession) {
-        if (!isHiRes) {
-            logDebug("The speaker should have high resolution")
-            return
-        }
-        //Speaker
-        speakerUser?.let { speaker ->
-            if (session.peerid == speaker.peerId && session.clientid == speaker.clientId && !speaker.isMe && speaker.isVideoOn) {
-                logDebug("Update speaker resolution (HiRes)")
-                inMeetingViewModel.onActivateVideo(
-                    speaker, true
-                )
-            }
-        }
-    }
-
-    /**
      * Check changes in remote A/V flags
      *
      * @param type type of change, Audio or Video
@@ -595,8 +542,9 @@ class SpeakerViewCallFragment : MeetingBaseFragment(),
      */
     fun updateRemoteAudioVideo(type: Int, session: MegaChatSession) {
         //Speaker
-        speakerUser?.let { speaker ->
-            if (session.peerid == speaker.peerId && session.clientid == speaker.clientId && !speaker.isMe) {
+        inMeetingViewModel.getCurrentSpeakerParticipant()?.let { speaker ->
+            if (session.peerid == speaker.peerId && session.clientid == speaker.clientId) {
+
                 speaker.isAudioOn = session.hasAudio()
                 speaker.isVideoOn = session.hasVideo()
 
@@ -630,7 +578,7 @@ class SpeakerViewCallFragment : MeetingBaseFragment(),
      */
     fun updateCallOnHold(isCallOnHold: Boolean) {
         //Speaker
-        speakerUser?.let { speaker ->
+        inMeetingViewModel.getCurrentSpeakerParticipant()?.let { speaker ->
             if (isCallOnHold) {
                 logDebug("Speaker call is on hold")
                 videoOffUI(speaker)
@@ -639,6 +587,9 @@ class SpeakerViewCallFragment : MeetingBaseFragment(),
                 checkVideoOn(speaker)
             }
         }
+
+        if(participants.isNullOrEmpty())
+            return
 
         //Participant in list
         val iterator = participants.iterator()
@@ -655,14 +606,14 @@ class SpeakerViewCallFragment : MeetingBaseFragment(),
      */
     fun updateSessionOnHold(session: MegaChatSession) {
         //Speaker
-        speakerUser?.let {
-            if (it.peerId == session.peerid && it.clientId == session.clientid) {
+        inMeetingViewModel.getCurrentSpeakerParticipant()?.let { speaker ->
+            if (speaker.peerId == session.peerid && speaker.clientId == session.clientid) {
                 if (session.isOnHold) {
                     logDebug("Speaker session is on hold")
-                    videoOffUI(it)
+                    videoOffUI(speaker)
                 } else {
                     logDebug("Speaker session is in progress")
-                    checkVideoOn(it)
+                    checkVideoOn(speaker)
                 }
             }
         }
@@ -678,11 +629,33 @@ class SpeakerViewCallFragment : MeetingBaseFragment(),
     }
 
     /**
+     * Method to control when the video listener should be added or removed.
+     *
+     * @param participant The participant whose listener of the video is to be added or deleted
+     * @param shouldAddListener True, should add the listener. False, should remove the listener
+     * @param isHiRes True, if is High resolution. False, if is Low resolution
+     */
+    fun updateListener(participant: Participant, shouldAddListener: Boolean, isHiRes: Boolean) {
+        //Speaker
+        inMeetingViewModel.getCurrentSpeakerParticipant()?.let { speaker ->
+            if (speaker.peerId == participant.peerId && speaker.clientId == participant.clientId && isHiRes) {
+                logDebug("Update listener in speaker, should the listener be added? $shouldAddListener")
+                updateListenerSpeaker(speaker.peerId, speaker.clientId, shouldAddListener)
+            }
+        }
+
+        //List of participants
+        logDebug("Update listener in participants list, should the listener be added? $shouldAddListener")
+        adapter.updateListener(participant, shouldAddListener, isHiRes)
+    }
+
+    /**
      * Check changes in name
      *
      * @param listPeers List of participants with changes
+     * @param typeChange the type of change, name or avatar
      */
-    fun updateName(listPeers: MutableSet<Participant>) {
+    fun updateNameOrAvatar(listPeers: MutableSet<Participant>, typeChange: Int) {
         val iterator = listPeers.iterator()
         iterator.forEach { peer ->
             inMeetingViewModel.getParticipant(
@@ -690,7 +663,7 @@ class SpeakerViewCallFragment : MeetingBaseFragment(),
                 peer.clientId
             )?.let {
                 logDebug("Update participant name")
-                adapter.updateName(it)
+                adapter.updateNameOrAvatar(it, typeChange)
             }
         }
     }
@@ -714,7 +687,8 @@ class SpeakerViewCallFragment : MeetingBaseFragment(),
     }
 
     companion object {
-
+        const val AVATAR_VIDEO_VISIBLE = 1f
+        const val ROTATION = 0f
         const val TAG = "SpeakerViewCallFragment"
 
         @JvmStatic
@@ -734,6 +708,7 @@ class SpeakerViewCallFragment : MeetingBaseFragment(),
         )?.let {
             if (!it.isVideoOn || it.videoListener == null)
                 return
+
             it.videoListener?.let { listener ->
                 logDebug("Reset Size participant listener")
                 listener.height = 0
@@ -743,31 +718,16 @@ class SpeakerViewCallFragment : MeetingBaseFragment(),
     }
 
     /**
-     * Method to delete the videos and texture views of participants
+     * Method for removing the video listener of Speaker
      */
-    private fun removeTextureView() {
-        speakerUser?.let {
-            inMeetingViewModel.removeSelected(
-                it.peerId,
-                it.clientId
-            )
-
-            if (it.isMe) {
-                logDebug("Close local video")
-                closeLocalVideo(it)
-            } else {
-                logDebug("Close remote video")
-                inMeetingViewModel.onCloseVideo(
-                    it
-                )
-            }
-
-            logDebug("Remove texture view")
+    private fun removeSpeakerListener() {
+        inMeetingViewModel.getCurrentSpeakerParticipant()?.let { speaker ->
+            logDebug("Remove texture view of speaker")
             if (surfaceContainer.childCount > 0) {
                 surfaceContainer.removeAllViews()
             }
 
-            it.videoListener?.let { listener ->
+            speaker.videoListener?.let { listener ->
                 listener.textureView?.let { textureView ->
                     textureView.parent?.let { surfaceParent ->
                         (surfaceParent as ViewGroup).removeView(textureView)
@@ -776,14 +736,37 @@ class SpeakerViewCallFragment : MeetingBaseFragment(),
                 }
             }
 
-            logDebug("Speaker ${it.clientId} video listener null")
-            it.videoListener = null
+            logDebug("Speaker ${speaker.clientId} video listener null")
+            speaker.videoListener = null
         }
+    }
+
+    /**
+     * Method to delete the videos and texture views of participants
+     */
+    fun removeTextureView() {
+        inMeetingViewModel.getCurrentSpeakerParticipant()?.let { speaker ->
+            removeTextureViewOfPreviousSpeaker(speaker.peerId, speaker.clientId)
+            inMeetingViewModel.removeSelected(
+                speaker.peerId,
+                speaker.clientId
+            )
+
+            speaker.videoListener?.let { listener ->
+                inMeetingViewModel.removeResolutionAndListener(speaker, listener)
+                removeSpeakerListener()
+            }
+        }
+
+        inMeetingViewModel.removePreviousSpeakers()
+        inMeetingViewModel.clearSpeakerParticipants()
+
+        if(participants.isNullOrEmpty())
+            return
 
         val iterator = participants.iterator()
         iterator.forEach {
-            inMeetingViewModel.onCloseVideo(it)
-            logDebug("Remove texture view")
+            logDebug("Remove texture view of participants")
             adapter.removeTextureView(it)
         }
     }

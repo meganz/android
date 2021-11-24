@@ -25,10 +25,10 @@ import mega.privacy.android.app.listeners.MoveListener
 import mega.privacy.android.app.listeners.RemoveListener
 import mega.privacy.android.app.listeners.RenameListener
 import mega.privacy.android.app.lollipop.FileExplorerActivityLollipop
-import mega.privacy.android.app.textFileEditor.TextFileEditorActivity
-import mega.privacy.android.app.textFileEditor.TextFileEditorActivity.Companion.FROM_HOME_PAGE
-import mega.privacy.android.app.textFileEditor.TextFileEditorViewModel.Companion.CREATE_MODE
-import mega.privacy.android.app.textFileEditor.TextFileEditorViewModel.Companion.MODE
+import mega.privacy.android.app.textEditor.TextEditorActivity
+import mega.privacy.android.app.textEditor.TextEditorViewModel.Companion.CREATE_MODE
+import mega.privacy.android.app.textEditor.TextEditorViewModel.Companion.MODE
+import mega.privacy.android.app.utils.AlertsAndWarnings.showForeignStorageOverQuotaWarningDialog
 import mega.privacy.android.app.utils.ColorUtils.setErrorAwareInputAppearance
 import mega.privacy.android.app.utils.Constants.*
 import mega.privacy.android.app.utils.FileUtil.TXT_EXTENSION
@@ -405,8 +405,6 @@ object MegaNodeDialogUtil {
                                         context,
                                         node,
                                         typedString,
-                                        oldMimeType.extension,
-                                        newExtension,
                                         snackbarShower,
                                         actionNodeCallback
                                     )
@@ -437,7 +435,7 @@ object MegaNodeDialogUtil {
                         }
                     }
                     TYPE_NEW_TXT_FILE -> {
-                        val textFileEditor = Intent(context, TextFileEditorActivity::class.java)
+                        val textFileEditor = Intent(context, TextEditorActivity::class.java)
                             .putExtra(MODE, CREATE_MODE)
                             .putExtra(INTENT_EXTRA_KEY_FILE_NAME, typedString)
                             .putExtra(INTENT_EXTRA_KEY_HANDLE, node?.handle)
@@ -510,8 +508,6 @@ object MegaNodeDialogUtil {
      * @param context            Current context.
      * @param node               A valid node if needed to confirm the action, null otherwise.
      * @param typedString        Typed name.
-     * @param oldExtension       Current file extension.
-     * @param newExtension       New file extension.
      * @param snackbarShower     Interface to show snackbar.
      * @param actionNodeCallback Callback to finish the node action if needed, null otherwise.
      */
@@ -519,46 +515,14 @@ object MegaNodeDialogUtil {
         context: Context,
         node: MegaNode,
         typedString: String,
-        oldExtension: String,
-        newExtension: String,
         snackbarShower: SnackbarShower?,
         actionNodeCallback: ActionNodeCallback?
     ) {
-        val typedOldExt =
-            if (oldExtension.isEmpty()) typedString.substring(0, typedString.lastIndexOf("."))
-            else typedString.substring(0, typedString.lastIndexOf(".") + 1) + oldExtension
-
-        val message = if (oldExtension.isEmpty() && newExtension.isNotEmpty()) {
-            getString(R.string.file_extension_change_warning_old_empty, newExtension)
-        } else if (oldExtension.isNotEmpty() && newExtension.isEmpty()) {
-            getString(R.string.file_extension_change_warning_new_empty, oldExtension)
-        } else {
-            getString(R.string.file_extension_change_warning, oldExtension, newExtension)
-        }
-
-        val useButton = if (newExtension.isEmpty()) {
-            getString(R.string.action_use_empty_new_extension)
-        } else {
-            getString(R.string.action_use_new_extension, newExtension)
-        }
-
-        val keepButton = if (oldExtension.isEmpty()) {
-            getString(R.string.action_keep_empty_old_extension)
-        } else {
-            getString(R.string.action_keep_old_extension, oldExtension)
-        }
-
         MaterialAlertDialogBuilder(context)
             .setTitle(getString(R.string.file_extension_change_title))
-            .setMessage(message)
-            .setPositiveButton(keepButton) { _, _ ->
-                if (typedOldExt == node.name) {
-                    return@setPositiveButton
-                }
-
-                confirmRenameAction(context, node, typedOldExt, snackbarShower, actionNodeCallback)
-            }
-            .setNegativeButton(useButton) { _, _ ->
+            .setMessage(getString(R.string.file_extension_change_warning))
+            .setPositiveButton(getString(R.string.general_cancel), null)
+            .setNegativeButton(getString(R.string.action_change_anyway)) { _, _ ->
                 confirmRenameAction(context, node, typedString, snackbarShower, actionNodeCallback)
             }
             .show()
@@ -649,18 +613,17 @@ object MegaNodeDialogUtil {
             MaterialAlertDialogBuilder(activity, R.style.ThemeOverlay_Mega_MaterialAlertDialog)
                 .setMessage(getString(R.string.confirmation_move_to_rubbish))
                 .setPositiveButton(getString(R.string.general_move)) { _, _ ->
-                    val progress = android.app.ProgressDialog(activity)
-                    progress.setMessage(getString(R.string.context_move_to_trash))
+                    val progress = MegaProgressDialogUtil.createProgressDialog(activity,getString(R.string.context_move_to_trash))
 
                     megaApi.moveNode(
                         node, rubbishNode,
-                        MoveListener {
+                        MoveListener { success, isForeignOverQuota ->
                             progress.dismiss()
 
-                            if (it) {
-                                activity.finish()
-                            } else {
-                                snackbarShower.showSnackbar(getString(R.string.context_no_moved))
+                            when {
+                                success -> activity.finish()
+                                isForeignOverQuota -> showForeignStorageOverQuotaWarningDialog(activity)
+                                else -> snackbarShower.showSnackbar(getString(R.string.context_no_moved))
                             }
                         })
 
@@ -672,8 +635,7 @@ object MegaNodeDialogUtil {
             MaterialAlertDialogBuilder(activity, R.style.ThemeOverlay_Mega_MaterialAlertDialog)
                 .setMessage(getString(R.string.confirmation_delete_from_mega))
                 .setPositiveButton(getString(R.string.general_remove)) { _, _ ->
-                    val progress = android.app.ProgressDialog(activity)
-                    progress.setMessage(getString(R.string.context_delete_from_mega))
+                    val progress = MegaProgressDialogUtil.createProgressDialog(activity, getString(R.string.context_delete_from_mega))
 
                     megaApi.remove(node, RemoveListener {
                         progress.dismiss()

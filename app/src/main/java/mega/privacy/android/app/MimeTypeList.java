@@ -13,6 +13,7 @@ import java.util.HashMap;
 import java.util.List;
 
 import static mega.privacy.android.app.components.textFormatter.TextFormatterUtils.INVALID_INDEX;
+import static mega.privacy.android.app.utils.Constants.TYPE_TEXT_PLAIN;
 
 /*
  * Mime type for files
@@ -80,9 +81,7 @@ public class MimeTypeList {
 		resources.put(R.drawable.ic_numbers_list, new String[] {"numbers", });
 		resources.put(R.drawable.ic_openoffice_list, new String[] {"odp", "odt", "ods"});
 		resources.put(R.drawable.ic_sketch_list, new String[] {"sketch", });
-
-
-
+		resources.put(R.drawable.ic_url_list, new String[]{"url"});
 	}
 
 	private String type;
@@ -146,7 +145,7 @@ public class MimeTypeList {
 	}
 	
 	public boolean isDocument(){
-		boolean r = type.startsWith("application/pdf") || type.startsWith("application/msword") || type.startsWith("application/vnd.ms-excel") || type.startsWith("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet") || type.startsWith("application/vnd.openxmlformats-officedocument.wordprocessingml.document") || type.startsWith("application/rtf") || type.startsWith("text/plain");
+		boolean r = type.startsWith("application/pdf") || type.startsWith("application/msword") || type.startsWith("application/vnd.ms-excel") || type.startsWith("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet") || type.startsWith("application/vnd.openxmlformats-officedocument.wordprocessingml.document") || type.startsWith("application/rtf") || type.startsWith(TYPE_TEXT_PLAIN);
 		
 		return r;
 	}
@@ -237,9 +236,8 @@ public class MimeTypeList {
 	}
 
 	public boolean isAudioNotSupported() {
-		return extension.equals("wma") || extension.equals("aif")
-				|| extension.equals("aiff") || extension.equals("iff") || extension.equals("oga")|| extension.equals("opus")
-				|| extension.equals("3ga");
+		return extension.equals("wma") || extension.equals("aif") || extension.equals("aiff")
+				|| extension.equals("iff") || extension.equals("oga") || extension.equals("3ga");
 	}
 
 	/*
@@ -285,7 +283,7 @@ public class MimeTypeList {
 	 */
 	public boolean isValidTextFileType() {
 				//Text
-		return type.startsWith("text/plain")
+		return type.startsWith(TYPE_TEXT_PLAIN)
 
 				//File extensions considered as plain text
 				|| TEXT_EXTENSIONS.contains(extension)

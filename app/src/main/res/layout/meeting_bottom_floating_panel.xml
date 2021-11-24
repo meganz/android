@@ -10,7 +10,7 @@
     app:behavior_fitToContents="false"
     app:behavior_hideable="false"
     app:behavior_peekHeight="@dimen/meeting_bottom_floating_panel_peek_height"
-    app:layout_behavior="@string/bottom_sheet_behavior">
+    app:layout_behavior="mega.privacy.android.app.meeting.LockableBottomSheetBehavior">
 
     <View
         android:id="@+id/background_mask"
@@ -38,7 +38,7 @@
         style="@style/BottomSheetIcon"
         android:layout_marginStart="20dp"
         android:layout_marginTop="40dp"
-        app:disable_icon="@drawable/ic_mic_disable"
+        app:disable_icon="@drawable/ic_mic_on"
         app:is_on="true"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
@@ -53,7 +53,8 @@
         android:elevation="3dp"
         android:src="@drawable/ic_permission_warning"
         app:layout_constraintRight_toRightOf="@id/fab_mic"
-        app:layout_constraintTop_toTopOf="@id/fab_mic" />
+        app:layout_constraintTop_toTopOf="@id/fab_mic"
+        tools:ignore="ContentDescription" />
 
     <TextView
         android:id="@+id/fab_mic_label"
@@ -69,7 +70,7 @@
     <mega.privacy.android.app.components.OnOffFab
         android:id="@+id/fab_cam"
         style="@style/BottomSheetIcon"
-        app:disable_icon="@drawable/ic_video_disable"
+        app:disable_icon="@drawable/ic_meeting_video_filled"
         app:is_on="true"
         app:layout_constraintEnd_toStartOf="@id/fab_hold"
         app:layout_constraintHorizontal_chainStyle="spread"
@@ -86,7 +87,8 @@
         android:elevation="3dp"
         android:src="@drawable/ic_permission_warning"
         app:layout_constraintRight_toRightOf="@id/fab_cam"
-        app:layout_constraintTop_toTopOf="@id/fab_cam" />
+        app:layout_constraintTop_toTopOf="@id/fab_cam"
+        tools:ignore="ContentDescription" />
 
     <TextView
         android:id="@+id/fab_cam_label"
@@ -102,7 +104,7 @@
     <mega.privacy.android.app.components.OnOffFab
         android:id="@+id/fab_hold"
         style="@style/BottomSheetIcon"
-        app:disable_icon="@drawable/ic_transfers_pause_disable"
+        app:disable_icon="@drawable/ic_transfers_pause"
         app:is_on="true"
         app:layout_constraintEnd_toStartOf="@id/fab_cam"
         app:layout_constraintHorizontal_chainStyle="spread"
@@ -126,14 +128,15 @@
     <mega.privacy.android.app.components.OnOffFab
         android:id="@+id/fab_speaker"
         style="@style/BottomSheetIcon"
+        app:disable_icon="@drawable/ic_speaker_on"
+        app:is_on="true"
         app:layout_constraintEnd_toStartOf="@id/fab_end"
         app:layout_constraintHorizontal_chainStyle="spread"
         app:layout_constraintStart_toEndOf="@id/fab_hold"
         app:layout_constraintTop_toTopOf="@id/fab_mic"
         app:off_icon="@drawable/ic_speaker_off"
         app:on_icon="@drawable/ic_speaker_on"
-        tools:ignore="ContentDescription"
-        tools:is_on="false" />
+        tools:ignore="ContentDescription" />
 
     <TextView
         android:id="@+id/fab_speaker_label"
@@ -239,7 +242,7 @@
         style="?attr/materialButtonOutlinedStyle"
         android:layout_marginStart="15dp"
         android:layout_marginEnd="13dp"
-        android:drawableLeft="@drawable/ic_social_share_white"
+        android:drawableStart="@drawable/ic_social_share_white"
         android:text="@string/context_get_link"
         android:textAllCaps="false"
         app:drawableTint="?attr/colorSecondary"

@@ -2,9 +2,8 @@ package mega.privacy.android.app.fragments.homepage
 
 import android.content.Context
 import android.os.Handler
+import android.os.Looper
 import androidx.lifecycle.MutableLiveData
-import dagger.hilt.android.AndroidEntryPoint
-import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.delay
 import mega.privacy.android.app.fragments.homepage.photos.PhotoNodeItem
 import mega.privacy.android.app.listeners.BaseListener
@@ -17,7 +16,6 @@ import java.time.LocalDate
 import java.time.YearMonth
 import java.time.format.DateTimeFormatter
 import java.util.*
-import javax.inject.Inject
 import kotlin.collections.LinkedHashMap
 
 /**
@@ -51,7 +49,7 @@ class TypedNodesFetcher(
         if (waitingForRefresh) return
         waitingForRefresh = true
 
-        Handler().postDelayed(
+        Handler(Looper.getMainLooper()).postDelayed(
             {
                 waitingForRefresh = false
                 result.postValue(ArrayList(fileNodesMap.values))

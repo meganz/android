@@ -1,5 +1,7 @@
 package mega.privacy.android.app;
 
+import static android.media.MediaCodecInfo.CodecProfileLevel.AVCProfileBaseline;
+
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.media.MediaCodec;
@@ -20,14 +22,17 @@ import java.util.concurrent.atomic.AtomicReference;
 import mega.privacy.android.app.lollipop.megachat.ChatUploadService;
 import mega.privacy.android.app.utils.conversion.VideoCompressionCallback;
 
+import static mega.privacy.android.app.constants.SettingsConstants.VIDEO_QUALITY_HIGH;
+import static mega.privacy.android.app.constants.SettingsConstants.VIDEO_QUALITY_MEDIUM;
 import static mega.privacy.android.app.utils.LogUtil.*;
+
+import androidx.annotation.Nullable;
 
 public class VideoDownsampling {
 
     private static final int TIMEOUT_USEC = 10000;
 
     private static final String OUTPUT_VIDEO_MIME_TYPE = "video/avc";
-    private static final int OUTPUT_VIDEO_BIT_RATE = 1280 * 720;
     private static final int OUTPUT_VIDEO_FRAME_RATE = 30;
     private static final int OUTPUT_VIDEO_IFRAME_INTERVAL = 10;
     private static final int OUTPUT_VIDEO_COLOR_FORMAT = MediaCodecInfo.CodecCapabilities.COLOR_FormatSurface;
@@ -38,8 +43,15 @@ public class VideoDownsampling {
     private static final int OUTPUT_AUDIO_AAC_PROFILE = MediaCodecInfo.CodecProfileLevel.AACObjectHE;
     private static final int OUTPUT_AUDIO_SAMPLE_RATE_HZ = 44100;
 
-    private int mWidth = 1280;
-    private int mHeight = 720;
+    private static final int SHORT_SIDE_SIZE_MEDIUM = 1080;
+    private static final int SHORT_SIDE_SIZE_LOW = 720;
+
+    protected int quality;
+
+    private int mWidth;
+    private int mHeight;
+    private int resultWidth;
+    private int resultHeight;
 
     static Context context;
 
@@ -76,8 +88,10 @@ public class VideoDownsampling {
         isRunning = running;
     }
 
-    public void changeResolution(File f, String inputFile, long idMessage) throws Throwable {
+    public void changeResolution(File f, String inputFile, long idMessage, int quality) throws Throwable {
         logDebug("changeResolution");
+
+        this.quality = quality;
 
         queue.add(new VideoUpload(f.getAbsolutePath(), inputFile, f.length(), idMessage));
 
@@ -125,6 +139,26 @@ public class VideoDownsampling {
         }
     }
 
+    /**
+     * Creates the decoders and encoders to compress a video given a quality.
+     *
+     * Depending on quality these are the params the video encoder receives to perform the compression:
+     *  - VIDEO_QUALITY_HIGH:
+     *      * Original resolution.
+     *      * Original frame rate.
+     *      * Average bitrate reduced by 2%.
+     *  - VIDEO_QUALITY_MEDIUM:
+     *      * 1080p resolution if supported, the closest one if not.
+     *      * OUTPUT_VIDEO_FRAME_RATE or the original one if smaller.
+     *      * Half of average bitrate.
+     *  - VIDEO_QUALITY_LOW:
+     *      * 720p resolution if supported, the closest one if not.
+     *      * OUTPUT_VIDEO_FRAME_RATE or the original one if smaller.
+     *      * A third of average bitrate.
+     *
+     * @param video VideoUpload object containing the required info to compress a video.
+     * @throws Exception If something wrong happens.
+     */
     protected void prepareAndChangeResolution(VideoUpload video) throws Exception {
         logDebug("prepareAndChangeResolution");
         Exception exception = null;
@@ -152,16 +186,93 @@ public class VideoDownsampling {
             videoExtractor = createExtractor(mInputFile);
             int videoInputTrack = getAndSelectVideoTrackIndex(videoExtractor);
             MediaFormat inputFormat = videoExtractor.getTrackFormat(videoInputTrack);
+            MediaMetadataRetriever m = new MediaMetadataRetriever();
+            m.setDataSource(mInputFile);
 
-            resetWidthAndHeight(mInputFile);
+            getOriginalWidthAndHeight(m);
 
-            MediaFormat outputVideoFormat = MediaFormat.createVideoFormat(OUTPUT_VIDEO_MIME_TYPE, mWidth, mHeight);
+            resultWidth = mWidth;
+            resultHeight = mHeight;
+
+            int bitrate = Integer.parseInt(m.extractMetadata(MediaMetadataRetriever.METADATA_KEY_BITRATE));
+            int shortSideByQuality = quality == VIDEO_QUALITY_MEDIUM
+                    ? SHORT_SIDE_SIZE_MEDIUM
+                    : SHORT_SIDE_SIZE_LOW;
+
+            int shortSide = Math.min(mWidth, mHeight);
+            int frameRate = inputFormat.containsKey(MediaFormat.KEY_FRAME_RATE)
+                    ? inputFormat.getInteger(MediaFormat.KEY_FRAME_RATE)
+                    : OUTPUT_VIDEO_FRAME_RATE;
+
+            logDebug("Video original width: " + mWidth + ", original height: " + mHeight
+                    + ", average bitrate: " + bitrate + ", frame rate: " + frameRate);
+
+            if (quality != VIDEO_QUALITY_HIGH) {
+                bitrate = quality == VIDEO_QUALITY_MEDIUM
+                        ? bitrate / 2
+                        : bitrate / 3;
+
+                frameRate = Math.min(frameRate, OUTPUT_VIDEO_FRAME_RATE);
+
+                if (shortSide > shortSideByQuality) {
+                    getCodecResolution(shortSideByQuality);
+                }
+            } else {
+                // Since the METADATA_KEY_BITRATE is not the right value of the final bitrate
+                // of a video but the average one, we can assume a 2% less to ensure the final size
+                // is a bit less than the original one.
+                bitrate *= 0.98;
+            }
+
+            logDebug("Video result width: " + resultWidth + ", result height: " + resultHeight
+                    + ", encode bitrate: " + bitrate + ", encode frame rate: " + frameRate);
+
+            MediaCodecInfo.VideoCapabilities capabilities = videoCodecInfo
+                    .getCapabilitiesForType(OUTPUT_VIDEO_MIME_TYPE).getVideoCapabilities();
+
+            boolean supported = capabilities.areSizeAndRateSupported(resultWidth, resultHeight, frameRate);
+
+            if (!supported) {
+                logWarning("Sizes width: " + resultWidth + " height: " + resultHeight + " not supported.");
+
+                for (int i = shortSideByQuality; i< shortSide; i++) {
+                    getCodecResolution(i);
+                    supported = capabilities.areSizeAndRateSupported(resultWidth, resultHeight, frameRate);
+
+                    if (supported) {
+                        break;
+                    }
+                }
+            }
+
+            if (!supported && quality == VIDEO_QUALITY_MEDIUM) {
+                logWarning("Sizes still not supported. Second try.");
+                shortSideByQuality--;
+
+                for (int i = shortSideByQuality; i > SHORT_SIDE_SIZE_LOW; i--) {
+                    getCodecResolution(i);
+                    supported = capabilities.areSizeAndRateSupported(resultWidth, resultHeight, frameRate);
+
+                    if (supported) {
+                        break;
+                    }
+                }
+            }
+
+            if (!supported) {
+                String error = "Latest sizes width: " + resultWidth + " height: " + resultHeight + " not supported. " +
+                        "Video not compressed, uploading original video.";
+                logError(error);
+                throw exception = new Exception(error);
+            }
+
+            MediaFormat outputVideoFormat = MediaFormat.createVideoFormat(OUTPUT_VIDEO_MIME_TYPE, resultWidth, resultHeight);
             outputVideoFormat.setInteger(MediaFormat.KEY_COLOR_FORMAT, OUTPUT_VIDEO_COLOR_FORMAT);
-            outputVideoFormat.setInteger(MediaFormat.KEY_BIT_RATE, OUTPUT_VIDEO_BIT_RATE);
-            outputVideoFormat.setInteger(MediaFormat.KEY_FRAME_RATE, OUTPUT_VIDEO_FRAME_RATE);
+            outputVideoFormat.setInteger(MediaFormat.KEY_BIT_RATE, bitrate);
+            outputVideoFormat.setInteger(MediaFormat.KEY_FRAME_RATE, frameRate);
             outputVideoFormat.setInteger(MediaFormat.KEY_I_FRAME_INTERVAL, OUTPUT_VIDEO_IFRAME_INTERVAL);
 
-            AtomicReference<Surface> inputSurfaceReference = new AtomicReference<Surface>();
+            AtomicReference<Surface> inputSurfaceReference = new AtomicReference<>();
             videoEncoder = createVideoEncoder(videoCodecInfo, outputVideoFormat, inputSurfaceReference);
             inputSurface = new InputSurface(inputSurfaceReference.get());
             inputSurface.makeCurrent();
@@ -171,15 +282,18 @@ public class VideoDownsampling {
 
             audioExtractor = createExtractor(mInputFile);
             int audioInputTrack = getAndSelectAudioTrackIndex(audioExtractor);
-            MediaFormat inputAudioFormat = audioExtractor.getTrackFormat(audioInputTrack);
-            MediaFormat outputAudioFormat = MediaFormat.createAudioFormat(inputAudioFormat.getString(MediaFormat.KEY_MIME),
-                    inputAudioFormat.getInteger(MediaFormat.KEY_SAMPLE_RATE),
-                    inputAudioFormat.getInteger(MediaFormat.KEY_CHANNEL_COUNT));
-            outputAudioFormat.setInteger(MediaFormat.KEY_BIT_RATE, OUTPUT_AUDIO_BIT_RATE);
-            outputAudioFormat.setInteger(MediaFormat.KEY_AAC_PROFILE, OUTPUT_AUDIO_AAC_PROFILE);
 
-            audioEncoder = createAudioEncoder(audioCodecInfo, outputAudioFormat);
-            audioDecoder = createAudioDecoder(inputAudioFormat);
+            if (audioInputTrack >= 0) {
+                MediaFormat inputAudioFormat = audioExtractor.getTrackFormat(audioInputTrack);
+                MediaFormat outputAudioFormat = MediaFormat.createAudioFormat(inputAudioFormat.getString(MediaFormat.KEY_MIME),
+                        inputAudioFormat.getInteger(MediaFormat.KEY_SAMPLE_RATE),
+                        inputAudioFormat.getInteger(MediaFormat.KEY_CHANNEL_COUNT));
+                outputAudioFormat.setInteger(MediaFormat.KEY_BIT_RATE, OUTPUT_AUDIO_BIT_RATE);
+                outputAudioFormat.setInteger(MediaFormat.KEY_AAC_PROFILE, OUTPUT_AUDIO_AAC_PROFILE);
+
+                audioEncoder = createAudioEncoder(audioCodecInfo, outputAudioFormat);
+                audioDecoder = createAudioDecoder(inputAudioFormat);
+            }
 
             muxer = new MediaMuxer(mOutputFile, MediaMuxer.OutputFormat.MUXER_OUTPUT_MPEG_4);
 
@@ -261,7 +375,7 @@ public class VideoDownsampling {
             }
         }
         if (exception != null){
-            logError("Exception", exception);
+            logError("Exception. Video not compressed, uploading original video.", exception);
             throw exception;
         }
         else{
@@ -271,11 +385,13 @@ public class VideoDownsampling {
         }
     }
 
-    private void resetWidthAndHeight(String mInputFile) {
-        MediaMetadataRetriever m = new MediaMetadataRetriever();
-        m.setDataSource(mInputFile);
+    private void getOriginalWidthAndHeight(MediaMetadataRetriever m) {
+        mWidth = Integer.parseInt(m.extractMetadata(MediaMetadataRetriever.METADATA_KEY_VIDEO_WIDTH));
+        mHeight = Integer.parseInt(m.extractMetadata(MediaMetadataRetriever.METADATA_KEY_VIDEO_HEIGHT));
         Bitmap thumbnail = m.getFrameAtTime();
-        int inputWidth = thumbnail.getWidth(), inputHeight = thumbnail.getHeight();
+        int inputWidth = thumbnail.getWidth();
+        int inputHeight = thumbnail.getHeight();
+
         if (inputWidth > inputHeight) {
             if (mWidth < mHeight) {
                 int w = mWidth;
@@ -348,7 +464,7 @@ public class VideoDownsampling {
 
     private void changeResolution(MediaExtractor videoExtractor, MediaExtractor audioExtractor,
                                   MediaCodec videoDecoder, MediaCodec videoEncoder,
-                                  MediaCodec audioDecoder, MediaCodec audioEncoder,
+                                  @Nullable MediaCodec audioDecoder,  @Nullable MediaCodec audioEncoder,
                                   MediaMuxer muxer,
                                   InputSurface inputSurface, OutputSurface outputSurface, VideoUpload video) {
         logDebug("changeResolution");
@@ -366,6 +482,14 @@ public class VideoDownsampling {
         videoDecoderOutputBufferInfo = new MediaCodec.BufferInfo();
         videoEncoderOutputBufferInfo = new MediaCodec.BufferInfo();
 
+        MediaFormat decoderOutputVideoFormat = null;
+        MediaFormat encoderOutputVideoFormat = null;
+        int outputVideoTrack = -1;
+
+        boolean videoExtractorDone = false;
+        boolean videoDecoderDone = false;
+        boolean videoEncoderDone = false;
+
         ByteBuffer[] audioDecoderInputBuffers = null;
         ByteBuffer[] audioDecoderOutputBuffers = null;
         ByteBuffer[] audioEncoderInputBuffers = null;
@@ -373,30 +497,30 @@ public class VideoDownsampling {
         MediaCodec.BufferInfo audioDecoderOutputBufferInfo = null;
         MediaCodec.BufferInfo audioEncoderOutputBufferInfo = null;
 
-        audioDecoderInputBuffers = audioDecoder.getInputBuffers();
-        audioDecoderOutputBuffers =  audioDecoder.getOutputBuffers();
-        audioEncoderInputBuffers = audioEncoder.getInputBuffers();
-        audioEncoderOutputBuffers = audioEncoder.getOutputBuffers();
-        audioDecoderOutputBufferInfo = new MediaCodec.BufferInfo();
-        audioEncoderOutputBufferInfo = new MediaCodec.BufferInfo();
-
-        MediaFormat decoderOutputVideoFormat = null;
-        MediaFormat decoderOutputAudioFormat = null;
-        MediaFormat encoderOutputVideoFormat = null;
-        MediaFormat encoderOutputAudioFormat = null;
-        int outputVideoTrack = -1;
-        int outputAudioTrack = -1;
-
-        boolean videoExtractorDone = false;
-        boolean videoDecoderDone = false;
-        boolean videoEncoderDone = false;
-
         boolean audioExtractorDone = false;
         boolean audioDecoderDone = false;
         boolean audioEncoderDone = false;
 
+        if (audioDecoder != null && audioEncoder != null) {
+            audioDecoderInputBuffers = audioDecoder.getInputBuffers();
+            audioDecoderOutputBuffers = audioDecoder.getOutputBuffers();
+            audioEncoderInputBuffers = audioEncoder.getInputBuffers();
+            audioEncoderOutputBuffers = audioEncoder.getOutputBuffers();
+            audioDecoderOutputBufferInfo = new MediaCodec.BufferInfo();
+            audioEncoderOutputBufferInfo = new MediaCodec.BufferInfo();
+        } else {
+            audioExtractorDone = true;
+            audioDecoderDone = true;
+            audioEncoderDone = true;
+        }
+
+        MediaFormat decoderOutputAudioFormat = null;
+        MediaFormat encoderOutputAudioFormat = null;
+        int outputAudioTrack = -1;
         int pendingAudioDecoderOutputBufferIndex = -1;
+
         boolean muxing = false;
+
         while ((!videoEncoderDone || !audioEncoderDone) && isRunning) {
             while (!videoExtractorDone && (encoderOutputVideoFormat == null || muxing)) {
                 int decoderInputBufferIndex = videoDecoder.dequeueInputBuffer(TIMEOUT_USEC);
@@ -424,7 +548,8 @@ public class VideoDownsampling {
                 break;
             }
 
-            while (!audioExtractorDone && (encoderOutputAudioFormat == null || muxing)) {
+            while (audioDecoder != null && audioDecoderInputBuffers != null
+                    && !audioExtractorDone && (encoderOutputAudioFormat == null || muxing)) {
                 int decoderInputBufferIndex = audioDecoder.dequeueInputBuffer(TIMEOUT_USEC);
                 if (decoderInputBufferIndex == MediaCodec.INFO_TRY_AGAIN_LATER)
                     break;
@@ -486,7 +611,8 @@ public class VideoDownsampling {
                 break;
             }
 
-            while (!audioDecoderDone && pendingAudioDecoderOutputBufferIndex == -1 && (encoderOutputAudioFormat == null || muxing)) {
+            while (audioDecoder != null && audioDecoderOutputBuffers != null
+                    && !audioDecoderDone && (encoderOutputAudioFormat == null || muxing)) {
                 int decoderOutputBufferIndex = audioDecoder.dequeueOutputBuffer(audioDecoderOutputBufferInfo, TIMEOUT_USEC);
                 if (decoderOutputBufferIndex == MediaCodec.INFO_TRY_AGAIN_LATER)
                     break;
@@ -508,7 +634,8 @@ public class VideoDownsampling {
                 break;
             }
 
-            while (pendingAudioDecoderOutputBufferIndex != -1) {
+            while (audioEncoder != null && audioEncoderInputBuffers != null
+                    && pendingAudioDecoderOutputBufferIndex != -1) {
                 int encoderInputBufferIndex = audioEncoder.dequeueInputBuffer(TIMEOUT_USEC);
                 ByteBuffer encoderInputBuffer = audioEncoderInputBuffers[encoderInputBufferIndex];
                 int size = audioDecoderOutputBufferInfo.size;
@@ -558,7 +685,8 @@ public class VideoDownsampling {
                 break;
             }
 
-            while (!audioEncoderDone && (encoderOutputAudioFormat == null || muxing)) {
+            while (audioEncoder != null && audioEncoderOutputBuffers != null
+                    && !audioEncoderDone && (encoderOutputAudioFormat == null || muxing)) {
                 int encoderOutputBufferIndex = audioEncoder.dequeueOutputBuffer(audioEncoderOutputBufferInfo, TIMEOUT_USEC);
                 if (encoderOutputBufferIndex == MediaCodec.INFO_TRY_AGAIN_LATER) {
                     break;
@@ -585,9 +713,13 @@ public class VideoDownsampling {
                 audioEncoder.releaseOutputBuffer(encoderOutputBufferIndex, false);
                 break;
             }
-            if (!muxing && (encoderOutputAudioFormat != null) && (encoderOutputVideoFormat != null)) {
+            if (!muxing && encoderOutputVideoFormat != null) {
                 outputVideoTrack = muxer.addTrack(encoderOutputVideoFormat);
-                outputAudioTrack = muxer.addTrack(encoderOutputAudioFormat);
+
+                if (encoderOutputAudioFormat != null) {
+                    outputAudioTrack = muxer.addTrack(encoderOutputAudioFormat);
+                }
+
                 muxer.start();
                 muxing = true;
             }
@@ -632,5 +764,20 @@ public class VideoDownsampling {
             }
         }
         return null;
+    }
+
+    /**
+     * Gets the resolution to compress the video.
+     *
+     * @param resolution Short side size.
+     */
+    private void getCodecResolution(int resolution) {
+        if (mWidth > mHeight) {
+            resultWidth = mWidth * resolution / mHeight;
+            resultHeight = resolution;
+        } else {
+            resultWidth = resolution;
+            resultHeight = mHeight * resolution / mWidth;
+        }
     }
 }

@@ -1,9 +1,9 @@
 package mega.privacy.android.app.meeting.fragments
 
-import android.annotation.SuppressLint
-import android.app.Dialog
 import android.os.Bundle
 import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
@@ -40,10 +40,11 @@ class MeetingParticipantBottomSheetDialogFragment : BaseBottomSheetDialogFragmen
     private lateinit var participantItem: Participant
     private lateinit var binding: BottomSheetMeetingParticipantBinding
 
-    @SuppressLint("RestrictedApi")
-    override fun setupDialog(dialog: Dialog, style: Int) {
-        super.setupDialog(dialog, style)
-
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View {
         if (arguments?.getSerializable(EXTRA_PARTICIPANT) != null) {
             participantItem = arguments?.getSerializable(EXTRA_PARTICIPANT) as Participant
             isMe = participantItem.isMe
@@ -69,14 +70,17 @@ class MeetingParticipantBottomSheetDialogFragment : BaseBottomSheetDialogFragmen
                     participant = participantItem
                 }
 
-        bottomViewModel.setShowingName(binding.name)
-
         contentView = binding.root
-        dialog.setContentView(contentView)
-        setBottomSheetBehavior(HEIGHT_HEADER_LARGE, true)
+        itemsLayout = binding.itemsLayout
 
+        return contentView
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        bottomViewModel.setShowingName(binding.name)
         initItemAction(binding)
         initAvatar(participantItem)
+        super.onViewCreated(view, savedInstanceState)
     }
 
     /**
@@ -90,7 +94,7 @@ class MeetingParticipantBottomSheetDialogFragment : BaseBottomSheetDialogFragmen
         listenAction(binding.contactInfo) { onContactInfoOrEditProfile() }
 
         listenAction(binding.sendMessage) {
-            // Opea chat page
+            // Open chat page
             bottomViewModel.sendMessage(requireActivity())
         }
 

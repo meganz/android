@@ -55,7 +55,7 @@ public class OnDragTouchListener implements View.OnTouchListener {
         maxLeft = 0;
         maxRight = maxLeft + mParent.getWidth();
 
-        maxTop = 0 + toolbarHeight;
+        maxTop = toolbarHeight;
         maxBottom = (bottomSheetHeight > 0) ? bottomSheetHeight : mParent.getHeight();
     }
 
@@ -98,12 +98,10 @@ public class OnDragTouchListener implements View.OnTouchListener {
                 case MotionEvent.ACTION_CANCEL:
                 case MotionEvent.ACTION_UP:
                     // Sticky
-                    float x;
-                    if(bounds[0] > (float)(mParent.getWidth() / 2)) {
-                        x = mParent.getWidth() - mView.getWidth();
-                    } else {
-                        x = 0;
-                    }
+                    float x = bounds[0] > (float) (mParent.getWidth() / 2)
+                            ? mParent.getWidth() - mView.getWidth()
+                            : 0;
+
                     mView.animate().x(x).y(bounds[1]).setDuration(0).start();
                     onDragFinish();
                     break;
@@ -114,16 +112,15 @@ public class OnDragTouchListener implements View.OnTouchListener {
             }
             return true;
         } else {
-            switch (event.getAction()) {
-                case MotionEvent.ACTION_DOWN:
-                    if (mOnDragActionListener != null) {
-                        mOnDragActionListener.onDragStart(mView);
-                    }
-                    isDragging = true;
-                    updateBounds();
-                    dX = v.getX() - event.getRawX();
-                    dY = v.getY() - event.getRawY();
-                    return true;
+            if (event.getAction() == MotionEvent.ACTION_DOWN) {
+                if (mOnDragActionListener != null) {
+                    mOnDragActionListener.onDragStart(mView);
+                }
+                isDragging = true;
+                updateBounds();
+                dX = v.getX() - event.getRawX();
+                dY = v.getY() - event.getRawY();
+                return true;
             }
         }
         return false;

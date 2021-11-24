@@ -2,13 +2,10 @@ package mega.privacy.android.app.lollipop.megaachievements;
 
 import android.annotation.SuppressLint;
 import android.content.Intent;
-import android.os.Build;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.Window;
-import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.FrameLayout;
@@ -16,32 +13,27 @@ import android.widget.TextView;
 
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.widget.Toolbar;
-import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
-import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.activities.PasscodeActivity;
 import mega.privacy.android.app.listeners.GetAchievementsListener;
 import mega.privacy.android.app.lollipop.InviteContactActivity;
-import mega.privacy.android.app.lollipop.LoginActivityLollipop;
+import mega.privacy.android.app.utils.StringResourcesUtils;
 import mega.privacy.android.app.utils.Util;
-import nz.mega.sdk.MegaApiAndroid;
-import nz.mega.sdk.MegaChatApi;
-import nz.mega.sdk.MegaChatApiAndroid;
 
 import static mega.privacy.android.app.utils.Constants.ACHIEVEMENTS_FRAGMENT;
 import static mega.privacy.android.app.utils.Constants.BONUSES_FRAGMENT;
 import static mega.privacy.android.app.utils.Constants.INFO_ACHIEVEMENTS_FRAGMENT;
 import static mega.privacy.android.app.utils.Constants.INVITE_FRIENDS_FRAGMENT;
-import static mega.privacy.android.app.utils.Constants.LOGIN_FRAGMENT;
 import static mega.privacy.android.app.utils.Constants.REQUEST_CODE_GET_CONTACTS;
-import static mega.privacy.android.app.utils.Constants.VISIBLE_FRAGMENT;
 import static mega.privacy.android.app.utils.LogUtil.logDebug;
 import static mega.privacy.android.app.utils.Util.hideKeyboard;
+
+import java.util.Locale;
 
 public class AchievementsActivity extends PasscodeActivity {
     private static final String TAG_ACHIEVEMENTS = "achievementsFragment";
@@ -51,9 +43,6 @@ public class AchievementsActivity extends PasscodeActivity {
     Toolbar tB;
     ActionBar aB;
 
-    MegaApiAndroid megaApi;
-    MegaChatApiAndroid megaChatApi;
-
     @SuppressLint("StaticFieldLeak")
     public static GetAchievementsListener sFetcher;
     private androidx.appcompat.app.AlertDialog successDialog;
@@ -62,31 +51,7 @@ public class AchievementsActivity extends PasscodeActivity {
         logDebug("onCreate");
         super.onCreate(savedInstanceState);
 
-        if (megaApi == null) {
-            megaApi = ((MegaApplication) getApplication()).getMegaApi();
-        }
-
-        if (megaApi == null || megaApi.getRootNode() == null) {
-            logDebug("Refresh session - sdk");
-            Intent intent = new Intent(this, LoginActivityLollipop.class);
-            intent.putExtra(VISIBLE_FRAGMENT, LOGIN_FRAGMENT);
-            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-            startActivity(intent);
-            finish();
-            return;
-        }
-
-        if (megaChatApi == null) {
-            megaChatApi = ((MegaApplication) getApplication()).getMegaChatApi();
-        }
-
-        if (megaChatApi == null || megaChatApi.getInitState() == MegaChatApi.INIT_ERROR) {
-            logDebug("Refresh session - karere");
-            Intent intent = new Intent(this, LoginActivityLollipop.class);
-            intent.putExtra(VISIBLE_FRAGMENT, LOGIN_FRAGMENT);
-            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-            startActivity(intent);
-            finish();
+        if (shouldRefreshSessionDueToSDK() || shouldRefreshSessionDueToKarere()) {
             return;
         }
 
@@ -154,7 +119,9 @@ public class AchievementsActivity extends PasscodeActivity {
         switch (fragmentName) {
             case ACHIEVEMENTS_FRAGMENT:
                 hideKeyboard(this, InputMethodManager.HIDE_NOT_ALWAYS);
-                aB.setTitle(getString(R.string.achievements_title));
+                aB.setTitle(StringResourcesUtils.getString(R.string.achievements_title)
+                        .toUpperCase(Locale.getDefault()));
+
                 fragment = new AchievementsFragment();
                 tag = "achievementsFragment";
                 break;

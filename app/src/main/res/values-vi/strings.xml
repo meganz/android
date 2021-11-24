@@ -1,15 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <!-- Full description text of the app in the Google Play page of the app (character limit 4000) -->
-    <string name="full_description_text">MEGA cung cấp không gian lưu trữ điện toán đám mây với công nghệ mã hoá đầu-cuối được điều hành bởi người sử dụng, cùng với dịch vụ chat thông qua trình duyệt web và các ứng dụng cho điện thoại di động. Không như các hãng khác, dữ liệu không thể bị giải mã bởi máy chủ, chỉ có thể thực hiện bởi người dùng trên chính chương trình được sử dụng.\n\nTải lên tệp tin từ smartphone hay máy tính bảng và quản lý bằng cách lưu trữ, tải về, truyền tải, chia sẻ, đổi tên, hay xóa bỏ dữ liệu vào bất cứ thời điểm, thiết bị muốn sử dụng ở bất cứ đâu. Chia sẻ thư mục với tên liên lạc và xem tương tác được cập nhật ngay tức thì. Bảo mật đầu-cuối mang nghĩa rằng mật khẩu BẮT BUỘC phải nhớ (hay cần phải có lưu lại Mã Phục Hồi) không thì sẽ mất toàn quyền truy cập vào tài khoản và mất hết dữ liệu.\n\nCông nghệ mã hóa đầu-cuối điều hành bởi người dùng cho phép thực hiện gọi video một cách bảo mật, và được hỗ trợ từ năm 2016 cho trình duyệt nay đã thực hiện cho app điện thoại, cùng với lịch sử cuộc trò chuyện có thể được xem trên nhiều thiết bị khác nhau. Nguời sử dụng còn có thể chia sẻ tệp tin từ Ổ Mây MEGA của mình vào cuộc chat.\n\nMEGA cung cấp cho mọi tài khoản không gian lưu trữ miễn phí lên đến 50 GB với các nhiệm vụ thưởng để mở rộng thêm không gian cùng các thuê bao trả phí như:\n\n\nGói Pro Lite: €4.99 (US$4.99) mỗi tháng hay €49.99 (US$49.99) mỗi năm cung cấp cho bạn 400 GB không gian lưu trữ và 1 TB cho băng thông truyền tải mỗi tháng.\nGói Pro I: €9.99 (US$9.99) mỗi tháng hay €99.99 (US$99.99) mỗi năm cung cấp cho bạn 2 TB không gian lưu trữ và 2 TB cho băng thông truyền tải mỗi tháng.\nGói Pro II: €19.99 (US$19.99) mỗi tháng hay €199.99 (US$199.99) mỗi năm cung cấp cho bạn 8 TB không gian lưu trữ và 8 TB cho băng thông truyền tải mỗi tháng.\nGói Pro III: €29.99 (US$29.99) mỗi tháng hay €299.99 (US$299.99) mỗi năm cung cấp cho bạn 16 TB không gian lưu trữ và 16 TB cho băng thông truyền tải mỗi tháng. tải mỗi tháng.\n\nGói thuê bao trả phí sẽ tự động mua chu kỳ mới vào ngày cuối hạn với cùng giá và thời hạn như thời kỳ ban đầu. Để quản lý việc mua gói cước, xin vào CH Play trên điện thoại, đăng nhập vào Gmail/Google ID (nếu chưa làm) và tìm đến app MEGA. Từ đó xem, quản lý, mua, hay hủy gói thuê bao.\n\nCấp Quyền Ứng Dụng:\nWRITE_EXTERNAL_STORAGE -&gt; Tải về tệp tin từ MEGA vào trong điện thoại và để lấy tệp tin trong máy tải lên MEGA\nCAMERA -&gt; Chụp ảnh và đăng tải lên MEGA\nREAD_CONTACTS -&gt; Để dễ dàng tìm các tên liên lạc có sử dụng MEGA\nRECORD_AUDIO và CAPTURE_VIDEO_OUTPUT (micrô và camera) -&gt; MEGA cung cấp tính năng bảo mật đầu-cuối và cần dùng để thực hiện các cuộc gọi thoại/video\n\n\nĐể tăng cường sự tin cậy của người sử dụng, tất cả mã nguồn dùng cho phía máy khách đề được công bố, các lập trình viên và khảo sát an ninh mạng có thể vào xem và đánh giá. Mã nguồn xây dựng ứng dụng di động: https://github.com/meganz/android \n\nXem thêm tại website:\nVào https://mega.nz/terms \n\n\nDesktop - https://mega.nz/</string>
+    <string name="full_description_text">MEGA provides user controlled encrypted cloud storage and chat through standard web browsers, together with dedicated apps for mobile devices. Unlike other cloud storage providers, your data is encrypted and decrypted by your client devices only and never by us.\n\nUpload your files from your smartphone or tablet then search, store, download, stream, view, share, rename or delete your files any time, from any device, anywhere. Share folders with your contacts and see their updates in real time. The encryption process means we cannot access or reset your password so you MUST remember it (unless you have your Recovery Key backed up) or you will lose access to your stored files.\n\nEnd-to-end user encrypted MEGA video chat allows for total privacy, and has been available in web browsers since 2016. It has been extended to the Mega Mobile App, with chat history accessible across multiple devices. Users can also easily add files to a chat from their MEGA Cloud Drive.\n\nMEGA offers a generous 20 GB free storage for all registered users with bonus achievements, and offers paid plans with much higher limits:\n\n\nPro Lite subscription: 4.99 € per month or 49.99 € per year gives you 400 GB of storage space and 1 TB of transfer quota per month.\nPro I subscription: 9.99 € per month or 99.99 € per year gives you 2 TB of storage space and 2 TB of transfer quota per month.\nPro II subscription: 19.99 € per month or 199.99 € per year gives you 8 TB of storage space and 8 TB of transfer quota per month.\nPro III subscription: 29.99 € per month or 299.99 € per year gives you 16 TB of storage space and 16 TB of transfer quota per month.\n\nSubscriptions are renewed automatically for successive periods of the same duration, at the same price as the initial period chosen. To manage your subscriptions, simply tap the Play Store icon on your mobile device, sign in with your Google ID (if you haven’t already done so). Then tap on the MEGA app. You’ll be able to manage your subscription there.\n\nApp Permissions:\nWRITE_EXTERNAL_STORAGE -&gt; Download your files from MEGA to your device and upload files from your device to MEGA\nCAMERA -&gt; Take a picture and upload your photos to MEGA\nREAD_CONTACTS -&gt; Easily add contacts from your device as MEGA contacts\nRECORD_AUDIO and CAPTURE_VIDEO_OUTPUT (mic and camera) -&gt; MEGA provides for end-to-end encrypted audio/video calls\n\n\nTo enhance users’ confidence in the MEGA system, all of the client-side code is published, so interested security researchers can evaluate the encryption process. The code of our mobile app is located on: https://github.com/meganz/android \n\nFor more info, please check our website:\nSee https://mega.nz/terms \n\n\nDesktop - https://mega.nz/</string>
     <!-- Short description text of the app in the Google Play page of the app (character limit 80) -->
-    <string name="short_description_text">MEGA - Lưu Trữ Điện Toán Đám Mây với Bảo Mật Luôn Luôn Duy Trì.</string>
+    <string name="short_description_text">MEGA is Cloud Storage with secure always-on privacy.</string>
     <!-- PRO Lite account -->
     <string name="prolite_account">Pro Lite</string>
     <!-- Name of the MEGA PDF Viewer. Keep uppercase. -->
     <string name="pdf_app_name">MEGA Xem PDF</string>
-    <!-- Showing progress of elements. Example: 2 of 10. -->
-    <string name="general_x_of_x">trong tổng</string>
     <!-- Answer for confirmation dialog. -->
     <string name="general_yes">Có</string>
     <!-- Answer for confirmation dialog. -->
@@ -75,7 +73,7 @@
     <!-- when any file or folder is selected -->
     <string name="error_no_selection">Chưa chọn tệp tin hay thư mục nào</string>
     <!-- when trying to download a file that is already downloaded in the device -->
-    <string name="general_already_downloaded">Đã tải xong từ trước</string>
+    <string name="general_already_downloaded">Đã tải xuống xong từ trước</string>
     <!-- when trying to upload a file that is already uploaded in the folder -->
     <string name="general_already_uploaded">đã được tải lên rồi</string>
     <!-- Label of the option menu. When clicking this button, the app shows the info of the file -->
@@ -191,7 +189,7 @@
     <!-- when the user tries to log in to MEGA without a valid session -->
     <string name="error_server_expired_session">Bạn bị đẩy đăng xuất ra ngoài vì đã đăng nhập ở một thiết bị khác</string>
     <!-- the first step when logging in is calculate the private and public encryption keys -->
-    <string name="login_generating_key">Đang tính toán các mã khóa</string>
+    <string name="login_generating_key">Generating encryption keys</string>
     <!-- Message displayed while the app is connecting to a MEGA server -->
     <string name="login_connecting_to_server">Đang kết nối tới máy chủ</string>
     <!-- Status text when updating the file manager -->
@@ -217,7 +215,7 @@
     <!--  -->
     <string name="tour_access_title">Truy Cập MEGA</string>
     <!-- Full description text of the app in the Google Play page of the app (character limit 4000) -->
-    <string name="tour_space_text">Đăng ký ngay và nhận miễn phí ngay 20+ GB không gian lưu trữ</string>
+    <string name="tour_space_text">Register now and get 20 GB of free storage</string>
     <!--  -->
     <string name="tour_speed_text">Upload cực nhanh. Chia sẻ dữ liệu với mọi người thật nhanh chóng</string>
     <!--  -->
@@ -390,7 +388,7 @@
     <string name="intent_not_available">Điện thoại của bạn không có ứng dụng nào có thể mở được tệp này</string>
     <!-- Message when trying to open a location message but there isn’t any app that open that location. -->
     <string name="intent_not_available_location">Không có ứng dụng nào trong điện thoại của bạn để mở định vị này</string>
-    <!-- message when trying to open file but there isn’t any app that open that file. Example: a user try to open a txt but doesn’t have any app to open txt -->
+    <!-- Message displayed when user tries to open a file with a 3rd party app using the option "Open with" but there isn't any app installed in the device which can open that file type, e.g. user tries to open a ".txt" but doesn’t have any installed 3rd party app which supports ".txt" files. -->
     <string name="intent_not_available_file">Bạn có thể không có ứng dụng nào đã được cài để xem dạng tệp tin này</string>
     <!-- to share an image using Facebook, Whatsapp, etc -->
     <string name="context_share_image">Gửi hình ảnh này bằng</string>
@@ -398,8 +396,6 @@
     <string name="context_get_link">Chia sẻ đường dẫn liên kết</string>
     <!-- Delete a link label -->
     <string name="context_delete_link">Xóa liên kết</string>
-    <!-- Item menu option upon right click on one or multiple files. -->
-    <string name="context_get_link_menu">Lấy Liên Kết</string>
     <!-- Item menu option upon right click on one or multiple files. -->
     <string name="context_leave_menu">Rời khỏi</string>
     <!-- Title alert before leaving a share. -->
@@ -453,7 +449,7 @@
     <!-- Menu option title -->
     <string name="context_clear_rubbish">Dọn Thùng Rác</string>
     <!-- Ask for confirmation before removing all the elements of the rubbish bin -->
-    <string name="clear_rubbish_confirmation">Bạn có chắc muốn xóa vĩnh viễn các mục ở trong Thùng Rác không?</string>
+    <string name="clear_rubbish_confirmation">Bạn đang chuẩn bị tiến hành xóa vĩnh viễn các mục ở trong Thùng Rác.</string>
     <!-- send cancel subscriptions dialog -->
     <string name="context_send">Gửi</string>
     <!-- send the file to inbox -->
@@ -481,7 +477,7 @@
     <!-- success message when reinvite a contact -->
     <string name="context_contact_invitation_resent">Thư mời đã được gửi lại lần nữa</string>
     <!-- success message when sending a contact request -->
-    <string name="context_contact_request_sent">Lời mời đã được gửi tới %s thành công. Theo dõi tình trạng của lời mời trong tab Yêu Cầu Gửi Đi.</string>
+    <string name="context_contact_request_sent">Request successfully sent to %s. View in Sent requests tab.</string>
     <!-- success message when removing a contact -->
     <string name="context_contact_removed">Đã xóa tên liên lạc</string>
     <!-- error message -->
@@ -521,11 +517,7 @@
     <!-- success message when moving a node -->
     <string name="number_incorrectly_moved">%d mục chưa được xóa xong</string>
     <!-- success message when moving a node -->
-    <string name="context_correctly_moved_to_rubbish">Đã di chuyển vào thùng rác thành công</string>
-    <!-- success message when moving a node -->
-    <string name="number_correctly_moved_to_rubbish">Đã di chuyển %d mục đến Thùng Rác thành công</string>
-    <!-- success message when moving a node -->
-    <string name="number_incorrectly_moved_to_rubbish">&#160;và %d mục chưa được gửi đi thành công</string>
+    <string name="context_correctly_moved_to_rubbish">Đã di chuyển vào Thùng Rác thành công</string>
     <!-- error message -->
     <string name="context_no_moved">Lỗi. Chưa di chuyển được</string>
     <!-- success message when sharing a folder -->
@@ -576,8 +568,6 @@
     <string name="number_contact_not_removed">%d tên liên lạc chưa được xóa</string>
     <!-- success message when sharing a file with multiple contacts -->
     <string name="number_contact_file_shared_correctly">Đã gửi thư mục chia sẻ đến %d tên liên lạc thành công</string>
-    <!-- error message when sharing a file with multiple contacts -->
-    <string name="number_contact_file_not_shared_">Tệp tin không thể chia sẻ được cho %d tên liên lạc</string>
     <!-- success message when sharing multiple files -->
     <string name="number_correctly_shared">%d thư mục đã được chia sẻ thành công</string>
     <!-- error message when sharing multiple files -->
@@ -587,13 +577,13 @@
     <!-- success message when removing all the contacts of a shared folder -->
     <string name="context_correctly_removed_sharing_contacts">Thư mục này đã không còn được chia sẻ nữa</string>
     <!-- error message when removing all the contacts of a shared folder -->
-    <string name="context_no_removed_sharing_contacts">Lỗi, thư mục vẫn còn dính chia sẻ với người khác</string>
+    <string name="context_no_removed_sharing_contacts">An error occurred. The folder is still shared with another contact</string>
     <!-- option available for just one file -->
     <string name="context_select_one_file">Chọn đúng một mục</string>
     <!-- success message when emptying the RB -->
     <string name="rubbish_bin_emptied">Thùng Rác đã được dọn sạch sẽ</string>
     <!-- error message when emptying the RB -->
-    <string name="rubbish_bin_no_emptied">Phát sinh lỗi. Không dọn được thùng rác</string>
+    <string name="rubbish_bin_no_emptied">An error occurred. The Rubbish Bin has not been emptied</string>
     <!-- dialog cancel subscriptions -->
     <string name="dialog_cancel_subscriptions">Quý khách đang chuẩn bị hủy bỏ gói thành viên MEGA. Xin vui lòng cho chúng tôi biết lý do để chúng tôi cải thiện và làm vừa lòng quý khách.</string>
     <!-- hint cancel subscriptions dialog -->
@@ -601,11 +591,11 @@
     <!-- send cancel subscriptions dialog -->
     <string name="send_cancel_subscriptions">Gửi</string>
     <!-- confirmation cancel subscriptions dialog -->
-    <string name="confirmation_cancel_subscriptions">Cảm ơn lời nhận xét của quý khách! Quý khách có muốn hủy thuê bao MEGA ngay không?</string>
+    <string name="confirmation_cancel_subscriptions">Thank you for your feedback. Are you sure you want to cancel your MEGA subscription?</string>
     <!-- provide a reason to cancel subscriptions dialog -->
     <string name="reason_cancel_subscriptions">Quá trình hủy bỏ hạng tài khoản PRO và ngưng trả phí chưa thể tiếp tục vì quý khách chưa điền lý do</string>
-    <!-- welcome message after user brought subscription. placeholder 1: subscription type (Lite/Pro1 etc), placeholder 2: renewal interval (monthly/yearly) -->
-    <string name="message_user_purchased_subscription">Cảm ơn quý khách đã đăng ký thuê bao %1$s %2$s!</string>
+    <!-- Confirmation message of the dialog shown when a subscription has been processed successfully -->
+    <string name="message_user_purchased_subscription">Xin cảm ơn. Giao dịch thanh toán của quý khách đang được tiến hành. Xin gửi email cho chúng tôi tại support&#64;mega.co.nz nếu tài khoản không nâng cấp sau 24 giờ.</string>
     <!-- Pop up message shows when user purchased a lower level of subscription -->
     <string name="message_user_purchased_subscription_down_grade">Thuê bao mới sẽ bắt đầu có hiệu lực ngay sau khi thuê bao hiện tại hết hạn, giá mới cũng sẽ được tự thanh toán ngay lúc đó.</string>
     <!-- Pop up message shows when user purchased a subscription with a payment method that can not be processed in real time, e.g. voucher -->
@@ -659,15 +649,13 @@
     <!-- title of the image gallery -->
     <string name="full_screen_image_viewer_label">Trang xem ảnh</string>
     <!-- Headline for the amount of storage space is used -->
-    <string name="my_account_used_space">Không Gian Đang Sử Dụng</string>
+    <string name="my_account_used_space">Used storage space</string>
     <!-- menu item -->
     <string name="my_account_change_password">Đổi mật khẩu</string>
     <!-- Dialog text overquota error -->
     <string name="overquota_alert_text">Không gian lưu trữ đã bị đầy quá mức. Bạn có muốn nâng cấp hạng tài khoản?</string>
     <!-- when did the last session happen -->
     <string name="my_account_last_session">Phiên hoạt động cuối</string>
-    <!-- header for the social connections, showing the number of contacts the user has -->
-    <string name="my_account_connections">Các kết nối</string>
     <!-- message displayed while the app is changing the password -->
     <string name="my_account_changing_password">Đang đổi mật khẩu</string>
     <!-- when changing the password, the first edittext is to enter the current password -->
@@ -677,13 +665,13 @@
     <!-- when changing the password -->
     <string name="my_account_change_password_newPassword2">Nhập lại mật khẩu mới</string>
     <!-- when changing the password or creating the account, the password is required twice and check that both times are the same -->
-    <string name="my_account_change_password_dont_match">Mật khẩu không trùng khớp</string>
+    <string name="my_account_change_password_dont_match">Hai mật khẩu này không trùng khớp</string>
     <!-- title of the selection of the pro account wanted -->
-    <string name="upgrade_select_pricing">Chọn hạng tài khoản</string>
+    <string name="upgrade_select_pricing">Select plan</string>
     <!-- the user has to decide the way of payment -->
     <string name="select_membership_1">Chọn hằng tháng hoặc hằng năm</string>
     <!-- choose the payment method option when no method is available -->
-    <string name="no_available_payment_method">Hiện tại, chưa có phương thức thanh toán cho gói này</string>
+    <string name="no_available_payment_method">There is no payment method set for this plan currently. Please select one.</string>
     <!-- button to decide monthly payment. The asterisk is needed -->
     <string name="upgrade_per_month">Hằng tháng*</string>
     <!-- button to decide annually payment. The asterisk is needed -->
@@ -693,7 +681,7 @@
     <!-- before sharing an image, the preview has to be downloaded -->
     <string name="full_image_viewer_not_preview">Bản xem trước của hình chưa được tải xong. Xin chờ</string>
     <!-- due to device is low on memory, cannot load an image preview temporarily -->
-    <string name="not_load_preview_low_memory">Bản xem trước không tải được do không đủ bộ nhớ. Xin thử lại sau.</string>
+    <string name="not_load_preview_low_memory">Not enough free memory to display preview. Please try again later.</string>
     <!-- alert when clicking a newsignup link being logged -->
     <string name="log_out_warning">Xin đăng xuất trước khi tạo tài khoản mới</string>
     <!-- message shown in the screen when there are not any active transfer -->
@@ -707,9 +695,9 @@
     <!-- Dialog title, to explain why MEGA needs the ’display over other apps’ permission (Android 10) -->
     <string name="ask_for_display_over_title">Cho phếp hiện thông báo cho các cuộc gọi MEGA</string>
     <!-- Dialog message, to explain why MEGA needs the ’display over other apps’ permission (Android 10) -->
-    <string name="ask_for_display_over_msg">MEGA cần sự cấp phép của bạn để giao diện cuộc gọi được bật lên màn hình khi đang hoạt động trong nền.</string>
+    <string name="ask_for_display_over_msg">Please grant MEGA permission to display over other apps for calls.</string>
     <!-- Prompt text shows when the user doesn’t want to make MEGA grant the ’display over other apps’ permission for now (Android 10) -->
-    <string name="ask_for_display_over_explain">Không sao cả, bạn vẫn có thể đi vào phần cài đặt trong điện thoại khi muốn bật tính năng này.</string>
+    <string name="ask_for_display_over_explain">You can still manually grant permissions in the device Settings.</string>
     <!-- the options of how to upload, but in an array. needed for the settings, how to upload the camera images. only when Wi-Fi connected -->
     <string name="cam_sync_wifi">Chỉ lúc dùng Wi-Fi</string>
     <!-- the options of how to upload, but in an array. needed for the settings, how to upload the camera images. when Wi-Fi connected and using data plan -->
@@ -723,7 +711,7 @@
     <!-- title of the notification when camera upload is checking files -->
     <string name="settings_camera_notif_checking_title">Đang kiểm tra các tệp tin cần được tải lên</string>
     <!-- title of the notification when camera upload is initializing -->
-    <string name="settings_camera_notif_initializing_title">Đang khởi động Camera Uploads</string>
+    <string name="settings_camera_notif_initializing_title">Initialising Camera Uploads</string>
     <!-- title of the notification when camera upload’s primary local folder is unavailable. -->
     <string name="camera_notif_primary_local_unavailable">Camera Uploads bị dừng. Không tìm thấy thư mục nội bộ.</string>
     <!-- title of the notification when camera upload’s secondary local folder is unavailable. -->
@@ -741,9 +729,9 @@
     <!-- Setting to allow the user to select the preferred passcode type -->
     <string name="settings_passcode_option">Tùy chọn mã số</string>
     <!-- Helper text to explain why we have this `Require me to plug in` setting, placeholder - 100 to 1000 in MB -->
-    <string name="settings_camera_upload_charging_helper_label">Việc nén kích thước video tiêu dùng rất nhiều điện; MEGA sẽ cần điện thoại phải được cắm sạc nếu video muốn nén có kích thước lớn hơn %s.</string>
+    <string name="settings_camera_upload_charging_helper_label">Video compression uses considerable amounts of power. Please plug in your device to charge if the videos to be compressed are larger than %s.</string>
     <!-- Helper text to explain the things to note if enable the feature of including GPS info -->
-    <string name="settings_camera_upload_include_gps_helper_label">Nếu được bật, tất cả các ảnh tải lên sẽ có kèm theo thông tin vị trí địa lý nơi mà ảnh đã được chụp, nên tự cân nhắc khi chia sẻ.</string>
+    <string name="settings_camera_upload_include_gps_helper_label">Nếu được bật. thông tin vị trí đã chụp sẽ được đính kèm với hình ảnh của bạn. Xin xem xét trước mỗi lần chia sẻ.</string>
     <!-- Settings category title for cache and offline files -->
     <string name="settings_advanced_features">Nâng Cao</string>
     <!-- Settings preference title for cache -->
@@ -795,7 +783,7 @@
     <!-- error message that will show to user when user entered invalid verification code -->
     <string name="verify_account_incorrect_code">Mã không đúng. Xin thử lại hoặc lấy cái mới.</string>
     <!-- text message to remind user to resend verification code -->
-    <string name="verify_account_resend_label">Không có nhận được mã?</string>
+    <string name="verify_account_resend_label">Didn’t receive the code?</string>
     <!-- Button to resend the create account email to a new email address in case the previous email address was misspelled -->
     <string name="general_resend_button">Gửi lại</string>
     <!-- error message that will show to user when host detected that the mobile number has been registered already -->
@@ -840,7 +828,7 @@
     <string name="settings_empty_folder">Chọn thư mục</string>
     <!-- the options of how to upload, but in an array. needed for the settings, how to upload the camera images. only when Wi-Fi connected -->
     <string-array name="settings_camera_upload_how_to_entries">
-        <item>Dùng WiFi và mạng di động</item>
+        <item>Dùng Wi-Fi hay mạng di động</item>
         <item>Chỉ lúc dùng Wi-Fi</item>
     </string-array>
     <!-- What kind of files are going to be uploaded: images, videos or both -->
@@ -953,10 +941,10 @@
     <string name="zip_browser_activity">Quản lý tệp ZIP</string>
     <!-- title of the My Account screen -->
     <string name="my_account_title">Hạng Tài Khoản</string>
+    <!-- Label to indicate the date when the current subscription renews -->
+    <string name="renews_on">Renews on&#160;</string>
     <!-- title of the Expiration Date -->
-    <string name="renews_on">Ngày tự động mua tiếp&#160;</string>
-    <!-- title of the Expiration Date -->
-    <string name="expires_on">Hết hạn vào ngày&#160;</string>
+    <string name="expires_on">Expires on&#160;</string>
     <!--  -->
     <string name="free_account">Miễn phí</string>
     <!-- info message shown to the user when the Camera Uploads folder has been created -->
@@ -991,14 +979,6 @@
     <string name="sortby_type_photo_first">Hình Ảnh</string>
     <!-- sort option, sort media files by videos first -->
     <string name="sortby_type_video_first">Videos</string>
-    <!-- sort files by date newest first -->
-    <string name="sort_by_newest_date">Ngày mới nhất</string>
-    <!-- sort files by date oldest first -->
-    <string name="sort_by_oldest_date">Ngày cũ nhất</string>
-    <!-- sort files by largest size -->
-    <string name="sort_by_largest_size">Kích thước lớn nhất</string>
-    <!-- sort files by smallest size -->
-    <string name="sort_by_smallest_size">Kích thước nhỏ nhất</string>
     <!-- Title to choose the type of Passcode -->
     <string name="pin_lock_type">Dạng Mã Số</string>
     <!-- Passcode with 4 digits -->
@@ -1012,7 +992,7 @@
     <!-- Confirmation message when disabling logs in the app -->
     <string name="settings_disable_logs">Bản ghi chép đã được tắt</string>
     <!-- Snackbar error message triggered by host error when user is trying to setup MEGA Camera Uploads folder in settings page -->
-    <string name="error_unable_to_setup_cloud_folder">Không tiến hành cài đặt thư mục Camera Uploads MEGA được</string>
+    <string name="error_unable_to_setup_cloud_folder">Không tiến hành thiết lập thư mục Camera Uploads MEGA được</string>
     <!-- Message displayed when the user denies the required permissions during the logs activation -->
     <string name="logs_not_enabled_permissions">Tệp log không tạo được do ứng dụng không được cấp phép các quyền hạn từng yêu cầu</string>
     <!-- Option in the sliding panel to open the folder which contains the file selected after performing a search -->
@@ -1084,7 +1064,7 @@
     <!-- Alert to inform the user that have to be logged in to perform the action -->
     <string name="alert_not_logged_in">Cần phải đăng nhập vào tài khoản để thực hiện hoạt động này.</string>
     <!-- Error message when a user attempts to change their email without an active login session. -->
-    <string name="change_email_not_logged_in">Bạn cần phải đăng nhập vào trước khi bạn được phép tiến hành việc thay đổi email. Xin sử dụng email hiện thời của tài khoản này và sau đó nhấp vào đường liên kết xác thực.</string>
+    <string name="change_email_not_logged_in">You need to be logged in to complete your email change. Please log in again with your current email address and then tap on your confirmation link again.</string>
     <!-- Text displayed to inform that the email was successfully changed. Please keep the placeholder, it will be replaced with the new email address. -->
     <string name="email_changed">Địa chỉ email cho tài khoản đã được thay đổi thành công, và là: %1$s</string>
     <!-- Error when the user leaves empty the password field -->
@@ -1128,21 +1108,21 @@
     <!-- Button to upgrade the account to PRO account in the panel that appears randomly -->
     <string name="my_account_upgrade_pro_panel">Nâng cấp ngay</string>
     <!-- Message to promote PRO accounts -->
-    <string name="get_pro_account">Tăng cường dung lượng của ổ mây.[A]Lấy thêm không gian lưu trữ &amp; lượng băng thông truyền tải với tài khoản hạng PRO!</string>
+    <string name="get_pro_account">Grow your cloud.[A]Get increased storage and transfer quotas with a Pro account.</string>
     <!-- success message when the MasterKey file has been downloaded -->
-    <string name="toast_master_key">Mã Phục Hồi đã được sao lưu vào vị trí: %1s.[A]Đồng thời, mã khóa cũng sẽ có trong mục Lưu về Ngoại Tuyến.[A]Ghi chú: Tệp tin chứa mã khóa sẽ bị xóa nếu bạn đăng xuất tài khoản khỏi ứng dụng MEGA, vì vậy nên lưu và sao chép mã ở một nơi an toàn.</string>
+    <string name="toast_master_key">The MEGA account Recovery Key has been saved to: %1s. [A]You can find the file with your Recovery Key in the Saved for Offline section.[/A] Note: as the file with your Recovery Key will be deleted when you log out, please store it in a safe place outside your MEGA account.</string>
     <!-- Error shown when the user tries to change his mail to one that is already used -->
-    <string name="mail_already_used">Lỗi. Địa chỉ email này đã có người sử dụng.</string>
+    <string name="mail_already_used">This email address is already in use. Please use another email address.</string>
     <!-- Error shown when the user tries to change his mail while the user has already requested a confirmation link for that email address -->
     <string name="mail_changed_confirm_requested">Bạn đã yêu cầu gửi một đường liên kết xác thực cho địa chỉ email này rồi.</string>
     <!-- Error shown when the user tries to change his mail while the email is the same as the old -->
-    <string name="mail_same_as_old">Địa chỉ email mới và cũ không được trùng nhau</string>
+    <string name="mail_same_as_old">This is your existing email address.</string>
     <!-- Text shown in the last alert dialog to change the email associated to an account -->
     <string name="change_mail_text_last_step">Đây là bước cuối cùng để hoàn tất việc thay đổi địa chỉ email. Xin vui lòng nhập mật khẩu ở dưới.</string>
     <!-- Title of the alert dialog to change the email associated to an account -->
     <string name="change_mail_title_last_step">Đổi email</string>
     <!-- Iitle of the warning when the user is running out of space -->
-    <string name="title_new_warning_out_space">Bạn sắp hết không gian lưu trữ!</string>
+    <string name="title_new_warning_out_space">You are running out of storage space.</string>
     <!-- Text of the warning when the user is running out of space -->
     <string name="new_warning_out_space">Nhận toàn bộ sức mạnh và các tính năng cho tài khoản MEGA của bạn khi lên hạng Pro.</string>
     <!-- Iitle of sliding panel to choose the option to edit the profile picture -->
@@ -1228,7 +1208,7 @@
     <!-- Title of the screen after creating the account. That screen asks the user to confirm the account by checking the email -->
     <string name="confirm_email_text">Đang chờ xác nhận địa chỉ email</string>
     <!-- Text below the title that explains the user should check the email and click the link to confirm the account -->
-    <string name="confirm_email_explanation">Hãy kiểm tra hộp thư của bạn và xác nhận tài khoản của bạn.</string>
+    <string name="confirm_email_explanation">Please check your email and tap the link to confirm your account.</string>
     <!-- Plural of items which contains a folder. 2 items -->
     <plurals name="general_num_items">
         <item quantity="other">%1$d mục</item>
@@ -1483,7 +1463,7 @@
     <string name="title_message_uploading_options">Đăng tải tệp đính kèm</string>
     <!-- message shown when a chat has no messages -->
     <string name="no_conversation_history">Không có lịch sử trò chuyện</string>
-    <!-- title of confirmation alert before removing a contact, Plural -->
+    <!-- Text to indicate that one participant is typing or multiple participants are typing at the same time in a chat room. The "%1$s" placeholder is to put the name(s) of the participant(s). The [A][/A] format marks are to put the text in a different color. -->
     <plurals name="user_typing">
         <item quantity="other">%1$s [A]đang viết tin nhắn&#8230;[/A]</item>
     </plurals>
@@ -1696,8 +1676,6 @@
     <string name="general_view">Xem tệp tin</string>
     <!-- Menu option to choose to add file or folders to Cloud Drive -->
     <string name="add_to_cloud">Chuyển nhập</string>
-    <!-- Menu option to choose save to Offline section -->
-    <string name="save_for_offline">Lưu để dùng ngoại tuyến</string>
     <!-- Menu option to choose to add file to Cloud Drive in the chat -->
     <string name="add_to_cloud_node_chat">Lưu vào Ổ Mây</string>
     <!-- Menu option -->
@@ -1711,7 +1689,7 @@
     <!-- message when trying to invite a contact with a pending request -->
     <string name="context_contact_already_invited">%s đã được mời rồi. Xem lại các lời yêu cầu đang chờ.</string>
     <!-- Hint text explaining that you can change the email and resend the create account link to the new email address -->
-    <string name="confirm_email_misspelled">Nếu địa chỉ email bị viết sai, sửa lại cho đúng và clíck vào [A]Gửi lại[A].</string>
+    <string name="confirm_email_misspelled">If you have misspelt your email address, correct it and tap [A]Resend[A].</string>
     <!-- Button to resend the create account email to a new email address in case the previous email address was misspelled -->
     <string name="confirm_email_misspelled_resend">Gửi lại</string>
     <!-- Text shown after the confirmation email has been sent to the new email address -->
@@ -1813,7 +1791,7 @@
     <!--  -->
     <string name="attachment_uploading_state_error">Lỗi. Không gửi được.</string>
     <!-- When a multiple download is started, some of the files could have already been downloaded before. This message shows the number of files that has already been downloaded and the number of files pending -->
-    <string name="already_downloaded_multiple">%d tệp tin đã được tải về rồi.</string>
+    <string name="already_downloaded_multiple">%d tệp tin đã được tải xuống từ trước.</string>
     <!-- When a multiple download is started, some of the files could have already been downloaded before. This message shows the number of files that are pending in plural. placeholder: number of files -->
     <string name="pending_multiple">%d tệp tin đang chờ.</string>
     <!--  -->
@@ -1877,30 +1855,28 @@
     <!-- subtitle of the section for achievements -->
     <string name="achievements_subtitle">Mời bạn bè tham gia và nhận thưởng</string>
     <!-- title of the introduction for the achievements screen -->
-    <string name="figures_achievements_text_referrals">%1$s vào không gian lưu trữ cho mỗi lần mời. Hạn dùng là 365 ngày.</string>
+    <string name="figures_achievements_text_referrals">%1$s of storage for each successful invite. Valid for 365 days.</string>
     <!-- sentence to detail the figures of storage and transfer quota related to each achievement -->
     <string name="figures_achievements_text">%1$s vào không gian lưu trữ. Hạn dùng là 365 ngày.</string>
     <!-- title of the section for unlocked rewards -->
     <string name="unlocked_rewards_title">Phần thưởng đã nhận</string>
     <!-- title of the section for unlocked storage quota -->
-    <string name="unlocked_storage_title">Hạn Mức Lưu Trữ</string>
+    <string name="unlocked_storage_title">Mức lưu trữ</string>
     <!-- title of the section for referral bonuses in achivements section (maximum 24 chars) -->
-    <string name="title_referral_bonuses">Thưởng từ Giới Thiệu</string>
-    <!-- title of the section for install a mobile app in achivements section (maximum 24 chars) -->
-    <string name="title_install_app">Cài app MEGA cho ĐT</string>
-    <!-- Title of the section for add phone number in achivements section (maximum 24 chars) -->
-    <string name="title_add_phone">Thêm số ĐTDĐ</string>
+    <string name="title_referral_bonuses">Invitation bonuses</string>
+    <!-- Title of the section for install a mobile app in achivements section (maximum 31 chars) -->
+    <string name="title_install_app">Tải và cài đặt MEGA cho điện thoại</string>
+    <!-- Title of the section for add phone number in achivements section (maximum 30 chars) -->
+    <string name="title_add_phone">Thêm số điện thoại</string>
     <!-- title of the section for install megasync in achivements section (maximum 24 chars) -->
     <string name="title_regitration">Thưởng tài khoản mới</string>
     <!-- title of the section for install a mobile app bonuses in achivements section (maximum 24 chars) -->
-    <string name="title_install_desktop">Cài app MEGA cho máy tính</string>
-    <!-- title of the section for base quota in achivements section -->
-    <string name="title_base_quota">Mức Cơ Bản của Tài Khoản</string>
+    <string name="title_install_desktop">Get a MEGA Desktop App</string>
     <!-- Text that indicates that no pictures have been uploaded to the Camera Uploads section -->
     <string name="camera_uploads_empty">Không có nội dung nào trong Camera Uploads</string>
     <!-- indicates the number of days left related to a achievement -->
     <string name="general_num_days_left">còn lại %1$d ngày</string>
-    <!-- State to indicate something has expired (achivements of business status account for instance) -->
+    <!-- State to indicate an achievement has expired -->
     <string name="expired_label">Hết</string>
     <!-- title of the advanced setting to choose the use of https -->
     <string name="setting_title_use_https_only">Không dùng HTTP</string>
@@ -1909,15 +1885,15 @@
     <!-- title of screen to invite friends and get an achievement -->
     <string name="title_achievement_invite_friends">Cách hoạt động</string>
     <!-- first paragraph of screen to invite friends and get an achievement -->
-    <string name="first_paragraph_achievement_invite_friends">Mời bạn bè tham gia tạo tài khoản MEGA miễn phí và cài đặt ứng dụng trên thiết bị di động. Bạn sẽ nhận được thưởng thêm không gian lưu trữ cho mỗi lần đăng ký và cài đặt thành công.</string>
+    <string name="first_paragraph_achievement_invite_friends">Invite your friends to create a MEGA Free account and to install a MEGA Mobile App. You will receive free storage as a bonus for every successful signup and app installation.</string>
     <!-- second paragraph of screen to invite friends and get an achievement -->
-    <string name="second_paragraph_achievement_invite_friends">Bạn sẽ không nhận được thưởng khi gửi lời mời tới những người đã có sẵn tài khoản với MEGA, hệ thống sẽ không gửi thông báo nào cho biết rằng lời mời đã bị từ chối. Những người được mời cần phải cài app trên điện thoại hay máy tính của mình.</string>
+    <string name="second_paragraph_achievement_invite_friends">Free storage bonus applicable to new invitations only and where MEGA Mobile App or MEGA Desktop App is installed.</string>
     <!-- explanation of screen to invite friends and get an achievement -->
     <string name="card_title_invite_friends">Chọn những tên trong danh bạ điện thoại hoặc điền vào các địa chỉ email.</string>
     <!-- title of the dialog to confirm the contact request -->
     <string name="title_confirmation_invite_friends">Mời giới thiệu bạn bè dùng MEGA</string>
     <!-- Text shown when the user sends a contact invitation -->
-    <string name="subtitle_confirmation_invite_friends">Lời Mời Đã Gửi</string>
+    <string name="subtitle_confirmation_invite_friends">Lời mời đã gửi đi</string>
     <!-- paragraph of the dialog to confirm the contact request -->
     <string name="paragraph_confirmation_invite_friends">Khuyên bạn bè đăng ký, cài và sử dụng MEGA. Chỉ cần người bạn được mời sử dụng địa chỉ email trùng với email trong thư mời đã nhập, phần thưởng sẽ xuất hiện trong tài khoản.</string>
     <!-- Error shown when the user writes a email with an incorrect format -->
@@ -1925,13 +1901,13 @@
     <!-- info paragraph about the achievement install megasync -->
     <string name="paragraph_info_achievement_install_desktop">Sau khi cài đặt MEGA trên máy tính, bạn sẽ nhận được thêm %1$s vào không gian lưu trữ, có hạn sử dụng là 365 ngày. MEGA còn có apps dành cho Windows, macOS và đa số các máy Linux distros.</string>
     <!-- info paragraph about the achievement install mobile app -->
-    <string name="paragraph_info_achievement_install_mobile_app">Sau khi cài đặt ứng dụng MEGA trên điện thoại, bạn sẽ nhận được thêm %1$s vào không gian lưu trữ, hạn sử dụng là 365 ngày. Chúng tôi còn có ứng dụng di động dành cho iOS, Android, và Windows Phone.</string>
+    <string name="paragraph_info_achievement_install_mobile_app">When you install the MEGA Mobile App you get %1$s of complimentary storage space, valid for 365 days. We provide mobile apps for iOS and Android.</string>
     <!-- info paragraph about the achievement ‘add phone number’. Placeholder 1: bonus storage space e.g. 20GB. Placeholder 2: bonus transfer quota e.g. 50GB -->
     <string name="paragraph_info_achievement_add_phone">Sau khi xác thực số điện thoại bạn sẽ nhận được thêm %1$s vào không gian lưu trữ, hạn sử dụng là 365 ngày.</string>
     <!-- info paragraph about the completed achievement install megasync -->
     <string name="result_paragraph_info_achievement_install_desktop">Bạn đã nhận được %1$s không gian lưu trữ từ việc cài ứng dụng MEGA cho máy tính.</string>
     <!-- info paragraph about the completed achievement install mobile app -->
-    <string name="result_paragraph_info_achievement_install_mobile_app">Bạn đã nhận được %1$s không gian lưu trữ từ việc cài ứng dụng MEGA cho dI động.</string>
+    <string name="result_paragraph_info_achievement_install_mobile_app">You have received %1$s storage space for installing the MEGA Mobile App.</string>
     <!-- info paragraph about the completed achievement of ‘add phone number’. Placeholder 1: bonus storage space e.g. 20GB. Placeholder 2: bonus transfer quota e.g. 50GB -->
     <string name="result_paragraph_info_achievement_add_phone">Bạn đã nhận được %1$s không gian lưu trữ từ việc xác thực số điện thoại thành công.</string>
     <!-- info paragraph about the completed achievement registration -->
@@ -1953,11 +1929,11 @@
     <!-- Settings preference title for help centre -->
     <string name="settings_help_centre">Thư Viện Hướng Dẫn</string>
     <!-- Settings preference title for send feedback -->
-    <string name="settings_help_preference">Gửi Phản Hồi</string>
+    <string name="settings_help_preference">Send feedback</string>
     <!-- mail subject -->
     <string name="setting_feedback_subject">Phản hồi từ thiết bị Android</string>
     <!-- mail body -->
-    <string name="setting_feedback_body">Xin viết lời phản hồi ở đây:</string>
+    <string name="setting_feedback_body">Please provide your feedback here:</string>
     <!-- mail body -->
     <string name="settings_feedback_body_device_model">Mẫu mã thiết bị</string>
     <!-- mail body -->
@@ -2010,7 +1986,8 @@
     <string name="invalid_characters_defined">Các ký tự không được phép sử dụng: ” * / : &lt; &gt; ? \ |</string>
     <!-- Warning show to the user after try to import files to MEGA with empty names. Plural. When more than one file name have this error. -->
     <plurals name="empty_names">
-        <item quantity="other">Xin đặt tên cho các tệp tin trước khi tiếp tục</item>
+        <item quantity="one">File name cannot be empty.</item>
+        <item quantity="other">File names cannot be empty.</item>
     </plurals>
     <!-- Label shown when audio file is playing -->
     <string name="audio_play">Tệp Âm Thanh</string>
@@ -2029,9 +2006,9 @@
     <!-- Info label about the connectivity state of the chat -->
     <string name="invalid_connection_state">Đang kết nối lại tới chát</string>
     <!-- Message show when a call cannot be established -->
-    <string name="call_error">Lỗi. Không tiến hành được cuộc gọi</string>
+    <string name="call_error">An error has occurred and the call cannot be connected.</string>
     <!-- Title of dialog to evaluate the app -->
-    <string name="title_evaluate_the_app_panel">Bạn có hài lòng với app MEGA hay không?</string>
+    <string name="title_evaluate_the_app_panel">Like the MEGA Mobile App?</string>
     <!-- Label to show rate the app -->
     <string name="rate_the_app_panel">Có, đánh dấu sao</string>
     <!-- Label to show send feedback -->
@@ -2039,7 +2016,7 @@
     <!-- title of the section advanced options on the get link screen -->
     <string name="link_advanced_options">Tùy chỉnh nâng cao</string>
     <!-- Message to show when users deny to permit the permissions to read and write on external storage on setting default download location -->
-    <string name="download_requires_permission">MEGA cần được cấp phép quyền để tải xuống tệp tin</string>
+    <string name="download_requires_permission">MEGA needs read and write permissions to your external storage to download files there.</string>
     <!-- Default download location is on old sd card, but currently the user installed a new SD card, need user to reset download location. -->
     <string name="old_sdcard_unavailable">Không tìm thấy thẻ SD đã được dùng trước đây, xin chọn ra vị trí mới để lưu về các tải xuống.</string>
     <!-- Dialog title to ask download to internal storage or external storage. -->
@@ -2049,7 +2026,7 @@
     <!-- Option of the sliding panel to go to QR code section -->
     <string name="choose_qr_option_panel">Mã QR của TK</string>
     <!-- Title of the screen that shows the options to the QR code -->
-    <string name="section_qr_code">Mã QR</string>
+    <string name="section_qr_code">Mã QR</string>
     <!-- Option in menu of section  My QR code to reset the QR code -->
     <string name="action_reset_qr">Đổi mã QR mới</string>
     <!-- Option in menu of section  My QR code to delete the QR code -->
@@ -2057,13 +2034,13 @@
     <!-- Option shown in QR code bottom sheet dialog to save QR code in Cloud Drive -->
     <string name="save_cloud_drive">Tới Ổ Mây</string>
     <!-- Option shown in QR code bottom sheet dialog to save QR code in File System -->
-    <string name="save_file_system">Tới File System</string>
+    <string name="save_file_system">To file system</string>
     <!-- Title of QR code section -->
-    <string name="section_my_code">Mã Hiện Tại</string>
+    <string name="section_my_code">Mã của tôi</string>
     <!-- Title of QR code scan section -->
-    <string name="section_scan_code">Quét Mã</string>
+    <string name="section_scan_code">Quét mã</string>
     <!-- Title of QR code settings that permits or not contacts that scan my QR code will be automatically added to my contact list -->
-    <string name="settings_qrcode_autoaccept">Tự Động Thêm</string>
+    <string name="settings_qrcode_autoaccept">Auto-accept</string>
     <!-- Subtitle of QR code settings auto-accept -->
     <string name="setting_subtitle_qrcode_autoccept">Bất cứ ai có tài khoản MEGA quét mã ảnh QR này sẽ được tự động thêm vào danh sách tên liên lạc của bạn.</string>
     <!-- Subtitle of QR code settings that reset the code -->
@@ -2099,9 +2076,9 @@
     <!-- Text of dialog shown when a contact request has not been sent with QR code because of is already a contact -->
     <string name="invite_not_sent_text_already_contact">Lời mời không gửi đi được. %s đã có tên trong liên lạc.</string>
     <!-- Text of dialog shown when a contact request has not been sent with QR code because of some error -->
-    <string name="invite_not_sent_text_error">Thư mời không gửi được. Có lỗi phát sinh.</string>
+    <string name="invite_not_sent_text_error">An error occurred and the invitation has not been sent.</string>
     <!-- Text of alert dialog informing that the qr is generating -->
-    <string name="generatin_qr">Đang tạo ra mã ảnh QR&#8230;</string>
+    <string name="generatin_qr">Đang tạo ra mã QR&#8230;</string>
     <!-- Title of QR code scan menu item -->
     <string name="menu_item_scan_code">Quét mã QR</string>
     <!-- get the contact link and copy it -->
@@ -2179,7 +2156,7 @@
     <!-- Text displayed in several parts when there is a call in progress (notification, recent chats list, etc). -->
     <string name="title_notification_call_in_progress">Cuộc gọi đang diễn ra</string>
     <!-- Subtitle of the notification shown on the action bar when there is a call in progress -->
-    <string name="action_notification_call_in_progress">Chạm để quay trở lại cuộc gọi</string>
+    <string name="action_notification_call_in_progress">Tap to go back to the call</string>
     <!-- Button in the notification shown on the action bar when there is a call in progress -->
     <string name="button_notification_call_in_progress">Quay trở lại cuộc gọi</string>
     <!-- When it lists contacts of MEGA, the title of list’s header -->
@@ -2189,7 +2166,7 @@
     <!-- Message error shown when trying to log in on an account has been suspended due to multiple breaches of Terms of Service -->
     <string name="account_suspended_multiple_breaches_ToS">Tài khoản của quý khách đã bị đình chỉ do vị phạm nhiều lỗi được nêu trong Điều Khoản Dịch Vụ của MEGA. Xin kiểm tra hộp thư email.</string>
     <!-- Message error shown when trying to log in on an account has been suspended due to breach of Terms of Service -->
-    <string name="account_suspended_breache_ToS">Tài khoản MEGA của quý khách đã bị chấm dứt hoạt động do vi phạm lỗi có nêu trong Điều Khoản Dịch Vụ của MEGA, chẳng hạn như lạm dụng hệ thống, quyền hạn sử dụng hay tàng trữ dữ liệu phi pháp.</string>
+    <string name="account_suspended_breache_ToS">Your account was terminated due to a breach of MEGA’s Terms of Service including, but not limited to, clause 15.</string>
     <!-- In a chat conversation when you try to send device’s images but images are still loading -->
     <string name="file_storage_loading">Đang tải tệp tin</string>
     <!-- In a chat conversation when you try to send device’s images but there aren’t available images -->
@@ -2248,10 +2225,12 @@
     <string name="settings_video_upload_quality">Chất Lượng Video</string>
     <!-- Text shown when the user refuses to permit the storage permission when enable camera upload -->
     <string name="on_refuse_storage_permission">Camera Uploads cần quyền truy cập vào hình ảnh và các nội dung đa phương tiện khác trên thiết bị. Xin đi vào phần cài đặt và cấp quyền truy cập cho MEGA.</string>
-    <!-- the options for the option on setting to set up the quality of multimedia files uploaded to the chat, the options of medium quality multimedia file to  upload. -->
+    <!-- Available options for the setting to set up the quality of multimedia files uploaded to the chat or the Camera Uploads -->
     <string-array name="settings_chat_upload_quality_entries">
-        <item>Chất lượng nguyên gốc</item>
-        <item>Chất lượng trung bình</item>
+        <item>Thấp</item>
+        <item>Thường</item>
+        <item>Cao</item>
+        <item>Nguyên gốc</item>
     </string-array>
     <!-- Title of the notification for a missed call -->
     <string name="missed_call_notification_title">Cuộc gọi nhỡ</string>
@@ -2430,7 +2409,7 @@
     <!--  -->
     <string name="two_factor_authentication_explain">Chức năng xác minh 2-bước là một lớp bảo mật thứ nhì cho tài khoản. Nghĩa là trong trường hợp có người biết mật khẩu để lén vào tài khoản sẽ không thể vào được, và buộc phải nhập thêm đoạn mã 6 chữ số mà chỉ chủ sở hữu tài khoản mới có.</string>
     <!-- Button that permits user begin with the process of enable Two-Factor Authentication -->
-    <string name="button_setup_2fa">Bắt Đầu Cài Đặt</string>
+    <string name="button_setup_2fa">Bắt Đầu Thiết Lập</string>
     <!-- Text that explain how to do with Two-Factor Authentication QR -->
     <string name="explain_qr_seed_2fa_1">Quét hoặc sao chép đoạn chủng tử này vào app Lập Xác Thực.</string>
     <!-- Text that explain how to do with Two-Factor Authentication seed -->
@@ -2450,7 +2429,7 @@
     <!-- Description of the screen shown when the user enabled correctly Two-Factor Authentication -->
     <string name="description_2fa_enabled">Vào những lần đăng nhập tiếp theo, hệ thống sẽ yêu cầu nhập một đoạn mã dài 6 chữ số lấy từ App Lập Xác Thực.</string>
     <!-- Recommendation displayed after enable Two-Factor Authentication -->
-    <string name="recommendation_2fa_enabled">Nên cân nhắc và xuất ra <b>Mã Phục Hồi</b> để đề phòng trường hợp mất khả năng truy cập vào ứng dụng hoặc khi muốn tắt Xác Thực 2-Bước trong tương lai.</string>
+    <string name="recommendation_2fa_enabled">Please save your <b>Recovery Key</b> in a safe location, to avoid issues in case you lose access to your app, or if you want to disable Two-Factor Authentication.</string>
     <!-- Error shown when a user tries to enable Two-Factor Authentication and introduce an invalid code -->
     <string name="pin_error_2fa">Mã không phù hợp</string>
     <!-- Title of screen Lost authenticator decive -->
@@ -2496,13 +2475,13 @@
     <!-- error message when importing multiple files from chat -->
     <string name="number_no_imported_from_chat">Chia sẻ %d tệp tin chưa được hoàn tất</string>
     <!-- button’s text to open a full screen image -->
-    <string name="preview_content">Xem Trước Nội Dung</string>
+    <string name="preview_content">Preview content</string>
     <!-- message shown when the user clicks on media file chat message, there is no network connection and the file is not been downloaded -->
-    <string name="no_network_connection_on_play_file">Việc truyền tải không thể thực hiện được và tệp tin chưa có tải về</string>
+    <string name="no_network_connection_on_play_file">Không có kết nối mạng. Tệp tin chưa được tải về và không thể truyền được.</string>
     <!-- message shown when the user open a file, the file is not been opened due to unknown reason -->
     <string name="error_fail_to_open_file_general">Không thể mở được tệp tin.</string>
     <!-- message shown when the user open a file, there is no network connection and the file is not been downloaded -->
-    <string name="error_fail_to_open_file_no_network">Không mở được tệp tin này do có lỗi kết nối mạng.</string>
+    <string name="error_fail_to_open_file_no_network">No network connection. Please reconnect to open the file.</string>
     <!-- message when trying to save for offline a file that already exists -->
     <string name="file_already_exists">Tệp tin đã có sẵn trong Lưu về Ngoại Tuyến</string>
     <!-- Error message if forwarding a message failed, many messages -->
@@ -2510,9 +2489,9 @@
         <item quantity="other">Tin nhắn chưa được chuyển tiếp</item>
     </plurals>
     <!-- Title of the dialog to disable the rich links previews on chat -->
-    <string name="title_confirmation_disable_rich_links">Xem Trước Nội Dung URL</string>
+    <string name="title_confirmation_disable_rich_links">Xem trước nội dung URL</string>
     <!-- Text of the dialog to disable the rich links previews on chat -->
-    <string name="text_confirmation_disable_rich_links">Sau khi tắt tính năng xem trước nội dụng URL. Nếu muốn bật lại sẽ cần phải vào phần Thiết Đặt. Có chắc muốn tắt tính này hay không?</string>
+    <string name="text_confirmation_disable_rich_links">You are disabling rich URL previews. You can re-enable them in Settings. Do you want to continue?</string>
     <!-- Message shown when a call ends. -->
     <string name="call_missed_messages">[A]Cuộc gọi bị lỡ[/A]</string>
     <!-- Message shown when a call ends. -->
@@ -2524,7 +2503,7 @@
     <!-- Message shown when a call ends. -->
     <string name="call_not_answered_messages">[A]Cuộc gọi không có trả lời[/A]</string>
     <!-- Indicates that can type a contact email -->
-    <string name="contact_email">Email của tên liên lạc</string>
+    <string name="contact_email">Email của người muốn thêm</string>
     <!-- When it tries to add a contact in a list an is already added -->
     <string name="contact_not_added">Tên liên lạc này đã được thêm rồi.</string>
     <!-- Content of a normal message that cannot be recognized -->
@@ -2538,13 +2517,9 @@
     <!-- success message when a node was restore from Rubbish bin -->
     <string name="context_correctly_node_restored">Đã được khôi phục vào %s</string>
     <!-- error message when a node was restore from Rubbish bin -->
-    <string name="context_no_restored">Lỗi. Không phục hồi được</string>
+    <string name="context_no_restored">An error occurred. Item not restored.</string>
     <!-- menu item from contact section to send a message to a contact -->
     <string name="context_send_message">Gửi Tin Nhắn</string>
-    <!-- Message shown when a contact is successfully sent to several chats, more contacts -->
-    <plurals name="plural_contact_sent_to_chats">
-        <item quantity="other">Thông tin tên liên lạc đã được gửi đến cuộc chát thành công</item>
-    </plurals>
     <!-- Error message on opening a MEGAdrop folder link -->
     <string name="error_MEGAdrop_not_supported">MEGAdrop chưa được hỗ trợ</string>
     <!-- Pre overquota error dialog when trying to copy or import a file -->
@@ -2554,9 +2529,9 @@
     <!-- Text of the option to show the arhived chat, it shows the number of archived chats -->
     <string name="archived_chats_show_option">Số cuộc chát được bảo lưu (%d)</string>
     <!-- Title of the option on the chat list to archive a chat -->
-    <string name="archive_chat_option">Bảo Lưu Cuộc Chát</string>
+    <string name="archive_chat_option">Bảo lưu cuộc chát</string>
     <!-- Title of the option on the chat list to unarchive a chat -->
-    <string name="unarchive_chat_option">Chuyển Cuộc Chát Khỏi Bảo Lưu</string>
+    <string name="unarchive_chat_option">Bỏ bảo lưu cuộc chát</string>
     <!-- Confirmation button of the dialog to archive a chat -->
     <string name="general_archive">Chuyển Vào Bảo Lưu</string>
     <!-- Confirmation button of the dialog to unarchive a chat -->
@@ -2575,10 +2550,6 @@
     <string name="inactive_chat">Cuộc chát bất hoạt động</string>
     <!-- Subtitle of chat screen when the chat is archived -->
     <string name="archived_chat">Cuộc chát được bảo lưu</string>
-    <!-- error message when restoring several nodes from rubbish -->
-    <string name="number_incorrectly_restored_from_rubbish">%d mục chưa được phục hồi thành công</string>
-    <!-- success message when restoring several nodes from rubbish -->
-    <string name="number_correctly_restored_from_rubbish">Hoàn tất phục hồi %d mục thành công</string>
     <!-- Title of the layout to join a group call from the chat screen -->
     <string name="join_call_layout">Chạm vào để tham gia cuộc gọi</string>
     <!-- Label shown when the user wants to add contacts into his MEGA account -->
@@ -2588,7 +2559,7 @@
     <!-- Message shown while the contact list from the device and from MEGA is being read and then shown to the user -->
     <string name="contacts_list_empty_text_loading_share">Đang tải các tên liên lạc&#8230;</string>
     <!-- Title of the screen New Group -->
-    <string name="title_new_group">Tạo Nhóm Mới</string>
+    <string name="title_new_group">Nhóm mới</string>
     <!-- Subtitle of the screen New Group -->
     <string name="subtitle_new_group">Điền tên cho nhóm</string>
     <!-- Hint of edittext shown when it is creating a new group to guide user to type the name of the group -->
@@ -2728,7 +2699,7 @@
     <!-- Title of compression queue size option in settings -->
     <string name="settings_video_compression_queue_size_title">Nếu videos cần nén có kích thước lớn hơn</string>
     <!-- Text of the alert when a FREE user tries to disable the RB scheduler -->
-    <string name="settings_rb_scheduler_alert_disabling">Để tắt Lịch Dọn Dẹp Thùng Rác hay gia hạn chờ thời gian tự dọn dẹp được lâu hơn, tài khoản cần phải nâng cấp lên hạng PRO.</string>
+    <string name="settings_rb_scheduler_alert_disabling">To disable the Rubbish Bin clearing scheduler or set a longer retention period, please subscribe to a Pro plan.</string>
     <!-- Picker text to choose custom retention time. This option indicates several days -->
     <string name="hint_days">ngày</string>
     <!-- Title of the option to generate a public chat link -->
@@ -2970,17 +2941,17 @@
     <!-- Title of the dialog to inform about a SSL error -->
     <string name="ssl_error_dialog_title">SSL key bị lỗi</string>
     <!-- Text of the dialog to inform about a SSL error -->
-    <string name="ssl_error_dialog_text">MEGA không tạo được liên kết an ninh tới SSL. Thiết bị bạn đang sử dụng có thể đang dùng mạng WiFi công cộng có yêu cầu một số điều kiện khi kết nối.</string>
+    <string name="ssl_error_dialog_text">MEGA is unable to establish a secure connection using SSL. You may be on a public Wi-Fi network with additional requirements.</string>
     <!-- Text of the empty screen for the notifications section -->
     <string name="context_empty_notifications">[B]Không có [/B][A]Thông Báo[/A]</string>
     <!-- Permissions screen title -->
-    <string name="general_setup_mega">Cài đặt MEGA</string>
+    <string name="general_setup_mega">Thiếp Lập MEGA</string>
     <!-- Permissions screen explanation -->
-    <string name="setup_mega_explanation">MEGA cần khả năng truy cập vào kho ảnh, media và tệp tin trong máy để thực hiện việc chia sẻ khi được yêu cầu, trao đổi các tin nhắn được mã hóa và các cuộc gọi bảo mật.</string>
+    <string name="setup_mega_explanation">MEGA needs your permission to access your media and files for sharing. Other access permissions may be needed for exchanging encrypted messages and to make secure calls.</string>
     <!-- Title of the screen asking permissions for files -->
     <string name="allow_acces_media_title">Cho phép truy cập vào hình ảnh, đa phương tiện và tệp tin.</string>
     <!-- Subtitle of the screen asking permissions for files -->
-    <string name="allow_acces_media_subtitle">Để có thể chia sẻ hình ảnh, nội dung đa phương tiện và tệp tin, MEGA cần sự cho phép của bạn.</string>
+    <string name="allow_acces_media_subtitle">MEGA needs your permission to access files for sharing.</string>
     <!-- Title of the screen asking permissions for camera -->
     <string name="allow_acces_camera_title">Truy cập camera</string>
     <!-- Subtitle of the screen asking permissions for camera -->
@@ -2988,7 +2959,7 @@
     <!-- Title of the screen asking permissions for microphone and write in log calls -->
     <string name="allow_acces_calls_title">Thực hiện cuộc gọi</string>
     <!-- Title of the screen asking permissions for contacts -->
-    <string name="allow_acces_contact_title">Cần Quyền Cho Phép Truy Cập vào Danh Bạ</string>
+    <string name="allow_acces_contact_title">Grant access to your address book</string>
     <!-- Subtitle of the screen asking permissions for contacts -->
     <string name="allow_acces_contact_subtitle">Dễ dàng tìm thêm người để kết nối trên MEGA từ sổ danh bạ của bạn.</string>
     <!-- Explanation under the subtitle of asking permissions for contacts to explain that MEGA will never use the address book data for any other purpose -->
@@ -2996,9 +2967,9 @@
     <!-- Subtitle of the screen asking permissions for microphone -->
     <string name="allow_acces_calls_subtitle_microphone">Cho phép ứng dụng MEGA sử dụng micrôphone của điện thoại để thực hiện cuộc gọi khi bạn yêu cầu.</string>
     <!-- General enable access -->
-    <string name="general_enable_access">Cho Phép Quyền Hạn</string>
+    <string name="general_enable_access">Grant access</string>
     <!-- Title of the option on chat info screen to list all the files sent to the chat -->
-    <string name="title_chat_shared_files_info">Tệp Tin Đã Chia Sẻ</string>
+    <string name="title_chat_shared_files_info">Chia sẻ tệp tin</string>
     <!-- Error mesage when trying to remove an uploading attachment that has already finished -->
     <string name="error_message_already_sent">Tệp đsính kèm đã được gửi đi rồi</string>
     <!-- Message shown when a group call ends. -->
@@ -3040,17 +3011,17 @@
     <!-- Text to indicate that a contact has left a group call -->
     <string name="contact_left_the_call">%1$s đã rời khỏi cuộc gọi</string>
     <!-- Warning show when a call cannot start because there are too many participants in the group chat -->
-    <string name="call_error_too_many_participants_start">Không thể tiến hành thực hiện cuộc gọi vì nhóm đã vượt quá số lượng thành viên.</string>
+    <string name="call_error_too_many_participants_start">Call cannot start because the maximum number of participants has been exceeded.</string>
     <!-- Message show when a call cannot be established because there are too many participants in the group call -->
-    <string name="call_error_too_many_participants">Không thể tham gia cuộc gọi này vì đã quá mức số lượng thành viên đang có trong cuộc gọi.</string>
+    <string name="call_error_too_many_participants">Call cannot be joined as the maximum number of participants has been exceeded.</string>
     <!-- Message show when a call cannot be established because there are too many participants in the group -->
-    <string name="call_error_too_many_participants_join">Không thể tiến hành gia nhập cuộc gọi vì nhóm chát này đã đạt giới hạn số lượng thành viên.</string>
+    <string name="call_error_too_many_participants_join">Unable to join the group call due to the maximum number of participants reached</string>
     <!-- Message show when a user cannot activate the video in a group call because the max number of videos has been reached -->
-    <string name="call_error_too_many_video">Không thể bật video cho cuộc gọi này được vì quá mức số lượng thành viên tham gia cuộc gọi đang sử dụng video.</string>
+    <string name="call_error_too_many_video">Video call cannot be joined as the maximum number of participants has been exceeded.</string>
     <!-- Message show when a user cannot put the call on hold -->
-    <string name="call_error_call_on_hold">Bạn không được phép chuyển cuộc gọi sang chế độ chờ.</string>
+    <string name="call_error_call_on_hold">Call cannot be put on hold.</string>
     <!-- Error message shown when a file cannot be opened by other app using the open with option menu -->
-    <string name="error_open_file_with">Lỗi. Không mở được tệp tin.</string>
+    <string name="error_open_file_with">An error has occurred and the file cannot be opened with this app.</string>
     <!-- Subtitle of the call screen when a incoming call is just starting -->
     <string name="incoming_call_starting">Đang có cuộc gọi đến&#8230;</string>
     <!-- Subtitle of the call screen when a outgoing call is just starting -->
@@ -3058,7 +3029,7 @@
     <!-- Content of a invalid meta message -->
     <string name="error_meta_message_invalid">Tin nhắn có chứa đựng siêu dữ liệu không hợp lệ</string>
     <!-- Title of the activity that sends a location -->
-    <string name="title_activity_maps">Gửi Vị Trí</string>
+    <string name="title_activity_maps">Gửi vị trí</string>
     <!-- Label layout on maps activity that permits send current location -->
     <string name="current_location_label">Gửi đi vị trí hiện tại</string>
     <!-- Label layout on maps activity that permits send current location. Placeholder is the current location -->
@@ -3254,7 +3225,7 @@
     <!-- Text of the empty screen when there are not chat conversations -->
     <string name="recent_chat_empty_text">Mở một cuộc trò chuyện với các tên liên lạc nằm trong danh sách, với tính bảo mật tối ưu</string>
     <!-- Text sent to recipients to invite to be contact. Placeholder: contact link url. -->
-    <string name="invite_contacts_to_start_chat_text_message">Xin chào! Mời bạn cùng sử dụng MEGA để có ngay 20+ GB không gian lưu trữ miễn phí và công cụ giao tiếp bảo mật. %1$s</string>
+    <string name="invite_contacts_to_start_chat_text_message">Hi. Have secure conversations on MEGA with me and get 20 GB of free cloud storage. %1$s</string>
     <!-- In some cases, a user may try to get the link for a chat room, but if such is not set by an operator - it would say ‘not link available’ and not auto create it. -->
     <string name="no_chat_link_available">Không có liên kết nào cả.</string>
     <!-- Alert shown when it has been deleted successfully a chat link -->
@@ -3283,11 +3254,11 @@
     <string name="invite_contact_chooser_title">Mời bạn bè bằng</string>
     <!-- Action button label -->
     <string name="invite_contact_action_button">Mời bạn bè thông qua&#8230;</string>
-    <!-- When a multiple download is started, some of the files could have already been downloaded before. This message shows the number of files that has already been downloaded in plural. placeholder: number of files -->
+    <!-- Message displayed when multiple download starts and all files has already been downloaded before. Placeholder: number of files -->
     <plurals name="file_already_downloaded">
-        <item quantity="other">%d tệp tin đã được tải xuống rồi.&#160;</item>
+        <item quantity="other">%d tệp tin đã được tải xuống từ trước.</item>
     </plurals>
-    <!-- When a multiple download is started, some of the files could have already been downloaded before. This message shows the number of files that are pending in plural. placeholder: number of files -->
+    <!-- When a multiple download is started, some of the files could have already been downloaded before. This message shows the number of files that are pending. Placeholder: number of files -->
     <plurals name="file_pending_download">
         <item quantity="other">%d tệp tin đang chờ.</item>
     </plurals>
@@ -3300,7 +3271,7 @@
     <!-- Label to reference a chats section -->
     <string name="chats_label">Cuộc chát</string>
     <!-- Text of the empty screen when there are not elements in Recents -->
-    <string name="context_empty_recents">[B]Không có tệp tin nào trong [/B][A]Sử Dụng Gần Đây[/A]</string>
+    <string name="context_empty_recents">[B]No files in [/B][A]Recents[/A]</string>
     <!-- Title of a recents bucket -->
     <string name="title_bucket">%1$s và %2$d mục nữa</string>
     <!-- Title of a media recents bucket that only contains some images -->
@@ -3361,8 +3332,8 @@
     <string name="business_management_alert">Bộ quản lý nhân viên cỉ hỗ trợ trên phiên bản trình duyệt web dành cho máy tính.</string>
     <!-- Title of the usage tab in My Account Section -->
     <string name="tab_my_account_usage">Lượng Dùng</string>
-    <!-- Title of usage storage details section in Storage -->
-    <string name="usage_storage_details_label">Chi tiết không gian đang sử dụng</string>
+    <!-- Title of usage storage details section in My Account -->
+    <string name="usage_storage_details_label">Liệt kê lượng dùng</string>
     <!-- Title of overall usage section in Storage -->
     <string name="overall_usage_label">Tổng quan lượng dùng</string>
     <!-- Title of transfer section in Storage -->
@@ -3370,7 +3341,7 @@
     <!-- Error shown when a Business account user (sub-user or admin) tries to remove a contact which is part of the same Business account. Please, keep the placeholder, it will be replaced with the name or email of the account, for example: Jane Appleseed or ja@mega.nz -->
     <string name="error_remove_business_contact">Không thể xóa tên %1$s khỏi sổ liên lạc vì đây là nhân viên trong tài khoản Doanh Nghiệp này.</string>
     <!-- When logging in during the grace period, the administrator of the Business account will be notified that their payment is overdue, indicating that they need to access MEGA using a desktop browser for more information -->
-    <string name="grace_period_admin_alert">Đã có vấn đề xảy ra với việc thanh toán gần đây. Xin truy cập MEGA bằng trình duyệt web trên máy tính để biết thêm thông tin.</string>
+    <string name="grace_period_admin_alert">A problem occurred with your last payment. Please access MEGA using a desktop browser for more information.</string>
     <!-- A dialog title shown to users when their business account is expired. -->
     <string name="expired_business_title">Tài khoản doanh nghiệp đã hết hạn</string>
     <!-- Details shown when a Business account is expired due a payment issue. The account is opened in a view-only mode. -->
@@ -3378,7 +3349,7 @@
     <!-- A message which is shown to sub-users of expired business accounts. -->
     <string name="expired_user_business_text">Tài khoản của bạn hiện đang bị [B]đình chỉ[/B]. Bạn chỉ có khả năng xem duyệt dữ liệu của mình.</string>
     <!-- Message shown when users with a business account (no administrators of a business account) try to enable the Camera Uploads, to advise them that the administrator do have the ability to view their data. -->
-    <string name="camera_uploads_business_alert">Mặc dù MEGA không có quyền truy cập vào dữ liệu của bạn, nhưng người quản trị tài khoản doanh nghiệp sẽ có khả năng xem nội dung Camera Uploads có trong tài khoản nhân viên của bạn</string>
+    <string name="camera_uploads_business_alert">MEGA không thể truy cập vào dữ liệu của bạn. Tuy nhiên, chủ điều hành tài khoản doanh nghiệp sẽ có quyền truy cập vào nội dung Camera Uploads của bạn.</string>
     <!-- General label to alert user that somehting went wrong -->
     <string name="general_something_went_wrong_error">Có vấn đề xảy ra</string>
     <!-- A dialog message which is shown to sub-users of expired business accounts. -->
@@ -3446,7 +3417,7 @@
     <!-- Error title shown when you are trying to do an action with a file or folder and you don’t have the necessary permissions -->
     <string name="permissions_error_label">Lỗi quyền hạn</string>
     <!-- Confirmation dialog shown to user when they try to revert a node in an incoming ReadWrite share. -->
-    <string name="alert_not_enough_permissions_revert">Bạn không có đủ quyền hạn để khôi phục tệp này. Để tiếp tục, cần phải tạo một tệp mới với dữ liệu muốn phục hồi. Bạn có muốn tiếp tục không?</string>
+    <string name="alert_not_enough_permissions_revert">You do not have the correct permissions to amend this file. Would you like to create a new file?</string>
     <!-- Text shown when the creation of a version as a new file was successful -->
     <string name="version_as_new_file_created">Phiên bản đã được chuyển thành một tệp tin toàn vẹn.</string>
     <!-- Label indicating a date. Keep the placeholder, is to set the date. -->
@@ -3476,15 +3447,15 @@
     <!-- Text warning of transfer over quota -->
     <string name="warning_transfer_over_quota">Các phiên truyên tải đã bị gián đoạn. Xin nâng cấp tài khoản hoặc đợi %s để tiếp tục.</string>
     <!-- Label indicating transfer over quota -->
-    <string name="label_transfer_over_quota">Đã quá mức băng thông để truyền tải</string>
+    <string name="label_transfer_over_quota">Quá hạn mức truyền tải</string>
     <!-- Label indicating storage over quota -->
-    <string name="label_storage_over_quota">Lưu trữ vượt mức giới hạn</string>
+    <string name="label_storage_over_quota">Cảnh báo vượt mức</string>
     <!-- Label indicating the action ‘upgrate account’ to get more transfer quota -->
     <string name="label_get_more_transfer_quota">Tăng hạn mức truyền tải</string>
     <!-- Warning show to the user when a folder does not exist -->
     <string name="warning_folder_not_exists">Thư mục không tồn tại.</string>
     <!-- Warning show to the user when a node does not exist in cloud -->
-    <string name="warning_node_not_exists_in_cloud">Tệp tin không có tồn tạo trong Ổ Mây.</string>
+    <string name="warning_node_not_exists_in_cloud">The file cannot be found in your Cloud Drive.</string>
     <!-- Header text of the Over Disk Quota Paywall warning -->
     <string name="over_disk_quota_paywall_header">Hết Không Gian Lưu Trữ</string>
     <!-- Title of the Over Disk Quota Paywall warning -->
@@ -3515,7 +3486,7 @@
     <string name="label_verify_credentials">Kiểm tra chứng thực</string>
     <!-- Label to indicate that contact’s credentials are not verified. -->
     <string name="label_not_verified">Chưa có xác thực</string>
-    <!-- Action indicating something was verified. -->
+    <!-- Label indicating the authenticity credentials of a contact have been verified -->
     <string name="label_verified">Đã xác thực</string>
     <!-- ”Verify user” dialog title -->
     <string name="authenticity_credentials_label">Công Nhận Chứng Thực</string>
@@ -3536,7 +3507,7 @@
     <!-- Text show in a snackbar when phone has successfully reset. -->
     <string name="remove_phone_number_success">Số điện thoại đã được xóa bỏ thành công.</string>
     <!-- Text show in a snackbar when reset phone number failed. -->
-    <string name="remove_phone_number_fail">Xóa số điện thoại không thành công.</string>
+    <string name="remove_phone_number_fail">Failed to remove your phone number.</string>
     <!-- Text hint shown in the global search box which sits on the top of the Homepage screen -->
     <string name="search_hint">Tìm trong MEGA</string>
     <!-- Alert shown when a user tries to reset an account wich is bloqued. -->
@@ -3594,15 +3565,15 @@
     <!-- Indicator of the progress in a download/upload. Please, don’t remove the place holders: the first one is to set the percentage, the second one is to set the size of the file. Example 33% of 33.3 MB -->
     <string name="progress_size_indicator">%1$d%% trong tổng %2$s</string>
     <!-- Message showing when enable the mode for showing the special information in the chat messages. This action is performed from the settings section, clicking 5 times on the App version option -->
-    <string name="show_info_chat_msg_enabled">Hiển thị thông tin đặc biệt cho tin nhắn chát đã được bật</string>
+    <string name="show_info_chat_msg_enabled">Debugging info for chat messages enabled</string>
     <!-- Message showing when disable the mode for showing the special information in the chat messages.. This action is performed from the settings section, clicking 5 times on the App version option -->
-    <string name="show_info_chat_msg_disabled">Hiển thị thông tin đặc biệt cho tin nhắn chát đã được tắt</string>
+    <string name="show_info_chat_msg_disabled">Debugging info for chat messages disabled</string>
     <!-- Shows the error when the limit of reactions per user is reached and the user tries to add one more. Keep the placeholder because is to show limit number in runtime. -->
     <string name="limit_reaction_per_user">Bạn đã đạt giới hạn bày tỏ tối đa %d cảm xúc.</string>
     <!-- Shows the error when the limit of reactions per message is reached and a user tries to add one more. Keep the placeholder because is to show limit number in runtime. -->
     <string name="limit_reaction_per_message">Tin nhắn này đã đạt giới hạn bày tỏ tối đa %d cảm xúc.</string>
     <!-- System message displayed to all chat participants when one of them enables retention history -->
-    <string name="retention_history_changed_by">[A]%1$s[/A][B] đã thay đổi thời gian tự động xóa tin nhắn đã có lâu là[/B][A] %2$s[/A][B].[/B]</string>
+    <string name="retention_history_changed_by">[A]%1$s[/A][B] đã thay đổi thời gian tự động xóa tin nhắn đã có lâu là [/B][A]%2$s[/A][B].[/B]</string>
     <!-- Title of the section to clear the chat content in the Manage chat history screen -->
     <string name="title_properties_clear_chat_history">Xóa lịch sử nội dung chát</string>
     <!-- System message that is shown to all chat participants upon disabling the Retention history -->
@@ -3628,7 +3599,7 @@
     <!-- Subtitle of the dialogue to select a retention time -->
     <string name="subtitle_properties_manage_chat">Tự động xóa các tin nhắn đã có lâu hơn:</string>
     <!-- Text of the confirmation dialog to clear the chat history from Manage chat history section -->
-    <string name="confirmation_clear_chat_history">Xóa hết toàn bộ lịch sử tin nhắn trong cuộc trò truyện này?</string>
+    <string name="confirmation_clear_chat_history">Bạn có chắc muốn don toàn bộ lịch sử các tin nhắn của cuộc trò chuyện này không?</string>
     <!-- Text on the label indicating that the oldest messages of a year will be automatically deleted. -->
     <string name="subtitle_properties_manage_chat_label_year">1 năm</string>
     <!-- Picker text to choose custom retention time. This option indicates several hours -->
@@ -3679,14 +3650,10 @@
     <string name="button_copy_key">Sao chép chìa khóa</string>
     <!-- Button which action is copy the password of a link -->
     <string name="button_copy_password">Sao chép mật khẩu</string>
-    <!-- Confirmation shown informing a link it’s copied to the clipboard -->
-    <string name="link_copied_clipboard">Liên kết đã được ghi vào bộ nhớ.</string>
     <!-- Confirmation shown informing a key link it’s copied to the clipboard -->
     <string name="key_copied_clipboard">Chia khóa đã được ghi vào bộ nhớ.</string>
     <!-- Confirmation shown informing a password link it’s copied to the clipboard -->
     <string name="password_copied_clipboard">Mật khẩu đã được ghi vào bộ nhớ.</string>
-    <!-- Confirmation shown informing a link it’s copied to the clipboard -->
-    <string name="link_sent">Liên kết đã được gửi thành công.</string>
     <!-- Confirmation shown informing a key link it’s copied to the clipboard -->
     <string name="link_and_key_sent">Liên kết và chìa khóa đã được gửi thành công.</string>
     <!-- Confirmation shown informing a key link it’s copied to the clipboard -->
@@ -3710,7 +3677,7 @@
     <!-- String to share a link protected with password with its password.Please keep the place holders, are to set the link and the password. Example: Link: https://mega.nz/file/kC42xRSK#Ud2QsvpIVYmCd1a9QUhk42wXv10jCSyPSWnXEwYX2VE Password: asfAFG3345g -->
     <string name="share_link_with_password">Liên kết: %1$s\n\nMật khẩu: %2$s</string>
     <!-- Warning show to the user when the app needs permissions to share files and the user has denied them. -->
-    <string name="files_required_permissions_warning">MEGA cần phải có sự cấp phép của bạn để chia sẻ tệp tin.</string>
+    <string name="files_required_permissions_warning">MEGA needs your permission to access your files for sharing.</string>
     <!-- Context menu item. Allows user to add file/folder to favourites -->
     <string name="file_properties_favourite">Đánh dấu ưa thích</string>
     <!-- Context menu item. Allows user to delete file/folder from favourites -->
@@ -3755,14 +3722,12 @@
     <string name="dialog_cookie_alert_unsaved">Cài Đặt Cookie chưa được lưu lại.</string>
     <!-- Snackbar message showed when there settings has been saved successfully. -->
     <string name="dialog_cookie_snackbar_saved">Thay đổi cho Cài Đặt Cookie đã được lưu lại</string>
-    <!-- Cookie dialog third party title -->
-    <string name="dialog_cookie_thirdparty_title">Cookies Bên Thứ Ba</string>
     <!-- Cookie dialog third party first subtitle -->
     <string name="dialog_cookie_thirdparty_subtitle1">Cookies Quảng Cáo của Google</string>
     <!-- Cookie dialog third party second subtitle -->
     <string name="dialog_cookie_thirdparty_subtitle2">Thể loại: Cookies Quảng Cáo</string>
     <!-- Cookie dialog third party message. Please, keep the placeholders to format the string. -->
-    <string name="dialog_cookie_thirdparty_message">Sử dụng bởi Google để:\n• tùy chỉnh các quảng cáo được Google hiển thị trên các dịch vụ của chúng tôi và trên các trang web và dịch vụ khác dựa trên những thứ như vị trí của quý khách và các trang web đã truy cập trước đây;\n• theo dõi tần suất quý khách xem các quảng cáo nhất định;\n• cung cấp cách phòng chống gian lận; và\n• xác định thời điểm quý khách clíck vào một quảng cáo cụ thể và để sau đó theo dõi các hành động mà quý khách thực hiện để phản hồi lại quảng cáo đó.\nhttps://policies.google.com/technologies/partner-sites</string>
+    <string name="dialog_cookie_thirdparty_message">Used by Google to:\n• customise the adverts Google shows on ours and other services and websites, based on such things as your location and other websites you’ve previously visited;\n• monitor how often you are displayed certain adverts;\n• provide fraud prevention; and\n• determine when you tap on a particular advert and then to track the following actions you take in response to that advert.\nhttps://policies.google.com/technologies/partner-sites</string>
     <!-- Preference screen item title -->
     <string name="preference_cookies_accept">Chấp Nhận Cookies</string>
     <!-- Preference screen item title -->
@@ -3784,11 +3749,7 @@
     <!-- Preference screen item title -->
     <string name="preference_cookies_thirdparty_title">Cookies Bên Thứ Ba</string>
     <!-- Preference screen item summary. Please, keep the placeholders to format the string. -->
-    <string name="preference_cookies_thirdparty_summary">Đây là những Cookies được kiểm soát bởi ai đó không phải từ phía chúng tôi; chúng tôi sử dụng các Cookies này để cung cấp các chức năng được mô tả ở trên. Việc không chấp nhận các Cookie này sẽ có các tác động khác nhau tùy thuộc vào loại Cookies của bên thứ ba. Clíck vào “Thêm Thông Tin” bên dưới để biết chi tiết về tất cả các Cookies của bên thứ ba mà chúng tôi sử dụng.</string>
-    <!-- Preference screen item action button -->
-    <string name="preference_cookies_policies_privacy">Chính Sách Quyền Riêng Tư</string>
-    <!-- Preference screen item action button -->
-    <string name="preference_cookies_policies_cookie">Chính Sách Cookie</string>
+    <string name="preference_cookies_thirdparty_summary">These are Cookies which are controlled by someone other than us; we use these Cookies to provide the types of functionality described above. Not accepting these Cookies will have different implications depending on what type of Cookie each third party Cookie is. Tap on “More Information” below for details on all the third party Cookies we use.</string>
     <!-- Preference screen item state description -->
     <string name="preference_cookies_always_on">Luôn Bật</string>
     <!-- Menu option that allows the user to scan document and upload it directly to MEGA. -->
@@ -3816,7 +3777,7 @@
     <!-- Label indicating a file was created successfully -->
     <string name="file_created">Tệp tin đã được tạo</string>
     <!-- Warning indicating a file was not created successfully -->
-    <string name="file_creation_failed">Tạo tệp tin bị thất bại. Xin thử lại.</string>
+    <string name="file_creation_failed">File creation failed. Please try again.</string>
     <!-- Label indicating a file was saved to some folder. e.g.: File saved to Cloud Drive -->
     <string name="file_saved_to">Tệp đã được lưu vào %1$s</string>
     <!-- Warning indicating a file was not saved to some folder. e.g.: File not saved to Cloud Drive. Try again -->
@@ -3824,7 +3785,7 @@
     <!-- Label indicating a file was updated successfully -->
     <string name="file_updated">Tệp tin đã được cập nhật</string>
     <!-- Warning indicating a file was not updated successfully -->
-    <string name="file_update_failed">Tệp tin chưa được cập nhật. Xin thử lại.</string>
+    <string name="file_update_failed">File update failed. Please try again.</string>
     <!-- Warning which alerts the user a file cannot be opened -->
     <string name="error_opening_file">Tệp tin quá lớn và không thể mở hoặc xem trước được.</string>
     <!-- Error shown when the user writes a file name without extension. The placeholder shows the file extension. e. g. File without extension (.jpg)-->
@@ -3833,20 +3794,8 @@
     <string name="file_without_extension_warning">Để tiếp tục bạn phải viết đầy đủ tên và dạng tệp tin</string>
     <!-- Title of the warning dialog indicating the renamed name file extension is not the same -->
     <string name="file_extension_change_title">Thay đổi dạng tệp tin</string>
-    <!-- Text of the warning dialog indicating the renamed name file extension is not the same. The placeholders show the file extensions. e.g. You may not be able to access this file if you change it from ".jpg" to ".txt" -->
-    <string name="file_extension_change_warning">Bạn có thể sẽ không truy cập được vào tệp tin này        nếu bạn thay đổi “.%1$s” thành “.%2$s”</string>
-    <!-- Text of the warning dialog indicating the renamed name file extension is not the same. The placeholder shows the file extension. e.g. You may not be able to access this file if you change it from empty to ".txt" -->
-    <string name="file_extension_change_warning_old_empty">Bạn có thể sẽ không truy cập được vào tệp tin này        nếu bạn thay đổi dạng tệp vô danh thành “.%1$s”</string>
-    <!-- Text of the warning dialog indicating the renamed name file extension is not the same. The placeholder shows the file extension. e.g. You may not be able to access this file if you change it from ".jpg" to empty -->
-    <string name="file_extension_change_warning_new_empty">Bạn có thể sẽ không truy cập được vào tệp tin này        nếu bạn thay đổi “.%1$s” thành dạng tệp vô danh</string>
-    <!-- Button of the warning dialog indicating the renamed name file extension is not the same to use the new extension -->
-    <string name="action_use_empty_new_extension">Dùng vô danh</string>
-    <!-- Button of the warning dialog indicating the renamed name file extension is not the same to use the new extension. The placeholder shows the file extension. e.g. Use .txt -->
-    <string name="action_use_new_extension">Dùng .%1$s</string>
-    <!-- Button of the warning dialog indicating the renamed name file extension is not the same to keep the old extension -->
-    <string name="action_keep_empty_old_extension">Dữ vô danh</string>
-    <!-- Button of the warning dialog indicating the renamed name file extension is not the same to keep the old extension. The placeholder shows the file extension. e.g. Keep .jpg -->
-    <string name="action_keep_old_extension">Giữ .%1$s</string>
+    <!-- Text of the warning dialog indicating the renamed name file extension is not the same. -->
+    <string name="file_extension_change_warning">Bạn có thể sẽ không truy cập được vào tệp tin này nếu bạn thay đổi định dạng.</string>
     <!-- Warning which alerts the user a file cannot be created because there is already one with the same name-->
     <string name="same_file_name_warning">Đã có một tệp tin tồn tại với cùng tên này</string>
     <!-- Warning which alerts the user an item cannot be created because there is already one with the same name -->
@@ -3881,4 +3830,258 @@
     <plurals name="cu_upload_progress">
         <item quantity="other">Việc tải lên đang được thực hiện, %1$d tệp đang chờ</item>
     </plurals>
+    <!-- Text to show as production api server option -->
+    <string name="production_api_server">Production</string>
+    <!-- Title to show in a dialog to change api server -->
+    <string name="title_change_server">Đổi máy chủ</string>
+    <!-- Show line numbers action -->
+    <string name="action_show_line_numbers">Hiện số dòng</string>
+    <!-- Hide line numbers action -->
+    <string name="action_hide_line_numbers">Ẩn số dòng</string>
+    <!-- Indicates pagination progress. E.g.: 3/49 -->
+    <string name="pagination_progress">Trang %1$s/%2$s</string>
+    <!-- An error shown as transfer error when uploading something to an incoming share and the owner’s account is over its storage quota. -->
+    <string name="error_share_owner_storage_quota">Chủ sở hữu dùng hết lượng băng thông.</string>
+    <!-- A message shown when uploading, copying or moving something to an incoming share and the owner’s account is over its storage quota. -->
+    <string name="warning_share_owner_storage_quota">Tệp tin không thể gửi tới người đã chọn vì họ đã dùng hết lượng băng thông lưu trữ của mình.</string>
+    <!-- Content to show in a Snackbar to tip the incompatibility-->
+    <string name="version_incompatibility">Chúng tôi đang nâng cấp dịch vụ MEGAchát. Cuộc gọi của bạn có thể sẽ không kết nối được do bất đồng tương thích phiên bản cho đến khi mỗi người cập nhật lên phiên bản mới nhất.</string>
+    <!-- Message displayed when multiple download starts and 1 file has already been downloaded before and 1 file is being downloaded -->
+    <string name="file_already_downloaded_and_file_pending_download">1 tệp tin đã được tải xuống. 1 tệp tin đang chờ để tải.</string>
+    <!-- Message displayed when multiple download starts and 1 file has already been downloaded before and multiple files are being downloaded. Placeholder: number of files -->
+    <string name="file_already_downloaded_and_files_pending_download">1 tệp tin đã được tải xuống. %d tệp tin đang chờ để tải.</string>
+    <!-- Message displayed when multiple download starts and multiple files have already been downloaded before and 1 file is being downloaded. Placeholder: number of files -->
+    <string name="files_already_downloaded_and_file_pending_download">%d tệp tin đã được tải xuống. 1 tệp tin đang chờ để tải.</string>
+    <!-- Message displayed when multiple download starts and multiple files have already been downloaded before and multiple files are being downloaded. Placeholders: number of files -->
+    <string name="files_already_downloaded_and_files_pending_download">%1$d tệp tin đã được tải xuống. %2$d tệp tin đang chờ để tải.</string>
+    <!-- Message displayed when 1 node (file or folder) has been successfully moved to the rubbish bin and 1 node has not been moved successfully -->
+    <string name="node_correctly_and_node_incorrectly_moved_to_rubbish">1 mục đã được di chuyển vào Thùng Rác thành công và 1 mục không di chuyển được</string>
+    <!-- Message displayed when 1 node (file or folder) has been successfully moved to the rubbish bin and multiple nodes have not been moved successfully. Placeholder: number of nodes -->
+    <string name="node_correctly_and_nodes_incorrectly_moved_to_rubbish">1 mục đã được di chuyển vào Thùng Rác thành công và %d mục không di chuyển được</string>
+    <!-- Message displayed when multiple nodes (files and folders) have been successfully moved to the rubbish bin and 1 node has not been moved successfully. Placeholder: number of nodes -->
+    <string name="nodes_correctly_and_node_incorrectly_moved_to_rubbish">%d mục đã được di chuyển vào Thùng Rác thành công và 1 mục không di chuyển được</string>
+    <!-- Message displayed when multiple nodes (files and folders) have been successfully moved to the rubbish bin and multiple nodes have not been moved successfully. Placeholders: number of nodes -->
+    <string name="nodes_correctly_and_nodes_incorrectly_moved_to_rubbish">%1$d mục đã được di chuyển vào Thùng Rác thành công và %2$d mục không di chuyển được</string>
+    <!-- Message displayed when 1 node (file or folder) has been successfully restored from the rubbish bin and 1 node has not been restored successfully -->
+    <string name="node_correctly_and_node_incorrectly_restored_from_rubbish">1 mục đã được phục hồi thành công và 1 mục không được phục hồi được</string>
+    <!-- Message displayed when 1 node (file or folder) has been successfully restored from the rubbish bin and multiple nodes have not been restored successfully. Placeholder: number of nodes -->
+    <string name="node_correctly_and_nodes_incorrectly_restored_from_rubbish">1 item restored successfully and %d items were not restored successfully</string>
+    <!-- Message displayed when multiple nodes (files and folders) have been successfully restored from the rubbish bin and 1 node has not been restored successfully. Placeholder: number of nodes -->
+    <string name="nodes_correctly_and_node_incorrectly_restored_from_rubbish">%d mục đã được phục hồi thành công và 1 mục không được phục hồi được</string>
+    <!-- Message displayed when multiple nodes (files and folders) have been successfully restored from the rubbish bin and multiple nodes have not been restored successfully. Placeholders: number of nodes -->
+    <string name="nodes_correctly_and_nodes_incorrectly_restored_from_rubbish">%1$d items restored successfully and %2$d items were not restored successfully</string>
+    <!-- Message displayed when nodes (files and folders) are being moved to the rubbish bin and all nodes have been successfully moved. Placeholder: number of nodes -->
+    <plurals name="number_correctly_moved_to_rubbish">
+        <item quantity="other">%d mục đã được di chuyển vào Thùng Rác thành công</item>
+    </plurals>
+    <!-- Message displayed when nodes (files and folders) are being moved to the rubbish bin and all nodes have not been successfully moved. Placeholder: number of nodes -->
+    <plurals name="number_incorrectly_moved_to_rubbish">
+        <item quantity="other">%d mục đã không được di chuyển vào Thùng Rác thành công</item>
+    </plurals>
+    <!-- Message displayed when nodes (files and folders) are being restored from the rubbish bin and all nodes have been successfully restored. Placeholder: number of nodes -->
+    <plurals name="number_correctly_restored_from_rubbish">
+        <item quantity="other">%d mục đã được phục hồi thành công</item>
+    </plurals>
+    <!-- Message displayed when nodes (files and folders) are being restored from the rubbish bin and all nodes have not been successfully restored. Placeholder: number of nodes -->
+    <plurals name="number_incorrectly_restored_from_rubbish">
+        <item quantity="other">%d mục đã không được phục hồi thành công</item>
+    </plurals>
+    <!-- Button of the warning dialog indicating the renamed name file extension is not the same to confirm the change. -->
+    <string name="action_change_anyway">Vẫn cứ đổi</string>
+    <!-- Snackbar text to display if the user doesn't grant the permission to access all files on a device with Android 11 or higher -->
+    <string name="snackbar_storage_permission_denied_android_11">Cần cấp quyền hạn để truy cập không gian lưu trữ trong máy.</string>
+    <!-- String to show the transfer quota and the used space in My Account section. E.g.: -->
+    <string name="used_storage_transfer">%1$s / %2$s</string>
+    <!-- String to show the transfer quota and the used space in My Account section -->
+    <string name="used_storage_transfer_percentage">%1$s%%</string>
+    <!-- Size in petabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
+    <string name="label_file_size_peta_byte">%1$s PB</string>
+    <!-- Size in exabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
+    <string name="label_file_size_exa_byte">%1$s EB</string>
+    <!-- Title of Add phone number option in My account section -->
+    <string name="add_phone_label">Thêm số điện thoại</string>
+    <!-- Text of the option Backup Recovery Key in My account section -->
+    <string name="backup_recovery_key_subtitle">Bạn còn nhớ mật khẩu hay không?\nMEGA sẽ không thể giúp đặt lại mật khẩu cho bạn nếu quên mất.</string>
+    <!-- Action to change name -->
+    <string name="change_name_action">Đổi tên</string>
+    <!-- Action to add photo -->
+    <string name="add_photo_action">Thêm ảnh</string>
+    <!-- Action to add phone number -->
+    <string name="add_phone_number_action">Thêm số điện thoại</string>
+    <!-- Warning indicating the app needs write permissions to do any action -->
+    <string name="denied_write_permissions">MEGA cần quyền viết dữ liệu vào lưu lượng của thiết bị để mới có thể thực hiện việc này.</string>
+    <!-- Date indicating is tomorrow. E.g: Tomorrow, 3 Jul 2021 -->
+    <string name="tomorrow_date">Ngày mai, %1$s</string>
+    <!-- Title of the confirmation dialog shown when a subscription has been processed successfully -->
+    <string name="title_user_purchased_subscription">Đang chờ việc xác nhận</string>
+    <!-- Number of social connections, showing the number of contacts the user has. E.g.: 37 connections -->
+    <plurals name="my_account_connections">
+        <item quantity="one">1 connection</item>
+        <item quantity="other">%1$d connections</item>
+    </plurals>
+    <!-- Section name for the “Recently Added Contacts” section. Preferably one word. -->
+    <string name="section_recently_added">Mới Thêm Gần Đây</string>
+    <!-- Text of the empty screen when there are not groups. No dot at the end because is for an empty state. The format placeholders are to showing it in different colors. -->
+    <string name="context_empty_groups">[B]Không có [/B][A]Nhóm[/A]</string>
+    <!-- Section name for the “Contact Requests” section. Preferably one word. -->
+    <string name="section_requests">Yêu cầu</string>
+    <!-- Section name for the “Groups” section. Preferably one word. -->
+    <string name="section_groups">Nhóm</string>
+    <!-- Text informing links management is only available for single items. -->
+    <string name="warning_get_links">Options such as “Send decryption key separately”, “Set expiry date” or “Set password protection” are only available for single items.</string>
+    <!-- Action which allows to copy all the links showed in the list. -->
+    <string name="action_copy_all">Copy all</string>
+    <!-- Confirmation shown informing links have been sent to the selected chats -->
+    <plurals name="links_sent">
+        <item quantity="one">Link successfully sent.</item>
+        <item quantity="other">Links successfully sent.</item>
+    </plurals>
+    <!-- Confirmation shown informing links have been copied to the clipboard -->
+    <plurals name="links_copied_clipboard">
+        <item quantity="one">Link copied to the clipboard.</item>
+        <item quantity="other">Links copied to the clipboard.</item>
+    </plurals>
+    <!-- Plural string used as button label or title of the screen to get only one or several links at the same time. -->
+    <plurals name="get_links">
+        <item quantity="one">Get Link</item>
+        <item quantity="other">Get Links</item>
+    </plurals>
+    <!-- Ask for confirmation before clear offline files -->
+    <string name="clear_offline_confirmation">Clear all offline files?</string>
+    <!-- Banner text when the call is in progress and I'm the only participant. -->
+    <string name="banner_alone_on_the_call">Bạn là người duy nhất ở đây</string>
+    <!-- Item menu option upon right click on meeting. -->
+    <string name="context_meeting">Gọi họp mặt</string>
+    <!-- Menu option that allows the user to start/join meeting. -->
+    <string name="start_join_meeting">Lập/Vào cuộc họp mặt</string>
+    <!-- Label that create a meeting -->
+    <string name="new_meeting">Cuộc meeting mới</string>
+    <!-- Label that join a meeting -->
+    <string name="join_meeting">Tham gia họp mặt</string>
+    <!-- Button that create a meeting -->
+    <string name="btn_start_meeting">Bắt đầu cuộc meeting</string>
+    <!-- Button that join a meeting as guest -->
+    <string name="btn_join_meeting_as_guest">Tham gia với tư cách khách</string>
+    <!-- Hint shown to guide user on meeting name -->
+    <string name="type_meeting_name">Cuộc họp của %s</string>
+    <!-- General label for reject the call. -->
+    <string name="general_reject">Gác máy</string>
+    <!-- General label for microphone -->
+    <string name="general_mic">Micrô</string>
+    <!-- General label for microphone muted -->
+    <string name="general_mic_mute">Micrô hiện đang tắt tiếng</string>
+    <!-- General label for microphone unmuted -->
+    <string name="general_mic_unmute">Micrô hiện đang thu tiếng</string>
+    <!-- General label for camera -->
+    <string name="general_camera">Camera</string>
+    <!-- General label for camera enable -->
+    <string name="general_camera_enable">Camera hiện đang được bật.</string>
+    <!-- General label for camera disable -->
+    <string name="general_camera_disable">Camera hiện đang bị tắt.</string>
+    <!-- Label for hold meeting -->
+    <string name="meeting_hold">Tạm giữ</string>
+    <!-- General label for speaker -->
+    <string name="general_speaker">Loa ngoài</string>
+    <!-- General label for headphone-->
+    <string name="general_headphone">Tai nghe</string>
+    <!-- General label for headphone on-->
+    <string name="general_headphone_on">Tai nghe hiện đang hoạt động</string>
+    <!-- General label for speaker on-->
+    <string name="general_speaker_on">Loa đang bật</string>
+    <!-- General label for speaker off-->
+    <string name="general_speaker_off">Loa bị tắt</string>
+    <!-- Label for end meeting-->
+    <string name="meeting_end">Chấm dứt</string>
+    <!-- Invite contacts as participants of the meeting-->
+    <string name="invite_participants">Mời thêm thành viên</string>
+    <!-- The number of participants in the meeting-->
+    <string name="participants_number">Thành viên (%d)</string>
+    <!-- Pin the participant to speaker view in the meeting-->
+    <string name="pin_to_speaker">Hiện tôi trong kiểu xem chính</string>
+    <!-- Make the participant as moderator in the meeting-->
+    <string name="make_moderator">Đặt làm người điều hành</string>
+    <!-- The title of dialog for end meeting confirmation-->
+    <string name="title_end_meeting">Rời khỏi cuộc họp mặt ngay?</string>
+    <!-- no moderator when the moderator leave meeting-->
+    <string name="no_moderator">Không có người điều hành</string>
+    <!-- assign moderator message when the moderator leave meeting-->
+    <string name="assign_moderator_message">Trước khi rời khỏi cuộc họp này, xin chọn ra một hay vài thành viên đang có mặt làm người điều hành của cuộc họp.</string>
+    <!-- assign moderator option when the moderator leave meeting-->
+    <string name="assign_moderator">Đặt làm người điều hành</string>
+    <!-- leave anyway option when the moderator leave meeting-->
+    <string name="leave_anyway">Vẫn cứ rời khỏi</string>
+    <!-- The message alert user to pick new moderator on assign moderator page-->
+    <string name="pick_new_moderator_message">Xin chọn một hoặc vài thành viên làm người điều hành mới.</string>
+    <!-- The title of dialog for changing meeting name-->
+    <string name="change_meeting_name">Đổi tên cuộc họp mặt</string>
+    <!-- The number of participants in the meeting on meeting info page-->
+    <string name="info_participants_number">Thành viên: %d</string>
+    <!-- The name of moderators in the meeting on meeting info page-->
+    <string name="info_moderator_name">Người điều hành: %s</string>
+    <!-- The literal meeting link text-->
+    <string name="meeting_link">Đường liên kết họp mặt</string>
+    <!-- Subtitle of the meeting screen-->
+    <string name="duration_meeting">Thời lượng</string>
+    <!-- The question in on-boarding screen asking if the user is going to join meeting as guest-->
+    <string name="join_meeting_as_guest">Tham gia họp mặt với tư cách khách</string>
+    <!-- The title of the paste meeting link dialog for guest-->
+    <string name="paste_meeting_link_guest_dialog_title">Bạn đã được mời tham gia một cuộc gọi họp mặt.</string>
+    <!-- Tell the guest to paste the meeting link in the edit box-->
+    <string name="paste_meeting_link_guest_instruction">Chạm vào Đường liên kết Họp Mặt được gửi cho bạn hoặc nhập nó vào đây</string>
+    <!-- Banner text to indicate poor network quality-->
+    <string name="slow_connection_meeting">Đường truyền kết nối yếu</string>
+    <!-- the message in the alert dialog for notifying the meeting has ended-->
+    <string name="meeting_has_ended">Cuộc họp mặt đã kết thúc</string>
+    <!-- error message shown when a meeting link is not well formed-->
+    <string name="invalid_meeting_link_args">Đường liên kết họp mặt không đúng</string>
+    <!-- Warning show to the user when the app needs permissions to start a meeting.-->
+    <string name="meeting_permission_info">Cần cấp quyền hạn truy cập cho MEGA</string>
+    <!-- Message of a dialog to show user the permissions that needed-->
+    <string name="meeting_permission_info_message">MEGA cần quyền truy cập vào micrô và camera để dùng cho các cuộc gọi họp mặt.</string>
+    <!-- Button to confirm the action of restarting one transfer-->
+    <string name="button_permission_info">Đã hiểu</string>
+    <!-- Warning show to the user when the app needs permissions to get the best meeting experience and the user has denied them.-->
+    <string name="meeting_required_permissions_warning">Vào phần Thiết Đặt và cho phép MEGA truy cập vào camera và micrô.</string>
+    <!-- The button text in the meeting ended alert dialog. Click the button to open the group chat screen of the meeting-->
+    <string name="view_meeting_chat">Xem tin nhắn cuộc họp mặt</string>
+    <!-- the content of tips when the user uses the meeting first time-->
+    <string name="tip_invite_more_participants">Mời thêm thành viên tham gia vào cuộc họp. Trượt lên để mời.</string>
+    <!-- the content of tips when the user enters recent chat page first time-->
+    <string name="tip_create_meeting">Chạm để tạo một cuộc họp mặt mới</string>
+    <!-- the content of tips when the user enters start conversation page first time-->
+    <string name="tip_setup_meeting">Lập nhanh một cuộc họp mặt trên MEGA với các tính năng mã hóa họp mặt an ninh mới</string>
+    <!-- the content of snack bar when the user be the new moderator-->
+    <string name="be_new_moderator">Bạn đã được chọn là người điều hành mới.</string>
+    <!-- the content of snack bar when copied meeting link-->
+    <string name="copied_meeting_link">Đường liên kết họp mặt đã được sao chép.</string>
+    <!-- Title of the layout to join a meeting from the chat screen. The placeholder indicates the user who initiated the meeting -->
+    <string name="join_meeting_layout_in_group_call">%s đã bắt đầu một cuộc họp mặt. Chạm để tham gia.</string>
+    <!-- Title of fifth tour screen -->
+    <string name="title_tour_five">MEGA Họp Mặt</string>
+    <!-- Content of fourth tour screen -->
+    <string name="content_tour_five">Gọi họp mặt an ninh mã hóa đầu-cuối</string>
+    <!-- Error shown when it tries to open an invalid meeting link and the text view is empty -->
+    <string name="invalid_meeting_link_empty">Xin nhập một đường liên kết họp mặt hợp lệ</string>
+    <!-- Guest leave call-->
+    <string name="more_than_meeting">Không đơn thuần chỉ là họp mặt</string>
+    <!-- the title of join without account on left meeting page-->
+    <string name="left_meeting_join_title">Mức độ an ninh là điều quan trọng</string>
+    <!-- the content of join without account on left meeting page-->
+    <string name="left_meeting_join_content">Tham gia vào dịch vụ lưu trữ điện toán đám mây lớn và an ninh nhất với nền tảng cộng tác toàn cầu.</string>
+    <!-- the bonus title of join without account on left meeting page-->
+    <string name="left_meeting_bonus_title">Nhận 20 GB miễn phí</string>
+    <!-- the bonus content of join without account on left meeting page-->
+    <string name="left_meeting_bonus_content">Đăng ký ngay và tận hưởng các tính năng cộng tác hữu dụng và miễn phí.</string>
+    <!-- Content of ongoing call for MaterialAlertDialog-->
+    <string name="ongoing_call_content">Đang có một cuộc gọi đang giang dở. Xin chấm dứt cuộc gọi đó trước khi tham gia vào cuộc khác.</string>
+    <!-- The hint text when changing meeting name-->
+    <string name="new_meeting_name">Tên mới cho cuộc họp mặt</string>
+    <!-- The content of dialog when failed for creating meeting-->
+    <string name="meeting_is_failed_content">Tạo cuộc họp mặt bị thất bại.</string>
+    <!-- Word next to own user’s name on participant list -->
+    <string name="meeting_me_text_bracket">%1s [A](tôi)[/A]</string>
+    <!-- Menu item to change from thumbnail view to main view in meeting-->
+    <string name="main_view">Kiểu xem chính</string>
+    <!-- Warning in Offline section alerting all the Offline files will be deleted after logout. -->
+    <string name="offline_warning">Đăng xuất tài khoản sẽ xóa các mục đã được lưu về ngoại tuyến.</string>
 </resources>

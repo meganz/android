@@ -3,24 +3,22 @@ package mega.privacy.android.app.providers;
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Activity;
-import android.app.ProgressDialog;
 import android.app.SearchManager;
 import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.Intent;
-import android.content.pm.PackageManager;
-import android.content.res.Configuration;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.os.StatFs;
 
+import com.google.android.material.appbar.AppBarLayout;
 import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.tabs.TabLayout;
 import com.google.android.material.textfield.TextInputLayout;
-import androidx.core.app.ActivityCompat;
+
+import androidx.appcompat.app.AlertDialog;
 import androidx.core.content.ContextCompat;
 import androidx.core.content.FileProvider;
 import androidx.core.view.MenuItemCompat;
@@ -66,6 +64,8 @@ import mega.privacy.android.app.UserCredentials;
 import mega.privacy.android.app.activities.WebViewActivity;
 import mega.privacy.android.app.components.CustomViewPager;
 import mega.privacy.android.app.components.EditTextPIN;
+import mega.privacy.android.app.utils.AlertDialogUtil;
+import mega.privacy.android.app.utils.MegaProgressDialogUtil;
 import mega.privacy.android.app.lollipop.providers.CloudDriveProviderFragmentLollipop;
 import mega.privacy.android.app.lollipop.providers.IncomingSharesProviderFragmentLollipop;
 import mega.privacy.android.app.lollipop.providers.ProviderPageAdapter;
@@ -93,6 +93,7 @@ import static mega.privacy.android.app.utils.FileUtil.*;
 import static mega.privacy.android.app.utils.JobUtil.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.MegaNodeUtil.getCloudRootHandle;
+import static mega.privacy.android.app.utils.PermissionUtils.*;
 import static mega.privacy.android.app.utils.Util.*;
 import static nz.mega.sdk.MegaApiJava.*;
 
@@ -106,6 +107,8 @@ public class FileProviderActivity extends PasscodeFileProviderActivity implement
 	public static final int CLOUD_TAB = 0;
 	public static final int INCOMING_TAB = 1;
 
+	public static final String FROM_MEGA_APP = "FROM_MEGA_APP";
+
 	private String lastEmail;
 	private String lastPassword;
 
@@ -115,6 +118,7 @@ public class FileProviderActivity extends PasscodeFileProviderActivity implement
 
 	private MaterialToolbar tB;
 	private ActionBar aB;
+	private AppBarLayout aBL;
 
 	private ScrollView scrollView;
 	private LinearLayout loginLogin;
@@ -138,6 +142,7 @@ public class FileProviderActivity extends PasscodeFileProviderActivity implement
 	private Button bLoginLol;
 
 	private MegaApiAndroid megaApi;
+	private MegaApiAndroid megaApiFolder;
 	private MegaChatApiAndroid megaChatApi;
 
 	private boolean folderSelected = false;
@@ -147,13 +152,12 @@ public class FileProviderActivity extends PasscodeFileProviderActivity implement
 	private CloudDriveProviderFragmentLollipop cDriveProviderLol;
 	private IncomingSharesProviderFragmentLollipop iSharesProviderLol;
 
-	private ProgressDialog statusDialog;
+	private AlertDialog statusDialog;
 
 	private Button cancelButton;
 	private Button attachButton;
 
 	private TabLayout tabLayoutProvider;
-	private LinearLayout providerSectionLayout;
 	private ProviderPageAdapter mTabsAdapterProvider;
 	private CustomViewPager viewPagerProvider;
 
@@ -228,6 +232,7 @@ public class FileProviderActivity extends PasscodeFileProviderActivity implement
 		}
 
 		megaApi = MegaApplication.getInstance().getMegaApi();
+		megaApiFolder = MegaApplication.getInstance().getMegaApiFolder();
 		megaChatApi = MegaApplication.getInstance().getMegaChatApi();
 
 		megaApi.addGlobalListener(this);
@@ -299,6 +304,8 @@ public class FileProviderActivity extends PasscodeFileProviderActivity implement
 
 				logDebug("megaApi.getRootNode() NOT null");
 
+				aBL = findViewById(R.id.app_bar_layout_provider);
+
 				//Set toolbar
 				tB = findViewById(R.id.toolbar_provider);
 				setSupportActionBar(tB);
@@ -320,12 +327,8 @@ public class FileProviderActivity extends PasscodeFileProviderActivity implement
 				activateButton(false);
 
 				//TABS section
-				providerSectionLayout = findViewById(R.id.tabhost_provider);
 				tabLayoutProvider = findViewById(R.id.sliding_tabs_provider);
 				viewPagerProvider = findViewById(R.id.provider_tabs_pager);
-
-				//Create tabs
-				providerSectionLayout.setVisibility(View.VISIBLE);
 
 				if (mTabsAdapterProvider == null) {
 
@@ -869,11 +872,10 @@ public class FileProviderActivity extends PasscodeFileProviderActivity implement
 		return "android:switcher:" + viewPagerId + ":" + fragmentPosition;
 	}
 
-	public void downloadAndAttachAfterClick(long size, long[] hashes) {
-		ProgressDialog temp = null;
+	public void downloadAndAttachAfterClick(long hash) {
+		AlertDialog temp;
 		try {
-			temp = new ProgressDialog(this);
-			temp.setMessage(getString(R.string.context_preparing_provider));
+			temp = MegaProgressDialogUtil.createProgressDialog(this, getString(R.string.context_preparing_provider));
 			temp.show();
 		} catch (Exception e) {
 			return;
@@ -883,20 +885,30 @@ public class FileProviderActivity extends PasscodeFileProviderActivity implement
 		progressTransfersFinish = 0;
 		clipDataTransfers = null;
 
-		downloadAndAttach(size, hashes);
+		downloadAndAttach(new long[]{hash});
 	}
 
-	public void downloadAndAttach(long size, long[] hashes) {
+	public void downloadAndAttach(long[] hashes) {
+		if (getIntent() != null && getIntent().getBooleanExtra(FROM_MEGA_APP, false)) {
+			AlertDialogUtil.dismissAlertDialogIfExists(statusDialog);
+
+			setResult(Activity.RESULT_OK, new Intent()
+					.setAction(Intent.ACTION_GET_CONTENT)
+					.putExtra(FROM_MEGA_APP, true)
+					.putExtra(NODE_HANDLES, hashes));
+
+			finish();
+
+			return;
+		}
 
 		logDebug("downloadAndAttach");
 
-		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-			boolean hasStoragePermission = (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED);
-			if (!hasStoragePermission) {
-				ActivityCompat.requestPermissions(this,
-						new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
-						REQUEST_WRITE_STORAGE);
-			}
+		boolean hasStoragePermission = hasPermissions(this, Manifest.permission.WRITE_EXTERNAL_STORAGE);
+		if (!hasStoragePermission) {
+			requestPermission(this,
+					REQUEST_WRITE_STORAGE,
+					Manifest.permission.WRITE_EXTERNAL_STORAGE);
 		}
 
 		if (MegaApplication.getInstance().getStorageState() == STORAGE_STATE_PAYWALL) {
@@ -919,7 +931,13 @@ public class FileProviderActivity extends PasscodeFileProviderActivity implement
 		if (hashes != null && hashes.length > 0) {
 			for (long hash : hashes) {
 				MegaNode tempNode = megaApi.getNodeByHandle(hash);
-				String localPath = getLocalFile(this, tempNode.getName(), tempNode.getSize());
+				// If node doesn't exist continue to the next one
+				if (tempNode == null) {
+					logWarning("Temp node is null");
+					continue;
+				}
+
+				String localPath = getLocalFile(tempNode);
 				if(localPath != null){
 					try {
 						logDebug("COPY_FILE");
@@ -1061,10 +1079,9 @@ public class FileProviderActivity extends PasscodeFileProviderActivity implement
 				break;
 			}
 			case R.id.attach_button: {
-				ProgressDialog temp = null;
+				AlertDialog temp;
 				try {
-					temp = new ProgressDialog(this);
-					temp.setMessage(getString(R.string.context_preparing_provider));
+					temp = MegaProgressDialogUtil.createProgressDialog(this, getString(R.string.context_preparing_provider));
 					temp.show();
 				} catch (Exception e) {
 					return;
@@ -1085,7 +1102,7 @@ public class FileProviderActivity extends PasscodeFileProviderActivity implement
 				for (int i = 0; i < totalHashes.size(); i++) {
 					hashes[i] = totalHashes.get(i);
 				}
-				downloadAndAttach(selectedNodes.size(), hashes);
+				downloadAndAttach(hashes);
 				break;
 			}
             case R.id.lost_authentication_device: {
@@ -1385,6 +1402,9 @@ public class FileProviderActivity extends PasscodeFileProviderActivity implement
 					stopRunningCameraUploadService(this);
 				}
 			} else {
+				logDebug("Logged in. Setting account auth token for folder links.");
+				megaApiFolder.setAccountAuth(megaApi.getAccountAuth());
+
 				if (is2FAEnabled) {
 					is2FAEnabled = false;
 					loginVerificationLayout.setVisibility(View.GONE);
@@ -1408,6 +1428,9 @@ public class FileProviderActivity extends PasscodeFileProviderActivity implement
 				logDebug("Logged in");
 
 				megaApi.fetchNodes(this);
+
+                // Get cookies settings after login.
+                MegaApplication.getInstance().checkEnabledCookies();
 			}
 		} else if (request.getType() == MegaRequest.TYPE_FETCH_NODES) {
 
@@ -1479,12 +1502,8 @@ public class FileProviderActivity extends PasscodeFileProviderActivity implement
 		activateButton(false);
 
 		//TABS section
-		providerSectionLayout = findViewById(R.id.tabhost_provider);
 		tabLayoutProvider = findViewById(R.id.sliding_tabs_provider);
 		viewPagerProvider = findViewById(R.id.provider_tabs_pager);
-
-		//Create tabs
-		providerSectionLayout.setVisibility(View.VISIBLE);
 
 		if (mTabsAdapterProvider == null) {
 			mTabsAdapterProvider = new ProviderPageAdapter(getSupportFragmentManager(), this);
@@ -1808,5 +1827,21 @@ public class FileProviderActivity extends PasscodeFileProviderActivity implement
 
 		viewPagerProvider.disableSwipe(hide);
 		tabLayoutProvider.setVisibility(hide ? View.GONE : View.VISIBLE);
+	}
+
+	/**
+	 * Changes the elevation.
+	 *
+	 * @param withElevation True if should show elevation, false otherwise.
+	 * @param fragmentIndex Fragment index wich wants to modify the elevation.
+	 */
+	public void changeActionBarElevation(boolean withElevation, int fragmentIndex) {
+		if (viewPagerProvider == null || viewPagerProvider.getCurrentItem() != fragmentIndex) {
+			return;
+		}
+
+		ColorUtils.changeStatusBarColorForElevation(this, withElevation);
+		float elevation = getResources().getDimension(R.dimen.toolbar_elevation);
+		aBL.setElevation(withElevation ? elevation : 0);
 	}
 }

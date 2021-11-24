@@ -60,7 +60,7 @@ import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.CustomizedGridLayoutManager;
 import mega.privacy.android.app.components.NewGridRecyclerView;
-import mega.privacy.android.app.components.NewHeaderItemDecoration;
+import mega.privacy.android.app.components.SimpleDividerItemDecoration;
 import mega.privacy.android.app.globalmanagement.SortOrderManagement;
 import mega.privacy.android.app.lollipop.FullScreenImageViewerLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
@@ -78,6 +78,7 @@ import static mega.privacy.android.app.utils.FileUtil.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.MegaApiUtils.*;
 import static mega.privacy.android.app.utils.MegaNodeUtil.manageTextFileIntent;
+import static mega.privacy.android.app.utils.MegaNodeUtil.manageURLNode;
 import static mega.privacy.android.app.utils.Util.*;
 
 @AndroidEntryPoint
@@ -91,8 +92,6 @@ public class RubbishBinFragmentLollipop extends Fragment{
 	LinearLayoutManager mLayoutManager;
 	CustomizedGridLayoutManager gridLayoutManager;
 	MegaNodeAdapter adapter;
-	private int placeholderCount;
-	public NewHeaderItemDecoration headerItemDecoration;
 
 	ArrayList<MegaNode> nodes;
 	
@@ -132,58 +131,6 @@ public class RubbishBinFragmentLollipop extends Fragment{
 			}
 		}
 	}
-    
-    public void addSectionTitle(List<MegaNode> nodes,int type) {
-        Map<Integer, String> sections = new HashMap<>();
-        int folderCount = 0;
-        int fileCount = 0;
-        for (MegaNode node : nodes) {
-            if(node == null) {
-                continue;
-            }
-            if (node.isFolder()) {
-                folderCount++;
-            }
-            if (node.isFile()) {
-                fileCount++;
-            }
-        }
-
-        if (type == MegaNodeAdapter.ITEM_VIEW_TYPE_GRID) {
-            int spanCount = 2;
-            if (recyclerView instanceof NewGridRecyclerView) {
-                spanCount = ((NewGridRecyclerView)recyclerView).getSpanCount();
-            }
-            if(folderCount > 0) {
-                for (int i = 0;i < spanCount;i++) {
-                    sections.put(i, getString(R.string.general_folders));
-                }
-            }
-            
-            if(fileCount > 0 ) {
-                placeholderCount =  (folderCount % spanCount) == 0 ? 0 : spanCount - (folderCount % spanCount);
-                if (placeholderCount == 0) {
-                    for (int i = 0;i < spanCount;i++) {
-                        sections.put(folderCount + i, getString(R.string.general_files));
-                    }
-                } else {
-                    for (int i = 0;i < spanCount;i++) {
-                        sections.put(folderCount + placeholderCount + i, getString(R.string.general_files));
-                    }
-                }
-            }
-        } else {
-            placeholderCount = 0;
-            sections.put(0, getString(R.string.general_folders));
-            sections.put(folderCount, getString(R.string.general_files));
-        }
-		if (headerItemDecoration == null) {
-			headerItemDecoration = new NewHeaderItemDecoration(context);
-			recyclerView.addItemDecoration(headerItemDecoration);
-		}
-		headerItemDecoration.setType(type);
-		headerItemDecoration.setKeys(sections);
-    }
 
 	private class ActionBarCallBack implements ActionMode.Callback {
 
@@ -352,6 +299,7 @@ public class RubbishBinFragmentLollipop extends Fragment{
 			recyclerView.setPadding(0, 0, 0, scaleHeightPx(85, outMetrics));
 			recyclerView.setClipToPadding(false);
 			recyclerView.setItemAnimator(noChangeRecyclerViewItemAnimator());
+			recyclerView.addItemDecoration(new SimpleDividerItemDecoration(requireContext()));
 			recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
 				@Override
 				public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
@@ -467,7 +415,6 @@ public class RubbishBinFragmentLollipop extends Fragment{
 			emptyTextView = (LinearLayout) v.findViewById(R.id.rubbishbin_grid_empty_text);
 			emptyTextViewFirst = (TextView) v.findViewById(R.id.rubbishbin_grid_empty_text_first);
 
-			addSectionTitle(nodes,MegaNodeAdapter.ITEM_VIEW_TYPE_GRID);
 			if (adapter == null){
 				adapter = new MegaNodeAdapter(context, this, nodes, ((ManagerActivityLollipop)context).getParentHandleRubbish(), recyclerView, null, RUBBISH_BIN_ADAPTER, MegaNodeAdapter.ITEM_VIEW_TYPE_GRID);
 			}
@@ -603,7 +550,6 @@ public class RubbishBinFragmentLollipop extends Fragment{
 
 				adapter.setParentHandle(((ManagerActivityLollipop)context).getParentHandleRubbish());
 				nodes = megaApi.getChildren(nodes.get(position), sortOrderManagement.getOrderCloud());
-				addSectionTitle(nodes,adapter.getAdapterType());
 				adapter.setNodes(nodes);
 				recyclerView.scrollToPosition(0);
 				
@@ -680,7 +626,7 @@ public class RubbishBinFragmentLollipop extends Fragment{
 				if (MimeTypeList.typeForName(nodes.get(position).getName()).isImage()){
 					Intent intent = new Intent(context, FullScreenImageViewerLollipop.class);
 					//Put flag to notify FullScreenImageViewerLollipop.
-					intent.putExtra("placeholder",placeholderCount);
+					intent.putExtra("placeholder", adapter.getPlaceholderCount());
 					intent.putExtra("position", position);
 					intent.putExtra("adapterType", RUBBISH_BIN_ADAPTER);
 					if (megaApi.getParentNode(nodes.get(position)).getType() == MegaNode.TYPE_RUBBISH){
@@ -719,7 +665,7 @@ public class RubbishBinFragmentLollipop extends Fragment{
 						internalIntent = true;
 						mediaIntent = getMediaIntent(context, nodes.get(position).getName());
 					}
-                    mediaIntent.putExtra("placeholder", placeholderCount);
+                    mediaIntent.putExtra("placeholder", adapter.getPlaceholderCount());
 					putThumbnailLocation(mediaIntent, recyclerView, position, VIEWER_FROM_RUBBISH_BIN, adapter);
 					mediaIntent.putExtra("FILENAME", file.getName());
 					mediaIntent.putExtra("adapterType", RUBBISH_BIN_ADAPTER);
@@ -731,7 +677,7 @@ public class RubbishBinFragmentLollipop extends Fragment{
 						mediaIntent.putExtra("parentNodeHandle", megaApi.getParentNode(nodes.get(position)).getHandle());
 					}
 
-					String localPath = getLocalFile(context, file.getName(), file.getSize());
+					String localPath = getLocalFile(file);
 
 					if (localPath != null){
 						File mediaFile = new File(localPath);
@@ -801,7 +747,7 @@ public class RubbishBinFragmentLollipop extends Fragment{
 					pdfIntent.putExtra("inside", true);
 					pdfIntent.putExtra("APP", true);
 
-					String localPath = getLocalFile(context, file.getName(), file.getSize());
+					String localPath = getLocalFile(file);
 
 					if (localPath != null){
 						File mediaFile = new File(localPath);
@@ -850,85 +796,7 @@ public class RubbishBinFragmentLollipop extends Fragment{
 					((ManagerActivityLollipop) context).overridePendingTransition(0,0);
 				}
 				else if (MimeTypeList.typeForName(nodes.get(position).getName()).isURL()) {
-					logDebug("Is URL file");
-					MegaNode file = nodes.get(position);
-
-					String localPath = getLocalFile(context, file.getName(), file.getSize());
-
-					if (localPath != null) {
-						File mediaFile = new File(localPath);
-						InputStream instream = null;
-
-						try {
-							// open the file for reading
-							instream = new FileInputStream(mediaFile.getAbsolutePath());
-
-							// if file the available for reading
-							if (instream != null) {
-								// prepare the file for reading
-								InputStreamReader inputreader = new InputStreamReader(instream);
-								BufferedReader buffreader = new BufferedReader(inputreader);
-
-								String line1 = buffreader.readLine();
-								if (line1 != null) {
-									String line2 = buffreader.readLine();
-
-									String url = line2.replace("URL=", "");
-
-									logDebug("Is URL - launch browser intent");
-									Intent i = new Intent(Intent.ACTION_VIEW);
-									i.setData(Uri.parse(url));
-									startActivity(i);
-								} else {
-									logWarning("Not expected format: Exception on processing url file");
-									Intent intent = new Intent(Intent.ACTION_VIEW);
-									if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-										intent.setDataAndType(FileProvider.getUriForFile(context, "mega.privacy.android.app.providers.fileprovider", mediaFile), "text/plain");
-									} else {
-										intent.setDataAndType(Uri.fromFile(mediaFile), "text/plain");
-									}
-									intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-
-									if (isIntentAvailable(context, intent)) {
-										startActivity(intent);
-									} else {
-										((ManagerActivityLollipop) context).saveNodesToDevice(
-												Collections.singletonList(nodes.get(position)),
-												true, false, false, false);
-									}
-								}
-							}
-						} catch (Exception ex) {
-
-							Intent intent = new Intent(Intent.ACTION_VIEW);
-							if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-								intent.setDataAndType(FileProvider.getUriForFile(context, "mega.privacy.android.app.providers.fileprovider", mediaFile), "text/plain");
-							} else {
-								intent.setDataAndType(Uri.fromFile(mediaFile), "text/plain");
-							}
-							intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-
-							if (isIntentAvailable(context, intent)) {
-								startActivity(intent);
-							} else {
-								((ManagerActivityLollipop) context).saveNodesToDevice(
-										Collections.singletonList(nodes.get(position)),
-										true, false, false, false);
-							}
-
-						} finally {
-							// close the file.
-							try {
-								instream.close();
-							} catch (IOException e) {
-								logError("EXCEPTION closing InputStream", e);
-							}
-						}
-					} else {
-						((ManagerActivityLollipop) context).saveNodesToDevice(
-								Collections.singletonList(nodes.get(position)),
-								true, false, false, false);
-					}
+					manageURLNode(context, megaApi, nodes.get(position));
 				} else if (MimeTypeList.typeForName(nodes.get(position).getName()).isOpenableTextFile(nodes.get(position).getSize())) {
 					manageTextFileIntent(requireContext(), nodes.get(position), RUBBISH_BIN_ADAPTER);
 				} else {
@@ -1026,7 +894,6 @@ public class RubbishBinFragmentLollipop extends Fragment{
 
 				((ManagerActivityLollipop)context).setToolbarTitle();
 				nodes = megaApi.getChildren(parentNode, sortOrderManagement.getOrderCloud());
-				addSectionTitle(nodes,adapter.getAdapterType());
 				adapter.setNodes(nodes);
 
 				int lastVisiblePosition = 0;
@@ -1073,13 +940,7 @@ public class RubbishBinFragmentLollipop extends Fragment{
 		}
 
 		this.nodes = nodes;
-		if (((ManagerActivityLollipop)context).isList) {
-			addSectionTitle(nodes,MegaNodeAdapter.ITEM_VIEW_TYPE_LIST);
-		}
-		else {
-			addSectionTitle(nodes,MegaNodeAdapter.ITEM_VIEW_TYPE_GRID);
-		}
-		
+
 		if (adapter != null){
 			adapter.setNodes(this.nodes);
 			if (adapter.getItemCount() == 0){

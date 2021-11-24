@@ -3,6 +3,7 @@ package mega.privacy.android.app.fragments.settingsFragments.cookie
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
+import android.view.View
 import android.widget.Toast
 import androidx.core.net.toUri
 import androidx.fragment.app.activityViewModels
@@ -45,8 +46,8 @@ class CookieSettingsFragment : SettingsBaseFragment() {
         policiesPreference = findPreference(KEY_COOKIE_POLICIES)!!
     }
 
-    override fun onActivityCreated(savedInstanceState: Bundle?) {
-        super.onActivityCreated(savedInstanceState)
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
         setupObservers()
         setupView()
     }
@@ -74,10 +75,10 @@ class CookieSettingsFragment : SettingsBaseFragment() {
             showThirdPartyInfoDialog()
         }
 
-        policiesPreference.setButton1(StringResourcesUtils.getString(R.string.preference_cookies_policies_cookie)) {
+        policiesPreference.setButton1(StringResourcesUtils.getString(R.string.settings_about_privacy_policy)) {
             openBrowser("https://mega.nz/cookie".toUri())
         }
-        policiesPreference.setButton2(StringResourcesUtils.getString(R.string.preference_cookies_policies_privacy)) {
+        policiesPreference.setButton2(StringResourcesUtils.getString(R.string.settings_about_cookie_policy)) {
             openBrowser("https://mega.nz/privacy".toUri())
         }
     }
