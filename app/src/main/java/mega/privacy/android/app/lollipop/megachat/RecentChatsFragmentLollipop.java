@@ -61,7 +61,6 @@ import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.ChatDividerItemDecoration;
 import mega.privacy.android.app.components.scrollBar.FastScroller;
-import mega.privacy.android.app.contacts.usecase.InviteContactUseCase;
 import mega.privacy.android.app.lollipop.AddContactActivityLollipop;
 import mega.privacy.android.app.lollipop.InviteContactActivity;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
@@ -110,8 +109,6 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
 
     @Inject
     PasscodeManagement passcodeManagement;
-    @Inject
-    InviteContactUseCase inviteContactUseCase;
 
     MegaApiAndroid megaApi;
     MegaChatApiAndroid megaChatApi;
@@ -574,8 +571,7 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
                     if (adapterList == null) {
                         logWarning("AdapterList is NULL");
                         adapterList = new MegaListChatLollipopAdapter(context, this, chats,
-                                listView, MegaListChatLollipopAdapter.ADAPTER_RECENT_CHATS,
-                                inviteContactUseCase);
+                                listView, MegaListChatLollipopAdapter.ADAPTER_RECENT_CHATS);
                     } else {
                         adapterList.setChats(chats);
                     }
