@@ -15,12 +15,10 @@ import mega.privacy.android.app.components.scrollBar.FastScroller
 import mega.privacy.android.app.fragments.BaseFragment
 import mega.privacy.android.app.fragments.homepage.photos.ZoomViewModel
 import mega.privacy.android.app.fragments.managerFragments.cu.PhotosFragment.ALL_VIEW
-import mega.privacy.android.app.lollipop.ManagerActivityLollipop
 import mega.privacy.android.app.utils.ColorUtils
 import mega.privacy.android.app.utils.Constants.MIN_ITEMS_SCROLLBAR
 import mega.privacy.android.app.utils.StyleUtils
 import mega.privacy.android.app.utils.ZoomUtil
-import org.w3c.dom.Text
 
 /**
  * A parent fragment with basic zoom UI logic, like menu, gestureScaleCallback.

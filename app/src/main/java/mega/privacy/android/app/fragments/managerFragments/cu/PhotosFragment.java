@@ -483,7 +483,7 @@ public class PhotosFragment extends BaseZoomFragment implements CUGridViewAdapte
             }
 
             updateEnableCUButtons(viewModel.isCUEnabled());
-            handleOptionsMenuUpdate(isShowMenu());
+            handlePhotosMenuUpdate(isShowMenu());
 
             binding.emptyHint.setVisibility(nodes.isEmpty() ? View.VISIBLE : View.GONE);
             binding.cuList.setVisibility(nodes.isEmpty() ? View.GONE : View.VISIBLE);
@@ -767,5 +767,12 @@ public class PhotosFragment extends BaseZoomFragment implements CUGridViewAdapte
 
     public boolean isInPhotosPage(){
         return (ManagerActivityLollipop) getActivity() != null && ((ManagerActivityLollipop) getActivity()).getDrawerItem() == ManagerActivityLollipop.DrawerItem.PHOTOS;
+    }
+
+    public void handlePhotosMenuUpdate(boolean isShowMenu){
+        if (!isInPhotosPage()) {
+            return;
+        }
+        handleOptionsMenuUpdate(isShowMenu);
     }
 }

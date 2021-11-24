@@ -119,7 +119,7 @@ class ImagesFragment : BaseZoomFragment(){
                 handleOptionsMenuUpdate(false)
                 viewTypePanel.visibility = View.GONE
             } else {
-                handleOptionsMenuUpdate(true)
+                handleOptionsMenuUpdate(shouldShowZoomMenuItem())
                 viewTypePanel.visibility = View.VISIBLE
             }
             removeSortByMenu()
