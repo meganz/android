@@ -87,6 +87,7 @@ import mega.privacy.android.app.lollipop.qrcode.QRCodeActivity;
 import mega.privacy.android.app.utils.CallUtil;
 import mega.privacy.android.app.utils.ColorUtils;
 import mega.privacy.android.app.utils.HighLightHintHelper;
+import mega.privacy.android.app.utils.StringResourcesUtils;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaChatApi;
 import nz.mega.sdk.MegaChatApiJava;
@@ -3022,7 +3023,7 @@ public class AddContactActivityLollipop extends PasscodeActivity implements View
 
     private void toStartMeeting() {
         if (CallUtil.participatingInACall()) {
-            showConfirmationInACall(this, passcodeManagement);
+            showConfirmationInACall(this, StringResourcesUtils.getString(R.string.ongoing_call_content), passcodeManagement);
         } else {
             Intent intent = new Intent();
             intent.putExtra(EXTRA_MEETING, true);

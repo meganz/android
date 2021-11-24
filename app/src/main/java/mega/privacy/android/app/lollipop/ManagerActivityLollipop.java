@@ -7339,7 +7339,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 	@Override
 	public void onJoinMeeting() {
 		if(CallUtil.participatingInACall()){
-			showConfirmationInACall(this, passcodeManagement);
+			showConfirmationInACall(this, StringResourcesUtils.getString(R.string.text_join_call), passcodeManagement);
 		} else {
 			showOpenLinkDialog();
 		}
@@ -7348,7 +7348,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 	@Override
 	public void onCreateMeeting() {
 		if(CallUtil.participatingInACall()){
-			showConfirmationInACall(this, passcodeManagement);
+			showConfirmationInACall(this, StringResourcesUtils.getString(R.string.ongoing_call_content), passcodeManagement);
 		} else {
 			openMeetingToCreate(this);
 		}
@@ -7721,7 +7721,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 
 	public void showMeetingOptionsPanel(){
 		if (CallUtil.participatingInACall()) {
-			showConfirmationInACall(this, passcodeManagement);
+			showConfirmationInACall(this, StringResourcesUtils.getString(R.string.ongoing_call_content), passcodeManagement);
 		} else {
 			bottomSheetDialogFragment = new MeetingBottomSheetDialogFragment();
 			bottomSheetDialogFragment.show(getSupportFragmentManager(), MeetingBottomSheetDialogFragment.TAG);

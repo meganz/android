@@ -1195,11 +1195,11 @@ public class CallUtil {
      * Method to display a dialogue informing the user that he/she cannot start or join a meeting while on a call in progress.
      *
      * @param context            Context of Activity
-     * @param passcodeManagement    To disable passcode.
+     * @param message            String with the text to show in the dialogue
+     * @param passcodeManagement To disable passcode.
      */
-    public static void showConfirmationInACall(Context context, PasscodeManagement passcodeManagement) {
+    public static void showConfirmationInACall(Context context, String message, PasscodeManagement passcodeManagement) {
         MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(context);
-        String message = context.getResources().getString(R.string.ongoing_call_content);
         builder.setMessage(message)
                 .setPositiveButton(R.string.general_ok, (dialog, which) -> {
                     if (context instanceof OpenLinkActivity) {
@@ -1286,7 +1286,7 @@ public class CallUtil {
 
         if (amIParticipatingInAnotherCall(chatId)) {
             logDebug("I am participating in another call");
-            showConfirmationInACall(context, passcodeManagement);
+            showConfirmationInACall(context, StringResourcesUtils.getString(R.string.text_join_call), passcodeManagement);
             return;
         }
 
@@ -1445,7 +1445,7 @@ public class CallUtil {
         }
 
         if (CallUtil.participatingInACall()) {
-            showConfirmationInACall(context, passcodeManagement);
+            showConfirmationInACall(context, StringResourcesUtils.getString(R.string.ongoing_call_content), passcodeManagement);
             return false;
         }
 

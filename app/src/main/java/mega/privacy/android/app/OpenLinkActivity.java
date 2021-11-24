@@ -22,6 +22,7 @@ import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop;
 import mega.privacy.android.app.meeting.activity.LeftMeetingActivity;
 import mega.privacy.android.app.meeting.fragments.MeetingHasEndedDialogFragment;
 import mega.privacy.android.app.utils.CallUtil;
+import mega.privacy.android.app.utils.StringResourcesUtils;
 import mega.privacy.android.app.utils.TextUtil;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
@@ -545,7 +546,7 @@ public class OpenLinkActivity extends PasscodeActivity implements MegaRequestLis
 		if (type == LINK_IS_FOR_MEETING) {
 			logDebug("It's a meeting link");
 			if (CallUtil.participatingInACall()) {
-				showConfirmationInACall(this, passcodeManagement);
+				showConfirmationInACall(this, StringResourcesUtils.getString(R.string.text_join_call), passcodeManagement);
 			} else {
 				if (CallUtil.isMeetingEnded(request.getMegaHandleList())) {
 					logDebug("Meeting has ended, open dialog");
