@@ -1122,7 +1122,7 @@
     <!-- Message to promote PRO accounts -->
     <string name="get_pro_account">Vergrößern Sie Ihre Cloud. [A]Holen Sie sich mit einem Pro-Account mehr Speicherplatz und Transfervolumen.</string>
     <!-- success message when the MasterKey file has been downloaded -->
-    <string name="toast_master_key">Der Rettungsschlüssel Ihres MEGA-Accounts wurde in %1s gespeichert.[A]Sie finden die Datei mit Ihrem Rettungsschlüssel im Bereich Für Offline-Zugriff gespeichert.[A]Hinweis: Da die Datei mit Ihrem Rettungsschlüssel beim Abmelden gelöscht wird, speichern Sie sie bitte an einem sicheren Ort außerhalb Ihres MEGA-Accounts.</string>
+    <string name="toast_master_key">Der Rettungsschlüssel Ihres MEGA-Accounts wurde gespeichert in: %1s. [A]Sie finden die Datei mit Ihrem Rettungsschlüssel im Bereich „Für Offline-Zugriff gespeichert“.[/A] Hinweis: Da die Datei mit Ihrem Rettungsschlüssel beim Abmelden gelöscht wird, speichern Sie sie bitte an einem sicheren Ort außerhalb Ihres MEGA-Accounts.</string>
     <!-- Error shown when the user tries to change his mail to one that is already used -->
     <string name="mail_already_used">Diese E-Mail-Adresse ist bereits belegt. Bitte verwenden Sie eine andere E-Mail-Adresse.</string>
     <!-- Error shown when the user tries to change his mail while the user has already requested a confirmation link for that email address -->
@@ -3453,7 +3453,7 @@
     <!-- Text informing user that their account has been suspended -->
     <string name="account_temporarily_suspended">Ihr Account wurde zu Ihrer eigenen Sicherheit temporär gesperrt.</string>
     <!-- Text informing user has to follow the steps of an email to unlock their account -->
-    <string name="verify_email_and_follow_steps">Zur Entsperrung Ihres Accounts [A]bestätigen Sie bitte Ihre E-Mail-Adresse[/A] und folgen Sie dann den Anweisungen in unserer E-Mail.</string>
+    <string name="verify_email_and_follow_steps">Zur Entsperrung Ihres Accounts befolgen Sie bitte die in der [A]Bestätigungs-E-Mail[/A] beschriebenen Schritte.</string>
     <!-- Question which takes the user to a help screen -->
     <string name="why_am_i_seeing_this">Details</string>
     <!-- Label of a button which action is resend an email -->
@@ -3720,7 +3720,7 @@
     <!-- Title indicating the select mode is enabled and ready to select transfers on Transfers section, In progress tab -->
     <string name="title_select_transfers">Transfers auswählen</string>
     <!-- Error shown to inform the priority change of a transfer failed. Please don’t remove the place holder, it’s to set the name of the transfer. Example: The priority change of the transfer “video.mp4” failed. -->
-    <string name="change_of_transfer_priority_failed">Die Priorität des Transfers „%1$s“ konnte nicht geändert werden.</string>
+    <string name="change_of_transfer_priority_failed">Priorität des Transfers „%1$s“ kann nicht geändert werden</string>
     <!-- Title option to send separated the link and decryption key -->
     <string name="option_send_decryption_key_separately">Schlüssel separat versenden</string>
     <!-- Explanation option to send separated the link and decryption key -->
@@ -3978,8 +3978,6 @@
     </plurals>
     <!-- Button of the warning dialog indicating the renamed name file extension is not the same to confirm the change. -->
     <string name="action_change_anyway">Trotzdem ändern</string>
-    <!-- Snackbar text to display if the user doesn't grant the permission to access all files on a device with Android 11 or higher -->
-    <string name="snackbar_storage_permission_denied_android_11">Berechtigung für den Speicherzugriff erforderlich.</string>
     <!-- String to show the transfer quota and the used space in My Account section. E.g.: -->
     <string name="used_storage_transfer">%1$s / %2$s</string>
     <!-- String to show the transfer quota and the used space in My Account section -->
@@ -4173,5 +4171,31 @@
     <!-- Menu item to change from thumbnail view to main view in meeting-->
     <string name="main_view">Hauptansicht</string>
     <!-- Warning in Offline section alerting all the Offline files will be deleted after logout. -->
-    <string name="offline_warning">Logging out deletes your offline content.</string>
+    <string name="offline_warning">Beim Abmelden werden Ihre Offline-Inhalte gelöscht.</string>
+    <!-- Settings category which contains all preferences related to user interface. -->
+    <string name="user_interface_setting">Benutzeroberfläche</string>
+    <!-- Setting which allows to choose the start screen. -->
+    <string name="start_screen_setting">Startbildschirm</string>
+    <!-- Setting which allows to hide or show the recent activity. -->
+    <string name="hide_recent_setting">Letzte Aktivitäten ausblenden</string>
+    <!-- Context of a setting which allows to hide or show the recent activity. -->
+    <string name="hide_recent_setting_context">Letzte Aktivitäten auf Startseite ausblenden.</string>
+    <!-- Title of a dialog informing the start screen can be modified. -->
+    <string name="choose_start_screen_title">Wählen Sie Ihren Startbildschirm</string>
+    <!-- Test of a dialog informing the start screen can be modified. -->
+    <string name="choose_start_screen_text">Sie können einstellen, welcher Bildschirm beim Starten der MEGA-App geöffnet wird.</string>
+    <!-- Action button which allows to change a setting. -->
+    <string name="change_setting_action">Einstellung ändern</string>
+    <!-- Subtitle of the settings page where the start screen can be chosen. -->
+    <string name="configure_start_screen">Standard-Startbildschirm konfigurieren</string>
+    <!-- Homepage section. -->
+    <string name="home_section">Startseite</string>
+    <!-- Action button which allows to show the recent activity. -->
+    <string name="show_activity_action">Aktivitäten anzeigen</string>
+    <!-- Text informing the recent activity is hidden. -->
+    <string name="recents_activity_hidden">[B]Letzte Aktivitäten[/B] ausgeblendet</string>
+    <!-- Alert informing the user can choose the video quality for Camera Uploads Videos -->
+    <string name="video_quality_info">Sie können Speicherplatz sparen, indem Sie die Videoqualität in den Kamera-Upload-Einstellungen verringern.</string>
+    <!-- Label indicating video original quality -->
+    <string name="original_quality">Höchste Qualitätsstufe</string>
 </resources>
