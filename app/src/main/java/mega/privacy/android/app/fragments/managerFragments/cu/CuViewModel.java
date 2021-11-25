@@ -380,6 +380,7 @@ class CuViewModel extends BaseRxViewModel {
                     mDbHandler.setChargingOnSize(DEFAULT_CONVENTION_QUEUE_SIZE);
                     // After target and local folder setup, then enable CU.
                     mDbHandler.setCamSyncEnabled(true);
+                    camSyncEnabled.postValue(true);
                     return true;
                 })
                 .subscribeOn(Schedulers.io())

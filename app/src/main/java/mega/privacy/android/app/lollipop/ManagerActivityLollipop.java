@@ -58,7 +58,6 @@ import androidx.core.app.NotificationManagerCompat;
 import androidx.core.content.ContextCompat;
 import androidx.core.view.MenuItemCompat;
 import androidx.navigation.NavController;
-import androidx.navigation.Navigation;
 import androidx.navigation.fragment.NavHostFragment;
 import androidx.viewpager.widget.ViewPager;
 import androidx.drawerlayout.widget.DrawerLayout;
@@ -7479,12 +7478,19 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 		selectDrawerItemLollipop(drawerItem);
 	}
 
-	public void refreshCameraUpload(){
-		drawerItem = DrawerItem.PHOTOS;
-		setBottomNavigationMenuItemChecked(PHOTOS_BNV);
-		setToolbarTitle();
-		refreshFragment(FragmentTag.PHOTOS.getTag());
-	}
+    /**
+     * Refresh PhotosFragment's UI after CU is enabled.
+     */
+    public void refreshPhotosFragment() {
+        drawerItem = DrawerItem.PHOTOS;
+        setBottomNavigationMenuItemChecked(PHOTOS_BNV);
+        setToolbarTitle();
+
+        PhotosFragment f = (PhotosFragment) getSupportFragmentManager().findFragmentByTag(FragmentTag.PHOTOS.getTag());
+        if (f != null) {
+            f.refreshViewLayout();
+        }
+    }
 
 	/**
 	 * Checks if should update some cu view visibility.

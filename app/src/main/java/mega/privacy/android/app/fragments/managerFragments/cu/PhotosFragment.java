@@ -7,7 +7,6 @@ import android.content.res.Configuration;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Parcelable;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -40,7 +39,6 @@ import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.ListenScrollChangesHelper;
 import mega.privacy.android.app.databinding.FragmentPhotosBinding;
-import mega.privacy.android.app.databinding.FragmentPhotosFirstLoginBinding;
 import mega.privacy.android.app.fragments.homepage.photos.ScaleGestureHandler;
 import mega.privacy.android.app.globalmanagement.SortOrderManagement;
 import mega.privacy.android.app.lollipop.FullScreenImageViewerLollipop;
@@ -71,7 +69,6 @@ import static mega.privacy.android.app.utils.Constants.VIEWER_FROM_CUMU;
 import static mega.privacy.android.app.utils.JobUtil.startCameraUploadService;
 import static mega.privacy.android.app.utils.LogUtil.logDebug;
 import static mega.privacy.android.app.utils.PermissionUtils.*;
-import static mega.privacy.android.app.utils.StyleUtils.setTextStyle;
 import static mega.privacy.android.app.utils.TextUtil.formatEmptyScreenText;
 import static mega.privacy.android.app.utils.Util.showSnackbar;
 import static mega.privacy.android.app.utils.ZoomUtil.*;
@@ -96,7 +93,6 @@ public class PhotosFragment extends BaseZoomFragment implements CUGridViewAdapte
     SortOrderManagement sortOrderManagement;
 
     private ManagerActivityLollipop mManagerActivity;
-    private FragmentPhotosFirstLoginBinding mFirstLoginBinding;
     private FragmentPhotosBinding binding;
     private CUGridViewAdapter gridAdapter;
     private CUCardViewAdapter cardAdapter;
@@ -171,7 +167,7 @@ public class PhotosFragment extends BaseZoomFragment implements CUGridViewAdapte
         if (mManagerActivity.isFirstLogin()) {
             mManagerActivity.skipInitialCUSetup();
         } else {
-            mManagerActivity.refreshCameraUpload();
+            mManagerActivity.refreshPhotosFragment();
         }
     }
 
@@ -180,12 +176,8 @@ public class PhotosFragment extends BaseZoomFragment implements CUGridViewAdapte
     }
 
     public void enableCu() {
-        if (mFirstLoginBinding == null) {
-            return;
-        }
-
-        viewModel.enableCu(mFirstLoginBinding.cellularConnectionSwitch.isChecked(),
-                mFirstLoginBinding.uploadVideosSwitch.isChecked());
+        viewModel.enableCu(binding.fragmentPhotosFirstLogin.cellularConnectionSwitch.isChecked(),
+                binding.fragmentPhotosFirstLogin.uploadVideosSwitch.isChecked());
 
         mManagerActivity.setFirstLogin(false);
         viewModel.setEnableCUShown(false);
@@ -193,7 +185,7 @@ public class PhotosFragment extends BaseZoomFragment implements CUGridViewAdapte
     }
 
     private void startCU() {
-        mManagerActivity.refreshCameraUpload();
+        mManagerActivity.refreshPhotosFragment();
 
         new Handler().postDelayed(() -> {
             logDebug("Starting CU");
@@ -219,16 +211,48 @@ public class PhotosFragment extends BaseZoomFragment implements CUGridViewAdapte
 
     @Nullable
     @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
-                             @Nullable Bundle savedInstanceState) {
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        binding = FragmentPhotosBinding.inflate(inflater, container, false);
 
         if (mManagerActivity.getFirstLogin() || viewModel.isEnableCUShown()) {
             viewModel.setEnableCUShown(true);
-            return createCameraUploadsViewForFirstLogin(inflater, container);
+            createCameraUploadsViewForFirstLogin();
         } else {
-            binding = FragmentPhotosBinding.inflate(inflater, container, false);
-            return binding.getRoot();
+            showPhotosGrid();
         }
+
+        return binding.getRoot();
+    }
+
+    /**
+     * Refresh view and layout after CU enabled or disabled.
+     */
+    public void refreshViewLayout() {
+        if(isEnableCUFragmentShown()) {
+            showEnablePage();
+            createCameraUploadsViewForFirstLogin();
+        } else {
+            showPhotosGrid();
+
+        }
+
+        initAfterViewCreated();
+    }
+
+    /**
+     * Show photos view.
+     */
+    private void showPhotosGrid() {
+        binding.fragmentPhotosFirstLogin.getRoot().setVisibility(View.GONE);
+        binding.fragmentPhotosGrid.setVisibility(View.VISIBLE);
+    }
+
+    /**
+     * Show enable CU page.
+     */
+    private void showEnablePage() {
+        binding.fragmentPhotosFirstLogin.getRoot().setVisibility(View.VISIBLE);
+        binding.fragmentPhotosGrid.setVisibility(View.GONE);
     }
 
     @Override
@@ -237,18 +261,14 @@ public class PhotosFragment extends BaseZoomFragment implements CUGridViewAdapte
         super.onSaveInstanceState(outState);
     }
 
-    private View createCameraUploadsViewForFirstLogin(@NonNull LayoutInflater inflater,
-                                                      @Nullable ViewGroup container) {
+    private void createCameraUploadsViewForFirstLogin() {
         viewModel.setInitialPreferences();
 
-        mFirstLoginBinding =
-                FragmentPhotosFirstLoginBinding.inflate(inflater, container, false);
-
-        new ListenScrollChangesHelper().addViewToListen(mFirstLoginBinding.camSyncScrollView,
+        new ListenScrollChangesHelper().addViewToListen(binding.fragmentPhotosFirstLogin.camSyncScrollView,
                 (v, scrollX, scrollY, oldScrollX, oldScrollY) -> mManagerActivity
-                        .changeAppBarElevation(mFirstLoginBinding.camSyncScrollView.canScrollVertically(SCROLLING_UP_DIRECTION)));
+                        .changeAppBarElevation(binding.fragmentPhotosFirstLogin.camSyncScrollView.canScrollVertically(SCROLLING_UP_DIRECTION)));
 
-        mFirstLoginBinding.enableButton.setOnClickListener(v -> {
+        binding.fragmentPhotosFirstLogin.enableButton.setOnClickListener(v -> {
             MegaApplication.getInstance().sendSignalPresenceActivity();
             String[] permissions = {android.Manifest.permission.READ_EXTERNAL_STORAGE};
             if (hasPermissions(context, permissions)) {
@@ -257,38 +277,48 @@ public class PhotosFragment extends BaseZoomFragment implements CUGridViewAdapte
                 requestCameraUploadPermission(permissions, REQUEST_CAMERA_ON_OFF_FIRST_TIME);
             }
         });
-
-        return mFirstLoginBinding.getRoot();
     }
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        initAfterViewCreated();
+    }
+
+    /**
+     * Init UI and view model when view is created or refreshed.
+     */
+    private void initAfterViewCreated() {
         if (viewModel.isEnableCUShown()) {
             mManagerActivity.updateCULayout(View.GONE);
             mManagerActivity.updateCUViewTypes(View.GONE);
 
-            mFirstLoginBinding.uploadVideosSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            binding.fragmentPhotosFirstLogin.uploadVideosSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
                 if (isChecked) {
                     mManagerActivity.showSnackbar(DISMISS_ACTION_SNACKBAR,
                             StringResourcesUtils.getString(R.string.video_quality_info),
                             MEGACHAT_INVALID_HANDLE);
                 }
 
-                mFirstLoginBinding.qualityText.setVisibility(isChecked ? View.VISIBLE : View.GONE);
+                binding.fragmentPhotosFirstLogin.qualityText.setVisibility(isChecked ? View.VISIBLE : View.GONE);
             });
+
+            handlePhotosMenuUpdate(false);
             return;
         }
-        int currentZoom = ZoomUtil.getPHOTO_ZOOM_LEVEL();
-        getZoomViewModel().setCurrentZoom(currentZoom);
-        getZoomViewModel().setZoom(currentZoom);
-        viewModel.setZoom(currentZoom);
+
         viewModel.resetOpenedNode();
         mManagerActivity.updateCUViewTypes(View.VISIBLE);
         setupRecyclerView();
         setupViewTypes();
         setupOtherViews();
         observeLiveData();
+
+        int currentZoom = ZoomUtil.getPHOTO_ZOOM_LEVEL();
+        getZoomViewModel().setCurrentZoom(currentZoom);
+        getZoomViewModel().setZoom(currentZoom);
+        viewModel.setZoom(currentZoom);
+
         viewModel.getCards();
         viewModel.getCUNodes();
     }
@@ -467,7 +497,7 @@ public class PhotosFragment extends BaseZoomFragment implements CUGridViewAdapte
 
         if (hasPermissions(context, permissions)) {
             viewModel.setEnableCUShown(true);
-            mManagerActivity.refreshCameraUpload();
+            mManagerActivity.refreshPhotosFragment();
         } else {
             requestCameraUploadPermission(permissions, REQUEST_CAMERA_ON_OFF);
         }
@@ -475,6 +505,9 @@ public class PhotosFragment extends BaseZoomFragment implements CUGridViewAdapte
 
     private void observeLiveData() {
         viewModel.cuNodes().observe(getViewLifecycleOwner(), nodes -> {
+            // On enable CU page, don't update layout and view.
+            if(isEnableCUFragmentShown()) return;
+
             boolean showScroller = nodes.size() >= (getCurrentZoom() < ZOOM_DEFAULT ? MIN_ITEMS_SCROLLBAR_GRID : MIN_ITEMS_SCROLLBAR);
             binding.scroller.setVisibility(showScroller ? View.VISIBLE : View.GONE);
 
