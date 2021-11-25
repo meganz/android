@@ -3978,8 +3978,6 @@
     </plurals>
     <!-- Button of the warning dialog indicating the renamed name file extension is not the same to confirm the change. -->
     <string name="action_change_anyway">La changer quand même</string>
-    <!-- Snackbar text to display if the user doesn't grant the permission to access all files on a device with Android 11 or higher -->
-    <string name="snackbar_storage_permission_denied_android_11">Une autorisation est nécessaire pour accéder à la mémoire.</string>
     <!-- String to show the transfer quota and the used space in My Account section. E.g.: -->
     <string name="used_storage_transfer">%1$s/%2$s</string>
     <!-- String to show the transfer quota and the used space in My Account section -->
@@ -4174,4 +4172,30 @@
     <string name="main_view">Vue principale</string>
     <!-- Warning in Offline section alerting all the Offline files will be deleted after logout. -->
     <string name="offline_warning">La déconnexion supprime votre contenu hors ligne.</string>
+    <!-- Settings category which contains all preferences related to user interface. -->
+    <string name="user_interface_setting">Interface utilisateur</string>
+    <!-- Setting which allows to choose the start screen. -->
+    <string name="start_screen_setting">Écran de lancement</string>
+    <!-- Setting which allows to hide or show the recent activity. -->
+    <string name="hide_recent_setting">Cacher l’activité récente</string>
+    <!-- Context of a setting which allows to hide or show the recent activity. -->
+    <string name="hide_recent_setting_context">Cacher l’activité récente dans la section Accueil.</string>
+    <!-- Title of a dialog informing the start screen can be modified. -->
+    <string name="choose_start_screen_title">Choisir votre écran de lancement</string>
+    <!-- Test of a dialog informing the start screen can be modified. -->
+    <string name="choose_start_screen_text">Changez le paramètre pour choisir quel écran s’ouvrira lors du prochain lancement de l’appli&#160;mobile&#160;MEGA.</string>
+    <!-- Action button which allows to change a setting. -->
+    <string name="change_setting_action">Changer le paramètre</string>
+    <!-- Subtitle of the settings page where the start screen can be chosen. -->
+    <string name="configure_start_screen">Configurez votre écran de lancement par défaut</string>
+    <!-- Homepage section. -->
+    <string name="home_section">Accueil</string>
+    <!-- Action button which allows to show the recent activity. -->
+    <string name="show_activity_action">Afficher l’activité</string>
+    <!-- Text informing the recent activity is hidden. -->
+    <string name="recents_activity_hidden">L’activité [B]Récente[/B] est cachée</string>
+    <!-- Alert informing the user can choose the video quality for Camera Uploads Videos -->
+    <string name="video_quality_info">Vous pouvez économiser de l’espace en diminuant la qualité de la vidéo dans les paramètres des Téléversements de l’appareil photo.</string>
+    <!-- Label indicating video original quality -->
+    <string name="original_quality">Qualité originale</string>
 </resources>

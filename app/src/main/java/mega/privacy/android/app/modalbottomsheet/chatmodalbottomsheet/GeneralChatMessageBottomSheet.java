@@ -251,7 +251,7 @@ public class GeneralChatMessageBottomSheet extends BaseBottomSheetDialogFragment
 
             optionDownload.setVisibility(!isRemovedOrPendingMsg && typeMessage == MegaChatMessage.TYPE_NODE_ATTACHMENT ? View.VISIBLE : View.GONE);
 
-            if (node != null && node.isFile() && !isRemovedOrPendingMsg) {
+            if (!isAndroid11OrUpper() && node != null && node.isFile() && !isRemovedOrPendingMsg) {
                 MimeTypeList nodeMime = MimeTypeList.typeForName(node.getName());
                 if (nodeMime.isImage() || nodeMime.isVideo()) {
                     optionGallery.setVisibility(View.VISIBLE);
