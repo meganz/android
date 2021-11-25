@@ -640,7 +640,14 @@ public class FileStorageActivityLollipop extends PasscodeActivity implements OnC
 	 */
 	private void showRootWithSDView(boolean show) {
 		if (show) {
-			contentText.setText(String.format("%s%s", SEPARATOR, getString(R.string.storage_root_label)));
+			// Avoid crash if `contentText` is null due any reason. For more info see AND-12958.
+			if (contentText == null) {
+				contentText = findViewById(R.id.file_storage_content_text);
+			}
+			if (contentText != null) {
+				contentText.setText(String.format("%s%s", SEPARATOR, getString(R.string.storage_root_label)));
+			}
+
 			rootLevelLayout.setVisibility(View.VISIBLE);
 			buttonsContainer.setVisibility(View.GONE);
 			showEmptyState();
@@ -674,7 +681,7 @@ public class FileStorageActivityLollipop extends PasscodeActivity implements OnC
 	 * Changes the path shown in the screen or finish the activity if the current one is not valid.
 	 */
 	private void checkPath() {
-		if (path == null || path.getAbsolutePath() == null) {
+		if (path == null) {
 			logError("Current path is not valid (null)");
 			showErrorAlertDialog(getString(R.string.error_io_problem),
 					true, this);
@@ -718,7 +725,15 @@ public class FileStorageActivityLollipop extends PasscodeActivity implements OnC
 		
 		setFiles(newPath);
 		path = newPath;
-		contentText.setText(path.getAbsolutePath());
+
+		// Avoid crash if `contentText` is null due any reason. For more info see AND-12958.
+		if (contentText == null) {
+			contentText = findViewById(R.id.file_storage_content_text);
+		}
+		if (contentText != null) {
+			contentText.setText(path.getAbsolutePath());
+		}
+
 		invalidateOptionsMenu();
         if (mode == Mode.PICK_FILE) {
 			clearSelections();
