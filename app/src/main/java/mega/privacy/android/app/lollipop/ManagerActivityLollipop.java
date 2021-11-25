@@ -107,6 +107,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Locale;
@@ -7404,10 +7405,11 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
      * Upon a node is tapped, if it cannot be previewed in-app,
      * then download it first, this download will be marked as "download by tap".
      *
-     * @param nodes A list only has one node.
+     * @param node Node to be downloaded.
      */
-    public void saveNodeByTap(List<MegaNode> nodes) {
-        nodeSaver.saveNodes(nodes, false, false, false, false, false, true);
+    public Unit saveNodeByTap(MegaNode node) {
+       nodeSaver.saveNodes(Collections.singletonList(node), false, false, false, false, false, true);
+       return null;
     }
 
 	/**

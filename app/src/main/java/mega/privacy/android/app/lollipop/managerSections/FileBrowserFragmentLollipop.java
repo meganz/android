@@ -92,6 +92,7 @@ import static mega.privacy.android.app.utils.MegaApiUtils.*;
 import static mega.privacy.android.app.utils.MegaNodeUtil.allHaveOwnerAccess;
 import static mega.privacy.android.app.utils.MegaNodeUtil.manageTextFileIntent;
 import static mega.privacy.android.app.utils.MegaNodeUtil.manageURLNode;
+import static mega.privacy.android.app.utils.MegaNodeUtil.onNodeTapped;
 import static mega.privacy.android.app.utils.TimeUtils.*;
 import static mega.privacy.android.app.utils.Util.*;
 
@@ -842,22 +843,7 @@ public class FileBrowserFragmentLollipop extends RotatableFragment{
 			manageTextFileIntent(context, node, FILE_BROWSER_ADAPTER);
         } else {
             logDebug("itemClick:isFile:otherOption");
-            String possibleLocalFile = FileUtil.getLocalFile(node);
-
-            if (possibleLocalFile != null) {
-                logDebug("The node is already downloaded, found in local.");
-
-                // ZIP file on SD card can't not be created by `new java.util.zip.ZipFile(path)`.
-                if (MimeTypeList.typeForName(node.getName()).isZip() && !SDCardUtils.isLocalFolderOnSDCard(context, possibleLocalFile)) {
-                    logDebug("The file is zip, open in-app.");
-                    MegaNodeUtil.openZip(context, (ManagerActivityLollipop) context, possibleLocalFile, node.getHandle());
-                } else {
-                    logDebug("The file cannot be opened in-app.");
-                    MegaNodeUtil.launchActionView(context, node.getName(), possibleLocalFile, (ManagerActivityLollipop) context, (ManagerActivityLollipop) context);
-                }
-            } else {
-                ((ManagerActivityLollipop) context).saveNodeByTap(Collections.singletonList(node));
-            }
+            onNodeTapped(context, node, ((ManagerActivityLollipop) context)::saveNodeByTap, (ManagerActivityLollipop) context, (ManagerActivityLollipop) context);
         }
     }
 

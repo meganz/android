@@ -53,7 +53,9 @@ import mega.privacy.android.app.utils.FileUtil.*
 import mega.privacy.android.app.utils.LogUtil.logDebug
 import mega.privacy.android.app.utils.LogUtil.logWarning
 import mega.privacy.android.app.utils.MegaApiUtils.isIntentAvailable
+import mega.privacy.android.app.utils.MegaNodeUtil.launchActionView
 import mega.privacy.android.app.utils.MegaNodeUtil.manageURLNode
+import mega.privacy.android.app.utils.MegaNodeUtil.openZip
 import mega.privacy.android.app.utils.StringResourcesUtils.getQuantityString
 import mega.privacy.android.app.utils.StringResourcesUtils.getString
 import mega.privacy.android.app.utils.TextUtil.isTextEmpty
@@ -1759,5 +1761,47 @@ object MegaNodeUtil {
                     LogUtil.logError(error.message)
                 }
             )
+    }
+
+    /**
+     *
+     */
+    @JvmStatic
+    fun onNodeTapped(
+        context: Context,
+        node: MegaNode,
+        nodeDownloader : (node: MegaNode) -> Unit,
+        activityLauncher: ActivityLauncher,
+        snackbarShower: SnackbarShower
+    ) {
+        val possibleLocalFile = getLocalFile(node)
+
+        if (possibleLocalFile != null) {
+            logDebug("The node is already downloaded, found in local.")
+
+            // ZIP file on SD card can't not be created by `new java.util.zip.ZipFile(path)`.
+            if (MimeTypeList.typeForName(node.name).isZip && !SDCardUtils.isLocalFolderOnSDCard(
+                    context,
+                    possibleLocalFile
+                )
+            ) {
+                logDebug("The file is zip, open in-app.")
+                openZip(
+                    context,
+                    activityLauncher, possibleLocalFile, node.handle
+                )
+            } else {
+                logDebug("The file cannot be opened in-app.")
+                launchActionView(
+                    context,
+                    node.name,
+                    possibleLocalFile,
+                    activityLauncher,
+                    snackbarShower
+                )
+            }
+        } else {
+            nodeDownloader(node)
+        }
     }
 }
