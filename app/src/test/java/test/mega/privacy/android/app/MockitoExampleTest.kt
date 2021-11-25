@@ -1,4 +1,4 @@
-package mega.privacy.android.app
+package test.mega.privacy.android.app
 
 import com.google.common.truth.Truth
 import org.junit.Test
@@ -11,7 +11,7 @@ import org.mockito.junit.MockitoJUnitRunner
  * Example unit test using Mockito
  */
 @RunWith(MockitoJUnitRunner::class)
-class MockitoExampleUnitTest {
+class MockitoExampleTest {
 
     @Test
     fun test_getGreetings_ReturnsValidIfUseridIsValid() {

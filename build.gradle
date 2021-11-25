@@ -90,4 +90,5 @@ ext {
     androidxArchCoreVersion = '2.1.0'
     roboletricVersion = '4.4'
     mockitoVersion = '3.3.3'
+    espressoVersion = '3.4.0'
 }

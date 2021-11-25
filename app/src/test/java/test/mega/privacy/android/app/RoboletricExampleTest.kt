@@ -1,6 +1,6 @@
-package mega.privacy.android.app
+package test.mega.privacy.android.app
 
-import android.content.Context
+/* import android.content.Context
 import android.os.Build
 import androidx.test.core.app.ApplicationProvider
 import com.google.common.truth.Truth.assertThat
@@ -8,6 +8,8 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.annotation.Config
+*/
+
 
 
 /**

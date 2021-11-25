@@ -36,6 +36,8 @@ android {
         viewBinding = true
     }
 
+
+
     defaultConfig {
         applicationId "mega.privacy.android.app"
 
@@ -260,6 +262,8 @@ dependencies {
     testImplementation "org.mockito:mockito-core:$mockitoVersion"
 
     androidTestImplementation "androidx.test.ext:junit:$androidxTestExtVersion"
+    androidTestImplementation "com.google.truth:truth:$truthVersion"
+    androidTestImplementation "androidx.test.espresso:espresso-core:$espressoVersion"
 }
 
 def taskRequests = gradle.getStartParameter().getTaskRequests().toString()
