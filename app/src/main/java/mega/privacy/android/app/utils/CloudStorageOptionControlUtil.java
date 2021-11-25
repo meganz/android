@@ -1,5 +1,7 @@
 package mega.privacy.android.app.utils;
 
+import static mega.privacy.android.app.utils.Util.isAndroid11OrUpper;
+
 import android.view.Menu;
 import android.view.MenuItem;
 import java.util.Arrays;
@@ -180,7 +182,7 @@ public class CloudStorageOptionControlUtil {
     menu.findItem(R.id.cab_menu_download).setVisible(control.saveToDevice.visible);
     menu.findItem(R.id.cab_menu_download).setShowAsAction(control.saveToDevice.showAsAction);
 
-    menu.findItem(R.id.cab_menu_save_gallery).setVisible(control.saveToGallery.visible);
+    menu.findItem(R.id.cab_menu_save_gallery).setVisible(!isAndroid11OrUpper() && control.saveToGallery.visible);
     menu.findItem(R.id.cab_menu_save_gallery).setShowAsAction(control.saveToGallery.showAsAction);
 
     menu.findItem(R.id.cab_menu_share_link).setVisible(control.getLink.visible);
