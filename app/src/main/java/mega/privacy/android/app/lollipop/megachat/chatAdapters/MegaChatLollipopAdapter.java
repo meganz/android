@@ -135,6 +135,7 @@ import static mega.privacy.android.app.utils.LinksUtil.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.MegaNodeUtil.*;
 import static mega.privacy.android.app.utils.PreviewUtils.*;
+import static mega.privacy.android.app.utils.StringResourcesUtils.getQuantityString;
 import static mega.privacy.android.app.utils.StringResourcesUtils.getString;
 import static mega.privacy.android.app.utils.TextUtil.*;
 import static mega.privacy.android.app.utils.ThumbnailUtils.*;
@@ -718,6 +719,8 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
         RelativeLayout contentOwnMessageContactLayout;
         RelativeLayout contentOwnMessageContactLayoutAvatar;
         RoundedImageView contentOwnMessageContactThumb;
+        private ImageView contentOwnMessageContactVerified;
+        private ImageView contentOwnMessageContactStatus;
         private EmojiTextView contentOwnMessageContactName;
         public EmojiTextView contentOwnMessageContactEmail;
         private ImageView forwardOwnContact;
@@ -814,6 +817,8 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
         private ImageView forwardContactContact;
         RelativeLayout contentContactMessageContactLayoutAvatar;
         RoundedImageView contentContactMessageContactThumb;
+        private ImageView contentContactMessageContactVerified;
+        private ImageView contentContactMessageContactStatus;
         private EmojiTextView contentContactMessageContactName;
         public EmojiTextView contentContactMessageContactEmail;
 
@@ -1096,6 +1101,8 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             holder.contentOwnMessageContactLayout = v.findViewById(R.id.content_own_message_contact_layout);
             holder.contentOwnMessageContactLayoutAvatar = v.findViewById(R.id.content_own_message_contact_layout_avatar);
             holder.contentOwnMessageContactThumb = v.findViewById(R.id.content_own_message_contact_thumb);
+            holder.contentOwnMessageContactVerified = v.findViewById(R.id.content_own_message_contact_verified_icon);
+            holder.contentOwnMessageContactStatus = v.findViewById(R.id.content_own_message_contact_status);
             holder.contentOwnMessageContactName = v.findViewById(R.id.content_own_message_contact_name);
             holder.contentOwnMessageContactName.setNeccessaryShortCode(false);
             holder.contentOwnMessageContactEmail = v.findViewById(R.id.content_own_message_contact_email);
@@ -1304,6 +1311,8 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
 
             holder.contentContactMessageContactLayoutAvatar = v.findViewById(R.id.content_contact_message_contact_layout_avatar);
             holder.contentContactMessageContactThumb = v.findViewById(R.id.content_contact_message_contact_thumb);
+            holder.contentContactMessageContactVerified = v.findViewById(R.id.content_contact_message_contact_verified_icon);
+            holder.contentContactMessageContactStatus = v.findViewById(R.id.content_contact_message_contact_status);
             holder.contentContactMessageContactName = v.findViewById(R.id.content_contact_message_contact_name);
             holder.contentContactMessageContactName.setNeccessaryShortCode(false);
             holder.contentContactMessageContactEmail = v.findViewById(R.id.content_contact_message_contact_email);
@@ -5777,6 +5786,12 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
         logDebug("bindContactAttachmentMessage");
 
         MegaChatMessage message = androidMessage.getMessage();
+        String email = message.getUserEmail(0);
+        boolean isContact = isContact(email);
+        MegaUser megaUser = megaApi.getContact(email);
+        boolean showVerified = isContact && megaApi.areCredentialsVerified(megaUser);
+        boolean showStatus = isContact && !showVerified;
+
         if (message.getUserHandle() == myUserHandle) {
             holder.layoutAvatarMessages.setVisibility(View.GONE);
             holder.titleOwnMessage.setGravity(Gravity.RIGHT);
@@ -5809,6 +5824,12 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             holder.contentOwnMessageContactThumb.setVisibility(View.VISIBLE);
             holder.contentOwnMessageContactName.setVisibility(View.VISIBLE);
             holder.contentOwnMessageContactEmail.setVisibility(View.VISIBLE);
+
+            holder.contentOwnMessageContactVerified.setVisibility(showVerified ? View.VISIBLE : View.GONE);
+            holder.contentOwnMessageContactStatus.setVisibility(showStatus ? View.VISIBLE : View.GONE);
+            if (showStatus) {
+                setContactStatus(getUserStatus(megaUser.getHandle()), holder.contentOwnMessageContactStatus, StatusIconLocation.STANDARD);
+            }
 
             holder.contentOwnMessageContactLayout.setBackgroundResource(isMsgRemovedOrHasRejectedOrManualSendingStatus(removedMessages, message) ?
                     R.drawable.light_rounded_chat_own_message :
@@ -5860,8 +5881,8 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                     name.append(", " + message.getUserName(i));
                 }
                 holder.contentOwnMessageContactEmail.setText(name);
-                String email = context.getResources().getQuantityString(R.plurals.general_selection_num_contacts, (int) userCount, userCount);
-                holder.contentOwnMessageContactName.setText(email);
+                String numContacts = getQuantityString(R.plurals.general_selection_num_contacts, (int) userCount, userCount);
+                holder.contentOwnMessageContactName.setText(numContacts);
                 Bitmap bitmapDefaultAvatar = getDefaultAvatar(getSpecificAvatarColor(AVATAR_PRIMARY_COLOR), userCount + "", AVATAR_SIZE, true);
                 holder.contentOwnMessageContactThumb.setImageBitmap(bitmapDefaultAvatar);
             }
@@ -5904,6 +5925,12 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             holder.urlContactMessageLayout.setVisibility(View.GONE);
             holder.contentContactMessageContactLayout.setVisibility(View.VISIBLE);
 
+            holder.contentContactMessageContactVerified.setVisibility(showVerified ? View.VISIBLE : View.GONE);
+            holder.contentContactMessageContactStatus.setVisibility(showStatus ? View.VISIBLE : View.GONE);
+            if (showStatus) {
+                setContactStatus(getUserStatus(megaUser.getHandle()), holder.contentContactMessageContactStatus, StatusIconLocation.STANDARD);
+            }
+
             //Forwards element (contact messages):
             if (checkForwardVisibilityInContactMsg(isMultipleSelect(), cC)) {
                 holder.forwardContactContact.setVisibility(View.VISIBLE);
@@ -5940,8 +5967,8 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                     name.append(", " + message.getUserName(i));
                 }
                 holder.contentContactMessageContactEmail.setText(name);
-                String email = context.getResources().getQuantityString(R.plurals.general_selection_num_contacts, (int) userCount, userCount);
-                holder.contentContactMessageContactName.setText(email);
+                String numContacts = getQuantityString(R.plurals.general_selection_num_contacts, (int) userCount, userCount);
+                holder.contentContactMessageContactName.setText(numContacts);
                 Bitmap bitmap = getDefaultAvatar(getSpecificAvatarColor(AVATAR_PRIMARY_COLOR), userCount + "", AVATAR_SIZE, true);
                 holder.contentContactMessageContactThumb.setImageBitmap(bitmap);
             }
