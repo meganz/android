@@ -1142,12 +1142,16 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             holder.ownManagementMessageIcon = v.findViewById(R.id.own_management_message_icon);
 
             holder.ownContactLinkMessage = v.findViewById(R.id.own_contact_link_container);
+            holder.ownContactLinkMessage.setTag(holder);
+            holder.ownContactLinkMessage.setOnClickListener(this);
             holder.ownContactLinkTextLayout = v.findViewById(R.id.own_contact_link_text_layout);
             holder.ownContactLinkText = v.findViewById(R.id.own_contact_link_text);
             holder.ownContactLinkName = v.findViewById(R.id.own_contact_link_name);
             holder.ownContactLinkSubtitle = v.findViewById(R.id.own_contact_link_subtitle);
             holder.ownContactLinkAvatar = v.findViewById(R.id.own_contact_link_avatar);
             holder.ownContactLinkForward = v.findViewById(R.id.own_contact_link_forward);
+            holder.ownContactLinkForward.setTag(holder);
+            holder.ownContactLinkForward.setOnClickListener(this);
             holder.ownContactLinkError = v.findViewById(R.id.own_contact_link_error_uploading);
 
             //Contact messages
@@ -1405,11 +1409,15 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             holder.ownManagementMessageText.setLayoutParams(paramsOwnManagement);
 
             holder.othersContactLinkMessage = v.findViewById(R.id.others_contact_link_container);
+            holder.othersContactLinkMessage.setTag(holder);
+            holder.othersContactLinkMessage.setOnClickListener(this);
             holder.othersContactLinkText = v.findViewById(R.id.others_contact_link_text);
             holder.othersContactLinkName = v.findViewById(R.id.others_contact_link_name);
             holder.othersContactLinkSubtitle = v.findViewById(R.id.others_contact_link_subtitle);
             holder.othersContactLinkAvatar = v.findViewById(R.id.others_contact_link_avatar);
             holder.othersContactLinkForward = v.findViewById(R.id.others_contact_link_forward);
+            holder.othersContactLinkForward.setTag(holder);
+            holder.othersContactLinkForward.setOnClickListener(this);
 
             v.setTag(holder);
 
@@ -7841,7 +7849,11 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
         logDebug("onClick()");
 
         ViewHolderMessageChat holder = (ViewHolderMessageChat) v.getTag();
-        int currentPositionInAdapter = holder.getAdapterPosition();
+        if (holder == null) {
+            return;
+        }
+
+        int currentPositionInAdapter = holder.getAbsoluteAdapterPosition();
         if(currentPositionInAdapter<0){
             logWarning("Current position error - not valid value");
             return;
@@ -7872,13 +7884,15 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             case R.id.forward_contact_preview_portrait:
             case R.id.forward_contact_preview_landscape:
             case R.id.forward_own_location:
-            case R.id.forward_contact_location:{
+            case R.id.forward_contact_location:
+            case R.id.own_contact_link_forward:
+            case R.id.others_contact_link_forward:
                 ArrayList<AndroidMegaChatMessage> messageArray = new ArrayList<>();
                 int currentPositionInMessages = currentPositionInAdapter -1;
                 messageArray.add(messages.get(currentPositionInMessages));
                 ((ChatActivityLollipop) context).forwardMessages(messageArray);
                 break;
-            }
+
             case R.id.content_own_message_text:
             case R.id.content_contact_message_text:
             case R.id.url_own_message_text:
@@ -7901,12 +7915,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                 int [] dimens = new int[4];
                 checkItem(v, holder, screenPosition, dimens);
 
-                if (holder.contactLinkResult != null) {
-                    ((ChatActivityLollipop) context).openContactLinkMessage(holder.contactLinkResult);
-                } else {
-                    ((ChatActivityLollipop) context).itemClick(currentPositionInAdapter, dimens);
-                }
-
+                ((ChatActivityLollipop) context).itemClick(currentPositionInAdapter, dimens);
                 break;
 
             case R.id.url_always_allow_button: {
@@ -7939,6 +7948,17 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                 this.notifyItemChanged(currentPositionInAdapter);
                 break;
             }
+            case R.id.own_contact_link_container:
+            case R.id.others_contact_link_container:
+                if (isMultipleSelect()) {
+                    screenPosition = new int[2];
+                    dimens = new int[4];
+                    checkItem(v, holder, screenPosition, dimens);
+                    ((ChatActivityLollipop) context).itemClick(currentPositionInAdapter, dimens);
+                } else {
+                    ((ChatActivityLollipop) context).openContactLinkMessage(holder.contactLinkResult);
+                }
+                break;
         }
     }
 

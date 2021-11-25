@@ -66,12 +66,14 @@
                 android:layout_marginStart="12dp"
                 android:layout_marginTop="18dp"
                 android:layout_marginEnd="12dp"
+                android:ellipsize="middle"
                 android:singleLine="true"
                 android:textAppearance="@style/TextAppearance.Mega.Body1"
                 app:emojiSize="14sp"
                 app:layout_constraintStart_toEndOf="@+id/others_contact_link_avatar"
                 app:layout_constraintTop_toTopOf="parent"
-                tools:text="Abbas Brahim" />
+                tools:text="Abbas Brahim"
+                style="@style/TextAppearance.Mega.Body1"/>
 
             <mega.privacy.android.app.components.twemoji.EmojiTextView
                 android:id="@+id/others_contact_link_subtitle"
@@ -81,6 +83,7 @@
                 android:layout_marginTop="2dp"
                 android:layout_marginEnd="12dp"
                 android:layout_marginBottom="18dp"
+                android:ellipsize="middle"
                 android:singleLine="true"
                 android:textAppearance="@style/TextAppearance.Mega.Body2"
                 app:emojiSize="12sp"
