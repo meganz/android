@@ -340,27 +340,4 @@ class RingingMeetingFragment : BaseFragment(),
 
         permissionsWarningDialogBuilder.show()
     }
-
-    override fun onRequestPermissionsResult(
-        requestCode: Int,
-        permissions: Array<out String>,
-        grantResults: IntArray
-    ) {
-        logDebug("onRequestPermissionsResult")
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-
-        var i = 0
-        while (i < grantResults.size) {
-            val bPermission = grantResults[i] == PackageManager.PERMISSION_GRANTED
-            when (permissions[i]) {
-                Manifest.permission.CAMERA -> {
-                    sharedModel.setCameraPermission(bPermission)
-                }
-                Manifest.permission.RECORD_AUDIO -> {
-                    sharedModel.setRecordAudioPermission(bPermission)
-                }
-            }
-            i++
-        }
-    }
 }
