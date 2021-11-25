@@ -5412,9 +5412,12 @@ public class ChatActivityLollipop extends PasscodeActivity
 
                                         if (contact != null && contact.getVisibility() == MegaUser.VISIBILITY_VISIBLE) {
                                             ContactUtil.openContactInfoActivity(this, email);
+                                        } else if (isContactRequestAlreadySent(email)) {
+                                            String text = StringResourcesUtils.getString(R.string.contact_already_invited, converterShortCodes(getNameContactAttachment(m.getMessage())));
+                                            showSnackbar(SENT_REQUESTS_TYPE, text, MEGACHAT_INVALID_HANDLE);
                                         } else {
-                                            String text = getString(R.string.user_is_not_contact, converterShortCodes(getNameContactAttachment(m.getMessage())));
-                                            showSnackbar(INVITE_CONTACT_TYPE, text, MEGACHAT_INVALID_HANDLE, m.getMessage().getUserEmail(0));
+                                            String text = StringResourcesUtils.getString(R.string.user_is_not_contact, converterShortCodes(getNameContactAttachment(m.getMessage())));
+                                            showSnackbar(INVITE_CONTACT_TYPE, text, MEGACHAT_INVALID_HANDLE, email);
                                         }
                                     }
                                 }
@@ -5475,6 +5478,24 @@ public class ChatActivityLollipop extends PasscodeActivity
         }else{
             logDebug("DO NOTHING: Position (" + positionInMessages + ") is more than size in messages (size: " + messages.size() + ")");
         }
+    }
+
+    /**
+     * Checks if a contact request already exists.
+     *
+     * @param email Email of the contact request to check.
+     * @return True if the request has already been sent, false otherwise.
+     */
+    private boolean isContactRequestAlreadySent(String email) {
+        List<MegaContactRequest> sentRequests = megaApi.getOutgoingContactRequests();
+
+        for (MegaContactRequest request : sentRequests) {
+            if (request.getTargetEmail().equals(email)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**
@@ -8253,9 +8274,8 @@ public class ChatActivityLollipop extends PasscodeActivity
             else{
                 if (e.getErrorCode() == MegaError.API_OK){
                     logDebug("OK INVITE CONTACT: " + request.getEmail());
-                    if(request.getNumber()==MegaContactRequest.INVITE_ACTION_ADD)
-                    {
-                        showSnackbar(SNACKBAR_TYPE, getString(R.string.context_contact_request_sent, request.getEmail()), -1);
+                    if (request.getNumber() == MegaContactRequest.INVITE_ACTION_ADD) {
+                        showSnackbar(DISMISS_ACTION_SNACKBAR, StringResourcesUtils.getString(R.string.contact_invited), MEGACHAT_INVALID_HANDLE);
                     }
                 }
                 else{

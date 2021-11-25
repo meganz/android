@@ -32,8 +32,6 @@ import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaNodeList;
 import nz.mega.sdk.MegaUser;
 
-import static mega.privacy.android.app.lollipop.megachat.AndroidMegaRichLinkMessage.extractContactLink;
-import static mega.privacy.android.app.lollipop.megachat.AndroidMegaRichLinkMessage.getContactLinkHandle;
 import static mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil.*;
 import static mega.privacy.android.app.utils.ChatUtil.*;
 import static mega.privacy.android.app.utils.Constants.*;
