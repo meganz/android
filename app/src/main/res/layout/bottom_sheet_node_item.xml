@@ -42,7 +42,7 @@
                     android:layout_height="wrap_content"
                     android:singleLine="true"
                     android:ellipsize="middle"
-                    android:textAppearance="?attr/textAppearanceSubtitle1"/>
+                    style="@style/textAppearanceSubtitle1" />
 
                 <RelativeLayout
                     android:id="@+id/node_relative_layout_icon"
@@ -58,7 +58,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:background="@null"
-                        app:tint="?android:attr/textColorSecondary"/>
+                        app:tint="?android:attr/textColorSecondary" />
 
                 </RelativeLayout>
 

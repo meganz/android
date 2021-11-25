@@ -3887,8 +3887,6 @@
     </plurals>
     <!-- Button of the warning dialog indicating the renamed name file extension is not the same to confirm the change. -->
     <string name="action_change_anyway">어쨌든 변경하기</string>
-    <!-- Snackbar text to display if the user doesn't grant the permission to access all files on a device with Android 11 or higher -->
-    <string name="snackbar_storage_permission_denied_android_11">저장소에 접근하려면 권한이 필요합니다.</string>
     <!-- String to show the transfer quota and the used space in My Account section. E.g.: -->
     <string name="used_storage_transfer">%1$s / %2$s</string>
     <!-- String to show the transfer quota and the used space in My Account section -->
@@ -4079,4 +4077,30 @@
     <string name="main_view">메인 보기</string>
     <!-- Warning in Offline section alerting all the Offline files will be deleted after logout. -->
     <string name="offline_warning">로그아웃 하면 오프라인 항목이 삭제됩니다.</string>
+    <!-- Settings category which contains all preferences related to user interface. -->
+    <string name="user_interface_setting">이용자 인터페이스</string>
+    <!-- Setting which allows to choose the start screen. -->
+    <string name="start_screen_setting">시작 화면</string>
+    <!-- Setting which allows to hide or show the recent activity. -->
+    <string name="hide_recent_setting">최근 활동 숨기기</string>
+    <!-- Context of a setting which allows to hide or show the recent activity. -->
+    <string name="hide_recent_setting_context">홈 섹션에서 최근 활동 숨기기</string>
+    <!-- Title of a dialog informing the start screen can be modified. -->
+    <string name="choose_start_screen_title">시작 화면을 선택하세요</string>
+    <!-- Test of a dialog informing the start screen can be modified. -->
+    <string name="choose_start_screen_text">다음 번에 MEGA 앱을 실행할 때 열 화면을 선택하는 설정을 바꿉니다.</string>
+    <!-- Action button which allows to change a setting. -->
+    <string name="change_setting_action">설정 변경</string>
+    <!-- Subtitle of the settings page where the start screen can be chosen. -->
+    <string name="configure_start_screen">기본 시작 화면 설정</string>
+    <!-- Homepage section. -->
+    <string name="home_section">홈</string>
+    <!-- Action button which allows to show the recent activity. -->
+    <string name="show_activity_action">활동 보기</string>
+    <!-- Text informing the recent activity is hidden. -->
+    <string name="recents_activity_hidden">[B]최근[/B] 활동 숨겨짐</string>
+    <!-- Alert informing the user can choose the video quality for Camera Uploads Videos -->
+    <string name="video_quality_info">카메라 업로드 설정에서 동영상 품질을 낮춰서 공간을 절약할 수 있습니다.</string>
+    <!-- Label indicating video original quality -->
+    <string name="original_quality">원본 품질</string>
 </resources>

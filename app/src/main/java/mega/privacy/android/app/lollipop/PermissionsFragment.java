@@ -241,28 +241,22 @@ public class PermissionsFragment extends Fragment implements View.OnClickListene
         }
     }
 
-    void askForMediaPermissions () {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-            if (!Environment.isExternalStorageManager()) {
-                requestManageExternalStoragePermission(context, PERMISSIONS_FRAGMENT);
-            }
-        } else {
-            if (!readGranted && !writeGranted) {
-                logDebug("WRITE_EXTERNAL_STORAGE and READ_EXTERNAL_STORAGE");
-                requestPermission((ManagerActivityLollipop) context,
-                        PERMISSIONS_FRAGMENT,
-                        Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE);
-            } else if (!writeGranted) {
-                logDebug("WRITE_EXTERNAL_STORAGE");
-                requestPermission((ManagerActivityLollipop) context,
-                        PERMISSIONS_FRAGMENT,
-                        Manifest.permission.WRITE_EXTERNAL_STORAGE);
-            } else if (!readGranted) {
-                logDebug("READ_EXTERNAL_STORAGE");
-                requestPermission((ManagerActivityLollipop) context,
-                        PERMISSIONS_FRAGMENT,
-                        Manifest.permission.READ_EXTERNAL_STORAGE);
-            }
+    void askForMediaPermissions() {
+        if (!readGranted && !writeGranted) {
+            logDebug("WRITE_EXTERNAL_STORAGE and READ_EXTERNAL_STORAGE");
+            requestPermission((ManagerActivityLollipop) context,
+                    PERMISSIONS_FRAGMENT,
+                    Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE);
+        } else if (!writeGranted) {
+            logDebug("WRITE_EXTERNAL_STORAGE");
+            requestPermission((ManagerActivityLollipop) context,
+                    PERMISSIONS_FRAGMENT,
+                    Manifest.permission.WRITE_EXTERNAL_STORAGE);
+        } else if (!readGranted) {
+            logDebug("READ_EXTERNAL_STORAGE");
+            requestPermission((ManagerActivityLollipop) context,
+                    PERMISSIONS_FRAGMENT,
+                    Manifest.permission.READ_EXTERNAL_STORAGE);
         }
     }
 

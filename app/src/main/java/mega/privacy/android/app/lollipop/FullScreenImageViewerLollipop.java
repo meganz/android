@@ -1537,16 +1537,6 @@ public class FullScreenImageViewerLollipop extends PasscodeActivity
 					}
 				}
 			}
-		} else if (requestCode == REQUEST_WRITE_STORAGE) {
-			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-				if (Environment.isExternalStorageManager()) {
-					nodeSaver.handleRequestPermissionsResult(requestCode);
-				} else {
-					super.onActivityResult(requestCode, resultCode, intent);
-				}
-			} else {
-				super.onActivityResult(requestCode, resultCode, intent);
-			}
 		}
 	}
 

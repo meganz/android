@@ -160,7 +160,7 @@ public class UploadService extends Service implements MegaTransferListenerInterf
         }
 
         mBuilder = new Notification.Builder(UploadService.this);
-		mBuilderCompat = new NotificationCompat.Builder(UploadService.this, null);
+		mBuilderCompat = new NotificationCompat.Builder(UploadService.this, NOTIFICATION_CHANNEL_UPLOAD_ID);
 		mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
 
 		startForeground();

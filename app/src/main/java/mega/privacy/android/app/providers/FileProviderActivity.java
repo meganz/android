@@ -1460,6 +1460,9 @@ public class FileProviderActivity extends PasscodeFileProviderActivity implement
 				logDebug("Logged in");
 
 				megaApi.fetchNodes(this);
+
+                // Get cookies settings after login.
+                MegaApplication.getInstance().checkEnabledCookies();
 			}
 		} else if (request.getType() == MegaRequest.TYPE_FETCH_NODES) {
 
