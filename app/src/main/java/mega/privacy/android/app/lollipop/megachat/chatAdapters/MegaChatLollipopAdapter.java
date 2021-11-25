@@ -135,6 +135,7 @@ import static mega.privacy.android.app.utils.LinksUtil.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.MegaNodeUtil.*;
 import static mega.privacy.android.app.utils.PreviewUtils.*;
+import static mega.privacy.android.app.utils.StringResourcesUtils.getString;
 import static mega.privacy.android.app.utils.TextUtil.*;
 import static mega.privacy.android.app.utils.ThumbnailUtils.*;
 import static mega.privacy.android.app.utils.TimeUtils.*;
@@ -1144,6 +1145,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             holder.ownContactLinkMessage = v.findViewById(R.id.own_contact_link_container);
             holder.ownContactLinkMessage.setTag(holder);
             holder.ownContactLinkMessage.setOnClickListener(this);
+            holder.ownContactLinkMessage.setOnLongClickListener(this);
             holder.ownContactLinkTextLayout = v.findViewById(R.id.own_contact_link_text_layout);
             holder.ownContactLinkText = v.findViewById(R.id.own_contact_link_text);
             holder.ownContactLinkName = v.findViewById(R.id.own_contact_link_name);
@@ -1411,6 +1413,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             holder.othersContactLinkMessage = v.findViewById(R.id.others_contact_link_container);
             holder.othersContactLinkMessage.setTag(holder);
             holder.othersContactLinkMessage.setOnClickListener(this);
+            holder.othersContactLinkMessage.setOnLongClickListener(this);
             holder.othersContactLinkText = v.findViewById(R.id.others_contact_link_text);
             holder.othersContactLinkName = v.findViewById(R.id.others_contact_link_name);
             holder.othersContactLinkSubtitle = v.findViewById(R.id.others_contact_link_subtitle);
@@ -1628,16 +1631,16 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                     switch (pendingMsg.getState()) {
                         case PendingMessageSingle.STATE_ERROR_UPLOADING:
                         case PendingMessageSingle.STATE_ERROR_ATTACHING:
-                            state = StringResourcesUtils.getString(R.string.attachment_uploading_state_error);
+                            state = getString(R.string.attachment_uploading_state_error);
                             break;
 
                         case PendingMessageSingle.STATE_COMPRESSING:
-                            state = StringResourcesUtils.getString(R.string.attachment_uploading_state_compressing);
+                            state = getString(R.string.attachment_uploading_state_compressing);
                             break;
 
                         default:
                             if (!areTransfersPaused) {
-                                state = StringResourcesUtils.getString(R.string.attachment_uploading_state_uploading);
+                                state = getString(R.string.attachment_uploading_state_uploading);
                             }
                     }
 
@@ -5659,10 +5662,10 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             holder.contentOwnMessageFileLayout.setVisibility(View.GONE);
             holder.contentOwnMessageVoiceClipLayout.setVisibility(View.GONE);
 
-//            holder.ownContactLinkTextLayout.setBackgroundResource(
-//                    isMsgRemovedOrHasRejectedOrManualSendingStatus(removedMessages, message)
-//                    ? R.drawable.light_rounded_chat_own_message
-//                    : R.drawable.dark_rounded_chat_own_message);
+            holder.ownContactLinkTextLayout.setBackgroundResource(
+                    isMsgRemovedOrHasRejectedOrManualSendingStatus(removedMessages, message)
+                    ? R.drawable.light_background_text_rich_link
+                    : R.drawable.dark_background_text_rich_link);
 
             //Forwards element (own messages):
             if (checkForwardVisibilityInOwnMsg(removedMessages, message, isMultipleSelect(), cC)) {
@@ -5676,20 +5679,35 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             int status = message.getStatus();
             logDebug("Status: " + message.getStatus());
 
-            if ((status == MegaChatMessage.STATUS_SERVER_REJECTED) || (status == MegaChatMessage.STATUS_SENDING_MANUAL)) {
-                holder.ownContactLinkError.setVisibility(View.VISIBLE);
-                holder.retryAlert.setVisibility(View.VISIBLE);
-            } else if (status == MegaChatMessage.STATUS_SENDING) {
-                holder.retryAlert.setVisibility(View.GONE);
-                holder.ownContactLinkError.setVisibility(View.GONE);
-            } else {
-                holder.retryAlert.setVisibility(View.GONE);
-                holder.ownContactLinkError.setVisibility(View.GONE);
+            switch (status) {
+                case MegaChatMessage.STATUS_SERVER_REJECTED:
+                case MegaChatMessage.STATUS_SENDING_MANUAL:
+                    holder.ownContactLinkError.setVisibility(View.VISIBLE);
+                    holder.retryAlert.setVisibility(View.VISIBLE);
+                    break;
+
+                default:
+                    holder.retryAlert.setVisibility(View.GONE);
+                    holder.ownContactLinkError.setVisibility(View.GONE);
             }
 
-            holder.ownContactLinkText.setText(contentText);
+            if (message.isEdited()) {
+                Spannable content = new SpannableString(contentText + " ");
+                content.setSpan(new ForegroundColorSpan(ContextCompat.getColor(context, R.color.white)), 0, content.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+                holder.ownContactLinkText.setText(content);
+
+                Spannable edited = new SpannableString(context.getString(R.string.edited_message_text));
+                edited.setSpan(new RelativeSizeSpan(0.70f), 0, edited.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+                edited.setSpan(new ForegroundColorSpan(ContextCompat.getColor(context, R.color.white_alpha_087)), 0, edited.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+                edited.setSpan(new android.text.style.StyleSpan(Typeface.ITALIC), 0, edited.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+                holder.ownContactLinkText.append(edited);
+            } else {
+                holder.ownContactLinkText.setText(contentText);
+            }
+
             holder.ownContactLinkName.setText(converterShortCodes(holder.contactLinkResult.getFullName()));
             holder.ownContactLinkSubtitle.setText(holder.contactLinkResult.getEmail());
+            checkEmojiSize(contentText, holder.ownContactLinkText);
         } else {
             holder.othersContactLinkMessage.setVisibility(View.VISIBLE);
 
@@ -5730,8 +5748,24 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             }
 
             holder.othersContactLinkText.setText(contentText);
+
+            if (message.isEdited()) {
+                Spannable content = new SpannableString(contentText + " ");
+                content.setSpan(new ForegroundColorSpan(ContextCompat.getColor(context, R.color.grey_087_white_087)), 0, content.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+                holder.othersContactLinkText.setText(content);
+
+                Spannable edited = new SpannableString(context.getString(R.string.edited_message_text));
+                edited.setSpan(new RelativeSizeSpan(0.70f), 0, edited.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+                edited.setSpan(new ForegroundColorSpan(ContextCompat.getColor(context, R.color.grey_087_white_087)), 0, edited.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+                edited.setSpan(new android.text.style.StyleSpan(Typeface.ITALIC), 0, edited.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+                holder.othersContactLinkText.append(edited);
+            } else {
+                holder.othersContactLinkText.setText(contentText);
+            }
+
             holder.othersContactLinkName.setText(converterShortCodes(holder.contactLinkResult.getFullName()));
             holder.othersContactLinkSubtitle.setText(holder.contactLinkResult.getEmail());
+            checkEmojiSize(contentText, holder.othersContactLinkText);
         }
 
         setContactLinkAvatar(holder, isOwnMessage);

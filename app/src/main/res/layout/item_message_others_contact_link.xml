@@ -41,9 +41,11 @@
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/others_contact_link_message"
-            android:layout_width="match_parent"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:minHeight="56dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/others_contact_link_text_layout">
 
             <mega.privacy.android.app.components.RoundedImageView
@@ -61,19 +63,20 @@
 
             <mega.privacy.android.app.components.twemoji.EmojiTextView
                 android:id="@+id/others_contact_link_name"
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="12dp"
                 android:layout_marginTop="18dp"
                 android:layout_marginEnd="12dp"
                 android:ellipsize="middle"
+                android:letterSpacing="0"
                 android:singleLine="true"
                 android:textAppearance="@style/TextAppearance.Mega.Body1"
                 app:emojiSize="14sp"
+                app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toEndOf="@+id/others_contact_link_avatar"
                 app:layout_constraintTop_toTopOf="parent"
-                tools:text="Abbas Brahim"
-                style="@style/TextAppearance.Mega.Body1"/>
+                tools:text="Abbas Brahim" />
 
             <mega.privacy.android.app.components.twemoji.EmojiTextView
                 android:id="@+id/others_contact_link_subtitle"
