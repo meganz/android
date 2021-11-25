@@ -8,7 +8,7 @@ import org.junit.Test
 /**
  * Unit tests for Constants class.
  */
-class ConstantsUnitTest {
+class ConstantsTest {
 
     /**
      * test Regex of Constants.MEGA_REGEXS
