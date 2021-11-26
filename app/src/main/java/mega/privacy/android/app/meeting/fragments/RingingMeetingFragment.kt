@@ -53,18 +53,13 @@ class RingingMeetingFragment : MeetingBaseFragment(),
 
     private var chatId: Long = MEGACHAT_INVALID_HANDLE
 
-    override fun onActivityCreated(savedInstanceState: Bundle?) {
-        super.onActivityCreated(savedInstanceState)
-        initViewModel()
-        permissionsRequester.launch(true)
-    }
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         arguments?.let {
             chatId = it.getLong(MEETING_CHAT_ID)
         }
+        initViewModel()
     }
 
     override fun onCreateView(
@@ -84,6 +79,7 @@ class RingingMeetingFragment : MeetingBaseFragment(),
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         initComponent()
+        permissionsRequester.launch(true)
     }
 
     /**

@@ -58,7 +58,7 @@ import androidx.core.app.NotificationManagerCompat;
 import androidx.core.content.ContextCompat;
 import androidx.core.view.MenuItemCompat;
 import androidx.navigation.NavController;
-import androidx.navigation.Navigation;
+import androidx.navigation.fragment.NavHostFragment;
 import androidx.viewpager.widget.ViewPager;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.appcompat.app.ActionBar;
@@ -129,7 +129,9 @@ import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.OpenPasswordLinkActivity;
 import mega.privacy.android.app.Product;
 import mega.privacy.android.app.R;
+import mega.privacy.android.app.objects.PasscodeManagement;
 import mega.privacy.android.app.fragments.homepage.documents.DocumentsFragment;
+import mega.privacy.android.app.fragments.managerFragments.cu.PhotosFragment;
 import mega.privacy.android.app.generalusecase.FilePrepareUseCase;
 import mega.privacy.android.app.smsVerification.SMSVerificationActivity;
 import mega.privacy.android.app.ShareInfo;
@@ -162,7 +164,6 @@ import mega.privacy.android.app.activities.OfflineFileInfoActivity;
 import mega.privacy.android.app.fragments.offline.OfflineFragment;
 import mega.privacy.android.app.globalmanagement.SortOrderManagement;
 import mega.privacy.android.app.interfaces.ActionNodeCallback;
-import mega.privacy.android.app.fragments.managerFragments.cu.CameraUploadsFragment;
 import mega.privacy.android.app.interfaces.SnackbarShower;
 import mega.privacy.android.app.interfaces.ChatManagementCallback;
 import mega.privacy.android.app.interfaces.MeetingBottomSheetDialogActionListener;
@@ -263,7 +264,7 @@ import nz.mega.sdk.MegaUser;
 import nz.mega.sdk.MegaUserAlert;
 
 import static mega.privacy.android.app.constants.EventConstants.*;
-import static mega.privacy.android.app.fragments.settingsFragments.startSceen.util.StartScreenUtil.CAMERA_UPLOADS_BNV;
+import static mega.privacy.android.app.fragments.settingsFragments.startSceen.util.StartScreenUtil.PHOTOS_BNV;
 import static mega.privacy.android.app.fragments.settingsFragments.startSceen.util.StartScreenUtil.CHAT_BNV;
 import static mega.privacy.android.app.fragments.settingsFragments.startSceen.util.StartScreenUtil.CLOUD_DRIVE_BNV;
 import static mega.privacy.android.app.fragments.settingsFragments.startSceen.util.StartScreenUtil.HOME_BNV;
@@ -323,7 +324,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 		MegaGlobalListenerInterface, MegaTransferListenerInterface, OnClickListener,
 		BottomNavigationView.OnNavigationItemSelectedListener, UploadBottomSheetDialogActionListener,
 		ChatManagementCallback, ActionNodeCallback, SnackbarShower,
-		MeetingBottomSheetDialogActionListener, LoadPreviewListener.OnPreviewLoadedCallback {
+		MeetingBottomSheetDialogActionListener, LoadPreviewListener.OnPreviewLoadedCallback{
 
 	private static final String TRANSFER_OVER_QUOTA_SHOWN = "TRANSFER_OVER_QUOTA_SHOWN";
 
@@ -342,8 +343,6 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
     public static final String LINK_JOINING_CHAT_LINK = "LINK_JOINING_CHAT_LINK";
     public static final String CONNECTED = "CONNECTED";
     private static final String PROCESS_FILE_DIALOG_SHOWN = "PROGRESS_DIALOG_SHOWN";
-
-    private static final String SMALL_GRID = "SMALL_GRID";
 
 	public static final int ERROR_TAB = -1;
 	public static final int INCOMING_TAB = 0;
@@ -377,6 +376,8 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 	InviteContactUseCase inviteContactUseCase;
 	@Inject
 	FilePrepareUseCase filePrepareUseCase;
+	@Inject
+	PasscodeManagement passcodeManagement;
 
 	public ArrayList<Integer> transfersInProgress;
 	public MegaTransferData transferData;
@@ -469,7 +470,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 	private boolean isFromMeeting = false;
 
 	public enum FragmentTag {
-		CLOUD_DRIVE, HOMEPAGE, CAMERA_UPLOADS, INBOX, INCOMING_SHARES, OUTGOING_SHARES, SETTINGS, SEARCH,TRANSFERS, COMPLETED_TRANSFERS,
+		CLOUD_DRIVE, HOMEPAGE, PHOTOS, INBOX, INCOMING_SHARES, OUTGOING_SHARES, SETTINGS, SEARCH,TRANSFERS, COMPLETED_TRANSFERS,
 		RECENT_CHAT, RUBBISH_BIN, NOTIFICATIONS, TURN_ON_NOTIFICATIONS, PERMISSIONS, SMS_VERIFICATION,
 		LINKS;
 
@@ -478,7 +479,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 				case CLOUD_DRIVE: return "fbFLol";
 				case HOMEPAGE: return "fragmentHomepage";
 				case RUBBISH_BIN: return "rubbishBinFLol";
-				case CAMERA_UPLOADS: return "cuFLol";
+				case PHOTOS: return "photosF";
 				case INBOX: return "iFLol";
 				case INCOMING_SHARES: return "isF";
 				case OUTGOING_SHARES: return "osF";
@@ -498,14 +499,14 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 	}
 
 	public enum DrawerItem {
-		CLOUD_DRIVE, CAMERA_UPLOADS, HOMEPAGE, CHAT, SHARED_ITEMS, NOTIFICATIONS,
+		CLOUD_DRIVE, PHOTOS, HOMEPAGE, CHAT, SHARED_ITEMS, NOTIFICATIONS,
 		SETTINGS, INBOX, SEARCH, TRANSFERS, RUBBISH_BIN, ASK_PERMISSIONS;
 
 		public String getTitle(Context context) {
 			switch(this)
 			{
 				case CLOUD_DRIVE: return context.getString(R.string.section_cloud_drive);
-				case CAMERA_UPLOADS: return context.getString(R.string.section_photo_sync);
+				case PHOTOS: return context.getString(R.string.sortby_type_photo_first);
 				case INBOX: return context.getString(R.string.section_inbox);
 				case SHARED_ITEMS: return context.getString(R.string.title_shared_items);
 				case SETTINGS: return context.getString(R.string.action_settings);
@@ -586,11 +587,9 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 	private HomepageScreen mHomepageScreen = HomepageScreen.HOMEPAGE;
 
 	private enum HomepageScreen {
-       	HOMEPAGE, PHOTOS, DOCUMENTS, AUDIO, VIDEO,
+       	HOMEPAGE, IMAGES, DOCUMENTS, AUDIO, VIDEO,
        	FULLSCREEN_OFFLINE, OFFLINE_FILE_INFO, RECENT_BUCKET
 	}
-
-	public boolean isSmallGridCameraUploads = false;
 
 	public boolean isList = true;
 
@@ -620,7 +619,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 	private CompletedTransfersFragmentLollipop completedTFLol;
 	private SearchFragmentLollipop sFLol;
 	private SettingsFragmentLollipop sttFLol;
-	private CameraUploadsFragment cuFragment;
+	private PhotosFragment cuFragment;
 	private RecentChatsFragmentLollipop rChatFL;
 	private NotificationsFragmentLollipop notificFragment;
 	private TurnOnNotificationsFragment tonF;
@@ -650,7 +649,6 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 	private AlertDialog newTextFileDialog;
 
 	private MenuItem searchMenuItem;
-	private MenuItem gridSmallLargeMenuItem;
 	private MenuItem addContactMenuItem;
 	private MenuItem addMenuItem;
 	private MenuItem createFolderMenuItem;
@@ -895,7 +893,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 		public void onReceive(Context context, Intent intent) {
 
 			synchronized (this){
-				if (drawerItem == DrawerItem.CAMERA_UPLOADS) {
+				if (drawerItem == DrawerItem.PHOTOS) {
 					cameraUploadsClicked();
 				}
 
@@ -1195,7 +1193,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 		if (checkPermissionsCall(this, typesCameraPermission)) {
 			switch (typesCameraPermission) {
 				case RETURN_CALL_PERMISSIONS:
-					returnActiveCall(this);
+					returnActiveCall(this, passcodeManagement);
 					break;
 
 				case START_CALL_PERMISSIONS:
@@ -1315,10 +1313,9 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 		outState.putString(LINK_JOINING_CHAT_LINK, linkJoinToChatLink);
 		outState.putBoolean(CONNECTED, connected);
 		outState.putBoolean(KEY_IS_FAB_EXPANDED, isFabExpanded);
-		outState.putBoolean(SMALL_GRID, isSmallGridCameraUploads);
 
 		if (getCameraUploadFragment() != null) {
-			getSupportFragmentManager().putFragment(outState, FragmentTag.CAMERA_UPLOADS.getTag(), cuFragment);
+			getSupportFragmentManager().putFragment(outState, FragmentTag.PHOTOS.getTag(), cuFragment);
 		}
 
 		checkNewTextFileDialogState(newTextFileDialog, outState);
@@ -1425,7 +1422,6 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 			linkJoinToChatLink = savedInstanceState.getString(LINK_JOINING_CHAT_LINK);
 			connected = savedInstanceState.getBoolean(CONNECTED, false);
 			isFabExpanded = savedInstanceState.getBoolean(KEY_IS_FAB_EXPANDED, false);
-			isSmallGridCameraUploads = savedInstanceState.getBoolean(SMALL_GRID, false);
 
 			nodeAttacher.restoreState(savedInstanceState);
 			nodeSaver.restoreState(savedInstanceState);
@@ -1583,10 +1579,6 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 		if (prefs == null){
 			firstTimeAfterInstallation = true;
 			isList=true;
-
-			if (savedInstanceState == null) {
-				isSmallGridCameraUploads = false;
-			}
 		}
 		else{
 			if (prefs.getFirstTime() == null){
@@ -1599,10 +1591,6 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 			}
 			else{
 				isList = Boolean.parseBoolean(prefs.getPreferredViewList());
-			}
-
-			if (savedInstanceState == null) {
-				isSmallGridCameraUploads = dbH.isSmallGridCamera();
 			}
 		}
 
@@ -2442,7 +2430,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 						if (accountType != FREE) {
 							showMyAccount(new Pair<>(EXTRA_ACCOUNT_TYPE, accountType));
 						} else if (firstLogin && app.getStorageState() != STORAGE_STATE_PAYWALL) {
-							drawerItem = DrawerItem.CAMERA_UPLOADS;
+							drawerItem = DrawerItem.PHOTOS;
 						} else {
 							showMyAccount();
 						}
@@ -2450,7 +2438,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 	        		else{
 						if (firstLogin && app.getStorageState() != STORAGE_STATE_PAYWALL) {
 							logDebug("First login. Go to Camera Uploads configuration.");
-							drawerItem = DrawerItem.CAMERA_UPLOADS;
+							drawerItem = DrawerItem.PHOTOS;
 							setIntent(null);
 						}
 					}
@@ -2475,7 +2463,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 						if (accountType != FREE) {
 							showMyAccount(new Pair<>(EXTRA_ACCOUNT_TYPE, accountType));
 						} else if (firstLogin && app.getStorageState() != STORAGE_STATE_PAYWALL) {
-							drawerItem = DrawerItem.CAMERA_UPLOADS;
+							drawerItem = DrawerItem.PHOTOS;
 						} else {
 							showMyAccount();
 						}
@@ -2488,7 +2476,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 							} else {
 								firstLogin = true;
 								if (app.getStorageState() != STORAGE_STATE_PAYWALL) {
-									drawerItem = DrawerItem.CAMERA_UPLOADS;
+									drawerItem = DrawerItem.PHOTOS;
 								}
 							}
 							setIntent(null);
@@ -2896,7 +2884,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 			drawerItem = DrawerItem.CLOUD_DRIVE;
 		} else {
 			firstLogin = true;
-			drawerItem = DrawerItem.CAMERA_UPLOADS;
+			drawerItem = DrawerItem.PHOTOS;
 		}
 
 		selectDrawerItemLollipop(drawerItem);
@@ -3218,7 +3206,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 								dbH.setCamSyncEnabled(false);
 								sendBroadcast(new Intent(ACTION_UPDATE_DISABLE_CU_SETTING));
 
-								if (drawerItem == DrawerItem.CAMERA_UPLOADS) {
+								if (drawerItem == DrawerItem.PHOTOS) {
 									cuLayout.setVisibility(View.VISIBLE);
 								}
 							});
@@ -3385,8 +3373,8 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 					MegaApplication.setRecentChatVisible(true);
 					break;
 
-				case CAMERA_UPLOADS: {
-					setBottomNavigationMenuItemChecked(CAMERA_UPLOADS_BNV);
+				case PHOTOS: {
+					setBottomNavigationMenuItemChecked(PHOTOS_BNV);
 					break;
 				}
 				case NOTIFICATIONS: {
@@ -3861,14 +3849,14 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 				setFirstNavigationLevel(true);
 				break;
 			}
-			case CAMERA_UPLOADS:{
+			case PHOTOS:{
 				aB.setSubtitle(null);
 				if (getCameraUploadFragment() != null && cuFragment.isEnableCUFragmentShown()) {
 					setFirstNavigationLevel(false);
 					aB.setTitle(getString(R.string.settings_camera_upload_on).toUpperCase());
 				} else {
 					setFirstNavigationLevel(true);
-					aB.setTitle(getString(R.string.section_photo_sync).toUpperCase());
+					aB.setTitle(getString(R.string.sortby_type_photo_first).toUpperCase());
 				}
 				break;
 			}
@@ -3877,8 +3865,8 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 				int titleId = -1;
 
 				switch (mHomepageScreen) {
-					case PHOTOS:
-						titleId = R.string.sortby_type_photo_first;
+					case IMAGES:
+						titleId = R.string.section_images;
 						break;
 					case DOCUMENTS:
 						titleId = R.string.section_documents;
@@ -4106,8 +4094,8 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 					setBottomNavigationMenuItemChecked(HOME_BNV);
 					break;
 				}
-				case CAMERA_UPLOADS:{
-					setBottomNavigationMenuItemChecked(CAMERA_UPLOADS_BNV);
+				case PHOTOS:{
+					setBottomNavigationMenuItemChecked(PHOTOS_BNV);
 					break;
 				}
 				case SHARED_ITEMS:{
@@ -4306,7 +4294,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 			}
 		}
 
-		boolean isCameraUploadItem = item == CAMERA_UPLOADS_BNV;
+		boolean isCameraUploadItem = item == PHOTOS_BNV;
 		updateMiniAudioPlayerVisibility(!isCameraUploadItem);
 	}
 
@@ -4433,7 +4421,8 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 	 * BNV, Toolbar title, etc.
 	 */
 	private void setupNavDestListener() {
-		mNavController = Navigation.findNavController(mNavHostView);
+		NavHostFragment navHostFragment = (NavHostFragment) getSupportFragmentManager().findFragmentById(R.id.nav_host_fragment);
+		mNavController = navHostFragment.getNavController();
 
 		mNavController.addOnDestinationChangedListener((controller, destination, arguments) -> {
 			int destinationId = destination.getId();
@@ -4448,10 +4437,15 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 				if (bottomNavigationCurrentItem == HOME_BNV) {
 					abL.setVisibility(View.GONE);
 				}
+
+                if (transfersWidget != null) {
+                    transfersWidget.update();
+                }
+
 				setDrawerLockMode(false);
 				return;
 			} else if (destinationId == R.id.photosFragment) {
-				mHomepageScreen = HomepageScreen.PHOTOS;
+				mHomepageScreen = HomepageScreen.IMAGES;
 			} else if (destinationId == R.id.documentsFragment) {
 				mHomepageScreen = HomepageScreen.DOCUMENTS;
 			} else if (destinationId == R.id.audioFragment) {
@@ -4470,6 +4464,9 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 				mHomepageScreen = HomepageScreen.RECENT_BUCKET;
 			}
 
+            if (transfersWidget != null) {
+                transfersWidget.update();
+            }
 			updatePsaViewVisibility();
 			abL.setVisibility(View.VISIBLE);
 			showHideBottomNavigationView(true);
@@ -4515,7 +4512,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 			removeFragment(getChatsFragment());
 		}
 
-		if (item != DrawerItem.CAMERA_UPLOADS) {
+		if (item != DrawerItem.PHOTOS) {
 			resetCUFragment();
 		}
 
@@ -4591,25 +4588,26 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 				}
 				break;
 			}
-    		case CAMERA_UPLOADS: {
+    		case PHOTOS: {
 				abL.setVisibility(View.VISIBLE);
 
 				if (getCameraUploadFragment() == null) {
-					cuFragment = new CameraUploadsFragment();
+					cuFragment = new PhotosFragment();
 				} else {
-					refreshFragment(FragmentTag.CAMERA_UPLOADS.getTag());
+					refreshFragment(FragmentTag.PHOTOS.getTag());
 				}
 
 				cuFragment.setViewTypes(cuViewTypes, cuYearsButton, cuMonthsButton, cuDaysButton, cuAllButton);
-				replaceFragment(cuFragment, FragmentTag.CAMERA_UPLOADS.getTag());
+				replaceFragment(cuFragment, FragmentTag.PHOTOS.getTag());
 				setToolbarTitle();
 				supportInvalidateOptionsMenu();
 				showFabButton();
 				showHideBottomNavigationView(false);
+                refreshCUNodes();
 				if (!comesFromNotifications) {
-					bottomNavigationCurrentItem = CAMERA_UPLOADS_BNV;
+					bottomNavigationCurrentItem = PHOTOS_BNV;
 				}
-				setBottomNavigationMenuItemChecked(CAMERA_UPLOADS_BNV);
+				setBottomNavigationMenuItemChecked(PHOTOS_BNV);
 
 				break;
     		}
@@ -4803,6 +4801,11 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 		updateMiniAudioPlayerVisibility(true);
 
 		bNV.setTranslationY(0);
+		bNV.animate().cancel();
+		bNV.clearAnimation();
+		if (bNV.getVisibility() != View.VISIBLE) {
+			bNV.setVisibility(View.VISIBLE);
+		}
 		bNV.setVisibility(View.VISIBLE);
 		final CoordinatorLayout.LayoutParams params = new CoordinatorLayout.LayoutParams(
 				ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
@@ -4902,7 +4905,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 				}
 				break;
 			}
-            case CAMERA_UPLOADS: {
+            case PHOTOS: {
                 if (getCameraUploadFragment() != null) {
 					cuFragment.checkScroll();
                 }
@@ -5245,7 +5248,6 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 			}
 		});
 
-		gridSmallLargeMenuItem = menu.findItem(R.id.action_grid_view_large_small);
 		addContactMenuItem = menu.findItem(R.id.action_add_contact);
 		addMenuItem = menu.findItem(R.id.action_add);
 		createFolderMenuItem = menu.findItem(R.id.action_new_folder);
@@ -5312,6 +5314,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 					if (mHomepageScreen == HomepageScreen.FULLSCREEN_OFFLINE) {
 						updateFullscreenOfflineFragmentOptionMenu(true);
 					}
+
 					break;
 				case RUBBISH_BIN:
 					if (getRubbishBinFragment() != null && rubbishBinFLol.getItemCount() > 0) {
@@ -5322,10 +5325,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 						searchMenuItem.setVisible(true);
 					}
 					break;
-				case CAMERA_UPLOADS:
-					gridSmallLargeMenuItem.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
-
-					updateCuFragmentOptionsMenu();
+				case PHOTOS:
 					break;
 
 				case INBOX:
@@ -5529,29 +5529,6 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
         return null;
     }
 
-	public void updateCuFragmentOptionsMenu() {
-		if (selectMenuItem == null || sortByMenuItem == null || gridSmallLargeMenuItem == null) {
-			return;
-		}
-
-		if (drawerItem == DrawerItem.CAMERA_UPLOADS
-				&& getCameraUploadFragment() != null
-				&& cuFragment.getItemCount() > 0) {
-			boolean visible = cuFragment.shouldShowFullInfoAndOptions();
-			sortByMenuItem.setVisible(visible);
-			setCuThumbnailTypeIcon();
-			gridSmallLargeMenuItem.setVisible(visible);
-		}
-	}
-
-	private void setCuThumbnailTypeIcon() {
-		if (isSmallGridCameraUploads) {
-			gridSmallLargeMenuItem.setIcon(R.drawable.ic_thumbnail_view);
-		} else {
-			gridSmallLargeMenuItem.setIcon(R.drawable.ic_menu_gridview_small);
-		}
-	}
-
 	private void setGridListIcon() {
 		if (isList){
 			thumbViewMenuItem.setTitle(getString(R.string.action_grid));
@@ -5618,7 +5595,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 							lF.onBackPressed();
 						}
 		    		}
-					else if (drawerItem == DrawerItem.CAMERA_UPLOADS) {
+					else if (drawerItem == DrawerItem.PHOTOS) {
 						if (getCameraUploadFragment() != null) {
 							if (cuFragment.isEnableCUFragmentShown()) {
 								cuFragment.onBackPressed();
@@ -5860,7 +5837,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 						}
 						break;
 
-					case CAMERA_UPLOADS:
+					case PHOTOS:
 						if (getCameraUploadFragment() != null) {
 							cuFragment.selectAll();
 						}
@@ -5869,35 +5846,13 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 
 	        	return true;
 	        }
-	        case R.id.action_grid_view_large_small:{
-				if (drawerItem == DrawerItem.CAMERA_UPLOADS){
-					isSmallGridCameraUploads = !isSmallGridCameraUploads;
-					dbH.setSmallGridCamera(isSmallGridCameraUploads);
+            case R.id.action_grid: {
+                logDebug("action_grid selected");
 
-					setCuThumbnailTypeIcon();
-
-					refreshFragment(FragmentTag.CAMERA_UPLOADS.getTag());
-	        	}
-	        	return true;
-	        }
-	        case R.id.action_grid:{
-				logDebug("action_grid selected");
-	        	if (drawerItem == DrawerItem.CAMERA_UPLOADS){
-					logDebug("action_grid_list in CameraUploads");
-					if(!firstLogin) {
-						gridSmallLargeMenuItem.setVisible(true);
-					}else{
-						gridSmallLargeMenuItem.setVisible(false);
-					}
-					searchMenuItem.setVisible(false);
-					refreshFragment(FragmentTag.CAMERA_UPLOADS.getTag());
-				} else {
-					updateView(!isList);
-				}
-	        	supportInvalidateOptionsMenu();
-
-	        	return true;
-	        }
+                updateView(!isList);
+                supportInvalidateOptionsMenu();
+                return true;
+            }
 	        case R.id.action_menu_clear_rubbish_bin:{
 	        	showClearRubbishBinDialog();
 	        	return true;
@@ -5906,7 +5861,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 	        	int orderType;
 
 	        	switch (drawerItem) {
-					case CAMERA_UPLOADS:
+					case PHOTOS:
 						orderType = ORDER_CAMERA;
 						break;
 
@@ -5971,7 +5926,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 		}
 	}
 
-    private void hideItemsWhenSearchSelected() {
+	private void hideItemsWhenSearchSelected() {
         textSubmitted = false;
         if (createFolderMenuItem != null) {
 			doNotDisturbMenuItem.setVisible(false);
@@ -5989,7 +5944,6 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
             importLinkMenuItem.setVisible(false);
             takePicture.setVisible(false);
             helpMenuItem.setVisible(false);
-            gridSmallLargeMenuItem.setVisible(false);
             inviteMenuItem.setVisible(false);
             selectMenuItem.setVisible(false);
             thumbViewMenuItem.setVisible(false);
@@ -6000,7 +5954,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 
 	private void returnCallWithPermissions() {
 		if (checkPermissionsCall(this, RETURN_CALL_PERMISSIONS)) {
-			returnActiveCall(this);
+			returnActiveCall(this, passcodeManagement);
 		}
 	}
 
@@ -6297,7 +6251,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
             } else {
 				performOnBack();
             }
-		} else if (drawerItem == DrawerItem.CAMERA_UPLOADS) {
+		} else if (drawerItem == DrawerItem.PHOTOS) {
 			if (getCameraUploadFragment() == null || cuFragment.onBackPressed() == 0){
 				performOnBack();
 			}
@@ -6379,8 +6333,8 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
     			fbFLol.setTransferOverQuotaBannerVisibility();
 			}
 		}
-		else if (item == CAMERA_UPLOADS_BNV) {
-			drawerItem = DrawerItem.CAMERA_UPLOADS;
+		else if (item == PHOTOS_BNV) {
+			drawerItem = DrawerItem.PHOTOS;
 		}
 		else if (item == CHAT_BNV) {
 			drawerItem = DrawerItem.CHAT;
@@ -6459,9 +6413,9 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 			}
 			case R.id.bottom_navigation_item_camera_uploads: {
 				// if pre fragment is the same one, do nothing.
-				if(oldDrawerItem != DrawerItem.CAMERA_UPLOADS) {
-					drawerItem = DrawerItem.CAMERA_UPLOADS;
-					setBottomNavigationMenuItemChecked(CAMERA_UPLOADS_BNV);
+				if(oldDrawerItem != DrawerItem.PHOTOS) {
+					drawerItem = DrawerItem.PHOTOS;
+					setBottomNavigationMenuItemChecked(PHOTOS_BNV);
 				}
 				break;
 			}
@@ -7513,8 +7467,8 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 
 	public void cameraUploadsClicked(){
 		logDebug("cameraUplaodsClicked");
-		drawerItem = DrawerItem.CAMERA_UPLOADS;
-		setBottomNavigationMenuItemChecked(CAMERA_UPLOADS_BNV);
+		drawerItem = DrawerItem.PHOTOS;
+		setBottomNavigationMenuItemChecked(PHOTOS_BNV);
 		selectDrawerItemLollipop(drawerItem);
 	}
 
@@ -7524,12 +7478,19 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 		selectDrawerItemLollipop(drawerItem);
 	}
 
-	public void refreshCameraUpload(){
-		drawerItem = DrawerItem.CAMERA_UPLOADS;
-		setBottomNavigationMenuItemChecked(CAMERA_UPLOADS_BNV);
-		setToolbarTitle();
-		refreshFragment(FragmentTag.CAMERA_UPLOADS.getTag());
-	}
+    /**
+     * Refresh PhotosFragment's UI after CU is enabled.
+     */
+    public void refreshPhotosFragment() {
+        drawerItem = DrawerItem.PHOTOS;
+        setBottomNavigationMenuItemChecked(PHOTOS_BNV);
+        setToolbarTitle();
+
+        PhotosFragment f = (PhotosFragment) getSupportFragmentManager().findFragmentByTag(FragmentTag.PHOTOS.getTag());
+        if (f != null) {
+            f.refreshViewLayout();
+        }
+    }
 
 	/**
 	 * Checks if should update some cu view visibility.
@@ -7538,7 +7499,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 	 * @return True if should apply the visibility update, false otherwise.
 	 */
 	private boolean rightCUVisibilityChange(int visibility) {
-		return drawerItem == DrawerItem.CAMERA_UPLOADS || visibility == View.GONE;
+		return drawerItem == DrawerItem.PHOTOS || visibility == View.GONE;
 	}
 
 	/**
@@ -7597,7 +7558,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 	 * @param pending  The number of pending uploads.
 	 */
 	public void updateCUProgress(int progress, int pending) {
-		if (drawerItem != DrawerItem.CAMERA_UPLOADS || getCameraUploadFragment() == null
+		if (drawerItem != DrawerItem.PHOTOS || getCameraUploadFragment() == null
 				|| !cuFragment.shouldShowFullInfoAndOptions()) {
 			return;
 		}
@@ -7635,7 +7596,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 		if (hide) {
 			cuLayout.animate().translationY(-100).setDuration(ANIMATION_DURATION)
 					.withEndAction(() -> cuLayout.setVisibility(View.GONE)).start();
-		} else if (drawerItem == DrawerItem.CAMERA_UPLOADS) {
+		} else if (drawerItem == DrawerItem.PHOTOS) {
 			cuLayout.setVisibility(View.VISIBLE);
 			cuLayout.animate().translationY(0).setDuration(ANIMATION_DURATION).start();
 		}
@@ -8568,47 +8529,29 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
                 fileIntent.setType(intent.getType());
                 startActivity(fileIntent);
             }
-        } else if (requestCode == PERMISSIONS_FRAGMENT) {
+        } else if (requestCode == REQUEST_WRITE_STORAGE || requestCode == REQUEST_READ_WRITE_STORAGE) {
 			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-				if (!Environment.isExternalStorageManager()) {
-					Toast.makeText(this,
-							StringResourcesUtils.getString(R.string.snackbar_storage_permission_denied_android_11),
-							Toast.LENGTH_SHORT).show();
-				}
-
-				if (getPermissionsFragment() != null) {
-					pF.setNextPermission();
-				}
-			}
-		} else if (requestCode == REQUEST_WRITE_STORAGE || requestCode == REQUEST_READ_WRITE_STORAGE) {
-			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-				if (!Environment.isExternalStorageManager()) {
-					Toast.makeText(this,
-							StringResourcesUtils.getString(R.string.snackbar_storage_permission_denied_android_11),
-							Toast.LENGTH_SHORT).show();
-				} else {
-					switch (requestCode) {
-						case REQUEST_WRITE_STORAGE:
-							// Take picture scenarios
-							if (typesCameraPermission == TAKE_PICTURE_OPTION) {
-								if (!hasPermissions(this, Manifest.permission.CAMERA)) {
-									requestPermission(this, REQUEST_CAMERA, Manifest.permission.CAMERA);
-								} else {
-									checkTakePicture(this, TAKE_PHOTO_CODE);
-									typesCameraPermission = INVALID_TYPE_PERMISSIONS;
-								}
-								break;
+				switch (requestCode) {
+					case REQUEST_WRITE_STORAGE:
+						// Take picture scenarios
+						if (typesCameraPermission == TAKE_PICTURE_OPTION) {
+							if (!hasPermissions(this, Manifest.permission.CAMERA)) {
+								requestPermission(this, REQUEST_CAMERA, Manifest.permission.CAMERA);
+							} else {
+								checkTakePicture(this, TAKE_PHOTO_CODE);
+								typesCameraPermission = INVALID_TYPE_PERMISSIONS;
 							}
-
-							// General download scenario
-							nodeSaver.handleRequestPermissionsResult(requestCode);
 							break;
+						}
 
-						case REQUEST_READ_WRITE_STORAGE:
-							// Upload scenario
-							new Handler(Looper.getMainLooper()).post(this::showUploadPanel);
-							break;
-					}
+						// General download scenario
+						nodeSaver.handleRequestPermissionsResult(requestCode);
+						break;
+
+					case REQUEST_READ_WRITE_STORAGE:
+						// Upload scenario
+						new Handler(Looper.getMainLooper()).post(this::showUploadPanel);
+						break;
 				}
 			}
 		} else {
@@ -10670,13 +10613,6 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 		return false;
 	}
 
-	public boolean isSmallGridCameraUploads() {
-		return isSmallGridCameraUploads;
-	}
-	public void setSmallGridCameraUploads(boolean isSmallGridCameraUploads) {
-		this.isSmallGridCameraUploads = isSmallGridCameraUploads;
-	}
-
 	public boolean getFirstLogin() {
 		return firstLogin;
 	}
@@ -11035,6 +10971,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 	/**
 	 * This method is used to change the elevation of the AppBarLayout when
 	 * scrolling the RecyclerView
+	 *
 	 * @param withElevation true if need elevation, false otherwise
 	 */
 	public void changeAppBarElevation(boolean withElevation) {
@@ -11761,9 +11698,9 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 		return rubbishBinFLol = (RubbishBinFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.RUBBISH_BIN.getTag());
 	}
 
-	private CameraUploadsFragment getCameraUploadFragment() {
-		return cuFragment = (CameraUploadsFragment) getSupportFragmentManager()
-				.findFragmentByTag(FragmentTag.CAMERA_UPLOADS.getTag());
+	private PhotosFragment getCameraUploadFragment() {
+		return cuFragment = (PhotosFragment) getSupportFragmentManager()
+				.findFragmentByTag(FragmentTag.PHOTOS.getTag());
 	}
 
 	private InboxFragmentLollipop getInboxFragment() {
@@ -11866,7 +11803,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 				}).show(getSupportFragmentManager(),
 						MeetingHasEndedDialogFragment.TAG);
 			} else {
-				CallUtil.checkMeetingInProgress(ManagerActivityLollipop.this, ManagerActivityLollipop.this, chatId, isFromOpenChatPreview, link, request.getMegaHandleList(), request.getText(), alreadyExist, request.getUserHandle());
+				CallUtil.checkMeetingInProgress(ManagerActivityLollipop.this, ManagerActivityLollipop.this, chatId, isFromOpenChatPreview, link, request.getMegaHandleList(), request.getText(), alreadyExist, request.getUserHandle(), passcodeManagement);
 			}
 		} else {
 			logDebug("It's a chat");
@@ -11886,12 +11823,27 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 		}
 	}
 
-	/**
-	 * Checks if the current screen is the main of Home.
-	 *
-	 * @return True if the current screen is the main of Home, false otherwise.
-	 */
-	public boolean isInMainHomePage() {
-		return drawerItem == DrawerItem.HOMEPAGE && mHomepageScreen == HomepageScreen.HOMEPAGE;
-	}
+    /**
+     * Checks if the current screen is the main of Home.
+     *
+     * @return True if the current screen is the main of Home, false otherwise.
+     */
+    public boolean isInMainHomePage() {
+        return drawerItem == DrawerItem.HOMEPAGE && mHomepageScreen == HomepageScreen.HOMEPAGE;
+    }
+
+    /**
+     * Checks if the current screen is photos section of Homepage.
+     *
+     * @return True if the current screen is the photos, false otherwise.
+     */
+    public boolean isInImagesPage() {
+        return drawerItem == DrawerItem.HOMEPAGE && mHomepageScreen == HomepageScreen.IMAGES;
+    }
+
+    public void hideTransferWidget() {
+    	if (transfersWidget != null) {
+			transfersWidget.hide();
+		}
+    }
 }

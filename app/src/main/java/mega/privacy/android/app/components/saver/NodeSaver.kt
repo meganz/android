@@ -508,7 +508,7 @@ class NodeSaver(
     }
 
     private fun doSave() {
-        if (!saving.downloadToGallery() && Util.askMe(app)) {
+        if (!saving.downloadToGallery() && Util.askMe()) {
             requestLocalFolder(null, activityLauncher)
         } else {
             checkSizeBeforeDownload(

@@ -22,6 +22,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.core.content.ContextCompat;
+import androidx.core.view.ViewCompat;
 import androidx.fragment.app.Fragment;
 import androidx.viewpager.widget.ViewPager;
 
@@ -211,6 +212,11 @@ public class TourFragmentLollipop extends Fragment implements View.OnClickListen
                 showParkAccountDialog(parkAccountUrl);
             }
         }
+
+        ViewCompat.setOnApplyWindowInsetsListener(view, (v, insets) -> {
+            view.setPadding(0, 0, 0, insets.getStableInsetBottom());
+            return insets.consumeSystemWindowInsets();
+        });
     }
 
     public void showRecoveryKeyDialog(String recoveryKeyUrl) {

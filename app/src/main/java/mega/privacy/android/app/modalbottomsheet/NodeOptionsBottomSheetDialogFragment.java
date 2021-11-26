@@ -314,7 +314,7 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
                 optionFavourite.setVisibility(View.VISIBLE);
 
                 MimeTypeList nodeMime = MimeTypeList.typeForName(node.getName());
-                if (nodeMime.isImage() || nodeMime.isVideo()) {
+                if (!isAndroid11OrUpper() && (nodeMime.isImage() || nodeMime.isVideo())) {
                     optionGallery.setVisibility(View.VISIBLE);
                 } else {
                     optionGallery.setVisibility(View.GONE);

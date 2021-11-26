@@ -3978,8 +3978,6 @@
     </plurals>
     <!-- Button of the warning dialog indicating the renamed name file extension is not the same to confirm the change. -->
     <string name="action_change_anyway">Cambiar de todos modos</string>
-    <!-- Snackbar text to display if the user doesn't grant the permission to access all files on a device with Android 11 or higher -->
-    <string name="snackbar_storage_permission_denied_android_11">Se necesita permiso de acceso al almacenamiento.</string>
     <!-- String to show the transfer quota and the used space in My Account section. E.g.: -->
     <string name="used_storage_transfer">%1$s / %2$s</string>
     <!-- String to show the transfer quota and the used space in My Account section -->
@@ -4174,4 +4172,30 @@
     <string name="main_view">Vista principal</string>
     <!-- Warning in Offline section alerting all the Offline files will be deleted after logout. -->
     <string name="offline_warning">Si cierras sesión, el contenido sin conexión será eliminado.</string>
+    <!-- Settings category which contains all preferences related to user interface. -->
+    <string name="user_interface_setting">Interfaz de usuario</string>
+    <!-- Setting which allows to choose the start screen. -->
+    <string name="start_screen_setting">Pantalla de inicio</string>
+    <!-- Setting which allows to hide or show the recent activity. -->
+    <string name="hide_recent_setting">Ocultar actividad reciente</string>
+    <!-- Context of a setting which allows to hide or show the recent activity. -->
+    <string name="hide_recent_setting_context">Ocultar la actividad reciente en la sección Inicio.</string>
+    <!-- Title of a dialog informing the start screen can be modified. -->
+    <string name="choose_start_screen_title">Elegir la pantalla de inicio</string>
+    <!-- Test of a dialog informing the start screen can be modified. -->
+    <string name="choose_start_screen_text">Cambiar los ajustes para elegir qué pantalla se abrirá la próxima vez que inicies la aplicación de MEGA.</string>
+    <!-- Action button which allows to change a setting. -->
+    <string name="change_setting_action">Cambiar ajustes</string>
+    <!-- Subtitle of the settings page where the start screen can be chosen. -->
+    <string name="configure_start_screen">Configurar la pantalla de inicio predeterminada</string>
+    <!-- Homepage section. -->
+    <string name="home_section">Inicio</string>
+    <!-- Action button which allows to show the recent activity. -->
+    <string name="show_activity_action">Mostrar actividad</string>
+    <!-- Text informing the recent activity is hidden. -->
+    <string name="recents_activity_hidden">[B]Actividad reciente[/B] oculta</string>
+    <!-- Alert informing the user can choose the video quality for Camera Uploads Videos -->
+    <string name="video_quality_info">Ahorra espacio disminuyendo la calidad de vídeo en los ajustes de las Subidas de la cámara.</string>
+    <!-- Label indicating video original quality -->
+    <string name="original_quality">Calidad original</string>
 </resources>
