@@ -3596,6 +3596,8 @@
     <string name="category_documents">Docs</string>
     <!-- The label under the button of opening all-documents screen -->
     <string name="section_documents">Documents</string>
+    <!-- The label under the button of viewing all images screen -->
+    <string name="section_images">Images</string>
     <!-- Label of the floating action button of opening the new chat conversation -->
     <string name="fab_label_new_chat">New chat</string>
     <!-- Text that indicates that there’s no photo to show -->

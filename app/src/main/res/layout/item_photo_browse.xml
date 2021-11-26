@@ -25,7 +25,6 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_margin="@dimen/photo_grid_margin"
         android:onClick="@{()->(actionModeViewModel.selectedNodes.empty ? itemOperationViewModel.onItemClick(item) : actionModeViewModel.onNodeClick(item))}"
         android:onLongClick="@{()->actionModeViewModel.onNodeLongClick(item)}">
 

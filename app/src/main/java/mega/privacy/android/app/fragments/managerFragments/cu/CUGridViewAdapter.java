@@ -27,13 +27,21 @@ public class CUGridViewAdapter extends RecyclerView.Adapter<CuGridViewHolder>
 
     private final Listener mListener;
     private final List<CuNode> mNodes = new ArrayList<>();
-    private final int mSpanCount;
-    private final CuItemSizeConfig mItemSizeConfig;
+    private int mSpanCount;
+    private CuItemSizeConfig mItemSizeConfig;
 
     public CUGridViewAdapter(Listener listener, int spanCount, CuItemSizeConfig itemSizeConfig) {
         mListener = listener;
         mSpanCount = spanCount;
         mItemSizeConfig = itemSizeConfig;
+    }
+
+    public void setSpanCount(int spanCount){
+        this.mSpanCount = spanCount;
+    }
+
+    public void setCuItemSizeConfig(CuItemSizeConfig itemSizeConfig){
+        this.mItemSizeConfig = itemSizeConfig;
     }
 
     @Override

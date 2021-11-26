@@ -1,7 +1,7 @@
 package mega.privacy.android.app.fragments.managerFragments.cu;
 
 public class CuItemSizeConfig {
-    private final boolean mSmallGrid;
+    private final int mZoom;
     private final int mGridSize;
     private final int mIcSelectedSize;
     private final int mImageMargin;
@@ -9,9 +9,9 @@ public class CuItemSizeConfig {
     private final int mIcSelectedMargin;
     private final int mRoundCornerRadius;
 
-    public CuItemSizeConfig(boolean smallGrid, int gridSize, int icSelectedSize, int imageMargin,
+    public CuItemSizeConfig(int zoom, int gridSize, int icSelectedSize, int imageMargin,
             int imageSelectedPadding, int icSelectedMargin, int roundCornerRadius) {
-        mSmallGrid = smallGrid;
+        mZoom = zoom;
         mGridSize = gridSize;
         mIcSelectedSize = icSelectedSize;
         mImageMargin = imageMargin;
@@ -20,8 +20,8 @@ public class CuItemSizeConfig {
         mRoundCornerRadius = roundCornerRadius;
     }
 
-    public boolean isSmallGrid() {
-        return mSmallGrid;
+    public int getZoom() {
+        return mZoom;
     }
 
     public int getGridSize() {
