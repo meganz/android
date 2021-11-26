@@ -1525,10 +1525,8 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             ((ViewHolderMessageChat) holder).videoIconOwnMessageThumbLand.setVisibility(View.GONE);
             ((ViewHolderMessageChat) holder).videoTimecontentOwnMessageThumbLand.setVisibility(View.GONE);
 
-            ((ViewHolderMessageChat) holder).contentOwnMessageContactLayout.setVisibility(View.GONE);
-            ((ViewHolderMessageChat) holder).contentOwnMessageContactThumb.setVisibility(View.GONE);
-            ((ViewHolderMessageChat) holder).contentOwnMessageContactName.setVisibility(View.GONE);
-            ((ViewHolderMessageChat) holder).contentOwnMessageContactEmail.setVisibility(View.GONE);
+            hideLayoutsContactLinkMessages(position, (ViewHolderMessageChat) holder);
+            hideLayoutsContactAttachmentMessages(position, (ViewHolderMessageChat) holder);
 
             hideLayoutsContactLinkMessages(position, (ViewHolderMessageChat) holder);
 
@@ -1763,6 +1761,10 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             ((ViewHolderMessageChat) holder).contentContactMessageText.setOnLongClickListener(null);
             ((ViewHolderMessageChat) holder).contentOwnMessageText.setOnClickListener(null);
             ((ViewHolderMessageChat) holder).contentOwnMessageText.setOnLongClickListener(null);
+        }
+
+        if (messageType != MegaChatMessage.TYPE_CONTACT_ATTACHMENT) {
+            hideLayoutsContactAttachmentMessages(position, (ViewHolderMessageChat) holder);
         }
 
         if (messageType != MegaChatMessage.TYPE_NORMAL) {
@@ -5243,6 +5245,35 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
     }
 
     /**
+     * Hides all the layouts related to contact attachment messages.
+     *
+     * @param position Position of holder in adapter.
+     * @param holder   ViewHolderMessageChat from which the layouts have to be hidden.
+     */
+    private void hideLayoutsContactAttachmentMessages(int position, ViewHolderMessageChat holder) {
+        if (isHolderNull(position, holder)) {
+            return;
+        }
+
+        holder.contentOwnMessageContactLayout.setVisibility(View.GONE);
+        holder.contentOwnMessageContactLayoutAvatar.setVisibility(View.GONE);
+        holder.contentOwnMessageContactThumb.setVisibility(View.GONE);
+        holder.contentOwnMessageContactVerified.setVisibility(View.GONE);
+        holder.contentOwnMessageContactStatus.setVisibility(View.GONE);
+        holder.contentOwnMessageContactName.setVisibility(View.GONE);
+        holder.contentOwnMessageContactEmail.setVisibility(View.GONE);
+        holder.forwardOwnContact.setVisibility(View.GONE);
+        holder.contentContactMessageContactLayout.setVisibility(View.GONE);
+        holder.forwardContactContact.setVisibility(View.GONE);
+        holder.contentContactMessageContactLayoutAvatar.setVisibility(View.GONE);
+        holder.contentContactMessageContactThumb.setVisibility(View.GONE);
+        holder.contentContactMessageContactVerified.setVisibility(View.GONE);
+        holder.contentContactMessageContactStatus.setVisibility(View.GONE);
+        holder.contentContactMessageContactName.setVisibility(View.GONE);
+        holder.contentContactMessageContactEmail.setVisibility(View.GONE);
+    }
+
+    /**
      * Hides forward option in messages.
      *
      * @param position  Position of holder in adapter.
@@ -5828,6 +5859,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             holder.contentOwnMessageVoiceClipLayout.setVisibility(View.GONE);
 
             holder.contentOwnMessageContactLayout.setVisibility(View.VISIBLE);
+            holder.contentOwnMessageContactLayoutAvatar.setVisibility(View.VISIBLE);
             holder.contentOwnMessageContactThumb.setVisibility(View.VISIBLE);
             holder.contentOwnMessageContactName.setVisibility(View.VISIBLE);
             holder.contentOwnMessageContactEmail.setVisibility(View.VISIBLE);
@@ -5947,6 +5979,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                 holder.forwardContactContact.setVisibility(View.GONE);
             }
 
+            holder.contentContactMessageContactLayoutAvatar.setVisibility(View.VISIBLE);
             holder.contentContactMessageContactThumb.setVisibility(View.VISIBLE);
             holder.contentContactMessageContactName.setVisibility(View.VISIBLE);
             holder.contentContactMessageContactEmail.setVisibility(View.VISIBLE);
