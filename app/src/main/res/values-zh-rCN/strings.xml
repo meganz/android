@@ -3887,8 +3887,6 @@
     </plurals>
     <!-- Button of the warning dialog indicating the renamed name file extension is not the same to confirm the change. -->
     <string name="action_change_anyway">仍要更改</string>
-    <!-- Snackbar text to display if the user doesn't grant the permission to access all files on a device with Android 11 or higher -->
-    <string name="snackbar_storage_permission_denied_android_11">请先开启访问存储所需的权限。</string>
     <!-- String to show the transfer quota and the used space in My Account section. E.g.: -->
     <string name="used_storage_transfer">%1$s/%2$s</string>
     <!-- String to show the transfer quota and the used space in My Account section -->
@@ -4079,4 +4077,30 @@
     <string name="main_view">主视图</string>
     <!-- Warning in Offline section alerting all the Offline files will be deleted after logout. -->
     <string name="offline_warning">登出帐户后，您保存在离线的内容将被删除。</string>
+    <!-- Settings category which contains all preferences related to user interface. -->
+    <string name="user_interface_setting">用户界面</string>
+    <!-- Setting which allows to choose the start screen. -->
+    <string name="start_screen_setting">开始屏幕</string>
+    <!-- Setting which allows to hide or show the recent activity. -->
+    <string name="hide_recent_setting">隐藏近期动态</string>
+    <!-- Context of a setting which allows to hide or show the recent activity. -->
+    <string name="hide_recent_setting_context">隐藏主页中的近期动态。</string>
+    <!-- Title of a dialog informing the start screen can be modified. -->
+    <string name="choose_start_screen_title">选择您的开始屏幕</string>
+    <!-- Test of a dialog informing the start screen can be modified. -->
+    <string name="choose_start_screen_text">通过更改设置可选择MEGA在下次启动时的开始屏幕。</string>
+    <!-- Action button which allows to change a setting. -->
+    <string name="change_setting_action">更改设置</string>
+    <!-- Subtitle of the settings page where the start screen can be chosen. -->
+    <string name="configure_start_screen">配置默认开始屏幕</string>
+    <!-- Homepage section. -->
+    <string name="home_section">主页</string>
+    <!-- Action button which allows to show the recent activity. -->
+    <string name="show_activity_action">显示动态</string>
+    <!-- Text informing the recent activity is hidden. -->
+    <string name="recents_activity_hidden">[B]近期[/B]动态已隐藏</string>
+    <!-- Alert informing the user can choose the video quality for Camera Uploads Videos -->
+    <string name="video_quality_info">您可以在相机上传设置中降低视频质量以节省空间。</string>
+    <!-- Label indicating video original quality -->
+    <string name="original_quality">原始画质</string>
 </resources>

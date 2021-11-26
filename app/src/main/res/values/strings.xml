@@ -3596,6 +3596,8 @@
     <string name="category_documents">Docs</string>
     <!-- The label under the button of opening all-documents screen -->
     <string name="section_documents">Documents</string>
+    <!-- The label under the button of viewing all images screen -->
+    <string name="section_images">Images</string>
     <!-- Label of the floating action button of opening the new chat conversation -->
     <string name="fab_label_new_chat">New chat</string>
     <!-- Text that indicates that there’s no photo to show -->
@@ -3960,8 +3962,6 @@
     </plurals>
     <!-- Button of the warning dialog indicating the renamed name file extension is not the same to confirm the change. -->
     <string name="action_change_anyway">Change anyway</string>
-    <!-- Snackbar text to display if the user doesn't grant the permission to access all files on a device with Android 11 or higher -->
-    <string name="snackbar_storage_permission_denied_android_11">Permission needed to access storage.</string>
     <!-- String to show the transfer quota and the used space in My Account section. E.g.: -->
     <string name="used_storage_transfer">%1$s / %2$s</string>
     <!-- String to show the transfer quota and the used space in My Account section -->

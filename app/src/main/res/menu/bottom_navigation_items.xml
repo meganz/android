@@ -9,7 +9,7 @@
 	<item
 		android:id="@+id/bottom_navigation_item_camera_uploads"
 		android:icon="@drawable/ic_camera_uploads"
-		android:title="@string/section_photo_sync"/>
+		android:title="@string/sortby_type_photo_first"/>
 
 	<item
 		android:id="@+id/bottom_navigation_item_homepage"
