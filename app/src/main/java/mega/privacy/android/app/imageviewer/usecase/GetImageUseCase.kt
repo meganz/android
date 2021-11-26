@@ -51,6 +51,21 @@ class GetImageUseCase @Inject constructor(
         getNodeUseCase.get(nodeHandle).flatMapPublisher { get(it, fullSize, highPriority) }
 
     /**
+     * Get an image given a Node file link.
+     *
+     * @param nodeFileLink  Image Node file link.
+     * @param fullSize      Flag to request full size image.
+     * @param highPriority  Flag to request full image with high priority.
+     * @return              Flowable which emits Uri for every image, from low to high resolution.
+     */
+    fun get(
+        nodeFileLink: String,
+        fullSize: Boolean = false,
+        highPriority: Boolean = false
+    ): Flowable<ImageResult> =
+        getNodeUseCase.getPublicNode(nodeFileLink).flatMapPublisher { get(it, fullSize, highPriority) }
+
+    /**
      * Get an image given a Node.
      *
      * @param node          Image Node to request.

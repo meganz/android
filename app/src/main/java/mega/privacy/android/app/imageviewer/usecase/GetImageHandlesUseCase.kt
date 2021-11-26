@@ -1,21 +1,17 @@
 package mega.privacy.android.app.imageviewer.usecase
 
 import android.content.Context
-import androidx.core.net.toUri
 import dagger.hilt.android.qualifiers.ApplicationContext
 import io.reactivex.rxjava3.core.BackpressureStrategy
 import io.reactivex.rxjava3.core.Flowable
 import io.reactivex.rxjava3.kotlin.subscribeBy
 import mega.privacy.android.app.DatabaseHandler
-import mega.privacy.android.app.MimeTypeList
 import mega.privacy.android.app.di.MegaApi
 import mega.privacy.android.app.imageviewer.data.ImageItem
-import mega.privacy.android.app.imageviewer.data.ImageResult
 import mega.privacy.android.app.usecase.GetGlobalChangesUseCase
 import mega.privacy.android.app.usecase.GetNodeUseCase
 import mega.privacy.android.app.utils.Constants.INVALID_POSITION
 import mega.privacy.android.app.utils.MegaNodeUtil.isValidForImageViewer
-import mega.privacy.android.app.utils.OfflineUtils
 import mega.privacy.android.app.utils.RxUtil.blockingGetOrNull
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
@@ -46,7 +42,7 @@ class GetImageHandlesUseCase @Inject constructor(
      *
      * @param nodeHandles       Image node handles
      * @param parentNodeHandle  Parent node to retrieve every other child
-     * @param nodeFileLink      Node public link
+     * @param nodeFileLinks     Node public link
      * @param sortOrder         Node search order
      * @param isOffline         Flag to check if it's offline node
      * @return                  Flowable with up-todate image nodes
@@ -54,7 +50,7 @@ class GetImageHandlesUseCase @Inject constructor(
     fun get(
         nodeHandles: LongArray? = null,
         parentNodeHandle: Long? = null,
-        nodeFileLink: String? = null,
+        nodeFileLinks: List<String>? = null,
         sortOrder: Int? = ORDER_PHOTO_ASC,
         isOffline: Boolean = false
     ): Flowable<List<ImageItem>> =
@@ -70,17 +66,11 @@ class GetImageHandlesUseCase @Inject constructor(
                         return@create
                     }
                 }
-                isOffline && nodeHandles != null && nodeHandles.isNotEmpty() -> {
-                    items.addOfflineNodeHandles(nodeHandles)
-                }
                 nodeHandles != null && nodeHandles.isNotEmpty() -> {
-                    items.addNodeHandles(nodeHandles)
+                    items.addNodeHandles(nodeHandles, isOffline)
                 }
-                !nodeFileLink.isNullOrBlank() -> {
-                    val node = getNodeUseCase.getPublicNode(nodeFileLink).blockingGetOrNull()
-                    if (node?.isValidForImageViewer() == true) {
-                        items.add(node.toImageItem())
-                    }
+                nodeFileLinks != null && nodeFileLinks.isNotEmpty() -> {
+                    items.addNodeFileLinks(nodeFileLinks)
                 }
                 else -> {
                     emitter.onError(IllegalArgumentException("Invalid parameters"))
@@ -103,18 +93,23 @@ class GetImageHandlesUseCase @Inject constructor(
                         change.nodes?.forEach { changedNode ->
                             val index = items.indexOfFirst { it.handle == changedNode.handle }
 
-                            if (changedNode.hasChanged(CHANGE_TYPE_NEW)
-                                || changedNode.hasChanged(CHANGE_TYPE_PARENT)
-                            ) {
+                            if (changedNode.hasChanged(CHANGE_TYPE_NEW) || changedNode.hasChanged(CHANGE_TYPE_PARENT)) {
                                 val hasSameParent = when {
-                                    changedNode.parentHandle == null -> // getParentHandle() can be null
+                                    changedNode.parentHandle == null -> { // MegaNode.getParentHandle() can be null
                                         false
-                                    parentNodeHandle != null ->
+                                    }
+                                    parentNodeHandle != null -> {
                                         changedNode.parentHandle == parentNodeHandle
-                                    items.isNotEmpty() ->
-                                        changedNode.parentHandle == items[0].nodeItem?.node?.parentHandle
-                                    else ->
+                                    }
+                                    items.isNotEmpty() -> {
+                                        val node = items.firstOrNull { !it.isOffline && it.publicLink == null }
+                                            ?.let { getNodeUseCase.get(it.handle).blockingGetOrNull() }
+
+                                        changedNode.parentHandle == node?.parentHandle
+                                    }
+                                    else -> {
                                         false
+                                    }
                                 }
 
                                 if (hasSameParent) {
@@ -145,15 +140,6 @@ class GetImageHandlesUseCase @Inject constructor(
             }
         }, BackpressureStrategy.LATEST)
 
-    private fun MutableList<ImageItem>.addNodeHandles(nodeHandles: LongArray) {
-        nodeHandles.forEach { nodeHandle ->
-            val node = getNodeUseCase.get(nodeHandle).blockingGetOrNull()
-            if (node?.isValidForImageViewer() == true) {
-                this.add(node.toImageItem())
-            }
-        }
-    }
-
     private fun MutableList<ImageItem>.addChildrenNodes(megaNode: MegaNode, sortOrder: Int) {
         megaApi.getChildren(megaNode, sortOrder).forEach { node ->
             if (node.isValidForImageViewer()) {
@@ -162,40 +148,36 @@ class GetImageHandlesUseCase @Inject constructor(
         }
     }
 
-    private fun MutableList<ImageItem>.addOfflineNodeHandles(nodeHandles: LongArray) {
-        val offlineNodes = databaseHandler.offlineFiles
-        nodeHandles.forEach { nodeHandle ->
-            offlineNodes
-                .find { offlineNode ->
-                    nodeHandle == offlineNode.handle.toLongOrNull() ||
-                            nodeHandle == offlineNode.handleIncoming.toLongOrNull()
-                }?.let { offlineNode ->
-                    val file = OfflineUtils.getOfflineFile(context, offlineNode)
-                    if (file.exists()) {
-                        this.add(
-                            ImageItem(
-                                handle = offlineNode.handle.toLong(),
-                                name = offlineNode.name,
-                                imageResult = ImageResult(
-                                    isVideo = MimeTypeList.typeForName(offlineNode.name).isVideo,
-                                    fullSizeUri = file.toUri()
-                                )
-                            )
-                        )
-                    }
+    private fun MutableList<ImageItem>.addNodeHandles(
+        nodeHandles: LongArray,
+        isOffline: Boolean
+    ) {
+        nodeHandles.forEach { handle ->
+            if (!isOffline) {
+                val node = getNodeUseCase.get(handle).blockingGetOrNull()
+                if (node?.isValidForImageViewer() == true) {
+                    this.add(node.toImageItem())
                 }
+            } else {
+                this.add(ImageItem(handle, null, true))
+            }
+        }
+    }
+
+    private fun MutableList<ImageItem>.addNodeFileLinks(nodeFileLinks: List<String>) {
+        nodeFileLinks.forEach { nodeFileLink ->
+            val node = getNodeUseCase.getPublicNode(nodeFileLink).blockingGetOrNull()
+            if (node?.isValidForImageViewer() == true) {
+                this.add(ImageItem(node.handle, nodeFileLink, false))
+            }
         }
     }
 
     /**
-     * Convert {@link MegaNode} to {@link ImageItem}
+     * Convert {@link MegaOffline} to {@link ImageItem}
      *
      * @return  Resulting ImageItem
      */
-    private fun MegaNode.toImageItem(): ImageItem =
-        ImageItem(
-            handle = handle,
-            name = name,
-            nodeItem = getNodeUseCase.getNodeItem(this).blockingGet()
-        )
+    private fun MegaNode.toImageItem(isOffline: Boolean = false): ImageItem =
+        ImageItem(handle, null, isOffline)
 }

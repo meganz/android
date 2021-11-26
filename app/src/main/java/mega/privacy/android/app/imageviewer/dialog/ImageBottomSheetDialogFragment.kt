@@ -11,6 +11,8 @@ import androidx.core.content.res.ResourcesCompat
 import androidx.core.view.isVisible
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.viewModels
+import com.facebook.drawee.backends.pipeline.Fresco
+import com.facebook.imagepipeline.request.ImageRequest
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.R
@@ -18,7 +20,6 @@ import mega.privacy.android.app.databinding.BottomSheetImageOptionsBinding
 import mega.privacy.android.app.imageviewer.ImageViewerActivity
 import mega.privacy.android.app.imageviewer.ImageViewerViewModel
 import mega.privacy.android.app.imageviewer.data.ImageItem
-import mega.privacy.android.app.interfaces.showSnackbar
 import mega.privacy.android.app.lollipop.FileExplorerActivityLollipop
 import mega.privacy.android.app.lollipop.FileExplorerActivityLollipop.ACTION_PICK_COPY_FOLDER
 import mega.privacy.android.app.lollipop.FileExplorerActivityLollipop.ACTION_PICK_IMPORT_FOLDER
@@ -29,13 +30,14 @@ import mega.privacy.android.app.modalbottomsheet.nodelabel.NodeLabelBottomSheetD
 import mega.privacy.android.app.utils.*
 import mega.privacy.android.app.utils.Constants.*
 import mega.privacy.android.app.utils.ExtraUtils.extraNotNull
-import mega.privacy.android.app.utils.LogUtil.logError
+import mega.privacy.android.app.utils.LogUtil.logWarning
 import mega.privacy.android.app.utils.MegaNodeUtil.getNodeLabelColor
 import mega.privacy.android.app.utils.MegaNodeUtil.getNodeLabelDrawable
 import mega.privacy.android.app.utils.MegaNodeUtil.getNodeLabelText
 import mega.privacy.android.app.utils.StringResourcesUtils.*
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 import nz.mega.sdk.MegaNode
+
 
 /**
  * Bottom Sheet Dialog that represents the UI for a dialog containing image information.
@@ -77,24 +79,28 @@ class ImageBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        viewModel.getImage(imageNodeHandle).observe(viewLifecycleOwner, ::showNodeData)
+        viewModel.onImage(imageNodeHandle).observe(viewLifecycleOwner, ::showNodeData)
         super.onViewCreated(view, savedInstanceState)
     }
 
     @SuppressLint("SetTextI18n")
     private fun showNodeData(imageItem: ImageItem?) {
         if (imageItem?.nodeItem == null) {
-            logError("Image node is null")
-            (activity as? ImageViewerActivity?)?.showSnackbar(StringResourcesUtils.getString(R.string.error_fail_to_open_file_general))
+            logWarning("Image node is null")
             dismiss()
             return
         }
 
         val node = imageItem.nodeItem.node
         val nodeItem = imageItem.nodeItem
-        binding.imgThumbnail.setImageURI(imageItem.imageResult?.getLowestResolutionAvailableUri())
+        val imageUri = imageItem.imageResult?.getLowestResolutionAvailableUri()
 
         binding.apply {
+            imgThumbnail.controller = Fresco.newDraweeControllerBuilder()
+                .setImageRequest(ImageRequest.fromUri(imageUri))
+                .setOldController(binding.imgThumbnail.controller)
+                .build()
+
             txtName.text = node.name
             txtInfo.text = nodeItem.infoText
 

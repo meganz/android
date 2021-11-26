@@ -44,6 +44,9 @@ class GetNodeUseCase @Inject constructor(
     fun getNodeItem(nodeHandle: Long): Single<MegaNodeItem> =
         get(nodeHandle).flatMap(::getNodeItem)
 
+    fun getNodeItem(nodeFileLink: String): Single<MegaNodeItem> =
+        getPublicNode(nodeFileLink).flatMap(::getNodeItem)
+
     fun getNodeItem(node: MegaNode?): Single<MegaNodeItem> =
         Single.fromCallable {
             requireNotNull(node)

@@ -282,7 +282,7 @@ class ImageViewerActivity : BaseActivity(), PermissionRequester, SnackbarShower 
                 error("Invalid params")
         }
 
-        viewModel.getImagesHandle().observe(this) { items ->
+        viewModel.onImagesHandle().observe(this) { items ->
             if (items.isNullOrEmpty()) {
                 logError("Null or empty image items")
                 finish()
@@ -296,9 +296,9 @@ class ImageViewerActivity : BaseActivity(), PermissionRequester, SnackbarShower 
             }
             binding.progress.hide()
         }
-        viewModel.getCurrentImage().observe(this, ::showCurrentImageInfo)
+        viewModel.onCurrentImageNode().observe(this, ::showCurrentImageInfo)
         viewModel.onSwitchToolbar().observe(this) { switchToolbarVisibility() }
-        viewModel.getCurrentPosition().observe(this) { positionPair ->
+        viewModel.onCurrentPosition().observe(this) { positionPair ->
             binding.txtPageCount.apply {
                 text = StringResourcesUtils.getString(
                     R.string.wizard_steps_indicator,

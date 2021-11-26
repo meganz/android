@@ -102,7 +102,8 @@ class ImageViewerPageFragment : Fragment() {
     }
 
     private fun setupObservers() {
-        viewModel.getImage(nodeHandle).observe(viewLifecycleOwner, ::showItem)
+        viewModel.onImage(nodeHandle).observe(viewLifecycleOwner, ::showItem)
+        viewModel.loadSingleNode(nodeHandle)
         viewModel.loadSingleImage(nodeHandle, fullSize = false, highPriority = false)
     }
 
@@ -173,10 +174,11 @@ class ImageViewerPageFragment : Fragment() {
 
     private fun launchVideoScreen(item: ImageItem) {
         val fileUri = item.imageResult?.getHighestResolutionAvailableUri()
+        val nodeName = item.nodeItem?.node?.name
         val intent = Intent(context, VideoPlayerActivity::class.java).apply {
-            setDataAndType(fileUri, MimeTypeList.typeForName(item.name).type)
+            setDataAndType(fileUri, MimeTypeList.typeForName(nodeName).type)
             putExtra(INTENT_EXTRA_KEY_HANDLE, item.handle)
-            putExtra(INTENT_EXTRA_KEY_FILE_NAME, item.name)
+            putExtra(INTENT_EXTRA_KEY_FILE_NAME, nodeName)
             putExtra(INTENT_EXTRA_KEY_ADAPTER_TYPE, FROM_IMAGE_VIEWER)
             putExtra(INTENT_EXTRA_KEY_POSITION, 0)
             putExtra(INTENT_EXTRA_KEY_PARENT_NODE_HANDLE, INVALID_HANDLE)

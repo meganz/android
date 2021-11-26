@@ -7,13 +7,15 @@ import mega.privacy.android.app.usecase.data.MegaNodeItem
  * Data object that encapsulates an item representing an Image.
  *
  * @property handle         Image node handle.
- * @property name           Image file name.
+ * @property publicLink     Node public link.
+ * @property isOffline      Is Offline node.
  * @property nodeItem       Image node item.
  * @property imageResult    Image result containing each Image Uri.
  */
 data class ImageItem constructor(
     val handle: Long,
-    val name: String,
+    val publicLink: String?,
+    val isOffline: Boolean,
     val nodeItem: MegaNodeItem? = null,
     val imageResult: ImageResult? = null
 ) {

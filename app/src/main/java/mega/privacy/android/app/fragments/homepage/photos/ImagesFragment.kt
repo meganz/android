@@ -30,7 +30,7 @@ import mega.privacy.android.app.databinding.FragmentImagesBinding
 import mega.privacy.android.app.fragments.homepage.*
 import mega.privacy.android.app.fragments.managerFragments.cu.*
 import mega.privacy.android.app.fragments.managerFragments.cu.PhotosFragment.*
-import mega.privacy.android.app.lollipop.FullScreenImageViewerLollipop
+import mega.privacy.android.app.imageviewer.ImageViewerActivity
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop
 import mega.privacy.android.app.modalbottomsheet.NodeOptionsBottomSheetDialogFragment
 import mega.privacy.android.app.utils.*
@@ -536,33 +536,14 @@ class ImagesFragment : BaseZoomFragment(){
         listView.findViewHolderForLayoutPosition(nodeItem.index)?.itemView?.findViewById<ImageView>(
             R.id.thumbnail
         )?.also {
-            val intent = Intent(context, FullScreenImageViewerLollipop::class.java)
-
-            intent.putExtra(INTENT_EXTRA_KEY_POSITION, nodeItem.photoIndex)
-            intent.putExtra(
-                INTENT_EXTRA_KEY_ORDER_GET_CHILDREN,
-                MegaApiJava.ORDER_MODIFICATION_DESC
-            )
-
-            intent.putExtra(
-                INTENT_EXTRA_KEY_ADAPTER_TYPE,
-                PHOTOS_BROWSE_ADAPTER
-            )
-
-            intent.putExtra(
-                INTENT_EXTRA_KEY_HANDLE,
-                nodeItem.node?.handle ?: MegaApiJava.INVALID_HANDLE
+            val intent = ImageViewerActivity.getIntentForChildren(
+                requireContext(),
+                childrenHandles = viewModel.getHandlesOfPhotos()!!,
+                currentNodeHandle = nodeItem.node?.handle
             )
             (listView.adapter as? DragThumbnailGetter)?.let {
-                DragToExitSupport.putThumbnailLocation(
-                    intent,
-                    listView,
-                    nodeItem.index,
-                    VIEWER_FROM_PHOTOS,
-                    it
-                )
+                DragToExitSupport.putThumbnailLocation(intent, listView, nodeItem.index, VIEWER_FROM_PHOTOS, it)
             }
-
             startActivity(intent)
             requireActivity().overridePendingTransition(0, 0)
         }
