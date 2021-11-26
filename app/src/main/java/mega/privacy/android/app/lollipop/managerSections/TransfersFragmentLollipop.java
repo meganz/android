@@ -94,8 +94,8 @@ public class TransfersFragmentLollipop extends TransfersBaseFragment implements 
 
 			@Override
 			public boolean onMove(@NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder, @NonNull RecyclerView.ViewHolder target) {
-				int posDragged = viewHolder.getAdapterPosition();
-				newPosition = target.getAdapterPosition();
+				int posDragged = viewHolder.getAbsoluteAdapterPosition();
+				newPosition = target.getAbsoluteAdapterPosition();
 
 				if (draggedTransfer == null) {
 					draggedTransfer = tL.get(posDragged);
