@@ -1526,7 +1526,7 @@ public class FileProviderActivity extends PasscodeFileProviderActivity implement
 		//Set toolbar
 		tB = findViewById(R.id.toolbar_provider);
 
-		RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) tB.getLayoutParams();
+		AppBarLayout.LayoutParams params = (AppBarLayout.LayoutParams) tB.getLayoutParams();
 		params.setMargins(0, 0, 0, 0);
 
 		showAB(tB);
