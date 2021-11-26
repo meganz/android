@@ -5805,7 +5805,14 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 
 	        	return true;
 	        }
-	        case R.id.action_menu_help:{
+			case R.id.action_menu_sort_by:
+				if (drawerItem == DrawerItem.PHOTOS) {
+					showNewSortByPanel(ORDER_CAMERA);
+				}
+
+				return true;
+
+			case R.id.action_menu_help:{
 	        	Intent intent = new Intent();
 	            intent.setAction(Intent.ACTION_VIEW);
 	            intent.addCategory(Intent.CATEGORY_BROWSABLE);
