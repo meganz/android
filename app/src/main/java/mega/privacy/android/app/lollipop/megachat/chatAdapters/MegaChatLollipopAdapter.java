@@ -1528,8 +1528,6 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             hideLayoutsContactLinkMessages(position, (ViewHolderMessageChat) holder);
             hideLayoutsContactAttachmentMessages(position, (ViewHolderMessageChat) holder);
 
-            hideLayoutsContactLinkMessages(position, (ViewHolderMessageChat) holder);
-
             ((ViewHolderMessageChat) holder).urlOwnMessageLayout.setVisibility(View.GONE);
 
             hideLayoutsLocationMessages(position, ((ViewHolderMessageChat) holder));
@@ -5675,6 +5673,13 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
         checkReactionsInMessage(positionInAdapter, holder, chatRoom.getChatId(), androidMessage);
     }
 
+    /**
+     * Draws a contact link message.
+     *
+     * @param holder         ViewHolder in which the message has to be drawn.
+     * @param androidMessage Android message to draw.
+     * @param position       Adapter position.
+     */
     private void bindContactLinkMessage(ViewHolderMessageChat holder, AndroidMegaChatMessage androidMessage, int position) {
         logDebug("bindContactLinkMessage");
 
