@@ -40,6 +40,7 @@ import mega.privacy.android.app.lollipop.TwoFactorAuthenticationActivity;
 import mega.privacy.android.app.lollipop.VerifyTwoFactorActivity;
 import mega.privacy.android.app.sync.BackupToolsKt;
 import mega.privacy.android.app.psa.PsaManager;
+import mega.privacy.android.app.utils.ZoomUtil;
 import mega.privacy.android.app.utils.contacts.MegaContactGetter;
 import mega.privacy.android.app.utils.LastShowSMSDialogTimeChecker;
 import nz.mega.sdk.MegaApiAndroid;
@@ -395,6 +396,9 @@ public class AccountController {
         //clear user interface preferences
         context.getSharedPreferences(USER_INTERFACE_PREFERENCES, Context.MODE_PRIVATE)
                 .edit().clear().apply();
+
+        //reset zoom level
+        ZoomUtil.INSTANCE.resetZoomLevel();
 
         removeEmojisSharedPreferences();
 
