@@ -11,13 +11,15 @@ import mega.privacy.android.app.usecase.data.MegaNodeItem
  * @property isOffline      Is Offline node.
  * @property nodeItem       Image node item.
  * @property imageResult    Image result containing each Image Uri.
+ * @property isDirty        Flag to check if Node needs to be updated
  */
 data class ImageItem constructor(
     val handle: Long,
     val publicLink: String?,
     val isOffline: Boolean,
     val nodeItem: MegaNodeItem? = null,
-    val imageResult: ImageResult? = null
+    val imageResult: ImageResult? = null,
+    val isDirty: Boolean = false
 ) {
 
     class DiffCallback : DiffUtil.ItemCallback<ImageItem>() {

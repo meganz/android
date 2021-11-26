@@ -116,7 +116,7 @@ class ImageViewerViewModel @ViewModelInject constructor(
     fun loadSingleNode(nodeHandle: Long) {
         val existingNode = images.value?.find { it.handle == nodeHandle }
         val subscription = when {
-            existingNode?.nodeItem?.node != null ->
+            existingNode?.nodeItem?.node != null && !existingNode.isDirty ->
                 getNodeUseCase.getNodeItem(existingNode.nodeItem.node)
             existingNode?.publicLink != null && existingNode.publicLink.isNotBlank() ->
                 getNodeUseCase.getNodeItem(existingNode.publicLink)
@@ -190,11 +190,17 @@ class ImageViewerViewModel @ViewModelInject constructor(
             val index = currentItems.indexOfFirst { it.handle == nodeHandle }
             if (index != INVALID_POSITION) {
                 val currentItem = currentItems[index]
-                if (nodeItem != null && nodeItem != currentItem.nodeItem) {
-                    currentItems[index] = currentItem.copy(nodeItem = nodeItem)
+                if (nodeItem != null) {
+                    currentItems[index] = currentItem.copy(
+                        nodeItem = nodeItem,
+                        isDirty = false
+                    )
                 }
-                if (imageResult != null && imageResult != currentItem.imageResult) {
-                    currentItems[index] = currentItem.copy(imageResult = imageResult)
+                if (imageResult != null) {
+                    currentItems[index] = currentItem.copy(
+                        imageResult = imageResult,
+                        isDirty = false
+                    )
                 }
                 images.value = currentItems.toList()
                 if (index == currentPosition.value) {
@@ -348,13 +354,18 @@ class ImageViewerViewModel @ViewModelInject constructor(
                                     currentItemPosition
                             }
 
+                            val dirtyNodeHandles = mutableListOf<Long>()
                             images.value = items.map { item ->
                                 val existingNode = images.value?.find { it.handle == item.handle }
+                                if (item.isDirty) {
+                                    dirtyNodeHandles.add(item.handle)
+                                }
                                 item.copy(
                                     imageResult = existingNode?.imageResult,
                                     nodeItem = existingNode?.nodeItem
                                 )
                             }
+                            dirtyNodeHandles.forEach(::loadSingleNode)
                             updateCurrentPosition(newPosition, true)
                         }
                     }

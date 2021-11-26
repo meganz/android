@@ -114,7 +114,7 @@ class GetImageHandlesUseCase @Inject constructor(
 
                                 if (hasSameParent) {
                                     if (changedNode.hasChanged(CHANGE_TYPE_PARENT)) {
-                                        items[index] = changedNode.toImageItem()
+                                        items[index] = changedNode.toImageItem(isDirty = true)
                                     } else if (changedNode.isValidForImageViewer()) {
                                         items.add(changedNode.toImageItem())
                                     }
@@ -125,7 +125,7 @@ class GetImageHandlesUseCase @Inject constructor(
                                 if (changedNode.hasChanged(CHANGE_TYPE_REMOVED)) {
                                     items.removeAt(index)
                                 } else {
-                                    items[index] = changedNode.toImageItem()
+                                    items[index] = changedNode.toImageItem(isDirty = true)
                                 }
                             }
                         }
@@ -176,8 +176,13 @@ class GetImageHandlesUseCase @Inject constructor(
     /**
      * Convert {@link MegaOffline} to {@link ImageItem}
      *
+     * @param isOffline Flag to check if Node is available offline
+     * @param isDirty   Flag to check if Node needs to be updated
      * @return  Resulting ImageItem
      */
-    private fun MegaNode.toImageItem(isOffline: Boolean = false): ImageItem =
-        ImageItem(handle, null, isOffline)
+    private fun MegaNode.toImageItem(
+        isOffline: Boolean = false,
+        isDirty: Boolean = false
+    ): ImageItem =
+        ImageItem(handle, null, isOffline = isOffline, isDirty = isDirty)
 }
