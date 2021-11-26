@@ -433,6 +433,7 @@ class CuViewModel extends BaseRxViewModel {
                     thumbnail.exists() ? thumbnail : null,
                     isVideoFile(node.getName()) ? CuNode.TYPE_VIDEO : CuNode.TYPE_IMAGE,
                     dateString,
+                    null,
                     mSelectedNodes.containsKey(node.getHandle()));
 
             if (mZoom == ZoomUtil.ZOOM_OUT_2X) {
