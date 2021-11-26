@@ -285,6 +285,7 @@ open class BaseBottomSheetDialogFragment : BottomSheetDialogFragment(), Activity
                 val windowInsets = requireActivity().window.decorView.rootWindowInsets
 
                 if (windowInsets != null) {
+                    @Suppress("DEPRECATION")
                     val insets =
                         WindowInsetsCompat.toWindowInsetsCompat(windowInsets).systemWindowInsets
 

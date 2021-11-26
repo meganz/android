@@ -14,8 +14,4 @@ class CrashReporterImpl : CrashReporter {
     override fun setEnabled(enabled: Boolean) {
         agConnectCrash.enableCrashCollection(enabled)
     }
-
-    override fun setEnabled(enabled: Boolean) {
-        // Haven't implemented for HMS.
-    }
 }
