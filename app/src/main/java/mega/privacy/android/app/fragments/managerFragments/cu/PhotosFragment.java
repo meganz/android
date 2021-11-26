@@ -730,6 +730,8 @@ public class PhotosFragment extends BaseZoomFragment implements CUGridViewAdapte
                 int cuNodePosition = gridAdapter.getNodePosition(card.getNode().getHandle());
                 openNode(cuNodePosition, gridAdapter.getNodeAtPosition(cuNodePosition));
                 layoutManager.scrollToPosition(cuNodePosition);
+
+                mManagerActivity.showBottomView();
                 break;
 
             case MONTHS_VIEW:
@@ -742,7 +744,6 @@ public class PhotosFragment extends BaseZoomFragment implements CUGridViewAdapte
                 layoutManager.scrollToPosition(viewModel.yearClicked(position, card));
                 break;
         }
-        mManagerActivity.showBottomView();
     }
 
     public void updateProgress(int visibility, int pending) {

@@ -3600,8 +3600,8 @@
     <string name="section_images">Images</string>
     <!-- Label of the floating action button of opening the new chat conversation -->
     <string name="fab_label_new_chat">New chat</string>
-    <!-- Text that indicates that there’s no photo to show -->
-    <string name="homepage_empty_hint_photos">No photos found</string>
+    <!-- Text that indicates that there’s no image to show in image section -->
+    <string name="homepage_empty_hint_photos">No images found</string>
     <!-- Text that indicates that there’s no document to show -->
     <string name="homepage_empty_hint_documents">No documents found</string>
     <!-- Text that indicates that there’s no audio to show -->
