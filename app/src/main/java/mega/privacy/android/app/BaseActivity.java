@@ -1298,43 +1298,21 @@ public class BaseActivity extends AppCompatActivity implements ActivityLauncher,
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent intent) {
         logDebug("Request code: " + requestCode + ", Result code:" + resultCode);
 
-        switch (requestCode) {
-            case REQUEST_WRITE_STORAGE_FOR_LOGS:
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-                    onRequestWriteStorageForLogs(Environment.isExternalStorageManager());
-                }
-                break;
+        if (requestCode == REQ_CODE_BUY) {
+            if (resultCode == Activity.RESULT_OK) {
+                int purchaseResult = billingManager.getPurchaseResult(intent);
 
-            case REQUEST_WRITE_STORAGE:
-            case REQUEST_READ_WRITE_STORAGE:
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-                    if (!Environment.isExternalStorageManager()) {
-                        Toast.makeText(this,
-                                StringResourcesUtils.getString(R.string.snackbar_storage_permission_denied_android_11),
-                                Toast.LENGTH_SHORT).show();
-                    }
-                }
-                break;
-
-            case REQ_CODE_BUY:
-                if (resultCode == Activity.RESULT_OK) {
-                    int purchaseResult = billingManager.getPurchaseResult(intent);
-
-                    if (BillingManager.ORDER_STATE_SUCCESS == purchaseResult) {
-                        billingManager.updatePurchase();
-                    } else {
-                        logWarning("Purchase failed, error code: " + purchaseResult);
-                    }
+                if (BillingManager.ORDER_STATE_SUCCESS == purchaseResult) {
+                    billingManager.updatePurchase();
                 } else {
-                    logWarning("cancel subscribe");
+                    logWarning("Purchase failed, error code: " + purchaseResult);
                 }
-
-                break;
-
-            default:
-                logWarning("No request code processed");
-                super.onActivityResult(requestCode, resultCode, intent);
-                break;
+            } else {
+                logWarning("cancel subscribe");
+            }
+        } else {
+            logWarning("No request code processed");
+            super.onActivityResult(requestCode, resultCode, intent);
         }
     }
 
