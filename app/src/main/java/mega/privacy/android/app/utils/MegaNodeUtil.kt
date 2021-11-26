@@ -514,8 +514,7 @@ object MegaNodeUtil {
             R.drawable.backup
         } else if (node.parentHandle == myBackupHandle) {
             getMyBackupSubFolderIcon(node)
-        } else if (BACKUP_SUBFOLDER == checkBackupNodeTypeByHandle(MegaApplication.getInstance().megaApi,node)
-            || BACKUP_SUB_DEVICE_FOLDER == checkBackupNodeTypeByHandle(MegaApplication.getInstance().megaApi,node)) {
+        } else if (BACKUP_SUB_DEVICE_FOLDER == checkBackupNodeTypeByHandle(MegaApplication.getInstance().megaApi,node)) {
             R.drawable.ic_folder_backup
         } else{
             R.drawable.ic_folder_list

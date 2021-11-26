@@ -28,6 +28,7 @@ import static mega.privacy.android.app.utils.Constants.EVENT_NOTIFICATION_COUNT_
 import static mega.privacy.android.app.utils.Constants.EXTRA_STORAGE_STATE;
 import static mega.privacy.android.app.utils.LogUtil.logDebug;
 import static nz.mega.sdk.MegaApiJava.USER_ATTR_CAMERA_UPLOADS_FOLDER;
+import static nz.mega.sdk.MegaApiJava.USER_ATTR_MY_BACKUPS_FOLDER;
 
 public class GlobalListener implements MegaGlobalListenerInterface {
 
@@ -89,6 +90,13 @@ public class GlobalListener implements MegaGlobalListenerInterface {
             // Receive the avatar change, send the event
             if (user.hasChanged(MegaUser.CHANGE_TYPE_AVATAR) && user.isOwnChange() == 0){
                 LiveEventBus.get(EVENT_MEETING_AVATAR_CHANGE, Long.class).post(user.getHandle());
+            }
+
+            if (user.hasChanged(MegaUser.CHANGE_TYPE_MY_BACKUPS_FOLDER) && isMyChange) {
+                //user has change backup attribute, need to update local ones
+                logDebug("Get backup attribute when change on other client.");
+                api.getUserAttribute(USER_ATTR_MY_BACKUPS_FOLDER, new GetCuAttributeListener(megaApplication));
+                break;
             }
         }
     }
