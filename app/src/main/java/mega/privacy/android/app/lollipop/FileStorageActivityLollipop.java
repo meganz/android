@@ -1241,8 +1241,12 @@ public class FileStorageActivityLollipop extends PasscodeActivity implements OnC
 
                 finishPickFolder();
             }
-        } else if (requestCode == REQUEST_SAVE_RK && intent != null && resultCode == Activity.RESULT_OK) {
-			setResult(RESULT_OK, new Intent().setData(intent.getData()));
+        } else if (requestCode == REQUEST_SAVE_RK) {
+			if (intent != null && resultCode == Activity.RESULT_OK) {
+				setResult(RESULT_OK, new Intent().setData(intent.getData()));
+			}
+
+			//If resultCode is not Activity.RESULT_OK, means cancelled, so only finish.
 			finish();
 		}
     }
