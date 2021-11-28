@@ -915,8 +915,6 @@ public class FullScreenImageViewerLollipop extends PasscodeActivity
 			File offlineDirectory = new File(currentImage.getParent());
 
 			paths.clear();
-			int imageNumber = 0;
-			int index = 0;
 			File[] fList = offlineDirectory.listFiles();
 			if(fList == null)
 			{
@@ -930,17 +928,16 @@ public class FullScreenImageViewerLollipop extends PasscodeActivity
 			}
 
 			logDebug("SIZE: " + zipFiles.size());
-			for (File f : zipFiles){
-				logDebug("F: " + f.getAbsolutePath());
-				if (MimeTypeList.typeForName(f.getName()).isImage()){
-					paths.add(f.getAbsolutePath());
-					if (index == positionG && savedInstanceState == null){
-						positionG = imageNumber;
-					}
-					imageNumber++;
-				}
-				index++;
-			}
+
+            for (int i = 0; i < zipFiles.size(); i++) {
+                File f = zipFiles.get(i);
+
+                if (MimeTypeList.typeForName(f.getName()).isImage()){
+                    paths.add(f.getAbsolutePath());
+                } else {
+                    positionG--;
+                }
+            }
 
 			if(paths.size() == 0) finish();
 

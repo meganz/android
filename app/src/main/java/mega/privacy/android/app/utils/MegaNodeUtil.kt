@@ -1764,7 +1764,13 @@ object MegaNodeUtil {
     }
 
     /**
+     * Handle the event when a node is tapped.
      *
+     * @param context Android context
+     * @param node The node tapped.
+     * @param nodeDownloader Function/Methd for downloading node.
+     * @param activityLauncher interface to launch activity
+     * @param snackbarShower interface to show snackbar
      */
     @JvmStatic
     fun onNodeTapped(
