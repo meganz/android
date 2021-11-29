@@ -186,20 +186,15 @@ object PermissionUtils {
         }
         if (context != null) {
             for (permission in permissions) {
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R &&
-                    (permission == Manifest.permission.WRITE_EXTERNAL_STORAGE || permission == Manifest.permission.READ_EXTERNAL_STORAGE)
-                ) {
-                    if (!Environment.isExternalStorageManager()) {
+                // In Android 11+ WRITE_EXTERNAL_STORAGE doesn't grant any addition access so can assume it has been granted
+                if (Build.VERSION.SDK_INT < Build.VERSION_CODES.R || permission != Manifest.permission.WRITE_EXTERNAL_STORAGE) {
+                    if (ContextCompat.checkSelfPermission(
+                            context,
+                            permission
+                        ) != PackageManager.PERMISSION_GRANTED
+                    ) {
                         return false
                     }
-                } else if (permission.let {
-                        ContextCompat.checkSelfPermission(
-                            context,
-                            it
-                        )
-                    } != PackageManager.PERMISSION_GRANTED
-                ) {
-                    return false
                 }
             }
         }
@@ -213,62 +208,12 @@ object PermissionUtils {
      * @param permissions requested permissions
      */
     @JvmStatic
-    fun requestPermission(@NonNull activity: Activity, @NonNull requestCode: Int, @NonNull vararg permissions: String) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-            for (permission in permissions) {
-                if (permission == Manifest.permission.WRITE_EXTERNAL_STORAGE || permission == Manifest.permission.READ_EXTERNAL_STORAGE) {
-                    if (!Environment.isExternalStorageManager()) {
-                        requestManageExternalStoragePermission(activity, requestCode)
-                        return
-                    }
-                }
-            }
-        }
+    fun requestPermission(@NonNull activity: Activity, @NonNull requestCode: Int, @NonNull vararg permissions: String?) {
         ActivityCompat.requestPermissions(
             activity,
             permissions,
             requestCode
         )
-    }
-
-    /**
-     * Ask for the MANAGE_EXTERNAL_STORAGE special permission required by the app since Android 11
-     *
-     * @param context Context
-     * @param requestCode request code of permission asking
-     */
-    @JvmStatic
-    @TargetApi(Build.VERSION_CODES.R)
-    fun requestManageExternalStoragePermission(@NonNull context: Context, requestCode: Int) {
-        var intent: Intent? = null
-        try {
-            intent = Intent(Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION)
-            intent.addCategory("android.intent.category.DEFAULT")
-            intent.data = Uri.parse(String.format("package:%s", context.packageName))
-        } catch (e: Exception) {
-            intent = Intent()
-            intent.action = Settings.ACTION_MANAGE_ALL_FILES_ACCESS_PERMISSION
-        } finally {
-            var activity: Activity? = null
-            when (context) {
-                is ManagerActivityLollipop -> {
-                    activity = context
-                }
-                is LoginActivityLollipop -> {
-                    activity = context
-                }
-                is FileProviderActivity -> {
-                    activity = context
-                }
-                is CameraUploadsPreferencesActivity -> {
-                    activity = context
-                }
-                is BaseActivity -> {
-                    activity = context
-                }
-            }
-            activity?.startActivityForResult(intent, requestCode)
-        }
     }
 
     /**
