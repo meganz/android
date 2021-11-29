@@ -98,6 +98,10 @@ public class SettingsConstants {
     public static final String KEY_CLEAR_VERSIONS = "settings_file_management_clear_version";
     public static final String KEY_AUTO_PLAY_SWITCH = "auto_play_switch";
 
+    /* User interface settings */
+    public static final String KEY_START_SCREEN = "settings_start_screen";
+    public static final String KEY_HIDE_RECENT_ACTIVITY = "settings_hide_recent_activity";
+
     /* PassCode Lock settings */
     public static final String KEY_PASSCODE_ENABLE = "settings_passcode_enable";
     public static final String KEY_RESET_PASSCODE = "settings_change_passcode";

@@ -41,9 +41,6 @@
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
     <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
     <uses-permission android:name="android.permission.USE_FULL_SCREEN_INTENT" />
-    <uses-permission
-        android:name="android.permission.MANAGE_EXTERNAL_STORAGE"
-        tools:ignore="ScopedStorage" />
 
     <!--<uses-permission android:name="android.permission.READ_CALL_LOG"/>-->
     <!--<uses-permission android:name="android.permission.WRITE_CALL_LOG"/>-->
@@ -695,6 +692,12 @@
             android:name=".activities.AskForDisplayOverActivity"
             android:theme="@android:style/Theme.Translucent.NoTitleBar.Fullscreen"
             android:launchMode="singleTask"/>
+
+        <activity
+            android:name="mega.privacy.android.app.activities.settingsActivities.StartScreenPreferencesActivity"
+            android:label="@string/start_screen_setting"
+            android:launchMode="singleTop">
+        </activity>
 
     </application>
 

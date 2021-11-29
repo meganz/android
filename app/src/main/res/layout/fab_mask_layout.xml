@@ -11,6 +11,7 @@
         android:background="@color/grey_600_085_dark_grey_070"/>
 
     <include
+        android:id="@+id/fabs_in_mask"
         layout="@layout/homepage_fabs"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

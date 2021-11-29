@@ -10,8 +10,6 @@ import androidx.navigation.NavGraph
 import androidx.navigation.fragment.NavHostFragment
 import com.jeremyliao.liveeventbus.LiveEventBus
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.android.synthetic.main.activity_meeting.*
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import mega.privacy.android.app.BaseActivity
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
@@ -52,7 +50,7 @@ class MeetingActivity : BaseActivity() {
     @Inject
     lateinit var passcodeUtil: PasscodeUtil
 
-    private lateinit var binding: ActivityMeetingBinding
+    lateinit var binding: ActivityMeetingBinding
     private val meetingViewModel: MeetingActivityViewModel by viewModels()
 
     private var meetingAction: String? = null
@@ -69,9 +67,18 @@ class MeetingActivity : BaseActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        if (shouldRefreshSessionDueToSDK() || shouldRefreshSessionDueToKarere()) {
-            if (intent != null) {
-                intent.getLongExtra(MEETING_CHAT_ID, MEGACHAT_INVALID_HANDLE).let { chatId ->
+        intent?.let {
+            isGuest = intent.getBooleanExtra(
+                MEETING_IS_GUEST,
+                false
+            )
+        }
+
+        if ((isGuest && shouldRefreshSessionDueToMegaApiIsNull()) ||
+            (!isGuest && shouldRefreshSessionDueToSDK()) || shouldRefreshSessionDueToKarere()
+        ) {
+            intent?.let {
+                it.getLongExtra(MEETING_CHAT_ID, MEGACHAT_INVALID_HANDLE).let { chatId ->
                     if (chatId != MEGACHAT_INVALID_HANDLE) {
                         //Notification of this call should be displayed again
                         MegaApplication.getChatManagement().removeNotificationShown(chatId)
@@ -81,6 +88,7 @@ class MeetingActivity : BaseActivity() {
             return
         }
 
+        @Suppress("DEPRECATION")
         window.decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_LAYOUT_STABLE or 0x00000010
 
         binding = ActivityMeetingBinding.inflate(layoutInflater)
@@ -98,15 +106,15 @@ class MeetingActivity : BaseActivity() {
         setStatusBarTranslucent()
     }
 
+    @Suppress("DEPRECATION")
     private fun setStatusBarTranslucent() {
         val decorView: View = window.decorView
 
         decorView.setOnApplyWindowInsetsListener { v: View, insets: WindowInsets? ->
             val defaultInsets = v.onApplyWindowInsets(insets)
 
-            toolbar.setMarginTop(defaultInsets.systemWindowInsetTop)
+            binding.toolbar.setMarginTop(defaultInsets.systemWindowInsetTop)
 
-            @Suppress("DEPRECATION")
             defaultInsets.replaceSystemWindowInsets(
                 defaultInsets.systemWindowInsetLeft,
                 0,
@@ -208,7 +216,6 @@ class MeetingActivity : BaseActivity() {
         navController.setGraph(navGraph, bundle)
     }
 
-    @ExperimentalCoroutinesApi
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
             android.R.id.home -> {
@@ -252,7 +259,6 @@ class MeetingActivity : BaseActivity() {
         sendQuitCallEvent()
     }
 
-    @ExperimentalCoroutinesApi
     override fun onResume() {
         super.onResume()
 
@@ -263,7 +269,6 @@ class MeetingActivity : BaseActivity() {
         }
     }
 
-    @ExperimentalCoroutinesApi
     override fun onBackPressed() {
         val currentFragment = getCurrentFragment()
 
