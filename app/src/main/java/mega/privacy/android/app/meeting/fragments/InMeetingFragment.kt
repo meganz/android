@@ -5,7 +5,6 @@ import android.app.Dialog
 import android.content.Context
 import android.content.Intent
 import android.content.pm.ActivityInfo
-import android.content.pm.PackageManager
 import android.content.res.Configuration
 import android.os.Build
 import android.os.Bundle
@@ -109,10 +108,10 @@ class InMeetingFragment : BaseFragment(), BottomFloatingPanelListener, SnackbarS
     StartChatCallListener.StartChatCallCallback, AnswerChatCallListener.OnCallAnsweredCallback,
     AutoJoinPublicChatListener.OnJoinedChatCallback {
 
-        @Inject
+    @Inject
     lateinit var passcodeManagement: PasscodeManagement
 
-        private lateinit var meetingActivity: MeetingActivity
+    private lateinit var meetingActivity: MeetingActivity
     private lateinit var permissionsRequester: PermissionsRequester
     private var bCountDownTimerStart: Boolean = false
     private var bInviteSent: Boolean = false
@@ -835,7 +834,7 @@ class InMeetingFragment : BaseFragment(), BottomFloatingPanelListener, SnackbarS
     override fun onAttach(context: Context) {
         super.onAttach(context)
         // Do not share the instance with other permission check process, because the callback functions are different.
-        permissionsRequester = permissionsBuilder(permissions.toCollection(ArrayList()))
+        permissionsRequester = permissionsBuilder(permissions)
             .setOnPermissionDenied { l -> onPermissionDenied(l, meetingPermissionCallbacks) }
             .setOnRequiresPermission { l -> onRequiresPermission(l, meetingPermissionCallbacks) }
             .setOnShowRationale { l -> onShowRationale(l) }
@@ -1073,9 +1072,7 @@ class InMeetingFragment : BaseFragment(), BottomFloatingPanelListener, SnackbarS
         sharedModel.cameraPermissionCheck.observe(viewLifecycleOwner) {
             if (it) {
                 permissionsBuilder(
-                    arrayOf(Manifest.permission.CAMERA).toCollection(
-                        ArrayList()
-                    )
+                    arrayOf(Manifest.permission.CAMERA)
                 )
                     .setOnRequiresPermission { l ->
                         run {
@@ -1093,9 +1090,7 @@ class InMeetingFragment : BaseFragment(), BottomFloatingPanelListener, SnackbarS
         sharedModel.recordAudioPermissionCheck.observe(viewLifecycleOwner) {
             if (it) {
                 permissionsBuilder(
-                    arrayOf(Manifest.permission.RECORD_AUDIO).toCollection(
-                        ArrayList()
-                    )
+                    arrayOf(Manifest.permission.RECORD_AUDIO)
                 )
                     .setOnRequiresPermission { l ->
                         run {
@@ -2838,7 +2833,7 @@ class InMeetingFragment : BaseFragment(), BottomFloatingPanelListener, SnackbarS
 
         // Use A New Instance to Check Permissions
         // Do not share the instance with other permission check process, because the callback functions are different.
-        permissionsBuilder(permissions.toCollection(ArrayList()))
+        permissionsBuilder(permissions)
             .setPermissionRequestType(PermissionType.CheckPermission)
             .setOnRequiresPermission { l ->
                 onRequiresPermission(l, meetingPermissionCallbacks)

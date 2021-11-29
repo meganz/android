@@ -139,7 +139,10 @@ object PermissionUtils {
      * @return false if the user ticket 'Don't ask again' and deny, otherwise true.
      */
     @JvmStatic
-    fun shouldShowRequestPermissionRationale(@NonNull activity: Activity, @NonNull permission: String): Boolean {
+    fun shouldShowRequestPermissionRationale(
+        @NonNull activity: Activity,
+        @NonNull permission: String
+    ): Boolean {
         return ActivityCompat.shouldShowRequestPermissionRationale(activity, permission)
     }
 
@@ -177,7 +180,7 @@ object PermissionUtils {
      * Check permissions whether are granted
      * @param context Context
      * @param permissions one or more permission strings
-     * @return whether permissions has ben granted
+     * @return whether permissions has been granted
      */
     @JvmStatic
     fun hasPermissions(context: Context?, vararg permissions: String): Boolean {
@@ -208,7 +211,11 @@ object PermissionUtils {
      * @param permissions requested permissions
      */
     @JvmStatic
-    fun requestPermission(@NonNull activity: Activity, @NonNull requestCode: Int, @NonNull vararg permissions: String?) {
+    fun requestPermission(
+        @NonNull activity: Activity,
+        @NonNull requestCode: Int,
+        @NonNull vararg permissions: String?
+    ) {
         ActivityCompat.requestPermissions(
             activity,
             permissions,
@@ -235,7 +242,10 @@ object PermissionUtils {
      * @param permissions permission list
      */
     @JvmStatic
-    fun onPermissionDenied(permissions: ArrayList<String>, permissionCallbacks: PermissionCallbacks) {
+    fun onPermissionDenied(
+        permissions: ArrayList<String>,
+        permissionCallbacks: PermissionCallbacks
+    ) {
         permissionCallbacks.onPermissionsCallback(TYPE_DENIED, permissions)
     }
 

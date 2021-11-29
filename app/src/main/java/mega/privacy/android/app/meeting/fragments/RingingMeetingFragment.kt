@@ -3,7 +3,6 @@ package mega.privacy.android.app.meeting.fragments
 import android.Manifest
 import android.annotation.SuppressLint
 import android.content.Context
-import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -205,9 +204,7 @@ class RingingMeetingFragment : BaseFragment(),
         sharedModel.cameraPermissionCheck.observe(viewLifecycleOwner) {
             if (it) {
                 permissionsRequester = permissionsBuilder(
-                    arrayOf(Manifest.permission.CAMERA).toCollection(
-                        ArrayList()
-                    )
+                    arrayOf(Manifest.permission.CAMERA)
                 )
                     .setOnRequiresPermission { l -> onRequiresPermission(l, meetingPermissionCallbacks) }
                     .setOnShowRationale { l -> onShowRationale(l) }
@@ -220,9 +217,7 @@ class RingingMeetingFragment : BaseFragment(),
         sharedModel.recordAudioPermissionCheck.observe(viewLifecycleOwner) {
             if (it) {
                 permissionsRequester = permissionsBuilder(
-                    arrayOf(Manifest.permission.RECORD_AUDIO).toCollection(
-                        ArrayList()
-                    )
+                    arrayOf(Manifest.permission.RECORD_AUDIO)
                 )
                     .setOnRequiresPermission { l -> onRequiresPermission(l, meetingPermissionCallbacks) }
                     .setOnShowRationale { l -> onShowRationale(l) }
@@ -235,7 +230,7 @@ class RingingMeetingFragment : BaseFragment(),
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
-        permissionsRequester = permissionsBuilder(permissions.toCollection(ArrayList()))
+        permissionsRequester = permissionsBuilder(permissions)
             .setOnPermissionDenied { l -> onPermissionDenied(l, meetingPermissionCallbacks) }
             .setOnRequiresPermission { l -> onRequiresPermission(l, meetingPermissionCallbacks) }
             .setOnShowRationale { l -> onShowRationale(l) }
@@ -248,7 +243,7 @@ class RingingMeetingFragment : BaseFragment(),
         super.onResume()
         // Use A New Instance to Check Permissions
         // Do not share the instance with other permission check process, because the callback functions are different.
-        permissionsBuilder(permissions.toCollection(ArrayList()))
+        permissionsBuilder(permissions)
             .setPermissionRequestType(PermissionType.CheckPermission)
             .setOnRequiresPermission { l ->
                 onRequiresPermission(l, meetingPermissionCallbacks)

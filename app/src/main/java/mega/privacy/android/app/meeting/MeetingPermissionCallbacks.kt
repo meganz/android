@@ -5,7 +5,13 @@ import mega.privacy.android.app.meeting.activity.MeetingActivityViewModel
 import mega.privacy.android.app.utils.LogUtil
 import mega.privacy.android.app.utils.permission.PermissionUtils
 
-open class MeetingPermissionCallbacks(val viewModel: MeetingActivityViewModel) : PermissionUtils.PermissionCallbacks {
+/**
+ * Class which allows implement only the necessary callbacks of PermissionUtils.PermissionCallbacks.
+ *
+ * @param viewModel The instance of MeetingActivityViewModel
+ */
+open class MeetingPermissionCallbacks(val viewModel: MeetingActivityViewModel) :
+    PermissionUtils.PermissionCallbacks {
 
     override fun onPermissionsCallback(requestType: Int, perms: ArrayList<String>) {
         LogUtil.logDebug("PermissionsCallback requestType = $requestType")

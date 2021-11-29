@@ -3,7 +3,6 @@ package mega.privacy.android.app.meeting.fragments
 import android.Manifest
 import android.annotation.SuppressLint
 import android.content.Context
-import android.content.pm.PackageManager
 import android.graphics.Rect
 import android.os.Bundle
 import android.view.*
@@ -120,7 +119,7 @@ abstract class AbstractMeetingOnBoardingFragment : BaseFragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         meetingActivity = activity as MeetingActivity
-        meetingPermissionCallbacks = object: MeetingPermissionCallbacks(sharedModel) {
+        meetingPermissionCallbacks = object : MeetingPermissionCallbacks(sharedModel) {
             override fun onPermissionsCallback(requestType: Int, perms: ArrayList<String>) {
                 super.onPermissionsCallback(requestType, perms)
                 onPermissionsResponse(requestType)
@@ -131,7 +130,7 @@ abstract class AbstractMeetingOnBoardingFragment : BaseFragment() {
     override fun onAttach(context: Context) {
         super.onAttach(context)
         // Do not share the instance with other permission check process, because the callback functions are different.
-        permissionsRequester = permissionsBuilder(permissions.toCollection(ArrayList()))
+        permissionsRequester = permissionsBuilder(permissions)
             .setOnPermissionDenied { l -> onPermissionDenied(l, meetingPermissionCallbacks) }
             .setOnRequiresPermission { l -> onRequiresPermission(l, meetingPermissionCallbacks) }
             .setOnShowRationale { l -> onShowRationale(l) }
@@ -189,7 +188,7 @@ abstract class AbstractMeetingOnBoardingFragment : BaseFragment() {
 
         // Use A New Instance to Check Permissions
         // Do not share the instance with other permission check process, because the callback functions are different.
-        permissionsBuilder(permissions.toCollection(ArrayList()))
+        permissionsBuilder(permissions)
             .setPermissionRequestType(PermissionType.CheckPermission)
             .setOnRequiresPermission { l ->
                 onRequiresPermission(l, meetingPermissionCallbacks)
@@ -231,9 +230,7 @@ abstract class AbstractMeetingOnBoardingFragment : BaseFragment() {
         binding.lifecycleOwner = this
         binding.btnStartJoinMeeting.setOnClickListener {
             permissionsRequester = permissionsBuilder(
-                listOf(Manifest.permission.RECORD_AUDIO).toCollection(
-                    java.util.ArrayList()
-                )
+                arrayOf(Manifest.permission.RECORD_AUDIO)
             )
                 .setOnPermissionDenied { l -> onPermissionDenied(l, meetingPermissionCallbacks) }
                 .setOnRequiresPermission { l ->
@@ -310,7 +307,7 @@ abstract class AbstractMeetingOnBoardingFragment : BaseFragment() {
                 cameraPermissionCheck.observe(viewLifecycleOwner) {
                     if (it) {
                         permissionsRequester = permissionsBuilder(
-                            arrayOf(Manifest.permission.CAMERA).toCollection(ArrayList())
+                            arrayOf(Manifest.permission.CAMERA)
                         )
                             .setOnRequiresPermission { l ->
                                 run {
@@ -328,7 +325,7 @@ abstract class AbstractMeetingOnBoardingFragment : BaseFragment() {
                 recordAudioPermissionCheck.observe(viewLifecycleOwner) {
                     if (it) {
                         permissionsRequester = permissionsBuilder(
-                            arrayOf(Manifest.permission.RECORD_AUDIO).toCollection(ArrayList())
+                            arrayOf(Manifest.permission.RECORD_AUDIO)
                         )
                             .setOnRequiresPermission { l ->
                                 run {
@@ -354,7 +351,8 @@ abstract class AbstractMeetingOnBoardingFragment : BaseFragment() {
      */
     private fun onPermNeverAskAgain(permissions: ArrayList<String>) {
         if (permissions.contains(Manifest.permission.RECORD_AUDIO)
-            || permissions.contains(Manifest.permission.CAMERA)) {
+            || permissions.contains(Manifest.permission.CAMERA)
+        ) {
             logDebug("user denies the permission")
             showSnackBar()
         }
