@@ -1455,7 +1455,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 		registerReceiver(receiverUpdateOrder, new IntentFilter(BROADCAST_ACTION_INTENT_UPDATE_ORDER));
 
 		LiveEventBus.get(EVENT_UPDATE_VIEW_MODE, Boolean.class)
-				.observe(this, isList -> updateView(isList));
+				.observe(this, this::updateView);
 
 		registerReceiver(chatArchivedReceiver, new IntentFilter(BROADCAST_ACTION_INTENT_CHAT_ARCHIVED));
 

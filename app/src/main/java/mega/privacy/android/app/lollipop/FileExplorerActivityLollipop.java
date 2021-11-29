@@ -611,8 +611,7 @@ public class FileExplorerActivityLollipop extends TransfersManagementActivity
 		getWindow().setFlags(WindowManager.LayoutParams.FLAG_WATCH_OUTSIDE_TOUCH, WindowManager.LayoutParams.FLAG_WATCH_OUTSIDE_TOUCH);
 		getWindow().setFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL, WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL);
 
-		LiveEventBus.get(EVENT_UPDATE_VIEW_MODE, Boolean.class)
-				.observe(this, isList -> refreshViewNodes(isList));
+		LiveEventBus.get(EVENT_UPDATE_VIEW_MODE, Boolean.class).observe(this, this::refreshViewNodes);
 	}
 	
 	private void afterLoginAndFetch(){
@@ -2709,17 +2708,13 @@ public class FileExplorerActivityLollipop extends TransfersManagementActivity
 		iSharesExplorer = getIncomingExplorerFragment();
 
 		if (cDriveExplorer != null) {
-			FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-			ft.detach(cDriveExplorer);
-			ft.attach(cDriveExplorer);
-			ft.commitAllowingStateLoss();
+			getSupportFragmentManager().beginTransaction().detach(cDriveExplorer).commitNowAllowingStateLoss();
+			getSupportFragmentManager().beginTransaction().attach(cDriveExplorer).commitNowAllowingStateLoss();
 		}
 
 		if (iSharesExplorer != null) {
-			FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-			ft.detach(iSharesExplorer);
-			ft.attach(iSharesExplorer);
-			ft.commitAllowingStateLoss();
+			getSupportFragmentManager().beginTransaction().detach(iSharesExplorer).commitNowAllowingStateLoss();
+			getSupportFragmentManager().beginTransaction().attach(iSharesExplorer).commitNowAllowingStateLoss();
 		}
 	}
 
