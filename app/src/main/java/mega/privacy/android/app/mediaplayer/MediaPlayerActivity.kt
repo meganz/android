@@ -232,7 +232,8 @@ abstract class MediaPlayerActivity : PasscodeActivity(), SnackbarShower, Activit
         } else if (!Util.isDarkMode(this)) {
             window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS)
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                window.decorView.systemUiVisibility = (window.decorView.systemUiVisibility or View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR)
+                window.decorView.systemUiVisibility = (window.decorView.systemUiVisibility
+                        or View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR)
             }
         }
 
