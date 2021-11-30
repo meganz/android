@@ -14,7 +14,6 @@ import mega.privacy.android.app.components.GestureScaleListener.GestureScaleCall
 import mega.privacy.android.app.components.scrollBar.FastScroller
 import mega.privacy.android.app.fragments.BaseFragment
 import mega.privacy.android.app.fragments.homepage.photos.ZoomViewModel
-import mega.privacy.android.app.fragments.managerFragments.cu.PhotosFragment.ALL_VIEW
 import mega.privacy.android.app.utils.ColorUtils
 import mega.privacy.android.app.utils.Constants.MIN_ITEMS_SCROLLBAR
 import mega.privacy.android.app.utils.StyleUtils
@@ -24,6 +23,16 @@ import mega.privacy.android.app.utils.ZoomUtil
  * A parent fragment with basic zoom UI logic, like menu, gestureScaleCallback.
  */
 abstract class BaseZoomFragment : BaseFragment(), GestureScaleCallback {
+
+    companion object {
+        const val ALL_VIEW = 0
+        const val DAYS_VIEW = 1
+        const val MONTHS_VIEW = 2
+        const val YEARS_VIEW = 3
+
+        const val SPAN_CARD_PORTRAIT = 1
+        const val SPAN_CARD_LANDSCAPE = 2
+    }
 
     protected lateinit var menu: Menu
     protected val zoomViewModel by viewModels<ZoomViewModel>()
@@ -130,9 +139,9 @@ abstract class BaseZoomFragment : BaseFragment(), GestureScaleCallback {
         setViewTypeButtonStyle(yearsButton, false)
 
         when (selectedView) {
-            PhotosFragment.DAYS_VIEW -> setViewTypeButtonStyle(daysButton, true)
-            PhotosFragment.MONTHS_VIEW -> setViewTypeButtonStyle(monthsButton, true)
-            PhotosFragment.YEARS_VIEW -> setViewTypeButtonStyle(yearsButton, true)
+            DAYS_VIEW -> setViewTypeButtonStyle(daysButton, true)
+            MONTHS_VIEW -> setViewTypeButtonStyle(monthsButton, true)
+            YEARS_VIEW -> setViewTypeButtonStyle(yearsButton, true)
             else -> setViewTypeButtonStyle(allButton, true)
         }
     }
@@ -179,7 +188,7 @@ abstract class BaseZoomFragment : BaseFragment(), GestureScaleCallback {
      */
     protected fun getSpanCount(selectedView:Int,isPortrait: Boolean): Int {
         return if (selectedView != ALL_VIEW) {
-            if (isPortrait) PhotosFragment.SPAN_CARD_PORTRAIT else PhotosFragment.SPAN_CARD_LANDSCAPE
+            if (isPortrait) SPAN_CARD_PORTRAIT else SPAN_CARD_LANDSCAPE
         } else {
             ZoomUtil.getSpanCount(isPortrait, zoomViewModel.getCurrentZoom())
         }

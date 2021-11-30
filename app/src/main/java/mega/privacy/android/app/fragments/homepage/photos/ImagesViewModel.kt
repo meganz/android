@@ -5,6 +5,7 @@ import androidx.lifecycle.*
 import com.jeremyliao.liveeventbus.LiveEventBus
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.fragments.homepage.TypedFilesRepository
+import mega.privacy.android.app.fragments.managerFragments.cu.BaseZoomFragment.Companion.ALL_VIEW
 import mega.privacy.android.app.fragments.managerFragments.cu.CUCard
 import mega.privacy.android.app.fragments.managerFragments.cu.PhotosFragment
 import mega.privacy.android.app.utils.Constants.EVENT_NODES_CHANGE
@@ -24,7 +25,7 @@ class ImagesViewModel @ViewModelInject constructor(
      */
     private var liveDataRoot = MutableLiveData<Unit>()
 
-    var selectedViewType = PhotosFragment.ALL_VIEW
+    var selectedViewType = ALL_VIEW
 
     private var forceUpdate = false
 

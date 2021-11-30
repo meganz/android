@@ -59,13 +59,13 @@ class CuViewModel @ViewModelInject constructor(
     private val dayCards = MutableLiveData<List<CUCard>>()
     private val monthCards = MutableLiveData<List<CUCard>>()
     private val yearCards = MutableLiveData<List<CUCard>>()
-    private val mCuNodes = MutableLiveData<List<CuNode>?>()
-    private val mNodeToOpen = MutableLiveData<Pair<Int, CuNode>>()
+    private val mCuNodes = MutableLiveData<List<CuNode>>()
+    private val mNodeToOpen = MutableLiveData<Pair<Int, CuNode?>>()
     private val mNodeToAnimate = MutableLiveData<Pair<Int, CuNode>>()
     private val mActionBarTitle = MutableLiveData<String>()
-    private val mActionMode = MutableLiveData<Boolean>()
+    private val mActionMode = MutableLiveData(false)
 
-    private val mOpenNodeAction: Subject<Pair<Int, CuNode>> = PublishSubject.create()
+    private val mOpenNodeAction: Subject<Pair<Int, CuNode?>> = PublishSubject.create()
     private val mCreatingThumbnailFinished: Subject<Any> = PublishSubject.create()
     private val mCreatingPreviewFinished: Subject<Any> = PublishSubject.create()
     private val mCreatePreviewForCardFinished: Subject<Any> = PublishSubject.create()
@@ -118,9 +118,9 @@ class CuViewModel @ViewModelInject constructor(
         add(
             mOpenNodeAction.throttleFirst(1, TimeUnit.SECONDS)
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe({ value: Pair<Int, CuNode>? ->
+                .subscribe({
                     mNodeToOpen.setValue(
-                        value
+                        it
                     )
                 }, logErr("openNodeAction"))
         )
@@ -153,49 +153,31 @@ class CuViewModel @ViewModelInject constructor(
         return yearCards
     }
 
-    fun getDayCards(): List<CUCard>? {
-        return dayCards.value
-    }
+    fun getDayCards() = dayCards.value!!
 
-    fun getMonthCards(): List<CUCard>? {
-        return monthCards.value
-    }
+    fun getMonthCards() = monthCards.value!!
 
-    fun getYearCards(): List<CUCard>? {
-        return yearCards.value
-    }
+    fun getYearCards() = yearCards.value!!
 
     fun isCUEnabled(): Boolean {
         return if (camSyncEnabled.value != null) camSyncEnabled.value!! else false
     }
 
-    fun cuNodes(): LiveData<List<CuNode>?> {
-        return mCuNodes
-    }
+    fun cuNodes() = mCuNodes
 
-    fun getCUNodes(): List<CuNode?>? {
-        return mCuNodes.value
-    }
+    fun getCUNodes() = mCuNodes.value
 
-    fun nodeToOpen(): LiveData<Pair<Int, CuNode>> {
-        return mNodeToOpen
-    }
+    fun nodeToOpen() = mNodeToOpen
 
-    fun nodeToAnimate(): LiveData<Pair<Int, CuNode>> {
-        return mNodeToAnimate
-    }
+    fun nodeToAnimate() = mNodeToAnimate
 
     fun actionBarTitle(): LiveData<String?> {
         return mActionBarTitle
     }
 
-    fun actionMode(): LiveData<Boolean?> {
-        return mActionMode
-    }
+    fun actionMode() = mActionMode
 
-    fun isSelecting(): Boolean {
-        return mSelecting
-    }
+    fun isSelecting() = mSelecting
 
     fun resetOpenedNode() {
         with(mNodeToOpen) {
@@ -233,9 +215,9 @@ class CuViewModel @ViewModelInject constructor(
             }
             mSelecting = !mSelectedNodes.isEmpty
             mActionMode.value = mSelecting
-            mNodeToAnimate.setValue(Pair.create(position, node))
+            mNodeToAnimate.setValue(Pair(position, node))
         } else {
-            mOpenNodeAction.onNext(Pair.create(position, node))
+            mOpenNodeAction.onNext(Pair(position, node))
         }
     }
 
@@ -244,7 +226,7 @@ class CuViewModel @ViewModelInject constructor(
         onNodeClicked(position, node)
     }
 
-    fun getSelectedNodes(): List<MegaNode>? {
+    fun getSelectedNodes(): List<MegaNode> {
         val nodes: MutableList<MegaNode> = ArrayList()
         var i = 0
         val n = mSelectedNodes.size()
@@ -279,7 +261,7 @@ class CuViewModel @ViewModelInject constructor(
             }
         }
         mSelecting = true
-        mCuNodes.value = nodes
+        mCuNodes.value = nodes!!
         mActionMode.value = true
     }
 
@@ -299,7 +281,7 @@ class CuViewModel @ViewModelInject constructor(
                 node.isSelected = false
             }
             mSelectedNodes.clear()
-            mCuNodes.value = nodes
+            mCuNodes.value = nodes!!
         }
     }
 
@@ -314,10 +296,10 @@ class CuViewModel @ViewModelInject constructor(
             mDbHandler.setStorageDownloadLocation(
                 defaultDownloadLocation.absolutePath
             )
-            mDbHandler.setPasscodeLockEnabled(false)
-            mDbHandler.setPasscodeLockCode("")
-            val nodeLinks: ArrayList<MegaNode> = mMegaApi.getPublicLinks()
-            if (nodeLinks == null || nodeLinks.size == 0) {
+            mDbHandler.isPasscodeLockEnabled = false
+            mDbHandler.passcodeLockCode = ""
+            val nodeLinks: ArrayList<MegaNode> = mMegaApi.publicLinks
+            if (nodeLinks.size == 0) {
                 logDebug("No public links: showCopyright set true")
                 mDbHandler.setShowCopyright(true)
             } else {
@@ -362,18 +344,16 @@ class CuViewModel @ViewModelInject constructor(
             .subscribe(IGNORE, logErr("enableCu")))
     }
 
-    fun camSyncEnabled(): LiveData<Boolean?>? {
+    fun camSyncEnabled(): LiveData<Boolean> {
         add(Single.fromCallable {
             java.lang.Boolean.parseBoolean(
-                mDbHandler.getPreferences().getCamSyncEnabled()
+                mDbHandler.preferences?.camSyncEnabled
             )
         }
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
-            .subscribe({ value: Boolean? ->
-                camSyncEnabled.setValue(
-                    value
-                )
+            .subscribe({
+                camSyncEnabled.setValue(it)
             }, logErr("camSyncEnabled")))
         return camSyncEnabled
     }
@@ -511,7 +491,7 @@ class CuViewModel @ViewModelInject constructor(
                         GET_THUMBNAIL_THROTTLE_MS,
                         TimeUnit.MILLISECONDS
                     ),
-                    { node: MegaNode, interval: Long? -> node })
+                    { node: MegaNode, _ -> node })
                 .observeOn(Schedulers.computation())
                 .subscribe({ node: MegaNode ->
                     if (!previewHandle.contains(node.handle)) {
@@ -550,7 +530,7 @@ class CuViewModel @ViewModelInject constructor(
                         GET_THUMBNAIL_THROTTLE_MS,
                         TimeUnit.MILLISECONDS
                     ),
-                    { node: MegaNode, interval: Long? -> node })
+                    { node: MegaNode, _ -> node })
                 .observeOn(Schedulers.computation())
                 .subscribe({ node: MegaNode ->
                     val preview = File(
