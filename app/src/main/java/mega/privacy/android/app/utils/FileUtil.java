@@ -333,7 +333,6 @@ public class FileUtil {
         }
 
         Context context = MegaApplication.getInstance();
-        MegaApiJava megaApiJava = MegaApplication.getInstance().getMegaApi();
 
         String data = MediaStore.Files.FileColumns.DATA;
         final String[] projection = {data};
@@ -351,19 +350,8 @@ public class FileUtil {
 
             List<String> candidates = checkFileInStorage(context, cursor, data, node.getName());
 
-            for(String path : candidates) {
-                File file = new File(path);
-
-                boolean isAvailable = isFileAvailable(file);
-
-                // Double check fingerprint for internal storage file.
-                if(isAvailable && node.getFingerprint().equals(megaApiJava.getFingerprint(path))) {
-                    return path;
-                }
-
-                // After moving to SD card, the local file's fingerprint is different, it's due to modification time changed.
-                // So here don't check fingerprint.
-                if(SDCardUtils.isLocalFolderOnSDCard(context, path) && isAvailable) {
+            for (String path : candidates) {
+                if (isFileAvailable(new File(path))) {
                     return path;
                 }
             }
