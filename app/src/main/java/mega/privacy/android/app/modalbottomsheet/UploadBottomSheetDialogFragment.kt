@@ -58,7 +58,6 @@ class UploadBottomSheetDialogFragment : BaseBottomSheetDialogFragment(), View.On
         }
 
         binding.uploadFromDeviceOption.setOnClickListener(this)
-        binding.uploadFromSystemOption.setOnClickListener(this)
         binding.scanDocumentOption.setOnClickListener(this)
         binding.takePictureOption.setOnClickListener(this)
         binding.newFolderOption.setOnClickListener(this)
@@ -70,7 +69,6 @@ class UploadBottomSheetDialogFragment : BaseBottomSheetDialogFragment(), View.On
     override fun onClick(v: View?) {
         when (v?.id) {
             R.id.upload_from_device_option -> listener.uploadFromDevice()
-            R.id.upload_from_system_option -> listener.uploadFromSystem()
             R.id.scan_document_option -> listener.scanDocument()
             R.id.take_picture_option -> listener.takePictureAndUpload()
             R.id.new_folder_option -> listener.showNewFolderDialog()
