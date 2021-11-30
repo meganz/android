@@ -8,16 +8,4 @@
         android:title="@string/menu_new_folder"
         app:iconTint="?attr/colorControlNormal"
         app:showAsAction="always" />
-
-    <item
-        android:id="@+id/cab_menu_select_all"
-        android:orderInCategory="110"
-        android:title="@string/action_select_all"
-        app:showAsAction="never" />
-
-    <item
-        android:id="@+id/cab_menu_unselect_all"
-        android:orderInCategory="110"
-        android:title="@string/action_unselect_all"
-        app:showAsAction="never" />
 </menu>
