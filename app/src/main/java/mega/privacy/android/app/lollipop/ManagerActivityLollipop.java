@@ -3301,7 +3301,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 				}
 				else if (getIntent().getAction().equals(ACTION_OPEN_FOLDER)) {
 					logDebug("Open after LauncherFileExplorerActivityLollipop ");
-					long handleIntent = getIntent().getLongExtra("PARENT_HANDLE", -1);
+					long handleIntent = getIntent().getLongExtra(INTENT_EXTRA_KEY_PARENT_HANDLE, -1);
 
 					if (getIntent().getBooleanExtra(SHOW_MESSAGE_UPLOAD_STARTED, false)) {
 						int numberUploads = getIntent().getIntExtra(NUMBER_UPLOADS, 1);
@@ -4535,6 +4535,9 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 					bottomNavigationCurrentItem = CLOUD_DRIVE_BNV;
 				}
 				setBottomNavigationMenuItemChecked(CLOUD_DRIVE_BNV);
+				if (getIntent().getBooleanExtra(INTENT_EXTRA_KEY_LOCATION_FILE_INFO, false)) {
+					fbFLol.refreshNodes();
+				}
 				logDebug("END for Cloud Drive");
     			break;
     		}
