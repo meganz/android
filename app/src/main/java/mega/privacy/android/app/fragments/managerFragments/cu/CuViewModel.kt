@@ -81,6 +81,7 @@ class CuViewModel @ViewModelInject constructor(
     private val thumbnailHandle = HashSet<Long>()
     private val previewHandle = HashSet<Long>()
     private var mZoom = 0
+    var selectedViewType = BaseZoomFragment.ALL_VIEW
 
     fun isEnableCUShown(): Boolean {
         return enableCUShown
@@ -465,22 +466,25 @@ class CuViewModel @ViewModelInject constructor(
                     ),
                     { node: MegaNode, _: Long? -> node })
                 .observeOn(Schedulers.computation())
-                .subscribe({ node: MegaNode ->
-                    if (!thumbnailHandle.contains(node.handle)) {
-                        thumbnailHandle.add(node.handle)
-                        val thumbnail = File(
-                            ThumbnailUtilsLollipop.getThumbFolder(mAppContext),
-                            node.base64Handle + FileUtil.JPG_EXTENSION
-                        )
-                        if (!thumbnail.exists()) {
-                            mMegaApi.getThumbnail(
-                                node,
-                                thumbnail.absolutePath,
-                                mCreateThumbnailRequest
+                .subscribe(
+                    { node: MegaNode ->
+                        if (!thumbnailHandle.contains(node.handle)) {
+                            thumbnailHandle.add(node.handle)
+                            val thumbnail = File(
+                                ThumbnailUtilsLollipop.getThumbFolder(mAppContext),
+                                node.base64Handle + FileUtil.JPG_EXTENSION
                             )
+                            if (!thumbnail.exists()) {
+                                mMegaApi.getThumbnail(
+                                    node,
+                                    thumbnail.absolutePath,
+                                    mCreateThumbnailRequest
+                                )
+                            }
                         }
-                    }
-                }, logErr("mega.privacy.android.app.fragments.managerFragments.cu.CuViewModel getThumbnail"))
+                    },
+                    logErr("mega.privacy.android.app.fragments.managerFragments.cu.CuViewModel getThumbnail")
+                )
         )
 
         // Fetch previews of nodes in computation thread, fetching each in 50ms interval
@@ -493,18 +497,25 @@ class CuViewModel @ViewModelInject constructor(
                     ),
                     { node: MegaNode, _ -> node })
                 .observeOn(Schedulers.computation())
-                .subscribe({ node: MegaNode ->
-                    if (!previewHandle.contains(node.handle)) {
-                        previewHandle.add(node.handle)
-                        val preview = File(
-                            PreviewUtils.getPreviewFolder(mAppContext),
-                            node.base64Handle + FileUtil.JPG_EXTENSION
-                        )
-                        if (!preview.exists()) {
-                            mMegaApi.getPreview(node, preview.absolutePath, createPreviewRequest)
+                .subscribe(
+                    { node: MegaNode ->
+                        if (!previewHandle.contains(node.handle)) {
+                            previewHandle.add(node.handle)
+                            val preview = File(
+                                PreviewUtils.getPreviewFolder(mAppContext),
+                                node.base64Handle + FileUtil.JPG_EXTENSION
+                            )
+                            if (!preview.exists()) {
+                                mMegaApi.getPreview(
+                                    node,
+                                    preview.absolutePath,
+                                    createPreviewRequest
+                                )
+                            }
                         }
-                    }
-                }, logErr("mega.privacy.android.app.fragments.managerFragments.cu.CuViewModel getPreview"))
+                    },
+                    logErr("mega.privacy.android.app.fragments.managerFragments.cu.CuViewModel getPreview")
+                )
         )
         return nodes
     }
@@ -532,19 +543,22 @@ class CuViewModel @ViewModelInject constructor(
                     ),
                     { node: MegaNode, _ -> node })
                 .observeOn(Schedulers.computation())
-                .subscribe({ node: MegaNode ->
-                    val preview = File(
-                        PreviewUtils.getPreviewFolder(mAppContext),
-                        node.base64Handle + FileUtil.JPG_EXTENSION
-                    )
-                    if (!preview.exists()) {
-                        mMegaApi.getPreview(
-                            node,
-                            preview.absolutePath,
-                            mCreatePreviewForCardRequest
+                .subscribe(
+                    { node: MegaNode ->
+                        val preview = File(
+                            PreviewUtils.getPreviewFolder(mAppContext),
+                            node.base64Handle + FileUtil.JPG_EXTENSION
                         )
-                    }
-                }, logErr("mega.privacy.android.app.fragments.managerFragments.cu.CuViewModel getPreview"))
+                        if (!preview.exists()) {
+                            mMegaApi.getPreview(
+                                node,
+                                preview.absolutePath,
+                                mCreatePreviewForCardRequest
+                            )
+                        }
+                    },
+                    logErr("mega.privacy.android.app.fragments.managerFragments.cu.CuViewModel getPreview")
+                )
         )
         dayCards.postValue(cardsProvider.getDays())
         monthCards.postValue(cardsProvider.getMonths())

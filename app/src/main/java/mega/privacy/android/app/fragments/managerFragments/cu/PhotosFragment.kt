@@ -55,7 +55,7 @@ class PhotosFragment : BaseZoomFragment(), CUGridViewAdapter.Listener,
     lateinit var sortOrderManagement: SortOrderManagement
 
     private lateinit var mManagerActivity: ManagerActivityLollipop
-    private var binding: FragmentPhotosBinding? = null
+    private lateinit var binding: FragmentPhotosBinding
     private var gridAdapter: CUGridViewAdapter? = null
     private var cardAdapter: CUCardViewAdapter? = null
 
@@ -84,10 +84,10 @@ class PhotosFragment : BaseZoomFragment(), CUGridViewAdapter.Listener,
     }
 
     fun checkScroll() {
-        if (binding == null) return
+        if (!this::binding.isInitialized) return
 
-        val isScrolled = binding!!.cuList.canScrollVertically(Constants.SCROLLING_UP_DIRECTION)
-        mManagerActivity.changeAppBarElevation(binding!!.uploadProgress.isVisible || viewModel.isSelecting() || isScrolled)
+        val isScrolled = binding.cuList.canScrollVertically(Constants.SCROLLING_UP_DIRECTION)
+        mManagerActivity.changeAppBarElevation(binding.uploadProgress.isVisible || viewModel.isSelecting() || isScrolled)
     }
 
     fun selectAll() {
@@ -138,8 +138,8 @@ class PhotosFragment : BaseZoomFragment(), CUGridViewAdapter.Listener,
 
     fun enableCu() {
         viewModel.enableCu(
-            binding!!.fragmentPhotosFirstLogin.cellularConnectionSwitch.isChecked,
-            binding!!.fragmentPhotosFirstLogin.uploadVideosSwitch.isChecked
+            binding.fragmentPhotosFirstLogin.cellularConnectionSwitch.isChecked,
+            binding.fragmentPhotosFirstLogin.uploadVideosSwitch.isChecked
         )
         mManagerActivity.isFirstLogin = false
         viewModel.setEnableCUShown(false)
@@ -166,7 +166,7 @@ class PhotosFragment : BaseZoomFragment(), CUGridViewAdapter.Listener,
         savedInstanceState: Bundle?
     ): View {
         binding = FragmentPhotosBinding.inflate(inflater, container, false)
-
+        this.selectedView = viewModel.selectedViewType
         if (mManagerActivity.firstLogin || viewModel.isEnableCUShown()) {
             viewModel.setEnableCUShown(true)
             createCameraUploadsViewForFirstLogin()
@@ -174,7 +174,7 @@ class PhotosFragment : BaseZoomFragment(), CUGridViewAdapter.Listener,
             showPhotosGrid()
         }
 
-        return binding!!.root
+        return binding.root
     }
 
     /**
@@ -194,31 +194,31 @@ class PhotosFragment : BaseZoomFragment(), CUGridViewAdapter.Listener,
      * Show photos view.
      */
     private fun showPhotosGrid() {
-        binding!!.fragmentPhotosFirstLogin.root.visibility = View.GONE
-        binding!!.fragmentPhotosGrid.visibility = View.VISIBLE
+        binding.fragmentPhotosFirstLogin.root.visibility = View.GONE
+        binding.fragmentPhotosGrid.visibility = View.VISIBLE
     }
 
     /**
      * Show enable CU page.
      */
     private fun showEnablePage() {
-        binding!!.fragmentPhotosFirstLogin.root.visibility = View.VISIBLE
-        binding!!.fragmentPhotosGrid.visibility = View.GONE
+        binding.fragmentPhotosFirstLogin.root.visibility = View.VISIBLE
+        binding.fragmentPhotosGrid.visibility = View.GONE
     }
 
     private fun createCameraUploadsViewForFirstLogin() {
         viewModel.setInitialPreferences()
         ListenScrollChangesHelper().addViewToListen(
-            binding!!.fragmentPhotosFirstLogin.camSyncScrollView
+            binding.fragmentPhotosFirstLogin.camSyncScrollView
         ) { _, _, _, _, _ ->
             mManagerActivity
                 .changeAppBarElevation(
-                    binding!!.fragmentPhotosFirstLogin.camSyncScrollView.canScrollVertically(
+                    binding.fragmentPhotosFirstLogin.camSyncScrollView.canScrollVertically(
                         Constants.SCROLLING_UP_DIRECTION
                     )
                 )
         }
-        binding!!.fragmentPhotosFirstLogin.enableButton.setOnClickListener {
+        binding.fragmentPhotosFirstLogin.enableButton.setOnClickListener {
             MegaApplication.getInstance().sendSignalPresenceActivity()
             val permissions =
                 arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE)
@@ -245,7 +245,7 @@ class PhotosFragment : BaseZoomFragment(), CUGridViewAdapter.Listener,
         if (viewModel.isEnableCUShown()) {
             mManagerActivity.updateCULayout(View.GONE)
             mManagerActivity.updateCUViewTypes(View.GONE)
-            binding!!.fragmentPhotosFirstLogin.uploadVideosSwitch.setOnCheckedChangeListener { _, isChecked ->
+            binding.fragmentPhotosFirstLogin.uploadVideosSwitch.setOnCheckedChangeListener { _, isChecked ->
                 if (isChecked) {
                     mManagerActivity.showSnackbar(
                         Constants.DISMISS_ACTION_SNACKBAR,
@@ -253,7 +253,7 @@ class PhotosFragment : BaseZoomFragment(), CUGridViewAdapter.Listener,
                         MegaChatApiJava.MEGACHAT_INVALID_HANDLE
                     )
                 }
-                binding!!.fragmentPhotosFirstLogin.qualityText.visibility =
+                binding.fragmentPhotosFirstLogin.qualityText.visibility =
                     if (isChecked) View.VISIBLE else View.GONE
             }
             handlePhotosMenuUpdate(false)
@@ -330,8 +330,8 @@ class PhotosFragment : BaseZoomFragment(), CUGridViewAdapter.Listener,
 
     @SuppressLint("ClickableViewAccessibility")
     private fun setupRecyclerView() {
-        binding!!.cuList.setHasFixedSize(true)
-        binding!!.cuList.addOnScrollListener(object : RecyclerView.OnScrollListener() {
+        binding.cuList.setHasFixedSize(true)
+        binding.cuList.addOnScrollListener(object : RecyclerView.OnScrollListener() {
 
             override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
                 super.onScrolled(recyclerView, dx, dy)
@@ -339,7 +339,7 @@ class PhotosFragment : BaseZoomFragment(), CUGridViewAdapter.Listener,
             }
         })
         scaleGestureHandler = ScaleGestureHandler(context, this)
-        binding!!.cuList.setOnTouchListener(scaleGestureHandler)
+        binding.cuList.setOnTouchListener(scaleGestureHandler)
         setGridView()
     }
 
@@ -348,14 +348,14 @@ class PhotosFragment : BaseZoomFragment(), CUGridViewAdapter.Listener,
         val isPortrait = resources.configuration.orientation == Configuration.ORIENTATION_PORTRAIT
         val spanCount = getSpanCount(selectedView, isPortrait)
         layoutManager = GridLayoutManager(context, spanCount)
-        binding!!.cuList.layoutManager = layoutManager
-        binding!!.cuList.setPadding(
+        binding.cuList.layoutManager = layoutManager
+        binding.cuList.setPadding(
             0,
             0,
             0,
             resources.getDimensionPixelSize(R.dimen.cu_margin_bottom)
         )
-        val params = binding!!.cuList.layoutParams as RelativeLayout.LayoutParams
+        val params = binding.cuList.layoutParams as RelativeLayout.LayoutParams
         if (selectedView == ALL_VIEW) {
             val imageMargin = getMargin(context, getCurrentZoom())
             setMargin(context, params, getCurrentZoom())
@@ -382,7 +382,7 @@ class PhotosFragment : BaseZoomFragment(), CUGridViewAdapter.Listener,
                     return gridAdapter!!.getSpanSize(position)
                 }
             }
-            binding!!.cuList.adapter = gridAdapter
+            binding.cuList.adapter = gridAdapter
         } else {
             val cardMargin =
                 resources.getDimensionPixelSize(if (isPortrait) R.dimen.card_margin_portrait else R.dimen.card_margin_landscape)
@@ -390,18 +390,18 @@ class PhotosFragment : BaseZoomFragment(), CUGridViewAdapter.Listener,
                 (outMetrics.widthPixels - cardMargin * spanCount * 2 - cardMargin * 2) / spanCount
             cardAdapter = CUCardViewAdapter(selectedView, cardWidth, cardMargin, this)
             cardAdapter!!.setHasStableIds(true)
-            binding!!.cuList.adapter = cardAdapter
+            binding.cuList.adapter = cardAdapter
             params.rightMargin = cardMargin
             params.leftMargin = params.rightMargin
         }
-        binding!!.cuList.layoutParams = params
-        binding!!.scroller.setRecyclerView(binding!!.cuList)
+        binding.cuList.layoutParams = params
+        binding.scroller.setRecyclerView(binding.cuList)
     }
 
     private fun setupOtherViews() {
-        binding!!.emptyEnableCuButton.setOnClickListener { enableCUClick() }
-        setImageViewAlphaIfDark(context, binding!!.emptyHintImage, DARK_IMAGE_ALPHA)
-        binding!!.emptyHintText.text = HtmlCompat.fromHtml(
+        binding.emptyEnableCuButton.setOnClickListener { enableCUClick() }
+        setImageViewAlphaIfDark(context, binding.emptyHintImage, DARK_IMAGE_ALPHA)
+        binding.emptyHintText.text = HtmlCompat.fromHtml(
             TextUtil.formatEmptyScreenText(
                 context,
                 StringResourcesUtils.getString(R.string.photos_empty)
@@ -425,19 +425,19 @@ class PhotosFragment : BaseZoomFragment(), CUGridViewAdapter.Listener,
         when (selectedView) {
             DAYS_VIEW -> {
                 showDayCards(viewModel.getDayCards())
-                binding!!.cuList.setOnTouchListener(null)
+                binding.cuList.setOnTouchListener(null)
             }
             MONTHS_VIEW -> {
                 showMonthCards(viewModel.getMonthCards())
-                binding!!.cuList.setOnTouchListener(null)
+                binding.cuList.setOnTouchListener(null)
             }
             YEARS_VIEW -> {
                 showYearCards(viewModel.getYearCards())
-                binding!!.cuList.setOnTouchListener(null)
+                binding.cuList.setOnTouchListener(null)
             }
             else -> {
                 gridAdapter!!.setNodes(viewModel.getCUNodes()!!)
-                binding!!.cuList.setOnTouchListener(scaleGestureHandler)
+                binding.cuList.setOnTouchListener(scaleGestureHandler)
             }
         }
         handleOptionsMenuUpdate(shouldShowFullInfoAndOptions())
@@ -462,15 +462,15 @@ class PhotosFragment : BaseZoomFragment(), CUGridViewAdapter.Listener,
                 if (isEnableCUFragmentShown()) return@observe
                 val showScroller =
                     it.size >= if (getCurrentZoom() < ZOOM_DEFAULT) Constants.MIN_ITEMS_SCROLLBAR_GRID else Constants.MIN_ITEMS_SCROLLBAR
-                binding!!.scroller.visibility = if (showScroller) View.VISIBLE else View.GONE
+                binding.scroller.visibility = if (showScroller) View.VISIBLE else View.GONE
                 if (gridAdapter != null) {
                     gridAdapter!!.setNodes(it)
                 }
                 updateEnableCUButtons(viewModel.isCUEnabled())
                 handlePhotosMenuUpdate(isShowMenu())
-                binding!!.emptyHint.visibility = if (it.isEmpty()) View.VISIBLE else View.GONE
-                binding!!.cuList.visibility = if (it.isEmpty()) View.GONE else View.VISIBLE
-                binding!!.scroller.visibility = if (it.isEmpty()) View.GONE else View.VISIBLE
+                binding.emptyHint.visibility = if (it.isEmpty()) View.VISIBLE else View.GONE
+                binding.cuList.visibility = if (it.isEmpty()) View.GONE else View.VISIBLE
+                binding.scroller.visibility = if (it.isEmpty()) View.GONE else View.VISIBLE
                 mManagerActivity.updateCUViewTypes(if (it.isEmpty()) View.GONE else View.VISIBLE)
             })
 
@@ -484,7 +484,7 @@ class PhotosFragment : BaseZoomFragment(), CUGridViewAdapter.Listener,
 
                 gridAdapter!!.showSelectionAnimation(
                     it.first, it.second,
-                    binding!!.cuList.findViewHolderForLayoutPosition(it.first)
+                    binding.cuList.findViewHolderForLayoutPosition(it.first)
                 )
             })
 
@@ -517,7 +517,7 @@ class PhotosFragment : BaseZoomFragment(), CUGridViewAdapter.Listener,
                 )
             })
 
-        observeDragSupportEvents(viewLifecycleOwner, binding!!.cuList, Constants.VIEWER_FROM_CUMU)
+        observeDragSupportEvents(viewLifecycleOwner, binding.cuList, Constants.VIEWER_FROM_CUMU)
 
         viewModel.getDayCardsData().observe(viewLifecycleOwner, { showDayCards(it) })
 
@@ -547,7 +547,7 @@ class PhotosFragment : BaseZoomFragment(), CUGridViewAdapter.Listener,
      */
     private fun updateEnableCUButtons(cuEnabled: Boolean) {
         val emptyAdapter = gridAdapter == null || gridAdapter!!.itemCount <= 0
-        binding!!.emptyEnableCuButton.visibility =
+        binding.emptyEnableCuButton.visibility =
             if (!cuEnabled && emptyAdapter) View.VISIBLE else View.GONE
         mManagerActivity.updateEnableCUButton(
             if (selectedView == ALL_VIEW && !cuEnabled
@@ -607,7 +607,7 @@ class PhotosFragment : BaseZoomFragment(), CUGridViewAdapter.Listener,
             )
             .putExtra(Constants.INTENT_EXTRA_KEY_ADAPTER_TYPE, Constants.PHOTO_SYNC_ADAPTER)
         putThumbnailLocation(
-            intent, binding!!.cuList, position, Constants.VIEWER_FROM_CUMU,
+            intent, binding.cuList, position, Constants.VIEWER_FROM_CUMU,
             gridAdapter!!
         )
         startActivity(intent)
@@ -616,7 +616,6 @@ class PhotosFragment : BaseZoomFragment(), CUGridViewAdapter.Listener,
 
     override fun onDestroyView() {
         super.onDestroyView()
-        binding = null
     }
 
     override fun onNodeClicked(position: Int, node: CuNode?) {
@@ -650,7 +649,7 @@ class PhotosFragment : BaseZoomFragment(), CUGridViewAdapter.Listener,
         )
         if (selectedView != ALL_VIEW) {
             hideCUProgress()
-            binding!!.uploadProgress.visibility = View.GONE
+            binding.uploadProgress.visibility = View.GONE
         }
     }
 
@@ -669,7 +668,7 @@ class PhotosFragment : BaseZoomFragment(), CUGridViewAdapter.Listener,
         }
         super.updateFastScrollerVisibility(
             selectedView,
-            binding!!.scroller,
+            binding.scroller,
             cardAdapter!!.itemCount
         )
     }
@@ -698,11 +697,11 @@ class PhotosFragment : BaseZoomFragment(), CUGridViewAdapter.Listener,
     }
 
     fun updateProgress(visibility: Int, pending: Int) {
-        if (binding!!.uploadProgress.visibility != visibility) {
-            binding!!.uploadProgress.visibility = visibility
+        if (binding.uploadProgress.visibility != visibility) {
+            binding.uploadProgress.visibility = visibility
             checkScroll()
         }
-        binding!!.uploadProgress.text = StringResourcesUtils
+        binding.uploadProgress.text = StringResourcesUtils
             .getQuantityString(R.plurals.cu_upload_progress, pending, pending)
     }
 
@@ -725,6 +724,11 @@ class PhotosFragment : BaseZoomFragment(), CUGridViewAdapter.Listener,
             setGridView()
             layoutManager!!.onRestoreInstanceState(state)
         }
+    }
+    
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        viewModel.selectedViewType = selectedView
     }
 
     override fun handleOnCreateOptionsMenu() {
