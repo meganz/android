@@ -476,7 +476,7 @@ public class FileStorageActivityLollipop extends PasscodeActivity implements OnC
 		if (fromSaveRecoveryKey && isAndroid11OrUpper()) {
 			createRKFile();
 		} else if (isCUOrMUFolder && isAndroid11OrUpper()) {
-			openPickFromSystem();
+			openPickCUFolderFromSystem();
 		} else if (mode == Mode.BROWSE_FILES) {
 			if (intent.getExtras() != null) {
 				String extraPath = intent.getExtras().getString(EXTRA_PATH);
@@ -512,7 +512,11 @@ public class FileStorageActivityLollipop extends PasscodeActivity implements OnC
 				.putExtra(Intent.EXTRA_TITLE, getRecoveryKeyFileName()), REQUEST_SAVE_RK);
 	}
 
-	private void openPickFromSystem() {
+	/**
+	 * On Android 11 and upper we cannot show our app picker, we must use the system one.
+	 * So opens the system file picker in order to give the option to chose a CU or MU local folder.
+	 */
+	private void openPickCUFolderFromSystem() {
 		startActivityForResult(new Intent(Intent.ACTION_OPEN_DOCUMENT_TREE)
 				.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION), REQUEST_PICK_CU_FOLDER);
 	}
@@ -1261,10 +1265,12 @@ public class FileStorageActivityLollipop extends PasscodeActivity implements OnC
 			finish();
 		} else if (requestCode == REQUEST_PICK_CU_FOLDER) {
 			if (intent != null && resultCode == Activity.RESULT_OK) {
+				logDebug("Folder picked from system picker");
 				Uri uri = intent.getData();
 				getContentResolver().takePersistableUriPermission(uri, Intent.FLAG_GRANT_READ_URI_PERMISSION);
 
 				SDCardOperator operator = null;
+
 				try {
 					operator = new SDCardOperator(this);
 				} catch (SDCardOperator.SDCardException e) {
@@ -1298,11 +1304,15 @@ public class FileStorageActivityLollipop extends PasscodeActivity implements OnC
 							finishPickFolder();
 							return;
 						}
+					} else {
+						logWarning("volumePath is null");
 					}
+				} else {
+					logDebug("operator is null");
 				}
 
 				//Primary storage
-				if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.R) {
+				if (isAndroid11OrUpper()) {
 					//This is always true since REQUEST_PICK_CU_FOLDER is only requested in that situation
 					StorageManager storageManager = (StorageManager) getSystemService(Context.STORAGE_SERVICE);
 					File file = storageManager.getPrimaryStorageVolume().getDirectory();
@@ -1311,6 +1321,8 @@ public class FileStorageActivityLollipop extends PasscodeActivity implements OnC
 					if (file != null && split.length == 2) {
 						path = new File(file.getAbsolutePath() + File.separator + split[1]);
 						finishPickFolder();
+					} else {
+						logError("Error getting primary storage path");
 					}
 				}
 			}
