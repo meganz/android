@@ -4,7 +4,8 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.ListAdapter
 import mega.privacy.android.app.components.scrollBar.SectionTitleProvider
-import mega.privacy.android.app.databinding.ItemCuCardBinding
+import mega.privacy.android.app.databinding.ItemGalleryCardBinding
+import mega.privacy.android.app.gallery.data.GalleryCard
 
 /**
  * Adapter to show Camera Uploads cards organized by days, months or years.
@@ -22,7 +23,7 @@ class CUCardViewAdapter(
     private val cardWidth: Int,
     private val cardMargin: Int,
     private val listener: Listener
-) : ListAdapter<CUCard, CUCardViewHolder>(CUCard.DiffCallback()), SectionTitleProvider {
+) : ListAdapter<GalleryCard, CUCardViewHolder>(GalleryCard.DiffCallback()), SectionTitleProvider {
 
     init {
         setHasStableIds(true)
@@ -31,7 +32,7 @@ class CUCardViewAdapter(
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CUCardViewHolder =
         CUCardViewHolder(
             cardViewType,
-            ItemCuCardBinding.inflate(LayoutInflater.from(parent.context), parent, false),
+            ItemGalleryCardBinding.inflate(LayoutInflater.from(parent.context), parent, false),
             cardWidth,
             cardMargin
         )
@@ -51,6 +52,6 @@ class CUCardViewAdapter(
         getItem(position).node.handle
 
     interface Listener {
-        fun onCardClicked(position: Int, card: CUCard)
+        fun onCardClicked(position: Int, card: GalleryCard)
     }
 }

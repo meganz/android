@@ -2,10 +2,11 @@ package mega.privacy.android.app.fragments.managerFragments.cu
 
 import android.view.View
 import mega.privacy.android.app.databinding.ItemCameraUploadsImageBinding
+import mega.privacy.android.app.gallery.data.GalleryItemSizeConfig
 
 class CuImageViewHolder(
     private val mBinding: ItemCameraUploadsImageBinding,
-    private val mItemSizeConfig: CuItemSizeConfig
+    private val mItemSizeConfig: GalleryItemSizeConfig
 ) : CuGridViewHolder(mBinding.root) {
 
     init {

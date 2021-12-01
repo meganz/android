@@ -1,4 +1,4 @@
-package mega.privacy.android.app.fragments.managerFragments.cu
+package mega.privacy.android.app.gallery.data
 
 import androidx.recyclerview.widget.DiffUtil
 import nz.mega.sdk.MegaNode
@@ -20,7 +20,7 @@ import java.time.LocalDate
  * @param localDate Modification date as LocalDate, without formatting.
  * @param numItems  Number of items contained in a card. Should be used only on day cards as per design.
  */
-data class CUCard(
+data class GalleryCard(
     val node: MegaNode,
     var preview: File?,
     var day: String? = null,
@@ -35,11 +35,11 @@ data class CUCard(
         numItems++
     }
 
-    class DiffCallback : DiffUtil.ItemCallback<CUCard>() {
-        override fun areItemsTheSame(oldItem: CUCard, newItem: CUCard) =
+    class DiffCallback : DiffUtil.ItemCallback<GalleryCard>() {
+        override fun areItemsTheSame(oldItem: GalleryCard, newItem: GalleryCard) =
             oldItem.node.handle == newItem.node.handle
 
-        override fun areContentsTheSame(oldItem: CUCard, newItem: CUCard) =
+        override fun areContentsTheSame(oldItem: GalleryCard, newItem: GalleryCard) =
             oldItem == newItem
     }
 }

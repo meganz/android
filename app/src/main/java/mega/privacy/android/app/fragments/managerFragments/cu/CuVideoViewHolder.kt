@@ -3,6 +3,7 @@ package mega.privacy.android.app.fragments.managerFragments.cu
 import android.view.View
 import mega.privacy.android.app.R
 import mega.privacy.android.app.databinding.ItemCameraUploadsVideoBinding
+import mega.privacy.android.app.gallery.data.GalleryItemSizeConfig
 import mega.privacy.android.app.utils.TimeUtils
 import mega.privacy.android.app.utils.ZoomUtil.ZOOM_DEFAULT
 import mega.privacy.android.app.utils.ZoomUtil.ZOOM_IN_1X
@@ -10,7 +11,7 @@ import mega.privacy.android.app.utils.ZoomUtil.ZOOM_OUT_1X
 
 class CuVideoViewHolder(
     private val mBinding: ItemCameraUploadsVideoBinding,
-    private val mItemSizeConfig: CuItemSizeConfig
+    private val mItemSizeConfig: GalleryItemSizeConfig
 ) : CuGridViewHolder(mBinding.root) {
 
     init {

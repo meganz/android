@@ -1,7 +1,7 @@
 package mega.privacy.android.app.fragments.homepage.photos
 
 import android.content.Context
-import mega.privacy.android.app.fragments.managerFragments.cu.CUCard
+import mega.privacy.android.app.gallery.data.GalleryCard
 import mega.privacy.android.app.utils.FileUtil
 import mega.privacy.android.app.utils.PreviewUtils
 import mega.privacy.android.app.utils.Util
@@ -23,17 +23,17 @@ class DateCardsProvider {
     /**
      * Days list.
      */
-    private val days = ArrayList<CUCard>()
+    private val days = ArrayList<GalleryCard>()
 
     /**
      * Months list.
      */
-    private val months = ArrayList<CUCard>()
+    private val months = ArrayList<GalleryCard>()
 
     /**
      * Years list.
      */
-    private val years = ArrayList<CUCard>()
+    private val years = ArrayList<GalleryCard>()
 
     /**
      * MegaNodes which doesn't have local preview.
@@ -44,7 +44,7 @@ class DateCardsProvider {
 
     /**
      * Organize MegaNode list by years, months and days.
-     * Convert MegaNode to CUCard and fill corresponding list.
+     * Convert MegaNode to GalleryCard and fill corresponding list.
      *
      * @param context Context object for get preview files' local path.
      * @param nodes MegaNode list, from which date cards will be extracted.
@@ -73,7 +73,7 @@ class DateCardsProvider {
                 val date =
                     DateTimeFormatter.ofPattern(if (sameYear) "dd MMMM" else "dd MMMM uuuu").format(lastDayDate)
                 days.add(
-                    CUCard(
+                    GalleryCard(
                         node, if (preview.exists()) preview else null, day, month,
                         if (sameYear) null else year, date, modifyDate, 0
                     )
@@ -88,7 +88,7 @@ class DateCardsProvider {
                 lastMonthDate = modifyDate
                 val date = if (sameYear) month else DateTimeFormatter.ofPattern("MMMM yyyy").format(modifyDate)
                 months.add(
-                    CUCard(
+                    GalleryCard(
                         node, if (preview.exists()) preview else null, null, month,
                         if (sameYear) null else year, date, modifyDate, 0
                     )
@@ -99,7 +99,7 @@ class DateCardsProvider {
                 shouldGetPreview = true
                 lastYearDate = modifyDate
                 years.add(
-                    CUCard(
+                    GalleryCard(
                         node, if (preview.exists()) preview else null, null, null,
                         year, year, modifyDate, 0
                     )

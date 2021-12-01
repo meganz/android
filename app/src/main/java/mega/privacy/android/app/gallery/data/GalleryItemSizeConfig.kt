@@ -1,6 +1,6 @@
-package mega.privacy.android.app.fragments.managerFragments.cu
+package mega.privacy.android.app.gallery.data
 
-data class CuItemSizeConfig(
+data class GalleryItemSizeConfig(
     val zoom : Int,
     val gridSize: Int,
     val icSelectedSize: Int,

@@ -6,8 +6,7 @@ import com.jeremyliao.liveeventbus.LiveEventBus
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.fragments.homepage.TypedFilesRepository
 import mega.privacy.android.app.fragments.managerFragments.cu.BaseZoomFragment.Companion.ALL_VIEW
-import mega.privacy.android.app.fragments.managerFragments.cu.CUCard
-import mega.privacy.android.app.fragments.managerFragments.cu.PhotosFragment
+import mega.privacy.android.app.gallery.data.GalleryCard
 import mega.privacy.android.app.utils.Constants.EVENT_NODES_CHANGE
 import mega.privacy.android.app.utils.Constants.INVALID_POSITION
 import mega.privacy.android.app.utils.ZoomUtil
@@ -79,7 +78,7 @@ class ImagesViewModel @ViewModelInject constructor(
         items
     }
 
-    val dateCards: LiveData<List<List<CUCard>>> = items.map {
+    val dateCards: LiveData<List<List<GalleryCard>>> = items.map {
         val cardsProvider = DateCardsProvider()
         cardsProvider.extractCardsFromNodeList(
             repository.context,
@@ -102,7 +101,7 @@ class ImagesViewModel @ViewModelInject constructor(
      * @return A month card corresponding to the year clicked, current month. If not exists,
      * the closest month to the current.
      */
-    fun yearClicked(position: Int, card: CUCard) = CardClickHandler.yearClicked(
+    fun yearClicked(position: Int, card: GalleryCard) = CardClickHandler.yearClicked(
         position,
         card,
         dateCards.value?.get(MONTHS_INDEX),
@@ -117,7 +116,7 @@ class ImagesViewModel @ViewModelInject constructor(
      * @return A day card corresponding to the month of the year clicked, current day. If not exists,
      * the closest day to the current.
      */
-    fun monthClicked(position: Int, card: CUCard) = CardClickHandler.monthClicked(
+    fun monthClicked(position: Int, card: GalleryCard) = CardClickHandler.monthClicked(
         position,
         card,
         dateCards.value?.get(DAYS_INDEX),

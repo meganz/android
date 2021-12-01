@@ -30,6 +30,7 @@ import mega.privacy.android.app.databinding.FragmentImagesBinding
 import mega.privacy.android.app.fragments.homepage.*
 import mega.privacy.android.app.fragments.managerFragments.cu.*
 import mega.privacy.android.app.fragments.managerFragments.cu.PhotosFragment.*
+import mega.privacy.android.app.gallery.data.GalleryCard
 import mega.privacy.android.app.lollipop.FullScreenImageViewerLollipop
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop
 import mega.privacy.android.app.modalbottomsheet.NodeOptionsBottomSheetDialogFragment
@@ -143,7 +144,7 @@ class ImagesFragment : BaseZoomFragment(){
 
     private val cardClickedListener = object : CUCardViewAdapter.Listener {
 
-        override fun onCardClicked(position: Int, @NonNull card: CUCard) {
+        override fun onCardClicked(position: Int, @NonNull card: GalleryCard) {
             when (selectedView) {
                 DAYS_VIEW -> {
                     zoomViewModel.restoreDefaultZoom()
@@ -576,7 +577,7 @@ class ImagesFragment : BaseZoomFragment(){
      *          The second element is the cards of months.
      *          The third element is the cards of years.
      */
-    private fun showCards(dateCards: List<List<CUCard>?>?) {
+    private fun showCards(dateCards: List<List<GalleryCard>?>?) {
         val index = when (selectedView) {
             DAYS_VIEW -> 0
             MONTHS_VIEW -> 1

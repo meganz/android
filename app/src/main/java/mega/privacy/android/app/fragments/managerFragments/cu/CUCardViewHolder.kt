@@ -6,10 +6,11 @@ import androidx.core.view.isVisible
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import mega.privacy.android.app.R
-import mega.privacy.android.app.databinding.ItemCuCardBinding
+import mega.privacy.android.app.databinding.ItemGalleryCardBinding
 import mega.privacy.android.app.fragments.managerFragments.cu.BaseZoomFragment.Companion.DAYS_VIEW
 import mega.privacy.android.app.fragments.managerFragments.cu.BaseZoomFragment.Companion.MONTHS_VIEW
 import mega.privacy.android.app.fragments.managerFragments.cu.BaseZoomFragment.Companion.YEARS_VIEW
+import mega.privacy.android.app.gallery.data.GalleryCard
 import mega.privacy.android.app.utils.StringResourcesUtils.getString
 import mega.privacy.android.app.utils.StringUtils.formatDateTitle
 
@@ -23,7 +24,7 @@ import mega.privacy.android.app.utils.StringUtils.formatDateTitle
  */
 class CUCardViewHolder(
     private val viewType: Int,
-    private val binding: ItemCuCardBinding,
+    private val binding: ItemGalleryCardBinding,
     cardWidth: Int,
     cardMargin: Int
 ) : RecyclerView.ViewHolder(binding.root) {
@@ -37,7 +38,7 @@ class CUCardViewHolder(
     }
 
     @SuppressLint("SetTextI18n")
-    fun bind(position: Int, card: CUCard, listener: CUCardViewAdapter.Listener) {
+    fun bind(position: Int, card: GalleryCard, listener: CUCardViewAdapter.Listener) {
         itemView.setOnClickListener { listener.onCardClicked(position, card) }
 
         val date = when (viewType) {

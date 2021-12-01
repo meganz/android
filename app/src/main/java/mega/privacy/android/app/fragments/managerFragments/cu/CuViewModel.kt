@@ -24,6 +24,7 @@ import mega.privacy.android.app.fragments.homepage.photos.CardClickHandler.getCl
 import mega.privacy.android.app.fragments.homepage.photos.CardClickHandler.monthClicked
 import mega.privacy.android.app.fragments.homepage.photos.CardClickHandler.yearClicked
 import mega.privacy.android.app.fragments.homepage.photos.DateCardsProvider
+import mega.privacy.android.app.gallery.data.GalleryCard
 import mega.privacy.android.app.globalmanagement.SortOrderManagement
 import mega.privacy.android.app.listeners.OptionalMegaRequestListenerInterface
 import mega.privacy.android.app.repo.MegaNodeRepo
@@ -56,9 +57,9 @@ class CuViewModel @ViewModelInject constructor(
 ) : BaseRxViewModel() {
 
     private val camSyncEnabled = MutableLiveData<Boolean>()
-    private val dayCards = MutableLiveData<List<CUCard>>()
-    private val monthCards = MutableLiveData<List<CUCard>>()
-    private val yearCards = MutableLiveData<List<CUCard>>()
+    private val dayCards = MutableLiveData<List<GalleryCard>>()
+    private val monthCards = MutableLiveData<List<GalleryCard>>()
+    private val yearCards = MutableLiveData<List<GalleryCard>>()
     private val mCuNodes = MutableLiveData<List<CuNode>>()
     private val mNodeToOpen = MutableLiveData<Pair<Int, CuNode?>>()
     private val mNodeToAnimate = MutableLiveData<Pair<Int, CuNode>>()
@@ -142,15 +143,15 @@ class CuViewModel @ViewModelInject constructor(
         )
     }
 
-    fun getDayCardsData(): LiveData<List<CUCard>> {
+    fun getDayCardsData(): LiveData<List<GalleryCard>> {
         return dayCards
     }
 
-    fun getMonthCardsData(): LiveData<List<CUCard>> {
+    fun getMonthCardsData(): LiveData<List<GalleryCard>> {
         return monthCards
     }
 
-    fun getYearCardsData(): LiveData<List<CUCard>> {
+    fun getYearCardsData(): LiveData<List<GalleryCard>> {
         return yearCards
     }
 
@@ -572,7 +573,7 @@ class CuViewModel @ViewModelInject constructor(
      * @param card     Clicked day card.
      * @return The checked day card.
      */
-    fun dayClicked(position: Int, card: CUCard): CUCard? {
+    fun dayClicked(position: Int, card: GalleryCard): GalleryCard? {
         return getClickedCard(position, card.node.handle, getDayCards())
     }
 
@@ -584,7 +585,7 @@ class CuViewModel @ViewModelInject constructor(
      * @return A day card corresponding to the month of the year clicked, current day. If not exists,
      * the closest day to the current.
      */
-    fun monthClicked(position: Int, card: CUCard?): Int {
+    fun monthClicked(position: Int, card: GalleryCard?): Int {
         return monthClicked(position, card!!, getDayCards(), getMonthCards())
     }
 
@@ -596,7 +597,7 @@ class CuViewModel @ViewModelInject constructor(
      * @return A month card corresponding to the year clicked, current month. If not exists,
      * the closest month to the current.
      */
-    fun yearClicked(position: Int, card: CUCard?): Int {
+    fun yearClicked(position: Int, card: GalleryCard?): Int {
         return yearClicked(position, card!!, getMonthCards(), getYearCards())
     }
 

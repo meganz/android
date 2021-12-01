@@ -13,12 +13,13 @@ import mega.privacy.android.app.components.scrollBar.SectionTitleProvider
 import mega.privacy.android.app.databinding.ItemCameraUploadsImageBinding
 import mega.privacy.android.app.databinding.ItemCameraUploadsTitleBinding
 import mega.privacy.android.app.databinding.ItemCameraUploadsVideoBinding
+import mega.privacy.android.app.gallery.data.GalleryItemSizeConfig
 import mega.privacy.android.app.utils.Constants
 
 class CUGridViewAdapter(
     private val listener: Listener,
     private var spanCount: Int,
-    private var itemSizeConfig: CuItemSizeConfig
+    private var itemSizeConfig: GalleryItemSizeConfig
 ) : RecyclerView.Adapter<CuGridViewHolder>(), SectionTitleProvider,
     DragThumbnailGetter {
 
@@ -28,7 +29,7 @@ class CUGridViewAdapter(
         this.spanCount = spanCount
     }
 
-    fun setCuItemSizeConfig(itemSizeConfig: CuItemSizeConfig) {
+    fun setCuItemSizeConfig(itemSizeConfig: GalleryItemSizeConfig) {
         this.itemSizeConfig = itemSizeConfig
     }
 

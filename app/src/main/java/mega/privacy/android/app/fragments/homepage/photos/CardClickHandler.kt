@@ -1,10 +1,10 @@
 package mega.privacy.android.app.fragments.homepage.photos
 
-import mega.privacy.android.app.fragments.managerFragments.cu.CUCard
+import mega.privacy.android.app.gallery.data.GalleryCard
 import java.time.LocalDate
 
 /**
- * Handle the click event on CUCard.
+ * Handle the click event on GalleryCard.
  */
 object CardClickHandler {
 
@@ -16,7 +16,7 @@ object CardClickHandler {
      * @param cards    List of cards to check.
      * @return The checked card if found, null otherwise.
      */
-    fun getClickedCard(position: Int, handle: Long, cards: List<CUCard>?): CUCard? {
+    fun getClickedCard(position: Int, handle: Long, cards: List<GalleryCard>?): GalleryCard? {
         if (cards == null) {
             return null
         }
@@ -25,7 +25,7 @@ object CardClickHandler {
             return null
         }
 
-        var card: CUCard? = cards[position]
+        var card: GalleryCard? = cards[position]
         if (handle != card!!.node.handle) {
             card = null
             for (c in cards) {
@@ -49,7 +49,7 @@ object CardClickHandler {
      * @return A month card corresponding to the year clicked, current month. If not exists,
      * the closest month to the current.
      */
-    fun yearClicked(position: Int, card: CUCard, months: List<CUCard>?, years: List<CUCard>?): Int {
+    fun yearClicked(position: Int, card: GalleryCard, months: List<GalleryCard>?, years: List<GalleryCard>?): Int {
         val yearCard = getClickedCard(position, card.node.handle, years) ?: return 0
         val monthCards = months ?: return 0
 
@@ -84,7 +84,7 @@ object CardClickHandler {
      * @return A day card corresponding to the month of the year clicked, current day. If not exists,
      * the closest day to the current.
      */
-    fun monthClicked(position: Int, card: CUCard, days: List<CUCard>?, months: List<CUCard>?): Int {
+    fun monthClicked(position: Int, card: GalleryCard, days: List<GalleryCard>?, months: List<GalleryCard>?): Int {
         val monthCard = getClickedCard(position, card.node.handle, months) ?: return 0
         val dayCards = days ?: return 0
 

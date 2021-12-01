@@ -9,6 +9,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.facebook.drawee.generic.RoundingParams
 import com.facebook.drawee.view.SimpleDraweeView
 import mega.privacy.android.app.R
+import mega.privacy.android.app.gallery.data.GalleryItemSizeConfig
 import mega.privacy.android.app.utils.ZoomUtil
 
 abstract class CuGridViewHolder(
@@ -21,7 +22,7 @@ abstract class CuGridViewHolder(
         fun updateThumbnailDisplay(
             thumbnail: SimpleDraweeView,
             node: CuNode,
-            itemSizeConfig: CuItemSizeConfig
+            itemSizeConfig: GalleryItemSizeConfig
         ) {
             // force set the thumbnail visible, in case FullscreenImageViewer/AudioVideoPlayer
             // doesn't call setVisibility when dismissed
@@ -47,7 +48,7 @@ abstract class CuGridViewHolder(
         }
 
         @JvmStatic
-        fun setViewSize(grid: View, icSelected: View, itemSizeConfig: CuItemSizeConfig) {
+        fun setViewSize(grid: View, icSelected: View, itemSizeConfig: GalleryItemSizeConfig) {
             val params = grid.layoutParams as GridLayoutManager.LayoutParams
             params.width = itemSizeConfig.gridSize
             params.height = itemSizeConfig.gridSize

@@ -28,6 +28,8 @@ import mega.privacy.android.app.components.dragger.DragToExitSupport.Companion.o
 import mega.privacy.android.app.components.dragger.DragToExitSupport.Companion.putThumbnailLocation
 import mega.privacy.android.app.databinding.FragmentPhotosBinding
 import mega.privacy.android.app.fragments.homepage.photos.ScaleGestureHandler
+import mega.privacy.android.app.gallery.data.GalleryCard
+import mega.privacy.android.app.gallery.data.GalleryItemSizeConfig
 import mega.privacy.android.app.globalmanagement.SortOrderManagement
 import mega.privacy.android.app.lollipop.FullScreenImageViewerLollipop
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop
@@ -362,7 +364,7 @@ class PhotosFragment : BaseZoomFragment(), CUGridViewAdapter.Listener,
             val gridWidth = getItemWidth(context, outMetrics, getCurrentZoom(), spanCount)
             val icSelectedWidth = getSelectedFrameWidth(context, getCurrentZoom())
             val icSelectedMargin = getSelectedFrameMargin(context, getCurrentZoom())
-            val itemSizeConfig = CuItemSizeConfig(
+            val itemSizeConfig = GalleryItemSizeConfig(
                 getCurrentZoom(), gridWidth,
                 icSelectedWidth, imageMargin,
                 resources.getDimensionPixelSize(R.dimen.cu_fragment_selected_padding),
@@ -570,19 +572,19 @@ class PhotosFragment : BaseZoomFragment(), CUGridViewAdapter.Listener,
         return !emptyAdapter && mActionMode == null && selectedView == ALL_VIEW
     }
 
-    private fun showDayCards(dayCards: List<CUCard>) {
+    private fun showDayCards(dayCards: List<GalleryCard>) {
         if (selectedView == DAYS_VIEW) {
             cardAdapter!!.submitList(dayCards)
         }
     }
 
-    private fun showMonthCards(monthCards: List<CUCard>) {
+    private fun showMonthCards(monthCards: List<GalleryCard>) {
         if (selectedView == MONTHS_VIEW) {
             cardAdapter!!.submitList(monthCards)
         }
     }
 
-    private fun showYearCards(yearCards: List<CUCard>) {
+    private fun showYearCards(yearCards: List<GalleryCard>) {
         if (selectedView == YEARS_VIEW) {
             cardAdapter!!.submitList(yearCards)
         }
@@ -673,7 +675,7 @@ class PhotosFragment : BaseZoomFragment(), CUGridViewAdapter.Listener,
         )
     }
 
-    override fun onCardClicked(position: Int, card: CUCard) {
+    override fun onCardClicked(position: Int, card: GalleryCard) {
         when (selectedView) {
             DAYS_VIEW -> {
                 zoomViewModel.restoreDefaultZoom()
