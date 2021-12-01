@@ -9,6 +9,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.facebook.drawee.generic.RoundingParams
 import com.facebook.drawee.view.SimpleDraweeView
 import mega.privacy.android.app.R
+import mega.privacy.android.app.gallery.data.GalleryItem
 import mega.privacy.android.app.gallery.data.GalleryItemSizeConfig
 import mega.privacy.android.app.utils.ZoomUtil
 
@@ -21,7 +22,7 @@ abstract class CuGridViewHolder(
         @JvmStatic
         fun updateThumbnailDisplay(
             thumbnail: SimpleDraweeView,
-            node: CuNode,
+            node: GalleryItem,
             itemSizeConfig: GalleryItemSizeConfig
         ) {
             // force set the thumbnail visible, in case FullscreenImageViewer/AudioVideoPlayer
@@ -76,15 +77,15 @@ abstract class CuGridViewHolder(
         }
     }
 
-    fun bind(position: Int, node: CuNode, listener: CUGridViewAdapter.Listener) {
+    fun bind(position: Int, node: GalleryItem, listener: CUGridViewAdapter.Listener) {
         if (handleClick() && node.node != null) {
-            itemView.setOnClickListener { v: View? ->
+            itemView.setOnClickListener {
                 listener.onNodeClicked(
                     position,
                     node
                 )
             }
-            itemView.setOnLongClickListener { v: View? ->
+            itemView.setOnLongClickListener {
                 listener.onNodeLongClicked(position, node)
                 true
             }
@@ -93,7 +94,7 @@ abstract class CuGridViewHolder(
         bind(node)
     }
 
-    protected abstract fun bind(node: CuNode)
+    protected abstract fun bind(node: GalleryItem)
 
     protected open fun handleClick() = true
 }

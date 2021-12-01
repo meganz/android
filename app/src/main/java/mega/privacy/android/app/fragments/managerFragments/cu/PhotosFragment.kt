@@ -29,6 +29,7 @@ import mega.privacy.android.app.components.dragger.DragToExitSupport.Companion.p
 import mega.privacy.android.app.databinding.FragmentPhotosBinding
 import mega.privacy.android.app.fragments.homepage.photos.ScaleGestureHandler
 import mega.privacy.android.app.gallery.data.GalleryCard
+import mega.privacy.android.app.gallery.data.GalleryItem
 import mega.privacy.android.app.gallery.data.GalleryItemSizeConfig
 import mega.privacy.android.app.globalmanagement.SortOrderManagement
 import mega.privacy.android.app.lollipop.FullScreenImageViewerLollipop
@@ -590,7 +591,7 @@ class PhotosFragment : BaseZoomFragment(), CUGridViewAdapter.Listener,
         }
     }
 
-    private fun openNode(position: Int, cuNode: CuNode?) {
+    private fun openNode(position: Int, cuNode: GalleryItem?) {
         if (position < 0 || gridAdapter == null || position >= gridAdapter!!.itemCount) {
             return
         }
@@ -620,11 +621,11 @@ class PhotosFragment : BaseZoomFragment(), CUGridViewAdapter.Listener,
         super.onDestroyView()
     }
 
-    override fun onNodeClicked(position: Int, node: CuNode?) {
+    override fun onNodeClicked(position: Int, node: GalleryItem?) {
         viewModel.onNodeClicked(position, node!!)
     }
 
-    override fun onNodeLongClicked(position: Int, node: CuNode?) {
+    override fun onNodeLongClicked(position: Int, node: GalleryItem?) {
         // Multiple selection only available for zoom default (3 items per row) or zoom out 1x (5 items per row).
         if (getCurrentZoom() == ZOOM_DEFAULT || getCurrentZoom() == ZOOM_OUT_1X) {
             viewModel.onNodeLongClicked(position, node!!)
@@ -645,8 +646,7 @@ class PhotosFragment : BaseZoomFragment(), CUGridViewAdapter.Listener,
         updateFastScrollerVisibility()
         mManagerActivity.enableHideBottomViewOnScroll(selectedView != ALL_VIEW)
         mManagerActivity.updateEnableCUButton(
-            if (selectedView == ALL_VIEW && gridAdapter != null && gridAdapter!!.itemCount > 0
-                && viewModel != null && !viewModel.isCUEnabled()
+            if (selectedView == ALL_VIEW && gridAdapter != null && gridAdapter!!.itemCount > 0 && !viewModel.isCUEnabled()
             ) View.VISIBLE else View.GONE
         )
         if (selectedView != ALL_VIEW) {
@@ -665,9 +665,8 @@ class PhotosFragment : BaseZoomFragment(), CUGridViewAdapter.Listener,
     }
 
     private fun updateFastScrollerVisibility() {
-        if (binding == null || cardAdapter == null) {
-            return
-        }
+        if (cardAdapter == null) return
+
         super.updateFastScrollerVisibility(
             selectedView,
             binding.scroller,

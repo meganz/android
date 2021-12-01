@@ -2,6 +2,7 @@ package mega.privacy.android.app.fragments.managerFragments.cu
 
 import android.view.View
 import mega.privacy.android.app.databinding.ItemCameraUploadsImageBinding
+import mega.privacy.android.app.gallery.data.GalleryItem
 import mega.privacy.android.app.gallery.data.GalleryItemSizeConfig
 
 class CuImageViewHolder(
@@ -13,7 +14,7 @@ class CuImageViewHolder(
         setViewSize(mBinding.root, mBinding.icSelected, mItemSizeConfig)
     }
 
-    override fun bind(node: CuNode) {
+    override fun bind(node: GalleryItem) {
         mBinding.icSelected.visibility = if (node.isSelected) View.VISIBLE else View.GONE
 
         updateThumbnailDisplay(

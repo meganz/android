@@ -2,6 +2,7 @@ package mega.privacy.android.app.fragments.managerFragments.cu
 
 import mega.privacy.android.app.R
 import mega.privacy.android.app.databinding.ItemCameraUploadsTitleBinding
+import mega.privacy.android.app.gallery.data.GalleryItem
 import mega.privacy.android.app.utils.LogUtil
 import mega.privacy.android.app.utils.StringResourcesUtils
 import mega.privacy.android.app.utils.StringUtils.toSpannedHtmlText
@@ -11,7 +12,7 @@ class CuTitleViewHolder(
     private val mBinding: ItemCameraUploadsTitleBinding
 ) : CuGridViewHolder(mBinding.root) {
 
-    override fun bind(node: CuNode) {
+    override fun bind(node: GalleryItem) {
         val date = node.headerDate
         var dateText =
             if (TextUtil.isTextEmpty(date!!.second)) "[B]" + date.first + "[/B]" else StringResourcesUtils.getString(

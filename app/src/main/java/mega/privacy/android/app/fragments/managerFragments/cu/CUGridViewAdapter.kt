@@ -13,6 +13,7 @@ import mega.privacy.android.app.components.scrollBar.SectionTitleProvider
 import mega.privacy.android.app.databinding.ItemCameraUploadsImageBinding
 import mega.privacy.android.app.databinding.ItemCameraUploadsTitleBinding
 import mega.privacy.android.app.databinding.ItemCameraUploadsVideoBinding
+import mega.privacy.android.app.gallery.data.GalleryItem
 import mega.privacy.android.app.gallery.data.GalleryItemSizeConfig
 import mega.privacy.android.app.utils.Constants
 
@@ -23,7 +24,7 @@ class CUGridViewAdapter(
 ) : RecyclerView.Adapter<CuGridViewHolder>(), SectionTitleProvider,
     DragThumbnailGetter {
 
-    private val mNodes = mutableListOf<CuNode>()
+    private val mNodes = mutableListOf<GalleryItem>()
 
     fun setSpanCount(spanCount: Int) {
         this.spanCount = spanCount
@@ -61,7 +62,7 @@ class CUGridViewAdapter(
         return null
     }
 
-    override fun getItemId(position: Int) = if (getItemViewType(position) == CuNode.TYPE_HEADER) {
+    override fun getItemId(position: Int) = if (getItemViewType(position) == GalleryItem.TYPE_HEADER) {
         mNodes[position].modifyDate.hashCode().toLong()
     } else {
         // Type isn't header, node object is non-null.
@@ -75,14 +76,14 @@ class CUGridViewAdapter(
         val inflater = LayoutInflater.from(parent.context)
 
         return when (viewType) {
-            CuNode.TYPE_HEADER -> CuTitleViewHolder(
+            GalleryItem.TYPE_HEADER -> CuTitleViewHolder(
                 ItemCameraUploadsTitleBinding.inflate(inflater, parent, false)
             )
-            CuNode.TYPE_VIDEO -> CuVideoViewHolder(
+            GalleryItem.TYPE_VIDEO -> CuVideoViewHolder(
                 ItemCameraUploadsVideoBinding.inflate(inflater, parent, false),
                 itemSizeConfig
             )
-            CuNode.TYPE_IMAGE -> CuImageViewHolder(
+            GalleryItem.TYPE_IMAGE -> CuImageViewHolder(
                 ItemCameraUploadsImageBinding.inflate(inflater, parent, false),
                 itemSizeConfig
             )
@@ -100,7 +101,7 @@ class CUGridViewAdapter(
     override fun getItemCount() = mNodes.size
 
     @SuppressLint("NotifyDataSetChanged")
-    fun setNodes(nodes: List<CuNode>) {
+    fun setNodes(nodes: List<GalleryItem>) {
         mNodes.clear()
         mNodes.addAll(nodes)
         notifyDataSetChanged()
@@ -109,14 +110,14 @@ class CUGridViewAdapter(
     fun getSpanSize(position: Int) = if (position < 0 || position >= mNodes.size) {
         1
     } else {
-        if (mNodes[position].type == CuNode.TYPE_HEADER) {
+        if (mNodes[position].type == GalleryItem.TYPE_HEADER) {
             spanCount
         } else {
             1
         }
     }
 
-    fun showSelectionAnimation(position: Int, node: CuNode, holder: RecyclerView.ViewHolder?) {
+    fun showSelectionAnimation(position: Int, node: GalleryItem, holder: RecyclerView.ViewHolder?) {
         if (holder == null || position < 0 || position >= mNodes.size || mNodes[position].node == null || mNodes[position].node?.handle != node.node?.handle) {
             return
         }
@@ -171,7 +172,7 @@ class CUGridViewAdapter(
     }
 
     interface Listener {
-        fun onNodeClicked(position: Int, node: CuNode?)
-        fun onNodeLongClicked(position: Int, node: CuNode?)
+        fun onNodeClicked(position: Int, node: GalleryItem?)
+        fun onNodeLongClicked(position: Int, node: GalleryItem?)
     }
 }

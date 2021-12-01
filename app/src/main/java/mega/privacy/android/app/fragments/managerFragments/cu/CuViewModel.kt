@@ -16,6 +16,7 @@ import io.reactivex.rxjava3.schedulers.Schedulers
 import io.reactivex.rxjava3.subjects.PublishSubject
 import io.reactivex.rxjava3.subjects.Subject
 import mega.privacy.android.app.DatabaseHandler
+import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.MegaPreferences
 import mega.privacy.android.app.arch.BaseRxViewModel
 import mega.privacy.android.app.constants.SettingsConstants
@@ -25,6 +26,7 @@ import mega.privacy.android.app.fragments.homepage.photos.CardClickHandler.month
 import mega.privacy.android.app.fragments.homepage.photos.CardClickHandler.yearClicked
 import mega.privacy.android.app.fragments.homepage.photos.DateCardsProvider
 import mega.privacy.android.app.gallery.data.GalleryCard
+import mega.privacy.android.app.gallery.data.GalleryItem
 import mega.privacy.android.app.globalmanagement.SortOrderManagement
 import mega.privacy.android.app.listeners.OptionalMegaRequestListenerInterface
 import mega.privacy.android.app.repo.MegaNodeRepo
@@ -60,13 +62,13 @@ class CuViewModel @ViewModelInject constructor(
     private val dayCards = MutableLiveData<List<GalleryCard>>()
     private val monthCards = MutableLiveData<List<GalleryCard>>()
     private val yearCards = MutableLiveData<List<GalleryCard>>()
-    private val mCuNodes = MutableLiveData<List<CuNode>>()
-    private val mNodeToOpen = MutableLiveData<Pair<Int, CuNode?>>()
-    private val mNodeToAnimate = MutableLiveData<Pair<Int, CuNode>>()
+    private val mCuNodes = MutableLiveData<List<GalleryItem>>()
+    private val mNodeToOpen = MutableLiveData<Pair<Int, GalleryItem?>>()
+    private val mNodeToAnimate = MutableLiveData<Pair<Int, GalleryItem>>()
     private val mActionBarTitle = MutableLiveData<String>()
     private val mActionMode = MutableLiveData(false)
 
-    private val mOpenNodeAction: Subject<Pair<Int, CuNode?>> = PublishSubject.create()
+    private val mOpenNodeAction: Subject<Pair<Int, GalleryItem?>> = PublishSubject.create()
     private val mCreatingThumbnailFinished: Subject<Any> = PublishSubject.create()
     private val mCreatingPreviewFinished: Subject<Any> = PublishSubject.create()
     private val mCreatePreviewForCardFinished: Subject<Any> = PublishSubject.create()
@@ -203,7 +205,7 @@ class CuViewModel @ViewModelInject constructor(
      * @param position clicked node position in RV
      * @param node     clicked node
      */
-    fun onNodeClicked(position: Int, node: CuNode) {
+    fun onNodeClicked(position: Int, node: GalleryItem) {
         if (mSelecting) {
             val nodes = mCuNodes.value
             if (nodes == null || position < 0 || position >= nodes.size || nodes[position].node == null || nodes[position].node!!.handle != node.node!!.handle) {
@@ -223,7 +225,7 @@ class CuViewModel @ViewModelInject constructor(
         }
     }
 
-    fun onNodeLongClicked(position: Int, node: CuNode) {
+    fun onNodeLongClicked(position: Int, node: GalleryItem) {
         mSelecting = true
         onNodeClicked(position, node)
     }
@@ -263,7 +265,7 @@ class CuViewModel @ViewModelInject constructor(
             }
         }
         mSelecting = true
-        mCuNodes.value = nodes!!
+        mCuNodes.value = nodes
         mActionMode.value = true
     }
 
@@ -283,7 +285,7 @@ class CuViewModel @ViewModelInject constructor(
                 node.isSelected = false
             }
             mSelectedNodes.clear()
-            mCuNodes.value = nodes!!
+            mCuNodes.value = nodes
         }
     }
 
@@ -325,10 +327,9 @@ class CuViewModel @ViewModelInject constructor(
 
     fun enableCu(enableCellularSync: Boolean, syncVideo: Boolean) {
         add(Completable.fromCallable {
-            val localFile = Environment.getExternalStoragePublicDirectory(
-                Environment.DIRECTORY_DCIM
-            )
-            mDbHandler.setCamSyncLocalPath(localFile.absolutePath)
+            val localFile =
+                MegaApplication.getInstance().getExternalFilesDir(Environment.DIRECTORY_DCIM)
+            mDbHandler.setCamSyncLocalPath(localFile?.absolutePath)
             mDbHandler.setCameraFolderExternalSDCard(false)
             mDbHandler.setCamSyncWifi(!enableCellularSync)
             mDbHandler.setCamSyncFileUpload(
@@ -364,7 +365,7 @@ class CuViewModel @ViewModelInject constructor(
         add(Single.fromCallable { getCuNodes() }
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
-            .subscribe({ value: List<CuNode>? ->
+            .subscribe({ value: List<GalleryItem>? ->
                 mCuNodes.setValue(
                     value
                 )
@@ -380,8 +381,8 @@ class CuViewModel @ViewModelInject constructor(
      *
      * @return The list of CUNode objects.
      */
-    private fun getCuNodes(): List<CuNode> {
-        val nodes: MutableList<CuNode> = ArrayList()
+    private fun getCuNodes(): List<GalleryItem> {
+        val nodes: MutableList<GalleryItem> = ArrayList()
         val nodesWithoutThumbnail: MutableList<MegaNode> = ArrayList()
         val nodesWithoutPreview: MutableList<MegaNode> = ArrayList()
         var lastYearDate: LocalDate? = null
@@ -402,10 +403,10 @@ class CuViewModel @ViewModelInject constructor(
             val modifyDate: LocalDate = fromEpoch(node.modificationTime)
             val dateString = DateTimeFormatter.ofPattern("MMMM yyyy").format(modifyDate)
             val sameYear = Year.from(LocalDate.now()) == Year.from(modifyDate)
-            val cuNode = CuNode(
+            val cuNode = GalleryItem(
                 node, pair.first,
                 if (thumbnail.exists()) thumbnail else null,
-                if (FileUtil.isVideoFile(node.name)) CuNode.TYPE_VIDEO else CuNode.TYPE_IMAGE,
+                if (FileUtil.isVideoFile(node.name)) GalleryItem.TYPE_VIDEO else GalleryItem.TYPE_IMAGE,
                 dateString,
                 null,
                 mSelectedNodes.containsKey(node.handle)
@@ -414,13 +415,13 @@ class CuViewModel @ViewModelInject constructor(
                 if (lastYearDate == null || Year.from(lastYearDate) != Year.from(modifyDate)) {
                     lastYearDate = modifyDate
                     val date = DateTimeFormatter.ofPattern("yyyy").format(modifyDate)
-                    nodes.add(CuNode(date, Pair(date, "")))
+                    nodes.add(GalleryItem(date, Pair(date, "")))
                 }
             } else if (mZoom == ZoomUtil.ZOOM_IN_1X) {
                 if (lastDayDate == null || lastDayDate.dayOfYear != modifyDate.dayOfYear) {
                     lastDayDate = modifyDate
                     nodes.add(
-                        CuNode(
+                        GalleryItem(
                             dateString, Pair(
                                 DateTimeFormatter.ofPattern("dd MMMM").format(modifyDate),
                                 if (sameYear) "" else DateTimeFormatter.ofPattern("yyyy")
@@ -437,7 +438,7 @@ class CuViewModel @ViewModelInject constructor(
                 ) {
                     lastMonthDate = modifyDate
                     nodes.add(
-                        CuNode(
+                        GalleryItem(
                             dateString, Pair(
                                 DateTimeFormatter.ofPattern("MMMM").format(modifyDate),
                                 if (sameYear) "" else DateTimeFormatter.ofPattern("yyyy")

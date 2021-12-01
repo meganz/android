@@ -3,6 +3,7 @@ package mega.privacy.android.app.fragments.managerFragments.cu
 import android.view.View
 import mega.privacy.android.app.R
 import mega.privacy.android.app.databinding.ItemCameraUploadsVideoBinding
+import mega.privacy.android.app.gallery.data.GalleryItem
 import mega.privacy.android.app.gallery.data.GalleryItemSizeConfig
 import mega.privacy.android.app.utils.TimeUtils
 import mega.privacy.android.app.utils.ZoomUtil.ZOOM_DEFAULT
@@ -18,7 +19,7 @@ class CuVideoViewHolder(
         setViewSize(mBinding.root, mBinding.icSelected, mItemSizeConfig)
     }
 
-    override fun bind(node: CuNode) {
+    override fun bind(node: GalleryItem) {
         when (mItemSizeConfig.zoom) {
             ZOOM_IN_1X, ZOOM_DEFAULT -> {
                 mBinding.playIcon.visibility = View.GONE
