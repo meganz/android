@@ -4,6 +4,8 @@ import android.content.Intent;
 import android.content.res.Resources;
 import android.os.Bundle;
 import android.os.Handler;
+
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.view.ActionMode;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -50,9 +52,9 @@ public class ContactSharedFolderFragment extends ContactFileBaseFragment {
     private ActionMode actionMode;
 
     Handler handler;
-    
+
     @Override
-    public View onCreateView(LayoutInflater inflater,ViewGroup container,Bundle savedInstanceState) {
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         logDebug("ContactSharedFolderFragment: onCreateView");
         handler = new Handler();
         View v = null;
@@ -83,10 +85,10 @@ public class ContactSharedFolderFragment extends ContactFileBaseFragment {
             listView.addItemDecoration(new SimpleDividerItemDecoration(context));
             listView.setLayoutManager(mLayoutManager);
             listView.setItemAnimator(noChangeRecyclerViewItemAnimator());
-            
+
             if (adapter == null) {
-                adapter = new MegaNodeAdapter(context,this,contactNodes,-1,listView,aB,CONTACT_SHARED_FOLDER_ADAPTER, MegaNodeAdapter.ITEM_VIEW_TYPE_LIST);
-                
+                adapter = new MegaNodeAdapter(context, this, contactNodes, -1,
+                        listView, CONTACT_SHARED_FOLDER_ADAPTER, MegaNodeAdapter.ITEM_VIEW_TYPE_LIST);
             } else {
                 adapter.setNodes(contactNodes);
                 adapter.setParentHandle(-1);
