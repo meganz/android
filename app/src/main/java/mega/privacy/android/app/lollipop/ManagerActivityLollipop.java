@@ -3551,10 +3551,8 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 		Fragment f = getSupportFragmentManager().findFragmentByTag(fTag);
 		if (f != null) {
 			logDebug("Fragment " + fTag + " refreshing");
-			FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-			ft.detach(f);
-			ft.attach(f);
-			ft.commitNowAllowingStateLoss();
+			getSupportFragmentManager().beginTransaction().detach(f).commitNowAllowingStateLoss();
+			getSupportFragmentManager().beginTransaction().attach(f).commitNowAllowingStateLoss();
 		} else {
 			logWarning("Fragment == NULL. Not refresh");
 		}
