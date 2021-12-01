@@ -4,6 +4,7 @@ import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.ContentResolver;
+import android.content.Context;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.net.Uri;
@@ -88,6 +89,7 @@ public class FileStorageActivityLollipop extends PasscodeActivity implements OnC
 	private static final String PATH = "PATH";
 	public static final String PICK_FOLDER_TYPE = "PICK_FOLDER_TYPE";
 	private static final int REQUEST_SAVE_RK = 1122;
+	private static final int REQUEST_PICK_CU_FOLDER = 1133;
 
 	public enum PickFolderType {
 		CU_FOLDER("CU_FOLDER"),
@@ -172,6 +174,7 @@ public class FileStorageActivityLollipop extends PasscodeActivity implements OnC
 	
 	private Boolean fromSettings, fromSaveRecoveryKey;
 	private PickFolderType pickFolderType;
+	private boolean isCUOrMUFolder;
 	private String sdRoot;
 	private boolean hasSDCard;
     private String prompt;
@@ -472,6 +475,8 @@ public class FileStorageActivityLollipop extends PasscodeActivity implements OnC
 
 		if (fromSaveRecoveryKey && isAndroid11OrUpper()) {
 			createRKFile();
+		} else if (isCUOrMUFolder && isAndroid11OrUpper()) {
+			openPickCUFolderFromSystem();
 		} else if (mode == Mode.BROWSE_FILES) {
 			if (intent.getExtras() != null) {
 				String extraPath = intent.getExtras().getString(EXTRA_PATH);
@@ -508,6 +513,15 @@ public class FileStorageActivityLollipop extends PasscodeActivity implements OnC
 	}
 
 	/**
+	 * On Android 11 and upper we cannot show our app picker, we must use the system one.
+	 * So opens the system file picker in order to give the option to chose a CU or MU local folder.
+	 */
+	private void openPickCUFolderFromSystem() {
+		startActivityForResult(new Intent(Intent.ACTION_OPEN_DOCUMENT_TREE)
+				.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION), REQUEST_PICK_CU_FOLDER);
+	}
+
+	/**
 	 * Sets the type of pick folder action.
 	 *
 	 * @param pickFolderString	the type of pick folder action.
@@ -524,6 +538,9 @@ public class FileStorageActivityLollipop extends PasscodeActivity implements OnC
 		} else if (pickFolderString.equals(PickFolderType.DOWNLOAD_FOLDER.getFolderType())) {
 			pickFolderType = PickFolderType.DOWNLOAD_FOLDER;
 		}
+
+		isCUOrMUFolder = pickFolderType.equals(PickFolderType.CU_FOLDER)
+				|| pickFolderType.equals(PickFolderType.MU_FOLDER);
 	}
 
 	/**
@@ -852,8 +869,6 @@ public class FileStorageActivityLollipop extends PasscodeActivity implements OnC
                     dbH.setLastUploadFolder(path.getAbsolutePath());
                 }
 				if (mode == Mode.PICK_FOLDER) {
-					boolean isCUOrMUFolder = pickFolderType.equals(PickFolderType.CU_FOLDER) || pickFolderType.equals(PickFolderType.MU_FOLDER);
-
 					if (!isCUOrMUFolder && dbH.getCredentials() != null && dbH.getAskSetDownloadLocation()) {
 						showConfirmationSaveInSameLocation();
 					} else {
@@ -1244,6 +1259,72 @@ public class FileStorageActivityLollipop extends PasscodeActivity implements OnC
         } else if (requestCode == REQUEST_SAVE_RK) {
 			if (intent != null && resultCode == Activity.RESULT_OK) {
 				setResult(RESULT_OK, new Intent().setData(intent.getData()));
+			}
+
+			//If resultCode is not Activity.RESULT_OK, means cancelled, so only finish.
+			finish();
+		} else if (requestCode == REQUEST_PICK_CU_FOLDER) {
+			if (intent != null && resultCode == Activity.RESULT_OK) {
+				logDebug("Folder picked from system picker");
+				Uri uri = intent.getData();
+				getContentResolver().takePersistableUriPermission(uri, Intent.FLAG_GRANT_READ_URI_PERMISSION);
+
+				SDCardOperator operator = null;
+
+				try {
+					operator = new SDCardOperator(this);
+				} catch (SDCardOperator.SDCardException e) {
+					logError("Error creating SDCardOperator", e);
+				}
+
+				if (operator != null) {
+					String volumePath = operator.getSDCardRoot();
+
+					if (volumePath != null) {
+						final String[] split = volumePath.split(File.separator);
+						if (split.length > 0 && uri.toString().contains(split[split.length - 1])) {
+							//SD card folder
+							String pathString = getFullPathFromTreeUri(uri, this);
+
+							if (isTextEmpty(pathString)) {
+								logWarning("getFullPathFromTreeUri is Null.");
+								return;
+							}
+
+							path = new File(pathString);
+
+							if (pickFolderType.equals(PickFolderType.CU_FOLDER)) {
+								dbH.setCameraFolderExternalSDCard(true);
+								dbH.setUriExternalSDCard(uri.toString());
+							} else if (pickFolderType.equals(PickFolderType.MU_FOLDER)) {
+								dbH.setMediaFolderExternalSdCard(true);
+								dbH.setUriMediaExternalSdCard(uri.toString());
+							}
+
+							finishPickFolder();
+							return;
+						}
+					} else {
+						logWarning("volumePath is null");
+					}
+				} else {
+					logDebug("operator is null");
+				}
+
+				//Primary storage
+				if (isAndroid11OrUpper()) {
+					//This is always true since REQUEST_PICK_CU_FOLDER is only requested in that situation
+					StorageManager storageManager = (StorageManager) getSystemService(Context.STORAGE_SERVICE);
+					File file = storageManager.getPrimaryStorageVolume().getDirectory();
+					String[] split = uri.getPath().split(":");
+
+					if (file != null && split.length == 2) {
+						path = new File(file.getAbsolutePath() + File.separator + split[1]);
+						finishPickFolder();
+					} else {
+						logError("Error getting primary storage path");
+					}
+				}
 			}
 
 			//If resultCode is not Activity.RESULT_OK, means cancelled, so only finish.
