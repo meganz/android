@@ -1780,7 +1780,7 @@ object MegaNodeUtil {
         activityLauncher: ActivityLauncher,
         snackbarShower: SnackbarShower
     ) {
-        val possibleLocalFile = getLocalFile(node)
+        val possibleLocalFile = getTappedNodeLocalFile(node)
 
         if (possibleLocalFile != null) {
             logDebug("The node is already downloaded, found in local.")
