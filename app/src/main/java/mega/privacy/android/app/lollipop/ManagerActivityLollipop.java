@@ -4535,7 +4535,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 					bottomNavigationCurrentItem = CLOUD_DRIVE_BNV;
 				}
 				setBottomNavigationMenuItemChecked(CLOUD_DRIVE_BNV);
-				if (getIntent().getBooleanExtra(INTENT_EXTRA_KEY_LOCATION_FILE_INFO, false)) {
+				if (getIntent() != null && getIntent().getBooleanExtra(INTENT_EXTRA_KEY_LOCATION_FILE_INFO, false)) {
 					fbFLol.refreshNodes();
 				}
 				logDebug("END for Cloud Drive");
