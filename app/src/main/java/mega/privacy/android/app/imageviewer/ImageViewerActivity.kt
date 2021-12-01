@@ -9,6 +9,7 @@ import android.view.MenuItem
 import android.view.ViewGroup
 import androidx.activity.viewModels
 import androidx.constraintlayout.widget.ConstraintSet
+import androidx.core.content.ContextCompat
 import androidx.core.view.*
 import androidx.viewpager2.widget.ViewPager2
 import dagger.hilt.android.AndroidEntryPoint
@@ -32,7 +33,6 @@ import mega.privacy.android.app.utils.LogUtil.logWarning
 import mega.privacy.android.app.utils.MegaNodeDialogUtil.showRenameNodeDialog
 import mega.privacy.android.app.utils.NetworkUtil.isOnline
 import mega.privacy.android.app.utils.StringResourcesUtils
-import mega.privacy.android.app.utils.StringResourcesUtils.getQuantityString
 import mega.privacy.android.app.utils.ViewUtils.waitForLayout
 import nz.mega.documentscanner.utils.IntentUtils.extra
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
@@ -48,7 +48,6 @@ class ImageViewerActivity : BaseActivity(), PermissionRequester, SnackbarShower 
 
     companion object {
         private const val OFFSCREEN_PAGE_LIMIT = 3
-        private const val STATE_PAGE_CALLBACK_SET = "STATE_PAGE_CALLBACK_SET"
 
         /**
          * Get Image Viewer intent to show a single image node.
@@ -191,7 +190,7 @@ class ImageViewerActivity : BaseActivity(), PermissionRequester, SnackbarShower 
     }
     private val dragToExit by lazy {
         WeakReference(
-            DragToExitSupport(this, null) {
+            DragToExitSupport(this, ::animateToolbar) {
                 finish()
                 overridePendingTransition(0, android.R.anim.fade_out)
             }
@@ -211,7 +210,7 @@ class ImageViewerActivity : BaseActivity(), PermissionRequester, SnackbarShower 
         setupObservers()
 
         if (savedInstanceState == null) {
-            dragToExit.get()?.runEnterAnimation(intent, binding.root, null)
+            dragToExit.get()?.runEnterAnimation(intent, binding.root, ::animateToolbar)
         }
     }
 
@@ -297,6 +296,7 @@ class ImageViewerActivity : BaseActivity(), PermissionRequester, SnackbarShower 
             binding.progress.hide()
         }
         viewModel.onCurrentImageNode().observe(this, ::showCurrentImageInfo)
+        viewModel.onSnackbarMessage().observe(this) { showSnackbar(it) }
         viewModel.onSwitchToolbar().observe(this) { switchToolbarVisibility() }
         viewModel.onCurrentPosition().observe(this) { positionPair ->
             binding.txtPageCount.apply {
@@ -331,8 +331,6 @@ class ImageViewerActivity : BaseActivity(), PermissionRequester, SnackbarShower 
      */
     private fun showCurrentImageInfo(item: MegaNodeItem?) {
         if (item != null) {
-            bottomSheet?.dismiss()
-
             binding.txtTitle.text = item.node.name
             binding.toolbar.menu?.apply {
                 findItem(R.id.action_download)?.isVisible =
@@ -363,6 +361,18 @@ class ImageViewerActivity : BaseActivity(), PermissionRequester, SnackbarShower 
         } else {
             binding.motion.transitionToStart()
         }
+    }
+
+    private fun animateToolbar(isActivated: Boolean) {
+        val color: Int
+        if (isActivated) {
+            color = android.R.color.transparent
+            binding.motion.transitionToEnd()
+        } else {
+            color = R.color.white_black
+            binding.motion.transitionToStart()
+        }
+        binding.motion.setBackgroundColor(ContextCompat.getColor(this, color))
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -412,16 +422,6 @@ class ImageViewerActivity : BaseActivity(), PermissionRequester, SnackbarShower 
 
     fun attachNode(node: MegaNode) {
         nodeAttacher.get()?.attachNode(node)
-    }
-
-    fun removeLink(nodeHandle: Long) {
-        viewModel.removeLink(nodeHandle).observe(this) { isSuccess ->
-            if (isSuccess) {
-                showSnackbar(getQuantityString(R.plurals.context_link_removal_success, 1))
-            } else {
-                showSnackbar(getQuantityString(R.plurals.context_link_removal_error, 1))
-            }
-        }
     }
 
     fun showRenameDialog(node: MegaNode) {

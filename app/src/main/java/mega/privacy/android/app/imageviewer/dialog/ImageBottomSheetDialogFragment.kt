@@ -79,6 +79,7 @@ class ImageBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        viewModel.loadSingleNode(imageNodeHandle, true)
         viewModel.onImage(imageNodeHandle).observe(viewLifecycleOwner, ::showNodeData)
         super.onViewCreated(view, savedInstanceState)
     }
@@ -87,7 +88,7 @@ class ImageBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
     private fun showNodeData(imageItem: ImageItem?) {
         if (imageItem?.nodeItem == null) {
             logWarning("Image node is null")
-            dismiss()
+            dismissAllowingStateLoss()
             return
         }
 
@@ -162,34 +163,26 @@ class ImageBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
             optionDownload.isVisible = !nodeItem.isFromRubbishBin
             optionDownload.setOnClickListener {
                 (activity as? ImageViewerActivity?)?.saveNode(node, false)
-                dismiss()
+                dismissAllowingStateLoss()
             }
 
             // Save to Gallery
             optionGallery.isVisible = !nodeItem.isFromRubbishBin && !node.isPublic
             optionGallery.setOnClickListener {
                 (activity as? ImageViewerActivity?)?.saveNode(node, true)
-                dismiss()
+                dismissAllowingStateLoss()
             }
 
             // Offline
-            optionOfflineLayout.isVisible = !nodeItem.isFromRubbishBin && !node.isPublic
+            optionOfflineLayout.isVisible = !nodeItem.isFromRubbishBin && !node.isPublic && nodeItem.hasFullAccess
             switchOffline.isChecked = nodeItem.isAvailableOffline
             switchOffline.setOnCheckedChangeListener { _, _ ->
-                viewModel.setNodeAvailableOffline(
-                    requireActivity(),
-                    node.handle,
-                    !nodeItem.isAvailableOffline
-                )
-                dismiss()
+                viewModel.setNodeAvailableOffline(requireActivity(), node, !nodeItem.isAvailableOffline)
+                dismissAllowingStateLoss()
             }
             optionOfflineLayout.setOnClickListener {
-                viewModel.setNodeAvailableOffline(
-                    requireActivity(),
-                    node.handle,
-                    !nodeItem.isAvailableOffline
-                )
-                dismiss()
+                viewModel.setNodeAvailableOffline(requireActivity(), node, !nodeItem.isAvailableOffline)
+                dismissAllowingStateLoss()
             }
 
             // Links
@@ -204,11 +197,7 @@ class ImageBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
             optionRemoveLink.setOnClickListener {
                 MaterialAlertDialogBuilder(requireContext())
                     .setMessage(getQuantityString(R.plurals.remove_links_warning_text, 1))
-                    .setPositiveButton(StringResourcesUtils.getString(R.string.general_remove)) { _, _ ->
-                        (activity as? ImageViewerActivity?)?.removeLink(node.handle) ?: run {
-                            viewModel.removeLink(node.handle)
-                        }
-                    }
+                    .setPositiveButton(StringResourcesUtils.getString(R.string.general_remove)) { _, _ -> viewModel.removeLink(node.handle) }
                     .setNegativeButton(StringResourcesUtils.getString(R.string.general_cancel), null)
                     .show()
             }
@@ -218,7 +207,7 @@ class ImageBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
             // Send to contact
             optionSendToContact.setOnClickListener {
                 (activity as? ImageViewerActivity?)?.attachNode(node)
-                dismiss()
+                dismissAllowingStateLoss()
             }
             optionSendToContact.isVisible = nodeItem.hasFullAccess && !nodeItem.isFromRubbishBin
 
@@ -226,7 +215,7 @@ class ImageBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
             optionShare.setOnClickListener {
                 viewModel.shareNode(node.handle).observe(viewLifecycleOwner) { link ->
                     MegaNodeUtil.startShareIntent(requireContext(), Intent(Intent.ACTION_SEND), link)
-                    dismiss()
+                    dismissAllowingStateLoss()
                 }
             }
             optionShare.isVisible = !nodeItem.isFromRubbishBin && !node.isPublic
@@ -268,11 +257,12 @@ class ImageBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
             // Restore
             optionRestore.setOnClickListener {
                 viewModel.moveNode(node.handle, node.restoreHandle)
-                dismiss()
+                dismissAllowingStateLoss()
             }
             optionRestore.isVisible = nodeItem.isFromRubbishBin && node.restoreHandle != INVALID_HANDLE
 
             // Rubbish bin
+            optionRubbishBin.isVisible = nodeItem.hasFullAccess
             if (nodeItem.isFromRubbishBin) {
                 optionRubbishBin.setText(R.string.general_remove)
             } else {
@@ -298,7 +288,7 @@ class ImageBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
                         } else {
                             viewModel.moveNodeToRubbishBin(node.handle)
                         }
-                        dismiss()
+                        dismissAllowingStateLoss()
                     }
                     .setNegativeButton(StringResourcesUtils.getString(R.string.general_cancel), null)
                     .show()

@@ -76,7 +76,7 @@
             <TextView
                 android:id="@+id/option_info"
                 style="@style/BottomSheetOption"
-                android:text="@string/general_file_info"
+                android:text="@string/file_properties_info_info_file"
                 app:drawableStartCompat="@drawable/info_ic" />
 
             <View

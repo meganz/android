@@ -136,6 +136,8 @@
     <style name="Theme.Mega.FullScreen.ImageViewer">
         <item name="android:statusBarColor">@android:color/transparent</item>
         <item name="android:navigationBarColor">@android:color/transparent</item>
+        <item name="android:windowLightStatusBar" tools:targetApi="m">@bool/isLightTheme</item>
+        <item name="android:windowLightNavigationBar" tools:targetApi="o_mr1">@bool/isLightTheme</item>
         <item name="android:windowTranslucentNavigation">false</item>
     </style>
 </resources>

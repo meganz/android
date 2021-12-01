@@ -136,8 +136,8 @@ class ImageViewerPageFragment : Fragment() {
                     }
                 }
                 binding.btnVideo.isVisible = imageResult.isVideo
+                binding.progress.hide()
             }
-            binding.progress.hide()
         }
     }
 

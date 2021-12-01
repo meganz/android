@@ -11,6 +11,7 @@ import io.reactivex.rxjava3.core.Flowable
 import io.reactivex.rxjava3.kotlin.addTo
 import io.reactivex.rxjava3.kotlin.subscribeBy
 import io.reactivex.rxjava3.schedulers.Schedulers
+import mega.privacy.android.app.R
 import mega.privacy.android.app.arch.BaseRxViewModel
 import mega.privacy.android.app.getLink.useCase.ExportNodeUseCase
 import mega.privacy.android.app.imageviewer.data.ImageItem
@@ -23,6 +24,9 @@ import mega.privacy.android.app.usecase.data.MegaNodeItem
 import mega.privacy.android.app.utils.Constants.INVALID_POSITION
 import mega.privacy.android.app.utils.LogUtil.logError
 import mega.privacy.android.app.utils.LogUtil.logWarning
+import mega.privacy.android.app.utils.StringResourcesUtils.getQuantityString
+import mega.privacy.android.app.utils.StringResourcesUtils.getString
+import mega.privacy.android.app.utils.livedata.SingleLiveEvent
 import nz.mega.sdk.MegaNode
 
 /**
@@ -48,6 +52,7 @@ class ImageViewerViewModel @ViewModelInject constructor(
     private val images = MutableLiveData<List<ImageItem>?>()
     private val currentPosition = MutableLiveData<Int>()
     private val switchToolbar = MutableLiveData<Unit>()
+    private val snackbarMessage = SingleLiveEvent<String>()
 
     fun onImagesHandle(): LiveData<List<Long>?> =
         images.map { items -> items?.map(ImageItem::handle) }
@@ -63,6 +68,8 @@ class ImageViewerViewModel @ViewModelInject constructor(
 
     fun getCurrentNode(): MegaNode? =
         currentPosition.value?.let { images.value?.getOrNull(it)?.nodeItem?.node }
+
+    fun onSnackbarMessage(): LiveData<String> = snackbarMessage
 
     fun onSwitchToolbar(): LiveData<Unit> = switchToolbar
 
@@ -113,10 +120,17 @@ class ImageViewerViewModel @ViewModelInject constructor(
      *
      * @param nodeHandle    Image node handle to be loaded.
      */
-    fun loadSingleNode(nodeHandle: Long) {
+    fun loadSingleNode(nodeHandle: Long, forceReload: Boolean = false) {
         val existingNode = images.value?.find { it.handle == nodeHandle }
         val subscription = when {
-            existingNode?.nodeItem?.node != null && !existingNode.isDirty ->
+            forceReload || existingNode?.isDirty == true -> {
+                if (existingNode?.publicLink != null) {
+                    getNodeUseCase.getNodeItem(existingNode.publicLink)
+                } else {
+                    getNodeUseCase.getNodeItem(nodeHandle)
+                }
+            }
+            existingNode?.nodeItem?.node != null ->
                 getNodeUseCase.getNodeItem(existingNode.nodeItem.node)
             existingNode?.publicLink != null && existingNode.publicLink.isNotBlank() ->
                 getNodeUseCase.getNodeItem(existingNode.publicLink)
@@ -221,29 +235,20 @@ class ImageViewerViewModel @ViewModelInject constructor(
 
     fun setNodeAvailableOffline(
         activity: Activity,
-        nodeHandle: Long,
+        node: MegaNode,
         setAvailableOffline: Boolean
     ) {
-        getNodeUseCase.setNodeAvailableOffline(nodeHandle, setAvailableOffline, activity)
-            .subscribeAndComplete()
+        getNodeUseCase.setNodeAvailableOffline(node, setAvailableOffline, activity)
+            .subscribeAndComplete {
+                loadSingleNode(node.handle, true)
+            }
     }
 
-    fun removeLink(nodeHandle: Long): LiveData<Boolean> {
-        val result = MutableLiveData<Boolean>()
+    fun removeLink(nodeHandle: Long) {
         exportNodeUseCase.disableExport(nodeHandle)
-            .subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribeBy(
-                onComplete = {
-                    result.value = true
-                },
-                onError = { error ->
-                    logError(error.stackTraceToString())
-                    result.value = false
-                }
-            )
-            .addTo(composite)
-        return result
+            .subscribeAndComplete {
+                snackbarMessage.value = getQuantityString(R.plurals.context_link_removal_success, 1)
+            }
     }
 
     fun shareNode(nodeHandle: Long): LiveData<String?> {
@@ -269,22 +274,30 @@ class ImageViewerViewModel @ViewModelInject constructor(
             node = getExistingNode(nodeHandle),
             nodeHandle = nodeHandle,
             toParentHandle = newParentHandle
-        ).subscribeAndComplete()
+        ).subscribeAndComplete {
+            snackbarMessage.value = getString(R.string.context_correctly_copied)
+        }
     }
 
     fun moveNode(nodeHandle: Long, newParentHandle: Long) {
         getNodeUseCase.moveNode(nodeHandle, newParentHandle)
-            .subscribeAndComplete()
+            .subscribeAndComplete {
+                snackbarMessage.value = getString(R.string.context_correctly_moved)
+            }
     }
 
     fun moveNodeToRubbishBin(nodeHandle: Long) {
         getNodeUseCase.moveToRubbishBin(nodeHandle)
-            .subscribeAndComplete()
+            .subscribeAndComplete {
+                snackbarMessage.value = getString(R.string.context_correctly_moved_to_rubbish)
+            }
     }
 
     fun removeNode(nodeHandle: Long) {
         getNodeUseCase.removeNode(nodeHandle)
-            .subscribeAndComplete()
+            .subscribeAndComplete {
+                snackbarMessage.value = getString(R.string.context_correctly_removed)
+            }
     }
 
     fun stopImageLoading(nodeHandle: Long) {
@@ -378,10 +391,13 @@ class ImageViewerViewModel @ViewModelInject constructor(
             .addTo(composite)
     }
 
-    private fun Completable.subscribeAndComplete() {
+    private fun Completable.subscribeAndComplete(completeAction: (() -> Unit)? = null) {
         subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeBy(
+                onComplete = {
+                    completeAction?.invoke()
+                },
                 onError = { error ->
                     logError(error.stackTraceToString())
                 }
