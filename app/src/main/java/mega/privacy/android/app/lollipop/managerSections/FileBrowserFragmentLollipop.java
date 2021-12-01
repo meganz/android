@@ -639,13 +639,13 @@ public class FileBrowserFragmentLollipop extends RotatableFragment{
 	}
 
 	private void getNodes() {
-		if (((ManagerActivityLollipop) context).getParentHandleBrowser() == -1 || ((ManagerActivityLollipop) context).getParentHandleBrowser() == megaApi.getRootNode().getHandle()) {
-			logWarning("After consulting... the parent keeps -1 or ROOTNODE: " + ((ManagerActivityLollipop) context).getParentHandleBrowser());
+		long parentHandleBrowser = ((ManagerActivityLollipop) context).getParentHandleBrowser();
+		if (parentHandleBrowser == -1 || parentHandleBrowser == megaApi.getRootNode().getHandle()) {
+			logWarning("After consulting... the parent keeps -1 or ROOTNODE: " + parentHandleBrowser);
 
 			nodes = megaApi.getChildren(megaApi.getRootNode(), sortOrderManagement.getOrderCloud());
 		} else {
-			MegaNode parentNode = megaApi.getNodeByHandle(((ManagerActivityLollipop) context).getParentHandleBrowser());
-
+			MegaNode parentNode = megaApi.getNodeByHandle(parentHandleBrowser);
 			nodes = megaApi.getChildren(parentNode, sortOrderManagement.getOrderCloud());
 		}
 	}

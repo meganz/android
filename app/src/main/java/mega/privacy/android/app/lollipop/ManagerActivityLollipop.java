@@ -2177,7 +2177,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 					}
 					else if (getIntent().getAction().equals(ACTION_OPEN_FOLDER)) {
 						logDebug("Open after LauncherFileExplorerActivityLollipop ");
-						boolean locationFileInfo = getIntent().getBooleanExtra("locationFileInfo", false);
+						boolean locationFileInfo = getIntent().getBooleanExtra(INTENT_EXTRA_KEY_LOCATION_FILE_INFO, false);
 						long handleIntent = getIntent().getLongExtra("PARENT_HANDLE", -1);
 
 						if (getIntent().getBooleanExtra(SHOW_MESSAGE_UPLOAD_STARTED, false)) {
