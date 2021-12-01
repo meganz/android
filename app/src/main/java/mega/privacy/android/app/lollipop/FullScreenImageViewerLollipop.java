@@ -915,8 +915,6 @@ public class FullScreenImageViewerLollipop extends PasscodeActivity
 			File offlineDirectory = new File(currentImage.getParent());
 
 			paths.clear();
-//            int imageNumber = 0;
-//            int index = 0;
 			File[] fList = offlineDirectory.listFiles();
 			if(fList == null)
 			{

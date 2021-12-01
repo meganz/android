@@ -332,28 +332,31 @@ public class FileUtil {
             return null;
         }
 
+        String path;
         Context context = MegaApplication.getInstance();
-
         String data = MediaStore.Files.FileColumns.DATA;
         final String[] projection = {data};
-        // Only query file by size, then compare file name. Since modification time will changed(copy to SD card)
-        // Display name may be null in the database.
-        final String selection = MediaStore.Files.FileColumns.SIZE + " = ?";
+        final String selection = MediaStore.Files.FileColumns.DISPLAY_NAME + " = ? AND "
+                + MediaStore.Files.FileColumns.SIZE + " = ? AND "
+                + MediaStore.Files.FileColumns.DATE_MODIFIED + " = ?";
 
         final String[] selectionArgs = {
-                String.valueOf(node.getSize())};
+                node.getName(),
+                String.valueOf(node.getSize()),
+                String.valueOf(node.getModificationTime())};
 
         try {
             Cursor cursor = context.getContentResolver().query(
                     MediaStore.Files.getContentUri(VOLUME_EXTERNAL), projection, selection,
                     selectionArgs, null);
 
-            List<String> candidates = checkFileInStorage(context, cursor, data, node.getName());
+            path = checkFileInStorage(cursor, data);
 
-            for (String path : candidates) {
-                if (isFileAvailable(new File(path))) {
-                    return path;
-                }
+            if (path == null) {
+                cursor = context.getContentResolver().query(
+                        MediaStore.Files.getContentUri(VOLUME_INTERNAL), projection, selection,
+                        selectionArgs, null);
+                path = checkFileInStorage(cursor, data);
             }
         } catch (SecurityException e) {
             // Workaround: devices with system below Android 10 cannot execute the query without storage permission.
@@ -361,45 +364,32 @@ public class FileUtil {
             return null;
         }
 
-        return null;
+        return path;
     }
 
     /**
-     * Searches in the correspondent storage established if the file exists.
-     * If a file path is found both on internal storage and SD card,
-     * put the path on internal storage before that on SD card.
+     * Searches in the correspondent storage established if the file exists
      *
-     * @param context Context object.
      * @param cursor Cursor which contains all the requirements to find the file
-     * @param columnName   Column name in which search
-     * @param fileName Name of the searching node.
-     * @return A list of file path that may be the path of the searching file.
+     * @param data   Column name in which search
+     * @return The path of the file if exists
      */
-    private static List<String> checkFileInStorage(Context context, Cursor cursor, String columnName, String fileName) {
-        List<String> candidates = new ArrayList<>();
-        List<String> sdCandidates = new ArrayList<>();
-
-        while (cursor != null && cursor.moveToNext()) {
-            int dataColumn = cursor.getColumnIndexOrThrow(columnName);
+    private static String checkFileInStorage(Cursor cursor, String data) {
+        if (cursor != null && cursor.moveToFirst()) {
+            int dataColumn = cursor.getColumnIndexOrThrow(data);
             String path = cursor.getString(dataColumn);
-
-            // Check file name.
-            if (path.endsWith(fileName)) {
-                if(SDCardUtils.isLocalFolderOnSDCard(context, path)) {
-                    sdCandidates.add(path);
-                } else {
-                    candidates.add(path);
-                }
+            cursor.close();
+            cursor = null;
+            if (new File(path).exists()) {
+                return path;
             }
         }
 
-        candidates.addAll(sdCandidates);
-
-        if(cursor != null) {
+        if (cursor != null) {
             cursor.close();
         }
 
-        return candidates;
+        return null;
     }
 
     /*

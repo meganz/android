@@ -469,14 +469,12 @@ public class RecentsFragment extends Fragment implements StickyHeaderHandler {
             ((ManagerActivityLollipop) context).showSnackbar(SNACKBAR_TYPE, getString(R.string.intent_not_available), -1);
         }
 
-        if(intent != null) {
-            if (paramsSetSuccessfully) {
-                intent.putExtra(INTENT_EXTRA_KEY_HANDLE, node.getHandle());
-                putThumbnailLocation(intent, listView, position, VIEWER_FROM_RECETS, adapter);
+        if (intent != null && paramsSetSuccessfully) {
+            intent.putExtra(INTENT_EXTRA_KEY_HANDLE, node.getHandle());
+            putThumbnailLocation(intent, listView, position, VIEWER_FROM_RECETS, adapter);
 
-                context.startActivity(intent);
-                ((ManagerActivityLollipop) context).overridePendingTransition(0, 0);
-            }
+            context.startActivity(intent);
+            ((ManagerActivityLollipop) context).overridePendingTransition(0, 0);
         }
     }
 
