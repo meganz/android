@@ -496,15 +496,7 @@ public class FileBrowserFragmentLollipop extends RotatableFragment{
 		display.getMetrics(outMetrics);
 		density = getResources().getDisplayMetrics().density;
 
-		if (((ManagerActivityLollipop) context).getParentHandleBrowser() == -1 || ((ManagerActivityLollipop) context).getParentHandleBrowser() == megaApi.getRootNode().getHandle()) {
-			logWarning("After consulting... the parent keeps -1 or ROOTNODE: " + ((ManagerActivityLollipop) context).getParentHandleBrowser());
-
-			nodes = megaApi.getChildren(megaApi.getRootNode(), sortOrderManagement.getOrderCloud());
-		} else {
-			MegaNode parentNode = megaApi.getNodeByHandle(((ManagerActivityLollipop) context).getParentHandleBrowser());
-
-			nodes = megaApi.getChildren(parentNode, sortOrderManagement.getOrderCloud());
-		}
+		getNodes();
 		((ManagerActivityLollipop) context).setToolbarTitle();
 		((ManagerActivityLollipop) context).supportInvalidateOptionsMenu();
 
@@ -664,6 +656,25 @@ public class FileBrowserFragmentLollipop extends RotatableFragment{
 		}
 
 		super.onDestroy();
+	}
+
+	private void getNodes() {
+		long parentHandleBrowser = ((ManagerActivityLollipop) context).getParentHandleBrowser();
+		if (parentHandleBrowser == -1 || parentHandleBrowser == megaApi.getRootNode().getHandle()) {
+			logWarning("After consulting... the parent keeps -1 or ROOTNODE: " + parentHandleBrowser);
+
+			nodes = megaApi.getChildren(megaApi.getRootNode(), sortOrderManagement.getOrderCloud());
+		} else {
+			MegaNode parentNode = megaApi.getNodeByHandle(parentHandleBrowser);
+			nodes = megaApi.getChildren(parentNode, sortOrderManagement.getOrderCloud());
+		}
+	}
+
+	public void refreshNodes(){
+		if (adapter != null) {
+			getNodes();
+			adapter.setNodes(nodes);
+		}
 	}
 
 	public void openFile(MegaNode node, int position) {
