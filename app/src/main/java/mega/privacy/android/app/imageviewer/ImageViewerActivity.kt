@@ -296,8 +296,11 @@ class ImageViewerActivity : BaseActivity(), PermissionRequester, SnackbarShower 
             binding.progress.hide()
         }
         viewModel.onCurrentImageNode().observe(this, ::showCurrentImageInfo)
-        viewModel.onSnackbarMessage().observe(this) { showSnackbar(it) }
         viewModel.onSwitchToolbar().observe(this) { switchToolbarVisibility() }
+        viewModel.onSnackbarMessage().observe(this) { message ->
+            bottomSheet?.dismissAllowingStateLoss()
+            showSnackbar(message)
+        }
         viewModel.onCurrentPosition().observe(this) { positionPair ->
             binding.txtPageCount.apply {
                 text = StringResourcesUtils.getString(
@@ -334,10 +337,10 @@ class ImageViewerActivity : BaseActivity(), PermissionRequester, SnackbarShower 
             binding.txtTitle.text = item.node.name
             binding.toolbar.menu?.apply {
                 findItem(R.id.action_download)?.isVisible =
-                    isOnline() && item.hasFullAccess && !item.isFromRubbishBin
+                    isOnline() && !item.isFromRubbishBin
 
                 findItem(R.id.action_save_gallery)?.isVisible =
-                    isOnline() && !item.isFromRubbishBin
+                    isOnline() && item.hasFullAccess && !item.isFromRubbishBin
 
                 findItem(R.id.action_get_link)?.isVisible =
                     isOnline() && item.hasFullAccess && !item.isFromRubbishBin

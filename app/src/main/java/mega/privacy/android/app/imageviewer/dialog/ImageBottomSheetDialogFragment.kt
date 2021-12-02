@@ -213,7 +213,7 @@ class ImageBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
                 (activity as? ImageViewerActivity?)?.attachNode(node)
                 dismissAllowingStateLoss()
             }
-            optionSendToContact.isVisible = nodeItem.hasFullAccess && !nodeItem.isFromRubbishBin
+            optionSendToContact.isVisible = !nodeItem.isFromRubbishBin && nodeItem.hasFullAccess
 
             // Share
             optionShare.setOnClickListener {
@@ -222,19 +222,19 @@ class ImageBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
                     dismissAllowingStateLoss()
                 }
             }
-            optionShare.isVisible = !nodeItem.isFromRubbishBin && !node.isPublic
+            optionShare.isVisible = !nodeItem.isFromRubbishBin && nodeItem.hasFullAccess
 
             // Rename
             optionRename.setOnClickListener {
                 (activity as? ImageViewerActivity?)?.showRenameDialog(node)
             }
-            optionRename.isVisible = nodeItem.hasFullAccess && !nodeItem.isFromRubbishBin
+            optionRename.isVisible = !nodeItem.isFromRubbishBin && nodeItem.hasFullAccess
 
             // Move
             optionMove.setOnClickListener {
                 selectMoveFolderLauncher.launch(longArrayOf(node.handle))
             }
-            optionMove.isVisible = nodeItem.hasFullAccess && !nodeItem.isFromRubbishBin
+            optionMove.isVisible = !nodeItem.isFromRubbishBin && nodeItem.hasFullAccess
 
             // Copy
             optionCopy.setOnClickListener {

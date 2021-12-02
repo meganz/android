@@ -45,7 +45,7 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
         android:layout_marginEnd="16dp"
-        android:ellipsize="end"
+        android:ellipsize="middle"
         android:maxLines="1"
         android:textAppearance="@style/TextAppearance.Mega.Body1.Variant2"
         app:layout_constrainedWidth="true"

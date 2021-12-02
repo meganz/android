@@ -65,9 +65,9 @@ class GetNodeUseCase @Inject constructor(
             var isFromInbox = false
             var isFromRoot = false
             when (megaApi.getRootParentNode(node).handle) {
-                megaApi.rootNode.handle -> isFromRoot = true
-                megaApi.inboxNode.handle -> isFromInbox = true
-                megaApi.rubbishNode.handle -> isFromRubbishBin = true
+                megaApi.rootNode?.handle -> isFromRoot = true
+                megaApi.inboxNode?.handle -> isFromInbox = true
+                megaApi.rubbishNode?.handle -> isFromRubbishBin = true
             }
 
             MegaNodeItem(
