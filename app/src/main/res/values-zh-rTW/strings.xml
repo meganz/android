@@ -1122,7 +1122,7 @@
     <!-- Text of the warning when the user is running out of space -->
     <string name="new_warning_out_space">升級到Pro方案，以充分發揮您MEGA帳戶的功用。</string>
     <!-- Iitle of sliding panel to choose the option to edit the profile picture -->
-    <string name="title_options_avatar_panel">編輯大頭貼</string>
+    <string name="title_options_avatar_panel">編輯大頭照</string>
     <!-- Option of the sliding panel to capture a new picture to upload to Cloud Drive or to set as user avatar -->
     <string name="take_photo_avatar_panel">拍照</string>
     <!-- Option of the sliding panel to change the avatar by choosing an existing picture -->
@@ -1140,7 +1140,7 @@
     <!-- Text of the alert dialog to inform the user that have to check the email to validate his new email -->
     <string name="email_verification_text_change_mail">您的新電子郵件地址需要驗證確認。請至您的電子信箱收信並進行驗證。</string>
     <!-- Confirmation before deleting the avatar of the user’s profile -->
-    <string name="confirmation_delete_avatar">要刪除您的大頭貼嗎？</string>
+    <string name="confirmation_delete_avatar">要刪除您的大頭照嗎？</string>
     <!-- Title of the Dialog to edit the profile attributes of the user’s account -->
     <string name="title_edit_profile_info">編輯</string>
     <!-- Alert Dialog to get link -->
@@ -1592,22 +1592,14 @@
     <string name="paused_transfers_title">傳輸暫停</string>
     <!-- message shown in the screen when there are not any active transfer -->
     <string name="completed_transfers_empty">沒有已完成的傳輸</string>
-    <!-- Text of the notification shown when the upload service is running, Plural -->
-    <plurals name="upload_service_notification">
-        <item quantity="other">正在上傳%2$d之%1$d個檔案</item>
-    </plurals>
-    <!-- Text of the notification shown when the upload service is running, Plural -->
-    <plurals name="upload_service_paused_notification">
-        <item quantity="other">正在上傳%2$d之%1$d個檔案（已暫停）</item>
-    </plurals>
-    <!-- Text of the notification shown when the folder upload service is running, Text of the notification shown when the folder upload service is running - plural e.g. Uploading 1 of 2 folders -->
-    <plurals name="folder_upload_service_notification">
-        <item quantity="other">正在上傳%2$d之%1$d個資料夾</item>
-    </plurals>
-    <!-- Text of the notification shown when the folder upload service is running, Text of the notification shown when the folder upload service is running - plural e.g. Uploading 1 of 2 folders -->
-    <plurals name="folder_upload_service_paused_notification">
-        <item quantity="other">正在上傳%2$d之%1$d個資料夾（已暫停）</item>
-    </plurals>
+    <!-- Text of the notification shown when the upload service is running: e.g. Uploading files: 1 of 10 -->
+    <string name="upload_service_notification">正在上傳檔案：%2$d之%1$d個</string>
+    <!-- Text of the notification shown when the upload service is paused: e.g. Uploading files: 1 of 10 (paused)-->
+    <string name="upload_service_notification_paused">正在上傳檔案：%2$d之%1$d個（已暫停）</string>
+    <!-- Text of the notification shown when the folder upload service is running, e.g. Uploading folders 1 of 2 -->
+    <string name="folder_upload_service_notification">正在上傳資料夾：%2$d之%1$d個</string>
+    <!-- Text of the notification shown when the folder upload service is paused, e.g. Uploading folders 1 of 2 (paused) -->
+    <string name="folder_upload_service_notification_paused">正在上傳資料夾：%2$d之%1$d個（已暫停）</string>
     <!-- Text of the notification shown when the upload service has finished, Plural -->
     <plurals name="upload_service_final_notification">
         <item quantity="other">已上傳%1$d個檔案</item>
@@ -1646,14 +1638,10 @@
     <plurals name="download_service_failed">
         <item quantity="other">有%1$d個檔案未被下載</item>
     </plurals>
-    <!-- Text of the notification shown when the download service is running, Plural -->
-    <plurals name="download_service_notification">
-        <item quantity="other">正在下載%2$d之%1$d個檔案</item>
-    </plurals>
-    <!-- Text of the notification shown when the download service is paused, Plural -->
-    <plurals name="download_service_paused_notification">
-        <item quantity="other">正在下載%2$d之%1$d個檔案（已暫停）</item>
-    </plurals>
+    <!-- Text of the notification shown when the download service is running -->
+    <string name="download_service_notification">正在下載檔案：%2$d之%1$d個</string>
+    <!-- Text of the notification shown when the download service is paused -->
+    <string name="download_service_notification_paused">正在下載檔案：%2$d之%1$d個（已暫停）</string>
     <!-- Title of the alert when the transfer quota is exceeded. -->
     <string name="title_depleted_transfer_overquota">傳輸配額不足</string>
     <!-- Text of the alert when the transfer quota is depleted. The placeholder indicates the time left for the transfer quota to be reset. For instance: 30m 45s -->
@@ -1729,15 +1717,15 @@
     <!--  -->
     <string name="camera_uploads_upload_videos">上傳影片</string>
     <!-- Message when an user avatar has been changed successfully -->
-    <string name="success_changing_user_avatar">已更新大頭貼</string>
+    <string name="success_changing_user_avatar">已更新大頭照</string>
     <!-- Message when an error ocurred when changing an user avatar -->
     <string name="error_changing_user_avatar_image_not_available">錯誤。所選的圖片不存在</string>
     <!-- Message when an error ocurred when changing an user avatar -->
-    <string name="error_changing_user_avatar">更換大頭貼時發生錯誤</string>
+    <string name="error_changing_user_avatar">更換大頭照時發生錯誤</string>
     <!-- Message when an user avatar has been deleted successfully -->
-    <string name="success_deleting_user_avatar">已刪除大頭貼</string>
+    <string name="success_deleting_user_avatar">已刪除大頭照</string>
     <!-- Message when an error ocurred when deleting an user avatar -->
-    <string name="error_deleting_user_avatar">刪除大頭貼時發生錯誤</string>
+    <string name="error_deleting_user_avatar">刪除大頭照時發生錯誤</string>
     <!-- Message when an error ocurred when changing an user attribute -->
     <string name="error_changing_user_attributes">更改名稱時發生錯誤</string>
     <!-- Message when an user attribute has been changed successfully -->
@@ -3658,7 +3646,7 @@
     <!-- Explanation of a warning recommending upgrade to Pro in relation to link available options -->
     <string name="link_upgrade_pro_explanation">MEGA Pro方案用戶可以獨享額外的連結安全功能，讓您的帳戶更加安全。</string>
     <!-- Meaning of links decryption key -->
-    <string name="decryption_key_explanation">我們的點對點加密系統需要有為此檔案自動生成的唯一金鑰才能開啟。預設情況下會自動產生帶有此金鑰的連結，但為了更加安全考量，您可以將解密金鑰單獨匯出。</string>
+    <string name="decryption_key_explanation">我們的點對點加密系統需要有為此檔案或資料夾自動生成的唯一金鑰才能開啟。預設情況下會自動產生帶有此金鑰的連結，但為了更多的安全考量，您可以單獨匯出解密金鑰。</string>
     <!-- Reset password label -->
     <string name="reset_password_label">重設密碼</string>
     <!-- Warning show to the user when has enable to send the decryption key of a link separately and tries to share the link -->
@@ -3773,7 +3761,7 @@
     <string name="file_created">檔案已建立</string>
     <!-- Warning indicating a file was not created successfully -->
     <string name="file_creation_failed">檔案建立牧敗。請再試一次。</string>
-    <!-- Label indicating a file was saved to some folder. e.g.: File saved to Cloud Drive -->
+    <!-- Label indicating a file was saved to some folder. e.g.: File saved to Cloud Drive. "Cloud Drive" is the only destination for the time being, thus any article isn't needed -->
     <string name="file_saved_to">檔案已儲存到%1$s</string>
     <!-- Warning indicating a file was not saved to some folder. e.g.: File not saved to Cloud Drive. Try again -->
     <string name="file_saved_to_failed">檔案未儲存到%1$s。再試一次。</string>
@@ -3898,7 +3886,7 @@
     <!-- Action to change name -->
     <string name="change_name_action">更改名稱</string>
     <!-- Action to add photo -->
-    <string name="add_photo_action">新增大頭貼</string>
+    <string name="add_photo_action">新增大頭照</string>
     <!-- Action to add phone number -->
     <string name="add_phone_number_action">新增電話號碼</string>
     <!-- Warning indicating the app needs write permissions to do any action -->
@@ -4099,4 +4087,18 @@
     <string name="video_quality_info">您可以在相機上傳的設定中調降影片畫質來節省空間。</string>
     <!-- Label indicating video original quality -->
     <string name="original_quality">原始品質</string>
+    <!-- Settings label which allows to enable or disable fingerprint unlock. -->
+    <string name="setting_fingerprint">指紋辨識</string>
+    <!-- Title of the dialog which allows to enable the fingerprint unlock. -->
+    <string name="title_enable_fingerprint">確認指紋解鎖</string>
+    <!-- Title of the dialog which allows to unlock the app with the fingerprint. -->
+    <string name="title_unlock_fingerprint">使用指紋解鎖</string>
+    <!-- Button of the dialog which allows to unlock the app with the fingerprint. Gives the option to unlock with the passcode instead -->
+    <string name="action_use_passcode">使用密碼</string>
+    <!-- Message informing the fingerprint was enabled successfully -->
+    <string name="confirmation_fingerprint_enabled">您的指紋已確認</string>
+    <!-- Warning indicating an image (GIF) cannot be inserted in an input text. Same string than the one shown by the system when it detects this behaviour on its own. -->
+    <string name="image_insertion_not_allowed">MEGA這此不支援插入圖片</string>
+    <!-- The label under the button of viewing all images screen -->
+    <string name="section_images">圖片</string>
 </resources>

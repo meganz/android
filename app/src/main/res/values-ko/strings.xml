@@ -1592,22 +1592,14 @@
     <string name="paused_transfers_title">일시정지된 전송</string>
     <!-- message shown in the screen when there are not any active transfer -->
     <string name="completed_transfers_empty">완료된 전송 없음</string>
-    <!-- Text of the notification shown when the upload service is running, Plural -->
-    <plurals name="upload_service_notification">
-        <item quantity="other">파일 %2$d개 중 %1$d번째 파일 업로드중</item>
-    </plurals>
-    <!-- Text of the notification shown when the upload service is running, Plural -->
-    <plurals name="upload_service_paused_notification">
-        <item quantity="other">파일 %2$d개 중 %1$d번째 업로드중 (일시정지됨)</item>
-    </plurals>
-    <!-- Text of the notification shown when the folder upload service is running, Text of the notification shown when the folder upload service is running - plural e.g. Uploading 1 of 2 folders -->
-    <plurals name="folder_upload_service_notification">
-        <item quantity="other">%2$d개의 폴더 중 %1$d번째 업로드중</item>
-    </plurals>
-    <!-- Text of the notification shown when the folder upload service is running, Text of the notification shown when the folder upload service is running - plural e.g. Uploading 1 of 2 folders -->
-    <plurals name="folder_upload_service_paused_notification">
-        <item quantity="other">폴더 %2$d개 중 %1$d번째 업로드중 (일시정지됨)</item>
-    </plurals>
+    <!-- Text of the notification shown when the upload service is running: e.g. Uploading files: 1 of 10 -->
+    <string name="upload_service_notification">파일 업로드 중: %2$d 중 %1$d</string>
+    <!-- Text of the notification shown when the upload service is paused: e.g. Uploading files: 1 of 10 (paused)-->
+    <string name="upload_service_notification_paused">파일 업로드 중: %2$d 중 %1$d (일시정지됨)</string>
+    <!-- Text of the notification shown when the folder upload service is running, e.g. Uploading folders 1 of 2 -->
+    <string name="folder_upload_service_notification">폴더 업로드 중: %2$d 중 %1$d</string>
+    <!-- Text of the notification shown when the folder upload service is paused, e.g. Uploading folders 1 of 2 (paused) -->
+    <string name="folder_upload_service_notification_paused">폴더 업로드 중: %2$d 중 %1$d (일시정지됨)</string>
     <!-- Text of the notification shown when the upload service has finished, Plural -->
     <plurals name="upload_service_final_notification">
         <item quantity="other">파일 %1$d개 업로드됨</item>
@@ -1646,14 +1638,10 @@
     <plurals name="download_service_failed">
         <item quantity="other">파일 %1$d개가 다운로드 되지 않음</item>
     </plurals>
-    <!-- Text of the notification shown when the download service is running, Plural -->
-    <plurals name="download_service_notification">
-        <item quantity="other">파일 %2$d개 중 %1$d번째 파일 다운로드중</item>
-    </plurals>
-    <!-- Text of the notification shown when the download service is paused, Plural -->
-    <plurals name="download_service_paused_notification">
-        <item quantity="other">파일 %2$d개 중 %1$d번째 다운로드중 (일시정지됨)</item>
-    </plurals>
+    <!-- Text of the notification shown when the download service is running -->
+    <string name="download_service_notification">파일 다운로드 중: %2$d 중 %1$d</string>
+    <!-- Text of the notification shown when the download service is paused -->
+    <string name="download_service_notification_paused">파일 다운로드 중: %2$d 중 %1$d (일시정지됨)</string>
     <!-- Title of the alert when the transfer quota is exceeded. -->
     <string name="title_depleted_transfer_overquota">전송 할당량 부족</string>
     <!-- Text of the alert when the transfer quota is depleted. The placeholder indicates the time left for the transfer quota to be reset. For instance: 30m 45s -->
@@ -3773,7 +3761,7 @@
     <string name="file_created">파일 생성됨</string>
     <!-- Warning indicating a file was not created successfully -->
     <string name="file_creation_failed">파일 생성 실패. 다시 시도하세요.</string>
-    <!-- Label indicating a file was saved to some folder. e.g.: File saved to Cloud Drive -->
+    <!-- Label indicating a file was saved to some folder. e.g.: File saved to Cloud Drive. "Cloud Drive" is the only destination for the time being, thus any article isn't needed -->
     <string name="file_saved_to">%1$s에 파일이 저장되었습니다</string>
     <!-- Warning indicating a file was not saved to some folder. e.g.: File not saved to Cloud Drive. Try again -->
     <string name="file_saved_to_failed">%1$s에 파일이 저장되지 않았습니다. 다시 시도하세요.</string>
@@ -4099,4 +4087,18 @@
     <string name="video_quality_info">카메라 업로드 설정에서 동영상 품질을 낮춰서 공간을 절약할 수 있습니다.</string>
     <!-- Label indicating video original quality -->
     <string name="original_quality">원본 품질</string>
+    <!-- Settings label which allows to enable or disable fingerprint unlock. -->
+    <string name="setting_fingerprint">지문 ID</string>
+    <!-- Title of the dialog which allows to enable the fingerprint unlock. -->
+    <string name="title_enable_fingerprint">잠금을 해제하려면 지문을 확인하세요</string>
+    <!-- Title of the dialog which allows to unlock the app with the fingerprint. -->
+    <string name="title_unlock_fingerprint">지문을 사용하여 잠금 해제</string>
+    <!-- Button of the dialog which allows to unlock the app with the fingerprint. Gives the option to unlock with the passcode instead -->
+    <string name="action_use_passcode">암호 사용</string>
+    <!-- Message informing the fingerprint was enabled successfully -->
+    <string name="confirmation_fingerprint_enabled">지문이 확인되었습니다</string>
+    <!-- Warning indicating an image (GIF) cannot be inserted in an input text. Same string than the one shown by the system when it detects this behaviour on its own. -->
+    <string name="image_insertion_not_allowed">MEGA가 여기서의 이미지 삽입을 지원하지 않습니다.</string>
+    <!-- The label under the button of viewing all images screen -->
+    <string name="section_images">이미지</string>
 </resources>

@@ -644,7 +644,7 @@
     <!-- error message shown on the decryption key dialog if the key typed in was wrong -->
     <string name="invalid_decryption_key">Nieprawidłowy klucz</string>
     <!-- upload to. Then choose an Image file -->
-    <string name="upload_to_image">Zdjęcie</string>
+    <string name="upload_to_image">Obraz</string>
     <!-- upload to. Then choose an Audio file -->
     <string name="upload_to_audio">Dzwięk</string>
     <!-- Title of the button in the contact info screen to start a video call -->
@@ -673,7 +673,7 @@
     <!-- error message while browsing the local filesystem -->
     <string name="general_error">Wystąpił błąd podczas wykonywania operacji</string>
     <!-- title of the image gallery -->
-    <string name="full_screen_image_viewer_label">Podgląd zdjęcia</string>
+    <string name="full_screen_image_viewer_label">Podgląd obrazu</string>
     <!-- Headline for the amount of storage space is used -->
     <string name="my_account_used_space">Używana pamięć</string>
     <!-- menu item -->
@@ -1661,34 +1661,14 @@
     <string name="paused_transfers_title">Wstrzymane transfery</string>
     <!-- message shown in the screen when there are not any active transfer -->
     <string name="completed_transfers_empty">Niezakonczone transfery</string>
-    <!-- Text of the notification shown when the upload service is running, Plural -->
-    <plurals name="upload_service_notification">
-        <item quantity="one">Wgrywanie %1$d z %2$d pliku</item>
-        <item quantity="few">Wgrywanie %1$d z %2$d plików</item>
-        <item quantity="many">Wgrywanie %1$d z %2$d plików</item>
-        <item quantity="other">Wgrywanie %1$d z %2$d plików</item>
-    </plurals>
-    <!-- Text of the notification shown when the upload service is running, Plural -->
-    <plurals name="upload_service_paused_notification">
-        <item quantity="one">Wgrywanie %1$d z %2$d pliku (wstrzymane)</item>
-        <item quantity="few">Wgrywanie %1$d z %2$d plików (wstrzymane)</item>
-        <item quantity="many">Wgrywanie %1$d z %2$d plików (wstrzymane)</item>
-        <item quantity="other">Wgrywanie %1$d z %2$d plików (wstrzymane)</item>
-    </plurals>
-    <!-- Text of the notification shown when the folder upload service is running, Text of the notification shown when the folder upload service is running - plural e.g. Uploading 1 of 2 folders -->
-    <plurals name="folder_upload_service_notification">
-        <item quantity="one">Przesyłanie %1$d do folderu %2$d</item>
-        <item quantity="few">Wgrywanie %1$d z %2$d katalogów</item>
-        <item quantity="many">Wgrywanie %1$d z %2$d katalogów</item>
-        <item quantity="other">Wgrywanie %1$d z %2$d katalogów</item>
-    </plurals>
-    <!-- Text of the notification shown when the folder upload service is running, Text of the notification shown when the folder upload service is running - plural e.g. Uploading 1 of 2 folders -->
-    <plurals name="folder_upload_service_paused_notification">
-        <item quantity="one">Wgrywanie %1$d z %2$d katalogu (wstrzymane)</item>
-        <item quantity="few">Wgrywanie %1$d z %2$d katalogów (wstrzymane)</item>
-        <item quantity="many">Wgrywanie %1$d z %2$d katalogów (wstrzymane)</item>
-        <item quantity="other">Wgrywanie %1$d z %2$d katalogów (wstrzymane)</item>
-    </plurals>
+    <!-- Text of the notification shown when the upload service is running: e.g. Uploading files: 1 of 10 -->
+    <string name="upload_service_notification">Przesyłanie plików: %1$d z %2$d</string>
+    <!-- Text of the notification shown when the upload service is paused: e.g. Uploading files: 1 of 10 (paused)-->
+    <string name="upload_service_notification_paused">Przesyłanie plików: %1$d z %2$d (wstrzymane)</string>
+    <!-- Text of the notification shown when the folder upload service is running, e.g. Uploading folders 1 of 2 -->
+    <string name="folder_upload_service_notification">Przesyłanie folderów: %1$d z %2$d</string>
+    <!-- Text of the notification shown when the folder upload service is paused, e.g. Uploading folders 1 of 2 (paused) -->
+    <string name="folder_upload_service_notification_paused">Przesyłanie folderów: %1$d z %2$d (wstrzymane)</string>
     <!-- Text of the notification shown when the upload service has finished, Plural -->
     <plurals name="upload_service_final_notification">
         <item quantity="one">Wgrano %1$d plik</item>
@@ -1754,20 +1734,10 @@
         <item quantity="many">%1$d nie zostało pobranych</item>
         <item quantity="other">%1$d nie zostało pobranych</item>
     </plurals>
-    <!-- Text of the notification shown when the download service is running, Plural -->
-    <plurals name="download_service_notification">
-        <item quantity="one">Pobieranie %1$d z %2$d plik</item>
-        <item quantity="few">Pobieranie %1$d z %2$d plików</item>
-        <item quantity="many">Pobieranie %1$d z %2$d plików</item>
-        <item quantity="other">Pobieranie %1$d z %2$d plików</item>
-    </plurals>
-    <!-- Text of the notification shown when the download service is paused, Plural -->
-    <plurals name="download_service_paused_notification">
-        <item quantity="one">Pobieranie %1$d z %2$d pliku (wstrzymane)</item>
-        <item quantity="few">Pobieranie %1$d z %2$d plików (wstrzymane)</item>
-        <item quantity="many">Pobieranie %1$d z %2$d plików (wstrzymane)</item>
-        <item quantity="other">Pobieranie %1$d z %2$d plików (wstrzymane)</item>
-    </plurals>
+    <!-- Text of the notification shown when the download service is running -->
+    <string name="download_service_notification">Pobieranie plików: %1$d z %2$d</string>
+    <!-- Text of the notification shown when the download service is paused -->
+    <string name="download_service_notification_paused">Pobieranie plików: %1$d z %2$d (wstrzymane)</string>
     <!-- Title of the alert when the transfer quota is exceeded. -->
     <string name="title_depleted_transfer_overquota">Niewystarczająca wielkość transferu</string>
     <!-- Text of the alert when the transfer quota is depleted. The placeholder indicates the time left for the transfer quota to be reset. For instance: 30m 45s -->
@@ -4031,7 +4001,7 @@
     <string name="file_created">Plik został utworzony</string>
     <!-- Warning indicating a file was not created successfully -->
     <string name="file_creation_failed">Tworzenie pliku nie powiodło się. Proszę spróbować ponownie.</string>
-    <!-- Label indicating a file was saved to some folder. e.g.: File saved to Cloud Drive -->
+    <!-- Label indicating a file was saved to some folder. e.g.: File saved to Cloud Drive. "Cloud Drive" is the only destination for the time being, thus any article isn't needed -->
     <string name="file_saved_to">Plik zapisany do %1$s</string>
     <!-- Warning indicating a file was not saved to some folder. e.g.: File not saved to Cloud Drive. Try again -->
     <string name="file_saved_to_failed">Plik nie został zapisany w %1$s. Spróbuj ponownie.</string>
@@ -4384,4 +4354,18 @@
     <string name="video_quality_info">Możesz zaoszczędzić miejsce zmniejszając jakość wideo w ustawieniach aparatu.</string>
     <!-- Label indicating video original quality -->
     <string name="original_quality">Oryginalna jakość</string>
+    <!-- Settings label which allows to enable or disable fingerprint unlock. -->
+    <string name="setting_fingerprint">Identyfikacja odcisku palca</string>
+    <!-- Title of the dialog which allows to enable the fingerprint unlock. -->
+    <string name="title_enable_fingerprint">Potwierdź swój odcisk palca, aby odblokować</string>
+    <!-- Title of the dialog which allows to unlock the app with the fingerprint. -->
+    <string name="title_unlock_fingerprint">Odblokowywanie za pomocą odcisku palca</string>
+    <!-- Button of the dialog which allows to unlock the app with the fingerprint. Gives the option to unlock with the passcode instead -->
+    <string name="action_use_passcode">Użyj kodu dostępu</string>
+    <!-- Message informing the fingerprint was enabled successfully -->
+    <string name="confirmation_fingerprint_enabled">Twój odcisk palca został potwierdzony</string>
+    <!-- Warning indicating an image (GIF) cannot be inserted in an input text. Same string than the one shown by the system when it detects this behaviour on its own. -->
+    <string name="image_insertion_not_allowed">MEGA nie obsługuje wstawiania zdjęć w tym miejscu</string>
+    <!-- The label under the button of viewing all images screen -->
+    <string name="section_images">Obrazy</string>
 </resources>

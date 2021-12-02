@@ -1615,26 +1615,14 @@
     <string name="paused_transfers_title">Trasferimenti messi in pausa</string>
     <!-- message shown in the screen when there are not any active transfer -->
     <string name="completed_transfers_empty">Nessun trasferimento completato</string>
-    <!-- Text of the notification shown when the upload service is running, Plural -->
-    <plurals name="upload_service_notification">
-        <item quantity="one">Caricamento di %1$d su %2$d file</item>
-        <item quantity="other">Caricamento di %1$d su %2$d file</item>
-    </plurals>
-    <!-- Text of the notification shown when the upload service is running, Plural -->
-    <plurals name="upload_service_paused_notification">
-        <item quantity="one">Caricamento di %1$d su %2$d file (in pausa)</item>
-        <item quantity="other">Caricamento di %1$d su %2$d file (in pausa)</item>
-    </plurals>
-    <!-- Text of the notification shown when the folder upload service is running, Text of the notification shown when the folder upload service is running - plural e.g. Uploading 1 of 2 folders -->
-    <plurals name="folder_upload_service_notification">
-        <item quantity="one">Caricamento di %1$d su %2$d cartella in corso</item>
-        <item quantity="other">Caricamento di %1$d su %2$d cartelle in corso</item>
-    </plurals>
-    <!-- Text of the notification shown when the folder upload service is running, Text of the notification shown when the folder upload service is running - plural e.g. Uploading 1 of 2 folders -->
-    <plurals name="folder_upload_service_paused_notification">
-        <item quantity="one">Caricamento di %1$d su %2$d cartella (in pausa)</item>
-        <item quantity="other">Caricamento di %1$d su %2$d cartelle (in pausa)</item>
-    </plurals>
+    <!-- Text of the notification shown when the upload service is running: e.g. Uploading files: 1 of 10 -->
+    <string name="upload_service_notification">Caricamento di %1$d su %2$d file</string>
+    <!-- Text of the notification shown when the upload service is paused: e.g. Uploading files: 1 of 10 (paused)-->
+    <string name="upload_service_notification_paused">Caricamento di %1$d su %2$d file (in pausa)</string>
+    <!-- Text of the notification shown when the folder upload service is running, e.g. Uploading folders 1 of 2 -->
+    <string name="folder_upload_service_notification">Caricamento di %1$d su %2$d cartelle</string>
+    <!-- Text of the notification shown when the folder upload service is paused, e.g. Uploading folders 1 of 2 (paused) -->
+    <string name="folder_upload_service_notification_paused">Caricamento di %1$d su %2$d cartelle (in pausa)</string>
     <!-- Text of the notification shown when the upload service has finished, Plural -->
     <plurals name="upload_service_final_notification">
         <item quantity="one">Caricato %1$d file</item>
@@ -1682,16 +1670,10 @@
         <item quantity="one">%1$d file non scaricato</item>
         <item quantity="other">%1$d file non scaricati</item>
     </plurals>
-    <!-- Text of the notification shown when the download service is running, Plural -->
-    <plurals name="download_service_notification">
-        <item quantity="one">Download di %1$d su %2$d file in corso</item>
-        <item quantity="other">Download di %1$d su %2$d file in corso</item>
-    </plurals>
-    <!-- Text of the notification shown when the download service is paused, Plural -->
-    <plurals name="download_service_paused_notification">
-        <item quantity="one">Download di %1$d su %2$d file (in pausa)</item>
-        <item quantity="other">Download di %1$d su %2$d file (in pausa)</item>
-    </plurals>
+    <!-- Text of the notification shown when the download service is running -->
+    <string name="download_service_notification">Download di %1$d su %2$d file</string>
+    <!-- Text of the notification shown when the download service is paused -->
+    <string name="download_service_notification_paused">Download di %1$d su %2$d file (in pausa)</string>
     <!-- Title of the alert when the transfer quota is exceeded. -->
     <string name="title_depleted_transfer_overquota">Banda di trasferimento insufficiente</string>
     <!-- Text of the alert when the transfer quota is depleted. The placeholder indicates the time left for the transfer quota to be reset. For instance: 30m 45s -->
@@ -3859,7 +3841,7 @@
     <string name="file_created">File creato</string>
     <!-- Warning indicating a file was not created successfully -->
     <string name="file_creation_failed">Creazione del file fallita. Per favore, riprova.</string>
-    <!-- Label indicating a file was saved to some folder. e.g.: File saved to Cloud Drive -->
+    <!-- Label indicating a file was saved to some folder. e.g.: File saved to Cloud Drive. "Cloud Drive" is the only destination for the time being, thus any article isn't needed -->
     <string name="file_saved_to">File salvato in %1$s</string>
     <!-- Warning indicating a file was not saved to some folder. e.g.: File not saved to Cloud Drive. Try again -->
     <string name="file_saved_to_failed">File non salvato in %1$s. Riprova.</string>
@@ -4194,4 +4176,18 @@
     <string name="video_quality_info">Puoi risparmiare spazio diminuendo la qualità dei video nelle Impostazioni dei Caricamenti da fotocamera.</string>
     <!-- Label indicating video original quality -->
     <string name="original_quality">Qualità originale</string>
+    <!-- Settings label which allows to enable or disable fingerprint unlock. -->
+    <string name="setting_fingerprint">Impronta digitale</string>
+    <!-- Title of the dialog which allows to enable the fingerprint unlock. -->
+    <string name="title_enable_fingerprint">Conferma la tua impronta digitale per sbloccare</string>
+    <!-- Title of the dialog which allows to unlock the app with the fingerprint. -->
+    <string name="title_unlock_fingerprint">Sblocca utilizzando la tua impronta digitale</string>
+    <!-- Button of the dialog which allows to unlock the app with the fingerprint. Gives the option to unlock with the passcode instead -->
+    <string name="action_use_passcode">Utilizza passcode</string>
+    <!-- Message informing the fingerprint was enabled successfully -->
+    <string name="confirmation_fingerprint_enabled">La tua impronta digitale è confermata</string>
+    <!-- Warning indicating an image (GIF) cannot be inserted in an input text. Same string than the one shown by the system when it detects this behaviour on its own. -->
+    <string name="image_insertion_not_allowed">MEGA non supporta l’inserimento di un’immagine qui</string>
+    <!-- The label under the button of viewing all images screen -->
+    <string name="section_images">Immagini</string>
 </resources>

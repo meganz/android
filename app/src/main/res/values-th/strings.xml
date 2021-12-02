@@ -1592,22 +1592,14 @@
     <string name="paused_transfers_title">หยุดการถ่ายโอนชั่วคราว</string>
     <!-- message shown in the screen when there are not any active transfer -->
     <string name="completed_transfers_empty">ไม่มีรายการถ่ายโอน</string>
-    <!-- Text of the notification shown when the upload service is running, Plural -->
-    <plurals name="upload_service_notification">
-        <item quantity="other">กำลังอัปโหลดไฟล์ %1$d จาก %2$d ไฟล์</item>
-    </plurals>
-    <!-- Text of the notification shown when the upload service is running, Plural -->
-    <plurals name="upload_service_paused_notification">
-        <item quantity="other">กำลังอัปโหลดไฟล์ %1$d จาก %2$d รายการ (หยุดชั่วคราว)</item>
-    </plurals>
-    <!-- Text of the notification shown when the folder upload service is running, Text of the notification shown when the folder upload service is running - plural e.g. Uploading 1 of 2 folders -->
-    <plurals name="folder_upload_service_notification">
-        <item quantity="other">กำลังอัปโหลด %1$d จาก %2$d โฟลเดอร์</item>
-    </plurals>
-    <!-- Text of the notification shown when the folder upload service is running, Text of the notification shown when the folder upload service is running - plural e.g. Uploading 1 of 2 folders -->
-    <plurals name="folder_upload_service_paused_notification">
-        <item quantity="other">กำลังอัปโหลดโฟลเดอร์ %1$d จาก %2$d รายการ (หยุดชั่วคราว)</item>
-    </plurals>
+    <!-- Text of the notification shown when the upload service is running: e.g. Uploading files: 1 of 10 -->
+    <string name="upload_service_notification">กำลังอัปโหลดไฟล์: %1$d จาก %2$d</string>
+    <!-- Text of the notification shown when the upload service is paused: e.g. Uploading files: 1 of 10 (paused)-->
+    <string name="upload_service_notification_paused">กำลังอัปโหลดไฟล์: %1$d จาก %2$d (หยุดชั่วคราว)</string>
+    <!-- Text of the notification shown when the folder upload service is running, e.g. Uploading folders 1 of 2 -->
+    <string name="folder_upload_service_notification">กำลังอัปโหลดโฟลเดอร์: %1$d จาก %2$d</string>
+    <!-- Text of the notification shown when the folder upload service is paused, e.g. Uploading folders 1 of 2 (paused) -->
+    <string name="folder_upload_service_notification_paused">กำลังอัปโหลดโฟลเดอร์: %1$d จาก %2$d (หยุดชั่วคราว)</string>
     <!-- Text of the notification shown when the upload service has finished, Plural -->
     <plurals name="upload_service_final_notification">
         <item quantity="other">อัปโหลดแล้ว %1$d ไฟล์</item>
@@ -1646,14 +1638,10 @@
     <plurals name="download_service_failed">
         <item quantity="other">ไม่ได้ดาวน์โหลดไฟล์ %1$d ไฟล์</item>
     </plurals>
-    <!-- Text of the notification shown when the download service is running, Plural -->
-    <plurals name="download_service_notification">
-        <item quantity="other">กำลังดาวน์โหลดไฟล์ %1$d จาก %2$d ไฟล์</item>
-    </plurals>
-    <!-- Text of the notification shown when the download service is paused, Plural -->
-    <plurals name="download_service_paused_notification">
-        <item quantity="other">กำลังดาวน์โหดไฟล์ %1$d จาก %2$d รายการ (หยุดชั่วคราว)</item>
-    </plurals>
+    <!-- Text of the notification shown when the download service is running -->
+    <string name="download_service_notification">กำลังดาวน์โหลดไฟล์: %1$d จาก %2$d</string>
+    <!-- Text of the notification shown when the download service is paused -->
+    <string name="download_service_notification_paused">กำลังดาวน์โหลดไฟล์: %1$d จาก %2$d (หยุดชั่วคราว)</string>
     <!-- Title of the alert when the transfer quota is exceeded. -->
     <string name="title_depleted_transfer_overquota">โควต้าการถ่ายโอนไม่เพียงพอ</string>
     <!-- Text of the alert when the transfer quota is depleted. The placeholder indicates the time left for the transfer quota to be reset. For instance: 30m 45s -->
@@ -3773,7 +3761,7 @@
     <string name="file_created">สร้างไฟล์แล้ว</string>
     <!-- Warning indicating a file was not created successfully -->
     <string name="file_creation_failed">สร้างไฟล์ล้มเหลว กรุณาลองอีกครั้ง</string>
-    <!-- Label indicating a file was saved to some folder. e.g.: File saved to Cloud Drive -->
+    <!-- Label indicating a file was saved to some folder. e.g.: File saved to Cloud Drive. "Cloud Drive" is the only destination for the time being, thus any article isn't needed -->
     <string name="file_saved_to">บันทึกไฟล์ลงใน %1$s แล้ว</string>
     <!-- Warning indicating a file was not saved to some folder. e.g.: File not saved to Cloud Drive. Try again -->
     <string name="file_saved_to_failed">ไม่ได้บันทึกไฟล์ลงใน %1$s ลองอีกครั้ง</string>
@@ -4099,4 +4087,18 @@
     <string name="video_quality_info">คุณสามารถประหยัดพื้นที่ได้ด้วยการลดคุณภาพวิดีโอลงโดยการตั้งค่าการอัปโหลดจากกล้อง</string>
     <!-- Label indicating video original quality -->
     <string name="original_quality">คุณภาพดั้งเดิม</string>
+    <!-- Settings label which allows to enable or disable fingerprint unlock. -->
+    <string name="setting_fingerprint">รหัสลายนิ้วมือ</string>
+    <!-- Title of the dialog which allows to enable the fingerprint unlock. -->
+    <string name="title_enable_fingerprint">ยืนยันลายนิ้วมือของคุณเพื่อปลดล็อก</string>
+    <!-- Title of the dialog which allows to unlock the app with the fingerprint. -->
+    <string name="title_unlock_fingerprint">ปลดล็อกโดยใช้ลายนิ้วมือของคุณ</string>
+    <!-- Button of the dialog which allows to unlock the app with the fingerprint. Gives the option to unlock with the passcode instead -->
+    <string name="action_use_passcode">ใช้รหัส</string>
+    <!-- Message informing the fingerprint was enabled successfully -->
+    <string name="confirmation_fingerprint_enabled">ยืนยันลายนิ้วมือของคุณเรียบร้อยแล้ว</string>
+    <!-- Warning indicating an image (GIF) cannot be inserted in an input text. Same string than the one shown by the system when it detects this behaviour on its own. -->
+    <string name="image_insertion_not_allowed">MEGA ไม่สนับสนุนการแทรกรูปภาพลงที่นี่</string>
+    <!-- The label under the button of viewing all images screen -->
+    <string name="section_images">รูปภาพ</string>
 </resources>
