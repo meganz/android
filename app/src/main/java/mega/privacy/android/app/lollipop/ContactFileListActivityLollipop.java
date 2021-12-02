@@ -127,8 +127,6 @@ public class ContactFileListActivityLollipop extends PasscodeActivity
 
 	DatabaseHandler dbH;
 
-	MenuItem createFolderMenuItem;
-	MenuItem startConversation;
 	private AlertDialog newFolderDialog;
 	DisplayMetrics outMetrics;
 
@@ -183,37 +181,13 @@ public class ContactFileListActivityLollipop extends PasscodeActivity
 	}
 
 	@Override
-	public boolean onCreateOptionsMenu(Menu menu) {
-		logDebug("onCreateOptionsMenuLollipop");
-
-		// Inflate the menu items for use in the action bar
-		MenuInflater inflater = getMenuInflater();
-		inflater.inflate(R.menu.file_explorer_action, menu);
-
-		menu.findItem(R.id.cab_menu_search).setVisible(false);
-		createFolderMenuItem = menu.findItem(R.id.cab_menu_create_folder);
-		startConversation = menu.findItem(R.id.cab_menu_new_chat);
-		startConversation.setVisible(false);
-
-		MegaNode n = megaApi.getNodeByHandle(parentHandle);
-		createFolderMenuItem.setVisible(n != null && megaApi.getAccess(n) > MegaShare.ACCESS_READ);
-		return super.onCreateOptionsMenu(menu);
-	}
-
-	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		logDebug("onOptionsItemSelected");
-		int id = item.getItemId();
-		switch (id) {
-			case android.R.id.home: {
-				onBackPressed();
-				break;
-			}
-			case R.id.cab_menu_create_folder: {
-				showNewFolderDialog();
-				break;
-			}
+
+		if (item.getItemId() == android.R.id.home) {
+			onBackPressed();
 		}
+
 		return true;
 	}
 

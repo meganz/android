@@ -650,8 +650,6 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 
 	private MenuItem searchMenuItem;
 	private MenuItem addContactMenuItem;
-	private MenuItem addMenuItem;
-	private MenuItem createFolderMenuItem;
 	private MenuItem importLinkMenuItem;
 	private MenuItem enableSelectMenuItem;
 	private MenuItem selectMenuItem;
@@ -661,7 +659,6 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 	private MenuItem doNotDisturbMenuItem;
 	private MenuItem upgradeAccountMenuItem;
 	private MenuItem clearRubbishBinMenuitem;
-	private MenuItem takePicture;
 	private MenuItem cancelAllTransfersMenuItem;
 	private MenuItem playTransfersMenuIcon;
 	private MenuItem pauseTransfersMenuIcon;
@@ -5239,8 +5236,6 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 		});
 
 		addContactMenuItem = menu.findItem(R.id.action_add_contact);
-		addMenuItem = menu.findItem(R.id.action_add);
-		createFolderMenuItem = menu.findItem(R.id.action_new_folder);
 		importLinkMenuItem = menu.findItem(R.id.action_import_link);
 		enableSelectMenuItem = menu.findItem(R.id.action_enable_select);
 		selectMenuItem = menu.findItem(R.id.action_select);
@@ -5256,7 +5251,6 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 		playTransfersMenuIcon = menu.findItem(R.id.action_play);
 		pauseTransfersMenuIcon = menu.findItem(R.id.action_pause);
 		scanQRcodeMenuItem = menu.findItem(R.id.action_scan_qr);
-		takePicture = menu.findItem(R.id.action_take_picture);
 		inviteMenuItem = menu.findItem(R.id.action_menu_invite);
 		returnCallMenuItem = menu.findItem(R.id.action_return_call);
 		openMeetingMenuItem = menu.findItem(R.id.action_menu_open_meeting);
@@ -5287,11 +5281,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 				case CLOUD_DRIVE:
 					upgradeAccountMenuItem.setVisible(true);
 					importLinkMenuItem.setVisible(true);
-					addMenuItem.setEnabled(true);
-					addMenuItem.setVisible(true);
-					takePicture.setVisible(true);
 
-					createFolderMenuItem.setVisible(true);
                     if (isCloudAdded() && fbFLol.getItemCount() > 0) {
                         searchMenuItem.setVisible(true);
                     }
@@ -5320,34 +5310,10 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 
 				case SHARED_ITEMS:
 					if (getTabItemShares() == INCOMING_TAB && isIncomingAdded()) {
-						addMenuItem.setEnabled(true);
-
 						if (isIncomingAdded() && inSFLol.getItemCount() > 0) {
 							searchMenuItem.setVisible(true);
-
-							if (parentHandleIncoming != INVALID_HANDLE) {
-								MegaNode node = megaApi.getNodeByHandle(parentHandleIncoming);
-								if (node != null) {
-									int accessLevel = megaApi.getAccess(node);
-
-									switch (accessLevel) {
-										case MegaShare.ACCESS_OWNER:
-										case MegaShare.ACCESS_READWRITE:
-										case MegaShare.ACCESS_FULL: {
-											addMenuItem.setVisible(true);
-											createFolderMenuItem.setVisible(true);
-											break;
-										}
-									}
-								}
-							}
 						}
 					} else if (getTabItemShares() == OUTGOING_TAB && isOutgoingAdded()) {
-						if (parentHandleOutgoing != INVALID_HANDLE) {
-							addMenuItem.setVisible(true);
-							createFolderMenuItem.setVisible(true);
-						}
-
 						if (isOutgoingAdded() && outSFLol.getItemCount() > 0) {
 							searchMenuItem.setVisible(true);
 						}
@@ -5605,35 +5571,6 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 				showOpenLinkDialog();
 		    	return true;
 		    }
-		    case R.id.action_take_picture:{
-		    	typesCameraPermission = TAKE_PICTURE_OPTION;
-
-				boolean hasStoragePermission = hasPermissions(this, Manifest.permission.WRITE_EXTERNAL_STORAGE);
-				if (!hasStoragePermission) {
-					requestPermission(this,
-							REQUEST_WRITE_STORAGE,
-							Manifest.permission.WRITE_EXTERNAL_STORAGE);
-
-					// If device is Android 11+ request this permission independently before any other one
-					// in order to avoid display the permission request activity twice.
-					if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-						return true;
-					}
-				}
-
-				boolean hasCameraPermission = hasPermissions(this, Manifest.permission.CAMERA);
-				if (!hasCameraPermission) {
-					requestPermission(this,
-							REQUEST_CAMERA,
-							Manifest.permission.CAMERA);
-				}
-
-				if (hasStoragePermission && hasCameraPermission) {
-					checkTakePicture(this, TAKE_PHOTO_CODE);
-				}
-
-		    	return true;
-		    }
 		    case R.id.action_menu_cancel_all_transfers:{
 		    	showConfirmationCancelAllTransfers();
 		    	return true;
@@ -5683,61 +5620,6 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 					}
 				}
 				return true;
-
-	        case R.id.action_new_folder:{
-	        	if (drawerItem == DrawerItem.CLOUD_DRIVE){
-	        		showNewFolderDialog();
-	        	}
-	        	else if(drawerItem == DrawerItem.SHARED_ITEMS){
-	        		showNewFolderDialog();
-	        	}
-	        	return true;
-	        }
-	        case R.id.action_add:{
-				if (!hasPermissions(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
-					requestPermission(this,
-							REQUEST_READ_WRITE_STORAGE,
-							Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE);
-					return true;
-				}
-
-	        	if (drawerItem == DrawerItem.SHARED_ITEMS){
-	        		if (viewPagerShares.getCurrentItem()==0){
-
-						MegaNode checkNode = megaApi.getNodeByHandle(parentHandleIncoming);
-
-						if((megaApi.checkAccess(checkNode, MegaShare.ACCESS_FULL).getErrorCode() == MegaError.API_OK)){
-							this.showUploadPanel();
-						}
-						else if(megaApi.checkAccess(checkNode, MegaShare.ACCESS_READWRITE).getErrorCode() == MegaError.API_OK){
-							this.showUploadPanel();
-						}
-						else if(megaApi.checkAccess(checkNode, MegaShare.ACCESS_READ).getErrorCode() == MegaError.API_OK){
-							logWarning("Not permissions to upload");
-							MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this);
-							builder.setMessage(getString(R.string.no_permissions_upload));
-							builder.setCancelable(false).setPositiveButton(R.string.general_ok, new DialogInterface.OnClickListener() {
-								   public void onClick(DialogInterface dialog, int id) {
-										//do things
-									   alertNotPermissionsUpload.dismiss();
-								   }
-							   });
-
-							alertNotPermissionsUpload = builder.create();
-							alertNotPermissionsUpload.show();
-						}
-
-	        		}
-	        		else if(viewPagerShares.getCurrentItem()==1){
-						this.showUploadPanel();
-					}
-	        	}
-	        	else {
-        			this.showUploadPanel();
-	        	}
-
-	        	return true;
-	        }
 
 	        case R.id.action_select:{
 	        	switch (drawerItem) {
@@ -5857,29 +5739,27 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 	}
 
 	private void hideItemsWhenSearchSelected() {
-        textSubmitted = false;
-        if (createFolderMenuItem != null) {
+		textSubmitted = false;
+
+		if (searchMenuItem != null) {
 			doNotDisturbMenuItem.setVisible(false);
 			upgradeAccountMenuItem.setVisible(false);
-            cancelAllTransfersMenuItem.setVisible(false);
-            clearCompletedTransfers.setVisible(false);
-            pauseTransfersMenuIcon.setVisible(false);
-            playTransfersMenuIcon.setVisible(false);
-            createFolderMenuItem.setVisible(false);
-            addContactMenuItem.setVisible(false);
-            addMenuItem.setVisible(false);
-            sortByMenuItem.setVisible(false);
-            unSelectMenuItem.setVisible(false);
-            clearRubbishBinMenuitem.setVisible(false);
-            importLinkMenuItem.setVisible(false);
-            takePicture.setVisible(false);
-            helpMenuItem.setVisible(false);
-            inviteMenuItem.setVisible(false);
-            selectMenuItem.setVisible(false);
-            searchMenuItem.setVisible(false);
-            openMeetingMenuItem.setVisible(false);
-        }
-    }
+			cancelAllTransfersMenuItem.setVisible(false);
+			clearCompletedTransfers.setVisible(false);
+			pauseTransfersMenuIcon.setVisible(false);
+			playTransfersMenuIcon.setVisible(false);
+			addContactMenuItem.setVisible(false);
+			sortByMenuItem.setVisible(false);
+			unSelectMenuItem.setVisible(false);
+			clearRubbishBinMenuitem.setVisible(false);
+			importLinkMenuItem.setVisible(false);
+			helpMenuItem.setVisible(false);
+			inviteMenuItem.setVisible(false);
+			selectMenuItem.setVisible(false);
+			searchMenuItem.setVisible(false);
+			openMeetingMenuItem.setVisible(false);
+		}
+	}
 
 	private void returnCallWithPermissions() {
 		if (checkPermissionsCall(this, RETURN_CALL_PERMISSIONS)) {
