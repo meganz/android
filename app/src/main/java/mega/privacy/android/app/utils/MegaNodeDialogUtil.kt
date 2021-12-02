@@ -2,7 +2,6 @@ package mega.privacy.android.app.utils
 
 import android.annotation.SuppressLint
 import android.app.Activity
-import android.app.Dialog
 import android.content.Context
 import android.content.DialogInterface
 import android.content.DialogInterface.BUTTON_NEGATIVE
@@ -71,12 +70,13 @@ object MegaNodeDialogUtil {
     const val BACKUP_NODE_TYPE = "BackupNodeType"
     const val BACKUP_ACTION_TYPE = "BackupActionType"
     const val BACKUP_DIALOG_WARN = "BackupDialogWarn"
+
     // Backup node type
-    const val BACKUP_NONE = -1
-    const val BACKUP_ROOT = 0
-    const val BACKUP_DEVICE = 1
-    const val BACKUP_SUB_DEVICE_FOLDER = 2 // the path is "backup/**device/"
-    const val BACKUP_SUBFOLDER = 3
+    const val BACKUP_NONE = -1 // The folder is not belong to the MyBackup
+    const val BACKUP_ROOT = 0 // MyBackup folder
+    const val BACKUP_DEVICE = 1 // Device folder
+    const val BACKUP_FOLDER = 2 // Backup folders underneath device folders
+    const val BACKUP_FOLDER_CHILD = 3 // All backups underneath BACKUP_FOLDER
 
     // For backup node actions
     const val ACTION_BACKUP_NONE = -1
@@ -87,12 +87,14 @@ object MegaNodeDialogUtil {
     const val ACTION_BACKUP_TAKE_PICTURE = 4
     const val ACTION_BACKUP_NEW_FOLDER = 5
     const val ACTION_BACKUP_SHARE_FOLDER = 6
-    const val ACTION_BACKUP_SHARE = 7
-    const val ACTION_BACKUP_SHARE_CHAT = 8
-    const val ACTION_BACKUP_GET_LINK = 9
-    const val ACTION_BACKUP_COPY = 10
-    const val ACTION_MOVE_TO_BACKUP = 11
-    const val ACTION_COPY_TO_BACKUP = 12
+//    const val ACTION_BACKUP_MULTI_SHARE = 7
+//    const val ACTION_BACKUP_SHARE_WITH_ROOT = 8
+    const val ACTION_BACKUP_SHARE = 9
+    const val ACTION_BACKUP_SHARE_CHAT = 10
+    const val ACTION_BACKUP_GET_LINK = 11
+    const val ACTION_BACKUP_COPY = 12
+    const val ACTION_MOVE_TO_BACKUP = 13
+    const val ACTION_COPY_TO_BACKUP = 14
 
     /**
      * Creates and shows a TYPE_RENAME dialog to rename a node.
@@ -749,10 +751,22 @@ object MegaNodeDialogUtil {
         activity: Activity,
         actionBackupNodeCallback: ActionBackupNodeCallback,
         handleList: ArrayList<Long>?,
-        pNodeBackup: MegaNode,
+        pNodeBackup: MegaNode?,
         nodeType: Int,
         actionType: Int
     ): AlertDialog {
+
+        logDebug("MyBackup + actWithBackupTips nodeType = $nodeType")
+        logDebug("MyBackup + actWithBackupTips actionType = $actionType")
+        if (handleList != null) {
+            logDebug("MyBackup + handleList.size = " + handleList.size)
+        }
+        if (pNodeBackup != null) {
+            logDebug("MyBackup + pNodeBackup Name = " + pNodeBackup.name)
+            logDebug("MyBackup + pNodeBackup DeviceId = " + pNodeBackup.deviceId)
+            logDebug("MyBackup + pNodeBackup Handle = " + pNodeBackup.handle)
+        }
+
         val dialogClickListener =
             DialogInterface.OnClickListener { dialog: DialogInterface?, which: Int ->
                 when (which) {
@@ -763,16 +777,18 @@ object MegaNodeDialogUtil {
                             || actionType == ACTION_BACKUP_GET_LINK
                             || (actionType == ACTION_COPY_TO_BACKUP && (nodeType == BACKUP_ROOT || nodeType == BACKUP_DEVICE))
                             || (actionType == ACTION_MOVE_TO_BACKUP && (nodeType == BACKUP_ROOT || nodeType == BACKUP_DEVICE))
-                            || (actionType == ACTION_BACKUP_ADD && nodeType != BACKUP_SUBFOLDER)
-                            || (actionType == ACTION_BACKUP_FAB && nodeType != BACKUP_SUBFOLDER)
-                            || (actionType == ACTION_BACKUP_TAKE_PICTURE && nodeType != BACKUP_SUBFOLDER)
-                            || (actionType == ACTION_BACKUP_NEW_FOLDER && nodeType != BACKUP_SUBFOLDER)) {
+                            || (actionType == ACTION_BACKUP_ADD && nodeType != BACKUP_FOLDER_CHILD)
+                            || (actionType == ACTION_BACKUP_FAB && nodeType != BACKUP_FOLDER_CHILD)
+                            || (actionType == ACTION_BACKUP_TAKE_PICTURE && nodeType != BACKUP_FOLDER_CHILD)
+                            || (actionType == ACTION_BACKUP_NEW_FOLDER && nodeType != BACKUP_FOLDER_CHILD)) {
+                            logDebug("MyBackup + showTipDialogWithBackup / actionExecute")
                             actionBackupNodeCallback.actionExecute(
                                 handleList,
                                 pNodeBackup,
                                 nodeType,
                                 actionType)
                         } else {
+                            logDebug("MyBackup + showTipDialogWithBackup / actionConfirmed")
                             actionBackupNodeCallback.actionConfirmed(
                                 handleList,
                                 pNodeBackup,
@@ -782,6 +798,7 @@ object MegaNodeDialogUtil {
                         }
                     }
                     BUTTON_NEGATIVE -> {
+                        logDebug("MyBackup + showTipDialogWithBackup / actionCancel")
                         actionBackupNodeCallback.actionCancel(dialog, actionType)
                     }
                 }
@@ -790,7 +807,10 @@ object MegaNodeDialogUtil {
         val view = layout.inflate(R.layout.dialog_backup_operate_tip, null)
         val tvTitle = view.findViewById<TextView>(R.id.title)
         val tvContent = view.findViewById<TextView>(R.id.backup_tip_content)
-        val nodeName = pNodeBackup.name
+        var nodeName = ""
+
+        pNodeBackup?.let { nodeName = it.name }
+
         when (actionType) {
             ACTION_BACKUP_NEW_FOLDER, ACTION_BACKUP_TAKE_PICTURE, ACTION_BACKUP_ADD, ACTION_BACKUP_FAB -> {
                 if(nodeType == BACKUP_DEVICE) {
@@ -803,7 +823,7 @@ object MegaNodeDialogUtil {
                 }
             }
             ACTION_COPY_TO_BACKUP, ACTION_MOVE_TO_BACKUP -> {
-                if (nodeType == BACKUP_ROOT || nodeType == BACKUP_DEVICE || nodeType == BACKUP_SUB_DEVICE_FOLDER) {
+                if (nodeType == BACKUP_ROOT || nodeType == BACKUP_DEVICE || nodeType == BACKUP_FOLDER) {
                     tvTitle.text = getString(R.string.backup_add_item_title)
                     tvContent.setText(R.string.backup_add_item_to_root_text)
                 } else {
@@ -819,7 +839,7 @@ object MegaNodeDialogUtil {
                     tvTitle.text = displayName
                     tvContent.setText(R.string.backup_move_root_folder)
 
-                } else if (nodeType == BACKUP_DEVICE || nodeType == BACKUP_SUB_DEVICE_FOLDER || nodeType == BACKUP_SUBFOLDER) {
+                } else if (nodeType == BACKUP_DEVICE || nodeType == BACKUP_FOLDER || nodeType == BACKUP_FOLDER_CHILD) {
                     // Move sub folder of backup
                     if (handleList != null) {
                         tvTitle.text = if (handleList.size == 1) {
@@ -839,7 +859,7 @@ object MegaNodeDialogUtil {
                     val displayName = getString(R.string.backup_remove_folder_title, nodeName)
                     tvTitle.text = displayName
                     tvContent.setText(R.string.backup_remove_root_folder)
-                } else if (nodeType == BACKUP_DEVICE || nodeType == BACKUP_SUB_DEVICE_FOLDER || nodeType == BACKUP_SUBFOLDER) {
+                } else if (nodeType == BACKUP_DEVICE || nodeType == BACKUP_FOLDER || nodeType == BACKUP_FOLDER_CHILD) {
                     // Move sub folder of backup to rubbish bin
                     if (handleList != null) {
                         tvTitle.text = if (handleList.size == 1) {
@@ -856,16 +876,48 @@ object MegaNodeDialogUtil {
             ACTION_BACKUP_GET_LINK, ACTION_BACKUP_SHARE_CHAT, ACTION_BACKUP_SHARE, ACTION_BACKUP_SHARE_FOLDER -> {
                 tvTitle.setText(R.string.backup_share_permission_title)
                 tvContent.setText(R.string.backup_share_permission_text)
+                handleList?.let {
+                    val nodeSize = it.size
+                    if(nodeSize > 1) {
+                        when (nodeType) {
+                            BACKUP_ROOT -> {
+                                if (pNodeBackup != null) {
+                                    tvContent.setText(R.string.backup_share_with_root_permission_text)
+                                }
+                            }
+                            else -> tvContent.setText(R.string.backup_multi_share_permission_text)
+                        }
+                    }
+                }
             }
         }
         val builder = MaterialAlertDialogBuilder(activity)
             .setView(view)
         when (actionType) {
             ACTION_BACKUP_GET_LINK, ACTION_BACKUP_SHARE_CHAT, ACTION_BACKUP_SHARE, ACTION_BACKUP_SHARE_FOLDER -> {
-                builder.setPositiveButton(
-                    getString(R.string.button_permission_info),
-                    dialogClickListener
-                )
+                if (handleList!=null) {
+                    val nodeSize = handleList.size
+                    if(nodeSize > 1 && nodeType == BACKUP_ROOT && pNodeBackup != null) {
+                        builder.setPositiveButton(
+                            getString(R.string.general_positive_button),
+                            dialogClickListener
+                        )
+                        builder.setNegativeButton(
+                            getString(R.string.general_cancel),
+                            dialogClickListener
+                        )
+                    } else {
+                        builder.setPositiveButton(
+                            getString(R.string.button_permission_info),
+                            dialogClickListener
+                        )
+                    }
+                } else {
+                    builder.setPositiveButton(
+                        getString(R.string.button_permission_info),
+                        dialogClickListener
+                    )
+                }
             }
             else -> {
                 builder.setPositiveButton(
@@ -935,7 +987,7 @@ object MegaNodeDialogUtil {
                     confirmInfo = getString(R.string.backup_action_confirm, checkStr)
                     tvConfirmString.text = confirmInfo
                     editTextLayout.hint = checkStr
-                } else if (nodeType == BACKUP_DEVICE || nodeType == BACKUP_SUB_DEVICE_FOLDER || nodeType == BACKUP_SUBFOLDER) {
+                } else if (nodeType == BACKUP_DEVICE || nodeType == BACKUP_FOLDER || nodeType == BACKUP_FOLDER_CHILD) {
                     // Move sub folder of backup
                     if (handleList != null) {
                         tvTitle.text = if (handleList.size == 1) {
@@ -952,7 +1004,7 @@ object MegaNodeDialogUtil {
                 if (nodeType == BACKUP_ROOT) {
                     // Move root folder of backup to rubbish bin
                     tvTitle.text = getString(R.string.backup_remove_folder_title, nodeName)
-                } else if (nodeType == BACKUP_DEVICE || nodeType == BACKUP_SUB_DEVICE_FOLDER || nodeType == BACKUP_SUBFOLDER) {
+                } else if (nodeType == BACKUP_DEVICE || nodeType == BACKUP_FOLDER || nodeType == BACKUP_FOLDER_CHILD) {
                     // Move sub folder of backup to rubbish bin
                     if (handleList != null) {
                         tvTitle.text = if (handleList.size == 1) {
@@ -988,6 +1040,7 @@ object MegaNodeDialogUtil {
                 when (actionType) {
                     ACTION_BACKUP_MOVE -> {
                         if (nodeType == BACKUP_ROOT && getString(R.string.backup_move_confirm) == strEditText) {
+                            logDebug("MyBackup + showConfirmDialogWithBackup / actionExecute")
                             actionBackupNodeCallback.actionExecute(
                                 handleList,
                                 pNodeBackup,
@@ -996,8 +1049,9 @@ object MegaNodeDialogUtil {
                             )
                             //Dismiss once everything is OK.
                             dialog.dismiss()
-                        } else if (nodeType == BACKUP_DEVICE || nodeType == BACKUP_SUB_DEVICE_FOLDER || nodeType == BACKUP_SUBFOLDER) {
+                        } else if (nodeType == BACKUP_DEVICE || nodeType == BACKUP_FOLDER || nodeType == BACKUP_FOLDER_CHILD) {
                             if (getString(R.string.backup_disable_confirm) == strEditText) {
+                                logDebug("MyBackup + showConfirmDialogWithBackup / actionExecute")
                                 actionBackupNodeCallback.actionExecute(
                                     handleList,
                                     pNodeBackup,
@@ -1015,6 +1069,7 @@ object MegaNodeDialogUtil {
                     }
                     else -> {
                         if (getString(R.string.backup_disable_confirm) == strEditText) {
+                            logDebug("MyBackup + showConfirmDialogWithBackup / actionExecute")
                             actionBackupNodeCallback.actionExecute(
                                 handleList,
                                 pNodeBackup,
@@ -1033,6 +1088,7 @@ object MegaNodeDialogUtil {
             val buttonCancel =
                 dialog.getButton(BUTTON_NEGATIVE)
             buttonCancel.setOnClickListener {
+                logDebug("MyBackup + showConfirmDialogWithBackup / actionCancel")
                 actionBackupNodeCallback.actionCancel(dialog, actionType)
                 dialog.dismiss()
             }

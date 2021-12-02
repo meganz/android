@@ -56,8 +56,8 @@ import mega.privacy.android.app.utils.MegaApiUtils.isIntentAvailable
 import mega.privacy.android.app.utils.MegaNodeDialogUtil.BACKUP_DEVICE
 import mega.privacy.android.app.utils.MegaNodeDialogUtil.BACKUP_NONE
 import mega.privacy.android.app.utils.MegaNodeDialogUtil.BACKUP_ROOT
-import mega.privacy.android.app.utils.MegaNodeDialogUtil.BACKUP_SUBFOLDER
-import mega.privacy.android.app.utils.MegaNodeDialogUtil.BACKUP_SUB_DEVICE_FOLDER
+import mega.privacy.android.app.utils.MegaNodeDialogUtil.BACKUP_FOLDER_CHILD
+import mega.privacy.android.app.utils.MegaNodeDialogUtil.BACKUP_FOLDER
 import mega.privacy.android.app.utils.StringResourcesUtils.getQuantityString
 import mega.privacy.android.app.utils.StringResourcesUtils.getString
 import mega.privacy.android.app.utils.TextUtil.isTextEmpty
@@ -510,24 +510,76 @@ object MegaNodeUtil {
             }
         } else if (isOutShare(node)) {
             R.drawable.ic_folder_outgoing
-        } else if (node.handle == myBackupHandle) {
+        } else if (isRootBackupFolder(node)) {
             R.drawable.backup
-        } else if (node.parentHandle == myBackupHandle) {
+        } else if (isDeviceBackupFolder(node)) {
             getMyBackupSubFolderIcon(node)
-        } else if (BACKUP_SUB_DEVICE_FOLDER == checkBackupNodeTypeByHandle(MegaApplication.getInstance().megaApi,node)) {
+        } else if (isBackupFolder(node)) {
             R.drawable.ic_folder_backup
         } else{
             R.drawable.ic_folder_list
         }
     }
 
+    /**
+     * Checks if a node is a backup folder under the device folder.
+     *
+     * @param node MegaNode to check
+     * @return True if the node is Device folder, false otherwise
+     */
+    private fun isBackupFolder(node: MegaNode): Boolean {
+        val megaApi = MegaApplication.getInstance().megaApi
+        var index = 0
+        var p = node
+
+        while (megaApi.getParentNode(p) != null) {
+            p = megaApi.getParentNode(p)
+            index++
+            if (p != null && p.parentHandle == myBackupHandle) {
+                return (!isTextEmpty(node.deviceId) && index == 1)
+            }
+        }
+        return false
+    }
+
+    /**
+     * Checks if a node is a device folder under the MyBackup folder.
+     *
+     * @param node MegaNode to check
+     * @return True if the node is a device folder, false otherwise
+     */
+    private fun isDeviceBackupFolder(node: MegaNode): Boolean {
+        return (node.parentHandle == myBackupHandle && !isTextEmpty(node.deviceId))
+    }
+
+    /**
+     * Checks if a node is the MyBackup folder.
+     *
+     * @param node MegaNode to check
+     * @return True if the node is the MyBackup folder, false otherwise
+     */
+    private fun isRootBackupFolder(node: MegaNode): Boolean {
+        return (node.handle == myBackupHandle)
+    }
+
+    /**
+     * Checks the type of the devices.
+     *
+     * @param node MegaNode to check
+     * @return The resource ID
+     */
     private fun getMyBackupSubFolderIcon(node: MegaNode): Int {
         if (isTextEmpty(node.deviceId)) return R.drawable.ic_folder_list
 
         val folderName = node.name
         return when {
             folderName.contains(Regex("win|desktop", RegexOption.IGNORE_CASE)) -> R.drawable.pc_win
-            folderName.contains(Regex("linux|debian|ubuntu|centos", RegexOption.IGNORE_CASE)) -> R.drawable.pc_linux
+            folderName.contains(
+                Regex(
+                    "linux|debian|ubuntu|centos",
+                    RegexOption.IGNORE_CASE
+                )
+            ) -> R.drawable.pc_linux
             folderName.contains(Regex("mac", RegexOption.IGNORE_CASE)) -> R.drawable.pc_mac
             folderName.contains(Regex("ext|drive", RegexOption.IGNORE_CASE)) -> R.drawable.ex_drive
             else -> R.drawable.pc
@@ -1733,13 +1785,17 @@ object MegaNodeUtil {
     }
 
     /**
-     * Check the folder of My Backup and get the folder name
+     * Check the folder of My Backup and get the folder node
      *
      * @param megaApi MegaApiAndroid instance to use.
      * @param handleList handles list of the nodes that selected
+     * @return The node of My Backups or null
      */
     @JvmStatic
-    fun checkBackupNodeByHandle(megaApi: MegaApiAndroid, handleList: ArrayList<Long>?): MegaNode? {
+    fun getBackupRootNodeByHandle(
+        megaApi: MegaApiAndroid,
+        handleList: ArrayList<Long>?
+    ): MegaNode? {
         if (handleList != null) {
             if (handleList.size > 0) {
                 for (handle in handleList) {
@@ -1754,83 +1810,99 @@ object MegaNodeUtil {
     }
 
     /**
-     * Check the sub folder of My Backup
+     * Check the folder type of My Backup
      *
      * @param megaApi MegaApiAndroid instance to use.
      * @param handleList handles list of the nodes that selected
-     * @return true - Sub folder of My Backup / false - Not the sub folder of My Backup
+     * @return The type of current nodes,
+     * if multiple nodes selected and MyBackup folder included, return BACKUP_ROOT
+     * if multiple nodes selected without MyBackup folder, return BACKUP_NONE
      */
     @JvmStatic
-    fun checkBackupNodeTypeByHandle(megaApi: MegaApiAndroid, handleList: ArrayList<Long>?): Int{
-        if(handleList != null) {
-            if (handleList.size > 0) {
-                val handle: Long = handleList[0]
-                var p: MegaNode? = megaApi.getNodeByHandle(handle)
-                if (p != null) {
-                    if(p.handle == myBackupHandle){
-                        return BACKUP_ROOT
-                    }
-                }
+    fun checkBackupNodeTypeByHandle(megaApi: MegaApiAndroid, handleList: ArrayList<Long>?): Int {
+        if (handleList != null) {
+            if (handleList.size == 1) {
+                // Only one node
+                val p: MegaNode? = megaApi.getNodeByHandle(handleList[0])
+                return checkBackupNodeTypeByHandle(megaApi, p)
+            } else {
+                val node = megaApi.getNodeByHandle(handleList[0])
 
-                p = megaApi.getParentNode(p)
-                if(p!= null && p.handle == myBackupHandle){
-                    return BACKUP_DEVICE
-                }
-
-                var index = 0
-                while (megaApi.getParentNode(p) != null) {
-                    p = megaApi.getParentNode(p)
-                    index ++
-
-                    if(p!= null && p.handle == myBackupHandle){
-                        if(index == 1){
-                            return BACKUP_SUB_DEVICE_FOLDER
+                if (node.parentHandle == megaApi.rootNode.handle) {
+                    // Check if handleList contains backup root node
+                    for (l in handleList) {
+                        if (isRootBackupFolder(megaApi.getNodeByHandle(l))) {
+                            return BACKUP_ROOT
                         }
-                        return BACKUP_SUBFOLDER
+                    }
+                    return BACKUP_NONE
+                } else {
+                    // the nodes in the handleList are belong to "My Backups"
+                    if (node.parentHandle == myBackupHandle) {
+                        // Check if handleList contains device nodes
+                        for (l in handleList) {
+                            if (isDeviceBackupFolder(megaApi.getNodeByHandle(l))) {
+                                return BACKUP_DEVICE
+                            }
+                        }
+                        return BACKUP_NONE
+                    } else {
+                        for (l in handleList) {
+                            val nodeType =
+                                checkBackupNodeTypeByHandle(megaApi, megaApi.getNodeByHandle(l))
+                            if (nodeType != BACKUP_NONE) return nodeType
+                        }
                     }
                 }
-                return BACKUP_NONE
             }
         }
         return BACKUP_NONE
     }
 
     /**
-     * Check the sub folder of My Backup
+     * Check the folder type of "My Backups"
      *
      * @param megaApi MegaApiAndroid instance to use.
-     * @param handleList handles list of the nodes that selected
-     * @return true - Sub folder of My Backup / false - Not the sub folder of My Backup
+     * @param node The nodes that selected
+     * @return The type of MyBackup folder, if the folder is not belong to the "My Backups" folder, return BACKUP_NONE
      */
     @JvmStatic
-    fun checkBackupNodeTypeByHandle(megaApi: MegaApiAndroid, node: MegaNode?): Int{
-        if(node != null) {
-            var p: MegaNode? = node
-            if (p != null) {
-                if(p.handle == myBackupHandle){
-                    return BACKUP_ROOT
-                }
-            }
+    fun checkBackupNodeTypeByHandle(megaApi: MegaApiAndroid, node: MegaNode?): Int {
+        var nodeType = BACKUP_NONE
 
-            p = megaApi.getParentNode(p)
-            if(p!= null && p.handle == myBackupHandle){
-                return BACKUP_DEVICE
-            }
+        if (node != null) {
+            if (node.handle == myBackupHandle) {
+                nodeType = BACKUP_ROOT
+            } else if (node.parentHandle == myBackupHandle && !isTextEmpty(node.deviceId)) {
+                nodeType = BACKUP_DEVICE
+            } else {
+                var index = 0
+                var p = node
+                var isInBackupFolder = false
 
-            var index = 0
-            while (megaApi.getParentNode(p) != null) {
-                p = megaApi.getParentNode(p)
-                index ++
-
-                if(p!= null && p.handle == myBackupHandle){
-                    if(index == 1){
-                        return BACKUP_SUB_DEVICE_FOLDER
+                while (megaApi.getParentNode(p) != null) {
+                    p = megaApi.getParentNode(p)
+                    index++
+                    if (p != null && p.parentHandle == myBackupHandle) {
+                        isInBackupFolder = true
+                        break
                     }
-                    return BACKUP_SUBFOLDER
+                }
+
+                nodeType = if (!isInBackupFolder) {
+                    BACKUP_NONE
+                } else {
+                    if (index > 1) {
+                        BACKUP_FOLDER_CHILD
+                    } else if (!isTextEmpty(node.deviceId) && index == 1) {
+                        BACKUP_FOLDER
+                    } else {
+                        BACKUP_NONE
+                    }
                 }
             }
-            return BACKUP_NONE
         }
-        return BACKUP_NONE
+        logDebug("MyBackup + checkBackupNodeTypeByHandle return nodeType = $nodeType")
+        return nodeType
     }
 }

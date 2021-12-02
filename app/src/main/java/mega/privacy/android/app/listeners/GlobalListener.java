@@ -94,8 +94,8 @@ public class GlobalListener implements MegaGlobalListenerInterface {
 
             if (user.hasChanged(MegaUser.CHANGE_TYPE_MY_BACKUPS_FOLDER) && isMyChange) {
                 //user has change backup attribute, need to update local ones
-                logDebug("Get backup attribute when change on other client.");
-                api.getUserAttribute(USER_ATTR_MY_BACKUPS_FOLDER, new GetCuAttributeListener(megaApplication));
+                logDebug("MyBackup + Get backup attribute when change on other client.");
+                api.getUserAttribute(USER_ATTR_MY_BACKUPS_FOLDER, new GetAttrUserListener(megaApplication));
                 break;
             }
         }

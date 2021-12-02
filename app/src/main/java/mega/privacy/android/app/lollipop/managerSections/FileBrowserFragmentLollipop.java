@@ -65,7 +65,6 @@ import mega.privacy.android.app.lollipop.FullScreenImageViewerLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.PdfViewerActivityLollipop;
 import mega.privacy.android.app.lollipop.adapters.MegaNodeAdapter;
-import mega.privacy.android.app.lollipop.adapters.RotatableAdapter;
 import mega.privacy.android.app.lollipop.controllers.NodeController;
 import mega.privacy.android.app.utils.CloudStorageOptionControlUtil;
 import mega.privacy.android.app.utils.ColorUtils;
@@ -83,11 +82,9 @@ import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.FileUtil.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.MegaApiUtils.*;
-import static mega.privacy.android.app.utils.MegaNodeDialogUtil.ACTION_BACKUP_GET_LINK;
 import static mega.privacy.android.app.utils.MegaNodeDialogUtil.ACTION_BACKUP_MOVE;
 import static mega.privacy.android.app.utils.MegaNodeDialogUtil.ACTION_BACKUP_REMOVE;
 import static mega.privacy.android.app.utils.MegaNodeDialogUtil.ACTION_BACKUP_SHARE;
-import static mega.privacy.android.app.utils.MegaNodeDialogUtil.ACTION_BACKUP_SHARE_CHAT;
 import static mega.privacy.android.app.utils.MegaNodeDialogUtil.ACTION_BACKUP_SHARE_FOLDER;
 import static mega.privacy.android.app.utils.MegaNodeDialogUtil.BACKUP_ACTION_TYPE;
 import static mega.privacy.android.app.utils.MegaNodeDialogUtil.BACKUP_DEVICE;
@@ -97,12 +94,12 @@ import static mega.privacy.android.app.utils.MegaNodeDialogUtil.BACKUP_HANDLED_N
 import static mega.privacy.android.app.utils.MegaNodeDialogUtil.BACKUP_NODE_TYPE;
 import static mega.privacy.android.app.utils.MegaNodeDialogUtil.BACKUP_NONE;
 import static mega.privacy.android.app.utils.MegaNodeDialogUtil.BACKUP_ROOT;
-import static mega.privacy.android.app.utils.MegaNodeDialogUtil.BACKUP_SUBFOLDER;
-import static mega.privacy.android.app.utils.MegaNodeDialogUtil.BACKUP_SUB_DEVICE_FOLDER;
+import static mega.privacy.android.app.utils.MegaNodeDialogUtil.BACKUP_FOLDER_CHILD;
+import static mega.privacy.android.app.utils.MegaNodeDialogUtil.BACKUP_FOLDER;
 import static mega.privacy.android.app.utils.MegaNodeDialogUtil.showConfirmDialogWithBackup;
 import static mega.privacy.android.app.utils.MegaNodeDialogUtil.showTipDialogWithBackup;
 import static mega.privacy.android.app.utils.MegaNodeUtil.allHaveOwnerAccess;
-import static mega.privacy.android.app.utils.MegaNodeUtil.checkBackupNodeByHandle;
+import static mega.privacy.android.app.utils.MegaNodeUtil.getBackupRootNodeByHandle;
 import static mega.privacy.android.app.utils.MegaNodeUtil.checkBackupNodeTypeByHandle;
 import static mega.privacy.android.app.utils.MegaNodeUtil.manageTextFileIntent;
 import static mega.privacy.android.app.utils.MegaNodeUtil.manageURLNode;
@@ -221,13 +218,13 @@ public class FileBrowserFragmentLollipop extends RotatableFragment{
 						handleList.add(documents.get(i).getHandle());
 					}
 
-					MegaNode pNode = checkBackupNodeByHandle(megaApi, handleList);
+					MegaNode pNode = getBackupRootNodeByHandle(megaApi, handleList);
 					nodeType = checkBackupNodeTypeByHandle(megaApi, handleList);
 
 					// Show the warning dialog if the list including Backup node
 					if (nodeType == BACKUP_ROOT) {
 						actWithBackupTips(handleList, pNode, nodeType, ACTION_BACKUP_MOVE);
-					} else if (nodeType == BACKUP_DEVICE || nodeType == BACKUP_SUB_DEVICE_FOLDER || nodeType == BACKUP_SUBFOLDER) {
+					} else if (nodeType == BACKUP_DEVICE || nodeType == BACKUP_FOLDER || nodeType == BACKUP_FOLDER_CHILD) {
 						Long handle = handleList.get(0);
 						MegaNode p = megaApi.getNodeByHandle(handle);
 						actWithBackupTips(handleList, p, nodeType, ACTION_BACKUP_MOVE);
@@ -248,19 +245,16 @@ public class FileBrowserFragmentLollipop extends RotatableFragment{
 						}
 					}
 
-					MegaNode pNode = checkBackupNodeByHandle(megaApi, handleList);
+					MegaNode pNode = getBackupRootNodeByHandle(megaApi, handleList);
 					nodeType = checkBackupNodeTypeByHandle(megaApi, handleList);
 
-					// Show the warning dialog if the list including Backup node
-					if (nodeType == BACKUP_ROOT) {
-						actWithBackupTips(handleList, pNode, nodeType, ACTION_BACKUP_SHARE_FOLDER);
-					} else if (nodeType == BACKUP_DEVICE || nodeType == BACKUP_SUB_DEVICE_FOLDER || nodeType == BACKUP_SUBFOLDER) {
-						Long handle = handleList.get(0);
-						MegaNode p = megaApi.getNodeByHandle(handle);
-						actWithBackupTips(handleList, p, nodeType, ACTION_BACKUP_SHARE_FOLDER);
-					} else {
+					if (nodeType == BACKUP_NONE && pNode == null){
+						// No buckup node in the selected nodes
 						NodeController nC = new NodeController(context);
 						nC.selectContactToShareFolders(handleList);
+					} else {
+						// Show the warning dialog if the list including Backup node
+						actWithBackupTips(handleList, pNode, nodeType, ACTION_BACKUP_SHARE_FOLDER);
 					}
 
 					clearSelections();
@@ -272,12 +266,12 @@ public class FileBrowserFragmentLollipop extends RotatableFragment{
 						handleList.add(documents.get(i).getHandle());
 					}
 
-					MegaNode pNode = checkBackupNodeByHandle(megaApi, handleList);
+					MegaNode pNode = getBackupRootNodeByHandle(megaApi, handleList);
 					nodeType = checkBackupNodeTypeByHandle(megaApi, handleList);
 
 					if (nodeType == BACKUP_ROOT) {
 						actWithBackupTips(handleList, pNode, nodeType, ACTION_BACKUP_SHARE);
-					} else if (nodeType == BACKUP_DEVICE || nodeType == BACKUP_SUB_DEVICE_FOLDER || nodeType == BACKUP_SUBFOLDER) {
+					} else if (nodeType == BACKUP_DEVICE || nodeType == BACKUP_FOLDER || nodeType == BACKUP_FOLDER_CHILD) {
 						Long handle = handleList.get(0);
 						MegaNode p = megaApi.getNodeByHandle(handle);
 						actWithBackupTips(handleList, p, nodeType, ACTION_BACKUP_SHARE);
@@ -1391,7 +1385,9 @@ public class FileBrowserFragmentLollipop extends RotatableFragment{
 	 */
 	private void actWithBackupTips(final ArrayList<Long> handleList, MegaNode pNodeBackup, int nodeType, int actionType) {
 		backupHandleList = handleList;
-		backupNodeHandle = pNodeBackup.getHandle();
+		if (pNodeBackup != null) {
+			backupNodeHandle = pNodeBackup.getHandle();
+		}
 		backupNodeType = nodeType;
 		backupActionType = actionType;
 		backupDialogType = 0;

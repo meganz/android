@@ -34,8 +34,11 @@ import static mega.privacy.android.app.listeners.ShareListener.*;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.MegaApiUtils.*;
+import static mega.privacy.android.app.utils.MegaNodeDialogUtil.BACKUP_NONE;
+import static mega.privacy.android.app.utils.MegaNodeUtil.checkBackupNodeTypeByHandle;
 import static mega.privacy.android.app.utils.StringResourcesUtils.getString;
 import static mega.privacy.android.app.utils.Util.*;
+import static nz.mega.sdk.MegaShare.ACCESS_READ;
 
 public class NodeController {
 
@@ -351,7 +354,7 @@ public class NodeController {
     public void moveToTrash(final ArrayList<Long> handleList, boolean moveToRubbish){
         logDebug("moveToTrash: " + moveToRubbish);
 
-        MultipleRequestListener moveMultipleListener = null;
+        MultipleRequestListener moveMultipleListener;
         MegaNode parent;
         //Check if the node is not yet in the rubbish bin (if so, remove it)
         if(handleList!=null){
@@ -617,7 +620,15 @@ public class NodeController {
     public void shareFolder(MegaNode node, String email, int permissions, ShareListener shareListener) {
         if (node == null || email == null) return;
 
-        megaApi.share(node, email, permissions, shareListener);
+        int nodeType = checkBackupNodeTypeByHandle(megaApi, node);
+        logDebug("MyBackup + shareFolders nodeType = " + nodeType);
+
+        if (nodeType == BACKUP_NONE) {
+            megaApi.share(node, email, permissions, shareListener);
+        } else {
+            megaApi.share(node, email, ACCESS_READ, shareListener);
+        }
+
     }
 
     public void cleanRubbishBin(){
