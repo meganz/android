@@ -10,6 +10,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.core.view.isVisible
+import com.jeremyliao.liveeventbus.LiveEventBus
 import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.R
 import mega.privacy.android.app.databinding.BottomSheetSortByBinding
@@ -78,18 +79,13 @@ class SortByBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
 
         oldOrder = when (orderType) {
             ORDER_CLOUD -> sortOrderManagement.getOrderCloud()
-            ORDER_CONTACTS -> sortOrderManagement.getOrderContacts()
             ORDER_CAMERA -> sortOrderManagement.getOrderCamera()
             ORDER_OTHERS -> sortOrderManagement.getOrderOthers()
+            ORDER_OFFLINE -> sortOrderManagement.getOrderOffline()
             else -> ORDER_DEFAULT_ASC
         }
 
         when (orderType) {
-            ORDER_CONTACTS -> {
-                binding.sortByLargestSize.isVisible = false
-                binding.sortBySmallestSize.isVisible = false
-                binding.sortBySizeSeparator.isVisible = false
-            }
             ORDER_CAMERA -> {
                 binding.sortByNameAsc.isVisible = false
                 binding.sortByNameDesc.isVisible = false
@@ -97,7 +93,8 @@ class SortByBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
                 binding.sortByLargestSize.isVisible = false
                 binding.sortBySmallestSize.isVisible = false
                 binding.sortBySizeSeparator.isVisible = false
-                binding.sortByDateSeparator.isVisible = true
+                binding.sortByFavoritesType.isVisible = false
+                binding.sortByLabelType.isVisible = false
                 binding.sortByPhotosMediaType.isVisible = true
                 binding.sortByVideosMediaType.isVisible = true
             }
@@ -108,7 +105,11 @@ class SortByBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
                 binding.sortBySizeSeparator.isVisible = false
                 binding.sortByNewestDate.isVisible = false
                 binding.sortByOldestDate.isVisible = false
+            }
+            ORDER_OFFLINE -> {
                 binding.sortByDateSeparator.isVisible = false
+                binding.sortByFavoritesType.isVisible = false
+                binding.sortByLabelType.isVisible = false
             }
         }
 
@@ -121,6 +122,8 @@ class SortByBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
             ORDER_MODIFICATION_ASC -> setSelectedColor(binding.sortByOldestDate)
             ORDER_SIZE_DESC -> setSelectedColor(binding.sortByLargestSize)
             ORDER_SIZE_ASC -> setSelectedColor(binding.sortBySmallestSize)
+            ORDER_FAV_ASC -> setSelectedColor(binding.sortByFavoritesType)
+            ORDER_LABEL_ASC -> setSelectedColor(binding.sortByLabelType)
             ORDER_PHOTO_DESC -> setSelectedColor(binding.sortByPhotosMediaType)
             ORDER_VIDEO_DESC -> setSelectedColor(binding.sortByVideosMediaType)
         }
@@ -134,11 +137,11 @@ class SortByBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
         }
 
         binding.sortByNewestDate.setOnClickListener {
-            setNewOrder(if (orderType == ORDER_CONTACTS) ORDER_CREATION_ASC else ORDER_MODIFICATION_DESC)
+            setNewOrder(ORDER_MODIFICATION_DESC)
         }
 
         binding.sortByOldestDate.setOnClickListener {
-            setNewOrder(if (orderType == ORDER_CONTACTS) ORDER_CREATION_DESC else ORDER_MODIFICATION_ASC)
+            setNewOrder(ORDER_MODIFICATION_ASC)
         }
 
         binding.sortByLargestSize.setOnClickListener {
@@ -147,6 +150,14 @@ class SortByBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
 
         binding.sortBySmallestSize.setOnClickListener {
             setNewOrder(ORDER_SIZE_ASC)
+        }
+
+        binding.sortByFavoritesType.setOnClickListener {
+            setNewOrder(ORDER_FAV_ASC)
+        }
+
+        binding.sortByLabelType.setOnClickListener {
+            setNewOrder(ORDER_LABEL_ASC)
         }
 
         binding.sortByPhotosMediaType.setOnClickListener {
@@ -178,15 +189,20 @@ class SortByBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
         when (orderType) {
             ORDER_CLOUD -> {
                 sortOrderManagement.setOrderCloud(order)
+                LiveEventBus.get(EVENT_ORDER_CHANGE, Triple::class.java)
+                    .post(
+                        Triple(
+                            order,
+                            sortOrderManagement.getOrderOthers(),
+                            sortOrderManagement.getOrderOffline()
+                        )
+                    )
 
                 if (requireActivity() is ManagerActivityLollipop) {
                     (requireActivity() as ManagerActivityLollipop).refreshCloudOrder(order)
                 } else if (requireActivity() is FileExplorerActivityLollipop) {
                     updateFileExplorerOrder(order)
                 }
-            }
-            ORDER_CONTACTS -> {
-                sortOrderManagement.setOrderContacts(order)
             }
             ORDER_CAMERA -> {
                 sortOrderManagement.setOrderCamera(order)
@@ -197,11 +213,34 @@ class SortByBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
             }
             ORDER_OTHERS -> {
                 sortOrderManagement.setOrderOthers(order)
+                LiveEventBus.get(EVENT_ORDER_CHANGE, Triple::class.java)
+                    .post(
+                        Triple(
+                            sortOrderManagement.getOrderCloud(),
+                            order,
+                            sortOrderManagement.getOrderOffline()
+                        )
+                    )
 
                 if (requireActivity() is ManagerActivityLollipop) {
                     (requireActivity() as ManagerActivityLollipop).refreshOthersOrder()
                 } else if (requireActivity() is FileExplorerActivityLollipop) {
                     updateFileExplorerOrder(order)
+                }
+            }
+            ORDER_OFFLINE -> {
+                sortOrderManagement.setOrderOffline(order)
+                LiveEventBus.get(EVENT_ORDER_CHANGE, Triple::class.java)
+                    .post(
+                        Triple(
+                            sortOrderManagement.getOrderCloud(),
+                            sortOrderManagement.getOrderOthers(),
+                            order
+                        )
+                    )
+
+                if (requireActivity() is ManagerActivityLollipop) {
+                    (requireActivity() as ManagerActivityLollipop).refreshOthersOrder()
                 }
             }
         }

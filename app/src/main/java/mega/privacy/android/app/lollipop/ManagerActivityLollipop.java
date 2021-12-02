@@ -658,7 +658,6 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 	private MenuItem enableSelectMenuItem;
 	private MenuItem selectMenuItem;
 	private MenuItem unSelectMenuItem;
-	private MenuItem thumbViewMenuItem;
 	private MenuItem sortByMenuItem;
 	private MenuItem helpMenuItem;
 	private MenuItem doNotDisturbMenuItem;
@@ -879,16 +878,6 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 			}
 		}
 	};
-
-    private BroadcastReceiver receiverUpdateView = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            if (intent != null) {
-                updateView(intent.getBooleanExtra("isList", true));
-				supportInvalidateOptionsMenu();
-            }
-        }
-    };
 
 	private BroadcastReceiver receiverCUAttrChanged = new BroadcastReceiver() {
 		@Override
@@ -1466,7 +1455,10 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 				new IntentFilter(BROADCAST_ACTION_INTENT_CU_ATTR_CHANGE));
 
 		registerReceiver(receiverUpdateOrder, new IntentFilter(BROADCAST_ACTION_INTENT_UPDATE_ORDER));
-		registerReceiver(receiverUpdateView, new IntentFilter(BROADCAST_ACTION_INTENT_UPDATE_VIEW));
+
+		LiveEventBus.get(EVENT_UPDATE_VIEW_MODE, Boolean.class)
+				.observe(this, this::updateView);
+
 		registerReceiver(chatArchivedReceiver, new IntentFilter(BROADCAST_ACTION_INTENT_CHAT_ARCHIVED));
 
 		LiveEventBus.get(EVENT_REFRESH_PHONE_NUMBER, Boolean.class)
@@ -1603,8 +1595,6 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 		logDebug("Preferred View List: " + isList);
 
 		LiveEventBus.get(EVENT_LIST_GRID_CHANGE, Boolean.class).post(isList);
-
-		LiveEventBus.get(EVENT_ORDER_CHANGE, Integer.class).post(sortOrderManagement.getOrderCloud());
 
 		handler = new Handler();
 
@@ -2179,7 +2169,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 					}
 					else if (getIntent().getAction().equals(ACTION_OPEN_FOLDER)) {
 						logDebug("Open after LauncherFileExplorerActivityLollipop ");
-						boolean locationFileInfo = getIntent().getBooleanExtra("locationFileInfo", false);
+						boolean locationFileInfo = getIntent().getBooleanExtra(INTENT_EXTRA_KEY_LOCATION_FILE_INFO, false);
 						long handleIntent = getIntent().getLongExtra("PARENT_HANDLE", -1);
 
 						if (getIntent().getBooleanExtra(SHOW_MESSAGE_UPLOAD_STARTED, false)) {
@@ -3303,7 +3293,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 				}
 				else if (getIntent().getAction().equals(ACTION_OPEN_FOLDER)) {
 					logDebug("Open after LauncherFileExplorerActivityLollipop ");
-					long handleIntent = getIntent().getLongExtra("PARENT_HANDLE", -1);
+					long handleIntent = getIntent().getLongExtra(INTENT_EXTRA_KEY_PARENT_HANDLE, -1);
 
 					if (getIntent().getBooleanExtra(SHOW_MESSAGE_UPLOAD_STARTED, false)) {
 						int numberUploads = getIntent().getIntExtra(NUMBER_UPLOADS, 1);
@@ -3492,7 +3482,6 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 		unregisterReceiver(updateMyAccountReceiver);
 		unregisterReceiver(networkReceiver);
 		unregisterReceiver(receiverUpdateOrder);
-		unregisterReceiver(receiverUpdateView);
 		unregisterReceiver(chatArchivedReceiver);
 		LiveEventBus.get(EVENT_REFRESH_PHONE_NUMBER, Boolean.class)
 				.removeObserver(refreshAddPhoneNumberButtonObserver);
@@ -4537,6 +4526,9 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 					bottomNavigationCurrentItem = CLOUD_DRIVE_BNV;
 				}
 				setBottomNavigationMenuItemChecked(CLOUD_DRIVE_BNV);
+				if (getIntent() != null && getIntent().getBooleanExtra(INTENT_EXTRA_KEY_LOCATION_FILE_INFO, false)) {
+					fbFLol.refreshNodes();
+				}
 				logDebug("END for Cloud Drive");
     			break;
     		}
@@ -5255,7 +5247,6 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 		enableSelectMenuItem = menu.findItem(R.id.action_enable_select);
 		selectMenuItem = menu.findItem(R.id.action_select);
 		unSelectMenuItem = menu.findItem(R.id.action_unselect);
-		thumbViewMenuItem = menu.findItem(R.id.action_grid);
 		sortByMenuItem = menu.findItem(R.id.action_menu_sort_by);
 		helpMenuItem = menu.findItem(R.id.action_menu_help);
 		doNotDisturbMenuItem = menu.findItem(R.id.action_menu_do_not_disturb);
@@ -5304,10 +5295,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 
 					createFolderMenuItem.setVisible(true);
                     if (isCloudAdded() && fbFLol.getItemCount() > 0) {
-                        thumbViewMenuItem.setVisible(true);
-                        setGridListIcon();
                         searchMenuItem.setVisible(true);
-                        sortByMenuItem.setVisible(true);
                     }
 					break;
 				case HOMEPAGE:
@@ -5318,10 +5306,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 					break;
 				case RUBBISH_BIN:
 					if (getRubbishBinFragment() != null && rubbishBinFLol.getItemCount() > 0) {
-						thumbViewMenuItem.setVisible(true);
-						setGridListIcon();
 						clearRubbishBinMenuitem.setVisible(true);
-						sortByMenuItem.setVisible(true);
 						searchMenuItem.setVisible(true);
 					}
 					break;
@@ -5331,10 +5316,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 				case INBOX:
 					if (getInboxFragment() != null && iFLol.getItemCount() > 0) {
 						selectMenuItem.setVisible(true);
-						sortByMenuItem.setVisible(true);
 						searchMenuItem.setVisible(true);
-						thumbViewMenuItem.setVisible(true);
-						setGridListIcon();
 					}
 					break;
 
@@ -5343,9 +5325,6 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 						addMenuItem.setEnabled(true);
 
 						if (isIncomingAdded() && inSFLol.getItemCount() > 0) {
-							thumbViewMenuItem.setVisible(true);
-							setGridListIcon();
-							sortByMenuItem.setVisible(true);
 							searchMenuItem.setVisible(true);
 
 							if (parentHandleIncoming != INVALID_HANDLE) {
@@ -5372,14 +5351,10 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 						}
 
 						if (isOutgoingAdded() && outSFLol.getItemCount() > 0) {
-							thumbViewMenuItem.setVisible(true);
-							setGridListIcon();
-							sortByMenuItem.setVisible(true);
 							searchMenuItem.setVisible(true);
 						}
 					} else if (getTabItemShares() == LINKS_TAB && isLinksAdded()) {
 						if (isLinksAdded() && lF.getItemCount() > 0) {
-							sortByMenuItem.setVisible(true);
 							searchMenuItem.setVisible(true);
 						}
 					}
@@ -5392,9 +5367,6 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 					} else if (getSearchFragment() != null
 							&& getSearchFragment().getNodes() != null
 							&& getSearchFragment().getNodes().size() > 0) {
-						sortByMenuItem.setVisible(true);
-						thumbViewMenuItem.setVisible(true);
-						setGridListIcon();
 					}
 					break;
 
@@ -5528,16 +5500,6 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 
         return null;
     }
-
-	private void setGridListIcon() {
-		if (isList){
-			thumbViewMenuItem.setTitle(getString(R.string.action_grid));
-			thumbViewMenuItem.setIcon(R.drawable.ic_thumbnail_view);
-		}
-		else{
-			thumbViewMenuItem.setIcon(R.drawable.ic_list_view);
-		}
-	}
 
 	@Override
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -5846,44 +5808,14 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 
 	        	return true;
 	        }
-            case R.id.action_grid: {
-                logDebug("action_grid selected");
-
-                updateView(!isList);
-                supportInvalidateOptionsMenu();
-                return true;
-            }
-	        case R.id.action_menu_clear_rubbish_bin:{
-	        	showClearRubbishBinDialog();
-	        	return true;
-	        }
-	        case R.id.action_menu_sort_by:{
-	        	int orderType;
-
-	        	switch (drawerItem) {
-					case PHOTOS:
-						orderType = ORDER_CAMERA;
-						break;
-
-					default:
-						if (drawerItem == DrawerItem.SHARED_ITEMS
-								&& getTabItemShares() == INCOMING_TAB && deepBrowserTreeIncoming == 0) {
-							showNewSortByPanel(ORDER_OTHERS, true);
-							return true;
-						}
-
-						if (drawerItem == DrawerItem.SHARED_ITEMS
-								&& getTabItemShares() == OUTGOING_TAB && deepBrowserTreeOutgoing == 0) {
-							orderType = ORDER_OTHERS;
-						} else {
-							orderType = ORDER_CLOUD;
-						}
+			case R.id.action_menu_sort_by:
+				if (drawerItem == DrawerItem.PHOTOS) {
+					showNewSortByPanel(ORDER_CAMERA);
 				}
 
-				showNewSortByPanel(orderType);
-	        	return true;
-	        }
-	        case R.id.action_menu_help:{
+				return true;
+
+			case R.id.action_menu_help:{
 	        	Intent intent = new Intent();
 	            intent.setAction(Intent.ACTION_VIEW);
 	            intent.addCategory(Intent.CATEGORY_BROWSABLE);
@@ -5946,7 +5878,6 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
             helpMenuItem.setVisible(false);
             inviteMenuItem.setVisible(false);
             selectMenuItem.setVisible(false);
-            thumbViewMenuItem.setVisible(false);
             searchMenuItem.setVisible(false);
             openMeetingMenuItem.setVisible(false);
         }
@@ -7835,8 +7766,6 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 	}
 
 	public void refreshCloudOrder(int order) {
-		LiveEventBus.get(EVENT_ORDER_CHANGE, Integer.class).post(order);
-
 		//Refresh Cloud Fragment
 		refreshCloudDrive();
 

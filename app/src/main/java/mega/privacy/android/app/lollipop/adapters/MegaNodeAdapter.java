@@ -11,6 +11,7 @@ import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AlertDialog;
+import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import android.graphics.drawable.Drawable;
 import android.util.DisplayMetrics;
@@ -28,6 +29,7 @@ import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
@@ -42,6 +44,8 @@ import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.NewGridRecyclerView;
 import mega.privacy.android.app.components.dragger.DragThumbnailGetter;
 import mega.privacy.android.app.components.scrollBar.SectionTitleProvider;
+import mega.privacy.android.app.databinding.SortByHeaderBinding;
+import mega.privacy.android.app.fragments.homepage.SortByHeaderViewModel;
 import mega.privacy.android.app.fragments.managerFragments.LinksFragment;
 import mega.privacy.android.app.components.twemoji.EmojiTextView;
 import mega.privacy.android.app.lollipop.ContactFileListActivityLollipop;
@@ -82,6 +86,7 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
 
     public static final int ITEM_VIEW_TYPE_LIST = 0;
     public static final int ITEM_VIEW_TYPE_GRID = 1;
+    public static final int ITEM_VIEW_TYPE_HEADER = 2;
 
     private Context context;
     private MegaApiAndroid megaApi;
@@ -107,6 +112,8 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
     private boolean multipleSelect;
     private int type = FILE_BROWSER_ADAPTER;
     private int adapterType;
+
+    private SortByHeaderViewModel sortByViewModel;
 
     public static class ViewHolderBrowser extends RecyclerView.ViewHolder {
 
@@ -160,13 +167,27 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
         public ImageView fileGridSelected;
     }
 
-    public static class ViewHolderOverQuotaBanner extends ViewHolderBrowser {
+    public class ViewHolderSortBy extends ViewHolderBrowser {
 
-        private ViewHolderOverQuotaBanner(View v) {
-            super(v);
+        private final SortByHeaderBinding binding;
+
+        private ViewHolderSortBy(SortByHeaderBinding binding) {
+            super(binding.getRoot());
+            this.binding = binding;
         }
 
-        TextView transferOverQuotaBannerText;
+        private void bind(SortByHeaderViewModel sortByHeaderViewModel) {
+            binding.setSortByHeaderViewModel(sortByHeaderViewModel);
+            binding.setOrderNameStringId(sortByHeaderViewModel.getOrderMap()
+                    .get(type == INCOMING_SHARES_ADAPTER
+                            && ((ManagerActivityLollipop) context).getDeepBrowserTreeIncoming() == 0
+                            ? sortByHeaderViewModel.getOrder().getSecond()
+                            : sortByHeaderViewModel.getOrder().getFirst()));
+
+            binding.listModeSwitch.setVisibility(type == LINKS_ADAPTER
+                    ? View.GONE
+                    : View.VISIBLE);
+        }
     }
 
     @Override
@@ -436,7 +457,13 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
      */
     private ArrayList<MegaNode> insertPlaceHolderNode(ArrayList<MegaNode> nodes) {
         if (adapterType == ITEM_VIEW_TYPE_LIST) {
-            placeholderCount = 0;
+            if (!nodes.isEmpty()) {
+                placeholderCount = 1;
+                nodes.add(0, null);
+            } else {
+                placeholderCount = 0;
+            }
+
             return nodes;
         }
 
@@ -460,14 +487,52 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
             }
         }
 
+        if (!nodes.isEmpty()) {
+            placeholderCount++;
+            nodes.add(0, null);
+        }
+
         return nodes;
     }
 
-    public MegaNodeAdapter(Context _context, Object fragment, ArrayList<MegaNode> _nodes, long _parentHandle, RecyclerView recyclerView, ActionBar aB, int type, int adapterType) {
+    @NotNull
+    public final GridLayoutManager.SpanSizeLookup getSpanSizeLookup(final int spanCount) {
+        return (GridLayoutManager.SpanSizeLookup) (new GridLayoutManager.SpanSizeLookup() {
+            public int getSpanSize(int position) {
+                return getItemViewType(position) == ITEM_VIEW_TYPE_HEADER ? spanCount : 1;
+            }
+        });
+    }
 
-        this.context = _context;
-        this.nodes = _nodes;
-        this.parentHandle = _parentHandle;
+    public MegaNodeAdapter(Context context, Object fragment, ArrayList<MegaNode> nodes,
+                           long parentHandle, RecyclerView recyclerView, int type, int adapterType) {
+        initAdapter(context, fragment, nodes, parentHandle, recyclerView, type, adapterType);
+    }
+
+    public MegaNodeAdapter(Context context, Object fragment, ArrayList<MegaNode> nodes,
+                           long parentHandle, RecyclerView recyclerView, int type, int adapterType,
+                           SortByHeaderViewModel sortByHeaderViewModel) {
+        initAdapter(context, fragment, nodes, parentHandle, recyclerView, type, adapterType);
+        this.sortByViewModel = sortByHeaderViewModel;
+    }
+
+    /**
+     * Initializes the principal properties of the adapter.
+     *
+     * @param context      Current Context.
+     * @param fragment     Current Fragment.
+     * @param nodes        List of nodes.
+     * @param parentHandle Current parent handle.
+     * @param recyclerView View in which the adapter will be set.
+     * @param type         Fragment adapter type.
+     * @param adapterType  List or grid adapter type.
+     */
+    private void initAdapter(Context context, Object fragment, ArrayList<MegaNode> nodes,
+                             long parentHandle, RecyclerView recyclerView, int type, int adapterType) {
+
+        this.context = context;
+        this.nodes = nodes;
+        this.parentHandle = parentHandle;
         this.type = type;
         this.adapterType = adapterType;
         this.fragment = fragment;
@@ -503,6 +568,7 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
             megaApi = ((MegaApplication)((Activity)context).getApplication())
                     .getMegaApi();
         }
+
     }
 
     public void setNodes(ArrayList<MegaNode> nodes) {
@@ -654,7 +720,8 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
 
             return holderGrid;
         } else {
-            return null;
+            SortByHeaderBinding binding = SortByHeaderBinding.inflate(LayoutInflater.from(parent.getContext()), parent, false);
+            return new ViewHolderSortBy(binding);
         }
     }
 
@@ -662,13 +729,22 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
     public void onBindViewHolder(ViewHolderBrowser holder, int position) {
         logDebug("Position: " + position);
 
-        if (adapterType == ITEM_VIEW_TYPE_LIST) {
-            ViewHolderBrowserList holderList = (ViewHolderBrowserList)holder;
-            onBindViewHolderList(holderList,position);
-        } else if (adapterType == ITEM_VIEW_TYPE_GRID) {
-            ViewHolderBrowserGrid holderGrid = (ViewHolderBrowserGrid)holder;
-            onBindViewHolderGrid(holderGrid,position);
+        switch (getItemViewType(position)) {
+            case ITEM_VIEW_TYPE_HEADER:
+                ((ViewHolderSortBy) holder).bind(sortByViewModel);
+                break;
+
+            case ITEM_VIEW_TYPE_LIST:
+                ViewHolderBrowserList holderList = (ViewHolderBrowserList) holder;
+                onBindViewHolderList(holderList, position);
+                break;
+
+            case ITEM_VIEW_TYPE_GRID:
+                ViewHolderBrowserGrid holderGrid = (ViewHolderBrowserGrid) holder;
+                onBindViewHolderGrid(holderGrid, position);
+                break;
         }
+
         reSelectUnhandledNode();
     }
 
@@ -1053,7 +1129,12 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
 
     @Override
     public int getItemViewType(int position) {
-        return adapterType;
+        return !nodes.isEmpty() && position == 0
+                && type != FOLDER_LINK_ADAPTER
+                && type != CONTACT_SHARED_FOLDER_ADAPTER
+                && type != CONTACT_FILE_ADAPTER
+                ? ITEM_VIEW_TYPE_HEADER
+                : adapterType;
     }
 
     public Object getItem(int position) {

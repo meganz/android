@@ -410,7 +410,7 @@ class OfflineFragment : Fragment(), ActionMode.Callback, Scrollable {
 
         viewModel.showSortedBy.observe(viewLifecycleOwner, EventObserver {
             callManager { manager ->
-                manager.showNewSortByPanel(ORDER_CLOUD)
+                manager.showNewSortByPanel(ORDER_OFFLINE)
             }
         })
 
@@ -418,12 +418,12 @@ class OfflineFragment : Fragment(), ActionMode.Callback, Scrollable {
 
         sortByHeaderViewModel.showDialogEvent.observe(viewLifecycleOwner, EventObserver {
             callManager { manager ->
-                manager.showNewSortByPanel(ORDER_CLOUD)
+                manager.showNewSortByPanel(ORDER_OFFLINE)
             }
         })
 
         sortByHeaderViewModel.orderChangeEvent.observe(viewLifecycleOwner, EventObserver {
-            viewModel.setOrder(it)
+            viewModel.setOrder(it.third)
             adapter?.notifyItemChanged(0)
         })
 

@@ -9,14 +9,14 @@
         android:id="@+id/linear_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:paddingBottom="9dp">
+        android:orientation="vertical">
 
         <TextView
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
-            android:layout_marginTop="12dp"
+            android:layout_height="48dp"
+            android:paddingStart="16dp"
+            android:gravity="center_vertical"
+            android:paddingEnd="16dp"
             android:text="@string/action_sort_by"
             android:textAppearance="@style/TextAppearance.Mega.Subtitle1.Grey54White54" />
 
@@ -35,10 +35,12 @@
             app:drawableStartCompat="@drawable/ic_sort_name_descending"
             tools:text="Name (descending)" />
 
-        <include
+        <View
             android:id="@+id/sort_by_name_separator"
-            layout="@layout/view_linear_layout_separator_72"
-            style="@style/BottomSheetItemDivider" />
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_marginStart="72dp"
+            android:background="@color/grey_012_white_012" />
 
         <TextView
             android:id="@+id/sort_by_largest_size"
@@ -52,10 +54,12 @@
             android:text="@string/sortby_size_smallest_first"
             app:drawableStartCompat="@drawable/ic_sort_smallest" />
 
-        <include
+        <View
             android:id="@+id/sort_by_size_separator"
-            layout="@layout/view_linear_layout_separator_72"
-            style="@style/BottomSheetItemDivider" />
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_marginStart="72dp"
+            android:background="@color/grey_012_white_012" />
 
         <TextView
             android:id="@+id/sort_by_newest_date"
@@ -69,10 +73,24 @@
             android:text="@string/sortby_date_oldest"
             app:drawableStartCompat="@drawable/ic_sort_oldest" />
 
-        <include
+        <View
             android:id="@+id/sort_by_date_separator"
-            layout="@layout/view_linear_layout_separator_72"
-            style="@style/BottomSheetItemDivider" />
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_marginStart="72dp"
+            android:background="@color/grey_012_white_012" />
+
+        <TextView
+            android:id="@+id/sort_by_favorites_type"
+            style="@style/BottomSheetItem"
+            android:text="@string/file_properties_favourite"
+            app:drawableStartCompat="@drawable/ic_add_favourite"/>
+
+        <TextView
+            android:id="@+id/sort_by_label_type"
+            style="@style/BottomSheetItem"
+            android:text="@string/file_properties_label"
+            app:drawableStartCompat="@drawable/ic_label" />
 
         <TextView
             android:id="@+id/sort_by_photos_media_type"

@@ -990,7 +990,9 @@ public class FolderLinkActivityLollipop extends TransfersManagementActivity impl
 						}
 
 						if (adapterList == null){
-							adapterList = new MegaNodeAdapter(this, null, nodes, parentHandle, listView, aB, FOLDER_LINK_ADAPTER, MegaNodeAdapter.ITEM_VIEW_TYPE_LIST);
+							adapterList = new MegaNodeAdapter(this, null, nodes,
+									parentHandle, listView, FOLDER_LINK_ADAPTER,
+									MegaNodeAdapter.ITEM_VIEW_TYPE_LIST);
 						}
 						else{
 							adapterList.setParentHandle(parentHandle);
@@ -1610,7 +1612,7 @@ public class FolderLinkActivityLollipop extends TransfersManagementActivity impl
 			startIntent.setAction(ACTION_OPEN_FOLDER);
 			startIntent.putExtra("PARENT_HANDLE", toHandle);
 			startIntent.putExtra("offline_adapter", false);
-			startIntent.putExtra("locationFileInfo", true);
+			startIntent.putExtra(INTENT_EXTRA_KEY_LOCATION_FILE_INFO, true);
 			startIntent.putExtra("fragmentHandle", fragmentHandle);
 		}
 		startActivity(startIntent);

@@ -15,6 +15,7 @@ import androidx.annotation.NonNull;
 import androidx.core.content.FileProvider;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.view.ActionMode;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -55,14 +56,17 @@ import javax.inject.Inject;
 import dagger.hilt.android.AndroidEntryPoint;
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
 import io.reactivex.rxjava3.schedulers.Schedulers;
+import kotlin.Unit;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.CustomizedGridLayoutManager;
 import mega.privacy.android.app.components.NewGridRecyclerView;
-import mega.privacy.android.app.components.SimpleDividerItemDecoration;
+import mega.privacy.android.app.components.PositionDividerItemDecoration;
 import mega.privacy.android.app.components.scrollBar.FastScroller;
 import mega.privacy.android.app.imageviewer.ImageViewerActivity;
+import mega.privacy.android.app.fragments.homepage.EventObserver;
+import mega.privacy.android.app.fragments.homepage.SortByHeaderViewModel;
 import mega.privacy.android.app.search.callback.SearchActionsCallback;
 import mega.privacy.android.app.search.usecase.SearchNodesUseCase;
 import mega.privacy.android.app.globalmanagement.SortOrderManagement;
@@ -487,10 +491,27 @@ public class SearchFragmentLollipop extends RotatableFragment implements SearchA
 			}
 		}
 	}
-	
+
+	/**
+	 * Shows the Sort by panel.
+	 *
+	 * @param unit Unit event.
+	 * @return Null.
+	 */
+	private Unit showSortByPanel(Unit unit) {
+		((ManagerActivityLollipop) context).showNewSortByPanel(ORDER_CLOUD);
+		return null;
+	}
+
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		logDebug("onCreateView");
+
+		SortByHeaderViewModel sortByHeaderViewModel = new ViewModelProvider(this)
+				.get(SortByHeaderViewModel.class);
+
+		sortByHeaderViewModel.getShowDialogEvent().observe(getViewLifecycleOwner(),
+				new EventObserver<>(this::showSortByPanel));
 
 		if (megaApi == null){
 			megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();
@@ -516,12 +537,11 @@ public class SearchFragmentLollipop extends RotatableFragment implements SearchA
             recyclerView.setPadding(0, 0, 0, scaleHeightPx(85, outMetrics));
             recyclerView.setClipToPadding(false);
 			recyclerView.setClipToPadding(false);
-//			recyclerView.addItemDecoration(new SimpleDividerItemDecoration(context, outMetrics));
 			mLayoutManager = new LinearLayoutManager(context);
 			recyclerView.setLayoutManager(mLayoutManager);
 			recyclerView.setHasFixedSize(true);
 			recyclerView.setItemAnimator(noChangeRecyclerViewItemAnimator());
-			recyclerView.addItemDecoration(new SimpleDividerItemDecoration(requireContext()));
+			recyclerView.addItemDecoration(new PositionDividerItemDecoration(requireContext(), getOutMetrics()));
 			recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
 				@Override
 				public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
@@ -535,7 +555,9 @@ public class SearchFragmentLollipop extends RotatableFragment implements SearchA
 			emptyTextViewFirst = (TextView) v.findViewById(R.id.file_list_empty_text_first);
 
 			if (adapter == null){
-				adapter = new MegaNodeAdapter(context, this, nodes, ((ManagerActivityLollipop)context).getParentHandleSearch(), recyclerView, null, SEARCH_ADAPTER, MegaNodeAdapter.ITEM_VIEW_TYPE_LIST);
+				adapter = new MegaNodeAdapter(context, this, nodes,
+						((ManagerActivityLollipop)context).getParentHandleSearch(), recyclerView,
+						SEARCH_ADAPTER, MegaNodeAdapter.ITEM_VIEW_TYPE_LIST, sortByHeaderViewModel);
 			}
 			else{
 				adapter.setListFragment(recyclerView);
@@ -568,12 +590,16 @@ public class SearchFragmentLollipop extends RotatableFragment implements SearchA
 			emptyTextViewFirst = (TextView) v.findViewById(R.id.file_grid_empty_text_first);
 
 			if (adapter == null){
-				adapter = new MegaNodeAdapter(context, this, nodes, ((ManagerActivityLollipop)context).getParentHandleSearch(), recyclerView, null, SEARCH_ADAPTER, MegaNodeAdapter.ITEM_VIEW_TYPE_GRID);
+				adapter = new MegaNodeAdapter(context, this, nodes,
+						((ManagerActivityLollipop)context).getParentHandleSearch(), recyclerView,
+						SEARCH_ADAPTER, MegaNodeAdapter.ITEM_VIEW_TYPE_GRID, sortByHeaderViewModel);
 			}
 			else{
 				adapter.setListFragment(recyclerView);
 				adapter.setAdapterType(MegaNodeAdapter.ITEM_VIEW_TYPE_GRID);
 			}
+
+			gridLayoutManager.setSpanSizeLookup(adapter.getSpanSizeLookup(gridLayoutManager.getSpanCount()));
 		}
 
 		adapter.setMultipleSelect(false);

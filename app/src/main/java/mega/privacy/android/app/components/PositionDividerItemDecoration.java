@@ -1,5 +1,7 @@
 package mega.privacy.android.app.components;
 
+import static mega.privacy.android.app.utils.Constants.INVALID_POSITION;
+
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.drawable.Drawable;
@@ -64,10 +66,7 @@ public class PositionDividerItemDecoration extends RecyclerView.ItemDecoration {
             return true;
         }
 
-        if (pos == 0 || (position != -1 && position-1 == pos)
-                || (position != -1 && position == pos)) {
-            return false;
-        }
-        return true;
+        return pos != 0 && (position == INVALID_POSITION || position - 1 != pos)
+                && (position == INVALID_POSITION || position != pos);
     }
 }
