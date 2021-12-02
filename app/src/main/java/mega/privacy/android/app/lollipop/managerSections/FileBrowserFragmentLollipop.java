@@ -17,6 +17,7 @@ import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.view.ActionMode;
 import androidx.core.text.HtmlCompat;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -39,22 +40,16 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Stack;
 
 import javax.inject.Inject;
 
 import dagger.hilt.android.AndroidEntryPoint;
+import kotlin.Unit;
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MegaPreferences;
@@ -62,8 +57,10 @@ import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.CustomizedGridLayoutManager;
 import mega.privacy.android.app.components.NewGridRecyclerView;
-import mega.privacy.android.app.components.SimpleDividerItemDecoration;
+import mega.privacy.android.app.components.PositionDividerItemDecoration;
 import mega.privacy.android.app.components.scrollBar.FastScroller;
+import mega.privacy.android.app.fragments.homepage.EventObserver;
+import mega.privacy.android.app.fragments.homepage.SortByHeaderViewModel;
 import mega.privacy.android.app.globalmanagement.SortOrderManagement;
 import mega.privacy.android.app.lollipop.FullScreenImageViewerLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
@@ -149,6 +146,17 @@ public class FileBrowserFragmentLollipop extends RotatableFragment{
 			adapter.setMultipleSelect(true);
 			actionMode = ((AppCompatActivity)context).startSupportActionMode(new ActionBarCallBack());
 		}
+	}
+
+	/**
+	 * Shows the Sort by panel.
+	 *
+	 * @param unit Unit event.
+	 * @return Null.
+	 */
+	private Unit showSortByPanel(Unit unit) {
+		((ManagerActivityLollipop) context).showNewSortByPanel(ORDER_CLOUD);
+		return null;
 	}
 
 	private class ActionBarCallBack implements ActionMode.Callback {
@@ -463,6 +471,12 @@ public class FileBrowserFragmentLollipop extends RotatableFragment{
 			return null;
 		}
 
+		SortByHeaderViewModel sortByHeaderViewModel = new ViewModelProvider(this)
+				.get(SortByHeaderViewModel.class);
+
+		sortByHeaderViewModel.getShowDialogEvent().observe(getViewLifecycleOwner(),
+				new EventObserver<>(this::showSortByPanel));
+
 		logDebug("Fragment ADDED");
 
 		if (megaApi == null) {
@@ -482,15 +496,7 @@ public class FileBrowserFragmentLollipop extends RotatableFragment{
 		display.getMetrics(outMetrics);
 		density = getResources().getDisplayMetrics().density;
 
-		if (((ManagerActivityLollipop) context).getParentHandleBrowser() == -1 || ((ManagerActivityLollipop) context).getParentHandleBrowser() == megaApi.getRootNode().getHandle()) {
-			logWarning("After consulting... the parent keeps -1 or ROOTNODE: " + ((ManagerActivityLollipop) context).getParentHandleBrowser());
-
-			nodes = megaApi.getChildren(megaApi.getRootNode(), sortOrderManagement.getOrderCloud());
-		} else {
-			MegaNode parentNode = megaApi.getNodeByHandle(((ManagerActivityLollipop) context).getParentHandleBrowser());
-
-			nodes = megaApi.getChildren(parentNode, sortOrderManagement.getOrderCloud());
-		}
+		getNodes();
 		((ManagerActivityLollipop) context).setToolbarTitle();
 		((ManagerActivityLollipop) context).supportInvalidateOptionsMenu();
 
@@ -510,7 +516,7 @@ public class FileBrowserFragmentLollipop extends RotatableFragment{
 			recyclerView.setLayoutManager(mLayoutManager);
 			recyclerView.setHasFixedSize(true);
 			recyclerView.setItemAnimator(noChangeRecyclerViewItemAnimator());
-			recyclerView.addItemDecoration(new SimpleDividerItemDecoration(requireContext()));
+			recyclerView.addItemDecoration(new PositionDividerItemDecoration(requireContext(), getOutMetrics()));
 			recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
 				@Override
 				public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
@@ -524,7 +530,9 @@ public class FileBrowserFragmentLollipop extends RotatableFragment{
 			emptyTextViewFirst = v.findViewById(R.id.file_list_empty_text_first);
 
 			if (adapter == null){
-				adapter = new MegaNodeAdapter(context, this, nodes, ((ManagerActivityLollipop)context).getParentHandleBrowser(), recyclerView, aB, FILE_BROWSER_ADAPTER, MegaNodeAdapter.ITEM_VIEW_TYPE_LIST);
+				adapter = new MegaNodeAdapter(context, this, nodes,
+						((ManagerActivityLollipop) context).getParentHandleBrowser(), recyclerView,
+						FILE_BROWSER_ADAPTER, MegaNodeAdapter.ITEM_VIEW_TYPE_LIST, sortByHeaderViewModel);
 			}
 			else{
 				adapter.setParentHandle(((ManagerActivityLollipop)context).getParentHandleBrowser());
@@ -576,12 +584,16 @@ public class FileBrowserFragmentLollipop extends RotatableFragment{
             emptyTextViewFirst = v.findViewById(R.id.file_grid_empty_text_first);
 
             if (adapter == null) {
-                adapter = new MegaNodeAdapter(context,this,nodes,((ManagerActivityLollipop)context).getParentHandleBrowser(),recyclerView,aB,FILE_BROWSER_ADAPTER,MegaNodeAdapter.ITEM_VIEW_TYPE_GRID);
+				adapter = new MegaNodeAdapter(context, this, nodes,
+						((ManagerActivityLollipop) context).getParentHandleBrowser(), recyclerView,
+						FILE_BROWSER_ADAPTER, MegaNodeAdapter.ITEM_VIEW_TYPE_GRID, sortByHeaderViewModel);
             } else {
                 adapter.setParentHandle(((ManagerActivityLollipop)context).getParentHandleBrowser());
                 adapter.setListFragment(recyclerView);
                 adapter.setAdapterType(MegaNodeAdapter.ITEM_VIEW_TYPE_GRID);
             }
+
+			gridLayoutManager.setSpanSizeLookup(adapter.getSpanSizeLookup(gridLayoutManager.getSpanCount()));
 
             adapter.setMultipleSelect(false);
             
@@ -644,6 +656,25 @@ public class FileBrowserFragmentLollipop extends RotatableFragment{
 		}
 
 		super.onDestroy();
+	}
+
+	private void getNodes() {
+		long parentHandleBrowser = ((ManagerActivityLollipop) context).getParentHandleBrowser();
+		if (parentHandleBrowser == -1 || parentHandleBrowser == megaApi.getRootNode().getHandle()) {
+			logWarning("After consulting... the parent keeps -1 or ROOTNODE: " + parentHandleBrowser);
+
+			nodes = megaApi.getChildren(megaApi.getRootNode(), sortOrderManagement.getOrderCloud());
+		} else {
+			MegaNode parentNode = megaApi.getNodeByHandle(parentHandleBrowser);
+			nodes = megaApi.getChildren(parentNode, sortOrderManagement.getOrderCloud());
+		}
+	}
+
+	public void refreshNodes(){
+		if (adapter != null) {
+			getNodes();
+			adapter.setNodes(nodes);
+		}
 	}
 
 	public void openFile(MegaNode node, int position) {

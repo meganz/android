@@ -1,9 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- Full description text of the app in the Google Play page of the app (character limit 4000) -->
-    <string name="full_description_text">MEGA透過標準網頁瀏覽器以及行動裝置專屬應用程式提供用戶控制的加密雲端儲存及對話功能。與其他雲端儲存服務供應商不同，您的資料僅可由您的用戶端裝置加密與解密，並非透過我們。\n\n從智慧型手機或平板電腦上傳檔案，然後可以從任何裝置搜尋、儲存、下載、串流播放、查看、共享，重新命名或刪除您的檔案。與您的聯絡人共享資料夾，並即時查看他們的更新狀況。加密功能表示我們無法存取或重置您的密碼，因此您必須記住它（除非您有備份還原金鑰；忘記密碼時可透過金鑰重設帳號密碼），否則您將無法存取您所儲存的檔案。\n\n點對點使用者加密的MEGA視訊通話能確保完全的隱私，此功能自2016年起可在網頁瀏覽器中使用，而且現在已支援我們的行動應用程式，並且可在多個裝置上檢視對話記錄。用戶還可以從MEGA雲端硬碟輕鬆地將檔案加入對話中。\n \nMEGA為所有註冊用戶大方的提供20 GB免費儲存空間以及成就獎勵，並提供更大空間的付費方案：\n\n\nPro Lite 訂閱：每月4.99歐元或每年49.99歐元，每月為您提供400 GB的儲存空間和1 TB的傳輸配額。\nPro I 訂閱：每月9.99歐元或每年99.99歐元，每月為您提供2 TB的儲存空間和2 TB的傳輸配額。\nPro II 訂閱：每月19.99歐元或每年199.99歐元，為您提供8 TB的儲存空間和每月8 TB的傳輸配額。\nPro III 訂閱：每月29.99歐元或每年299.99歐元，為您提供16 TB的儲存空間和每月16 TB的傳輸配額。\n\n訂閱將自動續購，且續期與第一次訂閱的相同，價格也相同。欲管理您的訂閱，只需點擊行動裝置上的Play商店圖示，使用您的Google ID登錄（若您尚未登入的話），然後點擊MEGA應用程式，您就能夠管理您的訂閱。\n\n應用程式存取權限：\n外部儲存裝置資料寫入 - &gt;將您的檔案從MEGA下載到您的裝置並將檔案從您的裝置上傳到MEGA \n 相機 - &gt;拍照並將其上傳到MEGA \n 讀取聯絡人 - &gt; 輕鬆將裝置中的聯絡人匯入以作為MEGA聯絡人 \n錄音與影像截取輸出（存取麥克風與相機） - &gt; MEGA提供點對點加密語音/視訊通話\n\n\n為了增加用戶對MEGA系統的信心，所有用戶端程式碼均已發布，有興趣的安全開發人員可以評估我們的加密過程。我們的行動應用程式碼放在：https://github.com/meganz/android \n\n相關詳細資訊，請查詢我們的網站：\nhttps://mega.nz/terms \n\n\n桌上型電腦 - https://mega.nz/</string>
-    <!-- Short description text of the app in the Google Play page of the app (character limit 80) -->
-    <string name="short_description_text">MEGA是隨時保護安全隱私的雲端空間。</string>
     <!-- PRO Lite account -->
     <string name="prolite_account">Pro Lite</string>
     <!-- Name of the MEGA PDF Viewer. Keep uppercase. -->
