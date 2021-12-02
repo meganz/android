@@ -238,7 +238,7 @@
                 app:drawableStartCompat="@drawable/ic_menu_copy" />
 
             <View
-                android:id="@+id/separator_rubbish"
+                android:id="@+id/separator_copy"
                 android:layout_width="match_parent"
                 android:layout_height="1dp"
                 android:layout_marginStart="72dp"

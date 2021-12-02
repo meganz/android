@@ -8,7 +8,7 @@
         app:constraintSetEnd="@+id/end"
         app:duration="250" />
 
-    <ConstraintSet android:id="@+id/start">
+    <ConstraintSet android:id="@+id/end">
         <Constraint android:id="@id/toolbar">
             <PropertySet android:alpha="1" />
             <Layout
@@ -44,7 +44,7 @@
         </Constraint>
     </ConstraintSet>
 
-    <ConstraintSet android:id="@+id/end">
+    <ConstraintSet android:id="@+id/start">
         <Constraint android:id="@id/toolbar">
             <PropertySet android:alpha="0" />
             <Layout

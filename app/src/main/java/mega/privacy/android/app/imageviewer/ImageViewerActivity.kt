@@ -190,7 +190,7 @@ class ImageViewerActivity : BaseActivity(), PermissionRequester, SnackbarShower 
     }
     private val dragToExit by lazy {
         WeakReference(
-            DragToExitSupport(this, ::animateToolbar) {
+            DragToExitSupport(this, ::enableToolbarTransition) {
                 finish()
                 overridePendingTransition(0, android.R.anim.fade_out)
             }
@@ -210,7 +210,7 @@ class ImageViewerActivity : BaseActivity(), PermissionRequester, SnackbarShower 
         setupObservers()
 
         if (savedInstanceState == null) {
-            dragToExit.get()?.runEnterAnimation(intent, binding.root, ::animateToolbar)
+            dragToExit.get()?.runEnterAnimation(intent, binding.root, ::enableToolbarTransition)
         }
     }
 
@@ -353,24 +353,29 @@ class ImageViewerActivity : BaseActivity(), PermissionRequester, SnackbarShower 
     }
 
     /**
-     * Show/hide toolbar and bottom bar with animation.
+     * Switch toolbar/bottomBar visibility with animation.
      */
     private fun switchToolbarVisibility() {
-        if (binding.motion.currentState == R.id.start) {
-            binding.motion.transitionToEnd()
-        } else {
+        if (binding.motion.currentState == R.id.end) {
             binding.motion.transitionToStart()
+        } else {
+            binding.motion.transitionToEnd()
         }
     }
 
-    private fun animateToolbar(isActivated: Boolean) {
+    /**
+     * Enable toolbar/bottomBar transparency transition for DragToExit support.
+     *
+     * @param isActivated   Check wether transition is activated or not.
+     */
+    private fun enableToolbarTransition(isActivated: Boolean) {
         val color: Int
         if (isActivated) {
             color = android.R.color.transparent
-            binding.motion.transitionToEnd()
+            binding.motion.transitionToStart()
         } else {
             color = R.color.white_black
-            binding.motion.transitionToStart()
+            binding.motion.transitionToEnd()
         }
         binding.motion.setBackgroundColor(ContextCompat.getColor(this, color))
     }

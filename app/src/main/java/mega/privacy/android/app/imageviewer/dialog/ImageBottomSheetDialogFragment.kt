@@ -295,11 +295,13 @@ class ImageBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
             }
 
             // Separators
-            separatorOpen.isVisible = optionOpenWith.isVisible
+            separatorInfo.isVisible = optionInfo.isVisible
             separatorLabel.isVisible = optionLabelLayout.isVisible
             separatorOpen.isVisible = optionOpenWith.isVisible
             separatorOffline.isVisible = optionOfflineLayout.isVisible
             separatorShare.isVisible = optionShare.isVisible
+            separatorCopy.isVisible = (optionRename.isVisible || optionCopy.isVisible || optionMove.isVisible)
+                    && (optionRestore.isVisible || optionRubbishBin.isVisible)
         }
     }
 
