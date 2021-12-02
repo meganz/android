@@ -38,15 +38,39 @@ class GetNodeUseCase @Inject constructor(
     private val databaseHandler: DatabaseHandler
 ) {
 
+    /**
+     * Get a {@link MegaNode} given a Node Handle.
+     *
+     * @param nodeHandle    Mega node handle
+     * @return              Single with Mega Node
+     */
     fun get(nodeHandle: Long): Single<MegaNode> =
         Single.fromCallable { nodeHandle.getMegaNode() }
 
+    /**
+     * Get a {@link MegaNodeItem} given a Node Handle.
+     *
+     * @param nodeHandle    Mega node handle
+     * @return              Single with Mega Node Item
+     */
     fun getNodeItem(nodeHandle: Long): Single<MegaNodeItem> =
         get(nodeHandle).flatMap(::getNodeItem)
 
+    /**
+     * Get a {@link MegaNodeItem} given a Node public link.
+     *
+     * @param nodeFileLink  MegaNode public link
+     * @return              Single with Mega Node Item
+     */
     fun getNodeItem(nodeFileLink: String): Single<MegaNodeItem> =
         getPublicNode(nodeFileLink).flatMap(::getNodeItem)
 
+    /**
+     * Get a {@link MegaNodeItem} given a Node.
+     *
+     * @param node  MegaNode
+     * @return      Single with Mega Node Item
+     */
     fun getNodeItem(node: MegaNode?): Single<MegaNodeItem> =
         Single.fromCallable {
             requireNotNull(node)
@@ -82,6 +106,12 @@ class GetNodeUseCase @Inject constructor(
             )
         }
 
+    /**
+     * Get a {@link MegaNode} given a Node public link.
+     *
+     * @param nodeFileLink      Node public link
+     * @return                  Single with Mega Node
+     */
     fun getPublicNode(nodeFileLink: String): Single<MegaNode> =
         Single.create { emitter ->
             if (nodeFileLink.isBlank()) {
@@ -104,15 +134,35 @@ class GetNodeUseCase @Inject constructor(
             ))
         }
 
+    /**
+     * Mark node as favorite
+     *
+     * @param nodeHandle    Node handle to mark as favorite
+     * @param isFavorite    Flag to mark/unmark as favorite
+     * @return              Completable
+     */
     fun markAsFavorite(nodeHandle: Long, isFavorite: Boolean): Completable =
         get(nodeHandle).flatMapCompletable { markAsFavorite(it, isFavorite) }
 
+    /**
+     * Mark node as favorite
+     *
+     * @param node          Node to mark as favorite
+     * @param isFavorite    Flag to mark/unmark as favorite
+     * @return              Completable
+     */
     fun markAsFavorite(node: MegaNode?, isFavorite: Boolean): Completable =
         Completable.fromCallable {
             requireNotNull(node)
             megaApi.setNodeFavourite(node, isFavorite)
         }
 
+    /**
+     * Check if a node is available offline
+     *
+     * @param nodeHandle    Mega Node handle to check
+     * @return              Single with true if it's available, false otherwise
+     */
     fun isNodeAvailableOffline(nodeHandle: Long): Single<Boolean> =
         Single.fromCallable {
             if (databaseHandler.exists(nodeHandle)) {
@@ -128,6 +178,14 @@ class GetNodeUseCase @Inject constructor(
             return@fromCallable false
         }
 
+    /**
+     * Set node as available offline
+     *
+     * @param nodeHandle        Node handle to set available offline
+     * @param availableOffline  Flag to set/unset available offline
+     * @param activity          Activity context needed to create file
+     * @return                  Completable
+     */
     fun setNodeAvailableOffline(
         nodeHandle: Long,
         availableOffline: Boolean,
@@ -135,6 +193,14 @@ class GetNodeUseCase @Inject constructor(
     ): Completable =
         get(nodeHandle).flatMapCompletable { setNodeAvailableOffline(it, availableOffline, activity) }
 
+    /**
+     * Set node as available offline
+     *
+     * @param node              Node to set available offline
+     * @param availableOffline  Flag to set/unset available offline
+     * @param activity          Activity context needed to create file
+     * @return                  Completable
+     */
     fun setNodeAvailableOffline(
         node: MegaNode?,
         availableOffline: Boolean,
@@ -160,7 +226,15 @@ class GetNodeUseCase @Inject constructor(
             }
         }
 
-
+    /**
+     * Copy node to a different location, either passing handles or node itself.
+     *
+     * @param nodeHandle        Node handle to be copied
+     * @param toParentHandle    Parent node handle to be copied to
+     * @param node              Node to be copied
+     * @param toParentNode      Parent node to be copied to
+     * @return                  Completable
+     */
     fun copyNode(
         nodeHandle: Long? = null,
         toParentHandle: Long? = null,
@@ -175,6 +249,13 @@ class GetNodeUseCase @Inject constructor(
             ).blockingAwait()
         }
 
+    /**
+     * Copy node to a different location.
+     *
+     * @param currentNode   Node to be copied
+     * @param toParentNode  Parent node to be copied to
+     * @return              Completable
+     */
     fun copyNode(currentNode: MegaNode?, toParentNode: MegaNode?): Completable =
         Completable.create { emitter ->
             if (currentNode == null || toParentNode == null) {
@@ -196,11 +277,25 @@ class GetNodeUseCase @Inject constructor(
             ))
         }
 
+    /**
+     * Move node to a different location
+     *
+     * @param nodeHandle        Node handle to be moved
+     * @param toParentHandle    Parent node handle to be moved to
+     * @return                  Completable
+     */
     fun moveNode(nodeHandle: Long, toParentHandle: Long): Completable =
         Completable.fromCallable {
             moveNode(nodeHandle.getMegaNode(), toParentHandle.getMegaNode()).blockingAwait()
         }
 
+    /**
+     * Move a node to a different location
+     *
+     * @param currentNode   Node to be moved
+     * @param toParentNode  Parent node to be moved to
+     * @return              Completable
+     */
     fun moveNode(currentNode: MegaNode?, toParentNode: MegaNode?): Completable =
         Completable.create { emitter ->
             if (currentNode == null || toParentNode == null) {
@@ -222,16 +317,34 @@ class GetNodeUseCase @Inject constructor(
             ))
         }
 
+    /**
+     * Move a node to the Rubbish bin
+     *
+     * @param nodeHandle    Node handle to be moved
+     * @return              Completable
+     */
     fun moveToRubbishBin(nodeHandle: Long): Completable =
         Completable.fromCallable {
             moveNode(nodeHandle, megaApi.rubbishNode.handle).blockingAwait()
         }
 
+    /**
+     * Remove a node
+     *
+     * @param nodeHandle    Node handle to be removed
+     * @return              Completable
+     */
     fun removeNode(nodeHandle: Long): Completable =
         Completable.fromCallable {
             removeNode(nodeHandle.getMegaNode()).blockingAwait()
         }
 
+    /**
+     * Remove a node
+     *
+     * @param node  Node to be removed
+     * @return      Completable
+     */
     fun removeNode(node: MegaNode?): Completable =
         Completable.create { emitter ->
             if (node == null) {
@@ -253,6 +366,12 @@ class GetNodeUseCase @Inject constructor(
             ))
         }
 
+    /**
+     * Get a {@link MegaNode} given a Long handle in a synchronous way.
+     * This will also authorize the Node if required.
+     *
+     * @return  MegaNode
+     */
     private fun Long.getMegaNode(): MegaNode? =
         megaApi.getNodeByHandle(this)
             ?: megaApiFolder.authorizeNode(megaApiFolder.getNodeByHandle(this))
