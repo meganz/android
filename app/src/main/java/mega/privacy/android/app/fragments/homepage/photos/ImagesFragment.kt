@@ -31,6 +31,7 @@ import mega.privacy.android.app.fragments.homepage.*
 import mega.privacy.android.app.fragments.managerFragments.cu.*
 import mega.privacy.android.app.fragments.managerFragments.cu.PhotosFragment.*
 import mega.privacy.android.app.gallery.data.GalleryCard
+import mega.privacy.android.app.gallery.data.GalleryItem
 import mega.privacy.android.app.lollipop.FullScreenImageViewerLollipop
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop
 import mega.privacy.android.app.modalbottomsheet.NodeOptionsBottomSheetDialogFragment
@@ -115,7 +116,8 @@ class ImagesFragment : BaseZoomFragment(){
 
     private fun subscribeObservers() {
         viewModel.items.observe(viewLifecycleOwner) {
-            actionModeViewModel.setNodesData(it.filter { nodeItem -> nodeItem.type == PhotoNodeItem.TYPE_PHOTO })
+            // TODO Remove filter.
+            actionModeViewModel.setNodesData(GalleryItem.toNodeItems(it))
             if (it.isEmpty()) {
                 handleOptionsMenuUpdate(false)
                 viewTypePanel.visibility = View.GONE
@@ -278,7 +280,7 @@ class ImagesFragment : BaseZoomFragment(){
 
     private fun setupNavigation() {
         itemOperationViewModel.openItemEvent.observe(viewLifecycleOwner, EventObserver {
-            openPhoto(it as PhotoNodeItem)
+            openPhoto(GalleryItem.fromNodeItem(it))
         })
 
         itemOperationViewModel.showNodeItemOptionsEvent.observe(viewLifecycleOwner, EventObserver {
@@ -296,7 +298,7 @@ class ImagesFragment : BaseZoomFragment(){
     /**
      * Only refresh the list items of uiDirty = true
      */
-    private fun updateUi() = viewModel.items.value?.let { it ->
+    private fun updateUi() = viewModel.items.value?.let {
         val newList = ArrayList(it)
         browseAdapter.submitList(newList)
 
@@ -533,7 +535,7 @@ class ImagesFragment : BaseZoomFragment(){
 
     fun loadPhotos() = viewModel.loadPhotos(true)
 
-    private fun openPhoto(nodeItem: PhotoNodeItem) {
+    private fun openPhoto(nodeItem: GalleryItem) {
         listView.findViewHolderForLayoutPosition(nodeItem.index)?.itemView?.findViewById<ImageView>(
             R.id.thumbnail
         )?.also {

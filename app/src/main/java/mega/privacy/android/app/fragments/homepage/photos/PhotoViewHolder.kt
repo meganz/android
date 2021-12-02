@@ -11,6 +11,7 @@ import mega.privacy.android.app.databinding.ItemPhotosTitleBinding
 import mega.privacy.android.app.di.MegaApi
 import mega.privacy.android.app.fragments.homepage.ActionModeViewModel
 import mega.privacy.android.app.fragments.homepage.ItemOperationViewModel
+import mega.privacy.android.app.gallery.data.GalleryItem
 import mega.privacy.android.app.utils.ZoomUtil
 import mega.privacy.android.app.utils.ZoomUtil.getMargin
 import nz.mega.sdk.MegaApiAndroid
@@ -26,7 +27,7 @@ class PhotoViewHolder(val binding: ViewDataBinding, private val zoom: Int = Zoom
     fun bind(
         actionModeViewModel: ActionModeViewModel,
         itemOperationViewModel: ItemOperationViewModel?,
-        item: PhotoNodeItem
+        item: GalleryItem
     ) {
         binding.apply {
             when (this) {
@@ -47,26 +48,6 @@ class PhotoViewHolder(val binding: ViewDataBinding, private val zoom: Int = Zoom
                     }
 
                     root.layoutParams = layoutParams
-                }
-                is ItemNodeListBinding -> {
-                    this.itemOperationViewModel = itemOperationViewModel
-                    this.actionModeViewModel = actionModeViewModel
-                    this.item = item
-                    this.megaApi = megaApi
-
-                    thumbnail.isVisible = true
-
-                    // This convoluted logic is a workaround for an UI issue of Fresco placeholder :
-                    // The placeholder(If set) image shows up transiently before showing the "tick"
-                    // image when the user long press an item for the very first time
-                    if (actionModeViewModel.selectedNodes.value?.isEmpty() == true ||
-                        actionModeViewModel.longClick.value?.peekContent()?.index != item.index ||
-                        !item.selected
-                    ) {
-                        thumbnail.hierarchy.setPlaceholderImage(R.drawable.ic_image_list)
-                    } else {
-                        thumbnail.hierarchy.setPlaceholderImage(null)
-                    }
                 }
                 is ItemPhotosTitleBinding -> {
                     this.item = item

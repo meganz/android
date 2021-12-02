@@ -14,12 +14,13 @@ import mega.privacy.android.app.databinding.ItemPhotosTitleBinding
 import mega.privacy.android.app.fragments.homepage.ActionModeViewModel
 import mega.privacy.android.app.fragments.homepage.ItemOperationViewModel
 import mega.privacy.android.app.fragments.homepage.NodeDiffCallback
+import mega.privacy.android.app.gallery.data.GalleryItem
 
 class PhotosBrowseAdapter constructor(
     private val actionModeViewModel: ActionModeViewModel,
     private val itemOperationViewModel: ItemOperationViewModel,
     private val zoom: Int
-) : ListAdapter<PhotoNodeItem, PhotoViewHolder>(NodeDiffCallback()),
+) : ListAdapter<GalleryItem, PhotoViewHolder>(GalleryItem.DiffCallback()),
     SectionTitleProvider, DragThumbnailGetter {
 
     private var itemDimen = 0
@@ -43,7 +44,7 @@ class PhotosBrowseAdapter constructor(
         val inflater = LayoutInflater.from(parent.context)
 
         val binding = when (viewType) {
-            PhotoNodeItem.TYPE_TITLE ->
+            GalleryItem.TYPE_HEADER ->
                 ItemPhotosTitleBinding.inflate(
                     inflater,
                     parent,
@@ -57,7 +58,7 @@ class PhotosBrowseAdapter constructor(
                 )
         }
 
-        if (viewType == PhotoNodeItem.TYPE_PHOTO && itemDimen > 0) {
+        if (viewType == GalleryItem.TYPE_IMAGE && itemDimen > 0) {
             setItemLayoutParams(binding)
             // FastScroller would affect the normal process of RecyclerView that makes the "selected"
             // icon appear before binding the item. Therefore, hide the icon up front
@@ -85,17 +86,17 @@ class PhotosBrowseAdapter constructor(
     fun getSpanSizeLookup(spanCount: Int) = object : GridLayoutManager.SpanSizeLookup() {
         override fun getSpanSize(position: Int): Int {
             return when (getItem(position).type) {
-                PhotoNodeItem.TYPE_TITLE -> spanCount
+                GalleryItem.TYPE_HEADER -> spanCount
                 else -> 1
             }
         }
     }
 
-    fun getNodeAtPosition(position: Int): PhotoNodeItem? {
+    fun getNodeAtPosition(position: Int): GalleryItem? {
         return if (position >= 0 && position < currentList.size) currentList[position] else null
     }
 
     override fun getSectionTitle(position: Int) = if (position < 0 || position >= itemCount) {
         ""
-    } else getItem(position).modifiedDate
+    } else getItem(position).modifyDate
 }

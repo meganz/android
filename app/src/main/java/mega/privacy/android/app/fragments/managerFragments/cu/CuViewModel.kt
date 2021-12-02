@@ -404,12 +404,17 @@ class CuViewModel @ViewModelInject constructor(
             val dateString = DateTimeFormatter.ofPattern("MMMM yyyy").format(modifyDate)
             val sameYear = Year.from(LocalDate.now()) == Year.from(modifyDate)
             val cuNode = GalleryItem(
-                node, pair.first,
+                node,
+                pair.first,
+                INVALID_POSITION,
+                INVALID_POSITION,
                 if (thumbnail.exists()) thumbnail else null,
                 if (FileUtil.isVideoFile(node.name)) GalleryItem.TYPE_VIDEO else GalleryItem.TYPE_IMAGE,
                 dateString,
                 null,
-                mSelectedNodes.containsKey(node.handle)
+                null,
+                mSelectedNodes.containsKey(node.handle),
+                false
             )
             if (mZoom == ZoomUtil.ZOOM_OUT_2X) {
                 if (lastYearDate == null || Year.from(lastYearDate) != Year.from(modifyDate)) {

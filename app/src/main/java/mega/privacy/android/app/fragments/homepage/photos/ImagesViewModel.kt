@@ -4,9 +4,11 @@ import androidx.hilt.lifecycle.ViewModelInject
 import androidx.lifecycle.*
 import com.jeremyliao.liveeventbus.LiveEventBus
 import kotlinx.coroutines.launch
-import mega.privacy.android.app.fragments.homepage.TypedFilesRepository
 import mega.privacy.android.app.fragments.managerFragments.cu.BaseZoomFragment.Companion.ALL_VIEW
 import mega.privacy.android.app.gallery.data.GalleryCard
+import mega.privacy.android.app.gallery.data.GalleryItem
+import mega.privacy.android.app.gallery.data.GalleryItem.Companion.TYPE_IMAGE
+import mega.privacy.android.app.gallery.repository.GalleryItemRepository
 import mega.privacy.android.app.utils.Constants.EVENT_NODES_CHANGE
 import mega.privacy.android.app.utils.Constants.INVALID_POSITION
 import mega.privacy.android.app.utils.ZoomUtil
@@ -16,7 +18,7 @@ import mega.privacy.android.app.utils.ZoomUtil.YEARS_INDEX
 import nz.mega.sdk.MegaApiJava.*
 
 class ImagesViewModel @ViewModelInject constructor(
-    private val repository: TypedFilesRepository
+    private val repository: GalleryItemRepository
 ) : ViewModel() {
 
     /**
@@ -50,29 +52,25 @@ class ImagesViewModel @ViewModelInject constructor(
         _refreshCards.value = false
     }
 
-    val items: LiveData<List<PhotoNodeItem>> = liveDataRoot.switchMap {
+    val items: LiveData<List<GalleryItem>> = liveDataRoot.switchMap {
         if (forceUpdate) {
             viewModelScope.launch {
-                repository.getFiles(
-                    FILE_TYPE_PHOTO,
-                    ORDER_MODIFICATION_DESC,
-                    _mZoom
-                )
+                repository.getFiles(_mZoom)
             }
         } else {
             repository.emitFiles()
         }
 
-        repository.fileNodeItems
+        repository.galleryItems
     }.map { it ->
         @Suppress("UNCHECKED_CAST")
-        val items = it as List<PhotoNodeItem>
+        val items = it
         var index = 0
         var photoIndex = 0
 
         items.forEach {
             it.index = index++
-            if (it.type == PhotoNodeItem.TYPE_PHOTO) it.photoIndex = photoIndex++
+            if (it.type == TYPE_IMAGE) it.photoIndex = photoIndex++
         }
 
         items
@@ -82,7 +80,7 @@ class ImagesViewModel @ViewModelInject constructor(
         val cardsProvider = DateCardsProvider()
         cardsProvider.extractCardsFromNodeList(
             repository.context,
-            it.mapNotNull { photoNodeItem -> photoNodeItem.node })
+            it.mapNotNull { item -> item.node })
 
         viewModelScope.launch {
             repository.getPreviews(cardsProvider.getNodesWithoutPreview()) {
@@ -131,7 +129,7 @@ class ImagesViewModel @ViewModelInject constructor(
         }
     }
 
-    private val loadFinishedObserver = Observer<List<PhotoNodeItem>> {
+    private val loadFinishedObserver = Observer<List<GalleryItem>> {
         loadInProgress = false
 
         if (pendingLoad) {
@@ -178,7 +176,7 @@ class ImagesViewModel @ViewModelInject constructor(
     }
 
     fun getRealPhotoCount(): Int {
-        items.value?.filter { it.type == PhotoNodeItem.TYPE_PHOTO }?.let {
+        items.value?.filter { it.type == TYPE_IMAGE }?.let {
             return it.size
         }
 
@@ -190,7 +188,7 @@ class ImagesViewModel @ViewModelInject constructor(
 
     fun getHandlesOfPhotos(): LongArray? {
         val list = items.value?.filter {
-            it.type == PhotoNodeItem.TYPE_PHOTO
+            it.type == TYPE_IMAGE
         }?.map { node -> node.node?.handle ?: INVALID_HANDLE }
 
         return list?.toLongArray()

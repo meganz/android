@@ -17,7 +17,7 @@
 
         <variable
             name="item"
-            type="mega.privacy.android.app.fragments.homepage.photos.PhotoNodeItem" />
+            type="mega.privacy.android.app.gallery.data.GalleryItem" />
     </data>
 
     <!-- Caution: don't set to wrap_content, or the grid item size will be messy and
@@ -25,8 +25,8 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:onClick="@{()->(actionModeViewModel.selectedNodes.empty ? itemOperationViewModel.onItemClick(item) : actionModeViewModel.onNodeClick(item))}"
-        android:onLongClick="@{()->actionModeViewModel.onNodeLongClick(item)}">
+        android:onClick="@{()->(actionModeViewModel.selectedNodes.empty ? itemOperationViewModel.onItemClick(item.toNodeItem()) : actionModeViewModel.onNodeClick(item.toNodeItem()))}"
+        android:onLongClick="@{()->actionModeViewModel.onNodeLongClick(item.toNodeItem())}">
 
         <com.facebook.drawee.view.SimpleDraweeView
             android:id="@+id/thumbnail"
