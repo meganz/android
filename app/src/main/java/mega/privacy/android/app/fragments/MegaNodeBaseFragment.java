@@ -1,39 +1,5 @@
 package mega.privacy.android.app.fragments;
 
-import static mega.privacy.android.app.components.dragger.DragToExitSupport.observeDragSupportEvents;
-import static mega.privacy.android.app.components.dragger.DragToExitSupport.putThumbnailLocation;
-import static mega.privacy.android.app.fragments.managerFragments.LinksFragment.getLinksOrderCloud;
-import static mega.privacy.android.app.lollipop.ManagerActivityLollipop.ERROR_TAB;
-import static mega.privacy.android.app.lollipop.ManagerActivityLollipop.INCOMING_TAB;
-import static mega.privacy.android.app.lollipop.ManagerActivityLollipop.LINKS_TAB;
-import static mega.privacy.android.app.lollipop.ManagerActivityLollipop.OUTGOING_TAB;
-import static mega.privacy.android.app.lollipop.adapters.MegaNodeAdapter.ITEM_VIEW_TYPE_GRID;
-import static mega.privacy.android.app.lollipop.adapters.MegaNodeAdapter.ITEM_VIEW_TYPE_LIST;
-import static mega.privacy.android.app.utils.Constants.AUTHORITY_STRING_FILE_PROVIDER;
-import static mega.privacy.android.app.utils.Constants.BUFFER_COMP;
-import static mega.privacy.android.app.utils.Constants.INCOMING_SHARES_ADAPTER;
-import static mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_NEED_STOP_HTTP_SERVER;
-import static mega.privacy.android.app.utils.Constants.LINKS_ADAPTER;
-import static mega.privacy.android.app.utils.Constants.MAX_BUFFER_16MB;
-import static mega.privacy.android.app.utils.Constants.MAX_BUFFER_32MB;
-import static mega.privacy.android.app.utils.Constants.MIN_ITEMS_SCROLLBAR;
-import static mega.privacy.android.app.utils.Constants.OUTGOING_SHARES_ADAPTER;
-import static mega.privacy.android.app.utils.Constants.SNACKBAR_TYPE;
-import static mega.privacy.android.app.utils.FileUtil.getDownloadLocation;
-import static mega.privacy.android.app.utils.FileUtil.getLocalFile;
-import static mega.privacy.android.app.utils.LogUtil.logDebug;
-import static mega.privacy.android.app.utils.LogUtil.logError;
-import static mega.privacy.android.app.utils.LogUtil.logWarning;
-import static mega.privacy.android.app.utils.MegaApiUtils.isIntentAvailable;
-import static mega.privacy.android.app.utils.MegaNodeUtil.manageTextFileIntent;
-import static mega.privacy.android.app.utils.MegaNodeUtil.manageURLNode;
-import static mega.privacy.android.app.utils.MegaNodeUtil.showConfirmationLeaveIncomingShares;
-import static mega.privacy.android.app.utils.Util.dp2px;
-import static mega.privacy.android.app.utils.Util.getMediaIntent;
-import static mega.privacy.android.app.utils.Util.isScreenInPortrait;
-import static mega.privacy.android.app.utils.Util.noChangeRecyclerViewItemAnimator;
-import static nz.mega.sdk.MegaApiJava.INVALID_HANDLE;
-
 import android.app.ActivityManager;
 import android.content.Context;
 import android.content.Intent;
@@ -100,6 +66,21 @@ import mega.privacy.android.app.utils.ColorUtils;
 import mega.privacy.android.app.utils.MegaNodeUtil;
 import mega.privacy.android.app.utils.StringResourcesUtils;
 import nz.mega.sdk.MegaNode;
+
+import static mega.privacy.android.app.components.dragger.DragToExitSupport.observeDragSupportEvents;
+import static mega.privacy.android.app.components.dragger.DragToExitSupport.putThumbnailLocation;
+import static mega.privacy.android.app.fragments.managerFragments.LinksFragment.getLinksOrderCloud;
+import static mega.privacy.android.app.lollipop.ManagerActivityLollipop.*;
+import static mega.privacy.android.app.lollipop.adapters.MegaNodeAdapter.*;
+import static mega.privacy.android.app.utils.Constants.*;
+import static mega.privacy.android.app.utils.FileUtil.*;
+import static mega.privacy.android.app.utils.LogUtil.*;
+import static mega.privacy.android.app.utils.MegaApiUtils.*;
+import static mega.privacy.android.app.utils.MegaNodeUtil.manageTextFileIntent;
+import static mega.privacy.android.app.utils.MegaNodeUtil.manageURLNode;
+import static mega.privacy.android.app.utils.MegaNodeUtil.showConfirmationLeaveIncomingShares;
+import static mega.privacy.android.app.utils.Util.*;
+import static nz.mega.sdk.MegaApiJava.*;
 
 @AndroidEntryPoint
 public abstract class MegaNodeBaseFragment extends RotatableFragment {

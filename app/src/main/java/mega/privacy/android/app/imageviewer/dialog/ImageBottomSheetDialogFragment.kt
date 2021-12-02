@@ -1,12 +1,12 @@
 package mega.privacy.android.app.imageviewer.dialog
 
 import android.annotation.SuppressLint
-import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.activity.result.ActivityResultLauncher
 import androidx.core.content.res.ResourcesCompat
 import androidx.core.view.isVisible
 import androidx.fragment.app.FragmentManager
@@ -16,13 +16,13 @@ import com.facebook.imagepipeline.request.ImageRequest
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.R
+import mega.privacy.android.app.activities.contract.SelectFolderToCopyActivityContract
+import mega.privacy.android.app.activities.contract.SelectFolderToImportActivityContract
+import mega.privacy.android.app.activities.contract.SelectFolderToMoveActivityContract
 import mega.privacy.android.app.databinding.BottomSheetImageOptionsBinding
 import mega.privacy.android.app.imageviewer.ImageViewerActivity
 import mega.privacy.android.app.imageviewer.ImageViewerViewModel
 import mega.privacy.android.app.imageviewer.data.ImageItem
-import mega.privacy.android.app.lollipop.FileExplorerActivityLollipop
-import mega.privacy.android.app.lollipop.FileExplorerActivityLollipop.ACTION_PICK_COPY_FOLDER
-import mega.privacy.android.app.lollipop.FileExplorerActivityLollipop.ACTION_PICK_IMPORT_FOLDER
 import mega.privacy.android.app.lollipop.FileInfoActivityLollipop
 import mega.privacy.android.app.modalbottomsheet.BaseBottomSheetDialogFragment
 import mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil
@@ -66,6 +66,9 @@ class ImageBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
     private val imageNodeHandle by extraNotNull(INTENT_EXTRA_KEY_HANDLE, INVALID_HANDLE)
 
     private lateinit var binding: BottomSheetImageOptionsBinding
+    private lateinit var selectMoveFolderLauncher: ActivityResultLauncher<LongArray>
+    private lateinit var selectCopyFolderLauncher: ActivityResultLauncher<LongArray>
+    private lateinit var selectImportFolderLauncher: ActivityResultLauncher<LongArray>
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -75,6 +78,7 @@ class ImageBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
         binding = BottomSheetImageOptionsBinding.inflate(inflater, container, false)
         contentView = binding.root
         itemsLayout = binding.layoutItems
+        buildActivityLaunchers()
         return binding.root
     }
 
@@ -228,27 +232,17 @@ class ImageBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
 
             // Move
             optionMove.setOnClickListener {
-                val intent = Intent(context, FileExplorerActivityLollipop::class.java).apply {
-                    action = FileExplorerActivityLollipop.ACTION_PICK_MOVE_FOLDER
-                    putExtra(INTENT_EXTRA_KEY_MOVE_FROM, longArrayOf(node.handle))
-                }
-
-                startActivityForResult(intent, REQUEST_CODE_SELECT_FOLDER_TO_MOVE)
+                selectMoveFolderLauncher.launch(longArrayOf(node.handle))
             }
             optionMove.isVisible = nodeItem.hasFullAccess && !nodeItem.isFromRubbishBin
 
             // Copy
             optionCopy.setOnClickListener {
-                val intent = Intent(context, FileExplorerActivityLollipop::class.java).apply {
-                    if (node.isPublic) {
-                        action = ACTION_PICK_IMPORT_FOLDER
-                        putExtra(INTENT_EXTRA_KEY_IMPORT_CHAT, longArrayOf(node.handle))
-                    } else {
-                        action = ACTION_PICK_COPY_FOLDER
-                        putExtra(INTENT_EXTRA_KEY_COPY_FROM, longArrayOf(node.handle))
-                    }
+                if (node.isPublic) {
+                    selectImportFolderLauncher.launch(longArrayOf(node.handle))
+                } else {
+                    selectCopyFolderLauncher.launch(longArrayOf(node.handle))
                 }
-                startActivityForResult(intent, REQUEST_CODE_SELECT_FOLDER_TO_COPY)
             }
             val copyAction = if (node.isPublic) R.string.general_import else R.string.context_copy
             optionCopy.text = StringResourcesUtils.getString(copyAction)
@@ -305,35 +299,33 @@ class ImageBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
         }
     }
 
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        when (requestCode) {
-            REQUEST_CODE_SELECT_FOLDER_TO_MOVE -> {
-                if (resultCode == Activity.RESULT_OK) {
-                    val moveHandle = data?.getLongArrayExtra(INTENT_EXTRA_KEY_MOVE_HANDLES)?.firstOrNull() ?: INVALID_HANDLE
-                    val toHandle = data?.getLongExtra(INTENT_EXTRA_KEY_MOVE_TO, INVALID_HANDLE) ?: INVALID_HANDLE
-                    if (moveHandle != INVALID_HANDLE && toHandle != INVALID_HANDLE) {
-                        viewModel.moveNode(moveHandle, toHandle)
-                    }
+    private fun buildActivityLaunchers() {
+        selectMoveFolderLauncher = registerForActivityResult(SelectFolderToMoveActivityContract()) { result ->
+            if (result != null) {
+                val moveHandle = result.first.firstOrNull()
+                val toHandle = result.second
+                if (moveHandle != null && moveHandle != INVALID_HANDLE && toHandle != INVALID_HANDLE) {
+                    viewModel.moveNode(moveHandle, toHandle)
                 }
             }
-            REQUEST_CODE_SELECT_FOLDER_TO_COPY -> {
-                if (resultCode == Activity.RESULT_OK) {
-                    val copyHandle =
-                        data?.getLongArrayExtra(INTENT_EXTRA_KEY_COPY_HANDLES)?.firstOrNull()
-                            ?: data?.getLongArrayExtra(INTENT_EXTRA_KEY_IMPORT_CHAT)?.firstOrNull()
-                            ?: INVALID_HANDLE
-
-                    val toHandle =
-                        data?.getLongExtra(INTENT_EXTRA_KEY_COPY_TO, INVALID_HANDLE)
-                            ?: data?.getLongExtra(INTENT_EXTRA_KEY_IMPORT_TO, INVALID_HANDLE)
-                            ?: INVALID_HANDLE
-
-                    if (copyHandle != INVALID_HANDLE && toHandle != INVALID_HANDLE) {
-                        viewModel.copyNode(copyHandle, toHandle)
-                    }
+        }
+        selectCopyFolderLauncher = registerForActivityResult(SelectFolderToCopyActivityContract()) { result ->
+            if (result != null) {
+                val copyHandle = result.first.firstOrNull()
+                val toHandle = result.second
+                if (copyHandle != null && copyHandle != INVALID_HANDLE && toHandle != INVALID_HANDLE) {
+                    viewModel.copyNode(copyHandle, toHandle)
                 }
             }
-            else -> super.onActivityResult(requestCode, resultCode, data)
+        }
+        selectImportFolderLauncher = registerForActivityResult(SelectFolderToImportActivityContract()) { result ->
+            if (result != null) {
+                val copyHandle = result.first.firstOrNull()
+                val toHandle = result.second
+                if (copyHandle != null && copyHandle != INVALID_HANDLE && toHandle != INVALID_HANDLE) {
+                    viewModel.copyNode(copyHandle, toHandle)
+                }
+            }
         }
     }
 
