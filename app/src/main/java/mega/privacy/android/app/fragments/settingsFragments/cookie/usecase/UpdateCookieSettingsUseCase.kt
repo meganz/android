@@ -2,12 +2,12 @@ package mega.privacy.android.app.fragments.settingsFragments.cookie.usecase
 
 import android.content.Intent
 import io.reactivex.rxjava3.core.Completable
-import mega.privacy.android.app.di.MegaApi
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.constants.BroadcastConstants.BROADCAST_ACTION_COOKIE_SETTINGS_SAVED
+import mega.privacy.android.app.di.MegaApi
 import mega.privacy.android.app.fragments.settingsFragments.cookie.data.CookieType
+import mega.privacy.android.app.listeners.OptionalMegaRequestListenerInterface
 import mega.privacy.android.app.utils.ErrorUtils.toThrowable
-import mega.privacy.android.app.utils.LogUtil.*
 import nz.mega.sdk.*
 import java.util.*
 import javax.inject.Inject
@@ -41,37 +41,16 @@ class UpdateCookieSettingsUseCase @Inject constructor(
             }
 
             val bitSetToDecimal = bitSet.toLongArray().first().toInt()
-
-            megaApi.setCookieSettings(bitSetToDecimal, object : MegaRequestListenerInterface {
-                override fun onRequestStart(api: MegaApiJava, request: MegaRequest) {}
-
-                override fun onRequestUpdate(api: MegaApiJava, request: MegaRequest) {}
-
-                override fun onRequestFinish(
-                    api: MegaApiJava,
-                    request: MegaRequest,
-                    error: MegaError
-                ) {
-                    if (emitter.isDisposed) return
+            megaApi.setCookieSettings(bitSetToDecimal, OptionalMegaRequestListenerInterface(
+                onRequestFinish = { _, error ->
+                    if (emitter.isDisposed) return@OptionalMegaRequestListenerInterface
 
                     when (error.errorCode) {
-                        MegaError.API_OK -> {
-                            emitter.onComplete()
-                        }
-                        else -> {
-                            emitter.onError(error.toThrowable())
-                        }
+                        MegaError.API_OK -> emitter.onComplete()
+                        else -> emitter.onError(error.toThrowable())
                     }
                 }
-
-                override fun onRequestTemporaryError(
-                    api: MegaApiJava,
-                    request: MegaRequest,
-                    error: MegaError
-                ) {
-                    logError(error.toThrowable().stackTraceToString())
-                }
-            })
+            ))
         }.doOnComplete {
             val intent = Intent(BROADCAST_ACTION_COOKIE_SETTINGS_SAVED)
             MegaApplication.getInstance()?.sendBroadcast(intent)
