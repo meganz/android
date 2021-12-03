@@ -23,7 +23,7 @@ class TypedFilesRepository @Inject constructor(
     var fileNodeItems: LiveData<List<NodeItem>> = MutableLiveData()
 
     /** Current effective NodeFetcher */
-    lateinit var nodesFetcher: TypedNodesFetcher
+    lateinit var nodesFetcher: TypedNodesFetcher<NodeItem>
 
     /** The selected nodes in action mode */
     private val selectedNodesMap: LinkedHashMap<Any, NodeItem> = LinkedHashMap()
@@ -39,10 +39,6 @@ class TypedFilesRepository @Inject constructor(
         withContext(Dispatchers.IO) {
             nodesFetcher.getNodeItems()
         }
-    }
-
-    suspend fun getPreviews(map: MutableMap<MegaNode, String>, refreshCallback: () -> Unit) {
-        nodesFetcher.getPreviewsFromServer(map, refreshCallback)
     }
 
     fun emitFiles() {

@@ -3,12 +3,11 @@ package mega.privacy.android.app.gallery.repository
 import android.content.Context
 import android.os.Handler
 import android.os.Looper
-import androidx.lifecycle.MutableLiveData
 import kotlinx.coroutines.delay
+import mega.privacy.android.app.fragments.homepage.TypedNodesFetcher
 import mega.privacy.android.app.gallery.data.GalleryItem
 import mega.privacy.android.app.gallery.data.GalleryItem.Companion.TYPE_HEADER
 import mega.privacy.android.app.gallery.data.GalleryItem.Companion.TYPE_IMAGE
-import mega.privacy.android.app.listeners.BaseListener
 import mega.privacy.android.app.listeners.OptionalMegaRequestListenerInterface
 import mega.privacy.android.app.utils.*
 import mega.privacy.android.app.utils.Constants.INVALID_POSITION
@@ -21,7 +20,6 @@ import java.time.Year
 import java.time.YearMonth
 import java.time.format.DateTimeFormatter.ofPattern
 import java.util.*
-import kotlin.collections.LinkedHashMap
 
 /**
  * Data fetcher for fetching typed files
@@ -31,20 +29,8 @@ class GalleryNodeFetcher(
     private val megaApi: MegaApiAndroid,
     private val selectedNodesMap: LinkedHashMap<Any, GalleryItem>,
     private val zoom: Int
-) {
-    val result = MutableLiveData<List<GalleryItem>>()
+) : TypedNodesFetcher<GalleryItem>(context, megaApi, selectedNodesMap = selectedNodesMap) {
 
-    /**
-     * LinkedHashMap guarantees that the index order of elements is consistent with
-     * the order of putting. Moreover, it has a quick element search[O(1)] (for
-     * the callback of megaApi.getThumbnail())
-     */
-    private val fileNodesMap: LinkedHashMap<Any, GalleryItem> = LinkedHashMap()
-
-    /** Refresh rate limit */
-    private var waitingForRefresh = false
-
-    private val getThumbnailNodes = mutableMapOf<MegaNode, String>()
     private val getPreviewNodes = mutableMapOf<MegaNode, String>()
 
     /**
@@ -61,11 +47,6 @@ class GalleryNodeFetcher(
             }, UPDATE_DATA_THROTTLE_TIME
         )
     }
-
-    private fun getThumbnailFile(node: MegaNode) = File(
-        ThumbnailUtilsLollipop.getThumbFolder(context),
-        node.base64Handle.plus(FileUtil.JPG_EXTENSION)
-    )
 
     private fun getPreviewFile(node: MegaNode) = File(
         PreviewUtils.getPreviewFolder(context),
@@ -120,7 +101,7 @@ class GalleryNodeFetcher(
         var lastMonthDate: LocalDate? = null
         var lastDayDate: LocalDate? = null
 
-        for (node in getMegaNodes()) {
+        for (node in getMegaNodes(ORDER_MODIFICATION_DESC, FILE_TYPE_PHOTO)) {
             val thumbnail = if (zoom == ZoomUtil.ZOOM_IN_1X) {
                 getPreview(node)
             } else {
@@ -211,35 +192,6 @@ class GalleryNodeFetcher(
         )
     }
 
-    private suspend fun getThumbnailsFromServer() {
-        for (item in getThumbnailNodes) {
-            megaApi.getThumbnail(
-                item.key,
-                item.value,
-                object : BaseListener(context) {
-                    override fun onRequestFinish(
-                        api: MegaApiJava,
-                        request: MegaRequest,
-                        e: MegaError
-                    ) {
-                        if (e.errorCode != MegaError.API_OK) return
-
-                        request.let {
-                            fileNodesMap[it.nodeHandle]?.apply {
-                                thumbnail = getThumbnailFile(item.key).absoluteFile
-                                uiDirty = true
-                            }
-                        }
-
-                        refreshLiveData()
-                    }
-                })
-
-            // Throttle the getThumbnail call, or the UI would be non-responsive
-            delay(GET_THUMBNAIL_THROTTLE)
-        }
-    }
-
     suspend fun getPreviewsFromServer(
         map: MutableMap<MegaNode, String>,
         refreshCallback: () -> Unit
@@ -266,14 +218,5 @@ class GalleryNodeFetcher(
             // Throttle the getThumbnail call, or the UI would be non-responsive
             delay(GET_THUMBNAIL_THROTTLE)
         }
-    }
-
-    private fun getMegaNodes(): List<MegaNode> =
-        megaApi.searchByType(ORDER_MODIFICATION_DESC, FILE_TYPE_PHOTO, SEARCH_TARGET_ROOTNODE)
-
-    companion object {
-        private const val UPDATE_DATA_THROTTLE_TIME =
-            500L   // 500ms, user can see the update of photos instantly
-        private const val GET_THUMBNAIL_THROTTLE = 10L // 10ms
     }
 }

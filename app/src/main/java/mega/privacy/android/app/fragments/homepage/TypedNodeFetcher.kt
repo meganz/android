@@ -17,26 +17,26 @@ import kotlin.collections.LinkedHashMap
 /**
  * Data fetcher for fetching typed files
  */
-class TypedNodesFetcher(
+open class TypedNodesFetcher<N : NodeItem>(
     private val context: Context,
     private val megaApi: MegaApiAndroid,
     private val type: Int = MegaApiJava.FILE_TYPE_DEFAULT,
     private val order: Int = MegaApiJava.ORDER_DEFAULT_ASC,
-    private val selectedNodesMap: LinkedHashMap<Any, NodeItem>
+    private val selectedNodesMap: LinkedHashMap<Any, N>
 ) {
-    val result = MutableLiveData<List<NodeItem>>()
+    val result = MutableLiveData<List<N>>()
 
     /**
      * LinkedHashMap guarantees that the index order of elements is consistent with
      * the order of putting. Moreover, it has a quick element search[O(1)] (for
      * the callback of megaApi.getThumbnail())
      */
-    private val fileNodesMap: LinkedHashMap<Any, NodeItem> = LinkedHashMap()
+    val fileNodesMap: LinkedHashMap<Any, N> = LinkedHashMap()
 
     /** Refresh rate limit */
-    private var waitingForRefresh = false
+    var waitingForRefresh = false
 
-    private val getThumbnailNodes = mutableMapOf<MegaNode, String>()
+    val getThumbnailNodes = mutableMapOf<MegaNode, String>()
 
     /**
      * Throttle for updating the LiveData
@@ -53,7 +53,7 @@ class TypedNodesFetcher(
         )
     }
 
-    private fun getThumbnailFile(node: MegaNode) = File(
+    fun getThumbnailFile(node: MegaNode) = File(
         ThumbnailUtilsLollipop.getThumbFolder(context),
         node.base64Handle.plus(FileUtil.JPG_EXTENSION)
     )
@@ -87,7 +87,7 @@ class TypedNodesFetcher(
      * Get all nodes items
      */
     suspend fun getNodeItems() {
-        for (node in getMegaNodes()) {
+        for (node in getMegaNodes(order, type)) {
             val thumbnail = getThumbnail(node)
             val dateString = ofPattern("MMMM uuuu").format(Util.fromEpoch(node.modificationTime))
             val selected = selectedNodesMap[node.handle]?.selected ?: false
@@ -99,7 +99,7 @@ class TypedNodesFetcher(
                 dateString,
                 thumbnail,
                 selected
-            )
+            ) as N
         }
 
         result.postValue(ArrayList(fileNodesMap.values))
@@ -107,7 +107,7 @@ class TypedNodesFetcher(
         getThumbnailsFromServer()
     }
 
-    private suspend fun getThumbnailsFromServer() {
+    suspend fun getThumbnailsFromServer() {
         for (item in getThumbnailNodes) {
             megaApi.getThumbnail(
                 item.key,
@@ -136,40 +136,12 @@ class TypedNodesFetcher(
         }
     }
 
-    suspend fun getPreviewsFromServer(
-        map: MutableMap<MegaNode, String>,
-        refreshCallback: () -> Unit
-    ) {
-        for (item in map) {
-            megaApi.getPreview(
-                item.key,
-                item.value,
-                OptionalMegaRequestListenerInterface(
-                    onRequestFinish = { request, error ->
-                        if (error.errorCode != MegaError.API_OK) return@OptionalMegaRequestListenerInterface
-
-                        request.let {
-                            fileNodesMap[it.nodeHandle]?.apply {
-                                thumbnail = getPreviewFile(item.key).absoluteFile
-                                uiDirty = true
-                            }
-                        }
-
-                        refreshCallback.invoke()
-                    }
-                ))
-
-            // Throttle the getThumbnail call, or the UI would be non-responsive
-            delay(GET_THUMBNAIL_THROTTLE)
-        }
-    }
-
-    private fun getMegaNodes(): List<MegaNode> =
+    fun getMegaNodes(order: Int, type: Int): List<MegaNode> =
         megaApi.searchByType(order, type, MegaApiJava.SEARCH_TARGET_ROOTNODE)
 
     companion object {
-        private const val UPDATE_DATA_THROTTLE_TIME =
+        const val UPDATE_DATA_THROTTLE_TIME =
             500L   // 500ms, user can see the update of photos instantly
-        private const val GET_THUMBNAIL_THROTTLE = 10L // 10ms
+        const val GET_THUMBNAIL_THROTTLE = 10L // 10ms
     }
 }
