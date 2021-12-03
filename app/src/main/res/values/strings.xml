@@ -1030,7 +1030,7 @@
     <!-- Third paragraph of the screen to backup the master key -->
     <string name="backup_third_paragraph">An external attacker cannot gain access to your account with just your key. A password reset requires both the key and access to your email.</string>
     <!-- Sentence to inform the user the available actions in the screen to backup the master key -->
-    <string name="backup_action">Copy the Recovery Key to clipboard or save it as text file</string>
+    <string name="backup_action">Copy the Recovery Key to the clipboard or save it as text file.</string>
     <!-- Action of a button to save something -->
     <string name="save_action">Save</string>
     <!-- Alert message when the master key has been successfully copied to the ClipBoard -->
@@ -3726,7 +3726,7 @@
     <!-- Explanation of a warning recommending upgrade to Pro in relation to link available options -->
     <string name="link_upgrade_pro_explanation">MEGA Pro users have exclusive access to additional link safety features making your account even more secure.</string>
     <!-- Meaning of links decryption key -->
-    <string name="decryption_key_explanation">Our end-to-end encryption system requires a unique key automatically generated for this file. A link with this key is created by default, but you can export the decryption key separately for an added layer of security.</string>
+    <string name="decryption_key_explanation">Our end-to-end encryption system requires a unique key automatically generated for this file or folder. A link with this key is created by default, but you can export the decryption key separately for an added layer of security.</string>
     <!-- Reset password label -->
     <string name="reset_password_label">Reset password</string>
     <!-- Warning show to the user when has enable to send the decryption key of a link separately and tries to share the link -->
@@ -4190,4 +4190,8 @@
     <string name="image_insertion_not_allowed">MEGA does not support image insertion here</string>
     <!-- The label under the button of viewing all images screen -->
     <string name="section_images">Images</string>
+    <!-- Title of the dialog warning the user about disable file versioning. -->
+    <string name="disable_versioning_label">Disable file versioning</string>
+    <!-- Warning of the dialog informing the user about disable file versioning. -->
+    <string name="disable_versioning_warning">Our file versioning feature ensures that we keep older copies of your files around if you replace them with newer versions. If you disable File Versioning you will no longer have this protection; the old copy will be lost when you replace it.</string>
 </resources>
