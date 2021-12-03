@@ -53,6 +53,9 @@ import mega.privacy.android.app.utils.FileUtil.*
 import mega.privacy.android.app.utils.LogUtil.logDebug
 import mega.privacy.android.app.utils.LogUtil.logWarning
 import mega.privacy.android.app.utils.MegaApiUtils.isIntentAvailable
+import mega.privacy.android.app.utils.MegaNodeUtil.launchActionView
+import mega.privacy.android.app.utils.MegaNodeUtil.manageURLNode
+import mega.privacy.android.app.utils.MegaNodeUtil.openZip
 import mega.privacy.android.app.utils.StringResourcesUtils.getQuantityString
 import mega.privacy.android.app.utils.StringResourcesUtils.getString
 import mega.privacy.android.app.utils.TextUtil.isTextEmpty
@@ -1403,18 +1406,9 @@ object MegaNodeUtil {
     ) {
         val mime = MimeTypeList.typeForName(autoPlayInfo.nodeName)
         when {
-            mime.isZip -> {
-                val zipFile = File(autoPlayInfo.localPath)
-
-                val intentZip = Intent(context, ZipBrowserActivityLollipop::class.java)
-                intentZip.putExtra(
-                    ZipBrowserActivityLollipop.EXTRA_PATH_ZIP, zipFile.absolutePath
-                )
-                intentZip.putExtra(
-                    ZipBrowserActivityLollipop.EXTRA_HANDLE_ZIP, autoPlayInfo.nodeHandle
-                )
-
-                activityLauncher.launchActivity(intentZip)
+            // // ZIP file on SD card can't not be created by `new java.util.zip.ZipFile(path)`.
+            mime.isZip && !SDCardUtils.isLocalFolderOnSDCard(context, autoPlayInfo.localPath) -> {
+                openZip(context, activityLauncher, autoPlayInfo.localPath, autoPlayInfo.nodeHandle)
             }
             mime.isPdf -> {
                 val pdfIntent = Intent(context, PdfViewerActivityLollipop::class.java)
@@ -1475,32 +1469,97 @@ object MegaNodeUtil {
                     if (isIntentAvailable(context, mediaIntent)) {
                         activityLauncher.launchActivity(mediaIntent)
                     } else {
-                        sendFile(context, autoPlayInfo, activityLauncher, snackbarShower)
+                        sendFile(
+                            context,
+                            autoPlayInfo.nodeName,
+                            autoPlayInfo.localPath,
+                            activityLauncher,
+                            snackbarShower
+                        )
                     }
                 }
             }
             else -> {
-                try {
-                    val viewIntent = Intent(Intent.ACTION_VIEW)
-
-                    if (!setLocalIntentParams(
-                            context, autoPlayInfo.nodeName, viewIntent,
-                            autoPlayInfo.localPath, false, snackbarShower
-                        )
-                    ) {
-                        return
-                    }
-
-                    viewIntent.flags = Intent.FLAG_GRANT_READ_URI_PERMISSION
-                    if (isIntentAvailable(context, viewIntent)) {
-                        activityLauncher.launchActivity(viewIntent)
-                    } else {
-                        sendFile(context, autoPlayInfo, activityLauncher, snackbarShower)
-                    }
-                } catch (e: Exception) {
-                    snackbarShower.showSnackbar(getString(R.string.general_already_downloaded))
-                }
+                launchActionView(
+                    context,
+                    autoPlayInfo.nodeName,
+                    autoPlayInfo.localPath,
+                    activityLauncher,
+                    snackbarShower
+                )
             }
+        }
+    }
+
+    /**
+     * Launch ZipBrowserActivityLollipop to preview a zip file.
+     *
+     * @param context Android context.
+     * @param activityLauncher interface to launch activity.
+     * @param zipFilePath The local path of the zip file.
+     * @param nodeHandle The handle of the corresponding node.
+     */
+    @JvmStatic
+    fun openZip(
+        context: Context,
+        activityLauncher: ActivityLauncher,
+        zipFilePath: String,
+        nodeHandle: Long
+    ) {
+        val intentZip = Intent(context, ZipBrowserActivityLollipop::class.java)
+        intentZip.putExtra(
+            ZipBrowserActivityLollipop.EXTRA_PATH_ZIP, zipFilePath
+        )
+        intentZip.putExtra(
+            ZipBrowserActivityLollipop.EXTRA_HANDLE_ZIP, nodeHandle
+        )
+
+        activityLauncher.launchActivity(intentZip)
+    }
+
+    /**
+     * For the node that cannot be opened in-app.
+     * Launch an intent with ACTION_VIEW and let user choose to use which app to open it.
+     *
+     * @param context Android context
+     * @param nodeName Name of the node.
+     * @param localPath Local path of the node.
+     * @param activityLauncher interface to launch activity
+     * @param snackbarShower interface to show snackbar
+     */
+    @JvmStatic
+    fun launchActionView(
+        context: Context,
+        nodeName: String,
+        localPath: String,
+        activityLauncher: ActivityLauncher,
+        snackbarShower: SnackbarShower
+    ) {
+        try {
+            val viewIntent = Intent(Intent.ACTION_VIEW)
+
+            if (!setLocalIntentParams(
+                    context, nodeName, viewIntent,
+                    localPath, false, snackbarShower
+                )
+            ) {
+                return
+            }
+
+            viewIntent.flags = Intent.FLAG_GRANT_READ_URI_PERMISSION
+            if (isIntentAvailable(context, viewIntent)) {
+                activityLauncher.launchActivity(viewIntent)
+            } else {
+                sendFile(
+                    context,
+                    nodeName,
+                    localPath,
+                    activityLauncher,
+                    snackbarShower
+                )
+            }
+        } catch (e: Exception) {
+            snackbarShower.showSnackbar(getString(R.string.general_already_downloaded))
         }
     }
 
@@ -1508,21 +1567,23 @@ object MegaNodeUtil {
      * Create an Intent with ACTION_SEND for an auto play file.
      *
      * @param context Android context
-     * @param autoPlayInfo auto play file info
+     * @param nodeName Name of the node.
+     * @param localPath Local path of the node.
      * @param activityLauncher interface to launch activity
      * @param snackbarShower interface to show snackbar
      */
     private fun sendFile(
         context: Context,
-        autoPlayInfo: AutoPlayInfo,
+        nodeName: String,
+        localPath: String,
         activityLauncher: ActivityLauncher,
         snackbarShower: SnackbarShower
     ) {
         val intentShare = Intent(Intent.ACTION_SEND)
 
         if (!setLocalIntentParams(
-                context, autoPlayInfo.nodeName, intentShare,
-                autoPlayInfo.localPath, false, snackbarShower
+                context, nodeName, intentShare,
+                localPath, false, snackbarShower
             )
         ) {
             return
@@ -1697,6 +1758,54 @@ object MegaNodeUtil {
                     LogUtil.logError(error.message)
                 }
             )
+    }
+
+    /**
+     * Handle the event when a node is tapped.
+     *
+     * @param context Android context
+     * @param node The node tapped.
+     * @param nodeDownloader Function/Methd for downloading node.
+     * @param activityLauncher interface to launch activity
+     * @param snackbarShower interface to show snackbar
+     */
+    @JvmStatic
+    fun onNodeTapped(
+        context: Context,
+        node: MegaNode,
+        nodeDownloader : (node: MegaNode) -> Unit,
+        activityLauncher: ActivityLauncher,
+        snackbarShower: SnackbarShower
+    ) {
+        val possibleLocalFile = getTappedNodeLocalFile(node)
+
+        if (possibleLocalFile != null) {
+            logDebug("The node is already downloaded, found in local.")
+
+            // ZIP file on SD card can't not be created by `new java.util.zip.ZipFile(path)`.
+            if (MimeTypeList.typeForName(node.name).isZip && !SDCardUtils.isLocalFolderOnSDCard(
+                    context,
+                    possibleLocalFile
+                )
+            ) {
+                logDebug("The file is zip, open in-app.")
+                openZip(
+                    context,
+                    activityLauncher, possibleLocalFile, node.handle
+                )
+            } else {
+                logDebug("The file cannot be opened in-app.")
+                launchActionView(
+                    context,
+                    node.name,
+                    possibleLocalFile,
+                    activityLauncher,
+                    snackbarShower
+                )
+            }
+        } else {
+            nodeDownloader(node)
+        }
     }
 
     fun MegaNode.isImage(): Boolean =

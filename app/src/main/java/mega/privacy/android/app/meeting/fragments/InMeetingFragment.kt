@@ -2646,11 +2646,15 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
      */
     private fun finishActivityAsGuest() {
         val chatId = inMeetingViewModel.getChatId()
-        val callId = inMeetingViewModel.getCall()?.callId
-        logDebug("Finishing the activity as guest: chatId $chatId, callId $callId")
-        if (chatId != MEGACHAT_INVALID_HANDLE && callId != MEGACHAT_INVALID_HANDLE) {
-            MegaApplication.getChatManagement().controlCallFinished(callId!!, chatId)
+
+        inMeetingViewModel.getCall()?.let {
+            val callId = it.callId
+            logDebug("Finishing the activity as guest: chatId $chatId, callId $callId")
+            if (chatId != MEGACHAT_INVALID_HANDLE && callId != MEGACHAT_INVALID_HANDLE) {
+                MegaApplication.getChatManagement().controlCallFinished(callId, chatId)
+            }
         }
+
         AccountController.logout(
             meetingActivity,
             MegaApplication.getInstance().megaApi
@@ -2874,6 +2878,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
     }
 
     override fun onJoinedChat(chatId: Long, userHandle: Long) {
+        logDebug("Joined to the chat")
         controlWhenJoinedAChat(chatId)
     }
 

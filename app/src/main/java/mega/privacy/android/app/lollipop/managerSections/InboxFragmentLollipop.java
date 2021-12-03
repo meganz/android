@@ -86,6 +86,7 @@ import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.MegaApiUtils.*;
 import static mega.privacy.android.app.utils.MegaNodeUtil.manageTextFileIntent;
 import static mega.privacy.android.app.utils.MegaNodeUtil.manageURLNode;
+import static mega.privacy.android.app.utils.MegaNodeUtil.onNodeTapped;
 import static mega.privacy.android.app.utils.Util.*;
 
 @AndroidEntryPoint
@@ -708,9 +709,7 @@ public class InboxFragmentLollipop extends RotatableFragment{
 			manageTextFileIntent(requireContext(), node, INBOX_ADAPTER);
 		} else {
 			adapter.notifyDataSetChanged();
-			((ManagerActivityLollipop) context).saveNodesToDevice(
-					Collections.singletonList(node),
-					true, false, false, false);
+			onNodeTapped(context, node, ((ManagerActivityLollipop) context)::saveNodeByTap, (ManagerActivityLollipop) context, (ManagerActivityLollipop) context);
 		}
 	}
 

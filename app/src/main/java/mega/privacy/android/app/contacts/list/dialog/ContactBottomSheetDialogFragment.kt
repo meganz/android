@@ -190,8 +190,15 @@ class ContactBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
         }
 
         binding.optionCall.setOnClickListener {
-            CallUtil.startNewCall(activity, activity as SnackbarShower, megaUser, passcodeManagement)
-            dismiss()
+            if (CallUtil.canCallBeStartedFromContactOption(requireActivity(), passcodeManagement)) {
+                CallUtil.startNewCall(
+                    activity,
+                    activity as SnackbarShower,
+                    megaUser,
+                    passcodeManagement
+                )
+                dismiss()
+            }
         }
 
         binding.optionSendMessage.setOnClickListener {

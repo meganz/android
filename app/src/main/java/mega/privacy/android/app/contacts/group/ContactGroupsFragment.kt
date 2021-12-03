@@ -1,5 +1,6 @@
 package mega.privacy.android.app.contacts.group
 
+import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -19,13 +20,19 @@ import mega.privacy.android.app.contacts.ContactsActivity
 import mega.privacy.android.app.contacts.group.adapter.ContactGroupsAdapter
 import mega.privacy.android.app.contacts.group.data.ContactGroupItem
 import mega.privacy.android.app.databinding.FragmentContactGroupsBinding
+import mega.privacy.android.app.interfaces.SnackbarShower
+import mega.privacy.android.app.interfaces.showSnackbar
 import mega.privacy.android.app.lollipop.AddContactActivityLollipop
+import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop
 import mega.privacy.android.app.lollipop.megachat.GroupChatInfoActivityLollipop
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.Constants.MIN_ITEMS_SCROLLBAR
+import mega.privacy.android.app.utils.LogUtil
 import mega.privacy.android.app.utils.MenuUtils.setupSearchView
+import mega.privacy.android.app.utils.StringResourcesUtils
 import mega.privacy.android.app.utils.StringUtils.formatColorTag
 import mega.privacy.android.app.utils.StringUtils.toSpannedHtmlText
+import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
 
 /**
  * Fragment that represents the UI showing the list of contact groups for the current user.
@@ -84,16 +91,66 @@ class ContactGroupsFragment : Fragment() {
         binding.listScroller.setRecyclerView(binding.list)
 
         binding.btnCreateGroup.setOnClickListener {
-            startActivity(Intent(requireContext(), AddContactActivityLollipop::class.java).apply {
+            val intent = Intent(
+                requireContext(),
+                AddContactActivityLollipop::class.java
+            ).apply {
                 putExtra(AddContactActivityLollipop.EXTRA_CONTACT_TYPE, Constants.CONTACT_TYPE_MEGA)
                 putExtra(AddContactActivityLollipop.EXTRA_ONLY_CREATE_GROUP, true)
-            })
+            }
+            startActivityForResult(
+                intent,
+                Constants.REQUEST_CREATE_CHAT
+            )
         }
 
         binding.viewEmpty.text = binding.viewEmpty.text.toString()
             .formatColorTag(requireContext(), 'A', R.color.grey_900_grey_100)
             .formatColorTag(requireContext(), 'B', R.color.grey_300_grey_600)
             .toSpannedHtmlText()
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, intent: Intent?) {
+        super.onActivityResult(requestCode, resultCode, intent)
+
+        when (requestCode) {
+            Constants.REQUEST_CREATE_CHAT -> {
+                if (resultCode == Activity.RESULT_OK && intent != null) {
+                    val contactsData =
+                        intent.getStringArrayListExtra(AddContactActivityLollipop.EXTRA_CONTACTS)
+                    val isGroup =
+                        intent.getBooleanExtra(AddContactActivityLollipop.EXTRA_GROUP_CHAT, false)
+                    if (contactsData == null || !isGroup) {
+                        LogUtil.logWarning("Is one to one chat or no contacts selected")
+                        return
+                    }
+
+                    val chatTitle =
+                        intent.getStringExtra(AddContactActivityLollipop.EXTRA_CHAT_TITLE)
+
+                    viewModel.getGroupChatRoom(contactsData, chatTitle)
+                        .observe(viewLifecycleOwner) { chatId ->
+                            if (chatId == MEGACHAT_INVALID_HANDLE) {
+                                (requireActivity() as SnackbarShower).showSnackbar(
+                                    StringResourcesUtils.getString(R.string.create_chat_error)
+                                )
+                            } else {
+                                val intent =
+                                    Intent(
+                                        requireContext(),
+                                        ChatActivityLollipop::class.java
+                                    ).apply {
+                                        action = Constants.ACTION_CHAT_SHOW_MESSAGES
+                                        putExtra(Constants.CHAT_ID, chatId)
+                                    }
+                                startActivity(intent)
+                            }
+                        }
+                } else {
+                    LogUtil.logWarning("Error creating chat")
+                }
+            }
+        }
     }
 
     private fun setupObservers() {
