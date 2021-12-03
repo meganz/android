@@ -5258,6 +5258,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 		layoutCallMenuItem = rootView.findViewById(R.id.layout_menu_call);
 		chronometerMenuItem = rootView.findViewById(R.id.chrono_menu);
 		chronometerMenuItem.setVisibility(View.GONE);
+		MenuItem moreMenuItem = menu.findItem(R.id.action_more);
 
 		rootView.setOnClickListener(v1 -> onOptionsItemSelected(returnCallMenuItem));
 
@@ -5279,8 +5280,9 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 		if (isOnline(this)) {
 			switch (drawerItem) {
 				case CLOUD_DRIVE:
-					upgradeAccountMenuItem.setVisible(true);
-					importLinkMenuItem.setVisible(true);
+					upgradeAccountMenuItem.setVisible(isFirstNavigationLevel());
+					importLinkMenuItem.setVisible(isFirstNavigationLevel());
+					moreMenuItem.setVisible(!isFirstNavigationLevel());
 
                     if (isCloudAdded() && fbFLol.getItemCount() > 0) {
                         searchMenuItem.setVisible(true);
@@ -5293,8 +5295,10 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 
 					break;
 				case RUBBISH_BIN:
+					moreMenuItem.setVisible(!isFirstNavigationLevel());
+
 					if (getRubbishBinFragment() != null && rubbishBinFLol.getItemCount() > 0) {
-						clearRubbishBinMenuitem.setVisible(true);
+						clearRubbishBinMenuitem.setVisible(isFirstNavigationLevel());
 						searchMenuItem.setVisible(true);
 					}
 					break;
@@ -5302,13 +5306,17 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 					break;
 
 				case INBOX:
+					moreMenuItem.setVisible(!isFirstNavigationLevel());
+
 					if (getInboxFragment() != null && iFLol.getItemCount() > 0) {
-						selectMenuItem.setVisible(true);
+						selectMenuItem.setVisible(isFirstNavigationLevel());
 						searchMenuItem.setVisible(true);
 					}
 					break;
 
 				case SHARED_ITEMS:
+					moreMenuItem.setVisible(!isFirstNavigationLevel());
+
 					if (getTabItemShares() == INCOMING_TAB && isIncomingAdded()) {
 						if (isIncomingAdded() && inSFLol.getItemCount() > 0) {
 							searchMenuItem.setVisible(true);
@@ -5328,10 +5336,10 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 					if (searchExpand) {
 						openSearchView();
 						sFLol.checkSelectMode();
-					} else if (getSearchFragment() != null
-							&& getSearchFragment().getNodes() != null
-							&& getSearchFragment().getNodes().size() > 0) {
+					} else {
+						moreMenuItem.setVisible(!isFirstNavigationLevel());
 					}
+
 					break;
 
 				case TRANSFERS:
@@ -5732,6 +5740,11 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 				// Click to enter "create meeting"
 				onCreateMeeting();
 				return true;
+
+			case R.id.action_more:
+				showNodeOptionsPanel(getCurrentParentNode(getCurrentParentHandle(), INVALID_VALUE));
+				return true;
+
 			default:{
 	            return super.onOptionsItemSelected(item);
             }

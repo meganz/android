@@ -30,6 +30,15 @@
         app:showAsAction="ifRoom" />
 
     <item
+        android:id="@+id/action_more"
+        android:icon="@drawable/ic_dots_vertical_white"
+        android:orderInCategory="100"
+        android:title="@string/label_more"
+        android:visible="false"
+        app:iconTint="?attr/colorControlNormal"
+        app:showAsAction="always" />
+
+    <item
         android:id="@+id/action_pause"
         android:icon="@drawable/ic_pause_white"
         android:orderInCategory="100"
