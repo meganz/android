@@ -116,7 +116,7 @@ class ImagesFragment : BaseZoomFragment() {
 
     private fun subscribeObservers() {
         viewModel.items.observe(viewLifecycleOwner) {
-            actionModeViewModel.setNodesData(it.filter { nodeItem -> nodeItem.type == PhotoNodeItem.TYPE_PHOTO })
+            actionModeViewModel.setNodesData(it.filter { nodeItem -> nodeItem.type == GalleryItem.TYPE_IMAGE })
             if (it.isEmpty()) {
                 handleOptionsMenuUpdate(false)
                 viewTypePanel.visibility = View.GONE

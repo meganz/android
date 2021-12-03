@@ -23,15 +23,15 @@ import java.io.File
  */
 data class GalleryItem(
     override var node: MegaNode?,
-    var indexForViewer: Int,
-    override var index: Int,
+    var indexForViewer: Int, // Index of real photo node
+    override var index: Int, // Index of Node including TYPE_TITLE node (RecyclerView Layout position)
     override var thumbnail: File?,
     var type: Int,
     var modifyDate: String,
     var formattedDate: Spanned?,
     var headerDate: Pair<String, String>?,
     override var selected: Boolean,
-    override var uiDirty: Boolean
+    override var uiDirty: Boolean // Force refresh the newly created Node list item
 ) : NodeItem(node, index, type == TYPE_VIDEO, modifyDate, thumbnail, selected, uiDirty) {
 
     /**
