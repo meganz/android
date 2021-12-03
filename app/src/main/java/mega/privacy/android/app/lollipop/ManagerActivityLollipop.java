@@ -106,6 +106,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Locale;
@@ -7272,6 +7273,17 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 								  boolean fromMediaViewer, boolean fromChat) {
 		nodeSaver.saveNodes(nodes, highPriority, isFolderLink, fromMediaViewer, fromChat);
 	}
+
+    /**
+     * Upon a node is tapped, if it cannot be previewed in-app,
+     * then download it first, this download will be marked as "download by tap".
+     *
+     * @param node Node to be downloaded.
+     */
+    public Unit saveNodeByTap(MegaNode node) {
+       nodeSaver.saveNodes(Collections.singletonList(node), true, false, false, false, false, true);
+       return null;
+    }
 
 	/**
 	 * Save nodes to gallery.

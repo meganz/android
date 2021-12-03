@@ -65,11 +65,14 @@ import mega.privacy.android.app.globalmanagement.SortOrderManagement;
 import mega.privacy.android.app.lollipop.FullScreenImageViewerLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.PdfViewerActivityLollipop;
+import mega.privacy.android.app.lollipop.ZipBrowserActivityLollipop;
 import mega.privacy.android.app.lollipop.adapters.MegaNodeAdapter;
 import mega.privacy.android.app.lollipop.controllers.NodeController;
 import mega.privacy.android.app.utils.CloudStorageOptionControlUtil;
 import mega.privacy.android.app.utils.ColorUtils;
+import mega.privacy.android.app.utils.FileUtil;
 import mega.privacy.android.app.utils.MegaNodeUtil;
+import mega.privacy.android.app.utils.SDCardUtils;
 import mega.privacy.android.app.utils.StringResourcesUtils;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaChatApiAndroid;
@@ -86,6 +89,7 @@ import static mega.privacy.android.app.utils.MegaApiUtils.*;
 import static mega.privacy.android.app.utils.MegaNodeUtil.allHaveOwnerAccess;
 import static mega.privacy.android.app.utils.MegaNodeUtil.manageTextFileIntent;
 import static mega.privacy.android.app.utils.MegaNodeUtil.manageURLNode;
+import static mega.privacy.android.app.utils.MegaNodeUtil.onNodeTapped;
 import static mega.privacy.android.app.utils.TimeUtils.*;
 import static mega.privacy.android.app.utils.Util.*;
 
@@ -868,13 +872,11 @@ public class FileBrowserFragmentLollipop extends RotatableFragment{
 			((ManagerActivityLollipop) context).overridePendingTransition(0, 0);
 		} else if (MimeTypeList.typeForName(node.getName()).isOpenableTextFile(node.getSize())) {
 			manageTextFileIntent(context, node, FILE_BROWSER_ADAPTER);
-		} else {
-			logDebug("itemClick:isFile:otherOption");
-			((ManagerActivityLollipop) context).saveNodesToDevice(
-					Collections.singletonList(node),
-					true, false, false, false);
-		}
-	}
+        } else {
+            logDebug("itemClick:isFile:otherOption");
+            onNodeTapped(context, node, ((ManagerActivityLollipop) context)::saveNodeByTap, (ManagerActivityLollipop) context, (ManagerActivityLollipop) context);
+        }
+    }
 
     public void itemClick(int position) {
 		logDebug("item click position: " + position);
