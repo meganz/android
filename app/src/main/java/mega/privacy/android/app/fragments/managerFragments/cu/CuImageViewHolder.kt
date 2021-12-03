@@ -15,7 +15,7 @@ class CuImageViewHolder(
     }
 
     override fun bind(node: GalleryItem) {
-        mBinding.icSelected.visibility = if (node.isSelected) View.VISIBLE else View.GONE
+        mBinding.icSelected.visibility = if (node.selected) View.VISIBLE else View.GONE
 
         updateThumbnailDisplay(
             mBinding.thumbnail,

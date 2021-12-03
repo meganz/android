@@ -62,18 +62,16 @@ class ImagesViewModel @ViewModelInject constructor(
         }
 
         repository.galleryItems
-    }.map { it ->
-        @Suppress("UNCHECKED_CAST")
-        val items = it
+    }.map {
         var index = 0
         var photoIndex = 0
 
-        items.forEach {
-            it.index = index++
-            if (it.type == TYPE_IMAGE) it.photoIndex = photoIndex++
+        it.forEach { item ->
+            item.index = index++
+            if (item.type == TYPE_IMAGE) item.indexForViewer = photoIndex++
         }
 
-        items
+        it
     }
 
     val dateCards: LiveData<List<List<GalleryCard>>> = items.map {

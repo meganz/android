@@ -126,14 +126,14 @@ class CUGridViewAdapter(
             is CuImageViewHolder -> {
                 showSelectionAnimation(
                     holder.binding().icSelected, position,
-                    node.isSelected
+                    node.selected
                 )
             }
 
             is CuVideoViewHolder -> {
                 showSelectionAnimation(
                     holder.binding().icSelected, position,
-                    node.isSelected
+                    node.selected
                 )
             }
         }

@@ -34,11 +34,11 @@ abstract class CuGridViewHolder(
                 thumbnail.setActualImageResource(R.drawable.ic_image_thumbnail)
             }
             thumbnail.hierarchy.roundingParams = RoundingParams.fromCornersRadius(
-                (if (node.isSelected) itemSizeConfig.roundCornerRadius else 0).toFloat()
+                (if (node.selected) itemSizeConfig.roundCornerRadius else 0).toFloat()
             )
-            val imagePadding = if (node.isSelected) itemSizeConfig.imageSelectedPadding else 0
+            val imagePadding = if (node.selected) itemSizeConfig.imageSelectedPadding else 0
             thumbnail.setPadding(imagePadding, imagePadding, imagePadding, imagePadding)
-            if (node.isSelected) {
+            if (node.selected) {
                 thumbnail.background = ContextCompat.getDrawable(
                     thumbnail.context,
                     R.drawable.background_item_grid_selected

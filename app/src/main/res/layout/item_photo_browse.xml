@@ -25,8 +25,8 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:onClick="@{()->(actionModeViewModel.selectedNodes.empty ? itemOperationViewModel.onItemClick(item.toNodeItem()) : actionModeViewModel.onNodeClick(item.toNodeItem()))}"
-        android:onLongClick="@{()->actionModeViewModel.onNodeLongClick(item.toNodeItem())}">
+        android:onClick="@{()->(actionModeViewModel.selectedNodes.empty ? itemOperationViewModel.onItemClick(item) : actionModeViewModel.onNodeClick(item))}"
+        android:onLongClick="@{()->actionModeViewModel.onNodeLongClick(item)}">
 
         <com.facebook.drawee.view.SimpleDraweeView
             android:id="@+id/thumbnail"

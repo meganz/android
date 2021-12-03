@@ -4,8 +4,6 @@ import androidx.core.view.isVisible
 import androidx.databinding.ViewDataBinding
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import mega.privacy.android.app.R
-import mega.privacy.android.app.databinding.ItemNodeListBinding
 import mega.privacy.android.app.databinding.ItemPhotoBrowseBinding
 import mega.privacy.android.app.databinding.ItemPhotosTitleBinding
 import mega.privacy.android.app.di.MegaApi

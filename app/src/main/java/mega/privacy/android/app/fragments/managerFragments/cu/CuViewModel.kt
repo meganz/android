@@ -211,8 +211,8 @@ class CuViewModel @ViewModelInject constructor(
             if (nodes == null || position < 0 || position >= nodes.size || nodes[position].node == null || nodes[position].node!!.handle != node.node!!.handle) {
                 return
             }
-            nodes[position].isSelected = !nodes[position].isSelected
-            if (nodes[position].isSelected) {
+            nodes[position].selected = !nodes[position].selected
+            if (nodes[position].selected) {
                 mSelectedNodes.put(node.node!!.handle, node.node)
             } else {
                 mSelectedNodes.remove(node.node!!.handle)
@@ -257,10 +257,10 @@ class CuViewModel @ViewModelInject constructor(
         for (i in nodes.indices) {
             val node = nodes[i]
             if (node.node != null) {
-                if (!node.isSelected) {
+                if (!node.selected) {
                     mNodeToAnimate.value = Pair.create(i, node)
                 }
-                node.isSelected = true
+                node.selected = true
                 mSelectedNodes.put(node.node!!.handle, node.node)
             }
         }
@@ -279,10 +279,10 @@ class CuViewModel @ViewModelInject constructor(
             }
             for (i in nodes.indices) {
                 val node = nodes[i]
-                if (node.isSelected) {
+                if (node.selected) {
                     mNodeToAnimate.value = Pair.create(i, node)
                 }
-                node.isSelected = false
+                node.selected = false
             }
             mSelectedNodes.clear()
             mCuNodes.value = nodes
@@ -406,7 +406,6 @@ class CuViewModel @ViewModelInject constructor(
             val cuNode = GalleryItem(
                 node,
                 pair.first,
-                INVALID_POSITION,
                 INVALID_POSITION,
                 if (thumbnail.exists()) thumbnail else null,
                 if (FileUtil.isVideoFile(node.name)) GalleryItem.TYPE_VIDEO else GalleryItem.TYPE_IMAGE,

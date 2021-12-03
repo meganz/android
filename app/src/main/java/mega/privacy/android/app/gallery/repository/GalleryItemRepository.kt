@@ -34,7 +34,7 @@ class GalleryItemRepository @Inject constructor(
 
         // Create a node fetcher for the new request, and link fileNodeItems to its result.
         // Then the result of any previous NodesFetcher will be ignored
-        nodesFetcher = GalleryNodeFetcher(context, megaApi,selectedNodesMap, zoom)
+        nodesFetcher = GalleryNodeFetcher(context, megaApi, selectedNodesMap, zoom)
         galleryItems = nodesFetcher.result
 
         withContext(Dispatchers.IO) {
@@ -61,7 +61,7 @@ class GalleryItemRepository @Inject constructor(
         val listNodeItem = galleryItems.value ?: return
 
         for (item in listNodeItem) {
-            if (item.isSelected) {
+            if (item.selected) {
                 item.node?.let {
                     selectedNodesMap[it.handle] = item
                 }

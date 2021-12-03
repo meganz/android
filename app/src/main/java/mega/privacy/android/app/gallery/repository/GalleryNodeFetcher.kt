@@ -5,7 +5,9 @@ import android.os.Handler
 import android.os.Looper
 import androidx.lifecycle.MutableLiveData
 import kotlinx.coroutines.delay
+import mega.privacy.android.app.fragments.homepage.photos.PhotoNodeItem
 import mega.privacy.android.app.gallery.data.GalleryItem
+import mega.privacy.android.app.gallery.data.GalleryItem.Companion.TYPE_HEADER
 import mega.privacy.android.app.gallery.data.GalleryItem.Companion.TYPE_IMAGE
 import mega.privacy.android.app.listeners.BaseListener
 import mega.privacy.android.app.listeners.OptionalMegaRequestListenerInterface
@@ -170,10 +172,9 @@ class GalleryNodeFetcher(
             }
 
 
-            val selected = selectedNodesMap[node.handle]?.isSelected ?: false
+            val selected = selectedNodesMap[node.handle]?.selected ?: false
             fileNodesMap[node.handle] = GalleryItem(
                 node,
-                INVALID_POSITION,
                 INVALID_POSITION,
                 INVALID_POSITION,
                 thumbnail,
@@ -201,9 +202,8 @@ class GalleryNodeFetcher(
             null,
             INVALID_POSITION,
             INVALID_POSITION,
-            INVALID_POSITION,
             null,
-            TYPE_IMAGE,
+            TYPE_HEADER,
             dateString,
             date.formatDateTitle(),
             null,
@@ -270,7 +270,7 @@ class GalleryNodeFetcher(
     }
 
     private fun getMegaNodes(): List<MegaNode> =
-        megaApi.searchByType(ORDER_DEFAULT_ASC, FILE_TYPE_PHOTO, SEARCH_TARGET_ROOTNODE)
+        megaApi.searchByType(ORDER_MODIFICATION_DESC, FILE_TYPE_PHOTO, SEARCH_TARGET_ROOTNODE)
 
     companion object {
         private const val UPDATE_DATA_THROTTLE_TIME =

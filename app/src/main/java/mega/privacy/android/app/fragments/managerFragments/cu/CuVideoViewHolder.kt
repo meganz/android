@@ -43,10 +43,10 @@ class CuVideoViewHolder(
         }
 
         mBinding.videoInfo.setBackgroundResource(
-            if (node.isSelected) R.drawable.grid_cam_uploads_rounded else R.color.grey_alpha_032
+            if (node.selected) R.drawable.grid_cam_uploads_rounded else R.color.grey_alpha_032
         )
 
-        mBinding.icSelected.visibility = if (node.isSelected) View.VISIBLE else View.GONE
+        mBinding.icSelected.visibility = if (node.selected) View.VISIBLE else View.GONE
 
         updateThumbnailDisplay(mBinding.thumbnail, node, mItemSizeConfig)
     }

@@ -7,7 +7,6 @@ import mega.privacy.android.app.fragments.homepage.NodeItem
 import mega.privacy.android.app.utils.Constants.INVALID_POSITION
 import nz.mega.sdk.MegaNode
 import java.io.File
-import java.util.stream.Collectors
 
 /**
  * Creates a TYPE_IMAGE or TYPE_VIDEO CuNode.
@@ -23,18 +22,17 @@ import java.util.stream.Collectors
  * @param isSelected       True if the node is selected on list, false otherwise.
  */
 data class GalleryItem(
-    var node: MegaNode?,
+    override var node: MegaNode?,
     var indexForViewer: Int,
-    var photoIndex: Int,
-    var index: Int,
-    var thumbnail: File?,
+    override var index: Int,
+    override var thumbnail: File?,
     var type: Int,
     var modifyDate: String,
     var formattedDate: Spanned?,
     var headerDate: Pair<String, String>?,
-    var isSelected: Boolean,
-    var uiDirty: Boolean
-) {
+    override var selected: Boolean,
+    override var uiDirty: Boolean
+) : NodeItem(node, index, type == TYPE_VIDEO, modifyDate, thumbnail, selected, uiDirty) {
 
     /**
      * Creates a TYPE_HEADER which represent date.
@@ -48,7 +46,7 @@ data class GalleryItem(
         modifyDate: String,
         headerDate: Pair<String, String>
     ) : this(
-        null, INVALID_POSITION, INVALID_POSITION, INVALID_POSITION, null,
+        null, INVALID_POSITION, INVALID_POSITION, null,
         TYPE_HEADER, modifyDate, null, headerDate, false, false
     )
 
@@ -57,51 +55,10 @@ data class GalleryItem(
             oldItem.node?.handle == newItem.node?.handle
 
         override fun areContentsTheSame(oldItem: GalleryItem, newItem: GalleryItem) =
-            oldItem == newItem
+            !newItem.uiDirty
     }
 
-    fun toNodeItem() = NodeItem(
-        node,
-        index,
-        false,
-        modifyDate,
-        thumbnail,
-        isSelected,
-        uiDirty
-    )
-
-
-
     companion object {
-
-        @JvmStatic
-        fun fromNodeItem(nodeItem: NodeItem) = GalleryItem(
-            nodeItem.node,
-            INVALID_POSITION,
-            INVALID_POSITION,
-            nodeItem.index,
-            nodeItem.thumbnail,
-            TYPE_IMAGE,
-            nodeItem.modifiedDate,
-            null,
-            null,
-            nodeItem.selected,
-            false
-        )
-
-        @JvmStatic
-        fun toNodeItems(galleryItems: List<GalleryItem>): List<NodeItem> =
-            galleryItems.stream().map {
-                NodeItem(
-                    it.node,
-                    it.index,
-                    false,
-                    it.modifyDate,
-                    it.thumbnail,
-                    it.isSelected,
-                    it.uiDirty
-                )
-            }.collect(Collectors.toList())
 
         /**
          * Three different types of nodes.

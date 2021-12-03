@@ -42,7 +42,7 @@ import nz.mega.sdk.MegaChatApiJava
 import java.util.*
 
 @AndroidEntryPoint
-class ImagesFragment : BaseZoomFragment(){
+class ImagesFragment : BaseZoomFragment() {
 
     private val viewModel by viewModels<ImagesViewModel>()
     private val actionModeViewModel by viewModels<ActionModeViewModel>()
@@ -67,7 +67,7 @@ class ImagesFragment : BaseZoomFragment(){
     private lateinit var itemDecoration: SimpleDividerItemDecoration
 
     private var selectedView = ALL_VIEW
-    private lateinit var binding:FragmentImagesBinding
+    private lateinit var binding: FragmentImagesBinding
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -101,7 +101,7 @@ class ImagesFragment : BaseZoomFragment(){
         setupNavigation()
     }
 
-    override fun handleZoomChange(zoom: Int,needReload:Boolean) {
+    override fun handleZoomChange(zoom: Int, needReload: Boolean) {
         ZoomUtil.IMAGES_ZOOM_LEVEL = zoom
         handleZoomAdapterLayoutChange(zoom)
         if (needReload) {
@@ -116,8 +116,7 @@ class ImagesFragment : BaseZoomFragment(){
 
     private fun subscribeObservers() {
         viewModel.items.observe(viewLifecycleOwner) {
-            // TODO Remove filter.
-            actionModeViewModel.setNodesData(GalleryItem.toNodeItems(it))
+            actionModeViewModel.setNodesData(it.filter { nodeItem -> nodeItem.type == PhotoNodeItem.TYPE_PHOTO })
             if (it.isEmpty()) {
                 handleOptionsMenuUpdate(false)
                 viewTypePanel.visibility = View.GONE
@@ -219,13 +218,13 @@ class ImagesFragment : BaseZoomFragment(){
      * then apply selected style for the selected button regarding to the selected view.
      */
     private fun updateViewSelected() {
-       super.updateViewSelected(allButton,daysButton,monthsButton,yearsButton,selectedView)
+        super.updateViewSelected(allButton, daysButton, monthsButton, yearsButton, selectedView)
     }
 
     private fun updateFastScrollerVisibility() {
         if (!this::cardAdapter.isInitialized)
             return
-       super.updateFastScrollerVisibility(selectedView,binding.scroller,cardAdapter.itemCount)
+        super.updateFastScrollerVisibility(selectedView, binding.scroller, cardAdapter.itemCount)
     }
 
     /**
@@ -280,7 +279,7 @@ class ImagesFragment : BaseZoomFragment(){
 
     private fun setupNavigation() {
         itemOperationViewModel.openItemEvent.observe(viewLifecycleOwner, EventObserver {
-            openPhoto(GalleryItem.fromNodeItem(it))
+            openPhoto(it as GalleryItem)
         })
 
         itemOperationViewModel.showNodeItemOptionsEvent.observe(viewLifecycleOwner, EventObserver {
@@ -301,7 +300,6 @@ class ImagesFragment : BaseZoomFragment(){
     private fun updateUi() = viewModel.items.value?.let {
         val newList = ArrayList(it)
         browseAdapter.submitList(newList)
-
     }
 
     private fun elevateToolbarWhenScrolling() = ListenScrollChangesHelper().addViewToListen(
@@ -453,7 +451,7 @@ class ImagesFragment : BaseZoomFragment(){
      * @param isPortrait true, on portrait mode, false otherwise.
      */
     private fun getSpanCount(isPortrait: Boolean): Int {
-        return super.getSpanCount(selectedView,isPortrait)
+        return super.getSpanCount(selectedView, isPortrait)
     }
 
     private fun handleZoomAdapterLayoutChange(zoom: Int) {
@@ -541,7 +539,7 @@ class ImagesFragment : BaseZoomFragment(){
         )?.also {
             val intent = Intent(context, FullScreenImageViewerLollipop::class.java)
 
-            intent.putExtra(INTENT_EXTRA_KEY_POSITION, nodeItem.photoIndex)
+            intent.putExtra(INTENT_EXTRA_KEY_POSITION, nodeItem.indexForViewer)
             intent.putExtra(
                 INTENT_EXTRA_KEY_ORDER_GET_CHILDREN,
                 MegaApiJava.ORDER_MODIFICATION_DESC
