@@ -4193,5 +4193,5 @@
     <!-- Title of the dialog warning the user about disable file versioning. -->
     <string name="disable_versioning_label">Disable file versioning</string>
     <!-- Warning of the dialog informing the user about disable file versioning. -->
-    <string name="disable_versioning_warning">When file versioning is disabled, the current version will be replaced with the new version once a file is updated (and your changes to the file will no longer be recorded).</string>
+    <string name="disable_versioning_warning">Our file versioning feature ensures that we keep older copies of your files around if you replace them with newer versions. If you disable File Versioning you will no longer have this protection; the old copy will be lost when you replace it.</string>
 </resources>
