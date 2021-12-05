@@ -6,19 +6,19 @@ import com.jeremyliao.liveeventbus.LiveEventBus
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.fragments.homepage.NodeItem
 import mega.privacy.android.app.fragments.homepage.TypedFilesRepository
+import mega.privacy.android.app.globalmanagement.SortOrderManagement
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.Constants.EVENT_NODES_CHANGE
 import mega.privacy.android.app.utils.TextUtil
 import nz.mega.sdk.MegaApiJava.*
 
 class VideoViewModel @ViewModelInject constructor(
-    private val repository: TypedFilesRepository
+    private val repository: TypedFilesRepository,
+    private val sortOrderManagement: SortOrderManagement
 ) : ViewModel() {
 
     private var _query = MutableLiveData<String>()
 
-    var order: Int = ORDER_DEFAULT_ASC
-        private set
     var isList = true
     var skipNextAutoScroll = false
 
@@ -34,9 +34,9 @@ class VideoViewModel @ViewModelInject constructor(
     private var pendingLoad = false
 
     val items: LiveData<List<NodeItem>> = _query.switchMap {
-        if (forceUpdate) {
+        if (forceUpdate || repository.fileNodeItems.value == null) {
             viewModelScope.launch {
-                repository.getFiles(FILE_TYPE_VIDEO, order)
+                repository.getFiles(FILE_TYPE_VIDEO, sortOrderManagement.getOrderCloud())
             }
         } else {
             repository.emitFiles()
@@ -93,9 +93,8 @@ class VideoViewModel @ViewModelInject constructor(
      * @param forceUpdate True if retrieve all nodes by calling API,
      *                    false if filter current nodes by searchQuery
      */
-    fun loadVideo(forceUpdate: Boolean = false, order: Int = this.order) {
+    fun loadVideo(forceUpdate: Boolean = false) {
         this.forceUpdate = forceUpdate
-        this.order = order
 
         if (loadInProgress) {
             pendingLoad = true

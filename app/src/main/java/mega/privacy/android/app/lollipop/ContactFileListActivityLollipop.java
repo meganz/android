@@ -190,9 +190,7 @@ public class ContactFileListActivityLollipop extends PasscodeActivity
 		MenuInflater inflater = getMenuInflater();
 		inflater.inflate(R.menu.file_explorer_action, menu);
 
-		menu.findItem(R.id.cab_menu_sort).setVisible(false);
 		menu.findItem(R.id.cab_menu_search).setVisible(false);
-		menu.findItem(R.id.cab_menu_grid_list).setVisible(false);
 		createFolderMenuItem = menu.findItem(R.id.cab_menu_create_folder);
 		startConversation = menu.findItem(R.id.cab_menu_new_chat);
 		startConversation.setVisible(false);
