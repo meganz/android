@@ -6,6 +6,12 @@ pipeline {
   // }
   environment {
     ANDROID_SDK_ROOT = '/Users/robinshi/Library/Android/sdk'
+
+    BUILD_LIB_DOWNLOAD_FOLDER = '~/mega_build_download/'
+    WEBRTC_LIB_URL = "https://mega.nz/#!1tcl3CrL!i23zkmx7ibnYy34HQdsOOFAPOqQuTo1-2iZ5qFlU7-k"
+    WEBRTC_LIB_FILE = 'WebRTC_NDKr16b_m76_p21.zip'
+    GOOGLE_MAP_API_URL = 'https://mega.nz/#!1tcl3CrL!i23zkmx7ibnYy34HQdsOOFAPOqQuTo1-2iZ5qFlU7-k'
+    GOOGLE_MAP_API_FILE = 'default_google_maps_api.zip'
   }
   options {
     // Stop the build early in case of compile or test failures
@@ -20,6 +26,61 @@ pipeline {
         sh 'git config --file=.gitmodules submodule."app/src/main/jni/megachat/sdk".branch develop'
         sh 'git submodule sync'
         sh 'git submodule update --init --recursive --remote'
+      }
+    }
+    stage('Download Dependency Lib for SDK') {
+      steps {
+        sh """
+        export PATH=/Applications/MEGAcmd.app/Contents/MacOS:$PATH
+        mkdir -p "${BUILD_LIB_DOWNLOAD_FOLDER}"
+        cd "${BUILD_LIB_DOWNLOAD_FOLDER}"
+        pwd
+        ls -lh
+
+        ## check webrtc file
+        if test -f "${BUILD_LIB_DOWNLOAD_FOLDER}/${WEBRTC_LIB_FILE}"; then
+          echo "${WEBRTC_LIB_FILE} already downloaded. Skip downloading."
+        else
+          echo "downloading webrtc"
+          mega-get ${WEBRTC_LIB_URL}
+        fi
+        if [ -d "${WEBRTC_LIB_UNZIPPED}" ]; then
+          echo "webrtc already unzipped"
+        else
+          unzip ${WEBRTC_LIB_FILE} -d ${WEBRTC_LIB_UNZIPPED}
+        fi
+
+        ## check default google api
+        if test -f "${BUILD_LIB_DOWNLOAD_FOLDER}/${GOOGLE_MAP_API_FILE}"; then
+          echo "${GOOGLE_MAP_API_FILE} already downloaded. Skip downloading."
+        else
+          echo "downloading google map api"
+          mega-get ${GOOGLE_MAP_API_URL}
+        fi
+        if [ -d "${GOOGLE_MAP_API_UNZIPPED}" ]; then
+          echo "default_google_map_api already unzipped"
+        else
+          unzip ${GOOGLE_MAP_API_FILE} -d ${GOOGLE_MAP_API_UNZIPPED}
+        fi
+
+        ls -lh
+
+        cd ${WORKSPACE}
+        pwd
+        # apply dependency patch
+        cp -fr ${BUILD_LIB_DOWNLOAD_FOLDER}/${WEBRTC_LIB_UNZIPPED}/webrtc app/src/main/jni/megachat/
+        # mkdir -p app/src
+        cp -fr ${BUILD_LIB_DOWNLOAD_FOLDER}/${GOOGLE_MAP_API_UNZIPPED} app/src
+
+        """
+      }
+    }
+    stage('Build SDK') {
+      steps {
+        sh """
+        cd ${WORKSPACE}/app/src/main/jni
+        ./build.sh all
+        """
       }
     }
     stage('Compile') {
