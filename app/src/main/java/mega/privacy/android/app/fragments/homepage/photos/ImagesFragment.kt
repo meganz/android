@@ -110,7 +110,11 @@ class ImagesFragment : BaseZoomFragment() {
     }
 
     override fun handleOnCreateOptionsMenu() {
-        handleOptionsMenuUpdate(shouldShowZoomMenuItem())
+        var hasImages = false
+        if (this::browseAdapter.isInitialized){
+             hasImages = browseAdapter.itemCount > 0
+        }
+        handleOptionsMenuUpdate(hasImages && shouldShowZoomMenuItem())
         removeSortByMenu()
     }
 
