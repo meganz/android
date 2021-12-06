@@ -36,9 +36,6 @@ allprojects {
         maven {
             url 'https://developer.huawei.com/repo/'
         }
-        flatDir {
-            dirs "$rootProject.projectDir/app/src/main/jni/ExoPlayer/"
-        }
     }
 }
 
