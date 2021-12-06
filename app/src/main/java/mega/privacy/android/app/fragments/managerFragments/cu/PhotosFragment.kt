@@ -464,7 +464,7 @@ class PhotosFragment : BaseZoomFragment(), CUGridViewAdapter.Listener,
                 // On enable CU page, don't update layout and view.
                 if (isEnableCUFragmentShown()) return@observe
                 val showScroller =
-                    it.size >= if (getCurrentZoom() < ZOOM_DEFAULT) Constants.MIN_ITEMS_SCROLLBAR_GRID else Constants.MIN_ITEMS_SCROLLBAR
+                    it?.size!! >= if (getCurrentZoom() < ZOOM_DEFAULT) Constants.MIN_ITEMS_SCROLLBAR_GRID else Constants.MIN_ITEMS_SCROLLBAR
                 binding.scroller.visibility = if (showScroller) View.VISIBLE else View.GONE
                 if (gridAdapter != null) {
                     gridAdapter!!.setNodes(it)
