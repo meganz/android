@@ -81,7 +81,7 @@ pipeline {
       steps {
         sh """
         cd ${WORKSPACE}/app/src/main/jni
-        ./build.sh all
+        /usr/local/bin/bash build.sh all
         """
       }
     }
