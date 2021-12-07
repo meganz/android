@@ -646,6 +646,10 @@ public class MegaApplication extends MultiDexApplication implements Application.
 		if (isRinging) {
 			logDebug("Is incoming call");
 			incomingCall(listAllCalls, call.getChatid(), callStatus);
+		} else {
+			clearIncomingCallNotification(call.getCallId());
+			getChatManagement().removeValues(call.getChatid());
+			stopService(new Intent(getInstance(), IncomingCallService.class));
 		}
 	};
 
