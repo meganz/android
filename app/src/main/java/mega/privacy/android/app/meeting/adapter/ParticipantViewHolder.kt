@@ -29,7 +29,6 @@ class ParticipantViewHolder(
 
     fun bind(participant: Participant) {
         binding.participantListThumbnail.setImageBitmap(participant.avatar)
-        binding.participantListName.text = participant.name
         binding.participantListName.text =
             participant.getDisplayName(binding.participantListName.context)
 

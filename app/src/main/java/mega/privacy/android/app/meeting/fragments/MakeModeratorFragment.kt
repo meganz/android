@@ -134,6 +134,7 @@ class MakeModeratorFragment : MeetingBaseFragment() {
      * Method for initialising UI elements
      */
     private fun setupView() {
+        logDebug("Update toolbar elements");
         binding.btCancel.setOnClickListener { cancel() }
         binding.btOk.setOnClickListener { makeModerators() }
 

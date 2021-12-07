@@ -104,7 +104,7 @@ class MeetingActivityViewModel @ViewModelInject constructor(
     val meetingLinkLiveData: LiveData<String> = _meetingLinkLiveData
 
     // Show snack bar
-    private val _snackBarLiveData: MutableLiveData<String> = MutableLiveData<String>()
+    private val _snackBarLiveData = MutableLiveData("")
     val snackBarLiveData: LiveData<String> = _snackBarLiveData
 
     private val audioOutputStateObserver =
@@ -516,6 +516,7 @@ class MeetingActivityViewModel @ViewModelInject constructor(
     }
 
     fun inviteToChat(context: Context, requestCode: Int, resultCode: Int, intent: Intent?) {
+        logDebug("******************* inviteToChat")
         logDebug("Result Code: $resultCode")
         if (intent == null) {
             LogUtil.logWarning("Intent is null")
@@ -544,6 +545,13 @@ class MeetingActivityViewModel @ViewModelInject constructor(
      */
     fun showSnackBar(content: String) {
         _snackBarLiveData.value = content
+    }
+
+    /**
+     * Hide snack bar
+     */
+    fun hideSnackBar(){
+        _snackBarLiveData.value = ""
     }
 
     /**

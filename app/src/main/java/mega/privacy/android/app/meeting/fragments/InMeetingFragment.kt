@@ -923,6 +923,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
     }
 
     private fun initToolbar() {
+        logDebug("Update toolbar elements");
         val root = meetingActivity.binding.root
         toolbar = meetingActivity.binding.toolbar
         toolbarTitle = meetingActivity.binding.titleToolbar
@@ -1097,7 +1098,8 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
         }
 
         sharedModel.snackBarLiveData.observe(viewLifecycleOwner) {
-            showSnackbar(SNACKBAR_TYPE, it, MEGACHAT_INVALID_HANDLE)
+            if (!it.isEmpty()) {
+                showSnackbar(SNACKBAR_TYPE, it, MEGACHAT_INVALID_HANDLE)
             if (bInviteSent) {
                 bInviteSent = false
                 val count = inMeetingViewModel.participants.value
@@ -1121,6 +1123,9 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
                 }
 
             }
+            }
+
+
         }
 
         sharedModel.cameraGranted.observe(viewLifecycleOwner) {
@@ -2819,6 +2824,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
     override fun onDestroy() {
         super.onDestroy()
 
+        sharedModel.hideSnackBar()
         bannerAnotherCallLayout.isVisible = false
         bannerParticipant?.isVisible = false
         bannerInfo?.isVisible = false
