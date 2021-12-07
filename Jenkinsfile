@@ -80,6 +80,7 @@ pipeline {
     stage('Build SDK') {
       steps {
         sh """
+        export PATH=/usr/local/opt/gnu-sed/libexec/gnubin:/usr/local/opt/gnu-tar/libexec/gnubin:/usr/local/opt/openjdk@11/bin:/usr/local/bin:$PATH
         cd ${WORKSPACE}/app/src/main/jni
         /usr/local/bin/bash build.sh all
         """
