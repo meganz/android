@@ -47,10 +47,9 @@ pipeline {
         else
           echo "downloading webrtc"
           mega-get ${WEBRTC_LIB_URL}
-        fi
-        if [ -d "${WEBRTC_LIB_UNZIPPED}" ]; then
-          echo "webrtc already unzipped"
-        else
+
+          echo "unzipping webrtc"
+          rm -fr ${WEBRTC_LIB_UNZIPPED}
           unzip ${WEBRTC_LIB_FILE} -d ${WEBRTC_LIB_UNZIPPED}
         fi
 
@@ -60,10 +59,9 @@ pipeline {
         else
           echo "downloading google map api"
           mega-get ${GOOGLE_MAP_API_URL}
-        fi
-        if [ -d "${GOOGLE_MAP_API_UNZIPPED}" ]; then
-          echo "default_google_map_api already unzipped"
-        else
+
+          echo "unzipping google map api"
+          rm -fr ${GOOGLE_MAP_API_UNZIPPED}
           unzip ${GOOGLE_MAP_API_FILE} -d ${GOOGLE_MAP_API_UNZIPPED}
         fi
 
