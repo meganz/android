@@ -751,7 +751,7 @@ class PhotosFragment : BaseZoomFragment(), CUGridViewAdapter.Listener,
     }
 
     fun isInPhotosPage(): Boolean {
-        return activity as ManagerActivityLollipop? != null && (activity as ManagerActivityLollipop?)!!.drawerItem == ManagerActivityLollipop.DrawerItem.PHOTOS
+        return activity as ManagerActivityLollipop? != null && (activity as ManagerActivityLollipop?)!!.isInPhotosPage
     }
 
     private fun handlePhotosMenuUpdate(isShowMenu: Boolean) {

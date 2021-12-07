@@ -2475,7 +2475,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 								firstLogin = false;
 							} else {
 								firstLogin = true;
-								if (app.getStorageState() != STORAGE_STATE_PAYWALL) {
+								if (app.getStorageState() != STORAGE_STATE_PAYWALL && isInPhotosPage()) {
 									drawerItem = DrawerItem.PHOTOS;
 								}
 							}
@@ -11840,6 +11840,15 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
     public boolean isInImagesPage() {
         return drawerItem == DrawerItem.HOMEPAGE && mHomepageScreen == HomepageScreen.IMAGES;
     }
+
+	/**
+	 * Checks if the current screen is Photos.
+	 *
+	 * @return True if the current screen is Photos, false otherwise.
+	 */
+	public boolean isInPhotosPage() {
+		return drawerItem == DrawerItem.PHOTOS;
+	}
 
     public void hideTransferWidget() {
     	if (transfersWidget != null) {

@@ -65,7 +65,6 @@ abstract class GalleryViewModel constructor(
     private val mSelectedNodes = LongSparseArray<MegaNode>(5)
     private var mSelecting = false
     private var mRealNodeCount = 0
-    private var enableCUShown = false
 
     private val thumbnailHandle = HashSet<Long>()
     private val previewHandle = HashSet<Long>()
