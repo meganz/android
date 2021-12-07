@@ -71,7 +71,10 @@ pipeline {
         pwd
         # apply dependency patch
         rm -fr app/src/main/jni/megachat/webrtc
-        cp -fr ${BUILD_LIB_DOWNLOAD_FOLDER}/${WEBRTC_LIB_UNZIPPED}/webrtc app/src/main/jni/megachat/
+
+        ## ATTENTION: sometimes the downloaded webrtc zip has a enclosing folder. like below.
+        ## so we might need to adjust below path when there is a new webrtc zip
+        cp -fr ${BUILD_LIB_DOWNLOAD_FOLDER}/${WEBRTC_LIB_UNZIPPED}/webrtc_branch-heads4405/webrtc app/src/main/jni/megachat/
         # mkdir -p app/src
         rm -fr app/src/debug
         rm -fr app/src/release
