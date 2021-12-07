@@ -1,25 +1,20 @@
 package mega.privacy.android.app.repo
 
-import android.util.Pair
 import mega.privacy.android.app.DatabaseHandler
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.MegaOffline
 import mega.privacy.android.app.MimeTypeThumbnail
 import mega.privacy.android.app.di.MegaApi
-import mega.privacy.android.app.utils.Constants.*
 import mega.privacy.android.app.utils.FileUtil
 import mega.privacy.android.app.utils.LogUtil.logError
 import mega.privacy.android.app.utils.OfflineUtils.getOfflineFile
 import mega.privacy.android.app.utils.SortUtil.*
-import mega.privacy.android.app.utils.Util
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava.*
 import nz.mega.sdk.MegaNode
 import nz.mega.sdk.MegaNodeList
 import java.io.File
-import java.time.YearMonth
 import java.util.*
-import java.util.function.Function
 import javax.inject.Inject
 import kotlin.collections.ArrayList
 
@@ -36,7 +31,7 @@ class MegaNodeRepo @Inject constructor(
      * @return List of nodes in that node.
      */
     private fun getChildrenByAMegaNode(node: MegaNode, orderBy: Int): List<MegaNode> {
-        return megaApi.getChildren(node, orderBy);
+        return megaApi.getChildren(node, orderBy)
     }
 
     /**
@@ -50,20 +45,20 @@ class MegaNodeRepo @Inject constructor(
     fun getMediaAsPairsByAMegaNode(
         node: MegaNode, orderBy: Int
     ): List<Pair<Int, MegaNode>> {
-        val children = getChildrenByAMegaNode(node,orderBy)
+        val children = getChildrenByAMegaNode(node, orderBy)
         val nodes = ArrayList<Pair<Int, MegaNode>>()
 
-        for ((index, node) in children.withIndex()) {
-            
-            if (node.isFolder) {
+        for ((index, n) in children.withIndex()) {
+
+            if (n.isFolder) {
                 continue
             }
 
-            val mime = MimeTypeThumbnail.typeForName(node.name)
+            val mime = MimeTypeThumbnail.typeForName(n.name)
             if (mime.isImage || mime.isVideoReproducible) {
                 // when not in search mode, index used by viewer is index in all siblings,
                 // including non image/video nodes
-                nodes.add(Pair.create(index, node))
+                nodes.add(Pair(index, n))
             }
         }
 
@@ -141,7 +136,7 @@ class MegaNodeRepo @Inject constructor(
             if (mime.isImage || mime.isVideoReproducible) {
                 // when not in search mode, index used by viewer is index in all siblings,
                 // including non image/video nodes
-                nodes.add(Pair.create(index, node))
+                nodes.add(Pair(index, node))
             }
         }
 

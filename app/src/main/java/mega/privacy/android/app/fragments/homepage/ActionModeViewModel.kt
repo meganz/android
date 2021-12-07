@@ -42,7 +42,10 @@ class ActionModeViewModel @ViewModelInject constructor() : ViewModel() {
 
         _animNodeIndices.value = hashSetOf(nodeItem.index)
 
-        if (nodeItem.selected) selectedNodeList.add(nodeItem) else selectedNodeList.remove(nodeItem)
+        if (nodeItem.selected)
+            selectedNodeList.add(nodeItem)
+        else
+            selectedNodeList.remove(nodeItem)
 
         _selectedNodes.value = selectedNodeList
     }

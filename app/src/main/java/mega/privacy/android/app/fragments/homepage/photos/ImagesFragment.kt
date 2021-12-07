@@ -1,8 +1,5 @@
 package mega.privacy.android.app.fragments.homepage.photos
 
-import android.animation.Animator
-import android.animation.AnimatorInflater
-import android.animation.AnimatorSet
 import android.annotation.SuppressLint
 import android.content.Intent
 import android.content.res.Configuration
@@ -12,14 +9,11 @@ import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.annotation.NonNull
-import androidx.appcompat.app.AppCompatActivity
-import androidx.appcompat.view.ActionMode
 import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.view.isVisible
 import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.facebook.drawee.view.SimpleDraweeView
 import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.R
 import mega.privacy.android.app.components.ListenScrollChangesHelper
@@ -30,14 +24,19 @@ import mega.privacy.android.app.databinding.FragmentImagesBinding
 import mega.privacy.android.app.fragments.homepage.*
 import mega.privacy.android.app.fragments.managerFragments.cu.*
 import mega.privacy.android.app.fragments.managerFragments.cu.PhotosFragment.*
+import mega.privacy.android.app.gallery.adapter.GalleryAdapter
 import mega.privacy.android.app.gallery.adapter.GalleryCardAdapter
 import mega.privacy.android.app.gallery.data.GalleryCard
 import mega.privacy.android.app.gallery.data.GalleryItem
+import mega.privacy.android.app.gallery.data.GalleryItemSizeConfig
 import mega.privacy.android.app.lollipop.FullScreenImageViewerLollipop
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop
 import mega.privacy.android.app.modalbottomsheet.NodeOptionsBottomSheetDialogFragment
 import mega.privacy.android.app.utils.*
 import mega.privacy.android.app.utils.Constants.*
+import mega.privacy.android.app.utils.ZoomUtil.DAYS_INDEX
+import mega.privacy.android.app.utils.ZoomUtil.MONTHS_INDEX
+import mega.privacy.android.app.utils.ZoomUtil.YEARS_INDEX
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaChatApiJava
 import java.util.*
@@ -46,11 +45,9 @@ import java.util.*
 class ImagesFragment : BaseZoomFragment() {
 
     private val viewModel by viewModels<ImagesViewModel>()
-    private val actionModeViewModel by viewModels<ActionModeViewModel>()
-    private val itemOperationViewModel by viewModels<ItemOperationViewModel>()
 
-    private lateinit var listView: RecyclerView
-    private lateinit var browseAdapter: PhotosBrowseAdapter
+    override lateinit var listView: RecyclerView
+    private lateinit var browseAdapter: GalleryAdapter
     private lateinit var gridLayoutManager: GridLayoutManager
     private lateinit var cardAdapter: GalleryCardAdapter
 
@@ -61,9 +58,6 @@ class ImagesFragment : BaseZoomFragment() {
     private lateinit var monthsButton: TextView
     private lateinit var daysButton: TextView
     private lateinit var allButton: TextView
-
-    private var actionMode: ActionMode? = null
-    private lateinit var actionModeCallback: ActionModeCallback
 
     private lateinit var itemDecoration: SimpleDividerItemDecoration
 
@@ -112,8 +106,8 @@ class ImagesFragment : BaseZoomFragment() {
 
     override fun handleOnCreateOptionsMenu() {
         var hasImages = false
-        if (this::browseAdapter.isInitialized){
-             hasImages = browseAdapter.itemCount > 0
+        if (this::browseAdapter.isInitialized) {
+            hasImages = browseAdapter.itemCount > 0
         }
         handleOptionsMenuUpdate(hasImages && shouldShowZoomMenuItem())
         removeSortByMenu()
@@ -302,9 +296,11 @@ class ImagesFragment : BaseZoomFragment() {
     /**
      * Only refresh the list items of uiDirty = true
      */
-    private fun updateUi() = viewModel.items.value?.let {
-        val newList = ArrayList(it)
-        browseAdapter.submitList(newList)
+    override fun updateUiWhenAnimationEnd() {
+        viewModel.items.value?.let {
+            val newList = ArrayList(it)
+            browseAdapter.submitList(newList)
+        }
     }
 
     private fun elevateToolbarWhenScrolling() = ListenScrollChangesHelper().addViewToListen(
@@ -336,120 +332,6 @@ class ImagesFragment : BaseZoomFragment() {
         listView.setOnTouchListener(scaleGestureHandler)
     }
 
-    private fun setupActionMode() {
-        actionModeCallback =
-            ActionModeCallback(activity as ManagerActivityLollipop, actionModeViewModel, megaApi)
-
-        observeItemLongClick()
-        observeSelectedItems()
-        observeAnimatedItems()
-        observeActionModeDestroy()
-    }
-
-    private fun observeItemLongClick() =
-        actionModeViewModel.longClick.observe(viewLifecycleOwner, EventObserver {
-            if (zoomViewModel.getCurrentZoom() == ZoomUtil.ZOOM_DEFAULT || zoomViewModel.getCurrentZoom() == ZoomUtil.ZOOM_OUT_1X) {
-                doIfOnline { actionModeViewModel.enterActionMode(it) }
-                animateBottomView()
-            }
-        })
-
-    private fun observeSelectedItems() =
-        actionModeViewModel.selectedNodes.observe(viewLifecycleOwner, {
-            if (it.isEmpty()) {
-                actionMode?.apply {
-                    finish()
-                }
-            } else {
-                actionModeCallback.nodeCount = viewModel.getRealPhotoCount()
-
-                if (actionMode == null) {
-                    callManager { manager ->
-                        manager.hideKeyboardSearch()
-                    }
-
-                    actionMode = (activity as AppCompatActivity).startSupportActionMode(
-                        actionModeCallback
-                    )
-                } else {
-                    actionMode?.invalidate()  // Update the action items based on the selected nodes
-                }
-
-                actionMode?.title = it.size.toString()
-            }
-        })
-
-    private fun observeAnimatedItems() {
-        var animatorSet: AnimatorSet? = null
-
-        actionModeViewModel.animNodeIndices.observe(viewLifecycleOwner, {
-            animatorSet?.run {
-                // End the started animation if any, or the view may show messy as its property
-                // would be wrongly changed by multiple animations running at the same time
-                // via contiguous quick clicks on the item
-                if (isStarted) {
-                    end()
-                }
-            }
-
-            // Must create a new AnimatorSet, or it would keep all previous
-            // animation and play them together
-            animatorSet = AnimatorSet()
-            val animatorList = mutableListOf<Animator>()
-
-            animatorSet?.addListener(object : Animator.AnimatorListener {
-                override fun onAnimationRepeat(animation: Animator?) {
-                }
-
-                override fun onAnimationEnd(animation: Animator?) {
-                    updateUi()
-                }
-
-                override fun onAnimationCancel(animation: Animator?) {
-                }
-
-                override fun onAnimationStart(animation: Animator?) {
-                }
-            })
-
-            it.forEach { pos ->
-                listView.findViewHolderForAdapterPosition(pos)?.let { viewHolder ->
-                    val itemView = viewHolder.itemView
-                    // Draw the green outline for the thumbnail view at once
-                    val thumbnailView =
-                        itemView.findViewById<SimpleDraweeView>(R.id.thumbnail)
-                    thumbnailView.hierarchy.roundingParams = getRoundingParams(context)
-
-                    val imageView = itemView.findViewById<ImageView>(
-                        R.id.icon_selected
-                    )
-
-                    imageView?.run {
-                        setImageResource(R.drawable.ic_select_folder)
-                        visibility = View.VISIBLE
-
-                        val animator =
-                            AnimatorInflater.loadAnimator(context, R.animator.icon_select)
-                        animator.setTarget(this)
-                        animatorList.add(animator)
-                    }
-                }
-            }
-
-            animatorSet?.playTogether(animatorList)
-            animatorSet?.start()
-        })
-    }
-
-    private fun observeActionModeDestroy() =
-        actionModeViewModel.actionModeDestroy.observe(viewLifecycleOwner, EventObserver {
-            actionMode = null
-            callManager { manager ->
-                manager.showKeyboardForSearch()
-            }
-            animateBottomView()
-        })
-
     /**
      * Get how many items will be shown per row, depends on screen direction and zoom level if all view is selected.
      *
@@ -480,8 +362,23 @@ class ImagesFragment : BaseZoomFragment() {
         listView.layoutManager = gridLayoutManager
 
         if (selectedView == ALL_VIEW) {
+            val imageMargin = ZoomUtil.getMargin(context, currentZoom)
+            ZoomUtil.setMargin(context, params, currentZoom)
+            val gridWidth = ZoomUtil.getItemWidth(context, outMetrics, currentZoom, spanCount)
+            val icSelectedWidth = ZoomUtil.getSelectedFrameWidth(context, currentZoom)
+            val icSelectedMargin = ZoomUtil.getSelectedFrameMargin(context, currentZoom)
+            val itemSizeConfig = GalleryItemSizeConfig(
+                currentZoom, gridWidth,
+                icSelectedWidth, imageMargin,
+                resources.getDimensionPixelSize(R.dimen.cu_fragment_selected_padding),
+                icSelectedMargin,
+                resources.getDimensionPixelSize(
+                    R.dimen.cu_fragment_selected_round_corner_radius
+                )
+            )
+
             browseAdapter =
-                PhotosBrowseAdapter(actionModeViewModel, itemOperationViewModel, currentZoom)
+                GalleryAdapter(actionModeViewModel, itemOperationViewModel, itemSizeConfig)
 
             ZoomUtil.setMargin(context, params, currentZoom)
 
@@ -584,9 +481,9 @@ class ImagesFragment : BaseZoomFragment() {
      */
     private fun showCards(dateCards: List<List<GalleryCard>?>?) {
         val index = when (selectedView) {
-            DAYS_VIEW -> 0
-            MONTHS_VIEW -> 1
-            YEARS_VIEW -> 2
+            DAYS_VIEW -> DAYS_INDEX
+            MONTHS_VIEW -> MONTHS_INDEX
+            YEARS_VIEW -> YEARS_INDEX
             else -> -1
         }
 
@@ -600,7 +497,7 @@ class ImagesFragment : BaseZoomFragment() {
     /**
      * Shows or hides the bottom view and animates the transition.
      */
-    fun animateBottomView() {
+    override fun animateBottomView() {
         val deltaY =
             viewTypePanel.height.toFloat() + resources.getDimensionPixelSize(R.dimen.cu_view_type_button_vertical_margin)
 
@@ -620,6 +517,8 @@ class ImagesFragment : BaseZoomFragment() {
                 .start()
         }
     }
+
+    override fun getNodeCount() = viewModel.getRealPhotoCount()
 
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)

@@ -9,8 +9,8 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.viewbinding.ViewBinding
 import mega.privacy.android.app.components.dragger.DragThumbnailGetter
 import mega.privacy.android.app.components.scrollBar.SectionTitleProvider
-import mega.privacy.android.app.databinding.ItemPhotoBrowseBinding
-import mega.privacy.android.app.databinding.ItemPhotosTitleBinding
+import mega.privacy.android.app.databinding.ItemGalleryImageBinding
+import mega.privacy.android.app.databinding.ItemGalleryTitleBinding
 import mega.privacy.android.app.fragments.homepage.ActionModeViewModel
 import mega.privacy.android.app.fragments.homepage.ItemOperationViewModel
 import mega.privacy.android.app.gallery.data.GalleryItem
@@ -28,7 +28,7 @@ class PhotosBrowseAdapter constructor(
         currentList.indexOfFirst { it.node?.handle == handle }
 
     override fun getThumbnail(viewHolder: RecyclerView.ViewHolder): View? {
-        if (viewHolder is PhotoViewHolder && viewHolder.binding is ItemPhotoBrowseBinding) {
+        if (viewHolder is PhotoViewHolder && viewHolder.binding is ItemGalleryImageBinding) {
             return viewHolder.binding.thumbnail
         }
 
@@ -44,13 +44,13 @@ class PhotosBrowseAdapter constructor(
 
         val binding = when (viewType) {
             GalleryItem.TYPE_HEADER ->
-                ItemPhotosTitleBinding.inflate(
+                ItemGalleryTitleBinding.inflate(
                     inflater,
                     parent,
                     false
                 )
             else ->  // TYPE_PHOTO
-                ItemPhotoBrowseBinding.inflate(
+                ItemGalleryImageBinding.inflate(
                     inflater,
                     parent,
                     false
@@ -61,7 +61,7 @@ class PhotosBrowseAdapter constructor(
             setItemLayoutParams(binding)
             // FastScroller would affect the normal process of RecyclerView that makes the "selected"
             // icon appear before binding the item. Therefore, hide the icon up front
-            (binding as ItemPhotoBrowseBinding).iconSelected.visibility = View.GONE
+            (binding as ItemGalleryImageBinding).iconSelected.visibility = View.GONE
         }
 
         return PhotoViewHolder(binding, zoom)

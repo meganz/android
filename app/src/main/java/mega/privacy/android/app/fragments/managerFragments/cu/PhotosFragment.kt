@@ -9,25 +9,29 @@ import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.view.*
+import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.RelativeLayout
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
-import androidx.appcompat.view.ActionMode
 import androidx.core.text.HtmlCompat
 import androidx.core.view.isVisible
 import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.GridLayoutManager
-import androidx.recyclerview.widget.GridLayoutManager.SpanSizeLookup
 import androidx.recyclerview.widget.RecyclerView
+import ash.TL
 import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
 import mega.privacy.android.app.components.ListenScrollChangesHelper
+import mega.privacy.android.app.components.dragger.DragThumbnailGetter
+import mega.privacy.android.app.components.dragger.DragToExitSupport
 import mega.privacy.android.app.components.dragger.DragToExitSupport.Companion.observeDragSupportEvents
 import mega.privacy.android.app.components.dragger.DragToExitSupport.Companion.putThumbnailLocation
 import mega.privacy.android.app.databinding.FragmentPhotosBinding
+import mega.privacy.android.app.fragments.homepage.EventObserver
 import mega.privacy.android.app.fragments.homepage.photos.ScaleGestureHandler
+import mega.privacy.android.app.gallery.adapter.GalleryAdapter
 import mega.privacy.android.app.gallery.adapter.GalleryCardAdapter
 import mega.privacy.android.app.gallery.data.GalleryCard
 import mega.privacy.android.app.gallery.data.GalleryItem
@@ -40,7 +44,6 @@ import mega.privacy.android.app.utils.ColorUtils.DARK_IMAGE_ALPHA
 import mega.privacy.android.app.utils.ColorUtils.setImageViewAlphaIfDark
 import mega.privacy.android.app.utils.ZoomUtil.PHOTO_ZOOM_LEVEL
 import mega.privacy.android.app.utils.ZoomUtil.ZOOM_DEFAULT
-import mega.privacy.android.app.utils.ZoomUtil.ZOOM_OUT_1X
 import mega.privacy.android.app.utils.ZoomUtil.getItemWidth
 import mega.privacy.android.app.utils.ZoomUtil.getMargin
 import mega.privacy.android.app.utils.ZoomUtil.getSelectedFrameMargin
@@ -49,21 +52,21 @@ import mega.privacy.android.app.utils.ZoomUtil.setMargin
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaChatApiJava
 import nz.mega.sdk.MegaNode
+import java.util.ArrayList
 import javax.inject.Inject
 
 @AndroidEntryPoint
-class PhotosFragment : BaseZoomFragment(), CUGridViewAdapter.Listener,
-    GalleryCardAdapter.Listener {
+class PhotosFragment : BaseZoomFragment(), GalleryCardAdapter.Listener {
 
     @Inject
     lateinit var sortOrderManagement: SortOrderManagement
 
+    override lateinit var listView: RecyclerView
+
     private lateinit var mManagerActivity: ManagerActivityLollipop
     private lateinit var binding: FragmentPhotosBinding
-    private var gridAdapter: CUGridViewAdapter? = null
+    private lateinit var gridAdapter: GalleryAdapter
     private var cardAdapter: GalleryCardAdapter? = null
-
-    private var mActionMode: ActionMode? = null
 
     private var viewTypesLayout: LinearLayout? = null
     private var yearsButton: TextView? = null
@@ -73,14 +76,11 @@ class PhotosFragment : BaseZoomFragment(), CUGridViewAdapter.Listener,
 
     private val viewModel by viewModels<CuViewModel>()
 
-    private var layoutManager: GridLayoutManager? = null
+    private lateinit var layoutManager: GridLayoutManager
 
     private lateinit var scaleGestureHandler: ScaleGestureHandler
 
     private var selectedView = ALL_VIEW
-
-    fun getItemCount() = if (gridAdapter == null) 0 else gridAdapter!!.itemCount
-
 
     fun reloadNodes() {
         viewModel.loadNodes()
@@ -88,9 +88,9 @@ class PhotosFragment : BaseZoomFragment(), CUGridViewAdapter.Listener,
     }
 
     fun checkScroll() {
-        if (!this::binding.isInitialized) return
+        if (!this::binding.isInitialized || !this::listView.isInitialized) return
 
-        val isScrolled = binding.cuList.canScrollVertically(Constants.SCROLLING_UP_DIRECTION)
+        val isScrolled = listView.canScrollVertically(Constants.SCROLLING_UP_DIRECTION)
         mManagerActivity.changeAppBarElevation(binding.uploadProgress.isVisible || viewModel.isSelecting() || isScrolled)
     }
 
@@ -263,18 +263,19 @@ class PhotosFragment : BaseZoomFragment(), CUGridViewAdapter.Listener,
             handlePhotosMenuUpdate(false)
             return
         }
-        viewModel.resetOpenedNode()
+
         mManagerActivity.updateCUViewTypes(View.VISIBLE)
-        setupRecyclerView()
-        setupViewTypes()
-        setupOtherViews()
-        observeLiveData()
         val currentZoom = PHOTO_ZOOM_LEVEL
         zoomViewModel.setCurrentZoom(currentZoom)
         zoomViewModel.setZoom(currentZoom)
         viewModel.setZoom(currentZoom)
         viewModel.getCards()
         viewModel.getCUNodes()
+        setupViewTypes()
+        setupOtherViews()
+        setupRecyclerView(currentZoom)
+        observeLiveData()
+        setupActionMode()
     }
 
     fun setViewTypes(
@@ -295,28 +296,28 @@ class PhotosFragment : BaseZoomFragment(), CUGridViewAdapter.Listener,
 
     private fun setupViewTypes() {
         if (allButton != null) {
-            allButton!!.setOnClickListener { _ ->
+            allButton!!.setOnClickListener {
                 newViewClicked(
                     ALL_VIEW
                 )
             }
         }
         if (daysButton != null) {
-            daysButton!!.setOnClickListener { _ ->
+            daysButton!!.setOnClickListener {
                 newViewClicked(
                     DAYS_VIEW
                 )
             }
         }
         if (monthsButton != null) {
-            monthsButton!!.setOnClickListener { _ ->
+            monthsButton!!.setOnClickListener {
                 newViewClicked(
                     MONTHS_VIEW
                 )
             }
         }
         if (yearsButton != null) {
-            yearsButton!!.setOnClickListener { _ ->
+            yearsButton!!.setOnClickListener {
                 newViewClicked(
                     YEARS_VIEW
                 )
@@ -333,9 +334,10 @@ class PhotosFragment : BaseZoomFragment(), CUGridViewAdapter.Listener,
     }
 
     @SuppressLint("ClickableViewAccessibility")
-    private fun setupRecyclerView() {
-        binding.cuList.setHasFixedSize(true)
-        binding.cuList.addOnScrollListener(object : RecyclerView.OnScrollListener() {
+    private fun setupRecyclerView(currentZoom: Int) {
+        listView = binding.cuList
+        listView.setHasFixedSize(true)
+        listView.addOnScrollListener(object : RecyclerView.OnScrollListener() {
 
             override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
                 super.onScrolled(recyclerView, dx, dy)
@@ -343,31 +345,31 @@ class PhotosFragment : BaseZoomFragment(), CUGridViewAdapter.Listener,
             }
         })
         scaleGestureHandler = ScaleGestureHandler(context, this)
-        binding.cuList.setOnTouchListener(scaleGestureHandler)
-        setGridView()
+        listView.setOnTouchListener(scaleGestureHandler)
+        setGridView(currentZoom)
     }
 
-    private fun setGridView() {
+    private fun setGridView(currentZoom: Int) {
         viewModel.clearSelection()
         val isPortrait = resources.configuration.orientation == Configuration.ORIENTATION_PORTRAIT
         val spanCount = getSpanCount(selectedView, isPortrait)
         layoutManager = GridLayoutManager(context, spanCount)
-        binding.cuList.layoutManager = layoutManager
-        binding.cuList.setPadding(
+        listView.layoutManager = layoutManager
+        listView.setPadding(
             0,
             0,
             0,
             resources.getDimensionPixelSize(R.dimen.cu_margin_bottom)
         )
-        val params = binding.cuList.layoutParams as RelativeLayout.LayoutParams
+        val params = listView.layoutParams as RelativeLayout.LayoutParams
         if (selectedView == ALL_VIEW) {
-            val imageMargin = getMargin(context, getCurrentZoom())
-            setMargin(context, params, getCurrentZoom())
-            val gridWidth = getItemWidth(context, outMetrics, getCurrentZoom(), spanCount)
-            val icSelectedWidth = getSelectedFrameWidth(context, getCurrentZoom())
-            val icSelectedMargin = getSelectedFrameMargin(context, getCurrentZoom())
+            val imageMargin = getMargin(context, currentZoom)
+            setMargin(context, params, currentZoom)
+            val gridWidth = getItemWidth(context, outMetrics, currentZoom, spanCount)
+            val icSelectedWidth = getSelectedFrameWidth(context, currentZoom)
+            val icSelectedMargin = getSelectedFrameMargin(context, currentZoom)
             val itemSizeConfig = GalleryItemSizeConfig(
-                getCurrentZoom(), gridWidth,
+                currentZoom, gridWidth,
                 icSelectedWidth, imageMargin,
                 resources.getDimensionPixelSize(R.dimen.cu_fragment_selected_padding),
                 icSelectedMargin,
@@ -375,18 +377,21 @@ class PhotosFragment : BaseZoomFragment(), CUGridViewAdapter.Listener,
                     R.dimen.cu_fragment_selected_round_corner_radius
                 )
             )
-            if (gridAdapter == null) {
-                gridAdapter = CUGridViewAdapter(this, spanCount, itemSizeConfig)
-            } else {
-                gridAdapter!!.setSpanCount(spanCount)
-                gridAdapter!!.setCuItemSizeConfig(itemSizeConfig)
+
+            gridAdapter = GalleryAdapter(
+                actionModeViewModel,
+                itemOperationViewModel,
+                itemSizeConfig
+            )
+
+            layoutManager.apply {
+                spanSizeLookup = gridAdapter.getSpanSizeLookup(spanCount)
+                val itemDimen = getItemWidth(context, outMetrics, currentZoom, spanCount)
+                gridAdapter.setItemDimen(itemDimen)
             }
-            layoutManager!!.spanSizeLookup = object : SpanSizeLookup() {
-                override fun getSpanSize(position: Int): Int {
-                    return gridAdapter!!.getSpanSize(position)
-                }
-            }
-            binding.cuList.adapter = gridAdapter
+
+            gridAdapter.submitList(viewModel.getCUNodes())
+            listView.adapter = gridAdapter
         } else {
             val cardMargin =
                 resources.getDimensionPixelSize(if (isPortrait) R.dimen.card_margin_portrait else R.dimen.card_margin_landscape)
@@ -394,12 +399,12 @@ class PhotosFragment : BaseZoomFragment(), CUGridViewAdapter.Listener,
                 (outMetrics.widthPixels - cardMargin * spanCount * 2 - cardMargin * 2) / spanCount
             cardAdapter = GalleryCardAdapter(selectedView, cardWidth, cardMargin, this)
             cardAdapter!!.setHasStableIds(true)
-            binding.cuList.adapter = cardAdapter
+            listView.adapter = cardAdapter
             params.rightMargin = cardMargin
             params.leftMargin = params.rightMargin
         }
-        binding.cuList.layoutParams = params
-        binding.scroller.setRecyclerView(binding.cuList)
+        listView.layoutParams = params
+        binding.scroller.setRecyclerView(listView)
     }
 
     private fun setupOtherViews() {
@@ -425,23 +430,24 @@ class PhotosFragment : BaseZoomFragment(), CUGridViewAdapter.Listener,
             return
         }
         this.selectedView = selectedView
-        setGridView()
+        setGridView(getCurrentZoom())
+
         when (selectedView) {
             DAYS_VIEW -> {
                 showDayCards(viewModel.getDayCards())
-                binding.cuList.setOnTouchListener(null)
+                listView.setOnTouchListener(null)
             }
             MONTHS_VIEW -> {
                 showMonthCards(viewModel.getMonthCards())
-                binding.cuList.setOnTouchListener(null)
+                listView.setOnTouchListener(null)
             }
             YEARS_VIEW -> {
                 showYearCards(viewModel.getYearCards())
-                binding.cuList.setOnTouchListener(null)
+                listView.setOnTouchListener(null)
             }
             else -> {
-                gridAdapter!!.setNodes(viewModel.getCUNodes()!!)
-                binding.cuList.setOnTouchListener(scaleGestureHandler)
+                gridAdapter.submitList(viewModel.getCUNodes())
+                listView.setOnTouchListener(scaleGestureHandler)
             }
         }
         handleOptionsMenuUpdate(shouldShowFullInfoAndOptions())
@@ -464,54 +470,30 @@ class PhotosFragment : BaseZoomFragment(), CUGridViewAdapter.Listener,
             viewLifecycleOwner, {
                 // On enable CU page, don't update layout and view.
                 if (isEnableCUFragmentShown()) return@observe
+
+                actionModeViewModel.setNodesData(it.filter { nodeItem -> nodeItem.type == GalleryItem.TYPE_IMAGE || nodeItem.type == GalleryItem.TYPE_VIDEO })
                 val showScroller =
                     it?.size!! >= if (getCurrentZoom() < ZOOM_DEFAULT) Constants.MIN_ITEMS_SCROLLBAR_GRID else Constants.MIN_ITEMS_SCROLLBAR
                 binding.scroller.visibility = if (showScroller) View.VISIBLE else View.GONE
-                if (gridAdapter != null) {
-                    gridAdapter!!.setNodes(it)
+                if (this::gridAdapter.isInitialized) {
+                    gridAdapter.submitList(it)
                 }
                 updateEnableCUButtons(viewModel.isCUEnabled())
                 handlePhotosMenuUpdate(isShowMenu())
                 binding.emptyHint.visibility = if (it.isEmpty()) View.VISIBLE else View.GONE
-                binding.cuList.visibility = if (it.isEmpty()) View.GONE else View.VISIBLE
+                listView.visibility = if (it.isEmpty()) View.GONE else View.VISIBLE
                 binding.scroller.visibility = if (it.isEmpty()) View.GONE else View.VISIBLE
                 mManagerActivity.updateCUViewTypes(if (it.isEmpty()) View.GONE else View.VISIBLE)
             })
 
-        viewModel.nodeToOpen().observe(viewLifecycleOwner, { openNode(it.first, it.second) })
-
-        viewModel.nodeToAnimate().observe(
-            viewLifecycleOwner, {
-                if (gridAdapter == null || it.first < 0 || it.first >= gridAdapter!!.itemCount) {
-                    return@observe
-                }
-
-                gridAdapter!!.showSelectionAnimation(
-                    it.first, it.second,
-                    binding.cuList.findViewHolderForLayoutPosition(it.first)
-                )
-            })
+        itemOperationViewModel.openItemEvent.observe(viewLifecycleOwner, EventObserver {
+            openNode(it.index, it as GalleryItem)
+        })
 
         viewModel.actionBarTitle().observe(viewLifecycleOwner, { title: String? ->
             val actionBar =
                 (context as AppCompatActivity).supportActionBar
-            actionBar?.setTitle(title)
-        })
-
-        viewModel.actionMode().observe(viewLifecycleOwner, {
-            if (it) {
-                if (mActionMode == null) {
-                    mActionMode = (context as AppCompatActivity).startSupportActionMode(
-                        CuActionModeCallback(context, this, viewModel, megaApi)
-                    )
-                }
-                mActionMode!!.title = viewModel.getSelectedNodesCount().toString()
-                mActionMode!!.invalidate()
-            } else if (mActionMode != null) {
-                mActionMode!!.finish()
-                mActionMode = null
-            }
-            animateUI(it)
+            actionBar?.title = title
         })
 
         viewModel.camSyncEnabled().observe(
@@ -521,7 +503,7 @@ class PhotosFragment : BaseZoomFragment(), CUGridViewAdapter.Listener,
                 )
             })
 
-        observeDragSupportEvents(viewLifecycleOwner, binding.cuList, Constants.VIEWER_FROM_CUMU)
+        observeDragSupportEvents(viewLifecycleOwner, listView, Constants.VIEWER_FROM_CUMU)
 
         viewModel.getDayCardsData().observe(viewLifecycleOwner, { showDayCards(it) })
 
@@ -531,36 +513,34 @@ class PhotosFragment : BaseZoomFragment(), CUGridViewAdapter.Listener,
     }
 
     /**
-     * Animates the UI by showing or hiding some views.
-     * Enables or disables the translucent navigation bar only if portrait mode.
-     *
-     * @param hide True if should hide the UI, false otherwise.
-     */
-    private fun animateUI(hide: Boolean) {
-        mManagerActivity.animateCULayout(hide || viewModel.isCUEnabled())
-        mManagerActivity.animateBottomView(hide)
-        mManagerActivity.setDrawerLockMode(hide)
-        checkScroll()
-    }
-
-    /**
      * Updates CU enable buttons visibility depending on if CU is enabled/disabled
      * and if the view contains some node.
      *
      * @param cuEnabled True if CU is enabled, false otherwise.
      */
     private fun updateEnableCUButtons(cuEnabled: Boolean) {
-        val emptyAdapter = gridAdapter == null || gridAdapter!!.itemCount <= 0
         binding.emptyEnableCuButton.visibility =
-            if (!cuEnabled && emptyAdapter) View.VISIBLE else View.GONE
+            if (!cuEnabled && emptyAdapter()) View.VISIBLE else View.GONE
         mManagerActivity.updateEnableCUButton(
             if (selectedView == ALL_VIEW && !cuEnabled
-                && !emptyAdapter && mActionMode == null
+                && !emptyAdapter() && actionMode == null
             ) View.VISIBLE else View.GONE
         )
         if (!cuEnabled) {
             hideCUProgress()
         }
+    }
+
+    private fun emptyAdapter(): Boolean {
+        val result = if (this::gridAdapter.isInitialized) {
+            TL.log("count: ${gridAdapter.itemCount}")
+            gridAdapter.itemCount <= 0
+        } else {
+            false
+        }
+        TL.log(result)
+
+        return false
     }
 
     /**
@@ -569,10 +549,7 @@ class PhotosFragment : BaseZoomFragment(), CUGridViewAdapter.Listener,
      * @return false, when no photo here or in the action mode or not in all view, then will hide the menu.
      * Otherwise, true, show menu.
      */
-    private fun isShowMenu(): Boolean {
-        val emptyAdapter = gridAdapter == null || gridAdapter!!.itemCount <= 0
-        return !emptyAdapter && mActionMode == null && selectedView == ALL_VIEW
-    }
+    private fun isShowMenu() = !emptyAdapter() && actionMode == null && selectedView == ALL_VIEW
 
     private fun showDayCards(dayCards: List<GalleryCard>) {
         if (selectedView == DAYS_VIEW) {
@@ -593,7 +570,7 @@ class PhotosFragment : BaseZoomFragment(), CUGridViewAdapter.Listener,
     }
 
     private fun openNode(position: Int, cuNode: GalleryItem?) {
-        if (position < 0 || gridAdapter == null || position >= gridAdapter!!.itemCount) {
+        if (position < 0 || position >= gridAdapter.itemCount) {
             return
         }
         val node = cuNode?.node ?: return
@@ -611,26 +588,11 @@ class PhotosFragment : BaseZoomFragment(), CUGridViewAdapter.Listener,
             )
             .putExtra(Constants.INTENT_EXTRA_KEY_ADAPTER_TYPE, Constants.PHOTO_SYNC_ADAPTER)
         putThumbnailLocation(
-            intent, binding.cuList, position, Constants.VIEWER_FROM_CUMU,
-            gridAdapter!!
+            intent, listView, position, Constants.VIEWER_FROM_CUMU,
+            gridAdapter
         )
         startActivity(intent)
         requireActivity().overridePendingTransition(0, 0)
-    }
-
-    override fun onDestroyView() {
-        super.onDestroyView()
-    }
-
-    override fun onNodeClicked(position: Int, node: GalleryItem?) {
-        viewModel.onNodeClicked(position, node!!)
-    }
-
-    override fun onNodeLongClicked(position: Int, node: GalleryItem?) {
-        // Multiple selection only available for zoom default (3 items per row) or zoom out 1x (5 items per row).
-        if (getCurrentZoom() == ZOOM_DEFAULT || getCurrentZoom() == ZOOM_OUT_1X) {
-            viewModel.onNodeLongClicked(position, node!!)
-        }
     }
 
     fun isEnableCUFragmentShown() = viewModel.isEnableCUShown()
@@ -647,7 +609,7 @@ class PhotosFragment : BaseZoomFragment(), CUGridViewAdapter.Listener,
         updateFastScrollerVisibility()
         mManagerActivity.enableHideBottomViewOnScroll(selectedView != ALL_VIEW)
         mManagerActivity.updateEnableCUButton(
-            if (selectedView == ALL_VIEW && gridAdapter != null && gridAdapter!!.itemCount > 0 && !viewModel.isCUEnabled()
+            if (selectedView == ALL_VIEW && !emptyAdapter() && !viewModel.isCUEnabled()
             ) View.VISIBLE else View.GONE
         )
         if (selectedView != ALL_VIEW) {
@@ -682,18 +644,18 @@ class PhotosFragment : BaseZoomFragment(), CUGridViewAdapter.Listener,
                 handleZoomMenuItemStatus()
                 val cardTemp = viewModel.dayClicked(position, card)!!
                 newViewClicked(ALL_VIEW)
-                val cuNodePosition = gridAdapter!!.getNodePosition(cardTemp.node.handle)
-                openNode(cuNodePosition, gridAdapter!!.getNodeAtPosition(cuNodePosition)!!)
-                layoutManager!!.scrollToPosition(cuNodePosition)
+                val cuNodePosition = gridAdapter.getNodePosition(cardTemp.node.handle)
+                openNode(cuNodePosition, gridAdapter.getNodeAtPosition(cuNodePosition)!!)
+                layoutManager.scrollToPosition(cuNodePosition)
                 mManagerActivity.showBottomView()
             }
             MONTHS_VIEW -> {
                 newViewClicked(DAYS_VIEW)
-                layoutManager!!.scrollToPosition(viewModel.monthClicked(position, card))
+                layoutManager.scrollToPosition(viewModel.monthClicked(position, card))
             }
             YEARS_VIEW -> {
                 newViewClicked(MONTHS_VIEW)
-                layoutManager!!.scrollToPosition(viewModel.yearClicked(position, card))
+                layoutManager.scrollToPosition(viewModel.yearClicked(position, card))
             }
         }
     }
@@ -722,12 +684,12 @@ class PhotosFragment : BaseZoomFragment(), CUGridViewAdapter.Listener,
         if (!viewModel.isEnableCUShown()) {
             viewModel.setZoom(zoom)
             PHOTO_ZOOM_LEVEL = zoom
-            val state = layoutManager!!.onSaveInstanceState()
-            setGridView()
-            layoutManager!!.onRestoreInstanceState(state)
+            val state = layoutManager.onSaveInstanceState()
+            setGridView(zoom)
+            layoutManager.onRestoreInstanceState(state)
         }
     }
-    
+
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
         viewModel.selectedViewType = selectedView
@@ -735,6 +697,22 @@ class PhotosFragment : BaseZoomFragment(), CUGridViewAdapter.Listener,
 
     override fun handleOnCreateOptionsMenu() {
         handleOptionsMenuUpdate(isShowMenu())
+    }
+
+    override fun animateBottomView() {
+        val hide = actionMode != null
+        mManagerActivity.animateCULayout(hide || viewModel.isCUEnabled())
+        mManagerActivity.animateBottomView(hide)
+        mManagerActivity.setDrawerLockMode(hide)
+        checkScroll()
+    }
+
+
+    override fun getNodeCount() = viewModel.getRealMegaNodes().size
+
+    override fun updateUiWhenAnimationEnd() {
+        val newList = ArrayList(viewModel.getCUNodes())
+        gridAdapter.submitList(newList)
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {

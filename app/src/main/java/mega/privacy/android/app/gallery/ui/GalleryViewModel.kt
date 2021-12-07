@@ -1,7 +1,6 @@
 package mega.privacy.android.app.gallery.ui
 
 import android.content.Context
-import android.util.Pair
 import androidx.collection.LongSparseArray
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -48,7 +47,7 @@ abstract class GalleryViewModel constructor(
     private val dayCards = MutableLiveData<List<GalleryCard>>()
     private val monthCards = MutableLiveData<List<GalleryCard>>()
     private val yearCards = MutableLiveData<List<GalleryCard>>()
-    private val mCuNodes = MutableLiveData<List<GalleryItem>?>()
+    private val mCuNodes = MutableLiveData<List<GalleryItem>>(ArrayList())
     private val mNodeToOpen = MutableLiveData<Pair<Int, GalleryItem?>>()
     private val mNodeToAnimate = MutableLiveData<Pair<Int, GalleryItem>>()
     private val mActionBarTitle = MutableLiveData<String>()
@@ -159,7 +158,7 @@ abstract class GalleryViewModel constructor(
     fun resetOpenedNode() {
         with(mNodeToOpen) {
             setValue(
-                Pair.create(
+                Pair(
                     INVALID_POSITION,
                     null
                 )
@@ -231,7 +230,7 @@ abstract class GalleryViewModel constructor(
             val node = nodes[i]
             if (node.node != null) {
                 if (!node.selected) {
-                    mNodeToAnimate.value = Pair.create(i, node)
+                    mNodeToAnimate.value = Pair(i, node)
                 }
                 node.selected = true
                 mSelectedNodes.put(node.node!!.handle, node.node)
@@ -253,7 +252,7 @@ abstract class GalleryViewModel constructor(
             for (i in nodes.indices) {
                 val node = nodes[i]
                 if (node.selected) {
-                    mNodeToAnimate.value = Pair.create(i, node)
+                    mNodeToAnimate.value = Pair(i, node)
                 }
                 node.selected = false
             }
@@ -313,7 +312,7 @@ abstract class GalleryViewModel constructor(
                 null,
                 null,
                 mSelectedNodes.containsKey(node.handle),
-                false
+                true
             )
             if (mZoom == ZoomUtil.ZOOM_OUT_2X) {
                 if (lastYearDate == null || Year.from(lastYearDate) != Year.from(modifyDate)) {
@@ -352,6 +351,8 @@ abstract class GalleryViewModel constructor(
                     )
                 }
             }
+            // Re-assign the index.
+            cuNode.index = nodes.size
             nodes.add(cuNode)
             if (!thumbnail.exists()) {
                 nodesWithoutThumbnail.add(node)

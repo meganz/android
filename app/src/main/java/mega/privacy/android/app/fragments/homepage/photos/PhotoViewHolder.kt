@@ -4,8 +4,8 @@ import androidx.core.view.isVisible
 import androidx.databinding.ViewDataBinding
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import mega.privacy.android.app.databinding.ItemPhotoBrowseBinding
-import mega.privacy.android.app.databinding.ItemPhotosTitleBinding
+import mega.privacy.android.app.databinding.ItemGalleryImageBinding
+import mega.privacy.android.app.databinding.ItemGalleryTitleBinding
 import mega.privacy.android.app.di.MegaApi
 import mega.privacy.android.app.fragments.homepage.ActionModeViewModel
 import mega.privacy.android.app.fragments.homepage.ItemOperationViewModel
@@ -29,7 +29,7 @@ class PhotoViewHolder(val binding: ViewDataBinding, private val zoom: Int = Zoom
     ) {
         binding.apply {
             when (this) {
-                is ItemPhotoBrowseBinding -> {
+                is ItemGalleryImageBinding -> {
                     this.actionModeViewModel = actionModeViewModel
                     this.itemOperationViewModel = itemOperationViewModel
                     this.item = item
@@ -47,7 +47,7 @@ class PhotoViewHolder(val binding: ViewDataBinding, private val zoom: Int = Zoom
 
                     root.layoutParams = layoutParams
                 }
-                is ItemPhotosTitleBinding -> {
+                is ItemGalleryTitleBinding -> {
                     this.item = item
                 }
             }

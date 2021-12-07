@@ -9,18 +9,19 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.viewbinding.ViewBinding
 import mega.privacy.android.app.components.dragger.DragThumbnailGetter
 import mega.privacy.android.app.components.scrollBar.SectionTitleProvider
-import mega.privacy.android.app.databinding.ItemPhotoBrowseBinding
-import mega.privacy.android.app.databinding.ItemPhotosTitleBinding
+import mega.privacy.android.app.databinding.ItemGalleryImageBinding
+import mega.privacy.android.app.databinding.ItemGalleryTitleBinding
+import mega.privacy.android.app.databinding.ItemGalleryVideoBinding
 import mega.privacy.android.app.fragments.homepage.ActionModeViewModel
 import mega.privacy.android.app.fragments.homepage.ItemOperationViewModel
-import mega.privacy.android.app.fragments.homepage.photos.PhotoViewHolder
 import mega.privacy.android.app.gallery.data.GalleryItem
+import mega.privacy.android.app.gallery.data.GalleryItemSizeConfig
 
 class GalleryAdapter(
     private val actionModeViewModel: ActionModeViewModel,
     private val itemOperationViewModel: ItemOperationViewModel,
-    private val zoom: Int
-) : ListAdapter<GalleryItem, PhotoViewHolder>(GalleryItem.DiffCallback()),
+    private var itemSizeConfig: GalleryItemSizeConfig
+) : ListAdapter<GalleryItem, GalleryViewHolder>(GalleryItem.DiffCallback()),
     SectionTitleProvider, DragThumbnailGetter {
 
     private var itemDimen = 0
@@ -29,8 +30,13 @@ class GalleryAdapter(
         currentList.indexOfFirst { it.node?.handle == handle }
 
     override fun getThumbnail(viewHolder: RecyclerView.ViewHolder): View? {
-        if (viewHolder is PhotoViewHolder && viewHolder.binding is ItemPhotoBrowseBinding) {
-            return viewHolder.binding.thumbnail
+        if (viewHolder is GalleryViewHolder) {
+            return when (viewHolder.binding) {
+                is ItemGalleryImageBinding -> viewHolder.binding.thumbnail
+                is ItemGalleryVideoBinding -> viewHolder.binding.thumbnail
+
+                else -> null
+            }
         }
 
         return null
@@ -40,32 +46,44 @@ class GalleryAdapter(
         return getItem(position).type
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PhotoViewHolder {
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): GalleryViewHolder {
         val inflater = LayoutInflater.from(parent.context)
 
         val binding = when (viewType) {
-            GalleryItem.TYPE_HEADER ->
-                ItemPhotosTitleBinding.inflate(
+            GalleryItem.TYPE_IMAGE ->
+                ItemGalleryImageBinding.inflate(
                     inflater,
                     parent,
                     false
                 )
-            else ->  // TYPE_PHOTO
-                ItemPhotoBrowseBinding.inflate(
+            GalleryItem.TYPE_VIDEO ->
+                ItemGalleryVideoBinding.inflate(
+                    inflater,
+                    parent,
+                    false
+                )
+            else ->
+                ItemGalleryTitleBinding.inflate(
                     inflater,
                     parent,
                     false
                 )
         }
 
-        if (viewType == GalleryItem.TYPE_IMAGE && itemDimen > 0) {
-            setItemLayoutParams(binding)
-            // FastScroller would affect the normal process of RecyclerView that makes the "selected"
-            // icon appear before binding the item. Therefore, hide the icon up front
-            (binding as ItemPhotoBrowseBinding).iconSelected.visibility = View.GONE
+        if (itemDimen > 0) {
+            when (viewType) {
+                GalleryItem.TYPE_IMAGE -> {
+                    setItemLayoutParams(binding)
+                    (binding as ItemGalleryImageBinding).iconSelected.visibility = View.GONE
+                }
+                GalleryItem.TYPE_VIDEO -> {
+                    setItemLayoutParams(binding)
+                    (binding as ItemGalleryVideoBinding).iconSelected.visibility = View.GONE
+                }
+            }
         }
 
-        return PhotoViewHolder(binding, zoom)
+        return GalleryViewHolder(binding, itemSizeConfig)
     }
 
     private fun setItemLayoutParams(binding: ViewBinding) {
@@ -75,7 +93,7 @@ class GalleryAdapter(
         }
     }
 
-    override fun onBindViewHolder(holder: PhotoViewHolder, position: Int) {
+    override fun onBindViewHolder(holder: GalleryViewHolder, position: Int) {
         holder.bind(actionModeViewModel, itemOperationViewModel, getItem(position))
     }
 

@@ -1,10 +1,10 @@
 package mega.privacy.android.app.gallery.data
 
 import android.text.Spanned
-import android.util.Pair
 import androidx.recyclerview.widget.DiffUtil
 import mega.privacy.android.app.fragments.homepage.NodeItem
 import mega.privacy.android.app.utils.Constants.INVALID_POSITION
+import mega.privacy.android.app.utils.StringUtils.formatDateTitle
 import nz.mega.sdk.MegaNode
 import java.io.File
 
@@ -47,7 +47,7 @@ data class GalleryItem(
         headerDate: Pair<String, String>
     ) : this(
         null, INVALID_POSITION, INVALID_POSITION, null,
-        TYPE_HEADER, modifyDate, null, headerDate, false, false
+        TYPE_HEADER, modifyDate, headerDate.formatDateTitle(), headerDate, false, false
     )
 
     class DiffCallback : DiffUtil.ItemCallback<GalleryItem>() {

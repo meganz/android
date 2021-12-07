@@ -2,7 +2,6 @@ package mega.privacy.android.app.fragments.managerFragments.cu
 
 import android.content.Context
 import android.os.Environment
-import android.util.Pair
 import androidx.hilt.lifecycle.ViewModelInject
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData

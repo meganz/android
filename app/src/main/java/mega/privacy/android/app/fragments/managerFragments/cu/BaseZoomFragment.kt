@@ -1,23 +1,32 @@
 package mega.privacy.android.app.fragments.managerFragments.cu
 
+import android.animation.Animator
+import android.animation.AnimatorInflater
+import android.animation.AnimatorSet
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.View
+import android.widget.ImageView
 import android.widget.TextView
+import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.view.ActionMode
 import androidx.core.content.ContextCompat
 import androidx.core.graphics.drawable.DrawableCompat
 import androidx.fragment.app.viewModels
+import androidx.recyclerview.widget.RecyclerView
+import com.facebook.drawee.view.SimpleDraweeView
 import mega.privacy.android.app.R
 import mega.privacy.android.app.components.GestureScaleListener.GestureScaleCallback
 import mega.privacy.android.app.components.scrollBar.FastScroller
 import mega.privacy.android.app.fragments.BaseFragment
+import mega.privacy.android.app.fragments.homepage.*
 import mega.privacy.android.app.fragments.homepage.photos.ZoomViewModel
-import mega.privacy.android.app.utils.ColorUtils
+import mega.privacy.android.app.lollipop.ManagerActivityLollipop
+import mega.privacy.android.app.utils.*
 import mega.privacy.android.app.utils.Constants.MIN_ITEMS_SCROLLBAR
-import mega.privacy.android.app.utils.StyleUtils
-import mega.privacy.android.app.utils.ZoomUtil
+import nz.mega.sdk.MegaChatApiJava
 
 /**
  * A parent fragment with basic zoom UI logic, like menu, gestureScaleCallback.
@@ -34,8 +43,14 @@ abstract class BaseZoomFragment : BaseFragment(), GestureScaleCallback {
         const val SPAN_CARD_LANDSCAPE = 2
     }
 
+    abstract val listView: RecyclerView
     protected lateinit var menu: Menu
     protected val zoomViewModel by viewModels<ZoomViewModel>()
+
+    protected var actionMode: ActionMode? = null
+    protected val actionModeViewModel by viewModels<ActionModeViewModel>()
+    protected val itemOperationViewModel by viewModels<ItemOperationViewModel>()
+    protected lateinit var actionModeCallback: ActionModeCallback
 
     /**
      * When zoom changes,handle zoom for sub class
@@ -46,6 +61,12 @@ abstract class BaseZoomFragment : BaseFragment(), GestureScaleCallback {
      * Handle menus for sub class
      */
     abstract fun handleOnCreateOptionsMenu()
+
+    abstract fun animateBottomView()
+
+    abstract fun getNodeCount(): Int
+
+    abstract fun updateUiWhenAnimationEnd()
 
     private fun subscribeObservers() {
         zoomViewModel.zoom.observe(viewLifecycleOwner, { zoom: Int ->
@@ -79,6 +100,135 @@ abstract class BaseZoomFragment : BaseFragment(), GestureScaleCallback {
             }
         }
         return super.onOptionsItemSelected(item)
+    }
+
+    protected fun setupActionMode() {
+        actionModeCallback =
+            ActionModeCallback(activity as ManagerActivityLollipop, actionModeViewModel, megaApi)
+
+        observeItemLongClick()
+        observeSelectedItems()
+        observeAnimatedItems()
+        observeActionModeDestroy()
+    }
+
+    private fun observeItemLongClick() =
+        actionModeViewModel.longClick.observe(viewLifecycleOwner, EventObserver {
+            if (zoomViewModel.getCurrentZoom() == ZoomUtil.ZOOM_DEFAULT || zoomViewModel.getCurrentZoom() == ZoomUtil.ZOOM_OUT_1X) {
+                doIfOnline { actionModeViewModel.enterActionMode(it) }
+                animateBottomView()
+            }
+        })
+
+    private fun observeSelectedItems() =
+        actionModeViewModel.selectedNodes.observe(viewLifecycleOwner, {
+            if (it.isEmpty()) {
+                actionMode?.apply {
+                    finish()
+                }
+            } else {
+                actionModeCallback.nodeCount = getNodeCount()
+
+                if (actionMode == null) {
+                    callManager { manager ->
+                        manager.hideKeyboardSearch()
+                    }
+
+                    actionMode = (activity as AppCompatActivity).startSupportActionMode(
+                        actionModeCallback
+                    )
+                } else {
+                    actionMode?.invalidate()  // Update the action items based on the selected nodes
+                }
+
+                actionMode?.title = it.size.toString()
+            }
+        })
+
+    private fun observeAnimatedItems() {
+        var animatorSet: AnimatorSet? = null
+
+        actionModeViewModel.animNodeIndices.observe(viewLifecycleOwner, {
+            animatorSet?.run {
+                // End the started animation if any, or the view may show messy as its property
+                // would be wrongly changed by multiple animations running at the same time
+                // via contiguous quick clicks on the item
+                if (isStarted) {
+                    end()
+                }
+            }
+
+            // Must create a new AnimatorSet, or it would keep all previous
+            // animation and play them together
+            animatorSet = AnimatorSet()
+            val animatorList = mutableListOf<Animator>()
+
+            animatorSet?.addListener(object : Animator.AnimatorListener {
+                override fun onAnimationRepeat(animation: Animator?) {
+                }
+
+                override fun onAnimationEnd(animation: Animator?) {
+                    updateUiWhenAnimationEnd()
+                }
+
+                override fun onAnimationCancel(animation: Animator?) {
+                }
+
+                override fun onAnimationStart(animation: Animator?) {
+                }
+            })
+
+            it.forEach { pos ->
+                listView.findViewHolderForAdapterPosition(pos)?.let { viewHolder ->
+                    val itemView = viewHolder.itemView
+                    // Draw the green outline for the thumbnail view at once
+                    val thumbnailView =
+                        itemView.findViewById<SimpleDraweeView>(R.id.thumbnail)
+                    thumbnailView.hierarchy.roundingParams = getRoundingParams(context)
+
+                    val imageView = itemView.findViewById<ImageView>(
+                        R.id.icon_selected
+                    )
+
+                    imageView?.run {
+                        setImageResource(R.drawable.ic_select_folder)
+                        visibility = View.VISIBLE
+
+                        val animator =
+                            AnimatorInflater.loadAnimator(context, R.animator.icon_select)
+                        animator.setTarget(this)
+                        animatorList.add(animator)
+                    }
+                }
+            }
+
+            animatorSet?.playTogether(animatorList)
+            animatorSet?.start()
+        })
+    }
+
+    private fun observeActionModeDestroy() =
+        actionModeViewModel.actionModeDestroy.observe(viewLifecycleOwner, EventObserver {
+            actionMode = null
+            callManager { manager ->
+                manager.showKeyboardForSearch()
+            }
+            animateBottomView()
+        })
+
+    private fun doIfOnline(operation: () -> Unit) {
+        if (Util.isOnline(context)) {
+            operation()
+        } else {
+            val activity = activity as ManagerActivityLollipop
+
+            activity.hideKeyboardSearch()  // Make the snack bar visible to the user
+            activity.showSnackbar(
+                Constants.SNACKBAR_TYPE,
+                context.getString(R.string.error_server_connection_problem),
+                MegaChatApiJava.MEGACHAT_INVALID_HANDLE
+            )
+        }
     }
 
     fun handleZoomMenuItemStatus() {
@@ -132,7 +282,13 @@ abstract class BaseZoomFragment : BaseFragment(), GestureScaleCallback {
         return zoomViewModel.getCurrentZoom()
     }
 
-    protected fun updateViewSelected(allButton:TextView?,daysButton:TextView?,monthsButton:TextView?,yearsButton:TextView?,selectedView:Int) {
+    protected fun updateViewSelected(
+        allButton: TextView?,
+        daysButton: TextView?,
+        monthsButton: TextView?,
+        yearsButton: TextView?,
+        selectedView: Int
+    ) {
         setViewTypeButtonStyle(allButton, false)
         setViewTypeButtonStyle(daysButton, false)
         setViewTypeButtonStyle(monthsButton, false)
@@ -171,7 +327,11 @@ abstract class BaseZoomFragment : BaseFragment(), GestureScaleCallback {
         )
     }
 
-    protected fun updateFastScrollerVisibility(selectedView:Int,scroller: FastScroller,itemCount:Int) {
+    protected fun updateFastScrollerVisibility(
+        selectedView: Int,
+        scroller: FastScroller,
+        itemCount: Int
+    ) {
         val gridView = selectedView == ALL_VIEW
 
         scroller.visibility =
@@ -186,7 +346,7 @@ abstract class BaseZoomFragment : BaseFragment(), GestureScaleCallback {
      *
      * @param isPortrait true, on portrait mode, false otherwise.
      */
-    protected fun getSpanCount(selectedView:Int,isPortrait: Boolean): Int {
+    protected fun getSpanCount(selectedView: Int, isPortrait: Boolean): Int {
         return if (selectedView != ALL_VIEW) {
             if (isPortrait) SPAN_CARD_PORTRAIT else SPAN_CARD_LANDSCAPE
         } else {
