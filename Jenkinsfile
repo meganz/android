@@ -8,9 +8,11 @@ pipeline {
     ANDROID_SDK_ROOT = '/Users/robinshi/Library/Android/sdk'
 
     BUILD_LIB_DOWNLOAD_FOLDER = '${WORKSPACE}/mega_build_download'
-    WEBRTC_LIB_URL = "https://mega.nz/file/t81HSYJI#KQNzSEqmGVSXfwmQx2HMJy3Jo2AcDfYm4oiMP_CFW6s"
-    WEBRTC_LIB_FILE = 'WebRTC_NDKr16b_m76_p21.zip'
+    // webrtc link and lib file may change with time. Update these 2 values if build failed.
+    WEBRTC_LIB_URL = "https://mega.nz/file/RsMEgZqA#s0P754Ua7AqvWwamCeyrvNcyhmPjHTQQIxtqziSU4HI"
+    WEBRTC_LIB_FILE = 'WebRTC_NDKr21_p21_branch-heads4405_v2.zip'
     WEBRTC_LIB_UNZIPPED = 'webrtc_unzipped'
+
     GOOGLE_MAP_API_URL = "https://mega.nz/#!1tcl3CrL!i23zkmx7ibnYy34HQdsOOFAPOqQuTo1-2iZ5qFlU7-k"
     GOOGLE_MAP_API_FILE = 'default_google_maps_api.zip'
     GOOGLE_MAP_API_UNZIPPED = 'default_google_map_api_unzipped'
@@ -70,9 +72,12 @@ pipeline {
         cd ${WORKSPACE}
         pwd
         # apply dependency patch
+        rm -fr app/src/main/jni/megachat/webrtc
         cp -fr ${BUILD_LIB_DOWNLOAD_FOLDER}/${WEBRTC_LIB_UNZIPPED}/webrtc app/src/main/jni/megachat/
         # mkdir -p app/src
-        cp -fr ${BUILD_LIB_DOWNLOAD_FOLDER}/${GOOGLE_MAP_API_UNZIPPED} app/src
+        rm -fr app/src/debug
+        rm -fr app/src/release
+        cp -fr ${BUILD_LIB_DOWNLOAD_FOLDER}/${GOOGLE_MAP_API_UNZIPPED}/* app/src/
 
         """
       }
