@@ -28,6 +28,7 @@ import mega.privacy.android.app.components.dragger.DragToExitSupport.Companion.o
 import mega.privacy.android.app.components.dragger.DragToExitSupport.Companion.putThumbnailLocation
 import mega.privacy.android.app.databinding.FragmentPhotosBinding
 import mega.privacy.android.app.fragments.homepage.photos.ScaleGestureHandler
+import mega.privacy.android.app.gallery.adapter.GalleryCardAdapter
 import mega.privacy.android.app.gallery.data.GalleryCard
 import mega.privacy.android.app.gallery.data.GalleryItem
 import mega.privacy.android.app.gallery.data.GalleryItemSizeConfig
@@ -52,7 +53,7 @@ import javax.inject.Inject
 
 @AndroidEntryPoint
 class PhotosFragment : BaseZoomFragment(), CUGridViewAdapter.Listener,
-    CUCardViewAdapter.Listener {
+    GalleryCardAdapter.Listener {
 
     @Inject
     lateinit var sortOrderManagement: SortOrderManagement
@@ -60,7 +61,7 @@ class PhotosFragment : BaseZoomFragment(), CUGridViewAdapter.Listener,
     private lateinit var mManagerActivity: ManagerActivityLollipop
     private lateinit var binding: FragmentPhotosBinding
     private var gridAdapter: CUGridViewAdapter? = null
-    private var cardAdapter: CUCardViewAdapter? = null
+    private var cardAdapter: GalleryCardAdapter? = null
 
     private var mActionMode: ActionMode? = null
 
@@ -391,7 +392,7 @@ class PhotosFragment : BaseZoomFragment(), CUGridViewAdapter.Listener,
                 resources.getDimensionPixelSize(if (isPortrait) R.dimen.card_margin_portrait else R.dimen.card_margin_landscape)
             val cardWidth =
                 (outMetrics.widthPixels - cardMargin * spanCount * 2 - cardMargin * 2) / spanCount
-            cardAdapter = CUCardViewAdapter(selectedView, cardWidth, cardMargin, this)
+            cardAdapter = GalleryCardAdapter(selectedView, cardWidth, cardMargin, this)
             cardAdapter!!.setHasStableIds(true)
             binding.cuList.adapter = cardAdapter
             params.rightMargin = cardMargin

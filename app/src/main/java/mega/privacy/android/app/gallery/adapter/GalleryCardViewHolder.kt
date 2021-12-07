@@ -1,4 +1,4 @@
-package mega.privacy.android.app.fragments.managerFragments.cu
+package mega.privacy.android.app.gallery.adapter
 
 import android.annotation.SuppressLint
 import android.net.Uri
@@ -22,7 +22,7 @@ import mega.privacy.android.app.utils.StringUtils.formatDateTitle
  * @param cardWidth  Size to set as card view width.
  * @param cardMargin Size to set as card view margin.
  */
-class CUCardViewHolder(
+class GalleryCardViewHolder(
     private val viewType: Int,
     private val binding: ItemGalleryCardBinding,
     cardWidth: Int,
@@ -38,7 +38,7 @@ class CUCardViewHolder(
     }
 
     @SuppressLint("SetTextI18n")
-    fun bind(position: Int, card: GalleryCard, listener: CUCardViewAdapter.Listener) {
+    fun bind(position: Int, card: GalleryCard, listener: GalleryCardAdapter.Listener) {
         itemView.setOnClickListener { listener.onCardClicked(position, card) }
 
         val date = when (viewType) {

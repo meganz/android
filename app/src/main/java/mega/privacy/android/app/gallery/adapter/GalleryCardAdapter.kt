@@ -1,4 +1,4 @@
-package mega.privacy.android.app.fragments.managerFragments.cu
+package mega.privacy.android.app.gallery.adapter
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
@@ -18,26 +18,26 @@ import mega.privacy.android.app.gallery.data.GalleryCard
  * @param cardMargin   Size to set as card view margin.
  * @param listener     Callback used to manage card events.
  */
-class CUCardViewAdapter(
+class GalleryCardAdapter(
     private val cardViewType: Int,
     private val cardWidth: Int,
     private val cardMargin: Int,
     private val listener: Listener
-) : ListAdapter<GalleryCard, CUCardViewHolder>(GalleryCard.DiffCallback()), SectionTitleProvider {
+) : ListAdapter<GalleryCard, GalleryCardViewHolder>(GalleryCard.DiffCallback()), SectionTitleProvider {
 
     init {
         setHasStableIds(true)
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CUCardViewHolder =
-        CUCardViewHolder(
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): GalleryCardViewHolder =
+        GalleryCardViewHolder(
             cardViewType,
             ItemGalleryCardBinding.inflate(LayoutInflater.from(parent.context), parent, false),
             cardWidth,
             cardMargin
         )
 
-    override fun onBindViewHolder(holder: CUCardViewHolder, position: Int) {
+    override fun onBindViewHolder(holder: GalleryCardViewHolder, position: Int) {
         holder.bind(position, getItem(position), listener)
     }
 

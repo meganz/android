@@ -11,7 +11,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.facebook.drawee.generic.RoundingParams
 import com.facebook.drawee.view.SimpleDraweeView
 import mega.privacy.android.app.R
-import mega.privacy.android.app.fragments.managerFragments.cu.CUCardViewAdapter
+import mega.privacy.android.app.gallery.adapter.GalleryCardAdapter
 import mega.privacy.android.app.gallery.data.GalleryItem
 import mega.privacy.android.app.utils.ColorUtils
 import mega.privacy.android.app.utils.FileUtil.isFileAvailable
@@ -24,7 +24,7 @@ fun setItems(listView: RecyclerView, items: List<NodeItem>?) {
     items?.let {
         // When the list's adapter is CUCardViewAdapter, its item type is CUCard, can't cast to NodeItem.
         // Just avoid the casting.
-        if(listView.adapter !is CUCardViewAdapter) {
+        if (listView.adapter !is GalleryCardAdapter) {
             (listView.adapter as ListAdapter<NodeItem, RecyclerView.ViewHolder>).submitList(it)
         }
     }
@@ -36,7 +36,7 @@ fun setGalleryItems(listView: RecyclerView, items: List<GalleryItem>?) {
     items?.let {
         // When the list's adapter is CUCardViewAdapter, its item type is CUCard, can't cast to NodeItem.
         // Just avoid the casting.
-        if(listView.adapter !is CUCardViewAdapter) {
+        if (listView.adapter !is GalleryCardAdapter) {
             (listView.adapter as ListAdapter<GalleryItem, RecyclerView.ViewHolder>).submitList(it)
         }
     }

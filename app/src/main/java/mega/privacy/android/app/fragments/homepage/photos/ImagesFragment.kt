@@ -30,6 +30,7 @@ import mega.privacy.android.app.databinding.FragmentImagesBinding
 import mega.privacy.android.app.fragments.homepage.*
 import mega.privacy.android.app.fragments.managerFragments.cu.*
 import mega.privacy.android.app.fragments.managerFragments.cu.PhotosFragment.*
+import mega.privacy.android.app.gallery.adapter.GalleryCardAdapter
 import mega.privacy.android.app.gallery.data.GalleryCard
 import mega.privacy.android.app.gallery.data.GalleryItem
 import mega.privacy.android.app.lollipop.FullScreenImageViewerLollipop
@@ -51,7 +52,7 @@ class ImagesFragment : BaseZoomFragment() {
     private lateinit var listView: RecyclerView
     private lateinit var browseAdapter: PhotosBrowseAdapter
     private lateinit var gridLayoutManager: GridLayoutManager
-    private lateinit var cardAdapter: CUCardViewAdapter
+    private lateinit var cardAdapter: GalleryCardAdapter
 
     private lateinit var scaleGestureHandler: ScaleGestureHandler
 
@@ -147,7 +148,7 @@ class ImagesFragment : BaseZoomFragment() {
         )
     }
 
-    private val cardClickedListener = object : CUCardViewAdapter.Listener {
+    private val cardClickedListener = object : GalleryCardAdapter.Listener {
 
         override fun onCardClicked(position: Int, @NonNull card: GalleryCard) {
             when (selectedView) {
@@ -500,7 +501,7 @@ class ImagesFragment : BaseZoomFragment() {
                 (outMetrics.widthPixels - cardMargin * spanCount * 2 - cardMargin * 2) / spanCount
 
             cardAdapter =
-                CUCardViewAdapter(selectedView, cardWidth, cardMargin, cardClickedListener)
+                GalleryCardAdapter(selectedView, cardWidth, cardMargin, cardClickedListener)
             cardAdapter.setHasStableIds(true)
             params.leftMargin = cardMargin
             params.rightMargin = cardMargin
