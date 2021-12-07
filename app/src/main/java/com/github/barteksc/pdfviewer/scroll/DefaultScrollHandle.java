@@ -1,5 +1,8 @@
 package com.github.barteksc.pdfviewer.scroll;
 
+import static mega.privacy.android.app.utils.LogUtil.logDebug;
+import static mega.privacy.android.app.utils.Util.dp2px;
+
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.os.Handler;
@@ -8,6 +11,7 @@ import android.view.MotionEvent;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.content.ContextCompat;
 
 import com.github.barteksc.pdfviewer.PDFView;
@@ -16,10 +20,7 @@ import com.github.barteksc.pdfviewer.util.Util;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.lollipop.PdfViewerActivityLollipop;
 
-import static mega.privacy.android.app.utils.LogUtil.logDebug;
-import static mega.privacy.android.app.utils.Util.dp2px;
-
-public class DefaultScrollHandle extends RelativeLayout implements ScrollHandle {
+public class DefaultScrollHandle extends ConstraintLayout implements ScrollHandle {
 
     float motionYOrigin;
 
@@ -53,23 +54,27 @@ public class DefaultScrollHandle extends RelativeLayout implements ScrollHandle 
     public void setupLayout(PDFView pdfView) {
         logDebug("setupLayout");
 
-        RelativeLayout.LayoutParams tvHlp = new RelativeLayout.LayoutParams(dp2px(50), dp2px(50));
+        ConstraintLayout.LayoutParams textViewHandleLp = new ConstraintLayout.LayoutParams(dp2px(45), dp2px(45));
+        textViewHandleLp.endToEnd = LayoutParams.PARENT_ID;
+        textViewHandleLp.topToTop = LayoutParams.PARENT_ID;
+        textViewHandleLp.bottomToBottom = LayoutParams.PARENT_ID;
+        textViewHandleLp.setMargins(dp2px(5), dp2px(5), dp2px(-10), dp2px(5));
         textViewHandle.setBackgroundResource(R.drawable.fastscroll_pdf_viewer);
-        tvHlp.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
-        tvHlp.setMargins(dp2px(5), 0, dp2px(-20), 0);
         textViewHandle.setPadding(dp2px(10), dp2px(10), dp2px(10), dp2px(10));
-        addView(textViewHandle, tvHlp);
+        textViewHandle.setElevation(dp2px(4));
+        addView(textViewHandle, textViewHandleLp);
 
-        RelativeLayout.LayoutParams tvBlp = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.WRAP_CONTENT);
-        textViewBubble.setBackgroundResource(R.drawable.fastscroll__pdf_bubble);
+        ConstraintLayout.LayoutParams textViewBubbleLp = new ConstraintLayout.LayoutParams(ConstraintLayout.LayoutParams.WRAP_CONTENT, ConstraintLayout.LayoutParams.WRAP_CONTENT);
+        textViewBubbleLp.endToEnd = LayoutParams.PARENT_ID;
+        textViewBubbleLp.topToTop = LayoutParams.PARENT_ID;
+        textViewBubbleLp.bottomToBottom = LayoutParams.PARENT_ID;
+        textViewBubbleLp.setMargins(0, 0, dp2px(40), 0);
+        textViewBubble.setBackgroundResource(R.drawable.fastscroll_pdf_bubble);
         textViewBubble.setElevation(dp2px(4));
-        tvBlp.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
-        tvBlp.addRule(RelativeLayout.CENTER_VERTICAL);
         textViewBubble.setTextAlignment(TEXT_ALIGNMENT_CENTER);
         textViewBubble.setTextColor(ContextCompat.getColor(context, R.color.scroll_bubble_text_color));
-        textViewBubble.setPadding(dp2px(10), dp2px(5), dp2px(10), dp2px(5));
-        tvBlp.setMargins(0, 0, dp2px(35), 0);
-        addView(textViewBubble, tvBlp);
+        textViewBubble.setPadding(dp2px(10), dp2px(6), dp2px(10), dp2px(6));
+        addView(textViewBubble, textViewBubbleLp);
 
         RelativeLayout.LayoutParams lp = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.WRAP_CONTENT);
         lp.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);

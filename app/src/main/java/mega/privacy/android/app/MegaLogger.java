@@ -22,7 +22,7 @@ public abstract class MegaLogger {
 
     public MegaLogger(String fileName) {
         logFile = null;
-        dir = getExternalStoragePath(LOG_DIR);
+        dir = MegaApplication.getInstance().getExternalFilesDir(null).getAbsolutePath() + File.separator + LOG_DIR;
         this.fileName = fileName;
         fileLogQueue = new ConcurrentLinkedDeque<>();
         logToFile();

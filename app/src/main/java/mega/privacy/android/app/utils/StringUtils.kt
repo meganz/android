@@ -5,8 +5,10 @@ import android.text.Spanned
 import android.util.Base64
 import androidx.annotation.ColorRes
 import androidx.core.text.HtmlCompat
+import mega.privacy.android.app.R
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaStringMap
+import java.lang.Exception
 
 object StringUtils {
 
@@ -53,5 +55,28 @@ object StringUtils {
         }
 
         return aliases
+    }
+
+    /**
+     * Format String pair to get date title.
+     *
+     * @param date String pair, which contains the whole date string.
+     * @return Formatted Spanned can be set to TextView.
+     */
+    fun  Pair<String?, String?>.formatDateTitle() : Spanned {
+        var dateText =
+            if (TextUtil.isTextEmpty(this.second)) "[B]" + this.first + "[/B]" else StringResourcesUtils.getString(
+                R.string.cu_month_year_date,
+                this.first,
+                this.second
+            )
+        try {
+            dateText = dateText.replace("[B]", "<font face=\"sans-serif-medium\">")
+                .replace("[/B]", "</font>")
+        } catch (e: Exception) {
+            LogUtil.logWarning("Exception formatting text.", e)
+        }
+
+        return dateText.toSpannedHtmlText()
     }
 }

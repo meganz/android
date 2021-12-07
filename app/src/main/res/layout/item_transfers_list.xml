@@ -1,10 +1,13 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:id="@+id/transfers_list_item_layout"
-    android:layout_width="match_parent"
-    android:layout_height="72dp"
-    android:layout_marginEnd="13dp"
-    android:descendantFocusability="blocksDescendants">
+	xmlns:app="http://schemas.android.com/apk/res-auto"
+	xmlns:tools="http://schemas.android.com/tools"
+	android:id="@+id/transfers_list_item_layout"
+	android:layout_width="match_parent"
+	android:layout_height="72dp"
+	android:paddingEnd="13dp"
+	android:background="@color/white_dark_grey"
+	android:descendantFocusability="blocksDescendants"
+	tools:ignore="RtlSymmetry">
 
     <ImageView
         android:id="@+id/transfers_list_thumbnail"
@@ -31,7 +34,7 @@
         android:layout_toEndOf="@id/transfers_list_thumbnail"
         android:ellipsize="middle"
         android:singleLine="true"
-        android:textAppearance="?attr/textAppearanceSubtitle1" />
+        style="@style/textAppearanceSubtitle1" />
 
     <ImageView
         android:id="@+id/transfers_list_completed_image"

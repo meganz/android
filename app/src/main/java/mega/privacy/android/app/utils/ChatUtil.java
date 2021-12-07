@@ -879,6 +879,11 @@ public class ChatUtil {
      * @return String with the title.
      */
     public static String getTitleChat(MegaChatRoom chat) {
+        if (chat == null) {
+            logError("chat is null");
+            return "";
+        }
+
         if (chat.isActive()) {
             return chat.getTitle();
         }
@@ -897,6 +902,11 @@ public class ChatUtil {
      * @return String with the title.
      */
     public static String getTitleChat(MegaChatListItem chat) {
+        if (chat == null) {
+            logError("chat is null");
+            return "";
+        }
+
         if (chat.isActive()) {
             return chat.getTitle();
         }
