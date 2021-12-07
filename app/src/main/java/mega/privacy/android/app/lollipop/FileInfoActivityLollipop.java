@@ -762,6 +762,21 @@ public class FileInfoActivityLollipop extends PasscodeActivity implements OnClic
             setActionBarDrawablesColorFilter(getResources().getColor(R.color.grey_087_white_087));
         }
 
+        //Location Layout
+        locationLayout = findViewById(R.id.file_properties_location_layout);
+        locationTextView = findViewById(R.id.file_properties_info_data_location);
+
+        LocationInfo locationInfo = getNodeLocationInfo(adapterType, from == FROM_INCOMING_SHARES,
+                node.getHandle());
+        if (locationInfo != null) {
+            locationTextView.setText(locationInfo.getLocation());
+            locationTextView.setOnClickListener(v -> {
+                handleLocationClick(this, adapterType, locationInfo);
+            });
+        } else {
+            locationLayout.setVisibility(View.GONE);
+        }
+
         if(savedInstanceState != null){
             long handle = savedInstanceState.getLong(KEY_SELECTED_SHARE_HANDLE, INVALID_HANDLE);
             if(handle == INVALID_HANDLE || node == null){
@@ -777,21 +792,6 @@ public class FileInfoActivityLollipop extends PasscodeActivity implements OnClic
 
             nodeAttacher.restoreState(savedInstanceState);
             nodeSaver.restoreState(savedInstanceState);
-        }
-
-        //Location Layout
-        locationLayout = findViewById(R.id.file_properties_location_layout);
-        locationTextView = findViewById(R.id.file_properties_info_data_location);
-
-        LocationInfo locationInfo = getNodeLocationInfo(adapterType, from == FROM_INCOMING_SHARES,
-                node.getHandle());
-        if (locationInfo != null) {
-            locationTextView.setText(locationInfo.getLocation());
-            locationTextView.setOnClickListener(v -> {
-                handleLocationClick(this, adapterType, locationInfo);
-            });
-        } else {
-            locationLayout.setVisibility(View.GONE);
         }
 	}
 

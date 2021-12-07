@@ -1,9 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- Full description text of the app in the Google Play page of the app (character limit 4000) -->
-    <string name="full_description_text">MEGAは、標準のウェブブラウザを通じてユーザー様が制御する暗号化クラウドストレージとチャットを、モバイル端末用の専用アプリとともにご提供いたします。他のクラウドストレージプロバイダとは異なり、あなたのデータはあなたのクライアント端末によってのみ暗号化され、復号されます（当社では決して行いません）。\n\nスマートフォンやタブレットからファイルをアップロードしてから、いつでも、どこでも、どんな端末からでも、ファイルの検索、保存、ダウンロード、ストリーム配信、表示、共有、名前の変更、削除を行うことができます。あなたの連絡先とフォルダを共有し、連絡先の最新情報をリアルタイムで表示します。暗号化プロセスでは、当社はあなたのパスワードにアクセスしたり、それをリセットしたりすることができないため、あなたはパスワードを必ず覚えておく必要があります（回復キーをバックアップしない限り）。そうしないと、保存されたファイルにアクセスできなくなります。\n\nエンドツーエンドのユーザー暗号化MEGAビデオチャットは完全なプライバシー保護を可能にし、2016年からウェブブラウザでご利用いただいております。これはMegaモバイルアプリにも拡張され、複数の端末間でチャット履歴にアクセスできます。またユーザー様は、MEGAクラウドドライブからチャットに簡単にファイルも追加できます。\n\nMEGAは、ボーナスを達成された、ご登録済みの全ユーザー様に20 GBの豊富な無料ストレージをご提供しております。また、上限がはるかに高い有料プランもご用意しております：\n\n\nPro Liteサブスクリプション：月額4.99ユーロまたは年間49.99ユーロで、400GBのストレージスペースと毎月1TBの転送容量をご提供いたします。\nPro Iサブスクリプション：月額9.99ユーロまたは年間99.99ユーロで、2TBのストレージスペースと毎月2TBの転送容量をご提供いたします。\nPro II サブスクリプション：月額19.99ユーロまたは年間199.99ユーロで、8TBのストレージスペースと毎月8TBの転送容量をご提供いたします。\nPro IIIサブスクリプション：月額29.99ユーロまたは年間299.99ユーロで、16TBのストレージスペースと毎月16TBの転送容量をご提供いたします。\n\nサブスクリプションは、選択した最初の期間と同じ期間の連続したサブスクリプション期間を対象に、および同じ価格で、自動的に更新されます。サブスクリプションを管理するには、携帯端末のPlay Storeアイコンをタップし、Google IDでサインインします（まだそのように行っていない場合）。次に、MEGAアプリをタップします。そこでサブスクリプションを管理することができます。\n\nアプリの権限：\nWRITE_EXTERNAL_STORAGE -&gt; MEGAから端末にファイルをダウンロードし、端末からMEGAにファイルをアップロードします\nCAMERA -&gt; 写真を撮って写真をMEGAにアップロードします\nREAD_CONTACTS -&gt; MEGAの連絡先として端末からカンタンに連絡先を追加します\nRECORD_AUDIOと CAPTURE_VIDEO_OUTPUT（マイクとカメラ） -&gt; MEGAは、エンドツーエンドの暗号化された音声/ビデオ通話をご提供いたします\n\n\nMEGAシステムに対するユーザー様の信頼を高めるために、クライアントサイドのコードはすべて公開しております。そのため、ご関心をお持ちのセキュリティ研究者の方々は、この暗号化プロセスを評価することができます。当社のモバイルアプリのコードは次の場所にございます：https://github.com/meganz/android \n\n詳細については、当社のウェブサイトをご覧ください：\n https://mega.nz/terms にアクセスしてください\n\n\nデスクトップ－ https://mega.nz/</string>
-    <!-- Short description text of the app in the Google Play page of the app (character limit 80) -->
-    <string name="short_description_text">MEGAは、安全な常時プライバシーを備えたクラウドストレージです。</string>
     <!-- PRO Lite account -->
     <string name="prolite_account">Pro Lite</string>
     <!-- Name of the MEGA PDF Viewer. Keep uppercase. -->
@@ -3887,8 +3883,6 @@
     </plurals>
     <!-- Button of the warning dialog indicating the renamed name file extension is not the same to confirm the change. -->
     <string name="action_change_anyway">とにかく変更する</string>
-    <!-- Snackbar text to display if the user doesn't grant the permission to access all files on a device with Android 11 or higher -->
-    <string name="snackbar_storage_permission_denied_android_11">ストレージへのアクセスには許可が必要です。</string>
     <!-- String to show the transfer quota and the used space in My Account section. E.g.: -->
     <string name="used_storage_transfer">%1$s / %2$s</string>
     <!-- String to show the transfer quota and the used space in My Account section -->
@@ -4079,4 +4073,30 @@
     <string name="main_view">メインビュー</string>
     <!-- Warning in Offline section alerting all the Offline files will be deleted after logout. -->
     <string name="offline_warning">ログアウトすると、オフラインのコンテンツが削除されます。</string>
+    <!-- Settings category which contains all preferences related to user interface. -->
+    <string name="user_interface_setting">ユーザーインターフェイス</string>
+    <!-- Setting which allows to choose the start screen. -->
+    <string name="start_screen_setting">開始画面</string>
+    <!-- Setting which allows to hide or show the recent activity. -->
+    <string name="hide_recent_setting">最近のアクティビティを非表示にする</string>
+    <!-- Context of a setting which allows to hide or show the recent activity. -->
+    <string name="hide_recent_setting_context">ホームセクションの最近のアクティビティを非表示にします。</string>
+    <!-- Title of a dialog informing the start screen can be modified. -->
+    <string name="choose_start_screen_title">開始画面を選択</string>
+    <!-- Test of a dialog informing the start screen can be modified. -->
+    <string name="choose_start_screen_text">MEGAアプリを次回起動したときに開く画面を選ぶための設定を変更します。</string>
+    <!-- Action button which allows to change a setting. -->
+    <string name="change_setting_action">設定を変更</string>
+    <!-- Subtitle of the settings page where the start screen can be chosen. -->
+    <string name="configure_start_screen">デフォルトの開始画面を構成</string>
+    <!-- Homepage section. -->
+    <string name="home_section">ホーム</string>
+    <!-- Action button which allows to show the recent activity. -->
+    <string name="show_activity_action">アクティビティを表示</string>
+    <!-- Text informing the recent activity is hidden. -->
+    <string name="recents_activity_hidden">[B]最近[/B]のアクティビティは非表示です</string>
+    <!-- Alert informing the user can choose the video quality for Camera Uploads Videos -->
+    <string name="video_quality_info">カメラアップロードの設定で動画の品質を下げることで、容量を節約することができます。</string>
+    <!-- Label indicating video original quality -->
+    <string name="original_quality">元の品質</string>
 </resources>

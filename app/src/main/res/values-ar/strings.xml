@@ -1,9 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- Full description text of the app in the Google Play page of the app (character limit 4000) -->
-    <string name="full_description_text">تقدم ميغا MEGA تحزين سحابي مشفرة و متحكم به عن طريق المستخدم و محادثة متاحة عبر متصفحات الويب الأساسية، بالإضافة لتطبيقات مخصصة للهواتف المحمولة. خلافاً لباقي مقدمي خدمة التخزين السحابي، يتم تشفير و فك تشفير البيانات الخاصة بك عن طريق الأجهزة الخاصة بك فقط و ليس عن طريقنا نهائياً.\n\nقم بترفيع ملفاتك من هاتفك الذكي أو الجهاز اللوحي ثم ابحث أو خزن أو حمل أو بث أو شاهد أو شارك أو أعد التسمية أو احذف ملفاتك بأي وقت ومن أي جهاز وفي أي مكان. شارك مجلدات مع جهات الاتصال خاصتك و شاهد تحديثاتهم فورياً في الوقت الحقيقي. عملية التشفير تعني أننا لا نستطيع الدخول أو إعادة تعيين كلمة المرور الخاصة بك لذا عليك تذكرها (مالم يكن لديك نسخة احتياطية من مفتاح الاستعادة) أو ستفقد إمكانية الدخول لملفاتك المخزنة.\n\nمكالمات الفيديو في ميغا MEGA المشفرة من طرف الى طرف تُتيح للمستخدم خصوصية كاملة، وهي متوفرة عن طريق المتصفح منذ 2016. وتم ضم الميزة لتطبيقاتنا على الهواتف المحمولة مع إمكانية تصفح تاريخ المحادثات عبر الأجهزة المختلفة. يستطيع المستخدمون أيضاً إضافة ملفات لمحادثة ما من سحابة التخزين ميغا MEGA الخاصة بهم وبكل سهولة.\n\nتقدم ميغا MEGA 20 غيغابايت كمساحة تخزينية واسعة و مجانية لجميع المستخدمين المسجلين لديها مع مكافآت الانجازات، كما توفر أيضا باقات مدفوعة لمساحات تخزين اعلى بكثير:\n\n\nاشتراك Pro Lite برو لايت : 4.99 يورو في الشهر أو 49.99 يورو في السنة يمنحك 400 غيغابايت من مساحة التخزين و 1 تيرابايت من حجم التراسل المتاح في الشهر.\nاشتراك Pro I برو 1: 9.99 يورو في الشهر أو 99.99 يورو في السنة يمنحك 2 تيرابايت من مساحة التخزين و 2 تيرابايت من حجم التراسل المتاح في الشهر.\nاشتراك Pro II برو 2: 19.99 يورو في الشهر أو 199.99 يورو في السنة يمنحك 8 تيرابايت من مساحة التخزين و 8 تيرابايت من حجم التراسل المتاح في الشهر.\nاشتراك Pro III برو 3: 29.99 يورو في الشهر أو 299.99 يورو في السنة يمنحك 16 تيرابايت من مساحة التخزين و 16 تيرابايت من حجم التراسل المتاح في الشهر.\n\nيتم تجديد الاشتراكات بشكل تلقائي و متتالي ولنفس مدة الاشتراك وبنفس سعر الاشتراك المدفوع في بداية المدة المختارة. لإدارة اشتراكاتك، ما عليك سوى النقر على أيقونة متجر بلاي Play store على جهازك المحمول، ثم سجل دخولك باستخدام حسابك على غوغل (في حال لم تكن قد قمت بتسجيل دخولك سابقاً)، ثم انقر على تطبيق ميغا MEGA. ستتمكن من إدارة اشتراكك هناك.\n\nصلاحيات التطبيق:\nالتخزين_على_الذاكرة_الخارجية -&gt;تنزيل ملفات من ميغا MEGA إلى جهازك وترفيع ملفات من جهازك إلى ميغا MEGA\nالكاميرا-&gt; التقاط صورة و ترفيع صورك إلى ميغا MEGA\nقراءة_جهات_الاتصال -&gt; إضافة جهات إتصال على ميغا MEGA من جهات الاتصال على جهازك بكل سهولة\nتسجيل_صوت و التقاط_فيديو_من خلال (الكاميرا و المايكروفون) -&gt; تقوم ميغا MEGA بتقديم اتصال صوت أو فيديو مشفر من طرف إلى طرف\n\n\nلتعزيز ثقة المستخدم في نظام ميغا MEGA، كل الرماز/الكود الخاص بالتطبيقات من طرف المستخدم منشور للعموم، بحيث يمكن للباحثين المهتمين في مجال الأمن تقييم عمليات التشفير. رماز/كود تطبيق الهاتف المحمول موجود على: https://github.com/meganz/android \n\nلمزيد من المعلومات، يرجى مراجعة موقعنا الإلكتروني:\nانظر https://mega.nz/terms \n\n\nللحاسوب المكتبي - https://mega.nz/</string>
-    <!-- Short description text of the app in the Google Play page of the app (character limit 80) -->
-    <string name="short_description_text">ميغا MEGA هي التخزين السحابي مع خصوصية آمنة دائمًا.</string>
     <!-- PRO Lite account -->
     <string name="prolite_account">برو لايت Pro Lite</string>
     <!-- Name of the MEGA PDF Viewer. Keep uppercase. -->
@@ -4342,8 +4338,6 @@
     </plurals>
     <!-- Button of the warning dialog indicating the renamed name file extension is not the same to confirm the change. -->
     <string name="action_change_anyway">تغيير على أي حال</string>
-    <!-- Snackbar text to display if the user doesn't grant the permission to access all files on a device with Android 11 or higher -->
-    <string name="snackbar_storage_permission_denied_android_11">مطلوب إذن الوصول إلى التخزين.</string>
     <!-- String to show the transfer quota and the used space in My Account section. E.g.: -->
     <string name="used_storage_transfer">%1$s / %2$s</string>
     <!-- String to show the transfer quota and the used space in My Account section -->
@@ -4554,4 +4548,30 @@
     <string name="main_view">عرض كقائمة</string>
     <!-- Warning in Offline section alerting all the Offline files will be deleted after logout. -->
     <string name="offline_warning">تسجيل الخروج يحذف المحتوى الخاص بك في قسم بدون الاتصال.</string>
+    <!-- Settings category which contains all preferences related to user interface. -->
+    <string name="user_interface_setting">واجهة المستخدم</string>
+    <!-- Setting which allows to choose the start screen. -->
+    <string name="start_screen_setting">ابدأ مشاركة الشاشة</string>
+    <!-- Setting which allows to hide or show the recent activity. -->
+    <string name="hide_recent_setting">إخفاء التفاعل مؤخراً</string>
+    <!-- Context of a setting which allows to hide or show the recent activity. -->
+    <string name="hide_recent_setting_context">إخفاء التفاعل مؤخراً في قسم الصفحة الرئيسية</string>
+    <!-- Title of a dialog informing the start screen can be modified. -->
+    <string name="choose_start_screen_title">اختر شاشة البداية الخاصة بك</string>
+    <!-- Test of a dialog informing the start screen can be modified. -->
+    <string name="choose_start_screen_text">قم بتغيير الإعدادات لاختيار الشاشة التي تفتح عند تشغيل تطبيق ميغا MEGA في المرة التالية.</string>
+    <!-- Action button which allows to change a setting. -->
+    <string name="change_setting_action">تغيير الإعدادات</string>
+    <!-- Subtitle of the settings page where the start screen can be chosen. -->
+    <string name="configure_start_screen">التهيئة الافتراضية لشاشة البداية</string>
+    <!-- Homepage section. -->
+    <string name="home_section">الصفحة الرئيسية</string>
+    <!-- Action button which allows to show the recent activity. -->
+    <string name="show_activity_action">اعرض التفاعل</string>
+    <!-- Text informing the recent activity is hidden. -->
+    <string name="recents_activity_hidden">التفاعل[B]مؤخراً[/B] مخفي</string>
+    <!-- Alert informing the user can choose the video quality for Camera Uploads Videos -->
+    <string name="video_quality_info">يمكنك توفير مساحة عن طريق تقليل جودة الفيديو في إعدادات ترفيعات الكاميرا.</string>
+    <!-- Label indicating video original quality -->
+    <string name="original_quality">الجودة الاصلية</string>
 </resources>

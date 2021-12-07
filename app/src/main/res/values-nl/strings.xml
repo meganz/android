@@ -1,9 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- Full description text of the app in the Google Play page of the app (character limit 4000) -->
-    <string name="full_description_text">MEGA biedt door de gebruiker gecontroleerde gecodeerde cloudopslag en chat via standaard webbrowsers, samen met speciale applicaties voor mobiele apparaten. In tegenstelling tot andere cloudopslagdiensten worden uw gegevens alleen gecodeerd en gedecodeerd door uw programma-apparaten en nooit door ons.\n\nUpload uw bestanden vanaf uw smartphone of tablet en zoek, bewaar, download, stream, bekijk, deel en hernoem ze of verwijder uw bestanden op elk moment, vanaf elk apparaat en overal. Deel mappen met uw contacten en bekijk hun updates in realtime. Het coderingsproces betekent dat we geen toegang hebben tot uw wachtwoord of het opnieuw kunnen instellen, dus u MOET het onthouden (tenzij u een back-up van uw herstelsleutel heeft), anders verliest u de toegang tot uw opgeslagen bestanden.\n\nEnd-to-end-gebruikersgecodeerde MEGA videochat zorgt voor totale privacy en is sinds 2016 beschikbaar via de browser. Het is uitgebreid naar onze mobiele applicatie, met chatgeschiedenis die toegankelijk is op meerdere apparaten. Gebruikers kunnen ook eenvoudig bestanden toevoegen aan een chat vanaf hun MEGA Cloud Drive.\n\nMEGA biedt een royale 50 GB gratis opslagruimte voor alle geregistreerde gebruikers met bonusprestaties, en biedt betaalde abonnementen met veel hogere limieten: \n\n\nPro Lite-abonnement: 4,99 € per maand of 49,99 € per jaar geeft u 400 GB opslagruimte en 1 TB overdrachtstegoed per maand. \nPro I-abonnement: 9,99 € per maand of 99,99 € per jaar geeft u 2 TB opslagruimte en 2 TB overdrachtstegoed per maand. \nPro II-abonnement: 19,99 € per maand of 199,99 € per jaar geeft u 8 TB opslagruimte en 8 TB overdrachtstegoed per maand. \nPro III-abonnement: 29,99 € per maand of 299,99 € per jaar geeft je 16 TB opslagruimte en 16 TB overdrachtstegoed per maand. \n\nAbonnementen worden automatisch verlengd voor opeenvolgende abonnementsperiodes van dezelfde duur en voor dezelfde prijs als de gekozen beginperiode. Om uw abonnementen te beheren, tikt u gewoon op het Play Store-pictogram op uw mobiele apparaat, logt u in met uw Google-ID (als u dit nog niet heeft gedaan) en klikt u vervolgens op de MEGA-applicatie. U kunt daar uw abonnement beheren. \n\nApplicatie-machtigingen: \nWRITE_EXTERNAL_STORAGE -&gt; Download uw bestanden van MEGA naar uw apparaat en upload bestanden van uw apparaat naar MEGA \nCAMERA -&gt;Neem een foto en upload uw foto’s naar MEGA \nREAD_CONTACTS -&gt; Voeg eenvoudig contacten toe vanaf je apparaat als MEGA-contacten \nRECORD_AUDIO en CAPTURE_VIDEO_OUTPUT (microfoon en camera) -&gt; MEGA zorgt voor end-to-end gecodeerde audio-/videogesprekken \n\n\nOm het vertrouwen van gebruikers in het MEGA-systeem te vergroten, wordt alle code aan de klantzijde gepubliceerd, zodat geïnteresseerde beveiligingsonderzoekers het coderingsproces kunnen evalueren. De code van onze mobiele applicatie is te vinden op:https://github.com/meganz/android \n\nVoor meer informatie, kijk op onze website: \nZie https://mega.nz/terms \n\n\nDesktop - https://mega.nz/</string>
-    <!-- Short description text of the app in the Google Play page of the app (character limit 80) -->
-    <string name="short_description_text">MEGA is een Cloud Opslag met veilige, altijd beschikbare privacy.</string>
     <!-- PRO Lite account -->
     <string name="prolite_account">Pro Lite</string>
     <!-- Name of the MEGA PDF Viewer. Keep uppercase. -->
@@ -3978,8 +3974,6 @@
     </plurals>
     <!-- Button of the warning dialog indicating the renamed name file extension is not the same to confirm the change. -->
     <string name="action_change_anyway">Toch wijzigen</string>
-    <!-- Snackbar text to display if the user doesn't grant the permission to access all files on a device with Android 11 or higher -->
-    <string name="snackbar_storage_permission_denied_android_11">Toestemming nodig voor toegang tot opslag.</string>
     <!-- String to show the transfer quota and the used space in My Account section. E.g.: -->
     <string name="used_storage_transfer">%1$s / %2$s</string>
     <!-- String to show the transfer quota and the used space in My Account section -->
@@ -4174,4 +4168,30 @@
     <string name="main_view">Hoofdweergave</string>
     <!-- Warning in Offline section alerting all the Offline files will be deleted after logout. -->
     <string name="offline_warning">Als u zich afmeldt, wordt uw offline inhoud verwijderd.</string>
+    <!-- Settings category which contains all preferences related to user interface. -->
+    <string name="user_interface_setting">Gebruikers interface</string>
+    <!-- Setting which allows to choose the start screen. -->
+    <string name="start_screen_setting">Start scherm</string>
+    <!-- Setting which allows to hide or show the recent activity. -->
+    <string name="hide_recent_setting">Recente activiteit verbergen</string>
+    <!-- Context of a setting which allows to hide or show the recent activity. -->
+    <string name="hide_recent_setting_context">Verberg recente activiteit in Home sectie.</string>
+    <!-- Title of a dialog informing the start screen can be modified. -->
+    <string name="choose_start_screen_title">Kies uw start scherm</string>
+    <!-- Test of a dialog informing the start screen can be modified. -->
+    <string name="choose_start_screen_text">Wijzig instellingen om te kiezen welk scherm wordt geopend wanneer u de volgende keer de MEGA-applicatie start.</string>
+    <!-- Action button which allows to change a setting. -->
+    <string name="change_setting_action">Wijzig instelling</string>
+    <!-- Subtitle of the settings page where the start screen can be chosen. -->
+    <string name="configure_start_screen">Configureer standaard start scherm</string>
+    <!-- Homepage section. -->
+    <string name="home_section">Thuis</string>
+    <!-- Action button which allows to show the recent activity. -->
+    <string name="show_activity_action">Activiteit weergeven</string>
+    <!-- Text informing the recent activity is hidden. -->
+    <string name="recents_activity_hidden">[B]Recent[/B] activiteit verborgen</string>
+    <!-- Alert informing the user can choose the video quality for Camera Uploads Videos -->
+    <string name="video_quality_info">U kunt ruimte besparen door de videokwaliteit te verlagen in de Camera Upload instellingen.</string>
+    <!-- Label indicating video original quality -->
+    <string name="original_quality">Originele kwaliteit</string>
 </resources>

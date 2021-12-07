@@ -285,6 +285,7 @@ open class BaseBottomSheetDialogFragment : BottomSheetDialogFragment(), Activity
                 val windowInsets = requireActivity().window.decorView.rootWindowInsets
 
                 if (windowInsets != null) {
+                    @Suppress("DEPRECATION")
                     val insets =
                         WindowInsetsCompat.toWindowInsetsCompat(windowInsets).systemWindowInsets
 
@@ -313,6 +314,7 @@ open class BaseBottomSheetDialogFragment : BottomSheetDialogFragment(), Activity
         startActivity(intent)
     }
 
+    @Suppress("deprecation") // TODO Migrate to registerForActivityResult()
     override fun launchActivityForResult(intent: Intent, requestCode: Int) {
         startActivityForResult(intent, requestCode)
     }

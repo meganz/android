@@ -13,21 +13,12 @@
     <item
         android:id="@+id/action_search"
         android:icon="@drawable/ic_menu_search"
-        android:orderInCategory="85"
+        android:orderInCategory="95"
         android:title="@string/action_search"
         android:visible="false"
         app:actionViewClass="androidx.appcompat.widget.SearchView"
         app:iconTint="?attr/colorControlNormal"
         app:showAsAction="ifRoom|collapseActionView" />
-
-    <item
-        android:id="@+id/action_grid_view_large_small"
-        android:icon="@drawable/ic_thumbnail_view"
-        android:orderInCategory="90"
-        android:title="@string/action_grid"
-        android:visible="false"
-        app:iconTint="?attr/colorControlNormal"
-        app:showAsAction="ifRoom" />
 
     <item
         android:id="@+id/action_play"
@@ -142,15 +133,6 @@
         android:title="@string/action_sort_by"
         android:visible="false"
         app:showAsAction="never" />
-
-    <item
-        android:id="@+id/action_grid"
-        android:icon="@drawable/ic_action_bar_null"
-        android:orderInCategory="120"
-        android:title="@string/action_grid"
-        android:visible="false"
-        app:iconTint="?attr/colorControlNormal"
-        app:showAsAction="always" />
 
     <item
         android:id="@+id/action_menu_help"

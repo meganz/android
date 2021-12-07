@@ -1,9 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- Full description text of the app in the Google Play page of the app (character limit 4000) -->
-    <string name="full_description_text">MEGA ofrece un servicio de almacenamiento en la nube y de chat cifrado y controlado por el usuario a través del navegador y de la aplicación para dispositivos móviles. A diferencia de otros proveedores de almacenamiento en la nube, tus datos son cifrados y descifrados únicamente en tus dispositivos y nunca por nosotros.\n\nSube tus archivos desde tu smartphone o tablet, luego busca, almacena, descarga, muestra, reproduce, comparte, renombra o elimina tus archivos en cualquier momento, desde cualquier dispositivo, en cualquier lugar. Comparte carpetas con tus contactos y comprueba sus actualizaciones en tiempo real. El cifrado nos impide conocer o restablecer tu contraseña, por lo que DEBES recordarla (o tener una copia de seguridad de tu Clave de recuperación) o perderás el acceso a tus archivos almacenados.\n\nLas videollamadas cifradas punto a punto de MEGA permiten una privacidad absoluta y llevan estando disponibles en el navegador desde 2016. Se proporcionan también en nuestra app para móvil, con el historial de chat accesible a través de múltiples dispositivos. Además los usuarios pueden añadir fácilmente archivos a un chat directamente desde su nube de MEGA.\n\nMEGA brinda un almacenamiento gratuito de 50 GB sujeto al programa de logros para todos los usuarios registrados, y ofrece planes de pago con límites mucho más amplios:\n\n\nSuscripción Pro LITE: 4,99€ al mes o 49,99€ al año, con 400 GB de espacio de almacenamiento y 1 TB de cuota de transferencia al mes.\nSuscripción Pro I: 9,99€ al mes o 99,99€ al año, con 2 TB de espacio de almacenamiento y 2 TB de cuota de transferencia al mes.\nSuscripción Pro II: 19,99€ al mes o 199,99€ al año, con 8 TB de espacio de almacenamiento y 8 TB de cuota de transferencia al mes.\nSuscripción Pro III: 29,99€ al mes o 299,99€ al año, con 16 TB de espacio de almacenamiento y 16 TB de cuota de transferencia al mes.\n\nLa suscripción se renueva automáticamente con la misma duración y precio elegidos inicialmente. Para gestionar tu suscripción, ve a la Play Store en tu dispositivo móvil, inicia sesión con tu Google ID (si aún no lo has hecho) y luego pulsa en la aplicación de MEGA. Desde aquí, podrás gestionar tu suscripción.\n\nPermisos de la aplicación:\nWRITE_EXTERNAL_STORAGE -&gt; Descarga tus archivos de MEGA a tu dispositivo y sube archivos desde tu dispositivo a MEGA\nCAMERA -&gt; Haz fotos y súbelas a MEGA\nREAD_CONTACTS -&gt; Añade contactos desde tu dispositivo a MEGA\nRECORD_AUDIO y CAPTURE_VIDEO_OUTPUT (micrófono y cámara) -&gt; MEGA proporciona llamadas y videollamadas cifradas punto a punto\n\n\nPara que los usuarios confíen plenamente en el sistema de MEGA, todo el código del cliente es público y los ingenieros de seguridad podrán evaluar nuestro proceso de cifrado. El código de nuestra aplicación móvil se encuentra en: https://github.com/meganz/android \n\nPara obtener más información, consulta nuestro sitio web:\nhttps://mega.nz/terms \n\n\nDesde ordenador - https://mega.nz/</string>
-    <!-- Short description text of the app in the Google Play page of the app (character limit 80) -->
-    <string name="short_description_text">MEGA es almacenamiento en la nube con privacidad permanente y segura.</string>
     <!-- PRO Lite account -->
     <string name="prolite_account">Pro Lite</string>
     <!-- Name of the MEGA PDF Viewer. Keep uppercase. -->
@@ -3978,8 +3974,6 @@
     </plurals>
     <!-- Button of the warning dialog indicating the renamed name file extension is not the same to confirm the change. -->
     <string name="action_change_anyway">Cambiar de todos modos</string>
-    <!-- Snackbar text to display if the user doesn't grant the permission to access all files on a device with Android 11 or higher -->
-    <string name="snackbar_storage_permission_denied_android_11">Se necesita permiso de acceso al almacenamiento.</string>
     <!-- String to show the transfer quota and the used space in My Account section. E.g.: -->
     <string name="used_storage_transfer">%1$s / %2$s</string>
     <!-- String to show the transfer quota and the used space in My Account section -->
@@ -4174,4 +4168,30 @@
     <string name="main_view">Vista principal</string>
     <!-- Warning in Offline section alerting all the Offline files will be deleted after logout. -->
     <string name="offline_warning">Si cierras sesión, el contenido sin conexión será eliminado.</string>
+    <!-- Settings category which contains all preferences related to user interface. -->
+    <string name="user_interface_setting">Interfaz de usuario</string>
+    <!-- Setting which allows to choose the start screen. -->
+    <string name="start_screen_setting">Pantalla de inicio</string>
+    <!-- Setting which allows to hide or show the recent activity. -->
+    <string name="hide_recent_setting">Ocultar actividad reciente</string>
+    <!-- Context of a setting which allows to hide or show the recent activity. -->
+    <string name="hide_recent_setting_context">Ocultar la actividad reciente en la sección Inicio.</string>
+    <!-- Title of a dialog informing the start screen can be modified. -->
+    <string name="choose_start_screen_title">Elegir la pantalla de inicio</string>
+    <!-- Test of a dialog informing the start screen can be modified. -->
+    <string name="choose_start_screen_text">Cambiar los ajustes para elegir qué pantalla se abrirá la próxima vez que inicies la aplicación de MEGA.</string>
+    <!-- Action button which allows to change a setting. -->
+    <string name="change_setting_action">Cambiar ajustes</string>
+    <!-- Subtitle of the settings page where the start screen can be chosen. -->
+    <string name="configure_start_screen">Configurar la pantalla de inicio predeterminada</string>
+    <!-- Homepage section. -->
+    <string name="home_section">Inicio</string>
+    <!-- Action button which allows to show the recent activity. -->
+    <string name="show_activity_action">Mostrar actividad</string>
+    <!-- Text informing the recent activity is hidden. -->
+    <string name="recents_activity_hidden">[B]Actividad reciente[/B] oculta</string>
+    <!-- Alert informing the user can choose the video quality for Camera Uploads Videos -->
+    <string name="video_quality_info">Ahorra espacio disminuyendo la calidad de vídeo en los ajustes de las Subidas de la cámara.</string>
+    <!-- Label indicating video original quality -->
+    <string name="original_quality">Calidad original</string>
 </resources>
