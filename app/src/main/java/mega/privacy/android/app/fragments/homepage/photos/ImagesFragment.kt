@@ -66,8 +66,17 @@ class ImagesFragment : BaseZoomFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        setupBinding()
         initViewCreated()
         subscribeObservers()
+    }
+
+    private fun setupBinding() {
+        binding.apply {
+            viewModel = this@ImagesFragment.viewModel
+            lifecycleOwner = viewLifecycleOwner
+            viewTypePanel = photosViewType.root
+        }
     }
 
     override fun onCreateView(
@@ -75,11 +84,7 @@ class ImagesFragment : BaseZoomFragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        binding = FragmentImagesBinding.inflate(inflater, container, false).apply {
-            viewModel = this@ImagesFragment.viewModel
-        }
-        binding.lifecycleOwner = viewLifecycleOwner
-        viewTypePanel = binding.photosViewType.root
+        binding = FragmentImagesBinding.inflate(inflater, container, false)
         return binding.root
     }
 

@@ -9,7 +9,6 @@ import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.view.*
-import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.RelativeLayout
 import android.widget.TextView
@@ -19,13 +18,10 @@ import androidx.core.view.isVisible
 import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import ash.TL
 import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
 import mega.privacy.android.app.components.ListenScrollChangesHelper
-import mega.privacy.android.app.components.dragger.DragThumbnailGetter
-import mega.privacy.android.app.components.dragger.DragToExitSupport
 import mega.privacy.android.app.components.dragger.DragToExitSupport.Companion.observeDragSupportEvents
 import mega.privacy.android.app.components.dragger.DragToExitSupport.Companion.putThumbnailLocation
 import mega.privacy.android.app.databinding.FragmentPhotosBinding
@@ -52,7 +48,7 @@ import mega.privacy.android.app.utils.ZoomUtil.setMargin
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaChatApiJava
 import nz.mega.sdk.MegaNode
-import java.util.ArrayList
+import java.util.*
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -532,14 +528,9 @@ class PhotosFragment : BaseZoomFragment(), GalleryCardAdapter.Listener {
     }
 
     private fun emptyAdapter(): Boolean {
-        val result = if (this::gridAdapter.isInitialized) {
-            TL.log("count: ${gridAdapter.itemCount}")
+        if (this::gridAdapter.isInitialized) {
             gridAdapter.itemCount <= 0
-        } else {
-            false
         }
-        TL.log(result)
-
         return false
     }
 

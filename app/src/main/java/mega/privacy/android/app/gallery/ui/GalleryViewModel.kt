@@ -38,6 +38,9 @@ import java.time.format.DateTimeFormatter
 import java.util.*
 import java.util.concurrent.TimeUnit
 
+/**
+ * GalleryViewModel encapsulate UI handle logic when read mega node which the type is video and audio
+ */
 abstract class GalleryViewModel constructor(
     @MegaApi private val mMegaApi: MegaApiAndroid,
     private val mRepo: MegaNodeRepo,
