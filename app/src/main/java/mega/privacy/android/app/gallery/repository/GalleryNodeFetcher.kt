@@ -29,7 +29,7 @@ class GalleryNodeFetcher(
     private val megaApi: MegaApiAndroid,
     private val selectedNodesMap: LinkedHashMap<Any, GalleryItem>,
     private val zoom: Int
-) : TypedNodesFetcher<GalleryItem>(context, megaApi, selectedNodesMap = selectedNodesMap) {
+) : TypedNodesFetcher(context, megaApi, selectedNodesMap = selectedNodesMap) {
 
     private val getPreviewNodes = mutableMapOf<MegaNode, String>()
 

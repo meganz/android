@@ -23,7 +23,7 @@ class TypedFilesRepository @Inject constructor(
     var fileNodeItems: LiveData<List<NodeItem>> = MutableLiveData()
 
     /** Current effective NodeFetcher */
-    lateinit var nodesFetcher: TypedNodesFetcher<NodeItem>
+    lateinit var nodesFetcher: TypedNodesFetcher
 
     /** The selected nodes in action mode */
     private val selectedNodesMap: LinkedHashMap<Any, NodeItem> = LinkedHashMap()

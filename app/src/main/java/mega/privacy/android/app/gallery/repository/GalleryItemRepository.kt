@@ -35,7 +35,8 @@ class GalleryItemRepository @Inject constructor(
         // Create a node fetcher for the new request, and link fileNodeItems to its result.
         // Then the result of any previous NodesFetcher will be ignored
         nodesFetcher = GalleryNodeFetcher(context, megaApi, selectedNodesMap, zoom)
-        galleryItems = nodesFetcher.result
+        @Suppress("UNCHECKED_CAST")
+        galleryItems = nodesFetcher.result as MutableLiveData<List<GalleryItem>>
 
         withContext(Dispatchers.IO) {
             nodesFetcher.getGalleryItems()

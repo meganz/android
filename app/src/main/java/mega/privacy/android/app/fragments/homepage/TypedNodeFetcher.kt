@@ -6,7 +6,6 @@ import android.os.Looper
 import androidx.lifecycle.MutableLiveData
 import kotlinx.coroutines.delay
 import mega.privacy.android.app.listeners.BaseListener
-import mega.privacy.android.app.listeners.OptionalMegaRequestListenerInterface
 import mega.privacy.android.app.utils.*
 import nz.mega.sdk.*
 import java.io.File
@@ -17,21 +16,21 @@ import kotlin.collections.LinkedHashMap
 /**
  * Data fetcher for fetching typed files
  */
-open class TypedNodesFetcher<N : NodeItem>(
+open class TypedNodesFetcher(
     private val context: Context,
     private val megaApi: MegaApiAndroid,
     private val type: Int = MegaApiJava.FILE_TYPE_DEFAULT,
     private val order: Int = MegaApiJava.ORDER_DEFAULT_ASC,
-    private val selectedNodesMap: LinkedHashMap<Any, N>
+    private val selectedNodesMap: LinkedHashMap<Any, out NodeItem>
 ) {
-    val result = MutableLiveData<List<N>>()
+    val result = MutableLiveData<List<NodeItem>>()
 
     /**
      * LinkedHashMap guarantees that the index order of elements is consistent with
      * the order of putting. Moreover, it has a quick element search[O(1)] (for
      * the callback of megaApi.getThumbnail())
      */
-    val fileNodesMap: LinkedHashMap<Any, N> = LinkedHashMap()
+    val fileNodesMap: LinkedHashMap<Any, NodeItem> = LinkedHashMap()
 
     /** Refresh rate limit */
     var waitingForRefresh = false
@@ -55,11 +54,6 @@ open class TypedNodesFetcher<N : NodeItem>(
 
     fun getThumbnailFile(node: MegaNode) = File(
         ThumbnailUtilsLollipop.getThumbFolder(context),
-        node.base64Handle.plus(FileUtil.JPG_EXTENSION)
-    )
-
-    private fun getPreviewFile(node: MegaNode) = File(
-        PreviewUtils.getPreviewFolder(context),
         node.base64Handle.plus(FileUtil.JPG_EXTENSION)
     )
 
@@ -99,7 +93,7 @@ open class TypedNodesFetcher<N : NodeItem>(
                 dateString,
                 thumbnail,
                 selected
-            ) as N
+            )
         }
 
         result.postValue(ArrayList(fileNodesMap.values))
