@@ -8,7 +8,6 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.res.Configuration;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
@@ -38,6 +37,7 @@ import android.widget.Toast;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -261,7 +261,7 @@ public class FullScreenImageViewerLollipop extends PasscodeActivity
 			fromIncoming = nC.nodeComesFromIncoming(megaApi.getNodeByHandle(imageHandles.get(positionG)));
 		}
 
-		if(adapterType != OFFLINE_ADAPTER) {
+		if(adapterType != OFFLINE_ADAPTER && adapterType != ZIP_ADAPTER) {
             shareIcon.setVisible(showShareOption(adapterType, isFolderLink, imageHandles.get(positionG)));
         }
 
@@ -287,7 +287,7 @@ public class FullScreenImageViewerLollipop extends PasscodeActivity
 			removeIcon.setVisible(false);
 			chatIcon.setVisible(false);
 		} else if (adapterType == RUBBISH_BIN_ADAPTER
-				|| megaApi.isInRubbish(megaApi.getNodeByHandle(imageHandles.get(positionG)))){
+				|| (!imageHandles.isEmpty() && megaApi.isInRubbish(megaApi.getNodeByHandle(imageHandles.get(positionG))))){
 			renameIcon.setVisible(false);
 			moveIcon.setVisible(false);
 			copyIcon .setVisible(false);
@@ -654,7 +654,7 @@ public class FullScreenImageViewerLollipop extends PasscodeActivity
 				if (adapterType == OFFLINE_ADAPTER) {
 					shareFile(this, getOfflineFile(this, mOffListImages.get(positionG)));
 				} else if (adapterType == ZIP_ADAPTER) {
-					shareFile(this, zipFiles.get(positionG));
+					shareFile(this, new File(paths.get(positionG)));
 				} else if (adapterType == FILE_LINK_ADAPTER) {
 					shareLink(this, url);
 				} else {
@@ -915,8 +915,6 @@ public class FullScreenImageViewerLollipop extends PasscodeActivity
 			File offlineDirectory = new File(currentImage.getParent());
 
 			paths.clear();
-			int imageNumber = 0;
-			int index = 0;
 			File[] fList = offlineDirectory.listFiles();
 			if(fList == null)
 			{
@@ -925,35 +923,36 @@ public class FullScreenImageViewerLollipop extends PasscodeActivity
 				finish();
 				return;
 			}
-			for (int i=0; i<fList.length; i++) {
-				zipFiles.add(fList[i]);
-			}
-			Collections.sort(zipFiles, (z1, z2) -> {
-				String name1 = z1.getName();
-				String name2 = z2.getName();
-				int res = String.CASE_INSENSITIVE_ORDER.compare(name1, name2);
-				if (res == 0) {
-					res = name1.compareTo(name2);
-				}
-				return res;
-			});
 
-			logDebug("SIZE: " + zipFiles.size());
-			for (File f : zipFiles){
-				logDebug("F: " + f.getAbsolutePath());
-				if (MimeTypeList.typeForName(f.getName()).isImage()){
-					paths.add(f.getAbsolutePath());
-					if (index == positionG && savedInstanceState == null){
-						positionG = imageNumber;
-					}
-					imageNumber++;
-				}
-				index++;
-			}
+            zipFiles.addAll(Arrays.asList(fList));
+            // Put folders at first.
+            Collections.sort(zipFiles, (z1, z2) -> {
+                if ((z1.isDirectory() && z2.isDirectory()) || (!z1.isDirectory() && !z2.isDirectory())) {
+                    return 0;
+                }
+                return -1;
+            });
+            logDebug("SIZE: " + zipFiles.size());
 
-			if(paths.size() == 0) finish();
+            // Add all images into a list first.
+            for (File f : zipFiles) {
+                if (MimeTypeList.typeForName(f.getName()).isImage()) {
+                    paths.add(f.getAbsolutePath());
+                }
+            }
 
-			if(positionG >= paths.size()) positionG = 0;
+            if (paths.isEmpty()) finish();
+
+            // Adjust positionG
+            int nonImageNum = 0;
+            for (int i = 0; i < positionG; i++) {
+                String name = zipFiles.get(i).getName();
+                if (!MimeTypeList.typeForName(name).isImage()) {
+                    nonImageNum++;
+                }
+            }
+            positionG -= nonImageNum;
+            if(positionG >= paths.size()) positionG = 0;
 
 			adapterOffline = new MegaOfflineFullScreenImageAdapterLollipop(this, fullScreenImageViewer, paths, true);
 			fileNameTextView.setText(new File(paths.get(positionG)).getName());
@@ -1029,7 +1028,7 @@ public class FullScreenImageViewerLollipop extends PasscodeActivity
 			getImageHandles(nodes, savedInstanceState);
 		}
 
-		if (adapterType == OFFLINE_ADAPTER) {
+		if (adapterType == OFFLINE_ADAPTER || adapterType == ZIP_ADAPTER) {
 			viewPager.setAdapter(adapterOffline);
 		}
 		else {
@@ -1536,16 +1535,6 @@ public class FullScreenImageViewerLollipop extends PasscodeActivity
 						logError(ex.getMessage());
 					}
 				}
-			}
-		} else if (requestCode == REQUEST_WRITE_STORAGE) {
-			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-				if (Environment.isExternalStorageManager()) {
-					nodeSaver.handleRequestPermissionsResult(requestCode);
-				} else {
-					super.onActivityResult(requestCode, resultCode, intent);
-				}
-			} else {
-				super.onActivityResult(requestCode, resultCode, intent);
 			}
 		}
 	}

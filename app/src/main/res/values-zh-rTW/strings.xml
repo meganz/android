@@ -1,9 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- Full description text of the app in the Google Play page of the app (character limit 4000) -->
-    <string name="full_description_text">MEGA透過標準網頁瀏覽器以及行動裝置專屬應用程式提供用戶控制的加密雲端儲存及對話功能。與其他雲端儲存服務供應商不同，您的資料僅可由您的用戶端裝置加密與解密，並非透過我們。\n\n從智慧型手機或平板電腦上傳檔案，然後可以從任何裝置搜尋、儲存、下載、串流播放、查看、共享，重新命名或刪除您的檔案。與您的聯絡人共享資料夾，並即時查看他們的更新狀況。加密功能表示我們無法存取或重置您的密碼，因此您必須記住它（除非您有備份還原金鑰；忘記密碼時可透過金鑰重設帳號密碼），否則您將無法存取您所儲存的檔案。\n\n點對點使用者加密的MEGA視訊通話能確保完全的隱私，此功能自2016年起可在網頁瀏覽器中使用，而且現在已支援我們的行動應用程式，並且可在多個裝置上檢視對話記錄。用戶還可以從MEGA雲端硬碟輕鬆地將檔案加入對話中。\n \nMEGA為所有註冊用戶大方的提供20 GB免費儲存空間以及成就獎勵，並提供更大空間的付費方案：\n\n\nPro Lite 訂閱：每月4.99歐元或每年49.99歐元，每月為您提供400 GB的儲存空間和1 TB的傳輸配額。\nPro I 訂閱：每月9.99歐元或每年99.99歐元，每月為您提供2 TB的儲存空間和2 TB的傳輸配額。\nPro II 訂閱：每月19.99歐元或每年199.99歐元，為您提供8 TB的儲存空間和每月8 TB的傳輸配額。\nPro III 訂閱：每月29.99歐元或每年299.99歐元，為您提供16 TB的儲存空間和每月16 TB的傳輸配額。\n\n訂閱將自動續購，且續期與第一次訂閱的相同，價格也相同。欲管理您的訂閱，只需點擊行動裝置上的Play商店圖示，使用您的Google ID登錄（若您尚未登入的話），然後點擊MEGA應用程式，您就能夠管理您的訂閱。\n\n應用程式存取權限：\n外部儲存裝置資料寫入 - &gt;將您的檔案從MEGA下載到您的裝置並將檔案從您的裝置上傳到MEGA \n 相機 - &gt;拍照並將其上傳到MEGA \n 讀取聯絡人 - &gt; 輕鬆將裝置中的聯絡人匯入以作為MEGA聯絡人 \n錄音與影像截取輸出（存取麥克風與相機） - &gt; MEGA提供點對點加密語音/視訊通話\n\n\n為了增加用戶對MEGA系統的信心，所有用戶端程式碼均已發布，有興趣的安全開發人員可以評估我們的加密過程。我們的行動應用程式碼放在：https://github.com/meganz/android \n\n相關詳細資訊，請查詢我們的網站：\nhttps://mega.nz/terms \n\n\n桌上型電腦 - https://mega.nz/</string>
-    <!-- Short description text of the app in the Google Play page of the app (character limit 80) -->
-    <string name="short_description_text">MEGA是隨時保護安全隱私的雲端空間。</string>
     <!-- PRO Lite account -->
     <string name="prolite_account">Pro Lite</string>
     <!-- Name of the MEGA PDF Viewer. Keep uppercase. -->
@@ -3887,8 +3883,6 @@
     </plurals>
     <!-- Button of the warning dialog indicating the renamed name file extension is not the same to confirm the change. -->
     <string name="action_change_anyway">仍要變更</string>
-    <!-- Snackbar text to display if the user doesn't grant the permission to access all files on a device with Android 11 or higher -->
-    <string name="snackbar_storage_permission_denied_android_11">需要存取儲存資料的權限。</string>
     <!-- String to show the transfer quota and the used space in My Account section. E.g.: -->
     <string name="used_storage_transfer">%1$s / %2$s</string>
     <!-- String to show the transfer quota and the used space in My Account section -->
@@ -4079,4 +4073,30 @@
     <string name="main_view">主視圖檢視</string>
     <!-- Warning in Offline section alerting all the Offline files will be deleted after logout. -->
     <string name="offline_warning">登出會刪除您的離線內容。</string>
+    <!-- Settings category which contains all preferences related to user interface. -->
+    <string name="user_interface_setting">使用者介面</string>
+    <!-- Setting which allows to choose the start screen. -->
+    <string name="start_screen_setting">開始畫面</string>
+    <!-- Setting which allows to hide or show the recent activity. -->
+    <string name="hide_recent_setting">隱藏近期動態</string>
+    <!-- Context of a setting which allows to hide or show the recent activity. -->
+    <string name="hide_recent_setting_context">隱藏首頁中的近期動態。</string>
+    <!-- Title of a dialog informing the start screen can be modified. -->
+    <string name="choose_start_screen_title">選擇您的開始畫面</string>
+    <!-- Test of a dialog informing the start screen can be modified. -->
+    <string name="choose_start_screen_text">更改設定來選擇下次啟動MEGA應用程式時的開始畫面。</string>
+    <!-- Action button which allows to change a setting. -->
+    <string name="change_setting_action">變更設定</string>
+    <!-- Subtitle of the settings page where the start screen can be chosen. -->
+    <string name="configure_start_screen">設定預設開始畫面</string>
+    <!-- Homepage section. -->
+    <string name="home_section">首頁</string>
+    <!-- Action button which allows to show the recent activity. -->
+    <string name="show_activity_action">顯示動態</string>
+    <!-- Text informing the recent activity is hidden. -->
+    <string name="recents_activity_hidden">[B]近期[/B]動態已隱藏</string>
+    <!-- Alert informing the user can choose the video quality for Camera Uploads Videos -->
+    <string name="video_quality_info">您可以在相機上傳的設定中調降影片畫質來節省空間。</string>
+    <!-- Label indicating video original quality -->
+    <string name="original_quality">原始品質</string>
 </resources>

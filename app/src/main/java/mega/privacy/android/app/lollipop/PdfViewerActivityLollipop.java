@@ -1043,7 +1043,7 @@ public class PdfViewerActivityLollipop extends PasscodeActivity
                 saveForOfflineMenuItem.setVisible(false);
                 chatRemoveMenuItem.setVisible(false);
             } else if (type == RUBBISH_BIN_ADAPTER
-                    || megaApi.isInRubbish(megaApi.getNodeByHandle(handle))) {
+                    || (megaApi != null && megaApi.isInRubbish(megaApi.getNodeByHandle(handle)))) {
                 shareMenuItem.setVisible(false);
                 getlinkMenuItem.setVisible(false);
                 removelinkMenuItem.setVisible(false);

@@ -173,8 +173,13 @@ public class FileManagementPreferencesActivity extends PreferencesBaseActivity {
 
         setTitle(R.string.settings_file_management_category);
 
-        sttFileManagement = new SettingsFileManagementFragment();
-        replaceFragment(sttFileManagement);
+        if (savedInstanceState == null) {
+            sttFileManagement = new SettingsFileManagementFragment();
+            replaceFragment(sttFileManagement);
+        } else {
+            sttFileManagement = (SettingsFileManagementFragment)
+                    getSupportFragmentManager().findFragmentById(R.id.fragment_container);
+        }
 
         registerReceiver(cacheSizeUpdateReceiver,
                 new IntentFilter(ACTION_UPDATE_CACHE_SIZE_SETTING));

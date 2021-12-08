@@ -1488,8 +1488,10 @@ public class FileProviderActivity extends PasscodeFileProviderActivity implement
 		logDebug("afterFetchNodes");
 		//Set toolbar
 		tB = findViewById(R.id.toolbar_provider);
+		//Set app bar layout
+		aBL = findViewById(R.id.app_bar_layout_provider);
 
-		RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) tB.getLayoutParams();
+		AppBarLayout.LayoutParams params = (AppBarLayout.LayoutParams) tB.getLayoutParams();
 		params.setMargins(0, 0, 0, 0);
 
 		showAB(tB);

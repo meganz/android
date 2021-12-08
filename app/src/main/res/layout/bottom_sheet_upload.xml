@@ -46,12 +46,6 @@
                 android:text="@string/attachment_upload_panel_photo"
                 app:drawableStartCompat="@drawable/ic_from_device" />
 
-            <TextView
-                android:id="@+id/upload_from_system_option"
-                style="@style/BottomSheetOption"
-                android:text="@string/upload_to_filesystem"
-                app:drawableStartCompat="@drawable/ic_pick_file_system" />
-
             <include layout="@layout/view_linear_layout_72_margin_start_separator" />
 
             <TextView

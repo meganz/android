@@ -1,9 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- Full description text of the app in the Google Play page of the app (character limit 4000) -->
-    <string name="full_description_text">MEGA offre un service de stockage nuagique et un système de dialogue en ligne chiffrés, contrôlés par l’utilisateur, en utilisant des navigateurs Web normaux, mais aussi des applis dédiées pour les appareils mobiles. Contrairement aux autres fournisseurs de service de stockage nuagique, vos données sont seulement chiffrées et déchiffrées par vos appareils client et jamais par nous.\n\nTéléversez vos fichiers de votre téléphone intelligent ou tablette, puis recherchez, stockez, téléchargez, lisez en continu, visualisez, partagez, renommez ou supprimez vos fichiers n’importe quand, de n’importe quel appareil, n’importe où. Partagez des dossiers avec vos contacts et suivez leurs modifications en temps réel. Le processus de chiffrement implique que nous ne pouvons ni accéder à votre mot de passe ni le réinitialiser. Vous DEVEZ donc le mémoriser (à moins que vous ayez sauvegardé votre Clé de récupération) ou vous perdrez l’accès à vos fichiers stockés.\n\nLe système de dialogue vidéo de MEGA, chiffré de bout en bout par l’utilisateur, permet une confidentialité totale et est proposé pour les navigateurs depuis 2016. Le service a été étendu à notre appli&#160;MEGA mobile, avec un historique des conversations accessible à partir de plusieurs appareils. Les utilisateurs peuvent aussi facilement ajouter des fichiers à une conversation à partir de leur Disque nuagique&#160;MEGA.\n\nMEGA offre un généreux espace de stockage gratuit de 20&#160;Go à tous les utilisateurs inscrits, avec des primes d’objectif, et propose des abonnements payants avec des limites beaucoup plus élevées&#160;: \n\n\nAbonnement Pro&#160;Lite&#160;: 4,99&#160;€ (4,99&#160;USD) par mois ou 49,99&#160;€ (49,99&#160;USD) par an vous donne 400&#160;Go d’espace de stockage et 1&#160;To de quota de transfert par mois.\nAbonnement Pro I&#160;: 9,99&#160;€ (9,99&#160;USD) par mois ou 99,99&#160;€ (99,99&#160;USD) par an vous donne 2&#160;To d’espace de stockage et 2&#160;To de quota de transfert par mois.\nAbonnement Pro&#160;II&#160;: 19,99&#160;€ (19,99&#160;USD) par mois ou 199,99&#160;€ (199,99&#160;USD) par an vous donne 8&#160;To d’espace de stockage et 8&#160;To de quota de transfert par mois.\nAbonnement Pro&#160;III&#160;: 29,99&#160;€ (29,99&#160;USD) par mois ou 299,99&#160;€ (299,99&#160;USD) par an vous donne 16&#160;To d’espace de stockage et 16&#160;To de quota de transfert par mois.\n\nLes abonnements sont renouvelés automatiquement pour les périodes successives de même durée et au même tarif que la période initiale choisie. Pour gérer vos abonnements, touchez simplement l’icône du magasin Play Store de Google sur votre appareil, connectez-vous avec votre identifiant Google (si ce n’est pas déjà fait). Puis touchez l’appli&#160;MEGA. Vous pourrez y gérer votre abonnement.\n\nPermissions de l’appli&#160;: \nWRITE_EXTERNAL_STORAGE (écriture sur la mémoire externe) -&gt; Télécharger vos fichiers de MEGA vers votre appareil et téléverser des fichiers de votre appareil vers MEGA\nCAMERA (appareil photo) -&gt; Prendre des photos et en téléverser vers MEGA\nREAD_CONTACTS (lire les contacts) -&gt; Ajouter facilement des contacts de votre appareil comme contacts MEGA\nRECORD_AUDIO et CAPTURE_VIDEO_OUTPUT (enregistrer du son et capturer la sortie vidéo, micro et appareil photo) -&gt; MEGA offre des appels audio et vidéo chiffrés de bout en bout\n\n\nPour augmenter la confiance des utilisateurs dans le système MEGA, tout le code côté client est publié afin que les chercheurs en matière de sécurité intéressés puissent évaluer le processus de chiffrement. Le code de notre appli mobile se trouve sur&#160;: https://github.com/meganz/android \n\nPour de plus amples renseignements, veuillez visiter notre site Web&#160;: \nhttps://mega.nz/terms \n\n\nOrdinateur – https://mega.nz/</string>
-    <!-- Short description text of the app in the Google Play page of the app (character limit 80) -->
-    <string name="short_description_text">Confidentialité et sécurité en tout temps avec le stockage nuagique MEGA.</string>
     <!-- PRO Lite account -->
     <string name="prolite_account">Pro&#160;Lite</string>
     <!-- Name of the MEGA PDF Viewer. Keep uppercase. -->
@@ -3978,8 +3974,6 @@
     </plurals>
     <!-- Button of the warning dialog indicating the renamed name file extension is not the same to confirm the change. -->
     <string name="action_change_anyway">La changer quand même</string>
-    <!-- Snackbar text to display if the user doesn't grant the permission to access all files on a device with Android 11 or higher -->
-    <string name="snackbar_storage_permission_denied_android_11">Une autorisation est nécessaire pour accéder à la mémoire.</string>
     <!-- String to show the transfer quota and the used space in My Account section. E.g.: -->
     <string name="used_storage_transfer">%1$s/%2$s</string>
     <!-- String to show the transfer quota and the used space in My Account section -->
@@ -4174,4 +4168,30 @@
     <string name="main_view">Vue principale</string>
     <!-- Warning in Offline section alerting all the Offline files will be deleted after logout. -->
     <string name="offline_warning">La déconnexion supprime votre contenu hors ligne.</string>
+    <!-- Settings category which contains all preferences related to user interface. -->
+    <string name="user_interface_setting">Interface utilisateur</string>
+    <!-- Setting which allows to choose the start screen. -->
+    <string name="start_screen_setting">Écran de lancement</string>
+    <!-- Setting which allows to hide or show the recent activity. -->
+    <string name="hide_recent_setting">Cacher l’activité récente</string>
+    <!-- Context of a setting which allows to hide or show the recent activity. -->
+    <string name="hide_recent_setting_context">Cacher l’activité récente dans la section Accueil.</string>
+    <!-- Title of a dialog informing the start screen can be modified. -->
+    <string name="choose_start_screen_title">Choisir votre écran de lancement</string>
+    <!-- Test of a dialog informing the start screen can be modified. -->
+    <string name="choose_start_screen_text">Changez le paramètre pour choisir quel écran s’ouvrira lors du prochain lancement de l’appli&#160;mobile&#160;MEGA.</string>
+    <!-- Action button which allows to change a setting. -->
+    <string name="change_setting_action">Changer le paramètre</string>
+    <!-- Subtitle of the settings page where the start screen can be chosen. -->
+    <string name="configure_start_screen">Configurez votre écran de lancement par défaut</string>
+    <!-- Homepage section. -->
+    <string name="home_section">Accueil</string>
+    <!-- Action button which allows to show the recent activity. -->
+    <string name="show_activity_action">Afficher l’activité</string>
+    <!-- Text informing the recent activity is hidden. -->
+    <string name="recents_activity_hidden">L’activité [B]Récente[/B] est cachée</string>
+    <!-- Alert informing the user can choose the video quality for Camera Uploads Videos -->
+    <string name="video_quality_info">Vous pouvez économiser de l’espace en diminuant la qualité de la vidéo dans les paramètres des Téléversements de l’appareil photo.</string>
+    <!-- Label indicating video original quality -->
+    <string name="original_quality">Qualité originale</string>
 </resources>
