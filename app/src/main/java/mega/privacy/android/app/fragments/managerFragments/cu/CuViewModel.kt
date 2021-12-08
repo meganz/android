@@ -84,6 +84,7 @@ class CuViewModel @ViewModelInject constructor(
             .subscribe(IGNORE, logErr("setCamSyncEnabled")))
     }
 
+    @Suppress("deprecation")
     fun enableCu(enableCellularSync: Boolean, syncVideo: Boolean) {
         add(Completable.fromCallable {
             val localFile = Environment.getExternalStoragePublicDirectory(

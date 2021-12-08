@@ -24,48 +24,6 @@ class MegaNodeRepo @Inject constructor(
 ) {
 
     /**
-     * Get children by a mega node, with the given order.
-     *
-     * @param node Mega node.
-     * @param orderBy Order.
-     * @return List of nodes in that node.
-     */
-    private fun getChildrenByAMegaNode(node: MegaNode, orderBy: Int): List<MegaNode> {
-        return megaApi.getChildren(node, orderBy)
-    }
-
-    /**
-     * Get children of Media files, with the given order. Only images and reproducible videos.
-     *
-     * @param node Mega node
-     * @param orderBy Order.
-     * @return List of pairs, whose first value is index used for
-     * FullscreenImageViewer/AudioVideoPlayer, and second value is the node.
-     */
-    fun getMediaAsPairsByAMegaNode(
-        node: MegaNode, orderBy: Int
-    ): List<Pair<Int, MegaNode>> {
-        val children = getChildrenByAMegaNode(node, orderBy)
-        val nodes = ArrayList<Pair<Int, MegaNode>>()
-
-        for ((index, n) in children.withIndex()) {
-
-            if (n.isFolder) {
-                continue
-            }
-
-            val mime = MimeTypeThumbnail.typeForName(n.name)
-            if (mime.isImage || mime.isVideoReproducible) {
-                // when not in search mode, index used by viewer is index in all siblings,
-                // including non image/video nodes
-                nodes.add(Pair(index, n))
-            }
-        }
-
-        return nodes
-    }
-
-    /**
      * Get children of CU/MU, with the given order. All nodes, including folders.
      *
      * @param orderBy Order.

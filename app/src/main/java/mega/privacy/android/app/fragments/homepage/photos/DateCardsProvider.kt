@@ -15,7 +15,7 @@ import java.util.ArrayList
 
 /**
  * Tool class used to organize MegaNode list by years, months and days.
- * MegaNode will be converted CUCard object.
+ * MegaNode will be converted GalleryCard object.
  * Also will filter out the node which doesn't have local preview.
  */
 class DateCardsProvider {

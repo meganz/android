@@ -472,10 +472,11 @@ class PhotosFragment : BaseZoomFragment(), GalleryCardAdapter.Listener {
                     it?.size!! >= if (getCurrentZoom() < ZOOM_DEFAULT) Constants.MIN_ITEMS_SCROLLBAR_GRID else Constants.MIN_ITEMS_SCROLLBAR
                 binding.scroller.visibility = if (showScroller) View.VISIBLE else View.GONE
                 if (this::gridAdapter.isInitialized) {
-                    gridAdapter.submitList(it)
+                    gridAdapter.submitList(it) {
+                        handlePhotosMenuUpdate(isShowMenu())
+                    }
                 }
                 updateEnableCUButtons(viewModel.isCUEnabled())
-                handlePhotosMenuUpdate(isShowMenu())
                 binding.emptyHint.visibility = if (it.isEmpty()) View.VISIBLE else View.GONE
                 listView.visibility = if (it.isEmpty()) View.GONE else View.VISIBLE
                 binding.scroller.visibility = if (it.isEmpty()) View.GONE else View.VISIBLE
@@ -528,10 +529,7 @@ class PhotosFragment : BaseZoomFragment(), GalleryCardAdapter.Listener {
     }
 
     private fun emptyAdapter(): Boolean {
-        if (this::gridAdapter.isInitialized) {
-            gridAdapter.itemCount <= 0
-        }
-        return false
+        return !this::gridAdapter.isInitialized || gridAdapter.itemCount <= 0
     }
 
     /**
@@ -675,9 +673,11 @@ class PhotosFragment : BaseZoomFragment(), GalleryCardAdapter.Listener {
         if (!viewModel.isEnableCUShown()) {
             viewModel.setZoom(zoom)
             PHOTO_ZOOM_LEVEL = zoom
-            val state = layoutManager.onSaveInstanceState()
-            setGridView(zoom)
-            layoutManager.onRestoreInstanceState(state)
+            if (this::layoutManager.isInitialized){
+                val state = layoutManager.onSaveInstanceState()
+                setGridView(zoom)
+                layoutManager.onRestoreInstanceState(state)
+            }
         }
     }
 

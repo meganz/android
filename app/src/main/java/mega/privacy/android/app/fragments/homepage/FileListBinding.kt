@@ -22,7 +22,7 @@ import java.io.File
 @BindingAdapter("items")
 fun setItems(listView: RecyclerView, items: List<NodeItem>?) {
     items?.let {
-        // When the list's adapter is CUCardViewAdapter, its item type is CUCard, can't cast to NodeItem.
+        // When the list's adapter is GalleryCardViewAdapter, its item type is GalleryCard, can't cast to NodeItem.
         // Just avoid the casting.
         if (listView.adapter !is GalleryCardAdapter) {
             (listView.adapter as ListAdapter<NodeItem, RecyclerView.ViewHolder>).submitList(it)
@@ -34,7 +34,7 @@ fun setItems(listView: RecyclerView, items: List<NodeItem>?) {
 @BindingAdapter("galleryItems")
 fun setGalleryItems(listView: RecyclerView, items: List<GalleryItem>?) {
     items?.let {
-        // When the list's adapter is CUCardViewAdapter, its item type is CUCard, can't cast to NodeItem.
+        // When the list's adapter is GalleryCardViewAdapter, its item type is GalleryCard, can't cast to NodeItem.
         // Just avoid the casting.
         if (listView.adapter !is GalleryCardAdapter) {
             (listView.adapter as ListAdapter<GalleryItem, RecyclerView.ViewHolder>).submitList(it)
