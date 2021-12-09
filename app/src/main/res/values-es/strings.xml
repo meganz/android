@@ -3726,7 +3726,7 @@
     <!-- Explanation of a warning recommending upgrade to Pro in relation to link available options -->
     <string name="link_upgrade_pro_explanation">Los usuarios Pro tienen acceso exclusivo a una capa adicional de seguridad para los enlace que hace que la cuenta sea aún más segura.</string>
     <!-- Meaning of links decryption key -->
-    <string name="decryption_key_explanation">Nuestro sistema de cifrado punto a punto requiere una clave única generada automáticamente para este archivo. El enlace se crea por defecto con esta clave pero puedes exportala por separado para más seguridad.</string>
+    <string name="decryption_key_explanation">Nuestro sistema de cifrado punto a punto requiere una clave única generada automáticamente para este archivo o carpeta. El enlace se crea por defecto con esta clave pero puedes exportarla por separado para más seguridad.</string>
     <!-- Reset password label -->
     <string name="reset_password_label">Restablecer contraseña</string>
     <!-- Warning show to the user when has enable to send the decryption key of a link separately and tries to share the link -->

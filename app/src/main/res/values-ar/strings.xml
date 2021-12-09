@@ -4391,9 +4391,9 @@
     <!-- General label for microphone -->
     <string name="general_mic">ميكروفون</string>
     <!-- General label for microphone muted -->
-    <string name="general_mic_mute">تم كتم صوت الميكروفون خاصتك</string>
+    <string name="general_mic_mute">الميكروفون الخاص بك مغلق</string>
     <!-- General label for microphone unmuted -->
-    <string name="general_mic_unmute">تم إعادة صوت الميكروفون خاصتك</string>
+    <string name="general_mic_unmute">الميكروفون الخاص بك قيد التشغيل</string>
     <!-- General label for camera -->
     <string name="general_camera">الكاميرا</string>
     <!-- General label for camera enable -->
@@ -4409,9 +4409,9 @@
     <!-- General label for headphone on-->
     <string name="general_headphone_on">سماعات الأذن مفعلة</string>
     <!-- General label for speaker on-->
-    <string name="general_speaker_on">مكبر الصوت قيد التشغيل</string>
+    <string name="general_speaker_on">مكبر الصوت الخاص بك قيد التشغيل</string>
     <!-- General label for speaker off-->
-    <string name="general_speaker_off">مكبر الصوت متوقف</string>
+    <string name="general_speaker_off">مكبر الصوت الخاص بك مغلق</string>
     <!-- Label for end meeting-->
     <string name="meeting_end">إنهاء</string>
     <!-- Invite contacts as participants of the meeting-->

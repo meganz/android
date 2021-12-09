@@ -3646,7 +3646,7 @@
     <!-- Explanation of a warning recommending upgrade to Pro in relation to link available options -->
     <string name="link_upgrade_pro_explanation">MEGA Pro 이용자는 계정을 더욱 안전하게 만드는 추가적인 링크 보안 기능에 대한 독점적 접근이 가능합니다.</string>
     <!-- Meaning of links decryption key -->
-    <string name="decryption_key_explanation">우리의 종단간 암호화 시스템은 이 파일을 위해 자동으로 생성된 고유의 키를 필요로 합니다. 이 키가 있는 링크는 자동으로 생성되지만, 추가적인 보안을 위해 복호화 키를 따로 내보낼 수 있습니다.</string>
+    <string name="decryption_key_explanation">우리의 종단간 암호화 시스템은 이 파일 또는 폴더를 위해 자동으로 생성된 고유의 키를 필요로 합니다. 이 키에 대한 링크는 자동으로 생성되지만, 보안을 위해 복호화 키를 별도로 내보낼 수 있습니다.</string>
     <!-- Reset password label -->
     <string name="reset_password_label">암호 재설정</string>
     <!-- Warning show to the user when has enable to send the decryption key of a link separately and tries to share the link -->

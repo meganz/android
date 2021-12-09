@@ -673,7 +673,7 @@
     <!-- button to decide annually payment. The asterisk is needed -->
     <string name="upgrade_per_year">Hằng năm*</string>
     <!-- the user can get the link and it’s copied to the clipboard -->
-    <string name="file_properties_get_link">Đường liên kết đã được ghi vào bộ nhớ</string>
+    <string name="file_properties_get_link">Đường liên kết đã được ghi vào bảng nhớ tạm</string>
     <!-- before sharing an image, the preview has to be downloaded -->
     <string name="full_image_viewer_not_preview">Bản xem trước của hình chưa được tải xong. Xin chờ</string>
     <!-- due to device is low on memory, cannot load an image preview temporarily -->
@@ -1018,7 +1018,7 @@
     <!-- Third paragraph of the screen to backup the master key -->
     <string name="backup_third_paragraph">Các kẻ tấn công không thể nào truy cập vào tài khoản của bạn chỉ với mã-khóa không thôi. Thủ tục đặt lại mật khẩu yêu cầu bạn phải có mã-khóa master và quyền truy cập vào email của bạn.</string>
     <!-- Sentence to inform the user the available actions in the screen to backup the master key -->
-    <string name="backup_action">Sao chép Mã Phục Hồi vào bộ ghi nhớ hoặc lưu lại mã dưới dạng tệp tin chữ</string>
+    <string name="backup_action">Sao chép Mã Phục Hồi vào bảng nhớ tạm hoặc lưu lại mã dưới dạng tệp tin chữ</string>
     <!-- Action of a button to save something -->
     <string name="save_action">Lưu</string>
     <!-- Alert message when the master key has been successfully copied to the ClipBoard -->
@@ -1430,7 +1430,7 @@
     <!-- chat message when a participant left a group chat -->
     <string name="non_format_message_participant_left_group_chat">%1$s đã rời khỏi cuộc chát</string>
     <!-- success alert when the user copy some messages to the clipboard -->
-    <string name="messages_copied_clipboard">Đã lưu vào bộ ghi nhớ</string>
+    <string name="messages_copied_clipboard">Đã lưu vào bảng nhớ tạm</string>
     <!-- Title of the error dialog when opening a chat -->
     <string name="chat_error_open_title">Chát lỗi</string>
     <!-- Message of the error dialog when opening a chat -->
@@ -2029,7 +2029,7 @@
     <!-- Subtitle of QR code settings that reset the code -->
     <string name="setting_subtitle_qrcode_reset">Các mã QR cũ sẽ bị vô hiệu</string>
     <!-- Text shown when it has been copied the QR code link -->
-    <string name="qrcode_link_copied">Liên kết được ghi vào bộ nhớ</string>
+    <string name="qrcode_link_copied">Liên kết được ghi vào bảng nhớ tạm</string>
     <!-- Text shown when it has been reseted the QR code successfully -->
     <string name="qrcode_reset_successfully">Mã QR đã được thay đổi</string>
     <!-- Text shown when it has been deleted the QR code successfully -->
@@ -2280,7 +2280,7 @@
     <!-- Text of the dialog ‘Recovery Key exported’ when the user wants logout -->
     <string name="recovery_key_exported_dialog_text_logout">Trước khi tiến hành việc đăng xuất, xin thử điền mật khẩu để kiểm tra rằng mình còn nhớ chính xác.\nQuên mất mật khẩu và không có mã phục hồi sẽ không lấy lại được tài khoản.</string>
     <!-- Option that permits user copy to clipboard -->
-    <string name="option_copy_to_clipboard">Ghi vào bộ nhớ</string>
+    <string name="option_copy_to_clipboard">Ghi vào bảng nhớ tạm</string>
     <!-- Option that permits user export his recovery key -->
     <string name="option_export_recovery_key">Xuất Mã Phục Hồi</string>
     <!-- Option that permits user logout -->
@@ -2290,7 +2290,7 @@
     <!-- Option that permits user save on File System -->
     <string name="option_save_on_filesystem">Lưu vào File System</string>
     <!-- Message shown when something has been copied to clipboard -->
-    <string name="message_copied_to_clipboard">Đã ghi vào bộ nhớ</string>
+    <string name="message_copied_to_clipboard">Đã ghi vào bảng nhớ tạm</string>
     <!-- text of the label to show that you have messages unread in the chat conversation -->
     <string name="message_jump_latest">Đi đến dòng cuối</string>
     <!-- text of the label to show that you have new messages in the chat conversation -->
@@ -2914,7 +2914,7 @@
     <!-- Error when the user tries to get a public chat link for a chat with the default title -->
     <string name="message_error_set_title_get_link">Trước khi tạo ra đường liên kết tới cuộc chát này, chủ đề phòng chát cần phải được chọn trước:</string>
     <!-- success alert when the user copy a chat link to the clipboard -->
-    <string name="chat_link_copied_clipboard">Đường liên kết tới chát đã được ghi vào bộ nhớ</string>
+    <string name="chat_link_copied_clipboard">Đường liên kết tới chát đã được ghi vào bảng nhớ tạm</string>
     <!-- Label to show the price of each plan in the upgrade account section -->
     <string name="type_month">[A]Giá từ[/A] %s / [A]tháng[/A] *</string>
     <!-- the meaning of the asterisk in monthly* and annually* payment -->
@@ -3634,9 +3634,9 @@
     <!-- Button which action is copy the password of a link -->
     <string name="button_copy_password">Sao chép mật khẩu</string>
     <!-- Confirmation shown informing a key link it’s copied to the clipboard -->
-    <string name="key_copied_clipboard">Chia khóa đã được ghi vào bộ nhớ.</string>
+    <string name="key_copied_clipboard">Chìa khóa đã được ghi vào bảng nhớ tạm.</string>
     <!-- Confirmation shown informing a password link it’s copied to the clipboard -->
-    <string name="password_copied_clipboard">Mật khẩu đã được ghi vào bộ nhớ.</string>
+    <string name="password_copied_clipboard">Mật khẩu đã được ghi vào bảng nhớ tạm.</string>
     <!-- Confirmation shown informing a key link it’s copied to the clipboard -->
     <string name="link_and_key_sent">Liên kết và chìa khóa đã được gửi thành công.</string>
     <!-- Confirmation shown informing a key link it’s copied to the clipboard -->
@@ -3646,7 +3646,7 @@
     <!-- Explanation of a warning recommending upgrade to Pro in relation to link available options -->
     <string name="link_upgrade_pro_explanation">Hạng MEGA Pro có truy cập độc quyền vào các tính năng an toàn bổ sung cho liên kết, giúp tài khoản được an toàn hơn nữa.</string>
     <!-- Meaning of links decryption key -->
-    <string name="decryption_key_explanation">Cấu trúc của mã hóa đầu-cuối yêu cầu một chìa khóa được tạo ra dành cho tệp tin này. Đường liên kết với chìa khóa này được ra sẵn theo chế độ mặc định, nhưng bạn có thể xuất mã giải khóa ra riêng để tăng cường thêm lớp bảo mật.</string>
+    <string name="decryption_key_explanation">Hệ thống mã hóa đầu-cuối tự động yêu cầu phải tạo ra một chìa khóa cho tệp tin hoặc thư mục này. Liên kết với chìa khóa này được tạo theo cài đặt mặc định, nhưng bạn có thể xuất chìa khóa giải mã ra riêng để tăng thêm một lớp bảo mật bổ sung.</string>
     <!-- Reset password label -->
     <string name="reset_password_label">Đặt lại mật khẩu</string>
     <!-- Warning show to the user when has enable to send the decryption key of a link separately and tries to share the link -->
@@ -3710,7 +3710,7 @@
     <!-- Cookie dialog third party second subtitle -->
     <string name="dialog_cookie_thirdparty_subtitle2">Thể loại: Cookies Quảng Cáo</string>
     <!-- Cookie dialog third party message. Please, keep the placeholders to format the string. -->
-    <string name="dialog_cookie_thirdparty_message">Used by Google to:\n• customise the adverts Google shows on ours and other services and websites, based on such things as your location and other websites you’ve previously visited;\n• monitor how often you are displayed certain adverts;\n• provide fraud prevention; and\n• determine when you tap on a particular advert and then to track the following actions you take in response to that advert.\nhttps://policies.google.com/technologies/partner-sites</string>
+    <string name="dialog_cookie_thirdparty_message">Sử dụng bởi Google để:\n• tùy chỉnh các quảng cáo được Google hiển thị trên các dịch vụ của chúng tôi và trên các trang web và dịch vụ khác dựa trên những thứ như vị trí của quý khách và các trang web đã truy cập trước đây;\n• theo dõi tần suất quý khách xem các quảng cáo nhất định;\n• cung cấp cách phòng chống gian lận; và\n• xác định thời điểm quý khách chạm vào một quảng cáo cụ thể và để sau đó theo dõi các hành động mà quý khách thực hiện để phản hồi lại quảng cáo đó.\nhttps://policies.google.com/technologies/partner-sites</string>
     <!-- Preference screen item title -->
     <string name="preference_cookies_accept">Chấp Nhận Cookies</string>
     <!-- Preference screen item title -->
@@ -3917,7 +3917,7 @@
     </plurals>
     <!-- Confirmation shown informing links have been copied to the clipboard -->
     <plurals name="links_copied_clipboard">
-        <item quantity="other">Các đường liên kết đã được ghi vào bộ nhớ.</item>
+        <item quantity="other">Các đường liên kết đã được ghi vào bảng nhớ tạm.</item>
     </plurals>
     <!-- Plural string used as button label or title of the screen to get only one or several links at the same time. -->
     <plurals name="get_links">

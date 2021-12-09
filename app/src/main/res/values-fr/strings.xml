@@ -1283,9 +1283,9 @@
     <!-- Title of the dialogue to mute the notifications of a specific chat. -->
     <string name="title_dialog_mute_chatroom_notifications">Mettre les notifications en sourdine</string>
     <!-- Label for the setting option that indicates the general notifications are enabled. -->
-    <string name="mute_chat_notification_option_on">Activé</string>
+    <string name="mute_chat_notification_option_on">Activée</string>
     <!-- Label for the dialog box option to mute a chat. This option will indicate that notifications for that chat are enabled. -->
-    <string name="mute_chatroom_notification_option_off">Désactivé</string>
+    <string name="mute_chatroom_notification_option_off">Désactivée</string>
     <!-- Label for the dialog box option to mute a chat. This option will indicate that chat notifications will be disabled until tomorrow at 8 a.m. -->
     <string name="mute_chatroom_notification_option_until_tomorrow_morning">Jusqu’à demain matin</string>
     <!-- Label for the dialog box option to mute a chat. This option will indicate that chat notifications will be disabled until today at 8 a.m. -->
@@ -2408,7 +2408,7 @@
     <!-- Text of the dialog to enable the rich links previews on chat -->
     <string name="text_enable_rich_links">Améliorez l’expérience MEGAchat. Le contenu des URL sera récupéré sans chiffrement de bout en bout.</string>
     <!-- Subtitle of a MEGA rich link without the decryption key -->
-    <string name="subtitle_mega_rich_link_no_key">Touchez pour saisir la clé de déchiffrement</string>
+    <string name="subtitle_mega_rich_link_no_key">Toucher pour saisir la clé de déchiffrement</string>
     <!-- when the user tries to creates a MEGA account or tries to change his password and the password strength is very weak -->
     <string name="error_password">Veuillez saisir un mot de passe plus robuste</string>
     <!-- title of the notification for an acceptance of a contact request -->
@@ -3201,7 +3201,7 @@
     <!-- Title of the layout to join a group call from the chat screen. The placeholder indicates the user who initiated the call -->
     <string name="join_call_layout_in_group_call">%s a commencé un appel de groupe. Touchez pour vous y joindre.</string>
     <!-- Title of the layout to return to a call -->
-    <string name="call_in_progress_layout">Touchez pour reprendre l’appel</string>
+    <string name="call_in_progress_layout">Toucher pour reprendre l’appel</string>
     <!-- message displayed when you try to start a call but it is not possible because you are already on a call -->
     <string name="not_allowed_to_start_call">Vous êtes actuellement en appel</string>
     <!-- chat message when a participant invites himself to a public chat using a chat link. Please keep the placeholder because is to show the participant’s name in runtime. -->
@@ -3774,13 +3774,13 @@
     <!-- Action to get more information -->
     <string name="action_more_information">Plus de précisions</string>
     <!-- Preferences screen item title for Cookie Policy -->
-    <string name="settings_about_cookie_policy">Politique sur les Témoins de connexion</string>
+    <string name="settings_about_cookie_policy">Politique sur les Témoins</string>
     <!-- Preferences screen item title for cookie settings -->
     <string name="settings_about_cookie_settings">Paramètres des Témoins</string>
     <!-- Cookie dialog title -->
     <string name="dialog_cookie_alert_title">Avant que vous ne poursuiviez</string>
     <!-- Cookie dialog message. Please, keep the placeholders to format the string. -->
-    <string name="dialog_cookie_alert_message">Nous utilisons la mémoire locale et des technologies semblables («&#160;cookies&#160;») pour vous fournir nos services, améliorer votre expérience d’utilisation de nos services et personnaliser les publicités que vous voyez, dont celles provenant de tiers. Acceptez dès le début de votre visite notre utilisation de Témoins ou personnalisez les Témoins dans les paramètres des Témoins de connexion. Apprenez-en davantage dans notre [A]Politique sur les Témoins de connexion[/A].</string>
+    <string name="dialog_cookie_alert_message">Nous utilisons la mémoire locale et des technologies semblables («&#160;cookies&#160;») pour vous fournir nos services, améliorer votre expérience d’utilisation de nos services et personnaliser les publicités que vous voyez, dont celles provenant de tiers. Acceptez dès le début de votre visite notre utilisation de Témoins ou personnalisez les Témoins dans les paramètres des Témoins. Apprenez-en davantage dans notre [A]Politique sur les Témoins[/A].</string>
     <!-- Cookie dialog message showed when there are unsaved settings. -->
     <string name="dialog_cookie_alert_unsaved">Des paramètres de témoins ne sont pas enregistrés.</string>
     <!-- Snackbar message showed when there settings has been saved successfully. -->
@@ -3792,7 +3792,7 @@
     <!-- Cookie dialog third party message. Please, keep the placeholders to format the string. -->
     <string name="dialog_cookie_thirdparty_message">Utilisés par Google pour&#160;: \n• Personnaliser les publicités que Google affiche sur nos services et sites Web, et sur d’autres services et sites Web, d’après des éléments tels que votre position géographique et les autres sites Web que vous avez visités précédemment ; \n• Surveiller la fréquence d’affichage de certaines publicités ; \n• Fournir une prévention contre les fraudes ; et\n• Déterminer si vous touchez une publicité particulière, pour ensuite suivre les différentes actions que vous effectuez en réponse à cette publicité.\nhttps://policies.google.com/technologies/partner-sites</string>
     <!-- Preference screen item title -->
-    <string name="preference_cookies_accept">Accepter les Témoins de connexion</string>
+    <string name="preference_cookies_accept">Accepter les Témoins</string>
     <!-- Preference screen item title -->
     <string name="preference_cookies_essential_title">Témoins essentiels</string>
     <!-- Preference screen item summary -->
@@ -3804,7 +3804,7 @@
     <!-- Preference screen item title -->
     <string name="preference_cookies_performance_title">Témoins de performance et d’analyse</string>
     <!-- Preference screen item summary -->
-    <string name="preference_cookies_performance_summary">Ils nous permettent de comprendre comment vous utilisez nos services et nous fournissent des données que nous pouvons utiliser pour apporter des améliorations. Le refus de ces Témoins signifierait que moins de données seraient à notre disposition pour faciliter les améliorations conceptionnelles.</string>
+    <string name="preference_cookies_performance_summary">Nous permettent de comprendre comment vous utilisez nos services et nous fournissent des données que nous pouvons utiliser pour apporter des améliorations. Le refus de ces Témoins signifierait que moins de données seraient à notre disposition pour faciliter les améliorations conceptionnelles.</string>
     <!-- Preference screen item title -->
     <string name="preference_cookies_advertising_title">Témoins publicitaires</string>
     <!-- Preference screen item summary -->
@@ -4035,9 +4035,9 @@
     <!-- General label for microphone -->
     <string name="general_mic">Micro</string>
     <!-- General label for microphone muted -->
-    <string name="general_mic_mute">Votre microphone est coupé</string>
+    <string name="general_mic_mute">Votre microphone est désactivé</string>
     <!-- General label for microphone unmuted -->
-    <string name="general_mic_unmute">Votre microphone est en fonction</string>
+    <string name="general_mic_unmute">Votre microphone est activé</string>
     <!-- General label for camera -->
     <string name="general_camera">Caméra</string>
     <!-- General label for camera enable -->
@@ -4053,9 +4053,9 @@
     <!-- General label for headphone on-->
     <string name="general_headphone_on">Le casque d’écoute est activé</string>
     <!-- General label for speaker on-->
-    <string name="general_speaker_on">Le haut-parleur est activé</string>
+    <string name="general_speaker_on">Votre haut-parleur est activé</string>
     <!-- General label for speaker off-->
-    <string name="general_speaker_off">Le haut-parleur est désactivé</string>
+    <string name="general_speaker_off">Votre haut-parleur est désactivé</string>
     <!-- Label for end meeting-->
     <string name="meeting_end">Mettre fin</string>
     <!-- Invite contacts as participants of the meeting-->
@@ -4121,7 +4121,7 @@
     <!-- the content of snack bar when copied meeting link-->
     <string name="copied_meeting_link">Le lien de la réunion a été copié.</string>
     <!-- Title of the layout to join a meeting from the chat screen. The placeholder indicates the user who initiated the meeting -->
-    <string name="join_meeting_layout_in_group_call">%s a commencé une réunion. Touchez pour vous y joindre.</string>
+    <string name="join_meeting_layout_in_group_call">%s a commencé une réunion. Toucher pour vous y joindre.</string>
     <!-- Title of fifth tour screen -->
     <string name="title_tour_five">Réunion&#160;MEGA</string>
     <!-- Content of fourth tour screen -->

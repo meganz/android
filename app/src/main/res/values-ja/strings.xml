@@ -3946,9 +3946,9 @@
     <!-- General label for microphone -->
     <string name="general_mic">マイク</string>
     <!-- General label for microphone muted -->
-    <string name="general_mic_mute">マイクがミュートになっています</string>
+    <string name="general_mic_mute">マイクがオフになっています</string>
     <!-- General label for microphone unmuted -->
-    <string name="general_mic_unmute">マイクのミュートが解除されています</string>
+    <string name="general_mic_unmute">マイクがオンになっています</string>
     <!-- General label for camera -->
     <string name="general_camera">カメラ</string>
     <!-- General label for camera enable -->
@@ -3964,9 +3964,9 @@
     <!-- General label for headphone on-->
     <string name="general_headphone_on">ヘッドホンが有効です</string>
     <!-- General label for speaker on-->
-    <string name="general_speaker_on">スピーカーはオンです</string>
+    <string name="general_speaker_on">スピーカーがオンになっています</string>
     <!-- General label for speaker off-->
-    <string name="general_speaker_off">スピーカーはオフです</string>
+    <string name="general_speaker_off">スピーカーがオフになっています</string>
     <!-- Label for end meeting-->
     <string name="meeting_end">終了</string>
     <!-- Invite contacts as participants of the meeting-->

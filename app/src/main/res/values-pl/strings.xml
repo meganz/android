@@ -3886,7 +3886,7 @@
     <!-- Explanation of a warning recommending upgrade to Pro in relation to link available options -->
     <string name="link_upgrade_pro_explanation">Użytkownicy MEGA Pro mają wyłączny dostęp do dodatkowych funkcji bezpieczeństwa linków, dzięki którym Twoje konto jest jeszcze bardziej bezpieczne.</string>
     <!-- Meaning of links decryption key -->
-    <string name="decryption_key_explanation">Nasz system szyfrowania end-to-end wymaga unikalnego klucza generowanego automatycznie dla tego pliku. Łącze z tym kluczem jest tworzone domyślnie, ale możesz wyeksportować klucz deszyfrowania osobno, aby uzyskać dodatkową warstwę bezpieczeństwa.</string>
+    <string name="decryption_key_explanation">Nasz system szyfrowania typu end-to-end wymaga unikalnego klucza generowanego automatycznie dla tego pliku lub folderu. Łącze z tym kluczem jest tworzone domyślnie, ale można wyeksportować klucz deszyfrowania osobno, aby uzyskać dodatkową warstwę bezpieczeństwa.</string>
     <!-- Reset password label -->
     <string name="reset_password_label">Zresetuj hasło</string>
     <!-- Warning show to the user when has enable to send the decryption key of a link separately and tries to share the link -->

@@ -3946,9 +3946,9 @@
     <!-- General label for microphone -->
     <string name="general_mic">麥克風</string>
     <!-- General label for microphone muted -->
-    <string name="general_mic_mute">您的麥克風已靜音</string>
+    <string name="general_mic_mute">您的麥克風已關閉</string>
     <!-- General label for microphone unmuted -->
-    <string name="general_mic_unmute">您的麥克風已取消靜音</string>
+    <string name="general_mic_unmute">您的麥克風已開啟</string>
     <!-- General label for camera -->
     <string name="general_camera">相機</string>
     <!-- General label for camera enable -->
@@ -3964,9 +3964,9 @@
     <!-- General label for headphone on-->
     <string name="general_headphone_on">耳機開啟</string>
     <!-- General label for speaker on-->
-    <string name="general_speaker_on">喇叭開啟</string>
+    <string name="general_speaker_on">您的喇叭已開啟</string>
     <!-- General label for speaker off-->
-    <string name="general_speaker_off">喇叭關閉</string>
+    <string name="general_speaker_off">您的喇叭已關閉</string>
     <!-- Label for end meeting-->
     <string name="meeting_end">結束</string>
     <!-- Invite contacts as participants of the meeting-->

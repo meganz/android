@@ -3646,7 +3646,7 @@
     <!-- Explanation of a warning recommending upgrade to Pro in relation to link available options -->
     <string name="link_upgrade_pro_explanation">Pengguna MEGA Pro memiliki akses eksklusif ke fitur keamanan tautan tambahan yang membuat akun anda semakin aman.</string>
     <!-- Meaning of links decryption key -->
-    <string name="decryption_key_explanation">Sistem enkripsi ujung-ke-ujung kami memerlukan kunci unik yang dibuat  secara otomatis untuk file ini. Tautan dengan kunci ini dibuat secara default, tetapi anda dapat mengekspor  kunci dekripsi secara terpisah untuk lapisan keamanan tambahan.</string>
+    <string name="decryption_key_explanation">Sistem enkripsi menyeluruh kami memerlukan kunci unik yang dibuat secara otomatis untuk file atau folder ini. Tautan dengan kunci ini dibuat secara default, tetapi anda dapat mengekspor kunci dekripsi secara terpisah untuk lapisan keamanan tambahan.</string>
     <!-- Reset password label -->
     <string name="reset_password_label">Setel ulang kata sandi</string>
     <!-- Warning show to the user when has enable to send the decryption key of a link separately and tries to share the link -->
