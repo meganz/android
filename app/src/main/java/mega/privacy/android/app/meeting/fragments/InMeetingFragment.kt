@@ -1098,34 +1098,32 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
         }
 
         sharedModel.snackBarLiveData.observe(viewLifecycleOwner) {
-            if (!it.isEmpty()) {
+            if (it.isNotEmpty()) {
                 showSnackbar(SNACKBAR_TYPE, it, MEGACHAT_INVALID_HANDLE)
-            if (bInviteSent) {
-                bInviteSent = false
-                val count = inMeetingViewModel.participants.value
-                if (count != null) {
-                    val participantsCount = getParticipantsCount()
-                    if (participantsCount == 0L && count.size == 0) {
-                        if (STATE_FINISH != inMeetingViewModel.shouldShowWarningMessage()) {
-                            logDebug("launchTimer() for no participant join in after Invite")
-                            inMeetingViewModel.updateShowWarningMessage(STATE_INVITE)
-                            launchTimer()
+                if (bInviteSent) {
+                    bInviteSent = false
+                    val count = inMeetingViewModel.participants.value
+                    if (count != null) {
+                        val participantsCount = getParticipantsCount()
+                        if (participantsCount == 0L && count.size == 0) {
+                            if (STATE_FINISH != inMeetingViewModel.shouldShowWarningMessage()) {
+                                logDebug("launchTimer() for no participant join in after Invite")
+                                inMeetingViewModel.updateShowWarningMessage(STATE_INVITE)
+                                launchTimer()
+                            }
+                        } else if (participantsCount > 0 && count.size < participantsCount.toInt()) {
+                            if (STATE_FINISH != inMeetingViewModel.shouldShowWarningMessage()) {
+                                logDebug("launchTimer() for not all participants join in after Invite")
+                                inMeetingViewModel.updateShowWarningMessage(STATE_INVITE)
+                                launchTimer()
+                            }
+                        } else {
+                            logDebug("noting to do")
                         }
-                    } else if (participantsCount > 0 && count.size < participantsCount.toInt()) {
-                        if (STATE_FINISH != inMeetingViewModel.shouldShowWarningMessage()) {
-                            logDebug("launchTimer() for not all participants join in after Invite")
-                            inMeetingViewModel.updateShowWarningMessage(STATE_INVITE)
-                            launchTimer()
-                        }
-                    } else {
-                        logDebug("noting to do")
                     }
+
                 }
-
             }
-            }
-
-
         }
 
         sharedModel.cameraGranted.observe(viewLifecycleOwner) {
@@ -2825,6 +2823,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
         super.onDestroy()
 
         sharedModel.hideSnackBar()
+        inMeetingViewModel.hideSnackBarWarningMsg()
         bannerAnotherCallLayout.isVisible = false
         bannerParticipant?.isVisible = false
         bannerInfo?.isVisible = false

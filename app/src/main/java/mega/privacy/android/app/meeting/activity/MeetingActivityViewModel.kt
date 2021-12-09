@@ -516,7 +516,6 @@ class MeetingActivityViewModel @ViewModelInject constructor(
     }
 
     fun inviteToChat(context: Context, requestCode: Int, resultCode: Int, intent: Intent?) {
-        logDebug("******************* inviteToChat")
         logDebug("Result Code: $resultCode")
         if (intent == null) {
             LogUtil.logWarning("Intent is null")

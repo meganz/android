@@ -59,7 +59,7 @@ class InMeetingViewModel @ViewModelInject constructor(
 
     private var currentTimer = WAITING_TIME
     var countDownTimer: CountDownTimer? = null
-    private val _updateUI: MutableLiveData<Boolean> = MutableLiveData<Boolean>()
+    private val _updateUI: MutableLiveData<Boolean> = MutableLiveData<Boolean>(false)
     val updateUI: LiveData<Boolean> = _updateUI
 
     private var haveConnection: Boolean = false
@@ -1910,6 +1910,13 @@ class InMeetingViewModel @ViewModelInject constructor(
             STATE_RESUME, STATE_INVITE -> MegaApplication.getInstance().applicationContext.defaultSharedPreferences.edit()
                 .putLong(LAST_TIMER, currentTimer).apply()
         }
+    }
+
+    /**
+     * Hide snack bar
+     */
+    fun hideSnackBarWarningMsg() {
+        _updateUI.value = false
     }
 
     /**
