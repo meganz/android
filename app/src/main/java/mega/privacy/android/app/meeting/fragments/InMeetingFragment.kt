@@ -2650,10 +2650,6 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
      * Will show bottom sheet fragment for the moderator
      */
     override fun onEndMeeting() {
-       // if (bottomFloatingPanelViewHolder.getState() == BottomSheetBehavior.STATE_EXPANDED) {
-       //     bottomFloatingPanelViewHolder.collapse()
-       // }
-
         if (inMeetingViewModel.isOneToOneCall() || inMeetingViewModel.isGroupCall()) {
             logDebug("End the one to one or group call")
             leaveMeeting()
