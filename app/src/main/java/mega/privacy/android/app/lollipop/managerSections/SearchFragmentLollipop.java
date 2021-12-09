@@ -98,6 +98,7 @@ import static mega.privacy.android.app.utils.MegaNodeUtil.allHaveOwnerAccess;
 import static mega.privacy.android.app.utils.MegaNodeUtil.areAllFileNodes;
 import static mega.privacy.android.app.utils.MegaNodeUtil.manageTextFileIntent;
 import static mega.privacy.android.app.utils.MegaNodeUtil.manageURLNode;
+import static mega.privacy.android.app.utils.MegaNodeUtil.onNodeTapped;
 import static mega.privacy.android.app.utils.Util.*;
 
 @AndroidEntryPoint
@@ -958,9 +959,7 @@ public class SearchFragmentLollipop extends RotatableFragment implements SearchA
 					manageTextFileIntent(requireContext(), nodes.get(position), SEARCH_ADAPTER);
 				} else{
 					adapter.notifyDataSetChanged();
-					((ManagerActivityLollipop) context).saveNodesToDevice(
-							Collections.singletonList(nodes.get(position)),
-							true, false, false, false);
+					onNodeTapped(context, nodes.get(position), ((ManagerActivityLollipop) context)::saveNodeByTap, (ManagerActivityLollipop) context, (ManagerActivityLollipop) context);
 				}
 			}
 		}

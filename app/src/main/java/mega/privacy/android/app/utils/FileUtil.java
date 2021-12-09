@@ -392,6 +392,85 @@ public class FileUtil {
         return null;
     }
 
+    /**
+     * Checks if the tapped MegaNode exists in local.
+     * Note: for node tapped event, only query system database by size.
+     *
+     * @param node MegaNode to check.
+     * @return The path of the file if the local file exists, null otherwise.
+     */
+    public static String getTappedNodeLocalFile(MegaNode node) {
+        if (node == null) {
+            logWarning("Node is null");
+            return null;
+        }
+
+        String data = MediaStore.Files.FileColumns.DATA;
+        final String[] projection = {data};
+        // Only query file by size, then compare file name. Since modification time will changed(copy to SD card)
+        // Display name may be null in the database.
+        final String selection = MediaStore.Files.FileColumns.SIZE + " = ?";
+        final String[] selectionArgs = {String.valueOf(node.getSize())};
+
+        Context context = MegaApplication.getInstance();
+
+        try {
+            Cursor cursor = context.getContentResolver().query( MediaStore.Files.getContentUri(VOLUME_EXTERNAL), projection, selection, selectionArgs, null);
+
+            List<String> candidates = getPotentialLocalPath(context, cursor, data, node.getName());
+
+            for (String path : candidates) {
+                if (isFileAvailable(new File(path))) {
+                    return path;
+                }
+            }
+        } catch (SecurityException e) {
+            // Workaround: devices with system below Android 10 cannot execute the query without storage permission.
+            logError("Haven't granted the permission.", e);
+            return null;
+        }
+
+        return null;
+    }
+
+    /**
+     * Searches in the correspondent storage established if the file exists.
+     * If a file path is found both on internal storage and SD card,
+     * put the path on internal storage before that on SD card.
+     *
+     * @param context Context object.
+     * @param cursor Cursor which contains all the requirements to find the file
+     * @param columnName   Column name in which search
+     * @param fileName Name of the searching node.
+     * @return A list of file path that may be the path of the searching file.
+     */
+    private static List<String> getPotentialLocalPath(Context context, Cursor cursor, String columnName, String fileName) {
+        List<String> candidates = new ArrayList<>();
+        List<String> sdCandidates = new ArrayList<>();
+
+        while (cursor != null && cursor.moveToNext()) {
+            int dataColumn = cursor.getColumnIndexOrThrow(columnName);
+            String path = cursor.getString(dataColumn);
+
+            // Check file name.
+            if (path.endsWith(fileName)) {
+                if(SDCardUtils.isLocalFolderOnSDCard(context, path)) {
+                    sdCandidates.add(path);
+                } else {
+                    candidates.add(path);
+                }
+            }
+        }
+
+        candidates.addAll(sdCandidates);
+
+        if(cursor != null) {
+            cursor.close();
+        }
+
+        return candidates;
+    }
+
     /*
      * Check is file belongs to the app
      */
@@ -650,7 +729,8 @@ public class FileUtil {
         Intent shareIntent = new Intent(android.content.Intent.ACTION_SEND);
         shareIntent.setType(MimeTypeList.typeForName(file.getName()).getType() + "/*");
         shareIntent.putExtra(Intent.EXTRA_STREAM, getUriForFile(context, file));
-        shareIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+        // To avoid java.lang.SecurityException: Permission Denial
+        shareIntent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION | Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
         context.startActivity(Intent.createChooser(shareIntent, getString(R.string.context_share)));
     }
 
@@ -665,7 +745,8 @@ public class FileUtil {
         Intent shareIntent = new Intent(android.content.Intent.ACTION_SEND);
         shareIntent.setType(MimeTypeList.typeForName(name).getType() + "/*");
         shareIntent.putExtra(Intent.EXTRA_STREAM, uri);
-        shareIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+        // To avoid java.lang.SecurityException: Permission Denial
+        shareIntent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION | Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
         context.startActivity(Intent.createChooser(shareIntent, context.getString(R.string.context_share)));
     }
 

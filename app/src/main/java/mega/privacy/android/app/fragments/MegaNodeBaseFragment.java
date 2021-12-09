@@ -78,6 +78,7 @@ import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.MegaApiUtils.*;
 import static mega.privacy.android.app.utils.MegaNodeUtil.manageTextFileIntent;
 import static mega.privacy.android.app.utils.MegaNodeUtil.manageURLNode;
+import static mega.privacy.android.app.utils.MegaNodeUtil.onNodeTapped;
 import static mega.privacy.android.app.utils.MegaNodeUtil.showConfirmationLeaveIncomingShares;
 import static mega.privacy.android.app.utils.Util.*;
 import static nz.mega.sdk.MegaApiJava.*;
@@ -459,11 +460,10 @@ public abstract class MegaNodeBaseFragment extends RotatableFragment {
     public void openFile(MegaNode node, int fragmentAdapter, int position) {
         MimeTypeList mimeType = MimeTypeList.typeForName(node.getName());
         String mimeTypeType = mimeType.getType();
-        Intent intent = null;
+        Intent intent;
         boolean internalIntent = false;
 
         if (mimeType.isImage()) {
-            internalIntent = true;
             intent = new Intent(context, FullScreenImageViewerLollipop.class);
             intent.putExtra("placeholder", adapter.getPlaceholderCount());
             intent.putExtra("position", position);
@@ -472,12 +472,13 @@ public abstract class MegaNodeBaseFragment extends RotatableFragment {
             intent.putExtra("parentNodeHandle", getParentHandle(fragmentAdapter));
             intent.putExtra("orderGetChildren", getIntentOrder(fragmentAdapter));
             intent.putExtra(INTENT_EXTRA_KEY_HANDLE, node.getHandle());
+
+            launchIntent(intent, true, position);
         } else if (mimeType.isVideoReproducible() || mimeType.isAudio()) {
             boolean opusFile = false;
 
             if (mimeType.isVideoNotSupported() || mimeType.isAudioNotSupported()) {
                 intent = new Intent(Intent.ACTION_VIEW);
-                internalIntent = false;
                 String[] s = node.getName().split("\\.");
                 opusFile = s.length > 1 && s[s.length - 1].equals("opus");
             } else {
@@ -540,9 +541,10 @@ public abstract class MegaNodeBaseFragment extends RotatableFragment {
             if (opusFile) {
                 intent.setDataAndType(intent.getData(), "audio/*");
             }
+
+            launchIntent(intent, internalIntent, position);
         } else if (mimeType.isURL()) {
             manageURLNode(context, megaApi, node);
-            return;
         } else if (mimeType.isPdf()) {
             logDebug("isFile:isPdf");
             intent = new Intent(context, PdfViewerActivityLollipop.class);
@@ -591,24 +593,33 @@ public abstract class MegaNodeBaseFragment extends RotatableFragment {
                     return;
                 }
             }
+
+            launchIntent(intent, false, position);
         } else if (mimeType.isOpenableTextFile(node.getSize())) {
             manageTextFileIntent(requireContext(), node, fragmentAdapter);
-            return;
+        } else {
+            logDebug("itemClick:isFile:otherOption");
+            onNodeTapped(context, node, managerActivity::saveNodeByTap, managerActivity, managerActivity);
         }
+    }
 
+    /**
+     * Launch corresponding intent to open the file based on its type.
+     *
+     * @param intent Intent to launch activity.
+     * @param internalIntent true, if the intent is for launching an intent in-app; false, otherwise.
+     * @param position Clicked item position.
+     */
+    private void launchIntent(Intent intent, boolean internalIntent, int position) {
         if (intent != null) {
             if (internalIntent || isIntentAvailable(context, intent)) {
                 putThumbnailLocation(intent, recyclerView, position, viewerFrom(), adapter);
                 context.startActivity(intent);
                 managerActivity.overridePendingTransition(0, 0);
-
-                return;
             } else {
                 Toast.makeText(context, context.getResources().getString(R.string.intent_not_available), Toast.LENGTH_LONG).show();
             }
         }
-
-        managerActivity.saveNodesToDevice(Collections.singletonList(node), true, false, false, false);
     }
 
     protected abstract int viewerFrom();
