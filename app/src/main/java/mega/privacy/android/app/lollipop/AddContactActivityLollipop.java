@@ -314,6 +314,8 @@ public class AddContactActivityLollipop extends PasscodeActivity implements View
 
     private class GetPhoneContactsTask extends AsyncTask<Void, Void, Void> {
 
+        int inProgressPosition = INVALID_POSITION;
+
         @Override
         protected Void doInBackground(Void... voids) {
             getDeviceContacts();
@@ -324,7 +326,7 @@ public class AddContactActivityLollipop extends PasscodeActivity implements View
 
             ShareContactInfo lastItem = filteredContactsShare.get(filteredContactsShare.size() - 1);
             if (lastItem.isProgress()) {
-               filteredContactsShare.remove(lastItem);
+                inProgressPosition = filteredContactsShare.size() - 1;
             }
 
             if (filteredContactsPhone != null && !filteredContactsPhone.isEmpty()) {
@@ -348,9 +350,7 @@ public class AddContactActivityLollipop extends PasscodeActivity implements View
                     }
                 }
 
-                for (int i=0; i<shareContacts.size(); i++) {
-                    filteredContactsShare.add(shareContacts.get(i));
-                }
+                filteredContactsShare.addAll(shareContacts);
             }
 
             return null;
@@ -358,6 +358,12 @@ public class AddContactActivityLollipop extends PasscodeActivity implements View
 
         @Override
         protected void onPostExecute(Void aVoid) {
+            logDebug("onPostExecute: GetPhoneContactsTask");
+
+            if (inProgressPosition != INVALID_POSITION) {
+                filteredContactsShare.remove(inProgressPosition);
+            }
+
             waitingForPhoneContacts = false;
             setShareAdapterContacts(filteredContactsShare);
         }
@@ -431,8 +437,10 @@ public class AddContactActivityLollipop extends PasscodeActivity implements View
                         shareContacts.add(contact);
                     }
 
-                    for (int i=0; i<shareContacts.size(); i++) {
-                        filteredContactsShare.add(shareContacts.get(i));
+                    filteredContactsShare.addAll(shareContacts);
+
+                    if (queryPermissions) {
+                        filteredContactsShare.add(new ShareContactInfo());
                     }
                 }
             }
@@ -465,7 +473,6 @@ public class AddContactActivityLollipop extends PasscodeActivity implements View
                     setShareAdapterContacts(filteredContactsShare);
                     if (queryPermissions) {
                         waitingForPhoneContacts = true;
-                        filteredContactsShare.add(new ShareContactInfo());
                         getPhoneContactsTask = new GetPhoneContactsTask();
                         getPhoneContactsTask.execute();
                     }
@@ -673,9 +680,7 @@ public class AddContactActivityLollipop extends PasscodeActivity implements View
                     }
                 }
                 filteredContactsShare.clear();
-                for (int i=0; i<shareContacts.size(); i++) {
-                    filteredContactsShare.add(shareContacts.get(i));
-                }
+                filteredContactsShare.addAll(shareContacts);
                 addedContactsShare.clear();
                 String contactToAddMail = null;
 
