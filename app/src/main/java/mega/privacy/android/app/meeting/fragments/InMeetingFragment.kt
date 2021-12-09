@@ -141,6 +141,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
     private var meetingLink: String = ""
     private var isManualModeView = false
     private var isWaitingForAnswerCall = false
+    private var isWaitingForMakeModerator = false
 
     // Children fragments
     private var individualCallFragment: IndividualCallFragment? = null
@@ -923,7 +924,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
     }
 
     private fun initToolbar() {
-        logDebug("Update toolbar elements");
+        logDebug("Update toolbar elements")
         val root = meetingActivity.binding.root
         toolbar = meetingActivity.binding.toolbar
         toolbarTitle = meetingActivity.binding.titleToolbar
@@ -2135,6 +2136,20 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
     }
 
     /**
+     * Change Bottom Floating Panel State
+     *
+     */
+    override fun onChangePanelState() {
+        if(isWaitingForMakeModerator){
+            if (bottomFloatingPanelViewHolder.getState() == BottomSheetBehavior.STATE_COLLAPSED) {
+                findNavController().navigate(
+                    InMeetingFragmentDirections.actionGlobalMakeModerator()
+                )
+            }
+        }
+    }
+
+    /**
      * Change Mic State
      *
      * @param micOn True, if the microphone is on. False, if the microphone is off
@@ -2635,6 +2650,10 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
      * Will show bottom sheet fragment for the moderator
      */
     override fun onEndMeeting() {
+       // if (bottomFloatingPanelViewHolder.getState() == BottomSheetBehavior.STATE_EXPANDED) {
+       //     bottomFloatingPanelViewHolder.collapse()
+       // }
+
         if (inMeetingViewModel.isOneToOneCall() || inMeetingViewModel.isGroupCall()) {
             logDebug("End the one to one or group call")
             leaveMeeting()
@@ -2657,10 +2676,21 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
         leaveMeeting()
     }
 
+    /**
+     * Method to navigate to the Make moderator screen
+     */
     private val showAssignModeratorFragment = fun() {
-        findNavController().navigate(
-            InMeetingFragmentDirections.actionGlobalMakeModerator()
-        )
+        var isPanelExpanded =
+            bottomFloatingPanelViewHolder.getState() == BottomSheetBehavior.STATE_EXPANDED
+        isWaitingForMakeModerator = isPanelExpanded
+
+        if (isPanelExpanded) {
+            bottomFloatingPanelViewHolder.collapse()
+        } else {
+            findNavController().navigate(
+                InMeetingFragmentDirections.actionGlobalMakeModerator()
+            )
+        }
     }
 
     /**
