@@ -135,6 +135,8 @@ public class OutgoingSharesFragmentLollipop extends MegaNodeBaseFragment {
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+		super.onCreateView(inflater, container, savedInstanceState);
+
 		logDebug("onCreateView");
 
 		if (megaApi.getRootNode() == null) {
@@ -149,14 +151,20 @@ public class OutgoingSharesFragmentLollipop extends MegaNodeBaseFragment {
 			v = getListView(inflater, container);
 
 			if (adapter == null) {
-				adapter = new MegaNodeAdapter(context, this, nodes, managerActivity.getParentHandleOutgoing(), recyclerView, null, OUTGOING_SHARES_ADAPTER, MegaNodeAdapter.ITEM_VIEW_TYPE_LIST);
+				adapter = new MegaNodeAdapter(context, this, nodes,
+						managerActivity.getParentHandleOutgoing(), recyclerView,
+						OUTGOING_SHARES_ADAPTER, MegaNodeAdapter.ITEM_VIEW_TYPE_LIST, sortByHeaderViewModel);
 			}
 		} else {
 			v = getGridView(inflater, container);
 
 			if (adapter == null) {
-				adapter = new MegaNodeAdapter(context, this, nodes, managerActivity.getParentHandleOutgoing(), recyclerView, null, OUTGOING_SHARES_ADAPTER, MegaNodeAdapter.ITEM_VIEW_TYPE_GRID);
+				adapter = new MegaNodeAdapter(context, this, nodes,
+						managerActivity.getParentHandleOutgoing(), recyclerView,
+						OUTGOING_SHARES_ADAPTER, MegaNodeAdapter.ITEM_VIEW_TYPE_GRID, sortByHeaderViewModel);
 			}
+
+			gridLayoutManager.setSpanSizeLookup(adapter.getSpanSizeLookup(gridLayoutManager.getSpanCount()));
 		}
 
 		adapter.setParentHandle(managerActivity.getParentHandleOutgoing());

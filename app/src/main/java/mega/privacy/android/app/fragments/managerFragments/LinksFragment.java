@@ -110,6 +110,7 @@ public class LinksFragment extends MegaNodeBaseFragment {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        super.onCreateView(inflater, container, savedInstanceState);
 
         if (megaApi.getRootNode() == null) {
             return null;
@@ -118,7 +119,9 @@ public class LinksFragment extends MegaNodeBaseFragment {
         View v = getListView(inflater, container);
 
         if (adapter == null) {
-            adapter = new MegaNodeAdapter(context, this, nodes, managerActivity.getParentHandleLinks(), recyclerView, null, LINKS_ADAPTER, ITEM_VIEW_TYPE_LIST);
+            adapter = new MegaNodeAdapter(context, this, nodes,
+                    managerActivity.getParentHandleLinks(), recyclerView, LINKS_ADAPTER,
+                    ITEM_VIEW_TYPE_LIST, sortByHeaderViewModel);
         }
 
         adapter.setListFragment(recyclerView);
