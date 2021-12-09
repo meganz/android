@@ -50,7 +50,7 @@ abstract class GalleryViewModel constructor(
     private val dayCards = MutableLiveData<List<GalleryCard>>()
     private val monthCards = MutableLiveData<List<GalleryCard>>()
     private val yearCards = MutableLiveData<List<GalleryCard>>()
-    private val mCuNodes = MutableLiveData<List<GalleryItem>>(ArrayList())
+    private val mCuNodes = MutableLiveData<List<GalleryItem>>()
     private val mNodeToOpen = MutableLiveData<Pair<Int, GalleryItem?>>()
     private val mNodeToAnimate = MutableLiveData<Pair<Int, GalleryItem>>()
     private val mActionBarTitle = MutableLiveData<String>()

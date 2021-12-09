@@ -474,6 +474,7 @@ class PhotosFragment : BaseZoomFragment(), GalleryCardAdapter.Listener {
                 if (this::gridAdapter.isInitialized) {
                     gridAdapter.submitList(it) {
                         handlePhotosMenuUpdate(isShowMenu())
+                        updateEnableCUButtons(viewModel.isCUEnabled())
                     }
                 }
                 updateEnableCUButtons(viewModel.isCUEnabled())
