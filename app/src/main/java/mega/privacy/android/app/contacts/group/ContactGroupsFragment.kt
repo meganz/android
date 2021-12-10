@@ -135,15 +135,14 @@ class ContactGroupsFragment : Fragment() {
                                     StringResourcesUtils.getString(R.string.create_chat_error)
                                 )
                             } else {
-                                val intent =
-                                    Intent(
-                                        requireContext(),
-                                        ChatActivityLollipop::class.java
-                                    ).apply {
-                                        action = Constants.ACTION_CHAT_SHOW_MESSAGES
-                                        putExtra(Constants.CHAT_ID, chatId)
-                                    }
-                                startActivity(intent)
+                                Intent(
+                                    requireContext(),
+                                    ChatActivityLollipop::class.java
+                                ).apply {
+                                    action = Constants.ACTION_CHAT_SHOW_MESSAGES
+                                    putExtra(Constants.CHAT_ID, chatId)
+                                    startActivity(this)
+                                }
                             }
                         }
                 } else {
