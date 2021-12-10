@@ -739,6 +739,8 @@ public class MegaApplication extends MultiDexApplication implements Application.
 		keepAliveHandler.postAtTime(keepAliveRunnable, System.currentTimeMillis()+interval);
 		keepAliveHandler.postDelayed(keepAliveRunnable, interval);
 
+		initLoggers();
+
 		checkAppUpgrade();
 
 		setupMegaApi();
@@ -836,6 +838,8 @@ public class MegaApplication extends MultiDexApplication implements Application.
 
 		Fresco.initialize(this);
 
+		// Try to initialize the loggers again in order to avoid have them uninitialized
+		// in case they failed to initialize before for some reason.
 		initLoggers();
 	}
 
