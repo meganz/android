@@ -209,22 +209,27 @@
                 app:tint="@color/grey_012_white_038"
                 tools:ignore="ContentDescription" />
 
-            <Button
+            <TextView
                 android:id="@+id/reset_password_button"
-                style="?attr/borderlessButtonStyle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
                 android:layout_below="@id/password_protection_set_text"
-                android:layout_marginStart="-16dp"
-                android:layout_marginTop="12dp"
-                android:text="@string/action_reset" />
+                android:layout_marginTop="20dp"
+                android:layout_marginBottom="10dp"
+                android:text="@string/action_reset"
+                android:textAppearance="@style/TextAppearance.Mega.Subtitle2.AccentColor.AllCaps" />
 
-            <Button
+            <TextView
                 android:id="@+id/remove_password_button"
-                style="?attr/borderlessButtonStyle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
                 android:layout_below="@id/password_protection_set_text"
-                android:layout_marginStart="8dp"
-                android:layout_marginTop="12dp"
+                android:layout_marginStart="30dp"
+                android:layout_marginTop="20dp"
+                android:layout_marginBottom="10dp"
                 android:layout_toEndOf="@+id/reset_password_button"
-                android:text="@string/general_remove" />
+                android:text="@string/general_remove"
+                android:textAppearance="@style/TextAppearance.Mega.Subtitle2.AccentColor.AllCaps" />
 
         </RelativeLayout>
 
