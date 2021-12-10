@@ -256,7 +256,7 @@ public class MegaApplication extends MultiDexApplication implements Application.
 
 	@Override
 	public void onActivityCreated(@NonNull Activity activity, @Nullable Bundle savedInstanceState) {
-
+    	initLoggers();
 	}
 
 	@Override
@@ -743,8 +743,7 @@ public class MegaApplication extends MultiDexApplication implements Application.
 		keepAliveHandler.postAtTime(keepAliveRunnable, System.currentTimeMillis()+interval);
 		keepAliveHandler.postDelayed(keepAliveRunnable, interval);
 
-		initLoggerSDK();
-		initLoggerKarere();
+		initLoggers();
 
 		checkAppUpgrade();
 
@@ -842,6 +841,27 @@ public class MegaApplication extends MultiDexApplication implements Application.
 		ContextUtils.initialize(getApplicationContext());
 
 		Fresco.initialize(this);
+
+		// Try to initialize the loggers again in order to avoid have them uninitialized
+		// in case they failed to initialize before for some reason.
+		initLoggers();
+	}
+
+	/**
+	 * Initializes loggers if app storage is available and if are not initialized yet.
+	 */
+	private void initLoggers() {
+		if (getExternalFilesDir(null) == null) {
+			return;
+		}
+
+		if (!isLoggerSDKInitialized()) {
+			initLoggerSDK();
+		}
+
+		if (!isLoggerKarereInitialized()) {
+			initLoggerKarere();
+		}
 	}
 
 	public void askForFullAccountInfo(){
