@@ -11,6 +11,12 @@
         app:popUpTo="@id/nav_meeting"
         app:popUpToInclusive="true" />
 
+    <action
+        android:id="@+id/action_global_makeModerator"
+        app:destination="@id/makeModeratorFragment"
+        app:popUpTo="@id/nav_meeting"
+        app:popUpToInclusive="true" />
+
     <fragment
         android:id="@+id/createMeetingFragment"
         android:name="mega.privacy.android.app.meeting.fragments.CreateMeetingFragment"
@@ -26,6 +32,11 @@
         android:name="mega.privacy.android.app.meeting.fragments.JoinMeetingAsGuestFragment"
         android:label="fragment_join_meeting_as_guest">
     </fragment>
+    <fragment
+        android:id="@+id/makeModeratorFragment"
+        android:name="mega.privacy.android.app.meeting.fragments.MakeModeratorFragment"
+        android:label="fragment_make_moderator"
+        tools:layout="@layout/make_moderator_fragment"/>
     <fragment
         android:id="@+id/inMeetingFragment"
         android:name="mega.privacy.android.app.meeting.fragments.InMeetingFragment"

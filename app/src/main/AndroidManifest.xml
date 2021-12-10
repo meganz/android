@@ -67,6 +67,9 @@
                 android:mimeType="application/*"
                 android:scheme="https" />
         </intent>
+
+        <!-- Location opened outside the app -->
+        <package android:name="com.google.android.apps.maps" />
     </queries>
 
     <application
