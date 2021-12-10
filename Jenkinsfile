@@ -1,14 +1,20 @@
 pipeline {
-  agent any
-  // {
-  //   // Run on a build agent where we have the Android SDK installed
-  //   label any
-  // }
+  agent { label 'mac-slave' }
   environment {
-    ANDROID_SDK_ROOT = '/Users/robinshi/Library/Android/sdk'
+    NDK_ROOT = "/opt/buildtools/android-sdk/ndk/21.3.6528147"
+    JAVA_HOME = "/opt/buildtools/zulu11.52.13-ca-jdk11.0.13-macosx_x64"
+    ANDROID_HOME = "/opt/buildtools/android-sdk"
+
+    PATH = "/opt/buildtools/zulu11.52.13-ca-jdk11.0.13-macosx_x64/bin:$PATH"
+    PATH = "/opt/buildtools/android-sdk/platform-tools:$PATH"
+    PATH = "/opt/homebrew/bin:$PATH"
+    PATH = "/opt/homebrew/opt/gnu-tar/libexec/gnubin:$PATH"
+    PATH = "/opt/homebrew/opt/gnu-sed/libexec/gnubin:$PATH"
+
+    CONSOLE_LOG_FILE = "androidLog.txt"
 
     BUILD_LIB_DOWNLOAD_FOLDER = '${WORKSPACE}/mega_build_download'
-    // webrtc link and lib file may change with time. Update these 2 values if build failed.
+    // webrtc lib link and file name may change with time. Update these 2 values if build failed.
     WEBRTC_LIB_URL = "https://mega.nz/file/RsMEgZqA#s0P754Ua7AqvWwamCeyrvNcyhmPjHTQQIxtqziSU4HI"
     WEBRTC_LIB_FILE = 'WebRTC_NDKr21_p21_branch-heads4405_v2.zip'
     WEBRTC_LIB_UNZIPPED = 'webrtc_unzipped'
@@ -16,13 +22,17 @@ pipeline {
     GOOGLE_MAP_API_URL = "https://mega.nz/#!1tcl3CrL!i23zkmx7ibnYy34HQdsOOFAPOqQuTo1-2iZ5qFlU7-k"
     GOOGLE_MAP_API_FILE = 'default_google_maps_api.zip'
     GOOGLE_MAP_API_UNZIPPED = 'default_google_map_api_unzipped'
+
+    PATH = "/Applications/MEGAcmd.app/Contents/MacOS:${PATH}"
+
   }
   options {
     // Stop the build early in case of compile or test failures
     skipStagesAfterUnstable()
+    timeout(time: 2, unit: 'HOURS')
   }
   stages {
-    stage('fetch SDK') {
+    stage('Fetch SDK Submodules') {
       steps {
         sh 'git config --file=.gitmodules submodule."app/src/main/jni/mega/sdk".url https://code.developers.mega.co.nz/sdk/sdk.git'
         sh 'git config --file=.gitmodules submodule."app/src/main/jni/mega/sdk".branch develop'
@@ -35,7 +45,7 @@ pipeline {
     stage('Download Dependency Lib for SDK') {
       steps {
         sh """
-        export PATH=/Applications/MEGAcmd.app/Contents/MacOS:$PATH
+
         mkdir -p "${BUILD_LIB_DOWNLOAD_FOLDER}"
         cd "${BUILD_LIB_DOWNLOAD_FOLDER}"
         pwd
@@ -86,9 +96,8 @@ pipeline {
     stage('Build SDK') {
       steps {
         sh """
-        export PATH=/usr/local/opt/gnu-sed/libexec/gnubin:/usr/local/opt/gnu-tar/libexec/gnubin:/usr/local/opt/openjdk@11/bin:/usr/local/bin:$PATH
         cd ${WORKSPACE}/app/src/main/jni
-        /usr/local/bin/bash build.sh all
+        bash build.sh all
         """
       }
     }
@@ -110,10 +119,10 @@ pipeline {
     stage('Build APK') {
       steps {
         // Finish building and packaging the APK
-        sh './gradlew assembleDebug'
+        sh './gradlew assemble'
 
         // Archive the APKs so that they can be downloaded from Jenkins
-        archiveArtifacts '**/*.apk'
+        // archiveArtifacts '**/*.apk'
       }
     }
     // stage('Static analysis') {
