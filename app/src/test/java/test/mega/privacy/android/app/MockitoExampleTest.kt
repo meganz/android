@@ -4,8 +4,8 @@ import com.google.common.truth.Truth
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Mockito
-import org.mockito.Mockito.`when`
 import org.mockito.junit.MockitoJUnitRunner
+import org.mockito.kotlin.whenever
 
 /**
  * Example unit test using Mockito
@@ -18,10 +18,10 @@ class MockitoExampleTest {
         val mockService = Mockito.mock(DependentService::class.java)
         val myClass = MyClassUnderTest(mockService)
 
-        `when`(mockService.getUserName(1)).thenReturn("Robin")
+        whenever(mockService.getUserName(1)).thenReturn("Robin")
         Truth.assertThat(myClass.getGreetings(1)).isEqualTo("Hello Robin")
 
-        `when`(mockService.getUserName(2)).thenReturn("Jack")
+        whenever(mockService.getUserName(2)).thenReturn("Jack")
         Truth.assertThat(myClass.getGreetings(2)).isEqualTo("Hello Jack")
     }
 
@@ -30,7 +30,7 @@ class MockitoExampleTest {
         val mockService = Mockito.mock(DependentService::class.java)
         val myClass = MyClassUnderTest(mockService)
 
-        `when`(mockService.getUserName(-1)).thenReturn(null)
+        whenever(mockService.getUserName(-1)).thenReturn(null)
         Truth.assertThat(myClass.getGreetings(-1)).isEqualTo("User Not Exist")
     }
 }

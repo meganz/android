@@ -262,6 +262,7 @@ dependencies {
     testImplementation "org.robolectric:robolectric:$roboletricVersion"
     testImplementation "androidx.test.ext:junit-ktx:$androidxTestExtVersion"
     testImplementation "org.mockito:mockito-core:$mockitoVersion"
+    testImplementation "org.mockito.kotlin:mockito-kotlin:$mockitoKotlinVersion"
 
     androidTestImplementation "androidx.test.ext:junit:$androidxTestExtVersion"
     androidTestImplementation "com.google.truth:truth:$truthVersion"
