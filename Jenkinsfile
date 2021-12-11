@@ -5,11 +5,7 @@ pipeline {
     JAVA_HOME = "/opt/buildtools/zulu11.52.13-ca-jdk11.0.13-macosx_x64"
     ANDROID_HOME = "/opt/buildtools/android-sdk"
 
-    PATH = "/opt/buildtools/zulu11.52.13-ca-jdk11.0.13-macosx_x64/bin:$PATH"
-    PATH = "/opt/buildtools/android-sdk/platform-tools:$PATH"
-    PATH = "/opt/homebrew/bin:$PATH"
-    PATH = "/opt/homebrew/opt/gnu-tar/libexec/gnubin:$PATH"
-    PATH = "/opt/homebrew/opt/gnu-sed/libexec/gnubin:$PATH"
+    PATH = "/opt/buildtools/zulu11.52.13-ca-jdk11.0.13-macosx_x64/bin:/opt/homebrew/bin:/opt/homebrew/opt/gnu-sed/libexec/gnubin:/opt/homebrew/opt/gnu-tar/libexec/gnubin:/opt/buildtools/android-sdk/platform-tools:$PATH"
 
     CONSOLE_LOG_FILE = "androidLog.txt"
 
