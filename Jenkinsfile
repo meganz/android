@@ -1,6 +1,21 @@
+
+def injectEnvironments(Closure body) {
+    withEnv([
+        "PATH=/Applications/MEGAcmd.app/Contents/MacOS:/Applications/CMake.app/Contents/bin:$PATH:/usr/local/bin",
+        "LC_ALL=en_US.UTF-8",
+        "LANG=en_US.UTF-8"
+    ]) {
+        body.call()
+    }
+}
+
 pipeline {
   agent { label 'mac-slave' }
   environment {
+
+    LC_ALL = "en_US.UTF-8"
+    LANG = "en_US.UTF-8"
+
     NDK_ROOT = "/opt/buildtools/android-sdk/ndk/21.3.6528147"
     JAVA_HOME = "/opt/buildtools/zulu11.52.13-ca-jdk11.0.13-macosx_x64"
     ANDROID_HOME = "/opt/buildtools/android-sdk"
@@ -18,6 +33,8 @@ pipeline {
     GOOGLE_MAP_API_URL = "https://mega.nz/#!1tcl3CrL!i23zkmx7ibnYy34HQdsOOFAPOqQuTo1-2iZ5qFlU7-k"
     GOOGLE_MAP_API_FILE = 'default_google_maps_api.zip'
     GOOGLE_MAP_API_UNZIPPED = 'default_google_map_api_unzipped'
+
+
   }
   options {
     // Stop the build early in case of compile or test failures
@@ -27,14 +44,29 @@ pipeline {
   stages {
     stage('Fetch SDK Submodules') {
       steps {
-        sh 'git config --file=.gitmodules submodule."app/src/main/jni/mega/sdk".url https://code.developers.mega.co.nz/sdk/sdk.git'
-        sh 'git config --file=.gitmodules submodule."app/src/main/jni/mega/sdk".branch develop'
-        sh 'git config --file=.gitmodules submodule."app/src/main/jni/megachat/sdk".url https://code.developers.mega.co.nz/megachat/MEGAchat.git'
-        sh 'git config --file=.gitmodules submodule."app/src/main/jni/megachat/sdk".branch develop'
-        sh 'git submodule sync'
-        sh 'git submodule update --init --recursive --remote'
+        withCredentials([gitUsernamePassword(credentialsId: 'Gitlab-Access-Token', gitToolName: 'Default')]) {
+          // injectEnvironments({
+            sh 'git config --file=.gitmodules submodule."app/src/main/jni/mega/sdk".url https://code.developers.mega.co.nz/sdk/sdk.git'
+            sh 'git config --file=.gitmodules submodule."app/src/main/jni/mega/sdk".branch develop'
+            sh 'git config --file=.gitmodules submodule."app/src/main/jni/megachat/sdk".url https://code.developers.mega.co.nz/megachat/MEGAchat.git'
+            sh 'git config --file=.gitmodules submodule."app/src/main/jni/megachat/sdk".branch develop'
+            sh 'git submodule sync'
+            sh 'git submodule update --init --recursive --remote'
+          // })
+        }
       }
     }
+
+    // stage('Fetch SDK Submodules') {
+    //   steps {
+    //     sh 'git config --file=.gitmodules submodule."app/src/main/jni/mega/sdk".url https://code.developers.mega.co.nz/sdk/sdk.git'
+    //     sh 'git config --file=.gitmodules submodule."app/src/main/jni/mega/sdk".branch develop'
+    //     sh 'git config --file=.gitmodules submodule."app/src/main/jni/megachat/sdk".url https://code.developers.mega.co.nz/megachat/MEGAchat.git'
+    //     sh 'git config --file=.gitmodules submodule."app/src/main/jni/megachat/sdk".branch develop'
+    //     sh 'git submodule sync'
+    //     sh 'git submodule update --init --recursive --remote'
+    //   }
+    // }
     stage('Download Dependency Lib for SDK') {
       steps {
         sh """
