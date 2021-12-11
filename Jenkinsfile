@@ -5,7 +5,7 @@ pipeline {
     JAVA_HOME = "/opt/buildtools/zulu11.52.13-ca-jdk11.0.13-macosx_x64"
     ANDROID_HOME = "/opt/buildtools/android-sdk"
 
-    PATH = "/opt/buildtools/zulu11.52.13-ca-jdk11.0.13-macosx_x64/bin:/opt/homebrew/bin:/opt/homebrew/opt/gnu-sed/libexec/gnubin:/opt/homebrew/opt/gnu-tar/libexec/gnubin:/opt/buildtools/android-sdk/platform-tools:$PATH"
+    PATH = "/Applications/MEGAcmd.app/Contents/MacOS:/opt/buildtools/zulu11.52.13-ca-jdk11.0.13-macosx_x64/bin:/opt/homebrew/bin:/opt/homebrew/opt/gnu-sed/libexec/gnubin:/opt/homebrew/opt/gnu-tar/libexec/gnubin:/opt/buildtools/android-sdk/platform-tools:$PATH"
 
     CONSOLE_LOG_FILE = "androidLog.txt"
 
@@ -18,9 +18,6 @@ pipeline {
     GOOGLE_MAP_API_URL = "https://mega.nz/#!1tcl3CrL!i23zkmx7ibnYy34HQdsOOFAPOqQuTo1-2iZ5qFlU7-k"
     GOOGLE_MAP_API_FILE = 'default_google_maps_api.zip'
     GOOGLE_MAP_API_UNZIPPED = 'default_google_map_api_unzipped'
-
-    PATH = "/Applications/MEGAcmd.app/Contents/MacOS:${PATH}"
-
   }
   options {
     // Stop the build early in case of compile or test failures
