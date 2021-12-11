@@ -3778,7 +3778,7 @@
     <!-- Preferences screen item title for cookie settings -->
     <string name="settings_about_cookie_settings">Cookie Settings</string>
     <!-- Cookie dialog title -->
-    <string name="dialog_cookie_alert_title">Before you continue</string>
+    <string name="dialog_cookie_alert_title">Your privacy</string>
     <!-- Cookie dialog message. Please, keep the placeholders to format the string. -->
     <string name="dialog_cookie_alert_message">We use Cookies and similar technologies (’Cookies’) to provide and enhance your experience with our services. Accept our use of Cookies from the beginning of your visit or customise Cookies in Cookie Settings. Read more in our [A]Cookie Policy[/A].</string>
     <!-- Cookie dialog message showed when there are unsaved settings. -->

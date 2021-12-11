@@ -60,10 +60,10 @@ class CookieSettingsFragment : SettingsBaseFragment() {
 
         policiesPreference.apply {
             setButton1(StringResourcesUtils.getString(R.string.settings_about_privacy_policy)) {
-                openBrowser("https://mega.nz/cookie".toUri())
+                openBrowser("https://mega.nz/privacy".toUri())
             }
             setButton2(StringResourcesUtils.getString(R.string.settings_about_cookie_policy)) {
-                openBrowser("https://mega.nz/privacy".toUri())
+                openBrowser("https://mega.nz/cookie".toUri())
             }
         }
     }
