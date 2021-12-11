@@ -122,7 +122,7 @@ pipeline {
       steps {
         sh """
         cd ${WORKSPACE}/app/src/main/jni
-        bash build.sh all
+        /opt/homebrew/bin/bash build.sh all
         """
       }
     }
