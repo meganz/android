@@ -32,6 +32,7 @@ import mega.privacy.android.app.utils.LogUtil.logError
 import mega.privacy.android.app.utils.LogUtil.logWarning
 import mega.privacy.android.app.utils.MegaNodeDialogUtil.showRenameNodeDialog
 import mega.privacy.android.app.utils.NetworkUtil.isOnline
+import mega.privacy.android.app.utils.SdkRestrictionUtils.isSaveToGalleryCompatible
 import mega.privacy.android.app.utils.StringResourcesUtils
 import mega.privacy.android.app.utils.ViewUtils.waitForLayout
 import nz.mega.documentscanner.utils.IntentUtils.extra
@@ -340,7 +341,7 @@ class ImageViewerActivity : BaseActivity(), PermissionRequester, SnackbarShower 
                     isOnline() && !item.isFromRubbishBin
 
                 findItem(R.id.action_save_gallery)?.isVisible =
-                    isOnline() && item.hasFullAccess && !item.isFromRubbishBin
+                    isSaveToGalleryCompatible() && isOnline() && item.hasFullAccess && !item.isFromRubbishBin
 
                 findItem(R.id.action_get_link)?.isVisible =
                     isOnline() && item.hasFullAccess && !item.isFromRubbishBin
@@ -369,7 +370,7 @@ class ImageViewerActivity : BaseActivity(), PermissionRequester, SnackbarShower 
     /**
      * Enable toolbar/bottomBar transparency transition for DragToExit support.
      *
-     * @param isActivated   Check wether transition is activated or not.
+     * @param isActivated   Check whether transition is activated or not.
      */
     private fun enableToolbarTransition(isActivated: Boolean) {
         val color: Int

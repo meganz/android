@@ -34,6 +34,7 @@ import mega.privacy.android.app.utils.LogUtil.logWarning
 import mega.privacy.android.app.utils.MegaNodeUtil.getNodeLabelColor
 import mega.privacy.android.app.utils.MegaNodeUtil.getNodeLabelDrawable
 import mega.privacy.android.app.utils.MegaNodeUtil.getNodeLabelText
+import mega.privacy.android.app.utils.SdkRestrictionUtils.isSaveToGalleryCompatible
 import mega.privacy.android.app.utils.StringResourcesUtils.*
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 import nz.mega.sdk.MegaNode
@@ -171,7 +172,7 @@ class ImageBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
             }
 
             // Save to Gallery
-            optionGallery.isVisible = !nodeItem.isFromRubbishBin && !node.isPublic
+            optionGallery.isVisible = isSaveToGalleryCompatible() && !nodeItem.isFromRubbishBin && !node.isPublic
             optionGallery.setOnClickListener {
                 (activity as? ImageViewerActivity?)?.saveNode(node, true)
                 dismissAllowingStateLoss()
@@ -294,6 +295,7 @@ class ImageBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
             separatorOpen.isVisible = optionOpenWith.isVisible
             separatorOffline.isVisible = optionOfflineLayout.isVisible
             separatorShare.isVisible = optionShare.isVisible
+            separatorRestore.isVisible = optionRestore.isVisible
             separatorCopy.isVisible = (optionRename.isVisible || optionCopy.isVisible || optionMove.isVisible)
                     && (optionRestore.isVisible || optionRubbishBin.isVisible)
         }

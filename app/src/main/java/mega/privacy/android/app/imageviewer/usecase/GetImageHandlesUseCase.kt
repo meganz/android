@@ -140,6 +140,12 @@ class GetImageHandlesUseCase @Inject constructor(
             }
         }, BackpressureStrategy.LATEST)
 
+    /**
+     * Add Children nodes to a List of ImageItem given a MegaNode and a Sort Order
+     *
+     * @param megaNode      MegaNode to obtain children from
+     * @param sortOrder     Sort Order for obtaining children
+     */
     private fun MutableList<ImageItem>.addChildrenNodes(megaNode: MegaNode, sortOrder: Int) {
         megaApi.getChildren(megaNode, sortOrder).forEach { node ->
             if (node.isValidForImageViewer()) {
@@ -148,6 +154,12 @@ class GetImageHandlesUseCase @Inject constructor(
         }
     }
 
+    /**
+     * Add MegaNode nodes to a List of ImageItem given their node handles.
+     *
+     * @param nodeHandles   Node handles to obtain MegaNode from
+     * @param isOffline     Flag to check if Node is offline
+     */
     private fun MutableList<ImageItem>.addNodeHandles(
         nodeHandles: LongArray,
         isOffline: Boolean
@@ -164,6 +176,11 @@ class GetImageHandlesUseCase @Inject constructor(
         }
     }
 
+    /**
+     * Add MegaNode nodes to a List of ImageItem given their node public link.
+     *
+     * @param nodeFileLinks     Node public link to obtain MegaNode from
+     */
     private fun MutableList<ImageItem>.addNodeFileLinks(nodeFileLinks: List<String>) {
         nodeFileLinks.forEach { nodeFileLink ->
             val node = getNodeUseCase.getPublicNode(nodeFileLink).blockingGetOrNull()

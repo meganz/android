@@ -46,6 +46,7 @@ import mega.privacy.android.app.utils.LastShowSMSDialogTimeChecker;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 
+import static mega.privacy.android.app.constants.SettingsConstants.KEY_MOBILE_DATA_HIGH_RESOLUTION;
 import static mega.privacy.android.app.fragments.offline.OfflineFragment.SHOW_OFFLINE_WARNING;
 import static mega.privacy.android.app.middlelayer.push.PushMessageHanlder.PUSH_TOKEN;
 import static mega.privacy.android.app.textEditor.TextEditorViewModel.SHOW_LINE_NUMBERS;
@@ -414,6 +415,10 @@ public class AccountController {
 
         // Clear get banner success flag
         LiveEventBus.get(EVENT_LOGOUT_CLEARED).post(null);
+
+        // Clear Key mobile data high resolution preference
+        SharedPreferences defaultPreferences = PreferenceManager.getDefaultSharedPreferences(context);
+        defaultPreferences.edit().remove(KEY_MOBILE_DATA_HIGH_RESOLUTION).apply();
     }
 
     public static void removeFolder(Context context, File folder) {

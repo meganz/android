@@ -29,8 +29,9 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
             android:layout_marginEnd="40dp"
-            android:ellipsize="end"
-            android:maxLines="1"
+            android:ellipsize="middle"
+            android:letterSpacing="0"
+            android:singleLine="true"
             android:textAppearance="@style/TextAppearance.Mega.Body1"
             app:layout_constrainedWidth="true"
             app:layout_constraintEnd_toEndOf="parent"
@@ -251,6 +252,13 @@
                 android:visibility="gone"
                 app:drawableStartCompat="@drawable/ic_restore"
                 tools:visibility="visible" />
+
+            <View
+                android:id="@+id/separator_restore"
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginStart="72dp"
+                android:background="@color/grey_012_white_012" />
 
             <TextView
                 android:id="@+id/option_rubbish_bin"

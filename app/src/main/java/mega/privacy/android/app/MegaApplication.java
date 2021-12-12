@@ -10,7 +10,6 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.content.SharedPreferences;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.media.AudioManager;
@@ -164,8 +163,6 @@ public class MegaApplication extends MultiDexApplication implements Application.
 	MyAccountInfo myAccountInfo;
 	@Inject
 	PasscodeManagement passcodeManagement;
-	@Inject
-	SharedPreferences preferences;
 
 	String localIpAddress = "";
 	BackgroundRequestListener requestListener;
@@ -803,7 +800,6 @@ public class MegaApplication extends MultiDexApplication implements Application.
                 if (intent != null) {
                     if (intent.getAction().equals(ACTION_LOG_OUT)) {
                         storageState = MegaApiJava.STORAGE_STATE_UNKNOWN; //Default value
-						preferences.edit().clear().commit();
                     }
                 }
             }
