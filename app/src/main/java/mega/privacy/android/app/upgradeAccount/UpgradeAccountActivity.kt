@@ -9,7 +9,6 @@ import androidx.core.view.isVisible
 import androidx.lifecycle.Observer
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.jeremyliao.liveeventbus.LiveEventBus
-import kotlinx.android.synthetic.main.alert_dialog.*
 import mega.privacy.android.app.R
 import mega.privacy.android.app.constants.EventConstants.EVENT_PURCHASES_UPDATED
 import mega.privacy.android.app.constants.IntentConstants
@@ -18,6 +17,7 @@ import mega.privacy.android.app.utils.*
 import mega.privacy.android.app.utils.Constants.*
 import mega.privacy.android.app.utils.StringUtils.toSpannedHtmlText
 import nz.mega.sdk.MegaApiJava
+import java.util.*
 
 class UpgradeAccountActivity : ChooseAccountActivity() {
 
@@ -60,6 +60,9 @@ class UpgradeAccountActivity : ChooseAccountActivity() {
     }
 
     private fun setupView() {
+        supportActionBar?.title = StringResourcesUtils.getString(R.string.action_upgrade_account)
+            .toUpperCase(Locale.getDefault())
+
         binding.titleMyAccountType.isVisible = true
         binding.chooseAccountFreeLayout.isVisible = false
 

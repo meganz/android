@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <!-- Label to show that an SDK operation has been complete successfully. -->
-    <string name="api_ok">Tidak ada error</string>
+    <string name="api_ok">Tidak ada kesalahan</string>
     <!-- Label to show that an Internal error occurs during a SDK operation. -->
-    <string name="api_einternal">Error internal</string>
+    <string name="api_einternal">Kesalahan internal</string>
     <!-- Label to show that an error of Invalid argument occurs during a SDK operation. -->
     <string name="api_eargs">Argumen salah</string>
     <!-- Label to show that a request error occurs during a SDK operation. -->
-    <string name="api_eagain">Request gagal, mencoba kembali</string>
+    <string name="api_eagain">Permintaan gagal, mencoba kembali</string>
     <!-- Label to show that the rate limit has been reached during a SDK operation. -->
     <string name="api_eratelimit">Rate limit telah terlampaui</string>
     <!-- Label to show that a SDK operation has failed permanently. -->
@@ -31,11 +31,11 @@
     <!-- Label to show that an error related with an Incomplete SDK operation. -->
     <string name="api_eincomplete">Tidak selesai</string>
     <!-- Label to show that an error related with the decryption process of a node occurs during a SDK operation. -->
-    <string name="api_ekey">Key salah/ Decryption error</string>
+    <string name="api_ekey">Kunci salah/Dekripsi salah</string>
     <!-- Label to show that an error related with a bad session ID occurs during a SDK operation. -->
     <string name="api_esid">Sesi ID buruk</string>
     <!-- Error shown when download a file that has violated ToS/AUP. -->
-    <string name="api_eblocked_ec_import_ec_download">Tidak dapat diakses karena pelanggaran ToS / AUP</string>
+    <string name="api_eblocked_ec_import_ec_download">Tidak dapat diakses karena pelanggaran ToS/AUP</string>
     <!-- Label to show that an error related with a blocked account occurs during a SDK operation. -->
     <string name="api_eblocked">Terblokir</string>
     <!-- Label to show that an error related with an over quota occurs during a SDK operation. -->
@@ -43,13 +43,13 @@
     <!-- Label to show that an error related with a temporary problem occurs during a SDK operation. -->
     <string name="api_etempunavail">Sementara tidak tersedia</string>
     <!-- Label to show that an error related with too many connections occurs during a SDK operation. -->
-    <string name="api_etoomanyconnections">Kebanjiran koneksi</string>
+    <string name="api_etoomanyconnections">Kebanjiran hubungan</string>
     <!-- Label to show that an error related with an write error occurs during a SDK operation. -->
     <string name="api_ewrite">Penulisan bermasalah</string>
     <!-- Label to show that an error related with an read error occurs during a SDK operation. -->
     <string name="api_eread">Baca bermasalah</string>
     <!-- Label to show that an error related with an invalid or missing application key occurs during a SDK operation. -->
-    <string name="api_eappkey">Application key salah</string>
+    <string name="api_eappkey">Kunci aplikasi salah</string>
     <!-- Error shown when SSL check has failed -->
     <string name="api_essl">Verifikasi SSL gagal</string>
     <!-- Label shown when current account does not have enough quota to complete the operation -->
@@ -71,9 +71,9 @@
     <!-- Label to show that an error of Balance occurs during a SDK operation. -->
     <string name="payment_ebalance">Kesalahan saldo</string>
     <!-- Label to show that an error related with an unknown error occurs during a SDK operation. -->
-    <string name="payment_egeneric_api_error_unknown">Error tidak diketahui</string>
+    <string name="payment_egeneric_api_error_unknown">Kesalahan tidak diketahui</string>
     <!-- Label to show that an error related with an HTTP error occurs during a SDK operation. -->
     <string name="api_error_http">Kesalahan HTTP</string>
-    <!-- Label to show that an error related with a circular upload procedures occurs recursivity during a SDK operation -->
+    <!-- Label to show that a transfer error happened during a SDK operation (sync a recursive folders structure). Only can happen if user syncs a folder with recursive links (link to the parent folder). -->
     <string name="api_ecircular_ec_upload">Transfer gagal karena struktur direktori rekursif</string>
 </resources>

@@ -84,13 +84,14 @@ import java.util.TimeZone;
 import dagger.hilt.android.AndroidEntryPoint;
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
 import io.reactivex.rxjava3.schedulers.Schedulers;
+import kotlin.Unit;
 import mega.privacy.android.app.BuildConfig;
-import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.ShareInfo;
 import mega.privacy.android.app.activities.GiphyPickerActivity;
+import mega.privacy.android.app.components.ChatManagement;
 import mega.privacy.android.app.utils.MegaProgressDialogUtil;
 import mega.privacy.android.app.generalusecase.FilePrepareUseCase;
 import mega.privacy.android.app.listeners.CreateChatListener;
@@ -152,6 +153,7 @@ import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.MessageNot
 import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.PendingMessageBottomSheetDialogFragment;
 import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.SendAttachmentChatBottomSheetDialogFragment;
 import mega.privacy.android.app.objects.GifData;
+import mega.privacy.android.app.objects.PasscodeManagement;
 import mega.privacy.android.app.utils.AlertsAndWarnings;
 import mega.privacy.android.app.utils.CallUtil;
 import mega.privacy.android.app.utils.ChatUtil;
@@ -204,6 +206,7 @@ import static mega.privacy.android.app.constants.EventConstants.EVENT_SESSION_ON
 import static mega.privacy.android.app.lollipop.megachat.AndroidMegaRichLinkMessage.*;
 import static mega.privacy.android.app.lollipop.megachat.MapsActivity.*;
 import static mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil.*;
+import static mega.privacy.android.app.providers.FileProviderActivity.FROM_MEGA_APP;
 import static mega.privacy.android.app.utils.AlertsAndWarnings.showForeignStorageOverQuotaWarningDialog;
 import static mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuotaPaywallWarning;
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
@@ -318,6 +321,8 @@ public class ChatActivityLollipop extends PasscodeActivity
 
     @Inject
     FilePrepareUseCase filePrepareUseCase;
+    @Inject
+    PasscodeManagement passcodeManagement;
 
     private int currentRecordButtonState;
     private String mOutputFilePath;
@@ -665,7 +670,7 @@ public class ChatActivityLollipop extends PasscodeActivity
     public void onCallAnswered(long chatId, boolean flag) {
         logDebug("The call has been answered success");
         callInProgressLayout.setEnabled(true);
-        openMeetingInProgress(this, chatId, true);
+        openMeetingInProgress(this, chatId, true, passcodeManagement);
     }
 
     @Override
@@ -694,7 +699,7 @@ public class ChatActivityLollipop extends PasscodeActivity
     public void onCallStarted(long chatId, boolean enableVideo, int enableAudio) {
         if (idChat == chatId) {
             // In this case, the callMenuItem will be reset to enabled after resuming this activity (it calls invalidateOptionMenu())
-            openMeetingWithAudioOrVideo(this, idChat, enableAudio == START_CALL_AUDIO_ENABLE, enableVideo);
+            openMeetingWithAudioOrVideo(this, idChat, enableAudio == START_CALL_AUDIO_ENABLE, enableVideo, passcodeManagement);
         } else {
             enableCallMenuItems(true);
         }
@@ -730,7 +735,7 @@ public class ChatActivityLollipop extends PasscodeActivity
                 }).show(getSupportFragmentManager(),
                         MeetingHasEndedDialogFragment.TAG);
             } else  {
-                CallUtil.checkMeetingInProgress(ChatActivityLollipop.this, ChatActivityLollipop.this, chatId, isFromOpenChatPreview, link, request.getMegaHandleList(), request.getText(), alreadyExist, request.getUserHandle());
+                CallUtil.checkMeetingInProgress(ChatActivityLollipop.this, ChatActivityLollipop.this, chatId, isFromOpenChatPreview, link, request.getMegaHandleList(), request.getText(), alreadyExist, request.getUserHandle(), passcodeManagement);
             }
         } else {
             logDebug("It's a chat link");
@@ -2707,7 +2712,7 @@ public class ChatActivityLollipop extends PasscodeActivity
                 if(recordView.isRecordingNow()) break;
 
                 if(participatingInACall()){
-                    showConfirmationInACall(this);
+                    showConfirmationInACall(this, StringResourcesUtils.getString(R.string.ongoing_call_content), passcodeManagement);
                     break;
                 }
 
@@ -2722,7 +2727,7 @@ public class ChatActivityLollipop extends PasscodeActivity
                 if(recordView.isRecordingNow()) break;
 
                 if(CallUtil.participatingInACall()){
-                    showConfirmationInACall(this);
+                    showConfirmationInACall(this, StringResourcesUtils.getString(R.string.ongoing_call_content), passcodeManagement);
                     break;
                 }
 
@@ -2781,12 +2786,6 @@ public class ChatActivityLollipop extends PasscodeActivity
                 break;
         }
         return super.onOptionsItemSelected(item);
-    }
-
-    private void showMeetingOptionsPanel(){
-        if (isBottomSheetDialogShown(bottomSheetDialogFragment)) return;
-        bottomSheetDialogFragment = new MeetingBottomSheetDialogFragment();
-        bottomSheetDialogFragment.show(getSupportFragmentManager(), bottomSheetDialogFragment.getTag());
     }
 
     /*
@@ -3175,7 +3174,7 @@ public class ChatActivityLollipop extends PasscodeActivity
                 if (callInThisChat.isOnHold() ||
                         (currentCallInProgress != null && currentCallInProgress.getChatid() == chatRoom.getChatId())) {
                     logDebug("I'm participating in the call of this chat");
-                    returnCall(this, chatRoom.getChatId());
+                    returnCall(this, chatRoom.getChatId(), passcodeManagement);
                     return;
                 }
 
@@ -3382,7 +3381,7 @@ public class ChatActivityLollipop extends PasscodeActivity
 
     public void disablePinScreen(){
         logDebug("disablePinScreen");
-        MegaApplication.getPasscodeManagement().setShowPasscodeScreen(false);
+        passcodeManagement.setShowPasscodeScreen(false);
     }
 
     public void showProgressForwarding(){
@@ -3507,6 +3506,11 @@ public class ChatActivityLollipop extends PasscodeActivity
         else if (requestCode == REQUEST_CODE_GET && resultCode == RESULT_OK) {
             if (intent == null) {
                 logWarning("Return.....");
+                return;
+            }
+
+            if (intent.getBooleanExtra(FROM_MEGA_APP, false)) {
+                nodeAttacher.handleSelectFileResult(intent, idChat, this, this);
                 return;
             }
 
@@ -3915,7 +3919,7 @@ public class ChatActivityLollipop extends PasscodeActivity
 
                 if (callInThisChat.getStatus() == MegaChatCall.CALL_STATUS_IN_PROGRESS) {
                     if (callInThisChat.isOnHold()) {
-                        returnCall(this, chatRoom.getChatId());
+                        returnCall(this, chatRoom.getChatId(), passcodeManagement);
                     }
 
                 } else if (chatRoom.isGroup()) {
@@ -3959,7 +3963,7 @@ public class ChatActivityLollipop extends PasscodeActivity
                         startCall();
                     }
                 } else {
-                    returnCall(this, chatIdBanner);
+                    returnCall(this, chatIdBanner, passcodeManagement);
                 }
                 break;
 
@@ -4186,9 +4190,9 @@ public class ChatActivityLollipop extends PasscodeActivity
         disablePinScreen();
 
         Intent intent = new Intent();
-        intent.setAction(Intent.ACTION_OPEN_DOCUMENT);
         intent.setAction(Intent.ACTION_GET_CONTENT);
         intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
+        intent.putExtra(FROM_MEGA_APP, true);
         intent.setType("*/*");
 
         startActivityForResult(Intent.createChooser(intent, null), REQUEST_CODE_GET);
@@ -4686,7 +4690,7 @@ public class ChatActivityLollipop extends PasscodeActivity
                             menu.findItem(R.id.chat_cab_menu_delete).setVisible(selected.get(0).getMessage().getUserHandle() == myUserHandle &&
                                     selected.get(0).getMessage().isDeletable() && !isRemovedMsg);
                             menu.findItem(R.id.chat_cab_menu_download).setVisible(isOnline(chatActivity) && !chatC.isInAnonymousMode()&& !isRemovedMsg);
-                            menu.findItem(R.id.chat_cab_menu_download_gallery).setVisible(isOnline(chatActivity) &&
+                            menu.findItem(R.id.chat_cab_menu_download_gallery).setVisible(!isAndroid11OrUpper() && isOnline(chatActivity) &&
                                     !chatC.isInAnonymousMode() && isMsgImage(selected.get(0)) && !isRemovedMsg);
                             importIcon.setVisible(isOnline(chatActivity) && !chatC.isInAnonymousMode() && selected.get(0).getMessage().getUserHandle() != myUserHandle && !isRemovedMsg);
                         }
@@ -4873,7 +4877,7 @@ public class ChatActivityLollipop extends PasscodeActivity
                                     importIcon.setVisible(false);
                                 } else {
                                     menu.findItem(R.id.chat_cab_menu_download).setVisible(true);
-                                    menu.findItem(R.id.chat_cab_menu_download_gallery).setVisible(allNodeImages);
+                                    menu.findItem(R.id.chat_cab_menu_download_gallery).setVisible(!isAndroid11OrUpper() && allNodeImages);
                                     menu.findItem(R.id.chat_cab_menu_share).setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
                                     menu.findItem(R.id.chat_cab_menu_share).setVisible(true);
                                     importIcon.setVisible(true);
@@ -4914,7 +4918,7 @@ public class ChatActivityLollipop extends PasscodeActivity
         nodeSaver.saveNodes(nodes, false, false, false, true, true);
     }
 
-    public void showConfirmationDeleteMessages(final ArrayList<AndroidMegaChatMessage> messages, final MegaChatRoom chat){
+    public void showConfirmationDeleteMessages(final ArrayList<AndroidMegaChatMessage> messagesToDelete, final MegaChatRoom chat){
         logDebug("showConfirmationDeleteMessages");
 
         DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
@@ -4923,8 +4927,7 @@ public class ChatActivityLollipop extends PasscodeActivity
                 switch (which){
                     case DialogInterface.BUTTON_POSITIVE:
                         stopReproductions();
-                        ChatController cC = new ChatController(chatActivity);
-                        cC.deleteAndroidMessages(messages, chat);
+                        chatC.deleteAndroidMessages(messagesToDelete, chat);
                         break;
                     case DialogInterface.BUTTON_NEGATIVE:
                         //No button clicked
@@ -5385,8 +5388,7 @@ public class ChatActivityLollipop extends PasscodeActivity
                                     } else if (MimeTypeList.typeForName(node.getName()).isOpenableTextFile(node.getSize())) {
                                         manageTextFileIntent(this, m.getMessage().getMsgId(), idChat);
                                     } else {
-                                        logDebug("NOT Image, pdf, audio or video - show node attachment panel for one node");
-                                        openWith(this, node);
+                                        onNodeTapped(this, node, this::saveNodeByTap, this, this);
                                     }
                                 }
                             }
@@ -6316,6 +6318,18 @@ public class ChatActivityLollipop extends PasscodeActivity
         nodeSaver.downloadVoiceClip(nodelist);
     }
 
+    /**
+     * Upon a node is tapped, if it cannot be previewed in-app,
+     * then download it first, this download will be marked as "download by tap".
+     * Since it's down
+     *
+     * @param node Node to be downloaded.
+     */
+    public Unit saveNodeByTap(MegaNode node) {
+        nodeSaver.saveNodes(Collections.singletonList(node), true, false, false, true, false, true);
+        return null;
+    }
+
     @Override
     public void onReactionUpdate(MegaChatApiJava api, long msgid, String reaction, int count) {
         MegaChatMessage message = api.getMessage(idChat, msgid);
@@ -6334,7 +6348,6 @@ public class ChatActivityLollipop extends PasscodeActivity
     @Override
     public void onMessageUpdate(MegaChatApiJava api, MegaChatMessage msg) {
         logDebug("msgID " + msg.getMsgId());
-
         if (msg.isDeleted()) {
             if (adapter != null) {
                 adapter.stopPlaying(msg.getMsgId());
@@ -6403,6 +6416,11 @@ public class ChatActivityLollipop extends PasscodeActivity
                         dbH.removePendingMessageById(idMsg);
                     }
 
+                    if (MegaApplication.getChatManagement().isMsgToBeDelete(idMsg)) {
+                        logDebug("Message to be deleted");
+                        MegaApplication.getChatManagement().removeMsgToDelete(idMsg);
+                        chatC.deleteMessage(msg, idChat);
+                    }
                     return;
                 }
             }
@@ -7668,34 +7686,19 @@ public class ChatActivityLollipop extends PasscodeActivity
      * @param pMsg The pending message.
      */
     public void removePendingMsg(PendingMessageSingle pMsg) {
-        if (pMsg == null) {
-            logWarning("pMsg is null, cannot remove it");
-            return;
-        }
-
-        int pMsgState = pMsg.getState();
-
-        if (pMsgState == PendingMessageSingle.STATE_UPLOADING
-                && pMsg.getTransferTag() != INVALID_ID) {
-            megaApi.cancelTransferByTag(pMsg.getTransferTag(), this);
-        }
-
-        if (pMsgState == PendingMessageSingle.STATE_SENT) {
+        if (pMsg == null || pMsg.getState() == PendingMessageSingle.STATE_SENT) {
             showSnackbar(SNACKBAR_TYPE, getString(R.string.error_message_already_sent), MEGACHAT_INVALID_HANDLE);
             return;
         }
 
-        try {
-            dbH.removePendingMessageById(pMsg.getId());
-            int positionToRemove = selectedPosition == INVALID_POSITION
-                    ? findPendingMessagePosition(pMsg.getId())
-                    : selectedPosition;
-
-            messages.remove(positionToRemove);
-            adapter.removeMessage(positionToRemove, messages);
-        } catch (IndexOutOfBoundsException e) {
-            logError("EXCEPTION", e);
+        if ((pMsg.getState() == PendingMessageSingle.STATE_UPLOADING || pMsg.getState() == PendingMessageSingle.STATE_ATTACHING)
+                && pMsg.getTransferTag() != INVALID_ID) {
+            MegaApplication.getChatManagement().setPendingMessageToBeCancelled(pMsg.getTransferTag(), pMsg.getId());
+            megaApi.cancelTransferByTag(pMsg.getTransferTag(), this);
+            return;
         }
+
+        removePendingMessageFromDbHAndUI(pMsg.getId());
     }
 
     /**
@@ -8292,11 +8295,15 @@ public class ChatActivityLollipop extends PasscodeActivity
             }
         }
         else if (request.getType() == MegaRequest.TYPE_CANCEL_TRANSFER){
+            int tag = request.getTransferTag();
+            ChatManagement chatManagement = MegaApplication.getChatManagement();
+            long pMsgId = chatManagement.getPendingMsgIdToBeCancelled(tag);
+            chatManagement.removePendingMsgToBeCancelled(tag);
+
             if (e.getErrorCode() != MegaError.API_OK) {
-                logError("Error TYPE_CANCEL_TRANSFER: " + e.getErrorCode());
-            }
-            else{
-                logDebug("Chat upload cancelled");
+                chatManagement.addMsgToBeDelete(pMsgId);
+            } else {
+                removePendingMessageFromDbHAndUI(pMsgId);
             }
         }
         else if (request.getType() == MegaRequest.TYPE_SET_ATTR_USER){
@@ -8311,6 +8318,25 @@ public class ChatActivityLollipop extends PasscodeActivity
                     MegaApplication.setEnabledGeoLocation(false);
                 }
             }
+        }
+    }
+
+    /**
+     * Method for removing a penging message from the database and UI
+     *
+     * @param pendingId Pending message ID
+     */
+    private void removePendingMessageFromDbHAndUI(long pendingId) {
+        try {
+            dbH.removePendingMessageById(pendingId);
+            int positionToRemove = selectedPosition == INVALID_POSITION
+                    ? findPendingMessagePosition(pendingId)
+                    : selectedPosition;
+
+            messages.remove(positionToRemove);
+            adapter.removeMessage(positionToRemove, messages);
+        } catch (IndexOutOfBoundsException exception) {
+            logError("EXCEPTION", exception);
         }
     }
 
@@ -8467,7 +8493,7 @@ public class ChatActivityLollipop extends PasscodeActivity
 
             setNodeAttachmentVisible();
 
-            MegaApplication.getPasscodeManagement().setShowPasscodeScreen(true);
+            passcodeManagement.setShowPasscodeScreen(true);
             MegaApplication.setOpenChatId(idChat);
             supportInvalidateOptionsMenu();
 

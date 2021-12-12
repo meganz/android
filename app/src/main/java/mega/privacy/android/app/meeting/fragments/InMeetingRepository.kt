@@ -4,7 +4,6 @@ import android.content.Context
 import android.graphics.Bitmap
 import dagger.hilt.android.qualifiers.ApplicationContext
 import mega.privacy.android.app.MegaApplication
-import mega.privacy.android.app.R
 import mega.privacy.android.app.di.MegaApi
 import mega.privacy.android.app.listeners.ChatConnectionListener
 import mega.privacy.android.app.lollipop.controllers.ChatController
@@ -467,18 +466,6 @@ class InMeetingRepository @Inject constructor(
             audio,
             video,
             isGuest = megaApi.isEphemeralPlusPlus
-        )
-    }
-
-    fun updateChatPermissions(
-        chatId: Long, peerId: Long,
-        listener: MegaChatRequestListenerInterface?
-    ) {
-        megaChatApi.updateChatPermissions(
-            chatId,
-            peerId,
-            MegaChatRoom.PRIV_MODERATOR,
-            listener
         )
     }
 

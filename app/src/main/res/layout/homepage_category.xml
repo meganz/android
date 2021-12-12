@@ -24,7 +24,7 @@
             app:layout_constraintHorizontal_chainStyle="spread_inside"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="@+id/category_document"
-            app:name="@string/sortby_type_photo_first" />
+            app:name="@string/section_images" />
 
         <mega.privacy.android.app.components.CategoryButton
             android:id="@+id/category_document"

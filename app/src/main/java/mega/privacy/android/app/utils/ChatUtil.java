@@ -17,6 +17,7 @@ import android.content.pm.ActivityInfo;
 import android.content.res.Resources;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.widget.SwitchCompat;
+import androidx.core.content.ContextCompat;
 
 import android.media.AudioAttributes;
 import android.media.AudioFocusRequest;
@@ -81,11 +82,11 @@ import nz.mega.sdk.MegaNodeList;
 import nz.mega.sdk.MegaPushNotificationSettings;
 import nz.mega.sdk.MegaStringList;
 
+import static mega.privacy.android.app.constants.SettingsConstants.VIDEO_QUALITY_ORIGINAL;
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
 import static mega.privacy.android.app.utils.CallUtil.isStatusConnected;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.ContactUtil.*;
-import static mega.privacy.android.app.utils.DBUtil.isSendOriginalAttachments;
 import static mega.privacy.android.app.utils.FileUtil.getLocalFile;
 import static mega.privacy.android.app.utils.FileUtil.shareFile;
 import static mega.privacy.android.app.utils.LogUtil.*;
@@ -572,6 +573,56 @@ public class ChatUtil {
     }
 
     /**
+     * Sets the contact status icon and status text
+     *
+     * @param userStatus          contact's status
+     * @param textViewContactIcon view in which the status icon has to be set
+     * @param contactStateText    view in which the status text has to be set
+     * @param where               The status icon image resource is different based on the place where it's placed.
+     */
+    public static void setContactStatusParticipantList(int userStatus, final ImageView textViewContactIcon, TextView contactStateText, StatusIconLocation where) {
+        MegaApplication app = MegaApplication.getInstance();
+        Context context = app.getApplicationContext();
+        int statusImageResId = getIconResourceIdByLocation(context, userStatus, where);
+
+        if (statusImageResId == 0) {
+            textViewContactIcon.setVisibility(View.GONE);
+        } else {
+            Drawable drawable = ContextCompat.getDrawable(MegaApplication.getInstance().getApplicationContext(), statusImageResId);
+            textViewContactIcon.setImageDrawable(drawable);
+            textViewContactIcon.setVisibility(View.VISIBLE);
+        }
+
+        if (contactStateText == null) {
+            return;
+        }
+
+        contactStateText.setVisibility(View.VISIBLE);
+
+        switch (userStatus) {
+            case MegaChatApi.STATUS_ONLINE:
+                contactStateText.setText(context.getString(R.string.online_status));
+                break;
+
+            case MegaChatApi.STATUS_AWAY:
+                contactStateText.setText(context.getString(R.string.away_status));
+                break;
+
+            case MegaChatApi.STATUS_BUSY:
+                contactStateText.setText(context.getString(R.string.busy_status));
+                break;
+
+            case MegaChatApi.STATUS_OFFLINE:
+                contactStateText.setText(context.getString(R.string.offline_status));
+                break;
+
+            case MegaChatApi.STATUS_INVALID:
+            default:
+                contactStateText.setVisibility(View.GONE);
+        }
+    }
+
+    /**
      * Get status icon image resource id by display mode and where the icon is placed.
      *
      * @param context Context object.
@@ -828,6 +879,11 @@ public class ChatUtil {
      * @return String with the title.
      */
     public static String getTitleChat(MegaChatRoom chat) {
+        if (chat == null) {
+            logError("chat is null");
+            return "";
+        }
+
         if (chat.isActive()) {
             return chat.getTitle();
         }
@@ -846,6 +902,11 @@ public class ChatUtil {
      * @return String with the title.
      */
     public static String getTitleChat(MegaChatListItem chat) {
+        if (chat == null) {
+            logError("chat is null");
+            return "";
+        }
+
         if (chat.isActive()) {
             return chat.getTitle();
         }
@@ -1489,7 +1550,7 @@ public class ChatUtil {
         pendingMsg.setName(fileName);
         pendingMsg.setFingerprint(MegaApplication.getInstance().getMegaApi().getFingerprint(filePath));
 
-        if (MimeTypeList.typeForName(fileName).isMp4Video() && !isSendOriginalAttachments()) {
+        if (MimeTypeList.typeForName(fileName).isMp4Video() && dbH.getChatVideoQuality() != VIDEO_QUALITY_ORIGINAL) {
             idPendingMessage = dbH.addPendingMessage(pendingMsg, PendingMessageSingle.STATE_COMPRESSING);
             pendingMsg.setState(PendingMessageSingle.STATE_COMPRESSING);
         } else if (fromExplorer) {

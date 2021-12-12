@@ -1,15 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- Full description text of the app in the Google Play page of the app (character limit 4000) -->
-    <string name="full_description_text">MEGA provides user controlled encrypted cloud storage and chat through standard web browsers, together with dedicated apps for mobile devices. Unlike other cloud storage providers, your data is encrypted and decrypted by your client devices only and never by us.\n\nUpload your files from your smartphone or tablet then search, store, download, stream, view, share, rename or delete your files any time, from any device, anywhere. Share folders with your contacts and see their updates in real time. The encryption process means we cannot access or reset your password so you MUST remember it (unless you have your Recovery Key backed up) or you will lose access to your stored files.\n\nEnd-to-end user encrypted MEGA video chat allows for total privacy, and has been available in web browsers since 2016. It has been extended to the Mega Mobile App, with chat history accessible across multiple devices. Users can also easily add files to a chat from their MEGA Cloud Drive.\n\nMEGA offers a generous 20 GB free storage for all registered users with bonus achievements, and offers paid plans with much higher limits:\n\n\nPro Lite subscription: 4.99 € per month or 49.99 € per year gives you 400 GB of storage space and 1 TB of transfer quota per month.\nPro I subscription: 9.99 € per month or 99.99 € per year gives you 2 TB of storage space and 2 TB of transfer quota per month.\nPro II subscription: 19.99 € per month or 199.99 € per year gives you 8 TB of storage space and 8 TB of transfer quota per month.\nPro III subscription: 29.99 € per month or 299.99 € per year gives you 16 TB of storage space and 16 TB of transfer quota per month.\n\nSubscriptions are renewed automatically for successive periods of the same duration, at the same price as the initial period chosen. To manage your subscriptions, simply tap the Play Store icon on your mobile device, sign in with your Google ID (if you haven’t already done so). Then tap on the MEGA app. You’ll be able to manage your subscription there.\n\nApp Permissions:\nWRITE_EXTERNAL_STORAGE -&gt; Download your files from MEGA to your device and upload files from your device to MEGA\nCAMERA -&gt; Take a picture and upload your photos to MEGA\nREAD_CONTACTS -&gt; Easily add contacts from your device as MEGA contacts\nRECORD_AUDIO and CAPTURE_VIDEO_OUTPUT (mic and camera) -&gt; MEGA provides for end-to-end encrypted audio/video calls\n\n\nTo enhance users’ confidence in the MEGA system, all of the client-side code is published, so interested security researchers can evaluate the encryption process. The code of our mobile app is located on: https://github.com/meganz/android \n\nFor more info, please check our website:\nSee https://mega.nz/terms \n\n\nDesktop - https://mega.nz/</string>
-    <!-- Short description text of the app in the Google Play page of the app (character limit 80) -->
-    <string name="short_description_text">MEGA is Cloud Storage with secure always-on privacy.</string>
     <!-- PRO Lite account -->
     <string name="prolite_account">Pro Lite</string>
     <!-- Name of the MEGA PDF Viewer. Keep uppercase. -->
     <string name="pdf_app_name">MEGA PDF Viewer</string>
-    <!-- Showing progress of elements. Example: 2 of 10. -->
-    <string name="general_x_of_x">of</string>
     <!-- Answer for confirmation dialog. -->
     <string name="general_yes">Yes</string>
     <!-- Answer for confirmation dialog. -->
@@ -1036,7 +1030,7 @@
     <!-- Third paragraph of the screen to backup the master key -->
     <string name="backup_third_paragraph">An external attacker cannot gain access to your account with just your key. A password reset requires both the key and access to your email.</string>
     <!-- Sentence to inform the user the available actions in the screen to backup the master key -->
-    <string name="backup_action">Copy the Recovery Key to clipboard or save it as text file</string>
+    <string name="backup_action">Copy the Recovery Key to the clipboard or save it as text file.</string>
     <!-- Action of a button to save something -->
     <string name="save_action">Save</string>
     <!-- Alert message when the master key has been successfully copied to the ClipBoard -->
@@ -1621,26 +1615,14 @@
     <string name="paused_transfers_title">Paused transfers</string>
     <!-- message shown in the screen when there are not any active transfer -->
     <string name="completed_transfers_empty">No completed transfers</string>
-    <!-- Text of the notification shown when the upload service is running, Plural -->
-    <plurals name="upload_service_notification">
-        <item quantity="one">Uploading %1$d of %2$d file</item>
-        <item quantity="other">Uploading %1$d of %2$d files</item>
-    </plurals>
-    <!-- Text of the notification shown when the upload service is running, Plural -->
-    <plurals name="upload_service_paused_notification">
-        <item quantity="one">Uploading %1$d of %2$d file (paused)</item>
-        <item quantity="other">Uploading %1$d of %2$d files (paused)</item>
-    </plurals>
-    <!-- Text of the notification shown when the folder upload service is running, Text of the notification shown when the folder upload service is running - plural e.g. Uploading 1 of 2 folders -->
-    <plurals name="folder_upload_service_notification">
-        <item quantity="one">Uploading %1$d of %2$d folder</item>
-        <item quantity="other">Uploading %1$d of %2$d folders</item>
-    </plurals>
-    <!-- Text of the notification shown when the folder upload service is running, Text of the notification shown when the folder upload service is running - plural e.g. Uploading 1 of 2 folders -->
-    <plurals name="folder_upload_service_paused_notification">
-        <item quantity="one">Uploading %1$d of %2$d folder (paused)</item>
-        <item quantity="other">Uploading %1$d of %2$d folders (paused)</item>
-    </plurals>
+    <!-- Text of the notification shown when the upload service is running: e.g. Uploading files: 1 of 10 -->
+    <string name="upload_service_notification">Uploading files: %1$d of %2$d</string>
+    <!-- Text of the notification shown when the upload service is paused: e.g. Uploading files: 1 of 10 (paused)-->
+    <string name="upload_service_notification_paused">Uploading files: %1$d of %2$d (paused)</string>
+    <!-- Text of the notification shown when the folder upload service is running, e.g. Uploading folders 1 of 2 -->
+    <string name="folder_upload_service_notification">Uploading folders: %1$d of %2$d</string>
+    <!-- Text of the notification shown when the folder upload service is paused, e.g. Uploading folders 1 of 2 (paused) -->
+    <string name="folder_upload_service_notification_paused">Uploading folders: %1$d of %2$d (paused)</string>
     <!-- Text of the notification shown when the upload service has finished, Plural -->
     <plurals name="upload_service_final_notification">
         <item quantity="one">Uploaded %1$d file</item>
@@ -1688,16 +1670,10 @@
         <item quantity="one">%1$d file not downloaded</item>
         <item quantity="other">%1$d files not downloaded</item>
     </plurals>
-    <!-- Text of the notification shown when the download service is running, Plural -->
-    <plurals name="download_service_notification">
-        <item quantity="one">Downloading %1$d of %2$d file</item>
-        <item quantity="other">Downloading %1$d of %2$d files</item>
-    </plurals>
-    <!-- Text of the notification shown when the download service is paused, Plural -->
-    <plurals name="download_service_paused_notification">
-        <item quantity="one">Downloading %1$d of %2$d file (paused)</item>
-        <item quantity="other">Downloading %1$d of %2$d files (paused)</item>
-    </plurals>
+    <!-- Text of the notification shown when the download service is running -->
+    <string name="download_service_notification">Downloading files: %1$d of %2$d</string>
+    <!-- Text of the notification shown when the download service is paused -->
+    <string name="download_service_notification_paused">Downloading files: %1$d of %2$d (paused)</string>
     <!-- Title of the alert when the transfer quota is exceeded. -->
     <string name="title_depleted_transfer_overquota">Insufficient transfer quota</string>
     <!-- Text of the alert when the transfer quota is depleted. The placeholder indicates the time left for the transfer quota to be reset. For instance: 30m 45s -->
@@ -2274,10 +2250,12 @@
     <string name="settings_video_upload_quality">Video Quality</string>
     <!-- Text shown when the user refuses to permit the storage permission when enable camera upload -->
     <string name="on_refuse_storage_permission">Camera Uploads needs to access your photos and other media on your device. Please go to the settings page and grant permission.</string>
-    <!-- the options for the option on setting to set up the quality of multimedia files uploaded to the chat, the options of medium quality multimedia file to  upload. -->
+    <!-- Available options for the setting to set up the quality of multimedia files uploaded to the chat or the Camera Uploads -->
     <string-array name="settings_chat_upload_quality_entries">
-        <item>Original quality</item>
-        <item>Medium quality</item>
+        <item>Low</item>
+        <item>Medium</item>
+        <item>High</item>
+        <item>Original</item>
     </string-array>
     <!-- Title of the notification for a missed call -->
     <string name="missed_call_notification_title">Missed call</string>
@@ -3339,7 +3317,7 @@
         <item quantity="other">%d files pending.</item>
     </plurals>
     <!-- Title of the login screen -->
-    <string name="login_to_mega">Log in to MEGA</string>
+    <string name="login_to_mega">Log into MEGA</string>
     <!-- Title of the create account screen -->
     <string name="create_account_title">Create your MEGA account</string>
     <!-- Label to reference a recents section -->
@@ -3453,7 +3431,7 @@
     <!-- Text informing user that their account has been suspended -->
     <string name="account_temporarily_suspended">Your account has been temporarily locked for your safety.</string>
     <!-- Text informing user has to follow the steps of an email to unlock their account -->
-    <string name="verify_email_and_follow_steps">[A]Please verify your email address[/A] and follow the steps in MEGA’s email to unlock your account.</string>
+    <string name="verify_email_and_follow_steps">Please follow the steps in the [A]verification email[/A] to unlock your account.</string>
     <!-- Question which takes the user to a help screen -->
     <string name="why_am_i_seeing_this">Why am I seeing this?</string>
     <!-- Label of a button which action is resend an email -->
@@ -3720,7 +3698,7 @@
     <!-- Title indicating the select mode is enabled and ready to select transfers on Transfers section, In progress tab -->
     <string name="title_select_transfers">Select transfers</string>
     <!-- Error shown to inform the priority change of a transfer failed. Please don’t remove the place holder, it’s to set the name of the transfer. Example: The priority change of the transfer “video.mp4” failed. -->
-    <string name="change_of_transfer_priority_failed">The priority change of the transfer ”%1$s” failed.</string>
+    <string name="change_of_transfer_priority_failed">Unable to change priority of the transfer “%1$s”</string>
     <!-- Title option to send separated the link and decryption key -->
     <string name="option_send_decryption_key_separately">Send decryption key separately</string>
     <!-- Explanation option to send separated the link and decryption key -->
@@ -3748,7 +3726,7 @@
     <!-- Explanation of a warning recommending upgrade to Pro in relation to link available options -->
     <string name="link_upgrade_pro_explanation">MEGA Pro users have exclusive access to additional link safety features making your account even more secure.</string>
     <!-- Meaning of links decryption key -->
-    <string name="decryption_key_explanation">Our end-to-end encryption system requires a unique key automatically generated for this file. A link with this key is created by default, but you can export the decryption key separately for an added layer of security.</string>
+    <string name="decryption_key_explanation">Our end-to-end encryption system requires a unique key automatically generated for this file or folder. A link with this key is created by default, but you can export the decryption key separately for an added layer of security.</string>
     <!-- Reset password label -->
     <string name="reset_password_label">Reset password</string>
     <!-- Warning show to the user when has enable to send the decryption key of a link separately and tries to share the link -->
@@ -3863,7 +3841,7 @@
     <string name="file_created">File created</string>
     <!-- Warning indicating a file was not created successfully -->
     <string name="file_creation_failed">File creation failed. Please try again.</string>
-    <!-- Label indicating a file was saved to some folder. e.g.: File saved to Cloud Drive -->
+    <!-- Label indicating a file was saved to some folder. e.g.: File saved to Cloud Drive. "Cloud Drive" is the only destination for the time being, thus any article isn't needed -->
     <string name="file_saved_to">File saved to %1$s</string>
     <!-- Warning indicating a file was not saved to some folder. e.g.: File not saved to Cloud Drive. Try again -->
     <string name="file_saved_to_failed">File not saved to %1$s. Try again.</string>
@@ -3978,8 +3956,6 @@
     </plurals>
     <!-- Button of the warning dialog indicating the renamed name file extension is not the same to confirm the change. -->
     <string name="action_change_anyway">Change anyway</string>
-    <!-- Snackbar text to display if the user doesn't grant the permission to access all files on a device with Android 11 or higher -->
-    <string name="snackbar_storage_permission_denied_android_11">Permission needed to access storage.</string>
     <!-- String to show the transfer quota and the used space in My Account section. E.g.: -->
     <string name="used_storage_transfer">%1$s / %2$s</string>
     <!-- String to show the transfer quota and the used space in My Account section -->
@@ -4059,9 +4035,9 @@
     <!-- General label for microphone -->
     <string name="general_mic">Mic</string>
     <!-- General label for microphone muted -->
-    <string name="general_mic_mute">Your microphone is muted</string>
+    <string name="general_mic_mute">Your microphone is turned off</string>
     <!-- General label for microphone unmuted -->
-    <string name="general_mic_unmute">Your microphone is unmuted</string>
+    <string name="general_mic_unmute">Your microphone is turned on</string>
     <!-- General label for camera -->
     <string name="general_camera">Camera</string>
     <!-- General label for camera enable -->
@@ -4077,9 +4053,9 @@
     <!-- General label for headphone on-->
     <string name="general_headphone_on">Headphones are active</string>
     <!-- General label for speaker on-->
-    <string name="general_speaker_on">Speaker is on</string>
+    <string name="general_speaker_on">Your speaker is turned on</string>
     <!-- General label for speaker off-->
-    <string name="general_speaker_off">Speaker is off</string>
+    <string name="general_speaker_off">Your speaker is turned off</string>
     <!-- Label for end meeting-->
     <string name="meeting_end">End</string>
     <!-- Invite contacts as participants of the meeting-->
@@ -4174,4 +4150,50 @@
     <string name="main_view">Main view</string>
     <!-- Warning in Offline section alerting all the Offline files will be deleted after logout. -->
     <string name="offline_warning">Logging out deletes your offline content.</string>
+    <!-- Settings category which contains all preferences related to user interface. -->
+    <string name="user_interface_setting">User interface</string>
+    <!-- Setting which allows to choose the start screen. -->
+    <string name="start_screen_setting">Start screen</string>
+    <!-- Setting which allows to hide or show the recent activity. -->
+    <string name="hide_recent_setting">Hide recent activity</string>
+    <!-- Context of a setting which allows to hide or show the recent activity. -->
+    <string name="hide_recent_setting_context">Hide recent activity in Home section.</string>
+    <!-- Title of a dialog informing the start screen can be modified. -->
+    <string name="choose_start_screen_title">Choose your start screen</string>
+    <!-- Test of a dialog informing the start screen can be modified. -->
+    <string name="choose_start_screen_text">Change settings to choose which screen opens when you next launch the MEGA app.</string>
+    <!-- Action button which allows to change a setting. -->
+    <string name="change_setting_action">Change setting</string>
+    <!-- Subtitle of the settings page where the start screen can be chosen. -->
+    <string name="configure_start_screen">Configure default start screen</string>
+    <!-- Homepage section. -->
+    <string name="home_section">Home</string>
+    <!-- Action button which allows to show the recent activity. -->
+    <string name="show_activity_action">Show activity</string>
+    <!-- Text informing the recent activity is hidden. -->
+    <string name="recents_activity_hidden">[B]Recents[/B] activity hidden</string>
+    <!-- Alert informing the user can choose the video quality for Camera Uploads Videos -->
+    <string name="video_quality_info">You can save space by decreasing the video quality in Camera Uploads settings.</string>
+    <!-- Label indicating video original quality -->
+    <string name="original_quality">Original quality</string>
+    <!-- Settings label which allows to enable or disable fingerprint unlock. -->
+    <string name="setting_fingerprint">Fingerprint ID</string>
+    <!-- Title of the dialog which allows to enable the fingerprint unlock. -->
+    <string name="title_enable_fingerprint">Confirm your fingerprint to unlock</string>
+    <!-- Title of the dialog which allows to unlock the app with the fingerprint. -->
+    <string name="title_unlock_fingerprint">Unlock using your fingerprint</string>
+    <!-- Button of the dialog which allows to unlock the app with the fingerprint. Gives the option to unlock with the passcode instead -->
+    <string name="action_use_passcode">Use passcode</string>
+    <!-- Message informing the fingerprint was enabled successfully -->
+    <string name="confirmation_fingerprint_enabled">Your fingerprint is confirmed</string>
+    <!-- Warning indicating an image (GIF) cannot be inserted in an input text. Same string than the one shown by the system when it detects this behaviour on its own. -->
+    <string name="image_insertion_not_allowed">MEGA does not support image insertion here</string>
+    <!-- The label under the button of viewing all images screen -->
+    <string name="section_images">Images</string>
+    <!-- Title of the dialog warning the user about disable file versioning. -->
+    <string name="disable_versioning_label">Disable file versioning</string>
+    <!-- Warning of the dialog informing the user about disable file versioning. -->
+    <string name="disable_versioning_warning">Our file versioning feature ensures that we keep older copies of your files around if you replace them with newer versions. If you disable File Versioning you will no longer have this protection; the old copy will be lost when you replace it.</string>
+    <!-- Warning informing the user the folder location is trying to open no longer exists. -->
+    <string name="location_not_exist">This location no longer exists.</string>
 </resources>

@@ -2,7 +2,6 @@ package mega.privacy.android.app.meeting.adapter
 
 import android.content.Context
 import android.graphics.Bitmap
-import androidx.annotation.StringRes
 import androidx.core.text.HtmlCompat
 import androidx.recyclerview.widget.DiffUtil
 import mega.privacy.android.app.R
@@ -43,7 +42,7 @@ data class Participant(
             try {
                 displayName = displayName.replace(
                     "[A]", "<font color='"
-                            + getColorHexString(context, R.color.grey_600) + "'>"
+                            + getColorHexString(context, R.color.grey_200) + "'>"
                 )
                 displayName = displayName.replace("[/A]", "</font>")
             } catch (e: Exception) {

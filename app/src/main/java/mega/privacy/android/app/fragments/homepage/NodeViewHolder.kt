@@ -43,7 +43,7 @@ class NodeViewHolder(private val binding: ViewDataBinding) :
                 }
                 is SortByHeaderBinding -> {
                     this.orderNameStringId =
-                        SortByHeaderViewModel.orderNameMap[sortByHeaderViewModel.order]!!
+                        SortByHeaderViewModel.orderNameMap[sortByHeaderViewModel.order.first]!!
                     this.sortByHeaderViewModel = sortByHeaderViewModel
                 }
             }

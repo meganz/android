@@ -41,9 +41,7 @@
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
     <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
     <uses-permission android:name="android.permission.USE_FULL_SCREEN_INTENT" />
-    <uses-permission
-        android:name="android.permission.MANAGE_EXTERNAL_STORAGE"
-        tools:ignore="ScopedStorage" />
+    <uses-permission android:name="android.permission.USE_BIOMETRIC" />
 
     <!-- For apps targeting Android 12 (API level 31) and higher,
     apps must have the Manifest.permission.SCHEDULE_EXACT_ALARM permission
@@ -75,6 +73,9 @@
                 android:mimeType="application/*"
                 android:scheme="https" />
         </intent>
+
+        <!-- Location opened outside the app -->
+        <package android:name="com.google.android.apps.maps" />
     </queries>
 
     <application
@@ -723,6 +724,12 @@
             android:name=".activities.AskForDisplayOverActivity"
             android:theme="@android:style/Theme.Translucent.NoTitleBar.Fullscreen"
             android:launchMode="singleTask"/>
+
+        <activity
+            android:name="mega.privacy.android.app.activities.settingsActivities.StartScreenPreferencesActivity"
+            android:label="@string/start_screen_setting"
+            android:launchMode="singleTop">
+        </activity>
 
     </application>
 

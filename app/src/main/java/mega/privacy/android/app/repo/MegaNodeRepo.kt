@@ -88,6 +88,9 @@ class MegaNodeRepo @Inject constructor(
         val nodes = ArrayList<Pair<Int, MegaNode>>()
 
         for ((index, node) in children.withIndex()) {
+            if (megaApi.isInRubbish(node))
+                continue
+
             if (node.isFolder) {
                 continue
             }
@@ -116,6 +119,9 @@ class MegaNodeRepo @Inject constructor(
         val nodes = ArrayList<MegaNode>()
 
         for (node in children) {
+            if (megaApi.isInRubbish(node))
+                continue
+
             if (node.isFolder) {
                 continue
             }

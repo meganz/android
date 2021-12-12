@@ -5,19 +5,22 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.os.Bundle;
-import android.text.Html;
 import android.text.Spanned;
 import android.util.DisplayMetrics;
 import android.view.Display;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ImageView;
-import android.widget.RelativeLayout;
+import android.widget.ScrollView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.constraintlayout.widget.ConstraintSet;
+import androidx.core.text.HtmlCompat;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
@@ -46,7 +49,6 @@ import mega.privacy.android.app.lollipop.FullScreenImageViewerLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.PdfViewerActivityLollipop;
 import mega.privacy.android.app.lollipop.adapters.RecentsAdapter;
-import mega.privacy.android.app.utils.ColorUtils;
 import mega.privacy.android.app.utils.StringResourcesUtils;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaNode;
@@ -56,16 +58,24 @@ import nz.mega.sdk.MegaUser;
 
 import static mega.privacy.android.app.components.dragger.DragToExitSupport.observeDragSupportEvents;
 import static mega.privacy.android.app.components.dragger.DragToExitSupport.putThumbnailLocation;
+import static mega.privacy.android.app.constants.EventConstants.EVENT_UPDATE_HIDE_RECENT_ACTIVITY;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.ContactUtil.*;
 import static mega.privacy.android.app.utils.FileUtil.*;
+import static mega.privacy.android.app.utils.LogUtil.logDebug;
 import static mega.privacy.android.app.utils.MegaApiUtils.*;
 import static mega.privacy.android.app.utils.MegaNodeUtil.manageTextFileIntent;
 import static mega.privacy.android.app.utils.MegaNodeUtil.manageURLNode;
+import static mega.privacy.android.app.utils.MegaNodeUtil.onNodeTapped;
+import static mega.privacy.android.app.utils.SharedPreferenceConstants.HIDE_RECENT_ACTIVITY;
+import static mega.privacy.android.app.utils.SharedPreferenceConstants.USER_INTERFACE_PREFERENCES;
+import static mega.privacy.android.app.utils.TextUtil.formatEmptyScreenText;
 import static mega.privacy.android.app.utils.Util.getMediaIntent;
 
 
 public class RecentsFragment extends Fragment implements StickyHeaderHandler {
+
+    private static final int LANDSCAPE_EMPTY_IMAGE_MARGIN = 60;
 
     private Context context;
     private DisplayMetrics outMetrics;
@@ -78,9 +88,11 @@ public class RecentsFragment extends Fragment implements StickyHeaderHandler {
     private ArrayList<RecentsItem> recentsItems;
     private RecentsAdapter adapter;
 
-    private RelativeLayout emptyLayout;
-    private ImageView emptyImage;
+    private ScrollView emptyLayout;
     private TextView emptyText;
+    private Button showActivityButton;
+    private Spanned emptySpanned;
+    private Spanned activityHiddenSpanned;
 
     private StickyLayoutManager stickyLayoutManager;
     private RecyclerView listView;
@@ -132,36 +144,38 @@ public class RecentsFragment extends Fragment implements StickyHeaderHandler {
 
         emptyLayout = v.findViewById(R.id.empty_state_recents);
 
-        emptyImage = v.findViewById(R.id.empty_image_recents);
+        ImageView emptyImage = v.findViewById(R.id.empty_image_recents);
+
+        ConstraintLayout emptyView = v.findViewById(R.id.empty_layout);
+        ConstraintSet constraintSet = new ConstraintSet();
+        constraintSet.clone(emptyView);
+
+        if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
+            emptyImage.setImageResource(R.drawable.empty_recents_landscape);
+            constraintSet.connect(R.id.empty_image_recents, ConstraintSet.TOP, R.id.parent, ConstraintSet.TOP, LANDSCAPE_EMPTY_IMAGE_MARGIN);
+        } else {
+            emptyImage.setImageResource(R.drawable.empty_recents_portrait);
+            constraintSet.connect(R.id.empty_image_recents, ConstraintSet.TOP, R.id.guideline, ConstraintSet.BOTTOM, 0);
+        }
+
+        constraintSet.applyTo(emptyView);
 
         emptyText = v.findViewById(R.id.empty_text_recents);
 
-        if (context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
-            emptyImage.setImageResource(R.drawable.empty_recents_landscape);
-        } else {
-            emptyImage.setImageResource(R.drawable.empty_recents_portrait);
-        }
+        showActivityButton = v.findViewById(R.id.show_activity_button);
+        showActivityButton.setOnClickListener(v1 -> showRecentActivity());
 
-        String textToShow = StringResourcesUtils.getString(R.string.context_empty_recents);
+        String emptyString = formatEmptyScreenText(requireContext(),
+                StringResourcesUtils.getString(R.string.context_empty_recents));
 
-        try {
-            textToShow = textToShow.replace("[A]","<font color=\'"
-                    + ColorUtils.getColorHexString(context, R.color.grey_900_grey_100)
-                    + "\'>");
-            textToShow = textToShow.replace("[/A]","</font>");
-            textToShow = textToShow.replace("[B]","<font color=\'"
-                    + ColorUtils.getColorHexString(context, R.color.grey_300_grey_600)
-                    + "\'>");
-            textToShow = textToShow.replace("[/B]","</font>");
-        } catch (Exception e) {
-        }
-        Spanned result = null;
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
-            result = Html.fromHtml(textToShow, Html.FROM_HTML_MODE_LEGACY);
-        } else {
-            result = Html.fromHtml(textToShow);
-        }
-        emptyText.setText(result);
+        emptySpanned = HtmlCompat.fromHtml(emptyString, HtmlCompat.FROM_HTML_MODE_LEGACY);
+
+        String activityHiddenString = formatEmptyScreenText(requireContext(),
+                StringResourcesUtils.getString(R.string.recents_activity_hidden));
+
+        activityHiddenSpanned =
+                HtmlCompat.fromHtml(activityHiddenString, HtmlCompat.FROM_HTML_MODE_LEGACY);
+
 
         listView = v.findViewById(R.id.list_view_recents);
         fastScroller = v.findViewById(R.id.fastscroll);
@@ -180,6 +194,9 @@ public class RecentsFragment extends Fragment implements StickyHeaderHandler {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         LiveEventBus.get(EVENT_NODES_CHANGE, Boolean.class).observeForever(nodeChangeObserver);
+        LiveEventBus.get(EVENT_UPDATE_HIDE_RECENT_ACTIVITY, Boolean.class)
+                .observe(getViewLifecycleOwner(), this::setRecentsView);
+
         selectedBucketModel = new ViewModelProvider(requireActivity()).get(SelectedBucketViewModel.class);
 
         observeDragSupportEvents(getViewLifecycleOwner(), listView, VIEWER_FROM_RECETS);
@@ -235,10 +252,39 @@ public class RecentsFragment extends Fragment implements StickyHeaderHandler {
     }
 
     private void setRecentsView() {
+        boolean hideRecentActivity = requireContext()
+                .getSharedPreferences(USER_INTERFACE_PREFERENCES, Context.MODE_PRIVATE)
+                .getBoolean(HIDE_RECENT_ACTIVITY, false);
+
+        setRecentsView(hideRecentActivity);
+        ((ManagerActivityLollipop) context).setToolbarTitle();
+    }
+
+    /**
+     * Sets the recent view. Hide it if the setting to hide it is enabled, and shows it if the
+     * setting is disabled.
+     *
+     * @param hideRecentActivity True if the setting to hide the recent activity is enabled,
+     *                           false otherwise.
+     */
+    private void setRecentsView(boolean hideRecentActivity) {
+        if (hideRecentActivity) {
+            hideRecentActivity();
+        } else {
+            showActivity();
+        }
+    }
+
+    /**
+     * Shows the recent activity.
+     */
+    private void showActivity() {
         if (buckets == null || buckets.isEmpty()) {
             emptyLayout.setVisibility(View.VISIBLE);
             listView.setVisibility(View.GONE);
             fastScroller.setVisibility(View.GONE);
+            showActivityButton.setVisibility(View.GONE);
+            emptyText.setText(emptySpanned);
         } else {
             emptyLayout.setVisibility(View.GONE);
             listView.setVisibility(View.VISIBLE);
@@ -249,7 +295,26 @@ public class RecentsFragment extends Fragment implements StickyHeaderHandler {
                 fastScroller.setVisibility(View.VISIBLE);
             }
         }
-        ((ManagerActivityLollipop) context).setToolbarTitle();
+    }
+
+    /**
+     * Hides the recent activity.
+     */
+    private void hideRecentActivity() {
+        emptyLayout.setVisibility(View.VISIBLE);
+        listView.setVisibility(View.GONE);
+        fastScroller.setVisibility(View.GONE);
+        showActivityButton.setVisibility(View.VISIBLE);
+        emptyText.setText(activityHiddenSpanned);
+    }
+
+    /**
+     * Disables the setting to hide recent activity and updates the UI by showing it.
+     */
+    private void showRecentActivity() {
+        LiveEventBus.get(EVENT_UPDATE_HIDE_RECENT_ACTIVITY, Boolean.class).post(false);
+        requireContext().getSharedPreferences(USER_INTERFACE_PREFERENCES, Context.MODE_PRIVATE)
+                .edit().putBoolean(HIDE_RECENT_ACTIVITY, false).apply();
     }
 
     public String findUserName(String mail) {
@@ -316,7 +381,7 @@ public class RecentsFragment extends Fragment implements StickyHeaderHandler {
     }
 
     public void openFile(int index, MegaNode node, boolean isMedia) {
-        Intent intent = null;
+        Intent intent;
 
         if (MimeTypeList.typeForName(node.getName()).isImage()) {
             intent = new Intent(context, FullScreenImageViewerLollipop.class);
@@ -335,7 +400,7 @@ public class RecentsFragment extends Fragment implements StickyHeaderHandler {
         }
 
         String localPath = getLocalFile(node);
-        boolean paramsSetSuccessfully = false;
+        boolean paramsSetSuccessfully;
 
         if (isAudioOrVideo(node)) {
             if (isInternalIntent(node)) {
@@ -364,9 +429,10 @@ public class RecentsFragment extends Fragment implements StickyHeaderHandler {
             if (paramsSetSuccessfully && isOpusFile(node)) {
                 intent.setDataAndType(intent.getData(), "audio/*");
             }
+
+            launchIntent(intent, paramsSetSuccessfully, node, index);
         } else if (MimeTypeList.typeForName(node.getName()).isURL()) {
             manageURLNode(context, megaApi, node);
-            return;
         } else if (MimeTypeList.typeForName(node.getName()).isPdf()) {
             intent = new Intent(context, PdfViewerActivityLollipop.class);
             intent.putExtra(INTENT_EXTRA_KEY_INSIDE, true);
@@ -379,27 +445,37 @@ public class RecentsFragment extends Fragment implements StickyHeaderHandler {
                 paramsSetSuccessfully = setStreamingIntentParams(context, node, megaApi, intent,
                         (ManagerActivityLollipop) requireActivity());
             }
+
+            launchIntent(intent, paramsSetSuccessfully, node, index);
         } else if (MimeTypeList.typeForName(node.getName()).isOpenableTextFile(node.getSize())) {
             manageTextFileIntent(requireContext(), node, RECENTS_ADAPTER);
-            return;
+        } else {
+            logDebug("itemClick:isFile:otherOption");
+            onNodeTapped(context, node, ((ManagerActivityLollipop) requireActivity())::saveNodeByTap, (ManagerActivityLollipop) requireActivity(), (ManagerActivityLollipop) requireActivity());
         }
+    }
 
+    /**
+     * Launch corresponding intent to open the file based on its type.
+     *
+     * @param intent Intent to launch activity.
+     * @param paramsSetSuccessfully true, if the param is set for the intent successfully; false, otherwise.
+     * @param node The node to open.
+     * @param position Thumbnail's position in the list.
+     */
+    private void launchIntent(Intent intent, boolean paramsSetSuccessfully, MegaNode node ,int position) {
         if (intent != null && !isIntentAvailable(context, intent)) {
             paramsSetSuccessfully = false;
             ((ManagerActivityLollipop) context).showSnackbar(SNACKBAR_TYPE, getString(R.string.intent_not_available), -1);
         }
 
-        if (paramsSetSuccessfully) {
+        if (intent != null && paramsSetSuccessfully) {
             intent.putExtra(INTENT_EXTRA_KEY_HANDLE, node.getHandle());
-            putThumbnailLocation(intent, listView, index, VIEWER_FROM_RECETS, adapter);
+            putThumbnailLocation(intent, listView, position, VIEWER_FROM_RECETS, adapter);
 
             context.startActivity(intent);
             ((ManagerActivityLollipop) context).overridePendingTransition(0, 0);
-            return;
         }
-
-        ((ManagerActivityLollipop) context).saveNodesToDevice(Collections.singletonList(node),
-                true, false, false, false);
     }
 
     public void setBucketSelected(MegaRecentActionBucket bucketSelected) {

@@ -1,15 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- Full description text of the app in the Google Play page of the app (character limit 4000) -->
-    <string name="full_description_text">MEGA ให้ที่เก็บข้อมูลบนคลาวด์แบบเข้ารหัสและระบบแชทผ่านมาตรฐานเว็บเบราว์เซอร์ที่ควบคุมโดยผู้ใช้ มาพร้อมกับแอปพลิเคชันเฉพาะสำหรับโทรศัพท์มือถือ ต่างจากผู้ให้บริการจัดเก็บข้อมูลบนคลาวด์รายอื่นตรงที่ข้อมูลของคุณจะถูกเข้ารหัสและถอดรหัสโดยใช้อุปกรณ์ไคลเอนต์ของคุณเท่านั้น ไม่มีการดำเนินการใด ๆ จากเรา\n\nสามารถอัปโหลดไฟล์ได้จากสมาร์ทโฟนหรือแท็บเล็ต จากนั้นค่อยค้นหา จัดเก็บ ดาวน์โหลด สตรีม ดู แชร์ เปลี่ยนชื่อหรือลบไฟล์ของคุณได้ตลอดเวลาจากอุปกรณ์ใดก็ได้ในทุก ๆ ที่ อีกทั้งยังแชร์โฟลเดอร์กับผู้ติดต่อของคุณและดูข้อมูลอัปเดตของพวกเขาในแบบเรียลไทม์ได้เช่นเดียวกัน กระบวนการเข้ารหัสหมายความว่า เราไม่สามารถเข้าถึงหรือรีเซ็ตรหัสผ่านของคุณได้ ดังนั้น คุณต้องจำรหัสผ่านไว้ให้ดี (เว้นแต่ว่าคุณได้ทำการสำรองคีย์การกู้คืนไว้แล้ว) ไม่เช่นนั้นคุณจะไม่สามารถเข้าถึงไฟล์ที่เก็บไว้ได้เลย\n\nวิดีโอแชท MEGA ที่เข้ารหัสโดยผู้ใช้แบบต้นทางถึงปลายทาง ช่วยเพิ่มความเป็นส่วนตัวโดยสมบูรณ์ที่สุด ถูกเปิดให้ใช้งานผ่านเบราว์เซอร์ตั้งแต่ปี พ.ศ. 2559 แล้ว โดยได้ขยายบริการไปยังแอปมือถือ พร้อมด้วยประวัติการแชทที่สามารถเข้าถึงได้จากอุปกรณ์หลายเครื่อง ผู้ใช้ยังสามารถเพิ่มไฟล์ลงในแชทจาก MEGA คลาวด์ไดร์ฟได้อย่างสะดวก\n\nMEGA ขอมอบพื้นที่เก็บข้อมูลฟรี 20 GB ให้กับผู้ใช้ที่ลงทะเบียนทุกคน พร้อมโบนัสความสำเร็จให้อีกด้วย และแผนแบบชำระเงินที่พร้อมให้เลือกสรรได้อย่างมากมาย:\n\n\nสมัครใช้งาน Pro Lite: 4.99 ยูโรต่อเดือนหรือ 49.99 ยูโรต่อปีจะให้พื้นที่เก็บข้อมูล 400 GB และโควต้าการถ่ายโอน 1 TB ต่อเดือน\nสมัครใช้งาน Pro I: 9.99 ยูโรต่อเดือนหรือ 99.99 ยูโรต่อปีจะให้พื้นที่เก็บข้อมูล 2 TB และโควต้าการถ่ายโอน 2 TB ต่อเดือน\nสมัครใช้งาน Pro II: 19.99 ยูโรต่อเดือนหรือ 199.99 ยูโรต่อปีจะให้พื้นที่เก็บข้อมูล 8 TB และโควต้าการถ่ายโอน 8 TB ต่อเดือน\nสมัครใช้งาน Pro III: 29.99 ยูโรต่อเดือนหรือ 299.99 ยูโรต่อปีจะให้พื้นที่เก็บข้อมูล 16 TB และโควต้าการถ่ายโอน 16 TB ต่อเดือน\n\nการสมัครใช้งานจะได้รับการต่ออายุโดยอัตโนมัติตามระยะเวลาที่สมัครไว้แบบต่อเนื่อง และจะถูกเรียกเก็บเงินในราคาเดียวกับระยะเวลาที่ได้สมัครตั้งแต่แรกเริ่มที่เลือกไว้ ในการจัดการการสมัครของคุณ เพียงแตะที่ไอคอน Play Store บนอุปกรณ์มือถือของคุณ ลงชื่อเข้าใช้ด้วย Google ID ของคุณ (หากคุณยังไม่ได้ดำเนินการ) จากนั้นแตะที่แอป MEGA คุณก็จะสามารถจัดการการสมัครใช้งานของคุณได้ที่นั่น\n\nการขอสิทธิ์ในแอปมีดังนี้:\nWRITE_EXTERNAL_STORAGE -&gt; ดาวน์โหลดไฟล์จาก MEGA ไปยังอุปกรณ์ของคุณและอัปโหลดไฟล์จากอุปกรณ์ของคุณไปที่ MEGA\nCAMERA -&gt; ถ่ายรูปและอัปโหลดรูปถ่ายของคุณไปที่ MEGA\nREAD_CONTACTS -&gt; เพิ่มรายชื่อติดต่อจากอุปกรณ์ของคุณเป็นรายชื่อติดต่อของ MEGA ได้อย่างง่ายดาย\nRECORD_AUDIO และ CAPTURE_VIDEO_OUTPUT (ไมโครโฟนและกล้องถ่ายรูป) -&gt; MEGA จัดเตรียมการโทรออกด้วยเสียง/วิดีโอแบบเข้ารหัสลับแบบต้นทางถึงปลายทาง\n\n\nเพื่อเพิ่มความมั่นใจให้กับผู้ใช้ในระบบ MEGA จะมีการเผยแพร่โค้ดไคลเอ็นต์ทั้งหมด เพื่อให้นักวิจัยด้านความปลอดภัยที่สนใจสามารถประเมินกระบวนการเข้ารหัสได้ โค้ดของแอปบนอุปกรณ์เคลื่อนที่ของเราจะอยู่ที่: https://github.com/meganz/android \n\nสำหรับข้อมูลเพิ่มเติม กรุณาตรวจสอบได้ที่เว็บไซต์ของเรา:\nhttps://mega.nz/terms \n\n\nเดสก์ทอป - https://mega.nz/</string>
-    <!-- Short description text of the app in the Google Play page of the app (character limit 80) -->
-    <string name="short_description_text">MEGA เป็นระบบจัดเก็บไฟล์ในระบบคลาวด์ พร้อมด้วยความเป็นส่วนตัวอย่างทรงพลัง</string>
     <!-- PRO Lite account -->
     <string name="prolite_account">Pro Lite</string>
     <!-- Name of the MEGA PDF Viewer. Keep uppercase. -->
     <string name="pdf_app_name">ดูไฟล์ PDF ด้วย MEGA</string>
-    <!-- Showing progress of elements. Example: 2 of 10. -->
-    <string name="general_x_of_x">จาก</string>
     <!-- Answer for confirmation dialog. -->
     <string name="general_yes">ใช่</string>
     <!-- Answer for confirmation dialog. -->
@@ -1598,22 +1592,14 @@
     <string name="paused_transfers_title">หยุดการถ่ายโอนชั่วคราว</string>
     <!-- message shown in the screen when there are not any active transfer -->
     <string name="completed_transfers_empty">ไม่มีรายการถ่ายโอน</string>
-    <!-- Text of the notification shown when the upload service is running, Plural -->
-    <plurals name="upload_service_notification">
-        <item quantity="other">กำลังอัปโหลดไฟล์ %1$d จาก %2$d ไฟล์</item>
-    </plurals>
-    <!-- Text of the notification shown when the upload service is running, Plural -->
-    <plurals name="upload_service_paused_notification">
-        <item quantity="other">กำลังอัปโหลดไฟล์ %1$d จาก %2$d รายการ (หยุดชั่วคราว)</item>
-    </plurals>
-    <!-- Text of the notification shown when the folder upload service is running, Text of the notification shown when the folder upload service is running - plural e.g. Uploading 1 of 2 folders -->
-    <plurals name="folder_upload_service_notification">
-        <item quantity="other">กำลังอัปโหลด %1$d จาก %2$d โฟลเดอร์</item>
-    </plurals>
-    <!-- Text of the notification shown when the folder upload service is running, Text of the notification shown when the folder upload service is running - plural e.g. Uploading 1 of 2 folders -->
-    <plurals name="folder_upload_service_paused_notification">
-        <item quantity="other">กำลังอัปโหลดโฟลเดอร์ %1$d จาก %2$d รายการ (หยุดชั่วคราว)</item>
-    </plurals>
+    <!-- Text of the notification shown when the upload service is running: e.g. Uploading files: 1 of 10 -->
+    <string name="upload_service_notification">กำลังอัปโหลดไฟล์: %1$d จาก %2$d</string>
+    <!-- Text of the notification shown when the upload service is paused: e.g. Uploading files: 1 of 10 (paused)-->
+    <string name="upload_service_notification_paused">กำลังอัปโหลดไฟล์: %1$d จาก %2$d (หยุดชั่วคราว)</string>
+    <!-- Text of the notification shown when the folder upload service is running, e.g. Uploading folders 1 of 2 -->
+    <string name="folder_upload_service_notification">กำลังอัปโหลดโฟลเดอร์: %1$d จาก %2$d</string>
+    <!-- Text of the notification shown when the folder upload service is paused, e.g. Uploading folders 1 of 2 (paused) -->
+    <string name="folder_upload_service_notification_paused">กำลังอัปโหลดโฟลเดอร์: %1$d จาก %2$d (หยุดชั่วคราว)</string>
     <!-- Text of the notification shown when the upload service has finished, Plural -->
     <plurals name="upload_service_final_notification">
         <item quantity="other">อัปโหลดแล้ว %1$d ไฟล์</item>
@@ -1652,14 +1638,10 @@
     <plurals name="download_service_failed">
         <item quantity="other">ไม่ได้ดาวน์โหลดไฟล์ %1$d ไฟล์</item>
     </plurals>
-    <!-- Text of the notification shown when the download service is running, Plural -->
-    <plurals name="download_service_notification">
-        <item quantity="other">กำลังดาวน์โหลดไฟล์ %1$d จาก %2$d ไฟล์</item>
-    </plurals>
-    <!-- Text of the notification shown when the download service is paused, Plural -->
-    <plurals name="download_service_paused_notification">
-        <item quantity="other">กำลังดาวน์โหดไฟล์ %1$d จาก %2$d รายการ (หยุดชั่วคราว)</item>
-    </plurals>
+    <!-- Text of the notification shown when the download service is running -->
+    <string name="download_service_notification">กำลังดาวน์โหลดไฟล์: %1$d จาก %2$d</string>
+    <!-- Text of the notification shown when the download service is paused -->
+    <string name="download_service_notification_paused">กำลังดาวน์โหลดไฟล์: %1$d จาก %2$d (หยุดชั่วคราว)</string>
     <!-- Title of the alert when the transfer quota is exceeded. -->
     <string name="title_depleted_transfer_overquota">โควต้าการถ่ายโอนไม่เพียงพอ</string>
     <!-- Text of the alert when the transfer quota is depleted. The placeholder indicates the time left for the transfer quota to be reset. For instance: 30m 45s -->
@@ -2226,10 +2208,12 @@
     <string name="settings_video_upload_quality">คุณภาพวีดีโอ</string>
     <!-- Text shown when the user refuses to permit the storage permission when enable camera upload -->
     <string name="on_refuse_storage_permission">การอัปโหลดจากกล้องจำเป็นต้องเข้าถึงภาพถ่ายและสื่ออื่น ๆ บนอุปกรณ์ของคุณ กรุณาไปที่หน้าการตั้งค่าและการให้สิทธิ์</string>
-    <!-- the options for the option on setting to set up the quality of multimedia files uploaded to the chat, the options of medium quality multimedia file to  upload. -->
+    <!-- Available options for the setting to set up the quality of multimedia files uploaded to the chat or the Camera Uploads -->
     <string-array name="settings_chat_upload_quality_entries">
-        <item>คุณภาพดั้งเดิม</item>
-        <item>คุณภาพปานกลาง</item>
+        <item>ต่ำ</item>
+        <item>ปานกลาง</item>
+        <item>สูง</item>
+        <item>ต้นฉบับ</item>
     </string-array>
     <!-- Title of the notification for a missed call -->
     <string name="missed_call_notification_title">สายที่ไม่ได้รับ</string>
@@ -3266,7 +3250,7 @@
     <!-- Title of the create account screen -->
     <string name="create_account_title">สร้างบัญชี MEGA ของคุณ</string>
     <!-- Label to reference a recents section -->
-    <string name="recents_label">เมื่อเร็ว ๆ นี้</string>
+    <string name="recents_label">ล่าสุด</string>
     <!-- Label to reference a chats section -->
     <string name="chats_label">แชท</string>
     <!-- Text of the empty screen when there are not elements in Recents -->
@@ -3376,7 +3360,7 @@
     <!-- Text informing user that their account has been suspended -->
     <string name="account_temporarily_suspended">บัญชีถูกล็อกชั่วคราวเพื่อความปลอดภัยของคุณ</string>
     <!-- Text informing user has to follow the steps of an email to unlock their account -->
-    <string name="verify_email_and_follow_steps">[A]กรุณาตรวจสอบอีเมล[/A]และทำตามขั้นตอนในอีเมลของ MEGA เพื่อปลดล็อกบัญชีของคุณ</string>
+    <string name="verify_email_and_follow_steps">กรุณาทำตามขั้นตอนใน[A]อีเมลยืนยัน[/A]เพื่อปลดล็อกบัญชีของคุณ</string>
     <!-- Question which takes the user to a help screen -->
     <string name="why_am_i_seeing_this">ทำไมฉันเห็นสิ่งนี้</string>
     <!-- Label of a button which action is resend an email -->
@@ -3572,7 +3556,7 @@
     <!-- Shows the error when the limit of reactions per message is reached and a user tries to add one more. Keep the placeholder because is to show limit number in runtime. -->
     <string name="limit_reaction_per_message">ข้อความนี้แสดงความรู้สึกถึงขีดจำกัดสูงสุด %d ครั้งแล้ว</string>
     <!-- System message displayed to all chat participants when one of them enables retention history -->
-    <string name="retention_history_changed_by">[A]%1$s[/A][B] เปลี่ยนเวลาล้างข้อความเป็น[/B][A] %2$s[/A][B][/B]</string>
+    <string name="retention_history_changed_by">[A]%1$s[/A][B] เปลี่ยนเวลาล้างข้อความเป็น [/B][A]%2$s[/A][B][/B]</string>
     <!-- Title of the section to clear the chat content in the Manage chat history screen -->
     <string name="title_properties_clear_chat_history">ล้างประวัติการแชท</string>
     <!-- System message that is shown to all chat participants upon disabling the Retention history -->
@@ -3634,7 +3618,7 @@
     <!-- Title indicating the select mode is enabled and ready to select transfers on Transfers section, In progress tab -->
     <string name="title_select_transfers">เลือกการถ่ายโอน</string>
     <!-- Error shown to inform the priority change of a transfer failed. Please don’t remove the place holder, it’s to set the name of the transfer. Example: The priority change of the transfer “video.mp4” failed. -->
-    <string name="change_of_transfer_priority_failed">เปลี่ยนลำดับความสำคัญการถ่ายโอน “%1$s” ไม่สำเร็จ</string>
+    <string name="change_of_transfer_priority_failed">ไม่สามารถเปลี่ยนลำดับความสำคัญการถ่ายโอน “%1$s” ได้</string>
     <!-- Title option to send separated the link and decryption key -->
     <string name="option_send_decryption_key_separately">ส่งคีย์ถอดรหัสลับแยกต่างหาก</string>
     <!-- Explanation option to send separated the link and decryption key -->
@@ -3662,7 +3646,7 @@
     <!-- Explanation of a warning recommending upgrade to Pro in relation to link available options -->
     <string name="link_upgrade_pro_explanation">ผู้ใช้ MEGA Pro สามารถเข้าถึงฟีเจอร์ด้านความปลอดภัยของลิงก์เพิ่มเติมได้โดยเฉพาะทำให้บัญชีของคุณปลอดภัยยิ่งขึ้น</string>
     <!-- Meaning of links decryption key -->
-    <string name="decryption_key_explanation">ระบบเข้ารหัสจากต้นทางถึงปลายทางของเรา มีการใช้คีย์เฉพาะที่สร้างขึ้นโดยอัตโนมัติของไฟล์นี้ ลิงก์ที่มีคีย์นี้จะถูกสร้างขึ้นตามค่าเริ่มต้น แต่คุณสามารถส่งออกคีย์ถอดรหัสแบบแยกต่างหากเพื่อเพิ่มระดับความปลอดภัยได้</string>
+    <string name="decryption_key_explanation">ระบบเข้ารหัสจากต้นทางถึงปลายทางของเรา มีการใช้คีย์เฉพาะที่สร้างขึ้นสำหรังไฟล์หรือโฟลเดอร์นี้โดยอัตโนมัติ ลิงก์ที่มีคีย์นี้จะถูกสร้างขึ้นตามค่าเริ่มต้น แต่คุณสามารถส่งออกคีย์ถอดรหัสแบบแยกต่างหากเพื่อเพิ่มระดับความปลอดภัยได้</string>
     <!-- Reset password label -->
     <string name="reset_password_label">รีเซ็ตรหัสผ่าน</string>
     <!-- Warning show to the user when has enable to send the decryption key of a link separately and tries to share the link -->
@@ -3777,7 +3761,7 @@
     <string name="file_created">สร้างไฟล์แล้ว</string>
     <!-- Warning indicating a file was not created successfully -->
     <string name="file_creation_failed">สร้างไฟล์ล้มเหลว กรุณาลองอีกครั้ง</string>
-    <!-- Label indicating a file was saved to some folder. e.g.: File saved to Cloud Drive -->
+    <!-- Label indicating a file was saved to some folder. e.g.: File saved to Cloud Drive. "Cloud Drive" is the only destination for the time being, thus any article isn't needed -->
     <string name="file_saved_to">บันทึกไฟล์ลงใน %1$s แล้ว</string>
     <!-- Warning indicating a file was not saved to some folder. e.g.: File not saved to Cloud Drive. Try again -->
     <string name="file_saved_to_failed">ไม่ได้บันทึกไฟล์ลงใน %1$s ลองอีกครั้ง</string>
@@ -3887,8 +3871,6 @@
     </plurals>
     <!-- Button of the warning dialog indicating the renamed name file extension is not the same to confirm the change. -->
     <string name="action_change_anyway">ยืนยันการเปลี่ยน</string>
-    <!-- Snackbar text to display if the user doesn't grant the permission to access all files on a device with Android 11 or higher -->
-    <string name="snackbar_storage_permission_denied_android_11">จำเป็นต้องให้สิทธิ์ในการเข้าถึงที่เก็บข้อมูล</string>
     <!-- String to show the transfer quota and the used space in My Account section. E.g.: -->
     <string name="used_storage_transfer">%1$s / %2$s</string>
     <!-- String to show the transfer quota and the used space in My Account section -->
@@ -3964,9 +3946,9 @@
     <!-- General label for microphone -->
     <string name="general_mic">ไมค์</string>
     <!-- General label for microphone muted -->
-    <string name="general_mic_mute">ไมโครโฟนของคุณปิดเสียงอยู่</string>
+    <string name="general_mic_mute">ไมโครโฟนของคุณปิดอยู่</string>
     <!-- General label for microphone unmuted -->
-    <string name="general_mic_unmute">ไมโครโฟนของคุณเปิดเสียงอยู่</string>
+    <string name="general_mic_unmute">ไมโครโฟนของคุณเปิดอยู่</string>
     <!-- General label for camera -->
     <string name="general_camera">กล้อง</string>
     <!-- General label for camera enable -->
@@ -3982,9 +3964,9 @@
     <!-- General label for headphone on-->
     <string name="general_headphone_on">หูฟังเปิดใช้งานอยู่</string>
     <!-- General label for speaker on-->
-    <string name="general_speaker_on">เปิดลำโพงอยู่</string>
+    <string name="general_speaker_on">ลำโพงของคุณเปิดอยู่</string>
     <!-- General label for speaker off-->
-    <string name="general_speaker_off">ลำโพงปิดอยู่</string>
+    <string name="general_speaker_off">ลำโพงของคุณปิดอยู่</string>
     <!-- Label for end meeting-->
     <string name="meeting_end">จบการประชุม</string>
     <!-- Invite contacts as participants of the meeting-->
@@ -4079,4 +4061,44 @@
     <string name="main_view">มุมมองหลัก</string>
     <!-- Warning in Offline section alerting all the Offline files will be deleted after logout. -->
     <string name="offline_warning">การออกจากระบบจะเป็นการลบเนื้อหาออฟไลน์ของคุณออก</string>
+    <!-- Settings category which contains all preferences related to user interface. -->
+    <string name="user_interface_setting">ส่วนติดต่อผู้ใช้</string>
+    <!-- Setting which allows to choose the start screen. -->
+    <string name="start_screen_setting">หน้าจอเริ่มต้น</string>
+    <!-- Setting which allows to hide or show the recent activity. -->
+    <string name="hide_recent_setting">ซ่อนกิจกรรมล่าสุด</string>
+    <!-- Context of a setting which allows to hide or show the recent activity. -->
+    <string name="hide_recent_setting_context">ซ่อนกิจกรรมล่าสุดในส่วนของหน้าแรก</string>
+    <!-- Title of a dialog informing the start screen can be modified. -->
+    <string name="choose_start_screen_title">เลือกหน้าจอเริ่มต้นของคุณ</string>
+    <!-- Test of a dialog informing the start screen can be modified. -->
+    <string name="choose_start_screen_text">เปลี่ยนการตั้งค่าเพื่อเลือกหน้าจอที่จะแสดงเป็นหน้าแรกเมื่อคุณเปิดแอป MEGA ครั้งถัดไป</string>
+    <!-- Action button which allows to change a setting. -->
+    <string name="change_setting_action">เปลี่ยนการตั้งค่า</string>
+    <!-- Subtitle of the settings page where the start screen can be chosen. -->
+    <string name="configure_start_screen">กำหนดค่าหน้าจอเพื่อแสดงเป็นหน้าแรก</string>
+    <!-- Homepage section. -->
+    <string name="home_section">หน้าแรก</string>
+    <!-- Action button which allows to show the recent activity. -->
+    <string name="show_activity_action">แสดงกิจกรรม</string>
+    <!-- Text informing the recent activity is hidden. -->
+    <string name="recents_activity_hidden">มีกิจกรรม[B]ล่าสุด[/B]ที่ซ่อนอยู่</string>
+    <!-- Alert informing the user can choose the video quality for Camera Uploads Videos -->
+    <string name="video_quality_info">คุณสามารถประหยัดพื้นที่ได้ด้วยการลดคุณภาพวิดีโอลงโดยการตั้งค่าการอัปโหลดจากกล้อง</string>
+    <!-- Label indicating video original quality -->
+    <string name="original_quality">คุณภาพดั้งเดิม</string>
+    <!-- Settings label which allows to enable or disable fingerprint unlock. -->
+    <string name="setting_fingerprint">รหัสลายนิ้วมือ</string>
+    <!-- Title of the dialog which allows to enable the fingerprint unlock. -->
+    <string name="title_enable_fingerprint">ยืนยันลายนิ้วมือของคุณเพื่อปลดล็อก</string>
+    <!-- Title of the dialog which allows to unlock the app with the fingerprint. -->
+    <string name="title_unlock_fingerprint">ปลดล็อกโดยใช้ลายนิ้วมือของคุณ</string>
+    <!-- Button of the dialog which allows to unlock the app with the fingerprint. Gives the option to unlock with the passcode instead -->
+    <string name="action_use_passcode">ใช้รหัส</string>
+    <!-- Message informing the fingerprint was enabled successfully -->
+    <string name="confirmation_fingerprint_enabled">ยืนยันลายนิ้วมือของคุณเรียบร้อยแล้ว</string>
+    <!-- Warning indicating an image (GIF) cannot be inserted in an input text. Same string than the one shown by the system when it detects this behaviour on its own. -->
+    <string name="image_insertion_not_allowed">MEGA ไม่สนับสนุนการแทรกรูปภาพลงที่นี่</string>
+    <!-- The label under the button of viewing all images screen -->
+    <string name="section_images">รูปภาพ</string>
 </resources>

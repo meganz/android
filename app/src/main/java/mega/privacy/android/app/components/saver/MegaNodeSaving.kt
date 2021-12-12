@@ -2,8 +2,8 @@ package mega.privacy.android.app.components.saver
 
 import android.content.Context
 import android.content.Intent
-import kotlinx.android.parcel.Parcelize
-import kotlinx.android.parcel.TypeParceler
+import kotlinx.parcelize.Parcelize
+import kotlinx.parcelize.TypeParceler
 import mega.privacy.android.app.*
 import mega.privacy.android.app.DownloadService.*
 import mega.privacy.android.app.interfaces.SnackbarShower
@@ -29,7 +29,8 @@ class MegaNodeSaving(
     private val fromMediaViewer: Boolean,
     private val needSerialize: Boolean,
     private val isVoiceClip: Boolean = false,
-    private val downloadToGallery: Boolean = false
+    private val downloadToGallery: Boolean = false,
+    private val downloadByTap: Boolean = false
 ) : Saving() {
 
     override fun totalSize() = totalSize
@@ -159,6 +160,8 @@ class MegaNodeSaving(
                     if (highPriority) {
                         intent.putExtra(HIGH_PRIORITY_TRANSFER, true)
                     }
+
+                    intent.putExtra(EXTRA_DOWNLOAD_BY_TAP, downloadByTap)
 
                     if (fromMediaViewer) {
                         intent.putExtra(EXTRA_FROM_MV, true)

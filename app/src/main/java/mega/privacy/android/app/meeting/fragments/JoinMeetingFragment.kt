@@ -4,7 +4,6 @@ import android.os.Bundle
 import android.view.View
 import androidx.navigation.fragment.findNavController
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.android.synthetic.main.meeting_on_boarding_fragment.*
 import mega.privacy.android.app.R
 import mega.privacy.android.app.meeting.activity.MeetingActivity.Companion.MEETING_ACTION_JOIN
 import mega.privacy.android.app.meeting.activity.MeetingActivity.Companion.MEETING_ACTION_REJOIN
@@ -66,7 +65,7 @@ class JoinMeetingFragment : AbstractMeetingOnBoardingFragment() {
         super.onViewCreated(view, savedInstanceState)
         initRTCAudioManager()
 
-        btn_start_join_meeting.text = StringResourcesUtils.getString(R.string.join_meeting)
-        type_meeting_edit_text.visibility = View.GONE
+        binding.btnStartJoinMeeting.text = StringResourcesUtils.getString(R.string.join_meeting)
+        binding.typeMeetingEditText.visibility = View.GONE
     }
 }

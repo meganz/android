@@ -220,7 +220,8 @@ public class ZipBrowserActivityLollipop extends PasscodeActivity {
 		if(aB != null) {
 			aB.setHomeButtonEnabled(true);
 			aB.setDisplayHomeAsUpEnabled(true);
-			aB.setTitle(getString(R.string.zip_browser_activity));
+			aB.setTitle(StringResourcesUtils.getString(R.string.zip_browser_activity)
+					.toUpperCase(Locale.getDefault()));
 		}
 		zipLayout = findViewById(R.id.zip_layout);
 		recyclerView = findViewById(R.id.zip_list_view_browser);
@@ -294,7 +295,6 @@ public class ZipBrowserActivityLollipop extends PasscodeActivity {
 			e.printStackTrace();
 		}
 
-		orderZips();
 		if (adapterList == null){
 			adapterList = new ZipListAdapterLollipop(this, recyclerView, aB, zipNodes, currentFolder);
 		}
@@ -302,18 +302,6 @@ public class ZipBrowserActivityLollipop extends PasscodeActivity {
 		recyclerView.setAdapter(adapterList);
 
 		observeDragSupportEvents(this, recyclerView, VIEWER_FROM_ZIP_BROWSER);
-	}
-
-	void orderZips () {
-		Collections.sort(zipNodes, (z1, z2) -> {
-			String name1 = z1.getName();
-			String name2 = z2.getName();
-			int res = String.CASE_INSENSITIVE_ORDER.compare(name1, name2);
-			if (res == 0) {
-				res = name1.compareTo(name2);
-			}
-			return res;
-		});
 	}
 	
 	@Override
@@ -333,19 +321,14 @@ public class ZipBrowserActivityLollipop extends PasscodeActivity {
 		if (dbH == null){
 			dbH = DatabaseHandler.getDbHandler(getApplicationContext());
 		}
-		
-		String downloadLocationDefaultPath = getDownloadLocation();
-		
-		String absolutePath= downloadLocationDefaultPath+"/"+currentPath;
-		if(!folderzipped){
-            logDebug("folderzipped = " + folderzipped);
-			int index = pathZip.lastIndexOf(".");
-			absolutePath = pathZip.substring(0, index);
-			absolutePath = absolutePath +"/"+currentPath;
-		}
-		else{
-            logDebug("folderzipped = " + folderzipped);
-		}
+
+        int indexDot = pathZip.lastIndexOf(".");
+        String absolutePath = pathZip.substring(0, indexDot);
+        if (!folderzipped) {
+            absolutePath = absolutePath + "/" + currentPath;
+        } else {
+            absolutePath = absolutePath + "/" + currentPath.substring(currentPath.lastIndexOf("/"));
+        }
 
         logDebug("The absolutePath of the file to open is: " + absolutePath);
 
@@ -528,7 +511,6 @@ public class ZipBrowserActivityLollipop extends PasscodeActivity {
 			depth=depth+1;
 			listDirectory(currentPath);
 			this.setFolder(currentPath);
-			orderZips();
 			adapterList.setNodes(zipNodes);
 		}
 		else{

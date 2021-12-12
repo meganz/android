@@ -1,15 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- Full description text of the app in the Google Play page of the app (character limit 4000) -->
-    <string name="full_description_text">MEGA는 휴대 기기를 위한 전용 앱과 더불어, 표준 웹 브라우저를 통해 이용자 제어 암호화 클라우드 저장소와 대화를 제공합니다. 다른 클라우드 저장소 제공자들과 달리, 당신의 데이터는 우리가 아닌 당신의 클라이언트 기기에서만 암호화되고 복호화됩니다.\n\n당신의 스마트폰 또는 태블릿에서 파일을 업로드하고 언제, 어디서나, 어느 기기에서든 당신의 파일을 검색, 저장, 다운로드, 스트림, 보기, 공유, 이름 변경 또는 삭제할 수 있습니다. 당신의 지인들과 폴더를 공유하고 그들이 수정하는 것을 실시간으로 보세요. 암호화 과정은 우리가 당신의 암호에 접근하거나 재설정할 수 없다는 것을 의미하므로 반드시 기억하지 않으면 (복구 키를 백업하지 않았다면) 저장한 파일들에 대한 접근을 잃게 됩니다.\n\n종단간 이용자 암호화 MEGA 영상 대화는 완전한 개인 정보 보호를 가능하게 하며, 2016년부터 웹 브라우저에서 사용할 수 있었습니다. 이것은 MEGA 모바일 앱으로 확장되어 여러 기기에서 대화 기록에 접근할 수 있습니다. 이용자들은 MEGA 클라우드 드라이브에서 대화로 파일을 쉽게 추가할 수 있습니다.\n\nMEGA는 보너스 도전 과제와 함께 모든 가입한 이용자에게 넉넉한 20GB의 무료 저장소를 제공하며, 더 높은 한도를 가진 유료 요금제를 제공합니다:\n\n\nPro Lite 구독: 매달 4.99 € 또는 매년 49.99 €로 매달 400GB의 저장 공간과 1TB의 전송 할당량을 받을 수 있습니다.\nPro I 구독: 매달 9.99 € 또는 매년 99.99 €로 매달 2TB의 저장 공간과 2TB의 전송 할당량을 받을 수 있습니다.\nPro II 구독: 매달 19.99 € 또는 매년 199.99 €로 매달 8TB의 저장 공간과 8TB의 전송 할당량을 받을 수 있습니다.\nPro III 구독: 매달 29.99 € 또는 매년 299.99 €로 매달 16TB의 저장 공간과 16TB의 전송 할당량을 받을 수 있습니다.\n\n구독은 처음 선택했던 기간과 같은 가격으로 자동으로 갱신됩니다. 구독을 관리하려면 휴대 기기에서 Play 스토어 아이콘을 탭한 후, Google ID로 로그인합니다(만약 아직 하지 않았다면). 그 다음 MEGA 앱을 탭하세요. 그 곳에서 구독을 관리할 수 있을 것입니다.\n\n앱 권한:\n외부 저장소 쓰기 -&gt; MEGA에서 당신의 기기로 파일을 다운로드하고 당신의 기기에서 MEGA로 파일을 업로드 합니다\n카메라 -&gt; 사진을 찍고 MEGA로 사진을 업로드합니다\n연락처 읽기 -&gt; 당신의 기기에서 연락처를 MEGA 연락처로 쉽게 추가합니다\n오디오 녹음과 비디오 출력 캡처 (마이크와 카메라) -&gt; MEGA가 종단간 암호화 음성/영상 통화를 제공하는데에 필요합니다\n\n\nMEGA 시스템에 대한 이용자의 신뢰를 향상시키기 위해, 모든 클라이언트 사이드 코드는 공개되며, 관심 있는 보안 연구자들은 암호화 과정을 평가할 수 있습니다. 우리의 모바일 앱의 코드는 다음에 있습니다: https://github.com/meganz/android \n\n자세한 정보는, 우리의 웹사이트를 확인하세요:\nhttps://mega.nz/terms \n\n\n데스크톱 - https://mega.nz/</string>
-    <!-- Short description text of the app in the Google Play page of the app (character limit 80) -->
-    <string name="short_description_text">MEGA는 안전한 상시 개인 정보 보호를 갖춘 클라우드 저장소입니다.</string>
     <!-- PRO Lite account -->
     <string name="prolite_account">Pro Lite</string>
     <!-- Name of the MEGA PDF Viewer. Keep uppercase. -->
     <string name="pdf_app_name">MEGA PDF 뷰어</string>
-    <!-- Showing progress of elements. Example: 2 of 10. -->
-    <string name="general_x_of_x">개째 진행중. 전체:</string>
     <!-- Answer for confirmation dialog. -->
     <string name="general_yes">예</string>
     <!-- Answer for confirmation dialog. -->
@@ -1112,7 +1106,7 @@
     <!-- Message to promote PRO accounts -->
     <string name="get_pro_account">클라우드를 키우세요.[A]Pro 계정으로 증가된 저장소와 전송 할당량을 받으세요.</string>
     <!-- success message when the MasterKey file has been downloaded -->
-    <string name="toast_master_key">MEGA 계정 복구 키는 다음에 저장되었습니다: %1s.[A]오프라인 섹션에서 복구 키 파일을 찾을 수 있습니다.[A]참고: 로그아웃 하면 복구 키가 담긴 파일이 삭제되니, MEGA 계정 밖의 안전한 곳에 보관하세요.</string>
+    <string name="toast_master_key">MEGA 계정 복구 키는 다음에 저장되었습니다: %1s.[A]오프라인용으로 저장됨 섹션에서 복구 키 파일을 찾을 수 있습니다.[/A] 참고: 로그아웃 하면 복구 키가 담긴 파일이 삭제되니, MEGA 계정 밖의 안전한 곳에 보관하세요.</string>
     <!-- Error shown when the user tries to change his mail to one that is already used -->
     <string name="mail_already_used">이 이메일 주소는 이미 사용 중입니다. 다른 이메일 주소를 사용하세요.</string>
     <!-- Error shown when the user tries to change his mail while the user has already requested a confirmation link for that email address -->
@@ -1598,22 +1592,14 @@
     <string name="paused_transfers_title">일시정지된 전송</string>
     <!-- message shown in the screen when there are not any active transfer -->
     <string name="completed_transfers_empty">완료된 전송 없음</string>
-    <!-- Text of the notification shown when the upload service is running, Plural -->
-    <plurals name="upload_service_notification">
-        <item quantity="other">파일 %2$d개 중 %1$d번째 파일 업로드중</item>
-    </plurals>
-    <!-- Text of the notification shown when the upload service is running, Plural -->
-    <plurals name="upload_service_paused_notification">
-        <item quantity="other">파일 %2$d개 중 %1$d번째 업로드중 (일시정지됨)</item>
-    </plurals>
-    <!-- Text of the notification shown when the folder upload service is running, Text of the notification shown when the folder upload service is running - plural e.g. Uploading 1 of 2 folders -->
-    <plurals name="folder_upload_service_notification">
-        <item quantity="other">%2$d개의 폴더 중 %1$d번째 업로드중</item>
-    </plurals>
-    <!-- Text of the notification shown when the folder upload service is running, Text of the notification shown when the folder upload service is running - plural e.g. Uploading 1 of 2 folders -->
-    <plurals name="folder_upload_service_paused_notification">
-        <item quantity="other">폴더 %2$d개 중 %1$d번째 업로드중 (일시정지됨)</item>
-    </plurals>
+    <!-- Text of the notification shown when the upload service is running: e.g. Uploading files: 1 of 10 -->
+    <string name="upload_service_notification">파일 업로드 중: %2$d 중 %1$d</string>
+    <!-- Text of the notification shown when the upload service is paused: e.g. Uploading files: 1 of 10 (paused)-->
+    <string name="upload_service_notification_paused">파일 업로드 중: %2$d 중 %1$d (일시정지됨)</string>
+    <!-- Text of the notification shown when the folder upload service is running, e.g. Uploading folders 1 of 2 -->
+    <string name="folder_upload_service_notification">폴더 업로드 중: %2$d 중 %1$d</string>
+    <!-- Text of the notification shown when the folder upload service is paused, e.g. Uploading folders 1 of 2 (paused) -->
+    <string name="folder_upload_service_notification_paused">폴더 업로드 중: %2$d 중 %1$d (일시정지됨)</string>
     <!-- Text of the notification shown when the upload service has finished, Plural -->
     <plurals name="upload_service_final_notification">
         <item quantity="other">파일 %1$d개 업로드됨</item>
@@ -1652,14 +1638,10 @@
     <plurals name="download_service_failed">
         <item quantity="other">파일 %1$d개가 다운로드 되지 않음</item>
     </plurals>
-    <!-- Text of the notification shown when the download service is running, Plural -->
-    <plurals name="download_service_notification">
-        <item quantity="other">파일 %2$d개 중 %1$d번째 파일 다운로드중</item>
-    </plurals>
-    <!-- Text of the notification shown when the download service is paused, Plural -->
-    <plurals name="download_service_paused_notification">
-        <item quantity="other">파일 %2$d개 중 %1$d번째 다운로드중 (일시정지됨)</item>
-    </plurals>
+    <!-- Text of the notification shown when the download service is running -->
+    <string name="download_service_notification">파일 다운로드 중: %2$d 중 %1$d</string>
+    <!-- Text of the notification shown when the download service is paused -->
+    <string name="download_service_notification_paused">파일 다운로드 중: %2$d 중 %1$d (일시정지됨)</string>
     <!-- Title of the alert when the transfer quota is exceeded. -->
     <string name="title_depleted_transfer_overquota">전송 할당량 부족</string>
     <!-- Text of the alert when the transfer quota is depleted. The placeholder indicates the time left for the transfer quota to be reset. For instance: 30m 45s -->
@@ -2226,10 +2208,12 @@
     <string name="settings_video_upload_quality">동영상 품질</string>
     <!-- Text shown when the user refuses to permit the storage permission when enable camera upload -->
     <string name="on_refuse_storage_permission">카메라 업로드는 당신의 기기의 사진과 다른 미디어에 대한 접근을 필요로 합니다. 설정 페이지에 가서 권한을 부여해주세요.</string>
-    <!-- the options for the option on setting to set up the quality of multimedia files uploaded to the chat, the options of medium quality multimedia file to  upload. -->
+    <!-- Available options for the setting to set up the quality of multimedia files uploaded to the chat or the Camera Uploads -->
     <string-array name="settings_chat_upload_quality_entries">
-        <item>원본 품질</item>
-        <item>중간 품질</item>
+        <item>낮음</item>
+        <item>중간</item>
+        <item>높음</item>
+        <item>원본</item>
     </string-array>
     <!-- Title of the notification for a missed call -->
     <string name="missed_call_notification_title">부재중 전화</string>
@@ -3376,7 +3360,7 @@
     <!-- Text informing user that their account has been suspended -->
     <string name="account_temporarily_suspended">당신의 안전을 위해 계정을 일시적으로 잠갔습니다.</string>
     <!-- Text informing user has to follow the steps of an email to unlock their account -->
-    <string name="verify_email_and_follow_steps">계정을 잠금 해제하려면 [A]이메일을 인증[/A]하고 절차를 수행하세요.</string>
+    <string name="verify_email_and_follow_steps">계정을 잠금 해제하려면 [A]인증 메일[/A]의 절차를 따라주세요.</string>
     <!-- Question which takes the user to a help screen -->
     <string name="why_am_i_seeing_this">이게 왜 보여지나요?</string>
     <!-- Label of a button which action is resend an email -->
@@ -3634,7 +3618,7 @@
     <!-- Title indicating the select mode is enabled and ready to select transfers on Transfers section, In progress tab -->
     <string name="title_select_transfers">전송 선택</string>
     <!-- Error shown to inform the priority change of a transfer failed. Please don’t remove the place holder, it’s to set the name of the transfer. Example: The priority change of the transfer “video.mp4” failed. -->
-    <string name="change_of_transfer_priority_failed">전송 ‘%1$s’의 우선 순위 변경을 실패하였습니다.</string>
+    <string name="change_of_transfer_priority_failed">전송 ”%1$s”의 우선순위를 바꿀 수 없습니다</string>
     <!-- Title option to send separated the link and decryption key -->
     <string name="option_send_decryption_key_separately">복호화 키 따로 보내기</string>
     <!-- Explanation option to send separated the link and decryption key -->
@@ -3662,7 +3646,7 @@
     <!-- Explanation of a warning recommending upgrade to Pro in relation to link available options -->
     <string name="link_upgrade_pro_explanation">MEGA Pro 이용자는 계정을 더욱 안전하게 만드는 추가적인 링크 보안 기능에 대한 독점적 접근이 가능합니다.</string>
     <!-- Meaning of links decryption key -->
-    <string name="decryption_key_explanation">우리의 종단간 암호화 시스템은 이 파일을 위해 자동으로 생성된 고유의 키를 필요로 합니다. 이 키가 있는 링크는 자동으로 생성되지만, 추가적인 보안을 위해 복호화 키를 따로 내보낼 수 있습니다.</string>
+    <string name="decryption_key_explanation">우리의 종단간 암호화 시스템은 이 파일 또는 폴더를 위해 자동으로 생성된 고유의 키를 필요로 합니다. 이 키에 대한 링크는 자동으로 생성되지만, 보안을 위해 복호화 키를 별도로 내보낼 수 있습니다.</string>
     <!-- Reset password label -->
     <string name="reset_password_label">암호 재설정</string>
     <!-- Warning show to the user when has enable to send the decryption key of a link separately and tries to share the link -->
@@ -3777,7 +3761,7 @@
     <string name="file_created">파일 생성됨</string>
     <!-- Warning indicating a file was not created successfully -->
     <string name="file_creation_failed">파일 생성 실패. 다시 시도하세요.</string>
-    <!-- Label indicating a file was saved to some folder. e.g.: File saved to Cloud Drive -->
+    <!-- Label indicating a file was saved to some folder. e.g.: File saved to Cloud Drive. "Cloud Drive" is the only destination for the time being, thus any article isn't needed -->
     <string name="file_saved_to">%1$s에 파일이 저장되었습니다</string>
     <!-- Warning indicating a file was not saved to some folder. e.g.: File not saved to Cloud Drive. Try again -->
     <string name="file_saved_to_failed">%1$s에 파일이 저장되지 않았습니다. 다시 시도하세요.</string>
@@ -3887,8 +3871,6 @@
     </plurals>
     <!-- Button of the warning dialog indicating the renamed name file extension is not the same to confirm the change. -->
     <string name="action_change_anyway">어쨌든 변경하기</string>
-    <!-- Snackbar text to display if the user doesn't grant the permission to access all files on a device with Android 11 or higher -->
-    <string name="snackbar_storage_permission_denied_android_11">저장소에 접근하려면 권한이 필요합니다.</string>
     <!-- String to show the transfer quota and the used space in My Account section. E.g.: -->
     <string name="used_storage_transfer">%1$s / %2$s</string>
     <!-- String to show the transfer quota and the used space in My Account section -->
@@ -4079,4 +4061,44 @@
     <string name="main_view">메인 보기</string>
     <!-- Warning in Offline section alerting all the Offline files will be deleted after logout. -->
     <string name="offline_warning">로그아웃 하면 오프라인 항목이 삭제됩니다.</string>
+    <!-- Settings category which contains all preferences related to user interface. -->
+    <string name="user_interface_setting">이용자 인터페이스</string>
+    <!-- Setting which allows to choose the start screen. -->
+    <string name="start_screen_setting">시작 화면</string>
+    <!-- Setting which allows to hide or show the recent activity. -->
+    <string name="hide_recent_setting">최근 활동 숨기기</string>
+    <!-- Context of a setting which allows to hide or show the recent activity. -->
+    <string name="hide_recent_setting_context">홈 섹션에서 최근 활동 숨기기</string>
+    <!-- Title of a dialog informing the start screen can be modified. -->
+    <string name="choose_start_screen_title">시작 화면을 선택하세요</string>
+    <!-- Test of a dialog informing the start screen can be modified. -->
+    <string name="choose_start_screen_text">다음 번에 MEGA 앱을 실행할 때 열 화면을 선택하는 설정을 바꿉니다.</string>
+    <!-- Action button which allows to change a setting. -->
+    <string name="change_setting_action">설정 변경</string>
+    <!-- Subtitle of the settings page where the start screen can be chosen. -->
+    <string name="configure_start_screen">기본 시작 화면 설정</string>
+    <!-- Homepage section. -->
+    <string name="home_section">홈</string>
+    <!-- Action button which allows to show the recent activity. -->
+    <string name="show_activity_action">활동 보기</string>
+    <!-- Text informing the recent activity is hidden. -->
+    <string name="recents_activity_hidden">[B]최근[/B] 활동 숨겨짐</string>
+    <!-- Alert informing the user can choose the video quality for Camera Uploads Videos -->
+    <string name="video_quality_info">카메라 업로드 설정에서 동영상 품질을 낮춰서 공간을 절약할 수 있습니다.</string>
+    <!-- Label indicating video original quality -->
+    <string name="original_quality">원본 품질</string>
+    <!-- Settings label which allows to enable or disable fingerprint unlock. -->
+    <string name="setting_fingerprint">지문 ID</string>
+    <!-- Title of the dialog which allows to enable the fingerprint unlock. -->
+    <string name="title_enable_fingerprint">잠금을 해제하려면 지문을 확인하세요</string>
+    <!-- Title of the dialog which allows to unlock the app with the fingerprint. -->
+    <string name="title_unlock_fingerprint">지문을 사용하여 잠금 해제</string>
+    <!-- Button of the dialog which allows to unlock the app with the fingerprint. Gives the option to unlock with the passcode instead -->
+    <string name="action_use_passcode">암호 사용</string>
+    <!-- Message informing the fingerprint was enabled successfully -->
+    <string name="confirmation_fingerprint_enabled">지문이 확인되었습니다</string>
+    <!-- Warning indicating an image (GIF) cannot be inserted in an input text. Same string than the one shown by the system when it detects this behaviour on its own. -->
+    <string name="image_insertion_not_allowed">MEGA가 여기서의 이미지 삽입을 지원하지 않습니다.</string>
+    <!-- The label under the button of viewing all images screen -->
+    <string name="section_images">이미지</string>
 </resources>

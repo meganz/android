@@ -7,7 +7,7 @@ import android.graphics.drawable.Drawable
 import android.graphics.drawable.GradientDrawable
 import android.graphics.drawable.InsetDrawable
 import android.graphics.drawable.LayerDrawable
-import android.util.Log
+import android.util.DisplayMetrics
 import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
@@ -18,9 +18,10 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import mega.privacy.android.app.R
 import mega.privacy.android.app.components.OnOffFab
-import mega.privacy.android.app.components.SimpleDividerItemDecoration
+import mega.privacy.android.app.components.PositionDividerItemDecoration
 import mega.privacy.android.app.databinding.InMeetingFragmentBinding
 import mega.privacy.android.app.lollipop.megachat.AppRTCAudioManager
+import mega.privacy.android.app.meeting.LockableBottomSheetBehavior
 import mega.privacy.android.app.meeting.adapter.Participant
 import mega.privacy.android.app.meeting.adapter.ParticipantsAdapter
 import mega.privacy.android.app.meeting.listeners.BottomFloatingPanelListener
@@ -36,13 +37,12 @@ import nz.mega.sdk.MegaChatSession
  * @property inMeetingViewModel InMeetingViewModel, get some values and do some logic actions
  * @property binding  InMeetingFragmentBinding, get views from this binding
  * @property listener listen to the actions of all buttons
- * @property isGroup determine if the current chat is group
  */
 class BottomFloatingPanelViewHolder(
     private val inMeetingViewModel: InMeetingViewModel,
     private val binding: InMeetingFragmentBinding,
     private val listener: BottomFloatingPanelListener,
-    private var isGroup: Boolean = true
+    private val displayMetrics: DisplayMetrics
 ) {
     private val context = binding.root.context
     private val floatingPanelView = binding.bottomFloatingPanel
@@ -55,6 +55,7 @@ class BottomFloatingPanelViewHolder(
     private var collapsedTop = 0
 
     private var popWindow: PopupWindow? = null
+    private lateinit var itemDecoration: PositionDividerItemDecoration
 
     /**
      * Save the Mic & Cam state, for revering state when hold state changed
@@ -187,7 +188,7 @@ class BottomFloatingPanelViewHolder(
             collapse()
         }
 
-        floatingPanelView.indicator.isVisible = isGroup
+        floatingPanelView.indicator.isVisible = !inMeetingViewModel.isOneToOneCall()
         updateShareAndInviteButton()
     }
 
@@ -273,12 +274,19 @@ class BottomFloatingPanelViewHolder(
      * Set the listener for bottom sheet behavior and property list
      */
     private fun setupBottomSheet() {
+        if (bottomSheetBehavior is LockableBottomSheetBehavior<*>) {
+            (bottomSheetBehavior as LockableBottomSheetBehavior<*>).setLocked(
+                inMeetingViewModel.isOneToOneCall()
+            )
+        }
+
         bottomSheetBehavior.addBottomSheetCallback(object :
             BottomSheetBehavior.BottomSheetCallback() {
             override fun onStateChanged(bottomSheet: View, newState: Int) {
-                Log.d("bottomSheetBehavior", "newState:$newState")
+                listener.onChangePanelState()
+
                 bottomFloatingPanelExpanded = newState == BottomSheetBehavior.STATE_EXPANDED
-                if (newState == BottomSheetBehavior.STATE_DRAGGING && !isGroup) {
+                if (newState == BottomSheetBehavior.STATE_DRAGGING && inMeetingViewModel.isOneToOneCall()) {
                     bottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
                 }
 
@@ -293,10 +301,11 @@ class BottomFloatingPanelViewHolder(
             }
 
             override fun onSlide(bottomSheet: View, slideOffset: Float) {
-                Log.d("bottomSheetBehavior", "onSlide")
-                onBottomFloatingPanelSlide(slideOffset)
-                if (slideOffset > 0.1f) {
-                    dismissPopWindow()
+                if (!inMeetingViewModel.isOneToOneCall()) {
+                    onBottomFloatingPanelSlide(slideOffset)
+                    if (slideOffset > 0.1f) {
+                        dismissPopWindow()
+                    }
                 }
             }
         })
@@ -384,11 +393,8 @@ class BottomFloatingPanelViewHolder(
 
     /**
      * When the meeting change, will update the panel
-     *
-     * @param group The flag that determine if this meeting is group call
      */
-    fun updateMeetingType(group: Boolean) {
-        isGroup = group
+    fun updateMeetingType() {
         updatePanel(false)
         updatePrivilege(inMeetingViewModel.getOwnPrivileges())
     }
@@ -397,12 +403,16 @@ class BottomFloatingPanelViewHolder(
      * Init recyclerview
      */
     private fun setupRecyclerView() {
+        itemDecoration = PositionDividerItemDecoration(context, displayMetrics)
+        itemDecoration.setDrawAllDividers(true)
+
         floatingPanelView.participants.apply {
             layoutManager = LinearLayoutManager(context)
-            itemAnimator = null
+            itemAnimator = Util.noChangeRecyclerViewItemAnimator()
             clipToPadding = false
+            setHasFixedSize(true)
             adapter = participantsAdapter
-            addItemDecoration(SimpleDividerItemDecoration(context))
+            addItemDecoration(itemDecoration)
         }
     }
 

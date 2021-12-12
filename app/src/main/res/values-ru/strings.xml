@@ -1,15 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- Full description text of the app in the Google Play page of the app (character limit 4000) -->
-    <string name="full_description_text">MEGA предоставляет зашифрованные, контролируемые пользователем облачное хранилище и чат в обычных веб-браузерах, а также специальных приложениях для мобильных устройств. В отличие от других облачных хранилищ, здесь данные шифруют и расшифровывают только ваши устройства, а не мы.\n\nЗагружайте файлы со смартфона или планшета, и ищите, храните, скачивайте, транслируйте, просматривайте, раздавайте, переименовывайте или удаляйте когда угодно, с любого устройства, где угодно. Делитесь папками со своими контактами и следите за изменениями в реальном времени. Процесс шифрования означает, что мы не можем получить доступ или сбросить пароль, поэтому вы ДОЛЖНЫ его запомнить (если у вас нет резервной копии ключа восстановления), иначе вы потеряете доступ к сохранённым файлам.\n\nЗащищённый сквозным пользовательским шифрованием видеочат MEGA обеспечивает максимальную приватность и доступен в веб-браузерах с 2016 года. Он был расширен для мобильного приложения MEGA, и история чата стала доступна на нескольких устройствах. Пользователи также могут легко добавлять файлы в чат из своего облачного диска MEGA.\n\nMEGA щедро предлагает бесплатные 20 ГБ для всех зарегистрированных пользователей с бонусными достижениями и предлагает платные подписки с гораздо более высокими лимитами:\n\n\nПодписка Pro Lite: 4,99 € в месяц или 49,99 € в год предоставляет 400 ГБ дискового пространства и 1 ТБ трафика в месяц.\nПодписка Pro I: 9,99 € в месяц или 99,99 € в год предоставляет 2 ТБ дискового пространства и 2 ТБ трафика в месяц.\nПодписка Pro II: 19,99 € в месяц или 199,99 € в год предоставляет 8 ТБ дискового пространства и 8 ТБ трафика в месяц.\nПодписка Pro III: 29,99 € в месяц или 299,99 € в год предоставляет 16 ТБ дискового пространства и 16 TB ТБ трафика в месяц.\n\nПодписки продлеваются автоматически на тот же срок по такой же цене. Чтобы управлять подписками, просто нажмите на значок Play Store на своем мобильном устройстве, войдите в свой аккаунт Google (если вы ещё этого не сделали), а затем выберите приложение MEGA. Там вы сможете управлять подпиской.\n\nРазрешения приложений:\nWRITE_EXTERNAL_STORAGE -&gt; Скачивайте свои файлы с MEGA на устройство и загружайте файлы с устройства в MEGA\nCAMERA -&gt; Делайте снимки и загружайте фото в MEGA\nREAD_CONTACTS -&gt; Просто добавляйте контакты с устройства в свои MEGA-контакты\nRECORD_AUDIO and CAPTURE_VIDEO_OUTPUT (микрофон и камера) -&gt; MEGA предоставляет сквозные зашифрованные аудио/видео звонки\n\n\nЧтобы повысить доверие пользователей к системе MEGA, весь клиентский код публикуется, поэтому заинтересованные исследователи безопасности могут оценить процесс шифрования. Код мобильного приложения расположен здесь: https://github.com/meganz/android \n\nБольше информации на нашем сайте:\nСмотрите https://mega.nz/terms \n\n\nНастольный — https://mega.nz/</string>
-    <!-- Short description text of the app in the Google Play page of the app (character limit 80) -->
-    <string name="short_description_text">MEGA — это облачное хранилище с надёжной и постоянной конфиденциальностью.</string>
     <!-- PRO Lite account -->
     <string name="prolite_account">Pro Lite</string>
     <!-- Name of the MEGA PDF Viewer. Keep uppercase. -->
     <string name="pdf_app_name">Просмотр PDF MEGA</string>
-    <!-- Showing progress of elements. Example: 2 of 10. -->
-    <string name="general_x_of_x">из</string>
     <!-- Answer for confirmation dialog. -->
     <string name="general_yes">Да</string>
     <!-- Answer for confirmation dialog. -->
@@ -1667,34 +1661,14 @@
     <string name="paused_transfers_title">Приостановленные передачи</string>
     <!-- message shown in the screen when there are not any active transfer -->
     <string name="completed_transfers_empty">Нет завершённых передач</string>
-    <!-- Text of the notification shown when the upload service is running, Plural -->
-    <plurals name="upload_service_notification">
-        <item quantity="one">Загрузка файла: %1$d из %2$d</item>
-        <item quantity="few">Загрузка файлов: %1$d из %2$d</item>
-        <item quantity="many">Загрузка файлов: %1$d из %2$d</item>
-        <item quantity="other">Загрузка файлов: %1$d из %2$d</item>
-    </plurals>
-    <!-- Text of the notification shown when the upload service is running, Plural -->
-    <plurals name="upload_service_paused_notification">
-        <item quantity="one">Загрузка файла: %1$d из %2$d (пауза)</item>
-        <item quantity="few">Загрузка файлов: %1$d из %2$d (пауза)</item>
-        <item quantity="many">Загрузка файлов: %1$d из %2$d (пауза)</item>
-        <item quantity="other">Загрузка файлов: %1$d из %2$d (пауза)</item>
-    </plurals>
-    <!-- Text of the notification shown when the folder upload service is running, Text of the notification shown when the folder upload service is running - plural e.g. Uploading 1 of 2 folders -->
-    <plurals name="folder_upload_service_notification">
-        <item quantity="one">Загрузка папки: %1$d из %2$d</item>
-        <item quantity="few">Загрузка папок: %1$d из %2$d</item>
-        <item quantity="many">Загрузка папок: %1$d из %2$d</item>
-        <item quantity="other">Загрузка папок: %1$d из %2$d</item>
-    </plurals>
-    <!-- Text of the notification shown when the folder upload service is running, Text of the notification shown when the folder upload service is running - plural e.g. Uploading 1 of 2 folders -->
-    <plurals name="folder_upload_service_paused_notification">
-        <item quantity="one">Загрузка папки: %1$d из %2$d (пауза)</item>
-        <item quantity="few">Загрузка папок: %1$d из %2$d (пауза)</item>
-        <item quantity="many">Загрузка папок: %1$d из %2$d (пауза)</item>
-        <item quantity="other">Загрузка папок: %1$d из %2$d (пауза)</item>
-    </plurals>
+    <!-- Text of the notification shown when the upload service is running: e.g. Uploading files: 1 of 10 -->
+    <string name="upload_service_notification">Загрузка файлов: %1$d из %2$d</string>
+    <!-- Text of the notification shown when the upload service is paused: e.g. Uploading files: 1 of 10 (paused)-->
+    <string name="upload_service_notification_paused">Загрузка файлов: %1$d из %2$d (пауза)</string>
+    <!-- Text of the notification shown when the folder upload service is running, e.g. Uploading folders 1 of 2 -->
+    <string name="folder_upload_service_notification">Загрузка файлов: %1$d из %2$d</string>
+    <!-- Text of the notification shown when the folder upload service is paused, e.g. Uploading folders 1 of 2 (paused) -->
+    <string name="folder_upload_service_notification_paused">Загрузка файлов: %1$d из %2$d (пауза)</string>
     <!-- Text of the notification shown when the upload service has finished, Plural -->
     <plurals name="upload_service_final_notification">
         <item quantity="one">Загружен %1$d файл</item>
@@ -1760,20 +1734,10 @@
         <item quantity="many">%1$d файлов не скачано</item>
         <item quantity="other">%1$d файла не скачано</item>
     </plurals>
-    <!-- Text of the notification shown when the download service is running, Plural -->
-    <plurals name="download_service_notification">
-        <item quantity="one">Скачивание %1$d из %2$d файла</item>
-        <item quantity="few">Скачивание %1$d из %2$d файлов</item>
-        <item quantity="many">Скачивание %1$d из %2$d файлов</item>
-        <item quantity="other">Скачивание %1$d из %2$d файлов</item>
-    </plurals>
-    <!-- Text of the notification shown when the download service is paused, Plural -->
-    <plurals name="download_service_paused_notification">
-        <item quantity="one">Скачивание файла: %1$d из %2$d (пауза)</item>
-        <item quantity="few">Скачивание файлов: %1$d из %2$d (пауза)</item>
-        <item quantity="many">Скачивание файлов: %1$d из %2$d (пауза)</item>
-        <item quantity="other">Скачивание файлов: %1$d из %2$d (пауза)</item>
-    </plurals>
+    <!-- Text of the notification shown when the download service is running -->
+    <string name="download_service_notification">Скачивание файлов: %1$d из %2$d</string>
+    <!-- Text of the notification shown when the download service is paused -->
+    <string name="download_service_notification_paused">Скачивание файлов: %1$d из %2$d (пауза)</string>
     <!-- Title of the alert when the transfer quota is exceeded. -->
     <string name="title_depleted_transfer_overquota">Недостаточная квота передач</string>
     <!-- Text of the alert when the transfer quota is depleted. The placeholder indicates the time left for the transfer quota to be reset. For instance: 30m 45s -->
@@ -2370,10 +2334,12 @@
     <string name="settings_video_upload_quality">Качество видео</string>
     <!-- Text shown when the user refuses to permit the storage permission when enable camera upload -->
     <string name="on_refuse_storage_permission">Для загрузок из камеры требуется доступ к фотографиям и другим медиафайлам на устройстве. Пожалуйста, перейдите в настройки и дайте разрешение.</string>
-    <!-- the options for the option on setting to set up the quality of multimedia files uploaded to the chat, the options of medium quality multimedia file to  upload. -->
+    <!-- Available options for the setting to set up the quality of multimedia files uploaded to the chat or the Camera Uploads -->
     <string-array name="settings_chat_upload_quality_entries">
-        <item>Оригинальное качество</item>
-        <item>Среднее качество</item>
+        <item>Низкое</item>
+        <item>Среднее</item>
+        <item>Высокое</item>
+        <item>Оригинал</item>
     </string-array>
     <!-- Title of the notification for a missed call -->
     <string name="missed_call_notification_title">Пропущенный звонок</string>
@@ -3607,7 +3573,7 @@
     <!-- Text informing user that their account has been suspended -->
     <string name="account_temporarily_suspended">Ваш аккаунт был временно заблокирован для вашей безопасности.</string>
     <!-- Text informing user has to follow the steps of an email to unlock their account -->
-    <string name="verify_email_and_follow_steps">[A]Пожалуйста, подтвердите адрес электронной почты[/A] и следуйте инструкциям, чтобы разблокировать аккаунт.</string>
+    <string name="verify_email_and_follow_steps">Пожалуйста, следуйте инструкциям в [A]письме с подтверждением[/A], чтобы разблокировать аккаунт.</string>
     <!-- Question which takes the user to a help screen -->
     <string name="why_am_i_seeing_this">Почему я это вижу?</string>
     <!-- Label of a button which action is resend an email -->
@@ -3809,7 +3775,7 @@
     <!-- Shows the error when the limit of reactions per message is reached and a user tries to add one more. Keep the placeholder because is to show limit number in runtime. -->
     <string name="limit_reaction_per_message">Достигнуто максимальное количество реакций на это сообщение: %d.</string>
     <!-- System message displayed to all chat participants when one of them enables retention history -->
-    <string name="retention_history_changed_by">[A]%1$s[/A][B] изменил время очистки сообщения на[/B][A] %2$s[/A][B].[/B]</string>
+    <string name="retention_history_changed_by">[A]%1$s[/A][B] изменил время очистки сообщения на [/B][A]%2$s[/A][B].[/B]</string>
     <!-- Title of the section to clear the chat content in the Manage chat history screen -->
     <string name="title_properties_clear_chat_history">Очистить историю чата</string>
     <!-- System message that is shown to all chat participants upon disabling the Retention history -->
@@ -3892,7 +3858,7 @@
     <!-- Title indicating the select mode is enabled and ready to select transfers on Transfers section, In progress tab -->
     <string name="title_select_transfers">Выбрать передачи</string>
     <!-- Error shown to inform the priority change of a transfer failed. Please don’t remove the place holder, it’s to set the name of the transfer. Example: The priority change of the transfer “video.mp4” failed. -->
-    <string name="change_of_transfer_priority_failed">Не удалось изменить приоритет передачи «%1$s».</string>
+    <string name="change_of_transfer_priority_failed">Невозможно изменить приоритет передачи «%1$s»</string>
     <!-- Title option to send separated the link and decryption key -->
     <string name="option_send_decryption_key_separately">Отправить ключ дешифрования отдельно</string>
     <!-- Explanation option to send separated the link and decryption key -->
@@ -3920,7 +3886,7 @@
     <!-- Explanation of a warning recommending upgrade to Pro in relation to link available options -->
     <string name="link_upgrade_pro_explanation">Пользователи MEGA Pro имеют эксклюзивный доступ к дополнительным функциям защиты ссылок, которые делают ваш аккаунт ещё безопаснее.</string>
     <!-- Meaning of links decryption key -->
-    <string name="decryption_key_explanation">Наша система сквозного шифрования требует, чтобы для этого файла автоматически генерировался уникальный ключ. Ссылка с этим ключом создается по умолчанию, но вы можете экспортировать ключ дешифрования отдельно для дополнительного уровня безопасности.</string>
+    <string name="decryption_key_explanation">Наша система сквозного шифрования требует, чтобы для этого файла или папки автоматически генерировался уникальный ключ. Ссылка с этим ключом создается по умолчанию, но вы можете экспортировать ключ дешифрования отдельно для дополнительного уровня безопасности.</string>
     <!-- Reset password label -->
     <string name="reset_password_label">Сбросить пароль</string>
     <!-- Warning show to the user when has enable to send the decryption key of a link separately and tries to share the link -->
@@ -4035,7 +4001,7 @@
     <string name="file_created">Фйал создан</string>
     <!-- Warning indicating a file was not created successfully -->
     <string name="file_creation_failed">Не удалось создать файл. Пожалуйста, попробуйте ещё раз.</string>
-    <!-- Label indicating a file was saved to some folder. e.g.: File saved to Cloud Drive -->
+    <!-- Label indicating a file was saved to some folder. e.g.: File saved to Cloud Drive. "Cloud Drive" is the only destination for the time being, thus any article isn't needed -->
     <string name="file_saved_to">Файл сохранён в %1$s</string>
     <!-- Warning indicating a file was not saved to some folder. e.g.: File not saved to Cloud Drive. Try again -->
     <string name="file_saved_to_failed">Файл не сохранён в %1$s. Попробуйте ещё раз.</string>
@@ -4160,8 +4126,6 @@
     </plurals>
     <!-- Button of the warning dialog indicating the renamed name file extension is not the same to confirm the change. -->
     <string name="action_change_anyway">Всё равно изменить</string>
-    <!-- Snackbar text to display if the user doesn't grant the permission to access all files on a device with Android 11 or higher -->
-    <string name="snackbar_storage_permission_denied_android_11">Требуется разрешение на доступ к памяти устройства.</string>
     <!-- String to show the transfer quota and the used space in My Account section. E.g.: -->
     <string name="used_storage_transfer">%1$s / %2$s</string>
     <!-- String to show the transfer quota and the used space in My Account section -->
@@ -4279,9 +4243,9 @@
     <!-- Pin the participant to speaker view in the meeting-->
     <string name="pin_to_speaker">Показать в главном окне</string>
     <!-- Make the participant as moderator in the meeting-->
-    <string name="make_moderator">Сделать модератором</string>
+    <string name="make_moderator">Назначить модератора</string>
     <!-- The title of dialog for end meeting confirmation-->
-    <string name="title_end_meeting">Покинуть встречу</string>
+    <string name="title_end_meeting">Покинуть встречу?</string>
     <!-- no moderator when the moderator leave meeting-->
     <string name="no_moderator">Нет модератора</string>
     <!-- assign moderator message when the moderator leave meeting-->
@@ -4364,4 +4328,44 @@
     <string name="main_view">Общий вид</string>
     <!-- Warning in Offline section alerting all the Offline files will be deleted after logout. -->
     <string name="offline_warning">Выход из системы удалит локальный контент.</string>
+    <!-- Settings category which contains all preferences related to user interface. -->
+    <string name="user_interface_setting">Пользовательский интерфейс</string>
+    <!-- Setting which allows to choose the start screen. -->
+    <string name="start_screen_setting">Стартовый раздел</string>
+    <!-- Setting which allows to hide or show the recent activity. -->
+    <string name="hide_recent_setting">Скрывать недавние действия</string>
+    <!-- Context of a setting which allows to hide or show the recent activity. -->
+    <string name="hide_recent_setting_context">Скрыть недавние действия в главном разделе.</string>
+    <!-- Title of a dialog informing the start screen can be modified. -->
+    <string name="choose_start_screen_title">Выберите стартовый раздел</string>
+    <!-- Test of a dialog informing the start screen can be modified. -->
+    <string name="choose_start_screen_text">Выберите, какой раздел будет открываться при следующем запуске приложения MEGA.</string>
+    <!-- Action button which allows to change a setting. -->
+    <string name="change_setting_action">Изменить</string>
+    <!-- Subtitle of the settings page where the start screen can be chosen. -->
+    <string name="configure_start_screen">Настройка стартового раздела</string>
+    <!-- Homepage section. -->
+    <string name="home_section">Домой</string>
+    <!-- Action button which allows to show the recent activity. -->
+    <string name="show_activity_action">Показать действия</string>
+    <!-- Text informing the recent activity is hidden. -->
+    <string name="recents_activity_hidden">[B]Недавние[/B] действия скрыты</string>
+    <!-- Alert informing the user can choose the video quality for Camera Uploads Videos -->
+    <string name="video_quality_info">Вы можете сэкономить место, уменьшив качество видео в настройках загрузок из камеры.</string>
+    <!-- Label indicating video original quality -->
+    <string name="original_quality">Оригинальное качество</string>
+    <!-- Settings label which allows to enable or disable fingerprint unlock. -->
+    <string name="setting_fingerprint">Отпечаток пальца</string>
+    <!-- Title of the dialog which allows to enable the fingerprint unlock. -->
+    <string name="title_enable_fingerprint">Просканируйте отпечаток пальца для разблокировки</string>
+    <!-- Title of the dialog which allows to unlock the app with the fingerprint. -->
+    <string name="title_unlock_fingerprint">Разблокировка отпечатком пальца</string>
+    <!-- Button of the dialog which allows to unlock the app with the fingerprint. Gives the option to unlock with the passcode instead -->
+    <string name="action_use_passcode">Использовать код доступа</string>
+    <!-- Message informing the fingerprint was enabled successfully -->
+    <string name="confirmation_fingerprint_enabled">Отпечаток пальца подтверждён</string>
+    <!-- Warning indicating an image (GIF) cannot be inserted in an input text. Same string than the one shown by the system when it detects this behaviour on its own. -->
+    <string name="image_insertion_not_allowed">Здесь MEGA не поддерживает вставку изображений</string>
+    <!-- The label under the button of viewing all images screen -->
+    <string name="section_images">Изображения</string>
 </resources>

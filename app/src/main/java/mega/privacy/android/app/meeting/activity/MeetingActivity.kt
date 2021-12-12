@@ -10,18 +10,20 @@ import androidx.navigation.NavGraph
 import androidx.navigation.fragment.NavHostFragment
 import com.jeremyliao.liveeventbus.LiveEventBus
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.android.synthetic.main.activity_meeting.*
-import kotlinx.coroutines.ExperimentalCoroutinesApi
+import mega.privacy.android.app.BaseActivity
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
-import mega.privacy.android.app.activities.PasscodeActivity
 import mega.privacy.android.app.constants.EventConstants.EVENT_ENTER_IN_MEETING
 import mega.privacy.android.app.databinding.ActivityMeetingBinding
 import mega.privacy.android.app.meeting.fragments.*
+import mega.privacy.android.app.objects.PasscodeManagement
+import mega.privacy.android.app.utils.Constants.REQUIRE_PASSCODE_INVALID
+import mega.privacy.android.app.utils.PasscodeUtil
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
+import javax.inject.Inject
 
 @AndroidEntryPoint
-class MeetingActivity : PasscodeActivity() {
+class MeetingActivity : BaseActivity() {
 
     companion object {
         /** The name of actions denoting set
@@ -31,6 +33,7 @@ class MeetingActivity : PasscodeActivity() {
         const val MEETING_ACTION_CREATE = "create_meeting"
         const val MEETING_ACTION_GUEST = "join_meeting_as_guest"
         const val MEETING_ACTION_IN = "in_meeting"
+        const val MEETING_ACTION_MAKE_MODERATOR = "make_moderator"
         const val MEETING_ACTION_RINGING = "ringing_meeting"
         const val MEETING_ACTION_RINGING_VIDEO_ON = "ringing_meeting_video_on"
         const val MEETING_ACTION_RINGING_VIDEO_OFF = "ringing_meeting_video_off"
@@ -46,12 +49,19 @@ class MeetingActivity : PasscodeActivity() {
         const val MEETING_IS_GUEST = "is_guest"
     }
 
-    private lateinit var binding: ActivityMeetingBinding
+    @Inject
+    lateinit var passcodeUtil: PasscodeUtil
+
+    @Inject
+    lateinit var passcodeManagement: PasscodeManagement
+
+    lateinit var binding: ActivityMeetingBinding
     private val meetingViewModel: MeetingActivityViewModel by viewModels()
 
     private var meetingAction: String? = null
 
     private var isGuest = false
+    private var isLockingEnabled = false
 
     private fun View.setMarginTop(marginTop: Int) {
         val menuLayoutParams = this.layoutParams as ViewGroup.MarginLayoutParams
@@ -62,9 +72,18 @@ class MeetingActivity : PasscodeActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        if (shouldRefreshSessionDueToSDK() || shouldRefreshSessionDueToKarere()) {
-            if (intent != null) {
-                intent.getLongExtra(MEETING_CHAT_ID, MEGACHAT_INVALID_HANDLE).let { chatId ->
+        intent?.let {
+            isGuest = intent.getBooleanExtra(
+                MEETING_IS_GUEST,
+                false
+            )
+        }
+
+        if ((isGuest && shouldRefreshSessionDueToMegaApiIsNull()) ||
+            (!isGuest && shouldRefreshSessionDueToSDK()) || shouldRefreshSessionDueToKarere()
+        ) {
+            intent?.let {
+                it.getLongExtra(MEETING_CHAT_ID, MEGACHAT_INVALID_HANDLE).let { chatId ->
                     if (chatId != MEGACHAT_INVALID_HANDLE) {
                         //Notification of this call should be displayed again
                         MegaApplication.getChatManagement().removeNotificationShown(chatId)
@@ -74,6 +93,7 @@ class MeetingActivity : PasscodeActivity() {
             return
         }
 
+        @Suppress("DEPRECATION")
         window.decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_LAYOUT_STABLE or 0x00000010
 
         binding = ActivityMeetingBinding.inflate(layoutInflater)
@@ -91,15 +111,15 @@ class MeetingActivity : PasscodeActivity() {
         setStatusBarTranslucent()
     }
 
+    @Suppress("DEPRECATION")
     private fun setStatusBarTranslucent() {
         val decorView: View = window.decorView
 
         decorView.setOnApplyWindowInsetsListener { v: View, insets: WindowInsets? ->
             val defaultInsets = v.onApplyWindowInsets(insets)
 
-            toolbar.setMarginTop(defaultInsets.systemWindowInsetTop)
+            binding.toolbar.setMarginTop(defaultInsets.systemWindowInsetTop)
 
-            @Suppress("DEPRECATION")
             defaultInsets.replaceSystemWindowInsets(
                 defaultInsets.systemWindowInsetLeft,
                 0,
@@ -195,13 +215,13 @@ class MeetingActivity : PasscodeActivity() {
             MEETING_ACTION_GUEST -> R.id.joinMeetingAsGuestFragment
             MEETING_ACTION_START, MEETING_ACTION_IN -> R.id.inMeetingFragment
             MEETING_ACTION_RINGING -> R.id.ringingMeetingFragment
+            MEETING_ACTION_MAKE_MODERATOR -> R.id.makeModeratorFragment
             else -> R.id.createMeetingFragment
         }
 
         navController.setGraph(navGraph, bundle)
     }
 
-    @ExperimentalCoroutinesApi
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
             android.R.id.home -> {
@@ -231,20 +251,29 @@ class MeetingActivity : PasscodeActivity() {
 
     override fun onPause() {
         super.onPause()
+
+        val timeRequired = passcodeUtil.timeRequiredForPasscode()
+        if (timeRequired != REQUIRE_PASSCODE_INVALID) {
+            if (isLockingEnabled) {
+                passcodeManagement.lastPause = System.currentTimeMillis() - timeRequired
+            } else {
+                passcodeUtil.pauseUpdate()
+            }
+        }
+
         sendQuitCallEvent()
     }
 
-    @ExperimentalCoroutinesApi
     override fun onResume() {
         super.onResume()
 
+        isLockingEnabled = passcodeUtil.shouldLock()
         val currentFragment = getCurrentFragment()
         if (currentFragment is InMeetingFragment) {
             currentFragment.sendEnterCallEvent()
         }
     }
 
-    @ExperimentalCoroutinesApi
     override fun onBackPressed() {
         val currentFragment = getCurrentFragment()
 
@@ -263,14 +292,17 @@ class MeetingActivity : PasscodeActivity() {
             }
             is InMeetingFragment -> {
                 // Prevent guest from quitting the call by pressing back
-                if(!isGuest){
+                if (!isGuest) {
                     currentFragment.removeUI()
                     sendQuitCallEvent()
                 }
             }
+            is MakeModeratorFragment -> {
+                currentFragment.cancel()
+            }
         }
 
-        if (currentFragment !is InMeetingFragment || !isGuest) {
+        if (currentFragment !is MakeModeratorFragment && (currentFragment !is InMeetingFragment || !isGuest)) {
             finish()
         }
     }

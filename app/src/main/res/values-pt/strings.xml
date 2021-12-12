@@ -1,15 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- Full description text of the app in the Google Play page of the app (character limit 4000) -->
-    <string name="full_description_text">O MEGA proporciona armazenamento em nuvem criptografado controlado pelo usuário e chat através de navegadores padrão e aplicativos para dispositivos móveis. Ao contrário de outros provedores de armazenamento em nuvem, os seus dados são codificados e decodificados apenas pelos seus dispositivos clientes e nunca por nós. \n \nFaça o upload de arquivos do seu smartphone ou tablet, depois pesquise, armazene, baixe, transmita, visualize, compartilhe, renomeie ou exclua os seus arquivos a qualquer momento, usando qualquer dispositivo, em qualquer lugar. Compartilhe pastas com os seus contatos e veja as atualizações deles em tempo real. O processo de criptografia significa que não podemos acessar ou redefinir a sua senha, então você PRECISA lembrá-la (a menos que você tenha a sua chave de recuperação guardada) ou você perderá o acesso aos seus arquivos armazenados. \n \nO chat de vídeo criptografado de ponta a ponta pelo usuário garante uma privacidade total, e está disponível em navegadores desde 2016. Atualmente, foi ampliado para os aplicativos do MEGA para dispositivos móveis, e o histórico do chat é acessível em vários dispositivos. Os usuários também podem facilmente adicionar arquivos da sua Nuvem de arquivos no MEGA em um chat. \n\nO MEGA oferece um generoso espaço de armazenamento gratuito de 20 GB para todos os usuários registrados com bônus de Conquistas, e oferece planos pagos com limites muito maiores: \n\n\nAssinatura Pro Lite: 4,99€ por mês ou 49,99€ por ano - oferece 400 GB de espaço de armazenamento e 1 TB de cota de transferência por mês. \nAssinatura Pro I: 9,99€ por mês ou 99,99€ por ano - oferece 2 TB de espaço de armazenamento e 2 TB de cota de transferência por mês. \nAssinatura Pro II: 19,99€ por mês ou 199,99€ por ano - oferece 8 TB de espaço de armazenamento e 8 TB de cota de transferência por mês. \nAssinatura Pro III: 29,99€ por mês ou 299,99€ por ano - oferece 16 TB de espaço de armazenamento e 16 TB de cota de transferência por mês. \n \nAs assinaturas são renovadas automaticamente por períodos com a mesma duração e o mesmo preço que o período inicial escolhido. Para gerenciar as suas assinaturas, basta pressionar o ícone da Play Store no seu dispositivo móvel, entrar com o seu usuário do Google (se você ainda não o fez) e depois selecionar MEGA. Você poderá gerenciar a sua assinatura lá. \n \nPermissões da aplicação: \nWRITE_EXTERNAL_STORAGE -&amp;gt; Baixar os seus arquivos do MEGA para o seu dispositivo e fazer o upload dos arquivos do seu dispositivo para o MEGA \nCAMERA -&amp;gt; Tirar fotos e fazer o upload delas para o MEGA \nREAD_CONTACTS -&amp;gt; Adicionar facilmente contatos do seu dispositivo como contatos no MEGA \nRECORD_AUDIO e CAPTURE_VIDEO_OUTPUT (microfone e câmera) -&amp;gt; O MEGA oferece chamadas de áudio e vídeo criptografadas de ponta a ponta \n\n\n Para aumentar a confiança dos usuários no sistema do MEGA, todos os códigos do lado do cliente são publicados, para que pesquisadores de segurança que estiverem interessados ​​possam avaliar o processo de criptografia. O código do nosso aplicativo móvel está localizado em: https://github.com/meganz/android \n\nPara obter mais informações, consulte o nosso site: \nAcesse https://mega.nz/terms \n \n \n Desktop - https://mega.nz/</string>
-    <!-- Short description text of the app in the Google Play page of the app (character limit 80) -->
-    <string name="short_description_text">O MEGA proporciona armazenamento em nuvem seguro com privacidade total.</string>
     <!-- PRO Lite account -->
     <string name="prolite_account">Pro Lite</string>
     <!-- Name of the MEGA PDF Viewer. Keep uppercase. -->
     <string name="pdf_app_name">Visualizador de PDF MEGA</string>
-    <!-- Showing progress of elements. Example: 2 of 10. -->
-    <string name="general_x_of_x">de</string>
     <!-- Answer for confirmation dialog. -->
     <string name="general_yes">Sim</string>
     <!-- Answer for confirmation dialog. -->
@@ -1124,7 +1118,7 @@
     <!-- Message to promote PRO accounts -->
     <string name="get_pro_account">Aumente a capacidade da sua nuvem.[A]Obtenha um maior espaço de armazenamento e mais cota de transferência com um plano Pro.</string>
     <!-- success message when the MasterKey file has been downloaded -->
-    <string name="toast_master_key">A chave de recuperação da sua conta no MEGA foi salva em: %1s. [A]Enquanto o arquivo permanecer neste caminho, você poderá encontrá-lo na seção Offline.[A]Aviso: o arquivo será deletado se você fizer logout. Por favor, salve a chave de recuperação em um lugar seguro, fora da sua conta no MEGA.</string>
+    <string name="toast_master_key">A chave de recuperação da sua conta no MEGA foi salva em: %1s. [A]Você pode encontrar o arquivo com a sua chave de recuperação na seção Offline.[/A] Aviso: como este arquivo será deletado se você fizer logout, você precisa salvar a chave de recuperação em um lugar seguro, fora da sua conta no MEGA.</string>
     <!-- Error shown when the user tries to change his mail to one that is already used -->
     <string name="mail_already_used">Este email já está sendo usado. Por favor, use outro email.</string>
     <!-- Error shown when the user tries to change his mail while the user has already requested a confirmation link for that email address -->
@@ -1621,26 +1615,14 @@
     <string name="paused_transfers_title">Transferências pausadas</string>
     <!-- message shown in the screen when there are not any active transfer -->
     <string name="completed_transfers_empty">Não há transferências concluídas</string>
-    <!-- Text of the notification shown when the upload service is running, Plural -->
-    <plurals name="upload_service_notification">
-        <item quantity="one">Fazendo upload %1$d de %2$d arquivo</item>
-        <item quantity="other">Fazendo upload %1$d de %2$d arquivos</item>
-    </plurals>
-    <!-- Text of the notification shown when the upload service is running, Plural -->
-    <plurals name="upload_service_paused_notification">
-        <item quantity="one">Fazendo o upload de %1$d de %2$d arquivo (pausado)</item>
-        <item quantity="other">Fazendo o upload de %1$d de %2$d arquivos (pausado)</item>
-    </plurals>
-    <!-- Text of the notification shown when the folder upload service is running, Text of the notification shown when the folder upload service is running - plural e.g. Uploading 1 of 2 folders -->
-    <plurals name="folder_upload_service_notification">
-        <item quantity="one">Fazendo o upload de %1$d de %2$d pasta</item>
-        <item quantity="other">Fazendo o upload de %1$d de %2$d pastas</item>
-    </plurals>
-    <!-- Text of the notification shown when the folder upload service is running, Text of the notification shown when the folder upload service is running - plural e.g. Uploading 1 of 2 folders -->
-    <plurals name="folder_upload_service_paused_notification">
-        <item quantity="one">Fazendo o upload de %1$d de %2$d pasta (pausado)</item>
-        <item quantity="other">Fazendo o upload de %1$d de %2$d pastas (pausado)</item>
-    </plurals>
+    <!-- Text of the notification shown when the upload service is running: e.g. Uploading files: 1 of 10 -->
+    <string name="upload_service_notification">Fazendo upload de arquivos:%1$d de %2$d</string>
+    <!-- Text of the notification shown when the upload service is paused: e.g. Uploading files: 1 of 10 (paused)-->
+    <string name="upload_service_notification_paused">Fazendo upload de arquivos: %1$d de %2$d (pausado)</string>
+    <!-- Text of the notification shown when the folder upload service is running, e.g. Uploading folders 1 of 2 -->
+    <string name="folder_upload_service_notification">Fazendo upload de pastas: %1$d de %2$d</string>
+    <!-- Text of the notification shown when the folder upload service is paused, e.g. Uploading folders 1 of 2 (paused) -->
+    <string name="folder_upload_service_notification_paused">Fazendo upload de arquivos: %1$d de %2$d (pausado)</string>
     <!-- Text of the notification shown when the upload service has finished, Plural -->
     <plurals name="upload_service_final_notification">
         <item quantity="one">Upload de %1$d arquivo concluído</item>
@@ -1688,16 +1670,10 @@
         <item quantity="one">Download de %1$d arquivo não concluído</item>
         <item quantity="other">Download de %1$d arquivos não concluído</item>
     </plurals>
-    <!-- Text of the notification shown when the download service is running, Plural -->
-    <plurals name="download_service_notification">
-        <item quantity="one">Fazendo download %1$d de %2$d arquivo</item>
-        <item quantity="other">Fazendo download %1$d de %2$d arquivos</item>
-    </plurals>
-    <!-- Text of the notification shown when the download service is paused, Plural -->
-    <plurals name="download_service_paused_notification">
-        <item quantity="one">Fazendo o download de %1$d de %2$d arquivo (pausado)</item>
-        <item quantity="other">Fazendo o download de %1$d de %2$d arquivos (pausado)</item>
-    </plurals>
+    <!-- Text of the notification shown when the download service is running -->
+    <string name="download_service_notification">Fazendo download de arquivos: %1$d de %2$d</string>
+    <!-- Text of the notification shown when the download service is paused -->
+    <string name="download_service_notification_paused">Fazendo download de arquivos: %1$d de %2$d (pausado)</string>
     <!-- Title of the alert when the transfer quota is exceeded. -->
     <string name="title_depleted_transfer_overquota">Cota de transferência insuficiente</string>
     <!-- Text of the alert when the transfer quota is depleted. The placeholder indicates the time left for the transfer quota to be reset. For instance: 30m 45s -->
@@ -2274,10 +2250,12 @@
     <string name="settings_video_upload_quality">Qualidade dos vídeos</string>
     <!-- Text shown when the user refuses to permit the storage permission when enable camera upload -->
     <string name="on_refuse_storage_permission">A função Uploads da câmera precisa acessar as suas fotos e outras arquivos multimídia no seu dispositivo. Por favor, acesse as configurações do seu dispositivo e conceda permissão.</string>
-    <!-- the options for the option on setting to set up the quality of multimedia files uploaded to the chat, the options of medium quality multimedia file to  upload. -->
+    <!-- Available options for the setting to set up the quality of multimedia files uploaded to the chat or the Camera Uploads -->
     <string-array name="settings_chat_upload_quality_entries">
-        <item>Qualidade original</item>
-        <item>Qualidade média</item>
+        <item>Baixa</item>
+        <item>Média</item>
+        <item>Alta</item>
+        <item>Original</item>
     </string-array>
     <!-- Title of the notification for a missed call -->
     <string name="missed_call_notification_title">Chamada perdida</string>
@@ -3453,7 +3431,7 @@
     <!-- Text informing user that their account has been suspended -->
     <string name="account_temporarily_suspended">A sua conta foi bloqueada temporalmente por motivos de segurança.</string>
     <!-- Text informing user has to follow the steps of an email to unlock their account -->
-    <string name="verify_email_and_follow_steps">Para desbloquear a sua conta, [A]confirme o seu email[/A] seguindo os passos indicados no email enviado pelo MEGA.</string>
+    <string name="verify_email_and_follow_steps">Siga os passos do [A]email de verificação[/A] para desbloquear a sua conta.</string>
     <!-- Question which takes the user to a help screen -->
     <string name="why_am_i_seeing_this">Por que estou vendo isso?</string>
     <!-- Label of a button which action is resend an email -->
@@ -3645,13 +3623,13 @@
     <!-- Message showing when enable the mode for showing the special information in the chat messages. This action is performed from the settings section, clicking 5 times on the App version option -->
     <string name="show_info_chat_msg_enabled">A informação de depuração para mensagens de chat foi ativada</string>
     <!-- Message showing when disable the mode for showing the special information in the chat messages.. This action is performed from the settings section, clicking 5 times on the App version option -->
-    <string name="show_info_chat_msg_disabled">A informação de depuração para mensagens de chat foi desativada</string>
+    <string name="show_info_chat_msg_disabled">Informação de depuração para mensagens de chat desativada</string>
     <!-- Shows the error when the limit of reactions per user is reached and the user tries to add one more. Keep the placeholder because is to show limit number in runtime. -->
     <string name="limit_reaction_per_user">Você atingiu o limite de %d reações.</string>
     <!-- Shows the error when the limit of reactions per message is reached and a user tries to add one more. Keep the placeholder because is to show limit number in runtime. -->
     <string name="limit_reaction_per_message">Esta mensagem atingiu o limite de %d reações.</string>
     <!-- System message displayed to all chat participants when one of them enables retention history -->
-    <string name="retention_history_changed_by">[A]%1$s[/A][B] alterou o tempo de eliminação de mensagens para[/B][A] %2$s[/A][B].[/B]</string>
+    <string name="retention_history_changed_by">[A]%1$s[/A][B] alterou o tempo de eliminação de mensagens para [/B][A]%2$s[/A][B].[/B]</string>
     <!-- Title of the section to clear the chat content in the Manage chat history screen -->
     <string name="title_properties_clear_chat_history">Deletar o histórico do chat</string>
     <!-- System message that is shown to all chat participants upon disabling the Retention history -->
@@ -3720,7 +3698,7 @@
     <!-- Title indicating the select mode is enabled and ready to select transfers on Transfers section, In progress tab -->
     <string name="title_select_transfers">Selecionar transferências</string>
     <!-- Error shown to inform the priority change of a transfer failed. Please don’t remove the place holder, it’s to set the name of the transfer. Example: The priority change of the transfer “video.mp4” failed. -->
-    <string name="change_of_transfer_priority_failed">Não foi possível alterar a prioridade da transferência ”%1$s”.</string>
+    <string name="change_of_transfer_priority_failed">Não foi possível alterar a prioridade da transferência ”%1$s”</string>
     <!-- Title option to send separated the link and decryption key -->
     <string name="option_send_decryption_key_separately">Enviar a chave de decodificação separadamente</string>
     <!-- Explanation option to send separated the link and decryption key -->
@@ -3748,7 +3726,7 @@
     <!-- Explanation of a warning recommending upgrade to Pro in relation to link available options -->
     <string name="link_upgrade_pro_explanation">Os usuários Pro do MEGA têm acesso exclusivo a recursos adicionais para a proteção dos links, tornando sua conta ainda mais segura.</string>
     <!-- Meaning of links decryption key -->
-    <string name="decryption_key_explanation">Nosso sistema de criptografia de ponta a ponta requer uma chave exclusiva gerada automaticamente para este arquivo. Um link com esta chave será criado de maneira predeterminada, mas você pode exportar a chave de decodificação separadamente para assim garantir uma camada adicional de segurança.</string>
+    <string name="decryption_key_explanation">Nosso sistema de criptografia de ponta a ponta requer uma chave exclusiva gerada automaticamente para este arquivo ou pasta. Um link com esta chave será criado de maneira predeterminada, mas você pode exportar a chave de decodificação separadamente para assim garantir uma camada adicional de segurança.</string>
     <!-- Reset password label -->
     <string name="reset_password_label">Resetar senha</string>
     <!-- Warning show to the user when has enable to send the decryption key of a link separately and tries to share the link -->
@@ -3863,7 +3841,7 @@
     <string name="file_created">Arquivo criado</string>
     <!-- Warning indicating a file was not created successfully -->
     <string name="file_creation_failed">Não foi possível criar o arquivo, tente novamente.</string>
-    <!-- Label indicating a file was saved to some folder. e.g.: File saved to Cloud Drive -->
+    <!-- Label indicating a file was saved to some folder. e.g.: File saved to Cloud Drive. "Cloud Drive" is the only destination for the time being, thus any article isn't needed -->
     <string name="file_saved_to">Arquivo salvo em %1$s</string>
     <!-- Warning indicating a file was not saved to some folder. e.g.: File not saved to Cloud Drive. Try again -->
     <string name="file_saved_to_failed">Não foi possível salvar o arquivo em %1$s, tente novamente.</string>
@@ -3978,8 +3956,6 @@
     </plurals>
     <!-- Button of the warning dialog indicating the renamed name file extension is not the same to confirm the change. -->
     <string name="action_change_anyway">Alterar mesmo assim</string>
-    <!-- Snackbar text to display if the user doesn't grant the permission to access all files on a device with Android 11 or higher -->
-    <string name="snackbar_storage_permission_denied_android_11">É necessário permitir o acesso ao armazenamento.</string>
     <!-- String to show the transfer quota and the used space in My Account section. E.g.: -->
     <string name="used_storage_transfer">%1$s / %2$s</string>
     <!-- String to show the transfer quota and the used space in My Account section -->
@@ -4174,4 +4150,44 @@
     <string name="main_view">Vista principal</string>
     <!-- Warning in Offline section alerting all the Offline files will be deleted after logout. -->
     <string name="offline_warning">Ao fazer logout, os seus arquivos offline serão deletados.</string>
+    <!-- Settings category which contains all preferences related to user interface. -->
+    <string name="user_interface_setting">Interface do usuário</string>
+    <!-- Setting which allows to choose the start screen. -->
+    <string name="start_screen_setting">Tela inicial</string>
+    <!-- Setting which allows to hide or show the recent activity. -->
+    <string name="hide_recent_setting">Ocultar atividade recente</string>
+    <!-- Context of a setting which allows to hide or show the recent activity. -->
+    <string name="hide_recent_setting_context">Ocultar a atividade recente no Início.</string>
+    <!-- Title of a dialog informing the start screen can be modified. -->
+    <string name="choose_start_screen_title">Escolha a sua tela inicial</string>
+    <!-- Test of a dialog informing the start screen can be modified. -->
+    <string name="choose_start_screen_text">Altere as configurações para escolher qual tela será mostrada na próxima vez que você abrir o aplicativo do MEGA.</string>
+    <!-- Action button which allows to change a setting. -->
+    <string name="change_setting_action">Alterar as configurações</string>
+    <!-- Subtitle of the settings page where the start screen can be chosen. -->
+    <string name="configure_start_screen">Configurar tela inicial predeterminada</string>
+    <!-- Homepage section. -->
+    <string name="home_section">Início</string>
+    <!-- Action button which allows to show the recent activity. -->
+    <string name="show_activity_action">Mostrar atividade</string>
+    <!-- Text informing the recent activity is hidden. -->
+    <string name="recents_activity_hidden">[B]Atividade recente[/B] oculta</string>
+    <!-- Alert informing the user can choose the video quality for Camera Uploads Videos -->
+    <string name="video_quality_info">Você pode economizar espaço diminuindo a qualidade dos vídeos nas configurações dos Uploads da câmera.</string>
+    <!-- Label indicating video original quality -->
+    <string name="original_quality">Qualidade original</string>
+    <!-- Settings label which allows to enable or disable fingerprint unlock. -->
+    <string name="setting_fingerprint">Impressão digital</string>
+    <!-- Title of the dialog which allows to enable the fingerprint unlock. -->
+    <string name="title_enable_fingerprint">Confirme a sua impressão digital para desbloquear</string>
+    <!-- Title of the dialog which allows to unlock the app with the fingerprint. -->
+    <string name="title_unlock_fingerprint">Desbloquear usando a sua impressão digital</string>
+    <!-- Button of the dialog which allows to unlock the app with the fingerprint. Gives the option to unlock with the passcode instead -->
+    <string name="action_use_passcode">Usar código de acesso</string>
+    <!-- Message informing the fingerprint was enabled successfully -->
+    <string name="confirmation_fingerprint_enabled">A sua impressão digital foi confirmada</string>
+    <!-- Warning indicating an image (GIF) cannot be inserted in an input text. Same string than the one shown by the system when it detects this behaviour on its own. -->
+    <string name="image_insertion_not_allowed">O MEGA não suporta a inserção de imagens aqui</string>
+    <!-- The label under the button of viewing all images screen -->
+    <string name="section_images">Imagens</string>
 </resources>

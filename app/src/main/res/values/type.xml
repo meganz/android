@@ -65,6 +65,10 @@
         <item name="android:textColor">@color/grey_038_white_038</item>
     </style>
 
+    <style name="TextAppearance.Mega.Subtitle1.Grey60White60">
+        <item name="android:textColor">@color/grey_060_white_060</item>
+    </style>
+
     <style name="TextAppearance.Mega.Subtitle1.Red.18">
         <item name="android:textSize">18sp</item>
     </style>
@@ -186,6 +190,10 @@
         <item name="android:textSize">20sp</item>
     </style>
 
+    <style name="TextAppearance.Mega.Subtitle1.Medium.Variant6.Grey87White">
+        <item name="android:textColor">@color/grey_087_white</item>
+    </style>
+
     <style name="TextAppearance.Mega.Subtitle1.Medium.Variant7">
         <item name="android:textSize">20sp</item>
         <item name="android:textColor">@color/grey_087_white</item>
@@ -268,6 +276,10 @@
 
     <style name="TextAppearance.Mega.Subtitle2.AccentColor">
         <item name="android:textColor">?attr/colorSecondary</item>
+    </style>
+
+    <style name="TextAppearance.Mega.Subtitle2.AccentColor.AllCaps">
+        <item name="android:textAllCaps">true</item>
     </style>
 
     <style name="TextAppearance.Mega.Subtitle2.PrimaryColor">

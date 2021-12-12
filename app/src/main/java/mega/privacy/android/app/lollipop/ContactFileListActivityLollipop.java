@@ -36,6 +36,7 @@ import org.jetbrains.annotations.NotNull;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 import dagger.hilt.android.AndroidEntryPoint;
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
@@ -189,9 +190,7 @@ public class ContactFileListActivityLollipop extends PasscodeActivity
 		MenuInflater inflater = getMenuInflater();
 		inflater.inflate(R.menu.file_explorer_action, menu);
 
-		menu.findItem(R.id.cab_menu_sort).setVisible(false);
 		menu.findItem(R.id.cab_menu_search).setVisible(false);
-		menu.findItem(R.id.cab_menu_grid_list).setVisible(false);
 		createFolderMenuItem = menu.findItem(R.id.cab_menu_create_folder);
 		startConversation = menu.findItem(R.id.cab_menu_new_chat);
 		startConversation.setVisible(false);
@@ -1085,7 +1084,8 @@ public class ContactFileListActivityLollipop extends PasscodeActivity
 		if (aB != null) {
 			if (title == null) {
 				logDebug("Reset title and subtitle");
-				aB.setTitle(R.string.title_incoming_shares_with_explorer);
+				aB.setTitle(StringResourcesUtils.getString(R.string.title_incoming_shares_with_explorer)
+						.toUpperCase(Locale.getDefault()));
 				aB.setSubtitle(fullName);
 
 			} else {
