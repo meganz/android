@@ -1,14 +1,4 @@
 
-def injectEnvironments(Closure body) {
-    withEnv([
-        "PATH=/Applications/MEGAcmd.app/Contents/MacOS:/Applications/CMake.app/Contents/bin:$PATH:/usr/local/bin",
-        "LC_ALL=en_US.UTF-8",
-        "LANG=en_US.UTF-8"
-    ]) {
-        body.call()
-    }
-}
-
 pipeline {
   agent { label 'mac-slave' }
   environment {
@@ -33,8 +23,6 @@ pipeline {
     GOOGLE_MAP_API_URL = "https://mega.nz/#!1tcl3CrL!i23zkmx7ibnYy34HQdsOOFAPOqQuTo1-2iZ5qFlU7-k"
     GOOGLE_MAP_API_FILE = 'default_google_maps_api.zip'
     GOOGLE_MAP_API_UNZIPPED = 'default_google_map_api_unzipped'
-
-
   }
   options {
     // Stop the build early in case of compile or test failures
