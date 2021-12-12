@@ -61,7 +61,7 @@ public class OpenLinkActivity extends PasscodeActivity implements MegaRequestLis
 	private String url;
 
 	@Override
-	protected void onCreate(Bundle savedInstanceState){
+	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
 		Intent intent = getIntent();
@@ -173,8 +173,7 @@ public class OpenLinkActivity extends PasscodeActivity implements MegaRequestLis
 					openChatLinkIntent.setData(Uri.parse(url));
 					startActivity(openChatLinkIntent);
 					finish();
-				}
-				else{
+				} else {
 					logDebug("Not logged");
 					int initResult = megaChatApi.getInitState();
 					if (initResult < MegaChatApi.INIT_WAITING_NEW_SESSION) {
@@ -184,10 +183,10 @@ public class OpenLinkActivity extends PasscodeActivity implements MegaRequestLis
 
 					if (initResult != MegaChatApi.INIT_ERROR) {
 						megaChatApi.connect(new ConnectListener(this));
-                    } else {
-                        logError("Open chat url:initAnonymous:INIT_ERROR");
-                        setError(getString(R.string.error_chat_link_init_error));
-                    }
+					} else {
+						logError("Open chat url:initAnonymous:INIT_ERROR");
+						setError(getString(R.string.error_chat_link_init_error));
+					}
 				}
 			}
 			return;
@@ -214,8 +213,7 @@ public class OpenLinkActivity extends PasscodeActivity implements MegaRequestLis
 				if (isLoggedIn) {
 					logDebug("Logged IN");
 					setError(getString(R.string.log_out_warning));
-				}
-				else{
+				} else {
 					logDebug("Not logged");
 					Intent createAccountIntent = new Intent(this, LoginActivityLollipop.class);
 					createAccountIntent.putExtra(VISIBLE_FRAGMENT, CREATE_ACCOUNT_FRAGMENT);
