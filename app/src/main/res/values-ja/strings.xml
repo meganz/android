@@ -1,9 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- Full description text of the app in the Google Play page of the app (character limit 4000) -->
-    <string name="full_description_text">MEGAは、標準のウェブブラウザを通じてユーザー様が制御する暗号化クラウドストレージとチャットを、モバイル端末用の専用アプリとともにご提供いたします。他のクラウドストレージプロバイダとは異なり、あなたのデータはあなたのクライアント端末によってのみ暗号化され、復号されます（当社では決して行いません）。\n\nスマートフォンやタブレットからファイルをアップロードしてから、いつでも、どこでも、どんな端末からでも、ファイルの検索、保存、ダウンロード、ストリーム配信、表示、共有、名前の変更、削除を行うことができます。あなたの連絡先とフォルダを共有し、連絡先の最新情報をリアルタイムで表示します。暗号化プロセスでは、当社はあなたのパスワードにアクセスしたり、それをリセットしたりすることができないため、あなたはパスワードを必ず覚えておく必要があります（回復キーをバックアップしない限り）。そうしないと、保存されたファイルにアクセスできなくなります。\n\nエンドツーエンドのユーザー暗号化MEGAビデオチャットは完全なプライバシー保護を可能にし、2016年からウェブブラウザでご利用いただいております。これはMegaモバイルアプリにも拡張され、複数の端末間でチャット履歴にアクセスできます。またユーザー様は、MEGAクラウドドライブからチャットに簡単にファイルも追加できます。\n\nMEGAは、ボーナスを達成された、ご登録済みの全ユーザー様に20 GBの豊富な無料ストレージをご提供しております。また、上限がはるかに高い有料プランもご用意しております：\n\n\nPro Liteサブスクリプション：月額4.99ユーロまたは年間49.99ユーロで、400GBのストレージスペースと毎月1TBの転送容量をご提供いたします。\nPro Iサブスクリプション：月額9.99ユーロまたは年間99.99ユーロで、2TBのストレージスペースと毎月2TBの転送容量をご提供いたします。\nPro II サブスクリプション：月額19.99ユーロまたは年間199.99ユーロで、8TBのストレージスペースと毎月8TBの転送容量をご提供いたします。\nPro IIIサブスクリプション：月額29.99ユーロまたは年間299.99ユーロで、16TBのストレージスペースと毎月16TBの転送容量をご提供いたします。\n\nサブスクリプションは、選択した最初の期間と同じ期間の連続したサブスクリプション期間を対象に、および同じ価格で、自動的に更新されます。サブスクリプションを管理するには、携帯端末のPlay Storeアイコンをタップし、Google IDでサインインします（まだそのように行っていない場合）。次に、MEGAアプリをタップします。そこでサブスクリプションを管理することができます。\n\nアプリの権限：\nWRITE_EXTERNAL_STORAGE -&gt; MEGAから端末にファイルをダウンロードし、端末からMEGAにファイルをアップロードします\nCAMERA -&gt; 写真を撮って写真をMEGAにアップロードします\nREAD_CONTACTS -&gt; MEGAの連絡先として端末からカンタンに連絡先を追加します\nRECORD_AUDIOと CAPTURE_VIDEO_OUTPUT（マイクとカメラ） -&gt; MEGAは、エンドツーエンドの暗号化された音声/ビデオ通話をご提供いたします\n\n\nMEGAシステムに対するユーザー様の信頼を高めるために、クライアントサイドのコードはすべて公開しております。そのため、ご関心をお持ちのセキュリティ研究者の方々は、この暗号化プロセスを評価することができます。当社のモバイルアプリのコードは次の場所にございます：https://github.com/meganz/android \n\n詳細については、当社のウェブサイトをご覧ください：\n https://mega.nz/terms にアクセスしてください\n\n\nデスクトップ－ https://mega.nz/</string>
-    <!-- Short description text of the app in the Google Play page of the app (character limit 80) -->
-    <string name="short_description_text">MEGAは、安全な常時プライバシーを備えたクラウドストレージです。</string>
     <!-- PRO Lite account -->
     <string name="prolite_account">Pro Lite</string>
     <!-- Name of the MEGA PDF Viewer. Keep uppercase. -->
@@ -1596,22 +1592,14 @@
     <string name="paused_transfers_title">転送を一時停止しました</string>
     <!-- message shown in the screen when there are not any active transfer -->
     <string name="completed_transfers_empty">完了した転送はありません</string>
-    <!-- Text of the notification shown when the upload service is running, Plural -->
-    <plurals name="upload_service_notification">
-        <item quantity="other">%1$d/%2$dファイルをアップロード中</item>
-    </plurals>
-    <!-- Text of the notification shown when the upload service is running, Plural -->
-    <plurals name="upload_service_paused_notification">
-        <item quantity="other">%1$d/%2$dファイルをアップロード中（一時停止）</item>
-    </plurals>
-    <!-- Text of the notification shown when the folder upload service is running, Text of the notification shown when the folder upload service is running - plural e.g. Uploading 1 of 2 folders -->
-    <plurals name="folder_upload_service_notification">
-        <item quantity="other">%1$d/%2$dフォルダをアップロード中</item>
-    </plurals>
-    <!-- Text of the notification shown when the folder upload service is running, Text of the notification shown when the folder upload service is running - plural e.g. Uploading 1 of 2 folders -->
-    <plurals name="folder_upload_service_paused_notification">
-        <item quantity="other">%1$d/%2$dフォルダをアップロード中（一時停止）</item>
-    </plurals>
+    <!-- Text of the notification shown when the upload service is running: e.g. Uploading files: 1 of 10 -->
+    <string name="upload_service_notification">ファイルをアップロード中：%1$d/%2$d</string>
+    <!-- Text of the notification shown when the upload service is paused: e.g. Uploading files: 1 of 10 (paused)-->
+    <string name="upload_service_notification_paused">ファイルをアップロード中：%1$d/%2$d (一時停止)</string>
+    <!-- Text of the notification shown when the folder upload service is running, e.g. Uploading folders 1 of 2 -->
+    <string name="folder_upload_service_notification">フォルダをアップロード中：%1$d/%2$d</string>
+    <!-- Text of the notification shown when the folder upload service is paused, e.g. Uploading folders 1 of 2 (paused) -->
+    <string name="folder_upload_service_notification_paused">フォルダをアップロード中：%1$d/%2$d (一時停止)</string>
     <!-- Text of the notification shown when the upload service has finished, Plural -->
     <plurals name="upload_service_final_notification">
         <item quantity="other">%1$dファイルがアップロードされました</item>
@@ -1650,14 +1638,10 @@
     <plurals name="download_service_failed">
         <item quantity="other">%1$dファイルがダウンロードされませんでした</item>
     </plurals>
-    <!-- Text of the notification shown when the download service is running, Plural -->
-    <plurals name="download_service_notification">
-        <item quantity="other">%1$d/%2$dファイルをダウンロード中</item>
-    </plurals>
-    <!-- Text of the notification shown when the download service is paused, Plural -->
-    <plurals name="download_service_paused_notification">
-        <item quantity="other">%1$d/%2$dファイルをダウンロード中（一時停止）</item>
-    </plurals>
+    <!-- Text of the notification shown when the download service is running -->
+    <string name="download_service_notification">ファイルをダウンロード中：%1$d/%2$d</string>
+    <!-- Text of the notification shown when the download service is paused -->
+    <string name="download_service_notification_paused">ファイルをダウンロード中：%1$d/%2$d (一時停止)</string>
     <!-- Title of the alert when the transfer quota is exceeded. -->
     <string name="title_depleted_transfer_overquota">転送容量が不十分です</string>
     <!-- Text of the alert when the transfer quota is depleted. The placeholder indicates the time left for the transfer quota to be reset. For instance: 30m 45s -->
@@ -3662,7 +3646,7 @@
     <!-- Explanation of a warning recommending upgrade to Pro in relation to link available options -->
     <string name="link_upgrade_pro_explanation">MEGA Proユーザー様は、アカウントをさらに安全にする追加のリンク安全機能に排他的にアクセスできます。</string>
     <!-- Meaning of links decryption key -->
-    <string name="decryption_key_explanation">当社のエンドツーエンドの暗号化システムでは、このファイルに対して自動的に生成される一意のキーが必要です。このキーを有するリンクはデフォルトで作成されますが、セキュリティの層を追加するために、復号キーを個別にエクスポートできます。</string>
+    <string name="decryption_key_explanation">当社のエンドツーエンドの暗号化システムでは、このファイルかフォルダに対して自動的に生成される一意のキーが必要です。このキーを有するリンクはデフォルトで作成されますが、セキュリティの層を追加するために、復号キーを個別にエクスポートできます。</string>
     <!-- Reset password label -->
     <string name="reset_password_label">パスワードをリセット</string>
     <!-- Warning show to the user when has enable to send the decryption key of a link separately and tries to share the link -->
@@ -3777,7 +3761,7 @@
     <string name="file_created">ファイルが作成されました</string>
     <!-- Warning indicating a file was not created successfully -->
     <string name="file_creation_failed">ファイルの作成に失敗しました。もう一度やり直してください。</string>
-    <!-- Label indicating a file was saved to some folder. e.g.: File saved to Cloud Drive -->
+    <!-- Label indicating a file was saved to some folder. e.g.: File saved to Cloud Drive. "Cloud Drive" is the only destination for the time being, thus any article isn't needed -->
     <string name="file_saved_to">ファイルが%1$sに保存されました</string>
     <!-- Warning indicating a file was not saved to some folder. e.g.: File not saved to Cloud Drive. Try again -->
     <string name="file_saved_to_failed">ファイルが%1$sに保存されませんでした。もう一度お試しください。</string>
@@ -3962,9 +3946,9 @@
     <!-- General label for microphone -->
     <string name="general_mic">マイク</string>
     <!-- General label for microphone muted -->
-    <string name="general_mic_mute">マイクがミュートになっています</string>
+    <string name="general_mic_mute">マイクがオフになっています</string>
     <!-- General label for microphone unmuted -->
-    <string name="general_mic_unmute">マイクのミュートが解除されています</string>
+    <string name="general_mic_unmute">マイクがオンになっています</string>
     <!-- General label for camera -->
     <string name="general_camera">カメラ</string>
     <!-- General label for camera enable -->
@@ -3980,9 +3964,9 @@
     <!-- General label for headphone on-->
     <string name="general_headphone_on">ヘッドホンが有効です</string>
     <!-- General label for speaker on-->
-    <string name="general_speaker_on">スピーカーはオンです</string>
+    <string name="general_speaker_on">スピーカーがオンになっています</string>
     <!-- General label for speaker off-->
-    <string name="general_speaker_off">スピーカーはオフです</string>
+    <string name="general_speaker_off">スピーカーがオフになっています</string>
     <!-- Label for end meeting-->
     <string name="meeting_end">終了</string>
     <!-- Invite contacts as participants of the meeting-->
@@ -4103,4 +4087,18 @@
     <string name="video_quality_info">カメラアップロードの設定で動画の品質を下げることで、容量を節約することができます。</string>
     <!-- Label indicating video original quality -->
     <string name="original_quality">元の品質</string>
+    <!-- Settings label which allows to enable or disable fingerprint unlock. -->
+    <string name="setting_fingerprint">指紋ID</string>
+    <!-- Title of the dialog which allows to enable the fingerprint unlock. -->
+    <string name="title_enable_fingerprint">指紋を確認してロックを解除します</string>
+    <!-- Title of the dialog which allows to unlock the app with the fingerprint. -->
+    <string name="title_unlock_fingerprint">指紋を使ってロックを解除します</string>
+    <!-- Button of the dialog which allows to unlock the app with the fingerprint. Gives the option to unlock with the passcode instead -->
+    <string name="action_use_passcode">パスコードを使用</string>
+    <!-- Message informing the fingerprint was enabled successfully -->
+    <string name="confirmation_fingerprint_enabled">指紋が確認されました</string>
+    <!-- Warning indicating an image (GIF) cannot be inserted in an input text. Same string than the one shown by the system when it detects this behaviour on its own. -->
+    <string name="image_insertion_not_allowed">MEGAはここでの画像挿入をサポートしておりません</string>
+    <!-- The label under the button of viewing all images screen -->
+    <string name="section_images">画像</string>
 </resources>

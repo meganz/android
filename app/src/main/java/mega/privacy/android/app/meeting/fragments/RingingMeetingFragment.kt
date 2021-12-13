@@ -59,7 +59,6 @@ class RingingMeetingFragment : MeetingBaseFragment(),
         arguments?.let {
             chatId = it.getLong(MEETING_CHAT_ID)
         }
-        initViewModel()
     }
 
     override fun onCreateView(
@@ -78,8 +77,9 @@ class RingingMeetingFragment : MeetingBaseFragment(),
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        initComponent()
+        initViewModel()
         permissionsRequester.launch(true)
+        initComponent()
     }
 
     /**

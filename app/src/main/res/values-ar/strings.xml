@@ -1,9 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- Full description text of the app in the Google Play page of the app (character limit 4000) -->
-    <string name="full_description_text">تقدم ميغا MEGA تحزين سحابي مشفرة و متحكم به عن طريق المستخدم و محادثة متاحة عبر متصفحات الويب الأساسية، بالإضافة لتطبيقات مخصصة للهواتف المحمولة. خلافاً لباقي مقدمي خدمة التخزين السحابي، يتم تشفير و فك تشفير البيانات الخاصة بك عن طريق الأجهزة الخاصة بك فقط و ليس عن طريقنا نهائياً.\n\nقم بترفيع ملفاتك من هاتفك الذكي أو الجهاز اللوحي ثم ابحث أو خزن أو حمل أو بث أو شاهد أو شارك أو أعد التسمية أو احذف ملفاتك بأي وقت ومن أي جهاز وفي أي مكان. شارك مجلدات مع جهات الاتصال خاصتك و شاهد تحديثاتهم فورياً في الوقت الحقيقي. عملية التشفير تعني أننا لا نستطيع الدخول أو إعادة تعيين كلمة المرور الخاصة بك لذا عليك تذكرها (مالم يكن لديك نسخة احتياطية من مفتاح الاستعادة) أو ستفقد إمكانية الدخول لملفاتك المخزنة.\n\nمكالمات الفيديو في ميغا MEGA المشفرة من طرف الى طرف تُتيح للمستخدم خصوصية كاملة، وهي متوفرة عن طريق المتصفح منذ 2016. وتم ضم الميزة لتطبيقاتنا على الهواتف المحمولة مع إمكانية تصفح تاريخ المحادثات عبر الأجهزة المختلفة. يستطيع المستخدمون أيضاً إضافة ملفات لمحادثة ما من سحابة التخزين ميغا MEGA الخاصة بهم وبكل سهولة.\n\nتقدم ميغا MEGA 20 غيغابايت كمساحة تخزينية واسعة و مجانية لجميع المستخدمين المسجلين لديها مع مكافآت الانجازات، كما توفر أيضا باقات مدفوعة لمساحات تخزين اعلى بكثير:\n\n\nاشتراك Pro Lite برو لايت : 4.99 يورو في الشهر أو 49.99 يورو في السنة يمنحك 400 غيغابايت من مساحة التخزين و 1 تيرابايت من حجم التراسل المتاح في الشهر.\nاشتراك Pro I برو 1: 9.99 يورو في الشهر أو 99.99 يورو في السنة يمنحك 2 تيرابايت من مساحة التخزين و 2 تيرابايت من حجم التراسل المتاح في الشهر.\nاشتراك Pro II برو 2: 19.99 يورو في الشهر أو 199.99 يورو في السنة يمنحك 8 تيرابايت من مساحة التخزين و 8 تيرابايت من حجم التراسل المتاح في الشهر.\nاشتراك Pro III برو 3: 29.99 يورو في الشهر أو 299.99 يورو في السنة يمنحك 16 تيرابايت من مساحة التخزين و 16 تيرابايت من حجم التراسل المتاح في الشهر.\n\nيتم تجديد الاشتراكات بشكل تلقائي و متتالي ولنفس مدة الاشتراك وبنفس سعر الاشتراك المدفوع في بداية المدة المختارة. لإدارة اشتراكاتك، ما عليك سوى النقر على أيقونة متجر بلاي Play store على جهازك المحمول، ثم سجل دخولك باستخدام حسابك على غوغل (في حال لم تكن قد قمت بتسجيل دخولك سابقاً)، ثم انقر على تطبيق ميغا MEGA. ستتمكن من إدارة اشتراكك هناك.\n\nصلاحيات التطبيق:\nالتخزين_على_الذاكرة_الخارجية -&gt;تنزيل ملفات من ميغا MEGA إلى جهازك وترفيع ملفات من جهازك إلى ميغا MEGA\nالكاميرا-&gt; التقاط صورة و ترفيع صورك إلى ميغا MEGA\nقراءة_جهات_الاتصال -&gt; إضافة جهات إتصال على ميغا MEGA من جهات الاتصال على جهازك بكل سهولة\nتسجيل_صوت و التقاط_فيديو_من خلال (الكاميرا و المايكروفون) -&gt; تقوم ميغا MEGA بتقديم اتصال صوت أو فيديو مشفر من طرف إلى طرف\n\n\nلتعزيز ثقة المستخدم في نظام ميغا MEGA، كل الرماز/الكود الخاص بالتطبيقات من طرف المستخدم منشور للعموم، بحيث يمكن للباحثين المهتمين في مجال الأمن تقييم عمليات التشفير. رماز/كود تطبيق الهاتف المحمول موجود على: https://github.com/meganz/android \n\nلمزيد من المعلومات، يرجى مراجعة موقعنا الإلكتروني:\nانظر https://mega.nz/terms \n\n\nللحاسوب المكتبي - https://mega.nz/</string>
-    <!-- Short description text of the app in the Google Play page of the app (character limit 80) -->
-    <string name="short_description_text">ميغا MEGA هي التخزين السحابي مع خصوصية آمنة دائمًا.</string>
     <!-- PRO Lite account -->
     <string name="prolite_account">برو لايت Pro Lite</string>
     <!-- Name of the MEGA PDF Viewer. Keep uppercase. -->
@@ -1711,42 +1707,14 @@
     <string name="paused_transfers_title">تم إيقاف عمليات التراسل مؤقتاً</string>
     <!-- message shown in the screen when there are not any active transfer -->
     <string name="completed_transfers_empty">لا يوجد عمليات تراسل معطيات مكتملة</string>
-    <!-- Text of the notification shown when the upload service is running, Plural -->
-    <plurals name="upload_service_notification">
-        <item quantity="zero">جاري ترفيع %1$d من %2$d ملف</item>
-        <item quantity="one">رفع %1$d من %2$d ملف</item>
-        <item quantity="two">جاري ترفيع %1$d من %2$d ملفين</item>
-        <item quantity="few">جاري ترفيع %1$d من %2$d ملفات</item>
-        <item quantity="many">جاري ترفيع %1$d من %2$d ملف</item>
-        <item quantity="other">جاري ترفيع %1$d من %2$d ملف</item>
-    </plurals>
-    <!-- Text of the notification shown when the upload service is running, Plural -->
-    <plurals name="upload_service_paused_notification">
-        <item quantity="zero">جاري ترفيع %1$d من %2$d ملف (متوقف مؤقتاً)</item>
-        <item quantity="one">جاري ترفيع %1$d من %2$d ملف (متوقف مؤقتاً)</item>
-        <item quantity="two">جاري ترفيع %1$d من %2$d ملفين (متوقف مؤقتاً)</item>
-        <item quantity="few">جاري ترفيع %1$d من %2$d ملفات (متوقف مؤقتاً)</item>
-        <item quantity="many">جاري ترفيع %1$d من %2$d ملف (متوقف مؤقتاً)</item>
-        <item quantity="other">جاري ترفيع %1$d من %2$d ملف (متوقف مؤقتاً)</item>
-    </plurals>
-    <!-- Text of the notification shown when the folder upload service is running, Text of the notification shown when the folder upload service is running - plural e.g. Uploading 1 of 2 folders -->
-    <plurals name="folder_upload_service_notification">
-        <item quantity="zero">جاري ترفيع %1$d من %2$d مجلد</item>
-        <item quantity="one">ترفيع %1$d من %2$d مجلد</item>
-        <item quantity="two">جاري ترفيع %1$d من %2$d مجلدين</item>
-        <item quantity="few">جاري ترفيع %1$d من %2$d مجلدات</item>
-        <item quantity="many">جاري ترفيع %1$d من %2$d مجلداً</item>
-        <item quantity="other">جاري ترفيع %1$d من %2$d مجلد</item>
-    </plurals>
-    <!-- Text of the notification shown when the folder upload service is running, Text of the notification shown when the folder upload service is running - plural e.g. Uploading 1 of 2 folders -->
-    <plurals name="folder_upload_service_paused_notification">
-        <item quantity="zero">جاري ترفيع %1$d من %2$d مجلد (متوقف مؤقتاً)</item>
-        <item quantity="one">جاري ترفيع %1$d من %2$d مجلد (متوقف مؤقتاً)</item>
-        <item quantity="two">جاري ترفيع %1$d من %2$d مجلدين (متوقف مؤقتاً)</item>
-        <item quantity="few">جاري ترفيع %1$d من %2$d مجلدات (متوقف مؤقتاً)</item>
-        <item quantity="many">جاري ترفيع %1$d من %2$d مجلداً (متوقف مؤقتاً)</item>
-        <item quantity="other">جاري ترفيع %1$d من %2$d مجلد (متوقف مؤقتاً)</item>
-    </plurals>
+    <!-- Text of the notification shown when the upload service is running: e.g. Uploading files: 1 of 10 -->
+    <string name="upload_service_notification">جاري ترفيع الملفات: %1$d من %2$d</string>
+    <!-- Text of the notification shown when the upload service is paused: e.g. Uploading files: 1 of 10 (paused)-->
+    <string name="upload_service_notification_paused">ترفيع الملفات: %1$d من %2$d (متوقف مؤقتاً)</string>
+    <!-- Text of the notification shown when the folder upload service is running, e.g. Uploading folders 1 of 2 -->
+    <string name="folder_upload_service_notification">جاري ترفيع المجلدات: %1$d من %2$d</string>
+    <!-- Text of the notification shown when the folder upload service is paused, e.g. Uploading folders 1 of 2 (paused) -->
+    <string name="folder_upload_service_notification_paused">ترفيع المجلدات: %1$d من %2$d (متوقف مؤقتاً)</string>
     <!-- Text of the notification shown when the upload service has finished, Plural -->
     <plurals name="upload_service_final_notification">
         <item quantity="zero">تم ترفيع %1$d ملف</item>
@@ -1830,24 +1798,10 @@
         <item quantity="many">%1$d ملف لم يتم تنزيلهم</item>
         <item quantity="other">%1$d ملف لم يتم تنزيلهم</item>
     </plurals>
-    <!-- Text of the notification shown when the download service is running, Plural -->
-    <plurals name="download_service_notification">
-        <item quantity="zero">جاري تنزيل %1$d من %2$d ملف</item>
-        <item quantity="one">جاري تحميل %1$d من %2$d ملف</item>
-        <item quantity="two">جاري تنزيل %1$d من %2$d ملفين</item>
-        <item quantity="few">جاري تنزيل %1$d من %2$d ملفات</item>
-        <item quantity="many">جاري تنزيل %1$d من %2$d ملف</item>
-        <item quantity="other">جاري تنزيل %1$d من %2$d ملف</item>
-    </plurals>
-    <!-- Text of the notification shown when the download service is paused, Plural -->
-    <plurals name="download_service_paused_notification">
-        <item quantity="zero">جاري تنزيل %1$d من %2$d ملف (متوقف مؤقتاً)</item>
-        <item quantity="one">جاري تنزيل %1$d من %2$d ملف (متوقف مؤقتاً)</item>
-        <item quantity="two">جاري تنزيل %1$d من %2$d ملفين (متوقف مؤقتاً)</item>
-        <item quantity="few">جاري تنزيل %1$d من %2$d ملفات (متوقف مؤقتاً)</item>
-        <item quantity="many">جاري تنزيل %1$d من %2$d ملف (متوقف مؤقتاً)</item>
-        <item quantity="other">جاري تنزيل %1$d من %2$d ملف (متوقف مؤقتاً)</item>
-    </plurals>
+    <!-- Text of the notification shown when the download service is running -->
+    <string name="download_service_notification">جاري تنزيل الملفات: %1$d من %2$d</string>
+    <!-- Text of the notification shown when the download service is paused -->
+    <string name="download_service_notification_paused">تنزيل الملفات: %1$d من %2$d (متوقف مؤقتاً)</string>
     <!-- Title of the alert when the transfer quota is exceeded. -->
     <string name="title_depleted_transfer_overquota">حجم التراسل المتاح غير كافي</string>
     <!-- Text of the alert when the transfer quota is depleted. The placeholder indicates the time left for the transfer quota to be reset. For instance: 30m 45s -->
@@ -4092,7 +4046,7 @@
     <!-- Explanation of a warning recommending upgrade to Pro in relation to link available options -->
     <string name="link_upgrade_pro_explanation">يتمتع مستخدمو ميغا برو MEGA Pro بوصول حصري إلى ميزات إضافية لأمان الروابط مما يجعل حسابك أكثر أمانًا.</string>
     <!-- Meaning of links decryption key -->
-    <string name="decryption_key_explanation">يتطلب نظام التشفير من طرف إلى طرف الخاص بنا مفتاحًا فريدًا يتم إنشاؤه تلقائيًا لهذا الملف. يتم إنشاء ارتباط بهذا المفتاح تلقائياً، ولكن يمكنك تصدير مفتاح فك التشفير بشكل منفصل للحصول على طبقة أمان إضافية.</string>
+    <string name="decryption_key_explanation">يتطلب نظام التشفير من طرف إلى طرف لدينا مفتاحًا فريدًا يتم إنشاؤه تلقائيًا لهذا الملف أو المجلد. يتم إنشاء رابط مع هذا المفتاح افتراضيًا، ولكن يمكنك تصدير مفتاح فك التشفير بشكل منفصل للحصول على طبقة أمان إضافية.</string>
     <!-- Reset password label -->
     <string name="reset_password_label">إعادة تعيين كلمة المرور</string>
     <!-- Warning show to the user when has enable to send the decryption key of a link separately and tries to share the link -->
@@ -4207,7 +4161,7 @@
     <string name="file_created">تم إنشاء الملف</string>
     <!-- Warning indicating a file was not created successfully -->
     <string name="file_creation_failed">فشل إنشاء الملف. حاول مرة أخرى.</string>
-    <!-- Label indicating a file was saved to some folder. e.g.: File saved to Cloud Drive -->
+    <!-- Label indicating a file was saved to some folder. e.g.: File saved to Cloud Drive. "Cloud Drive" is the only destination for the time being, thus any article isn't needed -->
     <string name="file_saved_to">تم حفظ الملف في %1$s</string>
     <!-- Warning indicating a file was not saved to some folder. e.g.: File not saved to Cloud Drive. Try again -->
     <string name="file_saved_to_failed">لم يتم حفظ الملف في %1$s. حاول مرة أخرى.</string>
@@ -4437,9 +4391,9 @@
     <!-- General label for microphone -->
     <string name="general_mic">ميكروفون</string>
     <!-- General label for microphone muted -->
-    <string name="general_mic_mute">تم كتم صوت الميكروفون خاصتك</string>
+    <string name="general_mic_mute">الميكروفون الخاص بك مغلق</string>
     <!-- General label for microphone unmuted -->
-    <string name="general_mic_unmute">تم إعادة صوت الميكروفون خاصتك</string>
+    <string name="general_mic_unmute">الميكروفون الخاص بك قيد التشغيل</string>
     <!-- General label for camera -->
     <string name="general_camera">الكاميرا</string>
     <!-- General label for camera enable -->
@@ -4455,9 +4409,9 @@
     <!-- General label for headphone on-->
     <string name="general_headphone_on">سماعات الأذن مفعلة</string>
     <!-- General label for speaker on-->
-    <string name="general_speaker_on">مكبر الصوت قيد التشغيل</string>
+    <string name="general_speaker_on">مكبر الصوت الخاص بك قيد التشغيل</string>
     <!-- General label for speaker off-->
-    <string name="general_speaker_off">مكبر الصوت متوقف</string>
+    <string name="general_speaker_off">مكبر الصوت الخاص بك مغلق</string>
     <!-- Label for end meeting-->
     <string name="meeting_end">إنهاء</string>
     <!-- Invite contacts as participants of the meeting-->
@@ -4578,4 +4532,18 @@
     <string name="video_quality_info">يمكنك توفير مساحة عن طريق تقليل جودة الفيديو في إعدادات ترفيعات الكاميرا.</string>
     <!-- Label indicating video original quality -->
     <string name="original_quality">الجودة الاصلية</string>
+    <!-- Settings label which allows to enable or disable fingerprint unlock. -->
+    <string name="setting_fingerprint">معرف بصمة الإصبع</string>
+    <!-- Title of the dialog which allows to enable the fingerprint unlock. -->
+    <string name="title_enable_fingerprint">قم بتأكيد بصمة إصبعك لإلغاء القفل</string>
+    <!-- Title of the dialog which allows to unlock the app with the fingerprint. -->
+    <string name="title_unlock_fingerprint">افتح باستخدام بصمة إصبعك</string>
+    <!-- Button of the dialog which allows to unlock the app with the fingerprint. Gives the option to unlock with the passcode instead -->
+    <string name="action_use_passcode">استخدم رمز المرور</string>
+    <!-- Message informing the fingerprint was enabled successfully -->
+    <string name="confirmation_fingerprint_enabled">تم تأكيد بصمة إصبعك</string>
+    <!-- Warning indicating an image (GIF) cannot be inserted in an input text. Same string than the one shown by the system when it detects this behaviour on its own. -->
+    <string name="image_insertion_not_allowed">ميغا MEGA لا تدعم إدراج الصور هنا</string>
+    <!-- The label under the button of viewing all images screen -->
+    <string name="section_images">صور</string>
 </resources>

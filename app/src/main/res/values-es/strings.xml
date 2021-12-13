@@ -1,9 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- Full description text of the app in the Google Play page of the app (character limit 4000) -->
-    <string name="full_description_text">MEGA ofrece un servicio de almacenamiento en la nube y de chat cifrado y controlado por el usuario a través del navegador y de la aplicación para dispositivos móviles. A diferencia de otros proveedores de almacenamiento en la nube, tus datos son cifrados y descifrados únicamente en tus dispositivos y nunca por nosotros.\n\nSube tus archivos desde tu smartphone o tablet, luego busca, almacena, descarga, muestra, reproduce, comparte, renombra o elimina tus archivos en cualquier momento, desde cualquier dispositivo, en cualquier lugar. Comparte carpetas con tus contactos y comprueba sus actualizaciones en tiempo real. El cifrado nos impide conocer o restablecer tu contraseña, por lo que DEBES recordarla (o tener una copia de seguridad de tu Clave de recuperación) o perderás el acceso a tus archivos almacenados.\n\nLas videollamadas cifradas punto a punto de MEGA permiten una privacidad absoluta y llevan estando disponibles en el navegador desde 2016. Se proporcionan también en nuestra app para móvil, con el historial de chat accesible a través de múltiples dispositivos. Además los usuarios pueden añadir fácilmente archivos a un chat directamente desde su nube de MEGA.\n\nMEGA brinda un almacenamiento gratuito de 50 GB sujeto al programa de logros para todos los usuarios registrados, y ofrece planes de pago con límites mucho más amplios:\n\n\nSuscripción Pro LITE: 4,99€ al mes o 49,99€ al año, con 400 GB de espacio de almacenamiento y 1 TB de cuota de transferencia al mes.\nSuscripción Pro I: 9,99€ al mes o 99,99€ al año, con 2 TB de espacio de almacenamiento y 2 TB de cuota de transferencia al mes.\nSuscripción Pro II: 19,99€ al mes o 199,99€ al año, con 8 TB de espacio de almacenamiento y 8 TB de cuota de transferencia al mes.\nSuscripción Pro III: 29,99€ al mes o 299,99€ al año, con 16 TB de espacio de almacenamiento y 16 TB de cuota de transferencia al mes.\n\nLa suscripción se renueva automáticamente con la misma duración y precio elegidos inicialmente. Para gestionar tu suscripción, ve a la Play Store en tu dispositivo móvil, inicia sesión con tu Google ID (si aún no lo has hecho) y luego pulsa en la aplicación de MEGA. Desde aquí, podrás gestionar tu suscripción.\n\nPermisos de la aplicación:\nWRITE_EXTERNAL_STORAGE -&gt; Descarga tus archivos de MEGA a tu dispositivo y sube archivos desde tu dispositivo a MEGA\nCAMERA -&gt; Haz fotos y súbelas a MEGA\nREAD_CONTACTS -&gt; Añade contactos desde tu dispositivo a MEGA\nRECORD_AUDIO y CAPTURE_VIDEO_OUTPUT (micrófono y cámara) -&gt; MEGA proporciona llamadas y videollamadas cifradas punto a punto\n\n\nPara que los usuarios confíen plenamente en el sistema de MEGA, todo el código del cliente es público y los ingenieros de seguridad podrán evaluar nuestro proceso de cifrado. El código de nuestra aplicación móvil se encuentra en: https://github.com/meganz/android \n\nPara obtener más información, consulta nuestro sitio web:\nhttps://mega.nz/terms \n\n\nDesde ordenador - https://mega.nz/</string>
-    <!-- Short description text of the app in the Google Play page of the app (character limit 80) -->
-    <string name="short_description_text">MEGA es almacenamiento en la nube con privacidad permanente y segura.</string>
     <!-- PRO Lite account -->
     <string name="prolite_account">Pro Lite</string>
     <!-- Name of the MEGA PDF Viewer. Keep uppercase. -->
@@ -266,7 +262,7 @@
         <item quantity="other">Se cancelarán las transferencias seleccionadas.</item>
     </plurals>
     <!-- The name of every users root drive in the cloud of MEGA. -->
-    <string name="section_cloud_drive">Mi nube</string>
+    <string name="section_cloud_drive">Nube</string>
     <!-- Label to reference a recents section -->
     <string name="section_recents">Recientes</string>
     <!-- title of the screen where the secondary media images are uploaded, and name of the folder where the secondary media images are uploaded -->
@@ -1619,26 +1615,14 @@
     <string name="paused_transfers_title">Transferencias pausadas</string>
     <!-- message shown in the screen when there are not any active transfer -->
     <string name="completed_transfers_empty">No hay transferencias completadas</string>
-    <!-- Text of the notification shown when the upload service is running, Plural -->
-    <plurals name="upload_service_notification">
-        <item quantity="one">Subiendo %1$d de %2$d archivo</item>
-        <item quantity="other">Subiendo %1$d de %2$d archivos</item>
-    </plurals>
-    <!-- Text of the notification shown when the upload service is running, Plural -->
-    <plurals name="upload_service_paused_notification">
-        <item quantity="one">Subiendo %1$d de %2$d archivo (en pausa)</item>
-        <item quantity="other">Subiendo %1$d de %2$d archivos (en pausa)</item>
-    </plurals>
-    <!-- Text of the notification shown when the folder upload service is running, Text of the notification shown when the folder upload service is running - plural e.g. Uploading 1 of 2 folders -->
-    <plurals name="folder_upload_service_notification">
-        <item quantity="one">Subiendo %1$d de %2$d carpeta</item>
-        <item quantity="other">Subiendo %1$d de %2$d carpetas</item>
-    </plurals>
-    <!-- Text of the notification shown when the folder upload service is running, Text of the notification shown when the folder upload service is running - plural e.g. Uploading 1 of 2 folders -->
-    <plurals name="folder_upload_service_paused_notification">
-        <item quantity="one">Subiendo %1$d de %2$d carpeta (en pausa)</item>
-        <item quantity="other">Subiendo %1$d de %2$d carpetas (en pausa)</item>
-    </plurals>
+    <!-- Text of the notification shown when the upload service is running: e.g. Uploading files: 1 of 10 -->
+    <string name="upload_service_notification">Subiendo archivos: %1$d de %2$d</string>
+    <!-- Text of the notification shown when the upload service is paused: e.g. Uploading files: 1 of 10 (paused)-->
+    <string name="upload_service_notification_paused">Subiendo archivos: %1$d de %2$d (en pausa)</string>
+    <!-- Text of the notification shown when the folder upload service is running, e.g. Uploading folders 1 of 2 -->
+    <string name="folder_upload_service_notification">Subiendo carpetas: %1$d de %2$d</string>
+    <!-- Text of the notification shown when the folder upload service is paused, e.g. Uploading folders 1 of 2 (paused) -->
+    <string name="folder_upload_service_notification_paused">Subiendo carpetas: %1$d de %2$d (en pausa)</string>
     <!-- Text of the notification shown when the upload service has finished, Plural -->
     <plurals name="upload_service_final_notification">
         <item quantity="one">%1$d archivo subido</item>
@@ -1686,16 +1670,10 @@
         <item quantity="one">%1$d archivo no descargado</item>
         <item quantity="other">%1$d archivos no descargados</item>
     </plurals>
-    <!-- Text of the notification shown when the download service is running, Plural -->
-    <plurals name="download_service_notification">
-        <item quantity="one">Descargando %1$d de %2$d archivo</item>
-        <item quantity="other">Descargando %1$d de %2$d archivos</item>
-    </plurals>
-    <!-- Text of the notification shown when the download service is paused, Plural -->
-    <plurals name="download_service_paused_notification">
-        <item quantity="one">Bajando %1$d de %2$d archivo (en pausa)</item>
-        <item quantity="other">Bajando %1$d de %2$d archivos (en pausa)</item>
-    </plurals>
+    <!-- Text of the notification shown when the download service is running -->
+    <string name="download_service_notification">Descargando archivos: %1$d de %2$d</string>
+    <!-- Text of the notification shown when the download service is paused -->
+    <string name="download_service_notification_paused">Descargando archivos: %1$d de %2$d (en pausa)</string>
     <!-- Title of the alert when the transfer quota is exceeded. -->
     <string name="title_depleted_transfer_overquota">Cuota de transferencia insuficiente</string>
     <!-- Text of the alert when the transfer quota is depleted. The placeholder indicates the time left for the transfer quota to be reset. For instance: 30m 45s -->
@@ -1716,13 +1694,13 @@
     <!-- Menu option to choose to add file or folders to Cloud Drive -->
     <string name="add_to_cloud">Importar</string>
     <!-- Menu option to choose to add file to Cloud Drive in the chat -->
-    <string name="add_to_cloud_node_chat">Añadir a Mi nube</string>
+    <string name="add_to_cloud_node_chat">Añadir a la Nube</string>
     <!-- Menu option -->
     <string name="general_view_contacts">Ver contactos</string>
     <!-- Message displayed when a file has been successfully imported to Cloud Drive -->
-    <string name="import_success_message">Añadido a Mi nube</string>
+    <string name="import_success_message">Añadido a la Nube</string>
     <!-- Menu option -->
-    <string name="import_success_error">No se ha podido añadir a Mi nube</string>
+    <string name="import_success_error">No se ha podido añadir a la Nube</string>
     <!-- Label in login screen to inform about the chat initialization proccess -->
     <string name="chat_connecting">Conectando&#8230;</string>
     <!-- message when trying to invite a contact with a pending request -->
@@ -1799,7 +1777,7 @@
     <!--  -->
     <string name="no_files_selected_warning">Ningún archivo seleccionado</string>
     <!--  -->
-    <string name="attachment_upload_panel_from_cloud">Desde Mi nube</string>
+    <string name="attachment_upload_panel_from_cloud">Desde la Nube</string>
     <!--  -->
     <string name="attachment_upload_panel_contact">Contacto</string>
     <!--  -->
@@ -2040,7 +2018,7 @@
     <!-- Label to include info of the user email in the feedback form -->
     <string name="user_account_feedback">Cuenta de usuario</string>
     <!-- Label shown in MEGA pdf-viewer when it open a PDF save in smartphone storage -->
-    <string name="save_to_mega">Guardar en \nMi nube</string>
+    <string name="save_to_mega">Guardar en mi \nNube</string>
     <!-- Error message when creating a chat one to one with a contact that already has a chat -->
     <string name="chat_already_exists">El chat ya existe</string>
     <!-- before sharing a file, has to be downloaded -->
@@ -2150,7 +2128,7 @@
     <!-- Text of the empty screen when there are not elements in  Inbox -->
     <string name="context_empty_inbox">[B]No hay archivos en la [/B][A]bandeja de entrada[/A]</string>
     <!-- Text of the empty screen when there are not elements in Cloud Drive -->
-    <string name="context_empty_cloud_drive">[B]No hay archivos en tu [/B][A]nube[/A]</string>
+    <string name="context_empty_cloud_drive">[B]No hay archivos en tu [/B][A]Nube[/A]</string>
     <!-- Text of the empty screen when there are not elements in Saved for Offline -->
     <string name="context_empty_offline">[B]No hay archivos [/B][A]sin conexión[/A]</string>
     <!-- Text of the empty screen when there are not contacts. No dot at the end because is for an empty state. The format placeholders are to showing it in different colors. -->
@@ -3197,7 +3175,7 @@
     <!-- Title of second tour screen -->
     <string name="title_tour_two">Chat cifrado</string>
     <!-- Content of second tour screen -->
-    <string name="content_tour_two">Chat totalmente cifrado con llamadas y videollamadas, chat de grupo y capacidad de compartir archivos con tu Cloud Drive.</string>
+    <string name="content_tour_two">Chat totalmente cifrado con llamadas y videollamadas, chat de grupo y capacidad de compartir archivos con tu Nube.</string>
     <!-- Title of third tour screen -->
     <string name="title_tour_three">Crea tu propia red</string>
     <!-- Content of third tour screen -->
@@ -3748,7 +3726,7 @@
     <!-- Explanation of a warning recommending upgrade to Pro in relation to link available options -->
     <string name="link_upgrade_pro_explanation">Los usuarios Pro tienen acceso exclusivo a una capa adicional de seguridad para los enlace que hace que la cuenta sea aún más segura.</string>
     <!-- Meaning of links decryption key -->
-    <string name="decryption_key_explanation">Nuestro sistema de cifrado punto a punto requiere una clave única generada automáticamente para este archivo. El enlace se crea por defecto con esta clave pero puedes exportala por separado para más seguridad.</string>
+    <string name="decryption_key_explanation">Nuestro sistema de cifrado punto a punto requiere una clave única generada automáticamente para este archivo o carpeta. El enlace se crea por defecto con esta clave pero puedes exportarla por separado para más seguridad.</string>
     <!-- Reset password label -->
     <string name="reset_password_label">Restablecer contraseña</string>
     <!-- Warning show to the user when has enable to send the decryption key of a link separately and tries to share the link -->
@@ -3863,7 +3841,7 @@
     <string name="file_created">Archivo creado</string>
     <!-- Warning indicating a file was not created successfully -->
     <string name="file_creation_failed">No se ha podido crear el archivo. Inténtalo de nuevo.</string>
-    <!-- Label indicating a file was saved to some folder. e.g.: File saved to Cloud Drive -->
+    <!-- Label indicating a file was saved to some folder. e.g.: File saved to Cloud Drive. "Cloud Drive" is the only destination for the time being, thus any article isn't needed -->
     <string name="file_saved_to">Archivo guardado en %1$s</string>
     <!-- Warning indicating a file was not saved to some folder. e.g.: File not saved to Cloud Drive. Try again -->
     <string name="file_saved_to_failed">No se ha podido guardar el archivo en %1$s. Inténtalo de nuevo.</string>
@@ -4198,4 +4176,18 @@
     <string name="video_quality_info">Ahorra espacio disminuyendo la calidad de vídeo en los ajustes de las Subidas de la cámara.</string>
     <!-- Label indicating video original quality -->
     <string name="original_quality">Calidad original</string>
+    <!-- Settings label which allows to enable or disable fingerprint unlock. -->
+    <string name="setting_fingerprint">Huella digital</string>
+    <!-- Title of the dialog which allows to enable the fingerprint unlock. -->
+    <string name="title_enable_fingerprint">Confirmar la huella para desbloquear</string>
+    <!-- Title of the dialog which allows to unlock the app with the fingerprint. -->
+    <string name="title_unlock_fingerprint">Desbloquear usando la huella</string>
+    <!-- Button of the dialog which allows to unlock the app with the fingerprint. Gives the option to unlock with the passcode instead -->
+    <string name="action_use_passcode">Usar código</string>
+    <!-- Message informing the fingerprint was enabled successfully -->
+    <string name="confirmation_fingerprint_enabled">Huella confirmada</string>
+    <!-- Warning indicating an image (GIF) cannot be inserted in an input text. Same string than the one shown by the system when it detects this behaviour on its own. -->
+    <string name="image_insertion_not_allowed">MEGA no admite la inserción de imágenes aquí</string>
+    <!-- The label under the button of viewing all images screen -->
+    <string name="section_images">Imágenes</string>
 </resources>

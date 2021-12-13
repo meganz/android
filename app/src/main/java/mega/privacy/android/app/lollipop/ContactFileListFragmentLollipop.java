@@ -297,7 +297,7 @@ public class ContactFileListFragmentLollipop extends ContactFileBaseFragment {
 	}
 
 	@Override
-	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+	public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		logDebug("onCreateView");
 		View v = null;
 		handler = new Handler();
@@ -384,8 +384,8 @@ public class ContactFileListFragmentLollipop extends ContactFileBaseFragment {
 			}
 
 			if (adapter == null) {
-				adapter = new MegaNodeAdapter(context, this, contactNodes, parentHandle,listView, aB,CONTACT_FILE_ADAPTER, MegaNodeAdapter.ITEM_VIEW_TYPE_LIST);
-
+				adapter = new MegaNodeAdapter(context, this, contactNodes, parentHandle,
+						listView, CONTACT_FILE_ADAPTER, MegaNodeAdapter.ITEM_VIEW_TYPE_LIST);
 			} else {
 				adapter.setNodes(contactNodes);
 				adapter.setParentHandle(parentHandle);

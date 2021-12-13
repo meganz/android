@@ -135,15 +135,6 @@
         app:showAsAction="never" />
 
     <item
-        android:id="@+id/action_grid"
-        android:icon="@drawable/ic_action_bar_null"
-        android:orderInCategory="120"
-        android:title="@string/action_grid"
-        android:visible="false"
-        app:iconTint="?attr/colorControlNormal"
-        app:showAsAction="always" />
-
-    <item
         android:id="@+id/action_menu_help"
         android:icon="@drawable/ic_action_bar_null"
         android:orderInCategory="135"

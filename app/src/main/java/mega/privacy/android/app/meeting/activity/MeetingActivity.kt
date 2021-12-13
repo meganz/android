@@ -33,6 +33,7 @@ class MeetingActivity : BaseActivity() {
         const val MEETING_ACTION_CREATE = "create_meeting"
         const val MEETING_ACTION_GUEST = "join_meeting_as_guest"
         const val MEETING_ACTION_IN = "in_meeting"
+        const val MEETING_ACTION_MAKE_MODERATOR = "make_moderator"
         const val MEETING_ACTION_RINGING = "ringing_meeting"
         const val MEETING_ACTION_RINGING_VIDEO_ON = "ringing_meeting_video_on"
         const val MEETING_ACTION_RINGING_VIDEO_OFF = "ringing_meeting_video_off"
@@ -50,6 +51,7 @@ class MeetingActivity : BaseActivity() {
 
     @Inject
     lateinit var passcodeUtil: PasscodeUtil
+
     @Inject
     lateinit var passcodeManagement: PasscodeManagement
 
@@ -213,6 +215,7 @@ class MeetingActivity : BaseActivity() {
             MEETING_ACTION_GUEST -> R.id.joinMeetingAsGuestFragment
             MEETING_ACTION_START, MEETING_ACTION_IN -> R.id.inMeetingFragment
             MEETING_ACTION_RINGING -> R.id.ringingMeetingFragment
+            MEETING_ACTION_MAKE_MODERATOR -> R.id.makeModeratorFragment
             else -> R.id.createMeetingFragment
         }
 
@@ -289,14 +292,17 @@ class MeetingActivity : BaseActivity() {
             }
             is InMeetingFragment -> {
                 // Prevent guest from quitting the call by pressing back
-                if(!isGuest){
+                if (!isGuest) {
                     currentFragment.removeUI()
                     sendQuitCallEvent()
                 }
             }
+            is MakeModeratorFragment -> {
+                currentFragment.cancel()
+            }
         }
 
-        if (currentFragment !is InMeetingFragment || !isGuest) {
+        if (currentFragment !is MakeModeratorFragment && (currentFragment !is InMeetingFragment || !isGuest)) {
             finish()
         }
     }

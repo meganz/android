@@ -13,7 +13,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
-import android.widget.RelativeLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
 
@@ -63,9 +62,11 @@ import static mega.privacy.android.app.constants.EventConstants.EVENT_UPDATE_HID
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.ContactUtil.*;
 import static mega.privacy.android.app.utils.FileUtil.*;
+import static mega.privacy.android.app.utils.LogUtil.logDebug;
 import static mega.privacy.android.app.utils.MegaApiUtils.*;
 import static mega.privacy.android.app.utils.MegaNodeUtil.manageTextFileIntent;
 import static mega.privacy.android.app.utils.MegaNodeUtil.manageURLNode;
+import static mega.privacy.android.app.utils.MegaNodeUtil.onNodeTapped;
 import static mega.privacy.android.app.utils.SharedPreferenceConstants.HIDE_RECENT_ACTIVITY;
 import static mega.privacy.android.app.utils.SharedPreferenceConstants.USER_INTERFACE_PREFERENCES;
 import static mega.privacy.android.app.utils.TextUtil.formatEmptyScreenText;
@@ -380,7 +381,7 @@ public class RecentsFragment extends Fragment implements StickyHeaderHandler {
     }
 
     public void openFile(int index, MegaNode node, boolean isMedia) {
-        Intent intent = null;
+        Intent intent;
 
         if (MimeTypeList.typeForName(node.getName()).isImage()) {
             intent = new Intent(context, FullScreenImageViewerLollipop.class);
@@ -399,7 +400,7 @@ public class RecentsFragment extends Fragment implements StickyHeaderHandler {
         }
 
         String localPath = getLocalFile(node);
-        boolean paramsSetSuccessfully = false;
+        boolean paramsSetSuccessfully;
 
         if (isAudioOrVideo(node)) {
             if (isInternalIntent(node)) {
@@ -428,9 +429,10 @@ public class RecentsFragment extends Fragment implements StickyHeaderHandler {
             if (paramsSetSuccessfully && isOpusFile(node)) {
                 intent.setDataAndType(intent.getData(), "audio/*");
             }
+
+            launchIntent(intent, paramsSetSuccessfully, node, index);
         } else if (MimeTypeList.typeForName(node.getName()).isURL()) {
             manageURLNode(context, megaApi, node);
-            return;
         } else if (MimeTypeList.typeForName(node.getName()).isPdf()) {
             intent = new Intent(context, PdfViewerActivityLollipop.class);
             intent.putExtra(INTENT_EXTRA_KEY_INSIDE, true);
@@ -443,27 +445,37 @@ public class RecentsFragment extends Fragment implements StickyHeaderHandler {
                 paramsSetSuccessfully = setStreamingIntentParams(context, node, megaApi, intent,
                         (ManagerActivityLollipop) requireActivity());
             }
+
+            launchIntent(intent, paramsSetSuccessfully, node, index);
         } else if (MimeTypeList.typeForName(node.getName()).isOpenableTextFile(node.getSize())) {
             manageTextFileIntent(requireContext(), node, RECENTS_ADAPTER);
-            return;
+        } else {
+            logDebug("itemClick:isFile:otherOption");
+            onNodeTapped(context, node, ((ManagerActivityLollipop) requireActivity())::saveNodeByTap, (ManagerActivityLollipop) requireActivity(), (ManagerActivityLollipop) requireActivity());
         }
+    }
 
+    /**
+     * Launch corresponding intent to open the file based on its type.
+     *
+     * @param intent Intent to launch activity.
+     * @param paramsSetSuccessfully true, if the param is set for the intent successfully; false, otherwise.
+     * @param node The node to open.
+     * @param position Thumbnail's position in the list.
+     */
+    private void launchIntent(Intent intent, boolean paramsSetSuccessfully, MegaNode node ,int position) {
         if (intent != null && !isIntentAvailable(context, intent)) {
             paramsSetSuccessfully = false;
             ((ManagerActivityLollipop) context).showSnackbar(SNACKBAR_TYPE, getString(R.string.intent_not_available), -1);
         }
 
-        if (paramsSetSuccessfully) {
+        if (intent != null && paramsSetSuccessfully) {
             intent.putExtra(INTENT_EXTRA_KEY_HANDLE, node.getHandle());
-            putThumbnailLocation(intent, listView, index, VIEWER_FROM_RECETS, adapter);
+            putThumbnailLocation(intent, listView, position, VIEWER_FROM_RECETS, adapter);
 
             context.startActivity(intent);
             ((ManagerActivityLollipop) context).overridePendingTransition(0, 0);
-            return;
         }
-
-        ((ManagerActivityLollipop) context).saveNodesToDevice(Collections.singletonList(node),
-                true, false, false, false);
     }
 
     public void setBucketSelected(MegaRecentActionBucket bucketSelected) {

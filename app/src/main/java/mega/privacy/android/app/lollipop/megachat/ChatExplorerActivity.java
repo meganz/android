@@ -166,8 +166,6 @@ public class ChatExplorerActivity extends PasscodeActivity implements View.OnCli
         // Inflate the menu items for use in the action bar
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.file_explorer_action, menu);
-        menu.findItem(R.id.cab_menu_sort).setVisible(false);
-        menu.findItem(R.id.cab_menu_grid_list).setVisible(false);
         searchMenuItem = menu.findItem(R.id.cab_menu_search);
         createFolderMenuItem = menu.findItem(R.id.cab_menu_create_folder);
         newChatMenuItem = menu.findItem(R.id.cab_menu_new_chat);

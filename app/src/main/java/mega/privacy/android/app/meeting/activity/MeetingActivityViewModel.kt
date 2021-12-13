@@ -104,7 +104,7 @@ class MeetingActivityViewModel @ViewModelInject constructor(
     val meetingLinkLiveData: LiveData<String> = _meetingLinkLiveData
 
     // Show snack bar
-    private val _snackBarLiveData: MutableLiveData<String> = MutableLiveData<String>()
+    private val _snackBarLiveData = MutableLiveData("")
     val snackBarLiveData: LiveData<String> = _snackBarLiveData
 
     private val audioOutputStateObserver =
@@ -544,5 +544,37 @@ class MeetingActivityViewModel @ViewModelInject constructor(
      */
     fun showSnackBar(content: String) {
         _snackBarLiveData.value = content
+    }
+
+    /**
+     * Hide snack bar
+     */
+    fun hideSnackBar(){
+        _snackBarLiveData.value = ""
+    }
+
+    /**
+     * Method for obtaining the bitmap of a participant's avatar
+     *
+     * @param peerId User handle of a participant
+     * @return The bitmap of a participant's avatar
+     */
+    fun getAvatarBitmapByPeerId(peerId: Long): Bitmap? {
+        return meetingActivityRepository.getAvatarBitmapByPeerId(peerId)
+    }
+
+    /**
+     * Give moderator permissions to a call participant.
+     *
+     * @param userHandle User handle of a participant
+     * @param listener MegaChatRequestListenerInterface
+     */
+    fun giveModeratorPermissions(
+        userHandle: Long,
+        listener: MegaChatRequestListenerInterface? = null
+    ) {
+        currentChatId.value?.let {
+            meetingActivityRepository.giveModeratorPermissions(it, userHandle, listener)
+        }
     }
 }
