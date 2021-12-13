@@ -8,6 +8,7 @@ import mega.privacy.android.app.utils.ErrorUtils.toThrowable
 import mega.privacy.android.app.utils.LogUtil.logError
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava.AFFILIATE_TYPE_CONTACT
+import nz.mega.sdk.MegaContactRequest
 import nz.mega.sdk.MegaContactRequest.*
 import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaError.API_EEXIST
@@ -148,4 +149,22 @@ class InviteContactUseCase @Inject constructor(
                     }
                 ))
         }
+
+    /**
+     * Checks if a contact request is already sent.
+     *
+     * @param email Contact email
+     * @return True if the request is already sent, false otherwise.
+     */
+    fun isContactRequestAlreadySent(email: String): Boolean {
+        val sentRequests: List<MegaContactRequest> = megaApi.outgoingContactRequests
+
+        for (request in sentRequests) {
+            if (request.targetEmail == email) {
+                return true
+            }
+        }
+
+        return false
+    }
 }
