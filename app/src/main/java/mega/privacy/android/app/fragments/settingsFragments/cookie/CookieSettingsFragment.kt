@@ -59,11 +59,11 @@ class CookieSettingsFragment : SettingsBaseFragment() {
         analyticsCookiesPreference.onPreferenceChangeListener = this
 
         policiesPreference.apply {
-            setButton1(StringResourcesUtils.getString(R.string.settings_about_privacy_policy)) {
-                openBrowser("https://mega.nz/privacy".toUri())
-            }
-            setButton2(StringResourcesUtils.getString(R.string.settings_about_cookie_policy)) {
+            setButton1(StringResourcesUtils.getString(R.string.settings_about_cookie_policy)) {
                 openBrowser("https://mega.nz/cookie".toUri())
+            }
+            setButton2(StringResourcesUtils.getString(R.string.settings_about_privacy_policy)) {
+                openBrowser("https://mega.nz/privacy".toUri())
             }
         }
     }
