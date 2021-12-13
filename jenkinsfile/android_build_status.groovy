@@ -1,3 +1,8 @@
+// run shell command and print stdout and stderr to log file
+def runShell(String cmd){
+    sh "${cmd} >> ${CONSOLE_LOG_FILE} 2>&1"
+}
+
 pipeline {
     agent { label 'mac-slave' }
     environment {
@@ -52,7 +57,7 @@ pipeline {
     stages {
         stage('Preparation') {
             steps {
-                sh "rm -f ${CONSOLE_LOG_FILE}"
+                runShell("rm -fv ${CONSOLE_LOG_FILE}")
             }
         }
 
@@ -68,12 +73,12 @@ pipeline {
         stage('Fetch SDK Submodules') {
             steps {
                 withCredentials([gitUsernamePassword(credentialsId: 'Gitlab-Access-Token', gitToolName: 'Default')]) {
-                    sh 'git config --file=.gitmodules submodule."app/src/main/jni/mega/sdk".url https://code.developers.mega.co.nz/sdk/sdk.git'
-                    sh 'git config --file=.gitmodules submodule."app/src/main/jni/mega/sdk".branch develop'
-                    sh 'git config --file=.gitmodules submodule."app/src/main/jni/megachat/sdk".url https://code.developers.mega.co.nz/megachat/MEGAchat.git'
-                    sh 'git config --file=.gitmodules submodule."app/src/main/jni/megachat/sdk".branch develop'
-                    sh "git submodule sync > ${CONSOLE_LOG_FILE}"
-                    sh "git submodule update --init --recursive --remote >> ${CONSOLE_LOG_FILE}"
+                    runShell 'git config --file=.gitmodules submodule."app/src/main/jni/mega/sdk".url https://code.developers.mega.co.nz/sdk/sdk.git'
+                    runShell 'git config --file=.gitmodules submodule."app/src/main/jni/mega/sdk".branch develop'
+                    runShell 'git config --file=.gitmodules submodule."app/src/main/jni/megachat/sdk".url https://code.developers.mega.co.nz/megachat/MEGAchat.git'
+                    runShell 'git config --file=.gitmodules submodule."app/src/main/jni/megachat/sdk".branch develop'
+                    runShell "git submodule sync"
+                    runShell "git submodule update --init --recursive --remote"
                 }
             }
         }
@@ -92,7 +97,7 @@ pipeline {
           echo "${WEBRTC_LIB_FILE} already downloaded. Skip downloading."
         else
           echo "downloading webrtc"
-          mega-get ${WEBRTC_LIB_URL} >> ${CONSOLE_LOG_FILE}
+          mega-get ${WEBRTC_LIB_URL} >> ${CONSOLE_LOG_FILE}  2>&1
 
           echo "unzipping webrtc"
           rm -fr ${WEBRTC_LIB_UNZIPPED}
@@ -104,7 +109,7 @@ pipeline {
           echo "${GOOGLE_MAP_API_FILE} already downloaded. Skip downloading."
         else
           echo "downloading google map api"
-          mega-get ${GOOGLE_MAP_API_URL} >> ${CONSOLE_LOG_FILE}
+          mega-get ${GOOGLE_MAP_API_URL} >> ${CONSOLE_LOG_FILE} 2>&1
 
           echo "unzipping google map api"
           rm -fr ${GOOGLE_MAP_API_UNZIPPED}
@@ -133,14 +138,14 @@ pipeline {
             steps {
                 sh """
         cd ${WORKSPACE}/app/src/main/jni
-        /opt/homebrew/bin/bash build.sh all >> ${CONSOLE_LOG_FILE}
+        /opt/homebrew/bin/bash build.sh all >> ${CONSOLE_LOG_FILE}  2>&1
         """
             }
         }
         stage('Compile') {
             steps {
                 // Compile the app and its dependencies
-                sh "./gradlew clean compileDebugSources >> ${CONSOLE_LOG_FILE}"
+                runShell "./gradlew clean compileDebugSources"
             }
         }
         stage('Unit test') {
@@ -148,7 +153,7 @@ pipeline {
                 updateGitlabCommitStatus name: 'test', state: 'pending'
 
                 // Compile and run the unit tests for the app and its dependencies
-                sh "./gradlew testDebugUnitTest >> ${CONSOLE_LOG_FILE}"
+                runShell "./gradlew testDebugUnitTest"
 
                 // Analyse the test results and update the build result as appropriate
                 //junit '**/TEST-*.xml'
@@ -163,7 +168,7 @@ pipeline {
         stage('Build APK') {
             steps {
                 // Finish building and packaging the APK
-                sh "./gradlew assemble >> ${CONSOLE_LOG_FILE}"
+                runShell "./gradlew assemble"
 
                 // Archive the APKs so that they can be downloaded from Jenkins
                 // archiveArtifacts '**/*.apk'
@@ -172,7 +177,7 @@ pipeline {
         // stage('Static analysis') {
         //   steps {
         //     // Run Lint and analyse the results
-        //     sh './gradlew lintDebug'
+        //     runShell './gradlew lintDebug'
         //     androidLint pattern: '**/lint-results-*.xml'
         //   }
         // }
@@ -192,7 +197,7 @@ pipeline {
             }
             steps {
                 // Build the app in release mode, and sign the APK using the environment variables
-                sh './gradlew assembleRelease'
+                runShell './gradlew assembleRelease'
 
                 // Archive the APKs so that they can be downloaded from Jenkins
                 archiveArtifacts '**/*.apk'
