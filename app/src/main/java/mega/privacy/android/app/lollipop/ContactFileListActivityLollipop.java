@@ -186,6 +186,8 @@ public class ContactFileListActivityLollipop extends PasscodeActivity
 
 		if (item.getItemId() == android.R.id.home) {
 			onBackPressed();
+		} else if (item.getItemId() == R.id.action_more) {
+			showOptionsPanel(megaApi.getNodeByHandle(parentHandle));
 		}
 
 		return true;
@@ -1134,5 +1136,11 @@ public class ContactFileListActivityLollipop extends PasscodeActivity
 			cflF.clearSelections();
 			cflF.hideMultipleSelect();
 		}
+	}
+
+	@Override
+	public boolean onCreateOptionsMenu(Menu menu) {
+		getMenuInflater().inflate(R.menu.activity_contact_file_list, menu);
+		return super.onCreateOptionsMenu(menu);
 	}
 }
