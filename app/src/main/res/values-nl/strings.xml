@@ -1615,26 +1615,14 @@
     <string name="paused_transfers_title">Overdrachten gepauzeerd</string>
     <!-- message shown in the screen when there are not any active transfer -->
     <string name="completed_transfers_empty">Geen voltooide overdrachten</string>
-    <!-- Text of the notification shown when the upload service is running, Plural -->
-    <plurals name="upload_service_notification">
-        <item quantity="one">Uploaden %1$d van %2$d bestand</item>
-        <item quantity="other">Uploaden %1$d van %2$d bestanden</item>
-    </plurals>
-    <!-- Text of the notification shown when the upload service is running, Plural -->
-    <plurals name="upload_service_paused_notification">
-        <item quantity="one">Uploaden %1$d van %2$d bestand (gepauzeerd)</item>
-        <item quantity="other">Uploaden %1$d van %2$d bestanden (gepauzeerd)</item>
-    </plurals>
-    <!-- Text of the notification shown when the folder upload service is running, Text of the notification shown when the folder upload service is running - plural e.g. Uploading 1 of 2 folders -->
-    <plurals name="folder_upload_service_notification">
-        <item quantity="one">%1$d Uploaden van %2$d map</item>
-        <item quantity="other">Uploaden %1$d van %2$d mappen</item>
-    </plurals>
-    <!-- Text of the notification shown when the folder upload service is running, Text of the notification shown when the folder upload service is running - plural e.g. Uploading 1 of 2 folders -->
-    <plurals name="folder_upload_service_paused_notification">
-        <item quantity="one">Uploaden %1$d van %2$d map (gepauzeerd)</item>
-        <item quantity="other">Uploaden %1$d van %2$d mappen (gepauzeerd)</item>
-    </plurals>
+    <!-- Text of the notification shown when the upload service is running: e.g. Uploading files: 1 of 10 -->
+    <string name="upload_service_notification">Bestanden uploaden: %1$d van %2$d</string>
+    <!-- Text of the notification shown when the upload service is paused: e.g. Uploading files: 1 of 10 (paused)-->
+    <string name="upload_service_notification_paused">Bestanden uploaden:%1$d van %2$d (gepauzeerd)</string>
+    <!-- Text of the notification shown when the folder upload service is running, e.g. Uploading folders 1 of 2 -->
+    <string name="folder_upload_service_notification">Mappen uploaden: %1$d van %2$d</string>
+    <!-- Text of the notification shown when the folder upload service is paused, e.g. Uploading folders 1 of 2 (paused) -->
+    <string name="folder_upload_service_notification_paused">Mappen uploaden: %1$d van %2$d (gepauzeerd)</string>
     <!-- Text of the notification shown when the upload service has finished, Plural -->
     <plurals name="upload_service_final_notification">
         <item quantity="one">%1$d bestand geüpload</item>
@@ -1682,16 +1670,10 @@
         <item quantity="one">%1$d bestand niet gedownload</item>
         <item quantity="other">%1$d bestanden niet gedownload</item>
     </plurals>
-    <!-- Text of the notification shown when the download service is running, Plural -->
-    <plurals name="download_service_notification">
-        <item quantity="one">Downloaden van %1$d of %2$d bestand</item>
-        <item quantity="other">Downloaden %1$d van %2$d bestanden</item>
-    </plurals>
-    <!-- Text of the notification shown when the download service is paused, Plural -->
-    <plurals name="download_service_paused_notification">
-        <item quantity="one">Downloaden %1$d van %2$d bestand (gepauzeerd)</item>
-        <item quantity="other">Downloaden %1$d van %2$d bestanden (gepauzeerd)</item>
-    </plurals>
+    <!-- Text of the notification shown when the download service is running -->
+    <string name="download_service_notification">Bestanden downloaden: %1$d van %2$d</string>
+    <!-- Text of the notification shown when the download service is paused -->
+    <string name="download_service_notification_paused">Bestanden downloaden: %1$d van %2$d (gepauzeerd)</string>
     <!-- Title of the alert when the transfer quota is exceeded. -->
     <string name="title_depleted_transfer_overquota">Onvoldoende overdracht tegoed</string>
     <!-- Text of the alert when the transfer quota is depleted. The placeholder indicates the time left for the transfer quota to be reset. For instance: 30m 45s -->
@@ -3744,7 +3726,7 @@
     <!-- Explanation of a warning recommending upgrade to Pro in relation to link available options -->
     <string name="link_upgrade_pro_explanation">MEGA Pro-gebruikers hebben exclusieve toegang tot extra linkbeveiligingsfuncties die uw account nog veiliger maken.</string>
     <!-- Meaning of links decryption key -->
-    <string name="decryption_key_explanation">Onze end-to-end-versleutelingssysteem vereist een unieke sleutel die automatisch voor dit bestand wordt gegenereerd. Er wordt standaard een link met deze sleutel gemaakt, maar u kunt de decoderingssleutel afzonderlijk exporteren voor een extra beveiligingslaag.</string>
+    <string name="decryption_key_explanation">Onze end-to-end coderingssysteem vereist een unieke sleutel die automatisch wordt gegenereerd voor deze map. Er wordt standaard een link met deze sleutel gemaakt, maar u kunt de decoderingssleutel afzonderlijk exporteren voor een extra beveiligingslaag.</string>
     <!-- Reset password label -->
     <string name="reset_password_label">Wachtwoord resetten</string>
     <!-- Warning show to the user when has enable to send the decryption key of a link separately and tries to share the link -->
@@ -3859,7 +3841,7 @@
     <string name="file_created">Bestand aangemaakt</string>
     <!-- Warning indicating a file was not created successfully -->
     <string name="file_creation_failed">Het maken van het bestand is mislukt. Probeer het opnieuw.</string>
-    <!-- Label indicating a file was saved to some folder. e.g.: File saved to Cloud Drive -->
+    <!-- Label indicating a file was saved to some folder. e.g.: File saved to Cloud Drive. "Cloud Drive" is the only destination for the time being, thus any article isn't needed -->
     <string name="file_saved_to">Bestand opgeslagen in %1$s</string>
     <!-- Warning indicating a file was not saved to some folder. e.g.: File not saved to Cloud Drive. Try again -->
     <string name="file_saved_to_failed">Bestand niet opgeslagen in %1$s. Probeer het nogmaals.</string>
@@ -4053,9 +4035,9 @@
     <!-- General label for microphone -->
     <string name="general_mic">Microfoon</string>
     <!-- General label for microphone muted -->
-    <string name="general_mic_mute">Uw microfoon is gedempt</string>
+    <string name="general_mic_mute">Uw microfoon is uitgeschakeld</string>
     <!-- General label for microphone unmuted -->
-    <string name="general_mic_unmute">Uw microfoon is niet gedempt</string>
+    <string name="general_mic_unmute">Uw microfoon is ingeschakeld</string>
     <!-- General label for camera -->
     <string name="general_camera">Camera</string>
     <!-- General label for camera enable -->
@@ -4071,9 +4053,9 @@
     <!-- General label for headphone on-->
     <string name="general_headphone_on">Koptelefoon is actief</string>
     <!-- General label for speaker on-->
-    <string name="general_speaker_on">Luidspreker staat aan</string>
+    <string name="general_speaker_on">Uw speaker is ingeschakeld</string>
     <!-- General label for speaker off-->
-    <string name="general_speaker_off">Luidspreker staat uit</string>
+    <string name="general_speaker_off">Uw speaker is uitgeschakeld</string>
     <!-- Label for end meeting-->
     <string name="meeting_end">Beëindigen</string>
     <!-- Invite contacts as participants of the meeting-->
@@ -4175,7 +4157,7 @@
     <!-- Setting which allows to hide or show the recent activity. -->
     <string name="hide_recent_setting">Recente activiteit verbergen</string>
     <!-- Context of a setting which allows to hide or show the recent activity. -->
-    <string name="hide_recent_setting_context">Verberg recente activiteit in Home sectie.</string>
+    <string name="hide_recent_setting_context">Verberg recente activiteit in Thuis sectie.</string>
     <!-- Title of a dialog informing the start screen can be modified. -->
     <string name="choose_start_screen_title">Kies uw start scherm</string>
     <!-- Test of a dialog informing the start screen can be modified. -->
@@ -4194,4 +4176,18 @@
     <string name="video_quality_info">U kunt ruimte besparen door de videokwaliteit te verlagen in de Camera Upload instellingen.</string>
     <!-- Label indicating video original quality -->
     <string name="original_quality">Originele kwaliteit</string>
+    <!-- Settings label which allows to enable or disable fingerprint unlock. -->
+    <string name="setting_fingerprint">Vingerprint ID</string>
+    <!-- Title of the dialog which allows to enable the fingerprint unlock. -->
+    <string name="title_enable_fingerprint">Bevestig uw vingerprint om te ontgrendelen</string>
+    <!-- Title of the dialog which allows to unlock the app with the fingerprint. -->
+    <string name="title_unlock_fingerprint">Ontgrendel met uw vingerafdruk</string>
+    <!-- Button of the dialog which allows to unlock the app with the fingerprint. Gives the option to unlock with the passcode instead -->
+    <string name="action_use_passcode">Gebruik passcode</string>
+    <!-- Message informing the fingerprint was enabled successfully -->
+    <string name="confirmation_fingerprint_enabled">Uw vingerprint is bevestigd</string>
+    <!-- Warning indicating an image (GIF) cannot be inserted in an input text. Same string than the one shown by the system when it detects this behaviour on its own. -->
+    <string name="image_insertion_not_allowed">MEGA ondersteunt het invoegen van afbeeldingen hier niet</string>
+    <!-- The label under the button of viewing all images screen -->
+    <string name="section_images">Afbeeldingen</string>
 </resources>

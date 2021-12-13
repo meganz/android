@@ -1615,26 +1615,14 @@
     <string name="paused_transfers_title">Transferências pausadas</string>
     <!-- message shown in the screen when there are not any active transfer -->
     <string name="completed_transfers_empty">Não há transferências concluídas</string>
-    <!-- Text of the notification shown when the upload service is running, Plural -->
-    <plurals name="upload_service_notification">
-        <item quantity="one">Fazendo upload %1$d de %2$d arquivo</item>
-        <item quantity="other">Fazendo upload %1$d de %2$d arquivos</item>
-    </plurals>
-    <!-- Text of the notification shown when the upload service is running, Plural -->
-    <plurals name="upload_service_paused_notification">
-        <item quantity="one">Fazendo o upload de %1$d de %2$d arquivo (pausado)</item>
-        <item quantity="other">Fazendo o upload de %1$d de %2$d arquivos (pausado)</item>
-    </plurals>
-    <!-- Text of the notification shown when the folder upload service is running, Text of the notification shown when the folder upload service is running - plural e.g. Uploading 1 of 2 folders -->
-    <plurals name="folder_upload_service_notification">
-        <item quantity="one">Fazendo o upload de %1$d de %2$d pasta</item>
-        <item quantity="other">Fazendo o upload de %1$d de %2$d pastas</item>
-    </plurals>
-    <!-- Text of the notification shown when the folder upload service is running, Text of the notification shown when the folder upload service is running - plural e.g. Uploading 1 of 2 folders -->
-    <plurals name="folder_upload_service_paused_notification">
-        <item quantity="one">Fazendo o upload de %1$d de %2$d pasta (pausado)</item>
-        <item quantity="other">Fazendo o upload de %1$d de %2$d pastas (pausado)</item>
-    </plurals>
+    <!-- Text of the notification shown when the upload service is running: e.g. Uploading files: 1 of 10 -->
+    <string name="upload_service_notification">Fazendo upload de arquivos:%1$d de %2$d</string>
+    <!-- Text of the notification shown when the upload service is paused: e.g. Uploading files: 1 of 10 (paused)-->
+    <string name="upload_service_notification_paused">Fazendo upload de arquivos: %1$d de %2$d (pausado)</string>
+    <!-- Text of the notification shown when the folder upload service is running, e.g. Uploading folders 1 of 2 -->
+    <string name="folder_upload_service_notification">Fazendo upload de pastas: %1$d de %2$d</string>
+    <!-- Text of the notification shown when the folder upload service is paused, e.g. Uploading folders 1 of 2 (paused) -->
+    <string name="folder_upload_service_notification_paused">Fazendo upload de arquivos: %1$d de %2$d (pausado)</string>
     <!-- Text of the notification shown when the upload service has finished, Plural -->
     <plurals name="upload_service_final_notification">
         <item quantity="one">Upload de %1$d arquivo concluído</item>
@@ -1682,16 +1670,10 @@
         <item quantity="one">Download de %1$d arquivo não concluído</item>
         <item quantity="other">Download de %1$d arquivos não concluído</item>
     </plurals>
-    <!-- Text of the notification shown when the download service is running, Plural -->
-    <plurals name="download_service_notification">
-        <item quantity="one">Fazendo download %1$d de %2$d arquivo</item>
-        <item quantity="other">Fazendo download %1$d de %2$d arquivos</item>
-    </plurals>
-    <!-- Text of the notification shown when the download service is paused, Plural -->
-    <plurals name="download_service_paused_notification">
-        <item quantity="one">Fazendo o download de %1$d de %2$d arquivo (pausado)</item>
-        <item quantity="other">Fazendo o download de %1$d de %2$d arquivos (pausado)</item>
-    </plurals>
+    <!-- Text of the notification shown when the download service is running -->
+    <string name="download_service_notification">Fazendo download de arquivos: %1$d de %2$d</string>
+    <!-- Text of the notification shown when the download service is paused -->
+    <string name="download_service_notification_paused">Fazendo download de arquivos: %1$d de %2$d (pausado)</string>
     <!-- Title of the alert when the transfer quota is exceeded. -->
     <string name="title_depleted_transfer_overquota">Cota de transferência insuficiente</string>
     <!-- Text of the alert when the transfer quota is depleted. The placeholder indicates the time left for the transfer quota to be reset. For instance: 30m 45s -->
@@ -3744,7 +3726,7 @@
     <!-- Explanation of a warning recommending upgrade to Pro in relation to link available options -->
     <string name="link_upgrade_pro_explanation">Os usuários Pro do MEGA têm acesso exclusivo a recursos adicionais para a proteção dos links, tornando sua conta ainda mais segura.</string>
     <!-- Meaning of links decryption key -->
-    <string name="decryption_key_explanation">Nosso sistema de criptografia de ponta a ponta requer uma chave exclusiva gerada automaticamente para este arquivo. Um link com esta chave será criado de maneira predeterminada, mas você pode exportar a chave de decodificação separadamente para assim garantir uma camada adicional de segurança.</string>
+    <string name="decryption_key_explanation">Nosso sistema de criptografia de ponta a ponta requer uma chave exclusiva gerada automaticamente para este arquivo ou pasta. Um link com esta chave será criado de maneira predeterminada, mas você pode exportar a chave de decodificação separadamente para assim garantir uma camada adicional de segurança.</string>
     <!-- Reset password label -->
     <string name="reset_password_label">Resetar senha</string>
     <!-- Warning show to the user when has enable to send the decryption key of a link separately and tries to share the link -->
@@ -3859,7 +3841,7 @@
     <string name="file_created">Arquivo criado</string>
     <!-- Warning indicating a file was not created successfully -->
     <string name="file_creation_failed">Não foi possível criar o arquivo, tente novamente.</string>
-    <!-- Label indicating a file was saved to some folder. e.g.: File saved to Cloud Drive -->
+    <!-- Label indicating a file was saved to some folder. e.g.: File saved to Cloud Drive. "Cloud Drive" is the only destination for the time being, thus any article isn't needed -->
     <string name="file_saved_to">Arquivo salvo em %1$s</string>
     <!-- Warning indicating a file was not saved to some folder. e.g.: File not saved to Cloud Drive. Try again -->
     <string name="file_saved_to_failed">Não foi possível salvar o arquivo em %1$s, tente novamente.</string>
@@ -4194,4 +4176,18 @@
     <string name="video_quality_info">Você pode economizar espaço diminuindo a qualidade dos vídeos nas configurações dos Uploads da câmera.</string>
     <!-- Label indicating video original quality -->
     <string name="original_quality">Qualidade original</string>
+    <!-- Settings label which allows to enable or disable fingerprint unlock. -->
+    <string name="setting_fingerprint">Impressão digital</string>
+    <!-- Title of the dialog which allows to enable the fingerprint unlock. -->
+    <string name="title_enable_fingerprint">Confirme a sua impressão digital para desbloquear</string>
+    <!-- Title of the dialog which allows to unlock the app with the fingerprint. -->
+    <string name="title_unlock_fingerprint">Desbloquear usando a sua impressão digital</string>
+    <!-- Button of the dialog which allows to unlock the app with the fingerprint. Gives the option to unlock with the passcode instead -->
+    <string name="action_use_passcode">Usar código de acesso</string>
+    <!-- Message informing the fingerprint was enabled successfully -->
+    <string name="confirmation_fingerprint_enabled">A sua impressão digital foi confirmada</string>
+    <!-- Warning indicating an image (GIF) cannot be inserted in an input text. Same string than the one shown by the system when it detects this behaviour on its own. -->
+    <string name="image_insertion_not_allowed">O MEGA não suporta a inserção de imagens aqui</string>
+    <!-- The label under the button of viewing all images screen -->
+    <string name="section_images">Imagens</string>
 </resources>

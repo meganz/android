@@ -482,7 +482,7 @@ class DocumentsFragment : Fragment(), HomepageSearchable {
             onNodeTapped(
                 requireContext(),
                 node,
-                { node: MegaNode? -> (requireActivity() as ManagerActivityLollipop).saveNodeByTap(node) },
+                { (requireActivity() as ManagerActivityLollipop).saveNodeByTap(it) },
                 requireActivity() as ManagerActivityLollipop,
                 requireActivity() as ManagerActivityLollipop
             )

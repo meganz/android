@@ -5,6 +5,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.preference.Preference;
 import androidx.preference.SwitchPreferenceCompat;
 
@@ -19,15 +21,22 @@ import mega.privacy.android.app.listeners.GetAttrUserListener;
 import mega.privacy.android.app.listeners.SetAttrUserListener;
 import mega.privacy.android.app.lollipop.tasks.ManageCacheTask;
 import mega.privacy.android.app.lollipop.tasks.ManageOfflineTask;
+import mega.privacy.android.app.utils.StringResourcesUtils;
 import nz.mega.sdk.MegaAccountDetails;
 
 import static mega.privacy.android.app.constants.SettingsConstants.*;
+import static mega.privacy.android.app.utils.AlertDialogUtil.dismissAlertDialogIfExists;
+import static mega.privacy.android.app.utils.AlertDialogUtil.isAlertDialogShown;
 import static mega.privacy.android.app.utils.Constants.INVALID_VALUE;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.Util.*;
 
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
+
 @AndroidEntryPoint
 public class SettingsFileManagementFragment extends SettingsBaseFragment {
+
+    private static final String IS_DISABLE_VERSIONS_SHOWN = "IS_DISABLE_VERSIONS_SHOWN";
 
     @Inject
     MyAccountInfo myAccountInfo;
@@ -43,6 +52,8 @@ public class SettingsFileManagementFragment extends SettingsBaseFragment {
     private Preference clearVersionsFileManagement;
     private SwitchPreferenceCompat autoPlaySwitch;
     private SwitchPreferenceCompat mobileDataHighResolution;
+
+    private AlertDialog disableVersionsWarning;
 
     @Override
     public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
@@ -101,6 +112,24 @@ public class SettingsFileManagementFragment extends SettingsBaseFragment {
         taskGetSizeOffline();
 
         megaApi.getFileVersionsOption(new GetAttrUserListener(context));
+
+        if (savedInstanceState != null
+                && savedInstanceState.getBoolean(IS_DISABLE_VERSIONS_SHOWN, false)) {
+            showWarningDisableVersions();
+        }
+    }
+
+    @Override
+    public void onSaveInstanceState(@NonNull Bundle outState) {
+        outState.putBoolean(IS_DISABLE_VERSIONS_SHOWN, isAlertDialogShown(disableVersionsWarning));
+        super.onSaveInstanceState(outState);
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+
+        dismissAlertDialogIfExists(disableVersionsWarning);
     }
 
     @Override
@@ -146,6 +175,11 @@ public class SettingsFileManagementFragment extends SettingsBaseFragment {
             case KEY_ENABLE_VERSIONS:
                 if (isOffline(context))
                     return false;
+
+                if (!enableVersionsSwitch.isChecked()) {
+                    showWarningDisableVersions();
+                    return false;
+                }
 
                 megaApi.setFileVersionsOption(!enableVersionsSwitch.isChecked(), new SetAttrUserListener(context));
                 break;
@@ -305,5 +339,16 @@ public class SettingsFileManagementFragment extends SettingsBaseFragment {
         fileVersionsFileManagement.setEnabled(isOnline);
         clearVersionsFileManagement.setEnabled(isOnline);
         clearVersionsFileManagement.setLayoutResource(isOnline ? R.layout.delete_versions_preferences : R.layout.delete_versions_preferences_disabled);
+    }
+
+    private void showWarningDisableVersions() {
+        enableVersionsSwitch.setChecked(true);
+        disableVersionsWarning = new MaterialAlertDialogBuilder(requireContext())
+                .setTitle(StringResourcesUtils.getString(R.string.disable_versioning_label))
+                .setMessage(StringResourcesUtils.getString(R.string.disable_versioning_warning))
+                .setPositiveButton(StringResourcesUtils.getString(R.string.verify_2fa_subtitle_diable_2fa),
+                        (dialog, which) -> megaApi.setFileVersionsOption(true, new SetAttrUserListener(context)))
+                .setNegativeButton(StringResourcesUtils.getString(R.string.general_cancel), null)
+                .show();
     }
 }

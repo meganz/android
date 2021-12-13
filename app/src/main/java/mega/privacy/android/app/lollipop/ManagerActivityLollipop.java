@@ -2242,7 +2242,8 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 						logDebug("IPC link - go to received request in Contacts");
 						markNotificationsSeen(true);
 						navigateToContactRequests();
-						selectDrawerItemPending=false;
+						getIntent().setAction(null);
+						setIntent(null);
 					}
 					else if(getIntent().getAction().equals(ACTION_CHAT_NOTIFICATION_MESSAGE)){
 						logDebug("Chat notitificacion received");
@@ -11502,6 +11503,13 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 				openFullscreenOfflineFragment(
 						removeInitialOfflinePath(transfer.getPath()) + SEPARATOR);
 			} else {
+				File file = new File(transfer.getPath());
+
+				if (!isFileAvailable(file)) {
+					showSnackbar(SNACKBAR_TYPE, StringResourcesUtils.getString(R.string.location_not_exist), MEGACHAT_INVALID_HANDLE);
+					return;
+				}
+
 				Intent intent = new Intent(this, FileStorageActivityLollipop.class);
 				intent.setAction(FileStorageActivityLollipop.Mode.BROWSE_FILES.getAction());
 				intent.putExtra(FileStorageActivityLollipop.EXTRA_PATH, transfer.getPath());

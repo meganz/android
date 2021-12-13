@@ -8,6 +8,8 @@ import android.view.Menu
 import android.view.MenuInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.res.ResourcesCompat
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
@@ -44,6 +46,52 @@ class ContactGroupsFragment : Fragment() {
 
     private val viewModel by viewModels<ContactGroupsViewModel>()
     private val groupsAdapter by lazy { ContactGroupsAdapter(::onGroupClick) }
+    private lateinit var createGroupChatLauncher: ActivityResultLauncher<Intent>
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+
+        createGroupChatLauncher =
+            registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+                val intent = result.data
+                val resultCode = result.resultCode
+                if (resultCode != Activity.RESULT_OK || intent == null) {
+                    LogUtil.logWarning("Error creating chat")
+                    return@registerForActivityResult
+                }
+
+                val contactsData =
+                    intent.getStringArrayListExtra(AddContactActivityLollipop.EXTRA_CONTACTS)
+                val isGroup =
+                    intent.getBooleanExtra(AddContactActivityLollipop.EXTRA_GROUP_CHAT, false)
+
+                if (contactsData == null || !isGroup) {
+                    LogUtil.logWarning("Is one to one chat or no contacts selected")
+                    return@registerForActivityResult
+                }
+
+                val chatTitle =
+                    intent.getStringExtra(AddContactActivityLollipop.EXTRA_CHAT_TITLE)
+
+                viewModel.getGroupChatRoom(contactsData, chatTitle)
+                    .observe(viewLifecycleOwner) { chatId ->
+                        if (chatId == MEGACHAT_INVALID_HANDLE) {
+                            (requireActivity() as SnackbarShower).showSnackbar(
+                                StringResourcesUtils.getString(R.string.create_chat_error)
+                            )
+                        } else {
+                            Intent(
+                                requireContext(),
+                                ChatActivityLollipop::class.java
+                            ).apply {
+                                action = Constants.ACTION_CHAT_SHOW_MESSAGES
+                                putExtra(Constants.CHAT_ID, chatId)
+                                startActivity(this)
+                            }
+                        }
+                    }
+            }
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -98,10 +146,7 @@ class ContactGroupsFragment : Fragment() {
                 putExtra(AddContactActivityLollipop.EXTRA_CONTACT_TYPE, Constants.CONTACT_TYPE_MEGA)
                 putExtra(AddContactActivityLollipop.EXTRA_ONLY_CREATE_GROUP, true)
             }
-            startActivityForResult(
-                intent,
-                Constants.REQUEST_CREATE_CHAT
-            )
+            intentToCreateGroupChat(intent)
         }
 
         binding.viewEmpty.text = binding.viewEmpty.text.toString()
@@ -110,47 +155,11 @@ class ContactGroupsFragment : Fragment() {
             .toSpannedHtmlText()
     }
 
-    override fun onActivityResult(requestCode: Int, resultCode: Int, intent: Intent?) {
-        super.onActivityResult(requestCode, resultCode, intent)
-
-        when (requestCode) {
-            Constants.REQUEST_CREATE_CHAT -> {
-                if (resultCode == Activity.RESULT_OK && intent != null) {
-                    val contactsData =
-                        intent.getStringArrayListExtra(AddContactActivityLollipop.EXTRA_CONTACTS)
-                    val isGroup =
-                        intent.getBooleanExtra(AddContactActivityLollipop.EXTRA_GROUP_CHAT, false)
-                    if (contactsData == null || !isGroup) {
-                        LogUtil.logWarning("Is one to one chat or no contacts selected")
-                        return
-                    }
-
-                    val chatTitle =
-                        intent.getStringExtra(AddContactActivityLollipop.EXTRA_CHAT_TITLE)
-
-                    viewModel.getGroupChatRoom(contactsData, chatTitle)
-                        .observe(viewLifecycleOwner) { chatId ->
-                            if (chatId == MEGACHAT_INVALID_HANDLE) {
-                                (requireActivity() as SnackbarShower).showSnackbar(
-                                    StringResourcesUtils.getString(R.string.create_chat_error)
-                                )
-                            } else {
-                                val intent =
-                                    Intent(
-                                        requireContext(),
-                                        ChatActivityLollipop::class.java
-                                    ).apply {
-                                        action = Constants.ACTION_CHAT_SHOW_MESSAGES
-                                        putExtra(Constants.CHAT_ID, chatId)
-                                    }
-                                startActivity(intent)
-                            }
-                        }
-                } else {
-                    LogUtil.logWarning("Error creating chat")
-                }
-            }
-        }
+    /**
+     * Launches an Intent to open create group chat room screen.
+     */
+    private fun intentToCreateGroupChat(intent: Intent) {
+        createGroupChatLauncher.launch(intent)
     }
 
     private fun setupObservers() {

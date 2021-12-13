@@ -89,6 +89,7 @@ class AudioViewModel @ViewModelInject constructor(
         items.observeForever(loadFinishedObserver)
         LiveEventBus.get(EVENT_NODES_CHANGE, Boolean::class.java)
             .observeForever(nodesChangeObserver)
+        loadAudio(true)
     }
 
     /**
