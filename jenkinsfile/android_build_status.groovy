@@ -28,33 +28,32 @@ pipeline {
     // Stop the build early in case of compile or test failures
     skipStagesAfterUnstable()
     timeout(time: 2, unit: 'HOURS')
+    gitLabConnection('GitLabConnection')
   }
+
   stages {
+
+    stage('Notify GitLab Test') {
+      steps {
+        echo 'Notify GitLab'
+        updateGitlabCommitStatus name: 'build', state: 'pending'
+        updateGitlabCommitStatus name: 'build', state: 'success'
+      }
+    }
+
     stage('Fetch SDK Submodules') {
       steps {
         withCredentials([gitUsernamePassword(credentialsId: 'Gitlab-Access-Token', gitToolName: 'Default')]) {
-          // injectEnvironments({
-            sh 'git config --file=.gitmodules submodule."app/src/main/jni/mega/sdk".url https://code.developers.mega.co.nz/sdk/sdk.git'
-            sh 'git config --file=.gitmodules submodule."app/src/main/jni/mega/sdk".branch develop'
-            sh 'git config --file=.gitmodules submodule."app/src/main/jni/megachat/sdk".url https://code.developers.mega.co.nz/megachat/MEGAchat.git'
-            sh 'git config --file=.gitmodules submodule."app/src/main/jni/megachat/sdk".branch develop'
-            sh 'git submodule sync'
-            sh 'git submodule update --init --recursive --remote'
-          // })
+          sh 'git config --file=.gitmodules submodule."app/src/main/jni/mega/sdk".url https://code.developers.mega.co.nz/sdk/sdk.git'
+          sh 'git config --file=.gitmodules submodule."app/src/main/jni/mega/sdk".branch develop'
+          sh 'git config --file=.gitmodules submodule."app/src/main/jni/megachat/sdk".url https://code.developers.mega.co.nz/megachat/MEGAchat.git'
+          sh 'git config --file=.gitmodules submodule."app/src/main/jni/megachat/sdk".branch develop'
+          sh 'git submodule sync'
+          sh 'git submodule update --init --recursive --remote'
         }
       }
     }
 
-    // stage('Fetch SDK Submodules') {
-    //   steps {
-    //     sh 'git config --file=.gitmodules submodule."app/src/main/jni/mega/sdk".url https://code.developers.mega.co.nz/sdk/sdk.git'
-    //     sh 'git config --file=.gitmodules submodule."app/src/main/jni/mega/sdk".branch develop'
-    //     sh 'git config --file=.gitmodules submodule."app/src/main/jni/megachat/sdk".url https://code.developers.mega.co.nz/megachat/MEGAchat.git'
-    //     sh 'git config --file=.gitmodules submodule."app/src/main/jni/megachat/sdk".branch develop'
-    //     sh 'git submodule sync'
-    //     sh 'git submodule update --init --recursive --remote'
-    //   }
-    // }
     stage('Download Dependency Lib for SDK') {
       steps {
         sh """
