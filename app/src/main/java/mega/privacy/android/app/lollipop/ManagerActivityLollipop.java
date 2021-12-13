@@ -6815,6 +6815,10 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 				parentHandle = getParentHandleBrowser();
 				break;
 
+			case INBOX:
+				parentHandle = parentHandleInbox;
+				break;
+
 			case SHARED_ITEMS:
 				if (viewPagerShares == null) break;
 
