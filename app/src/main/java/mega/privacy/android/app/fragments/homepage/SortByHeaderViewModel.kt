@@ -72,6 +72,13 @@ class SortByHeaderViewModel @ViewModelInject constructor(
         LiveEventBus.get(EVENT_UPDATE_VIEW_MODE, Boolean::class.java).post(!isList)
     }
 
+    /**
+     * Enter media discovery view.
+     */
+    fun enterMediaDiscovery() {
+        //TODO
+    }
+
     override fun onCleared() {
         @Suppress("UNCHECKED_CAST")
         LiveEventBus.get(EVENT_ORDER_CHANGE)
