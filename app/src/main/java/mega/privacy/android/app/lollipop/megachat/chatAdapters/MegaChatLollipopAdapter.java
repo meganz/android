@@ -3460,8 +3460,8 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             if (message.isEdited()) {
                 logDebug("Message is edited");
                 Spannable content = new SpannableString(messageContent);
-                holder.urlContactMessageText.setText(content + " ");
                 content.setSpan(new ForegroundColorSpan(ContextCompat.getColor(context, R.color.grey_087_white_087)), 0, content.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+                holder.urlContactMessageText.setText(content + " ");
 
                 Spannable edited = new SpannableString(context.getString(R.string.edited_message_text));
                 edited.setSpan(new RelativeSizeSpan(0.70f), 0, edited.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
@@ -3475,7 +3475,6 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             }
 
             checkEmojiSize(messageContent, holder.urlContactMessageText);
-            holder.urlContactMessageText.setText(holder.urlContactMessageText.getText().toString());
 
             holder.ownMessageLayout.setVisibility(View.GONE);
             holder.contactMessageLayout.setVisibility(View.VISIBLE);
