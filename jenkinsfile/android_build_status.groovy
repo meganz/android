@@ -41,6 +41,7 @@ pipeline {
         updateGitlabCommitStatus name: 'test', state: 'pending'
         updateGitlabCommitStatus name: 'test', state: 'failed'
         addGitLabMRComment comment: 'Another build has been triggered in CI'
+        slackSend color: "good", message: "Message from Jenkins Pipeline - Android"
       }
     }
 
