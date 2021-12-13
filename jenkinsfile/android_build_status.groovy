@@ -40,7 +40,7 @@ pipeline {
         updateGitlabCommitStatus name: 'build', state: 'failed'
         updateGitlabCommitStatus name: 'test', state: 'pending'
         updateGitlabCommitStatus name: 'test', state: 'failed'
-        addGitLabMRComment comment: 'A build has happened in CI'
+        addGitLabMRComment comment: 'A build has been triggered in CI'
       }
     }
 
