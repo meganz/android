@@ -86,60 +86,60 @@ pipeline {
         stage('Download Dependency Lib for SDK') {
             steps {
                 sh """
-
-        mkdir -p "${BUILD_LIB_DOWNLOAD_FOLDER}"
-        cd "${BUILD_LIB_DOWNLOAD_FOLDER}"
-        pwd
-        ls -lh
-
-        ## check webrtc file
-        if test -f "${BUILD_LIB_DOWNLOAD_FOLDER}/${WEBRTC_LIB_FILE}"; then
-          echo "${WEBRTC_LIB_FILE} already downloaded. Skip downloading."
-        else
-          echo "downloading webrtc"
-          mega-get ${WEBRTC_LIB_URL} >> ${CONSOLE_LOG_FILE}  2>&1
-
-          echo "unzipping webrtc"
-          rm -fr ${WEBRTC_LIB_UNZIPPED}
-          unzip ${WEBRTC_LIB_FILE} -d ${WEBRTC_LIB_UNZIPPED}
-        fi
-
-        ## check default google api
-        if test -f "${BUILD_LIB_DOWNLOAD_FOLDER}/${GOOGLE_MAP_API_FILE}"; then
-          echo "${GOOGLE_MAP_API_FILE} already downloaded. Skip downloading."
-        else
-          echo "downloading google map api"
-          mega-get ${GOOGLE_MAP_API_URL} >> ${CONSOLE_LOG_FILE} 2>&1
-
-          echo "unzipping google map api"
-          rm -fr ${GOOGLE_MAP_API_UNZIPPED}
-          unzip ${GOOGLE_MAP_API_FILE} -d ${GOOGLE_MAP_API_UNZIPPED}
-        fi
-
-        ls -lh >> ${CONSOLE_LOG_FILE}
-
-        cd ${WORKSPACE}
-        pwd
-        # apply dependency patch
-        rm -fr app/src/main/jni/megachat/webrtc
-
-        ## ATTENTION: sometimes the downloaded webrtc zip has a enclosing folder. like below.
-        ## so we might need to adjust below path when there is a new webrtc zip
-        cp -fr ${BUILD_LIB_DOWNLOAD_FOLDER}/${WEBRTC_LIB_UNZIPPED}/webrtc_branch-heads4405/webrtc app/src/main/jni/megachat/
+                mkdir -p "${BUILD_LIB_DOWNLOAD_FOLDER}"
+                cd "${BUILD_LIB_DOWNLOAD_FOLDER}"
+                pwd
+                ls -lh
         
-        rm -fr app/src/debug
-        rm -fr app/src/release
-        cp -fr ${BUILD_LIB_DOWNLOAD_FOLDER}/${GOOGLE_MAP_API_UNZIPPED}/* app/src/
-
-        """
+                ## check webrtc file
+                if test -f "${BUILD_LIB_DOWNLOAD_FOLDER}/${WEBRTC_LIB_FILE}"; then
+                  echo "${WEBRTC_LIB_FILE} already downloaded. Skip downloading."
+                else
+                  echo "downloading webrtc"
+                  mega-get ${WEBRTC_LIB_URL} >> ${CONSOLE_LOG_FILE}  2>&1
+        
+                  echo "unzipping webrtc"
+                  rm -fr ${WEBRTC_LIB_UNZIPPED}
+                  unzip ${WEBRTC_LIB_FILE} -d ${WEBRTC_LIB_UNZIPPED}
+                fi
+        
+                ## check default google api
+                if test -f "${BUILD_LIB_DOWNLOAD_FOLDER}/${GOOGLE_MAP_API_FILE}"; then
+                  echo "${GOOGLE_MAP_API_FILE} already downloaded. Skip downloading."
+                else
+                  echo "downloading google map api"
+                  mega-get ${GOOGLE_MAP_API_URL} >> ${CONSOLE_LOG_FILE} 2>&1
+        
+                  echo "unzipping google map api"
+                  rm -fr ${GOOGLE_MAP_API_UNZIPPED}
+                  unzip ${GOOGLE_MAP_API_FILE} -d ${GOOGLE_MAP_API_UNZIPPED}
+                fi
+        
+                ls -lh >> ${CONSOLE_LOG_FILE}
+        
+                cd ${WORKSPACE}
+                pwd
+                # apply dependency patch
+                rm -fr app/src/main/jni/megachat/webrtc
+        
+                ## ATTENTION: sometimes the downloaded webrtc zip has a enclosing folder. like below.
+                ## so we might need to adjust below path when there is a new webrtc zip
+                cp -fr ${BUILD_LIB_DOWNLOAD_FOLDER}/${WEBRTC_LIB_UNZIPPED}/webrtc_branch-heads4405/webrtc app/src/main/jni/megachat/
+                
+                rm -fr app/src/debug
+                rm -fr app/src/release
+                cp -fr ${BUILD_LIB_DOWNLOAD_FOLDER}/${GOOGLE_MAP_API_UNZIPPED}/* app/src/
+        
+                """
             }
         }
         stage('Build SDK') {
             steps {
                 sh """
-        cd ${WORKSPACE}/app/src/main/jni
-        /opt/homebrew/bin/bash build.sh all >> ${CONSOLE_LOG_FILE}  2>&1
-        """
+                cd ${WORKSPACE}/app/src/main/jni
+                ## /opt/homebrew/bin/bash build.sh all >> ${CONSOLE_LOG_FILE}  2>&1
+                /opt/homebrew/bin/bash build.sh all
+                """
             }
         }
         stage('Compile') {
