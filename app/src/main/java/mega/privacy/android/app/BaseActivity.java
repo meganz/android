@@ -47,6 +47,7 @@ import javax.inject.Inject;
 
 import dagger.hilt.android.AndroidEntryPoint;
 import kotlin.Pair;
+import kotlin.Suppress;
 import mega.privacy.android.app.globalmanagement.MyAccountInfo;
 import mega.privacy.android.app.interfaces.ActivityLauncher;
 import mega.privacy.android.app.interfaces.PermissionRequester;
@@ -749,6 +750,9 @@ public class BaseActivity extends AppCompatActivity implements ActivityLauncher,
                 case SNACKBAR_IMCOMPATIBILITY_TYPE:
                     snackbar = Snackbar.make(view, !isTextEmpty(s) ? s : getString(R.string.sent_as_message), Snackbar.LENGTH_INDEFINITE);
                     break;
+                case DISMISS_ACTION_SNACKBAR:
+                    snackbar = Snackbar.make(view, s, Snackbar.LENGTH_INDEFINITE);
+                    break;
                 default:
                     snackbar = Snackbar.make(view, s, Snackbar.LENGTH_LONG);
                     break;
@@ -810,6 +814,11 @@ public class BaseActivity extends AppCompatActivity implements ActivityLauncher,
                 snackbar.show();
                 break;
             }
+
+            case DISMISS_ACTION_SNACKBAR:
+                snackbar.setAction(R.string.general_ok, new SnackbarNavigateOption(view.getContext(), type));
+                snackbar.show();
+                break;
         }
     }
 
@@ -1247,6 +1256,7 @@ public class BaseActivity extends AppCompatActivity implements ActivityLauncher,
     }
 
     @Override
+    @SuppressWarnings("deprecation") // TODO Migrate to registerForActivityResult()
     public void launchActivityForResult(@NotNull Intent intent, int requestCode) {
         startActivityForResult(intent, requestCode);
     }

@@ -1,5 +1,22 @@
 package mega.privacy.android.app.fragments.managerFragments.cu;
 
+import static java.time.format.DateTimeFormatter.ofPattern;
+import static java.util.concurrent.TimeUnit.MILLISECONDS;
+import static mega.privacy.android.app.constants.SettingsConstants.DEFAULT_CONVENTION_QUEUE_SIZE;
+import static mega.privacy.android.app.constants.SettingsConstants.VIDEO_QUALITY_ORIGINAL;
+import static mega.privacy.android.app.utils.Constants.GET_THUMBNAIL_THROTTLE_MS;
+import static mega.privacy.android.app.utils.Constants.INVALID_POSITION;
+import static mega.privacy.android.app.utils.FileUtil.JPG_EXTENSION;
+import static mega.privacy.android.app.utils.FileUtil.buildDefaultDownloadDir;
+import static mega.privacy.android.app.utils.FileUtil.isVideoFile;
+import static mega.privacy.android.app.utils.LogUtil.logDebug;
+import static mega.privacy.android.app.utils.PreviewUtils.getPreviewFolder;
+import static mega.privacy.android.app.utils.RxUtil.IGNORE;
+import static mega.privacy.android.app.utils.RxUtil.logErr;
+import static mega.privacy.android.app.utils.ThumbnailUtilsLollipop.getThumbFolder;
+import static mega.privacy.android.app.utils.Util.fromEpoch;
+import static nz.mega.sdk.MegaApiJava.ORDER_MODIFICATION_DESC;
+
 import android.content.Context;
 import android.os.Environment;
 import android.util.Pair;
@@ -15,7 +32,9 @@ import java.time.LocalDate;
 import java.time.Year;
 import java.time.YearMonth;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 import javax.inject.Inject;
@@ -27,36 +46,24 @@ import io.reactivex.rxjava3.core.Single;
 import io.reactivex.rxjava3.schedulers.Schedulers;
 import io.reactivex.rxjava3.subjects.PublishSubject;
 import io.reactivex.rxjava3.subjects.Subject;
+import kotlin.Unit;
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.arch.BaseRxViewModel;
 import mega.privacy.android.app.di.MegaApi;
+import mega.privacy.android.app.fragments.homepage.photos.CardClickHandler;
+import mega.privacy.android.app.fragments.homepage.photos.DateCardsProvider;
 import mega.privacy.android.app.globalmanagement.SortOrderManagement;
 import mega.privacy.android.app.listeners.BaseListener;
+import mega.privacy.android.app.listeners.OptionalMegaRequestListenerInterface;
 import mega.privacy.android.app.repo.MegaNodeRepo;
+import mega.privacy.android.app.utils.ZoomUtil;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
-
-import static java.time.format.DateTimeFormatter.ofPattern;
-import static java.util.concurrent.TimeUnit.MILLISECONDS;
-import static mega.privacy.android.app.constants.SettingsConstants.DEFAULT_CONVENTION_QUEUE_SIZE;
-import static mega.privacy.android.app.constants.SettingsConstants.VIDEO_QUALITY_MEDIUM;
-import static mega.privacy.android.app.utils.Constants.GET_THUMBNAIL_THROTTLE_MS;
-import static mega.privacy.android.app.utils.Constants.INVALID_POSITION;
-import static mega.privacy.android.app.utils.FileUtil.JPG_EXTENSION;
-import static mega.privacy.android.app.utils.FileUtil.buildDefaultDownloadDir;
-import static mega.privacy.android.app.utils.FileUtil.isVideoFile;
-import static mega.privacy.android.app.utils.LogUtil.logDebug;
-import static mega.privacy.android.app.utils.PreviewUtils.getPreviewFolder;
-import static mega.privacy.android.app.utils.RxUtil.IGNORE;
-import static mega.privacy.android.app.utils.RxUtil.logErr;
-import static mega.privacy.android.app.utils.ThumbnailUtilsLollipop.getThumbFolder;
-import static mega.privacy.android.app.utils.Util.fromEpoch;
-import static nz.mega.sdk.MegaApiJava.ORDER_MODIFICATION_DESC;
 
 class CuViewModel extends BaseRxViewModel {
     private final MegaApiAndroid mMegaApi;
@@ -77,14 +84,20 @@ class CuViewModel extends BaseRxViewModel {
 
     private final Subject<Pair<Integer, CuNode>> mOpenNodeAction = PublishSubject.create();
     private final Subject<Object> mCreatingThumbnailFinished = PublishSubject.create();
-    private final Subject<Object> creatingPreviewFinished = PublishSubject.create();
+    private final Subject<Object> mCreatingPreviewFinished = PublishSubject.create();
+    private final Subject<Object> mCreatePreviewForCardFinished = PublishSubject.create();
 
     private final MegaRequestListenerInterface mCreateThumbnailRequest;
     private final MegaRequestListenerInterface createPreviewRequest;
+    private final MegaRequestListenerInterface mCreatePreviewForCardRequest;
     private final LongSparseArray<MegaNode> mSelectedNodes = new LongSparseArray<>(5);
     private boolean mSelecting;
     private int mRealNodeCount;
     private boolean enableCUShown;
+
+    private Set<Long> thumbnailHandle = new HashSet<>();
+    private Set<Long> previewHandle = new HashSet<>();
+    private int mZoom;
 
     public boolean isEnableCUShown() {
         return enableCUShown;
@@ -115,10 +128,18 @@ class CuViewModel extends BaseRxViewModel {
             @Override
             public void onRequestFinish(@NotNull MegaApiJava api, @NotNull MegaRequest request, @NotNull MegaError e) {
                 if (e.getErrorCode() == MegaError.API_OK) {
-                    creatingPreviewFinished.onNext(true);
+                    mCreatingPreviewFinished.onNext(true);
                 }
             }
         };
+
+        mCreatePreviewForCardRequest = new OptionalMegaRequestListenerInterface(null, null, null,
+                (MegaRequest request, MegaError e) -> {
+                    if (e.getErrorCode() == MegaError.API_OK) {
+                        mCreatePreviewForCardFinished.onNext(true);
+                    }
+                    return Unit.INSTANCE;
+                });
 
         loadNodes();
         getCards();
@@ -130,7 +151,10 @@ class CuViewModel extends BaseRxViewModel {
         add(mCreatingThumbnailFinished.throttleLatest(1, TimeUnit.SECONDS, true)
                 .subscribe(ignored -> loadNodes(), logErr("creatingThumbnailFinished")));
 
-        add(creatingPreviewFinished.throttleLatest(1, TimeUnit.SECONDS, true)
+        add(mCreatingPreviewFinished.throttleLatest(1, TimeUnit.SECONDS, true)
+                .subscribe(ignored -> loadNodes(), logErr("creatingPreviewFinished")));
+
+        add(mCreatePreviewForCardFinished.throttleLatest(1, TimeUnit.SECONDS, true)
                 .subscribe(ignored -> getCards(), logErr("creatingPreviewFinished")));
     }
 
@@ -351,11 +375,12 @@ class CuViewModel extends BaseRxViewModel {
                             syncVideo ? MegaPreferences.PHOTOS_AND_VIDEOS
                                     : MegaPreferences.ONLY_PHOTOS);
 
-                    mDbHandler.setCameraUploadVideoQuality(VIDEO_QUALITY_MEDIUM);
+                    mDbHandler.setCameraUploadVideoQuality(VIDEO_QUALITY_ORIGINAL);
                     mDbHandler.setConversionOnCharging(true);
                     mDbHandler.setChargingOnSize(DEFAULT_CONVENTION_QUEUE_SIZE);
                     // After target and local folder setup, then enable CU.
                     mDbHandler.setCamSyncEnabled(true);
+                    camSyncEnabled.postValue(true);
                     return true;
                 })
                 .subscribeOn(Schedulers.io())
@@ -382,7 +407,7 @@ class CuViewModel extends BaseRxViewModel {
     /**
      * Gets CU and MU content as CUNode objects.
      * Content means images and videos which are located on CU and MU folders.
-     *
+     * <p>
      * Also requests needed thumbnails to show in holders if not exist yet.
      *
      * @return The list of CUNode objects.
@@ -390,13 +415,17 @@ class CuViewModel extends BaseRxViewModel {
     private List<CuNode> getCuNodes() {
         List<CuNode> nodes = new ArrayList<>();
         List<MegaNode> nodesWithoutThumbnail = new ArrayList<>();
+        List<MegaNode> nodesWithoutPreview = new ArrayList<>();
+        LocalDate lastYearDate = null;
         LocalDate lastMonthDate = null;
+        LocalDate lastDayDate = null;
         List<Pair<Integer, MegaNode>> realNodes =
                 mRepo.getFilteredCuChildrenAsPairs(mSortOrderManagement.getOrderCamera());
 
         for (Pair<Integer, MegaNode> pair : realNodes) {
             MegaNode node = pair.second;
             File thumbnail = new File(getThumbFolder(mAppContext), node.getBase64Handle() + JPG_EXTENSION);
+            File preview = new File(getPreviewFolder(mAppContext), node.getBase64Handle() + JPG_EXTENSION);
             LocalDate modifyDate = fromEpoch(node.getModificationTime());
             String dateString = ofPattern("MMMM yyyy").format(modifyDate);
             boolean sameYear = Year.from(LocalDate.now()).equals(Year.from(modifyDate));
@@ -406,17 +435,37 @@ class CuViewModel extends BaseRxViewModel {
                     dateString,
                     mSelectedNodes.containsKey(node.getHandle()));
 
-            if (lastMonthDate == null
-                    || !YearMonth.from(lastMonthDate).equals(YearMonth.from(modifyDate))) {
-                lastMonthDate = modifyDate;
-                nodes.add(new CuNode(dateString, new Pair<>(ofPattern("MMMM").format(modifyDate),
-                        sameYear ? "" : ofPattern("yyyy").format(modifyDate))));
+            if (mZoom == ZoomUtil.ZOOM_OUT_2X) {
+                if (lastYearDate == null || !Year.from(lastYearDate).equals(Year.from(modifyDate))) {
+                    lastYearDate = modifyDate;
+                    String date = ofPattern("yyyy").format(modifyDate);
+                    nodes.add(new CuNode(date, new Pair<>(date, "")));
+                }
+            } else if (mZoom == ZoomUtil.ZOOM_IN_1X) {
+                if (lastDayDate == null || lastDayDate.getDayOfYear() != modifyDate.getDayOfYear()) {
+                    lastDayDate = modifyDate;
+                    nodes.add(new CuNode(dateString, new Pair<>(ofPattern("dd MMMM").format(modifyDate),
+                            sameYear ? "" : ofPattern("yyyy").format(modifyDate))));
+                }
+                // For zoom in 1X, use preview file as thumbnail to avoid blur.
+                cuNode.setThumbnail(preview);
+            } else {
+                if (lastMonthDate == null
+                        || !YearMonth.from(lastMonthDate).equals(YearMonth.from(modifyDate))) {
+                    lastMonthDate = modifyDate;
+                    nodes.add(new CuNode(dateString, new Pair<>(ofPattern("MMMM").format(modifyDate),
+                            sameYear ? "" : ofPattern("yyyy").format(modifyDate))));
+                }
             }
 
             nodes.add(cuNode);
 
             if (!thumbnail.exists()) {
                 nodesWithoutThumbnail.add(node);
+            }
+
+            if (!preview.exists() && mZoom == ZoomUtil.ZOOM_IN_1X) {
+                nodesWithoutPreview.add(node);
             }
         }
 
@@ -428,10 +477,34 @@ class CuViewModel extends BaseRxViewModel {
                         (node, interval) -> node)
                 .observeOn(Schedulers.computation())
                 .subscribe(node -> {
-                    File thumbnail =
-                            new File(getThumbFolder(mAppContext), node.getBase64Handle() + JPG_EXTENSION);
-                    mMegaApi.getThumbnail(node, thumbnail.getAbsolutePath(), mCreateThumbnailRequest);
+                    if (!thumbnailHandle.contains(node.getHandle())) {
+                        thumbnailHandle.add(node.getHandle());
+
+                        File thumbnail =
+                                new File(getThumbFolder(mAppContext), node.getBase64Handle() + JPG_EXTENSION);
+                        if (!thumbnail.exists()) {
+                            mMegaApi.getThumbnail(node, thumbnail.getAbsolutePath(), mCreateThumbnailRequest);
+                        }
+                    }
+
                 }, logErr("CuViewModel getThumbnail")));
+
+        // Fetch previews of nodes in computation thread, fetching each in 50ms interval
+        add(Observable.fromIterable(nodesWithoutPreview)
+                .zipWith(Observable.interval(GET_THUMBNAIL_THROTTLE_MS, MILLISECONDS),
+                        (node, interval) -> node)
+                .observeOn(Schedulers.computation())
+                .subscribe(node -> {
+                    if (!previewHandle.contains(node.getHandle())) {
+                        previewHandle.add(node.getHandle());
+
+                        File preview =
+                                new File(getPreviewFolder(mAppContext), node.getBase64Handle() + JPG_EXTENSION);
+                        if (!preview.exists()) {
+                            mMegaApi.getPreview(node, preview.getAbsolutePath(), createPreviewRequest);
+                        }
+                    }
+                }, logErr("CuViewModel getPreview")));
 
         return nodes;
     }
@@ -441,100 +514,28 @@ class CuViewModel extends BaseRxViewModel {
      * - Day cards:   Content organized by days.
      * - Month cards: Content organized by months.
      * - Year cards:  Content organized by years.
-     *
+     * <p>
      * Also requests needed previews to show in cards if not exist yet.
      */
     public void getCards() {
-        List<CUCard> days = new ArrayList<>();
-        List<CUCard> months = new ArrayList<>();
-        List<CUCard> years = new ArrayList<>();
-        List<MegaNode> nodesWithoutPreview = new ArrayList<>();
-        LocalDate lastDayDate = null;
-        LocalDate lastMonthDate = null;
-        LocalDate lastYearDate = null;
+        DateCardsProvider cardsProvider = new DateCardsProvider();
         List<MegaNode> cardNodes = mRepo.getFilteredCuChildren(ORDER_MODIFICATION_DESC);
+        cardsProvider.extractCardsFromNodeList(mAppContext, cardNodes);
 
-        for (MegaNode node : cardNodes) {
-            boolean shouldGetPreview = false;
-            File preview = new File(getPreviewFolder(mAppContext), node.getBase64Handle() + JPG_EXTENSION);
-            LocalDate modifyDate = fromEpoch(node.getModificationTime());
-            String day = ofPattern("dd").format(modifyDate);
-            String month = ofPattern("MMMM").format(modifyDate);
-            String year = ofPattern("yyyy").format(modifyDate);
-            boolean sameYear = Year.from(LocalDate.now()).equals(Year.from(modifyDate));
-
-            if (lastDayDate == null || lastDayDate.getDayOfYear() != modifyDate.getDayOfYear()) {
-                shouldGetPreview = true;
-                lastDayDate = modifyDate;
-                String date = ofPattern(sameYear ? "dd MMMM" : "dd MMMM yyyy").format(lastDayDate);
-                days.add(new CUCard(node, preview.exists() ? preview : null, day, month,
-                        sameYear ? null : year, date, modifyDate, 0));
-            } else if (!days.isEmpty()){
-                days.get(days.size() - 1).incrementNumItems();
-            }
-
-            if (lastMonthDate == null
-                    || !YearMonth.from(lastMonthDate).equals(YearMonth.from(modifyDate))) {
-                shouldGetPreview = true;
-                lastMonthDate = modifyDate;
-                String date = sameYear ? month : ofPattern("MMMM yyyy").format(modifyDate);
-                months.add(new CUCard(node, preview.exists() ? preview : null,null, month,
-                        sameYear ? null : year, date, modifyDate, 0));
-            }
-
-            if (lastYearDate == null || !Year.from(lastYearDate).equals(Year.from(modifyDate))) {
-                shouldGetPreview = true;
-                lastYearDate = modifyDate;
-                years.add(new CUCard(node, preview.exists() ? preview : null,null, null,
-                        year, year, modifyDate, 0));
-            }
-
-            if (shouldGetPreview && !preview.exists()) {
-                nodesWithoutPreview.add(node);
-            }
-        }
-
-        add(Observable.fromIterable(nodesWithoutPreview)
+        add(Observable.fromIterable(cardsProvider.getNodesWithoutPreview().keySet())
                 .zipWith(Observable.interval(GET_THUMBNAIL_THROTTLE_MS, MILLISECONDS),
                         (node, interval) -> node)
                 .observeOn(Schedulers.computation())
                 .subscribe(node -> {
                     File preview = new File(getPreviewFolder(mAppContext), node.getBase64Handle() + JPG_EXTENSION);
-                    mMegaApi.getPreview(node, preview.getAbsolutePath(), createPreviewRequest);
+                    if (!preview.exists()) {
+                        mMegaApi.getPreview(node, preview.getAbsolutePath(), mCreatePreviewForCardRequest);
+                    }
                 }, logErr("CuViewModel getPreview")));
 
-        dayCards.postValue(days);
-        monthCards.postValue(months);
-        yearCards.postValue(years);
-    }
-
-    /**
-     * Checks a clicked card, if it is in the provided list and if is in right position.
-     *
-     * @param position Clicked position in the list.
-     * @param handle   Identifier of the card node.
-     * @param cards    List of cards to check.
-     * @return The checked card if found, null otherwise.
-     */
-    private CUCard getClickedCard(int position, long handle, List<CUCard> cards) {
-        if (cards == null) {
-            return null;
-        }
-
-        CUCard card = cards.get(position);
-
-        if (handle != card.getNode().getHandle()) {
-            card = null;
-
-            for (CUCard c : cards) {
-                if (c.getNode().getHandle() == handle) {
-                    card = c;
-                    break;
-                }
-            }
-        }
-
-        return card;
+        dayCards.postValue(cardsProvider.getDays());
+        monthCards.postValue(cardsProvider.getMonths());
+        yearCards.postValue(cardsProvider.getYears());
     }
 
     /**
@@ -545,7 +546,7 @@ class CuViewModel extends BaseRxViewModel {
      * @return The checked day card.
      */
     public CUCard dayClicked(int position, CUCard card) {
-        return getClickedCard(position, card.getNode().getHandle(), getDayCards());
+        return CardClickHandler.INSTANCE.getClickedCard(position, card.getNode().getHandle(), getDayCards());
     }
 
     /**
@@ -557,44 +558,7 @@ class CuViewModel extends BaseRxViewModel {
      * the closest day to the current.
      */
     public int monthClicked(int position, CUCard card) {
-        CUCard monthCard = getClickedCard(position, card.getNode().getHandle(), getMonthCards());
-        if (monthCard == null) {
-            return 0;
-        }
-
-        List<CUCard> dayCards = getDayCards();
-        LocalDate cardLocalDate = monthCard.getLocalDate();
-        int cardMonth = cardLocalDate.getMonthValue();
-        int cardYear = cardLocalDate.getYear();
-        int currentDay = LocalDate.now().getDayOfMonth();
-        int dayPosition = 0;
-
-        for (int i = 0; i < dayCards.size(); i++) {
-            LocalDate nextLocalDate = dayCards.get(i).getLocalDate();
-            int nextDay = nextLocalDate.getDayOfMonth();
-            int nextMonth = nextLocalDate.getMonthValue();
-            int nextYear = nextLocalDate.getYear();
-
-            if (nextYear == cardYear && nextMonth == cardMonth) {
-                if (nextDay <= currentDay) {
-                    //Month of year clicked, current day. If not exists, the closest day behind the current.
-                    if (i == 0 || nextDay == currentDay
-                            || dayCards.get(i - 1).getLocalDate().getMonthValue() != cardMonth) {
-                        return i;
-                    }
-
-                    int previousDay = dayCards.get(i - 1).getLocalDate().getDayOfMonth();
-
-                    //The closest day to the current
-                    return previousDay - currentDay <= currentDay - nextDay ? i - 1 : i;
-                } else {
-                    //Save the closest day above the current in case there is no day of month behind the current.
-                    dayPosition = i;
-                }
-            }
-        }
-
-        return dayPosition;
+        return CardClickHandler.INSTANCE.monthClicked(position, card, getDayCards(), getMonthCards());
     }
 
     /**
@@ -606,34 +570,10 @@ class CuViewModel extends BaseRxViewModel {
      * the closest month to the current.
      */
     public int yearClicked(int position, CUCard card) {
-        CUCard yearCard = getClickedCard(position, card.getNode().getHandle(), getYearCards());
-        if (yearCard == null) {
-            return 0;
-        }
+        return CardClickHandler.INSTANCE.yearClicked(position, card, getMonthCards(), getYearCards());
+    }
 
-        List<CUCard> monthCards = getMonthCards();
-        int cardYear = yearCard.getLocalDate().getYear();
-        int currentMonth = LocalDate.now().getMonthValue();
-
-        for (int i = 0; i < monthCards.size(); i++) {
-            LocalDate nextLocalDate = monthCards.get(i).getLocalDate();
-            int nextMonth = nextLocalDate.getMonthValue();
-
-            if (nextLocalDate.getYear() == cardYear && nextMonth <= currentMonth) {
-                //Year clicked, current month. If not exists, the closest month behind the current.
-                if (i == 0 || nextMonth == currentMonth
-                        || monthCards.get(i -1).getLocalDate().getYear() != cardYear) {
-                    return i;
-                }
-
-                long previousMonth = monthCards.get(i - 1).getLocalDate().getMonthValue();
-
-                //The closest month to the current
-                return previousMonth - currentMonth <= currentMonth - nextMonth ? i - 1 : i;
-            }
-        }
-
-        //No month equal or behind the current found, then return the latest month.
-        return monthCards.size() - 1;
+    public void setZoom(int zoom) {
+        this.mZoom = zoom;
     }
 }

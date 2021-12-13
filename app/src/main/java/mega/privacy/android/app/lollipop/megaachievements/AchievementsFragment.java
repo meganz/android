@@ -249,7 +249,8 @@ public class AchievementsFragment extends BaseFragment implements OnClickListene
 		if (mActivity != null) {
 			ActionBar actionBar = mActivity.getSupportActionBar();
 			if (actionBar != null) {
-				actionBar.setTitle(getString(R.string.achievements_title));
+				actionBar.setTitle(StringResourcesUtils.getString(R.string.achievements_title)
+						.toUpperCase(Locale.getDefault()));
 			}
 		}
 

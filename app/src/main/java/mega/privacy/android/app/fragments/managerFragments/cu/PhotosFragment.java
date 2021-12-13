@@ -1,11 +1,16 @@
 package mega.privacy.android.app.fragments.managerFragments.cu;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Parcelable;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
@@ -17,7 +22,6 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.view.ActionMode;
-import androidx.core.app.ActivityCompat;
 import androidx.core.text.HtmlCompat;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.GridLayoutManager;
@@ -34,14 +38,14 @@ import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.ListenScrollChangesHelper;
-import mega.privacy.android.app.databinding.FragmentCameraUploadsBinding;
-import mega.privacy.android.app.databinding.FragmentCameraUploadsFirstLoginBinding;
-import mega.privacy.android.app.fragments.BaseFragment;
+import mega.privacy.android.app.databinding.FragmentPhotosBinding;
+import mega.privacy.android.app.fragments.homepage.photos.ScaleGestureHandler;
 import mega.privacy.android.app.globalmanagement.SortOrderManagement;
 import mega.privacy.android.app.lollipop.FullScreenImageViewerLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.repo.MegaNodeRepo;
 import mega.privacy.android.app.utils.StringResourcesUtils;
+import mega.privacy.android.app.utils.ZoomUtil;
 import nz.mega.sdk.MegaNode;
 
 import static android.content.res.Configuration.ORIENTATION_PORTRAIT;
@@ -49,6 +53,7 @@ import static mega.privacy.android.app.components.dragger.DragToExitSupport.obse
 import static mega.privacy.android.app.components.dragger.DragToExitSupport.putThumbnailLocation;
 import static mega.privacy.android.app.utils.ColorUtils.DARK_IMAGE_ALPHA;
 import static mega.privacy.android.app.utils.ColorUtils.setImageViewAlphaIfDark;
+import static mega.privacy.android.app.utils.Constants.DISMISS_ACTION_SNACKBAR;
 import static mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_ADAPTER_TYPE;
 import static mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_HANDLE;
 import static mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_ORDER_GET_CHILDREN;
@@ -64,13 +69,14 @@ import static mega.privacy.android.app.utils.Constants.VIEWER_FROM_CUMU;
 import static mega.privacy.android.app.utils.JobUtil.startCameraUploadService;
 import static mega.privacy.android.app.utils.LogUtil.logDebug;
 import static mega.privacy.android.app.utils.PermissionUtils.*;
-import static mega.privacy.android.app.utils.StyleUtils.setTextStyle;
 import static mega.privacy.android.app.utils.TextUtil.formatEmptyScreenText;
 import static mega.privacy.android.app.utils.Util.showSnackbar;
+import static mega.privacy.android.app.utils.ZoomUtil.*;
 import static nz.mega.sdk.MegaApiJava.INVALID_HANDLE;
+import static nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE;
 
 @AndroidEntryPoint
-public class CameraUploadsFragment extends BaseFragment implements CUGridViewAdapter.Listener,
+public class PhotosFragment extends BaseZoomFragment implements CUGridViewAdapter.Listener,
         CUCardViewAdapter.Listener {
 
     private static final String SELECTED_VIEW = "SELECTED_VIEW";
@@ -80,20 +86,14 @@ public class CameraUploadsFragment extends BaseFragment implements CUGridViewAda
     public static final int YEARS_VIEW = 3;
 
     // Cards per row
-    private static final int SPAN_CARD_PORTRAIT = 1;
-    private static final int SPAN_CARD_LANDSCAPE = 2;
-
-    // Thumbnails per row
-    private static final int SPAN_LARGE_GRID = 3;
-    private static final int SPAN_SMALL_GRID_PORTRAIT = 5;
-    private static final int SPAN_SMALL_GRID_LANDSCAPE = 7;
+    public static final int SPAN_CARD_PORTRAIT = 1;
+    public static final int SPAN_CARD_LANDSCAPE = 2;
 
     @Inject
     SortOrderManagement sortOrderManagement;
 
     private ManagerActivityLollipop mManagerActivity;
-    private FragmentCameraUploadsFirstLoginBinding mFirstLoginBinding;
-    private FragmentCameraUploadsBinding binding;
+    private FragmentPhotosBinding binding;
     private CUGridViewAdapter gridAdapter;
     private CUCardViewAdapter cardAdapter;
     private ActionMode mActionMode;
@@ -107,6 +107,8 @@ public class CameraUploadsFragment extends BaseFragment implements CUGridViewAda
     private CuViewModel viewModel;
 
     private GridLayoutManager layoutManager;
+
+    private ScaleGestureHandler scaleGestureHandler;
 
     private int selectedView = ALL_VIEW;
 
@@ -165,7 +167,7 @@ public class CameraUploadsFragment extends BaseFragment implements CUGridViewAda
         if (mManagerActivity.isFirstLogin()) {
             mManagerActivity.skipInitialCUSetup();
         } else {
-            mManagerActivity.refreshCameraUpload();
+            mManagerActivity.refreshPhotosFragment();
         }
     }
 
@@ -174,12 +176,8 @@ public class CameraUploadsFragment extends BaseFragment implements CUGridViewAda
     }
 
     public void enableCu() {
-        if (mFirstLoginBinding == null) {
-            return;
-        }
-
-        viewModel.enableCu(mFirstLoginBinding.cellularConnectionSwitch.isChecked(),
-                mFirstLoginBinding.uploadVideosSwitch.isChecked());
+        viewModel.enableCu(binding.fragmentPhotosFirstLogin.cellularConnectionSwitch.isChecked(),
+                binding.fragmentPhotosFirstLogin.uploadVideosSwitch.isChecked());
 
         mManagerActivity.setFirstLogin(false);
         viewModel.setEnableCUShown(false);
@@ -187,7 +185,7 @@ public class CameraUploadsFragment extends BaseFragment implements CUGridViewAda
     }
 
     private void startCU() {
-        mManagerActivity.refreshCameraUpload();
+        mManagerActivity.refreshPhotosFragment();
 
         new Handler().postDelayed(() -> {
             logDebug("Starting CU");
@@ -195,7 +193,8 @@ public class CameraUploadsFragment extends BaseFragment implements CUGridViewAda
         }, 1000);
     }
 
-    @Override public void onCreate(@Nullable Bundle savedInstanceState) {
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         if (savedInstanceState != null) {
@@ -210,18 +209,50 @@ public class CameraUploadsFragment extends BaseFragment implements CUGridViewAda
         viewModel = new ViewModelProvider(this, viewModelFactory).get(CuViewModel.class);
     }
 
-    @Nullable @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
-            @Nullable Bundle savedInstanceState) {
+    @Nullable
+    @Override
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        binding = FragmentPhotosBinding.inflate(inflater, container, false);
 
         if (mManagerActivity.getFirstLogin() || viewModel.isEnableCUShown()) {
             viewModel.setEnableCUShown(true);
-            mManagerActivity.updateCuFragmentOptionsMenu();
-            return createCameraUploadsViewForFirstLogin(inflater, container);
+            createCameraUploadsViewForFirstLogin();
         } else {
-            binding = FragmentCameraUploadsBinding.inflate(inflater, container, false);
-            return binding.getRoot();
+            showPhotosGrid();
         }
+
+        return binding.getRoot();
+    }
+
+    /**
+     * Refresh view and layout after CU enabled or disabled.
+     */
+    public void refreshViewLayout() {
+        if(isEnableCUFragmentShown()) {
+            showEnablePage();
+            createCameraUploadsViewForFirstLogin();
+        } else {
+            showPhotosGrid();
+
+        }
+
+        initAfterViewCreated();
+    }
+
+    /**
+     * Show photos view.
+     */
+    private void showPhotosGrid() {
+        binding.fragmentPhotosFirstLogin.getRoot().setVisibility(View.GONE);
+        binding.fragmentPhotosGrid.setVisibility(View.VISIBLE);
+    }
+
+    /**
+     * Show enable CU page.
+     */
+    private void showEnablePage() {
+        binding.fragmentPhotosFirstLogin.getRoot().setVisibility(View.VISIBLE);
+        binding.fragmentPhotosGrid.setVisibility(View.GONE);
     }
 
     @Override
@@ -230,36 +261,49 @@ public class CameraUploadsFragment extends BaseFragment implements CUGridViewAda
         super.onSaveInstanceState(outState);
     }
 
-    private View createCameraUploadsViewForFirstLogin(@NonNull LayoutInflater inflater,
-            @Nullable ViewGroup container) {
+    private void createCameraUploadsViewForFirstLogin() {
         viewModel.setInitialPreferences();
 
-        mFirstLoginBinding =
-                FragmentCameraUploadsFirstLoginBinding.inflate(inflater, container, false);
-
-        new ListenScrollChangesHelper().addViewToListen(mFirstLoginBinding.camSyncScrollView,
+        new ListenScrollChangesHelper().addViewToListen(binding.fragmentPhotosFirstLogin.camSyncScrollView,
                 (v, scrollX, scrollY, oldScrollX, oldScrollY) -> mManagerActivity
-                        .changeAppBarElevation(mFirstLoginBinding.camSyncScrollView.canScrollVertically(SCROLLING_UP_DIRECTION)));
+                        .changeAppBarElevation(binding.fragmentPhotosFirstLogin.camSyncScrollView.canScrollVertically(SCROLLING_UP_DIRECTION)));
 
-        mFirstLoginBinding.enableButton.setOnClickListener(v -> {
+        binding.fragmentPhotosFirstLogin.enableButton.setOnClickListener(v -> {
             MegaApplication.getInstance().sendSignalPresenceActivity();
-            String[] permissions = { android.Manifest.permission.READ_EXTERNAL_STORAGE };
+            String[] permissions = {android.Manifest.permission.READ_EXTERNAL_STORAGE};
             if (hasPermissions(context, permissions)) {
                 mManagerActivity.checkIfShouldShowBusinessCUAlert();
             } else {
                 requestCameraUploadPermission(permissions, REQUEST_CAMERA_ON_OFF_FIRST_TIME);
             }
         });
-
-        return mFirstLoginBinding.getRoot();
     }
 
-    @Override public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        initAfterViewCreated();
+    }
 
+    /**
+     * Init UI and view model when view is created or refreshed.
+     */
+    private void initAfterViewCreated() {
         if (viewModel.isEnableCUShown()) {
             mManagerActivity.updateCULayout(View.GONE);
             mManagerActivity.updateCUViewTypes(View.GONE);
+
+            binding.fragmentPhotosFirstLogin.uploadVideosSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
+                if (isChecked) {
+                    mManagerActivity.showSnackbar(DISMISS_ACTION_SNACKBAR,
+                            StringResourcesUtils.getString(R.string.video_quality_info),
+                            MEGACHAT_INVALID_HANDLE);
+                }
+
+                binding.fragmentPhotosFirstLogin.qualityText.setVisibility(isChecked ? View.VISIBLE : View.GONE);
+            });
+
+            handlePhotosMenuUpdate(false);
             return;
         }
 
@@ -269,7 +313,14 @@ public class CameraUploadsFragment extends BaseFragment implements CUGridViewAda
         setupViewTypes();
         setupOtherViews();
         observeLiveData();
+
+        int currentZoom = ZoomUtil.getPHOTO_ZOOM_LEVEL();
+        getZoomViewModel().setCurrentZoom(currentZoom);
+        getZoomViewModel().setZoom(currentZoom);
+        viewModel.setZoom(currentZoom);
+
         viewModel.getCards();
+        viewModel.getCUNodes();
     }
 
     public void setViewTypes(LinearLayout cuViewTypes, TextView cuYearsButton,
@@ -313,6 +364,7 @@ public class CameraUploadsFragment extends BaseFragment implements CUGridViewAda
         }
     }
 
+    @SuppressLint("ClickableViewAccessibility")
     private void setupRecyclerView() {
         binding.cuList.setHasFixedSize(true);
         binding.cuList.addOnScrollListener(new RecyclerView.OnScrollListener() {
@@ -323,48 +375,51 @@ public class CameraUploadsFragment extends BaseFragment implements CUGridViewAda
             }
         });
 
+        scaleGestureHandler = new ScaleGestureHandler(context, this);
+        binding.cuList.setOnTouchListener(scaleGestureHandler);
+
         setGridView();
     }
 
     private void setGridView() {
-        boolean smallGrid = mManagerActivity.isSmallGridCameraUploads;
+        viewModel.clearSelection();
+
         boolean isPortrait = getResources().getConfiguration().orientation == ORIENTATION_PORTRAIT;
-        int spanCount = getSpanCount(isPortrait, smallGrid);
+        int spanCount = getSpanCount(isPortrait);
+
         layoutManager = new GridLayoutManager(context, spanCount);
         binding.cuList.setLayoutManager(layoutManager);
         binding.cuList.setPadding(0, 0, 0, getResources().getDimensionPixelSize(R.dimen.cu_margin_bottom));
         RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) binding.cuList.getLayoutParams();
 
         if (selectedView == ALL_VIEW) {
-            int imageMargin = getResources().getDimensionPixelSize(smallGrid
-                    ? R.dimen.cu_fragment_image_margin_small
-                    : R.dimen.cu_fragment_image_margin_large);
+            int imageMargin = ZoomUtil.INSTANCE.getMargin(context, getCurrentZoom());
+            ZoomUtil.INSTANCE.setMargin(context, params, getCurrentZoom());
+            int gridWidth = ZoomUtil.INSTANCE.getItemWidth(context, outMetrics, getCurrentZoom(), spanCount);
 
-            int gridWidth = ((outMetrics.widthPixels - imageMargin * spanCount * 2) - imageMargin * 2) / spanCount;
-            int icSelectedWidth = getResources().getDimensionPixelSize(smallGrid
-                    ? R.dimen.cu_fragment_ic_selected_size_small
-                    : R.dimen.cu_fragment_ic_selected_size_large);
+            int icSelectedWidth = ZoomUtil.INSTANCE.getSelectedFrameWidth(context, getCurrentZoom());
 
-            int icSelectedMargin = getResources().getDimensionPixelSize(smallGrid
-                    ? R.dimen.cu_fragment_ic_selected_margin_small
-                    : R.dimen.cu_fragment_ic_selected_margin_large);
+            int icSelectedMargin = ZoomUtil.INSTANCE.getSelectedFrameMargin(context, getCurrentZoom());
 
-            CuItemSizeConfig itemSizeConfig = new CuItemSizeConfig(smallGrid, gridWidth,
+            CuItemSizeConfig itemSizeConfig = new CuItemSizeConfig(getCurrentZoom(), gridWidth,
                     icSelectedWidth, imageMargin,
                     getResources().getDimensionPixelSize(R.dimen.cu_fragment_selected_padding),
                     icSelectedMargin,
                     getResources().getDimensionPixelSize(
                             R.dimen.cu_fragment_selected_round_corner_radius));
-
-            gridAdapter = new CUGridViewAdapter(this, spanCount, itemSizeConfig);
-            gridAdapter.setHasStableIds(true);
+            if (gridAdapter == null) {
+                gridAdapter = new CUGridViewAdapter(this, spanCount, itemSizeConfig);
+            } else {
+                gridAdapter.setSpanCount(spanCount);
+                gridAdapter.setCuItemSizeConfig(itemSizeConfig);
+            }
             layoutManager.setSpanSizeLookup(new GridLayoutManager.SpanSizeLookup() {
-                @Override public int getSpanSize(int position) {
+                @Override
+                public int getSpanSize(int position) {
                     return gridAdapter.getSpanSize(position);
                 }
             });
             binding.cuList.setAdapter(gridAdapter);
-            params.leftMargin = params.rightMargin = imageMargin;
         } else {
             int cardMargin = getResources().getDimensionPixelSize(isPortrait
                     ? R.dimen.card_margin_portrait
@@ -382,14 +437,13 @@ public class CameraUploadsFragment extends BaseFragment implements CUGridViewAda
         binding.scroller.setRecyclerView(binding.cuList);
     }
 
-    private int getSpanCount(boolean isPortrait, boolean smallGRid) {
-        if (selectedView != ALL_VIEW) {
-            return isPortrait ? SPAN_CARD_PORTRAIT : SPAN_CARD_LANDSCAPE;
-        } else if (smallGRid) {
-            return isPortrait ? SPAN_SMALL_GRID_PORTRAIT : SPAN_SMALL_GRID_LANDSCAPE;
-        } else {
-            return SPAN_LARGE_GRID;
-        }
+    /**
+     * Get how many items will be shown per row, depends on screen direction and zoom level if all view is selected.
+     *
+     * @param isPortrait true, on portrait mode, false otherwise.
+     */
+    private int getSpanCount(boolean isPortrait) {
+        return super.getSpanCount(selectedView,isPortrait);
     }
 
     private void setupOtherViews() {
@@ -400,41 +454,50 @@ public class CameraUploadsFragment extends BaseFragment implements CUGridViewAda
                 HtmlCompat.FROM_HTML_MODE_LEGACY));
     }
 
+    /**
+     * Show the selected card view after corresponding button is clicked.
+     *
+     * @param selectedView The selected view.
+     */
+    @SuppressLint("ClickableViewAccessibility")
     private void newViewClicked(int selectedView) {
         if (this.selectedView == selectedView) {
             return;
         }
-
         this.selectedView = selectedView;
         setGridView();
 
         switch (selectedView) {
             case DAYS_VIEW:
                 showDayCards(viewModel.getDayCards());
+                binding.cuList.setOnTouchListener(null);
                 break;
 
             case MONTHS_VIEW:
                 showMonthCards(viewModel.getMonthCards());
+                binding.cuList.setOnTouchListener(null);
                 break;
 
             case YEARS_VIEW:
                 showYearCards(viewModel.getYearCards());
+                binding.cuList.setOnTouchListener(null);
                 break;
 
             default:
                 gridAdapter.setNodes(viewModel.getCUNodes());
+                binding.cuList.setOnTouchListener(scaleGestureHandler);
         }
-
+        handleOptionsMenuUpdate(shouldShowFullInfoAndOptions());
         updateViewSelected();
     }
 
     public void enableCUClick() {
         ((MegaApplication) ((Activity) context).getApplication()).sendSignalPresenceActivity();
-        String[] permissions = { android.Manifest.permission.READ_EXTERNAL_STORAGE };
+        String[] permissions = {android.Manifest.permission.READ_EXTERNAL_STORAGE};
 
         if (hasPermissions(context, permissions)) {
             viewModel.setEnableCUShown(true);
-            mManagerActivity.refreshCameraUpload();
+            mManagerActivity.refreshPhotosFragment();
         } else {
             requestCameraUploadPermission(permissions, REQUEST_CAMERA_ON_OFF);
         }
@@ -442,8 +505,10 @@ public class CameraUploadsFragment extends BaseFragment implements CUGridViewAda
 
     private void observeLiveData() {
         viewModel.cuNodes().observe(getViewLifecycleOwner(), nodes -> {
-            boolean showScroller = nodes.size() >= (mManagerActivity.isSmallGridCameraUploads
-                    ? MIN_ITEMS_SCROLLBAR_GRID : MIN_ITEMS_SCROLLBAR);
+            // On enable CU page, don't update layout and view.
+            if(isEnableCUFragmentShown()) return;
+
+            boolean showScroller = nodes.size() >= (getCurrentZoom() < ZOOM_DEFAULT ? MIN_ITEMS_SCROLLBAR_GRID : MIN_ITEMS_SCROLLBAR);
             binding.scroller.setVisibility(showScroller ? View.VISIBLE : View.GONE);
 
             if (gridAdapter != null) {
@@ -451,7 +516,7 @@ public class CameraUploadsFragment extends BaseFragment implements CUGridViewAda
             }
 
             updateEnableCUButtons(viewModel.isCUEnabled());
-            mManagerActivity.updateCuFragmentOptionsMenu();
+            handlePhotosMenuUpdate(isShowMenu());
 
             binding.emptyHint.setVisibility(nodes.isEmpty() ? View.VISIBLE : View.GONE);
             binding.cuList.setVisibility(nodes.isEmpty() ? View.GONE : View.VISIBLE);
@@ -535,6 +600,17 @@ public class CameraUploadsFragment extends BaseFragment implements CUGridViewAda
         }
     }
 
+    /**
+     * this method handle is show menu.
+     *
+     * @return false, when no photo here or in the action mode or not in all view, then will hide the menu.
+     * Otherwise, true, show menu.
+     */
+    private boolean isShowMenu() {
+        boolean emptyAdapter = gridAdapter == null || gridAdapter.getItemCount() <= 0;
+        return !emptyAdapter && mActionMode == null && selectedView == ALL_VIEW;
+    }
+
     private void showDayCards(List<CUCard> dayCards) {
         if (selectedView == DAYS_VIEW) {
             cardAdapter.submitList(dayCards);
@@ -543,7 +619,7 @@ public class CameraUploadsFragment extends BaseFragment implements CUGridViewAda
 
     private void showMonthCards(List<CUCard> monthCards) {
         if (selectedView == MONTHS_VIEW) {
-             cardAdapter.submitList(monthCards);
+            cardAdapter.submitList(monthCards);
         }
     }
 
@@ -585,12 +661,17 @@ public class CameraUploadsFragment extends BaseFragment implements CUGridViewAda
         binding = null;
     }
 
-    @Override public void onNodeClicked(int position, CuNode node) {
+    @Override
+    public void onNodeClicked(int position, CuNode node) {
         viewModel.onNodeClicked(position, node);
     }
 
-    @Override public void onNodeLongClicked(int position, CuNode node) {
-        viewModel.onNodeLongClicked(position, node);
+    @Override
+    public void onNodeLongClicked(int position, CuNode node) {
+        // Multiple selection only available for zoom default (3 items per row) or zoom out 1x (5 items per row).
+        if (getCurrentZoom() == ZOOM_DEFAULT || getCurrentZoom() == ZOOM_OUT_1X) {
+            viewModel.onNodeLongClicked(position, node);
+        }
     }
 
     public boolean isEnableCUFragmentShown() {
@@ -601,32 +682,15 @@ public class CameraUploadsFragment extends BaseFragment implements CUGridViewAda
         return !isEnableCUFragmentShown() && selectedView == ALL_VIEW;
     }
 
+    /**
+     * First make all the buttons unselected,
+     * then apply selected style for the selected button regarding to the selected view.
+     */
     private void updateViewSelected() {
-        setViewTypeButtonStyle(allButton, false);
-        setViewTypeButtonStyle(daysButton, false);
-        setViewTypeButtonStyle(monthsButton, false);
-        setViewTypeButtonStyle(yearsButton, false);
-
-        switch (selectedView) {
-            case DAYS_VIEW:
-                setViewTypeButtonStyle(daysButton, true);
-                break;
-
-            case MONTHS_VIEW:
-                setViewTypeButtonStyle(monthsButton, true);
-                break;
-
-            case YEARS_VIEW:
-                setViewTypeButtonStyle(yearsButton, true);
-                break;
-
-            default:
-                setViewTypeButtonStyle(allButton, true);
-        }
+        super.updateViewSelected(allButton,daysButton,monthsButton,yearsButton,selectedView);
 
         updateFastScrollerVisibility();
         mManagerActivity.enableHideBottomViewOnScroll(selectedView != ALL_VIEW);
-        mManagerActivity.updateCuFragmentOptionsMenu();
         mManagerActivity.updateEnableCUButton(selectedView == ALL_VIEW
                 && (gridAdapter != null && gridAdapter.getItemCount() > 0)
                 && (viewModel != null && !viewModel.isCUEnabled())
@@ -649,38 +713,18 @@ public class CameraUploadsFragment extends BaseFragment implements CUGridViewAda
     }
 
     private void updateFastScrollerVisibility() {
-        if (binding == null) {
+        if (binding == null || cardAdapter == null) {
             return;
         }
-
-        boolean gridView = selectedView == ALL_VIEW;
-        int visibility = (gridView && gridAdapter != null && gridAdapter.getItemCount() >= MIN_ITEMS_SCROLLBAR)
-                || (!gridView && cardAdapter != null && cardAdapter.getItemCount() >= MIN_ITEMS_SCROLLBAR)
-                ? View.VISIBLE
-                : View.GONE;
-
-        binding.scroller.setVisibility(visibility);
-    }
-
-    private void setViewTypeButtonStyle(TextView textView, boolean enabled) {
-        if (textView == null) {
-            return;
-        }
-
-        textView.setBackgroundResource(enabled
-                ? R.drawable.background_18dp_rounded_selected_button
-                : R.drawable.background_18dp_rounded_unselected_button);
-
-        setTextStyle(context, textView, enabled
-                        ? R.style.TextAppearance_Mega_Subtitle2_Medium_WhiteGrey87
-                        : R.style.TextAppearance_Mega_Subtitle2_Normal_Grey87White87,
-                enabled ? R.color.white_grey_087 : R.color.grey_087_white_087, false);
+        super.updateFastScrollerVisibility(selectedView, binding.scroller, cardAdapter.getItemCount());
     }
 
     @Override
     public void onCardClicked(int position, @NonNull CUCard card) {
         switch (selectedView) {
             case DAYS_VIEW:
+                getZoomViewModel().restoreDefaultZoom();
+                handleZoomMenuItemStatus();
                 card = viewModel.dayClicked(position, card);
                 newViewClicked(ALL_VIEW);
                 int cuNodePosition = gridAdapter.getNodePosition(card.getNode().getHandle());
@@ -698,7 +742,6 @@ public class CameraUploadsFragment extends BaseFragment implements CUGridViewAda
                 layoutManager.scrollToPosition(viewModel.yearClicked(position, card));
                 break;
         }
-
         mManagerActivity.showBottomView();
     }
 
@@ -714,5 +757,55 @@ public class CameraUploadsFragment extends BaseFragment implements CUGridViewAda
 
     public void setDefaultView() {
         newViewClicked(ALL_VIEW);
+    }
+
+    @Override
+    public void handleZoomChange(int zoom, boolean needReload) {
+        handleZoomAdapterLayoutChange(zoom);
+        if (needReload) {
+            reloadNodes();
+        }
+    }
+
+    private void handleZoomAdapterLayoutChange(int zoom) {
+        if (!viewModel.isEnableCUShown()) {
+            viewModel.setZoom(zoom);
+            ZoomUtil.setPHOTO_ZOOM_LEVEL(zoom);
+            Parcelable state = layoutManager.onSaveInstanceState();
+            setGridView();
+            layoutManager.onRestoreInstanceState(state);
+        }
+    }
+
+    @Override
+    public void handleOnCreateOptionsMenu() {
+        handleOptionsMenuUpdate(isShowMenu());
+    }
+
+    @Override
+    public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
+        if (!isInPhotosPage()) {
+            return;
+        }
+        super.onCreateOptionsMenu(menu, inflater);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        if (!isInPhotosPage()) {
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    public boolean isInPhotosPage(){
+        return (ManagerActivityLollipop) getActivity() != null && ((ManagerActivityLollipop) getActivity()).getDrawerItem() == ManagerActivityLollipop.DrawerItem.PHOTOS;
+    }
+
+    public void handlePhotosMenuUpdate(boolean isShowMenu){
+        if (!isInPhotosPage()) {
+            return;
+        }
+        handleOptionsMenuUpdate(isShowMenu);
     }
 }

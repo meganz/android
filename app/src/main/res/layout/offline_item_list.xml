@@ -27,7 +27,7 @@
             android:layout_height="wrap_content"
             android:ellipsize="middle"
             android:singleLine="true"
-            android:textAppearance="?attr/textAppearanceSubtitle1"
+            style="@style/textAppearanceSubtitle1"
             tools:text="2048.jpg" />
 
         <TextView

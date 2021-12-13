@@ -15,6 +15,7 @@ import androidx.core.content.ContextCompat;
 
 import java.util.Calendar;
 import java.util.Date;
+import java.util.Locale;
 
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.fragments.BaseFragment;
@@ -107,7 +108,7 @@ public class InfoAchievementsFragment extends BaseFragment implements GetAchieve
 				break;
 		}
 
-		actionBar.setTitle(title);
+		actionBar.setTitle(title.toUpperCase(Locale.getDefault()));
 	}
 
 	private void updateUI() {

@@ -1324,7 +1324,7 @@ public class FileExplorerActivityLollipop extends TransfersManagementActivity
 									setRootTitle();
 									aB.setSubtitle(R.string.general_select_to_download);
 								} else {
-									aB.setTitle(megaApi.getNodeByHandle(cDriveExplorer.getParentHandle()).getName().toUpperCase());
+									aB.setTitle(megaApi.getNodeByHandle(cDriveExplorer.getParentHandle()).getName());
 								}
 							}
 							break;
@@ -1399,7 +1399,7 @@ public class FileExplorerActivityLollipop extends TransfersManagementActivity
 						setRootTitle();
 					}
 					else{
-						aB.setTitle(megaApi.getNodeByHandle(((CloudDriveExplorerFragmentLollipop)f).getParentHandle()).getName().toUpperCase());
+						aB.setTitle(megaApi.getNodeByHandle(((CloudDriveExplorerFragmentLollipop)f).getParentHandle()).getName());
 					}
 				}
 				showFabButton(false);
@@ -2161,6 +2161,9 @@ public class FileExplorerActivityLollipop extends TransfersManagementActivity
 				logDebug("Setting account auth token for folder links.");
 				megaApiFolder.setAccountAuth(megaApi.getAccountAuth());
 				megaApi.fetchNodes(this);
+
+                // Get cookies settings after login.
+                MegaApplication.getInstance().checkEnabledCookies();
 			}
 		}
 		else if (request.getType() == MegaRequest.TYPE_FETCH_NODES){

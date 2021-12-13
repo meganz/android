@@ -3,11 +3,13 @@ package mega.privacy.android.app.meeting;
 import android.app.IntentService;
 import android.content.Intent;
 
+import dagger.hilt.android.AndroidEntryPoint;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.meeting.listeners.AnswerChatCallListener;
 import mega.privacy.android.app.meeting.listeners.HangChatCallListener;
 import mega.privacy.android.app.meeting.listeners.SetCallOnHoldListener;
+import mega.privacy.android.app.objects.PasscodeManagement;
 import mega.privacy.android.app.utils.StringResourcesUtils;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
@@ -20,6 +22,9 @@ import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE;
 
+import javax.inject.Inject;
+
+@AndroidEntryPoint
 public class CallNotificationIntentService extends IntentService implements HangChatCallListener.OnCallHungUpCallback, AnswerChatCallListener.OnCallAnsweredCallback, SetCallOnHoldListener.OnCallOnHoldCallback {
 
     public static final String ANSWER = "ANSWER";
@@ -29,6 +34,9 @@ public class CallNotificationIntentService extends IntentService implements Hang
     public static final String IGNORE = "IGNORE";
     public static final String HOLD_JOIN = "HOLD_JOIN";
     public static final String END_JOIN = "END_JOIN";
+
+    @Inject
+    PasscodeManagement passcodeManagement;
 
     MegaChatApiAndroid megaChatApi;
     MegaApiAndroid megaApi;
@@ -157,7 +165,7 @@ public class CallNotificationIntentService extends IntentService implements Hang
             return;
 
         logDebug("Incoming call answered.");
-        openMeetingInProgress(this, chatIdIncomingCall, true);
+        openMeetingInProgress(this, chatIdIncomingCall, true, passcodeManagement);
         clearIncomingCallNotification(callIdIncomingCall);
         stopSelf();
         Intent closeIntent = new Intent(Intent.ACTION_CLOSE_SYSTEM_DIALOGS);

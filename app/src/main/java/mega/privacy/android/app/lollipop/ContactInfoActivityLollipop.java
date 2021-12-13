@@ -59,6 +59,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
+import dagger.hilt.android.AndroidEntryPoint;
 import kotlin.Unit;
 import mega.privacy.android.app.AuthenticityCredentialsActivity;
 import mega.privacy.android.app.DatabaseHandler;
@@ -86,6 +87,7 @@ import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.NodeAttachmentHistoryActivity;
 import mega.privacy.android.app.modalbottomsheet.ContactFileListBottomSheetDialogFragment;
 import mega.privacy.android.app.modalbottomsheet.ContactNicknameBottomSheetDialogFragment;
+import mega.privacy.android.app.objects.PasscodeManagement;
 import mega.privacy.android.app.utils.AlertsAndWarnings;
 import mega.privacy.android.app.utils.AskForDisplayOverDialog;
 import mega.privacy.android.app.utils.ColorUtils;
@@ -138,14 +140,19 @@ import static nz.mega.sdk.MegaApiJava.INVALID_HANDLE;
 import static nz.mega.sdk.MegaApiJava.STORAGE_STATE_PAYWALL;
 import static nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE;
 
+import javax.inject.Inject;
+
 import mega.privacy.android.app.components.AppBarStateChangeListener.State;
 
 @SuppressLint("NewApi")
-
+@AndroidEntryPoint
 public class ContactInfoActivityLollipop extends PasscodeActivity
 		implements MegaChatRequestListenerInterface, OnClickListener,
 		MegaRequestListenerInterface, MegaChatListenerInterface, OnItemClickListener,
 		MegaGlobalListenerInterface, ActionNodeCallback, SnackbarShower, StartChatCallListener.StartChatCallCallback {
+
+	@Inject
+	PasscodeManagement passcodeManagement;
 
 	private ChatController chatC;
 	private ContactController cC;
@@ -897,7 +904,7 @@ public class ContactInfoActivityLollipop extends PasscodeActivity
 			}
 			case R.id.action_return_call:
 				if (checkPermissionsCall(this, INVALID_TYPE_PERMISSIONS)) {
-					returnActiveCall(this);
+					returnActiveCall(this, passcodeManagement);
 				}
 				return true;
 		}
@@ -966,7 +973,7 @@ public class ContactInfoActivityLollipop extends PasscodeActivity
 			logDebug("Chat exists");
 			if (megaChatApi.getChatCall(chatRoomTo.getChatId()) != null) {
 				logDebug("There is a call, open it");
-				openMeetingInProgress(this, chatRoomTo.getChatId(), true);
+				openMeetingInProgress(this, chatRoomTo.getChatId(), true, passcodeManagement);
 			} else if (isStatusConnected(this, chatRoomTo.getChatId())) {
 				logDebug("There is no call, start it");
 				startCallWithChatOnline(chatRoomTo);
@@ -1192,7 +1199,7 @@ public class ContactInfoActivityLollipop extends PasscodeActivity
 
 			case R.id.call_in_progress_layout:
 				if(checkPermissionsCall(this, INVALID_TYPE_PERMISSIONS)){
-					returnActiveCall(this);
+					returnActiveCall(this, passcodeManagement);
 				}
 				break;
 		}
@@ -2084,7 +2091,7 @@ public class ContactInfoActivityLollipop extends PasscodeActivity
 	public void onCallStarted(long chatId, boolean enableVideo, int enableAudio) {
 		MegaChatRoom chatRoomTo = megaChatApi.getChatRoomByUser(user.getHandle());
 		if (chatRoomTo != null && chatRoomTo.getChatId() == chatId) {
-			openMeetingWithAudioOrVideo(this, chatId, enableAudio == START_CALL_AUDIO_ENABLE, enableVideo);
+			openMeetingWithAudioOrVideo(this, chatId, enableAudio == START_CALL_AUDIO_ENABLE, enableVideo, passcodeManagement);
 		}
 
 		enableCallLayouts(true);
