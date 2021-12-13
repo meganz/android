@@ -37,7 +37,9 @@ pipeline {
       steps {
         echo 'Notify GitLab'
         updateGitlabCommitStatus name: 'build', state: 'pending'
-        updateGitlabCommitStatus name: 'build', state: 'success'
+        updateGitlabCommitStatus name: 'build', state: 'failed'
+        updateGitlabCommitStatus name: 'test', state: 'pending'
+        updateGitlabCommitStatus name: 'test', state: 'failed'
       }
     }
 
