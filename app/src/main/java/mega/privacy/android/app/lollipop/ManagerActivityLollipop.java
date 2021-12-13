@@ -5808,6 +5808,10 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 
 	        	return true;
 	        }
+			case R.id.action_menu_clear_rubbish_bin:
+				showClearRubbishBinDialog();
+				return true;
+
 			case R.id.action_menu_sort_by:
 				if (drawerItem == DrawerItem.PHOTOS) {
 					showNewSortByPanel(ORDER_CAMERA);
