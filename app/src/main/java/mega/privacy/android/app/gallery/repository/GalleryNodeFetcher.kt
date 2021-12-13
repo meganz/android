@@ -4,10 +4,12 @@ import android.content.Context
 import android.os.Handler
 import android.os.Looper
 import kotlinx.coroutines.delay
+import mega.privacy.android.app.MimeTypeThumbnail
 import mega.privacy.android.app.fragments.homepage.TypedNodesFetcher
 import mega.privacy.android.app.gallery.data.GalleryItem
 import mega.privacy.android.app.gallery.data.GalleryItem.Companion.TYPE_HEADER
 import mega.privacy.android.app.gallery.data.GalleryItem.Companion.TYPE_IMAGE
+import mega.privacy.android.app.gallery.data.GalleryItem.Companion.TYPE_VIDEO
 import mega.privacy.android.app.listeners.OptionalMegaRequestListenerInterface
 import mega.privacy.android.app.utils.*
 import mega.privacy.android.app.utils.Constants.INVALID_POSITION
@@ -24,7 +26,7 @@ import java.util.*
 /**
  * Data fetcher for fetching typed files
  */
-class GalleryNodeFetcher(
+abstract class GalleryNodeFetcher(
     private val context: Context,
     private val megaApi: MegaApiAndroid,
     private val selectedNodesMap: LinkedHashMap<Any, GalleryItem>,
@@ -153,12 +155,13 @@ class GalleryNodeFetcher(
 
 
             val selected = selectedNodesMap[node.handle]?.selected ?: false
+            val mime = MimeTypeThumbnail.typeForName(node.name)
             fileNodesMap[node.handle] = GalleryItem(
                 node,
                 INVALID_POSITION,
                 INVALID_POSITION,
                 thumbnail,
-                TYPE_IMAGE,
+                if (mime.isImage) TYPE_IMAGE else TYPE_VIDEO,
                 dateString,
                 null,
                 null,
@@ -219,4 +222,6 @@ class GalleryNodeFetcher(
             delay(GET_THUMBNAIL_THROTTLE)
         }
     }
+
+    abstract override fun getMegaNodes(order: Int, type: Int): List<MegaNode>
 }

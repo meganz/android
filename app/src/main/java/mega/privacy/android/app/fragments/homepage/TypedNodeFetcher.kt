@@ -130,7 +130,7 @@ open class TypedNodesFetcher(
         }
     }
 
-    fun getMegaNodes(order: Int, type: Int): List<MegaNode> =
+    open fun getMegaNodes(order: Int, type: Int): List<MegaNode> =
         megaApi.searchByType(order, type, MegaApiJava.SEARCH_TARGET_ROOTNODE)
 
     companion object {

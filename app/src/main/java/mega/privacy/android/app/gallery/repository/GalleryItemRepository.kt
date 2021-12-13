@@ -6,6 +6,7 @@ import androidx.lifecycle.MutableLiveData
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import mega.privacy.android.app.DatabaseHandler
 import mega.privacy.android.app.di.MegaApi
 import mega.privacy.android.app.gallery.data.GalleryItem
 import mega.privacy.android.app.utils.ZoomUtil
@@ -15,10 +16,10 @@ import java.util.*
 import javax.inject.Inject
 import javax.inject.Singleton
 
-@Singleton
-class GalleryItemRepository @Inject constructor(
-    @ApplicationContext val context: Context,
-    @MegaApi private val megaApi: MegaApiAndroid
+abstract class GalleryItemRepository constructor(
+    val context: Context,
+    val megaApi: MegaApiAndroid,
+    val mDbHandler: DatabaseHandler
 ) {
     /** Live Data to notify the query result*/
     var galleryItems: LiveData<List<GalleryItem>> = MutableLiveData()
@@ -34,7 +35,7 @@ class GalleryItemRepository @Inject constructor(
 
         // Create a node fetcher for the new request, and link fileNodeItems to its result.
         // Then the result of any previous NodesFetcher will be ignored
-        nodesFetcher = GalleryNodeFetcher(context, megaApi, selectedNodesMap, zoom)
+        nodesFetcher = initGalleryNodeFetcher(context, megaApi, selectedNodesMap, zoom, mDbHandler)
         @Suppress("UNCHECKED_CAST")
         galleryItems = nodesFetcher.result as MutableLiveData<List<GalleryItem>>
 
@@ -69,4 +70,12 @@ class GalleryItemRepository @Inject constructor(
             }
         }
     }
+
+    abstract fun initGalleryNodeFetcher(
+        context: Context,
+        megaApi: MegaApiAndroid,
+        selectedNodesMap: LinkedHashMap<Any, GalleryItem>,
+        zoom: Int,
+        dbHandler: DatabaseHandler
+    ): GalleryNodeFetcher
 }
