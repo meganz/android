@@ -350,6 +350,8 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
 
                 optionRemove.setVisibility(View.VISIBLE);
                 optionInfo.setVisibility(View.VISIBLE);
+                optionFavourite.setVisibility(View.VISIBLE);
+                optionLabel.setVisibility(View.VISIBLE);
 
                 //Hide
                 counterOpen--;
@@ -405,6 +407,8 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
 
                 offlineSwitch.setChecked(availableOffline(requireContext(), node));
                 optionInfo.setVisibility(View.VISIBLE);
+                optionFavourite.setVisibility(View.VISIBLE);
+                optionLabel.setVisibility(View.VISIBLE);
                 optionRubbishBin.setVisibility(View.VISIBLE);
                 optionLink.setVisibility(View.VISIBLE);
 
@@ -514,6 +518,8 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
 
                         case MegaShare.ACCESS_READ:
                             logDebug("access read");
+                            optionLabel.setVisibility(View.GONE);
+                            optionFavourite.setVisibility(View.GONE);
                             counterShares--;
                             optionLink.setVisibility(View.GONE);
                             counterShares--;
@@ -529,6 +535,8 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
 
                         case MegaShare.ACCESS_READWRITE:
                             logDebug("readwrite");
+                            optionLabel.setVisibility(View.GONE);
+                            optionFavourite.setVisibility(View.GONE);
                             counterShares--;
                             optionLink.setVisibility(View.GONE);
                             counterShares--;
@@ -674,6 +682,8 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
 
                     optionRemove.setVisibility(View.VISIBLE);
                     optionInfo.setVisibility(View.VISIBLE);
+                    optionLabel.setVisibility(View.VISIBLE);
+                    optionFavourite.setVisibility(View.VISIBLE);
 
                     //Hide
                     counterOpen--;
@@ -799,6 +809,8 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
 
                         case MegaShare.ACCESS_READ:
                             logDebug("access read");
+                            optionLabel.setVisibility(View.GONE);
+                            optionFavourite.setVisibility(View.GONE);
                             counterShares--;
                             optionLink.setVisibility(View.GONE);
                             counterShares--;
@@ -814,6 +826,8 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
 
                         case MegaShare.ACCESS_READWRITE:
                             logDebug("readwrite");
+                            optionLabel.setVisibility(View.GONE);
+                            optionFavourite.setVisibility(View.GONE);
                             counterShares--;
                             optionLink.setVisibility(View.GONE);
                             counterShares--;
@@ -899,6 +913,8 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
                     case MegaShare.ACCESS_READWRITE:
                     case MegaShare.ACCESS_READ:
                     case MegaShare.ACCESS_UNKNOWN:
+                        optionLabel.setVisibility(View.GONE);
+                        optionFavourite.setVisibility(View.GONE);
                         counterModify--;
                         optionRename.setVisibility(View.GONE);
                         counterModify--;

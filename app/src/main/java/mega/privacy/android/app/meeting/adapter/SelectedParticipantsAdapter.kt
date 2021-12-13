@@ -4,10 +4,10 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.ListAdapter
 import mega.privacy.android.app.databinding.ItemSelectedParticipantBinding
-import mega.privacy.android.app.meeting.fragments.InMeetingViewModel
+import mega.privacy.android.app.meeting.activity.MeetingActivityViewModel
 
 class SelectedParticipantsAdapter(
-    private val inMeetingViewModel: InMeetingViewModel,
+    private val sharedModel: MeetingActivityViewModel,
     private val delete: ((Participant) -> Unit)
 ) : ListAdapter<Participant, SelectedParticipantViewHolder>(
     AssignParticipantDiffCallback()
@@ -22,7 +22,7 @@ class SelectedParticipantsAdapter(
     ): SelectedParticipantViewHolder {
         val inflater = LayoutInflater.from(parent.context)
         return SelectedParticipantViewHolder(
-            inMeetingViewModel, delete,
+            sharedModel, delete,
             ItemSelectedParticipantBinding.inflate(
                 inflater,
                 parent,

@@ -106,6 +106,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Locale;
@@ -2236,7 +2237,8 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 						logDebug("IPC link - go to received request in Contacts");
 						markNotificationsSeen(true);
 						navigateToContactRequests();
-						selectDrawerItemPending=false;
+						getIntent().setAction(null);
+						setIntent(null);
 					}
 					else if(getIntent().getAction().equals(ACTION_CHAT_NOTIFICATION_MESSAGE)){
 						logDebug("Chat notitificacion received");
@@ -5696,6 +5698,10 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 
 	        	return true;
 	        }
+			case R.id.action_menu_clear_rubbish_bin:
+				showClearRubbishBinDialog();
+				return true;
+
 			case R.id.action_menu_sort_by:
 				if (drawerItem == DrawerItem.PHOTOS) {
 					showNewSortByPanel(ORDER_CAMERA);
@@ -7111,7 +7117,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 	@Override
 	public void onJoinMeeting() {
 		if(CallUtil.participatingInACall()){
-			showConfirmationInACall(this);
+			showConfirmationInACall(this, StringResourcesUtils.getString(R.string.text_join_call), passcodeManagement);
 		} else {
 			showOpenLinkDialog();
 		}
@@ -7120,7 +7126,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 	@Override
 	public void onCreateMeeting() {
 		if(CallUtil.participatingInACall()){
-			showConfirmationInACall(this);
+			showConfirmationInACall(this, StringResourcesUtils.getString(R.string.ongoing_call_content), passcodeManagement);
 		} else {
 			openMeetingToCreate(this);
 		}
@@ -7169,6 +7175,17 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 								  boolean fromMediaViewer, boolean fromChat) {
 		nodeSaver.saveNodes(nodes, highPriority, isFolderLink, fromMediaViewer, fromChat);
 	}
+
+    /**
+     * Upon a node is tapped, if it cannot be previewed in-app,
+     * then download it first, this download will be marked as "download by tap".
+     *
+     * @param node Node to be downloaded.
+     */
+    public Unit saveNodeByTap(MegaNode node) {
+       nodeSaver.saveNodes(Collections.singletonList(node), true, false, false, false, false, true);
+       return null;
+    }
 
 	/**
 	 * Save nodes to gallery.
@@ -7499,8 +7516,12 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 	}
 
 	public void showMeetingOptionsPanel(){
-		bottomSheetDialogFragment = new MeetingBottomSheetDialogFragment();
-		bottomSheetDialogFragment.show(getSupportFragmentManager(), MeetingBottomSheetDialogFragment.TAG);
+		if (CallUtil.participatingInACall()) {
+			showConfirmationInACall(this, StringResourcesUtils.getString(R.string.ongoing_call_content), passcodeManagement);
+		} else {
+			bottomSheetDialogFragment = new MeetingBottomSheetDialogFragment();
+			bottomSheetDialogFragment.show(getSupportFragmentManager(), MeetingBottomSheetDialogFragment.TAG);
+		}
 	}
 
 	/**
@@ -11381,6 +11402,13 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 				openFullscreenOfflineFragment(
 						removeInitialOfflinePath(transfer.getPath()) + SEPARATOR);
 			} else {
+				File file = new File(transfer.getPath());
+
+				if (!isFileAvailable(file)) {
+					showSnackbar(SNACKBAR_TYPE, StringResourcesUtils.getString(R.string.location_not_exist), MEGACHAT_INVALID_HANDLE);
+					return;
+				}
+
 				Intent intent = new Intent(this, FileStorageActivityLollipop.class);
 				intent.setAction(FileStorageActivityLollipop.Mode.BROWSE_FILES.getAction());
 				intent.putExtra(FileStorageActivityLollipop.EXTRA_PATH, transfer.getPath());

@@ -324,6 +324,7 @@ public class Constants {
     public static final String INTENT_EXTRA_KEY_CHAT = "chat";
     public static final String INTENT_EXTRA_KEY_TOOL_BAR_TITLE = "aBtitle";
     public static final String INTENT_EXTRA_IS_FROM_MEETING = "extra_is_from_meeting";
+    public static final String INTENT_EXTRA_MEETING_PARTICIPANTS = "participants_in_a_meeting";
 
     public static final int FILE_BROWSER_ADAPTER = 2000;
     public static final int CONTACT_FILE_ADAPTER = 2001;
@@ -561,6 +562,7 @@ public class Constants {
     public static final int INVITE_CONTACT_TYPE = 5;
     public static final int SNACKBAR_IMCOMPATIBILITY_TYPE = 6;
     public static final int DISMISS_ACTION_SNACKBAR = 7;
+    public static final int OPEN_FILE_SNACKBAR_TYPE = 8;
 
     public static final int INFO_ANIMATION = 3000;
     public static final int QUICK_INFO_ANIMATION = 500;

@@ -278,4 +278,22 @@ public class LogUtil {
         MegaChatApiAndroid.setLogLevel(DEBUG || statusLoggerKarere ? MegaChatApiAndroid.LOG_LEVEL_MAX : MegaChatApiAndroid.LOG_LEVEL_ERROR);
         logInfo("Karere logger initialized");
     }
+
+    /**
+     * Checks if loggerSDK is initialized.
+     *
+     * @return True if loggerSDK is initialized, false otherwise.
+     */
+    public static boolean isLoggerSDKInitialized() {
+        return loggerSDK != null;
+    }
+
+    /**
+     * Checks if loggerKarere is initialized.
+     *
+     * @return True if loggerKarere is initialized, false otherwise.
+     */
+    public static boolean isLoggerKarereInitialized() {
+        return loggerKarere != null;
+    }
 }

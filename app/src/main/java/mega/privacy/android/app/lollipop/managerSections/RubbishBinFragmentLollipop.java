@@ -83,6 +83,7 @@ import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.MegaApiUtils.*;
 import static mega.privacy.android.app.utils.MegaNodeUtil.manageTextFileIntent;
 import static mega.privacy.android.app.utils.MegaNodeUtil.manageURLNode;
+import static mega.privacy.android.app.utils.MegaNodeUtil.onNodeTapped;
 import static mega.privacy.android.app.utils.Util.*;
 
 @AndroidEntryPoint
@@ -828,9 +829,7 @@ public class RubbishBinFragmentLollipop extends Fragment{
 					manageTextFileIntent(requireContext(), nodes.get(position), RUBBISH_BIN_ADAPTER);
 				} else {
 					adapter.notifyDataSetChanged();
-					((ManagerActivityLollipop) context).saveNodesToDevice(
-							Collections.singletonList(nodes.get(position)),
-							true, false, false, false);
+                    onNodeTapped(context, nodes.get(position), ((ManagerActivityLollipop) context)::saveNodeByTap, (ManagerActivityLollipop) context, (ManagerActivityLollipop) context);
 				}
 			}
 		}

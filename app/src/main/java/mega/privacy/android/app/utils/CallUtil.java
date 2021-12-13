@@ -24,10 +24,10 @@ import androidx.core.content.ContextCompat;
 import androidx.preference.PreferenceManager;
 
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
-
 import java.util.ArrayList;
 
 import mega.privacy.android.app.MegaApplication;
+import mega.privacy.android.app.OpenLinkActivity;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.interfaces.SnackbarShower;
 import mega.privacy.android.app.listeners.CreateChatListener;
@@ -57,6 +57,7 @@ import nz.mega.sdk.MegaUser;
 import static android.content.Context.NOTIFICATION_SERVICE;
 import static android.view.View.GONE;
 import static mega.privacy.android.app.meeting.activity.MeetingActivity.*;
+import static mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuotaPaywallWarning;
 import static mega.privacy.android.app.utils.AvatarUtil.*;
 import static mega.privacy.android.app.utils.ChatUtil.getStatusBitmap;
 import static mega.privacy.android.app.utils.ChatUtil.getTitleChat;
@@ -67,6 +68,7 @@ import static mega.privacy.android.app.utils.PermissionUtils.*;
 import static mega.privacy.android.app.utils.StringResourcesUtils.getString;
 import static mega.privacy.android.app.utils.TextUtil.isTextEmpty;
 import static mega.privacy.android.app.utils.Util.*;
+import static nz.mega.sdk.MegaApiJava.STORAGE_STATE_PAYWALL;
 import static nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE;
 import static nz.mega.sdk.MegaChatCall.CALL_STATUS_USER_NO_PRESENT;
 
@@ -160,6 +162,7 @@ public class CallUtil {
         Intent meetingIntent = new Intent(context, MeetingActivity.class);
         meetingIntent.setAction(MEETING_ACTION_IN);
         meetingIntent.putExtra(MEETING_CHAT_ID, chatId);
+        meetingIntent.putExtra(MEETING_IS_GUEST, MegaApplication.getInstance().getMegaApi().isEphemeralPlusPlus());
         if (isNewTask) {
             logDebug("New task");
             meetingIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
@@ -224,10 +227,12 @@ public class CallUtil {
      */
     public static boolean participatingInACall() {
         MegaChatApiAndroid megaChatApi = MegaApplication.getInstance().getMegaChatApi();
+        MegaHandleList listCallsInitial = megaChatApi.getChatCalls(MegaChatCall.CALL_STATUS_INITIAL);
         MegaHandleList listCallsConnecting = megaChatApi.getChatCalls(MegaChatCall.CALL_STATUS_CONNECTING);
         MegaHandleList listCallsJoining = megaChatApi.getChatCalls(MegaChatCall.CALL_STATUS_JOINING);
         MegaHandleList listCallsInProgress = megaChatApi.getChatCalls(MegaChatCall.CALL_STATUS_IN_PROGRESS);
-        return listCallsConnecting.size() > 0 || listCallsJoining.size() > 0 || listCallsInProgress.size() > 0;
+
+        return listCallsInitial.size() > 0 || listCallsConnecting.size() > 0 || listCallsJoining.size() > 0 || listCallsInProgress.size() > 0;
     }
 
     /**
@@ -1069,6 +1074,7 @@ public class CallUtil {
 
         MegaChatPeerList peers = MegaChatPeerList.createInstance();
         if (chat == null) {
+            logDebug("Chat doesn't exist");
             ArrayList<MegaChatRoom> chats = new ArrayList<>();
             ArrayList<MegaUser> usersNoChat = new ArrayList<>();
             usersNoChat.add(user);
@@ -1080,8 +1086,10 @@ public class CallUtil {
                 megaChatApi.createChat(false, peers, listener);
             }
         } else if (megaChatApi.getChatCall(chat.getChatId()) != null) {
+            logDebug("There is a call, open it");
             openMeetingInProgress(activity, chat.getChatId(), true, passcodeManagement);
         } else if (isStatusConnected(activity, chat.getChatId())) {
+            logDebug("There is no call, start it");
             MegaApplication.setUserWaitingForCall(user.getHandle());
             startCallWithChatOnline(activity, chat);
         }
@@ -1185,14 +1193,20 @@ public class CallUtil {
 
     /**
      * Method to display a dialogue informing the user that he/she cannot start or join a meeting while on a call in progress.
+     *
+     * @param context            Context of Activity
+     * @param message            String with the text to show in the dialogue
+     * @param passcodeManagement To disable passcode.
      */
-    public static void showConfirmationInACall(Context context) {
-        DialogInterface.OnClickListener dialogClickListener = (dialog, which) -> {
-        };
-
+    public static void showConfirmationInACall(Context context, String message, PasscodeManagement passcodeManagement) {
         MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(context);
-        String message = context.getResources().getString(R.string.ongoing_call_content);
-        builder.setMessage(message).setPositiveButton(R.string.general_ok, dialogClickListener).show();
+        builder.setMessage(message)
+                .setPositiveButton(R.string.general_ok, (dialog, which) -> {
+                    if (context instanceof OpenLinkActivity) {
+                        returnActiveCall(context, passcodeManagement);
+                    }
+                })
+                .show();
     }
 
     /**
@@ -1272,7 +1286,7 @@ public class CallUtil {
 
         if (amIParticipatingInAnotherCall(chatId)) {
             logDebug("I am participating in another call");
-            showConfirmationInACall(context);
+            showConfirmationInACall(context, StringResourcesUtils.getString(R.string.text_join_call), passcodeManagement);
             return;
         }
 
@@ -1415,5 +1429,26 @@ public class CallUtil {
         }
 
         return views;
+    }
+
+    /**
+     * Method to control when an attempt is made to initiate a call from a contact option
+     *
+     * @param context The Activity context
+     * @param passcodeManagement    To disable passcode.
+     * @return True, if the call can be started. False, otherwise.
+     */
+    public static boolean canCallBeStartedFromContactOption(Activity context, PasscodeManagement passcodeManagement) {
+        if (MegaApplication.getInstance().getStorageState() == STORAGE_STATE_PAYWALL) {
+            showOverDiskQuotaPaywallWarning();
+            return false;
+        }
+
+        if (CallUtil.participatingInACall()) {
+            showConfirmationInACall(context, StringResourcesUtils.getString(R.string.ongoing_call_content), passcodeManagement);
+            return false;
+        }
+
+        return checkPermissionsCall(context, INVALID_TYPE_PERMISSIONS);
     }
 }

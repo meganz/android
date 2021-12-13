@@ -7,7 +7,7 @@ import android.graphics.drawable.Drawable
 import android.graphics.drawable.GradientDrawable
 import android.graphics.drawable.InsetDrawable
 import android.graphics.drawable.LayerDrawable
-import android.util.Log
+import android.util.DisplayMetrics
 import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
@@ -18,7 +18,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import mega.privacy.android.app.R
 import mega.privacy.android.app.components.OnOffFab
-import mega.privacy.android.app.components.SimpleDividerItemDecoration
+import mega.privacy.android.app.components.PositionDividerItemDecoration
 import mega.privacy.android.app.databinding.InMeetingFragmentBinding
 import mega.privacy.android.app.lollipop.megachat.AppRTCAudioManager
 import mega.privacy.android.app.meeting.LockableBottomSheetBehavior
@@ -42,6 +42,7 @@ class BottomFloatingPanelViewHolder(
     private val inMeetingViewModel: InMeetingViewModel,
     private val binding: InMeetingFragmentBinding,
     private val listener: BottomFloatingPanelListener,
+    private val displayMetrics: DisplayMetrics
 ) {
     private val context = binding.root.context
     private val floatingPanelView = binding.bottomFloatingPanel
@@ -54,6 +55,7 @@ class BottomFloatingPanelViewHolder(
     private var collapsedTop = 0
 
     private var popWindow: PopupWindow? = null
+    private lateinit var itemDecoration: PositionDividerItemDecoration
 
     /**
      * Save the Mic & Cam state, for revering state when hold state changed
@@ -281,6 +283,8 @@ class BottomFloatingPanelViewHolder(
         bottomSheetBehavior.addBottomSheetCallback(object :
             BottomSheetBehavior.BottomSheetCallback() {
             override fun onStateChanged(bottomSheet: View, newState: Int) {
+                listener.onChangePanelState()
+
                 bottomFloatingPanelExpanded = newState == BottomSheetBehavior.STATE_EXPANDED
                 if (newState == BottomSheetBehavior.STATE_DRAGGING && inMeetingViewModel.isOneToOneCall()) {
                     bottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
@@ -399,12 +403,16 @@ class BottomFloatingPanelViewHolder(
      * Init recyclerview
      */
     private fun setupRecyclerView() {
+        itemDecoration = PositionDividerItemDecoration(context, displayMetrics)
+        itemDecoration.setDrawAllDividers(true)
+
         floatingPanelView.participants.apply {
             layoutManager = LinearLayoutManager(context)
-            itemAnimator = null
+            itemAnimator = Util.noChangeRecyclerViewItemAnimator()
             clipToPadding = false
+            setHasFixedSize(true)
             adapter = participantsAdapter
-            addItemDecoration(SimpleDividerItemDecoration(context))
+            addItemDecoration(itemDecoration)
         }
     }
 
