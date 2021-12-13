@@ -58,12 +58,12 @@ pipeline {
     stage('Fetch SDK Submodules') {
       steps {
         withCredentials([gitUsernamePassword(credentialsId: 'Gitlab-Access-Token', gitToolName: 'Default')]) {
-          sh 'git config --file=.gitmodules submodule."app/src/main/jni/mega/sdk".url https://code.developers.mega.co.nz/sdk/sdk.git > ${env.CONSOLE_LOG_FILE}'
-          sh 'git config --file=.gitmodules submodule."app/src/main/jni/mega/sdk".branch develop >> ${env.CONSOLE_LOG_FILE}'
-          sh 'git config --file=.gitmodules submodule."app/src/main/jni/megachat/sdk".url https://code.developers.mega.co.nz/megachat/MEGAchat.git >> ${env.CONSOLE_LOG_FILE}'
-          sh 'git config --file=.gitmodules submodule."app/src/main/jni/megachat/sdk".branch develop >> ${env.CONSOLE_LOG_FILE}'
-          sh 'git submodule sync >> ${env.CONSOLE_LOG_FILE}'
-          sh 'git submodule update --init --recursive --remote >> ${env.CONSOLE_LOG_FILE}'
+          sh "git config --file=.gitmodules submodule.\"app/src/main/jni/mega/sdk\".url https://code.developers.mega.co.nz/sdk/sdk.git > ${CONSOLE_LOG_FILE}"
+          sh "git config --file=.gitmodules submodule.\"app/src/main/jni/mega/sdk\".branch develop >> ${CONSOLE_LOG_FILE}"
+          sh "git config --file=.gitmodules submodule.\"app/src/main/jni/megachat/sdk\".url https://code.developers.mega.co.nz/megachat/MEGAchat.git >> ${CONSOLE_LOG_FILE}"
+          sh "git config --file=.gitmodules submodule.\"app/src/main/jni/megachat/sdk\".branch develop >> ${CONSOLE_LOG_FILE}"
+          sh "git submodule sync >> ${CONSOLE_LOG_FILE}"
+          sh "git submodule update --init --recursive --remote >> ${CONSOLE_LOG_FILE}"
         }
       }
     }
@@ -82,7 +82,7 @@ pipeline {
           echo "${WEBRTC_LIB_FILE} already downloaded. Skip downloading."
         else
           echo "downloading webrtc"
-          mega-get ${WEBRTC_LIB_URL} >> ${env.CONSOLE_LOG_FILE}
+          mega-get ${WEBRTC_LIB_URL} >> ${CONSOLE_LOG_FILE}
 
           echo "unzipping webrtc"
           rm -fr ${WEBRTC_LIB_UNZIPPED}
@@ -94,14 +94,14 @@ pipeline {
           echo "${GOOGLE_MAP_API_FILE} already downloaded. Skip downloading."
         else
           echo "downloading google map api"
-          mega-get ${GOOGLE_MAP_API_URL} >> ${env.CONSOLE_LOG_FILE}
+          mega-get ${GOOGLE_MAP_API_URL} >> ${CONSOLE_LOG_FILE}
 
           echo "unzipping google map api"
           rm -fr ${GOOGLE_MAP_API_UNZIPPED}
           unzip ${GOOGLE_MAP_API_FILE} -d ${GOOGLE_MAP_API_UNZIPPED}
         fi
 
-        ls -lh >> ${env.CONSOLE_LOG_FILE}
+        ls -lh >> ${CONSOLE_LOG_FILE}
 
         cd ${WORKSPACE}
         pwd
