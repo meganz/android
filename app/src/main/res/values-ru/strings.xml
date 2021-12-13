@@ -1661,34 +1661,14 @@
     <string name="paused_transfers_title">Приостановленные передачи</string>
     <!-- message shown in the screen when there are not any active transfer -->
     <string name="completed_transfers_empty">Нет завершённых передач</string>
-    <!-- Text of the notification shown when the upload service is running, Plural -->
-    <plurals name="upload_service_notification">
-        <item quantity="one">Загрузка файла: %1$d из %2$d</item>
-        <item quantity="few">Загрузка файлов: %1$d из %2$d</item>
-        <item quantity="many">Загрузка файлов: %1$d из %2$d</item>
-        <item quantity="other">Загрузка файлов: %1$d из %2$d</item>
-    </plurals>
-    <!-- Text of the notification shown when the upload service is running, Plural -->
-    <plurals name="upload_service_paused_notification">
-        <item quantity="one">Загрузка файла: %1$d из %2$d (пауза)</item>
-        <item quantity="few">Загрузка файлов: %1$d из %2$d (пауза)</item>
-        <item quantity="many">Загрузка файлов: %1$d из %2$d (пауза)</item>
-        <item quantity="other">Загрузка файлов: %1$d из %2$d (пауза)</item>
-    </plurals>
-    <!-- Text of the notification shown when the folder upload service is running, Text of the notification shown when the folder upload service is running - plural e.g. Uploading 1 of 2 folders -->
-    <plurals name="folder_upload_service_notification">
-        <item quantity="one">Загрузка папки: %1$d из %2$d</item>
-        <item quantity="few">Загрузка папок: %1$d из %2$d</item>
-        <item quantity="many">Загрузка папок: %1$d из %2$d</item>
-        <item quantity="other">Загрузка папок: %1$d из %2$d</item>
-    </plurals>
-    <!-- Text of the notification shown when the folder upload service is running, Text of the notification shown when the folder upload service is running - plural e.g. Uploading 1 of 2 folders -->
-    <plurals name="folder_upload_service_paused_notification">
-        <item quantity="one">Загрузка папки: %1$d из %2$d (пауза)</item>
-        <item quantity="few">Загрузка папок: %1$d из %2$d (пауза)</item>
-        <item quantity="many">Загрузка папок: %1$d из %2$d (пауза)</item>
-        <item quantity="other">Загрузка папок: %1$d из %2$d (пауза)</item>
-    </plurals>
+    <!-- Text of the notification shown when the upload service is running: e.g. Uploading files: 1 of 10 -->
+    <string name="upload_service_notification">Загрузка файлов: %1$d из %2$d</string>
+    <!-- Text of the notification shown when the upload service is paused: e.g. Uploading files: 1 of 10 (paused)-->
+    <string name="upload_service_notification_paused">Загрузка файлов: %1$d из %2$d (пауза)</string>
+    <!-- Text of the notification shown when the folder upload service is running, e.g. Uploading folders 1 of 2 -->
+    <string name="folder_upload_service_notification">Загрузка файлов: %1$d из %2$d</string>
+    <!-- Text of the notification shown when the folder upload service is paused, e.g. Uploading folders 1 of 2 (paused) -->
+    <string name="folder_upload_service_notification_paused">Загрузка файлов: %1$d из %2$d (пауза)</string>
     <!-- Text of the notification shown when the upload service has finished, Plural -->
     <plurals name="upload_service_final_notification">
         <item quantity="one">Загружен %1$d файл</item>
@@ -1754,20 +1734,10 @@
         <item quantity="many">%1$d файлов не скачано</item>
         <item quantity="other">%1$d файла не скачано</item>
     </plurals>
-    <!-- Text of the notification shown when the download service is running, Plural -->
-    <plurals name="download_service_notification">
-        <item quantity="one">Скачивание %1$d из %2$d файла</item>
-        <item quantity="few">Скачивание %1$d из %2$d файлов</item>
-        <item quantity="many">Скачивание %1$d из %2$d файлов</item>
-        <item quantity="other">Скачивание %1$d из %2$d файлов</item>
-    </plurals>
-    <!-- Text of the notification shown when the download service is paused, Plural -->
-    <plurals name="download_service_paused_notification">
-        <item quantity="one">Скачивание файла: %1$d из %2$d (пауза)</item>
-        <item quantity="few">Скачивание файлов: %1$d из %2$d (пауза)</item>
-        <item quantity="many">Скачивание файлов: %1$d из %2$d (пауза)</item>
-        <item quantity="other">Скачивание файлов: %1$d из %2$d (пауза)</item>
-    </plurals>
+    <!-- Text of the notification shown when the download service is running -->
+    <string name="download_service_notification">Скачивание файлов: %1$d из %2$d</string>
+    <!-- Text of the notification shown when the download service is paused -->
+    <string name="download_service_notification_paused">Скачивание файлов: %1$d из %2$d (пауза)</string>
     <!-- Title of the alert when the transfer quota is exceeded. -->
     <string name="title_depleted_transfer_overquota">Недостаточная квота передач</string>
     <!-- Text of the alert when the transfer quota is depleted. The placeholder indicates the time left for the transfer quota to be reset. For instance: 30m 45s -->
@@ -3916,7 +3886,7 @@
     <!-- Explanation of a warning recommending upgrade to Pro in relation to link available options -->
     <string name="link_upgrade_pro_explanation">Пользователи MEGA Pro имеют эксклюзивный доступ к дополнительным функциям защиты ссылок, которые делают ваш аккаунт ещё безопаснее.</string>
     <!-- Meaning of links decryption key -->
-    <string name="decryption_key_explanation">Наша система сквозного шифрования требует, чтобы для этого файла автоматически генерировался уникальный ключ. Ссылка с этим ключом создается по умолчанию, но вы можете экспортировать ключ дешифрования отдельно для дополнительного уровня безопасности.</string>
+    <string name="decryption_key_explanation">Наша система сквозного шифрования требует, чтобы для этого файла или папки автоматически генерировался уникальный ключ. Ссылка с этим ключом создается по умолчанию, но вы можете экспортировать ключ дешифрования отдельно для дополнительного уровня безопасности.</string>
     <!-- Reset password label -->
     <string name="reset_password_label">Сбросить пароль</string>
     <!-- Warning show to the user when has enable to send the decryption key of a link separately and tries to share the link -->
@@ -4031,7 +4001,7 @@
     <string name="file_created">Фйал создан</string>
     <!-- Warning indicating a file was not created successfully -->
     <string name="file_creation_failed">Не удалось создать файл. Пожалуйста, попробуйте ещё раз.</string>
-    <!-- Label indicating a file was saved to some folder. e.g.: File saved to Cloud Drive -->
+    <!-- Label indicating a file was saved to some folder. e.g.: File saved to Cloud Drive. "Cloud Drive" is the only destination for the time being, thus any article isn't needed -->
     <string name="file_saved_to">Файл сохранён в %1$s</string>
     <!-- Warning indicating a file was not saved to some folder. e.g.: File not saved to Cloud Drive. Try again -->
     <string name="file_saved_to_failed">Файл не сохранён в %1$s. Попробуйте ещё раз.</string>
@@ -4273,9 +4243,9 @@
     <!-- Pin the participant to speaker view in the meeting-->
     <string name="pin_to_speaker">Показать в главном окне</string>
     <!-- Make the participant as moderator in the meeting-->
-    <string name="make_moderator">Сделать модератором</string>
+    <string name="make_moderator">Назначить модератора</string>
     <!-- The title of dialog for end meeting confirmation-->
-    <string name="title_end_meeting">Покинуть встречу</string>
+    <string name="title_end_meeting">Покинуть встречу?</string>
     <!-- no moderator when the moderator leave meeting-->
     <string name="no_moderator">Нет модератора</string>
     <!-- assign moderator message when the moderator leave meeting-->
@@ -4384,4 +4354,18 @@
     <string name="video_quality_info">Вы можете сэкономить место, уменьшив качество видео в настройках загрузок из камеры.</string>
     <!-- Label indicating video original quality -->
     <string name="original_quality">Оригинальное качество</string>
+    <!-- Settings label which allows to enable or disable fingerprint unlock. -->
+    <string name="setting_fingerprint">Отпечаток пальца</string>
+    <!-- Title of the dialog which allows to enable the fingerprint unlock. -->
+    <string name="title_enable_fingerprint">Просканируйте отпечаток пальца для разблокировки</string>
+    <!-- Title of the dialog which allows to unlock the app with the fingerprint. -->
+    <string name="title_unlock_fingerprint">Разблокировка отпечатком пальца</string>
+    <!-- Button of the dialog which allows to unlock the app with the fingerprint. Gives the option to unlock with the passcode instead -->
+    <string name="action_use_passcode">Использовать код доступа</string>
+    <!-- Message informing the fingerprint was enabled successfully -->
+    <string name="confirmation_fingerprint_enabled">Отпечаток пальца подтверждён</string>
+    <!-- Warning indicating an image (GIF) cannot be inserted in an input text. Same string than the one shown by the system when it detects this behaviour on its own. -->
+    <string name="image_insertion_not_allowed">Здесь MEGA не поддерживает вставку изображений</string>
+    <!-- The label under the button of viewing all images screen -->
+    <string name="section_images">Изображения</string>
 </resources>

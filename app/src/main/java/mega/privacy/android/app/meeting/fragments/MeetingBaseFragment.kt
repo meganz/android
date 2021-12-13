@@ -25,6 +25,7 @@ import mega.privacy.android.app.utils.permission.permissionsBuilder
  * [JoinMeetingAsGuestFragment],
  * [JoinMeetingFragment],
  * [InMeetingFragment],
+ * [MakeModeratorFragment],
  * [RingingMeetingFragment],
  * [IndividualCallFragment],
  * [GridViewCallFragment],

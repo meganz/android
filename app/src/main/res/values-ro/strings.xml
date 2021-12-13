@@ -1638,30 +1638,14 @@
     <string name="paused_transfers_title">Transferuri puse pe pauză</string>
     <!-- message shown in the screen when there are not any active transfer -->
     <string name="completed_transfers_empty">Niciun transfer finalizat</string>
-    <!-- Text of the notification shown when the upload service is running, Plural -->
-    <plurals name="upload_service_notification">
-        <item quantity="one">Se încarcă %1$d din %2$d fișier</item>
-        <item quantity="few">Se încarcă %1$d din %2$d fișiere</item>
-        <item quantity="other">Se încarcă %1$d din %2$d de fișiere</item>
-    </plurals>
-    <!-- Text of the notification shown when the upload service is running, Plural -->
-    <plurals name="upload_service_paused_notification">
-        <item quantity="one">Se încarcă %1$d din %2$d fișier (pus pe pauză)</item>
-        <item quantity="few">Se încarcă %1$d din %2$d fișiere (puse pe pauză)</item>
-        <item quantity="other">Se încarcă %1$d din %2$d de fișiere (puse pe pauză)</item>
-    </plurals>
-    <!-- Text of the notification shown when the folder upload service is running, Text of the notification shown when the folder upload service is running - plural e.g. Uploading 1 of 2 folders -->
-    <plurals name="folder_upload_service_notification">
-        <item quantity="one">Se încarcă %1$d din %2$d folder</item>
-        <item quantity="few">Se încarcă %1$d din %2$d foldere</item>
-        <item quantity="other">Se încarcă %1$d din %2$d de foldere</item>
-    </plurals>
-    <!-- Text of the notification shown when the folder upload service is running, Text of the notification shown when the folder upload service is running - plural e.g. Uploading 1 of 2 folders -->
-    <plurals name="folder_upload_service_paused_notification">
-        <item quantity="one">Se încarcă %1$d din %2$d folder (pus pe pauză)</item>
-        <item quantity="few">Se încarcă %1$d din %2$d foldere (puse pe pauză)</item>
-        <item quantity="other">Se încarcă %1$d din %2$d de foldere (puse pe pauză)</item>
-    </plurals>
+    <!-- Text of the notification shown when the upload service is running: e.g. Uploading files: 1 of 10 -->
+    <string name="upload_service_notification">Se încarcă fișiere: %1$d din %2$d</string>
+    <!-- Text of the notification shown when the upload service is paused: e.g. Uploading files: 1 of 10 (paused)-->
+    <string name="upload_service_notification_paused">Se încarcă fișiere: %1$d din %2$d (pus pe pauză)</string>
+    <!-- Text of the notification shown when the folder upload service is running, e.g. Uploading folders 1 of 2 -->
+    <string name="folder_upload_service_notification">Se încarcă foldere: %1$d din %2$d</string>
+    <!-- Text of the notification shown when the folder upload service is paused, e.g. Uploading folders 1 of 2 (paused) -->
+    <string name="folder_upload_service_notification_paused">Se încarcă foldere: %1$d din %2$d (pus pe pauză)</string>
     <!-- Text of the notification shown when the upload service has finished, Plural -->
     <plurals name="upload_service_final_notification">
         <item quantity="one">%1$d fișier încărcat</item>
@@ -1718,18 +1702,10 @@
         <item quantity="few">%1$d fișiere nedescărcate</item>
         <item quantity="other">%1$d de fișiere nedescărcate</item>
     </plurals>
-    <!-- Text of the notification shown when the download service is running, Plural -->
-    <plurals name="download_service_notification">
-        <item quantity="one">Se descarcă %1$d din %2$d fișier</item>
-        <item quantity="few">Se descarcă %1$d din %2$d fișiere</item>
-        <item quantity="other">Se descarcă %1$d din %2$d de fișiere</item>
-    </plurals>
-    <!-- Text of the notification shown when the download service is paused, Plural -->
-    <plurals name="download_service_paused_notification">
-        <item quantity="one">Se descarcă %1$d din %2$d fișier (pus pe pauză)</item>
-        <item quantity="few">Se descarcă %1$d din %2$d fișiere (puse pe pauză)</item>
-        <item quantity="other">Se descarcă %1$d din %2$d de fișiere (puse pe pauză)</item>
-    </plurals>
+    <!-- Text of the notification shown when the download service is running -->
+    <string name="download_service_notification">Se descarcă fișiere: %1$d din %2$d</string>
+    <!-- Text of the notification shown when the download service is paused -->
+    <string name="download_service_notification_paused">Se descarcă fișiere: %1$d din %2$d (pus pe pauză)</string>
     <!-- Title of the alert when the transfer quota is exceeded. -->
     <string name="title_depleted_transfer_overquota">Cotă de transfer insuficientă</string>
     <!-- Text of the alert when the transfer quota is depleted. The placeholder indicates the time left for the transfer quota to be reset. For instance: 30m 45s -->
@@ -3526,7 +3502,7 @@
     <!-- Text informing user that their account has been suspended -->
     <string name="account_temporarily_suspended">Contul tău a fost blocat temporar pentru siguranța ta.</string>
     <!-- Text informing user has to follow the steps of an email to unlock their account -->
-    <string name="verify_email_and_follow_steps">[A]Te rugăm să-ți verifici adresa de e-mail[/A] și urmează pașii din e-mailul MEGA pentru a-ți debloca contul.</string>
+    <string name="verify_email_and_follow_steps">Te rugăm să urmezi pașii din [A]e-mailul de verificare[/A] pentru a-ți debloca contul.</string>
     <!-- Question which takes the user to a help screen -->
     <string name="why_am_i_seeing_this">De ce văd asta?</string>
     <!-- Label of a button which action is resend an email -->
@@ -3802,7 +3778,7 @@
     <!-- Title indicating the select mode is enabled and ready to select transfers on Transfers section, In progress tab -->
     <string name="title_select_transfers">Selectează transferurile</string>
     <!-- Error shown to inform the priority change of a transfer failed. Please don’t remove the place holder, it’s to set the name of the transfer. Example: The priority change of the transfer “video.mp4” failed. -->
-    <string name="change_of_transfer_priority_failed">Modificarea priorității transferului „%1$s” a eșuat.</string>
+    <string name="change_of_transfer_priority_failed">Nu se poate schimba prioritatea transferului „%1$s”</string>
     <!-- Title option to send separated the link and decryption key -->
     <string name="option_send_decryption_key_separately">Trimite separat cheia de decriptare</string>
     <!-- Explanation option to send separated the link and decryption key -->
@@ -3830,7 +3806,7 @@
     <!-- Explanation of a warning recommending upgrade to Pro in relation to link available options -->
     <string name="link_upgrade_pro_explanation">MEGA Pro users have exclusive access to additional link safety features making your account even more secure.</string>
     <!-- Meaning of links decryption key -->
-    <string name="decryption_key_explanation">Sistemul nostru de criptare capăt-la-capăt necesită o cheie unică generată automat pentru acest fișier. În mod implicit, este creat un link cu această cheie, însă poți exporta cheia de decriptare separat pentru un strat de securitate suplimentar.</string>
+    <string name="decryption_key_explanation">Sistemul nostru de criptare capăt-la-capăt necesită o cheie unică generată automat pentru acest fișier sau folder. În mod implicit, este creat un link cu această cheie, însă poți exporta cheia de decriptare separat pentru un strat de securitate suplimentar.</string>
     <!-- Reset password label -->
     <string name="reset_password_label">Resetează parola</string>
     <!-- Warning show to the user when has enable to send the decryption key of a link separately and tries to share the link -->
@@ -3844,7 +3820,7 @@
     <!-- String to share a link protected with password with its password.Please keep the place holders, are to set the link and the password. Example: Link: https://mega.nz/file/kC42xRSK#Ud2QsvpIVYmCd1a9QUhk42wXv10jCSyPSWnXEwYX2VE Password: asfAFG3345g -->
     <string name="share_link_with_password">Link: %1$s\n\nParolă: %2$s</string>
     <!-- Warning show to the user when the app needs permissions to share files and the user has denied them. -->
-    <string name="files_required_permissions_warning">MEGA needs your permission to access your files for sharing.</string>
+    <string name="files_required_permissions_warning">MEGA are nevoie de permisiunea ta ca să acceseze fișierele pentru partajare.</string>
     <!-- Context menu item. Allows user to add file/folder to favourites -->
     <string name="file_properties_favourite">Favorit</string>
     <!-- Context menu item. Allows user to delete file/folder from favourites -->
@@ -3945,7 +3921,7 @@
     <string name="file_created">Fișier creat</string>
     <!-- Warning indicating a file was not created successfully -->
     <string name="file_creation_failed">Crearea fișierului a eșuat. Te rugăm să încerci din nou.</string>
-    <!-- Label indicating a file was saved to some folder. e.g.: File saved to Cloud Drive -->
+    <!-- Label indicating a file was saved to some folder. e.g.: File saved to Cloud Drive. "Cloud Drive" is the only destination for the time being, thus any article isn't needed -->
     <string name="file_saved_to">Fișier salvat în %1$s</string>
     <!-- Warning indicating a file was not saved to some folder. e.g.: File not saved to Cloud Drive. Try again -->
     <string name="file_saved_to_failed">Fișier nesalvat în %1$s. Încearcă din nou.</string>
@@ -4289,4 +4265,18 @@
     <string name="video_quality_info">You can save space by decreasing the video quality in Camera Uploads settings.</string>
     <!-- Label indicating video original quality -->
     <string name="original_quality">Calitate originală</string>
+    <!-- Settings label which allows to enable or disable fingerprint unlock. -->
+    <string name="setting_fingerprint">Fingerprint ID</string>
+    <!-- Title of the dialog which allows to enable the fingerprint unlock. -->
+    <string name="title_enable_fingerprint">Confirm your fingerprint to unlock</string>
+    <!-- Title of the dialog which allows to unlock the app with the fingerprint. -->
+    <string name="title_unlock_fingerprint">Unlock using your fingerprint</string>
+    <!-- Button of the dialog which allows to unlock the app with the fingerprint. Gives the option to unlock with the passcode instead -->
+    <string name="action_use_passcode">Use passcode</string>
+    <!-- Message informing the fingerprint was enabled successfully -->
+    <string name="confirmation_fingerprint_enabled">Your fingerprint is confirmed</string>
+    <!-- Warning indicating an image (GIF) cannot be inserted in an input text. Same string than the one shown by the system when it detects this behaviour on its own. -->
+    <string name="image_insertion_not_allowed">MEGA does not support image insertion here</string>
+    <!-- The label under the button of viewing all images screen -->
+    <string name="section_images">Imagini</string>
 </resources>

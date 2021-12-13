@@ -88,13 +88,38 @@ class MeetingParticipantBottomSheetDialogViewModel @ViewModelInject constructor(
     fun showContactInfoOrEditProfile(): Boolean = !isGuest &&
             !isParticipantGuest() && (participant?.isContact == true || participant?.isMe == true)
 
-
     /**
      * Determine if show the divider between info item and option items
      *
      * @return if should show return true, else false
      */
-    fun showDividerContactInfo(): Boolean = showAddContact() || showContactInfoOrEditProfile()
+    fun showDividerContactInfo(): Boolean = (showAddContact() || showContactInfoOrEditProfile())
+            && (showSendMessage() || showPinItem() || showMakeModeratorItem() || showRemoveItem())
+
+
+    /**
+     * Determine if show the divider between seng message item and option items
+     *
+     * @return if should show return true, else false
+     */
+    fun showDividerSendMessage(): Boolean =
+        showSendMessage() && (showPinItem() || showMakeModeratorItem() || showRemoveItem())
+
+
+    /**
+     * Determine if show the divider between ping to speaker item and option items
+     *
+     * @return if should show return true, else false
+     */
+    fun showDividerPingToSpeaker(): Boolean =
+        showPinItem() && (showMakeModeratorItem() || showRemoveItem())
+
+    /**
+     * Determine if show the divider between make moderator item and option items
+     *
+     * @return if should show return true, else false
+     */
+    fun showDividerMakeModerator(): Boolean = showMakeModeratorItem() && showRemoveItem()
 
     /**
      * Determine if show the `Edit Profile` item

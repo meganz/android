@@ -1615,26 +1615,14 @@
     <string name="paused_transfers_title">Angehaltene Transfers</string>
     <!-- message shown in the screen when there are not any active transfer -->
     <string name="completed_transfers_empty">Keine abgeschlossenen Transfers</string>
-    <!-- Text of the notification shown when the upload service is running, Plural -->
-    <plurals name="upload_service_notification">
-        <item quantity="one">Uploade %1$d von %2$d Datei</item>
-        <item quantity="other">Uploade %1$d von %2$d Dateien</item>
-    </plurals>
-    <!-- Text of the notification shown when the upload service is running, Plural -->
-    <plurals name="upload_service_paused_notification">
-        <item quantity="one">%1$d von %2$d Datei wird hochgeladen (angehalten)</item>
-        <item quantity="other">%1$d von %2$d Dateien werden hochgeladen (angehalten)</item>
-    </plurals>
-    <!-- Text of the notification shown when the folder upload service is running, Text of the notification shown when the folder upload service is running - plural e.g. Uploading 1 of 2 folders -->
-    <plurals name="folder_upload_service_notification">
-        <item quantity="one">%1$d von %2$d Ordner wird hochgeladen</item>
-        <item quantity="other">%1$d von %2$d Ordnern wird hochgeladen</item>
-    </plurals>
-    <!-- Text of the notification shown when the folder upload service is running, Text of the notification shown when the folder upload service is running - plural e.g. Uploading 1 of 2 folders -->
-    <plurals name="folder_upload_service_paused_notification">
-        <item quantity="one">%1$d von %2$d Ordner wird hochgeladen (angehalten)</item>
-        <item quantity="other">%1$d von %2$d Ordnern werden hochgeladen (angehalten)</item>
-    </plurals>
+    <!-- Text of the notification shown when the upload service is running: e.g. Uploading files: 1 of 10 -->
+    <string name="upload_service_notification">Dateiupload: %1$d von %2$d</string>
+    <!-- Text of the notification shown when the upload service is paused: e.g. Uploading files: 1 of 10 (paused)-->
+    <string name="upload_service_notification_paused">Dateiupload: %1$d von %2$d (pausiert)</string>
+    <!-- Text of the notification shown when the folder upload service is running, e.g. Uploading folders 1 of 2 -->
+    <string name="folder_upload_service_notification">Ordnerupload: %1$d von %2$d</string>
+    <!-- Text of the notification shown when the folder upload service is paused, e.g. Uploading folders 1 of 2 (paused) -->
+    <string name="folder_upload_service_notification_paused">Ordnerupload: %1$d von %2$d (pausiert)</string>
     <!-- Text of the notification shown when the upload service has finished, Plural -->
     <plurals name="upload_service_final_notification">
         <item quantity="one">%1$d Datei hochgeladen</item>
@@ -1682,16 +1670,10 @@
         <item quantity="one">%1$d Datei konnte nicht heruntergeladen werden</item>
         <item quantity="other">%1$d Dateien konnten nicht heruntergeladen werden</item>
     </plurals>
-    <!-- Text of the notification shown when the download service is running, Plural -->
-    <plurals name="download_service_notification">
-        <item quantity="one">Downloade %1$d von %2$d Datei</item>
-        <item quantity="other">Downloade %1$d von %2$d Dateien</item>
-    </plurals>
-    <!-- Text of the notification shown when the download service is paused, Plural -->
-    <plurals name="download_service_paused_notification">
-        <item quantity="one">%1$d von %2$d Datei wird heruntergeladen (pausiert)</item>
-        <item quantity="other">%1$d von %2$d Dateien wird heruntergeladen (pausiert)</item>
-    </plurals>
+    <!-- Text of the notification shown when the download service is running -->
+    <string name="download_service_notification">Dateidownload: %1$d von %2$d</string>
+    <!-- Text of the notification shown when the download service is paused -->
+    <string name="download_service_notification_paused">Dateidownload: %1$d von %2$d (pausiert)</string>
     <!-- Title of the alert when the transfer quota is exceeded. -->
     <string name="title_depleted_transfer_overquota">Transfervolumen nicht ausreichend</string>
     <!-- Text of the alert when the transfer quota is depleted. The placeholder indicates the time left for the transfer quota to be reset. For instance: 30m 45s -->
@@ -3859,7 +3841,7 @@
     <string name="file_created">Datei erstellt</string>
     <!-- Warning indicating a file was not created successfully -->
     <string name="file_creation_failed">Dateierstellung fehlgeschlagen. Bitte versuchen Sie es erneut.</string>
-    <!-- Label indicating a file was saved to some folder. e.g.: File saved to Cloud Drive -->
+    <!-- Label indicating a file was saved to some folder. e.g.: File saved to Cloud Drive. "Cloud Drive" is the only destination for the time being, thus any article isn't needed -->
     <string name="file_saved_to">Datei im Ordner %1$s gespeichert</string>
     <!-- Warning indicating a file was not saved to some folder. e.g.: File not saved to Cloud Drive. Try again -->
     <string name="file_saved_to_failed">Datei konnte nicht im Ordner %1$s gespeichert werden. Bitte versuchen Sie es erneut.</string>
@@ -4194,4 +4176,18 @@
     <string name="video_quality_info">Sie können Speicherplatz sparen, indem Sie die Videoqualität in den Kamera-Upload-Einstellungen verringern.</string>
     <!-- Label indicating video original quality -->
     <string name="original_quality">Höchste Qualitätsstufe</string>
+    <!-- Settings label which allows to enable or disable fingerprint unlock. -->
+    <string name="setting_fingerprint">Fingerabdruck-ID</string>
+    <!-- Title of the dialog which allows to enable the fingerprint unlock. -->
+    <string name="title_enable_fingerprint">Bestätigen Sie zum Entsperren Ihren Fingerabdruck</string>
+    <!-- Title of the dialog which allows to unlock the app with the fingerprint. -->
+    <string name="title_unlock_fingerprint">Entsperren mit Ihrem Fingerabdruck</string>
+    <!-- Button of the dialog which allows to unlock the app with the fingerprint. Gives the option to unlock with the passcode instead -->
+    <string name="action_use_passcode">Passcode verwenden</string>
+    <!-- Message informing the fingerprint was enabled successfully -->
+    <string name="confirmation_fingerprint_enabled">Ihr Fingerabdruck wurde bestätigt</string>
+    <!-- Warning indicating an image (GIF) cannot be inserted in an input text. Same string than the one shown by the system when it detects this behaviour on its own. -->
+    <string name="image_insertion_not_allowed">Hier können Sie leider keine Bilder einfügen.</string>
+    <!-- The label under the button of viewing all images screen -->
+    <string name="section_images">Bilder</string>
 </resources>
