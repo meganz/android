@@ -40,18 +40,29 @@ pipeline {
         slackUploadFile filePath: env.CONSOLE_LOG_FILE, initialComment: comment
       }
     }
+      success {
+          script {
+              def comment = "Android Build Success: ${env.GIT_BRANCH}"
+              if (env.CHANGE_URL) {
+                  comment = "Android Build Success: ${env.GIT_BRANCH} ${env.CHANGE_URL}"
+              }
+              slackSend color: "good", message: comment
+          }
+      }
   }
   stages {
+      stage('Preparation') {
+          steps {
+              sh "rm -f ${CONSOLE_LOG_FILE}"
+          }
+      }
 
     stage('Notify GitLab Test') {
       steps {
         echo 'Notify GitLab'
         updateGitlabCommitStatus name: 'build', state: 'pending'
         updateGitlabCommitStatus name: 'build', state: 'failed'
-        updateGitlabCommitStatus name: 'test', state: 'pending'
-        updateGitlabCommitStatus name: 'test', state: 'failed'
         addGitLabMRComment comment: 'Another build has been triggered in CI'
-        slackSend color: "warning", message: "Message from Jenkins Pipeline - Android"
       }
     }
 
@@ -111,7 +122,7 @@ pipeline {
         ## ATTENTION: sometimes the downloaded webrtc zip has a enclosing folder. like below.
         ## so we might need to adjust below path when there is a new webrtc zip
         cp -fr ${BUILD_LIB_DOWNLOAD_FOLDER}/${WEBRTC_LIB_UNZIPPED}/webrtc_branch-heads4405/webrtc app/src/main/jni/megachat/
-        # mkdir -p app/src
+        
         rm -fr app/src/debug
         rm -fr app/src/release
         cp -fr ${BUILD_LIB_DOWNLOAD_FOLDER}/${GOOGLE_MAP_API_UNZIPPED}/* app/src/
@@ -130,16 +141,24 @@ pipeline {
     stage('Compile') {
       steps {
         // Compile the app and its dependencies
-        sh "./gradlew compileDebugSources >> ${CONSOLE_LOG_FILE}"
+        sh "./gradlew clean compileDebugSources >> ${CONSOLE_LOG_FILE}"
       }
     }
     stage('Unit test') {
       steps {
+        updateGitlabCommitStatus name: 'test', state: 'pending'
+
         // Compile and run the unit tests for the app and its dependencies
         sh "./gradlew testDebugUnitTest >> ${CONSOLE_LOG_FILE}"
 
         // Analyse the test results and update the build result as appropriate
         //junit '**/TEST-*.xml'
+      }
+      post {
+        failure {
+          // Notify developer team of the failure
+          updateGitlabCommitStatus name: 'test', state: 'failed'
+        }
       }
     }
     stage('Build APK') {
