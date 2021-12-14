@@ -63,7 +63,7 @@ pipeline {
 
         stage('Notify GitLab Test') {
             steps {
-                echo 'Notify GitLab'
+                echo 'Notify GitLab Test'
                 updateGitlabCommitStatus name: 'build', state: 'pending'
                 updateGitlabCommitStatus name: 'build', state: 'failed'
                 addGitLabMRComment comment: 'Another build has been triggered in CI'
@@ -91,7 +91,7 @@ pipeline {
                 pwd
                 ls -lh
         
-                ## check webrtc file
+                ## check if webrtc exists
                 if test -f "${BUILD_LIB_DOWNLOAD_FOLDER}/${WEBRTC_LIB_FILE}"; then
                   echo "${WEBRTC_LIB_FILE} already downloaded. Skip downloading."
                 else
@@ -103,7 +103,7 @@ pipeline {
                   unzip ${WEBRTC_LIB_FILE} -d ${WEBRTC_LIB_UNZIPPED}
                 fi
         
-                ## check default google api
+                ## check default Google API
                 if test -f "${BUILD_LIB_DOWNLOAD_FOLDER}/${GOOGLE_MAP_API_FILE}"; then
                   echo "${GOOGLE_MAP_API_FILE} already downloaded. Skip downloading."
                 else
@@ -142,18 +142,18 @@ pipeline {
                 """
             }
         }
-        stage('Compile') {
-            steps {
-                // Compile the app and its dependencies
-                runShell "./gradlew clean compileDebugSources"
-            }
-        }
+//        stage('Compile') {
+//            steps {
+//                // Compile the app and its dependencies
+//                runShell "./gradlew clean compileDebugSources"
+//            }
+//        }
         stage('Unit test') {
             steps {
                 updateGitlabCommitStatus name: 'test', state: 'pending'
 
                 // Compile and run the unit tests for the app and its dependencies
-                runShell "./gradlew testDebugUnitTest"
+                runShell "./gradlew testGmsDebugUnitTest"
 
                 // Analyse the test results and update the build result as appropriate
                 //junit '**/TEST-*.xml'
@@ -163,12 +163,15 @@ pipeline {
                     // Notify developer team of the failure
                     updateGitlabCommitStatus name: 'test', state: 'failed'
                 }
+                success {
+                    updateGitlabCommitStatus name: 'test', state: 'success'
+                }
             }
         }
         stage('Build APK') {
             steps {
                 // Finish building and packaging the APK
-                runShell "./gradlew assemble"
+                runShell "./gradlew app:assembleGmsDebug app:assembleHmsDebug"
 
                 // Archive the APKs so that they can be downloaded from Jenkins
                 // archiveArtifacts '**/*.apk'
