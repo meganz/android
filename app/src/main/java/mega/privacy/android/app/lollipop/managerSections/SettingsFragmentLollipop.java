@@ -476,9 +476,7 @@ public class SettingsFragmentLollipop extends SettingsBaseFragment {
             case KEY_ABOUT_SDK_VERSION:
                 numberOfClicksSDK++;
                 if (numberOfClicksSDK == 5) {
-                    MegaAttributes attrs = dbH.getAttributes();
-
-                    if (attrs != null && attrs.getFileLoggerSDK() != null && Boolean.parseBoolean(attrs.getFileLoggerSDK())) {
+                    if (areSDKLogsEnabled()) {
                         numberOfClicksSDK = 0;
                         setStatusLoggerSDK(context, false);
                     } else {
@@ -491,13 +489,10 @@ public class SettingsFragmentLollipop extends SettingsBaseFragment {
             case KEY_ABOUT_KARERE_VERSION:
                 numberOfClicksKarere++;
                 if (numberOfClicksKarere == 5) {
-                    MegaAttributes attrs = dbH.getAttributes();
-
-                    if (attrs != null && attrs.getFileLoggerKarere() != null && Boolean.parseBoolean(attrs.getFileLoggerKarere())) {
+                    if (areKarereLogsEnabled()) {
                         numberOfClicksKarere = 0;
                         setStatusLoggerKarere(context, false);
                     } else {
-                        logWarning("Karere file logger attribute is NULL");
                         ((ManagerActivityLollipop) context).showConfirmationEnableLogsKarere();
                     }
                 }
