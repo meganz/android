@@ -54,7 +54,7 @@ android {
         resValue ("string", "sdk_version", "\"${getSdkGitHash()}\"")
         resValue ("string", "karere_version", "\"${getKarereGitHash()}\"")
 
-        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        testInstrumentationRunner "test.mega.privacy.android.app.CustomTestRunner"
     }
 
     sourceSets.main {
@@ -136,6 +136,11 @@ android {
             applicationId = "mega.privacy.android.app.huawei"
         }
     }
+}
+
+// See https://dagger.dev/hilt/gradle-setup#gradle-plugin-local-tests
+hilt {
+    enableTransformForLocalTests = true
 }
 
 dependencies {
@@ -267,6 +272,12 @@ dependencies {
     androidTestImplementation "androidx.test.ext:junit:$androidxTestExtVersion"
     androidTestImplementation "com.google.truth:truth:$truthVersion"
     androidTestImplementation "androidx.test.espresso:espresso-core:$espressoVersion"
+    androidTestImplementation "com.google.dagger:hilt-android-testing:$hiltVersion"
+    androidTestImplementation "org.mockito:mockito-core:$mockitoVersion"
+    androidTestImplementation "org.mockito.kotlin:mockito-kotlin:$mockitoKotlinVersion"
+
+    kaptAndroidTest "com.google.dagger:hilt-android-compiler:$hiltVersion"
+    debugImplementation "androidx.fragment:fragment-testing:$fragment_version"
 }
 
 def taskRequests = gradle.getStartParameter().getTaskRequests().toString()
