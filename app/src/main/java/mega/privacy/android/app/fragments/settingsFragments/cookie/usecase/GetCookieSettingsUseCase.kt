@@ -3,8 +3,8 @@ package mega.privacy.android.app.fragments.settingsFragments.cookie.usecase
 import io.reactivex.rxjava3.core.Single
 import mega.privacy.android.app.di.MegaApi
 import mega.privacy.android.app.fragments.settingsFragments.cookie.data.CookieType
+import mega.privacy.android.app.listeners.OptionalMegaRequestListenerInterface
 import mega.privacy.android.app.utils.ErrorUtils.toThrowable
-import mega.privacy.android.app.utils.LogUtil.logError
 import nz.mega.sdk.*
 import java.util.*
 import javax.inject.Inject
@@ -23,17 +23,9 @@ class GetCookieSettingsUseCase @Inject constructor(
      */
     fun get(): Single<Set<CookieType>> =
         Single.create { emitter ->
-            megaApi.getCookieSettings(object : MegaRequestListenerInterface {
-                override fun onRequestStart(api: MegaApiJava, request: MegaRequest) {}
-
-                override fun onRequestUpdate(api: MegaApiJava, request: MegaRequest) {}
-
-                override fun onRequestFinish(
-                    api: MegaApiJava,
-                    request: MegaRequest,
-                    error: MegaError
-                ) {
-                    if (emitter.isDisposed) return
+            megaApi.getCookieSettings(OptionalMegaRequestListenerInterface(
+                onRequestFinish = { request, error ->
+                    if (emitter.isDisposed) return@OptionalMegaRequestListenerInterface
 
                     when (error.errorCode) {
                         MegaError.API_OK -> {
@@ -56,15 +48,7 @@ class GetCookieSettingsUseCase @Inject constructor(
                         }
                     }
                 }
-
-                override fun onRequestTemporaryError(
-                    api: MegaApiJava,
-                    request: MegaRequest,
-                    error: MegaError
-                ) {
-                    logError(error.toThrowable().stackTraceToString())
-                }
-            })
+            ))
         }
 
     /**
