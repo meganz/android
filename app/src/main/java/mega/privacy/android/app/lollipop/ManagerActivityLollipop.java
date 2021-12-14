@@ -130,6 +130,10 @@ import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.OpenPasswordLinkActivity;
 import mega.privacy.android.app.Product;
 import mega.privacy.android.app.R;
+import mega.privacy.android.app.featuretoggle.SettingsFragmentRefactorToggle;
+import mega.privacy.android.app.lollipop.managerSections.settings.Settings;
+import mega.privacy.android.app.lollipop.managerSections.settings.SettingsActivity;
+import mega.privacy.android.app.lollipop.managerSections.settings.SettingsFragment;
 import mega.privacy.android.app.objects.PasscodeManagement;
 import mega.privacy.android.app.fragments.homepage.documents.DocumentsFragment;
 import mega.privacy.android.app.fragments.managerFragments.cu.PhotosFragment;
@@ -325,7 +329,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 		MegaGlobalListenerInterface, MegaTransferListenerInterface, OnClickListener,
 		BottomNavigationView.OnNavigationItemSelectedListener, UploadBottomSheetDialogActionListener,
 		ChatManagementCallback, ActionNodeCallback, SnackbarShower,
-		MeetingBottomSheetDialogActionListener, LoadPreviewListener.OnPreviewLoadedCallback{
+		MeetingBottomSheetDialogActionListener, LoadPreviewListener.OnPreviewLoadedCallback, SettingsActivity {
 
 	private static final String TRANSFER_OVER_QUOTA_SHOWN = "TRANSFER_OVER_QUOTA_SHOWN";
 
@@ -469,6 +473,26 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 
 	// Determine if open this activity from meeting page, if true, will finish this activity when user click back icon
 	private boolean isFromMeeting = false;
+
+	@Override
+	public boolean getOpenSettingsStartScreen() {
+		return openSettingsStartScreen;
+	}
+
+	@Override
+	public void setOpenSettingsStartScreen(boolean openSettingsStartScreen) {
+		this.openSettingsStartScreen = openSettingsStartScreen;
+	}
+
+	@Override
+	public boolean getOpenSettingsQR() {
+		return openSettingsQR;
+	}
+
+	@Override
+	public boolean getOpenSettingsStorage() {
+		return openSettingsQR;
+	}
 
 	public enum FragmentTag {
 		CLOUD_DRIVE, HOMEPAGE, PHOTOS, INBOX, INCOMING_SHARES, OUTGOING_SHARES, SETTINGS, SEARCH,TRANSFERS, COMPLETED_TRANSFERS,
@@ -619,7 +643,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 	private TransfersFragmentLollipop tFLol;
 	private CompletedTransfersFragmentLollipop completedTFLol;
 	private SearchFragmentLollipop sFLol;
-	private SettingsFragmentLollipop sttFLol;
+	private Settings sttFLol;
 	private PhotosFragment cuFragment;
 	private RecentChatsFragmentLollipop rChatFL;
 	private NotificationsFragmentLollipop notificFragment;
@@ -4666,10 +4690,14 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 						sttFLol.goToSectionStartScreen();
 					}
 				} else {
-					sttFLol = new SettingsFragmentLollipop();
+					if(SettingsFragmentRefactorToggle.INSTANCE.getEnabled()){
+						sttFLol = new SettingsFragment();
+					}else {
+						sttFLol = new SettingsFragmentLollipop();
+					}
 				}
 
-				replaceFragment(sttFLol, FragmentTag.SETTINGS.getTag());
+				replaceFragment((Fragment)sttFLol, FragmentTag.SETTINGS.getTag());
 
 				setToolbarTitle();
 				supportInvalidateOptionsMenu();
@@ -8099,16 +8127,16 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 
 	@Override
 	public void showConfirmationEnableLogsSDK(){
-		if(getSettingsFragment() != null){
-			sttFLol.numberOfClicksSDK = 0;
+		if(getSettingsFragment() != null && !SettingsFragmentRefactorToggle.INSTANCE.getEnabled()){
+			((SettingsFragmentLollipop)sttFLol).numberOfClicksSDK = 0;
 		}
 		super.showConfirmationEnableLogsSDK();
 	}
 
 	@Override
 	public void showConfirmationEnableLogsKarere(){
-		if(getSettingsFragment() != null){
-			sttFLol.numberOfClicksKarere = 0;
+		if(getSettingsFragment() != null && !SettingsFragmentRefactorToggle.INSTANCE.getEnabled()){
+			((SettingsFragmentLollipop)sttFLol).numberOfClicksKarere = 0;
 		}
 		super.showConfirmationEnableLogsKarere();
 	}
@@ -9563,28 +9591,28 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 				logDebug("Type: GET_ATTR_USER ParamType: USER_ATTR_CONTACT_LINK_VERIFICATION --> getContactLinkOption");
 				if (e.getErrorCode() == MegaError.API_OK) {
 					if (getSettingsFragment() != null) {
-						sttFLol.setAutoacceptSetting(request.getFlag());
+						sttFLol.setAutoAcceptSetting(request.getFlag());
 						logDebug("OK getContactLinkOption: " + request.getFlag());
 //						If user request to set QR autoaccept
-						if (sttFLol.getSetAutoaccept()) {
-							if (sttFLol.getAutoacceptSetting()) {
-								logDebug("setAutoaccept false");
+						if (sttFLol.getSetAutoAccept()) {
+							if (sttFLol.getAutoAcceptSetting()) {
+								logDebug("setAutoAccept false");
 //								If autoaccept is enabled -> request to disable
 								megaApi.setContactLinksOption(true, this);
 							} else {
-								logDebug("setAutoaccept true");
+								logDebug("setAutoAccept true");
 //								If autoaccept is disabled -> request to enable
 								megaApi.setContactLinksOption(false, this);
 							}
 						} else {
-							sttFLol.setValueOfAutoaccept(sttFLol.getAutoacceptSetting());
+							sttFLol.setValueOfAutoAccept(sttFLol.getAutoAcceptSetting());
 						}
-						logDebug("Autoacept: " + sttFLol.getAutoacceptSetting());
+						logDebug("Autoacept: " + sttFLol.getAutoAcceptSetting());
 					}
 				} else if (e.getErrorCode() == MegaError.API_ENOENT) {
 					logError("Error MegaError.API_ENOENT getContactLinkOption: " + request.getFlag());
 					if (getSettingsFragment() != null) {
-						sttFLol.setAutoacceptSetting(request.getFlag());
+						sttFLol.setAutoAcceptSetting(request.getFlag());
 					}
 					megaApi.setContactLinksOption(false, this);
 				} else {
@@ -10785,12 +10813,8 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 		this.selectedNode = selectedNode;
 	}
 
-	public SettingsFragmentLollipop getSettingsFragment() {
-		return sttFLol = (SettingsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.SETTINGS.getTag());
-	}
-
-	public void setSettingsFragment(SettingsFragmentLollipop sttFLol) {
-		this.sttFLol = sttFLol;
+	public Settings getSettingsFragment() {
+		return sttFLol = (Settings) getSupportFragmentManager().findFragmentByTag(FragmentTag.SETTINGS.getTag());
 	}
 
 	public MegaContactAdapter getSelectedUser() {
