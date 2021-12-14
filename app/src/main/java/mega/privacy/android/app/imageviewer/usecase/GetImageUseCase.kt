@@ -12,6 +12,7 @@ import mega.privacy.android.app.errors.QuotaOverdueMegaError
 import mega.privacy.android.app.imageviewer.data.ImageResult
 import mega.privacy.android.app.listeners.OptionalMegaRequestListenerInterface
 import mega.privacy.android.app.listeners.OptionalMegaTransferListenerInterface
+import mega.privacy.android.app.usecase.GetChatMessageUseCase
 import mega.privacy.android.app.usecase.GetNodeUseCase
 import mega.privacy.android.app.utils.CacheFolderManager.*
 import mega.privacy.android.app.utils.Constants
@@ -25,14 +26,16 @@ import javax.inject.Inject
 /**
  * Use case to retrieve a single image
  *
- * @property megaApi        MegaAPI required for node requests
- * @property context        Context required to build files
- * @property getNodeUseCase NodeUseCase required to retrieve node information
+ * @property megaApi                MegaAPI required for node requests
+ * @property context                Context required to build files
+ * @property getNodeUseCase         NodeUseCase required to retrieve node information
+ * @property getChatMessageUseCase  ChatMessageUseCase required to retrieve node information
  */
 class GetImageUseCase @Inject constructor(
     @MegaApi private val megaApi: MegaApiAndroid,
     @ApplicationContext private val context: Context,
-    private val getNodeUseCase: GetNodeUseCase
+    private val getNodeUseCase: GetNodeUseCase,
+    private val getChatMessageUseCase: GetChatMessageUseCase
 ) {
 
     /**
@@ -48,7 +51,8 @@ class GetImageUseCase @Inject constructor(
         fullSize: Boolean = false,
         highPriority: Boolean = false
     ): Flowable<ImageResult> =
-        getNodeUseCase.get(nodeHandle).flatMapPublisher { get(it, fullSize, highPriority) }
+        getNodeUseCase.get(nodeHandle)
+            .flatMapPublisher { node -> get(node, fullSize, highPriority) }
 
     /**
      * Get an image given a Node file link.
@@ -63,7 +67,26 @@ class GetImageUseCase @Inject constructor(
         fullSize: Boolean = false,
         highPriority: Boolean = false
     ): Flowable<ImageResult> =
-        getNodeUseCase.getPublicNode(nodeFileLink).flatMapPublisher { get(it, fullSize, highPriority) }
+        getNodeUseCase.getPublicNode(nodeFileLink)
+            .flatMapPublisher { node -> get(node, fullSize, highPriority) }
+
+    /**
+     * Get an image given a Node Chat Room Id and Chat Message Id.
+     *
+     * @param chatRoomId        Chat Message Room Id
+     * @param chatMessageId     Chat Message Id
+     * @param fullSize          Flag to request full size image.
+     * @param highPriority      Flag to request full image with high priority.
+     * @return                  Flowable which emits Uri for every image, from low to high resolution.
+     */
+    fun get(
+        chatRoomId: Long,
+        chatMessageId: Long,
+        fullSize: Boolean = false,
+        highPriority: Boolean = false
+    ): Flowable<ImageResult> =
+        getChatMessageUseCase.getChatNode(chatRoomId, chatMessageId)
+            .flatMapPublisher { node -> get(node, fullSize, highPriority) }
 
     /**
      * Get an image given a Node.

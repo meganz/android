@@ -142,6 +142,29 @@ class ImageViewerActivity : BaseActivity(), PermissionRequester, SnackbarShower 
             }
 
         /**
+         * Get Image Viewer intent to show a list of image nodes from chat messages.
+         *
+         * @param context           Required to build the Intent.
+         * @param messageIds        Message Ids to be retrieved.
+         * @param chatRoomId        Chat Room Id of given messages.
+         * @param currentNodeHandle Current node handle to show.
+         * @return                  Image Viewer Intent.
+         */
+        @JvmStatic
+        @JvmOverloads
+        fun getIntentForChatMessages(
+            context: Context,
+            chatRoomId: Long,
+            messageIds: LongArray,
+            currentNodeHandle: Long? = null
+        ): Intent =
+            Intent(context, ImageViewerActivity::class.java).apply {
+                putExtra(INTENT_EXTRA_KEY_CHAT_ID, chatRoomId)
+                putExtra(INTENT_EXTRA_KEY_MSG_ID, messageIds)
+                putExtra(INTENT_EXTRA_KEY_HANDLE, currentNodeHandle)
+            }
+
+        /**
          * Get Image Viewer intent to show a list of image nodes.
          *
          * @param context           Required to build the Intent.
@@ -168,6 +191,8 @@ class ImageViewerActivity : BaseActivity(), PermissionRequester, SnackbarShower 
     private val childrenHandles: LongArray? by extra(NODE_HANDLES)
     private val childrenOfflineHandles: LongArray? by extra(INTENT_EXTRA_KEY_ARRAY_OFFLINE)
     private val childOrder: Int? by extra(INTENT_EXTRA_KEY_ORDER_GET_CHILDREN)
+    private val chatRoomId: Long? by extra(INTENT_EXTRA_KEY_CHAT_ID)
+    private val chatMessagesId: LongArray? by extra(INTENT_EXTRA_KEY_MSG_ID)
 
     private var pageCallbackSet = false
     private val viewModel by viewModels<ImageViewerViewModel>()
@@ -268,16 +293,18 @@ class ImageViewerActivity : BaseActivity(), PermissionRequester, SnackbarShower 
         when {
             parentNodeHandle != null && parentNodeHandle != INVALID_HANDLE ->
                 viewModel.retrieveImagesFromParent(parentNodeHandle!!, childOrder, nodeHandle)
-            childrenHandles != null && childrenHandles!!.isNotEmpty() ->
+            childrenHandles?.isNotEmpty() == true ->
                 viewModel.retrieveImages(childrenHandles!!, nodeHandle)
-            childrenOfflineHandles != null && childrenOfflineHandles!!.isNotEmpty() ->
-                viewModel.retrieveOfflineImages(childrenOfflineHandles!!, nodeHandle)
+            childrenOfflineHandles?.isNotEmpty() == true ->
+                viewModel.retrieveImages(childrenOfflineHandles!!, nodeHandle, isOffline = true)
             nodeOfflineHandle != null && nodeOfflineHandle != INVALID_HANDLE ->
-                viewModel.retrieveSingleOfflineImage(nodeOfflineHandle!!)
-            nodeHandle != null && nodeHandle != INVALID_HANDLE ->
-                viewModel.retrieveSingleImage(nodeHandle!!)
+                viewModel.retrieveSingleImage(nodeOfflineHandle!!, isOffline = true)
+            chatRoomId != null && chatMessagesId?.isNotEmpty() == true ->
+                viewModel.retrieveChatImages(chatRoomId!!, chatMessagesId!!, nodeHandle)
             !nodeFileLink.isNullOrBlank() ->
                 viewModel.retrieveSingleImage(nodeFileLink!!)
+            nodeHandle != null && nodeHandle != INVALID_HANDLE ->
+                viewModel.retrieveSingleImage(nodeHandle!!)
             else ->
                 error("Invalid params")
         }

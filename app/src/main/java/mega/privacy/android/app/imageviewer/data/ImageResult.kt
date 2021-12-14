@@ -3,7 +3,7 @@ package mega.privacy.android.app.imageviewer.data
 import android.net.Uri
 
 /**
- * Data object that encapsulates an image result coming from {@link GetImageUseCase}.
+ * Data object that encapsulates an image result coming from GetImageUseCase.
  *
  * @property thumbnailUri   Image thumbnail Uri.
  * @property previewUri     Image preview Uri.

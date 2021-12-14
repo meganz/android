@@ -31,8 +31,8 @@ import nz.mega.sdk.MegaNode
 
 /**
  * Main ViewModel to handle all logic related to the ImageViewer.
- * This is shared between {@link ImageViewerActivity} behaving as the main container and
- * each individual {@link ImageViewerPageFragment} representing a single image within the ViewPager.
+ * This is shared between ImageViewerActivity behaving as the main container and
+ * each individual ImageViewerPageFragment representing a single image within the ViewPager.
  *
  * @property getImageUseCase        Needed to retrieve each individual image based on a node.
  * @property getImageHandlesUseCase Needed to retrieve node handles given sent params.
@@ -73,18 +73,13 @@ class ImageViewerViewModel @ViewModelInject constructor(
 
     fun onSwitchToolbar(): LiveData<Unit> = switchToolbar
 
-    fun retrieveSingleImage(nodeHandle: Long) {
-        getImageHandlesUseCase.get(nodeHandles = longArrayOf(nodeHandle))
+    fun retrieveSingleImage(nodeHandle: Long, isOffline: Boolean = false) {
+        getImageHandlesUseCase.get(nodeHandles = longArrayOf(nodeHandle), isOffline = isOffline)
             .subscribeAndUpdateImages()
     }
 
     fun retrieveSingleImage(nodeFileLink: String) {
         getImageHandlesUseCase.get(nodeFileLinks = listOf(nodeFileLink))
-            .subscribeAndUpdateImages()
-    }
-
-    fun retrieveSingleOfflineImage(nodeHandle: Long) {
-        getImageHandlesUseCase.get(nodeHandles = longArrayOf(nodeHandle), isOffline = true)
             .subscribeAndUpdateImages()
     }
 
@@ -99,41 +94,46 @@ class ImageViewerViewModel @ViewModelInject constructor(
 
     fun retrieveImages(
         nodeHandles: LongArray,
-        currentNodeHandle: Long? = null
+        currentNodeHandle: Long? = null,
+        isOffline: Boolean = false
     ) {
-        getImageHandlesUseCase.get(nodeHandles = nodeHandles)
+        getImageHandlesUseCase.get(nodeHandles = nodeHandles, isOffline = isOffline)
             .subscribeAndUpdateImages(currentNodeHandle)
     }
 
-    fun retrieveOfflineImages(
-        nodeHandles: LongArray,
+    fun retrieveChatImages(
+        chatRoomId: Long,
+        messageIds: LongArray,
         currentNodeHandle: Long? = null
     ) {
-        getImageHandlesUseCase.get(nodeHandles = nodeHandles, isOffline = true)
+        getImageHandlesUseCase.get(chatRoomId = chatRoomId, chatMessageIds = messageIds)
             .subscribeAndUpdateImages(currentNodeHandle)
     }
 
     /**
-     * Main method to request a {@link MegaNodeItem} given a previously loaded Node handle.
+     * Main method to request a MegaNodeItem given a previously loaded Node handle.
      * This will update the current Node on the main "images" list if it's newer.
      * You must be observing the requested Image to get the updated result.
      *
      * @param nodeHandle    Image node handle to be loaded.
+     * @param forceReload   Flag to force reload node if needed.
      */
     fun loadSingleNode(nodeHandle: Long, forceReload: Boolean = false) {
         val existingNode = images.value?.find { it.handle == nodeHandle }
         val subscription = when {
             forceReload || existingNode?.isDirty == true -> {
-                if (existingNode?.publicLink != null) {
-                    getNodeUseCase.getNodeItem(existingNode.publicLink)
+                if (existingNode?.nodePublicLink?.isNotBlank() == true) {
+                    getNodeUseCase.getNodeItem(existingNode.nodePublicLink)
                 } else {
                     getNodeUseCase.getNodeItem(nodeHandle)
                 }
             }
             existingNode?.nodeItem?.node != null ->
                 getNodeUseCase.getNodeItem(existingNode.nodeItem.node)
-            existingNode?.publicLink != null && existingNode.publicLink.isNotBlank() ->
-                getNodeUseCase.getNodeItem(existingNode.publicLink)
+            existingNode?.nodePublicLink?.isNotBlank() == true ->
+                getNodeUseCase.getNodeItem(existingNode.nodePublicLink)
+            existingNode?.chatMessageId != null && existingNode.chatRoomId != null ->
+                getNodeUseCase.getNodeItem(existingNode.chatRoomId, existingNode.chatMessageId)
             else ->
                 getNodeUseCase.getNodeItem(nodeHandle)
         }
@@ -152,7 +152,7 @@ class ImageViewerViewModel @ViewModelInject constructor(
     }
 
     /**
-     * Main method to request an {@link ImageResult} given a previously loaded Node handle.
+     * Main method to request an ImageResult given a previously loaded Node handle.
      * This will update the current Image on the main "images" list if it's newer.
      * You must be observing the requested Image to get the updated result.
      *
@@ -165,8 +165,10 @@ class ImageViewerViewModel @ViewModelInject constructor(
         val subscription = when {
             existingNode?.nodeItem?.node != null ->
                 getImageUseCase.get(existingNode.nodeItem.node, fullSize, highPriority)
-            existingNode?.publicLink != null && existingNode.publicLink.isNotBlank() ->
-                getImageUseCase.get(existingNode.publicLink)
+            existingNode?.nodePublicLink?.isNotBlank() == true ->
+                getImageUseCase.get(existingNode.nodePublicLink)
+            existingNode?.chatMessageId != null && existingNode.chatRoomId != null ->
+                getImageUseCase.get(existingNode.chatRoomId, existingNode.chatMessageId)
             else ->
                 getImageUseCase.get(nodeHandle, fullSize, highPriority)
         }
@@ -185,8 +187,8 @@ class ImageViewerViewModel @ViewModelInject constructor(
     }
 
     /**
-     * Update a specific {@link ImageItem} from the Images list with the provided
-     * {@link MegaNodeItem} or {@link ImageResult}
+     * Update a specific ImageItem from the Images list with the provided
+     * MegaNodeItem or ImageResult
      *
      * @param nodeHandle    Item node handle to be updated
      * @param nodeItem      MegaNodeItem to be updated with

@@ -94,7 +94,6 @@ import mega.privacy.android.app.ShareInfo;
 import mega.privacy.android.app.activities.GiphyPickerActivity;
 import mega.privacy.android.app.imageviewer.ImageViewerActivity;
 import mega.privacy.android.app.components.ChatManagement;
-import mega.privacy.android.app.utils.MegaNodeUtil;
 import mega.privacy.android.app.utils.MegaProgressDialogUtil;
 import mega.privacy.android.app.generalusecase.FilePrepareUseCase;
 import mega.privacy.android.app.listeners.CreateChatListener;
@@ -5483,30 +5482,29 @@ public class ChatActivityLollipop extends PasscodeActivity
     public void showFullScreenViewer(long msgId) {
         int position = 0;
         long currentNodeHandle = INVALID_HANDLE;
-        List<Long> nodeHandles = new ArrayList<>();
+        List<Long> messageIds = new ArrayList<>();
 
         for (int i = 0; i < messages.size(); i++) {
             AndroidMegaChatMessage androidMessage = messages.get(i);
             if (!androidMessage.isUploading()) {
                 MegaChatMessage message = androidMessage.getMessage();
                 if (message.getType() == MegaChatMessage.TYPE_NODE_ATTACHMENT) {
-                    MegaNode node = message.getMegaNodeList().get(0);
-                    if (MegaNodeUtil.isValidForImageViewer(node)) {
-                        nodeHandles.add(node.getHandle());
-                        if (msgId == message.getMsgId()) {
-                            currentNodeHandle = node.getHandle();
-                            position = i;
-                        }
+                    messageIds.add(message.getMsgId());
+                    if (message.getMsgId() == msgId) {
+                        currentNodeHandle = message.getMegaNodeList().get(0).getHandle();
+                        position = i;
                     }
                 }
             }
         }
 
-        Intent intent = ImageViewerActivity.getIntentForChildren(
+        Intent intent = ImageViewerActivity.getIntentForChatMessages(
                 this,
-                Longs.toArray(nodeHandles),
+                idChat,
+                Longs.toArray(messageIds),
                 currentNodeHandle
         );
+
         startActivity(intent);
         overridePendingTransition(0,0);
 

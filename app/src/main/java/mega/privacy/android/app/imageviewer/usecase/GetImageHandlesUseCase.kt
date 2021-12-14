@@ -8,6 +8,7 @@ import io.reactivex.rxjava3.kotlin.subscribeBy
 import mega.privacy.android.app.DatabaseHandler
 import mega.privacy.android.app.di.MegaApi
 import mega.privacy.android.app.imageviewer.data.ImageItem
+import mega.privacy.android.app.usecase.GetChatMessageUseCase
 import mega.privacy.android.app.usecase.GetGlobalChangesUseCase
 import mega.privacy.android.app.usecase.GetNodeUseCase
 import mega.privacy.android.app.utils.Constants.INVALID_POSITION
@@ -25,6 +26,7 @@ import javax.inject.Inject
  *
  * @property context                    Context to retrieve offline nodes
  * @property megaApi                    MegaAPI required for node requests
+ * @property getChatMessageUseCase
  * @property databaseHandler            DatabaseHandler required for offline nodes
  * @property getGlobalChangesUseCase    GlobalChangesUseCase required to update nodes in realtime
  * @property getNodeUseCase             NodeUseCase required to retrieve node information
@@ -32,6 +34,7 @@ import javax.inject.Inject
 class GetImageHandlesUseCase @Inject constructor(
     @ApplicationContext private val context: Context,
     @MegaApi private val megaApi: MegaApiAndroid,
+    private val getChatMessageUseCase: GetChatMessageUseCase,
     private val databaseHandler: DatabaseHandler,
     private val getGlobalChangesUseCase: GetGlobalChangesUseCase,
     private val getNodeUseCase: GetNodeUseCase,
@@ -43,6 +46,8 @@ class GetImageHandlesUseCase @Inject constructor(
      * @param nodeHandles       Image node handles
      * @param parentNodeHandle  Parent node to retrieve every other child
      * @param nodeFileLinks     Node public link
+     * @param chatRoomId        Node Chat Message Room Id.
+     * @param chatMessageIds    Node Chat Message Ids.
      * @param sortOrder         Node search order
      * @param isOffline         Flag to check if it's offline node
      * @return                  Flowable with up-todate image nodes
@@ -51,6 +56,8 @@ class GetImageHandlesUseCase @Inject constructor(
         nodeHandles: LongArray? = null,
         parentNodeHandle: Long? = null,
         nodeFileLinks: List<String>? = null,
+        chatRoomId: Long? = null,
+        chatMessageIds: LongArray? = null,
         sortOrder: Int? = ORDER_PHOTO_ASC,
         isOffline: Boolean = false
     ): Flowable<List<ImageItem>> =
@@ -66,12 +73,12 @@ class GetImageHandlesUseCase @Inject constructor(
                         return@create
                     }
                 }
-                nodeHandles != null && nodeHandles.isNotEmpty() -> {
+                nodeHandles != null && nodeHandles.isNotEmpty() ->
                     items.addNodeHandles(nodeHandles, isOffline)
-                }
-                nodeFileLinks != null && nodeFileLinks.isNotEmpty() -> {
+                nodeFileLinks != null && nodeFileLinks.isNotEmpty() ->
                     items.addNodeFileLinks(nodeFileLinks)
-                }
+                chatRoomId != null && chatMessageIds?.isNotEmpty() == true ->
+                    items.addChatChildren(chatRoomId, chatMessageIds)
                 else -> {
                     emitter.onError(IllegalArgumentException("Invalid parameters"))
                     return@create
@@ -102,7 +109,8 @@ class GetImageHandlesUseCase @Inject constructor(
                                         changedNode.parentHandle == parentNodeHandle
                                     }
                                     items.isNotEmpty() -> {
-                                        val node = items.firstOrNull { !it.isOffline && it.publicLink == null }
+                                        val node = items
+                                            .firstOrNull { !it.isOffline && it.nodePublicLink == null }
                                             ?.let { getNodeUseCase.get(it.handle).blockingGetOrNull() }
 
                                         changedNode.parentHandle == node?.parentHandle
@@ -171,7 +179,7 @@ class GetImageHandlesUseCase @Inject constructor(
                     this.add(node.toImageItem())
                 }
             } else {
-                this.add(ImageItem(handle, null, true))
+                this.add(ImageItem(handle, isOffline = true))
             }
         }
     }
@@ -185,13 +193,28 @@ class GetImageHandlesUseCase @Inject constructor(
         nodeFileLinks.forEach { nodeFileLink ->
             val node = getNodeUseCase.getPublicNode(nodeFileLink).blockingGetOrNull()
             if (node?.isValidForImageViewer() == true) {
-                this.add(ImageItem(node.handle, nodeFileLink, false))
+                this.add(ImageItem(node.handle, nodePublicLink = nodeFileLink))
             }
         }
     }
 
     /**
-     * Convert {@link MegaOffline} to {@link ImageItem}
+     * Add MegaNode nodes to a List of ImageItem given their chat room Ids and message Ids.
+     *
+     * @param messageIds    Node Chat Message Ids.
+     * @param chatRoomId    Node Chat Message Room Id.
+     */
+    private fun MutableList<ImageItem>.addChatChildren(chatRoomId: Long, messageIds: LongArray) {
+        messageIds.forEach { messageId ->
+            val node = getChatMessageUseCase.getChatNode(chatRoomId, messageId).blockingGetOrNull()
+            if (node?.isValidForImageViewer() == true) {
+                this.add(ImageItem(node.handle, chatRoomId = chatRoomId, chatMessageId = messageId))
+            }
+        }
+    }
+
+    /**
+     * Convert MegaOffline to ImageItem
      *
      * @param isOffline Flag to check if Node is available offline
      * @param isDirty   Flag to check if Node needs to be updated
@@ -201,5 +224,5 @@ class GetImageHandlesUseCase @Inject constructor(
         isOffline: Boolean = false,
         isDirty: Boolean = false
     ): ImageItem =
-        ImageItem(handle, null, isOffline = isOffline, isDirty = isDirty)
+        ImageItem(handle, isOffline = isOffline, isDirty = isDirty)
 }

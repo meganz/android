@@ -66,7 +66,6 @@ import mega.privacy.android.app.components.saver.NodeSaver;
 import mega.privacy.android.app.fragments.settingsFragments.cookie.data.CookieType;
 import mega.privacy.android.app.generalusecase.FilePrepareUseCase;
 import mega.privacy.android.app.imageviewer.ImageViewerActivity;
-import mega.privacy.android.app.imageviewer.data.ImageItem;
 import mega.privacy.android.app.imageviewer.usecase.GetImageHandlesUseCase;
 import mega.privacy.android.app.interfaces.SnackbarShower;
 import mega.privacy.android.app.interfaces.StoreDataBeforeForward;
@@ -713,23 +712,19 @@ public class NodeAttachmentHistoryActivity extends PasscodeActivity
 
     public void showFullScreenViewer(long msgId) {
         long currentNodeHandle = INVALID_HANDLE;
-        List<Long> nodeHandles = new ArrayList<>();
+        List<Long> messageIds = new ArrayList<>();
 
-        for (int i = 0; i < messages.size(); i++) {
-            MegaChatMessage message = messages.get(i);
-            MegaNode node = message.getMegaNodeList().get(0);
-
-            if (MegaNodeUtil.isValidForImageViewer(node)) {
-                nodeHandles.add(node.getHandle());
-                if (msgId == message.getMsgId()) {
-                    currentNodeHandle = node.getHandle();
-                }
+        for (MegaChatMessage message : messages) {
+            messageIds.add(message.getMsgId());
+            if (message.getMsgId() == msgId) {
+                currentNodeHandle = message.getMegaNodeList().get(0).getHandle();
             }
         }
 
-        Intent intent = ImageViewerActivity.getIntentForChildren(
+        Intent intent = ImageViewerActivity.getIntentForChatMessages(
                 this,
-                Longs.toArray(nodeHandles),
+                chatId,
+                Longs.toArray(messageIds),
                 currentNodeHandle
         );
         startActivity(intent);

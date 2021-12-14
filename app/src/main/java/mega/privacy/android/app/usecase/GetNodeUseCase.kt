@@ -35,11 +35,12 @@ class GetNodeUseCase @Inject constructor(
     @ApplicationContext private val context: Context,
     @MegaApi private val megaApi: MegaApiAndroid,
     @MegaApiFolder private val megaApiFolder: MegaApiAndroid,
+    private val getChatMessageUseCase: GetChatMessageUseCase,
     private val databaseHandler: DatabaseHandler
 ) {
 
     /**
-     * Get a {@link MegaNode} given a Node Handle.
+     * Get a MegaNode given a Node Handle.
      *
      * @param nodeHandle    Mega node handle
      * @return              Single with Mega Node
@@ -48,7 +49,7 @@ class GetNodeUseCase @Inject constructor(
         Single.fromCallable { nodeHandle.getMegaNode() }
 
     /**
-     * Get a {@link MegaNodeItem} given a Node Handle.
+     * Get a MegaNodeItem given a Node Handle.
      *
      * @param nodeHandle    Mega node handle
      * @return              Single with Mega Node Item
@@ -57,7 +58,7 @@ class GetNodeUseCase @Inject constructor(
         get(nodeHandle).flatMap(::getNodeItem)
 
     /**
-     * Get a {@link MegaNodeItem} given a Node public link.
+     * Get a MegaNodeItem given a Node public link.
      *
      * @param nodeFileLink  MegaNode public link
      * @return              Single with Mega Node Item
@@ -66,7 +67,17 @@ class GetNodeUseCase @Inject constructor(
         getPublicNode(nodeFileLink).flatMap(::getNodeItem)
 
     /**
-     * Get a {@link MegaNodeItem} given a Node.
+     * Get a MegaNodeItem given a Node Chat Room Id and Chat Message Id.
+     *
+     * @param chatRoomId    Chat Message Room Id
+     * @param chatMessageId Chat Message Id
+     * @return              Single with Mega Node Item
+     */
+    fun getNodeItem(chatRoomId: Long, chatMessageId: Long): Single<MegaNodeItem> =
+        getChatMessageUseCase.getChatNode(chatRoomId, chatMessageId).flatMap(::getNodeItem)
+
+    /**
+     * Get a MegaNodeItem given a Node.
      *
      * @param node  MegaNode
      * @return      Single with Mega Node Item
@@ -107,7 +118,7 @@ class GetNodeUseCase @Inject constructor(
         }
 
     /**
-     * Get a {@link MegaNode} given a Node public link.
+     * Get a MegaNode given a Node public link.
      *
      * @param nodeFileLink      Node public link
      * @return                  Single with Mega Node
@@ -367,7 +378,7 @@ class GetNodeUseCase @Inject constructor(
         }
 
     /**
-     * Get a {@link MegaNode} given a Long handle in a synchronous way.
+     * Get a MegaNode given a Long handle in a synchronous way.
      * This will also authorize the Node if required.
      *
      * @return  MegaNode
