@@ -1,8 +1,8 @@
 package mega.privacy.android.app.fragments.settingsFragments.cookie
 
-import androidx.hilt.lifecycle.ViewModelInject
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import dagger.hilt.android.lifecycle.HiltViewModel
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.kotlin.addTo
 import io.reactivex.rxjava3.kotlin.subscribeBy
@@ -14,8 +14,10 @@ import mega.privacy.android.app.fragments.settingsFragments.cookie.usecase.GetCo
 import mega.privacy.android.app.fragments.settingsFragments.cookie.usecase.UpdateCookieSettingsUseCase
 import mega.privacy.android.app.utils.LogUtil.logError
 import mega.privacy.android.app.utils.notifyObserver
+import javax.inject.Inject
 
-class CookieSettingsViewModel @ViewModelInject constructor(
+@HiltViewModel
+class CookieSettingsViewModel @Inject constructor(
     private val getCookieSettingsUseCase: GetCookieSettingsUseCase,
     private val updateCookieSettingsUseCase: UpdateCookieSettingsUseCase
 ) : BaseRxViewModel() {
