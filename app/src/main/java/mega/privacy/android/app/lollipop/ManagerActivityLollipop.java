@@ -9546,14 +9546,14 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 				if (e.getErrorCode() == MegaError.API_OK) {
 					logDebug("OK setContactLinkOption: " + request.getText());
 					if (getSettingsFragment() != null) {
-						sttFLol.setSetAutoaccept(false);
-						if (sttFLol.getAutoacceptSetting()) {
-							sttFLol.setAutoacceptSetting(false);
+						sttFLol.setSetAutoAccept(false);
+						if (sttFLol.getAutoAcceptSetting()) {
+							sttFLol.setAutoAcceptSetting(false);
 						} else {
-							sttFLol.setAutoacceptSetting(true);
+							sttFLol.setAutoAcceptSetting(true);
 						}
-						sttFLol.setValueOfAutoaccept(sttFLol.getAutoacceptSetting());
-						logDebug("Autoacept: " + sttFLol.getAutoacceptSetting());
+						sttFLol.setValueOfAutoAccept(sttFLol.getAutoAcceptSetting());
+						logDebug("Autoacept: " + sttFLol.getAutoAcceptSetting());
 					}
 				} else {
 					logError("Error setContactLinkOption");
