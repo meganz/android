@@ -1,11 +1,13 @@
 package mega.privacy.android.app.fragments.homepage
 
-import androidx.hilt.lifecycle.ViewModelInject
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import dagger.hilt.android.lifecycle.HiltViewModel
+import javax.inject.Inject
 
-class ItemOperationViewModel @ViewModelInject constructor() : ViewModel() {
+@HiltViewModel
+class ItemOperationViewModel @Inject constructor() : ViewModel() {
 
     private val _openItemEvent = MutableLiveData<Event<NodeItem>>()
     val openItemEvent: LiveData<Event<NodeItem>> = _openItemEvent
