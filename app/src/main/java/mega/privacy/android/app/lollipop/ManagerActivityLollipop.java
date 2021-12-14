@@ -130,10 +130,6 @@ import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.OpenPasswordLinkActivity;
 import mega.privacy.android.app.Product;
 import mega.privacy.android.app.R;
-import mega.privacy.android.app.featuretoggle.SettingsFragmentRefactorToggle;
-import mega.privacy.android.app.lollipop.managerSections.settings.Settings;
-import mega.privacy.android.app.lollipop.managerSections.settings.SettingsActivity;
-import mega.privacy.android.app.lollipop.managerSections.settings.SettingsFragment;
 import mega.privacy.android.app.objects.PasscodeManagement;
 import mega.privacy.android.app.fragments.homepage.documents.DocumentsFragment;
 import mega.privacy.android.app.fragments.managerFragments.cu.PhotosFragment;
@@ -161,6 +157,7 @@ import mega.privacy.android.app.components.saver.NodeSaver;
 import mega.privacy.android.app.components.transferWidget.TransfersManagement;
 import mega.privacy.android.app.components.twemoji.EmojiTextView;
 import mega.privacy.android.app.databinding.FabMaskChatLayoutBinding;
+import mega.privacy.android.app.featuretoggle.SettingsFragmentRefactorToggle;
 import mega.privacy.android.app.fragments.homepage.HomepageSearchable;
 import mega.privacy.android.app.fragments.homepage.main.HomepageFragment;
 import mega.privacy.android.app.fragments.homepage.main.HomepageFragmentDirections;
@@ -197,6 +194,9 @@ import mega.privacy.android.app.lollipop.managerSections.SearchFragmentLollipop;
 import mega.privacy.android.app.lollipop.managerSections.SettingsFragmentLollipop;
 import mega.privacy.android.app.lollipop.managerSections.TransfersFragmentLollipop;
 import mega.privacy.android.app.lollipop.managerSections.TurnOnNotificationsFragment;
+import mega.privacy.android.app.lollipop.managerSections.settings.Settings;
+import mega.privacy.android.app.lollipop.managerSections.settings.SettingsActivity;
+import mega.privacy.android.app.lollipop.managerSections.settings.SettingsFragment;
 import mega.privacy.android.app.lollipop.megachat.BadgeDrawerArrowDrawable;
 import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.RecentChatsFragmentLollipop;
@@ -473,26 +473,6 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 
 	// Determine if open this activity from meeting page, if true, will finish this activity when user click back icon
 	private boolean isFromMeeting = false;
-
-	@Override
-	public boolean getOpenSettingsStartScreen() {
-		return openSettingsStartScreen;
-	}
-
-	@Override
-	public void setOpenSettingsStartScreen(boolean openSettingsStartScreen) {
-		this.openSettingsStartScreen = openSettingsStartScreen;
-	}
-
-	@Override
-	public boolean getOpenSettingsQR() {
-		return openSettingsQR;
-	}
-
-	@Override
-	public boolean getOpenSettingsStorage() {
-		return openSettingsQR;
-	}
 
 	public enum FragmentTag {
 		CLOUD_DRIVE, HOMEPAGE, PHOTOS, INBOX, INCOMING_SHARES, OUTGOING_SHARES, SETTINGS, SEARCH,TRANSFERS, COMPLETED_TRANSFERS,
@@ -7114,7 +7094,8 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 		fabs.add(fabMaskLayout.findViewById(R.id.text_chat));
 		fabs.add(fabMaskLayout.findViewById(R.id.text_meeting));
 
-		fabMaskLayout.setOnClickListener(l-> fabMainClickCallback());fabMaskButton.setOnClickListener(l-> fabMainClickCallback());
+		fabMaskLayout.setOnClickListener(l-> fabMainClickCallback());
+		fabMaskButton.setOnClickListener(l-> fabMainClickCallback());
 
 		fabMaskLayout.findViewById(R.id.fab_chat).setOnClickListener(l -> {
 			fabMainClickCallback();
@@ -7167,14 +7148,16 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 	 * Showing the full screen mask by adding the mask layout to the window content
 	 */
 	private void addMask() {
-		getWindow().setStatusBarColor(ContextCompat.getColor(this, R.color.grey_600_085_dark_grey_070));windowContent.addView(fabMaskLayout);
+		getWindow().setStatusBarColor(ContextCompat.getColor(this, R.color.grey_600_085_dark_grey_070));
+		windowContent.addView(fabMaskLayout);
 	}
 
 	/**
 	 * Removing the full screen mask
 	 */
 	private void removeMask() {
-		getWindow().setStatusBarColor(ContextCompat.getColor(this, android.R.color.transparent));windowContent.removeView(fabMaskLayout);
+		getWindow().setStatusBarColor(ContextCompat.getColor(this, android.R.color.transparent));
+		windowContent.removeView(fabMaskLayout);
 	}
 
 	private void rotateFab(boolean isExpand) {
@@ -11824,5 +11807,25 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
     	if (transfersWidget != null) {
 			transfersWidget.hide();
 		}
+    }
+
+    @Override
+    public boolean getOpenSettingsStartScreen() {
+        return openSettingsStartScreen;
+    }
+
+    @Override
+    public void setOpenSettingsStartScreen(boolean openSettingsStartScreen) {
+        this.openSettingsStartScreen = openSettingsStartScreen;
+    }
+
+    @Override
+    public boolean getOpenSettingsQR() {
+        return openSettingsQR;
+    }
+
+    @Override
+    public boolean getOpenSettingsStorage() {
+        return openSettingsStorage;
     }
 }
