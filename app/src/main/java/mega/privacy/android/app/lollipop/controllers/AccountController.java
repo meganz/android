@@ -71,20 +71,7 @@ public class AccountController {
     public AccountController(Context context){
         logDebug("AccountController created");
         this.context = context;
-
-        if (megaApi == null){
-            if (context instanceof MegaApplication){
-                megaApi = ((MegaApplication)context).getMegaApi();
-            }
-            else{
-                megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();
-            }
-        }
-    }
-
-    public AccountController(Context context, MegaApiAndroid megaApi){
-        this.context = context;
-        this.megaApi = megaApi;
+        this.megaApi = MegaApplication.getInstance().getMegaApi();
     }
 
     public void resetPass(String myEmail){
