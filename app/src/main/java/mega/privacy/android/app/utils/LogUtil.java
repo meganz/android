@@ -24,11 +24,6 @@ public class LogUtil {
     private static boolean statusLoggerSDK = false;
     private static boolean statusLoggerKarere = false;
 
-    //Indicates if app is requesting the required permissions to enable the SDK logger
-    private static boolean permissionLoggerSDK = false;
-    //Indicates if app is requesting the required permissions to enable the Karere logger
-    private static boolean permissionLoggerKarere = false;
-
     /**
      * Send a log message with FATAL level to the logging system.
      *

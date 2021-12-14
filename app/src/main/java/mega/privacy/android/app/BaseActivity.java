@@ -1,18 +1,14 @@
 package mega.privacy.android.app;
 
-import android.Manifest;
 import android.app.Activity;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.content.pm.PackageManager;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 
-import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 
@@ -24,7 +20,6 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.text.HtmlCompat;
 import androidx.lifecycle.Observer;
 
-import android.os.Environment;
 import android.os.Handler;
 import android.os.Looper;
 import android.text.TextUtils;
@@ -39,7 +34,6 @@ import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -47,7 +41,6 @@ import javax.inject.Inject;
 
 import dagger.hilt.android.AndroidEntryPoint;
 import kotlin.Pair;
-import kotlin.Suppress;
 import mega.privacy.android.app.components.saver.AutoPlayInfo;
 import mega.privacy.android.app.globalmanagement.MyAccountInfo;
 import mega.privacy.android.app.interfaces.ActivityLauncher;
@@ -126,10 +119,9 @@ public class BaseActivity extends AppCompatActivity implements ActivityLauncher,
 
     private boolean delaySignalPresence = false;
 
-    //Indicates if app is requesting the required permissions to enable the SDK logger
-    protected boolean permissionLoggerSDK = false;
-    //Indicates if app is requesting the required permissions to enable the Karere logger
-    protected boolean permissionLoggerKarere = false;
+    private enum LogsType {
+        SDK_LOGS, KARERE_LOGS;
+    }
 
     private boolean isGeneralTransferOverQuotaWarningShown;
     private AlertDialog transferGeneralOverQuotaWarning;
@@ -1022,49 +1014,37 @@ public class BaseActivity extends AppCompatActivity implements ActivityLauncher,
      * Shows a dialog to confirm enable the SDK logs.
      */
     protected void showConfirmationEnableLogsSDK() {
-        showConfirmationEnableLogs(true, false);
+        showConfirmationEnableLogs(LogsType.SDK_LOGS);
     }
 
     /**
      * Shows a dialog to confirm enable the Karere logs.
      */
     protected void showConfirmationEnableLogsKarere() {
-        showConfirmationEnableLogs(false, true);
+        showConfirmationEnableLogs(LogsType.KARERE_LOGS);
     }
 
     /**
-     * Shows a dialog to confirm enable the SDK and/or Karere logs.
-     * @param sdk True to confirm enable the SDK logs or false otherwise.
-     * @param karere True to confirm enable the Karere logs or false otherwise.
+     * Shows a dialog to confirm enable the SDK or Karere logs.
+     *
+     * @param logsType SDK_LOGS to confirm enable the SDK logs,
+     *                 KARERE_LOGS to confirm enable the Karere logs.
      */
-    private void showConfirmationEnableLogs(boolean sdk, boolean karere) {
-        DialogInterface.OnClickListener dialogClickListener = (dialog, which) -> {
-            switch (which) {
-                case DialogInterface.BUTTON_POSITIVE:
-                    if (!hasPermissions(baseActivity, Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
-                        permissionLoggerSDK = sdk;
-                        permissionLoggerKarere = karere;
-                        requestPermission(baseActivity, REQUEST_WRITE_STORAGE_FOR_LOGS,
-                                Manifest.permission.WRITE_EXTERNAL_STORAGE);
-                        break;
-                    }
-                    if (sdk) {
-                        setStatusLoggerSDK(baseActivity, true);
-                    }
-                    if (karere) {
-                        setStatusLoggerKarere(baseActivity, true);
-                    }
-                    break;
-
-                case DialogInterface.BUTTON_NEGATIVE:
-                    break;
-            }
-        };
-
+    protected void showConfirmationEnableLogs(LogsType logsType) {
         new MaterialAlertDialogBuilder(this)
                 .setMessage(R.string.enable_log_text_dialog)
-                .setPositiveButton(R.string.general_enable, dialogClickListener)
-                .setNegativeButton(R.string.general_cancel, dialogClickListener)
+                .setPositiveButton(R.string.general_enable, (dialog, which) -> {
+                    switch (logsType) {
+                        case SDK_LOGS:
+                            setStatusLoggerSDK(baseActivity, true);
+                            break;
+
+                        case KARERE_LOGS:
+                            setStatusLoggerKarere(baseActivity, true);
+                            break;
+                    }
+                })
+                .setNegativeButton(R.string.general_cancel, null)
                 .show()
                 .setCanceledOnTouchOutside(false);
     }
@@ -1138,39 +1118,6 @@ public class BaseActivity extends AppCompatActivity implements ActivityLauncher,
         intent.setAction(ACTION_SHOW_UPGRADE_ACCOUNT);
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         startActivity(intent);
-    }
-
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        logDebug("Request Code: " + requestCode);
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        if (requestCode == REQUEST_WRITE_STORAGE_FOR_LOGS) {
-            onRequestWriteStorageForLogs(grantResults.length > 0 &&
-                    grantResults[0] == PackageManager.PERMISSION_GRANTED);
-        }
-    }
-
-    /**
-     * Method to enable logs if the required permission has been granted after request it
-     *
-     * @param permissionGranted Flag to indicate if the permission has been granted or not
-     */
-    protected void onRequestWriteStorageForLogs(boolean permissionGranted) {
-        if (permissionLoggerKarere) {
-            permissionLoggerKarere = false;
-            if (permissionGranted) {
-                setStatusLoggerKarere(baseActivity, true);
-            } else {
-                Util.showSnackbar(baseActivity, getString(R.string.logs_not_enabled_permissions));
-            }
-        } else if (permissionLoggerSDK) {
-            permissionLoggerSDK = false;
-            if (permissionGranted) {
-                setStatusLoggerSDK(baseActivity, true);
-            } else {
-                Util.showSnackbar(baseActivity, getString(R.string.logs_not_enabled_permissions));
-            }
-        }
     }
 
     @Override
