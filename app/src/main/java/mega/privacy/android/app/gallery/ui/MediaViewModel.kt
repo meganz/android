@@ -7,14 +7,14 @@ import mega.privacy.android.app.arch.BaseRxViewModel
 import mega.privacy.android.app.fragments.homepage.photos.CardClickHandler
 import mega.privacy.android.app.fragments.homepage.photos.DateCardsProvider
 import mega.privacy.android.app.fragments.managerFragments.cu.BaseZoomFragment.Companion.ALL_VIEW
+import mega.privacy.android.app.fragments.managerFragments.cu.BaseZoomFragment.Companion.DAYS_INDEX
+import mega.privacy.android.app.fragments.managerFragments.cu.BaseZoomFragment.Companion.MONTHS_INDEX
+import mega.privacy.android.app.fragments.managerFragments.cu.BaseZoomFragment.Companion.YEARS_INDEX
 import mega.privacy.android.app.gallery.data.GalleryCard
 import mega.privacy.android.app.gallery.data.GalleryItem
 import mega.privacy.android.app.gallery.repository.GalleryItemRepository
 import mega.privacy.android.app.utils.Constants.EVENT_NODES_CHANGE
 import mega.privacy.android.app.utils.Constants.INVALID_POSITION
-import mega.privacy.android.app.utils.ZoomUtil.DAYS_INDEX
-import mega.privacy.android.app.utils.ZoomUtil.MONTHS_INDEX
-import mega.privacy.android.app.utils.ZoomUtil.YEARS_INDEX
 
 abstract class MediaViewModel constructor(
     repository: GalleryItemRepository
@@ -25,7 +25,8 @@ abstract class MediaViewModel constructor(
      */
     var liveDataRoot = MutableLiveData<Unit>()
 
-    var selectedViewType = ALL_VIEW
+    var selectedViewTypeImages = ALL_VIEW
+    var selectedViewTypePhotos = ALL_VIEW
 
     var forceUpdate = false
 
@@ -67,9 +68,8 @@ abstract class MediaViewModel constructor(
 
         it.forEach { item ->
             item.index = index++
-            photoIndex = initMediaIndex(item,photoIndex)
+            photoIndex = initMediaIndex(item, photoIndex)
         }
-
 
         it
     }
@@ -79,7 +79,7 @@ abstract class MediaViewModel constructor(
      *
      * @return node index
      */
-    abstract fun initMediaIndex(item:GalleryItem,mediaIndex:Int):Int
+    abstract fun initMediaIndex(item: GalleryItem, mediaIndex: Int): Int
 
     val dateCards: LiveData<List<List<GalleryCard>>> = items.map {
         val cardsProvider = DateCardsProvider()

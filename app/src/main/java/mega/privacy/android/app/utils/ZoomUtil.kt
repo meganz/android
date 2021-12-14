@@ -25,10 +25,6 @@ object ZoomUtil {
     @JvmStatic
     var IMAGES_ZOOM_LEVEL = ZOOM_DEFAULT //ZOOM_DEFAULT
 
-    const val DAYS_INDEX = 0
-    const val MONTHS_INDEX = 1
-    const val YEARS_INDEX = 2
-
     // Span count portrait
     private const val SPAN_COUNT_PORTRAIT_OUT_2X = 12
     private const val SPAN_COUNT_PORTRAIT_OUT_1X = 5

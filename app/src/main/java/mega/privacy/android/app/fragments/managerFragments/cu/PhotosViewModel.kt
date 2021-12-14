@@ -12,6 +12,7 @@ import mega.privacy.android.app.DatabaseHandler
 import mega.privacy.android.app.MegaPreferences
 import mega.privacy.android.app.constants.SettingsConstants
 import mega.privacy.android.app.gallery.data.GalleryItem
+import mega.privacy.android.app.gallery.data.GalleryItem.Companion.TYPE_HEADER
 import mega.privacy.android.app.gallery.repository.PhotosItemRepository
 import mega.privacy.android.app.gallery.ui.MediaViewModel
 import mega.privacy.android.app.utils.LogUtil
@@ -28,8 +29,11 @@ class PhotosViewModel @ViewModelInject constructor(
 
     override fun initMediaIndex(item: GalleryItem, mediaIndex: Int): Int {
         var tempIndex = mediaIndex
-        if (item.type == GalleryItem.TYPE_IMAGE || item.type == GalleryItem.TYPE_VIDEO) item.indexForViewer =
-            tempIndex++
+
+        if (item.type != TYPE_HEADER) {
+            item.indexForViewer = tempIndex++
+        }
+
         return tempIndex
     }
 

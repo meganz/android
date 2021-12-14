@@ -17,7 +17,6 @@ import androidx.recyclerview.widget.RecyclerView
 import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.R
 import mega.privacy.android.app.components.ListenScrollChangesHelper
-import mega.privacy.android.app.components.SimpleDividerItemDecoration
 import mega.privacy.android.app.components.dragger.DragThumbnailGetter
 import mega.privacy.android.app.components.dragger.DragToExitSupport
 import mega.privacy.android.app.databinding.FragmentImagesBinding
@@ -34,15 +33,11 @@ import mega.privacy.android.app.lollipop.ManagerActivityLollipop
 import mega.privacy.android.app.modalbottomsheet.NodeOptionsBottomSheetDialogFragment
 import mega.privacy.android.app.utils.*
 import mega.privacy.android.app.utils.Constants.*
-import mega.privacy.android.app.utils.ZoomUtil.DAYS_INDEX
-import mega.privacy.android.app.utils.ZoomUtil.MONTHS_INDEX
-import mega.privacy.android.app.utils.ZoomUtil.YEARS_INDEX
 import nz.mega.sdk.MegaApiJava
-import nz.mega.sdk.MegaChatApiJava
 import java.util.*
 
 @AndroidEntryPoint
-class ImagesFragment : BaseZoomFragment() {
+class ImagesFragment : BaseZoomFragment(), GalleryCardAdapter.Listener {
 
     private val viewModel by viewModels<ImagesViewModel>()
 
@@ -59,10 +54,9 @@ class ImagesFragment : BaseZoomFragment() {
     private lateinit var daysButton: TextView
     private lateinit var allButton: TextView
 
-    private lateinit var itemDecoration: SimpleDividerItemDecoration
+    private lateinit var binding: FragmentImagesBinding
 
     private var selectedView = ALL_VIEW
-    private lateinit var binding: FragmentImagesBinding
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -114,7 +108,7 @@ class ImagesFragment : BaseZoomFragment() {
         if (this::browseAdapter.isInitialized) {
             hasImages = browseAdapter.itemCount > 0
         }
-        handleOptionsMenuUpdate(hasImages && shouldShowZoomMenuItem())
+        handleOptionsMenuUpdate(hasImages && shouldShowZoomMenuItem(selectedView))
         removeSortByMenu()
     }
 
@@ -125,7 +119,7 @@ class ImagesFragment : BaseZoomFragment() {
                 handleOptionsMenuUpdate(false)
                 viewTypePanel.visibility = View.GONE
             } else {
-                handleOptionsMenuUpdate(shouldShowZoomMenuItem())
+                handleOptionsMenuUpdate(shouldShowZoomMenuItem(selectedView))
                 viewTypePanel.visibility = View.VISIBLE
             }
             removeSortByMenu()
@@ -147,37 +141,36 @@ class ImagesFragment : BaseZoomFragment() {
         )
     }
 
-    private val cardClickedListener = object : GalleryCardAdapter.Listener {
 
-        override fun onCardClicked(position: Int, @NonNull card: GalleryCard) {
-            when (selectedView) {
-                DAYS_VIEW -> {
-                    zoomViewModel.restoreDefaultZoom()
-                    handleZoomMenuItemStatus()
-                    newViewClicked(ALL_VIEW)
-                    val photoPosition = browseAdapter.getNodePosition(card.node.handle)
-                    gridLayoutManager.scrollToPosition(photoPosition)
+    override fun onCardClicked(position: Int, @NonNull card: GalleryCard) {
+        when (selectedView) {
+            DAYS_VIEW -> {
+                zoomViewModel.restoreDefaultZoom()
+                handleZoomMenuItemStatus()
+                newViewClicked(ALL_VIEW)
+                val photoPosition = browseAdapter.getNodePosition(card.node.handle)
+                gridLayoutManager.scrollToPosition(photoPosition)
 
-                    val node = browseAdapter.getNodeAtPosition(photoPosition)
-                    node?.let {
-                        RunOnUIThreadUtils.post {
-                            openPhoto(it)
-                        }
+                val node = browseAdapter.getNodeAtPosition(photoPosition)
+                node?.let {
+                    RunOnUIThreadUtils.post {
+                        openPhoto(it)
                     }
                 }
-                MONTHS_VIEW -> {
-                    newViewClicked(DAYS_VIEW)
-                    gridLayoutManager.scrollToPosition(viewModel.monthClicked(position, card))
-                }
-                YEARS_VIEW -> {
-                    newViewClicked(MONTHS_VIEW)
-                    gridLayoutManager.scrollToPosition(viewModel.yearClicked(position, card))
-                }
             }
-
-            showViewTypePanel()
+            MONTHS_VIEW -> {
+                newViewClicked(DAYS_VIEW)
+                gridLayoutManager.scrollToPosition(viewModel.monthClicked(position, card))
+            }
+            YEARS_VIEW -> {
+                newViewClicked(MONTHS_VIEW)
+                gridLayoutManager.scrollToPosition(viewModel.yearClicked(position, card))
+            }
         }
+
+        showViewTypePanel()
     }
+
 
     private fun setupEmptyHint() {
         binding.emptyHint.emptyHintImage.isVisible = false
@@ -215,6 +208,11 @@ class ImagesFragment : BaseZoomFragment() {
         }
 
         updateViewSelected()
+
+        val params = viewTypePanel.layoutParams as CoordinatorLayout.LayoutParams
+        params.behavior =
+            if (selectedView != ALL_VIEW) CustomHideBottomViewOnScrollBehaviour<LinearLayout>() else null
+        viewTypePanel.layoutParams = params
     }
 
     /**
@@ -255,7 +253,7 @@ class ImagesFragment : BaseZoomFragment() {
                 listView.setOnTouchListener(scaleGestureHandler)
             }
         }
-        handleOptionsMenuUpdate(shouldShowZoomMenuItem())
+        handleOptionsMenuUpdate(shouldShowZoomMenuItem(selectedView))
         removeSortByMenu()
         updateViewSelected()
 
@@ -264,21 +262,6 @@ class ImagesFragment : BaseZoomFragment() {
         params.behavior =
             if (selectedView != ALL_VIEW) CustomHideBottomViewOnScrollBehaviour<LinearLayout>() else null
         viewTypePanel.layoutParams = params
-    }
-
-    private fun doIfOnline(operation: () -> Unit) {
-        if (Util.isOnline(context)) {
-            operation()
-        } else {
-            val activity = activity as ManagerActivityLollipop
-
-            activity.hideKeyboardSearch()  // Make the snack bar visible to the user
-            activity.showSnackbar(
-                SNACKBAR_TYPE,
-                context.getString(R.string.error_server_connection_problem),
-                MegaChatApiJava.MEGACHAT_INVALID_HANDLE
-            )
-        }
     }
 
     private fun setupNavigation() {
@@ -320,12 +303,10 @@ class ImagesFragment : BaseZoomFragment() {
 
     @SuppressLint("ClickableViewAccessibility")
     private fun setupListView() {
-        selectedView = viewModel.selectedViewType
+        selectedView = viewModel.selectedViewTypeImages
         listView = binding.photoList
         listView.itemAnimator = Util.noChangeRecyclerViewItemAnimator()
         elevateToolbarWhenScrolling()
-
-        itemDecoration = SimpleDividerItemDecoration(context)
 
         listView.clipToPadding = false
         listView.setHasFixedSize(true)
@@ -335,15 +316,6 @@ class ImagesFragment : BaseZoomFragment() {
             this
         )
         listView.setOnTouchListener(scaleGestureHandler)
-    }
-
-    /**
-     * Get how many items will be shown per row, depends on screen direction and zoom level if all view is selected.
-     *
-     * @param isPortrait true, on portrait mode, false otherwise.
-     */
-    private fun getSpanCount(isPortrait: Boolean): Int {
-        return super.getSpanCount(selectedView, isPortrait)
     }
 
     private fun handleZoomAdapterLayoutChange(zoom: Int) {
@@ -361,7 +333,7 @@ class ImagesFragment : BaseZoomFragment() {
     fun setupListAdapter(currentZoom: Int) {
         val isPortrait =
             resources.configuration.orientation == Configuration.ORIENTATION_PORTRAIT
-        val spanCount = getSpanCount(isPortrait)
+        val spanCount = getSpanCount(selectedView, isPortrait)
         val params = listView.layoutParams as CoordinatorLayout.LayoutParams
         gridLayoutManager = GridLayoutManager(context, spanCount)
         listView.layoutManager = gridLayoutManager
@@ -403,7 +375,7 @@ class ImagesFragment : BaseZoomFragment() {
                 (outMetrics.widthPixels - cardMargin * spanCount * 2 - cardMargin * 2) / spanCount
 
             cardAdapter =
-                GalleryCardAdapter(selectedView, cardWidth, cardMargin, cardClickedListener)
+                GalleryCardAdapter(selectedView, cardWidth, cardMargin, this)
             cardAdapter.setHasStableIds(true)
             params.leftMargin = cardMargin
             params.rightMargin = cardMargin
@@ -415,14 +387,6 @@ class ImagesFragment : BaseZoomFragment() {
         // Set fast scroller after adapter is set.
         binding.scroller.setRecyclerView(listView)
     }
-
-    /**
-     * Whether should show zoom in/out menu items.
-     * Depends on if selected view is all view.
-     *
-     * @return true, current view is all view should show the menu items, false, otherwise.
-     */
-    private fun shouldShowZoomMenuItem() = selectedView == ALL_VIEW
 
     /**
      * Display the view type buttons panel with animation effect, after a card is clicked.
@@ -527,7 +491,7 @@ class ImagesFragment : BaseZoomFragment() {
 
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
-        viewModel.selectedViewType = selectedView
+        viewModel.selectedViewTypeImages = selectedView
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {

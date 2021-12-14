@@ -41,7 +41,13 @@ abstract class BaseZoomFragment : BaseFragment(), GestureScaleCallback {
 
         const val SPAN_CARD_PORTRAIT = 1
         const val SPAN_CARD_LANDSCAPE = 2
+
+        const val DAYS_INDEX = 0
+        const val MONTHS_INDEX = 1
+        const val YEARS_INDEX = 2
     }
+
+    lateinit var mManagerActivity: ManagerActivityLollipop
 
     abstract val listView: RecyclerView
     protected lateinit var menu: Menu
@@ -67,6 +73,11 @@ abstract class BaseZoomFragment : BaseFragment(), GestureScaleCallback {
     abstract fun getNodeCount(): Int
 
     abstract fun updateUiWhenAnimationEnd()
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        mManagerActivity = activity as ManagerActivityLollipop
+    }
 
     private fun subscribeObservers() {
         zoomViewModel.zoom.observe(viewLifecycleOwner, { zoom: Int ->
@@ -104,7 +115,7 @@ abstract class BaseZoomFragment : BaseFragment(), GestureScaleCallback {
 
     protected fun setupActionMode() {
         actionModeCallback =
-            ActionModeCallback(activity as ManagerActivityLollipop, actionModeViewModel, megaApi)
+            ActionModeCallback(mManagerActivity, actionModeViewModel, megaApi)
 
         observeItemLongClick()
         observeSelectedItems()
@@ -216,7 +227,7 @@ abstract class BaseZoomFragment : BaseFragment(), GestureScaleCallback {
             animateBottomView()
         })
 
-    private fun doIfOnline(operation: () -> Unit) {
+    fun doIfOnline(operation: () -> Unit) {
         if (Util.isOnline(context)) {
             operation()
         } else {
@@ -340,6 +351,14 @@ abstract class BaseZoomFragment : BaseFragment(), GestureScaleCallback {
             else
                 View.GONE
     }
+
+    /**
+     * Whether should show zoom in/out menu items.
+     * Depends on if selected view is all view.
+     *
+     * @return true, current view is all view should show the menu items, false, otherwise.
+     */
+    protected fun shouldShowZoomMenuItem(selectedView: Int) = selectedView == ALL_VIEW
 
     /**
      * Get how many items will be shown per row, depends on screen direction and zoom level if all view is selected.

@@ -4589,7 +4589,6 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 					refreshFragment(FragmentTag.PHOTOS.getTag());
 				}
 
-				cuFragment.setViewTypes(cuViewTypes, cuYearsButton, cuMonthsButton, cuDaysButton, cuAllButton);
 				replaceFragment(cuFragment, FragmentTag.PHOTOS.getTag());
 				setToolbarTitle();
 				supportInvalidateOptionsMenu();
@@ -5796,12 +5795,6 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 					case SEARCH:
 						if (getSearchFragment() != null) {
 							sFLol.selectAll();
-						}
-						break;
-
-					case PHOTOS:
-						if (getCameraUploadFragment() != null) {
-							cuFragment.selectAll();
 						}
 						break;
 				}
@@ -7811,7 +7804,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 
 	public void refreshCUNodes() {
 		if (getCameraUploadFragment() != null) {
-			cuFragment.reloadNodes();
+			cuFragment.loadPhotos();
 		}
 	}
 
@@ -11160,7 +11153,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 	 */
 	public void showBottomView() {
 		LinearLayout bottomView = findViewById(R.id.container_bottom);
-		if (bottomView == null || fragmentLayout == null) {
+		if (bottomView == null || fragmentLayout == null || isInImagesPage()) {
 			return;
 		}
 
