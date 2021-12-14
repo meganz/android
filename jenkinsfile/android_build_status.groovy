@@ -14,7 +14,7 @@ pipeline {
         JAVA_HOME = "/opt/buildtools/zulu11.52.13-ca-jdk11.0.13-macosx_x64"
         ANDROID_HOME = "/opt/buildtools/android-sdk"
 
-        PATH = "/Applications/MEGAcmd.app/Contents/MacOS:/opt/buildtools/zulu11.52.13-ca-jdk11.0.13-macosx_x64/bin:/opt/homebrew/bin:/opt/homebrew/opt/gnu-sed/libexec/gnubin:/opt/homebrew/opt/gnu-tar/libexec/gnubin:/opt/buildtools/android-sdk/platform-tools:$PATH"
+        PATH = "/Applications/MEGAcmd.app/Contents/MacOS:/opt/buildtools/zulu11.52.13-ca-jdk11.0.13-macosx_x64/bin:/opt/brew/bin:/opt/brew/opt/gnu-sed/libexec/gnubin:/opt/brew/opt/gnu-tar/libexec/gnubin:/opt/buildtools/android-sdk/platform-tools:$PATH"
 
         CONSOLE_LOG_FILE = "androidLog.txt"
 
@@ -137,8 +137,8 @@ pipeline {
             steps {
                 sh """
                 cd ${WORKSPACE}/app/src/main/jni
-                ## /opt/homebrew/bin/bash build.sh all >> ${CONSOLE_LOG_FILE}  2>&1
-                /opt/homebrew/bin/bash build.sh all
+                # bash build.sh all >> ${CONSOLE_LOG_FILE}  2>&1
+                bash build.sh all
                 """
             }
         }
