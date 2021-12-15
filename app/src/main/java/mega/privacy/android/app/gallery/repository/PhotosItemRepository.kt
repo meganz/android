@@ -5,6 +5,8 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import mega.privacy.android.app.DatabaseHandler
 import mega.privacy.android.app.di.MegaApi
 import mega.privacy.android.app.gallery.data.GalleryItem
+import mega.privacy.android.app.gallery.repository.fetcher.GalleryNodeFetcher
+import mega.privacy.android.app.gallery.repository.fetcher.GalleryPhotosFetcher
 import mega.privacy.android.app.utils.FileUtil
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaNode

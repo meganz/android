@@ -1,4 +1,4 @@
-package mega.privacy.android.app.gallery.repository
+package mega.privacy.android.app.gallery.repository.fetcher
 
 import android.content.Context
 import android.os.Handler

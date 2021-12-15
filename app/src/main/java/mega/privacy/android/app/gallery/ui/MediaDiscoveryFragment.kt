@@ -1,4 +1,4 @@
-package mega.privacy.android.app.fragments.homepage.photos
+package mega.privacy.android.app.gallery.ui
 
 import android.annotation.SuppressLint
 import android.content.Intent
@@ -19,8 +19,9 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.components.ListenScrollChangesHelper
 import mega.privacy.android.app.components.dragger.DragThumbnailGetter
 import mega.privacy.android.app.components.dragger.DragToExitSupport
-import mega.privacy.android.app.databinding.FragmentImagesBinding
+import mega.privacy.android.app.databinding.FragmentMediaDecoveryBinding
 import mega.privacy.android.app.fragments.homepage.*
+import mega.privacy.android.app.fragments.homepage.photos.ScaleGestureHandler
 import mega.privacy.android.app.fragments.managerFragments.cu.*
 import mega.privacy.android.app.fragments.managerFragments.cu.PhotosFragment.*
 import mega.privacy.android.app.gallery.adapter.GalleryAdapter
@@ -29,7 +30,6 @@ import mega.privacy.android.app.gallery.data.GalleryCard
 import mega.privacy.android.app.gallery.data.GalleryItem
 import mega.privacy.android.app.gallery.data.GalleryItemSizeConfig
 import mega.privacy.android.app.lollipop.FullScreenImageViewerLollipop
-import mega.privacy.android.app.lollipop.ManagerActivityLollipop
 import mega.privacy.android.app.modalbottomsheet.NodeOptionsBottomSheetDialogFragment
 import mega.privacy.android.app.utils.*
 import mega.privacy.android.app.utils.Constants.*
@@ -37,9 +37,9 @@ import nz.mega.sdk.MegaApiJava
 import java.util.*
 
 @AndroidEntryPoint
-class ImagesFragment : BaseZoomFragment(), GalleryCardAdapter.Listener {
+class MediaDiscoveryFragment : BaseZoomFragment(), GalleryCardAdapter.Listener {
 
-    private val viewModel by viewModels<ImagesViewModel>()
+    private val viewModel by viewModels<MediaViewModel>()
 
     override lateinit var listView: RecyclerView
     private lateinit var browseAdapter: GalleryAdapter
@@ -54,20 +54,33 @@ class ImagesFragment : BaseZoomFragment(), GalleryCardAdapter.Listener {
     private lateinit var daysButton: TextView
     private lateinit var allButton: TextView
 
-    private lateinit var binding: FragmentImagesBinding
+    private lateinit var binding: FragmentMediaDecoveryBinding
 
     private var selectedView = ALL_VIEW
 
+    private var currentHandle:Long = 0L
+    companion object{
+        fun newInstance(): MediaDiscoveryFragment {
+            LogUtil.logDebug("newInstance")
+            return MediaDiscoveryFragment()
+        }
+    }
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        fetchData()
         setupBinding()
         initViewCreated()
         subscribeObservers()
     }
 
+    private fun fetchData() {
+        viewModel.getAndFilterFilesByHandle()
+    }
+
     private fun setupBinding() {
         binding.apply {
-            viewModel = this@ImagesFragment.viewModel
+            viewModel = this@MediaDiscoveryFragment.viewModel
             lifecycleOwner = viewLifecycleOwner
             viewTypePanel = photosViewType.root
         }
@@ -78,12 +91,16 @@ class ImagesFragment : BaseZoomFragment(), GalleryCardAdapter.Listener {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        binding = FragmentImagesBinding.inflate(inflater, container, false)
+        binding = FragmentMediaDecoveryBinding.inflate(inflater, container, false)
+        arguments?.let {
+            currentHandle = it.getLong("handle")
+            viewModel.setHandle(currentHandle)
+        }
         return binding.root
     }
 
     private fun initViewCreated() {
-        val currentZoom = ZoomUtil.IMAGES_ZOOM_LEVEL
+        val currentZoom = ZoomUtil.ZOOM_DEFAULT
         zoomViewModel.setCurrentZoom(currentZoom)
         zoomViewModel.setZoom(currentZoom)
         viewModel.setZoom(currentZoom)
@@ -96,7 +113,6 @@ class ImagesFragment : BaseZoomFragment(), GalleryCardAdapter.Listener {
     }
 
     override fun handleZoomChange(zoom: Int, needReload: Boolean) {
-        ZoomUtil.IMAGES_ZOOM_LEVEL = zoom
         handleZoomAdapterLayoutChange(zoom)
         if (needReload) {
             loadPhotos()
@@ -495,15 +511,16 @@ class ImagesFragment : BaseZoomFragment(), GalleryCardAdapter.Listener {
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
-        if (activity as ManagerActivityLollipop? != null && (activity as ManagerActivityLollipop?)!!.isInImagesPage) {
-            super.onCreateOptionsMenu(menu, inflater)
-        }
+//        if (activity as ManagerActivityLollipop? != null && (activity as ManagerActivityLollipop?)!!.drawerItem != ManagerActivityLollipop.DrawerItem.HOMEPAGE) {
+//            return
+//        }
+        super.onCreateOptionsMenu(menu, inflater)
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        if (activity as ManagerActivityLollipop? != null && (activity as ManagerActivityLollipop?)!!.isInImagesPage) {
-            return super.onOptionsItemSelected(item)
-        }
-        return true
+//        if (activity as ManagerActivityLollipop? != null && (activity as ManagerActivityLollipop?)!!.drawerItem != ManagerActivityLollipop.DrawerItem.HOMEPAGE) {
+//            return true
+//        }
+        return super.onOptionsItemSelected(item)
     }
 }

@@ -14,7 +14,7 @@ import mega.privacy.android.app.constants.SettingsConstants
 import mega.privacy.android.app.gallery.data.GalleryItem
 import mega.privacy.android.app.gallery.data.GalleryItem.Companion.TYPE_HEADER
 import mega.privacy.android.app.gallery.repository.PhotosItemRepository
-import mega.privacy.android.app.gallery.ui.MediaViewModel
+import mega.privacy.android.app.gallery.ui.GalleryViewModel
 import mega.privacy.android.app.utils.LogUtil
 import mega.privacy.android.app.utils.RxUtil
 import mega.privacy.android.app.utils.ZoomUtil
@@ -23,9 +23,14 @@ import nz.mega.sdk.MegaNode
 class PhotosViewModel @ViewModelInject constructor(
     private val repository: PhotosItemRepository,
     private val mDbHandler: DatabaseHandler
-) : MediaViewModel(repository) {
+) : GalleryViewModel(repository) {
 
     override var _mZoom: Int = ZoomUtil.PHOTO_ZOOM_LEVEL
+    override fun isAutoGetItem(): Boolean = true
+
+    override fun getFilterRealPhotoCountCondition(item: GalleryItem): Boolean {
+        return item.type != TYPE_HEADER
+    }
 
     override fun initMediaIndex(item: GalleryItem, mediaIndex: Int): Int {
         var tempIndex = mediaIndex
@@ -124,13 +129,5 @@ class PhotosViewModel @ViewModelInject constructor(
                 camSyncEnabled.setValue(it)
             }, RxUtil.logErr("camSyncEnabled")))
         return camSyncEnabled
-    }
-
-    fun getRealPhotoCount(): Int {
-        items.value?.filter { it.type == GalleryItem.TYPE_IMAGE || it.type == GalleryItem.TYPE_VIDEO }
-            ?.let {
-                return it.size
-            }
-        return 0
     }
 }

@@ -1,14 +1,10 @@
-package mega.privacy.android.app.gallery.repository
+package mega.privacy.android.app.gallery.repository.fetcher
 
 import android.content.Context
-import mega.privacy.android.app.DatabaseHandler
-import mega.privacy.android.app.MimeTypeThumbnail
 import mega.privacy.android.app.gallery.data.GalleryItem
-import mega.privacy.android.app.utils.LogUtil
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaNode
-import nz.mega.sdk.MegaNodeList
 import java.util.*
 
 class GalleryTypeFetcher(

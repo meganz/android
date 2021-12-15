@@ -3523,6 +3523,13 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 		}
 	}
 
+	public void skipToNewFragment(Fragment f){
+		FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+		ft.replace(R.id.fragment_container, f);
+		ft.addToBackStack(null);
+		ft.commitAllowingStateLoss();
+	}
+
 	void replaceFragment (Fragment f, String fTag) {
 		FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
 		ft.replace(R.id.fragment_container, f, fTag);

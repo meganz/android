@@ -1,5 +1,6 @@
 package mega.privacy.android.app.fragments.homepage
 
+import android.util.Log
 import androidx.hilt.lifecycle.ViewModelInject
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -7,6 +8,7 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModel
 import com.jeremyliao.liveeventbus.LiveEventBus
 import mega.privacy.android.app.R
+import mega.privacy.android.app.constants.EventConstants.EVENT_SHOW_MEDIA_DISCOVERY
 import mega.privacy.android.app.constants.EventConstants.EVENT_UPDATE_VIEW_MODE
 import mega.privacy.android.app.globalmanagement.SortOrderManagement
 import mega.privacy.android.app.utils.Constants.EVENT_LIST_GRID_CHANGE
@@ -76,7 +78,7 @@ class SortByHeaderViewModel @ViewModelInject constructor(
      * Enter media discovery view.
      */
     fun enterMediaDiscovery() {
-        //TODO
+        LiveEventBus.get(EVENT_SHOW_MEDIA_DISCOVERY, Long::class.java).post(0L)
     }
 
     override fun onCleared() {
