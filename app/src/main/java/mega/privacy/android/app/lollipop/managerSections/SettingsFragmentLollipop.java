@@ -480,7 +480,6 @@ public class SettingsFragmentLollipop extends SettingsBaseFragment {
                         numberOfClicksSDK = 0;
                         setStatusLoggerSDK(context, false);
                     } else {
-                        logWarning("SDK file logger attribute is NULL");
                         ((ManagerActivityLollipop) context).showConfirmationEnableLogsSDK();
                     }
                 }
