@@ -2884,6 +2884,8 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
         if (state != STATE_FINISH && state != STATE_CANCEL) {
             inMeetingViewModel.updateShowWarningMessage(STATE_RESUME)
         }
+
+        MegaApplication.getInstance().unregisterProximitySensor()
     }
 
     override fun onStop() {
