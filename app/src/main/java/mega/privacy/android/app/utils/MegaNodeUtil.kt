@@ -42,7 +42,6 @@ import mega.privacy.android.app.lollipop.FileExplorerActivityLollipop
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop.DrawerItem
 import mega.privacy.android.app.lollipop.PdfViewerActivityLollipop
-import mega.privacy.android.app.lollipop.ZipBrowserActivityLollipop
 import mega.privacy.android.app.lollipop.listeners.MultipleRequestListener
 import mega.privacy.android.app.textEditor.TextEditorViewModel.Companion.EDIT_MODE
 import mega.privacy.android.app.textEditor.TextEditorViewModel.Companion.MODE
@@ -53,14 +52,12 @@ import mega.privacy.android.app.utils.FileUtil.*
 import mega.privacy.android.app.utils.LogUtil.logDebug
 import mega.privacy.android.app.utils.LogUtil.logWarning
 import mega.privacy.android.app.utils.MegaApiUtils.isIntentAvailable
-import mega.privacy.android.app.utils.MegaNodeUtil.launchActionView
-import mega.privacy.android.app.utils.MegaNodeUtil.manageURLNode
-import mega.privacy.android.app.utils.MegaNodeUtil.openZip
 import mega.privacy.android.app.utils.StringResourcesUtils.getQuantityString
 import mega.privacy.android.app.utils.StringResourcesUtils.getString
 import mega.privacy.android.app.utils.TextUtil.isTextEmpty
 import mega.privacy.android.app.utils.TimeUtils.formatLongDateTime
 import mega.privacy.android.app.utils.Util.*
+import mega.privacy.android.app.zippreview.ui.ZipBrowserActivity
 import nz.mega.sdk.*
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 import java.io.*
@@ -1509,12 +1506,12 @@ object MegaNodeUtil {
         zipFilePath: String,
         nodeHandle: Long
     ) {
-        val intentZip = Intent(context, ZipBrowserActivityLollipop::class.java)
+        val intentZip = Intent(context, ZipBrowserActivity::class.java)
         intentZip.putExtra(
-            ZipBrowserActivityLollipop.EXTRA_PATH_ZIP, zipFilePath
+            ZipBrowserActivity.EXTRA_PATH_ZIP, zipFilePath
         )
         intentZip.putExtra(
-            ZipBrowserActivityLollipop.EXTRA_HANDLE_ZIP, nodeHandle
+            ZipBrowserActivity.EXTRA_HANDLE_ZIP, nodeHandle
         )
 
         activityLauncher.launchActivity(intentZip)

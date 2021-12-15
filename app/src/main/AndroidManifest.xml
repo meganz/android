@@ -320,7 +320,7 @@
             android:windowSoftInputMode="adjustResize|stateVisible"/>
 
         <activity
-            android:name="mega.privacy.android.app.lollipop.ZipBrowserActivityLollipop"
+            android:name="mega.privacy.android.app.zippreview.ui.ZipBrowserActivity"
             android:label="@string/zip_browser_activity"
             android:configChanges="orientation|screenSize">
         </activity>
