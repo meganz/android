@@ -171,6 +171,7 @@ class ImagesFragment : BaseZoomFragment(), GalleryCardAdapter.Listener {
         showViewTypePanel()
     }
 
+    override fun getViewType() = selectedView
 
     private fun setupEmptyHint() {
         binding.emptyHint.emptyHintImage.isVisible = false

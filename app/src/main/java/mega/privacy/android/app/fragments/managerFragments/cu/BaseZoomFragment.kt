@@ -47,15 +47,16 @@ abstract class BaseZoomFragment : BaseFragment(), GestureScaleCallback {
         const val YEARS_INDEX = 2
     }
 
-    lateinit var mManagerActivity: ManagerActivityLollipop
+    protected lateinit var mManagerActivity: ManagerActivityLollipop
 
     abstract val listView: RecyclerView
     protected lateinit var menu: Menu
-    protected val zoomViewModel by viewModels<ZoomViewModel>()
 
-    protected var actionMode: ActionMode? = null
+    protected val zoomViewModel by viewModels<ZoomViewModel>()
     protected val actionModeViewModel by viewModels<ActionModeViewModel>()
     protected val itemOperationViewModel by viewModels<ItemOperationViewModel>()
+
+    protected var actionMode: ActionMode? = null
     protected lateinit var actionModeCallback: ActionModeCallback
 
     /**
@@ -77,14 +78,6 @@ abstract class BaseZoomFragment : BaseFragment(), GestureScaleCallback {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         mManagerActivity = activity as ManagerActivityLollipop
-    }
-
-    private fun subscribeObservers() {
-        zoomViewModel.zoom.observe(viewLifecycleOwner, { zoom: Int ->
-            val needReload = ZoomUtil.needReload(getCurrentZoom(), zoom)
-            zoomViewModel.setCurrentZoom(zoom)
-            handleZoomChange(zoom, needReload)
-        })
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -111,6 +104,14 @@ abstract class BaseZoomFragment : BaseFragment(), GestureScaleCallback {
             }
         }
         return super.onOptionsItemSelected(item)
+    }
+
+    private fun subscribeObservers() {
+        zoomViewModel.zoom.observe(viewLifecycleOwner, { zoom: Int ->
+            val needReload = ZoomUtil.needReload(getCurrentZoom(), zoom)
+            zoomViewModel.setCurrentZoom(zoom)
+            handleZoomChange(zoom, needReload)
+        })
     }
 
     protected fun setupActionMode() {
@@ -312,6 +313,8 @@ abstract class BaseZoomFragment : BaseFragment(), GestureScaleCallback {
             else -> setViewTypeButtonStyle(allButton, true)
         }
     }
+
+    abstract fun getViewType() : Int
 
     /**
      * Apply selected/unselected style for the TextView button.
