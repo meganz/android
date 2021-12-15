@@ -483,7 +483,8 @@ public class ChatManagement {
      *
      * @param chatId      The chat id of a chat related
      * @param enableVideo True, if the video should be enabled. False, otherwise
-     * @param enableAudio True, if the video should be enabled. False, otherwise
+     * @param enableAudio True, if the audio should be enabled. False, otherwise
+     * @param speakerStatus True, if the speaker should be enabled. False, otherwise
      * @param listener    MegaChatRequestListenerInterface
      */
     public void answerChatCall(long chatId, boolean enableVideo, boolean enableAudio, boolean speakerStatus, MegaChatRequestListenerInterface listener) {

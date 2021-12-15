@@ -4,7 +4,6 @@ import android.content.Context
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.listeners.ChatBaseListener
 import mega.privacy.android.app.utils.LogUtil
-import mega.privacy.android.app.utils.LogUtil.logDebug
 import nz.mega.sdk.*
 
 class AnswerChatCallListener(context: Context?) : ChatBaseListener(context) {
