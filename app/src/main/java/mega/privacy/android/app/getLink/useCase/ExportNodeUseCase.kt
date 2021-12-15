@@ -60,6 +60,10 @@ class ExportNodeUseCase @Inject constructor(
                 emitter.onError(IllegalArgumentException("Null node"))
                 return@create
             }
+            if (node.isExported) {
+                emitter.onSuccess(node.publicLink)
+                return@create
+            }
 
             val listener = OptionalMegaRequestListenerInterface(
                 onRequestFinish = { request, error ->

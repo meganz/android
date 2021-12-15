@@ -1827,7 +1827,7 @@ object MegaNodeUtil {
         }
 
     /**
-     * Check if a specific {@link MegaNode} is valid for Image Viewer
+     * Check if a specific MegaNode is valid for Image Viewer
      *
      * @return  True if it's valid, false otherwise
      */

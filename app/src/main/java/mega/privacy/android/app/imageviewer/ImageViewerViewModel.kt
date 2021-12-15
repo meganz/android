@@ -20,6 +20,7 @@ import mega.privacy.android.app.imageviewer.usecase.GetImageHandlesUseCase
 import mega.privacy.android.app.imageviewer.usecase.GetImageUseCase
 import mega.privacy.android.app.usecase.CancelTransferUseCase
 import mega.privacy.android.app.usecase.GetNodeUseCase
+import mega.privacy.android.app.usecase.LoggedInUseCase
 import mega.privacy.android.app.usecase.data.MegaNodeItem
 import mega.privacy.android.app.utils.Constants.INVALID_POSITION
 import mega.privacy.android.app.utils.LogUtil.logError
@@ -46,13 +47,19 @@ class ImageViewerViewModel @ViewModelInject constructor(
     private val getImageHandlesUseCase: GetImageHandlesUseCase,
     private val getNodeUseCase: GetNodeUseCase,
     private val exportNodeUseCase: ExportNodeUseCase,
-    private val cancelTransferUseCase: CancelTransferUseCase
+    private val cancelTransferUseCase: CancelTransferUseCase,
+    private val loggedInUseCase: LoggedInUseCase
 ) : BaseRxViewModel() {
 
     private val images = MutableLiveData<List<ImageItem>?>()
     private val currentPosition = MutableLiveData<Int>()
     private val switchToolbar = MutableLiveData<Unit>()
     private val snackbarMessage = SingleLiveEvent<String>()
+    private var isUserLoggedIn = false
+
+    init {
+        checkIfUserIsLoggedIn()
+    }
 
     fun onImagesHandle(): LiveData<List<Long>?> =
         images.map { items -> items?.map(ImageItem::handle) }
@@ -109,6 +116,8 @@ class ImageViewerViewModel @ViewModelInject constructor(
         getImageHandlesUseCase.get(chatRoomId = chatRoomId, chatMessageIds = messageIds)
             .subscribeAndUpdateImages(currentNodeHandle)
     }
+
+    fun isUserLoggedIn(): Boolean = isUserLoggedIn
 
     /**
      * Main method to request a MegaNodeItem given a previously loaded Node handle.
@@ -253,21 +262,28 @@ class ImageViewerViewModel @ViewModelInject constructor(
             }
     }
 
-    fun shareNode(nodeHandle: Long): LiveData<String?> {
+    fun shareNode(node: MegaNode): LiveData<String?> {
         val result = MutableLiveData<String?>()
-        exportNodeUseCase.export(nodeHandle)
-            .subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribeBy(
-                onSuccess = { link ->
-                    result.value = link
-                },
-                onError = { error ->
-                    logError(error.stackTraceToString())
-                    result.value = null
-                }
-            )
-            .addTo(composite)
+
+        val existingPublicLink = images.value?.find { it.handle == node.handle }?.nodePublicLink
+        if (!existingPublicLink.isNullOrBlank()) {
+            result.value = existingPublicLink
+        } else {
+            exportNodeUseCase.export(node)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeBy(
+                    onSuccess = { link ->
+                        result.value = link
+                    },
+                    onError = { error ->
+                        logError(error.stackTraceToString())
+                        result.value = null
+                    }
+                )
+                .addTo(composite)
+        }
+
         return result
     }
 
@@ -327,6 +343,24 @@ class ImageViewerViewModel @ViewModelInject constructor(
 
     private fun getExistingNode(nodeHandle: Long): MegaNode? =
         images.value?.find { it.handle == nodeHandle }?.nodeItem?.node
+
+    /**
+     * Check if current user is logged in
+     */
+    private fun checkIfUserIsLoggedIn() {
+        loggedInUseCase.isUserLoggedIn()
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribeBy(
+                onSuccess = { isLoggedIn ->
+                    isUserLoggedIn = isLoggedIn
+                },
+                onError = { error ->
+                    logError(error.stackTraceToString())
+                }
+            )
+            .addTo(composite)
+    }
 
     /**
      * Reused Extension Function to subscribe to a Flowable<List<ImageItem>> and update each
