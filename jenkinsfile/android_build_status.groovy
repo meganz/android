@@ -42,6 +42,7 @@ pipeline {
                     comment = "Android Build Failed: ${env.GIT_BRANCH} ${env.CHANGE_URL}"
                 }
                 slackUploadFile filePath: env.CONSOLE_LOG_FILE, initialComment: comment
+                updateGitlabCommitStatus name: 'build', state: 'failed'
             }
         }
         success {
@@ -51,12 +52,14 @@ pipeline {
                     comment = "Android Build Success: ${env.GIT_BRANCH} ${env.CHANGE_URL}"
                 }
                 slackSend color: "good", message: comment
+                updateGitlabCommitStatus name: 'build', state: 'success'
             }
         }
     }
     stages {
         stage('Preparation') {
             steps {
+                updateGitlabCommitStatus name: 'build', state: 'running'
                 runShell("rm -fv ${CONSOLE_LOG_FILE}")
             }
         }
@@ -64,8 +67,7 @@ pipeline {
         stage('Notify GitLab Test') {
             steps {
                 echo 'Notify GitLab Test'
-                updateGitlabCommitStatus name: 'build', state: 'pending'
-                updateGitlabCommitStatus name: 'build', state: 'failed'
+
                 addGitLabMRComment comment: 'Another build has been triggered in CI'
             }
         }
