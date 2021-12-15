@@ -619,7 +619,7 @@
     <!-- upload to. Then choose an Image file -->
     <string name="upload_to_image">图片</string>
     <!-- upload to. Then choose an Audio file -->
-    <string name="upload_to_audio">音乐</string>
+    <string name="upload_to_audio">语音</string>
     <!-- Title of the button in the contact info screen to start a video call -->
     <string name="upload_to_video">视频</string>
     <!-- upload to. Then choose to browse the file system to choose a file -->
@@ -643,7 +643,7 @@
     <!-- error message while browsing the local filesystem -->
     <string name="general_error">执行操作时出错</string>
     <!-- title of the image gallery -->
-    <string name="full_screen_image_viewer_label">图像浏览器</string>
+    <string name="full_screen_image_viewer_label">图像查看器</string>
     <!-- Headline for the amount of storage space is used -->
     <string name="my_account_used_space">已使用存储空间</string>
     <!-- menu item -->
@@ -1500,7 +1500,7 @@
     <!-- Label for the option of setting to change the colour theme -->
     <string name="set_color_theme_label">主题颜色</string>
     <!-- Answer for confirmation dialog. -->
-    <string name="general_dismiss">解除</string>
+    <string name="general_dismiss">忽略</string>
     <!-- Label for any ‘Not available’ button, link, text, title, etc. - (String as short as possible). -->
     <string name="general_not_available">无法使用</string>
     <!-- Accepted request invitacion alert -->
@@ -1592,22 +1592,14 @@
     <string name="paused_transfers_title">已暂停的传输</string>
     <!-- message shown in the screen when there are not any active transfer -->
     <string name="completed_transfers_empty">没有已完成的传输</string>
-    <!-- Text of the notification shown when the upload service is running, Plural -->
-    <plurals name="upload_service_notification">
-        <item quantity="other">正在上传 %1$d 个文件，共%2$d个文件中。</item>
-    </plurals>
-    <!-- Text of the notification shown when the upload service is running, Plural -->
-    <plurals name="upload_service_paused_notification">
-        <item quantity="other">正在上传%2$d个文件中的%1$d（已暂停）</item>
-    </plurals>
-    <!-- Text of the notification shown when the folder upload service is running, Text of the notification shown when the folder upload service is running - plural e.g. Uploading 1 of 2 folders -->
-    <plurals name="folder_upload_service_notification">
-        <item quantity="other">正在上传%2$d个文件夹中的%1$d</item>
-    </plurals>
-    <!-- Text of the notification shown when the folder upload service is running, Text of the notification shown when the folder upload service is running - plural e.g. Uploading 1 of 2 folders -->
-    <plurals name="folder_upload_service_paused_notification">
-        <item quantity="other">正在上传%2$d文件夹中的%1$d（已暂停）</item>
-    </plurals>
+    <!-- Text of the notification shown when the upload service is running: e.g. Uploading files: 1 of 10 -->
+    <string name="upload_service_notification">正在上传%2$d个文件中的第%1$d个</string>
+    <!-- Text of the notification shown when the upload service is paused: e.g. Uploading files: 1 of 10 (paused)-->
+    <string name="upload_service_notification_paused">正在上传%2$d个文件中的第%1$d个（已暂停）</string>
+    <!-- Text of the notification shown when the folder upload service is running, e.g. Uploading folders 1 of 2 -->
+    <string name="folder_upload_service_notification">正在上传%2$d个文件夹中的第%1$d个</string>
+    <!-- Text of the notification shown when the folder upload service is paused, e.g. Uploading folders 1 of 2 (paused) -->
+    <string name="folder_upload_service_notification_paused">正在上传%2$d个文件夹中的第%1$d个（已暂停）</string>
     <!-- Text of the notification shown when the upload service has finished, Plural -->
     <plurals name="upload_service_final_notification">
         <item quantity="other">已上传%1$d个文件</item>
@@ -1646,14 +1638,10 @@
     <plurals name="download_service_failed">
         <item quantity="other">%1$d 个文件未下载</item>
     </plurals>
-    <!-- Text of the notification shown when the download service is running, Plural -->
-    <plurals name="download_service_notification">
-        <item quantity="other">正在下载 %2$d个文件中的%1$d个</item>
-    </plurals>
-    <!-- Text of the notification shown when the download service is paused, Plural -->
-    <plurals name="download_service_paused_notification">
-        <item quantity="other">正在下载%2$d个文件中的%1$d（已暂停）</item>
-    </plurals>
+    <!-- Text of the notification shown when the download service is running -->
+    <string name="download_service_notification">正在下载%2$d个文件中的第%1$d个</string>
+    <!-- Text of the notification shown when the download service is paused -->
+    <string name="download_service_notification_paused">正在下载%2$d个文件中的第%1$d个（已暂停）</string>
     <!-- Title of the alert when the transfer quota is exceeded. -->
     <string name="title_depleted_transfer_overquota">传输流量不足</string>
     <!-- Text of the alert when the transfer quota is depleted. The placeholder indicates the time left for the transfer quota to be reset. For instance: 30m 45s -->
@@ -2267,7 +2255,7 @@
     <string name="turn_on_notifications_fifth_step">开启并选择偏好</string>
     <!-- Alert message after sending to chat one or several messages to several chats, version items -->
     <plurals name="files_send_to_chat_success">
-        <item quantity="other">发送的文件</item>
+        <item quantity="other">文件已发送</item>
     </plurals>
     <!-- Error message after sending to chat one or several messages to several chats -->
     <string name="files_send_to_chat_error">出错了。发送失败</string>
@@ -3162,7 +3150,7 @@
     <!-- Label that indicates the steps of a wizard -->
     <string name="wizard_steps_indicator">%2$d的%1$d</string>
     <!-- Hint of the Search view -->
-    <string name="hint_action_search">搜索&#8230;&#8230;</string>
+    <string name="hint_action_search">搜索&#8230;</string>
     <!-- Notification button which is displayed to answer an incoming call if the call screen is not displayed for some reason. -->
     <string name="answer_call_incoming">应答</string>
     <!-- The text of the notification button that is displayed when there is a call in progress, another call is received and ignored. -->
@@ -3280,7 +3268,7 @@
     <!-- Title of a media recents bucket that contains an image and some videos -->
     <string name="title_media_bucket_image_and_videos">1个图片和%d个视频</string>
     <!-- Title of a media recents bucket that contains an image and a video -->
-    <string name="title_media_bucket_image_and_video">1张照片和1个视频</string>
+    <string name="title_media_bucket_image_and_video">1个图片和1个视频</string>
     <!-- Label that indicates who uploaded a file into a recents bucket -->
     <string name="create_action_bucket">由%s[A]创建[/A]</string>
     <!-- Label that indicates who updated a file into a recents bucket -->
@@ -3658,7 +3646,7 @@
     <!-- Explanation of a warning recommending upgrade to Pro in relation to link available options -->
     <string name="link_upgrade_pro_explanation">MEGA Pro会员用户可以独享链接额外安全保护，从而使您的帐户更加安全。</string>
     <!-- Meaning of links decryption key -->
-    <string name="decryption_key_explanation">我们的端到端加密系统需要为此文件自动生成唯一密钥。 默认情况下会创建带有此密钥的链接，您也可以单独导出解密密钥以增加链接安全性。</string>
+    <string name="decryption_key_explanation">我们的端到端加密系统需要为此文件或文件夹自动生成唯一密钥。 默认情况下会创建带有此密钥的链接，您也可以单独导出解密密钥进而增加安全性。</string>
     <!-- Reset password label -->
     <string name="reset_password_label">重置密码</string>
     <!-- Warning show to the user when has enable to send the decryption key of a link separately and tries to share the link -->
@@ -3773,7 +3761,7 @@
     <string name="file_created">文件已创建</string>
     <!-- Warning indicating a file was not created successfully -->
     <string name="file_creation_failed">创建文件失败。请重试。</string>
-    <!-- Label indicating a file was saved to some folder. e.g.: File saved to Cloud Drive -->
+    <!-- Label indicating a file was saved to some folder. e.g.: File saved to Cloud Drive. "Cloud Drive" is the only destination for the time being, thus any article isn't needed -->
     <string name="file_saved_to">文件已保存到%1$s</string>
     <!-- Warning indicating a file was not saved to some folder. e.g.: File not saved to Cloud Drive. Try again -->
     <string name="file_saved_to_failed">文件未保存到%1$s。请重试。</string>
@@ -3958,9 +3946,9 @@
     <!-- General label for microphone -->
     <string name="general_mic">麦克风</string>
     <!-- General label for microphone muted -->
-    <string name="general_mic_mute">您的麦克风已静音</string>
+    <string name="general_mic_mute">您的麦克风已关闭</string>
     <!-- General label for microphone unmuted -->
-    <string name="general_mic_unmute">您的麦克风已取消静音</string>
+    <string name="general_mic_unmute">您的麦克风已开启</string>
     <!-- General label for camera -->
     <string name="general_camera">相机</string>
     <!-- General label for camera enable -->
@@ -3976,9 +3964,9 @@
     <!-- General label for headphone on-->
     <string name="general_headphone_on">听筒已开启</string>
     <!-- General label for speaker on-->
-    <string name="general_speaker_on">扬声器已开启</string>
+    <string name="general_speaker_on">您的扬声器已开启</string>
     <!-- General label for speaker off-->
-    <string name="general_speaker_off">扬声器已关闭</string>
+    <string name="general_speaker_off">您的扬声器已关闭</string>
     <!-- Label for end meeting-->
     <string name="meeting_end">结束</string>
     <!-- Invite contacts as participants of the meeting-->
@@ -4099,4 +4087,18 @@
     <string name="video_quality_info">您可以在相机上传设置中降低视频质量以节省空间。</string>
     <!-- Label indicating video original quality -->
     <string name="original_quality">原始画质</string>
+    <!-- Settings label which allows to enable or disable fingerprint unlock. -->
+    <string name="setting_fingerprint">指纹锁</string>
+    <!-- Title of the dialog which allows to enable the fingerprint unlock. -->
+    <string name="title_enable_fingerprint">确认指纹以解锁</string>
+    <!-- Title of the dialog which allows to unlock the app with the fingerprint. -->
+    <string name="title_unlock_fingerprint">使用指纹解锁</string>
+    <!-- Button of the dialog which allows to unlock the app with the fingerprint. Gives the option to unlock with the passcode instead -->
+    <string name="action_use_passcode">使用密码解锁</string>
+    <!-- Message informing the fingerprint was enabled successfully -->
+    <string name="confirmation_fingerprint_enabled">指纹已确认</string>
+    <!-- Warning indicating an image (GIF) cannot be inserted in an input text. Same string than the one shown by the system when it detects this behaviour on its own. -->
+    <string name="image_insertion_not_allowed">MEGA目前不支持图片插入</string>
+    <!-- The label under the button of viewing all images screen -->
+    <string name="section_images">图片</string>
 </resources>

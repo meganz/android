@@ -96,10 +96,9 @@ class RingingMeetingFragment : BaseFragment(),
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        // initViewModel must be put after onCreateView, otherwise, some views may be null
         initViewModel()
-        initComponent()
         permissionsRequester.launch(true)
+        initComponent()
     }
 
     /**

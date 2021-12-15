@@ -2240,7 +2240,8 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 						logDebug("IPC link - go to received request in Contacts");
 						markNotificationsSeen(true);
 						navigateToContactRequests();
-						selectDrawerItemPending=false;
+						getIntent().setAction(null);
+						setIntent(null);
 					}
 					else if(getIntent().getAction().equals(ACTION_CHAT_NOTIFICATION_MESSAGE)){
 						logDebug("Chat notitificacion received");
@@ -5807,6 +5808,10 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 
 	        	return true;
 	        }
+			case R.id.action_menu_clear_rubbish_bin:
+				showClearRubbishBinDialog();
+				return true;
+
 			case R.id.action_menu_sort_by:
 				if (drawerItem == DrawerItem.PHOTOS) {
 					showNewSortByPanel(ORDER_CAMERA);
@@ -7081,6 +7086,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 		fabs.add(fabMaskLayout.findViewById(R.id.text_chat));
 		fabs.add(fabMaskLayout.findViewById(R.id.text_meeting));
 
+		fabMaskLayout.setOnClickListener(l-> fabMainClickCallback());
 		fabMaskButton.setOnClickListener(l-> fabMainClickCallback());
 
 		fabMaskLayout.findViewById(R.id.fab_chat).setOnClickListener(l -> {
@@ -7134,6 +7140,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 	 * Showing the full screen mask by adding the mask layout to the window content
 	 */
 	private void addMask() {
+		getWindow().setStatusBarColor(ContextCompat.getColor(this, R.color.grey_600_085_dark_grey_070));
 		windowContent.addView(fabMaskLayout);
 	}
 
@@ -7141,6 +7148,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 	 * Removing the full screen mask
 	 */
 	private void removeMask() {
+		getWindow().setStatusBarColor(ContextCompat.getColor(this, android.R.color.transparent));
 		windowContent.removeView(fabMaskLayout);
 	}
 
@@ -11500,6 +11508,13 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 				openFullscreenOfflineFragment(
 						removeInitialOfflinePath(transfer.getPath()) + SEPARATOR);
 			} else {
+				File file = new File(transfer.getPath());
+
+				if (!isFileAvailable(file)) {
+					showSnackbar(SNACKBAR_TYPE, StringResourcesUtils.getString(R.string.location_not_exist), MEGACHAT_INVALID_HANDLE);
+					return;
+				}
+
 				Intent intent = new Intent(this, FileStorageActivityLollipop.class);
 				intent.setAction(FileStorageActivityLollipop.Mode.BROWSE_FILES.getAction());
 				intent.putExtra(FileStorageActivityLollipop.EXTRA_PATH, transfer.getPath());
