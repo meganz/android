@@ -138,6 +138,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
 
     private var micIsEnable = false
     private var camIsEnable = false
+    private var speakerIsEnable = false
     private var meetingLink: String = ""
     private var isManualModeView = false
     private var isWaitingForAnswerCall = false
@@ -765,6 +766,9 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
 
                                                                 camIsEnable =
                                                                     sharedModel.cameraLiveData.value!!
+                                                                speakerIsEnable =
+                                                                    sharedModel.speakerLiveData.value!! == AppRTCAudioManager.AudioDevice.SPEAKER_PHONE
+
                                                                 inMeetingViewModel.joinPublicChat(
                                                                     args.chatId,
                                                                     AutoJoinPublicChatListener(
@@ -1054,6 +1058,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
 
         sharedModel.speakerLiveData.observe(viewLifecycleOwner) {
             logDebug("Speaker status has changed to $it")
+            speakerIsEnable = it == AppRTCAudioManager.AudioDevice.SPEAKER_PHONE
             updateSpeaker(it)
         }
 
@@ -2957,6 +2962,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
             inMeetingViewModel.answerChatCall(
                 camIsEnable,
                 micIsEnable,
+                speakerIsEnable,
                 AnswerChatCallListener(requireContext(), this)
             )
         }

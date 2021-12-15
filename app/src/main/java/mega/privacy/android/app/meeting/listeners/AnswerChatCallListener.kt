@@ -4,6 +4,7 @@ import android.content.Context
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.listeners.ChatBaseListener
 import mega.privacy.android.app.utils.LogUtil
+import mega.privacy.android.app.utils.LogUtil.logDebug
 import nz.mega.sdk.*
 
 class AnswerChatCallListener(context: Context?) : ChatBaseListener(context) {
@@ -19,6 +20,10 @@ class AnswerChatCallListener(context: Context?) : ChatBaseListener(context) {
     override fun onRequestFinish(api: MegaChatApiJava, request: MegaChatRequest, e: MegaChatError) {
         if (request.type != MegaChatRequest.TYPE_ANSWER_CHAT_CALL) {
             return
+        }
+
+        if (MegaApplication.getChatManagement().isAlreadyJoiningCall(request.chatHandle)) {
+            MegaApplication.getChatManagement().removeJoiningCallChatId(request.chatHandle)
         }
 
         if (e.errorCode == MegaError.API_OK) {

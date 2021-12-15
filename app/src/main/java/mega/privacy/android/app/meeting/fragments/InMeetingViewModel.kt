@@ -1760,16 +1760,12 @@ class InMeetingViewModel @ViewModelInject constructor(
     fun answerChatCall(
         videoEnable: Boolean,
         audioEnable: Boolean,
+        speakerStatus:Boolean,
         listener: MegaChatRequestListenerInterface
     ) {
         inMeetingRepository.getChatRoom(currentChatId)?.let {
             logDebug("The chat exists")
-            inMeetingRepository.answerCall(
-                it.chatId,
-                videoEnable,
-                audioEnable,
-                listener
-            )
+            MegaApplication.getChatManagement().answerChatCall(it.chatId, videoEnable, audioEnable, speakerStatus, listener)
             return
         }
     }

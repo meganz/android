@@ -123,6 +123,7 @@ class RingingMeetingFragment : MeetingBaseFragment(),
             inMeetingViewModel.answerChatCall(
                 enableVideo,
                 true,
+                enableVideo,
                 AnswerChatCallListener(requireContext(), this)
             )
         }
