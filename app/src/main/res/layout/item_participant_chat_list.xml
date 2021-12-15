@@ -1,101 +1,137 @@
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/participant_list_item_layout"
-    android:layout_width="fill_parent"
-    android:layout_height="72dp"
-    android:descendantFocusability="blocksDescendants" >
+    android:layout_width="match_parent"
+    android:layout_height="72dp">
 
-    <RelativeLayout
-        android:id="@+id/participant_list_relative_layout_avatar"
+    <mega.privacy.android.app.components.RoundedImageView
+        android:id="@+id/participant_list_thumbnail"
         android:layout_width="40dp"
         android:layout_height="40dp"
-        android:layout_marginStart="18dp"
-        android:layout_centerVertical="true">
-
-        <mega.privacy.android.app.components.RoundedImageView
-            android:id="@+id/participant_list_thumbnail"
-            android:layout_width="fill_parent"
-            android:layout_height="fill_parent"
-            android:scaleType="fitCenter"
-            android:layout_centerInParent="true"
-            app:corner_radius="20dp" />
-    </RelativeLayout>
+        android:layout_marginStart="16dp"
+        android:scaleType="fitCenter"
+        app:corner_radius="60dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
     <ImageView
         android:id="@+id/verified_icon"
         android:layout_width="24dp"
         android:layout_height="24dp"
-        android:src="@drawable/ic_verified"
         android:layout_marginStart="42dp"
         android:layout_marginTop="8dp"
-        android:visibility="gone"/>
+        android:src="@drawable/ic_verified"
+        android:visibility="gone"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
-    <RelativeLayout
-        android:id="@+id/participant_list_three_dots_layout"
+    <ImageView
+        android:id="@+id/participant_list_three_dots"
         android:layout_width="wrap_content"
-        android:layout_height="match_parent"
-        android:layout_alignParentEnd="true">
-
-        <ImageView
-            android:id="@+id/participant_list_three_dots"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:background="@null"
-            android:layout_marginEnd="10dp"
-            android:layout_centerVertical="true"
-            android:src="@drawable/ic_dots_vertical_grey"
-            tools:tint="?android:attr/textColorSecondary" />
-
-    </RelativeLayout>
+        android:layout_height="wrap_content"
+        android:layout_centerVertical="true"
+        android:layout_marginEnd="10dp"
+        android:background="@null"
+        android:src="@drawable/ic_dots_vertical_grey"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:tint="?android:attr/textColorSecondary" />
 
     <ImageView
         android:id="@+id/participant_list_permissions"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginStart="10dp"
+        android:layout_marginEnd="12dp"
         android:src="@drawable/ic_permissions_full_access"
-        android:background="@null"
-        android:layout_marginRight="12dp"
-        android:layout_marginLeft="12dp"
-        android:layout_toStartOf="@id/participant_list_three_dots_layout"
-        android:layout_centerVertical="true"
+        android:visibility="visible"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/participant_list_three_dots"
+        app:layout_constraintHorizontal_weight="1"
+        app:layout_constraintTop_toTopOf="parent"
         app:tint="?attr/textColorHint" />
 
-    <RelativeLayout
+    <LinearLayout
+        android:id="@+id/call_options"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="13dp"
-        android:layout_centerVertical="true"
-        android:layout_toEndOf="@id/participant_list_relative_layout_avatar">
-
-        <mega.privacy.android.app.components.twemoji.EmojiTextView
-            android:id="@+id/participant_list_name"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textAppearance="?attr/textAppearanceSubtitle1"
-            app:emojiSize="14sp"
-            android:maxLines="1"
-            android:singleLine="true" />
+        android:layout_marginStart="10dp"
+        android:layout_marginEnd="12dp"
+        android:orientation="horizontal"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/participant_list_permissions"
+        app:layout_constraintHorizontal_weight="1"
+        app:layout_constraintTop_toTopOf="parent">
 
         <ImageView
-            android:id="@+id/group_participants_state_circle"
-            android:layout_width="12dp"
-            android:layout_height="12dp"
-            android:layout_alignTop="@id/participant_list_name"
-            android:layout_toEndOf="@id/participant_list_name"
-            android:layout_marginTop="3dp"
-            android:layout_marginStart="6dp"
+            android:id="@+id/participant_list_audio"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="6dp"
             android:background="@null"
-            tools:src="@drawable/ic_offline_light" />
+            android:src="@drawable/ic_mic_off_grey_red" />
+
+        <ImageView
+            android:id="@+id/participant_list_video"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@null"
+            android:src="@drawable/ic_video" />
+    </LinearLayout>
+
+    <RelativeLayout
+        android:id="@+id/participant_list_name_rl"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="13dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/call_options"
+        app:layout_constraintHorizontal_bias="0"
+        app:layout_constraintStart_toEndOf="@+id/participant_list_thumbnail"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <LinearLayout
+            android:id="@+id/participant_list_name_layout"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:paddingStart="0dp"
+            android:paddingEnd="10dp">
+
+            <mega.privacy.android.app.components.twemoji.EmojiTextView
+                android:id="@+id/participant_list_name"
+                style="@style/TextAppearance.Mega.Subtitle1.Variant"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:ellipsize="middle"
+                android:singleLine="true" />
+
+            <ImageView
+                android:id="@+id/participant_list_icon_end"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@null"
+                android:visibility="gone"
+                android:src="@drawable/ic_moderator"/>
+        </LinearLayout>
 
         <mega.privacy.android.app.components.MarqueeTextView
             android:id="@+id/participant_list_content"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_below="@id/participant_list_name"
-            android:textAppearance="@style/TextAppearance.Mega.Subtitle2.Secondary"
+            android:layout_below="@id/participant_list_name_layout"
+            android:layout_marginTop="-1dp"
             android:ellipsize="none"
-            android:singleLine="true" />
+            android:singleLine="true"
+            android:textAppearance="@style/TextAppearance.Mega.Subtitle2.Secondary" />
     </RelativeLayout>
 
-</RelativeLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>
+
+

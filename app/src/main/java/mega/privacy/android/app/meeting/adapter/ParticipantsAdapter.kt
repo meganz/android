@@ -4,7 +4,7 @@ import android.graphics.Bitmap
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.ListAdapter
-import mega.privacy.android.app.databinding.ItemMeetingParticipantBinding
+import mega.privacy.android.app.databinding.ItemParticipantChatListBinding
 import mega.privacy.android.app.meeting.listeners.BottomFloatingPanelListener
 import mega.privacy.android.app.utils.Constants.AVATAR_CHANGE
 import mega.privacy.android.app.utils.Constants.NAME_CHANGE
@@ -20,7 +20,7 @@ class ParticipantsAdapter(
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ParticipantViewHolder {
         val inflater = LayoutInflater.from(parent.context)
         return ParticipantViewHolder(
-            ItemMeetingParticipantBinding.inflate(inflater, parent, false)
+            ItemParticipantChatListBinding.inflate(inflater, parent, false)
         ) {
             listener.onParticipantOption(getItem(it))
         }

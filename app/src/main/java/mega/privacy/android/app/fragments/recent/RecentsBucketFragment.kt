@@ -29,6 +29,7 @@ import mega.privacy.android.app.utils.Constants.*
 import mega.privacy.android.app.utils.LogUtil.logDebug
 import mega.privacy.android.app.utils.MegaNodeUtil.manageTextFileIntent
 import mega.privacy.android.app.utils.MegaNodeUtil.manageURLNode
+import mega.privacy.android.app.utils.MegaNodeUtil.onNodeTapped
 import mega.privacy.android.app.utils.Util.getMediaIntent
 import mega.privacy.android.app.utils.Util.mutateIconSecondary
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
@@ -192,7 +193,15 @@ class RecentsBucketFragment : BaseFragment() {
                 manageTextFileIntent(requireContext(), node, RECENTS_ADAPTER)
             }
             else -> {
-                download(node.handle)
+                onNodeTapped(
+                    context,
+                    node,
+                    {
+                        (requireActivity() as ManagerActivityLollipop).saveNodeByTap(it)
+                    },
+                    (requireActivity() as ManagerActivityLollipop),
+                    (requireActivity() as ManagerActivityLollipop)
+                )
             }
         }
     }

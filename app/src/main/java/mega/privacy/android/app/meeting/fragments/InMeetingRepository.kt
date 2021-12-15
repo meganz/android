@@ -469,18 +469,6 @@ class InMeetingRepository @Inject constructor(
         )
     }
 
-    fun updateChatPermissions(
-        chatId: Long, peerId: Long,
-        listener: MegaChatRequestListenerInterface?
-    ) {
-        megaChatApi.updateChatPermissions(
-            chatId,
-            peerId,
-            MegaChatRoom.PRIV_MODERATOR,
-            listener
-        )
-    }
-
     /**
      * Method for getting a participant's avatar
      *

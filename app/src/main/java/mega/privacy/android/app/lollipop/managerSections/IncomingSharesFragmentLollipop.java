@@ -9,12 +9,10 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.NewGridRecyclerView;
 import mega.privacy.android.app.fragments.MegaNodeBaseFragment;
@@ -22,14 +20,11 @@ import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.adapters.MegaNodeAdapter;
 import mega.privacy.android.app.utils.CloudStorageOptionControlUtil;
 import mega.privacy.android.app.utils.ColorUtils;
-import mega.privacy.android.app.utils.MegaNodeUtil;
-import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaNode;
 
 import static mega.privacy.android.app.lollipop.ManagerActivityLollipop.INCOMING_TAB;
 import static mega.privacy.android.app.utils.MegaNodeUtil.allHaveFullAccess;
 import static mega.privacy.android.app.utils.MegaNodeUtil.areAllFileNodes;
-import static mega.privacy.android.app.utils.SortUtil.*;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.Util.*;
@@ -123,6 +118,8 @@ public class IncomingSharesFragmentLollipop extends MegaNodeBaseFragment {
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+		super.onCreateView(inflater, container, savedInstanceState);
+
 		logDebug("Parent Handle: " + managerActivity.getParentHandleIncoming());
 
 		if (megaApi.getRootNode() == null) {
@@ -137,14 +134,20 @@ public class IncomingSharesFragmentLollipop extends MegaNodeBaseFragment {
 			v = getListView(inflater, container);
 
 			if (adapter == null) {
-				adapter = new MegaNodeAdapter(context, this, nodes, managerActivity.getParentHandleIncoming(), recyclerView, null, INCOMING_SHARES_ADAPTER, MegaNodeAdapter.ITEM_VIEW_TYPE_LIST);
+				adapter = new MegaNodeAdapter(context, this, nodes,
+						managerActivity.getParentHandleIncoming(), recyclerView,
+						INCOMING_SHARES_ADAPTER, MegaNodeAdapter.ITEM_VIEW_TYPE_LIST, sortByHeaderViewModel);
 			}
 		} else {
 			v = getGridView(inflater, container);
 
 			if (adapter == null) {
-				adapter = new MegaNodeAdapter(context, this, nodes, managerActivity.getParentHandleIncoming(), recyclerView, null, INCOMING_SHARES_ADAPTER, MegaNodeAdapter.ITEM_VIEW_TYPE_GRID);
+				adapter = new MegaNodeAdapter(context, this, nodes,
+						managerActivity.getParentHandleIncoming(), recyclerView,
+						INCOMING_SHARES_ADAPTER, MegaNodeAdapter.ITEM_VIEW_TYPE_GRID, sortByHeaderViewModel);
 			}
+
+			gridLayoutManager.setSpanSizeLookup(adapter.getSpanSizeLookup(gridLayoutManager.getSpanCount()));
 		}
 
 		adapter.setParentHandle(managerActivity.getParentHandleIncoming());
