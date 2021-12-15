@@ -136,6 +136,12 @@ android {
             applicationId = "mega.privacy.android.app.huawei"
         }
     }
+
+    configurations.all {
+        resolutionStrategy {
+            force 'androidx.test:monitor:1.4.0'
+        }
+    }
 }
 
 // See https://dagger.dev/hilt/gradle-setup#gradle-plugin-local-tests
@@ -275,6 +281,10 @@ dependencies {
     androidTestImplementation "com.google.dagger:hilt-android-testing:$hiltVersion"
     androidTestImplementation "org.mockito:mockito-core:$mockitoVersion"
     androidTestImplementation "org.mockito.kotlin:mockito-kotlin:$mockitoKotlinVersion"
+    androidTestImplementation "org.mockito:mockito-android:$mockitoVersion"
+    androidTestImplementation ("androidx.test.espresso:espresso-contrib:$espressoVersion") {
+        exclude group: 'org.checkerframework', module: 'checker'
+    }
 
     kaptAndroidTest "com.google.dagger:hilt-android-compiler:$hiltVersion"
     debugImplementation "androidx.fragment:fragment-testing:$fragment_version"
