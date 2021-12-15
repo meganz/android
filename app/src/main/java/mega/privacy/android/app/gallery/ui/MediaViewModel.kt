@@ -26,6 +26,7 @@ abstract class MediaViewModel constructor(
     var liveDataRoot = MutableLiveData<Unit>()
 
     var selectedViewTypeImages = ALL_VIEW
+
     var selectedViewTypePhotos = ALL_VIEW
 
     var forceUpdate = false
@@ -39,23 +40,26 @@ abstract class MediaViewModel constructor(
     private val _refreshCards = MutableLiveData(false)
     val refreshCards: LiveData<Boolean> = _refreshCards
 
-    abstract var _mZoom: Int
-
-    fun setZoom(zoom: Int) {
-        _mZoom = zoom
+    private val nodesChangeObserver = Observer<Boolean> {
+        if (it) {
+            loadPhotos(true)
+        } else {
+            refreshUi()
+        }
     }
 
-    /**
-     * Indicate refreshing cards has finished.
-     */
-    fun refreshCompleted() {
-        _refreshCards.value = false
+    private val loadFinishedObserver = Observer<List<GalleryItem>> {
+        loadInProgress = false
+
+        if (pendingLoad) {
+            loadPhotos(true)
+        }
     }
 
     val items: LiveData<List<GalleryItem>> = liveDataRoot.switchMap {
         if (forceUpdate) {
             viewModelScope.launch {
-                repository.getFiles(_mZoom)
+                repository.getFiles(mZoom)
             }
         } else {
             repository.emitFiles()
@@ -74,13 +78,6 @@ abstract class MediaViewModel constructor(
         it
     }
 
-    /**
-     * Custom node index and assign it to node.
-     *
-     * @return node index
-     */
-    abstract fun initMediaIndex(item: GalleryItem, mediaIndex: Int): Int
-
     val dateCards: LiveData<List<List<GalleryCard>>> = items.map {
         val cardsProvider = DateCardsProvider()
         cardsProvider.extractCardsFromNodeList(
@@ -95,6 +92,36 @@ abstract class MediaViewModel constructor(
 
         listOf(cardsProvider.getDays(), cardsProvider.getMonths(), cardsProvider.getYears())
     }
+
+    init {
+        items.observeForever(loadFinishedObserver)
+        // Calling ObserveForever() here instead of calling observe()
+        // in the PhotosFragment, for fear that an nodes update event would be missed if
+        // emitted accidentally between the Fragment's onDestroy and onCreate when rotating screen.
+        LiveEventBus.get(EVENT_NODES_CHANGE, Boolean::class.java)
+            .observeForever(nodesChangeObserver)
+        loadPhotos(true)
+    }
+
+    abstract var mZoom: Int
+
+    fun setZoom(zoom: Int) {
+        mZoom = zoom
+    }
+
+    /**
+     * Indicate refreshing cards has finished.
+     */
+    fun refreshCompleted() {
+        _refreshCards.value = false
+    }
+
+    /**
+     * Custom node index and assign it to node.
+     *
+     * @return node index
+     */
+    abstract fun initMediaIndex(item: GalleryItem, mediaIndex: Int): Int
 
     /**
      * Checks the clicked year card and gets the month card to show after click on a year card.
@@ -126,31 +153,7 @@ abstract class MediaViewModel constructor(
         dateCards.value?.get(MONTHS_INDEX)
     )
 
-    private val nodesChangeObserver = Observer<Boolean> {
-        if (it) {
-            loadPhotos(true)
-        } else {
-            refreshUi()
-        }
-    }
 
-    private val loadFinishedObserver = Observer<List<GalleryItem>> {
-        loadInProgress = false
-
-        if (pendingLoad) {
-            loadPhotos(true)
-        }
-    }
-
-    init {
-        items.observeForever(loadFinishedObserver)
-        // Calling ObserveForever() here instead of calling observe()
-        // in the PhotosFragment, for fear that an nodes update event would be missed if
-        // emitted accidentally between the Fragment's onDestroy and onCreate when rotating screen.
-        LiveEventBus.get(EVENT_NODES_CHANGE, Boolean::class.java)
-            .observeForever(nodesChangeObserver)
-        loadPhotos(true)
-    }
 
     /**
      * Load photos by calling Mega Api or just filter loaded nodes

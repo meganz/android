@@ -25,17 +25,7 @@ class PhotosViewModel @ViewModelInject constructor(
     private val mDbHandler: DatabaseHandler
 ) : MediaViewModel(repository) {
 
-    override var _mZoom: Int = ZoomUtil.PHOTO_ZOOM_LEVEL
-
-    override fun initMediaIndex(item: GalleryItem, mediaIndex: Int): Int {
-        var tempIndex = mediaIndex
-
-        if (item.type != TYPE_HEADER) {
-            item.indexForViewer = tempIndex++
-        }
-
-        return tempIndex
-    }
+    override var mZoom: Int = ZoomUtil.PHOTO_ZOOM_LEVEL
 
     private val camSyncEnabled = MutableLiveData<Boolean>()
     private var enableCUShown = false
@@ -124,6 +114,16 @@ class PhotosViewModel @ViewModelInject constructor(
                 camSyncEnabled.setValue(it)
             }, RxUtil.logErr("camSyncEnabled")))
         return camSyncEnabled
+    }
+
+    override fun initMediaIndex(item: GalleryItem, mediaIndex: Int): Int {
+        var tempIndex = mediaIndex
+
+        if (item.type != TYPE_HEADER) {
+            item.indexForViewer = tempIndex++
+        }
+
+        return tempIndex
     }
 
     fun getRealPhotoCount(): Int {

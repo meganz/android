@@ -11,7 +11,7 @@ class ImagesViewModel @ViewModelInject constructor(
     repository: ImagesItemRepository
 ) : MediaViewModel(repository) {
 
-    override var _mZoom: Int = ZoomUtil.IMAGES_ZOOM_LEVEL
+    override var mZoom: Int = ZoomUtil.IMAGES_ZOOM_LEVEL
 
     override fun initMediaIndex(item: GalleryItem, mediaIndex: Int): Int {
         var tempIndex = mediaIndex
@@ -22,7 +22,10 @@ class ImagesViewModel @ViewModelInject constructor(
     fun getHandlesOfPhotos(): LongArray? {
         val list = items.value?.filter {
             it.type == GalleryItem.TYPE_IMAGE
-        }?.map { node -> node.node?.handle ?: MegaApiJava.INVALID_HANDLE }
+        }?.map {
+            it.node?.handle ?: MegaApiJava.INVALID_HANDLE
+        }
+
         return list?.toLongArray()
     }
 

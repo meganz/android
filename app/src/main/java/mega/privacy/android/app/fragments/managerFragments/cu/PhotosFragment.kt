@@ -263,22 +263,22 @@ class PhotosFragment : BaseZoomFragment(), GalleryCardAdapter.Listener {
     }
 
     private fun setupTimePanel() {
-        yearsButton = yearsButton.apply {
+        yearsButton.apply {
             setOnClickListener {
                 newViewClicked(YEARS_VIEW)
             }
         }
-        monthsButton = monthsButton.apply {
+        monthsButton.apply {
             setOnClickListener {
                 newViewClicked(MONTHS_VIEW)
             }
         }
-        daysButton = daysButton.apply {
+        daysButton.apply {
             setOnClickListener {
                 newViewClicked(DAYS_VIEW)
             }
         }
-        allButton = allButton.apply {
+        allButton.apply {
             setOnClickListener {
                 newViewClicked(ALL_VIEW)
             }
@@ -752,4 +752,6 @@ class PhotosFragment : BaseZoomFragment(), GalleryCardAdapter.Listener {
         }
         handleOptionsMenuUpdate(isShowMenu)
     }
+
+    override fun getViewType() = selectedView
 }
