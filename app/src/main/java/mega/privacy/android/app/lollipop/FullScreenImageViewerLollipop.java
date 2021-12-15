@@ -997,11 +997,13 @@ public class FullScreenImageViewerLollipop extends PasscodeActivity
 		} else if (isInRootLinksLevel(adapterType, parentNodeHandle)) {
 			getImageHandles(megaApi.getPublicLinks(orderGetChildren), savedInstanceState);
 		} else if (adapterType == PHOTOS_BROWSE_ADAPTER) {
-			// TODO: use constants
 			getImageHandles(megaApi.searchByType(orderGetChildren, FILE_TYPE_PHOTO, SEARCH_TARGET_ROOTNODE), savedInstanceState);
 		} else if (adapterType == PHOTO_SYNC_ADAPTER) {
 			getImageHandles(new MegaNodeRepo(megaApi, dbH).getCuChildren(orderGetChildren), savedInstanceState, true);
-		} else {
+        } else if (adapterType == MEDIA_BROWSE_ADAPTER) {
+            // TODO Get nodes by folder handle.
+            getImageHandles(new MegaNodeRepo(megaApi, dbH).getCuChildren(orderGetChildren), savedInstanceState, true);
+        } else {
 			if (parentNodeHandle == INVALID_HANDLE){
 				switch(adapterType){
 					case RUBBISH_BIN_ADAPTER:{

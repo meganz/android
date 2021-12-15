@@ -3,35 +3,59 @@ package mega.privacy.android.app.gallery.fragment
 import android.animation.Animator
 import android.animation.AnimatorInflater
 import android.animation.AnimatorSet
+import android.annotation.SuppressLint
+import android.content.Intent
+import android.content.res.Configuration
 import android.os.Bundle
-import android.view.Menu
-import android.view.MenuInflater
-import android.view.MenuItem
-import android.view.View
+import android.view.*
 import android.widget.ImageView
+import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.view.ActionMode
+import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.content.ContextCompat
 import androidx.core.graphics.drawable.DrawableCompat
+import androidx.core.view.isVisible
 import androidx.fragment.app.viewModels
+import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.facebook.drawee.view.SimpleDraweeView
 import mega.privacy.android.app.R
 import mega.privacy.android.app.components.GestureScaleListener.GestureScaleCallback
+import mega.privacy.android.app.components.ListenScrollChangesHelper
+import mega.privacy.android.app.components.dragger.DragThumbnailGetter
+import mega.privacy.android.app.components.dragger.DragToExitSupport
 import mega.privacy.android.app.components.scrollBar.FastScroller
 import mega.privacy.android.app.fragments.BaseFragment
 import mega.privacy.android.app.fragments.homepage.*
+import mega.privacy.android.app.fragments.homepage.photos.ScaleGestureHandler
 import mega.privacy.android.app.fragments.homepage.photos.ZoomViewModel
+import mega.privacy.android.app.fragments.managerFragments.cu.CustomHideBottomViewOnScrollBehaviour
+import mega.privacy.android.app.gallery.adapter.GalleryAdapter
+import mega.privacy.android.app.gallery.adapter.GalleryCardAdapter
+import mega.privacy.android.app.gallery.data.GalleryItem
+import mega.privacy.android.app.gallery.data.GalleryItemSizeConfig
+import mega.privacy.android.app.lollipop.FullScreenImageViewerLollipop
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop
+import mega.privacy.android.app.modalbottomsheet.NodeOptionsBottomSheetDialogFragment
 import mega.privacy.android.app.utils.*
 import mega.privacy.android.app.utils.Constants.MIN_ITEMS_SCROLLBAR
+import mega.privacy.android.app.utils.ZoomUtil.ZOOM_DEFAULT
+import mega.privacy.android.app.utils.ZoomUtil.ZOOM_OUT_1X
+import mega.privacy.android.app.utils.ZoomUtil.getItemWidth
+import mega.privacy.android.app.utils.ZoomUtil.getMargin
+import mega.privacy.android.app.utils.ZoomUtil.getSelectedFrameMargin
+import mega.privacy.android.app.utils.ZoomUtil.getSelectedFrameWidth
+import mega.privacy.android.app.utils.ZoomUtil.setMargin
+import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaChatApiJava
 
 /**
  * A parent fragment with basic zoom UI logic, like menu, gestureScaleCallback.
  */
-abstract class BaseZoomFragment : BaseFragment(), GestureScaleCallback {
+abstract class BaseZoomFragment : BaseFragment(), GestureScaleCallback,
+    GalleryCardAdapter.Listener {
 
     companion object {
         const val ALL_VIEW = 0
@@ -49,7 +73,18 @@ abstract class BaseZoomFragment : BaseFragment(), GestureScaleCallback {
 
     protected lateinit var mManagerActivity: ManagerActivityLollipop
 
-    abstract val listView: RecyclerView
+    protected lateinit var listView: RecyclerView
+    protected lateinit var scroller: FastScroller
+    protected lateinit var viewTypePanel: View
+    protected lateinit var yearsButton: TextView
+    protected lateinit var monthsButton: TextView
+    protected lateinit var daysButton: TextView
+    protected lateinit var allButton: TextView
+    protected lateinit var gridAdapter: GalleryAdapter
+    protected lateinit var layoutManager: GridLayoutManager
+    protected lateinit var cardAdapter: GalleryCardAdapter
+
+    protected lateinit var scaleGestureHandler: ScaleGestureHandler
     protected lateinit var menu: Menu
 
     protected val zoomViewModel by viewModels<ZoomViewModel>()
@@ -69,7 +104,26 @@ abstract class BaseZoomFragment : BaseFragment(), GestureScaleCallback {
      */
     abstract fun handleOnCreateOptionsMenu()
 
-    abstract fun animateBottomView()
+    open fun animateBottomView() {
+        val deltaY =
+            viewTypePanel.height.toFloat() + resources.getDimensionPixelSize(R.dimen.cu_view_type_button_vertical_margin)
+
+        if (viewTypePanel.isVisible) {
+            viewTypePanel
+                .animate()
+                .translationYBy(deltaY)
+                .setDuration(Constants.ANIMATION_DURATION)
+                .withEndAction { viewTypePanel.visibility = View.GONE }
+                .start()
+        } else {
+            viewTypePanel
+                .animate()
+                .translationYBy(-deltaY)
+                .setDuration(Constants.ANIMATION_DURATION)
+                .withStartAction { viewTypePanel.visibility = View.VISIBLE }
+                .start()
+        }
+    }
 
     abstract fun getNodeCount(): Int
 
@@ -112,9 +166,18 @@ abstract class BaseZoomFragment : BaseFragment(), GestureScaleCallback {
             zoomViewModel.setCurrentZoom(zoom)
             handleZoomChange(zoom, needReload)
         })
+
+        setupNavigation()
+        setupActionMode()
+
+        DragToExitSupport.observeDragSupportEvents(
+            viewLifecycleOwner,
+            listView,
+            Constants.VIEWER_FROM_PHOTOS
+        )
     }
 
-    protected fun setupActionMode() {
+    private fun setupActionMode() {
         actionModeCallback =
             ActionModeCallback(mManagerActivity, actionModeViewModel, megaApi)
 
@@ -124,9 +187,160 @@ abstract class BaseZoomFragment : BaseFragment(), GestureScaleCallback {
         observeActionModeDestroy()
     }
 
+    private fun setupNavigation() {
+        itemOperationViewModel.openItemEvent.observe(viewLifecycleOwner, EventObserver {
+            openPhoto(it as GalleryItem)
+        })
+
+        itemOperationViewModel.showNodeItemOptionsEvent.observe(viewLifecycleOwner, EventObserver {
+            doIfOnline {
+                callManager { manager ->
+                    manager.showNodeOptionsPanel(
+                        it.node,
+                        NodeOptionsBottomSheetDialogFragment.MODE5
+                    )
+                }
+            }
+        })
+    }
+
+    /**
+     * Set recycle view and its inner layout depends on card view selected and zoom level.
+     *
+     * @param currentZoom Zoom level.
+     */
+    fun setupListAdapter(currentZoom: Int, data: List<GalleryItem>?) {
+        val viewType = getViewType()
+
+        val isPortrait =
+            resources.configuration.orientation == Configuration.ORIENTATION_PORTRAIT
+        val spanCount = getSpanCount(viewType, isPortrait)
+
+        val params = listView.layoutParams as ViewGroup.MarginLayoutParams
+
+        layoutManager = GridLayoutManager(context, spanCount)
+        listView.layoutManager = layoutManager
+
+        if (viewType == ALL_VIEW) {
+            val imageMargin = getMargin(context, currentZoom)
+            setMargin(context, params, currentZoom)
+            val gridWidth = getItemWidth(context, outMetrics, currentZoom, spanCount)
+            val icSelectedWidth = getSelectedFrameWidth(context, currentZoom)
+            val icSelectedMargin = getSelectedFrameMargin(context, currentZoom)
+            val itemSizeConfig = GalleryItemSizeConfig(
+                currentZoom, gridWidth,
+                icSelectedWidth, imageMargin,
+                resources.getDimensionPixelSize(R.dimen.cu_fragment_selected_padding),
+                icSelectedMargin,
+                resources.getDimensionPixelSize(
+                    R.dimen.cu_fragment_selected_round_corner_radius
+                )
+            )
+
+            gridAdapter =
+                GalleryAdapter(actionModeViewModel, itemOperationViewModel, itemSizeConfig)
+
+            setMargin(context, params, currentZoom)
+
+            layoutManager.apply {
+                spanSizeLookup = gridAdapter.getSpanSizeLookup(spanCount)
+                val itemDimen = getItemWidth(context, outMetrics, currentZoom, spanCount)
+                gridAdapter.setItemDimen(itemDimen)
+            }
+
+            gridAdapter.submitList(data)
+            listView.adapter = gridAdapter
+        } else {
+            val cardMargin =
+                resources.getDimensionPixelSize(if (isPortrait) R.dimen.card_margin_portrait else R.dimen.card_margin_landscape)
+
+            val cardWidth: Int =
+                (outMetrics.widthPixels - cardMargin * spanCount * 2 - cardMargin * 2) / spanCount
+
+            cardAdapter =
+                GalleryCardAdapter(viewType, cardWidth, cardMargin, this)
+            cardAdapter.setHasStableIds(true)
+            params.leftMargin = cardMargin
+            params.rightMargin = cardMargin
+            listView.adapter = cardAdapter
+
+            listView.layoutParams = params
+        }
+
+        // Set fast scroller after adapter is set.
+        scroller.setRecyclerView(listView)
+    }
+
+    @SuppressLint("ClickableViewAccessibility")
+    protected fun setupListView() {
+        listView.itemAnimator = Util.noChangeRecyclerViewItemAnimator()
+        elevateToolbarWhenScrolling()
+
+        listView.clipToPadding = false
+        listView.setHasFixedSize(true)
+
+        scaleGestureHandler = ScaleGestureHandler(
+            context,
+            this
+        )
+        listView.setOnTouchListener(scaleGestureHandler)
+    }
+
+    private fun elevateToolbarWhenScrolling() = ListenScrollChangesHelper().addViewToListen(
+        listView
+    ) { v: View?, _, _, _, _ ->
+        callManager {
+            it.changeAppBarElevation(
+                v!!.canScrollVertically(-1)
+            )
+        }
+    }
+
+    protected fun openPhoto(nodeItem: GalleryItem) {
+        listView.findViewHolderForLayoutPosition(nodeItem.index)?.itemView?.findViewById<ImageView>(
+            R.id.thumbnail
+        )?.also {
+            val intent = Intent(context, FullScreenImageViewerLollipop::class.java)
+
+            intent.putExtra(Constants.INTENT_EXTRA_KEY_POSITION, nodeItem.indexForViewer)
+            intent.putExtra(
+                Constants.INTENT_EXTRA_KEY_ORDER_GET_CHILDREN,
+                MegaApiJava.ORDER_MODIFICATION_DESC
+            )
+
+            intent.putExtra(
+                Constants.INTENT_EXTRA_KEY_ADAPTER_TYPE,
+                getAdapterType()
+            )
+
+            intent.putExtra(
+                Constants.INTENT_EXTRA_KEY_HANDLE,
+                nodeItem.node?.handle ?: MegaApiJava.INVALID_HANDLE
+            )
+            (listView.adapter as? DragThumbnailGetter)?.let {
+                DragToExitSupport.putThumbnailLocation(
+                    intent,
+                    listView,
+                    nodeItem.index,
+                    Constants.VIEWER_FROM_PHOTOS,
+                    it
+                )
+            }
+
+            startActivity(intent)
+            mManagerActivity.overridePendingTransition(0, 0)
+        }
+    }
+
+    fun gridAdapterHasData() = this::gridAdapter.isInitialized && gridAdapter.itemCount > 0
+
+    fun layoutManagerInitialized() = this::layoutManager.isInitialized
+
+    fun listViewInitialized() = this::listView.isInitialized
+
     private fun observeItemLongClick() =
         actionModeViewModel.longClick.observe(viewLifecycleOwner, EventObserver {
-            if (zoomViewModel.getCurrentZoom() == ZoomUtil.ZOOM_DEFAULT || zoomViewModel.getCurrentZoom() == ZoomUtil.ZOOM_OUT_1X) {
+            if (zoomViewModel.getCurrentZoom() == ZOOM_DEFAULT || zoomViewModel.getCurrentZoom() == ZOOM_OUT_1X) {
                 doIfOnline { actionModeViewModel.enterActionMode(it) }
                 animateBottomView()
             }
@@ -314,7 +528,9 @@ abstract class BaseZoomFragment : BaseFragment(), GestureScaleCallback {
         }
     }
 
-    abstract fun getViewType() : Int
+    abstract fun getViewType(): Int
+
+    abstract fun getAdapterType(): Int
 
     /**
      * Apply selected/unselected style for the TextView button.
@@ -341,18 +557,22 @@ abstract class BaseZoomFragment : BaseFragment(), GestureScaleCallback {
         )
     }
 
-    protected fun updateFastScrollerVisibility(
-        selectedView: Int,
-        scroller: FastScroller,
-        itemCount: Int
-    ) {
-        val gridView = selectedView == ALL_VIEW
+    protected fun updateFastScrollerVisibility() {
+        if(!this::cardAdapter.isInitialized) return
+
+        val gridView = getViewType() == ALL_VIEW
 
         scroller.visibility =
-            if (!gridView && itemCount >= MIN_ITEMS_SCROLLBAR)
+            if (!gridView && cardAdapter.itemCount >= MIN_ITEMS_SCROLLBAR)
                 View.VISIBLE
             else
                 View.GONE
+    }
+
+    protected fun setHideBottomViewScrollBehaviour() {
+        val params = viewTypePanel.layoutParams as CoordinatorLayout.LayoutParams
+        params.behavior =
+            if (getViewType() != ALL_VIEW) CustomHideBottomViewOnScrollBehaviour<LinearLayout>() else null
     }
 
     /**
@@ -361,7 +581,7 @@ abstract class BaseZoomFragment : BaseFragment(), GestureScaleCallback {
      *
      * @return true, current view is all view should show the menu items, false, otherwise.
      */
-    protected fun shouldShowZoomMenuItem(selectedView: Int) = selectedView == ALL_VIEW
+    protected fun shouldShowZoomMenuItem() = getViewType() == ALL_VIEW
 
     /**
      * Get how many items will be shown per row, depends on screen direction and zoom level if all view is selected.

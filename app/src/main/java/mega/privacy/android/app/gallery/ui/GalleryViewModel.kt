@@ -27,6 +27,7 @@ abstract class GalleryViewModel constructor(
 
     var selectedViewTypeImages = ALL_VIEW
     var selectedViewTypePhotos = ALL_VIEW
+    var selectedViewTypeMedia = ALL_VIEW
 
     var forceUpdate = false
 
