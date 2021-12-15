@@ -1,5 +1,5 @@
 // run shell command and print stdout and stderr to log file
-def runShell(String cmd){
+def runShell(String cmd) {
     sh "${cmd} >> ${CONSOLE_LOG_FILE} 2>&1"
 }
 
@@ -162,9 +162,11 @@ pipeline {
                 failure {
                     // Notify developer team of the failure
                     updateGitlabCommitStatus name: 'test', state: 'failed'
+                    slackSend color: "danger", message: "unit test failed"
                 }
                 success {
                     updateGitlabCommitStatus name: 'test', state: 'success'
+                    slackSend color: "good", message: "unit test passed"
                 }
             }
         }
