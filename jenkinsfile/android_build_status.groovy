@@ -27,6 +27,9 @@ pipeline {
         GOOGLE_MAP_API_URL = "https://mega.nz/#!1tcl3CrL!i23zkmx7ibnYy34HQdsOOFAPOqQuTo1-2iZ5qFlU7-k"
         GOOGLE_MAP_API_FILE = 'default_google_maps_api.zip'
         GOOGLE_MAP_API_UNZIPPED = 'default_google_map_api_unzipped'
+
+        // only build one architecture for SDK, to save build time. skipping "x86 armeabi-v7a x86_64"
+        BUILD_ARCHS="arm64-v8a"
     }
     options {
         // Stop the build early in case of compile or test failures
