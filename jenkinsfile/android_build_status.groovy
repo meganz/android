@@ -40,148 +40,139 @@ pipeline {
     post {
         failure {
             script {
-                def comment = "Android Build Failed: ${env.GIT_BRANCH}"
+                def comment = "Android Build Failed. \nBranch: ${env.GIT_BRANCH}"
                 if (env.CHANGE_URL) {
-                    comment = "Android Build Failed: ${env.GIT_BRANCH} ${env.CHANGE_URL}"
+                    comment = "Android Build Failed. \nBranch: ${env.GIT_BRANCH} \nMR: ${env.CHANGE_URL}"
                 }
                 slackUploadFile filePath: env.CONSOLE_LOG_FILE, initialComment: comment
-                updateGitlabCommitStatus name: 'build', state: 'failed'
             }
         }
         success {
             script {
-                def comment = "Android Build Success: ${env.GIT_BRANCH}"
+                def comment = "Android Build Success! \nBranch: ${env.GIT_BRANCH}"
                 if (env.CHANGE_URL) {
-                    comment = "Android Build Success: ${env.GIT_BRANCH} ${env.CHANGE_URL}"
+                    comment = "Android Build Success! \nBranch: ${env.GIT_BRANCH} \nMR: ${env.CHANGE_URL}"
                 }
                 slackSend color: "good", message: comment
-                updateGitlabCommitStatus name: 'build', state: 'success'
             }
         }
     }
     stages {
         stage('Preparation') {
             steps {
-                updateGitlabCommitStatus name: 'build', state: 'running'
-                runShell("rm -fv ${CONSOLE_LOG_FILE}")
-            }
-        }
-
-        stage('Notify GitLab Test') {
-            steps {
-                echo 'Notify GitLab Test'
-
-                addGitLabMRComment comment: 'Another build has been triggered in CI'
+                gitlabCommitStatus(name: 'Preparation') {
+                    runShell("rm -fv ${CONSOLE_LOG_FILE}")
+                }
             }
         }
 
         stage('Fetch SDK Submodules') {
             steps {
-                withCredentials([gitUsernamePassword(credentialsId: 'Gitlab-Access-Token', gitToolName: 'Default')]) {
-                    runShell 'git config --file=.gitmodules submodule."app/src/main/jni/mega/sdk".url https://code.developers.mega.co.nz/sdk/sdk.git'
-                    runShell 'git config --file=.gitmodules submodule."app/src/main/jni/mega/sdk".branch develop'
-                    runShell 'git config --file=.gitmodules submodule."app/src/main/jni/megachat/sdk".url https://code.developers.mega.co.nz/megachat/MEGAchat.git'
-                    runShell 'git config --file=.gitmodules submodule."app/src/main/jni/megachat/sdk".branch develop'
-                    runShell "git submodule sync"
-                    runShell "git submodule update --init --recursive --remote"
+                gitlabCommitStatus(name: 'Fetch SDK Submodules') {
+                    withCredentials([gitUsernamePassword(credentialsId: 'Gitlab-Access-Token', gitToolName: 'Default')]) {
+                        runShell 'git config --file=.gitmodules submodule."app/src/main/jni/mega/sdk".url https://code.developers.mega.co.nz/sdk/sdk.git'
+                        runShell 'git config --file=.gitmodules submodule."app/src/main/jni/mega/sdk".branch develop'
+                        runShell 'git config --file=.gitmodules submodule."app/src/main/jni/megachat/sdk".url https://code.developers.mega.co.nz/megachat/MEGAchat.git'
+                        runShell 'git config --file=.gitmodules submodule."app/src/main/jni/megachat/sdk".branch develop'
+                        runShell "git submodule sync"
+                        runShell "git submodule update --init --recursive --remote"
+                    }
                 }
             }
         }
 
         stage('Download Dependency Lib for SDK') {
             steps {
-                sh """
-                mkdir -p "${BUILD_LIB_DOWNLOAD_FOLDER}"
-                cd "${BUILD_LIB_DOWNLOAD_FOLDER}"
-                pwd
-                ls -lh
-        
-                ## check if webrtc exists
-                if test -f "${BUILD_LIB_DOWNLOAD_FOLDER}/${WEBRTC_LIB_FILE}"; then
-                  echo "${WEBRTC_LIB_FILE} already downloaded. Skip downloading."
-                else
-                  echo "downloading webrtc"
-                  mega-get ${WEBRTC_LIB_URL} >> ${CONSOLE_LOG_FILE}  2>&1
-        
-                  echo "unzipping webrtc"
-                  rm -fr ${WEBRTC_LIB_UNZIPPED}
-                  unzip ${WEBRTC_LIB_FILE} -d ${WEBRTC_LIB_UNZIPPED}
-                fi
-        
-                ## check default Google API
-                if test -f "${BUILD_LIB_DOWNLOAD_FOLDER}/${GOOGLE_MAP_API_FILE}"; then
-                  echo "${GOOGLE_MAP_API_FILE} already downloaded. Skip downloading."
-                else
-                  echo "downloading google map api"
-                  mega-get ${GOOGLE_MAP_API_URL} >> ${CONSOLE_LOG_FILE} 2>&1
-        
-                  echo "unzipping google map api"
-                  rm -fr ${GOOGLE_MAP_API_UNZIPPED}
-                  unzip ${GOOGLE_MAP_API_FILE} -d ${GOOGLE_MAP_API_UNZIPPED}
-                fi
-        
-                ls -lh >> ${CONSOLE_LOG_FILE}
-        
-                cd ${WORKSPACE}
-                pwd
-                # apply dependency patch
-                rm -fr app/src/main/jni/megachat/webrtc
-        
-                ## ATTENTION: sometimes the downloaded webrtc zip has a enclosing folder. like below.
-                ## so we might need to adjust below path when there is a new webrtc zip
-                cp -fr ${BUILD_LIB_DOWNLOAD_FOLDER}/${WEBRTC_LIB_UNZIPPED}/webrtc_branch-heads4405/webrtc app/src/main/jni/megachat/
+                gitlabCommitStatus(name: 'Download Dependency Lib for SDK') {
+                    sh """
+                        mkdir -p "${BUILD_LIB_DOWNLOAD_FOLDER}"
+                        cd "${BUILD_LIB_DOWNLOAD_FOLDER}"
+                        pwd
+                        ls -lh
                 
-                rm -fr app/src/debug
-                rm -fr app/src/release
-                cp -fr ${BUILD_LIB_DOWNLOAD_FOLDER}/${GOOGLE_MAP_API_UNZIPPED}/* app/src/
-        
-                """
+                        ## check if webrtc exists
+                        if test -f "${BUILD_LIB_DOWNLOAD_FOLDER}/${WEBRTC_LIB_FILE}"; then
+                            echo "${WEBRTC_LIB_FILE} already downloaded. Skip downloading."
+                        else
+                            echo "downloading webrtc"
+                            mega-get ${WEBRTC_LIB_URL} >> ${CONSOLE_LOG_FILE}  2>&1
+                
+                            echo "unzipping webrtc"
+                            rm -fr ${WEBRTC_LIB_UNZIPPED}
+                            unzip ${WEBRTC_LIB_FILE} -d ${WEBRTC_LIB_UNZIPPED}
+                        fi
+                
+                        ## check default Google API
+                        if test -f "${BUILD_LIB_DOWNLOAD_FOLDER}/${GOOGLE_MAP_API_FILE}"; then
+                            echo "${GOOGLE_MAP_API_FILE} already downloaded. Skip downloading."
+                        else
+                            echo "downloading google map api"
+                            mega-get ${GOOGLE_MAP_API_URL} >> ${CONSOLE_LOG_FILE} 2>&1
+                
+                            echo "unzipping google map api"
+                            rm -fr ${GOOGLE_MAP_API_UNZIPPED}
+                            unzip ${GOOGLE_MAP_API_FILE} -d ${GOOGLE_MAP_API_UNZIPPED}
+                        fi
+                
+                        ls -lh >> ${CONSOLE_LOG_FILE}
+                
+                        cd ${WORKSPACE}
+                        pwd
+                        # apply dependency patches
+                        rm -fr app/src/main/jni/megachat/webrtc
+                
+                        ## ATTENTION: sometimes the downloaded webrtc zip has a enclosing folder. like below.
+                        ## so we might need to adjust below path when there is a new webrtc zip
+                        cp -fr ${BUILD_LIB_DOWNLOAD_FOLDER}/${WEBRTC_LIB_UNZIPPED}/webrtc_branch-heads4405/webrtc app/src/main/jni/megachat/
+                        
+                        rm -fr app/src/debug
+                        rm -fr app/src/release
+                        cp -fr ${BUILD_LIB_DOWNLOAD_FOLDER}/${GOOGLE_MAP_API_UNZIPPED}/* app/src/
+                
+                    """
+                }
             }
         }
         stage('Build SDK') {
             steps {
-                sh """
-                cd ${WORKSPACE}/app/src/main/jni
-                # bash build.sh all >> ${CONSOLE_LOG_FILE}  2>&1
-                bash build.sh all
-                """
+                gitlabCommitStatus(name: 'Build SDK') {
+                    sh """
+                    cd ${WORKSPACE}/app/src/main/jni
+                    echo "=== START SDK BUILD====" >> ${CONSOLE_LOG_FILE} 2>&1
+                    bash build.sh all >> ${CONSOLE_LOG_FILE} 2>&1
+                    """
+                }
             }
         }
-//        stage('Compile') {
-//            steps {
-//                // Compile the app and its dependencies
-//                runShell "./gradlew clean compileDebugSources"
-//            }
-//        }
         stage('Unit test') {
             steps {
-                updateGitlabCommitStatus name: 'test', state: 'pending'
+                gitlabCommitStatus(name: 'Unit test') {
+                    // Compile and run the unit tests for the app and its dependencies
+                    runShell "./gradlew testGmsDebugUnitTest"
 
-                // Compile and run the unit tests for the app and its dependencies
-                runShell "./gradlew testGmsDebugUnitTest"
-
-                // Analyse the test results and update the build result as appropriate
-                //junit '**/TEST-*.xml'
+                    // Analyse the test results and update the build result as appropriate
+                    //junit '**/TEST-*.xml'
+                }
             }
             post {
                 failure {
                     // Notify developer team of the failure
-                    updateGitlabCommitStatus name: 'test', state: 'failed'
-                    slackSend color: "danger", message: "unit test failed"
+                    slackSend color: "danger", message: "unit test failed. \nbranch: ${env.GIT_BRANCH}"
                 }
                 success {
-                    updateGitlabCommitStatus name: 'test', state: 'success'
-                    slackSend color: "good", message: "unit test passed"
+                    slackSend color: "good", message: "unit test passed. \nbranch: ${env.GIT_BRANCH}"
                 }
             }
         }
-        stage('Build APK') {
+        stage('Build APK (GMS+HMS)') {
             steps {
-                // Finish building and packaging the APK
-                runShell "./gradlew app:assembleGmsDebug app:assembleHmsDebug"
+                gitlabCommitStatus(name: 'Build APK (GMS+HMS)') {
+                    // Finish building and packaging the APK
+                    runShell "./gradlew app:assembleGmsRelease app:assembleHmsRelease"
 
-                // Archive the APKs so that they can be downloaded from Jenkins
-                // archiveArtifacts '**/*.apk'
+                    // Archive the APKs so that they can be downloaded from Jenkins
+                    // archiveArtifacts '**/*.apk'
+                }
             }
         }
         // stage('Static analysis') {
