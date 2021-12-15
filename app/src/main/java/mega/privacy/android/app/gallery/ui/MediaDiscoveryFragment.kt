@@ -58,8 +58,9 @@ class MediaDiscoveryFragment : BaseZoomFragment(), GalleryCardAdapter.Listener {
 
     private var selectedView = ALL_VIEW
 
-    private var currentHandle:Long = 0L
-    companion object{
+    private var currentHandle: Long = 0L
+
+    companion object {
         fun newInstance(): MediaDiscoveryFragment {
             LogUtil.logDebug("newInstance")
             return MediaDiscoveryFragment()
@@ -156,6 +157,8 @@ class MediaDiscoveryFragment : BaseZoomFragment(), GalleryCardAdapter.Listener {
             VIEWER_FROM_PHOTOS
         )
     }
+
+    override fun getViewType(): Int = selectedView
 
 
     override fun onCardClicked(position: Int, @NonNull card: GalleryCard) {
