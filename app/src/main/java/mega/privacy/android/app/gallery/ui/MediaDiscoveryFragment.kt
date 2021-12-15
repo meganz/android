@@ -29,6 +29,7 @@ import mega.privacy.android.app.gallery.adapter.GalleryCardAdapter
 import mega.privacy.android.app.gallery.data.GalleryCard
 import mega.privacy.android.app.gallery.data.GalleryItem
 import mega.privacy.android.app.gallery.data.GalleryItemSizeConfig
+import mega.privacy.android.app.gallery.fragment.BaseZoomFragment
 import mega.privacy.android.app.lollipop.FullScreenImageViewerLollipop
 import mega.privacy.android.app.modalbottomsheet.NodeOptionsBottomSheetDialogFragment
 import mega.privacy.android.app.utils.*

@@ -1,4 +1,4 @@
-package mega.privacy.android.app.fragments.managerFragments.cu
+package mega.privacy.android.app.gallery.fragment
 
 import android.animation.Animator
 import android.animation.AnimatorInflater

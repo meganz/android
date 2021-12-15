@@ -7,9 +7,9 @@ import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import mega.privacy.android.app.R
 import mega.privacy.android.app.databinding.ItemGalleryCardBinding
-import mega.privacy.android.app.fragments.managerFragments.cu.BaseZoomFragment.Companion.DAYS_VIEW
-import mega.privacy.android.app.fragments.managerFragments.cu.BaseZoomFragment.Companion.MONTHS_VIEW
-import mega.privacy.android.app.fragments.managerFragments.cu.BaseZoomFragment.Companion.YEARS_VIEW
+import mega.privacy.android.app.gallery.fragment.BaseZoomFragment.Companion.DAYS_VIEW
+import mega.privacy.android.app.gallery.fragment.BaseZoomFragment.Companion.MONTHS_VIEW
+import mega.privacy.android.app.gallery.fragment.BaseZoomFragment.Companion.YEARS_VIEW
 import mega.privacy.android.app.gallery.data.GalleryCard
 import mega.privacy.android.app.utils.StringResourcesUtils.getString
 import mega.privacy.android.app.utils.StringUtils.formatDateTitle

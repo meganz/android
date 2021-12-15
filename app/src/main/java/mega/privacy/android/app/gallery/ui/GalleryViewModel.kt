@@ -6,10 +6,10 @@ import kotlinx.coroutines.launch
 import mega.privacy.android.app.arch.BaseRxViewModel
 import mega.privacy.android.app.fragments.homepage.photos.CardClickHandler
 import mega.privacy.android.app.fragments.homepage.photos.DateCardsProvider
-import mega.privacy.android.app.fragments.managerFragments.cu.BaseZoomFragment.Companion.ALL_VIEW
-import mega.privacy.android.app.fragments.managerFragments.cu.BaseZoomFragment.Companion.DAYS_INDEX
-import mega.privacy.android.app.fragments.managerFragments.cu.BaseZoomFragment.Companion.MONTHS_INDEX
-import mega.privacy.android.app.fragments.managerFragments.cu.BaseZoomFragment.Companion.YEARS_INDEX
+import mega.privacy.android.app.gallery.fragment.BaseZoomFragment.Companion.ALL_VIEW
+import mega.privacy.android.app.gallery.fragment.BaseZoomFragment.Companion.DAYS_INDEX
+import mega.privacy.android.app.gallery.fragment.BaseZoomFragment.Companion.MONTHS_INDEX
+import mega.privacy.android.app.gallery.fragment.BaseZoomFragment.Companion.YEARS_INDEX
 import mega.privacy.android.app.gallery.data.GalleryCard
 import mega.privacy.android.app.gallery.data.GalleryItem
 import mega.privacy.android.app.gallery.repository.GalleryItemRepository
