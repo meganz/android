@@ -1,100 +1,82 @@
 package test.mega.privacy.android.app.lollipop.managerSections.settings
 
-import android.content.Context
+import androidx.test.espresso.Espresso.onView
+import androidx.test.espresso.matcher.ViewMatchers.withId
+import androidx.test.espresso.matcher.ViewMatchers.withText
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
-import dagger.hilt.android.qualifiers.ApplicationContext
+import dagger.hilt.android.components.ActivityRetainedComponent
 import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
 import dagger.hilt.android.testing.UninstallModules
-import dagger.hilt.components.SingletonComponent
-import mega.privacy.android.app.DatabaseHandler
-import mega.privacy.android.app.di.AppModule
-import mega.privacy.android.app.di.MegaApi
-import mega.privacy.android.app.di.MegaApiFolder
+import mega.privacy.android.app.R
+import mega.privacy.android.app.TestActivityModule
+import mega.privacy.android.app.di.SettingsModule
+import mega.privacy.android.app.domain.usecase.*
+import mega.privacy.android.app.lollipop.managerSections.settings.SettingsActivity
 import mega.privacy.android.app.lollipop.managerSections.settings.SettingsFragment
-import mega.privacy.android.app.wrapper.InjectWrapper
-import nz.mega.sdk.MegaApiAndroid
-import nz.mega.sdk.MegaChatApiAndroid
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.whenever
+import test.mega.privacy.android.app.RecyclerViewAssertions.Companion.withNoRowContaining
+import test.mega.privacy.android.app.RecyclerViewAssertions.Companion.withRowContaining
 import test.mega.privacy.android.app.launchFragmentInHiltContainer
-import javax.inject.Singleton
 
-//private val chatSdk = mock<MegaChatApiAndroid>()
-//private val sdk = mock<MegaApiAndroid>()
-//private val databaseHandler = mock<DatabaseHandler>()
 
 @HiltAndroidTest
-@UninstallModules(AppModule::class)
-class SettingsFragmentTest{
+@UninstallModules(SettingsModule::class, TestActivityModule::class)
+class SettingsFragmentTest {
 
     @get:Rule
     var hiltRule = HiltAndroidRule(this)
 
     @Module
-    @InstallIn(SingletonComponent::class)
-    object TestAppModule {
+    @InstallIn(ActivityRetainedComponent::class)
+    object TestSettingsModule {
+        @Provides
+        fun provideGetAccountDetails(): GetAccountDetails = mock<GetAccountDetails>()
+
+        val canDeleteAccount = mock<CanDeleteAccount>()
 
         @Provides
-        fun provideApiInjectWrapper(): InjectWrapper<MegaApiAndroid> {
-            return object : InjectWrapper<MegaApiAndroid> {
-                override fun get(): MegaApiAndroid {
-//                    return sdk
-                    throw NotImplementedError()
-                }
-            }
-        }
+        fun provideCanDeleteAccount(): CanDeleteAccount = canDeleteAccount
 
         @Provides
-        fun provideChatApiInjectWrapper(): InjectWrapper<MegaChatApiAndroid> {
-            return object : InjectWrapper<MegaChatApiAndroid> {
-                override fun get(): MegaChatApiAndroid {
-                    throw NotImplementedError()
-//                    return chatSdk
-                }
-            }
-        }
+        fun provideRefreshUserAccount(): RefreshUserAccount = mock<RefreshUserAccount>()
 
         @Provides
-        fun provideDatabaseHandlerInjectWrapper(): InjectWrapper<DatabaseHandler> {
-            return object : InjectWrapper<DatabaseHandler> {
-                override fun get(): DatabaseHandler {
-                    throw NotImplementedError()
-//                    return databaseHandler
-                }
-            }
-        }
+        fun provideRefreshPasscodeLockPreference(): RefreshPasscodeLockPreference =
+            mock<RefreshPasscodeLockPreference>()
 
-
-        @MegaApi
-        @Singleton
         @Provides
-        fun provideMegaApi(): MegaApiAndroid {
-            throw NotImplementedError()
-        }
+        fun provideIsLoggingEnabled(): IsLoggingEnabled = mock<IsLoggingEnabled>()
 
-        @MegaApiFolder
-        @Singleton
         @Provides
-        fun provideMegaApiFolder(): MegaApiAndroid {
-            throw NotImplementedError()
-        }
+        fun provideIsChatLoggingEnabled(): IsChatLoggingEnabled = mock<IsChatLoggingEnabled>()
 
-        @Singleton
         @Provides
-        fun provideMegaChatApi(@MegaApi megaApi: MegaApiAndroid): MegaChatApiAndroid {
-            throw NotImplementedError()
-        }
+        fun provideIsCameraSyncEnabled(): IsCameraSyncEnabled = mock<IsCameraSyncEnabled>()
 
-        @Singleton
         @Provides
-        fun provideDbHandler(@ApplicationContext context: Context): DatabaseHandler {
-            throw NotImplementedError()
-        }
+        fun provideRootNodeExists(): RootNodeExists = mock<RootNodeExists>()
+
+        @Provides
+        fun provideIsMultiFactorAuthAvailable(): IsMultiFactorAuthAvailable =
+            mock<IsMultiFactorAuthAvailable>()
+
+        @Provides
+        fun provideFetchContactLinksOption(): FetchContactLinksOption =
+            mock<FetchContactLinksOption>()
+
+        @Provides
+        fun providePerformMultiFactorAuthCheck(): PerformMultiFactorAuthCheck =
+            mock<PerformMultiFactorAuthCheck>()
+
+        @Provides
+        fun provideSettingsActivity(): SettingsActivity = mock<SettingsActivity>()
     }
 
     @Before
@@ -103,7 +85,22 @@ class SettingsFragmentTest{
     }
 
     @Test
-    fun example_fragment_test() {
-        val scenario = launchFragmentInHiltContainer<SettingsFragment>()
+    fun test_delete_preference_is_removed_if_account_cannot_be_deleted() {
+        whenever(TestSettingsModule.canDeleteAccount.invoke()).thenReturn(false)
+        launchFragmentInHiltContainer<SettingsFragment>()
+
+        onView(withId(androidx.preference.R.id.recycler_view))
+            .check(withNoRowContaining(withText(R.string.settings_delete_account)))
     }
+
+    @Test
+    fun test_delete_preference_is_present_if_account_can_be_deleted() {
+        whenever(TestSettingsModule.canDeleteAccount.invoke()).thenReturn(true)
+        launchFragmentInHiltContainer<SettingsFragment>()
+
+        onView(withId(androidx.preference.R.id.recycler_view))
+            .check(withRowContaining(withText(R.string.settings_delete_account)))
+    }
+
+
 }
