@@ -2,7 +2,6 @@ package mega.privacy.android.app.meeting.fragments
 
 import android.Manifest
 import android.app.Dialog
-import android.content.Context
 import android.content.Intent
 import android.content.pm.ActivityInfo
 import android.content.res.Configuration
@@ -54,7 +53,6 @@ import mega.privacy.android.app.constants.EventConstants.EVENT_SESSION_ON_LOWRES
 import mega.privacy.android.app.constants.EventConstants.EVENT_SESSION_STATUS_CHANGE
 import mega.privacy.android.app.constants.EventConstants.EVENT_USER_VISIBILITY_CHANGE
 import mega.privacy.android.app.databinding.InMeetingFragmentBinding
-import mega.privacy.android.app.fragments.BaseFragment
 import mega.privacy.android.app.interfaces.SnackbarShower
 import mega.privacy.android.app.listeners.AutoJoinPublicChatListener
 import mega.privacy.android.app.listeners.ChatChangeVideoStreamListener
@@ -67,7 +65,6 @@ import mega.privacy.android.app.mediaplayer.service.MediaPlayerService.Companion
 import mega.privacy.android.app.meeting.AnimationTool.fadeInOut
 import mega.privacy.android.app.meeting.AnimationTool.moveX
 import mega.privacy.android.app.meeting.AnimationTool.moveY
-import mega.privacy.android.app.meeting.MeetingPermissionCallbacks
 import mega.privacy.android.app.meeting.OnDragTouchListener
 import mega.privacy.android.app.meeting.activity.MeetingActivity
 import mega.privacy.android.app.meeting.activity.MeetingActivity.Companion.MEETING_ACTION_CREATE
@@ -78,7 +75,6 @@ import mega.privacy.android.app.meeting.activity.MeetingActivity.Companion.MEETI
 import mega.privacy.android.app.meeting.activity.MeetingActivity.Companion.MEETING_ACTION_RINGING_VIDEO_ON
 import mega.privacy.android.app.meeting.activity.MeetingActivity.Companion.MEETING_ACTION_START
 import mega.privacy.android.app.meeting.activity.MeetingActivity.Companion.MEETING_IS_GUEST
-import mega.privacy.android.app.meeting.activity.MeetingActivityViewModel
 import mega.privacy.android.app.meeting.adapter.Participant
 import mega.privacy.android.app.meeting.fragments.InMeetingViewModel.Companion.STATE_CANCEL
 import mega.privacy.android.app.meeting.fragments.InMeetingViewModel.Companion.STATE_FINISH
@@ -95,24 +91,19 @@ import mega.privacy.android.app.utils.Constants.*
 import mega.privacy.android.app.utils.LogUtil.*
 import mega.privacy.android.app.utils.Util.isOnline
 import mega.privacy.android.app.utils.permission.*
-import mega.privacy.android.app.utils.permission.PermissionUtils.onNeverAskAgain
-import mega.privacy.android.app.utils.permission.PermissionUtils.onPermissionDenied
-import mega.privacy.android.app.utils.permission.PermissionUtils.onRequiresPermission
 import nz.mega.sdk.*
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
 import java.lang.Integer.min
 import javax.inject.Inject
 
 @AndroidEntryPoint
-class InMeetingFragment : BaseFragment(), BottomFloatingPanelListener, SnackbarShower,
+class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, SnackbarShower,
     StartChatCallListener.StartChatCallCallback, AnswerChatCallListener.OnCallAnsweredCallback,
     AutoJoinPublicChatListener.OnJoinedChatCallback {
 
     @Inject
     lateinit var passcodeManagement: PasscodeManagement
 
-    private lateinit var meetingActivity: MeetingActivity
-    private lateinit var permissionsRequester: PermissionsRequester
     private var bCountDownTimerStart: Boolean = false
     private var bInviteSent: Boolean = false
     val args: InMeetingFragmentArgs by navArgs()
@@ -179,13 +170,6 @@ class InMeetingFragment : BaseFragment(), BottomFloatingPanelListener, SnackbarS
     private var failedDialog: Dialog? = null
 
     val inMeetingViewModel: InMeetingViewModel by activityViewModels()
-    val sharedModel: MeetingActivityViewModel by activityViewModels()
-
-    // Default permission array for meeting
-    private val permissions = arrayOf(
-        Manifest.permission.CAMERA,
-        Manifest.permission.RECORD_AUDIO
-    )
 
     private val enableOrDisableLocalVideoObserver = Observer<Boolean> { shouldBeEnabled ->
         val chatId = inMeetingViewModel.getChatId()
@@ -618,8 +602,6 @@ class InMeetingFragment : BaseFragment(), BottomFloatingPanelListener, SnackbarS
         }
     }
 
-    lateinit var meetingPermissionCallbacks: MeetingPermissionCallbacks
-
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -819,10 +801,6 @@ class InMeetingFragment : BaseFragment(), BottomFloatingPanelListener, SnackbarS
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        meetingActivity = activity as MeetingActivity
-
-        meetingPermissionCallbacks = MeetingPermissionCallbacks(sharedModel)
-
         // Set parent activity can receive the orientation changes
         meetingActivity.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_SENSOR
 
@@ -832,18 +810,6 @@ class InMeetingFragment : BaseFragment(), BottomFloatingPanelListener, SnackbarS
         meetingActivity.window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
 
         sendEnterCallEvent()
-    }
-
-    override fun onAttach(context: Context) {
-        super.onAttach(context)
-        // Do not share the instance with other permission check process, because the callback functions are different.
-        permissionsRequester = permissionsBuilder(permissions)
-            .setOnPermissionDenied { l -> onPermissionDenied(l, meetingPermissionCallbacks) }
-            .setOnRequiresPermission { l -> onRequiresPermission(l, meetingPermissionCallbacks) }
-            .setOnShowRationale { l -> onShowRationale(l) }
-            .setOnNeverAskAgain { l -> onNeverAskAgain(l, meetingPermissionCallbacks) }
-            .setPermissionEducation { showPermissionsEducation() }
-            .build()
     }
 
     fun sendEnterCallEvent() = LiveEventBus.get(
@@ -1099,7 +1065,7 @@ class InMeetingFragment : BaseFragment(), BottomFloatingPanelListener, SnackbarS
                 )
                     .setOnRequiresPermission { l ->
                         run {
-                            onRequiresPermission(l, meetingPermissionCallbacks)
+                            onRequiresPermission(l)
                             // Continue expected action after granted
                             sharedModel.clickCamera(true)
                             bottomFloatingPanelViewHolder.updateCamPermissionWaring(true)
@@ -1117,7 +1083,7 @@ class InMeetingFragment : BaseFragment(), BottomFloatingPanelListener, SnackbarS
                 )
                     .setOnRequiresPermission { l ->
                         run {
-                            onRequiresPermission(l, meetingPermissionCallbacks)
+                            onRequiresPermission(l)
                             // Continue expected action after granted
                             sharedModel.clickMic(true)
                             bottomFloatingPanelViewHolder.updateMicPermissionWaring(true)
@@ -2898,16 +2864,6 @@ class InMeetingFragment : BaseFragment(), BottomFloatingPanelListener, SnackbarS
         MegaApplication.getInstance().startProximitySensor()
         checkChildFragments()
 
-        // Use A New Instance to Check Permissions
-        // Do not share the instance with other permission check process, because the callback functions are different.
-        permissionsBuilder(permissions)
-            .setPermissionRequestType(PermissionType.CheckPermission)
-            .setOnRequiresPermission { l ->
-                onRequiresPermission(l, meetingPermissionCallbacks)
-            }.setOnPermissionDenied { l ->
-                onPermissionDenied(l, meetingPermissionCallbacks)
-            }.build().launch(false)
-
         // The same chatId and the timer is paused, so resume it
         if (STATE_RESUME == inMeetingViewModel.shouldShowWarningMessage()) {
             logDebug("launchTimer when onResume")
@@ -3057,55 +3013,5 @@ class InMeetingFragment : BaseFragment(), BottomFloatingPanelListener, SnackbarS
 
     override fun onCallFailed(chatId: Long) {
         logError("Call with chat ID $chatId failed")
-    }
-
-    /**
-     * Check the condition of display of permission education dialog
-     * Then continue permission check without education dialog
-     */
-    private fun showPermissionsEducation() {
-        val sp = app.getSharedPreferences(MEETINGS_PREFERENCE, Context.MODE_PRIVATE)
-        val showEducation = sp.getBoolean(KEY_SHOW_EDUCATION, true)
-        if (showEducation) {
-            sp.edit()
-                .putBoolean(KEY_SHOW_EDUCATION, false).apply()
-            showPermissionsEducation(requireActivity()) { permissionsRequester.launch(false) }
-        } else {
-            permissionsRequester.launch(false)
-        }
-    }
-
-    /**
-     * Callback function that allow for continuation or cancellation of a permission request..
-     *
-     * @param request allow for continuation or cancellation of a permission request.
-     */
-    private fun onShowRationale(request: PermissionRequest) {
-        request.proceed()
-    }
-
-    /**
-     * Shows a permission education.
-     * It will be displayed at the beginning of meeting activity.
-     *
-     * @param context current Context.
-     * @param checkPermission a callback for check permissions
-     */
-    private fun showPermissionsEducation(context: Context, checkPermission: () -> Unit) {
-
-        val permissionsWarningDialogBuilder =
-            MaterialAlertDialogBuilder(context, R.style.ThemeOverlay_Mega_MaterialAlertDialog)
-
-        permissionsWarningDialogBuilder.setTitle(StringResourcesUtils.getString(R.string.meeting_permission_info))
-            .setMessage(StringResourcesUtils.getString(R.string.meeting_permission_info_message))
-            .setCancelable(false)
-            .setPositiveButton(StringResourcesUtils.getString(R.string.button_permission_info)) { dialog, _ ->
-                run {
-                    dialog.dismiss()
-                    checkPermission()
-                }
-            }
-
-        permissionsWarningDialogBuilder.show()
     }
 }

@@ -24,8 +24,6 @@ import mega.privacy.android.app.utils.LogUtil.logDebug
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.Util.hideKeyboardView
 import mega.privacy.android.app.utils.Util.showKeyboardDelayed
-import mega.privacy.android.app.utils.permission.PermissionUtils.TYPE_DENIED
-import mega.privacy.android.app.utils.permission.PermissionUtils.TYPE_REQUIRE_PERMISSION
 import nz.mega.sdk.MegaChatRoom
 import java.util.*
 
@@ -134,11 +132,21 @@ class CreateMeetingFragment : AbstractMeetingOnBoardingFragment() {
         }
     }
 
-    override fun onPermissionsResponse(requestType: Int) {
-        when (requestType) {
-            TYPE_REQUIRE_PERMISSION, TYPE_DENIED->{
-                showKeyboardDelayed(binding.typeMeetingEditText)
-            }
-        }
+    /**
+     * Callback when permissions are all granted
+     * @param permissions the granted permissions
+     */
+    override fun onRequiresPermission(permissions: ArrayList<String>) {
+        super.onRequiresPermission(permissions)
+        showKeyboardDelayed(binding.typeMeetingEditText)
+    }
+
+    /**
+     * Callback when permissions are denied
+     * @param permissions the granted permissions
+     */
+    override fun onPermissionDenied(permissions: ArrayList<String>) {
+        super.onPermissionDenied(permissions)
+        showKeyboardDelayed(binding.typeMeetingEditText)
     }
 }

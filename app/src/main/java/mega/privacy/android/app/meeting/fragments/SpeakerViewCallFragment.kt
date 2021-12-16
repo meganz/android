@@ -3,7 +3,9 @@ package mega.privacy.android.app.meeting.fragments
 import android.annotation.SuppressLint
 import android.os.Bundle
 import android.util.Pair
-import android.view.*
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.RelativeLayout
 import androidx.core.view.isVisible
@@ -14,7 +16,6 @@ import com.jeremyliao.liveeventbus.LiveEventBus
 import mega.privacy.android.app.components.RoundedImageView
 import mega.privacy.android.app.constants.EventConstants.EVENT_REMOTE_AUDIO_LEVEL_CHANGE
 import mega.privacy.android.app.databinding.SpeakerViewCallFragmentBinding
-import mega.privacy.android.app.fragments.BaseFragment
 import mega.privacy.android.app.fragments.homepage.EventObserver
 import mega.privacy.android.app.meeting.MegaSurfaceRenderer
 import mega.privacy.android.app.meeting.adapter.Participant
@@ -25,7 +26,7 @@ import mega.privacy.android.app.utils.Util
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
 import nz.mega.sdk.MegaChatSession
 
-class SpeakerViewCallFragment : BaseFragment(),
+class SpeakerViewCallFragment : MeetingBaseFragment(),
     MegaSurfaceRenderer.MegaSurfaceRendererListener {
 
     private lateinit var inMeetingViewModel: InMeetingViewModel

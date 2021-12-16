@@ -8,7 +8,6 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Build
-import android.os.Environment
 import android.provider.Settings
 import android.view.View
 import androidx.annotation.NonNull
@@ -16,15 +15,10 @@ import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.core.content.PermissionChecker
 import androidx.fragment.app.Fragment
-import mega.privacy.android.app.BaseActivity
 import mega.privacy.android.app.R
-import mega.privacy.android.app.activities.settingsActivities.CameraUploadsPreferencesActivity
-import mega.privacy.android.app.lollipop.LoginActivityLollipop
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop
-import mega.privacy.android.app.providers.FileProviderActivity
 import mega.privacy.android.app.utils.LogUtil
 import mega.privacy.android.app.utils.Util
-import java.lang.Exception
 
 /**
  * Declare singleton PermissionUtils

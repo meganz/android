@@ -1,13 +1,11 @@
 package mega.privacy.android.app.meeting.fragments
 
-import android.content.pm.ActivityInfo
 import android.graphics.Color
 import android.os.Bundle
 import android.util.Pair
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.view.WindowManager
 import android.widget.TextView
 import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
@@ -24,11 +22,7 @@ import mega.privacy.android.app.components.PositionDividerItemDecoration
 import mega.privacy.android.app.components.twemoji.EmojiTextView
 import mega.privacy.android.app.constants.EventConstants
 import mega.privacy.android.app.databinding.MakeModeratorFragmentBinding
-import mega.privacy.android.app.fragments.BaseFragment
-import mega.privacy.android.app.mediaplayer.service.MediaPlayerService
-import mega.privacy.android.app.meeting.MeetingPermissionCallbacks
 import mega.privacy.android.app.meeting.activity.MeetingActivity
-import mega.privacy.android.app.meeting.activity.MeetingActivityViewModel
 import mega.privacy.android.app.meeting.adapter.AssignParticipantsAdapter
 import mega.privacy.android.app.meeting.adapter.Participant
 import mega.privacy.android.app.meeting.adapter.SelectedParticipantsAdapter
@@ -45,12 +39,11 @@ import java.util.*
 import javax.inject.Inject
 
 @AndroidEntryPoint
-class MakeModeratorFragment : BaseFragment() {
+class MakeModeratorFragment : MeetingBaseFragment() {
     private lateinit var binding: MakeModeratorFragmentBinding
     private var selectedParticipants: MutableList<Participant> = mutableListOf()
     private var participants: MutableList<Participant> = mutableListOf()
 
-    private lateinit var meetingActivity: MeetingActivity
     private lateinit var selectedParticipantsAdapter: SelectedParticipantsAdapter
     private lateinit var participantsAdapter: AssignParticipantsAdapter
 
@@ -62,7 +55,6 @@ class MakeModeratorFragment : BaseFragment() {
     lateinit var toolbarTitle: EmojiTextView
     lateinit var toolbarSubtitle: TextView
     val inMeetingViewModel: InMeetingViewModel by activityViewModels()
-    val sharedModel: MeetingActivityViewModel by activityViewModels()
 
     @Inject
     lateinit var passcodeManagement: PasscodeManagement
@@ -94,12 +86,6 @@ class MakeModeratorFragment : BaseFragment() {
                 }
             }
         }
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-
-        meetingActivity = activity as MeetingActivity
-    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,

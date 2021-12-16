@@ -15,7 +15,6 @@ import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
 import mega.privacy.android.app.constants.EventConstants.EVENT_ENTER_IN_MEETING
 import mega.privacy.android.app.databinding.ActivityMeetingBinding
-import mega.privacy.android.app.fragments.BaseFragment
 import mega.privacy.android.app.meeting.fragments.*
 import mega.privacy.android.app.objects.PasscodeManagement
 import mega.privacy.android.app.utils.Constants.REQUIRE_PASSCODE_INVALID
@@ -235,10 +234,10 @@ class MeetingActivity : BaseActivity() {
     /**
      * Get current fragment from navHostFragment
      */
-    fun getCurrentFragment(): BaseFragment? {
+    fun getCurrentFragment(): MeetingBaseFragment? {
         val navHostFragment: Fragment? =
             supportFragmentManager.findFragmentById(R.id.nav_host_fragment)
-        return navHostFragment?.childFragmentManager?.fragments?.get(0) as BaseFragment?
+        return navHostFragment?.childFragmentManager?.fragments?.get(0) as MeetingBaseFragment?
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, intent: Intent?) {

@@ -61,10 +61,6 @@ class JoinMeetingFragment : AbstractMeetingOnBoardingFragment() {
         }
     }
 
-    override fun onPermissionsResponse(requestType: Int) {
-        logDebug("onPermissionsResponse requestType = $requestType")
-    }
-
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         initRTCAudioManager()
