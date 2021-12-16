@@ -20,7 +20,16 @@ class MediaFetcher(
         selectedNodesMap = selectedNodesMap,
         zoom = zoom
 ) {
-    override fun getNodes(): List<MegaNode> = getFilteredChildren(getChildren())
+
+    companion object {
+        @JvmStatic
+        var cachedResults : List<MegaNode>? = null
+    }
+
+    override fun getNodes(): List<MegaNode> {
+        cachedResults = getFilteredChildren(getChildren())
+        return cachedResults!!
+    }
 
     private fun getChildren(): List<MegaNode> {
         val nodes = megaApi.getNodeByHandle(handle)

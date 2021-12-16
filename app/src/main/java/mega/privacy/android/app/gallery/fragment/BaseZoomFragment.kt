@@ -105,6 +105,8 @@ abstract class BaseZoomFragment : BaseFragment(), GestureScaleCallback,
      */
     abstract fun handleZoomChange(zoom: Int, needReload: Boolean)
 
+    abstract fun getOrder(): Int
+
     /**
      * Handle menus for sub class
      */
@@ -198,7 +200,7 @@ abstract class BaseZoomFragment : BaseFragment(), GestureScaleCallback,
 
     private fun setupNavigation() {
         itemOperationViewModel.openItemEvent.observe(viewLifecycleOwner, EventObserver {
-            openPhoto(it as GalleryItem)
+            openPhoto(getOrder(), it as GalleryItem)
         })
 
         itemOperationViewModel.showNodeItemOptionsEvent.observe(viewLifecycleOwner, EventObserver {
@@ -305,7 +307,7 @@ abstract class BaseZoomFragment : BaseFragment(), GestureScaleCallback,
         }
     }
 
-    protected fun openPhoto(nodeItem: GalleryItem) {
+    protected fun openPhoto(order: Int, nodeItem: GalleryItem) {
         listView.findViewHolderForLayoutPosition(nodeItem.index)?.itemView?.findViewById<ImageView>(
             R.id.thumbnail
         )?.also {
@@ -314,7 +316,7 @@ abstract class BaseZoomFragment : BaseFragment(), GestureScaleCallback,
             intent.putExtra(Constants.INTENT_EXTRA_KEY_POSITION, nodeItem.indexForViewer)
             intent.putExtra(
                 Constants.INTENT_EXTRA_KEY_ORDER_GET_CHILDREN,
-                MegaApiJava.ORDER_MODIFICATION_DESC
+                order
             )
 
             intent.putExtra(

@@ -143,7 +143,7 @@ class MediaDiscoveryFragment : BaseZoomFragment(), GalleryCardAdapter.Listener {
                 val node = gridAdapter.getNodeAtPosition(photoPosition)
                 node?.let {
                     RunOnUIThreadUtils.post {
-                        openPhoto(it)
+                        openPhoto(getOrder(), it)
                     }
                 }
             }
@@ -159,7 +159,6 @@ class MediaDiscoveryFragment : BaseZoomFragment(), GalleryCardAdapter.Listener {
 
         showViewTypePanel()
     }
-
 
     private fun setupEmptyHint() {
         binding.emptyHint.emptyHintImage.isVisible = false
@@ -297,6 +296,8 @@ class MediaDiscoveryFragment : BaseZoomFragment(), GalleryCardAdapter.Listener {
     }
 
     override fun getNodeCount() = viewModel.getRealPhotoCount()
+
+    override fun getOrder() = viewModel.mOrder
 
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)

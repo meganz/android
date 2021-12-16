@@ -21,6 +21,7 @@ import mega.privacy.android.app.gallery.fragment.BaseZoomFragment
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop
 import mega.privacy.android.app.utils.*
 import mega.privacy.android.app.utils.Constants.*
+import nz.mega.sdk.MegaApiJava.ORDER_MODIFICATION_DESC
 import java.util.*
 
 @AndroidEntryPoint
@@ -120,7 +121,7 @@ class ImagesFragment : BaseZoomFragment(), GalleryCardAdapter.Listener {
                 val node = gridAdapter.getNodeAtPosition(photoPosition)
                 node?.let {
                     RunOnUIThreadUtils.post {
-                        openPhoto(it)
+                        openPhoto(ORDER_MODIFICATION_DESC, it)
                     }
                 }
             }
@@ -295,4 +296,6 @@ class ImagesFragment : BaseZoomFragment(), GalleryCardAdapter.Listener {
         }
         return true
     }
+
+    override fun getOrder() = ORDER_MODIFICATION_DESC
 }

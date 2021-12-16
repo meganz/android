@@ -440,7 +440,7 @@ class PhotosFragment : BaseZoomFragment(), GalleryCardAdapter.Listener {
                 val node = gridAdapter.getNodeAtPosition(photoPosition)
                 node?.let {
                     RunOnUIThreadUtils.post {
-                        openPhoto(it)
+                        openPhoto(getOrder(), it)
                     }
                 }
 
@@ -569,4 +569,6 @@ class PhotosFragment : BaseZoomFragment(), GalleryCardAdapter.Listener {
     override fun getViewType() = selectedView
 
     override fun getAdapterType() = PHOTO_SYNC_ADAPTER
+
+    override fun getOrder() = viewModel.mOrder
 }
