@@ -208,7 +208,7 @@ class ChooseUpgradeAccountViewModel @ViewModelInject constructor(
                 when {
                     isPurchasedAlready(BillingManagerImpl.SKU_PRO_LITE_MONTH) -> MONTHLY_SUBSCRIBED
                     isPurchasedAlready(BillingManagerImpl.SKU_PRO_LITE_YEAR) -> YEARLY_SUBSCRIBED
-                    else -> MONTHLY_SUBSCRIBED
+                    else -> NOT_SUBSCRIBED
                 }
             }
             else -> NOT_SUBSCRIBED
