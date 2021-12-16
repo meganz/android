@@ -159,20 +159,6 @@ pipeline {
                 }
             }
         }
-        stage('Unit Test') {
-            steps {
-                script {
-                    BUILD_STEP = "Unit Test"
-                }
-                gitlabCommitStatus(name: 'Unit Test') {
-                    // Compile and run the unit tests for the app and its dependencies
-                    runShell "./gradlew testGmsDebugUnitTest"
-
-                    // Analyse the test results and update the build result as appropriate
-                    //junit '**/TEST-*.xml'
-                }
-            }
-        }
         stage('Build APK (GMS+HMS)') {
             steps {
                 script {
@@ -184,6 +170,20 @@ pipeline {
 
                     // Archive the APKs so that they can be downloaded from Jenkins
                     // archiveArtifacts '**/*.apk'
+                }
+            }
+        }
+        stage('Unit Test') {
+            steps {
+                script {
+                    BUILD_STEP = "Unit Test"
+                }
+                gitlabCommitStatus(name: 'Unit Test') {
+                    // Compile and run the unit tests for the app and its dependencies
+                    runShell "./gradlew testGmsDebugUnitTest"
+
+                    // Analyse the test results and update the build result as appropriate
+                    //junit '**/TEST-*.xml'
                 }
             }
         }
