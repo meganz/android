@@ -42,18 +42,19 @@ pipeline {
     post {
         failure {
             script {
-                def comment = "Android Build Failed. \nReason: ${BUILD_STEP}\nBranch: ${env.GIT_BRANCH}"
+                def comment = "Android Build Failed. :disappointed: \nReason: ${BUILD_STEP}\nBranch: ${env.GIT_BRANCH}"
                 if (env.CHANGE_URL) {
-                    comment = "Android Build Failed. \nReason: ${BUILD_STEP}\nBranch: ${env.GIT_BRANCH} \nMR: ${env.CHANGE_URL}"
+                    comment = "Android Build Failed. :disappointed: \nReason: ${BUILD_STEP}\nBranch: ${env.GIT_BRANCH} \nMR: ${env.CHANGE_URL}"
                 }
-                slackUploadFile filePath: env.CONSOLE_LOG_FILE, initialComment: comment
+                slackSend color: "danger", message: comment
+                slackUploadFile filePath: env.CONSOLE_LOG_FILE, initialComment: "Android Build Log"
             }
         }
         success {
             script {
-                def comment = "Android Build Success! \nBranch: ${env.GIT_BRANCH}"
+                def comment = "Android Build Success! :smile: \nBranch: ${env.GIT_BRANCH}"
                 if (env.CHANGE_URL) {
-                    comment = "Android Build Success! \nBranch: ${env.GIT_BRANCH} \nMR: ${env.CHANGE_URL}"
+                    comment = "Android Build Success! :smile: \nBranch: ${env.GIT_BRANCH} \nMR: ${env.CHANGE_URL}"
                 }
                 slackSend color: "good", message: comment
             }
