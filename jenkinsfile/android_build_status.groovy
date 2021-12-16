@@ -3,7 +3,7 @@ def runShell(String cmd) {
     sh "${cmd} >> ${CONSOLE_LOG_FILE} 2>&1"
 }
 
-def buildStep = ""
+def BUILD_STEP = ""
 
 pipeline {
     agent { label 'mac-slave' }
@@ -42,9 +42,9 @@ pipeline {
     post {
         failure {
             script {
-                def comment = "Android Build Failed. \nReason: ${buildStep}\nBranch: ${env.GIT_BRANCH}"
+                def comment = "Android Build Failed. \nReason: ${BUILD_STEP}\nBranch: ${env.GIT_BRANCH}"
                 if (env.CHANGE_URL) {
-                    comment = "Android Build Failed. \nReason: ${buildStep}\nBranch: ${env.GIT_BRANCH} \nMR: ${env.CHANGE_URL}"
+                    comment = "Android Build Failed. \nReason: ${BUILD_STEP}\nBranch: ${env.GIT_BRANCH} \nMR: ${env.CHANGE_URL}"
                 }
                 slackUploadFile filePath: env.CONSOLE_LOG_FILE, initialComment: comment
             }
@@ -62,7 +62,9 @@ pipeline {
     stages {
         stage('Preparation') {
             steps {
-                buildStep = "Preparation"
+                script {
+                    BUILD_STEP = "Preparation"
+                }
                 gitlabCommitStatus(name: 'Preparation') {
                     runShell("rm -fv ${CONSOLE_LOG_FILE}")
                 }
@@ -71,7 +73,10 @@ pipeline {
 
         stage('Fetch SDK Submodules') {
             steps {
-                buildStep = "Fetch SDK Submodules"
+                script {
+                    BUILD_STEP = "Fetch SDK Submodules"
+                }
+
                 gitlabCommitStatus(name: 'Fetch SDK Submodules') {
                     withCredentials([gitUsernamePassword(credentialsId: 'Gitlab-Access-Token', gitToolName: 'Default')]) {
                         runShell 'git config --file=.gitmodules submodule."app/src/main/jni/mega/sdk".url https://code.developers.mega.co.nz/sdk/sdk.git'
@@ -87,7 +92,9 @@ pipeline {
 
         stage('Download Dependency Lib for SDK') {
             steps {
-                buildStep = "Download Dependency Lib for SDK"
+                script {
+                    BUILD_STEP = "Download Dependency Lib for SDK"
+                }
                 gitlabCommitStatus(name: 'Download Dependency Lib for SDK') {
                     sh """
                         mkdir -p "${BUILD_LIB_DOWNLOAD_FOLDER}"
@@ -140,7 +147,9 @@ pipeline {
         }
         stage('Build SDK') {
             steps {
-                buildStep = "Build SDK"
+                script {
+                    BUILD_STEP = "Build SDK"
+                }
                 gitlabCommitStatus(name: 'Build SDK') {
                     sh """
                     cd ${WORKSPACE}/app/src/main/jni
@@ -152,7 +161,9 @@ pipeline {
         }
         stage('Unit Test') {
             steps {
-                buildStep = "Unit Test"
+                script {
+                    BUILD_STEP = "Unit Test"
+                }
                 gitlabCommitStatus(name: 'Unit Test') {
                     // Compile and run the unit tests for the app and its dependencies
                     runShell "./gradlew testGmsDebugUnitTest"
@@ -164,7 +175,9 @@ pipeline {
         }
         stage('Build APK (GMS+HMS)') {
             steps {
-                buildStep = 'Build APK (GMS+HMS)'
+                script {
+                    BUILD_STEP = 'Build APK (GMS+HMS)'
+                }
                 gitlabCommitStatus(name: 'Build APK (GMS+HMS)') {
                     // Finish building and packaging the APK
                     runShell "./gradlew app:assembleGmsRelease app:assembleHmsRelease"
@@ -196,6 +209,9 @@ pipeline {
                 SIGNING_KEY_PASSWORD = credentials('my-app-signing-password')
             }
             steps {
+                script {
+                    BUILD_STEP = "Deploy"
+                }
                 // Build the app in release mode, and sign the APK using the environment variables
                 runShell './gradlew assembleRelease'
 
