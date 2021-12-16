@@ -325,6 +325,13 @@ class PasscodeUtil @Inject constructor(
     }
 
     /**
+     * Called when PasscodeLock activity is resumed to reset the lastPause value.
+     */
+    fun resetLastPauseUpdate() {
+        passcodeManagement.lastPause = 0
+    }
+
+    /**
      * Launches an intent to show passcode screen when the app is locked
      */
     private fun showLockScreen() {

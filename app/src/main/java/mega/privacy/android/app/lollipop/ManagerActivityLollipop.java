@@ -5807,7 +5807,9 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 
 	        	return true;
 	        }
-
+			case R.id.action_menu_clear_rubbish_bin:
+                showClearRubbishBinDialog();
+                return true;
 			case R.id.action_menu_help:{
 	        	Intent intent = new Intent();
 	            intent.setAction(Intent.ACTION_VIEW);
@@ -7075,6 +7077,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 		fabs.add(fabMaskLayout.findViewById(R.id.text_chat));
 		fabs.add(fabMaskLayout.findViewById(R.id.text_meeting));
 
+		fabMaskLayout.setOnClickListener(l-> fabMainClickCallback());
 		fabMaskButton.setOnClickListener(l-> fabMainClickCallback());
 
 		fabMaskLayout.findViewById(R.id.fab_chat).setOnClickListener(l -> {
@@ -7128,6 +7131,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 	 * Showing the full screen mask by adding the mask layout to the window content
 	 */
 	private void addMask() {
+		getWindow().setStatusBarColor(ContextCompat.getColor(this, R.color.grey_600_085_dark_grey_070));
 		windowContent.addView(fabMaskLayout);
 	}
 
@@ -7135,6 +7139,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 	 * Removing the full screen mask
 	 */
 	private void removeMask() {
+		getWindow().setStatusBarColor(ContextCompat.getColor(this, android.R.color.transparent));
 		windowContent.removeView(fabMaskLayout);
 	}
 
