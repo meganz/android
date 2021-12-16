@@ -25,7 +25,7 @@ class PhotosViewModel @ViewModelInject constructor(
     private val mDbHandler: DatabaseHandler
 ) : GalleryViewModel(repository) {
 
-    override var _mZoom: Int = ZoomUtil.PHOTO_ZOOM_LEVEL
+    override var mZoom: Int = ZoomUtil.PHOTO_ZOOM_LEVEL
     override fun isAutoGetItem(): Boolean = true
 
     override fun getFilterRealPhotoCountCondition(item: GalleryItem): Boolean {

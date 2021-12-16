@@ -11,7 +11,7 @@ class ImagesViewModel @ViewModelInject constructor(
     repository: ImagesItemRepository
 ) : GalleryViewModel(repository) {
 
-    override var _mZoom: Int = ZoomUtil.IMAGES_ZOOM_LEVEL
+    override var mZoom: Int = ZoomUtil.IMAGES_ZOOM_LEVEL
 
     override fun isAutoGetItem(): Boolean = true
 

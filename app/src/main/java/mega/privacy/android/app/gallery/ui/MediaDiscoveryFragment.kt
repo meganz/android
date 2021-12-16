@@ -80,7 +80,7 @@ class MediaDiscoveryFragment : BaseZoomFragment(), GalleryCardAdapter.Listener {
     }
 
     private fun initViewCreated() {
-        val currentZoom = ZoomUtil.ZOOM_DEFAULT
+        val currentZoom = ZoomUtil.MEDIA_ZOOM_LEVEL
         zoomViewModel.setCurrentZoom(currentZoom)
         zoomViewModel.setZoom(currentZoom)
         viewModel.setZoom(currentZoom)
@@ -91,6 +91,7 @@ class MediaDiscoveryFragment : BaseZoomFragment(), GalleryCardAdapter.Listener {
     }
 
     override fun handleZoomChange(zoom: Int, needReload: Boolean) {
+        ZoomUtil.MEDIA_ZOOM_LEVEL = zoom
         handleZoomAdapterLayoutChange(zoom)
         if (needReload) {
             loadPhotos()

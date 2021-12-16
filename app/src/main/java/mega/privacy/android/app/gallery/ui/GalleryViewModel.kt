@@ -40,14 +40,14 @@ abstract class GalleryViewModel constructor(
     private val _refreshCards = MutableLiveData(false)
     val refreshCards: LiveData<Boolean> = _refreshCards
 
-    abstract var _mZoom: Int
+    abstract var mZoom: Int
 
     abstract fun isAutoGetItem(): Boolean
 
     abstract fun getFilterRealPhotoCountCondition(item: GalleryItem): Boolean
 
     fun setZoom(zoom: Int) {
-        _mZoom = zoom
+        mZoom = zoom
     }
 
     /**
@@ -65,7 +65,7 @@ abstract class GalleryViewModel constructor(
         else return liveDataRoot.switchMap {
             if (forceUpdate) {
                 viewModelScope.launch {
-                    repository.getFiles(_mZoom)
+                    repository.getFiles(mZoom)
                 }
             } else {
                 repository.emitFiles()

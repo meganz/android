@@ -12,7 +12,8 @@ class MediaViewModel @ViewModelInject constructor(
      private val repository: MediaItemRepository,
 ) : GalleryViewModel(repository) {
 
-    override var _mZoom: Int = ZoomUtil.PHOTO_ZOOM_LEVEL
+    override var mZoom: Int = ZoomUtil.MEDIA_ZOOM_LEVEL
+
     var isAuto:Boolean = false
 
     override fun isAutoGetItem(): Boolean = isAuto
