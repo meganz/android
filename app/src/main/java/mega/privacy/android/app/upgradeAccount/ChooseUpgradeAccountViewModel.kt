@@ -7,8 +7,8 @@ import androidx.core.text.HtmlCompat
 import androidx.hilt.lifecycle.ViewModelInject
 import mega.privacy.android.app.*
 import mega.privacy.android.app.arch.BaseRxViewModel
-import mega.privacy.android.app.di.MegaApi
 import mega.privacy.android.app.globalmanagement.MyAccountInfo
+import mega.privacy.android.app.service.iab.BillingManagerImpl
 import mega.privacy.android.app.utils.ColorUtils.getColorHexString
 import mega.privacy.android.app.utils.Constants.*
 import mega.privacy.android.app.utils.DBUtil.callToPaymentMethods
@@ -18,17 +18,20 @@ import mega.privacy.android.app.utils.StringResourcesUtils.getString
 import mega.privacy.android.app.utils.Util.getSizeStringGBBased
 import mega.privacy.android.app.utils.billing.PaymentUtils.getSku
 import mega.privacy.android.app.utils.billing.PaymentUtils.getSkuDetails
-import nz.mega.sdk.MegaApiAndroid
 import java.text.NumberFormat
 import java.util.*
 
 class ChooseUpgradeAccountViewModel @ViewModelInject constructor(
     private val myAccountInfo: MyAccountInfo
-) : BaseRxViewModel(){
+) : BaseRxViewModel() {
 
     companion object {
         const val TYPE_STORAGE_LABEL = 0
         const val TYPE_TRANSFER_LABEL = 1
+
+        const val NOT_SUBSCRIBED = 0
+        const val MONTHLY_SUBSCRIBED = 1
+        const val YEARLY_SUBSCRIBED = 2
     }
 
     fun isGettingInfo(): Boolean =
@@ -99,7 +102,7 @@ class ChooseUpgradeAccountViewModel @ViewModelInject constructor(
         format.currency = Currency.getInstance(currency)
 
         var stringPrice = format.format(price)
-        var color = getColorHexString(context, R.color.grey_900_grey_100)
+        var color = getColorHexString(context, R.color.grey_087_white_087)
 
         if (monthlyBasePrice) {
             if (product.months != 1) {
@@ -168,4 +171,46 @@ class ChooseUpgradeAccountViewModel @ViewModelInject constructor(
             else -> ""
         }
     }
+
+    /**
+     * Gets the subscription depending on the upgrade type.
+     *
+     * @param upgradeType Type of upgrade.
+     * @return The subscription type:
+     *          - MONTHLY_SUBSCRIBED if already subscribed to the monthly plan
+     *          - YEARLY_SUBSCRIBED if already subscribed to the yearly plan
+     *          - NOT_SUBSCRIBED if not subscribed.
+     */
+    fun getSubscription(upgradeType: Int): Int =
+        when (upgradeType) {
+            PRO_I -> {
+                when {
+                    isPurchasedAlready(BillingManagerImpl.SKU_PRO_I_MONTH) -> MONTHLY_SUBSCRIBED
+                    isPurchasedAlready(BillingManagerImpl.SKU_PRO_I_YEAR) -> YEARLY_SUBSCRIBED
+                    else -> NOT_SUBSCRIBED
+                }
+            }
+            PRO_II -> {
+                when {
+                    isPurchasedAlready(BillingManagerImpl.SKU_PRO_II_MONTH) -> MONTHLY_SUBSCRIBED
+                    isPurchasedAlready(BillingManagerImpl.SKU_PRO_II_YEAR) -> YEARLY_SUBSCRIBED
+                    else -> NOT_SUBSCRIBED
+                }
+            }
+            PRO_III -> {
+                when {
+                    isPurchasedAlready(BillingManagerImpl.SKU_PRO_III_MONTH) -> MONTHLY_SUBSCRIBED
+                    isPurchasedAlready(BillingManagerImpl.SKU_PRO_III_YEAR) -> YEARLY_SUBSCRIBED
+                    else -> NOT_SUBSCRIBED
+                }
+            }
+            PRO_LITE -> {
+                when {
+                    isPurchasedAlready(BillingManagerImpl.SKU_PRO_LITE_MONTH) -> MONTHLY_SUBSCRIBED
+                    isPurchasedAlready(BillingManagerImpl.SKU_PRO_LITE_YEAR) -> YEARLY_SUBSCRIBED
+                    else -> MONTHLY_SUBSCRIBED
+                }
+            }
+            else -> NOT_SUBSCRIBED
+        }
 }

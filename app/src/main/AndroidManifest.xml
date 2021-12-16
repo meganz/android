@@ -686,6 +686,11 @@
             android:label="@string/choose_account_fragment"
             android:launchMode="singleTop" />
 
+        <activity
+            android:name="mega.privacy.android.app.upgradeAccount.PaymentActivity"
+            android:label="@string/payment"
+            android:launchMode="singleTop" />
+
         <receiver android:name=".psa.AlarmReceiver">
             <intent-filter>
                 <action android:name="android.intent.action.checking.psa" />

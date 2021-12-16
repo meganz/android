@@ -1,5 +1,6 @@
 package mega.privacy.android.app.upgradeAccount
 
+import android.content.Intent
 import android.os.Bundle
 import android.text.Spanned
 import androidx.appcompat.app.AlertDialog
@@ -13,6 +14,7 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.constants.EventConstants.EVENT_PURCHASES_UPDATED
 import mega.privacy.android.app.constants.IntentConstants
 import mega.privacy.android.app.service.iab.BillingManagerImpl
+import mega.privacy.android.app.upgradeAccount.PaymentActivity.Companion.UPGRADE_TYPE
 import mega.privacy.android.app.utils.*
 import mega.privacy.android.app.utils.Constants.*
 import mega.privacy.android.app.utils.StringUtils.toSpannedHtmlText
@@ -163,6 +165,10 @@ class UpgradeAccountActivity : ChooseAccountActivity() {
             LogUtil.logWarning("PaymentBitSet Null")
             return
         }
+
+        startActivity(Intent(this, PaymentActivity::class.java)
+            .putExtra(UPGRADE_TYPE, upgradeType))
+        return
 
         binding.availablePaymentMethods.isVisible = true
 
