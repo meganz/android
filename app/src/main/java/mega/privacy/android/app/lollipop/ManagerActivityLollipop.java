@@ -5253,7 +5253,6 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 		enableSelectMenuItem = menu.findItem(R.id.action_enable_select);
 		selectMenuItem = menu.findItem(R.id.action_select);
 		unSelectMenuItem = menu.findItem(R.id.action_unselect);
-		sortByMenuItem = menu.findItem(R.id.action_menu_sort_by);
 		helpMenuItem = menu.findItem(R.id.action_menu_help);
 		doNotDisturbMenuItem = menu.findItem(R.id.action_menu_do_not_disturb);
 		upgradeAccountMenuItem = menu.findItem(R.id.action_menu_upgrade_account);
@@ -5808,12 +5807,6 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 
 	        	return true;
 	        }
-			case R.id.action_menu_sort_by:
-				if (drawerItem == DrawerItem.PHOTOS) {
-					showNewSortByPanel(ORDER_CAMERA);
-				}
-
-				return true;
 
 			case R.id.action_menu_help:{
 	        	Intent intent = new Intent();

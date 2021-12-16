@@ -42,6 +42,7 @@ import mega.privacy.android.app.lollipop.ManagerActivityLollipop
 import mega.privacy.android.app.modalbottomsheet.NodeOptionsBottomSheetDialogFragment
 import mega.privacy.android.app.utils.*
 import mega.privacy.android.app.utils.Constants.MIN_ITEMS_SCROLLBAR
+import mega.privacy.android.app.utils.Constants.ORDER_CAMERA
 import mega.privacy.android.app.utils.ZoomUtil.ZOOM_DEFAULT
 import mega.privacy.android.app.utils.ZoomUtil.ZOOM_OUT_1X
 import mega.privacy.android.app.utils.ZoomUtil.getItemWidth
@@ -160,6 +161,9 @@ abstract class BaseZoomFragment : BaseFragment(), GestureScaleCallback,
             }
             R.id.action_zoom_out -> {
                 zoomOut()
+            }
+            R.id.action_menu_sort_by -> {
+                mManagerActivity.showNewSortByPanel(ORDER_CAMERA)
             }
         }
         return super.onOptionsItemSelected(item)
