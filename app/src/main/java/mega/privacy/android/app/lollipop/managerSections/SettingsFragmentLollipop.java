@@ -37,7 +37,6 @@ import javax.inject.Inject;
 
 import dagger.hilt.android.AndroidEntryPoint;
 import mega.privacy.android.app.MegaApplication;
-import mega.privacy.android.app.MegaAttributes;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.activities.WebViewActivity;
 import mega.privacy.android.app.activities.settingsActivities.StartScreenPreferencesActivity;
@@ -460,7 +459,7 @@ public class SettingsFragmentLollipop extends SettingsBaseFragment {
             case KEY_ABOUT_APP_VERSION:
                 logDebug("KEY_ABOUT_APP_VERSION pressed");
                 numberOfClicksAppVersion++;
-                if (numberOfClicksAppVersion == 5) {
+                if (numberOfClicksAppVersion == CLICKS_ENABLE_DEBUG) {
                     if (!MegaApplication.isShowInfoChatMessages()) {
                         MegaApplication.setShowInfoChatMessages(true);
                         numberOfClicksAppVersion = 0;
@@ -475,7 +474,7 @@ public class SettingsFragmentLollipop extends SettingsBaseFragment {
 
             case KEY_ABOUT_SDK_VERSION:
                 numberOfClicksSDK++;
-                if (numberOfClicksSDK == 5) {
+                if (numberOfClicksSDK == CLICKS_ENABLE_DEBUG) {
                     if (areSDKLogsEnabled()) {
                         numberOfClicksSDK = 0;
                         setStatusLoggerSDK(context, false);
@@ -488,7 +487,7 @@ public class SettingsFragmentLollipop extends SettingsBaseFragment {
 
             case KEY_ABOUT_KARERE_VERSION:
                 numberOfClicksKarere++;
-                if (numberOfClicksKarere == 5) {
+                if (numberOfClicksKarere == CLICKS_ENABLE_DEBUG) {
                     if (areKarereLogsEnabled()) {
                         numberOfClicksKarere = 0;
                         setStatusLoggerKarere(context, false);

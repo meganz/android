@@ -56,7 +56,6 @@ import java.util.Locale;
 
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
-import mega.privacy.android.app.MegaAttributes;
 import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.ShareInfo;
@@ -1457,7 +1456,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
             case R.id.login_text_view:
                 numberOfClicksKarere++;
 
-                if (numberOfClicksKarere == 5) {
+                if (numberOfClicksKarere == CLICKS_ENABLE_DEBUG) {
                     if (areKarereLogsEnabled()) {
                         numberOfClicksKarere = 0;
                         setStatusLoggerKarere(context, false);
@@ -1471,7 +1470,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
             case R.id.text_newToMega:
                 numberOfClicksSDK++;
 
-                if (numberOfClicksSDK == 5) {
+                if (numberOfClicksSDK == CLICKS_ENABLE_DEBUG) {
                     if (areSDKLogsEnabled()) {
                         numberOfClicksSDK = 0;
                         setStatusLoggerSDK(context, false);

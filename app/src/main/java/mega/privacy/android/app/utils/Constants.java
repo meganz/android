@@ -916,4 +916,6 @@ public class Constants {
 
     public static final int NAME_CHANGE = 0;
     public static final int AVATAR_CHANGE = 1;
+
+    public static final int CLICKS_ENABLE_DEBUG = 5;
 }
