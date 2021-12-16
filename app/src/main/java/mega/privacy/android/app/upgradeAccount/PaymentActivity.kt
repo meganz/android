@@ -38,7 +38,13 @@ class PaymentActivity : PasscodeActivity(), Scrollable {
 
         binding = ActivityPaymentBinding.inflate(layoutInflater)
         setContentView(binding.root)
+        initPayments()
         setupView()
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        destroyPayments()
     }
 
     private fun setupView() {

@@ -9,7 +9,6 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -24,7 +23,6 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.text.HtmlCompat;
 import androidx.lifecycle.Observer;
 
-import android.os.Environment;
 import android.os.Handler;
 import android.os.Looper;
 import android.text.TextUtils;
@@ -39,7 +37,6 @@ import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -47,7 +44,6 @@ import javax.inject.Inject;
 
 import dagger.hilt.android.AndroidEntryPoint;
 import kotlin.Pair;
-import kotlin.Suppress;
 import mega.privacy.android.app.components.saver.AutoPlayInfo;
 import mega.privacy.android.app.globalmanagement.MyAccountInfo;
 import mega.privacy.android.app.interfaces.ActivityLauncher;
@@ -79,10 +75,11 @@ import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaUser;
 
 import static mega.privacy.android.app.constants.EventConstants.EVENT_MEETING_INCOMPATIBILITY_SHOW;
-import static mega.privacy.android.app.constants.EventConstants.EVENT_PURCHASES_UPDATED;
 import static mega.privacy.android.app.lollipop.LoginFragmentLollipop.NAME_USER_LOCKED;
 import static mega.privacy.android.app.constants.BroadcastConstants.*;
 import static mega.privacy.android.app.middlelayer.iab.BillingManager.RequestCode.REQ_CODE_BUY;
+import static mega.privacy.android.app.utils.AlertDialogUtil.dismissAlertDialogIfExists;
+import static mega.privacy.android.app.utils.AlertDialogUtil.isAlertDialogShown;
 import static mega.privacy.android.app.utils.AlertsAndWarnings.showResumeTransfersWarning;
 import static mega.privacy.android.app.utils.Constants.SNACKBAR_IMCOMPATIBILITY_TYPE;
 import static mega.privacy.android.app.utils.LogUtil.*;
@@ -105,6 +102,8 @@ public class BaseActivity extends AppCompatActivity implements ActivityLauncher,
     private static final String EXPIRED_BUSINESS_ALERT_SHOWN = "EXPIRED_BUSINESS_ALERT_SHOWN";
     private static final String TRANSFER_OVER_QUOTA_WARNING_SHOWN = "TRANSFER_OVER_QUOTA_WARNING_SHOWN";
     private static final String RESUME_TRANSFERS_WARNING_SHOWN = "RESUME_TRANSFERS_WARNING_SHOWN";
+    private static final String UPGRADE_ALERT_SHOWN = "UPGRADE_ALERT_SHOWN";
+    private static final String UPGRADE_ALERT_MESSAGE = "UPGRADE_ALERT_MESSAGE";
 
     @Inject
     MyAccountInfo myAccountInfo;
@@ -134,6 +133,9 @@ public class BaseActivity extends AppCompatActivity implements ActivityLauncher,
     private boolean isGeneralTransferOverQuotaWarningShown;
     private AlertDialog transferGeneralOverQuotaWarning;
     private Snackbar snackbar;
+
+    private AlertDialog upgradeAlert;
+    private Pair<String, String> upgradeAlertMessage;
 
     /**
      * Contains the info of a node that to be opened in-app.
@@ -186,6 +188,7 @@ public class BaseActivity extends AppCompatActivity implements ActivityLauncher,
     private final Handler uiHandler = new Handler(Looper.getMainLooper());
 
     @Override
+    @SuppressWarnings("unchecked")
     protected void onCreate(Bundle savedInstanceState) {
 
         baseActivity = this;
@@ -242,6 +245,11 @@ public class BaseActivity extends AppCompatActivity implements ActivityLauncher,
             isResumeTransfersWarningShown = savedInstanceState.getBoolean(RESUME_TRANSFERS_WARNING_SHOWN, false);
             if (isResumeTransfersWarningShown) {
                 showResumeTransfersWarning(this);
+            }
+
+            if (savedInstanceState.getBoolean(UPGRADE_ALERT_SHOWN, false)) {
+                upgradeAlertMessage = (Pair<String, String>) savedInstanceState.getSerializable(UPGRADE_ALERT_MESSAGE);
+                showQueryPurchasesResult();
             }
         }
 
@@ -303,6 +311,8 @@ public class BaseActivity extends AppCompatActivity implements ActivityLauncher,
         outState.putBoolean(EXPIRED_BUSINESS_ALERT_SHOWN, isExpiredBusinessAlertShown);
         outState.putBoolean(TRANSFER_OVER_QUOTA_WARNING_SHOWN, isGeneralTransferOverQuotaWarningShown);
         outState.putBoolean(RESUME_TRANSFERS_WARNING_SHOWN, isResumeTransfersWarningShown);
+        outState.putBoolean(UPGRADE_ALERT_SHOWN, isAlertDialogShown(upgradeAlert));
+        outState.putSerializable(UPGRADE_ALERT_MESSAGE, upgradeAlertMessage);
 
         super.onSaveInstanceState(outState);
     }
@@ -347,13 +357,10 @@ public class BaseActivity extends AppCompatActivity implements ActivityLauncher,
         unregisterReceiver(transferOverQuotaReceiver);
         unregisterReceiver(resumeTransfersReceiver);
 
-        if (transferGeneralOverQuotaWarning != null) {
-            transferGeneralOverQuotaWarning.dismiss();
-        }
-
-        if (resumeTransfersWarning != null) {
-            resumeTransfersWarning.dismiss();
-        }
+        dismissAlertDialogIfExists(transferGeneralOverQuotaWarning);
+        dismissAlertDialogIfExists(transferGeneralOverQuotaWarning);
+        dismissAlertDialogIfExists(resumeTransfersWarning);
+        dismissAlertDialogIfExists(upgradeAlert);
 
         LiveEventBus.get(EVENT_PSA, Psa.class).removeObserver(psaObserver);
 
@@ -1391,7 +1398,8 @@ public class BaseActivity extends AppCompatActivity implements ActivityLauncher,
             message = StringResourcesUtils.getString(R.string.message_user_purchased_subscription_down_grade);
         }
 
-        LiveEventBus.get(EVENT_PURCHASES_UPDATED, Pair.class).post(new Pair<>(title, message));
+        upgradeAlertMessage = new Pair<>(title, message);
+        showQueryPurchasesResult();
     }
 
     @Override
@@ -1409,5 +1417,20 @@ public class BaseActivity extends AppCompatActivity implements ActivityLauncher,
     public void showSnackbar(int type, @Nullable String content, long chatId) {
         View rootView = getRootViewFromContext(this);
         showSnackbar(type, rootView, content, chatId);
+    }
+
+    /**
+     * Shows the result of a purchase as an alert.
+     */
+    private void showQueryPurchasesResult() {
+        if (upgradeAlertMessage == null) {
+            return;
+        }
+
+        upgradeAlert = new MaterialAlertDialogBuilder(this)
+                .setTitle(upgradeAlertMessage.getFirst())
+                .setMessage(upgradeAlertMessage.getSecond())
+                .setPositiveButton(StringResourcesUtils.getString(R.string.general_ok), null)
+                .show();
     }
 }

@@ -2,14 +2,9 @@ package mega.privacy.android.app.upgradeAccount
 
 import android.content.Intent
 import android.os.Bundle
-import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
-import androidx.lifecycle.Observer
-import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import com.jeremyliao.liveeventbus.LiveEventBus
 import mega.privacy.android.app.R
-import mega.privacy.android.app.constants.EventConstants.EVENT_PURCHASES_UPDATED
 import mega.privacy.android.app.upgradeAccount.PaymentActivity.Companion.UPGRADE_TYPE
 import mega.privacy.android.app.utils.*
 import mega.privacy.android.app.utils.Constants.*
@@ -17,11 +12,6 @@ import mega.privacy.android.app.utils.StringUtils.toSpannedHtmlText
 import java.util.*
 
 class UpgradeAccountActivity : ChooseAccountActivity() {
-
-    private var upgradeAlert: AlertDialog? = null
-
-    private val purchaseResultObserver =
-        Observer<Pair<String, String>> { content -> showQueryPurchasesResult(content) }
 
     override fun manageUpdateReceiver(action: Int) {
         super.manageUpdateReceiver(action)
@@ -34,17 +24,6 @@ class UpgradeAccountActivity : ChooseAccountActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setupView()
-        setupObservers()
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-
-        upgradeAlert?.dismiss()
-
-        @Suppress("UNCHECKED_CAST")
-        LiveEventBus.get(EVENT_PURCHASES_UPDATED)
-            .removeObserver(purchaseResultObserver as Observer<Any>)
     }
 
     override fun onBackPressed() {
@@ -60,12 +39,6 @@ class UpgradeAccountActivity : ChooseAccountActivity() {
 
         setAccountDetails()
         showAvailableAccount()
-    }
-
-    private fun setupObservers() {
-        @Suppress("UNCHECKED_CAST")
-        LiveEventBus.get(EVENT_PURCHASES_UPDATED)
-            .observeForever(purchaseResultObserver as Observer<Any>)
     }
 
     private fun showAvailableAccount() {
@@ -153,24 +126,5 @@ class UpgradeAccountActivity : ChooseAccountActivity() {
         startActivity(Intent(this, PaymentActivity::class.java)
             .putExtra(UPGRADE_TYPE, upgradeType))
         return
-    }
-
-    /**
-     * Shows the result of a purchase as an alert.
-     *
-     * @param content First String to show as title alert, second String to show as message alert.
-     */
-    private fun showQueryPurchasesResult(content: Pair<String, String>?) {
-        if (content == null) {
-            return
-        }
-
-        upgradeAlert = MaterialAlertDialogBuilder(this)
-            .setTitle(content.first)
-            .setMessage(content.second)
-            .setPositiveButton(StringResourcesUtils.getString(R.string.general_ok)) { _, _ ->
-                finish()
-            }
-            .show()
     }
 }
