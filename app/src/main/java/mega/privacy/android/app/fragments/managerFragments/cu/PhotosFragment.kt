@@ -498,7 +498,10 @@ class PhotosFragment : BaseZoomFragment(), GalleryCardAdapter.Listener {
         }
     }
 
-    fun loadPhotos() = viewModel.loadPhotos(true)
+    fun loadPhotos() {
+        viewModel.setOrder(sortOrderManagement.getOrderCamera())
+        viewModel.loadPhotos(true)
+    }
 
     private fun handleZoomAdapterLayoutChange(zoom: Int) {
         if (!viewModel.isEnableCUShown()) {

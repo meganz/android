@@ -269,8 +269,10 @@ class MediaDiscoveryFragment : BaseZoomFragment(), GalleryCardAdapter.Listener {
             .withEndAction { viewTypePanel.layoutParams = params }.start()
     }
 
-    fun loadPhotos() = viewModel.loadPhotos(true)
-
+    fun loadPhotos() {
+        viewModel.setOrder(sortOrderManagement.getOrderCamera())
+        viewModel.loadPhotos(true)
+    }
     /**
      * Show the view with the data of years, months or days depends on selected view.
      *

@@ -11,9 +11,11 @@ class ImagesViewModel @ViewModelInject constructor(
     repository: ImagesItemRepository
 ) : GalleryViewModel(repository) {
 
-    override var mZoom: Int = ZoomUtil.IMAGES_ZOOM_LEVEL
+    override var mZoom = ZoomUtil.IMAGES_ZOOM_LEVEL
 
-    override fun isAutoGetItem(): Boolean = true
+    override var mOrder = MegaApiJava.ORDER_MODIFICATION_DESC
+
+    override fun isAutoGetItem() = true
 
     override fun getFilterRealPhotoCountCondition(item: GalleryItem): Boolean {
        return item.type == GalleryItem.TYPE_IMAGE

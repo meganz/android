@@ -7,32 +7,31 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import mega.privacy.android.app.DatabaseHandler
 import mega.privacy.android.app.gallery.data.GalleryItem
-import mega.privacy.android.app.gallery.repository.fetcher.GalleryNodeFetcher
-import mega.privacy.android.app.utils.ZoomUtil
+import mega.privacy.android.app.gallery.repository.fetcher.GalleryBaseFetcher
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaNode
 import java.util.*
 
 abstract class GalleryItemRepository constructor(
-    val context: Context,
-    val megaApi: MegaApiAndroid,
-    val mDbHandler: DatabaseHandler
+        val context: Context,
+        val megaApi: MegaApiAndroid,
+        val mDbHandler: DatabaseHandler
 ) {
     /** Live Data to notify the query result*/
     var galleryItems: LiveData<List<GalleryItem>> = MutableLiveData()
 
     /** Current effective NodeFetcher */
-    lateinit var nodesFetcher: GalleryNodeFetcher
+    lateinit var nodesFetcher: GalleryBaseFetcher
 
     /** The selected nodes in action mode */
     private val selectedNodesMap: LinkedHashMap<Any, GalleryItem> = LinkedHashMap()
 
-    suspend fun getFiles(zoom: Int = ZoomUtil.ZOOM_DEFAULT) {
+    suspend fun getFiles(order: Int, zoom: Int) {
         preserveSelectedItems()
 
         // Create a node fetcher for the new request, and link fileNodeItems to its result.
         // Then the result of any previous NodesFetcher will be ignored
-        nodesFetcher = initGalleryNodeFetcher(context, megaApi, selectedNodesMap, zoom, mDbHandler)
+        nodesFetcher = initGalleryNodeFetcher(context, megaApi, selectedNodesMap, order, zoom, mDbHandler)
         @Suppress("UNCHECKED_CAST")
         galleryItems = nodesFetcher.result as MutableLiveData<List<GalleryItem>>
 
@@ -69,10 +68,11 @@ abstract class GalleryItemRepository constructor(
     }
 
     abstract fun initGalleryNodeFetcher(
-        context: Context,
-        megaApi: MegaApiAndroid,
-        selectedNodesMap: LinkedHashMap<Any, GalleryItem>,
-        zoom: Int,
-        dbHandler: DatabaseHandler
-    ): GalleryNodeFetcher
+            context: Context,
+            megaApi: MegaApiAndroid,
+            selectedNodesMap: LinkedHashMap<Any, GalleryItem>,
+            order: Int,
+            zoom: Int,
+            dbHandler: DatabaseHandler
+    ): GalleryBaseFetcher
 }

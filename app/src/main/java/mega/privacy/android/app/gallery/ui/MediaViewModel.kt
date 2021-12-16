@@ -1,26 +1,23 @@
 package mega.privacy.android.app.gallery.ui
 
 import androidx.hilt.lifecycle.ViewModelInject
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import mega.privacy.android.app.gallery.data.GalleryItem
 import mega.privacy.android.app.gallery.data.GalleryItem.Companion.TYPE_HEADER
 import mega.privacy.android.app.gallery.repository.MediaItemRepository
 import mega.privacy.android.app.utils.ZoomUtil
+import nz.mega.sdk.MegaApiJava
 
 class MediaViewModel @ViewModelInject constructor(
-     private val repository: MediaItemRepository,
+        private val repository: MediaItemRepository,
 ) : GalleryViewModel(repository) {
 
-    override var mZoom: Int = ZoomUtil.MEDIA_ZOOM_LEVEL
+    override var mZoom = ZoomUtil.MEDIA_ZOOM_LEVEL
 
-    var isAuto:Boolean = false
+    override var mOrder = MegaApiJava.ORDER_MODIFICATION_DESC
 
-    override fun isAutoGetItem(): Boolean = isAuto
+    private var isAuto = false
 
-    private fun setIsAutoGetItem(isAuto:Boolean) {
-        this.isAuto = isAuto
-    }
+    override fun isAutoGetItem() = isAuto
 
     override fun getFilterRealPhotoCountCondition(item: GalleryItem): Boolean {
         return item.type != TYPE_HEADER
@@ -34,12 +31,12 @@ class MediaViewModel @ViewModelInject constructor(
         return tempIndex
     }
 
-    fun setHandle(handle:Long){
+    fun setHandle(handle: Long) {
         repository.setCurrentHandle(handle)
     }
 
-    fun getAndFilterFilesByHandle(){
-        setIsAutoGetItem(true)
+    fun getAndFilterFilesByHandle() {
+        isAuto = true
         items = getAndFilterFiles()
     }
 }

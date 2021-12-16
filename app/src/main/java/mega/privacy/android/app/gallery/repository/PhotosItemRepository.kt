@@ -5,8 +5,8 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import mega.privacy.android.app.DatabaseHandler
 import mega.privacy.android.app.di.MegaApi
 import mega.privacy.android.app.gallery.data.GalleryItem
-import mega.privacy.android.app.gallery.repository.fetcher.GalleryNodeFetcher
-import mega.privacy.android.app.gallery.repository.fetcher.GalleryPhotosFetcher
+import mega.privacy.android.app.gallery.repository.fetcher.GalleryBaseFetcher
+import mega.privacy.android.app.gallery.repository.fetcher.PhotosFetcher
 import mega.privacy.android.app.utils.FileUtil
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaNode
@@ -26,10 +26,11 @@ class PhotosItemRepository @Inject constructor(
         context: Context,
         megaApi: MegaApiAndroid,
         selectedNodesMap: LinkedHashMap<Any, GalleryItem>,
+        order: Int,
         zoom: Int,
         dbHandler: DatabaseHandler
-    ): GalleryNodeFetcher {
-        return GalleryPhotosFetcher(context, megaApi, selectedNodesMap, zoom, mDbHandler)
+    ): GalleryBaseFetcher {
+        return PhotosFetcher(context, megaApi, selectedNodesMap, order, zoom, mDbHandler)
     }
 
 
