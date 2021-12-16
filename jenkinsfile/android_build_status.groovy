@@ -3,6 +3,8 @@ def runShell(String cmd) {
     sh "${cmd} >> ${CONSOLE_LOG_FILE} 2>&1"
 }
 
+def buildStep = ""
+
 pipeline {
     agent { label 'mac-slave' }
     environment {
@@ -29,7 +31,7 @@ pipeline {
         GOOGLE_MAP_API_UNZIPPED = 'default_google_map_api_unzipped'
 
         // only build one architecture for SDK, to save build time. skipping "x86 armeabi-v7a x86_64"
-        BUILD_ARCHS="arm64-v8a"
+        BUILD_ARCHS = "arm64-v8a"
     }
     options {
         // Stop the build early in case of compile or test failures
@@ -40,9 +42,9 @@ pipeline {
     post {
         failure {
             script {
-                def comment = "Android Build Failed. \nBranch: ${env.GIT_BRANCH}"
+                def comment = "Android Build Failed. \nReason: ${buildStep}\nBranch: ${env.GIT_BRANCH}"
                 if (env.CHANGE_URL) {
-                    comment = "Android Build Failed. \nBranch: ${env.GIT_BRANCH} \nMR: ${env.CHANGE_URL}"
+                    comment = "Android Build Failed. \nReason: ${buildStep}\nBranch: ${env.GIT_BRANCH} \nMR: ${env.CHANGE_URL}"
                 }
                 slackUploadFile filePath: env.CONSOLE_LOG_FILE, initialComment: comment
             }
@@ -60,6 +62,7 @@ pipeline {
     stages {
         stage('Preparation') {
             steps {
+                buildStep = "Preparation"
                 gitlabCommitStatus(name: 'Preparation') {
                     runShell("rm -fv ${CONSOLE_LOG_FILE}")
                 }
@@ -68,6 +71,7 @@ pipeline {
 
         stage('Fetch SDK Submodules') {
             steps {
+                buildStep = "Fetch SDK Submodules"
                 gitlabCommitStatus(name: 'Fetch SDK Submodules') {
                     withCredentials([gitUsernamePassword(credentialsId: 'Gitlab-Access-Token', gitToolName: 'Default')]) {
                         runShell 'git config --file=.gitmodules submodule."app/src/main/jni/mega/sdk".url https://code.developers.mega.co.nz/sdk/sdk.git'
@@ -83,6 +87,7 @@ pipeline {
 
         stage('Download Dependency Lib for SDK') {
             steps {
+                buildStep = "Download Dependency Lib for SDK"
                 gitlabCommitStatus(name: 'Download Dependency Lib for SDK') {
                     sh """
                         mkdir -p "${BUILD_LIB_DOWNLOAD_FOLDER}"
@@ -135,6 +140,7 @@ pipeline {
         }
         stage('Build SDK') {
             steps {
+                buildStep = "Build SDK"
                 gitlabCommitStatus(name: 'Build SDK') {
                     sh """
                     cd ${WORKSPACE}/app/src/main/jni
@@ -144,9 +150,10 @@ pipeline {
                 }
             }
         }
-        stage('Unit test') {
+        stage('Unit Test') {
             steps {
-                gitlabCommitStatus(name: 'Unit test') {
+                buildStep = "Unit Test"
+                gitlabCommitStatus(name: 'Unit Test') {
                     // Compile and run the unit tests for the app and its dependencies
                     runShell "./gradlew testGmsDebugUnitTest"
 
@@ -154,18 +161,10 @@ pipeline {
                     //junit '**/TEST-*.xml'
                 }
             }
-            post {
-                failure {
-                    // Notify developer team of the failure
-                    slackSend color: "danger", message: "Android Unit Test failed! \nBranch: ${env.GIT_BRANCH}"
-                }
-                success {
-                    slackSend color: "good", message: "Android Unit Test passed! \nBranch: ${env.GIT_BRANCH}"
-                }
-            }
         }
         stage('Build APK (GMS+HMS)') {
             steps {
+                buildStep = 'Build APK (GMS+HMS)'
                 gitlabCommitStatus(name: 'Build APK (GMS+HMS)') {
                     // Finish building and packaging the APK
                     runShell "./gradlew app:assembleGmsRelease app:assembleHmsRelease"
