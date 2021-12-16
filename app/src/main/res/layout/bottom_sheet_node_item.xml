@@ -153,6 +153,32 @@
                 android:text="@string/view_in_folder_label"
                 app:drawableStartCompat="@drawable/ic_upload_pick_file"/>
 
+            <LinearLayout
+                android:id="@+id/option_versions_layout"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:visibility="gone">
+
+                <TextView
+                    android:id="@+id/versions_option"
+                    style="@style/BottomSheetOption"
+                    android:layout_weight="1"
+                    android:text="@string/title_section_versions"
+                    app:drawableStartCompat="@drawable/ic_g_version" />
+
+                <TextView
+                    android:id="@+id/versions"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_marginEnd="16dp"
+                    android:textColor="#8A000000"
+                    android:layout_weight="1"
+                    android:gravity="end|center_vertical"
+                    android:textAppearance="@style/TextAppearance.Mega.Body2.Secondary.Variant" />
+            </LinearLayout>
+
             <TextView
                 android:id="@+id/favorite_option"
                 style="@style/BottomSheetOption"
