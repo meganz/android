@@ -366,9 +366,4 @@ class ConstantsUnitTest {
 
         assertThat(matchRegexs("", BUSINESS_INVITE_LINK_REGEXS)).isFalse()
     }
-
-    @Test
-    fun always_fail_testcase() {
-        assertThat(true).isFalse()
-    }
 }
