@@ -317,7 +317,8 @@ import static mega.privacy.android.app.utils.UploadUtil.*;
 import static mega.privacy.android.app.utils.Util.*;
 import static nz.mega.sdk.MegaApiJava.*;
 import static nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE;
-
+hahhahahhahaha i am devil build break maker.
+a;djhfalkjfhasl;kdfhashfd
 @AndroidEntryPoint
 public class ManagerActivityLollipop extends TransfersManagementActivity
 		implements MegaRequestListenerInterface, MegaChatListenerInterface,
