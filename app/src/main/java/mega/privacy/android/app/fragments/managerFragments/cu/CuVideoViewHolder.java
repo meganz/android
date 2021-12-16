@@ -5,6 +5,7 @@ import mega.privacy.android.app.R;
 import mega.privacy.android.app.databinding.ItemCameraUploadsVideoBinding;
 
 import static mega.privacy.android.app.utils.TimeUtils.getVideoDuration;
+import static mega.privacy.android.app.utils.ZoomUtil.*;
 
 class CuVideoViewHolder extends CuGridViewHolder {
 
@@ -21,18 +22,27 @@ class CuVideoViewHolder extends CuGridViewHolder {
     }
 
     @Override protected void bind(CuNode node) {
-        if (mItemSizeConfig.isSmallGrid()) {
-            mBinding.videoDuration.setVisibility(View.GONE);
-            mBinding.playIcon.setVisibility(View.VISIBLE);
-        } else {
-            mBinding.playIcon.setVisibility(View.GONE);
+        switch (mItemSizeConfig.getZoom()) {
+            case ZOOM_IN_1X:
+            case ZOOM_DEFAULT  :
+                mBinding.playIcon.setVisibility(View.GONE);
 
-            if (node.getNode() != null) {
-                mBinding.videoDuration.setVisibility(View.VISIBLE);
-                mBinding.videoDuration.setText(getVideoDuration(node.getNode().getDuration()));
-            } else {
+                if (node.getNode() != null) {
+                    mBinding.videoDuration.setVisibility(View.VISIBLE);
+                    mBinding.videoDuration.setText(getVideoDuration(node.getNode().getDuration()));
+                } else {
+                    mBinding.videoDuration.setVisibility(View.GONE);
+                }
+
+                break;
+            case ZOOM_OUT_1X:
                 mBinding.videoDuration.setVisibility(View.GONE);
-            }
+                mBinding.playIcon.setVisibility(View.VISIBLE);
+
+                break;
+            default:
+                mBinding.videoDuration.setVisibility(View.GONE);
+                mBinding.playIcon.setVisibility(View.GONE);
         }
 
         mBinding.videoInfo.setBackgroundResource(

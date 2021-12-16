@@ -58,6 +58,7 @@
                     android:layout_centerHorizontal="true"
                     android:background="@drawable/rounded_background"
                     android:layout_marginBottom="8dp">
+
                     <ImageView
                         android:layout_width="24dp"
                         android:layout_height="24dp"

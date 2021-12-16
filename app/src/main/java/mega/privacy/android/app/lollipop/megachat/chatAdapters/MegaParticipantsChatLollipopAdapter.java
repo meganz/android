@@ -4,9 +4,11 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 
 import androidx.appcompat.widget.SwitchCompat;
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.text.TextUtils;
 import android.util.DisplayMetrics;
 import android.view.Display;
 import android.view.LayoutInflater;
@@ -92,7 +94,7 @@ public class MegaParticipantsChatLollipopAdapter extends RecyclerView.Adapter<Me
             super(v);
         }
 
-        RelativeLayout itemLayout;
+        ConstraintLayout itemLayout;
     }
 
     public static class ViewHolderParticipantsList extends ViewHolderParticipants {
@@ -104,9 +106,8 @@ public class MegaParticipantsChatLollipopAdapter extends RecyclerView.Adapter<Me
         private ImageView verifiedIcon;
         private MarqueeTextView textViewContent;
         private EmojiTextView textViewContactName;
-        private RelativeLayout threeDotsLayout;
+        private ImageView textViewContactIcon;
         private ImageView imageButtonThreeDots;
-        private ImageView statusImage;
 
         private ImageView permissionsIcon;
         private int currentPosition;
@@ -257,19 +258,9 @@ public class MegaParticipantsChatLollipopAdapter extends RecyclerView.Adapter<Me
                 holderList.verifiedIcon = v.findViewById(R.id.verified_icon);
                 holderList.textViewContactName = v.findViewById(R.id.participant_list_name);
                 holderList.textViewContent = v.findViewById(R.id.participant_list_content);
-                holderList.threeDotsLayout = v.findViewById(R.id.participant_list_three_dots_layout);
+                holderList.textViewContactIcon = v.findViewById(R.id.participant_list_icon_end);
                 holderList.imageButtonThreeDots = v.findViewById(R.id.participant_list_three_dots);
                 holderList.permissionsIcon = v.findViewById(R.id.participant_list_permissions);
-                holderList.statusImage = v.findViewById(R.id.group_participants_state_circle);
-
-                if (isScreenInPortrait(groupChatInfoActivity)) {
-                    holderList.textViewContactName.setMaxWidthEmojis(scaleWidthPx(MAX_WIDTH_PORT, outMetrics));
-                    holderList.textViewContent.setMaxWidth(scaleWidthPx(MAX_WIDTH_PORT, outMetrics));
-                } else {
-                    holderList.textViewContactName.setMaxWidthEmojis(scaleWidthPx(MAX_WIDTH_LAND, outMetrics));
-                    holderList.textViewContent.setMaxWidth(scaleWidthPx(MAX_WIDTH_LAND, outMetrics));
-                }
-
                 holderList.itemLayout.setTag(holderList);
 
                 v.setTag(holderList);
@@ -441,22 +432,19 @@ public class MegaParticipantsChatLollipopAdapter extends RecyclerView.Adapter<Me
                     holderParticipantsList.imageView.setImageBitmap(getDefaultAvatar(avatarColor, holderParticipantsList.fullName, AVATAR_SIZE, true));
                 }
 
+                holderParticipantsList.textViewContactName.setText(participant.getFullName());
                 MegaUser contact = participant.isEmpty() ? null : megaApi.getContact(participant.getEmail());
                 holderParticipantsList.verifiedIcon.setVisibility(contact != null && megaApi.areCredentialsVerified(contact) ? View.VISIBLE : View.GONE);
-
-
                 int userStatus = handle == megaChatApi.getMyUserHandle() ? megaChatApi.getOnlineStatus() : getUserStatus(handle);
-                setContactStatus(userStatus, ((ViewHolderParticipantsList) holder).statusImage, ((ViewHolderParticipantsList) holder).textViewContent, StatusIconLocation.STANDARD);
+                setContactStatusParticipantList(userStatus, ((ViewHolderParticipantsList) holder).textViewContactIcon, ((ViewHolderParticipantsList) holder).textViewContent, StatusIconLocation.STANDARD);
                 setContactLastGreen(groupChatInfoActivity, userStatus, participant.getLastGreen(), ((ViewHolderParticipantsList) holder).textViewContent);
-
-                holderParticipantsList.textViewContactName.setText(holderParticipantsList.fullName);
 
                 if (isPreview && megaChatApi.getInitState() == INIT_ANONYMOUS) {
                     holderParticipantsList.imageButtonThreeDots.setColorFilter(ContextCompat.getColor(groupChatInfoActivity, R.color.grey_038_white_038));
-                    holderParticipantsList.threeDotsLayout.setOnClickListener(null);
+                    holderParticipantsList.imageButtonThreeDots.setOnClickListener(null);
                     holderParticipantsList.itemLayout.setOnClickListener(null);
                 } else {
-                    holderParticipantsList.threeDotsLayout.setOnClickListener(this);
+                    holderParticipantsList.imageButtonThreeDots.setOnClickListener(this);
                     holderParticipantsList.itemLayout.setOnClickListener(this);
                     holderParticipantsList.imageButtonThreeDots.setColorFilter(ContextCompat.getColor(groupChatInfoActivity, R.color.grey_054_white_054));
                 }
@@ -471,7 +459,7 @@ public class MegaParticipantsChatLollipopAdapter extends RecyclerView.Adapter<Me
                     holderParticipantsList.permissionsIcon.setImageResource(R.drawable.ic_permissions_read_only);
                 }
 
-                holderParticipantsList.threeDotsLayout.setTag(holder);
+                holderParticipantsList.imageButtonThreeDots.setTag(holder);
                 break;
 
             case ITEM_VIEW_TYPE_ADD_PARTICIPANT:
@@ -592,7 +580,7 @@ public class MegaParticipantsChatLollipopAdapter extends RecyclerView.Adapter<Me
         }
 
         switch (v.getId()) {
-            case R.id.participant_list_three_dots_layout:
+            case R.id.participant_list_three_dots:
             case R.id.participant_list_item_layout:
                 ViewHolderParticipantsList holder = (ViewHolderParticipantsList) v.getTag();
                 int currentPosition = holder.currentPosition;
@@ -748,7 +736,7 @@ public class MegaParticipantsChatLollipopAdapter extends RecyclerView.Adapter<Me
 
             if (isTextEmpty(nameFileEmail)) {
                 holderParticipantsList.imageButtonThreeDots.setColorFilter(ContextCompat.getColor(groupChatInfoActivity, R.color.grey_038_white_038));
-                holderParticipantsList.threeDotsLayout.setOnClickListener(null);
+                holderParticipantsList.imageButtonThreeDots.setOnClickListener(null);
                 holderParticipantsList.itemLayout.setOnClickListener(null);
                 avatarBitmap = getAvatarBitmap(nameFileHandle);
             } else {

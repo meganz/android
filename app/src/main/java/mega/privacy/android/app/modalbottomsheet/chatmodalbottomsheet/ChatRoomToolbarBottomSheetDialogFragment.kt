@@ -7,12 +7,11 @@ import android.content.pm.PackageManager
 import android.os.Build
 import android.view.LayoutInflater
 import android.view.View
+import android.widget.LinearLayout
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.google.android.material.bottomsheet.BottomSheetBehavior
-import kotlinx.android.synthetic.main.bottom_sheet_sort_by.view.*
 import mega.privacy.android.app.R
 import mega.privacy.android.app.adapters.FileStorageAdapter
 import mega.privacy.android.app.databinding.BottomSheetChatRoomToolbarBinding
@@ -32,6 +31,8 @@ class ChatRoomToolbarBottomSheetDialogFragment : BaseBottomSheetDialogFragment()
     private var mPhotoUris: ArrayList<FileGalleryItem>? = null
     private lateinit var adapter: FileStorageAdapter
 
+    lateinit var mainLinearLayout :LinearLayout
+
     @SuppressLint("SetTextI18n", "RestrictedApi")
     override fun setupDialog(dialog: Dialog, style: Int) {
         super.setupDialog(dialog, style)
@@ -46,8 +47,7 @@ class ChatRoomToolbarBottomSheetDialogFragment : BaseBottomSheetDialogFragment()
         val chatActivity = requireActivity() as ChatActivityLollipop
 
         contentView = binding.root
-        mainLinearLayout = binding.root.linear_layout
-        items_layout = binding.root.linear_layout
+        mainLinearLayout = binding.linearLayout
 
         mPhotoUris = ArrayList<FileGalleryItem>()
 
@@ -111,8 +111,8 @@ class ChatRoomToolbarBottomSheetDialogFragment : BaseBottomSheetDialogFragment()
 
         dialog.setContentView(contentView)
 
-        mBehavior = BottomSheetBehavior.from(mainLinearLayout.parent as View)
-        mBehavior.state = BottomSheetBehavior.STATE_EXPANDED
+        //mBehavior = BottomSheetBehavior.from(mainLinearLayout.parent as View)
+        //mBehavior.state = BottomSheetBehavior.STATE_EXPANDED
     }
 
     private fun setupListView() {
@@ -127,7 +127,10 @@ class ChatRoomToolbarBottomSheetDialogFragment : BaseBottomSheetDialogFragment()
 
 
     private fun setupListAdapter() {
-        adapter = FileStorageAdapter(context, mPhotoUris)
+        context?.let {
+            adapter = FileStorageAdapter(it, mPhotoUris)
+
+        }
         adapter.setHasStableIds(true)
         binding.recyclerViewGallery.adapter = adapter
     }

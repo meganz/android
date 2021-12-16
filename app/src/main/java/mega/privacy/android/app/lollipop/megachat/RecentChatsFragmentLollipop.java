@@ -395,7 +395,7 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
 
         emptyLayout = v.findViewById(R.id.linear_empty_layout_chat_recent);
         emptyDescriptionText = v.findViewById(R.id.empty_description_text_recent);
-        emptyDescriptionText.setText(replaceFormatText(context.getString(R.string.empty_screen_recent_chats_description_text),
+        emptyDescriptionText.setText(replaceFormatText(context.getString(R.string.recent_chat_empty),
                 ColorUtils.getColorHexString(context, R.color.grey_300_grey_600),
                 ColorUtils.getColorHexString(context, R.color.grey_900_grey_100)));
 
@@ -651,7 +651,7 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
             inviteButton.setVisibility(View.GONE);
             emptyTextView.setText(result);
         } else {
-            textToShow = context.getString(R.string.context_empty_list_of_chats).toUpperCase();
+            textToShow = context.getString(R.string.recent_chat_empty).toUpperCase();
             result = replaceFormatText(textToShow, colorStart, colorEnd);
             emptyTextViewInvite.setText(result);
             emptyTextViewInvite.setVisibility(View.VISIBLE);

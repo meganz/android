@@ -56,6 +56,7 @@ class ExportRecoveryKeyActivity : PasscodeActivity() {
         }
     }
 
+    @Suppress("deprecation") // TODO Migrate to registerForActivityResult()
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
 

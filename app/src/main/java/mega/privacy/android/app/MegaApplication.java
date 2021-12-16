@@ -73,6 +73,7 @@ import mega.privacy.android.app.lollipop.megachat.AppRTCAudioManager;
 import mega.privacy.android.app.lollipop.megachat.BadgeIntentService;
 import mega.privacy.android.app.meeting.CallService;
 import mega.privacy.android.app.meeting.listeners.MeetingListener;
+import mega.privacy.android.app.middlelayer.crashreporter.CrashReporter;
 import mega.privacy.android.app.objects.PasscodeManagement;
 import mega.privacy.android.app.receivers.NetworkStateReceiver;
 import mega.privacy.android.app.service.crashreporter.CrashReporterImpl;
@@ -231,6 +232,8 @@ public class MegaApplication extends MultiDexApplication implements Application.
 	private MeetingListener meetingListener = new MeetingListener();
 	private GlobalChatListener globalChatListener = new GlobalChatListener(this);
 
+	private CrashReporter crashReporter;
+
     @Override
 	public void networkAvailable() {
 		logDebug("Net available: Broadcast to ManagerActivity");
@@ -253,7 +256,7 @@ public class MegaApplication extends MultiDexApplication implements Application.
 
 	@Override
 	public void onActivityCreated(@NonNull Activity activity, @Nullable Bundle savedInstanceState) {
-
+    	initLoggers();
 	}
 
 	@Override
@@ -524,10 +527,7 @@ public class MegaApplication extends MultiDexApplication implements Application.
 						backgroundStatus = megaChatApi.getBackgroundStatus();
 						logDebug("backgroundStatus_activityVisible: " + backgroundStatus);
 						if (backgroundStatus != -1 && backgroundStatus != 0) {
-							MegaHandleList callsInProgress = megaChatApi.getChatCalls(MegaChatCall.CALL_STATUS_IN_PROGRESS);
-							if (callsInProgress == null || callsInProgress.size() <= 0) {
-								megaChatApi.setBackgroundStatus(false);
-							}
+							megaChatApi.setBackgroundStatus(false);
 						}
 					}
 
@@ -624,8 +624,9 @@ public class MegaApplication extends MultiDexApplication implements Application.
 		if (chatRoom != null && call.getCallCompositionChange() == 1 && call.getNumParticipants() > 1) {
 			logDebug("Stop sound");
 			if (megaChatApi.getMyUserHandle() == call.getPeeridCallCompositionChange()) {
+				clearIncomingCallNotification(call.getCallId());
+				getChatManagement().removeValues(call.getChatid());
 				stopService(new Intent(getInstance(), IncomingCallService.class));
-				removeRTCAudioManagerRingIn();
 				LiveEventBus.get(EVENT_CALL_ANSWERED_IN_ANOTHER_CLIENT, Long.class).post(call.getChatid());
 			}
 		}
@@ -642,6 +643,10 @@ public class MegaApplication extends MultiDexApplication implements Application.
 		if (isRinging) {
 			logDebug("Is incoming call");
 			incomingCall(listAllCalls, call.getChatid(), callStatus);
+		} else {
+			clearIncomingCallNotification(call.getCallId());
+			getChatManagement().removeValues(call.getChatid());
+			stopService(new Intent(getInstance(), IncomingCallService.class));
 		}
 	};
 
@@ -719,12 +724,13 @@ public class MegaApplication extends MultiDexApplication implements Application.
 
 		ThemeHelper.INSTANCE.initTheme(this);
 
+		crashReporter = new CrashReporterImpl();
+
 		// Setup handler for uncaught exceptions.
         Thread.setDefaultUncaughtExceptionHandler((thread, e) -> {
             handleUncaughtException(thread, e);
 
-            // Send the crash info manually.
-            new CrashReporterImpl().report(e);
+            crashReporter.report(e);
         });
 
 		registerActivityLifecycleCallbacks(this);
@@ -734,8 +740,7 @@ public class MegaApplication extends MultiDexApplication implements Application.
 		keepAliveHandler.postAtTime(keepAliveRunnable, System.currentTimeMillis()+interval);
 		keepAliveHandler.postDelayed(keepAliveRunnable, interval);
 
-		initLoggerSDK();
-		initLoggerKarere();
+		initLoggers();
 
 		checkAppUpgrade();
 
@@ -833,6 +838,27 @@ public class MegaApplication extends MultiDexApplication implements Application.
 		ContextUtils.initialize(getApplicationContext());
 
 		Fresco.initialize(this);
+
+		// Try to initialize the loggers again in order to avoid have them uninitialized
+		// in case they failed to initialize before for some reason.
+		initLoggers();
+	}
+
+	/**
+	 * Initializes loggers if app storage is available and if are not initialized yet.
+	 */
+	private void initLoggers() {
+		if (getExternalFilesDir(null) == null) {
+			return;
+		}
+
+		if (!isLoggerSDKInitialized()) {
+			initLoggerSDK();
+		}
+
+		if (!isLoggerKarereInitialized()) {
+			initLoggerKarere();
+		}
 	}
 
 	public void askForFullAccountInfo(){
@@ -1010,6 +1036,7 @@ public class MegaApplication extends MultiDexApplication implements Application.
 				.subscribe((cookies, throwable) -> {
 					if (throwable == null) {
 						setAdvertisingCookiesEnabled(cookies.contains(CookieType.ADVERTISEMENT));
+                        crashReporter.setEnabled(cookies.contains(CookieType.ANALYTICS));
 					}
 				});
 	}

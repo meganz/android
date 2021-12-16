@@ -25,6 +25,7 @@ import mega.privacy.android.app.utils.permission.permissionsBuilder
  * [JoinMeetingAsGuestFragment],
  * [JoinMeetingFragment],
  * [InMeetingFragment],
+ * [MakeModeratorFragment],
  * [RingingMeetingFragment],
  * [IndividualCallFragment],
  * [GridViewCallFragment],
@@ -263,6 +264,7 @@ open class MeetingBaseFragment : BaseFragment() {
         }
     }
 
+    @Suppress("deprecation") // TODO Migrate to registerForActivityResult()
     override fun onRequestPermissionsResult(
         requestCode: Int,
         permissions: Array<out String>,

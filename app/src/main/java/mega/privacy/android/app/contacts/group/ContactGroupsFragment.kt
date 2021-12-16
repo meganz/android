@@ -1,5 +1,6 @@
 package mega.privacy.android.app.contacts.group
 
+import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -7,6 +8,8 @@ import android.view.Menu
 import android.view.MenuInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.res.ResourcesCompat
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
@@ -19,13 +22,19 @@ import mega.privacy.android.app.contacts.ContactsActivity
 import mega.privacy.android.app.contacts.group.adapter.ContactGroupsAdapter
 import mega.privacy.android.app.contacts.group.data.ContactGroupItem
 import mega.privacy.android.app.databinding.FragmentContactGroupsBinding
+import mega.privacy.android.app.interfaces.SnackbarShower
+import mega.privacy.android.app.interfaces.showSnackbar
 import mega.privacy.android.app.lollipop.AddContactActivityLollipop
+import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop
 import mega.privacy.android.app.lollipop.megachat.GroupChatInfoActivityLollipop
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.Constants.MIN_ITEMS_SCROLLBAR
+import mega.privacy.android.app.utils.LogUtil
 import mega.privacy.android.app.utils.MenuUtils.setupSearchView
+import mega.privacy.android.app.utils.StringResourcesUtils
 import mega.privacy.android.app.utils.StringUtils.formatColorTag
 import mega.privacy.android.app.utils.StringUtils.toSpannedHtmlText
+import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
 
 /**
  * Fragment that represents the UI showing the list of contact groups for the current user.
@@ -37,6 +46,52 @@ class ContactGroupsFragment : Fragment() {
 
     private val viewModel by viewModels<ContactGroupsViewModel>()
     private val groupsAdapter by lazy { ContactGroupsAdapter(::onGroupClick) }
+    private lateinit var createGroupChatLauncher: ActivityResultLauncher<Intent>
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+
+        createGroupChatLauncher =
+            registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+                val intent = result.data
+                val resultCode = result.resultCode
+                if (resultCode != Activity.RESULT_OK || intent == null) {
+                    LogUtil.logWarning("Error creating chat")
+                    return@registerForActivityResult
+                }
+
+                val contactsData =
+                    intent.getStringArrayListExtra(AddContactActivityLollipop.EXTRA_CONTACTS)
+                val isGroup =
+                    intent.getBooleanExtra(AddContactActivityLollipop.EXTRA_GROUP_CHAT, false)
+
+                if (contactsData == null || !isGroup) {
+                    LogUtil.logWarning("Is one to one chat or no contacts selected")
+                    return@registerForActivityResult
+                }
+
+                val chatTitle =
+                    intent.getStringExtra(AddContactActivityLollipop.EXTRA_CHAT_TITLE)
+
+                viewModel.getGroupChatRoom(contactsData, chatTitle)
+                    .observe(viewLifecycleOwner) { chatId ->
+                        if (chatId == MEGACHAT_INVALID_HANDLE) {
+                            (requireActivity() as SnackbarShower).showSnackbar(
+                                StringResourcesUtils.getString(R.string.create_chat_error)
+                            )
+                        } else {
+                            Intent(
+                                requireContext(),
+                                ChatActivityLollipop::class.java
+                            ).apply {
+                                action = Constants.ACTION_CHAT_SHOW_MESSAGES
+                                putExtra(Constants.CHAT_ID, chatId)
+                                startActivity(this)
+                            }
+                        }
+                    }
+            }
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -84,16 +139,27 @@ class ContactGroupsFragment : Fragment() {
         binding.listScroller.setRecyclerView(binding.list)
 
         binding.btnCreateGroup.setOnClickListener {
-            startActivity(Intent(requireContext(), AddContactActivityLollipop::class.java).apply {
+            val intent = Intent(
+                requireContext(),
+                AddContactActivityLollipop::class.java
+            ).apply {
                 putExtra(AddContactActivityLollipop.EXTRA_CONTACT_TYPE, Constants.CONTACT_TYPE_MEGA)
                 putExtra(AddContactActivityLollipop.EXTRA_ONLY_CREATE_GROUP, true)
-            })
+            }
+            intentToCreateGroupChat(intent)
         }
 
         binding.viewEmpty.text = binding.viewEmpty.text.toString()
             .formatColorTag(requireContext(), 'A', R.color.grey_900_grey_100)
             .formatColorTag(requireContext(), 'B', R.color.grey_300_grey_600)
             .toSpannedHtmlText()
+    }
+
+    /**
+     * Launches an Intent to open create group chat room screen.
+     */
+    private fun intentToCreateGroupChat(intent: Intent) {
+        createGroupChatLauncher.launch(intent)
     }
 
     private fun setupObservers() {

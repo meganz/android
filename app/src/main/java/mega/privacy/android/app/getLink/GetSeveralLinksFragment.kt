@@ -3,10 +3,12 @@ package mega.privacy.android.app.getLink
 import android.content.Intent
 import android.os.Bundle
 import android.view.*
+import androidx.activity.result.ActivityResultLauncher
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import mega.privacy.android.app.BaseActivity
 import mega.privacy.android.app.R
+import mega.privacy.android.app.activities.contract.ChatExplorerActivityContract
 import mega.privacy.android.app.components.PositionDividerItemDecoration
 import mega.privacy.android.app.components.attacher.MegaAttacher
 import mega.privacy.android.app.databinding.FragmentGetSeveralLinksBinding
@@ -15,7 +17,6 @@ import mega.privacy.android.app.getLink.data.LinkItem
 import mega.privacy.android.app.interfaces.ActivityLauncher
 import mega.privacy.android.app.interfaces.SnackbarShower
 import mega.privacy.android.app.interfaces.showSnackbar
-import mega.privacy.android.app.lollipop.megachat.ChatExplorerActivity
 import mega.privacy.android.app.utils.Constants.*
 import mega.privacy.android.app.utils.MenuUtils.toggleAllMenuItemsVisibility
 import mega.privacy.android.app.utils.StringResourcesUtils
@@ -29,9 +30,24 @@ class GetSeveralLinksFragment : Fragment() {
     private val viewModel: GetSeveralLinksViewModel by activityViewModels()
 
     private lateinit var binding: FragmentGetSeveralLinksBinding
+    private lateinit var chatLauncher: ActivityResultLauncher<Unit?>
     private var menu: Menu? = null
 
     private val linksAdapter by lazy { LinksAdapter() }
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        chatLauncher = registerForActivityResult(ChatExplorerActivityContract()) { data ->
+            data?.putStringArrayListExtra(EXTRA_SEVERAL_LINKS, viewModel.getLinksList())
+
+            MegaAttacher(requireActivity() as ActivityLauncher).handleActivityResult(
+                REQUEST_CODE_SELECT_CHAT,
+                BaseActivity.RESULT_OK,
+                data,
+                requireActivity() as SnackbarShower
+            )
+        }
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -61,29 +77,11 @@ class GetSeveralLinksFragment : Fragment() {
                 )
             }
             R.id.action_chat -> {
-                startActivityForResult(
-                    Intent(requireContext(), ChatExplorerActivity::class.java),
-                    REQUEST_CODE_SEND_SEVERAL_LINKS
-                )
+                chatLauncher.launch(Unit)
             }
         }
 
         return super.onOptionsItemSelected(item)
-    }
-
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-
-        if (resultCode == BaseActivity.RESULT_OK && requestCode == REQUEST_CODE_SEND_SEVERAL_LINKS) {
-            data?.putStringArrayListExtra(EXTRA_SEVERAL_LINKS, viewModel.getLinksList())
-
-            MegaAttacher(requireActivity() as ActivityLauncher).handleActivityResult(
-                REQUEST_CODE_SELECT_CHAT,
-                BaseActivity.RESULT_OK,
-                data,
-                requireActivity() as SnackbarShower
-            )
-        }
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {

@@ -1,5 +1,6 @@
 package mega.privacy.android.app.fragments.homepage.photos
 
+import android.text.Spanned
 import mega.privacy.android.app.fragments.homepage.NodeItem
 import mega.privacy.android.app.utils.Constants.INVALID_POSITION
 import nz.mega.sdk.MegaNode
@@ -11,6 +12,7 @@ data class PhotoNodeItem(
     override var node: MegaNode? = null,
     override var index: Int = INVALID_POSITION,      // Index of Node including TYPE_TITLE node (RecyclerView Layout position)
     override var modifiedDate: String = "",
+    var formattedDate: Spanned? = null,
     override var thumbnail: File? = null,
     override var selected: Boolean = false,
     override var uiDirty: Boolean = true   // Force refresh the newly created Node list item
