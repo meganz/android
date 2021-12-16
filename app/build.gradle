@@ -285,6 +285,7 @@ dependencies {
     androidTestImplementation ("androidx.test.espresso:espresso-contrib:$espressoVersion") {
         exclude group: 'org.checkerframework', module: 'checker'
     }
+    androidTestImplementation "androidx.test.espresso:espresso-intents:$espressoVersion"
 
     kaptAndroidTest "com.google.dagger:hilt-android-compiler:$hiltVersion"
     debugImplementation "androidx.fragment:fragment-testing:$fragment_version"

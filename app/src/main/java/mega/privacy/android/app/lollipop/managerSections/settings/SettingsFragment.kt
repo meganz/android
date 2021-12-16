@@ -76,30 +76,76 @@ class SettingsFragment : Preference.OnPreferenceChangeListener,
         }
     }
 
-
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
         addPreferencesFromResource(R.xml.preferences)
         updateCancelAccountSetting()
-
         checkUIPreferences()
         update2FAVisibility()
         setAutoAccept = false
         autoAcceptSetting = true
     }
 
-    fun updatePasscodeLockSubtitle() {
-        findPreference<Preference>(KEY_PASSCODE_LOCK)?.setSummary(if (viewModel.passcodeLock) R.string.mute_chat_notification_option_on else R.string.mute_chatroom_notification_option_off)
+    /**
+     * Update the Cancel Account settings.
+     */
+    override fun updateCancelAccountSetting() {
+        if (viewModel.canNotDeleteAccount) {
+            findPreference<PreferenceCategory>(CATEGORY_ABOUT)?.removePreference(
+                findPreference(
+                    KEY_CANCEL_ACCOUNT
+                )
+            )
+        }
     }
 
     /**
-     * Updates the hide recent activity setting.
-     *
-     * @param hide True if should enable the setting, false otherwise.
+     * Checks and sets the User interface setting values.
      */
-    private fun updateHideRecentActivitySetting(hide: Boolean) {
-        if (hide != findPreference<SwitchPreferenceCompat>(KEY_HIDE_RECENT_ACTIVITY)?.isChecked) {
-            findPreference<SwitchPreferenceCompat>(KEY_HIDE_RECENT_ACTIVITY)?.isChecked = hide
+    fun checkUIPreferences() {
+        updateStartScreenSetting(viewModel.startScreen)
+        findPreference<SwitchPreferenceCompat>(KEY_HIDE_RECENT_ACTIVITY)?.isChecked =
+            viewModel.hideRecentActivity
+    }
+
+    /**
+     * Updates the start screen setting.
+     *
+     * @param newStartScreen Value to set as new start screen.
+     */
+    fun updateStartScreenSetting(newStartScreen: Int) {
+        val startScreenSummary =
+            resources.getStringArray(R.array.settings_start_screen)[newStartScreen]
+        findPreference<Preference>(KEY_START_SCREEN)?.summary = startScreenSummary
+    }
+
+    override fun update2FAVisibility() {
+        if (viewModel.multiFactorAuthAvailable) {
+            findPreference<SwitchPreferenceCompat>(KEY_2FA)?.isEnabled = false
+            findPreference<SwitchPreferenceCompat>(KEY_2FA)?.isVisible = true
+            viewModel.multiFactorAuthCheck(activity as SettingsActivity)
+        } else {
+            findPreference<SwitchPreferenceCompat>(KEY_2FA)?.isVisible = false
         }
+    }
+
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
+        val v = super.onCreateView(inflater, container, savedInstanceState)
+        setOnlineOptions(Util.isOnline(context) && viewModel.hasRootNode)
+        val playerServiceIntent = Intent(requireContext(), AudioPlayerService::class.java)
+        requireContext().bindService(playerServiceIntent, mediaServiceConnection, 0)
+        return v
+    }
+
+    override fun setOnlineOptions(isOnline: Boolean) {
+        findPreference<Preference>(KEY_FEATURES_CAMERA_UPLOAD)?.isEnabled = isOnline
+        findPreference<Preference>(KEY_FEATURES_CHAT)?.isEnabled = isOnline
+        findPreference<SwitchPreferenceCompat>(KEY_2FA)?.isEnabled = isOnline
+        findPreference<SwitchPreferenceCompat>(KEY_QR_CODE_AUTO_ACCEPT)?.isEnabled = isOnline
+        findPreference<Preference>(KEY_CANCEL_ACCOUNT)?.isEnabled = isOnline
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -131,15 +177,6 @@ class SettingsFragment : Preference.OnPreferenceChangeListener,
         restoreEvaluateDialogState(savedInstanceState)
     }
 
-    private fun restoreEvaluateDialogState(savedInstanceState: Bundle?) {
-        if (savedInstanceState != null) {
-            bEvaluateAppDialogShow = savedInstanceState.getBoolean(EVALUATE_APP_DIALOG_SHOW)
-        }
-        if (bEvaluateAppDialogShow) {
-            showEvaluatedAppDialog()
-        }
-    }
-
     private fun setupObservers() {
         LiveEventBus.get(EVENT_UPDATE_START_SCREEN, Int::class.java)
             .observe(
@@ -149,11 +186,29 @@ class SettingsFragment : Preference.OnPreferenceChangeListener,
             .observe(viewLifecycleOwner, { hide: Boolean -> updateHideRecentActivitySetting(hide) })
     }
 
-    override fun onSaveInstanceState(outState: Bundle) {
-        super.onSaveInstanceState(outState)
-        if (evaluateAppDialog != null && evaluateAppDialog?.isShowing == true) {
-            outState.putBoolean(EVALUATE_APP_DIALOG_SHOW, bEvaluateAppDialogShow)
-        }
+    /**
+     * Updates the hide recent activity setting.
+     *
+     * @param hide True if should enable the setting, false otherwise.
+     */
+    private fun updateHideRecentActivitySetting(hide: Boolean) {
+        findPreference<SwitchPreferenceCompat>(KEY_HIDE_RECENT_ACTIVITY)?.takeIf { it.isChecked != hide }?.let { it.isChecked = hide }
+    }
+
+    override fun goToCategoryStorage() {
+        val storagePreference = findPreference<Preference>(KEY_STORAGE_FILE_MANAGEMENT)
+        scrollToPreference(storagePreference)
+        onPreferenceTreeClick(storagePreference)
+    }
+
+    override fun goToCategoryQR() {
+        scrollToPreference(findPreference<SwitchPreferenceCompat>(KEY_QR_CODE_AUTO_ACCEPT))
+    }
+
+    override fun goToSectionStartScreen() {
+        scrollToPreference(findPreference(KEY_START_SCREEN))
+        startActivity(Intent(context, StartScreenPreferencesActivity::class.java))
+        (activity as SettingsActivity).openSettingsStartScreen = false
     }
 
     /**
@@ -167,21 +222,136 @@ class SettingsFragment : Preference.OnPreferenceChangeListener,
             .changeAppBarElevation(listView.canScrollVertically(Constants.SCROLLING_UP_DIRECTION))
     }
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
-        val v = super.onCreateView(inflater, container, savedInstanceState)
-        setOnlineOptions(Util.isOnline(context) && viewModel.hasRootNode)
-        val playerServiceIntent = Intent(requireContext(), AudioPlayerService::class.java)
-        requireContext().bindService(playerServiceIntent, mediaServiceConnection, 0)
-        return v
+    private fun restoreEvaluateDialogState(savedInstanceState: Bundle?) {
+        if (savedInstanceState != null) {
+            bEvaluateAppDialogShow = savedInstanceState.getBoolean(EVALUATE_APP_DIALOG_SHOW)
+        }
+        if (bEvaluateAppDialogShow) {
+            showEvaluatedAppDialog()
+        }
     }
 
-    override fun onDestroyView() {
-        requireContext().unbindService(mediaServiceConnection)
-        super.onDestroyView()
+    private fun showEvaluatedAppDialog() {
+        evaluateAppDialog = createFeedbackDialog()
+        evaluateAppDialog?.show()
+        bEvaluateAppDialogShow = true
+    }
+
+    private fun createFeedbackDialog(): AlertDialog {
+        return MaterialAlertDialogBuilder(requireContext())
+            .setView(createFeedbackDialogView())
+            .setTitle(getString(R.string.title_evaluate_the_app_panel))
+            .create()
+    }
+
+    private fun createFeedbackDialogView(): View? {
+        val dialogLayout = layoutInflater.inflate(R.layout.evaluate_the_app_dialog, null)
+
+        val display = requireActivity().windowManager.defaultDisplay
+        val outMetrics = DisplayMetrics()
+        display.getMetrics(outMetrics)
+
+        val rateAppCheck = dialogLayout.findViewById<CheckedTextView>(R.id.rate_the_app)
+        setFeedbackMargins(rateAppCheck, outMetrics)
+        rateAppCheck.setOnClickListener {
+            LogUtil.logDebug("Rate the app")
+            //Rate the app option:
+            startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(RATE_APP_URL)))
+            dismissEvaluateDialog()
+        }
+
+        val sendFeedbackCheck =
+            dialogLayout.findViewById<CheckedTextView>(R.id.send_feedback)
+        setFeedbackMargins(sendFeedbackCheck, outMetrics)
+        sendFeedbackCheck.setOnClickListener {
+            LogUtil.logDebug("Send Feedback")
+            val body = generateBody()
+            val versionApp = getString(R.string.app_version)
+            val subject = getString(R.string.setting_feedback_subject) + " v" + versionApp
+            sendEmail(subject, body)
+            dismissEvaluateDialog()
+        }
+        return dialogLayout
+    }
+
+    private fun setFeedbackMargins(
+        sendFeedbackCheck: CheckedTextView,
+        outMetrics: DisplayMetrics
+    ) {
+        sendFeedbackCheck.compoundDrawablePadding = Util.scaleWidthPx(10, outMetrics)
+        val sendFeedbackMLP = sendFeedbackCheck.layoutParams as MarginLayoutParams
+        sendFeedbackMLP.setMargins(
+            Util.scaleWidthPx(15, outMetrics),
+            Util.scaleHeightPx(10, outMetrics),
+            0,
+            Util.scaleHeightPx(10, outMetrics)
+        )
+    }
+
+    private fun generateBody(): String {
+        return StringBuilder()
+            .append(getString(R.string.setting_feedback_body))
+            .append("\n\n\n\n\n\n\n\n\n\n\n")
+            .append(getString(R.string.settings_feedback_body_device_model)).append("  ")
+            .append(Util.getDeviceName()).append("\n")
+            .append(getString(R.string.settings_feedback_body_android_version)).append("  ")
+            .append(Build.VERSION.RELEASE)
+            .append(" ").append(Build.DISPLAY).append("\n")
+            .append(getString(R.string.user_account_feedback)).append("  ")
+            .append(viewModel.email)
+            .append(" (${getAccountTypeLabel()})")
+            .toString()
+    }
+
+    private fun getAccountTypeLabel() = when (viewModel.accountType) {
+        Constants.FREE -> getString(R.string.my_account_free)
+        Constants.PRO_I -> getString(R.string.my_account_pro1)
+        Constants.PRO_II -> getString(R.string.my_account_pro2)
+        Constants.PRO_III -> getString(R.string.my_account_pro3)
+        Constants.PRO_LITE -> getString(R.string.my_account_prolite_feedback_email)
+        Constants.BUSINESS -> getString(R.string.business_label)
+        else -> getString(R.string.my_account_free)
+    }
+
+    private fun sendEmail(subject: String, body: String) {
+        val emailIntent = Intent(Intent.ACTION_SEND)
+        emailIntent.type = Constants.TYPE_TEXT_PLAIN
+        emailIntent.putExtra(Intent.EXTRA_EMAIL, arrayOf(Constants.MAIL_ANDROID))
+        emailIntent.putExtra(Intent.EXTRA_SUBJECT, subject)
+        emailIntent.putExtra(Intent.EXTRA_TEXT, body)
+        startActivity(Intent.createChooser(emailIntent, " "))
+    }
+
+    private fun dismissEvaluateDialog() {
+        if (evaluateAppDialog != null) {
+            evaluateAppDialog?.dismiss()
+            bEvaluateAppDialogShow = false
+        }
+    }
+
+    override fun onResume() {
+        viewModel.refreshAccount()
+        refreshCameraUploadsSettings()
+        updatePasscodeLockSubtitle()
+        if (!Util.isOnline(context)) {
+            findPreference<Preference>(KEY_FEATURES_CHAT)?.isEnabled = false
+            findPreference<Preference>(KEY_FEATURES_CAMERA_UPLOAD)?.isEnabled = false
+        }
+        super.onResume()
+    }
+
+    /**
+     * Refresh the Camera Uploads service settings depending on the service status.
+     */
+    override fun refreshCameraUploadsSettings() {
+        var isCameraUploadOn = false
+        isCameraUploadOn = viewModel.isCamSyncEnabled
+        findPreference<Preference>(KEY_FEATURES_CAMERA_UPLOAD)?.summary =
+            getString(if (isCameraUploadOn) R.string.mute_chat_notification_option_on else R.string.mute_chatroom_notification_option_off)
+    }
+
+    fun updatePasscodeLockSubtitle() {
+        findPreference<Preference>(KEY_PASSCODE_LOCK)?.setSummary(if (viewModel.passcodeLock) R.string.mute_chat_notification_option_on else R.string.mute_chatroom_notification_option_off)
     }
 
     override fun onPreferenceChange(preference: Preference?, newValue: Any?): Boolean {
@@ -215,7 +385,7 @@ class SettingsFragment : Preference.OnPreferenceChangeListener,
                     DownloadPreferencesActivity::class.java
                 )
             )
-            KEY_STORAGE_FILE_MANAGEMENT -> startActivity(
+            KEY_STORAGE_FILE_MANAGEMENT -> requireActivity().startActivity(
                 Intent(
                     context,
                     FileManagementPreferencesActivity::class.java
@@ -353,6 +523,12 @@ class SettingsFragment : Preference.OnPreferenceChangeListener,
         return true
     }
 
+    private fun launchWebPage(url: String) {
+        val viewIntent = Intent(Intent.ACTION_VIEW)
+        viewIntent.data = Uri.parse(url)
+        startActivity(viewIntent)
+    }
+
     private fun resetCounters(key: String?) {
         if (key != KEY_ABOUT_APP_VERSION) {
             numberOfClicksAppVersion = 0
@@ -365,36 +541,6 @@ class SettingsFragment : Preference.OnPreferenceChangeListener,
         }
     }
 
-    private fun launchWebPage(url: String) {
-        val viewIntent = Intent(Intent.ACTION_VIEW)
-        viewIntent.data = Uri.parse(url)
-        startActivity(viewIntent)
-    }
-
-    override fun onResume() {
-        viewModel.refreshAccount()
-        refreshCameraUploadsSettings()
-        updatePasscodeLockSubtitle()
-        if (!Util.isOnline(context)) {
-            findPreference<Preference>(KEY_FEATURES_CHAT)?.isEnabled = false
-            findPreference<Preference>(KEY_FEATURES_CAMERA_UPLOAD)?.isEnabled = false
-        }
-        super.onResume()
-    }
-
-    /**
-     * Update the Cancel Account settings.
-     */
-    override fun updateCancelAccountSetting() {
-        if (viewModel.canNotDeleteAccount) {
-            findPreference<PreferenceCategory>(CATEGORY_ABOUT)?.removePreference(
-                findPreference(
-                    KEY_CANCEL_ACCOUNT
-                )
-            )
-        }
-    }
-
     /**
      * Scroll to the beginning of Settings page.
      * In this case, the beginning is category KEY_FEATURES.
@@ -404,140 +550,6 @@ class SettingsFragment : Preference.OnPreferenceChangeListener,
      */
     override fun goToFirstCategory() {
         scrollToPreference(findPreference<PreferenceCategory>(KEY_FEATURES))
-    }
-
-    override fun goToCategoryStorage() {
-        val storagePreference = findPreference<Preference>(KEY_STORAGE_FILE_MANAGEMENT)
-        scrollToPreference(storagePreference)
-        onPreferenceTreeClick(storagePreference)
-    }
-
-    override fun goToCategoryQR() {
-        scrollToPreference(findPreference<SwitchPreferenceCompat>(KEY_QR_CODE_AUTO_ACCEPT))
-    }
-
-    override fun goToSectionStartScreen() {
-        scrollToPreference(findPreference(KEY_START_SCREEN))
-        startActivity(Intent(context, StartScreenPreferencesActivity::class.java))
-        (activity as SettingsActivity).openSettingsStartScreen = false
-    }
-
-    override fun setOnlineOptions(isOnline: Boolean) {
-        findPreference<Preference>(KEY_FEATURES_CAMERA_UPLOAD)?.isEnabled = isOnline
-        findPreference<Preference>(KEY_FEATURES_CHAT)?.isEnabled = isOnline
-        findPreference<SwitchPreferenceCompat>(KEY_2FA)?.isEnabled = isOnline
-        findPreference<SwitchPreferenceCompat>(KEY_QR_CODE_AUTO_ACCEPT)?.isEnabled = isOnline
-        findPreference<Preference>(KEY_CANCEL_ACCOUNT)?.isEnabled = isOnline
-    }
-
-    override fun update2FAVisibility() {
-
-            if (viewModel.multiFactorAuthAvailable) {
-                findPreference<SwitchPreferenceCompat>(KEY_2FA)?.isEnabled = false
-                findPreference<SwitchPreferenceCompat>(KEY_2FA)?.isVisible = true
-                viewModel.multiFactorAuthCheck(activity as SettingsActivity)
-            } else {
-                findPreference<SwitchPreferenceCompat>(KEY_2FA)?.isVisible = false
-            }
-
-    }
-
-    private fun showEvaluatedAppDialog() {
-        evaluateAppDialog = createFeedbackDialog()
-        evaluateAppDialog?.show()
-        bEvaluateAppDialogShow = true
-    }
-
-    private fun createFeedbackDialog(): AlertDialog {
-        return MaterialAlertDialogBuilder(requireContext())
-            .setView(createFeedbackDialogView())
-            .setTitle(getString(R.string.title_evaluate_the_app_panel))
-            .create()
-    }
-
-    private fun createFeedbackDialogView(): View? {
-        val dialogLayout = layoutInflater.inflate(R.layout.evaluate_the_app_dialog, null)
-
-        val display = requireActivity().windowManager.defaultDisplay
-        val outMetrics = DisplayMetrics()
-        display.getMetrics(outMetrics)
-
-        val rateAppCheck = dialogLayout.findViewById<CheckedTextView>(R.id.rate_the_app)
-        setFeedbackMargins(rateAppCheck, outMetrics)
-        rateAppCheck.setOnClickListener {
-            LogUtil.logDebug("Rate the app")
-            //Rate the app option:
-            startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(RATE_APP_URL)))
-            dismissEvaluateDialog()
-        }
-
-        val sendFeedbackCheck =
-            dialogLayout.findViewById<CheckedTextView>(R.id.send_feedback)
-        setFeedbackMargins(sendFeedbackCheck, outMetrics)
-        sendFeedbackCheck.setOnClickListener {
-            LogUtil.logDebug("Send Feedback")
-            val body = generateBody()
-            val versionApp = getString(R.string.app_version)
-            val subject = getString(R.string.setting_feedback_subject) + " v" + versionApp
-            sendEmail(subject, body)
-            dismissEvaluateDialog()
-        }
-        return dialogLayout
-    }
-
-    private fun setFeedbackMargins(
-        sendFeedbackCheck: CheckedTextView,
-        outMetrics: DisplayMetrics
-    ) {
-        sendFeedbackCheck.compoundDrawablePadding = Util.scaleWidthPx(10, outMetrics)
-        val sendFeedbackMLP = sendFeedbackCheck.layoutParams as MarginLayoutParams
-        sendFeedbackMLP.setMargins(
-            Util.scaleWidthPx(15, outMetrics),
-            Util.scaleHeightPx(10, outMetrics),
-            0,
-            Util.scaleHeightPx(10, outMetrics)
-        )
-    }
-
-    private fun generateBody(): String {
-        return StringBuilder()
-            .append(getString(R.string.setting_feedback_body))
-            .append("\n\n\n\n\n\n\n\n\n\n\n")
-            .append(getString(R.string.settings_feedback_body_device_model)).append("  ")
-            .append(Util.getDeviceName()).append("\n")
-            .append(getString(R.string.settings_feedback_body_android_version)).append("  ")
-            .append(Build.VERSION.RELEASE)
-            .append(" ").append(Build.DISPLAY).append("\n")
-            .append(getString(R.string.user_account_feedback)).append("  ")
-            .append(viewModel.email)
-            .append(" (${getAccountTypeLabel()})")
-            .toString()
-    }
-
-    private fun getAccountTypeLabel() = when (viewModel.accountType) {
-        Constants.FREE -> getString(R.string.my_account_free)
-        Constants.PRO_I -> getString(R.string.my_account_pro1)
-        Constants.PRO_II -> getString(R.string.my_account_pro2)
-        Constants.PRO_III -> getString(R.string.my_account_pro3)
-        Constants.PRO_LITE -> getString(R.string.my_account_prolite_feedback_email)
-        Constants.BUSINESS -> getString(R.string.business_label)
-        else -> getString(R.string.my_account_free)
-    }
-
-    private fun sendEmail(subject: String, body: String) {
-        val emailIntent = Intent(Intent.ACTION_SEND)
-        emailIntent.type = Constants.TYPE_TEXT_PLAIN
-        emailIntent.putExtra(Intent.EXTRA_EMAIL, arrayOf(Constants.MAIL_ANDROID))
-        emailIntent.putExtra(Intent.EXTRA_SUBJECT, subject)
-        emailIntent.putExtra(Intent.EXTRA_TEXT, body)
-        startActivity(Intent.createChooser(emailIntent, " "))
-    }
-
-    private fun dismissEvaluateDialog() {
-        if (evaluateAppDialog != null) {
-            evaluateAppDialog?.dismiss()
-            bEvaluateAppDialogShow = false
-        }
     }
 
     /**
@@ -559,36 +571,16 @@ class SettingsFragment : Preference.OnPreferenceChangeListener,
         findPreference<SwitchPreferenceCompat>(KEY_QR_CODE_AUTO_ACCEPT)?.isChecked = autoAccept
     }
 
-    /**
-     * Refresh the Camera Uploads service settings depending on the service status.
-     */
-    override fun refreshCameraUploadsSettings() {
-        var isCameraUploadOn = false
-        isCameraUploadOn = viewModel.isCamSyncEnabled
-        findPreference<Preference>(KEY_FEATURES_CAMERA_UPLOAD)?.summary =
-            getString(if (isCameraUploadOn) R.string.mute_chat_notification_option_on else R.string.mute_chatroom_notification_option_off)
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        if (evaluateAppDialog != null && evaluateAppDialog?.isShowing == true) {
+            outState.putBoolean(EVALUATE_APP_DIALOG_SHOW, bEvaluateAppDialogShow)
+        }
     }
 
-    /**
-     * Updates the start screen setting.
-     *
-     * @param newStartScreen Value to set as new start screen.
-     */
-    fun updateStartScreenSetting(newStartScreen: Int) {
-        val startScreenSummary =
-            resources.getStringArray(R.array.settings_start_screen)[newStartScreen]
-        findPreference<Preference>(KEY_START_SCREEN)?.summary = startScreenSummary
-    }
-
-    /**
-     * Checks and sets the User interface setting values.
-     */
-    fun checkUIPreferences() {
-        val sharedPreferences = requireContext()
-            .getSharedPreferences(USER_INTERFACE_PREFERENCES, Context.MODE_PRIVATE)
-        updateStartScreenSetting(sharedPreferences.getInt(PREFERRED_START_SCREEN, HOME_BNV))
-        findPreference<SwitchPreferenceCompat>(KEY_HIDE_RECENT_ACTIVITY)?.isChecked =
-            sharedPreferences.getBoolean(HIDE_RECENT_ACTIVITY, false)
+    override fun onDestroyView() {
+        requireContext().unbindService(mediaServiceConnection)
+        super.onDestroyView()
     }
 
 }

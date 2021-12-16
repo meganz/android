@@ -9,4 +9,6 @@ interface SettingsRepository {
     fun getPreferences(): MegaPreferences?
     fun setPasscodeLockEnabled(enabled: Boolean)
     fun fetchContactLinksOption(listenerInterface: MegaRequestListenerInterface)
+    fun getStartScreen(): Int
+    fun shouldHideRecentActivity(): Boolean
 }

@@ -22,6 +22,8 @@ class CustomTestRunner : AndroidJUnitRunner() {
     }
 }
 
+const val testFragmentTag = "underTest"
+
 /**
  * launchFragmentInContainer from the androidx.fragment:fragment-testing library
  * is NOT possible to use right now as it uses a hardcoded Activity under the hood
@@ -35,7 +37,7 @@ inline fun <reified T : Fragment> launchFragmentInHiltContainer(
     fragmentArgs: Bundle? = null,
     @StyleRes themeResId: Int = R.style.FragmentScenarioEmptyFragmentActivityTheme,
     crossinline action: Fragment.() -> Unit = {}
-) {
+): ActivityScenario<HiltTestActivity>? {
     val startActivityIntent = Intent.makeMainActivity(
         ComponentName(
             ApplicationProvider.getApplicationContext(),
@@ -46,7 +48,7 @@ inline fun <reified T : Fragment> launchFragmentInHiltContainer(
         themeResId
     )
 
-    ActivityScenario.launch<HiltTestActivity>(startActivityIntent).onActivity { activity ->
+    return ActivityScenario.launch<HiltTestActivity>(startActivityIntent).onActivity { activity ->
         val fragment: Fragment = activity.supportFragmentManager.fragmentFactory.instantiate(
             Preconditions.checkNotNull(T::class.java.classLoader),
             T::class.java.name
@@ -54,9 +56,13 @@ inline fun <reified T : Fragment> launchFragmentInHiltContainer(
         fragment.arguments = fragmentArgs
         activity.supportFragmentManager
             .beginTransaction()
-            .add(android.R.id.content, fragment, "")
+            .add(android.R.id.content, fragment, testFragmentTag)
             .commitNow()
 
         fragment.action()
     }
+}
+
+fun <T: Fragment> HiltTestActivity.testFragment(): T {
+    return supportFragmentManager.findFragmentByTag(testFragmentTag) as T
 }

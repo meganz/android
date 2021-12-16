@@ -1,14 +1,17 @@
 package mega.privacy.android.app.data.repository
 
 import android.content.Context
+import android.content.SharedPreferences
 import dagger.hilt.android.qualifiers.ApplicationContext
 import mega.privacy.android.app.DatabaseHandler
 import mega.privacy.android.app.MegaAttributes
 import mega.privacy.android.app.MegaPreferences
 import mega.privacy.android.app.di.MegaApi
 import mega.privacy.android.app.domain.repository.SettingsRepository
+import mega.privacy.android.app.fragments.settingsFragments.startSceen.util.StartScreenUtil
 import mega.privacy.android.app.utils.FileUtil
 import mega.privacy.android.app.utils.LogUtil
+import mega.privacy.android.app.utils.SharedPreferenceConstants
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaRequestListenerInterface
 import javax.inject.Inject
@@ -40,6 +43,25 @@ class DefaultSettingsRepository @Inject constructor(
 
     override fun fetchContactLinksOption(listenerInterface: MegaRequestListenerInterface) {
         sdk.getContactLinksOption(listenerInterface)
+    }
+
+    override fun getStartScreen(): Int {
+        return getUiPreferences().getInt(
+            SharedPreferenceConstants.PREFERRED_START_SCREEN,
+            StartScreenUtil.HOME_BNV
+        )
+    }
+
+    override fun shouldHideRecentActivity(): Boolean {
+        return getUiPreferences().getBoolean(SharedPreferenceConstants.HIDE_RECENT_ACTIVITY, false)
+    }
+
+    private fun getUiPreferences(): SharedPreferences {
+        return context
+            .getSharedPreferences(
+                SharedPreferenceConstants.USER_INTERFACE_PREFERENCES,
+                Context.MODE_PRIVATE
+            )
     }
 
     override fun getAttributes(): MegaAttributes = databaseHandler.attributes

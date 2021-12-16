@@ -20,8 +20,14 @@ class SettingsViewModel @ViewModelInject constructor(
     private val rootNodeExists: RootNodeExists,
     private val isMultiFactorAuthAvailable: IsMultiFactorAuthAvailable,
     private val fetchContactLinksOption: FetchContactLinksOption,
-    private val performMultiFactorAuthCheck: PerformMultiFactorAuthCheck
+    private val performMultiFactorAuthCheck: PerformMultiFactorAuthCheck,
+    private val getStartScreen: GetStartScreen,
+    private val shouldHideRecentActivity: ShouldHideRecentActivity,
 ) : ViewModel() {
+    val hideRecentActivity: Boolean
+        get() = shouldHideRecentActivity()
+    val startScreen: Int
+        get() = getStartScreen()
     val passcodeLock: Boolean
         get() = refreshPasscodeLockPreference()
     val email: String

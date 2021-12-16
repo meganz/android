@@ -2,6 +2,7 @@ package mega.privacy.android.app.lollipop.managerSections.settings
 
 import nz.mega.sdk.MegaRequestListenerInterface
 
+@Deprecated("Dependencies between fragments and their host activities need to be removed.")
 interface SettingsActivity : MegaRequestListenerInterface {
     fun changeAppBarElevation(canScrollVertically: Boolean)
     fun askConfirmationDeleteAccount()

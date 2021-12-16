@@ -65,4 +65,14 @@ abstract class SettingsModule {
         useCase: DefaultPerformMultiFactorAuthCheck
     ): PerformMultiFactorAuthCheck
 
+    @Binds
+    abstract fun bindGetStartScreen(
+        useCase: DefaultGetStartScreen
+    ): GetStartScreen
+
+    @Binds
+    abstract fun bindShouldHideRecentActivity(
+        useCase: DefaultShouldHideRecentActivity
+    ): ShouldHideRecentActivity
+
 }

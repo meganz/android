@@ -1,45 +1,76 @@
 package test.mega.privacy.android.app.lollipop.managerSections.settings
 
+import android.app.Activity
+import android.app.Instrumentation
+import android.content.ComponentName
+import android.content.Context
+import androidx.test.core.app.ApplicationProvider
 import androidx.test.espresso.Espresso.onView
-import androidx.test.espresso.matcher.ViewMatchers.withId
-import androidx.test.espresso.matcher.ViewMatchers.withText
+import androidx.test.espresso.intent.Intents
+import androidx.test.espresso.intent.Intents.intended
+import androidx.test.espresso.intent.Intents.intending
+import androidx.test.espresso.intent.matcher.ComponentNameMatchers.hasClassName
+import androidx.test.espresso.intent.matcher.ComponentNameMatchers.hasShortClassName
+import androidx.test.espresso.intent.matcher.IntentMatchers.*
+import androidx.test.espresso.intent.rule.IntentsTestRule
+import androidx.test.espresso.matcher.ViewMatchers.*
+import androidx.test.filters.SdkSuppress
+import androidx.test.filters.Suppress
+import com.jeremyliao.liveeventbus.LiveEventBus
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.components.ActivityRetainedComponent
 import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
+import dagger.hilt.android.testing.HiltTestApplication
 import dagger.hilt.android.testing.UninstallModules
+import mega.privacy.android.app.HiltTestActivity
 import mega.privacy.android.app.R
 import mega.privacy.android.app.TestActivityModule
+import mega.privacy.android.app.activities.settingsActivities.FileManagementPreferencesActivity
+import mega.privacy.android.app.constants.EventConstants
 import mega.privacy.android.app.di.SettingsModule
 import mega.privacy.android.app.domain.usecase.*
 import mega.privacy.android.app.lollipop.managerSections.settings.SettingsActivity
 import mega.privacy.android.app.lollipop.managerSections.settings.SettingsFragment
+import org.hamcrest.Matchers.allOf
+import org.hamcrest.Matchers.not
+import org.junit.After
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+import org.mockito.Mockito
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
 import test.mega.privacy.android.app.RecyclerViewAssertions.Companion.withNoRowContaining
 import test.mega.privacy.android.app.RecyclerViewAssertions.Companion.withRowContaining
 import test.mega.privacy.android.app.launchFragmentInHiltContainer
+import test.mega.privacy.android.app.testFragment
+import test.mega.privacy.android.app.testFragmentTag
 
 
 @HiltAndroidTest
 @UninstallModules(SettingsModule::class, TestActivityModule::class)
 class SettingsFragmentTest {
 
-    @get:Rule
+    @get:Rule(order = 0)
     var hiltRule = HiltAndroidRule(this)
 
     @Module
     @InstallIn(ActivityRetainedComponent::class)
     object TestSettingsModule {
+        val canDeleteAccount = mock<CanDeleteAccount>()
+        val getStartScreen = mock<GetStartScreen>()
+        val isMultiFactorAuthAvailable = mock<IsMultiFactorAuthAvailable>()
+        val settingsActivity = mock<SettingsActivity> ()
+
+        @Provides
+        fun provideSettingsActivity(): SettingsActivity = settingsActivity
+
         @Provides
         fun provideGetAccountDetails(): GetAccountDetails = mock<GetAccountDetails>()
 
-        val canDeleteAccount = mock<CanDeleteAccount>()
 
         @Provides
         fun provideCanDeleteAccount(): CanDeleteAccount = canDeleteAccount
@@ -63,9 +94,10 @@ class SettingsFragmentTest {
         @Provides
         fun provideRootNodeExists(): RootNodeExists = mock<RootNodeExists>()
 
+
         @Provides
         fun provideIsMultiFactorAuthAvailable(): IsMultiFactorAuthAvailable =
-            mock<IsMultiFactorAuthAvailable>()
+            isMultiFactorAuthAvailable
 
         @Provides
         fun provideFetchContactLinksOption(): FetchContactLinksOption =
@@ -75,13 +107,31 @@ class SettingsFragmentTest {
         fun providePerformMultiFactorAuthCheck(): PerformMultiFactorAuthCheck =
             mock<PerformMultiFactorAuthCheck>()
 
+
         @Provides
-        fun provideSettingsActivity(): SettingsActivity = mock<SettingsActivity>()
+        fun provideGetStartScreen(): GetStartScreen = getStartScreen
+
+        @Provides
+        fun provideShouldHideRecentActivity(): ShouldHideRecentActivity =
+            mock<ShouldHideRecentActivity>()
+
     }
 
     @Before
     fun setUp() {
         hiltRule.inject()
+        Intents.init()
+    }
+
+    @After
+    fun tearDown() {
+        Intents.release()
+        Mockito.reset(
+            TestSettingsModule.canDeleteAccount,
+            TestSettingsModule.getStartScreen,
+            TestSettingsModule.isMultiFactorAuthAvailable,
+            TestSettingsModule.settingsActivity,
+        )
     }
 
     @Test
@@ -89,7 +139,7 @@ class SettingsFragmentTest {
         whenever(TestSettingsModule.canDeleteAccount.invoke()).thenReturn(false)
         launchFragmentInHiltContainer<SettingsFragment>()
 
-        onView(withId(androidx.preference.R.id.recycler_view))
+        onPreferences()
             .check(withNoRowContaining(withText(R.string.settings_delete_account)))
     }
 
@@ -98,9 +148,227 @@ class SettingsFragmentTest {
         whenever(TestSettingsModule.canDeleteAccount.invoke()).thenReturn(true)
         launchFragmentInHiltContainer<SettingsFragment>()
 
-        onView(withId(androidx.preference.R.id.recycler_view))
+        onPreferences()
             .check(withRowContaining(withText(R.string.settings_delete_account)))
     }
 
 
+    @Test
+    @SdkSuppress(maxSdkVersion = 29)
+    fun test_that_download_location_is_included_pre_30() {
+        launchFragmentInHiltContainer<SettingsFragment>()
+
+        onPreferences()
+            .check(withRowContaining(withText(R.string.download_location)))
+    }
+
+    @Test
+    @SdkSuppress(minSdkVersion = 30)
+    fun test_that_download_location_is_excluded_post_30() {
+        launchFragmentInHiltContainer<SettingsFragment>()
+
+        onPreferences()
+            .check(withNoRowContaining(withText(R.string.download_location)))
+    }
+
+    @Test
+    fun test_that_activated_delete_has_100_percent_alpha() {
+        whenever(TestSettingsModule.canDeleteAccount.invoke()).thenReturn(true)
+        val scenario = launchFragmentInHiltContainer<SettingsFragment>()
+        scenario?.onActivity {
+            val fragment = it.testFragment<SettingsFragment>()
+            fragment.setOnlineOptions(true)
+        }
+
+        onPreferences()
+            .check(
+                withRowContaining(
+                    allOf(
+                        withText(R.string.settings_delete_account),
+                        withTextColorAlpha(1.0)
+                    )
+                )
+            )
+    }
+
+    @Test
+    fun test_that_deactivated_delete_has_50_percent_alpha() {
+        whenever(TestSettingsModule.canDeleteAccount.invoke()).thenReturn(true)
+        val scenario = launchFragmentInHiltContainer<SettingsFragment>()
+        scenario?.onActivity {
+            val fragment = it.testFragment<SettingsFragment>()
+            fragment.setOnlineOptions(false)
+        }
+
+        onPreferences()
+            .check(
+                withRowContaining(
+                    allOf(
+                        withText(R.string.settings_delete_account),
+                        withTextColorAlpha(0.5)
+                    )
+                )
+            )
+    }
+
+
+    @Test
+    fun test_that_updating_start_screen_preference_updates_the_description() {
+        val initialScreen = 0
+        val newStartScreen = 1
+        whenever(TestSettingsModule.getStartScreen.invoke()).thenReturn(initialScreen)
+        val scenario = launchFragmentInHiltContainer<SettingsFragment>()
+        val startScreenDescriptionStrings =
+            ApplicationProvider.getApplicationContext<HiltTestApplication>().resources.getStringArray(
+                R.array.settings_start_screen
+            )
+
+        onPreferences()
+            .check(withRowContaining(withText(startScreenDescriptionStrings[initialScreen])))
+
+        scenario?.onActivity {
+            val fragment = it.testFragment<SettingsFragment>()
+            fragment.updateStartScreenSetting(newStartScreen)
+        }
+
+        onPreferences()
+            .check(withRowContaining(withText(startScreenDescriptionStrings[newStartScreen])))
+    }
+
+    @Test
+    fun test_that_correct_fields_are_disable_when_offline() {
+        whenever(TestSettingsModule.canDeleteAccount.invoke()).thenReturn(true)
+        whenever(TestSettingsModule.isMultiFactorAuthAvailable.invoke()).thenReturn(true)
+        val scenario = launchFragmentInHiltContainer<SettingsFragment>()
+        scenario?.onActivity {
+            val fragment =
+                it.supportFragmentManager.findFragmentByTag(testFragmentTag) as SettingsFragment
+            fragment.setOnlineOptions(false)
+        }
+
+        onPreferences()
+            .check(
+                withRowContaining(
+                    allOf(
+                        withText(R.string.section_photo_sync), not(isEnabled())
+                    )
+                )
+            )
+
+        onPreferences()
+            .check(
+                withRowContaining(
+                    allOf(
+                        withText(R.string.section_chat), not(isEnabled())
+                    )
+                )
+            )
+
+        onPreferences()
+            .check(
+                withRowContaining(
+                    allOf(
+                        withText(R.string.settings_2fa), not(isEnabled())
+                    )
+                )
+            )
+
+        onPreferences()
+            .check(
+                withRowContaining(
+                    allOf(
+                        withText(R.string.section_qr_code), not(isEnabled())
+                    )
+                )
+            )
+
+        onPreferences()
+            .check(
+                withRowContaining(
+                    allOf(
+                        withText(R.string.settings_delete_account), not(
+                            isEnabled()
+                        )
+                    )
+                )
+            )
+
+    }
+
+    @Test
+    fun test_that_start_screen_update_event_updates_start_screen() {
+        val initialScreen = 0
+        val newStartScreen = 1
+        whenever(TestSettingsModule.getStartScreen.invoke()).thenReturn(initialScreen)
+        launchFragmentInHiltContainer<SettingsFragment>()
+        val startScreenDescriptionStrings =
+            ApplicationProvider.getApplicationContext<HiltTestApplication>().resources.getStringArray(
+                R.array.settings_start_screen
+            )
+
+        onPreferences()
+            .check(withRowContaining(withText(startScreenDescriptionStrings[initialScreen])))
+
+        LiveEventBus.get(EventConstants.EVENT_UPDATE_START_SCREEN, Int::class.java)
+            .post(newStartScreen)
+
+        onPreferences()
+            .check(withRowContaining(withText(startScreenDescriptionStrings[newStartScreen])))
+    }
+
+    @Test
+    fun test_that_hide_recent_activity_event_updates_hide_recent_activity() {
+        launchFragmentInHiltContainer<SettingsFragment>()
+
+        onPreferences()
+            .check(
+                withRowContaining(
+                    allOf(
+                        hasDescendant(withText(R.string.hide_recent_setting_context)),
+                        hasSibling(hasDescendant(not(isChecked())))
+                    )
+                )
+            )
+
+        LiveEventBus.get(EventConstants.EVENT_UPDATE_HIDE_RECENT_ACTIVITY, Boolean::class.java)
+            .post(true)
+
+        onPreferences()
+            .check(
+                withRowContaining(
+                    allOf(
+                        hasDescendant(withText(R.string.hide_recent_setting_context)),
+                        hasSibling(hasDescendant(isChecked()))
+                    )
+                )
+            )
+    }
+
+    @Suppress
+    @Test
+    fun test_that_when_fragment_is_launched_and_open_storage_is_true_storage_activity_is_launched() {
+        whenever(TestSettingsModule.settingsActivity.openSettingsStorage).thenReturn(true)
+        intending(
+            hasComponent(
+                ComponentName(
+                    ApplicationProvider.getApplicationContext<HiltTestApplication>(),
+                    FileManagementPreferencesActivity::class.java.name
+                )
+            )
+        ).respondWith(Instrumentation.ActivityResult(Activity.RESULT_OK, null))
+
+        launchFragmentInHiltContainer<SettingsFragment>()
+
+        intended(
+            hasComponent(
+                ComponentName(
+                    ApplicationProvider.getApplicationContext<HiltTestApplication>(),
+                    FileManagementPreferencesActivity::class.java.name
+                )
+            )
+        )
+    }
+
+    private fun onPreferences() = onView(withId(androidx.preference.R.id.recycler_view))
 }
+

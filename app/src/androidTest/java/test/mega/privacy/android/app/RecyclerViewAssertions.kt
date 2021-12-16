@@ -2,6 +2,7 @@ package test.mega.privacy.android.app
 
 import android.view.View
 import androidx.recyclerview.widget.RecyclerView
+import androidx.test.espresso.NoMatchingViewException
 import androidx.test.espresso.ViewAssertion
 import androidx.test.espresso.matcher.ViewMatchers
 import org.hamcrest.Description
@@ -38,7 +39,10 @@ class RecyclerViewAssertions {
                         return@ViewAssertion  // Found a matching row
                     }
                 }
-                Assert.fail("No match found")
+                throw NoMatchingViewException.Builder()
+                    .withRootView(view)
+                    .withViewMatcher(viewMatcher)
+                    .build()
             }
         }
 
