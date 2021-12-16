@@ -1,18 +1,22 @@
 package mega.privacy.android.app.imageviewer.usecase
 
 import android.content.Context
+import androidx.core.net.toUri
 import dagger.hilt.android.qualifiers.ApplicationContext
 import io.reactivex.rxjava3.core.BackpressureStrategy
 import io.reactivex.rxjava3.core.Flowable
 import io.reactivex.rxjava3.kotlin.subscribeBy
 import mega.privacy.android.app.DatabaseHandler
+import mega.privacy.android.app.MimeTypeList
 import mega.privacy.android.app.di.MegaApi
 import mega.privacy.android.app.imageviewer.data.ImageItem
+import mega.privacy.android.app.imageviewer.data.ImageResult
 import mega.privacy.android.app.usecase.GetChatMessageUseCase
 import mega.privacy.android.app.usecase.GetGlobalChangesUseCase
 import mega.privacy.android.app.usecase.GetNodeUseCase
 import mega.privacy.android.app.utils.Constants.INVALID_POSITION
 import mega.privacy.android.app.utils.MegaNodeUtil.isValidForImageViewer
+import mega.privacy.android.app.utils.OfflineUtils
 import mega.privacy.android.app.utils.RxUtil.blockingGetOrNull
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
@@ -26,16 +30,16 @@ import javax.inject.Inject
  *
  * @property context                    Context to retrieve offline nodes
  * @property megaApi                    MegaAPI required for node requests
- * @property getChatMessageUseCase
  * @property databaseHandler            DatabaseHandler required for offline nodes
+ * @property getChatMessageUseCase      ChatMessageUseCase required to retrieve chat node information
  * @property getGlobalChangesUseCase    GlobalChangesUseCase required to update nodes in realtime
  * @property getNodeUseCase             NodeUseCase required to retrieve node information
  */
 class GetImageHandlesUseCase @Inject constructor(
     @ApplicationContext private val context: Context,
     @MegaApi private val megaApi: MegaApiAndroid,
-    private val getChatMessageUseCase: GetChatMessageUseCase,
     private val databaseHandler: DatabaseHandler,
+    private val getChatMessageUseCase: GetChatMessageUseCase,
     private val getGlobalChangesUseCase: GetGlobalChangesUseCase,
     private val getNodeUseCase: GetNodeUseCase,
 ) {
@@ -73,9 +77,14 @@ class GetImageHandlesUseCase @Inject constructor(
                         return@create
                     }
                 }
-                nodeHandles != null && nodeHandles.isNotEmpty() ->
-                    items.addNodeHandles(nodeHandles, isOffline)
-                nodeFileLinks != null && nodeFileLinks.isNotEmpty() ->
+                nodeHandles?.isNotEmpty() == true -> {
+                    if (isOffline) {
+                        items.addOfflineNodeHandles(nodeHandles)
+                    } else {
+                        items.addNodeHandles(nodeHandles)
+                    }
+                }
+                nodeFileLinks?.isNotEmpty() == true ->
                     items.addNodeFileLinks(nodeFileLinks)
                 chatRoomId != null && chatMessageIds?.isNotEmpty() == true ->
                     items.addChatChildren(chatRoomId, chatMessageIds)
@@ -166,20 +175,43 @@ class GetImageHandlesUseCase @Inject constructor(
      * Add MegaNode nodes to a List of ImageItem given their node handles.
      *
      * @param nodeHandles   Node handles to obtain MegaNode from
-     * @param isOffline     Flag to check if Node is offline
      */
-    private fun MutableList<ImageItem>.addNodeHandles(
-        nodeHandles: LongArray,
-        isOffline: Boolean
-    ) {
+    private fun MutableList<ImageItem>.addNodeHandles(nodeHandles: LongArray) {
         nodeHandles.forEach { handle ->
-            if (!isOffline) {
-                val node = getNodeUseCase.get(handle).blockingGetOrNull()
-                if (node?.isValidForImageViewer() == true) {
-                    this.add(node.toImageItem())
+            val node = getNodeUseCase.get(handle).blockingGetOrNull()
+            if (node?.isValidForImageViewer() == true) {
+                this.add(node.toImageItem())
+            }
+        }
+    }
+
+    /**
+     * Add MegaOffline nodes to a List of ImageItem given their node handles.
+     *
+     * @param nodeHandles   Node handles to obtain MegaOffline from
+     */
+    private fun MutableList<ImageItem>.addOfflineNodeHandles(nodeHandles: LongArray) {
+        val existingOfflineNodes = databaseHandler.offlineFiles
+        nodeHandles.forEach { nodeHandle ->
+            existingOfflineNodes.find {
+                nodeHandle == it.handle.toLongOrNull()
+                        || nodeHandle == it.handleIncoming.toLongOrNull()
+            }?.let { offlineNode ->
+                if (!offlineNode.isFolder) {
+                    val file = OfflineUtils.getOfflineFile(context, offlineNode)
+                    if (file.exists()) {
+                        val item = ImageItem(
+                                handle = offlineNode.handle.toLong(),
+                                imageResult = ImageResult(
+                                        isVideo = MimeTypeList.typeForName(offlineNode.name).isVideo,
+                                        fullSizeUri = file.toUri(),
+                                        fullyLoaded = true
+                                ),
+                                isOffline = true
+                        )
+                        this.add(item)
+                    }
                 }
-            } else {
-                this.add(ImageItem(handle, isOffline = true))
             }
         }
     }
