@@ -157,10 +157,10 @@ pipeline {
             post {
                 failure {
                     // Notify developer team of the failure
-                    slackSend color: "danger", message: "unit test failed. \nbranch: ${env.GIT_BRANCH}"
+                    slackSend color: "danger", message: "Android Unit Test failed! \nBranch: ${env.GIT_BRANCH}"
                 }
                 success {
-                    slackSend color: "good", message: "unit test passed. \nbranch: ${env.GIT_BRANCH}"
+                    slackSend color: "good", message: "Android Unit Test passed! \nBranch: ${env.GIT_BRANCH}"
                 }
             }
         }
