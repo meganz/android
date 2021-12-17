@@ -104,6 +104,7 @@ public class BaseActivity extends AppCompatActivity implements ActivityLauncher,
     private static final String RESUME_TRANSFERS_WARNING_SHOWN = "RESUME_TRANSFERS_WARNING_SHOWN";
     private static final String UPGRADE_ALERT_SHOWN = "UPGRADE_ALERT_SHOWN";
     private static final String UPGRADE_ALERT_MESSAGE = "UPGRADE_ALERT_MESSAGE";
+    private static final String EVENT_PURCHASES_UPDATED = "EVENT_PURCHASES_UPDATED";
 
     @Inject
     MyAccountInfo myAccountInfo;
@@ -230,6 +231,13 @@ public class BaseActivity extends AppCompatActivity implements ActivityLauncher,
 
         registerReceiver(cookieSettingsReceiver,
                 new IntentFilter(BROADCAST_ACTION_COOKIE_SETTINGS_SAVED));
+
+        LiveEventBus.get(EVENT_PURCHASES_UPDATED).observe(this, o -> {
+            if (!isPaused) {
+                upgradeAlertMessage = (Pair<String, String>) o;
+                showQueryPurchasesResult();
+            }
+        });
 
         if (savedInstanceState != null) {
             isExpiredBusinessAlertShown = savedInstanceState.getBoolean(EXPIRED_BUSINESS_ALERT_SHOWN, false);
@@ -1398,8 +1406,7 @@ public class BaseActivity extends AppCompatActivity implements ActivityLauncher,
             message = StringResourcesUtils.getString(R.string.message_user_purchased_subscription_down_grade);
         }
 
-        upgradeAlertMessage = new Pair<>(title, message);
-        showQueryPurchasesResult();
+        LiveEventBus.get(EVENT_PURCHASES_UPDATED).post(new Pair<>(title, message));
     }
 
     @Override
