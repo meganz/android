@@ -56,7 +56,6 @@ import java.util.Locale;
 
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
-import mega.privacy.android.app.MegaAttributes;
 import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.ShareInfo;
@@ -1456,36 +1455,30 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
             }
             case R.id.login_text_view:
                 numberOfClicksKarere++;
-                if (numberOfClicksKarere == 5){
-                    MegaAttributes attrs = dbH.getAttributes();
-                    if (attrs != null && attrs.getFileLoggerKarere() != null) {
-                        if (Boolean.parseBoolean(attrs.getFileLoggerKarere())) {
-                            numberOfClicksKarere = 0;
-                            setStatusLoggerKarere(context, false);
-                            break;
-                        }
+
+                if (numberOfClicksKarere == CLICKS_ENABLE_DEBUG) {
+                    if (areKarereLogsEnabled()) {
+                        numberOfClicksKarere = 0;
+                        setStatusLoggerKarere(context, false);
                     } else {
-                        logWarning("Karere file logger attribute is NULL");
+                        ((LoginActivityLollipop) context).showConfirmationEnableLogsKarere();
                     }
-                    ((LoginActivityLollipop) context).showConfirmationEnableLogsKarere();
                 }
+
                 break;
 
             case R.id.text_newToMega:
                 numberOfClicksSDK++;
-                if (numberOfClicksSDK == 5) {
-                    MegaAttributes attrs = dbH.getAttributes();
-                    if (attrs != null && attrs.getFileLoggerSDK() != null) {
-                        if (Boolean.parseBoolean(attrs.getFileLoggerSDK())) {
-                            numberOfClicksSDK = 0;
-                            setStatusLoggerSDK(context, false);
-                            break;
-                        }
+
+                if (numberOfClicksSDK == CLICKS_ENABLE_DEBUG) {
+                    if (areSDKLogsEnabled()) {
+                        numberOfClicksSDK = 0;
+                        setStatusLoggerSDK(context, false);
                     } else {
-                        logWarning("SDK file logger attribute is NULL");
+                        ((LoginActivityLollipop) context).showConfirmationEnableLogsSDK();
                     }
-                    ((LoginActivityLollipop) context).showConfirmationEnableLogsSDK();
                 }
+
                 break;
 
             case R.id.lost_authentication_device: {
