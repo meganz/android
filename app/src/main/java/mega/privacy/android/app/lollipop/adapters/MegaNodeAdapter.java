@@ -187,6 +187,9 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
             binding.listModeSwitch.setVisibility(type == LINKS_ADAPTER
                     ? View.GONE
                     : View.VISIBLE);
+
+            binding.enterMediaDiscovery.setVisibility(type == FILE_BROWSER_ADAPTER && MegaNodeUtil.containsMediaFile(parentHandle)? View.VISIBLE
+                    : View.GONE);
         }
     }
 

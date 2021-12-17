@@ -78,6 +78,7 @@ import java.util.Stack;
 
 import javax.inject.Inject;
 
+import ash.TL;
 import dagger.hilt.android.AndroidEntryPoint;
 import kotlin.Unit;
 import mega.privacy.android.app.DatabaseHandler;
@@ -651,6 +652,7 @@ public class FileBrowserFragmentLollipop extends RotatableFragment{
 	private void showMediaDiscovery(long parentHandle){
 		MediaDiscoveryFragment f = MediaDiscoveryFragment.Companion.newInstance();
 		Bundle args = new Bundle();
+		TL.log(mediaHandle);
 		args.putLong("handle",mediaHandle);
 		f.setArguments(args);
 		((ManagerActivityLollipop)context).skipToNewFragment(f);
