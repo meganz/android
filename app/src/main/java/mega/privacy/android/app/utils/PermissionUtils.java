@@ -8,22 +8,13 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Build;
-import android.os.Environment;
 import android.provider.Settings;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import android.view.View;
 
-import mega.privacy.android.app.BaseActivity;
 import mega.privacy.android.app.R;
-import mega.privacy.android.app.activities.settingsActivities.CameraUploadsPreferencesActivity;
-import mega.privacy.android.app.lollipop.LoginActivityLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
-import mega.privacy.android.app.providers.FileProviderActivity;
-
-import static mega.privacy.android.app.lollipop.PermissionsFragment.PERMISSIONS_FRAGMENT;
-import static mega.privacy.android.app.utils.Constants.REQUEST_WRITE_STORAGE;
-import static mega.privacy.android.app.utils.Constants.REQUEST_WRITE_STORAGE_FOR_LOGS;
 import static mega.privacy.android.app.utils.LogUtil.logError;
 
 @TargetApi(Build.VERSION_CODES.M)
