@@ -4,16 +4,15 @@ import androidx.hilt.lifecycle.ViewModelInject
 import mega.privacy.android.app.gallery.data.GalleryItem
 import mega.privacy.android.app.gallery.repository.ImagesItemRepository
 import mega.privacy.android.app.gallery.ui.GalleryViewModel
+import mega.privacy.android.app.globalmanagement.SortOrderManagement
 import mega.privacy.android.app.utils.ZoomUtil
-import nz.mega.sdk.MegaApiJava
 
 class ImagesViewModel @ViewModelInject constructor(
-    repository: ImagesItemRepository
-) : GalleryViewModel(repository) {
+    repository: ImagesItemRepository,
+    sortOrderManagement: SortOrderManagement
+) : GalleryViewModel(repository, sortOrderManagement) {
 
     override var mZoom = ZoomUtil.IMAGES_ZOOM_LEVEL
-
-    override var mOrder = MegaApiJava.ORDER_MODIFICATION_DESC
 
     override fun isAutoGetItem() = true
 
@@ -26,11 +25,4 @@ class ImagesViewModel @ViewModelInject constructor(
         if (item.type == GalleryItem.TYPE_IMAGE) item.indexForViewer = tempIndex++
         return tempIndex
     }
-
-//    fun getHandlesOfPhotos(): LongArray? {
-//        val list = items.value?.filter {
-//            it.type == GalleryItem.TYPE_IMAGE
-//        }?.map { node -> node.node?.handle ?: MegaApiJava.INVALID_HANDLE }
-//        return list?.toLongArray()
-//    }
 }

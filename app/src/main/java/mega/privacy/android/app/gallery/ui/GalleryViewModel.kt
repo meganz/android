@@ -13,11 +13,13 @@ import mega.privacy.android.app.gallery.fragment.BaseZoomFragment.Companion.DAYS
 import mega.privacy.android.app.gallery.fragment.BaseZoomFragment.Companion.MONTHS_INDEX
 import mega.privacy.android.app.gallery.fragment.BaseZoomFragment.Companion.YEARS_INDEX
 import mega.privacy.android.app.gallery.repository.GalleryItemRepository
+import mega.privacy.android.app.globalmanagement.SortOrderManagement
 import mega.privacy.android.app.utils.Constants.EVENT_NODES_CHANGE
 import mega.privacy.android.app.utils.Constants.INVALID_POSITION
 
 abstract class GalleryViewModel constructor(
-        private val repository: GalleryItemRepository
+    private val repository: GalleryItemRepository,
+    private val sortOrderManagement: SortOrderManagement
 ) : BaseRxViewModel() {
 
     /**
@@ -42,18 +44,12 @@ abstract class GalleryViewModel constructor(
 
     abstract var mZoom: Int
 
-    abstract var mOrder: Int
-
     abstract fun isAutoGetItem(): Boolean
 
     abstract fun getFilterRealPhotoCountCondition(item: GalleryItem): Boolean
 
     fun setZoom(zoom: Int) {
         mZoom = zoom
-    }
-
-    fun setOrder(order: Int) {
-        mOrder = order
     }
 
     /**
@@ -71,7 +67,7 @@ abstract class GalleryViewModel constructor(
         else return liveDataRoot.switchMap {
             if (forceUpdate) {
                 viewModelScope.launch {
-                    repository.getFiles(mOrder, mZoom)
+                    repository.getFiles(sortOrderManagement.getOrderCamera(), mZoom)
                 }
             } else {
                 repository.emitFiles()
@@ -101,8 +97,8 @@ abstract class GalleryViewModel constructor(
     val dateCards: LiveData<List<List<GalleryCard>>> = items.map {
         val cardsProvider = DateCardsProvider()
         cardsProvider.extractCardsFromNodeList(
-                repository.context,
-                it.mapNotNull { item -> item.node })
+            repository.context,
+            it.mapNotNull { item -> item.node })
 
         viewModelScope.launch {
             repository.getPreviews(cardsProvider.getNodesWithoutPreview()) {
@@ -122,10 +118,10 @@ abstract class GalleryViewModel constructor(
      * the closest month to the current.
      */
     fun yearClicked(position: Int, card: GalleryCard) = CardClickHandler.yearClicked(
-            position,
-            card,
-            dateCards.value?.get(MONTHS_INDEX),
-            dateCards.value?.get(YEARS_INDEX)
+        position,
+        card,
+        dateCards.value?.get(MONTHS_INDEX),
+        dateCards.value?.get(YEARS_INDEX)
     )
 
     /**
@@ -137,10 +133,10 @@ abstract class GalleryViewModel constructor(
      * the closest day to the current.
      */
     fun monthClicked(position: Int, card: GalleryCard) = CardClickHandler.monthClicked(
-            position,
-            card,
-            dateCards.value?.get(DAYS_INDEX),
-            dateCards.value?.get(MONTHS_INDEX)
+        position,
+        card,
+        dateCards.value?.get(DAYS_INDEX),
+        dateCards.value?.get(MONTHS_INDEX)
     )
 
     private val nodesChangeObserver = Observer<Boolean> {
@@ -198,19 +194,19 @@ abstract class GalleryViewModel constructor(
     }
 
     fun getItemPositionByHandle(handle: Long) =
-            items.value?.find { it.node?.handle == handle }?.index ?: INVALID_POSITION
+        items.value?.find { it.node?.handle == handle }?.index ?: INVALID_POSITION
 
     override fun onCleared() {
         LiveEventBus.get(EVENT_NODES_CHANGE, Boolean::class.java)
-                .removeObserver(nodesChangeObserver)
+            .removeObserver(nodesChangeObserver)
         items.removeObserver(loadFinishedObserver)
     }
 
     fun getRealPhotoCount(): Int {
         items.value?.filter { getFilterRealPhotoCountCondition(it) }
-                ?.let {
-                    return it.size
-                }
+            ?.let {
+                return it.size
+            }
         return 0
     }
 }

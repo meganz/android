@@ -4,16 +4,17 @@ import androidx.hilt.lifecycle.ViewModelInject
 import mega.privacy.android.app.gallery.data.GalleryItem
 import mega.privacy.android.app.gallery.data.GalleryItem.Companion.TYPE_HEADER
 import mega.privacy.android.app.gallery.repository.MediaItemRepository
+import mega.privacy.android.app.globalmanagement.SortOrderManagement
 import mega.privacy.android.app.utils.ZoomUtil
-import nz.mega.sdk.MegaApiJava
 
 class MediaViewModel @ViewModelInject constructor(
         private val repository: MediaItemRepository,
-) : GalleryViewModel(repository) {
+        val sortOrderManagement: SortOrderManagement
+) : GalleryViewModel(repository, sortOrderManagement) {
 
     override var mZoom = ZoomUtil.MEDIA_ZOOM_LEVEL
 
-    override var mOrder = MegaApiJava.ORDER_MODIFICATION_DESC
+    fun getOrder() = sortOrderManagement.getOrderCamera()
 
     private var isAuto = false
 

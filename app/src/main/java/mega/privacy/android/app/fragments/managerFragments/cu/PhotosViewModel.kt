@@ -15,22 +15,23 @@ import mega.privacy.android.app.gallery.data.GalleryItem
 import mega.privacy.android.app.gallery.data.GalleryItem.Companion.TYPE_HEADER
 import mega.privacy.android.app.gallery.repository.PhotosItemRepository
 import mega.privacy.android.app.gallery.ui.GalleryViewModel
+import mega.privacy.android.app.globalmanagement.SortOrderManagement
 import mega.privacy.android.app.utils.LogUtil
 import mega.privacy.android.app.utils.RxUtil
 import mega.privacy.android.app.utils.ZoomUtil.PHOTO_ZOOM_LEVEL
-import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaNode
 
 class PhotosViewModel @ViewModelInject constructor(
     private val repository: PhotosItemRepository,
-    private val mDbHandler: DatabaseHandler
-) : GalleryViewModel(repository) {
+    private val mDbHandler: DatabaseHandler,
+    val sortOrderManagement: SortOrderManagement
+) : GalleryViewModel(repository, sortOrderManagement) {
 
     override var mZoom = PHOTO_ZOOM_LEVEL
 
-    override var mOrder = MegaApiJava.ORDER_MODIFICATION_DESC
-
     override fun isAutoGetItem() = true
+
+    fun getOrder() = sortOrderManagement.getOrderCamera()
 
     override fun getFilterRealPhotoCountCondition(item: GalleryItem): Boolean {
         return item.type != TYPE_HEADER

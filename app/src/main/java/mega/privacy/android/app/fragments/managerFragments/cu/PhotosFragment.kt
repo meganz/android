@@ -342,6 +342,7 @@ class PhotosFragment : BaseZoomFragment(), GalleryCardAdapter.Listener {
             // On enable CU page, don't update layout and view.
             if (isEnableCUFragmentShown() || !mManagerActivity.isInPhotosPage) return@observe
 
+            setupListAdapter(getCurrentZoom(), it)
             actionModeViewModel.setNodesData(it.filter { nodeItem -> nodeItem.type != GalleryItem.TYPE_HEADER })
             if (it.isEmpty()) {
                 handleOptionsMenuUpdate(false)
@@ -499,7 +500,6 @@ class PhotosFragment : BaseZoomFragment(), GalleryCardAdapter.Listener {
     }
 
     fun loadPhotos() {
-        viewModel.setOrder(sortOrderManagement.getOrderCamera())
         viewModel.loadPhotos(true)
     }
 
@@ -570,5 +570,5 @@ class PhotosFragment : BaseZoomFragment(), GalleryCardAdapter.Listener {
 
     override fun getAdapterType() = PHOTO_SYNC_ADAPTER
 
-    override fun getOrder() = viewModel.mOrder
+    override fun getOrder() = viewModel.getOrder()
 }

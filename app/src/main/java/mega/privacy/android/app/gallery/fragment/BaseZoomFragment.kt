@@ -36,7 +36,6 @@ import mega.privacy.android.app.gallery.adapter.GalleryAdapter
 import mega.privacy.android.app.gallery.adapter.GalleryCardAdapter
 import mega.privacy.android.app.gallery.data.GalleryItem
 import mega.privacy.android.app.gallery.data.GalleryItemSizeConfig
-import mega.privacy.android.app.globalmanagement.SortOrderManagement
 import mega.privacy.android.app.lollipop.FullScreenImageViewerLollipop
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop
 import mega.privacy.android.app.modalbottomsheet.NodeOptionsBottomSheetDialogFragment
@@ -52,7 +51,6 @@ import mega.privacy.android.app.utils.ZoomUtil.getSelectedFrameWidth
 import mega.privacy.android.app.utils.ZoomUtil.setMargin
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaChatApiJava
-import javax.inject.Inject
 
 /**
  * A parent fragment with basic zoom UI logic, like menu, gestureScaleCallback.
@@ -73,9 +71,6 @@ abstract class BaseZoomFragment : BaseFragment(), GestureScaleCallback,
         const val MONTHS_INDEX = 1
         const val YEARS_INDEX = 2
     }
-
-    @Inject
-    lateinit var sortOrderManagement: SortOrderManagement
 
     protected lateinit var mManagerActivity: ManagerActivityLollipop
 

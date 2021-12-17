@@ -27,10 +27,10 @@ import java.util.*
  * Data fetcher for fetching typed files
  */
 abstract class GalleryBaseFetcher(
-        protected val context: Context,
-        protected val megaApi: MegaApiAndroid,
-        protected val selectedNodesMap: LinkedHashMap<Any, GalleryItem>,
-        protected val zoom: Int
+    protected val context: Context,
+    protected val megaApi: MegaApiAndroid,
+    protected val selectedNodesMap: LinkedHashMap<Any, GalleryItem>,
+    protected val zoom: Int
 ) : TypedNodesFetcher(context, megaApi, selectedNodesMap = selectedNodesMap) {
 
     private val getPreviewNodes = mutableMapOf<MegaNode, String>()
@@ -43,16 +43,16 @@ abstract class GalleryBaseFetcher(
         waitingForRefresh = true
 
         Handler(Looper.getMainLooper()).postDelayed(
-                {
-                    waitingForRefresh = false
-                    result.postValue(ArrayList(fileNodesMap.values))
-                }, UPDATE_DATA_THROTTLE_TIME
+            {
+                waitingForRefresh = false
+                result.postValue(ArrayList(fileNodesMap.values))
+            }, UPDATE_DATA_THROTTLE_TIME
         )
     }
 
     private fun getPreviewFile(node: MegaNode) = File(
-            PreviewUtils.getPreviewFolder(context),
-            node.base64Handle.plus(FileUtil.JPG_EXTENSION)
+        PreviewUtils.getPreviewFolder(context),
+        node.base64Handle.plus(FileUtil.JPG_EXTENSION)
     )
 
     /**
@@ -120,8 +120,8 @@ abstract class GalleryBaseFetcher(
                     if (lastYearDate == null || Year.from(lastYearDate) != Year.from(modifyDate)) {
                         lastYearDate = modifyDate
                         addPhotoDateTitle(
-                                dateString,
-                                Pair(ofPattern("uuuu").format(modifyDate), "")
+                            dateString,
+                            Pair(ofPattern("uuuu").format(modifyDate), "")
                         )
                     }
                 }
@@ -130,24 +130,24 @@ abstract class GalleryBaseFetcher(
                         lastDayDate = modifyDate
 
                         addPhotoDateTitle(
-                                dateString, Pair(
+                            dateString, Pair(
                                 ofPattern("dd MMMM").format(modifyDate),
                                 if (sameYear) "" else ofPattern("uuuu").format(modifyDate)
-                        )
+                            )
                         )
                     }
                 }
                 else -> {
                     if (lastMonthDate == null || YearMonth.from(lastMonthDate) != YearMonth.from(
-                                    modifyDate
-                            )
+                            modifyDate
+                        )
                     ) {
                         lastMonthDate = modifyDate
                         addPhotoDateTitle(
-                                dateString, Pair(
+                            dateString, Pair(
                                 ofPattern("MMMM").format(modifyDate),
                                 if (sameYear) "" else ofPattern("uuuu").format(modifyDate)
-                        )
+                            )
                         )
                     }
                 }
@@ -157,16 +157,16 @@ abstract class GalleryBaseFetcher(
             val selected = selectedNodesMap[node.handle]?.selected ?: false
             val mime = MimeTypeThumbnail.typeForName(node.name)
             fileNodesMap[node.handle] = GalleryItem(
-                    node,
-                    INVALID_POSITION,
-                    INVALID_POSITION,
-                    thumbnail,
-                    if (mime.isImage) TYPE_IMAGE else TYPE_VIDEO,
-                    dateString,
-                    null,
-                    null,
-                    selected,
-                    true
+                node,
+                INVALID_POSITION,
+                INVALID_POSITION,
+                thumbnail,
+                if (mime.isImage) TYPE_IMAGE else TYPE_VIDEO,
+                dateString,
+                null,
+                null,
+                selected,
+                true
             )
         }
 
@@ -182,41 +182,41 @@ abstract class GalleryBaseFetcher(
     private fun addPhotoDateTitle(dateString: String, date: Pair<String, String>) {
         // RandomUUID() can ensure non-repetitive values in practical purpose
         fileNodesMap[UUID.randomUUID()] = GalleryItem(
-                null,
-                INVALID_POSITION,
-                INVALID_POSITION,
-                null,
-                TYPE_HEADER,
-                dateString,
-                date.formatDateTitle(),
-                null,
-                false,
-                uiDirty = true
+            null,
+            INVALID_POSITION,
+            INVALID_POSITION,
+            null,
+            TYPE_HEADER,
+            dateString,
+            date.formatDateTitle(),
+            null,
+            false,
+            uiDirty = true
         )
     }
 
     suspend fun getPreviewsFromServer(
-            map: MutableMap<MegaNode, String>,
-            refreshCallback: () -> Unit
+        map: MutableMap<MegaNode, String>,
+        refreshCallback: () -> Unit
     ) {
         for (item in map) {
             megaApi.getPreview(
-                    item.key,
-                    item.value,
-                    OptionalMegaRequestListenerInterface(
-                            onRequestFinish = { request, error ->
-                                if (error.errorCode != MegaError.API_OK) return@OptionalMegaRequestListenerInterface
+                item.key,
+                item.value,
+                OptionalMegaRequestListenerInterface(
+                    onRequestFinish = { request, error ->
+                        if (error.errorCode != MegaError.API_OK) return@OptionalMegaRequestListenerInterface
 
-                                request.let {
-                                    fileNodesMap[it.nodeHandle]?.apply {
-                                        thumbnail = getPreviewFile(item.key).absoluteFile
-                                        uiDirty = true
-                                    }
-                                }
-
-                                refreshCallback.invoke()
+                        request.let {
+                            fileNodesMap[it.nodeHandle]?.apply {
+                                thumbnail = getPreviewFile(item.key).absoluteFile
+                                uiDirty = true
                             }
-                    ))
+                        }
+
+                        refreshCallback.invoke()
+                    }
+                ))
 
             // Throttle the getThumbnail call, or the UI would be non-responsive
             delay(GET_THUMBNAIL_THROTTLE)
