@@ -16,6 +16,7 @@ import com.facebook.imagepipeline.request.ImageRequest
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.R
+import mega.privacy.android.app.activities.OfflineFileInfoActivity
 import mega.privacy.android.app.activities.contract.SelectFolderToCopyActivityContract
 import mega.privacy.android.app.activities.contract.SelectFolderToImportActivityContract
 import mega.privacy.android.app.activities.contract.SelectFolderToMoveActivityContract
@@ -109,7 +110,7 @@ class ImageBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
                 .setOldController(binding.imgThumbnail.controller)
                 .build()
 
-            txtName.text = node.name
+            txtName.text = nodeItem.name
             txtInfo.text = nodeItem.infoText
 
             if (nodeItem.hasVersions) {
@@ -123,146 +124,171 @@ class ImageBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
 
             // File Info
             optionInfo.setOnClickListener {
-                val intent = Intent(context, FileInfoActivityLollipop::class.java).apply {
-                    putExtra(HANDLE, node.handle)
-                    putExtra(NAME, node.name)
+                val intent = if (!nodeItem.isOffline) {
+                    Intent(context, FileInfoActivityLollipop::class.java).apply {
+                        putExtra(HANDLE, nodeItem.handle)
+                        putExtra(NAME, nodeItem.name)
+                    }
+                } else {
+                    Intent(context, OfflineFileInfoActivity::class.java).apply {
+                        putExtra(HANDLE, nodeItem.handle.toString())
+                    }
                 }
 
                 startActivity(intent)
             }
-            optionInfo.isVisible = !node.isPublic
+            optionInfo.isVisible = node?.isPublic != true
 
             // Favorite
-            val favoriteText = if (node.isFavourite) R.string.file_properties_unfavourite else R.string.file_properties_favourite
-            val favoriteDrawable = if (!node.isFavourite) R.drawable.ic_add_favourite else R.drawable.ic_remove_favourite
-            optionFavorite.text = StringResourcesUtils.getString(favoriteText)
-            optionFavorite.isVisible = isOnline && !nodeItem.isFromRubbishBin && nodeItem.hasFullAccess
-            optionFavorite.setCompoundDrawablesWithIntrinsicBounds(favoriteDrawable, 0, 0, 0)
-            optionFavorite.setOnClickListener {
-                viewModel.markNodeAsFavorite(node.handle, !node.isFavourite)
+            if (node != null) {
+                val favoriteText = if (node.isFavourite) R.string.file_properties_unfavourite else R.string.file_properties_favourite
+                val favoriteDrawable = if (node.isFavourite) R.drawable.ic_remove_favourite else R.drawable.ic_add_favourite
+                optionFavorite.text = StringResourcesUtils.getString(favoriteText)
+                optionFavorite.isVisible = isOnline && !nodeItem.isFromRubbishBin && nodeItem.hasFullAccess
+                optionFavorite.setCompoundDrawablesWithIntrinsicBounds(favoriteDrawable, 0, 0, 0)
+                optionFavorite.setOnClickListener {
+                    viewModel.markNodeAsFavorite(nodeItem.handle, !node.isFavourite)
+                }
+            } else {
+                optionFavorite.isVisible = false
             }
 
             // Label
-            val labelColor = ResourcesCompat.getColor(resources, getNodeLabelColor(node.label), null)
-            val labelDrawable = getNodeLabelDrawable(node.label, resources)
-            optionLabelCurrent.setCompoundDrawablesRelativeWithIntrinsicBounds(
-                null,
-                null,
-                labelDrawable,
-                null
-            )
-            optionLabelCurrent.setTextColor(labelColor)
-            optionLabelCurrent.text = getNodeLabelText(node.label)
-            optionLabelCurrent.isVisible = node.label != MegaNode.NODE_LBL_UNKNOWN
-            optionLabelLayout.isVisible = isOnline && !nodeItem.isFromRubbishBin && nodeItem.hasFullAccess
-            optionLabelLayout.setOnClickListener {
-                NodeLabelBottomSheetDialogFragment.newInstance(node.handle)
-                    .show(childFragmentManager, TAG)
+            if (node != null) {
+                val labelColor = ResourcesCompat.getColor(resources, getNodeLabelColor(node.label), null)
+                val labelDrawable = getNodeLabelDrawable(node.label, resources)
+                optionLabelCurrent.setCompoundDrawablesRelativeWithIntrinsicBounds(
+                        null,
+                        null,
+                        labelDrawable,
+                        null
+                )
+                optionLabelCurrent.setTextColor(labelColor)
+                optionLabelCurrent.text = getNodeLabelText(node.label)
+                optionLabelCurrent.isVisible = node.label != MegaNode.NODE_LBL_UNKNOWN
+                optionLabelLayout.isVisible = isOnline && !nodeItem.isFromRubbishBin && nodeItem.hasFullAccess
+                optionLabelLayout.setOnClickListener {
+                    NodeLabelBottomSheetDialogFragment.newInstance(nodeItem.handle).show(childFragmentManager, TAG)
+                }
+            } else {
+                optionLabelLayout.isVisible = false
             }
 
             // Open with
-            optionOpenWith.isVisible = !nodeItem.isFromRubbishBin && !node.isPublic
+            optionOpenWith.isVisible = !nodeItem.isFromRubbishBin && node?.isPublic != true
             optionOpenWith.setOnClickListener {
-                ModalBottomSheetUtil.openWith(requireContext(), node)
+                if (nodeItem.isOffline) {
+                    OfflineUtils.openWithOffline(requireContext(), nodeItem.handle)
+                } else {
+                    ModalBottomSheetUtil.openWith(requireContext(), node)
+                }
             }
 
             // Download
             optionDownload.isVisible = !nodeItem.isFromRubbishBin
             optionDownload.setOnClickListener {
-                (activity as? ImageViewerActivity?)?.saveNode(node, false)
+                if (nodeItem.isOffline) {
+                    (activity as? ImageViewerActivity?)?.saveOfflineNode(nodeItem.handle)
+                } else if (node != null) {
+                    (activity as? ImageViewerActivity?)?.saveNode(node, false)
+                }
                 dismissAllowingStateLoss()
             }
 
             // Save to Gallery
-            optionGallery.isVisible = isSaveToGalleryCompatible() && !nodeItem.isFromRubbishBin && !node.isPublic
+            optionGallery.isVisible = isSaveToGalleryCompatible() && !nodeItem.isFromRubbishBin && node?.isPublic != true
             optionGallery.setOnClickListener {
-                (activity as? ImageViewerActivity?)?.saveNode(node, true)
+                (activity as? ImageViewerActivity?)?.saveNode(node!!, false)
                 dismissAllowingStateLoss()
             }
 
             // Offline
-            optionOfflineLayout.isVisible = !nodeItem.isFromRubbishBin && !node.isPublic && nodeItem.hasFullAccess
+            optionOfflineLayout.isVisible = !nodeItem.isFromRubbishBin && node?.isPublic != true && nodeItem.hasFullAccess
             switchOffline.isChecked = nodeItem.isAvailableOffline
             switchOffline.post {
                 switchOffline.setOnCheckedChangeListener { _, _ ->
-                    viewModel.setNodeAvailableOffline(requireActivity(), node, !nodeItem.isAvailableOffline)
+                    viewModel.setNodeAvailableOffline(requireActivity(), node!!, !nodeItem.isAvailableOffline)
                     dismissAllowingStateLoss()
                 }
             }
             optionOfflineLayout.setOnClickListener {
-                viewModel.setNodeAvailableOffline(requireActivity(), node, !nodeItem.isAvailableOffline)
+                viewModel.setNodeAvailableOffline(requireActivity(), node!!, !nodeItem.isAvailableOffline)
                 dismissAllowingStateLoss()
             }
 
             // Links
-            if (node.isExported) {
+            if (node?.isExported == true) {
                 optionManageLink.text = StringResourcesUtils.getString(R.string.edit_link_option)
             } else {
                 optionManageLink.text = getQuantityString(R.plurals.get_links, 1)
             }
             optionManageLink.setOnClickListener {
-                LinksUtil.showGetLinkActivity(this@ImageBottomSheetDialogFragment, node.handle)
+                LinksUtil.showGetLinkActivity(this@ImageBottomSheetDialogFragment, nodeItem.handle)
             }
             optionRemoveLink.setOnClickListener {
                 MaterialAlertDialogBuilder(requireContext())
                     .setMessage(getQuantityString(R.plurals.remove_links_warning_text, 1))
-                    .setPositiveButton(StringResourcesUtils.getString(R.string.general_remove)) { _, _ -> viewModel.removeLink(node.handle) }
+                    .setPositiveButton(StringResourcesUtils.getString(R.string.general_remove)) { _, _ -> viewModel.removeLink(nodeItem.handle) }
                     .setNegativeButton(StringResourcesUtils.getString(R.string.general_cancel), null)
                     .show()
             }
             optionManageLink.isVisible = isOnline && nodeItem.hasFullAccess && !nodeItem.isFromRubbishBin
-            optionRemoveLink.isVisible = isOnline && node.isExported
+            optionRemoveLink.isVisible = isOnline && node?.isExported == true
 
             // Send to contact
             optionSendToContact.setOnClickListener {
-                (activity as? ImageViewerActivity?)?.attachNode(node)
+                (activity as? ImageViewerActivity?)?.attachNode(node!!)
                 dismissAllowingStateLoss()
             }
             optionSendToContact.isVisible = isOnline && !nodeItem.isFromRubbishBin && nodeItem.hasFullAccess
 
             // Share
+            optionShare.isVisible = !nodeItem.isFromRubbishBin
             optionShare.setOnClickListener {
-                viewModel.shareNode(node).observe(viewLifecycleOwner) { link ->
-                    if (!link.isNullOrBlank()) {
-                        MegaNodeUtil.shareLink(requireContext(), link)
-                        dismissAllowingStateLoss()
+                if (nodeItem.isOffline) {
+                    OfflineUtils.shareOfflineNode(context, nodeItem.handle)
+                } else if (node != null) {
+                    viewModel.shareNode(node).observe(viewLifecycleOwner) { link ->
+                        if (!link.isNullOrBlank()) {
+                            MegaNodeUtil.shareLink(requireContext(), link)
+                            dismissAllowingStateLoss()
+                        }
                     }
                 }
             }
-            optionShare.isVisible = isOnline && !nodeItem.isFromRubbishBin
 
             // Rename
             optionRename.setOnClickListener {
-                (activity as? ImageViewerActivity?)?.showRenameDialog(node)
+                (activity as? ImageViewerActivity?)?.showRenameDialog(node!!)
             }
-            optionRename.isVisible = isOnline && !nodeItem.isFromRubbishBin && nodeItem.hasFullAccess
+            optionRename.isVisible = isOnline && !nodeItem.isFromRubbishBin && nodeItem.hasFullAccess && node != null
 
             // Move
             optionMove.setOnClickListener {
-                selectMoveFolderLauncher.launch(longArrayOf(node.handle))
+                selectMoveFolderLauncher.launch(longArrayOf(nodeItem.handle))
             }
             optionMove.isVisible = isOnline && !nodeItem.isFromRubbishBin && nodeItem.hasFullAccess
 
             // Copy
             optionCopy.setOnClickListener {
-                if (node.isPublic) {
-                    selectImportFolderLauncher.launch(longArrayOf(node.handle))
+                if (node?.isPublic == true) {
+                    selectImportFolderLauncher.launch(longArrayOf(nodeItem.handle))
                 } else {
-                    selectCopyFolderLauncher.launch(longArrayOf(node.handle))
+                    selectCopyFolderLauncher.launch(longArrayOf(nodeItem.handle))
                 }
             }
-            val copyAction = if (node.isPublic) R.string.general_import else R.string.context_copy
-            val copyDrawable = if (node.isPublic) R.drawable.ic_import_to_cloud_white else R.drawable.ic_menu_copy
+            val copyAction = if (node?.isPublic == true) R.string.general_import else R.string.context_copy
+            val copyDrawable = if (node?.isPublic == true) R.drawable.ic_import_to_cloud_white else R.drawable.ic_menu_copy
             optionCopy.setCompoundDrawablesWithIntrinsicBounds(copyDrawable, 0, 0, 0)
             optionCopy.text = StringResourcesUtils.getString(copyAction)
             optionCopy.isVisible = isOnline && !nodeItem.isFromRubbishBin && viewModel.isUserLoggedIn()
 
             // Restore
             optionRestore.setOnClickListener {
-                viewModel.moveNode(node.handle, node.restoreHandle)
+                viewModel.moveNode(nodeItem.handle, node!!.restoreHandle)
                 dismissAllowingStateLoss()
             }
-            optionRestore.isVisible = isOnline && nodeItem.isFromRubbishBin && node.restoreHandle != INVALID_HANDLE
+            optionRestore.isVisible = isOnline && nodeItem.isFromRubbishBin && node != null && node.restoreHandle != INVALID_HANDLE
 
             // Rubbish bin
             optionRubbishBin.isVisible = isOnline && nodeItem.hasFullAccess
@@ -287,9 +313,9 @@ class ImageBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
                     .setMessage(StringResourcesUtils.getString(messageText))
                     .setPositiveButton(StringResourcesUtils.getString(buttonText)) { _, _ ->
                         if (nodeItem.isFromRubbishBin) {
-                            viewModel.removeNode(node.handle)
+                            viewModel.removeNode(nodeItem.handle)
                         } else {
-                            viewModel.moveNodeToRubbishBin(node.handle)
+                            viewModel.moveNodeToRubbishBin(nodeItem.handle)
                         }
                         dismissAllowingStateLoss()
                     }

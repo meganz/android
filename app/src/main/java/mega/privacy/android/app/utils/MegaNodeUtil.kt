@@ -23,10 +23,7 @@ import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.core.Completable
 import io.reactivex.rxjava3.kotlin.subscribeBy
 import io.reactivex.rxjava3.schedulers.Schedulers
-import mega.privacy.android.app.DatabaseHandler
-import mega.privacy.android.app.MegaApplication
-import mega.privacy.android.app.MimeTypeList
-import mega.privacy.android.app.R
+import mega.privacy.android.app.*
 import mega.privacy.android.app.activities.WebViewActivity
 import mega.privacy.android.app.components.saver.AutoPlayInfo
 import mega.privacy.android.app.constants.BroadcastConstants
@@ -1834,4 +1831,15 @@ object MegaNodeUtil {
     @JvmStatic
     fun MegaNode.isValidForImageViewer(): Boolean =
         isFile && (isImage() || isGif() || isVideo())
+
+    /**
+     * Check if a specific MegaOffline is valid for Image Viewer
+     *
+     * @return  True if it's valid, false otherwise
+     */
+    @JvmStatic
+    fun MegaOffline.isValidForImageViewer(): Boolean =
+            !isFolder && (MimeTypeList.typeForName(name).isImage
+                    || MimeTypeList.typeForName(name).isGIF
+                    || (MimeTypeList.typeForName(name).isVideoReproducible || MimeTypeList.typeForName(name).isMp4Video))
 }

@@ -15,12 +15,15 @@ import nz.mega.sdk.MegaNode
  * @property hasVersions        Flag to check if this node has versions.
  */
 data class MegaNodeItem constructor(
-    val node: MegaNode,
+    val name: String,
+    val handle: Long,
     val infoText: String,
     val hasFullAccess: Boolean,
     val isFromRubbishBin: Boolean,
     val isFromInbox: Boolean,
     val isFromRoot: Boolean,
     val isAvailableOffline: Boolean,
-    val hasVersions: Boolean
+    val hasVersions: Boolean,
+    val isOffline: Boolean = true,
+    val node: MegaNode? = null
 )

@@ -349,6 +349,7 @@
         </activity>
         <activity
             android:name=".activities.OfflineFileInfoActivity"
+            android:launchMode="singleTop"
             android:label="@string/app_name" />
 
         <activity

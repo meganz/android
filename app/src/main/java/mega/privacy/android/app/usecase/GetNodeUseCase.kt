@@ -6,6 +6,7 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import io.reactivex.rxjava3.core.Completable
 import io.reactivex.rxjava3.core.Single
 import mega.privacy.android.app.DatabaseHandler
+import mega.privacy.android.app.MegaOffline
 import mega.privacy.android.app.di.MegaApi
 import mega.privacy.android.app.di.MegaApiFolder
 import mega.privacy.android.app.errors.BusinessAccountOverdueMegaError
@@ -106,15 +107,56 @@ class GetNodeUseCase @Inject constructor(
             }
 
             MegaNodeItem(
-                node,
-                infoText,
-                hasFullAccess,
-                isFromRubbishBin,
-                isFromInbox,
-                isFromRoot,
-                isAvailableOffline,
-                hasVersions
+                name = node.name,
+                handle = node.handle,
+                infoText = infoText,
+                hasFullAccess = hasFullAccess,
+                isFromRubbishBin = isFromRubbishBin,
+                isFromInbox = isFromInbox,
+                isFromRoot = isFromRoot,
+                isAvailableOffline = isAvailableOffline,
+                hasVersions = hasVersions,
+                node = node
             )
+        }
+
+    fun getOfflineNode(nodeHandle: Long): Single<MegaOffline> =
+        Single.fromCallable {
+            val offlineNode = databaseHandler.offlineFiles.find { megaOffline ->
+                nodeHandle == megaOffline.handle.toLongOrNull()
+                        || nodeHandle == megaOffline.handleIncoming.toLongOrNull()
+            }
+            offlineNode ?: error("Offline node was not found")
+        }
+
+    fun getOfflineNodeItem(nodeHandle: Long): Single<MegaNodeItem> =
+        Single.fromCallable {
+            val offlineNode = getOfflineNode(nodeHandle).blockingGetOrNull()
+            if (offlineNode != null) {
+                val file = OfflineUtils.getOfflineFile(context, offlineNode)
+                if (file.exists()) {
+                    val nodeSizeText = Util.getSizeString(offlineNode.getSize(context))
+                    val nodeDateText = TimeUtils.formatLongDateTime(offlineNode.getModificationDate(context))
+                    val infoText = TextUtil.getFileInfo(nodeSizeText, nodeDateText)
+
+                    MegaNodeItem(
+                        name = offlineNode.name,
+                        handle = offlineNode.handle.toLong(),
+                        infoText = infoText,
+                        hasFullAccess = false,
+                        isFromRubbishBin = false,
+                        isFromInbox = offlineNode.origin == MegaOffline.INBOX,
+                        isFromRoot = false,
+                        isAvailableOffline = true,
+                        hasVersions = false,
+                        node = null
+                    )
+                } else {
+                    error("Offline file doesn't exist")
+                }
+            } else {
+                error("Offline node was not found")
+            }
         }
 
     /**

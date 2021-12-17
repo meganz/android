@@ -73,8 +73,8 @@ class ImageViewerViewModel @ViewModelInject constructor(
     fun onCurrentImageNode(): LiveData<MegaNodeItem?> =
         currentPosition.map { images.value?.getOrNull(it)?.nodeItem }
 
-    fun getCurrentNode(): MegaNode? =
-        currentPosition.value?.let { images.value?.getOrNull(it)?.nodeItem?.node }
+    fun getCurrentNode(): MegaNodeItem? =
+        currentPosition.value?.let { images.value?.getOrNull(it)?.nodeItem }
 
     fun onSnackbarMessage(): LiveData<String> = snackbarMessage
 
@@ -143,6 +143,8 @@ class ImageViewerViewModel @ViewModelInject constructor(
                 getNodeUseCase.getNodeItem(existingNode.nodePublicLink)
             existingNode?.chatMessageId != null && existingNode.chatRoomId != null ->
                 getNodeUseCase.getNodeItem(existingNode.chatRoomId, existingNode.chatMessageId)
+            existingNode?.isOffline == true ->
+                getNodeUseCase.getOfflineNodeItem(existingNode.handle)
             else ->
                 getNodeUseCase.getNodeItem(nodeHandle)
         }
@@ -178,6 +180,8 @@ class ImageViewerViewModel @ViewModelInject constructor(
                 getImageUseCase.get(existingNode.nodePublicLink)
             existingNode?.chatMessageId != null && existingNode.chatRoomId != null ->
                 getImageUseCase.get(existingNode.chatRoomId, existingNode.chatMessageId)
+            existingNode?.isOffline == true ->
+                getImageUseCase.getOffline(existingNode.handle)
             else ->
                 getImageUseCase.get(nodeHandle, fullSize, highPriority)
         }

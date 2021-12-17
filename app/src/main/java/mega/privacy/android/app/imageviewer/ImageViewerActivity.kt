@@ -362,7 +362,7 @@ class ImageViewerActivity : BaseActivity(), PermissionRequester, SnackbarShower 
      */
     private fun showCurrentImageInfo(item: MegaNodeItem?) {
         if (item != null) {
-            binding.txtTitle.text = item.node.name
+            binding.txtTitle.text = item.name
             binding.toolbar.menu?.apply {
                 findItem(R.id.action_download)?.isVisible =
                     isOnline() && !item.isFromRubbishBin
@@ -412,7 +412,7 @@ class ImageViewerActivity : BaseActivity(), PermissionRequester, SnackbarShower 
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        val currentNode = viewModel.getCurrentNode() ?: return true
+        val nodeItem = viewModel.getCurrentNode() ?: return true
 
         return when (item.itemId) {
             android.R.id.home -> {
@@ -420,23 +420,27 @@ class ImageViewerActivity : BaseActivity(), PermissionRequester, SnackbarShower 
                 true
             }
             R.id.action_download -> {
-                saveNode(currentNode, false)
+                if (nodeItem.isOffline) {
+                    saveOfflineNode(nodeItem.handle)
+                } else {
+                    nodeItem.node?.let { saveNode(it, false) }
+                }
                 true
             }
             R.id.action_save_gallery -> {
-                saveNode(currentNode, true)
+                nodeItem.node?.let { saveNode(it, true) }
                 true
             }
             R.id.action_get_link -> {
-                LinksUtil.showGetLinkActivity(this, currentNode.handle)
+                LinksUtil.showGetLinkActivity(this, nodeItem.handle)
                 true
             }
             R.id.action_chat -> {
-                attachNode(currentNode)
+                nodeItem.node?.let(::attachNode)
                 true
             }
             R.id.action_more -> {
-                bottomSheet = ImageBottomSheetDialogFragment.newInstance(currentNode.handle).apply {
+                bottomSheet = ImageBottomSheetDialogFragment.newInstance(nodeItem.handle).apply {
                     show(supportFragmentManager)
                 }
                 true
@@ -456,6 +460,10 @@ class ImageViewerActivity : BaseActivity(), PermissionRequester, SnackbarShower 
         )
     }
 
+    fun saveOfflineNode(nodeHandle: Long) {
+        nodeSaver.get()?.saveOfflineNode(nodeHandle, true)
+    }
+
     fun attachNode(node: MegaNode) {
         nodeAttacher.get()?.attachNode(node)
     }
@@ -464,6 +472,7 @@ class ImageViewerActivity : BaseActivity(), PermissionRequester, SnackbarShower 
         showRenameNodeDialog(this, node, this, null)
     }
 
+    @Suppress("deprecation")
     override fun onActivityResult(requestCode: Int, resultCode: Int, intent: Intent?) {
         when {
             nodeAttacher.get()?.handleActivityResult(requestCode, resultCode, intent, this) == true ->

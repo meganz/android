@@ -19,6 +19,8 @@ import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.ErrorUtils.toThrowable
 import mega.privacy.android.app.utils.MegaNodeUtil.isGif
 import mega.privacy.android.app.utils.MegaNodeUtil.isVideo
+import mega.privacy.android.app.utils.OfflineUtils
+import mega.privacy.android.app.utils.RxUtil.blockingGetOrNull
 import nz.mega.sdk.*
 import nz.mega.sdk.MegaError.*
 import javax.inject.Inject
@@ -26,14 +28,14 @@ import javax.inject.Inject
 /**
  * Use case to retrieve a single image
  *
- * @property megaApi                MegaAPI required for node requests
  * @property context                Context required to build files
+ * @property megaApi                MegaAPI required for node requests
  * @property getNodeUseCase         NodeUseCase required to retrieve node information
  * @property getChatMessageUseCase  ChatMessageUseCase required to retrieve node information
  */
 class GetImageUseCase @Inject constructor(
-    @MegaApi private val megaApi: MegaApiAndroid,
     @ApplicationContext private val context: Context,
+    @MegaApi private val megaApi: MegaApiAndroid,
     private val getNodeUseCase: GetNodeUseCase,
     private val getChatMessageUseCase: GetChatMessageUseCase
 ) {
@@ -217,4 +219,31 @@ class GetImageUseCase @Inject constructor(
                 }
             }
         }, BackpressureStrategy.LATEST)
+
+    /**
+     * Get an offline image given a Node handle.
+     *
+     * @param nodeHandle    Image Node handle to request.
+     * @return              Single with the ImageResult
+     */
+    fun getOffline(nodeHandle: Long): Flowable<ImageResult> =
+        Flowable.fromCallable {
+            val offlineNode = getNodeUseCase.getOfflineNode(nodeHandle).blockingGetOrNull()
+            when {
+                offlineNode == null -> error("Offline node was not found")
+                offlineNode.isFolder -> error("Offline node is a folder")
+                else -> {
+                    val file = OfflineUtils.getOfflineFile(context, offlineNode)
+                    if (file.exists()) {
+                        ImageResult(
+                            isVideo = MimeTypeList.typeForName(offlineNode.name).isVideo,
+                            fullSizeUri = file.toUri(),
+                            fullyLoaded = true
+                        )
+                    } else {
+                        error("Offline file doesn't exist")
+                    }
+                }
+            }
+        }
 }
