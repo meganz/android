@@ -910,6 +910,12 @@ public class Constants {
     /** The param type returned by checkChatLink denoting the link is for a meeting room */
     public final static int LINK_IS_FOR_MEETING = 1;
 
+    // The name of the preference to retrieve.
+    public final static String KEY_SHOW_EDUCATION = "show_education";
+
+    // SharedPreference file name
+    public final static String MEETINGS_PREFERENCE = "meeting_preference";
+
     public static final float MEETING_NAME_MARGIN_TOP = 16f;
 
     public static final int NAME_CHANGE = 0;
