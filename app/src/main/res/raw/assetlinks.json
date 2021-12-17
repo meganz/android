@@ -1,9 +1,0 @@
-[{
-  "relation": ["delegate_permission/common.handle_all_urls"],
-  "target": {
-    "namespace": "android_app",
-    "package_name": "mega.privacy.android.app",
-    "sha256_cert_fingerprints":
-    ["B7:F9:37:2B:64:9F:4C:9D:03:F4:CB:C7:4C:37:B2:18:E9:4B:03:CD:F9:5F:D8:14:2D:76:22:5F:E6:23:93:D9"]
-  }
-}]
