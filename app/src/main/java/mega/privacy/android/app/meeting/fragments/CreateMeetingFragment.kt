@@ -27,7 +27,6 @@ import mega.privacy.android.app.utils.Util.showKeyboardDelayed
 import nz.mega.sdk.MegaChatRoom
 import java.util.*
 
-
 @AndroidEntryPoint
 class CreateMeetingFragment : AbstractMeetingOnBoardingFragment() {
 

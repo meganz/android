@@ -540,10 +540,7 @@ public class MegaApplication extends MultiDexApplication implements Application.
 						backgroundStatus = megaChatApi.getBackgroundStatus();
 						logDebug("backgroundStatus_activityVisible: " + backgroundStatus);
 						if (backgroundStatus != -1 && backgroundStatus != 0) {
-							MegaHandleList callsInProgress = megaChatApi.getChatCalls(MegaChatCall.CALL_STATUS_IN_PROGRESS);
-							if (callsInProgress == null || callsInProgress.size() <= 0) {
-								megaChatApi.setBackgroundStatus(false);
-							}
+							megaChatApi.setBackgroundStatus(false);
 						}
 					}
 

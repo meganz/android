@@ -43,7 +43,7 @@ import static nz.mega.sdk.MegaApiJava.*;
 
 public class DatabaseHandler extends SQLiteOpenHelper {
 
-	private static final int DATABASE_VERSION = 66;
+	private static final int DATABASE_VERSION = 67;
     private static final String DATABASE_NAME = "megapreferences";
     private static final String TABLE_PREFERENCES = "preferences";
     private static final String TABLE_CREDENTIALS = "credentials";
@@ -391,22 +391,20 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 				+ KEY_ATTR_INTENTS + " TEXT, "                                                                                              //2
 				+ KEY_ATTR_ASK_SIZE_DOWNLOAD + " BOOLEAN, "                                                                                 //3
 				+ KEY_ATTR_ASK_NOAPP_DOWNLOAD + " BOOLEAN, "                                                                                //4
-				+ KEY_FILE_LOGGER_SDK + " TEXT, "                                                                                           //5
-				+ KEY_ACCOUNT_DETAILS_TIMESTAMP + " TEXT, "                                                                                 //6
-				+ KEY_PAYMENT_METHODS_TIMESTAMP + " TEXT, "                                                                                 //7
-				+ KEY_PRICING_TIMESTAMP + " TEXT, "                                                                                         //8
-				+ KEY_EXTENDED_ACCOUNT_DETAILS_TIMESTAMP + " TEXT, "                                                                        //9
-				+ KEY_INVALIDATE_SDK_CACHE + " TEXT, "                                                                                      //10
-				+ KEY_FILE_LOGGER_KARERE + " TEXT, "                                                                                        //11
-				+ KEY_USE_HTTPS_ONLY + " TEXT, "                                                                                            //12
-				+ KEY_SHOW_COPYRIGHT + " TEXT, "                                                                                            //13
-				+ KEY_SHOW_NOTIF_OFF + " TEXT, "                                                                                            //14
-				+ KEY_LAST_PUBLIC_HANDLE + " TEXT, "                                                                                        //15
-				+ KEY_LAST_PUBLIC_HANDLE_TIMESTAMP + " TEXT, "                                                                              //16
-				+ KEY_STORAGE_STATE + " INTEGER DEFAULT '" + encrypt(String.valueOf(MegaApiJava.STORAGE_STATE_UNKNOWN)) + "',"              //17
-				+ KEY_LAST_PUBLIC_HANDLE_TYPE + " INTEGER DEFAULT '" + encrypt(String.valueOf(MegaApiJava.AFFILIATE_TYPE_INVALID)) + "', "  //18
-				+ KEY_MY_CHAT_FILES_FOLDER_HANDLE + " TEXT DEFAULT '" + encrypt(String.valueOf(MegaApiJava.INVALID_HANDLE)) + "', " 		//19
-				+ KEY_TRANSFER_QUEUE_STATUS + " BOOLEAN DEFAULT '" + encrypt("false") + "'"                                          //20 - True if the queue is paused, false otherwise
+				+ KEY_ACCOUNT_DETAILS_TIMESTAMP + " TEXT, "                                                                                 //5
+				+ KEY_PAYMENT_METHODS_TIMESTAMP + " TEXT, "                                                                                 //6
+				+ KEY_PRICING_TIMESTAMP + " TEXT, "                                                                                         //7
+				+ KEY_EXTENDED_ACCOUNT_DETAILS_TIMESTAMP + " TEXT, "                                                                        //8
+				+ KEY_INVALIDATE_SDK_CACHE + " TEXT, "                                                                                      //9
+				+ KEY_USE_HTTPS_ONLY + " TEXT, "                                                                                            //10
+				+ KEY_SHOW_COPYRIGHT + " TEXT, "                                                                                            //11
+				+ KEY_SHOW_NOTIF_OFF + " TEXT, "                                                                                            //12
+				+ KEY_LAST_PUBLIC_HANDLE + " TEXT, "                                                                                        //13
+				+ KEY_LAST_PUBLIC_HANDLE_TIMESTAMP + " TEXT, "                                                                              //14
+				+ KEY_STORAGE_STATE + " INTEGER DEFAULT '" + encrypt(String.valueOf(MegaApiJava.STORAGE_STATE_UNKNOWN)) + "',"              //15
+				+ KEY_LAST_PUBLIC_HANDLE_TYPE + " INTEGER DEFAULT '" + encrypt(String.valueOf(MegaApiJava.AFFILIATE_TYPE_INVALID)) + "', "  //16
+				+ KEY_MY_CHAT_FILES_FOLDER_HANDLE + " TEXT DEFAULT '" + encrypt(String.valueOf(MegaApiJava.INVALID_HANDLE)) + "', " 		//17
+				+ KEY_TRANSFER_QUEUE_STATUS + " BOOLEAN DEFAULT '" + encrypt("false") + "'"                                          //18 - True if the queue is paused, false otherwise
 				+ ")";
 		db.execSQL(CREATE_ATTRIBUTES_TABLE);
 
@@ -601,9 +599,6 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 			db.execSQL("ALTER TABLE " + TABLE_PREFERENCES + " ADD COLUMN " + KEY_PREFERRED_SORT_OTHERS + " TEXT;");
 			db.execSQL("UPDATE " + TABLE_PREFERENCES + " SET " + KEY_PREFERRED_SORT_CLOUD + " = '" + encrypt(String.valueOf(MegaApiJava.ORDER_DEFAULT_ASC)) + "';");
 			db.execSQL("UPDATE " + TABLE_PREFERENCES + " SET " + KEY_PREFERRED_SORT_OTHERS + " = '" + encrypt(String.valueOf(MegaApiJava.ORDER_DEFAULT_ASC)) + "';");
-
-			db.execSQL("ALTER TABLE " + TABLE_ATTRIBUTES + " ADD COLUMN " + KEY_FILE_LOGGER_SDK + " TEXT;");
-			db.execSQL("UPDATE " + TABLE_ATTRIBUTES + " SET " + KEY_FILE_LOGGER_SDK + " = '" + encrypt("false") + "';");
 		}
 
 		if(oldVersion <= 21){
@@ -700,11 +695,6 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 			String CREATE_NODE_ATTACHMENTS_TABLE = "CREATE TABLE IF NOT EXISTS " + TABLE_NODE_ATTACHMENTS + "("
 					+ KEY_ID + " INTEGER PRIMARY KEY," + KEY_FILE_PATH + " TEXT, " + KEY_FILE_NAME + " TEXT, " + KEY_FILE_FINGERPRINT + " TEXT, " + KEY_NODE_HANDLE + " TEXT" + ")";
 			db.execSQL(CREATE_NODE_ATTACHMENTS_TABLE);
-		}
-
-		if (oldVersion <= 33){
-			db.execSQL("ALTER TABLE " + TABLE_ATTRIBUTES + " ADD COLUMN " + KEY_FILE_LOGGER_KARERE + " TEXT;");
-			db.execSQL("UPDATE " + TABLE_ATTRIBUTES + " SET " + KEY_FILE_LOGGER_KARERE + " = '" + encrypt("false") + "';");
 		}
 
 		if (oldVersion <= 34){
@@ -855,7 +845,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		}
 
 		if (oldVersion <= 61) {
-			recreateAttributes(db, getAttributesFromDBv61(db));
+			recreateAttributes(db, getAttributes(db));
 			attributesAlreadyUpdated = true;
 		}
 
@@ -875,15 +865,21 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		}
 
 		if (oldVersion <= 64 && !preferencesAlreadyUpdated) {
-			//KEY_CAM_SYNC_CHARGING and KEY_SMALL_GRID_CAMERA have been removed in DB v64
+			//KEY_CAM_SYNC_CHARGING and KEY_SMALL_GRID_CAMERA have been removed in DB v65
 			recreatePreferences(db, getPreferences(db));
 			preferencesAlreadyUpdated = true;
 		}
 
 		if (oldVersion <= 65 && !preferencesAlreadyUpdated) {
-			//KEY_PREFERRED_SORT_CONTACTS has been removed in DB v65
+			//KEY_PREFERRED_SORT_CONTACTS has been removed in DB v66
 			recreatePreferences(db, getPreferences(db));
 			preferencesAlreadyUpdated = true;
+		}
+
+		if (oldVersion <= 66 && !attributesAlreadyUpdated) {
+			//KEY_FILE_LOGGER_SDK and KEY_FILE_LOGGER_KARERE have been removed in DB v67
+			recreateAttributes(db, getAttributes(db));
+			attributesAlreadyUpdated = true;
 		}
 
 		this.db = db;
@@ -2195,13 +2191,11 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		values.put(KEY_ATTR_INTENTS, encrypt(Integer.toString(attr.getAttemps())));
 		values.put(KEY_ATTR_ASK_SIZE_DOWNLOAD, encrypt(attr.getAskSizeDownload()));
 		values.put(KEY_ATTR_ASK_NOAPP_DOWNLOAD, encrypt(attr.getAskNoAppDownload()));
-		values.put(KEY_FILE_LOGGER_SDK, encrypt(attr.getFileLoggerSDK()));
 		values.put(KEY_ACCOUNT_DETAILS_TIMESTAMP, encrypt(attr.getAccountDetailsTimeStamp()));
 		values.put(KEY_PAYMENT_METHODS_TIMESTAMP, encrypt(attr.getPaymentMethodsTimeStamp()));
 		values.put(KEY_PRICING_TIMESTAMP, encrypt(attr.getPricingTimeStamp()));
 		values.put(KEY_EXTENDED_ACCOUNT_DETAILS_TIMESTAMP, encrypt(attr.getExtendedAccountDetailsTimeStamp()));
 		values.put(KEY_INVALIDATE_SDK_CACHE, encrypt(attr.getInvalidateSdkCache()));
-		values.put(KEY_FILE_LOGGER_KARERE, encrypt(attr.getFileLoggerKarere()));
 		values.put(KEY_USE_HTTPS_ONLY, encrypt(attr.getUseHttpsOnly()));
 		values.put(KEY_USE_HTTPS_ONLY, encrypt(attr.getUseHttpsOnly()));
 		values.put(KEY_SHOW_COPYRIGHT, encrypt(attr.getShowCopyright()));
@@ -2216,57 +2210,6 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 	}
 
 	/**
-	 * Gets attributes from the DB v61 (previous to remove the value to enable/disable staging).
-	 * KEY_STAGING has been removed in DB v62.
-	 *
-	 * @return Attributes.
-	 */
-	private MegaAttributes getAttributesFromDBv61(SQLiteDatabase db) {
-		MegaAttributes attr = null;
-
-		String selectQuery = "SELECT * FROM " + TABLE_ATTRIBUTES;
-		try (Cursor cursor = db.rawQuery(selectQuery, null)) {
-			if (cursor != null && cursor.moveToFirst()) {
-				int id = Integer.parseInt(cursor.getString(0));
-				String online = decrypt(cursor.getString(1));
-				String intents = decrypt(cursor.getString(2));
-				String askSizeDownload = decrypt(cursor.getString(3));
-				String askNoAppDownload = decrypt(cursor.getString(4));
-				String fileLoggerSDK = decrypt(cursor.getString(5));
-				String accountDetailsTimeStamp = decrypt(cursor.getString(6));
-				String paymentMethodsTimeStamp = decrypt(cursor.getString(7));
-				String pricingTimeStamp = decrypt(cursor.getString(8));
-				String extendedAccountDetailsTimeStamp = decrypt(cursor.getString(9));
-				String invalidateSdkCache = decrypt(cursor.getString(10));
-				String fileLoggerKarere = decrypt(cursor.getString(11));
-				String useHttpsOnly = decrypt(cursor.getString(12));
-				String showCopyright = decrypt(cursor.getString(13));
-				String showNotifOff = decrypt(cursor.getString(14));
-				String staging = decrypt(cursor.getString(15));
-				String lastPublicHandle = decrypt(cursor.getString(16));
-				String lastPublicHandleTimeStamp = decrypt(cursor.getString(17));
-				String storageState = decrypt(cursor.getString(18));
-				String lastPublicHandleType = decrypt(cursor.getString(19));
-				String myChatFilesFolderHandle = decrypt(cursor.getString(20));
-				String transferQueueStatus = decrypt(cursor.getString(21));
-
-				attr = new MegaAttributes(online,
-						intents != null && !intents.isEmpty() ? Integer.parseInt(intents) : 0,
-						askSizeDownload, askNoAppDownload, fileLoggerSDK, accountDetailsTimeStamp,
-						paymentMethodsTimeStamp, pricingTimeStamp, extendedAccountDetailsTimeStamp,
-						invalidateSdkCache, fileLoggerKarere, useHttpsOnly, showCopyright, showNotifOff,
-						lastPublicHandle, lastPublicHandleTimeStamp,
-						lastPublicHandleType != null && !lastPublicHandleType.isEmpty() ? Integer.parseInt(lastPublicHandleType) : MegaApiJava.AFFILIATE_TYPE_INVALID,
-						storageState != null && !storageState.isEmpty() ? Integer.parseInt(storageState) : MegaApiJava.STORAGE_STATE_UNKNOWN,
-						myChatFilesFolderHandle, transferQueueStatus);
-			}
-		} catch (Exception e) {
-			logError("Exception opening or managing DB cursor", e);
-		}
-		return attr;
-	}
-
-	/**
 	 * Gets attributes.
 	 *
 	 * @param db	Current DB.
@@ -2278,33 +2221,42 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		String selectQuery = "SELECT * FROM " + TABLE_ATTRIBUTES;
 		try (Cursor cursor = db.rawQuery(selectQuery, null)) {
 			if (cursor != null && cursor.moveToFirst()) {
-				int id = Integer.parseInt(cursor.getString(0));
-				String online = decrypt(cursor.getString(1));
-				String intents = decrypt(cursor.getString(2));
-				String askSizeDownload = decrypt(cursor.getString(3));
-				String askNoAppDownload = decrypt(cursor.getString(4));
-				String fileLoggerSDK = decrypt(cursor.getString(5));
-				String accountDetailsTimeStamp = decrypt(cursor.getString(6));
-				String paymentMethodsTimeStamp = decrypt(cursor.getString(7));
-				String pricingTimeStamp = decrypt(cursor.getString(8));
-				String extendedAccountDetailsTimeStamp = decrypt(cursor.getString(9));
-				String invalidateSdkCache = decrypt(cursor.getString(10));
-				String fileLoggerKarere = decrypt(cursor.getString(11));
-				String useHttpsOnly = decrypt(cursor.getString(12));
-				String showCopyright = decrypt(cursor.getString(13));
-				String showNotifOff = decrypt(cursor.getString(14));
-				String lastPublicHandle = decrypt(cursor.getString(15));
-				String lastPublicHandleTimeStamp = decrypt(cursor.getString(16));
-				String storageState = decrypt(cursor.getString(17));
-				String lastPublicHandleType = decrypt(cursor.getString(18));
-				String myChatFilesFolderHandle = decrypt(cursor.getString(19));
-				String transferQueueStatus = decrypt(cursor.getString(20));
+				String online = decrypt(cursor.getString(getColumnIndex(cursor, KEY_ATTR_ONLINE)));
+				String intents = decrypt(cursor.getString(getColumnIndex(cursor, KEY_ATTR_INTENTS)));
+				String askSizeDownload = decrypt(cursor.getString(getColumnIndex(cursor, KEY_ATTR_ASK_SIZE_DOWNLOAD)));
+				String askNoAppDownload = decrypt(cursor.getString(getColumnIndex(cursor, KEY_ATTR_ASK_NOAPP_DOWNLOAD)));
+
+				if (!areSDKLogsEnabled() && cursor.getColumnIndex(KEY_FILE_LOGGER_SDK) != INVALID_VALUE) {
+					String fileLoggerSDK = decrypt(cursor.getString(getColumnIndex(cursor, KEY_FILE_LOGGER_SDK)));
+					updateSDKLogs(Boolean.parseBoolean(fileLoggerSDK));
+				}
+
+				String accountDetailsTimeStamp = decrypt(cursor.getString(getColumnIndex(cursor, KEY_ACCOUNT_DETAILS_TIMESTAMP)));
+				String paymentMethodsTimeStamp = decrypt(cursor.getString(getColumnIndex(cursor, KEY_PAYMENT_METHODS_TIMESTAMP)));
+				String pricingTimeStamp = decrypt(cursor.getString(getColumnIndex(cursor, KEY_PRICING_TIMESTAMP)));
+				String extendedAccountDetailsTimeStamp = decrypt(cursor.getString(getColumnIndex(cursor, KEY_EXTENDED_ACCOUNT_DETAILS_TIMESTAMP)));
+				String invalidateSdkCache = decrypt(cursor.getString(getColumnIndex(cursor, KEY_INVALIDATE_SDK_CACHE)));
+
+				if (!areKarereLogsEnabled() && cursor.getColumnIndex(KEY_FILE_LOGGER_KARERE) != INVALID_VALUE) {
+					String fileLoggerKarere = decrypt(cursor.getString(getColumnIndex(cursor, KEY_FILE_LOGGER_KARERE)));
+					updateKarereLogs(Boolean.parseBoolean(fileLoggerKarere));
+				}
+
+				String useHttpsOnly = decrypt(cursor.getString(getColumnIndex(cursor, KEY_USE_HTTPS_ONLY)));
+				String showCopyright = decrypt(cursor.getString(getColumnIndex(cursor, KEY_SHOW_COPYRIGHT)));
+				String showNotifOff = decrypt(cursor.getString(getColumnIndex(cursor, KEY_SHOW_NOTIF_OFF)));
+				String lastPublicHandle = decrypt(cursor.getString(getColumnIndex(cursor, KEY_LAST_PUBLIC_HANDLE)));
+				String lastPublicHandleTimeStamp = decrypt(cursor.getString(getColumnIndex(cursor, KEY_LAST_PUBLIC_HANDLE_TIMESTAMP)));
+				String storageState = decrypt(cursor.getString(getColumnIndex(cursor, KEY_STORAGE_STATE)));
+				String lastPublicHandleType = decrypt(cursor.getString(getColumnIndex(cursor, KEY_LAST_PUBLIC_HANDLE_TYPE)));
+				String myChatFilesFolderHandle = decrypt(cursor.getString(getColumnIndex(cursor, KEY_MY_CHAT_FILES_FOLDER_HANDLE)));
+				String transferQueueStatus = decrypt(cursor.getString(getColumnIndex(cursor, KEY_TRANSFER_QUEUE_STATUS)));
 
 				attr = new MegaAttributes(online,
 						intents != null && !intents.isEmpty() ? Integer.parseInt(intents) : 0,
-						askSizeDownload, askNoAppDownload, fileLoggerSDK, accountDetailsTimeStamp,
+						askSizeDownload, askNoAppDownload, accountDetailsTimeStamp,
 						paymentMethodsTimeStamp, pricingTimeStamp, extendedAccountDetailsTimeStamp,
-						invalidateSdkCache, fileLoggerKarere, useHttpsOnly, showCopyright, showNotifOff,
+						invalidateSdkCache, useHttpsOnly, showCopyright, showNotifOff,
 						lastPublicHandle, lastPublicHandleTimeStamp,
 						lastPublicHandleType != null && !lastPublicHandleType.isEmpty() ? Integer.parseInt(lastPublicHandleType) : MegaApiJava.AFFILIATE_TYPE_INVALID,
 						storageState != null && !storageState.isEmpty() ? Integer.parseInt(storageState) : MegaApiJava.STORAGE_STATE_UNKNOWN,
@@ -3669,40 +3621,6 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 				logDebug("UPDATE_ATTRIBUTES_TABLE : " + UPDATE_ATTRIBUTES_TABLE);
 			} else {
 				values.put(KEY_ATTR_INTENTS, encrypt(Integer.toString(attemp) + ""));
-				db.insert(TABLE_ATTRIBUTES, null, values);
-			}
-		} catch (Exception e) {
-			logError("Exception opening or managing DB cursor", e);
-		}
-	}
-
-	public void setFileLoggerSDK (boolean fileLoggerSDK){
-		String selectQuery = "SELECT * FROM " + TABLE_ATTRIBUTES;
-		ContentValues values = new ContentValues();
-		try (Cursor cursor = db.rawQuery(selectQuery, null)) {
-			if (cursor != null && cursor.moveToFirst()) {
-				String UPDATE_ATTRIBUTES_TABLE = "UPDATE " + TABLE_ATTRIBUTES + " SET " + KEY_FILE_LOGGER_SDK + "='" + encrypt(fileLoggerSDK + "") + "' WHERE " + KEY_ID + " ='1'";
-				db.execSQL(UPDATE_ATTRIBUTES_TABLE);
-				logDebug("UPDATE_ATTRIBUTES_TABLE : " + UPDATE_ATTRIBUTES_TABLE);
-			} else {
-				values.put(KEY_FILE_LOGGER_SDK, encrypt(fileLoggerSDK + ""));
-				db.insert(TABLE_ATTRIBUTES, null, values);
-			}
-		} catch (Exception e) {
-			logError("Exception opening or managing DB cursor", e);
-		}
-	}
-
-	public void setFileLoggerKarere (boolean fileLoggerKarere){
-		String selectQuery = "SELECT * FROM " + TABLE_ATTRIBUTES;
-		ContentValues values = new ContentValues();
-		try (Cursor cursor = db.rawQuery(selectQuery, null)) {
-			if (cursor != null && cursor.moveToFirst()) {
-				String UPDATE_ATTRIBUTES_TABLE = "UPDATE " + TABLE_ATTRIBUTES + " SET " + KEY_FILE_LOGGER_KARERE + "='" + encrypt(fileLoggerKarere + "") + "' WHERE " + KEY_ID + " ='1'";
-				db.execSQL(UPDATE_ATTRIBUTES_TABLE);
-				logDebug("UPDATE_ATTRIBUTES_TABLE : " + UPDATE_ATTRIBUTES_TABLE);
-			} else {
-				values.put(KEY_FILE_LOGGER_KARERE, encrypt(fileLoggerKarere + ""));
 				db.insert(TABLE_ATTRIBUTES, null, values);
 			}
 		} catch (Exception e) {
