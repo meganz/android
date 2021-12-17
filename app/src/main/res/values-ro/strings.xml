@@ -70,8 +70,6 @@
     <string name="general_error_word">Eroare</string>
     <!-- when clicking into a menu whose functionality is not yet implemented -->
     <string name="general_not_yet_implemented">Momentan neimplementat</string>
-    <!-- when any file or folder is selected -->
-    <string name="error_no_selection">Niciun fișier sau folder selectat</string>
     <!-- when trying to download a file that is already downloaded in the device -->
     <string name="general_already_downloaded">Descărcat deja</string>
     <!-- when trying to upload a file that is already uploaded in the folder -->
@@ -644,10 +642,6 @@
     <string name="upload_to_audio">Audio</string>
     <!-- Title of the button in the contact info screen to start a video call -->
     <string name="upload_to_video">Video</string>
-    <!-- upload to. Then choose to browse the file system to choose a file -->
-    <string name="upload_to_filesystem">Alege din sistemul de fișiere</string>
-    <!-- upload to. Then choose to browse the file system to choose a file -->
-    <string name="upload_to_filesystem_from">Alege din</string>
     <!-- Label for the current uploaded size of a file. For example, 3 files, 50KB uploaded -->
     <string name="upload_uploaded">încărcat</string>
     <!-- Status text at the beginning of an upload, Status text at the beginning of an upload for 2 or more files -->
@@ -3195,8 +3189,6 @@
     </plurals>
     <!-- Title of a chat message that contains geolocation info -->
     <string name="title_geolocation_message">Locație fixată</string>
-    <!-- Text of the button to indicate an attachment upload from file system -->
-    <string name="attachment_upload_panel_from_device">Din sistemul de fișiere</string>
     <!-- Alert shown when a num of files have not been sent because of any error occurs, Plural of file. 2 files -->
     <plurals name="num_files_not_send">
         <item quantity="one">%d fișier nu a fost trimis către %d chaturi</item>
