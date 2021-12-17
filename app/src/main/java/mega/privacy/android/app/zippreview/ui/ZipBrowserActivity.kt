@@ -31,12 +31,15 @@ import mega.privacy.android.app.utils.Constants.*
 import mega.privacy.android.app.utils.LogUtil.logDebug
 import mega.privacy.android.app.utils.MegaProgressDialogUtil.createProgressDialog
 import mega.privacy.android.app.zippreview.viewmodel.ZipBrowserViewModel
-import mega.privacy.android.app.zippreview.viewmodel.ZipBrowserViewModel.TypeItemClickResult.*
-import mega.privacy.android.app.zippreview.domain.ZipFileType
+import mega.privacy.android.app.zippreview.viewmodel.ZipBrowserViewModel.StatusItemClicked.*
+import mega.privacy.android.app.zippreview.domain.FileType
 import nz.mega.sdk.MegaApiJava
 import java.io.File
 import java.util.*
 
+/**
+ * Display the zip file content, replacement of ZipBrowserActivityLollipop.java
+ */
 class ZipBrowserActivity : PasscodeActivity() {
     companion object {
         const val EXTRA_PATH_ZIP = "PATH_ZIP"
@@ -78,6 +81,7 @@ class ZipBrowserActivity : PasscodeActivity() {
         intent.extras?.run {
             //Get the zip file path
             zipFullPath = getString(EXTRA_PATH_ZIP) ?: ""
+            //Get the unzip root path for unpack zip file
             unZipRootPath = "${zipFullPath.subSequence(0, zipFullPath.lastIndexOf("/") + 1)}"
         }
     }
@@ -101,7 +105,7 @@ class ZipBrowserActivity : PasscodeActivity() {
         }
 
         recyclerView = zipBrowserBinding.zipListViewBrowser.also {
-            it.setPadding(0, 0, 0, recycleViewHeight())
+            it.setPadding(0, 0, 0, recycleViewBottomPadding())
             it.clipToPadding = false
             it.addItemDecoration(SimpleDividerItemDecoration(this))
             it.layoutManager = LinearLayoutManager(this)
@@ -157,14 +161,25 @@ class ZipBrowserActivity : PasscodeActivity() {
         return true
     }
 
+    /**
+     * show snack bar
+     * @param message the message is displayed on snack bar
+     */
     private fun showSnackBar(message: String) {
         showSnackbar(zipBrowserBinding.zipLayout, message)
     }
 
-    private fun recycleViewHeight(): Int {
+    /**
+     * legacy logic to get the recycle view bottom padding
+     * @return bottom padding
+     */
+    private fun recycleViewBottomPadding(): Int {
         return (RATIO_RECYCLE_VIEW * getScreenHeight()).toInt() //Based on Eduardo's measurements
     }
 
+    /**
+     * Show progress dialog
+     */
     private fun showProgressDialog() {
         if (!::unZipWaitingDialog.isInitialized) {
             unZipWaitingDialog = createProgressDialog(
@@ -175,6 +190,9 @@ class ZipBrowserActivity : PasscodeActivity() {
         }
     }
 
+    /**
+     * Show alert dialog when the file cannot be opened
+     */
     private fun showAlert() {
         MaterialAlertDialogBuilder(this, R.style.ThemeOverlay_Mega_MaterialAlertDialog)
             .setMessage(StringResourcesUtils.getString(R.string.error_fail_to_open_file_general))
@@ -185,11 +203,16 @@ class ZipBrowserActivity : PasscodeActivity() {
             .show()
     }
 
-    private fun openFile(zipInfoBO: ZipInfoUIO, position: Int) {
-        if (zipInfoBO.fileType == ZipFileType.ZIP) {
-            openZipFile(zipInfoBO)
+    /**
+     * Open file
+     * @param zipInfoUIO ZipInfoUIO of file opened
+     * @param position position of file opened
+     */
+    private fun openFile(zipInfoUIO: ZipInfoUIO, position: Int) {
+        if (zipInfoUIO.fileType == FileType.ZIP) {
+            zipFileOpen(zipInfoUIO)
         } else {
-            val file = File("$unZipRootPath${zipInfoBO.zipFileName}")
+            val file = File("$unZipRootPath${zipInfoUIO.zipFileName}")
             MimeTypeList.typeForName(file.name).apply {
                 when {
                     isImage ->
@@ -214,7 +237,11 @@ class ZipBrowserActivity : PasscodeActivity() {
         }
     }
 
-    private fun openZipFile(zipInfoUIO: ZipInfoUIO) {
+    /**
+     * Open zip type file
+     * @param zipInfoUIO ZipInfoUIO of file opened
+     */
+    private fun zipFileOpen(zipInfoUIO: ZipInfoUIO) {
         val intentZip = Intent(
             this@ZipBrowserActivity,
             ZipBrowserActivity::class.java
@@ -223,6 +250,11 @@ class ZipBrowserActivity : PasscodeActivity() {
         startActivity(intentZip)
     }
 
+    /**
+     * legacy logic to open image type file
+     * @param position position of file opened
+     * @param file file
+     */
     private fun imageFileOpen(position: Int, file: File) {
         logDebug("isImage")
         val intent =
@@ -246,6 +278,11 @@ class ZipBrowserActivity : PasscodeActivity() {
         overridePendingTransition(0, 0)
     }
 
+    /**
+     * legacy logic to open media type file
+     * @param position position of file opened
+     * @param file file
+     */
     private fun MimeTypeList.mediaFileOpen(file: File, position: Int) {
         logDebug("Video file")
         val mediaIntent: Intent
@@ -326,6 +363,11 @@ class ZipBrowserActivity : PasscodeActivity() {
         overridePendingTransition(0, 0)
     }
 
+    /**
+     * legacy logic to open pdf type file
+     * @param position position of file opened
+     * @param file file
+     */
     private fun MimeTypeList.pdfFileOpen(file: File, position: Int) {
         logDebug("Pdf file")
         val pdfIntent =
@@ -361,6 +403,10 @@ class ZipBrowserActivity : PasscodeActivity() {
         }
     }
 
+    /**
+     * legacy logic to open other type file
+     * @param file file
+     */
     private fun MimeTypeList.otherFileOpen(file: File) {
         logDebug("NOT Image, video, audio or pdf")
         val viewIntent = Intent(Intent.ACTION_VIEW)

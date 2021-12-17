@@ -15,6 +15,10 @@ import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.Util.dpWidthAbs
 import mega.privacy.android.app.utils.getScreenWidth
 
+/**
+ * Zip list adapter, replacement of ZipListAdapterLollipop.java
+ * @param onItemClick item click event listener
+ */
 class ZipListAdapter(private val onItemClick: (zipInfoUIO: ZipInfoUIO, position: Int) -> Unit) :
     ListAdapter<ZipInfoUIO, ZipListViewHolder>(DiffCallback), DragThumbnailGetter {
 
@@ -23,9 +27,9 @@ class ZipListAdapter(private val onItemClick: (zipInfoUIO: ZipInfoUIO, position:
             parent.context, ItemFileListBinding
                 .inflate(LayoutInflater.from(parent.context), parent, false)
         )
-        holder.binding.also {
-            it.fileListFilename.layoutParams.height = RelativeLayout.LayoutParams.WRAP_CONTENT
-            it.fileListFilename.layoutParams.width =
+        with(holder.binding) {
+            fileListFilename.layoutParams.height = RelativeLayout.LayoutParams.WRAP_CONTENT
+            fileListFilename.layoutParams.width =
                 getTextFileNameWidth(parent.context as ZipBrowserActivity)
         }
         return holder
@@ -35,6 +39,11 @@ class ZipListAdapter(private val onItemClick: (zipInfoUIO: ZipInfoUIO, position:
         holder.bind(getItem(position), onItemClick)
     }
 
+    /**
+     * legacy logic to get the width of filename textview.
+     * @param activity Activity
+     * @return width of filename textview
+     */
     private fun getTextFileNameWidth(activity: Activity): Int {
         val screenWidth = activity.getScreenWidth()
         val density = activity.resources.displayMetrics.density
@@ -61,8 +70,18 @@ class ZipListAdapter(private val onItemClick: (zipInfoUIO: ZipInfoUIO, position:
     }
 }
 
+/**
+ * ViewHolder of zip list adapter
+ * @param context Context
+ * @param binding dataBinding
+ */
 class ZipListViewHolder(val context: Context, val binding: ItemFileListBinding) :
     RecyclerView.ViewHolder(binding.root) {
+    /**
+     * Bind the data with view
+     * @param item current ZipInfoUIO
+     * @param onItemClick item click event listener
+     */
     fun bind(item: ZipInfoUIO, onItemClick: (zipInfoUIO: ZipInfoUIO, position: Int) -> Unit) {
         binding.apply {
             fileListSavedOffline.visibility = View.INVISIBLE
@@ -80,6 +99,9 @@ class ZipListViewHolder(val context: Context, val binding: ItemFileListBinding) 
     }
 }
 
+/**
+ * DiffCallback of zip list adapter
+ */
 object DiffCallback : DiffUtil.ItemCallback<ZipInfoUIO>() {
     override fun areItemsTheSame(oldItem: ZipInfoUIO, newItem: ZipInfoUIO): Boolean {
         return oldItem.zipFileName == newItem.zipFileName

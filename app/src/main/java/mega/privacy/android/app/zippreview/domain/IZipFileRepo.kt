@@ -2,6 +2,9 @@ package mega.privacy.android.app.zippreview.domain
 
 import java.util.zip.ZipFile
 
+/**
+ * Zip repository to handle zip file
+ */
 interface IZipFileRepo {
 
     /**
@@ -10,17 +13,17 @@ interface IZipFileRepo {
      * @param unZipRootPath the unpacked root path
      * @return true is unpack succeed.
      */
-    suspend fun unpackZipFile(zipFullPath: String, unZipRootPath: String): Boolean
+    suspend fun unzipFile(zipFullPath: String, unZipRootPath: String): Boolean
 
     /**
-     * Updated zip info list when the content changed.
+     * Updated zip info list when the directory changed.
      * @param folderPath current zip folder path
      * @param zipFile zip file
      * @return the list in current content
      */
     suspend fun updateZipInfoList(
-        folderPath: String,
         unknownStr: String,
-        zipFile: ZipFile
+        zipFile: ZipFile,
+        folderPath: String
     ): List<ZipInfoBO>
 }

@@ -1,7 +1,6 @@
 package mega.privacy.android.app.utils
 
 import android.app.Activity
-import android.content.Context
 import android.os.Build
 import android.util.DisplayMetrics
 import android.view.WindowInsets
@@ -23,6 +22,10 @@ fun <F : Fragment> AppCompatActivity.getFragmentFromNavHost(
     return null
 }
 
+/**
+ * Get screen Height
+ * @return screen height
+ */
 fun Activity.getScreenHeight(): Int {
     return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
         val windowMetrics = windowManager.currentWindowMetrics
@@ -31,11 +34,16 @@ fun Activity.getScreenHeight(): Int {
         windowMetrics.bounds.height() - insets.top - insets.bottom
     } else {
         val displayMetrics = DisplayMetrics()
+        @Suppress("DEPRECATION")
         windowManager.defaultDisplay.getMetrics(displayMetrics)
         displayMetrics.heightPixels
     }
 }
 
+/**
+ * Get screen Width
+ * @return screen width
+ */
 fun Activity.getScreenWidth(): Int {
     return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
         val windowMetrics = windowManager.currentWindowMetrics
@@ -44,7 +52,8 @@ fun Activity.getScreenWidth(): Int {
         windowMetrics.bounds.width() - insets.left - insets.right
     } else {
         val displayMetrics = DisplayMetrics()
-        windowManager.defaultDisplay.getRealMetrics(displayMetrics)
+        @Suppress("DEPRECATION")
+        windowManager.defaultDisplay.getMetrics(displayMetrics)
         displayMetrics.widthPixels
     }
 }
