@@ -52,7 +52,7 @@ class ZipListAdapter(private val onItemClick: (zipInfoUIO: ZipInfoUIO, position:
 
     override fun getNodePosition(handle: Long): Int {
         currentList.indexOfFirst {
-            it.zipFileName.split("/").lastOrNull()?.hashCode()?.toLong() == handle
+            it.path.split("/").lastOrNull()?.hashCode()?.toLong() == handle
         }
         return Constants.INVALID_POSITION
     }
@@ -89,7 +89,7 @@ class ZipListViewHolder(val context: Context, val binding: ItemFileListBinding) 
             fileListThreeDotsLayout.visibility = View.INVISIBLE
             fileListThumbnail.visibility = View.VISIBLE
 
-            fileListFilename.text = item.displayedFileName
+            fileListFilename.text = item.name
             fileListFilesize.text = item.folderInfo
             fileListThumbnail.setImageResource(item.imageResourceId)
             fileListItemLayout.setOnClickListener {
@@ -104,7 +104,7 @@ class ZipListViewHolder(val context: Context, val binding: ItemFileListBinding) 
  */
 object DiffCallback : DiffUtil.ItemCallback<ZipInfoUIO>() {
     override fun areItemsTheSame(oldItem: ZipInfoUIO, newItem: ZipInfoUIO): Boolean {
-        return oldItem.zipFileName == newItem.zipFileName
+        return oldItem.path == newItem.path
     }
 
     override fun areContentsTheSame(oldItem: ZipInfoUIO, newItem: ZipInfoUIO): Boolean {

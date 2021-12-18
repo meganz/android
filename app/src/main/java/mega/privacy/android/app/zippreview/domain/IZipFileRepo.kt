@@ -10,10 +10,16 @@ interface IZipFileRepo {
     /**
      * Unpack Zip file
      * @param zipFullPath Zip file full path
-     * @param unZipRootPath the unpacked root path
+     * @param unzipRootPath the unpacked root path
      * @return true is unpack succeed.
      */
-    suspend fun unzipFile(zipFullPath: String, unZipRootPath: String): Boolean
+    suspend fun unzipFile(zipFullPath: String, unzipRootPath: String): Boolean
+
+    /**
+     * Init the ZipTreeNode. Created ZipTreeMap using zip entries of current zip file
+     * @param zipFile
+     */
+    suspend fun initZipTreeNode(zipFile: ZipFile)
 
     /**
      * Updated zip info list when the directory changed.
@@ -21,9 +27,13 @@ interface IZipFileRepo {
      * @param zipFile zip file
      * @return the list in current content
      */
-    suspend fun updateZipInfoList(
-        unknownStr: String,
-        zipFile: ZipFile,
-        folderPath: String
-    ): List<ZipInfoBO>
+    fun updateZipInfoList(zipFile: ZipFile, folderPath: String): List<ZipTreeNode>
+
+    /**
+     * Get the zip info list of current folder's parent
+     * @param folderPath current folder path
+     * @param isEmptyFolder current folder whether is empty
+     * @return ZipTreeNode List
+     */
+    fun getParentZipInfoList(folderPath: String, isEmptyFolder: Boolean): List<ZipTreeNode>
 }

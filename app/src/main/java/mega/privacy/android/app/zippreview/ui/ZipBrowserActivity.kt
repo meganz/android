@@ -60,7 +60,7 @@ class ZipBrowserActivity : PasscodeActivity() {
     private lateinit var zipAdapter: ZipListAdapter
 
     private lateinit var zipFullPath: String
-    private lateinit var unZipRootPath: String
+    private lateinit var unzipRootPath: String
 
     private lateinit var unZipWaitingDialog: AlertDialog
 
@@ -82,7 +82,7 @@ class ZipBrowserActivity : PasscodeActivity() {
             //Get the zip file path
             zipFullPath = getString(EXTRA_PATH_ZIP) ?: ""
             //Get the unzip root path for unpack zip file
-            unZipRootPath = "${zipFullPath.subSequence(0, zipFullPath.lastIndexOf("/") + 1)}"
+            unzipRootPath = zipFullPath.split(".").first()
         }
     }
 
@@ -140,8 +140,7 @@ class ZipBrowserActivity : PasscodeActivity() {
             //Open current zip file content
             viewModelInit(
                 zipFullPath,
-                resources.getString(R.string.transfer_unknown),
-                unZipRootPath
+                unzipRootPath
             )
         }
     }
@@ -210,9 +209,14 @@ class ZipBrowserActivity : PasscodeActivity() {
      */
     private fun openFile(zipInfoUIO: ZipInfoUIO, position: Int) {
         if (zipInfoUIO.fileType == FileType.ZIP) {
-            zipFileOpen(zipInfoUIO)
+            //If the zip file name is start with ".", it cannot be unzip. So show the alert.
+            if (zipInfoUIO.name.startsWith(".")) {
+                showAlert()
+            } else {
+                zipFileOpen(zipInfoUIO)
+            }
         } else {
-            val file = File("$unZipRootPath${zipInfoUIO.zipFileName}")
+            val file = File("$unzipRootPath${File.separator}${zipInfoUIO.path}")
             MimeTypeList.typeForName(file.name).apply {
                 when {
                     isImage ->
@@ -246,7 +250,7 @@ class ZipBrowserActivity : PasscodeActivity() {
             this@ZipBrowserActivity,
             ZipBrowserActivity::class.java
         )
-        intentZip.putExtra(EXTRA_PATH_ZIP, "${unZipRootPath}${zipInfoUIO.zipFileName}")
+        intentZip.putExtra(EXTRA_PATH_ZIP, "${unzipRootPath}${File.separator}${zipInfoUIO.path}")
         startActivity(intentZip)
     }
 

@@ -1,43 +1,44 @@
 package mega.privacy.android.app.zippreview.domain
 
-import android.text.TextUtils
+import android.util.Log
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import mega.privacy.android.app.utils.TextUtil
-import mega.privacy.android.app.utils.Util
 import java.io.*
 import java.lang.Exception
-import java.util.zip.ZipEntry
 import java.util.zip.ZipFile
 
 /**
  * Zip repository implementation class
  */
 class ZipFileRepo : IZipFileRepo {
+    companion object {
+        private const val SUFFIX_ZIP = ".zip"
+    }
+    private val zipTreeNodeMap: ZipTreeMap = ZipTreeMap()
 
-    override suspend fun unzipFile(zipFullPath: String, unZipRootPath: String): Boolean {
+    override suspend fun unzipFile(zipFullPath: String, unzipRootPath: String): Boolean {
         return withContext(Dispatchers.IO) {
-            unzip(zipFullPath, unZipRootPath)
+            unzip(zipFullPath, unzipRootPath)
         }
     }
 
     /**
      * Unzip file
      * @param zipFullPath zip file path
-     * @param unZipRootPath unzip destination path
+     * @param unzipRootPath unzip destination path
      * @return true is unzip succeed.
      */
-    fun unzip(zipFullPath: String, unZipRootPath: String): Boolean {
+    fun unzip(zipFullPath: String, unzipRootPath: String): Boolean {
         ZipFile(zipFullPath).apply {
             entries().toList().forEach {
-                val zipDestination = File(unZipRootPath + it.name)
+                val zipDestination = File(unzipRootPath + it.name)
                 if (it.isDirectory) {
                     if (!zipDestination.exists()) {
                         zipDestination.mkdirs()
                     }
                 } else {
                     try {
-                        val inputStream = this.getInputStream(it)
+                        val inputStream = getInputStream(it)
                         //Get the parent file. If it is null or
                         // doesn't exist, created the parent folder.
                         val parentFile = zipDestination.parentFile
@@ -71,94 +72,104 @@ class ZipFileRepo : IZipFileRepo {
         return true
     }
 
-    override suspend fun updateZipInfoList(
-        unknownStr: String,
-        zipFile: ZipFile,
-        folderPath: String
-    ): List<ZipInfoBO> {
-        return withContext(Dispatchers.IO) {
-            updateZipEntries(folderPath, zipFile).map {
-                try {
-                    zipEntryToZipInfoBO(it, zipFile)
-                } catch (e: IllegalArgumentException) {
-                    val unknownZipEntry = ZipEntry(unknownStr)
-                    ZipInfoBO(
-                        zipEntry = unknownZipEntry,
-                        zipFileName = unknownZipEntry.name,
-                        fileType = FileType.UNKNOWN,
-                        info = ""
-                    )
+    override fun getParentZipInfoList(
+        folderPath: String,
+        isEmptyFolder: Boolean
+    ): List<ZipTreeNode> {
+        val parentNodeKey = if (isEmptyFolder) {
+            //If folder is empty, using saved folder path to back preview directory
+            zipTreeNodeMap[folderPath.removeSuffix("/")]?.path
+        } else {
+            //If folder is not empty, using parent path of sub item to back preview directory
+            zipTreeNodeMap[folderPath.removeSuffix("/")]?.parent
+        }
+        // No at root level, show parent and it's siblings
+        return zipTreeNodeMap[parentNodeKey]?.let { parentNode ->
+            parentNode.parent?.let { grandpaPath ->
+                zipTreeNodeMap[grandpaPath]?.children ?: mutableListOf()
+                // Parent's parent is null, should show root children
+            } ?: getRootChildren()
+            // Parent is null, return empty list
+        } ?: mutableListOf()
+    }
+
+    override fun updateZipInfoList(zipFile: ZipFile, folderPath: String): List<ZipTreeNode> {
+        return if (folderPath.isNotEmpty()) {
+            zipTreeNodeMap[folderPath.removeSuffix("/")]?.children ?: mutableListOf()
+        } else {
+            //If folder is empty, show the root directory
+            getRootChildren()
+        }
+    }
+
+    /**
+     * Get items of root directory
+     * @return List<ZipTreeNode>
+     */
+    private fun getRootChildren() = zipTreeNodeMap.values.filter {
+        it.parent == null
+    }
+
+    /**
+     * Using zip tree map could save all of zip entries information and could created complete
+     * directory structure to handle the switch on different zip file directory. Meanwhile, avoid
+     * repeatedly iterate zip entries when the directory is changed.
+     */
+    override suspend fun initZipTreeNode(zipFile: ZipFile) {
+        zipFile.entries().toList().forEach { zipEntry ->
+            zipEntry.name.let { name ->
+                val nodeDepth = name.getZipTreeNodeDepth()
+                for (i in 1..nodeDepth) {
+                    //Get every sub path of current zip entry. For example, the path zip entry
+                    // path is 1/2/3.txt, the sub paths respectively are 1/ 1/2/ 1/2/3.txt
+                    val subPath = name.getSubPathByDepth(i)
+                    //Get name of current sub path
+                    val subName = subPath.getZipTreeNodeName()
+                    //Get parent path of current sub path. For example, if current sub path is 1/2/
+                    //its parent path is 1/
+                    val subParentPath = if (i == 1) {
+                        null
+                    } else {
+                        name.getSubPathByDepth(i - 1)
+                    }
+                    //Get current zip tree node using sub path
+                    var zipTreeNode = zipTreeNodeMap[subPath]
+
+                    // If node doesn't exist, create one, otherwise ignore it
+                    if (zipTreeNode == null) {
+                        zipTreeNode = ZipTreeNode(
+                            subName,
+                            subPath,
+                            zipEntry.size,
+                            if (i == nodeDepth) {
+                                if (zipEntry.isDirectory) {
+                                    FileType.FOLDER
+                                } else {
+                                    when {
+                                        subPath.endsWith(SUFFIX_ZIP) -> FileType.ZIP
+                                        else -> FileType.FILE
+                                    }
+                                }
+                            } else {
+                                FileType.FOLDER
+                            },
+                            subParentPath,
+                            mutableListOf(),
+
+                            ).also {
+                            Log.d("ZipFileRepo2", "add $subName:$it")
+                        }
+                        zipTreeNodeMap[subPath] = zipTreeNode
+
+                        // If parent path is not empty add current path to map
+                        // Empty path represents root directory
+                        if (!subParentPath.isNullOrEmpty()) {
+                            val parentNode = zipTreeNodeMap[subParentPath]
+                            parentNode?.children?.add(zipTreeNode)
+                        }
+                    }
                 }
             }
         }
-    }
-
-    /**
-     * Convert ZipEntry to ZipInfoBO
-     * @param zipEntry ZipEntry
-     * @param zipFile zip file
-     * @return ZipInfoBO
-     */
-    private fun zipEntryToZipInfoBO(zipEntry: ZipEntry, zipFile: ZipFile): ZipInfoBO {
-        //If the depth of current element the current depth and
-        // the element path is start with the current folder path, add the element.
-        return ZipInfoBO(
-            zipEntry,
-            zipEntry.name,
-            fileType = when {
-                zipEntry.isDirectory -> FileType.FOLDER
-                zipEntry.name.endsWith(SUFFIX_ZIP) -> FileType.ZIP
-                else -> FileType.FILE
-            },
-            info = if (zipEntry.isDirectory)
-                countFiles(zipEntry.name, zipFile)
-            else
-                Util.getSizeString(zipEntry.size)
-
-        )
-    }
-
-    /**
-     * Updated zip entries when the directory changed
-     * @param folderPath folder path
-     * @param zipFile ZipFile
-     * @return Zip entries
-     */
-    private fun updateZipEntries(folderPath: String, zipFile: ZipFile): List<ZipEntry> {
-        val expectedDepth = if (TextUtils.isEmpty(folderPath)) 1 else folderPath.getPathDepth()
-        return zipFile.entries().toList().filter {
-            it.name.startsWith(folderPath) and (it.getZipEntryDepth() == expectedDepth)
-        }
-    }
-
-    /**
-     * Count the files number of current folder
-     * @param folderPath current folder path
-     * @param zipFile Zip file
-     * @return files number string of current folder.
-     */
-    private fun countFiles(folderPath: String, zipFile: ZipFile): String {
-        val pathDepth = folderPath.getPathDepth()
-        val entryMap = zipFile.entries().toList().filter {
-            it.name.startsWith(folderPath) and (it.getZipEntryDepth() >= pathDepth)
-        }.groupBy {
-            it.isDirectory
-        }
-        return TextUtil.getFolderInfo(entryMap[true]?.size ?: 0, entryMap[false]?.size ?: 0)
-    }
-
-    /**
-     * Get depth of current ZipEntry
-     * @return depth of current ZipEntry
-     */
-    private fun ZipEntry.getZipEntryDepth(): Int {
-        // directory end with "/" so need to get rid of it
-        return name.getPathDepth() - if (isDirectory) 1 else 0
-    }
-
-    private fun String.getPathDepth() = count { c -> c == '/' }
-
-    companion object {
-        private const val SUFFIX_ZIP = ".zip"
     }
 }
