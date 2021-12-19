@@ -575,7 +575,7 @@
             android:name=".jobservices.CameraUploadsService"
             android:exported="false" />
 	    <service
-		    android:name=".jobservices.CuSyncInactiveHeartbeatService"
+		    android:name=".jobservices.CuSyncActiveHeartbeatService"
 		    android:permission="android.permission.BIND_JOB_SERVICE"
 		    android:exported="false" />
 	    <service

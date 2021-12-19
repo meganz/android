@@ -1998,7 +1998,7 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
 
         NotificationCompat.Builder builder = new NotificationCompat.Builder(mContext, OVER_QUOTA_NOTIFICATION_CHANNEL_ID);
         builder.setSmallIcon(R.drawable.ic_stat_camera_sync)
-                .setContentIntent(PendingIntent.getActivity(mContext, 0, intent, 0))
+                .setContentIntent(PendingIntent.getActivity(mContext, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT))
                 .setAutoCancel(true)
                 .setTicker(contentText)
                 .setContentTitle(message)

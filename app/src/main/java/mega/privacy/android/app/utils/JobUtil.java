@@ -20,12 +20,12 @@ import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.jobservices.CameraUploadStarterService;
 import mega.privacy.android.app.jobservices.CameraUploadsService;
-import mega.privacy.android.app.jobservices.CuSyncInactiveHeartbeatService;
+import mega.privacy.android.app.jobservices.CuSyncActiveHeartbeatService;
 import mega.privacy.android.app.sync.cusync.CuSyncManager;
 import nz.mega.sdk.MegaApiJava;
 
 import static mega.privacy.android.app.jobservices.CameraUploadsService.EXTRA_IGNORE_ATTR_CHECK;
-import static mega.privacy.android.app.utils.Constants.CU_SYNC_INACTIVE_HEARTBEAT_JOB_ID;
+import static mega.privacy.android.app.utils.Constants.CU_SYNC_ACTIVE_HEARTBEAT_JOB_ID;
 import static mega.privacy.android.app.utils.Constants.PHOTOS_UPLOAD_JOB_ID;
 import static mega.privacy.android.app.utils.LogUtil.logDebug;
 import static mega.privacy.android.app.utils.LogUtil.logError;
@@ -85,7 +85,7 @@ public class JobUtil {
     }
 
     private static void scheduleCuSyncInactiveHeartbeat(Context context) {
-        if (isJobScheduled(context, CU_SYNC_INACTIVE_HEARTBEAT_JOB_ID)) {
+        if (isJobScheduled(context, CU_SYNC_ACTIVE_HEARTBEAT_JOB_ID)) {
             return;
         }
 
@@ -93,8 +93,8 @@ public class JobUtil {
                 = (JobScheduler) context.getSystemService(Context.JOB_SCHEDULER_SERVICE);
         if (scheduler != null) {
             scheduler.schedule(
-                    new JobInfo.Builder(CU_SYNC_INACTIVE_HEARTBEAT_JOB_ID,
-                            new ComponentName(context, CuSyncInactiveHeartbeatService.class))
+                    new JobInfo.Builder(CU_SYNC_ACTIVE_HEARTBEAT_JOB_ID,
+                            new ComponentName(context, CuSyncActiveHeartbeatService.class))
                             .setPeriodic(TimeUnit.SECONDS.toMillis(
                                     CuSyncManager.INACTIVE_HEARTBEAT_INTERVAL_SECONDS))
                             .setPersisted(true)

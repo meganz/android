@@ -4,13 +4,13 @@ import android.app.job.JobParameters
 import android.app.job.JobService
 import mega.privacy.android.app.sync.cusync.CuSyncManager
 
-class CuSyncInactiveHeartbeatService: JobService() {
+class CuSyncActiveHeartbeatService: JobService() {
     override fun onStartJob(params: JobParameters?): Boolean {
         if (CuSyncManager.isActive()) {
             return false
         }
 
-        CuSyncManager.doInactiveHeartbeat {
+        CuSyncManager.doActiveHeartbeat {
             jobFinished(params, false)
         }
         return true
