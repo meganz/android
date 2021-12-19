@@ -1,8 +1,6 @@
 package test.mega.privacy.android.app
 
-import android.app.Application
 import android.content.ComponentName
-import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import androidx.annotation.StyleRes
@@ -10,17 +8,8 @@ import androidx.core.util.Preconditions
 import androidx.fragment.app.Fragment
 import androidx.test.core.app.ActivityScenario
 import androidx.test.core.app.ApplicationProvider
-import androidx.test.runner.AndroidJUnitRunner
-import dagger.hilt.android.testing.HiltTestApplication
 import mega.privacy.android.app.HiltTestActivity
 import mega.privacy.android.app.R
-
-class CustomTestRunner : AndroidJUnitRunner() {
-
-    override fun newApplication(cl: ClassLoader?, name: String?, context: Context?): Application? {
-        return super.newApplication(cl, HiltTestApplication::class.java.name, context)
-    }
-}
 
 const val testFragmentTag = "underTest"
 

@@ -3,17 +3,15 @@ package test.mega.privacy.android.app.lollipop.managerSections.settings
 import android.app.Activity
 import android.app.Instrumentation
 import android.content.ComponentName
-import android.content.Context
 import androidx.test.core.app.ApplicationProvider
+import androidx.test.core.app.ApplicationProvider.getApplicationContext
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.intent.Intents
 import androidx.test.espresso.intent.Intents.intended
 import androidx.test.espresso.intent.Intents.intending
-import androidx.test.espresso.intent.matcher.ComponentNameMatchers.hasClassName
-import androidx.test.espresso.intent.matcher.ComponentNameMatchers.hasShortClassName
-import androidx.test.espresso.intent.matcher.IntentMatchers.*
-import androidx.test.espresso.intent.rule.IntentsTestRule
+import androidx.test.espresso.intent.matcher.IntentMatchers.hasComponent
 import androidx.test.espresso.matcher.ViewMatchers.*
+import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.SdkSuppress
 import androidx.test.filters.Suppress
 import com.jeremyliao.liveeventbus.LiveEventBus
@@ -25,10 +23,10 @@ import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
 import dagger.hilt.android.testing.HiltTestApplication
 import dagger.hilt.android.testing.UninstallModules
-import mega.privacy.android.app.HiltTestActivity
 import mega.privacy.android.app.R
 import mega.privacy.android.app.TestActivityModule
 import mega.privacy.android.app.activities.settingsActivities.FileManagementPreferencesActivity
+import mega.privacy.android.app.activities.settingsActivities.StartScreenPreferencesActivity
 import mega.privacy.android.app.constants.EventConstants
 import mega.privacy.android.app.di.SettingsModule
 import mega.privacy.android.app.domain.usecase.*
@@ -40,8 +38,11 @@ import org.junit.After
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+import org.junit.runner.RunWith
 import org.mockito.Mockito
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.times
+import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 import test.mega.privacy.android.app.RecyclerViewAssertions.Companion.withNoRowContaining
 import test.mega.privacy.android.app.RecyclerViewAssertions.Companion.withRowContaining
@@ -51,6 +52,7 @@ import test.mega.privacy.android.app.testFragmentTag
 
 
 @HiltAndroidTest
+@RunWith(AndroidJUnit4::class)
 @UninstallModules(SettingsModule::class, TestActivityModule::class)
 class SettingsFragmentTest {
 
@@ -302,7 +304,7 @@ class SettingsFragmentTest {
         whenever(TestSettingsModule.getStartScreen.invoke()).thenReturn(initialScreen)
         launchFragmentInHiltContainer<SettingsFragment>()
         val startScreenDescriptionStrings =
-            ApplicationProvider.getApplicationContext<HiltTestApplication>().resources.getStringArray(
+            getApplicationContext<HiltTestApplication>().resources.getStringArray(
                 R.array.settings_start_screen
             )
 
@@ -351,7 +353,7 @@ class SettingsFragmentTest {
         intending(
             hasComponent(
                 ComponentName(
-                    ApplicationProvider.getApplicationContext<HiltTestApplication>(),
+                    getApplicationContext<HiltTestApplication>(),
                     FileManagementPreferencesActivity::class.java.name
                 )
             )
@@ -362,8 +364,34 @@ class SettingsFragmentTest {
         intended(
             hasComponent(
                 ComponentName(
-                    ApplicationProvider.getApplicationContext<HiltTestApplication>(),
+                    getApplicationContext<HiltTestApplication>(),
                     FileManagementPreferencesActivity::class.java.name
+                )
+            )
+        )
+
+        verify(TestSettingsModule.settingsActivity, times(1)).openSettingsStartScreen = false
+    }
+
+    @Test
+    fun test_that_when_fragment_is_launched_and_start_setting_screen_is_true_start_settings_screen_activity_is_launched() {
+        whenever(TestSettingsModule.settingsActivity.openSettingsStartScreen).thenReturn(true)
+        intending(
+            hasComponent(
+                ComponentName(
+                    getApplicationContext<HiltTestApplication>(),
+                    StartScreenPreferencesActivity::class.java.name
+                )
+            )
+        ).respondWith(Instrumentation.ActivityResult(Activity.RESULT_OK, null))
+
+        launchFragmentInHiltContainer<SettingsFragment>()
+
+        intended(
+            hasComponent(
+                ComponentName(
+                    getApplicationContext<HiltTestApplication>(),
+                    StartScreenPreferencesActivity::class.java.name
                 )
             )
         )
