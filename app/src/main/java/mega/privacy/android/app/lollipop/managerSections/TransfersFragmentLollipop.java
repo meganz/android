@@ -27,11 +27,9 @@ import mega.privacy.android.app.listeners.MoveTransferListener;
 import mega.privacy.android.app.lollipop.adapters.MegaTransfersLollipopAdapter;
 import mega.privacy.android.app.utils.ColorUtils;
 import mega.privacy.android.app.lollipop.adapters.RotatableAdapter;
-import mega.privacy.android.app.utils.MegaTransferUtils;
 import nz.mega.sdk.MegaTransfer;
 
 import static mega.privacy.android.app.lollipop.ManagerActivityLollipop.PENDING_TAB;
-import static mega.privacy.android.app.utils.Constants.APP_DATA_BACKGROUND_TRANSFER;
 import static mega.privacy.android.app.utils.Constants.INVALID_POSITION;
 import static mega.privacy.android.app.utils.Constants.SNACKBAR_TYPE;
 import static mega.privacy.android.app.utils.LogUtil.*;

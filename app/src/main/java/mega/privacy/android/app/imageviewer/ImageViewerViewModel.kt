@@ -152,6 +152,7 @@ class ImageViewerViewModel @ViewModelInject constructor(
         subscription
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
+            .retry(1)
             .subscribeBy(
                 onSuccess = { nodeItem ->
                     updateItemIfNeeded(nodeHandle, nodeItem = nodeItem)
@@ -160,6 +161,7 @@ class ImageViewerViewModel @ViewModelInject constructor(
                     logError(error.stackTraceToString())
                 }
             )
+            .addTo(composite)
     }
 
     /**
@@ -189,6 +191,7 @@ class ImageViewerViewModel @ViewModelInject constructor(
         subscription
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
+            .retry(1)
             .subscribeBy(
                 onNext = { imageResult ->
                     updateItemIfNeeded(nodeHandle, imageResult = imageResult)
@@ -197,6 +200,7 @@ class ImageViewerViewModel @ViewModelInject constructor(
                     logError(error.stackTraceToString())
                 }
             )
+            .addTo(composite)
     }
 
     /**

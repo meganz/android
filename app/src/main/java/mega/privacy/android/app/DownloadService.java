@@ -10,7 +10,6 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.media.MediaScannerConnection;
 import android.net.Uri;
 import android.net.wifi.WifiManager;
 import android.net.wifi.WifiManager.WifiLock;
@@ -74,8 +73,7 @@ import static mega.privacy.android.app.utils.CacheFolderManager.*;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.FileUtil.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
-import static mega.privacy.android.app.utils.MegaApiUtils.*;
-import static mega.privacy.android.app.utils.MegaNodeUtil.manageURLNode;
+import static mega.privacy.android.app.utils.MegaTransferUtils.getNumPendingDownloadsNonBackground;
 import static mega.privacy.android.app.utils.MegaTransferUtils.isBackgroundTransfer;
 import static mega.privacy.android.app.utils.MegaTransferUtils.isVoiceClipType;
 import static mega.privacy.android.app.utils.OfflineUtils.*;
@@ -217,7 +215,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 	}
 
 	private void startForeground() {
-		if (megaApi.getNumPendingDownloads() <= 0) {
+		if (getNumPendingDownloadsNonBackground(megaApi) <= 0) {
 			return;
 		}
 
@@ -446,7 +444,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 			logDebug("checkCurrentFile == false");
 
 			alreadyDownloaded++;
-            if (megaApi.getNumPendingDownloads() == 0){
+            if (getNumPendingDownloadsNonBackground(megaApi) == 0){
                 onQueueComplete(currentDocument.getHandle());
             }
 
@@ -556,22 +554,23 @@ public class DownloadService extends Service implements MegaTransferListenerInte
         showCompleteNotification(handle);
 		stopForeground();
 		rootNode = null;
-		int total = megaApi.getNumPendingDownloads();
-		logDebug("onQueueComplete: total of files before reset " + total);
-		if(total <= 0){
+		int pendingDownloads = getNumPendingDownloadsNonBackground(megaApi);
+		logDebug("onQueueComplete: total of files before reset " + pendingDownloads);
+		if(pendingDownloads <= 0){
 			logDebug("onQueueComplete: reset total downloads");
 			// When download a single file by tapping it, and auto play is enabled.
-            if (megaApi.getTotalDownloads() == 1 && Boolean.parseBoolean(dbH.getAutoPlayEnabled()) && autoPlayInfo != null && downloadByTap) {
+			int totalDownloads = megaApi.getTotalDownloads();
+			if (totalDownloads == 1 && Boolean.parseBoolean(dbH.getAutoPlayEnabled()) && autoPlayInfo != null && downloadByTap) {
                 sendBroadcast(new Intent(BROADCAST_ACTION_INTENT_SHOWSNACKBAR_TRANSFERS_FINISHED)
                         .putExtra(TRANSFER_TYPE, DOWNLOAD_TRANSFER_OPEN)
                         .putExtra(NODE_NAME, autoPlayInfo.getNodeName())
                         .putExtra(NODE_HANDLE, autoPlayInfo.getNodeHandle())
                         .putExtra(NUMBER_FILES, 1)
                         .putExtra(NODE_LOCAL_PATH, autoPlayInfo.getLocalPath()));
-            } else if (megaApi.getTotalDownloads() > 0) {
+            } else if (totalDownloads > 0) {
 				sendBroadcast(new Intent(BROADCAST_ACTION_INTENT_SHOWSNACKBAR_TRANSFERS_FINISHED)
 						.putExtra(TRANSFER_TYPE, DOWNLOAD_TRANSFER)
-						.putExtra(NUMBER_FILES, megaApi.getTotalDownloads()));
+						.putExtra(NUMBER_FILES, totalDownloads));
 			}
 			sendBroadcast(new Intent(BROADCAST_ACTION_INTENT_TRANSFER_UPDATE));
 
@@ -950,8 +949,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 	 */
 	@SuppressLint("NewApi")
 	private void updateProgressNotification() {
-
-		int pendingTransfers = megaApi.getNumPendingDownloads();
+		int pendingTransfers = getNumPendingDownloadsNonBackground(megaApi);
         int totalTransfers = megaApi.getTotalDownloads();
 
         long totalSizePendingTransfer = megaApi.getTotalDownloadBytes();
@@ -1181,7 +1179,6 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 		}
 
 		if(transfer.getType()==MegaTransfer.TYPE_DOWNLOAD){
-
 			boolean isVoiceClip = isVoiceClipType(transfer);
 			boolean isBackgroundTransfer = isBackgroundTransfer(transfer);
 
@@ -1327,7 +1324,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 
 			if(isVoiceClip || isBackgroundTransfer) return;
 
-			if (megaApi.getNumPendingDownloads() == 0 && transfersCount==0){
+			if (getNumPendingDownloadsNonBackground(megaApi) == 0 && transfersCount==0){
 				onQueueComplete(transfer.getNodeHandle());
 			}
 		}

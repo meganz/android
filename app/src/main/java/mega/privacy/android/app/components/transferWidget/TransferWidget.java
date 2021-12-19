@@ -3,7 +3,7 @@ package mega.privacy.android.app.components.transferWidget;
 import static android.view.View.GONE;
 import static android.view.View.VISIBLE;
 import static mega.privacy.android.app.components.transferWidget.TransfersManagement.isOnTransferOverQuota;
-import static mega.privacy.android.app.utils.MegaTransferUtils.getSilentNumPendingDownloads;
+import static mega.privacy.android.app.utils.MegaTransferUtils.getNumPendingDownloadsNonBackground;
 import static nz.mega.sdk.MegaTransfer.TYPE_DOWNLOAD;
 import static nz.mega.sdk.MegaTransfer.TYPE_UPLOAD;
 
@@ -208,7 +208,7 @@ public class TransferWidget {
     public void setProgress(int progress, int typeTransfer) {
         setProgress(progress);
 
-        int numPendingDownloads = getSilentNumPendingDownloads(megaApi.getTransfers());
+        int numPendingDownloads = getNumPendingDownloadsNonBackground(megaApi);
         int numPendingUploads = megaApi.getNumPendingUploads();
         boolean pendingDownloads = numPendingDownloads > 0;
         boolean pendingUploads = numPendingUploads > 0;
@@ -239,7 +239,7 @@ public class TransferWidget {
      * @return The number of pending transfers.
      */
     public int getPendingTransfers() {
-        return getSilentNumPendingDownloads(megaApi.getTransfers()) + megaApi.getNumPendingUploads();
+        return getNumPendingDownloadsNonBackground(megaApi) + megaApi.getNumPendingUploads();
     }
 
     /**

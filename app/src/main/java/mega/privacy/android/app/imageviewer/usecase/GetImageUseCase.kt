@@ -177,6 +177,8 @@ class GetImageUseCase @Inject constructor(
                             onTransferFinish = { _: MegaTransfer, error: MegaError ->
                                 if (emitter.isCancelled) return@OptionalMegaTransferListenerInterface
 
+                                megaApi.resetTotalDownloads()
+
                                 when (error.errorCode) {
                                     API_OK -> {
                                         image.fullSizeUri = fullFile.toUri()
