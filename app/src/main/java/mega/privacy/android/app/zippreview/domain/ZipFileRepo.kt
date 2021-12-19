@@ -1,6 +1,5 @@
 package mega.privacy.android.app.zippreview.domain
 
-import android.util.Log
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.io.*
@@ -28,46 +27,47 @@ class ZipFileRepo : IZipFileRepo {
      * @param unzipRootPath unzip destination path
      * @return true is unzip succeed.
      */
-    fun unzip(zipFullPath: String, unzipRootPath: String): Boolean {
-        ZipFile(zipFullPath).apply {
-            entries().toList().forEach {
-                val zipDestination = File(unzipRootPath + it.name)
-                if (it.isDirectory) {
-                    if (!zipDestination.exists()) {
-                        zipDestination.mkdirs()
-                    }
-                } else {
-                    try {
-                        val inputStream = getInputStream(it)
-                        //Get the parent file. If it is null or
-                        // doesn't exist, created the parent folder.
-                        val parentFile = zipDestination.parentFile
-                        if (parentFile != null) {
-                            if (!parentFile.exists()) {
-                                parentFile.mkdirs()
-                            }
-                            val byteArrayOutputStream = ByteArrayOutputStream()
-                            val buffer = ByteArray(1024)
-                            var count: Int
-                            FileOutputStream(zipDestination).use { outputStream ->
-                                //Write the file.
-                                while (inputStream.read(buffer)
-                                        .also { readCount -> count = readCount } != -1
-                                ) {
-                                    byteArrayOutputStream.write(buffer, 0, count)
-                                    val bytes = byteArrayOutputStream.toByteArray()
-                                    outputStream.write(bytes)
-                                    byteArrayOutputStream.reset()
-                                }
-                            }
-                            inputStream.close()
+    private fun unzip(zipFullPath: String, unzipRootPath: String): Boolean {
+        val zipFile = ZipFile(zipFullPath)
+        val zipEntries = zipFile.entries()
+        zipEntries.toList().forEach {
+            val zipDestination = File(unzipRootPath + it.name)
+            if (it.isDirectory) {
+                if (!zipDestination.exists()) {
+                    zipDestination.mkdirs()
+                }
+            } else {
+                try {
+                    val inputStream = zipFile.getInputStream(it)
+                    //Get the parent file. If it is null or
+                    // doesn't exist, created the parent folder.
+                    val parentFile = zipDestination.parentFile
+                    if (parentFile != null) {
+                        if (!parentFile.exists()) {
+                            parentFile.mkdirs()
                         }
-                    } catch (e: Exception) {
-                        e.printStackTrace()
-                        return false
+                        val byteArrayOutputStream = ByteArrayOutputStream()
+                        val buffer = ByteArray(1024)
+                        var count: Int
+                        FileOutputStream(zipDestination).use { outputStream ->
+                            //Write the file.
+                            while (inputStream.read(buffer)
+                                    .also { readCount -> count = readCount } != -1
+                            ) {
+                                byteArrayOutputStream.write(buffer, 0, count)
+                                val bytes = byteArrayOutputStream.toByteArray()
+                                outputStream.write(bytes)
+                                byteArrayOutputStream.reset()
+                            }
+                        }
+                        inputStream.close()
                     }
+                } catch (e: Exception) {
+                    e.printStackTrace()
+                    return false
                 }
             }
+
         }
         return true
     }
@@ -155,10 +155,7 @@ class ZipFileRepo : IZipFileRepo {
                             },
                             subParentPath,
                             mutableListOf(),
-
-                            ).also {
-                            Log.d("ZipFileRepo2", "add $subName:$it")
-                        }
+                        )
                         zipTreeNodeMap[subPath] = zipTreeNode
 
                         // If parent path is not empty add current path to map

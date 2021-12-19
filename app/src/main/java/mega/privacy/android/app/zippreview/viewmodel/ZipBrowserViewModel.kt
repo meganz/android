@@ -72,7 +72,7 @@ class ZipBrowserViewModel @ViewModelInject constructor(private val zipFileRepo: 
     private fun updateZipInfoList(folderPath: String = "") {
         _zipInfoList.value =
             zipFileRepo.updateZipInfoList(zipFile, folderPath).map {
-                zipTreeNodeOToUIO(it)
+                zipTreeNodeToZipInfoUIO(it)
             }
 
         getTitle(if (folderPath.isEmpty()) "" else folderPath)
@@ -83,7 +83,7 @@ class ZipBrowserViewModel @ViewModelInject constructor(private val zipFileRepo: 
      * @param zipTreeNode ZipTreeNode
      * @return ZipInfoUIO
      */
-    private fun zipTreeNodeOToUIO(zipTreeNode: ZipTreeNode): ZipInfoUIO {
+    private fun zipTreeNodeToZipInfoUIO(zipTreeNode: ZipTreeNode): ZipInfoUIO {
         val imageResourceId = if (zipTreeNode.fileType == FileType.FOLDER) {
             R.drawable.ic_folder_list
         } else {
@@ -110,7 +110,7 @@ class ZipBrowserViewModel @ViewModelInject constructor(private val zipFileRepo: 
 
     /**
      * Count the files number of current folder
-     * @return files number string of current folder.
+     * @return Pair of folder numbers and file numbers. First is folder number.
      */
     private fun countFiles(zipTreeNode: ZipTreeNode): Pair<Int, Int> {
         var counter = Pair(0, 0)
@@ -163,7 +163,7 @@ class ZipBrowserViewModel @ViewModelInject constructor(private val zipFileRepo: 
      */
     private fun backUpdateZipInfoList(parentFolderPath: String, isEmptyFolder: Boolean): Boolean {
         _zipInfoList.value = zipFileRepo.getParentZipInfoList(parentFolderPath, isEmptyFolder).map {
-            zipTreeNodeOToUIO(it)
+            zipTreeNodeToZipInfoUIO(it)
         }.also {
             val firstNodeParent = it.firstOrNull()?.parent
             getTitle(if (firstNodeParent.isNullOrEmpty()) "" else firstNodeParent)
@@ -183,7 +183,17 @@ class ZipBrowserViewModel @ViewModelInject constructor(private val zipFileRepo: 
                 //If zip folder doesn't exist, unpacked the zip file.
                 unpackedZipFile(zipInfoUIO, position)
             }
-            StatusItemClicked.OPEN_FILE -> _openFile.value = Pair(position, zipInfoUIO)
+            StatusItemClicked.OPEN_FILE -> {
+                //If the zip file name is start with ".", it cannot be unzip. So show the alert.
+                if (zipInfoUIO.fileType == FileType.ZIP && zipInfoUIO.name.startsWith(".")) {
+                    LogUtil.logError("zip file ${zipInfoUIO.name} start with \".\" cannot unzip")
+                    _showAlert.value = true
+                } else {
+                    _openFile.value = Pair(position, zipInfoUIO)
+                }
+
+            }
+
             StatusItemClicked.OPEN_FOLDER -> {
                 currentZipInfo = zipInfoUIO
                 updateZipInfoList(zipInfoUIO.path)
@@ -234,6 +244,7 @@ class ZipBrowserViewModel @ViewModelInject constructor(private val zipFileRepo: 
             val currentFile = File(rootPath + zipInfoUIO.path)
             if (File(rootPath).exists()) {
                 if (currentFile.exists()) {
+
                     StatusItemClicked.OPEN_FILE
                 } else {
                     StatusItemClicked.ITEM_NOT_EXIST

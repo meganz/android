@@ -209,12 +209,7 @@ class ZipBrowserActivity : PasscodeActivity() {
      */
     private fun openFile(zipInfoUIO: ZipInfoUIO, position: Int) {
         if (zipInfoUIO.fileType == FileType.ZIP) {
-            //If the zip file name is start with ".", it cannot be unzip. So show the alert.
-            if (zipInfoUIO.name.startsWith(".")) {
-                showAlert()
-            } else {
-                zipFileOpen(zipInfoUIO)
-            }
+            zipFileOpen(zipInfoUIO)
         } else {
             val file = File("$unzipRootPath${File.separator}${zipInfoUIO.path}")
             MimeTypeList.typeForName(file.name).apply {
