@@ -24,7 +24,6 @@ import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Environment;
 import android.os.Handler;
 import android.os.Looper;
 import android.provider.ContactsContract;
@@ -93,7 +92,6 @@ import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.TextView.OnEditorActionListener;
-import android.widget.Toast;
 
 import com.ittianyu.bottomnavigationviewex.BottomNavigationViewEx;
 import com.jeremyliao.liveeventbus.LiveEventBus;
@@ -276,6 +274,8 @@ import static mega.privacy.android.app.fragments.settingsFragments.startSceen.ut
 import static mega.privacy.android.app.fragments.settingsFragments.startSceen.util.StartScreenUtil.setStartScreenTimeStamp;
 import static mega.privacy.android.app.fragments.settingsFragments.startSceen.util.StartScreenUtil.shouldCloseApp;
 import static mega.privacy.android.app.lollipop.PermissionsFragment.PERMISSIONS_FRAGMENT;
+import static mega.privacy.android.app.meeting.activity.MeetingActivity.MEETING_ACTION_CREATE;
+import static mega.privacy.android.app.meeting.activity.MeetingActivity.MEETING_ACTION_JOIN;
 import static mega.privacy.android.app.modalbottomsheet.UploadBottomSheetDialogFragment.GENERAL_UPLOAD;
 import static mega.privacy.android.app.modalbottomsheet.UploadBottomSheetDialogFragment.HOMEPAGE_UPLOAD;
 import static mega.privacy.android.app.utils.AlertDialogUtil.dismissAlertDialogIfExists;
@@ -760,17 +760,19 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 
 	// for Meeting
 	boolean isFabExpanded = false;
-	private static long FAB_ANIM_DURATION = 200L;
-	private static long FAB_MASK_OUT_DELAY = 200L;
-	private static float ALPHA_TRANSPARENT = 0f;
+	private static final long FAB_ANIM_DURATION = 200L;
+	private static final long FAB_MASK_OUT_DELAY = 200L;
+	private static final float ALPHA_TRANSPARENT = 0f;
 	private static float ALPHA_OPAQUE = 1f;
 	private static float FAB_DEFAULT_ANGEL = 0f;
 	private static float FAB_ROTATE_ANGEL = 135f;
-	private static String KEY_IS_FAB_EXPANDED = "isFabExpanded";
+	private static final String KEY_IS_FAB_EXPANDED = "isFabExpanded";
+	private static String MEETING_TYPE = MEETING_ACTION_CREATE;
 	private View fabMaskLayout;
 	private ViewGroup windowContent;
 	private final ArrayList<View> fabs = new ArrayList<>();
 	// end for Meeting
+
 	/**
 	 * Broadcast to update the completed transfers tab.
 	 */
@@ -1171,6 +1173,22 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 				if ((typesCameraPermission == RETURN_CALL_PERMISSIONS || typesCameraPermission == START_CALL_PERMISSIONS) &&
 						grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
 					controlCallPermissions();
+				}
+				break;
+
+			case REQUEST_BT_CONNECT:
+				logDebug("get Bluetooth Connect permission");
+				if(permissions.length == 0) {
+					return;
+				}
+				if (grantResults[0] == PackageManager.PERMISSION_GRANTED){
+					if (MEETING_TYPE.equals(MEETING_ACTION_CREATE)) {
+						openMeetingToCreate(this);
+					} else {
+						showOpenLinkDialog();
+					}
+				} else {
+					showSnackbar(PERMISSIONS_TYPE, getString(R.string.meeting_bluetooth_connect_required_permissions_warning), INVALID_HANDLE);
 				}
 				break;
         }
@@ -7222,28 +7240,41 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 
 	@Override
 	public void onJoinMeeting() {
+		MEETING_TYPE = MEETING_ACTION_JOIN;
 		if(CallUtil.participatingInACall()){
 			showConfirmationInACall(this, StringResourcesUtils.getString(R.string.text_join_call), passcodeManagement);
 		} else {
+			// For android 12, need android.permission.BLUETOOTH_CONNECT permission
+			if (requestBluetoothPermission()) return;
 			showOpenLinkDialog();
 		}
 	}
 
 	@Override
 	public void onCreateMeeting() {
+		MEETING_TYPE = MEETING_ACTION_CREATE;
 		if(CallUtil.participatingInACall()){
 			showConfirmationInACall(this, StringResourcesUtils.getString(R.string.ongoing_call_content), passcodeManagement);
 		} else {
 			// For android 12, need android.permission.BLUETOOTH_CONNECT permission
-			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-				boolean hasPermission = hasPermissions(this, Manifest.permission.BLUETOOTH_CONNECT);
-				if (!hasPermission) {
-					requestPermission(this, REQUEST_BT_CONNECT, Manifest.permission.BLUETOOTH_CONNECT);
-					return;
-				}
-			}
+			if (requestBluetoothPermission()) return;
 			openMeetingToCreate(this);
 		}
+	}
+
+	/**
+	 * Request Bluetooth Connect Permission for Meeting and Call when SDK >= 31
+	 * @return false : permission granted, needn't request / true: should request permission
+	 */
+	private boolean requestBluetoothPermission() {
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+			boolean hasPermission = hasPermissions(this, Manifest.permission.BLUETOOTH_CONNECT);
+			if (!hasPermission) {
+				requestPermission(this, REQUEST_BT_CONNECT, Manifest.permission.BLUETOOTH_CONNECT);
+				return true;
+			}
+		}
+		return false;
 	}
 
 	public void addContactFromPhone() {
