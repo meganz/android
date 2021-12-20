@@ -3,11 +3,11 @@ package mega.privacy.android.app.di
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
-import dagger.hilt.android.components.ActivityRetainedComponent
+import dagger.hilt.android.components.ViewModelComponent
 import mega.privacy.android.app.domain.usecase.*
 
 @Module
-@InstallIn(ActivityRetainedComponent::class)
+@InstallIn(ViewModelComponent::class)
 abstract class SettingsModule {
 
     @Binds

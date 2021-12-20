@@ -1,15 +1,13 @@
 package mega.privacy.android.app.lollipop.managerSections.settings
 
-import androidx.hilt.lifecycle.ViewModelInject
 import androidx.lifecycle.ViewModel
-import mega.privacy.android.app.DatabaseHandler
-import mega.privacy.android.app.di.MegaApi
+import dagger.hilt.android.lifecycle.HiltViewModel
 import mega.privacy.android.app.domain.usecase.*
-import mega.privacy.android.app.globalmanagement.MyAccountInfo
-import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaRequestListenerInterface
+import javax.inject.Inject
 
-class SettingsViewModel @ViewModelInject constructor(
+@HiltViewModel
+class SettingsViewModel @Inject constructor(
     private val getAccountDetails: GetAccountDetails,
     private val canDeleteAccount: CanDeleteAccount,
     private val refreshUserAccount: RefreshUserAccount,

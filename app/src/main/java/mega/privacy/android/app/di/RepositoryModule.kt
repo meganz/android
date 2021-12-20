@@ -3,14 +3,14 @@ package mega.privacy.android.app.di
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
-import dagger.hilt.android.components.ApplicationComponent
+import dagger.hilt.components.SingletonComponent
 import mega.privacy.android.app.data.repository.DefaultAccountRepository
 import mega.privacy.android.app.data.repository.DefaultSettingsRepository
 import mega.privacy.android.app.domain.repository.AccountRepository
 import mega.privacy.android.app.domain.repository.SettingsRepository
 
 @Module
-@InstallIn(ApplicationComponent::class)
+@InstallIn(SingletonComponent::class)
 abstract class RepositoryModule {
 
     @Binds
