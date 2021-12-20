@@ -493,13 +493,13 @@ public class ChatManagement {
             return;
         }
 
-        if (MegaApplication.getChatManagement().isAlreadyJoiningCall(chatId)) {
+        if (isAlreadyJoiningCall(chatId)) {
             logDebug("AnswerChatCall already done");
             return;
         }
 
         CallUtil.addChecksForACall(chatId, speakerStatus);
-        MegaApplication.getChatManagement().addJoiningCallChatId(chatId);
+        addJoiningCallChatId(chatId);
         logDebug("Answering call ...");
         app.getMegaChatApi().answerChatCall(chatId, enableVideo, enableAudio, listener);
     }
