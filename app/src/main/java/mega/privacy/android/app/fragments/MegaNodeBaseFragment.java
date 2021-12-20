@@ -11,6 +11,7 @@ import androidx.annotation.Nullable;
 import androidx.core.content.FileProvider;
 import androidx.appcompat.view.ActionMode;
 import androidx.core.text.HtmlCompat;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -31,28 +32,24 @@ import android.widget.Toast;
 
 import org.jetbrains.annotations.NotNull;
 
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Stack;
 
 import javax.inject.Inject;
 
 import dagger.hilt.android.AndroidEntryPoint;
+import kotlin.Unit;
 import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.CustomizedGridLayoutManager;
-import mega.privacy.android.app.components.SimpleDividerItemDecoration;
+import mega.privacy.android.app.components.PositionDividerItemDecoration;
 import mega.privacy.android.app.components.scrollBar.FastScroller;
+import mega.privacy.android.app.fragments.homepage.EventObserver;
+import mega.privacy.android.app.fragments.homepage.SortByHeaderViewModel;
 import mega.privacy.android.app.fragments.managerFragments.LinksFragment;
 import mega.privacy.android.app.globalmanagement.SortOrderManagement;
 import mega.privacy.android.app.interfaces.SnackbarShower;
@@ -81,6 +78,7 @@ import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.MegaApiUtils.*;
 import static mega.privacy.android.app.utils.MegaNodeUtil.manageTextFileIntent;
 import static mega.privacy.android.app.utils.MegaNodeUtil.manageURLNode;
+import static mega.privacy.android.app.utils.MegaNodeUtil.onNodeTapped;
 import static mega.privacy.android.app.utils.MegaNodeUtil.showConfirmationLeaveIncomingShares;
 import static mega.privacy.android.app.utils.Util.*;
 import static nz.mega.sdk.MegaApiJava.*;
@@ -113,6 +111,8 @@ public abstract class MegaNodeBaseFragment extends RotatableFragment {
     protected LinearLayout emptyLinearLayout;
     protected TextView emptyTextViewFirst;
 
+    protected SortByHeaderViewModel sortByHeaderViewModel;
+
     protected abstract void setNodes(ArrayList<MegaNode> nodes);
 
     protected abstract void setEmptyView();
@@ -126,6 +126,17 @@ public abstract class MegaNodeBaseFragment extends RotatableFragment {
     public MegaNodeBaseFragment() {
         prefs = dbH.getPreferences();
         downloadLocationDefaultPath = getDownloadLocation();
+    }
+
+    @Nullable
+    @Override
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        sortByHeaderViewModel = new ViewModelProvider(this).get(SortByHeaderViewModel.class);
+
+        sortByHeaderViewModel.getShowDialogEvent().observe(getViewLifecycleOwner(),
+                new EventObserver<>(this::showSortByPanel));
+
+        return super.onCreateView(inflater, container, savedInstanceState);
     }
 
     protected abstract class BaseActionBarCallBack implements ActionMode.Callback {
@@ -353,6 +364,20 @@ public abstract class MegaNodeBaseFragment extends RotatableFragment {
         }
     }
 
+    /**
+     * Shows the Sort by panel.
+     *
+     * @param unit Unit event.
+     * @return Null.
+     */
+    protected Unit showSortByPanel(Unit unit) {
+        managerActivity.showNewSortByPanel(getCurrentSharesTab() == INCOMING_TAB
+                ? ORDER_OTHERS
+                : ORDER_CLOUD);
+
+        return null;
+    }
+
     public ActionMode getActionMode() {
         return actionMode;
     }
@@ -435,11 +460,10 @@ public abstract class MegaNodeBaseFragment extends RotatableFragment {
     public void openFile(MegaNode node, int fragmentAdapter, int position) {
         MimeTypeList mimeType = MimeTypeList.typeForName(node.getName());
         String mimeTypeType = mimeType.getType();
-        Intent intent = null;
+        Intent intent;
         boolean internalIntent = false;
 
         if (mimeType.isImage()) {
-            internalIntent = true;
             intent = new Intent(context, FullScreenImageViewerLollipop.class);
             intent.putExtra("placeholder", adapter.getPlaceholderCount());
             intent.putExtra("position", position);
@@ -448,12 +472,13 @@ public abstract class MegaNodeBaseFragment extends RotatableFragment {
             intent.putExtra("parentNodeHandle", getParentHandle(fragmentAdapter));
             intent.putExtra("orderGetChildren", getIntentOrder(fragmentAdapter));
             intent.putExtra(INTENT_EXTRA_KEY_HANDLE, node.getHandle());
+
+            launchIntent(intent, true, position);
         } else if (mimeType.isVideoReproducible() || mimeType.isAudio()) {
             boolean opusFile = false;
 
             if (mimeType.isVideoNotSupported() || mimeType.isAudioNotSupported()) {
                 intent = new Intent(Intent.ACTION_VIEW);
-                internalIntent = false;
                 String[] s = node.getName().split("\\.");
                 opusFile = s.length > 1 && s[s.length - 1].equals("opus");
             } else {
@@ -516,9 +541,10 @@ public abstract class MegaNodeBaseFragment extends RotatableFragment {
             if (opusFile) {
                 intent.setDataAndType(intent.getData(), "audio/*");
             }
+
+            launchIntent(intent, internalIntent, position);
         } else if (mimeType.isURL()) {
             manageURLNode(context, megaApi, node);
-            return;
         } else if (mimeType.isPdf()) {
             logDebug("isFile:isPdf");
             intent = new Intent(context, PdfViewerActivityLollipop.class);
@@ -567,24 +593,33 @@ public abstract class MegaNodeBaseFragment extends RotatableFragment {
                     return;
                 }
             }
+
+            launchIntent(intent, false, position);
         } else if (mimeType.isOpenableTextFile(node.getSize())) {
             manageTextFileIntent(requireContext(), node, fragmentAdapter);
-            return;
+        } else {
+            logDebug("itemClick:isFile:otherOption");
+            onNodeTapped(context, node, managerActivity::saveNodeByTap, managerActivity, managerActivity);
         }
+    }
 
+    /**
+     * Launch corresponding intent to open the file based on its type.
+     *
+     * @param intent Intent to launch activity.
+     * @param internalIntent true, if the intent is for launching an intent in-app; false, otherwise.
+     * @param position Clicked item position.
+     */
+    private void launchIntent(Intent intent, boolean internalIntent, int position) {
         if (intent != null) {
             if (internalIntent || isIntentAvailable(context, intent)) {
                 putThumbnailLocation(intent, recyclerView, position, viewerFrom(), adapter);
                 context.startActivity(intent);
                 managerActivity.overridePendingTransition(0, 0);
-
-                return;
             } else {
                 Toast.makeText(context, context.getResources().getString(R.string.intent_not_available), Toast.LENGTH_LONG).show();
             }
         }
-
-        managerActivity.saveNodesToDevice(Collections.singletonList(node), true, false, false, false);
     }
 
     protected abstract int viewerFrom();
@@ -612,7 +647,7 @@ public abstract class MegaNodeBaseFragment extends RotatableFragment {
         recyclerView = v.findViewById(R.id.file_list_view_browser);
         mLayoutManager = new LinearLayoutManager(context);
         recyclerView.setLayoutManager(mLayoutManager);
-        recyclerView.addItemDecoration(new SimpleDividerItemDecoration(requireContext()));
+        recyclerView.addItemDecoration(new PositionDividerItemDecoration(requireContext(), getOutMetrics()));
         fastScroller = v.findViewById(R.id.fastscroll);
         setRecyclerView();
         recyclerView.setItemAnimator(noChangeRecyclerViewItemAnimator());
@@ -648,6 +683,25 @@ public abstract class MegaNodeBaseFragment extends RotatableFragment {
         return v;
     }
 
+    /**
+     * Gets the current shares tab depending on the current Fragment instance.
+     *
+     * @return The current shares tab.
+     */
+    private int getCurrentSharesTab() {
+        int tab = ERROR_TAB;
+
+        if (MegaNodeBaseFragment.this instanceof IncomingSharesFragmentLollipop) {
+            tab = INCOMING_TAB;
+        } else if (MegaNodeBaseFragment.this instanceof OutgoingSharesFragmentLollipop) {
+            tab = OUTGOING_TAB;
+        } else if (MegaNodeBaseFragment.this instanceof LinksFragment) {
+            tab = LINKS_TAB;
+        }
+
+        return tab;
+    }
+
     private void setRecyclerView() {
         recyclerView.setPadding(0, 0, 0, dp2px(MARGIN_BOTTOM_LIST, outMetrics));
         recyclerView.setHasFixedSize(true);
@@ -656,14 +710,7 @@ public abstract class MegaNodeBaseFragment extends RotatableFragment {
             @Override
             public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
                 super.onScrolled(recyclerView, dx, dy);
-                int tab = ERROR_TAB;
-                if (MegaNodeBaseFragment.this instanceof IncomingSharesFragmentLollipop) {
-                    tab = INCOMING_TAB;
-                } else if (MegaNodeBaseFragment.this instanceof OutgoingSharesFragmentLollipop) {
-                    tab = OUTGOING_TAB;
-                } else if (MegaNodeBaseFragment.this instanceof LinksFragment) {
-                    tab = LINKS_TAB;
-                }
+                int tab = getCurrentSharesTab();
 
                 if (managerActivity.getTabItemShares() == tab) {
                     checkScroll();

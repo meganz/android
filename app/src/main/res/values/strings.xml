@@ -93,7 +93,7 @@
     <!-- confirmation message before sending an invitation to a contact -->
     <string name="confirmation_add_contact">Do you want to send an invitation to %s?</string>
     <!-- Button where the user can sign off or logout -->
-    <string name="action_logout">Logout</string>
+    <string name="action_logout">Log out</string>
     <!-- Item menu option upon right click on one or multiple files. -->
     <string name="action_add">Upload</string>
     <!-- Menu item -->
@@ -1428,7 +1428,7 @@
     <!-- settings of the chat to choose the status -->
     <string name="settings_chat_vibration">Vibration</string>
     <!-- Button text shown on SMS verification page, if the user wants to logout current suspended account and login with another account, user can press this button to logout -->
-    <string name="sms_logout">[A]Logout[/A] to use MEGA with another account</string>
+    <string name="sms_logout">[A]Log out[/A] to switch MEGA accounts</string>
     <!-- On SMS verification page, if the user presses the logout button, a dialog with this text will show to ask for user’s confirmation. -->
     <string name="confirm_logout_from_sms_verification">Are you sure that you want to log out of the current account?</string>
     <!-- Text shown when a message has been deleted in the chat -->
@@ -2330,7 +2330,7 @@
     <!-- Option that permits user export his recovery key -->
     <string name="option_export_recovery_key">Export Recovery Key</string>
     <!-- Option that permits user logout -->
-    <string name="proceed_to_logout">Proceed to logout</string>
+    <string name="proceed_to_logout">Proceed to log out</string>
     <!-- Title of the preference Recovery key on Settings section -->
     <string name="recovery_key_bottom_sheet">Recovery Key</string>
     <!-- Option that permits user save on File System -->
@@ -3746,7 +3746,7 @@
     <!-- Context menu item. Allows user to delete file/folder from favourites -->
     <string name="file_properties_unfavourite">Remove favourite</string>
     <!-- Context menu item. Allows to mark file/folder with own color label -->
-    <string name="file_properties_label">Label&#8230;</string>
+    <string name="file_properties_label">Label</string>
     <!-- Information text to let’s the user know that they can remove a colour from a folder or file that was already marked. -->
     <string name="action_remove_label">Remove label</string>
     <!-- Title text to show label selector. -->
@@ -3778,19 +3778,13 @@
     <!-- Preferences screen item title for cookie settings -->
     <string name="settings_about_cookie_settings">Cookie Settings</string>
     <!-- Cookie dialog title -->
-    <string name="dialog_cookie_alert_title">Before you continue</string>
+    <string name="dialog_cookie_alert_title">Your privacy</string>
     <!-- Cookie dialog message. Please, keep the placeholders to format the string. -->
-    <string name="dialog_cookie_alert_message">We use local storage and similar technologies (’Cookies’) to provide our services to you, enhance your experience with our services and customize the adverts you see, including through third parties. Accept our use of Cookies from the beginning of your visit or customise Cookies in Cookie Settings. Read more in our [A]Cookie Policy[/A].</string>
+    <string name="dialog_cookie_alert_message">We use Cookies and similar technologies (’Cookies’) to provide and enhance your experience with our services. Accept our use of Cookies from the beginning of your visit or customise Cookies in Cookie Settings. Read more in our [A]Cookie Policy[/A].</string>
     <!-- Cookie dialog message showed when there are unsaved settings. -->
     <string name="dialog_cookie_alert_unsaved">Cookie Settings unsaved.</string>
     <!-- Snackbar message showed when there settings has been saved successfully. -->
     <string name="dialog_cookie_snackbar_saved">Cookie Settings changes have been saved</string>
-    <!-- Cookie dialog third party first subtitle -->
-    <string name="dialog_cookie_thirdparty_subtitle1">Google Advertising Cookies</string>
-    <!-- Cookie dialog third party second subtitle -->
-    <string name="dialog_cookie_thirdparty_subtitle2">Category: Advertising Cookies</string>
-    <!-- Cookie dialog third party message. Please, keep the placeholders to format the string. -->
-    <string name="dialog_cookie_thirdparty_message">Used by Google to:\n• customise the adverts Google shows on ours and other services and websites, based on such things as your location and other websites you’ve previously visited;\n• monitor how often you are displayed certain adverts;\n• provide fraud prevention; and\n• determine when you tap on a particular advert and then to track the following actions you take in response to that advert.\nhttps://policies.google.com/technologies/partner-sites</string>
     <!-- Preference screen item title -->
     <string name="preference_cookies_accept">Accept Cookies</string>
     <!-- Preference screen item title -->
@@ -3798,21 +3792,9 @@
     <!-- Preference screen item summary -->
     <string name="preference_cookies_essential_summary">Essential for providing you important functionality and secure access to our services. For this reason, they do not require consent.</string>
     <!-- Preference screen item title -->
-    <string name="preference_cookies_preference_title">Preference Cookies</string>
-    <!-- Preference screen item summary -->
-    <string name="preference_cookies_preference_summary">Allow us to remember certain display and formatting settings you choose. Not accepting these Cookies will mean we won’t be able to remember some things for you such as your preferred screen layout.</string>
-    <!-- Preference screen item title -->
     <string name="preference_cookies_performance_title">Performance and Analytics Cookies</string>
     <!-- Preference screen item summary -->
     <string name="preference_cookies_performance_summary">Help us to understand how you use our services and provide us data that we can use to make improvements. Not accepting these Cookies will mean we will have less data available to us to help design improvements.</string>
-    <!-- Preference screen item title -->
-    <string name="preference_cookies_advertising_title">Advertising Cookies</string>
-    <!-- Preference screen item summary -->
-    <string name="preference_cookies_advertising_summary">Used by us and our approved advertising partners to customise the adverts you see on our services and on other websites based on your browsing history. Not accepting these Cookies means we may show advertisements that are less relevant.</string>
-    <!-- Preference screen item title -->
-    <string name="preference_cookies_thirdparty_title">Third Party Cookies</string>
-    <!-- Preference screen item summary. Please, keep the placeholders to format the string. -->
-    <string name="preference_cookies_thirdparty_summary">These are Cookies which are controlled by someone other than us; we use these Cookies to provide the types of functionality described above. Not accepting these Cookies will have different implications depending on what type of Cookie each third party Cookie is. Tap on “More Information” below for details on all the third party Cookies we use.</string>
     <!-- Preference screen item state description -->
     <string name="preference_cookies_always_on">Always On</string>
     <!-- Menu option that allows the user to scan document and upload it directly to MEGA. -->
@@ -4190,4 +4172,10 @@
     <string name="image_insertion_not_allowed">MEGA does not support image insertion here</string>
     <!-- The label under the button of viewing all images screen -->
     <string name="section_images">Images</string>
+    <!-- Title of the dialog warning the user about disable file versioning. -->
+    <string name="disable_versioning_label">Disable file versioning</string>
+    <!-- Warning of the dialog informing the user about disable file versioning. -->
+    <string name="disable_versioning_warning">Our file versioning feature ensures that we keep older copies of your files around if you replace them with newer versions. If you disable File Versioning you will no longer have this protection; the old copy will be lost when you replace it.</string>
+    <!-- Warning informing the user the folder location is trying to open no longer exists. -->
+    <string name="location_not_exist">This location no longer exists.</string>
 </resources>

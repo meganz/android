@@ -149,6 +149,11 @@ class PasscodeLockActivity : BaseActivity() {
         setListeners()
     }
 
+    override fun onResume() {
+        super.onResume()
+        passcodeUtil.resetLastPauseUpdate()
+    }
+
     /**
      * Increments the number of failed attempts.
      */

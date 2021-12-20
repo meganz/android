@@ -3666,7 +3666,7 @@
     <!-- Context menu item. Allows user to delete file/folder from favourites -->
     <string name="file_properties_unfavourite">Hapus favorit</string>
     <!-- Context menu item. Allows to mark file/folder with own color label -->
-    <string name="file_properties_label">Label&#8230;</string>
+    <string name="file_properties_label">Label</string>
     <!-- Information text to let’s the user know that they can remove a colour from a folder or file that was already marked. -->
     <string name="action_remove_label">Hapus label</string>
     <!-- Title text to show label selector. -->
@@ -3698,19 +3698,13 @@
     <!-- Preferences screen item title for cookie settings -->
     <string name="settings_about_cookie_settings">Pengaturan Cookie</string>
     <!-- Cookie dialog title -->
-    <string name="dialog_cookie_alert_title">Sebelum anda melanjutkan</string>
+    <string name="dialog_cookie_alert_title">Privasi anda</string>
     <!-- Cookie dialog message. Please, keep the placeholders to format the string. -->
-    <string name="dialog_cookie_alert_message">Kami menggunakan penyimpanan lokal dan teknologi serupa (‘Cookies’) untuk memberikan layanan kami kepada anda, meningkatkan pengalaman anda dengan layanan kami dan menyesuaikan iklan yang anda lihat, termasuk melalui pihak ketiga. Terima penggunaan Cookie kami sejak awal kunjungan anda  atau sesuaikan Cookie di Pengaturan Cookie. Baca selengkapnya di [A]Kebijakan Cookie[/A] kami.</string>
+    <string name="dialog_cookie_alert_message">Kami menggunakan Cookie dan teknologi serupa (“Cookies”) untuk menyediakan dan meningkatkan pengalaman anda dengan layanan kami. Terima penggunaan Cookie kami sejak awal kunjungan anda atau sesuaikan Cookie di Pengaturan Cookie. Baca selengkapnya di [A]Kebijakan Cookie[/A] kami.</string>
     <!-- Cookie dialog message showed when there are unsaved settings. -->
     <string name="dialog_cookie_alert_unsaved">Pengaturan Cookie belum disimpan</string>
     <!-- Snackbar message showed when there settings has been saved successfully. -->
     <string name="dialog_cookie_snackbar_saved">Perubahan Pengaturan Cookie telah disimpan.</string>
-    <!-- Cookie dialog third party first subtitle -->
-    <string name="dialog_cookie_thirdparty_subtitle1">Cookie Iklan Google</string>
-    <!-- Cookie dialog third party second subtitle -->
-    <string name="dialog_cookie_thirdparty_subtitle2">Kategori: Cookie Iklan</string>
-    <!-- Cookie dialog third party message. Please, keep the placeholders to format the string. -->
-    <string name="dialog_cookie_thirdparty_message">Digunakan oleh Google untuk:\n• sesuaikan iklan yang ditampilkan Google di layanan dan situs web kami dan lainnya, berdasarkan hal-hal seperti lokasi anda dan situs web lain yang pernah anda kunjungi sebelumnya;\n• pantau seberapa sering anda ditampilkan iklan tertentu;\n• memberikan pencegahan penipuan; dan\n• tentukan kapan anda mengetuk iklan tertentu dan kemudian melacak tindakan berikut yang anda ambil sebagai tanggapan terhadap iklan itu.\nhttps://policies.google.com/technologies/partner-sites</string>
     <!-- Preference screen item title -->
     <string name="preference_cookies_accept">Terima Cookies</string>
     <!-- Preference screen item title -->
@@ -3718,21 +3712,9 @@
     <!-- Preference screen item summary -->
     <string name="preference_cookies_essential_summary">Penting untuk memberi anda fungsionalitas penting dan akses aman ke layanan kami. Untuk alasan ini, mereka tidak membutuhkan persetujuan.</string>
     <!-- Preference screen item title -->
-    <string name="preference_cookies_preference_title">Preferensi Cookies</string>
-    <!-- Preference screen item summary -->
-    <string name="preference_cookies_preference_summary">Izinkan kami mengingat pengaturan tampilan dan format tertentu  yang anda pilih. Tidak menerima Cookie ini berarti kami tidak dapat mengingat beberapa hal untuk anda seperti tata letak layar pilihan anda.</string>
-    <!-- Preference screen item title -->
     <string name="preference_cookies_performance_title">Cookie Kinerja dan Analisis</string>
     <!-- Preference screen item summary -->
     <string name="preference_cookies_performance_summary">Bantu kami untuk memahami bagaimana anda menggunakan layanan kami dan memberikan kami data yang dapat kami gunakan untuk melakukan perbaikan. Tidak menerima Cookies ini  berarti kami akan memiliki lebih sedikit data yang tersedia bagi kami untuk membantu peningkatan desain.</string>
-    <!-- Preference screen item title -->
-    <string name="preference_cookies_advertising_title">Cookie Iklan</string>
-    <!-- Preference screen item summary -->
-    <string name="preference_cookies_advertising_summary">Digunakan oleh kami dan mitra periklanan kami yang disetujui untuk menyesuaikan iklan yang anda lihat di layanan kami dan di situs web lain berdasarkan riwayat penelusuran anda. Tidak menerima Cookies ini berarti kami mungkin menampilkan iklan yang kurang relevan.</string>
-    <!-- Preference screen item title -->
-    <string name="preference_cookies_thirdparty_title">Cookie Pihak Ketiga</string>
-    <!-- Preference screen item summary. Please, keep the placeholders to format the string. -->
-    <string name="preference_cookies_thirdparty_summary">Ini adalah Cookie yang dikendalikan oleh orang lain selain kami; kami menggunakan Cookie ini untuk menyediakan jenis fungsi yang dijelaskan di atas. Tidak menerima Cookie ini akan memiliki implikasi yang berbeda tergantung pada jenis Cookie masing-masing Cookie pihak ketiga. Ketuk “Informasi Lebih Lanjut” di bawah ini untuk detail tentang semua Cookie pihak ketiga yang kami gunakan.</string>
     <!-- Preference screen item state description -->
     <string name="preference_cookies_always_on">Selalu Aktif</string>
     <!-- Menu option that allows the user to scan document and upload it directly to MEGA. -->
@@ -3946,9 +3928,9 @@
     <!-- General label for microphone -->
     <string name="general_mic">Mikrofon</string>
     <!-- General label for microphone muted -->
-    <string name="general_mic_mute">Mikrofon anda mati</string>
+    <string name="general_mic_mute">Mikrofon anda dimatikan</string>
     <!-- General label for microphone unmuted -->
-    <string name="general_mic_unmute">Mikrofon anda nyala</string>
+    <string name="general_mic_unmute">Mikrofon anda diaktifkan</string>
     <!-- General label for camera -->
     <string name="general_camera">Kamera</string>
     <!-- General label for camera enable -->
@@ -3964,9 +3946,9 @@
     <!-- General label for headphone on-->
     <string name="general_headphone_on">Headphone sedang aktif</string>
     <!-- General label for speaker on-->
-    <string name="general_speaker_on">Suara nyala</string>
+    <string name="general_speaker_on">Speaker anda dihidupkan</string>
     <!-- General label for speaker off-->
-    <string name="general_speaker_off">Suara mati</string>
+    <string name="general_speaker_off">Speaker anda dimatikan</string>
     <!-- Label for end meeting-->
     <string name="meeting_end">Matikan</string>
     <!-- Invite contacts as participants of the meeting-->
@@ -4101,4 +4083,10 @@
     <string name="image_insertion_not_allowed">MEGA tidak mendukung penyisipan gambar di sini</string>
     <!-- The label under the button of viewing all images screen -->
     <string name="section_images">Gambar-gambar</string>
+    <!-- Title of the dialog warning the user about disable file versioning. -->
+    <string name="disable_versioning_label">Nonaktifkan versi file</string>
+    <!-- Warning of the dialog informing the user about disable file versioning. -->
+    <string name="disable_versioning_warning">Fitur pembuatan versi file kami memastikan bahwa kami menyimpan salinan lama dari file anda jika anda menggantinya dengan versi yang lebih baru. Jika anda menonaktifkan Pembuatan Versi File, anda tidak akan lagi memiliki perlindungan ini; salinan lama akan hilang saat anda menggantinya.</string>
+    <!-- Warning informing the user the folder location is trying to open no longer exists. -->
+    <string name="location_not_exist">This location no longer exists.</string>
 </resources>

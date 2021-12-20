@@ -3,12 +3,10 @@ package mega.privacy.android.app.components.saver
 import android.Manifest.permission
 import android.app.Activity
 import android.content.Intent
-import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Bundle
 import android.os.StatFs
 import android.text.TextUtils
-import androidx.core.content.ContextCompat
 import androidx.documentfile.provider.DocumentFile
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.core.Completable
@@ -240,6 +238,8 @@ class NodeSaver(
      * @param isFolderLink whether this download is a folder link
      * @param fromMediaViewer whether this download is from media viewer
      * @param needSerialize whether this download need serialize
+     * @param downloadToGallery whether this download is download to gallery
+     * @param downloadByTap whether this download is triggered by tap
      */
     @JvmOverloads
     fun saveNodes(
@@ -248,12 +248,13 @@ class NodeSaver(
         isFolderLink: Boolean = false,
         fromMediaViewer: Boolean = false,
         needSerialize: Boolean = false,
-        downloadToGallery: Boolean = false
+        downloadToGallery: Boolean = false,
+        downloadByTap: Boolean = false
     ) {
         save {
             MegaNodeSaving(
                 nodesTotalSize(nodes), highPriority, isFolderLink, nodes, fromMediaViewer,
-                needSerialize, downloadToGallery = downloadToGallery
+                needSerialize,  downloadToGallery = downloadToGallery, downloadByTap = downloadByTap
             )
         }
     }

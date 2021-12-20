@@ -274,7 +274,6 @@ public class Constants {
     public static final String BROADCAST_ACTION_INTENT_SSL_VERIFICATION_FAILED = "INTENT_SSL_VERIFICATION_FAILED";
     public static final String BROADCAST_ACTION_INTENT_SIGNAL_PRESENCE = "INTENT_SIGNAL_PRESENCE";
     public static final String BROADCAST_ACTION_INTENT_UPDATE_ORDER = "INTENT_UPDATE_ORDER";
-    public static final String BROADCAST_ACTION_INTENT_UPDATE_VIEW = "INTENT_UPDATE_VIEW";
     public static final String BROADCAST_ACTION_INTENT_VOICE_CLIP_DOWNLOADED = "INTENT_VOICE_CLIP_DOWNLOADED";
     public static final String BROADCAST_ACTION_INTENT_BUSINESS_EXPIRED = "INTENT_BUSINESS_EXPIRED";
     public static final String BROADCAST_ACTION_INTENT_CHAT_ARCHIVED = "INTENT_CHAT_ARCHIVED";
@@ -325,6 +324,7 @@ public class Constants {
     public static final String INTENT_EXTRA_KEY_CHAT = "chat";
     public static final String INTENT_EXTRA_KEY_TOOL_BAR_TITLE = "aBtitle";
     public static final String INTENT_EXTRA_IS_FROM_MEETING = "extra_is_from_meeting";
+    public static final String INTENT_EXTRA_MEETING_PARTICIPANTS = "participants_in_a_meeting";
 
     public static final int FILE_BROWSER_ADAPTER = 2000;
     public static final int CONTACT_FILE_ADAPTER = 2001;
@@ -562,6 +562,7 @@ public class Constants {
     public static final int INVITE_CONTACT_TYPE = 5;
     public static final int SNACKBAR_IMCOMPATIBILITY_TYPE = 6;
     public static final int DISMISS_ACTION_SNACKBAR = 7;
+    public static final int OPEN_FILE_SNACKBAR_TYPE = 8;
 
     public static final int INFO_ANIMATION = 3000;
     public static final int QUICK_INFO_ANIMATION = 500;
@@ -897,9 +898,9 @@ public class Constants {
     public static final String NEW_ORDER = "NEW_ORDER";
     public static final String IS_CLOUD_ORDER = "IS_CLOUD_ORDER";
     public static final int ORDER_CLOUD = 0;
-    public static final int ORDER_CONTACTS = 1;
-    public static final int ORDER_OTHERS = 2;
-    public static final int ORDER_CAMERA = 3;
+    public static final int ORDER_OTHERS = 1;
+    public static final int ORDER_CAMERA = 2;
+    public static final int ORDER_OFFLINE = 3;
 
     public final static float MAX_WIDTH_APPBAR_LAND = 400;
     public final static float MAX_WIDTH_APPBAR_PORT = 200;
