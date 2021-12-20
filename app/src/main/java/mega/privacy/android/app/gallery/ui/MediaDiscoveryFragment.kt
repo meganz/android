@@ -280,7 +280,7 @@ class MediaDiscoveryFragment : BaseZoomFragment(), GalleryCardAdapter.Listener {
     }
 
     fun loadPhotos() {
-        viewModel.loadPhotos(true)
+        if(isAdded) viewModel.loadPhotos(true)
     }
 
     /**
