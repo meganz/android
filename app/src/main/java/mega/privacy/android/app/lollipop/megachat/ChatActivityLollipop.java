@@ -5406,12 +5406,8 @@ public class ChatActivityLollipop extends PasscodeActivity
 
                                         if (contact != null && contact.getVisibility() == MegaUser.VISIBILITY_VISIBLE) {
                                             ContactUtil.openContactInfoActivity(this, email);
-                                        } else if (inviteContactUseCase.isContactRequestAlreadySent(email)) {
-                                            String text = StringResourcesUtils.getString(R.string.contact_already_invited, converterShortCodes(getNameContactAttachment(m.getMessage())));
-                                            showSnackbar(SENT_REQUESTS_TYPE, text, MEGACHAT_INVALID_HANDLE);
                                         } else {
-                                            String text = StringResourcesUtils.getString(R.string.user_is_not_contact, converterShortCodes(getNameContactAttachment(m.getMessage())));
-                                            showSnackbar(INVITE_CONTACT_TYPE, text, MEGACHAT_INVALID_HANDLE, email);
+                                            checkIfInvitationIsAlreadySent(email);
                                         }
                                     }
                                 }
@@ -5472,6 +5468,28 @@ public class ChatActivityLollipop extends PasscodeActivity
         }else{
             logDebug("DO NOTHING: Position (" + positionInMessages + ") is more than size in messages (size: " + messages.size() + ")");
         }
+    }
+
+    /**
+     * Checks if a contact invitation has been already sent.
+     *
+     * @param email Contact email to check.
+     */
+    private void checkIfInvitationIsAlreadySent(String email) {
+        inviteContactUseCase.isContactRequestAlreadySent(email)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe((alreadyInvited, throwable) -> {
+                    if (throwable == null) {
+                        if (alreadyInvited) {
+                            String text = StringResourcesUtils.getString(R.string.contact_already_invited, converterShortCodes(getNameContactAttachment(m.getMessage())));
+                            showSnackbar(SENT_REQUESTS_TYPE, text, MEGACHAT_INVALID_HANDLE);
+                        } else {
+                            String text = StringResourcesUtils.getString(R.string.user_is_not_contact, converterShortCodes(getNameContactAttachment(m.getMessage())));
+                            showSnackbar(INVITE_CONTACT_TYPE, text, MEGACHAT_INVALID_HANDLE, email);
+                        }
+                    }
+                });
     }
 
     /**

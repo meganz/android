@@ -156,15 +156,17 @@ class InviteContactUseCase @Inject constructor(
      * @param email Contact email
      * @return True if the request is already sent, false otherwise.
      */
-    fun isContactRequestAlreadySent(email: String): Boolean {
-        val sentRequests: List<MegaContactRequest> = megaApi.outgoingContactRequests
+    fun isContactRequestAlreadySent(email: String): Single<Boolean> =
+        Single.create { emitter ->
+            val sentRequests: List<MegaContactRequest> = megaApi.outgoingContactRequests
 
-        for (request in sentRequests) {
-            if (request.targetEmail == email) {
-                return true
+            for (request in sentRequests) {
+                if (request.targetEmail == email) {
+                    emitter.onSuccess(true)
+                    return@create
+                }
             }
-        }
 
-        return false
-    }
+            emitter.onSuccess(false)
+        }
 }
