@@ -130,6 +130,7 @@ import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.OpenPasswordLinkActivity;
 import mega.privacy.android.app.Product;
 import mega.privacy.android.app.R;
+import mega.privacy.android.app.gallery.ui.MediaDiscoveryFragment;
 import mega.privacy.android.app.objects.PasscodeManagement;
 import mega.privacy.android.app.fragments.homepage.documents.DocumentsFragment;
 import mega.privacy.android.app.fragments.managerFragments.cu.PhotosFragment;
@@ -3672,11 +3673,16 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
                 aB.setSubtitle(null);
                 logDebug("Cloud Drive SECTION");
                 MegaNode parentNode = megaApi.getNodeByHandle(parentHandleBrowser);
+                boolean isInMediaDiscovery = MediaDiscoveryFragment.Companion.isInMediaDiscovery();
                 if (parentNode != null) {
                     if (megaApi.getRootNode() != null) {
                         if (parentNode.getHandle() == megaApi.getRootNode().getHandle() || parentHandleBrowser == -1) {
                             aB.setTitle(getString(R.string.section_cloud_drive).toUpperCase());
-                            firstNavigationLevel = true;
+                            if(isInMediaDiscovery){
+								firstNavigationLevel = false;
+							}else{
+								firstNavigationLevel = true;
+							}
                         }
                         else {
                             aB.setTitle(parentNode.getName());
@@ -3922,7 +3928,11 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 				}
 			}
 			else{
-				aB.setHomeAsUpIndicator(tintIcon(this, R.drawable.ic_arrow_back_white));
+				if (MediaDiscoveryFragment.Companion.isInMediaDiscovery()){
+					aB.setHomeAsUpIndicator(tintIcon(this, R.drawable.ic_close_white));
+				} else {
+					aB.setHomeAsUpIndicator(tintIcon(this, R.drawable.ic_arrow_back_white));
+				}
 			}
 		}
 		else{
@@ -4517,6 +4527,11 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 		}
 
 		MegaApplication.getTransfersManagement().setIsOnTransfersSection(item == DrawerItem.TRANSFERS);
+
+		// Handle Media discovery page behavior
+		if (item != DrawerItem.CLOUD_DRIVE && MediaDiscoveryFragment.Companion.isInMediaDiscovery()){
+			MediaDiscoveryFragment.Companion.getInstance().onDestroy();
+		}
 
     	switch (item){
 			case CLOUD_DRIVE:{
@@ -5292,16 +5307,20 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 		if (isOnline(this)) {
 			switch (drawerItem) {
 				case CLOUD_DRIVE:
-					upgradeAccountMenuItem.setVisible(true);
-					importLinkMenuItem.setVisible(true);
-					addMenuItem.setEnabled(true);
-					addMenuItem.setVisible(true);
-					takePicture.setVisible(true);
+					if (MediaDiscoveryFragment.Companion.isInMediaDiscovery()){
 
-					createFolderMenuItem.setVisible(true);
-                    if (isCloudAdded() && fbFLol.getItemCount() > 0) {
-                        searchMenuItem.setVisible(true);
-                    }
+					} else {
+						upgradeAccountMenuItem.setVisible(true);
+						importLinkMenuItem.setVisible(true);
+						addMenuItem.setEnabled(true);
+						addMenuItem.setVisible(true);
+						takePicture.setVisible(true);
+
+						createFolderMenuItem.setVisible(true);
+						if (isCloudAdded() && fbFLol.getItemCount() > 0) {
+							searchMenuItem.setVisible(true);
+						}
+					}
 					break;
 				case HOMEPAGE:
 					if (mHomepageScreen == HomepageScreen.FULLSCREEN_OFFLINE) {
@@ -5542,9 +5561,14 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 				else{
 					logDebug("NOT firstNavigationLevel");
 		    		if (drawerItem == DrawerItem.CLOUD_DRIVE){
-						//Cloud Drive
-						if (isCloudAdded()) {
-							fbFLol.onBackPressed();
+						//Check media discovery mode
+						if (MediaDiscoveryFragment.Companion.isInMediaDiscovery()){
+							MediaDiscoveryFragment.Companion.getInstance().onBackPressed();
+						}else{
+							//Cloud Drive
+							if (isCloudAdded()) {
+								fbFLol.onBackPressed();
+							}
 						}
 		    		}
 					else if (drawerItem == DrawerItem.RUBBISH_BIN) {
@@ -6123,8 +6147,13 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 		}
 
 		if (drawerItem == DrawerItem.CLOUD_DRIVE) {
-		    if (!isCloudAdded() || fbFLol.onBackPressed() == 0) {
-		    	performOnBack();
+			if (MediaDiscoveryFragment.Companion.isInMediaDiscovery()){
+				MediaDiscoveryFragment.Companion.getInstance().onDestroy();
+				backToDrawerItem(bottomNavigationCurrentItem);
+			}else{
+				 if (!isCloudAdded() || fbFLol.onBackPressed() == 0) {
+		    		performOnBack();
+				 }
 			}
 		} else if (drawerItem == DrawerItem.RUBBISH_BIN) {
 			rubbishBinFLol = (RubbishBinFragmentLollipop) getSupportFragmentManager()

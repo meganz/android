@@ -46,6 +46,8 @@ abstract class GalleryViewModel constructor(
 
     abstract fun isAutoGetItem(): Boolean
 
+    var shouldMapCards = false
+
     abstract fun getFilterRealPhotoCountCondition(item: GalleryItem): Boolean
 
     fun setZoom(zoom: Int) {
@@ -83,6 +85,10 @@ abstract class GalleryViewModel constructor(
                 photoIndex = initMediaIndex(item, photoIndex)
             }
 
+            if (shouldMapCards){
+                dateCards = MutableLiveData(manuallyHandleDateCards(it))
+            }
+
             it
         }
     }
@@ -94,11 +100,21 @@ abstract class GalleryViewModel constructor(
      */
     abstract fun initMediaIndex(item: GalleryItem, mediaIndex: Int): Int
 
-    val dateCards: LiveData<List<List<GalleryCard>>> = items.map {
+    var dateCards: LiveData<List<List<GalleryCard>>> = getDateCardsFromItems()
+
+    private fun getDateCardsFromItems(): LiveData<List<List<GalleryCard>>> {
+        return if (!isAutoGetItem())
+            MutableLiveData()
+        else items.map {
+            manuallyHandleDateCards(it)
+        }
+    }
+
+    private fun manuallyHandleDateCards(items:List<GalleryItem>): List<List<GalleryCard>> {
         val cardsProvider = DateCardsProvider()
         cardsProvider.extractCardsFromNodeList(
             repository.context,
-            it.mapNotNull { item -> item.node })
+            items.mapNotNull { item -> item.node })
 
         viewModelScope.launch {
             repository.getPreviews(cardsProvider.getNodesWithoutPreview()) {
@@ -106,7 +122,7 @@ abstract class GalleryViewModel constructor(
             }
         }
 
-        listOf(cardsProvider.getDays(), cardsProvider.getMonths(), cardsProvider.getYears())
+        return listOf(cardsProvider.getDays(), cardsProvider.getMonths(), cardsProvider.getYears())
     }
 
     /**
@@ -161,7 +177,7 @@ abstract class GalleryViewModel constructor(
         // in the PhotosFragment, for fear that an nodes update event would be missed if
         // emitted accidentally between the Fragment's onDestroy and onCreate when rotating screen.
         LiveEventBus.get(EVENT_NODES_CHANGE, Boolean::class.java)
-                .observeForever(nodesChangeObserver)
+            .observeForever(nodesChangeObserver)
         loadPhotos(true)
     }
 

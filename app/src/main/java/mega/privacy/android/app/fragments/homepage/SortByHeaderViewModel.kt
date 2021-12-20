@@ -78,7 +78,7 @@ class SortByHeaderViewModel @ViewModelInject constructor(
      * Enter media discovery view.
      */
     fun enterMediaDiscovery() {
-        LiveEventBus.get(EVENT_SHOW_MEDIA_DISCOVERY, Long::class.java).post(0L)
+        LiveEventBus.get(EVENT_SHOW_MEDIA_DISCOVERY, Unit::class.java).post(Unit)
     }
 
     override fun onCleared() {

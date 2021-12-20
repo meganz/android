@@ -3,6 +3,7 @@ package mega.privacy.android.app.gallery.ui
 import android.annotation.SuppressLint
 import android.content.res.Configuration
 import android.os.Bundle
+import android.util.Log
 import android.view.*
 import androidx.annotation.NonNull
 import androidx.coordinatorlayout.widget.CoordinatorLayout
@@ -13,9 +14,11 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.databinding.FragmentMediaDecoveryBinding
 import mega.privacy.android.app.fragments.homepage.*
 import mega.privacy.android.app.gallery.adapter.GalleryCardAdapter
+import mega.privacy.android.app.gallery.constant.MEDIA_HANDLE
 import mega.privacy.android.app.gallery.data.GalleryCard
 import mega.privacy.android.app.gallery.data.GalleryItem
 import mega.privacy.android.app.gallery.fragment.BaseZoomFragment
+import mega.privacy.android.app.lollipop.ManagerActivityLollipop
 import mega.privacy.android.app.utils.*
 import mega.privacy.android.app.utils.Constants.*
 import java.util.*
@@ -32,10 +35,11 @@ class MediaDiscoveryFragment : BaseZoomFragment(), GalleryCardAdapter.Listener {
     private var currentHandle: Long = 0L
 
     companion object {
-        fun newInstance(): MediaDiscoveryFragment {
-            LogUtil.logDebug("newInstance")
-            return MediaDiscoveryFragment()
+        val instance: MediaDiscoveryFragment by lazy(mode = LazyThreadSafetyMode.NONE) {
+            MediaDiscoveryFragment()
         }
+
+        var isInMediaDiscovery = false
     }
 
     override fun onCreateView(
@@ -43,15 +47,23 @@ class MediaDiscoveryFragment : BaseZoomFragment(), GalleryCardAdapter.Listener {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
+        isInMediaDiscovery = true
+        Log.e("jizhe","onCreateView isInMediaDiscovery"+isInMediaDiscovery)
         binding = FragmentMediaDecoveryBinding.inflate(inflater, container, false)
         arguments?.let {
-            currentHandle = it.getLong("handle")
+            currentHandle = it.getLong(MEDIA_HANDLE)
             viewModel.setHandle(currentHandle)
         }
 
         setupBinding()
-
+        setupParentActivityUI()
         return binding.root
+    }
+
+    private fun setupParentActivityUI() {
+        (context as ManagerActivityLollipop).setToolbarTitle()
+        (context as ManagerActivityLollipop).invalidateOptionsMenu()
+        (context as ManagerActivityLollipop).hideFabButton()
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -268,6 +280,7 @@ class MediaDiscoveryFragment : BaseZoomFragment(), GalleryCardAdapter.Listener {
     fun loadPhotos() {
         viewModel.loadPhotos(true)
     }
+
     /**
      * Show the view with the data of years, months or days depends on selected view.
      *
@@ -298,5 +311,31 @@ class MediaDiscoveryFragment : BaseZoomFragment(), GalleryCardAdapter.Listener {
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
         viewModel.selectedViewTypeMedia = selectedView
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+        if (!isInThisPage()) {
+            return
+        }
+        super.onCreateOptionsMenu(menu, inflater)
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        return if (!isInThisPage()) {
+            true
+        } else super.onOptionsItemSelected(item)
+    }
+
+    fun isInThisPage(): Boolean {
+        return isInMediaDiscovery
+    }
+
+    override fun onDestroy() {
+        isInMediaDiscovery = false
+        super.onDestroy()
+    }
+
+    fun onBackPressed(){
+        (context as ManagerActivityLollipop).onBackPressed()
     }
 }
