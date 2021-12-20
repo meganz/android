@@ -46,7 +46,7 @@ public class KeepAliveService extends Service {
                 .putExtra(EXTRA_MOVE_TO_CHAT_SECTION, true)
                 .setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
 
-        PendingIntent pendingIntent = PendingIntent.getActivity(getApplicationContext(), 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+        PendingIntent pendingIntent = PendingIntent.getActivity(getApplicationContext(), 0, intent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
 
         NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(this, RETRIEVING_MSG_CHANNEL_ID);
         mBuilder.setSmallIcon(smallIcon)
