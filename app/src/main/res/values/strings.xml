@@ -1001,8 +1001,6 @@
     <string name="settings_disable_logs">Logs are now disabled</string>
     <!-- Snackbar error message triggered by host error when user is trying to setup MEGA Camera Uploads folder in settings page -->
     <string name="error_unable_to_setup_cloud_folder">Unable to setup MEGA Camera Uploads folder</string>
-    <!-- Message displayed when the user denies the required permissions during the logs activation -->
-    <string name="logs_not_enabled_permissions">Logs have not been enabled because you denied the required permissions</string>
     <!-- Option in the sliding panel to open the folder which contains the file selected after performing a search -->
     <string name="search_open_location">Open location</string>
     <!-- message when a temporary error on logging in is due to SDK is waiting for the server to complete a request due to an API lock -->
@@ -4184,4 +4182,22 @@
     <string name="payment_methods">Payment methods</string>
     <!-- Button to proceed with a payment -->
     <string name="proceed">Proceed</string>
+    <!-- Message informing the upgrade was processed correctly. Placeholder: type of subscription e.g: Pro Lite monthly -->
+    <string name="successful_upgrade">Thank you for subscribing to %1$s!</string>
+    <!-- Pro Lite monthly subscription -->
+    <string name="pro_lite_monthly">Pro Lite monthly</string>
+    <!-- Pro Lite yearly subscription -->
+    <string name="pro_lite_yearly">Pro Lite yearly</string>
+    <!-- Pro I monthly subscription -->
+    <string name="pro_i_monthly">Pro I monthly</string>
+    <!-- Pro I yearly subscription -->
+    <string name="pro_i_yearly">Pro I yearly</string>
+    <!-- Pro II monthly subscription -->
+    <string name="pro_ii_monthly">Pro II monthly</string>
+    <!-- Pro II yearly subscription -->
+    <string name="pro_ii_yearly">Pro II yearly</string>
+    <!-- Pro III monthly subscription -->
+    <string name="pro_iii_monthly">Pro III monthly</string>
+    <!-- Pro III yearly subscription -->
+    <string name="pro_iii_yearly">Pro III yearly</string>
 </resources>

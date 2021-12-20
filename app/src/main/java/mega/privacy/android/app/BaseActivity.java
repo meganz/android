@@ -20,6 +20,7 @@ import com.google.android.material.snackbar.Snackbar;
 import com.jeremyliao.liveeventbus.LiveEventBus;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
 import androidx.core.text.HtmlCompat;
 import androidx.lifecycle.Observer;
 
@@ -35,6 +36,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.FrameLayout;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -43,7 +45,6 @@ import org.jetbrains.annotations.NotNull;
 import javax.inject.Inject;
 
 import dagger.hilt.android.AndroidEntryPoint;
-import kotlin.Pair;
 import mega.privacy.android.app.components.saver.AutoPlayInfo;
 import mega.privacy.android.app.globalmanagement.MyAccountInfo;
 import mega.privacy.android.app.interfaces.ActivityLauncher;
@@ -103,8 +104,11 @@ public class BaseActivity extends AppCompatActivity implements ActivityLauncher,
     private static final String TRANSFER_OVER_QUOTA_WARNING_SHOWN = "TRANSFER_OVER_QUOTA_WARNING_SHOWN";
     private static final String RESUME_TRANSFERS_WARNING_SHOWN = "RESUME_TRANSFERS_WARNING_SHOWN";
     private static final String UPGRADE_ALERT_SHOWN = "UPGRADE_ALERT_SHOWN";
-    private static final String UPGRADE_ALERT_MESSAGE = "UPGRADE_ALERT_MESSAGE";
     private static final String EVENT_PURCHASES_UPDATED = "EVENT_PURCHASES_UPDATED";
+    private static final String PURCHASE_TYPE = "PURCHASE_TYPE";
+    private static final int PURCHASE_SUCCESS = 0;
+    private static final int PURCHASE_PENDING = 1;
+    private static final int PURCHASE_DOWNGRADE = 2;
 
     @Inject
     MyAccountInfo myAccountInfo;
@@ -136,7 +140,7 @@ public class BaseActivity extends AppCompatActivity implements ActivityLauncher,
     private Snackbar snackbar;
 
     private AlertDialog upgradeAlert;
-    private Pair<String, String> upgradeAlertMessage;
+    private int purchaseType;
 
     /**
      * Contains the info of a node that to be opened in-app.
@@ -189,7 +193,6 @@ public class BaseActivity extends AppCompatActivity implements ActivityLauncher,
     private final Handler uiHandler = new Handler(Looper.getMainLooper());
 
     @Override
-    @SuppressWarnings("unchecked")
     protected void onCreate(Bundle savedInstanceState) {
 
         baseActivity = this;
@@ -232,9 +235,9 @@ public class BaseActivity extends AppCompatActivity implements ActivityLauncher,
         registerReceiver(cookieSettingsReceiver,
                 new IntentFilter(BROADCAST_ACTION_COOKIE_SETTINGS_SAVED));
 
-        LiveEventBus.get(EVENT_PURCHASES_UPDATED).observe(this, o -> {
+        LiveEventBus.get(EVENT_PURCHASES_UPDATED).observe(this, type -> {
             if (!isPaused) {
-                upgradeAlertMessage = (Pair<String, String>) o;
+                purchaseType = (Integer) type;
                 showQueryPurchasesResult();
             }
         });
@@ -256,7 +259,7 @@ public class BaseActivity extends AppCompatActivity implements ActivityLauncher,
             }
 
             if (savedInstanceState.getBoolean(UPGRADE_ALERT_SHOWN, false)) {
-                upgradeAlertMessage = (Pair<String, String>) savedInstanceState.getSerializable(UPGRADE_ALERT_MESSAGE);
+                purchaseType = savedInstanceState.getInt(PURCHASE_TYPE, INVALID_VALUE);
                 showQueryPurchasesResult();
             }
         }
@@ -320,7 +323,7 @@ public class BaseActivity extends AppCompatActivity implements ActivityLauncher,
         outState.putBoolean(TRANSFER_OVER_QUOTA_WARNING_SHOWN, isGeneralTransferOverQuotaWarningShown);
         outState.putBoolean(RESUME_TRANSFERS_WARNING_SHOWN, isResumeTransfersWarningShown);
         outState.putBoolean(UPGRADE_ALERT_SHOWN, isAlertDialogShown(upgradeAlert));
-        outState.putSerializable(UPGRADE_ALERT_MESSAGE, upgradeAlertMessage);
+        outState.putInt(PURCHASE_TYPE, purchaseType);
 
         super.onSaveInstanceState(outState);
     }
@@ -1375,14 +1378,12 @@ public class BaseActivity extends AppCompatActivity implements ActivityLauncher,
             return;
         }
 
-        String title;
-        String message;
+        int purchaseResult;
 
         if (purchases != null && !purchases.isEmpty()) {
             MegaPurchase purchase = purchases.get(0);
             //payment may take time to process, we will not give privilege until it has been fully processed
             String sku = purchase.getSku();
-            title = StringResourcesUtils.getString(R.string.title_user_purchased_subscription);
 
             if (billingManager.isPurchased(purchase)) {
                 //payment has been processed
@@ -1391,22 +1392,21 @@ public class BaseActivity extends AppCompatActivity implements ActivityLauncher,
                         + getSubscriptionRenewalType(sku));
 
                 updateAccountInfo(this, purchases, myAccountInfo);
-                message = StringResourcesUtils.getString(R.string.message_user_purchased_subscription);
                 updateSubscriptionLevel(myAccountInfo, dbH, megaApi);
                 new RatingHandlerImpl(this).updateTransactionFlag(true);
+                purchaseResult = PURCHASE_SUCCESS;
             } else {
                 //payment is being processed or in unknown state
                 logDebug("Purchase " + sku + " is being processed or in unknown state.");
-                message = StringResourcesUtils.getString(R.string.message_user_payment_pending);
+                purchaseResult = PURCHASE_PENDING;
             }
         } else {
             //down grade case
             logDebug("Downgrade, the new subscription takes effect when the old one expires.");
-            title = StringResourcesUtils.getString(R.string.my_account_upgrade_pro);
-            message = StringResourcesUtils.getString(R.string.message_user_purchased_subscription_down_grade);
+            purchaseResult = PURCHASE_DOWNGRADE;
         }
 
-        LiveEventBus.get(EVENT_PURCHASES_UPDATED).post(new Pair<>(title, message));
+        LiveEventBus.get(EVENT_PURCHASES_UPDATED, Integer.class).post(purchaseResult);
     }
 
     @Override
@@ -1430,14 +1430,80 @@ public class BaseActivity extends AppCompatActivity implements ActivityLauncher,
      * Shows the result of a purchase as an alert.
      */
     private void showQueryPurchasesResult() {
-        if (upgradeAlertMessage == null) {
+        if (purchaseType == INVALID_VALUE) {
             return;
         }
 
-        upgradeAlert = new MaterialAlertDialogBuilder(this)
-                .setTitle(upgradeAlertMessage.getFirst())
-                .setMessage(upgradeAlertMessage.getSecond())
-                .setPositiveButton(StringResourcesUtils.getString(R.string.general_ok), null)
-                .show();
+        MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this)
+                .setPositiveButton(StringResourcesUtils.getString(R.string.general_ok), null);
+
+        switch (purchaseType) {
+            case PURCHASE_PENDING:
+                upgradeAlert = builder.setTitle(StringResourcesUtils.getString(R.string.title_user_purchased_subscription))
+                        .setMessage(StringResourcesUtils.getString(R.string.message_user_payment_pending))
+                        .create();
+                break;
+
+            case PURCHASE_DOWNGRADE:
+                upgradeAlert = builder.setTitle(StringResourcesUtils.getString(R.string.my_account_upgrade_pro))
+                        .setMessage(StringResourcesUtils.getString(R.string.message_user_purchased_subscription_down_grade))
+                        .create();
+                break;
+
+            case PURCHASE_SUCCESS:
+            default:
+                upgradeAlert = builder.setView(R.layout.dialog_purchase_success).create();
+
+                upgradeAlert.setOnShowListener(dialog -> {
+                    TextView purchaseType = upgradeAlert.findViewById(R.id.purchase_type);
+                    ImageView purchaseImage = upgradeAlert.findViewById(R.id.purchase_image);
+                    TextView purchaseMessage = upgradeAlert.findViewById(R.id.purchase_message);
+                    if (purchaseType == null || purchaseImage == null || purchaseMessage == null) {
+                        return;
+                    }
+
+                    int account;
+                    int color = R.color.red_600_red_300;
+                    int image;
+                    int purchaseText;
+
+                    switch (myAccountInfo.getLevelAccountDetails()) {
+                        case PRO_I:
+                            account = R.string.pro1_account;
+                            image = R.drawable.ic_pro_i_big_crest;
+                            purchaseText = R.string.pro_i_monthly;
+                            break;
+
+                        case PRO_II:
+                            account = R.string.pro2_account;
+                            image = R.drawable.ic_pro_ii_big_crest;
+                            purchaseText = R.string.pro_ii_monthly;
+                            break;
+
+                        case PRO_III:
+                            account = R.string.pro3_account;
+                            image = R.drawable.ic_pro_iii_big_crest;
+                            purchaseText = R.string.pro_iii_monthly;
+                            break;
+
+                        case PRO_LITE:
+                        default:
+                            account = R.string.prolite_account;
+                            color = R.color.orange_400_orange_300;
+                            image = R.drawable.ic_lite_big_crest;
+                            purchaseText = R.string.pro_lite_monthly;
+                            break;
+                    }
+
+
+                    purchaseType.setText(StringResourcesUtils.getString(account));
+                    purchaseType.setTextColor(ContextCompat.getColor(this, color));
+                    purchaseImage.setImageResource(image);
+                    purchaseMessage.setText(StringResourcesUtils.getString(R.string.successful_upgrade,
+                            StringResourcesUtils.getString(purchaseText)));
+                });
+        }
+
+        upgradeAlert.show();
     }
 }

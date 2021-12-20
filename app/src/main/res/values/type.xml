@@ -167,6 +167,10 @@
         <item name="android:textSize">16.5sp</item>
     </style>
 
+    <style name="TextAppearance.Mega.Subtitle1.Medium.20sp">
+        <item name="android:textSize">20sp</item>
+    </style>
+
     <!-- Medium, normal, 16sp, 0px, textColorPrimary -->
     <style name="TextAppearance.Mega.Subtitle1.Medium.Variant">
         <item name="android:letterSpacing">0</item>
