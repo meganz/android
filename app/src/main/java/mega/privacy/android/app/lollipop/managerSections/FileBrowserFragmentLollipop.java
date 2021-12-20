@@ -1134,7 +1134,9 @@ public class FileBrowserFragmentLollipop extends RotatableFragment {
                 return 2;
             } else {
                 MegaNode parentNode = megaApi.getParentNode(megaApi.getNodeByHandle(((ManagerActivityLollipop) context).getParentHandleBrowser()));
+
                 if (parentNode != null) {
+                    mediaHandle = parentNode.getHandle();
                     recyclerView.setVisibility(View.VISIBLE);
                     emptyImageView.setVisibility(View.GONE);
                     emptyTextView.setVisibility(View.GONE);
