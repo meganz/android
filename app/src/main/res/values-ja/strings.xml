@@ -1410,7 +1410,7 @@
     <!-- settings of the chat to choose the status -->
     <string name="settings_chat_vibration">バイブレーション</string>
     <!-- Button text shown on SMS verification page, if the user wants to logout current suspended account and login with another account, user can press this button to logout -->
-    <string name="sms_logout">[A]ログアウト[/A]して、別のアカウントでMEGAを使用します</string>
+    <string name="sms_logout">MEGAアカウントを切り替えるには[A]ログアウト[/A]します</string>
     <!-- On SMS verification page, if the user presses the logout button, a dialog with this text will show to ask for user’s confirmation. -->
     <string name="confirm_logout_from_sms_verification">現在のアカウントからログアウトしてもよろしいですか？</string>
     <!-- Text shown when a message has been deleted in the chat -->
@@ -3666,7 +3666,7 @@
     <!-- Context menu item. Allows user to delete file/folder from favourites -->
     <string name="file_properties_unfavourite">お気に入りを削除</string>
     <!-- Context menu item. Allows to mark file/folder with own color label -->
-    <string name="file_properties_label">ラベル&#8230;</string>
+    <string name="file_properties_label">ラベル</string>
     <!-- Information text to let’s the user know that they can remove a colour from a folder or file that was already marked. -->
     <string name="action_remove_label">ラベルを削除</string>
     <!-- Title text to show label selector. -->
@@ -3698,19 +3698,13 @@
     <!-- Preferences screen item title for cookie settings -->
     <string name="settings_about_cookie_settings">クッキーの設定</string>
     <!-- Cookie dialog title -->
-    <string name="dialog_cookie_alert_title">続行する前に</string>
+    <string name="dialog_cookie_alert_title">お客様のプライバシー</string>
     <!-- Cookie dialog message. Please, keep the placeholders to format the string. -->
-    <string name="dialog_cookie_alert_message">当社は、ローカルストレージおよび同様のテクノロジー（「クッキー」）を使用して、お客様にサービスをご提供し、当社サービスのエクスペリエンスを向上させ、サードパーティを介して表示される広告を含め、お客様がご覧になる広告をカスタマイズいたします。ご訪問の最初から当社によるクッキーの使用を受け入れるか、クッキーの設定でクッキーをカスタマイズしてください。詳細については、当社の[A]クッキーポリシー[/A]をご覧ください。</string>
+    <string name="dialog_cookie_alert_message">当社は、お客様に当社のサービスをご提供し、その利便性を高めるために、クッキー（Cookie）および類似の技術（以下、「クッキー」）を使用いたします。お客様がご訪問された最初から当社のクッキーの使用を受け入れるか、クッキー設定でクッキーをカスタマイズしてください。詳しくは、当社の[A]クッキーポリシー[/A]をご覧ください。</string>
     <!-- Cookie dialog message showed when there are unsaved settings. -->
     <string name="dialog_cookie_alert_unsaved">保存されていないクッキーの設定</string>
     <!-- Snackbar message showed when there settings has been saved successfully. -->
     <string name="dialog_cookie_snackbar_saved">クッキー設定の変更が保存されました</string>
-    <!-- Cookie dialog third party first subtitle -->
-    <string name="dialog_cookie_thirdparty_subtitle1">Google広告クッキー</string>
-    <!-- Cookie dialog third party second subtitle -->
-    <string name="dialog_cookie_thirdparty_subtitle2">カテゴリ：広告クッキー</string>
-    <!-- Cookie dialog third party message. Please, keep the placeholders to format the string. -->
-    <string name="dialog_cookie_thirdparty_message">Googleが使用する目的：\n・現在地や以前にアクセスした他のウェブサイトなどに基づいて、当社および他のサービスやウェブサイトにGoogleが表示する広告をカスタマイズします。\n・特定の広告が表示される頻度を監視します。\n・不正防止を提供いたします。さらに、\n・特定の広告をタップするタイミングを決定し、その広告に応じて実行する次のアクションを追跡します。\nhttps://policies.google.com/technologies/partner-sites</string>
     <!-- Preference screen item title -->
     <string name="preference_cookies_accept">クッキーを受け入れる</string>
     <!-- Preference screen item title -->
@@ -3718,21 +3712,9 @@
     <!-- Preference screen item summary -->
     <string name="preference_cookies_essential_summary">必須クッキーは、重要な機能と当社サービスへの安全なアクセスをご提供するのに不可欠なクッキーです。このため、同意は必要ありません。</string>
     <!-- Preference screen item title -->
-    <string name="preference_cookies_preference_title">お好みのクッキー</string>
-    <!-- Preference screen item summary -->
-    <string name="preference_cookies_preference_summary">ご選択された特定の表示とフォーマット設定を当社が覚えておけるようにするクッキーです。これらのクッキーを受け入れない場合、ご希望の画面レイアウトなど、当社は覚えておくことができません。</string>
-    <!-- Preference screen item title -->
     <string name="preference_cookies_performance_title">パフォーマンスとアナリティクスのクッキー</string>
     <!-- Preference screen item summary -->
     <string name="preference_cookies_performance_summary">お客様が当社サービスをどのようにご使用になられているのかを理解し、改善に使用できるデータをご提供いただくのに役立つクッキーです。これらのクッキーを受け入れない場合、当社が設計を改善するのに役立つデータが少なくなります。</string>
-    <!-- Preference screen item title -->
-    <string name="preference_cookies_advertising_title">広告クッキー</string>
-    <!-- Preference screen item summary -->
-    <string name="preference_cookies_advertising_summary">当社および当社が承認した広告パートナーが、閲覧履歴に基づいて、当社サービスおよび他のウェブサイトに表示される広告をカスタマイズするために使用いたします。これらのクッキーを受け入れない場合、関連性の低い広告が表示される可能性があります。</string>
-    <!-- Preference screen item title -->
-    <string name="preference_cookies_thirdparty_title">サードパーティのクッキー</string>
-    <!-- Preference screen item summary. Please, keep the placeholders to format the string. -->
-    <string name="preference_cookies_thirdparty_summary">これらは、当社以外の者が管理するクッキーです。これらのクッキーを使用して、上記の種類の機能をご提供いたします。これらのクッキーを受け入れない場合、各サードパーティのクッキーの種類に応じて異なる影響が生じます。当社が使用するサードパーティの全クッキーの詳細については、以下の「詳細情報」をタップしてください。</string>
     <!-- Preference screen item state description -->
     <string name="preference_cookies_always_on">常にオン</string>
     <!-- Menu option that allows the user to scan document and upload it directly to MEGA. -->
@@ -4101,4 +4083,10 @@
     <string name="image_insertion_not_allowed">MEGAはここでの画像挿入をサポートしておりません</string>
     <!-- The label under the button of viewing all images screen -->
     <string name="section_images">画像</string>
+    <!-- Title of the dialog warning the user about disable file versioning. -->
+    <string name="disable_versioning_label">ファイルのバージョン管理を無効にする</string>
+    <!-- Warning of the dialog informing the user about disable file versioning. -->
+    <string name="disable_versioning_warning">当社のファイルのバージョン管理機能により、ユーザー様のファイルが新しいバージョンに置き換えられても、古いコピーを維持することができます。ファイルのバージョン管理を無効にすると、この保護機能は使えなくなります。また、置き換えた際に、古いコピーは失われます。</string>
+    <!-- Warning informing the user the folder location is trying to open no longer exists. -->
+    <string name="location_not_exist">この場所はもう存在しません。</string>
 </resources>
