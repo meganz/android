@@ -49,6 +49,7 @@ class GetImageHandlesUseCase @Inject constructor(
      * @param isOffline         Flag to check if it's offline node
      * @return                  Flowable with up-todate image nodes
      */
+    @Suppress("SENSELESS_COMPARISON")
     fun get(
         nodeHandles: LongArray? = null,
         parentNodeHandle: Long? = null,
