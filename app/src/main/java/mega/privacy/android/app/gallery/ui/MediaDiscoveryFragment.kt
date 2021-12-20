@@ -110,7 +110,6 @@ class MediaDiscoveryFragment : BaseZoomFragment(), GalleryCardAdapter.Listener {
     override fun handleOnCreateOptionsMenu() {
         val hasImages = gridAdapterHasData()
         handleOptionsMenuUpdate(hasImages && shouldShowZoomMenuItem())
-        removeSortByMenu()
     }
 
     private fun subscribeObservers() {
@@ -123,7 +122,6 @@ class MediaDiscoveryFragment : BaseZoomFragment(), GalleryCardAdapter.Listener {
                 handleOptionsMenuUpdate(shouldShowZoomMenuItem())
                 viewTypePanel.visibility = View.VISIBLE
             }
-            removeSortByMenu()
         }
 
         viewModel.dateCards.observe(viewLifecycleOwner, ::showCards)
@@ -241,7 +239,6 @@ class MediaDiscoveryFragment : BaseZoomFragment(), GalleryCardAdapter.Listener {
             }
         }
         handleOptionsMenuUpdate(shouldShowZoomMenuItem())
-        removeSortByMenu()
         updateViewSelected()
         setHideBottomViewScrollBehaviour()
     }
