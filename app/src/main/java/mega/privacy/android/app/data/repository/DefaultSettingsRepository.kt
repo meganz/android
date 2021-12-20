@@ -21,7 +21,9 @@ class DefaultSettingsRepository @Inject constructor(
     @ApplicationContext private val context: Context,
     @MegaApi private val sdk: MegaApiAndroid,
 ) : SettingsRepository {
-
+    private val logPreferences = "LOG_PREFERENCES"
+    private val karereLogs = "KARERE_LOGS"
+    private val sdkLogs = "SDK_LOGS"
     init {
         initialisePreferences()
     }
@@ -54,6 +56,14 @@ class DefaultSettingsRepository @Inject constructor(
 
     override fun shouldHideRecentActivity(): Boolean {
         return getUiPreferences().getBoolean(SharedPreferenceConstants.HIDE_RECENT_ACTIVITY, false)
+    }
+
+    override fun isKarereLoggingEnabled(): Boolean {
+        return context.getSharedPreferences(logPreferences, Context.MODE_PRIVATE).getBoolean(karereLogs, false)
+    }
+
+    override fun isLoggingEnabled(): Boolean {
+        return context.getSharedPreferences(logPreferences, Context.MODE_PRIVATE).getBoolean(sdkLogs, false)
     }
 
     private fun getUiPreferences(): SharedPreferences {

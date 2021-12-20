@@ -5,6 +5,6 @@ import javax.inject.Inject
 
 class DefaultIsLoggingEnabled @Inject constructor(private val settingsRepository: SettingsRepository)  : IsLoggingEnabled {
     override fun invoke(): Boolean {
-        return settingsRepository.getAttributes()?.fileLoggerSDK.toBoolean()
+        return settingsRepository.isLoggingEnabled()
     }
 }
