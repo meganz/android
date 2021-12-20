@@ -39,6 +39,6 @@ class MediaViewModel @ViewModelInject constructor(
     fun getAndFilterFilesByHandle() {
         isAuto = true
         shouldMapCards = true
-        items = getAndFilterFiles()
+        triggerDataLoad()
     }
 }

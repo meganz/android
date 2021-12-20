@@ -35,8 +35,13 @@ class MediaDiscoveryFragment : BaseZoomFragment(), GalleryCardAdapter.Listener {
     private var currentHandle: Long = 0L
 
     companion object {
-        val instance: MediaDiscoveryFragment by lazy(mode = LazyThreadSafetyMode.NONE) {
-            MediaDiscoveryFragment()
+        private var instance: MediaDiscoveryFragment? = null
+
+        fun getInstance():MediaDiscoveryFragment{
+            if (instance == null){
+                instance  = MediaDiscoveryFragment()
+            }
+            return instance!!
         }
 
         var isInMediaDiscovery = false
@@ -329,6 +334,7 @@ class MediaDiscoveryFragment : BaseZoomFragment(), GalleryCardAdapter.Listener {
 
     override fun onDestroy() {
         isInMediaDiscovery = false
+        instance = null
         super.onDestroy()
     }
 

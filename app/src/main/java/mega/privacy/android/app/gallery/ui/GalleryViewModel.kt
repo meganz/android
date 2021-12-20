@@ -61,12 +61,8 @@ abstract class GalleryViewModel constructor(
         _refreshCards.value = false
     }
 
-    var items: LiveData<List<GalleryItem>> = getAndFilterFiles()
-
-    protected fun getAndFilterFiles(): LiveData<List<GalleryItem>> {
-        if (!isAutoGetItem())
-            return MutableLiveData()
-        else return liveDataRoot.switchMap {
+    var items: LiveData<List<GalleryItem>> = liveDataRoot.switchMap {
+        if (isAutoGetItem()){
             if (forceUpdate) {
                 viewModelScope.launch {
                     repository.getFiles(sortOrderManagement.getOrderCamera(), mZoom)
@@ -75,23 +71,29 @@ abstract class GalleryViewModel constructor(
                 repository.emitFiles()
             }
 
-            repository.galleryItems
-        }.map {
-            var index = 0
-            var photoIndex = 0
-
-            it.forEach { item ->
-                item.index = index++
-                photoIndex = initMediaIndex(item, photoIndex)
-            }
-
-            if (shouldMapCards){
-                dateCards = MutableLiveData(manuallyHandleDateCards(it))
-            }
-
-            it
         }
+
+        repository.galleryItems
+    }.map {
+        var index = 0
+        var photoIndex = 0
+
+        it.forEach { item ->
+            item.index = index++
+            photoIndex = initMediaIndex(item, photoIndex)
+        }
+
+        if (shouldMapCards) {
+            dateCards = MutableLiveData(manuallyHandleDateCards(it))
+        }
+
+        it
     }
+
+//    publcik fun getAndFilterFiles(): LiveData<List<GalleryItem>> {
+//           val r
+//            return r
+//    }
 
     /**
      * Custom node index and assign it to node.
@@ -198,7 +200,12 @@ abstract class GalleryViewModel constructor(
         }
     }
 
-    /**
+    fun triggerDataLoad(){
+        // Trigger data load.
+        liveDataRoot.value = liveDataRoot.value
+    }
+
+   /**
      * Make the list adapter to rebind all item views with data since
      * the underlying meta data of items may have been changed.
      */
