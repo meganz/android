@@ -113,7 +113,8 @@ class MediaDiscoveryFragment : BaseZoomFragment(), GalleryCardAdapter.Listener {
 
     private fun subscribeObservers() {
         viewModel.items.observe(viewLifecycleOwner) {
-            actionModeViewModel.setNodesData(it.filter { nodeItem -> nodeItem.type == GalleryItem.TYPE_IMAGE })
+            setupListAdapter(getCurrentZoom(), it)
+            actionModeViewModel.setNodesData(it.filter { nodeItem -> nodeItem.type != GalleryItem.TYPE_HEADER })
             if (it.isEmpty()) {
                 handleOptionsMenuUpdate(false)
                 viewTypePanel.visibility = View.GONE

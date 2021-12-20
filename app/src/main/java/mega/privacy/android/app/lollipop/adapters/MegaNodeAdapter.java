@@ -188,9 +188,17 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
                     ? View.GONE
                     : View.VISIBLE);
 
-            binding.enterMediaDiscovery.setVisibility(type == FILE_BROWSER_ADAPTER && MegaNodeUtil.containsMediaFile(parentHandle)? View.VISIBLE
-                    : View.GONE);
+            setMediaDiscoveryVisibility(binding);
         }
+    }
+
+    private void setMediaDiscoveryVisibility(SortByHeaderBinding binding) {
+        long currentHandle = ((ManagerActivityLollipop) context).getParentHandleBrowser();
+        boolean isInFileBrowser = type == FILE_BROWSER_ADAPTER;
+        boolean hasMediaFile = MegaNodeUtil.containsMediaFile(currentHandle);
+        boolean isNotRoot = currentHandle != megaApi.getRootNode().getHandle();
+
+        binding.enterMediaDiscovery.setVisibility(isInFileBrowser && hasMediaFile && isNotRoot ? View.VISIBLE : View.GONE);
     }
 
     @Override
