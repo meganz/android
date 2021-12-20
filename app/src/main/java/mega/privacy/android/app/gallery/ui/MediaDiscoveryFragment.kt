@@ -48,7 +48,6 @@ class MediaDiscoveryFragment : BaseZoomFragment(), GalleryCardAdapter.Listener {
         savedInstanceState: Bundle?
     ): View {
         isInMediaDiscovery = true
-        Log.e("jizhe","onCreateView isInMediaDiscovery"+isInMediaDiscovery)
         binding = FragmentMediaDecoveryBinding.inflate(inflater, container, false)
         arguments?.let {
             currentHandle = it.getLong(MEDIA_HANDLE)
