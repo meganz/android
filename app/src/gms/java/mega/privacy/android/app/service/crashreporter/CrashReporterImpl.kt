@@ -11,7 +11,7 @@ class CrashReporterImpl : CrashReporter {
     init {
         try {
             crashlytics = FirebaseCrashlytics.getInstance()
-        } catch (e: IllegalStateException) {
+        } catch (e: Exception) {
             e.printStackTrace()
             LogUtil.logError(e.message)
         }
