@@ -27,6 +27,8 @@ import mega.privacy.android.app.utils.ColorUtils.DARK_IMAGE_ALPHA
 import mega.privacy.android.app.utils.ColorUtils.setImageViewAlphaIfDark
 import mega.privacy.android.app.utils.Constants.PHOTO_SYNC_ADAPTER
 import mega.privacy.android.app.utils.ZoomUtil.PHOTO_ZOOM_LEVEL
+import mega.privacy.android.app.utils.permission.PermissionUtils.hasPermissions
+import mega.privacy.android.app.utils.permission.PermissionUtils.requestPermission
 import nz.mega.sdk.MegaChatApiJava
 import java.util.*
 
@@ -108,7 +110,7 @@ class PhotosFragment : BaseZoomFragment(), GalleryCardAdapter.Listener {
     }
 
     private fun requestCameraUploadPermission(permissions: Array<String>, requestCode: Int) {
-        PermissionUtils.requestPermission(mManagerActivity, requestCode, *permissions)
+        requestPermission(mManagerActivity, requestCode, *permissions)
     }
 
     fun enableCu() {
@@ -177,7 +179,7 @@ class PhotosFragment : BaseZoomFragment(), GalleryCardAdapter.Listener {
             MegaApplication.getInstance().sendSignalPresenceActivity()
             val permissions =
                 arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE)
-            if (PermissionUtils.hasPermissions(context, *permissions)) {
+            if (hasPermissions(context, *permissions)) {
                 mManagerActivity.checkIfShouldShowBusinessCUAlert()
             } else {
                 requestCameraUploadPermission(
@@ -329,7 +331,7 @@ class PhotosFragment : BaseZoomFragment(), GalleryCardAdapter.Listener {
     fun enableCUClick() {
         ((context as Activity).application as MegaApplication).sendSignalPresenceActivity()
         val permissions = arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE)
-        if (PermissionUtils.hasPermissions(context, *permissions)) {
+        if (hasPermissions(context, *permissions)) {
             viewModel.setEnableCUShown(true)
             mManagerActivity.refreshPhotosFragment()
         } else {
