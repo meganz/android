@@ -210,6 +210,8 @@ import mega.privacy.android.app.modalbottomsheet.SortByBottomSheetDialogFragment
 import mega.privacy.android.app.modalbottomsheet.UploadBottomSheetDialogFragment;
 import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.ChatBottomSheetDialogFragment;
 import mega.privacy.android.app.service.iar.RatingHandlerImpl;
+import mega.privacy.android.app.usecase.MoveNodeUseCase;
+import mega.privacy.android.app.usecase.RemoveNodeUseCase;
 import mega.privacy.android.app.utils.AlertsAndWarnings;
 import mega.privacy.android.app.utils.CallUtil;
 import mega.privacy.android.app.utils.ChatUtil;
@@ -379,6 +381,10 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 	FilePrepareUseCase filePrepareUseCase;
 	@Inject
 	PasscodeManagement passcodeManagement;
+	@Inject
+	MoveNodeUseCase moveNodeUseCase;
+	@Inject
+	RemoveNodeUseCase removeNodeUseCase;
 
 	public ArrayList<Integer> transfersInProgress;
 	public MegaTransferData transferData;
@@ -6381,22 +6387,6 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 		logDebug("askConfirmationMoveToRubbish");
 		isClearRubbishBin=false;
 
-		DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
-			@Override
-			public void onClick(DialogInterface dialog, int which) {
-				switch (which){
-					case DialogInterface.BUTTON_POSITIVE:
-						//TODO remove the outgoing shares
-						nC.moveToTrash(handleList, moveToRubbish);
-						break;
-
-					case DialogInterface.BUTTON_NEGATIVE:
-						//No button clicked
-						break;
-				}
-			}
-		};
-
 		if(handleList!=null){
 
 			if (handleList.size() > 0){
@@ -6406,9 +6396,6 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 					p = megaApi.getParentNode(p);
 				}
 				if (p.getHandle() != megaApi.getRubbishNode().getHandle()){
-
-					setMoveToRubbish(true);
-
 					MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this);
 					if (getPrimaryFolderHandle() == handle && CameraUploadUtil.isPrimaryEnabled()) {
 						builder.setMessage(getResources().getString(R.string.confirmation_move_cu_folder_to_rubbish));
@@ -6418,19 +6405,32 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 						builder.setMessage(getResources().getString(R.string.confirmation_move_to_rubbish));
 					}
 
-					builder.setPositiveButton(R.string.general_move, dialogClickListener);
-					builder.setNegativeButton(R.string.general_cancel, dialogClickListener);
+					builder.setPositiveButton(R.string.general_move, (dialog, which) ->
+							moveNodeUseCase.moveToRubbishBin(handleList)
+									.subscribeOn(Schedulers.io())
+									.observeOn(AndroidSchedulers.mainThread())
+									.subscribe((result, throwable) -> {
+										if (throwable == null) {
+										}
+									}));
+
+					builder.setNegativeButton(R.string.general_cancel, null);
 					builder.show();
 				}
 				else{
-
-					setMoveToRubbish(false);
-
 					MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this);
 					builder.setMessage(getResources().getString(R.string.confirmation_delete_from_mega));
 
-					builder.setPositiveButton(R.string.context_remove, dialogClickListener);
-					builder.setNegativeButton(R.string.general_cancel, dialogClickListener);
+					builder.setPositiveButton(R.string.context_remove, (dialog, which) ->
+							removeNodeUseCase.remove(handleList)
+									.subscribeOn(Schedulers.io())
+									.observeOn(AndroidSchedulers.mainThread())
+									.subscribe((result, throwable) -> {
+										if (throwable == null) {
+										}
+									}));
+
+					builder.setNegativeButton(R.string.general_cancel, null);
 					builder.show();
 				}
 			}
