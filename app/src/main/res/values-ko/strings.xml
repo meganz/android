@@ -1410,7 +1410,7 @@
     <!-- settings of the chat to choose the status -->
     <string name="settings_chat_vibration">진동</string>
     <!-- Button text shown on SMS verification page, if the user wants to logout current suspended account and login with another account, user can press this button to logout -->
-    <string name="sms_logout">다른 계정으로 MEGA를 이용하려면 [A]로그아웃[/A]하세요</string>
+    <string name="sms_logout">MEGA 계정을 전환하려면 [A]로그아웃[/A]하세요</string>
     <!-- On SMS verification page, if the user presses the logout button, a dialog with this text will show to ask for user’s confirmation. -->
     <string name="confirm_logout_from_sms_verification">현재 계정에서 로그아웃 하시겠습니까?</string>
     <!-- Text shown when a message has been deleted in the chat -->
@@ -3666,7 +3666,7 @@
     <!-- Context menu item. Allows user to delete file/folder from favourites -->
     <string name="file_properties_unfavourite">즐겨찾기 삭제</string>
     <!-- Context menu item. Allows to mark file/folder with own color label -->
-    <string name="file_properties_label">라벨&#8230;</string>
+    <string name="file_properties_label">라벨</string>
     <!-- Information text to let’s the user know that they can remove a colour from a folder or file that was already marked. -->
     <string name="action_remove_label">라벨 제거</string>
     <!-- Title text to show label selector. -->
@@ -3698,19 +3698,13 @@
     <!-- Preferences screen item title for cookie settings -->
     <string name="settings_about_cookie_settings">쿠키 설정</string>
     <!-- Cookie dialog title -->
-    <string name="dialog_cookie_alert_title">진행하기 전에</string>
+    <string name="dialog_cookie_alert_title">당신의 사생활</string>
     <!-- Cookie dialog message. Please, keep the placeholders to format the string. -->
-    <string name="dialog_cookie_alert_message">우리는 제3자를 포함하여 당신에게 서비스를 제공하고, 우리 서비스에서의 경험을 향상하고 당신이 보는 광고를 개인화하기 위하여 로컬 저장소 그리고 비슷한 기술 (‘쿠키’)를 사용합니다. 첫 방문시 쿠키를 허용하거나 쿠키 설정에서 설정할 수 있습니다. 더 알아보려면 우리의 [A]쿠키 정책[/A]을 읽어보세요.</string>
+    <string name="dialog_cookie_alert_message">우리는 제3자를 통한 것을 포함하여, 당신에게 서비스를 제공하고, 당신의 경험을 향상시키기 위하여 쿠키 그리고 이와 유사한 기술 (“쿠키”)을 사용합니다. 방문 초기에 우리의 쿠키 사용에 동의하거나 쿠키 설정에서 쿠키를 개인화 할 수 있습니다. 자세한 내용은 우리의 [A]쿠키 정책[/A]에서 읽어보세요.</string>
     <!-- Cookie dialog message showed when there are unsaved settings. -->
     <string name="dialog_cookie_alert_unsaved">쿠키 설정이 저장되지 않았습니다.</string>
     <!-- Snackbar message showed when there settings has been saved successfully. -->
     <string name="dialog_cookie_snackbar_saved">쿠키 설정 변경 사항이 저장되었습니다</string>
-    <!-- Cookie dialog third party first subtitle -->
-    <string name="dialog_cookie_thirdparty_subtitle1">구글 광고 쿠키</string>
-    <!-- Cookie dialog third party second subtitle -->
-    <string name="dialog_cookie_thirdparty_subtitle2">분류: 광고 쿠키</string>
-    <!-- Cookie dialog third party message. Please, keep the placeholders to format the string. -->
-    <string name="dialog_cookie_thirdparty_message">이러한 이유로 Google에 의해 사용됨:\n• 당신의 위치와 당신이 이전에 방문했던 웹사이트와 같은 것들을 기반으로 우리와 다른 서비스와 웹사이트에 Google이 광고를 개인화하여 보여줍니다\n• 특정 광고를 당신이 얼마나 자주 봤는지 모니터합니다;\n• 사기 방지를 제공합니다; 그리고\n• 당신이 언제 특정한 광고를 탭하고 그 광고에 대해 어떤 행동을 취하였는지 식별합니다.\nhttps://policies.google.com/technologies/partner-sites</string>
     <!-- Preference screen item title -->
     <string name="preference_cookies_accept">쿠키 허용</string>
     <!-- Preference screen item title -->
@@ -3718,21 +3712,9 @@
     <!-- Preference screen item summary -->
     <string name="preference_cookies_essential_summary">중요한 기능과 우리 서비스에 대한 안전한 접근을 제공하기 위해 필수적입니다. 이러한 이유로, 동의가 필요하지 않습니다.</string>
     <!-- Preference screen item title -->
-    <string name="preference_cookies_preference_title">선호 쿠키</string>
-    <!-- Preference screen item summary -->
-    <string name="preference_cookies_preference_summary">당신이 선택한 어떠한 표기나 형식 설정을 기억하도록 허용합니다. 이 쿠키를 허용하지 않으면 당신이 선호하는 화면 배치 등을 저장할 수 없습니다.</string>
-    <!-- Preference screen item title -->
     <string name="preference_cookies_performance_title">성능과 분석 쿠키</string>
     <!-- Preference screen item summary -->
     <string name="preference_cookies_performance_summary">당신이 우리의 서비스를 어떻게 이용하는지 이해할 수 있도록 도와주시고 향상할 수 있도록 데이터를 제공해주세요. 이러한 쿠키들을 허용하지 않는 것은 우리가 설계를 개선하는 데에 쓸 수 있는 데이터가 적어진다는 뜻입니다.</string>
-    <!-- Preference screen item title -->
-    <string name="preference_cookies_advertising_title">광고 쿠키</string>
-    <!-- Preference screen item summary -->
-    <string name="preference_cookies_advertising_summary">당신의 브라우징 기록을 우리 또는 우리의 승인된 광고 파트너들이 활용하여 당신이 우리 서비스와 다른 웹사이트에서 보는 광고를 개인화 하도록 합니다. 이 쿠키를 허용하지 않는다면 덜 관련있는 광고를 보게 됩니다.</string>
-    <!-- Preference screen item title -->
-    <string name="preference_cookies_thirdparty_title">제3자 쿠키</string>
-    <!-- Preference screen item summary. Please, keep the placeholders to format the string. -->
-    <string name="preference_cookies_thirdparty_summary">이것들은 우리가 아닌 다른 이들에 의해 통제되는 쿠키입니다; 우리는 위에 설명한 기능 유형들을 제공하기 위해 이 쿠키를 사용합니다. 이 쿠키를 허용하지 않는다면 각 제3자 쿠키가 어떤 것인가에 따라 서로 다른 영향을 받게 됩니다. 우리가 사용하는 제3자 쿠키가 어떤 것인지 자세히 보려면 “자세한 정보”를 탭하세요.</string>
     <!-- Preference screen item state description -->
     <string name="preference_cookies_always_on">항상 켬</string>
     <!-- Menu option that allows the user to scan document and upload it directly to MEGA. -->
@@ -3946,9 +3928,9 @@
     <!-- General label for microphone -->
     <string name="general_mic">마이크</string>
     <!-- General label for microphone muted -->
-    <string name="general_mic_mute">마이크 꺼짐</string>
+    <string name="general_mic_mute">마이크가 꺼졌습니다</string>
     <!-- General label for microphone unmuted -->
-    <string name="general_mic_unmute">마이크 켜짐</string>
+    <string name="general_mic_unmute">마이크가 켜졌습니다</string>
     <!-- General label for camera -->
     <string name="general_camera">카메라</string>
     <!-- General label for camera enable -->
@@ -3964,9 +3946,9 @@
     <!-- General label for headphone on-->
     <string name="general_headphone_on">헤드폰 켜짐</string>
     <!-- General label for speaker on-->
-    <string name="general_speaker_on">스피커 켜짐</string>
+    <string name="general_speaker_on">스피커가 켜졌습니다</string>
     <!-- General label for speaker off-->
-    <string name="general_speaker_off">스피커 꺼짐</string>
+    <string name="general_speaker_off">스피커가 꺼졌습니다</string>
     <!-- Label for end meeting-->
     <string name="meeting_end">종료</string>
     <!-- Invite contacts as participants of the meeting-->
@@ -4101,4 +4083,10 @@
     <string name="image_insertion_not_allowed">MEGA가 여기서의 이미지 삽입을 지원하지 않습니다.</string>
     <!-- The label under the button of viewing all images screen -->
     <string name="section_images">이미지</string>
+    <!-- Title of the dialog warning the user about disable file versioning. -->
+    <string name="disable_versioning_label">파일 버전 관리 비활성화</string>
+    <!-- Warning of the dialog informing the user about disable file versioning. -->
+    <string name="disable_versioning_warning">파일 버전 관리 기능은 만약 파일을 새 버전으로 교체했을 경우 오래된 버전을 유지합니다. 만약 비활성화하면 이러한 보호를 더이상 받지 못 합니다; 파일을 교체할 때 이전 버전이 사라집니다.</string>
+    <!-- Warning informing the user the folder location is trying to open no longer exists. -->
+    <string name="location_not_exist">이 위치가 더 이상 존재하지 않습니다.</string>
 </resources>

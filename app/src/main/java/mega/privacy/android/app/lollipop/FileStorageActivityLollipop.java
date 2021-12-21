@@ -77,7 +77,7 @@ import static mega.privacy.android.app.utils.FileUtil.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.MegaApiUtils.*;
 import static mega.privacy.android.app.utils.MegaNodeDialogUtil.showNewFolderDialog;
-import static mega.privacy.android.app.utils.PermissionUtils.*;
+import static mega.privacy.android.app.utils.permission.PermissionUtils.*;
 import static mega.privacy.android.app.utils.TextUtil.*;
 import static mega.privacy.android.app.utils.Util.*;
 
@@ -531,10 +531,8 @@ public class FileStorageActivityLollipop extends PasscodeActivity implements OnC
 			pickFolderType = PickFolderType.NONE_ONLY_DOWNLOAD;
 		} else if (pickFolderString.equals(PickFolderType.CU_FOLDER.getFolderType())) {
 			pickFolderType = PickFolderType.CU_FOLDER;
-			dbH.setCameraFolderExternalSDCard(false);
 		} else if (pickFolderString.equals(PickFolderType.MU_FOLDER.getFolderType())) {
 			pickFolderType = PickFolderType.MU_FOLDER;
-			dbH.setMediaFolderExternalSdCard(false);
 		} else if (pickFolderString.equals(PickFolderType.DOWNLOAD_FOLDER.getFolderType())) {
 			pickFolderType = PickFolderType.DOWNLOAD_FOLDER;
 		}
@@ -1257,10 +1255,8 @@ public class FileStorageActivityLollipop extends PasscodeActivity implements OnC
                 path = new File(pathString);
 
                 if (pickFolderType.equals(PickFolderType.CU_FOLDER)) {
-                    dbH.setCameraFolderExternalSDCard(true);
                     dbH.setUriExternalSDCard(uriString);
                 } else if (pickFolderType.equals(PickFolderType.MU_FOLDER)) {
-                    dbH.setMediaFolderExternalSdCard(true);
                     dbH.setUriMediaExternalSdCard(uriString);
                 } else if (fromSaveRecoveryKey) {
                     // For temporary use, don't store the uri to database.

@@ -1,5 +1,80 @@
 package mega.privacy.android.app;
 
+import static mega.privacy.android.app.constants.BroadcastConstants.ACTION_TRANSFER_OVER_QUOTA;
+import static mega.privacy.android.app.constants.BroadcastConstants.BROADCAST_ACTION_COOKIE_SETTINGS_SAVED;
+import static mega.privacy.android.app.constants.BroadcastConstants.BROADCAST_ACTION_INTENT_EVENT_ACCOUNT_BLOCKED;
+import static mega.privacy.android.app.constants.BroadcastConstants.BROADCAST_ACTION_INTENT_SHOWSNACKBAR_TRANSFERS_FINISHED;
+import static mega.privacy.android.app.constants.BroadcastConstants.BROADCAST_ACTION_INTENT_TAKEN_DOWN_FILES;
+import static mega.privacy.android.app.constants.BroadcastConstants.BROADCAST_ACTION_INTENT_TRANSFER_UPDATE;
+import static mega.privacy.android.app.constants.BroadcastConstants.BROADCAST_ACTION_RESUME_TRANSFERS;
+import static mega.privacy.android.app.constants.BroadcastConstants.BROADCAST_ACTION_SHOW_SNACKBAR;
+import static mega.privacy.android.app.constants.BroadcastConstants.DOWNLOAD_TRANSFER;
+import static mega.privacy.android.app.constants.BroadcastConstants.DOWNLOAD_TRANSFER_OPEN;
+import static mega.privacy.android.app.constants.BroadcastConstants.EVENT_NUMBER;
+import static mega.privacy.android.app.constants.BroadcastConstants.EVENT_TEXT;
+import static mega.privacy.android.app.constants.BroadcastConstants.FILE_EXPLORER_CHAT_UPLOAD;
+import static mega.privacy.android.app.constants.BroadcastConstants.NODE_HANDLE;
+import static mega.privacy.android.app.constants.BroadcastConstants.NODE_LOCAL_PATH;
+import static mega.privacy.android.app.constants.BroadcastConstants.NODE_NAME;
+import static mega.privacy.android.app.constants.BroadcastConstants.NUMBER_FILES;
+import static mega.privacy.android.app.constants.BroadcastConstants.SNACKBAR_TEXT;
+import static mega.privacy.android.app.constants.BroadcastConstants.TRANSFER_TYPE;
+import static mega.privacy.android.app.constants.BroadcastConstants.UPLOAD_TRANSFER;
+import static mega.privacy.android.app.constants.EventConstants.EVENT_MEETING_INCOMPATIBILITY_SHOW;
+import static mega.privacy.android.app.constants.EventConstants.EVENT_PURCHASES_UPDATED;
+import static mega.privacy.android.app.lollipop.LoginFragmentLollipop.NAME_USER_LOCKED;
+import static mega.privacy.android.app.middlelayer.iab.BillingManager.RequestCode.REQ_CODE_BUY;
+import static mega.privacy.android.app.utils.AlertsAndWarnings.showResumeTransfersWarning;
+import static mega.privacy.android.app.utils.Constants.ACCOUNT_NOT_BLOCKED;
+import static mega.privacy.android.app.utils.Constants.ACTION_SHOW_UPGRADE_ACCOUNT;
+import static mega.privacy.android.app.utils.Constants.BROADCAST_ACTION_INTENT_BUSINESS_EXPIRED;
+import static mega.privacy.android.app.utils.Constants.BROADCAST_ACTION_INTENT_SIGNAL_PRESENCE;
+import static mega.privacy.android.app.utils.Constants.BROADCAST_ACTION_INTENT_SSL_VERIFICATION_FAILED;
+import static mega.privacy.android.app.utils.Constants.CHAT_ID;
+import static mega.privacy.android.app.utils.Constants.COPYRIGHT_ACCOUNT_BLOCK;
+import static mega.privacy.android.app.utils.Constants.DISABLED_BUSINESS_ACCOUNT_BLOCK;
+import static mega.privacy.android.app.utils.Constants.DISMISS_ACTION_SNACKBAR;
+import static mega.privacy.android.app.utils.Constants.EVENT_PSA;
+import static mega.privacy.android.app.utils.Constants.INVALID_VALUE;
+import static mega.privacy.android.app.utils.Constants.INVITE_CONTACT_TYPE;
+import static mega.privacy.android.app.utils.Constants.LOGIN_FRAGMENT;
+import static mega.privacy.android.app.utils.Constants.MESSAGE_SNACKBAR_TYPE;
+import static mega.privacy.android.app.utils.Constants.MULTIPLE_COPYRIGHT_ACCOUNT_BLOCK;
+import static mega.privacy.android.app.utils.Constants.MUTE_NOTIFICATIONS_SNACKBAR_TYPE;
+import static mega.privacy.android.app.utils.Constants.NOT_SPACE_SNACKBAR_TYPE;
+import static mega.privacy.android.app.utils.Constants.OPEN_FILE_SNACKBAR_TYPE;
+import static mega.privacy.android.app.utils.Constants.PERMISSIONS_TYPE;
+import static mega.privacy.android.app.utils.Constants.REMOVED_BUSINESS_ACCOUNT_BLOCK;
+import static mega.privacy.android.app.utils.Constants.SMS_VERIFICATION_ACCOUNT_BLOCK;
+import static mega.privacy.android.app.utils.Constants.SNACKBAR_IMCOMPATIBILITY_TYPE;
+import static mega.privacy.android.app.utils.Constants.SNACKBAR_TYPE;
+import static mega.privacy.android.app.utils.Constants.VISIBLE_FRAGMENT;
+import static mega.privacy.android.app.utils.Constants.WEAK_PROTECTION_ACCOUNT_BLOCK;
+import static mega.privacy.android.app.utils.DBUtil.callToAccountDetails;
+import static mega.privacy.android.app.utils.LogUtil.logDebug;
+import static mega.privacy.android.app.utils.LogUtil.logError;
+import static mega.privacy.android.app.utils.LogUtil.logInfo;
+import static mega.privacy.android.app.utils.LogUtil.logWarning;
+import static mega.privacy.android.app.utils.LogUtil.setStatusLoggerKarere;
+import static mega.privacy.android.app.utils.LogUtil.setStatusLoggerSDK;
+import static mega.privacy.android.app.utils.TextUtil.isTextEmpty;
+import static mega.privacy.android.app.utils.TimeUtils.createAndShowCountDownTimer;
+import static mega.privacy.android.app.utils.TimeUtils.getHumanizedTime;
+import static mega.privacy.android.app.utils.Util.dp2px;
+import static mega.privacy.android.app.utils.Util.getRootViewFromContext;
+import static mega.privacy.android.app.utils.Util.isTopActivity;
+import static mega.privacy.android.app.utils.Util.setAppFontSize;
+import static mega.privacy.android.app.utils.Util.showErrorAlertDialog;
+import static mega.privacy.android.app.utils.billing.PaymentUtils.getSkuDetails;
+import static mega.privacy.android.app.utils.billing.PaymentUtils.getSubscriptionRenewalType;
+import static mega.privacy.android.app.utils.billing.PaymentUtils.getSubscriptionType;
+import static mega.privacy.android.app.utils.billing.PaymentUtils.updateAccountInfo;
+import static mega.privacy.android.app.utils.billing.PaymentUtils.updatePricing;
+import static mega.privacy.android.app.utils.billing.PaymentUtils.updateSubscriptionLevel;
+import static mega.privacy.android.app.utils.permission.PermissionUtils.requestPermission;
+import static nz.mega.sdk.MegaApiJava.BUSINESS_STATUS_EXPIRED;
+import static nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE;
+
 import android.app.Activity;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -37,6 +112,8 @@ import android.widget.TextView;
 
 import org.jetbrains.annotations.NotNull;
 
+import java.util.List;
+
 import javax.inject.Inject;
 
 import dagger.hilt.android.AndroidEntryPoint;
@@ -60,36 +137,16 @@ import mega.privacy.android.app.service.iab.BillingManagerImpl;
 import mega.privacy.android.app.service.iar.RatingHandlerImpl;
 import mega.privacy.android.app.smsVerification.SMSVerificationActivity;
 import mega.privacy.android.app.snackbarListeners.SnackbarNavigateOption;
-import mega.privacy.android.app.utils.MegaNodeUtil;
-import mega.privacy.android.app.utils.PermissionUtils;
 import mega.privacy.android.app.utils.ColorUtils;
+import mega.privacy.android.app.utils.MegaNodeUtil;
 import mega.privacy.android.app.utils.StringResourcesUtils;
 import mega.privacy.android.app.utils.Util;
+import mega.privacy.android.app.utils.permission.PermissionUtils;
 import nz.mega.sdk.MegaAccountDetails;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaChatApi;
 import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaUser;
-
-import static mega.privacy.android.app.constants.EventConstants.EVENT_MEETING_INCOMPATIBILITY_SHOW;
-import static mega.privacy.android.app.constants.EventConstants.EVENT_PURCHASES_UPDATED;
-import static mega.privacy.android.app.lollipop.LoginFragmentLollipop.NAME_USER_LOCKED;
-import static mega.privacy.android.app.constants.BroadcastConstants.*;
-import static mega.privacy.android.app.middlelayer.iab.BillingManager.RequestCode.REQ_CODE_BUY;
-import static mega.privacy.android.app.utils.AlertsAndWarnings.showResumeTransfersWarning;
-import static mega.privacy.android.app.utils.Constants.SNACKBAR_IMCOMPATIBILITY_TYPE;
-import static mega.privacy.android.app.utils.LogUtil.*;
-import static mega.privacy.android.app.utils.PermissionUtils.*;
-import static mega.privacy.android.app.utils.TimeUtils.*;
-import static mega.privacy.android.app.utils.TextUtil.isTextEmpty;
-import static mega.privacy.android.app.utils.Util.*;
-import static mega.privacy.android.app.utils.DBUtil.*;
-import static mega.privacy.android.app.utils.Constants.*;
-import static mega.privacy.android.app.utils.billing.PaymentUtils.*;
-import static nz.mega.sdk.MegaApiJava.*;
-import static nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE;
-
-import java.util.List;
 
 @AndroidEntryPoint
 public class BaseActivity extends AppCompatActivity implements ActivityLauncher, PermissionRequester, SnackbarShower,
@@ -120,7 +177,7 @@ public class BaseActivity extends AppCompatActivity implements ActivityLauncher,
     private boolean delaySignalPresence = false;
 
     private enum LogsType {
-        SDK_LOGS, KARERE_LOGS;
+        SDK_LOGS, KARERE_LOGS
     }
 
     private boolean isGeneralTransferOverQuotaWarningShown;
