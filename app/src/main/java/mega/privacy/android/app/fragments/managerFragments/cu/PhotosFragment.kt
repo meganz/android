@@ -369,7 +369,7 @@ class PhotosFragment : BaseZoomFragment(), GalleryCardAdapter.Listener {
                 viewTypePanel.visibility = View.VISIBLE
             }
 
-            updateEnableCUButtons(viewModel.isCUEnabled())
+            updateEnableCUButtons(gridAdapterHasData = it.isNotEmpty(), viewModel.isCUEnabled())
             binding.emptyHint.visibility = if (it.isEmpty()) View.VISIBLE else View.GONE
             listView.visibility = if (it.isEmpty()) View.GONE else View.VISIBLE
             binding.scroller.visibility = if (it.isEmpty()) View.GONE else View.VISIBLE
@@ -384,6 +384,11 @@ class PhotosFragment : BaseZoomFragment(), GalleryCardAdapter.Listener {
                 viewModel.refreshCompleted()
             }
         }
+
+        viewModel.camSyncEnabled().observe(
+            viewLifecycleOwner, {
+                updateEnableCUButtons(cuEnabled = it)
+            })
     }
 
     /**
@@ -392,12 +397,15 @@ class PhotosFragment : BaseZoomFragment(), GalleryCardAdapter.Listener {
      *
      * @param cuEnabled True if CU is enabled, false otherwise.
      */
-    private fun updateEnableCUButtons(cuEnabled: Boolean) {
+    private fun updateEnableCUButtons(
+        gridAdapterHasData: Boolean = gridAdapterHasData(),
+        cuEnabled: Boolean
+    ) {
         binding.emptyEnableCuButton.visibility =
-            if (!cuEnabled && !gridAdapterHasData()) View.VISIBLE else View.GONE
+            if (!cuEnabled && !gridAdapterHasData) View.VISIBLE else View.GONE
         mManagerActivity.updateEnableCUButton(
             if (selectedView == ALL_VIEW && !cuEnabled
-                && gridAdapterHasData() && actionMode == null
+                && gridAdapterHasData && actionMode == null
             ) View.VISIBLE else View.GONE
         )
         if (!cuEnabled) {

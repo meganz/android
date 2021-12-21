@@ -3,7 +3,7 @@ package mega.privacy.android.app.lollipop.managerSections;
 import static mega.privacy.android.app.components.dragger.DragToExitSupport.observeDragSupportEvents;
 import static mega.privacy.android.app.components.dragger.DragToExitSupport.putThumbnailLocation;
 import static mega.privacy.android.app.constants.EventConstants.EVENT_SHOW_MEDIA_DISCOVERY;
-import static mega.privacy.android.app.gallery.constant.ConstantKt.MEDIA_HANDLE;
+import static mega.privacy.android.app.gallery.constant.MDConstantKt.MEDIA_HANDLE;
 import static mega.privacy.android.app.utils.Constants.BUFFER_COMP;
 import static mega.privacy.android.app.utils.Constants.FILE_BROWSER_ADAPTER;
 import static mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_HANDLE;
