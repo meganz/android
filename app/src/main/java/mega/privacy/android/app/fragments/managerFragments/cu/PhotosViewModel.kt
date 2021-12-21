@@ -29,7 +29,7 @@ class PhotosViewModel @ViewModelInject constructor(
 
     override var mZoom = PHOTO_ZOOM_LEVEL
 
-    override fun isAutoGetItem() = true
+    override fun isFetchItemsDirectly() = true
 
     fun getOrder() = sortOrderManagement.getOrderCamera()
 

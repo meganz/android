@@ -14,7 +14,7 @@ class ImagesViewModel @ViewModelInject constructor(
 
     override var mZoom = ZoomUtil.IMAGES_ZOOM_LEVEL
 
-    override fun isAutoGetItem() = true
+    override fun isFetchItemsDirectly() = true
 
     override fun getFilterRealPhotoCountCondition(item: GalleryItem): Boolean {
        return item.type == GalleryItem.TYPE_IMAGE

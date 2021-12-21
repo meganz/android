@@ -44,10 +44,23 @@ abstract class GalleryViewModel constructor(
 
     abstract var mZoom: Int
 
-    abstract fun isAutoGetItem(): Boolean
+    /**
+     * Controller fetch items when view model init
+     *
+     * @return True,  fetch items when view model init; False, will skip fetch logic when viewModel init
+     */
+    abstract fun isFetchItemsDirectly(): Boolean
 
+    /**
+     * Controller should map date cards data when finish fetch items
+     *
+     * True, should; False, shouldn't
+     */
     var shouldMapCards = false
 
+    /**
+     * Custom condition in sub class for filter the real photos count
+     */
     abstract fun getFilterRealPhotoCountCondition(item: GalleryItem): Boolean
 
     fun setZoom(zoom: Int) {
@@ -61,8 +74,11 @@ abstract class GalleryViewModel constructor(
         _refreshCards.value = false
     }
 
+    /**
+     * the showing data from the UI layer, it will come from liveDataRoot
+     */
     var items: LiveData<List<GalleryItem>> = liveDataRoot.switchMap {
-        if (isAutoGetItem()){
+        if (isFetchItemsDirectly()){
             if (forceUpdate) {
                 viewModelScope.launch {
                     repository.getFiles(sortOrderManagement.getOrderCamera(), mZoom)
@@ -90,11 +106,6 @@ abstract class GalleryViewModel constructor(
         it
     }
 
-//    publcik fun getAndFilterFiles(): LiveData<List<GalleryItem>> {
-//           val r
-//            return r
-//    }
-
     /**
      * Custom node index and assign it to node.
      *
@@ -105,7 +116,7 @@ abstract class GalleryViewModel constructor(
     var dateCards: LiveData<List<List<GalleryCard>>> = getDateCardsFromItems()
 
     private fun getDateCardsFromItems(): LiveData<List<List<GalleryCard>>> {
-        return if (!isAutoGetItem())
+        return if (!isFetchItemsDirectly())
             MutableLiveData()
         else items.map {
             manuallyHandleDateCards(it)
@@ -196,7 +207,7 @@ abstract class GalleryViewModel constructor(
             pendingLoad = false
             loadInProgress = true
             // Trigger data load.
-            liveDataRoot.value = liveDataRoot.value
+            triggerDataLoad()
         }
     }
 

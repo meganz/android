@@ -32,8 +32,6 @@ class MediaDiscoveryFragment : BaseZoomFragment(), GalleryCardAdapter.Listener {
 
     private var selectedView = ALL_VIEW
 
-    private var currentHandle: Long = 0L
-
     companion object {
         private var instance: MediaDiscoveryFragment? = null
 
@@ -55,7 +53,7 @@ class MediaDiscoveryFragment : BaseZoomFragment(), GalleryCardAdapter.Listener {
         isInMediaDiscovery = true
         binding = FragmentMediaDecoveryBinding.inflate(inflater, container, false)
         arguments?.let {
-            currentHandle = it.getLong(MEDIA_HANDLE)
+            val currentHandle = it.getLong(MEDIA_HANDLE)
             viewModel.setHandle(currentHandle)
         }
 

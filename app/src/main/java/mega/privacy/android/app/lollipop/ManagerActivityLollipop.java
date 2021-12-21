@@ -474,7 +474,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 	public enum FragmentTag {
 		CLOUD_DRIVE, HOMEPAGE, PHOTOS, INBOX, INCOMING_SHARES, OUTGOING_SHARES, SETTINGS, SEARCH,TRANSFERS, COMPLETED_TRANSFERS,
 		RECENT_CHAT, RUBBISH_BIN, NOTIFICATIONS, TURN_ON_NOTIFICATIONS, PERMISSIONS, SMS_VERIFICATION,
-		LINKS;
+		LINKS, MEDIA_DISCOVERY;
 
 		public String getTag () {
 			switch (this) {
@@ -495,6 +495,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 				case PERMISSIONS: return "pF";
                 case SMS_VERIFICATION: return "svF";
 				case LINKS: return "lF";
+				case MEDIA_DISCOVERY: return "mdF";
 			}
 			return null;
 		}
@@ -3523,11 +3524,8 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 		}
 	}
 
-	public void skipToNewFragment(Fragment f){
-		FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-		ft.replace(R.id.fragment_container, f);
-		ft.addToBackStack(null);
-		ft.commitAllowingStateLoss();
+	public void skipToMediaDiscoveryFragment(Fragment f){
+		replaceFragment(f, FragmentTag.MEDIA_DISCOVERY.getTag());
 	}
 
 	void replaceFragment (Fragment f, String fTag) {

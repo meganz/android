@@ -7,6 +7,9 @@ import mega.privacy.android.app.gallery.repository.MediaItemRepository
 import mega.privacy.android.app.globalmanagement.SortOrderManagement
 import mega.privacy.android.app.utils.ZoomUtil
 
+/**
+ * MediaDiscovery viewModel
+ */
 class MediaViewModel @ViewModelInject constructor(
         private val repository: MediaItemRepository,
         val sortOrderManagement: SortOrderManagement
@@ -14,11 +17,13 @@ class MediaViewModel @ViewModelInject constructor(
 
     override var mZoom = ZoomUtil.MEDIA_ZOOM_LEVEL
 
+    private var currentHandle: Long = 0L
+
     fun getOrder() = sortOrderManagement.getOrderCamera()
 
-    private var isAuto = false
+    private var isFetchItemsDirectly = false
 
-    override fun isAutoGetItem() = isAuto
+    override fun isFetchItemsDirectly() = isFetchItemsDirectly
 
     override fun getFilterRealPhotoCountCondition(item: GalleryItem): Boolean {
         return item.type != TYPE_HEADER
@@ -33,11 +38,15 @@ class MediaViewModel @ViewModelInject constructor(
     }
 
     fun setHandle(handle: Long) {
-        repository.setCurrentHandle(handle)
+        currentHandle = handle
     }
 
+    /**
+     * manually getAndFilterFilesByHandle, should put the right flag [isFetchItemsDirectly] and [shouldMapCards]
+     */
     fun getAndFilterFilesByHandle() {
-        isAuto = true
+        repository.setCurrentHandle(currentHandle)
+        isFetchItemsDirectly = true
         shouldMapCards = true
         triggerDataLoad()
     }

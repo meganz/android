@@ -44,7 +44,6 @@ import android.os.Looper;
 import android.text.Html;
 import android.text.Spanned;
 import android.util.DisplayMetrics;
-import android.util.Log;
 import android.view.Display;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -654,7 +653,7 @@ public class FileBrowserFragmentLollipop extends RotatableFragment {
         Bundle args = new Bundle();
         args.putLong(MEDIA_HANDLE, mediaHandle);
         f.setArguments(args);
-        ((ManagerActivityLollipop) context).skipToNewFragment(f);
+        ((ManagerActivityLollipop) context).skipToMediaDiscoveryFragment(f);
     }
 
     @Override
