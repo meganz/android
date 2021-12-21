@@ -21,6 +21,7 @@ import com.jeremyliao.liveeventbus.LiveEventBus;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 
 import mega.privacy.android.app.MegaOffline;
 import mega.privacy.android.app.MimeTypeList;
@@ -1130,7 +1131,9 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
                 break;
 
             case R.id.restore_option:
-                ((ManagerActivityLollipop) requireActivity()).restoreFromRubbish(node);
+                List<MegaNode> nodes = new ArrayList<>();
+                nodes.add(node);
+                ((ManagerActivityLollipop) requireActivity()).restoreFromRubbish(nodes);
                 break;
 
             case R.id.share_option:

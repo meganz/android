@@ -111,7 +111,6 @@ public class Constants {
     public static final int MULTIPLE_REMOVE_CONTACT_SHARED_FOLDER = 9;
     public static final int MULTIPLE_CHAT_IMPORT = 10;
     public static final int MULTIPLE_CHANGE_PERMISSION = 12;
-    public static final int MULTIPLE_RESTORED_FROM_RUBBISH = 13;
 
     public static final int CANCEL_ACCOUNT_2FA = 4000;
     public static final int CHANGE_MAIL_2FA = 4001;

@@ -26,10 +26,10 @@ class MoveNodeUseCase @Inject constructor(
      * Moves nodes to a new location.
      *
      * @param handles       List of MegaNode handles to move.
-     * @param parentNode    Parent MegaNode in which the nodes have to be moved.
+     * @param parentHandle  Parent MegaNode handle in which the nodes have to be moved.
      * @return The movement.
      */
-    fun move(handles: List<Long>, parentNode: MegaNode): Single<String> =
+    fun move(handles: LongArray, parentHandle: Long): Single<String> =
         Single.create { emitter ->
             val count = handles.size
             var pending = count
@@ -77,7 +77,7 @@ class MoveNodeUseCase @Inject constructor(
                     continue
                 }
 
-                megaApi.moveNode(node, parentNode, listener)
+                megaApi.moveNode(node, megaApi.getNodeByHandle(parentHandle), listener)
             }
         }
 
@@ -105,12 +105,14 @@ class MoveNodeUseCase @Inject constructor(
 
                         val message: String = when {
                             count == 1 && success == 1 -> {
+                                DBUtil.resetAccountDetailsTimeStamp()
                                 getString(R.string.context_correctly_moved_to_rubbish)
                             }
                             count == 1 && errors == 1 -> {
                                 if (foreignNode) "" else getString(R.string.context_no_moved)
                             }
                             errors == 0 -> {
+                                DBUtil.resetAccountDetailsTimeStamp()
                                 getQuantityString(
                                     R.plurals.number_correctly_moved_to_rubbish,
                                     success,
@@ -125,21 +127,25 @@ class MoveNodeUseCase @Inject constructor(
                                 )
                             }
                             errors == 1 && success == 1 -> {
+                                DBUtil.resetAccountDetailsTimeStamp()
                                 getString(R.string.node_correctly_and_node_incorrectly_moved_to_rubbish)
                             }
                             errors == 1 -> {
+                                DBUtil.resetAccountDetailsTimeStamp()
                                 getString(
                                     R.string.nodes_correctly_and_node_incorrectly_moved_to_rubbish,
                                     success
                                 )
                             }
                             success == 1 -> {
+                                DBUtil.resetAccountDetailsTimeStamp()
                                 getString(
                                     R.string.node_correctly_and_nodes_incorrectly_moved_to_rubbish,
                                     errors
                                 )
                             }
                             else -> {
+                                DBUtil.resetAccountDetailsTimeStamp()
                                 getString(
                                     R.string.nodes_correctly_and_nodes_incorrectly_moved_to_rubbish,
                                     success,
@@ -148,7 +154,6 @@ class MoveNodeUseCase @Inject constructor(
                             }
                         }
 
-                        DBUtil.resetAccountDetailsTimeStamp()
                         emitter.onSuccess(message)
                     }
                 })
@@ -168,12 +173,12 @@ class MoveNodeUseCase @Inject constructor(
     /**
      * Moves nodes from the Rubbish Bin to their original parent if it still exists.
      *
-     * @param handles   List of MegaNode handles to restore.
+     * @param nodes List of MegaNode to restore.
      * @return The restoration result.
      */
-    fun restore(handles: List<Long>): Single<String> =
+    fun restore(nodes: List<MegaNode>): Single<String> =
         Single.create { emitter ->
-            val count = handles.size
+            val count = nodes.size
             var pending = count
             var success = 0
             val listener =
@@ -189,6 +194,7 @@ class MoveNodeUseCase @Inject constructor(
 
                         val message: String = when {
                             count == 1 && success == 1 -> {
+                                DBUtil.resetAccountDetailsTimeStamp()
                                 val destination = megaApi.getNodeByHandle(request.parentHandle)
                                 getString(
                                     R.string.context_correctly_node_restored,
@@ -200,6 +206,7 @@ class MoveNodeUseCase @Inject constructor(
                             }
 
                             errors == 0 -> {
+                                DBUtil.resetAccountDetailsTimeStamp()
                                 getQuantityString(
                                     R.plurals.number_correctly_restored_from_rubbish,
                                     success,
@@ -215,21 +222,25 @@ class MoveNodeUseCase @Inject constructor(
 
                             }
                             errors == 1 && success == 1 -> {
+                                DBUtil.resetAccountDetailsTimeStamp()
                                 getString(R.string.node_correctly_and_node_incorrectly_restored_from_rubbish)
                             }
                             errors == 1 -> {
+                                DBUtil.resetAccountDetailsTimeStamp()
                                 getString(
                                     R.string.nodes_correctly_and_node_incorrectly_restored_from_rubbish,
                                     success
                                 )
                             }
                             success == 1 -> {
+                                DBUtil.resetAccountDetailsTimeStamp()
                                 getString(
                                     R.string.node_correctly_and_nodes_incorrectly_restored_from_rubbish,
                                     errors
                                 )
                             }
                             else -> {
+                                DBUtil.resetAccountDetailsTimeStamp()
                                 getString(
                                     R.string.nodes_correctly_and_nodes_incorrectly_restored_from_rubbish,
                                     success,
@@ -238,19 +249,11 @@ class MoveNodeUseCase @Inject constructor(
                             }
                         }
 
-                        DBUtil.resetAccountDetailsTimeStamp()
                         emitter.onSuccess(message)
                     }
                 })
 
-            for (handle in handles) {
-                val node = megaApi.getNodeByHandle(handle)
-
-                if (node == null) {
-                    pending--
-                    continue
-                }
-
+            for (node in nodes) {
                 val parent = megaApi.getNodeByHandle(node.restoreHandle)
 
                 if (parent == null) {

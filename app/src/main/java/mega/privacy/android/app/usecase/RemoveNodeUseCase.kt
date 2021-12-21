@@ -1,13 +1,10 @@
 package mega.privacy.android.app.usecase
 
-import io.reactivex.rxjava3.core.Completable
 import io.reactivex.rxjava3.core.Single
 import mega.privacy.android.app.R
 import mega.privacy.android.app.di.MegaApi
 import mega.privacy.android.app.listeners.OptionalMegaRequestListenerInterface
 import mega.privacy.android.app.utils.DBUtil
-import mega.privacy.android.app.utils.ErrorUtils.toThrowable
-import mega.privacy.android.app.utils.StringResourcesUtils
 import mega.privacy.android.app.utils.StringResourcesUtils.*
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaError
@@ -43,6 +40,7 @@ class RemoveNodeUseCase @Inject constructor(
                         val errors = count - success
                         val message: String = when {
                             count == 1 && success == 1 -> {
+                                DBUtil.resetAccountDetailsTimeStamp()
                                 getString(R.string.context_correctly_removed)
                             }
                             count == 1 && errors == 1 -> {
@@ -53,15 +51,16 @@ class RemoveNodeUseCase @Inject constructor(
                                 }
                             }
                             errors == 0 -> {
+                                DBUtil.resetAccountDetailsTimeStamp()
                                 getString(R.string.number_correctly_removed, success)
                             }
                             else -> {
+                                DBUtil.resetAccountDetailsTimeStamp()
                                 getString(R.string.number_correctly_removed, success) +
                                         getString(R.string.number_no_removed, errors)
                             }
                         }
 
-                        DBUtil.resetAccountDetailsTimeStamp()
                         emitter.onSuccess(message)
                     }
                 })

@@ -586,8 +586,6 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 	boolean firstLogin = false;
 	private boolean askPermissions = false;
 	private boolean isClearRubbishBin = false;
-	private boolean moveToRubbish = false;
-	private boolean restoreFromRubbish = false;
 
 	boolean megaContacts = true;
 
@@ -6292,18 +6290,21 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
     	showSnackbar(type, fragmentContainer, content, chatId);
 	}
 
-	public void restoreFromRubbish(final MegaNode node) {
-		logDebug("Node Handle: " + node.getHandle());
+	public void restoreFromRubbish(final List<MegaNode> nodes) {
+		moveNodeUseCase.restore(nodes)
+				.subscribeOn(Schedulers.io())
+				.observeOn(AndroidSchedulers.mainThread())
+				.subscribe((result, throwable) -> {
+					if (throwable != null) {
+						return;
+					}
 
-		restoreFromRubbish = true;
-
-		MegaNode newParent = megaApi.getNodeByHandle(node.getRestoreHandle());
-		if(newParent !=null){
-			megaApi.moveNode(node, newParent, this);
-		}
-		else{
-			logDebug("The restore folder no longer exists");
-		}
+					if (result.isEmpty()) {
+						showForeignStorageOverQuotaWarningDialog(this);
+					} else {
+						showSnackbar(SNACKBAR_TYPE, result, MEGACHAT_INVALID_HANDLE);
+					}
+				});
 	}
 
 	public void showRenameDialog(final MegaNode document){
@@ -6375,14 +6376,6 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 		this.isClearRubbishBin = value;
 	}
 
-	public void setMoveToRubbish(boolean value) {
-		this.moveToRubbish = value;
-	}
-
-	public void setRestoreFromRubbish(boolean value) {
-		this.restoreFromRubbish = value;
-	}
-
 	public void askConfirmationMoveToRubbish(final ArrayList<Long> handleList){
 		logDebug("askConfirmationMoveToRubbish");
 		isClearRubbishBin=false;
@@ -6410,7 +6403,14 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 									.subscribeOn(Schedulers.io())
 									.observeOn(AndroidSchedulers.mainThread())
 									.subscribe((result, throwable) -> {
-										if (throwable == null) {
+										if (throwable != null) {
+											return;
+										}
+
+										if (result.isEmpty()) {
+											showForeignStorageOverQuotaWarningDialog(this);
+										} else {
+											showSnackbar(SNACKBAR_TYPE, result, MEGACHAT_INVALID_HANDLE);
 										}
 									}));
 
@@ -6427,6 +6427,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 									.observeOn(AndroidSchedulers.mainThread())
 									.subscribe((result, throwable) -> {
 										if (throwable == null) {
+											showSnackbar(SNACKBAR_TYPE, result, MEGACHAT_INVALID_HANDLE);
 										}
 									}));
 
@@ -8198,12 +8199,23 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 				return;
 			}
 
-			moveToRubbish = false;
-
 			final long[] moveHandles = intent.getLongArrayExtra("MOVE_HANDLES");
 			final long toHandle = intent.getLongExtra("MOVE_TO", 0);
 
-			nC.moveNodes(moveHandles, toHandle);
+			moveNodeUseCase.move(moveHandles, toHandle)
+					.subscribeOn(Schedulers.io())
+					.observeOn(AndroidSchedulers.mainThread())
+					.subscribe((result, throwable) -> {
+						if (throwable != null) {
+							return;
+						}
+
+						if (result.isEmpty()) {
+							showForeignStorageOverQuotaWarningDialog(this);
+						} else {
+							showSnackbar(SNACKBAR_TYPE, result, MEGACHAT_INVALID_HANDLE);
+						}
+					});
 
 		}
 		else if (requestCode == REQUEST_CODE_SELECT_FOLDER_TO_COPY && resultCode == RESULT_OK){
@@ -9571,62 +9583,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 					}
 				}
 			}
-		}
-		else if (request.getType() == MegaRequest.TYPE_MOVE){
-			dismissAlertDialogIfExists(statusDialog);
-
-			if (e.getErrorCode() == MegaError.API_OK){
-//				Toast.makeText(this, getString(R.string.context_correctly_moved), Toast.LENGTH_LONG).show();
-
-					if (moveToRubbish){
-						//Update both tabs
-        				//Rubbish bin
-						logDebug("Move to Rubbish");
-						refreshAfterMovingToRubbish();
-						showSnackbar(SNACKBAR_TYPE, getString(R.string.context_correctly_moved_to_rubbish), -1);
-						if (drawerItem == DrawerItem.INBOX) {
-							setInboxNavigationDrawer();
-						}
-						moveToRubbish = false;
-						resetAccountDetailsTimeStamp();
-					}
-					else if(restoreFromRubbish){
-						logDebug("Restore from rubbish");
-						MegaNode destination = megaApi.getNodeByHandle(request.getParentHandle());
-						showSnackbar(SNACKBAR_TYPE, getString(R.string.context_correctly_node_restored, destination.getName()), -1);
-						restoreFromRubbish = false;
-						resetAccountDetailsTimeStamp();
-					}
-					else{
-						logDebug("Not moved to rubbish");
-						refreshAfterMoving();
-						showSnackbar(SNACKBAR_TYPE, getString(R.string.context_correctly_moved), -1);
-					}
-			}
-			else {
-				if (e.getErrorCode() == MegaError.API_EOVERQUOTA
-						&& api.isForeignNode(request.getParentHandle())) {
-					showForeignStorageOverQuotaWarningDialog(this);
-
-					if (restoreFromRubbish) restoreFromRubbish = false;
-					else moveToRubbish = false;
-
-					return;
-				}
-
-				if(restoreFromRubbish){
-					showSnackbar(SNACKBAR_TYPE, getString(R.string.context_no_restored), -1);
-					restoreFromRubbish = false;
-				}
-				else{
-					showSnackbar(SNACKBAR_TYPE, getString(R.string.context_no_moved), -1);
-					moveToRubbish = false;
-				}
-			}
-
-			logDebug("SINGLE move nodes request finished");
-		}
-		else if (request.getType() == MegaRequest.TYPE_PAUSE_TRANSFERS){
+		} else if (request.getType() == MegaRequest.TYPE_PAUSE_TRANSFERS) {
 			logDebug("MegaRequest.TYPE_PAUSE_TRANSFERS");
 			//force update the pause notification to prevent missed onTransferUpdate
 			sendBroadcast(new Intent(BROADCAST_ACTION_INTENT_UPDATE_PAUSE_NOTIFICATION));
@@ -9698,21 +9655,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 				showSnackbar(SNACKBAR_TYPE, getString(R.string.error_general_nodes), -1);
 			}
 
-		}
-		else if (request.getType() == MegaRequest.TYPE_REMOVE){
-			logDebug("requestFinish " + MegaRequest.TYPE_REMOVE);
-			if (e.getErrorCode() == MegaError.API_OK){
-				dismissAlertDialogIfExists(statusDialog);
-				refreshAfterRemoving();
-				showSnackbar(SNACKBAR_TYPE, getString(R.string.context_correctly_removed), -1);
-				resetAccountDetailsTimeStamp();
-			} else if (e.getErrorCode() == MegaError.API_EMASTERONLY) {
-				showSnackbar(SNACKBAR_TYPE, e.getErrorString(), -1);
-			} else{
-			    showSnackbar(SNACKBAR_TYPE, getString(R.string.context_no_removed), -1);
-			}
-			logDebug("Remove request finished");
-		} else if (request.getType() == MegaRequest.TYPE_COPY){
+		} else if (request.getType() == MegaRequest.TYPE_COPY) {
 			logDebug("TYPE_COPY");
 
 			dismissAlertDialogIfExists(statusDialog);
