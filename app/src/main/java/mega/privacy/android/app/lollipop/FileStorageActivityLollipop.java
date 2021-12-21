@@ -531,10 +531,8 @@ public class FileStorageActivityLollipop extends PasscodeActivity implements OnC
 			pickFolderType = PickFolderType.NONE_ONLY_DOWNLOAD;
 		} else if (pickFolderString.equals(PickFolderType.CU_FOLDER.getFolderType())) {
 			pickFolderType = PickFolderType.CU_FOLDER;
-			dbH.setCameraFolderExternalSDCard(false);
 		} else if (pickFolderString.equals(PickFolderType.MU_FOLDER.getFolderType())) {
 			pickFolderType = PickFolderType.MU_FOLDER;
-			dbH.setMediaFolderExternalSdCard(false);
 		} else if (pickFolderString.equals(PickFolderType.DOWNLOAD_FOLDER.getFolderType())) {
 			pickFolderType = PickFolderType.DOWNLOAD_FOLDER;
 		}
@@ -1257,10 +1255,8 @@ public class FileStorageActivityLollipop extends PasscodeActivity implements OnC
                 path = new File(pathString);
 
                 if (pickFolderType.equals(PickFolderType.CU_FOLDER)) {
-                    dbH.setCameraFolderExternalSDCard(true);
                     dbH.setUriExternalSDCard(uriString);
                 } else if (pickFolderType.equals(PickFolderType.MU_FOLDER)) {
-                    dbH.setMediaFolderExternalSdCard(true);
                     dbH.setUriMediaExternalSdCard(uriString);
                 } else if (fromSaveRecoveryKey) {
                     // For temporary use, don't store the uri to database.
