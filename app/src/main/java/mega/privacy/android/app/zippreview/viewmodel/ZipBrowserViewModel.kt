@@ -1,10 +1,10 @@
 package mega.privacy.android.app.zippreview.viewmodel
 
-import androidx.hilt.lifecycle.ViewModelInject
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.MimeTypeList
 import mega.privacy.android.app.R
@@ -17,12 +17,14 @@ import mega.privacy.android.app.zippreview.domain.ZipTreeNode
 import mega.privacy.android.app.zippreview.ui.ZipInfoUIO
 import java.io.File
 import java.util.zip.ZipFile
+import javax.inject.Inject
 
 /**
  * ViewModel regarding to zip preview
  * @param zipFileRepo ZipFileRepo
  */
-class ZipBrowserViewModel @ViewModelInject constructor(private val zipFileRepo: IZipFileRepo) :
+@HiltViewModel
+class ZipBrowserViewModel @Inject constructor(private val zipFileRepo: IZipFileRepo) :
     ViewModel() {
     companion object {
         private const val TITLE_ZIP = "ZIP "
