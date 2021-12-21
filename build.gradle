@@ -92,4 +92,5 @@ ext {
     mockitoVersion = '3.3.3'
     mockitoKotlinVersion = '4.0.0'
     espressoVersion = '3.4.0'
+    workVersion = '2.6.0'
 }

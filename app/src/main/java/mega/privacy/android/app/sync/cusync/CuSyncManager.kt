@@ -94,7 +94,7 @@ object CuSyncManager: MegaRequestListenerInterface {
     /**
      * When the app is inactive, send heartbeat every 30m.
      */
-    const val INACTIVE_HEARTBEAT_INTERVAL_SECONDS = 30 * 60
+    const val INACTIVE_HEARTBEAT_INTERVAL_SECONDS = 30 // TimeUnit.MINUTES
 
     private val megaApplication = MegaApplication.getInstance()
 
@@ -690,7 +690,7 @@ object CuSyncManager: MegaRequestListenerInterface {
      *
      * @param onFinish Callback when the request finished.
      */
-    fun doActiveHeartbeat(onFinish: () -> Unit) {
+    fun doActiveHeartbeat(onFinish: (() -> Unit)?) {
         callback = onFinish
         if (megaApi.rootNode == null) {
             logWarning("RootNode = null, need to login again")
@@ -713,6 +713,7 @@ object CuSyncManager: MegaRequestListenerInterface {
         val cuBackup = databaseHandler.cuBackup
         val status: Int = Status.CU_SYNC_STATUS_UPTODATE
 
+        logDebug("CuSyncActiveHeartbeatService onStartJob, doActiveHeartbeat")
         if (cuBackup != null && CameraUploadUtil.isPrimaryEnabled()) {
             logDebug("doActiveHeartbeat Send CU heartbeat, backupId = ${cuBackup.backupId}, Status = CU_SYNC_STATUS_UPTODATE.")
             megaApi.sendBackupHeartbeat(

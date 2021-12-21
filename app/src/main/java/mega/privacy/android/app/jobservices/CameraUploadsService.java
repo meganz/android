@@ -672,10 +672,14 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
                 logDebug("Nothing to upload.");
 
                 // Make sure to send inactive heartbeat.
-                CuSyncManager.INSTANCE.doInactiveHeartbeat(() -> {
+                CuSyncManager.INSTANCE.doActiveHeartbeat(() -> {
                     logDebug("Nothing to upload, send inactive heartbeat.");
                     return Unit.INSTANCE;
                 });
+
+                // Make sure to re schedule the job
+                scheduleCameraUploadJob(this, true);
+
                 finish();
                 purgeDirectory(new File(tempRoot));
             }

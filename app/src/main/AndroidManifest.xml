@@ -574,14 +574,7 @@
         <service
             android:name=".jobservices.CameraUploadsService"
             android:exported="false" />
-	    <service
-		    android:name=".jobservices.CuSyncActiveHeartbeatService"
-		    android:permission="android.permission.BIND_JOB_SERVICE"
-		    android:exported="false" />
-	    <service
-		    android:name=".jobservices.CameraUploadStarterService"
-		    android:permission="android.permission.BIND_JOB_SERVICE"
-		    android:exported="false" />
+
         <service android:name=".fcm.IncomingCallService" android:exported="true"/>
         <service android:name=".fcm.KeepAliveService" android:exported="true"/>
         <receiver

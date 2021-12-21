@@ -79,7 +79,7 @@ public class NetworkStateReceiver extends BroadcastReceiver {
             }
 
             connected = true;
-            scheduleCameraUploadJob(c);
+            scheduleCameraUploadJob(c, true);
         } else if(intent.getBooleanExtra(ConnectivityManager.EXTRA_NO_CONNECTIVITY,Boolean.FALSE)) {
             logDebug("Network state: DISCONNECTED");
             mApplication.setLocalIpAddress(null);

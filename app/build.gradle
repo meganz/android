@@ -229,6 +229,11 @@ dependencies {
 
     implementation "androidx.biometric:biometric:$biometricVersion"
 
+    // (Java only)
+    implementation "androidx.work:work-runtime:$workVersion"
+    // Kotlin + coroutines
+    implementation "androidx.work:work-runtime-ktx:$workVersion"
+
     //GMS
     gmsImplementation 'com.google.firebase:firebase-core:18.0.0'
     gmsImplementation 'com.google.firebase:firebase-messaging:21.0.1'
@@ -239,6 +244,7 @@ dependencies {
     gmsImplementation platform("com.google.firebase:firebase-bom:$firebaseBom")
     gmsImplementation 'com.google.firebase:firebase-crashlytics-ndk'
     gmsImplementation 'com.google.firebase:firebase-analytics-ktx'
+
     //HMS
     hmsImplementation "com.huawei.agconnect:agconnect-core:$huaweiServicesVersion"
     hmsImplementation 'com.huawei.hms:push:4.0.2.300'
