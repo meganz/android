@@ -658,7 +658,6 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 	private MenuItem enableSelectMenuItem;
 	private MenuItem selectMenuItem;
 	private MenuItem unSelectMenuItem;
-	private MenuItem sortByMenuItem;
 	private MenuItem helpMenuItem;
 	private MenuItem doNotDisturbMenuItem;
 	private MenuItem upgradeAccountMenuItem;
@@ -5889,7 +5888,6 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
             createFolderMenuItem.setVisible(false);
             addContactMenuItem.setVisible(false);
             addMenuItem.setVisible(false);
-            sortByMenuItem.setVisible(false);
             unSelectMenuItem.setVisible(false);
             clearRubbishBinMenuitem.setVisible(false);
             importLinkMenuItem.setVisible(false);
