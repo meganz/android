@@ -91,10 +91,14 @@ class GetNodeUseCase @Inject constructor(
             val nodeDateText = TimeUtils.formatLongDateTime(node.getLastAvailableTime())
             val infoText = TextUtil.getFileInfo(nodeSizeText, nodeDateText)
 
-            val nodeAccess = megaApi.getAccess(node)
-            val hasReadWriteAccess = nodeAccess == MegaShare.ACCESS_READWRITE
-            val hasFullAccess = nodeAccess == MegaShare.ACCESS_FULL
-            val hasOwnerAccess = nodeAccess == MegaShare.ACCESS_OWNER
+            var hasReadWriteAccess = false
+            var hasFullAccess = false
+            var hasOwnerAccess = false
+            when (megaApi.getAccess(node)) {
+                MegaShare.ACCESS_READWRITE -> hasReadWriteAccess = true
+                MegaShare.ACCESS_FULL -> hasFullAccess = true
+                MegaShare.ACCESS_OWNER -> hasOwnerAccess = true
+            }
 
             val isAvailableOffline = isNodeAvailableOffline(node.handle).blockingGetOrNull() ?: false
             val hasVersions = megaApi.hasVersions(node)
@@ -153,7 +157,7 @@ class GetNodeUseCase @Inject constructor(
                         hasReadWriteAccess = false,
                         hasFullAccess = false,
                         hasOwnerAccess = false,
-                        isFromIncoming = false,
+                        isFromIncoming = offlineNode.origin == MegaOffline.INCOMING,
                         isFromRubbishBin = false,
                         isFromInbox = offlineNode.origin == MegaOffline.INBOX,
                         isFromRoot = false,
