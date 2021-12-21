@@ -300,6 +300,7 @@ public class ChatManagement {
 
         clearIncomingCallNotification(callId);
         removeValues(chatId);
+        removeStatusVideoAndSpeaker(chatId);
         setRequestSentCall(callId, false);
         unregisterScreenReceiver();
     }
@@ -311,7 +312,6 @@ public class ChatManagement {
      */
     public void removeValues(long chatId) {
         PreferenceManager.getDefaultSharedPreferences(MegaApplication.getInstance().getApplicationContext()).edit().remove(KEY_IS_SHOWED_WARNING_MESSAGE + chatId).apply();
-        removeStatusVideoAndSpeaker(chatId);
 
         if (!existsAnOngoingOrIncomingCall()) {
             MegaApplication.getInstance().removeRTCAudioManager();
