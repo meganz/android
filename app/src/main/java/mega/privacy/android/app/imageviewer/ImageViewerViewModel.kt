@@ -252,15 +252,19 @@ class ImageViewerViewModel @ViewModelInject constructor(
             .subscribeAndComplete()
     }
 
-    fun setNodeAvailableOffline(
+    fun switchNodeOfflineAvailability(
         activity: Activity,
-        node: MegaNode,
-        setAvailableOffline: Boolean
+        nodeItem: MegaNodeItem
     ) {
-        getNodeUseCase.setNodeAvailableOffline(node, setAvailableOffline, activity)
-            .subscribeAndComplete {
-                loadSingleNode(node.handle, true)
-            }
+        getNodeUseCase.setNodeAvailableOffline(
+            node = nodeItem.node,
+            setOffline = !nodeItem.isAvailableOffline,
+            isFromIncomingShares = nodeItem.isFromIncoming,
+            isFromInbox = nodeItem.isFromInbox,
+            activity = activity
+        ).subscribeAndComplete {
+            loadSingleNode(nodeItem.handle, true)
+        }
     }
 
     fun removeLink(nodeHandle: Long) {
@@ -272,26 +276,19 @@ class ImageViewerViewModel @ViewModelInject constructor(
 
     fun shareNode(node: MegaNode): LiveData<String?> {
         val result = MutableLiveData<String?>()
-
-        val existingPublicLink = images.value?.find { it.handle == node.handle }?.nodePublicLink
-        if (!existingPublicLink.isNullOrBlank()) {
-            result.value = existingPublicLink
-        } else {
-            exportNodeUseCase.export(node)
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribeBy(
-                    onSuccess = { link ->
-                        result.value = link
-                    },
-                    onError = { error ->
-                        logError(error.stackTraceToString())
-                        result.value = null
-                    }
-                )
-                .addTo(composite)
-        }
-
+        exportNodeUseCase.export(node)
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribeBy(
+                onSuccess = { link ->
+                    result.value = link
+                },
+                onError = { error ->
+                    logError(error.stackTraceToString())
+                    result.value = null
+                }
+            )
+            .addTo(composite)
         return result
     }
 

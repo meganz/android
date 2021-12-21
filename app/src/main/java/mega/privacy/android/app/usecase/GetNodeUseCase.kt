@@ -92,15 +92,19 @@ class GetNodeUseCase @Inject constructor(
             val infoText = TextUtil.getFileInfo(nodeSizeText, nodeDateText)
 
             val nodeAccess = megaApi.getAccess(node)
-            val hasFullAccess = nodeAccess == MegaShare.ACCESS_OWNER || nodeAccess == MegaShare.ACCESS_FULL
+            val hasReadWriteAccess = nodeAccess == MegaShare.ACCESS_READWRITE
+            val hasFullAccess = nodeAccess == MegaShare.ACCESS_FULL
+            val hasOwnerAccess = nodeAccess == MegaShare.ACCESS_OWNER
 
             val isAvailableOffline = isNodeAvailableOffline(node.handle).blockingGetOrNull() ?: false
             val hasVersions = megaApi.hasVersions(node)
 
+            val rootParentNode = megaApi.getRootParentNode(node)
+            val isFromIncoming = rootParentNode.isInShare
             var isFromRubbishBin = false
             var isFromInbox = false
             var isFromRoot = false
-            when (megaApi.getRootParentNode(node).handle) {
+            when (rootParentNode.handle) {
                 megaApi.rootNode?.handle -> isFromRoot = true
                 megaApi.inboxNode?.handle -> isFromInbox = true
                 megaApi.rubbishNode?.handle -> isFromRubbishBin = true
@@ -110,12 +114,15 @@ class GetNodeUseCase @Inject constructor(
                 name = node.name,
                 handle = node.handle,
                 infoText = infoText,
+                hasReadWriteAccess = hasReadWriteAccess,
                 hasFullAccess = hasFullAccess,
+                hasOwnerAccess = hasOwnerAccess,
+                isFromIncoming = isFromIncoming,
                 isFromRubbishBin = isFromRubbishBin,
                 isFromInbox = isFromInbox,
                 isFromRoot = isFromRoot,
-                isAvailableOffline = isAvailableOffline,
                 hasVersions = hasVersions,
+                isAvailableOffline = isAvailableOffline,
                 node = node
             )
         }
@@ -143,12 +150,15 @@ class GetNodeUseCase @Inject constructor(
                         name = offlineNode.name,
                         handle = offlineNode.handle.toLong(),
                         infoText = infoText,
+                        hasReadWriteAccess = false,
                         hasFullAccess = false,
+                        hasOwnerAccess = false,
+                        isFromIncoming = false,
                         isFromRubbishBin = false,
                         isFromInbox = offlineNode.origin == MegaOffline.INBOX,
                         isFromRoot = false,
-                        isAvailableOffline = true,
                         hasVersions = false,
+                        isAvailableOffline = true,
                         node = null
                     )
                 } else {
@@ -218,64 +228,88 @@ class GetNodeUseCase @Inject constructor(
      */
     fun isNodeAvailableOffline(nodeHandle: Long): Single<Boolean> =
         Single.fromCallable {
-            if (databaseHandler.exists(nodeHandle)) {
-                databaseHandler.findByHandle(nodeHandle)?.let { offlineNode ->
-                    val offlineFile = OfflineUtils.getOfflineFile(context, offlineNode)
-                    val isFileAvailable = FileUtil.isFileAvailable(offlineFile)
-                    val isFileDownloadedLatest = nodeHandle.getMegaNode()
-                        ?.let { FileUtil.isFileDownloadedLatest(offlineFile, it) } ?: false
-                    return@fromCallable isFileAvailable && isFileDownloadedLatest
-                }
+            databaseHandler.findByHandle(nodeHandle)?.let { offlineNode ->
+                val offlineFile = OfflineUtils.getOfflineFile(context, offlineNode)
+                val isFileAvailable = FileUtil.isFileAvailable(offlineFile)
+                val isFileDownloadedLatest = nodeHandle.getMegaNode()?.let { node ->
+                    FileUtil.isFileDownloadedLatest(offlineFile, node) && offlineFile.length() == node.size
+                } ?: false
+                return@fromCallable isFileAvailable && isFileDownloadedLatest
             }
 
             return@fromCallable false
         }
 
     /**
-     * Set node as available offline
+     * Set node as available offline given its Node Handle.
      *
-     * @param nodeHandle        Node handle to set available offline
-     * @param availableOffline  Flag to set/unset available offline
-     * @param activity          Activity context needed to create file
-     * @return                  Completable
+     * @param nodeHandle            Node handle to set available offline
+     * @param setOffline            Flag to set/unset available offline
+     * @param activity              Activity context needed to create file
+     * @param isFromIncomingShares  Flag indicating if node is from incoming shares.
+     * @param isFromInbox           Flag indicating if node is from inbox.
+     * @return                      Completable
      */
     fun setNodeAvailableOffline(
         nodeHandle: Long,
-        availableOffline: Boolean,
+        setOffline: Boolean,
+        isFromIncomingShares: Boolean = false,
+        isFromInbox: Boolean = false,
         activity: Activity
     ): Completable =
-        get(nodeHandle).flatMapCompletable { setNodeAvailableOffline(it, availableOffline, activity) }
+        get(nodeHandle).flatMapCompletable {
+            setNodeAvailableOffline(
+                it,
+                setOffline,
+                isFromIncomingShares,
+                isFromInbox,
+                activity
+            )
+        }
 
     /**
      * Set node as available offline
      *
-     * @param node              Node to set available offline
-     * @param availableOffline  Flag to set/unset available offline
-     * @param activity          Activity context needed to create file
+     * @param node                  Node to set available offline
+     * @param setOffline            Flag to set/unset available offline
+     * @param activity              Activity context needed to create file
+     * @param isFromIncomingShares  Flag indicating if node is from incoming shares.
+     * @param isFromInbox           Flag indicating if node is from inbox.
      * @return                  Completable
      */
     fun setNodeAvailableOffline(
         node: MegaNode?,
-        availableOffline: Boolean,
+        setOffline: Boolean,
+        isFromIncomingShares: Boolean = false,
+        isFromInbox: Boolean = false,
         activity: Activity
     ): Completable =
         Completable.fromCallable {
             requireNotNull(node)
-            val isCurrentlyAvailable = isNodeAvailableOffline(node.handle).blockingGet()
-
-            if (availableOffline) {
-                if (!isCurrentlyAvailable) {
-                    val offlineParent = OfflineUtils.getOfflineParentFile(activity, Constants.FROM_OTHERS, node, megaApi)
-                    if (FileUtil.isFileAvailable(offlineParent)) {
-                        val parentName = OfflineUtils.getOfflineParentFileName(activity, node).absolutePath + File.separator
-                        val offlineNode = databaseHandler.findbyPathAndName(parentName, node.name)
-                        OfflineUtils.removeOffline(offlineNode, databaseHandler, activity)
+            val isAvailableOffline = isNodeAvailableOffline(node.handle).blockingGetOrNull() ?: false
+            when {
+                setOffline && !isAvailableOffline -> {
+                    val from = when {
+                        isFromIncomingShares -> Constants.FROM_INCOMING_SHARES
+                        isFromInbox -> Constants.FROM_INBOX
+                        else -> Constants.FROM_OTHERS
                     }
+
+                    val offlineParent = OfflineUtils.getOfflineParentFile(activity, from, node, megaApi)
+                    if (FileUtil.isFileAvailable(offlineParent)) {
+                        val offlineFile = File(offlineParent, node.name)
+                        if (FileUtil.isFileAvailable(offlineFile)) {
+                            val offlineNode = databaseHandler.findByHandle(node.handle)
+                            OfflineUtils.removeOffline(offlineNode, databaseHandler, activity)
+                        }
+                    }
+
                     OfflineUtils.saveOffline(offlineParent, node, activity)
                 }
-            } else if (isCurrentlyAvailable) {
-                val offlineNode = databaseHandler.findByHandle(node.handle)
-                OfflineUtils.removeOffline(offlineNode, databaseHandler, activity)
+                !setOffline && isAvailableOffline -> {
+                    val offlineNode = databaseHandler.findByHandle(node.handle)
+                    OfflineUtils.removeOffline(offlineNode, databaseHandler, activity)
+                }
             }
         }
 

@@ -362,19 +362,20 @@ class ImageViewerActivity : BaseActivity(), PermissionRequester, SnackbarShower 
      */
     private fun showCurrentImageInfo(item: MegaNodeItem?) {
         if (item != null) {
+            val isOnline = isOnline()
             binding.txtTitle.text = item.name
             binding.toolbar.menu?.apply {
                 findItem(R.id.action_download)?.isVisible =
-                    isOnline() && !item.isFromRubbishBin
+                    !item.isFromRubbishBin
 
                 findItem(R.id.action_save_gallery)?.isVisible =
-                    isSaveToGalleryCompatible() && isOnline() && item.hasFullAccess && !item.isFromRubbishBin
+                    isSaveToGalleryCompatible() && !item.isFromRubbishBin && item.node?.isPublic != true
 
                 findItem(R.id.action_get_link)?.isVisible =
-                    isOnline() && item.hasFullAccess && !item.isFromRubbishBin
+                    isOnline && item.hasOwnerAccess && !item.isFromRubbishBin
 
                 findItem(R.id.action_chat)?.isVisible =
-                    isOnline() && item.hasFullAccess && !item.isFromRubbishBin
+                    isOnline && item.hasAllAccess() && !item.isFromRubbishBin
 
                 findItem(R.id.action_more)?.isVisible = true
             }
@@ -420,7 +421,7 @@ class ImageViewerActivity : BaseActivity(), PermissionRequester, SnackbarShower 
                 true
             }
             R.id.action_download -> {
-                if (nodeItem.isOffline) {
+                if (!isOnline() && nodeItem.isAvailableOffline) {
                     saveOfflineNode(nodeItem.handle)
                 } else {
                     nodeItem.node?.let { saveNode(it, false) }

@@ -124,14 +124,14 @@ class ImageBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
 
             // File Info
             optionInfo.setOnClickListener {
-                val intent = if (!nodeItem.isOffline) {
+                val intent = if (!isOnline && nodeItem.isAvailableOffline) {
+                    Intent(context, OfflineFileInfoActivity::class.java).apply {
+                        putExtra(HANDLE, nodeItem.handle.toString())
+                    }
+                } else {
                     Intent(context, FileInfoActivityLollipop::class.java).apply {
                         putExtra(HANDLE, nodeItem.handle)
                         putExtra(NAME, nodeItem.name)
-                    }
-                } else {
-                    Intent(context, OfflineFileInfoActivity::class.java).apply {
-                        putExtra(HANDLE, nodeItem.handle.toString())
                     }
                 }
 
@@ -144,7 +144,7 @@ class ImageBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
                 val favoriteText = if (node.isFavourite) R.string.file_properties_unfavourite else R.string.file_properties_favourite
                 val favoriteDrawable = if (node.isFavourite) R.drawable.ic_remove_favourite else R.drawable.ic_add_favourite
                 optionFavorite.text = StringResourcesUtils.getString(favoriteText)
-                optionFavorite.isVisible = isOnline && !nodeItem.isFromRubbishBin && nodeItem.hasFullAccess
+                optionFavorite.isVisible = isOnline && nodeItem.hasAllAccess()
                 optionFavorite.setCompoundDrawablesWithIntrinsicBounds(favoriteDrawable, 0, 0, 0)
                 optionFavorite.setOnClickListener {
                     viewModel.markNodeAsFavorite(nodeItem.handle, !node.isFavourite)
@@ -166,7 +166,7 @@ class ImageBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
                 optionLabelCurrent.setTextColor(labelColor)
                 optionLabelCurrent.text = getNodeLabelText(node.label)
                 optionLabelCurrent.isVisible = node.label != MegaNode.NODE_LBL_UNKNOWN
-                optionLabelLayout.isVisible = isOnline && !nodeItem.isFromRubbishBin && nodeItem.hasFullAccess
+                optionLabelLayout.isVisible = isOnline && nodeItem.hasAllAccess()
                 optionLabelLayout.setOnClickListener {
                     NodeLabelBottomSheetDialogFragment.newInstance(nodeItem.handle).show(childFragmentManager, TAG)
                 }
@@ -177,7 +177,7 @@ class ImageBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
             // Open with
             optionOpenWith.isVisible = !nodeItem.isFromRubbishBin && node?.isPublic != true
             optionOpenWith.setOnClickListener {
-                if (nodeItem.isOffline) {
+                if (!isOnline && nodeItem.isAvailableOffline) {
                     OfflineUtils.openWithOffline(requireContext(), nodeItem.handle)
                 } else {
                     ModalBottomSheetUtil.openWith(requireContext(), node)
@@ -187,7 +187,7 @@ class ImageBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
             // Download
             optionDownload.isVisible = !nodeItem.isFromRubbishBin
             optionDownload.setOnClickListener {
-                if (nodeItem.isOffline) {
+                if (!isOnline && nodeItem.isAvailableOffline) {
                     (activity as? ImageViewerActivity?)?.saveOfflineNode(nodeItem.handle)
                 } else if (node != null) {
                     (activity as? ImageViewerActivity?)?.saveNode(node, false)
@@ -203,17 +203,15 @@ class ImageBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
             }
 
             // Offline
-            optionOfflineLayout.isVisible = !nodeItem.isFromRubbishBin && node?.isPublic != true && nodeItem.hasFullAccess
+            optionOfflineLayout.isVisible = !nodeItem.isFromRubbishBin && nodeItem.hasAllAccess() && node?.isPublic != true
             switchOffline.isChecked = nodeItem.isAvailableOffline
-            switchOffline.post {
-                switchOffline.setOnCheckedChangeListener { _, _ ->
-                    viewModel.setNodeAvailableOffline(requireActivity(), node!!, !nodeItem.isAvailableOffline)
-                    dismissAllowingStateLoss()
-                }
-            }
-            optionOfflineLayout.setOnClickListener {
-                viewModel.setNodeAvailableOffline(requireActivity(), node!!, !nodeItem.isAvailableOffline)
+            val offlineAction = {
+                viewModel.switchNodeOfflineAvailability(requireActivity(), nodeItem)
                 dismissAllowingStateLoss()
+            }
+            switchOffline.post {
+                optionOfflineLayout.setOnClickListener { offlineAction.invoke() }
+                switchOffline.setOnCheckedChangeListener { _, _ -> offlineAction.invoke() }
             }
 
             // Links
@@ -232,28 +230,30 @@ class ImageBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
                     .setNegativeButton(StringResourcesUtils.getString(R.string.general_cancel), null)
                     .show()
             }
-            optionManageLink.isVisible = isOnline && nodeItem.hasFullAccess && !nodeItem.isFromRubbishBin
-            optionRemoveLink.isVisible = isOnline && node?.isExported == true
+            optionManageLink.isVisible = isOnline && nodeItem.hasOwnerAccess && !nodeItem.isFromRubbishBin
+            optionRemoveLink.isVisible = isOnline && nodeItem.hasOwnerAccess && !nodeItem.isFromRubbishBin && node?.isExported == true
 
             // Send to contact
             optionSendToContact.setOnClickListener {
                 (activity as? ImageViewerActivity?)?.attachNode(node!!)
                 dismissAllowingStateLoss()
             }
-            optionSendToContact.isVisible = isOnline && !nodeItem.isFromRubbishBin && nodeItem.hasFullAccess
+            optionSendToContact.isVisible = isOnline && !nodeItem.isFromRubbishBin && nodeItem.hasAllAccess()
 
             // Share
-            optionShare.isVisible = !nodeItem.isFromRubbishBin
+            optionShare.isVisible = !nodeItem.isFromRubbishBin && (nodeItem.hasOwnerAccess || !imageItem.nodePublicLink.isNullOrBlank())
             optionShare.setOnClickListener {
-                if (nodeItem.isOffline) {
-                    OfflineUtils.shareOfflineNode(context, nodeItem.handle)
-                } else if (node != null) {
-                    viewModel.shareNode(node).observe(viewLifecycleOwner) { link ->
-                        if (!link.isNullOrBlank()) {
-                            MegaNodeUtil.shareLink(requireContext(), link)
-                            dismissAllowingStateLoss()
+                when {
+                    !isOnline && nodeItem.isAvailableOffline ->
+                        OfflineUtils.shareOfflineNode(context, nodeItem.handle)
+                    imageItem.nodePublicLink.isNullOrBlank() ->
+                        MegaNodeUtil.shareLink(requireContext(), imageItem.nodePublicLink)
+                    node != null ->
+                        viewModel.shareNode(node).observe(viewLifecycleOwner) { link ->
+                            if (!link.isNullOrBlank()) {
+                                MegaNodeUtil.shareLink(requireContext(), link)
+                            }
                         }
-                    }
                 }
             }
 
@@ -261,13 +261,13 @@ class ImageBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
             optionRename.setOnClickListener {
                 (activity as? ImageViewerActivity?)?.showRenameDialog(node!!)
             }
-            optionRename.isVisible = isOnline && !nodeItem.isFromRubbishBin && nodeItem.hasFullAccess && node != null
+            optionRename.isVisible = isOnline && !nodeItem.isFromRubbishBin && nodeItem.hasAllAccess() && node != null
 
             // Move
             optionMove.setOnClickListener {
                 selectMoveFolderLauncher.launch(longArrayOf(nodeItem.handle))
             }
-            optionMove.isVisible = isOnline && !nodeItem.isFromRubbishBin && nodeItem.hasFullAccess
+            optionMove.isVisible = isOnline && !nodeItem.isFromRubbishBin && nodeItem.hasAllAccess()
 
             // Copy
             optionCopy.setOnClickListener {
@@ -291,7 +291,7 @@ class ImageBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
             optionRestore.isVisible = isOnline && nodeItem.isFromRubbishBin && node != null && node.restoreHandle != INVALID_HANDLE
 
             // Rubbish bin
-            optionRubbishBin.isVisible = isOnline && nodeItem.hasFullAccess
+            optionRubbishBin.isVisible = isOnline && nodeItem.hasAllAccess()
             if (nodeItem.isFromRubbishBin) {
                 optionRubbishBin.setText(R.string.general_remove)
             } else {
@@ -324,7 +324,6 @@ class ImageBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
             }
 
             // Separators
-            separatorInfo.isVisible = optionInfo.isVisible
             separatorLabel.isVisible = optionLabelLayout.isVisible
             separatorOpen.isVisible = optionOpenWith.isVisible
             separatorOffline.isVisible = optionOfflineLayout.isVisible

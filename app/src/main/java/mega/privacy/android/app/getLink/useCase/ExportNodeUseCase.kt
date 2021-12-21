@@ -60,7 +60,7 @@ class ExportNodeUseCase @Inject constructor(
                 emitter.onError(IllegalArgumentException("Null node"))
                 return@create
             }
-            if (node.isExported) {
+            if (node.isExported && !node.isExpired && !node.isTakenDown) {
                 emitter.onSuccess(node.publicLink)
                 return@create
             }

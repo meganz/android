@@ -80,13 +80,6 @@
                 android:text="@string/file_properties_info_info_file"
                 app:drawableStartCompat="@drawable/info_ic" />
 
-            <View
-                android:id="@+id/separator_info"
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:layout_marginStart="72dp"
-                android:background="@color/grey_012_white_012" />
-
             <TextView
                 android:id="@+id/option_favorite"
                 style="@style/BottomSheetOption"
