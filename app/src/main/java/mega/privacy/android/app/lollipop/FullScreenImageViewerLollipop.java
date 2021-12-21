@@ -1000,7 +1000,7 @@ public class FullScreenImageViewerLollipop extends PasscodeActivity
 		} else if (adapterType == PHOTOS_BROWSE_ADAPTER) {
 			getImageHandles(megaApi.searchByType(orderGetChildren, FILE_TYPE_PHOTO, SEARCH_TARGET_ROOTNODE), savedInstanceState);
 		} else if (adapterType == PHOTO_SYNC_ADAPTER) {
-			getImageHandles(new MegaNodeRepo(megaApi, dbH).getCuChildren(orderGetChildren), savedInstanceState, true);
+			getImageHandles(new MegaNodeRepo(megaApi, dbH).getFilteredCuChildren(orderGetChildren), savedInstanceState, true);
         } else if (adapterType == MEDIA_BROWSE_ADAPTER) {
             List<MegaNode> list = MediaFetcher.getCachedResults();
             if (list != null) {
