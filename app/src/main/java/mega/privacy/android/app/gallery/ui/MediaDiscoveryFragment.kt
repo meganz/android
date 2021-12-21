@@ -3,7 +3,6 @@ package mega.privacy.android.app.gallery.ui
 import android.annotation.SuppressLint
 import android.content.res.Configuration
 import android.os.Bundle
-import android.util.Log
 import android.view.*
 import androidx.annotation.NonNull
 import androidx.coordinatorlayout.widget.CoordinatorLayout
@@ -32,6 +31,11 @@ class MediaDiscoveryFragment : BaseZoomFragment(), GalleryCardAdapter.Listener {
 
     private var selectedView = ALL_VIEW
 
+    /**
+     * Current order.
+     */
+    private var order = 0
+
     companion object {
         private var instance: MediaDiscoveryFragment? = null
 
@@ -43,6 +47,11 @@ class MediaDiscoveryFragment : BaseZoomFragment(), GalleryCardAdapter.Listener {
         }
 
         var isInMediaDiscovery = false
+    }
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        order =  viewModel.getOrder()
     }
 
     override fun onCreateView(
@@ -116,7 +125,12 @@ class MediaDiscoveryFragment : BaseZoomFragment(), GalleryCardAdapter.Listener {
 
     private fun subscribeObservers() {
         viewModel.items.observe(viewLifecycleOwner) {
-            setupListAdapter(getCurrentZoom(), it)
+            // Order changed.
+            if(order != viewModel.getOrder()) {
+                setupListAdapter(getCurrentZoom(), it)
+                order = viewModel.getOrder()
+            }
+
             actionModeViewModel.setNodesData(it.filter { nodeItem -> nodeItem.type != GalleryItem.TYPE_HEADER })
             if (it.isEmpty()) {
                 handleOptionsMenuUpdate(false)

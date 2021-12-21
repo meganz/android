@@ -41,6 +41,16 @@ class PhotosFragment : BaseZoomFragment(), GalleryCardAdapter.Listener {
 
     private var selectedView = ALL_VIEW
 
+    /**
+     * Current order.
+     */
+    private var order = 0
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        order =  viewModel.getOrder()
+    }
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -344,7 +354,12 @@ class PhotosFragment : BaseZoomFragment(), GalleryCardAdapter.Listener {
             // On enable CU page, don't update layout and view.
             if (isEnableCUFragmentShown() || !mManagerActivity.isInPhotosPage) return@observe
 
-            setupListAdapter(getCurrentZoom(), it)
+            // Order changed.
+            if (order != viewModel.getOrder()) {
+                setupListAdapter(getCurrentZoom(), it)
+                order = viewModel.getOrder()
+            }
+
             actionModeViewModel.setNodesData(it.filter { nodeItem -> nodeItem.type != GalleryItem.TYPE_HEADER })
             if (it.isEmpty()) {
                 handleOptionsMenuUpdate(false)
