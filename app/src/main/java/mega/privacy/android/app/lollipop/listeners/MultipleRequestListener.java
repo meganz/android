@@ -106,14 +106,6 @@ public class MultipleRequestListener implements MegaRequestListenerInterface {
                         } else {
                             message = getQuantityString(R.plurals.number_correctly_moved_to_rubbish, success_items, success_items);
                         }
-
-                        if (context instanceof ManagerActivityLollipop) {
-                            ManagerActivityLollipop managerActivity = (ManagerActivityLollipop) context;
-                            managerActivity.refreshAfterMovingToRubbish();
-                            resetAccountDetailsTimeStamp();
-                        } else {
-                            ((ContactFileListActivityLollipop) context).actionConfirmed();
-                        }
                     }
                     break;
                 }
@@ -131,21 +123,6 @@ public class MultipleRequestListener implements MegaRequestListenerInterface {
                         else {
                             message = context.getString(R.string.number_correctly_leaved, max_items);
                         }
-                    }
-                    else{
-                        logDebug("Multi remove");
-                        if(error>0){
-                            message = context.getString(R.string.number_correctly_removed, max_items-error) + context.getString(R.string.number_no_removed, error);
-                        }
-                        else{
-                            message = context.getString(R.string.number_correctly_removed, max_items);
-                        }
-
-                        if (context instanceof ManagerActivityLollipop) {
-                            ManagerActivityLollipop managerActivity = (ManagerActivityLollipop) context;
-                            managerActivity.refreshAfterRemoving();
-                        }
-                        resetAccountDetailsTimeStamp();
                     }
 
                     break;
