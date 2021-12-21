@@ -94,6 +94,7 @@
                 android:layout_height="match_parent"
                 android:layout_below="@+id/upload_progress"
                 android:clipToPadding="false"
+                android:paddingBottom="@dimen/grid_node_list_padding_bottom"
                 app:galleryItems="@{viewModel.items}"
                 app:visibleGone="@{!viewModel.items.empty}"/>
 
