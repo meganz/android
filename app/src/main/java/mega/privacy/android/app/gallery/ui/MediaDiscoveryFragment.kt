@@ -52,6 +52,7 @@ class MediaDiscoveryFragment : BaseZoomFragment(), GalleryCardAdapter.Listener {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         order = viewModel.getOrder()
+        isInMediaDiscovery = true
     }
 
     override fun onCreateView(
@@ -59,7 +60,6 @@ class MediaDiscoveryFragment : BaseZoomFragment(), GalleryCardAdapter.Listener {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        isInMediaDiscovery = true
         binding = FragmentMediaDecoveryBinding.inflate(inflater, container, false)
         arguments?.let {
             val currentHandle = it.getLong(MEDIA_HANDLE)
@@ -72,9 +72,9 @@ class MediaDiscoveryFragment : BaseZoomFragment(), GalleryCardAdapter.Listener {
     }
 
     private fun setupParentActivityUI() {
-        (activity as ManagerActivityLollipop).setToolbarTitle()
-        (activity as ManagerActivityLollipop).invalidateOptionsMenu()
-        (activity as ManagerActivityLollipop).hideFabButton()
+        mManagerActivity.setToolbarTitle()
+        mManagerActivity.invalidateOptionsMenu()
+        mManagerActivity.hideFabButton()
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -346,10 +346,11 @@ class MediaDiscoveryFragment : BaseZoomFragment(), GalleryCardAdapter.Listener {
 
     override fun onDestroy() {
         instance = null
+        isInMediaDiscovery = false
         super.onDestroy()
     }
 
     fun onBackPressed() {
-        (activity as ManagerActivityLollipop).onBackPressed()
+        mManagerActivity.onBackPressed()
     }
 }
