@@ -41,6 +41,7 @@ import mega.privacy.android.app.components.ListenScrollChangesHelper;
 import mega.privacy.android.app.databinding.FragmentPhotosBinding;
 import mega.privacy.android.app.fragments.homepage.photos.ScaleGestureHandler;
 import mega.privacy.android.app.globalmanagement.SortOrderManagement;
+import mega.privacy.android.app.lollipop.DrawerItem;
 import mega.privacy.android.app.lollipop.FullScreenImageViewerLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.repo.MegaNodeRepo;
@@ -799,7 +800,7 @@ public class PhotosFragment extends BaseZoomFragment implements CUGridViewAdapte
     }
 
     public boolean isInPhotosPage(){
-        return (ManagerActivityLollipop) getActivity() != null && ((ManagerActivityLollipop) getActivity()).getDrawerItem() == ManagerActivityLollipop.DrawerItem.PHOTOS;
+        return (ManagerActivityLollipop) getActivity() != null && ((ManagerActivityLollipop) getActivity()).getDrawerItem() == DrawerItem.PHOTOS;
     }
 
     public void handlePhotosMenuUpdate(boolean isShowMenu){

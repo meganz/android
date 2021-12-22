@@ -24,7 +24,6 @@ import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Environment;
 import android.os.Handler;
 import android.os.Looper;
 import android.provider.ContactsContract;
@@ -93,7 +92,6 @@ import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.TextView.OnEditorActionListener;
-import android.widget.Toast;
 
 import com.ittianyu.bottomnavigationviewex.BottomNavigationViewEx;
 import com.jeremyliao.liveeventbus.LiveEventBus;
@@ -494,28 +492,6 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 				case PERMISSIONS: return "pF";
                 case SMS_VERIFICATION: return "svF";
 				case LINKS: return "lF";
-			}
-			return null;
-		}
-	}
-
-	public enum DrawerItem {
-		CLOUD_DRIVE, PHOTOS, HOMEPAGE, CHAT, SHARED_ITEMS, NOTIFICATIONS,
-		SETTINGS, INBOX, SEARCH, TRANSFERS, RUBBISH_BIN, ASK_PERMISSIONS;
-
-		public String getTitle(Context context) {
-			switch(this)
-			{
-				case CLOUD_DRIVE: return context.getString(R.string.section_cloud_drive);
-				case PHOTOS: return context.getString(R.string.sortby_type_photo_first);
-				case INBOX: return context.getString(R.string.section_inbox);
-				case SHARED_ITEMS: return context.getString(R.string.title_shared_items);
-				case SETTINGS: return context.getString(R.string.action_settings);
-				case SEARCH: return context.getString(R.string.action_search);
-				case TRANSFERS: return context.getString(R.string.section_transfers);
-				case CHAT: return context.getString(R.string.section_chat);
-				case RUBBISH_BIN: return context.getString(R.string.section_rubbish_bin);
-				case NOTIFICATIONS: return context.getString(R.string.title_properties_chat_contact_notifications);
 			}
 			return null;
 		}
@@ -11231,7 +11207,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 			megaApi.acknowledgeUserAlerts();
 		}
 		else{
-			if(drawerItem == ManagerActivityLollipop.DrawerItem.NOTIFICATIONS && app.isActivityVisible()){
+			if(drawerItem == DrawerItem.NOTIFICATIONS && app.isActivityVisible()){
 				megaApi.acknowledgeUserAlerts();
 			}
 		}

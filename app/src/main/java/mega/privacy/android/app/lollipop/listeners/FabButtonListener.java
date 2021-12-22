@@ -3,12 +3,11 @@ package mega.privacy.android.app.lollipop.listeners;
 import android.content.Context;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
-import android.content.Intent;
 import android.view.View;
 
 import mega.privacy.android.app.R;
-import mega.privacy.android.app.WeakAccountProtectionAlertActivity;
 import mega.privacy.android.app.lollipop.ContactFileListActivityLollipop;
+import mega.privacy.android.app.lollipop.DrawerItem;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.utils.Util;
 
@@ -19,7 +18,7 @@ import static mega.privacy.android.app.utils.Util.*;
 public class FabButtonListener implements FloatingActionButton.OnClickListener{
 
     Context context;
-    ManagerActivityLollipop.DrawerItem drawerItem;
+    DrawerItem drawerItem;
 
     public FabButtonListener(Context context){
         logDebug("FabButtonListener created");

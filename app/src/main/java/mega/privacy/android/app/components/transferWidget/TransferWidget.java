@@ -12,6 +12,7 @@ import androidx.core.content.ContextCompat;
 
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
+import mega.privacy.android.app.lollipop.DrawerItem;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.utils.ColorUtils;
 import mega.privacy.android.app.utils.Util;
@@ -77,7 +78,7 @@ public class TransferWidget {
      */
     public void update(int transferType) {
         if (context instanceof ManagerActivityLollipop) {
-            if (((ManagerActivityLollipop) context).getDrawerItem() == ManagerActivityLollipop.DrawerItem.TRANSFERS) {
+            if (((ManagerActivityLollipop) context).getDrawerItem() == DrawerItem.TRANSFERS) {
                 MegaApplication.getTransfersManagement().setFailedTransfers(false);
             }
 
@@ -106,14 +107,14 @@ public class TransferWidget {
      * @return True if the widget is on a file management section in ManagerActivity, false otherwise.
      */
     private boolean isOnFileManagementManagerSection() {
-        ManagerActivityLollipop.DrawerItem drawerItem = ((ManagerActivityLollipop) context).getDrawerItem();
+        DrawerItem drawerItem = ((ManagerActivityLollipop) context).getDrawerItem();
 
-        return drawerItem != ManagerActivityLollipop.DrawerItem.TRANSFERS
-                && drawerItem != ManagerActivityLollipop.DrawerItem.SETTINGS
-                && drawerItem != ManagerActivityLollipop.DrawerItem.NOTIFICATIONS
-                && drawerItem != ManagerActivityLollipop.DrawerItem.CHAT
-                && drawerItem != ManagerActivityLollipop.DrawerItem.RUBBISH_BIN
-                && drawerItem != ManagerActivityLollipop.DrawerItem.PHOTOS
+        return drawerItem != DrawerItem.TRANSFERS
+                && drawerItem != DrawerItem.SETTINGS
+                && drawerItem != DrawerItem.NOTIFICATIONS
+                && drawerItem != DrawerItem.CHAT
+                && drawerItem != DrawerItem.RUBBISH_BIN
+                && drawerItem != DrawerItem.PHOTOS
                 && !((ManagerActivityLollipop) context).isInImagesPage();
     }
 

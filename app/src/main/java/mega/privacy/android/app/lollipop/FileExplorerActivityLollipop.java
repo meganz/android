@@ -1,9 +1,7 @@
 package mega.privacy.android.app.lollipop;
 
-import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
@@ -2790,18 +2788,18 @@ public class FileExplorerActivityLollipop extends TransfersManagementActivity
 		return nameFiles;
 	}
 
-	public ManagerActivityLollipop.DrawerItem getCurrentItem() {
+	public DrawerItem getCurrentItem() {
 		if (viewPagerExplorer != null) {
 			if (viewPagerExplorer.getCurrentItem() == 0) {
 				cDriveExplorer = getCloudExplorerFragment();
 				if (cDriveExplorer != null) {
-					return ManagerActivityLollipop.DrawerItem.CLOUD_DRIVE;
+					return DrawerItem.CLOUD_DRIVE;
 				}
 			}
 			else {
 				iSharesExplorer = getIncomingExplorerFragment();
 				if (iSharesExplorer != null) {
-					return ManagerActivityLollipop.DrawerItem.SHARED_ITEMS;
+					return DrawerItem.SHARED_ITEMS;
 				}
 			}
 		}
