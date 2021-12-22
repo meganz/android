@@ -379,13 +379,9 @@ public class LoginActivityLollipop extends BaseActivity implements MegaRequestLi
             finish();
         } else {
             logDebug("Start the Camera Uploads service");
-            handler.postDelayed(new Runnable() {
-
-                @Override
-                public void run() {
-                    logDebug("Now I start the service");
-                    scheduleCameraUploadJob(LoginActivityLollipop.this, true);
-                }
+            handler.postDelayed(() -> {
+                logDebug("Now I start the service");
+                scheduleCameraUploadJob(LoginActivityLollipop.this, true);
             }, time);
         }
     }

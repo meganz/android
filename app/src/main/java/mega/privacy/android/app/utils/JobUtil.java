@@ -24,7 +24,7 @@ import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.jobservices.CameraUploadWork;
 import mega.privacy.android.app.jobservices.CameraUploadsService;
-import mega.privacy.android.app.jobservices.CuSyncActiveHeartbeatWork;
+import mega.privacy.android.app.jobservices.SendRegularCuSyncHeartbeatWork;
 import nz.mega.sdk.MegaApiJava;
 
 public class JobUtil {
@@ -77,7 +77,7 @@ public class JobUtil {
     private static void scheduleCuSyncActiveHeartbeat(Context context) {
         logDebug("Schedule Cu Sync Active Heartbeat");
         PeriodicWorkRequest cuSyncActiveHeartbeatWorkRequest =
-                new PeriodicWorkRequest.Builder(CuSyncActiveHeartbeatWork.class, INACTIVE_HEARTBEAT_INTERVAL_SECONDS, TimeUnit.MINUTES)
+                new PeriodicWorkRequest.Builder(SendRegularCuSyncHeartbeatWork.class, INACTIVE_HEARTBEAT_INTERVAL_SECONDS, TimeUnit.MINUTES)
                         // Additional configuration
                         .addTag(HEART_BEAT_TAG)
                         .build();

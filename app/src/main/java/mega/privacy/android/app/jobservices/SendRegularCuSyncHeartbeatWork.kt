@@ -6,15 +6,13 @@ import androidx.work.WorkerParameters
 import mega.privacy.android.app.sync.cusync.CuSyncManager
 import mega.privacy.android.app.utils.LogUtil.logDebug
 
-class CuSyncActiveHeartbeatWork(val appContext: Context, val workerParams: WorkerParameters) :
+class SendRegularCuSyncHeartbeatWork(val appContext: Context, val workerParams: WorkerParameters) :
     Worker(appContext, workerParams) {
-    override fun doWork(): Result {
 
+    override fun doWork(): Result {
         // Do the work here--in this case, upload the images.
-        logDebug("CuSyncManager doActiveHeartbeat")
-        CuSyncManager.doActiveHeartbeat {
-            logDebug("CuSyncActiveHeartbeatWork doActiveHeartbeat return.")
-        }
+        logDebug("Send regular heartbeat.")
+        CuSyncManager.doRegularHeartbeat()
 
         // Indicate whether the work finished successfully with the Result
         return Result.success()

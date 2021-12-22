@@ -38,7 +38,6 @@ import java.util.Queue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-import kotlin.Unit;
 import mega.privacy.android.app.AndroidCompletedTransfer;
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
@@ -672,10 +671,7 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
                 logDebug("Nothing to upload.");
 
                 // Make sure to send inactive heartbeat.
-                CuSyncManager.INSTANCE.doActiveHeartbeat(() -> {
-                    logDebug("Nothing to upload, send inactive heartbeat.");
-                    return Unit.INSTANCE;
-                });
+                CuSyncManager.INSTANCE.doRegularHeartbeat();
 
                 // Make sure to re schedule the job
                 scheduleCameraUploadJob(this, true);

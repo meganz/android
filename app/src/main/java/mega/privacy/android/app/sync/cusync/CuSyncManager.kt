@@ -11,22 +11,19 @@ import mega.privacy.android.app.constants.BroadcastConstants.BROADCAST_ACTION_RE
 import mega.privacy.android.app.constants.BroadcastConstants.KEY_REENABLE_WHICH_PREFERENCE
 import mega.privacy.android.app.constants.SettingsConstants
 import mega.privacy.android.app.jobservices.SyncRecord
-import mega.privacy.android.app.listeners.BaseListener
+import mega.privacy.android.app.listeners.OptionalMegaRequestListenerInterface
 import mega.privacy.android.app.sync.SyncListener
 import mega.privacy.android.app.sync.cusync.callback.RemoveBackupCallback
 import mega.privacy.android.app.sync.cusync.callback.SetBackupCallback
 import mega.privacy.android.app.sync.cusync.callback.UpdateBackupCallback
 import mega.privacy.android.app.utils.CameraUploadUtil
 import mega.privacy.android.app.utils.Constants.*
-import mega.privacy.android.app.utils.LogUtil
-import mega.privacy.android.app.utils.LogUtil.logDebug
-import mega.privacy.android.app.utils.LogUtil.logWarning
+import mega.privacy.android.app.utils.LogUtil.*
 import mega.privacy.android.app.utils.RxUtil.logErr
 import mega.privacy.android.app.utils.StringResourcesUtils
 import mega.privacy.android.app.utils.TextUtil
 import nz.mega.sdk.*
 import nz.mega.sdk.MegaApiJava.*
-import org.webrtc.ContextUtils
 import java.io.File
 import java.util.concurrent.TimeUnit.SECONDS
 
@@ -35,9 +32,8 @@ import java.util.concurrent.TimeUnit.SECONDS
  * CU refers to Camera Uploads, primary.
  * MU refers to Media Uploads, secondary.
  */
-object CuSyncManager: MegaRequestListenerInterface {
+object CuSyncManager {
 
-    private var callback: (() -> Unit)? = null
     private const val PROGRESS_FINISHED = 100
 
     /**
@@ -687,44 +683,42 @@ object CuSyncManager: MegaRequestListenerInterface {
     /**
      * When the CU service has nothing to upload, send heartbeat as well.
      * Before sending, check the account state and login again when the rootNode is null
-     *
-     * @param onFinish Callback when the request finished.
      */
-    fun doActiveHeartbeat(onFinish: (() -> Unit)?) {
-        callback = onFinish
+    fun doRegularHeartbeat() {
         if (megaApi.rootNode == null) {
             logWarning("RootNode = null, need to login again")
-            val dbH = DatabaseHandler.getDbHandler(ContextUtils.getApplicationContext())
+            val dbH = DatabaseHandler.getDbHandler(megaApplication)
             val credentials: UserCredentials = dbH.credentials
             val gSession = credentials.session
-            megaApi.fastLogin(gSession, this)
+            megaApi.fastLogin(gSession, createOnFinishListener {
+                megaApi.fetchNodes(createOnFinishListener {
+                    sendRegularHeartbeat()
+                })
+            })
             return
         } else {
-            callback?.let { sendActiveHeartbeat(it) }
+            sendRegularHeartbeat()
         }
     }
 
     /**
      * When the CU service has nothing to upload, send heartbeat as well.
-     *
-     * @param onFinish Callback when the request finished.
      */
-    private fun sendActiveHeartbeat(onFinish: () -> Unit) {
+    private fun sendRegularHeartbeat() {
         val cuBackup = databaseHandler.cuBackup
-        val status: Int = Status.CU_SYNC_STATUS_UPTODATE
 
         logDebug("CuSyncActiveHeartbeatService onStartJob, doActiveHeartbeat")
         if (cuBackup != null && CameraUploadUtil.isPrimaryEnabled()) {
             logDebug("doActiveHeartbeat Send CU heartbeat, backupId = ${cuBackup.backupId}, Status = CU_SYNC_STATUS_UPTODATE.")
             megaApi.sendBackupHeartbeat(
                 cuBackup.backupId,
-                status,
+                Status.CU_SYNC_STATUS_UPTODATE,
                 INVALID_VALUE,
                 0,
                 0,
                 0,
                 cuLastUploadedHandle,
-                createOnFinishListener(onFinish)
+                createOnFinishListener(null)
             )
         }
 
@@ -733,46 +727,13 @@ object CuSyncManager: MegaRequestListenerInterface {
             logDebug("doActiveHeartbeat Send MU heartbeat, backupId = ${cuBackup.backupId}, Status = CU_SYNC_STATUS_UPTODATE.")
             megaApi.sendBackupHeartbeat(
                 muBackup.backupId,
-                status,
+                Status.CU_SYNC_STATUS_UPTODATE,
                 INVALID_VALUE,
                 0,
                 0,
                 0,
                 muLastUploadedHandle,
-                createOnFinishListener(onFinish)
-            )
-        }
-    }
-
-    /**
-     * When the app is inactive, send heartbeat as well.
-     */
-    fun doInactiveHeartbeat(onFinish: () -> Unit) {
-        val cuBackup = databaseHandler.cuBackup
-        if (cuBackup != null && CameraUploadUtil.isPrimaryEnabled()) {
-            megaApi.sendBackupHeartbeat(
-                cuBackup.backupId,
-                Status.CU_SYNC_STATUS_INACTIVE,
-                INVALID_VALUE,
-                0,
-                0,
-                0,
-                cuLastUploadedHandle,
-                createOnFinishListener(onFinish)
-            )
-        }
-
-        val muBackup = databaseHandler.muBackup
-        if (muBackup != null && CameraUploadUtil.isSecondaryEnabled()) {
-            megaApi.sendBackupHeartbeat(
-                muBackup.backupId,
-                Status.CU_SYNC_STATUS_INACTIVE,
-                INVALID_VALUE,
-                0,
-                0,
-                0,
-                muLastUploadedHandle,
-                createOnFinishListener(onFinish)
+                createOnFinishListener(null)
             )
         }
     }
@@ -784,13 +745,16 @@ object CuSyncManager: MegaRequestListenerInterface {
      *
      * @return MegaRequestListenerInterface object listen to the request.
      */
-    private fun createOnFinishListener(onFinish: () -> Unit): MegaRequestListenerInterface {
-        return object : BaseListener(null) {
-            override fun onRequestFinish(api: MegaApiJava, request: MegaRequest, e: MegaError) {
-                onFinish()
-            }
+    private fun createOnFinishListener(onFinish: (() -> Unit)?) = OptionalMegaRequestListenerInterface(onRequestFinish = { request, e ->
+        logDebug("${request.requestString} finished with ${e.errorCode}: ${e.errorString}")
+
+        if(e.errorCode == MegaError.API_OK) {
+            onFinish?.invoke()
+        } else {
+            logError("${request.requestString} failed with ${e.errorCode}: ${e.errorString}")
         }
-    }
+    })
+
 
     /**
      * Check if CU process is running by checking if there's a non-null active send heartbeat task.
@@ -814,46 +778,4 @@ object CuSyncManager: MegaRequestListenerInterface {
                 which
             )
         )
-
-    override fun onRequestStart(api: MegaApiJava?, request: MegaRequest?) {
-    }
-
-    override fun onRequestUpdate(api: MegaApiJava?, request: MegaRequest?) {
-    }
-
-    override fun onRequestFinish(api: MegaApiJava?, request: MegaRequest?, e: MegaError?) {
-        request?.let { req->
-            logDebug("onRequestFinish: " + req.requestString)
-            when (request.type) {
-                MegaRequest.TYPE_LOGIN -> {
-                    e?.let {
-                        if (it.errorCode == MegaError.API_OK) {
-                            logDebug("Fast login OK")
-                            logDebug("Calling fetchNodes")
-                            megaApi.fetchNodes(this)
-                        } else {
-                            LogUtil.logError("ERROR: " + it.errorString);
-                        }
-                    }
-                }
-                MegaRequest.TYPE_FETCH_NODES -> {
-                    e?.let { err ->
-                        if (err.errorCode == MegaError.API_OK) {
-                            logDebug("OK fetch nodes")
-                            callback?.let { sendActiveHeartbeat(it) }
-                        } else {
-                            LogUtil.logError("ERROR: " + err.errorString)
-                        }
-                    }
-                }
-                else -> {}
-            }
-        }
-    }
-
-    override fun onRequestTemporaryError(api: MegaApiJava?, request: MegaRequest?, e: MegaError?) {
-        if (request != null && e != null) {
-            logDebug("onRequestTemporaryError: ${request.requestString} finished with ${e.errorCode}: ${e.errorString}")
-        }
-    }
 }
