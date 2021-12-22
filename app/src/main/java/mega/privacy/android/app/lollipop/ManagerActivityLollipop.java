@@ -24,7 +24,6 @@ import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Environment;
 import android.os.Handler;
 import android.os.Looper;
 import android.provider.ContactsContract;
@@ -93,7 +92,6 @@ import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.TextView.OnEditorActionListener;
-import android.widget.Toast;
 
 import com.ittianyu.bottomnavigationviewex.BottomNavigationViewEx;
 import com.jeremyliao.liveeventbus.LiveEventBus;
@@ -624,7 +622,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 	private TransfersFragmentLollipop tFLol;
 	private CompletedTransfersFragmentLollipop completedTFLol;
 	private SearchFragmentLollipop sFLol;
-	private Settings sttFLol;
+	private Settings settingsFragment;
 	private PhotosFragment cuFragment;
 	private RecentChatsFragmentLollipop rChatFL;
 	private NotificationsFragmentLollipop notificFragment;
@@ -1004,7 +1002,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 			if (intent != null && intent.getAction() != null && getSettingsFragment() != null
 					&& (intent.getAction().equals(ACTION_REFRESH_CAMERA_UPLOADS_SETTING)
 					|| intent.getAction().equals(ACTION_REFRESH_CAMERA_UPLOADS_SETTING_SUBTITLE))) {
-				sttFLol.refreshCameraUploadsSettings();
+				settingsFragment.refreshCameraUploadsSettings();
 			}
 		}
 	};
@@ -3962,7 +3960,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 					clickDrawerItemLollipop(drawerItem);
 
 					if (getSettingsFragment() != null) {
-						sttFLol.setOnlineOptions(true);
+						settingsFragment.setOnlineOptions(true);
 					}
 
 					supportInvalidateOptionsMenu();
@@ -4036,7 +4034,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 					megaChatApi.getMyFullname());
 
 			if (getSettingsFragment() != null) {
-				sttFLol.setOnlineOptions(false);
+				settingsFragment.setOnlineOptions(false);
 			}
 
 			logDebug("DrawerItem on start offline: " + drawerItem);
@@ -4663,29 +4661,29 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 
 				if (getSettingsFragment() != null) {
 					if (openSettingsStorage) {
-						sttFLol.goToCategoryStorage();
+						settingsFragment.goToCategoryStorage();
 					} else if (openSettingsQR) {
 						logDebug("goToCategoryQR");
-						sttFLol.goToCategoryQR();
+						settingsFragment.goToCategoryQR();
 					} else if (openSettingsStartScreen) {
-						sttFLol.goToSectionStartScreen();
+						settingsFragment.goToSectionStartScreen();
 					}
 				} else {
 					if(SettingsFragmentRefactorToggle.INSTANCE.getEnabled()){
-						sttFLol = new SettingsFragment();
+						settingsFragment = new SettingsFragment();
 					}else {
-						sttFLol = new SettingsFragmentLollipop();
+						settingsFragment = new SettingsFragmentLollipop();
 					}
 				}
 
-				replaceFragment((Fragment)sttFLol, FragmentTag.SETTINGS.getTag());
+				replaceFragment((Fragment) settingsFragment, FragmentTag.SETTINGS.getTag());
 
 				setToolbarTitle();
 				supportInvalidateOptionsMenu();
 				showFabButton();
 
-				if (sttFLol != null){
-					sttFLol.update2FAVisibility();
+				if (settingsFragment != null){
+					settingsFragment.update2FAVisibility();
 				}
 				break;
     		}
@@ -4927,7 +4925,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
             }
             case SETTINGS: {
                 if (getSettingsFragment() != null) {
-                    sttFLol.checkScroll();
+                    settingsFragment.checkScroll();
                 }
                 break;
             }
@@ -5026,7 +5024,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 		openSettingsStartScreen = false;
 
 		if (getSettingsFragment() != null) {
-			sttFLol.goToFirstCategory();
+			settingsFragment.goToFirstCategory();
 		}
 	}
 
@@ -7689,7 +7687,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 				}
 
 				if (getSettingsFragment() != null) {
-					sttFLol.updateCancelAccountSetting();
+					settingsFragment.updateCancelAccountSetting();
 				}
 			} else {
 				businessLabel.setVisibility(View.GONE);
@@ -8112,7 +8110,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 	@Override
 	public void showConfirmationEnableLogsSDK(){
 		if(getSettingsFragment() != null && !SettingsFragmentRefactorToggle.INSTANCE.getEnabled()){
-			((SettingsFragmentLollipop)sttFLol).numberOfClicksSDK = 0;
+			((SettingsFragmentLollipop) settingsFragment).numberOfClicksSDK = 0;
 		}
 		super.showConfirmationEnableLogsSDK();
 	}
@@ -8120,7 +8118,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 	@Override
 	public void showConfirmationEnableLogsKarere(){
 		if(getSettingsFragment() != null && !SettingsFragmentRefactorToggle.INSTANCE.getEnabled()){
-			((SettingsFragmentLollipop)sttFLol).numberOfClicksKarere = 0;
+			((SettingsFragmentLollipop) settingsFragment).numberOfClicksKarere = 0;
 		}
 		super.showConfirmationEnableLogsKarere();
 	}
@@ -8129,7 +8127,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 		logDebug("update2FAVisibility");
 		if (getSettingsFragment() != null) {
 			try {
-				sttFLol.update2FAVisibility();
+				settingsFragment.update2FAVisibility();
 			}catch (Exception e){}
 		}
 	}
@@ -8354,7 +8352,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 
 			if (getSettingsFragment() != null) {
 				try {
-					sttFLol.update2FAVisibility();
+					settingsFragment.update2FAVisibility();
 				}catch (Exception e){}
 			}
 		}
@@ -9394,7 +9392,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 			}
 
 			if(getSettingsFragment() != null){
-				sttFLol.hidePreferencesChat();
+				settingsFragment.hidePreferencesChat();
 			}
 
 			if (app != null){
@@ -9530,14 +9528,14 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 				if (e.getErrorCode() == MegaError.API_OK) {
 					logDebug("OK setContactLinkOption: " + request.getText());
 					if (getSettingsFragment() != null) {
-						sttFLol.setSetAutoAccept(false);
-						if (sttFLol.getAutoAcceptSetting()) {
-							sttFLol.setAutoAcceptSetting(false);
+						settingsFragment.setSetAutoAccept(false);
+						if (settingsFragment.getAutoAcceptSetting()) {
+							settingsFragment.setAutoAcceptSetting(false);
 						} else {
-							sttFLol.setAutoAcceptSetting(true);
+							settingsFragment.setAutoAcceptSetting(true);
 						}
-						sttFLol.setValueOfAutoAccept(sttFLol.getAutoAcceptSetting());
-						logDebug("Autoacept: " + sttFLol.getAutoAcceptSetting());
+						settingsFragment.setValueOfAutoAccept(settingsFragment.getAutoAcceptSetting());
+						logDebug("Autoacept: " + settingsFragment.getAutoAcceptSetting());
 					}
 				} else {
 					logError("Error setContactLinkOption");
@@ -9575,11 +9573,11 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 				logDebug("Type: GET_ATTR_USER ParamType: USER_ATTR_CONTACT_LINK_VERIFICATION --> getContactLinkOption");
 				if (e.getErrorCode() == MegaError.API_OK) {
 					if (getSettingsFragment() != null) {
-						sttFLol.setAutoAcceptSetting(request.getFlag());
+						settingsFragment.setAutoAcceptSetting(request.getFlag());
 						logDebug("OK getContactLinkOption: " + request.getFlag());
 //						If user request to set QR autoaccept
-						if (sttFLol.getSetAutoAccept()) {
-							if (sttFLol.getAutoAcceptSetting()) {
+						if (settingsFragment.getSetAutoAccept()) {
+							if (settingsFragment.getAutoAcceptSetting()) {
 								logDebug("setAutoAccept false");
 //								If autoaccept is enabled -> request to disable
 								megaApi.setContactLinksOption(true, this);
@@ -9589,14 +9587,14 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 								megaApi.setContactLinksOption(false, this);
 							}
 						} else {
-							sttFLol.setValueOfAutoAccept(sttFLol.getAutoAcceptSetting());
+							settingsFragment.setValueOfAutoAccept(settingsFragment.getAutoAcceptSetting());
 						}
-						logDebug("Autoacept: " + sttFLol.getAutoAcceptSetting());
+						logDebug("Autoacept: " + settingsFragment.getAutoAcceptSetting());
 					}
 				} else if (e.getErrorCode() == MegaError.API_ENOENT) {
 					logError("Error MegaError.API_ENOENT getContactLinkOption: " + request.getFlag());
 					if (getSettingsFragment() != null) {
-						sttFLol.setAutoAcceptSetting(request.getFlag());
+						settingsFragment.setAutoAcceptSetting(request.getFlag());
 					}
 					megaApi.setContactLinksOption(false, this);
 				} else {
@@ -9907,7 +9905,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 		else if (request.getType() == MegaRequest.TYPE_MULTI_FACTOR_AUTH_CHECK) {
 			// Re-enable 2fa switch first.
 			if (getSettingsFragment() != null) {
-				sttFLol.reEnable2faSwitch();
+				settingsFragment.reEnable2faSwitch();
 			}
 
             if (e.getErrorCode() == MegaError.API_OK) {
@@ -9940,7 +9938,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
         is2FAEnabled = isEnabled;
 
         if (getSettingsFragment() != null) {
-            sttFLol.update2FAPreference(is2FAEnabled);
+            settingsFragment.update2FAPreference(is2FAEnabled);
         }
     }
 
@@ -10798,7 +10796,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 	}
 
 	public Settings getSettingsFragment() {
-		return sttFLol = (Settings) getSupportFragmentManager().findFragmentByTag(FragmentTag.SETTINGS.getTag());
+		return settingsFragment = (Settings) getSupportFragmentManager().findFragmentByTag(FragmentTag.SETTINGS.getTag());
 	}
 
 	public MegaContactAdapter getSelectedUser() {
