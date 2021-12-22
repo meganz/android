@@ -210,6 +210,7 @@ import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.ChatBottom
 import mega.privacy.android.app.service.iar.RatingHandlerImpl;
 import mega.privacy.android.app.usecase.MoveNodeUseCase;
 import mega.privacy.android.app.usecase.RemoveNodeUseCase;
+import mega.privacy.android.app.usecase.data.MoveRequestResult;
 import mega.privacy.android.app.utils.AlertsAndWarnings;
 import mega.privacy.android.app.utils.CallUtil;
 import mega.privacy.android.app.utils.ChatUtil;
@@ -6302,7 +6303,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 						boolean notValidView = result.isSingleAction() && result.getAllSuccess()
 								&& parentHandleRubbish == nodes.get(0).getHandle();
 
-						finishRestoreOrRemoveRubbishAction(notValidView, result.isForeignNode(),
+						showRestorionOrRemovalResult(notValidView, result.isForeignNode(),
 								result.getResultText());
 					}
 				});
@@ -6315,7 +6316,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 	 * @param isForeignNode True if should show a foreign warning, false otherwise.
 	 * @param message       Text message to show as the request result.
 	 */
-	private void finishRestoreOrRemoveRubbishAction(boolean notValidView, boolean isForeignNode, String message) {
+	private void showRestorionOrRemovalResult(boolean notValidView, boolean isForeignNode, String message) {
 		if (notValidView) {
 			parentHandleRubbish = INVALID_HANDLE;
 			setToolbarTitle();
@@ -6425,14 +6426,8 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 									.subscribeOn(Schedulers.io())
 									.observeOn(AndroidSchedulers.mainThread())
 									.subscribe((result, throwable) -> {
-										if (throwable != null) {
-											return;
-										}
-
-										if (result.isForeignNode()) {
-											showForeignStorageOverQuotaWarningDialog(this);
-										} else {
-											showSnackbar(SNACKBAR_TYPE, result.getResultText(), MEGACHAT_INVALID_HANDLE);
+										if (throwable == null) {
+											showMovementResult(result, handleList.get(0));
 										}
 									}));
 
@@ -6453,7 +6448,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 													&& result.getAllSuccess()
 													&& parentHandleRubbish == handleList.get(0);
 
-											finishRestoreOrRemoveRubbishAction(notValidView, false,
+											showRestorionOrRemovalResult(notValidView, false,
 													result.getResultText());
 										}
 									}));
@@ -6468,6 +6463,64 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 			return;
 		}
 
+	}
+
+	/**
+	 * Shows the final result of a movement request.
+	 *
+	 * @param result Object containing the request result.
+	 * @param handle Handle of the node to mode.
+	 */
+	private void showMovementResult(MoveRequestResult result, long handle) {
+		if (result.isSingleAction() && result.getAllSuccess() && getCurrentParentHandle() == handle) {
+			switch (drawerItem) {
+				case CLOUD_DRIVE:
+					parentHandleBrowser = result.getOldParentHandle();
+					refreshCloudDrive();
+					break;
+
+				case INBOX:
+					parentHandleInbox = result.getOldParentHandle();
+					refreshInboxList();
+					break;
+
+				case SHARED_ITEMS:
+					switch (getTabItemShares()) {
+						case INCOMING_TAB:
+							decreaseDeepBrowserTreeIncoming();
+							parentHandleIncoming = deepBrowserTreeIncoming == 0 ? INVALID_HANDLE : result.getOldParentHandle();
+							refreshIncomingShares();
+							break;
+
+						case OUTGOING_TAB:
+							decreaseDeepBrowserTreeOutgoing();
+							parentHandleOutgoing = deepBrowserTreeOutgoing == 0 ? INVALID_HANDLE : result.getOldParentHandle();
+							refreshOutgoingShares();
+							break;
+
+						case LINKS_TAB:
+							decreaseDeepBrowserTreeLinks();
+							parentHandleLinks = deepBrowserTreeLinks == 0 ? INVALID_HANDLE : result.getOldParentHandle();
+							refreshLinks();
+							break;
+					}
+
+				case SEARCH:
+					parentHandleSearch = levelsSearch > 0 ? result.getOldParentHandle() : INVALID_HANDLE;
+					levelsSearch--;
+					refreshSearch();
+					break;
+
+			}
+
+			setToolbarTitle();
+		}
+
+		if (result.isForeignNode()) {
+			showForeignStorageOverQuotaWarningDialog(this);
+		} else {
+			showSnackbar(SNACKBAR_TYPE, result.getResultText(), MEGACHAT_INVALID_HANDLE);
+		}
 	}
 
 	public void askConfirmationDeleteAccount(){
