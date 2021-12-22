@@ -5407,7 +5407,7 @@ public class ChatActivityLollipop extends PasscodeActivity
                                         if (contact != null && contact.getVisibility() == MegaUser.VISIBILITY_VISIBLE) {
                                             ContactUtil.openContactInfoActivity(this, email);
                                         } else {
-                                            checkIfInvitationIsAlreadySent(email);
+                                            checkIfInvitationIsAlreadySent(email, m.getMessage());
                                         }
                                     }
                                 }
@@ -5473,19 +5473,20 @@ public class ChatActivityLollipop extends PasscodeActivity
     /**
      * Checks if a contact invitation has been already sent.
      *
-     * @param email Contact email to check.
+     * @param email   Contact email to check.
+     * @param message MegaChatMessage to get the contact name.
      */
-    private void checkIfInvitationIsAlreadySent(String email) {
+    private void checkIfInvitationIsAlreadySent(String email, MegaChatMessage message) {
         inviteContactUseCase.isContactRequestAlreadySent(email)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe((alreadyInvited, throwable) -> {
                     if (throwable == null) {
                         if (alreadyInvited) {
-                            String text = StringResourcesUtils.getString(R.string.contact_already_invited, converterShortCodes(getNameContactAttachment(m.getMessage())));
+                            String text = StringResourcesUtils.getString(R.string.contact_already_invited, converterShortCodes(getNameContactAttachment(message)));
                             showSnackbar(SENT_REQUESTS_TYPE, text, MEGACHAT_INVALID_HANDLE);
                         } else {
-                            String text = StringResourcesUtils.getString(R.string.user_is_not_contact, converterShortCodes(getNameContactAttachment(m.getMessage())));
+                            String text = StringResourcesUtils.getString(R.string.user_is_not_contact, converterShortCodes(getNameContactAttachment(message)));
                             showSnackbar(INVITE_CONTACT_TYPE, text, MEGACHAT_INVALID_HANDLE, email);
                         }
                     }
