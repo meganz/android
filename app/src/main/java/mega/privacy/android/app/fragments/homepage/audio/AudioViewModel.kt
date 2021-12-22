@@ -1,8 +1,8 @@
 package mega.privacy.android.app.fragments.homepage.audio
 
-import androidx.hilt.lifecycle.ViewModelInject
 import androidx.lifecycle.*
 import com.jeremyliao.liveeventbus.LiveEventBus
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.fragments.homepage.NodeItem
 import mega.privacy.android.app.fragments.homepage.TypedFilesRepository
@@ -12,8 +12,10 @@ import mega.privacy.android.app.utils.Constants.INVALID_POSITION
 import mega.privacy.android.app.utils.TextUtil
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
+import javax.inject.Inject
 
-class AudioViewModel @ViewModelInject constructor(
+@HiltViewModel
+class AudioViewModel @Inject constructor(
     private val repository: TypedFilesRepository,
     private val sortOrderManagement: SortOrderManagement
 ) : ViewModel() {

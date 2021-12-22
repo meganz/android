@@ -66,8 +66,6 @@
     <string name="general_error_word">Error</string>
     <!-- when clicking into a menu whose functionality is not yet implemented -->
     <string name="general_not_yet_implemented">Todavía no implementado</string>
-    <!-- when any file or folder is selected -->
-    <string name="error_no_selection">No se ha seleccionado ningún archivo o carpeta</string>
     <!-- when trying to download a file that is already downloaded in the device -->
     <string name="general_already_downloaded">Descargado anteriormente</string>
     <!-- when trying to upload a file that is already uploaded in the folder -->
@@ -631,10 +629,6 @@
     <string name="upload_to_audio">Audio</string>
     <!-- Title of the button in the contact info screen to start a video call -->
     <string name="upload_to_video">Vídeo</string>
-    <!-- upload to. Then choose to browse the file system to choose a file -->
-    <string name="upload_to_filesystem">Elegir del sistema de archivos</string>
-    <!-- upload to. Then choose to browse the file system to choose a file -->
-    <string name="upload_to_filesystem_from">Escoge de</string>
     <!-- Label for the current uploaded size of a file. For example, 3 files, 50KB uploaded -->
     <string name="upload_uploaded">subido</string>
     <!-- Status text at the beginning of an upload, Status text at the beginning of an upload for 2 or more files -->
@@ -3104,8 +3098,6 @@
     </plurals>
     <!-- Title of a chat message that contains geolocation info -->
     <string name="title_geolocation_message">Ubicación fijada</string>
-    <!-- Text of the button to indicate an attachment upload from file system -->
-    <string name="attachment_upload_panel_from_device">Desde el sistema de archivos</string>
     <!-- Alert shown when a num of files have not been sent because of any error occurs, Plural of file. 2 files -->
     <plurals name="num_files_not_send">
         <item quantity="one">No se ha podido enviar %d archivo a %d chats</item>
@@ -3746,7 +3738,7 @@
     <!-- Context menu item. Allows user to delete file/folder from favourites -->
     <string name="file_properties_unfavourite">Eliminar favorito</string>
     <!-- Context menu item. Allows to mark file/folder with own color label -->
-    <string name="file_properties_label">Etiqueta&#8230;</string>
+    <string name="file_properties_label">Etiqueta</string>
     <!-- Information text to let’s the user know that they can remove a colour from a folder or file that was already marked. -->
     <string name="action_remove_label">Eliminar etiqueta</string>
     <!-- Title text to show label selector. -->
@@ -3778,19 +3770,13 @@
     <!-- Preferences screen item title for cookie settings -->
     <string name="settings_about_cookie_settings">Ajustes de Cookies</string>
     <!-- Cookie dialog title -->
-    <string name="dialog_cookie_alert_title">Antes de continuar</string>
+    <string name="dialog_cookie_alert_title">Tu privacidad</string>
     <!-- Cookie dialog message. Please, keep the placeholders to format the string. -->
-    <string name="dialog_cookie_alert_message">Utilizamos el almacenamiento local y tecnologías similares (“Cookies”) para ofrecerte nuestros servicios, mejorar tu experiencia al usarlos y personalizar los anuncios que ves, incluso a través de terceros. Acepta el uso de Cookies o personalizalo en los ajustes. Encuentra más información al respecto en nuestra [A]Política de cookies[/A].</string>
+    <string name="dialog_cookie_alert_message">Utilizamos cookies y tecnologías similares (“Cookies”) para ofrecerte nuestros servicios y mejorar tu experiencia al usarlos. Acepta el uso de Cookies o personalizalo en los ajustes. Encuentra más información al respecto en nuestra [A]Política de cookies[/A].</string>
     <!-- Cookie dialog message showed when there are unsaved settings. -->
     <string name="dialog_cookie_alert_unsaved">Ajustes de Cookies no guardados.</string>
     <!-- Snackbar message showed when there settings has been saved successfully. -->
     <string name="dialog_cookie_snackbar_saved">Los cambios en los Ajustes de Cookies han sido guardados</string>
-    <!-- Cookie dialog third party first subtitle -->
-    <string name="dialog_cookie_thirdparty_subtitle1">Cookies publicitarias de Google</string>
-    <!-- Cookie dialog third party second subtitle -->
-    <string name="dialog_cookie_thirdparty_subtitle2">Categoría: Cookies publicitarias</string>
-    <!-- Cookie dialog third party message. Please, keep the placeholders to format the string. -->
-    <string name="dialog_cookie_thirdparty_message">Utilizado por Google para:\n• personalizar los anuncios que Google muestra en el nuestro y en otros servicios y sitios web, en función de cosas como tu ubicación y como las páginas web que hayas visitado anteriormente;\n• controlar la frecuencia con la que se te muestran determinados anuncios\n• proporcionar prevención de fraude y;\n• determinar cuándo toques en un anuncio en concreto y monitorear las acciones que realizas en respuesta a ese anuncio.\nhttps://policies.google.com/technologies/partner-sites</string>
     <!-- Preference screen item title -->
     <string name="preference_cookies_accept">Aceptar Cookies</string>
     <!-- Preference screen item title -->
@@ -3798,21 +3784,9 @@
     <!-- Preference screen item summary -->
     <string name="preference_cookies_essential_summary">Esenciales para el funcionamiento de nuestros servicios y para un acceso seguro. Por esta razón, no requieren consentimiento.</string>
     <!-- Preference screen item title -->
-    <string name="preference_cookies_preference_title">Cookies funcionales</string>
-    <!-- Preference screen item summary -->
-    <string name="preference_cookies_preference_summary">Permiten recordar tus ajustes de pantalla y de formato. Si no aceptas estas Cookies, no podremos recordar algunas cosas, como tu formato de pantalla preferido.</string>
-    <!-- Preference screen item title -->
     <string name="preference_cookies_performance_title">Cookies de análisis y rendimiento</string>
     <!-- Preference screen item summary -->
     <string name="preference_cookies_performance_summary">Sirven para entender cómo utilizas nuestros servicios y nos proporcionan datos que podemos utilizar para realizar mejoras. No aceptar estas Cookies significará que tendremos menos datos disponibles para mejorar el servicio.</string>
-    <!-- Preference screen item title -->
-    <string name="preference_cookies_advertising_title">Cookies publicitarias</string>
-    <!-- Preference screen item summary -->
-    <string name="preference_cookies_advertising_summary">Utilizadas por nosotros y nuestros socios publicitarios para personalizar los anuncios que ves en nuestros servicios y en otros sitios web en función de tu historial de navegación. No aceptar estas Cookies significa que mostraremos anuncios menos relevantes.</string>
-    <!-- Preference screen item title -->
-    <string name="preference_cookies_thirdparty_title">Cookies de terceros</string>
-    <!-- Preference screen item summary. Please, keep the placeholders to format the string. -->
-    <string name="preference_cookies_thirdparty_summary">Controladas por terceros, las usamos para proporcionar las funcionalidades descritas anteriormente. No aceptar estas Cookies tendrá distintas implicaciones en función del tipo de Cookie de terceros. Pulsa en “Más información” a continuación para obtener detalles sobre todas las Cookies de terceros que utilizamos.</string>
     <!-- Preference screen item state description -->
     <string name="preference_cookies_always_on">Activas por defecto</string>
     <!-- Menu option that allows the user to scan document and upload it directly to MEGA. -->
@@ -4190,4 +4164,10 @@
     <string name="image_insertion_not_allowed">MEGA no admite la inserción de imágenes aquí</string>
     <!-- The label under the button of viewing all images screen -->
     <string name="section_images">Imágenes</string>
+    <!-- Title of the dialog warning the user about disable file versioning. -->
+    <string name="disable_versioning_label">Desactivar versionado de archivos</string>
+    <!-- Warning of the dialog informing the user about disable file versioning. -->
+    <string name="disable_versioning_warning">Our file versioning feature ensures that we keep older copies of your files around if you replace them with newer versions. If you disable File Versioning you will no longer have this protection; the old copy will be lost when you replace it.</string>
+    <!-- Warning informing the user the folder location is trying to open no longer exists. -->
+    <string name="location_not_exist">This location no longer exists.</string>
 </resources>

@@ -90,7 +90,7 @@ import mega.privacy.android.app.utils.ChatUtil.*
 import mega.privacy.android.app.utils.Constants.*
 import mega.privacy.android.app.utils.LogUtil.*
 import mega.privacy.android.app.utils.Util.isOnline
-import mega.privacy.android.app.utils.permission.permissionsBuilder
+import mega.privacy.android.app.utils.permission.*
 import nz.mega.sdk.*
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
 import java.lang.Integer.min
@@ -138,6 +138,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
 
     private var micIsEnable = false
     private var camIsEnable = false
+    private var speakerIsEnable = false
     private var meetingLink: String = ""
     private var isManualModeView = false
     private var isWaitingForAnswerCall = false
@@ -765,6 +766,9 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
 
                                                                 camIsEnable =
                                                                     sharedModel.cameraLiveData.value!!
+                                                                speakerIsEnable =
+                                                                    sharedModel.speakerLiveData.value!! == AppRTCAudioManager.AudioDevice.SPEAKER_PHONE
+
                                                                 inMeetingViewModel.joinPublicChat(
                                                                     args.chatId,
                                                                     AutoJoinPublicChatListener(
@@ -800,6 +804,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
         // Set parent activity can receive the orientation changes
         meetingActivity.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_SENSOR
 
@@ -1054,19 +1059,18 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
 
         sharedModel.speakerLiveData.observe(viewLifecycleOwner) {
             logDebug("Speaker status has changed to $it")
+            speakerIsEnable = it == AppRTCAudioManager.AudioDevice.SPEAKER_PHONE
             updateSpeaker(it)
         }
 
         sharedModel.cameraPermissionCheck.observe(viewLifecycleOwner) {
             if (it) {
                 permissionsBuilder(
-                    arrayOf(Manifest.permission.CAMERA).toCollection(
-                        ArrayList()
-                    )
+                    arrayOf(Manifest.permission.CAMERA)
                 )
                     .setOnRequiresPermission { l ->
                         run {
-                            onRequiresCameraPermission(l)
+                            onRequiresPermission(l)
                             // Continue expected action after granted
                             sharedModel.clickCamera(true)
                             bottomFloatingPanelViewHolder.updateCamPermissionWaring(true)
@@ -1080,13 +1084,11 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
         sharedModel.recordAudioPermissionCheck.observe(viewLifecycleOwner) {
             if (it) {
                 permissionsBuilder(
-                    arrayOf(Manifest.permission.RECORD_AUDIO).toCollection(
-                        ArrayList()
-                    )
+                    arrayOf(Manifest.permission.RECORD_AUDIO)
                 )
                     .setOnRequiresPermission { l ->
                         run {
-                            onRequiresAudioPermission(l)
+                            onRequiresPermission(l)
                             // Continue expected action after granted
                             sharedModel.clickMic(true)
                             bottomFloatingPanelViewHolder.updateMicPermissionWaring(true)
@@ -2824,7 +2826,6 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
         const val TYPE_IN_SPEAKER_VIEW = "TYPE_IN_SPEAKER_VIEW"
 
         const val MAX_PARTICIPANTS_GRID_VIEW_AUTOMATIC = 6
-
     }
 
     /**
@@ -2957,6 +2958,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
             inMeetingViewModel.answerChatCall(
                 camIsEnable,
                 micIsEnable,
+                speakerIsEnable,
                 AnswerChatCallListener(requireContext(), this)
             )
         }

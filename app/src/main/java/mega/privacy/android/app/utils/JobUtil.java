@@ -29,7 +29,7 @@ import static mega.privacy.android.app.utils.Constants.CU_SYNC_INACTIVE_HEARTBEA
 import static mega.privacy.android.app.utils.Constants.PHOTOS_UPLOAD_JOB_ID;
 import static mega.privacy.android.app.utils.LogUtil.logDebug;
 import static mega.privacy.android.app.utils.LogUtil.logError;
-import static mega.privacy.android.app.utils.PermissionUtils.hasPermissions;
+import static mega.privacy.android.app.utils.permission.PermissionUtils.hasPermissions;
 
 public class JobUtil {
 

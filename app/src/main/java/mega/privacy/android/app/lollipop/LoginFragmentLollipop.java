@@ -56,7 +56,6 @@ import java.util.Locale;
 
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
-import mega.privacy.android.app.MegaAttributes;
 import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.ShareInfo;
@@ -71,8 +70,8 @@ import mega.privacy.android.app.middlelayer.push.PushMessageHanlder;
 import mega.privacy.android.app.providers.FileProviderActivity;
 import mega.privacy.android.app.upgradeAccount.ChooseAccountActivity;
 import mega.privacy.android.app.utils.ColorUtils;
-import mega.privacy.android.app.utils.PermissionUtils;
 import mega.privacy.android.app.utils.StringResourcesUtils;
+import mega.privacy.android.app.utils.permission.PermissionUtils;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaChatApi;
@@ -106,9 +105,9 @@ import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.ConstantsUrl.RECOVERY_URL;
 import static mega.privacy.android.app.utils.ConstantsUrl.RECOVERY_URL_EMAIL;
 import static mega.privacy.android.app.utils.LogUtil.*;
-import static mega.privacy.android.app.utils.PermissionUtils.hasPermissions;
 import static mega.privacy.android.app.utils.TextUtil.isTextEmpty;
 import static mega.privacy.android.app.utils.Util.*;
+import static mega.privacy.android.app.utils.permission.PermissionUtils.hasPermissions;
 import static nz.mega.sdk.MegaApiJava.STORAGE_STATE_PAYWALL;
 
 public class LoginFragmentLollipop extends Fragment implements View.OnClickListener, MegaRequestListenerInterface, MegaChatListenerInterface, View.OnFocusChangeListener, View.OnLongClickListener {
@@ -1456,36 +1455,30 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
             }
             case R.id.login_text_view:
                 numberOfClicksKarere++;
-                if (numberOfClicksKarere == 5){
-                    MegaAttributes attrs = dbH.getAttributes();
-                    if (attrs != null && attrs.getFileLoggerKarere() != null) {
-                        if (Boolean.parseBoolean(attrs.getFileLoggerKarere())) {
-                            numberOfClicksKarere = 0;
-                            setStatusLoggerKarere(context, false);
-                            break;
-                        }
+
+                if (numberOfClicksKarere == CLICKS_ENABLE_DEBUG) {
+                    if (areKarereLogsEnabled()) {
+                        numberOfClicksKarere = 0;
+                        setStatusLoggerKarere(context, false);
                     } else {
-                        logWarning("Karere file logger attribute is NULL");
+                        ((LoginActivityLollipop) context).showConfirmationEnableLogsKarere();
                     }
-                    ((LoginActivityLollipop) context).showConfirmationEnableLogsKarere();
                 }
+
                 break;
 
             case R.id.text_newToMega:
                 numberOfClicksSDK++;
-                if (numberOfClicksSDK == 5) {
-                    MegaAttributes attrs = dbH.getAttributes();
-                    if (attrs != null && attrs.getFileLoggerSDK() != null) {
-                        if (Boolean.parseBoolean(attrs.getFileLoggerSDK())) {
-                            numberOfClicksSDK = 0;
-                            setStatusLoggerSDK(context, false);
-                            break;
-                        }
+
+                if (numberOfClicksSDK == CLICKS_ENABLE_DEBUG) {
+                    if (areSDKLogsEnabled()) {
+                        numberOfClicksSDK = 0;
+                        setStatusLoggerSDK(context, false);
                     } else {
-                        logWarning("SDK file logger attribute is NULL");
+                        ((LoginActivityLollipop) context).showConfirmationEnableLogsSDK();
                     }
-                    ((LoginActivityLollipop) context).showConfirmationEnableLogsSDK();
                 }
+
                 break;
 
             case R.id.lost_authentication_device: {

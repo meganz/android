@@ -7,15 +7,13 @@ import android.content.Intent
 import android.content.SharedPreferences
 import android.net.Uri
 import androidx.core.net.toUri
-import androidx.hilt.lifecycle.ViewModelInject
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import mega.privacy.android.app.AndroidCompletedTransfer
-import mega.privacy.android.app.DatabaseHandler
 import mega.privacy.android.app.UploadService
 import mega.privacy.android.app.arch.BaseRxViewModel
 import mega.privacy.android.app.components.saver.NodeSaver
@@ -46,8 +44,10 @@ import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
 import java.io.*
 import java.net.HttpURLConnection
 import java.net.URL
+import javax.inject.Inject
 
-class TextEditorViewModel @ViewModelInject constructor(
+@HiltViewModel
+class TextEditorViewModel @Inject constructor(
     @MegaApi private val megaApi: MegaApiAndroid,
     @MegaApiFolder private val megaApiFolder: MegaApiAndroid,
     private val megaChatApi: MegaChatApiAndroid
