@@ -1,6 +1,7 @@
 package mega.privacy.android.app.mediaplayer.trackinfo
 
 import android.content.Context
+import android.util.Log
 import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -8,6 +9,7 @@ import com.google.android.exoplayer2.*
 import com.google.android.exoplayer2.trackselection.DefaultTrackSelector
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
+import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.core.Completable
 import io.reactivex.rxjava3.schedulers.Schedulers
 import mega.privacy.android.app.DatabaseHandler
@@ -52,6 +54,9 @@ class TrackInfoViewModel @Inject constructor(
 
     private var trackInfoArgs: TrackInfoFragmentArgs? = null
     private var metadataOnlyPlayer: Player? = null
+
+    private val _offlineRemoveSnackBarShow = MutableLiveData<Boolean>()
+    val offlineRemoveSnackBarShow: LiveData<Boolean> = _offlineRemoveSnackBarShow
 
     private val createThumbnailRequest = MegaRequestFinishListener({
         _nodeInfo.notifyObserver()
@@ -199,7 +204,7 @@ class TrackInfoViewModel @Inject constructor(
                     } else {
                         val node = megaApi.getNodeByHandle(args.handle) ?: return@Callable
                         val offlineParent =
-                            getOfflineParentFile(context, args.adapterType, node, megaApi)
+                            getOfflineParentFile(activity, args.adapterType, node, megaApi)
 
                         if (isFileAvailable(offlineParent)) {
                             val offlineFile = File(offlineParent, node.name)
@@ -228,7 +233,10 @@ class TrackInfoViewModel @Inject constructor(
                     }
                 })
                 .subscribeOn(Schedulers.io())
-                .subscribe(IGNORE, logErr("TrackInfoViewModel toggleAvailableOffline"))
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe({
+                    _offlineRemoveSnackBarShow.value = !available
+                }, logErr("TrackInfoViewModel toggleAvailableOffline"))
         )
     }
 

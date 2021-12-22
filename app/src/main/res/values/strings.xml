@@ -4176,4 +4176,8 @@
     <string name="disable_versioning_warning">Our file versioning feature ensures that we keep older copies of your files around if you replace them with newer versions. If you disable File Versioning you will no longer have this protection; the old copy will be lost when you replace it.</string>
     <!-- Warning informing the user the folder location is trying to open no longer exists. -->
     <string name="location_not_exist">This location no longer exists.</string>
+    <!-- Message when file available offline. -->
+    <string name="file_available_offline">File available Offline</string>
+    <!-- Message when file removed from offline. -->
+    <string name="file_removed_offline">File removed from Offline</string>
 </resources>
