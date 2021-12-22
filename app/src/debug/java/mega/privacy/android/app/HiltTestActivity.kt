@@ -88,7 +88,7 @@ class  TestActivityModule{
             get() = TODO("Not yet implemented")
         override var openSettingsStartScreen: Boolean
             get() = TODO("Not yet implemented")
-            set(value) {}
+            set(_) {}
         override val openSettingsQR: Boolean
             get() = TODO("Not yet implemented")
         override val openSettingsStorage: Boolean

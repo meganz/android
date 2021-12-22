@@ -344,8 +344,7 @@ class SettingsFragment : Preference.OnPreferenceChangeListener,
      * Refresh the Camera Uploads service settings depending on the service status.
      */
     override fun refreshCameraUploadsSettings() {
-        var isCameraUploadOn = false
-        isCameraUploadOn = viewModel.isCamSyncEnabled
+        var isCameraUploadOn = viewModel.isCamSyncEnabled
         findPreference<Preference>(KEY_FEATURES_CAMERA_UPLOAD)?.summary =
             getString(if (isCameraUploadOn) R.string.mute_chat_notification_option_on else R.string.mute_chatroom_notification_option_off)
     }

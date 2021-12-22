@@ -19,10 +19,12 @@ import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.components.ActivityRetainedComponent
+import dagger.hilt.android.components.ViewModelComponent
 import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
 import dagger.hilt.android.testing.HiltTestApplication
 import dagger.hilt.android.testing.UninstallModules
+import dagger.hilt.components.SingletonComponent
 import mega.privacy.android.app.R
 import mega.privacy.android.app.TestActivityModule
 import mega.privacy.android.app.activities.settingsActivities.FileManagementPreferencesActivity
@@ -60,7 +62,7 @@ class SettingsFragmentTest {
     var hiltRule = HiltAndroidRule(this)
 
     @Module
-    @InstallIn(ActivityRetainedComponent::class)
+    @InstallIn(SingletonComponent::class)
     object TestSettingsModule {
         val canDeleteAccount = mock<CanDeleteAccount>()
         val getStartScreen = mock<GetStartScreen>()
@@ -348,7 +350,7 @@ class SettingsFragmentTest {
 
     @Suppress
     @Test
-    fun test_that_when_fragment_is_launched_and_open_storage_is_true_storage_activity_is_launched() {
+    fun test_that_when_fragment_is_launched_and_openSettingsStorage_is_true_FileManagementPreferencesActivity_is_launched() {
         whenever(TestSettingsModule.settingsActivity.openSettingsStorage).thenReturn(true)
         intending(
             hasComponent(
@@ -374,7 +376,7 @@ class SettingsFragmentTest {
     }
 
     @Test
-    fun test_that_when_fragment_is_launched_and_start_setting_screen_is_true_start_settings_screen_activity_is_launched() {
+    fun test_that_when_fragment_is_launched_and_openSettingsStartScreen_is_true_StartScreenPreferencesActivity_is_launched() {
         whenever(TestSettingsModule.settingsActivity.openSettingsStartScreen).thenReturn(true)
         intending(
             hasComponent(
