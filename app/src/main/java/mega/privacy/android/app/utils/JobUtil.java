@@ -39,8 +39,8 @@ public class JobUtil {
 
     public static volatile boolean hasStartedCU;
 
-    private static final String CAMERA_UPLOAD_TAG = "CAMERA_UPLOAD_TAG";
-    private static final String HEART_BEAT_TAG = "HEART_BEAT_TAG";
+    public static final String CAMERA_UPLOAD_TAG = "CAMERA_UPLOAD_TAG";
+    public static final String HEART_BEAT_TAG = "HEART_BEAT_TAG";
 
     /**
      * Schedule job of camera upload

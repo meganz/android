@@ -443,6 +443,8 @@ public class SettingsCameraUploadsFragment extends SettingsBaseFragment {
      * and UI related process
      */
     public void disableCameraUpload() {
+        CuSyncManager.INSTANCE.stopCameraUploadWork(this.getContext());
+        CuSyncManager.INSTANCE.stopRegularCuSyncHeartbeatWork(this.getContext());
         disableCameraUploadSettingProcess();
         disableCameraUploadUIProcess();
     }
