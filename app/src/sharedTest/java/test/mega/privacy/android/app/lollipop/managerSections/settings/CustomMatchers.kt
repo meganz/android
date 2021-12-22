@@ -8,6 +8,14 @@ import org.hamcrest.Description
 import org.hamcrest.Matcher
 import kotlin.math.ceil
 
+
+/**
+ * A helper function that returns a view matcher for Espresso tests that matches a view
+ * containing text with the specified alpha value
+ *
+ * @param expectedAlpha expressed as a double value from 0.0 to 1.0
+ * @return the View matcher
+ */
 fun withTextColorAlpha(expectedAlpha: Double): Matcher<View?> {
     val fullAlpha = 255
     return object : BoundedMatcher<View?, TextView>(TextView::class.java) {
@@ -22,7 +30,7 @@ fun withTextColorAlpha(expectedAlpha: Double): Matcher<View?> {
 
         override fun describeMismatch(item: Any?, description: Description?) {
             super.describeMismatch(item, description)
-            description?.appendText("Expected alpha of $expectedAlpha, but found ${fullAlpha/(item as TextView).currentTextColor.alpha}" )
+            description?.appendText("Expected alpha of $expectedAlpha, but found ${fullAlpha / (item as TextView).currentTextColor.alpha}")
         }
     }
 }
