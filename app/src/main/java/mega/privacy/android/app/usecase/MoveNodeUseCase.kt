@@ -4,7 +4,7 @@ import io.reactivex.rxjava3.core.Single
 import mega.privacy.android.app.R
 import mega.privacy.android.app.di.MegaApi
 import mega.privacy.android.app.listeners.OptionalMegaRequestListenerInterface
-import mega.privacy.android.app.usecase.data.MoveActionResult
+import mega.privacy.android.app.usecase.data.MoveRequestResult
 import mega.privacy.android.app.utils.Constants.INVALID_VALUE
 import mega.privacy.android.app.utils.DBUtil
 import mega.privacy.android.app.utils.StringResourcesUtils.getQuantityString
@@ -31,7 +31,7 @@ class MoveNodeUseCase @Inject constructor(
      * @param newParentHandle   Parent MegaNode handle in which the nodes have to be moved.
      * @return The movement.
      */
-    fun move(handles: LongArray, newParentHandle: Long): Single<MoveActionResult> =
+    fun move(handles: LongArray, newParentHandle: Long): Single<MoveRequestResult> =
         Single.create { emitter ->
             val count = handles.size
             var pending = count
@@ -52,10 +52,10 @@ class MoveNodeUseCase @Inject constructor(
 
                         val result = when {
                             foreignNode -> {
-                                MoveActionResult(allSuccess = false, isForeignNode = true)
+                                MoveRequestResult(allSuccess = false, isForeignNode = true)
                             }
                             count == 1 && success == 1 -> {
-                                MoveActionResult(
+                                MoveRequestResult(
                                     isSingleAction = true,
                                     oldParent = oldParentHandle,
                                     newParent = newParentHandle,
@@ -63,7 +63,7 @@ class MoveNodeUseCase @Inject constructor(
                                 )
                             }
                             count == 1 && errors == 1 -> {
-                                MoveActionResult(
+                                MoveRequestResult(
                                     isSingleAction = true,
                                     oldParent = oldParentHandle,
                                     resultText = getString(R.string.context_no_moved),
@@ -71,7 +71,7 @@ class MoveNodeUseCase @Inject constructor(
                                 )
                             }
                             errors == 0 -> {
-                                MoveActionResult(
+                                MoveRequestResult(
                                     oldParent = oldParentHandle,
                                     newParent = newParentHandle,
                                     resultText = getString(R.string.number_correctly_moved)
@@ -81,7 +81,7 @@ class MoveNodeUseCase @Inject constructor(
                                 val result = getString(R.string.number_correctly_moved, success) +
                                         getString(R.string.number_incorrectly_moved, error)
 
-                                MoveActionResult(
+                                MoveRequestResult(
                                     oldParent = oldParentHandle,
                                     newParent = newParentHandle,
                                     resultText = result,
@@ -114,7 +114,7 @@ class MoveNodeUseCase @Inject constructor(
      * @param handles   List of MegaNode handles to move.
      * @return The movement result.
      */
-    fun moveToRubbishBin(handles: List<Long>): Single<MoveActionResult> =
+    fun moveToRubbishBin(handles: List<Long>): Single<MoveRequestResult> =
         Single.create { emitter ->
             val count = handles.size
             var pending = count
@@ -135,11 +135,11 @@ class MoveNodeUseCase @Inject constructor(
 
                         val result = when {
                             foreignNode -> {
-                                MoveActionResult(allSuccess = false, isForeignNode = true)
+                                MoveRequestResult(allSuccess = false, isForeignNode = true)
                             }
                             count == 1 && success == 1 -> {
                                 DBUtil.resetAccountDetailsTimeStamp()
-                                MoveActionResult(
+                                MoveRequestResult(
                                     isSingleAction = true,
                                     oldParent = oldParentHandle,
                                     newParent = megaApi.rubbishNode.handle,
@@ -147,7 +147,7 @@ class MoveNodeUseCase @Inject constructor(
                                 )
                             }
                             count == 1 && errors == 1 -> {
-                                MoveActionResult(
+                                MoveRequestResult(
                                     isSingleAction = true,
                                     oldParent = oldParentHandle,
                                     resultText = getString(R.string.context_no_moved),
@@ -156,7 +156,7 @@ class MoveNodeUseCase @Inject constructor(
                             }
                             errors == 0 -> {
                                 DBUtil.resetAccountDetailsTimeStamp()
-                                MoveActionResult(
+                                MoveRequestResult(
                                     oldParent = oldParentHandle,
                                     newParent = megaApi.rubbishNode.handle,
                                     resultText = getQuantityString(
@@ -167,7 +167,7 @@ class MoveNodeUseCase @Inject constructor(
                                 )
                             }
                             success == 0 -> {
-                                MoveActionResult(
+                                MoveRequestResult(
                                     oldParent = oldParentHandle,
                                     resultText = getQuantityString(
                                         R.plurals.number_incorrectly_moved_to_rubbish,
@@ -179,7 +179,7 @@ class MoveNodeUseCase @Inject constructor(
                             }
                             errors == 1 && success == 1 -> {
                                 DBUtil.resetAccountDetailsTimeStamp()
-                                MoveActionResult(
+                                MoveRequestResult(
                                     oldParent = oldParentHandle,
                                     newParent = megaApi.rubbishNode.handle,
                                     resultText =
@@ -189,7 +189,7 @@ class MoveNodeUseCase @Inject constructor(
                             }
                             errors == 1 -> {
                                 DBUtil.resetAccountDetailsTimeStamp()
-                                MoveActionResult(
+                                MoveRequestResult(
                                     oldParent = oldParentHandle,
                                     newParent = megaApi.rubbishNode.handle,
                                     resultText = getString(
@@ -201,7 +201,7 @@ class MoveNodeUseCase @Inject constructor(
                             }
                             success == 1 -> {
                                 DBUtil.resetAccountDetailsTimeStamp()
-                                MoveActionResult(
+                                MoveRequestResult(
                                     oldParent = oldParentHandle,
                                     newParent = megaApi.rubbishNode.handle,
                                     resultText = getString(
@@ -213,7 +213,7 @@ class MoveNodeUseCase @Inject constructor(
                             }
                             else -> {
                                 DBUtil.resetAccountDetailsTimeStamp()
-                                MoveActionResult(
+                                MoveRequestResult(
                                     oldParent = oldParentHandle,
                                     newParent = megaApi.rubbishNode.handle,
                                     resultText = getString(
@@ -249,7 +249,7 @@ class MoveNodeUseCase @Inject constructor(
      * @param nodes List of MegaNode to restore.
      * @return The restoration result.
      */
-    fun restore(nodes: List<MegaNode>): Single<MoveActionResult> =
+    fun restore(nodes: List<MegaNode>): Single<MoveRequestResult> =
         Single.create { emitter ->
             val count = nodes.size
             var pending = count
@@ -270,12 +270,12 @@ class MoveNodeUseCase @Inject constructor(
 
                         val result = when {
                             foreignNode -> {
-                                MoveActionResult(allSuccess = false, isForeignNode = true)
+                                MoveRequestResult(allSuccess = false, isForeignNode = true)
                             }
                             count == 1 && success == 1 -> {
                                 DBUtil.resetAccountDetailsTimeStamp()
                                 val destination = megaApi.getNodeByHandle(request.parentHandle)
-                                MoveActionResult(
+                                MoveRequestResult(
                                     isSingleAction = true,
                                     oldParent = oldParentHandle,
                                     newParent = megaApi.rubbishNode.handle,
@@ -286,7 +286,7 @@ class MoveNodeUseCase @Inject constructor(
                                 )
                             }
                             count == 1 && errors == 1 -> {
-                                MoveActionResult(
+                                MoveRequestResult(
                                     isSingleAction = true,
                                     oldParent = oldParentHandle,
                                     resultText = getString(R.string.context_no_restored),
@@ -296,7 +296,7 @@ class MoveNodeUseCase @Inject constructor(
 
                             errors == 0 -> {
                                 DBUtil.resetAccountDetailsTimeStamp()
-                                MoveActionResult(
+                                MoveRequestResult(
                                     oldParent = oldParentHandle,
                                     newParent = megaApi.rubbishNode.handle,
                                     resultText = getQuantityString(
@@ -307,7 +307,7 @@ class MoveNodeUseCase @Inject constructor(
                                 )
                             }
                             success == 0 -> {
-                                MoveActionResult(
+                                MoveRequestResult(
                                     oldParent = oldParentHandle,
                                     resultText = getQuantityString(
                                         R.plurals.number_incorrectly_restored_from_rubbish,
@@ -320,7 +320,7 @@ class MoveNodeUseCase @Inject constructor(
                             }
                             errors == 1 && success == 1 -> {
                                 DBUtil.resetAccountDetailsTimeStamp()
-                                MoveActionResult(
+                                MoveRequestResult(
                                     oldParent = oldParentHandle,
                                     newParent = megaApi.rubbishNode.handle,
                                     resultText =
@@ -330,7 +330,7 @@ class MoveNodeUseCase @Inject constructor(
                             }
                             errors == 1 -> {
                                 DBUtil.resetAccountDetailsTimeStamp()
-                                MoveActionResult(
+                                MoveRequestResult(
                                     oldParent = oldParentHandle,
                                     newParent = megaApi.rubbishNode.handle,
                                     resultText = getString(
@@ -342,7 +342,7 @@ class MoveNodeUseCase @Inject constructor(
                             }
                             success == 1 -> {
                                 DBUtil.resetAccountDetailsTimeStamp()
-                                MoveActionResult(
+                                MoveRequestResult(
                                     oldParent = oldParentHandle,
                                     newParent = megaApi.rubbishNode.handle,
                                     resultText = getString(
@@ -354,7 +354,7 @@ class MoveNodeUseCase @Inject constructor(
                             }
                             else -> {
                                 DBUtil.resetAccountDetailsTimeStamp()
-                                MoveActionResult(
+                                MoveRequestResult(
                                     oldParent = oldParentHandle,
                                     newParent = megaApi.rubbishNode.handle,
                                     resultText = getString(

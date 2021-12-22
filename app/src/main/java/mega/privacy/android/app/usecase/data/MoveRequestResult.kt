@@ -12,7 +12,7 @@ import mega.privacy.android.app.utils.Constants.INVALID_VALUE
  * @property isForeignNode  True if should show a foreign storage over quota warning, false otherwise.
  * @property allSuccess     True if all requests finished with success, false otherwise.
  */
-data class MoveActionResult(
+data class MoveRequestResult(
     val isSingleAction: Boolean = false,
     val oldParent: Long = INVALID_VALUE.toLong(),
     val newParent: Long = INVALID_VALUE.toLong(),

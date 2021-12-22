@@ -6288,28 +6288,45 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
     	showSnackbar(type, fragmentContainer, content, chatId);
 	}
 
+	/**
+	 * Restores a list of nodes from Rubbish Bin to their original parent.
+	 *
+	 * @param nodes	List of nodes.
+	 */
 	public void restoreFromRubbish(final List<MegaNode> nodes) {
 		moveNodeUseCase.restore(nodes)
 				.subscribeOn(Schedulers.io())
 				.observeOn(AndroidSchedulers.mainThread())
 				.subscribe((result, throwable) -> {
-					if (throwable != null) {
-						return;
-					}
+					if (throwable == null) {
+						boolean notValidView = result.isSingleAction() && result.getAllSuccess()
+								&& parentHandleRubbish == nodes.get(0).getHandle();
 
-					if (result.isSingleAction() && result.getAllSuccess()
-							&& parentHandleRubbish == nodes.get(0).getHandle()) {
-						parentHandleRubbish = INVALID_HANDLE;
-						setToolbarTitle();
-						refreshRubbishBin();
-					}
-
-					if (result.isForeignNode()) {
-						showForeignStorageOverQuotaWarningDialog(this);
-					} else {
-						showSnackbar(SNACKBAR_TYPE, result.getResultText(), MEGACHAT_INVALID_HANDLE);
+						finishRestoreOrRemoveRubbishAction(notValidView, result.isForeignNode(),
+								result.getResultText());
 					}
 				});
+	}
+
+	/**
+	 * Shows the final result of a restoration or removal from Rubbish Bin section.
+	 *
+	 * @param notValidView  True if should update the view, false otherwise.
+	 * @param isForeignNode True if should show a foreign warning, false otherwise.
+	 * @param message       Text message to show as the request result.
+	 */
+	private void finishRestoreOrRemoveRubbishAction(boolean notValidView, boolean isForeignNode, String message) {
+		if (notValidView) {
+			parentHandleRubbish = INVALID_HANDLE;
+			setToolbarTitle();
+			refreshRubbishBin();
+		}
+
+		if (isForeignNode) {
+			showForeignStorageOverQuotaWarningDialog(this);
+		} else {
+			showSnackbar(SNACKBAR_TYPE, message, MEGACHAT_INVALID_HANDLE);
+		}
 	}
 
 	public void showRenameDialog(final MegaNode document){
@@ -6432,7 +6449,12 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 									.observeOn(AndroidSchedulers.mainThread())
 									.subscribe((result, throwable) -> {
 										if (throwable == null) {
-											showSnackbar(SNACKBAR_TYPE, result.getResultText(), MEGACHAT_INVALID_HANDLE);
+											boolean notValidView = result.isSingleAction()
+													&& result.getAllSuccess()
+													&& parentHandleRubbish == handleList.get(0);
+
+											finishRestoreOrRemoveRubbishAction(notValidView, false,
+													result.getResultText());
 										}
 									}));
 
