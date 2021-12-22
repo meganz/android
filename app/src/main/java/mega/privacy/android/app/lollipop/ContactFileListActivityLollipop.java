@@ -56,6 +56,7 @@ import mega.privacy.android.app.lollipop.controllers.NodeController;
 import mega.privacy.android.app.modalbottomsheet.ContactFileListBottomSheetDialogFragment;
 import mega.privacy.android.app.modalbottomsheet.UploadBottomSheetDialogFragment;
 import mega.privacy.android.app.usecase.MoveNodeUseCase;
+import mega.privacy.android.app.usecase.data.MoveRequestResult;
 import mega.privacy.android.app.utils.AlertDialogUtil;
 import mega.privacy.android.app.utils.AlertsAndWarnings;
 import mega.privacy.android.app.utils.MegaNodeDialogUtil;
@@ -530,18 +531,32 @@ public class ContactFileListActivityLollipop extends PasscodeActivity
 				.subscribeOn(Schedulers.io())
 				.observeOn(AndroidSchedulers.mainThread())
 				.subscribe((result, throwable) -> {
-					if (throwable != null) {
-						return;
-					}
-
-					actionConfirmed();
-
-					if (result.isForeignNode()) {
-						showForeignStorageOverQuotaWarningDialog(this);
-					} else {
-						showSnackbar(SNACKBAR_TYPE, result.getResultText(), MEGACHAT_INVALID_HANDLE);
+					if (throwable == null) {
+						showMovementResult(result, handleList.get(0));
 					}
 				});
+	}
+
+	/**
+	 * Shows the final result of a movement request.
+	 *
+	 * @param result Object containing the request result.
+	 * @param handle Handle of the node to mode.
+	 */
+	private void showMovementResult(MoveRequestResult result, long handle) {
+		AlertDialogUtil.dismissAlertDialogIfExists(statusDialog);
+		actionConfirmed();
+
+		if (result.isSingleAction() && result.getAllSuccess() &&  parentHandle == handle) {
+			onBackPressed();
+			setTitleActionBar(megaApi.getNodeByHandle(parentHandle).getName());
+		}
+
+		if (result.isForeignNode()) {
+			showForeignStorageOverQuotaWarningDialog(this);
+		} else {
+			showSnackbar(SNACKBAR_TYPE, result.getResultText(), MEGACHAT_INVALID_HANDLE);
+		}
 	}
 
 	public void showMoveLollipop(ArrayList<Long> handleList) {
@@ -644,18 +659,8 @@ public class ContactFileListActivityLollipop extends PasscodeActivity
 					.subscribeOn(Schedulers.io())
 					.observeOn(AndroidSchedulers.mainThread())
 					.subscribe((result, throwable) -> {
-						if (throwable != null) {
-							return;
-						}
-
-						actionConfirmed();
-
-						AlertDialogUtil.dismissAlertDialogIfExists(statusDialog);
-
-						if (result.isForeignNode()) {
-							showForeignStorageOverQuotaWarningDialog(this);
-						} else {
-							showSnackbar(SNACKBAR_TYPE, result.getResultText(), MEGACHAT_INVALID_HANDLE);
+						if (throwable == null) {
+							showMovementResult(result, moveHandles[0]);
 						}
 					});
 		} else if (requestCode == REQUEST_CODE_GET && resultCode == RESULT_OK) {
