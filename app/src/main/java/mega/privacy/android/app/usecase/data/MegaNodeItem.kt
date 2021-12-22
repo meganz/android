@@ -7,6 +7,7 @@ import nz.mega.sdk.MegaNode
  *
  * @property node               MegaNode itself
  * @property infoText           Node information preformatted text
+ * @property hasReadAccess      Flag indicating if current user can read the node.
  * @property hasReadWriteAccess Flag indicating if current user can read and write the node.
  * @property hasFullAccess      Flag indicating if current user has full permissions over the node.
  * @property hasOwnerAccess     Flag indicating if current user is the owner of the node.
@@ -21,6 +22,7 @@ data class MegaNodeItem constructor(
     val name: String,
     val handle: Long,
     val infoText: String,
+    val hasReadAccess: Boolean,
     val hasReadWriteAccess: Boolean,
     val hasFullAccess: Boolean,
     val hasOwnerAccess: Boolean,
@@ -31,9 +33,4 @@ data class MegaNodeItem constructor(
     val hasVersions: Boolean,
     val isAvailableOffline: Boolean,
     val node: MegaNode? = null
-) {
-
-    fun hasWriteAccess(): Boolean = hasReadWriteAccess || hasAllAccess()
-
-    fun hasAllAccess(): Boolean = hasFullAccess || hasOwnerAccess
-}
+)

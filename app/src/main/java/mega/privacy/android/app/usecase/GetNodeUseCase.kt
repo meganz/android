@@ -91,13 +91,27 @@ class GetNodeUseCase @Inject constructor(
             val nodeDateText = TimeUtils.formatLongDateTime(node.getLastAvailableTime())
             val infoText = TextUtil.getFileInfo(nodeSizeText, nodeDateText)
 
+            var hasReadAccess = false
             var hasReadWriteAccess = false
             var hasFullAccess = false
             var hasOwnerAccess = false
             when (megaApi.getAccess(node)) {
-                MegaShare.ACCESS_READWRITE -> hasReadWriteAccess = true
-                MegaShare.ACCESS_FULL -> hasFullAccess = true
-                MegaShare.ACCESS_OWNER -> hasOwnerAccess = true
+                MegaShare.ACCESS_READ -> hasReadAccess = true
+                MegaShare.ACCESS_READWRITE -> {
+                    hasReadAccess = true
+                    hasReadWriteAccess = true
+                }
+                MegaShare.ACCESS_FULL -> {
+                    hasReadAccess = true
+                    hasReadWriteAccess = true
+                    hasFullAccess = true
+                }
+                MegaShare.ACCESS_OWNER -> {
+                    hasReadAccess = true
+                    hasReadWriteAccess = true
+                    hasFullAccess = true
+                    hasOwnerAccess = true
+                }
             }
 
             val isAvailableOffline = isNodeAvailableOffline(node.handle).blockingGetOrNull() ?: false
@@ -118,6 +132,7 @@ class GetNodeUseCase @Inject constructor(
                 name = node.name,
                 handle = node.handle,
                 infoText = infoText,
+                hasReadAccess = hasReadAccess,
                 hasReadWriteAccess = hasReadWriteAccess,
                 hasFullAccess = hasFullAccess,
                 hasOwnerAccess = hasOwnerAccess,
@@ -154,6 +169,7 @@ class GetNodeUseCase @Inject constructor(
                         name = offlineNode.name,
                         handle = offlineNode.handle.toLong(),
                         infoText = infoText,
+                        hasReadAccess = true,
                         hasReadWriteAccess = false,
                         hasFullAccess = false,
                         hasOwnerAccess = false,

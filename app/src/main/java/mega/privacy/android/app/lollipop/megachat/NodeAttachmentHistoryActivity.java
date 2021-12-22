@@ -66,7 +66,6 @@ import mega.privacy.android.app.components.saver.NodeSaver;
 import mega.privacy.android.app.fragments.settingsFragments.cookie.data.CookieType;
 import mega.privacy.android.app.generalusecase.FilePrepareUseCase;
 import mega.privacy.android.app.imageviewer.ImageViewerActivity;
-import mega.privacy.android.app.imageviewer.usecase.GetImageHandlesUseCase;
 import mega.privacy.android.app.interfaces.SnackbarShower;
 import mega.privacy.android.app.interfaces.StoreDataBeforeForward;
 import mega.privacy.android.app.listeners.CreateChatListener;
@@ -129,8 +128,6 @@ public class NodeAttachmentHistoryActivity extends PasscodeActivity
     public static int NUMBER_MESSAGES_TO_LOAD = 20;
     public static int NUMBER_MESSAGES_BEFORE_LOAD = 8;
 
-    @Inject
-    GetImageHandlesUseCase getImageHandlesUseCase;
     ActionBar aB;
     MaterialToolbar tB;
     NodeAttachmentHistoryActivity nodeAttachmentHistoryActivity = this;

@@ -1,10 +1,10 @@
 package mega.privacy.android.app.imageviewer
 
 import android.app.Activity
-import androidx.hilt.lifecycle.ViewModelInject
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.map
+import dagger.hilt.android.lifecycle.HiltViewModel
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.core.Completable
 import io.reactivex.rxjava3.core.Flowable
@@ -29,6 +29,7 @@ import mega.privacy.android.app.utils.StringResourcesUtils.getQuantityString
 import mega.privacy.android.app.utils.StringResourcesUtils.getString
 import mega.privacy.android.app.utils.livedata.SingleLiveEvent
 import nz.mega.sdk.MegaNode
+import javax.inject.Inject
 
 /**
  * Main ViewModel to handle all logic related to the ImageViewer.
@@ -42,7 +43,8 @@ import nz.mega.sdk.MegaNode
  * @property exportNodeUseCase      Needed to export image node on demand.
  * @property cancelTransferUseCase  Needed to cancel current full image transfer if needed.
  */
-class ImageViewerViewModel @ViewModelInject constructor(
+@HiltViewModel
+class ImageViewerViewModel @Inject constructor(
     private val getImageUseCase: GetImageUseCase,
     private val getImageHandlesUseCase: GetImageHandlesUseCase,
     private val getNodeUseCase: GetNodeUseCase,
@@ -130,11 +132,14 @@ class ImageViewerViewModel @ViewModelInject constructor(
     fun loadSingleNode(nodeHandle: Long, forceReload: Boolean = false) {
         val existingNode = images.value?.find { it.handle == nodeHandle }
         val subscription = when {
-            forceReload || existingNode?.isDirty == true -> {
-                if (existingNode?.nodePublicLink?.isNotBlank() == true) {
-                    getNodeUseCase.getNodeItem(existingNode.nodePublicLink)
-                } else {
-                    getNodeUseCase.getNodeItem(nodeHandle)
+            forceReload || existingNode?.isDirty == true && existingNode.nodeItem?.node != null -> {
+                when {
+                    existingNode?.nodePublicLink?.isNotBlank() == true ->
+                        getNodeUseCase.getNodeItem(existingNode.nodePublicLink)
+                    existingNode?.chatMessageId != null && existingNode.chatRoomId != null ->
+                        getNodeUseCase.getNodeItem(existingNode.chatRoomId, existingNode.chatMessageId)
+                    else ->
+                        getNodeUseCase.getNodeItem(nodeHandle)
                 }
             }
             existingNode?.nodeItem?.node != null ->

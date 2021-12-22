@@ -144,7 +144,7 @@ class ImageBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
                 val favoriteText = if (node.isFavourite) R.string.file_properties_unfavourite else R.string.file_properties_favourite
                 val favoriteDrawable = if (node.isFavourite) R.drawable.ic_remove_favourite else R.drawable.ic_add_favourite
                 optionFavorite.text = StringResourcesUtils.getString(favoriteText)
-                optionFavorite.isVisible = isOnline && nodeItem.hasAllAccess()
+                optionFavorite.isVisible = isOnline && nodeItem.hasFullAccess
                 optionFavorite.setCompoundDrawablesWithIntrinsicBounds(favoriteDrawable, 0, 0, 0)
                 optionFavorite.setOnClickListener {
                     viewModel.markNodeAsFavorite(nodeItem.handle, !node.isFavourite)
@@ -166,7 +166,7 @@ class ImageBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
                 optionLabelCurrent.setTextColor(labelColor)
                 optionLabelCurrent.text = getNodeLabelText(node.label)
                 optionLabelCurrent.isVisible = node.label != MegaNode.NODE_LBL_UNKNOWN
-                optionLabelLayout.isVisible = isOnline && nodeItem.hasAllAccess()
+                optionLabelLayout.isVisible = isOnline && nodeItem.hasFullAccess
                 optionLabelLayout.setOnClickListener {
                     NodeLabelBottomSheetDialogFragment.newInstance(nodeItem.handle).show(childFragmentManager, TAG)
                 }
@@ -203,7 +203,7 @@ class ImageBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
             }
 
             // Offline
-            optionOfflineLayout.isVisible = !nodeItem.isFromRubbishBin && nodeItem.hasAllAccess() && node?.isPublic != true
+            optionOfflineLayout.isVisible = !nodeItem.isFromRubbishBin && nodeItem.hasReadAccess
             switchOffline.isChecked = nodeItem.isAvailableOffline
             val offlineAction = {
                 viewModel.switchNodeOfflineAvailability(requireActivity(), nodeItem)
@@ -238,7 +238,7 @@ class ImageBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
                 (activity as? ImageViewerActivity?)?.attachNode(node!!)
                 dismissAllowingStateLoss()
             }
-            optionSendToContact.isVisible = isOnline && !nodeItem.isFromRubbishBin && nodeItem.hasAllAccess()
+            optionSendToContact.isVisible = isOnline && !nodeItem.isFromRubbishBin && node != null
 
             // Share
             optionShare.isVisible = !nodeItem.isFromRubbishBin && (nodeItem.hasOwnerAccess || !imageItem.nodePublicLink.isNullOrBlank())
@@ -261,13 +261,13 @@ class ImageBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
             optionRename.setOnClickListener {
                 (activity as? ImageViewerActivity?)?.showRenameDialog(node!!)
             }
-            optionRename.isVisible = isOnline && !nodeItem.isFromRubbishBin && nodeItem.hasAllAccess() && node != null
+            optionRename.isVisible = isOnline && !nodeItem.isFromRubbishBin && nodeItem.hasFullAccess && node != null
 
             // Move
             optionMove.setOnClickListener {
                 selectMoveFolderLauncher.launch(longArrayOf(nodeItem.handle))
             }
-            optionMove.isVisible = isOnline && !nodeItem.isFromRubbishBin && nodeItem.hasAllAccess()
+            optionMove.isVisible = isOnline && !nodeItem.isFromRubbishBin && nodeItem.hasFullAccess
 
             // Copy
             optionCopy.setOnClickListener {
@@ -291,7 +291,7 @@ class ImageBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
             optionRestore.isVisible = isOnline && nodeItem.isFromRubbishBin && node != null && node.restoreHandle != INVALID_HANDLE
 
             // Rubbish bin
-            optionRubbishBin.isVisible = isOnline && nodeItem.hasAllAccess()
+            optionRubbishBin.isVisible = isOnline && nodeItem.hasFullAccess
             if (nodeItem.isFromRubbishBin) {
                 optionRubbishBin.setText(R.string.general_remove)
             } else {
@@ -327,7 +327,7 @@ class ImageBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
             separatorLabel.isVisible = optionLabelLayout.isVisible
             separatorOpen.isVisible = optionOpenWith.isVisible
             separatorOffline.isVisible = optionOfflineLayout.isVisible
-            separatorShare.isVisible = optionShare.isVisible
+            separatorShare.isVisible = optionShare.isVisible || optionSendToContact.isVisible || optionManageLink.isVisible
             separatorRestore.isVisible = optionRestore.isVisible
             separatorCopy.isVisible = (optionRename.isVisible || optionCopy.isVisible || optionMove.isVisible)
                     && (optionRestore.isVisible || optionRubbishBin.isVisible)
