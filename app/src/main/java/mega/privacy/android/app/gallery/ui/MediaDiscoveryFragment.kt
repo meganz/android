@@ -39,9 +39,9 @@ class MediaDiscoveryFragment : BaseZoomFragment(), GalleryCardAdapter.Listener {
     companion object {
         private var instance: MediaDiscoveryFragment? = null
 
-        fun getInstance():MediaDiscoveryFragment{
-            if (instance == null){
-                instance  = MediaDiscoveryFragment()
+        fun getInstance(): MediaDiscoveryFragment {
+            if (instance == null) {
+                instance = MediaDiscoveryFragment()
             }
             return instance!!
         }
@@ -51,7 +51,7 @@ class MediaDiscoveryFragment : BaseZoomFragment(), GalleryCardAdapter.Listener {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        order =  viewModel.getOrder()
+        order = viewModel.getOrder()
     }
 
     override fun onCreateView(
@@ -72,9 +72,9 @@ class MediaDiscoveryFragment : BaseZoomFragment(), GalleryCardAdapter.Listener {
     }
 
     private fun setupParentActivityUI() {
-        (context as ManagerActivityLollipop).setToolbarTitle()
-        (context as ManagerActivityLollipop).invalidateOptionsMenu()
-        (context as ManagerActivityLollipop).hideFabButton()
+        (activity as ManagerActivityLollipop).setToolbarTitle()
+        (activity as ManagerActivityLollipop).invalidateOptionsMenu()
+        (activity as ManagerActivityLollipop).hideFabButton()
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -126,7 +126,7 @@ class MediaDiscoveryFragment : BaseZoomFragment(), GalleryCardAdapter.Listener {
     private fun subscribeObservers() {
         viewModel.items.observe(viewLifecycleOwner) {
             // Order changed.
-            if(order != viewModel.getOrder()) {
+            if (order != viewModel.getOrder()) {
                 setupListAdapter(getCurrentZoom(), it)
                 order = viewModel.getOrder()
             }
@@ -292,7 +292,7 @@ class MediaDiscoveryFragment : BaseZoomFragment(), GalleryCardAdapter.Listener {
     }
 
     fun loadPhotos() {
-        if(isAdded) viewModel.loadPhotos(true)
+        if (isAdded) viewModel.loadPhotos(true)
     }
 
     /**
@@ -345,12 +345,11 @@ class MediaDiscoveryFragment : BaseZoomFragment(), GalleryCardAdapter.Listener {
     }
 
     override fun onDestroy() {
-        isInMediaDiscovery = false
         instance = null
         super.onDestroy()
     }
 
-    fun onBackPressed(){
-        (context as ManagerActivityLollipop).onBackPressed()
+    fun onBackPressed() {
+        (activity as ManagerActivityLollipop).onBackPressed()
     }
 }

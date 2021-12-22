@@ -722,6 +722,8 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 	private Observer<Boolean> fabChangeObserver  = isShow -> {
 		if (drawerItem == DrawerItem.HOMEPAGE) {
 			controlFabInHomepage(isShow);
+		} else if (MediaDiscoveryFragment.Companion.isInMediaDiscovery()) {
+			hideFabButton();
 		} else {
 			if (initFabButtonShow) {
 				if (isShow) {
@@ -3947,7 +3949,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 			aB.setHomeAsUpIndicator(badgeDrawable);
 		}
 
-        if (MediaDiscoveryFragment.Companion.isInMediaDiscovery()) {
+        if (drawerItem == DrawerItem.CLOUD_DRIVE && MediaDiscoveryFragment.Companion.isInMediaDiscovery()) {
             aB.setHomeAsUpIndicator(tintIcon(this, R.drawable.ic_close_white));
         }
 	}
@@ -4522,7 +4524,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 
 		// Handle Media discovery page behavior
 		if (item != DrawerItem.CLOUD_DRIVE && MediaDiscoveryFragment.Companion.isInMediaDiscovery()){
-			MediaDiscoveryFragment.Companion.getInstance().onDestroy();
+			MediaDiscoveryFragment.Companion.setInMediaDiscovery(false);
 		}
 
     	switch (item){
@@ -6141,7 +6143,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 
 		if (drawerItem == DrawerItem.CLOUD_DRIVE) {
 			if (MediaDiscoveryFragment.Companion.isInMediaDiscovery()){
-				MediaDiscoveryFragment.Companion.getInstance().onDestroy();
+				MediaDiscoveryFragment.Companion.setInMediaDiscovery(false);
 				backToDrawerItem(bottomNavigationCurrentItem);
 			}else{
 				 if (!isCloudAdded() || fbFLol.onBackPressed() == 0) {
