@@ -16,6 +16,12 @@ class GetNodeUseCase @Inject constructor(
     @MegaApi private val megaApi: MegaApiAndroid
 ) {
 
+    /**
+     * Gets a MegaNode if exists.
+     *
+     * @param handle    Handle of the node to get.
+     * @return The MegaNode if exists.
+     */
     fun get(handle: Long): Single<MegaNode> =
         Single.create {emitter ->
             val node = megaApi.getNodeByHandle(handle)
