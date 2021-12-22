@@ -3670,16 +3670,11 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
                 aB.setSubtitle(null);
                 logDebug("Cloud Drive SECTION");
                 MegaNode parentNode = megaApi.getNodeByHandle(parentHandleBrowser);
-                boolean isInMediaDiscovery = MediaDiscoveryFragment.Companion.isInMediaDiscovery();
                 if (parentNode != null) {
                     if (megaApi.getRootNode() != null) {
                         if (parentNode.getHandle() == megaApi.getRootNode().getHandle() || parentHandleBrowser == -1) {
                             aB.setTitle(getString(R.string.section_cloud_drive).toUpperCase());
-                            if(isInMediaDiscovery){
-								firstNavigationLevel = false;
-							}else{
-								firstNavigationLevel = true;
-							}
+                            firstNavigationLevel = true;
                         }
                         else {
                             aB.setTitle(parentNode.getName());
@@ -3925,11 +3920,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 				}
 			}
 			else{
-				if (MediaDiscoveryFragment.Companion.isInMediaDiscovery()){
-					aB.setHomeAsUpIndicator(tintIcon(this, R.drawable.ic_close_white));
-				} else {
-					aB.setHomeAsUpIndicator(tintIcon(this, R.drawable.ic_arrow_back_white));
-				}
+                aB.setHomeAsUpIndicator(tintIcon(this, R.drawable.ic_arrow_back_white));
 			}
 		}
 		else{
@@ -3955,6 +3946,10 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 
 			aB.setHomeAsUpIndicator(badgeDrawable);
 		}
+
+        if (MediaDiscoveryFragment.Companion.isInMediaDiscovery()) {
+            aB.setHomeAsUpIndicator(tintIcon(this, R.drawable.ic_close_white));
+        }
 	}
 
 	public void showOnlineMode(){
