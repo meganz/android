@@ -8286,14 +8286,8 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 					.subscribeOn(Schedulers.io())
 					.observeOn(AndroidSchedulers.mainThread())
 					.subscribe((result, throwable) -> {
-						if (throwable != null) {
-							return;
-						}
-
-						if (result.isForeignNode()) {
-							showForeignStorageOverQuotaWarningDialog(this);
-						} else {
-							showSnackbar(SNACKBAR_TYPE, result.getResultText(), MEGACHAT_INVALID_HANDLE);
+						if (throwable == null) {
+							showMovementResult(result, moveHandles[0]);
 						}
 					});
 
