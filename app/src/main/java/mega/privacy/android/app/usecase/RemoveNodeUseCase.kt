@@ -4,9 +4,11 @@ import io.reactivex.rxjava3.core.Single
 import mega.privacy.android.app.R
 import mega.privacy.android.app.di.MegaApi
 import mega.privacy.android.app.listeners.OptionalMegaRequestListenerInterface
+import mega.privacy.android.app.usecase.data.RemoveActionResult
 import mega.privacy.android.app.utils.DBUtil
 import mega.privacy.android.app.utils.StringResourcesUtils.*
 import nz.mega.sdk.MegaApiAndroid
+import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaError.API_EMASTERONLY
 import javax.inject.Inject
@@ -25,7 +27,7 @@ class RemoveNodeUseCase @Inject constructor(
      * @param handles   List of MegaNode handles to remove.
      * @return The removal result.
      */
-    fun remove(handles: List<Long>): Single<String> =
+    fun remove(handles: List<Long>): Single<RemoveActionResult> =
         Single.create { emitter ->
             val count = handles.size
             var pending = count
@@ -38,30 +40,47 @@ class RemoveNodeUseCase @Inject constructor(
 
                     if (pending == 0) {
                         val errors = count - success
-                        val message: String = when {
+                        val result = when {
                             count == 1 && success == 1 -> {
                                 DBUtil.resetAccountDetailsTimeStamp()
-                                getString(R.string.context_correctly_removed)
+                                RemoveActionResult(
+                                    singleAction = true,
+                                    resultText = getString(R.string.context_correctly_removed)
+                                )
                             }
                             count == 1 && errors == 1 -> {
-                                if (error.errorCode == API_EMASTERONLY) {
-                                    getTranslatedErrorString(error)
-                                } else {
-                                    getString(R.string.context_no_removed)
-                                }
+                                RemoveActionResult(
+                                    resultText = if (error.errorCode == API_EMASTERONLY) {
+                                        getTranslatedErrorString(error)
+                                    } else {
+                                        getString(R.string.context_no_removed)
+                                    },
+                                    allSuccess = false
+                                )
                             }
                             errors == 0 -> {
                                 DBUtil.resetAccountDetailsTimeStamp()
-                                getString(R.string.number_correctly_removed, success)
+                                RemoveActionResult(
+                                    resultText = getString(
+                                        R.string.number_correctly_removed,
+                                        success
+                                    )
+                                )
+
                             }
                             else -> {
                                 DBUtil.resetAccountDetailsTimeStamp()
-                                getString(R.string.number_correctly_removed, success) +
+                                val result = getString(R.string.number_correctly_removed, success) +
                                         getString(R.string.number_no_removed, errors)
+
+                                RemoveActionResult(
+                                    resultText = result,
+                                    allSuccess = false
+                                )
                             }
                         }
 
-                        emitter.onSuccess(message)
+                        emitter.onSuccess(result)
                     }
                 })
 

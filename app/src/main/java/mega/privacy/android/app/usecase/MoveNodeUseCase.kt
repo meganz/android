@@ -4,6 +4,8 @@ import io.reactivex.rxjava3.core.Single
 import mega.privacy.android.app.R
 import mega.privacy.android.app.di.MegaApi
 import mega.privacy.android.app.listeners.OptionalMegaRequestListenerInterface
+import mega.privacy.android.app.usecase.data.MoveActionResult
+import mega.privacy.android.app.utils.Constants.INVALID_VALUE
 import mega.privacy.android.app.utils.DBUtil
 import mega.privacy.android.app.utils.StringResourcesUtils.getQuantityString
 import mega.privacy.android.app.utils.StringResourcesUtils.getString
@@ -25,15 +27,16 @@ class MoveNodeUseCase @Inject constructor(
     /**
      * Moves nodes to a new location.
      *
-     * @param handles       List of MegaNode handles to move.
-     * @param parentHandle  Parent MegaNode handle in which the nodes have to be moved.
+     * @param handles           List of MegaNode handles to move.
+     * @param newParentHandle   Parent MegaNode handle in which the nodes have to be moved.
      * @return The movement.
      */
-    fun move(handles: LongArray, parentHandle: Long): Single<String> =
+    fun move(handles: LongArray, newParentHandle: Long): Single<MoveActionResult> =
         Single.create { emitter ->
             val count = handles.size
             var pending = count
             var success = 0
+            var oldParentHandle = INVALID_VALUE.toLong()
             val listener =
                 OptionalMegaRequestListenerInterface(onRequestFinish = { request, error ->
                     if (error.errorCode == API_OK) {
@@ -45,27 +48,48 @@ class MoveNodeUseCase @Inject constructor(
                         val foreignNode =
                             error.errorCode == API_EOVERQUOTA && megaApi.isForeignNode(request.parentHandle)
 
-                        val message: String = when {
+                        val result = when {
+                            foreignNode -> {
+                                MoveActionResult(allSuccess = false, isForeignNode = true)
+                            }
                             count == 1 && success == 1 -> {
-                                getString(R.string.context_correctly_moved)
+                                MoveActionResult(
+                                    singleAction = true,
+                                    oldParent = oldParentHandle,
+                                    newParent = newParentHandle,
+                                    resultText = getString(R.string.context_correctly_moved)
+                                )
                             }
                             count == 1 && errors == 1 -> {
-                                if (foreignNode) "" else getString(R.string.context_no_moved)
+                                MoveActionResult(
+                                    singleAction = true,
+                                    oldParent = oldParentHandle,
+                                    resultText = getString(R.string.context_no_moved),
+                                    allSuccess = false
+                                )
                             }
                             errors == 0 -> {
-                                getString(R.string.number_correctly_moved)
-                            }
-                            foreignNode -> {
-                                ""
+                                MoveActionResult(
+                                    oldParent = oldParentHandle,
+                                    newParent = newParentHandle,
+                                    resultText = getString(R.string.number_correctly_moved)
+                                )
                             }
                             else -> {
-                                getString(R.string.number_correctly_moved, success) +
+                                val result = getString(R.string.number_correctly_moved, success) +
                                         getString(R.string.number_incorrectly_moved, error)
+
+                                MoveActionResult(
+                                    oldParent = oldParentHandle,
+                                    newParent = newParentHandle,
+                                    resultText = result,
+                                    allSuccess = false
+                                )
                             }
                         }
 
                         DBUtil.resetAccountDetailsTimeStamp()
-                        emitter.onSuccess(message)
+                        emitter.onSuccess(result)
                     }
                 })
 
@@ -77,7 +101,8 @@ class MoveNodeUseCase @Inject constructor(
                     continue
                 }
 
-                megaApi.moveNode(node, megaApi.getNodeByHandle(parentHandle), listener)
+                oldParentHandle = node.parentHandle
+                megaApi.moveNode(node, megaApi.getNodeByHandle(newParentHandle), listener)
             }
         }
 
@@ -87,11 +112,12 @@ class MoveNodeUseCase @Inject constructor(
      * @param handles   List of MegaNode handles to move.
      * @return The movement result.
      */
-    fun moveToRubbishBin(handles: List<Long>): Single<String> =
+    fun moveToRubbishBin(handles: List<Long>): Single<MoveActionResult> =
         Single.create { emitter ->
             val count = handles.size
             var pending = count
             var success = 0
+            var oldParentHandle = INVALID_VALUE.toLong()
             val listener =
                 OptionalMegaRequestListenerInterface(onRequestFinish = { request, error ->
                     if (error.errorCode == API_OK) {
@@ -103,58 +129,100 @@ class MoveNodeUseCase @Inject constructor(
                         val foreignNode =
                             error.errorCode == API_EOVERQUOTA && megaApi.isForeignNode(request.parentHandle)
 
-                        val message: String = when {
+                        val result = when {
+                            foreignNode -> {
+                                MoveActionResult(allSuccess = false, isForeignNode = true)
+                            }
                             count == 1 && success == 1 -> {
                                 DBUtil.resetAccountDetailsTimeStamp()
-                                getString(R.string.context_correctly_moved_to_rubbish)
+                                MoveActionResult(
+                                    singleAction = true,
+                                    oldParent = oldParentHandle,
+                                    newParent = megaApi.rubbishNode.handle,
+                                    resultText = getString(R.string.context_correctly_moved_to_rubbish)
+                                )
                             }
                             count == 1 && errors == 1 -> {
-                                if (foreignNode) "" else getString(R.string.context_no_moved)
+                                MoveActionResult(
+                                    singleAction = true,
+                                    oldParent = oldParentHandle,
+                                    resultText = getString(R.string.context_no_moved),
+                                    allSuccess = false
+                                )
                             }
                             errors == 0 -> {
                                 DBUtil.resetAccountDetailsTimeStamp()
-                                getQuantityString(
-                                    R.plurals.number_correctly_moved_to_rubbish,
-                                    success,
-                                    success
+                                MoveActionResult(
+                                    oldParent = oldParentHandle,
+                                    newParent = megaApi.rubbishNode.handle,
+                                    resultText = getQuantityString(
+                                        R.plurals.number_correctly_moved_to_rubbish,
+                                        success,
+                                        success
+                                    )
                                 )
                             }
                             success == 0 -> {
-                                getQuantityString(
-                                    R.plurals.number_incorrectly_moved_to_rubbish,
-                                    errors,
-                                    errors
+                                MoveActionResult(
+                                    oldParent = oldParentHandle,
+                                    resultText = getQuantityString(
+                                        R.plurals.number_incorrectly_moved_to_rubbish,
+                                        errors,
+                                        errors
+                                    ),
+                                    allSuccess = false
                                 )
                             }
                             errors == 1 && success == 1 -> {
                                 DBUtil.resetAccountDetailsTimeStamp()
-                                getString(R.string.node_correctly_and_node_incorrectly_moved_to_rubbish)
+                                MoveActionResult(
+                                    oldParent = oldParentHandle,
+                                    newParent = megaApi.rubbishNode.handle,
+                                    resultText =
+                                    getString(R.string.node_correctly_and_node_incorrectly_moved_to_rubbish),
+                                    allSuccess = false
+                                )
                             }
                             errors == 1 -> {
                                 DBUtil.resetAccountDetailsTimeStamp()
-                                getString(
-                                    R.string.nodes_correctly_and_node_incorrectly_moved_to_rubbish,
-                                    success
+                                MoveActionResult(
+                                    oldParent = oldParentHandle,
+                                    newParent = megaApi.rubbishNode.handle,
+                                    resultText = getString(
+                                        R.string.nodes_correctly_and_node_incorrectly_moved_to_rubbish,
+                                        success
+                                    ),
+                                    allSuccess = false
                                 )
                             }
                             success == 1 -> {
                                 DBUtil.resetAccountDetailsTimeStamp()
-                                getString(
-                                    R.string.node_correctly_and_nodes_incorrectly_moved_to_rubbish,
-                                    errors
+                                MoveActionResult(
+                                    oldParent = oldParentHandle,
+                                    newParent = megaApi.rubbishNode.handle,
+                                    resultText = getString(
+                                        R.string.node_correctly_and_nodes_incorrectly_moved_to_rubbish,
+                                        errors
+                                    ),
+                                    allSuccess = false
                                 )
                             }
                             else -> {
                                 DBUtil.resetAccountDetailsTimeStamp()
-                                getString(
-                                    R.string.nodes_correctly_and_nodes_incorrectly_moved_to_rubbish,
-                                    success,
-                                    errors
+                                MoveActionResult(
+                                    oldParent = oldParentHandle,
+                                    newParent = megaApi.rubbishNode.handle,
+                                    resultText = getString(
+                                        R.string.nodes_correctly_and_nodes_incorrectly_moved_to_rubbish,
+                                        success,
+                                        errors
+                                    ),
+                                    allSuccess = false
                                 )
                             }
                         }
 
-                        emitter.onSuccess(message)
+                        emitter.onSuccess(result)
                     }
                 })
 
@@ -166,6 +234,7 @@ class MoveNodeUseCase @Inject constructor(
                     continue
                 }
 
+                oldParentHandle = node.parentHandle
                 megaApi.moveNode(node, megaApi.rubbishNode, listener)
             }
         }
@@ -176,11 +245,12 @@ class MoveNodeUseCase @Inject constructor(
      * @param nodes List of MegaNode to restore.
      * @return The restoration result.
      */
-    fun restore(nodes: List<MegaNode>): Single<String> =
+    fun restore(nodes: List<MegaNode>): Single<MoveActionResult> =
         Single.create { emitter ->
             val count = nodes.size
             var pending = count
             var success = 0
+            var oldParentHandle = INVALID_VALUE.toLong()
             val listener =
                 OptionalMegaRequestListenerInterface(onRequestFinish = { request, error ->
                     if (error.errorCode == API_OK) {
@@ -192,64 +262,106 @@ class MoveNodeUseCase @Inject constructor(
                         val foreignNode =
                             error.errorCode == API_EOVERQUOTA && megaApi.isForeignNode(request.parentHandle)
 
-                        val message: String = when {
+                        val result = when {
+                            foreignNode -> {
+                                MoveActionResult(allSuccess = false, isForeignNode = true)
+                            }
                             count == 1 && success == 1 -> {
                                 DBUtil.resetAccountDetailsTimeStamp()
                                 val destination = megaApi.getNodeByHandle(request.parentHandle)
-                                getString(
-                                    R.string.context_correctly_node_restored,
-                                    destination.name
+                                MoveActionResult(
+                                    singleAction = true,
+                                    oldParent = oldParentHandle,
+                                    newParent = megaApi.rubbishNode.handle,
+                                    resultText = getString(
+                                        R.string.context_correctly_node_restored,
+                                        destination.name
+                                    )
                                 )
                             }
                             count == 1 && errors == 1 -> {
-                                if (foreignNode) "" else getString(R.string.context_no_restored)
+                                MoveActionResult(
+                                    singleAction = true,
+                                    oldParent = oldParentHandle,
+                                    resultText = getString(R.string.context_no_restored),
+                                    allSuccess = false
+                                )
                             }
 
                             errors == 0 -> {
                                 DBUtil.resetAccountDetailsTimeStamp()
-                                getQuantityString(
-                                    R.plurals.number_correctly_restored_from_rubbish,
-                                    success,
-                                    success
+                                MoveActionResult(
+                                    oldParent = oldParentHandle,
+                                    newParent = megaApi.rubbishNode.handle,
+                                    resultText = getQuantityString(
+                                        R.plurals.number_correctly_restored_from_rubbish,
+                                        success,
+                                        success
+                                    )
                                 )
                             }
                             success == 0 -> {
-                                getQuantityString(
-                                    R.plurals.number_incorrectly_restored_from_rubbish,
-                                    errors,
-                                    errors
+                                MoveActionResult(
+                                    oldParent = oldParentHandle,
+                                    resultText = getQuantityString(
+                                        R.plurals.number_incorrectly_restored_from_rubbish,
+                                        errors,
+                                        errors
+                                    ),
+                                    allSuccess = false
                                 )
 
                             }
                             errors == 1 && success == 1 -> {
                                 DBUtil.resetAccountDetailsTimeStamp()
-                                getString(R.string.node_correctly_and_node_incorrectly_restored_from_rubbish)
+                                MoveActionResult(
+                                    oldParent = oldParentHandle,
+                                    newParent = megaApi.rubbishNode.handle,
+                                    resultText =
+                                    getString(R.string.node_correctly_and_node_incorrectly_restored_from_rubbish),
+                                    allSuccess = false
+                                )
                             }
                             errors == 1 -> {
                                 DBUtil.resetAccountDetailsTimeStamp()
-                                getString(
-                                    R.string.nodes_correctly_and_node_incorrectly_restored_from_rubbish,
-                                    success
+                                MoveActionResult(
+                                    oldParent = oldParentHandle,
+                                    newParent = megaApi.rubbishNode.handle,
+                                    resultText = getString(
+                                        R.string.nodes_correctly_and_node_incorrectly_restored_from_rubbish,
+                                        success
+                                    ),
+                                    allSuccess = false
                                 )
                             }
                             success == 1 -> {
                                 DBUtil.resetAccountDetailsTimeStamp()
-                                getString(
-                                    R.string.node_correctly_and_nodes_incorrectly_restored_from_rubbish,
-                                    errors
+                                MoveActionResult(
+                                    oldParent = oldParentHandle,
+                                    newParent = megaApi.rubbishNode.handle,
+                                    resultText = getString(
+                                        R.string.node_correctly_and_nodes_incorrectly_restored_from_rubbish,
+                                        errors
+                                    ),
+                                    allSuccess = false
                                 )
                             }
                             else -> {
                                 DBUtil.resetAccountDetailsTimeStamp()
-                                getString(
-                                    R.string.nodes_correctly_and_nodes_incorrectly_restored_from_rubbish,
-                                    success,
-                                    errors
+                                MoveActionResult(
+                                    oldParent = oldParentHandle,
+                                    newParent = megaApi.rubbishNode.handle,
+                                    resultText = getString(
+                                        R.string.nodes_correctly_and_nodes_incorrectly_restored_from_rubbish,
+                                        success,
+                                        errors
+                                    ),
+                                    allSuccess = false
                                 )
                             }
                         }
 
-                        emitter.onSuccess(message)
+                        emitter.onSuccess(result)
                     }
                 })
 
@@ -261,6 +373,7 @@ class MoveNodeUseCase @Inject constructor(
                     continue
                 }
 
+                oldParentHandle = node.parentHandle
                 megaApi.moveNode(node, parent, listener)
             }
         }

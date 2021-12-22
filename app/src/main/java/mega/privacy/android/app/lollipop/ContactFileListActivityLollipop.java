@@ -536,10 +536,10 @@ public class ContactFileListActivityLollipop extends PasscodeActivity
 
 					actionConfirmed();
 
-					if (result.isEmpty()) {
+					if (result.isForeignNode()) {
 						showForeignStorageOverQuotaWarningDialog(this);
 					} else {
-						showSnackbar(SNACKBAR_TYPE, result, MEGACHAT_INVALID_HANDLE);
+						showSnackbar(SNACKBAR_TYPE, result.getResultText(), MEGACHAT_INVALID_HANDLE);
 					}
 				});
 	}
@@ -652,10 +652,10 @@ public class ContactFileListActivityLollipop extends PasscodeActivity
 
 						AlertDialogUtil.dismissAlertDialogIfExists(statusDialog);
 
-						if (result.isEmpty()) {
+						if (result.isForeignNode()) {
 							showForeignStorageOverQuotaWarningDialog(this);
 						} else {
-							showSnackbar(SNACKBAR_TYPE, result, MEGACHAT_INVALID_HANDLE);
+							showSnackbar(SNACKBAR_TYPE, result.getResultText(), MEGACHAT_INVALID_HANDLE);
 						}
 					});
 		} else if (requestCode == REQUEST_CODE_GET && resultCode == RESULT_OK) {
