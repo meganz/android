@@ -33,7 +33,6 @@ import mega.privacy.android.app.constants.EventConstants.EVENT_UPDATE_HIDE_RECEN
 import mega.privacy.android.app.constants.EventConstants.EVENT_UPDATE_START_SCREEN
 import mega.privacy.android.app.constants.SettingsConstants.*
 import mega.privacy.android.app.exportRK.ExportRecoveryKeyActivity
-import mega.privacy.android.app.fragments.settingsFragments.startSceen.util.StartScreenUtil.HOME_BNV
 import mega.privacy.android.app.lollipop.ChangePasswordActivityLollipop
 import mega.privacy.android.app.lollipop.TwoFactorAuthenticationActivity
 import mega.privacy.android.app.lollipop.VerifyTwoFactorActivity
@@ -44,7 +43,6 @@ import mega.privacy.android.app.service.RATE_APP_URL
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.LogUtil
 import mega.privacy.android.app.utils.SharedPreferenceConstants.HIDE_RECENT_ACTIVITY
-import mega.privacy.android.app.utils.SharedPreferenceConstants.PREFERRED_START_SCREEN
 import mega.privacy.android.app.utils.SharedPreferenceConstants.USER_INTERFACE_PREFERENCES
 import mega.privacy.android.app.utils.ThemeHelper.applyTheme
 import mega.privacy.android.app.utils.Util
@@ -244,8 +242,9 @@ class SettingsFragment : Preference.OnPreferenceChangeListener,
             .create()
     }
 
+    @Suppress("DEPRECATION")
     private fun createFeedbackDialogView(): View? {
-        val dialogLayout = layoutInflater.inflate(R.layout.evaluate_the_app_dialog, null)
+        val dialogLayout = View.inflate(context, R.layout.evaluate_the_app_dialog, null)
 
         val display = requireActivity().windowManager.defaultDisplay
         val outMetrics = DisplayMetrics()
@@ -344,7 +343,7 @@ class SettingsFragment : Preference.OnPreferenceChangeListener,
      * Refresh the Camera Uploads service settings depending on the service status.
      */
     override fun refreshCameraUploadsSettings() {
-        var isCameraUploadOn = viewModel.isCamSyncEnabled
+        val isCameraUploadOn = viewModel.isCamSyncEnabled
         findPreference<Preference>(KEY_FEATURES_CAMERA_UPLOAD)?.summary =
             getString(if (isCameraUploadOn) R.string.mute_chat_notification_option_on else R.string.mute_chatroom_notification_option_off)
     }
