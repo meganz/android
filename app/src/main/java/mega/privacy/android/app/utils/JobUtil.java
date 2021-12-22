@@ -160,4 +160,38 @@ public class JobUtil {
 
         return Boolean.parseBoolean(cuEnabled);
     }
+
+    /**
+     * Stop the camera upload work by Tag
+     *
+     * @param context From which the action is done.
+     */
+    public static void stopCameraUploadWork(Context context) {
+        logDebug("Stop camera upload work");
+        cancelWorkByTag(context, CAMERA_UPLOAD_TAG);
+    }
+
+    /**
+     * Stop regular camera upload sync heartbeat work by Tag
+     *
+     * @param context From which the action is done.
+     */
+    public static void stopRegularCuSyncHeartbeatWork(Context context) {
+        logDebug("Stop regular cu sync heartbeat work");
+        cancelWorkByTag(context, HEART_BEAT_TAG);
+    }
+
+    /**
+     * Cancels all unfinished work with the given tag.
+     *
+     * @param context From which the action is done.
+     * @param tag The tag used to identify the work
+     */
+    private static void cancelWorkByTag(Context context, String tag) {
+        if (context != null && tag != null) {
+            logDebug("Stop work by tag: " + tag);
+            WorkManager.getInstance(context).cancelAllWorkByTag(tag);
+        }
+    }
+
 }

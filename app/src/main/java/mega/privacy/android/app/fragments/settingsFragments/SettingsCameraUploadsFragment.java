@@ -22,7 +22,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AlertDialog;
-import androidx.core.app.ActivityCompat;
 import androidx.preference.ListPreference;
 import androidx.preference.Preference;
 import androidx.preference.SwitchPreferenceCompat;
@@ -443,8 +442,8 @@ public class SettingsCameraUploadsFragment extends SettingsBaseFragment {
      * and UI related process
      */
     public void disableCameraUpload() {
-        CuSyncManager.INSTANCE.stopCameraUploadWork(this.getContext());
-        CuSyncManager.INSTANCE.stopRegularCuSyncHeartbeatWork(this.getContext());
+        stopCameraUploadWork(this.getContext());
+        stopRegularCuSyncHeartbeatWork(this.getContext());
         disableCameraUploadSettingProcess();
         disableCameraUploadUIProcess();
     }

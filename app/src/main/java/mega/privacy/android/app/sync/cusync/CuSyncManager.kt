@@ -1,8 +1,6 @@
 package mega.privacy.android.app.sync.cusync
 
-import android.content.Context
 import android.content.Intent
-import androidx.work.WorkManager
 import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.disposables.Disposable
 import mega.privacy.android.app.DatabaseHandler
@@ -19,15 +17,16 @@ import mega.privacy.android.app.sync.cusync.callback.RemoveBackupCallback
 import mega.privacy.android.app.sync.cusync.callback.SetBackupCallback
 import mega.privacy.android.app.sync.cusync.callback.UpdateBackupCallback
 import mega.privacy.android.app.utils.CameraUploadUtil
-import mega.privacy.android.app.utils.Constants.*
-import mega.privacy.android.app.utils.JobUtil.CAMERA_UPLOAD_TAG
-import mega.privacy.android.app.utils.JobUtil.HEART_BEAT_TAG
+import mega.privacy.android.app.utils.Constants.INVALID_NON_NULL_VALUE
+import mega.privacy.android.app.utils.Constants.INVALID_VALUE
 import mega.privacy.android.app.utils.LogUtil.*
 import mega.privacy.android.app.utils.RxUtil.logErr
 import mega.privacy.android.app.utils.StringResourcesUtils
 import mega.privacy.android.app.utils.TextUtil
-import nz.mega.sdk.*
+import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaApiJava.*
+import nz.mega.sdk.MegaError
+import nz.mega.sdk.MegaNode
 import java.io.File
 import java.util.concurrent.TimeUnit.SECONDS
 
@@ -782,28 +781,4 @@ object CuSyncManager {
                 which
             )
         )
-
-    /**
-     * Stop the camera upload work by Tag
-     *
-     * @param context From which the action is done.
-     */
-    fun stopCameraUploadWork(context: Context?) {
-        logDebug("Stop camera upload work")
-        context?.let {
-            WorkManager.getInstance(context).cancelAllWorkByTag(CAMERA_UPLOAD_TAG)
-        }
-    }
-
-    /**
-     * Stop regular camera upload sync heartbeat work by Tag
-     *
-     * @param context From which the action is done.
-     */
-    fun stopRegularCuSyncHeartbeatWork(context: Context?) {
-        logDebug("Stop regular cu sync heartbeat work")
-        context?.let {
-            WorkManager.getInstance(context).cancelAllWorkByTag(HEART_BEAT_TAG)
-        }
-    }
 }
