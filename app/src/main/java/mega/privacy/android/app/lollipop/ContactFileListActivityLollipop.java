@@ -55,6 +55,7 @@ import mega.privacy.android.app.interfaces.UploadBottomSheetDialogActionListener
 import mega.privacy.android.app.lollipop.controllers.NodeController;
 import mega.privacy.android.app.modalbottomsheet.ContactFileListBottomSheetDialogFragment;
 import mega.privacy.android.app.modalbottomsheet.UploadBottomSheetDialogFragment;
+import mega.privacy.android.app.usecase.GetNodeUseCase;
 import mega.privacy.android.app.usecase.MoveNodeUseCase;
 import mega.privacy.android.app.usecase.data.MoveRequestResult;
 import mega.privacy.android.app.utils.AlertDialogUtil;
@@ -103,6 +104,8 @@ public class ContactFileListActivityLollipop extends PasscodeActivity
 	FilePrepareUseCase filePrepareUseCase;
 	@Inject
 	MoveNodeUseCase moveNodeUseCase;
+	@Inject
+	GetNodeUseCase getNodeUseCase;
 
 	FrameLayout fragmentContainer;
 
@@ -846,10 +849,30 @@ public class ContactFileListActivityLollipop extends PasscodeActivity
 
 	@Override
 	public void onNodesUpdate(MegaApiJava api, ArrayList<MegaNode> nodes) {
-		if (cflF != null) {
-			if (cflF.isVisible()) {
-				cflF.setNodes(parentHandle);
+		for (MegaNode node : nodes) {
+			if (node.isInShare() && parentHandle == node.getHandle()) {
+				getNodeUseCase.get(parentHandle)
+						.subscribeOn(Schedulers.io())
+						.observeOn(AndroidSchedulers.mainThread())
+						.subscribe((result, throwable) -> {
+							if (throwable == null) {
+								updateNodes();
+							} else {
+								finish();
+							}
+						});
+			} else {
+				updateNodes();
 			}
+		}
+	}
+
+	/**
+	 * Update the nodes.
+	 */
+	private void updateNodes() {
+		if (cflF != null && cflF.isVisible()){
+			cflF.setNodes(parentHandle);
 		}
 	}
 
