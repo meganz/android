@@ -120,6 +120,7 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         ImageView nodeThumb = contentView.findViewById(R.id.node_thumbnail);
         TextView nodeName = contentView.findViewById(R.id.node_name_text);
+
         nodeInfo = contentView.findViewById(R.id.node_info_text);
         ImageView nodeVersionsIcon = contentView.findViewById(R.id.node_info_versions_icon);
         RelativeLayout nodeIconLayout = contentView.findViewById(R.id.node_relative_layout_icon);
@@ -129,6 +130,9 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
         LinearLayout optionEdit = contentView.findViewById(R.id.edit_file_option);
 
         TextView optionInfo = contentView.findViewById(R.id.properties_option);
+        // option Versions
+        LinearLayout optionVersionsLayout = contentView.findViewById(R.id.option_versions_layout);
+        TextView versions = contentView.findViewById(R.id.versions);
 //      optionFavourite
         TextView optionFavourite = contentView.findViewById(R.id.favorite_option);
 //      optionLabel
@@ -225,8 +229,8 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
 
         if (isOnline(requireContext())) {
             nodeName.setText(node.getName());
-
             if (node.isFolder()) {
+                optionVersionsLayout.setVisibility(View.GONE);
                 nodeInfo.setText(getMegaNodeFolderInfo(node));
                 nodeVersionsIcon.setVisibility(View.GONE);
 
@@ -241,7 +245,12 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
                 optionSendChat.setVisibility(View.GONE);
             } else {
                 nodeInfo.setText(getFileInfo(node));
-
+                if (megaApi.hasVersions(node)) {
+                    optionVersionsLayout.setVisibility(View.VISIBLE);
+                    versions.setText(String.valueOf(megaApi.getNumVersions(node)));
+                } else {
+                    optionVersionsLayout.setVisibility(View.GONE);
+                }
                 if (megaApi.hasVersions(node)) {
                     nodeVersionsIcon.setVisibility(View.VISIBLE);
                 } else {
