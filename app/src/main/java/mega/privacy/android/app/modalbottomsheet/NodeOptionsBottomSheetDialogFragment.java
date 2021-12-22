@@ -464,7 +464,7 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
                     int dBT = ((ManagerActivityLollipop) requireActivity()).getDeepBrowserTreeIncoming();
                     logDebug("DeepTree value:" + dBT);
 
-                    if (dBT > 0) {
+                    if (dBT > 1) {
                         optionLeaveShares.setVisibility(View.GONE);
                     } else {
                         //Show the owner of the shared folder

@@ -208,6 +208,7 @@ import mega.privacy.android.app.modalbottomsheet.SortByBottomSheetDialogFragment
 import mega.privacy.android.app.modalbottomsheet.UploadBottomSheetDialogFragment;
 import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.ChatBottomSheetDialogFragment;
 import mega.privacy.android.app.service.iar.RatingHandlerImpl;
+import mega.privacy.android.app.usecase.GetNodeUseCase;
 import mega.privacy.android.app.usecase.MoveNodeUseCase;
 import mega.privacy.android.app.usecase.RemoveNodeUseCase;
 import mega.privacy.android.app.usecase.data.MoveRequestResult;
@@ -384,6 +385,8 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 	MoveNodeUseCase moveNodeUseCase;
 	@Inject
 	RemoveNodeUseCase removeNodeUseCase;
+	@Inject
+	GetNodeUseCase getNodeUseCase;
 
 	public ArrayList<Integer> transfersInProgress;
 	public MegaTransferData transferData;
@@ -10180,6 +10183,20 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 				if(!updateContacts){
 					if(updatedNode.isInShare()){
 						updateContacts = true;
+
+						if (drawerItem == DrawerItem.SHARED_ITEMS
+								&& getTabItemShares() == INCOMING_TAB && parentHandleIncoming == updatedNode.getHandle()) {
+							getNodeUseCase.get(parentHandleIncoming)
+									.subscribeOn(Schedulers.io())
+									.observeOn(AndroidSchedulers.mainThread())
+									.subscribe((result, throwable) -> {
+										if (throwable != null) {
+											decreaseDeepBrowserTreeIncoming();
+											parentHandleIncoming = INVALID_HANDLE;
+											refreshIncomingShares();
+										}
+									});
+						}
 					}
 				}
 
