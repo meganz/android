@@ -1,16 +1,18 @@
 package mega.privacy.android.app.gallery.ui
 
-import androidx.hilt.lifecycle.ViewModelInject
+import dagger.hilt.android.lifecycle.HiltViewModel
 import mega.privacy.android.app.gallery.data.GalleryItem
 import mega.privacy.android.app.gallery.data.GalleryItem.Companion.TYPE_HEADER
 import mega.privacy.android.app.gallery.repository.MediaItemRepository
 import mega.privacy.android.app.globalmanagement.SortOrderManagement
 import mega.privacy.android.app.utils.ZoomUtil
+import javax.inject.Inject
 
 /**
  * MediaDiscovery viewModel
  */
-class MediaViewModel @ViewModelInject constructor(
+@HiltViewModel
+class MediaViewModel @Inject constructor(
         private val repository: MediaItemRepository,
         val sortOrderManagement: SortOrderManagement
 ) : GalleryViewModel(repository, sortOrderManagement) {

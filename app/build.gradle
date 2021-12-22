@@ -87,20 +87,16 @@ android {
         // abortOnError false
     }
 
-    dexOptions{
-        jumboMode = true
-    }
-
     compileOptions {
         // Flag to enable support for the new language APIs
         coreLibraryDesugaringEnabled true
-        // Sets Java compatibility to Java 8
-        sourceCompatibility JavaVersion.VERSION_1_8
-        targetCompatibility JavaVersion.VERSION_1_8
+        // Sets Java compatibility to Java 11
+        sourceCompatibility JavaVersion.VERSION_11
+        targetCompatibility JavaVersion.VERSION_11
     }
 
     kotlinOptions {
-        jvmTarget = "1.8"
+        jvmTarget = "11"
     }
 //    task megaSDK(type: Exec, description: 'Compile MEGA SDK via NDK') {
 //        workingDir 'src/main/jni'
@@ -139,7 +135,7 @@ android {
 }
 
 dependencies {
-    implementation fileTree(dir: 'libs', include: ['*.jar'])
+    implementation fileTree(dir: "$rootProject.projectDir/app/src/main/jni/ExoPlayer/", include: ['*.aar'])
 
     // App dependencies
     implementation "androidx.appcompat:appcompat:$appCompatVersion"
@@ -176,7 +172,7 @@ dependencies {
     implementation "com.google.dagger:hilt-android:$hiltVersion"
     kapt "com.google.dagger:hilt-android-compiler:$hiltVersion"
     implementation "androidx.hilt:hilt-lifecycle-viewmodel:$hiltAndroidXVersion"
-    kapt "androidx.hilt:hilt-compiler:$hiltAndroidXVersion"
+    kapt "androidx.hilt:hilt-compiler:$hiltAndroidXCompilerVersion"
 
     // Other libs
     implementation 'androidx.exifinterface:exifinterface:1.3.0'
@@ -185,8 +181,6 @@ dependencies {
     implementation 'com.vdurmont:emoji-java:4.0.0'
     implementation 'com.google.android.exoplayer:exoplayer-core:2.12.1'
     implementation 'com.google.android.exoplayer:exoplayer-ui:2.12.1'
-    implementation(name: 'exoplayer-extension-ffmpeg-2.12.1', ext: 'aar')
-    implementation(name: 'exoplayer-extension-flac-2.12.1', ext: 'aar')
     implementation 'com.google.zxing:core:3.4.0'
     implementation 'com.budiyev.android:code-scanner:1.8.3'
     implementation 'me.leolin:ShortcutBadger:1.1.22@aar'

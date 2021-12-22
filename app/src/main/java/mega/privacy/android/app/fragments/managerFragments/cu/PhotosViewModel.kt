@@ -1,9 +1,9 @@
 package mega.privacy.android.app.fragments.managerFragments.cu
 
 import android.os.Environment
-import androidx.hilt.lifecycle.ViewModelInject
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import dagger.hilt.android.lifecycle.HiltViewModel
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.core.Completable
 import io.reactivex.rxjava3.core.Single
@@ -20,8 +20,10 @@ import mega.privacy.android.app.utils.LogUtil
 import mega.privacy.android.app.utils.RxUtil
 import mega.privacy.android.app.utils.ZoomUtil.PHOTO_ZOOM_LEVEL
 import nz.mega.sdk.MegaNode
+import javax.inject.Inject
 
-class PhotosViewModel @ViewModelInject constructor(
+@HiltViewModel
+class PhotosViewModel @Inject constructor(
     private val repository: PhotosItemRepository,
     private val mDbHandler: DatabaseHandler,
     val sortOrderManagement: SortOrderManagement
