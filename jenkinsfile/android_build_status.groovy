@@ -50,15 +50,6 @@ pipeline {
                 slackUploadFile filePath: env.CONSOLE_LOG_FILE, initialComment: "Android Build Log"
             }
         }
-        success {
-            script {
-                def comment = "Android Build Success! :smile: \nBranch: ${env.GIT_BRANCH}"
-                if (env.CHANGE_URL) {
-                    comment = "Android Build Success! :smile: \nBranch: ${env.GIT_BRANCH} \nMR: ${env.CHANGE_URL}"
-                }
-                slackSend color: "good", message: comment
-            }
-        }
     }
     stages {
         stage('Preparation') {
