@@ -158,7 +158,7 @@ pipeline {
                 }
                 gitlabCommitStatus(name: 'Build APK (GMS+HMS)') {
                     // Finish building and packaging the APK
-                    runShell "./gradlew app:assembleGmsRelease app:assembleHmsRelease"
+                    runShell "./gradlew clean app:assembleGmsRelease app:assembleHmsRelease"
 
                     // Archive the APKs so that they can be downloaded from Jenkins
                     // archiveArtifacts '**/*.apk'
