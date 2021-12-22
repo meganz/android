@@ -39,6 +39,8 @@ class MoveNodeUseCase @Inject constructor(
             var oldParentHandle = INVALID_VALUE.toLong()
             val listener =
                 OptionalMegaRequestListenerInterface(onRequestFinish = { request, error ->
+                    pending--
+
                     if (error.errorCode == API_OK) {
                         success++
                     }
@@ -54,7 +56,7 @@ class MoveNodeUseCase @Inject constructor(
                             }
                             count == 1 && success == 1 -> {
                                 MoveActionResult(
-                                    singleAction = true,
+                                    isSingleAction = true,
                                     oldParent = oldParentHandle,
                                     newParent = newParentHandle,
                                     resultText = getString(R.string.context_correctly_moved)
@@ -62,7 +64,7 @@ class MoveNodeUseCase @Inject constructor(
                             }
                             count == 1 && errors == 1 -> {
                                 MoveActionResult(
-                                    singleAction = true,
+                                    isSingleAction = true,
                                     oldParent = oldParentHandle,
                                     resultText = getString(R.string.context_no_moved),
                                     allSuccess = false
@@ -120,6 +122,8 @@ class MoveNodeUseCase @Inject constructor(
             var oldParentHandle = INVALID_VALUE.toLong()
             val listener =
                 OptionalMegaRequestListenerInterface(onRequestFinish = { request, error ->
+                    pending--
+
                     if (error.errorCode == API_OK) {
                         success++
                     }
@@ -136,7 +140,7 @@ class MoveNodeUseCase @Inject constructor(
                             count == 1 && success == 1 -> {
                                 DBUtil.resetAccountDetailsTimeStamp()
                                 MoveActionResult(
-                                    singleAction = true,
+                                    isSingleAction = true,
                                     oldParent = oldParentHandle,
                                     newParent = megaApi.rubbishNode.handle,
                                     resultText = getString(R.string.context_correctly_moved_to_rubbish)
@@ -144,7 +148,7 @@ class MoveNodeUseCase @Inject constructor(
                             }
                             count == 1 && errors == 1 -> {
                                 MoveActionResult(
-                                    singleAction = true,
+                                    isSingleAction = true,
                                     oldParent = oldParentHandle,
                                     resultText = getString(R.string.context_no_moved),
                                     allSuccess = false
@@ -253,6 +257,8 @@ class MoveNodeUseCase @Inject constructor(
             var oldParentHandle = INVALID_VALUE.toLong()
             val listener =
                 OptionalMegaRequestListenerInterface(onRequestFinish = { request, error ->
+                    pending--
+
                     if (error.errorCode == API_OK) {
                         success++
                     }
@@ -270,7 +276,7 @@ class MoveNodeUseCase @Inject constructor(
                                 DBUtil.resetAccountDetailsTimeStamp()
                                 val destination = megaApi.getNodeByHandle(request.parentHandle)
                                 MoveActionResult(
-                                    singleAction = true,
+                                    isSingleAction = true,
                                     oldParent = oldParentHandle,
                                     newParent = megaApi.rubbishNode.handle,
                                     resultText = getString(
@@ -281,7 +287,7 @@ class MoveNodeUseCase @Inject constructor(
                             }
                             count == 1 && errors == 1 -> {
                                 MoveActionResult(
-                                    singleAction = true,
+                                    isSingleAction = true,
                                     oldParent = oldParentHandle,
                                     resultText = getString(R.string.context_no_restored),
                                     allSuccess = false

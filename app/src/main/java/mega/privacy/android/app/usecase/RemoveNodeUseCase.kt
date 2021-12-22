@@ -34,6 +34,8 @@ class RemoveNodeUseCase @Inject constructor(
             var success = 0
             val listener =
                 OptionalMegaRequestListenerInterface(onRequestFinish = { _, error ->
+                    pending--
+
                     if (error.errorCode == MegaError.API_OK) {
                         success++
                     }

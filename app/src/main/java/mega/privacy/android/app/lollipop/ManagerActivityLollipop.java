@@ -6297,6 +6297,13 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 						return;
 					}
 
+					if (result.isSingleAction() && result.getAllSuccess()
+							&& parentHandleRubbish == nodes.get(0).getHandle()) {
+						parentHandleRubbish = INVALID_HANDLE;
+						setToolbarTitle();
+						refreshRubbishBin();
+					}
+
 					if (result.isForeignNode()) {
 						showForeignStorageOverQuotaWarningDialog(this);
 					} else {
