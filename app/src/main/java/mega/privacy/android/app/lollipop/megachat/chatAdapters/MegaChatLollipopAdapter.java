@@ -1452,6 +1452,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
         } else {
             hideLayoutsGiphyAndGifMessages(position, (ViewHolderMessageChat) holder);
             hideForwardOptions(position, (ViewHolderMessageChat) holder);
+            hideLayoutsContactLinkMessages(position, (ViewHolderMessageChat) holder);
 
             AndroidMegaChatMessage androidMessage = messages.get(position - 1);
             if (androidMessage.isUploading()) {
@@ -1527,7 +1528,6 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             ((ViewHolderMessageChat) holder).videoIconOwnMessageThumbLand.setVisibility(View.GONE);
             ((ViewHolderMessageChat) holder).videoTimecontentOwnMessageThumbLand.setVisibility(View.GONE);
 
-            hideLayoutsContactLinkMessages(position, (ViewHolderMessageChat) holder);
             hideLayoutsContactAttachmentMessages(position, (ViewHolderMessageChat) holder);
 
             ((ViewHolderMessageChat) holder).urlOwnMessageLayout.setVisibility(View.GONE);
@@ -1767,10 +1767,6 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             hideLayoutsContactAttachmentMessages(position, (ViewHolderMessageChat) holder);
         }
 
-        if (messageType != MegaChatMessage.TYPE_NORMAL) {
-            hideLayoutsContactLinkMessages(position, (ViewHolderMessageChat) holder);
-        }
-
         switch (messageType) {
             case MegaChatMessage.TYPE_ALTER_PARTICIPANTS: {
                 logDebug("ALTER PARTICIPANT MESSAGE!!");
@@ -1792,7 +1788,6 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                 String contactLink = extractContactLink(androidMessage.getMessage().getContent());
 
                 if (androidMessage.getRichLinkMessage() != null) {
-                    hideLayoutsContactLinkMessages(position, (ViewHolderMessageChat) holder);
                     bindMegaLinkMessage((ViewHolderMessageChat) holder, androidMessage, position);
                 } else if (contactLink != null) {
                     long contactLinkHandle = getContactLinkHandle(contactLink);
@@ -1807,7 +1802,6 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                                 }
                             });
                 } else {
-                    hideLayoutsContactLinkMessages(position, (ViewHolderMessageChat) holder);
                     bindNormalMessage((ViewHolderMessageChat) holder, androidMessage, position);
                 }
 
