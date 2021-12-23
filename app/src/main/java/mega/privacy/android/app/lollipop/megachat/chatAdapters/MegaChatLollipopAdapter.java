@@ -6721,17 +6721,20 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
      * @param ownMessage True if the message is own, false otherwise.
      */
     private void setContactLinkAvatar(ViewHolderMessageChat holder, boolean ownMessage) {
-        if (holder.contactLinkResult == null || holder.contactLinkResult.getContactLinkHandle() == null) {
+        if (holder.contactLinkResult == null
+                || holder.contactLinkResult.getContactHandle() == null
+                || holder.contactLinkResult.getEmail() == null) {
             return;
         }
 
-        long handle = holder.contactLinkResult.getContactLinkHandle();
+        InviteContactUseCase.ContactLinkResult contactLinkResult = holder.contactLinkResult;
 
+        long handle = contactLinkResult.getContactHandle();
         String userHandleEncoded = MegaApiAndroid.userHandleToBase64(handle);
-        String email = holder.contactLinkResult.getEmail();
+        String email = contactLinkResult.getEmail();
 
-        int color = getColorAvatar(userHandleEncoded);
-        Bitmap bitmapDefaultAvatar = getDefaultAvatar(color, holder.contactLinkResult.getFullName(), AVATAR_SIZE, true);
+        int color = contactLinkResult.isContact() ? getColorAvatar(megaApi.getContact(email)) : getColorAvatar(userHandleEncoded);
+        Bitmap bitmapDefaultAvatar = getDefaultAvatar(color, contactLinkResult.getFullName(), AVATAR_SIZE, true);
 
         if (ownMessage) {
             holder.ownContactLinkAvatar.setImageBitmap(bitmapDefaultAvatar);
@@ -6739,7 +6742,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             holder.othersContactLinkAvatar.setImageBitmap(bitmapDefaultAvatar);
         }
 
-        File avatar = buildAvatarFile(context, holder.contactLinkResult.getEmail() + JPG_EXTENSION);
+        File avatar = buildAvatarFile(context, contactLinkResult.getEmail() + JPG_EXTENSION);
         Bitmap bitmap = getAvatarBitmap(avatar);
 
         if (bitmap == null) {

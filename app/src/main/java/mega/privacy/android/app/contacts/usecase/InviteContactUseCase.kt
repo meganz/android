@@ -32,12 +32,14 @@ class InviteContactUseCase @Inject constructor(
      *
      * @property isContact          Flag to check wether is contact or not
      * @property email              User email
+     * @property contactHandle      Contact handle
      * @property contactLinkHandle  Contact link handle
      * @property fullName           User full name
      */
     data class ContactLinkResult(
         val isContact: Boolean,
         val email: String? = null,
+        val contactHandle: Long? = null,
         val contactLinkHandle: Long? = null,
         val fullName: String? = null
     )
@@ -76,6 +78,7 @@ class InviteContactUseCase @Inject constructor(
                                 ContactLinkResult(
                                     isContact,
                                     request.email,
+                                    request.parentHandle,
                                     request.nodeHandle,
                                     "${request.name} ${request.text}"
                                 )
