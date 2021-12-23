@@ -396,7 +396,7 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
 
         emptyLayout = v.findViewById(R.id.linear_empty_layout_chat_recent);
         emptyDescriptionText = v.findViewById(R.id.empty_description_text_recent);
-        emptyDescriptionText.setText(replaceFormatText(context.getString(R.string.recent_chat_empty),
+        emptyDescriptionText.setText(replaceFormatText(context.getString(R.string.description_recent_chat_empty),
                 ColorUtils.getColorHexString(context, R.color.grey_300_grey_600),
                 ColorUtils.getColorHexString(context, R.color.grey_900_grey_100)));
 
