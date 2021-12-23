@@ -8,8 +8,6 @@ import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import org.jetbrains.annotations.NotNull;
-
 import mega.privacy.android.app.activities.PasscodeActivity;
 import mega.privacy.android.app.activities.WebViewActivity;
 import mega.privacy.android.app.listeners.ConnectListener;
@@ -24,17 +22,17 @@ import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop;
 import mega.privacy.android.app.meeting.activity.LeftMeetingActivity;
 import mega.privacy.android.app.meeting.fragments.MeetingHasEndedDialogFragment;
 import mega.privacy.android.app.utils.CallUtil;
+import mega.privacy.android.app.utils.StringResourcesUtils;
 import mega.privacy.android.app.utils.TextUtil;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaChatApi;
-import nz.mega.sdk.MegaChatApiJava;
-import nz.mega.sdk.MegaChatError;
 import nz.mega.sdk.MegaChatRequest;
 import nz.mega.sdk.MegaError;
-import nz.mega.sdk.MegaHandleList;
 import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
+
+import static mega.privacy.android.app.utils.CallUtil.showConfirmationInACall;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.LinksUtil.requiresTransferSession;
 import static mega.privacy.android.app.utils.LogUtil.logDebug;
@@ -443,7 +441,7 @@ public class OpenLinkActivity extends PasscodeActivity implements MegaRequestLis
 	}
 
 	private void goToMeetingActivity(long chatId, String meetingName) {
-		CallUtil.openMeetingGuestMode(this, meetingName, chatId, url);
+		CallUtil.openMeetingGuestMode(this, meetingName, chatId, url, passcodeManagement);
 		finish();
 	}
 
@@ -547,27 +545,33 @@ public class OpenLinkActivity extends PasscodeActivity implements MegaRequestLis
 
 		if (type == LINK_IS_FOR_MEETING) {
 			logDebug("It's a meeting link");
-			if (CallUtil.isMeetingEnded(request.getMegaHandleList())) {
-				logDebug("Meeting has ended, open dialog");
-				new MeetingHasEndedDialogFragment(new MeetingHasEndedDialogFragment.ClickCallback() {
-					@Override
-					public void onViewMeetingChat() {
-						goToChatActivity();
-					}
-
-					@Override
-					public void onLeave() {
-						goToGuestLeaveMeetingActivity();
-					}
-				}).show(getSupportFragmentManager(),
-						MeetingHasEndedDialogFragment.TAG);
-			} else if (isFromOpenChatPreview) {
-				logDebug("Meeting is in progress, open join meeting");
-				goToMeetingActivity(chatId, request.getText());
+			if (CallUtil.participatingInACall()) {
+				showConfirmationInACall(this, StringResourcesUtils.getString(R.string.text_join_call), passcodeManagement);
 			} else {
-				logDebug("It's a meeting, open chat preview");
-				megaChatApi.openChatPreview(url, new LoadPreviewListener(this, OpenLinkActivity.this, CHECK_LINK_TYPE_MEETING_LINK));
+				if (CallUtil.isMeetingEnded(request.getMegaHandleList())) {
+					logDebug("Meeting has ended, open dialog");
+					new MeetingHasEndedDialogFragment(new MeetingHasEndedDialogFragment.ClickCallback() {
+						@Override
+						public void onViewMeetingChat() {
+							goToChatActivity();
+						}
+
+						@Override
+						public void onLeave() {
+							goToGuestLeaveMeetingActivity();
+						}
+					}).show(getSupportFragmentManager(),
+							MeetingHasEndedDialogFragment.TAG);
+				} else if (isFromOpenChatPreview) {
+					logDebug("Meeting is in progress, open join meeting");
+					goToMeetingActivity(chatId, request.getText());
+				} else {
+					logDebug("It's a meeting, open chat preview");
+					logDebug("openChatPreview");
+					megaChatApi.openChatPreview(url, new LoadPreviewListener(this, OpenLinkActivity.this, CHECK_LINK_TYPE_MEETING_LINK));
+				}
 			}
+
 		} else {
 			logDebug("It's a chat link");
 			goToChatActivity();

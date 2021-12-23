@@ -9,7 +9,8 @@ import android.view.ViewGroup
 import androidx.lifecycle.Observer
 import androidx.viewpager2.widget.ViewPager2
 import mega.privacy.android.app.databinding.GridViewCallFragmentBinding
-import mega.privacy.android.app.meeting.adapter.*
+import mega.privacy.android.app.meeting.adapter.GridViewPagerAdapter
+import mega.privacy.android.app.meeting.adapter.Participant
 import mega.privacy.android.app.utils.LogUtil.logDebug
 import nz.mega.sdk.MegaChatSession
 

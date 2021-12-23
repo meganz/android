@@ -10,6 +10,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.facebook.drawee.generic.RoundingParams;
 import com.facebook.drawee.view.SimpleDraweeView;
 import mega.privacy.android.app.R;
+import mega.privacy.android.app.utils.ZoomUtil;
 
 abstract class CuGridViewHolder extends RecyclerView.ViewHolder {
 
@@ -40,10 +41,18 @@ abstract class CuGridViewHolder extends RecyclerView.ViewHolder {
                 (GridLayoutManager.LayoutParams) grid.getLayoutParams();
         params.width = itemSizeConfig.getGridSize();
         params.height = itemSizeConfig.getGridSize();
+
+        if(itemSizeConfig.getZoom() == ZoomUtil.ZOOM_IN_1X) {
+            params.setMarginStart(0);
+            params.setMarginEnd(0);
+        } else {
+            params.setMarginStart(itemSizeConfig.getImageMargin());
+            params.setMarginEnd(itemSizeConfig.getImageMargin());
+        }
+
         params.bottomMargin = itemSizeConfig.getImageMargin();
         params.topMargin = itemSizeConfig.getImageMargin();
-        params.setMarginStart(itemSizeConfig.getImageMargin());
-        params.setMarginEnd(itemSizeConfig.getImageMargin());
+
         grid.setLayoutParams(params);
 
         FrameLayout.LayoutParams icSelectedParams =

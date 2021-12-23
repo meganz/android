@@ -1,11 +1,14 @@
 package mega.privacy.android.app.meeting.fragments
 
-import androidx.hilt.lifecycle.ViewModelInject
-import androidx.lifecycle.*
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.ViewModel
+import dagger.hilt.android.lifecycle.HiltViewModel
 import mega.privacy.android.app.R
 import mega.privacy.android.app.utils.StringResourcesUtils
+import javax.inject.Inject
 
-class CreateMeetingViewModel @ViewModelInject constructor(
+@HiltViewModel
+class CreateMeetingViewModel @Inject constructor(
     private val repository: CreateMeetingRepository
 ) : ViewModel() {
 

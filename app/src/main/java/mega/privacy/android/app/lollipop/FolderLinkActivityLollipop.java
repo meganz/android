@@ -87,7 +87,7 @@ import static mega.privacy.android.app.utils.FileUtil.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.MegaApiUtils.*;
 import static mega.privacy.android.app.utils.MegaNodeUtil.*;
-import static mega.privacy.android.app.utils.PermissionUtils.*;
+import static mega.privacy.android.app.utils.permission.PermissionUtils.*;
 import static mega.privacy.android.app.utils.PreviewUtils.*;
 import static mega.privacy.android.app.utils.Util.*;
 import static nz.mega.sdk.MegaApiJava.INVALID_HANDLE;
@@ -731,7 +731,10 @@ public class FolderLinkActivityLollipop extends TransfersManagementActivity impl
 
 		if (request.getType() == MegaRequest.TYPE_LOGIN){
 			if (e.getErrorCode() == MegaError.API_OK){
-				megaApiFolder.fetchNodes(this);	
+				megaApiFolder.fetchNodes(this);
+
+                // Get cookies settings after login.
+                MegaApplication.getInstance().checkEnabledCookies();
 			}
 			else{
 				logWarning("Error: " + e.getErrorCode());
@@ -984,7 +987,9 @@ public class FolderLinkActivityLollipop extends TransfersManagementActivity impl
 						}
 
 						if (adapterList == null){
-							adapterList = new MegaNodeAdapter(this, null, nodes, parentHandle, listView, aB, FOLDER_LINK_ADAPTER, MegaNodeAdapter.ITEM_VIEW_TYPE_LIST);
+							adapterList = new MegaNodeAdapter(this, null, nodes,
+									parentHandle, listView, FOLDER_LINK_ADAPTER,
+									MegaNodeAdapter.ITEM_VIEW_TYPE_LIST);
 						}
 						else{
 							adapterList.setParentHandle(parentHandle);
@@ -1613,7 +1618,7 @@ public class FolderLinkActivityLollipop extends TransfersManagementActivity impl
 			startIntent.setAction(ACTION_OPEN_FOLDER);
 			startIntent.putExtra("PARENT_HANDLE", toHandle);
 			startIntent.putExtra("offline_adapter", false);
-			startIntent.putExtra("locationFileInfo", true);
+			startIntent.putExtra(INTENT_EXTRA_KEY_LOCATION_FILE_INFO, true);
 			startIntent.putExtra("fragmentHandle", fragmentHandle);
 		}
 		startActivity(startIntent);

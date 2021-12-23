@@ -1,20 +1,24 @@
 package mega.privacy.android.app.meeting.fragments
 
 import android.graphics.Bitmap
-import androidx.hilt.lifecycle.ViewModelInject
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.listeners.BaseListener
-import nz.mega.sdk.*
+import nz.mega.sdk.MegaApiJava
+import nz.mega.sdk.MegaError
+import nz.mega.sdk.MegaRequest
+import javax.inject.Inject
 
 /**
  * TODO Has been migrated to MeetingActivityViewModel, can be deleted.
  */
-class AbstractMeetingOnBoardingViewModel @ViewModelInject constructor(
+@HiltViewModel
+class AbstractMeetingOnBoardingViewModel @Inject constructor(
     private val abstractMeetingOnBoardingRepository: AbstractMeetingOnBoardingRepository
 ) : ViewModel() {
 

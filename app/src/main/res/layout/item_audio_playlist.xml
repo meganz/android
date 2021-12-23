@@ -62,7 +62,7 @@
             android:ellipsize="middle"
             android:singleLine="true"
             android:text="@{item.nodeName}"
-            android:textAppearance="?attr/textAppearanceSubtitle1"
+            style="@style/textAppearanceSubtitle1"
             tools:text="Music.mp3" />
 
         <ImageView

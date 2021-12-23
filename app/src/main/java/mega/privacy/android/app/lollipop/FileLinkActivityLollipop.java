@@ -939,7 +939,7 @@ public class FileLinkActivityLollipop extends TransfersManagementActivity implem
 			startIntent.setAction(ACTION_OPEN_FOLDER);
 			startIntent.putExtra("PARENT_HANDLE", toHandle);
 			startIntent.putExtra("offline_adapter", false);
-			startIntent.putExtra("locationFileInfo", true);
+			startIntent.putExtra(INTENT_EXTRA_KEY_LOCATION_FILE_INFO, true);
 			startIntent.putExtra("fragmentHandle", fragmentHandle);
 		}
 		startActivity(startIntent);

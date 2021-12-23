@@ -3,11 +3,13 @@ package mega.privacy.android.app.meeting;
 import android.app.IntentService;
 import android.content.Intent;
 
+import dagger.hilt.android.AndroidEntryPoint;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.meeting.listeners.AnswerChatCallListener;
 import mega.privacy.android.app.meeting.listeners.HangChatCallListener;
 import mega.privacy.android.app.meeting.listeners.SetCallOnHoldListener;
+import mega.privacy.android.app.objects.PasscodeManagement;
 import mega.privacy.android.app.utils.StringResourcesUtils;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
@@ -20,6 +22,9 @@ import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE;
 
+import javax.inject.Inject;
+
+@AndroidEntryPoint
 public class CallNotificationIntentService extends IntentService implements HangChatCallListener.OnCallHungUpCallback, AnswerChatCallListener.OnCallAnsweredCallback, SetCallOnHoldListener.OnCallOnHoldCallback {
 
     public static final String ANSWER = "ANSWER";
@@ -29,6 +34,9 @@ public class CallNotificationIntentService extends IntentService implements Hang
     public static final String IGNORE = "IGNORE";
     public static final String HOLD_JOIN = "HOLD_JOIN";
     public static final String END_JOIN = "END_JOIN";
+
+    @Inject
+    PasscodeManagement passcodeManagement;
 
     MegaChatApiAndroid megaChatApi;
     MegaApiAndroid megaApi;
@@ -91,15 +99,13 @@ public class CallNotificationIntentService extends IntentService implements Hang
                     MegaChatCall call = megaChatApi.getChatCall(chatIdIncomingCall);
                     if (call != null && call.getStatus() == MegaChatCall.CALL_STATUS_USER_NO_PRESENT) {
                         logDebug("Answering incoming call ...");
-                        addChecksForACall(chatIdIncomingCall, false);
-                        megaChatApi.answerChatCall(chatIdIncomingCall, false, isTraditionalCall, new AnswerChatCallListener(this, this));
+                        MegaApplication.getChatManagement().answerChatCall(chatIdIncomingCall, false, isTraditionalCall, false, new AnswerChatCallListener(this, this));
                     }
 
                 } else {
                     if (currentCall == null) {
                         logDebug("Answering incoming call ...");
-                        addChecksForACall(chatIdIncomingCall, false);
-                        megaChatApi.answerChatCall(chatIdIncomingCall, false, isTraditionalCall, new AnswerChatCallListener(this, this));
+                        MegaApplication.getChatManagement().answerChatCall(chatIdIncomingCall, false, isTraditionalCall, false, new AnswerChatCallListener(this, this));
                     } else {
                         logDebug("Hanging up current call ... ");
                         megaChatApi.hangChatCall(callIdCurrentCall, new HangChatCallListener(this, this));
@@ -125,8 +131,7 @@ public class CallNotificationIntentService extends IntentService implements Hang
             case HOLD_JOIN:
                 if (currentCall == null || currentCall.isOnHold()) {
                     logDebug("Answering incoming call ...");
-                    addChecksForACall(chatIdIncomingCall, false);
-                    megaChatApi.answerChatCall(chatIdIncomingCall, false, isTraditionalCall, new AnswerChatCallListener(this, this));
+                    MegaApplication.getChatManagement().answerChatCall(chatIdIncomingCall, false, isTraditionalCall, false, new AnswerChatCallListener(this, this));
                 } else {
                     logDebug("Putting the current call on hold...");
                     megaChatApi.setCallOnHold(chatIdCurrentCall, true, new SetCallOnHoldListener(this, this));
@@ -146,8 +151,7 @@ public class CallNotificationIntentService extends IntentService implements Hang
             stopSelf();
         } else if (callId == callIdCurrentCall) {
             logDebug("Current call hung up. Answering incoming call ...");
-            addChecksForACall(chatIdIncomingCall, false);
-            megaChatApi.answerChatCall(chatIdIncomingCall, false, isTraditionalCall, new AnswerChatCallListener(this, this));
+            MegaApplication.getChatManagement().answerChatCall(chatIdIncomingCall, false, isTraditionalCall, false, new AnswerChatCallListener(this, this));
         }
     }
 
@@ -157,7 +161,7 @@ public class CallNotificationIntentService extends IntentService implements Hang
             return;
 
         logDebug("Incoming call answered.");
-        openMeetingInProgress(this, chatIdIncomingCall, true);
+        openMeetingInProgress(this, chatIdIncomingCall, true, passcodeManagement);
         clearIncomingCallNotification(callIdIncomingCall);
         stopSelf();
         Intent closeIntent = new Intent(Intent.ACTION_CLOSE_SYSTEM_DIALOGS);
@@ -173,8 +177,7 @@ public class CallNotificationIntentService extends IntentService implements Hang
     public void onCallOnHold(long chatId, boolean isOnHold) {
         if (chatIdCurrentCall == chatId && isOnHold) {
             logDebug("Current call on hold. Answering incoming call ...");
-            addChecksForACall(chatIdIncomingCall, false);
-            megaChatApi.answerChatCall(chatIdIncomingCall, false, isTraditionalCall, new AnswerChatCallListener(this, this));
+            MegaApplication.getChatManagement().answerChatCall(chatIdIncomingCall, false, isTraditionalCall, false, new AnswerChatCallListener(this, this));
         }
     }
 }

@@ -57,7 +57,7 @@ import static mega.privacy.android.app.lollipop.qrcode.MyCodeFragment.QR_IMAGE_F
 import static mega.privacy.android.app.textEditor.TextEditorUtil.getCreationOrEditorText;
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
 import static mega.privacy.android.app.utils.FileUtil.*;
-import static mega.privacy.android.app.utils.PermissionUtils.*;
+import static mega.privacy.android.app.utils.permission.PermissionUtils.*;
 import static mega.privacy.android.app.utils.TextUtil.addStringSeparator;
 import static mega.privacy.android.app.utils.TextUtil.isTextEmpty;
 import static mega.privacy.android.app.utils.Util.*;
@@ -160,7 +160,7 @@ public class UploadService extends Service implements MegaTransferListenerInterf
         }
 
         mBuilder = new Notification.Builder(UploadService.this);
-		mBuilderCompat = new NotificationCompat.Builder(UploadService.this, null);
+		mBuilderCompat = new NotificationCompat.Builder(UploadService.this, NOTIFICATION_CHANNEL_UPLOAD_ID);
 		mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
 
 		startForeground();
@@ -727,16 +727,16 @@ public class UploadService extends Service implements MegaTransferListenerInterf
             if (isFolderUpload) {
                 filesProgress = totalFolderUploadsCompleted + 1 > totalFolderUploads ? totalFolderUploads : totalFolderUploadsCompleted + 1;
                 if (megaApi.areTransfersPaused(MegaTransfer.TYPE_UPLOAD)) {
-                    message = getResources().getQuantityString(R.plurals.folder_upload_service_paused_notification, totalFolderUploads, filesProgress, totalFolderUploads);
+                    message = StringResourcesUtils.getString(R.string.folder_upload_service_notification_paused, filesProgress, totalFolderUploads);
                 } else {
-                    message = getResources().getQuantityString(R.plurals.folder_upload_service_notification, totalFolderUploads, filesProgress, totalFolderUploads);
+                    message = StringResourcesUtils.getString(R.string.folder_upload_service_notification, filesProgress, totalFolderUploads);
                 }
             } else {
                 filesProgress = totalFileUploadsCompleted + 1 > totalFileUploads ? totalFileUploads : totalFileUploadsCompleted + 1;
                 if (megaApi.areTransfersPaused(MegaTransfer.TYPE_UPLOAD)) {
-                    message = getResources().getQuantityString(R.plurals.upload_service_paused_notification, totalFileUploads, filesProgress, totalFileUploads);
+                    message = StringResourcesUtils.getString(R.string.upload_service_notification_paused, filesProgress, totalFileUploads);
                 } else {
-                    message = getResources().getQuantityString(R.plurals.upload_service_notification, totalFileUploads, filesProgress, totalFileUploads);
+                    message = StringResourcesUtils.getString(R.string.upload_service_notification, filesProgress, totalFileUploads);
                 }
             }
         }

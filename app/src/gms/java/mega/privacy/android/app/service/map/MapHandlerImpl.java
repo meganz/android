@@ -2,6 +2,7 @@ package mega.privacy.android.app.service.map;
 
 import android.annotation.SuppressLint;
 import android.graphics.Bitmap;
+import android.graphics.Canvas;
 import android.location.Address;
 import android.location.Location;
 import android.os.Looper;
@@ -221,25 +222,23 @@ public class MapHandlerImpl extends AbstractMapHandler implements OnMapReadyCall
             LatLngBounds latLngBounds = getLatLngBounds(RADIUS, location);
             googleMap.moveCamera(CameraUpdateFactory.newLatLngBounds(latLngBounds, 0));
             googleMap.setOnMapLoadedCallback(() -> {
-                mapView.setDrawingCacheEnabled(true);
-                mapView.measure(View.MeasureSpec.makeMeasureSpec(mapWidth, View.MeasureSpec.EXACTLY),
-                        View.MeasureSpec.makeMeasureSpec(mapWidth, View.MeasureSpec.EXACTLY));
-                mapView.layout(0, 0, mapWidth, mapWidth);
-                mapView.buildDrawingCache(true);
-                Bitmap bitmap = Bitmap.createScaledBitmap(mapView.getDrawingCache(), SNAPSHOT_SIZE, SNAPSHOT_SIZE, true);
-                mapView.setDrawingCacheEnabled(false);
-
+                Bitmap bitmap = Bitmap.createBitmap(mapView.getWidth(), mapView.getHeight(), Bitmap.Config.ARGB_8888);
+                Canvas canvas = new Canvas(bitmap);
+                mapView.draw(canvas);
+                bitmap = Bitmap.createScaledBitmap(bitmap, SNAPSHOT_SIZE, SNAPSHOT_SIZE, true);
                 ByteArrayOutputStream stream = new ByteArrayOutputStream();
                 int quality = 100;
                 bitmap.compress(Bitmap.CompressFormat.JPEG, quality, stream);
                 byte[] byteArray = stream.toByteArray();
                 logDebug("The bitmaps has " + byteArray.length + " initial size");
+
                 while (byteArray.length > MAX_SIZE) {
                     stream = new ByteArrayOutputStream();
                     quality -= 10;
                     bitmap.compress(Bitmap.CompressFormat.JPEG, quality, stream);
                     byteArray = stream.toByteArray();
                 }
+
                 logDebug("The bitmaps has " + byteArray.length + " final size with quality: " + quality);
                 sendSnapshot(byteArray, latitude, longitude);
             });
