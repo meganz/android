@@ -1,8 +1,8 @@
 package mega.privacy.android.app.fragments.homepage.photos
 
-import androidx.hilt.lifecycle.ViewModelInject
 import androidx.lifecycle.*
 import com.jeremyliao.liveeventbus.LiveEventBus
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.fragments.homepage.TypedFilesRepository
 import mega.privacy.android.app.fragments.managerFragments.cu.CUCard
@@ -14,8 +14,10 @@ import mega.privacy.android.app.utils.ZoomUtil.DAYS_INDEX
 import mega.privacy.android.app.utils.ZoomUtil.MONTHS_INDEX
 import mega.privacy.android.app.utils.ZoomUtil.YEARS_INDEX
 import nz.mega.sdk.MegaApiJava.*
+import javax.inject.Inject
 
-class ImagesViewModel @ViewModelInject constructor(
+@HiltViewModel
+class ImagesViewModel @Inject constructor(
     private val repository: TypedFilesRepository
 ) : ViewModel() {
 

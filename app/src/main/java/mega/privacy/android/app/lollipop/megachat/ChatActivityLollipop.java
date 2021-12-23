@@ -219,7 +219,7 @@ import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.LogUtil.logDebug;
 import static mega.privacy.android.app.utils.MegaApiUtils.*;
 import static mega.privacy.android.app.utils.MegaNodeUtil.*;
-import static mega.privacy.android.app.utils.PermissionUtils.*;
+import static mega.privacy.android.app.utils.permission.PermissionUtils.*;
 import static mega.privacy.android.app.utils.StringResourcesUtils.getQuantityString;
 import static mega.privacy.android.app.utils.TextUtil.*;
 import static mega.privacy.android.app.utils.StringResourcesUtils.getTranslatedErrorString;
@@ -665,8 +665,7 @@ public class ChatActivityLollipop extends PasscodeActivity
                 call.getStatus() == MegaChatCall.CALL_STATUS_TERMINATING_USER_PARTICIPATION))
             return;
 
-        addChecksForACall(chatRoom.getChatId(), false);
-        megaChatApi.answerChatCall(idChat, false, true,  new AnswerChatCallListener(this, this));
+        MegaApplication.getChatManagement().answerChatCall(chatRoom.getChatId(), false, true, false, new AnswerChatCallListener(this, this));
     }
 
     @Override
@@ -694,8 +693,7 @@ public class ChatActivityLollipop extends PasscodeActivity
                 return;
 
         logDebug("Active call on hold. Answer call.");
-        addChecksForACall(chatRoom.getChatId(), false);
-        megaChatApi.answerChatCall(idChat, false, true, new AnswerChatCallListener(this, this));
+        MegaApplication.getChatManagement().answerChatCall(idChat, false, true, false, new AnswerChatCallListener(this, this));
     }
 
     @Override
@@ -3209,9 +3207,8 @@ public class ChatActivityLollipop extends PasscodeActivity
             if (callInThisChat.getStatus() == MegaChatCall.CALL_STATUS_USER_NO_PRESENT ||
                     callInThisChat.getStatus() == MegaChatCall.CALL_STATUS_TERMINATING_USER_PARTICIPATION) {
                 logDebug("The call in this chat is In progress, but I do not participate");
-                addChecksForACall(chatRoom.getChatId(), startVideo);
                 callInProgressLayout.setEnabled(false);
-                megaChatApi.answerChatCall(idChat, startVideo, !chatRoom.isMeeting(), new AnswerChatCallListener(this, this));
+                MegaApplication.getChatManagement().answerChatCall(chatRoom.getChatId(), startVideo, !chatRoom.isMeeting(), startVideo, new AnswerChatCallListener(this, this));
             }
             return;
         }
@@ -3846,8 +3843,7 @@ public class ChatActivityLollipop extends PasscodeActivity
                         MegaChatCall callInChat = megaChatApi.getChatCall(callInThisChat);
                         if (callInChat != null && (callInChat.getStatus() == MegaChatCall.CALL_STATUS_USER_NO_PRESENT ||
                                 callInChat.getStatus() == MegaChatCall.CALL_STATUS_TERMINATING_USER_PARTICIPATION )) {
-                            addChecksForACall(callInThisChat, false);
-                            megaChatApi.answerChatCall(callInThisChat, false, true, new AnswerChatCallListener(this, this));
+                            MegaApplication.getChatManagement().answerChatCall(callInThisChat, false, true, false, new AnswerChatCallListener(this, this));
                         }
                     }else{
                         megaChatApi.setCallOnHold(anotherCall.getChatid(), true, new SetCallOnHoldListener(this, this, this));

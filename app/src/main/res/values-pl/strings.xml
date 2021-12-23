@@ -66,8 +66,6 @@
     <string name="general_error_word">Błąd</string>
     <!-- when clicking into a menu whose functionality is not yet implemented -->
     <string name="general_not_yet_implemented">W przygotowaniu</string>
-    <!-- when any file or folder is selected -->
-    <string name="error_no_selection">Nie wybrano żadnego pliku lub katalogu</string>
     <!-- when trying to download a file that is already downloaded in the device -->
     <string name="general_already_downloaded">Plik został już&#160;pobrany</string>
     <!-- when trying to upload a file that is already uploaded in the folder -->
@@ -649,10 +647,6 @@
     <string name="upload_to_audio">Dzwięk</string>
     <!-- Title of the button in the contact info screen to start a video call -->
     <string name="upload_to_video">Film</string>
-    <!-- upload to. Then choose to browse the file system to choose a file -->
-    <string name="upload_to_filesystem">Wybierz z systemu plików</string>
-    <!-- upload to. Then choose to browse the file system to choose a file -->
-    <string name="upload_to_filesystem_from">Wybierz z</string>
     <!-- Label for the current uploaded size of a file. For example, 3 files, 50KB uploaded -->
     <string name="upload_uploaded">wgrany</string>
     <!-- Status text at the beginning of an upload, Status text at the beginning of an upload for 2 or more files -->
@@ -1464,7 +1458,7 @@
     <!-- settings of the chat to choose the status -->
     <string name="settings_chat_vibration">Wibracje</string>
     <!-- Button text shown on SMS verification page, if the user wants to logout current suspended account and login with another account, user can press this button to logout -->
-    <string name="sms_logout">[A]Wyloguj się[/A], aby użyć MEGA z innym kontem</string>
+    <string name="sms_logout">[A]Wyloguj się[/A], aby zmienić konto MEGA</string>
     <!-- On SMS verification page, if the user presses the logout button, a dialog with this text will show to ask for user’s confirmation. -->
     <string name="confirm_logout_from_sms_verification">Czy na pewno chcesz się wylogować z bieżącego konta?</string>
     <!-- Text shown when a message has been deleted in the chat -->
@@ -3230,8 +3224,6 @@
     </plurals>
     <!-- Title of a chat message that contains geolocation info -->
     <string name="title_geolocation_message">Przypięta lokalizacja</string>
-    <!-- Text of the button to indicate an attachment upload from file system -->
-    <string name="attachment_upload_panel_from_device">Z systemu plików</string>
     <!-- Alert shown when a num of files have not been sent because of any error occurs, Plural of file. 2 files -->
     <plurals name="num_files_not_send">
         <item quantity="one">Plik %d nie został wysłany do czatów %d</item>
@@ -3906,7 +3898,7 @@
     <!-- Context menu item. Allows user to delete file/folder from favourites -->
     <string name="file_properties_unfavourite">Usuń ulubione</string>
     <!-- Context menu item. Allows to mark file/folder with own color label -->
-    <string name="file_properties_label">Etykieta&#8230;</string>
+    <string name="file_properties_label">Etykieta</string>
     <!-- Information text to let’s the user know that they can remove a colour from a folder or file that was already marked. -->
     <string name="action_remove_label">Usuń etykietę</string>
     <!-- Title text to show label selector. -->
@@ -3938,19 +3930,13 @@
     <!-- Preferences screen item title for cookie settings -->
     <string name="settings_about_cookie_settings">Ustawienia ciasteczek</string>
     <!-- Cookie dialog title -->
-    <string name="dialog_cookie_alert_title">Zanim przejdziesz dalej</string>
+    <string name="dialog_cookie_alert_title">Twoja prywatność</string>
     <!-- Cookie dialog message. Please, keep the placeholders to format the string. -->
-    <string name="dialog_cookie_alert_message">Korzystamy z lokalnej pamięci masowej i podobnych technologii (“pliki cookie”), aby świadczyć nasze usługi na rzecz użytkownika, poprawić jakość korzystania z naszych usług i dostosować reklamy, które użytkownik widzi, w tym za pośrednictwem stron trzecich. Zaakceptuj wykorzystanie przez nas plików cookie od początku wizyty lub dostosuj pliki cookie w Ustawieniach plików cookie. Przeczytaj więcej w naszej [A]Polityce plików cookie[/A].</string>
+    <string name="dialog_cookie_alert_message">Używamy plików cookie i podobnych technologii (“pliki cookie”), aby zapewnić i poprawić jakość korzystania z naszych usług. Zaakceptuj używanie przez nas plików cookie od początku wizyty lub dostosuj pliki cookie w Ustawieniach plików cookie. Przeczytaj więcej w naszej [A]Polityce plików cookie[/A].</string>
     <!-- Cookie dialog message showed when there are unsaved settings. -->
     <string name="dialog_cookie_alert_unsaved">Ustawienia ciasteczek nie zapisane.</string>
     <!-- Snackbar message showed when there settings has been saved successfully. -->
     <string name="dialog_cookie_snackbar_saved">Zmiany w ustawieniach plików cookie zostały zapisane</string>
-    <!-- Cookie dialog third party first subtitle -->
-    <string name="dialog_cookie_thirdparty_subtitle1">Cookies reklamowe Google</string>
-    <!-- Cookie dialog third party second subtitle -->
-    <string name="dialog_cookie_thirdparty_subtitle2">Kategoria: Cookies reklamowe</string>
-    <!-- Cookie dialog third party message. Please, keep the placeholders to format the string. -->
-    <string name="dialog_cookie_thirdparty_message">Używane przez Google do:\n- dostosowywania reklam wyświetlanych przez Google w naszej witrynie oraz w innych usługach i witrynach internetowych, w oparciu o takie elementy jak lokalizacja użytkownika i inne witryny, które użytkownik wcześniej odwiedził;\n- monitorowania częstotliwości wyświetlania określonych reklam;\n- zapobiegania oszustwom; oraz\n- określania, kiedy użytkownik kliknie konkretną reklamę, a następnie śledzenia następujących działań podejmowanych w odpowiedzi na tę reklamę.\nhttps://policies.google.com/technologies/partner-sites</string>
     <!-- Preference screen item title -->
     <string name="preference_cookies_accept">Zaakceptuj pliki cookie</string>
     <!-- Preference screen item title -->
@@ -3958,21 +3944,9 @@
     <!-- Preference screen item summary -->
     <string name="preference_cookies_essential_summary">Niezbędne do zapewnienia Państwu ważnych funkcji i bezpiecznego dostępu do naszych usług. Z tego powodu nie wymagają one zgody.</string>
     <!-- Preference screen item title -->
-    <string name="preference_cookies_preference_title">Pliki cookie dotyczące preferencji</string>
-    <!-- Preference screen item summary -->
-    <string name="preference_cookies_preference_summary">Pozwól nam zapamiętać wybrane przez Ciebie ustawienia wyświetlania i formatowania. Brak akceptacji tych plików cookie oznacza, że nie będziemy w stanie zapamiętać niektórych rzeczy, takich jak preferowany układ ekranu.</string>
-    <!-- Preference screen item title -->
     <string name="preference_cookies_performance_title">Pliki cookie dotyczące wydajności i analizy</string>
     <!-- Preference screen item summary -->
     <string name="preference_cookies_performance_summary">Pomóż nam zrozumieć, w jaki sposób korzystasz z naszych usług i podaj nam dane, których możemy użyć do wprowadzenia ulepszeń. Brak akceptacji tych plików cookie oznacza, że będziemy mieć mniej dostępnych danych, aby pomóc w projektowaniu ulepszeń.</string>
-    <!-- Preference screen item title -->
-    <string name="preference_cookies_advertising_title">Reklamowe pliki cookie</string>
-    <!-- Preference screen item summary -->
-    <string name="preference_cookies_advertising_summary">Używane przez nas i naszych zatwierdzonych partnerów reklamowych do dostosowywania reklam, które widzisz w naszych usługach i na innych stronach internetowych na podstawie historii przeglądania. Brak akceptacji tych plików cookie oznacza, że możemy wyświetlać reklamy, które są mniej istotne.</string>
-    <!-- Preference screen item title -->
-    <string name="preference_cookies_thirdparty_title">Pliki cookie stron trzecich</string>
-    <!-- Preference screen item summary. Please, keep the placeholders to format the string. -->
-    <string name="preference_cookies_thirdparty_summary">Są to pliki cookie, które są kontrolowane przez kogoś innego niż my; używamy tych plików cookie w celu zapewnienia opisanych powyżej funkcji. Brak akceptacji tych plików cookie będzie miał różne konsekwencje w zależności od rodzaju pliku cookie, jakim jest plik cookie należący do osoby trzeciej. Kliknij “Więcej informacji” poniżej, aby uzyskać szczegółowe informacje na temat wszystkich używanych przez nas plików cookie osób trzecich.</string>
     <!-- Preference screen item state description -->
     <string name="preference_cookies_always_on">Zawsze włączone</string>
     <!-- Menu option that allows the user to scan document and upload it directly to MEGA. -->
@@ -4368,4 +4342,10 @@
     <string name="image_insertion_not_allowed">MEGA nie obsługuje wstawiania zdjęć w tym miejscu</string>
     <!-- The label under the button of viewing all images screen -->
     <string name="section_images">Obrazy</string>
+    <!-- Title of the dialog warning the user about disable file versioning. -->
+    <string name="disable_versioning_label">Wyłącz wersjonowanie</string>
+    <!-- Warning of the dialog informing the user about disable file versioning. -->
+    <string name="disable_versioning_warning">Our file versioning feature ensures that we keep older copies of your files around if you replace them with newer versions. If you disable File Versioning you will no longer have this protection; the old copy will be lost when you replace it.</string>
+    <!-- Warning informing the user the folder location is trying to open no longer exists. -->
+    <string name="location_not_exist">This location no longer exists.</string>
 </resources>

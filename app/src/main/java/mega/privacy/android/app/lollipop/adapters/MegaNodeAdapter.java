@@ -457,7 +457,7 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
      */
     private ArrayList<MegaNode> insertPlaceHolderNode(ArrayList<MegaNode> nodes) {
         if (adapterType == ITEM_VIEW_TYPE_LIST) {
-            if (!nodes.isEmpty()) {
+            if (shouldShowSortByHeader(nodes)) {
                 placeholderCount = 1;
                 nodes.add(0, null);
             } else {
@@ -487,12 +487,25 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
             }
         }
 
-        if (!nodes.isEmpty()) {
+        if (shouldShowSortByHeader(nodes)) {
             placeholderCount++;
             nodes.add(0, null);
         }
 
         return nodes;
+    }
+
+    /**
+     * Checks if should show sort by header.
+     * It should show the header if the list of nodes is not empty and if the adapter is not:
+     * FOLDER_LINK_ADAPTER, CONTACT_SHARED_FOLDER_ADAPTER or CONTACT_FILE_ADAPTER.
+     *
+     * @param nodes List of nodes to check if is empty or not.
+     * @return True if should show the sort by header, false otherwise.
+     */
+    private boolean shouldShowSortByHeader(ArrayList<MegaNode> nodes) {
+        return !nodes.isEmpty() && type != FOLDER_LINK_ADAPTER
+                && type != CONTACT_SHARED_FOLDER_ADAPTER && type != CONTACT_FILE_ADAPTER;
     }
 
     @NotNull
@@ -916,11 +929,9 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
         holder.textViewFileName.setText(node.getName());
         holder.textViewFileSize.setText("");
 
-        holder.imageFavourite.setVisibility(type != RUBBISH_BIN_ADAPTER
-                && type != FOLDER_LINK_ADAPTER && node.isFavourite() ? View.VISIBLE : View.GONE);
+        holder.imageFavourite.setVisibility(type != FOLDER_LINK_ADAPTER && node.isFavourite() ? View.VISIBLE : View.GONE);
 
-        if (type != RUBBISH_BIN_ADAPTER && type != FOLDER_LINK_ADAPTER
-                && node.getLabel() != MegaNode.NODE_LBL_UNKNOWN) {
+        if (type != FOLDER_LINK_ADAPTER && node.getLabel() != MegaNode.NODE_LBL_UNKNOWN) {
             Drawable drawable = MegaNodeUtil.getNodeLabelDrawable(node.getLabel(), holder.itemView.getResources());
             holder.imageLabel.setImageDrawable(drawable);
             holder.imageLabel.setVisibility(View.VISIBLE);

@@ -1,11 +1,13 @@
 package mega.privacy.android.app.fragments.homepage
 
-import androidx.hilt.lifecycle.ViewModelInject
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import dagger.hilt.android.lifecycle.HiltViewModel
+import javax.inject.Inject
 
-class ActionModeViewModel @ViewModelInject constructor() : ViewModel() {
+@HiltViewModel
+class ActionModeViewModel @Inject constructor() : ViewModel() {
 
     // The full set of nodes
     private lateinit var nodesData: List<NodeItem>
