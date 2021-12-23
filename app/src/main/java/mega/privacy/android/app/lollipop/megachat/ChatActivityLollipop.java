@@ -147,7 +147,6 @@ import mega.privacy.android.app.lollipop.listeners.MultipleForwardChatProcessor;
 import mega.privacy.android.app.lollipop.listeners.MultipleRequestListener;
 import mega.privacy.android.app.lollipop.megachat.chatAdapters.MegaChatLollipopAdapter;
 import mega.privacy.android.app.middlelayer.push.PushMessageHanlder;
-import mega.privacy.android.app.modalbottomsheet.MeetingBottomSheetDialogFragment;
 import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.ReactionsBottomSheet;
 import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.InfoReactionsBottomSheet;
 import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.GeneralChatMessageBottomSheet;
@@ -1070,7 +1069,10 @@ public class ChatActivityLollipop extends PasscodeActivity
         }
     }
 
-    public void showGroupInfoActivity(){
+    /**
+     * Opens Group info if a group chat conversation or a contact info if a 1to1 conversation.
+     */
+    public void showGroupOrContactInfoActivity(){
         logDebug("showGroupInfoActivity");
         if (chatRoom == null)
             return;
@@ -2754,7 +2756,7 @@ public class ChatActivityLollipop extends PasscodeActivity
 
             case R.id.cab_menu_contact_info_chat:{
                 if(recordView.isRecordingNow()) break;
-                showGroupInfoActivity();
+                showGroupOrContactInfoActivity();
                 break;
             }
             case R.id.cab_menu_clear_history_chat:{
@@ -4049,7 +4051,7 @@ public class ChatActivityLollipop extends PasscodeActivity
                 logDebug("toolbar_chat");
                 if(recordView.isRecordingNow()) break;
 
-                showGroupInfoActivity();
+                showGroupOrContactInfoActivity();
                 break;
 
             case R.id.message_jump_layout:
@@ -5405,13 +5407,7 @@ public class ChatActivityLollipop extends PasscodeActivity
 
                                     if (m.getMessage().getUserHandle(0) != megaChatApi.getMyUserHandle()) {
                                         String email = m.getMessage().getUserEmail(0);
-                                        MegaUser contact = megaApi.getContact(email);
-
-                                        if (contact != null && contact.getVisibility() == MegaUser.VISIBILITY_VISIBLE) {
-                                            ContactUtil.openContactInfoActivity(this, email);
-                                        } else {
-                                            checkIfInvitationIsAlreadySent(email, getNameContactAttachment(m.getMessage()));
-                                        }
+                                        showContactClickResult(email, getNameContactAttachment(m.getMessage()));
                                     }
                                 }
                             }
@@ -5508,15 +5504,27 @@ public class ChatActivityLollipop extends PasscodeActivity
             return;
         }
 
-        MegaUser contact = megaApi.getContact(email);
-
         if (email.equals(megaApi.getMyEmail())) {
             logDebug("Contact is my own contact");
             return;
         }
 
+        showContactClickResult(email, contactLinkResult.getFullName());
+    }
+
+    /**
+     * Shows the final result of a contact link or attachment message click.
+     *
+     * @param email Email of the contact.
+     * @param name  Name of the contact.
+     */
+    private void showContactClickResult(String email, String name) {
+        MegaUser contact = megaApi.getContact(email);
+
         if (contact == null || contact.getVisibility() != MegaUser.VISIBILITY_VISIBLE) {
-            checkIfInvitationIsAlreadySent(email, contactLinkResult.getFullName());
+            checkIfInvitationIsAlreadySent(email, name);
+        } else if (!chatRoom.isGroup() && chatRoom.getPeerEmail(0).equals(email)){
+            showGroupOrContactInfoActivity();
         } else {
             ContactUtil.openContactInfoActivity(this, email);
         }
