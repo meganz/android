@@ -14,9 +14,9 @@ import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.google.android.exoplayer2.SimpleExoPlayer
 import com.google.android.exoplayer2.util.RepeatModeUtil
 import mega.privacy.android.app.databinding.FragmentAudioPlaylistBinding
+import mega.privacy.android.app.mediaplayer.MediaMegaPlayer
 import mega.privacy.android.app.mediaplayer.MediaPlayerActivity
 import mega.privacy.android.app.mediaplayer.service.*
 import mega.privacy.android.app.utils.CallUtil
@@ -45,7 +45,7 @@ class PlaylistFragment : Fragment(), PlaylistItemOperation {
                 playerService = service.service
 
                 if (service.service.viewModel.audioPlayer) {
-                    setupPlayerView(service.service.exoPlayer)
+                    setupPlayerView(service.service.player)
                 } else {
                     binding.playerView.isVisible = false
 
@@ -146,7 +146,7 @@ class PlaylistFragment : Fragment(), PlaylistItemOperation {
         }
     }
 
-    private fun setupPlayerView(player: SimpleExoPlayer) {
+    private fun setupPlayerView(player: MediaMegaPlayer) {
         binding.playerView.player = player
 
         binding.playerView.useController = true
@@ -158,8 +158,6 @@ class PlaylistFragment : Fragment(), PlaylistItemOperation {
         )
 
         binding.playerView.showController()
-
-        binding.playerView.setControlDispatcher(CallAwareControlDispatcher(player.repeatMode))
     }
 
     override fun onItemClick(item: PlaylistItem) {
