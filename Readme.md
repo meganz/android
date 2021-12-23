@@ -82,7 +82,7 @@ Then download and setup NDK follow guides above, then run this command to build:
     `bash ./build.sh all`
 
 
-#####If the build script fails to detect cmake when building ffmpeg extension on a mac
+##### If the build script fails to detect cmake when building ffmpeg extension on a mac
 
 1. In Android studio, open the SDK manager (Or through Settings>Appearance & Behaviour>System Settings>Android SDK)
 2. Go to the SDK Tools tab
