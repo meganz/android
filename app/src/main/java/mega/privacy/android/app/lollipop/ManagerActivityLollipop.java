@@ -6498,12 +6498,22 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 						case OUTGOING_TAB:
 							decreaseDeepBrowserTreeOutgoing();
 							parentHandleOutgoing = deepBrowserTreeOutgoing == 0 ? INVALID_HANDLE : result.getOldParentHandle();
+
+							if (parentHandleOutgoing == INVALID_HANDLE) {
+								hideTabs(false, OUTGOING_TAB);
+							}
+
 							refreshOutgoingShares();
 							break;
 
 						case LINKS_TAB:
 							decreaseDeepBrowserTreeLinks();
 							parentHandleLinks = deepBrowserTreeLinks == 0 ? INVALID_HANDLE : result.getOldParentHandle();
+
+							if (parentHandleLinks == INVALID_HANDLE) {
+								hideTabs(false, LINKS_TAB);
+							}
+
 							refreshLinks();
 							break;
 					}
@@ -10193,6 +10203,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 										if (throwable != null) {
 											decreaseDeepBrowserTreeIncoming();
 											parentHandleIncoming = INVALID_HANDLE;
+											hideTabs(false, INCOMING_TAB);
 											refreshIncomingShares();
 										}
 									});
