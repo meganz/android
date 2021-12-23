@@ -921,4 +921,5 @@ public class Constants {
     public static final int AVATAR_CHANGE = 1;
 
     public static final int CLICKS_ENABLE_DEBUG = 5;
+    public static final int FIRST_NAVIGATION_LEVEL = 0;
 }

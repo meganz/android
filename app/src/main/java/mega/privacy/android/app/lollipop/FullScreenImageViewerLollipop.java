@@ -685,7 +685,7 @@ public class FullScreenImageViewerLollipop extends PasscodeActivity
 					}
 					if (adapterType == INCOMING_SHARES_ADAPTER || fromIncoming) {
 						i.putExtra("from", FROM_INCOMING_SHARES);
-						i.putExtra("firstLevel", false);
+						i.putExtra(INTENT_EXTRA_KEY_FIRST_LEVEL, false);
 					}
 					else if(adapterType == INBOX_ADAPTER){
 						i.putExtra("from", FROM_INBOX);

@@ -466,7 +466,7 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
                     int dBT = ((ManagerActivityLollipop) requireActivity()).getDeepBrowserTreeIncoming();
                     logDebug("DeepTree value:" + dBT);
 
-                    if (dBT > 0 && !isParentNode) {
+                    if (dBT > FIRST_NAVIGATION_LEVEL && !isParentNode) {
                         optionLeaveShares.setVisibility(View.GONE);
                     } else {
                         //Show the owner of the shared folder
@@ -503,7 +503,7 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
                             optionClearShares.setVisibility(View.GONE);
                             optionRename.setVisibility(View.VISIBLE);
 
-                            if (dBT > 0 && !isParentNode) {
+                            if (dBT > FIRST_NAVIGATION_LEVEL && !isParentNode) {
                                 optionRubbishBin.setVisibility(View.VISIBLE);
                                 optionMove.setVisibility(View.VISIBLE);
                             } else {
@@ -576,7 +576,7 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
                         optionRemoveLink.setVisibility(View.GONE);
                     }
 
-                    if (((ManagerActivityLollipop) requireActivity()).getDeepBrowserTreeOutgoing() == 0) {
+                    if (((ManagerActivityLollipop) requireActivity()).getDeepBrowserTreeOutgoing() == FIRST_NAVIGATION_LEVEL) {
                         optionClearShares.setVisibility(View.VISIBLE);
 
                         //Show the number of contacts who shared the folder
@@ -755,7 +755,7 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
                     optionRestoreFromRubbish.setVisibility(View.GONE);
 
                     logDebug("DeepTree value:" + dBT);
-                    if (dBT > 0) {
+                    if (dBT > FIRST_NAVIGATION_LEVEL) {
                         optionLeaveShares.setVisibility(View.GONE);
                         nodeIconLayout.setVisibility(View.GONE);
                     } else {
@@ -792,7 +792,7 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
                             optionClearShares.setVisibility(View.GONE);
                             optionRename.setVisibility(View.VISIBLE);
 
-                            if (dBT > 0) {
+                            if (dBT > FIRST_NAVIGATION_LEVEL) {
                                 optionRubbishBin.setVisibility(View.VISIBLE);
                                 optionMove.setVisibility(View.VISIBLE);
 
@@ -1037,7 +1037,8 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
                 if (drawerItem == ManagerActivityLollipop.DrawerItem.SHARED_ITEMS) {
                     if (((ManagerActivityLollipop) requireActivity()).getTabItemShares() == 0) {
                         i.putExtra("from", FROM_INCOMING_SHARES);
-                        i.putExtra("firstLevel", ((ManagerActivityLollipop) requireActivity()).getDeepBrowserTreeIncoming() <= 0);
+                        i.putExtra(INTENT_EXTRA_KEY_FIRST_LEVEL,
+                                ((ManagerActivityLollipop) requireActivity()).getDeepBrowserTreeIncoming() <= FIRST_NAVIGATION_LEVEL);
                     } else if (((ManagerActivityLollipop) requireActivity()).getTabItemShares() == 1) {
                         i.putExtra("adapterType", OUTGOING_SHARES_ADAPTER);
                     }
@@ -1049,11 +1050,7 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
                     if (nC.nodeComesFromIncoming(node)) {
                         i.putExtra("from", FROM_INCOMING_SHARES);
                         int dBT = nC.getIncomingLevel(node);
-                        if (dBT <= 0) {
-                            i.putExtra("firstLevel", true);
-                        } else {
-                            i.putExtra("firstLevel", false);
-                        }
+                        i.putExtra(INTENT_EXTRA_KEY_FIRST_LEVEL, dBT <= FIRST_NAVIGATION_LEVEL);
                     }
                 }
                 i.putExtra(NAME, node.getName());

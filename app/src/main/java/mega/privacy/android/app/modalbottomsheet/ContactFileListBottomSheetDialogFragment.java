@@ -222,7 +222,7 @@ public class ContactFileListBottomSheetDialogFragment extends BaseBottomSheetDia
                 Intent i = new Intent(requireContext(), FileInfoActivityLollipop.class);
                 i.putExtra(HANDLE, node.getHandle());
                 i.putExtra("from", FROM_INCOMING_SHARES);
-                i.putExtra("firstLevel", node.isInShare());
+                i.putExtra(INTENT_EXTRA_KEY_FIRST_LEVEL, node.isInShare());
                 i.putExtra(NAME, node.getName());
                 startActivity(i);
                 break;
