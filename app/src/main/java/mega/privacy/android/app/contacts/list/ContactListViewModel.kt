@@ -1,10 +1,10 @@
 package mega.privacy.android.app.contacts.list
 
-import androidx.hilt.lifecycle.ViewModelInject
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.map
 import androidx.lifecycle.switchMap
+import dagger.hilt.android.lifecycle.HiltViewModel
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.kotlin.addTo
 import io.reactivex.rxjava3.kotlin.subscribeBy
@@ -24,6 +24,7 @@ import mega.privacy.android.app.utils.StringResourcesUtils.getString
 import mega.privacy.android.app.utils.notifyObserver
 import nz.mega.sdk.MegaUser
 import java.util.concurrent.TimeUnit
+import javax.inject.Inject
 
 /**
  * ViewModel that handles all related logic to Contacts for the current user.
@@ -33,7 +34,8 @@ import java.util.concurrent.TimeUnit
  * @property getChatRoomUseCase         Use case to get current chat room for existing user
  * @property removeContactUseCase       Use case to remove existing contact
  */
-class ContactListViewModel @ViewModelInject constructor(
+@HiltViewModel
+class ContactListViewModel @Inject constructor(
     private val getContactsUseCase: GetContactsUseCase,
     private val getContactRequestsUseCase: GetContactRequestsUseCase,
     private val getChatRoomUseCase: GetChatRoomUseCase,

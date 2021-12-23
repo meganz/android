@@ -66,8 +66,6 @@
     <string name="general_error_word">Erreur</string>
     <!-- when clicking into a menu whose functionality is not yet implemented -->
     <string name="general_not_yet_implemented">Pas encore implémenté</string>
-    <!-- when any file or folder is selected -->
-    <string name="error_no_selection">Aucun fichier ou dossier n’a été sélectionné</string>
     <!-- when trying to download a file that is already downloaded in the device -->
     <string name="general_already_downloaded">Déjà téléchargé</string>
     <!-- when trying to upload a file that is already uploaded in the folder -->
@@ -631,10 +629,6 @@
     <string name="upload_to_audio">Son</string>
     <!-- Title of the button in the contact info screen to start a video call -->
     <string name="upload_to_video">Vidéo</string>
-    <!-- upload to. Then choose to browse the file system to choose a file -->
-    <string name="upload_to_filesystem">Du système de fichiers</string>
-    <!-- upload to. Then choose to browse the file system to choose a file -->
-    <string name="upload_to_filesystem_from">Choisir de</string>
     <!-- Label for the current uploaded size of a file. For example, 3 files, 50KB uploaded -->
     <string name="upload_uploaded">téléversé</string>
     <!-- Status text at the beginning of an upload, Status text at the beginning of an upload for 2 or more files -->
@@ -1225,7 +1219,7 @@
         <item quantity="other">%1$d éléments</item>
     </plurals>
     <!-- Error message shown when opening a file or folder link which account has been removed due to ToS/AUP violation -->
-    <string name="file_link_unavaible_delete_account">Le compte utilisateur associé a été annulé en raison du non-respect répété de nos Conditions générales d’utilisation.</string>
+    <string name="file_link_unavaible_delete_account">Le compte utilisateur associé a été résilié en raison du non-respect répété de nos Conditions générales d’utilisation.</string>
     <!-- Error message shown after login into a folder link with an invalid decryption key -->
     <string name="general_error_invalid_decryption_key">La clé de déchiffrement fournie pour le lien de dossier est invalide.</string>
     <!-- Title of the label in the my account section. It shows the credentials of the current user so it can be used to be verified by other contacts -->
@@ -1428,7 +1422,7 @@
     <!-- settings of the chat to choose the status -->
     <string name="settings_chat_vibration">Vibration</string>
     <!-- Button text shown on SMS verification page, if the user wants to logout current suspended account and login with another account, user can press this button to logout -->
-    <string name="sms_logout">[A]Déconnectez-vous[/A] pour utiliser MEGA avec un autre compte</string>
+    <string name="sms_logout">[A]Déconnectez-vous[/A] pour changer de compte&#160;MEGA</string>
     <!-- On SMS verification page, if the user presses the logout button, a dialog with this text will show to ask for user’s confirmation. -->
     <string name="confirm_logout_from_sms_verification">Voulez-vous vraiment vous déconnecter du compte actuel ?</string>
     <!-- Text shown when a message has been deleted in the chat -->
@@ -3104,8 +3098,6 @@
     </plurals>
     <!-- Title of a chat message that contains geolocation info -->
     <string name="title_geolocation_message">Position épinglée</string>
-    <!-- Text of the button to indicate an attachment upload from file system -->
-    <string name="attachment_upload_panel_from_device">À partir du système de fichiers</string>
     <!-- Alert shown when a num of files have not been sent because of any error occurs, Plural of file. 2 files -->
     <plurals name="num_files_not_send">
         <item quantity="one">%d fichier n’a pas été envoyé vers %d conversations</item>
@@ -3746,7 +3738,7 @@
     <!-- Context menu item. Allows user to delete file/folder from favourites -->
     <string name="file_properties_unfavourite">Supprimer le favori</string>
     <!-- Context menu item. Allows to mark file/folder with own color label -->
-    <string name="file_properties_label">Étiquette&#8230;</string>
+    <string name="file_properties_label">Étiquette</string>
     <!-- Information text to let’s the user know that they can remove a colour from a folder or file that was already marked. -->
     <string name="action_remove_label">Supprimer l’étiquette</string>
     <!-- Title text to show label selector. -->
@@ -3778,19 +3770,13 @@
     <!-- Preferences screen item title for cookie settings -->
     <string name="settings_about_cookie_settings">Paramètres des Témoins</string>
     <!-- Cookie dialog title -->
-    <string name="dialog_cookie_alert_title">Avant que vous ne poursuiviez</string>
+    <string name="dialog_cookie_alert_title">Votre vie privée</string>
     <!-- Cookie dialog message. Please, keep the placeholders to format the string. -->
-    <string name="dialog_cookie_alert_message">Nous utilisons la mémoire locale et des technologies semblables («&#160;cookies&#160;») pour vous fournir nos services, améliorer votre expérience d’utilisation de nos services et personnaliser les publicités que vous voyez, dont celles provenant de tiers. Acceptez dès le début de votre visite notre utilisation de Témoins ou personnalisez les Témoins dans les paramètres des Témoins. Apprenez-en davantage dans notre [A]Politique sur les Témoins[/A].</string>
+    <string name="dialog_cookie_alert_message">Nous utilisons des Témoins de connexion et des technologies semblables («&#160;Témoins&#160;») pour vous fournir nos services et améliorer votre expérience d’utilisation de nos services. Acceptez notre utilisation de Témoins dès le début de votre visite ou personnalisez les Témoins dans les paramètres des Témoins. Apprenez-en davantage dans notre [A]Politique sur les Témoins[/A].</string>
     <!-- Cookie dialog message showed when there are unsaved settings. -->
     <string name="dialog_cookie_alert_unsaved">Des paramètres de témoins ne sont pas enregistrés.</string>
     <!-- Snackbar message showed when there settings has been saved successfully. -->
     <string name="dialog_cookie_snackbar_saved">Les modifications des paramètres des témoins ont été enregistrées</string>
-    <!-- Cookie dialog third party first subtitle -->
-    <string name="dialog_cookie_thirdparty_subtitle1">Témoins publicitaires de Google</string>
-    <!-- Cookie dialog third party second subtitle -->
-    <string name="dialog_cookie_thirdparty_subtitle2">Catégorie&#160;: Témoins publicitaires</string>
-    <!-- Cookie dialog third party message. Please, keep the placeholders to format the string. -->
-    <string name="dialog_cookie_thirdparty_message">Utilisés par Google pour&#160;: \n• Personnaliser les publicités que Google affiche sur nos services et sites Web, et sur d’autres services et sites Web, d’après des éléments tels que votre position géographique et les autres sites Web que vous avez visités précédemment ; \n• Surveiller la fréquence d’affichage de certaines publicités ; \n• Fournir une prévention contre les fraudes ; et\n• Déterminer si vous touchez une publicité particulière, pour ensuite suivre les différentes actions que vous effectuez en réponse à cette publicité.\nhttps://policies.google.com/technologies/partner-sites</string>
     <!-- Preference screen item title -->
     <string name="preference_cookies_accept">Accepter les Témoins</string>
     <!-- Preference screen item title -->
@@ -3798,21 +3784,9 @@
     <!-- Preference screen item summary -->
     <string name="preference_cookies_essential_summary">Ils sont essentiels pour une fonction importante et pour un accès sécurisé à nos services. Pour cette raison, ils ne demandent pas de consentement.</string>
     <!-- Preference screen item title -->
-    <string name="preference_cookies_preference_title">Témoins des préférences</string>
-    <!-- Preference screen item summary -->
-    <string name="preference_cookies_preference_summary">Ils nous permettent de mémoriser certains paramètres d’affichage et de formatage que vous choisissez. Le refus de ces Témoins signifierait que nous ne pourrions pas mémoriser certaines choses pour vous, telles que votre disposition d’écran préférée.</string>
-    <!-- Preference screen item title -->
     <string name="preference_cookies_performance_title">Témoins de performance et d’analyse</string>
     <!-- Preference screen item summary -->
     <string name="preference_cookies_performance_summary">Nous permettent de comprendre comment vous utilisez nos services et nous fournissent des données que nous pouvons utiliser pour apporter des améliorations. Le refus de ces Témoins signifierait que moins de données seraient à notre disposition pour faciliter les améliorations conceptionnelles.</string>
-    <!-- Preference screen item title -->
-    <string name="preference_cookies_advertising_title">Témoins publicitaires</string>
-    <!-- Preference screen item summary -->
-    <string name="preference_cookies_advertising_summary">Ils sont utilisés par nous et par nos partenaires publicitaires approuvés afin de personnaliser les publicités que vous voyez dans nos services et sur d’autres sites Web, d’après votre historique de connexion. Le refus de ces Témoins signifierait que nous pourrions afficher des publicités moins pertinentes.</string>
-    <!-- Preference screen item title -->
-    <string name="preference_cookies_thirdparty_title">Témoins tiers</string>
-    <!-- Preference screen item summary. Please, keep the placeholders to format the string. -->
-    <string name="preference_cookies_thirdparty_summary">Ces Témoins ne sont pas contrôlés par nous, mais par des tiers ; nous utilisons ces Témoins pour fournir les types de fonctions que nous décrivons ci-dessous. Le refus de ces Témoins aurait différentes implications suivant la nature de chaque Témoin tiers. Vous obtiendrez des détails sur les Témoins que nous utilisons en touchant «&#160;Plus de précision&#160;» ci-dessous.</string>
     <!-- Preference screen item state description -->
     <string name="preference_cookies_always_on">Toujours activés</string>
     <!-- Menu option that allows the user to scan document and upload it directly to MEGA. -->
@@ -4190,4 +4164,10 @@
     <string name="image_insertion_not_allowed">MEGA ne prend pas en charge ici l’insertion d’image</string>
     <!-- The label under the button of viewing all images screen -->
     <string name="section_images">Images</string>
+    <!-- Title of the dialog warning the user about disable file versioning. -->
+    <string name="disable_versioning_label">Désactiver le versionnage des fichiers</string>
+    <!-- Warning of the dialog informing the user about disable file versioning. -->
+    <string name="disable_versioning_warning">Notre fonction de versionnage des fichiers fait en sorte que nous conservons les anciennes versions de vos fichiers si vous les remplacez par de nouvelles versions. Si vous désactivez le versionnage des fichiers, vous ne profiterez plus de cette protection ; l’ancienne copie sera perdue quand vous la remplacerez.</string>
+    <!-- Warning informing the user the folder location is trying to open no longer exists. -->
+    <string name="location_not_exist">Cet emplacement n’existe plus.</string>
 </resources>

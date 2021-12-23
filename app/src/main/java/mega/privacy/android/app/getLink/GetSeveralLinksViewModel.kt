@@ -1,8 +1,8 @@
 package mega.privacy.android.app.getLink
 
-import androidx.hilt.lifecycle.ViewModelInject
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import dagger.hilt.android.lifecycle.HiltViewModel
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.kotlin.addTo
 import io.reactivex.rxjava3.kotlin.subscribeBy
@@ -24,6 +24,7 @@ import mega.privacy.android.app.utils.Util.getSizeString
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaNode
 import java.io.File
+import javax.inject.Inject
 
 /**
  * View Model used for manage data related to [GetSeveralLinksFragment].
@@ -33,7 +34,8 @@ import java.io.File
  * @property exportNodeUseCase   Use case to export nodes.
  * @property getThumbnailUseCase Use case to request thumbnails.
  */
-class GetSeveralLinksViewModel @ViewModelInject constructor(
+@HiltViewModel
+class GetSeveralLinksViewModel @Inject constructor(
     @MegaApi private val megaApi: MegaApiAndroid,
     private val exportNodeUseCase: ExportNodeUseCase,
     private val getThumbnailUseCase: GetThumbnailUseCase

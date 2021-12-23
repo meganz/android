@@ -1,16 +1,16 @@
 // Top-level build file where you can add configuration options common to all sub-projects/modules.
 buildscript {
-    ext.gradleVersion = '4.1.1'
+    ext.gradleVersion = '7.0.4'
     ext.kotlinVersion = '1.4.10'
     ext.navigationVersion = '2.3.5'
     ext.googleServicesVersion = '4.3.5'
-    ext.hiltVersion = "2.29.1-alpha"
+    ext.hiltVersion = "2.38.1"
     ext.huaweiServicesVersion = "1.5.2.300"
     ext.firebaseCrashlyticsVersion = "2.5.1"
     repositories {
         jcenter()
         google()
-        maven { url 'http://developer.huawei.com/repo/' }
+        maven { url 'https://developer.huawei.com/repo/' }
     }
     dependencies {
         classpath "com.android.tools.build:gradle:$gradleVersion"
@@ -34,10 +34,7 @@ allprojects {
             url "https://jitpack.io"
         }
         maven {
-            url 'http://developer.huawei.com/repo/'
-        }
-        flatDir {
-            dirs "$rootProject.projectDir/app/src/main/jni/ExoPlayer/"
+            url 'https://developer.huawei.com/repo/'
         }
     }
 }
@@ -49,8 +46,8 @@ task clean(type: Delete) {
 // Define versions in a single place
 ext {
     // App
-    appVersion = "5.4"
-    versionCode = 419
+    appVersion = "5.5"
+    versionCode = 420
 
     // Sdk and tools
     compileSdkVersion = 30
@@ -74,7 +71,8 @@ ext {
     viewPagerVersion = '1.0.0'
     cardViewVersion = '1.0.0'
     legacySupportVersion = 'v4:1.0.0'
-    hiltAndroidXVersion = '1.0.0-alpha02'
+    hiltAndroidXVersion = '1.0.0-alpha03'
+    hiltAndroidXCompilerVersion = '1.0.0'
     rxJavaVersion = '3.0.4'
     rxAndroidVersion = '3.0.0'
     ankoVersion = '0.10.8'
@@ -92,4 +90,5 @@ ext {
     mockitoVersion = '3.3.3'
     mockitoKotlinVersion = '4.0.0'
     espressoVersion = '3.4.0'
+    exoPlayerVersion = '2.16.0'
 }
