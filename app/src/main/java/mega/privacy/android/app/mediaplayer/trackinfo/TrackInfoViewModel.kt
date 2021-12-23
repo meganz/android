@@ -75,7 +75,7 @@ class TrackInfoViewModel @Inject constructor(
 
     private fun loadMetadata(args: TrackInfoFragmentArgs) {
         val trackSelector = DefaultTrackSelector(context)
-        val exoPlayer = SimpleExoPlayer.Builder(context, DefaultRenderersFactory(context))
+        val exoPlayer = ExoPlayer.Builder(context, DefaultRenderersFactory(context))
             .setTrackSelector(trackSelector)
             .setLoadControl(
                 DefaultLoadControl.Builder()
@@ -87,7 +87,7 @@ class TrackInfoViewModel @Inject constructor(
 
         metadataOnlyPlayer = exoPlayer
 
-        exoPlayer.addListener(MetadataExtractor(trackSelector) { title, artist, album ->
+        exoPlayer.addListener(MetadataExtractor { title, artist, album ->
             val duration = exoPlayer.duration
             val durationText = if (duration == C.TIME_UNSET) {
                 ""

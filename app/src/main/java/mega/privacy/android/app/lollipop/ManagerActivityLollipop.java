@@ -6869,11 +6869,6 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 	}
 
 	@Override
-	public void uploadFromSystem() {
-		pickFileFromFileSystem(this);
-	}
-
-	@Override
 	public void takePictureAndUpload() {
 		if (!hasPermissions(this, Manifest.permission.CAMERA)) {
 			setTypesCameraPermission(TAKE_PICTURE_OPTION);
