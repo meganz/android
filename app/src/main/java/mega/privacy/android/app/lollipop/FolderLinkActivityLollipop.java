@@ -59,6 +59,7 @@ import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.TransfersManagementActivity;
+import mega.privacy.android.app.utils.LogUtil;
 import mega.privacy.android.app.utils.MegaProgressDialogUtil;
 import mega.privacy.android.app.components.SimpleDividerItemDecoration;
 import mega.privacy.android.app.components.saver.NodeSaver;
@@ -1308,7 +1309,16 @@ public class FolderLinkActivityLollipop extends TransfersManagementActivity impl
 					mediaIntent.putExtra("FILENAME", file.getName());
 					putThumbnailLocation(mediaIntent, listView, position, VIEWER_FROM_FOLDER_LINK, adapterList);
 					mediaIntent.putExtra("adapterType", FOLDER_LINK_ADAPTER);
-					if (megaApiFolder.getParentNode(nodes.get(position)).getType() == MegaNode.TYPE_ROOT){
+
+					MegaNode parentNode = megaApiFolder.getParentNode(nodes.get(position));
+
+					//Null check validation.
+					if (parentNode == null) {
+						LogUtil.logError(nodes.get(position).getName() + "'s parent node is null");
+						return;
+					}
+
+					if (parentNode.getType() == MegaNode.TYPE_ROOT){
 						mediaIntent.putExtra("parentNodeHandle", -1L);
 					}
 					else{
