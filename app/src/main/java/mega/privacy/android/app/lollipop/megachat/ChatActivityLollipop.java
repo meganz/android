@@ -93,6 +93,7 @@ import mega.privacy.android.app.ShareInfo;
 import mega.privacy.android.app.activities.GiphyPickerActivity;
 import mega.privacy.android.app.components.ChatManagement;
 import mega.privacy.android.app.contacts.usecase.InviteContactUseCase;
+import mega.privacy.android.app.usecase.GetAvatarUseCase;
 import mega.privacy.android.app.utils.MegaProgressDialogUtil;
 import mega.privacy.android.app.generalusecase.FilePrepareUseCase;
 import mega.privacy.android.app.listeners.CreateChatListener;
@@ -324,6 +325,8 @@ public class ChatActivityLollipop extends PasscodeActivity
     PasscodeManagement passcodeManagement;
     @Inject
     InviteContactUseCase inviteContactUseCase;
+    @Inject
+    GetAvatarUseCase getAvatarUseCase;
 
     private int currentRecordButtonState;
     private String mOutputFilePath;
@@ -6797,7 +6800,8 @@ public class ChatActivityLollipop extends PasscodeActivity
                 //Create adapter
                 if (adapter == null) {
                     adapter = new MegaChatLollipopAdapter(this, chatRoom, messages,
-                            messagesPlaying, removedMessages, listView, inviteContactUseCase);
+                            messagesPlaying, removedMessages, listView, inviteContactUseCase,
+                            getAvatarUseCase);
 
                     adapter.setHasStableIds(true);
                     listView.setAdapter(adapter);
@@ -7843,7 +7847,7 @@ public class ChatActivityLollipop extends PasscodeActivity
     private void createAdapter() {
         //Create adapter
         adapter = new MegaChatLollipopAdapter(this, chatRoom, messages, messagesPlaying,
-                removedMessages, listView, inviteContactUseCase);
+                removedMessages, listView, inviteContactUseCase, getAvatarUseCase);
 
         adapter.setHasStableIds(true);
         listView.setLayoutManager(mLayoutManager);

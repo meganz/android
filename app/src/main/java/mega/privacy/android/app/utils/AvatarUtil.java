@@ -311,12 +311,21 @@ public class AvatarUtil {
     /**
      * Gets the bitmap of an avatar file.
      *
-     * @param avatarName    name of the avatar file
+     * @param avatarName name of the avatar file
      * @return Bitmap of the avatar if the file exists.
      */
     public static Bitmap getAvatarBitmap(String avatarName) {
+        return getAvatarBitmap(buildAvatarFile(MegaApplication.getInstance(), avatarName + JPG_EXTENSION));
+    }
+
+    /**
+     * Gets the bitmap of an avatar file given the File.
+     *
+     * @param avatar Avatar file.
+     * @return The bitmap of the avatar if available.
+     */
+    public static Bitmap getAvatarBitmap(File avatar) {
         Bitmap bitmap = null;
-        File avatar = buildAvatarFile(MegaApplication.getInstance(), avatarName + JPG_EXTENSION);
 
         if (isFileAvailable(avatar) && avatar.length() > 0) {
             bitmap = BitmapFactory.decodeFile(avatar.getAbsolutePath(), new BitmapFactory.Options());

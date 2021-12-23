@@ -86,7 +86,6 @@ import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.adapters.ReactionAdapter;
 import mega.privacy.android.app.lollipop.adapters.RotatableAdapter;
 import mega.privacy.android.app.lollipop.controllers.ChatController;
-import mega.privacy.android.app.lollipop.listeners.ChatAttachmentAvatarListener;
 import mega.privacy.android.app.lollipop.listeners.ChatNonContactNameListener;
 import mega.privacy.android.app.lollipop.megachat.AndroidMegaChatMessage;
 import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop;
@@ -95,8 +94,8 @@ import mega.privacy.android.app.lollipop.megachat.PendingMessageSingle;
 import mega.privacy.android.app.lollipop.megachat.RemovedMessage;
 import mega.privacy.android.app.objects.GifData;
 
+import mega.privacy.android.app.usecase.GetAvatarUseCase;
 import mega.privacy.android.app.utils.ColorUtils;
-import mega.privacy.android.app.utils.StringResourcesUtils;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
@@ -214,6 +213,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
     private ArrayList<Uri> animationsPlaying = new ArrayList<>();
 
     private InviteContactUseCase inviteContactUseCase;
+    private GetAvatarUseCase getAvatarUseCase;
 
     private class ChatVoiceClipAsyncTask extends AsyncTask<MegaNodeList, Void, Integer> {
         MegaChatLollipopAdapter.ViewHolderMessageChat holder;
@@ -569,7 +569,8 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                                    ArrayList<AndroidMegaChatMessage> _messages,
                                    ArrayList<MessageVoiceClip> _messagesPlaying,
                                    ArrayList<RemovedMessage> _removedMessages,
-                                   RecyclerView _listView, InviteContactUseCase inviteContactUseCase) {
+                                   RecyclerView _listView, InviteContactUseCase inviteContactUseCase,
+                                   GetAvatarUseCase getAvatarUseCase) {
         logDebug("New adapter");
         this.context = _context;
         this.messages = _messages;
@@ -578,6 +579,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
         this.removedMessages = _removedMessages;
         this.messagesPlaying = _messagesPlaying;
         this.inviteContactUseCase =  inviteContactUseCase;
+        this.getAvatarUseCase = getAvatarUseCase;
 
         if (megaApi == null) {
             megaApi = ((MegaApplication) ((Activity) context).getApplication()).getMegaApi();
@@ -6728,54 +6730,35 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
         String userHandleEncoded = MegaApiAndroid.userHandleToBase64(handle);
         String email = holder.contactLinkResult.getEmail();
 
-        ChatAttachmentAvatarListener listener;
         int color = getColorAvatar(userHandleEncoded);
         Bitmap bitmapDefaultAvatar = getDefaultAvatar(color, holder.contactLinkResult.getFullName(), AVATAR_SIZE, true);
 
         if (ownMessage) {
             holder.ownContactLinkAvatar.setImageBitmap(bitmapDefaultAvatar);
-            listener = new ChatAttachmentAvatarListener(context, holder, this, true);
         } else {
             holder.othersContactLinkAvatar.setImageBitmap(bitmapDefaultAvatar);
-            listener = new ChatAttachmentAvatarListener(context, holder, this, false);
         }
 
         File avatar = buildAvatarFile(context, holder.contactLinkResult.getEmail() + JPG_EXTENSION);
-        Bitmap bitmap;
-        if (isFileAvailable(avatar)) {
-            if (avatar.length() > 0) {
-                BitmapFactory.Options bOpts = new BitmapFactory.Options();
-                bitmap = BitmapFactory.decodeFile(avatar.getAbsolutePath(), bOpts);
+        Bitmap bitmap = getAvatarBitmap(avatar);
 
-                if (bitmap == null) {
-                    avatar.delete();
-
-                    if (megaApi == null) {
-                        logWarning("megaApi is Null in Offline mode");
-                        return;
-                    }
-
-                    megaApi.getUserAvatar(email, buildAvatarFile(context, email + JPG_EXTENSION).getAbsolutePath(), listener);
-                } else if (ownMessage) {
-                    holder.ownContactLinkAvatar.setImageBitmap(bitmap);
-                } else {
-                    holder.othersContactLinkAvatar.setImageBitmap(bitmap);
-                }
-            } else {
-                if (megaApi == null) {
-                    logWarning("megaApi is Null in Offline mode");
-                    return;
-                }
-
-                megaApi.getUserAvatar(email, buildAvatarFile(context, email + JPG_EXTENSION).getAbsolutePath(), listener);
-            }
+        if (bitmap == null) {
+            getAvatarUseCase.get(email, avatar.getAbsolutePath())
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe((result, throwable) -> {
+                        if (throwable == null) {
+                            if (ownMessage) {
+                                holder.ownContactLinkAvatar.setImageBitmap(result);
+                            } else {
+                                holder.othersContactLinkAvatar.setImageBitmap(result);
+                            }
+                        }
+                    });
+        } else if (ownMessage) {
+            holder.ownContactLinkAvatar.setImageBitmap(bitmap);
         } else {
-            if (megaApi == null) {
-                logWarning("megaApi is Null in Offline mode");
-                return;
-            }
-
-            megaApi.getUserAvatar(email, buildAvatarFile(context, email + JPG_EXTENSION).getAbsolutePath(), listener);
+            holder.othersContactLinkAvatar.setImageBitmap(bitmap);
         }
     }
 
@@ -6789,56 +6772,35 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
         String email = message.getUserEmail(0);
         String userHandleEncoded = MegaApiAndroid.userHandleToBase64(message.getUserHandle(0));
 
-        ChatAttachmentAvatarListener listener;
         int color = getColorAvatar(userHandleEncoded);
         Bitmap bitmapDefaultAvatar = getDefaultAvatar(color, name, AVATAR_SIZE, true);
+
         if (myUserHandle == message.getUserHandle()) {
             holder.contentOwnMessageContactThumb.setImageBitmap(bitmapDefaultAvatar);
-            listener = new ChatAttachmentAvatarListener(context, holder, this, true);
         } else {
             holder.contentContactMessageContactThumb.setImageBitmap(bitmapDefaultAvatar);
-            listener = new ChatAttachmentAvatarListener(context, holder, this, false);
         }
 
-        File avatar = buildAvatarFile(context, email + ".jpg");
-        Bitmap bitmap = null;
-        if (isFileAvailable(avatar)) {
-            if (avatar.length() > 0) {
-                BitmapFactory.Options bOpts = new BitmapFactory.Options();
-                bOpts.inPurgeable = true;
-                bOpts.inInputShareable = true;
-                bitmap = BitmapFactory.decodeFile(avatar.getAbsolutePath(), bOpts);
-                if (bitmap == null) {
-                    avatar.delete();
+        File avatar = buildAvatarFile(context, email + JPG_EXTENSION);
+        Bitmap bitmap = getAvatarBitmap(avatar);
 
-                    if (megaApi == null) {
-                        logWarning("megaApi is Null in Offline mode");
-                        return;
-                    }
-
-                    megaApi.getUserAvatar(email,buildAvatarFile(context,email + ".jpg").getAbsolutePath(),listener);
-                } else {
-                    if (myUserHandle == message.getUserHandle()) {
-                        holder.contentOwnMessageContactThumb.setImageBitmap(bitmap);
-                    } else {
-                        holder.contentContactMessageContactThumb.setImageBitmap(bitmap);
-                    }
-                }
-            } else {
-                if (megaApi == null) {
-                    logWarning("megaApi is Null in Offline mode");
-                    return;
-                }
-
-                megaApi.getUserAvatar(email,buildAvatarFile(context,email + ".jpg").getAbsolutePath(),listener);
-            }
+        if (bitmap == null) {
+            getAvatarUseCase.get(email, avatar.getAbsolutePath())
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe((result, throwable) -> {
+                        if (throwable == null) {
+                            if (myUserHandle == message.getUserHandle()) {
+                                holder.contentOwnMessageContactThumb.setImageBitmap(result);
+                            } else {
+                                holder.contentContactMessageContactThumb.setImageBitmap(result);
+                            }
+                        }
+                    });
+        } else if (myUserHandle == message.getUserHandle()) {
+            holder.contentOwnMessageContactThumb.setImageBitmap(bitmap);
         } else {
-            if (megaApi == null) {
-                logWarning("megaApi is Null in Offline mode");
-                return;
-            }
-
-            megaApi.getUserAvatar(email,buildAvatarFile(context,email + ".jpg").getAbsolutePath(),listener);
+            holder.contentContactMessageContactThumb.setImageBitmap(bitmap);
         }
     }
 
@@ -6848,32 +6810,20 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
         holder.contactImageView.setImageBitmap(getDefaultAvatar(getColorAvatar(userHandle), name, AVATAR_SIZE, true));
 
         /*Avatar*/
-        ChatAttachmentAvatarListener listener = new ChatAttachmentAvatarListener(context, holder, this, false);
-        File avatar = buildAvatarFile(context, userHandleEncoded + ".jpg");
-        Bitmap bitmap;
-        if (isFileAvailable(avatar) && avatar.length() > 0) {
-                BitmapFactory.Options bOpts = new BitmapFactory.Options();
-                bitmap = BitmapFactory.decodeFile(avatar.getAbsolutePath(), bOpts);
-                if (bitmap == null) {
-                    avatar.delete();
+        File avatar = buildAvatarFile(context, userHandleEncoded + JPG_EXTENSION);
+        Bitmap bitmap = getAvatarBitmap(avatar);
 
-                    if (megaApi == null) {
-                        logWarning("megaApi is Null in Offline mode");
-                        return;
-                    }
-
-                    megaApi.getUserAvatar(userHandleEncoded, buildAvatarFile(context, userHandleEncoded + ".jpg").getAbsolutePath(), listener);
-                } else {
-                    holder.contactImageView.setImageBitmap(bitmap);
-                }
+        if (bitmap == null) {
+            getAvatarUseCase.get(userHandleEncoded, avatar.getAbsolutePath())
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe((result, throwable) -> {
+                        if (throwable == null) {
+                            holder.contactImageView.setImageBitmap(result);
+                        }
+                    });
         } else {
-
-            if (megaApi == null) {
-                logWarning("megaApi is Null in Offline mode");
-                return;
-            }
-
-            megaApi.getUserAvatar(userHandleEncoded, buildAvatarFile(context, userHandleEncoded + ".jpg").getAbsolutePath(), listener);
+            holder.contactImageView.setImageBitmap(bitmap);
         }
     }
 
