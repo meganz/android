@@ -5410,7 +5410,7 @@ public class ChatActivityLollipop extends PasscodeActivity
                                         if (contact != null && contact.getVisibility() == MegaUser.VISIBILITY_VISIBLE) {
                                             ContactUtil.openContactInfoActivity(this, email);
                                         } else {
-                                            checkIfInvitationIsAlreadySent(email, m.getMessage());
+                                            checkIfInvitationIsAlreadySent(email, getNameContactAttachment(m.getMessage()));
                                         }
                                     }
                                 }
@@ -5476,20 +5476,20 @@ public class ChatActivityLollipop extends PasscodeActivity
     /**
      * Checks if a contact invitation has been already sent.
      *
-     * @param email   Contact email to check.
-     * @param message MegaChatMessage to get the contact name.
+     * @param email       Contact email to check.
+     * @param contactName Name of the contact.
      */
-    private void checkIfInvitationIsAlreadySent(String email, MegaChatMessage message) {
+    private void checkIfInvitationIsAlreadySent(String email, String contactName) {
         inviteContactUseCase.isContactRequestAlreadySent(email)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe((alreadyInvited, throwable) -> {
                     if (throwable == null) {
                         if (alreadyInvited) {
-                            String text = StringResourcesUtils.getString(R.string.contact_already_invited, converterShortCodes(getNameContactAttachment(message)));
+                            String text = StringResourcesUtils.getString(R.string.contact_already_invited, converterShortCodes(contactName));
                             showSnackbar(SENT_REQUESTS_TYPE, text, MEGACHAT_INVALID_HANDLE);
                         } else {
-                            String text = StringResourcesUtils.getString(R.string.user_is_not_contact, converterShortCodes(getNameContactAttachment(message)));
+                            String text = StringResourcesUtils.getString(R.string.user_is_not_contact, converterShortCodes(contactName));
                             showSnackbar(INVITE_CONTACT_TYPE, text, MEGACHAT_INVALID_HANDLE, email);
                         }
                     }
@@ -5503,18 +5503,22 @@ public class ChatActivityLollipop extends PasscodeActivity
      */
     public void openContactLinkMessage(InviteContactUseCase.ContactLinkResult contactLinkResult) {
         String email = contactLinkResult.getEmail();
-        MegaUser contact = megaApi.getContact(email);
-
-        if (contact == null || contact.getHandle() == megaChatApi.getMyUserHandle()) {
-            logDebug("Contact is null or is my own contact");
+        if (email == null) {
+            logDebug("Email is null");
             return;
         }
 
-        if (contact.getVisibility() == MegaUser.VISIBILITY_VISIBLE) {
-            ContactUtil.openContactInfoActivity(this, email);
+        MegaUser contact = megaApi.getContact(email);
+
+        if (email.equals(megaApi.getMyEmail())) {
+            logDebug("Contact is my own contact");
+            return;
+        }
+
+        if (contact == null || contact.getVisibility() != MegaUser.VISIBILITY_VISIBLE) {
+            checkIfInvitationIsAlreadySent(email, contactLinkResult.getFullName());
         } else {
-            String text = getString(R.string.user_is_not_contact, converterShortCodes(contactLinkResult.getFullName()));
-            showSnackbar(INVITE_CONTACT_TYPE, text, MEGACHAT_INVALID_HANDLE, contactLinkResult.getFullName());
+            ContactUtil.openContactInfoActivity(this, email);
         }
     }
 

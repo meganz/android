@@ -32,6 +32,7 @@
                 android:layout_marginBottom="12dp"
                 android:autoLink="web"
                 android:gravity="start"
+                android:linksClickable="false"
                 android:textAppearance="@style/TextAppearance.Mega.Body2.Variant4"
                 android:textColorLink="@color/grey_087_white"
                 app:emojiSize="14sp"
