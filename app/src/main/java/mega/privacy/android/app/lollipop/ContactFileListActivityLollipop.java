@@ -205,11 +205,6 @@ public class ContactFileListActivityLollipop extends PasscodeActivity
 	}
 
 	@Override
-	public void uploadFromSystem() {
-		pickFileFromFileSystem(this);
-	}
-
-	@Override
 	public void takePictureAndUpload() {
 		if (!hasPermissions(this, Manifest.permission.CAMERA)) {
 			requestPermission(this, REQUEST_CAMERA, Manifest.permission.CAMERA);

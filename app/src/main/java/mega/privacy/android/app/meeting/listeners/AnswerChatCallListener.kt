@@ -21,6 +21,10 @@ class AnswerChatCallListener(context: Context?) : ChatBaseListener(context) {
             return
         }
 
+        if (MegaApplication.getChatManagement().isAlreadyJoiningCall(request.chatHandle)) {
+            MegaApplication.getChatManagement().removeJoiningCallChatId(request.chatHandle)
+        }
+
         if (e.errorCode == MegaError.API_OK) {
             LogUtil.logDebug("Call answered")
 

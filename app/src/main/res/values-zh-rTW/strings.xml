@@ -66,8 +66,6 @@
     <string name="general_error_word">錯誤</string>
     <!-- when clicking into a menu whose functionality is not yet implemented -->
     <string name="general_not_yet_implemented">尚未實施</string>
-    <!-- when any file or folder is selected -->
-    <string name="error_no_selection">尚未選擇檔案或資料夾</string>
     <!-- when trying to download a file that is already downloaded in the device -->
     <string name="general_already_downloaded">已下載</string>
     <!-- when trying to upload a file that is already uploaded in the folder -->
@@ -622,10 +620,6 @@
     <string name="upload_to_audio">音樂</string>
     <!-- Title of the button in the contact info screen to start a video call -->
     <string name="upload_to_video">影片</string>
-    <!-- upload to. Then choose to browse the file system to choose a file -->
-    <string name="upload_to_filesystem">從檔案系統中選取</string>
-    <!-- upload to. Then choose to browse the file system to choose a file -->
-    <string name="upload_to_filesystem_from">選擇自</string>
     <!-- Label for the current uploaded size of a file. For example, 3 files, 50KB uploaded -->
     <string name="upload_uploaded">已上傳</string>
     <!-- Status text at the beginning of an upload, Status text at the beginning of an upload for 2 or more files -->
@@ -3041,8 +3035,6 @@
     </plurals>
     <!-- Title of a chat message that contains geolocation info -->
     <string name="title_geolocation_message">固定位置</string>
-    <!-- Text of the button to indicate an attachment upload from file system -->
-    <string name="attachment_upload_panel_from_device">從檔案系統</string>
     <!-- Alert shown when a num of files have not been sent because of any error occurs, Plural of file. 2 files -->
     <plurals name="num_files_not_send">
         <item quantity="other">%d個檔案未傳送至%d個對話中</item>
