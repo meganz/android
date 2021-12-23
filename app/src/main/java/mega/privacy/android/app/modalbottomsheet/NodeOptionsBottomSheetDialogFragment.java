@@ -437,6 +437,8 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
                 int tabSelected = ((ManagerActivityLollipop) requireActivity()).getTabItemShares();
                 if (tabSelected == 0) {
                     logDebug("showOptionsPanelIncoming");
+                    long incomingParentHandle = ((ManagerActivityLollipop) requireActivity()).getParentHandleIncoming();
+                    boolean isParentNode = node.getHandle() == incomingParentHandle;
 
                     if (node.isFolder()) {
                         counterShares--;
@@ -464,7 +466,7 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
                     int dBT = ((ManagerActivityLollipop) requireActivity()).getDeepBrowserTreeIncoming();
                     logDebug("DeepTree value:" + dBT);
 
-                    if (dBT > 1) {
+                    if (dBT > 0 && !isParentNode) {
                         optionLeaveShares.setVisibility(View.GONE);
                     } else {
                         //Show the owner of the shared folder
@@ -501,15 +503,13 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
                             optionClearShares.setVisibility(View.GONE);
                             optionRename.setVisibility(View.VISIBLE);
 
-                            if (dBT > 0) {
+                            if (dBT > 0 && !isParentNode) {
                                 optionRubbishBin.setVisibility(View.VISIBLE);
                                 optionMove.setVisibility(View.VISIBLE);
-
                             } else {
                                 optionRubbishBin.setVisibility(View.GONE);
                                 counterModify--;
                                 optionMove.setVisibility(View.GONE);
-
                             }
 
                             optionLabel.setVisibility(View.VISIBLE);
