@@ -887,7 +887,18 @@ public class FolderLinkActivityLollipop extends TransfersManagementActivity impl
 											dialog.dismiss();
 											boolean closedChat = MegaApplication.isClosedChat();
 											if(closedChat){
-												Intent backIntent = new Intent(folderLinkActivity, ManagerActivityLollipop.class);
+												Intent backIntent;
+												if(folderLinkActivity != null) {
+													backIntent = new Intent(
+															folderLinkActivity,
+															ManagerActivityLollipop.class
+													);
+												} else {
+													backIntent = new Intent(
+															FolderLinkActivityLollipop.this,
+															ManagerActivityLollipop.class
+													);
+												}
 												startActivity(backIntent);
 											}
 
@@ -1029,7 +1040,18 @@ public class FolderLinkActivityLollipop extends TransfersManagementActivity impl
 									dialog.dismiss();
 									boolean closedChat = MegaApplication.isClosedChat();
 									if(closedChat){
-										Intent backIntent = new Intent(folderLinkActivity, ManagerActivityLollipop.class);
+										Intent backIntent;
+										if(folderLinkActivity != null) {
+											backIntent = new Intent(
+													folderLinkActivity,
+													ManagerActivityLollipop.class
+											);
+										} else {
+											backIntent = new Intent(
+													FolderLinkActivityLollipop.this,
+													ManagerActivityLollipop.class
+											);
+										}
 										startActivity(backIntent);
 									}
 
@@ -1072,7 +1094,18 @@ public class FolderLinkActivityLollipop extends TransfersManagementActivity impl
 									dialog.dismiss();
 									boolean closedChat = MegaApplication.isClosedChat();
 									if(closedChat){
-										Intent backIntent = new Intent(folderLinkActivity, ManagerActivityLollipop.class);
+										Intent backIntent;
+										if(folderLinkActivity != null) {
+											backIntent = new Intent(
+													folderLinkActivity,
+													ManagerActivityLollipop.class
+											);
+										} else {
+											backIntent = new Intent(
+													FolderLinkActivityLollipop.this,
+													ManagerActivityLollipop.class
+											);
+										}
 										startActivity(backIntent);
 									}
 									finish();
