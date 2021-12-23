@@ -10,13 +10,11 @@ public class MegaAttributes {
     private int attemps;
     private String askSizeDownload;
     private String askNoAppDownload;
-    private String fileLoggerSDK;
     private String accountDetailsTimeStamp;
     private String paymentMethodsTimeStamp;
     private String pricingTimeStamp;
     private String extendedAccountDetailsTimeStamp;
     private String invalidateSdkCache;
-    private String fileLoggerKarere;
     private String useHttpsOnly;
     private String showCopyright;
     private String showNotifOff;
@@ -28,23 +26,21 @@ public class MegaAttributes {
     private String transferQueueStatus;
 
     public MegaAttributes(String online, int attemps, String askSizeDownload, String askNoAppDownload,
-                          String fileLogger, String accountDetailsTimeStamp, String paymentMethodsTimeStamp,
+                          String accountDetailsTimeStamp, String paymentMethodsTimeStamp,
                           String pricingTimeStamp, String extendedAccountDetailsTimeStamp,
-                          String invalidateSdkCache, String fileLoggerKarere, String useHttpsOnly,
-                          String showCopyright, String showNotifOff, String lastPublicHandle,
+                          String invalidateSdkCache, String useHttpsOnly, String showCopyright,
+                          String showNotifOff, String lastPublicHandle,
                           String lastPublicHandleTimeStamp, int lastPublicHandleType, int storageState,
                           String myChatFilesFolderHandle, String transferQueueStatus) {
         this.online = online;
         this.attemps = attemps;
         this.askNoAppDownload = askNoAppDownload;
         this.askSizeDownload = askSizeDownload;
-        this.fileLoggerSDK = fileLogger;
         this.accountDetailsTimeStamp = accountDetailsTimeStamp;
         this.paymentMethodsTimeStamp = paymentMethodsTimeStamp;
         this.pricingTimeStamp = pricingTimeStamp;
         this.extendedAccountDetailsTimeStamp = extendedAccountDetailsTimeStamp;
         this.invalidateSdkCache = invalidateSdkCache;
-        this.fileLoggerKarere = fileLoggerKarere;
         this.useHttpsOnly = useHttpsOnly;
         this.showCopyright = showCopyright;
         this.showNotifOff = showNotifOff;
@@ -86,22 +82,6 @@ public class MegaAttributes {
 
     public void setAskNoAppDownload(String askNoAppDownload) {
         this.askNoAppDownload = askNoAppDownload;
-    }
-
-    public String getFileLoggerSDK() {
-        return fileLoggerSDK;
-    }
-
-    public void setFileLoggerSDK(String fileLoggerSDK) {
-        this.fileLoggerSDK = fileLoggerSDK;
-    }
-
-    public String getFileLoggerKarere() {
-        return this.fileLoggerKarere;
-    }
-
-    public void setFileLoggerKarere(String fileLoggerKarere) {
-        this.fileLoggerKarere = fileLoggerKarere;
     }
 
     public String getAccountDetailsTimeStamp() {

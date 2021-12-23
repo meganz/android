@@ -3,9 +3,9 @@ package mega.privacy.android.app.mediaplayer
 import android.app.Activity.RESULT_OK
 import android.content.Context
 import android.content.Intent
-import androidx.hilt.lifecycle.ViewModelInject
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import dagger.hilt.android.lifecycle.HiltViewModel
 import mega.privacy.android.app.arch.BaseRxViewModel
 import mega.privacy.android.app.interfaces.ActivityLauncher
 import mega.privacy.android.app.interfaces.SnackbarShower
@@ -13,11 +13,13 @@ import mega.privacy.android.app.utils.Constants.REQUEST_CODE_SELECT_FOLDER_TO_CO
 import mega.privacy.android.app.utils.Constants.REQUEST_CODE_SELECT_FOLDER_TO_MOVE
 import mega.privacy.android.app.utils.MegaNodeUtil.handleSelectFolderToCopyResult
 import mega.privacy.android.app.utils.MegaNodeUtil.handleSelectFolderToMoveResult
+import javax.inject.Inject
 
 /**
  * ViewModel for main audio player UI logic.
  */
-class MediaPlayerViewModel @ViewModelInject constructor() : BaseRxViewModel() {
+@HiltViewModel
+class MediaPlayerViewModel @Inject constructor() : BaseRxViewModel() {
 
     private val _itemToRemove = MutableLiveData<Long>()
     val itemToRemove: LiveData<Long> = _itemToRemove

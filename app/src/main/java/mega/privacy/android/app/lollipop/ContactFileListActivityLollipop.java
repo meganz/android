@@ -82,7 +82,7 @@ import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.MegaNodeDialogUtil.IS_NEW_TEXT_FILE_SHOWN;
 import static mega.privacy.android.app.utils.MegaNodeDialogUtil.NEW_TEXT_FILE_TEXT;
 import static mega.privacy.android.app.utils.MegaNodeDialogUtil.checkNewTextFileDialogState;
-import static mega.privacy.android.app.utils.PermissionUtils.*;
+import static mega.privacy.android.app.utils.permission.PermissionUtils.*;
 import static mega.privacy.android.app.utils.StringResourcesUtils.getQuantityString;
 import static mega.privacy.android.app.utils.Util.*;
 import static mega.privacy.android.app.utils.ContactUtil.*;
@@ -220,11 +220,6 @@ public class ContactFileListActivityLollipop extends PasscodeActivity
 	@Override
 	public void uploadFromDevice() {
 		chooseFromDevice(this);
-	}
-
-	@Override
-	public void uploadFromSystem() {
-		pickFileFromFileSystem(this);
 	}
 
 	@Override

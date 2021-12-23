@@ -5,17 +5,17 @@ import android.app.Activity
 import android.app.Activity.RESULT_OK
 import android.content.Context
 import android.content.Intent
-import androidx.hilt.lifecycle.ViewModelInject
+import dagger.hilt.android.lifecycle.HiltViewModel
 import mega.privacy.android.app.arch.BaseRxViewModel
 import mega.privacy.android.app.di.MegaApi
 import mega.privacy.android.app.exportRK.ExportRecoveryKeyActivity.Companion.WRITE_STORAGE_TO_SAVE_RK
 import mega.privacy.android.app.lollipop.FileStorageActivityLollipop
 import mega.privacy.android.app.lollipop.controllers.AccountController
-import mega.privacy.android.app.utils.Constants.*
+import mega.privacy.android.app.utils.Constants.REQUEST_DOWNLOAD_FOLDER
 import mega.privacy.android.app.utils.FileUtil.*
 import mega.privacy.android.app.utils.LogUtil.logWarning
-import mega.privacy.android.app.utils.PermissionUtils.hasPermissions
-import mega.privacy.android.app.utils.PermissionUtils.requestPermission
+import mega.privacy.android.app.utils.permission.PermissionUtils.hasPermissions
+import mega.privacy.android.app.utils.permission.PermissionUtils.requestPermission
 import mega.privacy.android.app.utils.StorageUtils.thereIsNotEnoughFreeSpace
 import mega.privacy.android.app.utils.TextUtil.copyToClipboard
 import mega.privacy.android.app.utils.TextUtil.isTextEmpty
@@ -23,8 +23,10 @@ import mega.privacy.android.app.utils.Util.isAndroid11OrUpper
 import mega.privacy.android.app.utils.Util.isOffline
 import nz.mega.sdk.MegaApiAndroid
 import java.io.File
+import javax.inject.Inject
 
-class ExportRecoveryKeyViewModel @ViewModelInject constructor(
+@HiltViewModel
+class ExportRecoveryKeyViewModel @Inject constructor(
     @MegaApi private val megaApi: MegaApiAndroid
 ) : BaseRxViewModel() {
 
