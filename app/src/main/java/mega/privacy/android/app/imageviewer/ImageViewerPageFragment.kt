@@ -8,12 +8,15 @@ import android.view.*
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.Lifecycle
+import com.facebook.common.util.UriUtil
 import com.facebook.drawee.backends.pipeline.Fresco
 import com.facebook.drawee.controller.BaseControllerListener
 import com.facebook.imagepipeline.image.ImageInfo
 import com.facebook.imagepipeline.request.ImageRequest
 import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.MimeTypeList
+import mega.privacy.android.app.R
 import mega.privacy.android.app.constants.SettingsConstants
 import mega.privacy.android.app.databinding.PageImageViewerBinding
 import mega.privacy.android.app.imageviewer.data.ImageItem
@@ -138,6 +141,10 @@ class ImageViewerPageFragment : Fragment() {
                 binding.btnVideo.isVisible = imageResult.isVideo
                 binding.progress.hide()
             }
+        } else if (lifecycle.currentState == Lifecycle.State.RESUMED) {
+            binding.image.controller = Fresco.newDraweeControllerBuilder()
+                .setImageRequest(ImageRequest.fromUri(UriUtil.getUriForResourceId(R.drawable.ic_error)))
+                .build()
         }
     }
 

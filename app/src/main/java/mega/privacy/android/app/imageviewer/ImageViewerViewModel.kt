@@ -132,7 +132,7 @@ class ImageViewerViewModel @Inject constructor(
     fun loadSingleNode(nodeHandle: Long, forceReload: Boolean = false) {
         val existingNode = images.value?.find { it.handle == nodeHandle }
         val subscription = when {
-            forceReload || existingNode?.isDirty == true && existingNode.nodeItem?.node != null -> {
+            forceReload || existingNode?.isDirty == true -> {
                 when {
                     existingNode?.nodePublicLink?.isNotBlank() == true ->
                         getNodeUseCase.getNodeItem(existingNode.nodePublicLink)

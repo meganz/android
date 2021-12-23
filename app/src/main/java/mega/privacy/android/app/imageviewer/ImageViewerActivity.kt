@@ -12,6 +12,7 @@ import androidx.constraintlayout.widget.ConstraintSet
 import androidx.core.content.ContextCompat
 import androidx.core.view.*
 import androidx.viewpager2.widget.ViewPager2
+import com.facebook.drawee.backends.pipeline.Fresco
 import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.BaseActivity
 import mega.privacy.android.app.R
@@ -236,6 +237,8 @@ class ImageViewerActivity : BaseActivity(), PermissionRequester, SnackbarShower 
         setupObservers()
 
         if (savedInstanceState == null) {
+            if (!Fresco.hasBeenInitialized()) Fresco.initialize(this)
+
             dragToExit.get()?.runEnterAnimation(intent, binding.root, ::enableToolbarTransition)
         }
     }
@@ -375,7 +378,7 @@ class ImageViewerActivity : BaseActivity(), PermissionRequester, SnackbarShower 
                     isOnline && item.hasOwnerAccess && !item.isFromRubbishBin
 
                 findItem(R.id.action_chat)?.isVisible =
-                    isOnline && !item.isFromRubbishBin && item.node != null
+                    isOnline && !item.isFromRubbishBin && item.node != null && viewModel.isUserLoggedIn()
 
                 findItem(R.id.action_more)?.isVisible = true
             }

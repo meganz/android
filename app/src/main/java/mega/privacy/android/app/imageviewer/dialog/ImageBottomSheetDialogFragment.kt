@@ -102,6 +102,7 @@ class ImageBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
         val node = imageItem.nodeItem.node
         val nodeItem = imageItem.nodeItem
         val imageUri = imageItem.imageResult?.getLowestResolutionAvailableUri()
+        val isUserLoggedIn = viewModel.isUserLoggedIn()
         val isOnline = requireContext().isOnline()
 
         binding.apply {
@@ -238,7 +239,7 @@ class ImageBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
                 (activity as? ImageViewerActivity?)?.attachNode(node!!)
                 dismissAllowingStateLoss()
             }
-            optionSendToContact.isVisible = isOnline && !nodeItem.isFromRubbishBin && node != null
+            optionSendToContact.isVisible = isOnline && !nodeItem.isFromRubbishBin && node != null && isUserLoggedIn
 
             // Share
             optionShare.isVisible = !nodeItem.isFromRubbishBin && (nodeItem.hasOwnerAccess || !imageItem.nodePublicLink.isNullOrBlank())
@@ -246,7 +247,7 @@ class ImageBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
                 when {
                     !isOnline && nodeItem.isAvailableOffline ->
                         OfflineUtils.shareOfflineNode(context, nodeItem.handle)
-                    imageItem.nodePublicLink.isNullOrBlank() ->
+                    !imageItem.nodePublicLink.isNullOrBlank() ->
                         MegaNodeUtil.shareLink(requireContext(), imageItem.nodePublicLink)
                     node != null ->
                         viewModel.shareNode(node).observe(viewLifecycleOwner) { link ->
@@ -281,7 +282,7 @@ class ImageBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
             val copyDrawable = if (node?.isPublic == true) R.drawable.ic_import_to_cloud_white else R.drawable.ic_menu_copy
             optionCopy.setCompoundDrawablesWithIntrinsicBounds(copyDrawable, 0, 0, 0)
             optionCopy.text = StringResourcesUtils.getString(copyAction)
-            optionCopy.isVisible = isOnline && !nodeItem.isFromRubbishBin && viewModel.isUserLoggedIn()
+            optionCopy.isVisible = isOnline && !nodeItem.isFromRubbishBin && isUserLoggedIn
 
             // Restore
             optionRestore.setOnClickListener {
