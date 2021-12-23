@@ -514,32 +514,16 @@ object MegaNodeUtil {
             R.drawable.backup
         } else if (isDeviceBackupFolder(node)) {
             getMyBackupSubFolderIcon(node)
-        } else if (isBackupFolder(node)) {
-            R.drawable.ic_folder_backup
-        } else{
+        } else if (isSubRootBackupFolder(node)) {
+            val nodeType = checkBackupNodeTypeByHandle(MegaApplication.getInstance().megaApi, node)
+            if(nodeType == BACKUP_FOLDER_CHILD || nodeType == BACKUP_FOLDER) {
+                R.drawable.ic_folder_backup
+            } else {
+                R.drawable.ic_folder_list
+            }
+        } else {
             R.drawable.ic_folder_list
         }
-    }
-
-    /**
-     * Checks if a node is a backup folder under the device folder.
-     *
-     * @param node MegaNode to check
-     * @return True if the node is Device folder, false otherwise
-     */
-    private fun isBackupFolder(node: MegaNode): Boolean {
-        val megaApi = MegaApplication.getInstance().megaApi
-        var index = 0
-        var p = node
-
-        while (megaApi.getParentNode(p) != null) {
-            p = megaApi.getParentNode(p)
-            index++
-            if (p != null && p.parentHandle == myBackupHandle) {
-                return (!isTextEmpty(node.deviceId) && index == 1)
-            }
-        }
-        return false
     }
 
     /**
@@ -549,9 +533,32 @@ object MegaNodeUtil {
      * @return True if the node is a device folder, false otherwise
      */
     private fun isDeviceBackupFolder(node: MegaNode): Boolean {
-        return (node.parentHandle == myBackupHandle && !isTextEmpty(node.deviceId))
+        logDebug("MyBackup + isDeviceBackupFolder node name = ${node.name}, node deviceId = ${node.deviceId}")
+        return (node.parentHandle == myBackupHandle && !isTextEmpty(node.deviceId) && !isNodeInRubbishOrDeleted(node.handle))
     }
 
+    /**
+     * Checks if a node is a sub-folder of MyBackup folder.
+     *
+     * @param node MegaNode to check
+     * @return True if the node is a sub-folder of MyBackup folder, false otherwise
+     */
+    private fun isSubRootBackupFolder(node: MegaNode): Boolean {
+        val megaApi = MegaApplication.getInstance().megaApi
+        var p = node
+        if (isNodeInRubbishOrDeleted(node.handle)){
+            return false
+        }
+
+        while (megaApi.getParentNode(p) != null) {
+            p = megaApi.getParentNode(p)
+            if (p != null && p.parentHandle == myBackupHandle) {
+                logDebug("isSubRootBackupFolder")
+                return true
+            }
+        }
+        return false
+    }
     /**
      * Checks if a node is the MyBackup folder.
      *
@@ -559,7 +566,8 @@ object MegaNodeUtil {
      * @return True if the node is the MyBackup folder, false otherwise
      */
     private fun isRootBackupFolder(node: MegaNode): Boolean {
-        return (node.handle == myBackupHandle)
+        logDebug("MyBackup + isRootBackupFolder node name = ${node.name}, node deviceId = ${node.deviceId}")
+        return (node.handle == myBackupHandle && !isNodeInRubbishOrDeleted(node.handle))
     }
 
     /**
@@ -1871,33 +1879,48 @@ object MegaNodeUtil {
         var nodeType = BACKUP_NONE
 
         if (node != null) {
-            if (node.handle == myBackupHandle) {
+            logDebug("MyBackup + node name = ${node.name}, node deviceId = ${node.deviceId}")
+            if(isNodeInRubbishOrDeleted(node.handle)){
+                nodeType = BACKUP_NONE
+            } else if (node.handle == myBackupHandle) {
                 nodeType = BACKUP_ROOT
             } else if (node.parentHandle == myBackupHandle && !isTextEmpty(node.deviceId)) {
                 nodeType = BACKUP_DEVICE
             } else {
                 var index = 0
                 var p = node
+                var q = megaApi.getParentNode(p)
                 var isInBackupFolder = false
-
-                while (megaApi.getParentNode(p) != null) {
-                    p = megaApi.getParentNode(p)
-                    index++
-                    if (p != null && p.parentHandle == myBackupHandle) {
-                        isInBackupFolder = true
-                        break
-                    }
-                }
-
-                nodeType = if (!isInBackupFolder) {
-                    BACKUP_NONE
-                } else {
-                    if (index > 1) {
-                        BACKUP_FOLDER_CHILD
-                    } else if (!isTextEmpty(node.deviceId) && index == 1) {
+                if (q != null && q.parentHandle == myBackupHandle) {
+                    nodeType = if (!isTextEmpty(p.deviceId)) {
                         BACKUP_FOLDER
                     } else {
                         BACKUP_NONE
+                    }
+                } else {
+                    while (megaApi.getParentNode(p) != null) {
+                        q = p
+                        p = megaApi.getParentNode(p)
+                        index++
+                        if (p != null
+                            && p.parentHandle == myBackupHandle
+                            && !isTextEmpty(p.deviceId)
+                            && !isTextEmpty(q.deviceId)) {
+                            isInBackupFolder = true
+                            break
+                        }
+                    }
+
+                    nodeType = if (!isInBackupFolder) {
+                        BACKUP_NONE
+                    } else {
+                        if (index > 1) {
+                            BACKUP_FOLDER_CHILD
+                        } else if (!isTextEmpty(node.deviceId) && index == 1) {
+                            BACKUP_FOLDER
+                        } else {
+                            BACKUP_NONE
+                        }
                     }
                 }
             }

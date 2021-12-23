@@ -8156,7 +8156,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 		this.actionTypeBackup = ACTION_BACKUP_NONE;
 		// isInBackup Indicates if the current node is under "My backup"
 		int nodeType = fbFLol.checkSubBackupNode();
-		if (nodeType != BACKUP_ROOT) {
+		if (nodeType != BACKUP_ROOT && nodeType != BACKUP_NONE) {
 			MegaNode parentNode = fbFLol.getSubBackupParentNode();
 			actWithBackupTips(null, parentNode, nodeType, actionType);
 		} else {

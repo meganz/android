@@ -612,8 +612,8 @@ public class NodeController {
 
         if (nodeHandles == null || nodeHandles.length == 0) return;
 
-        for (int i = 0; i < nodeHandles.length; i++) {
-            shareFolder(megaApi.getNodeByHandle(nodeHandles[i]), contactsData, permissions);
+        for (long nodeHandle : nodeHandles) {
+            shareFolder(megaApi.getNodeByHandle(nodeHandle), contactsData, permissions);
         }
     }
 
