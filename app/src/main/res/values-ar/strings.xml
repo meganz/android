@@ -66,8 +66,6 @@
     <string name="general_error_word">خطأ</string>
     <!-- when clicking into a menu whose functionality is not yet implemented -->
     <string name="general_not_yet_implemented">لم تنفذ بعد</string>
-    <!-- when any file or folder is selected -->
-    <string name="error_no_selection">لم يتم اختيار ملف أو مجلد</string>
     <!-- when trying to download a file that is already downloaded in the device -->
     <string name="general_already_downloaded">تم تنزيلها بالفعل</string>
     <!-- when trying to upload a file that is already uploaded in the folder -->
@@ -667,10 +665,6 @@
     <string name="upload_to_audio">صوتي</string>
     <!-- Title of the button in the contact info screen to start a video call -->
     <string name="upload_to_video">فيديو</string>
-    <!-- upload to. Then choose to browse the file system to choose a file -->
-    <string name="upload_to_filesystem">اختيار من نظام الملف</string>
-    <!-- upload to. Then choose to browse the file system to choose a file -->
-    <string name="upload_to_filesystem_from">اختار من</string>
     <!-- Label for the current uploaded size of a file. For example, 3 files, 50KB uploaded -->
     <string name="upload_uploaded">تم الرفع</string>
     <!-- Status text at the beginning of an upload, Status text at the beginning of an upload for 2 or more files -->
@@ -1707,42 +1701,14 @@
     <string name="paused_transfers_title">تم إيقاف عمليات التراسل مؤقتاً</string>
     <!-- message shown in the screen when there are not any active transfer -->
     <string name="completed_transfers_empty">لا يوجد عمليات تراسل معطيات مكتملة</string>
-    <!-- Text of the notification shown when the upload service is running, Plural -->
-    <plurals name="upload_service_notification">
-        <item quantity="zero">جاري ترفيع %1$d من %2$d ملف</item>
-        <item quantity="one">رفع %1$d من %2$d ملف</item>
-        <item quantity="two">جاري ترفيع %1$d من %2$d ملفين</item>
-        <item quantity="few">جاري ترفيع %1$d من %2$d ملفات</item>
-        <item quantity="many">جاري ترفيع %1$d من %2$d ملف</item>
-        <item quantity="other">جاري ترفيع %1$d من %2$d ملف</item>
-    </plurals>
-    <!-- Text of the notification shown when the upload service is running, Plural -->
-    <plurals name="upload_service_paused_notification">
-        <item quantity="zero">جاري ترفيع %1$d من %2$d ملف (متوقف مؤقتاً)</item>
-        <item quantity="one">جاري ترفيع %1$d من %2$d ملف (متوقف مؤقتاً)</item>
-        <item quantity="two">جاري ترفيع %1$d من %2$d ملفين (متوقف مؤقتاً)</item>
-        <item quantity="few">جاري ترفيع %1$d من %2$d ملفات (متوقف مؤقتاً)</item>
-        <item quantity="many">جاري ترفيع %1$d من %2$d ملف (متوقف مؤقتاً)</item>
-        <item quantity="other">جاري ترفيع %1$d من %2$d ملف (متوقف مؤقتاً)</item>
-    </plurals>
-    <!-- Text of the notification shown when the folder upload service is running, Text of the notification shown when the folder upload service is running - plural e.g. Uploading 1 of 2 folders -->
-    <plurals name="folder_upload_service_notification">
-        <item quantity="zero">جاري ترفيع %1$d من %2$d مجلد</item>
-        <item quantity="one">ترفيع %1$d من %2$d مجلد</item>
-        <item quantity="two">جاري ترفيع %1$d من %2$d مجلدين</item>
-        <item quantity="few">جاري ترفيع %1$d من %2$d مجلدات</item>
-        <item quantity="many">جاري ترفيع %1$d من %2$d مجلداً</item>
-        <item quantity="other">جاري ترفيع %1$d من %2$d مجلد</item>
-    </plurals>
-    <!-- Text of the notification shown when the folder upload service is running, Text of the notification shown when the folder upload service is running - plural e.g. Uploading 1 of 2 folders -->
-    <plurals name="folder_upload_service_paused_notification">
-        <item quantity="zero">جاري ترفيع %1$d من %2$d مجلد (متوقف مؤقتاً)</item>
-        <item quantity="one">جاري ترفيع %1$d من %2$d مجلد (متوقف مؤقتاً)</item>
-        <item quantity="two">جاري ترفيع %1$d من %2$d مجلدين (متوقف مؤقتاً)</item>
-        <item quantity="few">جاري ترفيع %1$d من %2$d مجلدات (متوقف مؤقتاً)</item>
-        <item quantity="many">جاري ترفيع %1$d من %2$d مجلداً (متوقف مؤقتاً)</item>
-        <item quantity="other">جاري ترفيع %1$d من %2$d مجلد (متوقف مؤقتاً)</item>
-    </plurals>
+    <!-- Text of the notification shown when the upload service is running: e.g. Uploading files: 1 of 10 -->
+    <string name="upload_service_notification">جاري ترفيع الملفات: %1$d من %2$d</string>
+    <!-- Text of the notification shown when the upload service is paused: e.g. Uploading files: 1 of 10 (paused)-->
+    <string name="upload_service_notification_paused">ترفيع الملفات: %1$d من %2$d (متوقف مؤقتاً)</string>
+    <!-- Text of the notification shown when the folder upload service is running, e.g. Uploading folders 1 of 2 -->
+    <string name="folder_upload_service_notification">جاري ترفيع المجلدات: %1$d من %2$d</string>
+    <!-- Text of the notification shown when the folder upload service is paused, e.g. Uploading folders 1 of 2 (paused) -->
+    <string name="folder_upload_service_notification_paused">ترفيع المجلدات: %1$d من %2$d (متوقف مؤقتاً)</string>
     <!-- Text of the notification shown when the upload service has finished, Plural -->
     <plurals name="upload_service_final_notification">
         <item quantity="zero">تم ترفيع %1$d ملف</item>
@@ -1826,24 +1792,10 @@
         <item quantity="many">%1$d ملف لم يتم تنزيلهم</item>
         <item quantity="other">%1$d ملف لم يتم تنزيلهم</item>
     </plurals>
-    <!-- Text of the notification shown when the download service is running, Plural -->
-    <plurals name="download_service_notification">
-        <item quantity="zero">جاري تنزيل %1$d من %2$d ملف</item>
-        <item quantity="one">جاري تحميل %1$d من %2$d ملف</item>
-        <item quantity="two">جاري تنزيل %1$d من %2$d ملفين</item>
-        <item quantity="few">جاري تنزيل %1$d من %2$d ملفات</item>
-        <item quantity="many">جاري تنزيل %1$d من %2$d ملف</item>
-        <item quantity="other">جاري تنزيل %1$d من %2$d ملف</item>
-    </plurals>
-    <!-- Text of the notification shown when the download service is paused, Plural -->
-    <plurals name="download_service_paused_notification">
-        <item quantity="zero">جاري تنزيل %1$d من %2$d ملف (متوقف مؤقتاً)</item>
-        <item quantity="one">جاري تنزيل %1$d من %2$d ملف (متوقف مؤقتاً)</item>
-        <item quantity="two">جاري تنزيل %1$d من %2$d ملفين (متوقف مؤقتاً)</item>
-        <item quantity="few">جاري تنزيل %1$d من %2$d ملفات (متوقف مؤقتاً)</item>
-        <item quantity="many">جاري تنزيل %1$d من %2$d ملف (متوقف مؤقتاً)</item>
-        <item quantity="other">جاري تنزيل %1$d من %2$d ملف (متوقف مؤقتاً)</item>
-    </plurals>
+    <!-- Text of the notification shown when the download service is running -->
+    <string name="download_service_notification">جاري تنزيل الملفات: %1$d من %2$d</string>
+    <!-- Text of the notification shown when the download service is paused -->
+    <string name="download_service_notification_paused">تنزيل الملفات: %1$d من %2$d (متوقف مؤقتاً)</string>
     <!-- Title of the alert when the transfer quota is exceeded. -->
     <string name="title_depleted_transfer_overquota">حجم التراسل المتاح غير كافي</string>
     <!-- Text of the alert when the transfer quota is depleted. The placeholder indicates the time left for the transfer quota to be reset. For instance: 30m 45s -->
@@ -3398,8 +3350,6 @@
     </plurals>
     <!-- Title of a chat message that contains geolocation info -->
     <string name="title_geolocation_message">موقع مثبت</string>
-    <!-- Text of the button to indicate an attachment upload from file system -->
-    <string name="attachment_upload_panel_from_device">من نظام الملفات</string>
     <!-- Alert shown when a num of files have not been sent because of any error occurs, Plural of file. 2 files -->
     <plurals name="num_files_not_send">
         <item quantity="zero">لم يتم ارسال %d ملف إلى %d محادثة</item>
@@ -4088,7 +4038,7 @@
     <!-- Explanation of a warning recommending upgrade to Pro in relation to link available options -->
     <string name="link_upgrade_pro_explanation">يتمتع مستخدمو ميغا برو MEGA Pro بوصول حصري إلى ميزات إضافية لأمان الروابط مما يجعل حسابك أكثر أمانًا.</string>
     <!-- Meaning of links decryption key -->
-    <string name="decryption_key_explanation">يتطلب نظام التشفير من طرف إلى طرف الخاص بنا مفتاحًا فريدًا يتم إنشاؤه تلقائيًا لهذا الملف. يتم إنشاء ارتباط بهذا المفتاح تلقائياً، ولكن يمكنك تصدير مفتاح فك التشفير بشكل منفصل للحصول على طبقة أمان إضافية.</string>
+    <string name="decryption_key_explanation">يتطلب نظام التشفير من طرف إلى طرف لدينا مفتاحًا فريدًا يتم إنشاؤه تلقائيًا لهذا الملف أو المجلد. يتم إنشاء رابط مع هذا المفتاح افتراضيًا، ولكن يمكنك تصدير مفتاح فك التشفير بشكل منفصل للحصول على طبقة أمان إضافية.</string>
     <!-- Reset password label -->
     <string name="reset_password_label">إعادة تعيين كلمة المرور</string>
     <!-- Warning show to the user when has enable to send the decryption key of a link separately and tries to share the link -->
@@ -4108,7 +4058,7 @@
     <!-- Context menu item. Allows user to delete file/folder from favourites -->
     <string name="file_properties_unfavourite">حذف المفضلة</string>
     <!-- Context menu item. Allows to mark file/folder with own color label -->
-    <string name="file_properties_label">وسم...</string>
+    <string name="file_properties_label">وسم</string>
     <!-- Information text to let’s the user know that they can remove a colour from a folder or file that was already marked. -->
     <string name="action_remove_label">إزالة الوسم</string>
     <!-- Title text to show label selector. -->
@@ -4140,19 +4090,13 @@
     <!-- Preferences screen item title for cookie settings -->
     <string name="settings_about_cookie_settings">إعدادات ملفات تعريف الارتباط Cookie</string>
     <!-- Cookie dialog title -->
-    <string name="dialog_cookie_alert_title">قبل أن تقوم بالمتابعة</string>
+    <string name="dialog_cookie_alert_title">خصوصيتك</string>
     <!-- Cookie dialog message. Please, keep the placeholders to format the string. -->
-    <string name="dialog_cookie_alert_message">نستخدم التخزين المحلي والتقنيات المماثلة (”ملفات تعريف الارتباط Cookies”) لتقديم خدماتنا لك، وتعزيز تجربتك مع خدماتنا، وتخصيص الإعلانات التي تراها، بما في ذلك من خلال جهات خارجية. اقبل استخدامنا لملفات تعريف الارتباط Cookies من بداية زيارتك أو قم بتخصيص ملفات تعريف الارتباط Cookies في إعدادات ملفات تعريف الارتباط Cookies . اقرأ المزيد في [A]سياسة ملفات تعريف الارتباط Cookies الخاصة بنا[/A].</string>
+    <string name="dialog_cookie_alert_message">نحن نستخدم ملفات تعريف الارتباط Cookies والتقنيات المماثلة (“Cookies”) لتقديم وتعزيز تجربتك مع خدماتنا، وتخصيص الإعلانات التي تراها، بما في ذلك من خلال جهات خارجية. اقبل استخدامنا لملفات تعريف الارتباط Cookies من بداية زيارتك أو قم بتخصيص ملفات تعريف الارتباط في إعدادات ملفات تعريف الارتباط. اقرأ المزيد في [A]سياسة ملفات تعريف الارتباط Cookies[/A] الخاصة بنا.</string>
     <!-- Cookie dialog message showed when there are unsaved settings. -->
     <string name="dialog_cookie_alert_unsaved">إعدادات ملفات تعريف الارتباط Cookie غير محفوظة</string>
     <!-- Snackbar message showed when there settings has been saved successfully. -->
     <string name="dialog_cookie_snackbar_saved">تم حفظ تغييرات إعدادات ملفات تعريف الارتباط Cookie.</string>
-    <!-- Cookie dialog third party first subtitle -->
-    <string name="dialog_cookie_thirdparty_subtitle1">ملفات تعريف ارتباط Cookies إعلانات غوغل Google</string>
-    <!-- Cookie dialog third party second subtitle -->
-    <string name="dialog_cookie_thirdparty_subtitle2">التصنيف: ملفات تعريف الارتباط Cookies الإعلانية</string>
-    <!-- Cookie dialog third party message. Please, keep the placeholders to format the string. -->
-    <string name="dialog_cookie_thirdparty_message">مستخدم من قبل غوغل Google لـ:\n• تخصيص الإعلانات التي يعرضها غوغل Google على خدماتنا ومواقعنا الالكتروني وعلى خدمات ومواقع الكترونية أخرى، بناءً على أشياء أخرى مثل موقعك الجغرافي والمواقع الالكترونية التي زرتها سابقًا؛\n• مراقبة عدد مرات عرض إعلانات معينة؛ \n• توفير منع الاحتيال؛ و\n• تحديد وقت النقر فوق إعلان معين ثم تتبع الإجراءات التالية التي تتخذها ردًا على هذا الإعلان.\nhttps://policies.google.com/technologies/partner-sites</string>
     <!-- Preference screen item title -->
     <string name="preference_cookies_accept">قبول ملفات تعريف الارتباط Cookies</string>
     <!-- Preference screen item title -->
@@ -4160,21 +4104,9 @@
     <!-- Preference screen item summary -->
     <string name="preference_cookies_essential_summary">أساسية لتزويدك بوظائف مهمة والوصول الآمن إلى خدماتنا. لهذا السبب، لا يحتاجون إلى موافقة.</string>
     <!-- Preference screen item title -->
-    <string name="preference_cookies_preference_title">ملفات تعريف الارتباط Cookies المفضلة</string>
-    <!-- Preference screen item summary -->
-    <string name="preference_cookies_preference_summary">اسمح لنا بتذكر إعدادات عرض وتنسيق معينة تختارها. إن عدم قبول ملفات تعريف الارتباط Cookies هذه يعني أننا لن نتمكن من تذكر بعض الأشياء لك مثل نموذج الشاشة المفضل لديك.</string>
-    <!-- Preference screen item title -->
     <string name="preference_cookies_performance_title">أداء وتحليلات لملفات تعريف الارتباط Cookie</string>
     <!-- Preference screen item summary -->
     <string name="preference_cookies_performance_summary">ساعدنا في فهم كيفية استخدامك لخدماتنا وتزويدنا بالبيانات التي يمكننا استخدامها لإجراء تحسينات. يعني عدم قبول ملفات تعريف الارتباط Cookies هذه أننا سنحصل على بيانات متاحة أقل لنقوم بالمساعدة في تحسينات التصميم.</string>
-    <!-- Preference screen item title -->
-    <string name="preference_cookies_advertising_title">ملفات تعريف الارتباط Cookies الإعلانية</string>
-    <!-- Preference screen item summary -->
-    <string name="preference_cookies_advertising_summary">مستخدمة من قبلنا ومن قبل شركاؤنا الإعلانيون المعتمدون لتخصيص الإعلانات التي تراها على خدماتنا وعلى مواقع الويب الأخرى بناءً على سجل التصفح الخاص بك. يعني عدم قبول ملفات تعريف الارتباط هذه أننا قد نعرض إعلانات أقل صلة.</string>
-    <!-- Preference screen item title -->
-    <string name="preference_cookies_thirdparty_title">ملفات تعريف ارتباط Cookies تعود لطرف ثالث</string>
-    <!-- Preference screen item summary. Please, keep the placeholders to format the string. -->
-    <string name="preference_cookies_thirdparty_summary">هذه ملفات تعريف الارتباط Cookies المتحكم بها من قبل شخص آخر غيرنا؛ نستخدم ملفات تعريف الارتباط Cookies هذه لتوفير أنواع الوظائف الموضحة أعلاه. سيكون لعدم قبول ملفات تعريف الارتباط هذه آثار مختلفة اعتمادًا على نوع ملفات تعريف الارتباط لكل ملف تعريف ارتباط تابع لجهة خارجية. انقر فوق ”مزيد من المعلومات“ أدناه للحصول على تفاصيل حول جميع ملفات تعريف الارتباط Cookies للجهات الخارجية التي نستخدمها.</string>
     <!-- Preference screen item state description -->
     <string name="preference_cookies_always_on">دائما متاح</string>
     <!-- Menu option that allows the user to scan document and upload it directly to MEGA. -->
@@ -4203,7 +4135,7 @@
     <string name="file_created">تم إنشاء الملف</string>
     <!-- Warning indicating a file was not created successfully -->
     <string name="file_creation_failed">فشل إنشاء الملف. حاول مرة أخرى.</string>
-    <!-- Label indicating a file was saved to some folder. e.g.: File saved to Cloud Drive -->
+    <!-- Label indicating a file was saved to some folder. e.g.: File saved to Cloud Drive. "Cloud Drive" is the only destination for the time being, thus any article isn't needed -->
     <string name="file_saved_to">تم حفظ الملف في %1$s</string>
     <!-- Warning indicating a file was not saved to some folder. e.g.: File not saved to Cloud Drive. Try again -->
     <string name="file_saved_to_failed">لم يتم حفظ الملف في %1$s. حاول مرة أخرى.</string>
@@ -4433,9 +4365,9 @@
     <!-- General label for microphone -->
     <string name="general_mic">ميكروفون</string>
     <!-- General label for microphone muted -->
-    <string name="general_mic_mute">تم كتم صوت الميكروفون خاصتك</string>
+    <string name="general_mic_mute">الميكروفون الخاص بك مغلق</string>
     <!-- General label for microphone unmuted -->
-    <string name="general_mic_unmute">تم إعادة صوت الميكروفون خاصتك</string>
+    <string name="general_mic_unmute">الميكروفون الخاص بك قيد التشغيل</string>
     <!-- General label for camera -->
     <string name="general_camera">الكاميرا</string>
     <!-- General label for camera enable -->
@@ -4451,9 +4383,9 @@
     <!-- General label for headphone on-->
     <string name="general_headphone_on">سماعات الأذن مفعلة</string>
     <!-- General label for speaker on-->
-    <string name="general_speaker_on">مكبر الصوت قيد التشغيل</string>
+    <string name="general_speaker_on">مكبر الصوت الخاص بك قيد التشغيل</string>
     <!-- General label for speaker off-->
-    <string name="general_speaker_off">مكبر الصوت متوقف</string>
+    <string name="general_speaker_off">مكبر الصوت الخاص بك مغلق</string>
     <!-- Label for end meeting-->
     <string name="meeting_end">إنهاء</string>
     <!-- Invite contacts as participants of the meeting-->
@@ -4574,4 +4506,24 @@
     <string name="video_quality_info">يمكنك توفير مساحة عن طريق تقليل جودة الفيديو في إعدادات ترفيعات الكاميرا.</string>
     <!-- Label indicating video original quality -->
     <string name="original_quality">الجودة الاصلية</string>
+    <!-- Settings label which allows to enable or disable fingerprint unlock. -->
+    <string name="setting_fingerprint">معرف بصمة الإصبع</string>
+    <!-- Title of the dialog which allows to enable the fingerprint unlock. -->
+    <string name="title_enable_fingerprint">قم بتأكيد بصمة إصبعك لإلغاء القفل</string>
+    <!-- Title of the dialog which allows to unlock the app with the fingerprint. -->
+    <string name="title_unlock_fingerprint">افتح باستخدام بصمة إصبعك</string>
+    <!-- Button of the dialog which allows to unlock the app with the fingerprint. Gives the option to unlock with the passcode instead -->
+    <string name="action_use_passcode">استخدم رمز المرور</string>
+    <!-- Message informing the fingerprint was enabled successfully -->
+    <string name="confirmation_fingerprint_enabled">تم تأكيد بصمة إصبعك</string>
+    <!-- Warning indicating an image (GIF) cannot be inserted in an input text. Same string than the one shown by the system when it detects this behaviour on its own. -->
+    <string name="image_insertion_not_allowed">ميغا MEGA لا تدعم إدراج الصور هنا</string>
+    <!-- The label under the button of viewing all images screen -->
+    <string name="section_images">صور</string>
+    <!-- Title of the dialog warning the user about disable file versioning. -->
+    <string name="disable_versioning_label">تعطيل إصدار نسخ للملف</string>
+    <!-- Warning of the dialog informing the user about disable file versioning. -->
+    <string name="disable_versioning_warning">تضمن ميزة نسخ الملفات لدينا الاحتفاظ بنسخ أقدم من ملفاتك إذا قمت باستبدالها بنسخ أحدث. إذا قمت بتعطيل ميزة نسخ الملفات File Versioning، فلن تتمتع بهذه الحماية بعد الآن؛ ستفقد النسخة القديمة عند استبدالها.</string>
+    <!-- Warning informing the user the folder location is trying to open no longer exists. -->
+    <string name="location_not_exist">هذا الموقع لم يعد موجوداً.</string>
 </resources>

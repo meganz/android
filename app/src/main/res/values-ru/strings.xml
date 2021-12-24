@@ -66,8 +66,6 @@
     <string name="general_error_word">Ошибка</string>
     <!-- when clicking into a menu whose functionality is not yet implemented -->
     <string name="general_not_yet_implemented">В разработке</string>
-    <!-- when any file or folder is selected -->
-    <string name="error_no_selection">Не выбраны файлы или папки</string>
     <!-- when trying to download a file that is already downloaded in the device -->
     <string name="general_already_downloaded">Уже скачано</string>
     <!-- when trying to upload a file that is already uploaded in the folder -->
@@ -649,10 +647,6 @@
     <string name="upload_to_audio">Аудио</string>
     <!-- Title of the button in the contact info screen to start a video call -->
     <string name="upload_to_video">Видео</string>
-    <!-- upload to. Then choose to browse the file system to choose a file -->
-    <string name="upload_to_filesystem">Забрать с устройства</string>
-    <!-- upload to. Then choose to browse the file system to choose a file -->
-    <string name="upload_to_filesystem_from">Выбрать из</string>
     <!-- Label for the current uploaded size of a file. For example, 3 files, 50KB uploaded -->
     <string name="upload_uploaded">загружено</string>
     <!-- Status text at the beginning of an upload, Status text at the beginning of an upload for 2 or more files -->
@@ -1661,34 +1655,14 @@
     <string name="paused_transfers_title">Приостановленные передачи</string>
     <!-- message shown in the screen when there are not any active transfer -->
     <string name="completed_transfers_empty">Нет завершённых передач</string>
-    <!-- Text of the notification shown when the upload service is running, Plural -->
-    <plurals name="upload_service_notification">
-        <item quantity="one">Загрузка файла: %1$d из %2$d</item>
-        <item quantity="few">Загрузка файлов: %1$d из %2$d</item>
-        <item quantity="many">Загрузка файлов: %1$d из %2$d</item>
-        <item quantity="other">Загрузка файлов: %1$d из %2$d</item>
-    </plurals>
-    <!-- Text of the notification shown when the upload service is running, Plural -->
-    <plurals name="upload_service_paused_notification">
-        <item quantity="one">Загрузка файла: %1$d из %2$d (пауза)</item>
-        <item quantity="few">Загрузка файлов: %1$d из %2$d (пауза)</item>
-        <item quantity="many">Загрузка файлов: %1$d из %2$d (пауза)</item>
-        <item quantity="other">Загрузка файлов: %1$d из %2$d (пауза)</item>
-    </plurals>
-    <!-- Text of the notification shown when the folder upload service is running, Text of the notification shown when the folder upload service is running - plural e.g. Uploading 1 of 2 folders -->
-    <plurals name="folder_upload_service_notification">
-        <item quantity="one">Загрузка папки: %1$d из %2$d</item>
-        <item quantity="few">Загрузка папок: %1$d из %2$d</item>
-        <item quantity="many">Загрузка папок: %1$d из %2$d</item>
-        <item quantity="other">Загрузка папок: %1$d из %2$d</item>
-    </plurals>
-    <!-- Text of the notification shown when the folder upload service is running, Text of the notification shown when the folder upload service is running - plural e.g. Uploading 1 of 2 folders -->
-    <plurals name="folder_upload_service_paused_notification">
-        <item quantity="one">Загрузка папки: %1$d из %2$d (пауза)</item>
-        <item quantity="few">Загрузка папок: %1$d из %2$d (пауза)</item>
-        <item quantity="many">Загрузка папок: %1$d из %2$d (пауза)</item>
-        <item quantity="other">Загрузка папок: %1$d из %2$d (пауза)</item>
-    </plurals>
+    <!-- Text of the notification shown when the upload service is running: e.g. Uploading files: 1 of 10 -->
+    <string name="upload_service_notification">Загрузка файлов: %1$d из %2$d</string>
+    <!-- Text of the notification shown when the upload service is paused: e.g. Uploading files: 1 of 10 (paused)-->
+    <string name="upload_service_notification_paused">Загрузка файлов: %1$d из %2$d (пауза)</string>
+    <!-- Text of the notification shown when the folder upload service is running, e.g. Uploading folders 1 of 2 -->
+    <string name="folder_upload_service_notification">Загрузка файлов: %1$d из %2$d</string>
+    <!-- Text of the notification shown when the folder upload service is paused, e.g. Uploading folders 1 of 2 (paused) -->
+    <string name="folder_upload_service_notification_paused">Загрузка файлов: %1$d из %2$d (пауза)</string>
     <!-- Text of the notification shown when the upload service has finished, Plural -->
     <plurals name="upload_service_final_notification">
         <item quantity="one">Загружен %1$d файл</item>
@@ -1754,20 +1728,10 @@
         <item quantity="many">%1$d файлов не скачано</item>
         <item quantity="other">%1$d файла не скачано</item>
     </plurals>
-    <!-- Text of the notification shown when the download service is running, Plural -->
-    <plurals name="download_service_notification">
-        <item quantity="one">Скачивание %1$d из %2$d файла</item>
-        <item quantity="few">Скачивание %1$d из %2$d файлов</item>
-        <item quantity="many">Скачивание %1$d из %2$d файлов</item>
-        <item quantity="other">Скачивание %1$d из %2$d файлов</item>
-    </plurals>
-    <!-- Text of the notification shown when the download service is paused, Plural -->
-    <plurals name="download_service_paused_notification">
-        <item quantity="one">Скачивание файла: %1$d из %2$d (пауза)</item>
-        <item quantity="few">Скачивание файлов: %1$d из %2$d (пауза)</item>
-        <item quantity="many">Скачивание файлов: %1$d из %2$d (пауза)</item>
-        <item quantity="other">Скачивание файлов: %1$d из %2$d (пауза)</item>
-    </plurals>
+    <!-- Text of the notification shown when the download service is running -->
+    <string name="download_service_notification">Скачивание файлов: %1$d из %2$d</string>
+    <!-- Text of the notification shown when the download service is paused -->
+    <string name="download_service_notification_paused">Скачивание файлов: %1$d из %2$d (пауза)</string>
     <!-- Title of the alert when the transfer quota is exceeded. -->
     <string name="title_depleted_transfer_overquota">Недостаточная квота передач</string>
     <!-- Text of the alert when the transfer quota is depleted. The placeholder indicates the time left for the transfer quota to be reset. For instance: 30m 45s -->
@@ -3260,8 +3224,6 @@
     </plurals>
     <!-- Title of a chat message that contains geolocation info -->
     <string name="title_geolocation_message">Закреплённое местоположение</string>
-    <!-- Text of the button to indicate an attachment upload from file system -->
-    <string name="attachment_upload_panel_from_device">Из файловой системы</string>
     <!-- Alert shown when a num of files have not been sent because of any error occurs, Plural of file. 2 files -->
     <plurals name="num_files_not_send">
         <item quantity="one">%d файл не был отправлен в чаты (%d)</item>
@@ -3916,7 +3878,7 @@
     <!-- Explanation of a warning recommending upgrade to Pro in relation to link available options -->
     <string name="link_upgrade_pro_explanation">Пользователи MEGA Pro имеют эксклюзивный доступ к дополнительным функциям защиты ссылок, которые делают ваш аккаунт ещё безопаснее.</string>
     <!-- Meaning of links decryption key -->
-    <string name="decryption_key_explanation">Наша система сквозного шифрования требует, чтобы для этого файла автоматически генерировался уникальный ключ. Ссылка с этим ключом создается по умолчанию, но вы можете экспортировать ключ дешифрования отдельно для дополнительного уровня безопасности.</string>
+    <string name="decryption_key_explanation">Наша система сквозного шифрования требует, чтобы для этого файла или папки автоматически генерировался уникальный ключ. Ссылка с этим ключом создается по умолчанию, но вы можете экспортировать ключ дешифрования отдельно для дополнительного уровня безопасности.</string>
     <!-- Reset password label -->
     <string name="reset_password_label">Сбросить пароль</string>
     <!-- Warning show to the user when has enable to send the decryption key of a link separately and tries to share the link -->
@@ -3936,7 +3898,7 @@
     <!-- Context menu item. Allows user to delete file/folder from favourites -->
     <string name="file_properties_unfavourite">Удалить популярные</string>
     <!-- Context menu item. Allows to mark file/folder with own color label -->
-    <string name="file_properties_label">Метка&#8230;</string>
+    <string name="file_properties_label">Метка</string>
     <!-- Information text to let’s the user know that they can remove a colour from a folder or file that was already marked. -->
     <string name="action_remove_label">Удалить метку</string>
     <!-- Title text to show label selector. -->
@@ -3968,19 +3930,13 @@
     <!-- Preferences screen item title for cookie settings -->
     <string name="settings_about_cookie_settings">Настройки куки-файлов</string>
     <!-- Cookie dialog title -->
-    <string name="dialog_cookie_alert_title">Прежде чем продолжить</string>
+    <string name="dialog_cookie_alert_title">Ваша конфиденциальность</string>
     <!-- Cookie dialog message. Please, keep the placeholders to format the string. -->
-    <string name="dialog_cookie_alert_message">Мы используем локальное хранилище и аналогичные технологии («Cookies») для предоставления вам наших услуг, улучшения вашего опыта работы с нашими услугами и настройки рекламы, которую вы видите, в том числе через третьих лиц. Согласитесь с использованием куки-файлов с самого начала вашего посещения или настройте куки в настройках файлов куки. Подробнее читайте в нашей [A]Политике в отношении куки-файлов[/A].</string>
+    <string name="dialog_cookie_alert_message">Мы используем куки-файлы и аналогичные технологии («Cookies»), чтобы предоставить вам возможность пользоваться нашими услугами и сделать их более удобными. Согласитесь с использованием куки-файлов с самого начала вашего посещения или настройте куки в настройках файлов куки. Подробнее читайте в нашей [A]политике в отношении куки-файлов[/A].</string>
     <!-- Cookie dialog message showed when there are unsaved settings. -->
     <string name="dialog_cookie_alert_unsaved">Настройки куки-файлов не сохранены.</string>
     <!-- Snackbar message showed when there settings has been saved successfully. -->
     <string name="dialog_cookie_snackbar_saved">Изменения настроек куки-файлов сохранены</string>
-    <!-- Cookie dialog third party first subtitle -->
-    <string name="dialog_cookie_thirdparty_subtitle1">Рекламные куки-файлы Google</string>
-    <!-- Cookie dialog third party second subtitle -->
-    <string name="dialog_cookie_thirdparty_subtitle2">Категория: рекламные куки-файлы</string>
-    <!-- Cookie dialog third party message. Please, keep the placeholders to format the string. -->
-    <string name="dialog_cookie_thirdparty_message">Используется Google, чтобы:\n• настраивать рекламу, которую Google показывает в наших и других службах и веб-сайтах на основе таких вещей, как ваше местоположение и другие веб-сайты, которые вы ранее посещали;\n• отслеживать, как часто вам показываются определенные рекламные объявления;\n• обеспечивать предотвращение мошенничества; и\n• определять, когда вы нажимаете на конкретное объявление, а затем отслеживать следующие действия, которые вы предпринимаете в ответ на это объявление.\nhttps://policies.google.com/technologies/partner-sites</string>
     <!-- Preference screen item title -->
     <string name="preference_cookies_accept">Принять куки</string>
     <!-- Preference screen item title -->
@@ -3988,21 +3944,9 @@
     <!-- Preference screen item summary -->
     <string name="preference_cookies_essential_summary">Необходимы для предоставления вам важных функций и безопасного доступа к нашим услугам. По этой причине согласие на них не требуется.</string>
     <!-- Preference screen item title -->
-    <string name="preference_cookies_preference_title">Куки отображения</string>
-    <!-- Preference screen item summary -->
-    <string name="preference_cookies_preference_summary">Позвольте нам запомнить определенные выбранные вами настройки отображения и форматирования. Непринятие этих куки-файлов будет означать, что мы не сможем запомнить для вас некоторые вещи, такие как предпочтительный макет экрана.</string>
-    <!-- Preference screen item title -->
     <string name="preference_cookies_performance_title">Куки производительности и аналитики</string>
     <!-- Preference screen item summary -->
     <string name="preference_cookies_performance_summary">Помогите нам понять, как вы используете наши услуги, и предоставьте нам данные, которые мы можем использовать для улучшения. Непринятие этих файлов cookie будет означать, что у нас будет меньше данных, необходимых для улучшения разработки.</string>
-    <!-- Preference screen item title -->
-    <string name="preference_cookies_advertising_title">Рекламные куки</string>
-    <!-- Preference screen item summary -->
-    <string name="preference_cookies_advertising_summary">Используется нами и нашими утверждёнными рекламными партнерами для настройки рекламы, которую вы видите в наших сервисах и на других веб-сайтах на основе вашей истории просмотров. Непринятие этих куки, что мы можем показывать менее актуальную рекламу.</string>
-    <!-- Preference screen item title -->
-    <string name="preference_cookies_thirdparty_title">Сторонние куки</string>
-    <!-- Preference screen item summary. Please, keep the placeholders to format the string. -->
-    <string name="preference_cookies_thirdparty_summary">Это куки, которые контролируются кем-то, кроме нас; мы используем эти куки для предоставления функций, описанных выше. Непринятие этих куки будет иметь различные последствия в зависимости от того, какой тип у каждого стороннего куки-файла. Нажмите «Дополнительная информация» ниже, чтобы получить подробную информацию обо всех сторонних файлах cookie, которые мы используем.</string>
     <!-- Preference screen item state description -->
     <string name="preference_cookies_always_on">Всегда включены</string>
     <!-- Menu option that allows the user to scan document and upload it directly to MEGA. -->
@@ -4031,7 +3975,7 @@
     <string name="file_created">Фйал создан</string>
     <!-- Warning indicating a file was not created successfully -->
     <string name="file_creation_failed">Не удалось создать файл. Пожалуйста, попробуйте ещё раз.</string>
-    <!-- Label indicating a file was saved to some folder. e.g.: File saved to Cloud Drive -->
+    <!-- Label indicating a file was saved to some folder. e.g.: File saved to Cloud Drive. "Cloud Drive" is the only destination for the time being, thus any article isn't needed -->
     <string name="file_saved_to">Файл сохранён в %1$s</string>
     <!-- Warning indicating a file was not saved to some folder. e.g.: File not saved to Cloud Drive. Try again -->
     <string name="file_saved_to_failed">Файл не сохранён в %1$s. Попробуйте ещё раз.</string>
@@ -4243,7 +4187,7 @@
     <!-- General label for microphone -->
     <string name="general_mic">Микрофон</string>
     <!-- General label for microphone muted -->
-    <string name="general_mic_mute">Ваш микрофон отключён</string>
+    <string name="general_mic_mute">Ваш микрофон выключен</string>
     <!-- General label for microphone unmuted -->
     <string name="general_mic_unmute">Ваш микрофон включён</string>
     <!-- General label for camera -->
@@ -4261,9 +4205,9 @@
     <!-- General label for headphone on-->
     <string name="general_headphone_on">Наушники включены</string>
     <!-- General label for speaker on-->
-    <string name="general_speaker_on">Динамик включён</string>
+    <string name="general_speaker_on">Ваш динамик включён</string>
     <!-- General label for speaker off-->
-    <string name="general_speaker_off">Динамик отключён</string>
+    <string name="general_speaker_off">Ваш динамик выключен</string>
     <!-- Label for end meeting-->
     <string name="meeting_end">Закончить</string>
     <!-- Invite contacts as participants of the meeting-->
@@ -4273,9 +4217,9 @@
     <!-- Pin the participant to speaker view in the meeting-->
     <string name="pin_to_speaker">Показать в главном окне</string>
     <!-- Make the participant as moderator in the meeting-->
-    <string name="make_moderator">Сделать модератором</string>
+    <string name="make_moderator">Назначить модератора</string>
     <!-- The title of dialog for end meeting confirmation-->
-    <string name="title_end_meeting">Покинуть встречу</string>
+    <string name="title_end_meeting">Покинуть встречу?</string>
     <!-- no moderator when the moderator leave meeting-->
     <string name="no_moderator">Нет модератора</string>
     <!-- assign moderator message when the moderator leave meeting-->
@@ -4384,4 +4328,24 @@
     <string name="video_quality_info">Вы можете сэкономить место, уменьшив качество видео в настройках загрузок из камеры.</string>
     <!-- Label indicating video original quality -->
     <string name="original_quality">Оригинальное качество</string>
+    <!-- Settings label which allows to enable or disable fingerprint unlock. -->
+    <string name="setting_fingerprint">Отпечаток пальца</string>
+    <!-- Title of the dialog which allows to enable the fingerprint unlock. -->
+    <string name="title_enable_fingerprint">Просканируйте отпечаток пальца для разблокировки</string>
+    <!-- Title of the dialog which allows to unlock the app with the fingerprint. -->
+    <string name="title_unlock_fingerprint">Разблокировка отпечатком пальца</string>
+    <!-- Button of the dialog which allows to unlock the app with the fingerprint. Gives the option to unlock with the passcode instead -->
+    <string name="action_use_passcode">Использовать код доступа</string>
+    <!-- Message informing the fingerprint was enabled successfully -->
+    <string name="confirmation_fingerprint_enabled">Отпечаток пальца подтверждён</string>
+    <!-- Warning indicating an image (GIF) cannot be inserted in an input text. Same string than the one shown by the system when it detects this behaviour on its own. -->
+    <string name="image_insertion_not_allowed">Здесь MEGA не поддерживает вставку изображений</string>
+    <!-- The label under the button of viewing all images screen -->
+    <string name="section_images">Изображения</string>
+    <!-- Title of the dialog warning the user about disable file versioning. -->
+    <string name="disable_versioning_label">Отключить версии файлов</string>
+    <!-- Warning of the dialog informing the user about disable file versioning. -->
+    <string name="disable_versioning_warning">Наша функция управления версиями файлов гарантирует, что мы сохраним старые копии ваших файлов, если вы замените их более новыми версиями. Если вы отключите управление версиями файлов, у вас больше не будет этой защиты; при замене старая копия будет потеряна.</string>
+    <!-- Warning informing the user the folder location is trying to open no longer exists. -->
+    <string name="location_not_exist">Эта папка больше не существует.</string>
 </resources>

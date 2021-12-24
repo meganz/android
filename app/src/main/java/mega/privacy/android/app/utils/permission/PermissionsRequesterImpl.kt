@@ -38,6 +38,8 @@ class PermissionsRequesterImpl private constructor(
         private var permissionRequestType: PermissionType =
             PermissionType.NormalPermission
 
+        constructor(activity: FragmentActivity, permissions: Array<String>) : this(activity, permissions.toCollection(ArrayList()))
+
         /**
          * If set permissionEducation, It will be called when a permission is not GRANTED
          *

@@ -66,8 +66,6 @@
     <string name="general_error_word">Erreur</string>
     <!-- when clicking into a menu whose functionality is not yet implemented -->
     <string name="general_not_yet_implemented">Pas encore implémenté</string>
-    <!-- when any file or folder is selected -->
-    <string name="error_no_selection">Aucun fichier ou dossier n’a été sélectionné</string>
     <!-- when trying to download a file that is already downloaded in the device -->
     <string name="general_already_downloaded">Déjà téléchargé</string>
     <!-- when trying to upload a file that is already uploaded in the folder -->
@@ -87,7 +85,7 @@
     <!-- when no external card exists -->
     <string name="no_external_SD_card_detected">Aucune mémoire externe n’a été détectée</string>
     <!-- On clicking menu item upload in a incoming shared folder read only -->
-    <string name="no_permissions_upload">Ce dossier est en lecture seulement. Vous n’avez pas le droit de téléverser</string>
+    <string name="no_permissions_upload">Ce dossier est en lecture seule. Vous n’avez pas le droit de téléverser</string>
     <!-- confirmation message before removing the previously downloaded MasterKey file -->
     <string name="remove_key_confirmation">Vous êtes en train de supprimer le fichier de Clé de récupération exporté précédemment</string>
     <!-- confirmation message before sending an invitation to a contact -->
@@ -270,9 +268,9 @@
     <!-- Section name for the “Messages” section.Preferably one word. There is little space for this word. -->
     <string name="section_inbox">Boîte de réception</string>
     <!-- title of the screen that shows the files saved for offline in the device -->
-    <string name="section_saved_for_offline">Enregistré Hors ligne</string>
+    <string name="section_saved_for_offline">Enregistré Hors&#160;ligne</string>
     <!-- the options of what to upload in an array. Needed for the settings, the options of what to upload. -->
-    <string name="section_saved_for_offline_new">Hors ligne</string>
+    <string name="section_saved_for_offline_new">Hors&#160;ligne</string>
     <!-- Label showing the location of a node which is not in root navigation level. The first placeholder is the name of the parent folder. The second placeholder is the name of the section in which the file is. e.g. PR reviews and tickets (Cloud Drive) -->
     <string name="location_label">%1$s (%2$s)</string>
     <!-- title of the screen that shows all the shared items -->
@@ -312,7 +310,7 @@
     <!-- Title of the fragment Choose Account -->
     <string name="choose_account_fragment">CHOISIR UN COMPTE</string>
     <!-- The file are available “offline” (without a network Wi-Fi mobile data connection) -->
-    <string name="file_properties_available_offline">Accessible Hors ligne</string>
+    <string name="file_properties_available_offline">Accessible Hors&#160;ligne</string>
     <!-- category in sort by action -->
     <string name="file_properties_info_size_file">Taille</string>
     <!-- When the file/folder was last modified -->
@@ -462,7 +460,7 @@
     <!-- Menu option to delete one or multiple selected items. -->
     <string name="context_remove">Supprimer</string>
     <!-- Menu option to delete selected items of the offline state -->
-    <string name="context_delete_offline">Supprimer de Hors ligne</string>
+    <string name="context_delete_offline">Supprimer de Hors&#160;ligne</string>
     <!-- menu item -->
     <string name="context_share_folder">Partager un dossier</string>
     <!-- menu item -->
@@ -631,10 +629,6 @@
     <string name="upload_to_audio">Son</string>
     <!-- Title of the button in the contact info screen to start a video call -->
     <string name="upload_to_video">Vidéo</string>
-    <!-- upload to. Then choose to browse the file system to choose a file -->
-    <string name="upload_to_filesystem">Du système de fichiers</string>
-    <!-- upload to. Then choose to browse the file system to choose a file -->
-    <string name="upload_to_filesystem_from">Choisir de</string>
     <!-- Label for the current uploaded size of a file. For example, 3 files, 50KB uploaded -->
     <string name="upload_uploaded">téléversé</string>
     <!-- Status text at the beginning of an upload, Status text at the beginning of an upload for 2 or more files -->
@@ -669,7 +663,7 @@
     <!-- when changing the password -->
     <string name="my_account_change_password_newPassword1">Nouveau mot de passe</string>
     <!-- when changing the password -->
-    <string name="my_account_change_password_newPassword2">Confirmer le nouveau mot de passe</string>
+    <string name="my_account_change_password_newPassword2">Confirmez le nouveau mot de passe</string>
     <!-- when changing the password or creating the account, the password is required twice and check that both times are the same -->
     <string name="my_account_change_password_dont_match">Les mots de passe ne correspondent pas</string>
     <!-- title of the selection of the pro account wanted -->
@@ -743,7 +737,7 @@
     <!-- Settings preference title for cache -->
     <string name="settings_advanced_features_cache">Nettoyer le cache</string>
     <!-- Settings preference title for offline files -->
-    <string name="settings_advanced_features_offline">Vider les fichiers Hors ligne</string>
+    <string name="settings_advanced_features_offline">Vider les fichiers Hors&#160;ligne</string>
     <!-- description of switch ‘Open file when download is completed’ -->
     <string name="settings_auto_play_label">Ouvrir le fichier une fois téléchargé</string>
     <!-- Settings preference title for delete account -->
@@ -887,7 +881,7 @@
         <item quantity="other">%1$d tentatives d’accès infructueuses</item>
     </plurals>
     <!-- Error message when not typing the Passcode code correctly -->
-    <string name="pin_lock_alert">Vous serez déconnecté et vos fichiers Hors ligne seront supprimés après dix tentatives infructueuses</string>
+    <string name="pin_lock_alert">Vous serez déconnecté et vos fichiers Hors&#160;ligne seront supprimés après dix tentatives infructueuses</string>
     <!-- error message when not typing the Passcode code correctly -->
     <string name="pin_lock_incorrect">Le code est erroné</string>
     <!-- Error message when not typing the Passcode correctly and have several attempts left. The placeholder is to display the number of attempts left in runtime. -->
@@ -1118,7 +1112,7 @@
     <!-- Message to promote PRO accounts -->
     <string name="get_pro_account">Faites grandir votre nuage.[A]Obtenez de quotas augmentés d’espace de stockage et de transfert avec un compte&#160;Pro.</string>
     <!-- success message when the MasterKey file has been downloaded -->
-    <string name="toast_master_key">La Clé de récupération du compte&#160;MEGA a été enregistrée dans&#160;: %1s. [A]Vous trouverez le fichier de votre Clé de récupération dans la section Enregistré Hors ligne.[/A] Note&#160;: dans la mesure où le fichier de votre Clé de récupération sera supprimé si vous vous déconnectez, veuillez le conserver en lieu sûr en dehors de votre compte&#160;MEGA..</string>
+    <string name="toast_master_key">La Clé de récupération du compte&#160;MEGA a été enregistrée dans&#160;: %1s. [A]Vous trouverez le fichier de votre Clé de récupération dans la section Enregistré Hors&#160;ligne.[/A] Note&#160;: dans la mesure où le fichier de votre Clé de récupération sera supprimé si vous vous déconnectez, veuillez le conserver en lieu sûr en dehors de votre compte&#160;MEGA..</string>
     <!-- Error shown when the user tries to change his mail to one that is already used -->
     <string name="mail_already_used">L’adresse courriel est déjà utilisée. Veuillez saisir une adresse courriel différente.</string>
     <!-- Error shown when the user tries to change his mail while the user has already requested a confirmation link for that email address -->
@@ -1225,7 +1219,7 @@
         <item quantity="other">%1$d éléments</item>
     </plurals>
     <!-- Error message shown when opening a file or folder link which account has been removed due to ToS/AUP violation -->
-    <string name="file_link_unavaible_delete_account">Le compte utilisateur associé a été annulé en raison du non-respect répété de nos Conditions générales d’utilisation.</string>
+    <string name="file_link_unavaible_delete_account">Le compte utilisateur associé a été résilié en raison du non-respect répété de nos Conditions générales d’utilisation.</string>
     <!-- Error message shown after login into a folder link with an invalid decryption key -->
     <string name="general_error_invalid_decryption_key">La clé de déchiffrement fournie pour le lien de dossier est invalide.</string>
     <!-- Title of the label in the my account section. It shows the credentials of the current user so it can be used to be verified by other contacts -->
@@ -1283,9 +1277,9 @@
     <!-- Title of the dialogue to mute the notifications of a specific chat. -->
     <string name="title_dialog_mute_chatroom_notifications">Mettre les notifications en sourdine</string>
     <!-- Label for the setting option that indicates the general notifications are enabled. -->
-    <string name="mute_chat_notification_option_on">Activé</string>
+    <string name="mute_chat_notification_option_on">Activée</string>
     <!-- Label for the dialog box option to mute a chat. This option will indicate that notifications for that chat are enabled. -->
-    <string name="mute_chatroom_notification_option_off">Désactivé</string>
+    <string name="mute_chatroom_notification_option_off">Désactivée</string>
     <!-- Label for the dialog box option to mute a chat. This option will indicate that chat notifications will be disabled until tomorrow at 8 a.m. -->
     <string name="mute_chatroom_notification_option_until_tomorrow_morning">Jusqu’à demain matin</string>
     <!-- Label for the dialog box option to mute a chat. This option will indicate that chat notifications will be disabled until today at 8 a.m. -->
@@ -1354,7 +1348,7 @@
     <!-- Text shown after searching and no results found -->
     <string name="no_results_found">Aucun résultat n’a été trouvé</string>
     <!-- the options of what to upload in an array. Needed for the settings, the options of what to upload. -->
-    <string name="offline_status">Hors ligne</string>
+    <string name="offline_status">Hors&#160;ligne</string>
     <!-- the options of what to upload in an array. Needed for the settings, the options of what to upload. -->
     <string name="online_status">En ligne</string>
     <!-- the options of what to upload in an array. Needed for the settings, the options of what to upload. -->
@@ -1386,7 +1380,7 @@
     <!-- Text of the confirm dialog shown when it wants to remove a contact from a chat -->
     <string name="confirmation_remove_chat_contact">Supprimer %s de cette conversation ?</string>
     <!-- Label to explain the read only participant permission in the options panel of the group info screen -->
-    <string name="observer_permission_label_participants_panel">Lecture seulement</string>
+    <string name="observer_permission_label_participants_panel">Lecture seule</string>
     <!-- Label to show the participant permission in the options panel of the group info screen -->
     <string name="standard_permission_label_participants_panel">Normal</string>
     <!-- Label to show the participant permission in the options panel of the group info screen -->
@@ -1428,7 +1422,7 @@
     <!-- settings of the chat to choose the status -->
     <string name="settings_chat_vibration">Vibration</string>
     <!-- Button text shown on SMS verification page, if the user wants to logout current suspended account and login with another account, user can press this button to logout -->
-    <string name="sms_logout">[A]Déconnectez-vous[/A] pour utiliser MEGA avec un autre compte</string>
+    <string name="sms_logout">[A]Déconnectez-vous[/A] pour changer de compte&#160;MEGA</string>
     <!-- On SMS verification page, if the user presses the logout button, a dialog with this text will show to ask for user’s confirmation. -->
     <string name="confirm_logout_from_sms_verification">Voulez-vous vraiment vous déconnecter du compte actuel ?</string>
     <!-- Text shown when a message has been deleted in the chat -->
@@ -1516,7 +1510,7 @@
     <!-- String to show the transfer quota and the used space in My Account section -->
     <string name="my_account_of_string">%1$s [A]de %2$s[/A]</string>
     <!-- Confirmation message before removing something from the Offline section. -->
-    <string name="confirmation_delete_from_save_for_offline">Supprimer de Hors Ligne ?</string>
+    <string name="confirmation_delete_from_save_for_offline">Supprimer de Hors&#160;ligne ?</string>
     <!-- Label for the option of action menu to change the chat status -->
     <string name="set_status_option_label">Définir l’état</string>
     <!-- Label for the option of setting to change the colour theme -->
@@ -1554,10 +1548,10 @@
         <item>En ligne</item>
         <item>Absent</item>
         <item>Occupé</item>
-        <item>Hors ligne</item>
+        <item>Hors&#160;ligne</item>
     </string-array>
     <!-- Text that indicates that a the offline section is currently empty -->
-    <string name="offline_empty_folder">Aucun fichier n’est enregistré Hors ligne</string>
+    <string name="offline_empty_folder">Aucun fichier n’est enregistré Hors&#160;ligne</string>
     <!-- Positive confirmation to enable logs -->
     <string name="general_enable">Activer</string>
     <!-- Positive confirmation to allow MEGA to read contacts book. -->
@@ -1615,26 +1609,14 @@
     <string name="paused_transfers_title">Transferts en pause</string>
     <!-- message shown in the screen when there are not any active transfer -->
     <string name="completed_transfers_empty">Aucun transfert terminé</string>
-    <!-- Text of the notification shown when the upload service is running, Plural -->
-    <plurals name="upload_service_notification">
-        <item quantity="one">Téléversement d’un %1$d de %2$d fichier</item>
-        <item quantity="other">Téléversement de %1$d de %2$d fichiers</item>
-    </plurals>
-    <!-- Text of the notification shown when the upload service is running, Plural -->
-    <plurals name="upload_service_paused_notification">
-        <item quantity="one">Téléversement de %1$d fichier sur %2$d (en pause)</item>
-        <item quantity="other">Téléversement de %1$d fichiers sur %2$d (en pause)</item>
-    </plurals>
-    <!-- Text of the notification shown when the folder upload service is running, Text of the notification shown when the folder upload service is running - plural e.g. Uploading 1 of 2 folders -->
-    <plurals name="folder_upload_service_notification">
-        <item quantity="one">Téléversement d’un %1$d dossier de %2$d</item>
-        <item quantity="other">Téléversement de %1$d dossiers de %2$d</item>
-    </plurals>
-    <!-- Text of the notification shown when the folder upload service is running, Text of the notification shown when the folder upload service is running - plural e.g. Uploading 1 of 2 folders -->
-    <plurals name="folder_upload_service_paused_notification">
-        <item quantity="one">Téléversement de %1$d dossier de %2$d (en pause)</item>
-        <item quantity="other">Téléversement de %1$d dossiers de %2$d (en pause)</item>
-    </plurals>
+    <!-- Text of the notification shown when the upload service is running: e.g. Uploading files: 1 of 10 -->
+    <string name="upload_service_notification">Téléversement de fichiers&#160;: %1$d de %2$d</string>
+    <!-- Text of the notification shown when the upload service is paused: e.g. Uploading files: 1 of 10 (paused)-->
+    <string name="upload_service_notification_paused">Téléversement de fichiers&#160;: %1$d de %2$d (en pause)</string>
+    <!-- Text of the notification shown when the folder upload service is running, e.g. Uploading folders 1 of 2 -->
+    <string name="folder_upload_service_notification">Téléversement de dossiers&#160;: %1$d de %2$d</string>
+    <!-- Text of the notification shown when the folder upload service is paused, e.g. Uploading folders 1 of 2 (paused) -->
+    <string name="folder_upload_service_notification_paused">Téléversement de dossiers&#160;: %1$d de %2$d (en pause)</string>
     <!-- Text of the notification shown when the upload service has finished, Plural -->
     <plurals name="upload_service_final_notification">
         <item quantity="one">%1$d fichier a été téléversé</item>
@@ -1682,16 +1664,10 @@
         <item quantity="one">%1$d fichier n’a pas été téléchargé</item>
         <item quantity="other">%1$d fichiers n’ont pas été téléchargés</item>
     </plurals>
-    <!-- Text of the notification shown when the download service is running, Plural -->
-    <plurals name="download_service_notification">
-        <item quantity="one">Téléchargement d’un %1$d de %2$d fichier</item>
-        <item quantity="other">Téléchargement de %1$d de %2$d fichiers</item>
-    </plurals>
-    <!-- Text of the notification shown when the download service is paused, Plural -->
-    <plurals name="download_service_paused_notification">
-        <item quantity="one">Téléchargement de %1$d fichier sur %2$d (en pause)</item>
-        <item quantity="other">Téléchargement de %1$d fichiers sur %2$d (en pause)</item>
-    </plurals>
+    <!-- Text of the notification shown when the download service is running -->
+    <string name="download_service_notification">Téléchargement de fichiers&#160;: %1$d de %2$d</string>
+    <!-- Text of the notification shown when the download service is paused -->
+    <string name="download_service_notification_paused">Téléchargement de fichiers&#160;: %1$d de %2$d (en pause)</string>
     <!-- Title of the alert when the transfer quota is exceeded. -->
     <string name="title_depleted_transfer_overquota">Le quota de transfert est insuffisant</string>
     <!-- Text of the alert when the transfer quota is depleted. The placeholder indicates the time left for the transfer quota to be reset. For instance: 30m 45s -->
@@ -1817,7 +1793,7 @@
     <!-- Refers to access rights for a file folder. -->
     <string name="file_properties_shared_folder_full_access">Accès total</string>
     <!-- Label to explain the read only participant permission in the options panel of the group info screen -->
-    <string name="file_properties_shared_folder_read_only">Lecture seulement</string>
+    <string name="file_properties_shared_folder_read_only">Lecture seule</string>
     <!-- Refers to access rights for a file folder. (with the & needed. Don’t use the symbol itself. Use &) -->
     <string name="file_properties_shared_folder_read_write">Lecture et écriture</string>
     <!-- State of an attachment message when the upload is in progress but the queue of transfers is paused. -->
@@ -2148,7 +2124,7 @@
     <!-- Text of the empty screen when there are not elements in Cloud Drive -->
     <string name="context_empty_cloud_drive">[B]Aucun fichier [/B][A]dans votre Disque nuagique[/A]</string>
     <!-- Text of the empty screen when there are not elements in Saved for Offline -->
-    <string name="context_empty_offline">[B]Aucun fichier enregistré [/B][A]Hors ligne[/A]</string>
+    <string name="context_empty_offline">[B]Aucun fichier enregistré [/B][A]Hors&#160;ligne[/A]</string>
     <!-- Text of the empty screen when there are not contacts. No dot at the end because is for an empty state. The format placeholders are to showing it in different colors. -->
     <string name="context_empty_contacts">[B]Aucun [/B][A]contact[/A]</string>
     <!-- Message shown when the user has no chats -->
@@ -2426,7 +2402,7 @@
     <!-- Text of the dialog to enable the rich links previews on chat -->
     <string name="text_enable_rich_links">Améliorez l’expérience MEGAchat. Le contenu des URL sera récupéré sans chiffrement de bout en bout.</string>
     <!-- Subtitle of a MEGA rich link without the decryption key -->
-    <string name="subtitle_mega_rich_link_no_key">Touchez pour saisir la clé de déchiffrement</string>
+    <string name="subtitle_mega_rich_link_no_key">Toucher pour saisir la clé de déchiffrement</string>
     <!-- when the user tries to creates a MEGA account or tries to change his password and the password strength is very weak -->
     <string name="error_password">Veuillez saisir un mot de passe plus robuste</string>
     <!-- title of the notification for an acceptance of a contact request -->
@@ -2533,7 +2509,7 @@
     <!-- message shown when the user open a file, there is no network connection and the file is not been downloaded -->
     <string name="error_fail_to_open_file_no_network">Il n’y a pas de connexion réseau. Veuillez vous reconnecter pour ouvrir le fichier.</string>
     <!-- message when trying to save for offline a file that already exists -->
-    <string name="file_already_exists">Le fichier existe déjà dans Enregistré Hors ligne</string>
+    <string name="file_already_exists">Le fichier existe déjà dans Enregistré Hors&#160;ligne</string>
     <!-- Error message if forwarding a message failed, many messages -->
     <plurals name="error_forwarding_messages">
         <item quantity="one">Le message n’a pas été transféré</item>
@@ -2664,17 +2640,17 @@
     <!-- Error shown when a user tries to enable Two-Factor Authentication and introduce an invalid code -->
     <string name="invalid_code">Le code est invalide</string>
     <!-- Text of the dialog shown when the storage of a FREE account is almost full -->
-    <string name="text_almost_full_warning">Votre Disque nuagique est presque plein. Passez à un compte&#160;Pro et obtenez jusqu’à %1$s&#160;To d’espace de stockage et %2$s&#160;To de quota de transfert.</string>
+    <string name="text_almost_full_warning">Votre Disque nuagique est presque saturé. Passez à un compte&#160;Pro et obtenez jusqu’à %1$s&#160;To d’espace de stockage et %2$s&#160;To de quota de transfert.</string>
     <!-- Text of the dialog shown when the storage of a PRO I or II account is almost full -->
-    <string name="text_almost_full_warning_pro_account">Votre Disque nuagique est presque plein. Surclassez votre compte maintenant et obtenez jusqu’à %1$s&#160;To d’espace de stockage et %2$s&#160;To de quota de transfert.</string>
+    <string name="text_almost_full_warning_pro_account">Votre Disque nuagique est presque saturé. Surclassez votre compte maintenant et obtenez jusqu’à %1$s&#160;To d’espace de stockage et %2$s&#160;To de quota de transfert.</string>
     <!-- Text of the dialog shown when the storage of a PRO III account is almost full -->
-    <string name="text_almost_full_warning_pro3_account">Votre Disque nuagique est presque plein. Si vous avez besoin de plus d’espace de stockage, veuillez contacter l’assistance de MEGA pour obtenir un abonnement personnalisé.</string>
+    <string name="text_almost_full_warning_pro3_account">Votre Disque nuagique est presque saturé. Si vous avez besoin de plus d’espace de stockage, veuillez contacter l’assistance de MEGA pour obtenir un abonnement personnalisé.</string>
     <!-- Text of the dialog shown when the storage of a FREE account is full -->
-    <string name="text_storage_full_warning">Votre Disque nuagique est plein. Passez à un compte&#160;Pro et obtenez jusqu’à %1$s To d’espace de stockage et %2$s&#160;To de quota de transfert.</string>
+    <string name="text_storage_full_warning">Votre Disque nuagique est saturé. Passez à un compte&#160;Pro et obtenez jusqu’à %1$s To d’espace de stockage et %2$s&#160;To de quota de transfert.</string>
     <!-- Text of the dialog shown when the storage of a PRO I or II account is full -->
-    <string name="text_storage_full_warning_pro_account">Votre Disque nuagique est plein. Surclassez votre compte maintenant et obtenez jusqu’à %1$s&#160;To d’espace de stockage et %2$s&#160;To de quota de transfert.</string>
+    <string name="text_storage_full_warning_pro_account">Votre Disque nuagique est saturé. Surclassez votre compte maintenant et obtenez jusqu’à %1$s&#160;To d’espace de stockage et %2$s&#160;To de quota de transfert.</string>
     <!-- Text of the dialog shown when the storage of a PRO III account is full -->
-    <string name="text_storage_full_warning_pro3_account">Votre Disque nuagique est plein. Si vous avez besoin de plus d’espace de stockage, veuillez contacter l’assistance de MEGA pour obtenir un abonnement personnalisé.</string>
+    <string name="text_storage_full_warning_pro3_account">Votre Disque nuagique est saturé. Si vous avez besoin de plus d’espace de stockage, veuillez contacter l’assistance de MEGA pour obtenir un abonnement personnalisé.</string>
     <!-- Button of the dialog shown when the storage is almost full to see the available PRO plans -->
     <string name="button_plans_almost_full_warning">Voir les abonnements</string>
     <!-- Button of the dialog shown when the storage is almost full to custom a plan -->
@@ -2715,7 +2691,7 @@
     <!-- Popup message shown if an user try to login while there is still living transfer -->
     <string name="logout_warning_abort_transfers">Tous les transferts seront annulés, voulez-vous vous déconnecter ?</string>
     <!-- Label to explain the read only participant permission in the options panel of the group info screen -->
-    <string name="subtitle_read_only_permissions">Lecture seulement</string>
+    <string name="subtitle_read_only_permissions">Lecture seule</string>
     <!-- Label shown the total space and the used space in an account -->
     <string name="used_space">[A]%1$s [/A][B]sur %2$s sont utilisés[/B]</string>
     <!-- title of the alert dialog when the user is changing the API URL to staging -->
@@ -3122,8 +3098,6 @@
     </plurals>
     <!-- Title of a chat message that contains geolocation info -->
     <string name="title_geolocation_message">Position épinglée</string>
-    <!-- Text of the button to indicate an attachment upload from file system -->
-    <string name="attachment_upload_panel_from_device">À partir du système de fichiers</string>
     <!-- Alert shown when a num of files have not been sent because of any error occurs, Plural of file. 2 files -->
     <plurals name="num_files_not_send">
         <item quantity="one">%d fichier n’a pas été envoyé vers %d conversations</item>
@@ -3219,7 +3193,7 @@
     <!-- Title of the layout to join a group call from the chat screen. The placeholder indicates the user who initiated the call -->
     <string name="join_call_layout_in_group_call">%s a commencé un appel de groupe. Touchez pour vous y joindre.</string>
     <!-- Title of the layout to return to a call -->
-    <string name="call_in_progress_layout">Touchez pour reprendre l’appel</string>
+    <string name="call_in_progress_layout">Toucher pour reprendre l’appel</string>
     <!-- message displayed when you try to start a call but it is not possible because you are already on a call -->
     <string name="not_allowed_to_start_call">Vous êtes actuellement en appel</string>
     <!-- chat message when a participant invites himself to a public chat using a chat link. Please keep the placeholder because is to show the participant’s name in runtime. -->
@@ -3427,11 +3401,11 @@
     <!-- A dialog message which is shown to sub-users of expired business accounts. -->
     <string name="expired_user_business_text_2">Contactez l’administrateur de votre compte d’entreprise pour résoudre la situation et activer votre compte.</string>
     <!-- Warning message to alert user about logout in My Account section if has offline files. -->
-    <string name="logout_warning_offline">Quand vous vous déconnectez, les fichiers de votre section Hors ligne sont supprimés de votre appareil.</string>
+    <string name="logout_warning_offline">Quand vous vous déconnectez, les fichiers de votre section Hors&#160;ligne sont supprimés de votre appareil.</string>
     <!-- Warning message to alert user about logout in My Account section if has transfers in progress. -->
     <string name="logout_warning_transfers">Quand vous vous déconnectez, les transferts en cours sont annulés.</string>
     <!-- Warning message to alert user about logout in My Account section if has offline files and transfers in progress. -->
-    <string name="logout_warning_offline_and_transfers">Quand vous vous déconnectez, les fichiers de votre section Hors ligne sont supprimés de votre appareil et les transferts en cours sont annulés.</string>
+    <string name="logout_warning_offline_and_transfers">Quand vous vous déconnectez, les fichiers de votre section Hors&#160;ligne sont supprimés de votre appareil et les transferts en cours sont annulés.</string>
     <!-- Label to indicate that a name has not been possible to obtain for some reason -->
     <string name="unknown_name_label">Nom inconnu</string>
     <!-- Error when renaming a chat title and it is too long -->
@@ -3529,7 +3503,7 @@
     <!-- Warning show to the user when a node does not exist in cloud -->
     <string name="warning_node_not_exists_in_cloud">Le fichier est introuvable pas dans votre Disque nuagique.</string>
     <!-- Header text of the Over Disk Quota Paywall warning -->
-    <string name="over_disk_quota_paywall_header">L’espace de stockage est plein</string>
+    <string name="over_disk_quota_paywall_header">L’espace de stockage est saturé</string>
     <!-- Title of the Over Disk Quota Paywall warning -->
     <string name="over_disk_quota_paywall_title">Vos données courent un danger !</string>
     <!-- Text of the Over Disk Quota Paywall warning with multiple email notification. Placeholders: 1 user email, 2 and 3 list of email notification dates, 4 number of files, 5 files size (including units) and 6 required PRO plan -->
@@ -3744,7 +3718,7 @@
     <!-- Explanation of a warning recommending upgrade to Pro in relation to link available options -->
     <string name="link_upgrade_pro_explanation">Les utilisateurs de MEGA Pro ont l’accès exclusif à des fonctions supplémentaires de sécurité des liens qui rendent votre compte encore plus sûr.</string>
     <!-- Meaning of links decryption key -->
-    <string name="decryption_key_explanation">Notre système de chiffrement de bout en bout exige une clé unique générée automatiquement pour ce fichier. Un lien qui comprend cette clé est créé par défaut, mais par mesure supplémentaire de sécurité, vous pouvez exporter séparément la clé de chiffrement.</string>
+    <string name="decryption_key_explanation">Notre système de chiffrement de bout en bout exige une clé unique générée automatiquement pour ce fichier ou dossier. Un lien qui comprend cette clé est créé par défaut, mais par mesure supplémentaire de sécurité, vous pouvez exporter la clé de chiffrement séparément.</string>
     <!-- Reset password label -->
     <string name="reset_password_label">Réinitialiser le mot de passe</string>
     <!-- Warning show to the user when has enable to send the decryption key of a link separately and tries to share the link -->
@@ -3764,7 +3738,7 @@
     <!-- Context menu item. Allows user to delete file/folder from favourites -->
     <string name="file_properties_unfavourite">Supprimer le favori</string>
     <!-- Context menu item. Allows to mark file/folder with own color label -->
-    <string name="file_properties_label">Étiquette&#8230;</string>
+    <string name="file_properties_label">Étiquette</string>
     <!-- Information text to let’s the user know that they can remove a colour from a folder or file that was already marked. -->
     <string name="action_remove_label">Supprimer l’étiquette</string>
     <!-- Title text to show label selector. -->
@@ -3792,45 +3766,27 @@
     <!-- Action to get more information -->
     <string name="action_more_information">Plus de précisions</string>
     <!-- Preferences screen item title for Cookie Policy -->
-    <string name="settings_about_cookie_policy">Politique sur les Témoins de connexion</string>
+    <string name="settings_about_cookie_policy">Politique sur les Témoins</string>
     <!-- Preferences screen item title for cookie settings -->
-    <string name="settings_about_cookie_settings">Paramètres des Témoins de connexion</string>
+    <string name="settings_about_cookie_settings">Paramètres des Témoins</string>
     <!-- Cookie dialog title -->
-    <string name="dialog_cookie_alert_title">Avant que vous ne poursuiviez</string>
+    <string name="dialog_cookie_alert_title">Votre vie privée</string>
     <!-- Cookie dialog message. Please, keep the placeholders to format the string. -->
-    <string name="dialog_cookie_alert_message">Nous utilisons la mémoire locale et des technologies semblables («&#160;cookies&#160;») pour vous fournir nos services, améliorer votre expérience d’utilisation de nos services et personnaliser les publicités que vous voyez, dont celles provenant de tiers. Acceptez dès le début de votre visite notre utilisation de Témoins ou personnalisez les Témoins dans les paramètres des Témoins de connexion. Apprenez-en davantage dans notre [A]Politique sur les Témoins de connexion[/A].</string>
+    <string name="dialog_cookie_alert_message">Nous utilisons des Témoins de connexion et des technologies semblables («&#160;Témoins&#160;») pour vous fournir nos services et améliorer votre expérience d’utilisation de nos services. Acceptez notre utilisation de Témoins dès le début de votre visite ou personnalisez les Témoins dans les paramètres des Témoins. Apprenez-en davantage dans notre [A]Politique sur les Témoins[/A].</string>
     <!-- Cookie dialog message showed when there are unsaved settings. -->
     <string name="dialog_cookie_alert_unsaved">Des paramètres de témoins ne sont pas enregistrés.</string>
     <!-- Snackbar message showed when there settings has been saved successfully. -->
     <string name="dialog_cookie_snackbar_saved">Les modifications des paramètres des témoins ont été enregistrées</string>
-    <!-- Cookie dialog third party first subtitle -->
-    <string name="dialog_cookie_thirdparty_subtitle1">Témoins publicitaires de Google</string>
-    <!-- Cookie dialog third party second subtitle -->
-    <string name="dialog_cookie_thirdparty_subtitle2">Catégorie&#160;: Témoins publicitaires</string>
-    <!-- Cookie dialog third party message. Please, keep the placeholders to format the string. -->
-    <string name="dialog_cookie_thirdparty_message">Utilisés par Google pour&#160;: \n• Personnaliser les publicités que Google affiche sur nos services et sites Web, et sur d’autres services et sites Web, d’après des éléments tels que votre position géographique et les autres sites Web que vous avez visités précédemment ; \n• Surveiller la fréquence d’affichage de certaines publicités ; \n• Fournir une prévention contre les fraudes ; et\n• Déterminer si vous touchez une publicité particulière, pour ensuite suivre les différentes actions que vous effectuez en réponse à cette publicité.\nhttps://policies.google.com/technologies/partner-sites</string>
     <!-- Preference screen item title -->
-    <string name="preference_cookies_accept">Accepter les Témoins de connexion</string>
+    <string name="preference_cookies_accept">Accepter les Témoins</string>
     <!-- Preference screen item title -->
     <string name="preference_cookies_essential_title">Témoins essentiels</string>
     <!-- Preference screen item summary -->
     <string name="preference_cookies_essential_summary">Ils sont essentiels pour une fonction importante et pour un accès sécurisé à nos services. Pour cette raison, ils ne demandent pas de consentement.</string>
     <!-- Preference screen item title -->
-    <string name="preference_cookies_preference_title">Témoins des préférences</string>
+    <string name="preference_cookies_performance_title">Témoins de performance et d’analyse</string>
     <!-- Preference screen item summary -->
-    <string name="preference_cookies_preference_summary">Ils nous permettent de mémoriser certains paramètres d’affichage et de formatage que vous choisissez. Le refus de ces Témoins signifierait que nous ne pourrions pas mémoriser certaines choses pour vous, telles que votre disposition d’écran préférée.</string>
-    <!-- Preference screen item title -->
-    <string name="preference_cookies_performance_title">Témoins de performances et d’analyses</string>
-    <!-- Preference screen item summary -->
-    <string name="preference_cookies_performance_summary">Ils nous permettent de comprendre comment vous utilisez nos services et nous fournissent des données que nous pouvons utiliser pour apporter des améliorations. Le refus de ces Témoins signifierait que moins de données seraient à notre disposition pour faciliter les améliorations conceptionnelles.</string>
-    <!-- Preference screen item title -->
-    <string name="preference_cookies_advertising_title">Témoins publicitaires</string>
-    <!-- Preference screen item summary -->
-    <string name="preference_cookies_advertising_summary">Ils sont utilisés par nous et par nos partenaires publicitaires approuvés afin de personnaliser les publicités que vous voyez dans nos services et sur d’autres sites Web, d’après votre historique de connexion. Le refus de ces Témoins signifierait que nous pourrions afficher des publicités moins pertinentes.</string>
-    <!-- Preference screen item title -->
-    <string name="preference_cookies_thirdparty_title">Témoins tiers</string>
-    <!-- Preference screen item summary. Please, keep the placeholders to format the string. -->
-    <string name="preference_cookies_thirdparty_summary">Ces Témoins ne sont pas contrôlés par nous, mais par des tiers ; nous utilisons ces Témoins pour fournir les types de fonctions que nous décrivons ci-dessous. Le refus de ces Témoins aurait différentes implications suivant la nature de chaque Témoin tiers. Vous obtiendrez des détails sur les Témoins que nous utilisons en touchant «&#160;Plus de précision&#160;» ci-dessous.</string>
+    <string name="preference_cookies_performance_summary">Nous permettent de comprendre comment vous utilisez nos services et nous fournissent des données que nous pouvons utiliser pour apporter des améliorations. Le refus de ces Témoins signifierait que moins de données seraient à notre disposition pour faciliter les améliorations conceptionnelles.</string>
     <!-- Preference screen item state description -->
     <string name="preference_cookies_always_on">Toujours activés</string>
     <!-- Menu option that allows the user to scan document and upload it directly to MEGA. -->
@@ -3859,7 +3815,7 @@
     <string name="file_created">Le fichier a été créé</string>
     <!-- Warning indicating a file was not created successfully -->
     <string name="file_creation_failed">Erreur de création du fichier. Veuillez réessayer.</string>
-    <!-- Label indicating a file was saved to some folder. e.g.: File saved to Cloud Drive -->
+    <!-- Label indicating a file was saved to some folder. e.g.: File saved to Cloud Drive. "Cloud Drive" is the only destination for the time being, thus any article isn't needed -->
     <string name="file_saved_to">Le fichier a été enregistré dans le %1$s</string>
     <!-- Warning indicating a file was not saved to some folder. e.g.: File not saved to Cloud Drive. Try again -->
     <string name="file_saved_to_failed">Le fichier n’a pas été enregistré dans le %1$s. Veuillez réessayer.</string>
@@ -4031,7 +3987,7 @@
         <item quantity="other">Obtenir les liens</item>
     </plurals>
     <!-- Ask for confirmation before clear offline files -->
-    <string name="clear_offline_confirmation">Vider tous les fichiers Hors ligne ?</string>
+    <string name="clear_offline_confirmation">Vider tous les fichiers hors ligne ?</string>
     <!-- Banner text when the call is in progress and I'm the only participant. -->
     <string name="banner_alone_on_the_call">Vous êtes la seule personne ici</string>
     <!-- Item menu option upon right click on meeting. -->
@@ -4053,9 +4009,9 @@
     <!-- General label for microphone -->
     <string name="general_mic">Micro</string>
     <!-- General label for microphone muted -->
-    <string name="general_mic_mute">Votre microphone est coupé</string>
+    <string name="general_mic_mute">Votre microphone est désactivé</string>
     <!-- General label for microphone unmuted -->
-    <string name="general_mic_unmute">Votre microphone est en fonction</string>
+    <string name="general_mic_unmute">Votre microphone est activé</string>
     <!-- General label for camera -->
     <string name="general_camera">Caméra</string>
     <!-- General label for camera enable -->
@@ -4071,9 +4027,9 @@
     <!-- General label for headphone on-->
     <string name="general_headphone_on">Le casque d’écoute est activé</string>
     <!-- General label for speaker on-->
-    <string name="general_speaker_on">Le haut-parleur est activé</string>
+    <string name="general_speaker_on">Votre haut-parleur est activé</string>
     <!-- General label for speaker off-->
-    <string name="general_speaker_off">Le haut-parleur est désactivé</string>
+    <string name="general_speaker_off">Votre haut-parleur est désactivé</string>
     <!-- Label for end meeting-->
     <string name="meeting_end">Mettre fin</string>
     <!-- Invite contacts as participants of the meeting-->
@@ -4107,7 +4063,7 @@
     <!-- Subtitle of the meeting screen-->
     <string name="duration_meeting">Durée</string>
     <!-- The question in on-boarding screen asking if the user is going to join meeting as guest-->
-    <string name="join_meeting_as_guest">Me joindre à la réunion en tant qu’invité</string>
+    <string name="join_meeting_as_guest">Me joindre à une réunion en tant qu’invité</string>
     <!-- The title of the paste meeting link dialog for guest-->
     <string name="paste_meeting_link_guest_dialog_title">Vous avez reçu une invitation à une réunion.</string>
     <!-- Tell the guest to paste the meeting link in the edit box-->
@@ -4139,7 +4095,7 @@
     <!-- the content of snack bar when copied meeting link-->
     <string name="copied_meeting_link">Le lien de la réunion a été copié.</string>
     <!-- Title of the layout to join a meeting from the chat screen. The placeholder indicates the user who initiated the meeting -->
-    <string name="join_meeting_layout_in_group_call">%s a commencé une réunion. Touchez pour vous y joindre.</string>
+    <string name="join_meeting_layout_in_group_call">%s a commencé une réunion. Toucher pour vous y joindre.</string>
     <!-- Title of fifth tour screen -->
     <string name="title_tour_five">Réunion&#160;MEGA</string>
     <!-- Content of fourth tour screen -->
@@ -4171,27 +4127,47 @@
     <!-- Settings category which contains all preferences related to user interface. -->
     <string name="user_interface_setting">Interface utilisateur</string>
     <!-- Setting which allows to choose the start screen. -->
-    <string name="start_screen_setting">Écran de lancement</string>
+    <string name="start_screen_setting">Écran de démarrage</string>
     <!-- Setting which allows to hide or show the recent activity. -->
     <string name="hide_recent_setting">Cacher l’activité récente</string>
     <!-- Context of a setting which allows to hide or show the recent activity. -->
     <string name="hide_recent_setting_context">Cacher l’activité récente dans la section Accueil.</string>
     <!-- Title of a dialog informing the start screen can be modified. -->
-    <string name="choose_start_screen_title">Choisir votre écran de lancement</string>
+    <string name="choose_start_screen_title">Choisir votre écran de démarrage</string>
     <!-- Test of a dialog informing the start screen can be modified. -->
-    <string name="choose_start_screen_text">Changez le paramètre pour choisir quel écran s’ouvrira lors du prochain lancement de l’appli&#160;mobile&#160;MEGA.</string>
+    <string name="choose_start_screen_text">Changez les paramètres pour choisir quel écran s’ouvrira lors du prochain lancement de l’appli&#160;mobile&#160;MEGA.</string>
     <!-- Action button which allows to change a setting. -->
     <string name="change_setting_action">Changer le paramètre</string>
     <!-- Subtitle of the settings page where the start screen can be chosen. -->
-    <string name="configure_start_screen">Configurez votre écran de lancement par défaut</string>
+    <string name="configure_start_screen">Configurez votre écran de démarrage par défaut</string>
     <!-- Homepage section. -->
     <string name="home_section">Accueil</string>
     <!-- Action button which allows to show the recent activity. -->
     <string name="show_activity_action">Afficher l’activité</string>
     <!-- Text informing the recent activity is hidden. -->
-    <string name="recents_activity_hidden">L’activité [B]Récente[/B] est cachée</string>
+    <string name="recents_activity_hidden">L’activité des [B]Récents[/B] est cachée</string>
     <!-- Alert informing the user can choose the video quality for Camera Uploads Videos -->
     <string name="video_quality_info">Vous pouvez économiser de l’espace en diminuant la qualité de la vidéo dans les paramètres des Téléversements de l’appareil photo.</string>
     <!-- Label indicating video original quality -->
     <string name="original_quality">Qualité originale</string>
+    <!-- Settings label which allows to enable or disable fingerprint unlock. -->
+    <string name="setting_fingerprint">ID par empreinte</string>
+    <!-- Title of the dialog which allows to enable the fingerprint unlock. -->
+    <string name="title_enable_fingerprint">Confirmer votre empreinte pour déverrouiller</string>
+    <!-- Title of the dialog which allows to unlock the app with the fingerprint. -->
+    <string name="title_unlock_fingerprint">Déverrouiller avec votre empreinte</string>
+    <!-- Button of the dialog which allows to unlock the app with the fingerprint. Gives the option to unlock with the passcode instead -->
+    <string name="action_use_passcode">Utiliser le code d’accès</string>
+    <!-- Message informing the fingerprint was enabled successfully -->
+    <string name="confirmation_fingerprint_enabled">Votre empreinte est confirmée</string>
+    <!-- Warning indicating an image (GIF) cannot be inserted in an input text. Same string than the one shown by the system when it detects this behaviour on its own. -->
+    <string name="image_insertion_not_allowed">MEGA ne prend pas en charge ici l’insertion d’image</string>
+    <!-- The label under the button of viewing all images screen -->
+    <string name="section_images">Images</string>
+    <!-- Title of the dialog warning the user about disable file versioning. -->
+    <string name="disable_versioning_label">Désactiver le versionnage des fichiers</string>
+    <!-- Warning of the dialog informing the user about disable file versioning. -->
+    <string name="disable_versioning_warning">Notre fonction de versionnage des fichiers fait en sorte que nous conservons les anciennes versions de vos fichiers si vous les remplacez par de nouvelles versions. Si vous désactivez le versionnage des fichiers, vous ne profiterez plus de cette protection ; l’ancienne copie sera perdue quand vous la remplacerez.</string>
+    <!-- Warning informing the user the folder location is trying to open no longer exists. -->
+    <string name="location_not_exist">Cet emplacement n’existe plus.</string>
 </resources>

@@ -29,7 +29,7 @@ import mega.privacy.android.app.utils.AvatarUtil.getSpecificAvatarColor
 import mega.privacy.android.app.utils.CallUtil.getDefaultAvatarCall
 import mega.privacy.android.app.utils.CallUtil.getImageAvatarCall
 import mega.privacy.android.app.utils.ChatUtil.getTitleChat
-import mega.privacy.android.app.utils.Constants
+import mega.privacy.android.app.utils.Constants.AVATAR_GROUP_CHAT_COLOR
 import mega.privacy.android.app.utils.Constants.AVATAR_SIZE
 import mega.privacy.android.app.utils.LogUtil.logDebug
 import mega.privacy.android.app.utils.RunOnUIThreadUtils
@@ -38,7 +38,6 @@ import mega.privacy.android.app.utils.permission.permissionsBuilder
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
 import nz.mega.sdk.MegaChatCall
 import java.util.*
-
 
 @AndroidEntryPoint
 class RingingMeetingFragment : MeetingBaseFragment(),
@@ -59,7 +58,6 @@ class RingingMeetingFragment : MeetingBaseFragment(),
         arguments?.let {
             chatId = it.getLong(MEETING_CHAT_ID)
         }
-        initViewModel()
     }
 
     override fun onCreateView(
@@ -78,8 +76,9 @@ class RingingMeetingFragment : MeetingBaseFragment(),
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        initComponent()
+        initViewModel()
         permissionsRequester.launch(true)
+        initComponent()
     }
 
     /**
@@ -123,6 +122,7 @@ class RingingMeetingFragment : MeetingBaseFragment(),
             inMeetingViewModel.answerChatCall(
                 enableVideo,
                 true,
+                enableVideo,
                 AnswerChatCallListener(requireContext(), this)
             )
         }
@@ -155,7 +155,7 @@ class RingingMeetingFragment : MeetingBaseFragment(),
                 }
             } else {
                 bitmap = getDefaultAvatar(
-                    getSpecificAvatarColor(Constants.AVATAR_GROUP_CHAT_COLOR),
+                    getSpecificAvatarColor(AVATAR_GROUP_CHAT_COLOR),
                     getTitleChat(it),
                     AVATAR_SIZE,
                     true,
@@ -184,13 +184,11 @@ class RingingMeetingFragment : MeetingBaseFragment(),
         sharedModel.cameraPermissionCheck.observe(viewLifecycleOwner) {
             if (it) {
                 permissionsRequester = permissionsBuilder(
-                    arrayOf(Manifest.permission.CAMERA).toCollection(
-                        ArrayList()
-                    )
+                    arrayOf(Manifest.permission.CAMERA)
                 )
-                    .setOnRequiresPermission { l -> onRequiresCameraPermission(l) }
+                    .setOnRequiresPermission { l -> onRequiresPermission(l) }
                     .setOnShowRationale { l -> onShowRationale(l) }
-                    .setOnNeverAskAgain { l -> onCameraNeverAskAgain(l) }
+                    .setOnNeverAskAgain { l -> onPermNeverAskAgain(l) }
                     .build()
                 permissionsRequester.launch(false)
             }
@@ -199,13 +197,11 @@ class RingingMeetingFragment : MeetingBaseFragment(),
         sharedModel.recordAudioPermissionCheck.observe(viewLifecycleOwner) {
             if (it) {
                 permissionsRequester = permissionsBuilder(
-                    arrayOf(Manifest.permission.RECORD_AUDIO).toCollection(
-                        ArrayList()
-                    )
+                    arrayOf(Manifest.permission.RECORD_AUDIO)
                 )
-                    .setOnRequiresPermission { l -> onRequiresAudioPermission(l) }
+                    .setOnRequiresPermission { l -> onRequiresPermission(l) }
                     .setOnShowRationale { l -> onShowRationale(l) }
-                    .setOnNeverAskAgain { l -> onAudioNeverAskAgain(l) }
+                    .setOnNeverAskAgain { l -> onPermNeverAskAgain(l) }
                     .build()
                 permissionsRequester.launch(false)
             }
@@ -214,7 +210,7 @@ class RingingMeetingFragment : MeetingBaseFragment(),
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
-        permissionsRequester = permissionsBuilder(permissions.toCollection(ArrayList()))
+        permissionsRequester = permissionsBuilder(permissions)
             .setOnPermissionDenied { l -> onPermissionDenied(l) }
             .setOnRequiresPermission { l -> onRequiresPermission(l) }
             .setOnShowRationale { l -> onShowRationale(l) }
@@ -226,16 +222,15 @@ class RingingMeetingFragment : MeetingBaseFragment(),
     private fun showSnackBar(message: String) =
         (activity as BaseActivity).showSnackbar(binding.root, message)
 
-    private fun onAudioNeverAskAgain(permissions: ArrayList<String>) {
-        if (permissions.contains(Manifest.permission.RECORD_AUDIO)) {
-            logDebug("user denies the RECORD_AUDIO permissions")
-            showSnackBar(StringResourcesUtils.getString(R.string.meeting_required_permissions_warning))
-        }
-    }
-
-    private fun onCameraNeverAskAgain(permissions: ArrayList<String>) {
-        if (permissions.contains(Manifest.permission.CAMERA)) {
-            logDebug("user denies the CAMERA permissions")
+    /**
+     * user denies the RECORD_AUDIO or CAMERA permission
+     *
+     * @param permissions permission list
+     */
+    private fun onPermNeverAskAgain(permissions: ArrayList<String>) {
+        if (permissions.contains(Manifest.permission.RECORD_AUDIO)
+            || permissions.contains(Manifest.permission.CAMERA)) {
+            logDebug("user denies the permission")
             showSnackBar(StringResourcesUtils.getString(R.string.meeting_required_permissions_warning))
         }
     }

@@ -36,6 +36,8 @@ android {
         viewBinding = true
     }
 
+
+
     defaultConfig {
         applicationId "mega.privacy.android.app"
 
@@ -85,20 +87,16 @@ android {
         // abortOnError false
     }
 
-    dexOptions{
-        jumboMode = true
-    }
-
     compileOptions {
         // Flag to enable support for the new language APIs
         coreLibraryDesugaringEnabled true
-        // Sets Java compatibility to Java 8
-        sourceCompatibility JavaVersion.VERSION_1_8
-        targetCompatibility JavaVersion.VERSION_1_8
+        // Sets Java compatibility to Java 11
+        sourceCompatibility JavaVersion.VERSION_11
+        targetCompatibility JavaVersion.VERSION_11
     }
 
     kotlinOptions {
-        jvmTarget = "1.8"
+        jvmTarget = "11"
     }
 //    task megaSDK(type: Exec, description: 'Compile MEGA SDK via NDK') {
 //        workingDir 'src/main/jni'
@@ -108,6 +106,12 @@ android {
 //    tasks.withType(JavaCompile) {
 //        compileTask -> compileTask.dependsOn megaSDK
 //    }
+
+    testOptions {
+        unitTests {
+            includeAndroidResources = true
+        }
+    }
 
     flavorDimensions "service"
     productFlavors {
@@ -131,7 +135,7 @@ android {
 }
 
 dependencies {
-    implementation fileTree(dir: 'libs', include: ['*.jar'])
+    implementation fileTree(dir: "$rootProject.projectDir/app/src/main/jni/ExoPlayer/", include: ['*.aar'])
 
     // App dependencies
     implementation "androidx.appcompat:appcompat:$appCompatVersion"
@@ -168,17 +172,15 @@ dependencies {
     implementation "com.google.dagger:hilt-android:$hiltVersion"
     kapt "com.google.dagger:hilt-android-compiler:$hiltVersion"
     implementation "androidx.hilt:hilt-lifecycle-viewmodel:$hiltAndroidXVersion"
-    kapt "androidx.hilt:hilt-compiler:$hiltAndroidXVersion"
+    kapt "androidx.hilt:hilt-compiler:$hiltAndroidXCompilerVersion"
 
     // Other libs
     implementation 'androidx.exifinterface:exifinterface:1.3.0'
     implementation 'com.github.nirhart:parallaxscroll:1.0'
     implementation 'androidx.palette:palette-ktx:1.0.0'
     implementation 'com.vdurmont:emoji-java:4.0.0'
-    implementation 'com.google.android.exoplayer:exoplayer-core:2.12.1'
-    implementation 'com.google.android.exoplayer:exoplayer-ui:2.12.1'
-    implementation(name: 'exoplayer-extension-ffmpeg-2.12.1', ext: 'aar')
-    implementation(name: 'exoplayer-extension-flac-2.12.1', ext: 'aar')
+    implementation "com.google.android.exoplayer:exoplayer-core:$exoPlayerVersion"
+    implementation "com.google.android.exoplayer:exoplayer-ui:$exoPlayerVersion"
     implementation 'com.google.zxing:core:3.4.0'
     implementation 'com.budiyev.android:code-scanner:1.8.3'
     implementation 'me.leolin:ShortcutBadger:1.1.22@aar'
@@ -247,7 +249,18 @@ dependencies {
     // Testing dependencies
     testImplementation "junit:junit:$junitVersion"
     testImplementation "com.google.truth:truth:$truthVersion"
+    testImplementation "androidx.test.ext:truth:$androidxTestVersion"
+    testImplementation "androidx.arch.core:core-testing:$androidxArchCoreVersion"
+    testImplementation "androidx.test:core-ktx:$androidxTestVersion"
+    testImplementation "androidx.test:core:$androidxTestVersion"
+    testImplementation "org.robolectric:robolectric:$roboletricVersion"
+    testImplementation "androidx.test.ext:junit-ktx:$androidxTestExtVersion"
+    testImplementation "org.mockito:mockito-core:$mockitoVersion"
+    testImplementation "org.mockito.kotlin:mockito-kotlin:$mockitoKotlinVersion"
+
     androidTestImplementation "androidx.test.ext:junit:$androidxTestExtVersion"
+    androidTestImplementation "com.google.truth:truth:$truthVersion"
+    androidTestImplementation "androidx.test.espresso:espresso-core:$espressoVersion"
 }
 
 def taskRequests = gradle.getStartParameter().getTaskRequests().toString()

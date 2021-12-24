@@ -1,8 +1,8 @@
 package mega.privacy.android.app.fragments.homepage.video
 
-import androidx.hilt.lifecycle.ViewModelInject
 import androidx.lifecycle.*
 import com.jeremyliao.liveeventbus.LiveEventBus
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.fragments.homepage.NodeItem
 import mega.privacy.android.app.fragments.homepage.TypedFilesRepository
@@ -10,9 +10,12 @@ import mega.privacy.android.app.globalmanagement.SortOrderManagement
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.Constants.EVENT_NODES_CHANGE
 import mega.privacy.android.app.utils.TextUtil
-import nz.mega.sdk.MegaApiJava.*
+import nz.mega.sdk.MegaApiJava.FILE_TYPE_VIDEO
+import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
+import javax.inject.Inject
 
-class VideoViewModel @ViewModelInject constructor(
+@HiltViewModel
+class VideoViewModel @Inject constructor(
     private val repository: TypedFilesRepository,
     private val sortOrderManagement: SortOrderManagement
 ) : ViewModel() {
@@ -86,6 +89,7 @@ class VideoViewModel @ViewModelInject constructor(
         items.observeForever(loadFinishedObserver)
         LiveEventBus.get(EVENT_NODES_CHANGE, Boolean::class.java)
             .observeForever(nodesChangeObserver)
+        loadVideo(true)
     }
 
     /**

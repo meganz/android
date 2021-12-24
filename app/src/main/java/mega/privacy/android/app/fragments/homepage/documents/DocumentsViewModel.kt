@@ -1,8 +1,8 @@
 package mega.privacy.android.app.fragments.homepage.documents
 
-import androidx.hilt.lifecycle.ViewModelInject
 import androidx.lifecycle.*
 import com.jeremyliao.liveeventbus.LiveEventBus
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.fragments.homepage.NodeItem
 import mega.privacy.android.app.fragments.homepage.TypedFilesRepository
@@ -11,8 +11,10 @@ import mega.privacy.android.app.utils.Constants.EVENT_NODES_CHANGE
 import mega.privacy.android.app.utils.Constants.INVALID_POSITION
 import mega.privacy.android.app.utils.TextUtil
 import nz.mega.sdk.MegaApiJava
+import javax.inject.Inject
 
-class DocumentsViewModel @ViewModelInject constructor(
+@HiltViewModel
+class DocumentsViewModel @Inject constructor(
     private val repository: TypedFilesRepository,
     private val sortOrderManagement: SortOrderManagement
 ) : ViewModel() {
@@ -88,6 +90,7 @@ class DocumentsViewModel @ViewModelInject constructor(
         items.observeForever(loadFinishedObserver)
         LiveEventBus.get(EVENT_NODES_CHANGE, Boolean::class.java)
             .observeForever(nodesChangeObserver)
+        loadDocuments(true)
     }
 
     /**
