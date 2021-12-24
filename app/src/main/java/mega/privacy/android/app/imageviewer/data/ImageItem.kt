@@ -32,5 +32,7 @@ data class ImageItem constructor(
 
         override fun areContentsTheSame(oldItem: ImageItem, newItem: ImageItem) =
             oldItem == newItem
+                    && oldItem.nodeItem == newItem.nodeItem
+                    && oldItem.imageResult == newItem.imageResult
     }
 }

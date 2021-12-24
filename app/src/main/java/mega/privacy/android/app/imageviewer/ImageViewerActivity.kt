@@ -317,11 +317,14 @@ class ImageViewerActivity : BaseActivity(), PermissionRequester, SnackbarShower 
                 logError("Null or empty image items")
                 finish()
             } else {
-                val sizeDifference = pagerAdapter.itemCount != items.size
-                pagerAdapter.submitList(items) {
-                    if (sizeDifference) {
-                        pagerAdapter.notifyDataSetChanged()
+                binding.viewPager.waitForLayout {
+                    val sizeDifference = pagerAdapter.itemCount != items.size
+                    pagerAdapter.submitList(items) {
+                        if (sizeDifference) {
+                            pagerAdapter.notifyDataSetChanged()
+                        }
                     }
+                    true
                 }
             }
             binding.progress.hide()

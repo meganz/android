@@ -145,6 +145,7 @@ class ImageViewerPageFragment : Fragment() {
             binding.image.controller = Fresco.newDraweeControllerBuilder()
                 .setImageRequest(ImageRequest.fromUri(UriUtil.getUriForResourceId(R.drawable.ic_error)))
                 .build()
+            binding.progress.hide()
         }
     }
 
