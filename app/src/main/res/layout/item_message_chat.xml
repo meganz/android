@@ -983,15 +983,15 @@
                         android:layout_marginEnd="12dp"
                         android:layout_centerVertical="true">
 
-                        <mega.privacy.android.app.components.RoundedImageView
+                        <com.facebook.drawee.view.SimpleDraweeView
                             android:id="@+id/content_own_message_contact_thumb"
                             android:layout_width="match_parent"
                             android:layout_height="match_parent"
-                            android:scaleType="fitCenter"
                             android:layout_centerInParent="true"
-                            app:border_color="@color/white"
-                            app:border_width="2dp"
-                            app:corner_radius="20dp"/>
+                            app:roundAsCircle="true"
+                            app:roundedCornerRadius="20dp"
+                            app:roundingBorderColor="@color/white"
+                            app:roundingBorderWidth="2dp" />
                     </RelativeLayout>
 
                     <ImageView
@@ -1218,14 +1218,13 @@
                     android:layout_marginStart="16dp"
                     android:layout_marginBottom="10dp">
 
-                    <mega.privacy.android.app.components.RoundedImageView
+                    <com.facebook.drawee.view.SimpleDraweeView
                         android:id="@+id/contact_thumbnail"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         android:layout_centerInParent="true"
-                        android:scaleType="fitCenter"
-                        app:border_width="0dp"
-                        app:corner_radius="40dp" />
+                        app:roundAsCircle="true" />
+
                 </RelativeLayout>
 
                 <!--multiseleccion-->
@@ -1816,15 +1815,15 @@
                         android:layout_marginEnd="12dp"
                         android:layout_centerVertical="true">
 
-                        <mega.privacy.android.app.components.RoundedImageView
+                        <com.facebook.drawee.view.SimpleDraweeView
                             android:id="@+id/content_contact_message_contact_thumb"
                             android:layout_width="match_parent"
                             android:layout_height="match_parent"
-                            android:scaleType="fitCenter"
                             android:layout_centerInParent="true"
-                            app:border_color="@color/white"
-                            app:border_width="2dp"
-                            app:corner_radius="20dp"/>
+                            app:roundAsCircle="true"
+                            app:roundedCornerRadius="20dp"
+                            app:roundingBorderColor="@color/white"
+                            app:roundingBorderWidth="2dp" />
                     </RelativeLayout>
 
                     <ImageView
