@@ -131,12 +131,15 @@ import mega.privacy.android.app.middlelayer.iab.BillingManager;
 import mega.privacy.android.app.middlelayer.iab.BillingUpdatesListener;
 import mega.privacy.android.app.middlelayer.iab.MegaPurchase;
 import mega.privacy.android.app.middlelayer.iab.MegaSku;
+import mega.privacy.android.app.myAccount.MyAccountActivity;
 import mega.privacy.android.app.psa.Psa;
 import mega.privacy.android.app.psa.PsaWebBrowser;
 import mega.privacy.android.app.service.iab.BillingManagerImpl;
 import mega.privacy.android.app.service.iar.RatingHandlerImpl;
 import mega.privacy.android.app.smsVerification.SMSVerificationActivity;
 import mega.privacy.android.app.snackbarListeners.SnackbarNavigateOption;
+import mega.privacy.android.app.upgradeAccount.PaymentActivity;
+import mega.privacy.android.app.upgradeAccount.UpgradeAccountActivity;
 import mega.privacy.android.app.utils.ColorUtils;
 import mega.privacy.android.app.utils.MegaNodeUtil;
 import mega.privacy.android.app.utils.StringResourcesUtils;
@@ -291,7 +294,12 @@ public class BaseActivity extends AppCompatActivity implements ActivityLauncher,
                 new IntentFilter(BROADCAST_ACTION_COOKIE_SETTINGS_SAVED));
 
         LiveEventBus.get(EVENT_PURCHASES_UPDATED).observe(this, type -> {
-            if (!isPaused) {
+            if (this instanceof PaymentActivity) {
+                finish();
+            } else if (this instanceof UpgradeAccountActivity) {
+                finish();
+            } else if ((this instanceof MyAccountActivity && myAccountInfo.isUpgradeFromAccount())
+                    || (this instanceof ManagerActivityLollipop && myAccountInfo.isUpgradeFromManager())) {
                 purchaseType = (Integer) type;
                 showQueryPurchasesResult();
             }
@@ -1440,7 +1448,7 @@ public class BaseActivity extends AppCompatActivity implements ActivityLauncher,
      * Shows the result of a purchase as an alert.
      */
     private void showQueryPurchasesResult() {
-        if (purchaseType == INVALID_VALUE) {
+        if (purchaseType == INVALID_VALUE || isAlertDialogShown(upgradeAlert)) {
             return;
         }
 

@@ -42,6 +42,10 @@ class MyAccountInfo @Inject constructor(
         const val HAS_SESSIONS_DETAILS = 0x020
     }
 
+    enum class UpgradeFrom {
+        MANAGER, ACCOUNT
+    }
+
     var usedPercentage = INVALID_VALUE
     var usedTransferPercentage = INVALID_VALUE
     var usedStorage = INVALID_VALUE.toLong()
@@ -89,6 +93,8 @@ class MyAccountInfo @Inject constructor(
     var previousVersionsSize = INVALID_VALUE.toLong()
 
     var bonusStorageSMS = "GB"
+
+    var upgradeOpenedFrom = UpgradeFrom.MANAGER
 
     /**
      * Resets all values by default.
@@ -143,6 +149,8 @@ class MyAccountInfo @Inject constructor(
         previousVersionsSize = INVALID_VALUE.toLong()
 
         bonusStorageSMS = "GB"
+
+        upgradeOpenedFrom = UpgradeFrom.MANAGER
     }
 
     fun setAccountDetails(numDetails: Int) {
@@ -399,4 +407,7 @@ class MyAccountInfo @Inject constructor(
 
         return null
     }
+
+    fun isUpgradeFromAccount(): Boolean = upgradeOpenedFrom == UpgradeFrom.ACCOUNT
+    fun isUpgradeFromManager(): Boolean = upgradeOpenedFrom == UpgradeFrom.MANAGER
 }

@@ -125,6 +125,5 @@ class UpgradeAccountActivity : ChooseAccountActivity() {
         viewModel.refreshAccountInfo()
         startActivity(Intent(this, PaymentActivity::class.java)
             .putExtra(UPGRADE_TYPE, upgradeType))
-        return
     }
 }

@@ -7905,6 +7905,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 		}
 
 		startActivity(new Intent(this, UpgradeAccountActivity.class));
+		myAccountInfo.setUpgradeOpenedFrom(MyAccountInfo.UpgradeFrom.MANAGER);
 	}
 
 	public void navigateToAchievements(){
