@@ -1486,7 +1486,7 @@ public class BaseActivity extends AppCompatActivity implements ActivityLauncher,
                     int image;
                     int purchaseText;
 
-                    switch (myAccountInfo.getLevelAccountDetails()) {
+                    switch (myAccountInfo.getLevelInventory()) {
                         case PRO_I:
                             account = R.string.pro1_account;
                             image = R.drawable.ic_pro_i_big_crest;
