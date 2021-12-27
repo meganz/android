@@ -165,9 +165,10 @@ public class BaseActivity extends AppCompatActivity implements ActivityLauncher,
     private static final String UPGRADE_ALERT_SHOWN = "UPGRADE_ALERT_SHOWN";
     private static final String EVENT_PURCHASES_UPDATED = "EVENT_PURCHASES_UPDATED";
     private static final String PURCHASE_TYPE = "PURCHASE_TYPE";
-    private static final int PURCHASE_SUCCESS = 0;
-    private static final int PURCHASE_PENDING = 1;
-    private static final int PURCHASE_DOWNGRADE = 2;
+
+    private enum PurchaseType {
+        SUCCESS, PENDING, DOWNGRADE
+    }
 
     @Inject
     MyAccountInfo myAccountInfo;
@@ -198,7 +199,7 @@ public class BaseActivity extends AppCompatActivity implements ActivityLauncher,
     private Snackbar snackbar;
 
     private AlertDialog upgradeAlert;
-    private int purchaseType;
+    private PurchaseType purchaseType;
 
     /**
      * Contains the info of a node that to be opened in-app.
@@ -300,7 +301,7 @@ public class BaseActivity extends AppCompatActivity implements ActivityLauncher,
                 finish();
             } else if ((this instanceof MyAccountActivity && myAccountInfo.isUpgradeFromAccount())
                     || (this instanceof ManagerActivityLollipop && myAccountInfo.isUpgradeFromManager())) {
-                purchaseType = (Integer) type;
+                purchaseType = (PurchaseType) type;
                 showQueryPurchasesResult();
             }
         });
@@ -322,7 +323,7 @@ public class BaseActivity extends AppCompatActivity implements ActivityLauncher,
             }
 
             if (savedInstanceState.getBoolean(UPGRADE_ALERT_SHOWN, false)) {
-                purchaseType = savedInstanceState.getInt(PURCHASE_TYPE, INVALID_VALUE);
+                purchaseType = (PurchaseType) savedInstanceState.getSerializable(PURCHASE_TYPE);
                 showQueryPurchasesResult();
             }
         }
@@ -386,7 +387,7 @@ public class BaseActivity extends AppCompatActivity implements ActivityLauncher,
         outState.putBoolean(TRANSFER_OVER_QUOTA_WARNING_SHOWN, isGeneralTransferOverQuotaWarningShown);
         outState.putBoolean(RESUME_TRANSFERS_WARNING_SHOWN, isResumeTransfersWarningShown);
         outState.putBoolean(UPGRADE_ALERT_SHOWN, isAlertDialogShown(upgradeAlert));
-        outState.putInt(PURCHASE_TYPE, purchaseType);
+        outState.putSerializable(PURCHASE_TYPE, purchaseType);
 
         super.onSaveInstanceState(outState);
     }
@@ -1396,7 +1397,7 @@ public class BaseActivity extends AppCompatActivity implements ActivityLauncher,
             return;
         }
 
-        int purchaseResult;
+        PurchaseType purchaseResult;
 
         if (purchases != null && !purchases.isEmpty()) {
             MegaPurchase purchase = purchases.get(0);
@@ -1412,19 +1413,19 @@ public class BaseActivity extends AppCompatActivity implements ActivityLauncher,
                 updateAccountInfo(this, purchases, myAccountInfo);
                 updateSubscriptionLevel(myAccountInfo, dbH, megaApi);
                 new RatingHandlerImpl(this).updateTransactionFlag(true);
-                purchaseResult = PURCHASE_SUCCESS;
+                purchaseResult = PurchaseType.SUCCESS;
             } else {
                 //payment is being processed or in unknown state
                 logDebug("Purchase " + sku + " is being processed or in unknown state.");
-                purchaseResult = PURCHASE_PENDING;
+                purchaseResult = PurchaseType.PENDING;
             }
         } else {
             //down grade case
             logDebug("Downgrade, the new subscription takes effect when the old one expires.");
-            purchaseResult = PURCHASE_DOWNGRADE;
+            purchaseResult = PurchaseType.DOWNGRADE;
         }
 
-        LiveEventBus.get(EVENT_PURCHASES_UPDATED, Integer.class).post(purchaseResult);
+        LiveEventBus.get(EVENT_PURCHASES_UPDATED, PurchaseType.class).post(purchaseResult);
     }
 
     @Override
@@ -1448,7 +1449,7 @@ public class BaseActivity extends AppCompatActivity implements ActivityLauncher,
      * Shows the result of a purchase as an alert.
      */
     private void showQueryPurchasesResult() {
-        if (purchaseType == INVALID_VALUE || isAlertDialogShown(upgradeAlert)) {
+        if (purchaseType == null || isAlertDialogShown(upgradeAlert)) {
             return;
         }
 
@@ -1456,19 +1457,19 @@ public class BaseActivity extends AppCompatActivity implements ActivityLauncher,
                 .setPositiveButton(StringResourcesUtils.getString(R.string.general_ok), null);
 
         switch (purchaseType) {
-            case PURCHASE_PENDING:
+            case PENDING:
                 upgradeAlert = builder.setTitle(StringResourcesUtils.getString(R.string.title_user_purchased_subscription))
                         .setMessage(StringResourcesUtils.getString(R.string.message_user_payment_pending))
                         .create();
                 break;
 
-            case PURCHASE_DOWNGRADE:
+            case DOWNGRADE:
                 upgradeAlert = builder.setTitle(StringResourcesUtils.getString(R.string.my_account_upgrade_pro))
                         .setMessage(StringResourcesUtils.getString(R.string.message_user_purchased_subscription_down_grade))
                         .create();
                 break;
 
-            case PURCHASE_SUCCESS:
+            case SUCCESS:
             default:
                 upgradeAlert = builder.setView(R.layout.dialog_purchase_success).create();
 
