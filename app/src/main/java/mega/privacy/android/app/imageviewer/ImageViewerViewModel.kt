@@ -19,6 +19,7 @@ import mega.privacy.android.app.imageviewer.data.ImageResult
 import mega.privacy.android.app.imageviewer.usecase.GetImageHandlesUseCase
 import mega.privacy.android.app.imageviewer.usecase.GetImageUseCase
 import mega.privacy.android.app.usecase.CancelTransferUseCase
+import mega.privacy.android.app.usecase.GetNetworkConnectionUseCase
 import mega.privacy.android.app.usecase.GetNodeUseCase
 import mega.privacy.android.app.usecase.LoggedInUseCase
 import mega.privacy.android.app.usecase.data.MegaNodeItem
@@ -50,7 +51,8 @@ class ImageViewerViewModel @Inject constructor(
     private val getNodeUseCase: GetNodeUseCase,
     private val exportNodeUseCase: ExportNodeUseCase,
     private val cancelTransferUseCase: CancelTransferUseCase,
-    private val loggedInUseCase: LoggedInUseCase
+    private val loggedInUseCase: LoggedInUseCase,
+    private val getNetworkConnectionUseCase: GetNetworkConnectionUseCase
 ) : BaseRxViewModel() {
 
     private val images = MutableLiveData<List<ImageItem>?>()
@@ -58,9 +60,11 @@ class ImageViewerViewModel @Inject constructor(
     private val switchToolbar = MutableLiveData<Unit>()
     private val snackbarMessage = SingleLiveEvent<String>()
     private var isUserLoggedIn = false
+    private var isConnected = false
 
     init {
         checkIfUserIsLoggedIn()
+        checkInternetConnection()
     }
 
     fun onImagesHandle(): LiveData<List<Long>?> =
@@ -148,7 +152,7 @@ class ImageViewerViewModel @Inject constructor(
                 getNodeUseCase.getNodeItem(existingNode.nodePublicLink)
             existingNode?.chatMessageId != null && existingNode.chatRoomId != null ->
                 getNodeUseCase.getNodeItem(existingNode.chatRoomId, existingNode.chatMessageId)
-            existingNode?.isOffline == true ->
+            existingNode?.isOffline == true && !isConnected ->
                 getNodeUseCase.getOfflineNodeItem(existingNode.handle)
             else ->
                 getNodeUseCase.getNodeItem(nodeHandle)
@@ -364,6 +368,24 @@ class ImageViewerViewModel @Inject constructor(
             .subscribeBy(
                 onSuccess = { isLoggedIn ->
                     isUserLoggedIn = isLoggedIn
+                },
+                onError = { error ->
+                    logError(error.stackTraceToString())
+                }
+            )
+            .addTo(composite)
+    }
+
+    /**
+     * Subscribe to Internet connection changes
+     */
+    private fun checkInternetConnection() {
+        getNetworkConnectionUseCase.getConnectionUpdates()
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribeBy(
+                onNext = { isConnected ->
+                    this.isConnected = isConnected
                 },
                 onError = { error ->
                     logError(error.stackTraceToString())
