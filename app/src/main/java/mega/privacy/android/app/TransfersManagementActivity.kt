@@ -280,4 +280,12 @@ open class TransfersManagementActivity : PasscodeActivity() {
 
         dismissAlertDialogIfExists(scanningFolderDialog)
     }
+
+    fun updateWidget() {
+        transfersWidget?.update()
+    }
+
+    fun hideWidget() {
+        transfersWidget?.hide()
+    }
 }

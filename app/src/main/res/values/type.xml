@@ -278,6 +278,10 @@
         <item name="android:textColor">?attr/colorSecondary</item>
     </style>
 
+    <style name="TextAppearance.Mega.Subtitle2.AccentColor.AllCaps">
+        <item name="android:textAllCaps">true</item>
+    </style>
+
     <style name="TextAppearance.Mega.Subtitle2.PrimaryColor">
         <item name="android:textColor">?attr/colorPrimary</item>
     </style>

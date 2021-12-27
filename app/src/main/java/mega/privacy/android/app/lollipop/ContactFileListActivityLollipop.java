@@ -82,7 +82,7 @@ import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.MegaNodeDialogUtil.IS_NEW_TEXT_FILE_SHOWN;
 import static mega.privacy.android.app.utils.MegaNodeDialogUtil.NEW_TEXT_FILE_TEXT;
 import static mega.privacy.android.app.utils.MegaNodeDialogUtil.checkNewTextFileDialogState;
-import static mega.privacy.android.app.utils.PermissionUtils.*;
+import static mega.privacy.android.app.utils.permission.PermissionUtils.*;
 import static mega.privacy.android.app.utils.StringResourcesUtils.getQuantityString;
 import static mega.privacy.android.app.utils.Util.*;
 import static mega.privacy.android.app.utils.ContactUtil.*;
@@ -190,9 +190,7 @@ public class ContactFileListActivityLollipop extends PasscodeActivity
 		MenuInflater inflater = getMenuInflater();
 		inflater.inflate(R.menu.file_explorer_action, menu);
 
-		menu.findItem(R.id.cab_menu_sort).setVisible(false);
 		menu.findItem(R.id.cab_menu_search).setVisible(false);
-		menu.findItem(R.id.cab_menu_grid_list).setVisible(false);
 		createFolderMenuItem = menu.findItem(R.id.cab_menu_create_folder);
 		startConversation = menu.findItem(R.id.cab_menu_new_chat);
 		startConversation.setVisible(false);
@@ -222,11 +220,6 @@ public class ContactFileListActivityLollipop extends PasscodeActivity
 	@Override
 	public void uploadFromDevice() {
 		chooseFromDevice(this);
-	}
-
-	@Override
-	public void uploadFromSystem() {
-		pickFileFromFileSystem(this);
 	}
 
 	@Override

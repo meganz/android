@@ -84,8 +84,8 @@ import java.util.TimeZone;
 import dagger.hilt.android.AndroidEntryPoint;
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
 import io.reactivex.rxjava3.schedulers.Schedulers;
+import kotlin.Unit;
 import mega.privacy.android.app.BuildConfig;
-import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
@@ -219,7 +219,7 @@ import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.LogUtil.logDebug;
 import static mega.privacy.android.app.utils.MegaApiUtils.*;
 import static mega.privacy.android.app.utils.MegaNodeUtil.*;
-import static mega.privacy.android.app.utils.PermissionUtils.*;
+import static mega.privacy.android.app.utils.permission.PermissionUtils.*;
 import static mega.privacy.android.app.utils.StringResourcesUtils.getQuantityString;
 import static mega.privacy.android.app.utils.TextUtil.*;
 import static mega.privacy.android.app.utils.StringResourcesUtils.getTranslatedErrorString;
@@ -661,8 +661,7 @@ public class ChatActivityLollipop extends PasscodeActivity
                 call.getStatus() == MegaChatCall.CALL_STATUS_TERMINATING_USER_PARTICIPATION))
             return;
 
-        addChecksForACall(chatRoom.getChatId(), false);
-        megaChatApi.answerChatCall(idChat, false, true,  new AnswerChatCallListener(this, this));
+        MegaApplication.getChatManagement().answerChatCall(chatRoom.getChatId(), false, true, false, new AnswerChatCallListener(this, this));
     }
 
     @Override
@@ -690,8 +689,7 @@ public class ChatActivityLollipop extends PasscodeActivity
                 return;
 
         logDebug("Active call on hold. Answer call.");
-        addChecksForACall(chatRoom.getChatId(), false);
-        megaChatApi.answerChatCall(idChat, false, true, new AnswerChatCallListener(this, this));
+        MegaApplication.getChatManagement().answerChatCall(idChat, false, true, false, new AnswerChatCallListener(this, this));
     }
 
     @Override
@@ -2711,7 +2709,7 @@ public class ChatActivityLollipop extends PasscodeActivity
                 if(recordView.isRecordingNow()) break;
 
                 if(participatingInACall()){
-                    showConfirmationInACall(this);
+                    showConfirmationInACall(this, StringResourcesUtils.getString(R.string.ongoing_call_content), passcodeManagement);
                     break;
                 }
 
@@ -2726,7 +2724,7 @@ public class ChatActivityLollipop extends PasscodeActivity
                 if(recordView.isRecordingNow()) break;
 
                 if(CallUtil.participatingInACall()){
-                    showConfirmationInACall(this);
+                    showConfirmationInACall(this, StringResourcesUtils.getString(R.string.ongoing_call_content), passcodeManagement);
                     break;
                 }
 
@@ -2785,12 +2783,6 @@ public class ChatActivityLollipop extends PasscodeActivity
                 break;
         }
         return super.onOptionsItemSelected(item);
-    }
-
-    private void showMeetingOptionsPanel(){
-        if (isBottomSheetDialogShown(bottomSheetDialogFragment)) return;
-        bottomSheetDialogFragment = new MeetingBottomSheetDialogFragment();
-        bottomSheetDialogFragment.show(getSupportFragmentManager(), bottomSheetDialogFragment.getTag());
     }
 
     /*
@@ -3208,9 +3200,8 @@ public class ChatActivityLollipop extends PasscodeActivity
             if (callInThisChat.getStatus() == MegaChatCall.CALL_STATUS_USER_NO_PRESENT ||
                     callInThisChat.getStatus() == MegaChatCall.CALL_STATUS_TERMINATING_USER_PARTICIPATION) {
                 logDebug("The call in this chat is In progress, but I do not participate");
-                addChecksForACall(chatRoom.getChatId(), startVideo);
                 callInProgressLayout.setEnabled(false);
-                megaChatApi.answerChatCall(idChat, startVideo, !chatRoom.isMeeting(), new AnswerChatCallListener(this, this));
+                MegaApplication.getChatManagement().answerChatCall(chatRoom.getChatId(), startVideo, !chatRoom.isMeeting(), startVideo, new AnswerChatCallListener(this, this));
             }
             return;
         }
@@ -3846,8 +3837,7 @@ public class ChatActivityLollipop extends PasscodeActivity
                         MegaChatCall callInChat = megaChatApi.getChatCall(callInThisChat);
                         if (callInChat != null && (callInChat.getStatus() == MegaChatCall.CALL_STATUS_USER_NO_PRESENT ||
                                 callInChat.getStatus() == MegaChatCall.CALL_STATUS_TERMINATING_USER_PARTICIPATION )) {
-                            addChecksForACall(callInThisChat, false);
-                            megaChatApi.answerChatCall(callInThisChat, false, true, new AnswerChatCallListener(this, this));
+                            MegaApplication.getChatManagement().answerChatCall(callInThisChat, false, true, false, new AnswerChatCallListener(this, this));
                         }
                     }else{
                         megaChatApi.setCallOnHold(anotherCall.getChatid(), true, new SetCallOnHoldListener(this, this, this));
@@ -4689,7 +4679,7 @@ public class ChatActivityLollipop extends PasscodeActivity
                             menu.findItem(R.id.chat_cab_menu_delete).setVisible(selected.get(0).getMessage().getUserHandle() == myUserHandle &&
                                     selected.get(0).getMessage().isDeletable() && !isRemovedMsg);
                             menu.findItem(R.id.chat_cab_menu_download).setVisible(isOnline(chatActivity) && !chatC.isInAnonymousMode()&& !isRemovedMsg);
-                            menu.findItem(R.id.chat_cab_menu_download_gallery).setVisible(isOnline(chatActivity) &&
+                            menu.findItem(R.id.chat_cab_menu_download_gallery).setVisible(!isAndroid11OrUpper() && isOnline(chatActivity) &&
                                     !chatC.isInAnonymousMode() && isMsgImage(selected.get(0)) && !isRemovedMsg);
                             importIcon.setVisible(isOnline(chatActivity) && !chatC.isInAnonymousMode() && selected.get(0).getMessage().getUserHandle() != myUserHandle && !isRemovedMsg);
                         }
@@ -4876,7 +4866,7 @@ public class ChatActivityLollipop extends PasscodeActivity
                                     importIcon.setVisible(false);
                                 } else {
                                     menu.findItem(R.id.chat_cab_menu_download).setVisible(true);
-                                    menu.findItem(R.id.chat_cab_menu_download_gallery).setVisible(allNodeImages);
+                                    menu.findItem(R.id.chat_cab_menu_download_gallery).setVisible(!isAndroid11OrUpper() && allNodeImages);
                                     menu.findItem(R.id.chat_cab_menu_share).setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
                                     menu.findItem(R.id.chat_cab_menu_share).setVisible(true);
                                     importIcon.setVisible(true);
@@ -5387,8 +5377,7 @@ public class ChatActivityLollipop extends PasscodeActivity
                                     } else if (MimeTypeList.typeForName(node.getName()).isOpenableTextFile(node.getSize())) {
                                         manageTextFileIntent(this, m.getMessage().getMsgId(), idChat);
                                     } else {
-                                        logDebug("NOT Image, pdf, audio or video - show node attachment panel for one node");
-                                        openWith(this, node);
+                                        onNodeTapped(this, node, this::saveNodeByTap, this, this);
                                     }
                                 }
                             }
@@ -6316,6 +6305,18 @@ public class ChatActivityLollipop extends PasscodeActivity
     public void sendToDownload(MegaNodeList nodelist){
         logDebug("sendToDownload");
         nodeSaver.downloadVoiceClip(nodelist);
+    }
+
+    /**
+     * Upon a node is tapped, if it cannot be previewed in-app,
+     * then download it first, this download will be marked as "download by tap".
+     * Since it's down
+     *
+     * @param node Node to be downloaded.
+     */
+    public Unit saveNodeByTap(MegaNode node) {
+        nodeSaver.saveNodes(Collections.singletonList(node), true, false, false, true, false, true);
+        return null;
     }
 
     @Override

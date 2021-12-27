@@ -1,9 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- Full description text of the app in the Google Play page of the app (character limit 4000) -->
-    <string name="full_description_text">MEGAは、標準のウェブブラウザを通じてユーザー様が制御する暗号化クラウドストレージとチャットを、モバイル端末用の専用アプリとともにご提供いたします。他のクラウドストレージプロバイダとは異なり、あなたのデータはあなたのクライアント端末によってのみ暗号化され、復号されます（当社では決して行いません）。\n\nスマートフォンやタブレットからファイルをアップロードしてから、いつでも、どこでも、どんな端末からでも、ファイルの検索、保存、ダウンロード、ストリーム配信、表示、共有、名前の変更、削除を行うことができます。あなたの連絡先とフォルダを共有し、連絡先の最新情報をリアルタイムで表示します。暗号化プロセスでは、当社はあなたのパスワードにアクセスしたり、それをリセットしたりすることができないため、あなたはパスワードを必ず覚えておく必要があります（回復キーをバックアップしない限り）。そうしないと、保存されたファイルにアクセスできなくなります。\n\nエンドツーエンドのユーザー暗号化MEGAビデオチャットは完全なプライバシー保護を可能にし、2016年からウェブブラウザでご利用いただいております。これはMegaモバイルアプリにも拡張され、複数の端末間でチャット履歴にアクセスできます。またユーザー様は、MEGAクラウドドライブからチャットに簡単にファイルも追加できます。\n\nMEGAは、ボーナスを達成された、ご登録済みの全ユーザー様に20 GBの豊富な無料ストレージをご提供しております。また、上限がはるかに高い有料プランもご用意しております：\n\n\nPro Liteサブスクリプション：月額4.99ユーロまたは年間49.99ユーロで、400GBのストレージスペースと毎月1TBの転送容量をご提供いたします。\nPro Iサブスクリプション：月額9.99ユーロまたは年間99.99ユーロで、2TBのストレージスペースと毎月2TBの転送容量をご提供いたします。\nPro II サブスクリプション：月額19.99ユーロまたは年間199.99ユーロで、8TBのストレージスペースと毎月8TBの転送容量をご提供いたします。\nPro IIIサブスクリプション：月額29.99ユーロまたは年間299.99ユーロで、16TBのストレージスペースと毎月16TBの転送容量をご提供いたします。\n\nサブスクリプションは、選択した最初の期間と同じ期間の連続したサブスクリプション期間を対象に、および同じ価格で、自動的に更新されます。サブスクリプションを管理するには、携帯端末のPlay Storeアイコンをタップし、Google IDでサインインします（まだそのように行っていない場合）。次に、MEGAアプリをタップします。そこでサブスクリプションを管理することができます。\n\nアプリの権限：\nWRITE_EXTERNAL_STORAGE -&gt; MEGAから端末にファイルをダウンロードし、端末からMEGAにファイルをアップロードします\nCAMERA -&gt; 写真を撮って写真をMEGAにアップロードします\nREAD_CONTACTS -&gt; MEGAの連絡先として端末からカンタンに連絡先を追加します\nRECORD_AUDIOと CAPTURE_VIDEO_OUTPUT（マイクとカメラ） -&gt; MEGAは、エンドツーエンドの暗号化された音声/ビデオ通話をご提供いたします\n\n\nMEGAシステムに対するユーザー様の信頼を高めるために、クライアントサイドのコードはすべて公開しております。そのため、ご関心をお持ちのセキュリティ研究者の方々は、この暗号化プロセスを評価することができます。当社のモバイルアプリのコードは次の場所にございます：https://github.com/meganz/android \n\n詳細については、当社のウェブサイトをご覧ください：\n https://mega.nz/terms にアクセスしてください\n\n\nデスクトップ－ https://mega.nz/</string>
-    <!-- Short description text of the app in the Google Play page of the app (character limit 80) -->
-    <string name="short_description_text">MEGAは、安全な常時プライバシーを備えたクラウドストレージです。</string>
     <!-- PRO Lite account -->
     <string name="prolite_account">Pro Lite</string>
     <!-- Name of the MEGA PDF Viewer. Keep uppercase. -->
@@ -70,8 +66,6 @@
     <string name="general_error_word">エラー</string>
     <!-- when clicking into a menu whose functionality is not yet implemented -->
     <string name="general_not_yet_implemented">まだ実装されていません</string>
-    <!-- when any file or folder is selected -->
-    <string name="error_no_selection">ファイルまたはフォルダが選択されていません</string>
     <!-- when trying to download a file that is already downloaded in the device -->
     <string name="general_already_downloaded">ダウンロード済み</string>
     <!-- when trying to upload a file that is already uploaded in the folder -->
@@ -626,10 +620,6 @@
     <string name="upload_to_audio">音声</string>
     <!-- Title of the button in the contact info screen to start a video call -->
     <string name="upload_to_video">動画</string>
-    <!-- upload to. Then choose to browse the file system to choose a file -->
-    <string name="upload_to_filesystem">ファイルシステムから選択</string>
-    <!-- upload to. Then choose to browse the file system to choose a file -->
-    <string name="upload_to_filesystem_from">以下から選択：</string>
     <!-- Label for the current uploaded size of a file. For example, 3 files, 50KB uploaded -->
     <string name="upload_uploaded">アップロード済み</string>
     <!-- Status text at the beginning of an upload, Status text at the beginning of an upload for 2 or more files -->
@@ -1414,7 +1404,7 @@
     <!-- settings of the chat to choose the status -->
     <string name="settings_chat_vibration">バイブレーション</string>
     <!-- Button text shown on SMS verification page, if the user wants to logout current suspended account and login with another account, user can press this button to logout -->
-    <string name="sms_logout">[A]ログアウト[/A]して、別のアカウントでMEGAを使用します</string>
+    <string name="sms_logout">MEGAアカウントを切り替えるには[A]ログアウト[/A]します</string>
     <!-- On SMS verification page, if the user presses the logout button, a dialog with this text will show to ask for user’s confirmation. -->
     <string name="confirm_logout_from_sms_verification">現在のアカウントからログアウトしてもよろしいですか？</string>
     <!-- Text shown when a message has been deleted in the chat -->
@@ -1596,22 +1586,14 @@
     <string name="paused_transfers_title">転送を一時停止しました</string>
     <!-- message shown in the screen when there are not any active transfer -->
     <string name="completed_transfers_empty">完了した転送はありません</string>
-    <!-- Text of the notification shown when the upload service is running, Plural -->
-    <plurals name="upload_service_notification">
-        <item quantity="other">%1$d/%2$dファイルをアップロード中</item>
-    </plurals>
-    <!-- Text of the notification shown when the upload service is running, Plural -->
-    <plurals name="upload_service_paused_notification">
-        <item quantity="other">%1$d/%2$dファイルをアップロード中（一時停止）</item>
-    </plurals>
-    <!-- Text of the notification shown when the folder upload service is running, Text of the notification shown when the folder upload service is running - plural e.g. Uploading 1 of 2 folders -->
-    <plurals name="folder_upload_service_notification">
-        <item quantity="other">%1$d/%2$dフォルダをアップロード中</item>
-    </plurals>
-    <!-- Text of the notification shown when the folder upload service is running, Text of the notification shown when the folder upload service is running - plural e.g. Uploading 1 of 2 folders -->
-    <plurals name="folder_upload_service_paused_notification">
-        <item quantity="other">%1$d/%2$dフォルダをアップロード中（一時停止）</item>
-    </plurals>
+    <!-- Text of the notification shown when the upload service is running: e.g. Uploading files: 1 of 10 -->
+    <string name="upload_service_notification">ファイルをアップロード中：%1$d/%2$d</string>
+    <!-- Text of the notification shown when the upload service is paused: e.g. Uploading files: 1 of 10 (paused)-->
+    <string name="upload_service_notification_paused">ファイルをアップロード中：%1$d/%2$d (一時停止)</string>
+    <!-- Text of the notification shown when the folder upload service is running, e.g. Uploading folders 1 of 2 -->
+    <string name="folder_upload_service_notification">フォルダをアップロード中：%1$d/%2$d</string>
+    <!-- Text of the notification shown when the folder upload service is paused, e.g. Uploading folders 1 of 2 (paused) -->
+    <string name="folder_upload_service_notification_paused">フォルダをアップロード中：%1$d/%2$d (一時停止)</string>
     <!-- Text of the notification shown when the upload service has finished, Plural -->
     <plurals name="upload_service_final_notification">
         <item quantity="other">%1$dファイルがアップロードされました</item>
@@ -1650,14 +1632,10 @@
     <plurals name="download_service_failed">
         <item quantity="other">%1$dファイルがダウンロードされませんでした</item>
     </plurals>
-    <!-- Text of the notification shown when the download service is running, Plural -->
-    <plurals name="download_service_notification">
-        <item quantity="other">%1$d/%2$dファイルをダウンロード中</item>
-    </plurals>
-    <!-- Text of the notification shown when the download service is paused, Plural -->
-    <plurals name="download_service_paused_notification">
-        <item quantity="other">%1$d/%2$dファイルをダウンロード中（一時停止）</item>
-    </plurals>
+    <!-- Text of the notification shown when the download service is running -->
+    <string name="download_service_notification">ファイルをダウンロード中：%1$d/%2$d</string>
+    <!-- Text of the notification shown when the download service is paused -->
+    <string name="download_service_notification_paused">ファイルをダウンロード中：%1$d/%2$d (一時停止)</string>
     <!-- Title of the alert when the transfer quota is exceeded. -->
     <string name="title_depleted_transfer_overquota">転送容量が不十分です</string>
     <!-- Text of the alert when the transfer quota is depleted. The placeholder indicates the time left for the transfer quota to be reset. For instance: 30m 45s -->
@@ -3057,8 +3035,6 @@
     </plurals>
     <!-- Title of a chat message that contains geolocation info -->
     <string name="title_geolocation_message">ピン留めされた場所</string>
-    <!-- Text of the button to indicate an attachment upload from file system -->
-    <string name="attachment_upload_panel_from_device">ファイルシステムから</string>
     <!-- Alert shown when a num of files have not been sent because of any error occurs, Plural of file. 2 files -->
     <plurals name="num_files_not_send">
         <item quantity="other">%d個のファイルが%dチャットに送信されませんでした</item>
@@ -3662,7 +3638,7 @@
     <!-- Explanation of a warning recommending upgrade to Pro in relation to link available options -->
     <string name="link_upgrade_pro_explanation">MEGA Proユーザー様は、アカウントをさらに安全にする追加のリンク安全機能に排他的にアクセスできます。</string>
     <!-- Meaning of links decryption key -->
-    <string name="decryption_key_explanation">当社のエンドツーエンドの暗号化システムでは、このファイルに対して自動的に生成される一意のキーが必要です。このキーを有するリンクはデフォルトで作成されますが、セキュリティの層を追加するために、復号キーを個別にエクスポートできます。</string>
+    <string name="decryption_key_explanation">当社のエンドツーエンドの暗号化システムでは、このファイルかフォルダに対して自動的に生成される一意のキーが必要です。このキーを有するリンクはデフォルトで作成されますが、セキュリティの層を追加するために、復号キーを個別にエクスポートできます。</string>
     <!-- Reset password label -->
     <string name="reset_password_label">パスワードをリセット</string>
     <!-- Warning show to the user when has enable to send the decryption key of a link separately and tries to share the link -->
@@ -3682,7 +3658,7 @@
     <!-- Context menu item. Allows user to delete file/folder from favourites -->
     <string name="file_properties_unfavourite">お気に入りを削除</string>
     <!-- Context menu item. Allows to mark file/folder with own color label -->
-    <string name="file_properties_label">ラベル&#8230;</string>
+    <string name="file_properties_label">ラベル</string>
     <!-- Information text to let’s the user know that they can remove a colour from a folder or file that was already marked. -->
     <string name="action_remove_label">ラベルを削除</string>
     <!-- Title text to show label selector. -->
@@ -3714,19 +3690,13 @@
     <!-- Preferences screen item title for cookie settings -->
     <string name="settings_about_cookie_settings">クッキーの設定</string>
     <!-- Cookie dialog title -->
-    <string name="dialog_cookie_alert_title">続行する前に</string>
+    <string name="dialog_cookie_alert_title">お客様のプライバシー</string>
     <!-- Cookie dialog message. Please, keep the placeholders to format the string. -->
-    <string name="dialog_cookie_alert_message">当社は、ローカルストレージおよび同様のテクノロジー（「クッキー」）を使用して、お客様にサービスをご提供し、当社サービスのエクスペリエンスを向上させ、サードパーティを介して表示される広告を含め、お客様がご覧になる広告をカスタマイズいたします。ご訪問の最初から当社によるクッキーの使用を受け入れるか、クッキーの設定でクッキーをカスタマイズしてください。詳細については、当社の[A]クッキーポリシー[/A]をご覧ください。</string>
+    <string name="dialog_cookie_alert_message">当社は、お客様に当社のサービスをご提供し、その利便性を高めるために、クッキー（Cookie）および類似の技術（以下、「クッキー」）を使用いたします。お客様がご訪問された最初から当社のクッキーの使用を受け入れるか、クッキー設定でクッキーをカスタマイズしてください。詳しくは、当社の[A]クッキーポリシー[/A]をご覧ください。</string>
     <!-- Cookie dialog message showed when there are unsaved settings. -->
     <string name="dialog_cookie_alert_unsaved">保存されていないクッキーの設定</string>
     <!-- Snackbar message showed when there settings has been saved successfully. -->
     <string name="dialog_cookie_snackbar_saved">クッキー設定の変更が保存されました</string>
-    <!-- Cookie dialog third party first subtitle -->
-    <string name="dialog_cookie_thirdparty_subtitle1">Google広告クッキー</string>
-    <!-- Cookie dialog third party second subtitle -->
-    <string name="dialog_cookie_thirdparty_subtitle2">カテゴリ：広告クッキー</string>
-    <!-- Cookie dialog third party message. Please, keep the placeholders to format the string. -->
-    <string name="dialog_cookie_thirdparty_message">Googleが使用する目的：\n・現在地や以前にアクセスした他のウェブサイトなどに基づいて、当社および他のサービスやウェブサイトにGoogleが表示する広告をカスタマイズします。\n・特定の広告が表示される頻度を監視します。\n・不正防止を提供いたします。さらに、\n・特定の広告をタップするタイミングを決定し、その広告に応じて実行する次のアクションを追跡します。\nhttps://policies.google.com/technologies/partner-sites</string>
     <!-- Preference screen item title -->
     <string name="preference_cookies_accept">クッキーを受け入れる</string>
     <!-- Preference screen item title -->
@@ -3734,21 +3704,9 @@
     <!-- Preference screen item summary -->
     <string name="preference_cookies_essential_summary">必須クッキーは、重要な機能と当社サービスへの安全なアクセスをご提供するのに不可欠なクッキーです。このため、同意は必要ありません。</string>
     <!-- Preference screen item title -->
-    <string name="preference_cookies_preference_title">お好みのクッキー</string>
-    <!-- Preference screen item summary -->
-    <string name="preference_cookies_preference_summary">ご選択された特定の表示とフォーマット設定を当社が覚えておけるようにするクッキーです。これらのクッキーを受け入れない場合、ご希望の画面レイアウトなど、当社は覚えておくことができません。</string>
-    <!-- Preference screen item title -->
     <string name="preference_cookies_performance_title">パフォーマンスとアナリティクスのクッキー</string>
     <!-- Preference screen item summary -->
     <string name="preference_cookies_performance_summary">お客様が当社サービスをどのようにご使用になられているのかを理解し、改善に使用できるデータをご提供いただくのに役立つクッキーです。これらのクッキーを受け入れない場合、当社が設計を改善するのに役立つデータが少なくなります。</string>
-    <!-- Preference screen item title -->
-    <string name="preference_cookies_advertising_title">広告クッキー</string>
-    <!-- Preference screen item summary -->
-    <string name="preference_cookies_advertising_summary">当社および当社が承認した広告パートナーが、閲覧履歴に基づいて、当社サービスおよび他のウェブサイトに表示される広告をカスタマイズするために使用いたします。これらのクッキーを受け入れない場合、関連性の低い広告が表示される可能性があります。</string>
-    <!-- Preference screen item title -->
-    <string name="preference_cookies_thirdparty_title">サードパーティのクッキー</string>
-    <!-- Preference screen item summary. Please, keep the placeholders to format the string. -->
-    <string name="preference_cookies_thirdparty_summary">これらは、当社以外の者が管理するクッキーです。これらのクッキーを使用して、上記の種類の機能をご提供いたします。これらのクッキーを受け入れない場合、各サードパーティのクッキーの種類に応じて異なる影響が生じます。当社が使用するサードパーティの全クッキーの詳細については、以下の「詳細情報」をタップしてください。</string>
     <!-- Preference screen item state description -->
     <string name="preference_cookies_always_on">常にオン</string>
     <!-- Menu option that allows the user to scan document and upload it directly to MEGA. -->
@@ -3777,7 +3735,7 @@
     <string name="file_created">ファイルが作成されました</string>
     <!-- Warning indicating a file was not created successfully -->
     <string name="file_creation_failed">ファイルの作成に失敗しました。もう一度やり直してください。</string>
-    <!-- Label indicating a file was saved to some folder. e.g.: File saved to Cloud Drive -->
+    <!-- Label indicating a file was saved to some folder. e.g.: File saved to Cloud Drive. "Cloud Drive" is the only destination for the time being, thus any article isn't needed -->
     <string name="file_saved_to">ファイルが%1$sに保存されました</string>
     <!-- Warning indicating a file was not saved to some folder. e.g.: File not saved to Cloud Drive. Try again -->
     <string name="file_saved_to_failed">ファイルが%1$sに保存されませんでした。もう一度お試しください。</string>
@@ -3887,8 +3845,6 @@
     </plurals>
     <!-- Button of the warning dialog indicating the renamed name file extension is not the same to confirm the change. -->
     <string name="action_change_anyway">とにかく変更する</string>
-    <!-- Snackbar text to display if the user doesn't grant the permission to access all files on a device with Android 11 or higher -->
-    <string name="snackbar_storage_permission_denied_android_11">ストレージへのアクセスには許可が必要です。</string>
     <!-- String to show the transfer quota and the used space in My Account section. E.g.: -->
     <string name="used_storage_transfer">%1$s / %2$s</string>
     <!-- String to show the transfer quota and the used space in My Account section -->
@@ -3964,9 +3920,9 @@
     <!-- General label for microphone -->
     <string name="general_mic">マイク</string>
     <!-- General label for microphone muted -->
-    <string name="general_mic_mute">マイクがミュートになっています</string>
+    <string name="general_mic_mute">マイクがオフになっています</string>
     <!-- General label for microphone unmuted -->
-    <string name="general_mic_unmute">マイクのミュートが解除されています</string>
+    <string name="general_mic_unmute">マイクがオンになっています</string>
     <!-- General label for camera -->
     <string name="general_camera">カメラ</string>
     <!-- General label for camera enable -->
@@ -3982,9 +3938,9 @@
     <!-- General label for headphone on-->
     <string name="general_headphone_on">ヘッドホンが有効です</string>
     <!-- General label for speaker on-->
-    <string name="general_speaker_on">スピーカーはオンです</string>
+    <string name="general_speaker_on">スピーカーがオンになっています</string>
     <!-- General label for speaker off-->
-    <string name="general_speaker_off">スピーカーはオフです</string>
+    <string name="general_speaker_off">スピーカーがオフになっています</string>
     <!-- Label for end meeting-->
     <string name="meeting_end">終了</string>
     <!-- Invite contacts as participants of the meeting-->
@@ -4079,4 +4035,50 @@
     <string name="main_view">メインビュー</string>
     <!-- Warning in Offline section alerting all the Offline files will be deleted after logout. -->
     <string name="offline_warning">ログアウトすると、オフラインのコンテンツが削除されます。</string>
+    <!-- Settings category which contains all preferences related to user interface. -->
+    <string name="user_interface_setting">ユーザーインターフェイス</string>
+    <!-- Setting which allows to choose the start screen. -->
+    <string name="start_screen_setting">開始画面</string>
+    <!-- Setting which allows to hide or show the recent activity. -->
+    <string name="hide_recent_setting">最近のアクティビティを非表示にする</string>
+    <!-- Context of a setting which allows to hide or show the recent activity. -->
+    <string name="hide_recent_setting_context">ホームセクションの最近のアクティビティを非表示にします。</string>
+    <!-- Title of a dialog informing the start screen can be modified. -->
+    <string name="choose_start_screen_title">開始画面を選択</string>
+    <!-- Test of a dialog informing the start screen can be modified. -->
+    <string name="choose_start_screen_text">MEGAアプリを次回起動したときに開く画面を選ぶための設定を変更します。</string>
+    <!-- Action button which allows to change a setting. -->
+    <string name="change_setting_action">設定を変更</string>
+    <!-- Subtitle of the settings page where the start screen can be chosen. -->
+    <string name="configure_start_screen">デフォルトの開始画面を構成</string>
+    <!-- Homepage section. -->
+    <string name="home_section">ホーム</string>
+    <!-- Action button which allows to show the recent activity. -->
+    <string name="show_activity_action">アクティビティを表示</string>
+    <!-- Text informing the recent activity is hidden. -->
+    <string name="recents_activity_hidden">[B]最近[/B]のアクティビティは非表示です</string>
+    <!-- Alert informing the user can choose the video quality for Camera Uploads Videos -->
+    <string name="video_quality_info">カメラアップロードの設定で動画の品質を下げることで、容量を節約することができます。</string>
+    <!-- Label indicating video original quality -->
+    <string name="original_quality">元の品質</string>
+    <!-- Settings label which allows to enable or disable fingerprint unlock. -->
+    <string name="setting_fingerprint">指紋ID</string>
+    <!-- Title of the dialog which allows to enable the fingerprint unlock. -->
+    <string name="title_enable_fingerprint">指紋を確認してロックを解除します</string>
+    <!-- Title of the dialog which allows to unlock the app with the fingerprint. -->
+    <string name="title_unlock_fingerprint">指紋を使ってロックを解除します</string>
+    <!-- Button of the dialog which allows to unlock the app with the fingerprint. Gives the option to unlock with the passcode instead -->
+    <string name="action_use_passcode">パスコードを使用</string>
+    <!-- Message informing the fingerprint was enabled successfully -->
+    <string name="confirmation_fingerprint_enabled">指紋が確認されました</string>
+    <!-- Warning indicating an image (GIF) cannot be inserted in an input text. Same string than the one shown by the system when it detects this behaviour on its own. -->
+    <string name="image_insertion_not_allowed">MEGAはここでの画像挿入をサポートしておりません</string>
+    <!-- The label under the button of viewing all images screen -->
+    <string name="section_images">画像</string>
+    <!-- Title of the dialog warning the user about disable file versioning. -->
+    <string name="disable_versioning_label">ファイルのバージョン管理を無効にする</string>
+    <!-- Warning of the dialog informing the user about disable file versioning. -->
+    <string name="disable_versioning_warning">当社のファイルのバージョン管理機能により、ユーザー様のファイルが新しいバージョンに置き換えられても、古いコピーを維持することができます。ファイルのバージョン管理を無効にすると、この保護機能は使えなくなります。また、置き換えた際に、古いコピーは失われます。</string>
+    <!-- Warning informing the user the folder location is trying to open no longer exists. -->
+    <string name="location_not_exist">この場所はもう存在しません。</string>
 </resources>

@@ -15,7 +15,6 @@ import mega.privacy.android.app.utils.CloudStorageOptionControlUtil;
 import mega.privacy.android.app.utils.MegaNodeUtil;
 import mega.privacy.android.app.utils.StringResourcesUtils;
 import nz.mega.sdk.MegaApiAndroid;
-import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaShare;
@@ -26,11 +25,11 @@ import static mega.privacy.android.app.utils.MegaNodeUtil.allHaveOwnerAccess;
 class CuActionModeCallback implements ActionMode.Callback {
 
     private final Context mContext;
-    private final CameraUploadsFragment mFragment;
+    private final PhotosFragment mFragment;
     private final CuViewModel mViewModel;
     private final MegaApiAndroid mMegaApi;
 
-    CuActionModeCallback(Context context, CameraUploadsFragment fragment,
+    CuActionModeCallback(Context context, PhotosFragment fragment,
             CuViewModel viewModel, MegaApiAndroid megaApi) {
 
         mContext = context;

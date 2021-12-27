@@ -110,7 +110,7 @@
             <View
                 android:id="@+id/divider_send_message"
                 style="@style/BottomSheetItemDivider"
-                android:show="@{viewModel.showSendMessage()}" />
+                android:show="@{viewModel.showDividerSendMessage()}" />
 
             <TextView
                 android:id="@+id/ping_to_speaker"
@@ -122,7 +122,7 @@
             <View
                 android:id="@+id/divider_ping_to_speaker"
                 style="@style/BottomSheetItemDivider"
-                android:show="@{viewModel.showPinItem()}" />
+                android:show="@{viewModel.showDividerPingToSpeaker()}" />
 
             <TextView
                 android:id="@+id/make_moderator"
@@ -134,7 +134,7 @@
             <View
                 android:id="@+id/divider_make_moderator"
                 style="@style/BottomSheetItemDivider"
-                android:show="@{viewModel.showMakeModeratorItem()}" />
+                android:show="@{viewModel.showDividerMakeModerator()}" />
 
             <TextView
                 android:id="@+id/remove_participant"

@@ -257,7 +257,7 @@ public class MegaApplication extends MultiDexApplication implements Application.
 
 	@Override
 	public void onActivityCreated(@NonNull Activity activity, @Nullable Bundle savedInstanceState) {
-
+    	initLoggers();
 	}
 
 	@Override
@@ -528,10 +528,7 @@ public class MegaApplication extends MultiDexApplication implements Application.
 						backgroundStatus = megaChatApi.getBackgroundStatus();
 						logDebug("backgroundStatus_activityVisible: " + backgroundStatus);
 						if (backgroundStatus != -1 && backgroundStatus != 0) {
-							MegaHandleList callsInProgress = megaChatApi.getChatCalls(MegaChatCall.CALL_STATUS_IN_PROGRESS);
-							if (callsInProgress == null || callsInProgress.size() <= 0) {
-								megaChatApi.setBackgroundStatus(false);
-							}
+							megaChatApi.setBackgroundStatus(false);
 						}
 					}
 
@@ -628,8 +625,9 @@ public class MegaApplication extends MultiDexApplication implements Application.
 		if (chatRoom != null && call.getCallCompositionChange() == 1 && call.getNumParticipants() > 1) {
 			logDebug("Stop sound");
 			if (megaChatApi.getMyUserHandle() == call.getPeeridCallCompositionChange()) {
+				clearIncomingCallNotification(call.getCallId());
+				getChatManagement().removeValues(call.getChatid());
 				stopService(new Intent(getInstance(), IncomingCallService.class));
-				removeRTCAudioManagerRingIn();
 				LiveEventBus.get(EVENT_CALL_ANSWERED_IN_ANOTHER_CLIENT, Long.class).post(call.getChatid());
 			}
 		}
@@ -646,6 +644,10 @@ public class MegaApplication extends MultiDexApplication implements Application.
 		if (isRinging) {
 			logDebug("Is incoming call");
 			incomingCall(listAllCalls, call.getChatid(), callStatus);
+		} else {
+			clearIncomingCallNotification(call.getCallId());
+			getChatManagement().removeValues(call.getChatid());
+			stopService(new Intent(getInstance(), IncomingCallService.class));
 		}
 	};
 
@@ -739,8 +741,7 @@ public class MegaApplication extends MultiDexApplication implements Application.
 		keepAliveHandler.postAtTime(keepAliveRunnable, System.currentTimeMillis()+interval);
 		keepAliveHandler.postDelayed(keepAliveRunnable, interval);
 
-		initLoggerSDK();
-		initLoggerKarere();
+		initLoggers();
 
 		checkAppUpgrade();
 
@@ -838,6 +839,27 @@ public class MegaApplication extends MultiDexApplication implements Application.
 		ContextUtils.initialize(getApplicationContext());
 
 		Fresco.initialize(this);
+
+		// Try to initialize the loggers again in order to avoid have them uninitialized
+		// in case they failed to initialize before for some reason.
+		initLoggers();
+	}
+
+	/**
+	 * Initializes loggers if app storage is available and if are not initialized yet.
+	 */
+	private void initLoggers() {
+		if (getExternalFilesDir(null) == null) {
+			return;
+		}
+
+		if (!isLoggerSDKInitialized()) {
+			initLoggerSDK();
+		}
+
+		if (!isLoggerKarereInitialized()) {
+			initLoggerKarere();
+		}
 	}
 
 	public void askForFullAccountInfo(){

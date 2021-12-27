@@ -17,7 +17,7 @@ public class RecoveryKeyBottomSheetDialogFragment extends BaseBottomSheetDialogF
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        contentView = View.inflate(getContext(), R.layout.bottom_sheet_recovery_key, null);
+        contentView = View.inflate(requireContext(), R.layout.bottom_sheet_recovery_key, null);
         itemsLayout = contentView.findViewById(R.id.items_layout);
         return contentView;
     }
@@ -32,23 +32,21 @@ public class RecoveryKeyBottomSheetDialogFragment extends BaseBottomSheetDialogF
 
     @Override
     public void onClick(View v) {
-        AccountController aC = new AccountController(getContext());
-
         switch(v.getId()){
             case R.id.recovery_key_copytoclipboard_layout:
-                if (getContext() instanceof TwoFactorAuthenticationActivity) {
-                    ((TwoFactorAuthenticationActivity) getContext()).finish();
-                }
+                new AccountController(requireActivity()).copyRkToClipboard();
 
-                aC.copyRkToClipboard();
+                if (requireActivity() instanceof TwoFactorAuthenticationActivity) {
+                    ((TwoFactorAuthenticationActivity) requireActivity()).finish();
+                }
                 break;
 
             case R.id.recovery_key_saveTo_fileSystem_layout:
-                AccountController.saveRkToFileSystem(getActivity());
+                AccountController.saveRkToFileSystem(requireActivity());
                 break;
 
             case R.id.recovery_key_print_layout:
-                aC.printRK();
+                new AccountController(requireActivity()).printRK();
                 break;
         }
 

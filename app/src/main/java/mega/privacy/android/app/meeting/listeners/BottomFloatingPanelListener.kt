@@ -22,4 +22,9 @@ interface BottomFloatingPanelListener {
      * Listener for participant item
      */
     fun onParticipantOption(participant: Participant)
+
+    /**
+     * Listener for bottom panel state
+     */
+    fun onChangePanelState()
 }

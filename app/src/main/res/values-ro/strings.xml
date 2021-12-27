@@ -1,9 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- Full description text of the app in the Google Play page of the app (character limit 4000) -->
-    <string name="full_description_text">MEGA oferă stocare în cloud criptată, controlată de utilizatori, și chat prin intermediul browserelor web standard, împreună cu aplicații dedicate pentru dispozitivele mobile. Spre deosebire de ceilalți furnizori de stocare în cloud, datele tale sunt criptate și decriptate doar de către dispozitivele client ale tale și niciodată de către noi.\n\nÎncarcă fișierele de pe smartphone sau tabletă, apoi caută, stochează, descarcă, redă în flux, vezi, partajează, redenumește sau șterge fișierele oricând, de pe orice dispozitiv, oriunde. Partajează folderele cu contactele tale și vezi modificările acestora în timp real. Procesul de criptare înseamnă că nu putem să îți accesăm sau să îți resetăm parola astfel încât TREBUIE să o reții (excepție făcând cazul în care ai cheia de recuperare păstrată ca backup) sau vei pierde accesul la fișierele tale stocate.\n\nChatul video MEGA criptat între utilizatori capăt-la-capăt MEGA permite confidențialitate totală și a fost disponibil în browserele web începând cu 2016. Acesta a fost extins pe aplicația mobilă Mega, cu istoricul chaturilor accesibil pe mai multe dispozitive. De asemenea, utilizatorii pot adăuga cu ușurință fișiere într-un chat din unitatea lor cloud MEGA.\n\nMEGA oferă un spațiu de stocare generos de 20 GB gratuit pentru toți utilizatorii înregistrați cu realizările bonus și oferă planuri plătite cu limite mult mai mari:\n\n\nAbonamentul Pro Lite: 4,99€ pe lună sau 49,99€ pe an îți oferă 400 GB spațiu de stocare și 1 TB cotă de transfer pe lună.\nAbonamentul Pro I: 9,99€ pe lună sau 99,99€ pe an îți oferă 2 TB spațiu de stocare și 2 TB cotă de transfer pe lună.\nAbonamentul Pro II: 19,99€ pe lună sau 199,99€ pe an îți oferă 8 TB spațiu de stocare și 8 TB cotă de transfer pe lună.\nAbonamentul Pro III: 29,99€ pe lună sau 299,99€ pe an îți oferă 16 TB spațiu de stocare și 16 TB cotă de transfer pe lună.\n\nAbonamentele sunt reînnoite automat pentru perioade succesive de aceeași durată, la același preț ca și perioada inițială aleasă. Pentru a gestiona abonamentele, atinge pictograma Magazin Play de pe dispozitivul mobil, autentifică-te cu ID-ul Google (dacă nu ai făcut deja acest lucru). Apoi atinge aplicația MEGA. Vei putea gestiona abonamentul de acolo.\n\nPermisiunile aplicației:\nWRITE_EXTERNAL_STORAGE -&gt; Descarcă fișiere de pe MEGA pe dispozitiv și încarcă fișiere de pe dispozitiv pe MEGA\nCAMERA -&gt; Realizează o fotografie și încarcă fotografiile pe MEGA\nREAD_CONTACTS -&gt; Adaugă cu ușurință contacte de pe dispozitiv ca contacte MEGA\nRECORD_AUDIO și CAPTURE_VIDEO_OUTPUT (microfon și cameră) -&gt; MEGA oferă apeluri audio/video criptate capăt-la-capăt\n\n\nPentru a spori încrederea utilizatorilor în sistemul MEGA, tot codul pe partea de client este publicat, astfel încât cercetătorii de securitate interesați pot evalua procesul de criptare. Codul pentru aplicația noastră mobilă se află la adresa: https://github.com/meganz/android \n\nPentru mai multe informații, te rugăm să consulți site-ul nostru web:\nVezi https://mega.nz/terms \n\n\nDesktop - https://mega.nz/</string>
-    <!-- Short description text of the app in the Google Play page of the app (character limit 80) -->
-    <string name="short_description_text">MEGA, serviciul de stocare în cloud cu confidențialitate puternică mereu activă.</string>
     <!-- PRO Lite account -->
     <string name="prolite_account">Pro Lite</string>
     <!-- Name of the MEGA PDF Viewer. Keep uppercase. -->
@@ -70,8 +66,6 @@
     <string name="general_error_word">Eroare</string>
     <!-- when clicking into a menu whose functionality is not yet implemented -->
     <string name="general_not_yet_implemented">Momentan neimplementat</string>
-    <!-- when any file or folder is selected -->
-    <string name="error_no_selection">Niciun fișier sau folder selectat</string>
     <!-- when trying to download a file that is already downloaded in the device -->
     <string name="general_already_downloaded">Descărcat deja</string>
     <!-- when trying to upload a file that is already uploaded in the folder -->
@@ -644,10 +638,6 @@
     <string name="upload_to_audio">Audio</string>
     <!-- Title of the button in the contact info screen to start a video call -->
     <string name="upload_to_video">Video</string>
-    <!-- upload to. Then choose to browse the file system to choose a file -->
-    <string name="upload_to_filesystem">Alege din sistemul de fișiere</string>
-    <!-- upload to. Then choose to browse the file system to choose a file -->
-    <string name="upload_to_filesystem_from">Alege din</string>
     <!-- Label for the current uploaded size of a file. For example, 3 files, 50KB uploaded -->
     <string name="upload_uploaded">încărcat</string>
     <!-- Status text at the beginning of an upload, Status text at the beginning of an upload for 2 or more files -->
@@ -1642,30 +1632,14 @@
     <string name="paused_transfers_title">Transferuri puse pe pauză</string>
     <!-- message shown in the screen when there are not any active transfer -->
     <string name="completed_transfers_empty">Niciun transfer finalizat</string>
-    <!-- Text of the notification shown when the upload service is running, Plural -->
-    <plurals name="upload_service_notification">
-        <item quantity="one">Se încarcă %1$d din %2$d fișier</item>
-        <item quantity="few">Se încarcă %1$d din %2$d fișiere</item>
-        <item quantity="other">Se încarcă %1$d din %2$d de fișiere</item>
-    </plurals>
-    <!-- Text of the notification shown when the upload service is running, Plural -->
-    <plurals name="upload_service_paused_notification">
-        <item quantity="one">Se încarcă %1$d din %2$d fișier (pus pe pauză)</item>
-        <item quantity="few">Se încarcă %1$d din %2$d fișiere (puse pe pauză)</item>
-        <item quantity="other">Se încarcă %1$d din %2$d de fișiere (puse pe pauză)</item>
-    </plurals>
-    <!-- Text of the notification shown when the folder upload service is running, Text of the notification shown when the folder upload service is running - plural e.g. Uploading 1 of 2 folders -->
-    <plurals name="folder_upload_service_notification">
-        <item quantity="one">Se încarcă %1$d din %2$d folder</item>
-        <item quantity="few">Se încarcă %1$d din %2$d foldere</item>
-        <item quantity="other">Se încarcă %1$d din %2$d de foldere</item>
-    </plurals>
-    <!-- Text of the notification shown when the folder upload service is running, Text of the notification shown when the folder upload service is running - plural e.g. Uploading 1 of 2 folders -->
-    <plurals name="folder_upload_service_paused_notification">
-        <item quantity="one">Se încarcă %1$d din %2$d folder (pus pe pauză)</item>
-        <item quantity="few">Se încarcă %1$d din %2$d foldere (puse pe pauză)</item>
-        <item quantity="other">Se încarcă %1$d din %2$d de foldere (puse pe pauză)</item>
-    </plurals>
+    <!-- Text of the notification shown when the upload service is running: e.g. Uploading files: 1 of 10 -->
+    <string name="upload_service_notification">Se încarcă fișiere: %1$d din %2$d</string>
+    <!-- Text of the notification shown when the upload service is paused: e.g. Uploading files: 1 of 10 (paused)-->
+    <string name="upload_service_notification_paused">Se încarcă fișiere: %1$d din %2$d (pus pe pauză)</string>
+    <!-- Text of the notification shown when the folder upload service is running, e.g. Uploading folders 1 of 2 -->
+    <string name="folder_upload_service_notification">Se încarcă foldere: %1$d din %2$d</string>
+    <!-- Text of the notification shown when the folder upload service is paused, e.g. Uploading folders 1 of 2 (paused) -->
+    <string name="folder_upload_service_notification_paused">Se încarcă foldere: %1$d din %2$d (pus pe pauză)</string>
     <!-- Text of the notification shown when the upload service has finished, Plural -->
     <plurals name="upload_service_final_notification">
         <item quantity="one">%1$d fișier încărcat</item>
@@ -1722,18 +1696,10 @@
         <item quantity="few">%1$d fișiere nedescărcate</item>
         <item quantity="other">%1$d de fișiere nedescărcate</item>
     </plurals>
-    <!-- Text of the notification shown when the download service is running, Plural -->
-    <plurals name="download_service_notification">
-        <item quantity="one">Se descarcă %1$d din %2$d fișier</item>
-        <item quantity="few">Se descarcă %1$d din %2$d fișiere</item>
-        <item quantity="other">Se descarcă %1$d din %2$d de fișiere</item>
-    </plurals>
-    <!-- Text of the notification shown when the download service is paused, Plural -->
-    <plurals name="download_service_paused_notification">
-        <item quantity="one">Se descarcă %1$d din %2$d fișier (pus pe pauză)</item>
-        <item quantity="few">Se descarcă %1$d din %2$d fișiere (puse pe pauză)</item>
-        <item quantity="other">Se descarcă %1$d din %2$d de fișiere (puse pe pauză)</item>
-    </plurals>
+    <!-- Text of the notification shown when the download service is running -->
+    <string name="download_service_notification">Se descarcă fișiere: %1$d din %2$d</string>
+    <!-- Text of the notification shown when the download service is paused -->
+    <string name="download_service_notification_paused">Se descarcă fișiere: %1$d din %2$d (pus pe pauză)</string>
     <!-- Title of the alert when the transfer quota is exceeded. -->
     <string name="title_depleted_transfer_overquota">Cotă de transfer insuficientă</string>
     <!-- Text of the alert when the transfer quota is depleted. The placeholder indicates the time left for the transfer quota to be reset. For instance: 30m 45s -->
@@ -3195,8 +3161,6 @@
     </plurals>
     <!-- Title of a chat message that contains geolocation info -->
     <string name="title_geolocation_message">Locație fixată</string>
-    <!-- Text of the button to indicate an attachment upload from file system -->
-    <string name="attachment_upload_panel_from_device">Din sistemul de fișiere</string>
     <!-- Alert shown when a num of files have not been sent because of any error occurs, Plural of file. 2 files -->
     <plurals name="num_files_not_send">
         <item quantity="one">%d fișier nu a fost trimis către %d chaturi</item>
@@ -3530,7 +3494,7 @@
     <!-- Text informing user that their account has been suspended -->
     <string name="account_temporarily_suspended">Contul tău a fost blocat temporar pentru siguranța ta.</string>
     <!-- Text informing user has to follow the steps of an email to unlock their account -->
-    <string name="verify_email_and_follow_steps">[A]Te rugăm să-ți verifici adresa de e-mail[/A] și urmează pașii din e-mailul MEGA pentru a-ți debloca contul.</string>
+    <string name="verify_email_and_follow_steps">Te rugăm să urmezi pașii din [A]e-mailul de verificare[/A] pentru a-ți debloca contul.</string>
     <!-- Question which takes the user to a help screen -->
     <string name="why_am_i_seeing_this">De ce văd asta?</string>
     <!-- Label of a button which action is resend an email -->
@@ -3806,7 +3770,7 @@
     <!-- Title indicating the select mode is enabled and ready to select transfers on Transfers section, In progress tab -->
     <string name="title_select_transfers">Selectează transferurile</string>
     <!-- Error shown to inform the priority change of a transfer failed. Please don’t remove the place holder, it’s to set the name of the transfer. Example: The priority change of the transfer “video.mp4” failed. -->
-    <string name="change_of_transfer_priority_failed">Modificarea priorității transferului „%1$s” a eșuat.</string>
+    <string name="change_of_transfer_priority_failed">Nu se poate schimba prioritatea transferului „%1$s”</string>
     <!-- Title option to send separated the link and decryption key -->
     <string name="option_send_decryption_key_separately">Trimite separat cheia de decriptare</string>
     <!-- Explanation option to send separated the link and decryption key -->
@@ -3834,7 +3798,7 @@
     <!-- Explanation of a warning recommending upgrade to Pro in relation to link available options -->
     <string name="link_upgrade_pro_explanation">MEGA Pro users have exclusive access to additional link safety features making your account even more secure.</string>
     <!-- Meaning of links decryption key -->
-    <string name="decryption_key_explanation">Sistemul nostru de criptare capăt-la-capăt necesită o cheie unică generată automat pentru acest fișier. În mod implicit, este creat un link cu această cheie, însă poți exporta cheia de decriptare separat pentru un strat de securitate suplimentar.</string>
+    <string name="decryption_key_explanation">Sistemul nostru de criptare capăt-la-capăt necesită o cheie unică generată automat pentru acest fișier sau folder. În mod implicit, este creat un link cu această cheie, însă poți exporta cheia de decriptare separat pentru un strat de securitate suplimentar.</string>
     <!-- Reset password label -->
     <string name="reset_password_label">Resetează parola</string>
     <!-- Warning show to the user when has enable to send the decryption key of a link separately and tries to share the link -->
@@ -3848,13 +3812,13 @@
     <!-- String to share a link protected with password with its password.Please keep the place holders, are to set the link and the password. Example: Link: https://mega.nz/file/kC42xRSK#Ud2QsvpIVYmCd1a9QUhk42wXv10jCSyPSWnXEwYX2VE Password: asfAFG3345g -->
     <string name="share_link_with_password">Link: %1$s\n\nParolă: %2$s</string>
     <!-- Warning show to the user when the app needs permissions to share files and the user has denied them. -->
-    <string name="files_required_permissions_warning">MEGA needs your permission to access your files for sharing.</string>
+    <string name="files_required_permissions_warning">MEGA are nevoie de permisiunea ta ca să acceseze fișierele pentru partajare.</string>
     <!-- Context menu item. Allows user to add file/folder to favourites -->
     <string name="file_properties_favourite">Favorit</string>
     <!-- Context menu item. Allows user to delete file/folder from favourites -->
     <string name="file_properties_unfavourite">Elimină de la favorite</string>
     <!-- Context menu item. Allows to mark file/folder with own color label -->
-    <string name="file_properties_label">Etichetă&#8230;</string>
+    <string name="file_properties_label">Etichetă</string>
     <!-- Information text to let’s the user know that they can remove a colour from a folder or file that was already marked. -->
     <string name="action_remove_label">Elimină eticheta</string>
     <!-- Title text to show label selector. -->
@@ -3886,19 +3850,13 @@
     <!-- Preferences screen item title for cookie settings -->
     <string name="settings_about_cookie_settings">Setări privind cookie-urile</string>
     <!-- Cookie dialog title -->
-    <string name="dialog_cookie_alert_title">Înainte de a continua</string>
+    <string name="dialog_cookie_alert_title">Intimitatea ta</string>
     <!-- Cookie dialog message. Please, keep the placeholders to format the string. -->
-    <string name="dialog_cookie_alert_message">Folosim spațiul de stocare local și tehnologii similare („Cookie-uri”) pentru a-ți oferi serviciile noastre, pentru a-ți îmbunătăți experiența cu serviciile noastre și pentru a personaliza anunțurile pe care le vezi, inclusiv prin intermediul unor terțe părți. Acceptă folosirea cookie-urilor de la începutul vizitei tale sau personalizează cookie-urile în Setări privind cookie-urile. Citește mai multe în [A]Politica noastră privind cookie-urile[/A].</string>
+    <string name="dialog_cookie_alert_message">Folosim cookie-uri și tehnologii similare („Cookie-uri”) pentru a-ți oferi și a-ți îmbunătăți experiența cu serviciile noastre. Acceptă folosirea cookie-urilor de la începutul vizitei tale sau personalizează cookie-urile în Setări privind cookie-urile. Citește mai multe în [A]Politica noastră privind cookie-urile[/A].</string>
     <!-- Cookie dialog message showed when there are unsaved settings. -->
     <string name="dialog_cookie_alert_unsaved">Setările privind cookie-urile nu au fost salvate.</string>
     <!-- Snackbar message showed when there settings has been saved successfully. -->
     <string name="dialog_cookie_snackbar_saved">Modificările la setările privind cookie-urile au fost salvate</string>
-    <!-- Cookie dialog third party first subtitle -->
-    <string name="dialog_cookie_thirdparty_subtitle1">Cookie-uri de publicitate Google</string>
-    <!-- Cookie dialog third party second subtitle -->
-    <string name="dialog_cookie_thirdparty_subtitle2">Categorie: Cookie-uri de publicitate</string>
-    <!-- Cookie dialog third party message. Please, keep the placeholders to format the string. -->
-    <string name="dialog_cookie_thirdparty_message">Folosite de Google:\n• să personalizeze anunțurile pe care Google le afișează pe serviciile și site-urile web ale noastre și ale altora, pe baza unor lucruri precum locația ta și alte site-uri web pe care le-ai vizitat anterior;\n• să monitorizeze cât de des îți sunt afișate anumite anunțuri;\n• să asigure prevenirea fraudelor; și \n• să determine când atingi un anumit anunț și apoi să urmărească următoarele acțiuni pe care le întreprinzi ca răspuns la acel anunț.\nhttps://policies.google.com/technologies/partner-sites</string>
     <!-- Preference screen item title -->
     <string name="preference_cookies_accept">Acceptă cookie-urile</string>
     <!-- Preference screen item title -->
@@ -3906,21 +3864,9 @@
     <!-- Preference screen item summary -->
     <string name="preference_cookies_essential_summary">Esențiale pentru furnizarea de funcționalități importante și acces securizat la serviciile noastre. Din acest motiv, ele nu necesită consimțământ.</string>
     <!-- Preference screen item title -->
-    <string name="preference_cookies_preference_title">Cookie-uri de preferință</string>
-    <!-- Preference screen item summary -->
-    <string name="preference_cookies_preference_summary">Permite-ne să ținem minte anumite setări de afișare și formatare pe care le alegi. Neacceptarea acestor cookie-uri va însemna că nu vom putea să ținem minte unele lucruri pentru tine, precum aspectul preferat al ecranului.</string>
-    <!-- Preference screen item title -->
     <string name="preference_cookies_performance_title">Cookie-uri de performanță și analiză</string>
     <!-- Preference screen item summary -->
     <string name="preference_cookies_performance_summary">Ajută-ne să înțelegem modul în care folosești serviciile noastre și furnizează-ne date pe care le putem folosi pentru a face îmbunătățiri. Neacceptarea acestor cookie-uri va însemna că vom avea mai puține date disponibile pentru a ajuta la îmbunătățiri ale designului.</string>
-    <!-- Preference screen item title -->
-    <string name="preference_cookies_advertising_title">Cookie-uri de publicitate</string>
-    <!-- Preference screen item summary -->
-    <string name="preference_cookies_advertising_summary">Folosite de noi și partenerii noștri de publicitate aprobați pentru a personaliza anunțurile pe care le vezi în serviciile noastre și pe alte site-uri web pe baza istoricului tău de navigare. Neacceptarea acestor cookie-uri înseamnă că putem afișa reclame care sunt mai puțin relevante.</string>
-    <!-- Preference screen item title -->
-    <string name="preference_cookies_thirdparty_title">Cookie-uri terță parte</string>
-    <!-- Preference screen item summary. Please, keep the placeholders to format the string. -->
-    <string name="preference_cookies_thirdparty_summary">Acestea sunt cookie-uri care sunt controlate de altcineva decât noi; folosim aceste cookie-uri pentru a furniza tipurile de funcționalități descrise mai sus. Neacceptarea acestor cookie-uri va avea implicații diferite în funcție de ce tip de cookie este fiecare cookie terță parte. Atinge „Mai multe informații” de mai jos pentru detalii despre toate cookie-urile terță parte pe care le folosim.</string>
     <!-- Preference screen item state description -->
     <string name="preference_cookies_always_on">Mereu activate</string>
     <!-- Menu option that allows the user to scan document and upload it directly to MEGA. -->
@@ -3949,7 +3895,7 @@
     <string name="file_created">Fișier creat</string>
     <!-- Warning indicating a file was not created successfully -->
     <string name="file_creation_failed">Crearea fișierului a eșuat. Te rugăm să încerci din nou.</string>
-    <!-- Label indicating a file was saved to some folder. e.g.: File saved to Cloud Drive -->
+    <!-- Label indicating a file was saved to some folder. e.g.: File saved to Cloud Drive. "Cloud Drive" is the only destination for the time being, thus any article isn't needed -->
     <string name="file_saved_to">Fișier salvat în %1$s</string>
     <!-- Warning indicating a file was not saved to some folder. e.g.: File not saved to Cloud Drive. Try again -->
     <string name="file_saved_to_failed">Fișier nesalvat în %1$s. Încearcă din nou.</string>
@@ -4069,8 +4015,6 @@
     </plurals>
     <!-- Button of the warning dialog indicating the renamed name file extension is not the same to confirm the change. -->
     <string name="action_change_anyway">Modifică oricum</string>
-    <!-- Snackbar text to display if the user doesn't grant the permission to access all files on a device with Android 11 or higher -->
-    <string name="snackbar_storage_permission_denied_android_11">Permission needed to access storage.</string>
     <!-- String to show the transfer quota and the used space in My Account section. E.g.: -->
     <string name="used_storage_transfer">%1$s / %2$s</string>
     <!-- String to show the transfer quota and the used space in My Account section -->
@@ -4269,4 +4213,50 @@
     <string name="main_view">Vizualizare principală</string>
     <!-- Warning in Offline section alerting all the Offline files will be deleted after logout. -->
     <string name="offline_warning">Logging out deletes your offline content.</string>
+    <!-- Settings category which contains all preferences related to user interface. -->
+    <string name="user_interface_setting">Interfața utilizatorului</string>
+    <!-- Setting which allows to choose the start screen. -->
+    <string name="start_screen_setting">Start screen</string>
+    <!-- Setting which allows to hide or show the recent activity. -->
+    <string name="hide_recent_setting">Ascunde activitatea recentă</string>
+    <!-- Context of a setting which allows to hide or show the recent activity. -->
+    <string name="hide_recent_setting_context">Hide recent activity in Home section.</string>
+    <!-- Title of a dialog informing the start screen can be modified. -->
+    <string name="choose_start_screen_title">Choose your start screen</string>
+    <!-- Test of a dialog informing the start screen can be modified. -->
+    <string name="choose_start_screen_text">Change settings to choose which screen opens when you next launch the MEGA app.</string>
+    <!-- Action button which allows to change a setting. -->
+    <string name="change_setting_action">Change setting</string>
+    <!-- Subtitle of the settings page where the start screen can be chosen. -->
+    <string name="configure_start_screen">Configure default start screen</string>
+    <!-- Homepage section. -->
+    <string name="home_section">Start</string>
+    <!-- Action button which allows to show the recent activity. -->
+    <string name="show_activity_action">Show activity</string>
+    <!-- Text informing the recent activity is hidden. -->
+    <string name="recents_activity_hidden">[B]Recents[/B] activity hidden</string>
+    <!-- Alert informing the user can choose the video quality for Camera Uploads Videos -->
+    <string name="video_quality_info">You can save space by decreasing the video quality in Camera Uploads settings.</string>
+    <!-- Label indicating video original quality -->
+    <string name="original_quality">Calitate originală</string>
+    <!-- Settings label which allows to enable or disable fingerprint unlock. -->
+    <string name="setting_fingerprint">Fingerprint ID</string>
+    <!-- Title of the dialog which allows to enable the fingerprint unlock. -->
+    <string name="title_enable_fingerprint">Confirm your fingerprint to unlock</string>
+    <!-- Title of the dialog which allows to unlock the app with the fingerprint. -->
+    <string name="title_unlock_fingerprint">Unlock using your fingerprint</string>
+    <!-- Button of the dialog which allows to unlock the app with the fingerprint. Gives the option to unlock with the passcode instead -->
+    <string name="action_use_passcode">Use passcode</string>
+    <!-- Message informing the fingerprint was enabled successfully -->
+    <string name="confirmation_fingerprint_enabled">Your fingerprint is confirmed</string>
+    <!-- Warning indicating an image (GIF) cannot be inserted in an input text. Same string than the one shown by the system when it detects this behaviour on its own. -->
+    <string name="image_insertion_not_allowed">MEGA does not support image insertion here</string>
+    <!-- The label under the button of viewing all images screen -->
+    <string name="section_images">Imagini</string>
+    <!-- Title of the dialog warning the user about disable file versioning. -->
+    <string name="disable_versioning_label">Dezactivează versionarea fișierelor</string>
+    <!-- Warning of the dialog informing the user about disable file versioning. -->
+    <string name="disable_versioning_warning">Our file versioning feature ensures that we keep older copies of your files around if you replace them with newer versions. If you disable File Versioning you will no longer have this protection; the old copy will be lost when you replace it.</string>
+    <!-- Warning informing the user the folder location is trying to open no longer exists. -->
+    <string name="location_not_exist">This location no longer exists.</string>
 </resources>

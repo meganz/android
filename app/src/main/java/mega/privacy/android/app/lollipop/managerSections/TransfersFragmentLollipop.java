@@ -94,8 +94,8 @@ public class TransfersFragmentLollipop extends TransfersBaseFragment implements 
 
 			@Override
 			public boolean onMove(@NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder, @NonNull RecyclerView.ViewHolder target) {
-				int posDragged = viewHolder.getAdapterPosition();
-				newPosition = target.getAdapterPosition();
+				int posDragged = viewHolder.getAbsoluteAdapterPosition();
+				newPosition = target.getAbsoluteAdapterPosition();
 
 				if (draggedTransfer == null) {
 					draggedTransfer = tL.get(posDragged);
@@ -116,8 +116,10 @@ public class TransfersFragmentLollipop extends TransfersBaseFragment implements 
 			public void onChildDraw(@NonNull Canvas c, @NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder, float dX, float dY, int actionState, boolean isCurrentlyActive) {
 				// Add elevation when the item is picked
 				if (addElevation) {
+					recyclerView.post(() -> listView.removeItemDecoration(itemDecoration));
 					ViewPropertyAnimator animator = viewHolder.itemView.animate();
 					viewHolder.itemView.setTranslationZ(dp2px(2, outMetrics));
+					viewHolder.itemView.setAlpha(0.95f);
 					animator.start();
 
 					addElevation = false;
@@ -125,8 +127,10 @@ public class TransfersFragmentLollipop extends TransfersBaseFragment implements 
 
 				// Remove elevation when the item is loose
 				if (resetElevation){
+					recyclerView.post(() -> listView.addItemDecoration(itemDecoration));
 					ViewPropertyAnimator animator = viewHolder.itemView.animate();
 					viewHolder.itemView.setTranslationZ(0);
+					viewHolder.itemView.setAlpha(1f);
 					animator.start();
 
 					addElevation = true;

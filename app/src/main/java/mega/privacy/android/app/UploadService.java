@@ -62,7 +62,7 @@ import static mega.privacy.android.app.lollipop.qrcode.MyCodeFragment.QR_IMAGE_F
 import static mega.privacy.android.app.textEditor.TextEditorUtil.getCreationOrEditorText;
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
 import static mega.privacy.android.app.utils.FileUtil.*;
-import static mega.privacy.android.app.utils.PermissionUtils.*;
+import static mega.privacy.android.app.utils.permission.PermissionUtils.*;
 import static mega.privacy.android.app.utils.TextUtil.addStringSeparator;
 import static mega.privacy.android.app.utils.TextUtil.isTextEmpty;
 import static mega.privacy.android.app.utils.Util.*;

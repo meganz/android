@@ -47,7 +47,7 @@ import java.util.ListIterator;
 
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
-import mega.privacy.android.app.components.GroupParticipantsDividerItemDecoration;
+import mega.privacy.android.app.components.PositionDividerItemDecoration;
 import mega.privacy.android.app.components.twemoji.EmojiEditText;
 import mega.privacy.android.app.interfaces.SnackbarShower;
 import mega.privacy.android.app.listeners.GetAttrUserListener;
@@ -239,7 +239,7 @@ public class GroupChatInfoActivityLollipop extends PasscodeActivity
             aB.setTitle(getString(R.string.group_chat_info_label).toUpperCase());
 
             recyclerView = findViewById(R.id.chat_group_contact_properties_list);
-            recyclerView.addItemDecoration(new GroupParticipantsDividerItemDecoration(this));
+            recyclerView.addItemDecoration(new PositionDividerItemDecoration(this, getOutMetrics()));
             recyclerView.setHasFixedSize(true);
             linearLayoutManager = new LinearLayoutManager(this);
             recyclerView.setLayoutManager(linearLayoutManager);
