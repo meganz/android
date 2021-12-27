@@ -272,7 +272,7 @@ public class MegaFullScreenImageAdapterLollipop extends PagerAdapter implements 
 				pendingFullImages.add(handle);
 				logDebug("Node handle: " + node.getHandle());
 				String previewFolder = getCacheFolder(context, PREVIEW_FOLDER).getAbsolutePath() + File.separator;
-				megaApi.startDownload(node, previewFolder, megaFullScreenImageAdapter);
+				megaApi.startDownload(node, previewFolder, null, null, false, null, megaFullScreenImageAdapter);
 			}
 		}
 	}	

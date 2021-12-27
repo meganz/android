@@ -371,33 +371,29 @@ public class UploadService extends Service implements MegaTransferListenerInterf
             String appData = APP_DATA_TXT_FILE + APP_DATA_INDICATOR + textFileMode
                     + APP_DATA_INDICATOR + fromHome;
 
-            megaApi.startUploadWithTopPriority(file.getAbsolutePath(), parentNode, appData, true, nameInMEGA);
+            megaApi.startUpload(file.getAbsolutePath(), parentNode, INVALID_VALUE, appData,
+                    nameInMEGA, true, true, null);
         } else if (file.isDirectory()) {
             // Folder upload
             totalFolderUploads++;
             ScanningFolderData folderData = transfersManagement.createScanningFolderData(
                     MegaTransfer.TYPE_UPLOAD, file.getAbsolutePath(), parentNode);
 
-            megaApi.startUploadWithCancellation(folderData.getLocalPath(), folderData.getNode(),
-                    folderData.getCancelToken());
+            megaApi.startUpload(folderData.getLocalPath(), folderData.getNode(), INVALID_VALUE,
+                    null, null, false, false, folderData.getCancelToken());
         } else {
             totalFileUploads++;
 
             if (nameInMEGAEdited != null) {
                 // File upload with edited name
-                megaApi.startUpload(file.getAbsolutePath(), parentNode, nameInMEGAEdited);
+                megaApi.startUpload(file.getAbsolutePath(), parentNode, INVALID_VALUE, null,
+                        nameInMEGAEdited, false, false, null);
             } else if (lastModified == 0) {
-                if (nameInMEGA != null) {
-                    megaApi.startUpload(file.getAbsolutePath(), parentNode, nameInMEGA);
-                } else {
-                    megaApi.startUpload(file.getAbsolutePath(), parentNode);
-                }
+                megaApi.startUpload(file.getAbsolutePath(), parentNode, INVALID_VALUE, null,
+                            nameInMEGA, false, false, null);
             } else {
-                if (nameInMEGA != null) {
-                    megaApi.startUpload(file.getAbsolutePath(), parentNode, nameInMEGA, lastModified / 1000);
-                } else {
-                    megaApi.startUpload(file.getAbsolutePath(), parentNode, lastModified / 1000);
-                }
+                megaApi.startUpload(file.getAbsolutePath(), parentNode, lastModified / 1000,
+                        null, nameInMEGA, false, false, null);
             }
         }
     }

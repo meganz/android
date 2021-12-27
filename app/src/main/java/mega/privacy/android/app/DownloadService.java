@@ -512,17 +512,17 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 			if (highPriority) {
 			    // Download to SD card from chat.
                 if (!isTextEmpty(appData)) {
-                    megaApi.startDownloadWithTopPriority(currentDocument, currentDir.getAbsolutePath() + "/", appData);
+                    megaApi.startDownload(currentDocument, currentDir.getAbsolutePath() + "/", appData, null, true, null);
                 } else {
                     String data = isVoiceClipType(type) ? APP_DATA_VOICE_CLIP : "";
-                    megaApi.startDownloadWithTopPriority(currentDocument, currentDir.getAbsolutePath() + "/", data);
+                    megaApi.startDownload(currentDocument, currentDir.getAbsolutePath() + "/", data, null, true, null);
                 }
 			} else if (currentDocument.isFolder()) {
 				startFolderDownload(currentDocument, appData);
 			} else if (!isTextEmpty(appData)) {
-				megaApi.startDownloadWithData(currentDocument, currentDir.getAbsolutePath() + "/", appData);
+				megaApi.startDownload(currentDocument, currentDir.getAbsolutePath() + "/", appData, null, false, null);
 			} else {
-				megaApi.startDownload(currentDocument, currentDir.getAbsolutePath() + "/");
+				megaApi.startDownload(currentDocument, currentDir.getAbsolutePath() + "/", null, null, false, null);
 			}
 		} else {
 			logWarning("currentDir is not a directory");
@@ -1582,11 +1582,9 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 				MegaTransfer.TYPE_DOWNLOAD, currentDir.getAbsolutePath() + "/", node);
 
 		if (!isTextEmpty(appData)) {
-			megaApi.startDownloadWithDataAndCancellation(folderData.getNode(),
-					folderData.getLocalPath(), appData, folderData.getCancelToken());
+			megaApi.startDownload(folderData.getNode(), folderData.getLocalPath(), appData, null, false, folderData.getCancelToken());
 		} else {
-			megaApi.startDownloadWithCancellation(folderData.getNode(),
-					folderData.getLocalPath(), folderData.getCancelToken());
+			megaApi.startDownload(folderData.getNode(), folderData.getLocalPath(), null, null, false, folderData.getCancelToken());
 		}
 	}
 

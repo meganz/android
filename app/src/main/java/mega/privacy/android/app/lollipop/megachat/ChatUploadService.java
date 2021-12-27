@@ -555,11 +555,7 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 			data = APP_DATA_VOICE_CLIP + APP_DATA_SEPARATOR + data;
 		}
 
-		if (!isTextEmpty(fileName)) {
-			megaApi.startUploadForChat(localPath, parentNode, data, false, fileName);
-		} else {
-			megaApi.startUploadForChat(localPath, parentNode, data, false);
-		}
+		megaApi.startUploadForChat(localPath, parentNode, data, false, fileName);
 	}
 
 	/*
