@@ -37,6 +37,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Set;
 
 import mega.privacy.android.app.components.saver.AutoPlayInfo;
 import mega.privacy.android.app.components.transferWidget.TransfersManagement;
@@ -136,6 +138,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 	DatabaseHandler dbH = null;
 
 	int transfersCount = 0;
+	Set<Integer> backgroundTransfers = new HashSet<>();
 
 	HashMap<Long, Uri> storeToAdvacedDevices;
 	HashMap<Long, Boolean> fromMediaViewers;
@@ -575,6 +578,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 			sendBroadcast(new Intent(BROADCAST_ACTION_INTENT_TRANSFER_UPDATE));
 
 			megaApi.resetTotalDownloads();
+			backgroundTransfers.clear();
 			errorEBloqued = 0;
 			errorCount = 0;
 			alreadyDownloaded = 0;
@@ -628,7 +632,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 		logDebug("showCompleteNotification");
 		String notificationTitle, size;
 
-        int totalDownloads = megaApi.getTotalDownloads();
+        int totalDownloads = megaApi.getTotalDownloads() - backgroundTransfers.size();
 
 		if(alreadyDownloaded>0 && errorCount>0){
 			int totalNumber = totalDownloads + errorCount + alreadyDownloaded;
@@ -950,7 +954,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 	@SuppressLint("NewApi")
 	private void updateProgressNotification() {
 		int pendingTransfers = getNumPendingDownloadsNonBackground(megaApi);
-        int totalTransfers = megaApi.getTotalDownloads();
+        int totalTransfers = megaApi.getTotalDownloads() - backgroundTransfers.size();
 
         long totalSizePendingTransfer = megaApi.getTotalDownloadBytes();
         long totalSizeTransferred = megaApi.getTotalDownloadedBytes();
@@ -1138,7 +1142,11 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 	private void doOnTransferStart(MegaTransfer transfer) {
 		logDebug("Download start: " + transfer.getNodeHandle() + ", totalDownloads: " + megaApi.getTotalDownloads());
 
-		if (transfer.isStreamingTransfer() || isVoiceClipType(transfer) || isBackgroundTransfer(transfer)) return;
+		if (transfer.isStreamingTransfer() || isVoiceClipType(transfer)) return;
+		if (isBackgroundTransfer(transfer)) {
+			backgroundTransfers.add(transfer.getTag());
+			return;
+		}
 
 		if (transfer.getType() == MegaTransfer.TYPE_DOWNLOAD) {
 			String appData = transfer.getAppData();
@@ -1401,7 +1409,11 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 				DownloadService.this.cancel();
 				return;
 			}
-			if(transfer.isStreamingTransfer() || isVoiceClipType(transfer) || isBackgroundTransfer(transfer)) return;
+			if(transfer.isStreamingTransfer() || isVoiceClipType(transfer)) return;
+			if (isBackgroundTransfer(transfer)) {
+				backgroundTransfers.add(transfer.getTag());
+				return;
+			}
 
 			if(!transfer.isFolderTransfer()){
 				sendBroadcast(new Intent(BROADCAST_ACTION_INTENT_TRANSFER_UPDATE));

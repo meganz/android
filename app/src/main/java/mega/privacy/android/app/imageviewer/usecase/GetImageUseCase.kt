@@ -5,7 +5,9 @@ import androidx.core.net.toUri
 import dagger.hilt.android.qualifiers.ApplicationContext
 import io.reactivex.rxjava3.core.BackpressureStrategy
 import io.reactivex.rxjava3.core.Flowable
+import mega.privacy.android.app.DownloadService
 import mega.privacy.android.app.MimeTypeList
+import mega.privacy.android.app.components.transferWidget.TransfersManagement
 import mega.privacy.android.app.di.MegaApi
 import mega.privacy.android.app.errors.BusinessAccountOverdueMegaError
 import mega.privacy.android.app.errors.QuotaOverdueMegaError
@@ -19,6 +21,7 @@ import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.ErrorUtils.toThrowable
 import mega.privacy.android.app.utils.MegaNodeUtil.isGif
 import mega.privacy.android.app.utils.MegaNodeUtil.isVideo
+import mega.privacy.android.app.utils.MegaTransferUtils.getNumPendingDownloadsNonBackground
 import mega.privacy.android.app.utils.OfflineUtils
 import mega.privacy.android.app.utils.RxUtil.blockingGetOrNull
 import nz.mega.sdk.*
@@ -177,8 +180,6 @@ class GetImageUseCase @Inject constructor(
                             onTransferFinish = { _: MegaTransfer, error: MegaError ->
                                 if (emitter.isCancelled) return@OptionalMegaTransferListenerInterface
 
-                                megaApi.resetTotalDownloads()
-
                                 when (error.errorCode) {
                                     API_OK -> {
                                         image.fullSizeUri = fullFile.toUri()
@@ -192,6 +193,8 @@ class GetImageUseCase @Inject constructor(
                                     else ->
                                         emitter.onError(error.toThrowable())
                                 }
+
+                                resetTotalDownloadsIfNeeded()
                             },
                             onTransferTemporaryError = { _, error ->
                                 if (emitter.isCancelled) return@OptionalMegaTransferListenerInterface
@@ -221,6 +224,17 @@ class GetImageUseCase @Inject constructor(
                 }
             }
         }, BackpressureStrategy.LATEST)
+
+    /**
+     * Reset MegaApi Total Downloads count to avoid counting background transfers.
+     */
+    private fun resetTotalDownloadsIfNeeded() {
+        val currentTransfers = megaApi.getNumPendingDownloadsNonBackground()
+        val isServiceRunning = TransfersManagement.isServiceRunning(DownloadService::class.java)
+        if (currentTransfers == 0 && !isServiceRunning) {
+            megaApi.resetTotalDownloads()
+        }
+    }
 
     /**
      * Get an offline image given a Node handle.
