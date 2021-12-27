@@ -1,13 +1,12 @@
 package mega.privacy.android.app.utils;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.util.Log;
 
 import mega.privacy.android.app.AndroidChatLogger;
 import mega.privacy.android.app.AndroidLogger;
-import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
-import mega.privacy.android.app.MegaAttributes;
 import mega.privacy.android.app.R;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaChatApiAndroid;
@@ -16,18 +15,15 @@ import static mega.privacy.android.app.utils.Util.*;
 
 public class LogUtil {
 
-    private static MegaApplication app = MegaApplication.getInstance();
+    private static final String LOG_PREFERENCES = "LOG_PREFERENCES";
+    private static final String SDK_LOGS = "SDK_LOGS";
+    private static final String KARERE_LOGS = "KARERE_LOGS";
 
     private static AndroidLogger loggerSDK = null;
     private static AndroidChatLogger loggerKarere = null;
 
     private static boolean statusLoggerSDK = false;
     private static boolean statusLoggerKarere = false;
-
-    //Indicates if app is requesting the required permissions to enable the SDK logger
-    private static boolean permissionLoggerSDK = false;
-    //Indicates if app is requesting the required permissions to enable the Karere logger
-    private static boolean permissionLoggerKarere = false;
 
     /**
      * Send a log message with FATAL level to the logging system.
@@ -176,7 +172,7 @@ public class LogUtil {
             logInfo("SDK logs are now disabled - App Version: " + getVersion());
         }
 
-        app.getDbH().setFileLoggerSDK(enabled);
+        updateSDKLogs(enabled);
         statusLoggerSDK = enabled;
         if (enabled) {
             MegaApiAndroid.setLogLevel(MegaApiAndroid.LOG_LEVEL_MAX);
@@ -206,7 +202,7 @@ public class LogUtil {
             logInfo("Karere logs are now disabled - App Version: " + getVersion());
         }
 
-        app.getDbH().setFileLoggerKarere(enabled);
+        updateKarereLogs(enabled);
         statusLoggerKarere = enabled;
         if (enabled) {
             MegaChatApiAndroid.setLogLevel(MegaChatApiAndroid.LOG_LEVEL_MAX);
@@ -234,14 +230,7 @@ public class LogUtil {
             loggerSDK = new AndroidLogger(AndroidLogger.LOG_FILE_NAME);
         }
 
-        DatabaseHandler dbH = app.getDbH();
-        if (dbH != null) {
-            MegaAttributes attrs = dbH.getAttributes();
-            if (attrs != null && attrs.getFileLoggerSDK() != null) {
-                statusLoggerSDK = Boolean.parseBoolean(attrs.getFileLoggerSDK());
-            }
-        }
-
+        statusLoggerSDK = areSDKLogsEnabled();
         MegaApiAndroid.addLoggerObject(loggerSDK);
         MegaApiAndroid.setLogLevel(DEBUG || statusLoggerSDK ? MegaApiAndroid.LOG_LEVEL_MAX : MegaApiAndroid.LOG_LEVEL_FATAL);
         logInfo("SDK logger initialized");
@@ -266,16 +255,72 @@ public class LogUtil {
             loggerKarere = new AndroidChatLogger(AndroidChatLogger.LOG_FILE_NAME);
         }
 
-        DatabaseHandler dbH = app.getDbH();
-        if (dbH != null) {
-            MegaAttributes attrs = dbH.getAttributes();
-            if (attrs != null && attrs.getFileLoggerKarere() != null) {
-                statusLoggerKarere = Boolean.parseBoolean(attrs.getFileLoggerKarere());
-            }
-        }
-
+        statusLoggerKarere = areKarereLogsEnabled();
         MegaChatApiAndroid.setLoggerObject(loggerKarere);
         MegaChatApiAndroid.setLogLevel(DEBUG || statusLoggerKarere ? MegaChatApiAndroid.LOG_LEVEL_MAX : MegaChatApiAndroid.LOG_LEVEL_ERROR);
         logInfo("Karere logger initialized");
+    }
+
+    /**
+     * Checks if loggerSDK is initialized.
+     *
+     * @return True if loggerSDK is initialized, false otherwise.
+     */
+    public static boolean isLoggerSDKInitialized() {
+        return loggerSDK != null;
+    }
+
+    /**
+     * Checks if loggerKarere is initialized.
+     *
+     * @return True if loggerKarere is initialized, false otherwise.
+     */
+    public static boolean isLoggerKarereInitialized() {
+        return loggerKarere != null;
+    }
+
+    /**
+     * Gets Log SharedPreferences.
+     *
+     * @return Log SharedPreferences
+     */
+    public static SharedPreferences getLogSharedPreferences() {
+        return MegaApplication.getInstance().getSharedPreferences(LOG_PREFERENCES, Context.MODE_PRIVATE);
+    }
+
+    /**
+     * Checks if SDK logs are enabled.
+     *
+     * @return True if SDK logs are enabled, false otherwise.
+     */
+    public static boolean areSDKLogsEnabled() {
+        return getLogSharedPreferences().getBoolean(SDK_LOGS, false);
+    }
+
+    /**
+     * Updates SDK logs preference.
+     *
+     * @param enabled True if should enable SDK logs, false otherwise.
+     */
+    public static void updateSDKLogs(boolean enabled) {
+        getLogSharedPreferences().edit().putBoolean(SDK_LOGS, enabled).apply();
+    }
+
+    /**
+     * Checks if SDK logs are enabled.
+     *
+     * @return True if SDK logs are enabled, false otherwise.
+     */
+    public static boolean areKarereLogsEnabled() {
+        return getLogSharedPreferences().getBoolean(KARERE_LOGS, false);
+    }
+
+    /**
+     * Updates Karere logs preference.
+     *
+     * @param enabled True if should enable Karere logs, false otherwise.
+     */
+    public static void updateKarereLogs(boolean enabled) {
+        getLogSharedPreferences().edit().putBoolean(KARERE_LOGS, enabled).apply();
     }
 }

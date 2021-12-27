@@ -4,8 +4,8 @@ import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.ContentResolver;
+import android.content.Context;
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.net.Uri;
 import android.os.AsyncTask;
@@ -16,9 +16,8 @@ import android.os.Handler;
 import android.os.Looper;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AlertDialog;
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.view.ActionMode;
 import androidx.core.content.FileProvider;
@@ -30,6 +29,7 @@ import androidx.appcompat.widget.Toolbar;
 
 import android.os.storage.StorageManager;
 import android.os.storage.StorageVolume;
+import android.provider.DocumentsContract;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -77,7 +77,7 @@ import static mega.privacy.android.app.utils.FileUtil.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.MegaApiUtils.*;
 import static mega.privacy.android.app.utils.MegaNodeDialogUtil.showNewFolderDialog;
-import static mega.privacy.android.app.utils.PermissionUtils.*;
+import static mega.privacy.android.app.utils.permission.PermissionUtils.*;
 import static mega.privacy.android.app.utils.TextUtil.*;
 import static mega.privacy.android.app.utils.Util.*;
 
@@ -88,6 +88,8 @@ public class FileStorageActivityLollipop extends PasscodeActivity implements OnC
 	private static final String IS_CONFIRMATION_CHECKED = "IS_CONFIRMATION_CHECKED";
 	private static final String PATH = "PATH";
 	public static final String PICK_FOLDER_TYPE = "PICK_FOLDER_TYPE";
+	private static final int REQUEST_SAVE_RK = 1122;
+	private static final int REQUEST_PICK_CU_FOLDER = 1133;
 
 	public enum PickFolderType {
 		CU_FOLDER("CU_FOLDER"),
@@ -123,8 +125,6 @@ public class FileStorageActivityLollipop extends PasscodeActivity implements OnC
 	public enum Mode {
 		// Select single folder
 		PICK_FOLDER("ACTION_PICK_FOLDER"),
-		// Pick one or multiple files or folders
-		PICK_FILE("ACTION_PICK_FILE"),
 		//Browse files
 		BROWSE_FILES("ACTION_BROWSE_FILES");
 
@@ -139,9 +139,7 @@ public class FileStorageActivityLollipop extends PasscodeActivity implements OnC
 		}
 
 		public static Mode getFromIntent(Intent intent) {
-			if (intent.getAction().equals(PICK_FILE.getAction())) {
-				return PICK_FILE;
-			} else if (intent.getAction().equals(BROWSE_FILES.getAction())) {
+			if (intent.getAction().equals(BROWSE_FILES.getAction())) {
 				return BROWSE_FILES;
 			} else {
 				return PICK_FOLDER;
@@ -172,6 +170,7 @@ public class FileStorageActivityLollipop extends PasscodeActivity implements OnC
 	
 	private Boolean fromSettings, fromSaveRecoveryKey;
 	private PickFolderType pickFolderType;
+	private boolean isCUOrMUFolder;
 	private String sdRoot;
 	private boolean hasSDCard;
     private String prompt;
@@ -186,8 +185,6 @@ public class FileStorageActivityLollipop extends PasscodeActivity implements OnC
 	private FileStorageLollipopAdapter adapter;
 	private Toolbar tB;
 	private ActionBar aB;
-	
-	private ActionMode actionMode;
 
 	private AlertDialog setDownloadLocationDialog;
 	private boolean isSetDownloadLocationShown;
@@ -196,6 +193,7 @@ public class FileStorageActivityLollipop extends PasscodeActivity implements OnC
 	private Handler handler;
 
 	private boolean pickingFromSDCard;
+	private boolean isChoosingStorage;
 
     /**
      * Pass to exporting recovery key operation.
@@ -216,96 +214,9 @@ public class FileStorageActivityLollipop extends PasscodeActivity implements OnC
 				showNewFolderDialog(this, this);
                 return true;
 
-            case R.id.cab_menu_select_all:
-                selectAll();
-                return true;
-
-            case R.id.cab_menu_unselect_all:
-                clearSelections();
-                return true;
-
             default:
                 return super.onOptionsItemSelected(item);
         }
-	}
-	
-	private class ActionBarCallBack implements ActionMode.Callback {
-		
-		@Override
-        public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
-
-            switch (item.getItemId()) {
-                case R.id.cab_menu_select_all:
-                    selectAll();
-                    break;
-
-                case R.id.cab_menu_unselect_all:
-                    clearSelections();
-                    break;
-            }
-
-            return false;
-        }
-
-		@Override
-		public boolean onCreateActionMode(ActionMode mode, Menu menu) {
-			MenuInflater inflater = mode.getMenuInflater();
-			inflater.inflate(R.menu.file_storage_action, menu);
-			checkScroll();
-			return true;
-		}
-
-		@Override
-		public void onDestroyActionMode(ActionMode arg0) {
-			clearSelections();
-			adapter.setMultipleSelect(false);
-			checkScroll();
-		}
-
-		@Override
-		public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
-			List<FileDocument> selected = adapter.getSelectedDocuments();
-			
-			if (selected.size() != 0) {				
-				
-				if(selected.size()==adapter.getItemCount()){
-					menu.findItem(R.id.cab_menu_select_all).setVisible(false);
-					menu.findItem(R.id.cab_menu_unselect_all).setVisible(true);			
-				}
-				else{
-					menu.findItem(R.id.cab_menu_select_all).setVisible(true);
-					menu.findItem(R.id.cab_menu_unselect_all).setVisible(true);	
-				}	
-			}
-			else{
-				menu.findItem(R.id.cab_menu_select_all).setVisible(true);
-				menu.findItem(R.id.cab_menu_unselect_all).setVisible(false);
-			}
-			
-			if (!(mode.equals(Mode.PICK_FOLDER))) {
-				logDebug("Not Mode.PICK_FOLDER");
-				menu.findItem(R.id.cab_menu_create_folder).setVisible(false);
-			}
-			
-			return false;
-		}
-	}
-	
-	public void selectAll(){
-		logDebug("selectAll");
-		if (adapter != null){
-			if(adapter.isMultipleSelect()){
-				adapter.selectAll();
-			}
-			else{			
-				adapter.setMultipleSelect(true);
-				adapter.selectAll();
-				
-				actionMode = startSupportActionMode(new ActionBarCallBack());
-			}
-
-			new Handler(Looper.getMainLooper()).post(() -> updateActionModeTitle());
-		}
 	}
 	
 	@Override
@@ -319,7 +230,7 @@ public class FileStorageActivityLollipop extends PasscodeActivity implements OnC
 	    getSupportActionBar().setDisplayShowCustomEnabled(true);
 	    
 	    newFolderMenuItem = menu.findItem(R.id.cab_menu_create_folder);
-        newFolderMenuItem.setVisible(mode == Mode.PICK_FOLDER);
+	    newFolderMenuItem.setVisible(!isChoosingStorage && mode == Mode.PICK_FOLDER);
 	    
 	    return super.onCreateOptionsMenu(menu);
 	}
@@ -328,9 +239,7 @@ public class FileStorageActivityLollipop extends PasscodeActivity implements OnC
     public boolean onPrepareOptionsMenu(Menu menu) {
 		logDebug("onPrepareOptionsMenu");
 
-		menu.findItem(R.id.cab_menu_unselect_all).setVisible(false);
-		menu.findItem(R.id.cab_menu_select_all).setVisible(mode == Mode.PICK_FILE);
-		newFolderMenuItem.setVisible(mode == Mode.PICK_FOLDER);
+		newFolderMenuItem.setVisible(!isChoosingStorage && mode == Mode.PICK_FOLDER);
 
 		return super.onPrepareOptionsMenu(menu);
 	}
@@ -415,8 +324,6 @@ public class FileStorageActivityLollipop extends PasscodeActivity implements OnC
 			button.setText(getString(R.string.general_select).toUpperCase(Locale.getDefault()));
 		} else if (mode == Mode.PICK_FOLDER) {
 			button.setText(getString(R.string.general_save_to_device).toUpperCase(Locale.getDefault()));
-		} else if (mode == Mode.PICK_FILE){
-			button.setText(getString(R.string.context_upload).toUpperCase(Locale.getDefault()));
 		} else if (mode == Mode.BROWSE_FILES) {
 			buttonsContainer.setVisibility(View.GONE);
 		}
@@ -461,7 +368,7 @@ public class FileStorageActivityLollipop extends PasscodeActivity implements OnC
 		});
 		
 		if (adapter == null){
-			adapter = new FileStorageLollipopAdapter(this, listView, mode);
+			adapter = new FileStorageLollipopAdapter(this, mode);
 			listView.setAdapter(adapter);
 		}
 
@@ -469,7 +376,11 @@ public class FileStorageActivityLollipop extends PasscodeActivity implements OnC
 
 		prefs = dbH.getPreferences();
 
-		if (mode == Mode.BROWSE_FILES) {
+		if (fromSaveRecoveryKey && isAndroid11OrUpper()) {
+			createRKFile();
+		} else if (isCUOrMUFolder && isAndroid11OrUpper()) {
+			openPickCUFolderFromSystem();
+		} else if (mode == Mode.BROWSE_FILES) {
 			if (intent.getExtras() != null) {
 				String extraPath = intent.getExtras().getString(EXTRA_PATH);
 				if (!isTextEmpty(extraPath)) {
@@ -489,6 +400,31 @@ public class FileStorageActivityLollipop extends PasscodeActivity implements OnC
 	}
 
 	/**
+	 * Launches the System picker to create the Recovery Key file in the chosen path.
+	 */
+	@RequiresApi(api = Build.VERSION_CODES.O)
+	private void createRKFile() {
+		File defaultDownloadDir = buildDefaultDownloadDir(this);
+		defaultDownloadDir.mkdirs();
+		Uri initialUri = Uri.parse(defaultDownloadDir.getAbsolutePath());
+
+		startActivityForResult(new Intent(Intent.ACTION_CREATE_DOCUMENT)
+				.addCategory(Intent.CATEGORY_OPENABLE)
+				.setType(TYPE_TEXT_PLAIN)
+				.putExtra(DocumentsContract.EXTRA_INITIAL_URI, initialUri)
+				.putExtra(Intent.EXTRA_TITLE, getRecoveryKeyFileName()), REQUEST_SAVE_RK);
+	}
+
+	/**
+	 * On Android 11 and upper we cannot show our app picker, we must use the system one.
+	 * So opens the system file picker in order to give the option to chose a CU or MU local folder.
+	 */
+	private void openPickCUFolderFromSystem() {
+		startActivityForResult(new Intent(Intent.ACTION_OPEN_DOCUMENT_TREE)
+				.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION), REQUEST_PICK_CU_FOLDER);
+	}
+
+	/**
 	 * Sets the type of pick folder action.
 	 *
 	 * @param pickFolderString	the type of pick folder action.
@@ -498,19 +434,27 @@ public class FileStorageActivityLollipop extends PasscodeActivity implements OnC
 			pickFolderType = PickFolderType.NONE_ONLY_DOWNLOAD;
 		} else if (pickFolderString.equals(PickFolderType.CU_FOLDER.getFolderType())) {
 			pickFolderType = PickFolderType.CU_FOLDER;
-			dbH.setCameraFolderExternalSDCard(false);
 		} else if (pickFolderString.equals(PickFolderType.MU_FOLDER.getFolderType())) {
 			pickFolderType = PickFolderType.MU_FOLDER;
-			dbH.setMediaFolderExternalSdCard(false);
 		} else if (pickFolderString.equals(PickFolderType.DOWNLOAD_FOLDER.getFolderType())) {
 			pickFolderType = PickFolderType.DOWNLOAD_FOLDER;
 		}
+
+		isCUOrMUFolder = pickFolderType.equals(PickFolderType.CU_FOLDER)
+				|| pickFolderType.equals(PickFolderType.MU_FOLDER);
 	}
 
 	/**
 	 * Sets the view to pick from Internal Storage.
 	 */
 	private void openPickFromInternalStorage() {
+		if (isAndroid11OrUpper() && mode == Mode.PICK_FOLDER) {
+			path = buildDefaultDownloadDir(this);
+			path.mkdirs();
+			finishPickFolder();
+			return;
+		}
+
 		pickingFromSDCard = false;
 		root = buildExternalStorageFile("");
 
@@ -551,9 +495,7 @@ public class FileStorageActivityLollipop extends PasscodeActivity implements OnC
 
 		String sdCardRoot = sdCardOperator.getSDCardRoot();
 
-		if (mode.equals(Mode.PICK_FILE)) {
-			sdRoot = sdCardRoot;
-		} else if (isBasedOnFileStorage()) {
+		if (isBasedOnFileStorage()) {
 			try {
 				sdCardOperator.initDocumentFileRoot(dbH.getSDCardUri());
 				sdRoot = sdCardRoot;
@@ -640,14 +582,25 @@ public class FileStorageActivityLollipop extends PasscodeActivity implements OnC
 	 */
 	private void showRootWithSDView(boolean show) {
 		if (show) {
-			contentText.setText(String.format("%s%s", SEPARATOR, getString(R.string.storage_root_label)));
+			isChoosingStorage = true;
+			// Avoid crash if `contentText` is null due any reason. For more info see AND-12958.
+			if (contentText == null) {
+				contentText = findViewById(R.id.file_storage_content_text);
+			}
+			if (contentText != null) {
+				contentText.setText(String.format("%s%s", SEPARATOR, getString(R.string.storage_root_label)));
+			}
+
 			rootLevelLayout.setVisibility(View.VISIBLE);
 			buttonsContainer.setVisibility(View.GONE);
 			showEmptyState();
 		} else {
+			isChoosingStorage = false;
 			rootLevelLayout.setVisibility(View.GONE);
 			buttonsContainer.setVisibility(View.VISIBLE);
 		}
+
+		invalidateOptionsMenu();
 	}
 
 	/**
@@ -674,7 +627,7 @@ public class FileStorageActivityLollipop extends PasscodeActivity implements OnC
 	 * Changes the path shown in the screen or finish the activity if the current one is not valid.
 	 */
 	private void checkPath() {
-		if (path == null){
+		if (path == null) {
 			logError("Current path is not valid (null)");
 			showErrorAlertDialog(getString(R.string.error_io_problem),
 					true, this);
@@ -718,11 +671,16 @@ public class FileStorageActivityLollipop extends PasscodeActivity implements OnC
 		
 		setFiles(newPath);
 		path = newPath;
-		contentText.setText(path.getAbsolutePath());
-		invalidateOptionsMenu();
-        if (mode == Mode.PICK_FILE) {
-			clearSelections();
+
+		// Avoid crash if `contentText` is null due any reason. For more info see AND-12958.
+		if (contentText == null) {
+			contentText = findViewById(R.id.file_storage_content_text);
 		}
+		if (contentText != null) {
+			contentText.setText(path.getAbsolutePath());
+		}
+
+		invalidateOptionsMenu();
 	}
 	
 	/*
@@ -759,45 +717,6 @@ public class FileStorageActivityLollipop extends PasscodeActivity implements OnC
 		showEmptyState();
 	}
 
-	private void updateActionModeTitle() {
-		logDebug("updateActionModeTitle");
-		if (actionMode == null) {
-			logWarning("RETURN");
-			return;
-		}
-		
-		List<FileDocument> documents = adapter.getSelectedDocuments();
-		int files = 0;
-		int folders = 0;
-		for (FileDocument document : documents) {
-			if (document.isFolder()) {
-				folders++;
-			}
-			else{
-				files++;
-			}
-		}
-
-		actionMode.setTitle(getFolderInfo(folders, files));
-
-		try {
-			actionMode.invalidate();
-		} catch (NullPointerException e) {
-			logError("Invalidate error", e);
-			e.printStackTrace();
-		}
-	}
-
-	/*
-	 * Clear all selected items
-	 */
-	private void clearSelections() {
-		logDebug("clearSelections");
-		if(adapter.isMultipleSelect()){
-			adapter.clearSelections();
-		}
-	}
-
 	/*
 	 * Comparator to sort the files
 	 */
@@ -822,47 +741,11 @@ public class FileStorageActivityLollipop extends PasscodeActivity implements OnC
                     dbH.setLastUploadFolder(path.getAbsolutePath());
                 }
 				if (mode == Mode.PICK_FOLDER) {
-					boolean isCUOrMUFolder = pickFolderType.equals(PickFolderType.CU_FOLDER) || pickFolderType.equals(PickFolderType.MU_FOLDER);
-
 					if (!isCUOrMUFolder && dbH.getCredentials() != null && dbH.getAskSetDownloadLocation()) {
 						showConfirmationSaveInSameLocation();
 					} else {
 						finishPickFolder();
 					}
-				}
-				else {
-					logDebug("Mode.PICK_FILE");
-					if(adapter.getSelectedCount()<=0){
-						showSnackbar(viewContainer, getString(R.string.error_no_selection));
-						break;
-					}
-					new AsyncTask<Void, Void, Void>()
-					{
-						ArrayList<String> files = new ArrayList<String>();
-
-						@Override
-						protected Void doInBackground(Void... params) {
-							List<FileDocument> selectedDocuments= adapter.getSelectedDocuments();
-							for (int i = 0; i < selectedDocuments.size(); i++) {
-								FileDocument document = selectedDocuments.get(i);
-								if(document != null)
-								{
-									File file = document.getFile();
-									logDebug("Add to files selected: " + file.getAbsolutePath());
-									files.add(file.getAbsolutePath());
-								}
-								
-							}
-							return null;	
-						}
-
-						@Override
-						public void onPostExecute(Void a)
-						{
-
-							setResultFiles(files);
-						}
-					}.execute();			
 				}
 				break;
 
@@ -962,21 +845,13 @@ public class FileStorageActivityLollipop extends PasscodeActivity implements OnC
 			return;
 		}
 
-		if (adapter.isMultipleSelect()) {
-			adapter.toggleSelection(position);
-			List<FileDocument> selected = adapter.getSelectedDocuments();
-			if (selected.size() > 0) {
-				updateActionModeTitle();
+		if (document.isFolder()) {
+			if (!document.getFile().canRead()) {
+				return;
 			}
-		} else if (document.isFolder()) {
+
 			lastPositionStack.push(mLayoutManager.findFirstCompletelyVisibleItemPosition());
 			changeFolder(document.getFile());
-		} else if (mode == Mode.PICK_FILE) {
-			//Multiselect on to select several files if desired
-			checkActionMode();
-			adapter.toggleSelection(position);
-			updateActionModeTitle();
-			adapter.notifyDataSetChanged();
 		} else if (mode == Mode.BROWSE_FILES) {
 			File f = adapter.getItem(position).getFile();
 
@@ -1013,17 +888,6 @@ public class FileStorageActivityLollipop extends PasscodeActivity implements OnC
 		intent.putExtra(EXTRA_PATH, path.getAbsolutePath());
 		setResult(RESULT_OK, intent);
 		finish();
-	}
-	
-	/*
-	 * Disable selection
-	 */
-	public void hideMultipleSelect() {
-		logDebug("hideMultipleSelect");
-		adapter.setMultipleSelect(false);
-		if (actionMode != null) {
-			actionMode.finish();
-		}
 	}
 	
 	@Override
@@ -1101,18 +965,6 @@ public class FileStorageActivityLollipop extends PasscodeActivity implements OnC
         newFolder.setReadable(true, false);
         newFolder.setExecutable(true, false);
     }
-
-	/**
-	 * Starts the action mode if needed.
-	 */
-	public void checkActionMode() {
-		if (mode != Mode.PICK_FILE) return;
-
-		if (adapter != null && !adapter.isMultipleSelect()){
-			adapter.setMultipleSelect(true);
-			actionMode = startSupportActionMode(new ActionBarCallBack());
-		}
-	}
 
 	@Override
 	public void onActivityResult(int requestCode, int resultCode, Intent intent) {
@@ -1193,10 +1045,8 @@ public class FileStorageActivityLollipop extends PasscodeActivity implements OnC
                 path = new File(pathString);
 
                 if (pickFolderType.equals(PickFolderType.CU_FOLDER)) {
-                    dbH.setCameraFolderExternalSDCard(true);
                     dbH.setUriExternalSDCard(uriString);
                 } else if (pickFolderType.equals(PickFolderType.MU_FOLDER)) {
-                    dbH.setMediaFolderExternalSdCard(true);
                     dbH.setUriMediaExternalSdCard(uriString);
                 } else if (fromSaveRecoveryKey) {
                     // For temporary use, don't store the uri to database.
@@ -1207,7 +1057,80 @@ public class FileStorageActivityLollipop extends PasscodeActivity implements OnC
 
                 finishPickFolder();
             }
-        }
+        } else if (requestCode == REQUEST_SAVE_RK) {
+			if (intent != null && resultCode == Activity.RESULT_OK) {
+				setResult(RESULT_OK, new Intent().setData(intent.getData()));
+			}
+
+			//If resultCode is not Activity.RESULT_OK, means cancelled, so only finish.
+			finish();
+		} else if (requestCode == REQUEST_PICK_CU_FOLDER) {
+			if (intent != null && resultCode == Activity.RESULT_OK) {
+				logDebug("Folder picked from system picker");
+				Uri uri = intent.getData();
+				getContentResolver().takePersistableUriPermission(uri, Intent.FLAG_GRANT_READ_URI_PERMISSION);
+
+				SDCardOperator operator = null;
+
+				try {
+					operator = new SDCardOperator(this);
+				} catch (SDCardOperator.SDCardException e) {
+					logError("Error creating SDCardOperator", e);
+				}
+
+				if (operator != null) {
+					String volumePath = operator.getSDCardRoot();
+
+					if (volumePath != null) {
+						final String[] split = volumePath.split(File.separator);
+						if (split.length > 0 && uri.toString().contains(split[split.length - 1])) {
+							//SD card folder
+							String pathString = getFullPathFromTreeUri(uri, this);
+
+							if (isTextEmpty(pathString)) {
+								logWarning("getFullPathFromTreeUri is Null.");
+								return;
+							}
+
+							path = new File(pathString);
+
+							if (pickFolderType.equals(PickFolderType.CU_FOLDER)) {
+								dbH.setCameraFolderExternalSDCard(true);
+								dbH.setUriExternalSDCard(uri.toString());
+							} else if (pickFolderType.equals(PickFolderType.MU_FOLDER)) {
+								dbH.setMediaFolderExternalSdCard(true);
+								dbH.setUriMediaExternalSdCard(uri.toString());
+							}
+
+							finishPickFolder();
+							return;
+						}
+					} else {
+						logWarning("volumePath is null");
+					}
+				} else {
+					logDebug("operator is null");
+				}
+
+				//Primary storage
+				if (isAndroid11OrUpper()) {
+					//This is always true since REQUEST_PICK_CU_FOLDER is only requested in that situation
+					StorageManager storageManager = (StorageManager) getSystemService(Context.STORAGE_SERVICE);
+					File file = storageManager.getPrimaryStorageVolume().getDirectory();
+					String[] split = uri.getPath().split(":");
+
+					if (file != null && split.length == 2) {
+						path = new File(file.getAbsolutePath() + File.separator + split[1]);
+						finishPickFolder();
+					} else {
+						logError("Error getting primary storage path");
+					}
+				}
+			}
+
+			//If resultCode is not Activity.RESULT_OK, means cancelled, so only finish.
+			finish();
+		}
     }
 
 	/**
@@ -1230,7 +1153,6 @@ public class FileStorageActivityLollipop extends PasscodeActivity implements OnC
 			return;
 		}
 
-		changeActionBarElevation(listView.canScrollVertically(SCROLLING_UP_DIRECTION)
-				|| (adapter != null && adapter.isMultipleSelect()));
+		changeActionBarElevation(listView.canScrollVertically(SCROLLING_UP_DIRECTION));
 	}
 }

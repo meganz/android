@@ -1,9 +1,9 @@
 package mega.privacy.android.app.fragments.offline
 
 import android.content.Context
-import androidx.hilt.lifecycle.ViewModelInject
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.core.Single
@@ -19,8 +19,10 @@ import mega.privacy.android.app.utils.OfflineUtils.getThumbnailFile
 import mega.privacy.android.app.utils.RxUtil.logErr
 import mega.privacy.android.app.utils.TimeUtils
 import mega.privacy.android.app.utils.Util.getSizeString
+import javax.inject.Inject
 
-class OfflineFileInfoViewModel @ViewModelInject constructor(
+@HiltViewModel
+class OfflineFileInfoViewModel @Inject constructor(
     @ApplicationContext private val context: Context,
     private val repo: MegaNodeRepo
 ) : BaseRxViewModel() {

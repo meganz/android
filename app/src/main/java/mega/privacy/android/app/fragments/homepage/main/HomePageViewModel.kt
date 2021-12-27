@@ -1,9 +1,12 @@
 package mega.privacy.android.app.fragments.homepage.main
 
 import android.graphics.Bitmap
-import androidx.hilt.lifecycle.ViewModelInject
-import androidx.lifecycle.*
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.jeremyliao.liveeventbus.LiveEventBus
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.listeners.BaseListener
@@ -12,8 +15,10 @@ import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaBanner
 import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaRequest
+import javax.inject.Inject
 
-class HomePageViewModel @ViewModelInject constructor(
+@HiltViewModel
+class HomePageViewModel @Inject constructor(
     private val repository: HomepageRepository
 ) : ViewModel() {
 

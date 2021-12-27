@@ -11,12 +11,8 @@ import mega.privacy.android.app.fragments.BaseFragment
 import mega.privacy.android.app.meeting.activity.MeetingActivity
 import mega.privacy.android.app.meeting.activity.MeetingActivityViewModel
 import mega.privacy.android.app.utils.LogUtil.logDebug
-import mega.privacy.android.app.utils.PermissionUtils
 import mega.privacy.android.app.utils.StringResourcesUtils
-import mega.privacy.android.app.utils.permission.PermissionRequest
-import mega.privacy.android.app.utils.permission.PermissionType
-import mega.privacy.android.app.utils.permission.PermissionsRequester
-import mega.privacy.android.app.utils.permission.permissionsBuilder
+import mega.privacy.android.app.utils.permission.*
 
 /**
  * Base fragment for meeting fragment:
@@ -25,6 +21,7 @@ import mega.privacy.android.app.utils.permission.permissionsBuilder
  * [JoinMeetingAsGuestFragment],
  * [JoinMeetingFragment],
  * [InMeetingFragment],
+ * [MakeModeratorFragment],
  * [RingingMeetingFragment],
  * [IndividualCallFragment],
  * [GridViewCallFragment],
@@ -60,7 +57,7 @@ open class MeetingBaseFragment : BaseFragment() {
         super.onResume()
         // Use A New Instance to Check Permissions
         // Do not share the instance with other permission check process, because the callback functions are different.
-        permissionsBuilder(permissions.toCollection(ArrayList()))
+        permissionsBuilder(permissions)
             .setPermissionRequestType(PermissionType.CheckPermission)
             .setOnRequiresPermission { l ->
                 onCheckRequiresPermission(l)

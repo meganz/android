@@ -3,9 +3,9 @@ package mega.privacy.android.app.meeting.activity
 import android.content.Context
 import android.content.Intent
 import android.graphics.Bitmap
-import androidx.hilt.lifecycle.ViewModelInject
 import androidx.lifecycle.*
 import com.jeremyliao.liveeventbus.LiveEventBus
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.BaseActivity
 import mega.privacy.android.app.MegaApplication
@@ -36,14 +36,15 @@ import mega.privacy.android.app.utils.StringResourcesUtils.getString
 import mega.privacy.android.app.utils.VideoCaptureUtils
 import nz.mega.sdk.*
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
+import javax.inject.Inject
 
 /**
  * It's very common that two or more fragments in Meeting activity need to communicate with each other.
  * These fragments can share a ViewModel using their activity scope to handle this communication.
  * MeetingActivityViewModel shares state of Mic, Camera and Speaker for all Fragments
  */
-
-class MeetingActivityViewModel @ViewModelInject constructor(
+@HiltViewModel
+class MeetingActivityViewModel @Inject constructor(
     private val meetingActivityRepository: MeetingActivityRepository
 ) : ViewModel(), OpenVideoDeviceListener.OnOpenVideoDeviceCallback,
     DisableAudioVideoCallListener.OnDisableAudioVideoCallback {
@@ -104,7 +105,7 @@ class MeetingActivityViewModel @ViewModelInject constructor(
     val meetingLinkLiveData: LiveData<String> = _meetingLinkLiveData
 
     // Show snack bar
-    private val _snackBarLiveData: MutableLiveData<String> = MutableLiveData<String>()
+    private val _snackBarLiveData = MutableLiveData("")
     val snackBarLiveData: LiveData<String> = _snackBarLiveData
 
     private val audioOutputStateObserver =
@@ -544,5 +545,37 @@ class MeetingActivityViewModel @ViewModelInject constructor(
      */
     fun showSnackBar(content: String) {
         _snackBarLiveData.value = content
+    }
+
+    /**
+     * Hide snack bar
+     */
+    fun hideSnackBar(){
+        _snackBarLiveData.value = ""
+    }
+
+    /**
+     * Method for obtaining the bitmap of a participant's avatar
+     *
+     * @param peerId User handle of a participant
+     * @return The bitmap of a participant's avatar
+     */
+    fun getAvatarBitmapByPeerId(peerId: Long): Bitmap? {
+        return meetingActivityRepository.getAvatarBitmapByPeerId(peerId)
+    }
+
+    /**
+     * Give moderator permissions to a call participant.
+     *
+     * @param userHandle User handle of a participant
+     * @param listener MegaChatRequestListenerInterface
+     */
+    fun giveModeratorPermissions(
+        userHandle: Long,
+        listener: MegaChatRequestListenerInterface? = null
+    ) {
+        currentChatId.value?.let {
+            meetingActivityRepository.giveModeratorPermissions(it, userHandle, listener)
+        }
     }
 }

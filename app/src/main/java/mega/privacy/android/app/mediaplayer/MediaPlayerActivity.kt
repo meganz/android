@@ -232,7 +232,8 @@ abstract class MediaPlayerActivity : PasscodeActivity(), SnackbarShower, Activit
         } else if (!Util.isDarkMode(this)) {
             window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS)
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                window.decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR
+                window.decorView.systemUiVisibility = (window.decorView.systemUiVisibility
+                        or View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR)
             }
         }
 
@@ -566,10 +567,10 @@ abstract class MediaPlayerActivity : PasscodeActivity(), SnackbarShower, Activit
                 when (adapterType) {
                     OFFLINE_ADAPTER -> nodeSaver.saveOfflineNode(playingHandle, true)
                     ZIP_ADAPTER -> {
-                        val uri = service.exoPlayer.currentMediaItem?.playbackProperties?.uri
+                        val uri = service.player.currentMediaItem?.localConfiguration?.uri
                             ?: return false
                         val playlistItem =
-                            service.viewModel.getPlaylistItem(service.exoPlayer.currentMediaItem?.mediaId)
+                            service.viewModel.getPlaylistItem(service.player.currentMediaItem?.mediaId)
                                 ?: return false
 
                         nodeSaver.saveUri(uri, playlistItem.nodeName, playlistItem.size, true)
@@ -611,7 +612,7 @@ abstract class MediaPlayerActivity : PasscodeActivity(), SnackbarShower, Activit
             R.id.properties -> {
                 if (isAudioPlayer()) {
                     val uri =
-                        service.exoPlayer.currentMediaItem?.playbackProperties?.uri ?: return true
+                        service.player.currentMediaItem?.localConfiguration?.uri ?: return true
                     navController.navigate(
                         MediaPlayerFragmentDirections.actionPlayerToTrackInfo(
                             adapterType, adapterType == INCOMING_SHARES_ADAPTER, playingHandle, uri
@@ -670,9 +671,9 @@ abstract class MediaPlayerActivity : PasscodeActivity(), SnackbarShower, Activit
                 when (adapterType) {
                     OFFLINE_ADAPTER, ZIP_ADAPTER -> {
                         val nodeName =
-                            service.viewModel.getPlaylistItem(service.exoPlayer.currentMediaItem?.mediaId)?.nodeName
+                            service.viewModel.getPlaylistItem(service.player.currentMediaItem?.mediaId)?.nodeName
                                 ?: return false
-                        val uri = service.exoPlayer.currentMediaItem?.playbackProperties?.uri
+                        val uri = service.player.currentMediaItem?.localConfiguration?.uri
                             ?: return false
 
                         shareUri(this, nodeName, uri)

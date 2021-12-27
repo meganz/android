@@ -4,25 +4,28 @@ import android.content.Context
 import android.text.Spanned
 import androidx.core.content.ContextCompat
 import androidx.core.text.HtmlCompat
-import androidx.hilt.lifecycle.ViewModelInject
-import mega.privacy.android.app.*
+import dagger.hilt.android.lifecycle.HiltViewModel
+import mega.privacy.android.app.MegaApplication
+import mega.privacy.android.app.Product
+import mega.privacy.android.app.R
 import mega.privacy.android.app.arch.BaseRxViewModel
-import mega.privacy.android.app.di.MegaApi
 import mega.privacy.android.app.globalmanagement.MyAccountInfo
 import mega.privacy.android.app.utils.ColorUtils.getColorHexString
 import mega.privacy.android.app.utils.Constants.*
 import mega.privacy.android.app.utils.DBUtil.callToPaymentMethods
 import mega.privacy.android.app.utils.DBUtil.callToPricing
-import mega.privacy.android.app.utils.LogUtil.*
+import mega.privacy.android.app.utils.LogUtil.logDebug
+import mega.privacy.android.app.utils.LogUtil.logError
 import mega.privacy.android.app.utils.StringResourcesUtils.getString
 import mega.privacy.android.app.utils.Util.getSizeStringGBBased
 import mega.privacy.android.app.utils.billing.PaymentUtils.getSku
 import mega.privacy.android.app.utils.billing.PaymentUtils.getSkuDetails
-import nz.mega.sdk.MegaApiAndroid
 import java.text.NumberFormat
 import java.util.*
+import javax.inject.Inject
 
-class ChooseUpgradeAccountViewModel @ViewModelInject constructor(
+@HiltViewModel
+class ChooseUpgradeAccountViewModel @Inject constructor(
     private val myAccountInfo: MyAccountInfo
 ) : BaseRxViewModel(){
 
