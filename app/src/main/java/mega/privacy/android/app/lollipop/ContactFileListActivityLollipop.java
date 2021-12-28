@@ -22,7 +22,6 @@ import androidx.appcompat.widget.Toolbar;
 import android.util.DisplayMetrics;
 import android.view.Display;
 import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
@@ -71,7 +70,6 @@ import nz.mega.sdk.MegaGlobalListenerInterface;
 import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
-import nz.mega.sdk.MegaShare;
 import nz.mega.sdk.MegaUser;
 import nz.mega.sdk.MegaUserAlert;
 
@@ -545,7 +543,7 @@ public class ContactFileListActivityLollipop extends PasscodeActivity
 		AlertDialogUtil.dismissAlertDialogIfExists(statusDialog);
 		actionConfirmed();
 
-		if (result.isSingleAction() && result.getAllSuccess() &&  parentHandle == handle) {
+		if (result.isSingleAction() && result.isSuccess() &&  parentHandle == handle) {
 			onBackPressed();
 			setTitleActionBar(megaApi.getNodeByHandle(parentHandle).getName());
 		}

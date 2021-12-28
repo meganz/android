@@ -56,7 +56,7 @@ class RemoveNodeUseCase @Inject constructor(
                                     } else {
                                         getString(R.string.context_no_removed)
                                     },
-                                    allSuccess = false
+                                    isSuccess = false
                                 )
                             }
                             errors == 0 -> {
@@ -76,7 +76,7 @@ class RemoveNodeUseCase @Inject constructor(
 
                                 RemoveRequestResult(
                                     resultText = result,
-                                    allSuccess = false
+                                    isSuccess = false
                                 )
                             }
                         }

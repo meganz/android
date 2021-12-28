@@ -6303,7 +6303,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 				.observeOn(AndroidSchedulers.mainThread())
 				.subscribe((result, throwable) -> {
 					if (throwable == null) {
-						boolean notValidView = result.isSingleAction() && result.getAllSuccess()
+						boolean notValidView = result.isSingleAction() && result.isSuccess()
 								&& parentHandleRubbish == nodes.get(0).getHandle();
 
 						showRestorionOrRemovalResult(notValidView, result.isForeignNode(),
@@ -6448,7 +6448,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 									.subscribe((result, throwable) -> {
 										if (throwable == null) {
 											boolean notValidView = result.isSingleAction()
-													&& result.getAllSuccess()
+													&& result.isSuccess()
 													&& parentHandleRubbish == handleList.get(0);
 
 											showRestorionOrRemovalResult(notValidView, false,
@@ -6475,7 +6475,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 	 * @param handle Handle of the node to mode.
 	 */
 	private void showMovementResult(MoveRequestResult result, long handle) {
-		if (result.isSingleAction() && result.getAllSuccess() && getCurrentParentHandle() == handle) {
+		if (result.isSingleAction() && result.isSuccess() && getCurrentParentHandle() == handle) {
 			switch (drawerItem) {
 				case CLOUD_DRIVE:
 					parentHandleBrowser = result.getOldParentHandle();

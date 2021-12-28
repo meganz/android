@@ -5,10 +5,10 @@ package mega.privacy.android.app.usecase.data
  *
  * @property isSingleAction True if the removal is only of a node, false otherwise.
  * @property resultText     Text to show as result of the request, null if should not show anything.
- * @property allSuccess     True if all requests finished with success, false otherwise.
+ * @property isSuccess      True if all requests finished with success, false otherwise.
  */
 data class RemoveRequestResult(
     val isSingleAction: Boolean = false,
     val resultText: String? = null,
-    val allSuccess: Boolean = true
+    val isSuccess: Boolean = true
 )

@@ -27,7 +27,7 @@ class GetNodeUseCase @Inject constructor(
             val node = megaApi.getNodeByHandle(handle)
 
             if (node == null) {
-                emitter.onError("Node is null".toThrowable())
+                emitter.onError(NullPointerException("Node is null"))
             } else {
                 emitter.onSuccess(node)
             }

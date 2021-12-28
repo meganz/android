@@ -5,11 +5,11 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.di.MegaApi
 import mega.privacy.android.app.listeners.OptionalMegaRequestListenerInterface
 import mega.privacy.android.app.usecase.data.MoveRequestResult
-import mega.privacy.android.app.utils.Constants.INVALID_VALUE
 import mega.privacy.android.app.utils.DBUtil
 import mega.privacy.android.app.utils.StringResourcesUtils.getQuantityString
 import mega.privacy.android.app.utils.StringResourcesUtils.getString
 import nz.mega.sdk.MegaApiAndroid
+import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 import nz.mega.sdk.MegaError.API_EOVERQUOTA
 import nz.mega.sdk.MegaError.API_OK
 import nz.mega.sdk.MegaNode
@@ -36,9 +36,12 @@ class MoveNodeUseCase @Inject constructor(
             val count = handles.size
             var pending = count
             var success = 0
+            val parentNode = megaApi.getNodeByHandle(newParentHandle)
             val oldParentHandle = if (count == 1) {
                 megaApi.getNodeByHandle(handles[0]).parentHandle
-            } else INVALID_VALUE.toLong()
+            } else {
+                INVALID_HANDLE
+            }
 
             val listener =
                 OptionalMegaRequestListenerInterface(onRequestFinish = { request, error ->
@@ -55,7 +58,7 @@ class MoveNodeUseCase @Inject constructor(
 
                         val result = when {
                             foreignNode -> {
-                                MoveRequestResult(allSuccess = false, isForeignNode = true)
+                                MoveRequestResult(isSuccess = false, isForeignNode = true)
                             }
                             count == 1 && success == 1 -> {
                                 MoveRequestResult(
@@ -68,7 +71,7 @@ class MoveNodeUseCase @Inject constructor(
                                 MoveRequestResult(
                                     isSingleAction = true,
                                     resultText = getString(R.string.context_no_moved),
-                                    allSuccess = false
+                                    isSuccess = false
                                 )
                             }
                             errors == 0 -> {
@@ -82,7 +85,7 @@ class MoveNodeUseCase @Inject constructor(
 
                                 MoveRequestResult(
                                     resultText = result,
-                                    allSuccess = false
+                                    isSuccess = false
                                 )
                             }
                         }
@@ -100,7 +103,7 @@ class MoveNodeUseCase @Inject constructor(
                     continue
                 }
 
-                megaApi.moveNode(node, megaApi.getNodeByHandle(newParentHandle), listener)
+                megaApi.moveNode(node, parentNode, listener)
             }
         }
 
@@ -115,9 +118,12 @@ class MoveNodeUseCase @Inject constructor(
             val count = handles.size
             var pending = count
             var success = 0
+            val rubbishNode = megaApi.rubbishNode
             val oldParentHandle = if (count == 1) {
                 megaApi.getNodeByHandle(handles[0]).parentHandle
-            } else INVALID_VALUE.toLong()
+            } else {
+                INVALID_HANDLE
+            }
 
             val listener =
                 OptionalMegaRequestListenerInterface(onRequestFinish = { request, error ->
@@ -134,7 +140,7 @@ class MoveNodeUseCase @Inject constructor(
 
                         val result = when {
                             foreignNode -> {
-                                MoveRequestResult(allSuccess = false, isForeignNode = true)
+                                MoveRequestResult(isSuccess = false, isForeignNode = true)
                             }
                             count == 1 && success == 1 -> {
                                 DBUtil.resetAccountDetailsTimeStamp()
@@ -148,7 +154,7 @@ class MoveNodeUseCase @Inject constructor(
                                 MoveRequestResult(
                                     isSingleAction = true,
                                     resultText = getString(R.string.context_no_moved),
-                                    allSuccess = false
+                                    isSuccess = false
                                 )
                             }
                             errors == 0 -> {
@@ -168,7 +174,7 @@ class MoveNodeUseCase @Inject constructor(
                                         errors,
                                         errors
                                     ),
-                                    allSuccess = false
+                                    isSuccess = false
                                 )
                             }
                             errors == 1 && success == 1 -> {
@@ -176,7 +182,7 @@ class MoveNodeUseCase @Inject constructor(
                                 MoveRequestResult(
                                     resultText =
                                     getString(R.string.node_correctly_and_node_incorrectly_moved_to_rubbish),
-                                    allSuccess = false
+                                    isSuccess = false
                                 )
                             }
                             errors == 1 -> {
@@ -186,7 +192,7 @@ class MoveNodeUseCase @Inject constructor(
                                         R.string.nodes_correctly_and_node_incorrectly_moved_to_rubbish,
                                         success
                                     ),
-                                    allSuccess = false
+                                    isSuccess = false
                                 )
                             }
                             success == 1 -> {
@@ -196,7 +202,7 @@ class MoveNodeUseCase @Inject constructor(
                                         R.string.node_correctly_and_nodes_incorrectly_moved_to_rubbish,
                                         errors
                                     ),
-                                    allSuccess = false
+                                    isSuccess = false
                                 )
                             }
                             else -> {
@@ -207,7 +213,7 @@ class MoveNodeUseCase @Inject constructor(
                                         success,
                                         errors
                                     ),
-                                    allSuccess = false
+                                    isSuccess = false
                                 )
                             }
                         }
@@ -224,7 +230,7 @@ class MoveNodeUseCase @Inject constructor(
                     continue
                 }
 
-                megaApi.moveNode(node, megaApi.rubbishNode, listener)
+                megaApi.moveNode(node, rubbishNode, listener)
             }
         }
 
@@ -254,7 +260,7 @@ class MoveNodeUseCase @Inject constructor(
 
                         val result = when {
                             foreignNode -> {
-                                MoveRequestResult(allSuccess = false, isForeignNode = true)
+                                MoveRequestResult(isSuccess = false, isForeignNode = true)
                             }
                             count == 1 && success == 1 -> {
                                 DBUtil.resetAccountDetailsTimeStamp()
@@ -271,7 +277,7 @@ class MoveNodeUseCase @Inject constructor(
                                 MoveRequestResult(
                                     isSingleAction = true,
                                     resultText = getString(R.string.context_no_restored),
-                                    allSuccess = false
+                                    isSuccess = false
                                 )
                             }
 
@@ -292,7 +298,7 @@ class MoveNodeUseCase @Inject constructor(
                                         errors,
                                         errors
                                     ),
-                                    allSuccess = false
+                                    isSuccess = false
                                 )
 
                             }
@@ -301,7 +307,7 @@ class MoveNodeUseCase @Inject constructor(
                                 MoveRequestResult(
                                     resultText =
                                     getString(R.string.node_correctly_and_node_incorrectly_restored_from_rubbish),
-                                    allSuccess = false
+                                    isSuccess = false
                                 )
                             }
                             errors == 1 -> {
@@ -311,7 +317,7 @@ class MoveNodeUseCase @Inject constructor(
                                         R.string.nodes_correctly_and_node_incorrectly_restored_from_rubbish,
                                         success
                                     ),
-                                    allSuccess = false
+                                    isSuccess = false
                                 )
                             }
                             success == 1 -> {
@@ -321,7 +327,7 @@ class MoveNodeUseCase @Inject constructor(
                                         R.string.node_correctly_and_nodes_incorrectly_restored_from_rubbish,
                                         errors
                                     ),
-                                    allSuccess = false
+                                    isSuccess = false
                                 )
                             }
                             else -> {
@@ -332,7 +338,7 @@ class MoveNodeUseCase @Inject constructor(
                                         success,
                                         errors
                                     ),
-                                    allSuccess = false
+                                    isSuccess = false
                                 )
                             }
                         }
