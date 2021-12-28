@@ -1,20 +1,190 @@
 package mega.privacy.android.app.usecase.data
 
-import mega.privacy.android.app.utils.Constants.INVALID_VALUE
+import mega.privacy.android.app.R
+import mega.privacy.android.app.utils.DBUtil
+import mega.privacy.android.app.utils.StringResourcesUtils.getQuantityString
+import mega.privacy.android.app.utils.StringResourcesUtils.getString
+import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
+import nz.mega.sdk.MegaNode
 
 /**
- * Data class containing all the info related to a movement request.
+ * Sealed class containing all the info related to a movement request.
+ * The class can be a [GeneralMovement], [RubbishMovement] or [Restoration]
  *
- * @property isSingleAction     True if the movement is only of a node, false otherwise.
+ * @property count              Number of requests.
+ * @property errorCount         Number of requests which finished with an error.
  * @property oldParentHandle    Handle of the old parent.
- * @property resultText         Text to show as result of the request, null if should not show anything.
  * @property isForeignNode      True if should show a foreign storage over quota warning, false otherwise.
- * @property isSuccess          True if all requests finished with success, false otherwise.
  */
-data class MoveRequestResult(
-    val isSingleAction: Boolean = false,
-    val oldParentHandle: Long = INVALID_VALUE.toLong(),
-    val resultText: String? = null,
-    val isSuccess: Boolean = true,
-    val isForeignNode: Boolean = false
-)
+sealed class MoveRequestResult(
+    val count: Int,
+    val errorCount: Int,
+    val oldParentHandle: Long? = INVALID_HANDLE,
+    val isForeignNode: Boolean
+) {
+
+    val successCount = count - errorCount
+    val isSingleAction: Boolean = count == 1
+    val isSuccess: Boolean = errorCount == 0
+
+    abstract fun getResultText(): String?
+
+    /**
+     * Result of a movement request from one location to another one.
+     */
+    class GeneralMovement(
+        count: Int,
+        errorCount: Int,
+        oldParentHandle: Long?,
+        isForeignNode: Boolean
+    ) : MoveRequestResult(
+        count = count,
+        errorCount = errorCount,
+        oldParentHandle = oldParentHandle,
+        isForeignNode = isForeignNode
+    ) {
+        init {
+            DBUtil.resetAccountDetailsTimeStamp()
+        }
+
+        override fun getResultText(): String? =
+            when {
+                count == 1 && isSuccess -> getString(R.string.context_correctly_moved)
+                count == 1 -> getString(R.string.context_no_moved)
+                isSuccess -> getString(R.string.number_correctly_moved)
+                else -> getString(
+                    R.string.number_correctly_moved,
+                    count - errorCount
+                ) + getString(R.string.number_incorrectly_moved, errorCount)
+            }
+    }
+
+    /**
+     * Result of a movement to the Rubbish Bin.
+     */
+    class RubbishMovement constructor(
+        count: Int,
+        errorCount: Int,
+        oldParentHandle: Long?
+    ) : MoveRequestResult(
+        count = count,
+        errorCount = errorCount,
+        oldParentHandle = oldParentHandle,
+        isForeignNode = false
+    ) {
+        override fun getResultText(): String? =
+            when {
+                count == 1 && isSuccess -> {
+                    DBUtil.resetAccountDetailsTimeStamp()
+                    getString(R.string.context_correctly_moved_to_rubbish)
+                }
+                count == 1 -> {
+                    getString(R.string.context_no_moved)
+                }
+                isSuccess -> {
+                    DBUtil.resetAccountDetailsTimeStamp()
+                    getQuantityString(R.plurals.number_correctly_moved_to_rubbish, count, count)
+                }
+                count == errorCount -> {
+                    getQuantityString(
+                        R.plurals.number_incorrectly_moved_to_rubbish,
+                        errorCount,
+                        errorCount
+                    )
+                }
+                errorCount == 1 && successCount == 1 -> {
+                    DBUtil.resetAccountDetailsTimeStamp()
+                    getString(R.string.node_correctly_and_node_incorrectly_moved_to_rubbish)
+                }
+                errorCount == 1 -> {
+                    DBUtil.resetAccountDetailsTimeStamp()
+                    getString(
+                        R.string.nodes_correctly_and_node_incorrectly_moved_to_rubbish,
+                        successCount
+                    )
+                }
+                successCount == 1 -> {
+                    getString(
+                        R.string.node_correctly_and_nodes_incorrectly_moved_to_rubbish,
+                        errorCount
+                    )
+                }
+                else -> {
+                    getString(
+                        R.string.nodes_correctly_and_nodes_incorrectly_moved_to_rubbish,
+                        successCount,
+                        errorCount
+                    )
+                }
+            }
+    }
+
+    /**
+     * Result of a movement from the Rubbish Bin to the original location.
+     */
+    class Restoration(
+        count: Int,
+        errorCount: Int,
+        isForeignNode: Boolean,
+        val destination: MegaNode?
+    ) : MoveRequestResult(
+        count = count,
+        errorCount = errorCount,
+        isForeignNode = isForeignNode
+    ) {
+        override fun getResultText(): String? =
+            when {
+                count == 1 && isSuccess -> {
+                    DBUtil.resetAccountDetailsTimeStamp()
+
+                    if (destination != null) {
+                        getString(R.string.context_correctly_node_restored, destination.name)
+                    } else {
+                        getString(R.string.context_correctly_moved)
+                    }
+                }
+                count == 1 -> {
+                    getString(R.string.context_no_restored)
+                }
+                isSuccess -> {
+                    DBUtil.resetAccountDetailsTimeStamp()
+                    getQuantityString(
+                        R.plurals.number_correctly_restored_from_rubbish,
+                        count,
+                        count
+                    )
+                }
+                count == errorCount -> {
+                    getQuantityString(
+                        R.plurals.number_incorrectly_restored_from_rubbish,
+                        errorCount,
+                        errorCount
+                    )
+                }
+                errorCount == 1 && successCount == 1 -> {
+                    DBUtil.resetAccountDetailsTimeStamp()
+                    getString(R.string.node_correctly_and_node_incorrectly_restored_from_rubbish)
+                }
+                errorCount == 1 -> {
+                    DBUtil.resetAccountDetailsTimeStamp()
+                    getString(
+                        R.string.nodes_correctly_and_node_incorrectly_restored_from_rubbish,
+                        successCount
+                    )
+                }
+                successCount == 1 -> {
+                    getString(
+                        R.string.node_correctly_and_nodes_incorrectly_restored_from_rubbish,
+                        errorCount
+                    )
+                }
+                else -> {
+                    getString(
+                        R.string.nodes_correctly_and_nodes_incorrectly_restored_from_rubbish,
+                        successCount,
+                        errorCount
+                    )
+                }
+            }
+    }
+}

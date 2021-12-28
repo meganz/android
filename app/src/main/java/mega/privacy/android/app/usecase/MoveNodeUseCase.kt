@@ -1,18 +1,17 @@
 package mega.privacy.android.app.usecase
 
+import io.reactivex.rxjava3.core.Completable
 import io.reactivex.rxjava3.core.Single
-import mega.privacy.android.app.R
+import io.reactivex.rxjava3.kotlin.blockingSubscribeBy
 import mega.privacy.android.app.di.MegaApi
 import mega.privacy.android.app.listeners.OptionalMegaRequestListenerInterface
 import mega.privacy.android.app.usecase.data.MoveRequestResult
-import mega.privacy.android.app.utils.DBUtil
-import mega.privacy.android.app.utils.StringResourcesUtils.getQuantityString
-import mega.privacy.android.app.utils.StringResourcesUtils.getString
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 import nz.mega.sdk.MegaError.API_EOVERQUOTA
 import nz.mega.sdk.MegaError.API_OK
 import nz.mega.sdk.MegaNode
+import java.lang.IllegalArgumentException
 import javax.inject.Inject
 
 /**
@@ -25,6 +24,28 @@ class MoveNodeUseCase @Inject constructor(
 ) {
 
     /**
+     * Moves a node to other location.
+     *
+     * @param node          The MegaNoe to move.
+     * @param parentNode    The parent MegaNode where the node has to be moved.
+     * @return Completable.
+     */
+    fun move(node: MegaNode, parentNode: MegaNode): Completable =
+        Completable.create { emitter ->
+            megaApi.moveNode(
+                node,
+                parentNode,
+                OptionalMegaRequestListenerInterface(onRequestFinish = { _, error ->
+                    if (error.errorCode == API_OK) {
+                        emitter.onComplete()
+                    } else {
+                        emitter.onError(MegaException(error.errorCode, error.errorString))
+                    }
+                })
+            )
+        }
+
+    /**
      * Moves nodes to a new location.
      *
      * @param handles           List of MegaNode handles to move.
@@ -33,78 +54,44 @@ class MoveNodeUseCase @Inject constructor(
      */
     fun move(handles: LongArray, newParentHandle: Long): Single<MoveRequestResult> =
         Single.create { emitter ->
-            val count = handles.size
-            var pending = count
-            var success = 0
             val parentNode = megaApi.getNodeByHandle(newParentHandle)
-            val oldParentHandle = if (count == 1) {
+
+            if (parentNode == null) {
+                emitter.onError(IllegalArgumentException("New parent node is not valid"))
+            }
+
+            var errorCount = 0
+            var isForeignNode = false
+            val oldParentHandle = if (handles.size == 1) {
                 megaApi.getNodeByHandle(handles[0]).parentHandle
             } else {
                 INVALID_HANDLE
             }
 
-            val listener =
-                OptionalMegaRequestListenerInterface(onRequestFinish = { request, error ->
-                    pending--
-
-                    if (error.errorCode == API_OK) {
-                        success++
-                    }
-
-                    if (pending == 0) {
-                        val errors = count - success
-                        val foreignNode =
-                            error.errorCode == API_EOVERQUOTA && megaApi.isForeignNode(request.parentHandle)
-
-                        val result = when {
-                            foreignNode -> {
-                                MoveRequestResult(isSuccess = false, isForeignNode = true)
-                            }
-                            count == 1 && success == 1 -> {
-                                MoveRequestResult(
-                                    isSingleAction = true,
-                                    oldParentHandle = oldParentHandle,
-                                    resultText = getString(R.string.context_correctly_moved)
-                                )
-                            }
-                            count == 1 && errors == 1 -> {
-                                MoveRequestResult(
-                                    isSingleAction = true,
-                                    resultText = getString(R.string.context_no_moved),
-                                    isSuccess = false
-                                )
-                            }
-                            errors == 0 -> {
-                                MoveRequestResult(
-                                    resultText = getString(R.string.number_correctly_moved)
-                                )
-                            }
-                            else -> {
-                                val result = getString(R.string.number_correctly_moved, success) +
-                                        getString(R.string.number_incorrectly_moved, error)
-
-                                MoveRequestResult(
-                                    resultText = result,
-                                    isSuccess = false
-                                )
-                            }
-                        }
-
-                        DBUtil.resetAccountDetailsTimeStamp()
-                        emitter.onSuccess(result)
-                    }
-                })
-
-            for (handle in handles) {
+            handles.forEach { handle ->
                 val node = megaApi.getNodeByHandle(handle)
 
                 if (node == null) {
-                    pending--
-                    continue
-                }
+                    errorCount++
+                } else {
+                    move(node, parentNode).blockingSubscribeBy(onError = { error ->
+                        errorCount++
 
-                megaApi.moveNode(node, parentNode, listener)
+                        if (error is MegaException && error.errorCode == API_EOVERQUOTA) {
+                            isForeignNode = megaApi.isForeignNode(parentNode.handle)
+                        }
+                    })
+                }
             }
+
+            emitter.onSuccess(
+                MoveRequestResult.GeneralMovement(
+                    handles.size,
+                    errorCount,
+                    oldParentHandle,
+                    isForeignNode
+                )
+            )
         }
 
     /**
@@ -115,123 +102,33 @@ class MoveNodeUseCase @Inject constructor(
      */
     fun moveToRubbishBin(handles: List<Long>): Single<MoveRequestResult> =
         Single.create { emitter ->
-            val count = handles.size
-            var pending = count
-            var success = 0
+            var errorCount = 0
             val rubbishNode = megaApi.rubbishNode
-            val oldParentHandle = if (count == 1) {
+            val oldParentHandle = if (handles.size == 1) {
                 megaApi.getNodeByHandle(handles[0]).parentHandle
             } else {
                 INVALID_HANDLE
             }
 
-            val listener =
-                OptionalMegaRequestListenerInterface(onRequestFinish = { request, error ->
-                    pending--
-
-                    if (error.errorCode == API_OK) {
-                        success++
-                    }
-
-                    if (pending == 0) {
-                        val errors = count - success
-                        val foreignNode =
-                            error.errorCode == API_EOVERQUOTA && megaApi.isForeignNode(request.parentHandle)
-
-                        val result = when {
-                            foreignNode -> {
-                                MoveRequestResult(isSuccess = false, isForeignNode = true)
-                            }
-                            count == 1 && success == 1 -> {
-                                DBUtil.resetAccountDetailsTimeStamp()
-                                MoveRequestResult(
-                                    isSingleAction = true,
-                                    oldParentHandle = oldParentHandle,
-                                    resultText = getString(R.string.context_correctly_moved_to_rubbish)
-                                )
-                            }
-                            count == 1 && errors == 1 -> {
-                                MoveRequestResult(
-                                    isSingleAction = true,
-                                    resultText = getString(R.string.context_no_moved),
-                                    isSuccess = false
-                                )
-                            }
-                            errors == 0 -> {
-                                DBUtil.resetAccountDetailsTimeStamp()
-                                MoveRequestResult(
-                                    resultText = getQuantityString(
-                                        R.plurals.number_correctly_moved_to_rubbish,
-                                        success,
-                                        success
-                                    )
-                                )
-                            }
-                            success == 0 -> {
-                                MoveRequestResult(
-                                    resultText = getQuantityString(
-                                        R.plurals.number_incorrectly_moved_to_rubbish,
-                                        errors,
-                                        errors
-                                    ),
-                                    isSuccess = false
-                                )
-                            }
-                            errors == 1 && success == 1 -> {
-                                DBUtil.resetAccountDetailsTimeStamp()
-                                MoveRequestResult(
-                                    resultText =
-                                    getString(R.string.node_correctly_and_node_incorrectly_moved_to_rubbish),
-                                    isSuccess = false
-                                )
-                            }
-                            errors == 1 -> {
-                                DBUtil.resetAccountDetailsTimeStamp()
-                                MoveRequestResult(
-                                    resultText = getString(
-                                        R.string.nodes_correctly_and_node_incorrectly_moved_to_rubbish,
-                                        success
-                                    ),
-                                    isSuccess = false
-                                )
-                            }
-                            success == 1 -> {
-                                DBUtil.resetAccountDetailsTimeStamp()
-                                MoveRequestResult(
-                                    resultText = getString(
-                                        R.string.node_correctly_and_nodes_incorrectly_moved_to_rubbish,
-                                        errors
-                                    ),
-                                    isSuccess = false
-                                )
-                            }
-                            else -> {
-                                DBUtil.resetAccountDetailsTimeStamp()
-                                MoveRequestResult(
-                                    resultText = getString(
-                                        R.string.nodes_correctly_and_nodes_incorrectly_moved_to_rubbish,
-                                        success,
-                                        errors
-                                    ),
-                                    isSuccess = false
-                                )
-                            }
-                        }
-
-                        emitter.onSuccess(result)
-                    }
-                })
-
-            for (handle in handles) {
+            handles.forEach { handle ->
                 val node = megaApi.getNodeByHandle(handle)
 
                 if (node == null) {
-                    pending--
-                    continue
+                    errorCount++
+                } else {
+                    move(node, rubbishNode).blockingSubscribeBy(onError = {
+                        errorCount++
+                    })
                 }
-
-                megaApi.moveNode(node, rubbishNode, listener)
             }
+
+            emitter.onSuccess(
+                MoveRequestResult.RubbishMovement(
+                    handles.size,
+                    errorCount,
+                    oldParentHandle
+                )
+            )
         }
 
     /**
@@ -242,120 +139,37 @@ class MoveNodeUseCase @Inject constructor(
      */
     fun restore(nodes: List<MegaNode>): Single<MoveRequestResult> =
         Single.create { emitter ->
-            val count = nodes.size
-            var pending = count
-            var success = 0
-            val listener =
-                OptionalMegaRequestListenerInterface(onRequestFinish = { request, error ->
-                    pending--
+            var errorCount = 0
+            var isForeignNode = false
+            val destination: MegaNode? = if (nodes.size == 1) {
+                megaApi.getNodeByHandle(nodes[0].restoreHandle)
+            } else {
+                null
+            }
 
-                    if (error.errorCode == API_OK) {
-                        success++
-                    }
-
-                    if (pending == 0) {
-                        val errors = count - success
-                        val foreignNode =
-                            error.errorCode == API_EOVERQUOTA && megaApi.isForeignNode(request.parentHandle)
-
-                        val result = when {
-                            foreignNode -> {
-                                MoveRequestResult(isSuccess = false, isForeignNode = true)
-                            }
-                            count == 1 && success == 1 -> {
-                                DBUtil.resetAccountDetailsTimeStamp()
-                                val destination = megaApi.getNodeByHandle(request.parentHandle)
-                                MoveRequestResult(
-                                    isSingleAction = true,
-                                    resultText = getString(
-                                        R.string.context_correctly_node_restored,
-                                        destination.name
-                                    )
-                                )
-                            }
-                            count == 1 && errors == 1 -> {
-                                MoveRequestResult(
-                                    isSingleAction = true,
-                                    resultText = getString(R.string.context_no_restored),
-                                    isSuccess = false
-                                )
-                            }
-
-                            errors == 0 -> {
-                                DBUtil.resetAccountDetailsTimeStamp()
-                                MoveRequestResult(
-                                    resultText = getQuantityString(
-                                        R.plurals.number_correctly_restored_from_rubbish,
-                                        success,
-                                        success
-                                    )
-                                )
-                            }
-                            success == 0 -> {
-                                MoveRequestResult(
-                                    resultText = getQuantityString(
-                                        R.plurals.number_incorrectly_restored_from_rubbish,
-                                        errors,
-                                        errors
-                                    ),
-                                    isSuccess = false
-                                )
-
-                            }
-                            errors == 1 && success == 1 -> {
-                                DBUtil.resetAccountDetailsTimeStamp()
-                                MoveRequestResult(
-                                    resultText =
-                                    getString(R.string.node_correctly_and_node_incorrectly_restored_from_rubbish),
-                                    isSuccess = false
-                                )
-                            }
-                            errors == 1 -> {
-                                DBUtil.resetAccountDetailsTimeStamp()
-                                MoveRequestResult(
-                                    resultText = getString(
-                                        R.string.nodes_correctly_and_node_incorrectly_restored_from_rubbish,
-                                        success
-                                    ),
-                                    isSuccess = false
-                                )
-                            }
-                            success == 1 -> {
-                                DBUtil.resetAccountDetailsTimeStamp()
-                                MoveRequestResult(
-                                    resultText = getString(
-                                        R.string.node_correctly_and_nodes_incorrectly_restored_from_rubbish,
-                                        errors
-                                    ),
-                                    isSuccess = false
-                                )
-                            }
-                            else -> {
-                                DBUtil.resetAccountDetailsTimeStamp()
-                                MoveRequestResult(
-                                    resultText = getString(
-                                        R.string.nodes_correctly_and_nodes_incorrectly_restored_from_rubbish,
-                                        success,
-                                        errors
-                                    ),
-                                    isSuccess = false
-                                )
-                            }
-                        }
-
-                        emitter.onSuccess(result)
-                    }
-                })
-
-            for (node in nodes) {
+            nodes.forEach { node ->
                 val parent = megaApi.getNodeByHandle(node.restoreHandle)
 
                 if (parent == null) {
-                    pending--
-                    continue
-                }
+                    errorCount++
+                } else {
+                    move(node, parent).blockingSubscribeBy(onError = { error ->
+                        errorCount++
 
-                megaApi.moveNode(node, parent, listener)
+                        if (error is MegaException && error.errorCode == API_EOVERQUOTA) {
+                            isForeignNode = megaApi.isForeignNode(node.restoreHandle)
+                        }
+                    })
+                }
             }
+
+            emitter.onSuccess(
+                MoveRequestResult.Restoration(
+                    nodes.size,
+                    errorCount,
+                    isForeignNode,
+                    destination
+                )
+            )
         }
 }
