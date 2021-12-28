@@ -6734,21 +6734,16 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 		clearRubbishBinDialog.show();
 	}
 
-	public void chooseAddContactDialog(boolean isMegaContact) {
+	public void chooseAddContactDialog() {
 		logDebug("chooseAddContactDialog");
-		if (isMegaContact) {
-			if (megaApi != null && megaApi.getRootNode() != null) {
-				Intent intent = new Intent(this, AddContactActivityLollipop.class);
-				intent.putExtra("contactType", CONTACT_TYPE_MEGA);
-				startActivityForResult(intent, REQUEST_CREATE_CHAT);
-			}
-			else{
-				logWarning("Online but not megaApi");
-				showSnackbar(SNACKBAR_TYPE, getString(R.string.error_server_connection_problem), -1);
-			}
+		if (megaApi != null && megaApi.getRootNode() != null) {
+			Intent intent = new Intent(this, AddContactActivityLollipop.class);
+			intent.putExtra("contactType", CONTACT_TYPE_MEGA);
+			startActivityForResult(intent, REQUEST_CREATE_CHAT);
 		}
 		else{
-			addContactFromPhone();
+			logWarning("Online but not megaApi");
+			showSnackbar(SNACKBAR_TYPE, getString(R.string.error_server_connection_problem), MEGACHAT_INVALID_HANDLE);
 		}
 	}
 
@@ -6778,12 +6773,12 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 
 		fabMaskLayout.findViewById(R.id.fab_chat).setOnClickListener(l -> {
 			fabMainClickCallback();
-			handler.postDelayed(() -> chooseAddContactDialog(true), FAB_MASK_OUT_DELAY);
+			handler.postDelayed(() -> chooseAddContactDialog(), FAB_MASK_OUT_DELAY);
 		});
 
 		fabMaskLayout.findViewById(R.id.text_chat).setOnClickListener(l -> {
 			fabMainClickCallback();
-			handler.postDelayed(() -> chooseAddContactDialog(true), FAB_MASK_OUT_DELAY);
+			handler.postDelayed(() -> chooseAddContactDialog(), FAB_MASK_OUT_DELAY);
 		});
 
 		fabMaskLayout.findViewById(R.id.fab_meeting).setOnClickListener(l -> {
@@ -6921,12 +6916,6 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 		} else {
 			openMeetingToCreate(this);
 		}
-	}
-
-	public void addContactFromPhone() {
-		Intent in = new Intent(this, InviteContactActivity.class);
-		in.putExtra("contactType", CONTACT_TYPE_DEVICE);
-		startActivityForResult(in, REQUEST_INVITE_CONTACT_FROM_DEVICE);
 	}
 
 	public void showConfirmationRemoveAllSharingContacts(final List<MegaNode> shares) {
