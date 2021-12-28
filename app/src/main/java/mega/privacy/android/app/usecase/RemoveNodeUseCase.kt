@@ -1,15 +1,14 @@
 package mega.privacy.android.app.usecase
 
+import io.reactivex.rxjava3.core.Completable
 import io.reactivex.rxjava3.core.Single
-import mega.privacy.android.app.R
+import io.reactivex.rxjava3.kotlin.blockingSubscribeBy
 import mega.privacy.android.app.di.MegaApi
 import mega.privacy.android.app.listeners.OptionalMegaRequestListenerInterface
 import mega.privacy.android.app.usecase.data.RemoveRequestResult
-import mega.privacy.android.app.utils.DBUtil
-import mega.privacy.android.app.utils.StringResourcesUtils.*
 import nz.mega.sdk.MegaApiAndroid
-import nz.mega.sdk.MegaError
-import nz.mega.sdk.MegaError.API_EMASTERONLY
+import nz.mega.sdk.MegaError.API_OK
+import nz.mega.sdk.MegaNode
 import javax.inject.Inject
 
 /**
@@ -20,6 +19,27 @@ import javax.inject.Inject
 class RemoveNodeUseCase @Inject constructor(
     @MegaApi private val megaApi: MegaApiAndroid
 ) {
+
+    /**
+     * Removes a node.
+     *
+     * @param node  The MegaNode to move.
+     * @return Completable.
+     */
+    fun remove(node: MegaNode): Completable =
+        Completable.create { emitter ->
+            megaApi.remove(
+                node,
+                OptionalMegaRequestListenerInterface(onRequestFinish = { _, error ->
+                    if (error.errorCode == API_OK) {
+                        emitter.onComplete()
+                    } else {
+                        emitter.onError(MegaException(error.errorCode, error.errorString))
+                    }
+                })
+            )
+        }
+
     /**
      * Removes a list of MegaNodes.
      *
@@ -28,72 +48,25 @@ class RemoveNodeUseCase @Inject constructor(
      */
     fun remove(handles: List<Long>): Single<RemoveRequestResult> =
         Single.create { emitter ->
-            val count = handles.size
-            var pending = count
-            var success = 0
-            val listener =
-                OptionalMegaRequestListenerInterface(onRequestFinish = { _, error ->
-                    pending--
+            var errorCount = 0
 
-                    if (error.errorCode == MegaError.API_OK) {
-                        success++
-                    }
-
-                    if (pending == 0) {
-                        val errors = count - success
-                        val result = when {
-                            count == 1 && success == 1 -> {
-                                DBUtil.resetAccountDetailsTimeStamp()
-                                RemoveRequestResult(
-                                    isSingleAction = true,
-                                    resultText = getString(R.string.context_correctly_removed)
-                                )
-                            }
-                            count == 1 && errors == 1 -> {
-                                RemoveRequestResult(
-                                    resultText = if (error.errorCode == API_EMASTERONLY) {
-                                        getTranslatedErrorString(error)
-                                    } else {
-                                        getString(R.string.context_no_removed)
-                                    },
-                                    isSuccess = false
-                                )
-                            }
-                            errors == 0 -> {
-                                DBUtil.resetAccountDetailsTimeStamp()
-                                RemoveRequestResult(
-                                    resultText = getString(
-                                        R.string.number_correctly_removed,
-                                        success
-                                    )
-                                )
-
-                            }
-                            else -> {
-                                DBUtil.resetAccountDetailsTimeStamp()
-                                val result = getString(R.string.number_correctly_removed, success) +
-                                        getString(R.string.number_no_removed, errors)
-
-                                RemoveRequestResult(
-                                    resultText = result,
-                                    isSuccess = false
-                                )
-                            }
-                        }
-
-                        emitter.onSuccess(result)
-                    }
-                })
-
-            for (handle in handles) {
+            handles.forEach { handle ->
                 val node = megaApi.getNodeByHandle(handle)
 
                 if (node == null) {
-                    pending--
-                    continue
+                    errorCount++
+                } else {
+                    remove(node).blockingSubscribeBy(onError = {
+                        errorCount++
+                    })
                 }
-
-                megaApi.remove(node, listener)
             }
+
+            emitter.onSuccess(
+                RemoveRequestResult(
+                    count = handles.size,
+                    errorCount
+                )
+            )
         }
 }

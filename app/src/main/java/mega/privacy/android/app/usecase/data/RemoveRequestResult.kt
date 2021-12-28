@@ -1,14 +1,40 @@
 package mega.privacy.android.app.usecase.data
 
+import mega.privacy.android.app.R
+import mega.privacy.android.app.utils.DBUtil
+import mega.privacy.android.app.utils.StringResourcesUtils.getString
+
 /**
  * Data class containing all the info related to a movement request.
  *
- * @property isSingleAction True if the removal is only of a node, false otherwise.
- * @property resultText     Text to show as result of the request, null if should not show anything.
- * @property isSuccess      True if all requests finished with success, false otherwise.
+ * @property count      Number of requests.
+ * @property errorCount Number of requests which finished with an error.
  */
 data class RemoveRequestResult(
-    val isSingleAction: Boolean = false,
-    val resultText: String? = null,
-    val isSuccess: Boolean = true
-)
+    val count: Int,
+    val errorCount: Int
+) {
+
+    val successCount = count - errorCount
+    val isSingleAction = count == 1
+    val isSuccess = errorCount == 0
+
+    fun getResultText(): String =
+        when {
+            isSingleAction && isSuccess -> {
+                getString(R.string.context_correctly_removed)
+            }
+            isSingleAction -> {
+                DBUtil.resetAccountDetailsTimeStamp()
+                getString(R.string.context_no_removed)
+            }
+            isSuccess -> {
+                DBUtil.resetAccountDetailsTimeStamp()
+                getString(R.string.number_correctly_removed, count)
+            }
+            else -> {
+                getString(R.string.number_correctly_removed, successCount) +
+                        getString(R.string.number_no_removed, errorCount)
+            }
+        }
+}
