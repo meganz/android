@@ -51,7 +51,7 @@ sealed class MoveRequestResult(
             when {
                 count == 1 && isSuccess -> getString(R.string.context_correctly_moved)
                 count == 1 -> getString(R.string.context_no_moved)
-                isSuccess -> getString(R.string.number_correctly_moved)
+                isSuccess -> getString(R.string.number_correctly_moved, count)
                 else -> getString(
                     R.string.number_correctly_moved,
                     count - errorCount
