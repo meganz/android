@@ -195,9 +195,9 @@
                 tools:visibility="visible" />
 
             <TextView
-                android:id="@+id/option_send_to_contact"
+                android:id="@+id/option_send_to_chat"
                 style="@style/BottomSheetOption"
-                android:text="@string/context_send_file_inbox"
+                android:text="@string/context_send_file_to_chat"
                 app:drawableStartCompat="@drawable/ic_send_to_contact" />
 
             <TextView

@@ -235,11 +235,11 @@ class ImageBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
             optionRemoveLink.isVisible = isOnline && nodeItem.hasOwnerAccess && !nodeItem.isFromRubbishBin && node?.isExported == true
 
             // Send to contact
-            optionSendToContact.setOnClickListener {
+            optionSendToChat.setOnClickListener {
                 (activity as? ImageViewerActivity?)?.attachNode(node!!)
                 dismissAllowingStateLoss()
             }
-            optionSendToContact.isVisible = isOnline && !nodeItem.isFromRubbishBin && node != null && isUserLoggedIn
+            optionSendToChat.isVisible = isOnline && !nodeItem.isFromRubbishBin && node?.isPublic != true && node != null && isUserLoggedIn
 
             // Share
             optionShare.isVisible = !nodeItem.isFromRubbishBin && (nodeItem.hasOwnerAccess || !imageItem.nodePublicLink.isNullOrBlank())
@@ -325,10 +325,10 @@ class ImageBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
             }
 
             // Separators
-            separatorLabel.isVisible = optionLabelLayout.isVisible
+            separatorLabel.isVisible = optionLabelLayout.isVisible || optionInfo.isVisible
             separatorOpen.isVisible = optionOpenWith.isVisible
             separatorOffline.isVisible = optionOfflineLayout.isVisible
-            separatorShare.isVisible = optionShare.isVisible || optionSendToContact.isVisible || optionManageLink.isVisible
+            separatorShare.isVisible = optionShare.isVisible || optionSendToChat.isVisible || optionManageLink.isVisible
             separatorRestore.isVisible = optionRestore.isVisible
             separatorCopy.isVisible = (optionRename.isVisible || optionCopy.isVisible || optionMove.isVisible)
                     && (optionRestore.isVisible || optionRubbishBin.isVisible)
