@@ -13,10 +13,10 @@
         android:id="@+id/transfer_stage"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:text="@string/scanning_transfers"
         android:textAppearance="@style/TextAppearance.Mega.Subtitle1.Grey60White60"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        tool:text="Creating folder structure..." />
+        app:layout_constraintTop_toTopOf="parent" />
 
     <ProgressBar
         android:id="@+id/scanning_progress"
@@ -31,7 +31,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="18dp"
-        android:text="@string/warning_scanning_folder"
+        android:text="@string/warning_scanning_transfers"
         android:textAppearance="@style/TextAppearance.Mega.Caption.Secondary.13sp.Grey38White38"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/scanning_progress" />

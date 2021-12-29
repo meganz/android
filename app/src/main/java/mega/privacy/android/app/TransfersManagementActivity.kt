@@ -18,6 +18,7 @@ import mega.privacy.android.app.utils.AlertDialogUtil.isAlertDialogShown
 import mega.privacy.android.app.utils.Constants.*
 import mega.privacy.android.app.utils.LogUtil
 import mega.privacy.android.app.utils.StringResourcesUtils
+import mega.privacy.android.app.utils.Util
 
 open class TransfersManagementActivity : PasscodeActivity() {
 
@@ -62,9 +63,9 @@ open class TransfersManagementActivity : PasscodeActivity() {
 
         if (savedInstanceState != null) {
             when {
-                transfersManagement.isScanningTransfers() -> showScanningTransfersDialog()
                 savedInstanceState.getBoolean(IS_CANCEL_TRANSFERS_SHOWN, false) ->
                     showCancelTransfersDialog()
+                transfersManagement.isScanningTransfers() -> showScanningTransfersDialog()
             }
         }
     }
@@ -184,12 +185,11 @@ open class TransfersManagementActivity : PasscodeActivity() {
         }
 
         scanningTransfersDialog = MaterialAlertDialogBuilder(this)
-            .setTitle(StringResourcesUtils.getString(R.string.title_scanning_folder))
             .setView(R.layout.dialog_scanning_folder)
             .setPositiveButton(
-                StringResourcesUtils.getString(R.string.option_cancel_transfer)
+                StringResourcesUtils.getString(R.string.cancel_transfers)
             ) { _, _ ->
-                transfersManagement.cancelScanningTransfers()
+                showCancelTransfersDialog()
             }
             .create()
             .apply {
@@ -203,7 +203,22 @@ open class TransfersManagementActivity : PasscodeActivity() {
      * Shows a confirmation dialog before cancel all scanning transfers.
      */
     private fun showCancelTransfersDialog() {
-
+        cancelTransfersDialog = MaterialAlertDialogBuilder(this)
+            .setTitle(StringResourcesUtils.getString(R.string.cancel_transfers))
+            .setMessage(StringResourcesUtils.getString(R.string.warning_cancel_transfers))
+            .setPositiveButton(
+                StringResourcesUtils.getString(R.string.button_proceed)
+            ) { _, _ ->
+                transfersManagement.cancelScanningTransfers()
+                Util.showSnackbar(this, StringResourcesUtils.getString(R.string.transfers_cancelled))
+            }
+            .setNegativeButton(StringResourcesUtils.getString(R.string.general_dismiss), null)
+            .create()
+            .apply {
+                setCancelable(false)
+                setCanceledOnTouchOutside(false)
+                show()
+            }
     }
 
     override fun onResume() {
