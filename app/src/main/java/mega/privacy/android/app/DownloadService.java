@@ -41,7 +41,6 @@ import java.util.HashMap;
 
 import mega.privacy.android.app.components.saver.AutoPlayInfo;
 import mega.privacy.android.app.fragments.offline.OfflineFragment;
-import mega.privacy.android.app.globalmanagement.ScanningFolderData;
 import mega.privacy.android.app.globalmanagement.TransfersManagement;
 import mega.privacy.android.app.lollipop.LoginActivityLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
@@ -54,6 +53,7 @@ import mega.privacy.android.app.utils.StringResourcesUtils;
 import mega.privacy.android.app.utils.ThumbnailUtilsLollipop;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
+import nz.mega.sdk.MegaCancelToken;
 import nz.mega.sdk.MegaChatApi;
 import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaChatApiJava;
@@ -77,13 +77,12 @@ import static mega.privacy.android.app.utils.CacheFolderManager.*;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.FileUtil.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
-import static mega.privacy.android.app.utils.MegaApiUtils.*;
-import static mega.privacy.android.app.utils.MegaNodeUtil.manageURLNode;
 import static mega.privacy.android.app.utils.OfflineUtils.*;
 import static mega.privacy.android.app.utils.SDCardUtils.getSDCardTargetPath;
 import static mega.privacy.android.app.utils.SDCardUtils.getSDCardTargetUri;
 import static mega.privacy.android.app.utils.TextUtil.*;
 import static mega.privacy.android.app.utils.Util.*;
+import static nz.mega.sdk.MegaTransfer.TYPE_DOWNLOAD;
 
 import javax.inject.Inject;
 
@@ -292,7 +291,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 		if (intent.getAction() != null && intent.getAction().equals(ACTION_CANCEL)){
 			logDebug("Cancel intent");
 			canceled = true;
-			megaApi.cancelTransfers(MegaTransfer.TYPE_DOWNLOAD);
+			megaApi.cancelTransfers(TYPE_DOWNLOAD);
 			return START_NOT_STICKY;
 		}
 
@@ -338,7 +337,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 				stopForeground();
 			}
 
-			launchTransferUpdateIntent(MegaTransfer.TYPE_DOWNLOAD);
+			launchTransferUpdateIntent(TYPE_DOWNLOAD);
 			return;
 		}
 
@@ -509,21 +508,15 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 			}
 
 			logDebug("CurrentDocument is not null");
-			if (highPriority) {
-			    // Download to SD card from chat.
-                if (!isTextEmpty(appData)) {
-                    megaApi.startDownload(currentDocument, currentDir.getAbsolutePath() + "/", appData, null, true, null);
-                } else {
-                    String data = isVoiceClipType(type) ? APP_DATA_VOICE_CLIP : "";
-                    megaApi.startDownload(currentDocument, currentDir.getAbsolutePath() + "/", data, null, true, null);
-                }
-			} else if (currentDocument.isFolder()) {
-				startFolderDownload(currentDocument, appData);
-			} else if (!isTextEmpty(appData)) {
-				megaApi.startDownload(currentDocument, currentDir.getAbsolutePath() + "/", appData, null, false, null);
-			} else {
-				megaApi.startDownload(currentDocument, currentDir.getAbsolutePath() + "/", null, null, false, null);
+			if (isTextEmpty(appData)) {
+				appData = isVoiceClipType(type) ? APP_DATA_VOICE_CLIP : "";
 			}
+
+			String localPath = currentDir.getAbsolutePath() + "/";
+			MegaCancelToken token = transfersManagement.addScanningTransfer(TYPE_DOWNLOAD,
+					localPath, currentDocument, currentDocument.isFolder());
+
+			megaApi.startDownload(currentDocument, localPath, appData, null, highPriority, token);
 		} else {
 			logWarning("currentDir is not a directory");
 		}
@@ -993,7 +986,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 			 * while in paused status, the update should not be avoided*/
 			if(!isOverquota) {
 				long now = System.currentTimeMillis();
-				if (now - lastUpdated > ONTRANSFERUPDATE_REFRESH_MILLIS || megaApi.areTransfersPaused(MegaTransfer.TYPE_DOWNLOAD) ) {
+				if (now - lastUpdated > ONTRANSFERUPDATE_REFRESH_MILLIS || megaApi.areTransfersPaused(TYPE_DOWNLOAD) ) {
 					lastUpdated = now;
 				} else {
 					return;
@@ -1012,7 +1005,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 				int inProgress = pendingTransfers == 0 ? totalTransfers
 						: totalTransfers - pendingTransfers + 1;
 
-				if (megaApi.areTransfersPaused(MegaTransfer.TYPE_DOWNLOAD)) {
+				if (megaApi.areTransfersPaused(TYPE_DOWNLOAD)) {
 					message = StringResourcesUtils.getString(R.string.download_service_notification_paused, inProgress, totalTransfers);
 				} else {
 					message = StringResourcesUtils.getString(R.string.download_service_notification, inProgress, totalTransfers);
@@ -1155,7 +1148,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 
 		if (transfer.isStreamingTransfer() || isVoiceClipType(transfer.getAppData())) return;
 
-		if (transfer.getType() == MegaTransfer.TYPE_DOWNLOAD) {
+		if (transfer.getType() == TYPE_DOWNLOAD) {
 			String appData = transfer.getAppData();
 
 			if (!isTextEmpty(appData) && appData.contains(APP_DATA_SD_CARD)) {
@@ -1168,7 +1161,8 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 						appData));
 			}
 
-			launchTransferUpdateIntent(MegaTransfer.TYPE_DOWNLOAD);
+			transfersManagement.checkScanningTransferOnStart(transfer);
+			launchTransferUpdateIntent(TYPE_DOWNLOAD);
 			transfersCount++;
 			updateProgressNotification();
 		}
@@ -1193,7 +1187,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 			sendBroadcast(new Intent(BROADCAST_ACTION_INTENT_BUSINESS_EXPIRED));
 		}
 
-		if(transfer.getType()==MegaTransfer.TYPE_DOWNLOAD){
+		if(transfer.getType()== TYPE_DOWNLOAD){
 
 			boolean isVoiceClip = isVoiceClipType(transfer.getAppData());
 
@@ -1212,7 +1206,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 					addCompletedTransfer(completedTransfer, dbH);
 				}
 
-				launchTransferUpdateIntent(MegaTransfer.TYPE_DOWNLOAD);
+				launchTransferUpdateIntent(TYPE_DOWNLOAD);
 				if (transfer.getState() == MegaTransfer.STATE_FAILED) {
 					transfersManagement.setFailedTransfers(true);
 				}
@@ -1402,8 +1396,8 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 	}
 
 	private void doOnTransferUpdate(MegaTransfer transfer) {
-		if(transfer.getType()==MegaTransfer.TYPE_DOWNLOAD){
-			launchTransferUpdateIntent(MegaTransfer.TYPE_DOWNLOAD);
+		if(transfer.getType()== TYPE_DOWNLOAD){
+			launchTransferUpdateIntent(TYPE_DOWNLOAD);
 			if (canceled) {
 				logDebug("Transfer cancel: " + transfer.getNodeHandle());
 
@@ -1418,9 +1412,9 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 			}
 			if(transfer.isStreamingTransfer() || isVoiceClipType(transfer.getAppData())) return;
 
-			if (transfer.isFolderTransfer()) {
-				transfersManagement.checkFolderTransfer(transfer);
-			} else {
+			transfersManagement.checkScanningTransferOnUpdate(transfer);
+
+			if (!transfer.isFolderTransfer()) {
 				sendBroadcast(new Intent(BROADCAST_ACTION_INTENT_TRANSFER_UPDATE));
 				updateProgressNotification();
 			}
@@ -1447,7 +1441,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 			return;
 		}
 
-		if(transfer.getType()==MegaTransfer.TYPE_DOWNLOAD){
+		if(transfer.getType()== TYPE_DOWNLOAD){
 			if(e.getErrorCode() == MegaError.API_EOVERQUOTA) {
 				if (e.getValue() != 0) {
 					logWarning("TRANSFER OVERQUOTA ERROR: " + e.getErrorCode());
@@ -1565,29 +1559,14 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 			if (!lock.isHeld()) lock.acquire();
 			if (currentDir.isDirectory()) {
 				logDebug("To downloadPublic(dir)");
-				startFolderDownload(node, appData);
+				String localPath = currentDir.getAbsolutePath() + "/";
+				MegaCancelToken token = transfersManagement.addScanningTransfer(TYPE_DOWNLOAD,
+						localPath, currentDocument, currentDocument.isFolder());
+
+				megaApi.startDownload(currentDocument, localPath, appData, null, false, token);
 			}
 		}
 	}
-
-	/**
-	 * Starts a folder download.
-	 *
-	 * @param node    MegaNode to download.
-	 * @param appData Custom app data to save in the MegaTransfer object if applicable,
-	 *                null otherwise.
-	 */
-	private void startFolderDownload(MegaNode node, String appData) {
-		ScanningFolderData folderData = transfersManagement.createScanningFolderData(
-				MegaTransfer.TYPE_DOWNLOAD, currentDir.getAbsolutePath() + "/", node);
-
-		if (!isTextEmpty(appData)) {
-			megaApi.startDownload(folderData.getNode(), folderData.getLocalPath(), appData, null, false, folderData.getCancelToken());
-		} else {
-			megaApi.startDownload(folderData.getNode(), folderData.getLocalPath(), null, null, false, folderData.getCancelToken());
-		}
-	}
-
 
 	@Override
 	public void onRequestTemporaryError(MegaApiJava api, MegaRequest request,
