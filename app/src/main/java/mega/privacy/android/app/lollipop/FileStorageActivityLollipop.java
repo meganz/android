@@ -892,7 +892,7 @@ public class FileStorageActivityLollipop extends PasscodeActivity implements OnC
 	
 	@Override
 	public void onBackPressed() {
-		if (psaWebBrowser.consumeBack()) return;
+		if (psaWebBrowser != null && psaWebBrowser.consumeBack()) return;
 		retryConnectionsAndSignalPresence();
 
 		// Finish activity if at the root
