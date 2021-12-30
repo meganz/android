@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tool="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:paddingStart="24dp"
@@ -10,7 +9,7 @@
     android:paddingBottom="24dp">
 
     <TextView
-        android:id="@+id/transfer_stage"
+        android:id="@+id/scanning_text"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/scanning_transfers"
@@ -24,7 +23,7 @@
         android:layout_width="match_parent"
         android:layout_height="2dp"
         android:layout_marginTop="18dp"
-        app:layout_constraintTop_toBottomOf="@+id/transfer_stage" />
+        app:layout_constraintTop_toBottomOf="@+id/scanning_text" />
 
     <TextView
         android:id="@+id/scanning_warning"

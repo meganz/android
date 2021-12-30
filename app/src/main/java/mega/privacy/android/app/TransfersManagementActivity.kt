@@ -185,7 +185,7 @@ open class TransfersManagementActivity : PasscodeActivity() {
         }
 
         scanningTransfersDialog = MaterialAlertDialogBuilder(this)
-            .setView(R.layout.dialog_scanning_folder)
+            .setView(R.layout.dialog_scanning_transfers)
             .setPositiveButton(
                 StringResourcesUtils.getString(R.string.cancel_transfers)
             ) { _, _ ->
