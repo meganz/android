@@ -8262,21 +8262,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 				permissionsDialog = dialogBuilder.create();
 				permissionsDialog.show();
 			}
-		}
-		else if (requestCode == REQUEST_CODE_GET_LOCAL && resultCode == RESULT_OK) {
-
-			if (intent == null) {
-				logDebug("Intent NULL");
-				return;
-			}
-
-			String folderPath = intent.getStringExtra(FileStorageActivityLollipop.EXTRA_PATH);
-			ArrayList<String> paths = intent.getStringArrayListExtra(FileStorageActivityLollipop.EXTRA_FILES);
-
-			UploadServiceTask uploadServiceTask = new UploadServiceTask(folderPath, paths, getCurrentParentHandle());
-			uploadServiceTask.start();
-		}
-		else if (requestCode == REQUEST_CODE_SELECT_FOLDER_TO_MOVE && resultCode == RESULT_OK) {
+		} else if (requestCode == REQUEST_CODE_SELECT_FOLDER_TO_MOVE && resultCode == RESULT_OK) {
 
 			if (intent == null) {
 				logDebug("Intent NULL");

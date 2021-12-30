@@ -17,7 +17,6 @@ public class Constants {
     public static final int REQUEST_CODE_GET = 1000;
     public static final int REQUEST_CODE_SELECT_FOLDER_TO_MOVE = 1001;
     public static final int REQUEST_CODE_SELECT_FOLDER_TO_COPY = 1002;
-    public static final int REQUEST_CODE_GET_LOCAL = 1003;
     public static final int REQUEST_CODE_SELECT_LOCAL_FOLDER = 1004;
     public static final int REQUEST_CODE_REFRESH = 1005;
     public static final int REQUEST_CODE_SORT_BY = 1006;

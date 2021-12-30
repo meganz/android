@@ -716,54 +716,6 @@ public class ContactFileListActivityLollipop extends PasscodeActivity
 				permissionsDialog = dialogBuilder.create();
 				permissionsDialog.show();
 			}
-		} else if (requestCode == REQUEST_CODE_GET_LOCAL && resultCode == RESULT_OK) {
-			if (intent == null) {
-				return;
-			}
-			String folderPath = intent.getStringExtra(FileStorageActivityLollipop.EXTRA_PATH);
-			ArrayList<String> paths = intent.getStringArrayListExtra(FileStorageActivityLollipop.EXTRA_FILES);
-
-			int i = 0;
-
-			MegaNode parentNode = megaApi.getNodeByHandle(parentHandle);
-			if (parentNode == null) {
-				parentNode = megaApi.getRootNode();
-			}
-
-			if (app.getStorageState() == STORAGE_STATE_PAYWALL) {
-				showOverDiskQuotaPaywallWarning();
-				return;
-			}
-
-			showSnackbar(SNACKBAR_TYPE, getResources().getQuantityString(R.plurals.upload_began, paths.size(), paths.size()));
-			for (String path : paths) {
-				Intent uploadServiceIntent = new Intent(this, UploadService.class);
-				File file = new File(path);
-				if (file.isDirectory()) {
-					uploadServiceIntent.putExtra(UploadService.EXTRA_FILEPATH, file.getAbsolutePath());
-					uploadServiceIntent.putExtra(UploadService.EXTRA_NAME, file.getName());
-					logDebug("FOLDER: EXTRA_FILEPATH: " + file.getAbsolutePath());
-					logDebug("FOLDER: EXTRA_NAME: " + file.getName());
-				} else {
-					ShareInfo info = ShareInfo.infoFromFile(file);
-					if (info == null) {
-						continue;
-					}
-					uploadServiceIntent.putExtra(UploadService.EXTRA_FILEPATH, info.getFileAbsolutePath());
-					uploadServiceIntent.putExtra(UploadService.EXTRA_NAME, info.getTitle());
-					uploadServiceIntent.putExtra(UploadService.EXTRA_SIZE, info.getSize());
-
-					logDebug("FILE: EXTRA_FILEPATH: " + info.getFileAbsolutePath());
-					logDebug("FILE: EXTRA_NAME: " + info.getTitle());
-					logDebug("FILE: EXTRA_SIZE: " + info.getSize());
-				}
-
-				uploadServiceIntent.putExtra(UploadService.EXTRA_FOLDERPATH, folderPath);
-				uploadServiceIntent.putExtra(UploadService.EXTRA_PARENT_HASH, parentNode.getHandle());
-				logDebug("PARENTNODE: " + parentNode.getHandle() + "___" + parentNode.getName());
-				startService(uploadServiceIntent);
-				i++;
-			}
 		} else if (requestCode == TAKE_PHOTO_CODE) {
 			logDebug("TAKE_PHOTO_CODE");
 			if (resultCode == Activity.RESULT_OK) {
