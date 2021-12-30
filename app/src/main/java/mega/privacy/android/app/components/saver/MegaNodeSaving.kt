@@ -84,20 +84,14 @@ class MegaNodeSaving(
             val dlFiles = HashMap<MegaNode, String>()
             val targets = HashMap<Long, String>()
 
-            if (node.type == MegaNode.TYPE_FOLDER) {
-                if (sdCardOperator != null && sdCardOperator.isSDCardDownload) {
-                    sdCardOperator.buildFileStructure(targets, parentPath, api, node)
-                    getDlList(api, dlFiles, node, File(sdCardOperator.downloadRoot, node.name))
-                } else {
-                    getDlList(api, dlFiles, node, File(parentPath, node.name))
-                }
+            if (node.type == MegaNode.TYPE_FOLDER && sdCardOperator != null && sdCardOperator.isSDCardDownload) {
+                sdCardOperator.buildFileStructure(targets, parentPath, api, node)
+                getDlList(api, dlFiles, node, File(sdCardOperator.downloadRoot, node.name))
+            } else if (sdCardOperator != null && sdCardOperator.isSDCardDownload) {
+                targets[node.handle] = parentPath
+                dlFiles[node] = sdCardOperator.downloadRoot
             } else {
-                if (sdCardOperator != null && sdCardOperator.isSDCardDownload) {
-                    targets[node.handle] = parentPath
-                    dlFiles[node] = sdCardOperator.downloadRoot
-                } else {
-                    dlFiles[node] = parentPath
-                }
+                dlFiles[node] = parentPath
             }
 
             if (dlFiles.isEmpty()) {
