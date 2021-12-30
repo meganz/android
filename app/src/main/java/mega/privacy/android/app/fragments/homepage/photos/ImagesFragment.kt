@@ -34,6 +34,7 @@ class ImagesFragment : BaseZoomFragment() {
         savedInstanceState: Bundle?
     ): View {
         binding = FragmentImagesBinding.inflate(inflater, container, false)
+        adapterType = PHOTOS_BROWSE_ADAPTER
         setupBinding()
         return binding.root
     }
@@ -132,8 +133,6 @@ class ImagesFragment : BaseZoomFragment() {
 
         showViewTypePanel()
     }
-
-    override fun getAdapterType() = PHOTOS_BROWSE_ADAPTER
 
     private fun setupEmptyHint() {
         binding.emptyHint.emptyHintImage.isVisible = false

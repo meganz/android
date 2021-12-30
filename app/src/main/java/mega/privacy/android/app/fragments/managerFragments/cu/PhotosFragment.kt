@@ -63,6 +63,7 @@ class PhotosFragment : BaseZoomFragment() {
             setupBinding()
         }
 
+        adapterType = PHOTO_SYNC_ADAPTER
         listView = binding.cuList
         scroller = binding.scroller
         viewTypePanel = mManagerActivity.findViewById(R.id.cu_view_type)
@@ -582,8 +583,6 @@ class PhotosFragment : BaseZoomFragment() {
         }
         handleOptionsMenuUpdate(isShowMenu)
     }
-
-    override fun getAdapterType() = PHOTO_SYNC_ADAPTER
 
     override fun getOrder() = viewModel.getOrder()
 }

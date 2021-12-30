@@ -57,6 +57,7 @@ class MediaDiscoveryFragment : BaseZoomFragment() {
         savedInstanceState: Bundle?
     ): View {
         binding = FragmentMediaDecoveryBinding.inflate(inflater, container, false)
+        adapterType = MEDIA_BROWSE_ADAPTER
         arguments?.let {
             val currentHandle = it.getLong(MEDIA_HANDLE)
             viewModel.setHandle(currentHandle)
@@ -146,8 +147,6 @@ class MediaDiscoveryFragment : BaseZoomFragment() {
             }
         }
     }
-
-    override fun getAdapterType() = MEDIA_BROWSE_ADAPTER
 
     override fun onCardClicked(position: Int, @NonNull card: GalleryCard) {
         when (selectedView) {

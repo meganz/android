@@ -103,6 +103,7 @@ abstract class BaseZoomFragment : BaseFragment(), GestureScaleCallback,
     protected val itemOperationViewModel by viewModels<ItemOperationViewModel>()
 
     protected var selectedView = ALL_VIEW
+    protected open var adapterType = 0
 
     /**
      * When zoom changes,handle zoom for sub class
@@ -330,7 +331,7 @@ abstract class BaseZoomFragment : BaseFragment(), GestureScaleCallback,
 
             intent.putExtra(
                 Constants.INTENT_EXTRA_KEY_ADAPTER_TYPE,
-                getAdapterType()
+                adapterType
             )
 
             intent.putExtra(
@@ -547,10 +548,6 @@ abstract class BaseZoomFragment : BaseFragment(), GestureScaleCallback,
             else -> setViewTypeButtonStyle(allButton, true)
         }
     }
-
-//    abstract fun getViewType(): Int
-
-    abstract fun getAdapterType(): Int
 
     /**
      * Apply selected/unselected style for the TextView button.
