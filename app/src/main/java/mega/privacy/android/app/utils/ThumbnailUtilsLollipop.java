@@ -488,12 +488,16 @@ public class ThumbnailUtilsLollipop {
 
 		@Override
 		public void onRequestFinish(MegaApiJava api, MegaRequest request,MegaError e) {
-
-			logDebug("Downloading thumbnail finished");
-			final long handle = request.getNodeHandle();
-			MegaNode node = api.getNodeByHandle(handle);
 			if (e.getErrorCode() == MegaError.API_OK){
-				logDebug("Downloading thumbnail OK: " + handle);
+                final long handle = request.getNodeHandle();
+                MegaNode node = api.getNodeByHandle(handle);
+
+                logDebug("Downloading thumbnail OK, handle is: " + handle);
+                if (node == null) {
+                    logError("Get null node with handle: " + handle);
+                    return;
+                }
+
 				thumbnailCache.remove(handle);
 
 				if (holder != null){
