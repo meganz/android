@@ -1288,7 +1288,7 @@ public class FileExplorerActivityLollipop extends TransfersManagementActivity
 			aB.setSubtitle(null);
 		}
 
-		if(tabShown==NO_TABS){
+		if (tabShown == NO_TABS || mTabsAdapterExplorer == null) {
 			if (importFileF) {
 				if (importFragmentSelected != -1) {
 					switch (importFragmentSelected) {
