@@ -12,7 +12,6 @@ import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.R
 import mega.privacy.android.app.databinding.FragmentImagesBinding
 import mega.privacy.android.app.fragments.homepage.*
-import mega.privacy.android.app.gallery.adapter.GalleryCardAdapter
 import mega.privacy.android.app.gallery.data.GalleryCard
 import mega.privacy.android.app.gallery.data.GalleryItem
 import mega.privacy.android.app.gallery.fragment.BaseZoomFragment
@@ -23,13 +22,11 @@ import nz.mega.sdk.MegaApiJava.ORDER_MODIFICATION_DESC
 import java.util.*
 
 @AndroidEntryPoint
-class ImagesFragment : BaseZoomFragment(), GalleryCardAdapter.Listener {
+class ImagesFragment : BaseZoomFragment() {
 
     private val viewModel by viewModels<ImagesViewModel>()
 
     private lateinit var binding: FragmentImagesBinding
-
-    private var selectedView = ALL_VIEW
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -135,8 +132,6 @@ class ImagesFragment : BaseZoomFragment(), GalleryCardAdapter.Listener {
 
         showViewTypePanel()
     }
-
-    override fun getViewType() = selectedView
 
     override fun getAdapterType() = PHOTOS_BROWSE_ADAPTER
 
@@ -276,11 +271,6 @@ class ImagesFragment : BaseZoomFragment(), GalleryCardAdapter.Listener {
     }
 
     override fun getNodeCount() = viewModel.getRealPhotoCount()
-
-    override fun onSaveInstanceState(outState: Bundle) {
-        super.onSaveInstanceState(outState)
-        viewModel.selectedViewTypeImages = selectedView
-    }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         if (activity as ManagerActivityLollipop? != null && (activity as ManagerActivityLollipop?)!!.isInImagesPage) {

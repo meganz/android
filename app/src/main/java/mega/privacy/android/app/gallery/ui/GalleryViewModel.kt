@@ -8,7 +8,6 @@ import mega.privacy.android.app.fragments.homepage.photos.CardClickHandler
 import mega.privacy.android.app.fragments.homepage.photos.DateCardsProvider
 import mega.privacy.android.app.gallery.data.GalleryCard
 import mega.privacy.android.app.gallery.data.GalleryItem
-import mega.privacy.android.app.gallery.fragment.BaseZoomFragment.Companion.ALL_VIEW
 import mega.privacy.android.app.gallery.fragment.BaseZoomFragment.Companion.DAYS_INDEX
 import mega.privacy.android.app.gallery.fragment.BaseZoomFragment.Companion.MONTHS_INDEX
 import mega.privacy.android.app.gallery.fragment.BaseZoomFragment.Companion.YEARS_INDEX
@@ -26,10 +25,6 @@ abstract class GalleryViewModel constructor(
      * Empty live data, used to switch to LiveData<List<PhotoNodeItem>>.
      */
     var liveDataRoot = MutableLiveData<Unit>()
-
-    var selectedViewTypeImages = ALL_VIEW
-    var selectedViewTypePhotos = ALL_VIEW
-    var selectedViewTypeMedia = ALL_VIEW
 
     var forceUpdate = false
 

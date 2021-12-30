@@ -12,24 +12,20 @@ import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.R
 import mega.privacy.android.app.databinding.FragmentMediaDecoveryBinding
 import mega.privacy.android.app.fragments.homepage.*
-import mega.privacy.android.app.gallery.adapter.GalleryCardAdapter
 import mega.privacy.android.app.gallery.constant.MEDIA_HANDLE
 import mega.privacy.android.app.gallery.data.GalleryCard
 import mega.privacy.android.app.gallery.data.GalleryItem
 import mega.privacy.android.app.gallery.fragment.BaseZoomFragment
-import mega.privacy.android.app.lollipop.ManagerActivityLollipop
 import mega.privacy.android.app.utils.*
 import mega.privacy.android.app.utils.Constants.*
 import java.util.*
 
 @AndroidEntryPoint
-class MediaDiscoveryFragment : BaseZoomFragment(), GalleryCardAdapter.Listener {
+class MediaDiscoveryFragment : BaseZoomFragment() {
 
     private val viewModel by viewModels<MediaViewModel>()
 
     private lateinit var binding: FragmentMediaDecoveryBinding
-
-    private var selectedView = ALL_VIEW
 
     /**
      * Current order.
@@ -150,8 +146,6 @@ class MediaDiscoveryFragment : BaseZoomFragment(), GalleryCardAdapter.Listener {
             }
         }
     }
-
-    override fun getViewType() = selectedView
 
     override fun getAdapterType() = MEDIA_BROWSE_ADAPTER
 
@@ -321,11 +315,6 @@ class MediaDiscoveryFragment : BaseZoomFragment(), GalleryCardAdapter.Listener {
     override fun getNodeCount() = viewModel.getRealPhotoCount()
 
     override fun getOrder() = viewModel.getOrder()
-
-    override fun onSaveInstanceState(outState: Bundle) {
-        super.onSaveInstanceState(outState)
-        viewModel.selectedViewTypeMedia = selectedView
-    }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         if (!isInThisPage()) {

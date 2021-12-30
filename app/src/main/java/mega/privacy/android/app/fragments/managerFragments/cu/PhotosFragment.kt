@@ -17,7 +17,6 @@ import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
 import mega.privacy.android.app.components.ListenScrollChangesHelper
 import mega.privacy.android.app.databinding.FragmentPhotosBinding
-import mega.privacy.android.app.gallery.adapter.GalleryCardAdapter
 import mega.privacy.android.app.gallery.data.GalleryCard
 import mega.privacy.android.app.gallery.data.GalleryItem
 import mega.privacy.android.app.gallery.fragment.BaseZoomFragment
@@ -33,13 +32,11 @@ import nz.mega.sdk.MegaChatApiJava
 import java.util.*
 
 @AndroidEntryPoint
-class PhotosFragment : BaseZoomFragment(), GalleryCardAdapter.Listener {
+class PhotosFragment : BaseZoomFragment() {
 
     private val viewModel by viewModels<PhotosViewModel>()
 
     private lateinit var binding: FragmentPhotosBinding
-
-    private var selectedView = ALL_VIEW
 
     /**
      * Current order.
@@ -540,11 +537,6 @@ class PhotosFragment : BaseZoomFragment(), GalleryCardAdapter.Listener {
         }
     }
 
-    override fun onSaveInstanceState(outState: Bundle) {
-        super.onSaveInstanceState(outState)
-        viewModel.selectedViewTypePhotos = selectedView
-    }
-
     override fun handleOnCreateOptionsMenu() {
         handleOptionsMenuUpdate(isShowMenu())
     }
@@ -590,8 +582,6 @@ class PhotosFragment : BaseZoomFragment(), GalleryCardAdapter.Listener {
         }
         handleOptionsMenuUpdate(isShowMenu)
     }
-
-    override fun getViewType() = selectedView
 
     override fun getAdapterType() = PHOTO_SYNC_ADAPTER
 

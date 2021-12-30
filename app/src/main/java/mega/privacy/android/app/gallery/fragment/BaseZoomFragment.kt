@@ -70,30 +70,39 @@ abstract class BaseZoomFragment : BaseFragment(), GestureScaleCallback,
         const val DAYS_INDEX = 0
         const val MONTHS_INDEX = 1
         const val YEARS_INDEX = 2
+
+        const val VIEW_TYPE = "VIEW_TYPE"
     }
 
     protected lateinit var mManagerActivity: ManagerActivityLollipop
 
-    protected lateinit var listView: RecyclerView
-    protected lateinit var scroller: FastScroller
+    // View type panel
     protected lateinit var viewTypePanel: View
     protected lateinit var yearsButton: TextView
     protected lateinit var monthsButton: TextView
     protected lateinit var daysButton: TextView
     protected lateinit var allButton: TextView
-    protected lateinit var gridAdapter: GalleryAdapter
-    protected lateinit var layoutManager: GridLayoutManager
-    protected lateinit var cardAdapter: GalleryCardAdapter
 
+    // List view
+    protected lateinit var listView: RecyclerView
+    protected lateinit var gridAdapter: GalleryAdapter
+    protected lateinit var cardAdapter: GalleryCardAdapter
+    protected lateinit var layoutManager: GridLayoutManager
+    protected lateinit var scroller: FastScroller
     protected lateinit var scaleGestureHandler: ScaleGestureHandler
+
     protected lateinit var menu: Menu
 
+    // Action mode
+    protected var actionMode: ActionMode? = null
+    protected lateinit var actionModeCallback: ActionModeCallback
+
+    // View model
     protected val zoomViewModel by viewModels<ZoomViewModel>()
     protected val actionModeViewModel by viewModels<ActionModeViewModel>()
     protected val itemOperationViewModel by viewModels<ItemOperationViewModel>()
 
-    protected var actionMode: ActionMode? = null
-    protected lateinit var actionModeCallback: ActionModeCallback
+    protected var selectedView = ALL_VIEW
 
     /**
      * When zoom changes,handle zoom for sub class
@@ -139,6 +148,8 @@ abstract class BaseZoomFragment : BaseFragment(), GestureScaleCallback,
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        selectedView = savedInstanceState?.getInt(VIEW_TYPE) ?: ALL_VIEW
+
         subscribeObservers()
         setHasOptionsMenu(true)
     }
@@ -149,6 +160,11 @@ abstract class BaseZoomFragment : BaseFragment(), GestureScaleCallback,
         this.menu = menu
         handleOnCreateOptionsMenu()
         handleZoomMenuItemStatus()
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        outState.putInt(VIEW_TYPE, selectedView)
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -216,18 +232,16 @@ abstract class BaseZoomFragment : BaseFragment(), GestureScaleCallback,
      * @param currentZoom Zoom level.
      */
     fun setupListAdapter(currentZoom: Int, data: List<GalleryItem>?) {
-        val viewType = getViewType()
-
         val isPortrait =
             resources.configuration.orientation == Configuration.ORIENTATION_PORTRAIT
-        val spanCount = getSpanCount(viewType, isPortrait)
+        val spanCount = getSpanCount(selectedView, isPortrait)
 
         val params = listView.layoutParams as ViewGroup.MarginLayoutParams
 
         layoutManager = GridLayoutManager(context, spanCount)
         listView.layoutManager = layoutManager
 
-        if (viewType == ALL_VIEW) {
+        if (selectedView == ALL_VIEW) {
             val imageMargin = getMargin(context, currentZoom)
             setMargin(context, params, currentZoom)
             val gridWidth = getItemWidth(context, outMetrics, currentZoom, spanCount)
@@ -264,7 +278,7 @@ abstract class BaseZoomFragment : BaseFragment(), GestureScaleCallback,
                 (outMetrics.widthPixels - cardMargin * spanCount * 2 - cardMargin * 2) / spanCount
 
             cardAdapter =
-                GalleryCardAdapter(viewType, cardWidth, cardMargin, this)
+                GalleryCardAdapter(selectedView, cardWidth, cardMargin, this)
             cardAdapter.setHasStableIds(true)
             params.leftMargin = cardMargin
             params.rightMargin = cardMargin
@@ -534,7 +548,7 @@ abstract class BaseZoomFragment : BaseFragment(), GestureScaleCallback,
         }
     }
 
-    abstract fun getViewType(): Int
+//    abstract fun getViewType(): Int
 
     abstract fun getAdapterType(): Int
 
@@ -564,9 +578,9 @@ abstract class BaseZoomFragment : BaseFragment(), GestureScaleCallback,
     }
 
     protected fun updateFastScrollerVisibility() {
-        if(!this::cardAdapter.isInitialized) return
+        if (!this::cardAdapter.isInitialized) return
 
-        val gridView = getViewType() == ALL_VIEW
+        val gridView = selectedView == ALL_VIEW
 
         scroller.visibility =
             if (!gridView && cardAdapter.itemCount >= MIN_ITEMS_SCROLLBAR)
@@ -578,7 +592,7 @@ abstract class BaseZoomFragment : BaseFragment(), GestureScaleCallback,
     protected fun setHideBottomViewScrollBehaviour() {
         val params = viewTypePanel.layoutParams as CoordinatorLayout.LayoutParams
         params.behavior =
-            if (getViewType() != ALL_VIEW) CustomHideBottomViewOnScrollBehaviour<LinearLayout>() else null
+            if (selectedView != ALL_VIEW) CustomHideBottomViewOnScrollBehaviour<LinearLayout>() else null
     }
 
     /**
@@ -587,7 +601,7 @@ abstract class BaseZoomFragment : BaseFragment(), GestureScaleCallback,
      *
      * @return true, current view is all view should show the menu items, false, otherwise.
      */
-    protected fun shouldShowZoomMenuItem() = getViewType() == ALL_VIEW
+    protected fun shouldShowZoomMenuItem() = selectedView == ALL_VIEW
 
     /**
      * Get how many items will be shown per row, depends on screen direction and zoom level if all view is selected.

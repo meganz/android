@@ -11158,7 +11158,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 	 */
 	public void enableHideBottomViewOnScroll(boolean enable) {
 		LinearLayout layout = findViewById(R.id.container_bottom);
-		if (layout == null) {
+		if (layout == null || !isInPhotosPage()) {
 			return;
 		}
 
