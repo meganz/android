@@ -84,14 +84,12 @@ class MoveNodeUseCase @Inject constructor(
                 }
             }
 
-            emitter.onSuccess(
-                MoveRequestResult.GeneralMovement(
-                    handles.size,
-                    errorCount,
-                    oldParentHandle,
-                    isForeignNode
-                )
-            )
+            emitter.onSuccess(MoveRequestResult.GeneralMovement(
+                handles.size,
+                errorCount,
+                oldParentHandle,
+                isForeignNode
+            ).apply { resetAccountDetailsIfNeeded() })
         }
 
     /**
@@ -122,13 +120,11 @@ class MoveNodeUseCase @Inject constructor(
                 }
             }
 
-            emitter.onSuccess(
-                MoveRequestResult.RubbishMovement(
-                    handles.size,
-                    errorCount,
-                    oldParentHandle
-                )
-            )
+            emitter.onSuccess(MoveRequestResult.RubbishMovement(
+                handles.size,
+                errorCount,
+                oldParentHandle
+            ).apply { resetAccountDetailsIfNeeded() })
         }
 
     /**
@@ -163,13 +159,11 @@ class MoveNodeUseCase @Inject constructor(
                 }
             }
 
-            emitter.onSuccess(
-                MoveRequestResult.Restoration(
-                    nodes.size,
-                    errorCount,
-                    isForeignNode,
-                    destination
-                )
-            )
+            emitter.onSuccess(MoveRequestResult.Restoration(
+                nodes.size,
+                errorCount,
+                isForeignNode,
+                destination
+            ).apply { resetAccountDetailsIfNeeded() })
         }
 }

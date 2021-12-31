@@ -66,7 +66,7 @@ class RemoveNodeUseCase @Inject constructor(
                 RemoveRequestResult(
                     count = handles.size,
                     errorCount
-                )
+                ).apply { resetAccountDetailsIfNeeded() }
             )
         }
 }

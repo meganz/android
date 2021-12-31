@@ -25,11 +25,9 @@ data class RemoveRequestResult(
                 getString(R.string.context_correctly_removed)
             }
             isSingleAction -> {
-                DBUtil.resetAccountDetailsTimeStamp()
                 getString(R.string.context_no_removed)
             }
             isSuccess -> {
-                DBUtil.resetAccountDetailsTimeStamp()
                 getString(R.string.number_correctly_removed, count)
             }
             else -> {
@@ -37,4 +35,13 @@ data class RemoveRequestResult(
                         getString(R.string.number_no_removed, errorCount)
             }
         }
+
+    /**
+     * Resets the account details timestamp if some request finished with success.
+     */
+    fun resetAccountDetailsIfNeeded() {
+        if (successCount > 0) {
+            DBUtil.resetAccountDetailsTimeStamp()
+        }
+    }
 }

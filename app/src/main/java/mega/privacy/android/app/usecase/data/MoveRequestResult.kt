@@ -30,6 +30,15 @@ sealed class MoveRequestResult(
     abstract fun getResultText(): String?
 
     /**
+     * Resets the account details timestamp if some request finished with success.
+     */
+    fun resetAccountDetailsIfNeeded() {
+        if (successCount > 0) {
+            DBUtil.resetAccountDetailsTimeStamp()
+        }
+    }
+
+    /**
      * Result of a movement request from one location to another one.
      */
     class GeneralMovement(
@@ -43,9 +52,6 @@ sealed class MoveRequestResult(
         oldParentHandle = oldParentHandle,
         isForeignNode = isForeignNode
     ) {
-        init {
-            DBUtil.resetAccountDetailsTimeStamp()
-        }
 
         override fun getResultText(): String? =
             when {
@@ -75,14 +81,12 @@ sealed class MoveRequestResult(
         override fun getResultText(): String? =
             when {
                 count == 1 && isSuccess -> {
-                    DBUtil.resetAccountDetailsTimeStamp()
                     getString(R.string.context_correctly_moved_to_rubbish)
                 }
                 count == 1 -> {
                     getString(R.string.context_no_moved)
                 }
                 isSuccess -> {
-                    DBUtil.resetAccountDetailsTimeStamp()
                     getQuantityString(R.plurals.number_correctly_moved_to_rubbish, count, count)
                 }
                 count == errorCount -> {
@@ -93,11 +97,9 @@ sealed class MoveRequestResult(
                     )
                 }
                 errorCount == 1 && successCount == 1 -> {
-                    DBUtil.resetAccountDetailsTimeStamp()
                     getString(R.string.node_correctly_and_node_incorrectly_moved_to_rubbish)
                 }
                 errorCount == 1 -> {
-                    DBUtil.resetAccountDetailsTimeStamp()
                     getString(
                         R.string.nodes_correctly_and_node_incorrectly_moved_to_rubbish,
                         successCount
@@ -135,7 +137,6 @@ sealed class MoveRequestResult(
         override fun getResultText(): String? =
             when {
                 count == 1 && isSuccess -> {
-                    DBUtil.resetAccountDetailsTimeStamp()
 
                     if (destination != null) {
                         getString(R.string.context_correctly_node_restored, destination.name)
@@ -147,7 +148,6 @@ sealed class MoveRequestResult(
                     getString(R.string.context_no_restored)
                 }
                 isSuccess -> {
-                    DBUtil.resetAccountDetailsTimeStamp()
                     getQuantityString(
                         R.plurals.number_correctly_restored_from_rubbish,
                         count,
@@ -162,11 +162,9 @@ sealed class MoveRequestResult(
                     )
                 }
                 errorCount == 1 && successCount == 1 -> {
-                    DBUtil.resetAccountDetailsTimeStamp()
                     getString(R.string.node_correctly_and_node_incorrectly_restored_from_rubbish)
                 }
                 errorCount == 1 -> {
-                    DBUtil.resetAccountDetailsTimeStamp()
                     getString(
                         R.string.nodes_correctly_and_node_incorrectly_restored_from_rubbish,
                         successCount
