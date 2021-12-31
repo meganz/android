@@ -188,7 +188,7 @@ class ImageBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
             // Download
             optionDownload.isVisible = !nodeItem.isFromRubbishBin
             optionDownload.setOnClickListener {
-                if (!isOnline && nodeItem.isAvailableOffline) {
+                if (nodeItem.isAvailableOffline) {
                     (activity as? ImageViewerActivity?)?.saveOfflineNode(nodeItem.handle)
                 } else if (node != null) {
                     (activity as? ImageViewerActivity?)?.saveNode(node, false)

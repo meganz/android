@@ -195,11 +195,8 @@ class ImageViewerActivity : BaseActivity(), PermissionRequester, SnackbarShower 
     private val chatRoomId: Long? by extra(INTENT_EXTRA_KEY_CHAT_ID)
     private val chatMessagesId: LongArray? by extra(INTENT_EXTRA_KEY_MSG_ID)
 
-    private var pageCallbackSet = false
     private val viewModel by viewModels<ImageViewerViewModel>()
     private val pagerAdapter by lazy { ImageViewerAdapter(this) }
-    private val nodeAttacher by lazy { WeakReference(MegaAttacher(this)) }
-    private var bottomSheet: ImageBottomSheetDialogFragment? = null
     private val pageChangeCallback by lazy {
         object : ViewPager2.OnPageChangeCallback() {
             override fun onPageSelected(position: Int) {
@@ -207,28 +204,18 @@ class ImageViewerActivity : BaseActivity(), PermissionRequester, SnackbarShower 
             }
         }
     }
-    private val nodeSaver by lazy {
-        WeakReference(
-            NodeSaver(
-                this, this, this,
-                showSaveToDeviceConfirmDialog(this)
-            )
-        )
-    }
-    private val dragToExit by lazy {
-        WeakReference(
-            DragToExitSupport(this, ::enableToolbarTransition) {
-                finish()
-                overridePendingTransition(0, android.R.anim.fade_out)
-            }
-        )
-    }
 
+    private var pageCallbackSet = false
+    private var bottomSheet: ImageBottomSheetDialogFragment? = null
     private lateinit var binding: ActivityImageViewerBinding
+    private lateinit var nodeSaver: WeakReference<NodeSaver>
+    private lateinit var nodeAttacher: WeakReference<MegaAttacher>
+    private lateinit var dragToExit: WeakReference<DragToExitSupport>
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         WindowCompat.setDecorFitsSystemWindows(window, false)
+        setupWeakReferences(savedInstanceState)
 
         binding = ActivityImageViewerBinding.inflate(layoutInflater)
         setContentView(dragToExit.get()?.wrapContentView(binding.root))
@@ -238,8 +225,9 @@ class ImageViewerActivity : BaseActivity(), PermissionRequester, SnackbarShower 
 
         if (savedInstanceState == null) {
             if (!Fresco.hasBeenInitialized()) Fresco.initialize(this)
-
-            dragToExit.get()?.runEnterAnimation(intent, binding.root, ::enableToolbarTransition)
+            binding.root.post {
+                dragToExit.get()?.runEnterAnimation(intent, binding.root, ::enableToolbarTransition)
+            }
         }
     }
 
@@ -248,9 +236,16 @@ class ImageViewerActivity : BaseActivity(), PermissionRequester, SnackbarShower 
         return true
     }
 
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        nodeSaver.get()?.saveState(outState)
+        nodeAttacher.get()?.saveState(outState)
+    }
+
     override fun onDestroy() {
         binding.viewPager.unregisterOnPageChangeCallback(pageChangeCallback)
         nodeAttacher.clear()
+        nodeSaver.get()?.destroy()
         nodeSaver.clear()
         if (isFinishing) dragToExit.get()?.showPreviousHiddenThumbnail()
         dragToExit.clear()
@@ -361,6 +356,28 @@ class ImageViewerActivity : BaseActivity(), PermissionRequester, SnackbarShower 
         }
     }
 
+    private fun setupWeakReferences(savedInstanceState: Bundle?) {
+        dragToExit = WeakReference(
+            DragToExitSupport(this, ::enableToolbarTransition) {
+                finish()
+                overridePendingTransition(0, android.R.anim.fade_out)
+            }
+        )
+        nodeAttacher = WeakReference(
+            MegaAttacher(this).apply {
+                savedInstanceState?.let(::restoreState)
+            }
+        )
+        nodeSaver = WeakReference(
+            NodeSaver(
+                this, this, this,
+                showSaveToDeviceConfirmDialog(this)
+            ).apply {
+                savedInstanceState?.let(::restoreState)
+            }
+        )
+    }
+
     /**
      * Populate current image information to bottom texts and toolbar options.
      *
@@ -427,10 +444,10 @@ class ImageViewerActivity : BaseActivity(), PermissionRequester, SnackbarShower 
                 true
             }
             R.id.action_download -> {
-                if (!isOnline() && nodeItem.isAvailableOffline) {
+                if (nodeItem.isAvailableOffline) {
                     saveOfflineNode(nodeItem.handle)
-                } else {
-                    nodeItem.node?.let { saveNode(it, false) }
+                } else if (nodeItem.node != null) {
+                    saveNode(nodeItem.node, false)
                 }
                 true
             }
@@ -479,12 +496,21 @@ class ImageViewerActivity : BaseActivity(), PermissionRequester, SnackbarShower 
         showRenameNodeDialog(this, node, this, null)
     }
 
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<out String>,
+        grantResults: IntArray
+    ) {
+        nodeSaver.get()?.handleRequestPermissionsResult(requestCode)
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+    }
+
     @Suppress("deprecation")
     override fun onActivityResult(requestCode: Int, resultCode: Int, intent: Intent?) {
         when {
-            nodeAttacher.get()?.handleActivityResult(requestCode, resultCode, intent, this) == true ->
-                return
             nodeSaver.get()?.handleActivityResult(requestCode, resultCode, intent) == true ->
+                return
+            nodeAttacher.get()?.handleActivityResult(requestCode, resultCode, intent, this) == true ->
                 return
             else ->
                 super.onActivityResult(requestCode, resultCode, intent)

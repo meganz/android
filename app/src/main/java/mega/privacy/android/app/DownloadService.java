@@ -562,7 +562,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 		if(pendingDownloads <= 0){
 			logDebug("onQueueComplete: reset total downloads");
 			// When download a single file by tapping it, and auto play is enabled.
-			int totalDownloads = megaApi.getTotalDownloads();
+			int totalDownloads = megaApi.getTotalDownloads() - backgroundTransfers.size();
 			if (totalDownloads == 1 && Boolean.parseBoolean(dbH.getAutoPlayEnabled()) && autoPlayInfo != null && downloadByTap) {
                 sendBroadcast(new Intent(BROADCAST_ACTION_INTENT_SHOWSNACKBAR_TRANSFERS_FINISHED)
                         .putExtra(TRANSFER_TYPE, DOWNLOAD_TRANSFER_OPEN)

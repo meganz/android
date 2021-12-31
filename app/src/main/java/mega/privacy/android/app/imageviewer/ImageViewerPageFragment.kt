@@ -111,40 +111,37 @@ class ImageViewerPageFragment : Fragment() {
     }
 
     private fun showItem(item: ImageItem?) {
-        if (item?.imageResult != null) {
-            val imageResult = item.imageResult
-            when {
-                imageResult.fullSizeUri != null && imageResult.isVideo ->
-                    showImageUris(imageResult.fullSizeUri!!, null)
-                imageResult.fullSizeUri != null ->
-                    showImageUris(imageResult.fullSizeUri!!, imageResult.previewUri ?: imageResult.thumbnailUri)
-                imageResult.previewUri != null && !imageResult.isVideo ->
-                    showImageUris(imageResult.previewUri!!, imageResult.thumbnailUri)
-                imageResult.thumbnailUri != null && !imageResult.isVideo ->
-                    showImageUris(imageResult.thumbnailUri!!)
-            }
+        val imageResult = item?.imageResult ?: return
 
-            if (imageResult.fullyLoaded) {
-                if (imageResult.isVideo) {
-                    binding.btnVideo.setOnClickListener { launchVideoScreen(item) }
-                    binding.image.apply {
-                        setZoomingEnabled(false)
-                        setIsLongpressEnabled(false)
-                        setTapListener(object : GestureDetector.SimpleOnGestureListener() {
-                            override fun onSingleTapUp(e: MotionEvent?): Boolean {
-                                launchVideoScreen(item)
-                                return true
-                            }
-                        })
-                    }
+        when {
+            imageResult.fullSizeUri != null && imageResult.isVideo ->
+                showImageUris(imageResult.fullSizeUri!!, null)
+            imageResult.fullSizeUri != null ->
+                showImageUris(
+                    imageResult.fullSizeUri!!,
+                    imageResult.previewUri ?: imageResult.thumbnailUri
+                )
+            imageResult.previewUri != null && !imageResult.isVideo ->
+                showImageUris(imageResult.previewUri!!, imageResult.thumbnailUri)
+            imageResult.thumbnailUri != null && !imageResult.isVideo ->
+                showImageUris(imageResult.thumbnailUri!!)
+        }
+
+        if (imageResult.fullyLoaded) {
+            if (imageResult.isVideo) {
+                binding.btnVideo.setOnClickListener { launchVideoScreen(item) }
+                binding.image.apply {
+                    setZoomingEnabled(false)
+                    setIsLongpressEnabled(false)
+                    setTapListener(object : GestureDetector.SimpleOnGestureListener() {
+                        override fun onSingleTapUp(e: MotionEvent?): Boolean {
+                            launchVideoScreen(item)
+                            return true
+                        }
+                    })
                 }
-                binding.btnVideo.isVisible = imageResult.isVideo
-                binding.progress.hide()
             }
-        } else if (lifecycle.currentState == Lifecycle.State.RESUMED) {
-            binding.image.controller = Fresco.newDraweeControllerBuilder()
-                .setImageRequest(ImageRequest.fromUri(UriUtil.getUriForResourceId(R.drawable.ic_error)))
-                .build()
+            binding.btnVideo.isVisible = imageResult.isVideo
             binding.progress.hide()
         }
     }
