@@ -63,9 +63,12 @@ open class TransfersManagementActivity : PasscodeActivity() {
 
         if (savedInstanceState != null) {
             when {
-                savedInstanceState.getBoolean(IS_CANCEL_TRANSFERS_SHOWN, false) ->
+                savedInstanceState.getBoolean(IS_CANCEL_TRANSFERS_SHOWN, false) -> {
                     showCancelTransfersDialog()
-                transfersManagement.isScanningTransfers() -> showScanningTransfersDialog()
+                }
+                transfersManagement.shouldShowScanningTransfersDialog() -> {
+                    showScanningTransfersDialog()
+                }
             }
         }
     }
@@ -91,10 +94,13 @@ open class TransfersManagementActivity : PasscodeActivity() {
 
         LiveEventBus.get(EVENT_SHOW_SCANNING_TRANSFERS_DIALOG, Boolean::class.java)
             .observe(this) { show ->
-                if (show) {
-                    showScanningTransfersDialog()
-                } else {
-                    scanningTransfersDialog?.dismiss()
+                when {
+                    show && transfersManagement.shouldShowScanningTransfersDialog() -> {
+                        showScanningTransfersDialog()
+                    }
+                    !show && !transfersManagement.shouldShowScanningTransfersDialog() -> {
+                        scanningTransfersDialog?.dismiss()
+                    }
                 }
             }
     }

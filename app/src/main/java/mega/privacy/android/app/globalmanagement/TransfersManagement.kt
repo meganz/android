@@ -148,21 +148,6 @@ class TransfersManagement @Inject constructor(
 
                 mBuilder.build()
             }
-
-        /**
-         * Checks if should update the scanning folder dialog in case the folder transfer stage
-         * is STAGE_SCAN, STAGE_CREATE_TREE, STAGE_GEN_TRANSFERS, STAGE_PROCESS_TRANSFER_QUEUE or
-         * STAGE_TRANSFERRING_FILES.
-         *
-         * @return True if should update it, false otherwise.
-         */
-        @JvmStatic
-        fun shouldUpdateScanningFolderDialog(transfer: MegaTransfer): Boolean =
-            transfer.stage.toInt() == MegaTransfer.STAGE_SCAN
-                    || transfer.stage.toInt() == MegaTransfer.STAGE_CREATE_TREE
-                    || transfer.stage.toInt() == MegaTransfer.STAGE_GEN_TRANSFERS
-                    || transfer.stage.toInt() == MegaTransfer.STAGE_PROCESS_TRANSFER_QUEUE
-                    || transfer.stage.toInt() == MegaTransfer.STAGE_TRANSFERRING_FILES
     }
 
     private var networkTimer: CountDownTimer? = null
@@ -181,6 +166,8 @@ class TransfersManagement @Inject constructor(
 
     private val scanningTransfers = ArrayList<ScanningTransferData>()
     private var scanningTransfersToken: MegaCancelToken? = null
+    private var isProcessingSDCardFolders = false
+    private var shouldBreakTransfersProcessing = false
 
     init {
         resetTransferOverQuotaTimestamp()
@@ -200,6 +187,8 @@ class TransfersManagement @Inject constructor(
         pausedTransfers.clear()
         scanningTransfers.clear()
         scanningTransfersToken = null
+        isProcessingSDCardFolders = false
+        shouldBreakTransfersProcessing = false
     }
 
     /**
@@ -252,7 +241,7 @@ class TransfersManagement @Inject constructor(
      * @param transfer MegaTransfer to check.
      */
     fun checkIfTransferIsPaused(transfer: MegaTransfer?) {
-        if (transfer?.state == MegaTransfer.STATE_PAUSED) {
+        if (transfer?.state == STATE_PAUSED) {
             addPausedTransfers(transfer.tag)
         }
     }
@@ -446,6 +435,8 @@ class TransfersManagement @Inject constructor(
      * Cancels all the scanning transfers.
      */
     fun cancelScanningTransfers() {
+        shouldBreakTransfersProcessing = true
+        isProcessingSDCardFolders = false
         scanningTransfersToken?.cancel()
         scanningTransfers.clear()
     }
@@ -523,7 +514,56 @@ class TransfersManagement @Inject constructor(
         }
     }
 
-    fun isScanningTransfers() : Boolean = scanningTransfers.isNotEmpty()
+    /**
+     * Checks if is scanning transfers.
+     *
+     * @return True if scanningTransfers is not empty, which means is scanning transfers.
+     *         False otherwise.
+     */
+    private fun isScanningTransfers(): Boolean = scanningTransfers.isNotEmpty()
+
+    /**
+     * Updates the flag isProcessingSDCardFolders if needed and launches and event to show
+     * or hide the scanning transfers dialog if so.
+     *
+     * @param processing True if is processing SD card download folders, false otherwise.
+     */
+    fun setIsProcessingSDCardFolders(processing: Boolean) {
+        when {
+            !isScanningTransfers() && !isProcessingSDCardFolders && processing -> {
+                isProcessingSDCardFolders = true
+                LiveEventBus.get(EVENT_SHOW_SCANNING_TRANSFERS_DIALOG, Boolean::class.java)
+                    .post(true)
+            }
+            !processing -> {
+                isProcessingSDCardFolders = false
+                LiveEventBus.get(EVENT_SHOW_SCANNING_TRANSFERS_DIALOG, Boolean::class.java)
+                    .post(false)
+            }
+        }
+    }
+
+    /**
+     * Checks if should show the scanning transfers dialog.
+     *
+     * @return True if should show the dialog, false otherwise.
+     */
+    fun shouldShowScanningTransfersDialog(): Boolean =
+        isProcessingSDCardFolders || isScanningTransfers()
+
+    /**
+     * Checks if should stop processing transfers.
+     * If so, updates the flag to false since is already checked and stopped.
+     *
+     * @return True if should stop processing transfers, false otherwise.
+     */
+    fun shouldBreakProcessingTransfers(): Boolean =
+        if (shouldBreakTransfersProcessing) {
+            isProcessingSDCardFolders = false
+            true
+        } else {
+            false
+        }
 
     /**
      * Checks if the transfer over quota has occurred at this moment

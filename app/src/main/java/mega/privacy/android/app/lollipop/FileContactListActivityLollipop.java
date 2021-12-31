@@ -701,6 +701,10 @@ public class FileContactListActivityLollipop extends PasscodeActivity implements
 			}
 			showSnackbar(getQuantityString(R.plurals.upload_began, infos.size(), infos.size()));
 			for (ShareInfo info : infos) {
+				if (transfersManagement.shouldBreakProcessingTransfers()) {
+					break;
+				}
+
 				Intent intent = new Intent(this, UploadService.class);
 				intent.putExtra(UploadService.EXTRA_FILEPATH, info.getFileAbsolutePath());
 				intent.putExtra(UploadService.EXTRA_NAME, info.getTitle());

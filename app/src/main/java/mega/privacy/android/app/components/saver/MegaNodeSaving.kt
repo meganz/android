@@ -81,10 +81,15 @@ class MegaNodeSaving(
         var theOnlyLocalFilePath = ""
 
         for (node in nodes) {
+            if (app.transfersManagement.shouldBreakProcessingTransfers()) {
+                return AutoPlayInfo.NO_AUTO_PLAY
+            }
+
             val dlFiles = HashMap<MegaNode, String>()
             val targets = HashMap<Long, String>()
 
             if (node.type == MegaNode.TYPE_FOLDER && sdCardOperator != null && sdCardOperator.isSDCardDownload) {
+                app.transfersManagement.setIsProcessingSDCardFolders(true)
                 sdCardOperator.buildFileStructure(targets, parentPath, api, node)
                 getDlList(api, dlFiles, node, File(sdCardOperator.downloadRoot, node.name))
             } else if (sdCardOperator != null && sdCardOperator.isSDCardDownload) {
@@ -167,6 +172,8 @@ class MegaNodeSaving(
                 }
             }
         }
+
+        app.transfersManagement.setIsProcessingSDCardFolders(false)
 
         val message = when {
             numberOfNodesPending == 0 && numberOfNodesAlreadyDownloaded == 0 -> {

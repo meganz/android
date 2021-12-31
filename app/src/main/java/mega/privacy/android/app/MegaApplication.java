@@ -163,7 +163,7 @@ public class MegaApplication extends MultiDexApplication implements Application.
 	@Inject
 	PasscodeManagement passcodeManagement;
 	@Inject
-	TransfersManagement transfersManagement;
+	public TransfersManagement transfersManagement;
 
 	String localIpAddress = "";
 	BackgroundRequestListener requestListener;
