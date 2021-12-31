@@ -104,6 +104,10 @@ class MegaNodeSaving(
             }
 
             for (document in dlFiles.keys) {
+                if (app.transfersManagement.shouldBreakProcessingTransfers()) {
+                    return AutoPlayInfo.NO_AUTO_PLAY
+                }
+
                 val path = dlFiles[document]
                 val targetPath = targets[document.handle]
                 if (TextUtil.isTextEmpty(path)) {
