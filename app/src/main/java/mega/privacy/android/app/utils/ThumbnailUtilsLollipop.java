@@ -492,7 +492,6 @@ public class ThumbnailUtilsLollipop {
             String base64 = MegaApiJava.handleToBase64(handle);
 			if (e.getErrorCode() == MegaError.API_OK){
 				logDebug("Downloading thumbnail OK: " + handle);
-				TL.log("Downloading thumbnail OK: " + handle);
 				thumbnailCache.remove(handle);
 
 				if (holder != null){
