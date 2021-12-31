@@ -559,7 +559,7 @@ class TransfersManagement @Inject constructor(
      */
     fun shouldBreakProcessingTransfers(): Boolean =
         if (shouldBreakTransfersProcessing) {
-            isProcessingSDCardFolders = false
+            shouldBreakTransfersProcessing = false
             true
         } else {
             false
