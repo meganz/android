@@ -3661,7 +3661,6 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 
 		switch (drawerItem){
 			case CLOUD_DRIVE:{
-
                 aB.setSubtitle(null);
                 logDebug("Cloud Drive SECTION");
                 MegaNode parentNode = megaApi.getNodeByHandle(parentHandleBrowser);
@@ -3695,7 +3694,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 			}
 			case RUBBISH_BIN: {
 				aB.setSubtitle(null);
-				if(parentHandleRubbish == megaApi.getRubbishNode().getHandle() || parentHandleRubbish == -1){
+				if (parentHandleRubbish == INVALID_HANDLE || (megaApi.getRubbishNode() != null && parentHandleRubbish == megaApi.getRubbishNode().getHandle())) {
 					aB.setTitle(getResources().getString(R.string.section_rubbish_bin).toUpperCase());
 					firstNavigationLevel = true;
 				}
