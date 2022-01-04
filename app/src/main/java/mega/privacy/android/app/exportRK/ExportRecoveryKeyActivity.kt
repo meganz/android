@@ -131,7 +131,7 @@ class ExportRecoveryKeyActivity : PasscodeActivity() {
      *
      * @param copiedRK Message to show as copy RK action result.
      */
-    private fun recoveryKeyCopied(copiedRK: String) {
+    private fun recoveryKeyCopied(copiedRK: String?) {
         showAlert(
             this, StringResourcesUtils.getString(
                 if (isTextEmpty(copiedRK)) R.string.general_text_error
