@@ -19,13 +19,14 @@ import mega.privacy.android.app.imageviewer.data.ImageResult
 import mega.privacy.android.app.imageviewer.usecase.GetImageHandlesUseCase
 import mega.privacy.android.app.imageviewer.usecase.GetImageUseCase
 import mega.privacy.android.app.usecase.CancelTransferUseCase
-import mega.privacy.android.app.usecase.GetNetworkConnectionUseCase
 import mega.privacy.android.app.usecase.GetNodeUseCase
 import mega.privacy.android.app.usecase.LoggedInUseCase
 import mega.privacy.android.app.usecase.data.MegaNodeItem
 import mega.privacy.android.app.utils.Constants.INVALID_POSITION
+import mega.privacy.android.app.utils.HashCompositeDisposable
 import mega.privacy.android.app.utils.LogUtil.logError
 import mega.privacy.android.app.utils.LogUtil.logWarning
+import mega.privacy.android.app.utils.RxUtil.addTo
 import mega.privacy.android.app.utils.StringResourcesUtils.getQuantityString
 import mega.privacy.android.app.utils.StringResourcesUtils.getString
 import mega.privacy.android.app.utils.livedata.SingleLiveEvent
@@ -58,10 +59,18 @@ class ImageViewerViewModel @Inject constructor(
     private val currentPosition = MutableLiveData<Int>()
     private val switchToolbar = MutableLiveData<Unit>()
     private val snackbarMessage = SingleLiveEvent<String>()
+    private val nodesComposite = HashCompositeDisposable()
+    private val imagesComposite = HashCompositeDisposable()
     private var isUserLoggedIn = false
 
     init {
         checkIfUserIsLoggedIn()
+    }
+
+    override fun onCleared() {
+        nodesComposite.clear()
+        imagesComposite.clear()
+        super.onCleared()
     }
 
     fun onImagesHandle(): LiveData<List<Long>?> =
@@ -167,7 +176,7 @@ class ImageViewerViewModel @Inject constructor(
                     logError(error.stackTraceToString())
                 }
             )
-            .addTo(composite)
+            .addTo(nodeHandle, nodesComposite)
     }
 
     /**
@@ -206,7 +215,7 @@ class ImageViewerViewModel @Inject constructor(
                     logError(error.stackTraceToString())
                 }
             )
-            .addTo(composite)
+            .addTo(nodeHandle, imagesComposite)
     }
 
     /**
@@ -340,6 +349,8 @@ class ImageViewerViewModel @Inject constructor(
                     }
                 )
         }
+        imagesComposite.remove(nodeHandle)
+        nodesComposite.remove(nodeHandle)
     }
 
     fun updateCurrentPosition(position: Int, forceUpdate: Boolean = false) {

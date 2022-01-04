@@ -7,7 +7,7 @@ import nz.mega.sdk.*
  */
 class OptionalMegaGlobalListenerInterface(
     private val onUsersUpdate: ((ArrayList<MegaUser>) -> Unit)? = null,
-    private val onUserAlertsUpdate: ((ArrayList<MegaUserAlert>) -> Unit)? = null,
+    private val onUserAlertsUpdate: ((ArrayList<MegaUserAlert>?) -> Unit)? = null,
     private val onNodesUpdate: ((ArrayList<MegaNode>?) -> Unit)? = null,
     private val onReloadNeeded: (() -> Unit)? = null,
     private val onAccountUpdate: (() -> Unit)? = null,
@@ -19,7 +19,7 @@ class OptionalMegaGlobalListenerInterface(
         onUsersUpdate?.invoke(users)
     }
 
-    override fun onUserAlertsUpdate(api: MegaApiJava, userAlerts: ArrayList<MegaUserAlert>) {
+    override fun onUserAlertsUpdate(api: MegaApiJava, userAlerts: ArrayList<MegaUserAlert>?) {
         onUserAlertsUpdate?.invoke(userAlerts)
     }
 

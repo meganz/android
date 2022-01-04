@@ -2,6 +2,7 @@ package mega.privacy.android.app.utils
 
 import io.reactivex.rxjava3.core.Flowable
 import io.reactivex.rxjava3.core.Single
+import io.reactivex.rxjava3.disposables.Disposable
 import io.reactivex.rxjava3.functions.Action
 import io.reactivex.rxjava3.functions.Consumer
 import java.util.concurrent.TimeUnit
@@ -33,4 +34,14 @@ object RxUtil {
         } catch (ignore: Exception) {
             null
         }
+
+    /**
+     * Add the disposable to a HashCompositeDisposable.
+     *
+     * @param key           Disposable associated key
+     * @param disposable    HashCompositeDisposable to add this disposable to
+     * @return              this instance
+     */
+    fun Disposable.addTo(key: Long, disposable: HashCompositeDisposable): Disposable =
+        apply { disposable.add(key, this) }
 }
