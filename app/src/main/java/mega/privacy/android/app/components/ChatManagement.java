@@ -17,6 +17,7 @@ import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.listeners.ChatRoomListener;
 import mega.privacy.android.app.meeting.listeners.DisableAudioVideoCallListener;
 import mega.privacy.android.app.utils.CallUtil;
+import mega.privacy.android.app.utils.VideoCaptureUtils;
 import nz.mega.sdk.MegaChatCall;
 import nz.mega.sdk.MegaChatListItem;
 import nz.mega.sdk.MegaChatRequestListenerInterface;
@@ -454,7 +455,7 @@ public class ChatManagement {
     public void controlProximitySensor(boolean isNear) {
         MegaChatCall call = CallUtil.getCallInProgress();
         if (call == null || (call.getStatus() != MegaChatCall.CALL_STATUS_JOINING &&
-                call.getStatus() != MegaChatCall.CALL_STATUS_IN_PROGRESS) || !isScreenOn)
+                call.getStatus() != MegaChatCall.CALL_STATUS_IN_PROGRESS) || !isScreenOn || !VideoCaptureUtils.isFrontCameraInUse())
             return;
 
         if (!getVideoStatus(call.getChatid())) {
