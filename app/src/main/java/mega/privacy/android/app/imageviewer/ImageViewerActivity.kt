@@ -49,7 +49,7 @@ import java.lang.ref.WeakReference
 class ImageViewerActivity : BaseActivity(), PermissionRequester, SnackbarShower {
 
     companion object {
-        private const val OFFSCREEN_PAGE_LIMIT = 3
+        private const val OFFSCREEN_PAGE_LIMIT = 2
 
         /**
          * Get Image Viewer intent to show a single image node.
