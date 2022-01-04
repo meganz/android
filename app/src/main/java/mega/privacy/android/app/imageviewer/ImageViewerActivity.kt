@@ -200,7 +200,7 @@ class ImageViewerActivity : BaseActivity(), PermissionRequester, SnackbarShower 
     private val pageChangeCallback by lazy {
         object : ViewPager2.OnPageChangeCallback() {
             override fun onPageSelected(position: Int) {
-                viewModel.updateCurrentPosition(position)
+                viewModel.updateCurrentPosition(position, false)
             }
         }
     }
@@ -218,10 +218,10 @@ class ImageViewerActivity : BaseActivity(), PermissionRequester, SnackbarShower 
         setupWeakReferences(savedInstanceState)
 
         binding = ActivityImageViewerBinding.inflate(layoutInflater)
-        setContentView(dragToExit.get()?.wrapContentView(binding.root))
+        setContentView(dragToExit.get()?.wrapContentView(binding.root) ?: binding.root)
 
         setupView()
-        setupObservers()
+        setupObservers(savedInstanceState == null)
 
         if (savedInstanceState == null) {
             if (!Fresco.hasBeenInitialized()) Fresco.initialize(this)
@@ -287,24 +287,26 @@ class ImageViewerActivity : BaseActivity(), PermissionRequester, SnackbarShower 
     }
 
     @SuppressLint("NotifyDataSetChanged")
-    private fun setupObservers() {
-        when {
-            parentNodeHandle != null && parentNodeHandle != INVALID_HANDLE ->
-                viewModel.retrieveImagesFromParent(parentNodeHandle!!, childOrder, nodeHandle)
-            childrenHandles?.isNotEmpty() == true ->
-                viewModel.retrieveImages(childrenHandles!!, nodeHandle)
-            childrenOfflineHandles?.isNotEmpty() == true ->
-                viewModel.retrieveImages(childrenOfflineHandles!!, nodeHandle, isOffline = true)
-            nodeOfflineHandle != null && nodeOfflineHandle != INVALID_HANDLE ->
-                viewModel.retrieveSingleImage(nodeOfflineHandle!!, isOffline = true)
-            chatRoomId != null && chatMessagesId?.isNotEmpty() == true ->
-                viewModel.retrieveChatImages(chatRoomId!!, chatMessagesId!!, nodeHandle)
-            !nodeFileLink.isNullOrBlank() ->
-                viewModel.retrieveSingleImage(nodeFileLink!!)
-            nodeHandle != null && nodeHandle != INVALID_HANDLE ->
-                viewModel.retrieveSingleImage(nodeHandle!!)
-            else ->
-                error("Invalid params")
+    private fun setupObservers(requestImagesData: Boolean) {
+        if (requestImagesData) {
+            when {
+                parentNodeHandle != null && parentNodeHandle != INVALID_HANDLE ->
+                    viewModel.retrieveImagesFromParent(parentNodeHandle!!, childOrder, nodeHandle)
+                childrenHandles?.isNotEmpty() == true ->
+                    viewModel.retrieveImages(childrenHandles!!, nodeHandle)
+                childrenOfflineHandles?.isNotEmpty() == true ->
+                    viewModel.retrieveImages(childrenOfflineHandles!!, nodeHandle, isOffline = true)
+                nodeOfflineHandle != null && nodeOfflineHandle != INVALID_HANDLE ->
+                    viewModel.retrieveSingleImage(nodeOfflineHandle!!, isOffline = true)
+                chatRoomId != null && chatMessagesId?.isNotEmpty() == true ->
+                    viewModel.retrieveChatImages(chatRoomId!!, chatMessagesId!!, nodeHandle)
+                !nodeFileLink.isNullOrBlank() ->
+                    viewModel.retrieveSingleImage(nodeFileLink!!)
+                nodeHandle != null && nodeHandle != INVALID_HANDLE ->
+                    viewModel.retrieveSingleImage(nodeHandle!!)
+                else ->
+                    error("Invalid params")
+            }
         }
 
         viewModel.onImagesHandle().observe(this) { items ->

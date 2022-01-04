@@ -2,22 +2,17 @@ package mega.privacy.android.app.imageviewer.usecase
 
 import android.content.Context
 import dagger.hilt.android.qualifiers.ApplicationContext
-import io.reactivex.rxjava3.core.BackpressureStrategy
-import io.reactivex.rxjava3.core.Flowable
-import io.reactivex.rxjava3.kotlin.subscribeBy
+import io.reactivex.rxjava3.core.Single
 import mega.privacy.android.app.di.MegaApi
 import mega.privacy.android.app.imageviewer.data.ImageItem
 import mega.privacy.android.app.usecase.GetChatMessageUseCase
-import mega.privacy.android.app.usecase.GetGlobalChangesUseCase
 import mega.privacy.android.app.usecase.GetNodeUseCase
-import mega.privacy.android.app.utils.Constants.INVALID_POSITION
 import mega.privacy.android.app.utils.MegaNodeUtil.isValidForImageViewer
 import mega.privacy.android.app.utils.RxUtil.blockingGetOrNull
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 import nz.mega.sdk.MegaApiJava.ORDER_PHOTO_ASC
 import nz.mega.sdk.MegaNode
-import nz.mega.sdk.MegaNode.*
 import javax.inject.Inject
 
 /**
@@ -26,14 +21,12 @@ import javax.inject.Inject
  * @property context                    Context to retrieve offline nodes
  * @property megaApi                    MegaAPI required for node requests
  * @property getChatMessageUseCase      ChatMessageUseCase required to retrieve chat node information
- * @property getGlobalChangesUseCase    GlobalChangesUseCase required to update nodes in realtime
  * @property getNodeUseCase             NodeUseCase required to retrieve node information
  */
 class GetImageHandlesUseCase @Inject constructor(
     @ApplicationContext private val context: Context,
     @MegaApi private val megaApi: MegaApiAndroid,
     private val getChatMessageUseCase: GetChatMessageUseCase,
-    private val getGlobalChangesUseCase: GetGlobalChangesUseCase,
     private val getNodeUseCase: GetNodeUseCase,
 ) {
 
@@ -47,9 +40,8 @@ class GetImageHandlesUseCase @Inject constructor(
      * @param chatMessageIds    Node Chat Message Ids.
      * @param sortOrder         Node search order
      * @param isOffline         Flag to check if it's offline node
-     * @return                  Flowable with up-todate image nodes
+     * @return                  Single with image nodes
      */
-    @Suppress("SENSELESS_COMPARISON")
     fun get(
         nodeHandles: LongArray? = null,
         parentNodeHandle: Long? = null,
@@ -58,8 +50,8 @@ class GetImageHandlesUseCase @Inject constructor(
         chatMessageIds: LongArray? = null,
         sortOrder: Int? = ORDER_PHOTO_ASC,
         isOffline: Boolean = false
-    ): Flowable<List<ImageItem>> =
-        Flowable.create({ emitter ->
+    ): Single<List<ImageItem>> =
+        Single.fromCallable {
             val items = mutableListOf<ImageItem>()
             when {
                 parentNodeHandle != null && parentNodeHandle != INVALID_HANDLE -> {
@@ -67,8 +59,7 @@ class GetImageHandlesUseCase @Inject constructor(
                     if (parentNode != null && megaApi.hasChildren(parentNode)) {
                         items.addChildrenNodes(parentNode, sortOrder ?: ORDER_PHOTO_ASC)
                     } else {
-                        emitter.onError(IllegalStateException("Node is null or has no children"))
-                        return@create
+                        error("Node is null or has no children")
                     }
                 }
                 nodeHandles?.isNotEmpty() == true -> {
@@ -83,73 +74,16 @@ class GetImageHandlesUseCase @Inject constructor(
                 chatRoomId != null && chatMessageIds?.isNotEmpty() == true ->
                     items.addChatChildren(chatRoomId, chatMessageIds)
                 else -> {
-                    emitter.onError(IllegalArgumentException("Invalid parameters"))
-                    return@create
+                    error("Invalid parameters")
                 }
             }
 
             if (items.isNotEmpty()) {
-                emitter.onNext(items)
+                items
             } else {
-                emitter.onError(IllegalArgumentException("Invalid image handles"))
-                return@create
+                error("Invalid image handles")
             }
-
-            val globalSubscription = getGlobalChangesUseCase.get().subscribeBy(
-                onNext = { change ->
-                    if (emitter.isCancelled) return@subscribeBy
-
-                    if (change is GetGlobalChangesUseCase.Result.OnNodesUpdate) {
-                        change.nodes?.forEach { changedNode ->
-                            val index = items.indexOfFirst { it.handle == changedNode.handle }
-
-                            if (changedNode.hasChanged(CHANGE_TYPE_NEW) || changedNode.hasChanged(CHANGE_TYPE_PARENT)) {
-                                val hasSameParent = when {
-                                    changedNode.parentHandle == null -> { // MegaNode.getParentHandle() can be null
-                                        false
-                                    }
-                                    parentNodeHandle != null -> {
-                                        changedNode.parentHandle == parentNodeHandle
-                                    }
-                                    items.isNotEmpty() -> {
-                                        val node = items
-                                            .firstOrNull { !it.isOffline && it.nodePublicLink == null }
-                                            ?.let { getNodeUseCase.get(it.handle).blockingGetOrNull() }
-
-                                        changedNode.parentHandle == node?.parentHandle
-                                    }
-                                    else -> {
-                                        false
-                                    }
-                                }
-
-                                if (hasSameParent) {
-                                    if (changedNode.hasChanged(CHANGE_TYPE_PARENT)) {
-                                        items[index] = ImageItem(changedNode.handle, isDirty = true)
-                                    } else if (changedNode.isValidForImageViewer()) {
-                                        items.add(ImageItem(changedNode.handle))
-                                    }
-                                } else if (changedNode.hasChanged(CHANGE_TYPE_PARENT)) {
-                                    items.removeAt(index)
-                                }
-                            } else if (index != INVALID_POSITION) {
-                                if (changedNode.hasChanged(CHANGE_TYPE_REMOVED)) {
-                                    items.removeAt(index)
-                                } else {
-                                    items[index] = ImageItem(changedNode.handle, isDirty = true)
-                                }
-                            }
-                        }
-
-                        emitter.onNext(items)
-                    }
-                }
-            )
-
-            emitter.setCancellable {
-                globalSubscription.dispose()
-            }
-        }, BackpressureStrategy.LATEST)
+        }
 
     /**
      * Add Children nodes to a List of ImageItem given a MegaNode and a Sort Order

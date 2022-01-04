@@ -7,7 +7,7 @@ import androidx.lifecycle.map
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.core.Completable
-import io.reactivex.rxjava3.core.Flowable
+import io.reactivex.rxjava3.core.Single
 import io.reactivex.rxjava3.kotlin.addTo
 import io.reactivex.rxjava3.kotlin.subscribeBy
 import io.reactivex.rxjava3.schedulers.Schedulers
@@ -19,6 +19,8 @@ import mega.privacy.android.app.imageviewer.data.ImageResult
 import mega.privacy.android.app.imageviewer.usecase.GetImageHandlesUseCase
 import mega.privacy.android.app.imageviewer.usecase.GetImageUseCase
 import mega.privacy.android.app.usecase.CancelTransferUseCase
+import mega.privacy.android.app.usecase.GetGlobalChangesUseCase
+import mega.privacy.android.app.usecase.GetGlobalChangesUseCase.Result
 import mega.privacy.android.app.usecase.GetNodeUseCase
 import mega.privacy.android.app.usecase.LoggedInUseCase
 import mega.privacy.android.app.usecase.data.MegaNodeItem
@@ -26,6 +28,7 @@ import mega.privacy.android.app.utils.Constants.INVALID_POSITION
 import mega.privacy.android.app.utils.HashCompositeDisposable
 import mega.privacy.android.app.utils.LogUtil.logError
 import mega.privacy.android.app.utils.LogUtil.logWarning
+import mega.privacy.android.app.utils.MegaNodeUtil.isValidForImageViewer
 import mega.privacy.android.app.utils.RxUtil.addTo
 import mega.privacy.android.app.utils.StringResourcesUtils.getQuantityString
 import mega.privacy.android.app.utils.StringResourcesUtils.getString
@@ -49,6 +52,7 @@ import javax.inject.Inject
 class ImageViewerViewModel @Inject constructor(
     private val getImageUseCase: GetImageUseCase,
     private val getImageHandlesUseCase: GetImageHandlesUseCase,
+    private val getGlobalChangesUseCase: GetGlobalChangesUseCase,
     private val getNodeUseCase: GetNodeUseCase,
     private val exportNodeUseCase: ExportNodeUseCase,
     private val cancelTransferUseCase: CancelTransferUseCase,
@@ -65,6 +69,7 @@ class ImageViewerViewModel @Inject constructor(
 
     init {
         checkIfUserIsLoggedIn()
+        subscribeToNodeChanges()
     }
 
     override fun onCleared() {
@@ -142,7 +147,7 @@ class ImageViewerViewModel @Inject constructor(
     fun loadSingleNode(nodeHandle: Long, forceReload: Boolean = false) {
         val existingNode = images.value?.find { it.handle == nodeHandle }
         val subscription = when {
-            forceReload || existingNode?.isDirty == true -> {
+            forceReload -> {
                 when {
                     existingNode?.nodePublicLink?.isNotBlank() == true ->
                         getNodeUseCase.getNodeItem(existingNode.nodePublicLink)
@@ -194,9 +199,9 @@ class ImageViewerViewModel @Inject constructor(
             existingNode?.nodeItem?.node != null ->
                 getImageUseCase.get(existingNode.nodeItem.node, fullSize, highPriority)
             existingNode?.nodePublicLink?.isNotBlank() == true ->
-                getImageUseCase.get(existingNode.nodePublicLink)
+                getImageUseCase.get(existingNode.nodePublicLink, fullSize, highPriority)
             existingNode?.chatMessageId != null && existingNode.chatRoomId != null ->
-                getImageUseCase.get(existingNode.chatRoomId, existingNode.chatMessageId)
+                getImageUseCase.get(existingNode.chatRoomId, existingNode.chatMessageId, fullSize, highPriority)
             existingNode?.isOffline == true ->
                 getImageUseCase.getOffline(existingNode.handle)
             else ->
@@ -233,24 +238,23 @@ class ImageViewerViewModel @Inject constructor(
     ) {
         if (nodeItem == null && imageResult == null) return
 
-        val currentItems = images.value?.toMutableList()
-        if (!currentItems.isNullOrEmpty()) {
-            val index = currentItems.indexOfFirst { it.handle == nodeHandle }
+        val items = images.value?.toMutableList()
+        if (!items.isNullOrEmpty()) {
+            val index = items.indexOfFirst { it.handle == nodeHandle }
             if (index != INVALID_POSITION) {
-                val currentItem = currentItems[index]
+                val currentItem = items[index]
                 if (nodeItem != null) {
-                    currentItems[index] = currentItem.copy(
-                        nodeItem = nodeItem,
-                        isDirty = false
+                    items[index] = currentItem.copy(
+                        nodeItem = nodeItem
                     )
                 }
                 if (imageResult != null) {
-                    currentItems[index] = currentItem.copy(
-                        imageResult = imageResult,
-                        isDirty = false
+                    items[index] = currentItem.copy(
+                        imageResult = imageResult
                     )
                 }
-                images.value = currentItems.toList()
+
+                images.value = items.toList()
                 if (index == currentPosition.value) {
                     updateCurrentPosition(index, true)
                 }
@@ -258,8 +262,89 @@ class ImageViewerViewModel @Inject constructor(
                 logWarning("Node $nodeHandle not found")
             }
         } else {
-            logWarning("Images are null")
+            logWarning("Images are null or empty")
         }
+    }
+
+    /**
+     * Subscribe to latest node changes to update existing ones.
+     */
+    @Suppress("SENSELESS_COMPARISON")
+    private fun subscribeToNodeChanges() {
+        getGlobalChangesUseCase.get()
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .filter { change -> change is Result.OnNodesUpdate }
+            .subscribeBy(
+                onNext = { change ->
+                    val items = images.value?.toMutableList()
+                    if (items.isNullOrEmpty()) {
+                        logWarning("Images are null or empty")
+                        return@subscribeBy
+                    }
+
+                    val currentItemPosition = currentPosition.value ?: 0
+                    val dirtyNodeHandles = mutableListOf<Long>()
+
+                    (change as Result.OnNodesUpdate).nodes?.forEach { changedNode ->
+                        val currentIndex = items.indexOfFirst { it.handle == changedNode.handle }
+
+                        when {
+                            changedNode.hasChanged(MegaNode.CHANGE_TYPE_NEW) -> {
+                                val hasSameParent = (changedNode.parentHandle != null
+                                        && changedNode.parentHandle == items.firstOrNull()?.nodeItem?.node?.parentHandle)
+                                if (hasSameParent && changedNode.isValidForImageViewer()) {
+                                    items.add(ImageItem(changedNode.handle))
+                                    dirtyNodeHandles.add(changedNode.handle)
+                                }
+                            }
+                            changedNode.hasChanged(MegaNode.CHANGE_TYPE_PARENT) -> {
+                                if (currentIndex != INVALID_POSITION) {
+                                    val hasSameParent = (changedNode.parentHandle != null
+                                            && changedNode.parentHandle == items.firstOrNull()?.nodeItem?.node?.parentHandle)
+                                    if (!hasSameParent) {
+                                        items.removeAt(currentIndex)
+                                    }
+                                }
+                            }
+                            changedNode.hasChanged(MegaNode.CHANGE_TYPE_REMOVED) -> {
+                                if (currentIndex != INVALID_POSITION) {
+                                    items.removeAt(currentIndex)
+                                }
+                            }
+                            currentIndex != INVALID_POSITION -> {
+                                dirtyNodeHandles.add(changedNode.handle)
+                            }
+                        }
+                    }
+
+                    val currentNodeIndex = items.indexOfFirst { it.handle == getCurrentNode()?.handle }
+                    val newPosition = when {
+                        currentNodeIndex != INVALID_POSITION ->
+                            currentNodeIndex
+                        currentItemPosition >= items.size ->
+                            items.size - 1
+                        currentItemPosition == 0 ->
+                            currentItemPosition + 1
+                        else ->
+                            currentItemPosition
+                    }
+
+                    images.value = items.map { item ->
+                        val existingNode = images.value?.find { it.handle == item.handle }
+                        item.copy(
+                            imageResult = existingNode?.imageResult,
+                            nodeItem = existingNode?.nodeItem
+                        )
+                    }
+                    dirtyNodeHandles.forEach { loadSingleNode(it, true) }
+                    updateCurrentPosition(newPosition, true)
+                },
+                onError = { error ->
+                    logError(error.stackTraceToString())
+                }
+            )
+            .addTo(composite)
     }
 
     fun markNodeAsFavorite(nodeHandle: Long, isFavorite: Boolean) {
@@ -353,9 +438,9 @@ class ImageViewerViewModel @Inject constructor(
         nodesComposite.remove(nodeHandle)
     }
 
-    fun updateCurrentPosition(position: Int, forceUpdate: Boolean = false) {
+    fun updateCurrentPosition(position: Int, forceUpdate: Boolean) {
         if (forceUpdate || position != currentPosition.value) {
-            currentPosition.postValue(position)
+            currentPosition.value = position
         }
     }
 
@@ -385,60 +470,22 @@ class ImageViewerViewModel @Inject constructor(
     }
 
     /**
-     * Reused Extension Function to subscribe to a Flowable<List<ImageItem>> and update each
-     * individual ImageItem in the list with the new changes from MegaAPI.
+     * Reused Extension Function to subscribe to a Single<List<ImageItem>>.
      *
      * @param currentNodeHandle Node handle to be shown on first load.
      */
-    private fun Flowable<List<ImageItem>>.subscribeAndUpdateImages(currentNodeHandle: Long? = null) {
+    private fun Single<List<ImageItem>>.subscribeAndUpdateImages(currentNodeHandle: Long? = null) {
         subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeBy(
-                onNext = { items ->
-                    when {
-                        items.isEmpty() -> {
-                            images.value = null
-                            updateCurrentPosition(0)
-                        }
-                        images.value.isNullOrEmpty() -> {
-                            images.value = items.toList()
+                onSuccess = { items ->
+                    images.value = items.toList()
 
-                            val position = items.indexOfFirst { it.handle == currentNodeHandle }
-                            if (position != INVALID_POSITION) {
-                                updateCurrentPosition(position, true)
-                            } else {
-                                updateCurrentPosition(0, true)
-                            }
-                        }
-                        else -> {
-                            val actualNodeHandle = getCurrentNode()?.handle
-                            val currentItemPosition = currentPosition.value ?: 0
-                            val foundIndex = items.indexOfFirst { it.handle == actualNodeHandle }
-                            val newPosition = when {
-                                foundIndex != INVALID_POSITION ->
-                                    foundIndex
-                                currentItemPosition >= items.size ->
-                                    items.size - 1
-                                currentItemPosition == 0 ->
-                                    currentItemPosition + 1
-                                else ->
-                                    currentItemPosition
-                            }
-
-                            val dirtyNodeHandles = mutableListOf<Long>()
-                            images.value = items.map { item ->
-                                val existingNode = images.value?.find { it.handle == item.handle }
-                                if (item.isDirty) {
-                                    dirtyNodeHandles.add(item.handle)
-                                }
-                                item.copy(
-                                    imageResult = existingNode?.imageResult,
-                                    nodeItem = existingNode?.nodeItem
-                                )
-                            }
-                            dirtyNodeHandles.forEach(::loadSingleNode)
-                            updateCurrentPosition(newPosition, true)
-                        }
+                    val position = items.indexOfFirst { it.handle == currentNodeHandle }
+                    if (position != INVALID_POSITION) {
+                        updateCurrentPosition(position, true)
+                    } else {
+                        updateCurrentPosition(0, true)
                     }
                 },
                 onError = { error ->

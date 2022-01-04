@@ -8,15 +8,12 @@ import android.view.*
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
-import androidx.lifecycle.Lifecycle
-import com.facebook.common.util.UriUtil
 import com.facebook.drawee.backends.pipeline.Fresco
 import com.facebook.drawee.controller.BaseControllerListener
 import com.facebook.imagepipeline.image.ImageInfo
 import com.facebook.imagepipeline.request.ImageRequest
 import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.MimeTypeList
-import mega.privacy.android.app.R
 import mega.privacy.android.app.constants.SettingsConstants
 import mega.privacy.android.app.databinding.PageImageViewerBinding
 import mega.privacy.android.app.imageviewer.data.ImageItem
@@ -69,7 +66,7 @@ class ImageViewerPageFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         require(nodeHandle != INVALID_HANDLE) { "Invalid node handle" }
         setupView()
-        setupObservers()
+        setupObservers(savedInstanceState == null)
     }
 
     override fun onResume() {
@@ -104,10 +101,12 @@ class ImageViewerPageFragment : Fragment() {
         }
     }
 
-    private fun setupObservers() {
+    private fun setupObservers(requestImageData: Boolean) {
         viewModel.onImage(nodeHandle).observe(viewLifecycleOwner, ::showItem)
-        viewModel.loadSingleNode(nodeHandle)
-        viewModel.loadSingleImage(nodeHandle, fullSize = false, highPriority = false)
+        if (requestImageData) {
+            viewModel.loadSingleNode(nodeHandle)
+            viewModel.loadSingleImage(nodeHandle, fullSize = false, highPriority = false)
+        }
     }
 
     private fun showItem(item: ImageItem?) {
