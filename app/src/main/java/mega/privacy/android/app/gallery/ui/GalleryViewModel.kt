@@ -23,7 +23,8 @@ abstract class GalleryViewModel constructor(
     savedStateHandle: SavedStateHandle? = null
 ) : BaseRxViewModel() {
 
-    var currentHandle:Long? = null
+    var currentHandle: Long? = null
+
     /**
      * Empty live data, used to switch to LiveData<List<PhotoNodeItem>>.
      */
@@ -45,11 +46,7 @@ abstract class GalleryViewModel constructor(
     /**
      * Custom condition in sub class for filter the real photos count
      */
-    abstract fun getFilterRealPhotoCountCondition(item: GalleryItem): Boolean
-
-    fun setZoom(zoom: Int) {
-        mZoom = zoom
-    }
+    open fun getFilterRealPhotoCountCondition(item: GalleryItem) = item.type != GalleryItem.TYPE_HEADER
 
     /**
      * Indicate refreshing cards has finished.
@@ -63,7 +60,15 @@ abstract class GalleryViewModel constructor(
      *
      * @return node index
      */
-    abstract fun initMediaIndex(item: GalleryItem, mediaIndex: Int): Int
+    open fun initMediaIndex(item: GalleryItem, mediaIndex: Int): Int {
+        var tempIndex = mediaIndex
+
+        if (item.type != GalleryItem.TYPE_HEADER) {
+            item.indexForViewer = tempIndex++
+        }
+
+        return tempIndex
+    }
 
     /**
      * the showing data from the UI layer, it will come from liveDataRoot

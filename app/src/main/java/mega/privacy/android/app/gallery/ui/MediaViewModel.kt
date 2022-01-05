@@ -19,22 +19,10 @@ import javax.inject.Inject
 class MediaViewModel @Inject constructor(
     repository: MediaItemRepository,
     val sortOrderManagement: SortOrderManagement,
-    savedStateHandle:SavedStateHandle
-) : GalleryViewModel(repository, sortOrderManagement,savedStateHandle) {
+    savedStateHandle: SavedStateHandle
+) : GalleryViewModel(repository, sortOrderManagement, savedStateHandle) {
 
     override var mZoom = ZoomUtil.MEDIA_ZOOM_LEVEL
 
     fun getOrder() = sortOrderManagement.getOrderCamera()
-
-    override fun getFilterRealPhotoCountCondition(item: GalleryItem): Boolean {
-        return item.type != TYPE_HEADER
-    }
-
-    override fun initMediaIndex(item: GalleryItem, mediaIndex: Int): Int {
-        var tempIndex = mediaIndex
-        if (item.type != TYPE_HEADER) {
-            item.indexForViewer = tempIndex++
-        }
-        return tempIndex
-    }
 }

@@ -11,8 +11,6 @@ import io.reactivex.rxjava3.schedulers.Schedulers
 import mega.privacy.android.app.DatabaseHandler
 import mega.privacy.android.app.MegaPreferences
 import mega.privacy.android.app.constants.SettingsConstants
-import mega.privacy.android.app.gallery.data.GalleryItem
-import mega.privacy.android.app.gallery.data.GalleryItem.Companion.TYPE_HEADER
 import mega.privacy.android.app.gallery.repository.PhotosItemRepository
 import mega.privacy.android.app.gallery.ui.GalleryViewModel
 import mega.privacy.android.app.globalmanagement.SortOrderManagement
@@ -32,20 +30,6 @@ class PhotosViewModel @Inject constructor(
     override var mZoom = PHOTO_ZOOM_LEVEL
 
     fun getOrder() = sortOrderManagement.getOrderCamera()
-
-    override fun getFilterRealPhotoCountCondition(item: GalleryItem): Boolean {
-        return item.type != TYPE_HEADER
-    }
-
-    override fun initMediaIndex(item: GalleryItem, mediaIndex: Int): Int {
-        var tempIndex = mediaIndex
-
-        if (item.type != TYPE_HEADER) {
-            item.indexForViewer = tempIndex++
-        }
-
-        return tempIndex
-    }
 
     private val camSyncEnabled = MutableLiveData<Boolean>()
     private var enableCUShown = false

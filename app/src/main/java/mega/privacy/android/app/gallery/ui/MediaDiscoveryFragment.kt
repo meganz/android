@@ -12,7 +12,6 @@ import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.R
 import mega.privacy.android.app.databinding.FragmentMediaDecoveryBinding
 import mega.privacy.android.app.fragments.homepage.*
-import mega.privacy.android.app.gallery.constant.MEDIA_HANDLE
 import mega.privacy.android.app.gallery.data.GalleryCard
 import mega.privacy.android.app.gallery.data.GalleryItem
 import mega.privacy.android.app.gallery.fragment.BaseZoomFragment
@@ -87,7 +86,7 @@ class MediaDiscoveryFragment : BaseZoomFragment() {
         val currentZoom = ZoomUtil.MEDIA_ZOOM_LEVEL
         zoomViewModel.setCurrentZoom(currentZoom)
         zoomViewModel.setZoom(currentZoom)
-        viewModel.setZoom(currentZoom)
+        viewModel.mZoom = currentZoom
         setupEmptyHint()
         setupListView()
         setupTimePanel()
@@ -253,7 +252,7 @@ class MediaDiscoveryFragment : BaseZoomFragment() {
     private fun handleZoomAdapterLayoutChange(zoom: Int) {
         val state = listView.layoutManager?.onSaveInstanceState()
         setupListAdapter(zoom, viewModel.items.value)
-        viewModel.setZoom(zoom)
+        viewModel.mZoom = zoom
         listView.layoutManager?.onRestoreInstanceState(state)
     }
 

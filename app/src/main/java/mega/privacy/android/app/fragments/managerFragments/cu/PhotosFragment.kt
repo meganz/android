@@ -224,7 +224,7 @@ class PhotosFragment : BaseZoomFragment() {
         val currentZoom = PHOTO_ZOOM_LEVEL
         zoomViewModel.setCurrentZoom(currentZoom)
         zoomViewModel.setZoom(currentZoom)
-        viewModel.setZoom(currentZoom)
+        viewModel.mZoom = currentZoom
 
         setupOtherViews()
         setupListView()
@@ -528,7 +528,7 @@ class PhotosFragment : BaseZoomFragment() {
 
     private fun handleZoomAdapterLayoutChange(zoom: Int) {
         if (!viewModel.isEnableCUShown()) {
-            viewModel.setZoom(zoom)
+            viewModel.mZoom = zoom
             PHOTO_ZOOM_LEVEL = zoom
             if (layoutManagerInitialized()) {
                 val state = layoutManager.onSaveInstanceState()

@@ -16,9 +16,7 @@ class ImagesViewModel @Inject constructor(
 
     override var mZoom = ZoomUtil.IMAGES_ZOOM_LEVEL
 
-    override fun getFilterRealPhotoCountCondition(item: GalleryItem): Boolean {
-       return item.type == GalleryItem.TYPE_IMAGE
-    }
+    override fun getFilterRealPhotoCountCondition(item: GalleryItem)= item.type == GalleryItem.TYPE_IMAGE
 
     override fun initMediaIndex(item: GalleryItem, mediaIndex: Int): Int {
         var tempIndex = mediaIndex

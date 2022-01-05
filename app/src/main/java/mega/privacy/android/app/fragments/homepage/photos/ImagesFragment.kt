@@ -60,7 +60,7 @@ class ImagesFragment : BaseZoomFragment() {
         val currentZoom = ZoomUtil.IMAGES_ZOOM_LEVEL
         zoomViewModel.setCurrentZoom(currentZoom)
         zoomViewModel.setZoom(currentZoom)
-        viewModel.setZoom(currentZoom)
+        viewModel.mZoom = currentZoom
         setupEmptyHint()
         setupListView()
         setupTimePanel()
@@ -226,7 +226,7 @@ class ImagesFragment : BaseZoomFragment() {
     private fun handleZoomAdapterLayoutChange(zoom: Int) {
         val state = listView.layoutManager?.onSaveInstanceState()
         setupListAdapter(zoom, viewModel.items.value)
-        viewModel.setZoom(zoom)
+        viewModel.mZoom = zoom
         listView.layoutManager?.onRestoreInstanceState(state)
     }
 
