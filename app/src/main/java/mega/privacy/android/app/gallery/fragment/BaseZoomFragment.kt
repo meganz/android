@@ -34,8 +34,10 @@ import mega.privacy.android.app.fragments.homepage.photos.ZoomViewModel
 import mega.privacy.android.app.fragments.managerFragments.cu.CustomHideBottomViewOnScrollBehaviour
 import mega.privacy.android.app.gallery.adapter.GalleryAdapter
 import mega.privacy.android.app.gallery.adapter.GalleryCardAdapter
+import mega.privacy.android.app.gallery.data.GalleryCard
 import mega.privacy.android.app.gallery.data.GalleryItem
 import mega.privacy.android.app.gallery.data.GalleryItemSizeConfig
+import mega.privacy.android.app.gallery.ui.GalleryViewModel
 import mega.privacy.android.app.lollipop.FullScreenImageViewerLollipop
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop
 import mega.privacy.android.app.modalbottomsheet.NodeOptionsBottomSheetDialogFragment
@@ -98,6 +100,7 @@ abstract class BaseZoomFragment : BaseFragment(), GestureScaleCallback,
     protected lateinit var actionModeCallback: ActionModeCallback
 
     // View model
+    abstract val viewModel : GalleryViewModel
     protected val zoomViewModel by viewModels<ZoomViewModel>()
     protected val actionModeViewModel by viewModels<ActionModeViewModel>()
     protected val itemOperationViewModel by viewModels<ItemOperationViewModel>()
@@ -529,13 +532,7 @@ abstract class BaseZoomFragment : BaseFragment(), GestureScaleCallback,
         return zoomViewModel.getCurrentZoom()
     }
 
-    protected fun updateViewSelected(
-        allButton: TextView?,
-        daysButton: TextView?,
-        monthsButton: TextView?,
-        yearsButton: TextView?,
-        selectedView: Int
-    ) {
+    protected open fun updateViewSelected() {
         setViewTypeButtonStyle(allButton, false)
         setViewTypeButtonStyle(daysButton, false)
         setViewTypeButtonStyle(monthsButton, false)
@@ -574,6 +571,85 @@ abstract class BaseZoomFragment : BaseFragment(), GestureScaleCallback,
         )
     }
 
+    protected fun setupTimePanel() {
+        yearsButton.setOnClickListener {
+                newViewClicked(YEARS_VIEW)
+            }
+
+        monthsButton.setOnClickListener {
+                newViewClicked(MONTHS_VIEW)
+            }
+
+        daysButton.setOnClickListener {
+                newViewClicked(DAYS_VIEW)
+            }
+
+        allButton.setOnClickListener {
+                newViewClicked(ALL_VIEW)
+            }
+
+
+        if (resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE) {
+            val params = viewTypePanel.layoutParams
+            params.width = outMetrics.heightPixels
+            viewTypePanel.layoutParams = params
+        }
+
+        updateViewSelected()
+        setHideBottomViewScrollBehaviour()
+    }
+
+    /**
+     * Show the selected card view after corresponding button is clicked.
+     *
+     * @param selectedView The selected view.
+     */
+    @SuppressLint("ClickableViewAccessibility")
+    protected open fun newViewClicked(selectedView: Int) {
+        if (this.selectedView == selectedView) return
+
+        this.selectedView = selectedView
+        setupListAdapter(getCurrentZoom(), viewModel.items.value)
+
+        when (selectedView) {
+            DAYS_VIEW, MONTHS_VIEW, YEARS_VIEW -> {
+                showCards(
+                    viewModel.dateCards.value
+                )
+
+                listView.setOnTouchListener(null)
+            }
+            else -> {
+                listView.setOnTouchListener(scaleGestureHandler)
+            }
+        }
+        handleOptionsMenuUpdate(shouldShowZoomMenuItem())
+        updateViewSelected()
+    }
+
+    /**
+     * Show the view with the data of years, months or days depends on selected view.
+     *
+     * @param dateCards
+     *          The first element is the cards of days.
+     *          The second element is the cards of months.
+     *          The third element is the cards of years.
+     */
+    protected fun showCards(dateCards: List<List<GalleryCard>?>?) {
+        val index = when (selectedView) {
+            DAYS_VIEW -> DAYS_INDEX
+            MONTHS_VIEW -> MONTHS_INDEX
+            YEARS_VIEW -> YEARS_INDEX
+            else -> -1
+        }
+
+        if (index != -1) {
+            cardAdapter.submitList(dateCards?.get(index))
+        }
+
+        updateFastScrollerVisibility()
+    }
+
     protected fun updateFastScrollerVisibility() {
         if (!this::cardAdapter.isInitialized) return
 
@@ -586,7 +662,7 @@ abstract class BaseZoomFragment : BaseFragment(), GestureScaleCallback,
                 View.GONE
     }
 
-    protected fun setHideBottomViewScrollBehaviour() {
+    protected open fun setHideBottomViewScrollBehaviour() {
         val params = viewTypePanel.layoutParams as CoordinatorLayout.LayoutParams
         params.behavior =
             if (selectedView != ALL_VIEW) CustomHideBottomViewOnScrollBehaviour<LinearLayout>() else null

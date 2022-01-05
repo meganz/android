@@ -1,9 +1,7 @@
 package mega.privacy.android.app.fragments.managerFragments.cu
 
 import android.Manifest
-import android.annotation.SuppressLint
 import android.app.Activity
-import android.content.res.Configuration
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
@@ -34,7 +32,7 @@ import java.util.*
 @AndroidEntryPoint
 class PhotosFragment : BaseZoomFragment() {
 
-    private val viewModel by viewModels<PhotosViewModel>()
+    override val viewModel by viewModels<PhotosViewModel>()
 
     private lateinit var binding: FragmentPhotosBinding
 
@@ -45,7 +43,7 @@ class PhotosFragment : BaseZoomFragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        order =  viewModel.getOrder()
+        order = viewModel.getOrder()
     }
 
     override fun onCreateView(
@@ -240,38 +238,6 @@ class PhotosFragment : BaseZoomFragment() {
         }
     }
 
-    private fun setupTimePanel() {
-        yearsButton.apply {
-            setOnClickListener {
-                newViewClicked(YEARS_VIEW)
-            }
-        }
-        monthsButton.apply {
-            setOnClickListener {
-                newViewClicked(MONTHS_VIEW)
-            }
-        }
-        daysButton.apply {
-            setOnClickListener {
-                newViewClicked(DAYS_VIEW)
-            }
-        }
-        allButton.apply {
-            setOnClickListener {
-                newViewClicked(ALL_VIEW)
-            }
-        }
-
-        if (resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE) {
-            val params = viewTypePanel.layoutParams
-            params.width = outMetrics.heightPixels
-            viewTypePanel.layoutParams = params
-        }
-
-        mManagerActivity.enableHideBottomViewOnScroll(selectedView != ALL_VIEW)
-        super.updateViewSelected(allButton, daysButton, monthsButton, yearsButton, selectedView)
-    }
-
     private fun setupOtherViews() {
         binding.emptyEnableCuButton.setOnClickListener { enableCUClick() }
         setImageViewAlphaIfDark(context, binding.emptyHintImage, DARK_IMAGE_ALPHA)
@@ -282,58 +248,6 @@ class PhotosFragment : BaseZoomFragment() {
             ),
             HtmlCompat.FROM_HTML_MODE_LEGACY
         )
-    }
-
-    /**
-     * Show the selected card view after corresponding button is clicked.
-     *
-     * @param selectedView The selected view.
-     */
-    @SuppressLint("ClickableViewAccessibility")
-    private fun newViewClicked(selectedView: Int) {
-        if (this.selectedView == selectedView) return
-
-        this.selectedView = selectedView
-        setupListAdapter(getCurrentZoom(), viewModel.items.value)
-
-        when (selectedView) {
-            DAYS_VIEW, MONTHS_VIEW, YEARS_VIEW -> {
-                showCards(
-                    viewModel.dateCards.value
-                )
-
-                listView.setOnTouchListener(null)
-            }
-            else -> {
-                listView.setOnTouchListener(scaleGestureHandler)
-            }
-        }
-        handleOptionsMenuUpdate(shouldShowZoomMenuItem())
-        updateViewSelected()
-    }
-
-
-    /**
-     * Show the view with the data of years, months or days depends on selected view.
-     *
-     * @param dateCards
-     *          The first element is the cards of days.
-     *          The second element is the cards of months.
-     *          The third element is the cards of years.
-     */
-    private fun showCards(dateCards: List<List<GalleryCard>?>?) {
-        val index = when (selectedView) {
-            DAYS_VIEW -> DAYS_INDEX
-            MONTHS_VIEW -> MONTHS_INDEX
-            YEARS_VIEW -> YEARS_INDEX
-            else -> -1
-        }
-
-        if (index != -1) {
-            cardAdapter.submitList(dateCards?.get(index))
-        }
-
-        updateFastScrollerVisibility()
     }
 
     fun enableCUClick() {
@@ -429,8 +343,8 @@ class PhotosFragment : BaseZoomFragment() {
      * First make all the buttons unselected,
      * then apply selected style for the selected button regarding to the selected view.
      */
-    private fun updateViewSelected() {
-        super.updateViewSelected(allButton, daysButton, monthsButton, yearsButton, selectedView)
+    override fun updateViewSelected() {
+        super.updateViewSelected()
         updateFastScrollerVisibility()
         mManagerActivity.enableHideBottomViewOnScroll(selectedView != ALL_VIEW)
         mManagerActivity.updateEnableCUButton(
@@ -441,6 +355,10 @@ class PhotosFragment : BaseZoomFragment() {
             hideCUProgress()
             binding.uploadProgress.visibility = View.GONE
         }
+    }
+
+    override fun setHideBottomViewScrollBehaviour() {
+        mManagerActivity.enableHideBottomViewOnScroll(selectedView != ALL_VIEW)
     }
 
     /**

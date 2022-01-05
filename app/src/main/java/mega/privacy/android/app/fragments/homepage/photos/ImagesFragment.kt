@@ -1,7 +1,5 @@
 package mega.privacy.android.app.fragments.homepage.photos
 
-import android.annotation.SuppressLint
-import android.content.res.Configuration
 import android.os.Bundle
 import android.view.*
 import androidx.annotation.NonNull
@@ -24,7 +22,7 @@ import java.util.*
 @AndroidEntryPoint
 class ImagesFragment : BaseZoomFragment() {
 
-    private val viewModel by viewModels<ImagesViewModel>()
+    override val viewModel by viewModels<ImagesViewModel>()
 
     private lateinit var binding: FragmentImagesBinding
 
@@ -54,6 +52,11 @@ class ImagesFragment : BaseZoomFragment() {
 
         listView = binding.photoList
         scroller = binding.scroller
+        viewTypePanel = binding.photosViewType.root
+        yearsButton = binding.photosViewType.yearsButton
+        monthsButton = binding.photosViewType.monthsButton
+        daysButton = binding.photosViewType.daysButton
+        allButton = binding.photosViewType.allButton
     }
 
     private fun initViewCreated() {
@@ -141,74 +144,16 @@ class ImagesFragment : BaseZoomFragment() {
             getString(R.string.homepage_empty_hint_photos).toUpperCase(Locale.ROOT)
     }
 
-    private fun setupTimePanel() {
-        yearsButton = binding.photosViewType.yearsButton.apply {
-            setOnClickListener {
-                newViewClicked(YEARS_VIEW)
-            }
-        }
-        monthsButton = binding.photosViewType.monthsButton.apply {
-            setOnClickListener {
-                newViewClicked(MONTHS_VIEW)
-            }
-        }
-        daysButton = binding.photosViewType.daysButton.apply {
-            setOnClickListener {
-                newViewClicked(DAYS_VIEW)
-            }
-        }
-        allButton = binding.photosViewType.allButton.apply {
-            setOnClickListener {
-                newViewClicked(ALL_VIEW)
-            }
-        }
-
-        if (resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE) {
-            val params = viewTypePanel.layoutParams
-            params.width = outMetrics.heightPixels
-            viewTypePanel.layoutParams = params
-        }
-
-        updateViewSelected()
-        setHideBottomViewScrollBehaviour()
-    }
-
-    /**
-     * First make all the buttons unselected,
-     * then apply selected style for the selected button regarding to the selected view.
-     */
-    private fun updateViewSelected() {
-        super.updateViewSelected(allButton, daysButton, monthsButton, yearsButton, selectedView)
-    }
-
     /**
      * Show the selected card view after corresponding button is clicked.
      *
      * @param selectedView The selected view.
      */
-    @SuppressLint("ClickableViewAccessibility")
-    private fun newViewClicked(selectedView: Int) {
-        if (this.selectedView == selectedView) return
+    override fun newViewClicked(selectedView: Int) {
+        if(this.selectedView == selectedView) return
 
-        this.selectedView = selectedView
-        setupListAdapter(getCurrentZoom(), viewModel.items.value)
-
-        when (selectedView) {
-            DAYS_VIEW, MONTHS_VIEW, YEARS_VIEW -> {
-                showCards(
-                    viewModel.dateCards.value
-                )
-
-                listView.setOnTouchListener(null)
-            }
-            else -> {
-                listView.setOnTouchListener(scaleGestureHandler)
-            }
-        }
-
-        handleOptionsMenuUpdate(shouldShowZoomMenuItem())
+        super.newViewClicked(selectedView)
         removeSortByMenu()
-        updateViewSelected()
         // If selected view is not all view, add layout param behaviour, so that button panel will go off when scroll.
         setHideBottomViewScrollBehaviour()
     }
@@ -245,29 +190,6 @@ class ImagesFragment : BaseZoomFragment() {
     }
 
     fun loadPhotos() = viewModel.loadPhotos(true)
-
-    /**
-     * Show the view with the data of years, months or days depends on selected view.
-     *
-     * @param dateCards
-     *          The first element is the cards of days.
-     *          The second element is the cards of months.
-     *          The third element is the cards of years.
-     */
-    private fun showCards(dateCards: List<List<GalleryCard>?>?) {
-        val index = when (selectedView) {
-            DAYS_VIEW -> DAYS_INDEX
-            MONTHS_VIEW -> MONTHS_INDEX
-            YEARS_VIEW -> YEARS_INDEX
-            else -> -1
-        }
-
-        if (index != -1) {
-            cardAdapter.submitList(dateCards?.get(index))
-        }
-
-        updateFastScrollerVisibility()
-    }
 
     override fun getNodeCount() = viewModel.getRealPhotoCount()
 
