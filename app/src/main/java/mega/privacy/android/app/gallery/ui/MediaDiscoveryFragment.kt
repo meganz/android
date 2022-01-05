@@ -185,16 +185,6 @@ class MediaDiscoveryFragment : BaseZoomFragment() {
         setHideBottomViewScrollBehaviour()
     }
 
-    /**
-     * Only refresh the list items of uiDirty = true
-     */
-    override fun updateUiWhenAnimationEnd() {
-        viewModel.items.value?.let {
-            val newList = ArrayList(it)
-            gridAdapter.submitList(newList)
-        }
-    }
-
     private fun handleZoomAdapterLayoutChange(zoom: Int) {
         val state = listView.layoutManager?.onSaveInstanceState()
         setupListAdapter(zoom, viewModel.items.value)
@@ -219,8 +209,6 @@ class MediaDiscoveryFragment : BaseZoomFragment() {
     fun loadPhotos() {
         if (isAdded) viewModel.loadPhotos(true)
     }
-
-    override fun getNodeCount() = viewModel.getRealPhotoCount()
 
     override fun getOrder() = viewModel.getOrder()
 

@@ -468,16 +468,6 @@ class PhotosFragment : BaseZoomFragment() {
         checkScroll()
     }
 
-
-    override fun getNodeCount() = viewModel.getRealPhotoCount()
-
-    override fun updateUiWhenAnimationEnd() {
-        viewModel.items.value?.let {
-            val newList = ArrayList(it)
-            gridAdapter.submitList(newList)
-        }
-    }
-
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         if (!isInPhotosPage()) {
             return

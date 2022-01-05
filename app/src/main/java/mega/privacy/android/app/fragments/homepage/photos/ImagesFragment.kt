@@ -158,16 +158,6 @@ class ImagesFragment : BaseZoomFragment() {
         setHideBottomViewScrollBehaviour()
     }
 
-    /**
-     * Only refresh the list items of uiDirty = true
-     */
-    override fun updateUiWhenAnimationEnd() {
-        viewModel.items.value?.let {
-            val newList = ArrayList(it)
-            gridAdapter.submitList(newList)
-        }
-    }
-
     private fun handleZoomAdapterLayoutChange(zoom: Int) {
         val state = listView.layoutManager?.onSaveInstanceState()
         setupListAdapter(zoom, viewModel.items.value)
@@ -190,8 +180,6 @@ class ImagesFragment : BaseZoomFragment() {
     }
 
     fun loadPhotos() = viewModel.loadPhotos(true)
-
-    override fun getNodeCount() = viewModel.getRealPhotoCount()
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         if (activity as ManagerActivityLollipop? != null && (activity as ManagerActivityLollipop?)!!.isInImagesPage) {

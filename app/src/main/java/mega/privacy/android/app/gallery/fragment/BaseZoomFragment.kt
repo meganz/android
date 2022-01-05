@@ -53,6 +53,7 @@ import mega.privacy.android.app.utils.ZoomUtil.getSelectedFrameWidth
 import mega.privacy.android.app.utils.ZoomUtil.setMargin
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaChatApiJava
+import java.util.ArrayList
 
 /**
  * A parent fragment with basic zoom UI logic, like menu, gestureScaleCallback.
@@ -141,9 +142,14 @@ abstract class BaseZoomFragment : BaseFragment(), GestureScaleCallback,
         }
     }
 
-    abstract fun getNodeCount(): Int
+    private fun getNodeCount() = viewModel.getRealPhotoCount()
 
-    abstract fun updateUiWhenAnimationEnd()
+    private fun updateUiWhenAnimationEnd() {
+        viewModel.items.value?.let {
+            val newList = ArrayList(it)
+            gridAdapter.submitList(newList)
+        }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
