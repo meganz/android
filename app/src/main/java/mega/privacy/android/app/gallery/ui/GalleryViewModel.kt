@@ -6,6 +6,7 @@ import kotlinx.coroutines.launch
 import mega.privacy.android.app.arch.BaseRxViewModel
 import mega.privacy.android.app.fragments.homepage.photos.CardClickHandler
 import mega.privacy.android.app.fragments.homepage.photos.DateCardsProvider
+import mega.privacy.android.app.gallery.constant.MEDIA_HANDLE
 import mega.privacy.android.app.gallery.data.GalleryCard
 import mega.privacy.android.app.gallery.data.GalleryItem
 import mega.privacy.android.app.gallery.fragment.BaseZoomFragment.Companion.DAYS_INDEX
@@ -18,9 +19,11 @@ import mega.privacy.android.app.utils.Constants.INVALID_POSITION
 
 abstract class GalleryViewModel constructor(
     private val repository: GalleryItemRepository,
-    private val sortOrderManagement: SortOrderManagement
+    private val sortOrderManagement: SortOrderManagement,
+    savedStateHandle: SavedStateHandle? = null
 ) : BaseRxViewModel() {
 
+    var currentHandle:Long? = null
     /**
      * Empty live data, used to switch to LiveData<List<PhotoNodeItem>>.
      */
@@ -40,20 +43,6 @@ abstract class GalleryViewModel constructor(
     abstract var mZoom: Int
 
     /**
-     * Controller fetch items when view model init
-     *
-     * @return True,  fetch items when view model init; False, will skip fetch logic when viewModel init
-     */
-    abstract fun isFetchItemsDirectly(): Boolean
-
-    /**
-     * Controller should map date cards data when finish fetch items
-     *
-     * True, should; False, shouldn't
-     */
-    var shouldMapCards = false
-
-    /**
      * Custom condition in sub class for filter the real photos count
      */
     abstract fun getFilterRealPhotoCountCondition(item: GalleryItem): Boolean
@@ -70,18 +59,22 @@ abstract class GalleryViewModel constructor(
     }
 
     /**
+     * Custom node index and assign it to node.
+     *
+     * @return node index
+     */
+    abstract fun initMediaIndex(item: GalleryItem, mediaIndex: Int): Int
+
+    /**
      * the showing data from the UI layer, it will come from liveDataRoot
      */
     var items: LiveData<List<GalleryItem>> = liveDataRoot.switchMap {
-        if (isFetchItemsDirectly()){
-            if (forceUpdate) {
-                viewModelScope.launch {
-                    repository.getFiles(sortOrderManagement.getOrderCamera(), mZoom)
-                }
-            } else {
-                repository.emitFiles()
+        if (forceUpdate) {
+            viewModelScope.launch {
+                repository.getFiles(sortOrderManagement.getOrderCamera(), mZoom, currentHandle)
             }
-
+        } else {
+            repository.emitFiles()
         }
 
         repository.galleryItems
@@ -94,35 +87,14 @@ abstract class GalleryViewModel constructor(
             photoIndex = initMediaIndex(item, photoIndex)
         }
 
-        if (shouldMapCards) {
-            dateCards = MutableLiveData(manuallyHandleDateCards(it))
-        }
-
         it
     }
 
-    /**
-     * Custom node index and assign it to node.
-     *
-     * @return node index
-     */
-    abstract fun initMediaIndex(item: GalleryItem, mediaIndex: Int): Int
-
-    var dateCards: LiveData<List<List<GalleryCard>>> = getDateCardsFromItems()
-
-    private fun getDateCardsFromItems(): LiveData<List<List<GalleryCard>>> {
-        return if (!isFetchItemsDirectly())
-            MutableLiveData()
-        else items.map {
-            manuallyHandleDateCards(it)
-        }
-    }
-
-    private fun manuallyHandleDateCards(items:List<GalleryItem>): List<List<GalleryCard>> {
+    var dateCards: LiveData<List<List<GalleryCard>>> = items.map {
         val cardsProvider = DateCardsProvider()
         cardsProvider.extractCardsFromNodeList(
             repository.context,
-            items.mapNotNull { item -> item.node })
+            it.mapNotNull { item -> item.node })
 
         viewModelScope.launch {
             repository.getPreviews(cardsProvider.getNodesWithoutPreview()) {
@@ -130,7 +102,7 @@ abstract class GalleryViewModel constructor(
             }
         }
 
-        return listOf(cardsProvider.getDays(), cardsProvider.getMonths(), cardsProvider.getYears())
+        listOf(cardsProvider.getDays(), cardsProvider.getMonths(), cardsProvider.getYears())
     }
 
     /**
@@ -180,6 +152,8 @@ abstract class GalleryViewModel constructor(
     }
 
     init {
+        currentHandle = savedStateHandle?.get<Long>(MEDIA_HANDLE)
+
         items.observeForever(loadFinishedObserver)
         // Calling ObserveForever() here instead of calling observe()
         // in the PhotosFragment, for fear that an nodes update event would be missed if
@@ -206,12 +180,12 @@ abstract class GalleryViewModel constructor(
         }
     }
 
-    fun triggerDataLoad(){
+    fun triggerDataLoad() {
         // Trigger data load.
         liveDataRoot.value = liveDataRoot.value
     }
 
-   /**
+    /**
      * Make the list adapter to rebind all item views with data since
      * the underlying meta data of items may have been changed.
      */

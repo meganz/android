@@ -1,6 +1,10 @@
 package mega.privacy.android.app.gallery.ui
 
+import androidx.lifecycle.*
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.launch
+import mega.privacy.android.app.gallery.constant.MEDIA_HANDLE
+import mega.privacy.android.app.gallery.data.GalleryCard
 import mega.privacy.android.app.gallery.data.GalleryItem
 import mega.privacy.android.app.gallery.data.GalleryItem.Companion.TYPE_HEADER
 import mega.privacy.android.app.gallery.repository.MediaItemRepository
@@ -13,19 +17,14 @@ import javax.inject.Inject
  */
 @HiltViewModel
 class MediaViewModel @Inject constructor(
-        private val repository: MediaItemRepository,
-        val sortOrderManagement: SortOrderManagement
-) : GalleryViewModel(repository, sortOrderManagement) {
+    repository: MediaItemRepository,
+    val sortOrderManagement: SortOrderManagement,
+    savedStateHandle:SavedStateHandle
+) : GalleryViewModel(repository, sortOrderManagement,savedStateHandle) {
 
     override var mZoom = ZoomUtil.MEDIA_ZOOM_LEVEL
 
-    private var currentHandle: Long = 0L
-
     fun getOrder() = sortOrderManagement.getOrderCamera()
-
-    private var isFetchItemsDirectly = false
-
-    override fun isFetchItemsDirectly() = isFetchItemsDirectly
 
     override fun getFilterRealPhotoCountCondition(item: GalleryItem): Boolean {
         return item.type != TYPE_HEADER
@@ -37,19 +36,5 @@ class MediaViewModel @Inject constructor(
             item.indexForViewer = tempIndex++
         }
         return tempIndex
-    }
-
-    fun setHandle(handle: Long) {
-        currentHandle = handle
-    }
-
-    /**
-     * manually getAndFilterFilesByHandle, should put the right flag [isFetchItemsDirectly] and [shouldMapCards]
-     */
-    fun getAndFilterFilesByHandle() {
-        repository.setCurrentHandle(currentHandle)
-        isFetchItemsDirectly = true
-        shouldMapCards = true
-        triggerDataLoad()
     }
 }

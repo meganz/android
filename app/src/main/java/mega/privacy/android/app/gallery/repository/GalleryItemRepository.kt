@@ -13,9 +13,9 @@ import nz.mega.sdk.MegaNode
 import java.util.*
 
 abstract class GalleryItemRepository constructor(
-        val context: Context,
-        val megaApi: MegaApiAndroid,
-        val mDbHandler: DatabaseHandler
+    val context: Context,
+    val megaApi: MegaApiAndroid,
+    val mDbHandler: DatabaseHandler
 ) {
     /** Live Data to notify the query result*/
     var galleryItems: LiveData<List<GalleryItem>> = MutableLiveData()
@@ -26,12 +26,20 @@ abstract class GalleryItemRepository constructor(
     /** The selected nodes in action mode */
     private val selectedNodesMap: LinkedHashMap<Any, GalleryItem> = LinkedHashMap()
 
-    suspend fun getFiles(order: Int, zoom: Int) {
+    suspend fun getFiles(order: Int, zoom: Int, handle: Long? = null) {
         preserveSelectedItems()
 
         // Create a node fetcher for the new request, and link fileNodeItems to its result.
         // Then the result of any previous NodesFetcher will be ignored
-        nodesFetcher = initGalleryNodeFetcher(context, megaApi, selectedNodesMap, order, zoom, mDbHandler)
+        nodesFetcher = initGalleryNodeFetcher(
+            context,
+            megaApi,
+            selectedNodesMap,
+            order,
+            zoom,
+            mDbHandler,
+            handle
+        )
         @Suppress("UNCHECKED_CAST")
         galleryItems = nodesFetcher.result as MutableLiveData<List<GalleryItem>>
 
@@ -68,11 +76,12 @@ abstract class GalleryItemRepository constructor(
     }
 
     abstract fun initGalleryNodeFetcher(
-            context: Context,
-            megaApi: MegaApiAndroid,
-            selectedNodesMap: LinkedHashMap<Any, GalleryItem>,
-            order: Int,
-            zoom: Int,
-            dbHandler: DatabaseHandler
+        context: Context,
+        megaApi: MegaApiAndroid,
+        selectedNodesMap: LinkedHashMap<Any, GalleryItem>,
+        order: Int,
+        zoom: Int,
+        dbHandler: DatabaseHandler,
+        handle: Long? = null
     ): GalleryBaseFetcher
 }

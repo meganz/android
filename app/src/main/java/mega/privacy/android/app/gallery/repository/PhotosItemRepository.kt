@@ -22,23 +22,23 @@ class PhotosItemRepository @Inject constructor(
     mDbHandler: DatabaseHandler
 ) : GalleryItemRepository(context, megaApi, mDbHandler) {
 
-    override fun initGalleryNodeFetcher(
-        context: Context,
-        megaApi: MegaApiAndroid,
-        selectedNodesMap: LinkedHashMap<Any, GalleryItem>,
-        order: Int,
-        zoom: Int,
-        dbHandler: DatabaseHandler
-    ): GalleryBaseFetcher {
-        return PhotosFetcher(context, megaApi, selectedNodesMap, order, zoom, mDbHandler)
-    }
-
-
     fun getPublicLinks():ArrayList<MegaNode>{
         return megaApi.publicLinks
     }
 
     fun buildDefaultDownloadDir(): File {
         return FileUtil.buildDefaultDownloadDir(context)
+    }
+
+    override fun initGalleryNodeFetcher(
+        context: Context,
+        megaApi: MegaApiAndroid,
+        selectedNodesMap: LinkedHashMap<Any, GalleryItem>,
+        order: Int,
+        zoom: Int,
+        dbHandler: DatabaseHandler,
+        handle: Long?
+    ): GalleryBaseFetcher {
+        return PhotosFetcher(context, megaApi, selectedNodesMap, order, zoom, mDbHandler)
     }
 }

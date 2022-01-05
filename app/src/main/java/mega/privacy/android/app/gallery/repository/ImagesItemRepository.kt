@@ -25,8 +25,10 @@ class ImagesItemRepository @Inject constructor(
         selectedNodesMap: LinkedHashMap<Any, GalleryItem>,
         order: Int,
         zoom: Int,
-        dbHandler: DatabaseHandler
+        dbHandler: DatabaseHandler,
+        handle: Long?
     ): GalleryBaseFetcher {
         return ImagesFetcher(context, megaApi, selectedNodesMap, zoom)
     }
+
 }

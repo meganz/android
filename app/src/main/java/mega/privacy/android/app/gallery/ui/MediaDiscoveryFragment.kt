@@ -41,14 +41,11 @@ class MediaDiscoveryFragment : BaseZoomFragment() {
             }
             return instance!!
         }
-
-        var isInMediaDiscovery = false
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         order = viewModel.getOrder()
-        isInMediaDiscovery = true
     }
 
     override fun onCreateView(
@@ -58,11 +55,6 @@ class MediaDiscoveryFragment : BaseZoomFragment() {
     ): View {
         binding = FragmentMediaDecoveryBinding.inflate(inflater, container, false)
         adapterType = MEDIA_BROWSE_ADAPTER
-        arguments?.let {
-            val currentHandle = it.getLong(MEDIA_HANDLE)
-            viewModel.setHandle(currentHandle)
-        }
-
         setupBinding()
         setupParentActivityUI()
         return binding.root
@@ -76,13 +68,8 @@ class MediaDiscoveryFragment : BaseZoomFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        fetchData()
         initViewCreated()
         subscribeObservers()
-    }
-
-    private fun fetchData() {
-        viewModel.getAndFilterFilesByHandle()
     }
 
     private fun setupBinding() {
@@ -329,16 +316,11 @@ class MediaDiscoveryFragment : BaseZoomFragment() {
     }
 
     fun isInThisPage(): Boolean {
-        return isInMediaDiscovery
+        return mManagerActivity.isInMDPage
     }
 
     override fun onDestroy() {
         instance = null
-        isInMediaDiscovery = false
         super.onDestroy()
-    }
-
-    fun onBackPressed() {
-        mManagerActivity.onBackPressed()
     }
 }

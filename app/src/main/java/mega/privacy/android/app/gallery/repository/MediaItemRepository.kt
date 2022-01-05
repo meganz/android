@@ -19,20 +19,15 @@ class MediaItemRepository @Inject constructor(
         mDbHandler: DatabaseHandler
 ) : GalleryItemRepository(context, megaApi, mDbHandler) {
 
-    private var mHandle = 0L
-
     override fun initGalleryNodeFetcher(
-            context: Context,
-            megaApi: MegaApiAndroid,
-            selectedNodesMap: LinkedHashMap<Any, GalleryItem>,
-            order: Int,
-            zoom: Int,
-            dbHandler: DatabaseHandler
+        context: Context,
+        megaApi: MegaApiAndroid,
+        selectedNodesMap: LinkedHashMap<Any, GalleryItem>,
+        order: Int,
+        zoom: Int,
+        dbHandler: DatabaseHandler,
+        handle: Long?
     ): GalleryBaseFetcher {
-        return MediaFetcher(context, megaApi, selectedNodesMap, order, zoom, mHandle)
-    }
-
-    fun setCurrentHandle(handle: Long) {
-        mHandle = handle
+        return MediaFetcher(context, megaApi, selectedNodesMap, order, zoom, handle!!)
     }
 }

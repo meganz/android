@@ -471,6 +471,10 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 	// Determine if open this activity from meeting page, if true, will finish this activity when user click back icon
 	private boolean isFromMeeting = false;
 
+	private static final String STATE_KEY_IS_IN_MD_MODE = "isInMDMode";
+	// Determine if in Media discovery page, if it is true, it must in CD drawerItem tab
+	private boolean isInMDMode = false;
+
 	public enum FragmentTag {
 		CLOUD_DRIVE, HOMEPAGE, PHOTOS, INBOX, INCOMING_SHARES, OUTGOING_SHARES, SETTINGS, SEARCH,TRANSFERS, COMPLETED_TRANSFERS,
 		RECENT_CHAT, RUBBISH_BIN, NOTIFICATIONS, TURN_ON_NOTIFICATIONS, PERMISSIONS, SMS_VERIFICATION,
@@ -628,6 +632,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 	private TurnOnNotificationsFragment tonF;
 	private PermissionsFragment pF;
 	private SMSVerificationFragment svF;
+	private MediaDiscoveryFragment mdF;
 
 	private boolean mStopped = true;
 	private int bottomItemBeforeOpenFullscreenOffline = INVALID_VALUE;
@@ -722,7 +727,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 	private Observer<Boolean> fabChangeObserver  = isShow -> {
 		if (drawerItem == DrawerItem.HOMEPAGE) {
 			controlFabInHomepage(isShow);
-		} else if (MediaDiscoveryFragment.Companion.isInMediaDiscovery()) {
+		} else if (isInMDMode) {
 			hideFabButton();
 		} else {
 			if (initFabButtonShow) {
@@ -1317,6 +1322,12 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 		nodeSaver.saveState(outState);
 
 		outState.putBoolean(PROCESS_FILE_DIALOG_SHOWN, isAlertDialogShown(processFileDialog));
+
+		outState.putBoolean(STATE_KEY_IS_IN_MD_MODE, isInMDMode);
+		mdF = (MediaDiscoveryFragment) getSupportFragmentManager().findFragmentByTag(FragmentTag.MEDIA_DISCOVERY.getTag());
+		if (mdF != null) {
+			getSupportFragmentManager().putFragment(outState, FragmentTag.MEDIA_DISCOVERY.getTag(), mdF);
+		}
 	}
 
 	@Override
@@ -1415,6 +1426,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 			linkJoinToChatLink = savedInstanceState.getString(LINK_JOINING_CHAT_LINK);
 			connected = savedInstanceState.getBoolean(CONNECTED, false);
 			isFabExpanded = savedInstanceState.getBoolean(KEY_IS_FAB_EXPANDED, false);
+			isInMDMode = savedInstanceState.getBoolean(STATE_KEY_IS_IN_MD_MODE, false);
 
 			nodeAttacher.restoreState(savedInstanceState);
 			nodeSaver.restoreState(savedInstanceState);
@@ -3527,7 +3539,13 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 	}
 
 	public void skipToMediaDiscoveryFragment(Fragment f){
+		mdF = (MediaDiscoveryFragment) f;
 		replaceFragment(f, FragmentTag.MEDIA_DISCOVERY.getTag());
+		isInMDMode = true;
+	}
+
+	public void changeMDMode(boolean targetMDMode){
+		isInMDMode = targetMDMode;
 	}
 
 	void replaceFragment (Fragment f, String fTag) {
@@ -3569,12 +3587,20 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
         viewPagerTransfers.setVisibility(View.GONE);
 
         fragmentContainer.setVisibility(View.VISIBLE);
-
-        fbFLol = (FileBrowserFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.CLOUD_DRIVE.getTag());
-        if (fbFLol == null) {
-            fbFLol = FileBrowserFragmentLollipop.newInstance();
-        }
-        replaceFragment(fbFLol, FragmentTag.CLOUD_DRIVE.getTag());
+		fbFLol = (FileBrowserFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.CLOUD_DRIVE.getTag());
+		if (fbFLol == null) {
+			fbFLol = FileBrowserFragmentLollipop.newInstance();
+		}
+		if (isInMDMode) {
+			mdF = (MediaDiscoveryFragment) getSupportFragmentManager().findFragmentByTag(FragmentTag.MEDIA_DISCOVERY.getTag());
+		}
+		replaceFragment(fbFLol, FragmentTag.CLOUD_DRIVE.getTag());
+        if (isInMDMode) {
+			if (mdF == null) {
+				mdF = fbFLol.showMediaDiscovery(Unit.INSTANCE);
+			}
+			replaceFragment(mdF, FragmentTag.MEDIA_DISCOVERY.getTag());
+		}
     }
 
     private void showGlobalAlertDialogsIfNeeded() {
@@ -3949,7 +3975,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 			aB.setHomeAsUpIndicator(badgeDrawable);
 		}
 
-        if (drawerItem == DrawerItem.CLOUD_DRIVE && MediaDiscoveryFragment.Companion.isInMediaDiscovery()) {
+        if (drawerItem == DrawerItem.CLOUD_DRIVE && isInMDMode) {
             aB.setHomeAsUpIndicator(tintIcon(this, R.drawable.ic_close_white));
         }
 	}
@@ -4521,11 +4547,6 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 		}
 
 		MegaApplication.getTransfersManagement().setIsOnTransfersSection(item == DrawerItem.TRANSFERS);
-
-		// Handle Media discovery page behavior
-		if (item != DrawerItem.CLOUD_DRIVE && MediaDiscoveryFragment.Companion.isInMediaDiscovery()){
-			MediaDiscoveryFragment.Companion.setInMediaDiscovery(false);
-		}
 
     	switch (item){
 			case CLOUD_DRIVE:{
@@ -5303,7 +5324,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 		if (isOnline(this)) {
 			switch (drawerItem) {
 				case CLOUD_DRIVE:
-					if (MediaDiscoveryFragment.Companion.isInMediaDiscovery()){
+					if (isInMDMode){
 
 					} else {
 						upgradeAccountMenuItem.setVisible(true);
@@ -5558,8 +5579,8 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 					logDebug("NOT firstNavigationLevel");
 		    		if (drawerItem == DrawerItem.CLOUD_DRIVE){
 						//Check media discovery mode
-						if (MediaDiscoveryFragment.Companion.isInMediaDiscovery()){
-							MediaDiscoveryFragment.Companion.getInstance().onBackPressed();
+						if (isInMDMode){
+							onBackPressed();
 						}else{
 							//Cloud Drive
 							if (isCloudAdded()) {
@@ -6142,8 +6163,8 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 		}
 
 		if (drawerItem == DrawerItem.CLOUD_DRIVE) {
-			if (MediaDiscoveryFragment.Companion.isInMediaDiscovery()){
-				MediaDiscoveryFragment.Companion.setInMediaDiscovery(false);
+			if (isInMDMode){
+				changeMDMode(false);
 				backToDrawerItem(bottomNavigationCurrentItem);
 			}else{
 				 if (!isCloudAdded() || fbFLol.onBackPressed() == 0) {
@@ -10723,7 +10744,9 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 
 		switch (drawerItem) {
 			case CLOUD_DRIVE:
-				updateFabAndShow();
+				if (!isInMDMode){
+					updateFabAndShow();
+				}
 				break;
 
 			case SHARED_ITEMS:
@@ -11819,6 +11842,15 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 	 */
 	public boolean isInPhotosPage() {
 		return drawerItem == DrawerItem.PHOTOS;
+	}
+
+	/**
+	 * Checks if the current screen is Media discovery page.
+	 *
+	 * @return True if the current screen is Media discovery page, false otherwise.
+	 */
+	public boolean isInMDPage() {
+		return drawerItem == DrawerItem.CLOUD_DRIVE && isInMDMode;
 	}
 
     public void hideTransferWidget() {

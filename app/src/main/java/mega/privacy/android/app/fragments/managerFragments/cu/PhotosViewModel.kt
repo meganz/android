@@ -31,8 +31,6 @@ class PhotosViewModel @Inject constructor(
 
     override var mZoom = PHOTO_ZOOM_LEVEL
 
-    override fun isFetchItemsDirectly() = true
-
     fun getOrder() = sortOrderManagement.getOrderCamera()
 
     override fun getFilterRealPhotoCountCondition(item: GalleryItem): Boolean {
