@@ -101,12 +101,6 @@ public class CallService extends Service{
         updateNotificationContent();
     };
 
-    private final Observer<Long> callAnsweredInAnotherClientObserver = chatId -> {
-        if (currentChatId == chatId) {
-            stopSelf();
-        }
-    };
-
     public void onCreate() {
         super.onCreate();
         app = (MegaApplication) getApplication();
@@ -123,7 +117,6 @@ public class CallService extends Service{
         LiveEventBus.get(EVENT_CALL_ON_HOLD_CHANGE, MegaChatCall.class).observeForever(callOnHoldObserver);
         LiveEventBus.get(EVENT_CHAT_TITLE_CHANGE, MegaChatRoom.class).observeForever(titleMeetingChangeObserver);
         LiveEventBus.get(EVENT_ENTER_IN_MEETING, Boolean.class).observeForever(isInMeetingObserver);
-        LiveEventBus.get(EVENT_CALL_ANSWERED_IN_ANOTHER_CLIENT, Long.class).observeForever(callAnsweredInAnotherClientObserver);
     }
 
     @Override
@@ -453,7 +446,6 @@ public class CallService extends Service{
         LiveEventBus.get(EVENT_CALL_ON_HOLD_CHANGE, MegaChatCall.class).removeObserver(callOnHoldObserver);
         LiveEventBus.get(EVENT_CHAT_TITLE_CHANGE, MegaChatRoom.class).removeObserver(titleMeetingChangeObserver);
         LiveEventBus.get(EVENT_ENTER_IN_MEETING, Boolean.class).removeObserver(isInMeetingObserver);
-        LiveEventBus.get(EVENT_CALL_ANSWERED_IN_ANOTHER_CLIENT, Long.class).removeObserver(callAnsweredInAnotherClientObserver);
 
         cancelNotification();
         MegaApplication.setOpenCallChatId(MEGACHAT_INVALID_HANDLE);
