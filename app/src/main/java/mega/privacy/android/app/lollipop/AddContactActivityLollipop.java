@@ -3318,6 +3318,7 @@ public class AddContactActivityLollipop extends PasscodeActivity implements View
         newGroupLayout.setVisibility(View.VISIBLE);
         if (createNewChatLink) {
             findViewById(R.id.ekr_layout).setVisibility(View.GONE);
+            newMeetingButton.setVisibility(View.GONE);
         }
         setSendInvitationVisibility();
         setMegaAdapterContacts(addedContactsMEGA, MegaContactsLollipopAdapter.ITEM_VIEW_TYPE_LIST_GROUP_CHAT);
