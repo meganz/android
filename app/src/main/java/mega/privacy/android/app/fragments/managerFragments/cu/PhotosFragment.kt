@@ -288,15 +288,6 @@ class PhotosFragment : BaseZoomFragment() {
             mManagerActivity.updateCUViewTypes(if (it.isEmpty()) View.GONE else View.VISIBLE)
         }
 
-        viewModel.dateCards.observe(viewLifecycleOwner, ::showCards)
-
-        viewModel.refreshCards.observe(viewLifecycleOwner) {
-            if (it && selectedView != ALL_VIEW) {
-                showCards(viewModel.dateCards.value)
-                viewModel.refreshCompleted()
-            }
-        }
-
         viewModel.camSyncEnabled().observe(
             viewLifecycleOwner, {
                 updateEnableCUButtons(cuEnabled = it)
@@ -368,48 +359,6 @@ class PhotosFragment : BaseZoomFragment() {
     private fun hideCUProgress() {
         mManagerActivity.hideCUProgress()
         checkScroll()
-    }
-
-    override fun onCardClicked(position: Int, card: GalleryCard) {
-        when (selectedView) {
-            DAYS_VIEW -> {
-                zoomViewModel.restoreDefaultZoom()
-                handleZoomMenuItemStatus()
-                newViewClicked(ALL_VIEW)
-                val photoPosition = gridAdapter.getNodePosition(card.node.handle)
-                layoutManager.scrollToPosition(photoPosition)
-
-                val node = gridAdapter.getNodeAtPosition(photoPosition)
-                node?.let {
-                    RunOnUIThreadUtils.post {
-                        openPhoto(getOrder(), it)
-                    }
-                }
-
-                mManagerActivity.showBottomView()
-            }
-            MONTHS_VIEW -> {
-                newViewClicked(DAYS_VIEW)
-                layoutManager.scrollToPosition(viewModel.monthClicked(position, card))
-            }
-            YEARS_VIEW -> {
-                newViewClicked(MONTHS_VIEW)
-                layoutManager.scrollToPosition(viewModel.yearClicked(position, card))
-            }
-        }
-
-        showViewTypePanel()
-    }
-
-    private fun showViewTypePanel() {
-        val params = viewTypePanel.layoutParams as LinearLayout.LayoutParams
-        params.setMargins(
-            0, 0, 0,
-            resources.getDimensionPixelSize(R.dimen.cu_view_type_button_vertical_margin)
-        )
-        viewTypePanel.animate().translationY(0f).setDuration(175)
-            .withStartAction { viewTypePanel.visibility = View.VISIBLE }
-            .withEndAction { viewTypePanel.layoutParams = params }.start()
     }
 
     fun checkScroll() {

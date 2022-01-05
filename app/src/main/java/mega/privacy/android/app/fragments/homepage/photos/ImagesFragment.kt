@@ -96,45 +96,6 @@ class ImagesFragment : BaseZoomFragment() {
             }
             removeSortByMenu()
         }
-
-        viewModel.dateCards.observe(viewLifecycleOwner, ::showCards)
-
-        viewModel.refreshCards.observe(viewLifecycleOwner) {
-            if (it && selectedView != ALL_VIEW) {
-                showCards(viewModel.dateCards.value)
-                viewModel.refreshCompleted()
-            }
-        }
-    }
-
-
-    override fun onCardClicked(position: Int, @NonNull card: GalleryCard) {
-        when (selectedView) {
-            DAYS_VIEW -> {
-                zoomViewModel.restoreDefaultZoom()
-                handleZoomMenuItemStatus()
-                newViewClicked(ALL_VIEW)
-                val photoPosition = gridAdapter.getNodePosition(card.node.handle)
-                layoutManager.scrollToPosition(photoPosition)
-
-                val node = gridAdapter.getNodeAtPosition(photoPosition)
-                node?.let {
-                    RunOnUIThreadUtils.post {
-                        openPhoto(ORDER_MODIFICATION_DESC, it)
-                    }
-                }
-            }
-            MONTHS_VIEW -> {
-                newViewClicked(DAYS_VIEW)
-                layoutManager.scrollToPosition(viewModel.monthClicked(position, card))
-            }
-            YEARS_VIEW -> {
-                newViewClicked(MONTHS_VIEW)
-                layoutManager.scrollToPosition(viewModel.yearClicked(position, card))
-            }
-        }
-
-        showViewTypePanel()
     }
 
     private fun setupEmptyHint() {
@@ -163,20 +124,6 @@ class ImagesFragment : BaseZoomFragment() {
         setupListAdapter(zoom, viewModel.items.value)
         viewModel.mZoom = zoom
         listView.layoutManager?.onRestoreInstanceState(state)
-    }
-
-    /**
-     * Display the view type buttons panel with animation effect, after a card is clicked.
-     */
-    private fun showViewTypePanel() {
-        val params = viewTypePanel.layoutParams as CoordinatorLayout.LayoutParams
-        params.setMargins(
-            0, 0, 0,
-            resources.getDimensionPixelSize(R.dimen.cu_view_type_button_vertical_margin)
-        )
-        viewTypePanel.animate().translationY(0f).setDuration(175)
-            .withStartAction { viewTypePanel.visibility = View.VISIBLE }
-            .withEndAction { viewTypePanel.layoutParams = params }.start()
     }
 
     fun loadPhotos() = viewModel.loadPhotos(true)

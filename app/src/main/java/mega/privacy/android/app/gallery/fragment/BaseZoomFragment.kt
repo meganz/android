@@ -8,6 +8,7 @@ import android.content.Intent
 import android.content.res.Configuration
 import android.os.Bundle
 import android.view.*
+import android.view.ViewGroup.MarginLayoutParams
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
@@ -199,6 +200,15 @@ abstract class BaseZoomFragment : BaseFragment(), GestureScaleCallback,
             handleZoomChange(zoom, needReload)
         })
 
+        viewModel.dateCards.observe(viewLifecycleOwner, ::showCards)
+
+        viewModel.refreshCards.observe(viewLifecycleOwner) {
+            if (it && selectedView != ALL_VIEW) {
+                showCards(viewModel.dateCards.value)
+                viewModel.refreshCompleted()
+            }
+        }
+
         setupNavigation()
         setupActionMode()
 
@@ -326,7 +336,52 @@ abstract class BaseZoomFragment : BaseFragment(), GestureScaleCallback,
         }
     }
 
-    protected fun openPhoto(order: Int, nodeItem: GalleryItem) {
+    override fun onCardClicked(position: Int, card: GalleryCard) {
+        when (selectedView) {
+            DAYS_VIEW -> {
+                zoomViewModel.restoreDefaultZoom()
+                handleZoomMenuItemStatus()
+                newViewClicked(ALL_VIEW)
+                val photoPosition = gridAdapter.getNodePosition(card.node.handle)
+                layoutManager.scrollToPosition(photoPosition)
+
+                val node = gridAdapter.getNodeAtPosition(photoPosition)
+                node?.let {
+                    RunOnUIThreadUtils.post {
+                        openPhoto(getOrder(), it)
+                    }
+                }
+
+                mManagerActivity.showBottomView()
+            }
+            MONTHS_VIEW -> {
+                newViewClicked(DAYS_VIEW)
+                layoutManager.scrollToPosition(viewModel.monthClicked(position, card))
+            }
+            YEARS_VIEW -> {
+                newViewClicked(MONTHS_VIEW)
+                layoutManager.scrollToPosition(viewModel.yearClicked(position, card))
+            }
+        }
+
+        showViewTypePanel()
+    }
+
+    /**
+     * Display the view type buttons panel with animation effect, after a card is clicked.
+     */
+    protected fun showViewTypePanel() {
+        val params = viewTypePanel.layoutParams as MarginLayoutParams
+        params.setMargins(
+            0, 0, 0,
+            resources.getDimensionPixelSize(R.dimen.cu_view_type_button_vertical_margin)
+        )
+        viewTypePanel.animate().translationY(0f).setDuration(175)
+            .withStartAction { viewTypePanel.visibility = View.VISIBLE }
+            .withEndAction { viewTypePanel.layoutParams = params }.start()
+    }
+
+    private fun openPhoto(order: Int, nodeItem: GalleryItem) {
         listView.findViewHolderForLayoutPosition(nodeItem.index)?.itemView?.findViewById<ImageView>(
             R.id.thumbnail
         )?.also {
