@@ -552,9 +552,10 @@ public class MegaApplication extends MultiDexApplication implements Application.
 		}
 	};
 
-	public void handleUncaughtException(Throwable e) {
-		logFatal("UNCAUGHT EXCEPTION", e);
-		e.printStackTrace();
+	public void handleUncaughtException(Throwable throwable) {
+		logFatal("UNCAUGHT EXCEPTION", throwable);
+		throwable.printStackTrace();
+		crashReporter.report(throwable);
 	}
 
 	private final Observer<MegaChatCall> callStatusObserver = call -> {
@@ -727,15 +728,9 @@ public class MegaApplication extends MultiDexApplication implements Application.
 
 		crashReporter = new CrashReporterImpl();
 
-		// Setup handler for uncaught exceptions.
-        Thread.setDefaultUncaughtExceptionHandler((thread, e) -> {
-            handleUncaughtException(e);
-            crashReporter.report(e);
-        });
-		RxJavaPlugins.setErrorHandler(throwable -> {
-			handleUncaughtException(throwable);
-			crashReporter.report(throwable);
-		});
+		// Setup handler and RxJava for uncaught exceptions.
+		Thread.setDefaultUncaughtExceptionHandler((thread, e) -> handleUncaughtException(e));
+		RxJavaPlugins.setErrorHandler(this::handleUncaughtException);
 
 		registerActivityLifecycleCallbacks(this);
 
