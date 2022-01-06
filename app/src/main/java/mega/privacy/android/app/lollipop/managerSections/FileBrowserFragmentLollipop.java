@@ -649,10 +649,7 @@ public class FileBrowserFragmentLollipop extends RotatableFragment {
     }
 
     public MediaDiscoveryFragment showMediaDiscovery(Unit u) {
-        MediaDiscoveryFragment f = MediaDiscoveryFragment.Companion.getInstance();
-        Bundle args = new Bundle();
-        args.putLong(MEDIA_HANDLE, mediaHandle);
-        f.setArguments(args);
+        MediaDiscoveryFragment f = MediaDiscoveryFragment.getInstance(mediaHandle);
         ((ManagerActivityLollipop) context).skipToMediaDiscoveryFragment(f);
         return f;
     }

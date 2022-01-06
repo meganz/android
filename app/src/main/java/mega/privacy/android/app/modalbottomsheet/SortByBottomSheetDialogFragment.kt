@@ -210,9 +210,10 @@ class SortByBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
 
                 if (requireActivity() is ManagerActivityLollipop) {
                     (requireActivity() as ManagerActivityLollipop).refreshCUNodes()
+                    if((requireActivity() as ManagerActivityLollipop).isInMDPage) {
+                        (requireActivity() as ManagerActivityLollipop).mdFragment.loadPhotos()
+                    }
                 }
-
-                MediaDiscoveryFragment.getInstance().loadPhotos()
             }
             ORDER_OTHERS -> {
                 sortOrderManagement.setOrderOthers(order)

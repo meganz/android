@@ -11712,6 +11712,10 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 		return pF = (PermissionsFragment) getSupportFragmentManager().findFragmentByTag(FragmentTag.PERMISSIONS.getTag());
 	}
 
+	public MediaDiscoveryFragment getMDFragment(){
+		return mdF;
+	}
+
 	/**
 	 * Checks whether the current screen is the main of Homepage or Documents.
 	 * Video / Audio / Photos do not need Fab button

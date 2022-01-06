@@ -10,9 +10,11 @@ import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.R
 import mega.privacy.android.app.databinding.FragmentMediaDecoveryBinding
 import mega.privacy.android.app.fragments.homepage.*
+import mega.privacy.android.app.gallery.constant.MEDIA_HANDLE
 import mega.privacy.android.app.gallery.data.GalleryCard
 import mega.privacy.android.app.gallery.data.GalleryItem
 import mega.privacy.android.app.gallery.fragment.BaseZoomFragment
+import mega.privacy.android.app.modalbottomsheet.SortByBottomSheetDialogFragment
 import mega.privacy.android.app.utils.*
 import mega.privacy.android.app.utils.Constants.*
 import java.lang.ref.WeakReference
@@ -32,13 +34,14 @@ class MediaDiscoveryFragment : BaseZoomFragment() {
 
     companion object {
 
-        private var instance: WeakReference<MediaDiscoveryFragment?>? = null
+        @JvmStatic
+        fun getInstance(mediaHandle:Long): MediaDiscoveryFragment {
+            val fragment = MediaDiscoveryFragment()
+            val args = Bundle()
+            args.putLong(MEDIA_HANDLE, mediaHandle);
+            fragment.arguments = args
 
-        fun getInstance(): MediaDiscoveryFragment {
-            if (instance == null) {
-                instance = WeakReference(MediaDiscoveryFragment())
-            }
-            return instance!!.get()!!
+            return fragment
         }
     }
 
@@ -177,10 +180,5 @@ class MediaDiscoveryFragment : BaseZoomFragment() {
 
     private fun isInThisPage(): Boolean {
         return mManagerActivity.isInMDPage
-    }
-
-    override fun onDestroy() {
-        instance = null
-        super.onDestroy()
     }
 }
