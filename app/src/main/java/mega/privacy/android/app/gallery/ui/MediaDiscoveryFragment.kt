@@ -2,8 +2,6 @@ package mega.privacy.android.app.gallery.ui
 
 import android.os.Bundle
 import android.view.*
-import androidx.annotation.NonNull
-import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.view.isVisible
 import androidx.fragment.app.viewModels
 import dagger.hilt.android.AndroidEntryPoint
@@ -11,13 +9,10 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.databinding.FragmentMediaDecoveryBinding
 import mega.privacy.android.app.fragments.homepage.*
 import mega.privacy.android.app.gallery.constant.MEDIA_HANDLE
-import mega.privacy.android.app.gallery.data.GalleryCard
 import mega.privacy.android.app.gallery.data.GalleryItem
 import mega.privacy.android.app.gallery.fragment.BaseZoomFragment
-import mega.privacy.android.app.modalbottomsheet.SortByBottomSheetDialogFragment
 import mega.privacy.android.app.utils.*
 import mega.privacy.android.app.utils.Constants.*
-import java.lang.ref.WeakReference
 import java.util.*
 
 @AndroidEntryPoint

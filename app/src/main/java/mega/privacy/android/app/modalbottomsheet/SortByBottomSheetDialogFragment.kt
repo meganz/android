@@ -14,7 +14,6 @@ import com.jeremyliao.liveeventbus.LiveEventBus
 import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.R
 import mega.privacy.android.app.databinding.BottomSheetSortByBinding
-import mega.privacy.android.app.gallery.ui.MediaDiscoveryFragment
 import mega.privacy.android.app.globalmanagement.SortOrderManagement
 import mega.privacy.android.app.lollipop.FileExplorerActivityLollipop
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop
