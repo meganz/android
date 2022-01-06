@@ -38,6 +38,7 @@ import androidx.multidex.MultiDexApplication;
 import com.facebook.drawee.backends.pipeline.Fresco;
 import com.jeremyliao.liveeventbus.LiveEventBus;
 
+import io.reactivex.rxjava3.plugins.RxJavaPlugins;
 import mega.privacy.android.app.di.MegaApi;
 import mega.privacy.android.app.di.MegaApiFolder;
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
@@ -551,7 +552,7 @@ public class MegaApplication extends MultiDexApplication implements Application.
 		}
 	};
 
-	public void handleUncaughtException(Thread thread, Throwable e) {
+	public void handleUncaughtException(Throwable e) {
 		logFatal("UNCAUGHT EXCEPTION", e);
 		e.printStackTrace();
 	}
@@ -728,10 +729,13 @@ public class MegaApplication extends MultiDexApplication implements Application.
 
 		// Setup handler for uncaught exceptions.
         Thread.setDefaultUncaughtExceptionHandler((thread, e) -> {
-            handleUncaughtException(thread, e);
-
+            handleUncaughtException(e);
             crashReporter.report(e);
         });
+		RxJavaPlugins.setErrorHandler(throwable -> {
+			handleUncaughtException(throwable);
+			crashReporter.report(throwable);
+		});
 
 		registerActivityLifecycleCallbacks(this);
 
