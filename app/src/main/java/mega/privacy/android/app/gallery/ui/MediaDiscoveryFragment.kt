@@ -15,6 +15,7 @@ import mega.privacy.android.app.gallery.data.GalleryItem
 import mega.privacy.android.app.gallery.fragment.BaseZoomFragment
 import mega.privacy.android.app.utils.*
 import mega.privacy.android.app.utils.Constants.*
+import java.lang.ref.WeakReference
 import java.util.*
 
 @AndroidEntryPoint
@@ -30,13 +31,14 @@ class MediaDiscoveryFragment : BaseZoomFragment() {
     private var order = 0
 
     companion object {
-        private var instance: MediaDiscoveryFragment? = null
+
+        private var instance: WeakReference<MediaDiscoveryFragment?>? = null
 
         fun getInstance(): MediaDiscoveryFragment {
             if (instance == null) {
-                instance = MediaDiscoveryFragment()
+                instance = WeakReference(MediaDiscoveryFragment())
             }
-            return instance!!
+            return instance!!.get()!!
         }
     }
 
