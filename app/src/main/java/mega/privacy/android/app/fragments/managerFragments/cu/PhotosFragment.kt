@@ -323,7 +323,7 @@ class PhotosFragment : BaseZoomFragment() {
      * Otherwise, true, show menu.
      */
     private fun isShowMenu() =
-        gridAdapterHasData() && actionMode == null && selectedView == ALL_VIEW
+        gridAdapterHasData() && actionMode == null && selectedView == ALL_VIEW && !viewModel.isEnableCUShown()
 
     fun isEnableCUFragmentShown() = viewModel.isEnableCUShown()
 
