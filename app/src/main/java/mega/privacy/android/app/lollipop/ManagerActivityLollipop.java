@@ -6352,6 +6352,9 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 		switch (menuItem.getItemId()){
 			case R.id.bottom_navigation_item_cloud_drive: {
 				if (drawerItem == DrawerItem.CLOUD_DRIVE) {
+					if (isInMDMode) {
+						changeMDMode(false);
+					}
 					MegaNode rootNode = megaApi.getRootNode();
 					if (rootNode == null) {
 						logError("Root node is null");
