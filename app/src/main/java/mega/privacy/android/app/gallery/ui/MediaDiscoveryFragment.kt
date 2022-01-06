@@ -173,7 +173,7 @@ class MediaDiscoveryFragment : BaseZoomFragment() {
         } else super.onOptionsItemSelected(item)
     }
 
-    fun isInThisPage(): Boolean {
+    private fun isInThisPage(): Boolean {
         return mManagerActivity.isInMDPage
     }
 

@@ -417,7 +417,7 @@ abstract class BaseZoomFragment : BaseFragment(), GestureScaleCallback,
         }
     }
 
-    fun gridAdapterHasData() = this::gridAdapter.isInitialized && gridAdapter.itemCount > 0
+    fun gridAdapterHasData() = viewModel.items.value?.isNotEmpty()?:false
 
     fun layoutManagerInitialized() = this::layoutManager.isInitialized
 
