@@ -204,6 +204,8 @@ class GetNodeUseCase @Inject constructor(
 
             megaApi.getPublicNode(nodeFileLink, OptionalMegaRequestListenerInterface(
                 onRequestFinish = { request, error ->
+                    if (emitter.isDisposed) return@OptionalMegaRequestListenerInterface
+
                     if (error.errorCode == MegaError.API_OK) {
                         if (!request.flag) {
                             emitter.onSuccess(request.publicNode)
@@ -372,6 +374,8 @@ class GetNodeUseCase @Inject constructor(
 
             megaApi.copyNode(currentNode, toParentNode, OptionalMegaRequestListenerInterface(
                 onRequestFinish = { _, error ->
+                    if (emitter.isDisposed) return@OptionalMegaRequestListenerInterface
+
                     when (error.errorCode) {
                         MegaError.API_OK ->
                             emitter.onComplete()
@@ -412,6 +416,8 @@ class GetNodeUseCase @Inject constructor(
 
             megaApi.moveNode(currentNode, toParentNode, OptionalMegaRequestListenerInterface(
                 onRequestFinish = { _, error ->
+                    if (emitter.isDisposed) return@OptionalMegaRequestListenerInterface
+
                     when (error.errorCode) {
                         MegaError.API_OK ->
                             emitter.onComplete()
@@ -461,6 +467,8 @@ class GetNodeUseCase @Inject constructor(
 
             megaApi.remove(node, OptionalMegaRequestListenerInterface(
                 onRequestFinish = { _, error ->
+                    if (emitter.isDisposed) return@OptionalMegaRequestListenerInterface
+
                     when (error.errorCode) {
                         MegaError.API_OK ->
                             emitter.onComplete()

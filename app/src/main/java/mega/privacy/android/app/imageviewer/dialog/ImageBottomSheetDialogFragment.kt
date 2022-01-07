@@ -86,7 +86,7 @@ class ImageBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        viewModel.loadSingleNode(imageNodeHandle, true)
+        viewModel.loadSingleNode(imageNodeHandle)
         viewModel.onImage(imageNodeHandle).observe(viewLifecycleOwner, ::showNodeData)
         super.onViewCreated(view, savedInstanceState)
     }

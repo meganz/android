@@ -142,27 +142,16 @@ class ImageViewerViewModel @Inject constructor(
      * You must be observing the requested Image to get the updated result.
      *
      * @param nodeHandle    Image node handle to be loaded.
-     * @param forceReload   Flag to force reload node if needed.
      */
-    fun loadSingleNode(nodeHandle: Long, forceReload: Boolean = false) {
+    fun loadSingleNode(nodeHandle: Long) {
         val existingNode = images.value?.find { it.handle == nodeHandle }
         val subscription = when {
-            forceReload -> {
-                when {
-                    existingNode?.nodePublicLink?.isNotBlank() == true ->
-                        getNodeUseCase.getNodeItem(existingNode.nodePublicLink)
-                    existingNode?.chatMessageId != null && existingNode.chatRoomId != null ->
-                        getNodeUseCase.getNodeItem(existingNode.chatRoomId, existingNode.chatMessageId)
-                    else ->
-                        getNodeUseCase.getNodeItem(nodeHandle)
-                }
-            }
-            existingNode?.nodeItem?.node != null ->
-                getNodeUseCase.getNodeItem(existingNode.nodeItem.node)
             existingNode?.nodePublicLink?.isNotBlank() == true ->
                 getNodeUseCase.getNodeItem(existingNode.nodePublicLink)
             existingNode?.chatMessageId != null && existingNode.chatRoomId != null ->
                 getNodeUseCase.getNodeItem(existingNode.chatRoomId, existingNode.chatMessageId)
+            existingNode?.nodeItem?.node != null ->
+                getNodeUseCase.getNodeItem(existingNode.nodeItem.node)
             existingNode?.isOffline == true ->
                 getNodeUseCase.getOfflineNodeItem(existingNode.handle)
             else ->
@@ -196,14 +185,14 @@ class ImageViewerViewModel @Inject constructor(
     fun loadSingleImage(nodeHandle: Long, fullSize: Boolean, highPriority: Boolean) {
         val existingNode = images.value?.find { it.handle == nodeHandle }
         val subscription = when {
-            existingNode?.nodeItem?.node != null ->
-                getImageUseCase.get(existingNode.nodeItem.node, fullSize, highPriority)
             existingNode?.nodePublicLink?.isNotBlank() == true ->
                 getImageUseCase.get(existingNode.nodePublicLink, fullSize, highPriority)
             existingNode?.chatMessageId != null && existingNode.chatRoomId != null ->
                 getImageUseCase.get(existingNode.chatRoomId, existingNode.chatMessageId, fullSize, highPriority)
             existingNode?.isOffline == true ->
                 getImageUseCase.getOffline(existingNode.handle)
+            existingNode?.nodeItem?.node != null ->
+                getImageUseCase.get(existingNode.nodeItem.node, fullSize, highPriority)
             else ->
                 getImageUseCase.get(nodeHandle, fullSize, highPriority)
         }
@@ -263,6 +252,7 @@ class ImageViewerViewModel @Inject constructor(
             }
         } else {
             logWarning("Images are null or empty")
+            images.value = null
         }
     }
 
@@ -337,7 +327,7 @@ class ImageViewerViewModel @Inject constructor(
                             nodeItem = existingNode?.nodeItem
                         )
                     }
-                    dirtyNodeHandles.forEach { loadSingleNode(it, true) }
+                    dirtyNodeHandles.forEach(::loadSingleNode)
                     updateCurrentPosition(newPosition, true)
                 },
                 onError = { error ->
@@ -363,7 +353,7 @@ class ImageViewerViewModel @Inject constructor(
             isFromInbox = nodeItem.isFromInbox,
             activity = activity
         ).subscribeAndComplete {
-            loadSingleNode(nodeItem.handle, true)
+            loadSingleNode(nodeItem.handle)
         }
     }
 

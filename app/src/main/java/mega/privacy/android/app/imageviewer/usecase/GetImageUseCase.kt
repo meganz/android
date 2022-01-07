@@ -139,6 +139,8 @@ class GetImageUseCase @Inject constructor(
                             thumbnailFile.absolutePath,
                             OptionalMegaRequestListenerInterface(
                                 onRequestFinish = { _: MegaRequest, error: MegaError ->
+                                    if (emitter.isCancelled) return@OptionalMegaRequestListenerInterface
+
                                     if (error.errorCode == API_OK) {
                                         image.thumbnailUri = thumbnailFile.toUri()
                                         emitter.onNext(image)
@@ -153,6 +155,8 @@ class GetImageUseCase @Inject constructor(
                             previewFile.absolutePath,
                             OptionalMegaRequestListenerInterface(
                                 onRequestFinish = { _: MegaRequest, error: MegaError ->
+                                    if (emitter.isCancelled) return@OptionalMegaRequestListenerInterface
+
                                     if (error.errorCode == API_OK) {
                                         image.previewUri = previewFile.toUri()
                                         if (isFullSizeRequired) {
