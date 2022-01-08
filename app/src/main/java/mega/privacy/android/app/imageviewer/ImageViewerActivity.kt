@@ -40,7 +40,6 @@ import nz.mega.documentscanner.utils.IntentUtils.extra
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 import nz.mega.sdk.MegaApiJava.ORDER_PHOTO_ASC
 import nz.mega.sdk.MegaNode
-import java.lang.ref.WeakReference
 
 /**
  * Entry point to show an image based on an existing Node.
@@ -208,17 +207,17 @@ class ImageViewerActivity : BaseActivity(), PermissionRequester, SnackbarShower 
     private var pageCallbackSet = false
     private var bottomSheet: ImageBottomSheetDialogFragment? = null
     private lateinit var binding: ActivityImageViewerBinding
-    private lateinit var nodeSaver: WeakReference<NodeSaver>
-    private lateinit var nodeAttacher: WeakReference<MegaAttacher>
-    private lateinit var dragToExit: WeakReference<DragToExitSupport>
+    private var nodeSaver: NodeSaver? = null
+    private var nodeAttacher: MegaAttacher? = null
+    private var dragToExit: DragToExitSupport? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         WindowCompat.setDecorFitsSystemWindows(window, false)
-        setupWeakReferences(savedInstanceState)
+        setupAttachers(savedInstanceState)
 
         binding = ActivityImageViewerBinding.inflate(layoutInflater)
-        setContentView(dragToExit.get()?.wrapContentView(binding.root) ?: binding.root)
+        setContentView(dragToExit?.wrapContentView(binding.root) ?: binding.root)
 
         setupView()
         setupObservers(savedInstanceState == null)
@@ -226,7 +225,7 @@ class ImageViewerActivity : BaseActivity(), PermissionRequester, SnackbarShower 
         if (savedInstanceState == null) {
             if (!Fresco.hasBeenInitialized()) Fresco.initialize(this)
             binding.root.post {
-                dragToExit.get()?.runEnterAnimation(intent, binding.root, ::enableToolbarTransition)
+                dragToExit?.runEnterAnimation(intent, binding.root, ::enableToolbarTransition)
             }
         }
     }
@@ -238,17 +237,17 @@ class ImageViewerActivity : BaseActivity(), PermissionRequester, SnackbarShower 
 
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
-        nodeSaver.get()?.saveState(outState)
-        nodeAttacher.get()?.saveState(outState)
+        nodeSaver?.saveState(outState)
+        nodeAttacher?.saveState(outState)
     }
 
     override fun onDestroy() {
         binding.viewPager.unregisterOnPageChangeCallback(pageChangeCallback)
-        nodeAttacher.clear()
-        nodeSaver.get()?.destroy()
-        nodeSaver.clear()
-        if (isFinishing) dragToExit.get()?.showPreviousHiddenThumbnail()
-        dragToExit.clear()
+        if (isFinishing) dragToExit?.showPreviousHiddenThumbnail()
+        dragToExit = null
+        nodeSaver?.destroy()
+        nodeSaver = null
+        nodeAttacher = null
         super.onDestroy()
     }
 
@@ -358,26 +357,22 @@ class ImageViewerActivity : BaseActivity(), PermissionRequester, SnackbarShower 
         }
     }
 
-    private fun setupWeakReferences(savedInstanceState: Bundle?) {
-        dragToExit = WeakReference(
-            DragToExitSupport(this, ::enableToolbarTransition) {
-                finish()
-                overridePendingTransition(0, android.R.anim.fade_out)
-            }
-        )
-        nodeAttacher = WeakReference(
-            MegaAttacher(this).apply {
-                savedInstanceState?.let(::restoreState)
-            }
-        )
-        nodeSaver = WeakReference(
-            NodeSaver(
-                this, this, this,
-                showSaveToDeviceConfirmDialog(this)
-            ).apply {
-                savedInstanceState?.let(::restoreState)
-            }
-        )
+    private fun setupAttachers(savedInstanceState: Bundle?) {
+        dragToExit = DragToExitSupport(this, ::enableToolbarTransition) {
+            finish()
+            overridePendingTransition(0, android.R.anim.fade_out)
+        }
+
+        nodeAttacher = MegaAttacher(this).apply {
+            savedInstanceState?.let(::restoreState)
+        }
+
+        nodeSaver = NodeSaver(
+            this, this, this,
+            showSaveToDeviceConfirmDialog(this)
+        ).apply {
+            savedInstanceState?.let(::restoreState)
+        }
     }
 
     /**
@@ -388,19 +383,20 @@ class ImageViewerActivity : BaseActivity(), PermissionRequester, SnackbarShower 
     private fun showCurrentImageInfo(item: MegaNodeItem?) {
         if (item != null) {
             val isOnline = isOnline()
+            val isExternal = item.node?.isPublic == true || item.node?.isForeign == true
             binding.txtTitle.text = item.name
             binding.toolbar.menu?.apply {
                 findItem(R.id.action_download)?.isVisible =
                     !item.isFromRubbishBin
 
                 findItem(R.id.action_save_gallery)?.isVisible =
-                    isSaveToGalleryCompatible() && !item.isFromRubbishBin && item.node?.isPublic != true
+                    isSaveToGalleryCompatible() && !isExternal && !item.isFromRubbishBin
 
                 findItem(R.id.action_get_link)?.isVisible =
                     isOnline && item.hasOwnerAccess && !item.isFromRubbishBin
 
                 findItem(R.id.action_chat)?.isVisible =
-                    isOnline && !item.isFromRubbishBin && item.node?.isPublic != true && viewModel.isUserLoggedIn()
+                    isOnline && !isExternal && !item.isFromRubbishBin && viewModel.isUserLoggedIn()
 
                 findItem(R.id.action_more)?.isVisible = true
             }
@@ -476,10 +472,10 @@ class ImageViewerActivity : BaseActivity(), PermissionRequester, SnackbarShower 
     }
 
     fun saveNode(node: MegaNode, downloadToGallery: Boolean) {
-        nodeSaver.get()?.saveNode(
+        nodeSaver?.saveNode(
             node,
             highPriority = false,
-            isFolderLink = false,
+            isFolderLink = node.isForeign,
             fromMediaViewer = true,
             needSerialize = true,
             downloadToGallery = downloadToGallery
@@ -487,11 +483,11 @@ class ImageViewerActivity : BaseActivity(), PermissionRequester, SnackbarShower 
     }
 
     fun saveOfflineNode(nodeHandle: Long) {
-        nodeSaver.get()?.saveOfflineNode(nodeHandle, true)
+        nodeSaver?.saveOfflineNode(nodeHandle, true)
     }
 
     fun attachNode(node: MegaNode) {
-        nodeAttacher.get()?.attachNode(node)
+        nodeAttacher?.attachNode(node)
     }
 
     fun showRenameDialog(node: MegaNode) {
@@ -503,16 +499,16 @@ class ImageViewerActivity : BaseActivity(), PermissionRequester, SnackbarShower 
         permissions: Array<out String>,
         grantResults: IntArray
     ) {
-        nodeSaver.get()?.handleRequestPermissionsResult(requestCode)
+        nodeSaver?.handleRequestPermissionsResult(requestCode)
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
     }
 
     @Suppress("deprecation")
     override fun onActivityResult(requestCode: Int, resultCode: Int, intent: Intent?) {
         when {
-            nodeSaver.get()?.handleActivityResult(requestCode, resultCode, intent) == true ->
+            nodeSaver?.handleActivityResult(requestCode, resultCode, intent) == true ->
                 return
-            nodeAttacher.get()?.handleActivityResult(requestCode, resultCode, intent, this) == true ->
+            nodeAttacher?.handleActivityResult(requestCode, resultCode, intent, this) == true ->
                 return
             else ->
                 super.onActivityResult(requestCode, resultCode, intent)
