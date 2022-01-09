@@ -50,6 +50,7 @@ import nz.mega.sdk.MegaChatApiJava
 
 @AndroidEntryPoint
 @SuppressLint("NewApi")
+@Suppress("DEPRECATION")
 class SettingsFragment : Preference.OnPreferenceChangeListener,
     Settings, PreferenceFragmentCompat() {
 

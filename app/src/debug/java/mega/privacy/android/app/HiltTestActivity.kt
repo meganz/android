@@ -14,6 +14,7 @@ import javax.inject.Inject
 import javax.inject.Provider
 
 @AndroidEntryPoint
+@Suppress("DEPRECATION")
 class HiltTestActivity : AppCompatActivity(), SettingsActivity {
 
     @Inject

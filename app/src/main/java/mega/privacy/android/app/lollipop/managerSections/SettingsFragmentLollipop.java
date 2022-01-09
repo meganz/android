@@ -78,6 +78,7 @@ import static nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE;
 
 @AndroidEntryPoint
 @SuppressLint("NewApi")
+@SuppressWarnings( "deprecation" )
 public class SettingsFragmentLollipop extends SettingsBaseFragment implements Settings {
 
     private static final String EVALUATE_APP_DIALOG_SHOW = "EvaluateAppDialogShow";
