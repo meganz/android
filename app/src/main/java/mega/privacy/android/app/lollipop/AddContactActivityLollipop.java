@@ -326,9 +326,13 @@ public class AddContactActivityLollipop extends PasscodeActivity implements View
             boolean found;
             shareContacts.clear();
 
-            ShareContactInfo lastItem = filteredContactsShare.get(filteredContactsShare.size() - 1);
-            if (lastItem.isProgress()) {
-                inProgressPosition = filteredContactsShare.size() - 1;
+            if (!filteredContactsShare.isEmpty()) {
+                int pos = filteredContactsShare.size() - 1;
+                ShareContactInfo lastItem = filteredContactsShare.get(pos);
+
+                if (lastItem.isProgress()) {
+                    inProgressPosition = pos;
+                }
             }
 
             if (filteredContactsPhone != null && !filteredContactsPhone.isEmpty()) {
