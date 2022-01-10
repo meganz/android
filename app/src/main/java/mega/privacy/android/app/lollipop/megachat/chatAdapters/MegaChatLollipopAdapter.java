@@ -1447,6 +1447,9 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             hideLayoutsGiphyAndGifMessages(position, (ViewHolderMessageChat) holder);
             hideForwardOptions(position, (ViewHolderMessageChat) holder);
             hideLayoutsContactLinkMessages(position, (ViewHolderMessageChat) holder);
+            hideLayoutsVoiceClipMessages(position, (ViewHolderMessageChat) holder);
+            hideLayoutsNormalMessages(position, (ViewHolderMessageChat) holder);
+            hideLayoutsAttachmentMessages(position, (ViewHolderMessageChat) holder);
 
             AndroidMegaChatMessage androidMessage = messages.get(position - 1);
             if (androidMessage.isUploading()) {
@@ -5230,6 +5233,36 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
 
         holder.ownContactLinkMessage.setVisibility(View.GONE);
         holder.othersContactLinkMessage.setVisibility(View.GONE);
+    }
+
+    /**
+     * Hides all the layouts related to voice clip messages.
+     *
+     * @param position Position of holder in adapter.
+     * @param holder   ViewHolderMessageChat from which the layouts have to be hidden.
+     */
+    private void hideLayoutsVoiceClipMessages(int position, ViewHolderMessageChat holder) {
+        if (isHolderNull(position, holder)) {
+            return;
+        }
+
+        holder.contentOwnMessageVoiceClipLayout.setVisibility(View.GONE);
+        holder.contentContactMessageVoiceClipLayout.setVisibility(View.GONE);
+    }
+
+    /**
+     * Hides all the layouts related to normal messages.
+     *
+     * @param position Position of holder in adapter.
+     * @param holder   ViewHolderMessageChat from which the layouts have to be hidden.
+     */
+    private void hideLayoutsNormalMessages(int position, ViewHolderMessageChat holder) {
+        if (isHolderNull(position, holder)) {
+            return;
+        }
+
+        holder.contentOwnMessageText.setVisibility(View.GONE);
+        holder.contentContactMessageText.setVisibility(View.GONE);
     }
 
     /**
