@@ -3,8 +3,6 @@ package test.mega.privacy.android.app.domain.usecase
 import mega.privacy.android.app.domain.repository.AccountRepository
 import mega.privacy.android.app.domain.usecase.DefaultRefreshUserAccount
 import mega.privacy.android.app.domain.usecase.RefreshUserAccount
-import org.junit.Assert.*
-
 import org.junit.Before
 import org.junit.Test
 import org.mockito.kotlin.*
