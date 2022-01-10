@@ -308,6 +308,10 @@ public class FolderLinkActivityLollipop extends TransfersManagementActivity impl
 			case R.id.share_link:
 				shareLink(this, url);
 				break;
+
+			case R.id.action_more:
+				showOptionsPanel(megaApiFolder.getNodeByHandle(parentHandle));
+				break;
 		}
 
 		return super.onOptionsItemSelected(item);
@@ -1420,7 +1424,7 @@ public class FolderLinkActivityLollipop extends TransfersManagementActivity impl
 	@Override
 	public void onBackPressed() {
 		logDebug("onBackPressed");
-		if (psaWebBrowser.consumeBack()) return;
+		if (psaWebBrowser != null && psaWebBrowser.consumeBack()) return;
 		retryConnectionsAndSignalPresence();
 
 		if (fileLinkFolderLink){
@@ -1635,7 +1639,7 @@ public class FolderLinkActivityLollipop extends TransfersManagementActivity impl
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		getMenuInflater().inflate(R.menu.file_folder_link_action, menu);
-
+		menu.findItem(R.id.action_more).setVisible(true);
 		return super.onCreateOptionsMenu(menu);
 	}
 }
