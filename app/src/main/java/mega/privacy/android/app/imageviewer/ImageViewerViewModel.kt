@@ -273,12 +273,10 @@ class ImageViewerViewModel @Inject constructor(
                         return@subscribeBy
                     }
 
-                    val currentItemPosition = currentPosition.value ?: 0
                     val dirtyNodeHandles = mutableListOf<Long>()
 
                     (change as Result.OnNodesUpdate).nodes?.forEach { changedNode ->
                         val currentIndex = items.indexOfFirst { it.handle == changedNode.handle }
-
                         when {
                             changedNode.hasChanged(MegaNode.CHANGE_TYPE_NEW) -> {
                                 val hasSameParent = (changedNode.parentHandle != null
@@ -308,27 +306,9 @@ class ImageViewerViewModel @Inject constructor(
                         }
                     }
 
-                    val currentNodeIndex = items.indexOfFirst { it.handle == getCurrentNode()?.handle }
-                    val newPosition = when {
-                        currentNodeIndex != INVALID_POSITION ->
-                            currentNodeIndex
-                        currentItemPosition >= items.size ->
-                            items.size - 1
-                        currentItemPosition == 0 ->
-                            currentItemPosition + 1
-                        else ->
-                            currentItemPosition
-                    }
-
-                    images.value = items.map { item ->
-                        val existingNode = images.value?.find { it.handle == item.handle }
-                        item.copy(
-                            imageResult = existingNode?.imageResult,
-                            nodeItem = existingNode?.nodeItem
-                        )
-                    }
+                    images.value = items.toList()
                     dirtyNodeHandles.forEach(::loadSingleNode)
-                    updateCurrentPosition(newPosition, true)
+                    calculateNewPosition(items)
                 },
                 onError = { error ->
                     logError(error.stackTraceToString())
@@ -343,8 +323,8 @@ class ImageViewerViewModel @Inject constructor(
     }
 
     fun switchNodeOfflineAvailability(
-        activity: Activity,
-        nodeItem: MegaNodeItem
+        nodeItem: MegaNodeItem,
+        activity: Activity
     ) {
         getNodeUseCase.setNodeAvailableOffline(
             node = nodeItem.node,
@@ -355,6 +335,48 @@ class ImageViewerViewModel @Inject constructor(
         ).subscribeAndComplete {
             loadSingleNode(nodeItem.handle)
         }
+    }
+
+    fun removeOfflineNode(nodeHandle: Long, activity: Activity) {
+        getNodeUseCase.removeOfflineNode(nodeHandle, activity)
+            .subscribeAndComplete {
+                val currentIndex = images.value?.indexOfFirst { it.handle == nodeHandle } ?: INVALID_POSITION
+                if (currentIndex != INVALID_POSITION) {
+                    val items = images.value!!.toMutableList().apply {
+                        removeAt(currentIndex)
+                    }
+                    images.value = items.toList()
+                    calculateNewPosition(items)
+                }
+            }
+    }
+
+    /**
+     * Calculate new ViewPager position based on a new list of items
+     *
+     * @param newItems  New ImageItems to calculate new position from
+     */
+    private fun calculateNewPosition(newItems: List<ImageItem>) {
+        val items = images.value?.toMutableList()
+        val newPosition =
+            if (items.isNullOrEmpty()) {
+                0
+            } else {
+                val currentPositionNewIndex = newItems.indexOfFirst { it.handle == getCurrentNode()?.handle }
+                val currentItemPosition = currentPosition.value ?: 0
+                when {
+                    currentPositionNewIndex != INVALID_POSITION ->
+                        currentPositionNewIndex
+                    currentItemPosition >= items.size ->
+                        items.size - 1
+                    currentItemPosition == 0 ->
+                        currentItemPosition + 1
+                    else ->
+                        currentItemPosition
+                }
+            }
+
+        updateCurrentPosition(newPosition, true)
     }
 
     fun removeLink(nodeHandle: Long) {

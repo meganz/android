@@ -126,7 +126,7 @@ class ImageBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
 
             // File Info
             optionInfo.setOnClickListener {
-                val intent = if (!isOnline && nodeItem.isAvailableOffline) {
+                val intent = if (imageItem.isOffline) {
                     Intent(context, OfflineFileInfoActivity::class.java).apply {
                         putExtra(HANDLE, nodeItem.handle.toString())
                     }
@@ -179,7 +179,7 @@ class ImageBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
             // Open with
             optionOpenWith.isVisible = isUserLoggedIn && !isExternalNode && !nodeItem.isFromRubbishBin
             optionOpenWith.setOnClickListener {
-                if (!isOnline && nodeItem.isAvailableOffline) {
+                if (imageItem.isOffline) {
                     OfflineUtils.openWithOffline(requireContext(), nodeItem.handle)
                 } else {
                     ModalBottomSheetUtil.openWith(requireContext(), node)
@@ -205,12 +205,14 @@ class ImageBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
             }
 
             // Offline
-            optionOfflineLayout.isVisible = !nodeItem.isFromRubbishBin && nodeItem.hasReadAccess
+            optionOfflineLayout.isVisible = !imageItem.isOffline && !nodeItem.isFromRubbishBin && nodeItem.hasReadAccess
+            optionOfflineRemove.isVisible = imageItem.isOffline
             switchOffline.isChecked = nodeItem.isAvailableOffline
             val offlineAction = {
-                viewModel.switchNodeOfflineAvailability(requireActivity(), nodeItem)
+                viewModel.switchNodeOfflineAvailability(nodeItem, requireActivity())
                 dismissAllowingStateLoss()
             }
+            optionOfflineRemove.setOnClickListener { viewModel.removeOfflineNode(imageItem.handle, requireActivity()) }
             switchOffline.post {
                 optionOfflineLayout.setOnClickListener { offlineAction.invoke() }
                 switchOffline.setOnCheckedChangeListener { _, _ -> offlineAction.invoke() }
@@ -243,10 +245,10 @@ class ImageBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
             optionSendToChat.isVisible = isOnline && isUserLoggedIn && !isExternalNode && node != null && !nodeItem.isFromRubbishBin
 
             // Share
-            optionShare.isVisible = !nodeItem.isFromRubbishBin && (nodeItem.hasOwnerAccess || !imageItem.nodePublicLink.isNullOrBlank())
+            optionShare.isVisible = !nodeItem.isFromRubbishBin && (imageItem.isOffline || nodeItem.hasOwnerAccess || !imageItem.nodePublicLink.isNullOrBlank())
             optionShare.setOnClickListener {
                 when {
-                    !isOnline && nodeItem.isAvailableOffline ->
+                    imageItem.isOffline ->
                         OfflineUtils.shareOfflineNode(context, nodeItem.handle)
                     !imageItem.nodePublicLink.isNullOrBlank() ->
                         MegaNodeUtil.shareLink(requireContext(), imageItem.nodePublicLink)
@@ -283,7 +285,7 @@ class ImageBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
             val copyDrawable = if (isExternalNode) R.drawable.ic_import_to_cloud_white else R.drawable.ic_menu_copy
             optionCopy.setCompoundDrawablesWithIntrinsicBounds(copyDrawable, 0, 0, 0)
             optionCopy.text = StringResourcesUtils.getString(copyAction)
-            optionCopy.isVisible = isOnline && isUserLoggedIn && !nodeItem.isFromRubbishBin
+            optionCopy.isVisible = isOnline && isUserLoggedIn && !nodeItem.isFromRubbishBin && !imageItem.isOffline
 
             // Restore
             optionRestore.setOnClickListener {
@@ -328,7 +330,7 @@ class ImageBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
             // Separators
             separatorLabel.isVisible = optionLabelLayout.isVisible || optionInfo.isVisible
             separatorOpen.isVisible = optionOpenWith.isVisible
-            separatorOffline.isVisible = optionOfflineLayout.isVisible
+            separatorOffline.isVisible = optionOfflineLayout.isVisible || optionShare.isVisible
             separatorShare.isVisible = optionShare.isVisible || optionSendToChat.isVisible || optionManageLink.isVisible
             separatorRestore.isVisible = optionRestore.isVisible
             separatorCopy.isVisible = (optionRename.isVisible || optionCopy.isVisible || optionMove.isVisible)
