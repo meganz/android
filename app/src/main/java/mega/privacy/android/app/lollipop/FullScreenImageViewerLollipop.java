@@ -686,7 +686,7 @@ public class FullScreenImageViewerLollipop extends PasscodeActivity
 					}
 					if (adapterType == INCOMING_SHARES_ADAPTER || fromIncoming) {
 						i.putExtra("from", FROM_INCOMING_SHARES);
-						i.putExtra("firstLevel", false);
+						i.putExtra(INTENT_EXTRA_KEY_FIRST_LEVEL, false);
 					}
 					else if(adapterType == INBOX_ADAPTER){
 						i.putExtra("from", FROM_INBOX);
@@ -1193,39 +1193,42 @@ public class FullScreenImageViewerLollipop extends PasscodeActivity
 	public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
 	}
 
-	@Override
-	public void onPageScrollStateChanged(int state) {
-		logDebug("State: " + state);
+    @Override
+    public void onPageScrollStateChanged(int state) {
+        logDebug("State: " + state);
 
-		supportInvalidateOptionsMenu();
-		if (state == ViewPager.SCROLL_STATE_IDLE){
-			if (viewPager.getCurrentItem() != positionG){
-				int oldPosition = positionG;
-				int newPosition = viewPager.getCurrentItem();
-				positionG = newPosition;
-				if ((adapterType == OFFLINE_ADAPTER)){
-					fileNameTextView.setText(mOffListImages.get(positionG).getName());
-				}
-				else if(adapterType == ZIP_ADAPTER){
-					fileNameTextView.setText(new File(paths.get(positionG)).getName());
-				}
-				else{
-					try {
-						TouchImageView tIV = (TouchImageView) adapterMega.getVisibleImage(oldPosition);
-						if (tIV != null) {
-							tIV.setZoom(1);
-						}
-					}
-					catch (Exception e) {
-						logError(e.getMessage());
-					}
-					fileNameTextView.setText(megaApi.getNodeByHandle(imageHandles.get(positionG)).getName());
-				}
-//				title.setText(names.get(positionG));
-				updateScrollPosition();
-			}
-		}
-	}
+        supportInvalidateOptionsMenu();
+        if (state == ViewPager.SCROLL_STATE_IDLE) {
+            if (viewPager.getCurrentItem() != positionG) {
+                int oldPosition = positionG;
+                positionG = viewPager.getCurrentItem();
+                if ((adapterType == OFFLINE_ADAPTER)) {
+                    fileNameTextView.setText(mOffListImages.get(positionG).getName());
+                } else if (adapterType == ZIP_ADAPTER) {
+                    fileNameTextView.setText(new File(paths.get(positionG)).getName());
+                } else {
+                    try {
+                        TouchImageView tIV = (TouchImageView) adapterMega.getVisibleImage(oldPosition);
+                        if (tIV != null) {
+                            tIV.setZoom(1);
+                        }
+                    } catch (Exception e) {
+                        logError(e.getMessage());
+                    }
+
+                    Long handle = imageHandles.get(positionG);
+                    MegaNode node = megaApi.getNodeByHandle(handle);
+
+                    if(node != null) {
+                        fileNameTextView.setText(node.getName());
+                    } else {
+                        logError("Get null node with handle: " + handle + ", position G is: " + positionG);
+                    }
+                }
+                updateScrollPosition();
+            }
+        }
+    }
 
 	@Override
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {

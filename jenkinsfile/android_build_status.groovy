@@ -16,7 +16,7 @@ pipeline {
         JAVA_HOME = "/opt/buildtools/zulu11.52.13-ca-jdk11.0.13-macosx_x64"
         ANDROID_HOME = "/opt/buildtools/android-sdk"
 
-        PATH = "/Applications/MEGAcmd.app/Contents/MacOS:/opt/buildtools/zulu11.52.13-ca-jdk11.0.13-macosx_x64/bin:/opt/brew/bin:/opt/brew/opt/gnu-sed/libexec/gnubin:/opt/brew/opt/gnu-tar/libexec/gnubin:/opt/buildtools/android-sdk/platform-tools:$PATH"
+        PATH = "/opt/buildtools/android-sdk/cmake/3.10.2.4988404/bin:/Applications/MEGAcmd.app/Contents/MacOS:/opt/buildtools/zulu11.52.13-ca-jdk11.0.13-macosx_x64/bin:/opt/brew/bin:/opt/brew/opt/gnu-sed/libexec/gnubin:/opt/brew/opt/gnu-tar/libexec/gnubin:/opt/buildtools/android-sdk/platform-tools:$PATH"
 
         CONSOLE_LOG_FILE = "androidLog.txt"
 
@@ -48,15 +48,6 @@ pipeline {
                 }
                 slackSend color: "danger", message: comment
                 slackUploadFile filePath: env.CONSOLE_LOG_FILE, initialComment: "Android Build Log"
-            }
-        }
-        success {
-            script {
-                def comment = "Android Build Success! :smile: \nBranch: ${env.GIT_BRANCH}"
-                if (env.CHANGE_URL) {
-                    comment = "Android Build Success! :smile: \nBranch: ${env.GIT_BRANCH} \nMR: ${env.CHANGE_URL}"
-                }
-                slackSend color: "good", message: comment
             }
         }
     }
@@ -167,7 +158,7 @@ pipeline {
                 }
                 gitlabCommitStatus(name: 'Build APK (GMS+HMS)') {
                     // Finish building and packaging the APK
-                    runShell "./gradlew app:assembleGmsRelease app:assembleHmsRelease"
+                    runShell "./gradlew clean app:assembleGmsRelease app:assembleHmsRelease"
 
                     // Archive the APKs so that they can be downloaded from Jenkins
                     // archiveArtifacts '**/*.apk'
