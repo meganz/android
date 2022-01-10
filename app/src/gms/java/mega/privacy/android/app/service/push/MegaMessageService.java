@@ -14,6 +14,8 @@ import static mega.privacy.android.app.utils.Constants.DEVICE_ANDROID;
 import static mega.privacy.android.app.utils.LogUtil.logDebug;
 import static mega.privacy.android.app.utils.LogUtil.logWarning;
 
+import android.content.Context;
+
 public class MegaMessageService extends FirebaseMessagingService {
 
     private PushMessageHanlder messageHanlder;
@@ -60,8 +62,10 @@ public class MegaMessageService extends FirebaseMessagingService {
 
     /**
      * Request push service token, then register it in API as an identifier of the device.
+     *
+     * @param context Context.
      */
-    public static void getToken() {
+    public static void getToken(Context context) {
         //project number from google-service.json
         Executors.newFixedThreadPool(1).submit(() -> {
             FirebaseMessaging.getInstance().getToken().addOnCompleteListener(task -> {

@@ -2096,7 +2096,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 			}
 
 			dbH.setInvalidateSdkCache(false);
-            MegaMessageService.getToken();
+            MegaMessageService.getToken(this);
 			nVEmail.setVisibility(View.VISIBLE);
 			nVEmail.setText(megaApi.getMyEmail());
 //				megaApi.getUserData(this);
