@@ -52,6 +52,7 @@ inline fun <reified T : Fragment> launchFragmentInHiltContainer(
     }
 }
 
+@Suppress("UNCHECKED_CAST")
 fun <T: Fragment> HiltTestActivity.testFragment(): T {
     return supportFragmentManager.findFragmentByTag(testFragmentTag) as T
 }
