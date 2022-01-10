@@ -3589,16 +3589,8 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 		if (fbFLol == null) {
 			fbFLol = FileBrowserFragmentLollipop.newInstance();
 		}
-		if (isInMDMode) {
-			mdF = (MediaDiscoveryFragment) getSupportFragmentManager().findFragmentByTag(FragmentTag.MEDIA_DISCOVERY.getTag());
-		}
+
 		replaceFragment(fbFLol, FragmentTag.CLOUD_DRIVE.getTag());
-        if (isInMDMode) {
-			if (mdF == null) {
-				mdF = fbFLol.showMediaDiscovery(Unit.INSTANCE);
-			}
-			replaceFragment(mdF, FragmentTag.MEDIA_DISCOVERY.getTag());
-		}
     }
 
     private void showGlobalAlertDialogsIfNeeded() {
@@ -4548,7 +4540,21 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 
     	switch (item){
 			case CLOUD_DRIVE:{
-				selectDrawerItemCloudDrive();
+                if (isInMDPage()) {
+                    mdF = (MediaDiscoveryFragment) getSupportFragmentManager().findFragmentByTag(FragmentTag.MEDIA_DISCOVERY.getTag());
+
+                    if (mdF == null) {
+                        selectDrawerItemCloudDrive();
+                        mdF = fbFLol.showMediaDiscovery(Unit.INSTANCE);
+                    } else {
+                        refreshFragment(FragmentTag.MEDIA_DISCOVERY.getTag());
+                    }
+
+                    replaceFragment(mdF, FragmentTag.MEDIA_DISCOVERY.getTag());
+                } else {
+                    selectDrawerItemCloudDrive();
+                }
+
 				if (openFolderRefresh){
 					onNodesCloudDriveUpdate();
 					openFolderRefresh = false;
