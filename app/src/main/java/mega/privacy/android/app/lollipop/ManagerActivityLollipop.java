@@ -5476,9 +5476,11 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 	private HomepageSearchable findHomepageSearchable() {
 		FragmentManager fragmentManager = getSupportFragmentManager();
 		Fragment navHostFragment = fragmentManager.findFragmentById(R.id.nav_host_fragment);
-		for (Fragment fragment : navHostFragment.getChildFragmentManager().getFragments()) {
-			if (fragment instanceof HomepageSearchable) {
-				return (HomepageSearchable) fragment;
+		if (navHostFragment != null && navHostFragment.getChildFragmentManager() != null) {
+			for (Fragment fragment : navHostFragment.getChildFragmentManager().getFragments()) {
+				if (fragment instanceof HomepageSearchable) {
+					return (HomepageSearchable) fragment;
+				}
 			}
 		}
 
