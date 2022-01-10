@@ -18,8 +18,6 @@ import com.jeremyliao.liveeventbus.LiveEventBus
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
-import dagger.hilt.android.components.ActivityRetainedComponent
-import dagger.hilt.android.components.ViewModelComponent
 import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
 import dagger.hilt.android.testing.HiltTestApplication
@@ -56,6 +54,7 @@ import test.mega.privacy.android.app.testFragmentTag
 @HiltAndroidTest
 @RunWith(AndroidJUnit4::class)
 @UninstallModules(SettingsModule::class, TestActivityModule::class)
+@kotlin.Suppress("DEPRECATION")
 class SettingsFragmentTest {
 
     @get:Rule(order = 0)
@@ -73,30 +72,30 @@ class SettingsFragmentTest {
         fun provideSettingsActivity(): SettingsActivity = settingsActivity
 
         @Provides
-        fun provideGetAccountDetails(): GetAccountDetails = mock<GetAccountDetails>()
+        fun provideGetAccountDetails(): GetAccountDetails = mock()
 
 
         @Provides
         fun provideCanDeleteAccount(): CanDeleteAccount = canDeleteAccount
 
         @Provides
-        fun provideRefreshUserAccount(): RefreshUserAccount = mock<RefreshUserAccount>()
+        fun provideRefreshUserAccount(): RefreshUserAccount = mock()
 
         @Provides
         fun provideRefreshPasscodeLockPreference(): RefreshPasscodeLockPreference =
-            mock<RefreshPasscodeLockPreference>()
+            mock()
 
         @Provides
-        fun provideIsLoggingEnabled(): IsLoggingEnabled = mock<IsLoggingEnabled>()
+        fun provideIsLoggingEnabled(): IsLoggingEnabled = mock()
 
         @Provides
-        fun provideIsChatLoggingEnabled(): IsChatLoggingEnabled = mock<IsChatLoggingEnabled>()
+        fun provideIsChatLoggingEnabled(): IsChatLoggingEnabled = mock()
 
         @Provides
-        fun provideIsCameraSyncEnabled(): IsCameraSyncEnabled = mock<IsCameraSyncEnabled>()
+        fun provideIsCameraSyncEnabled(): IsCameraSyncEnabled = mock()
 
         @Provides
-        fun provideRootNodeExists(): RootNodeExists = mock<RootNodeExists>()
+        fun provideRootNodeExists(): RootNodeExists = mock()
 
 
         @Provides
@@ -117,7 +116,7 @@ class SettingsFragmentTest {
 
         @Provides
         fun provideShouldHideRecentActivity(): ShouldHideRecentActivity =
-            mock<ShouldHideRecentActivity>()
+            mock()
 
     }
 
