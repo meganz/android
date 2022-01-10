@@ -208,7 +208,7 @@ class GetNodeUseCase @Inject constructor(
 
                     if (error.errorCode == MegaError.API_OK) {
                         if (!request.flag) {
-                            emitter.onSuccess(request.publicNode)
+                            emitter.onSuccess(request.publicMegaNode)
                         } else {
                             emitter.onError(IllegalArgumentException("Invalid key for public node"))
                         }
