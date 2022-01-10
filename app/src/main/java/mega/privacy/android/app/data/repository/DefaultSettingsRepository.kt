@@ -58,7 +58,7 @@ class DefaultSettingsRepository @Inject constructor(
         return getUiPreferences().getBoolean(SharedPreferenceConstants.HIDE_RECENT_ACTIVITY, false)
     }
 
-    override fun isKarereLoggingEnabled(): Boolean {
+    override fun isChatLoggingEnabled(): Boolean {
         return context.getSharedPreferences(logPreferences, Context.MODE_PRIVATE).getBoolean(karereLogs, false)
     }
 

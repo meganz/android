@@ -5,6 +5,6 @@ import javax.inject.Inject
 
 class DefaultIsChatLoggingEnabled @Inject constructor(private val settingsRepository: SettingsRepository) : IsChatLoggingEnabled {
     override fun invoke(): Boolean {
-        return settingsRepository.isKarereLoggingEnabled()
+        return settingsRepository.isChatLoggingEnabled()
     }
 }

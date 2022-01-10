@@ -11,6 +11,6 @@ interface SettingsRepository {
     fun fetchContactLinksOption(listenerInterface: MegaRequestListenerInterface)
     fun getStartScreen(): Int
     fun shouldHideRecentActivity(): Boolean
-    fun isKarereLoggingEnabled(): Boolean
+    fun isChatLoggingEnabled(): Boolean
     fun isLoggingEnabled(): Boolean
 }

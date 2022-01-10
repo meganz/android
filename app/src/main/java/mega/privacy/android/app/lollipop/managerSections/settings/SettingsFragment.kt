@@ -477,7 +477,7 @@ class SettingsFragment : Preference.OnPreferenceChangeListener,
             KEY_ABOUT_KARERE_VERSION -> {
                 if (++numberOfClicksKarere == 5) {
                     numberOfClicksKarere = 0
-                    if (viewModel.isKarereLoggerEnabled) {
+                    if (viewModel.isChatLoggerEnabled) {
                         LogUtil.setStatusLoggerKarere(activity, false)
                     } else {
                         LogUtil.logWarning("Karere file logger attribute is NULL")

@@ -34,7 +34,7 @@ class SettingsViewModel @Inject constructor(
         get() = !canDeleteAccount()
     val isLoggerEnabled: Boolean
         get() = isLoggingEnabled()
-    val isKarereLoggerEnabled: Boolean
+    val isChatLoggerEnabled: Boolean
         get() = isChatLoggingEnabled()
     val isCamSyncEnabled: Boolean
         get() = isCameraSyncEnabled()
