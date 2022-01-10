@@ -3585,7 +3585,7 @@
     <!-- Label of the floating action button of opening the new chat conversation -->
     <string name="fab_label_new_chat">New chat</string>
     <!-- Text that indicates that there’s no image to show in image section -->
-    <string name="homepage_empty_hint_photos">No images found</string>
+    <string name="homepage_empty_hint_photos">[B]No[/B] [A]Images[/A] [B]Found[/B]</string>
     <!-- Text that indicates that there’s no document to show -->
     <string name="homepage_empty_hint_documents">No documents found</string>
     <!-- Text that indicates that there’s no audio to show -->
@@ -3846,7 +3846,7 @@
     <!-- Settings hint that indicates the audio will still be played in background if the app is backgrounded -->
     <string name="settings_background_play_hint">Playing on the background</string>
     <!-- Text of the empty screen when there are no elements in Photos -->
-    <string name="photos_empty">[B]No[/B] [A]Photos[/A]</string>
+    <string name="photos_empty">[B]No[/B] [A]Photos[/A] [B]Found[/B]</string>
     <!-- Text to show as subtitle of Enable camera uploads screen -->
     <string name="enable_cu_subtitle">Automatically backup your photos and videos to your Cloud Drive.</string>
     <!-- Text of a button on Camera Uploads section to show all the content of the section-->

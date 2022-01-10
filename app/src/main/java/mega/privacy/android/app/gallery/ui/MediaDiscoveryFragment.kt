@@ -2,6 +2,7 @@ package mega.privacy.android.app.gallery.ui
 
 import android.os.Bundle
 import android.view.*
+import androidx.core.text.HtmlCompat
 import androidx.core.view.isVisible
 import androidx.fragment.app.viewModels
 import dagger.hilt.android.AndroidEntryPoint
@@ -33,7 +34,7 @@ class MediaDiscoveryFragment : BaseZoomFragment() {
         fun getInstance(mediaHandle:Long): MediaDiscoveryFragment {
             val fragment = MediaDiscoveryFragment()
             val args = Bundle()
-            args.putLong(MEDIA_HANDLE, mediaHandle);
+            args.putLong(MEDIA_HANDLE, mediaHandle)
             fragment.arguments = args
 
             return fragment
@@ -131,8 +132,18 @@ class MediaDiscoveryFragment : BaseZoomFragment() {
     private fun setupEmptyHint() {
         binding.emptyHint.emptyHintImage.isVisible = false
         binding.emptyHint.emptyHintText.isVisible = false
-        binding.emptyHint.emptyHintText.text =
-            getString(R.string.homepage_empty_hint_photos).toUpperCase(Locale.ROOT)
+        ColorUtils.setImageViewAlphaIfDark(
+            context,
+            binding.emptyHint.emptyHintImage,
+            ColorUtils.DARK_IMAGE_ALPHA
+        )
+        binding.emptyHint.emptyHintText.text = HtmlCompat.fromHtml(
+            TextUtil.formatEmptyScreenText(
+                context,
+                StringResourcesUtils.getString(R.string.homepage_empty_hint_photos)
+            ),
+            HtmlCompat.FROM_HTML_MODE_LEGACY
+        )
     }
 
     /**

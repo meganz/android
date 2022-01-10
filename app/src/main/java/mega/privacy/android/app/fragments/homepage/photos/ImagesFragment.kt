@@ -2,15 +2,13 @@ package mega.privacy.android.app.fragments.homepage.photos
 
 import android.os.Bundle
 import android.view.*
-import androidx.annotation.NonNull
-import androidx.coordinatorlayout.widget.CoordinatorLayout
+import androidx.core.text.HtmlCompat
 import androidx.core.view.isVisible
 import androidx.fragment.app.viewModels
 import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.R
 import mega.privacy.android.app.databinding.FragmentImagesBinding
 import mega.privacy.android.app.fragments.homepage.*
-import mega.privacy.android.app.gallery.data.GalleryCard
 import mega.privacy.android.app.gallery.data.GalleryItem
 import mega.privacy.android.app.gallery.fragment.BaseZoomFragment
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop
@@ -101,8 +99,18 @@ class ImagesFragment : BaseZoomFragment() {
     private fun setupEmptyHint() {
         binding.emptyHint.emptyHintImage.isVisible = false
         binding.emptyHint.emptyHintText.isVisible = false
-        binding.emptyHint.emptyHintText.text =
-            getString(R.string.homepage_empty_hint_photos).toUpperCase(Locale.ROOT)
+        ColorUtils.setImageViewAlphaIfDark(
+            context,
+            binding.emptyHint.emptyHintImage,
+            ColorUtils.DARK_IMAGE_ALPHA
+        )
+        binding.emptyHint.emptyHintText.text = HtmlCompat.fromHtml(
+            TextUtil.formatEmptyScreenText(
+                context,
+                StringResourcesUtils.getString(R.string.homepage_empty_hint_photos)
+            ),
+            HtmlCompat.FROM_HTML_MODE_LEGACY
+        )
     }
 
     /**
