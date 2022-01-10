@@ -3801,8 +3801,6 @@
     <string name="error_share_owner_storage_quota">เจ้าของการแชร์ได้ใช้พื้นที่เก็บข้อมูลเกินโควต้า</string>
     <!-- A message shown when uploading, copying or moving something to an incoming share and the owner’s account is over its storage quota. -->
     <string name="warning_share_owner_storage_quota">ไม่สามารถส่งไฟล์ไปยังผู้ใช้ปลายทางได้ เนื่องจากเกินโควต้าการจัดเก็บข้อมูลแล้ว</string>
-    <!-- Content to show in a Snackbar to tip the incompatibility-->
-    <string name="version_incompatibility">เรากำลังอัปเกรด MEGAchat การโทรของคุณอาจไม่เชื่อมต่อเนื่องจากเวอร์ชันที่เข้ากันไม่ได้ เว้นแต่ทุกฝ่ายจะอัปเดตแอป MEGA เป็นเวอร์ชันล่าสุดแล้ว</string>
     <!-- Message displayed when multiple download starts and 1 file has already been downloaded before and 1 file is being downloaded -->
     <string name="file_already_downloaded_and_file_pending_download">ดาวน์โหลดแล้ว 1 ไฟล์ อยู่ระหว่างดำเนินการ 1 ไฟล์</string>
     <!-- Message displayed when multiple download starts and 1 file has already been downloaded before and multiple files are being downloaded. Placeholder: number of files -->

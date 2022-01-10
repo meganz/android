@@ -4206,8 +4206,6 @@
     <string name="error_share_owner_storage_quota">صاحب المشاركة تجاوز مساحة التخزين المتاحة له.</string>
     <!-- A message shown when uploading, copying or moving something to an incoming share and the owner’s account is over its storage quota. -->
     <string name="warning_share_owner_storage_quota">لا يمكن إرسال الملف لأن المستخدم المستهدف قد تجاوز حصة التخزين المتاحة له.</string>
-    <!-- Content to show in a Snackbar to tip the incompatibility-->
-    <string name="version_incompatibility">نحن بصدد ترقية محادثات ميغا MEGAchat. قد لا تكون مكالماتك متصلة بسبب عدم توافق الإصدار ما لم تقم جميع الأطراف بتحديث تطبيقات ميغا MEGA الخاصة بهم إلى أحدث إصدار.</string>
     <!-- Message displayed when multiple download starts and 1 file has already been downloaded before and 1 file is being downloaded -->
     <string name="file_already_downloaded_and_file_pending_download">تم تنزيل 1 ملف بالفعل. 1 ملف قيد الانتظار.</string>
     <!-- Message displayed when multiple download starts and 1 file has already been downloaded before and multiple files are being downloaded. Placeholder: number of files -->

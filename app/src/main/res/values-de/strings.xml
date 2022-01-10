@@ -3882,8 +3882,6 @@
     <string name="error_share_owner_storage_quota">Der Eigentümer der Ordnerfreigabe hat sein Speicherplatzlimit überschritten.</string>
     <!-- A message shown when uploading, copying or moving something to an incoming share and the owner’s account is over its storage quota. -->
     <string name="warning_share_owner_storage_quota">Die Datei kann nicht versandt werden, da der Empfänger sein Speicherplatzlimit überschritten hat.</string>
-    <!-- Content to show in a Snackbar to tip the incompatibility-->
-    <string name="version_incompatibility">Wir aktualisieren MEGAchat. Anrufe könnten aufgrund von Versionsinkompatibilitäten scheitern, wenn nicht alle Teilnehmer ihre MEGA-Apps auf die neueste Version aktualisiert haben.</string>
     <!-- Message displayed when multiple download starts and 1 file has already been downloaded before and 1 file is being downloaded -->
     <string name="file_already_downloaded_and_file_pending_download">Eine Datei wurde bereits heruntergeladen. Eine Datei steht noch aus.</string>
     <!-- Message displayed when multiple download starts and 1 file has already been downloaded before and multiple files are being downloaded. Placeholder: number of files -->
