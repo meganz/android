@@ -297,7 +297,7 @@ class GetNodeUseCase @Inject constructor(
      * @param activity              Activity context needed to create file
      * @param isFromIncomingShares  Flag indicating if node is from incoming shares.
      * @param isFromInbox           Flag indicating if node is from inbox.
-     * @return                  Completable
+     * @return                      Completable
      */
     fun setNodeAvailableOffline(
         node: MegaNode?,
@@ -329,10 +329,22 @@ class GetNodeUseCase @Inject constructor(
                     OfflineUtils.saveOffline(offlineParent, node, activity)
                 }
                 !setOffline && isAvailableOffline -> {
-                    val offlineNode = databaseHandler.findByHandle(node.handle)
-                    OfflineUtils.removeOffline(offlineNode, databaseHandler, activity)
+                    removeOfflineNode(node.handle, activity).blockingAwait()
                 }
             }
+        }
+
+    /**
+     * Remove offline node
+     *
+     * @param nodeHandle    Node handle to be removed
+     * @param activity      Activity context needed to remove file
+     * @return              Completable
+     */
+    fun removeOfflineNode(nodeHandle: Long, activity: Activity): Completable =
+        Completable.fromCallable {
+            val offlineNode = databaseHandler.findByHandle(nodeHandle)
+            OfflineUtils.removeOffline(offlineNode, databaseHandler, activity)
         }
 
     /**

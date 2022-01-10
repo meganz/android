@@ -30,7 +30,7 @@
         app:showAsAction="always" />
 
     <item
-        android:id="@+id/action_chat"
+        android:id="@+id/action_send_to_chat"
         android:icon="@drawable/ic_send_to_contact"
         android:orderInCategory="130"
         android:title="@string/context_send_file_to_chat"

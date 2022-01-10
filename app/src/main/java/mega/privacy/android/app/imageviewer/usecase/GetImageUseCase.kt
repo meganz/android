@@ -111,10 +111,10 @@ class GetImageUseCase @Inject constructor(
                 node == null -> emitter.onError(IllegalArgumentException("Node is null"))
                 !node.isFile -> emitter.onError(IllegalArgumentException("Node is not a file"))
                 else -> {
-                    val fileExtension = ".${MimeTypeList.typeForName(node.name).extension}"
-                    val thumbnailFile = if (node.hasThumbnail()) buildThumbnailFile(context, node.base64Handle + fileExtension) else null
-                    val previewFile = if (node.hasPreview()) buildPreviewFile(context, node.base64Handle + fileExtension) else null
-                    val fullFile = buildTempFile(context, node.base64Handle + fileExtension)
+                    val fileName = "${node.base64Handle}.${MimeTypeList.typeForName(node.name).extension}"
+                    val thumbnailFile = if (node.hasThumbnail()) buildThumbnailFile(context, fileName) else null
+                    val previewFile = if (node.hasPreview()) buildPreviewFile(context, fileName) else null
+                    val fullFile = buildTempFile(context, fileName)
                     val isFullSizeRequired = fullSize || node.isGif() || node.isVideo()
 
                     val image = ImageResult(

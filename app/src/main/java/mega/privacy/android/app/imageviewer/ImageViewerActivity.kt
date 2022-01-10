@@ -395,8 +395,8 @@ class ImageViewerActivity : BaseActivity(), PermissionRequester, SnackbarShower 
                 findItem(R.id.action_get_link)?.isVisible =
                     isOnline && item.hasOwnerAccess && !item.isFromRubbishBin
 
-                findItem(R.id.action_chat)?.isVisible =
-                    isOnline && !isExternal && !item.isFromRubbishBin && viewModel.isUserLoggedIn()
+                findItem(R.id.action_send_to_chat)?.isVisible =
+                    isOnline && !isExternal && item.node != null && !item.isFromRubbishBin && viewModel.isUserLoggedIn()
 
                 findItem(R.id.action_more)?.isVisible = true
             }
