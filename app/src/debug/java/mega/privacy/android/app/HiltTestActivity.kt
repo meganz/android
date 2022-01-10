@@ -65,54 +65,36 @@ class HiltTestActivity : AppCompatActivity(), SettingsActivity {
 class  TestActivityModule{
     @Provides
     fun provideSettingsActivity(): SettingsActivity = object : SettingsActivity{
-        override fun changeAppBarElevation(canScrollVertically: Boolean) {
-            TODO("Not yet implemented")
-        }
+        override fun changeAppBarElevation(canScrollVertically: Boolean) {}
 
-        override fun askConfirmationDeleteAccount() {
-            TODO("Not yet implemented")
-        }
+        override fun askConfirmationDeleteAccount() {}
 
-        override fun showConfirmationEnableLogsKarere() {
-            TODO("Not yet implemented")
-        }
+        override fun showConfirmationEnableLogsKarere() {}
 
-        override fun showConfirmationEnableLogsSDK() {
-            TODO("Not yet implemented")
-        }
+        override fun showConfirmationEnableLogsSDK() {}
 
-        override fun showSnackbar(snackbarType: Int, string: String, megachatInvalidHandle: Long) {
-            TODO("Not yet implemented")
-        }
+        override fun showSnackbar(snackbarType: Int, string: String, megachatInvalidHandle: Long) {}
 
         override val is2FAEnabled: Boolean
-            get() = TODO("Not yet implemented")
+            get() = false
         override var openSettingsStartScreen: Boolean
-            get() = TODO("Not yet implemented")
+            get() = false
             set(_) {}
         override val openSettingsQR: Boolean
-            get() = TODO("Not yet implemented")
+            get() = false
         override val openSettingsStorage: Boolean
-            get() = TODO("Not yet implemented")
+            get() = false
 
-        override fun onRequestStart(api: MegaApiJava?, request: MegaRequest?) {
-            TODO("Not yet implemented")
-        }
+        override fun onRequestStart(api: MegaApiJava?, request: MegaRequest?) {}
 
-        override fun onRequestUpdate(api: MegaApiJava?, request: MegaRequest?) {
-            TODO("Not yet implemented")
-        }
+        override fun onRequestUpdate(api: MegaApiJava?, request: MegaRequest?) {}
 
-        override fun onRequestFinish(api: MegaApiJava?, request: MegaRequest?, e: MegaError?) {
-            TODO("Not yet implemented")
-        }
+        override fun onRequestFinish(api: MegaApiJava?, request: MegaRequest?, e: MegaError?) {}
 
         override fun onRequestTemporaryError(
             api: MegaApiJava?,
             request: MegaRequest?,
             e: MegaError?
-        ) {
-            TODO("Not yet implemented")
-        }
+        ) {}
     }
 }
