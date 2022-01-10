@@ -197,7 +197,7 @@ class GetLinkActivity : PasscodeActivity(), SnackbarShower {
     }
 
     override fun onBackPressed() {
-        if (psaWebBrowser.consumeBack()) return
+        if (psaWebBrowser != null && psaWebBrowser.consumeBack()) return
 
         if (!navController.navigateUp()) {
             finish()

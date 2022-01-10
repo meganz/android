@@ -3871,7 +3871,7 @@ public class ChatActivityLollipop extends PasscodeActivity
     @Override
     public void onBackPressed() {
         logDebug("onBackPressed");
-        if (psaWebBrowser.consumeBack()) return;
+        if (psaWebBrowser != null && psaWebBrowser.consumeBack()) return;
 
         retryConnectionsAndSignalPresence();
         if (emojiKeyboard != null && emojiKeyboard.getEmojiKeyboardShown()) {
