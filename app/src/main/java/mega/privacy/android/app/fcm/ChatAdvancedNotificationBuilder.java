@@ -35,6 +35,7 @@ import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.controllers.ChatController;
 import mega.privacy.android.app.lollipop.megachat.ChatSettings;
 import mega.privacy.android.app.meeting.CallNotificationIntentService;
+import mega.privacy.android.app.meeting.activity.MeetingActivity;
 import mega.privacy.android.app.utils.CallUtil;
 import mega.privacy.android.app.utils.StringResourcesUtils;
 import nz.mega.sdk.MegaApiAndroid;
@@ -969,11 +970,22 @@ public final class ChatAdvancedNotificationBuilder {
         PendingIntent intentIgnore = getPendingIntent(MEGACHAT_INVALID_HANDLE, chatIdCallToAnswer, CallNotificationIntentService.IGNORE, notificationId);
         PendingIntent callScreen = getPendingIntentMeetingRinging(context, callToAnswer.getChatid(), notificationId + ONE_REQUEST_NEEDED);
 
-        Intent answerIntent = new Intent(context, CallNotificationIntentService.class);
-        answerIntent.putExtra(CHAT_ID_OF_CURRENT_CALL, MEGACHAT_INVALID_HANDLE);
-        answerIntent.putExtra(CHAT_ID_OF_INCOMING_CALL, callToAnswer.getChatid());
-        answerIntent.setAction(CallNotificationIntentService.ANSWER);
-        PendingIntent intentAnswer = PendingIntent.getService(context, notificationId + ONE_REQUEST_NEEDED, answerIntent, PendingIntent.FLAG_CANCEL_CURRENT | PendingIntent.FLAG_IMMUTABLE);
+        Intent answerIntent;
+        PendingIntent intentAnswer;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            // Notification trampoline restrictions
+            answerIntent = new Intent(context, MeetingActivity.class);
+            answerIntent.putExtra(CHAT_ID_OF_CURRENT_CALL, MEGACHAT_INVALID_HANDLE);
+            answerIntent.putExtra(CHAT_ID_OF_INCOMING_CALL, callToAnswer.getChatid());
+            answerIntent.setAction(CallNotificationIntentService.ANSWER);
+            intentAnswer = PendingIntent.getActivity(context, notificationId + ONE_REQUEST_NEEDED, answerIntent, PendingIntent.FLAG_CANCEL_CURRENT | PendingIntent.FLAG_IMMUTABLE);
+        } else {
+            answerIntent = new Intent(context, CallNotificationIntentService.class);
+            answerIntent.putExtra(CHAT_ID_OF_CURRENT_CALL, MEGACHAT_INVALID_HANDLE);
+            answerIntent.putExtra(CHAT_ID_OF_INCOMING_CALL, callToAnswer.getChatid());
+            answerIntent.setAction(CallNotificationIntentService.ANSWER);
+            intentAnswer = PendingIntent.getService(context, notificationId + ONE_REQUEST_NEEDED, answerIntent, PendingIntent.FLAG_CANCEL_CURRENT | PendingIntent.FLAG_IMMUTABLE);
+        }
 
         Bitmap avatarIcon = setUserAvatar(chatToAnswer);
 

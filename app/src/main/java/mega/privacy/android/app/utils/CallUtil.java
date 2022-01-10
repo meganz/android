@@ -1040,7 +1040,7 @@ public class CallUtil {
     }
 
     public static PendingIntent getPendingIntentMeetingRinging(Context context, long chatIdCallToAnswer, int requestCode) {
-        Intent intentMeeting = new Intent(context, MeetingActivity.class);
+        Intent intentMeeting = new Intent(context.getApplicationContext(), MeetingActivity.class);
         intentMeeting.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         intentMeeting.setAction(MEETING_ACTION_RINGING);
         intentMeeting.putExtra(MEETING_CHAT_ID, chatIdCallToAnswer);
