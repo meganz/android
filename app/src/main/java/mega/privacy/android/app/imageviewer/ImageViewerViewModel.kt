@@ -274,7 +274,6 @@ class ImageViewerViewModel @Inject constructor(
                     }
 
                     val dirtyNodeHandles = mutableListOf<Long>()
-
                     (change as Result.OnNodesUpdate).nodes?.forEach { changedNode ->
                         val currentIndex = items.indexOfFirst { it.handle == changedNode.handle }
                         when {
@@ -306,9 +305,11 @@ class ImageViewerViewModel @Inject constructor(
                         }
                     }
 
-                    images.value = items.toList()
-                    dirtyNodeHandles.forEach(::loadSingleNode)
-                    calculateNewPosition(items)
+                    if (dirtyNodeHandles.isNotEmpty() || items.size != images.value?.size) {
+                        images.value = items.toList()
+                        dirtyNodeHandles.forEach(::loadSingleNode)
+                        calculateNewPosition(items)
+                    }
                 },
                 onError = { error ->
                     logError(error.stackTraceToString())
