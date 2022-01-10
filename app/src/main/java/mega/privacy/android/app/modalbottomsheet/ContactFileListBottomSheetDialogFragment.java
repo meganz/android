@@ -103,7 +103,7 @@ public class ContactFileListBottomSheetDialogFragment extends BaseBottomSheetDia
 
         nodeName.setText(node.getName());
 
-        boolean firstLevel = getFirstLevel();
+        boolean firstLevel = node.isInShare();
         long parentHandle = INVALID_HANDLE;
         if (requireActivity() instanceof ContactFileListActivityLollipop) {
             parentHandle = contactFileListActivity.getParentHandle();
@@ -199,10 +199,6 @@ public class ContactFileListBottomSheetDialogFragment extends BaseBottomSheetDia
         super.onViewCreated(view, savedInstanceState);
     }
 
-    private boolean getFirstLevel() {
-        return !(requireActivity() instanceof ContactFileListActivityLollipop) || contactFileListActivity.isEmptyParentHandleStack();
-    }
-
     @Override
     public void onClick(View v) {
         if (node == null) {
@@ -226,8 +222,7 @@ public class ContactFileListBottomSheetDialogFragment extends BaseBottomSheetDia
                 Intent i = new Intent(requireContext(), FileInfoActivityLollipop.class);
                 i.putExtra(HANDLE, node.getHandle());
                 i.putExtra("from", FROM_INCOMING_SHARES);
-                boolean firstLevel = getFirstLevel();
-                i.putExtra("firstLevel", firstLevel);
+                i.putExtra(INTENT_EXTRA_KEY_FIRST_LEVEL, node.isInShare());
                 i.putExtra(NAME, node.getName());
                 startActivity(i);
                 break;
