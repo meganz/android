@@ -117,6 +117,7 @@ import static mega.privacy.android.app.utils.Constants.FROM_INCOMING_SHARES;
 import static mega.privacy.android.app.utils.Constants.HIGH_PRIORITY_TRANSFER;
 import static mega.privacy.android.app.utils.Constants.INBOX_ADAPTER;
 import static mega.privacy.android.app.utils.Constants.INCOMING_SHARES_ADAPTER;
+import static mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_FIRST_LEVEL;
 import static mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_NEED_STOP_HTTP_SERVER;
 import static mega.privacy.android.app.utils.Constants.MAX_BUFFER_16MB;
 import static mega.privacy.android.app.utils.Constants.MAX_BUFFER_32MB;
@@ -1533,7 +1534,7 @@ public class PdfViewerActivityLollipop extends PasscodeActivity
             }
             if (type == INCOMING_SHARES_ADAPTER || fromIncoming) {
                 i.putExtra("from", FROM_INCOMING_SHARES);
-                i.putExtra("firstLevel", false);
+                i.putExtra(INTENT_EXTRA_KEY_FIRST_LEVEL, false);
             }
             else if(type == INBOX_ADAPTER){
                 i.putExtra("from", FROM_INBOX);
