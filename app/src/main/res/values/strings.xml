@@ -1623,11 +1623,6 @@
         <item quantity="one">1 file already uploaded</item>
         <item quantity="other">%1$d files already uploaded</item>
     </plurals>
-    <!-- Text of the notification shown when the folder upload service has finished, Text of the notification shown when the folder upload service has finished - plural  e.g. Uploaded 2 folders -->
-    <plurals name="folder_upload_service_final_notification">
-        <item quantity="one">Uploaded %1$d folder</item>
-        <item quantity="other">Uploaded %1$d folders</item>
-    </plurals>
     <!-- label for the total file size of multiple files and/or folders (no need to put the colon punctuation in the translation) -->
     <string name="general_total_size">Total size: %1$s</string>
     <!-- Text of the notification shown when the upload service has finished with any transfer error, Plural -->
