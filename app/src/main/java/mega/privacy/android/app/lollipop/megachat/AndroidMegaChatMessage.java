@@ -1,6 +1,7 @@
 package mega.privacy.android.app.lollipop.megachat;
 
 
+import mega.privacy.android.app.contacts.usecase.InviteContactUseCase;
 import nz.mega.sdk.MegaChatMessage;
 
 public class AndroidMegaChatMessage {
@@ -16,6 +17,7 @@ public class AndroidMegaChatMessage {
     boolean uploading = false;
 
     AndroidMegaRichLinkMessage richLinkMessage = null;
+    InviteContactUseCase.ContactLinkResult contactLinkResult;
 
     public AndroidMegaChatMessage(MegaChatMessage message) {
         this.message = message;
@@ -73,5 +75,13 @@ public class AndroidMegaChatMessage {
 
     public void setRichLinkMessage(AndroidMegaRichLinkMessage richLinkMessage) {
         this.richLinkMessage = richLinkMessage;
+    }
+
+    public InviteContactUseCase.ContactLinkResult getContactLinkResult() {
+        return contactLinkResult;
+    }
+
+    public void setContactLinkResult(InviteContactUseCase.ContactLinkResult contactLinkResult) {
+        this.contactLinkResult = contactLinkResult;
     }
 }

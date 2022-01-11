@@ -859,9 +859,6 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
         RelativeLayout pinnedContactLocationLayout;
         TextView pinnedContactLocationInfoText;
 
-        //When message is a contact link
-        InviteContactUseCase.ContactLinkResult contactLinkResult;
-
         public String filePathUploading;
 
         public long getUserHandle() {
@@ -1731,8 +1728,6 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
         ((ViewHolderMessageChat) holder).contactManagementMessageLayout.setVisibility(View.GONE);
         ((ViewHolderMessageChat) holder).contentContactMessageAttachLayout.setVisibility(View.GONE);
 
-        ((ViewHolderMessageChat) holder).contactLinkResult = null;
-
         AndroidMegaChatMessage androidMessage = messages.get(position - 1);
         MegaChatMessage message = androidMessage.getMessage();
         ((ViewHolderMessageChat) holder).userHandle = message.getUserHandle();
@@ -1787,17 +1782,22 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                 if (androidMessage.getRichLinkMessage() != null) {
                     bindMegaLinkMessage((ViewHolderMessageChat) holder, androidMessage, position);
                 } else if (contactLink != null) {
-                    long contactLinkHandle = getContactLinkHandle(contactLink);
+                    if (androidMessage.getContactLinkResult() != null) {
+                        bindContactLinkMessage((ViewHolderMessageChat) holder, androidMessage, position);
+                    } else {
+                        inviteContactUseCase.getContactLink(getContactLinkHandle(contactLink))
+                                .subscribeOn(Schedulers.io())
+                                .observeOn(AndroidSchedulers.mainThread())
+                                .subscribe((contactLinkResult, throwable) -> {
+                                    if (throwable == null) {
+                                        androidMessage.setContactLinkResult(contactLinkResult);
 
-                        inviteContactUseCase.getContactLink(contactLinkHandle)
-                            .subscribeOn(Schedulers.io())
-                            .observeOn(AndroidSchedulers.mainThread())
-                            .subscribe((contactLinkResult, throwable) -> {
-                                if (throwable == null) {
-                                    ((ViewHolderMessageChat) holder).contactLinkResult = contactLinkResult;
-                                    bindContactLinkMessage((ViewHolderMessageChat) holder, androidMessage, position);
-                                }
-                            });
+                                        if (position == holder.getBindingAdapterPosition()) {
+                                            bindContactLinkMessage((ViewHolderMessageChat) holder, androidMessage, position);
+                                        }
+                                    }
+                                });
+                    }
                 } else {
                     bindNormalMessage((ViewHolderMessageChat) holder, androidMessage, position);
                 }
@@ -5706,6 +5706,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
     private void bindContactLinkMessage(ViewHolderMessageChat holder, AndroidMegaChatMessage androidMessage, int position) {
         logDebug("bindContactLinkMessage");
 
+        InviteContactUseCase.ContactLinkResult result = androidMessage.getContactLinkResult();
         MegaChatMessage message = androidMessage.getMessage();
         boolean isLandscape = context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE;
         boolean isOwnMessage = message.getUserHandle() == myUserHandle;
@@ -5780,8 +5781,8 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                 holder.ownContactLinkText.setText(contentText);
             }
 
-            holder.ownContactLinkName.setText(converterShortCodes(holder.contactLinkResult.getFullName()));
-            holder.ownContactLinkSubtitle.setText(holder.contactLinkResult.getEmail());
+            holder.ownContactLinkName.setText(converterShortCodes(result.getFullName()));
+            holder.ownContactLinkSubtitle.setText(result.getEmail());
             checkEmojiSize(contentText, holder.ownContactLinkText);
         } else {
             holder.othersContactLinkMessage.setVisibility(View.VISIBLE);
@@ -5838,12 +5839,12 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                 holder.othersContactLinkText.setText(contentText);
             }
 
-            holder.othersContactLinkName.setText(converterShortCodes(holder.contactLinkResult.getFullName()));
-            holder.othersContactLinkSubtitle.setText(holder.contactLinkResult.getEmail());
+            holder.othersContactLinkName.setText(converterShortCodes(result.getFullName()));
+            holder.othersContactLinkSubtitle.setText(result.getEmail());
             checkEmojiSize(contentText, holder.othersContactLinkText);
         }
 
-        setContactLinkAvatar(holder, isOwnMessage);
+        setContactLinkAvatar(holder, isOwnMessage, result);
         checkMultiselectionMode(position, holder, isOwnMessage, message.getMsgId());
         checkReactionsInMessage(position, holder, chatRoom.getChatId(), androidMessage);
     }
@@ -6742,23 +6743,21 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
      * @param holder     ViewHolder where the avatar has to be set.
      * @param ownMessage True if the message is own, false otherwise.
      */
-    private void setContactLinkAvatar(ViewHolderMessageChat holder, boolean ownMessage) {
-        if (holder.contactLinkResult == null
-                || holder.contactLinkResult.getContactHandle() == null
-                || holder.contactLinkResult.getEmail() == null
-                || holder.contactLinkResult.getFullName() == null) {
+    private void setContactLinkAvatar(ViewHolderMessageChat holder, boolean ownMessage, InviteContactUseCase.ContactLinkResult result) {
+        if (result == null
+                || result.getContactHandle() == null
+                || result.getEmail() == null
+                || result.getFullName() == null) {
             return;
         }
 
-        InviteContactUseCase.ContactLinkResult contactLinkResult = holder.contactLinkResult;
-
-        long handle = contactLinkResult.getContactHandle();
+        long handle = result.getContactHandle();
         String userHandleEncoded = MegaApiAndroid.userHandleToBase64(handle);
-        String email = contactLinkResult.getEmail();
+        String email = result.getEmail();
 
-        int color = contactLinkResult.isContact() ? getColorAvatar(megaApi.getContact(email)) : getColorAvatar(userHandleEncoded);
+        int color = result.isContact() ? getColorAvatar(megaApi.getContact(email)) : getColorAvatar(userHandleEncoded);
         Drawable drawableDefaultAvatar = getAvatarUseCase.getDefaultAvatarDrawable(context,
-                contactLinkResult.getFullName(), color, GetAvatarUseCase.AvatarType.LINK);
+                result.getFullName(), color, GetAvatarUseCase.AvatarType.LINK);
 
         if (ownMessage) {
             holder.ownContactLinkAvatar.getHierarchy().setPlaceholderImage(drawableDefaultAvatar);
@@ -6766,19 +6765,19 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             holder.othersContactLinkAvatar.getHierarchy().setPlaceholderImage(drawableDefaultAvatar);
         }
 
-        File avatar = buildAvatarFile(context, contactLinkResult.getEmail() + JPG_EXTENSION);
+        File avatar = buildAvatarFile(context, result.getEmail() + JPG_EXTENSION);
         Uri uri = getAvatarUri(avatar);
 
         if (uri == null) {
             getAvatarUseCase.get(email, avatar.getAbsolutePath())
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
-                    .subscribe((result, throwable) -> {
+                    .subscribe((uriResult, throwable) -> {
                         if (throwable == null) {
                             if (ownMessage) {
-                                holder.ownContactLinkAvatar.setImageRequest(ImageRequest.fromUri(result));
+                                holder.ownContactLinkAvatar.setImageRequest(ImageRequest.fromUri(uriResult));
                             } else {
-                                holder.othersContactLinkAvatar.setImageRequest(ImageRequest.fromUri(result));
+                                holder.othersContactLinkAvatar.setImageRequest(ImageRequest.fromUri(uriResult));
                             }
                         }
                     });
@@ -8041,7 +8040,9 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                     checkItem(v, holder, screenPosition, dimens);
                     ((ChatActivityLollipop) context).itemClick(currentPositionInAdapter, dimens);
                 } else {
-                    ((ChatActivityLollipop) context).openContactLinkMessage(holder.contactLinkResult);
+                    int positionInMessages = currentPositionInAdapter -1;
+                    InviteContactUseCase.ContactLinkResult result = messages.get(positionInMessages).getContactLinkResult();
+                    ((ChatActivityLollipop) context).openContactLinkMessage(result);
                 }
                 break;
         }
