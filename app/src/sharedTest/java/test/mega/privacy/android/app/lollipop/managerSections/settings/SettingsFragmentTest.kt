@@ -22,6 +22,7 @@ import dagger.hilt.android.testing.HiltAndroidTest
 import dagger.hilt.android.testing.HiltTestApplication
 import dagger.hilt.android.testing.UninstallModules
 import dagger.hilt.components.SingletonComponent
+import kotlinx.coroutines.runBlocking
 import mega.privacy.android.app.R
 import mega.privacy.android.app.TestActivityModule
 import mega.privacy.android.app.activities.settingsActivities.FileManagementPreferencesActivity
@@ -127,6 +128,7 @@ class SettingsFragmentTest {
 
     @Before
     fun setUp() {
+        runBlocking{ whenever(TestSettingsModule.fetchAutoAcceptQRLinks()).thenReturn(false) }
         hiltRule.inject()
         Intents.init()
     }
