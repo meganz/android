@@ -3694,21 +3694,20 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 			}
 			case RUBBISH_BIN: {
 				aB.setSubtitle(null);
-				if (parentHandleRubbish == INVALID_HANDLE || (megaApi.getRubbishNode() != null && parentHandleRubbish == megaApi.getRubbishNode().getHandle())) {
+				if (parentHandleRubbish == INVALID_HANDLE || megaApi.getRubbishNode() == null || parentHandleRubbish == megaApi.getRubbishNode().getHandle()) {
 					aB.setTitle(getResources().getString(R.string.section_rubbish_bin).toUpperCase());
 					firstNavigationLevel = true;
 				}
 				else{
 					MegaNode node = megaApi.getNodeByHandle(parentHandleRubbish);
-					if(node==null){
+					if (node == null) {
 						logWarning("Node NULL - cannot be recovered");
 						aB.setTitle(getResources().getString(R.string.section_rubbish_bin).toUpperCase());
-					}
-					else{
+						firstNavigationLevel = true;
+					} else {
 						aB.setTitle(node.getName());
+						firstNavigationLevel = false;
 					}
-
-					firstNavigationLevel = false;
 				}
 				break;
 			}
