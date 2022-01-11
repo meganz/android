@@ -1,7 +1,6 @@
 package mega.privacy.android.app.fragments.homepage.photos
 
 import mega.privacy.android.app.gallery.data.GalleryCard
-import java.time.LocalDate
 
 /**
  * Handle the click event on GalleryCard.
@@ -49,24 +48,24 @@ object CardClickHandler {
      * @return A month card corresponding to the year clicked, current month. If not exists,
      * the closest month to the current.
      */
-    fun yearClicked(position: Int, card: GalleryCard, months: List<GalleryCard>?, years: List<GalleryCard>?): Int {
+    fun yearClicked(
+        position: Int,
+        card: GalleryCard,
+        months: List<GalleryCard>?,
+        years: List<GalleryCard>?
+    ): Int {
         val yearCard = getClickedCard(position, card.node.handle, years) ?: return 0
         val monthCards = months ?: return 0
 
         val cardYear = yearCard.localDate.year
-        val currentMonth = LocalDate.now().monthValue
+
         for (i in monthCards.indices) {
             val nextLocalDate = monthCards[i].localDate
-            val nextMonth = nextLocalDate.monthValue
-            if (nextLocalDate.year == cardYear && nextMonth <= currentMonth) {
+            if (nextLocalDate.year == cardYear) {
                 //Year clicked, current month. If not exists, the closest month behind the current.
-                if (i == 0 || nextMonth == currentMonth || monthCards[i - 1].localDate.year != cardYear) {
+                if (i == 0 || monthCards[i - 1].localDate.year != cardYear) {
                     return i
                 }
-                val previousMonth = monthCards[i - 1].localDate.monthValue.toLong()
-
-                //The closest month to the current
-                return if (previousMonth - currentMonth <= currentMonth - nextMonth) i - 1 else i
             }
         }
 
@@ -84,36 +83,31 @@ object CardClickHandler {
      * @return A day card corresponding to the month of the year clicked, current day. If not exists,
      * the closest day to the current.
      */
-    fun monthClicked(position: Int, card: GalleryCard, days: List<GalleryCard>?, months: List<GalleryCard>?): Int {
+    fun monthClicked(
+        position: Int,
+        card: GalleryCard,
+        days: List<GalleryCard>?,
+        months: List<GalleryCard>?
+    ): Int {
         val monthCard = getClickedCard(position, card.node.handle, months) ?: return 0
         val dayCards = days ?: return 0
 
         val cardLocalDate = monthCard.localDate
         val cardMonth = cardLocalDate.monthValue
         val cardYear = cardLocalDate.year
-        val currentDay = LocalDate.now().dayOfMonth
-        var dayPosition = 0
+
         for (i in dayCards.indices) {
             val nextLocalDate = dayCards[i].localDate
-            val nextDay = nextLocalDate.dayOfMonth
             val nextMonth = nextLocalDate.monthValue
             val nextYear = nextLocalDate.year
-            if (nextYear == cardYear && nextMonth == cardMonth) {
-                dayPosition = if (nextDay <= currentDay) {
-                    //Month of year clicked, current day. If not exists, the closest day behind the current.
-                    if (i == 0 || nextDay == currentDay || dayCards[i - 1].localDate.monthValue != cardMonth) {
-                        return i
-                    }
-                    val previousDay = dayCards[i - 1].localDate.dayOfMonth
 
-                    //The closest day to the current
-                    return if (previousDay - currentDay <= currentDay - nextDay) i - 1 else i
-                } else {
-                    //Save the closest day above the current in case there is no day of month behind the current.
-                    i
+            if (nextYear == cardYear && nextMonth == cardMonth) {
+                //Month of year clicked, current day. If not exists, the closest day behind the current.
+                if (i == 0 || dayCards[i - 1].localDate.monthValue != cardMonth) {
+                    return i
                 }
             }
         }
-        return dayPosition
+        return dayCards.size - 1
     }
 }
