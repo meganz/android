@@ -152,7 +152,7 @@ class DragToExitSupport(
                         val displayMetrics = DisplayMetrics()
 
                         @Suppress("DEPRECATION")
-                        display?.getMetrics(displayMetrics)
+                        display.getMetrics(displayMetrics)
                         width = displayMetrics.widthPixels
                         height = displayMetrics.heightPixels
                     }
