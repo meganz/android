@@ -562,7 +562,7 @@ class MyAccountActivity : PasscodeActivity(), MyAccountFragment.MessageResultCal
 
                 editLayout.hint =
                     StringResourcesUtils.getString(R.string.edit_text_insert_pass)
-                        .capitalize(Locale.ROOT)
+                        .replaceFirstChar { it.uppercase(Locale.ROOT) }
 
                 textField.apply {
                     setOnEditorActionListener { _, actionId, _ ->

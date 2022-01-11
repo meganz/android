@@ -177,7 +177,7 @@ class ImagesFragment : BaseZoomFragment(){
         binding.emptyHint.emptyHintImage.isVisible = false
         binding.emptyHint.emptyHintText.isVisible = false
         binding.emptyHint.emptyHintText.text =
-            getString(R.string.homepage_empty_hint_photos).toUpperCase(Locale.ROOT)
+            getString(R.string.homepage_empty_hint_photos).uppercase(Locale.ROOT)
     }
 
     private fun setupTimePanel() {

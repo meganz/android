@@ -6,20 +6,16 @@ import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.MegaOffline
 import mega.privacy.android.app.MimeTypeThumbnail
 import mega.privacy.android.app.di.MegaApi
-import mega.privacy.android.app.utils.Constants.*
 import mega.privacy.android.app.utils.FileUtil
 import mega.privacy.android.app.utils.LogUtil.logError
 import mega.privacy.android.app.utils.OfflineUtils.getOfflineFile
 import mega.privacy.android.app.utils.SortUtil.*
-import mega.privacy.android.app.utils.Util
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava.*
 import nz.mega.sdk.MegaNode
 import nz.mega.sdk.MegaNodeList
 import java.io.File
-import java.time.YearMonth
 import java.util.*
-import java.util.function.Function
 import javax.inject.Inject
 import kotlin.collections.ArrayList
 
@@ -180,7 +176,7 @@ class MegaNodeRepo @Inject constructor(
                 result.addAll(searchOfflineNodes(getChildPath(node), query))
             }
 
-            if (node.name.toLowerCase(Locale.ROOT).contains(query.toLowerCase(Locale.ROOT)) &&
+            if (node.name.lowercase(Locale.ROOT).contains(query.lowercase(Locale.ROOT)) &&
                 FileUtil.isFileAvailable(getOfflineFile(MegaApplication.getInstance(), node))
             ) {
                 result.add(node)
