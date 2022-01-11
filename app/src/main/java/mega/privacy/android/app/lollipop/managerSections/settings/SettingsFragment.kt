@@ -17,6 +17,9 @@ import android.view.ViewGroup.MarginLayoutParams
 import android.widget.CheckedTextView
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.preference.Preference
 import androidx.preference.PreferenceCategory
 import androidx.preference.PreferenceFragmentCompat
@@ -25,6 +28,8 @@ import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.jeremyliao.liveeventbus.LiveEventBus
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.launch
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.WebViewActivity
@@ -50,15 +55,22 @@ import nz.mega.sdk.MegaChatApiJava
 
 @AndroidEntryPoint
 @SuppressLint("NewApi")
-@Suppress("DEPRECATION")
 class SettingsFragment : Preference.OnPreferenceChangeListener,
     Settings, PreferenceFragmentCompat() {
 
     override var numberOfClicksKarere = 0
     override var numberOfClicksAppVersion = 0
     override var numberOfClicksSDK = 0
-    override var setAutoAccept = false
-    override var autoAcceptSetting = true
+
+    private val refactorInProgressException =
+        IllegalStateException("Functionality has been replaced. This method will be removed once dependencies on deprecated Settings and SettingsActivity interfaces has been removed")
+
+    override var setAutoAccept: Boolean
+        get() = throw refactorInProgressException
+        set(value) {throw refactorInProgressException}
+    override var autoAcceptSetting: Boolean
+        get() = throw refactorInProgressException
+        set(value) {throw refactorInProgressException}
 
     private val viewModel: SettingsViewModel by viewModels()
 
@@ -80,8 +92,17 @@ class SettingsFragment : Preference.OnPreferenceChangeListener,
         updateCancelAccountSetting()
         checkUIPreferences()
         update2FAVisibility()
-        setAutoAccept = false
-        autoAcceptSetting = true
+        observeAutoAccept()
+    }
+
+    private fun observeAutoAccept() {
+        lifecycleScope.launch{
+            repeatOnLifecycle(Lifecycle.State.STARTED){
+                viewModel.isAutoExceptEnabled.collect {
+                    findPreference<SwitchPreferenceCompat>(KEY_QR_CODE_AUTO_ACCEPT)?.isChecked = it
+                }
+            }
+        }
     }
 
     /**
@@ -152,9 +173,7 @@ class SettingsFragment : Preference.OnPreferenceChangeListener,
         LogUtil.logDebug("onViewCreated")
         setupObservers()
 
-        // Init QR code setting
         val managerActivityLollipop = requireActivity() as SettingsActivity
-        viewModel.getContactLinksOption(managerActivityLollipop)
         when {
             managerActivityLollipop.openSettingsStorage -> {
                 goToCategoryStorage()
@@ -412,16 +431,14 @@ class SettingsFragment : Preference.OnPreferenceChangeListener,
                 findPreference<SwitchPreferenceCompat>(KEY_2FA)?.isChecked = true
                 val intent = Intent(context, VerifyTwoFactorActivity::class.java)
                 intent.putExtra(VerifyTwoFactorActivity.KEY_VERIFY_TYPE, Constants.DISABLE_2FA)
-                requireActivity().startActivity(intent)
+                startActivity(intent)
             } else {
                 findPreference<SwitchPreferenceCompat>(KEY_2FA)?.isChecked = false
                 val intent = Intent(context, TwoFactorAuthenticationActivity::class.java)
                 startActivity(intent)
             }
             KEY_QR_CODE_AUTO_ACCEPT -> {
-                //			First query if QR auto-accept is enabled or not, then change the value
-                setAutoAccept = true
-                viewModel.getContactLinksOption(activity as SettingsActivity)
+                viewModel.toggleAutoAcceptPreference()
             }
             KEY_SECURITY_ADVANCED -> startActivity(
                 Intent(
@@ -562,13 +579,14 @@ class SettingsFragment : Preference.OnPreferenceChangeListener,
         findPreference<Preference>(KEY_FEATURES_CHAT)?.isEnabled = false
     }
 
+    override fun setValueOfAutoAccept(autoAccept: Boolean) {
+        TODO("Not yet implemented")
+    }
+
     override fun update2FAPreference(enabled: Boolean) {
         findPreference<SwitchPreferenceCompat>(KEY_2FA)?.isChecked = enabled
     }
 
-    override fun setValueOfAutoAccept(autoAccept: Boolean) {
-        findPreference<SwitchPreferenceCompat>(KEY_QR_CODE_AUTO_ACCEPT)?.isChecked = autoAccept
-    }
 
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)

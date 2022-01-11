@@ -7,14 +7,16 @@ import mega.privacy.android.app.DatabaseHandler
 import mega.privacy.android.app.MegaAttributes
 import mega.privacy.android.app.MegaPreferences
 import mega.privacy.android.app.di.MegaApi
+import mega.privacy.android.app.domain.exception.ApiError
+import mega.privacy.android.app.domain.exception.SettingNotFoundException
 import mega.privacy.android.app.domain.repository.SettingsRepository
 import mega.privacy.android.app.fragments.settingsFragments.startSceen.util.StartScreenUtil
 import mega.privacy.android.app.utils.FileUtil
 import mega.privacy.android.app.utils.LogUtil
 import mega.privacy.android.app.utils.SharedPreferenceConstants
-import nz.mega.sdk.MegaApiAndroid
-import nz.mega.sdk.MegaRequestListenerInterface
+import nz.mega.sdk.*
 import javax.inject.Inject
+import kotlin.coroutines.suspendCoroutine
 
 class DefaultSettingsRepository @Inject constructor(
     private val databaseHandler: DatabaseHandler,
@@ -24,6 +26,7 @@ class DefaultSettingsRepository @Inject constructor(
     private val logPreferences = "LOG_PREFERENCES"
     private val karereLogs = "KARERE_LOGS"
     private val sdkLogs = "SDK_LOGS"
+
     init {
         initialisePreferences()
     }
@@ -43,9 +46,52 @@ class DefaultSettingsRepository @Inject constructor(
         databaseHandler.isPasscodeLockEnabled = enabled
     }
 
-    override fun fetchContactLinksOption(listenerInterface: MegaRequestListenerInterface) {
-        sdk.getContactLinksOption(listenerInterface)
+    override suspend fun fetchContactLinksOption(): Boolean {
+        return suspendCoroutine { continuation ->
+            sdk.getContactLinksOption(object : MegaRequestListenerInterface {
+                override fun onRequestStart(api: MegaApiJava?, request: MegaRequest?) {}
+
+                override fun onRequestUpdate(api: MegaApiJava?, request: MegaRequest?) {}
+
+                override fun onRequestFinish(
+                    api: MegaApiJava?,
+                    request: MegaRequest?,
+                    e: MegaError?
+                ) {
+                    if (isFetchAutoAcceptQRResponse(request)) {
+                        when (e?.errorCode) {
+                            MegaError.API_OK -> {
+                                continuation.resumeWith(Result.success(request!!.flag))
+                            }
+                            MegaError.API_ENOENT -> {
+                                continuation.resumeWith(Result.failure(SettingNotFoundException(e.errorString)))
+                            }
+                            else -> {
+                                continuation.resumeWith(
+                                    Result.failure(
+                                        ApiError(
+                                            e?.errorCode,
+                                            e?.errorString
+                                        )
+                                    )
+                                )
+                            }
+                        }
+                    }
+                }
+
+                override fun onRequestTemporaryError(
+                    api: MegaApiJava?,
+                    request: MegaRequest?,
+                    e: MegaError?
+                ) {
+                }
+            })
+        }
     }
+
+    private fun isFetchAutoAcceptQRResponse(request: MegaRequest?) =
+        request?.type == MegaRequest.TYPE_GET_ATTR_USER && request.paramType == MegaApiJava.USER_ATTR_CONTACT_LINK_VERIFICATION
 
     override fun getStartScreen(): Int {
         return getUiPreferences().getInt(
@@ -59,11 +105,17 @@ class DefaultSettingsRepository @Inject constructor(
     }
 
     override fun isChatLoggingEnabled(): Boolean {
-        return context.getSharedPreferences(logPreferences, Context.MODE_PRIVATE).getBoolean(karereLogs, false)
+        return context.getSharedPreferences(logPreferences, Context.MODE_PRIVATE)
+            .getBoolean(karereLogs, false)
     }
 
     override fun isLoggingEnabled(): Boolean {
-        return context.getSharedPreferences(logPreferences, Context.MODE_PRIVATE).getBoolean(sdkLogs, false)
+        return context.getSharedPreferences(logPreferences, Context.MODE_PRIVATE)
+            .getBoolean(sdkLogs, false)
+    }
+
+    override fun setAutoAcceptQR(accept: Boolean) {
+        TODO("Not yet implemented")
     }
 
     private fun getUiPreferences(): SharedPreferences {

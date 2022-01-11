@@ -3,7 +3,6 @@ package test.mega.privacy.android.app.lollipop.managerSections.settings
 import android.app.Activity
 import android.app.Instrumentation
 import android.content.ComponentName
-import androidx.test.core.app.ApplicationProvider
 import androidx.test.core.app.ApplicationProvider.getApplicationContext
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.intent.Intents
@@ -67,6 +66,7 @@ class SettingsFragmentTest {
         val getStartScreen = mock<GetStartScreen>()
         val isMultiFactorAuthAvailable = mock<IsMultiFactorAuthAvailable>()
         val settingsActivity = mock<SettingsActivity> ()
+        val fetchAutoAcceptQRLinks = mock<FetchAutoAcceptQRLinks>()
 
         @Provides
         fun provideSettingsActivity(): SettingsActivity = settingsActivity
@@ -102,13 +102,14 @@ class SettingsFragmentTest {
         fun provideIsMultiFactorAuthAvailable(): IsMultiFactorAuthAvailable =
             isMultiFactorAuthAvailable
 
+
         @Provides
-        fun provideFetchContactLinksOption(): FetchContactLinksOption =
-            mock<FetchContactLinksOption>()
+        fun provideFetchContactLinksOption(): FetchAutoAcceptQRLinks =
+            fetchAutoAcceptQRLinks
 
         @Provides
         fun providePerformMultiFactorAuthCheck(): PerformMultiFactorAuthCheck =
-            mock<PerformMultiFactorAuthCheck>()
+            mock()
 
 
         @Provides
@@ -116,6 +117,10 @@ class SettingsFragmentTest {
 
         @Provides
         fun provideShouldHideRecentActivity(): ShouldHideRecentActivity =
+            mock()
+
+        @Provides
+        fun provideToggleAutoAcceptQRLinks(): ToggleAutoAcceptQRLinks =
             mock()
 
     }
@@ -139,7 +144,7 @@ class SettingsFragmentTest {
 
     @Test
     fun test_delete_preference_is_removed_if_account_cannot_be_deleted() {
-        whenever(TestSettingsModule.canDeleteAccount.invoke()).thenReturn(false)
+        whenever(TestSettingsModule.canDeleteAccount()).thenReturn(false)
         launchFragmentInHiltContainer<SettingsFragment>()
 
         onPreferences()
@@ -148,7 +153,7 @@ class SettingsFragmentTest {
 
     @Test
     fun test_delete_preference_is_present_if_account_can_be_deleted() {
-        whenever(TestSettingsModule.canDeleteAccount.invoke()).thenReturn(true)
+        whenever(TestSettingsModule.canDeleteAccount()).thenReturn(true)
         launchFragmentInHiltContainer<SettingsFragment>()
 
         onPreferences()
@@ -176,7 +181,7 @@ class SettingsFragmentTest {
 
     @Test
     fun test_that_activated_delete_has_100_percent_alpha() {
-        whenever(TestSettingsModule.canDeleteAccount.invoke()).thenReturn(true)
+        whenever(TestSettingsModule.canDeleteAccount()).thenReturn(true)
         val scenario = launchFragmentInHiltContainer<SettingsFragment>()
         scenario?.onActivity {
             val fragment = it.testFragment<SettingsFragment>()
@@ -196,7 +201,7 @@ class SettingsFragmentTest {
 
     @Test
     fun test_that_deactivated_delete_has_50_percent_alpha() {
-        whenever(TestSettingsModule.canDeleteAccount.invoke()).thenReturn(true)
+        whenever(TestSettingsModule.canDeleteAccount()).thenReturn(true)
         val scenario = launchFragmentInHiltContainer<SettingsFragment>()
         scenario?.onActivity {
             val fragment = it.testFragment<SettingsFragment>()
@@ -219,10 +224,10 @@ class SettingsFragmentTest {
     fun test_that_updating_start_screen_preference_updates_the_description() {
         val initialScreen = 0
         val newStartScreen = 1
-        whenever(TestSettingsModule.getStartScreen.invoke()).thenReturn(initialScreen)
+        whenever(TestSettingsModule.getStartScreen()).thenReturn(initialScreen)
         val scenario = launchFragmentInHiltContainer<SettingsFragment>()
         val startScreenDescriptionStrings =
-            ApplicationProvider.getApplicationContext<HiltTestApplication>().resources.getStringArray(
+            getApplicationContext<HiltTestApplication>().resources.getStringArray(
                 R.array.settings_start_screen
             )
 
@@ -240,8 +245,8 @@ class SettingsFragmentTest {
 
     @Test
     fun test_that_correct_fields_are_disable_when_offline() {
-        whenever(TestSettingsModule.canDeleteAccount.invoke()).thenReturn(true)
-        whenever(TestSettingsModule.isMultiFactorAuthAvailable.invoke()).thenReturn(true)
+        whenever(TestSettingsModule.canDeleteAccount()).thenReturn(true)
+        whenever(TestSettingsModule.isMultiFactorAuthAvailable()).thenReturn(true)
         val scenario = launchFragmentInHiltContainer<SettingsFragment>()
         scenario?.onActivity {
             val fragment =
@@ -302,7 +307,7 @@ class SettingsFragmentTest {
     fun test_that_start_screen_update_event_updates_start_screen() {
         val initialScreen = 0
         val newStartScreen = 1
-        whenever(TestSettingsModule.getStartScreen.invoke()).thenReturn(initialScreen)
+        whenever(TestSettingsModule.getStartScreen()).thenReturn(initialScreen)
         launchFragmentInHiltContainer<SettingsFragment>()
         val startScreenDescriptionStrings =
             getApplicationContext<HiltTestApplication>().resources.getStringArray(

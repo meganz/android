@@ -8,9 +8,10 @@ interface SettingsRepository {
     fun getAttributes(): MegaAttributes?
     fun getPreferences(): MegaPreferences?
     fun setPasscodeLockEnabled(enabled: Boolean)
-    fun fetchContactLinksOption(listenerInterface: MegaRequestListenerInterface)
+    suspend fun fetchContactLinksOption(): Boolean
     fun getStartScreen(): Int
     fun shouldHideRecentActivity(): Boolean
     fun isChatLoggingEnabled(): Boolean
     fun isLoggingEnabled(): Boolean
+    fun setAutoAcceptQR(accept: Boolean)
 }

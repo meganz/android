@@ -187,6 +187,9 @@ dependencies {
     implementation "androidx.navigation:navigation-fragment-ktx:$navigationVersion"
     implementation "androidx.navigation:navigation-ui-ktx:$navigationVersion"
 
+
+    implementation "androidx.preference:preference-ktx:$preferenceVersion"
+
     // Kotlin
     implementation "androidx.core:core-ktx:$ktxVersion"
     implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlinVersion"
@@ -283,7 +286,9 @@ dependencies {
     testImplementation "androidx.test.espresso:espresso-core:$espressoVersion"
     testImplementation "androidx.test.espresso:espresso-intents:$espressoVersion"
     testImplementation "com.google.dagger:hilt-android-testing:$hiltVersion"
-
+    testImplementation "org.jetbrains.kotlinx:kotlinx-coroutines-test:$coroutineTestVersion"
+    testImplementation "org.jetbrains.kotlin:kotlin-test:$kotlinVersion"
+    testImplementation 'app.cash.turbine:turbine:0.7.0'
 
     androidTestImplementation "androidx.test.ext:junit:$androidxTestExtVersion"
     androidTestImplementation "com.google.truth:truth:$truthVersion"

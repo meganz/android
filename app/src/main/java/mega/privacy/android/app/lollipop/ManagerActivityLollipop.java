@@ -9198,21 +9198,23 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 					logDebug("New value of attribute USER_ATTR_PWD_REMINDER: " + request.getText());
 				}
 			} else if (request.getParamType() == MegaApiJava.USER_ATTR_CONTACT_LINK_VERIFICATION) {
-				logDebug("change QR autoaccept - USER_ATTR_CONTACT_LINK_VERIFICATION finished");
-				if (e.getErrorCode() == MegaError.API_OK) {
-					logDebug("OK setContactLinkOption: " + request.getText());
-					if (getSettingsFragment() != null) {
-						settingsFragment.setSetAutoAccept(false);
-						if (settingsFragment.getAutoAcceptSetting()) {
-							settingsFragment.setAutoAcceptSetting(false);
-						} else {
-							settingsFragment.setAutoAcceptSetting(true);
+				if(SettingsFragmentRefactorToggle.INSTANCE.getEnabled() == false){
+					logDebug("change QR autoaccept - USER_ATTR_CONTACT_LINK_VERIFICATION finished");
+					if (e.getErrorCode() == MegaError.API_OK) {
+						logDebug("OK setContactLinkOption: " + request.getText());
+						if (getSettingsFragment() != null) {
+							settingsFragment.setSetAutoAccept(false);
+							if (settingsFragment.getAutoAcceptSetting()) {
+								settingsFragment.setAutoAcceptSetting(false);
+							} else {
+								settingsFragment.setAutoAcceptSetting(true);
+							}
+							settingsFragment.setValueOfAutoAccept(settingsFragment.getAutoAcceptSetting());
+							logDebug("Autoacept: " + settingsFragment.getAutoAcceptSetting());
 						}
-						settingsFragment.setValueOfAutoAccept(settingsFragment.getAutoAcceptSetting());
-						logDebug("Autoacept: " + settingsFragment.getAutoAcceptSetting());
+					} else {
+						logError("Error setContactLinkOption");
 					}
-				} else {
-					logError("Error setContactLinkOption");
 				}
 			}
 		}
@@ -9244,35 +9246,37 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 				}
 			}
             else if (request.getParamType() == MegaApiJava.USER_ATTR_CONTACT_LINK_VERIFICATION) {
-				logDebug("Type: GET_ATTR_USER ParamType: USER_ATTR_CONTACT_LINK_VERIFICATION --> getContactLinkOption");
-				if (e.getErrorCode() == MegaError.API_OK) {
-					if (getSettingsFragment() != null) {
-						settingsFragment.setAutoAcceptSetting(request.getFlag());
-						logDebug("OK getContactLinkOption: " + request.getFlag());
+				if (SettingsFragmentRefactorToggle.INSTANCE.getEnabled() == false){
+					logDebug("Type: GET_ATTR_USER ParamType: USER_ATTR_CONTACT_LINK_VERIFICATION --> getContactLinkOption");
+					if (e.getErrorCode() == MegaError.API_OK) {
+						if (getSettingsFragment() != null) {
+							settingsFragment.setAutoAcceptSetting(request.getFlag());
+							logDebug("OK getContactLinkOption: " + request.getFlag());
 //						If user request to set QR autoaccept
-						if (settingsFragment.getSetAutoAccept()) {
-							if (settingsFragment.getAutoAcceptSetting()) {
-								logDebug("setAutoAccept false");
+							if (settingsFragment.getSetAutoAccept()) {
+								if (settingsFragment.getAutoAcceptSetting()) {
+									logDebug("setAutoAccept false");
 //								If autoaccept is enabled -> request to disable
-								megaApi.setContactLinksOption(true, this);
-							} else {
-								logDebug("setAutoAccept true");
+									megaApi.setContactLinksOption(true, this);
+								} else {
+									logDebug("setAutoAccept true");
 //								If autoaccept is disabled -> request to enable
-								megaApi.setContactLinksOption(false, this);
+									megaApi.setContactLinksOption(false, this);
+								}
+							} else {
+								settingsFragment.setValueOfAutoAccept(settingsFragment.getAutoAcceptSetting());
 							}
-						} else {
-							settingsFragment.setValueOfAutoAccept(settingsFragment.getAutoAcceptSetting());
+							logDebug("Autoacept: " + settingsFragment.getAutoAcceptSetting());
 						}
-						logDebug("Autoacept: " + settingsFragment.getAutoAcceptSetting());
+					} else if (e.getErrorCode() == MegaError.API_ENOENT) {
+						logError("Error MegaError.API_ENOENT getContactLinkOption: " + request.getFlag());
+						if (getSettingsFragment() != null) {
+							settingsFragment.setAutoAcceptSetting(request.getFlag());
+						}
+						megaApi.setContactLinksOption(false, this);
+					} else {
+						logError("Error getContactLinkOption: " + e.getErrorString());
 					}
-				} else if (e.getErrorCode() == MegaError.API_ENOENT) {
-					logError("Error MegaError.API_ENOENT getContactLinkOption: " + request.getFlag());
-					if (getSettingsFragment() != null) {
-						settingsFragment.setAutoAcceptSetting(request.getFlag());
-					}
-					megaApi.setContactLinksOption(false, this);
-				} else {
-					logError("Error getContactLinkOption: " + e.getErrorString());
 				}
 			}
             else if(request.getParamType() == MegaApiJava.USER_ATTR_DISABLE_VERSIONS){

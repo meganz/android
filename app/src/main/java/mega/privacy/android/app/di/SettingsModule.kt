@@ -57,8 +57,8 @@ abstract class SettingsModule {
 
     @Binds
     abstract fun bindFetchContactLinksOption(
-        useCase: DefaultFetchContactLinksOption
-    ): FetchContactLinksOption
+        useCase: DefaultFetchAutoAcceptQRLinks
+    ): FetchAutoAcceptQRLinks
 
     @Binds
     abstract fun bindPerformMultiFactorAuthCheck(
@@ -75,4 +75,8 @@ abstract class SettingsModule {
         useCase: DefaultShouldHideRecentActivity
     ): ShouldHideRecentActivity
 
+    @Binds
+    abstract fun bindToggleAutoAcceptQRLinks(
+        useCase: DefaultToggleAutoAcceptQRLinks
+    ): ToggleAutoAcceptQRLinks
 }
