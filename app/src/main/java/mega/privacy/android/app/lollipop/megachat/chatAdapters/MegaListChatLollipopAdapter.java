@@ -2385,9 +2385,6 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 	}
 
 	public void setChats (ArrayList<MegaChatListItem> updatedChats){
-		if (updatedChats == null)
-			return;
-
 		logDebug("Number of updated chats: "+ updatedChats.size());
 		this.chats = updatedChats;
 
