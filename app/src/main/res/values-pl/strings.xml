@@ -66,8 +66,6 @@
     <string name="general_error_word">Błąd</string>
     <!-- when clicking into a menu whose functionality is not yet implemented -->
     <string name="general_not_yet_implemented">W przygotowaniu</string>
-    <!-- when any file or folder is selected -->
-    <string name="error_no_selection">Nie wybrano żadnego pliku lub katalogu</string>
     <!-- when trying to download a file that is already downloaded in the device -->
     <string name="general_already_downloaded">Plik został już&#160;pobrany</string>
     <!-- when trying to upload a file that is already uploaded in the folder -->
@@ -649,10 +647,6 @@
     <string name="upload_to_audio">Dzwięk</string>
     <!-- Title of the button in the contact info screen to start a video call -->
     <string name="upload_to_video">Film</string>
-    <!-- upload to. Then choose to browse the file system to choose a file -->
-    <string name="upload_to_filesystem">Wybierz z systemu plików</string>
-    <!-- upload to. Then choose to browse the file system to choose a file -->
-    <string name="upload_to_filesystem_from">Wybierz z</string>
     <!-- Label for the current uploaded size of a file. For example, 3 files, 50KB uploaded -->
     <string name="upload_uploaded">wgrany</string>
     <!-- Status text at the beginning of an upload, Status text at the beginning of an upload for 2 or more files -->
@@ -3230,8 +3224,6 @@
     </plurals>
     <!-- Title of a chat message that contains geolocation info -->
     <string name="title_geolocation_message">Przypięta lokalizacja</string>
-    <!-- Text of the button to indicate an attachment upload from file system -->
-    <string name="attachment_upload_panel_from_device">Z systemu plików</string>
     <!-- Alert shown when a num of files have not been sent because of any error occurs, Plural of file. 2 files -->
     <plurals name="num_files_not_send">
         <item quantity="one">Plik %d nie został wysłany do czatów %d</item>
