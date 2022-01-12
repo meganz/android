@@ -98,8 +98,6 @@
     <string name="action_create_folder">Creează un folder nou</string>
     <!-- Option which allows create a new text file -->
     <string name="action_create_txt">Creează un fișier text nou</string>
-    <!-- Menu option to open a link. Also title of the dialog to open a link. -->
-    <string name="action_open_link">Deschide un link</string>
     <!-- Menu item -->
     <string name="action_settings">Setări</string>
     <!-- Search button -->
@@ -1007,8 +1005,6 @@
     <string name="settings_disable_logs">Jurnalele sunt acum dezactivate</string>
     <!-- Snackbar error message triggered by host error when user is trying to setup MEGA Camera Uploads folder in settings page -->
     <string name="error_unable_to_setup_cloud_folder">Nu se poate configura folderul Încărcări cameră MEGA</string>
-    <!-- Message displayed when the user denies the required permissions during the logs activation -->
-    <string name="logs_not_enabled_permissions">Jurnalele nu au fost activate deoarece ai refuzat permisiunile necesare</string>
     <!-- Option in the sliding panel to open the folder which contains the file selected after performing a search -->
     <string name="search_open_location">Deschide locația</string>
     <!-- message when a temporary error on logging in is due to SDK is waiting for the server to complete a request due to an API lock -->
@@ -1440,7 +1436,7 @@
     <!-- settings of the chat to choose the status -->
     <string name="settings_chat_vibration">Vibrații</string>
     <!-- Button text shown on SMS verification page, if the user wants to logout current suspended account and login with another account, user can press this button to logout -->
-    <string name="sms_logout">[A]Deconectează-te[/A] pentru a folosi MEGA cu un alt cont</string>
+    <string name="sms_logout">[A]Deconectează-te[/A] pentru a comuta între conturile MEGA</string>
     <!-- On SMS verification page, if the user presses the logout button, a dialog with this text will show to ask for user’s confirmation. -->
     <string name="confirm_logout_from_sms_verification">Sigur vrei să te deconectezi din contul actual?</string>
     <!-- Text shown when a message has been deleted in the chat -->
@@ -2825,16 +2821,12 @@
     <string name="message_set_chat_private">[A]%1$s[/A][B] a activat rotația cheii de criptare.[/B]</string>
     <!-- error message shown when a chat link is invalid -->
     <string name="invalid_chat_link">Această conversație nu mai este disponibilă</string>
-    <!-- error message shown when a chat link is not well formed -->
-    <string name="invalid_chat_link_args">Linkul chatului nevalid</string>
     <!-- When it is creating a new group chat, this option permits to establish it private or public -->
     <string name="ekr_label">Rotația cheii de criptare</string>
     <!-- Text of the dialog to change a public chat to private (enable encryption key rotation) -->
     <string name="ekr_explanation">Rotația cheii de criptare este puțin mai sigură, dar nu îți permite să creezi un link al chatului, iar noii participanți nu vor vedea mesajele din trecut.</string>
     <!-- Text of the dialog to change a public chat to private (enable encryption key rotation) -->
     <string name="subtitle_chat_message_enabled_ERK">Rotația cheii de criptare este puțin mai sigură, dar nu îți permite să creezi un link al chatului, iar noii participanți nu vor vedea mesajele din trecut.</string>
-    <!-- Menu item -->
-    <string name="action_open_chat_link">Deschide un link de chat</string>
     <!-- Message shown when a contact request has not been sent because the invitation has been sent before -->
     <string name="invite_not_sent_already_sent">Invitația către contactul %s a fost trimisă înainte și poate fi consultată în fila Cereri trimise.</string>
     <!-- Label shown to indicate the QR is saving in Cloud Drive -->
@@ -3309,22 +3301,6 @@
     <string name="text_join_call">Pentru a te alătura acestui apel, trebuie să termini apelul actual.</string>
     <!-- Text of the dialog shown when you want to join a group call but you are in another active call -->
     <string name="text_join_another_call">Pentru a te alătura acestui apel, trebuie să închei sau să pui în așteptare apelul actual.</string>
-    <!-- Hint shown in the open chat link alert dialog -->
-    <string name="hint_enter_chat_link">Introdu linkul chatului</string>
-    <!-- Hint shown in the open link alert dialog -->
-    <string name="hint_paste_link">Lipește linkul</string>
-    <!-- Error shown when it tries to open an invalid file or folder link -->
-    <string name="invalid_file_folder_link">Link nevalid al folderului sau fișierului</string>
-    <!-- Error shown when it tries to open an invalid file or folder link and the text view is empty -->
-    <string name="invalid_file_folder_link_empty">Te rugăm să introduci un link valid al unui fișier sau folder</string>
-    <!-- Error shown when it tries to open an invalid chat link and the text view is empty -->
-    <string name="invalid_chat_link_empty">Te rugăm să introduci un link valid al unui chat</string>
-    <!-- Error shown when it tries to open a chat link from the Cloud Drive section -->
-    <string name="valid_chat_link">Ai lipit un link de chat.</string>
-    <!-- Error shown when it tries to open a contact link from the Cloud Drive section -->
-    <string name="valid_contact_link">Ai lipit un link de contact.</string>
-    <!-- Menu item -->
-    <string name="action_open_contact_link">Deschide un link de contact</string>
     <!-- Explanation of the dialog shown to share a chat link -->
     <string name="copy_link_explanation">Oamenii se pot alătura grupului folosind acest link.</string>
     <!-- Label that indicates the creation of a chat link -->
@@ -4098,9 +4074,9 @@
     <!-- General label for microphone -->
     <string name="general_mic">Microfon</string>
     <!-- General label for microphone muted -->
-    <string name="general_mic_mute">Microfonul este amuțit</string>
+    <string name="general_mic_mute">Microfonul este oprit</string>
     <!-- General label for microphone unmuted -->
-    <string name="general_mic_unmute">Microfonul nu mai este amuțit</string>
+    <string name="general_mic_unmute">Microfonul este pornit</string>
     <!-- General label for camera -->
     <string name="general_camera">Cameră</string>
     <!-- General label for camera enable -->
