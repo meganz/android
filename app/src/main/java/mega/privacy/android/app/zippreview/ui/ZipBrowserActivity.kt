@@ -116,27 +116,27 @@ class ZipBrowserActivity : PasscodeActivity() {
 
     private fun setupViewModel() {
         zipBrowserViewModel.apply {
-            title.observe(this@ZipBrowserActivity, { title ->
+            title.observe(this@ZipBrowserActivity) { title ->
                 actionBar?.title = title
-            })
-            zipInfoList.observe(this@ZipBrowserActivity, { zipInfoList ->
+            }
+            zipInfoList.observe(this@ZipBrowserActivity) { zipInfoList ->
                 zipAdapter.submitList(zipInfoList)
-            })
-            showProgressDialog.observe(this@ZipBrowserActivity, { showProgressDialog ->
+            }
+            showProgressDialog.observe(this@ZipBrowserActivity) { showProgressDialog ->
                 if (showProgressDialog) {
                     showProgressDialog()
                 } else if (unZipWaitingDialog.isShowing) {
                     unZipWaitingDialog.dismiss()
                 }
-            })
-            showAlert.observe(this@ZipBrowserActivity, { isShowAlert ->
+            }
+            showAlert.observe(this@ZipBrowserActivity) { isShowAlert ->
                 if (isShowAlert) {
                     showAlert()
                 }
-            })
-            openFile.observe(this@ZipBrowserActivity, { openFile ->
+            }
+            openFile.observe(this@ZipBrowserActivity) { openFile ->
                 openFile(openFile.second, openFile.first)
-            })
+            }
             //Open current zip file content
             viewModelInit(
                 zipFullPath,
