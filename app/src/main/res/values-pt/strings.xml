@@ -3882,6 +3882,8 @@
     <string name="error_share_owner_storage_quota">O proprietário da pasta compartilhada excedeu a cota de armazenamento disponível</string>
     <!-- A message shown when uploading, copying or moving something to an incoming share and the owner’s account is over its storage quota. -->
     <string name="warning_share_owner_storage_quota">Não foi possível enviar o arquivo porque destinatário ultrapassou o seu limite de armazenamento.</string>
+    <!-- Content to show in a Snackbar to tip the incompatibility-->
+    <string name="version_incompatibility">Estamos atualizando o MEGAchat. As suas chamadas podem não ser estabelecidas devido a uma incompatibilidade com a versão do aplicativo, a menos que todos os participantes atualizem os seus aplicativos do MEGA à versão mais recente.</string>
     <!-- Message displayed when multiple download starts and 1 file has already been downloaded before and 1 file is being downloaded -->
     <string name="file_already_downloaded_and_file_pending_download">Já foi feito o download de 1 arquivo. 1 arquivo pendente.</string>
     <!-- Message displayed when multiple download starts and 1 file has already been downloaded before and multiple files are being downloaded. Placeholder: number of files -->

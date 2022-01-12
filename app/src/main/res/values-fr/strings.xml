@@ -3882,6 +3882,8 @@
     <string name="error_share_owner_storage_quota">Le propriétaire du partage a dépassé son quota d’espace de stockage.</string>
     <!-- A message shown when uploading, copying or moving something to an incoming share and the owner’s account is over its storage quota. -->
     <string name="warning_share_owner_storage_quota">Le fichier ne peut pas être envoyé, car l’utilisateur cible a dépassé son quota d’espace de stockage.</string>
+    <!-- Content to show in a Snackbar to tip the incompatibility-->
+    <string name="version_incompatibility">Nous mettons MEGAchat à niveau. Vos appels pourraient ne pas être connectés en raison d’incompatibilité des versions, à moins qu’appelant et appelés aient aussi mis à niveau leurs applis&#160;MEGA vers la version la plus récente.</string>
     <!-- Message displayed when multiple download starts and 1 file has already been downloaded before and 1 file is being downloaded -->
     <string name="file_already_downloaded_and_file_pending_download">1 fichier est déjà téléchargé, 1 fichier est en attente.</string>
     <!-- Message displayed when multiple download starts and 1 file has already been downloaded before and multiple files are being downloaded. Placeholder: number of files -->

@@ -3801,6 +3801,8 @@
     <string name="error_share_owner_storage_quota">共有所有者はストレージ容量を超えています。</string>
     <!-- A message shown when uploading, copying or moving something to an incoming share and the owner’s account is over its storage quota. -->
     <string name="warning_share_owner_storage_quota">ターゲットユーザーはストレージ容量を超えているため、ファイルを送信できません。</string>
+    <!-- Content to show in a Snackbar to tip the incompatibility-->
+    <string name="version_incompatibility">MEGAchatをバージョンアップしています。すべての参加者がMEGAアプリを最新版にアップデートしないと、バージョンの互換性がないために、通話がつながらない場合がございます。</string>
     <!-- Message displayed when multiple download starts and 1 file has already been downloaded before and 1 file is being downloaded -->
     <string name="file_already_downloaded_and_file_pending_download">1個のファイルはすでにダウンロードされています。1個のファイルが保留されています。</string>
     <!-- Message displayed when multiple download starts and 1 file has already been downloaded before and multiple files are being downloaded. Placeholder: number of files -->

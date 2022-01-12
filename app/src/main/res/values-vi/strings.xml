@@ -3801,6 +3801,8 @@
     <string name="error_share_owner_storage_quota">Chủ sở hữu dùng hết lượng băng thông.</string>
     <!-- A message shown when uploading, copying or moving something to an incoming share and the owner’s account is over its storage quota. -->
     <string name="warning_share_owner_storage_quota">Tệp tin không thể gửi tới người đã chọn vì họ đã dùng hết lượng băng thông lưu trữ của mình.</string>
+    <!-- Content to show in a Snackbar to tip the incompatibility-->
+    <string name="version_incompatibility">Chúng tôi đang nâng cấp dịch vụ MEGAchát. Cuộc gọi của bạn có thể sẽ không kết nối được do bất đồng tương thích phiên bản cho đến khi mỗi người cập nhật lên phiên bản mới nhất.</string>
     <!-- Message displayed when multiple download starts and 1 file has already been downloaded before and 1 file is being downloaded -->
     <string name="file_already_downloaded_and_file_pending_download">1 tệp tin đã được tải xuống. 1 tệp tin đang chờ để tải.</string>
     <!-- Message displayed when multiple download starts and 1 file has already been downloaded before and multiple files are being downloaded. Placeholder: number of files -->
