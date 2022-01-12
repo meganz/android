@@ -4,8 +4,6 @@ apply plugin: 'kotlin-parcelize'
 apply plugin: 'kotlin-kapt'
 apply plugin: 'dagger.hilt.android.plugin'
 apply plugin: 'androidx.navigation.safeargs.kotlin'
-apply plugin: 'com.google.firebase.crashlytics'
-apply plugin: 'com.google.firebase.firebase-perf'
 
 // Get the MEGA SDK commit hash using Git
 def getSdkGitHash = { ->
@@ -120,6 +118,7 @@ android {
         gms {
             dimension "service"
             apply plugin: 'com.google.firebase.crashlytics'
+            apply plugin: 'com.google.firebase.firebase-perf'
             firebaseCrashlytics {
                 // Enable processing and uploading of native symbols to Crashlytics servers.
                 // This flag must be enabled to see properly-symbolicated native
@@ -132,6 +131,11 @@ android {
         hms {
             dimension "service"
             applicationId = "mega.privacy.android.app.huawei"
+            FirebasePerformance {
+                // Disable @AddTrace annotation processing and automatic monitoring
+                // of HTTP/S network requests for HMS build
+                instrumentationEnabled false
+            }
         }
     }
 }
