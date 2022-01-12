@@ -612,7 +612,7 @@ class PasscodeLockActivity : BaseActivity() {
     }
 
     override fun onBackPressed() {
-        if (psaWebBrowser.consumeBack()) return
+        if (psaWebBrowser != null && psaWebBrowser.consumeBack()) return
         if (attempts < MAX_ATTEMPTS) {
             when (mode) {
                 UNLOCK_MODE -> return
