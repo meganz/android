@@ -1,6 +1,7 @@
 package mega.privacy.android.app.gallery.repository.fetcher
 
 import android.content.Context
+import mega.privacy.android.app.MimeTypeThumbnail
 import mega.privacy.android.app.gallery.data.GalleryItem
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava.*
@@ -20,5 +21,5 @@ class ImagesFetcher(
 ) {
 
     override fun getNodes(): List<MegaNode> =
-            megaApi.searchByType(ORDER_MODIFICATION_DESC, FILE_TYPE_PHOTO, SEARCH_TARGET_ROOTNODE)
+            megaApi.searchByType(ORDER_MODIFICATION_DESC, FILE_TYPE_PHOTO, SEARCH_TARGET_ROOTNODE).filter { MimeTypeThumbnail.typeForName(it.name).isImage }
 }

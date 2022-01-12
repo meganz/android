@@ -17,6 +17,7 @@ import mega.privacy.android.app.globalmanagement.SortOrderManagement
 import mega.privacy.android.app.utils.Constants.EVENT_NODES_CHANGE
 import mega.privacy.android.app.utils.Constants.INVALID_POSITION
 import nz.mega.sdk.MegaApiJava
+import nz.mega.sdk.MegaNode
 
 abstract class GalleryViewModel constructor(
     private val repository: GalleryItemRepository,
@@ -100,7 +101,10 @@ abstract class GalleryViewModel constructor(
         val cardsProvider = DateCardsProvider()
         cardsProvider.extractCardsFromNodeList(
             repository.context,
-            it.mapNotNull { item -> item.node }.sortedByDescending { node -> node.modificationTime })
+            it.mapNotNull { item -> item.node }
+                // Sort by modification time and name desc.
+                .sortedWith(compareByDescending<MegaNode> { node -> node.modificationTime }.thenByDescending { node -> node.name })
+        )
 
         viewModelScope.launch {
             repository.getPreviews(cardsProvider.getNodesWithoutPreview()) {
