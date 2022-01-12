@@ -106,51 +106,6 @@ public class MultipleRequestListener implements MegaRequestListenerInterface {
                         } else {
                             message = getQuantityString(R.plurals.number_correctly_moved_to_rubbish, success_items, success_items);
                         }
-
-                        if (context instanceof ManagerActivityLollipop) {
-                            ManagerActivityLollipop managerActivity = (ManagerActivityLollipop) context;
-                            managerActivity.setMoveToRubbish(false);
-                            managerActivity.refreshAfterMovingToRubbish();
-                            resetAccountDetailsTimeStamp();
-                        } else {
-                            ((ContactFileListActivityLollipop) context).actionConfirmed();
-                        }
-                    } else if (actionListener == MULTIPLE_RESTORED_FROM_RUBBISH) {
-                        logDebug("Restore nodes from rubbish request finished");
-                        int success_items = max_items - error;
-                        if (error > 0 && (success_items > 0)) {
-                            if (error == 1 && (success_items == 1)) {
-                                message = getString(R.string.node_correctly_and_node_incorrectly_restored_from_rubbish);
-                            } else if (error == 1) {
-                                message = getString(R.string.nodes_correctly_and_node_incorrectly_restored_from_rubbish, success_items);
-                            } else if (success_items == 1) {
-                                message = getString(R.string.node_correctly_and_nodes_incorrectly_restored_from_rubbish, error);
-                            } else {
-                                message = getString(R.string.nodes_correctly_and_nodes_incorrectly_restored_from_rubbish, success_items, error);
-                            }
-                        } else if (error > 0) {
-                            message = getQuantityString(R.plurals.number_incorrectly_restored_from_rubbish, error, error);
-                        } else {
-                            message = getQuantityString(R.plurals.number_correctly_restored_from_rubbish, success_items, success_items);
-                        }
-
-                        ManagerActivityLollipop managerActivity = (ManagerActivityLollipop) context;
-                        managerActivity.setRestoreFromRubbish(false);
-                        managerActivity.refreshAfterMovingToRubbish();
-                        resetAccountDetailsTimeStamp();
-                    } else {
-                        logDebug("Move nodes request finished");
-                        if(error>0){
-                            if (e.getErrorCode() == MegaError.API_EOVERQUOTA && api.isForeignNode(request.getParentHandle())) {
-                                showForeignStorageOverQuotaWarningDialog(context);
-                            }
-
-                            message = context.getString(R.string.number_correctly_moved, max_items-error) + context.getString(R.string.number_incorrectly_moved, error);
-                        }
-                        else{
-                            message = context.getString(R.string.number_correctly_moved, max_items);
-                        }
-                        ((ManagerActivityLollipop) context).refreshAfterMoving();
                     }
                     break;
                 }
@@ -168,21 +123,6 @@ public class MultipleRequestListener implements MegaRequestListenerInterface {
                         else {
                             message = context.getString(R.string.number_correctly_leaved, max_items);
                         }
-                    }
-                    else{
-                        logDebug("Multi remove");
-                        if(error>0){
-                            message = context.getString(R.string.number_correctly_removed, max_items-error) + context.getString(R.string.number_no_removed, error);
-                        }
-                        else{
-                            message = context.getString(R.string.number_correctly_removed, max_items);
-                        }
-
-                        if (context instanceof ManagerActivityLollipop) {
-                            ManagerActivityLollipop managerActivity = (ManagerActivityLollipop) context;
-                            managerActivity.refreshAfterRemoving();
-                        }
-                        resetAccountDetailsTimeStamp();
                     }
 
                     break;

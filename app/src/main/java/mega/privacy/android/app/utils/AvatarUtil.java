@@ -11,6 +11,7 @@ import android.graphics.Path;
 import android.graphics.Rect;
 import android.graphics.Shader;
 import android.graphics.Typeface;
+import android.net.Uri;
 import android.util.Pair;
 import android.widget.ImageView;
 
@@ -311,18 +312,43 @@ public class AvatarUtil {
     /**
      * Gets the bitmap of an avatar file.
      *
-     * @param avatarName    name of the avatar file
+     * @param avatarName name of the avatar file
      * @return Bitmap of the avatar if the file exists.
      */
     public static Bitmap getAvatarBitmap(String avatarName) {
+        return getAvatarBitmap(buildAvatarFile(MegaApplication.getInstance(), avatarName + JPG_EXTENSION));
+    }
+
+    /**
+     * Gets the bitmap of an avatar file given the File.
+     *
+     * @param avatar Avatar file.
+     * @return The bitmap of the avatar if available.
+     */
+    public static Bitmap getAvatarBitmap(File avatar) {
         Bitmap bitmap = null;
-        File avatar = buildAvatarFile(MegaApplication.getInstance(), avatarName + JPG_EXTENSION);
 
         if (isFileAvailable(avatar) && avatar.length() > 0) {
             bitmap = BitmapFactory.decodeFile(avatar.getAbsolutePath(), new BitmapFactory.Options());
         }
 
         return bitmap;
+    }
+
+    /**
+     * Gets the Uri of an avatar file given the File.
+     *
+     * @param avatar Avatar file.
+     * @return The Uri of the avatar if available.
+     */
+    public static Uri getAvatarUri(File avatar) {
+        Uri uri = null;
+
+        if (isFileAvailable(avatar) && avatar.length() > 0) {
+            uri = Uri.fromFile(avatar);
+        }
+
+        return uri;
     }
 
     /**

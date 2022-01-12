@@ -98,8 +98,6 @@
     <string name="action_create_folder">Create new folder</string>
     <!-- Option which allows create a new text file -->
     <string name="action_create_txt">Create new text file</string>
-    <!-- Menu option to open a link. Also title of the dialog to open a link. -->
-    <string name="action_open_link">Open link</string>
     <!-- Menu item -->
     <string name="action_settings">Settings</string>
     <!-- Search button -->
@@ -2772,16 +2770,12 @@
     <string name="message_set_chat_private">[A]%1$s[/A][B] enabled encryption key rotation.[/B]</string>
     <!-- error message shown when a chat link is invalid -->
     <string name="invalid_chat_link">This conversation is no longer available</string>
-    <!-- error message shown when a chat link is not well formed -->
-    <string name="invalid_chat_link_args">Invalid chat link</string>
     <!-- When it is creating a new group chat, this option permits to establish it private or public -->
     <string name="ekr_label">Encryption key rotation</string>
     <!-- Text of the dialog to change a public chat to private (enable encryption key rotation) -->
     <string name="ekr_explanation">Encryption key rotation is slightly more secure, but does not allow you to create a chat link and new participants will not see past messages.</string>
     <!-- Text of the dialog to change a public chat to private (enable encryption key rotation) -->
     <string name="subtitle_chat_message_enabled_ERK">Encryption key rotation is slightly more secure, but does not allow you to create a chat link and new participants will not see past messages.</string>
-    <!-- Menu item -->
-    <string name="action_open_chat_link">Open chat link</string>
     <!-- Message shown when a contact request has not been sent because the invitation has been sent before -->
     <string name="invite_not_sent_already_sent">The invitation to contact %s has been sent before and can be consulted in the Sent Requests tab.</string>
     <!-- Label shown to indicate the QR is saving in Cloud Drive -->
@@ -3238,22 +3232,6 @@
     <string name="text_join_call">To join this call you have to end your current call.</string>
     <!-- Text of the dialog shown when you want to join a group call but you are in another active call -->
     <string name="text_join_another_call">To join this call you have to end or hold the current call.</string>
-    <!-- Hint shown in the open chat link alert dialog -->
-    <string name="hint_enter_chat_link">Enter chat link</string>
-    <!-- Hint shown in the open link alert dialog -->
-    <string name="hint_paste_link">Paste link</string>
-    <!-- Error shown when it tries to open an invalid file or folder link -->
-    <string name="invalid_file_folder_link">Invalid file or folder link</string>
-    <!-- Error shown when it tries to open an invalid file or folder link and the text view is empty -->
-    <string name="invalid_file_folder_link_empty">Please enter a valid file or folder link</string>
-    <!-- Error shown when it tries to open an invalid chat link and the text view is empty -->
-    <string name="invalid_chat_link_empty">Please enter a valid chat link</string>
-    <!-- Error shown when it tries to open a chat link from the Cloud Drive section -->
-    <string name="valid_chat_link">You have pasted a chat link.</string>
-    <!-- Error shown when it tries to open a contact link from the Cloud Drive section -->
-    <string name="valid_contact_link">You have pasted a contact link.</string>
-    <!-- Menu item -->
-    <string name="action_open_contact_link">Open contact link</string>
     <!-- Explanation of the dialog shown to share a chat link -->
     <string name="copy_link_explanation">People can join your group by using this link.</string>
     <!-- Label that indicates the creation of a chat link -->
@@ -4166,4 +4144,8 @@
     <string name="disable_versioning_warning">Our file versioning feature ensures that we keep older copies of your files around if you replace them with newer versions. If you disable File Versioning you will no longer have this protection; the old copy will be lost when you replace it.</string>
     <!-- Warning informing the user the folder location is trying to open no longer exists. -->
     <string name="location_not_exist">This location no longer exists.</string>
+    <!-- Warning shown informing the contact has been previously invited. The placeholder is to show the name of the contact. -->
+    <string name="contact_already_invited">%1$s previously invited.</string>
+    <!-- Warning shown informing the contact request has been sent and can be managed in sent requests section. -->
+    <string name="contact_invited">Invite sent successfully. See sent requests.</string>
 </resources>
