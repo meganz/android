@@ -1,5 +1,6 @@
 package mega.privacy.android.app.lollipop;
 
+import android.animation.ObjectAnimator;
 import android.annotation.SuppressLint;
 import android.app.ActivityManager;
 import android.content.BroadcastReceiver;
@@ -10,6 +11,7 @@ import android.content.IntentFilter;
 import android.content.res.Configuration;
 import android.database.Cursor;
 import android.graphics.Color;
+import android.graphics.Rect;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
@@ -115,6 +117,7 @@ import static mega.privacy.android.app.utils.Constants.FROM_INCOMING_SHARES;
 import static mega.privacy.android.app.utils.Constants.HIGH_PRIORITY_TRANSFER;
 import static mega.privacy.android.app.utils.Constants.INBOX_ADAPTER;
 import static mega.privacy.android.app.utils.Constants.INCOMING_SHARES_ADAPTER;
+import static mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_FIRST_LEVEL;
 import static mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_NEED_STOP_HTTP_SERVER;
 import static mega.privacy.android.app.utils.Constants.MAX_BUFFER_16MB;
 import static mega.privacy.android.app.utils.Constants.MAX_BUFFER_32MB;
@@ -909,10 +912,13 @@ public class PdfViewerActivityLollipop extends PasscodeActivity
         nodeSaver.handleRequestPermissionsResult(requestCode);
     }
 
-    public  void setToolbarVisibilityShow () {
+    public void setToolbarVisibilityShow () {
         logDebug("setToolbarVisibilityShow");
         toolbarVisible = true;
+
         aB.show();
+        adjustPositionOfScroller();
+
         if(tB != null) {
             tB.animate().translationY(0).setDuration(200L).start();
             bottomLayout.animate().translationY(0).setDuration(200L).start();
@@ -931,6 +937,27 @@ public class PdfViewerActivityLollipop extends PasscodeActivity
         else {
             aB.hide();
         }
+    }
+
+    /*
+     * Adjust the position of scroller below the ActionBar
+     */
+    private void adjustPositionOfScroller() {
+        defaultScrollHandle.post(() -> {
+            int[] location = new int[2];
+            defaultScrollHandle.getLocationInWindow(location);
+
+            Rect frame = new Rect();
+            getWindow().getDecorView().getWindowVisibleDisplayFrame(frame);
+
+            int height = aB.getHeight();
+
+            // When there is an intersection between the scroller and the ActionBar, move the scroller.
+            if (location[1] < height) {
+                ObjectAnimator animator = ObjectAnimator.ofFloat(defaultScrollHandle, "translationY", height+16);
+                animator.setDuration(200L).start();
+            }
+        });
     }
 
     public boolean isToolbarVisible(){
@@ -1022,7 +1049,7 @@ public class PdfViewerActivityLollipop extends PasscodeActivity
                 saveForOfflineMenuItem.setVisible(false);
                 chatRemoveMenuItem.setVisible(false);
             } else if (type == RUBBISH_BIN_ADAPTER
-                    || megaApi.isInRubbish(megaApi.getNodeByHandle(handle))) {
+                    || (megaApi != null && megaApi.isInRubbish(megaApi.getNodeByHandle(handle)))) {
                 shareMenuItem.setVisible(false);
                 getlinkMenuItem.setVisible(false);
                 removelinkMenuItem.setVisible(false);
@@ -1507,7 +1534,7 @@ public class PdfViewerActivityLollipop extends PasscodeActivity
             }
             if (type == INCOMING_SHARES_ADAPTER || fromIncoming) {
                 i.putExtra("from", FROM_INCOMING_SHARES);
-                i.putExtra("firstLevel", false);
+                i.putExtra(INTENT_EXTRA_KEY_FIRST_LEVEL, false);
             }
             else if(type == INBOX_ADAPTER){
                 i.putExtra("from", FROM_INBOX);
@@ -1851,6 +1878,9 @@ public class PdfViewerActivityLollipop extends PasscodeActivity
                 logDebug("Setting account auth token for folder links.");
                 megaApiFolder.setAccountAuth(megaApi.getAccountAuth());
                 megaApi.fetchNodes(this);
+
+                // Get cookies settings after login.
+                MegaApplication.getInstance().checkEnabledCookies();
             }
         }
         else if (request.getType() == MegaRequest.TYPE_FETCH_NODES){

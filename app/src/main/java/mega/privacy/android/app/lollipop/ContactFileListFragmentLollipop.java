@@ -297,7 +297,7 @@ public class ContactFileListFragmentLollipop extends ContactFileBaseFragment {
 	}
 
 	@Override
-	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+	public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		logDebug("onCreateView");
 		View v = null;
 		handler = new Handler();
@@ -384,8 +384,8 @@ public class ContactFileListFragmentLollipop extends ContactFileBaseFragment {
 			}
 
 			if (adapter == null) {
-				adapter = new MegaNodeAdapter(context, this, contactNodes, parentHandle,listView, aB,CONTACT_FILE_ADAPTER, MegaNodeAdapter.ITEM_VIEW_TYPE_LIST);
-
+				adapter = new MegaNodeAdapter(context, this, contactNodes, parentHandle,
+						listView, CONTACT_FILE_ADAPTER, MegaNodeAdapter.ITEM_VIEW_TYPE_LIST);
 			} else {
 				adapter.setNodes(contactNodes);
 				adapter.setParentHandle(parentHandle);
@@ -420,18 +420,10 @@ public class ContactFileListFragmentLollipop extends ContactFileBaseFragment {
 		((ContactFileListActivityLollipop)context).showOptionsPanel(sNode);
 	}
 
-	public void setNodes(long parentHandle){
-		if (megaApi.getNodeByHandle(parentHandle) == null){
-			parentHandle = -1;
-			this.parentHandle = -1;
-			((ContactFileListActivityLollipop)context).setParentHandle(parentHandle);
-			adapter.setParentHandle(parentHandle);
-
-			setNodes(megaApi.getInShares(contact));
-		}
-		else{
+	public void setNodes(long parentHandle) {
+		if (megaApi.getNodeByHandle(parentHandle) != null) {
 			this.parentHandle = parentHandle;
-			((ContactFileListActivityLollipop)context).setParentHandle(parentHandle);
+			((ContactFileListActivityLollipop) context).setParentHandle(parentHandle);
 			adapter.setParentHandle(parentHandle);
 			setNodes(megaApi.getChildren(megaApi.getNodeByHandle(parentHandle), orderGetChildren));
 		}

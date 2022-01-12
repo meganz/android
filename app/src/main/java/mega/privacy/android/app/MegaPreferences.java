@@ -3,55 +3,51 @@ package mega.privacy.android.app;
 import static mega.privacy.android.app.utils.LogUtil.*;
 
 public class MegaPreferences{
-	
-	String firstTime = "";
-	String camSyncWifi = "";
-	String camSyncCharging = "";
-	String camSyncEnabled = "";
-	String camSyncHandle = "";
-	String camSyncLocalPath = "";
-	String camSyncFileUpload = "";
-	String camSyncTimeStamp = "";
-	String camVideoSyncTimeStamp = "";
-	String passcodeLockEnabled = "";
-	String passcodeLockCode = "";
-	String storageAskAlways = "";
-	String storageDownloadLocation = "";
-	String lastFolderUpload = "";
-	String lastFolderCloud = "";
-	String secondaryMediaFolderEnabled = "";
-	String localPathSecondaryFolder = "";
-	String megaHandleSecondaryFolder = "";
-	String secSyncTimeStamp = "";
-	String secVideoSyncTimeStamp = "";
-	String keepFileNames = "";
-	String storageAdvancedDevices = "";
-	String preferredViewList = "";
-	String preferredViewListCameraUploads = "";
-	String uriExternalSDCard = "";
-	String cameraFolderExternalSDCard = "";	
-	String passcodeLockType = "";
-	String preferredSortCloud = "";
-	String preferredSortContacts = "";
-	private String preferredSortCameraUpload;
-	String preferredSortOthers = "";
-	String firstTimeChat = "";
-	String smallGridCamera = "";
-	String uploadVideoQuality = "";
-	String conversionOnCharging = "";
-	private String removeGPS;
-	String chargingOnSize = "";
-	String shouldClearCameraSyncRecords;
 
-	String isAutoPlayEnabled = "";
-	private String showInviteBanner = "";
-	String sdCardUri = "";
+	String firstTime;
+	String camSyncWifi;
+	String camSyncEnabled;
+	String camSyncHandle;
+	String camSyncLocalPath;
+	String camSyncFileUpload;
+	String camSyncTimeStamp;
+	String camVideoSyncTimeStamp;
+	String passcodeLockEnabled;
+	String passcodeLockCode;
+	String storageAskAlways;
+	String storageDownloadLocation;
+	String lastFolderUpload;
+	String lastFolderCloud;
+	String secondaryMediaFolderEnabled;
+	String localPathSecondaryFolder;
+	String megaHandleSecondaryFolder;
+	String secSyncTimeStamp;
+	String secVideoSyncTimeStamp;
+	String keepFileNames;
+	String storageAdvancedDevices;
+	String preferredViewList;
+	String preferredViewListCameraUploads;
+	String uriExternalSDCard;
+	String cameraFolderExternalSDCard;
+	String passcodeLockType;
+	String preferredSortCloud;
+	private String preferredSortCameraUpload;
+	String preferredSortOthers;
+	String firstTimeChat;
+	String uploadVideoQuality;
+	String conversionOnCharging;
+	private String removeGPS;
+	String chargingOnSize;
+	String shouldClearCameraSyncRecords;
+	String isAutoPlayEnabled;
+	private String showInviteBanner;
+	String sdCardUri;
 	private String askForDisplayOver;
 	private String askForSetDownloadLocation;
 	private String mediaSDCardUri;
 	private String isMediaOnSDCard;
-
 	private String passcodeLockRequireTime;
+	private String fingerprintLock;
 
 	public final static int ONLY_PHOTOS = 1001;
 	public final static int ONLY_VIDEOS = 1002;
@@ -61,21 +57,21 @@ public class MegaPreferences{
 	MegaPreferences(String firstTime, String camSyncWifi, String camSyncEnabled,
 					String camSyncHandle, String camSyncLocalPath, String camSyncFileUpload,
 					String camSyncTimeStamp, String passcodeLockEnabled, String passcodeLockCode,
-					String storageAskAlways, String storageDownloadLocation, String camSyncCharging,
+					String storageAskAlways, String storageDownloadLocation,
 					String lastFolderUpload, String lastFolderCloud,
 					String secondaryMediaFolderEnabled, String localPathSecondaryFolder,
 					String megaHandleSecondaryFolder, String secSyncTimeStamp,
 					String keepFileNames, String storageAdvancedDevices, String preferredViewList,
 					String preferredViewListCameraUploads, String uriExternalSDCard,
 					String cameraFolderExternalSDCard, String passcodeLockType,
-					String preferredSortCloud, String preferredSortContacts,
-					String preferredSortOthers, String firstTimeChat, String smallGridCamera,
-					String uploadVideoQuality, String conversionOnCharging, String chargingOnSize,
-					String shouldClearCameraSyncRecords, String camVideoSyncTimeStamp,
-					String secVideoSyncTimeStamp, String isAutoPlayEnabled, String removeGPS,
-					String showInviteBanner, String preferredSortCameraUpload, String sdCardUri,
-					String askForDisplayOver, String askForSetDownloadLocation,
-					String mediaSDCardUri, String isMediaOnSDCard, String passcodeLockRequireTime) {
+					String preferredSortCloud, String preferredSortOthers, String firstTimeChat,
+					String uploadVideoQuality, String conversionOnCharging,
+					String chargingOnSize, String shouldClearCameraSyncRecords,
+					String camVideoSyncTimeStamp, String secVideoSyncTimeStamp,
+					String isAutoPlayEnabled, String removeGPS, String showInviteBanner,
+					String preferredSortCameraUpload, String sdCardUri, String askForDisplayOver,
+					String askForSetDownloadLocation, String mediaSDCardUri, String isMediaOnSDCard,
+					String passcodeLockRequireTime, String fingerprintLock) {
 		this.firstTime = firstTime;
 		this.camSyncWifi = camSyncWifi;
 		this.camSyncEnabled = camSyncEnabled;
@@ -87,7 +83,6 @@ public class MegaPreferences{
 		this.passcodeLockCode = passcodeLockCode;
 		this.storageAskAlways = storageAskAlways;
 		this.storageDownloadLocation = storageDownloadLocation;
-		this.camSyncCharging = camSyncCharging;
 		this.lastFolderUpload = lastFolderUpload;
 		this.lastFolderCloud = lastFolderCloud;
 		this.secondaryMediaFolderEnabled = secondaryMediaFolderEnabled;
@@ -102,10 +97,8 @@ public class MegaPreferences{
 		this.cameraFolderExternalSDCard = cameraFolderExternalSDCard;
 		this.passcodeLockType = passcodeLockType;
 		this.preferredSortCloud = preferredSortCloud;
-		this.preferredSortContacts = preferredSortContacts;
 		this.preferredSortOthers = preferredSortOthers;
 		this.firstTimeChat = firstTimeChat;
-		this.smallGridCamera = smallGridCamera;
 		this.uploadVideoQuality = uploadVideoQuality;
 		this.conversionOnCharging = conversionOnCharging;
 		this.chargingOnSize = chargingOnSize;
@@ -122,6 +115,7 @@ public class MegaPreferences{
 		this.mediaSDCardUri = mediaSDCardUri;
 		this.isMediaOnSDCard = isMediaOnSDCard;
 		this.passcodeLockRequireTime = passcodeLockRequireTime;
+		this.fingerprintLock = fingerprintLock;
 	}
 
 	public String getFirstTime (){
@@ -171,13 +165,6 @@ public class MegaPreferences{
     public void setShouldClearCameraSyncRecords(String shouldClearCameraSyncRecords) {
         this.shouldClearCameraSyncRecords = shouldClearCameraSyncRecords;
     }
-    //	public String getCamSyncCharging (){
-//		return camSyncCharging;
-//	}
-//
-//	public void setCamSyncCharging(String camSyncCharging){
-//		this.camSyncCharging = camSyncCharging;
-//	}
 	
 	public String getCamSyncFileUpload(){
 		return camSyncFileUpload;
@@ -359,14 +346,6 @@ public class MegaPreferences{
 		this.preferredSortCloud = preferredSortCloud;
 	}
 
-	public String getPreferredSortContacts() {
-		return preferredSortContacts;
-	}
-
-	public void setPreferredSortContacts(String preferredSortContacts) {
-		this.preferredSortContacts = preferredSortContacts;
-	}
-
 	public String getPreferredSortOthers() {
 		return preferredSortOthers;
 	}
@@ -381,14 +360,6 @@ public class MegaPreferences{
 
 	public void setFirstTimeChat(String firstTimeChat){
 		this.firstTimeChat = firstTimeChat;
-	}
-
-	public String getSmallGridCamera() {
-		return smallGridCamera;
-	}
-
-	public void setSmallGridCamera(String smallGridCamera) {
-		this.smallGridCamera = smallGridCamera;
 	}
 
     public String getUploadVideoQuality() {
@@ -447,49 +418,49 @@ public class MegaPreferences{
         this.removeGPS = removeGPS;
     }
 
-	public String getAskForDisplayOver() {
-		return askForDisplayOver;
-	}
+    public String getAskForDisplayOver() {
+        return askForDisplayOver;
+    }
 
-	public void setAskForDisplayOver(String askForDisplayOver) {
-		this.askForDisplayOver = askForDisplayOver;
-	}
+    public void setAskForDisplayOver(String askForDisplayOver) {
+        this.askForDisplayOver = askForDisplayOver;
+    }
 
-	public String getAskForSetDownloadLocation() {
-		return askForSetDownloadLocation;
-	}
+    public String getAskForSetDownloadLocation() {
+        return askForSetDownloadLocation;
+    }
 
-	public void setAskForSetDownloadLocation(String askForSetDownloadLocation) {
-		this.askForSetDownloadLocation = askForSetDownloadLocation;
-	}
+    public void setAskForSetDownloadLocation(String askForSetDownloadLocation) {
+        this.askForSetDownloadLocation = askForSetDownloadLocation;
+    }
 
-	public String getMediaSDCardUri() {
-		return mediaSDCardUri;
-	}
+    public String getMediaSDCardUri() {
+        return mediaSDCardUri;
+    }
 
-	public void setMediaSDCardUri(String mediaSDCardUri) {
-		this.mediaSDCardUri = mediaSDCardUri;
-	}
+    public void setMediaSDCardUri(String mediaSDCardUri) {
+        this.mediaSDCardUri = mediaSDCardUri;
+    }
 
-	public String getIsMediaOnSDCard() {
-		return isMediaOnSDCard;
-	}
+    public String getIsMediaOnSDCard() {
+        return isMediaOnSDCard;
+    }
 
-	public void setIsMediaOnSDCard(String isMediaOnSDCard) {
-		this.isMediaOnSDCard = isMediaOnSDCard;
-	}
+    public void setIsMediaOnSDCard(String isMediaOnSDCard) {
+        this.isMediaOnSDCard = isMediaOnSDCard;
+    }
 
-	public String getIsAutoPlayEnabled() {
-		return isAutoPlayEnabled;
-	}
+    public String getIsAutoPlayEnabled() {
+        return isAutoPlayEnabled;
+    }
 
-	public void setIsAutoPlayEnabled(String isAutoPlayEnabled) {
-		this.isAutoPlayEnabled = isAutoPlayEnabled;
-	}
+    public void setIsAutoPlayEnabled(String isAutoPlayEnabled) {
+        this.isAutoPlayEnabled = isAutoPlayEnabled;
+    }
 
-	public void setShowInviteBanner(String showInviteBanner) {
-		this.showInviteBanner = showInviteBanner;
-	}
+    public void setShowInviteBanner(String showInviteBanner) {
+        this.showInviteBanner = showInviteBanner;
+    }
 
 	public String getPasscodeLockRequireTime() {
 		return passcodeLockRequireTime;
@@ -497,6 +468,10 @@ public class MegaPreferences{
 
 	public void setPasscodeLockRequireTime(String passcodeLockRequireTime) {
 		this.passcodeLockRequireTime = passcodeLockRequireTime;
+	}
+
+	public String getFingerprintLock() {
+		return fingerprintLock;
 	}
 
     @Override

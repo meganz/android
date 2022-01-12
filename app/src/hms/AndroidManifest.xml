@@ -16,5 +16,6 @@
 
     </application>
     <uses-permission android:name="com.huawei.appmarket.service.commondata.permission.GET_COMMON_DATA" />
+    <uses-permission android:name="com.huawei.permission.SECURITY_DIAGNOSE" />
 
 </manifest>

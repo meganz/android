@@ -17,7 +17,8 @@ import mega.privacy.android.app.fragments.homepage.NodeDiffCallback
 
 class PhotosBrowseAdapter constructor(
     private val actionModeViewModel: ActionModeViewModel,
-    private val itemOperationViewModel: ItemOperationViewModel
+    private val itemOperationViewModel: ItemOperationViewModel,
+    private val zoom: Int
 ) : ListAdapter<PhotoNodeItem, PhotoViewHolder>(NodeDiffCallback()),
     SectionTitleProvider, DragThumbnailGetter {
 
@@ -63,7 +64,7 @@ class PhotosBrowseAdapter constructor(
             (binding as ItemPhotoBrowseBinding).iconSelected.visibility = View.GONE
         }
 
-        return PhotoViewHolder(binding)
+        return PhotoViewHolder(binding, zoom)
     }
 
     private fun setItemLayoutParams(binding: ViewBinding) {
@@ -88,6 +89,10 @@ class PhotosBrowseAdapter constructor(
                 else -> 1
             }
         }
+    }
+
+    fun getNodeAtPosition(position: Int): PhotoNodeItem? {
+        return if (position >= 0 && position < currentList.size) currentList[position] else null
     }
 
     override fun getSectionTitle(position: Int) = if (position < 0 || position >= itemCount) {

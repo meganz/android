@@ -148,9 +148,11 @@ class DragToExitSupport(
                         width = windowMetrics.bounds.width()
                         height = windowMetrics.bounds.height()
                     } else {
+                        val display = mainView.display ?: return false
                         val displayMetrics = DisplayMetrics()
+
                         @Suppress("DEPRECATION")
-                        mainView.display.getMetrics(displayMetrics)
+                        display?.getMetrics(displayMetrics)
                         width = displayMetrics.widthPixels
                         height = displayMetrics.heightPixels
                     }

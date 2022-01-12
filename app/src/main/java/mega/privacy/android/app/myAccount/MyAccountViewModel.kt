@@ -6,12 +6,11 @@ import android.app.Activity.RESULT_OK
 import android.content.Context
 import android.content.Intent
 import android.os.Build
-import android.os.Environment
 import android.util.Patterns
-import androidx.hilt.lifecycle.ViewModelInject
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.jeremyliao.liveeventbus.LiveEventBus
+import dagger.hilt.android.lifecycle.HiltViewModel
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.kotlin.addTo
 import io.reactivex.rxjava3.kotlin.subscribeBy
@@ -32,14 +31,17 @@ import mega.privacy.android.app.lollipop.controllers.AccountController
 import mega.privacy.android.app.lollipop.qrcode.QRCodeActivity
 import mega.privacy.android.app.myAccount.usecase.*
 import mega.privacy.android.app.smsVerification.usecase.ResetPhoneNumberUseCase
-import mega.privacy.android.app.utils.*
+import mega.privacy.android.app.utils.CacheFolderManager
 import mega.privacy.android.app.utils.CacheFolderManager.buildAvatarFile
+import mega.privacy.android.app.utils.CallUtil
 import mega.privacy.android.app.utils.Constants.*
+import mega.privacy.android.app.utils.FileUtil
 import mega.privacy.android.app.utils.FileUtil.JPG_EXTENSION
 import mega.privacy.android.app.utils.LogUtil.*
-import mega.privacy.android.app.utils.PermissionUtils.hasPermissions
-import mega.privacy.android.app.utils.PermissionUtils.requestPermission
+import mega.privacy.android.app.utils.permission.PermissionUtils.hasPermissions
+import mega.privacy.android.app.utils.permission.PermissionUtils.requestPermission
 import mega.privacy.android.app.utils.StringResourcesUtils.getString
+import mega.privacy.android.app.utils.Util
 import nz.mega.sdk.*
 import nz.mega.sdk.MegaError.API_EARGS
 import nz.mega.sdk.MegaError.API_OK
@@ -47,8 +49,10 @@ import java.io.File
 import java.io.FileNotFoundException
 import java.io.IOException
 import java.io.InputStream
+import javax.inject.Inject
 
-class MyAccountViewModel @ViewModelInject constructor(
+@HiltViewModel
+class MyAccountViewModel @Inject constructor(
     private val myAccountInfo: MyAccountInfo,
     @MegaApi private val megaApi: MegaApiAndroid,
     private val setAvatarUseCase: SetAvatarUseCase,
@@ -250,25 +254,6 @@ class MyAccountViewModel @ViewModelInject constructor(
         data: Intent?,
         snackbarShower: SnackbarShower
     ) {
-        // Check if the result is from the OS activity to request "All files access" permission on Android 11.
-        // This piece of code must be here (before check 'resultCode != RESULT_OK' because the
-        // result code from that permission activity is always RESULT_CANCELED (0).
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R && requestCode == REQUEST_WRITE_STORAGE
-            && Environment.isExternalStorageManager()
-        ) {
-            if (!hasPermissions(activity, Manifest.permission.CAMERA)) {
-                requestPermission(
-                    activity,
-                    REQUEST_CAMERA,
-                    Manifest.permission.CAMERA
-                )
-            } else {
-                Util.checkTakePicture(activity, TAKE_PICTURE_PROFILE_CODE)
-            }
-
-            return
-        }
-
         if (resultCode != RESULT_OK) {
             logWarning("Result code not OK. Request code $requestCode")
             return

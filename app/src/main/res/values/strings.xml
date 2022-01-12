@@ -1,9 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- Full description text of the app in the Google Play page of the app (character limit 4000) -->
-    <string name="full_description_text">MEGA provides user controlled encrypted cloud storage and chat through standard web browsers, together with dedicated apps for mobile devices. Unlike other cloud storage providers, your data is encrypted and decrypted by your client devices only and never by us.\n\nUpload your files from your smartphone or tablet then search, store, download, stream, view, share, rename or delete your files any time, from any device, anywhere. Share folders with your contacts and see their updates in real time. The encryption process means we cannot access or reset your password so you MUST remember it (unless you have your Recovery Key backed up) or you will lose access to your stored files.\n\nEnd-to-end user encrypted MEGA video chat allows for total privacy, and has been available in web browsers since 2016. It has been extended to the Mega Mobile App, with chat history accessible across multiple devices. Users can also easily add files to a chat from their MEGA Cloud Drive.\n\nMEGA offers a generous 20 GB free storage for all registered users with bonus achievements, and offers paid plans with much higher limits:\n\n\nPro Lite subscription: 4.99 € per month or 49.99 € per year gives you 400 GB of storage space and 1 TB of transfer quota per month.\nPro I subscription: 9.99 € per month or 99.99 € per year gives you 2 TB of storage space and 2 TB of transfer quota per month.\nPro II subscription: 19.99 € per month or 199.99 € per year gives you 8 TB of storage space and 8 TB of transfer quota per month.\nPro III subscription: 29.99 € per month or 299.99 € per year gives you 16 TB of storage space and 16 TB of transfer quota per month.\n\nSubscriptions are renewed automatically for successive periods of the same duration, at the same price as the initial period chosen. To manage your subscriptions, simply tap the Play Store icon on your mobile device, sign in with your Google ID (if you haven’t already done so). Then tap on the MEGA app. You’ll be able to manage your subscription there.\n\nApp Permissions:\nWRITE_EXTERNAL_STORAGE -&gt; Download your files from MEGA to your device and upload files from your device to MEGA\nCAMERA -&gt; Take a picture and upload your photos to MEGA\nREAD_CONTACTS -&gt; Easily add contacts from your device as MEGA contacts\nRECORD_AUDIO and CAPTURE_VIDEO_OUTPUT (mic and camera) -&gt; MEGA provides for end-to-end encrypted audio/video calls\n\n\nTo enhance users’ confidence in the MEGA system, all of the client-side code is published, so interested security researchers can evaluate the encryption process. The code of our mobile app is located on: https://github.com/meganz/android \n\nFor more info, please check our website:\nSee https://mega.nz/terms \n\n\nDesktop - https://mega.nz/</string>
-    <!-- Short description text of the app in the Google Play page of the app (character limit 80) -->
-    <string name="short_description_text">MEGA is Cloud Storage with secure always-on privacy.</string>
     <!-- PRO Lite account -->
     <string name="prolite_account">Pro Lite</string>
     <!-- Name of the MEGA PDF Viewer. Keep uppercase. -->
@@ -70,8 +66,6 @@
     <string name="general_error_word">Error</string>
     <!-- when clicking into a menu whose functionality is not yet implemented -->
     <string name="general_not_yet_implemented">Not yet implemented</string>
-    <!-- when any file or folder is selected -->
-    <string name="error_no_selection">No file or folder selected</string>
     <!-- when trying to download a file that is already downloaded in the device -->
     <string name="general_already_downloaded">Already downloaded</string>
     <!-- when trying to upload a file that is already uploaded in the folder -->
@@ -97,15 +91,13 @@
     <!-- confirmation message before sending an invitation to a contact -->
     <string name="confirmation_add_contact">Do you want to send an invitation to %s?</string>
     <!-- Button where the user can sign off or logout -->
-    <string name="action_logout">Logout</string>
+    <string name="action_logout">Log out</string>
     <!-- Item menu option upon right click on one or multiple files. -->
     <string name="action_add">Upload</string>
     <!-- Menu item -->
     <string name="action_create_folder">Create new folder</string>
     <!-- Option which allows create a new text file -->
     <string name="action_create_txt">Create new text file</string>
-    <!-- Menu option to open a link. Also title of the dialog to open a link. -->
-    <string name="action_open_link">Open link</string>
     <!-- Menu item -->
     <string name="action_settings">Settings</string>
     <!-- Search button -->
@@ -635,10 +627,6 @@
     <string name="upload_to_audio">Audio</string>
     <!-- Title of the button in the contact info screen to start a video call -->
     <string name="upload_to_video">Video</string>
-    <!-- upload to. Then choose to browse the file system to choose a file -->
-    <string name="upload_to_filesystem">Pick from File System</string>
-    <!-- upload to. Then choose to browse the file system to choose a file -->
-    <string name="upload_to_filesystem_from">Pick from</string>
     <!-- Label for the current uploaded size of a file. For example, 3 files, 50KB uploaded -->
     <string name="upload_uploaded">uploaded</string>
     <!-- Status text at the beginning of an upload, Status text at the beginning of an upload for 2 or more files -->
@@ -1005,8 +993,6 @@
     <string name="settings_disable_logs">Logs are now disabled</string>
     <!-- Snackbar error message triggered by host error when user is trying to setup MEGA Camera Uploads folder in settings page -->
     <string name="error_unable_to_setup_cloud_folder">Unable to setup MEGA Camera Uploads folder</string>
-    <!-- Message displayed when the user denies the required permissions during the logs activation -->
-    <string name="logs_not_enabled_permissions">Logs have not been enabled because you denied the required permissions</string>
     <!-- Option in the sliding panel to open the folder which contains the file selected after performing a search -->
     <string name="search_open_location">Open location</string>
     <!-- message when a temporary error on logging in is due to SDK is waiting for the server to complete a request due to an API lock -->
@@ -1034,7 +1020,7 @@
     <!-- Third paragraph of the screen to backup the master key -->
     <string name="backup_third_paragraph">An external attacker cannot gain access to your account with just your key. A password reset requires both the key and access to your email.</string>
     <!-- Sentence to inform the user the available actions in the screen to backup the master key -->
-    <string name="backup_action">Copy the Recovery Key to clipboard or save it as text file</string>
+    <string name="backup_action">Copy the Recovery Key to the clipboard or save it as text file.</string>
     <!-- Action of a button to save something -->
     <string name="save_action">Save</string>
     <!-- Alert message when the master key has been successfully copied to the ClipBoard -->
@@ -1432,7 +1418,7 @@
     <!-- settings of the chat to choose the status -->
     <string name="settings_chat_vibration">Vibration</string>
     <!-- Button text shown on SMS verification page, if the user wants to logout current suspended account and login with another account, user can press this button to logout -->
-    <string name="sms_logout">[A]Logout[/A] to use MEGA with another account</string>
+    <string name="sms_logout">[A]Log out[/A] to switch MEGA accounts</string>
     <!-- On SMS verification page, if the user presses the logout button, a dialog with this text will show to ask for user’s confirmation. -->
     <string name="confirm_logout_from_sms_verification">Are you sure that you want to log out of the current account?</string>
     <!-- Text shown when a message has been deleted in the chat -->
@@ -1619,26 +1605,14 @@
     <string name="paused_transfers_title">Paused transfers</string>
     <!-- message shown in the screen when there are not any active transfer -->
     <string name="completed_transfers_empty">No completed transfers</string>
-    <!-- Text of the notification shown when the upload service is running, Plural -->
-    <plurals name="upload_service_notification">
-        <item quantity="one">Uploading %1$d of %2$d file</item>
-        <item quantity="other">Uploading %1$d of %2$d files</item>
-    </plurals>
-    <!-- Text of the notification shown when the upload service is running, Plural -->
-    <plurals name="upload_service_paused_notification">
-        <item quantity="one">Uploading %1$d of %2$d file (paused)</item>
-        <item quantity="other">Uploading %1$d of %2$d files (paused)</item>
-    </plurals>
-    <!-- Text of the notification shown when the folder upload service is running, Text of the notification shown when the folder upload service is running - plural e.g. Uploading 1 of 2 folders -->
-    <plurals name="folder_upload_service_notification">
-        <item quantity="one">Uploading %1$d of %2$d folder</item>
-        <item quantity="other">Uploading %1$d of %2$d folders</item>
-    </plurals>
-    <!-- Text of the notification shown when the folder upload service is running, Text of the notification shown when the folder upload service is running - plural e.g. Uploading 1 of 2 folders -->
-    <plurals name="folder_upload_service_paused_notification">
-        <item quantity="one">Uploading %1$d of %2$d folder (paused)</item>
-        <item quantity="other">Uploading %1$d of %2$d folders (paused)</item>
-    </plurals>
+    <!-- Text of the notification shown when the upload service is running: e.g. Uploading files: 1 of 10 -->
+    <string name="upload_service_notification">Uploading files: %1$d of %2$d</string>
+    <!-- Text of the notification shown when the upload service is paused: e.g. Uploading files: 1 of 10 (paused)-->
+    <string name="upload_service_notification_paused">Uploading files: %1$d of %2$d (paused)</string>
+    <!-- Text of the notification shown when the folder upload service is running, e.g. Uploading folders 1 of 2 -->
+    <string name="folder_upload_service_notification">Uploading folders: %1$d of %2$d</string>
+    <!-- Text of the notification shown when the folder upload service is paused, e.g. Uploading folders 1 of 2 (paused) -->
+    <string name="folder_upload_service_notification_paused">Uploading folders: %1$d of %2$d (paused)</string>
     <!-- Text of the notification shown when the upload service has finished, Plural -->
     <plurals name="upload_service_final_notification">
         <item quantity="one">Uploaded %1$d file</item>
@@ -1686,16 +1660,10 @@
         <item quantity="one">%1$d file not downloaded</item>
         <item quantity="other">%1$d files not downloaded</item>
     </plurals>
-    <!-- Text of the notification shown when the download service is running, Plural -->
-    <plurals name="download_service_notification">
-        <item quantity="one">Downloading %1$d of %2$d file</item>
-        <item quantity="other">Downloading %1$d of %2$d files</item>
-    </plurals>
-    <!-- Text of the notification shown when the download service is paused, Plural -->
-    <plurals name="download_service_paused_notification">
-        <item quantity="one">Downloading %1$d of %2$d file (paused)</item>
-        <item quantity="other">Downloading %1$d of %2$d files (paused)</item>
-    </plurals>
+    <!-- Text of the notification shown when the download service is running -->
+    <string name="download_service_notification">Downloading files: %1$d of %2$d</string>
+    <!-- Text of the notification shown when the download service is paused -->
+    <string name="download_service_notification_paused">Downloading files: %1$d of %2$d (paused)</string>
     <!-- Title of the alert when the transfer quota is exceeded. -->
     <string name="title_depleted_transfer_overquota">Insufficient transfer quota</string>
     <!-- Text of the alert when the transfer quota is depleted. The placeholder indicates the time left for the transfer quota to be reset. For instance: 30m 45s -->
@@ -2352,7 +2320,7 @@
     <!-- Option that permits user export his recovery key -->
     <string name="option_export_recovery_key">Export Recovery Key</string>
     <!-- Option that permits user logout -->
-    <string name="proceed_to_logout">Proceed to logout</string>
+    <string name="proceed_to_logout">Proceed to log out</string>
     <!-- Title of the preference Recovery key on Settings section -->
     <string name="recovery_key_bottom_sheet">Recovery Key</string>
     <!-- Option that permits user save on File System -->
@@ -2802,16 +2770,12 @@
     <string name="message_set_chat_private">[A]%1$s[/A][B] enabled encryption key rotation.[/B]</string>
     <!-- error message shown when a chat link is invalid -->
     <string name="invalid_chat_link">This conversation is no longer available</string>
-    <!-- error message shown when a chat link is not well formed -->
-    <string name="invalid_chat_link_args">Invalid chat link</string>
     <!-- When it is creating a new group chat, this option permits to establish it private or public -->
     <string name="ekr_label">Encryption key rotation</string>
     <!-- Text of the dialog to change a public chat to private (enable encryption key rotation) -->
     <string name="ekr_explanation">Encryption key rotation is slightly more secure, but does not allow you to create a chat link and new participants will not see past messages.</string>
     <!-- Text of the dialog to change a public chat to private (enable encryption key rotation) -->
     <string name="subtitle_chat_message_enabled_ERK">Encryption key rotation is slightly more secure, but does not allow you to create a chat link and new participants will not see past messages.</string>
-    <!-- Menu item -->
-    <string name="action_open_chat_link">Open chat link</string>
     <!-- Message shown when a contact request has not been sent because the invitation has been sent before -->
     <string name="invite_not_sent_already_sent">The invitation to contact %s has been sent before and can be consulted in the Sent Requests tab.</string>
     <!-- Label shown to indicate the QR is saving in Cloud Drive -->
@@ -3126,8 +3090,6 @@
     </plurals>
     <!-- Title of a chat message that contains geolocation info -->
     <string name="title_geolocation_message">Pinned Location</string>
-    <!-- Text of the button to indicate an attachment upload from file system -->
-    <string name="attachment_upload_panel_from_device">From File System</string>
     <!-- Alert shown when a num of files have not been sent because of any error occurs, Plural of file. 2 files -->
     <plurals name="num_files_not_send">
         <item quantity="one">%d file was not sent to %d chats</item>
@@ -3270,22 +3232,6 @@
     <string name="text_join_call">To join this call you have to end your current call.</string>
     <!-- Text of the dialog shown when you want to join a group call but you are in another active call -->
     <string name="text_join_another_call">To join this call you have to end or hold the current call.</string>
-    <!-- Hint shown in the open chat link alert dialog -->
-    <string name="hint_enter_chat_link">Enter chat link</string>
-    <!-- Hint shown in the open link alert dialog -->
-    <string name="hint_paste_link">Paste link</string>
-    <!-- Error shown when it tries to open an invalid file or folder link -->
-    <string name="invalid_file_folder_link">Invalid file or folder link</string>
-    <!-- Error shown when it tries to open an invalid file or folder link and the text view is empty -->
-    <string name="invalid_file_folder_link_empty">Please enter a valid file or folder link</string>
-    <!-- Error shown when it tries to open an invalid chat link and the text view is empty -->
-    <string name="invalid_chat_link_empty">Please enter a valid chat link</string>
-    <!-- Error shown when it tries to open a chat link from the Cloud Drive section -->
-    <string name="valid_chat_link">You have pasted a chat link.</string>
-    <!-- Error shown when it tries to open a contact link from the Cloud Drive section -->
-    <string name="valid_contact_link">You have pasted a contact link.</string>
-    <!-- Menu item -->
-    <string name="action_open_contact_link">Open contact link</string>
     <!-- Explanation of the dialog shown to share a chat link -->
     <string name="copy_link_explanation">People can join your group by using this link.</string>
     <!-- Label that indicates the creation of a chat link -->
@@ -3339,7 +3285,7 @@
         <item quantity="other">%d files pending.</item>
     </plurals>
     <!-- Title of the login screen -->
-    <string name="login_to_mega">Log in to MEGA</string>
+    <string name="login_to_mega">Log into MEGA</string>
     <!-- Title of the create account screen -->
     <string name="create_account_title">Create your MEGA account</string>
     <!-- Label to reference a recents section -->
@@ -3748,7 +3694,7 @@
     <!-- Explanation of a warning recommending upgrade to Pro in relation to link available options -->
     <string name="link_upgrade_pro_explanation">MEGA Pro users have exclusive access to additional link safety features making your account even more secure.</string>
     <!-- Meaning of links decryption key -->
-    <string name="decryption_key_explanation">Our end-to-end encryption system requires a unique key automatically generated for this file. A link with this key is created by default, but you can export the decryption key separately for an added layer of security.</string>
+    <string name="decryption_key_explanation">Our end-to-end encryption system requires a unique key automatically generated for this file or folder. A link with this key is created by default, but you can export the decryption key separately for an added layer of security.</string>
     <!-- Reset password label -->
     <string name="reset_password_label">Reset password</string>
     <!-- Warning show to the user when has enable to send the decryption key of a link separately and tries to share the link -->
@@ -3768,7 +3714,7 @@
     <!-- Context menu item. Allows user to delete file/folder from favourites -->
     <string name="file_properties_unfavourite">Remove favourite</string>
     <!-- Context menu item. Allows to mark file/folder with own color label -->
-    <string name="file_properties_label">Label&#8230;</string>
+    <string name="file_properties_label">Label</string>
     <!-- Information text to let’s the user know that they can remove a colour from a folder or file that was already marked. -->
     <string name="action_remove_label">Remove label</string>
     <!-- Title text to show label selector. -->
@@ -3800,19 +3746,13 @@
     <!-- Preferences screen item title for cookie settings -->
     <string name="settings_about_cookie_settings">Cookie Settings</string>
     <!-- Cookie dialog title -->
-    <string name="dialog_cookie_alert_title">Before you continue</string>
+    <string name="dialog_cookie_alert_title">Your privacy</string>
     <!-- Cookie dialog message. Please, keep the placeholders to format the string. -->
-    <string name="dialog_cookie_alert_message">We use local storage and similar technologies (’Cookies’) to provide our services to you, enhance your experience with our services and customize the adverts you see, including through third parties. Accept our use of Cookies from the beginning of your visit or customise Cookies in Cookie Settings. Read more in our [A]Cookie Policy[/A].</string>
+    <string name="dialog_cookie_alert_message">We use Cookies and similar technologies (’Cookies’) to provide and enhance your experience with our services. Accept our use of Cookies from the beginning of your visit or customise Cookies in Cookie Settings. Read more in our [A]Cookie Policy[/A].</string>
     <!-- Cookie dialog message showed when there are unsaved settings. -->
     <string name="dialog_cookie_alert_unsaved">Cookie Settings unsaved.</string>
     <!-- Snackbar message showed when there settings has been saved successfully. -->
     <string name="dialog_cookie_snackbar_saved">Cookie Settings changes have been saved</string>
-    <!-- Cookie dialog third party first subtitle -->
-    <string name="dialog_cookie_thirdparty_subtitle1">Google Advertising Cookies</string>
-    <!-- Cookie dialog third party second subtitle -->
-    <string name="dialog_cookie_thirdparty_subtitle2">Category: Advertising Cookies</string>
-    <!-- Cookie dialog third party message. Please, keep the placeholders to format the string. -->
-    <string name="dialog_cookie_thirdparty_message">Used by Google to:\n• customise the adverts Google shows on ours and other services and websites, based on such things as your location and other websites you’ve previously visited;\n• monitor how often you are displayed certain adverts;\n• provide fraud prevention; and\n• determine when you tap on a particular advert and then to track the following actions you take in response to that advert.\nhttps://policies.google.com/technologies/partner-sites</string>
     <!-- Preference screen item title -->
     <string name="preference_cookies_accept">Accept Cookies</string>
     <!-- Preference screen item title -->
@@ -3820,21 +3760,9 @@
     <!-- Preference screen item summary -->
     <string name="preference_cookies_essential_summary">Essential for providing you important functionality and secure access to our services. For this reason, they do not require consent.</string>
     <!-- Preference screen item title -->
-    <string name="preference_cookies_preference_title">Preference Cookies</string>
-    <!-- Preference screen item summary -->
-    <string name="preference_cookies_preference_summary">Allow us to remember certain display and formatting settings you choose. Not accepting these Cookies will mean we won’t be able to remember some things for you such as your preferred screen layout.</string>
-    <!-- Preference screen item title -->
     <string name="preference_cookies_performance_title">Performance and Analytics Cookies</string>
     <!-- Preference screen item summary -->
     <string name="preference_cookies_performance_summary">Help us to understand how you use our services and provide us data that we can use to make improvements. Not accepting these Cookies will mean we will have less data available to us to help design improvements.</string>
-    <!-- Preference screen item title -->
-    <string name="preference_cookies_advertising_title">Advertising Cookies</string>
-    <!-- Preference screen item summary -->
-    <string name="preference_cookies_advertising_summary">Used by us and our approved advertising partners to customise the adverts you see on our services and on other websites based on your browsing history. Not accepting these Cookies means we may show advertisements that are less relevant.</string>
-    <!-- Preference screen item title -->
-    <string name="preference_cookies_thirdparty_title">Third Party Cookies</string>
-    <!-- Preference screen item summary. Please, keep the placeholders to format the string. -->
-    <string name="preference_cookies_thirdparty_summary">These are Cookies which are controlled by someone other than us; we use these Cookies to provide the types of functionality described above. Not accepting these Cookies will have different implications depending on what type of Cookie each third party Cookie is. Tap on “More Information” below for details on all the third party Cookies we use.</string>
     <!-- Preference screen item state description -->
     <string name="preference_cookies_always_on">Always On</string>
     <!-- Menu option that allows the user to scan document and upload it directly to MEGA. -->
@@ -3863,7 +3791,7 @@
     <string name="file_created">File created</string>
     <!-- Warning indicating a file was not created successfully -->
     <string name="file_creation_failed">File creation failed. Please try again.</string>
-    <!-- Label indicating a file was saved to some folder. e.g.: File saved to Cloud Drive -->
+    <!-- Label indicating a file was saved to some folder. e.g.: File saved to Cloud Drive. "Cloud Drive" is the only destination for the time being, thus any article isn't needed -->
     <string name="file_saved_to">File saved to %1$s</string>
     <!-- Warning indicating a file was not saved to some folder. e.g.: File not saved to Cloud Drive. Try again -->
     <string name="file_saved_to_failed">File not saved to %1$s. Try again.</string>
@@ -3978,8 +3906,6 @@
     </plurals>
     <!-- Button of the warning dialog indicating the renamed name file extension is not the same to confirm the change. -->
     <string name="action_change_anyway">Change anyway</string>
-    <!-- Snackbar text to display if the user doesn't grant the permission to access all files on a device with Android 11 or higher -->
-    <string name="snackbar_storage_permission_denied_android_11">Permission needed to access storage.</string>
     <!-- String to show the transfer quota and the used space in My Account section. E.g.: -->
     <string name="used_storage_transfer">%1$s / %2$s</string>
     <!-- String to show the transfer quota and the used space in My Account section -->
@@ -4059,9 +3985,9 @@
     <!-- General label for microphone -->
     <string name="general_mic">Mic</string>
     <!-- General label for microphone muted -->
-    <string name="general_mic_mute">Your microphone is muted</string>
+    <string name="general_mic_mute">Your microphone is turned off</string>
     <!-- General label for microphone unmuted -->
-    <string name="general_mic_unmute">Your microphone is unmuted</string>
+    <string name="general_mic_unmute">Your microphone is turned on</string>
     <!-- General label for camera -->
     <string name="general_camera">Camera</string>
     <!-- General label for camera enable -->
@@ -4077,9 +4003,9 @@
     <!-- General label for headphone on-->
     <string name="general_headphone_on">Headphones are active</string>
     <!-- General label for speaker on-->
-    <string name="general_speaker_on">Speaker is on</string>
+    <string name="general_speaker_on">Your speaker is turned on</string>
     <!-- General label for speaker off-->
-    <string name="general_speaker_off">Speaker is off</string>
+    <string name="general_speaker_off">Your speaker is turned off</string>
     <!-- Label for end meeting-->
     <string name="meeting_end">End</string>
     <!-- Invite contacts as participants of the meeting-->
@@ -4200,6 +4126,26 @@
     <string name="video_quality_info">You can save space by decreasing the video quality in Camera Uploads settings.</string>
     <!-- Label indicating video original quality -->
     <string name="original_quality">Original quality</string>
+    <!-- Settings label which allows to enable or disable fingerprint unlock. -->
+    <string name="setting_fingerprint">Fingerprint ID</string>
+    <!-- Title of the dialog which allows to enable the fingerprint unlock. -->
+    <string name="title_enable_fingerprint">Confirm your fingerprint to unlock</string>
+    <!-- Title of the dialog which allows to unlock the app with the fingerprint. -->
+    <string name="title_unlock_fingerprint">Unlock using your fingerprint</string>
+    <!-- Button of the dialog which allows to unlock the app with the fingerprint. Gives the option to unlock with the passcode instead -->
+    <string name="action_use_passcode">Use passcode</string>
+    <!-- Message informing the fingerprint was enabled successfully -->
+    <string name="confirmation_fingerprint_enabled">Your fingerprint is confirmed</string>
+    <!-- Warning indicating an image (GIF) cannot be inserted in an input text. Same string than the one shown by the system when it detects this behaviour on its own. -->
+    <string name="image_insertion_not_allowed">MEGA does not support image insertion here</string>
+    <!-- The label under the button of viewing all images screen -->
+    <string name="section_images">Images</string>
+    <!-- Title of the dialog warning the user about disable file versioning. -->
+    <string name="disable_versioning_label">Disable file versioning</string>
+    <!-- Warning of the dialog informing the user about disable file versioning. -->
+    <string name="disable_versioning_warning">Our file versioning feature ensures that we keep older copies of your files around if you replace them with newer versions. If you disable File Versioning you will no longer have this protection; the old copy will be lost when you replace it.</string>
+    <!-- Warning informing the user the folder location is trying to open no longer exists. -->
+    <string name="location_not_exist">This location no longer exists.</string>
     <!-- If users want to move the root backup folder, all backups underneath it are disabled. Warning dialog will show to confirm -->
     <string name="backup_move_root_folder">You are changing a default backup folder loacation. This may affect your ability to find your backup folder in the future. Please remember where it is located so that you can find it in the future.</string>
     <!-- If users want to move the sub backup folder, all backups underneath it are disabled. Warning dialog will show to confirm -->

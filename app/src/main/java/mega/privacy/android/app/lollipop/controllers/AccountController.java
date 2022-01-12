@@ -40,6 +40,7 @@ import mega.privacy.android.app.lollipop.TwoFactorAuthenticationActivity;
 import mega.privacy.android.app.lollipop.VerifyTwoFactorActivity;
 import mega.privacy.android.app.sync.BackupToolsKt;
 import mega.privacy.android.app.psa.PsaManager;
+import mega.privacy.android.app.utils.ZoomUtil;
 import mega.privacy.android.app.utils.contacts.MegaContactGetter;
 import mega.privacy.android.app.utils.LastShowSMSDialogTimeChecker;
 import nz.mega.sdk.MegaApiAndroid;
@@ -58,7 +59,7 @@ import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.SharedPreferenceConstants.USER_INTERFACE_PREFERENCES;
 import static mega.privacy.android.app.utils.StorageUtils.thereIsNotEnoughFreeSpace;
 import static mega.privacy.android.app.utils.StringResourcesUtils.getString;
-import static mega.privacy.android.app.utils.PermissionUtils.*;
+import static mega.privacy.android.app.utils.permission.PermissionUtils.*;
 import static mega.privacy.android.app.utils.Util.*;
 
 public class AccountController {
@@ -69,20 +70,7 @@ public class AccountController {
     public AccountController(Context context){
         logDebug("AccountController created");
         this.context = context;
-
-        if (megaApi == null){
-            if (context instanceof MegaApplication){
-                megaApi = ((MegaApplication)context).getMegaApi();
-            }
-            else{
-                megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();
-            }
-        }
-    }
-
-    public AccountController(Context context, MegaApiAndroid megaApi){
-        this.context = context;
-        this.megaApi = megaApi;
+        this.megaApi = MegaApplication.getInstance().getMegaApi();
     }
 
     public void resetPass(String myEmail){
@@ -395,6 +383,9 @@ public class AccountController {
         //clear user interface preferences
         context.getSharedPreferences(USER_INTERFACE_PREFERENCES, Context.MODE_PRIVATE)
                 .edit().clear().apply();
+
+        //reset zoom level
+        ZoomUtil.INSTANCE.resetZoomLevel();
 
         removeEmojisSharedPreferences();
 

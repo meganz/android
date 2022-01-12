@@ -42,7 +42,7 @@ data class Participant(
             try {
                 displayName = displayName.replace(
                     "[A]", "<font color='"
-                            + getColorHexString(context, R.color.grey_600) + "'>"
+                            + getColorHexString(context, R.color.grey_200) + "'>"
                 )
                 displayName = displayName.replace("[/A]", "</font>")
             } catch (e: Exception) {

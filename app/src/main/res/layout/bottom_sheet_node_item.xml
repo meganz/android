@@ -42,7 +42,7 @@
                     android:layout_height="wrap_content"
                     android:singleLine="true"
                     android:ellipsize="middle"
-                    android:textAppearance="?attr/textAppearanceSubtitle1"/>
+                    style="@style/textAppearanceSubtitle1" />
 
                 <RelativeLayout
                     android:id="@+id/node_relative_layout_icon"
@@ -58,7 +58,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:background="@null"
-                        app:tint="?android:attr/textColorSecondary"/>
+                        app:tint="?android:attr/textColorSecondary" />
 
                 </RelativeLayout>
 
@@ -152,6 +152,31 @@
                 style="@style/BottomSheetOption"
                 android:text="@string/view_in_folder_label"
                 app:drawableStartCompat="@drawable/ic_upload_pick_file"/>
+
+            <LinearLayout
+                android:id="@+id/option_versions_layout"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:visibility="gone">
+
+                <TextView
+                    android:id="@+id/versions_option"
+                    style="@style/BottomSheetOption"
+                    android:layout_weight="1"
+                    android:text="@string/title_section_versions"
+                    app:drawableStartCompat="@drawable/ic_g_version" />
+
+                <TextView
+                    android:id="@+id/versions"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_marginEnd="16dp"
+                    android:layout_weight="1"
+                    android:gravity="end|center_vertical"
+                    android:textAppearance="@style/TextAppearance.Mega.Body2.Secondary.Variant" />
+            </LinearLayout>
 
             <TextView
                 android:id="@+id/favorite_option"

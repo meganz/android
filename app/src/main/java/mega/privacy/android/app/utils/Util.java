@@ -1097,34 +1097,58 @@ public class Util {
 		window.setStatusBarColor(ContextCompat.getColor(activity, color));
 	}
 
+	/**
+	 * Gets the status bar height if available.
+	 *
+	 * @return The status bar height if available.
+	 */
 	public static int getStatusBarHeight() {
+		return getSystemBarHeight("status_bar_height");
+	}
+
+	/**
+	 * Gets the navigation bar height if available.
+	 *
+	 * @return The status bar height if available.
+	 */
+	public static int getNavigationBarHeight() {
+		return getSystemBarHeight("navigation_bar_height");
+	}
+
+	/**
+	 * Gets a system bar height if available.
+	 *
+	 * @param systemBarName The system bar name.
+	 * @return The system bar height if available.
+	 */
+	public static int getSystemBarHeight(String systemBarName) {
 		Context context = MegaApplication.getInstance().getBaseContext();
-		int resourceId = context.getResources().getIdentifier("status_bar_height", "dimen",
+		int resourceId = context.getResources().getIdentifier(systemBarName, "dimen",
 				"android");
 
 		return resourceId > 0 ? context.getResources().getDimensionPixelSize(resourceId)
-				: dp2px(24, context.getResources().getDisplayMetrics());
+				: 0;
 	}
 
 	public static MegaPreferences getPreferences (Context context) {
 		return DatabaseHandler.getDbHandler(context).getPreferences();
 	}
 
-    public static boolean askMe (Context context) {
-		DatabaseHandler dbH = DatabaseHandler.getDbHandler(context);
-		MegaPreferences prefs = dbH.getPreferences();
+	/**
+	 * Checks if should ask for download location.
+	 *
+	 * @return True if should ask for download location, false otherwise.
+	 */
+	public static boolean askMe() {
+		MegaPreferences prefs = DatabaseHandler.getDbHandler(MegaApplication.getInstance())
+				.getPreferences();
 
-		if (prefs != null){
-			if (prefs.getStorageAskAlways() != null){
-				if (!Boolean.parseBoolean(prefs.getStorageAskAlways())){
-					if (prefs.getStorageDownloadLocation() != null){
-						if (prefs.getStorageDownloadLocation().compareTo("") != 0){
-							return false;
-						}
-					}
-				}
-			}
+		if (prefs != null && prefs.getStorageAskAlways() != null
+				&& !Boolean.parseBoolean(prefs.getStorageAskAlways())
+				&& prefs.getStorageDownloadLocation() != null) {
+			return TextUtil.isTextEmpty(prefs.getStorageDownloadLocation());
 		}
+
 		return true;
 	}
 
@@ -1205,7 +1229,7 @@ public class Util {
 		}
 	}
 
-    private static View getRootViewFromContext(Context context) {
+    public static View getRootViewFromContext(Context context) {
         BaseActivity activity = (BaseActivity)context;
         View rootView = null;
         try {
@@ -1463,6 +1487,15 @@ public class Util {
 		}
 	}
 
+	/**
+	 * Checks if the current Android version is Android 11 or upper.
+	 *
+	 * @return True if the current Android version is Android 11 or upper, false otherwise.
+	 */
+	public static boolean isAndroid11OrUpper() {
+		return Build.VERSION.SDK_INT >= Build.VERSION_CODES.R;
+	}
+
 	public static boolean isAndroid10() {
 		return Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q;
 	}
@@ -1562,7 +1595,13 @@ public class Util {
      */
     public static void storeDownloadLocationIfNeeded(String downloadLocation) {
         DatabaseHandler dbH = MegaApplication.getInstance().getDbH();
-        boolean askMe = Boolean.parseBoolean(dbH.getPreferences().getStorageAskAlways());
+
+        MegaPreferences preferences = dbH.getPreferences();
+
+        boolean askMe = true;
+        if (preferences != null && preferences.getStorageAskAlways() != null) {
+            askMe = Boolean.parseBoolean(preferences.getStorageAskAlways());
+        }
 
         // Should set as default download location.
         if (!askMe) {

@@ -142,33 +142,6 @@ public class NodeController {
         ((ManagerActivityLollipop) context).startActivityForResult(intent, REQUEST_CODE_SELECT_FOLDER_TO_MOVE);
     }
 
-    public void moveNodes(long[] moveHandles, long toHandle){
-        logDebug("moveNodes");
-
-        if(!isOnline(context)){
-            ((SnackbarShower) context).showSnackbar(SNACKBAR_TYPE, getString(R.string.error_server_connection_problem), -1);
-            return;
-        }
-
-        MegaNode parent = megaApi.getNodeByHandle(toHandle);
-        if(parent!=null){
-            MultipleRequestListener moveMultipleListener = new MultipleRequestListener(MULTIPLE_MOVE, context);
-
-            if(moveHandles.length>1){
-                logDebug("MOVE multiple: " + moveHandles.length);
-
-                for(int i=0; i<moveHandles.length;i++){
-                    megaApi.moveNode(megaApi.getNodeByHandle(moveHandles[i]), parent, moveMultipleListener);
-                }
-            }
-            else{
-                logDebug("MOVE single");
-
-                megaApi.moveNode(megaApi.getNodeByHandle(moveHandles[0]), parent, (ManagerActivityLollipop) context);
-            }
-        }
-    }
-
     public void checkIfNodesAreMine(List<MegaNode> nodes, ArrayList<MegaNode> ownerNodes, ArrayList<MegaNode> notOwnerNodes) {
         MegaNode currentNode;
 
@@ -349,47 +322,6 @@ public class NodeController {
         intent.putExtra("MULTISELECT", 0);
         intent.putExtra(AddContactActivityLollipop.EXTRA_NODE_HANDLE, node.getHandle());
         ((ManagerActivityLollipop) context).startActivityForResult(intent, REQUEST_CODE_SELECT_CONTACT);
-    }
-
-    public void moveToTrash(final ArrayList<Long> handleList, boolean moveToRubbish){
-        logDebug("moveToTrash: " + moveToRubbish);
-
-        MultipleRequestListener moveMultipleListener;
-        MegaNode parent;
-        //Check if the node is not yet in the rubbish bin (if so, remove it)
-        if(handleList!=null){
-            if(handleList.size()>1){
-                logDebug("MOVE multiple: " + handleList.size());
-                if (moveToRubbish){
-                    moveMultipleListener = new MultipleRequestListener(MULTIPLE_SEND_RUBBISH, context);
-                }
-                else{
-                    moveMultipleListener = new MultipleRequestListener(MULTIPLE_MOVE, context);
-                }
-                for (int i=0;i<handleList.size();i++){
-                    if (moveToRubbish){
-                        megaApi.moveNode(megaApi.getNodeByHandle(handleList.get(i)), megaApi.getRubbishNode(), moveMultipleListener);
-
-                    }
-                    else{
-                        megaApi.remove(megaApi.getNodeByHandle(handleList.get(i)), moveMultipleListener);
-                    }
-                }
-            }
-            else{
-                logDebug("MOVE single");
-                if (moveToRubbish){
-                    megaApi.moveNode(megaApi.getNodeByHandle(handleList.get(0)), megaApi.getRubbishNode(), ((ManagerActivityLollipop) context));
-                }
-                else{
-                    megaApi.remove(megaApi.getNodeByHandle(handleList.get(0)), ((ManagerActivityLollipop) context));
-                }
-            }
-        }
-        else{
-            logWarning("handleList NULL");
-            return;
-        }
     }
 
     public void openFolderFromSearch(long folderHandle){

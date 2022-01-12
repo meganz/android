@@ -97,7 +97,7 @@ import static mega.privacy.android.app.utils.FileUtil.*;
 import static mega.privacy.android.app.utils.JobUtil.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.MegaNodeUtil.getCloudRootHandle;
-import static mega.privacy.android.app.utils.PermissionUtils.*;
+import static mega.privacy.android.app.utils.permission.PermissionUtils.*;
 import static mega.privacy.android.app.utils.Util.*;
 import static nz.mega.sdk.MegaApiJava.*;
 
@@ -1460,6 +1460,9 @@ public class FileProviderActivity extends PasscodeFileProviderActivity implement
 				logDebug("Logged in");
 
 				megaApi.fetchNodes(this);
+
+                // Get cookies settings after login.
+                MegaApplication.getInstance().checkEnabledCookies();
 			}
 		} else if (request.getType() == MegaRequest.TYPE_FETCH_NODES) {
 
@@ -1525,8 +1528,10 @@ public class FileProviderActivity extends PasscodeFileProviderActivity implement
 		logDebug("afterFetchNodes");
 		//Set toolbar
 		tB = findViewById(R.id.toolbar_provider);
+		//Set app bar layout
+		aBL = findViewById(R.id.app_bar_layout_provider);
 
-		RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) tB.getLayoutParams();
+		AppBarLayout.LayoutParams params = (AppBarLayout.LayoutParams) tB.getLayoutParams();
 		params.setMargins(0, 0, 0, 0);
 
 		showAB(tB);

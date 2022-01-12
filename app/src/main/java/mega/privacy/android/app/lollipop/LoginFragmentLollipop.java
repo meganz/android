@@ -56,7 +56,6 @@ import java.util.Locale;
 
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
-import mega.privacy.android.app.MegaAttributes;
 import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.ShareInfo;
@@ -72,8 +71,8 @@ import mega.privacy.android.app.providers.FileProviderActivity;
 import mega.privacy.android.app.upgradeAccount.ChooseAccountActivity;
 import mega.privacy.android.app.utils.ColorUtils;
 import mega.privacy.android.app.utils.MegaNodeUtil;
-import mega.privacy.android.app.utils.PermissionUtils;
 import mega.privacy.android.app.utils.StringResourcesUtils;
+import mega.privacy.android.app.utils.permission.PermissionUtils;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaChatApi;
@@ -107,9 +106,9 @@ import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.ConstantsUrl.RECOVERY_URL;
 import static mega.privacy.android.app.utils.ConstantsUrl.RECOVERY_URL_EMAIL;
 import static mega.privacy.android.app.utils.LogUtil.*;
-import static mega.privacy.android.app.utils.PermissionUtils.hasPermissions;
 import static mega.privacy.android.app.utils.TextUtil.isTextEmpty;
 import static mega.privacy.android.app.utils.Util.*;
+import static mega.privacy.android.app.utils.permission.PermissionUtils.hasPermissions;
 import static nz.mega.sdk.MegaApiJava.STORAGE_STATE_PAYWALL;
 import static nz.mega.sdk.MegaApiJava.USER_ATTR_MY_BACKUPS_FOLDER;
 
@@ -215,9 +214,6 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
     public static final String NAME_USER_LOCKED = "NAME_USER_LOCKED";
     private Intent receivedIntent;
     private ArrayList<ShareInfo> shareInfos;
-
-    private final static int DATA_AGGREGATE = 2;
-    private int mDataCount;
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
@@ -1461,36 +1457,30 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
             }
             case R.id.login_text_view:
                 numberOfClicksKarere++;
-                if (numberOfClicksKarere == 5){
-                    MegaAttributes attrs = dbH.getAttributes();
-                    if (attrs != null && attrs.getFileLoggerKarere() != null) {
-                        if (Boolean.parseBoolean(attrs.getFileLoggerKarere())) {
-                            numberOfClicksKarere = 0;
-                            setStatusLoggerKarere(context, false);
-                            break;
-                        }
+
+                if (numberOfClicksKarere == CLICKS_ENABLE_DEBUG) {
+                    if (areKarereLogsEnabled()) {
+                        numberOfClicksKarere = 0;
+                        setStatusLoggerKarere(context, false);
                     } else {
-                        logWarning("Karere file logger attribute is NULL");
+                        ((LoginActivityLollipop) context).showConfirmationEnableLogsKarere();
                     }
-                    ((LoginActivityLollipop) context).showConfirmationEnableLogsKarere();
                 }
+
                 break;
 
             case R.id.text_newToMega:
                 numberOfClicksSDK++;
-                if (numberOfClicksSDK == 5) {
-                    MegaAttributes attrs = dbH.getAttributes();
-                    if (attrs != null && attrs.getFileLoggerSDK() != null) {
-                        if (Boolean.parseBoolean(attrs.getFileLoggerSDK())) {
-                            numberOfClicksSDK = 0;
-                            setStatusLoggerSDK(context, false);
-                            break;
-                        }
+
+                if (numberOfClicksSDK == CLICKS_ENABLE_DEBUG) {
+                    if (areSDKLogsEnabled()) {
+                        numberOfClicksSDK = 0;
+                        setStatusLoggerSDK(context, false);
                     } else {
-                        logWarning("SDK file logger attribute is NULL");
+                        ((LoginActivityLollipop) context).showConfirmationEnableLogsSDK();
                     }
-                    ((LoginActivityLollipop) context).showConfirmationEnableLogsSDK();
                 }
+
                 break;
 
             case R.id.lost_authentication_device: {
@@ -1933,6 +1923,9 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
 
                 megaApi.fetchNodes(this);
                 megaApi.getMyBackupsFolder(this);
+
+                // Get cookies settings after login.
+                MegaApplication.getInstance().checkEnabledCookies();
             }
         } else if(request.getType() == MegaRequest.TYPE_LOGOUT) {
             logDebug("TYPE_LOGOUT");
@@ -2000,7 +1993,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                     }
                 }
 
-                goToMainActivityIfDataReady();
+                readyToManager();
             } else {
                 if(confirmLogoutDialog != null) {
                     confirmLogoutDialog.dismiss();
@@ -2135,7 +2128,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                 MegaNodeUtil.myBackupHandle = request.getNodeHandle();
             }
 
-            goToMainActivityIfDataReady();
+            readyToManager();
         }
     }
 
@@ -2592,9 +2585,5 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
         });
         builder.setCancelable(false);
         builder.show();
-    }
-
-    private void goToMainActivityIfDataReady() {
-        if (++mDataCount == DATA_AGGREGATE) readyToManager();
     }
 }

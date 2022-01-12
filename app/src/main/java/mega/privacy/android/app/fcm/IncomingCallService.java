@@ -230,6 +230,9 @@ public class IncomingCallService extends Service implements MegaRequestListenerI
                 megaApiFolder.setAccountAuth(megaApi.getAccountAuth());
                 logDebug("Calling fetchNodes from MegaFireBaseMessagingService");
                 megaApi.fetchNodes(this);
+
+                // Get cookies settings after login.
+                MegaApplication.getInstance().checkEnabledCookies();
             } else {
                 logError("ERROR: " + e.getErrorString());
             }
