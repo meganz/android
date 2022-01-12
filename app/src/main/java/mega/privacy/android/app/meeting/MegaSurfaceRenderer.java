@@ -15,6 +15,7 @@ package mega.privacy.android.app.meeting;
 
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.PorterDuff;
@@ -202,6 +203,8 @@ public class MegaSurfaceRenderer implements Callback, TextureView.SurfaceTexture
         Canvas canvas = isGroup ? myTexture.lockCanvas() : surfaceHolder.lockCanvas();
 
         if (canvas == null) return;
+        canvas.drawColor(Color.TRANSPARENT, PorterDuff.Mode.MULTIPLY);
+
 
         if (isLocal && isFrontCameraInUse()) {
             canvas.scale(-1, 1);
@@ -216,7 +219,6 @@ public class MegaSurfaceRenderer implements Callback, TextureView.SurfaceTexture
         } else {
             paint = null;
         }
-
         canvas.drawBitmap(bitmap, srcRect, dstRect, paint);
 
         if (isGroup) {

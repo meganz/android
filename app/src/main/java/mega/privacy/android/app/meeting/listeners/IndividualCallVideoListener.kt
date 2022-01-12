@@ -55,12 +55,6 @@ class IndividualCallVideoListener(
         // Re-calculate the camera preview ratio when surface view size changed
         if (this.width != width || this.height != height
             || viewWidth != surfaceView.width || viewHeight != surfaceView.height) {
-
-
-          //  if((isFloatingWindow &&
-          //          (this.width != width || this.height != height || viewWidth != renderer.surfaceWidth || viewHeight != renderer.surfaceHeight)) ||
-           // (!isFloatingWindow && (this.width != width || this.height != height))){
-
             this.width = width
             this.height = height
             val holder = surfaceView.holder
@@ -96,7 +90,6 @@ class IndividualCallVideoListener(
         bitmap!!.copyPixelsFromBuffer(ByteBuffer.wrap(byteBuffer))
         if (VideoCaptureUtils.isVideoAllowed()) {
             renderer.drawBitmap(isLocal, false)
-            //renderer.drawBitmapForMeeting(false, isLocal && VideoCaptureUtils.isFrontCameraInUse())
         }
     }
 
