@@ -1,9 +1,7 @@
 package mega.privacy.android.app.lollipop;
 
-import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
@@ -60,6 +58,8 @@ import mega.privacy.android.app.ShareInfo;
 import mega.privacy.android.app.TransfersManagementActivity;
 import mega.privacy.android.app.UploadService;
 import mega.privacy.android.app.UserCredentials;
+import mega.privacy.android.app.usecase.CheckNameCollisionUseCase;
+import mega.privacy.android.app.usecase.exception.MegaNodeException;
 import mega.privacy.android.app.utils.MegaProgressDialogUtil;
 import mega.privacy.android.app.generalusecase.FilePrepareUseCase;
 import mega.privacy.android.app.interfaces.ActionNodeCallback;
@@ -178,6 +178,8 @@ public class FileExplorerActivityLollipop extends TransfersManagementActivity
 
 	@Inject
 	FilePrepareUseCase filePrepareUseCase;
+	@Inject
+	CheckNameCollisionUseCase checkNameCollisionUseCase;
 
 	private DatabaseHandler dbH;
 	private MegaPreferences prefs;
@@ -1981,27 +1983,39 @@ public class FileExplorerActivityLollipop extends TransfersManagementActivity
 		}
 
 		File file;
-		if (isURL){
+		if (isURL) {
 			file = createTemporalURLFile(this, name, data);
-		}
-		else {
+		} else {
 			file = createTemporalTextFile(this, name, data);
 		}
-		if(file!=null){
-			Intent intent = new Intent(this, UploadService.class);
-			intent.putExtra(UploadService.EXTRA_FILEPATH, file.getAbsolutePath());
-			intent.putExtra(UploadService.EXTRA_NAME, file.getName());
-			intent.putExtra(UploadService.EXTRA_PARENT_HASH, parentNode.getHandle());
-			intent.putExtra(UploadService.EXTRA_SIZE, file.getTotalSpace());
-			startService(intent);
 
-			logDebug("After UPLOAD click - back to Cloud");
-			this.backToCloud(parentNode.getHandle(), 1);
-			finishActivity();
+		if (file == null) {
+			showSnackbar(StringResourcesUtils.getString(R.string.general_text_error));
+			return;
 		}
-		else{
-			showSnackbar(getString(R.string.general_text_error));
-		}
+
+		checkNameCollisionUseCase.check(file.getName(), parentNode)
+				.subscribeOn(Schedulers.io())
+				.observeOn(AndroidSchedulers.mainThread())
+				.subscribe(() -> {
+							Intent intent = new Intent(this, UploadService.class);
+							intent.putExtra(UploadService.EXTRA_FILEPATH, file.getAbsolutePath());
+							intent.putExtra(UploadService.EXTRA_NAME, file.getName());
+							intent.putExtra(UploadService.EXTRA_PARENT_HASH, parentNode.getHandle());
+							intent.putExtra(UploadService.EXTRA_SIZE, file.getTotalSpace());
+							startService(intent);
+
+							logDebug("After UPLOAD click - back to Cloud");
+							this.backToCloud(parentNode.getHandle(), 1);
+							finishActivity();
+						},
+						throwable -> {
+							if (throwable instanceof MegaNodeException.ChildAlreadyExistsException) {
+								//TODO Show name collision activity
+							} else {
+								showSnackbar(StringResourcesUtils.getString(R.string.general_text_error));
+							}
+						});
 	}
 
 	@Override

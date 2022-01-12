@@ -64,15 +64,12 @@ import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.widget.SearchView;
 
-import android.text.Editable;
 import android.text.Html;
 import android.text.Spanned;
-import android.text.TextWatcher;
 import android.util.DisplayMetrics;
 import android.util.Pair;
 import android.view.Display;
 import android.view.Gravity;
-import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -81,17 +78,14 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.view.Window;
-import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.Chronometer;
-import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-import android.widget.TextView.OnEditorActionListener;
 
 import com.ittianyu.bottomnavigationviewex.BottomNavigationViewEx;
 import com.jeremyliao.liveeventbus.LiveEventBus;
@@ -125,7 +119,6 @@ import mega.privacy.android.app.MegaAttributes;
 import mega.privacy.android.app.MegaContactAdapter;
 import mega.privacy.android.app.MegaOffline;
 import mega.privacy.android.app.MegaPreferences;
-import mega.privacy.android.app.OpenPasswordLinkActivity;
 import mega.privacy.android.app.Product;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.objects.PasscodeManagement;
@@ -211,6 +204,8 @@ import mega.privacy.android.app.usecase.GetNodeUseCase;
 import mega.privacy.android.app.usecase.MoveNodeUseCase;
 import mega.privacy.android.app.usecase.RemoveNodeUseCase;
 import mega.privacy.android.app.usecase.data.MoveRequestResult;
+import mega.privacy.android.app.usecase.CheckNameCollisionUseCase;
+import mega.privacy.android.app.usecase.exception.MegaNodeException;
 import mega.privacy.android.app.utils.AlertsAndWarnings;
 import mega.privacy.android.app.utils.CallUtil;
 import mega.privacy.android.app.utils.ChatUtil;
@@ -386,6 +381,8 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 	RemoveNodeUseCase removeNodeUseCase;
 	@Inject
 	GetNodeUseCase getNodeUseCase;
+	@Inject
+	CheckNameCollisionUseCase checkNameCollisionUseCase;
 
 	public ArrayList<Integer> transfersInProgress;
 	public MegaTransferData transferData;
@@ -8005,7 +8002,21 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 		else if (requestCode == TAKE_PHOTO_CODE) {
 			logDebug("TAKE_PHOTO_CODE");
             if (resultCode == Activity.RESULT_OK) {
-                uploadTakePicture(this, getCurrentParentHandle(), megaApi);
+            	long parentHandle = getCurrentParentHandle();
+            	File file = getTemporalTakePictureFile(this);
+				if (file != null) {
+					checkNameCollisionUseCase.check(file.getName(), parentHandle)
+							.subscribeOn(Schedulers.io())
+							.observeOn(AndroidSchedulers.mainThread())
+							.subscribe(() -> uploadFile(managerActivity, file.getAbsolutePath(), parentHandle, megaApi),
+									throwable -> {
+										if (throwable instanceof MegaNodeException.ChildAlreadyExistsException) {
+											//TODO Show name collision activity
+										} else {
+											showSnackbar(SNACKBAR_TYPE, StringResourcesUtils.getString(R.string.general_error), MEGACHAT_INVALID_HANDLE);
+										}
+									});
+				}
             } else {
                 logWarning("TAKE_PHOTO_CODE--->ERROR!");
             }
@@ -8955,26 +8966,37 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 	}
 
 	private void createFile(String name, String data, MegaNode parentNode){
-
 		if (app.getStorageState() == STORAGE_STATE_PAYWALL) {
 			showOverDiskQuotaPaywallWarning();
 			return;
 		}
 
 		File file = createTemporalTextFile(this, name, data);
-		if(file!=null){
-			showSnackbar(SNACKBAR_TYPE, getResources().getQuantityString(R.plurals.upload_began, 1, 1), -1);
+		if (file == null) {
+			showSnackbar(SNACKBAR_TYPE, getString(R.string.general_text_error), MEGACHAT_INVALID_HANDLE);
+			return;
+		}
 
-			Intent intent = new Intent(this, UploadService.class);
-			intent.putExtra(UploadService.EXTRA_FILEPATH, file.getAbsolutePath());
-			intent.putExtra(UploadService.EXTRA_NAME, file.getName());
-			intent.putExtra(UploadService.EXTRA_PARENT_HASH, parentNode.getHandle());
-			intent.putExtra(UploadService.EXTRA_SIZE, file.getTotalSpace());
-			startService(intent);
-		}
-		else{
-			showSnackbar(SNACKBAR_TYPE, getString(R.string.general_text_error), -1);
-		}
+		checkNameCollisionUseCase.check(file.getName(), parentNode)
+				.subscribeOn(Schedulers.io())
+				.observeOn(AndroidSchedulers.mainThread())
+				.subscribe(() -> {
+							showSnackbar(SNACKBAR_TYPE, getResources().getQuantityString(R.plurals.upload_began, 1, 1), MEGACHAT_INVALID_HANDLE);
+
+							Intent intent = new Intent(this, UploadService.class);
+							intent.putExtra(UploadService.EXTRA_FILEPATH, file.getAbsolutePath());
+							intent.putExtra(UploadService.EXTRA_NAME, file.getName());
+							intent.putExtra(UploadService.EXTRA_PARENT_HASH, parentNode.getHandle());
+							intent.putExtra(UploadService.EXTRA_SIZE, file.getTotalSpace());
+							startService(intent);
+						},
+						throwable -> {
+							if (throwable instanceof MegaNodeException.ChildAlreadyExistsException) {
+								//TODO Show name collision activity
+							} else {
+								showSnackbar(SNACKBAR_TYPE, StringResourcesUtils.getString(R.string.general_error), MEGACHAT_INVALID_HANDLE);
+							}
+						});
 	}
 
 	@Override

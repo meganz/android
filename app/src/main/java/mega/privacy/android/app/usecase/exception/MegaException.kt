@@ -1,4 +1,4 @@
-package mega.privacy.android.app.usecase
+package mega.privacy.android.app.usecase.exception
 
 /**
  * Class to manage Errors on requests.

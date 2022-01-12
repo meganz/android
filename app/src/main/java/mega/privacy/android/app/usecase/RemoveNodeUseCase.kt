@@ -6,6 +6,7 @@ import io.reactivex.rxjava3.kotlin.blockingSubscribeBy
 import mega.privacy.android.app.di.MegaApi
 import mega.privacy.android.app.listeners.OptionalMegaRequestListenerInterface
 import mega.privacy.android.app.usecase.data.RemoveRequestResult
+import mega.privacy.android.app.usecase.exception.MegaException
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaError.API_OK
 import nz.mega.sdk.MegaNode

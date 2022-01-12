@@ -9,7 +9,6 @@ import java.io.File;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.UploadService;
-import mega.privacy.android.app.lollipop.FileStorageActivityLollipop;
 import nz.mega.sdk.MegaApiAndroid;
 
 import static mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuotaPaywallWarning;
@@ -56,15 +55,14 @@ public class UploadUtil {
      * This method is to upload camera taken photos to Cloud
      *
      * @param context The context where to start the upload service
-     * @param parentHandle The handle of the folder where photo would be located
-     * @param megaApi The Mega Api to upload the picture
+     * @return The temporal file in which the picture is stored.
      */
-    public static void uploadTakePicture(Context context, long parentHandle, MegaApiAndroid megaApi) {
+    public static File getTemporalTakePictureFile(Context context) {
         logDebug("uploadTakePicture");
         File imgFile = getCacheFile(context, TEMPORAL_FOLDER, "picture.jpg");
         if (!isFileAvailable(imgFile)) {
-            Util.showSnackbar(context, context.getString(R.string.general_error));
-            return;
+            Util.showSnackbar(context, StringResourcesUtils.getString(R.string.general_error));
+            return null;
         }
 
         String name = Util.getPhotoSyncName(imgFile.lastModified(), imgFile.getAbsolutePath());
@@ -72,7 +70,7 @@ public class UploadUtil {
         File newFile = buildTempFile(context, name);
         imgFile.renameTo(newFile);
 
-        uploadFile(context, newFile.getAbsolutePath(), parentHandle, megaApi);
+        return imgFile;
     }
 
     /**

@@ -8,12 +8,18 @@ import android.view.ViewGroup;
 
 import java.io.File;
 
+import dagger.hilt.android.AndroidEntryPoint;
+import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
+import io.reactivex.rxjava3.schedulers.Schedulers;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.ShareInfo;
 import mega.privacy.android.app.UploadService;
 import mega.privacy.android.app.lollipop.FileStorageActivityLollipop;
 import mega.privacy.android.app.lollipop.qrcode.QRCodeActivity;
+import mega.privacy.android.app.usecase.CheckNameCollisionUseCase;
+import mega.privacy.android.app.usecase.exception.MegaNodeException;
+import mega.privacy.android.app.utils.StringResourcesUtils;
 import nz.mega.sdk.MegaNode;
 
 import static mega.privacy.android.app.lollipop.qrcode.MyCodeFragment.QR_IMAGE_FILE_NAME;
@@ -21,12 +27,19 @@ import static mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuota
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
 import static mega.privacy.android.app.utils.FileUtil.*;
 import static mega.privacy.android.app.utils.Constants.*;
+import static mega.privacy.android.app.utils.Util.showSnackbar;
 import static nz.mega.sdk.MegaApiJava.STORAGE_STATE_PAYWALL;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+import javax.inject.Inject;
+
+@AndroidEntryPoint
 public class QRCodeSaveBottomSheetDialogFragment extends BaseBottomSheetDialogFragment implements View.OnClickListener {
+
+    @Inject
+    CheckNameCollisionUseCase checkNameCollisionUseCase;
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -62,24 +75,41 @@ public class QRCodeSaveBottomSheetDialogFragment extends BaseBottomSheetDialogFr
         String myEmail = megaApi.getMyUser().getEmail();
         File qrFile = buildQrFile(getActivity(), myEmail + QR_IMAGE_FILE_NAME);
 
-        if (isFileAvailable(qrFile)) {
-            if (MegaApplication.getInstance().getStorageState() == STORAGE_STATE_PAYWALL) {
-                showOverDiskQuotaPaywallWarning();
-                return;
-            }
-
-            ShareInfo info = ShareInfo.infoFromFile(qrFile);
-            Intent intent = new Intent(getActivity().getApplicationContext(), UploadService.class);
-            intent.putExtra(UploadService.EXTRA_FILEPATH, info.getFileAbsolutePath());
-            intent.putExtra(UploadService.EXTRA_NAME, info.getTitle());
-            intent.putExtra(UploadService.EXTRA_PARENT_HASH, parentNode.getHandle());
-            intent.putExtra(UploadService.EXTRA_SIZE, info.getSize());
-            intent.putExtra("qrfile", true);
-            getActivity().startService(intent);
-            ((QRCodeActivity) getActivity()).showSnackbar(null, getString(R.string.save_qr_cloud_drive, qrFile.getName()));
-        } else {
-            ((QRCodeActivity) getActivity()).showSnackbar(null, getString(R.string.error_upload_qr));
+        if (!isFileAvailable(qrFile)) {
+            showSnackbar(requireActivity(), StringResourcesUtils.getString(R.string.error_upload_qr));
+            return;
         }
+
+        if (MegaApplication.getInstance().getStorageState() == STORAGE_STATE_PAYWALL) {
+            showOverDiskQuotaPaywallWarning();
+            return;
+        }
+
+        checkNameCollisionUseCase.check(qrFile.getName(), parentNode)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(() -> {
+                            ShareInfo info = ShareInfo.infoFromFile(qrFile);
+                            if (info == null) {
+                                showSnackbar(requireActivity(), StringResourcesUtils.getString(R.string.error_upload_qr));
+                                return;
+                            }
+
+                            Intent intent = new Intent(requireActivity(), UploadService.class);
+                            intent.putExtra(UploadService.EXTRA_FILEPATH, info.getFileAbsolutePath());
+                            intent.putExtra(UploadService.EXTRA_NAME, info.getTitle());
+                            intent.putExtra(UploadService.EXTRA_PARENT_HASH, parentNode.getHandle());
+                            intent.putExtra(UploadService.EXTRA_SIZE, info.getSize());
+                            requireActivity().startService(intent);
+                            showSnackbar(requireActivity(), StringResourcesUtils.getString(R.string.save_qr_cloud_drive, qrFile.getName()));
+                        },
+                        throwable -> {
+                            if (throwable instanceof MegaNodeException.ChildAlreadyExistsException) {
+                                //TODO Show name collision activity
+                            } else {
+                                showSnackbar(requireActivity(), StringResourcesUtils.getString(R.string.error_upload_qr));
+                            }
+                        });
     }
 
     private void saveToFileSystem() {

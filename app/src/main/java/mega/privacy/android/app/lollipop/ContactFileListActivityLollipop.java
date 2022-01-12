@@ -57,7 +57,9 @@ import mega.privacy.android.app.modalbottomsheet.UploadBottomSheetDialogFragment
 import mega.privacy.android.app.usecase.GetNodeUseCase;
 import mega.privacy.android.app.usecase.MoveNodeUseCase;
 import mega.privacy.android.app.usecase.data.MoveRequestResult;
+import mega.privacy.android.app.usecase.exception.MegaNodeException;
 import mega.privacy.android.app.utils.AlertDialogUtil;
+import mega.privacy.android.app.usecase.CheckNameCollisionUseCase;
 import mega.privacy.android.app.utils.AlertsAndWarnings;
 import mega.privacy.android.app.utils.MegaNodeDialogUtil;
 import mega.privacy.android.app.utils.StringResourcesUtils;
@@ -104,6 +106,8 @@ public class ContactFileListActivityLollipop extends PasscodeActivity
 	MoveNodeUseCase moveNodeUseCase;
 	@Inject
 	GetNodeUseCase getNodeUseCase;
+	@Inject
+	CheckNameCollisionUseCase checkNameCollisionUseCase;
 
 	FrameLayout fragmentContainer;
 
@@ -710,7 +714,20 @@ public class ContactFileListActivityLollipop extends PasscodeActivity
 			logDebug("TAKE_PHOTO_CODE");
 			if (resultCode == Activity.RESULT_OK) {
 				long parentHandle = cflF.getParentHandle();
-				uploadTakePicture(this, parentHandle, megaApi);
+				File file = getTemporalTakePictureFile(this);
+				if (file != null) {
+					checkNameCollisionUseCase.check(file.getName(), parentHandle)
+							.subscribeOn(Schedulers.io())
+							.observeOn(AndroidSchedulers.mainThread())
+							.subscribe(() -> uploadFile(contactPropertiesMainActivity, file.getAbsolutePath(), parentHandle, megaApi),
+									throwable -> {
+										if (throwable instanceof MegaNodeException.ChildAlreadyExistsException) {
+											//TODO Show name collision activity
+										} else {
+											showSnackbar(SNACKBAR_TYPE, StringResourcesUtils.getString(R.string.general_error));
+										}
+									});
+				}
 			} else {
 				logWarning("TAKE_PHOTO_CODE--->ERROR!");
 			}
