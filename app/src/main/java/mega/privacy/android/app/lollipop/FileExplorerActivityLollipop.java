@@ -1732,7 +1732,7 @@ public class FileExplorerActivityLollipop extends TransfersManagementActivity
 
 				backToCloud(parentNode.getHandle(), infos.size());
 				for (ShareInfo info : infos) {
-					if (transfersManagement.shouldBreakProcessingTransfers()) {
+					if (transfersManagement.shouldBreakTransfersProcessing()) {
 						break;
 					}
 

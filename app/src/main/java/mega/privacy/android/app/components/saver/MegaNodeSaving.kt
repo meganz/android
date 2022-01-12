@@ -81,7 +81,7 @@ class MegaNodeSaving(
         var theOnlyLocalFilePath = ""
 
         for (node in nodes) {
-            if (app.transfersManagement.shouldBreakProcessingTransfers()) {
+            if (app.transfersManagement.shouldBreakTransfersProcessing()) {
                 return AutoPlayInfo.NO_AUTO_PLAY
             }
 
@@ -104,7 +104,7 @@ class MegaNodeSaving(
             }
 
             for (document in dlFiles.keys) {
-                if (app.transfersManagement.shouldBreakProcessingTransfers()) {
+                if (app.transfersManagement.shouldBreakTransfersProcessing()) {
                     return AutoPlayInfo.NO_AUTO_PLAY
                 }
 

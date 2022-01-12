@@ -24,6 +24,8 @@ import android.os.PowerManager.WakeLock;
 import android.widget.Toast;
 import androidx.core.app.NotificationCompat;
 import androidx.core.content.ContextCompat;
+import androidx.lifecycle.Observer;
+
 import android.widget.RemoteViews;
 
 import dagger.hilt.android.AndroidEntryPoint;
@@ -69,6 +71,8 @@ import nz.mega.sdk.MegaTransferData;
 import nz.mega.sdk.MegaTransferListenerInterface;
 
 import static mega.privacy.android.app.constants.BroadcastConstants.*;
+import static mega.privacy.android.app.constants.EventConstants.EVENT_FINISH_SERVICE_IF_NO_TRANSFERS;
+import static mega.privacy.android.app.globalmanagement.TransfersManagement.WAIT_TIME_BEFORE_UPDATE;
 import static mega.privacy.android.app.globalmanagement.TransfersManagement.addCompletedTransfer;
 import static mega.privacy.android.app.globalmanagement.TransfersManagement.createInitialServiceNotification;
 import static mega.privacy.android.app.globalmanagement.TransfersManagement.launchTransferUpdateIntent;
@@ -83,6 +87,8 @@ import static mega.privacy.android.app.utils.SDCardUtils.getSDCardTargetUri;
 import static mega.privacy.android.app.utils.TextUtil.*;
 import static mega.privacy.android.app.utils.Util.*;
 import static nz.mega.sdk.MegaTransfer.TYPE_DOWNLOAD;
+
+import com.jeremyliao.liveeventbus.LiveEventBus;
 
 import javax.inject.Inject;
 
@@ -173,6 +179,12 @@ public class DownloadService extends Service implements MegaTransferListenerInte
      */
     private AutoPlayInfo autoPlayInfo;
 
+    private final Observer<Boolean> stopServiceObserver = finish -> {
+		if (finish && megaApi.getNumPendingDownloads() == 0) {
+			stopForeground();
+		}
+	};
+
 	@SuppressLint("NewApi")
 	@Override
 	public void onCreate(){
@@ -212,14 +224,14 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 		pauseBroadcastReceiver = new BroadcastReceiver() {
 			@Override
 			public void onReceive(Context context, Intent intent) {
-				new Handler().postDelayed(() -> {
-					updateProgressNotification();
-				}, 1000);
+				new Handler().postDelayed(() -> updateProgressNotification(), WAIT_TIME_BEFORE_UPDATE);
 			}
 		};
 
 		registerReceiver(pauseBroadcastReceiver, new IntentFilter(BROADCAST_ACTION_INTENT_UPDATE_PAUSE_NOTIFICATION));
 
+		LiveEventBus.get(EVENT_FINISH_SERVICE_IF_NO_TRANSFERS, Boolean.class)
+				.observeForever(stopServiceObserver);
 	}
 
 	private void startForeground() {
@@ -274,6 +286,9 @@ public class DownloadService extends Service implements MegaTransferListenerInte
         unregisterReceiver(pauseBroadcastReceiver);
 		rxSubscriptions.clear();
 		stopForeground();
+
+		LiveEventBus.get(EVENT_FINISH_SERVICE_IF_NO_TRANSFERS, Boolean.class)
+				.removeObserver(stopServiceObserver);
 
 		super.onDestroy();
 	}
@@ -516,7 +531,9 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 			MegaCancelToken token = transfersManagement.addScanningTransfer(TYPE_DOWNLOAD,
 					localPath, currentDocument, currentDocument.isFolder());
 
-			megaApi.startDownload(currentDocument, localPath, appData, null, highPriority, token);
+			if (token != null) {
+				megaApi.startDownload(currentDocument, localPath, appData, null, highPriority, token);
+			}
 		} else {
 			logWarning("currentDir is not a directory");
 		}
@@ -1563,7 +1580,9 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 				MegaCancelToken token = transfersManagement.addScanningTransfer(TYPE_DOWNLOAD,
 						localPath, currentDocument, currentDocument.isFolder());
 
-				megaApi.startDownload(currentDocument, localPath, appData, null, false, token);
+				if (token != null) {
+					megaApi.startDownload(currentDocument, localPath, appData, null, false, token);
+				}
 			}
 		}
 	}

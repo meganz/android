@@ -771,7 +771,7 @@ public class ContactFileListActivityLollipop extends PasscodeActivity
 			}
 			showSnackbar(SNACKBAR_TYPE, getResources().getQuantityString(R.plurals.upload_began, infos.size(), infos.size()));
 			for (ShareInfo info : infos) {
-				if (transfersManagement.shouldBreakProcessingTransfers()) {
+				if (transfersManagement.shouldBreakTransfersProcessing()) {
 					break;
 				}
 

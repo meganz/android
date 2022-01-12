@@ -24,7 +24,9 @@ import android.os.PowerManager.WakeLock;
 import androidx.core.app.NotificationCompat;
 import androidx.core.content.ContextCompat;
 import androidx.exifinterface.media.ExifInterface;
+import androidx.lifecycle.Observer;
 
+import com.jeremyliao.liveeventbus.LiveEventBus;
 import com.shockwave.pdfium.PdfDocument;
 import com.shockwave.pdfium.PdfiumCore;
 
@@ -54,6 +56,8 @@ import nz.mega.sdk.MegaTransferData;
 import nz.mega.sdk.MegaTransferListenerInterface;
 
 import static mega.privacy.android.app.constants.BroadcastConstants.*;
+import static mega.privacy.android.app.constants.EventConstants.EVENT_FINISH_SERVICE_IF_NO_TRANSFERS;
+import static mega.privacy.android.app.globalmanagement.TransfersManagement.WAIT_TIME_BEFORE_UPDATE;
 import static mega.privacy.android.app.globalmanagement.TransfersManagement.addCompletedTransfer;
 import static mega.privacy.android.app.globalmanagement.TransfersManagement.createInitialServiceNotification;
 import static mega.privacy.android.app.globalmanagement.TransfersManagement.launchTransferUpdateIntent;
@@ -142,6 +146,12 @@ public class UploadService extends Service implements MegaTransferListenerInterf
     // the flag to determine the rating dialog is showed for this upload action
     private boolean isRatingShowed;
 
+    private final Observer<Boolean> stopServiceObserver = finish -> {
+        if (finish && megaApi.getNumPendingUploads() == 0) {
+            stopForeground();
+        }
+    };
+
     @SuppressLint("NewApi")
 	@Override
 	public void onCreate() {
@@ -188,10 +198,13 @@ public class UploadService extends Service implements MegaTransferListenerInterf
                     if (totalFolderUploads > 0) {
                         updateProgressNotification(true);
                     }
-                }, 1000);
+                }, WAIT_TIME_BEFORE_UPDATE);
             }
         };
         registerReceiver(pauseBroadcastReceiver, new IntentFilter(BROADCAST_ACTION_INTENT_UPDATE_PAUSE_NOTIFICATION));
+
+        LiveEventBus.get(EVENT_FINISH_SERVICE_IF_NO_TRANSFERS, Boolean.class)
+                .observeForever(stopServiceObserver);
 	}
 
     private void startForeground() {
@@ -239,6 +252,9 @@ public class UploadService extends Service implements MegaTransferListenerInterf
         unregisterReceiver(pauseBroadcastReceiver);
         rxSubscriptions.clear();
         stopForeground();
+
+        LiveEventBus.get(EVENT_FINISH_SERVICE_IF_NO_TRANSFERS, Boolean.class)
+                .removeObserver(stopServiceObserver);
 
 		super.onDestroy();
 	}
@@ -366,34 +382,32 @@ public class UploadService extends Service implements MegaTransferListenerInterf
         }
 
         MegaNode parentNode = megaApi.getNodeByHandle(parentHandle);
-        String appData = null;
         long mTime = lastModified == 0 ? INVALID_VALUE : lastModified;
         String fileName = nameInMEGAEdited != null ? nameInMEGAEdited : nameInMEGA;
-        boolean isSourceTemporary = false;
-        boolean startFirst = false;
-        MegaCancelToken cancelToken = null;
 
         if (!isTextEmpty(textFileMode)) {
-            appData = APP_DATA_TXT_FILE + APP_DATA_INDICATOR + textFileMode
+            String appData = APP_DATA_TXT_FILE + APP_DATA_INDICATOR + textFileMode
                     + APP_DATA_INDICATOR + intent.getBooleanExtra(FROM_HOME_PAGE, false);
 
-            isSourceTemporary = true;
-            startFirst = true;
+            megaApi.startUpload(file.getAbsolutePath(), parentNode, mTime, appData, fileName,
+                    true, true, null);
         } else {
             boolean isFolder = file.isDirectory();
 
-            cancelToken = transfersManagement
+            MegaCancelToken cancelToken = transfersManagement
                     .addScanningTransfer(TYPE_UPLOAD, file.getAbsolutePath(), parentNode, isFolder);
 
-            if (isFolder) {
-                totalFolderUploads++;
-            } else {
-                totalFileUploads++;
+            if (cancelToken != null) {
+                if (isFolder) {
+                    totalFolderUploads++;
+                } else {
+                    totalFileUploads++;
+                }
+
+                megaApi.startUpload(file.getAbsolutePath(), parentNode, mTime, null, fileName,
+                        false, false, cancelToken);
             }
         }
-
-        megaApi.startUpload(file.getAbsolutePath(), parentNode, mTime, appData, fileName,
-                isSourceTemporary, startFirst, cancelToken);
     }
 
 	/*

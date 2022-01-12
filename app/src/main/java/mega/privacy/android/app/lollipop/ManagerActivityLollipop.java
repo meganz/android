@@ -9193,7 +9193,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 					requestContactsPermissions(info, parentNode);
 				}
 				else{
-					if (transfersManagement.shouldBreakProcessingTransfers()) {
+					if (transfersManagement.shouldBreakTransfersProcessing()) {
 						break;
 					}
 

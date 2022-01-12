@@ -16,6 +16,7 @@ import com.jeremyliao.liveeventbus.LiveEventBus
 import mega.privacy.android.app.*
 import mega.privacy.android.app.components.transferWidget.TransferWidget.NO_TYPE
 import mega.privacy.android.app.constants.BroadcastConstants.*
+import mega.privacy.android.app.constants.EventConstants.EVENT_FINISH_SERVICE_IF_NO_TRANSFERS
 import mega.privacy.android.app.constants.EventConstants.EVENT_SHOW_SCANNING_TRANSFERS_DIALOG
 import mega.privacy.android.app.di.MegaApi
 import mega.privacy.android.app.lollipop.megachat.ChatUploadService
@@ -45,6 +46,7 @@ class TransfersManagement @Inject constructor(
         private const val WAIT_TIME_TO_SHOW_WARNING = 60000L
         private const val WAIT_TIME_TO_SHOW_NETWORK_WARNING = 30000L
         private const val WAIT_TIME_TO_RESTART_SERVICES = 5000L
+        const val WAIT_TIME_BEFORE_UPDATE = 1000L
 
         /**
          * Checks if a service is already running.
@@ -405,13 +407,19 @@ class TransfersManagement @Inject constructor(
      * @param node      Parent MegaNode where the folder will be uploaded if transferType is TYPE_UPLOAD.
      *                  MegaNode to download if transferType is TYPE_DOWNLOAD.
      * @param isFolder  True if the transfer is a folder, false otherwise.
+     * @return The cancel token if the transfer was included in scanning transfers
+     * and can be processed, null otherwise.
      */
     fun addScanningTransfer(
         type: Int,
         localPath: String,
         node: MegaNode,
         isFolder: Boolean
-    ): MegaCancelToken {
+    ): MegaCancelToken? {
+        if (shouldBreakTransfersProcessing()) {
+            return null
+        }
+
         if (!isScanningTransfers()) {
             LiveEventBus.get(EVENT_SHOW_SCANNING_TRANSFERS_DIALOG, Boolean::class.java).post(true)
         }
@@ -423,12 +431,12 @@ class TransfersManagement @Inject constructor(
     /**
      * Gets the current scanningTransfersToken if exists or a new one if not.
      */
-    fun getScanningTransfersToken(): MegaCancelToken {
+    fun getScanningTransfersToken(): MegaCancelToken? {
         if (scanningTransfersToken == null) {
             scanningTransfersToken = MegaCancelToken.createInstance()
         }
 
-        return scanningTransfersToken!!
+        return scanningTransfersToken
     }
 
     /**
@@ -438,6 +446,7 @@ class TransfersManagement @Inject constructor(
         shouldBreakTransfersProcessing = true
         isProcessingSDCardFolders = false
         scanningTransfersToken?.cancel()
+        scanningTransfersToken = null
         scanningTransfers.clear()
     }
 
@@ -450,11 +459,13 @@ class TransfersManagement @Inject constructor(
     fun checkScanningTransferOnStart(transfer: MegaTransfer) {
         for (data in scanningTransfers) {
             if (data.isTheSameTransfer(transfer)) {
-                if (data.isFolder) {
-                    data.transferTag = transfer.tag
-                    data.transferStage = transfer.stage
-                } else {
-                    data.removeProcessedScanningTransfer()
+                data.apply {
+                    if (isFolder) {
+                        transferTag = transfer.tag
+                        transferStage = transfer.stage
+                    } else {
+                        removeProcessedScanningTransfer()
+                    }
                 }
 
                 break
@@ -552,14 +563,25 @@ class TransfersManagement @Inject constructor(
         isProcessingSDCardFolders || isScanningTransfers()
 
     /**
+     * Sets shouldBreakTransfersProcessing to false after a second in order
+     * to prevent the break processing fails at some point.
+     */
+    fun updateShouldBreakTransfersProcessing() {
+        Handler(Looper.getMainLooper()).postDelayed({
+            shouldBreakTransfersProcessing = false
+            LiveEventBus.get(EVENT_FINISH_SERVICE_IF_NO_TRANSFERS, Boolean::class.java).post(true)
+        }, WAIT_TIME_BEFORE_UPDATE)
+    }
+
+    /**
      * Checks if should stop processing transfers.
      * If so, updates the flag to false since is already checked and stopped.
      *
      * @return True if should stop processing transfers, false otherwise.
      */
-    fun shouldBreakProcessingTransfers(): Boolean =
+    fun shouldBreakTransfersProcessing(): Boolean =
         if (shouldBreakTransfersProcessing) {
-            shouldBreakTransfersProcessing = false
+            updateShouldBreakTransfersProcessing()
             true
         } else {
             false
