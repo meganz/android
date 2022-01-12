@@ -3819,7 +3819,7 @@ public class ChatActivityLollipop extends PasscodeActivity
         LayoutInflater inflater = getLayoutInflater();
         View dialogLayout = inflater.inflate(R.layout.join_call_dialog, null);
         TextView joinCallDialogTitle = dialogLayout.findViewById(R.id.join_call_dialog_title);
-        joinCallDialogTitle.setText(chatRoom.isGroup() ? R.string.title_join_call : R.string.answer_call_incoming);
+        joinCallDialogTitle.setText(chatRoom.isGroup() ? R.string.title_join_call : R.string.title_join_one_to_one_call);
 
         final Button holdJoinButton = dialogLayout.findViewById(R.id.hold_join_button);
         final Button endJoinButton = dialogLayout.findViewById(R.id.end_join_button);
@@ -9122,7 +9122,7 @@ public class ChatActivityLollipop extends PasscodeActivity
                     returnCallOnHoldButtonIcon.setImageResource(R.drawable.ic_call_chat);
                     returnCallOnHoldButtonText.setText(getResources().getString(chatRoom.isGroup() ?
                             R.string.title_join_call :
-                            R.string.answer_call_incoming));
+                            R.string.title_join_one_to_one_call));
                 }
                 break;
 
