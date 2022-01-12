@@ -91,15 +91,17 @@ class SettingsFragment : Preference.OnPreferenceChangeListener,
         addPreferencesFromResource(R.xml.preferences)
         updateCancelAccountSetting()
         checkUIPreferences()
-        update2FAVisibility()
-        observeAutoAccept()
+        observeState()
     }
 
-    private fun observeAutoAccept() {
+    private fun observeState() {
         lifecycleScope.launch{
             repeatOnLifecycle(Lifecycle.State.STARTED){
                 viewModel.isAutoExceptEnabled.collect {
                     findPreference<SwitchPreferenceCompat>(KEY_QR_CODE_AUTO_ACCEPT)?.isChecked = it
+                }
+                viewModel.isMultiFactorEnabled.collect {
+                    findPreference<SwitchPreferenceCompat>(KEY_2FA)?.isChecked = it
                 }
             }
         }
@@ -139,13 +141,7 @@ class SettingsFragment : Preference.OnPreferenceChangeListener,
     }
 
     override fun update2FAVisibility() {
-        if (viewModel.multiFactorAuthAvailable) {
-            findPreference<SwitchPreferenceCompat>(KEY_2FA)?.isEnabled = false
-            findPreference<SwitchPreferenceCompat>(KEY_2FA)?.isVisible = true
-            viewModel.multiFactorAuthCheck(activity as SettingsActivity)
-        } else {
-            findPreference<SwitchPreferenceCompat>(KEY_2FA)?.isVisible = false
-        }
+        throw refactorInProgressException
     }
 
     override fun onCreateView(
@@ -356,6 +352,7 @@ class SettingsFragment : Preference.OnPreferenceChangeListener,
             findPreference<Preference>(KEY_FEATURES_CHAT)?.isEnabled = false
             findPreference<Preference>(KEY_FEATURES_CAMERA_UPLOAD)?.isEnabled = false
         }
+        findPreference<SwitchPreferenceCompat>(KEY_2FA)?.isVisible = viewModel.multiFactorAuthAvailable
         super.onResume()
     }
 
@@ -427,13 +424,11 @@ class SettingsFragment : Preference.OnPreferenceChangeListener,
                     ChangePasswordActivityLollipop::class.java
                 )
             )
-            KEY_2FA -> if ((activity as SettingsActivity).is2FAEnabled) {
-                findPreference<SwitchPreferenceCompat>(KEY_2FA)?.isChecked = true
+            KEY_2FA -> if (viewModel.isMultiFactorEnabled.value) {
                 val intent = Intent(context, VerifyTwoFactorActivity::class.java)
                 intent.putExtra(VerifyTwoFactorActivity.KEY_VERIFY_TYPE, Constants.DISABLE_2FA)
                 startActivity(intent)
             } else {
-                findPreference<SwitchPreferenceCompat>(KEY_2FA)?.isChecked = false
                 val intent = Intent(context, TwoFactorAuthenticationActivity::class.java)
                 startActivity(intent)
             }
@@ -568,11 +563,9 @@ class SettingsFragment : Preference.OnPreferenceChangeListener,
         scrollToPreference(findPreference<PreferenceCategory>(KEY_FEATURES))
     }
 
-    /**
-     * Re-enable 'findPreference<SwitchPreferenceCompat>(KEY_2FA)' after 'multiFactorAuthCheck' finished.
-     */
+
     override fun reEnable2faSwitch() {
-        findPreference<SwitchPreferenceCompat>(KEY_2FA)?.isEnabled = true
+        throw refactorInProgressException
     }
 
     override fun hidePreferencesChat() {
@@ -584,7 +577,7 @@ class SettingsFragment : Preference.OnPreferenceChangeListener,
     }
 
     override fun update2FAPreference(enabled: Boolean) {
-        findPreference<SwitchPreferenceCompat>(KEY_2FA)?.isChecked = enabled
+        throw refactorInProgressException
     }
 
 

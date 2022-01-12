@@ -42,7 +42,7 @@ class SettingsViewModelTest {
             rootNodeExists = mock(),
             isMultiFactorAuthAvailable = mock(),
             fetchAutoAcceptQRLinks = fetchAutoAcceptQRLinks,
-            performMultiFactorAuthCheck = mock(),
+            fetchMultiFactorAuthSetting = mock(),
             getStartScreen = mock(),
             shouldHideRecentActivity = mock(),
             toggleAutoAcceptQRLinks = toggleAutoAcceptQRLinks,

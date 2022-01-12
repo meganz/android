@@ -3,6 +3,7 @@ package test.mega.privacy.android.app.lollipop.managerSections.settings
 import android.app.Activity
 import android.app.Instrumentation
 import android.content.ComponentName
+import androidx.lifecycle.Lifecycle
 import androidx.test.core.app.ApplicationProvider.getApplicationContext
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.intent.Intents
@@ -22,6 +23,7 @@ import dagger.hilt.android.testing.HiltAndroidTest
 import dagger.hilt.android.testing.HiltTestApplication
 import dagger.hilt.android.testing.UninstallModules
 import dagger.hilt.components.SingletonComponent
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.runBlocking
 import mega.privacy.android.app.R
 import mega.privacy.android.app.TestActivityModule
@@ -66,8 +68,9 @@ class SettingsFragmentTest {
         val canDeleteAccount = mock<CanDeleteAccount>()
         val getStartScreen = mock<GetStartScreen>()
         val isMultiFactorAuthAvailable = mock<IsMultiFactorAuthAvailable>()
-        val settingsActivity = mock<SettingsActivity> ()
+        val settingsActivity = mock<SettingsActivity>()
         val fetchAutoAcceptQRLinks = mock<FetchAutoAcceptQRLinks>()
+        val fetchMultiFactorAuthSetting = mock<FetchMultiFactorAuthSetting>()
 
         @Provides
         fun provideSettingsActivity(): SettingsActivity = settingsActivity
@@ -108,9 +111,10 @@ class SettingsFragmentTest {
         fun provideFetchContactLinksOption(): FetchAutoAcceptQRLinks =
             fetchAutoAcceptQRLinks
 
+
         @Provides
-        fun providePerformMultiFactorAuthCheck(): PerformMultiFactorAuthCheck =
-            mock()
+        fun provideFetchMultiFactorAuthSetting(): FetchMultiFactorAuthSetting =
+            fetchMultiFactorAuthSetting
 
 
         @Provides
@@ -128,7 +132,8 @@ class SettingsFragmentTest {
 
     @Before
     fun setUp() {
-        runBlocking{ whenever(TestSettingsModule.fetchAutoAcceptQRLinks()).thenReturn(false) }
+        runBlocking { whenever(TestSettingsModule.fetchAutoAcceptQRLinks()).thenReturn(false) }
+        whenever(TestSettingsModule.fetchMultiFactorAuthSetting()).thenReturn(flowOf())
         hiltRule.inject()
         Intents.init()
     }
@@ -403,6 +408,26 @@ class SettingsFragmentTest {
                 )
             )
         )
+    }
+
+    @Test
+    fun test_that_2FA_updates_toggle_the_switch() {
+        whenever(TestSettingsModule.fetchMultiFactorAuthSetting()).thenReturn(flowOf(true))
+        whenever(TestSettingsModule.isMultiFactorAuthAvailable()).thenReturn(true)
+        val scenario = launchFragmentInHiltContainer<SettingsFragment>()
+        scenario?.moveToState(Lifecycle.State.STARTED)
+        scenario?.moveToState(Lifecycle.State.RESUMED)
+
+        onPreferences()
+            .check(
+                withRowContaining(
+                    allOf(
+                        hasDescendant(withText(R.string.setting_subtitle_2fa)),
+                        hasSibling(hasDescendant(isChecked()))
+                    )
+                )
+            )
+
     }
 
     private fun onPreferences() = onView(withId(androidx.preference.R.id.recycler_view))

@@ -3,7 +3,9 @@ package mega.privacy.android.app.lollipop.managerSections.settings
 import androidx.lifecycle.*
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.domain.usecase.*
 import nz.mega.sdk.MegaRequestListenerInterface
@@ -21,10 +23,10 @@ class SettingsViewModel @Inject constructor(
     private val rootNodeExists: RootNodeExists,
     private val isMultiFactorAuthAvailable: IsMultiFactorAuthAvailable,
     private val fetchAutoAcceptQRLinks: FetchAutoAcceptQRLinks,
-    private val performMultiFactorAuthCheck: PerformMultiFactorAuthCheck,
     private val getStartScreen: GetStartScreen,
     private val shouldHideRecentActivity: ShouldHideRecentActivity,
     private val toggleAutoAcceptQRLinks: ToggleAutoAcceptQRLinks,
+    fetchMultiFactorAuthSetting: FetchMultiFactorAuthSetting,
 ) : ViewModel() {
     val hideRecentActivity: Boolean
         get() = shouldHideRecentActivity()
@@ -48,8 +50,14 @@ class SettingsViewModel @Inject constructor(
         get() = rootNodeExists()
     val multiFactorAuthAvailable: Boolean
         get() = isMultiFactorAuthAvailable()
-    private val autoExceptEnabled = MutableStateFlow<Boolean>(false)
+    private val autoExceptEnabled = MutableStateFlow(false)
     val isAutoExceptEnabled: StateFlow<Boolean> = autoExceptEnabled
+    val isMultiFactorEnabled: StateFlow<Boolean> =
+        fetchMultiFactorAuthSetting().stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.Eagerly,
+            initialValue = false
+        )
 
     init {
         viewModelScope.launch {
@@ -57,12 +65,7 @@ class SettingsViewModel @Inject constructor(
         }
     }
 
-
-
     fun refreshAccount() = refreshUserAccount()
-
-    fun multiFactorAuthCheck(listener: MegaRequestListenerInterface) =
-        performMultiFactorAuthCheck(listener)
 
     fun toggleAutoAcceptPreference() {
         viewModelScope.launch {

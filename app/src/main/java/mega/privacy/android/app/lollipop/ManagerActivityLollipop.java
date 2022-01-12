@@ -4647,7 +4647,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 				supportInvalidateOptionsMenu();
 				showFabButton();
 
-				if (settingsFragment != null){
+				if (settingsFragment != null && SettingsFragmentRefactorToggle.INSTANCE.getEnabled() == false){
 					settingsFragment.update2FAVisibility();
 				}
 				break;
@@ -7802,7 +7802,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 
 	public void update2FAEnableState(){
 		logDebug("update2FAVisibility");
-		if (getSettingsFragment() != null) {
+		if (getSettingsFragment() != null && SettingsFragmentRefactorToggle.INSTANCE.getEnabled() == false) {
 			try {
 				settingsFragment.update2FAVisibility();
 			}catch (Exception e){}
@@ -9512,14 +9512,16 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 			}
 		}
 		else if (request.getType() == MegaRequest.TYPE_MULTI_FACTOR_AUTH_CHECK) {
-			// Re-enable 2fa switch first.
-			if (getSettingsFragment() != null) {
-				settingsFragment.reEnable2faSwitch();
-			}
+			if (SettingsFragmentRefactorToggle.INSTANCE.getEnabled() == false){
+				// Re-enable 2fa switch first.
+				if (getSettingsFragment() != null) {
+					settingsFragment.reEnable2faSwitch();
+				}
 
-            if (e.getErrorCode() == MegaError.API_OK) {
-                update2FAEnableState(request.getFlag());
-            }
+				if (e.getErrorCode() == MegaError.API_OK) {
+					update2FAEnableState(request.getFlag());
+				}
+			}
 		}
 		else if(request.getType() == MegaRequest.TYPE_FOLDER_INFO) {
 			if (e.getErrorCode() == MegaError.API_OK) {
@@ -9544,11 +9546,13 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
      * @param isEnabled true, turn on SwitchPreference, false, turn off.
      */
     private void update2FAEnableState(boolean isEnabled) {
-        is2FAEnabled = isEnabled;
+		if (SettingsFragmentRefactorToggle.INSTANCE.getEnabled() == false){
+			is2FAEnabled = isEnabled;
 
-        if (getSettingsFragment() != null) {
-            settingsFragment.update2FAPreference(is2FAEnabled);
-        }
+			if (getSettingsFragment() != null) {
+				settingsFragment.update2FAPreference(is2FAEnabled);
+			}
+		}
     }
 
 	/**

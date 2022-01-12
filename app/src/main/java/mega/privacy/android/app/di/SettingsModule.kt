@@ -61,9 +61,9 @@ abstract class SettingsModule {
     ): FetchAutoAcceptQRLinks
 
     @Binds
-    abstract fun bindPerformMultiFactorAuthCheck(
-        useCase: DefaultPerformMultiFactorAuthCheck
-    ): PerformMultiFactorAuthCheck
+    abstract fun bindFetchMultiFactorAuthSetting(
+        useCase: DefaultFetchMultiFactorAuthSetting
+    ): FetchMultiFactorAuthSetting
 
     @Binds
     abstract fun bindGetStartScreen(
