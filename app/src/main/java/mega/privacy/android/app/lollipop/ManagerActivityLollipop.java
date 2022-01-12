@@ -5057,6 +5057,10 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 		searchMenuItem = menu.findItem(R.id.action_search);
 		searchView = (SearchView) searchMenuItem.getActionView();
 
+		if (outMetrics.widthPixels < 500) {
+			findViewById(R.id.navigation_drawer_add_phone_number_icon).setVisibility(View.GONE);
+		}
+
 		SearchView.SearchAutoComplete searchAutoComplete = searchView.findViewById(androidx.appcompat.R.id.search_src_text);
 		searchAutoComplete.setHint(getString(R.string.hint_action_search));
 		View v = searchView.findViewById(androidx.appcompat.R.id.search_plate);
