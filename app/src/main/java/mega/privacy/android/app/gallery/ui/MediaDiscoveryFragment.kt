@@ -146,17 +146,6 @@ class MediaDiscoveryFragment : BaseZoomFragment() {
         )
     }
 
-    /**
-     * Show the selected card view after corresponding button is clicked.
-     *
-     * @param selectedView The selected view.
-     */
-    override fun newViewClicked(selectedView: Int) {
-        if(this.selectedView == selectedView) return
-
-        super.newViewClicked(selectedView)
-        setHideBottomViewScrollBehaviour()
-    }
 
     private fun handleZoomAdapterLayoutChange(zoom: Int) {
         val state = listView.layoutManager?.onSaveInstanceState()

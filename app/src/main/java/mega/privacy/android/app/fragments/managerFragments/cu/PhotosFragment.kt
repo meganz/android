@@ -347,6 +347,7 @@ class PhotosFragment : BaseZoomFragment() {
     }
 
     override fun setHideBottomViewScrollBehaviour() {
+        mManagerActivity.showBottomView()
         mManagerActivity.enableHideBottomViewOnScroll(selectedView != ALL_VIEW)
     }
 

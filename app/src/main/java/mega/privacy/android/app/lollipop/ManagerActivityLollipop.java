@@ -10828,19 +10828,16 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 	/**
 	 * Shows all the content of bottom view.
 	 */
-	public void showBottomView() {
-		LinearLayout bottomView = findViewById(R.id.container_bottom);
-		if (bottomView == null || fragmentLayout == null || isInImagesPage()) {
-			return;
-		}
+    public void showBottomView() {
+        LinearLayout bottomView = findViewById(R.id.container_bottom);
+        if (bottomView == null || fragmentLayout == null || isInImagesPage()) {
+            return;
+        }
 
-		CoordinatorLayout.LayoutParams params = (CoordinatorLayout.LayoutParams) fragmentLayout.getLayoutParams();
-		params.setMargins(0, 0, 0,
-				getResources().getDimensionPixelSize(R.dimen.bottom_navigation_view_height));
-		bottomView.animate().translationY(0).setDuration(175)
-				.withStartAction(() -> bottomView.setVisibility(View.VISIBLE))
-				.withEndAction(() -> fragmentLayout.setLayoutParams(params)).start();
-	}
+        bottomView.animate().translationY(0).setDuration(175)
+                .withStartAction(() -> bottomView.setVisibility(View.VISIBLE))
+                .start();
+    }
 
 	/**
 	 * Shows or hides the bottom view and animates the transition.

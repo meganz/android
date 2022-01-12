@@ -686,6 +686,8 @@ abstract class BaseZoomFragment : BaseFragment(), GestureScaleCallback,
         }
         handleOptionsMenuUpdate(shouldShowZoomMenuItem())
         updateViewSelected()
+        // If selected view is not all view, add layout param behaviour, so that button panel will go off when scroll.
+        setHideBottomViewScrollBehaviour()
     }
 
     /**
