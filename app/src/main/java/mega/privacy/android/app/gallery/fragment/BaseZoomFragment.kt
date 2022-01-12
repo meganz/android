@@ -351,8 +351,6 @@ abstract class BaseZoomFragment : BaseFragment(), GestureScaleCallback,
                         openPhoto(getOrder(), it)
                     }
                 }
-
-                mManagerActivity.showBottomView()
             }
             MONTHS_VIEW -> {
                 newViewClicked(DAYS_VIEW)
