@@ -9090,18 +9090,9 @@ public class ChatActivityLollipop extends PasscodeActivity
 
                 if(chatRoom.isGroup()){
                     if (anotherActiveCall == null && anotherOnHoldCall == null) {
-                        long callerHandle = callInThisChat.getCaller();
-                        String callerFullName = chatC.getParticipantFullName(callerHandle);
-                        String textLayout;
-                        if (callerHandle != MEGACHAT_INVALID_HANDLE && !isTextEmpty(callerFullName)) {
-                            if(chatRoom.isMeeting()) {
-                                textLayout = getString(R.string.join_meeting_layout_in_group_call, callerFullName);
-                            } else {
-                                textLayout = getString(R.string.join_call_layout_in_group_call, callerFullName);
-                            }
-                        } else {
-                            textLayout = getString(R.string.join_call_layout);
-                        }
+                        String textLayout = getString(chatRoom.isMeeting() ?
+                                R.string.join_meeting_layout_in_group_call :
+                                R.string.join_call_layout_in_group_call);
                         tapToReturnLayout(callInThisChat, textLayout);
                     }else{
                         updateCallInProgressLayout(anotherActiveCall != null ? anotherActiveCall : anotherOnHoldCall,
