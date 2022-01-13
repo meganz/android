@@ -97,6 +97,7 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 	private NotificationManager mNotificationManager;
 
     private HashMap<Integer, MegaTransfer> mapProgressFileTransfers;
+    private int pendingToAddInQueue = 0;
     private int completed = 0;
     private int completedSuccessfully = 0;
     private int alreadyUploaded = 0;
@@ -319,6 +320,7 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 
         MegaNode parentNode = megaApi.getNodeByHandle(parentHandle);
 
+        pendingToAddInQueue++;
         if (!isTextEmpty(textFileMode)) {
             boolean fromHome = intent.getBooleanExtra(FROM_HOME_PAGE, false);
             String appData = APP_DATA_TXT_FILE + APP_DATA_INDICATOR + textFileMode
@@ -669,6 +671,8 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 				return;
 			}
 
+			pendingToAddInQueue--;
+
 			if (!transfer.isFolderTransfer()) {
                 uploadCount++;
                 mapProgressFileTransfers.put(transfer.getTag(), transfer);
@@ -912,7 +916,7 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 					logError("transfer.getPath() is NULL or temporal folder unavailable");
 				}
 
-                if (completed == uploadCount) {
+                if (completed == uploadCount && pendingToAddInQueue == 0) {
                     onQueueComplete(true);
                 } else {
                     updateProgressNotification();
@@ -1076,6 +1080,7 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 
     private void resetUploadNumbers(){
 		logDebug("resetUploadNumbers");
+		pendingToAddInQueue = 0;
         completed = 0;
         completedSuccessfully = 0;
         alreadyUploaded = 0;
