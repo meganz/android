@@ -9,11 +9,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
 
+import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaNode;
 
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.Util.*;
+import static nz.mega.sdk.MegaApiJava.INVALID_HANDLE;
 
 public class AndroidMegaRichLinkMessage {
 
@@ -139,6 +141,40 @@ public class AndroidMegaRichLinkMessage {
 
     public static boolean isContactLink(String url) {
         return matchRegexs(url, CONTACT_LINK_REGEXS);
+    }
+
+    /**
+     * Extracts a contact link from a chat messages if exists.
+     *
+     * @param content Text of the chat message.
+     * @return The contact link if exists.
+     */
+    public static String extractContactLink(String content) {
+        Matcher m = Patterns.WEB_URL.matcher(content);
+
+        while (m.find()) {
+            String url = decodeURL(m.group());
+
+            if (isContactLink(url)) {
+                return url;
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * Gets the user handle of a contact link.
+     *
+     * @param link Contact link to check.
+     * @return The user handle.
+     */
+    public static long getContactLinkHandle(String link) {
+        String[] s = link.split("C!");
+
+        return s.length > 0
+                ? MegaApiAndroid.base64ToHandle(s[1].trim())
+                : INVALID_HANDLE;
     }
 
     public boolean isChat() {
