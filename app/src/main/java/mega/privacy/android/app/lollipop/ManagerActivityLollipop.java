@@ -3625,7 +3625,6 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 
 		switch (drawerItem){
 			case CLOUD_DRIVE:{
-
                 aB.setSubtitle(null);
                 logDebug("Cloud Drive SECTION");
                 MegaNode parentNode = megaApi.getNodeByHandle(parentHandleBrowser);
@@ -3659,20 +3658,16 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 			}
 			case RUBBISH_BIN: {
 				aB.setSubtitle(null);
-				if(parentHandleRubbish == megaApi.getRubbishNode().getHandle() || parentHandleRubbish == -1){
-					aB.setTitle(getResources().getString(R.string.section_rubbish_bin).toUpperCase());
+				MegaNode node = megaApi.getNodeByHandle(parentHandleRubbish);
+				MegaNode rubbishNode = megaApi.getRubbishNode();
+				if (rubbishNode == null) {
+					parentHandleRubbish = INVALID_HANDLE;
 					firstNavigationLevel = true;
-				}
-				else{
-					MegaNode node = megaApi.getNodeByHandle(parentHandleRubbish);
-					if(node==null){
-						logWarning("Node NULL - cannot be recovered");
-						aB.setTitle(getResources().getString(R.string.section_rubbish_bin).toUpperCase());
-					}
-					else{
-						aB.setTitle(node.getName());
-					}
-
+				} else if (parentHandleRubbish == INVALID_HANDLE || node == null || node.getHandle() == rubbishNode.getHandle()){
+					aB.setTitle(StringResourcesUtils.getString(R.string.section_rubbish_bin).toUpperCase());
+					firstNavigationLevel = true;
+				} else {
+					aB.setTitle(node.getName());
 					firstNavigationLevel = false;
 				}
 				break;
@@ -5397,9 +5392,11 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 	private HomepageSearchable findHomepageSearchable() {
 		FragmentManager fragmentManager = getSupportFragmentManager();
 		Fragment navHostFragment = fragmentManager.findFragmentById(R.id.nav_host_fragment);
-		for (Fragment fragment : navHostFragment.getChildFragmentManager().getFragments()) {
-			if (fragment instanceof HomepageSearchable) {
-				return (HomepageSearchable) fragment;
+		if (navHostFragment != null && navHostFragment.getChildFragmentManager() != null) {
+			for (Fragment fragment : navHostFragment.getChildFragmentManager().getFragments()) {
+				if (fragment instanceof HomepageSearchable) {
+					return (HomepageSearchable) fragment;
+				}
 			}
 		}
 

@@ -48,6 +48,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import java.util.Stack;
 import java.util.function.ToLongFunction;
 import java.util.stream.LongStream;
@@ -61,6 +62,7 @@ import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.TransfersManagementActivity;
+import mega.privacy.android.app.utils.LogUtil;
 import mega.privacy.android.app.imageviewer.ImageViewerActivity;
 import mega.privacy.android.app.utils.MegaProgressDialogUtil;
 import mega.privacy.android.app.components.SimpleDividerItemDecoration;
@@ -772,10 +774,12 @@ public class FolderLinkActivityLollipop extends TransfersManagementActivity impl
 									Intent backIntent;
 									boolean closedChat = MegaApplication.isClosedChat();
 									if(closedChat){
-										if(folderLinkActivity != null)
-											backIntent = new Intent(folderLinkActivity, ManagerActivityLollipop.class);
-										else
-											backIntent = new Intent(FolderLinkActivityLollipop.this, ManagerActivityLollipop.class);
+										backIntent = new Intent(
+												Objects.requireNonNullElse(
+														folderLinkActivity,
+														FolderLinkActivityLollipop.this
+												),
+												ManagerActivityLollipop.class);
 
 										startActivity(backIntent);
 									}
@@ -807,10 +811,12 @@ public class FolderLinkActivityLollipop extends TransfersManagementActivity impl
 								Intent backIntent;
 								boolean closedChat = MegaApplication.isClosedChat();
 								if(closedChat){
-									if(folderLinkActivity != null)
-										backIntent = new Intent(folderLinkActivity, ManagerActivityLollipop.class);
-									else
-										backIntent = new Intent(FolderLinkActivityLollipop.this, ManagerActivityLollipop.class);
+									backIntent = new Intent(
+											Objects.requireNonNullElse(
+													folderLinkActivity,
+													FolderLinkActivityLollipop.this
+											),
+											ManagerActivityLollipop.class);
 									startActivity(backIntent);
 								}
 
@@ -893,7 +899,14 @@ public class FolderLinkActivityLollipop extends TransfersManagementActivity impl
 											dialog.dismiss();
 											boolean closedChat = MegaApplication.isClosedChat();
 											if(closedChat){
-												Intent backIntent = new Intent(folderLinkActivity, ManagerActivityLollipop.class);
+												Intent backIntent;
+												backIntent = new Intent(
+														Objects.requireNonNullElse(
+																folderLinkActivity,
+																FolderLinkActivityLollipop.this
+														),
+														ManagerActivityLollipop.class
+												);
 												startActivity(backIntent);
 											}
 
@@ -1035,7 +1048,14 @@ public class FolderLinkActivityLollipop extends TransfersManagementActivity impl
 									dialog.dismiss();
 									boolean closedChat = MegaApplication.isClosedChat();
 									if(closedChat){
-										Intent backIntent = new Intent(folderLinkActivity, ManagerActivityLollipop.class);
+										Intent backIntent;
+										backIntent = new Intent(
+												Objects.requireNonNullElse(
+														folderLinkActivity,
+														FolderLinkActivityLollipop.this
+												),
+												ManagerActivityLollipop.class
+										);
 										startActivity(backIntent);
 									}
 
@@ -1078,7 +1098,14 @@ public class FolderLinkActivityLollipop extends TransfersManagementActivity impl
 									dialog.dismiss();
 									boolean closedChat = MegaApplication.isClosedChat();
 									if(closedChat){
-										Intent backIntent = new Intent(folderLinkActivity, ManagerActivityLollipop.class);
+										Intent backIntent;
+										backIntent = new Intent(
+												Objects.requireNonNullElse(
+														folderLinkActivity,
+														FolderLinkActivityLollipop.this
+												),
+												ManagerActivityLollipop.class
+										);
 										startActivity(backIntent);
 									}
 									finish();
@@ -1306,7 +1333,16 @@ public class FolderLinkActivityLollipop extends TransfersManagementActivity impl
 					mediaIntent.putExtra("FILENAME", file.getName());
 					putThumbnailLocation(mediaIntent, listView, position, VIEWER_FROM_FOLDER_LINK, adapterList);
 					mediaIntent.putExtra("adapterType", FOLDER_LINK_ADAPTER);
-					if (megaApiFolder.getParentNode(nodes.get(position)).getType() == MegaNode.TYPE_ROOT){
+
+					MegaNode parentNode = megaApiFolder.getParentNode(nodes.get(position));
+
+					//Null check validation.
+					if (parentNode == null) {
+						LogUtil.logError(nodes.get(position).getName() + "'s parent node is null");
+						return;
+					}
+
+					if (parentNode.getType() == MegaNode.TYPE_ROOT){
 						mediaIntent.putExtra("parentNodeHandle", -1L);
 					}
 					else{
