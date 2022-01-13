@@ -204,7 +204,7 @@ import mega.privacy.android.app.usecase.GetNodeUseCase;
 import mega.privacy.android.app.usecase.MoveNodeUseCase;
 import mega.privacy.android.app.usecase.RemoveNodeUseCase;
 import mega.privacy.android.app.usecase.data.MoveRequestResult;
-import mega.privacy.android.app.usecase.CheckNameCollisionUseCase;
+import mega.privacy.android.app.namecollision.usecase.CheckNameCollisionUseCase;
 import mega.privacy.android.app.usecase.exception.MegaNodeException;
 import mega.privacy.android.app.utils.AlertsAndWarnings;
 import mega.privacy.android.app.utils.CallUtil;
@@ -8859,46 +8859,68 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 	 */
 	private void onIntentProcessed(List<ShareInfo> infos) {
 		logDebug("onIntentProcessedLollipop");
-
-		dismissAlertDialogIfExists(statusDialog);
-		dismissAlertDialogIfExists(processFileDialog);
-
 		MegaNode parentNode = getCurrentParentNode(getCurrentParentHandle(), -1);
 		if(parentNode == null){
-			showSnackbar(SNACKBAR_TYPE, getString(R.string.error_temporary_unavaible), -1);
+			dismissAlertDialogIfExists(statusDialog);
+			dismissAlertDialogIfExists(processFileDialog);
+			showSnackbar(SNACKBAR_TYPE, StringResourcesUtils.getString(R.string.error_temporary_unavaible), -1);
 			return;
 		}
 
 		if (infos == null) {
-			showSnackbar(SNACKBAR_TYPE, getString(R.string.upload_can_not_open), -1);
+			dismissAlertDialogIfExists(statusDialog);
+			dismissAlertDialogIfExists(processFileDialog);
+			showSnackbar(SNACKBAR_TYPE, StringResourcesUtils.getString(R.string.upload_can_not_open), MEGACHAT_INVALID_HANDLE);
+			return;
 		}
-		else {
-			if (app.getStorageState() == STORAGE_STATE_PAYWALL) {
-				showOverDiskQuotaPaywallWarning();
-				return;
-			}
 
-			showSnackbar(SNACKBAR_TYPE, getResources().getQuantityString(R.plurals.upload_began, infos.size(), infos.size()), -1);
+		if (app.getStorageState() == STORAGE_STATE_PAYWALL) {
+			dismissAlertDialogIfExists(statusDialog);
+			dismissAlertDialogIfExists(processFileDialog);
+			showOverDiskQuotaPaywallWarning();
+			return;
+		}
 
-			for (ShareInfo info : infos) {
-				if(info.isContact){
-					requestContactsPermissions(info, parentNode);
-				}
-				else{
-					if (transfersManagement.shouldBreakTransfersProcessing()) {
-						break;
+		checkNameCollisionUseCase.check(infos, parentNode)
+				.subscribeOn(Schedulers.io())
+				.observeOn(AndroidSchedulers.mainThread())
+				.subscribe((result, throwable) -> {
+					dismissAlertDialogIfExists(statusDialog);
+					dismissAlertDialogIfExists(processFileDialog);
+
+					if (throwable != null) {
+						showSnackbar(SNACKBAR_TYPE, StringResourcesUtils.getString(R.string.error_temporary_unavaible), MEGACHAT_INVALID_HANDLE);
+					} else {
+						List<ShareInfo> collisions = result.getFirst();
+						List<ShareInfo> withoutCollisions = result.getSecond();
+
+						if (!collisions.isEmpty()) {
+							//TODO Show name collision activity
+						}
+
+						if (!withoutCollisions.isEmpty()) {
+							showSnackbar(SNACKBAR_TYPE, StringResourcesUtils.getQuantityString(R.plurals.upload_began, withoutCollisions.size(), withoutCollisions.size()), MEGACHAT_INVALID_HANDLE);
+
+							for (ShareInfo info : withoutCollisions) {
+								if (info.isContact) {
+									requestContactsPermissions(info, parentNode);
+								} else {
+									if (transfersManagement.shouldBreakTransfersProcessing()) {
+										break;
+									}
+
+									Intent intent = new Intent(this, UploadService.class);
+									intent.putExtra(UploadService.EXTRA_FILEPATH, info.getFileAbsolutePath());
+									intent.putExtra(UploadService.EXTRA_NAME, info.getTitle());
+									intent.putExtra(UploadService.EXTRA_LAST_MODIFIED, info.getLastModified());
+									intent.putExtra(UploadService.EXTRA_PARENT_HASH, parentNode.getHandle());
+									intent.putExtra(UploadService.EXTRA_UPLOAD_COUNT, infos.size());
+									startService(intent);
+								}
+							}
+						}
 					}
-
-					Intent intent = new Intent(this, UploadService.class);
-					intent.putExtra(UploadService.EXTRA_FILEPATH, info.getFileAbsolutePath());
-					intent.putExtra(UploadService.EXTRA_NAME, info.getTitle());
-					intent.putExtra(UploadService.EXTRA_LAST_MODIFIED, info.getLastModified());
-					intent.putExtra(UploadService.EXTRA_PARENT_HASH, parentNode.getHandle());
-					intent.putExtra(UploadService.EXTRA_UPLOAD_COUNT, infos.size());
-					startService(intent);
-				}
-			}
-		}
+				});
 	}
 
 	public void requestContactsPermissions(ShareInfo info, MegaNode parentNode){

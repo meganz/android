@@ -11,6 +11,10 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
+import io.reactivex.rxjava3.kotlin.addTo
+import io.reactivex.rxjava3.kotlin.subscribeBy
+import io.reactivex.rxjava3.schedulers.Schedulers
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -22,6 +26,8 @@ import mega.privacy.android.app.di.MegaApiFolder
 import mega.privacy.android.app.interfaces.ActivityLauncher
 import mega.privacy.android.app.interfaces.SnackbarShower
 import mega.privacy.android.app.listeners.ExportListener
+import mega.privacy.android.app.namecollision.usecase.CheckNameCollisionUseCase
+import mega.privacy.android.app.usecase.exception.MegaNodeException
 import mega.privacy.android.app.utils.*
 import mega.privacy.android.app.utils.AlertsAndWarnings.showConfirmRemoveLinkDialog
 import mega.privacy.android.app.utils.CacheFolderManager.buildTempFile
@@ -51,7 +57,8 @@ import javax.inject.Inject
 class TextEditorViewModel @Inject constructor(
     @MegaApi private val megaApi: MegaApiAndroid,
     @MegaApiFolder private val megaApiFolder: MegaApiAndroid,
-    private val megaChatApi: MegaChatApiAndroid
+    private val megaChatApi: MegaChatApiAndroid,
+    private val checkNameCollisionUseCase: CheckNameCollisionUseCase
 ) : BaseRxViewModel() {
 
     companion object {
@@ -407,25 +414,44 @@ class TextEditorViewModel @Inject constructor(
             return
         }
 
-        val uploadIntent = Intent(activity, UploadService::class.java)
-            .putExtra(UploadService.EXTRA_UPLOAD_TXT, mode.value)
-            .putExtra(FROM_HOME_PAGE, fromHome)
-            .putExtra(UploadService.EXTRA_FILEPATH, tempFile.absolutePath)
-            .putExtra(UploadService.EXTRA_NAME, fileName.value)
-            .putExtra(UploadService.EXTRA_SIZE, tempFile.length())
-            .putExtra(
-                UploadService.EXTRA_PARENT_HASH,
-                if (mode.value == CREATE_MODE && getNode() == null) {
-                    megaApi.rootNode.handle
-                } else if (mode.value == CREATE_MODE) {
-                    getNode()?.handle
-                } else {
-                    getNode()?.parentHandle
+        val parentHandle = if (mode.value == CREATE_MODE && getNode() == null) {
+            megaApi.rootNode?.handle
+        } else if (mode.value == CREATE_MODE) {
+            getNode()?.handle
+        } else {
+            getNode()?.parentHandle
+        }
+
+        if (parentHandle == null) {
+            logError("Parent handle not valid.")
+            return
+        }
+
+        checkNameCollisionUseCase.check(tempFile.name, parentHandle)
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribeBy(
+                onComplete = {
+                    val uploadIntent = Intent(activity, UploadService::class.java)
+                        .putExtra(UploadService.EXTRA_UPLOAD_TXT, mode.value)
+                        .putExtra(FROM_HOME_PAGE, fromHome)
+                        .putExtra(UploadService.EXTRA_FILEPATH, tempFile.absolutePath)
+                        .putExtra(UploadService.EXTRA_NAME, fileName.value)
+                        .putExtra(UploadService.EXTRA_SIZE, tempFile.length())
+                        .putExtra(UploadService.EXTRA_PARENT_HASH, parentHandle)
+
+                    activity.startService(uploadIntent)
+                    activity.finish()
+                },
+                onError = { error ->
+                    if (error is MegaNodeException.ChildAlreadyExistsException) {
+                        //TODO notify view to show name collision activity
+                    } else {
+                        logError(error.message)
+                    }
                 }
             )
-
-        activity.startService(uploadIntent)
-        activity.finish()
+            .addTo(composite)
     }
 
     /**

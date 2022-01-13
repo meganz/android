@@ -58,7 +58,7 @@ import mega.privacy.android.app.ShareInfo;
 import mega.privacy.android.app.TransfersManagementActivity;
 import mega.privacy.android.app.UploadService;
 import mega.privacy.android.app.UserCredentials;
-import mega.privacy.android.app.usecase.CheckNameCollisionUseCase;
+import mega.privacy.android.app.namecollision.usecase.CheckNameCollisionUseCase;
 import mega.privacy.android.app.usecase.exception.MegaNodeException;
 import mega.privacy.android.app.utils.MegaProgressDialogUtil;
 import mega.privacy.android.app.generalusecase.FilePrepareUseCase;
@@ -107,6 +107,7 @@ import nz.mega.sdk.MegaUserAlert;
 import static android.webkit.URLUtil.*;
 import static mega.privacy.android.app.constants.EventConstants.EVENT_UPDATE_VIEW_MODE;
 import static mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil.isBottomSheetDialogShown;
+import static mega.privacy.android.app.utils.AlertDialogUtil.dismissAlertDialogIfExists;
 import static mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuotaPaywallWarning;
 import static mega.privacy.android.app.utils.ChatUtil.createAttachmentPendingMessage;
 import static mega.privacy.android.app.utils.ColorUtils.tintIcon;
@@ -1701,57 +1702,75 @@ public class FileExplorerActivityLollipop extends TransfersManagementActivity
 			getIntent().setAction(ACTION_PROCESSED);
 		}
 
-		if (statusDialog != null) {
-			try {
-				statusDialog.dismiss();
-			}
-			catch(Exception ex){}
-		}
 
 		logDebug("intent processed!");
 		if (folderSelected) {
 			if (infos == null) {
-				showSnackbar(getString(R.string.upload_can_not_open));
+				dismissAlertDialogIfExists(statusDialog);
+				showSnackbar(StringResourcesUtils.getString(R.string.upload_can_not_open));
 				return;
 			}
-			else {
-				if (app.getStorageState() == STORAGE_STATE_PAYWALL) {
-					showOverDiskQuotaPaywallWarning();
-					return;
-				}
 
-				long parentHandle;
-				if (cDriveExplorer != null){
-					parentHandle = cDriveExplorer.getParentHandle();
-				}
-				else{
-					parentHandle = parentHandleCloud;
-				}
-				MegaNode parentNode = megaApi.getNodeByHandle(parentHandle);
-				if(parentNode == null){
-					parentNode = megaApi.getRootNode();
-				}
+			if (app.getStorageState() == STORAGE_STATE_PAYWALL) {
+				dismissAlertDialogIfExists(statusDialog);
+				showOverDiskQuotaPaywallWarning();
+				return;
+			}
 
-				backToCloud(parentNode.getHandle(), infos.size());
-				for (ShareInfo info : infos) {
-					if (transfersManagement.shouldBreakTransfersProcessing()) {
-						break;
-					}
+			long parentHandle = cDriveExplorer != null
+					? cDriveExplorer.getParentHandle()
+					: parentHandleCloud;
 
-					Intent intent = new Intent(this, UploadService.class);
-					intent.putExtra(UploadService.EXTRA_FILEPATH, info.getFileAbsolutePath());
-					intent.putExtra(UploadService.EXTRA_NAME, info.getTitle());
-					if (nameFiles != null && nameFiles.get(info.getTitle()) != null && !nameFiles.get(info.getTitle()).equals(info.getTitle())) {
-						intent.putExtra(UploadService.EXTRA_NAME_EDITED, nameFiles.get(info.getTitle()));
-					}
-					intent.putExtra(UploadService.EXTRA_PARENT_HASH, parentNode.getHandle());
-					intent.putExtra(UploadService.EXTRA_SIZE, info.getSize());
-					startService(intent);
-				}
-				filePreparedInfos = null;
-				logDebug("finish!!!");
-				finishActivity();
-			}	
+			MegaNode parentNode = megaApi.getNodeByHandle(parentHandle);
+			if (parentNode == null) {
+				parentNode = megaApi.getRootNode();
+			}
+
+			MegaNode finalParentNode = parentNode;
+			checkNameCollisionUseCase.check(infos, parentNode)
+					.subscribeOn(Schedulers.io())
+					.observeOn(AndroidSchedulers.mainThread())
+					.subscribe((result, throwable) -> {
+						dismissAlertDialogIfExists(statusDialog);
+
+						if (throwable != null) {
+							showSnackbar(StringResourcesUtils.getString(R.string.error_temporary_unavaible));
+						} else {
+							List<ShareInfo> collisions = result.getFirst();
+							List<ShareInfo> withoutCollisions = result.getSecond();
+
+							if (!collisions.isEmpty()) {
+								//TODO Show name collision activity
+							}
+
+							if (!withoutCollisions.isEmpty()) {
+								showSnackbar(StringResourcesUtils.getQuantityString(R.plurals.upload_began, withoutCollisions.size(), withoutCollisions.size()));
+
+								backToCloud(finalParentNode.getHandle(), infos.size());
+
+								for (ShareInfo info : infos) {
+									if (transfersManagement.shouldBreakTransfersProcessing()) {
+										break;
+									}
+
+									Intent intent = new Intent(this, UploadService.class);
+									intent.putExtra(UploadService.EXTRA_FILEPATH, info.getFileAbsolutePath());
+									intent.putExtra(UploadService.EXTRA_NAME, info.getTitle());
+									if (nameFiles != null && nameFiles.get(info.getTitle()) != null
+											&& !nameFiles.get(info.getTitle()).equals(info.getTitle())) {
+										intent.putExtra(UploadService.EXTRA_NAME_EDITED, nameFiles.get(info.getTitle()));
+									}
+									intent.putExtra(UploadService.EXTRA_PARENT_HASH, finalParentNode.getHandle());
+									intent.putExtra(UploadService.EXTRA_SIZE, info.getSize());
+									startService(intent);
+								}
+
+								filePreparedInfos = null;
+								logDebug("finish!!!");
+								finishActivity();
+							}
+						}
+					});
 		}
 	}
 

@@ -38,6 +38,9 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Stack;
 
+import dagger.hilt.android.AndroidEntryPoint;
+import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
+import io.reactivex.rxjava3.schedulers.Schedulers;
 import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.ShareInfo;
@@ -49,6 +52,8 @@ import mega.privacy.android.app.lollipop.adapters.MegaSharedFolderLollipopAdapte
 import mega.privacy.android.app.lollipop.controllers.ContactController;
 import mega.privacy.android.app.lollipop.controllers.NodeController;
 import mega.privacy.android.app.modalbottomsheet.FileContactsListBottomSheetDialogFragment;
+import mega.privacy.android.app.namecollision.usecase.CheckNameCollisionUseCase;
+import mega.privacy.android.app.utils.AlertDialogUtil;
 import mega.privacy.android.app.utils.StringResourcesUtils;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaContactRequest;
@@ -72,7 +77,13 @@ import static mega.privacy.android.app.utils.Util.*;
 import static nz.mega.sdk.MegaApiJava.INVALID_HANDLE;
 import static nz.mega.sdk.MegaApiJava.STORAGE_STATE_PAYWALL;
 
+import javax.inject.Inject;
+
+@AndroidEntryPoint
 public class FileContactListActivityLollipop extends PasscodeActivity implements OnClickListener, MegaGlobalListenerInterface {
+
+	@Inject
+	CheckNameCollisionUseCase checkNameCollisionUseCase;
 
 	private ContactController cC;
 	private NodeController nC;
@@ -676,43 +687,60 @@ public class FileContactListActivityLollipop extends PasscodeActivity implements
 	 */
 	public void onIntentProcessed() {
 		List<ShareInfo> infos = filePreparedInfos;
-		if (statusDialog != null) {
-			try {
-				statusDialog.dismiss();
-			}
-			catch(Exception ex){
-				logError(ex.getMessage());
-			}
-		}
 		
 		MegaNode parentNode = megaApi.getNodeByHandle(parentHandle);
 		if(parentNode == null){
+			AlertDialogUtil.dismissAlertDialogIfExists(statusDialog);
 			showSnackbar(getString(R.string.error_temporary_unavaible));
 			return;
 		}
 		
 		if (infos == null) {
+			AlertDialogUtil.dismissAlertDialogIfExists(statusDialog);
 			showSnackbar(getString(R.string.upload_can_not_open));
+			return;
 		}
-		else {
-			if (app.getStorageState() == STORAGE_STATE_PAYWALL) {
-				showOverDiskQuotaPaywallWarning();
-				return;
-			}
-			showSnackbar(getQuantityString(R.plurals.upload_began, infos.size(), infos.size()));
-			for (ShareInfo info : infos) {
-				if (transfersManagement.shouldBreakTransfersProcessing()) {
-					break;
-				}
 
-				Intent intent = new Intent(this, UploadService.class);
-				intent.putExtra(UploadService.EXTRA_FILEPATH, info.getFileAbsolutePath());
-				intent.putExtra(UploadService.EXTRA_NAME, info.getTitle());
-				intent.putExtra(UploadService.EXTRA_PARENT_HASH, parentNode.getHandle());
-				intent.putExtra(UploadService.EXTRA_SIZE, info.getSize());
-				startService(intent);
-			}
+		if (app.getStorageState() == STORAGE_STATE_PAYWALL) {
+			AlertDialogUtil.dismissAlertDialogIfExists(statusDialog);
+			showOverDiskQuotaPaywallWarning();
+			return;
 		}
+
+		checkNameCollisionUseCase.check(infos, parentNode)
+				.subscribeOn(Schedulers.io())
+				.observeOn(AndroidSchedulers.mainThread())
+				.subscribe((result, throwable) -> {
+					AlertDialogUtil.dismissAlertDialogIfExists(statusDialog);
+
+					if (throwable != null) {
+						showSnackbar(getString(R.string.error_temporary_unavaible));
+					} else {
+						List<ShareInfo> collisions = result.getFirst();
+						List<ShareInfo> withoutCollisions = result.getSecond();
+
+						if (!collisions.isEmpty()) {
+							//TODO Show name collision activity
+						}
+
+						if (!withoutCollisions.isEmpty()) {
+							showSnackbar(getQuantityString(R.plurals.upload_began, withoutCollisions.size(), withoutCollisions.size()));
+
+							for (ShareInfo info : withoutCollisions) {
+								if (transfersManagement.shouldBreakTransfersProcessing()) {
+									break;
+								}
+
+								Intent intent = new Intent(this, UploadService.class);
+								intent.putExtra(UploadService.EXTRA_FILEPATH, info.getFileAbsolutePath());
+								intent.putExtra(UploadService.EXTRA_NAME, info.getTitle());
+								intent.putExtra(UploadService.EXTRA_PARENT_HASH, parentNode.getHandle());
+								intent.putExtra(UploadService.EXTRA_SIZE, info.getSize());
+								startService(intent);
+							}
+						}
+					}
+				});
 	}
 	
 	@Override
