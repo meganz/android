@@ -75,7 +75,6 @@ import static mega.privacy.android.app.utils.TimeUtils.*;
 import static mega.privacy.android.app.utils.Util.*;
 import static mega.privacy.android.app.utils.AvatarUtil.*;
 import static mega.privacy.android.app.utils.TextUtil.*;
-import static nz.mega.sdk.MegaChatCall.CALL_STATUS_DESTROYED;
 import static nz.mega.sdk.MegaChatCall.CALL_STATUS_IN_PROGRESS;
 import static nz.mega.sdk.MegaChatCall.CALL_STATUS_JOINING;
 import static nz.mega.sdk.MegaChatCall.CALL_STATUS_TERMINATING_USER_PARTICIPATION;
@@ -111,7 +110,9 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 
 	int adapterType;
 
-	public MegaListChatLollipopAdapter(Context _context, Object _fragment, ArrayList<MegaChatListItem> _chats, RecyclerView _listView, int type) {
+	public MegaListChatLollipopAdapter(Context _context, Object _fragment,
+									   ArrayList<MegaChatListItem> _chats, RecyclerView _listView,
+									   int type) {
 		logDebug("New adapter");
 		this.context = _context;
 		this.chats = _chats;
@@ -2252,6 +2253,7 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 
 				long lastMsgSender = chat.getLastMessageSender();
 
+
 				if(lastMsgSender==megaChatApi.getMyUserHandle()){
 
 					logDebug("The last message is mine: " + lastMsgSender);
@@ -2278,21 +2280,21 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 						String fullNameAction = converterShortCodes(cC.getParticipantFullName(lastMsgSender));
 
 						if(isTextEmpty(fullNameAction)){
-                            if(!(((ViewHolderNormalChatList)holder).nameRequestedAction)){
-                                logDebug("Call for nonContactHandle: " + lastMsgSender);
-                                fullNameAction = context.getString(R.string.unknown_name_label);
-                                ((ViewHolderNormalChatList)holder).nameRequestedAction=true;
-                                ((ViewHolderNormalChatList)holder).userHandle = lastMsgSender;
+							if(!(((ViewHolderNormalChatList)holder).nameRequestedAction)){
+								logDebug("Call for nonContactHandle: " + lastMsgSender);
+								fullNameAction = context.getString(R.string.unknown_name_label);
+								((ViewHolderNormalChatList)holder).nameRequestedAction=true;
+								((ViewHolderNormalChatList)holder).userHandle = lastMsgSender;
 
-                                ChatNonContactNameListener listener = new ChatNonContactNameListener(context, holder, this, lastMsgSender, chat.isPreview());
+								ChatNonContactNameListener listener = new ChatNonContactNameListener(context, holder, this, lastMsgSender, chat.isPreview());
 
-                                megaChatApi.getUserFirstname(lastMsgSender, chatRoom.getAuthorizationToken(), listener);
-                                megaChatApi.getUserLastname(lastMsgSender, chatRoom.getAuthorizationToken(), listener);
-                                megaChatApi.getUserEmail(lastMsgSender, listener);
-                            }
-                            else{
-                                logWarning("Name already asked and no name received: handle " + lastMsgSender);
-                            }
+								megaChatApi.getUserFirstname(lastMsgSender, chatRoom.getAuthorizationToken(), listener);
+								megaChatApi.getUserLastname(lastMsgSender, chatRoom.getAuthorizationToken(), listener);
+								megaChatApi.getUserEmail(lastMsgSender, listener);
+							}
+							else{
+								logWarning("Name already asked and no name received: handle " + lastMsgSender);
+							}
 						}
 
 						Spannable name = new SpannableString(fullNameAction + ": ");

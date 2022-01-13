@@ -573,6 +573,7 @@
 
         <service
             android:name=".jobservices.CameraUploadsService"
+            android:foregroundServiceType="dataSync"
             android:exported="false" />
 	    <service
 		    android:name=".jobservices.CuSyncInactiveHeartbeatService"
