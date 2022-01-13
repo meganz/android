@@ -5057,7 +5057,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 		searchMenuItem = menu.findItem(R.id.action_search);
 		searchView = (SearchView) searchMenuItem.getActionView();
 
-		if (Math.round(outMetrics.widthPixels / (outMetrics.xdpi / 160)) <= 330) {
+		if (addPhoneNumberButton.getLineCount() > 1) {
 			findViewById(R.id.navigation_drawer_add_phone_number_icon).setVisibility(View.GONE);
 		}
 
