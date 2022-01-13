@@ -1,7 +1,7 @@
 package mega.privacy.android.app.lollipop.managerSections.settings
 
-import android.util.Log
-import androidx.lifecycle.*
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
@@ -25,6 +25,16 @@ class SettingsViewModel @Inject constructor(
     fetchMultiFactorAuthSetting: FetchMultiFactorAuthSetting,
 ) : ViewModel() {
     private val userAccount = MutableStateFlow(getAccountDetails(false))
+    private val state = MutableStateFlow(initialiseState())
+    val uiState: StateFlow<SettingsState> = state
+
+    private fun initialiseState(): SettingsState {
+        return SettingsState(
+            autoAcceptEnabled = false,
+            multiFactorAuthEnabled = false,
+            canDeleteAccount = canDeleteAccount(getAccountDetails(false))
+        )
+    }
 
     val hideRecentActivity: Boolean
         get() = shouldHideRecentActivity()
@@ -34,15 +44,6 @@ class SettingsViewModel @Inject constructor(
         get() = refreshPasscodeLockPreference()
     val email: String
         get() = userAccount.value.email
-    val displayDeleteAccountOption: StateFlow<Boolean> =
-        userAccount.mapLatest {
-            canDeleteAccount(it)
-        }.stateIn(
-            viewModelScope,
-            SharingStarted.Eagerly,
-            canDeleteAccount(userAccount.value)
-        )
-
     val isLoggerEnabled: Boolean
         get() = isLoggingEnabled()
     val isChatLoggerEnabled: Boolean
@@ -56,32 +57,30 @@ class SettingsViewModel @Inject constructor(
     val multiFactorAuthAvailable: Boolean
         get() = isMultiFactorAuthAvailable()
 
-    private val autoAcceptEnabled = MutableStateFlow(false)
-    val isAutoAcceptEnabled: StateFlow<Boolean> = autoAcceptEnabled
-    val isMultiFactorEnabled: StateFlow<Boolean> =
-        fetchMultiFactorAuthSetting()
-            .stateIn(
-                scope = viewModelScope,
-                started = SharingStarted.Eagerly,
-                initialValue = false
-            )
 
     init {
         viewModelScope.launch {
-            autoAcceptEnabled.value = fetchAutoAcceptQRLinks()
+            state.update { it.copy(autoAcceptEnabled = fetchAutoAcceptQRLinks()) }
+            fetchMultiFactorAuthSetting().collect { enabled ->
+                state.update { it.copy(multiFactorAuthEnabled = enabled) }
+            }
         }
+
     }
 
     fun refreshAccount() {
-        userAccount.value = getAccountDetails(true)
+        viewModelScope.launch {
+            userAccount.value = getAccountDetails(true)
+            state.update { it.copy(canDeleteAccount = canDeleteAccount(userAccount.value)) }
+        }
     }
 
     fun toggleAutoAcceptPreference() {
         viewModelScope.launch {
             kotlin.runCatching {
                 toggleAutoAcceptQRLinks()
-            }.onSuccess {
-                autoAcceptEnabled.value = it
+            }.onSuccess { autoAccept ->
+                state.update { it.copy(autoAcceptEnabled = autoAccept) }
             }
         }
     }

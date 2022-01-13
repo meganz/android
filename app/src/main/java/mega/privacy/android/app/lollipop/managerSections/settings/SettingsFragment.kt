@@ -101,23 +101,10 @@ class SettingsFragment : Preference.OnPreferenceChangeListener,
     private fun observeState() {
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.RESUMED) {
-                viewModel.isAutoAcceptEnabled.collect {
-                    findPreference<SwitchPreferenceCompat>(KEY_QR_CODE_AUTO_ACCEPT)?.isChecked = it
-                }
-            }
-        }
-        lifecycleScope.launch {
-            repeatOnLifecycle(Lifecycle.State.RESUMED) {
-                viewModel.isMultiFactorEnabled.collect {
-                    Log.d("MultiFactorAuthSetting", "isEnabled: $it ")
-                    setMultiFactorCheckedState(it)
-                }
-            }
-        }
-        lifecycleScope.launch {
-            repeatOnLifecycle(Lifecycle.State.RESUMED) {
-                viewModel.displayDeleteAccountOption.collect {
-                    setDeletePreference(it)
+                viewModel.uiState.collect {
+                    findPreference<SwitchPreferenceCompat>(KEY_QR_CODE_AUTO_ACCEPT)?.isChecked = it.autoAcceptEnabled
+                    setMultiFactorCheckedState(it.multiFactorAuthEnabled)
+                    setDeletePreference(it.canDeleteAccount)
                 }
             }
         }
@@ -146,7 +133,7 @@ class SettingsFragment : Preference.OnPreferenceChangeListener,
     /**
      * Checks and sets the User interface setting values.
      */
-    fun checkUIPreferences() {
+    private fun checkUIPreferences() {
         updateStartScreenSetting(viewModel.startScreen)
         findPreference<SwitchPreferenceCompat>(KEY_HIDE_RECENT_ACTIVITY)?.isChecked =
             viewModel.hideRecentActivity
@@ -452,7 +439,7 @@ class SettingsFragment : Preference.OnPreferenceChangeListener,
                     ChangePasswordActivityLollipop::class.java
                 )
             )
-            KEY_2FA -> if (viewModel.isMultiFactorEnabled.value) {
+            KEY_2FA -> if (viewModel.uiState.value.multiFactorAuthEnabled) {
                 val intent = Intent(context, VerifyTwoFactorActivity::class.java)
                 intent.putExtra(VerifyTwoFactorActivity.KEY_VERIFY_TYPE, Constants.DISABLE_2FA)
                 startActivity(intent)

@@ -212,7 +212,6 @@ class SettingsFragmentTest {
         scenario?.moveToState(Lifecycle.State.STARTED)
         scenario?.moveToState(Lifecycle.State.RESUMED)
 
-        verify(TestSettingsModule.canDeleteAccount, times(2)).invoke(userAccount)
         onPreferences()
             .check(withNoRowContaining(withText(R.string.settings_delete_account)))
 
@@ -222,9 +221,6 @@ class SettingsFragmentTest {
         val receiver = object : BroadcastReceiver() {
             override fun onReceive(context: Context?, intent: Intent?) {
                 idlingResource.decrement()
-                verify(TestSettingsModule.getAccountDetails, times(1)).invoke(false)
-                verify(TestSettingsModule.getAccountDetails, times(1)).invoke(true)
-                verify(TestSettingsModule.canDeleteAccount, times(1)).invoke(refreshUserAccount)
             }
         }
 
