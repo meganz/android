@@ -487,7 +487,7 @@ public class MapsActivity extends PasscodeActivity implements ActivityCompat.OnR
 
     @Override
     public void onBackPressed() {
-        if (psaWebBrowser.consumeBack()) return;
+        if (psaWebBrowser != null && psaWebBrowser.consumeBack()) return;
         super.onBackPressed();
         this.finish();
     }

@@ -24,6 +24,10 @@ class GetMyAvatarUseCase @Inject constructor(
                 avatarPath,
                 OptionalMegaRequestListenerInterface(
                     onRequestFinish = { _, error ->
+                        if (emitter.isDisposed) {
+                            return@OptionalMegaRequestListenerInterface
+                        }
+
                         if (error.errorCode == API_OK) {
                             emitter.onSuccess(true)
                         } else {

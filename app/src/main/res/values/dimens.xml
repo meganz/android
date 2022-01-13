@@ -150,4 +150,9 @@
     <dimen name="image_group_size">26dp</dimen>
     <dimen name="image_group_text_size">15sp</dimen>
     <dimen name="image_group_border_size">1dp</dimen>
+
+    <dimen name="image_mini_avatar_size">24dp</dimen>
+    <dimen name="image_mini_avatar_text_size">12sp</dimen>
+    <dimen name="image_link_avatar_size">44dp</dimen>
+    <dimen name="image_link_avatar_text_size">22sp</dimen>
 </resources>
