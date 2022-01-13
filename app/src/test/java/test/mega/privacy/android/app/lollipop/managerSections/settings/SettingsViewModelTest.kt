@@ -5,12 +5,7 @@ import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.take
-import kotlinx.coroutines.flow.toList
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.StandardTestDispatcher
-import kotlinx.coroutines.test.runBlockingTest
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import mega.privacy.android.app.domain.usecase.FetchAutoAcceptQRLinks
@@ -34,7 +29,6 @@ class SettingsViewModelTest {
         underTest = SettingsViewModel(
             getAccountDetails = mock(),
             canDeleteAccount = mock(),
-            refreshUserAccount = mock(),
             refreshPasscodeLockPreference = mock(),
             isLoggingEnabled = mock(),
             isChatLoggingEnabled = mock(),
@@ -51,14 +45,14 @@ class SettingsViewModelTest {
 
     @Test
     fun `test initial value for auto accept is false`() = runTest {
-        val actual = underTest.isAutoExceptEnabled.first()
+        val actual = underTest.isAutoAcceptEnabled.first()
         assertThat(actual).isFalse()
     }
 
     @Test
     fun `test that the subsequent value auto accept is returned from the use case`() = runTest{
         whenever(fetchAutoAcceptQRLinks()).thenReturn(true)
-        underTest.isAutoExceptEnabled.test {
+        underTest.isAutoAcceptEnabled.test {
             assertThat(awaitItem()).isFalse()
             assertThat(awaitItem()).isTrue()
         }
@@ -70,7 +64,7 @@ class SettingsViewModelTest {
         whenever(fetchAutoAcceptQRLinks()).thenReturn(true)
         whenever(toggleAutoAcceptQRLinks()).thenReturn(false)
 
-        underTest.isAutoExceptEnabled.test {
+        underTest.isAutoAcceptEnabled.test {
             assertThat(awaitItem()).isFalse()
             assertThat(awaitItem()).isTrue()
             underTest.toggleAutoAcceptPreference()

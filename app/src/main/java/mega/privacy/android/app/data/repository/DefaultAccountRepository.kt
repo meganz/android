@@ -7,6 +7,7 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.constants.EventConstants.EVENT_2FA_UPDATED
@@ -37,7 +38,7 @@ class DefaultAccountRepository @Inject constructor(
         )
     }
 
-    override fun hasAccountBeenFetched(): Boolean {
+    override fun isAccountDataStale(): Boolean {
         LogUtil.logDebug("Check the last call to getAccountDetails")
         return DBUtil.callToAccountDetails() || myAccountInfo.usedFormatted.isBlank()
     }
@@ -97,7 +98,6 @@ class DefaultAccountRepository @Inject constructor(
     override fun monitorMultiFactorAuthChanges(): Flow<Boolean> {
         val eventObservable =
             eventBusGateway.getEventObservable(EVENT_2FA_UPDATED, Boolean::class.java)
-                ?: return flowOf()
 
         return callbackFlow {
             val flowObserver = Observer(this::trySend)

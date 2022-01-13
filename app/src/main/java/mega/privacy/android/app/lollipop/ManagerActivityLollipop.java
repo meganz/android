@@ -7364,7 +7364,9 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 				}
 
 				if (getSettingsFragment() != null) {
-					settingsFragment.updateCancelAccountSetting();
+					if (SettingsFragmentRefactorToggle.INSTANCE.getEnabled() == false){
+						settingsFragment.updateCancelAccountSetting();
+					}
 				}
 			} else {
 				businessLabel.setVisibility(View.GONE);
@@ -8032,10 +8034,13 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 				refreshIncomingShares();
 			}
 
-			if (getSettingsFragment() != null) {
-				try {
-					settingsFragment.update2FAVisibility();
-				}catch (Exception e){}
+			if (SettingsFragmentRefactorToggle.INSTANCE.getEnabled() == false){
+				if (getSettingsFragment() != null) {
+					try {
+						settingsFragment.update2FAVisibility();
+					} catch (Exception e) {
+					}
+				}
 			}
 		}
 		else if (requestCode == TAKE_PHOTO_CODE) {

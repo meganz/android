@@ -1,6 +1,7 @@
 package test.mega.privacy.android.app.domain.usecase
 
 import com.google.common.truth.Truth.assertThat
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.app.domain.exception.ApiError
 import mega.privacy.android.app.domain.exception.SettingNotFoundException
@@ -26,6 +27,10 @@ class ToggleAutoAcceptQRLinksTest {
 
     @Before
     fun setUp() {
+        runBlocking {
+            whenever(settingsRepository.setAutoAcceptQR(false)).thenReturn(false)
+            whenever(settingsRepository.setAutoAcceptQR(true)).thenReturn(true)
+        }
         underTest = DefaultToggleAutoAcceptQRLinks(
             fetchAutoAcceptQRLinks = fetchAutoAcceptQRLinks,
             settingsRepository = settingsRepository

@@ -13,5 +13,5 @@ interface SettingsRepository {
     fun shouldHideRecentActivity(): Boolean
     fun isChatLoggingEnabled(): Boolean
     fun isLoggingEnabled(): Boolean
-    fun setAutoAcceptQR(accept: Boolean)
+    suspend fun setAutoAcceptQR(accept: Boolean): Boolean
 }

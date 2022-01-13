@@ -2,10 +2,14 @@ package test.mega.privacy.android.app.lollipop.managerSections.settings
 
 import android.app.Activity
 import android.app.Instrumentation
-import android.content.ComponentName
+import android.content.*
 import androidx.lifecycle.Lifecycle
 import androidx.test.core.app.ApplicationProvider.getApplicationContext
 import androidx.test.espresso.Espresso.onView
+import androidx.test.espresso.IdlingRegistry
+import androidx.test.espresso.IdlingResource
+import androidx.test.espresso.IdlingResource.ResourceCallback
+import androidx.test.espresso.idling.CountingIdlingResource
 import androidx.test.espresso.intent.Intents
 import androidx.test.espresso.intent.Intents.intended
 import androidx.test.espresso.intent.Intents.intending
@@ -31,9 +35,11 @@ import mega.privacy.android.app.activities.settingsActivities.FileManagementPref
 import mega.privacy.android.app.activities.settingsActivities.StartScreenPreferencesActivity
 import mega.privacy.android.app.constants.EventConstants
 import mega.privacy.android.app.di.SettingsModule
+import mega.privacy.android.app.domain.entity.UserAccount
 import mega.privacy.android.app.domain.usecase.*
 import mega.privacy.android.app.lollipop.managerSections.settings.SettingsActivity
 import mega.privacy.android.app.lollipop.managerSections.settings.SettingsFragment
+import mega.privacy.android.app.utils.Constants
 import org.hamcrest.Matchers.allOf
 import org.hamcrest.Matchers.not
 import org.junit.After
@@ -42,15 +48,14 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Mockito
-import org.mockito.kotlin.mock
-import org.mockito.kotlin.times
-import org.mockito.kotlin.verify
-import org.mockito.kotlin.whenever
+import org.mockito.kotlin.*
 import test.mega.privacy.android.app.RecyclerViewAssertions.Companion.withNoRowContaining
 import test.mega.privacy.android.app.RecyclerViewAssertions.Companion.withRowContaining
 import test.mega.privacy.android.app.launchFragmentInHiltContainer
 import test.mega.privacy.android.app.testFragment
 import test.mega.privacy.android.app.testFragmentTag
+import java.util.concurrent.atomic.AtomicBoolean
+import kotlin.concurrent.thread
 
 
 @HiltAndroidTest
@@ -62,6 +67,15 @@ class SettingsFragmentTest {
     @get:Rule(order = 0)
     var hiltRule = HiltAndroidRule(this)
 
+    private val idlingResource = CountingIdlingResource("IdleCounter")
+
+    private val userAccount = UserAccount(
+        email = "email",
+        isBusinessAccount = false,
+        isMasterBusinessAccount = false,
+        accountTypeIdentifier = Constants.FREE
+    )
+
     @Module
     @InstallIn(SingletonComponent::class)
     object TestSettingsModule {
@@ -71,19 +85,18 @@ class SettingsFragmentTest {
         val settingsActivity = mock<SettingsActivity>()
         val fetchAutoAcceptQRLinks = mock<FetchAutoAcceptQRLinks>()
         val fetchMultiFactorAuthSetting = mock<FetchMultiFactorAuthSetting>()
+        val getAccountDetails = mock<GetAccountDetails>()
 
         @Provides
         fun provideSettingsActivity(): SettingsActivity = settingsActivity
 
+
         @Provides
-        fun provideGetAccountDetails(): GetAccountDetails = mock()
+        fun provideGetAccountDetails(): GetAccountDetails = getAccountDetails
 
 
         @Provides
         fun provideCanDeleteAccount(): CanDeleteAccount = canDeleteAccount
-
-        @Provides
-        fun provideRefreshUserAccount(): RefreshUserAccount = mock()
 
         @Provides
         fun provideRefreshPasscodeLockPreference(): RefreshPasscodeLockPreference =
@@ -132,27 +145,35 @@ class SettingsFragmentTest {
 
     @Before
     fun setUp() {
+        IdlingRegistry.getInstance().register(idlingResource)
         runBlocking { whenever(TestSettingsModule.fetchAutoAcceptQRLinks()).thenReturn(false) }
         whenever(TestSettingsModule.fetchMultiFactorAuthSetting()).thenReturn(flowOf())
+        whenever(TestSettingsModule.getAccountDetails(any())).thenReturn(userAccount)
         hiltRule.inject()
         Intents.init()
     }
 
     @After
     fun tearDown() {
+        IdlingRegistry.getInstance().unregister(idlingResource)
         Intents.release()
         Mockito.reset(
-            TestSettingsModule.canDeleteAccount,
             TestSettingsModule.getStartScreen,
             TestSettingsModule.isMultiFactorAuthAvailable,
+            TestSettingsModule.fetchMultiFactorAuthSetting,
             TestSettingsModule.settingsActivity,
+            TestSettingsModule.canDeleteAccount,
+            TestSettingsModule.getAccountDetails
         )
     }
 
     @Test
     fun test_delete_preference_is_removed_if_account_cannot_be_deleted() {
-        whenever(TestSettingsModule.canDeleteAccount()).thenReturn(false)
-        launchFragmentInHiltContainer<SettingsFragment>()
+        whenever(TestSettingsModule.canDeleteAccount(userAccount)).thenReturn(false)
+        val scenario = launchFragmentInHiltContainer<SettingsFragment>()
+        scenario?.moveToState(Lifecycle.State.CREATED)
+        scenario?.moveToState(Lifecycle.State.STARTED)
+        scenario?.moveToState(Lifecycle.State.RESUMED)
 
         onPreferences()
             .check(withNoRowContaining(withText(R.string.settings_delete_account)))
@@ -160,13 +181,72 @@ class SettingsFragmentTest {
 
     @Test
     fun test_delete_preference_is_present_if_account_can_be_deleted() {
-        whenever(TestSettingsModule.canDeleteAccount()).thenReturn(true)
-        launchFragmentInHiltContainer<SettingsFragment>()
+        whenever(TestSettingsModule.canDeleteAccount(userAccount)).thenReturn(true)
+
+        val scenario = launchFragmentInHiltContainer<SettingsFragment>()
+        scenario?.moveToState(Lifecycle.State.STARTED)
+        scenario?.moveToState(Lifecycle.State.RESUMED)
 
         onPreferences()
             .check(withRowContaining(withText(R.string.settings_delete_account)))
     }
 
+
+    @Test
+    fun test_that_when_can_delete_changes_to_true_preference_is_added_again() {
+        val refreshUserAccount = UserAccount(
+            email = "refreshEmail",
+            isBusinessAccount = false,
+            isMasterBusinessAccount = false,
+            accountTypeIdentifier = Constants.FREE
+        )
+
+        whenever(TestSettingsModule.getAccountDetails(false)).thenReturn(userAccount)
+        whenever(TestSettingsModule.getAccountDetails(true)).thenReturn(refreshUserAccount)
+
+        whenever(TestSettingsModule.canDeleteAccount(userAccount)).thenReturn(false)
+        whenever(TestSettingsModule.canDeleteAccount(refreshUserAccount)).thenReturn(true)
+
+        val scenario = launchFragmentInHiltContainer<SettingsFragment>()
+        scenario?.moveToState(Lifecycle.State.CREATED)
+        scenario?.moveToState(Lifecycle.State.STARTED)
+        scenario?.moveToState(Lifecycle.State.RESUMED)
+
+        verify(TestSettingsModule.canDeleteAccount, times(2)).invoke(userAccount)
+        onPreferences()
+            .check(withNoRowContaining(withText(R.string.settings_delete_account)))
+
+//        This test occasionally fails due to timing issues.
+//        Adding this receiver with an idling resource ensures that the verification only happens
+//        after the broadcast has been received.
+        val receiver = object : BroadcastReceiver() {
+            override fun onReceive(context: Context?, intent: Intent?) {
+                idlingResource.decrement()
+                verify(TestSettingsModule.getAccountDetails, times(1)).invoke(false)
+                verify(TestSettingsModule.getAccountDetails, times(1)).invoke(true)
+                verify(TestSettingsModule.canDeleteAccount, times(1)).invoke(refreshUserAccount)
+            }
+        }
+
+        scenario?.onActivity {
+            it.registerReceiver(
+                receiver,
+                IntentFilter(Constants.BROADCAST_ACTION_INTENT_UPDATE_ACCOUNT_DETAILS)
+            )
+            val intent = Intent(Constants.BROADCAST_ACTION_INTENT_UPDATE_ACCOUNT_DETAILS)
+            it.sendBroadcast(intent)
+            idlingResource.increment()
+        }
+
+        onPreferences()
+            .check(withRowContaining(withText(R.string.settings_delete_account)))
+
+        scenario?.onActivity {
+            it.unregisterReceiver(
+                receiver
+            )
+        }
+    }
 
     @Test
     @SdkSuppress(maxSdkVersion = 29)
@@ -188,7 +268,7 @@ class SettingsFragmentTest {
 
     @Test
     fun test_that_activated_delete_has_100_percent_alpha() {
-        whenever(TestSettingsModule.canDeleteAccount()).thenReturn(true)
+        whenever(TestSettingsModule.canDeleteAccount(userAccount)).thenReturn(true)
         val scenario = launchFragmentInHiltContainer<SettingsFragment>()
         scenario?.onActivity {
             val fragment = it.testFragment<SettingsFragment>()
@@ -208,7 +288,7 @@ class SettingsFragmentTest {
 
     @Test
     fun test_that_deactivated_delete_has_50_percent_alpha() {
-        whenever(TestSettingsModule.canDeleteAccount()).thenReturn(true)
+        whenever(TestSettingsModule.canDeleteAccount(userAccount)).thenReturn(true)
         val scenario = launchFragmentInHiltContainer<SettingsFragment>()
         scenario?.onActivity {
             val fragment = it.testFragment<SettingsFragment>()
@@ -252,7 +332,7 @@ class SettingsFragmentTest {
 
     @Test
     fun test_that_correct_fields_are_disable_when_offline() {
-        whenever(TestSettingsModule.canDeleteAccount()).thenReturn(true)
+        whenever(TestSettingsModule.canDeleteAccount(userAccount)).thenReturn(true)
         whenever(TestSettingsModule.isMultiFactorAuthAvailable()).thenReturn(true)
         val scenario = launchFragmentInHiltContainer<SettingsFragment>()
         scenario?.onActivity {
@@ -412,9 +492,10 @@ class SettingsFragmentTest {
 
     @Test
     fun test_that_2FA_updates_toggle_the_switch() {
-        whenever(TestSettingsModule.fetchMultiFactorAuthSetting()).thenReturn(flowOf(true))
         whenever(TestSettingsModule.isMultiFactorAuthAvailable()).thenReturn(true)
+        whenever(TestSettingsModule.fetchMultiFactorAuthSetting()).thenReturn(flowOf(true))
         val scenario = launchFragmentInHiltContainer<SettingsFragment>()
+        scenario?.moveToState(Lifecycle.State.CREATED)
         scenario?.moveToState(Lifecycle.State.STARTED)
         scenario?.moveToState(Lifecycle.State.RESUMED)
 
@@ -429,6 +510,7 @@ class SettingsFragmentTest {
             )
 
     }
+
 
     private fun onPreferences() = onView(withId(androidx.preference.R.id.recycler_view))
 }

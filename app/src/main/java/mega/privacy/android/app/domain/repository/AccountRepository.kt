@@ -7,7 +7,7 @@ import nz.mega.sdk.MegaRequestListenerInterface
 
 interface AccountRepository {
     fun getUserAccount(): UserAccount
-    fun hasAccountBeenFetched(): Boolean
+    fun isAccountDataStale(): Boolean
     fun requestAccount()
     fun getRootNode(): MegaNode?
     fun isMultiFactorAuthAvailable(): Boolean

@@ -1,8 +1,7 @@
 package mega.privacy.android.app.domain.usecase
 
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.emitAll
-import kotlinx.coroutines.flow.flow
+import android.util.Log
+import kotlinx.coroutines.flow.*
 import mega.privacy.android.app.domain.repository.AccountRepository
 import nz.mega.sdk.MegaRequestListenerInterface
 import javax.inject.Inject

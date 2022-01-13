@@ -5,7 +5,7 @@ import com.jeremyliao.liveeventbus.core.Observable
 import javax.inject.Inject
 
 class EventBusGateway @Inject constructor() {
-    fun <T> getEventObservable(event: String, type: Class<T>): Observable<T>? {
+    fun <T> getEventObservable(event: String, type: Class<T>): Observable<T> {
         return LiveEventBus.get(event, type)
     }
 }

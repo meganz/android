@@ -114,9 +114,50 @@ class DefaultSettingsRepository @Inject constructor(
             .getBoolean(sdkLogs, false)
     }
 
-    override fun setAutoAcceptQR(accept: Boolean) {
-        TODO("Not yet implemented")
+    override suspend fun setAutoAcceptQR(accept: Boolean): Boolean {
+
+        return suspendCoroutine { continuation ->
+            sdk.setContactLinksOption(!accept, object : MegaRequestListenerInterface {
+                override fun onRequestStart(api: MegaApiJava?, request: MegaRequest?) {}
+
+                override fun onRequestUpdate(api: MegaApiJava?, request: MegaRequest?) {}
+
+                override fun onRequestFinish(
+                    api: MegaApiJava?,
+                    request: MegaRequest?,
+                    e: MegaError?
+                ) {
+                    if (isSetAutoAcceptQRResponse(request)) {
+                        when (e?.errorCode) {
+                            MegaError.API_OK -> {
+                                continuation.resumeWith(Result.success(accept))
+                            }
+                            else -> {
+                                continuation.resumeWith(
+                                    Result.failure(
+                                        ApiError(
+                                            e?.errorCode,
+                                            e?.errorString
+                                        )
+                                    )
+                                )
+                            }
+                        }
+                    }
+                }
+
+                override fun onRequestTemporaryError(
+                    api: MegaApiJava?,
+                    request: MegaRequest?,
+                    e: MegaError?
+                ) {
+                }
+            })
+        }
     }
+
+    private fun isSetAutoAcceptQRResponse(request: MegaRequest?)=
+        request?.type == MegaRequest.TYPE_SET_ATTR_USER && request.paramType == MegaApiJava.USER_ATTR_CONTACT_LINK_VERIFICATION
 
     private fun getUiPreferences(): SharedPreferences {
         return context

@@ -21,11 +21,6 @@ abstract class SettingsModule {
     ): CanDeleteAccount
 
     @Binds
-    abstract fun bindRefreshUserAccount(
-        useCase: DefaultRefreshUserAccount
-    ): RefreshUserAccount
-
-    @Binds
     abstract fun bindRefreshPasscodeLockPreference(
         useCase: DefaultRefreshPasscodeLockPreference
     ): RefreshPasscodeLockPreference

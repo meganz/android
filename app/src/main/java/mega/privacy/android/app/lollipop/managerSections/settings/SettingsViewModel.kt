@@ -1,21 +1,17 @@
 package mega.privacy.android.app.lollipop.managerSections.settings
 
+import android.util.Log
 import androidx.lifecycle.*
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.domain.usecase.*
-import nz.mega.sdk.MegaRequestListenerInterface
 import javax.inject.Inject
 
 @HiltViewModel
 class SettingsViewModel @Inject constructor(
     private val getAccountDetails: GetAccountDetails,
     private val canDeleteAccount: CanDeleteAccount,
-    private val refreshUserAccount: RefreshUserAccount,
     private val refreshPasscodeLockPreference: RefreshPasscodeLockPreference,
     private val isLoggingEnabled: IsLoggingEnabled,
     private val isChatLoggingEnabled: IsChatLoggingEnabled,
@@ -28,6 +24,8 @@ class SettingsViewModel @Inject constructor(
     private val toggleAutoAcceptQRLinks: ToggleAutoAcceptQRLinks,
     fetchMultiFactorAuthSetting: FetchMultiFactorAuthSetting,
 ) : ViewModel() {
+    private val userAccount = MutableStateFlow(getAccountDetails(false))
+
     val hideRecentActivity: Boolean
         get() = shouldHideRecentActivity()
     val startScreen: Int
@@ -35,9 +33,16 @@ class SettingsViewModel @Inject constructor(
     val passcodeLock: Boolean
         get() = refreshPasscodeLockPreference()
     val email: String
-        get() = getAccountDetails().email
-    val canNotDeleteAccount: Boolean
-        get() = !canDeleteAccount()
+        get() = userAccount.value.email
+    val displayDeleteAccountOption: StateFlow<Boolean> =
+        userAccount.mapLatest {
+            canDeleteAccount(it)
+        }.stateIn(
+            viewModelScope,
+            SharingStarted.Eagerly,
+            canDeleteAccount(userAccount.value)
+        )
+
     val isLoggerEnabled: Boolean
         get() = isLoggingEnabled()
     val isChatLoggerEnabled: Boolean
@@ -45,34 +50,38 @@ class SettingsViewModel @Inject constructor(
     val isCamSyncEnabled: Boolean
         get() = isCameraSyncEnabled()
     val accountType: Int
-        get() = getAccountDetails().accountTypeIdentifier
+        get() = userAccount.value.accountTypeIdentifier
     val hasRootNode: Boolean
         get() = rootNodeExists()
     val multiFactorAuthAvailable: Boolean
         get() = isMultiFactorAuthAvailable()
-    private val autoExceptEnabled = MutableStateFlow(false)
-    val isAutoExceptEnabled: StateFlow<Boolean> = autoExceptEnabled
+
+    private val autoAcceptEnabled = MutableStateFlow(false)
+    val isAutoAcceptEnabled: StateFlow<Boolean> = autoAcceptEnabled
     val isMultiFactorEnabled: StateFlow<Boolean> =
-        fetchMultiFactorAuthSetting().stateIn(
-            scope = viewModelScope,
-            started = SharingStarted.Eagerly,
-            initialValue = false
-        )
+        fetchMultiFactorAuthSetting()
+            .stateIn(
+                scope = viewModelScope,
+                started = SharingStarted.Eagerly,
+                initialValue = false
+            )
 
     init {
         viewModelScope.launch {
-            autoExceptEnabled.value = fetchAutoAcceptQRLinks()
+            autoAcceptEnabled.value = fetchAutoAcceptQRLinks()
         }
     }
 
-    fun refreshAccount() = refreshUserAccount()
+    fun refreshAccount() {
+        userAccount.value = getAccountDetails(true)
+    }
 
     fun toggleAutoAcceptPreference() {
         viewModelScope.launch {
             kotlin.runCatching {
                 toggleAutoAcceptQRLinks()
             }.onSuccess {
-                autoExceptEnabled.value = it
+                autoAcceptEnabled.value = it
             }
         }
     }

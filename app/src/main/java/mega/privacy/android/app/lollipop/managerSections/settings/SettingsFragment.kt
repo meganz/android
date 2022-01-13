@@ -1,15 +1,13 @@
 package mega.privacy.android.app.lollipop.managerSections.settings
 
 import android.annotation.SuppressLint
-import android.content.ComponentName
-import android.content.Context
-import android.content.Intent
-import android.content.ServiceConnection
+import android.content.*
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.os.IBinder
 import android.util.DisplayMetrics
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -29,6 +27,8 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.jeremyliao.liveeventbus.LiveEventBus
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.onCompletion
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
@@ -62,15 +62,8 @@ class SettingsFragment : Preference.OnPreferenceChangeListener,
     override var numberOfClicksAppVersion = 0
     override var numberOfClicksSDK = 0
 
-    private val refactorInProgressException =
-        IllegalStateException("Functionality has been replaced. This method will be removed once dependencies on deprecated Settings and SettingsActivity interfaces has been removed")
-
-    override var setAutoAccept: Boolean
-        get() = throw refactorInProgressException
-        set(value) {throw refactorInProgressException}
-    override var autoAcceptSetting: Boolean
-        get() = throw refactorInProgressException
-        set(value) {throw refactorInProgressException}
+    override var setAutoAccept = false
+    override var autoAcceptSetting = false
 
     private val viewModel: SettingsViewModel by viewModels()
 
@@ -87,37 +80,67 @@ class SettingsFragment : Preference.OnPreferenceChangeListener,
         }
     }
 
+    private val updateMyAccountReceiver: BroadcastReceiver = object : BroadcastReceiver() {
+        override fun onReceive(context: Context, intent: Intent) {
+            viewModel.refreshAccount()
+        }
+    }
+
+
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
         addPreferencesFromResource(R.xml.preferences)
         updateCancelAccountSetting()
         checkUIPreferences()
+    }
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
         observeState()
     }
 
     private fun observeState() {
-        lifecycleScope.launch{
-            repeatOnLifecycle(Lifecycle.State.STARTED){
-                viewModel.isAutoExceptEnabled.collect {
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.RESUMED) {
+                viewModel.isAutoAcceptEnabled.collect {
                     findPreference<SwitchPreferenceCompat>(KEY_QR_CODE_AUTO_ACCEPT)?.isChecked = it
                 }
+            }
+        }
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.RESUMED) {
                 viewModel.isMultiFactorEnabled.collect {
-                    findPreference<SwitchPreferenceCompat>(KEY_2FA)?.isChecked = it
+                    Log.d("MultiFactorAuthSetting", "isEnabled: $it ")
+                    setMultiFactorCheckedState(it)
+                }
+            }
+        }
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.RESUMED) {
+                viewModel.displayDeleteAccountOption.collect {
+                    setDeletePreference(it)
                 }
             }
         }
     }
 
+    private fun setMultiFactorCheckedState(isEnabled: Boolean) {
+        findPreference<SwitchPreferenceCompat>(KEY_2FA)?.isChecked = isEnabled
+    }
+
+    private fun setDeletePreference(canDelete: Boolean) {
+        findPreference<Preference>(
+            KEY_CANCEL_ACCOUNT
+        )?.isVisible = canDelete
+    }
+
     /**
      * Update the Cancel Account settings.
      */
-    override fun updateCancelAccountSetting() {
-        if (viewModel.canNotDeleteAccount) {
-            findPreference<PreferenceCategory>(CATEGORY_ABOUT)?.removePreference(
-                findPreference(
-                    KEY_CANCEL_ACCOUNT
-                )
-            )
-        }
+    override fun updateCancelAccountSetting() {}
+
+    private fun registerAccountChangeReceiver() {
+        val filter = IntentFilter(Constants.BROADCAST_ACTION_INTENT_UPDATE_ACCOUNT_DETAILS)
+        requireContext().registerReceiver(updateMyAccountReceiver, filter)
     }
 
     /**
@@ -140,9 +163,7 @@ class SettingsFragment : Preference.OnPreferenceChangeListener,
         findPreference<Preference>(KEY_START_SCREEN)?.summary = startScreenSummary
     }
 
-    override fun update2FAVisibility() {
-        throw refactorInProgressException
-    }
+    override fun update2FAVisibility() {}
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -206,7 +227,8 @@ class SettingsFragment : Preference.OnPreferenceChangeListener,
      * @param hide True if should enable the setting, false otherwise.
      */
     private fun updateHideRecentActivitySetting(hide: Boolean) {
-        findPreference<SwitchPreferenceCompat>(KEY_HIDE_RECENT_ACTIVITY)?.takeIf { it.isChecked != hide }?.let { it.isChecked = hide }
+        findPreference<SwitchPreferenceCompat>(KEY_HIDE_RECENT_ACTIVITY)?.takeIf { it.isChecked != hide }
+            ?.let { it.isChecked = hide }
     }
 
     override fun goToCategoryStorage() {
@@ -345,15 +367,21 @@ class SettingsFragment : Preference.OnPreferenceChangeListener,
     }
 
     override fun onResume() {
-        viewModel.refreshAccount()
+        registerAccountChangeReceiver()
         refreshCameraUploadsSettings()
         updatePasscodeLockSubtitle()
         if (!Util.isOnline(context)) {
             findPreference<Preference>(KEY_FEATURES_CHAT)?.isEnabled = false
             findPreference<Preference>(KEY_FEATURES_CAMERA_UPLOAD)?.isEnabled = false
         }
-        findPreference<SwitchPreferenceCompat>(KEY_2FA)?.isVisible = viewModel.multiFactorAuthAvailable
+        findPreference<SwitchPreferenceCompat>(KEY_2FA)?.isVisible =
+            viewModel.multiFactorAuthAvailable
         super.onResume()
+    }
+
+    override fun onPause() {
+        super.onPause()
+        requireContext().unregisterReceiver(updateMyAccountReceiver)
     }
 
     /**
@@ -564,21 +592,15 @@ class SettingsFragment : Preference.OnPreferenceChangeListener,
     }
 
 
-    override fun reEnable2faSwitch() {
-        throw refactorInProgressException
-    }
+    override fun reEnable2faSwitch() {}
 
     override fun hidePreferencesChat() {
         findPreference<Preference>(KEY_FEATURES_CHAT)?.isEnabled = false
     }
 
-    override fun setValueOfAutoAccept(autoAccept: Boolean) {
-        TODO("Not yet implemented")
-    }
+    override fun setValueOfAutoAccept(autoAccept: Boolean) {}
 
-    override fun update2FAPreference(enabled: Boolean) {
-        throw refactorInProgressException
-    }
+    override fun update2FAPreference(enabled: Boolean) {}
 
 
     override fun onSaveInstanceState(outState: Bundle) {
