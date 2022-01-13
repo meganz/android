@@ -288,6 +288,7 @@ public class Constants {
     public static final String INTENT_EXTRA_KEY_INSIDE = "inside";
     public static final String INTENT_EXTRA_KEY_IS_URL = "isUrl";
     public static final String INTENT_EXTRA_KEY_POSITION = "position";
+    public static final String INTENT_EXTRA_KEY_IS_FOLDER_LINK = "isFolderLink";
     public static final String INTENT_EXTRA_KEY_ORDER_GET_CHILDREN = "orderGetChildren";
     public static final String INTENT_EXTRA_KEY_PARENT_NODE_HANDLE = "parentNodeHandle";
     public static final String INTENT_EXTRA_KEY_HANDLES_NODES_SEARCH = "handlesNodesSearch";
@@ -560,6 +561,7 @@ public class Constants {
     public static final int SNACKBAR_IMCOMPATIBILITY_TYPE = 6;
     public static final int DISMISS_ACTION_SNACKBAR = 7;
     public static final int OPEN_FILE_SNACKBAR_TYPE = 8;
+    public static final int SENT_REQUESTS_TYPE = 9;
 
     public static final int INFO_ANIMATION = 3000;
     public static final int QUICK_INFO_ANIMATION = 500;

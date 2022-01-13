@@ -234,6 +234,7 @@ import mega.privacy.android.app.utils.ThumbnailUtilsLollipop;
 import mega.privacy.android.app.utils.Util;
 import mega.privacy.android.app.utils.TimeUtils;
 import mega.privacy.android.app.utils.contacts.MegaContactGetter;
+import mega.privacy.android.app.zippreview.ui.ZipBrowserActivity;
 import nz.mega.documentscanner.DocumentScannerActivity;
 import nz.mega.sdk.MegaAccountDetails;
 import nz.mega.sdk.MegaAchievementsDetails;
@@ -3058,8 +3059,8 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 
     				String pathZip=intent.getExtras().getString(EXTRA_PATH_ZIP);
 
-    				Intent intentZip = new Intent(managerActivity, ZipBrowserActivityLollipop.class);
-    				intentZip.putExtra(ZipBrowserActivityLollipop.EXTRA_PATH_ZIP, pathZip);
+    				Intent intentZip = new Intent(managerActivity, ZipBrowserActivity.class);
+    				intentZip.putExtra(ZipBrowserActivity.EXTRA_PATH_ZIP, pathZip);
     			    startActivity(intentZip);
     			}
 //    			else if(getIntent().getAction().equals(ManagerActivityLollipop.ACTION_OPEN_PDF)){
