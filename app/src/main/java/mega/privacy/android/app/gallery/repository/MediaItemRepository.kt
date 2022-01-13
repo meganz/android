@@ -14,10 +14,10 @@ import javax.inject.Singleton
 
 @Singleton
 class MediaItemRepository @Inject constructor(
-        @ApplicationContext context: Context,
-        @MegaApi megaApi: MegaApiAndroid,
-        mDbHandler: DatabaseHandler
-) : GalleryItemRepository(context, megaApi, mDbHandler) {
+    @ApplicationContext context: Context,
+    @MegaApi megaApi: MegaApiAndroid,
+    dbHandler: DatabaseHandler
+) : GalleryItemRepository(context, megaApi, dbHandler) {
 
     override fun initGalleryNodeFetcher(
         context: Context,

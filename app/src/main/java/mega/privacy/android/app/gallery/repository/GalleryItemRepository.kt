@@ -12,10 +12,13 @@ import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaNode
 import java.util.*
 
+/**
+ * The repository to handle gallery data logic
+ */
 abstract class GalleryItemRepository constructor(
     val context: Context,
     val megaApi: MegaApiAndroid,
-    val mDbHandler: DatabaseHandler
+    val dbHandler: DatabaseHandler
 ) {
     /** Live Data to notify the query result*/
     var galleryItems: LiveData<List<GalleryItem>> = MutableLiveData()
@@ -37,7 +40,7 @@ abstract class GalleryItemRepository constructor(
             selectedNodesMap,
             order,
             zoom,
-            mDbHandler,
+            dbHandler,
             handle
         )
         @Suppress("UNCHECKED_CAST")

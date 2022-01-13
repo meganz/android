@@ -2,11 +2,6 @@ package mega.privacy.android.app.gallery.ui
 
 import androidx.lifecycle.*
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.launch
-import mega.privacy.android.app.gallery.constant.MEDIA_HANDLE
-import mega.privacy.android.app.gallery.data.GalleryCard
-import mega.privacy.android.app.gallery.data.GalleryItem
-import mega.privacy.android.app.gallery.data.GalleryItem.Companion.TYPE_HEADER
 import mega.privacy.android.app.gallery.repository.MediaItemRepository
 import mega.privacy.android.app.globalmanagement.SortOrderManagement
 import mega.privacy.android.app.utils.ZoomUtil

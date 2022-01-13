@@ -21,5 +21,6 @@ class ImagesFetcher(
 ) {
 
     override fun getNodes(): List<MegaNode> =
-            megaApi.searchByType(ORDER_MODIFICATION_DESC, FILE_TYPE_PHOTO, SEARCH_TARGET_ROOTNODE).filter { MimeTypeThumbnail.typeForName(it.name).isImage }
+            megaApi.searchByType(ORDER_MODIFICATION_DESC, FILE_TYPE_PHOTO, SEARCH_TARGET_ROOTNODE)
+                    .filter { MimeTypeThumbnail.typeForName(it.name).isImage }
 }

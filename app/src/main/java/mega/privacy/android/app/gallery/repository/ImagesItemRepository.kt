@@ -16,8 +16,8 @@ import javax.inject.Singleton
 class ImagesItemRepository @Inject constructor(
     @ApplicationContext context: Context,
     @MegaApi megaApi: MegaApiAndroid,
-    mDbHandler: DatabaseHandler
-) : GalleryItemRepository(context, megaApi, mDbHandler) {
+    dbHandler: DatabaseHandler
+) : GalleryItemRepository(context, megaApi, dbHandler) {
 
     override fun initGalleryNodeFetcher(
         context: Context,

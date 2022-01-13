@@ -69,7 +69,6 @@ import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaShare;
 import nz.mega.sdk.MegaUser;
 
-import static mega.privacy.android.app.gallery.constant.MDConstantKt.FEATURE_FLAG_MEDIA_DISCOVERY;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.FileUtil.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
@@ -200,10 +199,6 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
         boolean isNotRoot = currentHandle != megaApi.getRootNode().getHandle();
 
         binding.enterMediaDiscovery.setVisibility(isInFileBrowser && hasMediaFile && isNotRoot ? View.VISIBLE : View.GONE);
-
-        if (!FEATURE_FLAG_MEDIA_DISCOVERY) {
-            binding.enterMediaDiscovery.setVisibility(View.GONE);
-        }
     }
 
     @Override

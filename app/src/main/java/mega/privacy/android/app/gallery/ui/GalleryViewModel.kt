@@ -6,7 +6,7 @@ import kotlinx.coroutines.launch
 import mega.privacy.android.app.arch.BaseRxViewModel
 import mega.privacy.android.app.fragments.homepage.photos.CardClickHandler
 import mega.privacy.android.app.fragments.homepage.photos.DateCardsProvider
-import mega.privacy.android.app.gallery.constant.MEDIA_HANDLE
+import mega.privacy.android.app.gallery.constant.INTENT_KEY_MEDIA_HANDLE
 import mega.privacy.android.app.gallery.data.GalleryCard
 import mega.privacy.android.app.gallery.data.GalleryItem
 import mega.privacy.android.app.gallery.fragment.BaseZoomFragment.Companion.DAYS_INDEX
@@ -16,7 +16,6 @@ import mega.privacy.android.app.gallery.repository.GalleryItemRepository
 import mega.privacy.android.app.globalmanagement.SortOrderManagement
 import mega.privacy.android.app.utils.Constants.EVENT_NODES_CHANGE
 import mega.privacy.android.app.utils.Constants.INVALID_POSITION
-import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaNode
 
 abstract class GalleryViewModel constructor(
@@ -48,7 +47,8 @@ abstract class GalleryViewModel constructor(
     /**
      * Custom condition in sub class for filter the real photos count
      */
-    open fun getFilterRealPhotoCountCondition(item: GalleryItem) = item.type != GalleryItem.TYPE_HEADER
+    open fun getFilterRealPhotoCountCondition(item: GalleryItem) =
+        item.type != GalleryItem.TYPE_HEADER
 
     /**
      * Indicate refreshing cards has finished.
@@ -162,7 +162,7 @@ abstract class GalleryViewModel constructor(
     }
 
     init {
-        currentHandle = savedStateHandle?.get<Long>(MEDIA_HANDLE)
+        currentHandle = savedStateHandle?.get<Long>(INTENT_KEY_MEDIA_HANDLE)
 
         items.observeForever(loadFinishedObserver)
         // Calling ObserveForever() here instead of calling observe()

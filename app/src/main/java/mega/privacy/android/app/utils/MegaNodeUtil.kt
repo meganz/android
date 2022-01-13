@@ -25,7 +25,6 @@ import io.reactivex.rxjava3.kotlin.subscribeBy
 import io.reactivex.rxjava3.schedulers.Schedulers
 import mega.privacy.android.app.*
 import mega.privacy.android.app.activities.WebViewActivity
-import mega.privacy.android.app.textEditor.TextEditorActivity
 import mega.privacy.android.app.components.saver.AutoPlayInfo
 import mega.privacy.android.app.constants.BroadcastConstants
 import mega.privacy.android.app.interfaces.ActivityLauncher
@@ -41,6 +40,7 @@ import mega.privacy.android.app.lollipop.ManagerActivityLollipop.DrawerItem
 import mega.privacy.android.app.lollipop.PdfViewerActivityLollipop
 import mega.privacy.android.app.lollipop.ZipBrowserActivityLollipop
 import mega.privacy.android.app.lollipop.listeners.MultipleRequestListener
+import mega.privacy.android.app.textEditor.TextEditorActivity
 import mega.privacy.android.app.textEditor.TextEditorViewModel.Companion.EDIT_MODE
 import mega.privacy.android.app.textEditor.TextEditorViewModel.Companion.MODE
 import mega.privacy.android.app.textEditor.TextEditorViewModel.Companion.VIEW_MODE
@@ -50,9 +50,6 @@ import mega.privacy.android.app.utils.FileUtil.*
 import mega.privacy.android.app.utils.LogUtil.logDebug
 import mega.privacy.android.app.utils.LogUtil.logWarning
 import mega.privacy.android.app.utils.MegaApiUtils.isIntentAvailable
-import mega.privacy.android.app.utils.MegaNodeUtil.launchActionView
-import mega.privacy.android.app.utils.MegaNodeUtil.manageURLNode
-import mega.privacy.android.app.utils.MegaNodeUtil.openZip
 import mega.privacy.android.app.utils.StringResourcesUtils.getQuantityString
 import mega.privacy.android.app.utils.StringResourcesUtils.getString
 import mega.privacy.android.app.utils.TextUtil.isTextEmpty

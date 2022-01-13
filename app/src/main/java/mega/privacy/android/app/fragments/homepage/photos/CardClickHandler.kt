@@ -45,8 +45,8 @@ object CardClickHandler {
      * @param card     Clicked year card.
      * @param months Months cards list.
      * @param years Years cards list.
-     * @return A month card corresponding to the year clicked, current month. If not exists,
-     * the closest month to the current.
+     * @return A month card index corresponding to the year clicked, current month index. If not exists,
+     * the closest month index to the current.
      */
     fun yearClicked(
         position: Int,
@@ -80,8 +80,8 @@ object CardClickHandler {
      * @param card     Clicked month card.
      * @param days Days cards list.
      * @param months Months cards list.
-     * @return A day card corresponding to the month of the year clicked, current day. If not exists,
-     * the closest day to the current.
+     * @return A day card index corresponding to the month of the year clicked, current day index. If not exists,
+     * the closest day index to the current.
      */
     fun monthClicked(
         position: Int,

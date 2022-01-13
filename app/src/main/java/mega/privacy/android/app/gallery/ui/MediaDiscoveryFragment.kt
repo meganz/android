@@ -9,7 +9,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.R
 import mega.privacy.android.app.databinding.FragmentMediaDecoveryBinding
 import mega.privacy.android.app.fragments.homepage.*
-import mega.privacy.android.app.gallery.constant.MEDIA_HANDLE
+import mega.privacy.android.app.gallery.constant.INTENT_KEY_MEDIA_HANDLE
 import mega.privacy.android.app.gallery.data.GalleryItem
 import mega.privacy.android.app.gallery.fragment.BaseZoomFragment
 import mega.privacy.android.app.utils.*
@@ -34,7 +34,7 @@ class MediaDiscoveryFragment : BaseZoomFragment() {
         fun getInstance(mediaHandle:Long): MediaDiscoveryFragment {
             val fragment = MediaDiscoveryFragment()
             val args = Bundle()
-            args.putLong(MEDIA_HANDLE, mediaHandle)
+            args.putLong(INTENT_KEY_MEDIA_HANDLE, mediaHandle)
             fragment.arguments = args
 
             return fragment

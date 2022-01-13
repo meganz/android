@@ -245,5 +245,8 @@ abstract class GalleryBaseFetcher(
 
     protected fun shouldAdd(mime: MimeTypeThumbnail) = mime.isImage || mime.isVideoReproducible
 
+    /**
+     * Sub class to implement their own get node method by their own strategy
+     */
     abstract fun getNodes(): List<MegaNode>
 }

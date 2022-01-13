@@ -19,8 +19,8 @@ import javax.inject.Singleton
 class PhotosItemRepository @Inject constructor(
     @ApplicationContext context: Context,
     @MegaApi megaApi: MegaApiAndroid,
-    mDbHandler: DatabaseHandler
-) : GalleryItemRepository(context, megaApi, mDbHandler) {
+    dbHandler: DatabaseHandler
+) : GalleryItemRepository(context, megaApi, dbHandler) {
 
     fun getPublicLinks():ArrayList<MegaNode>{
         return megaApi.publicLinks
@@ -39,6 +39,8 @@ class PhotosItemRepository @Inject constructor(
         dbHandler: DatabaseHandler,
         handle: Long?
     ): GalleryBaseFetcher {
-        return PhotosFetcher(context, megaApi, selectedNodesMap, order, zoom, mDbHandler)
+        return PhotosFetcher(context, megaApi, selectedNodesMap, order, zoom,
+            this.dbHandler
+        )
     }
 }

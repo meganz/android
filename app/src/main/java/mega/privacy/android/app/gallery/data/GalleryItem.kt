@@ -12,26 +12,29 @@ import java.io.File
  * Creates a TYPE_IMAGE or TYPE_VIDEO CuNode.
  *
  * @param node           MegaNode representing the item.
- * @param indexForViewer Index needed on viewers to show the dismiss animation after a drag event.
+ * @param indexForViewer Index needed on viewers to show the dismiss animation after a drag event. Index of real photo node.
+ * @param index          Index of Node including TYPE_TITLE node (RecyclerView Layout position)
  * @param thumbnail      Thumbnail or preview of the node if exists, null otherwise.
  * @param type           TYPE_IMAGE if photo, TYPE_VIDEO if video.
  * @param modifyDate     String containing the modified date of the node.
+ * @param formattedDate
  * @param headerDate     Pair containing the text to show as header in adapter:
  *                          - First: Month.
  *                          - Second: Year if not current year, empty otherwise.
- * @param isSelected       True if the node is selected on list, false otherwise.
+ * @param selected       True if the node is selected on list, false otherwise.
+ * @param uiDirty        Force refresh the newly created Node list item
  */
 data class GalleryItem(
     override var node: MegaNode?,
-    var indexForViewer: Int, // Index of real photo node
-    override var index: Int, // Index of Node including TYPE_TITLE node (RecyclerView Layout position)
+    var indexForViewer: Int,
+    override var index: Int,
     override var thumbnail: File?,
     var type: Int,
     var modifyDate: String,
     var formattedDate: Spanned?,
     var headerDate: Pair<String, String>?,
     override var selected: Boolean,
-    override var uiDirty: Boolean // Force refresh the newly created Node list item
+    override var uiDirty: Boolean
 ) : NodeItem(node, index, type == TYPE_VIDEO, modifyDate, thumbnail, selected, uiDirty) {
 
     /**
