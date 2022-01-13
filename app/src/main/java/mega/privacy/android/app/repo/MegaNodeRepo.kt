@@ -1,12 +1,8 @@
 package mega.privacy.android.app.repo
 
 import android.util.Pair
-import mega.privacy.android.app.DatabaseHandler
-import mega.privacy.android.app.MegaApplication
-import mega.privacy.android.app.MegaOffline
-import mega.privacy.android.app.MimeTypeThumbnail
+import mega.privacy.android.app.*
 import mega.privacy.android.app.di.MegaApi
-import mega.privacy.android.app.utils.Constants.*
 import mega.privacy.android.app.utils.FileUtil
 import mega.privacy.android.app.utils.LogUtil.logError
 import mega.privacy.android.app.utils.OfflineUtils.getOfflineFile
@@ -95,7 +91,7 @@ class MegaNodeRepo @Inject constructor(
                 continue
             }
 
-            val mime = MimeTypeThumbnail.typeForName(node.name)
+            val mime = MimeTypeList.typeForName(node.name)
             if (mime.isImage || mime.isVideoReproducible) {
                 // when not in search mode, index used by viewer is index in all siblings,
                 // including non image/video nodes
@@ -126,7 +122,7 @@ class MegaNodeRepo @Inject constructor(
                 continue
             }
 
-            val mime = MimeTypeThumbnail.typeForName(node.name)
+            val mime = MimeTypeList.typeForName(node.name)
             if (mime.isImage || mime.isVideoReproducible) {
                 nodes.add(node)
             }
