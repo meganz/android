@@ -640,7 +640,7 @@ public class FileInfoActivityLollipop extends PasscodeActivity implements OnClic
         if (extras != null){
             from = extras.getInt("from");
             if(from==FROM_INCOMING_SHARES){
-                firstIncomingLevel = extras.getBoolean("firstLevel");
+                firstIncomingLevel = extras.getBoolean(INTENT_EXTRA_KEY_FIRST_LEVEL);
             }
 
             long handleNode = extras.getLong("handle", -1);
@@ -2280,7 +2280,7 @@ public class FileInfoActivityLollipop extends PasscodeActivity implements OnClic
 
 	@Override
 	public void onBackPressed() {
-        if (psaWebBrowser.consumeBack()) return;
+        if (psaWebBrowser != null && psaWebBrowser.consumeBack()) return;
         retryConnectionsAndSignalPresence();
 
         if(isRemoveOffline){

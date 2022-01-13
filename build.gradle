@@ -90,4 +90,5 @@ ext {
     mockitoVersion = '3.3.3'
     mockitoKotlinVersion = '4.0.0'
     espressoVersion = '3.4.0'
+    exoPlayerVersion = '2.16.0'
 }

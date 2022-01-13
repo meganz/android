@@ -563,7 +563,12 @@ public class MegaTransfersLollipopAdapter extends RecyclerView.Adapter<MegaTrans
                 continue;
             }
 
-            MegaTransfer transfer = tL.get(selectedItems.keyAt(i));
+            int selected = selectedItems.keyAt(i);
+            if (selected < 0 || selected >= tL.size()) {
+                continue;
+            }
+
+            MegaTransfer transfer = tL.get(selected);
             if (transfer != null) {
                 selectedTransfers.add(transfer);
             }

@@ -420,18 +420,10 @@ public class ContactFileListFragmentLollipop extends ContactFileBaseFragment {
 		((ContactFileListActivityLollipop)context).showOptionsPanel(sNode);
 	}
 
-	public void setNodes(long parentHandle){
-		if (megaApi.getNodeByHandle(parentHandle) == null){
-			parentHandle = -1;
-			this.parentHandle = -1;
-			((ContactFileListActivityLollipop)context).setParentHandle(parentHandle);
-			adapter.setParentHandle(parentHandle);
-
-			setNodes(megaApi.getInShares(contact));
-		}
-		else{
+	public void setNodes(long parentHandle) {
+		if (megaApi.getNodeByHandle(parentHandle) != null) {
 			this.parentHandle = parentHandle;
-			((ContactFileListActivityLollipop)context).setParentHandle(parentHandle);
+			((ContactFileListActivityLollipop) context).setParentHandle(parentHandle);
 			adapter.setParentHandle(parentHandle);
 			setNodes(megaApi.getChildren(megaApi.getNodeByHandle(parentHandle), orderGetChildren));
 		}
