@@ -20,14 +20,13 @@ object ZoomUtil {
     const val ZOOM_IN_1X = 1
 
     @JvmStatic
-    var PHOTO_ZOOM_LEVEL = ZOOM_DEFAULT //ZOOM_DEFAULT
+    var PHOTO_ZOOM_LEVEL = ZOOM_DEFAULT
 
     @JvmStatic
-    var IMAGES_ZOOM_LEVEL = ZOOM_DEFAULT //ZOOM_DEFAULT
+    var IMAGES_ZOOM_LEVEL = ZOOM_DEFAULT
 
-    const val DAYS_INDEX = 0
-    const val MONTHS_INDEX = 1
-    const val YEARS_INDEX = 2
+    @JvmStatic
+    var MEDIA_ZOOM_LEVEL = ZOOM_DEFAULT
 
     // Span count portrait
     private const val SPAN_COUNT_PORTRAIT_OUT_2X = 12
@@ -110,17 +109,18 @@ object ZoomUtil {
     }
 
     fun getItemWidth(context: Context, outMetrics: DisplayMetrics, zoom: Int, spanCount: Int) =
-        if (zoom == ZOOM_IN_1X) {
-            outMetrics.widthPixels
-        } else {
-            ((outMetrics.widthPixels - getMargin(
-                context,
-                zoom
-            ) * spanCount * 2) - getMargin(context, zoom) * 2) / spanCount
-        }
+            if (zoom == ZOOM_IN_1X) {
+                outMetrics.widthPixels
+            } else {
+                ((outMetrics.widthPixels - getMargin(
+                        context,
+                        zoom
+                ) * spanCount * 2) - getMargin(context, zoom) * 2) / spanCount
+            }
 
     fun resetZoomLevel() {
         PHOTO_ZOOM_LEVEL = ZOOM_DEFAULT
         IMAGES_ZOOM_LEVEL = ZOOM_DEFAULT
+        MEDIA_ZOOM_LEVEL = ZOOM_DEFAULT
     }
 }

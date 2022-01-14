@@ -8,6 +8,7 @@ import mega.privacy.android.app.utils.ErrorUtils.toThrowable
 import mega.privacy.android.app.utils.LogUtil.logError
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava.AFFILIATE_TYPE_CONTACT
+import nz.mega.sdk.MegaContactRequest
 import nz.mega.sdk.MegaContactRequest.*
 import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaError.API_EEXIST
@@ -31,12 +32,14 @@ class InviteContactUseCase @Inject constructor(
      *
      * @property isContact          Flag to check wether is contact or not
      * @property email              User email
+     * @property contactHandle      Contact handle
      * @property contactLinkHandle  Contact link handle
      * @property fullName           User full name
      */
     data class ContactLinkResult(
         val isContact: Boolean,
         val email: String? = null,
+        val contactHandle: Long? = null,
         val contactLinkHandle: Long? = null,
         val fullName: String? = null
     )
@@ -75,6 +78,7 @@ class InviteContactUseCase @Inject constructor(
                                 ContactLinkResult(
                                     isContact,
                                     request.email,
+                                    request.parentHandle,
                                     request.nodeHandle,
                                     "${request.name} ${request.text}"
                                 )
@@ -147,5 +151,25 @@ class InviteContactUseCase @Inject constructor(
                         logError(error.toThrowable().stackTraceToString())
                     }
                 ))
+        }
+
+    /**
+     * Checks if a contact request is already sent.
+     *
+     * @param email Contact email
+     * @return True if the request is already sent, false otherwise.
+     */
+    fun isContactRequestAlreadySent(email: String): Single<Boolean> =
+        Single.create { emitter ->
+            val sentRequests: List<MegaContactRequest> = megaApi.outgoingContactRequests
+
+            for (request in sentRequests) {
+                if (request.targetEmail == email) {
+                    emitter.onSuccess(true)
+                    return@create
+                }
+            }
+
+            emitter.onSuccess(false)
         }
 }
