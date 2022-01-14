@@ -571,13 +571,6 @@ public class UploadService extends Service implements MegaTransferListenerInterf
     }
 
     private void updateProgressNotification() {
-      rxSubscriptions.add(Single.just(true)
-          .observeOn(Schedulers.single())
-          .subscribe(ignored -> doUpdateProgressNotification(),
-              throwable -> logError("doUpdateProgressNotification onError", throwable)));
-    }
-
-    private void doUpdateProgressNotification() {
         Collection<MegaTransfer> transfers = mapProgressFileTransfers.values();
 
         UploadProgress up = getInProgressNotification(transfers);
@@ -593,7 +586,7 @@ public class UploadService extends Service implements MegaTransferListenerInterf
         }
 
         String message = getMessageForProgressNotification(inProgress);
-		logDebug("updateProgressNotification" + progressPercent + " " + message);
+        logDebug("updateProgressNotification" + progressPercent + " " + message);
         String actionString = isOverquota == NOT_OVERQUOTA_STATE ? getString(R.string.download_touch_to_show) : getString(R.string.general_show_info);
         String info = getProgressSize(UploadService.this,inProgress,total);
 
