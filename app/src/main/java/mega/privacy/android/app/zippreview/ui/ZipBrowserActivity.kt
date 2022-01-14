@@ -23,7 +23,6 @@ import mega.privacy.android.app.components.SimpleDividerItemDecoration
 import mega.privacy.android.app.components.dragger.DragToExitSupport
 import mega.privacy.android.app.components.dragger.DragToExitSupport.*
 import mega.privacy.android.app.databinding.ActivityZipBrowserBinding
-import mega.privacy.android.app.lollipop.FullScreenImageViewerLollipop
 import mega.privacy.android.app.lollipop.PdfViewerActivityLollipop
 import mega.privacy.android.app.textEditor.TextEditorActivity
 import mega.privacy.android.app.utils.*
@@ -256,25 +255,26 @@ class ZipBrowserActivity : PasscodeActivity() {
      */
     private fun imageFileOpen(position: Int, file: File) {
         logDebug("isImage")
-        val intent =
-            Intent(this@ZipBrowserActivity, FullScreenImageViewerLollipop::class.java)
-        intent.apply {
-            putExtra(INTENT_EXTRA_KEY_POSITION, position)
-            putExtra(INTENT_EXTRA_KEY_ADAPTER_TYPE, ZIP_ADAPTER)
-            putExtra(INTENT_EXTRA_KEY_IS_FOLDER_LINK, false)
-            putExtra(INTENT_EXTRA_KEY_PARENT_NODE_HANDLE, -1L)
-            putExtra(INTENT_EXTRA_KEY_OFFLINE_PATH_DIRECTORY, file.absolutePath)
-            putExtra(INTENT_EXTRA_KEY_ORDER_GET_CHILDREN, MegaApiJava.ORDER_DEFAULT_ASC)
-        }
-        DragToExitSupport.putThumbnailLocation(
-            intent,
-            recyclerView,
-            position,
-            VIEWER_FROM_ZIP_BROWSER,
-            zipAdapter
-        )
-        startActivity(intent)
-        overridePendingTransition(0, 0)
+//        TODO Replace with new custom call
+//        val intent =
+//            Intent(this@ZipBrowserActivity, FullScreenImageViewerLollipop::class.java)
+//        intent.apply {
+//            putExtra(INTENT_EXTRA_KEY_POSITION, position)
+//            putExtra(INTENT_EXTRA_KEY_ADAPTER_TYPE, ZIP_ADAPTER)
+//            putExtra(INTENT_EXTRA_KEY_IS_FOLDER_LINK, false)
+//            putExtra(INTENT_EXTRA_KEY_PARENT_NODE_HANDLE, -1L)
+//            putExtra(INTENT_EXTRA_KEY_OFFLINE_PATH_DIRECTORY, file.absolutePath)
+//            putExtra(INTENT_EXTRA_KEY_ORDER_GET_CHILDREN, MegaApiJava.ORDER_DEFAULT_ASC)
+//        }
+//        DragToExitSupport.putThumbnailLocation(
+//            intent,
+//            recyclerView,
+//            position,
+//            VIEWER_FROM_ZIP_BROWSER,
+//            zipAdapter
+//        )
+//        startActivity(intent)
+//        overridePendingTransition(0, 0)
     }
 
     /**
