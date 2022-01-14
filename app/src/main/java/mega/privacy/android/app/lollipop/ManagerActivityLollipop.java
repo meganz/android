@@ -128,6 +128,7 @@ import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.OpenPasswordLinkActivity;
 import mega.privacy.android.app.Product;
 import mega.privacy.android.app.R;
+import mega.privacy.android.app.gallery.ui.MediaDiscoveryFragment;
 import mega.privacy.android.app.objects.PasscodeManagement;
 import mega.privacy.android.app.fragments.homepage.documents.DocumentsFragment;
 import mega.privacy.android.app.fragments.managerFragments.cu.PhotosFragment;
@@ -235,6 +236,7 @@ import mega.privacy.android.app.utils.ThumbnailUtilsLollipop;
 import mega.privacy.android.app.utils.Util;
 import mega.privacy.android.app.utils.TimeUtils;
 import mega.privacy.android.app.utils.contacts.MegaContactGetter;
+import mega.privacy.android.app.zippreview.ui.ZipBrowserActivity;
 import nz.mega.documentscanner.DocumentScannerActivity;
 import nz.mega.sdk.MegaAccountDetails;
 import nz.mega.sdk.MegaAchievementsDetails;
@@ -480,10 +482,14 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 	// Determine if open this activity from meeting page, if true, will finish this activity when user click back icon
 	private boolean isFromMeeting = false;
 
+	private static final String STATE_KEY_IS_IN_MD_MODE = "isInMDMode";
+	// Determine if in Media discovery page, if it is true, it must in CD drawerItem tab
+	private boolean isInMDMode = false;
+
 	public enum FragmentTag {
 		CLOUD_DRIVE, HOMEPAGE, PHOTOS, INBOX, INCOMING_SHARES, OUTGOING_SHARES, SETTINGS, SEARCH,TRANSFERS, COMPLETED_TRANSFERS,
 		RECENT_CHAT, RUBBISH_BIN, NOTIFICATIONS, TURN_ON_NOTIFICATIONS, PERMISSIONS, SMS_VERIFICATION,
-		LINKS;
+		LINKS, MEDIA_DISCOVERY;
 
 		public String getTag () {
 			switch (this) {
@@ -504,6 +510,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 				case PERMISSIONS: return "pF";
                 case SMS_VERIFICATION: return "svF";
 				case LINKS: return "lF";
+				case MEDIA_DISCOVERY: return "mdF";
 			}
 			return null;
 		}
@@ -634,6 +641,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 	private TurnOnNotificationsFragment tonF;
 	private PermissionsFragment pF;
 	private SMSVerificationFragment svF;
+	private MediaDiscoveryFragment mdF;
 
 	private boolean mStopped = true;
 	private int bottomItemBeforeOpenFullscreenOffline = INVALID_VALUE;
@@ -656,7 +664,6 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 
 	private MenuItem searchMenuItem;
 	private MenuItem enableSelectMenuItem;
-	private MenuItem sortByMenuItem;
 	private MenuItem doNotDisturbMenuItem;
 	private MenuItem clearRubbishBinMenuitem;
 	private MenuItem cancelAllTransfersMenuItem;
@@ -716,6 +723,8 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 	private Observer<Boolean> fabChangeObserver  = isShow -> {
 		if (drawerItem == DrawerItem.HOMEPAGE) {
 			controlFabInHomepage(isShow);
+		} else if (isInMDMode) {
+			hideFabButton();
 		} else {
 			if (initFabButtonShow) {
 				if (isShow) {
@@ -1291,6 +1300,12 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 		nodeSaver.saveState(outState);
 
 		outState.putBoolean(PROCESS_FILE_DIALOG_SHOWN, isAlertDialogShown(processFileDialog));
+
+		outState.putBoolean(STATE_KEY_IS_IN_MD_MODE, isInMDMode);
+		mdF = (MediaDiscoveryFragment) getSupportFragmentManager().findFragmentByTag(FragmentTag.MEDIA_DISCOVERY.getTag());
+		if (mdF != null) {
+			getSupportFragmentManager().putFragment(outState, FragmentTag.MEDIA_DISCOVERY.getTag(), mdF);
+		}
 	}
 
 	@Override
@@ -1388,6 +1403,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 			linkJoinToChatLink = savedInstanceState.getString(LINK_JOINING_CHAT_LINK);
 			connected = savedInstanceState.getBoolean(CONNECTED, false);
 			isFabExpanded = savedInstanceState.getBoolean(KEY_IS_FAB_EXPANDED, false);
+			isInMDMode = savedInstanceState.getBoolean(STATE_KEY_IS_IN_MD_MODE, false);
 
 			nodeAttacher.restoreState(savedInstanceState);
 			nodeSaver.restoreState(savedInstanceState);
@@ -2443,7 +2459,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 								firstLogin = false;
 							} else {
 								firstLogin = true;
-								if (app.getStorageState() != STORAGE_STATE_PAYWALL) {
+								if (app.getStorageState() != STORAGE_STATE_PAYWALL && isInPhotosPage()) {
 									drawerItem = DrawerItem.PHOTOS;
 								}
 							}
@@ -3060,8 +3076,8 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 
     				String pathZip=intent.getExtras().getString(EXTRA_PATH_ZIP);
 
-    				Intent intentZip = new Intent(managerActivity, ZipBrowserActivityLollipop.class);
-    				intentZip.putExtra(ZipBrowserActivityLollipop.EXTRA_PATH_ZIP, pathZip);
+    				Intent intentZip = new Intent(managerActivity, ZipBrowserActivity.class);
+    				intentZip.putExtra(ZipBrowserActivity.EXTRA_PATH_ZIP, pathZip);
     			    startActivity(intentZip);
     			}
 //    			else if(getIntent().getAction().equals(ManagerActivityLollipop.ACTION_OPEN_PDF)){
@@ -3487,6 +3503,16 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 		}
 	}
 
+	public void skipToMediaDiscoveryFragment(Fragment f){
+		mdF = (MediaDiscoveryFragment) f;
+		replaceFragment(f, FragmentTag.MEDIA_DISCOVERY.getTag());
+		isInMDMode = true;
+	}
+
+	public void changeMDMode(boolean targetMDMode){
+		isInMDMode = targetMDMode;
+	}
+
 	void replaceFragment (Fragment f, String fTag) {
 		FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
 		ft.replace(R.id.fragment_container, f, fTag);
@@ -3526,12 +3552,12 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
         viewPagerTransfers.setVisibility(View.GONE);
 
         fragmentContainer.setVisibility(View.VISIBLE);
+		fbFLol = (FileBrowserFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.CLOUD_DRIVE.getTag());
+		if (fbFLol == null) {
+			fbFLol = FileBrowserFragmentLollipop.newInstance();
+		}
 
-        fbFLol = (FileBrowserFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.CLOUD_DRIVE.getTag());
-        if (fbFLol == null) {
-            fbFLol = FileBrowserFragmentLollipop.newInstance();
-        }
-        replaceFragment(fbFLol, FragmentTag.CLOUD_DRIVE.getTag());
+		replaceFragment(fbFLol, FragmentTag.CLOUD_DRIVE.getTag());
     }
 
     private void showGlobalAlertDialogsIfNeeded() {
@@ -3874,7 +3900,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 				}
 			}
 			else{
-				aB.setHomeAsUpIndicator(tintIcon(this, R.drawable.ic_arrow_back_white));
+                aB.setHomeAsUpIndicator(tintIcon(this, R.drawable.ic_arrow_back_white));
 			}
 		}
 		else{
@@ -3900,6 +3926,10 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 
 			aB.setHomeAsUpIndicator(badgeDrawable);
 		}
+
+        if (drawerItem == DrawerItem.CLOUD_DRIVE && isInMDMode) {
+            aB.setHomeAsUpIndicator(tintIcon(this, R.drawable.ic_close_white));
+        }
 	}
 
 	public void showOnlineMode(){
@@ -4472,7 +4502,21 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 
     	switch (item){
 			case CLOUD_DRIVE:{
-				selectDrawerItemCloudDrive();
+                if (isInMDPage()) {
+                    mdF = (MediaDiscoveryFragment) getSupportFragmentManager().findFragmentByTag(FragmentTag.MEDIA_DISCOVERY.getTag());
+
+                    if (mdF == null) {
+                        selectDrawerItemCloudDrive();
+                        mdF = fbFLol.showMediaDiscovery(Unit.INSTANCE);
+                    } else {
+                        refreshFragment(FragmentTag.MEDIA_DISCOVERY.getTag());
+                    }
+
+                    replaceFragment(mdF, FragmentTag.MEDIA_DISCOVERY.getTag());
+                } else {
+                    selectDrawerItemCloudDrive();
+                }
+
 				if (openFolderRefresh){
 					onNodesCloudDriveUpdate();
 					openFolderRefresh = false;
@@ -4548,7 +4592,6 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 					refreshFragment(FragmentTag.PHOTOS.getTag());
 				}
 
-				cuFragment.setViewTypes(cuViewTypes, cuYearsButton, cuMonthsButton, cuDaysButton, cuAllButton);
 				replaceFragment(cuFragment, FragmentTag.PHOTOS.getTag());
 				setToolbarTitle();
 				supportInvalidateOptionsMenu();
@@ -4847,7 +4890,9 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 
         switch (drawerItem) {
             case CLOUD_DRIVE: {
-            	fbFLol.checkScroll();
+            	if (fbFLol != null){
+					fbFLol.checkScroll();
+				}
                 break;
             }
 			case HOMEPAGE: {
@@ -5200,7 +5245,6 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 		});
 
 		enableSelectMenuItem = menu.findItem(R.id.action_enable_select);
-		sortByMenuItem = menu.findItem(R.id.action_menu_sort_by);
 		doNotDisturbMenuItem = menu.findItem(R.id.action_menu_do_not_disturb);
 		clearRubbishBinMenuitem = menu.findItem(R.id.action_menu_clear_rubbish_bin);
 		cancelAllTransfersMenuItem = menu.findItem(R.id.action_menu_cancel_all_transfers);
@@ -5237,11 +5281,13 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 		if (isOnline(this)) {
 			switch (drawerItem) {
 				case CLOUD_DRIVE:
-					moreMenuItem.setVisible(!isFirstNavigationLevel());
+					if (!isInMDMode) {
+						moreMenuItem.setVisible(!isFirstNavigationLevel());
 
-                    if (isCloudAdded() && fbFLol.getItemCount() > 0) {
-                        searchMenuItem.setVisible(true);
-                    }
+						if (isCloudAdded() && fbFLol.getItemCount() > 0) {
+							searchMenuItem.setVisible(true);
+						}
+					}
 					break;
 				case HOMEPAGE:
 					if (mHomepageScreen == HomepageScreen.FULLSCREEN_OFFLINE) {
@@ -5455,9 +5501,14 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 				else{
 					logDebug("NOT firstNavigationLevel");
 		    		if (drawerItem == DrawerItem.CLOUD_DRIVE){
-						//Cloud Drive
-						if (isCloudAdded()) {
-							fbFLol.onBackPressed();
+						//Check media discovery mode
+						if (isInMDMode){
+							onBackPressed();
+						}else{
+							//Cloud Drive
+							if (isCloudAdded()) {
+								fbFLol.onBackPressed();
+							}
 						}
 		    		}
 					else if (drawerItem == DrawerItem.RUBBISH_BIN) {
@@ -5614,25 +5665,12 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 							sFLol.selectAll();
 						}
 						break;
-
-					case PHOTOS:
-						if (getCameraUploadFragment() != null) {
-							cuFragment.selectAll();
-						}
-						break;
 				}
 
 	        	return true;
 	        }
 			case R.id.action_menu_clear_rubbish_bin:
 				showClearRubbishBinDialog();
-				return true;
-
-			case R.id.action_menu_sort_by:
-				if (drawerItem == DrawerItem.PHOTOS) {
-					showNewSortByPanel(ORDER_CAMERA);
-				}
-
 				return true;
 
 			case R.id.action_scan_qr: {
@@ -5679,7 +5717,6 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 			clearCompletedTransfers.setVisible(false);
 			pauseTransfersMenuIcon.setVisible(false);
 			playTransfersMenuIcon.setVisible(false);
-			sortByMenuItem.setVisible(false);
 			clearRubbishBinMenuitem.setVisible(false);
 			searchMenuItem.setVisible(false);
 			openMeetingMenuItem.setVisible(false);
@@ -5931,8 +5968,13 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 		}
 
 		if (drawerItem == DrawerItem.CLOUD_DRIVE) {
-		    if (!isCloudAdded() || fbFLol.onBackPressed() == 0) {
-		    	performOnBack();
+			if (isInMDMode){
+				changeMDMode(false);
+				backToDrawerItem(bottomNavigationCurrentItem);
+			}else{
+				 if (!isCloudAdded() || fbFLol.onBackPressed() == 0) {
+		    		performOnBack();
+				 }
 			}
 		} else if (drawerItem == DrawerItem.RUBBISH_BIN) {
 			rubbishBinFLol = (RubbishBinFragmentLollipop) getSupportFragmentManager()
@@ -6115,6 +6157,9 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 		switch (menuItem.getItemId()){
 			case R.id.bottom_navigation_item_cloud_drive: {
 				if (drawerItem == DrawerItem.CLOUD_DRIVE) {
+					if (isInMDMode) {
+						changeMDMode(false);
+					}
 					MegaNode rootNode = megaApi.getRootNode();
 					if (rootNode == null) {
 						logError("Root node is null");
@@ -7153,6 +7198,9 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 	 */
 	public void updateEnableCUButton(int visibility) {
 		if (enableCUButton.getVisibility() == visibility) {
+			if(enableCUButton.getVisibility() == View.VISIBLE){
+				updateCULayout(visibility);
+			}
 			return;
 		}
 
@@ -7488,7 +7536,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 
 	public void refreshCUNodes() {
 		if (getCameraUploadFragment() != null) {
-			cuFragment.reloadNodes();
+			cuFragment.loadPhotos();
 		}
 	}
 
@@ -10326,7 +10374,9 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 
 		switch (drawerItem) {
 			case CLOUD_DRIVE:
-				updateFabAndShow();
+				if (!isInMDMode){
+					updateFabAndShow();
+				}
 				break;
 
 			case SHARED_ITEMS:
@@ -10761,7 +10811,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 	 */
 	public void enableHideBottomViewOnScroll(boolean enable) {
 		LinearLayout layout = findViewById(R.id.container_bottom);
-		if (layout == null) {
+		if (layout == null || isInImagesPage()) {
 			return;
 		}
 
@@ -10778,19 +10828,16 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 	/**
 	 * Shows all the content of bottom view.
 	 */
-	public void showBottomView() {
-		LinearLayout bottomView = findViewById(R.id.container_bottom);
-		if (bottomView == null || fragmentLayout == null) {
-			return;
-		}
+    public void showBottomView() {
+        LinearLayout bottomView = findViewById(R.id.container_bottom);
+        if (bottomView == null || fragmentLayout == null || isInImagesPage()) {
+            return;
+        }
 
-		CoordinatorLayout.LayoutParams params = (CoordinatorLayout.LayoutParams) fragmentLayout.getLayoutParams();
-		params.setMargins(0, 0, 0,
-				getResources().getDimensionPixelSize(R.dimen.bottom_navigation_view_height));
-		bottomView.animate().translationY(0).setDuration(175)
-				.withStartAction(() -> bottomView.setVisibility(View.VISIBLE))
-				.withEndAction(() -> fragmentLayout.setLayoutParams(params)).start();
-	}
+        bottomView.animate().translationY(0).setDuration(175)
+                .withStartAction(() -> bottomView.setVisibility(View.VISIBLE))
+                .start();
+    }
 
 	/**
 	 * Shows or hides the bottom view and animates the transition.
@@ -11289,6 +11336,10 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 		return pF = (PermissionsFragment) getSupportFragmentManager().findFragmentByTag(FragmentTag.PERMISSIONS.getTag());
 	}
 
+	public MediaDiscoveryFragment getMDFragment(){
+		return mdF;
+	}
+
 	/**
 	 * Checks whether the current screen is the main of Homepage or Documents.
 	 * Video / Audio / Photos do not need Fab button
@@ -11409,6 +11460,24 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
     public boolean isInImagesPage() {
         return drawerItem == DrawerItem.HOMEPAGE && mHomepageScreen == HomepageScreen.IMAGES;
     }
+
+	/**
+	 * Checks if the current screen is Photos.
+	 *
+	 * @return True if the current screen is Photos, false otherwise.
+	 */
+	public boolean isInPhotosPage() {
+		return drawerItem == DrawerItem.PHOTOS;
+	}
+
+	/**
+	 * Checks if the current screen is Media discovery page.
+	 *
+	 * @return True if the current screen is Media discovery page, false otherwise.
+	 */
+	public boolean isInMDPage() {
+		return drawerItem == DrawerItem.CLOUD_DRIVE && isInMDMode;
+	}
 
     public void hideTransferWidget() {
     	if (transfersWidget != null) {

@@ -6,6 +6,7 @@ import androidx.lifecycle.MutableLiveData
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
+import io.reactivex.rxjava3.core.Maybe
 import io.reactivex.rxjava3.core.Single
 import io.reactivex.rxjava3.functions.Consumer
 import io.reactivex.rxjava3.schedulers.Schedulers
@@ -28,21 +29,18 @@ class OfflineFileInfoViewModel @Inject constructor(
 ) : BaseRxViewModel() {
 
     private val _node = MutableLiveData<OfflineNode?>()
-    private val _totalSize = MutableLiveData<String>()
-    private val _contains = MutableLiveData<String>()
-    private val _added = MutableLiveData<String>()
+    private val _totalSize = MutableLiveData<String?>()
+    private val _contains = MutableLiveData<String?>()
+    private val _added = MutableLiveData<String?>()
 
     val node: LiveData<OfflineNode?> = _node
-    val totalSize: LiveData<String> = _totalSize
-    val contains: LiveData<String> = _contains
-    val added: LiveData<String> = _added
+    val totalSize: LiveData<String?> = _totalSize
+    val contains: LiveData<String?> = _contains
+    val added: LiveData<String?> = _added
 
     fun loadNode(handle: String) {
-        add(Single.fromCallable { repo.findOfflineNode(handle) }
+        add(Maybe.fromCallable<MegaOffline> { repo.findOfflineNode(handle) }
             .map {
-                if (it == null) {
-                    return@map null
-                }
                 val thumbnail = if (MimeTypeList.typeForName(it.name).isImage) {
                     getOfflineFile(context, it)
                 } else {
@@ -52,11 +50,9 @@ class OfflineFileInfoViewModel @Inject constructor(
             }
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
-            .subscribe(Consumer {
+            .subscribe({
                 _node.value = it
-                if (it != null) {
-                    getMetaInfo(it.node)
-                }
+                getMetaInfo(it.node)
             }, logErr("OfflineFileInfoViewModel loadNode")))
     }
 
@@ -79,7 +75,7 @@ class OfflineFileInfoViewModel @Inject constructor(
             }
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
-            .subscribe(Consumer {
+            .subscribe({
                 _totalSize.value = it.first
                 _added.value = it.third
                 if (node.isFolder) {

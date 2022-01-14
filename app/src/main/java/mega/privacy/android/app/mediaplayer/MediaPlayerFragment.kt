@@ -186,7 +186,7 @@ class MediaPlayerFragment : Fragment() {
                             )
                             .setPositiveButton(
                                 StringResourcesUtils.getString(R.string.general_ok)
-                                    .toUpperCase(Locale.ROOT)
+                                    .uppercase(Locale.ROOT)
                             ) { _, _ ->
                                 playerService?.stopAudioPlayer()
                                 requireActivity().finish()

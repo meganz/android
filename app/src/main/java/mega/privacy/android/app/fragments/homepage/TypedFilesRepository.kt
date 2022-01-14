@@ -7,9 +7,7 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import mega.privacy.android.app.di.MegaApi
-import mega.privacy.android.app.utils.ZoomUtil
 import nz.mega.sdk.MegaApiAndroid
-import nz.mega.sdk.MegaNode
 import java.util.*
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -28,21 +26,20 @@ class TypedFilesRepository @Inject constructor(
     /** The selected nodes in action mode */
     private val selectedNodesMap: LinkedHashMap<Any, NodeItem> = LinkedHashMap()
 
-    suspend fun getFiles(type: Int, order: Int, zoom: Int = ZoomUtil.ZOOM_DEFAULT) {
+    /**
+     * Using a node fetcher for the new request, and link fileNodeItems to its result.
+     */
+    suspend fun getFiles(type: Int, order: Int) {
         preserveSelectedItems()
 
         // Create a node fetcher for the new request, and link fileNodeItems to its result.
         // Then the result of any previous NodesFetcher will be ignored
-        nodesFetcher = TypedNodesFetcher(context, megaApi, type, order, selectedNodesMap, zoom)
+        nodesFetcher = TypedNodesFetcher(context, megaApi, type, order, selectedNodesMap)
         fileNodeItems = nodesFetcher.result
 
         withContext(Dispatchers.IO) {
             nodesFetcher.getNodeItems()
         }
-    }
-
-    suspend fun getPreviews(map: MutableMap<MegaNode, String>, refreshCallback: () -> Unit) {
-        nodesFetcher.getPreviewsFromServer(map, refreshCallback)
     }
 
     fun emitFiles() {
