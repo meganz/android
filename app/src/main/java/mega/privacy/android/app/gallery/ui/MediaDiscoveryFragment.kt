@@ -7,7 +7,7 @@ import androidx.core.view.isVisible
 import androidx.fragment.app.viewModels
 import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.R
-import mega.privacy.android.app.databinding.FragmentMediaDecoveryBinding
+import mega.privacy.android.app.databinding.FragmentMediaDiscoveryBinding
 import mega.privacy.android.app.fragments.homepage.*
 import mega.privacy.android.app.gallery.constant.INTENT_KEY_MEDIA_HANDLE
 import mega.privacy.android.app.gallery.data.GalleryItem
@@ -21,7 +21,7 @@ class MediaDiscoveryFragment : BaseZoomFragment() {
 
     override val viewModel by viewModels<MediaViewModel>()
 
-    private lateinit var binding: FragmentMediaDecoveryBinding
+    private lateinit var binding: FragmentMediaDiscoveryBinding
 
     /**
      * Current order.
@@ -51,7 +51,7 @@ class MediaDiscoveryFragment : BaseZoomFragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        binding = FragmentMediaDecoveryBinding.inflate(inflater, container, false)
+        binding = FragmentMediaDiscoveryBinding.inflate(inflater, container, false)
         adapterType = MEDIA_BROWSE_ADAPTER
         setupBinding()
         setupParentActivityUI()
