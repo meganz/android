@@ -272,9 +272,7 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 
                     uploadCount = mapProgressFileTransfers.size();
 
-                    if (uploadCount == 0) {
-                        stopForeground();
-                    } else {
+                    if (uploadCount > 0) {
                         isForeground = false;
                         stopForeground(true);
                         mNotificationManager.cancel(NOTIFICATION_UPLOAD);
@@ -284,7 +282,11 @@ public class UploadService extends Service implements MegaTransferListenerInterf
                     break;
             }
 
-            updateProgressNotification();
+            if (uploadCount == 0) {
+                stopForeground();
+            } else {
+                updateProgressNotification();
+            }
 
             return;
         } else {
