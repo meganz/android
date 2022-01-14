@@ -19,6 +19,7 @@ import mega.privacy.android.app.lollipop.FileExplorerActivityLollipop
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop
 import mega.privacy.android.app.utils.ColorUtils
 import mega.privacy.android.app.utils.Constants.*
+import mega.privacy.android.app.utils.callManager
 import nz.mega.sdk.MegaApiJava.*
 import java.util.*
 import javax.inject.Inject
@@ -207,10 +208,10 @@ class SortByBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
             ORDER_CAMERA -> {
                 sortOrderManagement.setOrderCamera(order)
 
-                if (requireActivity() is ManagerActivityLollipop) {
-                    (requireActivity() as ManagerActivityLollipop).refreshCUNodes()
-                    if((requireActivity() as ManagerActivityLollipop).isInMDPage) {
-                        (requireActivity() as ManagerActivityLollipop).mdFragment.loadPhotos()
+                callManager { manager ->
+                    manager.refreshCUNodes()
+                    if(manager.isInMDPage) {
+                        manager.mdFragment.loadPhotos()
                     }
                 }
             }
@@ -242,8 +243,8 @@ class SortByBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
                         )
                     )
 
-                if (requireActivity() is ManagerActivityLollipop) {
-                    (requireActivity() as ManagerActivityLollipop).refreshOthersOrder()
+                callManager { manager ->
+                    manager.refreshOthersOrder()
                 }
             }
         }
