@@ -691,13 +691,13 @@ public class FileContactListActivityLollipop extends PasscodeActivity implements
 		MegaNode parentNode = megaApi.getNodeByHandle(parentHandle);
 		if(parentNode == null){
 			AlertDialogUtil.dismissAlertDialogIfExists(statusDialog);
-			showSnackbar(getString(R.string.error_temporary_unavaible));
+			showSnackbar(StringResourcesUtils.getString(R.string.error_temporary_unavaible));
 			return;
 		}
 		
 		if (infos == null) {
 			AlertDialogUtil.dismissAlertDialogIfExists(statusDialog);
-			showSnackbar(getString(R.string.upload_can_not_open));
+			showSnackbar(StringResourcesUtils.getString(R.string.upload_can_not_open));
 			return;
 		}
 
@@ -714,7 +714,7 @@ public class FileContactListActivityLollipop extends PasscodeActivity implements
 					AlertDialogUtil.dismissAlertDialogIfExists(statusDialog);
 
 					if (throwable != null) {
-						showSnackbar(getString(R.string.error_temporary_unavaible));
+						showSnackbar(StringResourcesUtils.getString(R.string.error_temporary_unavaible));
 					} else {
 						List<ShareInfo> collisions = result.getFirst();
 						List<ShareInfo> withoutCollisions = result.getSecond();
@@ -724,7 +724,7 @@ public class FileContactListActivityLollipop extends PasscodeActivity implements
 						}
 
 						if (!withoutCollisions.isEmpty()) {
-							showSnackbar(getQuantityString(R.plurals.upload_began, withoutCollisions.size(), withoutCollisions.size()));
+							showSnackbar(StringResourcesUtils.getQuantityString(R.plurals.upload_began, withoutCollisions.size(), withoutCollisions.size()));
 
 							for (ShareInfo info : withoutCollisions) {
 								if (transfersManagement.shouldBreakTransfersProcessing()) {
