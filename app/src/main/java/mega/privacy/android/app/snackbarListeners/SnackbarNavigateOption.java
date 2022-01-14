@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.view.View;
 
 import mega.privacy.android.app.MegaApplication;
+import mega.privacy.android.app.contacts.ContactsActivity;
 import mega.privacy.android.app.lollipop.ContactFileListActivityLollipop;
 import mega.privacy.android.app.lollipop.ContactInfoActivityLollipop;
 import mega.privacy.android.app.lollipop.FileInfoActivityLollipop;
@@ -67,9 +68,16 @@ public class SnackbarNavigateOption implements View.OnClickListener {
             return;
         }
 
-        if(context instanceof ChatActivityLollipop && type == INVITE_CONTACT_TYPE){
-            new ContactController(context).inviteContact(userEmail);
-            return;
+        if(context instanceof ChatActivityLollipop){
+            switch (type) {
+                case INVITE_CONTACT_TYPE:
+                    new ContactController(context).inviteContact(userEmail);
+                    return;
+
+                case SENT_REQUESTS_TYPE:
+                    ((ChatActivityLollipop) context).startActivity(ContactsActivity.getSentRequestsIntent(context));
+                    return;
+            }
         }
 
         Intent intent = new Intent(context, ManagerActivityLollipop.class);
