@@ -1688,7 +1688,6 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 				public boolean onPreDraw() {
 					if (addPhoneNumberButton.getLayout().getLineCount() > 1) {
 						findViewById(R.id.navigation_drawer_add_phone_number_icon).setVisibility(View.GONE);
-						return true;
 					}
 					addPhoneNumberButton.getViewTreeObserver().removeOnPreDrawListener(this);
 					return false;
