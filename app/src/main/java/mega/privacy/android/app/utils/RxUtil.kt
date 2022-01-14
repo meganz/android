@@ -19,6 +19,6 @@ object RxUtil {
     /**
      * Took from https://stackoverflow.com/a/56479387/5004910
      */
-    fun <T> Flowable<T>.debounceImmediate(timeout: Long, unit: TimeUnit): Flowable<T> =
+    fun <T : Any> Flowable<T>.debounceImmediate(timeout: Long, unit: TimeUnit): Flowable<T> =
         publish { it.take(1).concatWith(it.debounce(timeout, unit)) }
 }

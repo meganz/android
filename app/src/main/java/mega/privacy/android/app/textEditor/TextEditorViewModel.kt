@@ -42,6 +42,7 @@ import nz.mega.sdk.*
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
 import java.io.*
+import java.lang.Exception
 import java.net.HttpURLConnection
 import java.net.URL
 import javax.inject.Inject
@@ -305,7 +306,11 @@ class TextEditorViewModel @Inject constructor(
      * Starts the read action to get the content of the file.
      */
     fun readFileContent() {
-        viewModelScope.launch { readFile() }
+        try {
+            viewModelScope.launch { readFile() }
+        } catch (e: Exception) {
+            logError("Exception reading file content", e)
+        }
     }
 
     /**
