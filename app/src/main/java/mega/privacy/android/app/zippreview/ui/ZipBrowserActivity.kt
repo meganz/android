@@ -99,7 +99,7 @@ class ZipBrowserActivity : PasscodeActivity() {
         actionBar?.apply {
             setHomeButtonEnabled(true)
             setDisplayHomeAsUpEnabled(true)
-            title = (StringResourcesUtils.getString(R.string.zip_browser_activity).toUpperCase(
+            title = (StringResourcesUtils.getString(R.string.zip_browser_activity).uppercase(
                 Locale.getDefault()
             ))
         }
@@ -197,7 +197,7 @@ class ZipBrowserActivity : PasscodeActivity() {
             .setMessage(StringResourcesUtils.getString(R.string.error_fail_to_open_file_general))
             .setPositiveButton(
                 StringResourcesUtils.getString(R.string.general_ok)
-                    .toUpperCase(Locale.getDefault())
+                    .uppercase(Locale.getDefault())
             ) { _: DialogInterface?, _: Int -> }
             .show()
     }
