@@ -249,7 +249,7 @@ class MediaPlayerServiceViewModel(
                             AUDIO_BROWSE_ADAPTER -> {
                                 _playlistTitle.postValue(
                                     getString(R.string.upload_to_audio)
-                                        .toUpperCase(Locale.getDefault())
+                                        .uppercase(Locale.getDefault())
                                 )
 
                                 buildPlaylistForAudio(intent, firstPlayHandle)
@@ -257,7 +257,7 @@ class MediaPlayerServiceViewModel(
                             VIDEO_BROWSE_ADAPTER -> {
                                 _playlistTitle.postValue(
                                     getString(R.string.sortby_type_video_first)
-                                        .toUpperCase(Locale.getDefault())
+                                        .uppercase(Locale.getDefault())
                                 )
 
                                 buildPlaylistForVideos(intent, firstPlayHandle)
@@ -281,7 +281,7 @@ class MediaPlayerServiceViewModel(
                                 if (isInRootLinksLevel(type, parentHandle)) {
                                     _playlistTitle.postValue(
                                         getString(R.string.tab_links_shares)
-                                            .toUpperCase(Locale.getDefault())
+                                            .uppercase(Locale.getDefault())
                                     )
 
                                     buildPlaylistFromNodes(
@@ -293,7 +293,7 @@ class MediaPlayerServiceViewModel(
                                 if (type == INCOMING_SHARES_ADAPTER && parentHandle == INVALID_HANDLE) {
                                     _playlistTitle.postValue(
                                         getString(R.string.tab_incoming_shares)
-                                            .toUpperCase(Locale.getDefault())
+                                            .uppercase(Locale.getDefault())
                                     )
 
                                     buildPlaylistFromNodes(
@@ -305,7 +305,7 @@ class MediaPlayerServiceViewModel(
                                 if (type == OUTGOING_SHARES_ADAPTER && parentHandle == INVALID_HANDLE) {
                                     _playlistTitle.postValue(
                                         getString(R.string.tab_outgoing_shares)
-                                            .toUpperCase(Locale.getDefault())
+                                            .uppercase(Locale.getDefault())
                                     )
 
                                     val nodes = ArrayList<MegaNode>()
@@ -330,7 +330,7 @@ class MediaPlayerServiceViewModel(
 
                                     val title =
                                         getString(R.string.title_incoming_shares_with_explorer)
-                                            .toUpperCase(Locale.getDefault()) + " " + getMegaUserNameDB(
+                                            .uppercase(Locale.getDefault()) + " " + getMegaUserNameDB(
                                             contact
                                         )
 
@@ -357,7 +357,7 @@ class MediaPlayerServiceViewModel(
                                             INBOX_ADAPTER -> R.string.section_inbox
                                             else -> R.string.section_cloud_drive
                                         }
-                                    ).toUpperCase(Locale.getDefault())
+                                    ).uppercase(Locale.getDefault())
                                 } else {
                                     parent.name
                                 }
@@ -369,7 +369,7 @@ class MediaPlayerServiceViewModel(
                             RECENTS_ADAPTER, RECENTS_BUCKET_ADAPTER -> {
                                 _playlistTitle.postValue(
                                     getString(R.string.section_recents)
-                                        .toUpperCase(Locale.getDefault())
+                                        .uppercase(Locale.getDefault())
                                 )
 
                                 val handles =
@@ -870,7 +870,7 @@ class MediaPlayerServiceViewModel(
         val filteredItems = ArrayList<PlaylistItem>()
 
         for ((index, item) in items.withIndex()) {
-            if (item.nodeName.toLowerCase(Locale.ROOT).contains(filter)) {
+            if (item.nodeName.lowercase(Locale.ROOT).contains(filter)) {
                 // Filter only affects displayed playlist, it doesn't affect what
                 // ExoPlayer is playing, so we still need use the index before filter.
                 filteredItems.add(item.finalizeItem(index, PlaylistItem.TYPE_PREVIOUS))

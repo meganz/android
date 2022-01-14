@@ -122,7 +122,7 @@ class ContactsActivity : PasscodeActivity(), SnackbarShower {
                         R.id.contact_groups -> R.string.section_groups
                         else -> R.string.section_contacts
                     }
-                ).toUpperCase(Locale.getDefault())
+                ).uppercase(Locale.getDefault())
             }
         }
     }
