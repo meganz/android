@@ -3,6 +3,12 @@ def BUILD_STEP = ""
 
 pipeline {
     agent { label 'mac-slave' }
+    options {
+        // Stop the build early in case of compile or test failures
+        skipStagesAfterUnstable()
+        timeout(time: 2, unit: 'HOURS')
+        gitLabConnection('GitLabConnection')
+    }
     environment {
 
         LC_ALL = "en_US.UTF-8"
@@ -29,21 +35,41 @@ pipeline {
         // only build one architecture for SDK, to save build time. skipping "x86 armeabi-v7a x86_64"
         BUILD_ARCHS = "arm64-v8a"
     }
-    options {
-        // Stop the build early in case of compile or test failures
-        skipStagesAfterUnstable()
-        timeout(time: 2, unit: 'HOURS')
-        gitLabConnection('GitLabConnection')
-    }
     post {
         failure {
             script {
-                def comment = "Android Build Failed. :disappointed: \nReason: ${BUILD_STEP}\nBranch: ${env.GIT_BRANCH}"
+                if (env.BRANCH_NAME.startsWith('MR-')) {
+                    def mrNumber = env.BRANCH_NAME.replace('MR-', '')
+
+                    withCredentials([usernameColonPassword(credentialsId: 'Jenkins-Login', variable: 'CREDENTIALS')]) {
+                        sh 'curl -u $CREDENTIALS ${BUILD_URL}/consoleText -o console.txt'
+                    }
+
+                    withCredentials([usernamePassword(credentialsId: 'Gitlab-Access-Token', usernameVariable: 'USERNAME', passwordVariable: 'TOKEN')]) {
+                        final String response = sh(script: 'curl -s --request POST --header PRIVATE-TOKEN:$TOKEN --form file=@console.txt https://code.developers.mega.co.nz/api/v4/projects/199/uploads', returnStdout: true).trim()
+                        def json = new groovy.json.JsonSlurperClassic().parseText(response)
+                        env.MARKDOWN_LINK = ":x: Build Failed <br />Build Log: ${json.markdown}"
+                        env.MERGE_REQUEST_URL = "https://code.developers.mega.co.nz/api/v4/projects/199/merge_requests/${mrNumber}/notes"
+                        sh 'curl --request POST --header PRIVATE-TOKEN:$TOKEN --form body=\"${MARKDOWN_LINK}\" ${MERGE_REQUEST_URL}'
+                    }
+                } else {
+                    withCredentials([usernameColonPassword(credentialsId: 'Jenkins-Login', variable: 'CREDENTIALS')]) {
+                        def comment = ":x: Android Build failed for branch: ${env.GIT_BRANCH}"
+                        if (env.CHANGE_URL) {
+                            comment = ":x: Android Build failed for branch: ${env.GIT_BRANCH} \nMR Link:${env.CHANGE_URL}"
+                        }
+                        slackSend color: "danger", message: comment
+                        sh 'curl -u $CREDENTIALS ${BUILD_URL}/consoleText -o console.txt'
+                        slackUploadFile filePath:"console.txt", initialComment:"Android Build Log"
+                    }
+                }
+
+                /*def comment = "Android Build Failed. :disappointed: \nReason: ${BUILD_STEP}\nBranch: ${env.GIT_BRANCH}"
                 if (env.CHANGE_URL) {
                     comment = "Android Build Failed. :disappointed: \nReason: ${BUILD_STEP}\nBranch: ${env.GIT_BRANCH} \nMR: ${env.CHANGE_URL}"
                 }
                 slackSend color: "danger", message: comment
-                slackUploadFile filePath: env.CONSOLE_LOG_FILE, initialComment: "Android Build Log"
+                slackUploadFile filePath: env.CONSOLE_LOG_FILE, initialComment: "Android Build Log"*/
             }
         }
     }
