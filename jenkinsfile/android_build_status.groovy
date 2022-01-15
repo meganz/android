@@ -1,7 +1,3 @@
-// run shell command and print stdout and stderr to log file
-def runShell(String cmd) {
-    sh "${cmd} >> ${CONSOLE_LOG_FILE} 2>&1"
-}
 
 def BUILD_STEP = ""
 
@@ -58,7 +54,7 @@ pipeline {
                     BUILD_STEP = "Preparation"
                 }
                 gitlabCommitStatus(name: 'Preparation') {
-                    runShell("rm -fv ${CONSOLE_LOG_FILE}")
+                    sh("rm -fv ${CONSOLE_LOG_FILE}")
                 }
             }
         }
@@ -71,12 +67,12 @@ pipeline {
 
                 gitlabCommitStatus(name: 'Fetch SDK Submodules') {
                     withCredentials([gitUsernamePassword(credentialsId: 'Gitlab-Access-Token', gitToolName: 'Default')]) {
-                        runShell 'git config --file=.gitmodules submodule."app/src/main/jni/mega/sdk".url https://code.developers.mega.co.nz/sdk/sdk.git'
-                        runShell 'git config --file=.gitmodules submodule."app/src/main/jni/mega/sdk".branch develop'
-                        runShell 'git config --file=.gitmodules submodule."app/src/main/jni/megachat/sdk".url https://code.developers.mega.co.nz/megachat/MEGAchat.git'
-                        runShell 'git config --file=.gitmodules submodule."app/src/main/jni/megachat/sdk".branch develop'
-                        runShell "git submodule sync"
-                        runShell "git submodule update --init --recursive --remote"
+                        sh 'git config --file=.gitmodules submodule."app/src/main/jni/mega/sdk".url https://code.developers.mega.co.nz/sdk/sdk.git'
+                        sh 'git config --file=.gitmodules submodule."app/src/main/jni/mega/sdk".branch develop'
+                        sh 'git config --file=.gitmodules submodule."app/src/main/jni/megachat/sdk".url https://code.developers.mega.co.nz/megachat/MEGAchat.git'
+                        sh 'git config --file=.gitmodules submodule."app/src/main/jni/megachat/sdk".branch develop'
+                        sh "git submodule sync"
+                        sh "git submodule update --init --recursive --remote"
                     }
                 }
             }
@@ -158,7 +154,7 @@ pipeline {
                 }
                 gitlabCommitStatus(name: 'Build APK (GMS+HMS)') {
                     // Finish building and packaging the APK
-                    runShell "./gradlew clean app:assembleGmsRelease app:assembleHmsRelease"
+                    sh "./gradlew clean app:assembleGmsRelease app:assembleHmsRelease"
 
                     // Archive the APKs so that they can be downloaded from Jenkins
                     // archiveArtifacts '**/*.apk'
@@ -172,7 +168,7 @@ pipeline {
                 }
                 gitlabCommitStatus(name: 'Unit Test') {
                     // Compile and run the unit tests for the app and its dependencies
-                    runShell "./gradlew testGmsDebugUnitTest"
+                    sh "./gradlew testGmsDebugUnitTest"
 
                     // Analyse the test results and update the build result as appropriate
                     //junit '**/TEST-*.xml'
@@ -182,7 +178,7 @@ pipeline {
         // stage('Static analysis') {
         //   steps {
         //     // Run Lint and analyse the results
-        //     runShell './gradlew lintDebug'
+        //     sh './gradlew lintDebug'
         //     androidLint pattern: '**/lint-results-*.xml'
         //   }
         // }
@@ -205,7 +201,7 @@ pipeline {
                     BUILD_STEP = "Deploy"
                 }
                 // Build the app in release mode, and sign the APK using the environment variables
-                runShell './gradlew assembleRelease'
+                sh './gradlew assembleRelease'
 
                 // Archive the APKs so that they can be downloaded from Jenkins
                 archiveArtifacts '**/*.apk'
