@@ -35,7 +35,6 @@ pipeline {
         // only build one architecture for SDK, to save build time. skipping "x86 armeabi-v7a x86_64"
         BUILD_ARCHS = "arm64-v8a"
     }
-    
     post {
         failure {
             script {
