@@ -99,6 +99,10 @@ pipeline {
                         sh 'git config --file=.gitmodules submodule."app/src/main/jni/megachat/sdk".branch develop'
                         sh "git submodule sync"
                         sh "git submodule update --init --recursive --remote"
+
+                        // CREATE AN BUILD ERROR BY ROBIN FOR TESTING PURPOSE
+                        sh "echo THIS IS A HUMAN ERROR INTENTIALLY MADE BY ROBIN SHI."
+                        sh "cd afasdfasdf"
                     }
                 }
             }
