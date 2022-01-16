@@ -371,7 +371,7 @@ object MegaNodeDialogUtil {
 
                             val oldMimeType = MimeTypeList.typeForName(node.name)
                             var newExtension = MimeTypeList.typeForName(typedString).extension
-                            if (newExtension == typedString.toLowerCase(Locale.ROOT)) newExtension =
+                            if (newExtension == typedString.lowercase(Locale.ROOT)) newExtension =
                                 ""
 
                             when (if (node.isFolder) NO_ERROR else isValidRenameDialogValue(

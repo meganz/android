@@ -143,7 +143,7 @@ class MegaNodeRepo @Inject constructor(
                 result.addAll(searchOfflineNodes(getChildPath(node), query))
             }
 
-            if (node.name.toLowerCase(Locale.ROOT).contains(query.toLowerCase(Locale.ROOT)) &&
+            if (node.name.lowercase(Locale.ROOT).contains(query.lowercase(Locale.ROOT)) &&
                 FileUtil.isFileAvailable(getOfflineFile(MegaApplication.getInstance(), node))
             ) {
                 result.add(node)
