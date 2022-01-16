@@ -5,8 +5,10 @@ import dagger.Module
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import mega.privacy.android.app.data.repository.DefaultAccountRepository
+import mega.privacy.android.app.data.repository.DefaultNetworkRepository
 import mega.privacy.android.app.data.repository.DefaultSettingsRepository
 import mega.privacy.android.app.domain.repository.AccountRepository
+import mega.privacy.android.app.domain.repository.NetworkRepository
 import mega.privacy.android.app.domain.repository.SettingsRepository
 
 @Module
@@ -18,4 +20,7 @@ abstract class RepositoryModule {
 
     @Binds
     abstract fun bindAccountRepository(repository: DefaultAccountRepository): AccountRepository
+
+    @Binds
+    abstract fun bindNetworkRepository(repository: DefaultNetworkRepository): NetworkRepository
 }

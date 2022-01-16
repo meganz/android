@@ -7,7 +7,6 @@ import android.os.Build
 import android.os.Bundle
 import android.os.IBinder
 import android.util.DisplayMetrics
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -26,9 +25,6 @@ import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.jeremyliao.liveeventbus.LiveEventBus
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.flow.onCompletion
-import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
@@ -89,7 +85,6 @@ class SettingsFragment : Preference.OnPreferenceChangeListener,
 
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
         addPreferencesFromResource(R.xml.preferences)
-        updateCancelAccountSetting()
         checkUIPreferences()
     }
 
@@ -102,33 +97,35 @@ class SettingsFragment : Preference.OnPreferenceChangeListener,
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.RESUMED) {
                 viewModel.uiState.collect {
-                    findPreference<SwitchPreferenceCompat>(KEY_QR_CODE_AUTO_ACCEPT)?.isChecked = it.autoAcceptEnabled
-                    setMultiFactorCheckedState(it.multiFactorAuthEnabled)
-                    setDeletePreference(it.canDeleteAccount)
+                    findPreference<Preference>(KEY_FEATURES_CAMERA_UPLOAD)?.isEnabled = it.cameraUploadEnabled
+                    findPreference<Preference>(KEY_FEATURES_CHAT)?.isEnabled = it.chatEnabled
+
+                    findPreference<SwitchPreferenceCompat>(KEY_2FA)?.apply {
+                        isVisible = it.multiFactorVisible
+                        isChecked = it.multiFactorAuthChecked
+                        isEnabled = it.multiFactorEnabled
+                    }
+
+                    findPreference<SwitchPreferenceCompat>(KEY_QR_CODE_AUTO_ACCEPT)?.apply {
+                        isEnabled = it.autoAcceptEnabled
+                        isChecked = it.autoAcceptChecked
+                    }
+
+                    findPreference<Preference>(KEY_CANCEL_ACCOUNT)?.apply {
+                        isVisible = it.deleteAccountVisible
+                        isEnabled = it.deleteEnabled
+                    }
                 }
             }
         }
     }
 
-    private fun setMultiFactorCheckedState(isEnabled: Boolean) {
-        findPreference<SwitchPreferenceCompat>(KEY_2FA)?.isChecked = isEnabled
-    }
-
-    private fun setDeletePreference(canDelete: Boolean) {
-        findPreference<Preference>(
-            KEY_CANCEL_ACCOUNT
-        )?.isVisible = canDelete
-    }
 
     /**
      * Update the Cancel Account settings.
      */
     override fun updateCancelAccountSetting() {}
 
-    private fun registerAccountChangeReceiver() {
-        val filter = IntentFilter(Constants.BROADCAST_ACTION_INTENT_UPDATE_ACCOUNT_DETAILS)
-        requireContext().registerReceiver(updateMyAccountReceiver, filter)
-    }
 
     /**
      * Checks and sets the User interface setting values.
@@ -158,19 +155,12 @@ class SettingsFragment : Preference.OnPreferenceChangeListener,
         savedInstanceState: Bundle?
     ): View? {
         val v = super.onCreateView(inflater, container, savedInstanceState)
-        setOnlineOptions(Util.isOnline(context) && viewModel.hasRootNode)
         val playerServiceIntent = Intent(requireContext(), AudioPlayerService::class.java)
         requireContext().bindService(playerServiceIntent, mediaServiceConnection, 0)
         return v
     }
 
-    override fun setOnlineOptions(isOnline: Boolean) {
-        findPreference<Preference>(KEY_FEATURES_CAMERA_UPLOAD)?.isEnabled = isOnline
-        findPreference<Preference>(KEY_FEATURES_CHAT)?.isEnabled = isOnline
-        findPreference<SwitchPreferenceCompat>(KEY_2FA)?.isEnabled = isOnline
-        findPreference<SwitchPreferenceCompat>(KEY_QR_CODE_AUTO_ACCEPT)?.isEnabled = isOnline
-        findPreference<Preference>(KEY_CANCEL_ACCOUNT)?.isEnabled = isOnline
-    }
+    override fun setOnlineOptions(isOnline: Boolean) { }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -357,13 +347,12 @@ class SettingsFragment : Preference.OnPreferenceChangeListener,
         registerAccountChangeReceiver()
         refreshCameraUploadsSettings()
         updatePasscodeLockSubtitle()
-        if (!Util.isOnline(context)) {
-            findPreference<Preference>(KEY_FEATURES_CHAT)?.isEnabled = false
-            findPreference<Preference>(KEY_FEATURES_CAMERA_UPLOAD)?.isEnabled = false
-        }
-        findPreference<SwitchPreferenceCompat>(KEY_2FA)?.isVisible =
-            viewModel.multiFactorAuthAvailable
         super.onResume()
+    }
+
+    private fun registerAccountChangeReceiver() {
+        val filter = IntentFilter(Constants.BROADCAST_ACTION_INTENT_UPDATE_ACCOUNT_DETAILS)
+        requireContext().registerReceiver(updateMyAccountReceiver, filter)
     }
 
     override fun onPause() {
@@ -439,7 +428,7 @@ class SettingsFragment : Preference.OnPreferenceChangeListener,
                     ChangePasswordActivityLollipop::class.java
                 )
             )
-            KEY_2FA -> if (viewModel.uiState.value.multiFactorAuthEnabled) {
+            KEY_2FA -> if (viewModel.uiState.value.multiFactorAuthChecked) {
                 val intent = Intent(context, VerifyTwoFactorActivity::class.java)
                 intent.putExtra(VerifyTwoFactorActivity.KEY_VERIFY_TYPE, Constants.DISABLE_2FA)
                 startActivity(intent)

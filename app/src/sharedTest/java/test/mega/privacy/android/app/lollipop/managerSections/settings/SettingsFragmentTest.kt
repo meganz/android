@@ -86,6 +86,8 @@ class SettingsFragmentTest {
         val fetchAutoAcceptQRLinks = mock<FetchAutoAcceptQRLinks>()
         val fetchMultiFactorAuthSetting = mock<FetchMultiFactorAuthSetting>()
         val getAccountDetails = mock<GetAccountDetails>()
+        val isOnline = mock<IsOnline>()
+        val rootNodeExists = mock<RootNodeExists>()
 
         @Provides
         fun provideSettingsActivity(): SettingsActivity = settingsActivity
@@ -111,8 +113,9 @@ class SettingsFragmentTest {
         @Provides
         fun provideIsCameraSyncEnabled(): IsCameraSyncEnabled = mock()
 
+
         @Provides
-        fun provideRootNodeExists(): RootNodeExists = mock()
+        fun provideRootNodeExists(): RootNodeExists = rootNodeExists
 
 
         @Provides
@@ -141,16 +144,29 @@ class SettingsFragmentTest {
         fun provideToggleAutoAcceptQRLinks(): ToggleAutoAcceptQRLinks =
             mock()
 
+
+        @Provides
+        fun provideIsOnline(): IsOnline = isOnline
+
     }
 
     @Before
     fun setUp() {
         IdlingRegistry.getInstance().register(idlingResource)
-        runBlocking { whenever(TestSettingsModule.fetchAutoAcceptQRLinks()).thenReturn(false) }
-        whenever(TestSettingsModule.fetchMultiFactorAuthSetting()).thenReturn(flowOf())
-        whenever(TestSettingsModule.getAccountDetails(any())).thenReturn(userAccount)
+        initialiseMockDefaults()
         hiltRule.inject()
         Intents.init()
+    }
+
+    private fun initialiseMockDefaults() {
+        runBlocking { whenever(TestSettingsModule.fetchAutoAcceptQRLinks()).thenReturn(false) }
+
+        whenever(TestSettingsModule.canDeleteAccount(userAccount)).thenReturn(true)
+        whenever(TestSettingsModule.isMultiFactorAuthAvailable()).thenReturn(true)
+        whenever(TestSettingsModule.isOnline()).thenReturn(flowOf(true))
+        whenever(TestSettingsModule.fetchMultiFactorAuthSetting()).thenReturn(flowOf())
+        whenever(TestSettingsModule.getAccountDetails(any())).thenReturn(userAccount)
+        whenever(TestSettingsModule.rootNodeExists()).thenReturn(true)
     }
 
     @After
@@ -163,7 +179,9 @@ class SettingsFragmentTest {
             TestSettingsModule.fetchMultiFactorAuthSetting,
             TestSettingsModule.settingsActivity,
             TestSettingsModule.canDeleteAccount,
-            TestSettingsModule.getAccountDetails
+            TestSettingsModule.getAccountDetails,
+            TestSettingsModule.isOnline,
+            TestSettingsModule.rootNodeExists,
         )
     }
 
@@ -184,6 +202,7 @@ class SettingsFragmentTest {
         whenever(TestSettingsModule.canDeleteAccount(userAccount)).thenReturn(true)
 
         val scenario = launchFragmentInHiltContainer<SettingsFragment>()
+        scenario?.moveToState(Lifecycle.State.CREATED)
         scenario?.moveToState(Lifecycle.State.STARTED)
         scenario?.moveToState(Lifecycle.State.RESUMED)
 
@@ -265,11 +284,7 @@ class SettingsFragmentTest {
     @Test
     fun test_that_activated_delete_has_100_percent_alpha() {
         whenever(TestSettingsModule.canDeleteAccount(userAccount)).thenReturn(true)
-        val scenario = launchFragmentInHiltContainer<SettingsFragment>()
-        scenario?.onActivity {
-            val fragment = it.testFragment<SettingsFragment>()
-            fragment.setOnlineOptions(true)
-        }
+        launchFragmentInHiltContainer<SettingsFragment>()
 
         onPreferences()
             .check(
@@ -285,11 +300,8 @@ class SettingsFragmentTest {
     @Test
     fun test_that_deactivated_delete_has_50_percent_alpha() {
         whenever(TestSettingsModule.canDeleteAccount(userAccount)).thenReturn(true)
-        val scenario = launchFragmentInHiltContainer<SettingsFragment>()
-        scenario?.onActivity {
-            val fragment = it.testFragment<SettingsFragment>()
-            fragment.setOnlineOptions(false)
-        }
+        whenever(TestSettingsModule.isOnline()).thenReturn(flowOf(false))
+        launchFragmentInHiltContainer<SettingsFragment>()
 
         onPreferences()
             .check(
@@ -330,12 +342,8 @@ class SettingsFragmentTest {
     fun test_that_correct_fields_are_disable_when_offline() {
         whenever(TestSettingsModule.canDeleteAccount(userAccount)).thenReturn(true)
         whenever(TestSettingsModule.isMultiFactorAuthAvailable()).thenReturn(true)
-        val scenario = launchFragmentInHiltContainer<SettingsFragment>()
-        scenario?.onActivity {
-            val fragment =
-                it.supportFragmentManager.findFragmentByTag(testFragmentTag) as SettingsFragment
-            fragment.setOnlineOptions(false)
-        }
+        whenever(TestSettingsModule.isOnline()).thenReturn(flowOf(false))
+        launchFragmentInHiltContainer<SettingsFragment>()
 
         onPreferences()
             .check(

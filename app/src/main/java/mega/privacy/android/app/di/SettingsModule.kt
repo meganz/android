@@ -74,4 +74,9 @@ abstract class SettingsModule {
     abstract fun bindToggleAutoAcceptQRLinks(
         useCase: DefaultToggleAutoAcceptQRLinks
     ): ToggleAutoAcceptQRLinks
+
+    @Binds
+    abstract fun bindIsOnline(
+        useCase: DefaultIsOnline
+    ): IsOnline
 }

@@ -3949,7 +3949,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 					}
 					clickDrawerItemLollipop(drawerItem);
 
-					if (getSettingsFragment() != null) {
+					if (getSettingsFragment() != null && SettingsFragmentRefactorToggle.INSTANCE.getEnabled() == false) {
 						settingsFragment.setOnlineOptions(true);
 					}
 
@@ -4023,7 +4023,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 			setOfflineAvatar(megaChatApi.getMyEmail(), megaChatApi.getMyUserHandle(),
 					megaChatApi.getMyFullname());
 
-			if (getSettingsFragment() != null) {
+			if (getSettingsFragment() != null && SettingsFragmentRefactorToggle.INSTANCE.getEnabled() == false) {
 				settingsFragment.setOnlineOptions(false);
 			}
 

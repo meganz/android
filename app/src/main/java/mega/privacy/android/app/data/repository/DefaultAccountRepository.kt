@@ -7,11 +7,9 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
-import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.flow.flowOf
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.constants.EventConstants.EVENT_2FA_UPDATED
-import mega.privacy.android.app.data.gateway.EventBusGateway
+import mega.privacy.android.app.data.facade.EventBusFacade
 import mega.privacy.android.app.di.MegaApi
 import mega.privacy.android.app.domain.entity.UserAccount
 import mega.privacy.android.app.domain.exception.ApiError
@@ -27,7 +25,7 @@ class DefaultAccountRepository @Inject constructor(
     private val myAccountInfo: MyAccountInfo,
     @MegaApi private val sdk: MegaApiAndroid,
     @ApplicationContext private val context: Context,
-    private val eventBusGateway: EventBusGateway,
+    private val eventBusFacade: EventBusFacade,
 ) : AccountRepository {
     override fun getUserAccount(): UserAccount {
         return UserAccount(
@@ -97,7 +95,7 @@ class DefaultAccountRepository @Inject constructor(
     @OptIn(ExperimentalCoroutinesApi::class)
     override fun monitorMultiFactorAuthChanges(): Flow<Boolean> {
         val eventObservable =
-            eventBusGateway.getEventObservable(EVENT_2FA_UPDATED, Boolean::class.java)
+            eventBusFacade.getEventObservable(EVENT_2FA_UPDATED, Boolean::class.java)
 
         return callbackFlow {
             val flowObserver = Observer(this::trySend)

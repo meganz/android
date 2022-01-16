@@ -23,6 +23,7 @@ class SettingsViewModel @Inject constructor(
     private val shouldHideRecentActivity: ShouldHideRecentActivity,
     private val toggleAutoAcceptQRLinks: ToggleAutoAcceptQRLinks,
     fetchMultiFactorAuthSetting: FetchMultiFactorAuthSetting,
+    private val isOnline: IsOnline,
 ) : ViewModel() {
     private val userAccount = MutableStateFlow(getAccountDetails(false))
     private val state = MutableStateFlow(initialiseState())
@@ -30,9 +31,15 @@ class SettingsViewModel @Inject constructor(
 
     private fun initialiseState(): SettingsState {
         return SettingsState(
+            autoAcceptChecked = false,
+            multiFactorAuthChecked = false,
+            deleteAccountVisible = false,
+            cameraUploadEnabled = false,
+            chatEnabled = false,
             autoAcceptEnabled = false,
-            multiFactorAuthEnabled = false,
-            canDeleteAccount = canDeleteAccount(getAccountDetails(false))
+            multiFactorEnabled = false,
+            deleteEnabled = false,
+            multiFactorVisible = false,
         )
     }
 
@@ -52,18 +59,43 @@ class SettingsViewModel @Inject constructor(
         get() = isCameraSyncEnabled()
     val accountType: Int
         get() = userAccount.value.accountTypeIdentifier
-    val hasRootNode: Boolean
-        get() = rootNodeExists()
-    val multiFactorAuthAvailable: Boolean
-        get() = isMultiFactorAuthAvailable()
 
 
     init {
         viewModelScope.launch {
-            state.update { it.copy(autoAcceptEnabled = fetchAutoAcceptQRLinks()) }
-            fetchMultiFactorAuthSetting().collect { enabled ->
-                state.update { it.copy(multiFactorAuthEnabled = enabled) }
+            merge(
+                userAccount.map {
+                    { state: SettingsState -> state.copy(deleteAccountVisible = canDeleteAccount(it)) }
+                },
+                flowOf(isMultiFactorAuthAvailable())
+                    .map { available ->
+                        {state: SettingsState -> state.copy(multiFactorVisible = available)}
+                    },
+                flowOf(fetchAutoAcceptQRLinks())
+                    .map { enabled ->
+                        { state: SettingsState -> state.copy(autoAcceptChecked = enabled) }
+                    },
+                fetchMultiFactorAuthSetting()
+                    .map { enabled ->
+                        { state: SettingsState -> state.copy(multiFactorAuthChecked = enabled) }
+                    },
+                isOnline()
+                    .map { it && rootNodeExists() }
+                    .map { online ->
+                        { state: SettingsState ->
+                            state.copy(
+                                cameraUploadEnabled = online,
+                                chatEnabled = online,
+                                autoAcceptEnabled = online,
+                                multiFactorEnabled = online,
+                                deleteEnabled = online,
+                            )
+                        }
+                    }
+            ).collect {
+                state.update(it)
             }
+
         }
 
     }
@@ -71,7 +103,6 @@ class SettingsViewModel @Inject constructor(
     fun refreshAccount() {
         viewModelScope.launch {
             userAccount.value = getAccountDetails(true)
-            state.update { it.copy(canDeleteAccount = canDeleteAccount(userAccount.value)) }
         }
     }
 
@@ -80,7 +111,7 @@ class SettingsViewModel @Inject constructor(
             kotlin.runCatching {
                 toggleAutoAcceptQRLinks()
             }.onSuccess { autoAccept ->
-                state.update { it.copy(autoAcceptEnabled = autoAccept) }
+                state.update { it.copy(autoAcceptChecked = autoAccept) }
             }
         }
     }
