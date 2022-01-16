@@ -1,6 +1,7 @@
 
 def BUILD_STEP = ""
 
+
 pipeline {
     agent { label 'mac-slave' }
     options {
@@ -63,13 +64,6 @@ pipeline {
                         slackUploadFile filePath:"console.txt", initialComment:"Android Build Log"
                     }
                 }
-
-                /*def comment = "Android Build Failed. :disappointed: \nReason: ${BUILD_STEP}\nBranch: ${env.GIT_BRANCH}"
-                if (env.CHANGE_URL) {
-                    comment = "Android Build Failed. :disappointed: \nReason: ${BUILD_STEP}\nBranch: ${env.GIT_BRANCH} \nMR: ${env.CHANGE_URL}"
-                }
-                slackSend color: "danger", message: comment
-                slackUploadFile filePath: env.CONSOLE_LOG_FILE, initialComment: "Android Build Log"*/
             }
         }
     }
@@ -90,11 +84,16 @@ pipeline {
                 script {
                     BUILD_STEP = "Fetch SDK Submodules"
 
-                    // test code to print environment variable
-                    sh "echo START print env variable"
-                    sh "echo ${env.gitlabMergeRequestDescription}"
+                    /*
+                    title: GITLAB_OA_TITLE
+                    description:  GITLAB_OA_DESCRIPTION
+                    */
+
                     sh "set"
-                    sh "echo END print env variable"
+
+                    // break the build on purpose, for debugging reason
+                    sh "cd afdasfasdf"
+
                 }
 
                 gitlabCommitStatus(name: 'Fetch SDK Submodules') {
@@ -106,7 +105,7 @@ pipeline {
                         sh "git submodule sync"
                         sh "git submodule update --init --recursive --remote"
 
-                        // break the build on purpose, for debugging reason
+
                     }
                 }
             }
