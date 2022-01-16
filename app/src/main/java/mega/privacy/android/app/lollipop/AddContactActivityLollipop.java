@@ -302,8 +302,19 @@ public class AddContactActivityLollipop extends PasscodeActivity implements View
     protected void onResume() {
         super.onResume();
         LiveEventBus.get(EVENT_FAB_CHANGE, Boolean.class).observeForever(fabChangeObserver);
-        String j;
-        j.isEmpty()
+
+        String description = "line1\nSDK_BRANCH=mybranch\nline3";
+        String[] lines = description.split("\n");
+        String KEY = "SDK_BRANCH=";
+        for (String line: lines) {
+            line = line.trim();
+            if (line.startsWith(KEY)) {
+                String result = line.substring(KEY.length());
+//                return result;
+            }
+        }
+        //return "";
+
     }
 
     @Override

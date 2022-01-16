@@ -16,6 +16,35 @@ static def shouldSkip(title) {
     return true
 }
 
+def getSDKBranch() {
+    def description = env.GITLAB_OA_DESCRIPTION
+    String[] lines = description.split("\n");
+    String KEY = "SDK_BRANCH=";
+    for (String line: lines) {
+        line = line.trim();
+        if (line.startsWith(KEY)) {
+            String result = line.substring(KEY.length());
+                return result;
+        }
+    }
+    return "";
+}
+
+def getMEGAchatBranch() {
+    def description = env.GITLAB_OA_DESCRIPTION
+    String[] lines = description.split("\n");
+    String KEY = "MEGACHAT_BRANCH=";
+    for (String line: lines) {
+        line = line.trim();
+        if (line.startsWith(KEY)) {
+            String result = line.substring(KEY.length());
+            return result;
+        }
+    }
+    return "";
+
+}
+
 pipeline {
     agent { label 'mac-slave' }
     options {
@@ -103,9 +132,14 @@ pipeline {
             steps {
                 script {
                     BUILD_STEP = "Preparation"
+
+                    print("SDK Branch = " + getSDKBranch())
+                    print("MEGACHAT Branch = " + getMEGAchatBranch())
+
                 }
                 gitlabCommitStatus(name: 'Preparation') {
                     sh("rm -fv ${CONSOLE_LOG_FILE}")
+                    sh("set")
                 }
             }
         }
@@ -117,16 +151,6 @@ pipeline {
             steps {
                 script {
                     BUILD_STEP = "Fetch SDK Submodules"
-
-                    /*
-                    description:  GITLAB_OA_DESCRIPTION
-                    */
-
-                    sh "set"
-
-                    // break the build on purpose, for debugging reason
-                    //sh "cd afdasfasdf"
-
                 }
 
                 gitlabCommitStatus(name: 'Fetch SDK Submodules') {
@@ -137,8 +161,6 @@ pipeline {
                         sh 'git config --file=.gitmodules submodule."app/src/main/jni/megachat/sdk".branch develop'
                         sh "git submodule sync"
                         sh "git submodule update --init --recursive --remote"
-
-
                     }
                 }
             }
