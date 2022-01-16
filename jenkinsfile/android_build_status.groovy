@@ -82,6 +82,7 @@ pipeline {
             script {
                 // If CI build is skipped due to Draft status, send to a comment to MR
                 if (env.BRANCH_NAME.startsWith('MR-') && shouldSkip(env.GITLAB_OA_TITLE)) {
+                    def mrNumber = env.BRANCH_NAME.replace('MR-', '')
                     withCredentials([usernamePassword(credentialsId: 'Gitlab-Access-Token', usernameVariable: 'USERNAME', passwordVariable: 'TOKEN')]) {
                         final String response = sh(script: 'curl -s --request POST --header PRIVATE-TOKEN:$TOKEN --form file=@console.txt https://code.developers.mega.co.nz/api/v4/projects/199/uploads', returnStdout: true).trim()
 //                        def json = new groovy.json.JsonSlurperClassic().parseText(response)
