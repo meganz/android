@@ -93,6 +93,7 @@ pipeline {
                     // test code to print environment variable
                     sh "echo START print env variable"
                     sh "echo ${env.gitlabMergeRequestDescription}"
+                    sh "set"
                     sh "echo END print env variable"
                 }
 
