@@ -89,6 +89,11 @@ pipeline {
             steps {
                 script {
                     BUILD_STEP = "Fetch SDK Submodules"
+
+                    // test code to print environment variable
+                    sh "echo START print env variable"
+                    sh "echo ${env.gitlabMergeRequestDescription}"
+                    sh "echo END print env variable"
                 }
 
                 gitlabCommitStatus(name: 'Fetch SDK Submodules') {
@@ -99,6 +104,8 @@ pipeline {
                         sh 'git config --file=.gitmodules submodule."app/src/main/jni/megachat/sdk".branch develop'
                         sh "git submodule sync"
                         sh "git submodule update --init --recursive --remote"
+
+                        // break the build on purpose, for debugging reason
                     }
                 }
             }
