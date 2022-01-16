@@ -1,6 +1,18 @@
 
 def BUILD_STEP = ""
 
+/**
+ * Decide whether we should skip the build. If the MR title starts with "Draft:" or "WIP:"
+ * @param title of the Merge Request
+ * @return true if current stage should be skipped. Otherwise return false.
+ */
+static def shouldSkip(title) {
+    if (title != null && !title.isEmpty()) {
+        return title.toLowerCase().startsWith("draft:") ||
+                title.toLowerCase().startsWith("wip:")
+    }
+    return true
+}
 
 pipeline {
     agent { label 'mac-slave' }
@@ -66,9 +78,27 @@ pipeline {
                 }
             }
         }
+        success {
+            script {
+                // If CI build is skipped due to Draft status, send to a comment to MR
+                if (env.BRANCH_NAME.startsWith('MR-') && shouldSkip(env.GITLAB_OA_TITLE)) {
+                    withCredentials([usernamePassword(credentialsId: 'Gitlab-Access-Token', usernameVariable: 'USERNAME', passwordVariable: 'TOKEN')]) {
+                        final String response = sh(script: 'curl -s --request POST --header PRIVATE-TOKEN:$TOKEN --form file=@console.txt https://code.developers.mega.co.nz/api/v4/projects/199/uploads', returnStdout: true).trim()
+//                        def json = new groovy.json.JsonSlurperClassic().parseText(response)
+                        env.MARKDOWN_LINK = "CI build has been skipped because MR is still in draft status. Please remove Draft: or WIP: in the beginning of MR title."
+                        env.MERGE_REQUEST_URL = "https://code.developers.mega.co.nz/api/v4/projects/199/merge_requests/${mrNumber}/notes"
+                        sh 'curl --request POST --header PRIVATE-TOKEN:$TOKEN --form body=\"${MARKDOWN_LINK}\" ${MERGE_REQUEST_URL}'
+                    }
+                }
+            }
+        }
+
     }
     stages {
         stage('Preparation') {
+            when {
+                expression { (!shouldSkip(env.GITLAB_OA_TITLE)) }
+            }
             steps {
                 script {
                     BUILD_STEP = "Preparation"
@@ -80,6 +110,9 @@ pipeline {
         }
 
         stage('Fetch SDK Submodules') {
+            when {
+                expression { (!shouldSkip(env.GITLAB_OA_TITLE)) }
+            }
             steps {
                 script {
                     BUILD_STEP = "Fetch SDK Submodules"
@@ -92,7 +125,7 @@ pipeline {
                     sh "set"
 
                     // break the build on purpose, for debugging reason
-                    sh "cd afdasfasdf"
+                    //sh "cd afdasfasdf"
 
                 }
 
@@ -112,6 +145,9 @@ pipeline {
         }
 
         stage('Download Dependency Lib for SDK') {
+            when {
+                expression { (!shouldSkip(env.GITLAB_OA_TITLE)) }
+            }
             steps {
                 script {
                     BUILD_STEP = "Download Dependency Lib for SDK"
@@ -167,6 +203,9 @@ pipeline {
             }
         }
         stage('Build SDK') {
+            when {
+                expression { (!shouldSkip(env.GITLAB_OA_TITLE)) }
+            }
             steps {
                 script {
                     BUILD_STEP = "Build SDK"
@@ -181,6 +220,9 @@ pipeline {
             }
         }
         stage('Build APK (GMS+HMS)') {
+            when {
+                expression { (!shouldSkip(env.GITLAB_OA_TITLE)) }
+            }
             steps {
                 script {
                     BUILD_STEP = 'Build APK (GMS+HMS)'
@@ -195,6 +237,9 @@ pipeline {
             }
         }
         stage('Unit Test') {
+            when {
+                expression { (!shouldSkip(env.GITLAB_OA_TITLE)) }
+            }
             steps {
                 script {
                     BUILD_STEP = "Unit Test"
@@ -209,6 +254,9 @@ pipeline {
             }
         }
         // stage('Static analysis') {
+        //   when {
+        //      expression { (!shouldSkip(env.GITLAB_OA_TITLE)) }
+        //   }
         //   steps {
         //     // Run Lint and analyse the results
         //     sh './gradlew lintDebug'
@@ -217,8 +265,12 @@ pipeline {
         // }
         stage('Deploy') {
             when {
-                // Only execute this stage when building from the `beta` branch
-                branch 'beta'
+                allOf {
+                    expression { (!shouldSkip(env.GITLAB_OA_TITLE)) }
+
+                    // Only execute this stage when building from the `beta` branch
+                    branch 'beta'
+                }
             }
             environment {
                 // Assuming a file credential has been added to Jenkins, with the ID 'my-app-signing-keystore',
