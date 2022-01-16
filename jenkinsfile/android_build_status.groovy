@@ -2,7 +2,9 @@
 def BUILD_STEP = ""
 
 /**
- * Decide whether we should skip the build. If the MR title starts with "Draft:" or "WIP:"
+ * Decide whether we should skip the current build. If MR title starts with "Draft:"
+ * or "WIP:", then CI Server won't start a build. Build will resume until these 2 tags
+ * have been removed from MR title.
  * @param title of the Merge Request
  * @return true if current stage should be skipped. Otherwise return false.
  */
@@ -85,15 +87,13 @@ pipeline {
                     def mrNumber = env.BRANCH_NAME.replace('MR-', '')
                     withCredentials([usernamePassword(credentialsId: 'Gitlab-Access-Token', usernameVariable: 'USERNAME', passwordVariable: 'TOKEN')]) {
                         final String response = sh(script: 'curl -s --request POST --header PRIVATE-TOKEN:$TOKEN --form file=@console.txt https://code.developers.mega.co.nz/api/v4/projects/199/uploads', returnStdout: true).trim()
-//                        def json = new groovy.json.JsonSlurperClassic().parseText(response)
-                        env.MARKDOWN_LINK = "CI build has been skipped because MR is still in draft status. Please remove Draft: or WIP: in the beginning of MR title."
+                        env.MARKDOWN_LINK = ":raising_hand: Android Pipeline Build Skipped! <BR/> Build will start to be triggerd after you remove <b>Draft:</b> or <b>WIP:</b> at the beginning of MR title."
                         env.MERGE_REQUEST_URL = "https://code.developers.mega.co.nz/api/v4/projects/199/merge_requests/${mrNumber}/notes"
                         sh 'curl --request POST --header PRIVATE-TOKEN:$TOKEN --form body=\"${MARKDOWN_LINK}\" ${MERGE_REQUEST_URL}'
                     }
                 }
             }
         }
-
     }
     stages {
         stage('Preparation') {
