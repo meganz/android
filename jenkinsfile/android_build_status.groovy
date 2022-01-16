@@ -1,5 +1,7 @@
 
 def BUILD_STEP = ""
+def SDK_BRANCH = "develop"
+def MEGACHAT_BRANCH = "develop"
 
 /**
  * Decide whether we should skip the current build. If MR title starts with "Draft:"
@@ -20,11 +22,11 @@ def getSDKBranch() {
     def description = env.GITLAB_OA_DESCRIPTION
     String[] lines = description.split("\n");
     String KEY = "SDK_BRANCH=";
-    for (String line: lines) {
+    for (String line : lines) {
         line = line.trim();
         if (line.startsWith(KEY)) {
             String result = line.substring(KEY.length());
-                return result;
+            return result;
         }
     }
     return "";
@@ -76,8 +78,10 @@ pipeline {
         GOOGLE_MAP_API_FILE = 'default_google_maps_api.zip'
         GOOGLE_MAP_API_UNZIPPED = 'default_google_map_api_unzipped'
 
+
         // only build one architecture for SDK, to save build time. skipping "x86 armeabi-v7a x86_64"
         BUILD_ARCHS = "arm64-v8a"
+
     }
     post {
         failure {
@@ -133,9 +137,8 @@ pipeline {
                 script {
                     BUILD_STEP = "Preparation"
 
-                    print("SDK Branch = " + getSDKBranch())
-                    print("MEGACHAT Branch = " + getMEGAchatBranch())
-
+                    SDK_BRANCH = getSDKBranch()
+                    MEGACHAT_BRANCH = getMEGAchatBranch()
                 }
                 gitlabCommitStatus(name: 'Preparation') {
                     sh("rm -fv ${CONSOLE_LOG_FILE}")
@@ -156,9 +159,9 @@ pipeline {
                 gitlabCommitStatus(name: 'Fetch SDK Submodules') {
                     withCredentials([gitUsernamePassword(credentialsId: 'Gitlab-Access-Token', gitToolName: 'Default')]) {
                         sh 'git config --file=.gitmodules submodule."app/src/main/jni/mega/sdk".url https://code.developers.mega.co.nz/sdk/sdk.git'
-                        sh 'git config --file=.gitmodules submodule."app/src/main/jni/mega/sdk".branch develop'
+                        sh "git config --file=.gitmodules submodule.\"app/src/main/jni/mega/sdk\".branch ${SDK_BRANCH}"
                         sh 'git config --file=.gitmodules submodule."app/src/main/jni/megachat/sdk".url https://code.developers.mega.co.nz/megachat/MEGAchat.git'
-                        sh 'git config --file=.gitmodules submodule."app/src/main/jni/megachat/sdk".branch develop'
+                        sh "git config --file=.gitmodules submodule.\"app/src/main/jni/megachat/sdk\".branch ${MEGACHAT_BRANCH}"
                         sh "git submodule sync"
                         sh "git submodule update --init --recursive --remote"
                     }
