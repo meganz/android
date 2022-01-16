@@ -118,7 +118,6 @@ pipeline {
                     BUILD_STEP = "Fetch SDK Submodules"
 
                     /*
-                    title: GITLAB_OA_TITLE
                     description:  GITLAB_OA_DESCRIPTION
                     */
 
