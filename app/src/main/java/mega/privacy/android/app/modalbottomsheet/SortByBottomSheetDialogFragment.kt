@@ -19,6 +19,7 @@ import mega.privacy.android.app.lollipop.FileExplorerActivityLollipop
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop
 import mega.privacy.android.app.utils.ColorUtils
 import mega.privacy.android.app.utils.Constants.*
+import mega.privacy.android.app.utils.callManager
 import nz.mega.sdk.MegaApiJava.*
 import java.util.*
 import javax.inject.Inject
@@ -69,8 +70,8 @@ class SortByBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
     @SuppressLint("SetTextI18n")
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         val sortByName = getString(R.string.sortby_name)
-        val sortByAsc = getString(R.string.sortby_name_ascending).toLowerCase(Locale.ROOT)
-        val sortByDesc = getString(R.string.sortby_name_descending).toLowerCase(Locale.ROOT)
+        val sortByAsc = getString(R.string.sortby_name_ascending).lowercase(Locale.ROOT)
+        val sortByDesc = getString(R.string.sortby_name_descending).lowercase(Locale.ROOT)
         binding.sortByNameAsc.text = "$sortByName ($sortByAsc)"
         binding.sortByNameDesc.text = "$sortByName ($sortByDesc)"
 
@@ -207,8 +208,11 @@ class SortByBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
             ORDER_CAMERA -> {
                 sortOrderManagement.setOrderCamera(order)
 
-                if (requireActivity() is ManagerActivityLollipop) {
-                    (requireActivity() as ManagerActivityLollipop).refreshCUNodes()
+                callManager { manager ->
+                    manager.refreshCUNodes()
+                    if(manager.isInMDPage) {
+                        manager.mdFragment.loadPhotos()
+                    }
                 }
             }
             ORDER_OTHERS -> {
@@ -239,8 +243,8 @@ class SortByBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
                         )
                     )
 
-                if (requireActivity() is ManagerActivityLollipop) {
-                    (requireActivity() as ManagerActivityLollipop).refreshOthersOrder()
+                callManager { manager ->
+                    manager.refreshOthersOrder()
                 }
             }
         }
