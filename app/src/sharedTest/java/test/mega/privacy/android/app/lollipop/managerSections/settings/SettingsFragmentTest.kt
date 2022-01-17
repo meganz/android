@@ -7,8 +7,6 @@ import androidx.lifecycle.Lifecycle
 import androidx.test.core.app.ApplicationProvider.getApplicationContext
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.IdlingRegistry
-import androidx.test.espresso.IdlingResource
-import androidx.test.espresso.IdlingResource.ResourceCallback
 import androidx.test.espresso.idling.CountingIdlingResource
 import androidx.test.espresso.intent.Intents
 import androidx.test.espresso.intent.Intents.intended
@@ -27,6 +25,7 @@ import dagger.hilt.android.testing.HiltAndroidTest
 import dagger.hilt.android.testing.HiltTestApplication
 import dagger.hilt.android.testing.UninstallModules
 import dagger.hilt.components.SingletonComponent
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.runBlocking
 import mega.privacy.android.app.R
@@ -52,10 +51,6 @@ import org.mockito.kotlin.*
 import test.mega.privacy.android.app.RecyclerViewAssertions.Companion.withNoRowContaining
 import test.mega.privacy.android.app.RecyclerViewAssertions.Companion.withRowContaining
 import test.mega.privacy.android.app.launchFragmentInHiltContainer
-import test.mega.privacy.android.app.testFragment
-import test.mega.privacy.android.app.testFragmentTag
-import java.util.concurrent.atomic.AtomicBoolean
-import kotlin.concurrent.thread
 
 
 @HiltAndroidTest
@@ -68,6 +63,9 @@ class SettingsFragmentTest {
     var hiltRule = HiltAndroidRule(this)
 
     private val idlingResource = CountingIdlingResource("IdleCounter")
+    private val hide = MutableStateFlow(false)
+    private val initialScreen = 0
+    private val startScreen = MutableStateFlow(initialScreen)
 
     private val userAccount = UserAccount(
         email = "email",
@@ -88,6 +86,7 @@ class SettingsFragmentTest {
         val getAccountDetails = mock<GetAccountDetails>()
         val isOnline = mock<IsOnline>()
         val rootNodeExists = mock<RootNodeExists>()
+        val shouldHideRecentActivity = mock<ShouldHideRecentActivity>()
 
         @Provides
         fun provideSettingsActivity(): SettingsActivity = settingsActivity
@@ -136,18 +135,20 @@ class SettingsFragmentTest {
         @Provides
         fun provideGetStartScreen(): GetStartScreen = getStartScreen
 
+
         @Provides
         fun provideShouldHideRecentActivity(): ShouldHideRecentActivity =
-            mock()
+            shouldHideRecentActivity
 
         @Provides
         fun provideToggleAutoAcceptQRLinks(): ToggleAutoAcceptQRLinks =
             mock()
 
-
         @Provides
         fun provideIsOnline(): IsOnline = isOnline
 
+        @Provides
+        fun provideRequestAccountDeletion(): RequestAccountDeletion = mock()
     }
 
     @Before
@@ -167,6 +168,8 @@ class SettingsFragmentTest {
         whenever(TestSettingsModule.fetchMultiFactorAuthSetting()).thenReturn(flowOf())
         whenever(TestSettingsModule.getAccountDetails(any())).thenReturn(userAccount)
         whenever(TestSettingsModule.rootNodeExists()).thenReturn(true)
+        whenever(TestSettingsModule.shouldHideRecentActivity()).thenReturn(hide)
+        whenever(TestSettingsModule.getStartScreen()).thenReturn(startScreen)
     }
 
     @After
@@ -317,10 +320,8 @@ class SettingsFragmentTest {
 
     @Test
     fun test_that_updating_start_screen_preference_updates_the_description() {
-        val initialScreen = 0
         val newStartScreen = 1
-        whenever(TestSettingsModule.getStartScreen()).thenReturn(initialScreen)
-        val scenario = launchFragmentInHiltContainer<SettingsFragment>()
+        launchFragmentInHiltContainer<SettingsFragment>()
         val startScreenDescriptionStrings =
             getApplicationContext<HiltTestApplication>().resources.getStringArray(
                 R.array.settings_start_screen
@@ -329,10 +330,7 @@ class SettingsFragmentTest {
         onPreferences()
             .check(withRowContaining(withText(startScreenDescriptionStrings[initialScreen])))
 
-        scenario?.onActivity {
-            val fragment = it.testFragment<SettingsFragment>()
-            fragment.updateStartScreenSetting(newStartScreen)
-        }
+        startScreen.tryEmit(newStartScreen)
 
         onPreferences()
             .check(withRowContaining(withText(startScreenDescriptionStrings[newStartScreen])))
@@ -394,26 +392,6 @@ class SettingsFragmentTest {
 
     }
 
-    @Test
-    fun test_that_start_screen_update_event_updates_start_screen() {
-        val initialScreen = 0
-        val newStartScreen = 1
-        whenever(TestSettingsModule.getStartScreen()).thenReturn(initialScreen)
-        launchFragmentInHiltContainer<SettingsFragment>()
-        val startScreenDescriptionStrings =
-            getApplicationContext<HiltTestApplication>().resources.getStringArray(
-                R.array.settings_start_screen
-            )
-
-        onPreferences()
-            .check(withRowContaining(withText(startScreenDescriptionStrings[initialScreen])))
-
-        LiveEventBus.get(EventConstants.EVENT_UPDATE_START_SCREEN, Int::class.java)
-            .post(newStartScreen)
-
-        onPreferences()
-            .check(withRowContaining(withText(startScreenDescriptionStrings[newStartScreen])))
-    }
 
     @Test
     fun test_that_hide_recent_activity_event_updates_hide_recent_activity() {
@@ -428,10 +406,7 @@ class SettingsFragmentTest {
                     )
                 )
             )
-
-        LiveEventBus.get(EventConstants.EVENT_UPDATE_HIDE_RECENT_ACTIVITY, Boolean::class.java)
-            .post(true)
-
+        hide.tryEmit(true)
         onPreferences()
             .check(
                 withRowContaining(

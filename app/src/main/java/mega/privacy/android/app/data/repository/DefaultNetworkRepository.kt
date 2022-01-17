@@ -12,6 +12,7 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
+import kotlinx.coroutines.flow.map
 import mega.privacy.android.app.constants.EventConstants
 import mega.privacy.android.app.data.facade.EventBusFacade
 import mega.privacy.android.app.domain.entity.ConnectivityState
@@ -98,22 +99,16 @@ class DefaultNetworkRepository @Inject constructor(
     }
 
     private fun monitorConnectivity(): Flow<ConnectivityState> {
-        val eventObservable =
-            eventBusFacade.getEventObservable(
+        return eventBusFacade.getEventFlow(
                 EventConstants.EVENT_NETWORK_CHANGE,
                 Boolean::class.java
-            )
-        return callbackFlow {
-            val flowObserver = Observer { connected: Boolean ->
-                val metered = connectivityManager?.isActiveNetworkMetered
-                if (connected && metered != null) {
-                    this.trySend(ConnectivityState.Connected(metered))
-                } else {
-                    this.trySend(ConnectivityState.Disconnected)
-                }
+            ).map { connected ->
+            val metered = connectivityManager?.isActiveNetworkMetered
+            if (connected && metered != null) {
+                ConnectivityState.Connected(metered)
+            } else {
+                ConnectivityState.Disconnected
             }
-            eventObservable.observeForever(flowObserver)
-            awaitClose { eventObservable.removeObserver(flowObserver) }
         }
     }
 

@@ -48,10 +48,11 @@ class SettingsViewModelTest {
             isMultiFactorAuthAvailable = mock { on { invoke() }.thenReturn(true) },
             fetchAutoAcceptQRLinks = fetchAutoAcceptQRLinks,
             fetchMultiFactorAuthSetting = mock { on { invoke() }.thenReturn(emptyFlow()) },
-            getStartScreen = mock(),
-            shouldHideRecentActivity = mock(),
+            startScreen = mock { on { invoke() }.thenReturn(emptyFlow()) },
+            shouldHideRecentActivity = mock { on { invoke() }.thenReturn(emptyFlow()) },
             toggleAutoAcceptQRLinks = toggleAutoAcceptQRLinks,
             isOnline = mock { on { invoke() }.thenReturn(emptyFlow()) },
+            requestAccountDeletion = mock(),
         )
     }
 

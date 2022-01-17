@@ -1,20 +1,17 @@
 package mega.privacy.android.app.data.repository
 
 import android.content.Context
-import androidx.lifecycle.Observer
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.callbackFlow
 import mega.privacy.android.app.MegaApplication
-import mega.privacy.android.app.constants.EventConstants.EVENT_2FA_UPDATED
+import mega.privacy.android.app.constants.EventConstants
 import mega.privacy.android.app.data.facade.EventBusFacade
 import mega.privacy.android.app.di.MegaApi
 import mega.privacy.android.app.domain.entity.UserAccount
-import mega.privacy.android.app.domain.exception.MegaError
-import mega.privacy.android.app.domain.exception.NoLoggedInUserError
-import mega.privacy.android.app.domain.exception.NotMasterBusinessAccountError
+import mega.privacy.android.app.domain.exception.MegaException
+import mega.privacy.android.app.domain.exception.NoLoggedInUserException
+import mega.privacy.android.app.domain.exception.NotMasterBusinessAccountException
 import mega.privacy.android.app.domain.repository.AccountRepository
 import mega.privacy.android.app.globalmanagement.MyAccountInfo
 import mega.privacy.android.app.utils.DBUtil
@@ -73,7 +70,7 @@ class DefaultAccountRepository @Inject constructor(
                         } else {
                             continuation.resumeWith(
                                 Result.failure(
-                                    mega.privacy.android.app.domain.exception.MegaError(
+                                    MegaException(
                                         e?.errorCode,
                                         e?.errorString
                                     )
@@ -96,34 +93,12 @@ class DefaultAccountRepository @Inject constructor(
 
     @OptIn(ExperimentalCoroutinesApi::class)
     override fun monitorMultiFactorAuthChanges(): Flow<Boolean> {
-        val eventObservable =
-            eventBusFacade.getEventObservable(EVENT_2FA_UPDATED, Boolean::class.java)
-
-        return callbackFlow {
-            val flowObserver = Observer(this::trySend)
-            eventObservable.observeForever(flowObserver)
-            awaitClose { eventObservable.removeObserver(flowObserver) }
-        }
-
+        val event = EventConstants.EVENT_2FA_UPDATED
+        val type = Boolean::class.java
+        return eventBusFacade.getEventFlow(event, type)
     }
 
     override suspend fun requestDeleteAccountLink() {
-        /**
-         * Initialize the cancellation of an account.
-         *
-         * The associated request type with this request is MegaRequest::TYPE_GET_CANCEL_LINK.
-         *
-         * If this request succeed, a cancellation link will be sent to the email address of the user.
-         * If no user is logged in, you will get the error code MegaError::API_EACCESS in onRequestFinish().
-         *
-         * If the MEGA account is a sub-user business account, onRequestFinish will
-         * be called with the error code MegaError::API_EMASTERONLY.
-         *
-         * @see MegaApi::confirmCancelAccount
-         *
-         * @param listener MegaRequestListener to track this request
-         */
-
         return suspendCoroutine { continuation ->
             sdk.cancelAccount(object : MegaRequestListenerInterface {
                 override fun onRequestStart(api: MegaApiJava?, request: MegaRequest?) {}
@@ -143,7 +118,7 @@ class DefaultAccountRepository @Inject constructor(
                             MegaError.API_EACCESS -> {
                                 continuation.resumeWith(
                                     Result.failure(
-                                        NoLoggedInUserError(
+                                        NoLoggedInUserException(
                                             e.errorCode,
                                             e.errorString
                                         )
@@ -153,7 +128,7 @@ class DefaultAccountRepository @Inject constructor(
                             MegaError.API_EMASTERONLY -> {
                                 continuation.resumeWith(
                                     Result.failure(
-                                        NotMasterBusinessAccountError(
+                                        NotMasterBusinessAccountException(
                                             e.errorCode,
                                             e.errorString
                                         )
@@ -163,7 +138,7 @@ class DefaultAccountRepository @Inject constructor(
                             else -> {
                                 continuation.resumeWith(
                                     Result.failure(
-                                        mega.privacy.android.app.domain.exception.MegaError(
+                                        MegaException(
                                             e?.errorCode,
                                             e?.errorString
                                         )

@@ -2,12 +2,18 @@ package mega.privacy.android.app.data.repository
 
 import android.content.Context
 import android.content.SharedPreferences
+import androidx.lifecycle.Observer
 import dagger.hilt.android.qualifiers.ApplicationContext
+import kotlinx.coroutines.channels.awaitClose
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.callbackFlow
 import mega.privacy.android.app.DatabaseHandler
 import mega.privacy.android.app.MegaAttributes
 import mega.privacy.android.app.MegaPreferences
+import mega.privacy.android.app.constants.EventConstants
+import mega.privacy.android.app.data.facade.EventBusFacade
 import mega.privacy.android.app.di.MegaApi
-import mega.privacy.android.app.domain.exception.MegaError
+import mega.privacy.android.app.domain.exception.MegaException
 import mega.privacy.android.app.domain.exception.SettingNotFoundException
 import mega.privacy.android.app.domain.repository.SettingsRepository
 import mega.privacy.android.app.fragments.settingsFragments.startSceen.util.StartScreenUtil
@@ -22,6 +28,7 @@ class DefaultSettingsRepository @Inject constructor(
     private val databaseHandler: DatabaseHandler,
     @ApplicationContext private val context: Context,
     @MegaApi private val sdk: MegaApiAndroid,
+    private val eventBusFacade: EventBusFacade,
 ) : SettingsRepository {
     private val logPreferences = "LOG_PREFERENCES"
     private val karereLogs = "KARERE_LOGS"
@@ -64,12 +71,12 @@ class DefaultSettingsRepository @Inject constructor(
                                 continuation.resumeWith(Result.success(request!!.flag))
                             }
                             MegaError.API_ENOENT -> {
-                                continuation.resumeWith(Result.failure(SettingNotFoundException(e.errorString)))
+                                continuation.resumeWith(Result.failure(SettingNotFoundException(e.errorCode, e.errorString)))
                             }
                             else -> {
                                 continuation.resumeWith(
                                     Result.failure(
-                                        mega.privacy.android.app.domain.exception.MegaError(
+                                        MegaException(
                                             e?.errorCode,
                                             e?.errorString
                                         )
@@ -135,7 +142,7 @@ class DefaultSettingsRepository @Inject constructor(
                             else -> {
                                 continuation.resumeWith(
                                     Result.failure(
-                                        mega.privacy.android.app.domain.exception.MegaError(
+                                        MegaException(
                                             e?.errorCode,
                                             e?.errorString
                                         )
@@ -170,4 +177,16 @@ class DefaultSettingsRepository @Inject constructor(
     override fun getAttributes(): MegaAttributes = databaseHandler.attributes
 
     override fun getPreferences(): MegaPreferences = databaseHandler.preferences
+
+    override fun monitorStartScreen(): Flow<Int> {
+        val event = EventConstants.EVENT_UPDATE_START_SCREEN
+        val type = Int::class.java
+        return eventBusFacade.getEventFlow(event, type)
+    }
+
+    override fun monitorHideRecentActivity(): Flow<Boolean> {
+        val event = EventConstants.EVENT_UPDATE_HIDE_RECENT_ACTIVITY
+        val type = Boolean::class.java
+        return eventBusFacade.getEventFlow(event, type)
+    }
 }

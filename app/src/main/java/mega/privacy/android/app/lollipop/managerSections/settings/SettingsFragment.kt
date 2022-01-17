@@ -88,7 +88,6 @@ class SettingsFragment : Preference.OnPreferenceChangeListener,
 
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
         addPreferencesFromResource(R.xml.preferences)
-        checkUIPreferences()
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -99,26 +98,34 @@ class SettingsFragment : Preference.OnPreferenceChangeListener,
     private fun observeState() {
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.RESUMED) {
-                viewModel.uiState.collect {
+                viewModel.uiState.collect { state ->
                     findPreference<Preference>(KEY_FEATURES_CAMERA_UPLOAD)?.isEnabled =
-                        it.cameraUploadEnabled
-                    findPreference<Preference>(KEY_FEATURES_CHAT)?.isEnabled = it.chatEnabled
+                        state.cameraUploadEnabled
+                    findPreference<Preference>(KEY_FEATURES_CHAT)?.isEnabled = state.chatEnabled
 
                     findPreference<SwitchPreferenceCompat>(KEY_2FA)?.apply {
-                        isVisible = it.multiFactorVisible
-                        isChecked = it.multiFactorAuthChecked
-                        isEnabled = it.multiFactorEnabled
+                        isVisible = state.multiFactorVisible
+                        isChecked = state.multiFactorAuthChecked
+                        isEnabled = state.multiFactorEnabled
                     }
 
                     findPreference<SwitchPreferenceCompat>(KEY_QR_CODE_AUTO_ACCEPT)?.apply {
-                        isEnabled = it.autoAcceptEnabled
-                        isChecked = it.autoAcceptChecked
+                        isEnabled = state.autoAcceptEnabled
+                        isChecked = state.autoAcceptChecked
                     }
 
                     findPreference<Preference>(KEY_CANCEL_ACCOUNT)?.apply {
-                        isVisible = it.deleteAccountVisible
-                        isEnabled = it.deleteEnabled
+                        isVisible = state.deleteAccountVisible
+                        isEnabled = state.deleteEnabled
                     }
+
+                    val startScreenSummary =
+                        resources.getStringArray(R.array.settings_start_screen)[state.startScreen]
+                    findPreference<Preference>(KEY_START_SCREEN)?.summary = startScreenSummary
+
+                    findPreference<SwitchPreferenceCompat>(KEY_HIDE_RECENT_ACTIVITY)?.takeIf { it.isChecked != state.hideRecentActivity }
+                        ?.let { it.isChecked = state.hideRecentActivity }
+
                 }
             }
         }
@@ -129,27 +136,6 @@ class SettingsFragment : Preference.OnPreferenceChangeListener,
      * Update the Cancel Account settings.
      */
     override fun updateCancelAccountSetting() {}
-
-
-    /**
-     * Checks and sets the User interface setting values.
-     */
-    private fun checkUIPreferences() {
-        updateStartScreenSetting(viewModel.startScreen)
-        findPreference<SwitchPreferenceCompat>(KEY_HIDE_RECENT_ACTIVITY)?.isChecked =
-            viewModel.hideRecentActivity
-    }
-
-    /**
-     * Updates the start screen setting.
-     *
-     * @param newStartScreen Value to set as new start screen.
-     */
-    fun updateStartScreenSetting(newStartScreen: Int) {
-        val startScreenSummary =
-            resources.getStringArray(R.array.settings_start_screen)[newStartScreen]
-        findPreference<Preference>(KEY_START_SCREEN)?.summary = startScreenSummary
-    }
 
     override fun update2FAVisibility() {}
 
@@ -169,7 +155,6 @@ class SettingsFragment : Preference.OnPreferenceChangeListener,
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         LogUtil.logDebug("onViewCreated")
-        setupObservers()
 
         val managerActivityLollipop = requireActivity() as SettingsActivity
         when {
@@ -191,25 +176,6 @@ class SettingsFragment : Preference.OnPreferenceChangeListener,
         })
 
         restoreEvaluateDialogState(savedInstanceState)
-    }
-
-    private fun setupObservers() {
-        LiveEventBus.get(EVENT_UPDATE_START_SCREEN, Int::class.java)
-            .observe(
-                viewLifecycleOwner,
-                { newStartScreen: Int -> updateStartScreenSetting(newStartScreen) })
-        LiveEventBus.get(EVENT_UPDATE_HIDE_RECENT_ACTIVITY, Boolean::class.java)
-            .observe(viewLifecycleOwner, { hide: Boolean -> updateHideRecentActivitySetting(hide) })
-    }
-
-    /**
-     * Updates the hide recent activity setting.
-     *
-     * @param hide True if should enable the setting, false otherwise.
-     */
-    private fun updateHideRecentActivitySetting(hide: Boolean) {
-        findPreference<SwitchPreferenceCompat>(KEY_HIDE_RECENT_ACTIVITY)?.takeIf { it.isChecked != hide }
-            ?.let { it.isChecked = hide }
     }
 
     override fun goToCategoryStorage() {

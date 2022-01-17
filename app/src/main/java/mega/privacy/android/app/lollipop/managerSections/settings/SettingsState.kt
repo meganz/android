@@ -10,4 +10,7 @@ data class SettingsState(
     val deleteEnabled: Boolean,
     val cameraUploadEnabled: Boolean,
     val chatEnabled: Boolean,
-)
+    val startScreen: Int,
+    val hideRecentActivity: Boolean,
+) {
+}

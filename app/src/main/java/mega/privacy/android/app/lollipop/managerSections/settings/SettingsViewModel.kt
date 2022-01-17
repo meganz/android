@@ -5,7 +5,6 @@ import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
-import mega.privacy.android.app.domain.exception.MegaError
 import mega.privacy.android.app.domain.usecase.*
 import mega.privacy.android.app.utils.LogUtil
 import javax.inject.Inject
@@ -21,7 +20,7 @@ class SettingsViewModel @Inject constructor(
     private val rootNodeExists: RootNodeExists,
     private val isMultiFactorAuthAvailable: IsMultiFactorAuthAvailable,
     private val fetchAutoAcceptQRLinks: FetchAutoAcceptQRLinks,
-    private val getStartScreen: GetStartScreen,
+    private val startScreen: GetStartScreen,
     private val shouldHideRecentActivity: ShouldHideRecentActivity,
     private val toggleAutoAcceptQRLinks: ToggleAutoAcceptQRLinks,
     fetchMultiFactorAuthSetting: FetchMultiFactorAuthSetting,
@@ -34,22 +33,20 @@ class SettingsViewModel @Inject constructor(
 
     private fun initialiseState(): SettingsState {
         return SettingsState(
+            autoAcceptEnabled = false,
             autoAcceptChecked = false,
             multiFactorAuthChecked = false,
+            multiFactorEnabled = false,
+            multiFactorVisible = false,
             deleteAccountVisible = false,
+            deleteEnabled = false,
             cameraUploadEnabled = false,
             chatEnabled = false,
-            autoAcceptEnabled = false,
-            multiFactorEnabled = false,
-            deleteEnabled = false,
-            multiFactorVisible = false,
+            startScreen = 0,
+            hideRecentActivity = false,
         )
     }
 
-    val hideRecentActivity: Boolean
-        get() = shouldHideRecentActivity()
-    val startScreen: Int
-        get() = getStartScreen()
     val passcodeLock: Boolean
         get() = refreshPasscodeLockPreference()
     val email: String
@@ -94,7 +91,15 @@ class SettingsViewModel @Inject constructor(
                                 deleteEnabled = online,
                             )
                         }
-                    }
+                    },
+                startScreen()
+                    .map{ screen ->
+                        { state: SettingsState -> state.copy(startScreen = screen)}
+                    },
+                shouldHideRecentActivity()
+                    .map{ hide ->
+                        { state: SettingsState -> state.copy(hideRecentActivity = hide)}
+                    },
             ).collect {
                 state.update(it)
             }
