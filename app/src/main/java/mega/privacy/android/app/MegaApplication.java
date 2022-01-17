@@ -46,6 +46,7 @@ import androidx.multidex.MultiDexApplication;
 import com.facebook.drawee.backends.pipeline.Fresco;
 import com.jeremyliao.liveeventbus.LiveEventBus;
 
+import io.reactivex.rxjava3.plugins.RxJavaPlugins;
 import mega.privacy.android.app.di.MegaApi;
 import mega.privacy.android.app.di.MegaApiFolder;
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
@@ -564,9 +565,10 @@ public class MegaApplication extends MultiDexApplication implements Application.
 		}
 	};
 
-	public void handleUncaughtException(Thread thread, Throwable e) {
-		logFatal("UNCAUGHT EXCEPTION", e);
-		e.printStackTrace();
+	public void handleUncaughtException(Throwable throwable) {
+		logFatal("UNCAUGHT EXCEPTION", throwable);
+		throwable.printStackTrace();
+		crashReporter.report(throwable);
 	}
 
 	private final Observer<MegaChatCall> callStatusObserver = call -> {
@@ -640,7 +642,9 @@ public class MegaApplication extends MultiDexApplication implements Application.
 				clearIncomingCallNotification(call.getCallId());
 				getChatManagement().removeValues(call.getChatid());
 				stopService(new Intent(getInstance(), IncomingCallService.class));
-				LiveEventBus.get(EVENT_CALL_ANSWERED_IN_ANOTHER_CLIENT, Long.class).post(call.getChatid());
+				if (call.getStatus() == CALL_STATUS_USER_NO_PRESENT) {
+					LiveEventBus.get(EVENT_CALL_ANSWERED_IN_ANOTHER_CLIENT, Long.class).post(call.getChatid());
+				}
 			}
 		}
 	};
@@ -739,12 +743,9 @@ public class MegaApplication extends MultiDexApplication implements Application.
 
 		crashReporter = new CrashReporterImpl();
 
-		// Setup handler for uncaught exceptions.
-        Thread.setDefaultUncaughtExceptionHandler((thread, e) -> {
-            handleUncaughtException(thread, e);
-
-            crashReporter.report(e);
-        });
+		// Setup handler and RxJava for uncaught exceptions.
+		Thread.setDefaultUncaughtExceptionHandler((thread, e) -> handleUncaughtException(e));
+		RxJavaPlugins.setErrorHandler(this::handleUncaughtException);
 
 		registerActivityLifecycleCallbacks(this);
 

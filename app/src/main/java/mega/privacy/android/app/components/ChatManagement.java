@@ -17,8 +17,10 @@ import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.listeners.ChatRoomListener;
 import mega.privacy.android.app.meeting.listeners.DisableAudioVideoCallListener;
 import mega.privacy.android.app.utils.CallUtil;
+import mega.privacy.android.app.utils.VideoCaptureUtils;
 import nz.mega.sdk.MegaChatCall;
 import nz.mega.sdk.MegaChatListItem;
+import nz.mega.sdk.MegaChatRequestListenerInterface;
 import nz.mega.sdk.MegaChatRoom;
 
 import static mega.privacy.android.app.constants.BroadcastConstants.BROADCAST_ACTION_JOINED_SUCCESSFULLY;
@@ -43,6 +45,8 @@ public class ChatManagement {
     private final List<Long> joiningChatIds = new ArrayList<>();
     // List of chat ids to control if a chat is already leaving.
     private final List<Long> leavingChatIds = new ArrayList<>();
+    // List of chats ids to control if I'm trying to join the call
+    private final List<Long> joiningCallChatIds = new ArrayList<>();
     // List of chats with video activated in the call
     private final HashMap<Long, Boolean> hashMapVideo = new HashMap<>();
     // List of chats with speaker activated in the call
@@ -59,7 +63,6 @@ public class ChatManagement {
     private final HashMap<Integer, Long> hashMapPendingMsgsToBeCancelled = new HashMap<>();
     // List of messages id to delete
     private final ArrayList<Long> msgsToBeDeleted = new ArrayList<>();
-
 
     // If this has a valid value, means there is a pending chat link to join.
     private String pendingJoinLink;
@@ -130,6 +133,18 @@ public class ChatManagement {
 
     public boolean isAlreadyLeaving(long leaveChatId) {
         return leavingChatIds.contains(leaveChatId);
+    }
+
+    public void addJoiningCallChatId(long joiningCallChatId) {
+        joiningCallChatIds.add(joiningCallChatId);
+    }
+
+    public void removeJoiningCallChatId(long joiningCallChatId) {
+        joiningCallChatIds.remove(joiningCallChatId);
+    }
+
+    public boolean isAlreadyJoiningCall(long joiningCallChatId) {
+        return joiningCallChatIds.contains(joiningCallChatId);
     }
 
     public boolean getSpeakerStatus(long chatId) {
@@ -300,6 +315,7 @@ public class ChatManagement {
 
         clearIncomingCallNotification(callId);
         removeValues(chatId);
+        removeStatusVideoAndSpeaker(chatId);
         setRequestSentCall(callId, false);
         unregisterScreenReceiver();
     }
@@ -311,7 +327,6 @@ public class ChatManagement {
      */
     public void removeValues(long chatId) {
         PreferenceManager.getDefaultSharedPreferences(MegaApplication.getInstance().getApplicationContext()).edit().remove(KEY_IS_SHOWED_WARNING_MESSAGE + chatId).apply();
-        removeStatusVideoAndSpeaker(chatId);
 
         if (!existsAnOngoingOrIncomingCall()) {
             MegaApplication.getInstance().removeRTCAudioManager();
@@ -440,7 +455,7 @@ public class ChatManagement {
     public void controlProximitySensor(boolean isNear) {
         MegaChatCall call = CallUtil.getCallInProgress();
         if (call == null || (call.getStatus() != MegaChatCall.CALL_STATUS_JOINING &&
-                call.getStatus() != MegaChatCall.CALL_STATUS_IN_PROGRESS) || !isScreenOn)
+                call.getStatus() != MegaChatCall.CALL_STATUS_IN_PROGRESS) || !isScreenOn || !VideoCaptureUtils.isFrontCameraInUse())
             return;
 
         if (!getVideoStatus(call.getChatid())) {
@@ -462,5 +477,31 @@ public class ChatManagement {
                 CallUtil.enableOrDisableLocalVideo(true, call.getChatid(), new DisableAudioVideoCallListener(MegaApplication.getInstance()));
             }
         }
+    }
+
+    /**
+     * Method to answer incoming call or joining in a in progress call
+     *
+     * @param chatId      The chat id of a chat related
+     * @param enableVideo True, if the video should be enabled. False, otherwise
+     * @param enableAudio True, if the audio should be enabled. False, otherwise
+     * @param speakerStatus True, if the speaker should be enabled. False, otherwise
+     * @param listener    MegaChatRequestListenerInterface
+     */
+    public void answerChatCall(long chatId, boolean enableVideo, boolean enableAudio, boolean speakerStatus, MegaChatRequestListenerInterface listener) {
+        if (CallUtil.amIParticipatingInThisMeeting(chatId)) {
+            logDebug("Already participating in this call");
+            return;
+        }
+
+        if (isAlreadyJoiningCall(chatId)) {
+            logDebug("AnswerChatCall already done");
+            return;
+        }
+
+        CallUtil.addChecksForACall(chatId, speakerStatus);
+        addJoiningCallChatId(chatId);
+        logDebug("Answering call ...");
+        app.getMegaChatApi().answerChatCall(chatId, enableVideo, enableAudio, listener);
     }
 }

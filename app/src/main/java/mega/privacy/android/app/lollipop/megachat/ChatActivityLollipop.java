@@ -92,6 +92,8 @@ import mega.privacy.android.app.R;
 import mega.privacy.android.app.ShareInfo;
 import mega.privacy.android.app.activities.GiphyPickerActivity;
 import mega.privacy.android.app.components.ChatManagement;
+import mega.privacy.android.app.contacts.usecase.InviteContactUseCase;
+import mega.privacy.android.app.usecase.GetAvatarUseCase;
 import mega.privacy.android.app.utils.MegaProgressDialogUtil;
 import mega.privacy.android.app.generalusecase.FilePrepareUseCase;
 import mega.privacy.android.app.listeners.CreateChatListener;
@@ -145,7 +147,6 @@ import mega.privacy.android.app.lollipop.listeners.MultipleForwardChatProcessor;
 import mega.privacy.android.app.lollipop.listeners.MultipleRequestListener;
 import mega.privacy.android.app.lollipop.megachat.chatAdapters.MegaChatLollipopAdapter;
 import mega.privacy.android.app.middlelayer.push.PushMessageHanlder;
-import mega.privacy.android.app.modalbottomsheet.MeetingBottomSheetDialogFragment;
 import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.ReactionsBottomSheet;
 import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.InfoReactionsBottomSheet;
 import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.GeneralChatMessageBottomSheet;
@@ -167,7 +168,6 @@ import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaChatApi;
-import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaChatApiJava;
 import nz.mega.sdk.MegaChatCall;
 import nz.mega.sdk.MegaChatContainsMeta;
@@ -322,6 +322,10 @@ public class ChatActivityLollipop extends PasscodeActivity
     FilePrepareUseCase filePrepareUseCase;
     @Inject
     PasscodeManagement passcodeManagement;
+    @Inject
+    InviteContactUseCase inviteContactUseCase;
+    @Inject
+    GetAvatarUseCase getAvatarUseCase;
 
     private int currentRecordButtonState;
     private String mOutputFilePath;
@@ -661,8 +665,7 @@ public class ChatActivityLollipop extends PasscodeActivity
                 call.getStatus() == MegaChatCall.CALL_STATUS_TERMINATING_USER_PARTICIPATION))
             return;
 
-        addChecksForACall(chatRoom.getChatId(), false);
-        megaChatApi.answerChatCall(idChat, false, true,  new AnswerChatCallListener(this, this));
+        MegaApplication.getChatManagement().answerChatCall(chatRoom.getChatId(), false, true, false, new AnswerChatCallListener(this, this));
     }
 
     @Override
@@ -690,8 +693,7 @@ public class ChatActivityLollipop extends PasscodeActivity
                 return;
 
         logDebug("Active call on hold. Answer call.");
-        addChecksForACall(chatRoom.getChatId(), false);
-        megaChatApi.answerChatCall(idChat, false, true, new AnswerChatCallListener(this, this));
+        MegaApplication.getChatManagement().answerChatCall(idChat, false, true, false, new AnswerChatCallListener(this, this));
     }
 
     @Override
@@ -1065,7 +1067,10 @@ public class ChatActivityLollipop extends PasscodeActivity
         }
     }
 
-    public void showGroupInfoActivity(){
+    /**
+     * Opens Group info if a group chat conversation or a contact info if a 1to1 conversation.
+     */
+    public void showGroupOrContactInfoActivity(){
         logDebug("showGroupInfoActivity");
         if (chatRoom == null)
             return;
@@ -2749,7 +2754,7 @@ public class ChatActivityLollipop extends PasscodeActivity
 
             case R.id.cab_menu_contact_info_chat:{
                 if(recordView.isRecordingNow()) break;
-                showGroupInfoActivity();
+                showGroupOrContactInfoActivity();
                 break;
             }
             case R.id.cab_menu_clear_history_chat:{
@@ -3202,9 +3207,8 @@ public class ChatActivityLollipop extends PasscodeActivity
             if (callInThisChat.getStatus() == MegaChatCall.CALL_STATUS_USER_NO_PRESENT ||
                     callInThisChat.getStatus() == MegaChatCall.CALL_STATUS_TERMINATING_USER_PARTICIPATION) {
                 logDebug("The call in this chat is In progress, but I do not participate");
-                addChecksForACall(chatRoom.getChatId(), startVideo);
                 callInProgressLayout.setEnabled(false);
-                megaChatApi.answerChatCall(idChat, startVideo, !chatRoom.isMeeting(), new AnswerChatCallListener(this, this));
+                MegaApplication.getChatManagement().answerChatCall(chatRoom.getChatId(), startVideo, !chatRoom.isMeeting(), startVideo, new AnswerChatCallListener(this, this));
             }
             return;
         }
@@ -3488,15 +3492,14 @@ public class ChatActivityLollipop extends PasscodeActivity
         else if (requestCode == REQUEST_SEND_CONTACTS && resultCode == RESULT_OK) {
             final ArrayList<String> contactsData = intent.getStringArrayListExtra(AddContactActivityLollipop.EXTRA_CONTACTS);
             if (contactsData != null) {
-                MegaHandleList handleList = MegaHandleList.createInstance();
-                for(int i=0; i<contactsData.size();i++){
+                for (int i = 0; i < contactsData.size(); i++) {
                     MegaUser user = megaApi.getContact(contactsData.get(i));
                     if (user != null) {
+                        MegaHandleList handleList = MegaHandleList.createInstance();
                         handleList.addMegaHandle(user.getHandle());
-
+                        retryContactAttachment(handleList);
                     }
                 }
-                retryContactAttachment(handleList);
             }
         }
         else if (requestCode == REQUEST_CODE_SELECT_FILE && resultCode == RESULT_OK) {
@@ -3846,8 +3849,7 @@ public class ChatActivityLollipop extends PasscodeActivity
                         MegaChatCall callInChat = megaChatApi.getChatCall(callInThisChat);
                         if (callInChat != null && (callInChat.getStatus() == MegaChatCall.CALL_STATUS_USER_NO_PRESENT ||
                                 callInChat.getStatus() == MegaChatCall.CALL_STATUS_TERMINATING_USER_PARTICIPATION )) {
-                            addChecksForACall(callInThisChat, false);
-                            megaChatApi.answerChatCall(callInThisChat, false, true, new AnswerChatCallListener(this, this));
+                            MegaApplication.getChatManagement().answerChatCall(callInThisChat, false, true, false, new AnswerChatCallListener(this, this));
                         }
                     }else{
                         megaChatApi.setCallOnHold(anotherCall.getChatid(), true, new SetCallOnHoldListener(this, this, this));
@@ -3881,7 +3883,7 @@ public class ChatActivityLollipop extends PasscodeActivity
     @Override
     public void onBackPressed() {
         logDebug("onBackPressed");
-        if (psaWebBrowser.consumeBack()) return;
+        if (psaWebBrowser != null && psaWebBrowser.consumeBack()) return;
 
         retryConnectionsAndSignalPresence();
         if (emojiKeyboard != null && emojiKeyboard.getEmojiKeyboardShown()) {
@@ -4051,7 +4053,7 @@ public class ChatActivityLollipop extends PasscodeActivity
                 logDebug("toolbar_chat");
                 if(recordView.isRecordingNow()) break;
 
-                showGroupInfoActivity();
+                showGroupOrContactInfoActivity();
                 break;
 
             case R.id.message_jump_layout:
@@ -5407,14 +5409,7 @@ public class ChatActivityLollipop extends PasscodeActivity
 
                                     if (m.getMessage().getUserHandle(0) != megaChatApi.getMyUserHandle()) {
                                         String email = m.getMessage().getUserEmail(0);
-                                        MegaUser contact = megaApi.getContact(email);
-
-                                        if (contact != null && contact.getVisibility() == MegaUser.VISIBILITY_VISIBLE) {
-                                            ContactUtil.openContactInfoActivity(this, email);
-                                        } else {
-                                            String text = getString(R.string.user_is_not_contact, converterShortCodes(getNameContactAttachment(m.getMessage())));
-                                            showSnackbar(INVITE_CONTACT_TYPE, text, MEGACHAT_INVALID_HANDLE, m.getMessage().getUserEmail(0));
-                                        }
+                                        showContactClickResult(email, getNameContactAttachment(m.getMessage()));
                                     }
                                 }
                             }
@@ -5473,6 +5468,67 @@ public class ChatActivityLollipop extends PasscodeActivity
             }
         }else{
             logDebug("DO NOTHING: Position (" + positionInMessages + ") is more than size in messages (size: " + messages.size() + ")");
+        }
+    }
+
+    /**
+     * Checks if a contact invitation has been already sent.
+     *
+     * @param email       Contact email to check.
+     * @param contactName Name of the contact.
+     */
+    private void checkIfInvitationIsAlreadySent(String email, String contactName) {
+        inviteContactUseCase.isContactRequestAlreadySent(email)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe((alreadyInvited, throwable) -> {
+                    if (throwable == null) {
+                        if (alreadyInvited) {
+                            String text = StringResourcesUtils.getString(R.string.contact_already_invited, converterShortCodes(contactName));
+                            showSnackbar(SENT_REQUESTS_TYPE, text, MEGACHAT_INVALID_HANDLE);
+                        } else {
+                            String text = StringResourcesUtils.getString(R.string.user_is_not_contact, converterShortCodes(contactName));
+                            showSnackbar(INVITE_CONTACT_TYPE, text, MEGACHAT_INVALID_HANDLE, email);
+                        }
+                    }
+                });
+    }
+
+    /**
+     * Opens a contact link message.
+     *
+     * @param contactLinkResult All the data of the contact link.
+     */
+    public void openContactLinkMessage(InviteContactUseCase.ContactLinkResult contactLinkResult) {
+        String email = contactLinkResult.getEmail();
+        if (email == null) {
+            logDebug("Email is null");
+            return;
+        }
+
+        if (email.equals(megaApi.getMyEmail())) {
+            logDebug("Contact is my own contact");
+            return;
+        }
+
+        showContactClickResult(email, contactLinkResult.getFullName());
+    }
+
+    /**
+     * Shows the final result of a contact link or attachment message click.
+     *
+     * @param email Email of the contact.
+     * @param name  Name of the contact.
+     */
+    private void showContactClickResult(String email, String name) {
+        MegaUser contact = megaApi.getContact(email);
+
+        if (contact == null || contact.getVisibility() != MegaUser.VISIBILITY_VISIBLE) {
+            checkIfInvitationIsAlreadySent(email, name);
+        } else if (!chatRoom.isGroup() && chatRoom.getPeerEmail(0).equals(email)){
+            showGroupOrContactInfoActivity();
+        } else {
+            ContactUtil.openContactInfoActivity(this, email);
         }
     }
 
@@ -6757,7 +6813,10 @@ public class ChatActivityLollipop extends PasscodeActivity
 
                 //Create adapter
                 if (adapter == null) {
-                    adapter = new MegaChatLollipopAdapter(this, chatRoom, messages,messagesPlaying, removedMessages,  listView);
+                    adapter = new MegaChatLollipopAdapter(this, chatRoom, messages,
+                            messagesPlaying, removedMessages, listView, inviteContactUseCase,
+                            getAvatarUseCase);
+
                     adapter.setHasStableIds(true);
                     listView.setAdapter(adapter);
                 } else {
@@ -7801,7 +7860,9 @@ public class ChatActivityLollipop extends PasscodeActivity
 
     private void createAdapter() {
         //Create adapter
-        adapter = new MegaChatLollipopAdapter(this, chatRoom, messages, messagesPlaying, removedMessages, listView);
+        adapter = new MegaChatLollipopAdapter(this, chatRoom, messages, messagesPlaying,
+                removedMessages, listView, inviteContactUseCase, getAvatarUseCase);
+
         adapter.setHasStableIds(true);
         listView.setLayoutManager(mLayoutManager);
         listView.setAdapter(adapter);
@@ -8238,9 +8299,8 @@ public class ChatActivityLollipop extends PasscodeActivity
             else{
                 if (e.getErrorCode() == MegaError.API_OK){
                     logDebug("OK INVITE CONTACT: " + request.getEmail());
-                    if(request.getNumber()==MegaContactRequest.INVITE_ACTION_ADD)
-                    {
-                        showSnackbar(SNACKBAR_TYPE, getString(R.string.context_contact_request_sent, request.getEmail()), -1);
+                    if (request.getNumber() == MegaContactRequest.INVITE_ACTION_ADD) {
+                        showSnackbar(DISMISS_ACTION_SNACKBAR, StringResourcesUtils.getString(R.string.contact_invited), MEGACHAT_INVALID_HANDLE);
                     }
                 }
                 else{

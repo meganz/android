@@ -66,8 +66,6 @@
     <string name="general_error_word">Error</string>
     <!-- when clicking into a menu whose functionality is not yet implemented -->
     <string name="general_not_yet_implemented">Not yet implemented</string>
-    <!-- when any file or folder is selected -->
-    <string name="error_no_selection">No file or folder selected</string>
     <!-- when trying to download a file that is already downloaded in the device -->
     <string name="general_already_downloaded">Already downloaded</string>
     <!-- when trying to upload a file that is already uploaded in the folder -->
@@ -93,15 +91,13 @@
     <!-- confirmation message before sending an invitation to a contact -->
     <string name="confirmation_add_contact">Do you want to send an invitation to %s?</string>
     <!-- Button where the user can sign off or logout -->
-    <string name="action_logout">Logout</string>
+    <string name="action_logout">Log out</string>
     <!-- Item menu option upon right click on one or multiple files. -->
     <string name="action_add">Upload</string>
     <!-- Menu item -->
     <string name="action_create_folder">Create new folder</string>
     <!-- Option which allows create a new text file -->
     <string name="action_create_txt">Create new text file</string>
-    <!-- Menu option to open a link. Also title of the dialog to open a link. -->
-    <string name="action_open_link">Open link</string>
     <!-- Menu item -->
     <string name="action_settings">Settings</string>
     <!-- Search button -->
@@ -631,10 +627,6 @@
     <string name="upload_to_audio">Audio</string>
     <!-- Title of the button in the contact info screen to start a video call -->
     <string name="upload_to_video">Video</string>
-    <!-- upload to. Then choose to browse the file system to choose a file -->
-    <string name="upload_to_filesystem">Pick from File System</string>
-    <!-- upload to. Then choose to browse the file system to choose a file -->
-    <string name="upload_to_filesystem_from">Pick from</string>
     <!-- Label for the current uploaded size of a file. For example, 3 files, 50KB uploaded -->
     <string name="upload_uploaded">uploaded</string>
     <!-- Status text at the beginning of an upload, Status text at the beginning of an upload for 2 or more files -->
@@ -1426,7 +1418,7 @@
     <!-- settings of the chat to choose the status -->
     <string name="settings_chat_vibration">Vibration</string>
     <!-- Button text shown on SMS verification page, if the user wants to logout current suspended account and login with another account, user can press this button to logout -->
-    <string name="sms_logout">[A]Logout[/A] to use MEGA with another account</string>
+    <string name="sms_logout">[A]Log out[/A] to switch MEGA accounts</string>
     <!-- On SMS verification page, if the user presses the logout button, a dialog with this text will show to ask for user’s confirmation. -->
     <string name="confirm_logout_from_sms_verification">Are you sure that you want to log out of the current account?</string>
     <!-- Text shown when a message has been deleted in the chat -->
@@ -2328,7 +2320,7 @@
     <!-- Option that permits user export his recovery key -->
     <string name="option_export_recovery_key">Export Recovery Key</string>
     <!-- Option that permits user logout -->
-    <string name="proceed_to_logout">Proceed to logout</string>
+    <string name="proceed_to_logout">Proceed to log out</string>
     <!-- Title of the preference Recovery key on Settings section -->
     <string name="recovery_key_bottom_sheet">Recovery Key</string>
     <!-- Option that permits user save on File System -->
@@ -2778,16 +2770,12 @@
     <string name="message_set_chat_private">[A]%1$s[/A][B] enabled encryption key rotation.[/B]</string>
     <!-- error message shown when a chat link is invalid -->
     <string name="invalid_chat_link">This conversation is no longer available</string>
-    <!-- error message shown when a chat link is not well formed -->
-    <string name="invalid_chat_link_args">Invalid chat link</string>
     <!-- When it is creating a new group chat, this option permits to establish it private or public -->
     <string name="ekr_label">Encryption key rotation</string>
     <!-- Text of the dialog to change a public chat to private (enable encryption key rotation) -->
     <string name="ekr_explanation">Encryption key rotation is slightly more secure, but does not allow you to create a chat link and new participants will not see past messages.</string>
     <!-- Text of the dialog to change a public chat to private (enable encryption key rotation) -->
     <string name="subtitle_chat_message_enabled_ERK">Encryption key rotation is slightly more secure, but does not allow you to create a chat link and new participants will not see past messages.</string>
-    <!-- Menu item -->
-    <string name="action_open_chat_link">Open chat link</string>
     <!-- Message shown when a contact request has not been sent because the invitation has been sent before -->
     <string name="invite_not_sent_already_sent">The invitation to contact %s has been sent before and can be consulted in the Sent Requests tab.</string>
     <!-- Label shown to indicate the QR is saving in Cloud Drive -->
@@ -3102,8 +3090,6 @@
     </plurals>
     <!-- Title of a chat message that contains geolocation info -->
     <string name="title_geolocation_message">Pinned Location</string>
-    <!-- Text of the button to indicate an attachment upload from file system -->
-    <string name="attachment_upload_panel_from_device">From File System</string>
     <!-- Alert shown when a num of files have not been sent because of any error occurs, Plural of file. 2 files -->
     <plurals name="num_files_not_send">
         <item quantity="one">%d file was not sent to %d chats</item>
@@ -3246,22 +3232,6 @@
     <string name="text_join_call">To join this call you have to end your current call.</string>
     <!-- Text of the dialog shown when you want to join a group call but you are in another active call -->
     <string name="text_join_another_call">To join this call you have to end or hold the current call.</string>
-    <!-- Hint shown in the open chat link alert dialog -->
-    <string name="hint_enter_chat_link">Enter chat link</string>
-    <!-- Hint shown in the open link alert dialog -->
-    <string name="hint_paste_link">Paste link</string>
-    <!-- Error shown when it tries to open an invalid file or folder link -->
-    <string name="invalid_file_folder_link">Invalid file or folder link</string>
-    <!-- Error shown when it tries to open an invalid file or folder link and the text view is empty -->
-    <string name="invalid_file_folder_link_empty">Please enter a valid file or folder link</string>
-    <!-- Error shown when it tries to open an invalid chat link and the text view is empty -->
-    <string name="invalid_chat_link_empty">Please enter a valid chat link</string>
-    <!-- Error shown when it tries to open a chat link from the Cloud Drive section -->
-    <string name="valid_chat_link">You have pasted a chat link.</string>
-    <!-- Error shown when it tries to open a contact link from the Cloud Drive section -->
-    <string name="valid_contact_link">You have pasted a contact link.</string>
-    <!-- Menu item -->
-    <string name="action_open_contact_link">Open contact link</string>
     <!-- Explanation of the dialog shown to share a chat link -->
     <string name="copy_link_explanation">People can join your group by using this link.</string>
     <!-- Label that indicates the creation of a chat link -->
@@ -3592,8 +3562,8 @@
     <string name="section_documents">Documents</string>
     <!-- Label of the floating action button of opening the new chat conversation -->
     <string name="fab_label_new_chat">New chat</string>
-    <!-- Text that indicates that there’s no photo to show -->
-    <string name="homepage_empty_hint_photos">No photos found</string>
+    <!-- Text that indicates that there’s no image to show in image section -->
+    <string name="homepage_empty_hint_photos">[B]No[/B] [A]Images[/A] [B]Found[/B]</string>
     <!-- Text that indicates that there’s no document to show -->
     <string name="homepage_empty_hint_documents">No documents found</string>
     <!-- Text that indicates that there’s no audio to show -->
@@ -3744,7 +3714,7 @@
     <!-- Context menu item. Allows user to delete file/folder from favourites -->
     <string name="file_properties_unfavourite">Remove favourite</string>
     <!-- Context menu item. Allows to mark file/folder with own color label -->
-    <string name="file_properties_label">Label&#8230;</string>
+    <string name="file_properties_label">Label</string>
     <!-- Information text to let’s the user know that they can remove a colour from a folder or file that was already marked. -->
     <string name="action_remove_label">Remove label</string>
     <!-- Title text to show label selector. -->
@@ -3854,7 +3824,7 @@
     <!-- Settings hint that indicates the audio will still be played in background if the app is backgrounded -->
     <string name="settings_background_play_hint">Playing on the background</string>
     <!-- Text of the empty screen when there are no elements in Photos -->
-    <string name="photos_empty">[B]No[/B] [A]Photos[/A]</string>
+    <string name="photos_empty">[B]No[/B] [A]Photos[/A] [B]Found[/B]</string>
     <!-- Text to show as subtitle of Enable camera uploads screen -->
     <string name="enable_cu_subtitle">Automatically backup your photos and videos to your Cloud Drive.</string>
     <!-- Text of a button on Camera Uploads section to show all the content of the section-->
@@ -4178,4 +4148,8 @@
     <string name="disable_versioning_warning">Our file versioning feature ensures that we keep older copies of your files around if you replace them with newer versions. If you disable File Versioning you will no longer have this protection; the old copy will be lost when you replace it.</string>
     <!-- Warning informing the user the folder location is trying to open no longer exists. -->
     <string name="location_not_exist">This location no longer exists.</string>
+    <!-- Warning shown informing the contact has been previously invited. The placeholder is to show the name of the contact. -->
+    <string name="contact_already_invited">%1$s previously invited.</string>
+    <!-- Warning shown informing the contact request has been sent and can be managed in sent requests section. -->
+    <string name="contact_invited">Invite sent successfully. See sent requests.</string>
 </resources>

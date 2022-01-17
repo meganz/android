@@ -12,4 +12,8 @@ open class NodeItem(
     open var thumbnail: File? = null,
     open var selected: Boolean = false,
     open var uiDirty: Boolean = true   // Force refresh the newly created Node list item
-)
+) {
+    override fun toString(): String {
+        return "NodeItem(node=$node, index=$index, isVideo=$isVideo, modifiedDate='$modifiedDate', thumbnail=$thumbnail, selected=$selected, uiDirty=$uiDirty)"
+    }
+}
