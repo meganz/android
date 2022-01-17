@@ -75,6 +75,7 @@ import mega.privacy.android.app.objects.PasscodeManagement;
 import mega.privacy.android.app.utils.AskForDisplayOverDialog;
 import mega.privacy.android.app.utils.ColorUtils;
 import mega.privacy.android.app.utils.HighLightHintHelper;
+import mega.privacy.android.app.utils.StringResourcesUtils;
 import mega.privacy.android.app.utils.TextUtil;
 
 import mega.privacy.android.app.utils.permission.PermissionUtils;
@@ -396,9 +397,9 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
 
         emptyLayout = v.findViewById(R.id.linear_empty_layout_chat_recent);
         emptyDescriptionText = v.findViewById(R.id.empty_description_text_recent);
-        emptyDescriptionText.setText(replaceFormatText(context.getString(R.string.description_recent_chat_empty),
-                ColorUtils.getColorHexString(context, R.color.grey_300_grey_600),
-                ColorUtils.getColorHexString(context, R.color.grey_900_grey_100)));
+        emptyDescriptionText.setText(replaceFormatText(StringResourcesUtils.getString(R.string.context_empty_chat_recent),
+                ColorUtils.getColorHexString(context, R.color.grey_900_grey_100),
+                ColorUtils.getColorHexString(context, R.color.grey_300_grey_600)));
 
         emptyTextViewInvite = v.findViewById(R.id.empty_text_chat_recent_invite);
         emptyTextView = v.findViewById(R.id.empty_text_chat_recent);
