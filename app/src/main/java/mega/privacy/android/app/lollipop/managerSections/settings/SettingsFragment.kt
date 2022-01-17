@@ -12,6 +12,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.ViewGroup.MarginLayoutParams
 import android.widget.CheckedTextView
+import androidx.annotation.StringRes
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
@@ -23,6 +24,7 @@ import androidx.preference.PreferenceFragmentCompat
 import androidx.preference.SwitchPreferenceCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.google.android.material.snackbar.Snackbar
 import com.jeremyliao.liveeventbus.LiveEventBus
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
@@ -35,6 +37,7 @@ import mega.privacy.android.app.constants.EventConstants.EVENT_UPDATE_START_SCRE
 import mega.privacy.android.app.constants.SettingsConstants.*
 import mega.privacy.android.app.exportRK.ExportRecoveryKeyActivity
 import mega.privacy.android.app.lollipop.ChangePasswordActivityLollipop
+import mega.privacy.android.app.lollipop.ManagerActivityLollipop
 import mega.privacy.android.app.lollipop.TwoFactorAuthenticationActivity
 import mega.privacy.android.app.lollipop.VerifyTwoFactorActivity
 import mega.privacy.android.app.mediaplayer.service.AudioPlayerService
@@ -97,7 +100,8 @@ class SettingsFragment : Preference.OnPreferenceChangeListener,
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.RESUMED) {
                 viewModel.uiState.collect {
-                    findPreference<Preference>(KEY_FEATURES_CAMERA_UPLOAD)?.isEnabled = it.cameraUploadEnabled
+                    findPreference<Preference>(KEY_FEATURES_CAMERA_UPLOAD)?.isEnabled =
+                        it.cameraUploadEnabled
                     findPreference<Preference>(KEY_FEATURES_CHAT)?.isEnabled = it.chatEnabled
 
                     findPreference<SwitchPreferenceCompat>(KEY_2FA)?.apply {
@@ -160,7 +164,7 @@ class SettingsFragment : Preference.OnPreferenceChangeListener,
         return v
     }
 
-    override fun setOnlineOptions(isOnline: Boolean) { }
+    override fun setOnlineOptions(isOnline: Boolean) {}
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -464,18 +468,22 @@ class SettingsFragment : Preference.OnPreferenceChangeListener,
                     numberOfClicksAppVersion = 0
                     if (!MegaApplication.isShowInfoChatMessages()) {
                         MegaApplication.setShowInfoChatMessages(true)
-                        (activity as SettingsActivity).showSnackbar(
-                            Constants.SNACKBAR_TYPE,
-                            getString(R.string.show_info_chat_msg_enabled),
-                            MegaChatApiJava.MEGACHAT_INVALID_HANDLE
-                        )
+                        view?.let {
+                            Snackbar.make(
+                                it,
+                                R.string.show_info_chat_msg_enabled,
+                                Snackbar.LENGTH_SHORT
+                            ).show()
+                        }
                     } else {
                         MegaApplication.setShowInfoChatMessages(false)
-                        (activity as SettingsActivity).showSnackbar(
-                            Constants.SNACKBAR_TYPE,
-                            getString(R.string.show_info_chat_msg_disabled),
-                            MegaChatApiJava.MEGACHAT_INVALID_HANDLE
-                        )
+                        view?.let {
+                            Snackbar.make(
+                                it,
+                                R.string.show_info_chat_msg_disabled,
+                                Snackbar.LENGTH_SHORT
+                            ).show()
+                        }
                     }
                 }
             }
@@ -501,7 +509,7 @@ class SettingsFragment : Preference.OnPreferenceChangeListener,
                     }
                 }
             }
-            KEY_CANCEL_ACCOUNT -> (activity as SettingsActivity).askConfirmationDeleteAccount()
+            KEY_CANCEL_ACCOUNT -> deleteAccountClicked()
             KEY_ABOUT_COOKIE_POLICY -> {
                 val intent = Intent(context, WebViewActivity::class.java)
                 intent.data = Uri.parse("https://mega.nz/cookie")
@@ -536,6 +544,58 @@ class SettingsFragment : Preference.OnPreferenceChangeListener,
         }
         resetCounters(key)
         return true
+    }
+
+    private fun deleteAccountClicked() {
+        LogUtil.logDebug("askConfirmationDeleteAccount")
+
+        MaterialAlertDialogBuilder(requireContext())
+            .setTitle(getString(R.string.delete_account))
+            .setMessage(resources.getString(R.string.delete_account_text))
+            .setPositiveButton(R.string.delete_account) { _, _ -> deleteAccountConfirmed() }
+            .setNegativeButton(R.string.general_dismiss) { _, _ -> }
+            .show()
+
+    }
+
+    private fun deleteAccountConfirmed() {
+        LogUtil.logDebug("deleteAccount")
+        if (viewModel.uiState.value.multiFactorAuthChecked) {
+            deleteAccountWithMultiFactorAuthentication()
+        } else {
+            deleteAccount()
+        }
+    }
+
+    private fun deleteAccountWithMultiFactorAuthentication() {
+        val intent = Intent(context, VerifyTwoFactorActivity::class.java)
+        intent.putExtra(VerifyTwoFactorActivity.KEY_VERIFY_TYPE, Constants.CANCEL_ACCOUNT_2FA)
+        startActivity(intent)
+    }
+
+    private fun deleteAccount() {
+        viewLifecycleOwner.lifecycleScope.launch {
+            if (viewModel.deleteAccount()) {
+                showInfoDialog(
+                    R.string.email_verification_title,
+                    R.string.email_verification_text
+                )
+            } else {
+                showInfoDialog(
+                    R.string.general_error_word,
+                    R.string.general_text_error
+                )
+            }
+        }
+    }
+
+    private fun showInfoDialog(@StringRes title: Int, @StringRes message: Int) {
+        Util.hideKeyboard(requireActivity(), 0)
+        MaterialAlertDialogBuilder(requireContext())
+            .setPositiveButton(R.string.general_ok) { _, _ -> }
+            .setTitle(title)
+            .setMessage(message)
+            .show()
     }
 
     private fun launchWebPage(url: String) {

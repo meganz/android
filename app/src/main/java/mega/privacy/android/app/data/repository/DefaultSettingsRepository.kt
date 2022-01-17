@@ -7,7 +7,7 @@ import mega.privacy.android.app.DatabaseHandler
 import mega.privacy.android.app.MegaAttributes
 import mega.privacy.android.app.MegaPreferences
 import mega.privacy.android.app.di.MegaApi
-import mega.privacy.android.app.domain.exception.ApiError
+import mega.privacy.android.app.domain.exception.MegaError
 import mega.privacy.android.app.domain.exception.SettingNotFoundException
 import mega.privacy.android.app.domain.repository.SettingsRepository
 import mega.privacy.android.app.fragments.settingsFragments.startSceen.util.StartScreenUtil
@@ -69,7 +69,7 @@ class DefaultSettingsRepository @Inject constructor(
                             else -> {
                                 continuation.resumeWith(
                                     Result.failure(
-                                        ApiError(
+                                        mega.privacy.android.app.domain.exception.MegaError(
                                             e?.errorCode,
                                             e?.errorString
                                         )
@@ -135,7 +135,7 @@ class DefaultSettingsRepository @Inject constructor(
                             else -> {
                                 continuation.resumeWith(
                                     Result.failure(
-                                        ApiError(
+                                        mega.privacy.android.app.domain.exception.MegaError(
                                             e?.errorCode,
                                             e?.errorString
                                         )

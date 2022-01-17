@@ -12,7 +12,9 @@ import mega.privacy.android.app.constants.EventConstants.EVENT_2FA_UPDATED
 import mega.privacy.android.app.data.facade.EventBusFacade
 import mega.privacy.android.app.di.MegaApi
 import mega.privacy.android.app.domain.entity.UserAccount
-import mega.privacy.android.app.domain.exception.ApiError
+import mega.privacy.android.app.domain.exception.MegaError
+import mega.privacy.android.app.domain.exception.NoLoggedInUserError
+import mega.privacy.android.app.domain.exception.NotMasterBusinessAccountError
 import mega.privacy.android.app.domain.repository.AccountRepository
 import mega.privacy.android.app.globalmanagement.MyAccountInfo
 import mega.privacy.android.app.utils.DBUtil
@@ -71,7 +73,7 @@ class DefaultAccountRepository @Inject constructor(
                         } else {
                             continuation.resumeWith(
                                 Result.failure(
-                                    ApiError(
+                                    mega.privacy.android.app.domain.exception.MegaError(
                                         e?.errorCode,
                                         e?.errorString
                                     )
@@ -100,7 +102,85 @@ class DefaultAccountRepository @Inject constructor(
         return callbackFlow {
             val flowObserver = Observer(this::trySend)
             eventObservable.observeForever(flowObserver)
-            awaitClose { eventObservable.removeObserver(flowObserver)}
+            awaitClose { eventObservable.removeObserver(flowObserver) }
+        }
+
+    }
+
+    override suspend fun requestDeleteAccountLink() {
+        /**
+         * Initialize the cancellation of an account.
+         *
+         * The associated request type with this request is MegaRequest::TYPE_GET_CANCEL_LINK.
+         *
+         * If this request succeed, a cancellation link will be sent to the email address of the user.
+         * If no user is logged in, you will get the error code MegaError::API_EACCESS in onRequestFinish().
+         *
+         * If the MEGA account is a sub-user business account, onRequestFinish will
+         * be called with the error code MegaError::API_EMASTERONLY.
+         *
+         * @see MegaApi::confirmCancelAccount
+         *
+         * @param listener MegaRequestListener to track this request
+         */
+
+        return suspendCoroutine { continuation ->
+            sdk.cancelAccount(object : MegaRequestListenerInterface {
+                override fun onRequestStart(api: MegaApiJava?, request: MegaRequest?) {}
+
+                override fun onRequestUpdate(api: MegaApiJava?, request: MegaRequest?) {}
+
+                override fun onRequestFinish(
+                    api: MegaApiJava?,
+                    request: MegaRequest?,
+                    e: MegaError?
+                ) {
+                    if (request?.type == MegaRequest.TYPE_GET_CANCEL_LINK) {
+                        when (e?.errorCode) {
+                            MegaError.API_OK -> {
+                                continuation.resumeWith(Result.success(Unit))
+                            }
+                            MegaError.API_EACCESS -> {
+                                continuation.resumeWith(
+                                    Result.failure(
+                                        NoLoggedInUserError(
+                                            e.errorCode,
+                                            e.errorString
+                                        )
+                                    )
+                                )
+                            }
+                            MegaError.API_EMASTERONLY -> {
+                                continuation.resumeWith(
+                                    Result.failure(
+                                        NotMasterBusinessAccountError(
+                                            e.errorCode,
+                                            e.errorString
+                                        )
+                                    )
+                                )
+                            }
+                            else -> {
+                                continuation.resumeWith(
+                                    Result.failure(
+                                        mega.privacy.android.app.domain.exception.MegaError(
+                                            e?.errorCode,
+                                            e?.errorString
+                                        )
+                                    )
+                                )
+                            }
+                        }
+                    }
+                }
+
+                override fun onRequestTemporaryError(
+                    api: MegaApiJava?,
+                    request: MegaRequest?,
+                    e: MegaError?
+                ) {
+                }
+            })
         }
 
     }

@@ -13,4 +13,5 @@ interface AccountRepository {
     fun isMultiFactorAuthAvailable(): Boolean
     suspend fun isMultiFactorAuthEnabled(): Boolean
     fun monitorMultiFactorAuthChanges(): Flow<Boolean>
+    suspend fun requestDeleteAccountLink()
 }

@@ -3,13 +3,12 @@ package test.mega.privacy.android.app.domain.usecase
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
-import mega.privacy.android.app.domain.exception.ApiError
+import mega.privacy.android.app.domain.exception.MegaError
 import mega.privacy.android.app.domain.exception.SettingNotFoundException
 import mega.privacy.android.app.domain.repository.SettingsRepository
 import mega.privacy.android.app.domain.usecase.DefaultToggleAutoAcceptQRLinks
 import mega.privacy.android.app.domain.usecase.FetchAutoAcceptQRLinks
 import mega.privacy.android.app.domain.usecase.ToggleAutoAcceptQRLinks
-import org.junit.Assert.assertThrows
 import org.junit.Before
 import org.junit.Test
 import org.mockito.kotlin.mock
@@ -55,8 +54,8 @@ class ToggleAutoAcceptQRLinksTest {
 
     @Test
     fun `test that errors are propagated`() = runTest {
-        whenever(fetchAutoAcceptQRLinks()).thenAnswer { throw ApiError() }
-        assertFailsWith<ApiError> {
+        whenever(fetchAutoAcceptQRLinks()).thenAnswer { throw MegaError() }
+        assertFailsWith<MegaError> {
             underTest()
         }
     }

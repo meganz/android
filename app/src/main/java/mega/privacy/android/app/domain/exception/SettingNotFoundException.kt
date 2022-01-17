@@ -1,3 +1,3 @@
 package mega.privacy.android.app.domain.exception
 
-class SettingNotFoundException(errorString: String? = null) : Throwable(message = errorString)
+class SettingNotFoundException(errorCode: Int?, errorString: String?) : MegaError(errorCode, errorString)

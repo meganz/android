@@ -5,7 +5,9 @@ import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
+import mega.privacy.android.app.domain.exception.MegaError
 import mega.privacy.android.app.domain.usecase.*
+import mega.privacy.android.app.utils.LogUtil
 import javax.inject.Inject
 
 @HiltViewModel
@@ -24,6 +26,7 @@ class SettingsViewModel @Inject constructor(
     private val toggleAutoAcceptQRLinks: ToggleAutoAcceptQRLinks,
     fetchMultiFactorAuthSetting: FetchMultiFactorAuthSetting,
     private val isOnline: IsOnline,
+    private val requestAccountDeletion: RequestAccountDeletion
 ) : ViewModel() {
     private val userAccount = MutableStateFlow(getAccountDetails(false))
     private val state = MutableStateFlow(initialiseState())
@@ -69,7 +72,7 @@ class SettingsViewModel @Inject constructor(
                 },
                 flowOf(isMultiFactorAuthAvailable())
                     .map { available ->
-                        {state: SettingsState -> state.copy(multiFactorVisible = available)}
+                        { state: SettingsState -> state.copy(multiFactorVisible = available) }
                     },
                 flowOf(fetchAutoAcceptQRLinks())
                     .map { enabled ->
@@ -114,6 +117,17 @@ class SettingsViewModel @Inject constructor(
                 state.update { it.copy(autoAcceptChecked = autoAccept) }
             }
         }
+    }
+
+    suspend fun deleteAccount(): Boolean {
+        return kotlin.runCatching { requestAccountDeletion() }
+            .fold(
+                { return true },
+                { e ->
+                    LogUtil.logError( "Error when asking for the cancellation link: ${e.message}")
+                    return false
+                }
+            )
     }
 
 }
