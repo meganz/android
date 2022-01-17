@@ -10,7 +10,7 @@ MEGACHAT_BRANCH = "develop"
  * @param title of the Merge Request
  * @return true if current stage should be skipped. Otherwise return false.
  */
-static def shouldSkip(title) {
+def shouldSkip(title) {
     if (title != null && !title.isEmpty()) {
         return title.toLowerCase().startsWith("draft:") ||
                 title.toLowerCase().startsWith("wip:")
