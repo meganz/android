@@ -79,4 +79,9 @@ abstract class SettingsModule {
     abstract fun bindIsOnline(
         useCase: DefaultIsOnline
     ): IsOnline
+
+    @Binds
+    abstract fun bindRequestAccountDeletion(
+        useCase: DefaultRequestAccountDeletion
+    ): RequestAccountDeletion
 }
