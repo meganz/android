@@ -1,7 +1,7 @@
 
-def BUILD_STEP = ""
-def SDK_BRANCH = "develop"
-def MEGACHAT_BRANCH = "develop"
+BUILD_STEP = ""
+SDK_BRANCH = "develop"
+MEGACHAT_BRANCH = "develop"
 
 /**
  * Decide whether we should skip the current build. If MR title starts with "Draft:"
@@ -45,7 +45,7 @@ def getMEGAchatBranch() {
     for (String line: lines) {
         line = line.trim();
         if (line.startsWith(KEY)) {
-            print("MEGACHAT_BRANCH line found!!!");
+            print("MEGACHAT_BRANCH line found!!!" + line);
             String value = line.substring(KEY.length());
             if (!value.isEmpty()) {
                 MEGACHAT_BRANCH = value;
