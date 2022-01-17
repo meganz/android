@@ -25,8 +25,11 @@ def getSDKBranch() {
     for (String line : lines) {
         line = line.trim();
         if (line.startsWith(KEY)) {
-            String result = line.substring(KEY.length());
-            return result;
+            String value = line.substring(KEY.length());
+            if (!value.isEmpty()) {
+                SDK_BRANCH = value;
+                return value;
+            }
         }
     }
     return "";
@@ -39,8 +42,12 @@ def getMEGAchatBranch() {
     for (String line: lines) {
         line = line.trim();
         if (line.startsWith(KEY)) {
-            String result = line.substring(KEY.length());
-            return result;
+            String value = line.substring(KEY.length());
+            if (!value.isEmpty()) {
+                MEGACHAT_BRANCH = value;
+                return value;
+            }
+
         }
     }
     return "";
@@ -66,7 +73,7 @@ pipeline {
 
         PATH = "/opt/buildtools/android-sdk/cmake/3.10.2.4988404/bin:/Applications/MEGAcmd.app/Contents/MacOS:/opt/buildtools/zulu11.52.13-ca-jdk11.0.13-macosx_x64/bin:/opt/brew/bin:/opt/brew/opt/gnu-sed/libexec/gnubin:/opt/brew/opt/gnu-tar/libexec/gnubin:/opt/buildtools/android-sdk/platform-tools:$PATH"
 
-        CONSOLE_LOG_FILE = "androidLog.txt"
+        CONSOLE_LOG_FILE = "console.txt"
 
         BUILD_LIB_DOWNLOAD_FOLDER = '${WORKSPACE}/mega_build_download'
         // webrtc lib link and file name may change with time. Update these 2 values if build failed.
@@ -137,8 +144,11 @@ pipeline {
                 script {
                     BUILD_STEP = "Preparation"
 
-                    SDK_BRANCH = getSDKBranch()
-                    MEGACHAT_BRANCH = getMEGAchatBranch()
+                    getSDKBranch()
+                    sh("echo SDK_BRANCH = ${SDK_BRANCH}")
+
+                    getMEGAchatBranch()
+                    sh("echo MEGACHAT_BRANCH = ${MEGACHAT_BRANCH}")
                 }
                 gitlabCommitStatus(name: 'Preparation') {
                     sh("rm -fv ${CONSOLE_LOG_FILE}")
