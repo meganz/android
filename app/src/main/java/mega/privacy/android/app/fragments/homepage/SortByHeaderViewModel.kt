@@ -7,6 +7,7 @@ import androidx.lifecycle.ViewModel
 import com.jeremyliao.liveeventbus.LiveEventBus
 import dagger.hilt.android.lifecycle.HiltViewModel
 import mega.privacy.android.app.R
+import mega.privacy.android.app.constants.EventConstants.EVENT_SHOW_MEDIA_DISCOVERY
 import mega.privacy.android.app.constants.EventConstants.EVENT_UPDATE_VIEW_MODE
 import mega.privacy.android.app.globalmanagement.SortOrderManagement
 import mega.privacy.android.app.utils.Constants.EVENT_LIST_GRID_CHANGE
@@ -72,6 +73,13 @@ class SortByHeaderViewModel @Inject constructor(
 
     fun switchListGrid() {
         LiveEventBus.get(EVENT_UPDATE_VIEW_MODE, Boolean::class.java).post(!isList)
+    }
+
+    /**
+     * Enter media discovery view.
+     */
+    fun enterMediaDiscovery() {
+        LiveEventBus.get(EVENT_SHOW_MEDIA_DISCOVERY, Unit::class.java).post(Unit)
     }
 
     override fun onCleared() {
