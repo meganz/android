@@ -19,6 +19,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="26dp"
+            android:fontFamily="sans-serif-light"
             android:gravity="start"
             android:maxWidth="272dp"
             android:textSize="16sp" />
@@ -37,7 +38,7 @@
             android:gravity="center"
             android:maxWidth="300dp"
             android:textAppearance="@style/TextAppearance.Mega.Subtitle1.Secondary"
-            android:fontFamily="sans-serif-light"
+            android:fontFamily="sans-serif"
             android:textSize="16sp" />
 
         <TextView
@@ -54,6 +55,7 @@
             android:layout_gravity="center_horizontal"
             android:layout_marginTop="32dp"
             android:minWidth="96dp"
+            android:text="@string/new_chat_link_label"
             android:paddingStart="20dp"
             android:paddingTop="10dp"
             android:paddingEnd="20dp"

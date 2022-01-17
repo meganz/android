@@ -611,7 +611,7 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
     }
 
     private void showFab() {
-        if (adapterList == null || adapterList.isMultipleSelect()) {
+        if (adapterList != null && adapterList.isMultipleSelect()) {
             return;
         }
 
@@ -642,10 +642,10 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
         Spanned result;
         colorStart =  ColorUtils.getColorHexString(context, R.color.grey_300_grey_600);
         colorEnd =  ColorUtils.getColorHexString(context, R.color.grey_900_grey_100);
-        if (context instanceof ArchivedChatsActivity) {
-            textToShow = context.getString(R.string.recent_chat_empty).toUpperCase();
-            result = replaceFormatText(textToShow, colorStart, colorEnd);
+        textToShow = StringResourcesUtils.getString(R.string.recent_chat_empty).toUpperCase();
+        result = replaceFormatText(textToShow, colorStart, colorEnd);
 
+        if (context instanceof ArchivedChatsActivity) {
             emptyTextView.setVisibility(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE ?
                     View.GONE : View.VISIBLE);
 
@@ -654,12 +654,9 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
             inviteButton.setVisibility(View.GONE);
             emptyTextView.setText(result);
         } else {
-            textToShow = context.getString(R.string.recent_chat_empty).toUpperCase();
-            result = replaceFormatText(textToShow, colorStart, colorEnd);
             emptyTextViewInvite.setText(result);
             emptyTextViewInvite.setVisibility(View.VISIBLE);
             emptyDescriptionText.setVisibility(View.VISIBLE);
-            inviteButton.setText(getString(R.string.new_chat_link_label));
             inviteButton.setVisibility(View.VISIBLE);
         }
     }
