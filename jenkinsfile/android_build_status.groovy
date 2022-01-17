@@ -15,7 +15,9 @@ static def shouldSkip(title) {
         return title.toLowerCase().startsWith("draft:") ||
                 title.toLowerCase().startsWith("wip:")
     }
-    return true
+    // if title is null, this build is probably triggered by 'jenkins rebuild' comment
+    // in such case, build should not be skipped.
+    return false
 }
 
 /**
