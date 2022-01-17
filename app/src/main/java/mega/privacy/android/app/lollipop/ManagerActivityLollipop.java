@@ -64,15 +64,12 @@ import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.widget.SearchView;
 
-import android.text.Editable;
 import android.text.Html;
 import android.text.Spanned;
-import android.text.TextWatcher;
 import android.util.DisplayMetrics;
 import android.util.Pair;
 import android.view.Display;
 import android.view.Gravity;
-import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -81,17 +78,14 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.view.Window;
-import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.Chronometer;
-import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-import android.widget.TextView.OnEditorActionListener;
 
 import com.ittianyu.bottomnavigationviewex.BottomNavigationViewEx;
 import com.jeremyliao.liveeventbus.LiveEventBus;
@@ -125,7 +119,6 @@ import mega.privacy.android.app.MegaAttributes;
 import mega.privacy.android.app.MegaContactAdapter;
 import mega.privacy.android.app.MegaOffline;
 import mega.privacy.android.app.MegaPreferences;
-import mega.privacy.android.app.OpenPasswordLinkActivity;
 import mega.privacy.android.app.Product;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.gallery.ui.MediaDiscoveryFragment;
@@ -6589,12 +6582,12 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 
 	@Override
 	public void uploadFiles() {
-		chooseFromDevice(this);
+		chooseFiles(this);
 	}
 
 	@Override
 	public void uploadFolder() {
-
+		chooseFolder(this);
 	}
 
 	@Override
@@ -7866,7 +7859,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 			return;
 		}
 
-        if (requestCode == REQUEST_CODE_GET && resultCode == RESULT_OK) {
+        if (requestCode == REQUEST_CODE_GET_FILES && resultCode == RESULT_OK) {
 			if (intent == null) {
 				logWarning("Intent NULL");
 				return;
@@ -7886,6 +7879,10 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 							onIntentProcessed(shareInfo);
 						}
 					});
+		} else if (requestCode == REQUEST_CODE_GET_FOLDER) {
+			getFolder(this, resultCode, intent);
+		} else if (requestCode == REQUEST_CODE_GET_FOLDER_CONTENT) {
+
 		} else if (requestCode == WRITE_SD_CARD_REQUEST_CODE && resultCode == RESULT_OK) {
 
 			if (!hasPermissions(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)) {

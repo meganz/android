@@ -199,12 +199,12 @@ public class ContactFileListActivityLollipop extends PasscodeActivity
 
 	@Override
 	public void uploadFiles() {
-		chooseFromDevice(this);
+		chooseFiles(this);
 	}
 
 	@Override
 	public void uploadFolder() {
-
+		chooseFolder(this);
 	}
 
 	@Override
@@ -664,7 +664,7 @@ public class ContactFileListActivityLollipop extends PasscodeActivity
 							showMovementResult(result, moveHandles[0]);
 						}
 					});
-		} else if (requestCode == REQUEST_CODE_GET && resultCode == RESULT_OK) {
+		} else if (requestCode == REQUEST_CODE_GET_FILES && resultCode == RESULT_OK) {
 			if (intent == null) {
 				return;
 			}
@@ -685,6 +685,10 @@ public class ContactFileListActivityLollipop extends PasscodeActivity
 							onIntentProcessed(shareInfo);
 						}
 					});
+		}  else if (requestCode == REQUEST_CODE_GET_FOLDER) {
+			getFolder(this, resultCode, intent);
+		} else if (requestCode == REQUEST_CODE_GET_FOLDER_CONTENT) {
+
 		} else if (requestCode == REQUEST_CODE_SELECT_FOLDER && resultCode == RESULT_OK) {
 			if (intent == null) {
 				return;

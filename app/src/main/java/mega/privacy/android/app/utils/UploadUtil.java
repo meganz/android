@@ -1,15 +1,18 @@
 package mega.privacy.android.app.utils;
 
+import static android.app.Activity.RESULT_OK;
+
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.net.Uri;
 
 import java.io.File;
 
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.UploadService;
-import mega.privacy.android.app.lollipop.FileStorageActivityLollipop;
+import mega.privacy.android.app.upload.UploadFolderActivity;
 import nz.mega.sdk.MegaApiAndroid;
 
 import static mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuotaPaywallWarning;
@@ -18,6 +21,7 @@ import static mega.privacy.android.app.utils.CacheFolderManager.buildTempFile;
 import static mega.privacy.android.app.utils.CacheFolderManager.getCacheFile;
 import static mega.privacy.android.app.utils.FileUtil.isFileAvailable;
 import static mega.privacy.android.app.utils.LogUtil.logDebug;
+import static mega.privacy.android.app.utils.LogUtil.logWarning;
 import static nz.mega.sdk.MegaApiJava.STORAGE_STATE_PAYWALL;
 
 public class UploadUtil {
@@ -76,17 +80,41 @@ public class UploadUtil {
     }
 
     /**
-     * This method is to start device folder from Activity to choose files or folders to upload
+     * Opens the system file picker to choose files to upload.
      *
-     * @param activity the activity the camera would start from
+     * @param activity Activity to start the Intent.
      */
-    public static void chooseFromDevice(Activity activity) {
-        Intent intent = new Intent();
-        intent.setAction(Intent.ACTION_OPEN_DOCUMENT);
-        intent.setAction(Intent.ACTION_GET_CONTENT);
-        intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
-        intent.setType("*/*");
-        activity.startActivityForResult(Intent.createChooser(intent, null), Constants.REQUEST_CODE_GET);
+    public static void chooseFiles(Activity activity) {
+        activity.startActivityForResult(Intent.createChooser(new Intent(Intent.ACTION_OPEN_DOCUMENT)
+                .putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true)
+                .setType("*/*"), null), Constants.REQUEST_CODE_GET_FILES);
+    }
+
+    /**
+     * Opens the system file picker to choose a folder to upload.
+     *
+     * @param activity Activity to start the Intent.
+     */
+    public static void chooseFolder(Activity activity) {
+        activity.startActivityForResult(Intent.createChooser(new Intent(Intent.ACTION_OPEN_DOCUMENT_TREE)
+                .addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION), null), Constants.REQUEST_CODE_GET_FOLDER);
+    }
+
+    /**
+     * Opens the system file picker to choose a folder to upload.
+     *
+     * @param activity Activity to start the Intent.
+     */
+    public static void getFolder(Activity activity, int resultCode, Intent data) {
+        if (resultCode != RESULT_OK || data == null || data.getData() == null) {
+            logWarning("resultCode: " + resultCode);
+            return;
+        }
+
+        Uri uri = data.getData();
+        activity.getContentResolver().takePersistableUriPermission(uri, Intent.FLAG_GRANT_READ_URI_PERMISSION);
+        activity.startActivityForResult(new Intent(activity, UploadFolderActivity.class)
+                .setData(uri), Constants.REQUEST_CODE_GET_FOLDER_CONTENT);
     }
 
     /** The method is to return sdcard root of the file

@@ -702,6 +702,10 @@
             android:launchMode="singleTop">
         </activity>
 
+        <activity
+            android:name="mega.privacy.android.app.upload.UploadFolderActivity"
+            android:launchMode="singleTop"/>
+
     </application>
 
 </manifest>

@@ -3499,7 +3499,7 @@ public class ChatActivityLollipop extends PasscodeActivity
         else if (requestCode == REQUEST_CODE_SELECT_FILE && resultCode == RESULT_OK) {
             nodeAttacher.handleSelectFileResult(intent, idChat, this, this);
         }
-        else if (requestCode == REQUEST_CODE_GET && resultCode == RESULT_OK) {
+        else if (requestCode == REQUEST_CODE_GET_FILES && resultCode == RESULT_OK) {
             if (intent == null) {
                 logWarning("Return.....");
                 return;
@@ -4190,7 +4190,7 @@ public class ChatActivityLollipop extends PasscodeActivity
         intent.putExtra(FROM_MEGA_APP, true);
         intent.setType("*/*");
 
-        startActivityForResult(Intent.createChooser(intent, null), REQUEST_CODE_GET);
+        startActivityForResult(Intent.createChooser(intent, null), REQUEST_CODE_GET_FILES);
     }
 
     public void sendMessage(String text){

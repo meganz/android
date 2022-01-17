@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <data>
+
+        <import type="mega.privacy.android.app.utils.Constants" />
+
+        <variable
+            name="viewModel"
+            type="mega.privacy.android.app.upload.UploadFolderViewModel" />
+
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <com.google.android.material.appbar.MaterialToolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:minHeight="?attr/actionBarSize"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <include
+            android:id="@+id/empty_view"
+            layout="@layout/empty_result_files"
+            app:showHint="@{viewModel.items.empty}" />
+
+        <mega.privacy.android.app.components.NewGridRecyclerView
+            android:id="@+id/list"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:columnWidth="@dimen/grid_node_item_width"
+            android:paddingBottom="@dimen/grid_node_list_padding_bottom"
+            app:items="@{viewModel.items}"
+            app:layout_constraintBottom_toTopOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/toolbar"
+            app:visibleGone="@{!viewModel.items.empty}" />
+
+        <mega.privacy.android.app.components.scrollBar.FastScroller
+            android:id="@+id/fastscroll"
+            android:layout_width="wrap_content"
+            android:layout_height="0dp"
+            android:orientation="vertical"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/toolbar"
+            app:layout_constraintTop_toTopOf="parent"
+            app:visibleGone="@{viewModel.items.size() > Constants.MIN_ITEMS_SCROLLBAR}" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</layout>
