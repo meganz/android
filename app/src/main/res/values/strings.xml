@@ -127,7 +127,7 @@
     <!-- Menu item to change from grid view to list view -->
     <string name="action_list">List view</string>
     <!-- Title of the preference Recovery key on Settings section -->
-    <string name="action_export_master_key">Backup Recovery Key</string>
+    <string name="action_export_master_key">Back up Recovery Key</string>
     <!-- Menu item to let the user cancel subscriptions -->
     <string name="action_cancel_subscriptions">Cancel subscription</string>
     <!-- success message when the subscription has been canceled correctly -->
@@ -992,7 +992,7 @@
     <!-- Confirmation message when disabling logs in the app -->
     <string name="settings_disable_logs">Logs are now disabled</string>
     <!-- Snackbar error message triggered by host error when user is trying to setup MEGA Camera Uploads folder in settings page -->
-    <string name="error_unable_to_setup_cloud_folder">Unable to setup MEGA Camera Uploads folder</string>
+    <string name="error_unable_to_setup_cloud_folder">Unable to set up MEGA Camera Uploads folder</string>
     <!-- Option in the sliding panel to open the folder which contains the file selected after performing a search -->
     <string name="search_open_location">Open location</string>
     <!-- message when a temporary error on logging in is due to SDK is waiting for the server to complete a request due to an API lock -->
@@ -1010,7 +1010,7 @@
     <!-- Type of account info added to the feedback email sent to support -->
     <string name="my_account_prolite_feedback_email">Pro Lite Account</string>
     <!--  -->
-    <string name="backup_title">Backup your Recovery Key</string>
+    <string name="backup_title">Back up your Recovery Key</string>
     <!-- Subtitle of the screen to backup the master key -->
     <string name="backup_subtitle">Your password unlocks your Recovery Key</string>
     <!-- First paragraph of the screen to backup the master key -->
@@ -1198,11 +1198,11 @@
     <!-- Error message shown when opening a folder link which doesn’t exist -->
     <string name="general_error_folder_not_found">Folder link unavailable</string>
     <!-- Error message shown when opening a folder link which has been removed due to ToS/AUP violation -->
-    <string name="folder_link_unavaible_ToS_violation">The folder link has been removed because of a ToS/AUP violation.</string>
+    <string name="folder_link_unavaible_ToS_violation">The folder link has been removed because of a ToS or AUP violation.</string>
     <!-- Error message shown when opening a file link which doesn’t exist -->
     <string name="general_error_file_not_found">File link unavailable</string>
     <!-- Error message shown when opening a file link which has been removed due to ToS/AUP violation -->
-    <string name="file_link_unavaible_ToS_violation">The file link has been removed because of a ToS/AUP violation.</string>
+    <string name="file_link_unavaible_ToS_violation">The file link has been removed because of a ToS or AUP violation.</string>
     <!-- Error message shown when opening a folder link or file link which has been corrupt or deformed -->
     <string name="link_broken">This URL is corrupt or deformed. The link you are trying to access does not exist.</string>
     <!-- Title of the screen after creating the account. That screen asks the user to confirm the account by checking the email -->
@@ -1704,9 +1704,9 @@
     <!-- text_copyright_alert_title -->
     <string name="copyright_alert_title">Copyright warning to all users</string>
     <!-- text_copyright_alert_first_paragraph -->
-    <string name="copyright_alert_first_paragraph">MEGA respects the copyrights of others and requires that users of the MEGA cloud service comply with the laws of copyright.</string>
+    <string name="copyright_alert_first_paragraph">MEGA respects the copyrights of others and requires that users of the MEGA Cloud service comply with the laws of copyright.</string>
     <!-- text_copyright_alert_second_paragraph -->
-    <string name="copyright_alert_second_paragraph">You are strictly prohibited from using the MEGA cloud service to infringe copyrights. You may not upload, download, store, share, display, stream, distribute, email, link to, transmit or otherwise make available any files, data or content that infringes any copyright or other proprietary rights of any person or entity.</string>
+    <string name="copyright_alert_second_paragraph">You are strictly prohibited from using the MEGA Cloud service to infringe copyrights. You may not upload, download, store, share, display, stream, distribute, email, link to, transmit or otherwise make available any files, data or content that infringes any copyright or other proprietary rights of any person or entity.</string>
     <!-- text of the Agree button -->
     <string name="copyright_alert_agree_button">Agree</string>
     <!-- text of the Disagree button -->
@@ -1770,8 +1770,6 @@
     <string name="attachment_upload_panel_from_cloud">From Cloud Drive</string>
     <!--  -->
     <string name="attachment_upload_panel_contact">Contact</string>
-    <!--  -->
-    <string name="attachment_upload_panel_photo">From device</string>
     <!-- Button and title of dialog shown when the user wants to delete permanently their account. -->
     <string name="delete_account">Delete account</string>
     <!-- Text shown in the alert dialog to confirm the deletion of an account -->
@@ -1909,13 +1907,13 @@
     <!-- Error shown when the user writes a email with an incorrect format -->
     <string name="invalid_email_to_invite">Email is malformed</string>
     <!-- info paragraph about the achievement install megasync -->
-    <string name="paragraph_info_achievement_install_desktop">When you install MEGA desktop app you get %1$s of complimentary storage space, valid for 365 days. MEGA desktop app is available for Windows, macOS and most Linux distros.</string>
+    <string name="paragraph_info_achievement_install_desktop">When you install the MEGA Desktop App you get %1$s of complimentary storage space, valid for 365 days. The MEGA Desktop App is available for Windows, macOS and most Linux distributions.</string>
     <!-- info paragraph about the achievement install mobile app -->
     <string name="paragraph_info_achievement_install_mobile_app">When you install the MEGA Mobile App you get %1$s of complimentary storage space, valid for 365 days. We provide mobile apps for iOS and Android.</string>
     <!-- info paragraph about the achievement ‘add phone number’. Placeholder 1: bonus storage space e.g. 20GB. Placeholder 2: bonus transfer quota e.g. 50GB -->
     <string name="paragraph_info_achievement_add_phone">When you verify your phone number you get %1$s of complimentary storage space, valid for 365 days.</string>
     <!-- info paragraph about the completed achievement install megasync -->
-    <string name="result_paragraph_info_achievement_install_desktop">You have received %1$s storage space for installing our MEGA desktop app.</string>
+    <string name="result_paragraph_info_achievement_install_desktop">You have received %1$s storage space for installing our MEGA Desktop App.</string>
     <!-- info paragraph about the completed achievement install mobile app -->
     <string name="result_paragraph_info_achievement_install_mobile_app">You have received %1$s storage space for installing the MEGA Mobile App.</string>
     <!-- info paragraph about the completed achievement of ‘add phone number’. Placeholder 1: bonus storage space e.g. 20GB. Placeholder 2: bonus transfer quota e.g. 50GB -->
@@ -2178,7 +2176,7 @@
     <!-- Message error shown when trying to log in on an account has been suspended due to multiple breaches of Terms of Service -->
     <string name="account_suspended_multiple_breaches_ToS">Your account has been suspended due to multiple breaches of MEGA’s Terms of Service. Please check your email inbox.</string>
     <!-- Message error shown when trying to log in on an account has been suspended due to breach of Terms of Service -->
-    <string name="account_suspended_breache_ToS">Your account was terminated due to a breach of MEGA’s Terms of Service including, but not limited to, clause 15.</string>
+    <string name="account_suspended_breache_ToS">Your account was terminated due to a breach of MEGA\’s Terms of Service including, but not limited to, clause 15.</string>
     <!-- In a chat conversation when you try to send device’s images but images are still loading -->
     <string name="file_storage_loading">Loading files</string>
     <!-- In a chat conversation when you try to send device’s images but there aren’t available images -->
@@ -2312,7 +2310,7 @@
     <!-- Message shown to the user when is testing her password and it is correct -->
     <string name="test_pwd_accepted">Password accepted</string>
     <!-- Message shown to the user when is testing her password and it is wrong -->
-    <string name="test_pwd_wrong">Wrong password.\nBackup your Recovery Key as soon as possible!</string>
+    <string name="test_pwd_wrong">Wrong password.\nBack up your Recovery Key as soon as possible!</string>
     <!-- Text of the dialog ‘Recovery Key exported’ when the user wants logout -->
     <string name="recovery_key_exported_dialog_text_logout">You are about to log out, please test your password to ensure you remember it.\nIf you lose your password, you will lose access to your MEGA data.</string>
     <!-- Option that permits user copy to clipboard -->
@@ -2356,7 +2354,7 @@
     <!-- Title of the category Security options on Settings section -->
     <string name="settings_security_options_title">Security</string>
     <!-- Title of the preference Recovery key on Settings section -->
-    <string name="settings_recovery_key_title">Backup Recovery Key</string>
+    <string name="settings_recovery_key_title">Back up Recovery Key</string>
     <!-- Summary of the preference Recovery key on Settings section -->
     <string name="settings_recovery_key_summary">Exporting the Recovery Key and keeping it in a secure location enables you to set a new password without data loss.</string>
     <!-- message when a temporary error on logging in is due to connectivity issues -->
@@ -2435,7 +2433,7 @@
     <!-- Text that explain how to do with Two-Factor Authentication QR -->
     <string name="explain_qr_seed_2fa_1">Scan or copy the seed to your Authenticator App.</string>
     <!-- Text that explain how to do with Two-Factor Authentication seed -->
-    <string name="explain_qr_seed_2fa_2">Be sure to backup this seed to a safe place in case you lose your device.</string>
+    <string name="explain_qr_seed_2fa_2">Be sure to back up this seed to a safe place in case you lose your device.</string>
     <!-- Text that explain how to confirm Two-Factor Authentication -->
     <string name="explain_confirm_2fa">Please enter the 6-digit code generated by your Authenticator App.</string>
     <!-- Text button -->
@@ -2833,7 +2831,7 @@
     <!-- option to dispute taken down file or folder -->
     <string name="dispute_takendown_file">Dispute Takedown</string>
     <!-- Error shown when download a file that has violated ToS/AUP. -->
-    <string name="error_download_takendown_node">Not accessible due to ToS/AUP violation</string>
+    <string name="error_download_takendown_node">Not accessible due to ToS or AUP violation</string>
     <!-- Alert shown when some files were not downloaded due to ToS/AUP violation, Plural of taken down files. 2 files -->
     <plurals name="alert_taken_down_files">
         <item quantity="one">%d file was not downloaded due to ToS/AUP violation.</item>
@@ -2973,7 +2971,7 @@
     <!-- Text of the empty screen for the notifications section -->
     <string name="context_empty_notifications">[B]No [/B][A]Notifications[/A]</string>
     <!-- Permissions screen title -->
-    <string name="general_setup_mega">Setup MEGA</string>
+    <string name="general_setup_mega">Set up MEGA</string>
     <!-- Permissions screen explanation -->
     <string name="setup_mega_explanation">MEGA needs your permission to access your media and files for sharing. Other access permissions may be needed for exchanging encrypted messages and to make secure calls.</string>
     <!-- Title of the screen asking permissions for files -->
@@ -3826,7 +3824,7 @@
     <!-- Text of the empty screen when there are no elements in Photos -->
     <string name="photos_empty">[B]No[/B] [A]Photos[/A] [B]Found[/B]</string>
     <!-- Text to show as subtitle of Enable camera uploads screen -->
-    <string name="enable_cu_subtitle">Automatically backup your photos and videos to your Cloud Drive.</string>
+    <string name="enable_cu_subtitle">Automatically back up your photos and videos to your Cloud Drive.</string>
     <!-- Text of a button on Camera Uploads section to show all the content of the section-->
     <string name="all_view_button">All</string>
     <!-- Text of a button on Camera Uploads section to show the content of the section organized by days-->
@@ -3969,7 +3967,7 @@
     <!-- Item menu option upon right click on meeting. -->
     <string name="context_meeting">Meeting</string>
     <!-- Menu option that allows the user to start/join meeting. -->
-    <string name="start_join_meeting">Start/Join meeting</string>
+    <string name="start_join_meeting">Start or Join meeting</string>
     <!-- Label that create a meeting -->
     <string name="new_meeting">New meeting</string>
     <!-- Label that join a meeting -->
@@ -4150,4 +4148,8 @@
     <string name="contact_already_invited">%1$s previously invited.</string>
     <!-- Warning shown informing the contact request has been sent and can be managed in sent requests section. -->
     <string name="contact_invited">Invite sent successfully. See sent requests.</string>
+    <!-- Action button to upload files. -->
+    <string name="upload_files">Upload files</string>
+    <!-- Action button to upload a folder. -->
+    <string name="upload_folder">Upload folder</string>
 </resources>

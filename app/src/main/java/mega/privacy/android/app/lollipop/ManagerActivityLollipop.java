@@ -6588,8 +6588,13 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 	}
 
 	@Override
-	public void uploadFromDevice() {
+	public void uploadFiles() {
 		chooseFromDevice(this);
+	}
+
+	@Override
+	public void uploadFolder() {
+
 	}
 
 	@Override

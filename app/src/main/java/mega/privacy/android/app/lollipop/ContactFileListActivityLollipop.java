@@ -198,8 +198,13 @@ public class ContactFileListActivityLollipop extends PasscodeActivity
 	}
 
 	@Override
-	public void uploadFromDevice() {
+	public void uploadFiles() {
 		chooseFromDevice(this);
+	}
+
+	@Override
+	public void uploadFolder() {
+
 	}
 
 	@Override
