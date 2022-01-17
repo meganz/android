@@ -18,6 +18,12 @@ static def shouldSkip(title) {
     return true
 }
 
+/**
+ * Detect if there is SDK_BRANCH specified in MR Description.
+ * If yes, parse and assign the value to SDK_BRANCH, so later we
+ * can checkout wanted branch in SDK.
+ * If no, assign 'develop' to variable SDK_BRANCH.
+ */
 def getSDKBranch() {
     def description = env.GITLAB_OA_DESCRIPTION
     String[] lines = description.split("\n");
@@ -30,13 +36,18 @@ def getSDKBranch() {
             String value = line.substring(KEY.length());
             if (!value.isEmpty()) {
                 SDK_BRANCH = value;
-                return value;
             }
         }
     }
-    return "";
+    SDK_BRANCH = 'develop'
 }
 
+/**
+ * Detect if there is SDK_BRANCH specified in MR Description.
+ * If yes, parse and assign the value to MEGACHAT_BRANCH, so later we
+ * can checkout wanted branch in SDK.
+ * If no, assign 'develop' to variable MEGACHAT_BRANCH.
+ */
 def getMEGAchatBranch() {
     def description = env.GITLAB_OA_DESCRIPTION
     String[] lines = description.split("\n");
@@ -49,12 +60,11 @@ def getMEGAchatBranch() {
             String value = line.substring(KEY.length());
             if (!value.isEmpty()) {
                 MEGACHAT_BRANCH = value;
-                return value;
             }
 
         }
     }
-    return "";
+    MEGACHAT_BRANCH = 'develop'
 
 }
 
@@ -63,7 +73,8 @@ pipeline {
     options {
         // Stop the build early in case of compile or test failures
         skipStagesAfterUnstable()
-        timeout(time: 2, unit: 'HOURS')
+        buildDiscarder(logRotator(numToKeepStr: '3', artifactNumToKeepStr: '1'))
+        timeout(time: 1, unit: 'HOURS')
         gitLabConnection('GitLabConnection')
     }
     environment {
