@@ -94,4 +94,5 @@ ext {
     fragmentTestingVersion = '1.3.2'
     preferenceVersion ='1.1.1'
     coroutineTestVersion = '1.6.0'
+    turbineVersion = '0.7.0'
 }

@@ -288,7 +288,7 @@ dependencies {
     testImplementation "com.google.dagger:hilt-android-testing:$hiltVersion"
     testImplementation "org.jetbrains.kotlinx:kotlinx-coroutines-test:$coroutineTestVersion"
     testImplementation "org.jetbrains.kotlin:kotlin-test:$kotlinVersion"
-    testImplementation 'app.cash.turbine:turbine:0.7.0'
+    testImplementation "app.cash.turbine:turbine:$turbineVersion"
 
     androidTestImplementation "androidx.test.ext:junit:$androidxTestExtVersion"
     androidTestImplementation "com.google.truth:truth:$truthVersion"
