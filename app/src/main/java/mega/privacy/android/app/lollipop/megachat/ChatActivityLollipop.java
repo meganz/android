@@ -353,7 +353,7 @@ public class ChatActivityLollipop extends PasscodeActivity
     private AlertDialog dialogCall;
 
     private RelativeLayout editMsgLayout;
-    private ImageButton cancelEdit;
+    private RelativeLayout cancelEdit;
     private EmojiTextView editMsgText;
 
     AlertDialog dialog;
@@ -569,6 +569,7 @@ public class ChatActivityLollipop extends PasscodeActivity
      * Current contact online status.
      */
     private int contactOnlineStatus;
+    private int emoji_icon;
 
     @Override
     public void storedUnhandledData(ArrayList<AndroidMegaChatMessage> preservedData) {
@@ -1198,7 +1199,7 @@ public class ChatActivityLollipop extends PasscodeActivity
         cancelEdit.setOnClickListener(this);
         hideEditMsgLayout();
 
-        expandCollapseInputTextIcon.setOnClickListener(this);
+        expandCollapseInputTextLayout.setOnClickListener(this);
         expandCollapseInputTextLayout.setVisibility(View.GONE);
 
         emptyLayout = findViewById(R.id.empty_messages_layout);
@@ -1554,9 +1555,9 @@ public class ChatActivityLollipop extends PasscodeActivity
     }
 
     private void showLetterKB() {
-        if(emojiKeyboard == null || emojiKeyboard.getLetterKeyboardShown())
+        if(emojiKeyboard == null || emojiKeyboard.getLetterKeyboardShown()){
             return;
-
+        }
         emojiKeyboard.showLetterKeyboard();
     }
 
@@ -1753,7 +1754,7 @@ public class ChatActivityLollipop extends PasscodeActivity
         collapseInputText();
         sendIcon.setVisibility(View.GONE);
         sendIcon.setEnabled(false);
-        keyboardTwemojiButton.setImageResource(R.drawable.ic_emoji_unchecked);
+        emojiKeyboard.changeKeyboardIcon();
         sendIcon.setImageDrawable(ColorUtils.tintIcon(chatActivity, R.drawable.ic_send_white, R.color.grey_054_white_054));
 
         if (chatRoom != null) {
@@ -2946,7 +2947,7 @@ public class ChatActivityLollipop extends PasscodeActivity
         disableButton(rLPickAttachButton, pickAttachButton);
         disableButton(rLPickFileStorageButton, pickFileStorageButton);
         disableButton(rlGifButton, gifButton);
-        keyboardTwemojiButton.setImageResource(R.drawable.ic_emoji_unchecked);
+        emojiKeyboard.changeKeyboardIcon();
     }
 
     private void disableButton(final RelativeLayout layout, final  ImageButton button){
@@ -2994,7 +2995,7 @@ public class ChatActivityLollipop extends PasscodeActivity
         textChat.setHint(" ");
         setSizeInputText(false);
         sendIcon.setVisibility(View.VISIBLE);
-        keyboardTwemojiButton.setImageResource(R.drawable.ic_emoji_checked);
+        emojiKeyboard.changeKeyboardIcon();
         currentRecordButtonState = 0;
         recordLayout.setVisibility(View.GONE);
         recordButtonLayout.setVisibility(View.GONE);
@@ -3008,7 +3009,7 @@ public class ChatActivityLollipop extends PasscodeActivity
             showSendIcon();
         } else {
             recordButtonLayout.setBackground(null);
-            keyboardTwemojiButton.setImageResource(R.drawable.ic_emoji_unchecked);
+            emojiKeyboard.changeKeyboardIcon();
             sendIcon.setVisibility(View.GONE);
             recordButton.setVisibility(View.VISIBLE);
 
@@ -3946,7 +3947,7 @@ public class ChatActivityLollipop extends PasscodeActivity
                 }
                 break;
 
-            case R.id.expand_input_text_icon:
+            case R.id.expand_input_text_rl:
                 isInputTextExpanded = !isInputTextExpanded;
                 checkExpandOrCollapseInputText();
                 break;
@@ -3982,8 +3983,9 @@ public class ChatActivityLollipop extends PasscodeActivity
                 refreshTextInput();
                 break;
 
+            case R.id.emoji_rl:
             case R.id.emoji_icon:
-                logDebug("keyboard_icon_chat");
+                logDebug("Emoji icon clicked");
                 if(emojiKeyboard==null) break;
                 changeKeyboard(keyboardTwemojiButton);
                 break;
@@ -4084,11 +4086,8 @@ public class ChatActivityLollipop extends PasscodeActivity
                 !emojiKeyboard.getEmojiKeyboardShown()) {
             if(emojiKeyboard.getLetterKeyboardShown()){
                 emojiKeyboard.hideLetterKeyboard();
-                handlerKeyboard.postDelayed(new Runnable() {
-                    @Override
-                    public void run() {
-                        emojiKeyboard.showEmojiKeyboard();
-                    }
+                handlerKeyboard.postDelayed(() -> {
+                    emojiKeyboard.showEmojiKeyboard();
                 },250);
             }else{
                 emojiKeyboard.showEmojiKeyboard();

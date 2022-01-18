@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/write_and_options_layout"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
@@ -42,97 +43,113 @@
             android:paddingStart="12dp"
             android:paddingEnd="10dp">
 
-                <LinearLayout
-                    android:layout_width="0dp"
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical"
+                tools:ignore="NestedWeights">
+
+                <RelativeLayout
+                    android:id="@+id/edit_msg_layout"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:orientation="vertical">
+                    android:layout_marginBottom="12dp"
+                    android:gravity="center_vertical"
+                    android:paddingStart="0dp"
+                    android:paddingTop="10dp"
+                    android:paddingEnd="14dp">
+
+                    <View
+                        android:id="@+id/edit_icon"
+                        android:layout_width="2dp"
+                        android:layout_height="31dp"
+                        android:layout_marginEnd="6dp"
+                        android:background="@color/teal_200"
+                        android:textAppearance="@style/TextAppearance.Mega.Caption.Secondary.Variant" />
 
                     <RelativeLayout
-                        android:id="@+id/edit_msg_layout"
-                        android:layout_width="match_parent"
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginBottom="12dp"
-                        android:gravity="center_vertical"
-                        android:paddingTop="10dp"
-                        android:paddingEnd="14dp">
+                        android:layout_toEndOf="@id/edit_icon">
 
-                        <View
-                            android:id="@+id/edit_icon"
-                            android:layout_width="2dp"
-                            android:layout_height="31dp"
-                            android:layout_marginEnd="6dp"
-                            android:background="@color/teal_200"
-                            android:textAppearance="@style/TextAppearance.Mega.Caption.Secondary.Variant" />
-
-                        <RelativeLayout
+                        <TextView
+                            android:id="@+id/edit_msg_title"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_toEndOf="@id/edit_icon">
+                            android:fontFamily="sans-serif-medium"
+                            android:text="@string/edit_chat_message"
+                            android:textColor="@color/teal_200"
+                            android:textSize="12sp" />
 
-                            <TextView
-                                android:id="@+id/edit_msg_title"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:fontFamily="sans-serif-medium"
-                                android:text="@string/edited_message_text"
-                                android:textColor="@color/teal_200"
-                                android:textSize="12sp" />
-
-                            <mega.privacy.android.app.components.twemoji.EmojiTextView
-                                android:id="@+id/edit_msg_text"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_below="@id/edit_msg_title"
-                                android:fontFamily="sans-serif"
-                                android:ellipsize="end"
-                                android:singleLine="true"
-                                android:textAppearance="@style/TextAppearance.Mega.Caption.Secondary.Variant"
-                                android:textSize="13sp" />
-                        </RelativeLayout>
+                        <mega.privacy.android.app.components.twemoji.EmojiTextView
+                            android:id="@+id/edit_msg_text"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_below="@id/edit_msg_title"
+                            android:ellipsize="end"
+                            android:fontFamily="sans-serif"
+                            android:singleLine="true"
+                            android:textAppearance="@style/TextAppearance.Mega.Caption.Secondary.Variant"
+                            android:textSize="13sp" />
                     </RelativeLayout>
+                </RelativeLayout>
 
-                    <mega.privacy.android.app.components.twemoji.EmojiEditText
-                        android:id="@+id/input_text_chat"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="start|top"
-                        android:background="@null"
-                        android:gravity="start"
-                        android:inputType="textMultiLine|textCapSentences"
-                        android:maxLines="5"
-                        android:minHeight="38dp"
-                        android:paddingTop="10dp"
-                        android:paddingBottom="8dp"
-                        android:textAppearance="@style/TextAppearance.Mega.Caption.Secondary.Variant"
-                        android:textSize="14sp"
-                        app:emojiSize="18sp" />
-                </LinearLayout>
+                <mega.privacy.android.app.components.twemoji.EmojiEditText
+                    android:id="@+id/input_text_chat"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="start|top"
+                    android:background="@null"
+                    android:gravity="start"
+                    android:inputType="textMultiLine|textCapSentences"
+                    android:maxLines="5"
+                    android:minHeight="38dp"
+                    android:paddingTop="10dp"
+                    android:paddingBottom="8dp"
+                    android:textAppearance="@style/TextAppearance.Mega.Caption.Secondary.Variant"
+                    android:textSize="14sp"
+                    app:emojiSize="18sp"
+                    tools:ignore="SpeakableTextPresentCheck,TouchTargetSizeCheck" />
+            </LinearLayout>
 
             <RelativeLayout
-                android:id="@+id/emoji_rl"
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
-                android:gravity="end"
-                android:paddingBottom="8dp">
+                android:gravity="end">
 
-                <ImageButton
+                <RelativeLayout
                     android:id="@+id/cancel_edit"
-                    android:layout_width="12dp"
-                    android:layout_height="12dp"
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
                     android:layout_alignParentTop="true"
-                    android:layout_centerHorizontal="true"
-                    android:layout_marginTop="12dp"
-                    android:background="@null"
-                    android:src="@drawable/ic_remove_chat_toolbar" />
+                    android:layout_centerHorizontal="true">
 
-                <ImageButton
-                    android:id="@+id/emoji_icon"
-                    android:layout_width="24dp"
-                    android:layout_height="24dp"
-                    android:layout_alignParentBottom="true"
-                    android:background="@null"
-                    android:src="@drawable/ic_emoji_unchecked" />
+                    <ImageButton
+                        android:layout_width="12dp"
+                        android:layout_height="12dp"
+                        android:layout_centerInParent="true"
+                        android:background="@null"
+                        android:src="@drawable/ic_remove_chat_toolbar"
+                        tools:ignore="SpeakableTextPresentCheck" />
+                </RelativeLayout>
+
+                <RelativeLayout
+                    android:id="@+id/emoji_rl"
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
+                    android:layout_alignParentBottom="true">
+
+                    <ImageButton
+                        android:id="@+id/emoji_icon"
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
+                        android:layout_centerInParent="true"
+                        android:background="@null"
+                        android:src="@drawable/ic_emoji_unchecked"
+                        tools:ignore="SpeakableTextPresentCheck" />
+                </RelativeLayout>
+
             </RelativeLayout>
         </LinearLayout>
 
@@ -154,7 +171,8 @@
                     android:layout_height="24dp"
                     android:background="@null"
                     android:src="@drawable/ic_expand_text_input"
-                    android:visibility="visible" />
+                    android:visibility="visible"
+                    tools:ignore="SpeakableTextPresentCheck,TouchTargetSizeCheck" />
             </RelativeLayout>
 
             <RelativeLayout

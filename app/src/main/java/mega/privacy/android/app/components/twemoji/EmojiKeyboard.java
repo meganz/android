@@ -2,12 +2,16 @@ package mega.privacy.android.app.components.twemoji;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.res.ColorStateList;
 import android.content.res.TypedArray;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
+import androidx.core.content.ContextCompat;
+import androidx.core.widget.ImageViewCompat;
+
 import android.util.AttributeSet;
 import android.util.DisplayMetrics;
 import android.view.View;
@@ -153,7 +157,7 @@ public class EmojiKeyboard extends LinearLayout {
         if (imm == null) return;
         imm.showSoftInput(view, 0, null);
         isLetterKeyboardShown = true;
-        changeKeyboardIcon(false);
+        changeKeyboardIcon();
         needToReplace();
     }
 
@@ -163,7 +167,7 @@ public class EmojiKeyboard extends LinearLayout {
         hideLetterKeyboard();
         setVisibility(VISIBLE);
         isEmojiKeyboardShown = true;
-        changeKeyboardIcon(true);
+        changeKeyboardIcon();
         if (editInterface instanceof View) {
             View view = (View) editInterface;
             view.setFocusableInTouchMode(true);
@@ -178,7 +182,7 @@ public class EmojiKeyboard extends LinearLayout {
         logDebug("hideBothKeyboard()");
         hideEmojiKeyboard();
         hideLetterKeyboard();
-        changeKeyboardIcon(false);
+        changeKeyboardIcon();
     }
 
     public void hideLetterKeyboard() {
@@ -196,19 +200,40 @@ public class EmojiKeyboard extends LinearLayout {
     public void hideKeyboardFromFileStorage(){
         hideEmojiKeyboard();
         hideLetterKeyboard();
-        changeKeyboardIcon(true);
+        changeKeyboardIcon();
     }
 
-    public void changeKeyboardIcon(boolean isKeyboard){
+    /**
+     * Method to check if the icon is the same in emojiIcon
+     *
+     * @param newIcon The new icon
+     * @return True if it's the same, false otherwise
+     */
+    private boolean isSameIcon(Drawable newIcon) {
+        Drawable currentDrawable = emojiIcon.getDrawable();
+        return areDrawablesIdentical(currentDrawable, newIcon);
+    }
+
+    /**
+     * Method controlling the change in the keyboard icon
+     */
+    public void changeKeyboardIcon() {
         Drawable drawable;
-        if (isKeyboard) {
-            drawable = getResources().getDrawable(R.drawable.ic_keyboard_white);
+        if (!isLetterKeyboardShown && isEmojiKeyboardShown) {
+            drawable = ContextCompat.getDrawable(getContext(), R.drawable.ic_keyboard_white);
+            if (!isSameIcon(drawable)) {
+                emojiIcon.setImageDrawable(drawable);
+            }
+            ImageViewCompat.setImageTintList(emojiIcon, ColorStateList.valueOf(ContextCompat.getColor(getContext(), editInterface.isTextEmpty() ? R.color.grey_alpha_020 : R.color.grey_alpha_060)));
         } else {
-            drawable = getResources().getDrawable(editInterface.isTextEmpty() ?
+            drawable = ContextCompat.getDrawable(getContext(), editInterface.isTextEmpty() ?
                     R.drawable.ic_emoji_unchecked :
                     R.drawable.ic_emoji_checked);
+            if (!isSameIcon(drawable)) {
+                ImageViewCompat.setImageTintList(emojiIcon, null);
+                emojiIcon.setImageDrawable(drawable);
+            }
         }
-        emojiIcon.setImageDrawable(drawable);
     }
 
     public void hideEmojiKeyboard() {
