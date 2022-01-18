@@ -18,10 +18,7 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
-import androidx.preference.Preference
-import androidx.preference.PreferenceCategory
-import androidx.preference.PreferenceFragmentCompat
-import androidx.preference.SwitchPreferenceCompat
+import androidx.preference.*
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.Snackbar
@@ -89,7 +86,7 @@ class SettingsFragment : Preference.OnPreferenceChangeListener,
 
 
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
-        addPreferencesFromResource(R.xml.preferences)
+        setPreferencesFromResource(R.xml.preferences, rootKey)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -133,7 +130,6 @@ class SettingsFragment : Preference.OnPreferenceChangeListener,
         }
     }
 
-
     /**
      * Update the Cancel Account settings.
      */
@@ -158,54 +154,35 @@ class SettingsFragment : Preference.OnPreferenceChangeListener,
         super.onViewCreated(view, savedInstanceState)
         LogUtil.logDebug("onViewCreated")
 
-        val managerActivityLollipop = requireActivity() as SettingsActivity
-        when {
-            managerActivityLollipop.openSettingsStorage -> {
-                goToCategoryStorage()
-            }
-            managerActivityLollipop.openSettingsQR -> {
-                goToCategoryQR()
-            }
-            managerActivityLollipop.openSettingsStartScreen -> {
-                goToSectionStartScreen()
-            }
-        }
-        listView.addOnScrollListener(object : RecyclerView.OnScrollListener() {
-            override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
-                super.onScrolled(recyclerView, dx, dy)
-                checkScroll()
-            }
-        })
+        navigateToInitialPreference()
 
         restoreEvaluateDialogState(savedInstanceState)
     }
 
-    override fun goToCategoryStorage() {
-        val storagePreference = findPreference<Preference>(KEY_STORAGE_FILE_MANAGEMENT)
-        scrollToPreference(storagePreference)
-        onPreferenceTreeClick(storagePreference)
+    private fun navigateToInitialPreference() {
+        val initial =
+            arguments?.getString(INITIAL_PREFERENCE)?.let {
+                findPreference<Preference>(it)
+            }
+
+        initial?.let {
+            scrollToPreference(it)
+            if (arguments?.getBoolean(NAVIGATE_TO_INITIAL_PREFERENCE, false) == true) {
+                onPreferenceTreeClick(it)
+            }
+        }
     }
 
-    override fun goToCategoryQR() {
-        scrollToPreference(findPreference<SwitchPreferenceCompat>(KEY_QR_CODE_AUTO_ACCEPT))
-    }
+    override fun goToCategoryStorage() {}
 
-    override fun goToSectionStartScreen() {
-        scrollToPreference(findPreference(KEY_START_SCREEN))
-        startActivity(Intent(context, StartScreenPreferencesActivity::class.java))
-        (activity as SettingsActivity).openSettingsStartScreen = false
-    }
+    override fun goToCategoryQR() {}
+
+    override fun goToSectionStartScreen() {}
 
     /**
      * Method for controlling whether or not to display the action bar elevation.
      */
-    override fun checkScroll() {
-        if (listView == null) {
-            return
-        }
-        (activity as SettingsActivity)
-            .changeAppBarElevation(listView.canScrollVertically(Constants.SCROLLING_UP_DIRECTION))
-    }
+    override fun checkScroll() {}
 
     private fun restoreEvaluateDialogState(savedInstanceState: Bundle?) {
         if (savedInstanceState != null) {
@@ -584,16 +561,7 @@ class SettingsFragment : Preference.OnPreferenceChangeListener,
         }
     }
 
-    /**
-     * Scroll to the beginning of Settings page.
-     * In this case, the beginning is category KEY_FEATURES.
-     *
-     *
-     * Note: If the first category changes, this method should be updated with the new one.
-     */
-    override fun goToFirstCategory() {
-        scrollToPreference(findPreference<PreferenceCategory>(KEY_FEATURES))
-    }
+    override fun goToFirstCategory() {}
 
 
     override fun reEnable2faSwitch() {}
@@ -617,6 +585,11 @@ class SettingsFragment : Preference.OnPreferenceChangeListener,
     override fun onDestroyView() {
         requireContext().unbindService(mediaServiceConnection)
         super.onDestroyView()
+    }
+
+    companion object {
+        internal const val INITIAL_PREFERENCE = "initial"
+        internal const val NAVIGATE_TO_INITIAL_PREFERENCE = "navigateToInitial"
     }
 
 }

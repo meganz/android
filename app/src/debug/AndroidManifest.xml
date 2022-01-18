@@ -99,6 +99,11 @@
             android:launchMode="singleTop" />
 
         <activity
+            android:name=".presentation.settings.SettingsActivity"
+            android:exported="false"
+            android:label="@string/action_settings" />
+
+        <activity
             android:name="mega.privacy.android.app.lollipop.ManagerActivityLollipop"
             android:label="@string/app_name"
             android:launchMode="singleTop"

@@ -354,7 +354,6 @@ import mega.privacy.android.app.modalbottomsheet.nodelabel.NodeLabelBottomSheetD
 import mega.privacy.android.app.myAccount.MyAccountActivity;
 import mega.privacy.android.app.myAccount.usecase.CheckPasswordReminderUseCase;
 import mega.privacy.android.app.objects.PasscodeManagement;
-import mega.privacy.android.app.presentation.settings.SettingsFragment;
 import mega.privacy.android.app.psa.Psa;
 import mega.privacy.android.app.psa.PsaManager;
 import mega.privacy.android.app.psa.PsaViewHolder;
@@ -4762,8 +4761,6 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 					}
 				} else {
 					if(SettingsFragmentRefactorToggle.INSTANCE.getEnabled()){
-						settingsFragment = new SettingsFragment();
-					}else {
 						settingsFragment = new SettingsFragmentLollipop();
 					}
 				}
@@ -5018,7 +5015,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
                 break;
             }
             case SETTINGS: {
-                if (getSettingsFragment() != null) {
+                if (getSettingsFragment() != null && SettingsFragmentRefactorToggle.INSTANCE.getEnabled() == false) {
                     settingsFragment.checkScroll();
                 }
                 break;
