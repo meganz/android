@@ -1,6 +1,7 @@
 package mega.privacy.android.app.imageviewer
 
 import android.app.Activity
+import android.net.Uri
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.map
@@ -33,6 +34,7 @@ import mega.privacy.android.app.utils.RxUtil.addTo
 import mega.privacy.android.app.utils.StringResourcesUtils.getQuantityString
 import mega.privacy.android.app.utils.StringResourcesUtils.getString
 import mega.privacy.android.app.utils.livedata.SingleLiveEvent
+import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 import nz.mega.sdk.MegaNode
 import javax.inject.Inject
 
@@ -107,6 +109,11 @@ class ImageViewerViewModel @Inject constructor(
             .subscribeAndUpdateImages()
     }
 
+    fun retrieveSingleImage(imageUri: Uri) {
+        getImageHandlesUseCase.get(imageUri = imageUri)
+            .subscribeAndUpdateImages()
+    }
+
     fun retrieveImagesFromParent(
         parentNodeHandle: Long,
         childOrder: Int? = null,
@@ -154,8 +161,10 @@ class ImageViewerViewModel @Inject constructor(
                 getNodeUseCase.getNodeItem(existingNode.nodeItem.node)
             existingNode?.isOffline == true ->
                 getNodeUseCase.getOfflineNodeItem(existingNode.handle)
-            else ->
+            existingNode?.handle != INVALID_HANDLE ->
                 getNodeUseCase.getNodeItem(nodeHandle)
+            else ->
+                return // Image file uri with no handle
         }
 
         subscription
@@ -193,8 +202,10 @@ class ImageViewerViewModel @Inject constructor(
                 getImageUseCase.getOffline(existingNode.handle)
             existingNode?.nodeItem?.node != null ->
                 getImageUseCase.get(existingNode.nodeItem.node, fullSize, highPriority)
-            else ->
+            existingNode?.handle != INVALID_HANDLE ->
                 getImageUseCase.get(nodeHandle, fullSize, highPriority)
+            else ->
+                return // Image file uri with no handle
         }
 
         subscription

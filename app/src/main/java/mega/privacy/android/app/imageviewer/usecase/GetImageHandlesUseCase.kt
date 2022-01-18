@@ -1,14 +1,19 @@
 package mega.privacy.android.app.imageviewer.usecase
 
 import android.content.Context
+import android.net.Uri
+import androidx.core.net.toFile
 import dagger.hilt.android.qualifiers.ApplicationContext
 import io.reactivex.rxjava3.core.Single
 import mega.privacy.android.app.di.MegaApi
 import mega.privacy.android.app.imageviewer.data.ImageItem
 import mega.privacy.android.app.usecase.GetChatMessageUseCase
 import mega.privacy.android.app.usecase.GetNodeUseCase
+import mega.privacy.android.app.usecase.data.MegaNodeItem
 import mega.privacy.android.app.utils.MegaNodeUtil.isValidForImageViewer
 import mega.privacy.android.app.utils.RxUtil.blockingGetOrNull
+import mega.privacy.android.app.utils.TextUtil
+import mega.privacy.android.app.utils.TimeUtils
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 import nz.mega.sdk.MegaApiJava.ORDER_PHOTO_ASC
@@ -28,6 +33,7 @@ class GetImageHandlesUseCase @Inject constructor(
     @MegaApi private val megaApi: MegaApiAndroid,
     private val getChatMessageUseCase: GetChatMessageUseCase,
     private val getNodeUseCase: GetNodeUseCase,
+    private val getImageUseCase: GetImageUseCase
 ) {
 
     /**
@@ -36,8 +42,9 @@ class GetImageHandlesUseCase @Inject constructor(
      * @param nodeHandles       Image node handles
      * @param parentNodeHandle  Parent node to retrieve every other child
      * @param nodeFileLinks     Node public link
-     * @param chatRoomId        Node Chat Message Room Id.
-     * @param chatMessageIds    Node Chat Message Ids.
+     * @param chatRoomId        Node Chat Message Room Id
+     * @param chatMessageIds    Node Chat Message Ids
+     * @param imageUri          Image file uri
      * @param sortOrder         Node search order
      * @param isOffline         Flag to check if it's offline node
      * @return                  Single with image nodes
@@ -48,6 +55,7 @@ class GetImageHandlesUseCase @Inject constructor(
         nodeFileLinks: List<String>? = null,
         chatRoomId: Long? = null,
         chatMessageIds: LongArray? = null,
+        imageUri: Uri? = null,
         sortOrder: Int? = ORDER_PHOTO_ASC,
         isOffline: Boolean = false
     ): Single<List<ImageItem>> =
@@ -73,6 +81,8 @@ class GetImageHandlesUseCase @Inject constructor(
                     items.addNodeFileLinks(nodeFileLinks)
                 chatRoomId != null && chatMessageIds?.isNotEmpty() == true ->
                     items.addChatChildren(chatRoomId, chatMessageIds)
+                imageUri != null ->
+                    items.addImageUri(imageUri)
                 else -> {
                     error("Invalid parameters")
                 }
@@ -153,6 +163,32 @@ class GetImageHandlesUseCase @Inject constructor(
             if (node?.isValidForImageViewer() == true) {
                 this.add(ImageItem(node.handle, chatRoomId = chatRoomId, chatMessageId = messageId))
             }
+        }
+    }
+
+    /**
+     * Add Image Uri to a list of ImageItem given its image file uri
+     *
+     * @param imageUri  Image file uri to retrieve image from
+     */
+    private fun MutableList<ImageItem>.addImageUri(imageUri: Uri) {
+        val file = imageUri.toFile()
+        if (file.exists()) {
+            val fileTime = TimeUtils.formatLongDateTime(file.lastModified())
+            val fileSize = file.length().toString()
+            val nodeItem = MegaNodeItem(
+                handle = INVALID_HANDLE,
+                name = file.name,
+                infoText = TextUtil.getFileInfo(fileSize, fileTime)
+            )
+
+            this.add(
+                ImageItem(
+                    INVALID_HANDLE,
+                    nodeItem = nodeItem,
+                    imageResult = getImageUseCase.getImageUri(imageUri).blockingFirst()
+                )
+            )
         }
     }
 }

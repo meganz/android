@@ -12,6 +12,7 @@ import androidx.activity.viewModels
 import androidx.appcompat.app.ActionBar
 import androidx.appcompat.app.AlertDialog
 import androidx.core.content.FileProvider
+import androidx.core.net.toUri
 import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -23,6 +24,7 @@ import mega.privacy.android.app.components.SimpleDividerItemDecoration
 import mega.privacy.android.app.components.dragger.DragToExitSupport
 import mega.privacy.android.app.components.dragger.DragToExitSupport.*
 import mega.privacy.android.app.databinding.ActivityZipBrowserBinding
+import mega.privacy.android.app.imageviewer.ImageViewerActivity
 import mega.privacy.android.app.lollipop.PdfViewerActivityLollipop
 import mega.privacy.android.app.textEditor.TextEditorActivity
 import mega.privacy.android.app.utils.*
@@ -255,26 +257,17 @@ class ZipBrowserActivity : PasscodeActivity() {
      */
     private fun imageFileOpen(position: Int, file: File) {
         logDebug("isImage")
-//        TODO Replace with new custom call
-//        val intent =
-//            Intent(this@ZipBrowserActivity, FullScreenImageViewerLollipop::class.java)
-//        intent.apply {
-//            putExtra(INTENT_EXTRA_KEY_POSITION, position)
-//            putExtra(INTENT_EXTRA_KEY_ADAPTER_TYPE, ZIP_ADAPTER)
-//            putExtra(INTENT_EXTRA_KEY_IS_FOLDER_LINK, false)
-//            putExtra(INTENT_EXTRA_KEY_PARENT_NODE_HANDLE, -1L)
-//            putExtra(INTENT_EXTRA_KEY_OFFLINE_PATH_DIRECTORY, file.absolutePath)
-//            putExtra(INTENT_EXTRA_KEY_ORDER_GET_CHILDREN, MegaApiJava.ORDER_DEFAULT_ASC)
-//        }
-//        DragToExitSupport.putThumbnailLocation(
-//            intent,
-//            recyclerView,
-//            position,
-//            VIEWER_FROM_ZIP_BROWSER,
-//            zipAdapter
-//        )
-//        startActivity(intent)
-//        overridePendingTransition(0, 0)
+
+        val intent = ImageViewerActivity.getIntentForSingleFile(this, file.toUri())
+        DragToExitSupport.putThumbnailLocation(
+            intent,
+            recyclerView,
+            position,
+            VIEWER_FROM_ZIP_BROWSER,
+            zipAdapter
+        )
+        startActivity(intent)
+        overridePendingTransition(0, 0)
     }
 
     /**

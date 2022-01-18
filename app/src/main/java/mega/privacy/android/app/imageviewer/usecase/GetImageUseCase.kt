@@ -1,6 +1,8 @@
 package mega.privacy.android.app.imageviewer.usecase
 
 import android.content.Context
+import android.net.Uri
+import androidx.core.net.toFile
 import androidx.core.net.toUri
 import dagger.hilt.android.qualifiers.ApplicationContext
 import io.reactivex.rxjava3.core.BackpressureStrategy
@@ -26,6 +28,7 @@ import mega.privacy.android.app.utils.OfflineUtils
 import mega.privacy.android.app.utils.RxUtil.blockingGetOrNull
 import nz.mega.sdk.*
 import nz.mega.sdk.MegaError.*
+import java.io.File
 import javax.inject.Inject
 
 /**
@@ -44,7 +47,7 @@ class GetImageUseCase @Inject constructor(
 ) {
 
     /**
-     * Get an image given a Node handle.
+     * Get an ImageResult given a Node handle.
      *
      * @param nodeHandle    Image Node handle to request.
      * @param fullSize      Flag to request full size image.
@@ -60,7 +63,7 @@ class GetImageUseCase @Inject constructor(
             .flatMapPublisher { node -> get(node, fullSize, highPriority) }
 
     /**
-     * Get an image given a Node file link.
+     * Get an ImageResult given a Node file link.
      *
      * @param nodeFileLink  Image Node file link.
      * @param fullSize      Flag to request full size image.
@@ -76,7 +79,7 @@ class GetImageUseCase @Inject constructor(
             .flatMapPublisher { node -> get(node, fullSize, highPriority) }
 
     /**
-     * Get an image given a Node Chat Room Id and Chat Message Id.
+     * Get an ImageResult given a Node Chat Room Id and Chat Message Id.
      *
      * @param chatRoomId        Chat Message Room Id
      * @param chatMessageId     Chat Message Id
@@ -94,7 +97,7 @@ class GetImageUseCase @Inject constructor(
             .flatMapPublisher { node -> get(node, fullSize, highPriority) }
 
     /**
-     * Get an image given a Node.
+     * Get an ImageResult given a Node.
      *
      * @param node          Image Node to request.
      * @param fullSize      Flag to request full size image.
@@ -230,18 +233,7 @@ class GetImageUseCase @Inject constructor(
         }, BackpressureStrategy.LATEST)
 
     /**
-     * Reset MegaApi Total Downloads count to avoid counting background transfers.
-     */
-    private fun resetTotalDownloadsIfNeeded() {
-        val currentTransfers = megaApi.getNumPendingDownloadsNonBackground()
-        val isServiceRunning = TransfersManagement.isServiceRunning(DownloadService::class.java)
-        if (currentTransfers == 0 && !isServiceRunning) {
-            megaApi.resetTotalDownloads()
-        }
-    }
-
-    /**
-     * Get an offline image given a Node handle.
+     * Get an ImageResult given an offline node handle.
      *
      * @param nodeHandle    Image Node handle to request.
      * @return              Single with the ImageResult
@@ -266,4 +258,34 @@ class GetImageUseCase @Inject constructor(
                 }
             }
         }
+
+    /**
+     * Get an ImageResult given an Image file uri.
+     *
+     * @param imageUri      Image file uri
+     * @return              Single with the ImageResult
+     */
+    fun getImageUri(imageUri: Uri): Flowable<ImageResult> =
+        Flowable.fromCallable {
+            val file = imageUri.toFile()
+            if (file.exists()) {
+                ImageResult(
+                    fullSizeUri = file.toUri(),
+                    fullyLoaded = true
+                )
+            } else {
+                error("Image file doesn't exist")
+            }
+        }
+
+    /**
+     * Reset MegaApi Total Downloads count to avoid counting background transfers.
+     */
+    private fun resetTotalDownloadsIfNeeded() {
+        val currentTransfers = megaApi.getNumPendingDownloadsNonBackground()
+        val isServiceRunning = TransfersManagement.isServiceRunning(DownloadService::class.java)
+        if (currentTransfers == 0 && !isServiceRunning) {
+            megaApi.resetTotalDownloads()
+        }
+    }
 }

@@ -3,6 +3,7 @@ package mega.privacy.android.app.imageviewer
 import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
@@ -183,6 +184,22 @@ class ImageViewerActivity : BaseActivity(), PermissionRequester, SnackbarShower 
                 putExtra(INTENT_EXTRA_KEY_ARRAY_OFFLINE, childrenHandles)
                 putExtra(INTENT_EXTRA_KEY_HANDLE, currentNodeHandle)
             }
+
+        /**
+         * Get Image Viewer intent to show a single image file.
+         *
+         * @param context       Required to build the Intent.
+         * @param fileUri       Image file uri.
+         * @return              Image Viewer Intent.
+         */
+        @JvmStatic
+        fun getIntentForSingleFile(
+            context: Context,
+            fileUri: Uri
+        ): Intent =
+            Intent(context, ImageViewerActivity::class.java).apply {
+                putExtra(INTENT_EXTRA_KEY_URI, fileUri)
+            }
     }
 
     private val nodeHandle: Long? by extra(INTENT_EXTRA_KEY_HANDLE, INVALID_HANDLE)
@@ -194,6 +211,7 @@ class ImageViewerActivity : BaseActivity(), PermissionRequester, SnackbarShower 
     private val childOrder: Int? by extra(INTENT_EXTRA_KEY_ORDER_GET_CHILDREN)
     private val chatRoomId: Long? by extra(INTENT_EXTRA_KEY_CHAT_ID)
     private val chatMessagesId: LongArray? by extra(INTENT_EXTRA_KEY_MSG_ID)
+    private val imageFileUri: Uri? by extra(INTENT_EXTRA_KEY_URI)
 
     private val viewModel by viewModels<ImageViewerViewModel>()
     private val pagerAdapter by lazy { ImageViewerAdapter(this) }
@@ -305,6 +323,8 @@ class ImageViewerActivity : BaseActivity(), PermissionRequester, SnackbarShower 
                     viewModel.retrieveSingleImage(nodeFileLink!!)
                 nodeHandle != null && nodeHandle != INVALID_HANDLE ->
                     viewModel.retrieveSingleImage(nodeHandle!!)
+                imageFileUri != null ->
+                    viewModel.retrieveSingleImage(imageFileUri!!)
                 else ->
                     error("Invalid params")
             }
@@ -384,10 +404,11 @@ class ImageViewerActivity : BaseActivity(), PermissionRequester, SnackbarShower 
      */
     private fun showCurrentImageInfo(item: MegaNodeItem?) {
         if (item != null) {
-            val isOnline = isOnline()
-            val isExternal = item.node?.isPublic == true || item.node?.isForeign == true
             binding.txtTitle.text = item.name
             binding.toolbar.menu?.apply {
+                val isOnline = isOnline()
+                val isExternal = item.node?.isPublic == true || item.node?.isForeign == true
+
                 findItem(R.id.action_download)?.isVisible =
                     !item.isFromRubbishBin
 
@@ -400,10 +421,11 @@ class ImageViewerActivity : BaseActivity(), PermissionRequester, SnackbarShower 
                 findItem(R.id.action_send_to_chat)?.isVisible =
                     isOnline && !isExternal && item.node != null && !item.isFromRubbishBin && viewModel.isUserLoggedIn()
 
-                findItem(R.id.action_more)?.isVisible = true
+                findItem(R.id.action_more)?.isVisible =
+                    item.handle != INVALID_HANDLE
             }
         } else {
-            logWarning("Null image item")
+            logWarning("Null MegaNodeItem")
         }
     }
 

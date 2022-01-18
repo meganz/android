@@ -30,7 +30,7 @@ import mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil
 import mega.privacy.android.app.modalbottomsheet.nodelabel.NodeLabelBottomSheetDialogFragment
 import mega.privacy.android.app.utils.*
 import mega.privacy.android.app.utils.Constants.*
-import mega.privacy.android.app.utils.ExtraUtils.extraNotNull
+import mega.privacy.android.app.utils.ExtraUtils.extra
 import mega.privacy.android.app.utils.LogUtil.logWarning
 import mega.privacy.android.app.utils.MegaNodeUtil.getNodeLabelColor
 import mega.privacy.android.app.utils.MegaNodeUtil.getNodeLabelDrawable
@@ -54,24 +54,29 @@ class ImageBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
         /**
          * Main method to create a ImageBottomSheetDialogFragment.
          *
-         * @param imageNodeHandle       Image to show information about
-         * @return                      ImageBottomSheetDialogFragment to be shown
+         * @param nodeHandle    Image node to show information from
+         * @return              ImageBottomSheetDialogFragment to be shown
          */
-        fun newInstance(imageNodeHandle: Long): ImageBottomSheetDialogFragment =
+        fun newInstance(nodeHandle: Long): ImageBottomSheetDialogFragment =
             ImageBottomSheetDialogFragment().apply {
                 arguments = Bundle().apply {
-                    putLong(INTENT_EXTRA_KEY_HANDLE, imageNodeHandle)
+                    putLong(INTENT_EXTRA_KEY_HANDLE, nodeHandle)
                 }
             }
     }
 
     private val viewModel by viewModels<ImageViewerViewModel>({ requireActivity() })
-    private val imageNodeHandle by extraNotNull(INTENT_EXTRA_KEY_HANDLE, INVALID_HANDLE)
+    private val nodeHandle: Long? by extra(INTENT_EXTRA_KEY_HANDLE)
 
     private lateinit var binding: BottomSheetImageOptionsBinding
     private lateinit var selectMoveFolderLauncher: ActivityResultLauncher<LongArray>
     private lateinit var selectCopyFolderLauncher: ActivityResultLauncher<LongArray>
     private lateinit var selectImportFolderLauncher: ActivityResultLauncher<LongArray>
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        requireNotNull(nodeHandle)
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -86,8 +91,8 @@ class ImageBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        viewModel.loadSingleNode(imageNodeHandle)
-        viewModel.onImage(imageNodeHandle).observe(viewLifecycleOwner, ::showNodeData)
+        viewModel.loadSingleNode(nodeHandle!!)
+        viewModel.onImage(nodeHandle!!).observe(viewLifecycleOwner, ::showNodeData)
         super.onViewCreated(view, savedInstanceState)
     }
 

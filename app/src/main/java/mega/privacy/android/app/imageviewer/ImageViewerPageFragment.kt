@@ -19,10 +19,10 @@ import mega.privacy.android.app.databinding.PageImageViewerBinding
 import mega.privacy.android.app.imageviewer.data.ImageItem
 import mega.privacy.android.app.mediaplayer.VideoPlayerActivity
 import mega.privacy.android.app.utils.Constants.*
+import mega.privacy.android.app.utils.ExtraUtils.extra
 import mega.privacy.android.app.utils.LogUtil.logError
 import mega.privacy.android.app.utils.NetworkUtil.isMeteredConnection
 import mega.privacy.android.app.utils.view.MultiTapGestureListener
-import nz.mega.documentscanner.utils.IntentUtils.extraNotNull
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 import nz.mega.sdk.MegaApiJava.ORDER_DEFAULT_ASC
 import javax.inject.Inject
@@ -36,6 +36,12 @@ class ImageViewerPageFragment : Fragment() {
     companion object {
         private const val STATE_FULL_IMAGE_REQUESTED = "STATE_FULL_IMAGE_REQUESTED"
 
+        /**
+         * Main method to create a ImageViewerPageFragment.
+         *
+         * @param nodeHandle    Image node to show information from
+         * @return              ImageBottomSheetDialogFragment to be shown
+         */
         fun newInstance(nodeHandle: Long): ImageViewerPageFragment =
             ImageViewerPageFragment().apply {
                 arguments = Bundle().apply {
@@ -51,13 +57,18 @@ class ImageViewerPageFragment : Fragment() {
 
     private var fullImageRequested = false
     private val viewModel by activityViewModels<ImageViewerViewModel>()
-    private val nodeHandle: Long by extraNotNull(INTENT_EXTRA_KEY_HANDLE, INVALID_HANDLE)
+    private val nodeHandle: Long? by extra(INTENT_EXTRA_KEY_HANDLE)
     private val imageControllerListener by lazy {
         object : BaseControllerListener<ImageInfo>() {
             override fun onFailure(id: String, throwable: Throwable) {
                 logError(throwable.stackTraceToString())
             }
         }
+    }
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        requireNotNull(nodeHandle)
     }
 
     override fun onCreateView(
@@ -71,7 +82,6 @@ class ImageViewerPageFragment : Fragment() {
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        require(nodeHandle != INVALID_HANDLE) { "Invalid node handle" }
         setupView()
         setupObservers(savedInstanceState == null)
     }
@@ -89,7 +99,7 @@ class ImageViewerPageFragment : Fragment() {
     }
 
     override fun onDestroyView() {
-        viewModel.stopImageLoading(nodeHandle)
+        viewModel.stopImageLoading(nodeHandle!!)
         super.onDestroyView()
     }
 
@@ -109,10 +119,10 @@ class ImageViewerPageFragment : Fragment() {
     }
 
     private fun setupObservers(requestImageData: Boolean) {
-        viewModel.onImage(nodeHandle).observe(viewLifecycleOwner, ::showItem)
+        viewModel.onImage(nodeHandle!!).observe(viewLifecycleOwner, ::showItem)
         if (requestImageData) {
-            viewModel.loadSingleNode(nodeHandle)
-            viewModel.loadSingleImage(nodeHandle, fullSize = false, highPriority = false)
+            viewModel.loadSingleNode(nodeHandle!!)
+            viewModel.loadSingleImage(nodeHandle!!, fullSize = false, highPriority = false)
         }
     }
 
@@ -181,7 +191,7 @@ class ImageViewerPageFragment : Fragment() {
     private fun requestFullSizeImage() {
         if (!fullImageRequested) {
             fullImageRequested = true
-            viewModel.loadSingleImage(nodeHandle, fullSize = true, highPriority = true)
+            viewModel.loadSingleImage(nodeHandle!!, fullSize = true, highPriority = true)
         }
     }
 

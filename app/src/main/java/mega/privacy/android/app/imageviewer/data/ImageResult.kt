@@ -12,7 +12,7 @@ import android.net.Uri
  * @property isVideo        Flag to check if it's a video.
  * @property fullyLoaded    Flag to check if the image has been fully loaded.
  */
-data class ImageResult(
+data class ImageResult constructor(
     var thumbnailUri: Uri? = null,
     var previewUri: Uri? = null,
     var fullSizeUri: Uri? = null,
