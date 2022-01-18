@@ -28,16 +28,18 @@ def shouldSkip(title) {
  */
 def getSDKBranch() {
     def description = env.GITLAB_OA_DESCRIPTION
-    String[] lines = description.split("\n");
-    print("getSDKBranch() description has " + lines.length + " lines");
-    String KEY = "SDK_BRANCH=";
-    for (String line : lines) {
-        line = line.trim();
-        if (line.startsWith(KEY)) {
-            print("SDK_BRANCH line found!!!" + line);
-            String value = line.substring(KEY.length());
-            if (!value.isEmpty()) {
-                SDK_BRANCH = value;
+    if (description != null) {
+        String[] lines = description.split("\n");
+        print("getSDKBranch() description has " + lines.length + " lines");
+        String KEY = "SDK_BRANCH=";
+        for (String line : lines) {
+            line = line.trim();
+            if (line.startsWith(KEY)) {
+                print("SDK_BRANCH line found!!!" + line);
+                String value = line.substring(KEY.length());
+                if (!value.isEmpty()) {
+                    SDK_BRANCH = value;
+                }
             }
         }
     }
@@ -52,22 +54,22 @@ def getSDKBranch() {
  */
 def getMEGAchatBranch() {
     def description = env.GITLAB_OA_DESCRIPTION
-    String[] lines = description.split("\n");
-    print("getMEGAchatBranch() description has " + lines.length + " lines");
-    String KEY = "MEGACHAT_BRANCH=";
-    for (String line: lines) {
-        line = line.trim();
-        if (line.startsWith(KEY)) {
-            print("MEGACHAT_BRANCH line found!!!" + line);
-            String value = line.substring(KEY.length());
-            if (!value.isEmpty()) {
-                MEGACHAT_BRANCH = value;
+    if (description != null) {
+        String[] lines = description.split("\n");
+        print("getMEGAchatBranch() description has " + lines.length + " lines");
+        String KEY = "MEGACHAT_BRANCH=";
+        for (String line : lines) {
+            line = line.trim();
+            if (line.startsWith(KEY)) {
+                print("MEGACHAT_BRANCH line found!!!" + line);
+                String value = line.substring(KEY.length());
+                if (!value.isEmpty()) {
+                    MEGACHAT_BRANCH = value;
+                }
             }
-
         }
     }
     MEGACHAT_BRANCH = 'develop'
-
 }
 
 pipeline {
