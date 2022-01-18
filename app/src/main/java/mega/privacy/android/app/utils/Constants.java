@@ -436,9 +436,7 @@ public class Constants {
     public static final String NOTIFICATION_CHANNEL_DOWNLOAD_ID = "DownloadServiceNotification";
     public static final String NOTIFICATION_CHANNEL_DOWNLOAD_NAME = "MEGA Download";
     public static final String NOTIFICATION_CHANNEL_UPLOAD_ID = "UploadServiceNotification";
-    public static final String NOTIFICATION_CHANNEL_UPLOAD_ID_FOLDER = "FolderUploadServiceNotification";
     public static final String NOTIFICATION_CHANNEL_UPLOAD_NAME = "MEGA File Upload";
-    public static final String NOTIFICATION_CHANNEL_UPLOAD_NAME_FOLDER = "MEGA Folder Upload";
     public static final String NOTIFICATION_CHANNEL_CAMERA_UPLOADS_ID = "CameraUploadsServiceNotification";
     public static final String NOTIFICATION_CHANNEL_CAMERA_UPLOADS_NAME = "MEGA Camera Uploads";
     public static final String NOTIFICATION_CHANNEL_CHAT_ID = "ChatNotification";
