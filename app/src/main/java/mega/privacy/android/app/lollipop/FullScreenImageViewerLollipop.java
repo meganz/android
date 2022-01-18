@@ -40,6 +40,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import kotlin.Unit;
 import mega.privacy.android.app.DatabaseHandler;
@@ -49,6 +50,7 @@ import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.activities.PasscodeActivity;
 import mega.privacy.android.app.components.ExtendedViewPager;
+import mega.privacy.android.app.gallery.repository.fetcher.MediaFetcher;
 import mega.privacy.android.app.utils.MegaProgressDialogUtil;
 import mega.privacy.android.app.components.TouchImageView;
 import mega.privacy.android.app.components.attacher.MegaAttacher;
@@ -685,7 +687,7 @@ public class FullScreenImageViewerLollipop extends PasscodeActivity
 					}
 					if (adapterType == INCOMING_SHARES_ADAPTER || fromIncoming) {
 						i.putExtra("from", FROM_INCOMING_SHARES);
-						i.putExtra("firstLevel", false);
+						i.putExtra(INTENT_EXTRA_KEY_FIRST_LEVEL, false);
 					}
 					else if(adapterType == INBOX_ADAPTER){
 						i.putExtra("from", FROM_INBOX);
@@ -997,11 +999,17 @@ public class FullScreenImageViewerLollipop extends PasscodeActivity
 		} else if (isInRootLinksLevel(adapterType, parentNodeHandle)) {
 			getImageHandles(megaApi.getPublicLinks(orderGetChildren), savedInstanceState);
 		} else if (adapterType == PHOTOS_BROWSE_ADAPTER) {
-			// TODO: use constants
-			getImageHandles(megaApi.searchByType(orderGetChildren, FILE_TYPE_PHOTO, SEARCH_TARGET_ROOTNODE), savedInstanceState);
+			getImageHandles(megaApi.searchByType(orderGetChildren, FILE_TYPE_PHOTO, SEARCH_TARGET_ROOTNODE).stream()
+                    .filter(megaNode -> MimeTypeList.typeForName(megaNode.getName()).isImage())
+                    .collect(Collectors.toList()), savedInstanceState);
 		} else if (adapterType == PHOTO_SYNC_ADAPTER) {
-			getImageHandles(new MegaNodeRepo(megaApi, dbH).getCuChildren(orderGetChildren), savedInstanceState, true);
-		} else {
+			getImageHandles(new MegaNodeRepo(megaApi, dbH).getFilteredCuChildren(orderGetChildren), savedInstanceState, true);
+        } else if (adapterType == MEDIA_BROWSE_ADAPTER) {
+            List<MegaNode> list = MediaFetcher.getCachedResults();
+            if (list != null) {
+                getImageHandles(list, savedInstanceState, true);
+            }
+        } else {
 			if (parentNodeHandle == INVALID_HANDLE){
 				switch(adapterType){
 					case RUBBISH_BIN_ADAPTER:{
@@ -1188,39 +1196,42 @@ public class FullScreenImageViewerLollipop extends PasscodeActivity
 	public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
 	}
 
-	@Override
-	public void onPageScrollStateChanged(int state) {
-		logDebug("State: " + state);
+    @Override
+    public void onPageScrollStateChanged(int state) {
+        logDebug("State: " + state);
 
-		supportInvalidateOptionsMenu();
-		if (state == ViewPager.SCROLL_STATE_IDLE){
-			if (viewPager.getCurrentItem() != positionG){
-				int oldPosition = positionG;
-				int newPosition = viewPager.getCurrentItem();
-				positionG = newPosition;
-				if ((adapterType == OFFLINE_ADAPTER)){
-					fileNameTextView.setText(mOffListImages.get(positionG).getName());
-				}
-				else if(adapterType == ZIP_ADAPTER){
-					fileNameTextView.setText(new File(paths.get(positionG)).getName());
-				}
-				else{
-					try {
-						TouchImageView tIV = (TouchImageView) adapterMega.getVisibleImage(oldPosition);
-						if (tIV != null) {
-							tIV.setZoom(1);
-						}
-					}
-					catch (Exception e) {
-						logError(e.getMessage());
-					}
-					fileNameTextView.setText(megaApi.getNodeByHandle(imageHandles.get(positionG)).getName());
-				}
-//				title.setText(names.get(positionG));
-				updateScrollPosition();
-			}
-		}
-	}
+        supportInvalidateOptionsMenu();
+        if (state == ViewPager.SCROLL_STATE_IDLE) {
+            if (viewPager.getCurrentItem() != positionG) {
+                int oldPosition = positionG;
+                positionG = viewPager.getCurrentItem();
+                if ((adapterType == OFFLINE_ADAPTER)) {
+                    fileNameTextView.setText(mOffListImages.get(positionG).getName());
+                } else if (adapterType == ZIP_ADAPTER) {
+                    fileNameTextView.setText(new File(paths.get(positionG)).getName());
+                } else {
+                    try {
+                        TouchImageView tIV = (TouchImageView) adapterMega.getVisibleImage(oldPosition);
+                        if (tIV != null) {
+                            tIV.setZoom(1);
+                        }
+                    } catch (Exception e) {
+                        logError(e.getMessage());
+                    }
+
+                    Long handle = imageHandles.get(positionG);
+                    MegaNode node = megaApi.getNodeByHandle(handle);
+
+                    if(node != null) {
+                        fileNameTextView.setText(node.getName());
+                    } else {
+                        logError("Get null node with handle: " + handle + ", position G is: " + positionG);
+                    }
+                }
+                updateScrollPosition();
+            }
+        }
+    }
 
 	@Override
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {

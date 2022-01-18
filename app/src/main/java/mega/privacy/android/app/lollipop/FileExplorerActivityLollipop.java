@@ -1279,7 +1279,7 @@ public class FileExplorerActivityLollipop extends TransfersManagementActivity
 			aB.setSubtitle(null);
 		}
 
-		if(tabShown==NO_TABS){
+		if (tabShown == NO_TABS || mTabsAdapterExplorer == null) {
 			if (importFileF) {
 				if (importFragmentSelected != -1) {
 					switch (importFragmentSelected) {
@@ -1463,7 +1463,7 @@ public class FileExplorerActivityLollipop extends TransfersManagementActivity
 	@Override
 	public void onBackPressed() {
 		logDebug("tabShown: " + tabShown);
-		if (psaWebBrowser.consumeBack()) return;
+		if (psaWebBrowser != null && psaWebBrowser.consumeBack()) return;
 		retryConnectionsAndSignalPresence();
 
 		cDriveExplorer = getCloudExplorerFragment();

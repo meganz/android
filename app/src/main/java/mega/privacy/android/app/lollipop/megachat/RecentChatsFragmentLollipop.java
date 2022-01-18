@@ -124,7 +124,7 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
     LinearLayoutManager mLayoutManager;
     FastScroller fastScroller;
 
-    ArrayList<MegaChatListItem> chats;
+    ArrayList<MegaChatListItem> chats = new ArrayList<>();
 
     FilterChatsTask filterChatsTask;
 
@@ -570,7 +570,8 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
 
                     if (adapterList == null) {
                         logWarning("AdapterList is NULL");
-                        adapterList = new MegaListChatLollipopAdapter(context, this, chats, listView, MegaListChatLollipopAdapter.ADAPTER_RECENT_CHATS);
+                        adapterList = new MegaListChatLollipopAdapter(context, this, chats,
+                                listView, MegaListChatLollipopAdapter.ADAPTER_RECENT_CHATS);
                     } else {
                         adapterList.setChats(chats);
                     }
@@ -1802,7 +1803,7 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
 
     class FilterChatsTask extends AsyncTask<String, Void, Void> {
 
-        ArrayList<MegaChatListItem> filteredChats;
+        ArrayList<MegaChatListItem> filteredChats = new ArrayList<>();
         int archivedSize = 0;
 
         @Override
@@ -1822,11 +1823,7 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
             }
 
             if (!chatsToSearch.isEmpty()) {
-                if (filteredChats == null) {
-                    filteredChats = new ArrayList<>();
-                } else {
-                    filteredChats.clear();
-                }
+                filteredChats.clear();
                 for (MegaChatListItem chat : chatsToSearch) {
                     if (getTitleChat(chat).toLowerCase().contains(strings[0].toLowerCase())) {
                         filteredChats.add(chat);
