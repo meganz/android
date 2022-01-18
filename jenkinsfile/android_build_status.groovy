@@ -73,7 +73,8 @@ def getMEGAchatBranch() {
 }
 
 pipeline {
-    agent { label 'mac-slave' }
+    //agent { label 'mac-slave' }
+    agent { label 'label-macminid' }
     options {
         // Stop the build early in case of compile or test failures
         skipStagesAfterUnstable()
