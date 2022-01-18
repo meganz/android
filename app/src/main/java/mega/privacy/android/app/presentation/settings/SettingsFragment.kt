@@ -3,22 +3,19 @@ package mega.privacy.android.app.presentation.settings
 import android.annotation.SuppressLint
 import android.content.*
 import android.net.Uri
-import android.os.Build
 import android.os.Bundle
 import android.os.IBinder
-import android.util.DisplayMetrics
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.view.ViewGroup.MarginLayoutParams
-import android.widget.CheckedTextView
 import androidx.annotation.StringRes
-import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
-import androidx.preference.*
+import androidx.preference.Preference
+import androidx.preference.PreferenceFragmentCompat
+import androidx.preference.SwitchPreferenceCompat
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.Snackbar
 import com.jeremyliao.liveeventbus.LiveEventBus
@@ -39,7 +36,6 @@ import mega.privacy.android.app.lollipop.managerSections.settings.SettingsActivi
 import mega.privacy.android.app.mediaplayer.service.AudioPlayerService
 import mega.privacy.android.app.mediaplayer.service.MediaPlayerService
 import mega.privacy.android.app.mediaplayer.service.MediaPlayerServiceBinder
-import mega.privacy.android.app.service.RATE_APP_URL
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.LogUtil
 import mega.privacy.android.app.utils.SharedPreferenceConstants.HIDE_RECENT_ACTIVITY
@@ -62,8 +58,6 @@ class SettingsFragment : Preference.OnPreferenceChangeListener,
     private val viewModel: SettingsViewModel by viewModels()
 
     private var playerService: MediaPlayerService? = null
-    private var bEvaluateAppDialogShow = false
-    private var evaluateAppDialog: AlertDialog? = null
     private val mediaServiceConnection: ServiceConnection = object : ServiceConnection {
         override fun onServiceConnected(name: ComponentName, service: IBinder) {
             playerService = (service as MediaPlayerServiceBinder).service
@@ -153,8 +147,6 @@ class SettingsFragment : Preference.OnPreferenceChangeListener,
         LogUtil.logDebug("onViewCreated")
 
         navigateToInitialPreference()
-
-        restoreEvaluateDialogState(savedInstanceState)
     }
 
     private fun navigateToInitialPreference() {
@@ -182,118 +174,19 @@ class SettingsFragment : Preference.OnPreferenceChangeListener,
      */
     override fun checkScroll() {}
 
-    private fun restoreEvaluateDialogState(savedInstanceState: Bundle?) {
-        if (savedInstanceState != null) {
-            bEvaluateAppDialogShow = savedInstanceState.getBoolean(EVALUATE_APP_DIALOG_SHOW)
-        }
-        if (bEvaluateAppDialogShow) {
-            showEvaluatedAppDialog()
-        }
-    }
 
     private fun showEvaluatedAppDialog() {
-        evaluateAppDialog = createFeedbackDialog()
-        evaluateAppDialog?.show()
-        bEvaluateAppDialogShow = true
-    }
-
-    private fun createFeedbackDialog(): AlertDialog {
-        return MaterialAlertDialogBuilder(requireContext())
-            .setView(createFeedbackDialogView())
-            .setTitle(getString(R.string.title_evaluate_the_app_panel))
-            .create()
-    }
-
-    @Suppress("DEPRECATION")
-    private fun createFeedbackDialogView(): View? {
-        val dialogLayout = View.inflate(context, R.layout.evaluate_the_app_dialog, null)
-
-        val display = requireActivity().windowManager.defaultDisplay
-        val outMetrics = DisplayMetrics()
-        display.getMetrics(outMetrics)
-
-        val rateAppCheck = dialogLayout.findViewById<CheckedTextView>(R.id.rate_the_app)
-        setFeedbackMargins(rateAppCheck, outMetrics)
-        rateAppCheck.setOnClickListener {
-            LogUtil.logDebug("Rate the app")
-            //Rate the app option:
-            startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(RATE_APP_URL)))
-            dismissEvaluateDialog()
-        }
-
-        val sendFeedbackCheck =
-            dialogLayout.findViewById<CheckedTextView>(R.id.send_feedback)
-        setFeedbackMargins(sendFeedbackCheck, outMetrics)
-        sendFeedbackCheck.setOnClickListener {
-            LogUtil.logDebug("Send Feedback")
-            val body = generateBody()
-            val versionApp = getString(R.string.app_version)
-            val subject = getString(R.string.setting_feedback_subject) + " v" + versionApp
-            sendEmail(subject, body)
-            dismissEvaluateDialog()
-        }
-        return dialogLayout
-    }
-
-    private fun setFeedbackMargins(
-        sendFeedbackCheck: CheckedTextView,
-        outMetrics: DisplayMetrics
-    ) {
-        sendFeedbackCheck.compoundDrawablePadding = Util.scaleWidthPx(10, outMetrics)
-        val sendFeedbackMLP = sendFeedbackCheck.layoutParams as MarginLayoutParams
-        sendFeedbackMLP.setMargins(
-            Util.scaleWidthPx(15, outMetrics),
-            Util.scaleHeightPx(10, outMetrics),
-            0,
-            Util.scaleHeightPx(10, outMetrics)
-        )
-    }
-
-    private fun generateBody(): String {
-        return StringBuilder()
-            .append(getString(R.string.setting_feedback_body))
-            .append("\n\n\n\n\n\n\n\n\n\n\n")
-            .append(getString(R.string.settings_feedback_body_device_model)).append("  ")
-            .append(Util.getDeviceName()).append("\n")
-            .append(getString(R.string.settings_feedback_body_android_version)).append("  ")
-            .append(Build.VERSION.RELEASE)
-            .append(" ").append(Build.DISPLAY).append("\n")
-            .append(getString(R.string.user_account_feedback)).append("  ")
-            .append(viewModel.email)
-            .append(" (${getAccountTypeLabel()})")
-            .toString()
-    }
-
-    private fun getAccountTypeLabel() = when (viewModel.accountType) {
-        Constants.FREE -> getString(R.string.my_account_free)
-        Constants.PRO_I -> getString(R.string.my_account_pro1)
-        Constants.PRO_II -> getString(R.string.my_account_pro2)
-        Constants.PRO_III -> getString(R.string.my_account_pro3)
-        Constants.PRO_LITE -> getString(R.string.my_account_prolite_feedback_email)
-        Constants.BUSINESS -> getString(R.string.business_label)
-        else -> getString(R.string.my_account_free)
-    }
-
-    private fun sendEmail(subject: String, body: String) {
-        val emailIntent = Intent(Intent.ACTION_SEND)
-        emailIntent.type = Constants.TYPE_TEXT_PLAIN
-        emailIntent.putExtra(Intent.EXTRA_EMAIL, arrayOf(Constants.MAIL_ANDROID))
-        emailIntent.putExtra(Intent.EXTRA_SUBJECT, subject)
-        emailIntent.putExtra(Intent.EXTRA_TEXT, body)
-        startActivity(Intent.createChooser(emailIntent, " "))
-    }
-
-    private fun dismissEvaluateDialog() {
-        if (evaluateAppDialog != null) {
-            evaluateAppDialog?.dismiss()
-            bEvaluateAppDialogShow = false
-        }
+        FeedBackDialog.newInstance(
+            viewModel.email,
+                viewModel.accountType
+        ).show(childFragmentManager, FeedBackDialog.TAG)
     }
 
     override fun onResume() {
         registerAccountChangeReceiver()
         refreshCameraUploadsSettings()
         updatePasscodeLockSubtitle()
+        resetCounters(null)
         super.onResume()
     }
 
@@ -570,14 +463,6 @@ class SettingsFragment : Preference.OnPreferenceChangeListener,
 
     override fun update2FAPreference(enabled: Boolean) {}
 
-
-    override fun onSaveInstanceState(outState: Bundle) {
-        super.onSaveInstanceState(outState)
-        if (evaluateAppDialog != null && evaluateAppDialog?.isShowing == true) {
-            outState.putBoolean(EVALUATE_APP_DIALOG_SHOW, bEvaluateAppDialogShow)
-        }
-    }
-
     override fun onDestroyView() {
         requireContext().unbindService(mediaServiceConnection)
         super.onDestroyView()
@@ -589,5 +474,3 @@ class SettingsFragment : Preference.OnPreferenceChangeListener,
     }
 
 }
-
-private const val EVALUATE_APP_DIALOG_SHOW = "EvaluateAppDialogShow"
