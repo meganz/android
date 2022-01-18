@@ -70,7 +70,6 @@ import mega.privacy.android.app.middlelayer.push.PushMessageHanlder;
 import mega.privacy.android.app.providers.FileProviderActivity;
 import mega.privacy.android.app.upgradeAccount.ChooseAccountActivity;
 import mega.privacy.android.app.utils.ColorUtils;
-import mega.privacy.android.app.utils.MegaNodeUtil;
 import mega.privacy.android.app.utils.StringResourcesUtils;
 import mega.privacy.android.app.utils.permission.PermissionUtils;
 import nz.mega.sdk.MegaApiAndroid;
@@ -110,7 +109,6 @@ import static mega.privacy.android.app.utils.TextUtil.isTextEmpty;
 import static mega.privacy.android.app.utils.Util.*;
 import static mega.privacy.android.app.utils.permission.PermissionUtils.hasPermissions;
 import static nz.mega.sdk.MegaApiJava.STORAGE_STATE_PAYWALL;
-import static nz.mega.sdk.MegaApiJava.USER_ATTR_MY_BACKUPS_FOLDER;
 
 public class LoginFragmentLollipop extends Fragment implements View.OnClickListener, MegaRequestListenerInterface, MegaChatListenerInterface, View.OnFocusChangeListener, View.OnLongClickListener {
 
@@ -1992,7 +1990,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                     }
                 }
 
-                megaApi.getMyBackupsFolder(this);
+                readyToManager();
             } else {
                 if(confirmLogoutDialog != null) {
                     confirmLogoutDialog.dismiss();
@@ -2120,12 +2118,6 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                 else{
                     ((LoginActivityLollipop)context).showSnackbar(error.getErrorString());
                 }
-            }
-        } else if (request.getType() == MegaRequest.TYPE_GET_ATTR_USER
-                && request.getParamType() == USER_ATTR_MY_BACKUPS_FOLDER) {
-            if (error.getErrorCode() == MegaError.API_OK) {
-                MegaNodeUtil.myBackupHandle = request.getNodeHandle();
-                readyToManager();
             }
         }
     }

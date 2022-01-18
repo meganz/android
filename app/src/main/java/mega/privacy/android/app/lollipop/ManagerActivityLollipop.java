@@ -1663,6 +1663,8 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 
 		observePsa();
 
+		megaApi.getMyBackupsFolder(this);
+
 		//Set toolbar
 		abL = (AppBarLayout) findViewById(R.id.app_bar_layout);
 
@@ -9764,8 +9766,9 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
             else if(request.getParamType() == MegaApiJava.USER_ATTR_DISABLE_VERSIONS){
 				MegaApplication.setDisableFileVersions(request.getFlag());
 			}
-            else if(request.getParamType() == MegaApiJava.USER_ATTR_MY_BACKUPS_FOLDER){
+			else if (request.getParamType() == USER_ATTR_MY_BACKUPS_FOLDER) {
 				if (e.getErrorCode() == MegaError.API_OK) {
+					logDebug("requesting myBackupHandle");
 					MegaNodeUtil.myBackupHandle = request.getNodeHandle();
 				}
 			}
