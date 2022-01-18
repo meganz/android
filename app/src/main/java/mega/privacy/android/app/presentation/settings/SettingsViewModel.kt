@@ -21,15 +21,17 @@ class SettingsViewModel @Inject constructor(
     private val isMultiFactorAuthAvailable: IsMultiFactorAuthAvailable,
     private val fetchAutoAcceptQRLinks: FetchAutoAcceptQRLinks,
     private val startScreen: GetStartScreen,
-    private val shouldHideRecentActivity: ShouldHideRecentActivity,
+    private val isHideRecentActivityEnabled: IsHideRecentActivityEnabled,
     private val toggleAutoAcceptQRLinks: ToggleAutoAcceptQRLinks,
     fetchMultiFactorAuthSetting: FetchMultiFactorAuthSetting,
     private val isOnline: IsOnline,
-    private val requestAccountDeletion: RequestAccountDeletion
+    private val requestAccountDeletion: RequestAccountDeletion,
+    private val isChatLoggedIn: IsChatLoggedIn,
 ) : ViewModel() {
     private val userAccount = MutableStateFlow(getAccountDetails(false))
     private val state = MutableStateFlow(initialiseState())
     val uiState: StateFlow<SettingsState> = state
+    private val online = isOnline().shareIn(viewModelScope, SharingStarted.Eagerly, replay = 1)
 
     private fun initialiseState(): SettingsState {
         return SettingsState(
@@ -43,7 +45,7 @@ class SettingsViewModel @Inject constructor(
             cameraUploadEnabled = false,
             chatEnabled = false,
             startScreen = 0,
-            hideRecentActivity = false,
+            hideRecentActivityChecked = false,
         )
     }
 
@@ -79,13 +81,12 @@ class SettingsViewModel @Inject constructor(
                     .map { enabled ->
                         { state: SettingsState -> state.copy(multiFactorAuthChecked = enabled) }
                     },
-                isOnline()
+                online
                     .map { it && rootNodeExists() }
                     .map { online ->
                         { state: SettingsState ->
                             state.copy(
                                 cameraUploadEnabled = online,
-                                chatEnabled = online,
                                 autoAcceptEnabled = online,
                                 multiFactorEnabled = online,
                                 deleteEnabled = online,
@@ -96,9 +97,14 @@ class SettingsViewModel @Inject constructor(
                     .map{ screen ->
                         { state: SettingsState -> state.copy(startScreen = screen)}
                     },
-                shouldHideRecentActivity()
+                isHideRecentActivityEnabled()
                     .map{ hide ->
-                        { state: SettingsState -> state.copy(hideRecentActivity = hide)}
+                        { state: SettingsState -> state.copy(hideRecentActivityChecked = hide)}
+                    },
+                isChatLoggedIn()
+                    .combine(online){ loggedIn, online -> loggedIn && online}
+                    .map { enabled ->
+                        { state: SettingsState -> state.copy(chatEnabled = enabled)}
                     },
             ).collect {
                 state.update(it)

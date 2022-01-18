@@ -16,7 +16,6 @@ import androidx.test.espresso.matcher.ViewMatchers.*
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.SdkSuppress
 import androidx.test.filters.Suppress
-import com.jeremyliao.liveeventbus.LiveEventBus
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -32,12 +31,11 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.TestActivityModule
 import mega.privacy.android.app.activities.settingsActivities.FileManagementPreferencesActivity
 import mega.privacy.android.app.activities.settingsActivities.StartScreenPreferencesActivity
-import mega.privacy.android.app.constants.EventConstants
 import mega.privacy.android.app.di.SettingsModule
 import mega.privacy.android.app.domain.entity.UserAccount
 import mega.privacy.android.app.domain.usecase.*
 import mega.privacy.android.app.lollipop.managerSections.settings.SettingsActivity
-import mega.privacy.android.app.lollipop.managerSections.settings.SettingsFragment
+import mega.privacy.android.app.presentation.settings.SettingsFragment
 import mega.privacy.android.app.utils.Constants
 import org.hamcrest.Matchers.allOf
 import org.hamcrest.Matchers.not
@@ -86,7 +84,7 @@ class SettingsFragmentTest {
         val getAccountDetails = mock<GetAccountDetails>()
         val isOnline = mock<IsOnline>()
         val rootNodeExists = mock<RootNodeExists>()
-        val shouldHideRecentActivity = mock<ShouldHideRecentActivity>()
+        val shouldHideRecentActivity = mock<IsHideRecentActivityEnabled>()
 
         @Provides
         fun provideSettingsActivity(): SettingsActivity = settingsActivity
@@ -137,7 +135,7 @@ class SettingsFragmentTest {
 
 
         @Provides
-        fun provideShouldHideRecentActivity(): ShouldHideRecentActivity =
+        fun provideShouldHideRecentActivity(): IsHideRecentActivityEnabled =
             shouldHideRecentActivity
 
         @Provides

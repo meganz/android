@@ -4,14 +4,14 @@ import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.flow.distinctUntilChanged
-import kotlinx.coroutines.flow.emptyFlow
-import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import mega.privacy.android.app.domain.entity.UserAccount
 import mega.privacy.android.app.domain.usecase.FetchAutoAcceptQRLinks
+import mega.privacy.android.app.domain.usecase.IsChatLoggedIn
 import mega.privacy.android.app.domain.usecase.ToggleAutoAcceptQRLinks
 import mega.privacy.android.app.presentation.settings.SettingsViewModel
 import org.junit.Before
@@ -34,9 +34,16 @@ class SettingsViewModelTest {
         accountTypeIdentifier = 0
     )
 
+    private  val isChatLoggedInValue = MutableStateFlow(true)
+    private val isChatLoggedIn = mock<IsChatLoggedIn> { on { invoke() }.thenReturn(isChatLoggedInValue) }
+
+
     @Before
     fun setUp() {
         Dispatchers.setMain(StandardTestDispatcher())
+        runBlocking {
+            whenever(fetchAutoAcceptQRLinks()).thenReturn(true)
+        }
         underTest = SettingsViewModel(
             getAccountDetails = mock { on { invoke(any()) }.thenReturn(userAccount) },
             canDeleteAccount = mock { on { invoke(userAccount) }.thenReturn(true) },
@@ -49,10 +56,11 @@ class SettingsViewModelTest {
             fetchAutoAcceptQRLinks = fetchAutoAcceptQRLinks,
             fetchMultiFactorAuthSetting = mock { on { invoke() }.thenReturn(emptyFlow()) },
             startScreen = mock { on { invoke() }.thenReturn(emptyFlow()) },
-            shouldHideRecentActivity = mock { on { invoke() }.thenReturn(emptyFlow()) },
+            isHideRecentActivityEnabled = mock { on { invoke() }.thenReturn(emptyFlow()) },
             toggleAutoAcceptQRLinks = toggleAutoAcceptQRLinks,
-            isOnline = mock { on { invoke() }.thenReturn(emptyFlow()) },
+            isOnline = mock { on { invoke() }.thenReturn(flowOf(true)) },
             requestAccountDeletion = mock(),
+            isChatLoggedIn = isChatLoggedIn,
         )
     }
 
@@ -66,10 +74,9 @@ class SettingsViewModelTest {
 
     @Test
     fun `test that the subsequent value auto accept is returned from the use case`() = runTest {
-        whenever(fetchAutoAcceptQRLinks()).thenReturn(true)
         underTest.uiState
             .map { it.autoAcceptChecked }
-            .distinctUntilChanged(Boolean::equals)
+            .distinctUntilChanged()
             .test {
             assertThat(awaitItem()).isFalse()
             assertThat(awaitItem()).isTrue()
@@ -79,7 +86,6 @@ class SettingsViewModelTest {
 
     @Test
     fun `test that toggle updates the auto accept value`() = runTest {
-        whenever(fetchAutoAcceptQRLinks()).thenReturn(true)
         whenever(toggleAutoAcceptQRLinks()).thenReturn(false)
 
         underTest.uiState
@@ -92,5 +98,21 @@ class SettingsViewModelTest {
             assertThat(awaitItem()).isFalse()
         }
 
+    }
+
+    @Test
+    fun `test that logging out of chat disables chat settings`() = runTest{
+
+        underTest.uiState
+            .map { it.chatEnabled }
+            .distinctUntilChanged()
+            .test {
+                assertThat(awaitItem()).isFalse()
+                assertThat(awaitItem()).isTrue()
+
+                isChatLoggedInValue.tryEmit(false)
+
+                assertThat(awaitItem()).isFalse()
+            }
     }
 }

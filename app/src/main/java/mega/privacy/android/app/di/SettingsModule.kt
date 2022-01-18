@@ -67,8 +67,8 @@ abstract class SettingsModule {
 
     @Binds
     abstract fun bindShouldHideRecentActivity(
-        useCase: DefaultShouldHideRecentActivity
-    ): ShouldHideRecentActivity
+        useCase: DefaultIsHideRecentActivityEnabled
+    ): IsHideRecentActivityEnabled
 
     @Binds
     abstract fun bindToggleAutoAcceptQRLinks(
@@ -84,4 +84,9 @@ abstract class SettingsModule {
     abstract fun bindRequestAccountDeletion(
         useCase: DefaultRequestAccountDeletion
     ): RequestAccountDeletion
+
+    @Binds
+    abstract fun bindIsChatLoggedIn(
+        useCase: DefaultIsChatLoggedIn
+    ): IsChatLoggedIn
 }

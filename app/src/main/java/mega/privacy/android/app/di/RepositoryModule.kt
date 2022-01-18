@@ -5,9 +5,11 @@ import dagger.Module
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import mega.privacy.android.app.data.repository.DefaultAccountRepository
+import mega.privacy.android.app.data.repository.DefaultChatRepository
 import mega.privacy.android.app.data.repository.DefaultNetworkRepository
 import mega.privacy.android.app.data.repository.DefaultSettingsRepository
 import mega.privacy.android.app.domain.repository.AccountRepository
+import mega.privacy.android.app.domain.repository.ChatRepository
 import mega.privacy.android.app.domain.repository.NetworkRepository
 import mega.privacy.android.app.domain.repository.SettingsRepository
 
@@ -23,4 +25,7 @@ abstract class RepositoryModule {
 
     @Binds
     abstract fun bindNetworkRepository(repository: DefaultNetworkRepository): NetworkRepository
+
+    @Binds
+    abstract fun bindChatRepository(repository: DefaultChatRepository): ChatRepository
 }

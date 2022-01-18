@@ -4740,40 +4740,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 				break;
 			}
     		case SETTINGS:{
-				showHideBottomNavigationView(true);
-				if(myAccountInfo.getNumVersions() == -1){
-					megaApi.getFolderInfo(megaApi.getRootNode(), this);
-				}
-
-				aB.setSubtitle(null);
-				abL.setVisibility(View.VISIBLE);
-
-    			supportInvalidateOptionsMenu();
-
-				if (getSettingsFragment() != null) {
-					if (openSettingsStorage) {
-						settingsFragment.goToCategoryStorage();
-					} else if (openSettingsQR) {
-						logDebug("goToCategoryQR");
-						settingsFragment.goToCategoryQR();
-					} else if (openSettingsStartScreen) {
-						settingsFragment.goToSectionStartScreen();
-					}
-				} else {
-					if(SettingsFragmentRefactorToggle.INSTANCE.getEnabled()){
-						settingsFragment = new SettingsFragmentLollipop();
-					}
-				}
-
-				replaceFragment((Fragment) settingsFragment, FragmentTag.SETTINGS.getTag());
-
-				setToolbarTitle();
-				supportInvalidateOptionsMenu();
-				showFabButton();
-
-				if (settingsFragment != null && SettingsFragmentRefactorToggle.INSTANCE.getEnabled() == false){
-					settingsFragment.update2FAVisibility();
-				}
+				displaySettings();
 				break;
     		}
     		case SEARCH:{
@@ -4827,6 +4794,46 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 			if (newAccount || isEnable2FADialogShown) {
 				showEnable2FADialog();
 			}
+		}
+	}
+
+	private void displaySettings() {
+		if(myAccountInfo.getNumVersions() == -1){
+			megaApi.getFolderInfo(megaApi.getRootNode(), this);
+		}
+
+		if(SettingsFragmentRefactorToggle.INSTANCE.getEnabled() == false){
+			showHideBottomNavigationView(true);
+			aB.setSubtitle(null);
+			abL.setVisibility(View.VISIBLE);
+
+			supportInvalidateOptionsMenu();
+
+			if (getSettingsFragment() != null) {
+				if (openSettingsStorage) {
+					settingsFragment.goToCategoryStorage();
+				} else if (openSettingsQR) {
+					logDebug("goToCategoryQR");
+					settingsFragment.goToCategoryQR();
+				} else if (openSettingsStartScreen) {
+					settingsFragment.goToSectionStartScreen();
+				}
+			} else {
+				settingsFragment = new SettingsFragmentLollipop();
+			}
+
+			replaceFragment((Fragment) settingsFragment, FragmentTag.SETTINGS.getTag());
+
+			setToolbarTitle();
+			supportInvalidateOptionsMenu();
+			showFabButton();
+
+			if (settingsFragment != null) {
+				settingsFragment.update2FAVisibility();
+			}
+		} else{
+			//TODO: Launch Settings activity
+			throw new UnsupportedOperationException();
 		}
 	}
 
@@ -9207,7 +9214,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 				logError("MegaChatRequest.TYPE_LOGOUT:ERROR");
 			}
 
-			if(getSettingsFragment() != null){
+			if(getSettingsFragment() != null && SettingsFragmentRefactorToggle.INSTANCE.getEnabled() == false){
 				settingsFragment.hidePreferencesChat();
 			}
 

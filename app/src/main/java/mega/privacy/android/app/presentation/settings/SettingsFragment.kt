@@ -19,7 +19,6 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.preference.*
-import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.Snackbar
 import com.jeremyliao.liveeventbus.LiveEventBus
@@ -30,11 +29,9 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.WebViewActivity
 import mega.privacy.android.app.activities.settingsActivities.*
 import mega.privacy.android.app.constants.EventConstants.EVENT_UPDATE_HIDE_RECENT_ACTIVITY
-import mega.privacy.android.app.constants.EventConstants.EVENT_UPDATE_START_SCREEN
 import mega.privacy.android.app.constants.SettingsConstants.*
 import mega.privacy.android.app.exportRK.ExportRecoveryKeyActivity
 import mega.privacy.android.app.lollipop.ChangePasswordActivityLollipop
-import mega.privacy.android.app.lollipop.ManagerActivityLollipop
 import mega.privacy.android.app.lollipop.TwoFactorAuthenticationActivity
 import mega.privacy.android.app.lollipop.VerifyTwoFactorActivity
 import mega.privacy.android.app.lollipop.managerSections.settings.Settings
@@ -49,7 +46,6 @@ import mega.privacy.android.app.utils.SharedPreferenceConstants.HIDE_RECENT_ACTI
 import mega.privacy.android.app.utils.SharedPreferenceConstants.USER_INTERFACE_PREFERENCES
 import mega.privacy.android.app.utils.ThemeHelper.applyTheme
 import mega.privacy.android.app.utils.Util
-import nz.mega.sdk.MegaChatApiJava
 
 @AndroidEntryPoint
 @SuppressLint("NewApi")
@@ -122,8 +118,10 @@ class SettingsFragment : Preference.OnPreferenceChangeListener,
                         resources.getStringArray(R.array.settings_start_screen)[state.startScreen]
                     findPreference<Preference>(KEY_START_SCREEN)?.summary = startScreenSummary
 
-                    findPreference<SwitchPreferenceCompat>(KEY_HIDE_RECENT_ACTIVITY)?.takeIf { it.isChecked != state.hideRecentActivity }
-                        ?.let { it.isChecked = state.hideRecentActivity }
+                    findPreference<SwitchPreferenceCompat>(KEY_HIDE_RECENT_ACTIVITY)?.takeIf { it.isChecked != state.hideRecentActivityChecked }
+                        ?.let { it.isChecked = state.hideRecentActivityChecked }
+
+                    findPreference<Preference>(KEY_FEATURES_CHAT)?.isEnabled = state.chatEnabled
 
                 }
             }
@@ -566,9 +564,7 @@ class SettingsFragment : Preference.OnPreferenceChangeListener,
 
     override fun reEnable2faSwitch() {}
 
-    override fun hidePreferencesChat() {
-        findPreference<Preference>(KEY_FEATURES_CHAT)?.isEnabled = false
-    }
+    override fun hidePreferencesChat() {}
 
     override fun setValueOfAutoAccept(autoAccept: Boolean) {}
 
