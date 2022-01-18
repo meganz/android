@@ -11,6 +11,7 @@ import androidx.activity.viewModels
 import androidx.constraintlayout.widget.ConstraintSet
 import androidx.core.content.ContextCompat
 import androidx.core.view.*
+import androidx.viewpager2.widget.MarginPageTransformer
 import androidx.viewpager2.widget.ViewPager2
 import com.facebook.drawee.backends.pipeline.Fresco
 import dagger.hilt.android.AndroidEntryPoint
@@ -258,8 +259,9 @@ class ImageViewerActivity : BaseActivity(), PermissionRequester, SnackbarShower 
 
         binding.viewPager.apply {
             isSaveEnabled = false
-            adapter = pagerAdapter
             offscreenPageLimit = OFFSCREEN_PAGE_LIMIT
+            setPageTransformer(MarginPageTransformer(resources.getDimensionPixelSize(R.dimen.image_viewer_pager_margin)))
+            adapter = pagerAdapter
         }
 
         // Apply statusBar top inset as padding for toolbar
@@ -457,7 +459,7 @@ class ImageViewerActivity : BaseActivity(), PermissionRequester, SnackbarShower 
                 LinksUtil.showGetLinkActivity(this, nodeItem.handle)
                 true
             }
-            R.id.action_chat -> {
+            R.id.action_send_to_chat -> {
                 nodeItem.node?.let(::attachNode)
                 true
             }

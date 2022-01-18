@@ -146,6 +146,12 @@ class GetNodeUseCase @Inject constructor(
             )
         }
 
+    /**
+     * Get a MegaOffline node given a node handle
+     *
+     * @param nodeHandle    Node handle to be retrieved
+     * @return              Single with the MegaOffline
+     */
     fun getOfflineNode(nodeHandle: Long): Single<MegaOffline> =
         Single.fromCallable {
             val offlineNode = databaseHandler.offlineFiles.find { megaOffline ->
@@ -155,6 +161,12 @@ class GetNodeUseCase @Inject constructor(
             offlineNode ?: error("Offline node was not found")
         }
 
+    /**
+     * Get an offline MegaNodeItem given a node handle
+     *
+     * @param nodeHandle    Node handle to be retrieved
+     * @return              Single with the MegaNodeItem
+     */
     fun getOfflineNodeItem(nodeHandle: Long): Single<MegaNodeItem> =
         Single.fromCallable {
             val offlineNode = getOfflineNode(nodeHandle).blockingGetOrNull()

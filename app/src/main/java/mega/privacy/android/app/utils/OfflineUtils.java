@@ -8,7 +8,6 @@ import android.os.Build;
 import android.os.StatFs;
 
 import android.util.Base64;
-import android.widget.Toast;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -840,7 +839,7 @@ public class OfflineUtils {
         if (isIntentAvailable(context, mediaIntent)) {
             context.startActivity(mediaIntent);
         } else {
-            Toast.makeText(context, context.getResources().getString(R.string.intent_not_available), Toast.LENGTH_LONG).show();
+            Util.showSnackbar(context, getString(R.string.intent_not_available_file));
         }
     }
 }

@@ -6,7 +6,6 @@ import android.view.ViewTreeObserver.OnGlobalLayoutListener
 import android.view.inputmethod.InputMethodManager
 import mega.privacy.android.app.utils.Util.SHOW_IM_DELAY
 
-@Suppress("DEPRECATION")
 object ViewUtils {
 
     /**

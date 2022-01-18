@@ -109,14 +109,8 @@ import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
-import mega.privacy.android.app.getLink.GetLinkActivity;
-import mega.privacy.android.app.lollipop.ContactFileListActivityLollipop;
-import mega.privacy.android.app.lollipop.ContactInfoActivityLollipop;
+import mega.privacy.android.app.interfaces.SnackbarShower;
 import mega.privacy.android.app.lollipop.FileInfoActivityLollipop;
-import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
-import mega.privacy.android.app.lollipop.PdfViewerActivityLollipop;
-import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop;
-import mega.privacy.android.app.lollipop.megachat.NodeAttachmentHistoryActivity;
 import mega.privacy.android.app.mediaplayer.AudioPlayerActivity;
 import mega.privacy.android.app.mediaplayer.VideoPlayerActivity;
 import nz.mega.sdk.MegaApiAndroid;
@@ -1196,30 +1190,10 @@ public class Util {
      * @param idChat Chat ID. If this param has a valid value, different to -1, the function of MESSAGE_SNACKBAR_TYPE ends in the specified chat
      */
 	public static void showSnackbar(Context context, int snackbarType, String message, long idChat) {
-		if (context instanceof FileInfoActivityLollipop) {
-			((FileInfoActivityLollipop) context).showSnackbar(snackbarType, message, idChat);
-		} else if (context instanceof ContactFileListActivityLollipop) {
-			((ContactFileListActivityLollipop) context).showSnackbar(snackbarType, message);
-		} else if (context instanceof ContactInfoActivityLollipop) {
-			((ContactInfoActivityLollipop) context).showSnackbar(snackbarType, message, idChat);
-		} else if (context instanceof GetLinkActivity) {
-			((GetLinkActivity) context).showSnackbar(snackbarType, message, idChat);
-		} else if (context instanceof PdfViewerActivityLollipop) {
-			((PdfViewerActivityLollipop) context).showSnackbar(snackbarType, message, idChat);
-		} else if (context instanceof ChatActivityLollipop) {
-			((ChatActivityLollipop) context).showSnackbar(snackbarType, message, idChat);
-		} else if (context instanceof NodeAttachmentHistoryActivity) {
-			((NodeAttachmentHistoryActivity) context).showSnackbar(snackbarType, message);
-		} else if (context instanceof ManagerActivityLollipop) {
-			((ManagerActivityLollipop) context).showSnackbar(snackbarType, message, idChat);
-		} else if (context instanceof BaseActivity) {
-			View rootView = getRootViewFromContext(context);
-			if (rootView != null) {
-				((BaseActivity) context).showSnackbar(snackbarType, rootView, message, idChat);
-				return;
-			}
-
-			logWarning("Unable to show snack bar, view does not exist or context is not instance of BaseActivity");
+		if (context instanceof SnackbarShower) {
+			((SnackbarShower) context).showSnackbar(snackbarType, message, idChat);
+		} else {
+			logWarning("Unable to show snack bar, view does not exist or context is not instance of SnackbarShower");
 		}
 	}
 

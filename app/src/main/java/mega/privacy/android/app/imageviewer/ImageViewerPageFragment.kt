@@ -49,9 +49,16 @@ class ImageViewerPageFragment : Fragment() {
 
     private lateinit var binding: PageImageViewerBinding
 
-    private val viewModel by activityViewModels<ImageViewerViewModel>()
     private var fullImageRequested = false
+    private val viewModel by activityViewModels<ImageViewerViewModel>()
     private val nodeHandle: Long by extraNotNull(INTENT_EXTRA_KEY_HANDLE, INVALID_HANDLE)
+    private val imageControllerListener by lazy {
+        object : BaseControllerListener<ImageInfo>() {
+            override fun onFailure(id: String, throwable: Throwable) {
+                logError(throwable.stackTraceToString())
+            }
+        }
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -153,19 +160,21 @@ class ImageViewerPageFragment : Fragment() {
      * @param lowResImageUri    Lower resolution Image uri to show
      */
     private fun showImageUris(mainImageUri: Uri, lowResImageUri: Uri? = null) {
+        val lowImageRequest = ImageRequest.fromUri(lowResImageUri)
+        val mainImageRequest = ImageRequest.fromUri(mainImageUri)
         val controller = Fresco.newDraweeControllerBuilder()
-            .setAutoPlayAnimations(true)
-            .setControllerListener(object : BaseControllerListener<ImageInfo>() {
-                override fun onFailure(id: String, throwable: Throwable) {
-                    logError(throwable.stackTraceToString())
-                }
-            })
-            .setLowResImageRequest(ImageRequest.fromUri(lowResImageUri))
-            .setImageRequest(ImageRequest.fromUri(mainImageUri))
+            .setLowResImageRequest(lowImageRequest)
+            .setImageRequest(mainImageRequest)
             .build()
 
-        if (binding.image.controller == null || !controller.isSameImageRequest(binding.image.controller)) {
-            binding.image.controller = controller
+        if (binding.image.controller?.isSameImageRequest(controller) != true) {
+            binding.image.controller = Fresco.newDraweeControllerBuilder()
+                .setOldController(binding.image.controller)
+                .setControllerListener(imageControllerListener)
+                .setAutoPlayAnimations(true)
+                .setLowResImageRequest(lowImageRequest)
+                .setImageRequest(mainImageRequest)
+                .build()
         }
     }
 

@@ -253,7 +253,7 @@ class ContactBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
         if (nodePermissionsDialog?.isShowing == true) nodePermissionsDialog?.dismiss()
 
         val node = megaApi.getNodeByHandle(folderHandle!!) // TODO Remove `MegaApi` calls in UI
-        if (node != null && node.isFolder) {
+        if (node?.isFolder == true) {
             val permissions = arrayOf(
                 getString(R.string.file_properties_shared_folder_read_only),
                 getString(R.string.file_properties_shared_folder_read_write),

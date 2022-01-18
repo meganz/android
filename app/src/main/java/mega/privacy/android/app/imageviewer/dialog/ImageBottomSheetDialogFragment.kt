@@ -180,10 +180,11 @@ class ImageBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
             optionOpenWith.isVisible = isUserLoggedIn && !isExternalNode && !nodeItem.isFromRubbishBin
             optionOpenWith.setOnClickListener {
                 if (imageItem.isOffline) {
-                    OfflineUtils.openWithOffline(requireContext(), nodeItem.handle)
+                    OfflineUtils.openWithOffline(requireActivity(), nodeItem.handle)
                 } else {
-                    ModalBottomSheetUtil.openWith(requireContext(), node)
+                    ModalBottomSheetUtil.openWith(requireActivity(), node)
                 }
+                dismissAllowingStateLoss()
             }
 
             // Download
@@ -251,11 +252,11 @@ class ImageBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
                     imageItem.isOffline ->
                         OfflineUtils.shareOfflineNode(context, nodeItem.handle)
                     !imageItem.nodePublicLink.isNullOrBlank() ->
-                        MegaNodeUtil.shareLink(requireContext(), imageItem.nodePublicLink)
+                        MegaNodeUtil.shareLink(requireActivity(), imageItem.nodePublicLink)
                     node != null ->
                         viewModel.shareNode(node).observe(viewLifecycleOwner) { link ->
                             if (!link.isNullOrBlank()) {
-                                MegaNodeUtil.shareLink(requireContext(), link)
+                                MegaNodeUtil.shareLink(requireActivity(), link)
                             }
                         }
                 }
