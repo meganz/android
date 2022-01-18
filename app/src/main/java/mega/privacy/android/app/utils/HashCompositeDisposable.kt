@@ -145,6 +145,9 @@ class HashCompositeDisposable : Disposable {
         dispose(map)
     }
 
+    /**
+     * Dispose the map resource.
+     */
     private fun dispose(map: HashMap<Long, Disposable>?) {
         val disposables = map?.values ?: return
         val errors = mutableListOf<Throwable>()
