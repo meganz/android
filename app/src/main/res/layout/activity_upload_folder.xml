@@ -1,15 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
 
     <data>
 
-        <import type="mega.privacy.android.app.utils.Constants" />
-
-        <variable
-            name="viewModel"
-            type="mega.privacy.android.app.upload.UploadFolderViewModel" />
-
+        <import type="android.content.res.Configuration" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -23,10 +19,28 @@
             android:minHeight="?attr/actionBarSize"
             app:layout_constraintTop_toTopOf="parent" />
 
-        <include
-            android:id="@+id/empty_view"
-            layout="@layout/empty_result_files"
-            app:showHint="@{viewModel.items.empty}" />
+        <ImageView
+            android:id="@+id/empty_hint_image"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@{context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE ? @drawable/empty_folder_landscape : @drawable/empty_folder_portrait}"
+            app:layout_constraintBottom_toTopOf="@id/empty_hint_text"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_chainStyle="packed"
+            tools:src="@drawable/empty_folder_portrait" />
+
+        <TextView
+            android:id="@+id/empty_hint_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/file_browser_empty_folder"
+            android:textAppearance="@style/TextAppearance.Mega.Body2.Secondary.Variant.AllCaps"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/empty_hint_image" />
 
         <mega.privacy.android.app.components.NewGridRecyclerView
             android:id="@+id/list"
@@ -34,12 +48,10 @@
             android:layout_height="0dp"
             android:columnWidth="@dimen/grid_node_item_width"
             android:paddingBottom="@dimen/grid_node_list_padding_bottom"
-            app:items="@{viewModel.items}"
             app:layout_constraintBottom_toTopOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/toolbar"
-            app:visibleGone="@{!viewModel.items.empty}" />
+            app:layout_constraintTop_toBottomOf="@+id/toolbar" />
 
         <mega.privacy.android.app.components.scrollBar.FastScroller
             android:id="@+id/fastscroll"
@@ -48,8 +60,7 @@
             android:orientation="vertical"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/toolbar"
-            app:layout_constraintTop_toTopOf="parent"
-            app:visibleGone="@{viewModel.items.size() > Constants.MIN_ITEMS_SCROLLBAR}" />
+            app:layout_constraintTop_toTopOf="parent" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

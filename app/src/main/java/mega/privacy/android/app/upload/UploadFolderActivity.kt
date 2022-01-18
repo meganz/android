@@ -1,6 +1,8 @@
 package mega.privacy.android.app.upload
 
 import android.os.Bundle
+import android.view.Menu
+import android.view.MenuItem
 import androidx.activity.viewModels
 import androidx.documentfile.provider.DocumentFile
 import androidx.recyclerview.widget.RecyclerView
@@ -20,17 +22,27 @@ class UploadFolderActivity : PasscodeActivity(), Scrollable {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+        binding = ActivityUploadFolderBinding.inflate(layoutInflater)
+
+        setContentView(binding.root)
+        setupView()
+        setupObservers()
+
         if (savedInstanceState == null) {
             intent.data?.let { uri ->
-                DocumentFile.fromSingleUri(this@UploadFolderActivity, uri)?.let { documentFile ->
+                DocumentFile.fromTreeUri(this@UploadFolderActivity, uri)?.let { documentFile ->
                     viewModel.retrieveFolderContent(documentFile)
                 }
             }
         }
-        binding = ActivityUploadFolderBinding.inflate(layoutInflater)
-        setContentView(binding.root)
-        setupView()
-        setupObservers()
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        when (item.itemId) {
+            android.R.id.home -> onBackPressed()
+        }
+
+        return super.onOptionsItemSelected(item)
     }
 
     fun setupView() {
@@ -51,10 +63,15 @@ class UploadFolderActivity : PasscodeActivity(), Scrollable {
 
     fun setupObservers() {
         viewModel.getCurrentFolder().observe(this, ::showCurrentFolder)
+        viewModel.getFolderContent().observe(this, ::showFolderContent)
     }
 
     private fun showCurrentFolder(currentFolder: String) {
         supportActionBar?.title = currentFolder
+    }
+
+    private fun showFolderContent(folderContent: List<DocumentFile>) {
+
     }
 
     override fun checkScroll() {
