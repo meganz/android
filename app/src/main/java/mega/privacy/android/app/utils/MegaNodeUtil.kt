@@ -23,12 +23,8 @@ import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.core.Completable
 import io.reactivex.rxjava3.kotlin.subscribeBy
 import io.reactivex.rxjava3.schedulers.Schedulers
-import mega.privacy.android.app.DatabaseHandler
-import mega.privacy.android.app.MegaApplication
-import mega.privacy.android.app.MimeTypeList
-import mega.privacy.android.app.R
+import mega.privacy.android.app.*
 import mega.privacy.android.app.activities.WebViewActivity
-import mega.privacy.android.app.textEditor.TextEditorActivity
 import mega.privacy.android.app.components.saver.AutoPlayInfo
 import mega.privacy.android.app.constants.BroadcastConstants
 import mega.privacy.android.app.interfaces.ActivityLauncher
@@ -42,8 +38,8 @@ import mega.privacy.android.app.lollipop.FileExplorerActivityLollipop
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop
 import mega.privacy.android.app.lollipop.DrawerItem
 import mega.privacy.android.app.lollipop.PdfViewerActivityLollipop
-import mega.privacy.android.app.lollipop.ZipBrowserActivityLollipop
 import mega.privacy.android.app.lollipop.listeners.MultipleRequestListener
+import mega.privacy.android.app.textEditor.TextEditorActivity
 import mega.privacy.android.app.textEditor.TextEditorViewModel.Companion.EDIT_MODE
 import mega.privacy.android.app.textEditor.TextEditorViewModel.Companion.MODE
 import mega.privacy.android.app.textEditor.TextEditorViewModel.Companion.VIEW_MODE
@@ -58,6 +54,7 @@ import mega.privacy.android.app.utils.StringResourcesUtils.getString
 import mega.privacy.android.app.utils.TextUtil.isTextEmpty
 import mega.privacy.android.app.utils.TimeUtils.formatLongDateTime
 import mega.privacy.android.app.utils.Util.*
+import mega.privacy.android.app.zippreview.ui.ZipBrowserActivity
 import nz.mega.sdk.*
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 import java.io.*
@@ -1506,12 +1503,12 @@ object MegaNodeUtil {
         zipFilePath: String,
         nodeHandle: Long
     ) {
-        val intentZip = Intent(context, ZipBrowserActivityLollipop::class.java)
+        val intentZip = Intent(context, ZipBrowserActivity::class.java)
         intentZip.putExtra(
-            ZipBrowserActivityLollipop.EXTRA_PATH_ZIP, zipFilePath
+            ZipBrowserActivity.EXTRA_PATH_ZIP, zipFilePath
         )
         intentZip.putExtra(
-            ZipBrowserActivityLollipop.EXTRA_HANDLE_ZIP, nodeHandle
+            ZipBrowserActivity.EXTRA_HANDLE_ZIP, nodeHandle
         )
 
         activityLauncher.launchActivity(intentZip)
@@ -1806,5 +1803,19 @@ object MegaNodeUtil {
         } else {
             nodeDownloader(node)
         }
+    }
+
+    @JvmStatic
+    fun containsMediaFile(handle: Long): Boolean {
+        val megaApi = MegaApplication.getInstance().megaApi
+        val parent = megaApi.getNodeByHandle(handle)
+        val children: List<MegaNode?>? = megaApi.getChildren(parent)
+
+        children?.forEach {
+            val mime = MimeTypeList.typeForName(it?.name)
+            if (mime.isImage || mime.isVideoReproducible) return true
+        }
+
+        return false
     }
 }

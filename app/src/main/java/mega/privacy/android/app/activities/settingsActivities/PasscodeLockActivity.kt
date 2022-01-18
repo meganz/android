@@ -142,7 +142,7 @@ class PasscodeLockActivity : BaseActivity() {
                 StringResourcesUtils.getString(
                     if (mode == SET_MODE) R.string.settings_passcode_lock
                     else R.string.title_change_passcode
-                ).toUpperCase(Locale.ROOT)
+                ).uppercase(Locale.ROOT)
         }
 
         initPasscodeScreen()
@@ -612,7 +612,7 @@ class PasscodeLockActivity : BaseActivity() {
     }
 
     override fun onBackPressed() {
-        if (psaWebBrowser.consumeBack()) return
+        if (psaWebBrowser != null && psaWebBrowser.consumeBack()) return
         if (attempts < MAX_ATTEMPTS) {
             when (mode) {
                 UNLOCK_MODE -> return

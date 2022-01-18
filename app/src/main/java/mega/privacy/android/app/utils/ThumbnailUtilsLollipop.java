@@ -64,8 +64,6 @@ import nz.mega.sdk.MegaRequestListenerInterface;
 
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
 import static mega.privacy.android.app.utils.Constants.THUMB_CORNER_RADIUS_DP;
-import static mega.privacy.android.app.utils.Constants.THUMB_MARGIN_DP;
-import static mega.privacy.android.app.utils.Constants.THUMB_SIZE_DP;
 import static mega.privacy.android.app.utils.FileUtil.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.Util.dp2px;
@@ -415,14 +413,14 @@ public class ThumbnailUtilsLollipop {
 
 			logDebug("Downloading thumbnail finished");
 			final long handle = request.getNodeHandle();
-			MegaNode node = api.getNodeByHandle(handle);
+            String handleBase64 = MegaApiJava.handleToBase64(handle);
 			if (e.getErrorCode() == MegaError.API_OK){
 				logDebug("Downloading thumbnail OK: " + handle);
 				thumbnailCache.remove(handle);
 
 				if (holder != null){
 					File thumbDir = getThumbFolder(context);
-					File thumb = new File(thumbDir, node.getBase64Handle()+".jpg");
+                    File thumb = new File(thumbDir, handleBase64 + ".jpg");
 					if (thumb.exists()) {
 						if (thumb.length() > 0) {
 							final Bitmap bitmap = getBitmapForCache(thumb, context);
@@ -489,16 +487,16 @@ public class ThumbnailUtilsLollipop {
 		@Override
 		public void onRequestFinish(MegaApiJava api, MegaRequest request,MegaError e) {
 
-			logDebug("Downloading thumbnail finished");
 			final long handle = request.getNodeHandle();
-			MegaNode node = api.getNodeByHandle(handle);
+            logDebug("Downloading thumbnail finished");
+            String handleBase64 = MegaApiJava.handleToBase64(handle);
 			if (e.getErrorCode() == MegaError.API_OK){
 				logDebug("Downloading thumbnail OK: " + handle);
 				thumbnailCache.remove(handle);
 
 				if (holder != null){
 					File thumbDir = getThumbFolder(context);
-					File thumb = new File(thumbDir, node.getBase64Handle()+".jpg");
+                    File thumb = new File(thumbDir, handleBase64 + ".jpg");
 					if (thumb.exists()) {
 						if (thumb.length() > 0) {
 							final Bitmap bitmap = getBitmapForCache(thumb, context);
@@ -556,14 +554,14 @@ public class ThumbnailUtilsLollipop {
 
 			logDebug("Downloading thumbnail finished");
 			final long handle = request.getNodeHandle();
-			MegaNode node = api.getNodeByHandle(handle);
+            String handleBase64 = MegaApiJava.handleToBase64(handle);
 			if (e.getErrorCode() == MegaError.API_OK){
 				logDebug("Downloading thumbnail OK: " + handle);
 				thumbnailCache.remove(handle);
 
 				if (holder != null){
 					File thumbDir = getThumbFolder(context);
-					File thumb = new File(thumbDir, node.getBase64Handle()+".jpg");
+                    File thumb = new File(thumbDir, handleBase64 + ".jpg");
 					if (thumb.exists()) {
 						if (thumb.length() > 0) {
 							final Bitmap bitmap = getBitmapForCache(thumb, context);
@@ -621,9 +619,7 @@ public class ThumbnailUtilsLollipop {
 
 			logDebug("Downloading thumbnail finished");
 			final long handle = request.getNodeHandle();
-			MegaNode node = api.getNodeByHandle(handle);
-
-//			pendingThumbnails.remove(handle);
+            String handleBase64 = MegaApiJava.handleToBase64(handle);
 
 			if (e.getErrorCode() == MegaError.API_OK){
 				logDebug("Downloading thumbnail OK: " + handle);
@@ -631,7 +627,7 @@ public class ThumbnailUtilsLollipop {
 
 				if (holder != null){
 					File thumbDir = getThumbFolder(context);
-					File thumb = new File(thumbDir, node.getBase64Handle()+".jpg");
+                    File thumb = new File(thumbDir, handleBase64 + ".jpg");
 					if (thumb.exists()) {
 						if (thumb.length() > 0) {
 							final Bitmap bitmap = getBitmapForCache(thumb, context);
@@ -1422,7 +1418,7 @@ public class ThumbnailUtilsLollipop {
 
 			logDebug("Downloading thumbnail finished");
 			final long handle = request.getNodeHandle();
-			MegaNode node = api.getNodeByHandle(handle);
+            String handleBase64 = MegaApiJava.handleToBase64(handle);
 
 			if (e.getErrorCode() == MegaError.API_OK){
 				logDebug("Downloading thumbnail OK: " + handle);
@@ -1430,7 +1426,7 @@ public class ThumbnailUtilsLollipop {
 
 				if (holder != null){
 					File thumbDir = getThumbFolder(context);
-					File thumb = new File(thumbDir, node.getBase64Handle()+".jpg");
+                    File thumb = new File(thumbDir, handleBase64 + ".jpg");
 					if (thumb.exists() && thumb.length() > 0) {
 						final Bitmap bitmap = getBitmapForCache(thumb, context);
 						if (bitmap != null) {

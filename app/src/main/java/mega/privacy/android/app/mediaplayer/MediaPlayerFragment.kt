@@ -14,7 +14,6 @@ import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import com.google.android.exoplayer2.Player
-import com.google.android.exoplayer2.SimpleExoPlayer
 import com.google.android.exoplayer2.ui.PlayerView
 import com.google.android.exoplayer2.util.RepeatModeUtil
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
@@ -58,7 +57,7 @@ class MediaPlayerFragment : Fragment() {
             }
         }
     }
-    private val playerListener = object : Player.EventListener {
+    private val playerListener = object : Player.Listener {
         override fun onPlaybackStateChanged(state: Int) {
             if (isResumed) {
                 updateLoadingAnimation(state)
@@ -154,7 +153,7 @@ class MediaPlayerFragment : Fragment() {
     override fun onDestroy() {
         super.onDestroy()
 
-        playerService?.exoPlayer?.removeListener(playerListener)
+        playerService?.player?.removeListener(playerListener)
         playerService = null
         requireContext().unbindService(connection)
     }
@@ -187,7 +186,7 @@ class MediaPlayerFragment : Fragment() {
                             )
                             .setPositiveButton(
                                 StringResourcesUtils.getString(R.string.general_ok)
-                                    .toUpperCase(Locale.ROOT)
+                                    .uppercase(Locale.ROOT)
                             ) { _, _ ->
                                 playerService?.stopAudioPlayer()
                                 requireActivity().finish()
@@ -207,7 +206,7 @@ class MediaPlayerFragment : Fragment() {
         if (MediaPlayerActivity.isAudioPlayer(activity?.intent)) {
             val viewHolder = audioPlayerVH ?: return
 
-            setupPlayerView(service.exoPlayer, viewHolder.binding.playerView, false)
+            setupPlayerView(service.player, viewHolder.binding.playerView, false)
             viewHolder.layoutArtwork()
             service.metadata.observe(viewLifecycleOwner, viewHolder::displayMetadata)
 
@@ -217,7 +216,7 @@ class MediaPlayerFragment : Fragment() {
         } else {
             val viewHolder = videoPlayerVH ?: return
 
-            setupPlayerView(service.exoPlayer, viewHolder.binding.playerView, true)
+            setupPlayerView(service.player, viewHolder.binding.playerView, true)
             service.metadata.observe(viewLifecycleOwner, viewHolder::displayMetadata)
 
             // we need setup control buttons again, because reset player would reset
@@ -236,7 +235,7 @@ class MediaPlayerFragment : Fragment() {
     }
 
     private fun setupPlayerView(
-        player: SimpleExoPlayer,
+        player: MediaMegaPlayer,
         playerView: PlayerView,
         videoPlayer: Boolean
     ) {
@@ -257,8 +256,6 @@ class MediaPlayerFragment : Fragment() {
 
         playerView.showController()
 
-        playerView.setControlDispatcher(CallAwareControlDispatcher(player.repeatMode))
-
         playerView.setOnClickListener {
             if (toolbarVisible) {
                 hideToolbar()
@@ -270,7 +267,7 @@ class MediaPlayerFragment : Fragment() {
         }
 
         updateLoadingAnimation(player.playbackState)
-        player.addListener(playerListener)
+        player.wrappedPlayer.addListener(playerListener)
     }
 
     private fun updateLoadingAnimation(@Player.State playbackState: Int) {

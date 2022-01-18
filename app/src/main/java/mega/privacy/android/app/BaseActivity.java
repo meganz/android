@@ -45,6 +45,7 @@ import static mega.privacy.android.app.utils.Constants.NOT_SPACE_SNACKBAR_TYPE;
 import static mega.privacy.android.app.utils.Constants.OPEN_FILE_SNACKBAR_TYPE;
 import static mega.privacy.android.app.utils.Constants.PERMISSIONS_TYPE;
 import static mega.privacy.android.app.utils.Constants.REMOVED_BUSINESS_ACCOUNT_BLOCK;
+import static mega.privacy.android.app.utils.Constants.SENT_REQUESTS_TYPE;
 import static mega.privacy.android.app.utils.Constants.SMS_VERIFICATION_ACCOUNT_BLOCK;
 import static mega.privacy.android.app.utils.Constants.SNACKBAR_IMCOMPATIBILITY_TYPE;
 import static mega.privacy.android.app.utils.Constants.SNACKBAR_TYPE;
@@ -711,7 +712,7 @@ public class BaseActivity extends AppCompatActivity implements ActivityLauncher,
 
     @Override
     public void onBackPressed() {
-        if (psaWebBrowser.consumeBack()) return;
+        if (psaWebBrowser != null && psaWebBrowser.consumeBack()) return;
         retryConnectionsAndSignalPresence();
         super.onBackPressed();
     }
@@ -891,11 +892,15 @@ public class BaseActivity extends AppCompatActivity implements ActivityLauncher,
                 snackbar.show();
                 break;
 
-            case OPEN_FILE_SNACKBAR_TYPE: {
+            case OPEN_FILE_SNACKBAR_TYPE:
                 snackbar.setAction(R.string.action_see, (v) -> openDownloadedFile());
                 snackbar.show();
                 break;
-            }
+
+            case SENT_REQUESTS_TYPE:
+                snackbar.setAction(R.string.tab_sent_requests, new SnackbarNavigateOption(view.getContext(), type, userEmail));
+                snackbar.show();
+                break;
         }
     }
 

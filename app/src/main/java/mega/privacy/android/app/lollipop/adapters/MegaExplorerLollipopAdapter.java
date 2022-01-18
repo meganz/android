@@ -152,6 +152,8 @@ public class MegaExplorerLollipopAdapter extends RecyclerView.Adapter<MegaExplor
                             && parentHandle == INVALID_HANDLE
                             ? sortByHeaderViewModel.getOrder().getSecond()
                             : sortByHeaderViewModel.getOrder().getFirst()));
+
+            binding.enterMediaDiscovery.setVisibility(View.GONE);
         }
     }
 	

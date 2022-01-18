@@ -139,24 +139,8 @@ public class RubbishBinFragmentLollipop extends Fragment{
 
 			switch (item.getItemId()) {
 				case R.id.cab_menu_restore_from_rubbish:
-					if (documents.size() > 1) {
-						logDebug("Restore multiple: " + documents.size());
-						MultipleRequestListener moveMultipleListener =
-								new MultipleRequestListener(MULTIPLE_RESTORED_FROM_RUBBISH,
-										(ManagerActivityLollipop) context);
-						for (int i = 0; i < documents.size(); i++) {
-							MegaNode newParent =
-									megaApi.getNodeByHandle(documents.get(i).getRestoreHandle());
-							if (newParent != null) {
-								megaApi.moveNode(documents.get(i), newParent, moveMultipleListener);
-							} else {
-								logWarning("The restore folder no longer exists");
-							}
-						}
-					} else {
-						logDebug("Restore single item");
-						((ManagerActivityLollipop) context).restoreFromRubbish(documents.get(0));
-					}
+
+					((ManagerActivityLollipop) context).restoreFromRubbish(documents);
 					clearSelections();
 					hideMultipleSelect();
 					break;
