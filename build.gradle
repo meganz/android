@@ -6,7 +6,8 @@ buildscript {
     ext.googleServicesVersion = '4.3.5'
     ext.hiltVersion = "2.38.1"
     ext.huaweiServicesVersion = "1.5.2.300"
-    ext.firebaseCrashlyticsVersion = "2.5.1"
+    ext.firebaseCrashlyticsVersion = "2.8.1"
+    ext.firebasePerformanceVersion = "1.4.0"
     repositories {
         jcenter()
         google()
@@ -20,6 +21,7 @@ buildscript {
         classpath "com.google.dagger:hilt-android-gradle-plugin:$hiltVersion"
         classpath "com.huawei.agconnect:agcp:$huaweiServicesVersion"
         classpath "com.google.firebase:firebase-crashlytics-gradle:$firebaseCrashlyticsVersion"
+        classpath "com.google.firebase:perf-plugin:$firebasePerformanceVersion"
         // NOTE: Do not place your application dependencies here; they belong
         // in the individual module build.gradle files
     }
@@ -79,7 +81,7 @@ ext {
     frescoVersion = '2.3.0'
     bannerViewPagerVersion = '3.4.0'
     liveEventBus = '1.7.3'
-    firebaseBom = '26.7.0'
+    firebaseBom = '29.0.3'
     junitVersion = '4.13.2'
     truthVersion = '1.1.3'
     androidxTestExtVersion = '1.1.3'
