@@ -64,15 +64,12 @@ import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.widget.SearchView;
 
-import android.text.Editable;
 import android.text.Html;
 import android.text.Spanned;
-import android.text.TextWatcher;
 import android.util.DisplayMetrics;
 import android.util.Pair;
 import android.view.Display;
 import android.view.Gravity;
-import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -81,17 +78,14 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.view.Window;
-import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.Chronometer;
-import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-import android.widget.TextView.OnEditorActionListener;
 
 import com.ittianyu.bottomnavigationviewex.BottomNavigationViewEx;
 import com.jeremyliao.liveeventbus.LiveEventBus;
@@ -126,7 +120,6 @@ import mega.privacy.android.app.MegaAttributes;
 import mega.privacy.android.app.MegaContactAdapter;
 import mega.privacy.android.app.MegaOffline;
 import mega.privacy.android.app.MegaPreferences;
-import mega.privacy.android.app.OpenPasswordLinkActivity;
 import mega.privacy.android.app.Product;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.gallery.ui.MediaDiscoveryFragment;
@@ -807,9 +800,12 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 	// end for Meeting
 
 	// Backup warning dialog
+	private static int BACKUP_DIALOG_SHOW_NONE = -1;
+	private static int BACKUP_DIALOG_SHOW_WARNING = 0;
+	private static int BACKUP_DIALOG_SHOW_CONFIRM = 1;
 	private AlertDialog backupWarningDialog;
 	private ArrayList<Long> backupHandleList;
-	private int backupDialogType = -1;
+	private int backupDialogType = BACKUP_DIALOG_SHOW_NONE;
 	private Long backupNodeHandle;
 	private int backupNodeType;
 	private int backupActionType;
@@ -1080,10 +1076,9 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 	};
 
 	private final Observer<Boolean> finishObserver = finish -> {
-		if (finish) finish();
+		if (finish)
+			finish();
 	};
-
-
 
 	/**
 	 * Method for updating the visible elements related to a call.
@@ -1478,7 +1473,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 			backupNodeHandle = savedInstanceState.getLong(BACKUP_HANDLED_NODE, -1);
 			backupNodeType = savedInstanceState.getInt(BACKUP_NODE_TYPE, -1);
 			backupActionType = savedInstanceState.getInt(BACKUP_ACTION_TYPE, -1);
-			backupDialogType = savedInstanceState.getInt(BACKUP_DIALOG_WARN, -1);
+			backupDialogType = savedInstanceState.getInt(BACKUP_DIALOG_WARN, BACKUP_DIALOG_SHOW_NONE);
 		}
 		else{
 			logDebug("Bundle is NULL");
@@ -2593,10 +2588,10 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 		new RatingHandlerImpl(this).showRatingBaseOnTransaction();
 
 		// Show backup dialog
-		if (backupDialogType == 0) {
+		if (backupDialogType == BACKUP_DIALOG_SHOW_WARNING) {
 			actWithBackupTips(backupHandleList, megaApi.getNodeByHandle(backupNodeHandle), backupNodeType, backupActionType);
-		} else if (backupDialogType == 1) {
-			ConfirmAction(backupHandleList, megaApi.getNodeByHandle(backupNodeHandle), backupNodeType, backupActionType);
+		} else if (backupDialogType == BACKUP_DIALOG_SHOW_CONFIRM) {
+			confirmAction(backupHandleList, megaApi.getNodeByHandle(backupNodeHandle), backupNodeType, backupActionType);
 		} else {
 			logDebug("Backup warning dialog is not show");
 		}
@@ -6437,7 +6432,6 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 	public void chooseLocationToPutNodes(final ArrayList<Long> handleList, int actionType) {
 		logDebug("MyBackup + NodeOptionsBottomSheetDialogFragment Move a backup folder or file");
 		if (handleList != null && handleList.size() > 0) {
-			MegaNode pNode = getBackupRootNodeByHandle(megaApi, handleList);
 			int nodeType = checkBackupNodeTypeByHandle(megaApi, handleList);
 
 			// Show the warning dialog if the list including Backup node
@@ -6446,7 +6440,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 				MegaNode p = megaApi.getNodeByHandle(handle);
 				actWithBackupTips(handleList, p, nodeType, actionType);
 			} else if (nodeType == BACKUP_ROOT) {
-				actWithBackupTips(handleList, pNode, nodeType, actionType);
+				actWithBackupTips(handleList, megaApi.getNodeByHandle(myBackupHandle), nodeType, actionType);
 			} else {
 				logDebug("MyBackup + chooseLocationToPutNodes nodeType = " + nodeType);
 			}
@@ -6471,7 +6465,6 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 					p = megaApi.getParentNode(p);
 				}
 				if (p.getHandle() != megaApi.getRubbishNode().getHandle()){
-					MegaNode pNode = getBackupRootNodeByHandle(megaApi, handleList);
 					int nodeType = checkBackupNodeTypeByHandle(megaApi, handleList);
 					// Show the warning dialog if the list including Backup node
 					if(nodeType == BACKUP_DEVICE || nodeType == BACKUP_FOLDER || nodeType == BACKUP_FOLDER_CHILD){
@@ -6481,7 +6474,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 						return;
 					}
 					if(nodeType == BACKUP_ROOT){
-						actWithBackupTips(handleList, pNode,nodeType, ACTION_BACKUP_REMOVE);
+						actWithBackupTips(handleList, megaApi.getNodeByHandle(myBackupHandle),nodeType, ACTION_BACKUP_REMOVE);
 						return;
 					}
 
@@ -6571,7 +6564,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 		backupNodeHandle = pNodeBackup.getHandle();
 		backupNodeType = nodeType;
 		backupActionType = actionType;
-		backupDialogType = 0;
+		backupDialogType = BACKUP_DIALOG_SHOW_WARNING;
 
 		backupWarningDialog = showTipDialogWithBackup(this, new ActionBackupNodeCallback() {
 
@@ -6655,7 +6648,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 
 					@Override
 					public void actionConfirmed(ArrayList<Long> handleList, @NotNull MegaNode pNodeBackup, int nodeType, int actionType) {
-						ConfirmAction(handleList, pNodeBackup, nodeType, actionType);
+						confirmAction(handleList, pNodeBackup, nodeType, actionType);
 					}
 				},
 				handleList,
@@ -6672,13 +6665,13 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 	 * @param nodeType the type of the backup node - BACKUP_NONE / BACKUP_ROOT / BACKUP_DEVICE / BACKUP_FOLDER / BACKUP_FOLDER_CHILD
 	 * @param actionType Indicates the action to backup folder or file (move, remove, add, create etc.)
 	 */
-	private void ConfirmAction(ArrayList<Long> handleList, MegaNode pNodeBackup, int nodeType, int actionType) {
+	private void confirmAction(ArrayList<Long> handleList, MegaNode pNodeBackup, int nodeType, int actionType) {
 		if (pNodeBackup != null) {
 			backupHandleList = handleList;
 			backupNodeHandle = pNodeBackup.getHandle();
 			backupNodeType = nodeType;
 			backupActionType = actionType;
-			backupDialogType = 1;
+			backupDialogType = BACKUP_DIALOG_SHOW_CONFIRM;
 
 			backupWarningDialog = showConfirmDialogWithBackup(this, new ActionBackupNodeCallback() {
 						@Override
@@ -6777,7 +6770,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 		backupNodeHandle = -1L;
 		backupNodeType = -1;
 		backupActionType = -1;
-		backupDialogType = -1;
+		backupDialogType = BACKUP_DIALOG_SHOW_NONE;
 	}
 
 	/**

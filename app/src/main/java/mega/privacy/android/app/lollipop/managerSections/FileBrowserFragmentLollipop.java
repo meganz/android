@@ -109,6 +109,7 @@ import static mega.privacy.android.app.utils.MegaNodeUtil.getBackupRootNodeByHan
 import static mega.privacy.android.app.utils.MegaNodeUtil.checkBackupNodeTypeByHandle;
 import static mega.privacy.android.app.utils.MegaNodeUtil.manageTextFileIntent;
 import static mega.privacy.android.app.utils.MegaNodeUtil.manageURLNode;
+import static mega.privacy.android.app.utils.MegaNodeUtil.myBackupHandle;
 import static mega.privacy.android.app.utils.MegaNodeUtil.onNodeTapped;
 import static mega.privacy.android.app.utils.TimeUtils.*;
 import static mega.privacy.android.app.utils.Util.*;
@@ -237,12 +238,11 @@ public class FileBrowserFragmentLollipop extends RotatableFragment{
 						handleList.add(documents.get(i).getHandle());
 					}
 
-					MegaNode pNode = getBackupRootNodeByHandle(megaApi, handleList);
 					nodeType = checkBackupNodeTypeByHandle(megaApi, handleList);
 
 					// Show the warning dialog if the list including Backup node
 					if (nodeType == BACKUP_ROOT) {
-						actWithBackupTips(handleList, pNode, nodeType, ACTION_BACKUP_MOVE);
+						actWithBackupTips(handleList, megaApi.getNodeByHandle(myBackupHandle), nodeType, ACTION_BACKUP_MOVE);
 					} else if (nodeType == BACKUP_DEVICE || nodeType == BACKUP_FOLDER || nodeType == BACKUP_FOLDER_CHILD) {
 						Long handle = handleList.get(0);
 						MegaNode p = megaApi.getNodeByHandle(handle);
@@ -268,7 +268,7 @@ public class FileBrowserFragmentLollipop extends RotatableFragment{
 					nodeType = checkBackupNodeTypeByHandle(megaApi, handleList);
 
 					if (nodeType == BACKUP_NONE && pNode == null){
-						// No buckup node in the selected nodes
+						// No backup node in the selected nodes
 						NodeController nC = new NodeController(context);
 						nC.selectContactToShareFolders(handleList);
 					} else {
@@ -281,23 +281,7 @@ public class FileBrowserFragmentLollipop extends RotatableFragment{
 					break;
 				}
 				case R.id.cab_menu_share_out: {
-					for (int i=0;i<documents.size();i++){
-						handleList.add(documents.get(i).getHandle());
-					}
-
-					MegaNode pNode = getBackupRootNodeByHandle(megaApi, handleList);
-					nodeType = checkBackupNodeTypeByHandle(megaApi, handleList);
-
-					if (nodeType == BACKUP_ROOT) {
-						actWithBackupTips(handleList, pNode, nodeType, ACTION_BACKUP_SHARE);
-					} else if (nodeType == BACKUP_DEVICE || nodeType == BACKUP_FOLDER || nodeType == BACKUP_FOLDER_CHILD) {
-						Long handle = handleList.get(0);
-						MegaNode p = megaApi.getNodeByHandle(handle);
-						actWithBackupTips(handleList, p, nodeType, ACTION_BACKUP_SHARE);
-					} else {
-						MegaNodeUtil.shareNodes(context, documents);
-					}
-
+					MegaNodeUtil.shareNodes(context, documents);
 					clearSelections();
 					hideMultipleSelect();
 					break;

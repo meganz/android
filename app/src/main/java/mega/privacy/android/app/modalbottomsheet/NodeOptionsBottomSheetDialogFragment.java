@@ -1196,12 +1196,7 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
                 break;
 
             case R.id.share_option:
-                nodeType = checkBackupNodeTypeByHandle(megaApi, node);
-                if (nodeType != BACKUP_NONE) {
-                    ((ManagerActivityLollipop) requireActivity()).showWarningDialogOfShare(node, nodeType, ACTION_BACKUP_SHARE);
-                } else {
-                    shareNode(requireActivity(), node);
-                }
+                shareNode(requireActivity(), node);
                 break;
 
             case R.id.edit_file_option:

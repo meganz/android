@@ -2932,6 +2932,11 @@
         <item quantity="one">%1$d folders · 1 file</item>
         <item quantity="other">%1$d folders · %2$d files</item>
     </plurals>
+    <!-- Indicates the content of the backup folder -->
+    <plurals name="num_devices">
+        <item quantity="one">%d device</item>
+        <item quantity="other">%d devices</item>
+    </plurals>
     <!-- Subtitle of the historic notification for new additions inside an existing shared folder. Placeholders are: email who added the folders or files, number of folders added, number of files added -->
     <string name="subtitle_notification_added_folders_and_files">[A]%1$s[/A][B] added %2$s and %3$s[/B]</string>
     <!-- Subtitle of the historic notification for new additions inside an existing shared folder, Plural of file. 2 files -->

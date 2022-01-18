@@ -9,7 +9,6 @@ import android.graphics.drawable.ColorDrawable;
 
 import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
-import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AlertDialog;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -76,7 +75,9 @@ import static mega.privacy.android.app.utils.MegaApiUtils.*;
 import static mega.privacy.android.app.utils.MegaNodeUtil.*;
 import static mega.privacy.android.app.utils.OfflineUtils.*;
 import static mega.privacy.android.app.utils.StringResourcesUtils.getQuantityString;
+import static mega.privacy.android.app.utils.StringResourcesUtils.getString;
 import static mega.privacy.android.app.utils.TextUtil.getFileInfo;
+import static mega.privacy.android.app.utils.TextUtil.isTextEmpty;
 import static mega.privacy.android.app.utils.ThumbnailUtilsLollipop.*;
 import static mega.privacy.android.app.utils.TimeUtils.*;
 import static mega.privacy.android.app.utils.Util.*;
@@ -984,10 +985,21 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
             holder.imageView.setLayoutParams(params);
 
             holder.textViewFileSize.setVisibility(View.VISIBLE);
-            holder.textViewFileSize.setText(type == FOLDER_LINK_ADAPTER
-                    ? getMegaNodeFolderLinkInfo(node)
-                    : getMegaNodeFolderInfo(node));
-
+            if(node.getHandle() == myBackupHandle){
+                ArrayList<MegaNode> subBackupNodes = megaApi.getChildren(node);
+                if (subBackupNodes != null && subBackupNodes.size() > 0) {
+                    int device = getMegaNodeBackupDeviceInfo(subBackupNodes);
+                    holder.textViewFileSize.setText(getQuantityString(R.plurals.num_devices, device, device));
+                } else {
+                    holder.textViewFileSize.setText(type == FOLDER_LINK_ADAPTER
+                            ? getMegaNodeFolderLinkInfo(node)
+                            : getMegaNodeFolderInfo(node));
+                }
+            } else {
+                holder.textViewFileSize.setText(type == FOLDER_LINK_ADAPTER
+                        ? getMegaNodeFolderLinkInfo(node)
+                        : getMegaNodeFolderInfo(node));
+            }
             holder.versionsIcon.setVisibility(View.GONE);
 
             setFolderListSelected(holder, position, getFolderIcon(node, type == OUTGOING_SHARES_ADAPTER ? ManagerActivityLollipop.DrawerItem.SHARED_ITEMS : ManagerActivityLollipop.DrawerItem.CLOUD_DRIVE));
@@ -1122,6 +1134,21 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
         else {
             holder.savedOffline.setVisibility(View.INVISIBLE);
         }
+    }
+
+    /**
+     * Get the number of device node in backup folder
+     * @param subBackupNodes The node list of MyBackup folder
+     * @return the number of device node
+     */
+    private int getMegaNodeBackupDeviceInfo(ArrayList<MegaNode> subBackupNodes) {
+        int device = 0;
+        for (MegaNode n : subBackupNodes) {
+            if (!isTextEmpty(n.getDeviceId())) {
+                device++;
+            }
+        }
+        return device;
     }
 
     private void getThumbAndSetView(ViewHolderBrowserList holder, MegaNode node) {
