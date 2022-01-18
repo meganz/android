@@ -219,7 +219,7 @@ pipeline {
                             echo "${WEBRTC_LIB_FILE} already downloaded. Skip downloading."
                         else
                             echo "downloading webrtc"
-                            mega-get ${WEBRTC_LIB_URL} >> ${CONSOLE_LOG_FILE}  2>&1
+                            mega-get ${WEBRTC_LIB_URL}
                 
                             echo "unzipping webrtc"
                             rm -fr ${WEBRTC_LIB_UNZIPPED}
@@ -231,14 +231,14 @@ pipeline {
                             echo "${GOOGLE_MAP_API_FILE} already downloaded. Skip downloading."
                         else
                             echo "downloading google map api"
-                            mega-get ${GOOGLE_MAP_API_URL} >> ${CONSOLE_LOG_FILE} 2>&1
+                            mega-get ${GOOGLE_MAP_API_URL}
                 
                             echo "unzipping google map api"
                             rm -fr ${GOOGLE_MAP_API_UNZIPPED}
                             unzip ${GOOGLE_MAP_API_FILE} -d ${GOOGLE_MAP_API_UNZIPPED}
                         fi
                 
-                        ls -lh >> ${CONSOLE_LOG_FILE}
+                        ls -lh
                 
                         cd ${WORKSPACE}
                         pwd
@@ -268,8 +268,8 @@ pipeline {
                 gitlabCommitStatus(name: 'Build SDK') {
                     sh """
                     cd ${WORKSPACE}/app/src/main/jni
-                    echo "=== START SDK BUILD====" >> ${CONSOLE_LOG_FILE} 2>&1
-                    bash build.sh all >> ${CONSOLE_LOG_FILE} 2>&1
+                    echo "=== START SDK BUILD===="
+                    bash build.sh all
                     """
                 }
             }
