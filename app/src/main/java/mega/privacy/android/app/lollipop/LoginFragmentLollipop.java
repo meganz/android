@@ -1922,7 +1922,6 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                 dbH.clearEphemeral();
 
                 megaApi.fetchNodes(this);
-                megaApi.getMyBackupsFolder(this);
 
                 // Get cookies settings after login.
                 MegaApplication.getInstance().checkEnabledCookies();
@@ -1993,7 +1992,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                     }
                 }
 
-                readyToManager();
+                megaApi.getMyBackupsFolder(this);
             } else {
                 if(confirmLogoutDialog != null) {
                     confirmLogoutDialog.dismiss();
@@ -2126,9 +2125,8 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                 && request.getParamType() == USER_ATTR_MY_BACKUPS_FOLDER) {
             if (error.getErrorCode() == MegaError.API_OK) {
                 MegaNodeUtil.myBackupHandle = request.getNodeHandle();
+                readyToManager();
             }
-
-            readyToManager();
         }
     }
 

@@ -778,6 +778,12 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 		}
 	};
 
+	private final Observer<Boolean> fileBackupChangedObserver = change -> {
+		if (change) {
+			megaApi.getMyBackupsFolder(this);
+		}
+	};
+
 	private boolean isBusinessGraceAlertShown;
 	private AlertDialog businessGraceAlert;
 	private boolean isBusinessCUAlertShown;
@@ -1076,6 +1082,8 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 	private final Observer<Boolean> finishObserver = finish -> {
 		if (finish) finish();
 	};
+
+
 
 	/**
 	 * Method for updating the visible elements related to a call.
@@ -1542,6 +1550,8 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 		registerReceiver(cuUpdateReceiver, new IntentFilter(ACTION_UPDATE_CU));
 
 		LiveEventBus.get(EVENT_FINISH_ACTIVITY, Boolean.class).observeForever(finishObserver);
+
+		LiveEventBus.get(EVENT_MY_BACKUPS_FOLDER_CHANGED, Boolean.class).observeForever(fileBackupChangedObserver);
 
         smsDialogTimeChecker = new LastShowSMSDialogTimeChecker(this);
         nC = new NodeController(this);
@@ -3542,6 +3552,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 		unregisterReceiver(updateCUSettingsReceiver);
 		unregisterReceiver(cuUpdateReceiver);
 		LiveEventBus.get(EVENT_FINISH_ACTIVITY, Boolean.class).removeObserver(finishObserver);
+		LiveEventBus.get(EVENT_MY_BACKUPS_FOLDER_CHANGED, Boolean.class).removeObserver( fileBackupChangedObserver);
 
 		destroyPayments();
 
@@ -7740,7 +7751,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 	 * @param actionType Indicates the action to backup folder or file (move, remove, add, create etc.)
 	 */
 	public void showUploadPanelForBackup(int uploadType, int actionType) {
-		this.uploadTypeBackup = actionType;
+		this.uploadTypeBackup = uploadType;
 		this.actionTypeBackup = actionType;
 		if (!hasPermissions(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
 			requestPermission(this, REQUEST_READ_WRITE_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE);
@@ -7749,9 +7760,9 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 
 		this.actionTypeBackup = ACTION_BACKUP_NONE;
 		// isInBackup Indicates if the current node is under "My backup"
-		int nodeType = fbFLol.checkSubBackupNode();
+		int nodeType = fbFLol.checkSubBackupNode(getCurrentParentNode(getCurrentParentHandle(), INVALID_VALUE));
 		if (nodeType != BACKUP_ROOT && nodeType != BACKUP_NONE) {
-			MegaNode parentNode = fbFLol.getSubBackupParentNode();
+			MegaNode parentNode = fbFLol.getSubBackupParentNode(getCurrentParentNode(getCurrentParentHandle(), INVALID_VALUE));
 			actWithBackupTips(null, parentNode, nodeType, actionType);
 		} else {
 			showUploadPanel(uploadType);
@@ -9752,6 +9763,11 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 			}
             else if(request.getParamType() == MegaApiJava.USER_ATTR_DISABLE_VERSIONS){
 				MegaApplication.setDisableFileVersions(request.getFlag());
+			}
+            else if(request.getParamType() == MegaApiJava.USER_ATTR_MY_BACKUPS_FOLDER){
+				if (e.getErrorCode() == MegaError.API_OK) {
+					MegaNodeUtil.myBackupHandle = request.getNodeHandle();
+				}
 			}
         } else if (request.getType() == MegaRequest.TYPE_GET_CANCEL_LINK) {
             logDebug("TYPE_GET_CANCEL_LINK");

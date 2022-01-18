@@ -58,4 +58,7 @@ object EventConstants {
 
     const val EVENT_UPDATE_VIEW_MODE = "EVENT_UPDATE_VIEW_MODE"
     const val EVENT_SHOW_MEDIA_DISCOVERY = "EVENT_SHOW_MEDIA_DISCOVERY"
+
+    /** Event Keys related to file backup*/
+    const val EVENT_MY_BACKUPS_FOLDER_CHANGED = "EVENT_MY_BACKUPS_FOLDER_CHANGED"
 }

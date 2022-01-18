@@ -49,9 +49,6 @@ import mega.privacy.android.app.utils.FileUtil.*
 import mega.privacy.android.app.utils.LogUtil.logDebug
 import mega.privacy.android.app.utils.LogUtil.logWarning
 import mega.privacy.android.app.utils.MegaApiUtils.isIntentAvailable
-import mega.privacy.android.app.utils.MegaNodeUtil.launchActionView
-import mega.privacy.android.app.utils.MegaNodeUtil.manageURLNode
-import mega.privacy.android.app.utils.MegaNodeUtil.openZip
 import mega.privacy.android.app.utils.MegaNodeDialogUtil.BACKUP_DEVICE
 import mega.privacy.android.app.utils.MegaNodeDialogUtil.BACKUP_NONE
 import mega.privacy.android.app.utils.MegaNodeDialogUtil.BACKUP_ROOT
@@ -533,7 +530,7 @@ object MegaNodeUtil {
      * @return True if the node is a device folder, false otherwise
      */
     private fun isDeviceBackupFolder(node: MegaNode): Boolean {
-        logDebug("MyBackup + isDeviceBackupFolder node name = ${node.name}, node deviceId = ${node.deviceId}")
+        logDebug("MyBackup + isDeviceBackupFolder node.handle = ${node.handle}")
         return (node.parentHandle == myBackupHandle && !isTextEmpty(node.deviceId) && !isNodeInRubbishOrDeleted(node.handle))
     }
 
@@ -566,7 +563,7 @@ object MegaNodeUtil {
      * @return True if the node is the MyBackup folder, false otherwise
      */
     private fun isRootBackupFolder(node: MegaNode): Boolean {
-        logDebug("MyBackup + isRootBackupFolder node name = ${node.name}, node deviceId = ${node.deviceId}")
+        logDebug("MyBackup + isRootBackupFolder node.handle = ${node.handle}")
         return (node.handle == myBackupHandle && !isNodeInRubbishOrDeleted(node.handle))
     }
 
@@ -1910,13 +1907,11 @@ object MegaNodeUtil {
         megaApi: MegaApiAndroid,
         handleList: ArrayList<Long>?
     ): MegaNode? {
-        if (handleList != null) {
-            if (handleList.size > 0) {
-                for (handle in handleList) {
-                    val p: MegaNode = megaApi.getNodeByHandle(handle)
-                    if (p.handle == myBackupHandle) {
-                        return p
-                    }
+        if (handleList != null && handleList.size > 0) {
+            for (handle in handleList) {
+                val p: MegaNode = megaApi.getNodeByHandle(handle)
+                if (p.handle == myBackupHandle) {
+                    return p
                 }
             }
         }
@@ -1985,7 +1980,7 @@ object MegaNodeUtil {
         var nodeType = BACKUP_NONE
 
         if (node != null) {
-            logDebug("MyBackup + node name = ${node.name}, node deviceId = ${node.deviceId}")
+            logDebug("MyBackup + node.handle = ${node.handle}")
             if(isNodeInRubbishOrDeleted(node.handle)){
                 nodeType = BACKUP_NONE
             } else if (node.handle == myBackupHandle) {

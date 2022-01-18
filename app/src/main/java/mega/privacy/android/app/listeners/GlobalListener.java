@@ -20,6 +20,7 @@ import nz.mega.sdk.MegaUserAlert;
 
 import static mega.privacy.android.app.constants.BroadcastConstants.*;
 import static mega.privacy.android.app.constants.EventConstants.EVENT_MEETING_AVATAR_CHANGE;
+import static mega.privacy.android.app.constants.EventConstants.EVENT_MY_BACKUPS_FOLDER_CHANGED;
 import static mega.privacy.android.app.constants.EventConstants.EVENT_USER_VISIBILITY_CHANGE;
 import static mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuotaPaywallWarning;
 import static mega.privacy.android.app.utils.Constants.ACTION_STORAGE_STATE_CHANGED;
@@ -95,7 +96,7 @@ public class GlobalListener implements MegaGlobalListenerInterface {
             if (user.hasChanged(MegaUser.CHANGE_TYPE_MY_BACKUPS_FOLDER) && isMyChange) {
                 //user has change backup attribute, need to update local ones
                 logDebug("MyBackup + Get backup attribute when change on other client.");
-                api.getUserAttribute(USER_ATTR_MY_BACKUPS_FOLDER, new GetAttrUserListener(megaApplication));
+                LiveEventBus.get(EVENT_MY_BACKUPS_FOLDER_CHANGED, Boolean.class).post(true);
                 break;
             }
         }

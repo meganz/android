@@ -87,8 +87,6 @@ object MegaNodeDialogUtil {
     const val ACTION_BACKUP_TAKE_PICTURE = 4
     const val ACTION_BACKUP_NEW_FOLDER = 5
     const val ACTION_BACKUP_SHARE_FOLDER = 6
-//    const val ACTION_BACKUP_MULTI_SHARE = 7
-//    const val ACTION_BACKUP_SHARE_WITH_ROOT = 8
     const val ACTION_BACKUP_SHARE = 9
     const val ACTION_BACKUP_SHARE_CHAT = 10
     const val ACTION_BACKUP_GET_LINK = 11

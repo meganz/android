@@ -1570,27 +1570,59 @@ public class FileBrowserFragmentLollipop extends RotatableFragment{
 		backupDialogType = -1;
 	}
 
-	public int checkSubBackupNode() {
-		if(nodes != null && nodes.size()>0){
-			ArrayList<Long> handleList = new ArrayList<>();
-			for (int i=0;i<nodes.size();i++){
-				MegaNode node = nodes.get(i);
-				if (node != null) {
-					handleList.add(node.getHandle());
+	/**
+	 * Check the type of the node in Backup folder (include empty folder).
+	 * @param currentParentHandle The parent node
+	 * @return The type of node
+	 */
+	public int checkSubBackupNode(MegaNode currentParentHandle) {
+		if(nodes != null){
+			if (nodes.size()>0) {
+				ArrayList<Long> handleList = new ArrayList<>();
+				for (int i = 0; i < nodes.size(); i++) {
+					MegaNode node = nodes.get(i);
+					if (node != null) {
+						handleList.add(node.getHandle());
+					}
+				}
+				return checkBackupNodeTypeByHandle(megaApi, handleList);
+			} else {
+				if(currentParentHandle != null) {
+					int nodeType = checkBackupNodeTypeByHandle(megaApi, currentParentHandle);
+					logDebug("nodeType = " + nodeType);
+					switch (nodeType){
+						case BACKUP_ROOT:
+							return BACKUP_DEVICE;
+						case BACKUP_DEVICE:
+							return BACKUP_FOLDER;
+						case BACKUP_FOLDER:
+						case BACKUP_FOLDER_CHILD:
+							return BACKUP_FOLDER_CHILD;
+						default:
+							return BACKUP_NONE;
+					}
 				}
 			}
-			return checkBackupNodeTypeByHandle(megaApi, handleList);
 		}
 		return BACKUP_NONE;
 	}
 
-	public MegaNode getSubBackupParentNode() {
-		if (nodes != null && nodes.size() > 0) {
-			for (MegaNode p : nodes) {
-				if (p != null) {
-					p = megaApi.getParentNode(p);
-					return p;
+	/**
+	 * Get the parent node in Backup folder (include empty folder).
+	 * @param currentParentHandle The parent node of empty folder
+	 * @return The parent node
+	 */
+	public MegaNode getSubBackupParentNode(MegaNode currentParentHandle) {
+		if (nodes != null) {
+			if (nodes.size() > 0) {
+				for (MegaNode p : nodes) {
+					if (p != null) {
+						p = megaApi.getParentNode(p);
+						return p;
+					}
 				}
+			} else {
+				return currentParentHandle;
 			}
 		}
 		return null;
