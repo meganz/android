@@ -13,7 +13,7 @@ import kotlinx.coroutines.test.setMain
 import mega.privacy.android.app.domain.entity.UserAccount
 import mega.privacy.android.app.domain.usecase.FetchAutoAcceptQRLinks
 import mega.privacy.android.app.domain.usecase.ToggleAutoAcceptQRLinks
-import mega.privacy.android.app.lollipop.managerSections.settings.SettingsViewModel
+import mega.privacy.android.app.presentation.settings.SettingsViewModel
 import org.junit.Before
 import org.junit.Test
 import org.mockito.kotlin.any

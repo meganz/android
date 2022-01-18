@@ -1,4 +1,4 @@
-package mega.privacy.android.app.lollipop.managerSections.settings
+package mega.privacy.android.app.presentation.settings
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope

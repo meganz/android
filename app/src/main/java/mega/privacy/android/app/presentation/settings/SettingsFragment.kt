@@ -1,4 +1,4 @@
-package mega.privacy.android.app.lollipop.managerSections.settings
+package mega.privacy.android.app.presentation.settings
 
 import android.annotation.SuppressLint
 import android.content.*
@@ -40,6 +40,8 @@ import mega.privacy.android.app.lollipop.ChangePasswordActivityLollipop
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop
 import mega.privacy.android.app.lollipop.TwoFactorAuthenticationActivity
 import mega.privacy.android.app.lollipop.VerifyTwoFactorActivity
+import mega.privacy.android.app.lollipop.managerSections.settings.Settings
+import mega.privacy.android.app.lollipop.managerSections.settings.SettingsActivity
 import mega.privacy.android.app.mediaplayer.service.AudioPlayerService
 import mega.privacy.android.app.mediaplayer.service.MediaPlayerService
 import mega.privacy.android.app.mediaplayer.service.MediaPlayerServiceBinder

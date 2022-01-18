@@ -1,4 +1,4 @@
-package mega.privacy.android.app.lollipop.managerSections.settings
+package mega.privacy.android.app.presentation.settings
 
 data class SettingsState(
     val autoAcceptEnabled: Boolean,
