@@ -19,6 +19,7 @@ import mega.privacy.android.app.lollipop.FileExplorerActivityLollipop
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop
 import mega.privacy.android.app.utils.ColorUtils
 import mega.privacy.android.app.utils.Constants.*
+import mega.privacy.android.app.utils.Util.isOffline
 import mega.privacy.android.app.utils.callManager
 import nz.mega.sdk.MegaApiJava.*
 import java.util.*
@@ -69,6 +70,11 @@ class SortByBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
 
     @SuppressLint("SetTextI18n")
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        if (isOffline(requireActivity())) {
+            dismiss()
+            return
+        }
+
         val sortByName = getString(R.string.sortby_name)
         val sortByAsc = getString(R.string.sortby_name_ascending).lowercase(Locale.ROOT)
         val sortByDesc = getString(R.string.sortby_name_descending).lowercase(Locale.ROOT)

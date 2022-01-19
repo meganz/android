@@ -1226,6 +1226,10 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
     }
 
     private void fileClicked(int currentPosition) {
+        if (isOffline(context)) {
+            return;
+        }
+
         if (type == RUBBISH_BIN_ADAPTER) {
             ((RubbishBinFragmentLollipop) fragment).itemClick(currentPosition);
         } else if (type == INBOX_ADAPTER) {
@@ -1252,14 +1256,7 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
 
     private void threeDotsClicked(int currentPosition,MegaNode n) {
         logDebug("onClick: file_list_three_dots: " + currentPosition);
-        if (!isOnline(context)) {
-            if (context instanceof ManagerActivityLollipop) {
-                ((ManagerActivityLollipop)context).showSnackbar(SNACKBAR_TYPE, context.getString(R.string.error_server_connection_problem), -1);
-            } else if (context instanceof FolderLinkActivityLollipop) {
-                ((FolderLinkActivityLollipop)context).showSnackbar(SNACKBAR_TYPE, context.getString(R.string.error_server_connection_problem));
-            } else if (context instanceof ContactFileListActivityLollipop) {
-                ((ContactFileListActivityLollipop)context).showSnackbar(SNACKBAR_TYPE, context.getString(R.string.error_server_connection_problem));
-            }
+        if (isOffline(context)) {
             return;
         }
 
@@ -1302,6 +1299,10 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
     @Override
     public boolean onLongClick(View view) {
         logDebug("OnLongCLick");
+
+        if (isOffline(context)) {
+            return true;
+        }
 
         ViewHolderBrowser holder = (ViewHolderBrowser)view.getTag();
         int currentPosition = holder.getAdapterPosition();
