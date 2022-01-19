@@ -39,6 +39,7 @@ def getSDKBranch() {
                 String value = line.substring(KEY.length());
                 if (!value.isEmpty()) {
                     SDK_BRANCH = value;
+                    return;
                 }
             }
         }
@@ -67,6 +68,7 @@ def getMEGAchatBranch() {
                 if (!value.isEmpty()) {
                     MEGACHAT_BRANCH = value;
                     print("setting MEGACHAT_BRANCH = " + MEGACHAT_BRANCH)
+                    return;
                 }
             }
         }
