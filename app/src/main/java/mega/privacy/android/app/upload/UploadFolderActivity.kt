@@ -1,5 +1,6 @@
 package mega.privacy.android.app.upload
 
+import android.app.Activity
 import android.os.Bundle
 import android.view.MenuItem
 import androidx.activity.viewModels
@@ -77,6 +78,16 @@ class UploadFolderActivity : PasscodeActivity() {
         }
 
         binding.fastscroll.setRecyclerView(binding.list)
+
+        binding.cancelButton.setOnClickListener {
+            setResult(Activity.RESULT_CANCELED)
+            finish()
+        }
+
+        binding.uploadButton.setOnClickListener {
+            setResult(RESULT_OK)
+            finish()
+        }
     }
 
     fun setupObservers() {

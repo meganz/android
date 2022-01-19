@@ -48,6 +48,7 @@
             android:layout_height="0dp"
             android:columnWidth="@dimen/grid_node_item_width"
             android:paddingBottom="@dimen/grid_node_list_padding_bottom"
+            app:layout_constraintBottom_toBottomOf="@+id/actions_view"
             app:layout_constraintBottom_toTopOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -61,6 +62,31 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/toolbar"
             app:layout_constraintTop_toTopOf="parent" />
+
+        <View
+            android:id="@+id/actions_view"
+            android:layout_width="match_parent"
+            android:layout_height="52dp"
+            app:layout_constraintBottom_toBottomOf="parent" />
+
+        <Button
+            android:id="@+id/upload_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="18dp"
+            app:layout_constraintBottom_toBottomOf="@+id/actions_view"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:text="@string/action_add"/>
+
+        <Button
+            android:id="@+id/cancel_button"
+            style="@style/Widget.Mega.Button.Transparent"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="16dp"
+            app:layout_constraintBottom_toBottomOf="@+id/actions_view"
+            app:layout_constraintEnd_toStartOf="@id/upload_button"
+            android:text="@string/general_cancel"/>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
