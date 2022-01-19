@@ -109,17 +109,4 @@ public class UploadUtil {
         }
         return s.substring(0, x);
     }
-
-
-    /** The method is to open FileStorageActivity to select file or folder
-     *
-     * @param activity the activity where the FileStorageActivity would start
-     */
-    public static void pickFileFromFileSystem(Activity activity) {
-        Intent intent = new Intent();
-        intent.setAction(FileStorageActivityLollipop.Mode.PICK_FILE.getAction());
-        intent.putExtra(FileStorageActivityLollipop.EXTRA_FROM_SETTINGS, false);
-        intent.setClass(activity, FileStorageActivityLollipop.class);
-        activity.startActivityForResult(intent, Constants.REQUEST_CODE_GET_LOCAL);
-    }
 }

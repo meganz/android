@@ -10,12 +10,12 @@ import android.widget.RelativeLayout
 import android.widget.TextView
 import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
-import androidx.hilt.lifecycle.ViewModelInject
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModel
 import com.jeremyliao.liveeventbus.LiveEventBus
+import dagger.hilt.android.lifecycle.HiltViewModel
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
 import mega.privacy.android.app.components.twemoji.EmojiTextView
@@ -30,7 +30,10 @@ import mega.privacy.android.app.lollipop.listeners.CreateGroupChatWithPublicLink
 import mega.privacy.android.app.meeting.adapter.Participant
 import mega.privacy.android.app.meeting.fragments.InMeetingFragment.Companion.TYPE_IN_GRID_VIEW
 import mega.privacy.android.app.meeting.fragments.InMeetingFragment.Companion.TYPE_IN_SPEAKER_VIEW
-import mega.privacy.android.app.meeting.listeners.*
+import mega.privacy.android.app.meeting.listeners.GroupVideoListener
+import mega.privacy.android.app.meeting.listeners.HangChatCallListener
+import mega.privacy.android.app.meeting.listeners.RequestHiResVideoListener
+import mega.privacy.android.app.meeting.listeners.RequestLowResVideoListener
 import mega.privacy.android.app.objects.PasscodeManagement
 import mega.privacy.android.app.utils.CallUtil
 import mega.privacy.android.app.utils.ChatUtil.getTitleChat
@@ -42,8 +45,10 @@ import nz.mega.sdk.*
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
 import nz.mega.sdk.MegaChatCall.*
 import org.jetbrains.anko.defaultSharedPreferences
+import javax.inject.Inject
 
-class InMeetingViewModel @ViewModelInject constructor(
+@HiltViewModel
+class InMeetingViewModel @Inject constructor(
     private val inMeetingRepository: InMeetingRepository
 ) : ViewModel(), EditChatRoomNameListener.OnEditedChatRoomNameCallback,
     HangChatCallListener.OnCallHungUpCallback, GetUserEmailListener.OnUserEmailUpdateCallback {
@@ -1760,16 +1765,12 @@ class InMeetingViewModel @ViewModelInject constructor(
     fun answerChatCall(
         videoEnable: Boolean,
         audioEnable: Boolean,
+        speakerStatus:Boolean,
         listener: MegaChatRequestListenerInterface
     ) {
         inMeetingRepository.getChatRoom(currentChatId)?.let {
             logDebug("The chat exists")
-            inMeetingRepository.answerCall(
-                it.chatId,
-                videoEnable,
-                audioEnable,
-                listener
-            )
+            MegaApplication.getChatManagement().answerChatCall(it.chatId, videoEnable, audioEnable, speakerStatus, listener)
             return
         }
     }

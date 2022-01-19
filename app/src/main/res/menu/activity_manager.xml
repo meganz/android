@@ -30,6 +30,15 @@
         app:showAsAction="ifRoom" />
 
     <item
+        android:id="@+id/action_more"
+        android:icon="@drawable/ic_dots_vertical_white"
+        android:orderInCategory="100"
+        android:title="@string/label_more"
+        android:visible="false"
+        app:iconTint="?attr/colorControlNormal"
+        app:showAsAction="always" />
+
+    <item
         android:id="@+id/action_pause"
         android:icon="@drawable/ic_pause_white"
         android:orderInCategory="100"
@@ -37,30 +46,6 @@
         android:visible="false"
         app:iconTint="?attr/colorControlNormal"
         app:showAsAction="ifRoom" />
-
-    <item
-        android:id="@+id/action_add"
-        android:icon="@drawable/ic_action_bar_null"
-        android:orderInCategory="100"
-        android:title="@string/action_add"
-        android:visible="false"
-        app:showAsAction="never" />
-
-    <item
-        android:id="@+id/action_menu_invite"
-        android:icon="@drawable/ic_action_bar_null"
-        android:orderInCategory="100"
-        android:title="@string/contact_invite"
-        android:visible="false"
-        app:showAsAction="never" />
-
-    <item
-        android:id="@+id/action_add_contact"
-        android:icon="@drawable/ic_action_bar_null"
-        android:orderInCategory="100"
-        android:title="@string/menu_add_contact"
-        android:visible="false"
-        app:showAsAction="never" />
 
     <item
         android:id="@+id/action_scan_qr"
@@ -78,30 +63,6 @@
         android:visible="false"
         app:showAsAction="never" />
 
-    <item
-        android:id="@+id/action_take_picture"
-        android:icon="@drawable/ic_action_bar_null"
-        android:orderInCategory="100"
-        android:title="@string/menu_take_picture"
-        android:visible="false"
-        app:showAsAction="never" />
-
-    <item
-        android:id="@+id/action_new_folder"
-        android:icon="@drawable/ic_action_bar_null"
-        android:orderInCategory="105"
-        android:title="@string/action_create_folder"
-        android:visible="false"
-        app:showAsAction="never" />
-
-    <item
-        android:id="@+id/action_import_link"
-        android:icon="@drawable/ic_action_bar_null"
-        android:orderInCategory="110"
-        android:title="@string/action_open_link"
-        android:visible="false"
-        app:showAsAction="never" />
-
 	<item
 		android:id="@+id/action_enable_select"
 		android:orderInCategory="110"
@@ -109,22 +70,6 @@
 		android:icon="@drawable/ic_action_bar_null"
 		app:showAsAction="never"
 		android:visible="false"/>
-
-	<item
-		android:id="@+id/action_select"
-		android:icon="@drawable/ic_action_bar_null"
-		android:orderInCategory="110"
-		android:title="@string/action_select_all"
-		android:visible="false"
-		app:showAsAction="never" />
-
-    <item
-        android:id="@+id/action_unselect"
-        android:icon="@drawable/ic_action_bar_null"
-        android:orderInCategory="110"
-        android:title="@string/action_unselect_all"
-        android:visible="false"
-        app:showAsAction="never" />
 
     <item
         android:id="@+id/action_menu_sort_by"
@@ -135,25 +80,9 @@
         app:showAsAction="never" />
 
     <item
-        android:id="@+id/action_menu_help"
-        android:icon="@drawable/ic_action_bar_null"
-        android:orderInCategory="135"
-        android:title="@string/action_help"
-        android:visible="false"
-        app:showAsAction="never" />
-
-    <item
         android:id="@+id/action_menu_do_not_disturb"
         android:orderInCategory="140"
         android:title="@string/title_dialog_mute_chat_notifications"
-        android:visible="false"
-        app:showAsAction="never" />
-
-    <item
-        android:id="@+id/action_menu_upgrade_account"
-        android:icon="@drawable/ic_action_bar_null"
-        android:orderInCategory="145"
-        android:title="@string/action_upgrade_account"
         android:visible="false"
         app:showAsAction="never" />
 

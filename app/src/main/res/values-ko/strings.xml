@@ -66,8 +66,6 @@
     <string name="general_error_word">오류</string>
     <!-- when clicking into a menu whose functionality is not yet implemented -->
     <string name="general_not_yet_implemented">아직 구현되지 않음</string>
-    <!-- when any file or folder is selected -->
-    <string name="error_no_selection">선택된 파일 또는 폴더 없음</string>
     <!-- when trying to download a file that is already downloaded in the device -->
     <string name="general_already_downloaded">이미 다운로드됨</string>
     <!-- when trying to upload a file that is already uploaded in the folder -->
@@ -100,8 +98,6 @@
     <string name="action_create_folder">새 폴더 생성</string>
     <!-- Option which allows create a new text file -->
     <string name="action_create_txt">새 텍스트 파일 생성</string>
-    <!-- Menu option to open a link. Also title of the dialog to open a link. -->
-    <string name="action_open_link">링크 열기</string>
     <!-- Menu item -->
     <string name="action_settings">설정</string>
     <!-- Search button -->
@@ -622,10 +618,6 @@
     <string name="upload_to_audio">오디오</string>
     <!-- Title of the button in the contact info screen to start a video call -->
     <string name="upload_to_video">동영상</string>
-    <!-- upload to. Then choose to browse the file system to choose a file -->
-    <string name="upload_to_filesystem">파일 시스템에서 선택</string>
-    <!-- upload to. Then choose to browse the file system to choose a file -->
-    <string name="upload_to_filesystem_from">다음에서 고르기</string>
     <!-- Label for the current uploaded size of a file. For example, 3 files, 50KB uploaded -->
     <string name="upload_uploaded">업로드됨</string>
     <!-- Status text at the beginning of an upload, Status text at the beginning of an upload for 2 or more files -->
@@ -989,8 +981,6 @@
     <string name="settings_disable_logs">로그가 비활성화 되었습니다.</string>
     <!-- Snackbar error message triggered by host error when user is trying to setup MEGA Camera Uploads folder in settings page -->
     <string name="error_unable_to_setup_cloud_folder">MEGA 카메라 업로드 폴더를 설정할 수 없습니다</string>
-    <!-- Message displayed when the user denies the required permissions during the logs activation -->
-    <string name="logs_not_enabled_permissions">당신이 필요한 권한을 거부했기 때문에 기록을 활성화할 수 없습니다</string>
     <!-- Option in the sliding panel to open the folder which contains the file selected after performing a search -->
     <string name="search_open_location">위치 열기</string>
     <!-- message when a temporary error on logging in is due to SDK is waiting for the server to complete a request due to an API lock -->
@@ -2729,16 +2719,12 @@
     <string name="message_set_chat_private">[A]%1$s[/A]님이[B] 암호화 키 순환을 활성화하였습니다.[/B]</string>
     <!-- error message shown when a chat link is invalid -->
     <string name="invalid_chat_link">이 대화는 더 이상 유효하지 않습니다</string>
-    <!-- error message shown when a chat link is not well formed -->
-    <string name="invalid_chat_link_args">잘못된 대화 링크</string>
     <!-- When it is creating a new group chat, this option permits to establish it private or public -->
     <string name="ekr_label">암호화 키 순환</string>
     <!-- Text of the dialog to change a public chat to private (enable encryption key rotation) -->
     <string name="ekr_explanation">암호화 키 순환은 약간 더 안전하지만, 대화 링크를 만들 수 없고 새 참여자들이 지난 메시지를 볼 수 없게 됩니다.</string>
     <!-- Text of the dialog to change a public chat to private (enable encryption key rotation) -->
     <string name="subtitle_chat_message_enabled_ERK">암호화 키 순환은 약간 더 안전하지만, 대화 링크를 만들 수 없고 새 참여자들이 지난 메시지를 볼 수 없게 됩니다.</string>
-    <!-- Menu item -->
-    <string name="action_open_chat_link">대화 링크 열기</string>
     <!-- Message shown when a contact request has not been sent because the invitation has been sent before -->
     <string name="invite_not_sent_already_sent">연락처 %s에 대한 초대장이 이전에 발송되었으며, 발송된 요청 탭에서 찾아볼 수 있습니다.</string>
     <!-- Label shown to indicate the QR is saving in Cloud Drive -->
@@ -3041,8 +3027,6 @@
     </plurals>
     <!-- Title of a chat message that contains geolocation info -->
     <string name="title_geolocation_message">고정된 위치</string>
-    <!-- Text of the button to indicate an attachment upload from file system -->
-    <string name="attachment_upload_panel_from_device">파일 시스템에서</string>
     <!-- Alert shown when a num of files have not been sent because of any error occurs, Plural of file. 2 files -->
     <plurals name="num_files_not_send">
         <item quantity="other">%d개의 파일이 %d개의 대화에 전송되지 않았습니다</item>
@@ -3179,22 +3163,6 @@
     <string name="text_join_call">이 통화에 참여하려면 현재 통화를 마쳐야합니다</string>
     <!-- Text of the dialog shown when you want to join a group call but you are in another active call -->
     <string name="text_join_another_call">이 통화에 참여하려면 현재 통화를 종료하거나 보류해야합니다.</string>
-    <!-- Hint shown in the open chat link alert dialog -->
-    <string name="hint_enter_chat_link">대화 링크 입력</string>
-    <!-- Hint shown in the open link alert dialog -->
-    <string name="hint_paste_link">링크 붙여넣기</string>
-    <!-- Error shown when it tries to open an invalid file or folder link -->
-    <string name="invalid_file_folder_link">유효하지 않은 파일 또는 폴더 링크</string>
-    <!-- Error shown when it tries to open an invalid file or folder link and the text view is empty -->
-    <string name="invalid_file_folder_link_empty">유효한 파일 또는 폴더 링크를 입력하세요</string>
-    <!-- Error shown when it tries to open an invalid chat link and the text view is empty -->
-    <string name="invalid_chat_link_empty">유효한 대화 링크를 입력하세요</string>
-    <!-- Error shown when it tries to open a chat link from the Cloud Drive section -->
-    <string name="valid_chat_link">대화 링크를 붙여넣었습니다.</string>
-    <!-- Error shown when it tries to open a contact link from the Cloud Drive section -->
-    <string name="valid_contact_link">연락처 링크를 붙여넣었습니다.</string>
-    <!-- Menu item -->
-    <string name="action_open_contact_link">연락처 링크 열기</string>
     <!-- Explanation of the dialog shown to share a chat link -->
     <string name="copy_link_explanation">사람들이 이 링크를 이용하여 당신의 그룹에 참여할 수 있습니다.</string>
     <!-- Label that indicates the creation of a chat link -->

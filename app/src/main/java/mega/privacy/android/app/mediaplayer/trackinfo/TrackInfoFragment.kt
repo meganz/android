@@ -88,7 +88,7 @@ class TrackInfoFragment : Fragment() {
                 return@setOnClickListener
             }
 
-            viewModel.makeAvailableOffline(isChecked)
+            viewModel.makeAvailableOffline(isChecked, requireActivity())
         }
 
         viewModel.loadTrackInfo(args)

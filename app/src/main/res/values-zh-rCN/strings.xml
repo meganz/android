@@ -66,8 +66,6 @@
     <string name="general_error_word">错误</string>
     <!-- when clicking into a menu whose functionality is not yet implemented -->
     <string name="general_not_yet_implemented">功能尚未完善</string>
-    <!-- when any file or folder is selected -->
-    <string name="error_no_selection">未选中任何文件或文件夹</string>
     <!-- when trying to download a file that is already downloaded in the device -->
     <string name="general_already_downloaded">已下载</string>
     <!-- when trying to upload a file that is already uploaded in the folder -->
@@ -100,8 +98,6 @@
     <string name="action_create_folder">新建文件夹</string>
     <!-- Option which allows create a new text file -->
     <string name="action_create_txt">新建文本文档</string>
-    <!-- Menu option to open a link. Also title of the dialog to open a link. -->
-    <string name="action_open_link">打开链接</string>
     <!-- Menu item -->
     <string name="action_settings">设置</string>
     <!-- Search button -->
@@ -622,10 +618,6 @@
     <string name="upload_to_audio">语音</string>
     <!-- Title of the button in the contact info screen to start a video call -->
     <string name="upload_to_video">视频</string>
-    <!-- upload to. Then choose to browse the file system to choose a file -->
-    <string name="upload_to_filesystem">从文件系统中挑选</string>
-    <!-- upload to. Then choose to browse the file system to choose a file -->
-    <string name="upload_to_filesystem_from">选择从</string>
     <!-- Label for the current uploaded size of a file. For example, 3 files, 50KB uploaded -->
     <string name="upload_uploaded">已上传</string>
     <!-- Status text at the beginning of an upload, Status text at the beginning of an upload for 2 or more files -->
@@ -989,8 +981,6 @@
     <string name="settings_disable_logs">日志已关闭</string>
     <!-- Snackbar error message triggered by host error when user is trying to setup MEGA Camera Uploads folder in settings page -->
     <string name="error_unable_to_setup_cloud_folder">无法设置MEGA相机上传文件夹</string>
-    <!-- Message displayed when the user denies the required permissions during the logs activation -->
-    <string name="logs_not_enabled_permissions">日志尚未启用，由于您未开启所需的权限</string>
     <!-- Option in the sliding panel to open the folder which contains the file selected after performing a search -->
     <string name="search_open_location">开启位置</string>
     <!-- message when a temporary error on logging in is due to SDK is waiting for the server to complete a request due to an API lock -->
@@ -2729,16 +2719,12 @@
     <string name="message_set_chat_private">[A]%1$s[/A][B]已启用密钥轮换[/B]</string>
     <!-- error message shown when a chat link is invalid -->
     <string name="invalid_chat_link">该对话不再可用</string>
-    <!-- error message shown when a chat link is not well formed -->
-    <string name="invalid_chat_link_args">无效聊天链接</string>
     <!-- When it is creating a new group chat, this option permits to establish it private or public -->
     <string name="ekr_label">加密密钥轮换</string>
     <!-- Text of the dialog to change a public chat to private (enable encryption key rotation) -->
     <string name="ekr_explanation">加密密钥轮换更为安全，然而您将无法创建聊天链接，同时新参与者也不会看到历史消息。</string>
     <!-- Text of the dialog to change a public chat to private (enable encryption key rotation) -->
     <string name="subtitle_chat_message_enabled_ERK">加密密钥轮换更为安全，然而您将无法创建聊天链接，同时新参与者也不会看到历史消息。</string>
-    <!-- Menu item -->
-    <string name="action_open_chat_link">打开聊天链接</string>
     <!-- Message shown when a contact request has not been sent because the invitation has been sent before -->
     <string name="invite_not_sent_already_sent">邀请已发送至联系人%s，可在‘发送请求’选项卡中查阅。</string>
     <!-- Label shown to indicate the QR is saving in Cloud Drive -->
@@ -3041,8 +3027,6 @@
     </plurals>
     <!-- Title of a chat message that contains geolocation info -->
     <string name="title_geolocation_message">置顶位置</string>
-    <!-- Text of the button to indicate an attachment upload from file system -->
-    <string name="attachment_upload_panel_from_device">从文件系统</string>
     <!-- Alert shown when a num of files have not been sent because of any error occurs, Plural of file. 2 files -->
     <plurals name="num_files_not_send">
         <item quantity="other">%d个文件未发送至%d个聊天</item>
@@ -3179,22 +3163,6 @@
     <string name="text_join_call">加入该通话需结束您的当前通话。</string>
     <!-- Text of the dialog shown when you want to join a group call but you are in another active call -->
     <string name="text_join_another_call">加入该通话需结束或保留当前通话。</string>
-    <!-- Hint shown in the open chat link alert dialog -->
-    <string name="hint_enter_chat_link">输入聊天链接</string>
-    <!-- Hint shown in the open link alert dialog -->
-    <string name="hint_paste_link">粘贴链接</string>
-    <!-- Error shown when it tries to open an invalid file or folder link -->
-    <string name="invalid_file_folder_link">无效文件或文件夹链接</string>
-    <!-- Error shown when it tries to open an invalid file or folder link and the text view is empty -->
-    <string name="invalid_file_folder_link_empty">请输入一个有效的文件或文件夹链接</string>
-    <!-- Error shown when it tries to open an invalid chat link and the text view is empty -->
-    <string name="invalid_chat_link_empty">请输入一个有效的聊天链接</string>
-    <!-- Error shown when it tries to open a chat link from the Cloud Drive section -->
-    <string name="valid_chat_link">您已粘贴聊天链接。</string>
-    <!-- Error shown when it tries to open a contact link from the Cloud Drive section -->
-    <string name="valid_contact_link">您已粘贴联系人链接。</string>
-    <!-- Menu item -->
-    <string name="action_open_contact_link">打开联系人链接</string>
     <!-- Explanation of the dialog shown to share a chat link -->
     <string name="copy_link_explanation">参与者可通过此链接加入您的群组。</string>
     <!-- Label that indicates the creation of a chat link -->
@@ -3700,7 +3668,7 @@
     <!-- Cookie dialog title -->
     <string name="dialog_cookie_alert_title">您的隐私</string>
     <!-- Cookie dialog message. Please, keep the placeholders to format the string. -->
-    <string name="dialog_cookie_alert_message">我們使用Cookies和類似技術（“Cookies”）來提供並增強您對我們服務的體驗。在您開始到訪時就接受我們所使用的Cookies或在Cookie設定中自訂Cookies選項。您可以在我們的[A]Cookie政策[/A]了解更多訊息。</string>
+    <string name="dialog_cookie_alert_message">我们使用Cookie和类似技术（“Cookie”）来提供并增强您对我们服务的体验。在您开始访问时就接受我们对Cookie的使用或在Cookie设置中个性化设置Cookie。您可以在我们的[A]Cookie政策[/A]中阅读更多信息。</string>
     <!-- Cookie dialog message showed when there are unsaved settings. -->
     <string name="dialog_cookie_alert_unsaved">Cookie设置未保存。</string>
     <!-- Snackbar message showed when there settings has been saved successfully. -->

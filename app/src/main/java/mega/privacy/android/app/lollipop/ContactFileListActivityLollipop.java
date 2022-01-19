@@ -22,7 +22,6 @@ import androidx.appcompat.widget.Toolbar;
 import android.util.DisplayMetrics;
 import android.view.Display;
 import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
@@ -53,9 +52,12 @@ import mega.privacy.android.app.interfaces.SnackbarShower;
 import mega.privacy.android.app.interfaces.ActionNodeCallback;
 import mega.privacy.android.app.interfaces.UploadBottomSheetDialogActionListener;
 import mega.privacy.android.app.lollipop.controllers.NodeController;
-import mega.privacy.android.app.lollipop.listeners.MultipleRequestListener;
 import mega.privacy.android.app.modalbottomsheet.ContactFileListBottomSheetDialogFragment;
 import mega.privacy.android.app.modalbottomsheet.UploadBottomSheetDialogFragment;
+import mega.privacy.android.app.usecase.GetNodeUseCase;
+import mega.privacy.android.app.usecase.MoveNodeUseCase;
+import mega.privacy.android.app.usecase.data.MoveRequestResult;
+import mega.privacy.android.app.utils.AlertDialogUtil;
 import mega.privacy.android.app.utils.AlertsAndWarnings;
 import mega.privacy.android.app.utils.MegaNodeDialogUtil;
 import mega.privacy.android.app.utils.StringResourcesUtils;
@@ -68,7 +70,6 @@ import nz.mega.sdk.MegaGlobalListenerInterface;
 import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
-import nz.mega.sdk.MegaShare;
 import nz.mega.sdk.MegaUser;
 import nz.mega.sdk.MegaUserAlert;
 
@@ -82,12 +83,13 @@ import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.MegaNodeDialogUtil.IS_NEW_TEXT_FILE_SHOWN;
 import static mega.privacy.android.app.utils.MegaNodeDialogUtil.NEW_TEXT_FILE_TEXT;
 import static mega.privacy.android.app.utils.MegaNodeDialogUtil.checkNewTextFileDialogState;
-import static mega.privacy.android.app.utils.PermissionUtils.*;
+import static mega.privacy.android.app.utils.permission.PermissionUtils.*;
 import static mega.privacy.android.app.utils.StringResourcesUtils.getQuantityString;
 import static mega.privacy.android.app.utils.Util.*;
 import static mega.privacy.android.app.utils.ContactUtil.*;
 import static mega.privacy.android.app.utils.UploadUtil.*;
 import static nz.mega.sdk.MegaApiJava.STORAGE_STATE_PAYWALL;
+import static nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE;
 
 import javax.inject.Inject;
 
@@ -98,6 +100,10 @@ public class ContactFileListActivityLollipop extends PasscodeActivity
 
 	@Inject
 	FilePrepareUseCase filePrepareUseCase;
+	@Inject
+	MoveNodeUseCase moveNodeUseCase;
+	@Inject
+	GetNodeUseCase getNodeUseCase;
 
 	FrameLayout fragmentContainer;
 
@@ -118,8 +124,6 @@ public class ContactFileListActivityLollipop extends PasscodeActivity
 	MenuItem shareMenuItem;
 	MenuItem viewSharedItem;
 
-	boolean moveToRubbish = false;
-
 	private final static String PARENT_HANDLE = "parentHandle";
 	static ContactFileListActivityLollipop contactPropertiesMainActivity;
 
@@ -127,8 +131,6 @@ public class ContactFileListActivityLollipop extends PasscodeActivity
 
 	DatabaseHandler dbH;
 
-	MenuItem createFolderMenuItem;
-	MenuItem startConversation;
 	private AlertDialog newFolderDialog;
 	DisplayMetrics outMetrics;
 
@@ -183,48 +185,21 @@ public class ContactFileListActivityLollipop extends PasscodeActivity
 	}
 
 	@Override
-	public boolean onCreateOptionsMenu(Menu menu) {
-		logDebug("onCreateOptionsMenuLollipop");
-
-		// Inflate the menu items for use in the action bar
-		MenuInflater inflater = getMenuInflater();
-		inflater.inflate(R.menu.file_explorer_action, menu);
-
-		menu.findItem(R.id.cab_menu_search).setVisible(false);
-		createFolderMenuItem = menu.findItem(R.id.cab_menu_create_folder);
-		startConversation = menu.findItem(R.id.cab_menu_new_chat);
-		startConversation.setVisible(false);
-
-		MegaNode n = megaApi.getNodeByHandle(parentHandle);
-		createFolderMenuItem.setVisible(n != null && megaApi.getAccess(n) > MegaShare.ACCESS_READ);
-		return super.onCreateOptionsMenu(menu);
-	}
-
-	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		logDebug("onOptionsItemSelected");
-		int id = item.getItemId();
-		switch (id) {
-			case android.R.id.home: {
-				onBackPressed();
-				break;
-			}
-			case R.id.cab_menu_create_folder: {
-				showNewFolderDialog();
-				break;
-			}
+
+		if (item.getItemId() == android.R.id.home) {
+			onBackPressed();
+		} else if (item.getItemId() == R.id.action_more) {
+			showOptionsPanel(megaApi.getNodeByHandle(parentHandle));
 		}
+
 		return true;
 	}
 
 	@Override
 	public void uploadFromDevice() {
 		chooseFromDevice(this);
-	}
-
-	@Override
-	public void uploadFromSystem() {
-		pickFileFromFileSystem(this);
 	}
 
 	@Override
@@ -543,37 +518,44 @@ public class ContactFileListActivityLollipop extends PasscodeActivity
 
 	public void moveToTrash(final ArrayList<Long> handleList) {
 		logDebug("moveToTrash: ");
-		moveToRubbish = true;
 		if (!isOnline(this)) {
 			showSnackbar(SNACKBAR_TYPE, getString(R.string.error_server_connection_problem));
 			return;
 		}
 
-		MultipleRequestListener moveMultipleListener = null;
-		MegaNode parent;
-		//Check if the node is not yet in the rubbish bin (if so, remove it)
-		if (handleList != null) {
-			if (handleList.size() > 1) {
-				logDebug("MOVE multiple: " + handleList.size());
-				moveMultipleListener = new MultipleRequestListener(MULTIPLE_SEND_RUBBISH, this);
-				for (int i = 0;
-					 i < handleList.size();
-					 i++) {
-					megaApi.moveNode(megaApi.getNodeByHandle(handleList.get(i)), megaApi.getRubbishNode(), moveMultipleListener);
-				}
-			} else {
-				logDebug("MOVE single");
-				megaApi.moveNode(megaApi.getNodeByHandle(handleList.get(0)), megaApi.getRubbishNode(), this);
+		moveNodeUseCase.moveToRubbishBin(handleList)
+				.subscribeOn(Schedulers.io())
+				.observeOn(AndroidSchedulers.mainThread())
+				.subscribe((result, throwable) -> {
+					if (throwable == null) {
+						showMovementResult(result, handleList.get(0));
+					}
+				});
+	}
 
-			}
+	/**
+	 * Shows the final result of a movement request.
+	 *
+	 * @param result Object containing the request result.
+	 * @param handle Handle of the node to mode.
+	 */
+	private void showMovementResult(MoveRequestResult result, long handle) {
+		AlertDialogUtil.dismissAlertDialogIfExists(statusDialog);
+		actionConfirmed();
+
+		if (result.isSingleAction() && result.isSuccess() &&  parentHandle == handle) {
+			onBackPressed();
+			setTitleActionBar(megaApi.getNodeByHandle(parentHandle).getName());
+		}
+
+		if (result.isForeignNode()) {
+			showForeignStorageOverQuotaWarningDialog(this);
 		} else {
-			logWarning("handleList NULL");
-			return;
+			showSnackbar(SNACKBAR_TYPE, result.getResultText(), MEGACHAT_INVALID_HANDLE);
 		}
 	}
 
 	public void showMoveLollipop(ArrayList<Long> handleList) {
-		moveToRubbish = false;
 		Intent intent = new Intent(this, FileExplorerActivityLollipop.class);
 		intent.setAction(FileExplorerActivityLollipop.ACTION_PICK_MOVE_FOLDER);
 		long[] longArray = new long[handleList.size()];
@@ -659,8 +641,6 @@ public class ContactFileListActivityLollipop extends PasscodeActivity
 
 			final long[] moveHandles = intent.getLongArrayExtra("MOVE_HANDLES");
 			final long toHandle = intent.getLongExtra("MOVE_TO", 0);
-			moveToRubbish = false;
-			MegaNode parent = megaApi.getNodeByHandle(toHandle);
 
 			AlertDialog temp;
 			try {
@@ -671,9 +651,14 @@ public class ContactFileListActivityLollipop extends PasscodeActivity
 			}
 			statusDialog = temp;
 
-			for (int i = 0; i < moveHandles.length; i++) {
-				megaApi.moveNode(megaApi.getNodeByHandle(moveHandles[i]), parent, this);
-			}
+			moveNodeUseCase.move(moveHandles, toHandle)
+					.subscribeOn(Schedulers.io())
+					.observeOn(AndroidSchedulers.mainThread())
+					.subscribe((result, throwable) -> {
+						if (throwable == null) {
+							showMovementResult(result, moveHandles[0]);
+						}
+					});
 		} else if (requestCode == REQUEST_CODE_GET && resultCode == RESULT_OK) {
 			if (intent == null) {
 				return;
@@ -836,7 +821,7 @@ public class ContactFileListActivityLollipop extends PasscodeActivity
 
 	@Override
 	public void onBackPressed() {
-		if (psaWebBrowser.consumeBack()) return;
+		if (psaWebBrowser != null && psaWebBrowser.consumeBack()) return;
 		retryConnectionsAndSignalPresence();
 
 		if (cflF != null && cflF.isVisible() && cflF.onBackPressed() == 0) {
@@ -857,10 +842,30 @@ public class ContactFileListActivityLollipop extends PasscodeActivity
 
 	@Override
 	public void onNodesUpdate(MegaApiJava api, ArrayList<MegaNode> nodes) {
-		if (cflF != null) {
-			if (cflF.isVisible()) {
-				cflF.setNodes(parentHandle);
+		for (MegaNode node : nodes) {
+			if (node.isInShare() && parentHandle == node.getHandle()) {
+				getNodeUseCase.get(parentHandle)
+						.subscribeOn(Schedulers.io())
+						.observeOn(AndroidSchedulers.mainThread())
+						.subscribe((result, throwable) -> {
+							if (throwable == null) {
+								updateNodes();
+							} else {
+								finish();
+							}
+						});
+			} else {
+				updateNodes();
 			}
+		}
+	}
+
+	/**
+	 * Update the nodes.
+	 */
+	private void updateNodes() {
+		if (cflF != null && cflF.isVisible()){
+			cflF.setNodes(parentHandle);
 		}
 	}
 
@@ -988,34 +993,6 @@ public class ContactFileListActivityLollipop extends PasscodeActivity
 			}
 
 			logDebug("Copy nodes request finished");
-		} else if (request.getType() == MegaRequest.TYPE_MOVE) {
-			try {
-				statusDialog.dismiss();
-			} catch (Exception ex) {
-			}
-
-			if (cflF != null && cflF.isVisible()) {
-				cflF.clearSelections();
-				cflF.hideMultipleSelect();
-			}
-
-			if (e.getErrorCode() == MegaError.API_EOVERQUOTA && api.isForeignNode(request.getParentHandle())) {
-				showForeignStorageOverQuotaWarningDialog(this);
-			} else if (moveToRubbish) {
-				logDebug("Finish move to Rubbish!");
-				if (e.getErrorCode() == MegaError.API_OK) {
-					showSnackbar(SNACKBAR_TYPE, getString(R.string.context_correctly_moved_to_rubbish));
-				}
-			} else {
-				if (e.getErrorCode() == MegaError.API_OK) {
-					showSnackbar(SNACKBAR_TYPE, getString(R.string.context_correctly_moved));
-				} else {
-					showSnackbar(SNACKBAR_TYPE, getString(R.string.context_no_moved));
-				}
-			}
-
-			moveToRubbish = false;
-			logDebug("Move request finished");
 		}
 	}
 
@@ -1160,5 +1137,11 @@ public class ContactFileListActivityLollipop extends PasscodeActivity
 			cflF.clearSelections();
 			cflF.hideMultipleSelect();
 		}
+	}
+
+	@Override
+	public boolean onCreateOptionsMenu(Menu menu) {
+		getMenuInflater().inflate(R.menu.activity_contact_file_list, menu);
+		return super.onCreateOptionsMenu(menu);
 	}
 }

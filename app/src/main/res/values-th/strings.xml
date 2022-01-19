@@ -66,8 +66,6 @@
     <string name="general_error_word">ผิดพลาด</string>
     <!-- when clicking into a menu whose functionality is not yet implemented -->
     <string name="general_not_yet_implemented">ยังไม่ได้ใช้</string>
-    <!-- when any file or folder is selected -->
-    <string name="error_no_selection">ยังไม่ได้เลือกไฟล์หรือโฟลเดอร์</string>
     <!-- when trying to download a file that is already downloaded in the device -->
     <string name="general_already_downloaded">ดาวน์โหลดมาแล้ว</string>
     <!-- when trying to upload a file that is already uploaded in the folder -->
@@ -100,8 +98,6 @@
     <string name="action_create_folder">สร้างโฟลเดอร์ใหม่</string>
     <!-- Option which allows create a new text file -->
     <string name="action_create_txt">สร้างไฟล์ข้อความใหม่</string>
-    <!-- Menu option to open a link. Also title of the dialog to open a link. -->
-    <string name="action_open_link">เปิดลิงก์</string>
     <!-- Menu item -->
     <string name="action_settings">ตั้งค่า</string>
     <!-- Search button -->
@@ -622,10 +618,6 @@
     <string name="upload_to_audio">เสียง</string>
     <!-- Title of the button in the contact info screen to start a video call -->
     <string name="upload_to_video">วิดีโอ</string>
-    <!-- upload to. Then choose to browse the file system to choose a file -->
-    <string name="upload_to_filesystem">เลือกจาก File System</string>
-    <!-- upload to. Then choose to browse the file system to choose a file -->
-    <string name="upload_to_filesystem_from">เลือกจาก</string>
     <!-- Label for the current uploaded size of a file. For example, 3 files, 50KB uploaded -->
     <string name="upload_uploaded">อัปโหลดแล้ว</string>
     <!-- Status text at the beginning of an upload, Status text at the beginning of an upload for 2 or more files -->
@@ -989,8 +981,6 @@
     <string name="settings_disable_logs">รายการบันทึกจะถูกปิดใช้งานในขณะนี้</string>
     <!-- Snackbar error message triggered by host error when user is trying to setup MEGA Camera Uploads folder in settings page -->
     <string name="error_unable_to_setup_cloud_folder">ไม่สามารถตั้งค่าโฟลเดอร์ MEGA อัปโหลดจากกล้องได้</string>
-    <!-- Message displayed when the user denies the required permissions during the logs activation -->
-    <string name="logs_not_enabled_permissions">ไฟล์บันทึกยังไม่ได้เปิดใช้งาน เนื่องจากคุณปฏิเสธสิทธิ์ดังกล่าว</string>
     <!-- Option in the sliding panel to open the folder which contains the file selected after performing a search -->
     <string name="search_open_location">เปิดตำแหน่งที่ตั้ง</string>
     <!-- message when a temporary error on logging in is due to SDK is waiting for the server to complete a request due to an API lock -->
@@ -2729,16 +2719,12 @@
     <string name="message_set_chat_private">[A]%1$s[/A][B] ได้เปิดใช้งานการหมุนเวียนคีย์เข้ารหัส[/B]</string>
     <!-- error message shown when a chat link is invalid -->
     <string name="invalid_chat_link">การสนทนานี้ไม่สามารถใช้งานได้อีกต่อไป</string>
-    <!-- error message shown when a chat link is not well formed -->
-    <string name="invalid_chat_link_args">ลิงก์แชทไม่ถูกต้อง</string>
     <!-- When it is creating a new group chat, this option permits to establish it private or public -->
     <string name="ekr_label">การหมุนเวียนคีย์เข้ารหัส</string>
     <!-- Text of the dialog to change a public chat to private (enable encryption key rotation) -->
     <string name="ekr_explanation">การหมุนเวียนคีย์เข้ารหัสมีความปลอดภัยในระดับหนึ่ง แต่จะไม่อนุญาตให้คุณสร้างลิงก์แชท และผู้เข้าร่วมใหม่จะไม่เห็นข้อความที่ผ่านมา</string>
     <!-- Text of the dialog to change a public chat to private (enable encryption key rotation) -->
     <string name="subtitle_chat_message_enabled_ERK">การหมุนเวียนคีย์เข้ารหัสมีความปลอดภัยในระดับหนึ่ง แต่จะไม่อนุญาตให้คุณสร้างลิงก์แชท และผู้เข้าร่วมใหม่จะไม่เห็นข้อความที่ผ่านมา</string>
-    <!-- Menu item -->
-    <string name="action_open_chat_link">เปิดลิงก์แชท</string>
     <!-- Message shown when a contact request has not been sent because the invitation has been sent before -->
     <string name="invite_not_sent_already_sent">คำเชิญให้ติดต่อ %s มีการส่งไปแล้วและสามารถดูได้ในแท็บคำขอที่ส่งแล้ว</string>
     <!-- Label shown to indicate the QR is saving in Cloud Drive -->
@@ -3041,8 +3027,6 @@
     </plurals>
     <!-- Title of a chat message that contains geolocation info -->
     <string name="title_geolocation_message">ตำแหน่งที่ปักหมุด</string>
-    <!-- Text of the button to indicate an attachment upload from file system -->
-    <string name="attachment_upload_panel_from_device">จากระบบไฟล์</string>
     <!-- Alert shown when a num of files have not been sent because of any error occurs, Plural of file. 2 files -->
     <plurals name="num_files_not_send">
         <item quantity="other">ไฟล์ %d รายการไม่ได้ถูกส่งไปยังแชท %d</item>
@@ -3179,22 +3163,6 @@
     <string name="text_join_call">ในการเข้าร่วมการโทรนี้คุณต้องวางสายปัจจุบันก่อน</string>
     <!-- Text of the dialog shown when you want to join a group call but you are in another active call -->
     <string name="text_join_another_call">หากต้องการเข้าร่วมสายนี้ คุณต้องวางสายหรือพักสายปัจจุบันไว้</string>
-    <!-- Hint shown in the open chat link alert dialog -->
-    <string name="hint_enter_chat_link">เข้าสู่ลิงก์แชท</string>
-    <!-- Hint shown in the open link alert dialog -->
-    <string name="hint_paste_link">วางลิงก์</string>
-    <!-- Error shown when it tries to open an invalid file or folder link -->
-    <string name="invalid_file_folder_link">ลิงก์ไฟล์หรือโฟลเดอร์ไม่ถูกต้อง</string>
-    <!-- Error shown when it tries to open an invalid file or folder link and the text view is empty -->
-    <string name="invalid_file_folder_link_empty">กรุณากรอกลิงก์ไฟล์หรือโฟลเดอร์ให้ถูกต้อง</string>
-    <!-- Error shown when it tries to open an invalid chat link and the text view is empty -->
-    <string name="invalid_chat_link_empty">กรุณากรอกลิงก์แชทให้ถูกต้อง</string>
-    <!-- Error shown when it tries to open a chat link from the Cloud Drive section -->
-    <string name="valid_chat_link">คุณได้วางลิงก์แชทแล้ว</string>
-    <!-- Error shown when it tries to open a contact link from the Cloud Drive section -->
-    <string name="valid_contact_link">คุณได้วางลิงก์ผู้ติดต่อแล้ว</string>
-    <!-- Menu item -->
-    <string name="action_open_contact_link">เปิดลิงก์ผู้ติดต่อ</string>
     <!-- Explanation of the dialog shown to share a chat link -->
     <string name="copy_link_explanation">ผู้คนสามารถเข้าร่วมกลุ่มของคุณโดยใช้ลิงก์นี้</string>
     <!-- Label that indicates the creation of a chat link -->

@@ -1,9 +1,9 @@
 package mega.privacy.android.app.contacts.requests
 
-import androidx.hilt.lifecycle.ViewModelInject
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.map
+import dagger.hilt.android.lifecycle.HiltViewModel
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.core.Completable
 import io.reactivex.rxjava3.kotlin.addTo
@@ -17,6 +17,7 @@ import mega.privacy.android.app.contacts.usecase.GetContactRequestsUseCase
 import mega.privacy.android.app.contacts.usecase.ReplyContactRequestUseCase
 import mega.privacy.android.app.utils.LogUtil.logError
 import mega.privacy.android.app.utils.notifyObserver
+import javax.inject.Inject
 
 /**
  * ViewModel that handles all related logic to Contact Groups for the current user.
@@ -24,7 +25,8 @@ import mega.privacy.android.app.utils.notifyObserver
  * @param getContactRequestsUseCase     Use case to retrieve contact requests for current user
  * @param replyContactRequestUseCase    Use case to reply to existing contact requests
  */
-class ContactRequestsViewModel @ViewModelInject constructor(
+@HiltViewModel
+class ContactRequestsViewModel @Inject constructor(
     private val getContactRequestsUseCase: GetContactRequestsUseCase,
     private val replyContactRequestUseCase: ReplyContactRequestUseCase
 ) : BaseRxViewModel() {

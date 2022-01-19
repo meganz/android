@@ -66,8 +66,6 @@
     <string name="general_error_word">錯誤</string>
     <!-- when clicking into a menu whose functionality is not yet implemented -->
     <string name="general_not_yet_implemented">尚未實施</string>
-    <!-- when any file or folder is selected -->
-    <string name="error_no_selection">尚未選擇檔案或資料夾</string>
     <!-- when trying to download a file that is already downloaded in the device -->
     <string name="general_already_downloaded">已下載</string>
     <!-- when trying to upload a file that is already uploaded in the folder -->
@@ -100,8 +98,6 @@
     <string name="action_create_folder">建立新資料夾</string>
     <!-- Option which allows create a new text file -->
     <string name="action_create_txt">建立新的文字檔案</string>
-    <!-- Menu option to open a link. Also title of the dialog to open a link. -->
-    <string name="action_open_link">打開連結</string>
     <!-- Menu item -->
     <string name="action_settings">設定</string>
     <!-- Search button -->
@@ -622,10 +618,6 @@
     <string name="upload_to_audio">音樂</string>
     <!-- Title of the button in the contact info screen to start a video call -->
     <string name="upload_to_video">影片</string>
-    <!-- upload to. Then choose to browse the file system to choose a file -->
-    <string name="upload_to_filesystem">從檔案系統中選取</string>
-    <!-- upload to. Then choose to browse the file system to choose a file -->
-    <string name="upload_to_filesystem_from">選擇自</string>
     <!-- Label for the current uploaded size of a file. For example, 3 files, 50KB uploaded -->
     <string name="upload_uploaded">已上傳</string>
     <!-- Status text at the beginning of an upload, Status text at the beginning of an upload for 2 or more files -->
@@ -989,8 +981,6 @@
     <string name="settings_disable_logs">日誌已關閉</string>
     <!-- Snackbar error message triggered by host error when user is trying to setup MEGA Camera Uploads folder in settings page -->
     <string name="error_unable_to_setup_cloud_folder">無法設定MEGA相機上傳資料夾</string>
-    <!-- Message displayed when the user denies the required permissions during the logs activation -->
-    <string name="logs_not_enabled_permissions">因為您拒絕所需要的權限，因此未啟用日誌功能。</string>
     <!-- Option in the sliding panel to open the folder which contains the file selected after performing a search -->
     <string name="search_open_location">開啟位置</string>
     <!-- message when a temporary error on logging in is due to SDK is waiting for the server to complete a request due to an API lock -->
@@ -2729,16 +2719,12 @@
     <string name="message_set_chat_private">[A]%1$s[/A][B]開啟加密金鑰輪替。[/B]</string>
     <!-- error message shown when a chat link is invalid -->
     <string name="invalid_chat_link">這個對話已無法再使用</string>
-    <!-- error message shown when a chat link is not well formed -->
-    <string name="invalid_chat_link_args">無效的對話連結</string>
     <!-- When it is creating a new group chat, this option permits to establish it private or public -->
     <string name="ekr_label">加密金鑰輪替</string>
     <!-- Text of the dialog to change a public chat to private (enable encryption key rotation) -->
     <string name="ekr_explanation">加密金鑰輪替更安全一些，但是不允許您建立對話連結，而且新加入的與會者將看不到舊的訊息。</string>
     <!-- Text of the dialog to change a public chat to private (enable encryption key rotation) -->
     <string name="subtitle_chat_message_enabled_ERK">加密金鑰輪替更安全一些，但是不允許您建立對話連結，而且新加入的與會者將看不到舊的訊息。</string>
-    <!-- Menu item -->
-    <string name="action_open_chat_link">開啟對話連結</string>
     <!-- Message shown when a contact request has not been sent because the invitation has been sent before -->
     <string name="invite_not_sent_already_sent">給聯絡人%s的邀請之前已發送過，可在已發送請求的頁面中查看。</string>
     <!-- Label shown to indicate the QR is saving in Cloud Drive -->
@@ -3041,8 +3027,6 @@
     </plurals>
     <!-- Title of a chat message that contains geolocation info -->
     <string name="title_geolocation_message">固定位置</string>
-    <!-- Text of the button to indicate an attachment upload from file system -->
-    <string name="attachment_upload_panel_from_device">從檔案系統</string>
     <!-- Alert shown when a num of files have not been sent because of any error occurs, Plural of file. 2 files -->
     <plurals name="num_files_not_send">
         <item quantity="other">%d個檔案未傳送至%d個對話中</item>
@@ -3179,22 +3163,6 @@
     <string name="text_join_call">如要加入此通話，您必須先結束目前的通話。</string>
     <!-- Text of the dialog shown when you want to join a group call but you are in another active call -->
     <string name="text_join_another_call">如要加入此通話，您必須先結束或保留目前的通話。</string>
-    <!-- Hint shown in the open chat link alert dialog -->
-    <string name="hint_enter_chat_link">輸入對話連結</string>
-    <!-- Hint shown in the open link alert dialog -->
-    <string name="hint_paste_link">貼上連結</string>
-    <!-- Error shown when it tries to open an invalid file or folder link -->
-    <string name="invalid_file_folder_link">無效的檔案或資料夾連結</string>
-    <!-- Error shown when it tries to open an invalid file or folder link and the text view is empty -->
-    <string name="invalid_file_folder_link_empty">請輸入有效的檔案或資料夾連結</string>
-    <!-- Error shown when it tries to open an invalid chat link and the text view is empty -->
-    <string name="invalid_chat_link_empty">請輸入有效的對話連結</string>
-    <!-- Error shown when it tries to open a chat link from the Cloud Drive section -->
-    <string name="valid_chat_link">您已貼上一個對話連結。</string>
-    <!-- Error shown when it tries to open a contact link from the Cloud Drive section -->
-    <string name="valid_contact_link">您已貼上一個連絡人連結。</string>
-    <!-- Menu item -->
-    <string name="action_open_contact_link">打開連絡人連結</string>
     <!-- Explanation of the dialog shown to share a chat link -->
     <string name="copy_link_explanation">人們可以使用此連結加入您的群組。</string>
     <!-- Label that indicates the creation of a chat link -->

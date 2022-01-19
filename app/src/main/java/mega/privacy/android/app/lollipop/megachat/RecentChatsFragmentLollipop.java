@@ -74,7 +74,7 @@ import mega.privacy.android.app.objects.PasscodeManagement;
 import mega.privacy.android.app.utils.AskForDisplayOverDialog;
 import mega.privacy.android.app.utils.ColorUtils;
 import mega.privacy.android.app.utils.HighLightHintHelper;
-import mega.privacy.android.app.utils.PermissionUtils;
+import mega.privacy.android.app.utils.permission.PermissionUtils;
 import mega.privacy.android.app.utils.TimeUtils;
 import mega.privacy.android.app.utils.Util;
 import mega.privacy.android.app.utils.contacts.MegaContactGetter;
@@ -92,7 +92,7 @@ import static mega.privacy.android.app.utils.CallUtil.*;
 import static mega.privacy.android.app.utils.ChatUtil.*;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
-import static mega.privacy.android.app.utils.PermissionUtils.*;
+import static mega.privacy.android.app.utils.permission.PermissionUtils.*;
 import static mega.privacy.android.app.utils.Util.*;
 
 import javax.inject.Inject;
@@ -124,7 +124,7 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
     LinearLayoutManager mLayoutManager;
     FastScroller fastScroller;
 
-    ArrayList<MegaChatListItem> chats;
+    ArrayList<MegaChatListItem> chats = new ArrayList<>();
 
     FilterChatsTask filterChatsTask;
 
@@ -1802,7 +1802,7 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
 
     class FilterChatsTask extends AsyncTask<String, Void, Void> {
 
-        ArrayList<MegaChatListItem> filteredChats;
+        ArrayList<MegaChatListItem> filteredChats = new ArrayList<>();
         int archivedSize = 0;
 
         @Override
@@ -1822,11 +1822,7 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
             }
 
             if (!chatsToSearch.isEmpty()) {
-                if (filteredChats == null) {
-                    filteredChats = new ArrayList<>();
-                } else {
-                    filteredChats.clear();
-                }
+                filteredChats.clear();
                 for (MegaChatListItem chat : chatsToSearch) {
                     if (getTitleChat(chat).toLowerCase().contains(strings[0].toLowerCase())) {
                         filteredChats.add(chat);

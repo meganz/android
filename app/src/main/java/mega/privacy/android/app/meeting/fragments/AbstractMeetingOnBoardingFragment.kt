@@ -10,10 +10,7 @@ import android.view.ViewTreeObserver.OnGlobalLayoutListener
 import android.widget.Toast
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.lifecycle.lifecycleScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
+import kotlinx.coroutines.*
 import mega.privacy.android.app.BaseActivity
 import mega.privacy.android.app.R
 import mega.privacy.android.app.components.OnOffFab
@@ -25,7 +22,7 @@ import mega.privacy.android.app.utils.*
 import mega.privacy.android.app.utils.Constants.*
 import mega.privacy.android.app.utils.LogUtil.logDebug
 import mega.privacy.android.app.utils.LogUtil.logError
-import mega.privacy.android.app.utils.permission.permissionsBuilder
+import mega.privacy.android.app.utils.permission.*
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
 
 /**
@@ -34,9 +31,11 @@ import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
  * E.g. Turn on/off mic/camera/speaker buttons, self video preview,
  * click the big bottom button to move forward, etc.
  */
+
 abstract class AbstractMeetingOnBoardingFragment : MeetingBaseFragment() {
 
     protected lateinit var binding: MeetingOnBoardingFragmentBinding
+
     private var videoListener: IndividualCallVideoListener? = null
 
     protected var meetingName = ""
@@ -94,7 +93,7 @@ abstract class AbstractMeetingOnBoardingFragment : MeetingBaseFragment() {
     override fun onAttach(context: Context) {
         super.onAttach(context)
         // Do not share the instance with other permission check process, because the callback functions are different.
-        permissionsRequester = permissionsBuilder(permissions.toCollection(ArrayList()))
+        permissionsRequester = permissionsBuilder(permissions)
             .setOnPermissionDenied { l -> onPermissionDenied(l) }
             .setOnRequiresPermission { l -> onRequiresPermission(l) }
             .setOnShowRationale { l -> onShowRationale(l) }
@@ -163,7 +162,7 @@ abstract class AbstractMeetingOnBoardingFragment : MeetingBaseFragment() {
         binding.meetingInfo.layoutParams = menuLayoutParams
     }
 
-    protected fun setMarginBottomOfMeetingButton(marginBottom: Float) {
+    private fun setMarginBottomOfMeetingButton(marginBottom: Float) {
         val layoutParams = binding.btnStartJoinMeeting.layoutParams as ConstraintLayout.LayoutParams
         layoutParams.bottomMargin = Util.dp2px(marginBottom)
         binding.btnStartJoinMeeting.layoutParams = layoutParams
@@ -184,15 +183,12 @@ abstract class AbstractMeetingOnBoardingFragment : MeetingBaseFragment() {
         binding.lifecycleOwner = this
         binding.btnStartJoinMeeting.setOnClickListener {
             permissionsRequester = permissionsBuilder(
-                listOf(Manifest.permission.RECORD_AUDIO).toCollection(
-                    java.util.ArrayList()
-                )
+                arrayOf(Manifest.permission.RECORD_AUDIO)
             )
                 .setOnPermissionDenied { l -> onPermissionDenied(l) }
                 .setOnRequiresPermission { l ->
                     run {
                         toast?.cancel()
-
                         onRequiresPermission(l)
                         onMeetingButtonClick()
                     }
@@ -214,7 +210,7 @@ abstract class AbstractMeetingOnBoardingFragment : MeetingBaseFragment() {
      * Use ViewModel to manage UI-related data
      */
     private fun initViewModel() {
-        sharedModel.let { model->
+        sharedModel.let { model ->
             model.apply {
                 micLiveData.observe(viewLifecycleOwner) {
                     binding.onOffFab.fabMic.isOn = it
@@ -264,17 +260,17 @@ abstract class AbstractMeetingOnBoardingFragment : MeetingBaseFragment() {
                 cameraPermissionCheck.observe(viewLifecycleOwner) {
                     if (it) {
                         permissionsRequester = permissionsBuilder(
-                            arrayOf(Manifest.permission.CAMERA).toCollection(ArrayList())
+                            arrayOf(Manifest.permission.CAMERA)
                         )
                             .setOnRequiresPermission { l ->
                                 run {
-                                    onRequiresCameraPermission(l)
+                                    onRequiresPermission(l)
                                     // Continue expected action after granted
                                     sharedModel.clickCamera(true)
                                 }
                             }
                             .setOnShowRationale { l -> onShowRationale(l) }
-                            .setOnNeverAskAgain { l -> onCameraNeverAskAgain(l) }
+                            .setOnNeverAskAgain { l -> onPermNeverAskAgain(l) }
                             .build()
                         permissionsRequester.launch(false)
                     }
@@ -282,17 +278,17 @@ abstract class AbstractMeetingOnBoardingFragment : MeetingBaseFragment() {
                 recordAudioPermissionCheck.observe(viewLifecycleOwner) {
                     if (it) {
                         permissionsRequester = permissionsBuilder(
-                            arrayOf(Manifest.permission.RECORD_AUDIO).toCollection(ArrayList())
+                            arrayOf(Manifest.permission.RECORD_AUDIO)
                         )
                             .setOnRequiresPermission { l ->
                                 run {
-                                    onRequiresAudioPermission(l)
+                                    onRequiresPermission(l)
                                     // Continue expected action after granted
                                     sharedModel.clickMic(true)
                                 }
                             }
                             .setOnShowRationale { l -> onShowRationale(l) }
-                            .setOnNeverAskAgain { l -> onAudioNeverAskAgain(l) }
+                            .setOnNeverAskAgain { l -> onPermNeverAskAgain(l) }
                             .build()
                         permissionsRequester.launch(false)
                     }
@@ -302,37 +298,27 @@ abstract class AbstractMeetingOnBoardingFragment : MeetingBaseFragment() {
     }
 
     /**
-     * user denies the RECORD_AUDIO permission
+     * user denies the RECORD_AUDIO or CAMERA permission
      *
      * @param permissions permission list
      */
-    private fun onAudioNeverAskAgain(permissions: ArrayList<String>) {
-        if (permissions.contains(Manifest.permission.RECORD_AUDIO)) {
-            logDebug("user denies the RECORD_AUDIO permission")
+    private fun onPermNeverAskAgain(permissions: ArrayList<String>) {
+        if (permissions.contains(Manifest.permission.RECORD_AUDIO)
+            || permissions.contains(Manifest.permission.CAMERA)
+        ) {
+            logDebug("user denies the permission")
             showSnackBar()
         }
     }
 
     /**
-     * user denies the CAMERA permission
-     *
-     * @param permissions permission list
-     */
-    private fun onCameraNeverAskAgain(permissions: ArrayList<String>) {
-        if (permissions.contains(Manifest.permission.CAMERA)) {
-            logDebug("user denies the CAMERA permission")
-            showSnackBar()
-        }
-    }
-
-    /**
-     * Notify the client to manually open the permission in system setting, This only needed when bRequested is true
+     * Notify the client to manually open the permission in system setting.
      */
     protected fun showSnackBar() {
         val warningText =
             StringResourcesUtils.getString(R.string.meeting_required_permissions_warning)
         (activity as BaseActivity).showSnackbar(
-            Constants.PERMISSIONS_TYPE,
+            PERMISSIONS_TYPE,
             binding.root,
             warningText
         )
@@ -394,7 +380,6 @@ abstract class AbstractMeetingOnBoardingFragment : MeetingBaseFragment() {
         }
     }
 
-
     /**
      * Switch Camera
      *
@@ -404,7 +389,7 @@ abstract class AbstractMeetingOnBoardingFragment : MeetingBaseFragment() {
         binding.onOffFab.fabCam.isOn = shouldVideoBeEnabled
         setViewEnable(binding.onOffFab.fabCam, false)
 
-        if(shouldVideoBeEnabled){
+        if (shouldVideoBeEnabled) {
             // Always try to start the video using the front camera
             binding.mask.visibility = View.VISIBLE
             bCameraOpen = true
@@ -413,7 +398,7 @@ abstract class AbstractMeetingOnBoardingFragment : MeetingBaseFragment() {
             // Hide avatar when camera open
             triggerAvatar(View.GONE)
             activateVideo()
-        }else{
+        } else {
             binding.mask.visibility = View.GONE
             bCameraOpen = false
 

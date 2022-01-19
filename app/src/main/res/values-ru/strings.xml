@@ -66,8 +66,6 @@
     <string name="general_error_word">Ошибка</string>
     <!-- when clicking into a menu whose functionality is not yet implemented -->
     <string name="general_not_yet_implemented">В разработке</string>
-    <!-- when any file or folder is selected -->
-    <string name="error_no_selection">Не выбраны файлы или папки</string>
     <!-- when trying to download a file that is already downloaded in the device -->
     <string name="general_already_downloaded">Уже скачано</string>
     <!-- when trying to upload a file that is already uploaded in the folder -->
@@ -100,8 +98,6 @@
     <string name="action_create_folder">Создать новую папку</string>
     <!-- Option which allows create a new text file -->
     <string name="action_create_txt">Создать новый текстовый файл</string>
-    <!-- Menu option to open a link. Also title of the dialog to open a link. -->
-    <string name="action_open_link">Открыть ссылку</string>
     <!-- Menu item -->
     <string name="action_settings">Настройки</string>
     <!-- Search button -->
@@ -649,10 +645,6 @@
     <string name="upload_to_audio">Аудио</string>
     <!-- Title of the button in the contact info screen to start a video call -->
     <string name="upload_to_video">Видео</string>
-    <!-- upload to. Then choose to browse the file system to choose a file -->
-    <string name="upload_to_filesystem">Забрать с устройства</string>
-    <!-- upload to. Then choose to browse the file system to choose a file -->
-    <string name="upload_to_filesystem_from">Выбрать из</string>
     <!-- Label for the current uploaded size of a file. For example, 3 files, 50KB uploaded -->
     <string name="upload_uploaded">загружено</string>
     <!-- Status text at the beginning of an upload, Status text at the beginning of an upload for 2 or more files -->
@@ -1025,8 +1017,6 @@
     <string name="settings_disable_logs">Журнал отключён</string>
     <!-- Snackbar error message triggered by host error when user is trying to setup MEGA Camera Uploads folder in settings page -->
     <string name="error_unable_to_setup_cloud_folder">Невозможно настроить MEGA-папку загрузок из камеры</string>
-    <!-- Message displayed when the user denies the required permissions during the logs activation -->
-    <string name="logs_not_enabled_permissions">Журналы не были включены, потому что вы отказали в необходимых разрешениях</string>
     <!-- Option in the sliding panel to open the folder which contains the file selected after performing a search -->
     <string name="search_open_location">Расположение</string>
     <!-- message when a temporary error on logging in is due to SDK is waiting for the server to complete a request due to an API lock -->
@@ -1464,7 +1454,7 @@
     <!-- settings of the chat to choose the status -->
     <string name="settings_chat_vibration">Вибрация</string>
     <!-- Button text shown on SMS verification page, if the user wants to logout current suspended account and login with another account, user can press this button to logout -->
-    <string name="sms_logout">[A]Выйти[/A] для входа в другой аккаунт MEGA</string>
+    <string name="sms_logout">[A]Выйти[/A], чтобы сменить аккаунт MEGA</string>
     <!-- On SMS verification page, if the user presses the logout button, a dialog with this text will show to ask for user’s confirmation. -->
     <string name="confirm_logout_from_sms_verification">Действительно выйти из аккаунта?</string>
     <!-- Text shown when a message has been deleted in the chat -->
@@ -2882,16 +2872,12 @@
     <string name="message_set_chat_private">[A]%1$s[/A][B] включил чередование ключей шифрования.[/B]</string>
     <!-- error message shown when a chat link is invalid -->
     <string name="invalid_chat_link">Эта беседа больше не доступна</string>
-    <!-- error message shown when a chat link is not well formed -->
-    <string name="invalid_chat_link_args">Неверная ссылка на чат</string>
     <!-- When it is creating a new group chat, this option permits to establish it private or public -->
     <string name="ekr_label">Чередование ключей шифрования</string>
     <!-- Text of the dialog to change a public chat to private (enable encryption key rotation) -->
     <string name="ekr_explanation">Чередование ключей шифрования немного безопаснее, но не позволяет создавать ссылку на чат, и новые участники не будут видеть прошлые сообщения.</string>
     <!-- Text of the dialog to change a public chat to private (enable encryption key rotation) -->
     <string name="subtitle_chat_message_enabled_ERK">Чередование ключей шифрования немного безопаснее, но не позволяет создавать ссылку на чат, и новые участники не будут видеть прошлые сообщения.</string>
-    <!-- Menu item -->
-    <string name="action_open_chat_link">Открыть ссылку на чат</string>
     <!-- Message shown when a contact request has not been sent because the invitation has been sent before -->
     <string name="invite_not_sent_already_sent">Приглашение контакту %s было отправлено раньше, и с ним можно ознакомиться на вкладке «Отправленные запросы».</string>
     <!-- Label shown to indicate the QR is saving in Cloud Drive -->
@@ -3230,8 +3216,6 @@
     </plurals>
     <!-- Title of a chat message that contains geolocation info -->
     <string name="title_geolocation_message">Закреплённое местоположение</string>
-    <!-- Text of the button to indicate an attachment upload from file system -->
-    <string name="attachment_upload_panel_from_device">Из файловой системы</string>
     <!-- Alert shown when a num of files have not been sent because of any error occurs, Plural of file. 2 files -->
     <plurals name="num_files_not_send">
         <item quantity="one">%d файл не был отправлен в чаты (%d)</item>
@@ -3386,22 +3370,6 @@
     <string name="text_join_call">Чтобы присоединиться к этому вызову, вы должны завершить текущий вызов.</string>
     <!-- Text of the dialog shown when you want to join a group call but you are in another active call -->
     <string name="text_join_another_call">Чтобы присоединиться к этому вызову, вы должны завершить текущий вызов или удержать его.</string>
-    <!-- Hint shown in the open chat link alert dialog -->
-    <string name="hint_enter_chat_link">Введите ссылку на чат</string>
-    <!-- Hint shown in the open link alert dialog -->
-    <string name="hint_paste_link">Вставьте ссылку</string>
-    <!-- Error shown when it tries to open an invalid file or folder link -->
-    <string name="invalid_file_folder_link">Недействительная ссылка на файл или папку</string>
-    <!-- Error shown when it tries to open an invalid file or folder link and the text view is empty -->
-    <string name="invalid_file_folder_link_empty">Введите действительную ссылку на файл или папку</string>
-    <!-- Error shown when it tries to open an invalid chat link and the text view is empty -->
-    <string name="invalid_chat_link_empty">Введите действительную ссылку на чат</string>
-    <!-- Error shown when it tries to open a chat link from the Cloud Drive section -->
-    <string name="valid_chat_link">Вы вставили ссылку на чат</string>
-    <!-- Error shown when it tries to open a contact link from the Cloud Drive section -->
-    <string name="valid_contact_link">Вы вставили ссылку на контакт</string>
-    <!-- Menu item -->
-    <string name="action_open_contact_link">Открыть ссылку на контакт</string>
     <!-- Explanation of the dialog shown to share a chat link -->
     <string name="copy_link_explanation">Люди могут присоединиться к группе с помощью этой ссылки.</string>
     <!-- Label that indicates the creation of a chat link -->

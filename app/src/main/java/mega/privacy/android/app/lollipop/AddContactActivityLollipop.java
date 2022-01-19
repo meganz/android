@@ -109,7 +109,7 @@ import nz.mega.sdk.MegaUserAlert;
 import static mega.privacy.android.app.utils.CallUtil.*;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
-import static mega.privacy.android.app.utils.PermissionUtils.*;
+import static mega.privacy.android.app.utils.permission.PermissionUtils.*;
 import static mega.privacy.android.app.utils.StringResourcesUtils.getQuantityString;
 import static mega.privacy.android.app.utils.TimeUtils.*;
 import static mega.privacy.android.app.utils.Util.*;
@@ -326,9 +326,13 @@ public class AddContactActivityLollipop extends PasscodeActivity implements View
             boolean found;
             shareContacts.clear();
 
-            ShareContactInfo lastItem = filteredContactsShare.get(filteredContactsShare.size() - 1);
-            if (lastItem.isProgress()) {
-                inProgressPosition = filteredContactsShare.size() - 1;
+            if (!filteredContactsShare.isEmpty()) {
+                int pos = filteredContactsShare.size() - 1;
+                ShareContactInfo lastItem = filteredContactsShare.get(pos);
+
+                if (lastItem.isProgress()) {
+                    inProgressPosition = pos;
+                }
             }
 
             if (filteredContactsPhone != null && !filteredContactsPhone.isEmpty()) {
@@ -3148,7 +3152,7 @@ public class AddContactActivityLollipop extends PasscodeActivity implements View
 
     @Override
     public void onBackPressed() {
-        if (psaWebBrowser.consumeBack()) return;
+        if (psaWebBrowser != null && psaWebBrowser.consumeBack()) return;
         retryConnectionsAndSignalPresence();
 
         if (onNewGroup) {
