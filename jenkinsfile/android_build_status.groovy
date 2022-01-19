@@ -220,6 +220,26 @@ pipeline {
             //   }
             // }
         }
+        stage('Clean up') {
+            steps {
+                script {
+                    BUILD_STEP = "Clean Up"
+                }
+                gitlabCommitStatus(name: 'Clean Up') {
+                    sh """
+                    cd ${WORKSPACE}
+                    echo "print workspace size before clean"
+                    du -sh
+                    cd ${WORKSPACE}/app/src/main/jni
+                    bash build.sh clean
+                    cd ${WORKSPACE}
+                    ./gradlew clean
+                    echo "print workspace size after clean"
+                    du -sh
+                    """
+                }
+            }
+        }
     }
     // post {
     //   failure {
