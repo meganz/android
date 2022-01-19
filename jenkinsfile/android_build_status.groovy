@@ -63,8 +63,10 @@ def getMEGAchatBranch() {
             if (line.startsWith(KEY)) {
                 print("MEGACHAT_BRANCH line found!!!" + line);
                 String value = line.substring(KEY.length());
+                print("MEGACHAT_BRANCH value = " + value);
                 if (!value.isEmpty()) {
                     MEGACHAT_BRANCH = value;
+                    print("setting MEGACHAT_BRANCH = " + MEGACHAT_BRANCH)
                 }
             }
         }
