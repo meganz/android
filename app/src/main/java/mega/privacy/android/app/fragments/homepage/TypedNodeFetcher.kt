@@ -25,6 +25,9 @@ open class TypedNodesFetcher(
 ) {
     val result = MutableLiveData<List<NodeItem>>()
 
+    val thumbnailFolder = File(context.cacheDir, CacheFolderManager.THUMBNAIL_FOLDER)
+    val previewFolder = File(context.cacheDir, CacheFolderManager.PREVIEW_FOLDER)
+
     /**
      * LinkedHashMap guarantees that the index order of elements is consistent with
      * the order of putting. Moreover, it has a quick element search[O(1)] (for
@@ -53,14 +56,14 @@ open class TypedNodesFetcher(
     }
 
     fun getThumbnailFile(node: MegaNode) = File(
-        ThumbnailUtilsLollipop.getThumbFolder(context),
+        thumbnailFolder,
         node.base64Handle.plus(FileUtil.JPG_EXTENSION)
     )
 
     /**
      * Get the thumbnail of the file.
      */
-    private fun getThumbnail(node: MegaNode): File? {
+    protected fun getThumbnail(node: MegaNode): File? {
         val thumbFile = getThumbnailFile(node)
 
         return if (thumbFile.exists()) {
