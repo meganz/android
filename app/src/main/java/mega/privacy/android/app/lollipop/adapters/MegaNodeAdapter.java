@@ -1212,9 +1212,14 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
                 if (n.isTakenDown() && !isMultipleSelect()) {
                     takenDownDialog = showTakenDownDialog(n.isFolder(), currentPosition, this, context);
                     unHandledItem = currentPosition;
+                } else if (n.isFile() && !isOnline(context) && getLocalFile(n) == null) {
+                    if (isOffline(context)) {
+                        break;
+                    }
                 } else {
                     fileClicked(currentPosition);
                 }
+
                 break;
             }
         }
@@ -1226,10 +1231,6 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
     }
 
     private void fileClicked(int currentPosition) {
-        if (isOffline(context)) {
-            return;
-        }
-
         if (type == RUBBISH_BIN_ADAPTER) {
             ((RubbishBinFragmentLollipop) fragment).itemClick(currentPosition);
         } else if (type == INBOX_ADAPTER) {
