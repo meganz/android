@@ -52,7 +52,7 @@ open class PreferencesBaseActivity : PasscodeActivity(), SimpleSnackbarCallBack 
 
     override fun setTitle(@StringRes titleId: Int) {
         supportActionBar?.title = StringResourcesUtils.getString(titleId)
-            .toUpperCase(Locale.getDefault())
+            .uppercase(Locale.getDefault())
     }
 
     protected fun replaceFragment(fragment: SettingsBaseFragment) {

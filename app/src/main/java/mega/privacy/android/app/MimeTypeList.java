@@ -37,7 +37,7 @@ public class MimeTypeList {
 		resources = new SparseArray<String[]>();
 		resources.put(R.drawable.ic_3d_list, new String[] {"3ds", "3dm", "max", "obj", });
 		resources.put(R.drawable.ic_aftereffects_list, new String[] {"aec", "aep", "aepx", "aes", "aet", "aetx", });
-		resources.put(R.drawable.ic_audio_list, new String[] {"aif", "aiff", "wav", "flac", "iff", "m4a", "wma", "oga", "ogg", "mp3", "3ga", "opus",});
+		resources.put(R.drawable.ic_audio_list, new String[] {"aif", "aiff", "wav", "flac", "iff", "m4a", "wma", "oga", "ogg", "mp3", "3ga", "opus", "weba"});
 		resources.put(R.drawable.ic_cad_list, new String[] {"dwg", "dxf", });
 		resources.put(R.drawable.ic_compressed_list, new String[] {"bz2", "gz", "rar", "tar", "tbz", "tgz", "zip", "deb", "udeb", "rpm", "air", "apk", "dmg", "7z", "bz", "bzip2", "cab", "lha", "gzip", "ace", "arc", "pkg", });
 		resources.put(R.drawable.ic_database_list, new String[] {"accdb", "db", "dbf", "mdb", "pdb", "sql", });
@@ -226,7 +226,7 @@ public class MimeTypeList {
 	 * Check is MimeType of audio type
 	 */
 	public boolean isAudio() {
-		return type.startsWith("audio/") || extension.equals("opus");
+		return type.startsWith("audio/") || extension.equals("opus") || extension.equals("weba");
 	}
 	/*
 	 * Check is MimeType of voice type

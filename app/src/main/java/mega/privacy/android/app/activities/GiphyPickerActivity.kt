@@ -101,7 +101,7 @@ class GiphyPickerActivity : PasscodeActivity(), GiphyInterface {
         supportActionBar?.apply {
             setDisplayHomeAsUpEnabled(true)
             title = StringResourcesUtils.getString(R.string.search_giphy_title)
-                .toUpperCase(Locale.getDefault())
+                .uppercase(Locale.getDefault())
         }
 
         binding.giphyToolbar.setOnClickListener { searchMenuItem?.expandActionView() }
