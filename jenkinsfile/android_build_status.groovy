@@ -30,14 +30,14 @@ def getSDKBranch() {
     def description = env.GITLAB_OA_DESCRIPTION
     if (description != null) {
         String[] lines = description.split("\n");
-        print("getSDKBranch() description has " + lines.length + " lines");
         String KEY = "SDK_BRANCH=";
         for (String line : lines) {
             line = line.trim();
             if (line.startsWith(KEY)) {
-                print("SDK_BRANCH line found!!!" + line);
+                print("SDK_BRANCH line found!!! --> " + line);
                 String value = line.substring(KEY.length());
                 if (!value.isEmpty()) {
+                    print("Setting SDK_BRANCH value --> " + value);
                     SDK_BRANCH = value;
                     return;
                 }
@@ -57,17 +57,15 @@ def getMEGAchatBranch() {
     def description = env.GITLAB_OA_DESCRIPTION
     if (description != null) {
         String[] lines = description.split("\n");
-        print("getMEGAchatBranch() description has " + lines.length + " lines");
         String KEY = "MEGACHAT_BRANCH=";
         for (String line : lines) {
             line = line.trim();
             if (line.startsWith(KEY)) {
-                print("MEGACHAT_BRANCH line found!!!" + line);
+                print("MEGACHAT_BRANCH line found!!! --> " + line);
                 String value = line.substring(KEY.length());
-                print("MEGACHAT_BRANCH value = " + value);
                 if (!value.isEmpty()) {
                     MEGACHAT_BRANCH = value;
-                    print("setting MEGACHAT_BRANCH = " + MEGACHAT_BRANCH)
+                    print("Setting MEGACHAT_BRANCH value --> " + value);
                     return;
                 }
             }
@@ -99,7 +97,7 @@ pipeline {
         CONSOLE_LOG_FILE = "console.txt"
 
         BUILD_LIB_DOWNLOAD_FOLDER = '${WORKSPACE}/mega_build_download'
-        // webrtc lib link and file name may change with time. Update these 2 values if build failed.
+        // webrtc lib link and file name may change with time. Update these 2 values if build fails.
         WEBRTC_LIB_URL = "https://mega.nz/file/RsMEgZqA#s0P754Ua7AqvWwamCeyrvNcyhmPjHTQQIxtqziSU4HI"
         WEBRTC_LIB_FILE = 'WebRTC_NDKr21_p21_branch-heads4405_v2.zip'
         WEBRTC_LIB_UNZIPPED = 'webrtc_unzipped'
@@ -111,8 +109,8 @@ pipeline {
 
         // only build one architecture for SDK, to save build time. skipping "x86 armeabi-v7a x86_64"
         BUILD_ARCHS = "arm64-v8a"
-
     }
+
     post {
         failure {
             script {
@@ -367,13 +365,13 @@ pipeline {
                 gitlabCommitStatus(name: 'Clean Up') {
                     sh """
                     cd ${WORKSPACE}
-                    echo "print workspace size before clean"
+                    echo "workspace size before clean: "
                     du -sh
                     cd ${WORKSPACE}/app/src/main/jni
                     bash build.sh clean
                     cd ${WORKSPACE}
                     ./gradlew clean
-                    echo "print workspace size after clean"
+                    echo "workspace size after clean: "
                     du -sh
                     """
                 }
