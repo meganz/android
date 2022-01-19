@@ -24,7 +24,7 @@ class SettingsViewModel @Inject constructor(
     private val isHideRecentActivityEnabled: IsHideRecentActivityEnabled,
     private val toggleAutoAcceptQRLinks: ToggleAutoAcceptQRLinks,
     fetchMultiFactorAuthSetting: FetchMultiFactorAuthSetting,
-    private val isOnline: IsOnline,
+    isOnline: IsOnline,
     private val requestAccountDeletion: RequestAccountDeletion,
     private val isChatLoggedIn: IsChatLoggedIn,
 ) : ViewModel() {

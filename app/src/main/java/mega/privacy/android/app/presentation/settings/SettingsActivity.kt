@@ -6,6 +6,7 @@ import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
+import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.R
 import mega.privacy.android.app.constants.SettingsConstants
 import mega.privacy.android.app.constants.SettingsConstants.*
@@ -14,6 +15,7 @@ import mega.privacy.android.app.presentation.settings.SettingsFragment.Companion
 
 private const val TITLE_TAG = "settingsActivityTitle"
 
+@AndroidEntryPoint
 class SettingsActivity : AppCompatActivity(),
     PreferenceFragmentCompat.OnPreferenceStartFragmentCallback {
 

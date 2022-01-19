@@ -13,6 +13,7 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
+import androidx.preference.ListPreference
 import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
 import androidx.preference.SwitchPreferenceCompat
@@ -45,15 +46,12 @@ import mega.privacy.android.app.utils.Util
 
 @AndroidEntryPoint
 @SuppressLint("NewApi")
-class SettingsFragment : Preference.OnPreferenceChangeListener,
+class SettingsFragment : SharedPreferences.OnSharedPreferenceChangeListener,
     Settings, PreferenceFragmentCompat() {
 
     override var numberOfClicksKarere = 0
     override var numberOfClicksAppVersion = 0
     override var numberOfClicksSDK = 0
-
-    override var setAutoAccept = false
-    override var autoAcceptSetting = false
 
     private val viewModel: SettingsViewModel by viewModels()
 
@@ -108,6 +106,7 @@ class SettingsFragment : Preference.OnPreferenceChangeListener,
                         isEnabled = state.deleteEnabled
                     }
 
+                    //        TODO: Move Summaries to initialise and update summaries methods
                     val startScreenSummary =
                         resources.getStringArray(R.array.settings_start_screen)[state.startScreen]
                     findPreference<Preference>(KEY_START_SCREEN)?.summary = startScreenSummary
@@ -122,13 +121,6 @@ class SettingsFragment : Preference.OnPreferenceChangeListener,
         }
     }
 
-    /**
-     * Update the Cancel Account settings.
-     */
-    override fun updateCancelAccountSetting() {}
-
-    override fun update2FAVisibility() {}
-
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -139,8 +131,6 @@ class SettingsFragment : Preference.OnPreferenceChangeListener,
         requireContext().bindService(playerServiceIntent, mediaServiceConnection, 0)
         return v
     }
-
-    override fun setOnlineOptions(isOnline: Boolean) {}
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -163,29 +153,10 @@ class SettingsFragment : Preference.OnPreferenceChangeListener,
         }
     }
 
-    override fun goToCategoryStorage() {}
-
-    override fun goToCategoryQR() {}
-
-    override fun goToSectionStartScreen() {}
-
-    /**
-     * Method for controlling whether or not to display the action bar elevation.
-     */
-    override fun checkScroll() {}
-
-
-    private fun showEvaluatedAppDialog() {
-        FeedBackDialog.newInstance(
-            viewModel.email,
-                viewModel.accountType
-        ).show(childFragmentManager, FeedBackDialog.TAG)
-    }
-
     override fun onResume() {
         registerAccountChangeReceiver()
-        refreshCameraUploadsSettings()
-        updatePasscodeLockSubtitle()
+        preferenceManager.sharedPreferences.registerOnSharedPreferenceChangeListener(this)
+        refreshSummaries()
         resetCounters(null)
         super.onResume()
     }
@@ -195,31 +166,36 @@ class SettingsFragment : Preference.OnPreferenceChangeListener,
         requireContext().registerReceiver(updateMyAccountReceiver, filter)
     }
 
-    override fun onPause() {
-        super.onPause()
-        requireContext().unregisterReceiver(updateMyAccountReceiver)
+    private fun refreshSummaries() {
+//        TODO: Once all fragments Settings fragments have been refactored, these functions can be improved.
+        updateCameraUploadSummary()
+        updatePasscodeLockSummary()
     }
 
-    /**
-     * Refresh the Camera Uploads service settings depending on the service status.
-     */
-    override fun refreshCameraUploadsSettings() {
+    private fun updateCameraUploadSummary() {
         val isCameraUploadOn = viewModel.isCamSyncEnabled
         findPreference<Preference>(KEY_FEATURES_CAMERA_UPLOAD)?.summary =
             getString(if (isCameraUploadOn) R.string.mute_chat_notification_option_on else R.string.mute_chatroom_notification_option_off)
     }
 
-    fun updatePasscodeLockSubtitle() {
+    private fun updatePasscodeLockSummary() {
         findPreference<Preference>(KEY_PASSCODE_LOCK)?.setSummary(if (viewModel.passcodeLock) R.string.mute_chat_notification_option_on else R.string.mute_chatroom_notification_option_off)
     }
 
-    override fun onPreferenceChange(preference: Preference?, newValue: Any?): Boolean {
-        when (preference?.key) {
-            KEY_APPEARNCE_COLOR_THEME -> applyTheme(
-                (newValue as String)
-            )
+    override fun onPause() {
+        preferenceManager.sharedPreferences.unregisterOnSharedPreferenceChangeListener(this)
+        requireContext().unregisterReceiver(updateMyAccountReceiver)
+        super.onPause()
+    }
+
+    override fun onSharedPreferenceChanged(sharedPreferences: SharedPreferences?, key: String?) {
+        when(key){
+            KEY_APPEARNCE_COLOR_THEME -> findPreference<ListPreference>(key)?.value?.let {
+                applyTheme(
+                    it
+                )
+            }
         }
-        return true
     }
 
     override fun onPreferenceTreeClick(preference: Preference?): Boolean {
@@ -372,14 +348,20 @@ class SettingsFragment : Preference.OnPreferenceChangeListener,
                 requireContext().getSharedPreferences(
                     USER_INTERFACE_PREFERENCES,
                     Context.MODE_PRIVATE
-                )
-                    .edit().putBoolean(HIDE_RECENT_ACTIVITY, checked == true).apply()
+                ).edit().putBoolean(HIDE_RECENT_ACTIVITY, checked == true).apply()
                 LiveEventBus.get(EVENT_UPDATE_HIDE_RECENT_ACTIVITY, Boolean::class.java)
                     .post(checked)
             }
         }
         resetCounters(key)
         return true
+    }
+
+    private fun showEvaluatedAppDialog() {
+        FeedBackDialog.newInstance(
+            viewModel.email,
+            viewModel.accountType
+        ).show(childFragmentManager, FeedBackDialog.TAG)
     }
 
     private fun deleteAccountClicked() {
@@ -452,16 +434,7 @@ class SettingsFragment : Preference.OnPreferenceChangeListener,
         }
     }
 
-    override fun goToFirstCategory() {}
 
-
-    override fun reEnable2faSwitch() {}
-
-    override fun hidePreferencesChat() {}
-
-    override fun setValueOfAutoAccept(autoAccept: Boolean) {}
-
-    override fun update2FAPreference(enabled: Boolean) {}
 
     override fun onDestroyView() {
         requireContext().unbindService(mediaServiceConnection)
@@ -473,4 +446,21 @@ class SettingsFragment : Preference.OnPreferenceChangeListener,
         internal const val NAVIGATE_TO_INITIAL_PREFERENCE = "navigateToInitial"
     }
 
+//    TODO: Remove once refactor is complete
+
+    override var setAutoAccept = false
+    override var autoAcceptSetting = false
+    override fun goToFirstCategory() {}
+    override fun reEnable2faSwitch() {}
+    override fun hidePreferencesChat() {}
+    override fun setValueOfAutoAccept(autoAccept: Boolean) {}
+    override fun update2FAPreference(enabled: Boolean) {}
+    override fun goToCategoryStorage() {}
+    override fun goToCategoryQR() {}
+    override fun goToSectionStartScreen() {}
+    override fun checkScroll() {}
+    override fun updateCancelAccountSetting() {}
+    override fun update2FAVisibility() {}
+    override fun setOnlineOptions(isOnline: Boolean) {}
+    override fun refreshCameraUploadsSettings() {}
 }

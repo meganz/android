@@ -4832,8 +4832,9 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 				settingsFragment.update2FAVisibility();
 			}
 		} else{
-			//TODO: Launch Settings activity
-			throw new UnsupportedOperationException();
+			Intent settingsIntent = mega.privacy.android.app.presentation.settings.SettingsActivity.Companion.getIntent(this, null);
+			startActivity(settingsIntent);
+			//TODO: Update intent with target settings section
 		}
 	}
 
