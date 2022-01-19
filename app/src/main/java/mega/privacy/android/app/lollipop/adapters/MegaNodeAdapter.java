@@ -75,9 +75,7 @@ import static mega.privacy.android.app.utils.MegaApiUtils.*;
 import static mega.privacy.android.app.utils.MegaNodeUtil.*;
 import static mega.privacy.android.app.utils.OfflineUtils.*;
 import static mega.privacy.android.app.utils.StringResourcesUtils.getQuantityString;
-import static mega.privacy.android.app.utils.StringResourcesUtils.getString;
 import static mega.privacy.android.app.utils.TextUtil.getFileInfo;
-import static mega.privacy.android.app.utils.TextUtil.isTextEmpty;
 import static mega.privacy.android.app.utils.ThumbnailUtilsLollipop.*;
 import static mega.privacy.android.app.utils.TimeUtils.*;
 import static mega.privacy.android.app.utils.Util.*;
@@ -1134,21 +1132,6 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
         else {
             holder.savedOffline.setVisibility(View.INVISIBLE);
         }
-    }
-
-    /**
-     * Get the number of device node in backup folder
-     * @param subBackupNodes The node list of MyBackup folder
-     * @return the number of device node
-     */
-    private int getMegaNodeBackupDeviceInfo(ArrayList<MegaNode> subBackupNodes) {
-        int device = 0;
-        for (MegaNode n : subBackupNodes) {
-            if (!isTextEmpty(n.getDeviceId())) {
-                device++;
-            }
-        }
-        return device;
     }
 
     private void getThumbAndSetView(ViewHolderBrowserList holder, MegaNode node) {
