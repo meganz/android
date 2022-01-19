@@ -14,6 +14,7 @@ import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.PorterDuff;
+import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
 import android.location.Address;
 import android.media.AudioFocusRequest;
@@ -48,12 +49,15 @@ import android.text.TextWatcher;
 import android.util.Base64;
 import android.util.DisplayMetrics;
 import android.util.Pair;
+import android.util.TypedValue;
 import android.view.HapticFeedbackConstants;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
+import android.view.ViewTreeObserver;
 import android.view.Window;
 import android.view.inputmethod.EditorInfo;
 import android.widget.Button;
@@ -836,6 +840,39 @@ public class ChatActivityLollipop extends PasscodeActivity
         enableCallMenuItems(true);
     }
 
+    public void setKeyboardVisibilityListener() {
+        final View parentView = ((ViewGroup) findViewById(android.R.id.content)).getChildAt(0);
+        if (parentView == null) {
+            logWarning("Cannot set the keyboard visibility listener. Parent view is NULL.");
+            return;
+        }
+
+        parentView.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+
+            private boolean alreadyOpen;
+            private final int defaultKeyboardHeightDP = 100;
+            private final int EstimatedKeyboardDP = defaultKeyboardHeightDP + (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP ? 48 : 0);
+            private final Rect rect = new Rect();
+
+            @Override
+            public void onGlobalLayout() {
+                int estimatedKeyboardHeight = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, EstimatedKeyboardDP, parentView.getResources().getDisplayMetrics());
+                parentView.getWindowVisibleDisplayFrame(rect);
+                int heightDiff = parentView.getRootView().getHeight() - (rect.bottom - rect.top);
+                boolean isShown = heightDiff >= estimatedKeyboardHeight;
+
+                if (isShown == alreadyOpen) {
+                    return;
+                }
+                alreadyOpen = isShown;
+
+                if (emojiKeyboard != null) {
+                    emojiKeyboard.updateStatusLetterKeyboard(alreadyOpen);
+                }
+            }
+        });
+    }
+
     private class UserTyping {
         MegaChatParticipant participantTyping;
         long timeStampTyping;
@@ -1380,7 +1417,7 @@ public class ChatActivityLollipop extends PasscodeActivity
 
         textChat.setOnTouchListener((v, event) -> {
             showLetterKB();
-            return false;
+            return true;
         });
 
         textChat.setOnLongClickListener(v -> {
@@ -1558,6 +1595,7 @@ public class ChatActivityLollipop extends PasscodeActivity
         if(emojiKeyboard == null || emojiKeyboard.getLetterKeyboardShown()){
             return;
         }
+
         emojiKeyboard.showLetterKeyboard();
     }
 
@@ -3987,7 +4025,7 @@ public class ChatActivityLollipop extends PasscodeActivity
             case R.id.emoji_icon:
                 logDebug("Emoji icon clicked");
                 if(emojiKeyboard==null) break;
-                changeKeyboard(keyboardTwemojiButton);
+                changeKeyboard();
                 break;
 
 
@@ -4076,8 +4114,8 @@ public class ChatActivityLollipop extends PasscodeActivity
         }
     }
 
-    private void changeKeyboard(ImageButton btn){
-        Drawable currentDrawable = btn.getDrawable();
+    private void changeKeyboard(){
+        Drawable currentDrawable = keyboardTwemojiButton.getDrawable();
         Drawable emojiDrawableLight = getDrawable(R.drawable.ic_emoji_unchecked);
         Drawable emojiDrawableDark = getDrawable(R.drawable.ic_emoji_checked);
         Drawable keyboardDrawable = getResources().getDrawable(R.drawable.ic_keyboard_white);
@@ -4093,7 +4131,7 @@ public class ChatActivityLollipop extends PasscodeActivity
                 emojiKeyboard.showEmojiKeyboard();
             }
         }else if(areDrawablesIdentical(currentDrawable, keyboardDrawable) && !emojiKeyboard.getLetterKeyboardShown()){
-            emojiKeyboard.showLetterKeyboard();
+            showLetterKB();
         }
     }
 
@@ -4386,8 +4424,10 @@ public class ChatActivityLollipop extends PasscodeActivity
         });
         setSizeInputText(false);
         showSendIcon();
-        hideKeyboard();
-        showLetterKB();
+
+        handlerKeyboard.postDelayed(() -> {
+            showLetterKB();
+        }, 250);
 
         checkExpandOrCollapseInputText();
     }
@@ -8541,6 +8581,8 @@ public class ChatActivityLollipop extends PasscodeActivity
     public void onResume(){
         super.onResume();
        stopService(new Intent(this, KeepAliveService.class));
+
+       setKeyboardVisibilityListener();
         if(idChat!=-1 && chatRoom!=null) {
 
             setNodeAttachmentVisible();
