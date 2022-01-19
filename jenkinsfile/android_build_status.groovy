@@ -5,26 +5,26 @@ MEGACHAT_BRANCH = "develop"
 
 /**
  * Decide whether we should skip the current build. If MR title starts with "Draft:"
- * or "WIP:", then CI Server won't start a build. Build will resume until these 2 tags
- * have been removed from MR title.
- * @param title of the Merge Request
+ * or "WIP:", then CI pipeline skips all stages in a build. After these 2 tags have
+ * been removed from MR title, newly triggered builds will resume to normal.
+ * @param mrTitle of the Merge Request
  * @return true if current stage should be skipped. Otherwise return false.
  */
-def shouldSkip(title) {
-    if (title != null && !title.isEmpty()) {
-        return title.toLowerCase().startsWith("draft:") ||
-                title.toLowerCase().startsWith("wip:")
+def shouldSkip(mrTitle) {
+    if (mrTitle != null && !mrTitle.isEmpty()) {
+        return mrTitle.toLowerCase().startsWith("draft:") ||
+                mrTitle.toLowerCase().startsWith("wip:")
     }
-    // if title is null, this build is probably triggered by 'jenkins rebuild' comment
-    // in such case, build should not be skipped.
+    // If title is null, this build is probably triggered by 'jenkins rebuild' comment.
+    // In such case, build should not be skipped.
     return false
 }
 
 /**
  * Detect if there is SDK_BRANCH specified in MR Description.
  * If yes, parse and assign the value to SDK_BRANCH, so later we
- * can checkout wanted branch in SDK.
- * If no, assign 'develop' to variable SDK_BRANCH.
+ * can checkout wanted branch for SDK.
+ * If no, set SDK_BRANCH to "develop".
  */
 def getSDKBranch() {
     def description = env.GITLAB_OA_DESCRIPTION
@@ -48,10 +48,10 @@ def getSDKBranch() {
 }
 
 /**
- * Detect if there is SDK_BRANCH specified in MR Description.
+ * Detect if there is MEGACHAT_BRANCH specified in MR Description.
  * If yes, parse and assign the value to MEGACHAT_BRANCH, so later we
- * can checkout wanted branch in SDK.
- * If no, assign 'develop' to variable MEGACHAT_BRANCH.
+ * can checkout wanted branch for MEGAChat SDK.
+ * If no, set MEGACHAT_BRANCH to "develop".
  */
 def getMEGAchatBranch() {
     def description = env.GITLAB_OA_DESCRIPTION
@@ -106,11 +106,9 @@ pipeline {
         GOOGLE_MAP_API_FILE = 'default_google_maps_api.zip'
         GOOGLE_MAP_API_UNZIPPED = 'default_google_map_api_unzipped'
 
-
         // only build one architecture for SDK, to save build time. skipping "x86 armeabi-v7a x86_64"
         BUILD_ARCHS = "arm64-v8a"
     }
-
     post {
         failure {
             script {
@@ -143,12 +141,12 @@ pipeline {
         }
         success {
             script {
-                // If CI build is skipped due to Draft status, send to a comment to MR
+                // If CI build is skipped due to Draft status, send a comment to MR
                 if (env.BRANCH_NAME.startsWith('MR-') && shouldSkip(env.GITLAB_OA_TITLE)) {
                     def mrNumber = env.BRANCH_NAME.replace('MR-', '')
                     withCredentials([usernamePassword(credentialsId: 'Gitlab-Access-Token', usernameVariable: 'USERNAME', passwordVariable: 'TOKEN')]) {
                         final String response = sh(script: 'curl -s --request POST --header PRIVATE-TOKEN:$TOKEN --form file=@console.txt https://code.developers.mega.co.nz/api/v4/projects/199/uploads', returnStdout: true).trim()
-                        env.MARKDOWN_LINK = ":raising_hand: Android Pipeline Build Skipped! <BR/> Build will start to be triggerd after you remove <b>Draft:</b> or <b>WIP:</b> at the beginning of MR title."
+                        env.MARKDOWN_LINK = ":raising_hand: Android Pipeline Build Skipped! <BR/> Newly triggered builds will resume after you have removed <b>Draft:</b> or <b>WIP:</b> from the beginning of MR title."
                         env.MERGE_REQUEST_URL = "https://code.developers.mega.co.nz/api/v4/projects/199/merge_requests/${mrNumber}/notes"
                         sh 'curl --request POST --header PRIVATE-TOKEN:$TOKEN --form body=\"${MARKDOWN_LINK}\" ${MERGE_REQUEST_URL}'
                     }
