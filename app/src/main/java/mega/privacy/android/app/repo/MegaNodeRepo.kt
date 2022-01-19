@@ -1,9 +1,10 @@
 package mega.privacy.android.app.repo
 
+import android.util.Pair
+import mega.privacy.android.app.*
 import mega.privacy.android.app.DatabaseHandler
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.MegaOffline
-import mega.privacy.android.app.MimeTypeThumbnail
 import mega.privacy.android.app.di.MegaApi
 import mega.privacy.android.app.utils.FileUtil
 import mega.privacy.android.app.utils.LogUtil.logError
@@ -89,7 +90,7 @@ class MegaNodeRepo @Inject constructor(
                 continue
             }
 
-            val mime = MimeTypeThumbnail.typeForName(node.name)
+            val mime = MimeTypeList.typeForName(node.name)
             if (mime.isImage || mime.isVideoReproducible) {
                 nodes.add(node)
             }
