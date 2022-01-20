@@ -1,4 +1,4 @@
-package mega.privacy.android.app.middlelayer.crashreporter
+package mega.privacy.android.app.middlelayer.reporter
 
 /**
  * When uncaught exception occurs, upload related info to platform tools. For example, Firebase Crashlytics. 
