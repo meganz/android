@@ -33,7 +33,6 @@ import mega.privacy.android.app.lollipop.ChangePasswordActivityLollipop
 import mega.privacy.android.app.lollipop.TwoFactorAuthenticationActivity
 import mega.privacy.android.app.lollipop.VerifyTwoFactorActivity
 import mega.privacy.android.app.lollipop.managerSections.settings.Settings
-import mega.privacy.android.app.lollipop.managerSections.settings.SettingsActivity
 import mega.privacy.android.app.mediaplayer.service.AudioPlayerService
 import mega.privacy.android.app.mediaplayer.service.MediaPlayerService
 import mega.privacy.android.app.mediaplayer.service.MediaPlayerServiceBinder
@@ -46,12 +45,11 @@ import mega.privacy.android.app.utils.Util
 
 @AndroidEntryPoint
 @SuppressLint("NewApi")
-class SettingsFragment : SharedPreferences.OnSharedPreferenceChangeListener,
-    Settings, PreferenceFragmentCompat() {
+class SettingsFragment : SharedPreferences.OnSharedPreferenceChangeListener, PreferenceFragmentCompat() {
 
-    override var numberOfClicksKarere = 0
-    override var numberOfClicksAppVersion = 0
-    override var numberOfClicksSDK = 0
+    private var numberOfClicksKarere = 0
+    private var numberOfClicksAppVersion = 0
+    private var numberOfClicksSDK = 0
 
     private val viewModel: SettingsViewModel by viewModels()
 
@@ -189,7 +187,7 @@ class SettingsFragment : SharedPreferences.OnSharedPreferenceChangeListener,
     }
 
     override fun onSharedPreferenceChanged(sharedPreferences: SharedPreferences?, key: String?) {
-        when(key){
+        when (key) {
             KEY_APPEARNCE_COLOR_THEME -> findPreference<ListPreference>(key)?.value?.let {
                 applyTheme(
                     it
@@ -302,23 +300,13 @@ class SettingsFragment : SharedPreferences.OnSharedPreferenceChangeListener,
             KEY_ABOUT_SDK_VERSION -> {
                 if (++numberOfClicksSDK == 5) {
                     numberOfClicksSDK = 0
-                    if (viewModel.isLoggerEnabled) {
-                        LogUtil.setStatusLoggerSDK(activity, false)
-                    } else {
-                        LogUtil.logWarning("SDK file logger attribute is NULL")
-                        (activity as SettingsActivity).showConfirmationEnableLogsSDK()
-                    }
+                    toggleLogger()
                 }
             }
             KEY_ABOUT_KARERE_VERSION -> {
                 if (++numberOfClicksKarere == 5) {
                     numberOfClicksKarere = 0
-                    if (viewModel.isChatLoggerEnabled) {
-                        LogUtil.setStatusLoggerKarere(activity, false)
-                    } else {
-                        LogUtil.logWarning("Karere file logger attribute is NULL")
-                        (activity as SettingsActivity).showConfirmationEnableLogsKarere()
-                    }
+                    toggleChatLogger()
                 }
             }
             KEY_CANCEL_ACCOUNT -> deleteAccountClicked()
@@ -355,6 +343,47 @@ class SettingsFragment : SharedPreferences.OnSharedPreferenceChangeListener,
         }
         resetCounters(key)
         return true
+    }
+
+    private fun toggleLogger() {
+        if (!viewModel.disableLogger()) {
+            showConfirmationEnableLogs {
+                viewModel.enableLogger()
+                view?.let {
+                    Snackbar.make(it, R.string.settings_enable_logs, Snackbar.LENGTH_SHORT).show()
+                }
+            }
+        } else {
+            view?.let {
+                Snackbar.make(it, R.string.settings_disable_logs, Snackbar.LENGTH_SHORT).show()
+            }
+        }
+    }
+
+    private fun toggleChatLogger() {
+        if (!viewModel.disableChatLogger()) {
+            showConfirmationEnableLogs {
+                viewModel.enableChatLogger()
+                view?.let {
+                    Snackbar.make(it, R.string.settings_enable_logs, Snackbar.LENGTH_SHORT).show()
+                }
+            }
+        } else {
+            view?.let {
+                Snackbar.make(it, R.string.settings_disable_logs, Snackbar.LENGTH_SHORT).show()
+            }
+        }
+    }
+
+    private fun showConfirmationEnableLogs(enableFunction: () -> Unit) {
+        MaterialAlertDialogBuilder(requireContext())
+            .setMessage(R.string.enable_log_text_dialog)
+            .setPositiveButton(R.string.general_enable) { _, _ ->
+                enableFunction()
+            }
+            .setNegativeButton(R.string.general_cancel, null)
+            .show()
+            .setCanceledOnTouchOutside(false)
     }
 
     private fun showEvaluatedAppDialog() {
@@ -435,7 +464,6 @@ class SettingsFragment : SharedPreferences.OnSharedPreferenceChangeListener,
     }
 
 
-
     override fun onDestroyView() {
         requireContext().unbindService(mediaServiceConnection)
         super.onDestroyView()
@@ -446,21 +474,4 @@ class SettingsFragment : SharedPreferences.OnSharedPreferenceChangeListener,
         internal const val NAVIGATE_TO_INITIAL_PREFERENCE = "navigateToInitial"
     }
 
-//    TODO: Remove once refactor is complete
-
-    override var setAutoAccept = false
-    override var autoAcceptSetting = false
-    override fun goToFirstCategory() {}
-    override fun reEnable2faSwitch() {}
-    override fun hidePreferencesChat() {}
-    override fun setValueOfAutoAccept(autoAccept: Boolean) {}
-    override fun update2FAPreference(enabled: Boolean) {}
-    override fun goToCategoryStorage() {}
-    override fun goToCategoryQR() {}
-    override fun goToSectionStartScreen() {}
-    override fun checkScroll() {}
-    override fun updateCancelAccountSetting() {}
-    override fun update2FAVisibility() {}
-    override fun setOnlineOptions(isOnline: Boolean) {}
-    override fun refreshCameraUploadsSettings() {}
 }

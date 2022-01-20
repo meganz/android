@@ -89,4 +89,14 @@ abstract class SettingsModule {
     abstract fun bindIsChatLoggedIn(
         useCase: DefaultIsChatLoggedIn
     ): IsChatLoggedIn
+
+    @Binds
+    abstract fun bindSetLoggingEnabled(
+        useCase: DefaultSetLoggingEnabled
+    ): SetLoggingEnabled
+
+    @Binds
+    abstract fun bindSetChatLoggingEnabled(
+        useCase: DefaultSetChatLoggingEnabled
+    ): SetChatLoggingEnabled
 }

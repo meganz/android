@@ -27,6 +27,8 @@ class SettingsViewModel @Inject constructor(
     isOnline: IsOnline,
     private val requestAccountDeletion: RequestAccountDeletion,
     private val isChatLoggedIn: IsChatLoggedIn,
+    private val setLoggingEnabled: SetLoggingEnabled,
+    private val setChatLoggingEnabled: SetChatLoggingEnabled,
 ) : ViewModel() {
     private val userAccount = MutableStateFlow(getAccountDetails(false))
     private val state = MutableStateFlow(initialiseState())
@@ -53,10 +55,6 @@ class SettingsViewModel @Inject constructor(
         get() = refreshPasscodeLockPreference()
     val email: String
         get() = userAccount.value.email
-    val isLoggerEnabled: Boolean
-        get() = isLoggingEnabled()
-    val isChatLoggerEnabled: Boolean
-        get() = isChatLoggingEnabled()
     val isCamSyncEnabled: Boolean
         get() = isCameraSyncEnabled()
     val accountType: Int
@@ -139,6 +137,32 @@ class SettingsViewModel @Inject constructor(
                     return false
                 }
             )
+    }
+
+    fun disableLogger(): Boolean {
+        return if (isLoggingEnabled()){
+            setLoggingEnabled(false)
+            true
+        } else{
+            false
+        }
+    }
+
+    fun disableChatLogger(): Boolean {
+        return if (isChatLoggingEnabled()){
+            setChatLoggingEnabled(false)
+            true
+        } else{
+            false
+        }
+    }
+
+    fun enableLogger() {
+        setLoggingEnabled(true)
+    }
+
+    fun enableChatLogger() {
+        setChatLoggingEnabled(true)
     }
 
 }
