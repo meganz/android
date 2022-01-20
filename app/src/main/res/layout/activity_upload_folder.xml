@@ -42,26 +42,23 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/empty_hint_image" />
 
-        <mega.privacy.android.app.components.NewGridRecyclerView
+        <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/list"
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:columnWidth="@dimen/grid_node_item_width"
-            android:paddingBottom="@dimen/grid_node_list_padding_bottom"
-            app:layout_constraintBottom_toBottomOf="@+id/actions_view"
-            app:layout_constraintBottom_toTopOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/toolbar" />
+            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+            app:layout_constraintBottom_toTopOf="@+id/actions_view"
+            app:layout_constraintTop_toBottomOf="@+id/toolbar"
+            tools:listitem="@layout/item_folder_content" />
 
         <mega.privacy.android.app.components.scrollBar.FastScroller
             android:id="@+id/fastscroll"
             android:layout_width="wrap_content"
             android:layout_height="0dp"
             android:orientation="vertical"
+            app:layout_constraintBottom_toBottomOf="@id/list"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/toolbar"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toTopOf="@id/list" />
 
         <View
             android:id="@+id/actions_view"
@@ -74,9 +71,9 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginEnd="18dp"
+            android:text="@string/action_add"
             app:layout_constraintBottom_toBottomOf="@+id/actions_view"
-            app:layout_constraintEnd_toEndOf="parent"
-            android:text="@string/action_add"/>
+            app:layout_constraintEnd_toEndOf="parent" />
 
         <Button
             android:id="@+id/cancel_button"
@@ -84,9 +81,9 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginEnd="16dp"
+            android:text="@string/general_cancel"
             app:layout_constraintBottom_toBottomOf="@+id/actions_view"
-            app:layout_constraintEnd_toStartOf="@id/upload_button"
-            android:text="@string/general_cancel"/>
+            app:layout_constraintEnd_toStartOf="@id/upload_button" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

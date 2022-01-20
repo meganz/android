@@ -7,10 +7,12 @@ import androidx.recyclerview.widget.RecyclerView
 import mega.privacy.android.app.components.scrollBar.SectionTitleProvider
 import mega.privacy.android.app.databinding.ItemFolderContentBinding
 import mega.privacy.android.app.databinding.SortByHeaderBinding
+import mega.privacy.android.app.fragments.homepage.SortByHeaderViewModel
 import mega.privacy.android.app.upload.list.data.FolderContent
 import mega.privacy.android.app.utils.AdapterUtils.isValidPosition
 
 class FolderContentListAdapter(
+    private val sortByViewModel: SortByHeaderViewModel,
     private val folderClickCallback: (FolderContent.Data) -> Unit,
     private val onLongClickCallback: (FolderContent.Data) -> Unit
 ) : ListAdapter<FolderContent, RecyclerView.ViewHolder>(FolderContent.DiffCallback()),
@@ -30,14 +32,16 @@ class FolderContentListAdapter(
         return when (viewType) {
             VIEW_TYPE_HEADER -> {
                 val binding = SortByHeaderBinding.inflate(layoutInflater, parent, false)
-                FolderContentHeaderHolder(binding)
+                FolderContentHeaderHolder(sortByViewModel, binding)
             }
             else -> {
                 val binding = ItemFolderContentBinding.inflate(layoutInflater, parent, false)
                 FolderContentListHolder(binding).apply {
                     binding.root.apply {
                         setOnClickListener {
-                            if (isValidPosition(bindingAdapterPosition)) {
+                            if (isValidPosition(bindingAdapterPosition)
+                                && (getItem(bindingAdapterPosition) as FolderContent.Data).isFolder
+                            ) {
                                 folderClickCallback.invoke(getItem(bindingAdapterPosition) as FolderContent.Data)
                             }
                         }

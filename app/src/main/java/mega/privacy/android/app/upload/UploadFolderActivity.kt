@@ -4,13 +4,20 @@ import android.app.Activity
 import android.os.Bundle
 import android.view.MenuItem
 import androidx.activity.viewModels
+import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.documentfile.provider.DocumentFile
 import androidx.recyclerview.widget.RecyclerView
+import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.PasscodeActivity
 import mega.privacy.android.app.databinding.ActivityUploadFolderBinding
+import mega.privacy.android.app.fragments.homepage.EventObserver
+import mega.privacy.android.app.fragments.homepage.SortByHeaderViewModel
+import mega.privacy.android.app.modalbottomsheet.SortByBottomSheetDialogFragment.Companion.newInstance
 import mega.privacy.android.app.upload.list.adapter.FolderContentListAdapter
 import mega.privacy.android.app.upload.list.data.FolderContent
+import mega.privacy.android.app.utils.Constants
+import mega.privacy.android.app.utils.Util
 
 /**
  * Activity which shows the content of a local folder picked via system picker to upload all its content
@@ -19,11 +26,14 @@ import mega.privacy.android.app.upload.list.data.FolderContent
 class UploadFolderActivity : PasscodeActivity() {
 
     private val viewModel: UploadFolderViewModel by viewModels()
+    private val sortByHeaderViewModel: SortByHeaderViewModel by viewModels()
     private lateinit var binding: ActivityUploadFolderBinding
 
     private val folderContentAdapter by lazy {
-        FolderContentListAdapter(::onFolderClick, ::onLongClick)
+        FolderContentListAdapter(sortByHeaderViewModel, ::onFolderClick, ::onLongClick)
     }
+
+    private val toolbarElevation by lazy { resources.getDimension(R.dimen.toolbar_elevation) }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -37,7 +47,7 @@ class UploadFolderActivity : PasscodeActivity() {
         if (savedInstanceState == null) {
             intent.data?.let { uri ->
                 DocumentFile.fromTreeUri(this@UploadFolderActivity, uri)?.let { documentFile ->
-                    viewModel.retrieveFolderContent(documentFile)
+                    viewModel.retrieveFolderContent(documentFile, sortByHeaderViewModel.order.third)
                 }
             }
         }
@@ -70,6 +80,13 @@ class UploadFolderActivity : PasscodeActivity() {
                 override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
                     super.onScrolled(recyclerView, dx, dy)
                     val showElevation = recyclerView.canScrollVertically(RecyclerView.NO_POSITION)
+                    binding.toolbar.elevation = if (showElevation) toolbarElevation else 0F
+                    if (Util.isDarkMode(this@UploadFolderActivity)) {
+                        val color =
+                            if (showElevation) R.color.action_mode_background else R.color.dark_grey
+                        window.statusBarColor =
+                            ContextCompat.getColor(this@UploadFolderActivity, color)
+                    }
                 }
             })
 
@@ -93,10 +110,24 @@ class UploadFolderActivity : PasscodeActivity() {
     fun setupObservers() {
         viewModel.getCurrentFolder().observe(this, ::showCurrentFolder)
         viewModel.getFolderContent().observe(this, ::showFolderContent)
+        sortByHeaderViewModel.showDialogEvent.observe(this, EventObserver {
+            newInstance(Constants.ORDER_OFFLINE, false).apply {
+                show(supportFragmentManager, this.tag)
+            }
+        })
+
+        sortByHeaderViewModel.orderChangeEvent.observe(this, EventObserver { order ->
+            folderContentAdapter.notifyItemChanged(0)
+            viewModel.setOrder(order.third)
+        })
+
+        sortByHeaderViewModel.listGridChangeEvent.observe(this, EventObserver { isList ->
+            folderContentAdapter.notifyItemChanged(0)
+        })
     }
 
     private fun showCurrentFolder(currentFolder: FolderContent.Data) {
-        supportActionBar?.title = currentFolder.document.name
+        supportActionBar?.title = currentFolder.name
     }
 
     private fun showFolderContent(folderContent: List<FolderContent>) {

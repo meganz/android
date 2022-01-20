@@ -20,6 +20,7 @@ import android.webkit.MimeTypeMap;
 
 import androidx.annotation.Nullable;
 import androidx.core.content.FileProvider;
+import androidx.documentfile.provider.DocumentFile;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -948,6 +949,29 @@ public class FileUtil {
 
         for (File f : fList) {
             if (f.isDirectory()) {
+                numFolders++;
+            } else {
+                numFiles++;
+            }
+        }
+
+        return getFolderInfo(numFolders, numFiles);
+    }
+
+    /**
+     * Gets the string to show as content of a folder.
+     *
+     * @param documentFile The folder to get its string content.
+     * @return The string to show as content of the folder.
+     */
+    public static String getFileFolderInfo(DocumentFile documentFile) {
+        DocumentFile[] fList = documentFile.listFiles();
+
+        int numFolders = 0;
+        int numFiles = 0;
+
+        for (DocumentFile d : fList) {
+            if (d.isDirectory()) {
                 numFolders++;
             } else {
                 numFiles++;

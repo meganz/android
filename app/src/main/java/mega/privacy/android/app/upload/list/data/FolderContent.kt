@@ -2,6 +2,10 @@ package mega.privacy.android.app.upload.list.data
 
 import androidx.documentfile.provider.DocumentFile
 import androidx.recyclerview.widget.DiffUtil
+import mega.privacy.android.app.utils.FileUtil
+import mega.privacy.android.app.utils.TextUtil
+import mega.privacy.android.app.utils.TimeUtils
+import mega.privacy.android.app.utils.Util
 
 sealed class FolderContent(val id: Long) {
 
@@ -15,6 +19,20 @@ sealed class FolderContent(val id: Long) {
         val parent: Data?,
         val document: DocumentFile
     ) : FolderContent(document.uri.hashCode().toLong()) {
+        val isFolder = document.isDirectory
+        val name = document.name
+        val uri = document.uri
+        val lastModified = document.lastModified()
+        val size = document.length()
+        val info: String = if (document.isDirectory) {
+            FileUtil.getFileFolderInfo(document)
+        } else {
+            TextUtil.getFileInfo(
+                Util.getSizeString(size),
+                TimeUtils.formatLongDateTime(lastModified / 1000)
+            )
+        }
+
         override fun getSectionTitle(): String =
             document.name?.substring(0, 1) ?: ""
     }
