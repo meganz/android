@@ -32,16 +32,14 @@ import mega.privacy.android.app.exportRK.ExportRecoveryKeyActivity
 import mega.privacy.android.app.lollipop.ChangePasswordActivityLollipop
 import mega.privacy.android.app.lollipop.TwoFactorAuthenticationActivity
 import mega.privacy.android.app.lollipop.VerifyTwoFactorActivity
-import mega.privacy.android.app.lollipop.managerSections.settings.Settings
 import mega.privacy.android.app.mediaplayer.service.AudioPlayerService
 import mega.privacy.android.app.mediaplayer.service.MediaPlayerService
 import mega.privacy.android.app.mediaplayer.service.MediaPlayerServiceBinder
+import mega.privacy.android.app.presentation.extensions.hideKeyboard
 import mega.privacy.android.app.utils.Constants
-import mega.privacy.android.app.utils.LogUtil
 import mega.privacy.android.app.utils.SharedPreferenceConstants.HIDE_RECENT_ACTIVITY
 import mega.privacy.android.app.utils.SharedPreferenceConstants.USER_INTERFACE_PREFERENCES
 import mega.privacy.android.app.utils.ThemeHelper.applyTheme
-import mega.privacy.android.app.utils.Util
 
 @AndroidEntryPoint
 @SuppressLint("NewApi")
@@ -132,8 +130,6 @@ class SettingsFragment : SharedPreferences.OnSharedPreferenceChangeListener, Pre
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        LogUtil.logDebug("onViewCreated")
-
         navigateToInitialPreference()
     }
 
@@ -198,7 +194,6 @@ class SettingsFragment : SharedPreferences.OnSharedPreferenceChangeListener, Pre
 
     override fun onPreferenceTreeClick(preference: Preference?): Boolean {
         val key = preference?.key
-        LogUtil.logDebug("KEY pressed: $key")
         when (key) {
             KEY_FEATURES_CAMERA_UPLOAD -> startActivity(
                 Intent(
@@ -273,7 +268,6 @@ class SettingsFragment : SharedPreferences.OnSharedPreferenceChangeListener, Pre
                 launchWebPage("https://github.com/meganz/android")
             }
             KEY_ABOUT_APP_VERSION -> {
-                LogUtil.logDebug("KEY_ABOUT_APP_VERSION pressed")
                 if (++numberOfClicksAppVersion == 5) {
                     numberOfClicksAppVersion = 0
                     if (!MegaApplication.isShowInfoChatMessages()) {
@@ -394,8 +388,6 @@ class SettingsFragment : SharedPreferences.OnSharedPreferenceChangeListener, Pre
     }
 
     private fun deleteAccountClicked() {
-        LogUtil.logDebug("askConfirmationDeleteAccount")
-
         MaterialAlertDialogBuilder(requireContext())
             .setTitle(getString(R.string.delete_account))
             .setMessage(resources.getString(R.string.delete_account_text))
@@ -406,7 +398,6 @@ class SettingsFragment : SharedPreferences.OnSharedPreferenceChangeListener, Pre
     }
 
     private fun deleteAccountConfirmed() {
-        LogUtil.logDebug("deleteAccount")
         if (viewModel.uiState.value.multiFactorAuthChecked) {
             deleteAccountWithMultiFactorAuthentication()
         } else {
@@ -437,7 +428,7 @@ class SettingsFragment : SharedPreferences.OnSharedPreferenceChangeListener, Pre
     }
 
     private fun showInfoDialog(@StringRes title: Int, @StringRes message: Int) {
-        Util.hideKeyboard(requireActivity(), 0)
+        requireActivity().hideKeyboard()
         MaterialAlertDialogBuilder(requireContext())
             .setPositiveButton(R.string.general_ok) { _, _ -> }
             .setTitle(title)

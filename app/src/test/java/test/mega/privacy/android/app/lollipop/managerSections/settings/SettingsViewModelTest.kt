@@ -61,6 +61,8 @@ class SettingsViewModelTest {
             isOnline = mock { on { invoke() }.thenReturn(flowOf(true)) },
             requestAccountDeletion = mock(),
             isChatLoggedIn = isChatLoggedIn,
+            setLoggingEnabled = mock(),
+            setChatLoggingEnabled = mock(),
         )
     }
 

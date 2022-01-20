@@ -3,6 +3,7 @@ package test.mega.privacy.android.app.lollipop.managerSections.settings
 import android.app.Activity
 import android.app.Instrumentation
 import android.content.*
+import android.os.Bundle
 import androidx.lifecycle.Lifecycle
 import androidx.test.core.app.ApplicationProvider.getApplicationContext
 import androidx.test.espresso.Espresso.onView
@@ -19,22 +20,23 @@ import androidx.test.filters.Suppress
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
+import dagger.hilt.android.components.ViewModelComponent
 import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
 import dagger.hilt.android.testing.HiltTestApplication
 import dagger.hilt.android.testing.UninstallModules
 import dagger.hilt.components.SingletonComponent
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.runBlocking
 import mega.privacy.android.app.R
-import mega.privacy.android.app.TestActivityModule
 import mega.privacy.android.app.activities.settingsActivities.FileManagementPreferencesActivity
 import mega.privacy.android.app.activities.settingsActivities.StartScreenPreferencesActivity
+import mega.privacy.android.app.constants.SettingsConstants
 import mega.privacy.android.app.di.SettingsModule
 import mega.privacy.android.app.domain.entity.UserAccount
 import mega.privacy.android.app.domain.usecase.*
-import mega.privacy.android.app.lollipop.managerSections.settings.SettingsActivity
 import mega.privacy.android.app.presentation.settings.SettingsFragment
 import mega.privacy.android.app.utils.Constants
 import org.hamcrest.Matchers.allOf
@@ -45,7 +47,9 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Mockito
-import org.mockito.kotlin.*
+import org.mockito.kotlin.any
+import org.mockito.kotlin.mock
+import org.mockito.kotlin.whenever
 import test.mega.privacy.android.app.RecyclerViewAssertions.Companion.withNoRowContaining
 import test.mega.privacy.android.app.RecyclerViewAssertions.Companion.withRowContaining
 import test.mega.privacy.android.app.launchFragmentInHiltContainer
@@ -53,8 +57,7 @@ import test.mega.privacy.android.app.launchFragmentInHiltContainer
 
 @HiltAndroidTest
 @RunWith(AndroidJUnit4::class)
-@UninstallModules(SettingsModule::class, TestActivityModule::class)
-@kotlin.Suppress("DEPRECATION")
+@UninstallModules(SettingsModule::class)
 class SettingsFragmentTest {
 
     @get:Rule(order = 0)
@@ -73,22 +76,17 @@ class SettingsFragmentTest {
     )
 
     @Module
-    @InstallIn(SingletonComponent::class)
+    @InstallIn(ViewModelComponent::class)
     object TestSettingsModule {
         val canDeleteAccount = mock<CanDeleteAccount>()
         val getStartScreen = mock<GetStartScreen>()
         val isMultiFactorAuthAvailable = mock<IsMultiFactorAuthAvailable>()
-        val settingsActivity = mock<SettingsActivity>()
         val fetchAutoAcceptQRLinks = mock<FetchAutoAcceptQRLinks>()
         val fetchMultiFactorAuthSetting = mock<FetchMultiFactorAuthSetting>()
         val getAccountDetails = mock<GetAccountDetails>()
         val isOnline = mock<IsOnline>()
         val rootNodeExists = mock<RootNodeExists>()
         val shouldHideRecentActivity = mock<IsHideRecentActivityEnabled>()
-
-        @Provides
-        fun provideSettingsActivity(): SettingsActivity = settingsActivity
-
 
         @Provides
         fun provideGetAccountDetails(): GetAccountDetails = getAccountDetails
@@ -147,6 +145,16 @@ class SettingsFragmentTest {
 
         @Provides
         fun provideRequestAccountDeletion(): RequestAccountDeletion = mock()
+
+
+        @Provides
+        fun provideIsChatLoggedIn(): IsChatLoggedIn = mock { on { invoke() }.thenReturn(emptyFlow())}
+
+        @Provides
+        fun provideSetLoggingEnabled(): SetLoggingEnabled = mock()
+
+        @Provides
+        fun provideSetChatLoggingEnabled(): SetChatLoggingEnabled = mock()
     }
 
     @Before
@@ -178,7 +186,6 @@ class SettingsFragmentTest {
             TestSettingsModule.getStartScreen,
             TestSettingsModule.isMultiFactorAuthAvailable,
             TestSettingsModule.fetchMultiFactorAuthSetting,
-            TestSettingsModule.settingsActivity,
             TestSettingsModule.canDeleteAccount,
             TestSettingsModule.getAccountDetails,
             TestSettingsModule.isOnline,
@@ -235,7 +242,7 @@ class SettingsFragmentTest {
         onPreferences()
             .check(withNoRowContaining(withText(R.string.settings_delete_account)))
 
-//        This test occasionally fails due to timing issues.
+//        This test occasionally failed due to timing issues.
 //        Adding this receiver with an idling resource ensures that the verification only happens
 //        after the broadcast has been received.
         val receiver = object : BroadcastReceiver() {
@@ -390,7 +397,6 @@ class SettingsFragmentTest {
 
     }
 
-
     @Test
     fun test_that_hide_recent_activity_event_updates_hide_recent_activity() {
         launchFragmentInHiltContainer<SettingsFragment>()
@@ -418,8 +424,7 @@ class SettingsFragmentTest {
 
     @Suppress
     @Test
-    fun test_that_when_fragment_is_launched_and_openSettingsStorage_is_true_FileManagementPreferencesActivity_is_launched() {
-        whenever(TestSettingsModule.settingsActivity.openSettingsStorage).thenReturn(true)
+    fun test_that_when_fragment_is_launched_and_openSettingsStorage_is_set_FileManagementPreferencesActivity_is_launched() {
         intending(
             hasComponent(
                 ComponentName(
@@ -429,7 +434,15 @@ class SettingsFragmentTest {
             )
         ).respondWith(Instrumentation.ActivityResult(Activity.RESULT_OK, null))
 
-        launchFragmentInHiltContainer<SettingsFragment>()
+        val args = Bundle().apply {
+            putString(
+                SettingsFragment.INITIAL_PREFERENCE,
+                SettingsConstants.KEY_STORAGE_FILE_MANAGEMENT
+            )
+            putBoolean(SettingsFragment.NAVIGATE_TO_INITIAL_PREFERENCE, true)
+        }
+
+        launchFragmentInHiltContainer<SettingsFragment>(args)
 
         intended(
             hasComponent(
@@ -440,12 +453,10 @@ class SettingsFragmentTest {
             )
         )
 
-        verify(TestSettingsModule.settingsActivity, times(1)).openSettingsStartScreen = false
     }
 
     @Test
-    fun test_that_when_fragment_is_launched_and_openSettingsStartScreen_is_true_StartScreenPreferencesActivity_is_launched() {
-        whenever(TestSettingsModule.settingsActivity.openSettingsStartScreen).thenReturn(true)
+    fun test_that_when_fragment_is_launched_and_openSettingsStartScreen_is_set_StartScreenPreferencesActivity_is_launched() {
         intending(
             hasComponent(
                 ComponentName(
@@ -455,7 +466,15 @@ class SettingsFragmentTest {
             )
         ).respondWith(Instrumentation.ActivityResult(Activity.RESULT_OK, null))
 
-        launchFragmentInHiltContainer<SettingsFragment>()
+        val args = Bundle().apply {
+            putString(
+                SettingsFragment.INITIAL_PREFERENCE,
+                SettingsConstants.KEY_START_SCREEN
+            )
+            putBoolean(SettingsFragment.NAVIGATE_TO_INITIAL_PREFERENCE, true)
+        }
+
+        launchFragmentInHiltContainer<SettingsFragment>(args)
 
         intended(
             hasComponent(

@@ -307,6 +307,7 @@ dependencies {
     androidTestImplementation "org.mockito:mockito-android:$mockitoVersion"
     androidTestImplementation ("androidx.test.espresso:espresso-contrib:$espressoVersion") {
         exclude group: 'org.checkerframework', module: 'checker'
+        exclude module: "protobuf-lite"
     }
     androidTestImplementation "androidx.test.espresso:espresso-intents:$espressoVersion"
 

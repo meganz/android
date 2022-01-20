@@ -332,7 +332,6 @@ import mega.privacy.android.app.lollipop.managerSections.SettingsFragmentLollipo
 import mega.privacy.android.app.lollipop.managerSections.TransfersFragmentLollipop;
 import mega.privacy.android.app.lollipop.managerSections.TurnOnNotificationsFragment;
 import mega.privacy.android.app.lollipop.managerSections.settings.Settings;
-import mega.privacy.android.app.lollipop.managerSections.settings.SettingsActivity;
 import mega.privacy.android.app.lollipop.megachat.BadgeDrawerArrowDrawable;
 import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.RecentChatsFragmentLollipop;
@@ -423,7 +422,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 		MegaGlobalListenerInterface, MegaTransferListenerInterface, OnClickListener,
 		BottomNavigationView.OnNavigationItemSelectedListener, UploadBottomSheetDialogActionListener,
 		ChatManagementCallback, ActionNodeCallback, SnackbarShower,
-		MeetingBottomSheetDialogActionListener, LoadPreviewListener.OnPreviewLoadedCallback, SettingsActivity {
+		MeetingBottomSheetDialogActionListener, LoadPreviewListener.OnPreviewLoadedCallback {
 
 	private static final String TRANSFER_OVER_QUOTA_SHOWN = "TRANSFER_OVER_QUOTA_SHOWN";
 
@@ -11594,23 +11593,4 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 		}
     }
 
-    @Override
-    public boolean getOpenSettingsStartScreen() {
-        return openSettingsStartScreen;
-    }
-
-    @Override
-    public void setOpenSettingsStartScreen(boolean openSettingsStartScreen) {
-        this.openSettingsStartScreen = openSettingsStartScreen;
-    }
-
-    @Override
-    public boolean getOpenSettingsQR() {
-        return openSettingsQR;
-    }
-
-    @Override
-    public boolean getOpenSettingsStorage() {
-        return openSettingsStorage;
-    }
 }
