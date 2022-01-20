@@ -42,11 +42,11 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/empty_hint_image" />
 
-        <androidx.recyclerview.widget.RecyclerView
+        <mega.privacy.android.app.components.NewGridRecyclerView
             android:id="@+id/list"
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+            android:columnWidth="@dimen/grid_node_item_width"
             app:layout_constraintBottom_toTopOf="@+id/actions_view"
             app:layout_constraintTop_toBottomOf="@+id/toolbar"
             tools:listitem="@layout/item_folder_content" />
@@ -56,9 +56,9 @@
             android:layout_width="wrap_content"
             android:layout_height="0dp"
             android:orientation="vertical"
-            app:layout_constraintBottom_toBottomOf="@id/list"
+            app:layout_constraintBottom_toBottomOf="@+id/list"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="@id/list" />
+            app:layout_constraintTop_toTopOf="@+id/list" />
 
         <View
             android:id="@+id/actions_view"

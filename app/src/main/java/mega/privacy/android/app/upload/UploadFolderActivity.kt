@@ -10,6 +10,8 @@ import androidx.documentfile.provider.DocumentFile
 import androidx.recyclerview.widget.RecyclerView
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.PasscodeActivity
+import mega.privacy.android.app.components.CustomizedGridLayoutManager
+import mega.privacy.android.app.components.PositionDividerItemDecoration
 import mega.privacy.android.app.databinding.ActivityUploadFolderBinding
 import mega.privacy.android.app.fragments.homepage.EventObserver
 import mega.privacy.android.app.fragments.homepage.SortByHeaderViewModel
@@ -34,6 +36,7 @@ class UploadFolderActivity : PasscodeActivity() {
     }
 
     private val toolbarElevation by lazy { resources.getDimension(R.dimen.toolbar_elevation) }
+    private val itemDecoration by lazy { PositionDividerItemDecoration(this, resources.displayMetrics) }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -96,6 +99,8 @@ class UploadFolderActivity : PasscodeActivity() {
 
         binding.fastscroll.setRecyclerView(binding.list)
 
+        switchListGrid(sortByHeaderViewModel.isList)
+
         binding.cancelButton.setOnClickListener {
             setResult(Activity.RESULT_CANCELED)
             finish()
@@ -122,7 +127,7 @@ class UploadFolderActivity : PasscodeActivity() {
         })
 
         sortByHeaderViewModel.listGridChangeEvent.observe(this, EventObserver { isList ->
-            folderContentAdapter.notifyItemChanged(0)
+            switchListGrid(isList)
         })
     }
 
@@ -144,5 +149,27 @@ class UploadFolderActivity : PasscodeActivity() {
 
     private fun onLongClick(itemClicked: FolderContent.Data) {
 
+    }
+
+    private fun switchListGrid(isList: Boolean) {
+        binding.list.apply {
+            if (isList) {
+                switchToLinear()
+
+                if (itemDecorationCount == 0) {
+                    addItemDecoration(itemDecoration)
+                }
+            } else {
+                switchBackToGrid()
+                (layoutManager as CustomizedGridLayoutManager).spanSizeLookup =
+                    folderContentAdapter.getSpanSizeLookup((layoutManager as CustomizedGridLayoutManager).spanCount)
+
+                if (itemDecorationCount > 0) {
+                    post {
+                        removeItemDecoration(itemDecoration)
+                    }
+                }
+            }
+        }
     }
 }

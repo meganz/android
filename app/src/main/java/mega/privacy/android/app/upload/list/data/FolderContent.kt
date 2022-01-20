@@ -19,6 +19,7 @@ sealed class FolderContent(val id: Long) {
         val parent: Data?,
         val document: DocumentFile
     ) : FolderContent(document.uri.hashCode().toLong()) {
+        val isSelected = false
         val isFolder = document.isDirectory
         val name = document.name
         val uri = document.uri
