@@ -1812,7 +1812,7 @@ object MegaNodeUtil {
         val children: List<MegaNode?>? = megaApi.getChildren(parent)
 
         children?.forEach {
-            val mime = MimeTypeThumbnail.typeForName(it?.name)
+            val mime = MimeTypeList.typeForName(it?.name)
             if (mime.isImage || mime.isVideoReproducible) return true
         }
 

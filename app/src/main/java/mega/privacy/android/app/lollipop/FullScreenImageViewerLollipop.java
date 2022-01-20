@@ -47,7 +47,6 @@ import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.DownloadService;
 import mega.privacy.android.app.MegaOffline;
 import mega.privacy.android.app.MimeTypeList;
-import mega.privacy.android.app.MimeTypeThumbnail;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.activities.PasscodeActivity;
 import mega.privacy.android.app.components.ExtendedViewPager;
@@ -1001,7 +1000,7 @@ public class FullScreenImageViewerLollipop extends PasscodeActivity
 			getImageHandles(megaApi.getPublicLinks(orderGetChildren), savedInstanceState);
 		} else if (adapterType == PHOTOS_BROWSE_ADAPTER) {
 			getImageHandles(megaApi.searchByType(orderGetChildren, FILE_TYPE_PHOTO, SEARCH_TARGET_ROOTNODE).stream()
-                    .filter(megaNode -> MimeTypeThumbnail.typeForName(megaNode.getName()).isImage())
+                    .filter(megaNode -> MimeTypeList.typeForName(megaNode.getName()).isImage())
                     .collect(Collectors.toList()), savedInstanceState);
 		} else if (adapterType == PHOTO_SYNC_ADAPTER) {
 			getImageHandles(new MegaNodeRepo(megaApi, dbH).getFilteredCuChildren(orderGetChildren), savedInstanceState, true);

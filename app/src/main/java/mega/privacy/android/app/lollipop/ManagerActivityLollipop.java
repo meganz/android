@@ -8377,7 +8377,6 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 
 				uploadServiceIntent.putExtra(UploadService.EXTRA_FOLDERPATH, folderPath);
 				uploadServiceIntent.putExtra(UploadService.EXTRA_PARENT_HASH, parentNode.getHandle());
-				uploadServiceIntent.putExtra(UploadService.EXTRA_UPLOAD_COUNT, paths.size());
 				startService(uploadServiceIntent);
 			}
 		}
@@ -8986,7 +8985,6 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 					intent.putExtra(UploadService.EXTRA_NAME, info.getTitle());
 					intent.putExtra(UploadService.EXTRA_LAST_MODIFIED, info.getLastModified());
 					intent.putExtra(UploadService.EXTRA_PARENT_HASH, parentNode.getHandle());
-					intent.putExtra(UploadService.EXTRA_UPLOAD_COUNT, infos.size());
 					startService(intent);
 				}
 			}
