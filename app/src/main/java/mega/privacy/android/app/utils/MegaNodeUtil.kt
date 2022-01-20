@@ -1816,6 +1816,12 @@ object MegaNodeUtil {
         return false
     }
 
+    fun MegaNode.getFileName(): String =
+        "$base64Handle.${MimeTypeList.typeForName(name)?.extension}"
+
+    fun MegaNode.getThumbnailFileName(): String =
+        "$base64Handle${JPG_EXTENSION}"
+
     fun MegaNode.isImage(): Boolean =
         this.isFile && MimeTypeList.typeForName(name).isImage
 

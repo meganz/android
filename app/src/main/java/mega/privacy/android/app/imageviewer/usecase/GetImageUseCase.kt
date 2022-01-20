@@ -21,14 +21,16 @@ import mega.privacy.android.app.usecase.GetNodeUseCase
 import mega.privacy.android.app.utils.CacheFolderManager.*
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.ErrorUtils.toThrowable
-import mega.privacy.android.app.utils.MegaNodeUtil.isGif
+import mega.privacy.android.app.utils.LogUtil.logWarning
+import mega.privacy.android.app.utils.MegaNodeUtil.getFileName
+import mega.privacy.android.app.utils.MegaNodeUtil.getThumbnailFileName
+import mega.privacy.android.app.utils.MegaNodeUtil.isImage
 import mega.privacy.android.app.utils.MegaNodeUtil.isVideo
 import mega.privacy.android.app.utils.MegaTransferUtils.getNumPendingDownloadsNonBackground
 import mega.privacy.android.app.utils.OfflineUtils
 import mega.privacy.android.app.utils.RxUtil.blockingGetOrNull
 import nz.mega.sdk.*
 import nz.mega.sdk.MegaError.*
-import java.io.File
 import javax.inject.Inject
 
 /**
@@ -114,11 +116,11 @@ class GetImageUseCase @Inject constructor(
                 node == null -> emitter.onError(IllegalArgumentException("Node is null"))
                 !node.isFile -> emitter.onError(IllegalArgumentException("Node is not a file"))
                 else -> {
-                    val fileName = "${node.base64Handle}.${MimeTypeList.typeForName(node.name).extension}"
-                    val thumbnailFile = if (node.hasThumbnail()) buildThumbnailFile(context, fileName) else null
-                    val previewFile = if (node.hasPreview()) buildPreviewFile(context, fileName) else null
-                    val fullFile = buildTempFile(context, fileName)
-                    val isFullSizeRequired = fullSize || node.isGif() || node.isVideo()
+                    val isFullSizeRequired = fullSize || !node.isImage()
+
+                    val thumbnailFile = if (node.hasThumbnail()) buildThumbnailFile(context, node.getThumbnailFileName()) else null
+                    val previewFile = if (node.hasPreview() || node.isVideo()) buildPreviewFile(context, node.getThumbnailFileName()) else null
+                    val fullFile = buildTempFile(context, node.getFileName())
 
                     val image = ImageResult(
                         isVideo = node.isVideo(),
@@ -127,8 +129,8 @@ class GetImageUseCase @Inject constructor(
                         fullSizeUri = if (fullFile?.exists() == true) fullFile.toUri() else null
                     )
 
-                    if (fullFile?.exists() == true || (!isFullSizeRequired && previewFile?.exists() == true)) {
-                        image.fullyLoaded = true
+                    if (fullFile?.exists() == true && (previewFile == null || previewFile.exists())) {
+                        image.isFullyLoaded = true
                         emitter.onNext(image)
                         emitter.onComplete()
                         return@create
@@ -147,6 +149,8 @@ class GetImageUseCase @Inject constructor(
                                     if (error.errorCode == API_OK) {
                                         image.thumbnailUri = thumbnailFile.toUri()
                                         emitter.onNext(image)
+                                    } else {
+                                        logWarning(error.toThrowable().stackTraceToString())
                                     }
                                 }
                             ))
@@ -165,12 +169,14 @@ class GetImageUseCase @Inject constructor(
                                         if (isFullSizeRequired) {
                                             emitter.onNext(image)
                                         } else {
-                                            image.fullyLoaded = true
+                                            image.isFullyLoaded = true
                                             emitter.onNext(image)
                                             emitter.onComplete()
                                         }
                                     } else if (!isFullSizeRequired) {
                                         emitter.onError(error.toThrowable())
+                                    } else {
+                                        logWarning(error.toThrowable().stackTraceToString())
                                     }
                                 }
                             ))
@@ -188,10 +194,10 @@ class GetImageUseCase @Inject constructor(
                                 if (emitter.isCancelled) return@OptionalMegaTransferListenerInterface
 
                                 when (error.errorCode) {
-                                    API_OK -> {
+                                    API_OK, API_EEXIST -> {
                                         image.fullSizeUri = fullFile.toUri()
                                         image.transferTag = null
-                                        image.fullyLoaded = true
+                                        image.isFullyLoaded = true
                                         emitter.onNext(image)
                                         emitter.onComplete()
                                     }
@@ -250,7 +256,7 @@ class GetImageUseCase @Inject constructor(
                         ImageResult(
                             isVideo = MimeTypeList.typeForName(offlineNode.name).isVideo,
                             fullSizeUri = file.toUri(),
-                            fullyLoaded = true
+                            isFullyLoaded = true
                         )
                     } else {
                         error("Offline file doesn't exist")
@@ -271,7 +277,7 @@ class GetImageUseCase @Inject constructor(
             if (file.exists()) {
                 ImageResult(
                     fullSizeUri = file.toUri(),
-                    fullyLoaded = true
+                    isFullyLoaded = true
                 )
             } else {
                 error("Image file doesn't exist")

@@ -14,6 +14,7 @@ import androidx.core.content.ContextCompat
 import androidx.core.view.*
 import androidx.viewpager2.widget.MarginPageTransformer
 import androidx.viewpager2.widget.ViewPager2
+import androidx.viewpager2.widget.ViewPager2.OFFSCREEN_PAGE_LIMIT_DEFAULT
 import com.facebook.drawee.backends.pipeline.Fresco
 import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.BaseActivity
@@ -260,6 +261,11 @@ class ImageViewerActivity : BaseActivity(), PermissionRequester, SnackbarShower 
         nodeAttacher?.saveState(outState)
     }
 
+    override fun onLowMemory() {
+        logWarning("onLowMemory")
+        binding.viewPager.offscreenPageLimit = OFFSCREEN_PAGE_LIMIT_DEFAULT
+    }
+
     override fun onDestroy() {
         binding.viewPager.unregisterOnPageChangeCallback(pageChangeCallback)
         if (isFinishing) dragToExit?.showPreviousHiddenThumbnail()
@@ -433,10 +439,12 @@ class ImageViewerActivity : BaseActivity(), PermissionRequester, SnackbarShower 
      * Switch toolbar/bottomBar visibility with animation.
      */
     private fun switchToolbarVisibility() {
-        if (binding.motion.currentState == R.id.end) {
-            binding.motion.transitionToStart()
-        } else {
-            binding.motion.transitionToEnd()
+        binding.motion.post {
+            if (binding.motion.currentState == R.id.end) {
+                binding.motion.transitionToStart()
+            } else {
+                binding.motion.transitionToEnd()
+            }
         }
     }
 

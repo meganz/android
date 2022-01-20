@@ -5,6 +5,7 @@ import android.net.Uri
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.map
+import com.facebook.drawee.backends.pipeline.Fresco
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.core.Completable
@@ -77,6 +78,7 @@ class ImageViewerViewModel @Inject constructor(
     override fun onCleared() {
         nodesComposite.clear()
         imagesComposite.clear()
+        Fresco.getImagePipeline()?.clearMemoryCaches()
         super.onCleared()
     }
 
@@ -94,6 +96,9 @@ class ImageViewerViewModel @Inject constructor(
 
     fun getCurrentNode(): MegaNodeItem? =
         currentPosition.value?.let { images.value?.getOrNull(it)?.nodeItem }
+
+    fun getImageItem(nodeHandle: Long): ImageItem? =
+        images.value?.find { it.handle == nodeHandle }
 
     fun onSnackbarMessage(): LiveData<String> = snackbarMessage
 
@@ -151,17 +156,17 @@ class ImageViewerViewModel @Inject constructor(
      * @param nodeHandle    Image node handle to be loaded.
      */
     fun loadSingleNode(nodeHandle: Long) {
-        val existingNode = images.value?.find { it.handle == nodeHandle }
+        val imageItem = images.value?.find { it.handle == nodeHandle }
         val subscription = when {
-            existingNode?.nodePublicLink?.isNotBlank() == true ->
-                getNodeUseCase.getNodeItem(existingNode.nodePublicLink)
-            existingNode?.chatMessageId != null && existingNode.chatRoomId != null ->
-                getNodeUseCase.getNodeItem(existingNode.chatRoomId, existingNode.chatMessageId)
-            existingNode?.nodeItem?.node != null ->
-                getNodeUseCase.getNodeItem(existingNode.nodeItem.node)
-            existingNode?.isOffline == true ->
-                getNodeUseCase.getOfflineNodeItem(existingNode.handle)
-            existingNode?.handle != INVALID_HANDLE ->
+            imageItem?.nodePublicLink?.isNotBlank() == true ->
+                getNodeUseCase.getNodeItem(imageItem.nodePublicLink)
+            imageItem?.chatMessageId != null && imageItem.chatRoomId != null ->
+                getNodeUseCase.getNodeItem(imageItem.chatRoomId, imageItem.chatMessageId)
+            imageItem?.nodeItem?.node != null ->
+                getNodeUseCase.getNodeItem(imageItem.nodeItem.node)
+            imageItem?.isOffline == true ->
+                getNodeUseCase.getOfflineNodeItem(imageItem.handle)
+            imageItem?.handle != INVALID_HANDLE ->
                 getNodeUseCase.getNodeItem(nodeHandle)
             else ->
                 return // Image file uri with no handle
@@ -192,17 +197,17 @@ class ImageViewerViewModel @Inject constructor(
      * @param highPriority  Flag to request full image with high priority.
      */
     fun loadSingleImage(nodeHandle: Long, fullSize: Boolean, highPriority: Boolean) {
-        val existingNode = images.value?.find { it.handle == nodeHandle }
+        val imageItem = images.value?.find { it.handle == nodeHandle }
         val subscription = when {
-            existingNode?.nodePublicLink?.isNotBlank() == true ->
-                getImageUseCase.get(existingNode.nodePublicLink, fullSize, highPriority)
-            existingNode?.chatMessageId != null && existingNode.chatRoomId != null ->
-                getImageUseCase.get(existingNode.chatRoomId, existingNode.chatMessageId, fullSize, highPriority)
-            existingNode?.isOffline == true ->
-                getImageUseCase.getOffline(existingNode.handle)
-            existingNode?.nodeItem?.node != null ->
-                getImageUseCase.get(existingNode.nodeItem.node, fullSize, highPriority)
-            existingNode?.handle != INVALID_HANDLE ->
+            imageItem?.nodePublicLink?.isNotBlank() == true ->
+                getImageUseCase.get(imageItem.nodePublicLink, fullSize, highPriority)
+            imageItem?.chatMessageId != null && imageItem.chatRoomId != null ->
+                getImageUseCase.get(imageItem.chatRoomId, imageItem.chatMessageId, fullSize, highPriority)
+            imageItem?.isOffline == true ->
+                getImageUseCase.getOffline(imageItem.handle)
+            imageItem?.nodeItem?.node != null ->
+                getImageUseCase.get(imageItem.nodeItem.node, fullSize, highPriority)
+            imageItem?.handle != INVALID_HANDLE ->
                 getImageUseCase.get(nodeHandle, fullSize, highPriority)
             else ->
                 return // Image file uri with no handle
@@ -447,19 +452,28 @@ class ImageViewerViewModel @Inject constructor(
             }
     }
 
-    fun stopImageLoading(nodeHandle: Long) {
-        images.value?.find { nodeHandle == it.handle }?.imageResult?.transferTag?.let { tag ->
-            cancelTransferUseCase.cancel(tag)
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribeBy(
-                    onError = { error ->
-                        logError(error.stackTraceToString())
-                    }
-                )
+    fun stopImageLoading(nodeHandle: Long, aggressive: Boolean) {
+        if (aggressive) {
+            imagesComposite.remove(nodeHandle)
+            nodesComposite.remove(nodeHandle)
         }
-        imagesComposite.remove(nodeHandle)
-        nodesComposite.remove(nodeHandle)
+        images.value?.find { nodeHandle == it.handle }?.imageResult?.let { imageResult ->
+            imageResult.fullSizeUri?.let { fullSizeImageUri ->
+                Fresco.getImagePipeline()?.evictFromMemoryCache(fullSizeImageUri)
+            }
+            if (aggressive) {
+                imageResult.transferTag?.let { tag ->
+                    cancelTransferUseCase.cancel(tag)
+                        .subscribeOn(Schedulers.io())
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribeBy(
+                            onError = { error ->
+                                logError(error.stackTraceToString())
+                            }
+                        )
+                }
+            }
+        }
     }
 
     fun updateCurrentPosition(position: Int, forceUpdate: Boolean) {

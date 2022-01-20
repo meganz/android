@@ -10,7 +10,7 @@ import android.net.Uri
  * @property fullSizeUri    Image full size Uri.
  * @property transferTag    Full Image Mega request tag to cancel if it's not needed anymore.
  * @property isVideo        Flag to check if it's a video.
- * @property fullyLoaded    Flag to check if the image has been fully loaded.
+ * @property isFullyLoaded  Flag to check if the image has been fully loaded.
  */
 data class ImageResult constructor(
     var thumbnailUri: Uri? = null,
@@ -18,7 +18,7 @@ data class ImageResult constructor(
     var fullSizeUri: Uri? = null,
     var transferTag: Int? = null,
     var isVideo: Boolean = false,
-    var fullyLoaded: Boolean = false
+    var isFullyLoaded: Boolean = false
 ) {
 
     /**
