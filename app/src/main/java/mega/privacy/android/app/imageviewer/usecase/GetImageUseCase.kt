@@ -21,6 +21,7 @@ import mega.privacy.android.app.usecase.GetNodeUseCase
 import mega.privacy.android.app.utils.CacheFolderManager.*
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.ErrorUtils.toThrowable
+import mega.privacy.android.app.utils.FileUtil
 import mega.privacy.android.app.utils.LogUtil.logWarning
 import mega.privacy.android.app.utils.MegaNodeUtil.getFileName
 import mega.privacy.android.app.utils.MegaNodeUtil.getThumbnailFileName
@@ -121,6 +122,10 @@ class GetImageUseCase @Inject constructor(
                     val thumbnailFile = if (node.hasThumbnail()) buildThumbnailFile(context, node.getThumbnailFileName()) else null
                     val previewFile = if (node.hasPreview() || node.isVideo()) buildPreviewFile(context, node.getThumbnailFileName()) else null
                     val fullFile = buildTempFile(context, node.getFileName())
+
+                    if (fullFile.exists() && fullFile.length() != node.size) {
+                        FileUtil.deleteFileSafely(fullFile)
+                    }
 
                     val image = ImageResult(
                         isVideo = node.isVideo(),

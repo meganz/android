@@ -64,7 +64,7 @@ class ImageViewerViewModel @Inject constructor(
 
     private val images = MutableLiveData<List<ImageItem>?>()
     private val currentPosition = MutableLiveData<Int>()
-    private val switchToolbar = MutableLiveData<Unit>()
+    private val showToolbar = MutableLiveData<Boolean>()
     private val snackbarMessage = SingleLiveEvent<String>()
     private val nodesComposite = HashCompositeDisposable()
     private val imagesComposite = HashCompositeDisposable()
@@ -102,7 +102,7 @@ class ImageViewerViewModel @Inject constructor(
 
     fun onSnackbarMessage(): LiveData<String> = snackbarMessage
 
-    fun onSwitchToolbar(): LiveData<Unit> = switchToolbar
+    fun onShowToolbar(): LiveData<Boolean> = showToolbar
 
     fun retrieveSingleImage(nodeHandle: Long, isOffline: Boolean = false) {
         getImageHandlesUseCase.get(nodeHandles = longArrayOf(nodeHandle), isOffline = isOffline)
@@ -483,7 +483,7 @@ class ImageViewerViewModel @Inject constructor(
     }
 
     fun switchToolbar() {
-        switchToolbar.value = Unit
+        showToolbar.value = showToolbar.value?.not() ?: true
     }
 
     private fun getExistingNode(nodeHandle: Long): MegaNode? =

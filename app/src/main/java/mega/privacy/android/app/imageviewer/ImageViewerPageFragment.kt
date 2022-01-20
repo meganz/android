@@ -10,9 +10,9 @@ import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Lifecycle
-import com.facebook.common.util.UriUtil
 import com.facebook.drawee.backends.pipeline.Fresco
 import com.facebook.drawee.controller.BaseControllerListener
+import com.facebook.drawee.drawable.ScalingUtils.ScaleType
 import com.facebook.imagepipeline.common.Priority
 import com.facebook.imagepipeline.common.RotationOptions
 import com.facebook.imagepipeline.image.ImageInfo
@@ -137,33 +137,35 @@ class ImageViewerPageFragment : Fragment() {
 
     private fun showItem(imageItem: ImageItem?) {
         val imageResult = imageItem?.imageResult ?: return
-        var mainImageRequest: ImageRequest? = null
-        var lowImageRequest: ImageRequest? = null
+        var mainImageUri: Uri? = null
+        var lowImageUri: Uri? = null
 
         when {
             imageResult.isVideo -> {
-                mainImageRequest = imageResult.previewUri?.toImageRequest()
-                lowImageRequest = imageResult.thumbnailUri?.toImageRequest()
+                mainImageUri = imageResult.previewUri
+                lowImageUri = imageResult.thumbnailUri
             }
             imageResult.fullSizeUri != null -> {
                 if (lifecycle.currentState == Lifecycle.State.RESUMED) {
-                    mainImageRequest = imageResult.fullSizeUri?.toImageRequest()
-                    lowImageRequest = (imageResult.previewUri ?: imageResult.thumbnailUri)?.toImageRequest()
+                    mainImageUri = imageResult.fullSizeUri
+                    lowImageUri = imageResult.previewUri ?: imageResult.thumbnailUri
                 } else {
-                    mainImageRequest = imageResult.previewUri?.toImageRequest()
-                    lowImageRequest = imageResult.thumbnailUri?.toImageRequest()
+                    mainImageUri = imageResult.previewUri
+                    lowImageUri = imageResult.thumbnailUri
                 }
             }
             imageResult.previewUri != null -> {
-                mainImageRequest = imageResult.previewUri?.toImageRequest()
-                lowImageRequest = imageResult.thumbnailUri?.toImageRequest()
+                mainImageUri = imageResult.previewUri
+                lowImageUri = imageResult.thumbnailUri
             }
             imageResult.thumbnailUri != null -> {
-                mainImageRequest = imageResult.thumbnailUri?.toImageRequest()
+                mainImageUri = imageResult.thumbnailUri
             }
         }
 
-        if (mainImageRequest == null && lowImageRequest == null) return
+        if (mainImageUri == null && lowImageUri == null) return
+        val mainImageRequest = mainImageUri?.toImageRequest()
+        val lowImageRequest = lowImageUri?.toImageRequest()
 
         val newController = Fresco.newDraweeControllerBuilder()
             .setLowResImageRequest(lowImageRequest)
@@ -178,7 +180,7 @@ class ImageViewerPageFragment : Fragment() {
                 .setLowResImageRequest(lowImageRequest)
                 .setImageRequest(mainImageRequest)
                 .build()
-        } else if (imageResult.isFullyLoaded && imageResult.isVideo && binding.progress.isVisible) {
+        } else if (imageResult.isFullyLoaded && imageResult.isVideo) {
             showVideoButton(imageItem)
             binding.progress.hide()
         }
@@ -204,33 +206,29 @@ class ImageViewerPageFragment : Fragment() {
             if (throwable is BasePool.PoolSizeViolationException) activity?.onLowMemory()
 
             val imageItem = viewModel.getImageItem(nodeHandle!!)
-            val imageResult = imageItem?.imageResult ?: return
-            val fallbackImageUri = imageResult.previewUri ?: UriUtil.getUriForResourceId(R.drawable.ic_error)
-
+            binding.image.hierarchy.setFailureImage(R.drawable.ic_error, ScaleType.FIT_CENTER)
             binding.image.controller = Fresco.newDraweeControllerBuilder()
-                .setImageRequest(fallbackImageUri.toImageRequest())
+                .setImageRequest(imageItem?.imageResult?.previewUri?.toImageRequest())
                 .build()
 
-            if (imageResult.isVideo) showVideoButton(imageItem)
+            if (imageItem?.imageResult?.isVideo == true) showVideoButton(imageItem)
             binding.progress.hide()
         }
     }
 
     private fun showVideoButton(imageItem: ImageItem) {
-        binding.image.post {
-            binding.image.apply {
-                setZoomingEnabled(false)
-                setIsLongpressEnabled(false)
-                setTapListener(object : GestureDetector.SimpleOnGestureListener() {
-                    override fun onSingleTapUp(e: MotionEvent?): Boolean {
-                        launchVideoScreen(imageItem)
-                        return true
-                    }
-                })
-                setOnClickListener { launchVideoScreen(imageItem) }
-            }
-            binding.btnVideo.setOnClickListener { launchVideoScreen(imageItem) }
-            binding.btnVideo.isVisible = true
+        binding.btnVideo.setOnClickListener { launchVideoScreen(imageItem) }
+        binding.btnVideo.isVisible = true
+        binding.image.apply {
+            setAllowTouchInterceptionWhileZoomed(true)
+            setZoomingEnabled(false)
+            setTapListener(object : GestureDetector.SimpleOnGestureListener() {
+                override fun onSingleTapUp(e: MotionEvent?): Boolean {
+                    launchVideoScreen(imageItem)
+                    return true
+                }
+            })
+            setOnClickListener { launchVideoScreen(imageItem) }
         }
     }
 

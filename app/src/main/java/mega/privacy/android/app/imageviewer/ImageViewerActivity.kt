@@ -245,7 +245,9 @@ class ImageViewerActivity : BaseActivity(), PermissionRequester, SnackbarShower 
         if (savedInstanceState == null) {
             if (!Fresco.hasBeenInitialized()) Fresco.initialize(this)
             binding.root.post {
-                dragToExit?.runEnterAnimation(intent, binding.root, ::enableToolbarTransition)
+                dragToExit?.runEnterAnimation(intent, binding.root) { show ->
+                    changeToolbarVisibility(show, true)
+                }
             }
         }
     }
@@ -288,26 +290,29 @@ class ImageViewerActivity : BaseActivity(), PermissionRequester, SnackbarShower 
             adapter = pagerAdapter
         }
 
-        // Apply statusBar top inset as padding for toolbar
-        ViewCompat.setOnApplyWindowInsetsListener(binding.toolbar) { view, windowInsets ->
-            val topInset = windowInsets.getInsets(WindowInsetsCompat.Type.statusBars()).top
-            view.updatePadding(0, topInset, 0, 0)
-            WindowInsetsCompat.CONSUMED
-        }
+        binding.root.post {
+            val bottomBgHeight = binding.bgBottom.height
 
-        // Apply navigationBar bottom inset as margin for txtPageCount
-        ViewCompat.setOnApplyWindowInsetsListener(binding.txtPageCount) { view, windowInsets ->
-            val bottomInset = windowInsets.getInsets(WindowInsetsCompat.Type.navigationBars()).bottom
-            view.updateLayoutParams<ViewGroup.MarginLayoutParams> { bottomMargin = bottomInset }
+            // Apply system bars top and bottom insets
+            ViewCompat.setOnApplyWindowInsetsListener(binding.root) { _, windowInsets ->
+                val insets = windowInsets.getInsets(WindowInsetsCompat.Type.systemBars())
 
-            binding.motion.apply { // Needs to also update margins on MotionsLayout's Scene
-                constraintSetIds.forEach { id ->
-                    getConstraintSet(id).apply {
-                        setMargin(view.id, ConstraintSet.BOTTOM, bottomInset)
+                binding.toolbar.updatePadding(0, insets.top, 0, 0)
+                binding.txtPageCount.updateLayoutParams<ViewGroup.MarginLayoutParams> { bottomMargin = insets.bottom }
+                binding.bgBottom.updateLayoutParams { height = bottomBgHeight + insets.bottom }
+
+                // Update margins on MotionsLayout's Scene
+                binding.motion.apply {
+                    constraintSetIds.forEach { id ->
+                        getConstraintSet(id).apply {
+                            setMargin(binding.txtPageCount.id, ConstraintSet.BOTTOM, insets.bottom)
+                            constrainHeight(binding.bgBottom.id, bottomBgHeight + insets.bottom)
+                        }
                     }
                 }
+
+                WindowInsetsCompat.CONSUMED
             }
-            WindowInsetsCompat.CONSUMED
         }
     }
 
@@ -354,7 +359,7 @@ class ImageViewerActivity : BaseActivity(), PermissionRequester, SnackbarShower 
             binding.progress.hide()
         }
         viewModel.onCurrentImageNode().observe(this, ::showCurrentImageInfo)
-        viewModel.onSwitchToolbar().observe(this) { switchToolbarVisibility() }
+        viewModel.onShowToolbar().observe(this, ::changeToolbarVisibility)
         viewModel.onSnackbarMessage().observe(this) { message ->
             bottomSheet?.dismissAllowingStateLoss()
             showSnackbar(message)
@@ -386,7 +391,7 @@ class ImageViewerActivity : BaseActivity(), PermissionRequester, SnackbarShower 
     }
 
     private fun setupAttachers(savedInstanceState: Bundle?) {
-        dragToExit = DragToExitSupport(this, ::enableToolbarTransition) {
+        dragToExit = DragToExitSupport(this, { changeToolbarVisibility(it, true) }) {
             finish()
             overridePendingTransition(0, android.R.anim.fade_out)
         }
@@ -436,33 +441,25 @@ class ImageViewerActivity : BaseActivity(), PermissionRequester, SnackbarShower 
     }
 
     /**
-     * Switch toolbar/bottomBar visibility with animation.
+     * Change toolbar/bottomBar visibility with animation.
+     *
+     * @param show                  Show or hide toolbar/bottombar
+     * @param enableTransparency    Enable transparency change
      */
-    private fun switchToolbarVisibility() {
+    private fun changeToolbarVisibility(show: Boolean, enableTransparency: Boolean = false) {
         binding.motion.post {
-            if (binding.motion.currentState == R.id.end) {
+            val color: Int
+            if (show) {
+                color = android.R.color.transparent
                 binding.motion.transitionToStart()
             } else {
+                color = R.color.white_black
                 binding.motion.transitionToEnd()
             }
+            if (enableTransparency) {
+                binding.motion.setBackgroundColor(ContextCompat.getColor(this, color))
+            }
         }
-    }
-
-    /**
-     * Enable toolbar/bottomBar transparency transition for DragToExit support.
-     *
-     * @param isActivated   Check whether transition is activated or not.
-     */
-    private fun enableToolbarTransition(isActivated: Boolean) {
-        val color: Int
-        if (isActivated) {
-            color = android.R.color.transparent
-            binding.motion.transitionToStart()
-        } else {
-            color = R.color.white_black
-            binding.motion.transitionToEnd()
-        }
-        binding.motion.setBackgroundColor(ContextCompat.getColor(this, color))
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
