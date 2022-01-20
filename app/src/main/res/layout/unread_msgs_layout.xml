@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/new_messages_icon"
     android:layout_width="wrap_content"
@@ -9,16 +9,20 @@
         android:id="@+id/badge_image"
         android:layout_width="32dp"
         android:layout_height="32dp"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toTopOf="@id/badge_rl"
         android:layout_marginStart="12dp"
         android:layout_marginTop="10dp"
-        android:src="@drawable/ic_jump_to_latest"/>
+        android:src="@drawable/ic_jump_to_latest" />
     <RelativeLayout
         android:id="@+id/badge_rl"
         android:layout_width="wrap_content"
-        android:layout_height="20dp"
+        android:layout_height="24dp"
         android:background="@drawable/unread_badge"
-        android:layout_gravity="top|start"
-        android:layout_marginTop="3dp"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
         android:gravity="center_vertical"
         android:visibility="visible">
         <TextView
@@ -29,10 +33,10 @@
             android:textStyle="bold"
             android:gravity="center"
             android:textSize="11sp"
-            android:layout_marginEnd="6dp"
-            android:layout_marginStart="6dp"
+            android:layout_marginEnd="8dp"
+            android:layout_marginStart="8dp"
             android:layout_marginTop="1dp"
             android:layout_marginBottom="1dp"
             android:textAppearance="@style/TextAppearance.Mega.Body2.PrimaryColor" />
     </RelativeLayout>
-</FrameLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>

@@ -29,6 +29,7 @@ import android.os.Looper;
 import android.provider.MediaStore;
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
 
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.coordinatorlayout.widget.CoordinatorLayout;
 import androidx.core.content.ContextCompat;
 import androidx.core.content.FileProvider;
@@ -506,7 +507,7 @@ public class ChatActivityLollipop extends PasscodeActivity
     private ArrayList<MessageVoiceClip> messagesPlaying = new ArrayList<>();
     private ArrayList<RemovedMessage> removedMessages = new ArrayList<>();
 
-    private FrameLayout unreadMsgsLayout;
+    private ConstraintLayout unreadMsgsLayout;
     private RelativeLayout unreadBadgeLayout;
     private TextView unreadBadgeText;
     private ArrayList<Long> msgsReceived = new ArrayList<>();
