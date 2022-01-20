@@ -6,6 +6,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.domain.usecase.*
+import mega.privacy.android.app.presentation.settings.model.SettingsState
 import mega.privacy.android.app.utils.LogUtil
 import javax.inject.Inject
 

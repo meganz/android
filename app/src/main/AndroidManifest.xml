@@ -98,7 +98,9 @@
         <activity
             android:name=".presentation.settings.SettingsActivity"
             android:exported="false"
-            android:label="@string/action_settings" />
+            android:label="@string/action_settings"
+            android:launchMode="singleTop"
+            android:parentActivityName=".lollipop.ManagerActivityLollipop"/>
 
         <meta-data
             android:name="fontProviderRequests"

@@ -1,4 +1,4 @@
-package mega.privacy.android.app.presentation.settings
+package mega.privacy.android.app.presentation.settings.model
 
 data class SettingsState(
     val autoAcceptEnabled: Boolean,

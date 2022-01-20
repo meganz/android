@@ -8,10 +8,9 @@ import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
 import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.R
-import mega.privacy.android.app.constants.SettingsConstants
-import mega.privacy.android.app.constants.SettingsConstants.*
 import mega.privacy.android.app.presentation.settings.SettingsFragment.Companion.INITIAL_PREFERENCE
 import mega.privacy.android.app.presentation.settings.SettingsFragment.Companion.NAVIGATE_TO_INITIAL_PREFERENCE
+import mega.privacy.android.app.presentation.settings.model.TargetPreference
 
 private const val TITLE_TAG = "settingsActivityTitle"
 
@@ -22,6 +21,7 @@ class SettingsActivity : AppCompatActivity(),
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.settings_activity)
+        setSupportActionBar(findViewById(R.id.settings_toolbar))
         if (savedInstanceState == null) {
             supportFragmentManager
                 .beginTransaction()
@@ -45,6 +45,14 @@ class SettingsActivity : AppCompatActivity(),
         // Save current activity title so we can set it again after a configuration change
         outState.putCharSequence(TITLE_TAG, title)
     }
+
+//    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+//        if (item.itemId == android.R.id.home){
+//            onBackPressed()
+//            return true
+//        }
+//        return super.onOptionsItemSelected(item)
+//    }
 
     override fun onSupportNavigateUp(): Boolean {
         if (supportFragmentManager.popBackStackImmediate()) {
@@ -83,11 +91,6 @@ class SettingsActivity : AppCompatActivity(),
             }
         }
 
-        sealed class TargetPreference(val preferenceId: String, val requiresNavigation: Boolean) {
-            object Storage : TargetPreference(KEY_STORAGE_FILE_MANAGEMENT, true)
-            object QR : TargetPreference(KEY_QR_CODE_AUTO_ACCEPT, false)
-            object StartScreen : TargetPreference(KEY_START_SCREEN, true)
-        }
     }
 
 }

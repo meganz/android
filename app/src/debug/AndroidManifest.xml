@@ -101,7 +101,9 @@
         <activity
             android:name=".presentation.settings.SettingsActivity"
             android:exported="false"
-            android:label="@string/action_settings" />
+            android:label="@string/action_settings"
+            android:launchMode="singleTop"
+            android:parentActivityName=".lollipop.ManagerActivityLollipop"/>
 
         <activity
             android:name="mega.privacy.android.app.lollipop.ManagerActivityLollipop"

@@ -353,6 +353,7 @@ import mega.privacy.android.app.modalbottomsheet.nodelabel.NodeLabelBottomSheetD
 import mega.privacy.android.app.myAccount.MyAccountActivity;
 import mega.privacy.android.app.myAccount.usecase.CheckPasswordReminderUseCase;
 import mega.privacy.android.app.objects.PasscodeManagement;
+import mega.privacy.android.app.presentation.settings.model.TargetPreference;
 import mega.privacy.android.app.psa.Psa;
 import mega.privacy.android.app.psa.PsaManager;
 import mega.privacy.android.app.psa.PsaViewHolder;
@@ -3413,8 +3414,10 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 		    		break;
 	    		}
 				case SETTINGS:{
-					setToolbarTitle();
-					setBottomNavigationMenuItemChecked(NO_BNV);
+					if(SettingsFragmentRefactorToggle.INSTANCE.getEnabled() == false){
+						setToolbarTitle();
+						setBottomNavigationMenuItemChecked(NO_BNV);
+					}
 					break;
 				}
 				case SEARCH:{
@@ -3903,9 +3906,11 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 				break;
 			}
 			case SETTINGS:{
-				aB.setSubtitle(null);
-				aB.setTitle(getString(R.string.action_settings).toUpperCase());
-				firstNavigationLevel = true;
+				if(SettingsFragmentRefactorToggle.INSTANCE.getEnabled() == false){
+					aB.setSubtitle(null);
+					aB.setTitle(getString(R.string.action_settings).toUpperCase());
+					firstNavigationLevel = true;
+				}
 				break;
 			}
 			case TRANSFERS:{
@@ -4176,6 +4181,9 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 					break;
 				}
 				case SETTINGS:
+					if(SettingsFragmentRefactorToggle.INSTANCE.getEnabled() == true){
+						break;
+					}
 				case SEARCH:
 				case TRANSFERS:
 				case NOTIFICATIONS:
@@ -4570,7 +4578,9 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
     	// Homepage may hide the Appbar before
 		abL.setVisibility(View.VISIBLE);
 
-    	drawerItem = item;
+		if(SettingsFragmentRefactorToggle.INSTANCE.getEnabled() == false || item != DrawerItem.SETTINGS){
+			drawerItem = item;
+		}
 		MegaApplication.setRecentChatVisible(false);
 		resetActionBar(aB);
 		transfersWidget.update();
@@ -4831,10 +4841,24 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 				settingsFragment.update2FAVisibility();
 			}
 		} else{
-			Intent settingsIntent = mega.privacy.android.app.presentation.settings.SettingsActivity.Companion.getIntent(this, null);
-			startActivity(settingsIntent);
-			//TODO: Update intent with target settings section
+			TargetPreference targetPreference = null;
+			if (openSettingsStorage) {
+				targetPreference = TargetPreference.Storage.INSTANCE;
+			} else if (openSettingsQR) {
+				targetPreference = TargetPreference.QR.INSTANCE;
+			} else if (openSettingsStartScreen) {
+				targetPreference = TargetPreference.StartScreen.INSTANCE;
+			}
+			navigateToSettingsActivity(targetPreference);
 		}
+	}
+
+	private void navigateToSettingsActivity(TargetPreference targetPreference) {
+		if (nV != null && drawerLayout != null && drawerLayout.isDrawerOpen(nV)) {
+			drawerLayout.closeDrawer(Gravity.LEFT);
+		}
+		Intent settingsIntent = mega.privacy.android.app.presentation.settings.SettingsActivity.Companion.getIntent(this, targetPreference);
+		startActivity(settingsIntent);
 	}
 
 	public void openFullscreenOfflineFragment(String path) {
@@ -5085,32 +5109,48 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 	 * Opens the settings section.
 	 */
 	public void moveToSettingsSection() {
-		drawerItem = DrawerItem.SETTINGS;
-		selectDrawerItemLollipop(drawerItem);
+		if(SettingsFragmentRefactorToggle.INSTANCE.getEnabled() == false){
+			drawerItem = DrawerItem.SETTINGS;
+			selectDrawerItemLollipop(drawerItem);
+		} else {
+			navigateToSettingsActivity(null);
+		}
 	}
 
 	/**
 	 * Opens the settings section and scrolls to storage category.
 	 */
 	public void moveToSettingsSectionStorage() {
-		openSettingsStorage = true;
-		moveToSettingsSection();
+		if(SettingsFragmentRefactorToggle.INSTANCE.getEnabled() == false){
+			openSettingsStorage = true;
+			moveToSettingsSection();
+		}else {
+			navigateToSettingsActivity(TargetPreference.Storage.INSTANCE);
+		}
 	}
 
 	/**
 	 * Opens the settings section and scrolls to QR setting.
 	 */
 	public void moveToSettingsSectionQR(){
-		openSettingsQR = true;
-		moveToSettingsSection();
+		if(SettingsFragmentRefactorToggle.INSTANCE.getEnabled() == false){
+			openSettingsQR = true;
+			moveToSettingsSection();
+		}else {
+			navigateToSettingsActivity(TargetPreference.QR.INSTANCE);
+		}
 	}
 
 	/**
 	 * Opens the settings section and scrolls to start screen setting.
 	 */
 	public void moveToSettingsSectionStartScreen() {
-		openSettingsStartScreen = true;
-		moveToSettingsSection();
+		if(SettingsFragmentRefactorToggle.INSTANCE.getEnabled() == false){
+			openSettingsStartScreen = true;
+			moveToSettingsSection();
+		}else {
+			navigateToSettingsActivity(TargetPreference.StartScreen.INSTANCE);
+		}
 	}
 
 	/**
@@ -5121,7 +5161,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 		openSettingsQR = false;
 		openSettingsStartScreen = false;
 
-		if (getSettingsFragment() != null) {
+		if (getSettingsFragment() != null && SettingsFragmentRefactorToggle.INSTANCE.getEnabled() == false) {
 			settingsFragment.goToFirstCategory();
 		}
 	}
@@ -7836,8 +7876,12 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 				break;
 
 			case R.id.settings_section: {
-				sectionClicked = true;
-				drawerItem = DrawerItem.SETTINGS;
+				if(SettingsFragmentRefactorToggle.INSTANCE.getEnabled() == false){
+				    sectionClicked = true;
+					drawerItem = DrawerItem.SETTINGS;
+				} else {
+					navigateToSettingsActivity(null);
+				}
 				break;
 			}
 			case R.id.upgrade_navigation_view: {
