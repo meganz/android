@@ -5,7 +5,7 @@ buildscript {
     ext.navigationVersion = '2.3.5'
     ext.googleServicesVersion = '4.3.5'
     ext.hiltVersion = "2.38.1"
-    ext.huaweiServicesVersion = "1.5.2.300"
+    ext.huaweiServicesVersion = "1.6.3.300"
     ext.firebaseCrashlyticsVersion = "2.5.1"
     repositories {
         jcenter()
