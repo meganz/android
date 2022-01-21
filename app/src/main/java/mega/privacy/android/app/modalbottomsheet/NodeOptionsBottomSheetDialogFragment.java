@@ -33,6 +33,7 @@ import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.controllers.NodeController;
 import mega.privacy.android.app.utils.MegaNodeUtil;
 import mega.privacy.android.app.utils.StringResourcesUtils;
+import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaShare;
 import nz.mega.sdk.MegaUser;
@@ -1034,6 +1035,8 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
                 if (availableOffline(requireContext(), node)) {
                     MegaOffline mOffDelete = dbH.findByHandle(node.getHandle());
                     removeFromOffline(mOffDelete);
+                    Util.showSnackbar(
+                            getActivity(), getResources().getString(R.string.file_removed_offline));
                 } else {
                     saveForOffline();
                 }

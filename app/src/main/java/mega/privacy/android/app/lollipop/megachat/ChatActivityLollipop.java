@@ -675,6 +675,7 @@ public class ChatActivityLollipop extends PasscodeActivity
         openMeetingInProgress(this, chatId, true, passcodeManagement);
     }
 
+
     @Override
     public void onErrorAnsweredCall(int errorCode) {
         callInProgressLayout.setEnabled(true);

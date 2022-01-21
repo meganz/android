@@ -82,6 +82,7 @@ import mega.privacy.android.app.utils.LocationInfo;
 import mega.privacy.android.app.utils.CameraUploadUtil;
 import mega.privacy.android.app.utils.ContactUtil;
 import mega.privacy.android.app.utils.StringResourcesUtils;
+import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaContactRequest;
 import nz.mega.sdk.MegaError;
@@ -1426,8 +1427,9 @@ public class FileInfoActivityLollipop extends PasscodeActivity implements OnClic
 						offlineSwitch.setChecked(false);
 						mOffDelete = dbH.findByHandle(handle);
                         removeOffline(mOffDelete, dbH, this);
-						supportInvalidateOptionsMenu();
-					}
+                        Util.showSnackbar(this,
+                                getResources().getString(R.string.file_removed_offline));
+                    }
 					else{
                         logDebug("NOT Checked");
                         isRemoveOffline = false;
@@ -1440,17 +1442,20 @@ public class FileInfoActivityLollipop extends PasscodeActivity implements OnClic
 
 						if (isFileAvailable(destination) && destination.isDirectory()){
 							File offlineFile = new File(destination, node.getName());
-							if (isFileAvailable(offlineFile) && node.getSize() == offlineFile.length() && offlineFile.getName().equals(node.getName())){ //This means that is already available offline
-								return;
-							}
+                            if (isFileAvailable(offlineFile)
+                                    && node.getSize() == offlineFile.length()
+                                    && offlineFile.getName().equals(node.getName())) {
+                                //This means that is already available offline
+                                return;
+                            }
 						}
 
                         logDebug("Handle to save for offline : " + node.getHandle());
                         saveOffline(destination, node, fileInfoActivityLollipop);
 
-						supportInvalidateOptionsMenu();
-					}
-				}
+                    }
+                    supportInvalidateOptionsMenu();
+                }
 				else{
                     logDebug("Not owner");
 					if (!isChecked){

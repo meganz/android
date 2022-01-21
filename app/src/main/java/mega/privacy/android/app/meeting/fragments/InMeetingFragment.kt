@@ -741,42 +741,35 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
                                     MegaRequest.TYPE_CREATE_ACCOUNT,
                                     onSuccess = { _, _, _ ->
                                         logDebug("Action guest. Create ephemeral Account, done")
-                                        inMeetingViewModel.chatConnect(
+                                        inMeetingViewModel.openChatPreview(
+                                            meetingLink,
                                             SimpleChatRequestListener(
-                                                MegaChatRequest.TYPE_CONNECT,
-                                                onSuccess = { _, _, _ ->
-                                                    logDebug("Action guest. Connect to chat, done")
-                                                    inMeetingViewModel.openChatPreview(
-                                                        meetingLink,
-                                                        SimpleChatRequestListener(
-                                                            MegaChatRequest.TYPE_LOAD_PREVIEW,
-                                                            onSuccess = { _, request, _ ->
-                                                                logDebug(
-                                                                    "Action guest. Open chat preview, done. Param type: ${request.paramType}, Chat id: ${request.chatHandle}, Flag: ${request.flag}, Call id: ${
-                                                                        request.megaHandleList?.get(
-                                                                            0
-                                                                        )
-                                                                    }"
-                                                                )
-                                                                MegaApplication.getChatManagement()
-                                                                    .setOpeningMeetingLink(
-                                                                        request.chatHandle,
-                                                                        true
-                                                                    )
+                                                MegaChatRequest.TYPE_LOAD_PREVIEW,
+                                                onSuccess = { _, request, _ ->
+                                                    logDebug(
+                                                        "Action guest. Open chat preview, done. Param type: ${request.paramType}, Chat id: ${request.chatHandle}, Flag: ${request.flag}, Call id: ${
+                                                            request.megaHandleList?.get(
+                                                                0
+                                                            )
+                                                        }"
+                                                    )
+                                                    MegaApplication.getChatManagement()
+                                                        .setOpeningMeetingLink(
+                                                            request.chatHandle,
+                                                            true
+                                                        )
 
-                                                                camIsEnable =
-                                                                    sharedModel.cameraLiveData.value!!
-                                                                speakerIsEnable =
-                                                                    sharedModel.speakerLiveData.value!! == AppRTCAudioManager.AudioDevice.SPEAKER_PHONE
+                                                    camIsEnable =
+                                                        sharedModel.cameraLiveData.value!!
+                                                    speakerIsEnable =
+                                                        sharedModel.speakerLiveData.value!! == AppRTCAudioManager.AudioDevice.SPEAKER_PHONE
 
-                                                                inMeetingViewModel.joinPublicChat(
-                                                                    args.chatId,
-                                                                    AutoJoinPublicChatListener(
-                                                                        context,
-                                                                        this@InMeetingFragment
-                                                                    )
-                                                                )
-                                                            })
+                                                    inMeetingViewModel.joinPublicChat(
+                                                        args.chatId,
+                                                        AutoJoinPublicChatListener(
+                                                            context,
+                                                            this@InMeetingFragment
+                                                        )
                                                     )
                                                 })
                                         )

@@ -3179,8 +3179,8 @@
     <string name="not_allow_play_alert">It is not possible to play media files while there is a call in progress.</string>
     <!-- Text shown in the list of chats when there is a call in progress but I am not on it -->
     <string name="ongoing_call_messages">Ongoing Call</string>
-    <!-- Title of the layout to join a group call from the chat screen. The placeholder indicates the user who initiated the call -->
-    <string name="join_call_layout_in_group_call">%s started a group call. Tap to join.</string>
+    <!-- Title of the layout to join a group call from the chat screen. -->
+    <string name="join_call_layout_in_group_call">Tap to join current group call.</string>
     <!-- Title of the layout to return to a call -->
     <string name="call_in_progress_layout">Tap to return to call</string>
     <!-- message displayed when you try to start a call but it is not possible because you are already on a call -->
@@ -4083,8 +4083,8 @@
     <string name="be_new_moderator">You are the new moderator.</string>
     <!-- the content of snack bar when copied meeting link-->
     <string name="copied_meeting_link">Copied meeting link.</string>
-    <!-- Title of the layout to join a meeting from the chat screen. The placeholder indicates the user who initiated the meeting -->
-    <string name="join_meeting_layout_in_group_call">%s started a meeting. Tap to join.</string>
+    <!-- Title of the layout to join a meeting from the chat screen. -->
+    <string name="join_meeting_layout_in_group_call">Tap to join current meeting.</string>
     <!-- Title of fifth tour screen -->
     <string name="title_tour_five">MEGA Meeting</string>
     <!-- Content of fourth tour screen -->
@@ -4161,6 +4161,10 @@
     <string name="location_not_exist">This location no longer exists.</string>
     <!-- Title of the button when you want to answer a one to one call -->
     <string name="title_join_one_to_one_call">Answer call</string>
+    <!-- Message when file available offline. -->
+    <string name="file_available_offline">File available Offline</string>
+    <!-- Message when file removed from offline. -->
+    <string name="file_removed_offline">File removed from Offline</string>
     <!-- Warning shown informing the contact has been previously invited. The placeholder is to show the name of the contact. -->
     <string name="contact_already_invited">%1$s previously invited.</string>
     <!-- Warning shown informing the contact request has been sent and can be managed in sent requests section. -->
