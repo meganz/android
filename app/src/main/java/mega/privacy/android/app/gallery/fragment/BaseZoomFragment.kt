@@ -21,6 +21,7 @@ import androidx.core.view.isVisible
 import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.facebook.drawee.backends.pipeline.Fresco
 import com.facebook.drawee.view.SimpleDraweeView
 import mega.privacy.android.app.R
 import mega.privacy.android.app.components.GestureScaleListener.GestureScaleCallback
@@ -324,6 +325,18 @@ abstract class BaseZoomFragment : BaseFragment(), GestureScaleCallback,
             this
         )
         listView.setOnTouchListener(scaleGestureHandler)
+
+        listView.addOnScrollListener(object: RecyclerView.OnScrollListener() {
+
+            override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
+                if (newState == RecyclerView.SCROLL_STATE_IDLE){
+                    Fresco.getImagePipeline().resume()
+                }else{
+                    Fresco.getImagePipeline().pause()
+                }
+                super.onScrollStateChanged(recyclerView, newState)
+            }
+        })
     }
 
     private fun elevateToolbarWhenScrolling() = ListenScrollChangesHelper().addViewToListen(
