@@ -1067,14 +1067,6 @@ public class MegaApplication extends MultiDexApplication implements Application.
 		return getCurrentActivity() != null;
 	}
 
-	public static void setFirstConnect(boolean firstConnect){
-		MegaApplication.firstConnect = firstConnect;
-	}
-
-	public static boolean isFirstConnect(){
-		return firstConnect;
-	}
-
 	public static boolean isShowInfoChatMessages() {
 		return showInfoChatMessages;
 	}

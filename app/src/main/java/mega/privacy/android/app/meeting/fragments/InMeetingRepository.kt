@@ -410,10 +410,6 @@ class InMeetingRepository @Inject constructor(
         }
     }
 
-    fun fetchNodes(listener: MegaRequestListenerInterface) = megaApi.fetchNodes(listener)
-
-    fun chatConnect(listener: MegaChatRequestListenerInterface) = megaChatApi.connect(listener)
-
     fun openChatPreview(link: String, listener: MegaChatRequestListenerInterface) =
         megaChatApi.openChatPreview(link, listener)
 

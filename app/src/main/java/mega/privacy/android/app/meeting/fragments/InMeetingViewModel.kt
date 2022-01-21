@@ -1698,22 +1698,6 @@ class InMeetingViewModel @Inject constructor(
     ) = inMeetingRepository.createEphemeralAccountPlusPlus(firstName, lastName, listener)
 
     /**
-     * Method to do fetch nodes when joining as a guest
-     *
-     * @param listener MegaRequestListenerInterface
-     */
-    fun fetchNodes(listener: MegaRequestListenerInterface) =
-        inMeetingRepository.fetchNodes(listener)
-
-    /**
-     * Method to connect the chat when joining as a guest
-     *
-     * @param listener MegaChatRequestListenerInterface
-     */
-    fun chatConnect(listener: MegaChatRequestListenerInterface) =
-        inMeetingRepository.chatConnect(listener)
-
-    /**
      * Method to open chat preview when joining as a guest
      *
      * @param link The link to the chat room or the meeting
