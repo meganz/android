@@ -11,6 +11,7 @@ sealed class FolderContent(val id: Long) {
 
     companion object {
         private const val HEADER_ID = "HEADER_ID"
+        private const val SEPARATOR_ID = "SEPARATOR_ID"
     }
 
     abstract fun getSectionTitle(): String
@@ -39,6 +40,10 @@ sealed class FolderContent(val id: Long) {
     }
 
     class Header : FolderContent(HEADER_ID.hashCode().toLong()) {
+        override fun getSectionTitle(): String = ""
+    }
+
+    class Separator : FolderContent(SEPARATOR_ID.hashCode().toLong()) {
         override fun getSectionTitle(): String = ""
     }
 

@@ -8,6 +8,7 @@ import androidx.recyclerview.widget.RecyclerView
 import mega.privacy.android.app.components.scrollBar.SectionTitleProvider
 import mega.privacy.android.app.databinding.ItemFolderContentBinding
 import mega.privacy.android.app.databinding.ItemFolderContentGridBinding
+import mega.privacy.android.app.databinding.ItemGridSeparatorBinding
 import mega.privacy.android.app.databinding.SortByHeaderBinding
 import mega.privacy.android.app.fragments.homepage.SortByHeaderViewModel
 import mega.privacy.android.app.upload.list.data.FolderContent
@@ -24,6 +25,7 @@ class FolderContentListAdapter(
         private const val VIEW_TYPE_HEADER = 0
         private const val VIEW_TYPE_DATA_LIST = 1
         private const val VIEW_TYPE_DATA_GRID = 2
+        private const val VIEW_TYPE_GRID_SEPARATOR = 3
     }
 
     init {
@@ -59,7 +61,7 @@ class FolderContentListAdapter(
                     }
                 }
             }
-            else -> {
+            VIEW_TYPE_DATA_GRID -> {
                 val binding = ItemFolderContentGridBinding.inflate(layoutInflater, parent, false)
                 FolderContentGridHolder(binding).apply {
                     binding.root.apply {
@@ -81,6 +83,10 @@ class FolderContentListAdapter(
                     }
                 }
             }
+            else -> {
+                val binding = ItemGridSeparatorBinding.inflate(layoutInflater, parent, false)
+                GridSeparatorHolder(binding)
+            }
         }
     }
 
@@ -100,6 +106,7 @@ class FolderContentListAdapter(
             is FolderContent.Header -> VIEW_TYPE_HEADER
             is FolderContent.Data ->
                 if (sortByViewModel.isList) VIEW_TYPE_DATA_LIST else VIEW_TYPE_DATA_GRID
+            is FolderContent.Separator -> VIEW_TYPE_GRID_SEPARATOR
         }
 
     override fun getSectionTitle(position: Int): String =
@@ -107,8 +114,9 @@ class FolderContentListAdapter(
 
     fun getSpanSizeLookup(spanCount: Int): SpanSizeLookup =
         object : SpanSizeLookup() {
-            override fun getSpanSize(position: Int): Int {
-                return if (getItemViewType(position) == VIEW_TYPE_HEADER) spanCount else 1
-            }
+            override fun getSpanSize(position: Int): Int =
+                if (getItemViewType(position) == VIEW_TYPE_HEADER
+                    || getItemViewType(position) == VIEW_TYPE_GRID_SEPARATOR
+                ) spanCount else 1
         }
 }

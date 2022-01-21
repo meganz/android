@@ -1,4 +1,4 @@
-package mega.privacy.android.app.upload
+package mega.privacy.android.app.upload.usecase
 
 import io.reactivex.rxjava3.core.Single
 import io.reactivex.rxjava3.kotlin.blockingSubscribeBy
@@ -77,6 +77,7 @@ class GetFolderContentUseCase @Inject constructor() {
                 }
 
                 finalContent.addAll(folders)
+                finalContent.add(FolderContent.Separator())
                 finalContent.addAll(files)
                 emitter.onSuccess(finalContent)
             }

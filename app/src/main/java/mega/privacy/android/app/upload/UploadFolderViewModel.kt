@@ -10,6 +10,7 @@ import io.reactivex.rxjava3.kotlin.subscribeBy
 import io.reactivex.rxjava3.schedulers.Schedulers
 import mega.privacy.android.app.arch.BaseRxViewModel
 import mega.privacy.android.app.upload.list.data.FolderContent
+import mega.privacy.android.app.upload.usecase.GetFolderContentUseCase
 import nz.mega.sdk.MegaApiJava
 import javax.inject.Inject
 
