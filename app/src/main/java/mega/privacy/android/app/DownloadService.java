@@ -99,6 +99,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 	public static final String EXTRA_OPEN_FILE = "OPEN_FILE";
 	public static final String EXTRA_CONTENT_URI = "CONTENT_URI";
 	public static final String EXTRA_DOWNLOAD_BY_TAP = "EXTRA_DOWNLOAD_BY_TAP";
+	public static final String EXTRA_DOWNLOAD_FOR_OFFLINE = "EXTRA_DOWNLOAD_FOR_OFFLINE";
 
 	private static int errorEBloqued = 0;
 	private int errorCount = 0;
@@ -155,6 +156,8 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 
 	// the flag to determine the rating dialog is showed for this download action
 	private boolean isRatingShowed;
+
+	private boolean isDownloadForOffline;
 
     /**
      * Contains the info of a node that to be opened in-app.
@@ -331,6 +334,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 
         long hash = intent.getLongExtra(EXTRA_HASH, -1);
         String url = intent.getStringExtra(EXTRA_URL);
+        isDownloadForOffline = intent.getBooleanExtra(EXTRA_DOWNLOAD_FOR_OFFLINE, false);
         boolean isFolderLink = intent.getBooleanExtra(EXTRA_FOLDER_LINK, false);
         openFile = intent.getBooleanExtra(EXTRA_OPEN_FILE, true);
         downloadByTap = intent.getBooleanExtra(EXTRA_DOWNLOAD_BY_TAP, false);
@@ -567,9 +571,13 @@ public class DownloadService extends Service implements MegaTransferListenerInte
                         .putExtra(NUMBER_FILES, 1)
                         .putExtra(NODE_LOCAL_PATH, autoPlayInfo.getLocalPath()));
             } else if (megaApi.getTotalDownloads() > 0) {
-				sendBroadcast(new Intent(BROADCAST_ACTION_INTENT_SHOWSNACKBAR_TRANSFERS_FINISHED)
+            	Intent intent = new Intent(BROADCAST_ACTION_INTENT_SHOWSNACKBAR_TRANSFERS_FINISHED)
 						.putExtra(TRANSFER_TYPE, DOWNLOAD_TRANSFER)
-						.putExtra(NUMBER_FILES, megaApi.getTotalDownloads()));
+						.putExtra(NUMBER_FILES, megaApi.getTotalDownloads());
+            	if (isDownloadForOffline) {
+            		intent.putExtra(OFFLINE_AVAILABLE, true);
+				}
+				sendBroadcast(intent);
 			}
 			sendBroadcast(new Intent(BROADCAST_ACTION_INTENT_TRANSFER_UPDATE));
 

@@ -7786,6 +7786,8 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 
 						onNodesSharedUpdate();
 						LiveEventBus.get(EVENT_NODES_CHANGE).post(false);
+						Util.showSnackbar(ManagerActivityLollipop.this,
+								getResources().getString(R.string.file_removed_offline));
 					}
 				})
 				.setNegativeButton(R.string.general_cancel, null)
