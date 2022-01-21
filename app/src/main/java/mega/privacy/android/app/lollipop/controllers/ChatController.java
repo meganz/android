@@ -1004,6 +1004,7 @@ public class ChatController {
             logDebug("serializeString: " + serializeString);
             service.putExtra(Constants.EXTRA_SERIALIZE_STRING, serializeString);
             service.putExtra(DownloadService.EXTRA_PATH, path);
+            service.putExtra(DownloadService.EXTRA_DOWNLOAD_FOR_OFFLINE, true);
             if (fromMediaViewer) {
                 service.putExtra("fromMV", true);
             }

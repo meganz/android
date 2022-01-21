@@ -22,7 +22,7 @@ import java.util.ArrayList;
 
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaOffline;
-import mega.privacy.android.app.MimeTypeThumbnail;
+import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.TouchImageView;
 import mega.privacy.android.app.lollipop.FullScreenImageViewerLollipop;
@@ -117,7 +117,7 @@ public class MegaOfflineFullScreenImageAdapterLollipop extends PagerAdapter impl
 
 		holder.currentPath = path;
 
-        if (MimeTypeThumbnail.typeForName(imageFile.getName()).isGIF()) {
+        if (MimeTypeList.typeForName(imageFile.getName()).isGIF()) {
             holder.imgDisplay.setVisibility(View.GONE);
             holder.gifImgDisplay.setVisibility(View.VISIBLE);
             loadGif(holder.gifImgDisplay, pb, null, UriUtil.getUriForFile(imageFile));

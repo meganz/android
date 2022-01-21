@@ -136,7 +136,7 @@ class GetLinkActivity : PasscodeActivity(), SnackbarShower {
                 R.id.decryption_key -> {
                     supportActionBar?.title =
                         StringResourcesUtils.getString(R.string.option_decryption_key)
-                            .toUpperCase(Locale.getDefault())
+                            .uppercase(Locale.getDefault())
                 }
                 R.id.password -> {
                     supportActionBar?.title = StringResourcesUtils.getString(
@@ -144,7 +144,7 @@ class GetLinkActivity : PasscodeActivity(), SnackbarShower {
                                 .isNullOrEmpty()
                         ) R.string.set_password_protection_dialog
                         else R.string.reset_password_label
-                    ).toUpperCase(Locale.getDefault())
+                    ).uppercase(Locale.getDefault())
                 }
                 R.id.main_get_several_links -> {
                     viewModelNode.setElevation(true)
@@ -197,7 +197,7 @@ class GetLinkActivity : PasscodeActivity(), SnackbarShower {
     }
 
     override fun onBackPressed() {
-        if (psaWebBrowser.consumeBack()) return
+        if (psaWebBrowser != null && psaWebBrowser.consumeBack()) return
 
         if (!navController.navigateUp()) {
             finish()

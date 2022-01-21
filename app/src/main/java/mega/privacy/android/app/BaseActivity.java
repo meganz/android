@@ -17,6 +17,7 @@ import static mega.privacy.android.app.constants.BroadcastConstants.NODE_HANDLE;
 import static mega.privacy.android.app.constants.BroadcastConstants.NODE_LOCAL_PATH;
 import static mega.privacy.android.app.constants.BroadcastConstants.NODE_NAME;
 import static mega.privacy.android.app.constants.BroadcastConstants.NUMBER_FILES;
+import static mega.privacy.android.app.constants.BroadcastConstants.OFFLINE_AVAILABLE;
 import static mega.privacy.android.app.constants.BroadcastConstants.SNACKBAR_TEXT;
 import static mega.privacy.android.app.constants.BroadcastConstants.TRANSFER_TYPE;
 import static mega.privacy.android.app.constants.BroadcastConstants.UPLOAD_TRANSFER;
@@ -45,6 +46,7 @@ import static mega.privacy.android.app.utils.Constants.NOT_SPACE_SNACKBAR_TYPE;
 import static mega.privacy.android.app.utils.Constants.OPEN_FILE_SNACKBAR_TYPE;
 import static mega.privacy.android.app.utils.Constants.PERMISSIONS_TYPE;
 import static mega.privacy.android.app.utils.Constants.REMOVED_BUSINESS_ACCOUNT_BLOCK;
+import static mega.privacy.android.app.utils.Constants.SENT_REQUESTS_TYPE;
 import static mega.privacy.android.app.utils.Constants.SMS_VERIFICATION_ACCOUNT_BLOCK;
 import static mega.privacy.android.app.utils.Constants.SNACKBAR_IMCOMPATIBILITY_TYPE;
 import static mega.privacy.android.app.utils.Constants.SNACKBAR_TYPE;
@@ -516,12 +518,23 @@ public class BaseActivity extends AppCompatActivity implements ActivityLauncher,
             }
 
             if (intent.getBooleanExtra(FILE_EXPLORER_CHAT_UPLOAD, false)) {
-                Util.showSnackbar(baseActivity, MESSAGE_SNACKBAR_TYPE, null, intent.getLongExtra(CHAT_ID, MEGACHAT_INVALID_HANDLE));
+                Util.showSnackbar(
+                        baseActivity,
+                        MESSAGE_SNACKBAR_TYPE,
+                        null,
+                        intent.getLongExtra(CHAT_ID, MEGACHAT_INVALID_HANDLE)
+                );
                 return;
             }
 
             int numTransfers = intent.getIntExtra(NUMBER_FILES, 1);
-            String message = getResources().getQuantityString(R.plurals.download_finish, numTransfers, numTransfers);
+            String message;
+            if (intent.getBooleanExtra(OFFLINE_AVAILABLE, false)) {
+                message = getResources().getString(R.string.file_available_offline);
+            } else {
+                message = getResources().getQuantityString(
+                        R.plurals.download_finish, numTransfers, numTransfers);
+            }
 
             switch (intent.getStringExtra(TRANSFER_TYPE)) {
                 case DOWNLOAD_TRANSFER:
@@ -534,7 +547,12 @@ public class BaseActivity extends AppCompatActivity implements ActivityLauncher,
                     break;
 
                 case DOWNLOAD_TRANSFER_OPEN:
-                    autoPlayInfo = new AutoPlayInfo(intent.getStringExtra(NODE_NAME), intent.getLongExtra(NODE_HANDLE, INVALID_VALUE), intent.getStringExtra(NODE_LOCAL_PATH), true);
+                    autoPlayInfo = new AutoPlayInfo(
+                            intent.getStringExtra(NODE_NAME),
+                            intent.getLongExtra(NODE_HANDLE, INVALID_VALUE),
+                            intent.getStringExtra(NODE_LOCAL_PATH),
+                            true
+                    );
                     showSnackbar(OPEN_FILE_SNACKBAR_TYPE, message, MEGACHAT_INVALID_HANDLE);
                     break;
             }
@@ -546,7 +564,12 @@ public class BaseActivity extends AppCompatActivity implements ActivityLauncher,
      */
     private void openDownloadedFile() {
         if(autoPlayInfo != null) {
-            MegaNodeUtil.autoPlayNode(BaseActivity.this, autoPlayInfo, BaseActivity.this,BaseActivity.this);
+            MegaNodeUtil.autoPlayNode(
+                    BaseActivity.this,
+                    autoPlayInfo,
+                    BaseActivity.this,
+                    BaseActivity.this
+            );
             autoPlayInfo = null;
         }
     }
@@ -711,7 +734,7 @@ public class BaseActivity extends AppCompatActivity implements ActivityLauncher,
 
     @Override
     public void onBackPressed() {
-        if (psaWebBrowser.consumeBack()) return;
+        if (psaWebBrowser != null && psaWebBrowser.consumeBack()) return;
         retryConnectionsAndSignalPresence();
         super.onBackPressed();
     }
@@ -891,11 +914,15 @@ public class BaseActivity extends AppCompatActivity implements ActivityLauncher,
                 snackbar.show();
                 break;
 
-            case OPEN_FILE_SNACKBAR_TYPE: {
+            case OPEN_FILE_SNACKBAR_TYPE:
                 snackbar.setAction(R.string.action_see, (v) -> openDownloadedFile());
                 snackbar.show();
                 break;
-            }
+
+            case SENT_REQUESTS_TYPE:
+                snackbar.setAction(R.string.tab_sent_requests, new SnackbarNavigateOption(view.getContext(), type, userEmail));
+                snackbar.show();
+                break;
         }
     }
 

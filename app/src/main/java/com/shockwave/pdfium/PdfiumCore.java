@@ -391,7 +391,9 @@ public class PdfiumCore {
     public List<PdfDocument.Link> getPageLinks(PdfDocument doc, int pageIndex) {
         synchronized (lock) {
             List<PdfDocument.Link> links = new ArrayList<>();
-            long[] linkPtrs = nativeGetPageLinks(doc.mNativePagesPtr.get(pageIndex));
+            Long pagePtr = doc.mNativePagesPtr.get(pageIndex);
+            if (pagePtr == null) return links;
+            long[] linkPtrs = nativeGetPageLinks(pagePtr);
             for (long linkPtr : linkPtrs) {
                 Integer index = nativeGetDestPageIndex(doc.mNativeDocPtr, linkPtr);
                 String uri = nativeGetLinkURI(doc.mNativeDocPtr, linkPtr);

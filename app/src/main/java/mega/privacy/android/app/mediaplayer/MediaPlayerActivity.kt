@@ -292,7 +292,7 @@ abstract class MediaPlayerActivity : PasscodeActivity(), SnackbarShower, Activit
     }
 
     override fun onBackPressed() {
-        if (psaWebBrowser.consumeBack()) return
+        if (psaWebBrowser != null && psaWebBrowser.consumeBack()) return
         if (!navController.navigateUp()) {
             finish()
         }
@@ -312,7 +312,7 @@ abstract class MediaPlayerActivity : PasscodeActivity(), SnackbarShower, Activit
                 }
                 R.id.track_info -> {
                     actionBar.title = StringResourcesUtils.getString(R.string.audio_track_info)
-                        .toUpperCase(Locale.getDefault())
+                        .uppercase(Locale.getDefault())
 
                     if (args != null) {
                         viewingTrackInfo = TrackInfoFragmentArgs.fromBundle(args)

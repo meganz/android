@@ -38,6 +38,7 @@ import androidx.multidex.MultiDexApplication;
 import com.facebook.drawee.backends.pipeline.Fresco;
 import com.jeremyliao.liveeventbus.LiveEventBus;
 
+import io.reactivex.rxjava3.plugins.RxJavaPlugins;
 import mega.privacy.android.app.di.MegaApi;
 import mega.privacy.android.app.di.MegaApiFolder;
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
@@ -73,10 +74,10 @@ import mega.privacy.android.app.lollipop.megachat.AppRTCAudioManager;
 import mega.privacy.android.app.lollipop.megachat.BadgeIntentService;
 import mega.privacy.android.app.meeting.CallService;
 import mega.privacy.android.app.meeting.listeners.MeetingListener;
-import mega.privacy.android.app.middlelayer.crashreporter.CrashReporter;
+import mega.privacy.android.app.middlelayer.reporter.CrashReporter;
+import mega.privacy.android.app.middlelayer.reporter.PerformanceReporter;
 import mega.privacy.android.app.objects.PasscodeManagement;
 import mega.privacy.android.app.receivers.NetworkStateReceiver;
-import mega.privacy.android.app.service.crashreporter.CrashReporterImpl;
 import mega.privacy.android.app.utils.CUBackupInitializeChecker;
 import mega.privacy.android.app.utils.CallUtil;
 import mega.privacy.android.app.utils.ThemeHelper;
@@ -163,6 +164,10 @@ public class MegaApplication extends MultiDexApplication implements Application.
 	MyAccountInfo myAccountInfo;
 	@Inject
 	PasscodeManagement passcodeManagement;
+	@Inject
+	CrashReporter crashReporter;
+	@Inject
+	PerformanceReporter performanceReporter;
 
 	String localIpAddress = "";
 	BackgroundRequestListener requestListener;
@@ -231,8 +236,6 @@ public class MegaApplication extends MultiDexApplication implements Application.
 
 	private MeetingListener meetingListener = new MeetingListener();
 	private GlobalChatListener globalChatListener = new GlobalChatListener(this);
-
-	private CrashReporter crashReporter;
 
     @Override
 	public void networkAvailable() {
@@ -551,9 +554,10 @@ public class MegaApplication extends MultiDexApplication implements Application.
 		}
 	};
 
-	public void handleUncaughtException(Thread thread, Throwable e) {
-		logFatal("UNCAUGHT EXCEPTION", e);
-		e.printStackTrace();
+	public void handleUncaughtException(Throwable throwable) {
+		logFatal("UNCAUGHT EXCEPTION", throwable);
+		throwable.printStackTrace();
+		crashReporter.report(throwable);
 	}
 
 	private final Observer<MegaChatCall> callStatusObserver = call -> {
@@ -627,7 +631,9 @@ public class MegaApplication extends MultiDexApplication implements Application.
 				clearIncomingCallNotification(call.getCallId());
 				getChatManagement().removeValues(call.getChatid());
 				stopService(new Intent(getInstance(), IncomingCallService.class));
-				LiveEventBus.get(EVENT_CALL_ANSWERED_IN_ANOTHER_CLIENT, Long.class).post(call.getChatid());
+				if (call.getStatus() == CALL_STATUS_USER_NO_PRESENT) {
+					LiveEventBus.get(EVENT_CALL_ANSWERED_IN_ANOTHER_CLIENT, Long.class).post(call.getChatid());
+				}
 			}
 		}
 	};
@@ -724,14 +730,9 @@ public class MegaApplication extends MultiDexApplication implements Application.
 
 		ThemeHelper.INSTANCE.initTheme(this);
 
-		crashReporter = new CrashReporterImpl();
-
-		// Setup handler for uncaught exceptions.
-        Thread.setDefaultUncaughtExceptionHandler((thread, e) -> {
-            handleUncaughtException(thread, e);
-
-            crashReporter.report(e);
-        });
+		// Setup handler and RxJava for uncaught exceptions.
+		Thread.setDefaultUncaughtExceptionHandler((thread, e) -> handleUncaughtException(e));
+		RxJavaPlugins.setErrorHandler(this::handleUncaughtException);
 
 		registerActivityLifecycleCallbacks(this);
 
@@ -1036,7 +1037,10 @@ public class MegaApplication extends MultiDexApplication implements Application.
 				.subscribe((cookies, throwable) -> {
 					if (throwable == null) {
 						setAdvertisingCookiesEnabled(cookies.contains(CookieType.ADVERTISEMENT));
-                        crashReporter.setEnabled(cookies.contains(CookieType.ANALYTICS));
+
+						boolean analyticsCookiesEnabled = cookies.contains(CookieType.ANALYTICS);
+						crashReporter.setEnabled(analyticsCookiesEnabled);
+						performanceReporter.setEnabled(analyticsCookiesEnabled);
 					}
 				});
 	}
@@ -1061,14 +1065,6 @@ public class MegaApplication extends MultiDexApplication implements Application.
 	public boolean isActivityVisible() {
 		logDebug("Activity visible? => " + (currentActivity != null));
 		return getCurrentActivity() != null;
-	}
-
-	public static void setFirstConnect(boolean firstConnect){
-		MegaApplication.firstConnect = firstConnect;
-	}
-
-	public static boolean isFirstConnect(){
-		return firstConnect;
 	}
 
 	public static boolean isShowInfoChatMessages() {
