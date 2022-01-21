@@ -119,7 +119,7 @@ open class TypedNodesFetcher(
 
                         request.let {
                             fileNodesMap[it.nodeHandle]?.apply {
-                                thumbnail = getThumbnailFile(item.key).absoluteFile
+                                thumbnail = getThumbnailFile(item.key)
                                 uiDirty = true
                             }
                         }
@@ -133,7 +133,7 @@ open class TypedNodesFetcher(
         }
     }
 
-    open fun getMegaNodes(order: Int, type: Int): List<MegaNode> =
+    fun getMegaNodes(order: Int, type: Int): List<MegaNode> =
         megaApi.searchByType(order, type, MegaApiJava.SEARCH_TARGET_ROOTNODE)
 
     companion object {

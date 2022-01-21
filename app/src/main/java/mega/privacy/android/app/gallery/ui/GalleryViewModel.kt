@@ -206,9 +206,6 @@ abstract class GalleryViewModel constructor(
         loadPhotos()
     }
 
-    fun getItemPositionByHandle(handle: Long) =
-        items.value?.find { it.node?.handle == handle }?.index ?: INVALID_POSITION
-
     override fun onCleared() {
         LiveEventBus.get(EVENT_NODES_CHANGE, Boolean::class.java)
             .removeObserver(nodesChangeObserver)

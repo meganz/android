@@ -133,7 +133,6 @@ abstract class GalleryBaseFetcher(
                 }
             }
 
-
             val selected = selectedNodesMap[node.handle]?.selected ?: false
             fileNodesMap[node.handle] = GalleryItem(
                 node,
