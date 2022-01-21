@@ -482,8 +482,8 @@ class ImageViewerViewModel @Inject constructor(
         }
     }
 
-    fun switchToolbar() {
-        showToolbar.value = showToolbar.value?.not() ?: true
+    fun switchToolbar(hide: Boolean? = null) {
+        showToolbar.value = hide ?: showToolbar.value?.not() ?: true
     }
 
     private fun getExistingNode(nodeHandle: Long): MegaNode? =

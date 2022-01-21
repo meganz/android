@@ -265,6 +265,7 @@ class ImageViewerActivity : BaseActivity(), PermissionRequester, SnackbarShower 
 
     override fun onLowMemory() {
         logWarning("onLowMemory")
+        Fresco.getImagePipeline().clearMemoryCaches()
         binding.viewPager.offscreenPageLimit = OFFSCREEN_PAGE_LIMIT_DEFAULT
     }
 

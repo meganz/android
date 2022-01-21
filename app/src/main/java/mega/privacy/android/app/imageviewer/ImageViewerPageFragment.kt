@@ -137,6 +137,11 @@ class ImageViewerPageFragment : Fragment() {
 
     private fun showItem(imageItem: ImageItem?) {
         val imageResult = imageItem?.imageResult ?: return
+
+        if (imageResult.isFullyLoaded && imageResult.isVideo) {
+            showVideoButton(imageItem)
+        }
+
         var mainImageUri: Uri? = null
         var lowImageUri: Uri? = null
 
@@ -180,9 +185,6 @@ class ImageViewerPageFragment : Fragment() {
                 .setLowResImageRequest(lowImageRequest)
                 .setImageRequest(mainImageRequest)
                 .build()
-        } else if (imageResult.isFullyLoaded && imageResult.isVideo) {
-            showVideoButton(imageItem)
-            binding.progress.hide()
         }
     }
 
@@ -194,9 +196,6 @@ class ImageViewerPageFragment : Fragment() {
         ) {
             val imageItem = viewModel.getImageItem(nodeHandle!!)
             if (imageItem?.imageResult?.isFullyLoaded == true) {
-                if (imageItem.imageResult.isVideo) {
-                    showVideoButton(imageItem)
-                }
                 binding.progress.hide()
             }
         }
@@ -211,25 +210,31 @@ class ImageViewerPageFragment : Fragment() {
                 .setImageRequest(imageItem?.imageResult?.previewUri?.toImageRequest())
                 .build()
 
-            if (imageItem?.imageResult?.isVideo == true) showVideoButton(imageItem)
-            binding.progress.hide()
+            if (imageItem?.imageResult?.isFullyLoaded == true) {
+                binding.progress.hide()
+            }
         }
     }
 
     private fun showVideoButton(imageItem: ImageItem) {
-        binding.btnVideo.setOnClickListener { launchVideoScreen(imageItem) }
-        binding.btnVideo.isVisible = true
-        binding.image.apply {
-            setAllowTouchInterceptionWhileZoomed(true)
-            setZoomingEnabled(false)
-            setTapListener(object : GestureDetector.SimpleOnGestureListener() {
-                override fun onSingleTapUp(e: MotionEvent?): Boolean {
-                    launchVideoScreen(imageItem)
-                    return true
-                }
-            })
-            setOnClickListener { launchVideoScreen(imageItem) }
-        }
+        if (binding.btnVideo.isVisible && viewModel.onShowToolbar().value != true) return
+
+        binding.image.postDelayed({
+            viewModel.switchToolbar(false)
+            binding.btnVideo.setOnClickListener { launchVideoScreen(imageItem) }
+            binding.btnVideo.isVisible = true
+            binding.image.apply {
+                setAllowTouchInterceptionWhileZoomed(true)
+                setZoomingEnabled(false)
+                setTapListener(object : GestureDetector.SimpleOnGestureListener() {
+                    override fun onSingleTapUp(e: MotionEvent?): Boolean {
+                        launchVideoScreen(imageItem)
+                        return true
+                    }
+                })
+                setOnClickListener { launchVideoScreen(imageItem) }
+            }
+        }, 250)
     }
 
     private fun launchVideoScreen(item: ImageItem) {
