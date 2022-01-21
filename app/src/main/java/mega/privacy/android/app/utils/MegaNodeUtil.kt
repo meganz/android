@@ -1919,16 +1919,23 @@ object MegaNodeUtil {
     }
 
     /**
-     * Check the folder type of My Backup
+     * Check the node type of handleList for the operation related to "My Backups"
+     * if the node in the handleList is belong to "My Backups", check the type:
+     * BACKUP_ROOT -> the node of "My Backups" exists in the handleList
+     * BACKUP_DEVICE -> the node of BACKUP_DEVICE exists in the handleList
+     * BACKUP_FOLDER -> the node of BACKUP_FOLDER exists in the handleList
+     * BACKUP_FOLDER_CHILD -> the node of BACKUP_FOLDER_CHILD exists in the handleList
+     * otherwise, return the type: BACKUP_NONE
      *
      * @param megaApi MegaApiAndroid instance to use.
      * @param handleList handles list of the nodes that selected
-     * @return The type of current nodes,
+     *
+     * @return The type of handleList
      * if multiple nodes selected and MyBackup folder included, return BACKUP_ROOT
      * if multiple nodes selected without MyBackup folder, return BACKUP_NONE
      */
     @JvmStatic
-    fun checkBackupNodeTypeByHandle(megaApi: MegaApiAndroid, handleList: ArrayList<Long>?): Int {
+    fun checkBackupNodeTypeInList(megaApi: MegaApiAndroid, handleList: ArrayList<Long>?): Int {
         if (handleList != null) {
             if (handleList.size == 1) {
                 // Only one node
@@ -1969,10 +1976,17 @@ object MegaNodeUtil {
     }
 
     /**
-     * Check the folder type of "My Backups"
+     * Check the type of node for the operation related to "My Backups"
+     * if the node is belong to "My Backups", check the type:
+     * BACKUP_ROOT -> the node of "My Backups"
+     * BACKUP_DEVICE -> child node of "My Backups"
+     * BACKUP_FOLDER -> child node of BACKUP_DEVICE
+     * BACKUP_FOLDER_CHILD -> child node of BACKUP_FOLDER
+     * otherwise, return the type: BACKUP_NONE
      *
      * @param megaApi MegaApiAndroid instance to use.
-     * @param node The nodes that selected
+     * @param node The node that selected
+     *
      * @return The type of MyBackup folder, if the folder is not belong to the "My Backups" folder, return BACKUP_NONE
      */
     @JvmStatic

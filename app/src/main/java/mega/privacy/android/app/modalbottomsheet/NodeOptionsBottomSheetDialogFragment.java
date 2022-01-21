@@ -46,7 +46,6 @@ import static mega.privacy.android.app.utils.FileUtil.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.MegaApiUtils.*;
 import static mega.privacy.android.app.utils.MegaNodeDialogUtil.ACTION_BACKUP_MOVE;
-import static mega.privacy.android.app.utils.MegaNodeDialogUtil.ACTION_BACKUP_SHARE;
 import static mega.privacy.android.app.utils.MegaNodeDialogUtil.ACTION_BACKUP_SHARE_CHAT;
 import static mega.privacy.android.app.utils.MegaNodeDialogUtil.ACTION_BACKUP_SHARE_FOLDER;
 import static mega.privacy.android.app.utils.MegaNodeDialogUtil.BACKUP_NONE;
@@ -342,7 +341,7 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
                 // Check if sub folder of "My Backup"
                 ArrayList<Long> handleList = new ArrayList<>();
                 handleList.add(node.getHandle());
-                int nodeType = checkBackupNodeTypeByHandle(megaApi, handleList);
+                int nodeType = checkBackupNodeTypeInList(megaApi, handleList);
                 if(nodeType != BACKUP_NONE) {
                     counterModify--;
                     optionRename.setVisibility(View.GONE);

@@ -238,7 +238,7 @@ public class FileBrowserFragmentLollipop extends RotatableFragment{
 						handleList.add(documents.get(i).getHandle());
 					}
 
-					nodeType = checkBackupNodeTypeByHandle(megaApi, handleList);
+					nodeType = MegaNodeUtil.checkBackupNodeTypeInList(megaApi, handleList);
 
 					// Show the warning dialog if the list including Backup node
 					if (nodeType == BACKUP_ROOT) {
@@ -265,7 +265,7 @@ public class FileBrowserFragmentLollipop extends RotatableFragment{
 					}
 
 					MegaNode pNode = getBackupRootNodeByHandle(megaApi, handleList);
-					nodeType = checkBackupNodeTypeByHandle(megaApi, handleList);
+					nodeType = MegaNodeUtil.checkBackupNodeTypeInList(megaApi, handleList);
 
 					if (nodeType == BACKUP_NONE && pNode == null){
 						// No backup node in the selected nodes
@@ -1397,7 +1397,7 @@ public class FileBrowserFragmentLollipop extends RotatableFragment{
 			if (backupDialogType == 0) {
 				actWithBackupTips(backupHandleList, megaApi.getNodeByHandle(backupNodeHandle), backupNodeType, backupActionType);
 			} else if (backupDialogType == 1) {
-				confirmationAction(backupHandleList, megaApi.getNodeByHandle(backupNodeHandle), backupNodeType, backupActionType);
+				confirmationActionForBackup(backupHandleList, megaApi.getNodeByHandle(backupNodeHandle), backupNodeType, backupActionType);
 			} else {
 				logDebug("Backup warning dialog is not show");
 			}
@@ -1408,9 +1408,11 @@ public class FileBrowserFragmentLollipop extends RotatableFragment{
 	/**
 	 * Show the warning dialog for moving or deleting "My backup" folder or sub folders
 	 *
-	 * @param handleList handleList handles list of the nodes that selected
-	 * @param pNodeBackup the node of "My backup"
-	 * @param nodeType the type of the backup node - BACKUP_NONE / BACKUP_ROOT / BACKUP_DEVICE / BACKUP_SUBFOLDER
+	 * @param handleList The handles list of the nodes that selected
+	 * @param pNodeBackup The destination node belongs to "My backups" for "Move" or "Copy"
+	 *                    or the the node for "Share".
+	 *                    The node in the handleList that passes the node name to the dialog.
+	 * @param nodeType The type of the backup node - BACKUP_NONE / BACKUP_ROOT / BACKUP_DEVICE / BACKUP_SUBFOLDER
 	 * @param actionType Indicates the action to backup folder or file (move, remove, add, create etc.)
 	 */
 	private void actWithBackupTips(final ArrayList<Long> handleList, MegaNode pNodeBackup, int nodeType, int actionType) {
@@ -1458,7 +1460,7 @@ public class FileBrowserFragmentLollipop extends RotatableFragment{
 
 					@Override
 					public void actionConfirmed(ArrayList<Long> handleList, @NotNull MegaNode pNodeBackup, int nodeType, int actionType) {
-						confirmationAction(handleList, pNodeBackup, nodeType, actionType);
+						confirmationActionForBackup(handleList, pNodeBackup, nodeType, actionType);
 					}
 				},
 				handleList,
@@ -1476,7 +1478,7 @@ public class FileBrowserFragmentLollipop extends RotatableFragment{
 	 * @param nodeType the type of the backup node - BACKUP_NONE / BACKUP_ROOT / BACKUP_DEVICE / BACKUP_SUBFOLDER
 	 * @param actionType Indicates the action to backup folder or file (move, remove, add, create etc.)
 	 */
-	private void confirmationAction(final ArrayList<Long> handleList, MegaNode pNodeBackup, int nodeType, int actionType) {
+	private void confirmationActionForBackup(final ArrayList<Long> handleList, MegaNode pNodeBackup, int nodeType, int actionType) {
 		if (handleList != null && pNodeBackup != null) {
 			backupHandleList = handleList;
 			backupNodeHandle = pNodeBackup.getHandle();
@@ -1569,7 +1571,7 @@ public class FileBrowserFragmentLollipop extends RotatableFragment{
 						handleList.add(node.getHandle());
 					}
 				}
-				return checkBackupNodeTypeByHandle(megaApi, handleList);
+				return MegaNodeUtil.checkBackupNodeTypeInList(megaApi, handleList);
 			} else {
 				if(currentParentHandle != null) {
 					int nodeType = checkBackupNodeTypeByHandle(megaApi, currentParentHandle);

@@ -651,7 +651,6 @@ public class FileContactListActivityLollipop extends PasscodeActivity implements
 	public void changePermissions(){
 		logDebug("changePermissions");
 		notifyDataSetChanged();
-		String name = node.getName();
 		int nodeType = checkBackupNodeTypeByHandle(megaApi, node);
 		if (nodeType != BACKUP_NONE) {
 			showWarningDialog();
@@ -681,7 +680,6 @@ public class FileContactListActivityLollipop extends PasscodeActivity implements
 		View view = layout.inflate(R.layout.dialog_backup_operate_tip, null);
 		TextView tvTitle = view.findViewById(R.id.title);
 		TextView tvContent = view.findViewById(R.id.backup_tip_content);
-		String nodeName = node.getName();
 		tvTitle.setText(R.string.backup_share_permission_title);
 		tvContent.setText(R.string.backup_share_permission_text);
 		AlertDialog.Builder builder = new MaterialAlertDialogBuilder(this)

@@ -1728,4 +1728,19 @@ public class Util {
 	public static int getCurrentOrientation() {
 		return MegaApplication.getInstance().getApplicationContext().getResources().getConfiguration().orientation;
 	}
+
+	/**
+	 * Convert ArrayList type of handleList to Array
+	 * @param handleList handle list of the nodes
+	 * @return new Array or null
+	 */
+	public static long[] getHandleArray(ArrayList<Long> handleList) {
+		if (handleList == null) return null;
+
+		long[] handles = new long[handleList.size()];
+		for (int i = 0; i < handleList.size(); i++) {
+			handles[i] = handleList.get(i);
+		}
+		return handles;
+	}
 }
