@@ -138,10 +138,6 @@ class ImageViewerPageFragment : Fragment() {
     private fun showItem(imageItem: ImageItem?) {
         val imageResult = imageItem?.imageResult ?: return
 
-        if (imageResult.isFullyLoaded && imageResult.isVideo) {
-            showVideoButton(imageItem)
-        }
-
         var mainImageUri: Uri? = null
         var lowImageUri: Uri? = null
 
@@ -196,6 +192,9 @@ class ImageViewerPageFragment : Fragment() {
         ) {
             val imageItem = viewModel.getImageItem(nodeHandle!!)
             if (imageItem?.imageResult?.isFullyLoaded == true) {
+                if (imageItem.imageResult.isVideo) {
+                    showVideoButton(imageItem)
+                }
                 binding.progress.hide()
             }
         }
@@ -211,16 +210,18 @@ class ImageViewerPageFragment : Fragment() {
                 .build()
 
             if (imageItem?.imageResult?.isFullyLoaded == true) {
+                if (imageItem.imageResult.isVideo) {
+                    showVideoButton(imageItem)
+                }
                 binding.progress.hide()
             }
         }
     }
 
     private fun showVideoButton(imageItem: ImageItem) {
-        if (binding.btnVideo.isVisible && viewModel.onShowToolbar().value != true) return
-
-        binding.image.postDelayed({
-            viewModel.switchToolbar(false)
+        if (binding.btnVideo.isVisible && viewModel.isToolbarShown()) return
+        binding.image.post {
+            viewModel.switchToolbar(true)
             binding.btnVideo.setOnClickListener { launchVideoScreen(imageItem) }
             binding.btnVideo.isVisible = true
             binding.image.apply {
@@ -234,7 +235,7 @@ class ImageViewerPageFragment : Fragment() {
                 })
                 setOnClickListener { launchVideoScreen(imageItem) }
             }
-        }, 250)
+        }
     }
 
     private fun launchVideoScreen(item: ImageItem) {

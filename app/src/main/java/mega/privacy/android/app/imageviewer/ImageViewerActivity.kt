@@ -245,8 +245,8 @@ class ImageViewerActivity : BaseActivity(), PermissionRequester, SnackbarShower 
         if (savedInstanceState == null) {
             if (!Fresco.hasBeenInitialized()) Fresco.initialize(this)
             binding.root.post {
-                dragToExit?.runEnterAnimation(intent, binding.root) { show ->
-                    changeToolbarVisibility(show, true)
+                dragToExit?.runEnterAnimation(intent, binding.root) { startAnimation ->
+                    changeToolbarVisibility(!startAnimation, true)
                 }
             }
         }
@@ -392,7 +392,7 @@ class ImageViewerActivity : BaseActivity(), PermissionRequester, SnackbarShower 
     }
 
     private fun setupAttachers(savedInstanceState: Bundle?) {
-        dragToExit = DragToExitSupport(this, { changeToolbarVisibility(it, true) }) {
+        dragToExit = DragToExitSupport(this, { changeToolbarVisibility(!it, true) }) {
             finish()
             overridePendingTransition(0, android.R.anim.fade_out)
         }
@@ -451,11 +451,11 @@ class ImageViewerActivity : BaseActivity(), PermissionRequester, SnackbarShower 
         binding.motion.post {
             val color: Int
             if (show) {
-                color = android.R.color.transparent
-                binding.motion.transitionToStart()
-            } else {
                 color = R.color.white_black
                 binding.motion.transitionToEnd()
+            } else {
+                color = android.R.color.transparent
+                binding.motion.transitionToStart()
             }
             if (enableTransparency) {
                 binding.motion.setBackgroundColor(ContextCompat.getColor(this, color))

@@ -19,7 +19,7 @@
         android:layout_gravity="center"
         android:background="@null"
         android:src="@drawable/video_player_play"
-        android:visibility="gone"
+        android:visibility="invisible"
         tools:visibility="visible" />
 
     <com.google.android.material.progressindicator.CircularProgressIndicator

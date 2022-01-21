@@ -104,6 +104,8 @@ class ImageViewerViewModel @Inject constructor(
 
     fun onShowToolbar(): LiveData<Boolean> = showToolbar
 
+    fun isToolbarShown(): Boolean = showToolbar.value ?: false
+
     fun retrieveSingleImage(nodeHandle: Long, isOffline: Boolean = false) {
         getImageHandlesUseCase.get(nodeHandles = longArrayOf(nodeHandle), isOffline = isOffline)
             .subscribeAndUpdateImages()
@@ -482,8 +484,8 @@ class ImageViewerViewModel @Inject constructor(
         }
     }
 
-    fun switchToolbar(hide: Boolean? = null) {
-        showToolbar.value = hide ?: showToolbar.value?.not() ?: true
+    fun switchToolbar(show: Boolean? = null) {
+        showToolbar.value = show ?: showToolbar.value?.not() ?: true
     }
 
     private fun getExistingNode(nodeHandle: Long): MegaNode? =
