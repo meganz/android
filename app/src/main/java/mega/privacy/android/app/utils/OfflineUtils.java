@@ -101,6 +101,7 @@ public class OfflineUtils {
             service.putExtra(DownloadService.EXTRA_URL, url);
             service.putExtra(DownloadService.EXTRA_SIZE, document.getSize());
             service.putExtra(DownloadService.EXTRA_PATH, path);
+            service.putExtra(DownloadService.EXTRA_DOWNLOAD_FOR_OFFLINE, true);
             activity.startService(service);
         }
     }
