@@ -379,7 +379,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 					}
 
 					pendingIntents.add(intent);
-					if (!type.contains(APP_DATA_VOICE_CLIP) && !type.contains(APP_DATA_BACKGROUND_TRANSFER)) {
+					if (type == null || (!type.contains(APP_DATA_VOICE_CLIP) && !type.contains(APP_DATA_BACKGROUND_TRANSFER))) {
 						updateProgressNotification();
 					}
 
@@ -500,7 +500,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
                 if (!isTextEmpty(appData)) {
                     megaApi.startDownloadWithTopPriority(currentDocument, currentDir.getAbsolutePath() + "/", appData);
                 } else {
-                    String data = type.contains(APP_DATA_VOICE_CLIP) ? APP_DATA_VOICE_CLIP : "";
+                    String data = type != null && type.contains(APP_DATA_VOICE_CLIP) ? APP_DATA_VOICE_CLIP : "";
                     megaApi.startDownloadWithTopPriority(currentDocument, currentDir.getAbsolutePath() + "/", data);
                 }
 			} else if (!isTextEmpty(appData)) {

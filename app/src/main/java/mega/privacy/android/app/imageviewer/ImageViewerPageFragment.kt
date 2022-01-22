@@ -147,7 +147,9 @@ class ImageViewerPageFragment : Fragment() {
                 lowImageUri = imageResult.thumbnailUri
             }
             imageResult.fullSizeUri != null -> {
-                if (lifecycle.currentState == Lifecycle.State.RESUMED) {
+                if (lifecycle.currentState == Lifecycle.State.RESUMED
+                    || (imageResult.previewUri == null && imageResult.thumbnailUri == null)
+                ) {
                     mainImageUri = imageResult.fullSizeUri
                     lowImageUri = imageResult.previewUri ?: imageResult.thumbnailUri
                 } else {

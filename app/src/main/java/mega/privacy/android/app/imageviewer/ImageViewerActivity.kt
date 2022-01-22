@@ -31,6 +31,7 @@ import mega.privacy.android.app.interfaces.showSnackbar
 import mega.privacy.android.app.usecase.data.MegaNodeItem
 import mega.privacy.android.app.utils.AlertsAndWarnings.showSaveToDeviceConfirmDialog
 import mega.privacy.android.app.utils.Constants.*
+import mega.privacy.android.app.utils.ContextUtils.isLowMemory
 import mega.privacy.android.app.utils.LinksUtil
 import mega.privacy.android.app.utils.LogUtil.logError
 import mega.privacy.android.app.utils.LogUtil.logWarning
@@ -51,7 +52,7 @@ import nz.mega.sdk.MegaNode
 class ImageViewerActivity : BaseActivity(), PermissionRequester, SnackbarShower {
 
     companion object {
-        private const val OFFSCREEN_PAGE_LIMIT = 2
+        private const val IMAGE_OFFSCREEN_PAGE_LIMIT = 2
 
         /**
          * Get Image Viewer intent to show a single image node.
@@ -265,8 +266,8 @@ class ImageViewerActivity : BaseActivity(), PermissionRequester, SnackbarShower 
 
     override fun onLowMemory() {
         logWarning("onLowMemory")
-        Fresco.getImagePipeline().clearMemoryCaches()
         binding.viewPager.offscreenPageLimit = OFFSCREEN_PAGE_LIMIT_DEFAULT
+        Fresco.getImagePipeline().clearMemoryCaches()
     }
 
     override fun onDestroy() {
@@ -286,7 +287,7 @@ class ImageViewerActivity : BaseActivity(), PermissionRequester, SnackbarShower 
 
         binding.viewPager.apply {
             isSaveEnabled = false
-            offscreenPageLimit = OFFSCREEN_PAGE_LIMIT
+            offscreenPageLimit = if (isLowMemory()) OFFSCREEN_PAGE_LIMIT_DEFAULT else IMAGE_OFFSCREEN_PAGE_LIMIT
             setPageTransformer(MarginPageTransformer(resources.getDimensionPixelSize(R.dimen.image_viewer_pager_margin)))
             adapter = pagerAdapter
         }
