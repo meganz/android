@@ -10,6 +10,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.core.Completable
 import io.reactivex.rxjava3.core.Single
+import io.reactivex.rxjava3.disposables.CompositeDisposable
 import io.reactivex.rxjava3.kotlin.addTo
 import io.reactivex.rxjava3.kotlin.subscribeBy
 import io.reactivex.rxjava3.schedulers.Schedulers
@@ -27,11 +28,9 @@ import mega.privacy.android.app.usecase.GetNodeUseCase
 import mega.privacy.android.app.usecase.LoggedInUseCase
 import mega.privacy.android.app.usecase.data.MegaNodeItem
 import mega.privacy.android.app.utils.Constants.INVALID_POSITION
-import mega.privacy.android.app.utils.HashCompositeDisposable
 import mega.privacy.android.app.utils.LogUtil.logError
 import mega.privacy.android.app.utils.LogUtil.logWarning
 import mega.privacy.android.app.utils.MegaNodeUtil.isValidForImageViewer
-import mega.privacy.android.app.utils.RxUtil.addTo
 import mega.privacy.android.app.utils.StringResourcesUtils.getQuantityString
 import mega.privacy.android.app.utils.StringResourcesUtils.getString
 import mega.privacy.android.app.utils.livedata.SingleLiveEvent
@@ -66,8 +65,8 @@ class ImageViewerViewModel @Inject constructor(
     private val currentPosition = MutableLiveData<Int>()
     private val showToolbar = MutableLiveData<Boolean>()
     private val snackbarMessage = SingleLiveEvent<String>()
-    private val nodesComposite = HashCompositeDisposable()
-    private val imagesComposite = HashCompositeDisposable()
+    private val nodesComposite = CompositeDisposable()
+    private val imagesComposite = CompositeDisposable()
     private var isUserLoggedIn = false
 
     init {
@@ -160,16 +159,18 @@ class ImageViewerViewModel @Inject constructor(
     fun loadSingleNode(nodeHandle: Long) {
         val imageItem = images.value?.find { it.handle == nodeHandle }
         val subscription = when {
-            imageItem?.nodePublicLink?.isNotBlank() == true ->
+            imageItem == null ->
+                return
+            imageItem.nodePublicLink?.isNotBlank() == true ->
                 getNodeUseCase.getNodeItem(imageItem.nodePublicLink)
-            imageItem?.chatMessageId != null && imageItem.chatRoomId != null ->
+            imageItem.chatMessageId != null && imageItem.chatRoomId != null ->
                 getNodeUseCase.getNodeItem(imageItem.chatRoomId, imageItem.chatMessageId)
-            imageItem?.nodeItem?.node != null ->
-                getNodeUseCase.getNodeItem(imageItem.nodeItem.node)
-            imageItem?.isOffline == true ->
+            imageItem.isOffline ->
                 getNodeUseCase.getOfflineNodeItem(imageItem.handle)
-            imageItem?.handle != INVALID_HANDLE ->
+            imageItem.handle != INVALID_HANDLE ->
                 getNodeUseCase.getNodeItem(nodeHandle)
+            imageItem.nodeItem?.node != null ->
+                getNodeUseCase.getNodeItem(imageItem.nodeItem.node)
             else ->
                 return // Image file uri with no handle
         }
@@ -186,7 +187,7 @@ class ImageViewerViewModel @Inject constructor(
                     logError(error.stackTraceToString())
                 }
             )
-            .addTo(nodeHandle, nodesComposite)
+            .addTo(composite)
     }
 
     /**
@@ -200,17 +201,24 @@ class ImageViewerViewModel @Inject constructor(
      */
     fun loadSingleImage(nodeHandle: Long, fullSize: Boolean, highPriority: Boolean) {
         val imageItem = images.value?.find { it.handle == nodeHandle }
+        val isFullSizeRequired = fullSize || images.value?.size == 1
+
         val subscription = when {
-            imageItem?.nodePublicLink?.isNotBlank() == true ->
-                getImageUseCase.get(imageItem.nodePublicLink, fullSize, highPriority)
-            imageItem?.chatMessageId != null && imageItem.chatRoomId != null ->
-                getImageUseCase.get(imageItem.chatRoomId, imageItem.chatMessageId, fullSize, highPriority)
-            imageItem?.isOffline == true ->
+            imageItem == null
+                    || (imageItem.imageResult?.isFullyLoaded == true
+                    && imageItem.imageResult.fullSizeUri != null
+                    && imageItem.imageResult.previewUri != null) ->
+                return
+            imageItem.nodePublicLink?.isNotBlank() == true ->
+                getImageUseCase.get(imageItem.nodePublicLink, isFullSizeRequired, highPriority)
+            imageItem.chatMessageId != null && imageItem.chatRoomId != null ->
+                getImageUseCase.get(imageItem.chatRoomId, imageItem.chatMessageId, isFullSizeRequired, highPriority)
+            imageItem.isOffline ->
                 getImageUseCase.getOffline(imageItem.handle)
-            imageItem?.nodeItem?.node != null ->
-                getImageUseCase.get(imageItem.nodeItem.node, fullSize, highPriority)
-            imageItem?.handle != INVALID_HANDLE ->
-                getImageUseCase.get(nodeHandle, fullSize, highPriority)
+            imageItem.handle != INVALID_HANDLE ->
+                getImageUseCase.get(nodeHandle, isFullSizeRequired, highPriority)
+            imageItem.nodeItem?.node != null ->
+                getImageUseCase.get(imageItem.nodeItem.node, isFullSizeRequired, highPriority)
             else ->
                 return // Image file uri with no handle
         }
@@ -227,7 +235,7 @@ class ImageViewerViewModel @Inject constructor(
                     logError(error.stackTraceToString())
                 }
             )
-            .addTo(nodeHandle, imagesComposite)
+            .addTo(composite)
     }
 
     /**
@@ -255,7 +263,7 @@ class ImageViewerViewModel @Inject constructor(
                         nodeItem = nodeItem
                     )
                 }
-                if (imageResult != null) {
+                if (imageResult != null && imageResult != currentItem.imageResult) {
                     items[index] = currentItem.copy(
                         imageResult = imageResult
                     )
@@ -455,10 +463,6 @@ class ImageViewerViewModel @Inject constructor(
     }
 
     fun stopImageLoading(nodeHandle: Long, aggressive: Boolean) {
-        if (aggressive) {
-            imagesComposite.remove(nodeHandle)
-            nodesComposite.remove(nodeHandle)
-        }
         images.value?.find { nodeHandle == it.handle }?.imageResult?.let { imageResult ->
             imageResult.fullSizeUri?.let { fullSizeImageUri ->
                 Fresco.getImagePipeline()?.evictFromMemoryCache(fullSizeImageUri)

@@ -1,12 +1,17 @@
 package mega.privacy.android.app.imageviewer.usecase
 
 import android.content.Context
+import android.graphics.Bitmap
+import android.media.ThumbnailUtils.createVideoThumbnail
 import android.net.Uri
+import android.os.Build
+import android.provider.MediaStore
 import androidx.core.net.toFile
 import androidx.core.net.toUri
 import dagger.hilt.android.qualifiers.ApplicationContext
 import io.reactivex.rxjava3.core.BackpressureStrategy
 import io.reactivex.rxjava3.core.Flowable
+import io.reactivex.rxjava3.core.Single
 import mega.privacy.android.app.DownloadService
 import mega.privacy.android.app.MimeTypeList
 import mega.privacy.android.app.components.transferWidget.TransfersManagement
@@ -20,6 +25,7 @@ import mega.privacy.android.app.usecase.GetChatMessageUseCase
 import mega.privacy.android.app.usecase.GetNodeUseCase
 import mega.privacy.android.app.utils.CacheFolderManager.*
 import mega.privacy.android.app.utils.Constants
+import mega.privacy.android.app.utils.ContextUtils.getScreenSize
 import mega.privacy.android.app.utils.ErrorUtils.toThrowable
 import mega.privacy.android.app.utils.FileUtil
 import mega.privacy.android.app.utils.LogUtil.logWarning
@@ -30,8 +36,11 @@ import mega.privacy.android.app.utils.MegaNodeUtil.isVideo
 import mega.privacy.android.app.utils.MegaTransferUtils.getNumPendingDownloadsNonBackground
 import mega.privacy.android.app.utils.OfflineUtils
 import mega.privacy.android.app.utils.RxUtil.blockingGetOrNull
+import mega.privacy.android.app.utils.StringUtils.encodeBase64
 import nz.mega.sdk.*
 import nz.mega.sdk.MegaError.*
+import java.io.BufferedOutputStream
+import java.io.FileOutputStream
 import javax.inject.Inject
 
 /**
@@ -117,13 +126,14 @@ class GetImageUseCase @Inject constructor(
                 node == null -> emitter.onError(IllegalArgumentException("Node is null"))
                 !node.isFile -> emitter.onError(IllegalArgumentException("Node is not a file"))
                 else -> {
-                    val isFullSizeRequired = fullSize || !node.isImage()
+                    val hasReadAccess = megaApi.getAccess(node) != MegaShare.ACCESS_UNKNOWN
+                    val isFullSizeRequired = hasReadAccess && (fullSize || !node.isImage())
 
                     val thumbnailFile = if (node.hasThumbnail()) buildThumbnailFile(context, node.getThumbnailFileName()) else null
                     val previewFile = if (node.hasPreview() || node.isVideo()) buildPreviewFile(context, node.getThumbnailFileName()) else null
-                    val fullFile = buildTempFile(context, node.getFileName())
+                    val fullFile = if (hasReadAccess) buildTempFile(context, node.getFileName()) else null
 
-                    if (fullFile.exists() && fullFile.length() != node.size) {
+                    if (fullFile?.exists() == true && fullFile.length() != node.size) {
                         FileUtil.deleteFileSafely(fullFile)
                     }
 
@@ -134,7 +144,11 @@ class GetImageUseCase @Inject constructor(
                         fullSizeUri = if (fullFile?.exists() == true) fullFile.toUri() else null
                     )
 
-                    if (fullFile?.exists() == true && (previewFile == null || previewFile.exists())) {
+                    if (image.isVideo && fullFile?.exists() == true && previewFile == null) {
+                        image.previewUri = getVideoPreviewImage(node.getThumbnailFileName(), fullFile.toUri()).blockingGetOrNull()
+                    }
+
+                    if ((!hasReadAccess && previewFile?.exists() == true) || (fullFile?.exists() == true && (previewFile == null || previewFile.exists()))) {
                         image.isFullyLoaded = true
                         emitter.onNext(image)
                         emitter.onComplete()
@@ -187,7 +201,7 @@ class GetImageUseCase @Inject constructor(
                             ))
                     }
 
-                    if (isFullSizeRequired && !fullFile.exists()) {
+                    if (isFullSizeRequired && fullFile != null && !fullFile.exists()) {
                         val listener = OptionalMegaTransferListenerInterface(
                             onTransferStart = { transfer ->
                                 if (emitter.isCancelled) return@OptionalMegaTransferListenerInterface
@@ -258,8 +272,19 @@ class GetImageUseCase @Inject constructor(
                 else -> {
                     val file = OfflineUtils.getOfflineFile(context, offlineNode)
                     if (file.exists()) {
+                        val isVideo = MimeTypeList.typeForName(offlineNode.name).isVideo
+                        val thumbnailFileName = "${offlineNode.handle.encodeBase64()}${FileUtil.JPG_EXTENSION}"
+                        val thumbnailFile = buildThumbnailFile(context, thumbnailFileName)
+                        val previewFile = buildPreviewFile(context, thumbnailFileName)
+
+                        if (isVideo && !previewFile.exists()) {
+                            getVideoPreviewImage(thumbnailFileName, file.toUri()).blockingGetOrNull()
+                        }
+
                         ImageResult(
-                            isVideo = MimeTypeList.typeForName(offlineNode.name).isVideo,
+                            isVideo = isVideo,
+                            thumbnailUri = if (thumbnailFile.exists()) thumbnailFile.toUri() else null,
+                            previewUri = if (previewFile.exists()) previewFile.toUri() else null,
                             fullSizeUri = file.toUri(),
                             isFullyLoaded = true
                         )
@@ -287,6 +312,36 @@ class GetImageUseCase @Inject constructor(
             } else {
                 error("Image file doesn't exist")
             }
+        }
+
+    /**
+     * Generate a thumbnail given a video file
+     *
+     * @param fileName  Thumbnail file name
+     * @param videoUri  Video to get thumbnail from
+     * @return          Single with generated file uri
+     */
+    @Suppress("deprecation")
+    fun getVideoPreviewImage(fileName: String, videoUri: Uri): Single<Uri> =
+        Single.fromCallable {
+            val videoFile = videoUri.toFile()
+            require(videoFile.exists())
+
+            val bitmap = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                val screenSize = context.getScreenSize()
+                createVideoThumbnail(videoFile, screenSize, null)
+            } else {
+                createVideoThumbnail(videoFile.path, MediaStore.Images.Thumbnails.FULL_SCREEN_KIND)
+            }
+            requireNotNull(bitmap)
+
+            val previewFile = buildPreviewFile(context, fileName)
+            BufferedOutputStream(FileOutputStream(previewFile)).apply {
+                bitmap.compress(Bitmap.CompressFormat.JPEG, 75, this)
+                close()
+            }
+
+            previewFile.toUri()
         }
 
     /**

@@ -249,9 +249,26 @@ class GetNodeUseCase @Inject constructor(
      * @return              Completable
      */
     fun markAsFavorite(node: MegaNode?, isFavorite: Boolean): Completable =
-        Completable.fromCallable {
-            requireNotNull(node)
-            megaApi.setNodeFavourite(node, isFavorite)
+        Completable.create { emitter ->
+            if (node == null) {
+                emitter.onError(IllegalArgumentException("Null node"))
+                return@create
+            }
+
+            megaApi.setNodeFavourite(node, isFavorite, OptionalMegaRequestListenerInterface(
+                onRequestFinish = { _, error ->
+                    if (emitter.isDisposed) return@OptionalMegaRequestListenerInterface
+
+                    when (error.errorCode) {
+                        MegaError.API_OK ->
+                            emitter.onComplete()
+                        MegaError.API_EBUSINESSPASTDUE ->
+                            emitter.onError(BusinessAccountOverdueMegaError())
+                        else ->
+                            emitter.onError(error.toThrowable())
+                    }
+                }
+            ))
         }
 
     /**

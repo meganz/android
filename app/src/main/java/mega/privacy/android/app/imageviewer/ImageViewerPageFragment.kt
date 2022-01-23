@@ -5,6 +5,7 @@ import android.content.SharedPreferences
 import android.graphics.drawable.Animatable
 import android.net.Uri
 import android.os.Bundle
+import android.util.Size
 import android.view.*
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
@@ -14,6 +15,7 @@ import com.facebook.drawee.backends.pipeline.Fresco
 import com.facebook.drawee.controller.BaseControllerListener
 import com.facebook.drawee.drawable.ScalingUtils.ScaleType
 import com.facebook.imagepipeline.common.Priority
+import com.facebook.imagepipeline.common.ResizeOptions
 import com.facebook.imagepipeline.common.RotationOptions
 import com.facebook.imagepipeline.image.ImageInfo
 import com.facebook.imagepipeline.memory.BasePool
@@ -27,6 +29,7 @@ import mega.privacy.android.app.databinding.PageImageViewerBinding
 import mega.privacy.android.app.imageviewer.data.ImageItem
 import mega.privacy.android.app.mediaplayer.VideoPlayerActivity
 import mega.privacy.android.app.utils.Constants.*
+import mega.privacy.android.app.utils.ContextUtils.getScreenSize
 import mega.privacy.android.app.utils.ExtraUtils.extra
 import mega.privacy.android.app.utils.LogUtil.logError
 import mega.privacy.android.app.utils.NetworkUtil.isMeteredConnection
@@ -65,7 +68,8 @@ class ImageViewerPageFragment : Fragment() {
     private val viewModel by activityViewModels<ImageViewerViewModel>()
     private val nodeHandle: Long? by extra(INTENT_EXTRA_KEY_HANDLE)
     private val controllerListener by lazy { buildImageControllerListener() }
-    private val isMobileDataAllowed by lazy {
+    private val screenSize: Size by lazy { requireContext().getScreenSize() }
+    private val isMobileDataAllowed: Boolean by lazy {
         preferences.getBoolean(SettingsConstants.KEY_MOBILE_DATA_HIGH_RESOLUTION, true)
     }
 
@@ -183,6 +187,13 @@ class ImageViewerPageFragment : Fragment() {
                 .setLowResImageRequest(lowImageRequest)
                 .setImageRequest(mainImageRequest)
                 .build()
+        } else if (imageItem.imageResult.isFullyLoaded) {
+            binding.image.post {
+                if (imageItem.imageResult.isVideo) {
+                    showVideoButton(imageItem)
+                }
+                binding.progress.hide()
+            }
         }
     }
 
@@ -194,10 +205,12 @@ class ImageViewerPageFragment : Fragment() {
         ) {
             val imageItem = viewModel.getImageItem(nodeHandle!!)
             if (imageItem?.imageResult?.isFullyLoaded == true) {
-                if (imageItem.imageResult.isVideo) {
-                    showVideoButton(imageItem)
+                binding.image.post {
+                    if (imageItem.imageResult.isVideo) {
+                        showVideoButton(imageItem)
+                    }
+                    binding.progress.hide()
                 }
-                binding.progress.hide()
             }
         }
 
@@ -212,42 +225,44 @@ class ImageViewerPageFragment : Fragment() {
                 .build()
 
             if (imageItem?.imageResult?.isFullyLoaded == true) {
-                if (imageItem.imageResult.isVideo) {
-                    showVideoButton(imageItem)
+                binding.image.post {
+                    if (imageItem.imageResult.isVideo) {
+                        showVideoButton(imageItem)
+                    }
+                    binding.progress.hide()
                 }
-                binding.progress.hide()
             }
         }
     }
 
     private fun showVideoButton(imageItem: ImageItem) {
         if (binding.btnVideo.isVisible && viewModel.isToolbarShown()) return
-        binding.image.post {
-            viewModel.switchToolbar(true)
-            binding.btnVideo.setOnClickListener { launchVideoScreen(imageItem) }
-            binding.btnVideo.isVisible = true
-            binding.image.apply {
-                setAllowTouchInterceptionWhileZoomed(true)
-                setZoomingEnabled(false)
-                setTapListener(object : GestureDetector.SimpleOnGestureListener() {
-                    override fun onSingleTapUp(e: MotionEvent?): Boolean {
-                        launchVideoScreen(imageItem)
-                        return true
-                    }
-                })
-                setOnClickListener { launchVideoScreen(imageItem) }
-            }
+
+        viewModel.switchToolbar(true)
+        binding.btnVideo.setOnClickListener { launchVideoScreen(imageItem) }
+        binding.btnVideo.isVisible = true
+        binding.image.apply {
+            setAllowTouchInterceptionWhileZoomed(true)
+            setZoomingEnabled(false)
+            setTapListener(object : GestureDetector.SimpleOnGestureListener() {
+                override fun onSingleTapUp(e: MotionEvent?): Boolean {
+                    launchVideoScreen(imageItem)
+                    return true
+                }
+            })
+            setOnClickListener { launchVideoScreen(imageItem) }
         }
     }
 
     private fun launchVideoScreen(item: ImageItem) {
-        val fileUri = item.imageResult?.fullSizeUri ?: return
-        val nodeName = item.nodeItem?.node?.name ?: return
+        val fileUri = item.imageResult?.getHighestResolutionAvailableUri() ?: return
+        val nodeName = item.nodeItem?.name ?: return
         val intent = Intent(context, VideoPlayerActivity::class.java).apply {
             setDataAndType(fileUri, MimeTypeList.typeForName(nodeName).type)
             putExtra(INTENT_EXTRA_KEY_HANDLE, nodeHandle)
             putExtra(INTENT_EXTRA_KEY_FILE_NAME, nodeName)
             putExtra(INTENT_EXTRA_KEY_ADAPTER_TYPE, FROM_IMAGE_VIEWER)
+            putExtra(INTENT_EXTRA_KEY_IS_FOLDER_LINK, !item.nodeItem.hasReadAccess)
             putExtra(INTENT_EXTRA_KEY_POSITION, 0)
             putExtra(INTENT_EXTRA_KEY_PARENT_NODE_HANDLE, INVALID_HANDLE)
             putExtra(INTENT_EXTRA_KEY_ORDER_GET_CHILDREN, ORDER_DEFAULT_ASC)
@@ -265,6 +280,7 @@ class ImageViewerPageFragment : Fragment() {
     private fun Uri.toImageRequest(): ImageRequest? =
         ImageRequestBuilder.newBuilderWithSource(this)
             .setRotationOptions(RotationOptions.autoRotate())
+            .setResizeOptions(ResizeOptions.forDimensions(screenSize.width, screenSize.height))
             .setRequestPriority(
                 if (lifecycle.currentState == Lifecycle.State.RESUMED)
                     Priority.HIGH

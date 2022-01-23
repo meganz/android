@@ -432,7 +432,7 @@ class ImageViewerActivity : BaseActivity(), PermissionRequester, SnackbarShower 
                     isOnline && item.hasOwnerAccess && !item.isFromRubbishBin
 
                 findItem(R.id.action_send_to_chat)?.isVisible =
-                    isOnline && !isExternal && item.node != null && !item.isFromRubbishBin && viewModel.isUserLoggedIn()
+                    isOnline && !isExternal && item.node != null && !item.isFromRubbishBin && viewModel.isUserLoggedIn() && item.hasReadAccess
 
                 findItem(R.id.action_more)?.isVisible =
                     item.handle != INVALID_HANDLE

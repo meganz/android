@@ -144,7 +144,7 @@ class ImageBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
 
                 startActivity(intent)
             }
-            optionInfo.isVisible = isUserLoggedIn && !isExternalNode
+            optionInfo.isVisible = isUserLoggedIn && !isExternalNode && nodeItem.hasReadAccess
 
             // Favorite
             if (node != null) {
@@ -182,7 +182,7 @@ class ImageBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
             }
 
             // Open with
-            optionOpenWith.isVisible = isUserLoggedIn && !isExternalNode && !nodeItem.isFromRubbishBin
+            optionOpenWith.isVisible = isUserLoggedIn && !isExternalNode && !nodeItem.isFromRubbishBin && nodeItem.hasReadAccess
             optionOpenWith.setOnClickListener {
                 if (imageItem.isOffline) {
                     OfflineUtils.openWithOffline(requireActivity(), nodeItem.handle)
@@ -248,7 +248,7 @@ class ImageBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
                 (activity as? ImageViewerActivity?)?.attachNode(node!!)
                 dismissAllowingStateLoss()
             }
-            optionSendToChat.isVisible = isOnline && isUserLoggedIn && !isExternalNode && node != null && !nodeItem.isFromRubbishBin
+            optionSendToChat.isVisible = isOnline && isUserLoggedIn && !isExternalNode && node != null && !nodeItem.isFromRubbishBin && nodeItem.hasReadAccess
 
             // Share
             optionShare.isVisible = !nodeItem.isFromRubbishBin && (imageItem.isOffline || nodeItem.hasOwnerAccess || !imageItem.nodePublicLink.isNullOrBlank())
@@ -291,7 +291,7 @@ class ImageBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
             val copyDrawable = if (isExternalNode) R.drawable.ic_import_to_cloud_white else R.drawable.ic_menu_copy
             optionCopy.setCompoundDrawablesWithIntrinsicBounds(copyDrawable, 0, 0, 0)
             optionCopy.text = StringResourcesUtils.getString(copyAction)
-            optionCopy.isVisible = isOnline && isUserLoggedIn && !nodeItem.isFromRubbishBin && !imageItem.isOffline
+            optionCopy.isVisible = isOnline && isUserLoggedIn && !nodeItem.isFromRubbishBin && !imageItem.isOffline && nodeItem.hasReadAccess
 
             // Restore
             optionRestore.setOnClickListener {

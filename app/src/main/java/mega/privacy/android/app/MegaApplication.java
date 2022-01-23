@@ -36,6 +36,7 @@ import androidx.lifecycle.Observer;
 import androidx.multidex.MultiDexApplication;
 
 import com.facebook.drawee.backends.pipeline.Fresco;
+import com.facebook.imagepipeline.core.ImagePipelineConfig;
 import com.jeremyliao.liveeventbus.LiveEventBus;
 
 import io.reactivex.rxjava3.plugins.RxJavaPlugins;
@@ -838,7 +839,9 @@ public class MegaApplication extends MultiDexApplication implements Application.
 
 		ContextUtils.initialize(getApplicationContext());
 
-		Fresco.initialize(this);
+		Fresco.initialize(this, ImagePipelineConfig.newBuilder(this)
+				.setDownsampleEnabled(true)
+				.build());
 
 		// Try to initialize the loggers again in order to avoid have them uninitialized
 		// in case they failed to initialize before for some reason.
