@@ -4140,12 +4140,34 @@
     <string name="disable_versioning_warning">Our file versioning feature ensures that we keep older copies of your files around if you replace them with newer versions. If you disable File Versioning you will no longer have this protection; the old copy will be lost when you replace it.</string>
     <!-- Warning informing the user the folder location is trying to open no longer exists. -->
     <string name="location_not_exist">This location no longer exists.</string>
-    <!-- Message when file available offline. -->
-    <string name="file_available_offline">File available Offline</string>
-    <!-- Message when file removed from offline. -->
-    <string name="file_removed_offline">File removed from Offline</string>
     <!-- Warning shown informing the contact has been previously invited. The placeholder is to show the name of the contact. -->
     <string name="contact_already_invited">%1$s previously invited.</string>
     <!-- Warning shown informing the contact request has been sent and can be managed in sent requests section. -->
     <string name="contact_invited">Invite sent successfully. See sent requests.</string>
+    <!-- Message when file available offline. -->
+    <string name="file_available_offline">File available Offline</string>
+    <!-- Message when file removed from offline. -->
+    <string name="file_removed_offline">File removed from Offline</string>
+    <!-- Menu option to open a link. Also title of the dialog to open a link. -->
+    <string name="action_open_link">Open link</string>
+    <!-- error message shown when a chat link is not well formed. -->
+    <string name="invalid_chat_link_args">Invalid chat link</string>
+    <!-- Menu option to open a chat link. -->
+    <string name="action_open_chat_link">Open chat link</string>
+    <!-- Hint shown in the open chat link alert dialog. -->
+    <string name="hint_enter_chat_link">Enter chat link</string>
+    <!-- Hint shown in the open link alert dialog. -->
+    <string name="hint_paste_link">Paste link</string>
+    <!-- Error shown when it tries to open an invalid file or folder link .-->
+    <string name="invalid_file_folder_link">Invalid file or folder link</string>
+    <!-- Error shown when it tries to open an invalid file or folder link and the text view is empty. -->
+    <string name="invalid_file_folder_link_empty">Please enter a valid file or folder link</string>
+    <!-- Error shown when it tries to open an invalid chat link and the text view is empty. -->
+    <string name="invalid_chat_link_empty">Please enter a valid chat link</string>
+    <!-- Error shown when it tries to open a chat link from the Cloud Drive section. -->
+    <string name="valid_chat_link">You have pasted a chat link.</string>
+    <!-- Error shown when it tries to open a contact link from the Cloud Drive section. -->
+    <string name="valid_contact_link">You have pasted a contact link.</string>
+    <!-- Action button to open a contact link.-->
+    <string name="action_open_contact_link">Open contact link</string>
 </resources>
