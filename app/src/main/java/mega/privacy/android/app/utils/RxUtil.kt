@@ -27,7 +27,7 @@ object RxUtil {
      * Retrieve a Single source synchronously ignoring any errors
      * @return  Result from Single source or null if there was any errors
      */
-    fun <T> Single<T>.blockingGetOrNull(): T? =
+    fun <T : Any> Single<T>.blockingGetOrNull(): T? =
         try {
             blockingGet()
         } catch (ignore: Exception) {
