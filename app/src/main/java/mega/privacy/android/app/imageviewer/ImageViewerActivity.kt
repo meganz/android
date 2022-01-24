@@ -420,19 +420,18 @@ class ImageViewerActivity : BaseActivity(), PermissionRequester, SnackbarShower 
             binding.txtTitle.text = item.name
             binding.toolbar.menu?.apply {
                 val isOnline = isOnline()
-                val isExternal = item.node?.isPublic == true || item.node?.isForeign == true
 
                 findItem(R.id.action_download)?.isVisible =
                     !item.isFromRubbishBin
 
                 findItem(R.id.action_save_gallery)?.isVisible =
-                    isSaveToGalleryCompatible() && !isExternal && !item.isFromRubbishBin
+                    isSaveToGalleryCompatible() && !item.isExternalNode && !item.isFromRubbishBin
 
                 findItem(R.id.action_get_link)?.isVisible =
-                    isOnline && item.hasOwnerAccess && !item.isFromRubbishBin
+                    isOnline && item.hasOwnerAccess && !item.isFromRubbishBin && !item.isExternalNode
 
                 findItem(R.id.action_send_to_chat)?.isVisible =
-                    isOnline && !isExternal && item.node != null && !item.isFromRubbishBin && viewModel.isUserLoggedIn() && item.hasReadAccess
+                    isOnline && !item.isExternalNode && item.node != null && !item.isFromRubbishBin && viewModel.isUserLoggedIn() && item.hasReadAccess
 
                 findItem(R.id.action_more)?.isVisible =
                     item.handle != INVALID_HANDLE

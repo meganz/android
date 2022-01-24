@@ -15,6 +15,7 @@ import nz.mega.sdk.MegaNode
  * @property isFromRubbishBin   Flag indicating if node is a child of Rubbish bin node.
  * @property isFromInbox        Flag indicating if node is a child of Inbox node.
  * @property isFromRoot         Flag indicating if node is a child of Root node.
+ * @property isExternalNode     Flag indicating if node is external.
  * @property isAvailableOffline Flag indicating if node is available offline.
  * @property hasVersions        Flag indicating if node has versions.
  */
@@ -30,6 +31,7 @@ data class MegaNodeItem constructor(
     val isFromRubbishBin: Boolean = false,
     val isFromInbox: Boolean = false,
     val isFromRoot: Boolean = false,
+    val isExternalNode: Boolean = false,
     val hasVersions: Boolean = false,
     val isAvailableOffline: Boolean = false,
     val node: MegaNode? = null

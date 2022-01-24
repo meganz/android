@@ -18,6 +18,7 @@ import mega.privacy.android.app.utils.MegaNodeUtil.getLastAvailableTime
 import mega.privacy.android.app.utils.MegaNodeUtil.getRootParentNode
 import mega.privacy.android.app.utils.RxUtil.blockingGetOrNull
 import nz.mega.sdk.MegaApiAndroid
+import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaNode
 import nz.mega.sdk.MegaShare
@@ -117,6 +118,8 @@ class GetNodeUseCase @Inject constructor(
             val isAvailableOffline = isNodeAvailableOffline(node.handle).blockingGetOrNull() ?: false
             val hasVersions = megaApi.hasVersions(node)
 
+            val isMine = node.owner != INVALID_HANDLE && node.owner == megaApi.myUserHandle.toLongOrNull()
+            val isExternalNode = node.isPublic || node.isForeign || !isMine
             val rootParentNode = megaApi.getRootParentNode(node)
             val isFromIncoming = rootParentNode.isInShare
             var isFromRubbishBin = false
@@ -140,6 +143,7 @@ class GetNodeUseCase @Inject constructor(
                 isFromRubbishBin = isFromRubbishBin,
                 isFromInbox = isFromInbox,
                 isFromRoot = isFromRoot,
+                isExternalNode = isExternalNode,
                 hasVersions = hasVersions,
                 isAvailableOffline = isAvailableOffline,
                 node = node
@@ -190,6 +194,7 @@ class GetNodeUseCase @Inject constructor(
                         isFromInbox = offlineNode.origin == MegaOffline.INBOX,
                         isFromRoot = false,
                         hasVersions = false,
+                        isExternalNode = false,
                         isAvailableOffline = true,
                         node = null
                     )
