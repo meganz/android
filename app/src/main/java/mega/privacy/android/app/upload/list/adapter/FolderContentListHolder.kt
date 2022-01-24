@@ -17,17 +17,21 @@ class FolderContentListHolder(
         binding.apply {
             if (item.isFolder) {
                 thumbnail.apply {
-                    hierarchy.setPlaceholderImage(R.drawable.ic_folder_list)
-                    setImageURI(null as Uri?)
+                    setActualImageResource(if (item.isSelected) R.drawable.ic_select_folder else R.drawable.ic_folder_list)
                 }
             } else {
                 thumbnail.apply {
-                    setImageURI(null as Uri?)
                     hierarchy.setPlaceholderImage(MimeTypeList.typeForName(item.name).iconResourceId)
-                    setImageRequest(
-                        ImageRequestBuilder.fromRequest(ImageRequest.fromUri(item.uri))
-                            .setLocalThumbnailPreviewsEnabled(true).build()
-                    )
+
+                    if (item.isSelected) {
+                        setActualImageResource(R.drawable.ic_select_folder)
+                    } else {
+                        setImageURI(null as Uri?)
+                        setImageRequest(
+                            ImageRequestBuilder.fromRequest(ImageRequest.fromUri(item.uri))
+                                .setLocalThumbnailPreviewsEnabled(true).build()
+                        )
+                    }
                 }
             }
 

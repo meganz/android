@@ -2,6 +2,8 @@ package mega.privacy.android.app.upload.list.adapter
 
 import android.graphics.drawable.Animatable
 import android.net.Uri
+import android.view.View.INVISIBLE
+import android.view.View.VISIBLE
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.RecyclerView
 import com.facebook.drawee.backends.pipeline.Fresco.*
@@ -11,6 +13,7 @@ import com.facebook.imagepipeline.request.ImageRequest
 import com.facebook.imagepipeline.request.ImageRequestBuilder
 import mega.privacy.android.app.MimeTypeList
 import mega.privacy.android.app.MimeTypeThumbnail
+import mega.privacy.android.app.R
 import mega.privacy.android.app.databinding.ItemFolderContentGridBinding
 import mega.privacy.android.app.listeners.OptionalRequestListener
 import mega.privacy.android.app.upload.list.data.FolderContent
@@ -37,8 +40,12 @@ class FolderContentGridHolder(
             videoView.isVisible = false
             videoIcon.isVisible = false
 
+            root.setBackgroundResource(if (item.isSelected) R.drawable.background_item_grid_selected else R.drawable.background_item_grid)
+            selectedIcon.isVisible = item.isSelected
+
             if (item.isFolder) {
-                folderThumbnail.isVisible = true
+                folderThumbnail.visibility = if (item.isSelected) INVISIBLE else VISIBLE
+
                 folderName.apply {
                     isVisible = true
                     text = item.name

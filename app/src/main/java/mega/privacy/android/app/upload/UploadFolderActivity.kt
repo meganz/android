@@ -1,9 +1,15 @@
 package mega.privacy.android.app.upload
 
+import android.animation.Animator
+import android.animation.AnimatorInflater
+import android.animation.AnimatorSet
 import android.app.Activity
 import android.os.Bundle
+import android.view.Menu
 import android.view.MenuItem
+import android.widget.ImageView
 import androidx.activity.viewModels
+import androidx.appcompat.view.ActionMode
 import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.documentfile.provider.DocumentFile
@@ -15,28 +21,38 @@ import mega.privacy.android.app.components.PositionDividerItemDecoration
 import mega.privacy.android.app.databinding.ActivityUploadFolderBinding
 import mega.privacy.android.app.fragments.homepage.EventObserver
 import mega.privacy.android.app.fragments.homepage.SortByHeaderViewModel
+import mega.privacy.android.app.interfaces.Scrollable
 import mega.privacy.android.app.modalbottomsheet.SortByBottomSheetDialogFragment.Companion.newInstance
-import mega.privacy.android.app.upload.list.adapter.FolderContentListAdapter
+import mega.privacy.android.app.upload.list.adapter.FolderContentAdapter
 import mega.privacy.android.app.upload.list.data.FolderContent
 import mega.privacy.android.app.utils.Constants
+import mega.privacy.android.app.utils.MenuUtils.setupSearchView
 import mega.privacy.android.app.utils.Util
 
 /**
  * Activity which shows the content of a local folder picked via system picker to upload all its content
  * or part of it.
  */
-class UploadFolderActivity : PasscodeActivity() {
+class UploadFolderActivity : PasscodeActivity(), Scrollable {
 
     private val viewModel: UploadFolderViewModel by viewModels()
     private val sortByHeaderViewModel: SortByHeaderViewModel by viewModels()
     private lateinit var binding: ActivityUploadFolderBinding
 
+    private var actionMode: ActionMode? = null
+    private var animatorSet: AnimatorSet? = null
+
     private val folderContentAdapter by lazy {
-        FolderContentListAdapter(sortByHeaderViewModel, ::onFolderClick, ::onLongClick)
+        FolderContentAdapter(sortByHeaderViewModel, ::onClick, ::onLongClick)
     }
 
     private val toolbarElevation by lazy { resources.getDimension(R.dimen.toolbar_elevation) }
-    private val itemDecoration by lazy { PositionDividerItemDecoration(this, resources.displayMetrics) }
+    private val itemDecoration by lazy {
+        PositionDividerItemDecoration(
+            this,
+            resources.displayMetrics
+        )
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -54,6 +70,14 @@ class UploadFolderActivity : PasscodeActivity() {
                 }
             }
         }
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        menuInflater.inflate(R.menu.activity_upload_folder, menu)
+        menu?.findItem(R.id.action_search)?.setupSearchView { query ->
+            viewModel.search(query)
+        }
+        return super.onCreateOptionsMenu(menu)
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -82,14 +106,7 @@ class UploadFolderActivity : PasscodeActivity() {
 
                 override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
                     super.onScrolled(recyclerView, dx, dy)
-                    val showElevation = recyclerView.canScrollVertically(RecyclerView.NO_POSITION)
-                    binding.toolbar.elevation = if (showElevation) toolbarElevation else 0F
-                    if (Util.isDarkMode(this@UploadFolderActivity)) {
-                        val color =
-                            if (showElevation) R.color.action_mode_background else R.color.dark_grey
-                        window.statusBarColor =
-                            ContextCompat.getColor(this@UploadFolderActivity, color)
-                    }
+                    checkScroll()
                 }
             })
 
@@ -114,7 +131,9 @@ class UploadFolderActivity : PasscodeActivity() {
 
     fun setupObservers() {
         viewModel.getCurrentFolder().observe(this, ::showCurrentFolder)
-        viewModel.getFolderContent().observe(this, ::showFolderContent)
+        viewModel.getFolderItems().observe(this, ::showFolderContent)
+        viewModel.getSelectedItems().observe(this, ::updateActionMode)
+
         sortByHeaderViewModel.showDialogEvent.observe(this, EventObserver {
             newInstance(Constants.ORDER_OFFLINE, false).apply {
                 show(supportFragmentManager, this.tag)
@@ -143,12 +162,91 @@ class UploadFolderActivity : PasscodeActivity() {
         folderContentAdapter.submitList(folderContent)
     }
 
-    private fun onFolderClick(folderClicked: FolderContent.Data) {
-        viewModel.folderClick(folderClicked)
+    private fun updateActionMode(selectedItems: List<FolderContent.Data>) {
+        when {
+            selectedItems.isEmpty() -> {
+                actionMode?.finish()
+            }
+            actionMode == null -> startSupportActionMode(object : ActionMode.Callback {
+                override fun onPrepareActionMode(mode: ActionMode?, menu: Menu?): Boolean = true
+
+                override fun onCreateActionMode(mode: ActionMode?, menu: Menu?): Boolean {
+                    actionMode = mode
+                    checkScroll()
+                    return true
+                }
+
+                override fun onActionItemClicked(mode: ActionMode?, item: MenuItem?): Boolean {
+
+                    return true
+                }
+
+                override fun onDestroyActionMode(mode: ActionMode?) {
+                    animate(viewModel.clearSelected())
+                    actionMode = null
+                    checkScroll()
+                }
+            })
+        }
+
+        actionMode?.title = selectedItems.size.toString()
     }
 
-    private fun onLongClick(itemClicked: FolderContent.Data) {
+    private fun onClick(itemClicked: FolderContent.Data, position: Int) {
+        when {
+            actionMode != null -> onLongClick(itemClicked, position)
+            itemClicked.isFolder -> viewModel.folderClick(itemClicked)
+        }
+    }
 
+    private fun onLongClick(itemClicked: FolderContent.Data, position: Int) {
+        animate(listOf(position))
+        viewModel.itemLongClick(itemClicked)
+    }
+
+    private fun animate(positions: List<Int>) {
+        animatorSet?.run { if (isStarted) end() }
+        val animatorList = mutableListOf<Animator>()
+
+        positions.forEach { position ->
+            binding.list.findViewHolderForAdapterPosition(position)?.apply {
+                val imageView: ImageView = when {
+                    sortByHeaderViewModel.isList -> itemView.findViewById(R.id.thumbnail)
+                    else -> {
+                        itemView.setBackgroundResource(R.drawable.background_item_grid_selected)
+                        itemView.findViewById(R.id.selected_icon)
+                    }
+                }
+
+                imageView.run {
+                    setImageResource(R.drawable.ic_select_folder)
+                    isVisible = true
+
+                    val animator = AnimatorInflater.loadAnimator(context, R.animator.icon_select)
+                    animator.setTarget(this)
+                    animatorList.add(animator)
+                }
+            }
+        }
+
+        animatorSet = AnimatorSet().apply {
+            addListener(object : Animator.AnimatorListener {
+                override fun onAnimationStart(animation: Animator?) {}
+
+                override fun onAnimationEnd(animation: Animator?) {
+                    folderContentAdapter.submitList(viewModel.getFolderContentItems()!!)
+                    folderContentAdapter.notifyDataSetChanged()
+                }
+
+                override fun onAnimationCancel(animation: Animator?) {}
+
+                override fun onAnimationRepeat(animation: Animator?) {}
+
+            })
+
+            playTogether(animatorList)
+            start()
+        }
     }
 
     private fun switchListGrid(isList: Boolean) {
@@ -170,6 +268,19 @@ class UploadFolderActivity : PasscodeActivity() {
                     }
                 }
             }
+        }
+    }
+
+    override fun checkScroll() {
+        val showElevation =
+            binding.list.canScrollVertically(RecyclerView.NO_POSITION) || actionMode != null
+
+        binding.toolbar.elevation = if (showElevation) toolbarElevation else 0F
+        if (Util.isDarkMode(this@UploadFolderActivity)) {
+            val color =
+                if (showElevation) R.color.action_mode_background else R.color.dark_grey
+            window.statusBarColor =
+                ContextCompat.getColor(this@UploadFolderActivity, color)
         }
     }
 }

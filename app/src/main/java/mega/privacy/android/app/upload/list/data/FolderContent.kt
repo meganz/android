@@ -20,7 +20,7 @@ sealed class FolderContent(val id: Long) {
         val parent: Data?,
         val document: DocumentFile
     ) : FolderContent(document.uri.hashCode().toLong()) {
-        val isSelected = false
+        var isSelected = false
         val isFolder = document.isDirectory
         val name = document.name
         val uri = document.uri
@@ -37,6 +37,10 @@ sealed class FolderContent(val id: Long) {
 
         override fun getSectionTitle(): String =
             document.name?.substring(0, 1) ?: ""
+
+        fun longClick() {
+            isSelected = !isSelected
+        }
     }
 
     class Header : FolderContent(HEADER_ID.hashCode().toLong()) {
@@ -58,9 +62,11 @@ sealed class FolderContent(val id: Long) {
             oldContent: FolderContent,
             newContent: FolderContent
         ): Boolean {
-            val isSameData = oldContent is Data && newContent is Data && oldContent == newContent
+            val isSameData =
+                oldContent is Data && newContent is Data && oldContent.isSelected == newContent.isSelected
             val isSameHeader =
                 oldContent is Header && newContent is Header && oldContent == newContent
+
             return isSameData || isSameHeader
         }
     }

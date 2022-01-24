@@ -14,10 +14,10 @@ import mega.privacy.android.app.fragments.homepage.SortByHeaderViewModel
 import mega.privacy.android.app.upload.list.data.FolderContent
 import mega.privacy.android.app.utils.AdapterUtils.isValidPosition
 
-class FolderContentListAdapter(
+class FolderContentAdapter(
     private val sortByViewModel: SortByHeaderViewModel,
-    private val folderClickCallback: (FolderContent.Data) -> Unit,
-    private val onLongClickCallback: (FolderContent.Data) -> Unit
+    private val onClickCallback: (FolderContent.Data, Int) -> Unit,
+    private val onLongClickCallback: (FolderContent.Data, Int) -> Unit
 ) : ListAdapter<FolderContent, RecyclerView.ViewHolder>(FolderContent.DiffCallback()),
     SectionTitleProvider {
 
@@ -44,16 +44,20 @@ class FolderContentListAdapter(
                 FolderContentListHolder(binding).apply {
                     binding.root.apply {
                         setOnClickListener {
-                            if (isValidPosition(bindingAdapterPosition)
-                                && (getItem(bindingAdapterPosition) as FolderContent.Data).isFolder
-                            ) {
-                                folderClickCallback.invoke(getItem(bindingAdapterPosition) as FolderContent.Data)
+                            if (isValidPosition(bindingAdapterPosition)) {
+                                onClickCallback.invoke(
+                                    getItem(bindingAdapterPosition) as FolderContent.Data,
+                                    bindingAdapterPosition
+                                )
                             }
                         }
 
                         setOnLongClickListener {
                             if (isValidPosition(bindingAdapterPosition)) {
-                                onLongClickCallback.invoke(getItem(bindingAdapterPosition) as FolderContent.Data)
+                                onLongClickCallback.invoke(
+                                    getItem(bindingAdapterPosition) as FolderContent.Data,
+                                    bindingAdapterPosition
+                                )
                             }
 
                             true
@@ -66,16 +70,20 @@ class FolderContentListAdapter(
                 FolderContentGridHolder(binding).apply {
                     binding.root.apply {
                         setOnClickListener {
-                            if (isValidPosition(bindingAdapterPosition)
-                                && (getItem(bindingAdapterPosition) as FolderContent.Data).isFolder
-                            ) {
-                                folderClickCallback.invoke(getItem(bindingAdapterPosition) as FolderContent.Data)
+                            if (isValidPosition(bindingAdapterPosition)) {
+                                onClickCallback.invoke(
+                                    getItem(bindingAdapterPosition) as FolderContent.Data,
+                                    bindingAdapterPosition
+                                )
                             }
                         }
 
                         setOnLongClickListener {
                             if (isValidPosition(bindingAdapterPosition)) {
-                                onLongClickCallback.invoke(getItem(bindingAdapterPosition) as FolderContent.Data)
+                                onLongClickCallback.invoke(
+                                    getItem(bindingAdapterPosition) as FolderContent.Data,
+                                    bindingAdapterPosition
+                                )
                             }
 
                             true

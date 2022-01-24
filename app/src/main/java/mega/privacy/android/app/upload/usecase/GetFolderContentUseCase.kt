@@ -10,7 +10,7 @@ import kotlin.collections.ArrayList
 
 class GetFolderContentUseCase @Inject constructor() {
 
-    fun get(folderContent: FolderContent.Data, order: Int): Single<List<FolderContent>> =
+    fun get(folderContent: FolderContent.Data, order: Int): Single<MutableList<FolderContent>> =
         Single.create { emitter ->
             val listFiles = folderContent.document.listFiles()
             if (listFiles.isNullOrEmpty()) {
@@ -30,7 +30,7 @@ class GetFolderContentUseCase @Inject constructor() {
             }
         }
 
-    fun reorder(folderContent: List<FolderContent>, order: Int): Single<List<FolderContent>> =
+    fun reorder(folderContent: MutableList<FolderContent>, order: Int): Single<MutableList<FolderContent>> =
         Single.create { emitter ->
             if (folderContent.isEmpty()) {
                 emitter.onError(FileNotFoundException("Empty folder"))
