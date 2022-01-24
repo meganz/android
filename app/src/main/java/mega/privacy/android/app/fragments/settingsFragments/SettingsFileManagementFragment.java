@@ -205,7 +205,7 @@ public class SettingsFileManagementFragment extends SettingsBaseFragment {
         int numVersions = myAccountInfo.getNumVersions();
         logDebug("Num versions: " + numVersions);
         String previousVersions = myAccountInfo.getFormattedPreviousVersionsSize();
-        String text = getString(R.string.settings_file_management_file_versions_subtitle, numVersions, previousVersions);
+        String text = StringResourcesUtils.getQuantityString(R.plurals.settings_file_management_file_versions_subtitle, numVersions, numVersions, previousVersions);
         logDebug("Previous versions: " + previousVersions);
         fileVersionsFileManagement.setSummary(text);
 
@@ -220,7 +220,7 @@ public class SettingsFileManagementFragment extends SettingsBaseFragment {
      * Method for reset the version information.
      */
     public void resetVersionsInfo() {
-        String text = getString(R.string.settings_file_management_file_versions_subtitle, 0, "0 B");
+        String text = StringResourcesUtils.getQuantityString(R.plurals.settings_file_management_file_versions_subtitle, 0, 0, "0 B");
         fileVersionsFileManagement.setSummary(text);
         getPreferenceScreen().removePreference(clearVersionsFileManagement);
     }
