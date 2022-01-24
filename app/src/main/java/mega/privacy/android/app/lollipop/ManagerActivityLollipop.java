@@ -91,7 +91,6 @@ import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-import android.widget.TextView.OnEditorActionListener;
 
 import com.ittianyu.bottomnavigationviewex.BottomNavigationViewEx;
 import com.jeremyliao.liveeventbus.LiveEventBus;
@@ -6546,6 +6545,12 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 		builder.show();
 	}
 
+	/**
+	 * Shows an error in the Open link dialog.
+	 *
+	 * @param show  True if should show an error.
+	 * @param error Error value to identify and show the corresponding error.
+	 */
 	private void showOpenLinkError(boolean show, int error) {
 		if (openLinkDialog != null) {
 			if (show) {
@@ -6597,6 +6602,11 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 		}
 	}
 
+	/**
+	 * Opens a links via Open link dialog.
+	 *
+	 * @param link The link to open.
+	 */
 	private void openLink(String link) {
 		// Password link
 		if (matchRegexs(link, PASSWORD_LINK_REGEXS)) {
@@ -6652,6 +6662,9 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 		}
 	}
 
+	/**
+	 * Shows an Open link dialog.
+	 */
 	private void showOpenLinkDialog() {
 		MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this);
 		LayoutInflater inflater = getLayoutInflater();
