@@ -21,7 +21,6 @@ import androidx.core.view.isVisible
 import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.facebook.drawee.backends.pipeline.Fresco
 import com.facebook.drawee.view.SimpleDraweeView
 import mega.privacy.android.app.R
 import mega.privacy.android.app.components.GestureScaleListener.GestureScaleCallback
@@ -257,7 +256,7 @@ abstract class BaseZoomFragment : BaseFragment(), GestureScaleCallback,
             resources.configuration.orientation == Configuration.ORIENTATION_PORTRAIT
         val spanCount = getSpanCount(selectedView, isPortrait)
 
-        val params = listView.layoutParams as ViewGroup.MarginLayoutParams
+        val params = listView.layoutParams as MarginLayoutParams
 
         layoutManager = GridLayoutManager(context, spanCount)
         listView.layoutManager = layoutManager
@@ -265,7 +264,7 @@ abstract class BaseZoomFragment : BaseFragment(), GestureScaleCallback,
         if (selectedView == ALL_VIEW) {
             val imageMargin = getMargin(context, currentZoom)
             setMargin(context, params, currentZoom)
-            val gridWidth = getItemWidth(context, outMetrics, currentZoom, spanCount)
+            val gridWidth = getItemWidth(context, outMetrics, currentZoom, spanCount, isPortrait)
             val icSelectedWidth = getSelectedFrameWidth(context, currentZoom)
             val icSelectedMargin = getSelectedFrameMargin(context, currentZoom)
             val itemSizeConfig = GalleryItemSizeConfig(
@@ -281,11 +280,9 @@ abstract class BaseZoomFragment : BaseFragment(), GestureScaleCallback,
             gridAdapter =
                 GalleryAdapter(actionModeViewModel, itemOperationViewModel, itemSizeConfig)
 
-            setMargin(context, params, currentZoom)
-
             layoutManager.apply {
                 spanSizeLookup = gridAdapter.getSpanSizeLookup(spanCount)
-                val itemDimen = getItemWidth(context, outMetrics, currentZoom, spanCount)
+                val itemDimen = getItemWidth(context, outMetrics, currentZoom, spanCount, isPortrait)
                 gridAdapter.setItemDimen(itemDimen)
             }
 
