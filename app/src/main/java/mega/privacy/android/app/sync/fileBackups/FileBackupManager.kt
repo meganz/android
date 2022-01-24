@@ -155,13 +155,15 @@ class FileBackupManager(
      * @return The parent node or null
      */
     fun getSubBackupParentNode(
-        megaNodes: ArrayList<MegaNode>?,
+        megaNodes: ArrayList<MegaNode?>?,
         currentParentHandle: MegaNode?
     ): MegaNode? {
-        if (megaNodes != null) {
+        megaNodes?.let {
             if (megaNodes.size > 0) {
                 for (p in megaNodes) {
-                    return megaApi.getParentNode(p)
+                    if (p != null) {
+                        return megaApi.getParentNode(p)
+                    }
                 }
             } else {
                 return currentParentHandle
@@ -598,7 +600,7 @@ class FileBackupManager(
      * @return true if the node belongs to the backup folder, else return false.
      */
     fun fabForBackup(
-        nodeList: ArrayList<MegaNode>,
+        nodeList: ArrayList<MegaNode?>,
         currentParentHandle: MegaNode?,
         actionType: Int
     ): Boolean {
