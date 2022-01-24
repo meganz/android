@@ -45,14 +45,11 @@ import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.FileUtil.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.MegaApiUtils.*;
-import static mega.privacy.android.app.utils.MegaNodeDialogUtil.ACTION_BACKUP_MOVE;
-import static mega.privacy.android.app.utils.MegaNodeDialogUtil.ACTION_BACKUP_SHARE_CHAT;
 import static mega.privacy.android.app.utils.MegaNodeDialogUtil.ACTION_BACKUP_SHARE_FOLDER;
 import static mega.privacy.android.app.utils.MegaNodeDialogUtil.BACKUP_NONE;
 import static mega.privacy.android.app.utils.MegaNodeUtil.*;
 import static mega.privacy.android.app.utils.OfflineUtils.*;
 import static mega.privacy.android.app.utils.StringResourcesUtils.getQuantityString;
-import static mega.privacy.android.app.utils.TextUtil.isTextEmpty;
 import static mega.privacy.android.app.utils.Util.*;
 import static mega.privacy.android.app.utils.ContactUtil.*;
 import static nz.mega.sdk.MegaApiJava.INVALID_HANDLE;
@@ -1143,12 +1140,7 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
                 break;
 
             case R.id.send_chat_option:
-                nodeType = checkBackupNodeTypeByHandle(megaApi, node);
-                if (nodeType != BACKUP_NONE) {
-                    ((ManagerActivityLollipop) requireActivity()).showWarningDialogOfShare(node, nodeType, ACTION_BACKUP_SHARE_CHAT);
-                } else {
-                    ((ManagerActivityLollipop) requireActivity()).attachNodeToChats(node);
-                }
+                ((ManagerActivityLollipop) requireActivity()).attachNodeToChats(node);
                 dismissAllowingStateLoss();
                 break;
 
@@ -1163,7 +1155,7 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
                 break;
 
             case R.id.option_backup_move_layout:
-                ((ManagerActivityLollipop) requireActivity()).chooseLocationToPutNodes(handleList, ACTION_BACKUP_MOVE);
+                ((ManagerActivityLollipop) requireActivity()).chooseLocationToPutNodes(handleList);
                 dismissAllowingStateLoss();
                 break;
 

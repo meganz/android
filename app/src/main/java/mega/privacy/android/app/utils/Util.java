@@ -1732,10 +1732,10 @@ public class Util {
 	/**
 	 * Convert ArrayList type of handleList to Array
 	 * @param handleList handle list of the nodes
-	 * @return new Array or null
+	 * @return new Array
 	 */
 	public static long[] getHandleArray(ArrayList<Long> handleList) {
-		if (handleList == null) return null;
+		if (handleList == null) return new long[0];
 
 		long[] handles = new long[handleList.size()];
 		for (int i = 0; i < handleList.size(); i++) {

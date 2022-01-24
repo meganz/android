@@ -83,13 +83,9 @@ object MegaNodeDialogUtil {
     const val ACTION_BACKUP_MOVE = 0
     const val ACTION_BACKUP_REMOVE = 1
     const val ACTION_BACKUP_FAB = 2
-    const val ACTION_BACKUP_ADD = 3
-    const val ACTION_BACKUP_TAKE_PICTURE = 4
-    const val ACTION_BACKUP_NEW_FOLDER = 5
     const val ACTION_BACKUP_SHARE_FOLDER = 6
+    const val ACTION_MENU_BACKUP_SHARE_FOLDER = 7
     const val ACTION_BACKUP_SHARE = 9
-    const val ACTION_BACKUP_SHARE_CHAT = 10
-    const val ACTION_BACKUP_GET_LINK = 11
     const val ACTION_BACKUP_COPY = 12
     const val ACTION_MOVE_TO_BACKUP = 13
     const val ACTION_COPY_TO_BACKUP = 14
@@ -736,20 +732,34 @@ object MegaNodeDialogUtil {
 
     /**
      * Show the warning dialog when moving or deleting folders with "My backup" folder
-     *
-     * @param activity Android activity
-     * @param actionBackupNodeCallback Callback to finish the node action if needed, null otherwise.
-     * @param handleList handleList handles list of the nodes that selected
-     * @param pNodeBackup the node of "My backup"
-     * @param nodeType the type of the backup node - BACKUP_NONE / BACKUP_ROOT / BACKUP_DEVICE / BACKUP_SUBFOLDER
-     * @param actionType Indicates the action to backup folder or file (move, remove, add, create etc.)
+     * @param handleList handle list of the nodes that selected
+     * @param pNodeBackup Can not be null, for the actions:
+     * ACTION_COPY_TO_BACKUP            - The destination node belongs to "My backups"
+     * ACTION_BACKUP_REMOVE             - The root of backup node in handleList,
+     *                                    otherwise one of the node in handleList
+     * ACTION_MOVE_TO_BACKUP            - The destination node belongs to "My backups"
+     * ACTION_BACKUP_MOVE               - The root of backup node in handleList,
+     *                                    otherwise one of the node in handleList
+     * ACTION_MENU_BACKUP_SHARE_FOLDER  - The root of backup node
+     * ACTION_BACKUP_SHARE_FOLDER       - The node that select for share.
+     * ACTION_BACKUP_FAB                - if the folder is empty, pNodeBackup is the parent node of empty folder,
+     *                                    otherwise one of the node in handleList.
+     * @param nodeType the type of the backup node - BACKUP_NONE / BACKUP_ROOT / BACKUP_DEVICE / BACKUP_FOLDER / BACKUP_FOLDER_CHILD
+     * @param actionType Indicates the action to backup folder or file:
+     *                                  - ACTION_COPY_TO_BACKUP
+     *                                  - ACTION_BACKUP_REMOVE
+     *                                  - ACTION_MOVE_TO_BACKUP
+     *                                  - ACTION_BACKUP_MOVE
+     *                                  - ACTION_MENU_BACKUP_SHARE_FOLDER
+     *                                  - ACTION_BACKUP_SHARE_FOLDER
+     *                                  - ACTION_BACKUP_FAB
      */
     @JvmStatic
     fun showTipDialogWithBackup(
         activity: Activity,
         actionBackupNodeCallback: ActionBackupNodeCallback,
         handleList: ArrayList<Long>?,
-        pNodeBackup: MegaNode?,
+        pNodeBackup: MegaNode,
         nodeType: Int,
         actionType: Int
     ): AlertDialog {
@@ -759,26 +769,17 @@ object MegaNodeDialogUtil {
         if (handleList != null) {
             logDebug("MyBackup + handleList.size = " + handleList.size)
         }
-        if (pNodeBackup != null) {
-            logDebug("MyBackup + pNodeBackup Name = " + pNodeBackup.name)
-            logDebug("MyBackup + pNodeBackup DeviceId = " + pNodeBackup.deviceId)
-            logDebug("MyBackup + pNodeBackup Handle = " + pNodeBackup.handle)
-        }
 
         val dialogClickListener =
             DialogInterface.OnClickListener { dialog: DialogInterface?, which: Int ->
                 when (which) {
                     BUTTON_POSITIVE -> {
                         if(actionType == ACTION_BACKUP_SHARE_FOLDER
+                            || actionType == ACTION_MENU_BACKUP_SHARE_FOLDER
                             || actionType == ACTION_BACKUP_SHARE
-                            || actionType == ACTION_BACKUP_SHARE_CHAT
-                            || actionType == ACTION_BACKUP_GET_LINK
                             || (actionType == ACTION_COPY_TO_BACKUP && (nodeType == BACKUP_ROOT || nodeType == BACKUP_DEVICE))
                             || (actionType == ACTION_MOVE_TO_BACKUP && (nodeType == BACKUP_ROOT || nodeType == BACKUP_DEVICE))
-                            || (actionType == ACTION_BACKUP_ADD && nodeType != BACKUP_FOLDER_CHILD)
-                            || (actionType == ACTION_BACKUP_FAB && nodeType != BACKUP_FOLDER_CHILD)
-                            || (actionType == ACTION_BACKUP_TAKE_PICTURE && nodeType != BACKUP_FOLDER_CHILD)
-                            || (actionType == ACTION_BACKUP_NEW_FOLDER && nodeType != BACKUP_FOLDER_CHILD)) {
+                            || (actionType == ACTION_BACKUP_FAB && nodeType != BACKUP_FOLDER_CHILD)) {
                             logDebug("MyBackup + showTipDialogWithBackup / actionExecute")
                             actionBackupNodeCallback.actionExecute(
                                 handleList,
@@ -805,12 +806,10 @@ object MegaNodeDialogUtil {
         val view = layout.inflate(R.layout.dialog_backup_operate_tip, null)
         val tvTitle = view.findViewById<TextView>(R.id.title)
         val tvContent = view.findViewById<TextView>(R.id.backup_tip_content)
-        var nodeName = ""
-
-        pNodeBackup?.let { nodeName = it.name }
+        val nodeName = pNodeBackup.name
 
         when (actionType) {
-            ACTION_BACKUP_NEW_FOLDER, ACTION_BACKUP_TAKE_PICTURE, ACTION_BACKUP_ADD, ACTION_BACKUP_FAB -> {
+            ACTION_BACKUP_FAB -> {
                 if(nodeType == BACKUP_DEVICE) {
                     tvTitle.text = getString(R.string.backup_add_item_title)
                     tvContent.setText(R.string.backup_add_item_to_root_text)
@@ -871,7 +870,7 @@ object MegaNodeDialogUtil {
                     logDebug("Not in the backup folder")
                 }
             }
-            ACTION_BACKUP_GET_LINK, ACTION_BACKUP_SHARE_CHAT, ACTION_BACKUP_SHARE, ACTION_BACKUP_SHARE_FOLDER -> {
+            ACTION_BACKUP_SHARE, ACTION_BACKUP_SHARE_FOLDER, ACTION_MENU_BACKUP_SHARE_FOLDER -> {
                 tvTitle.setText(R.string.backup_share_permission_title)
                 tvContent.setText(R.string.backup_share_permission_text)
                 handleList?.let {
@@ -879,9 +878,7 @@ object MegaNodeDialogUtil {
                     if(nodeSize > 1) {
                         when (nodeType) {
                             BACKUP_ROOT -> {
-                                if (pNodeBackup != null) {
-                                    tvContent.setText(R.string.backup_share_with_root_permission_text)
-                                }
+                                tvContent.setText(R.string.backup_share_with_root_permission_text)
                             }
                             else -> tvContent.setText(R.string.backup_multi_share_permission_text)
                         }
@@ -892,10 +889,10 @@ object MegaNodeDialogUtil {
         val builder = MaterialAlertDialogBuilder(activity)
             .setView(view)
         when (actionType) {
-            ACTION_BACKUP_GET_LINK, ACTION_BACKUP_SHARE_CHAT, ACTION_BACKUP_SHARE, ACTION_BACKUP_SHARE_FOLDER -> {
+            ACTION_BACKUP_SHARE, ACTION_BACKUP_SHARE_FOLDER, ACTION_MENU_BACKUP_SHARE_FOLDER -> {
                 if (handleList!=null) {
                     val nodeSize = handleList.size
-                    if(nodeSize > 1 && nodeType == BACKUP_ROOT && pNodeBackup != null) {
+                    if(nodeSize > 1 && nodeType == BACKUP_ROOT) {
                         builder.setPositiveButton(
                             getString(R.string.general_positive_button),
                             dialogClickListener
@@ -936,10 +933,27 @@ object MegaNodeDialogUtil {
 
     /**
      * Show the confirm dialog when moving or deleting folders with "My backup" folder
-     * @param handleList handleList handles list of the nodes that selected
-     * @param pNodeBackup the node of "My backup"
-     * @param nodeType the type of the backup node - BACKUP_NONE / BACKUP_ROOT / BACKUP_DEVICE / BACKUP_SUBFOLDER
-     * @param actionType Indicates the action to backup folder or file (move, remove, add, create etc.)
+     * @param handleList handle list of the nodes that selected
+     * @param pNodeBackup Can not be null, for the actions:
+     * ACTION_COPY_TO_BACKUP            - The destination node belongs to "My backups"
+     * ACTION_BACKUP_REMOVE             - The root of backup node in handleList,
+     *                                    otherwise one of the node in handleList
+     * ACTION_MOVE_TO_BACKUP            - The destination node belongs to "My backups"
+     * ACTION_BACKUP_MOVE               - The root of backup node in handleList,
+     *                                    otherwise one of the node in handleList
+     * ACTION_MENU_BACKUP_SHARE_FOLDER  - The root of backup node
+     * ACTION_BACKUP_SHARE_FOLDER       - The node that select for share.
+     * ACTION_BACKUP_FAB                - if the folder is empty, pNodeBackup is the parent node of empty folder,
+     *                                    otherwise one of the node in handleList.
+     * @param nodeType the type of the backup node - BACKUP_NONE / BACKUP_ROOT / BACKUP_DEVICE / BACKUP_FOLDER / BACKUP_FOLDER_CHILD
+     * @param actionType Indicates the action to backup folder or file:
+     *                                  - ACTION_COPY_TO_BACKUP
+     *                                  - ACTION_BACKUP_REMOVE
+     *                                  - ACTION_MOVE_TO_BACKUP
+     *                                  - ACTION_BACKUP_MOVE
+     *                                  - ACTION_MENU_BACKUP_SHARE_FOLDER
+     *                                  - ACTION_BACKUP_SHARE_FOLDER
+     *                                  - ACTION_BACKUP_FAB
      */
     @JvmStatic
     fun showConfirmDialogWithBackup(
@@ -973,7 +987,7 @@ object MegaNodeDialogUtil {
         val nodeName = pNodeBackup.name
 
         when (actionType) {
-            ACTION_COPY_TO_BACKUP, ACTION_MOVE_TO_BACKUP, ACTION_BACKUP_NEW_FOLDER, ACTION_BACKUP_TAKE_PICTURE, ACTION_BACKUP_ADD, ACTION_BACKUP_FAB -> {
+            ACTION_COPY_TO_BACKUP, ACTION_MOVE_TO_BACKUP, ACTION_BACKUP_FAB -> {
                 // Add
                 tvTitle.text = getString(R.string.backup_add_confirm_title, nodeName)
             }
