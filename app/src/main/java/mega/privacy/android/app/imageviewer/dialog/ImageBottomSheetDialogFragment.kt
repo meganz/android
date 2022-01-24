@@ -301,7 +301,7 @@ class ImageBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
             optionRestore.isVisible = isOnline && nodeItem.isFromRubbishBin && node != null && node.restoreHandle != INVALID_HANDLE
 
             // Rubbish bin
-            optionRubbishBin.isVisible = isOnline && nodeItem.hasFullAccess
+            optionRubbishBin.isVisible = isOnline && nodeItem.hasFullAccess && !isFromChat
             if (nodeItem.isFromRubbishBin) {
                 optionRubbishBin.setText(R.string.general_remove)
             } else {
