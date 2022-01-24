@@ -1,10 +1,8 @@
 package mega.privacy.android.app.service.push;
 
-import android.content.Context;
-
 import androidx.annotation.NonNull;
 
-import com.google.firebase.iid.FirebaseInstanceId;
+import com.google.firebase.messaging.FirebaseMessaging;
 import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.messaging.RemoteMessage;
 
@@ -15,6 +13,8 @@ import mega.privacy.android.app.middlelayer.push.PushMessageHanlder;
 import static mega.privacy.android.app.utils.Constants.DEVICE_ANDROID;
 import static mega.privacy.android.app.utils.LogUtil.logDebug;
 import static mega.privacy.android.app.utils.LogUtil.logWarning;
+
+import android.content.Context;
 
 public class MegaMessageService extends FirebaseMessagingService {
 
@@ -68,14 +68,14 @@ public class MegaMessageService extends FirebaseMessagingService {
     public static void getToken(Context context) {
         //project number from google-service.json
         Executors.newFixedThreadPool(1).submit(() -> {
-            FirebaseInstanceId.getInstance().getInstanceId().addOnCompleteListener(task -> {
+            FirebaseMessaging.getInstance().getToken().addOnCompleteListener(task -> {
                 if (!task.isSuccessful()) {
                     logWarning("Get token failed.");
                     return;
                 }
 
                 // Get new Instance ID token
-                String token = task.getResult().getToken();
+                String token = task.getResult();
                 logDebug("Get token: " + token);
                 new PushMessageHanlder().sendRegistrationToServer(token, DEVICE_ANDROID);
             });
