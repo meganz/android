@@ -10,12 +10,12 @@ import android.widget.RelativeLayout
 import android.widget.TextView
 import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
-import androidx.hilt.lifecycle.ViewModelInject
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModel
 import com.jeremyliao.liveeventbus.LiveEventBus
+import dagger.hilt.android.lifecycle.HiltViewModel
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
 import mega.privacy.android.app.components.twemoji.EmojiTextView
@@ -24,12 +24,17 @@ import mega.privacy.android.app.constants.EventConstants.EVENT_UPDATE_CALL
 import mega.privacy.android.app.fragments.homepage.Event
 import mega.privacy.android.app.listeners.EditChatRoomNameListener
 import mega.privacy.android.app.listeners.GetUserEmailListener
+import mega.privacy.android.app.lollipop.controllers.AccountController
 import mega.privacy.android.app.lollipop.controllers.ChatController
 import mega.privacy.android.app.lollipop.listeners.CreateGroupChatWithPublicLink
 import mega.privacy.android.app.meeting.adapter.Participant
 import mega.privacy.android.app.meeting.fragments.InMeetingFragment.Companion.TYPE_IN_GRID_VIEW
 import mega.privacy.android.app.meeting.fragments.InMeetingFragment.Companion.TYPE_IN_SPEAKER_VIEW
-import mega.privacy.android.app.meeting.listeners.*
+import mega.privacy.android.app.meeting.listeners.GroupVideoListener
+import mega.privacy.android.app.meeting.listeners.HangChatCallListener
+import mega.privacy.android.app.meeting.listeners.RequestHiResVideoListener
+import mega.privacy.android.app.meeting.listeners.RequestLowResVideoListener
+import mega.privacy.android.app.objects.PasscodeManagement
 import mega.privacy.android.app.utils.CallUtil
 import mega.privacy.android.app.utils.ChatUtil.getTitleChat
 import mega.privacy.android.app.utils.Constants.*
@@ -40,11 +45,15 @@ import nz.mega.sdk.*
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
 import nz.mega.sdk.MegaChatCall.*
 import org.jetbrains.anko.defaultSharedPreferences
+import javax.inject.Inject
 
-class InMeetingViewModel @ViewModelInject constructor(
+@HiltViewModel
+class InMeetingViewModel @Inject constructor(
     private val inMeetingRepository: InMeetingRepository
 ) : ViewModel(), EditChatRoomNameListener.OnEditedChatRoomNameCallback,
     HangChatCallListener.OnCallHungUpCallback, GetUserEmailListener.OnUserEmailUpdateCallback {
+
+    var status = InMeetingFragment.NOT_TYPE
 
     var currentChatId: Long = MEGACHAT_INVALID_HANDLE
     var previousState: Int = CALL_STATUS_INITIAL
@@ -55,7 +64,7 @@ class InMeetingViewModel @ViewModelInject constructor(
 
     private var currentTimer = WAITING_TIME
     var countDownTimer: CountDownTimer? = null
-    private val _updateUI: MutableLiveData<Boolean> = MutableLiveData<Boolean>()
+    private val _updateUI: MutableLiveData<Boolean> = MutableLiveData<Boolean>(false)
     val updateUI: LiveData<Boolean> = _updateUI
 
     private var haveConnection: Boolean = false
@@ -898,15 +907,14 @@ class InMeetingViewModel @ViewModelInject constructor(
      * Method for creating participants already on the call
      *
      * @param list list of participants
-     * @param status if it's grid view or speaker view
      */
-    fun createCurrentParticipants(list: MegaHandleList?, status: String) {
+    fun createCurrentParticipants(list: MegaHandleList?) {
         list?.let { listParticipants ->
             if (listParticipants.size() > 0) {
                 _callLiveData.value = inMeetingRepository.getMeeting(currentChatId)
                 for (i in 0 until list.size()) {
                     getSession(list[i])?.let { session ->
-                        createParticipant(session, status)?.let { participantCreated ->
+                        createParticipant(session)?.let { participantCreated ->
                             logDebug("Adding current participant... ${participantCreated.clientId}")
                             participants.value?.add(participantCreated)
                         }
@@ -925,8 +933,8 @@ class InMeetingViewModel @ViewModelInject constructor(
      * @param session MegaChatSession of a participant
      * @return the position of the participant
      */
-    fun addParticipant(session: MegaChatSession, status: String): Int? {
-        createParticipant(session, status)?.let { participantCreated ->
+    fun addParticipant(session: MegaChatSession): Int? {
+        createParticipant(session)?.let { participantCreated ->
             participants.value?.add(participantCreated)
             logDebug("Adding participant... ${participantCreated.clientId}")
             participants.value = participants.value
@@ -943,7 +951,7 @@ class InMeetingViewModel @ViewModelInject constructor(
      * @param session MegaChatSession of a participant
      * @return the position of the participant
      */
-    private fun createParticipant(session: MegaChatSession, status: String): Participant? {
+    private fun createParticipant(session: MegaChatSession): Participant? {
         inMeetingRepository.getChatRoom(currentChatId)?.let {
             participants.value?.let { listParticipants ->
                 val peer = listParticipants.filter { participant ->
@@ -1525,10 +1533,8 @@ class InMeetingViewModel @ViewModelInject constructor(
      *
      * In Speaker view, the list of participants should have low res
      * In Grid view, if there is more than 4, low res. Hi res in the opposite case
-     *
-     * @param status if it's Speaker view or Grid view
      */
-    fun updateParticipantResolution(status: String) {
+    fun updateParticipantResolution() {
         logDebug("Changing the resolution of participants when the UI changes")
         participants.value?.let { listParticipants ->
             val iterator = listParticipants.iterator()
@@ -1692,22 +1698,6 @@ class InMeetingViewModel @ViewModelInject constructor(
     ) = inMeetingRepository.createEphemeralAccountPlusPlus(firstName, lastName, listener)
 
     /**
-     * Method to do fetch nodes when joining as a guest
-     *
-     * @param listener MegaRequestListenerInterface
-     */
-    fun fetchNodes(listener: MegaRequestListenerInterface) =
-        inMeetingRepository.fetchNodes(listener)
-
-    /**
-     * Method to connect the chat when joining as a guest
-     *
-     * @param listener MegaChatRequestListenerInterface
-     */
-    fun chatConnect(listener: MegaChatRequestListenerInterface) =
-        inMeetingRepository.chatConnect(listener)
-
-    /**
      * Method to open chat preview when joining as a guest
      *
      * @param link The link to the chat room or the meeting
@@ -1759,16 +1749,12 @@ class InMeetingViewModel @ViewModelInject constructor(
     fun answerChatCall(
         videoEnable: Boolean,
         audioEnable: Boolean,
+        speakerStatus:Boolean,
         listener: MegaChatRequestListenerInterface
     ) {
         inMeetingRepository.getChatRoom(currentChatId)?.let {
             logDebug("The chat exists")
-            inMeetingRepository.answerCall(
-                it.chatId,
-                videoEnable,
-                audioEnable,
-                listener
-            )
+            MegaApplication.getChatManagement().answerChatCall(it.chatId, videoEnable, audioEnable, speakerStatus, listener)
             return
         }
     }
@@ -1855,19 +1841,6 @@ class InMeetingViewModel @ViewModelInject constructor(
         getOwnPrivileges() == MegaChatRoom.PRIV_MODERATOR
 
     /**
-     * Method for updating a participant's permissions
-     *
-     * @param peerId User handle of a participant
-     * @param listener MegaChatRequestListenerInterface
-     */
-    fun updateChatPermissions(
-        peerId: Long,
-        listener: MegaChatRequestListenerInterface? = null
-    ) {
-        inMeetingRepository.updateChatPermissions(currentChatId, peerId, listener)
-    }
-
-    /**
      * Method for obtaining the bitmap of a participant's avatar
      *
      * @param peerId User handle of a participant
@@ -1922,6 +1895,13 @@ class InMeetingViewModel @ViewModelInject constructor(
             STATE_RESUME, STATE_INVITE -> MegaApplication.getInstance().applicationContext.defaultSharedPreferences.edit()
                 .putLong(LAST_TIMER, currentTimer).apply()
         }
+    }
+
+    /**
+     * Hide snack bar
+     */
+    fun hideSnackBarWarningMsg() {
+        _updateUI.value = false
     }
 
     /**
@@ -2001,7 +1981,7 @@ class InMeetingViewModel @ViewModelInject constructor(
             .filter { it.isModerator && it.name.isNotEmpty() }
             .map { it.name }
             .forEach {
-                nameList = if (nameList.isNotEmpty()) "$nameList, $it" else "$it"
+                nameList = if (nameList.isNotEmpty()) "$nameList, $it" else it
             }
 
         return nameList
@@ -2201,5 +2181,47 @@ class InMeetingViewModel @ViewModelInject constructor(
         }
 
         return null
+    }
+
+    /**
+     * Perform the necessary actions when the call is over.
+     * Check if exists another call in progress or on hold
+     */
+    fun checkIfAnotherCallShouldBeShown(passcodeManagement: PasscodeManagement): Boolean {
+        getAnotherCall()?.let {
+            logDebug("Show another call")
+            CallUtil.openMeetingInProgress(
+                MegaApplication.getInstance().applicationContext,
+                it.chatid,
+                false,
+                passcodeManagement
+            )
+            return true
+        }
+
+        return false
+    }
+
+    /**
+     * Method to know if local video is activated
+     *
+     * @return True, if it's on. False, if it's off
+     */
+    fun isLocalCameraOn(): Boolean = getCall()?.hasLocalVideo() ?: false
+
+    /**
+     * Method to control when I am a guest and my participation in the meeting ends
+     */
+    fun finishActivityAsGuest(meetingActivity: Context) {
+        val chatId = getChatId()
+        val callId = getCall()?.callId
+        logDebug("Finishing the activity as guest: chatId $chatId, callId $callId")
+        if (chatId != MEGACHAT_INVALID_HANDLE && callId != MEGACHAT_INVALID_HANDLE) {
+            MegaApplication.getChatManagement().controlCallFinished(callId!!, chatId)
+        }
+        AccountController.logout(
+            meetingActivity,
+            MegaApplication.getInstance().megaApi
+        )
     }
 }

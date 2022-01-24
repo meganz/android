@@ -43,6 +43,7 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.ListIterator;
 
@@ -1540,6 +1541,10 @@ public class NodeAttachmentHistoryActivity extends PasscodeActivity
 
     public void setMyChatFilesFolder(MegaNode myChatFilesFolder) {
         this.myChatFilesFolder = myChatFilesFolder;
+    }
+
+    public void downloadNodeList(MegaNodeList nodeList) {
+        nodeSaver.saveNodeLists(Collections.singletonList(nodeList), false, false, false, true, false);
     }
 }
 

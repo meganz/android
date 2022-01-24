@@ -1,21 +1,15 @@
 package mega.privacy.android.app.lollipop.adapters;
 
 import android.content.Context;
-import android.graphics.Color;
-import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
-import android.util.SparseBooleanArray;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
-import android.view.animation.Animation;
-import android.view.animation.AnimationUtils;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import mega.privacy.android.app.MegaApplication;
@@ -33,21 +27,17 @@ import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.Util.*;
 
 /*
- * Adapter for FilestorageActivity list
+ * Adapter for FileStorageLollipopAdapter list
  */
-public class FileStorageLollipopAdapter extends RecyclerView.Adapter<FileStorageLollipopAdapter.ViewHolderFileStorage> implements OnClickListener, View.OnLongClickListener {
+public class FileStorageLollipopAdapter extends RecyclerView.Adapter<FileStorageLollipopAdapter.ViewHolderFileStorage> implements OnClickListener {
 
     private Context context;
     private MegaApiAndroid megaApi;
     private List<FileDocument> currentFiles;
     private Mode mode;
-    private RecyclerView listFragment;
-    private SparseBooleanArray selectedItems;
-    private boolean multipleSelect;
 
-    public FileStorageLollipopAdapter(Context context, RecyclerView listView, Mode mode2) {
+    public FileStorageLollipopAdapter(Context context, Mode mode2) {
         this.mode = mode2;
-        this.listFragment = listView;
         this.context = context;
 
         if (this.megaApi == null) {
@@ -72,19 +62,15 @@ public class FileStorageLollipopAdapter extends RecyclerView.Adapter<FileStorage
     @Override
     public ViewHolderFileStorage onCreateViewHolder(ViewGroup parent, int viewType) {
 
-        listFragment = (RecyclerView) parent;
-
         View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_file_explorer, parent, false);
         ViewHolderFileStorage holder = new ViewHolderFileStorage(v);
 
         holder.itemLayout = v.findViewById(R.id.file_explorer_item_layout);
         holder.itemLayout.setOnClickListener(this);
-        holder.itemLayout.setOnLongClickListener(this);
         holder.imageView = v.findViewById(R.id.file_explorer_thumbnail);
 
         holder.textViewFileName = v.findViewById(R.id.file_explorer_filename);
         holder.textViewFileName.setOnClickListener(this);
-        holder.textViewFileName.setOnLongClickListener(this);
         holder.textViewFileName.setTag(holder);
         holder.textViewFileSize = v.findViewById(R.id.file_explorer_filesize);
 
@@ -110,33 +96,6 @@ public class FileStorageLollipopAdapter extends RecyclerView.Adapter<FileStorage
         resetImageView(holder.imageView);
 
         switch (mode) {
-            case PICK_FILE:
-                boolean isReadable = document.getFile().canRead();
-                setViewAlpha(holder.imageView, isReadable ? 1 : .4f);
-
-                boolean isReadableAndSelected = isReadable && multipleSelect && isItemChecked(position);
-                if (isReadableAndSelected) {
-                    holder.itemLayout.setBackgroundColor(ContextCompat.getColor(context, R.color.new_multiselect_color));
-                } else {
-                    holder.itemLayout.setBackground(null);
-                }
-
-                if (document.isFolder()) {
-                    holder.imageView.setImageResource(isReadableAndSelected ? R.drawable.ic_select_folder
-                            : R.drawable.ic_folder_list);
-                    break;
-                }
-
-                //File
-                if (isReadableAndSelected) {
-                    holder.imageView.setImageResource(R.drawable.ic_select_folder);
-                } else {
-                    holder.imageView.setImageResource(MimeTypeList.typeForName(document.getName()).getIconResourceId());
-                    ThumbnailUtilsLollipop.createThumbnailExplorerLollipop(context, document, holder, this.megaApi, this, position);
-                }
-
-                break;
-
             case PICK_FOLDER:
                 holder.itemLayout.setEnabled(isEnabled(position));
 
@@ -213,159 +172,6 @@ public class FileStorageLollipopAdapter extends RecyclerView.Adapter<FileStorage
         return document.getFile().canRead();
     }
 
-    public void toggleSelection(int pos) {
-        logDebug("Position: " + pos);
-        if (selectedItems.get(pos, false)) {
-            logDebug("Delete pos: " + pos);
-            selectedItems.delete(pos);
-        } else {
-            logDebug("PUT pos: " + pos);
-            selectedItems.put(pos, true);
-        }
-        notifyItemChanged(pos);
-
-        FileStorageLollipopAdapter.ViewHolderFileStorage view = (FileStorageLollipopAdapter.ViewHolderFileStorage) listFragment.findViewHolderForLayoutPosition(pos);
-        if (view != null) {
-            logDebug("Start animation: " + pos);
-            Animation flipAnimation = AnimationUtils.loadAnimation(context, R.anim.multiselect_flip);
-            flipAnimation.setAnimationListener(new Animation.AnimationListener() {
-                @Override
-                public void onAnimationStart(Animation animation) {
-                }
-
-                @Override
-                public void onAnimationEnd(Animation animation) {
-                    if (selectedItems.size() <= 0) {
-                        ((FileStorageActivityLollipop) context).hideMultipleSelect();
-                    }
-                }
-
-                @Override
-                public void onAnimationRepeat(Animation animation) {
-                }
-            });
-            view.imageView.startAnimation(flipAnimation);
-        }
-    }
-
-    public void toggleAllSelection(int pos) {
-        logDebug("Position: " + pos);
-        final int positionToflip = pos;
-
-        if (selectedItems.get(pos, false)) {
-            logDebug("Delete pos: " + pos);
-            selectedItems.delete(pos);
-        } else {
-            logDebug("PUT pos: " + pos);
-            selectedItems.put(pos, true);
-        }
-
-        FileStorageLollipopAdapter.ViewHolderFileStorage view = (FileStorageLollipopAdapter.ViewHolderFileStorage) listFragment.findViewHolderForLayoutPosition(pos);
-        if (view != null) {
-            logDebug("Start animation: " + pos);
-            Animation flipAnimation = AnimationUtils.loadAnimation(context, R.anim.multiselect_flip);
-            flipAnimation.setAnimationListener(new Animation.AnimationListener() {
-                @Override
-                public void onAnimationStart(Animation animation) {
-
-                }
-
-                @Override
-                public void onAnimationEnd(Animation animation) {
-                    if (selectedItems.size() <= 0) {
-                        ((FileStorageActivityLollipop) context).hideMultipleSelect();
-
-                    }
-                    notifyItemChanged(positionToflip);
-                }
-
-                @Override
-                public void onAnimationRepeat(Animation animation) {
-
-                }
-            });
-            view.imageView.startAnimation(flipAnimation);
-        } else {
-            logWarning("NULL view pos: " + positionToflip);
-            notifyItemChanged(pos);
-        }
-    }
-
-    public void selectAll() {
-        for (int i = 0; i < this.getItemCount(); i++) {
-            if (!isItemChecked(i)) {
-                toggleSelection(i);
-            }
-        }
-    }
-
-    public void clearSelections() {
-        logDebug("clearSelections");
-        for (int i = 0; i < this.getItemCount(); i++) {
-            if (isItemChecked(i)) {
-                toggleAllSelection(i);
-            }
-        }
-    }
-
-    private boolean isItemChecked(int position) {
-        return selectedItems.get(position);
-    }
-
-    public int getSelectedItemCount() {
-        return selectedItems.size();
-    }
-
-    public List<Integer> getSelectedItems() {
-        List<Integer> items = new ArrayList<Integer>(selectedItems.size());
-        for (int i = 0; i < selectedItems.size(); i++) {
-            items.add(selectedItems.keyAt(i));
-        }
-        return items;
-    }
-
-    /*
-     * Get list of all selected nodes
-     */
-    public List<FileDocument> getSelectedDocuments() {
-        ArrayList<FileDocument> nodes = new ArrayList<FileDocument>();
-
-        for (int i = 0; i < selectedItems.size(); i++) {
-            if (selectedItems.valueAt(i)) {
-                FileDocument document = getDocumentAt(selectedItems.keyAt(i));
-                if (document != null) {
-                    nodes.add(document);
-                }
-            }
-        }
-        return nodes;
-    }
-
-    /*
-     * Get list of all selected nodes
-     */
-    public int getSelectedCount() {
-
-        if (selectedItems != null) {
-            return selectedItems.size();
-        }
-
-        return -1;
-    }
-
-    public boolean isMultipleSelect() {
-        return multipleSelect;
-    }
-
-    public void setMultipleSelect(boolean multipleSelect) {
-        if (this.multipleSelect != multipleSelect) {
-            this.multipleSelect = multipleSelect;
-        }
-        if (this.multipleSelect) {
-            selectedItems = new SparseBooleanArray();
-        }
-    }
-
     public FileDocument getItem(int position) {
         return currentFiles.get(position);
     }
@@ -384,20 +190,4 @@ public class FileStorageLollipopAdapter extends RecyclerView.Adapter<FileStorage
             }
         }
     }
-
-    @Override
-    public boolean onLongClick(View view) {
-
-        ViewHolderFileStorage holder = (ViewHolderFileStorage) view.getTag();
-
-        switch (view.getId()) {
-            case R.id.file_explorer_item_layout:
-                ((FileStorageActivityLollipop) context).checkActionMode();
-                ((FileStorageActivityLollipop) context).itemClick(holder.getAdapterPosition());
-                break;
-        }
-
-        return true;
-    }
-
 }

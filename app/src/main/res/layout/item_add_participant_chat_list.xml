@@ -1,37 +1,34 @@
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/add_participant_list_item_layout"
-    android:layout_width="fill_parent"
+    android:layout_width="match_parent"
     android:layout_height="56dp"
     android:descendantFocusability="blocksDescendants">
 
-    <RelativeLayout
-        android:id="@+id/add_participant_list_relative_layout"
+    <ImageView
+        android:id="@+id/add_participant_list_icon"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_centerVertical="true"
-        android:layout_marginStart="24dp">
-
-        <ImageView
-            android:id="@+id/add_participant_list_icon"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:gravity="center_horizontal|center_vertical"
-            android:src="@drawable/ic_g_add_contact"
-            app:tint="?attr/colorSecondary" />
-    </RelativeLayout>
+        android:layout_marginStart="24dp"
+        android:src="@drawable/ic_g_add_contact"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:tint="?attr/colorSecondary" />
 
     <mega.privacy.android.app.components.twemoji.EmojiTextView
-        android:id="@+id/add_participant_list_text"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_centerVertical="true"
         android:layout_marginStart="24dp"
-        android:layout_toEndOf="@id/add_participant_list_relative_layout"
         android:maxLines="1"
         android:text="@string/add_participants_menu_item"
         android:textAllCaps="true"
         android:textAppearance="@style/TextAppearance.Mega.Body2.Medium.Accent"
-        app:emojiSize="12sp" />
+        app:emojiSize="12sp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toEndOf="@id/add_participant_list_icon"
+        app:layout_constraintTop_toTopOf="parent" />
 
-</RelativeLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>

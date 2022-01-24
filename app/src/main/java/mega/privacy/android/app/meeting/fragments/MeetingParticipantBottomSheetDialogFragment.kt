@@ -105,7 +105,7 @@ class MeetingParticipantBottomSheetDialogFragment : BaseBottomSheetDialogFragmen
 
         listenAction(binding.makeModerator) {
             // Make moderator
-            inMeetingViewModel.updateChatPermissions(
+            sharedViewModel.giveModeratorPermissions(
                 participantItem.peerId
             )
         }
@@ -181,7 +181,7 @@ class MeetingParticipantBottomSheetDialogFragment : BaseBottomSheetDialogFragmen
      * @param participant the target participant
      */
     private fun initAvatar(participant: Participant) {
-        binding.avatar.setImageBitmap(inMeetingViewModel.getAvatarBitmapByPeerId(participant.peerId))
+        binding.avatar.setImageBitmap(sharedViewModel.getAvatarBitmapByPeerId(participant.peerId))
     }
 
     companion object {

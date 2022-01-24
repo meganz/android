@@ -2,8 +2,8 @@ package mega.privacy.android.app.fragments.settingsFragments.cookie.usecase
 
 import io.reactivex.rxjava3.core.Single
 import mega.privacy.android.app.di.MegaApi
+import mega.privacy.android.app.listeners.OptionalMegaRequestListenerInterface
 import mega.privacy.android.app.utils.ErrorUtils.toThrowable
-import mega.privacy.android.app.utils.LogUtil.logError
 import nz.mega.sdk.*
 import javax.inject.Inject
 
@@ -19,35 +19,17 @@ class CheckCookieBannerEnabledUseCase @Inject constructor(
      */
     fun check(): Single<Boolean> =
         Single.create { emitter ->
-            megaApi.getMiscFlags(object : MegaRequestListenerInterface {
-                override fun onRequestStart(api: MegaApiJava, request: MegaRequest) {}
-
-                override fun onRequestUpdate(api: MegaApiJava, request: MegaRequest) {}
-
-                override fun onRequestFinish(
-                    api: MegaApiJava,
-                    request: MegaRequest,
-                    error: MegaError
-                ) {
-                    if (emitter.isDisposed) return
+            megaApi.getMiscFlags(OptionalMegaRequestListenerInterface(
+                onRequestFinish = { _, error ->
+                    if (emitter.isDisposed) return@OptionalMegaRequestListenerInterface
 
                     when (error.errorCode) {
-                        MegaError.API_OK, MegaError.API_EACCESS -> {
-                            emitter.onSuccess(api.isCookieBannerEnabled)
-                        }
-                        else -> {
+                        MegaError.API_OK, MegaError.API_EACCESS ->
+                            emitter.onSuccess(megaApi.isCookieBannerEnabled)
+                        else ->
                             emitter.onError(error.toThrowable())
-                        }
                     }
                 }
-
-                override fun onRequestTemporaryError(
-                    api: MegaApiJava,
-                    request: MegaRequest,
-                    error: MegaError
-                ) {
-                    logError(error.toThrowable().stackTraceToString())
-                }
-            })
+            ))
         }
 }

@@ -2,6 +2,7 @@ package mega.privacy.android.app.mediaplayer.trackinfo
 
 import android.net.Uri
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -11,10 +12,12 @@ import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.navArgs
 import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.MegaApplication
+import mega.privacy.android.app.R
 import mega.privacy.android.app.mediaplayer.MediaPlayerActivity
 import mega.privacy.android.app.databinding.FragmentAudioTrackInfoBinding
 import mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuotaPaywallWarning
 import mega.privacy.android.app.utils.MegaNodeUtil.handleLocationClick
+import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.autoCleared
 import nz.mega.sdk.MegaApiJava.STORAGE_STATE_PAYWALL
 
@@ -78,6 +81,11 @@ class TrackInfoFragment : Fragment() {
                 handleLocationClick(requireActivity(), args.adapterType, location)
             }
         }
+        viewModel.offlineRemoveSnackBarShow.observe(viewLifecycleOwner) {
+            if (it) {
+                Util.showSnackbar(activity, getString(R.string.file_removed_offline))
+            }
+        }
 
         binding.availableOfflineSwitch.setOnClickListener {
             val isChecked = binding.availableOfflineSwitch.isChecked
@@ -88,7 +96,7 @@ class TrackInfoFragment : Fragment() {
                 return@setOnClickListener
             }
 
-            viewModel.makeAvailableOffline(isChecked)
+            viewModel.makeAvailableOffline(isChecked, requireActivity())
         }
 
         viewModel.loadTrackInfo(args)

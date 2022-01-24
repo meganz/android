@@ -1,27 +1,30 @@
 package mega.privacy.android.app.fragments.settingsFragments.cookie
 
-import androidx.hilt.lifecycle.ViewModelInject
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import dagger.hilt.android.lifecycle.HiltViewModel
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.kotlin.addTo
 import io.reactivex.rxjava3.kotlin.subscribeBy
 import io.reactivex.rxjava3.schedulers.Schedulers
+import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.arch.BaseRxViewModel
 import mega.privacy.android.app.fragments.settingsFragments.cookie.data.CookieType
 import mega.privacy.android.app.fragments.settingsFragments.cookie.usecase.GetCookieSettingsUseCase
 import mega.privacy.android.app.fragments.settingsFragments.cookie.usecase.UpdateCookieSettingsUseCase
 import mega.privacy.android.app.utils.LogUtil.logError
 import mega.privacy.android.app.utils.notifyObserver
+import javax.inject.Inject
 
-class CookieSettingsViewModel @ViewModelInject constructor(
+@HiltViewModel
+class CookieSettingsViewModel @Inject constructor(
     private val getCookieSettingsUseCase: GetCookieSettingsUseCase,
     private val updateCookieSettingsUseCase: UpdateCookieSettingsUseCase
 ) : BaseRxViewModel() {
 
     private val enabledCookies = MutableLiveData(mutableSetOf(CookieType.ESSENTIAL))
     private val updateResult = MutableLiveData<Boolean>()
-    private var cookiesSaved = true
+    private var savedCookiesSize = 1
 
     fun onEnabledCookies(): LiveData<MutableSet<CookieType>> = enabledCookies
     fun onUpdateResult(): LiveData<Boolean> = updateResult
@@ -43,7 +46,6 @@ class CookieSettingsViewModel @ViewModelInject constructor(
             enabledCookies.value?.remove(cookie)
         }
 
-        cookiesSaved = false
         enabledCookies.notifyObserver()
     }
 
@@ -59,14 +61,13 @@ class CookieSettingsViewModel @ViewModelInject constructor(
         } else {
             resetCookies()
         }
-
-        cookiesSaved = false
     }
 
     /**
      * Check if current cookie settings are saved
      */
-    fun areCookiesSaved(): Boolean = cookiesSaved
+    fun areCookiesSaved(): Boolean =
+        savedCookiesSize == enabledCookies.value?.size
 
     /**
      * Save cookie settings to SDK
@@ -78,7 +79,8 @@ class CookieSettingsViewModel @ViewModelInject constructor(
             .subscribeBy(
                 onComplete = {
                     updateResult.value = true
-                    cookiesSaved = true
+
+                    MegaApplication.getInstance().checkEnabledCookies()
                 },
                 onError = { error ->
                     logError(error.stackTraceToString())
@@ -99,6 +101,7 @@ class CookieSettingsViewModel @ViewModelInject constructor(
                 onSuccess = { settings ->
                     if (!settings.isNullOrEmpty()) {
                         enabledCookies.value = settings.toMutableSet()
+                        savedCookiesSize = settings.size
                     }
 
                     updateResult.value = true

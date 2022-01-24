@@ -19,6 +19,7 @@ import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import mega.privacy.android.app.R
+import mega.privacy.android.app.activities.contract.ViewGifActivityContract
 import mega.privacy.android.app.adapters.GiphyAdapter
 import mega.privacy.android.app.databinding.ActivityGiphyBinding
 import mega.privacy.android.app.interfaces.GiphyEndPointsInterface
@@ -31,7 +32,6 @@ import mega.privacy.android.app.objects.GifData
 import mega.privacy.android.app.objects.GiphyResponse
 import mega.privacy.android.app.services.GiphyService
 import mega.privacy.android.app.utils.ColorUtils
-import mega.privacy.android.app.utils.Constants.REQUEST_CODE_PICK_GIF
 import mega.privacy.android.app.utils.LogUtil.logError
 import mega.privacy.android.app.utils.LogUtil.logWarning
 import mega.privacy.android.app.utils.StringResourcesUtils
@@ -40,6 +40,8 @@ import mega.privacy.android.app.utils.Util.*
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
+import java.util.*
+import kotlin.collections.ArrayList
 
 class GiphyPickerActivity : PasscodeActivity(), GiphyInterface {
 
@@ -79,6 +81,13 @@ class GiphyPickerActivity : PasscodeActivity(), GiphyInterface {
 
     private lateinit var emptyText: Spanned
 
+    private val pickGifLauncher = registerForActivityResult(ViewGifActivityContract()) { gifData ->
+        if (gifData != null) {
+            setResult(RESULT_OK, Intent().putExtra(GIF_DATA, gifData))
+            finish()
+        }
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -88,9 +97,13 @@ class GiphyPickerActivity : PasscodeActivity(), GiphyInterface {
         setContentView(binding.root)
 
         setSupportActionBar(binding.giphyToolbar)
-        val actionBar = supportActionBar
-        actionBar?.setDisplayHomeAsUpEnabled(true)
-        binding.giphyToolbar.title = getString(R.string.search_giphy_title)
+
+        supportActionBar?.apply {
+            setDisplayHomeAsUpEnabled(true)
+            title = StringResourcesUtils.getString(R.string.search_giphy_title)
+                .uppercase(Locale.getDefault())
+        }
+
         binding.giphyToolbar.setOnClickListener { searchMenuItem?.expandActionView() }
 
         screenOrientation = resources.configuration.orientation
@@ -163,7 +176,7 @@ class GiphyPickerActivity : PasscodeActivity(), GiphyInterface {
     }
 
     override fun onBackPressed() {
-        if (psaWebBrowser.consumeBack()) return
+        if (psaWebBrowser != null && psaWebBrowser.consumeBack()) return
         setResult(RESULT_CANCELED)
         super.onBackPressed()
     }
@@ -434,22 +447,8 @@ class GiphyPickerActivity : PasscodeActivity(), GiphyInterface {
         return super.onCreateOptionsMenu(menu)
     }
 
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-
-        if (resultCode == RESULT_OK && requestCode == REQUEST_CODE_PICK_GIF) {
-            val gifData = data?.getParcelableExtra(GIF_DATA) as GifData?
-            setResult(RESULT_OK, Intent().putExtra(GIF_DATA, gifData))
-            finish()
-        }
-    }
-
     override fun openGifViewer(gifData: GifData?) {
-        startActivityForResult(
-            Intent(this@GiphyPickerActivity, GiphyViewerActivity::class.java)
-                .putExtra(GIF_DATA, gifData),
-            REQUEST_CODE_PICK_GIF
-        )
+        gifData?.let { pickGifLauncher.launch(it) }
     }
 
     override fun setEmptyState(emptyState: Int) {

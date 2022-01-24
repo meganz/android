@@ -1,9 +1,9 @@
 //copyright: https://stackoverflow.com/questions/34927748/android-5-0-documentfile-from-tree-uri/36162691#36162691
 package mega.privacy.android.app.utils;
 
-import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
 import android.app.ActivityManager;
+import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
@@ -11,6 +11,7 @@ import android.media.MediaScannerConnection;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Environment;
+import android.os.ParcelFileDescriptor;
 import android.os.storage.StorageManager;
 import android.provider.DocumentsContract;
 import android.provider.MediaStore;
@@ -58,6 +59,7 @@ import static mega.privacy.android.app.utils.TextUtil.getFolderInfo;
 import static mega.privacy.android.app.utils.OfflineUtils.getOfflineFile;
 import static mega.privacy.android.app.utils.TimeUtils.formatLongDateTime;
 import static mega.privacy.android.app.utils.Util.getSizeString;
+import static mega.privacy.android.app.utils.Util.isAndroid11OrUpper;
 import static nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE;
 
 public class FileUtil {
@@ -66,9 +68,9 @@ public class FileUtil {
 
     public static final String CAMERA_FOLDER = "Camera";
 
-    public static final String DOWNLOAD_DIR = MAIN_DIR + File.separator + "MEGA Downloads";
+    public static final String DOWNLOAD_DIR = "MEGA Downloads";
 
-    public static final String LOG_DIR = MAIN_DIR + File.separator + "MEGA Logs";
+    public static final String LOG_DIR = "MEGA Logs";
 
     public static final String OLD_MK_FILE = MAIN_DIR + File.separator + "MEGAMasterKey.txt";
 
@@ -390,6 +392,85 @@ public class FileUtil {
         return null;
     }
 
+    /**
+     * Checks if the tapped MegaNode exists in local.
+     * Note: for node tapped event, only query system database by size.
+     *
+     * @param node MegaNode to check.
+     * @return The path of the file if the local file exists, null otherwise.
+     */
+    public static String getTappedNodeLocalFile(MegaNode node) {
+        if (node == null) {
+            logWarning("Node is null");
+            return null;
+        }
+
+        String data = MediaStore.Files.FileColumns.DATA;
+        final String[] projection = {data};
+        // Only query file by size, then compare file name. Since modification time will changed(copy to SD card)
+        // Display name may be null in the database.
+        final String selection = MediaStore.Files.FileColumns.SIZE + " = ?";
+        final String[] selectionArgs = {String.valueOf(node.getSize())};
+
+        Context context = MegaApplication.getInstance();
+
+        try {
+            Cursor cursor = context.getContentResolver().query( MediaStore.Files.getContentUri(VOLUME_EXTERNAL), projection, selection, selectionArgs, null);
+
+            List<String> candidates = getPotentialLocalPath(context, cursor, data, node.getName());
+
+            for (String path : candidates) {
+                if (isFileAvailable(new File(path))) {
+                    return path;
+                }
+            }
+        } catch (SecurityException e) {
+            // Workaround: devices with system below Android 10 cannot execute the query without storage permission.
+            logError("Haven't granted the permission.", e);
+            return null;
+        }
+
+        return null;
+    }
+
+    /**
+     * Searches in the correspondent storage established if the file exists.
+     * If a file path is found both on internal storage and SD card,
+     * put the path on internal storage before that on SD card.
+     *
+     * @param context Context object.
+     * @param cursor Cursor which contains all the requirements to find the file
+     * @param columnName   Column name in which search
+     * @param fileName Name of the searching node.
+     * @return A list of file path that may be the path of the searching file.
+     */
+    private static List<String> getPotentialLocalPath(Context context, Cursor cursor, String columnName, String fileName) {
+        List<String> candidates = new ArrayList<>();
+        List<String> sdCandidates = new ArrayList<>();
+
+        while (cursor != null && cursor.moveToNext()) {
+            int dataColumn = cursor.getColumnIndexOrThrow(columnName);
+            String path = cursor.getString(dataColumn);
+
+            // Check file name.
+            if (path.endsWith(fileName)) {
+                if(SDCardUtils.isLocalFolderOnSDCard(context, path)) {
+                    sdCandidates.add(path);
+                } else {
+                    candidates.add(path);
+                }
+            }
+        }
+
+        candidates.addAll(sdCandidates);
+
+        if(cursor != null) {
+            cursor.close();
+        }
+
+        return candidates;
+    }
+
     /*
      * Check is file belongs to the app
      */
@@ -476,6 +557,10 @@ public class FileUtil {
     }
 
     public static String getDownloadLocation() {
+        if (isAndroid11OrUpper()) {
+            return buildDefaultDownloadDir(MegaApplication.getInstance()).getAbsolutePath();
+        }
+
         DatabaseHandler dbH = DatabaseHandler.getDbHandler(MegaApplication.getInstance());
         MegaPreferences prefs = dbH.getPreferences();
 
@@ -486,7 +571,8 @@ public class FileUtil {
                 && prefs.getStorageDownloadLocation().compareTo("") != 0) {
             return prefs.getStorageDownloadLocation();
         }
-        return DOWNLOAD_DIR;
+
+        return buildDefaultDownloadDir(MegaApplication.getInstance()).getAbsolutePath();
     }
 
     public static boolean isFileAvailable(File file) {
@@ -508,17 +594,14 @@ public class FileUtil {
         return downloadedFile.lastModified() - node.getModificationTime() * 1000 >= 0;
     }
 
-    public static String getExternalStoragePath(String filePath) {
-        return Environment.getExternalStorageDirectory().getAbsolutePath() + filePath;
-    }
-
     public static File buildExternalStorageFile(String filePath) {
-        return new File(getExternalStoragePath(filePath));
+        return new File(Environment.getExternalStorageDirectory().getAbsolutePath() + filePath);
     }
 
     public static File buildDefaultDownloadDir(Context context) {
-        if (Environment.getExternalStorageDirectory() != null) {
-            return buildExternalStorageFile(DOWNLOAD_DIR);
+        File downloadsDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
+        if (downloadsDir != null) {
+            return new File(downloadsDir, DOWNLOAD_DIR);
         } else {
             return context.getFilesDir();
         }
@@ -646,7 +729,8 @@ public class FileUtil {
         Intent shareIntent = new Intent(android.content.Intent.ACTION_SEND);
         shareIntent.setType(MimeTypeList.typeForName(file.getName()).getType() + "/*");
         shareIntent.putExtra(Intent.EXTRA_STREAM, getUriForFile(context, file));
-        shareIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+        // To avoid java.lang.SecurityException: Permission Denial
+        shareIntent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION | Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
         context.startActivity(Intent.createChooser(shareIntent, getString(R.string.context_share)));
     }
 
@@ -661,7 +745,8 @@ public class FileUtil {
         Intent shareIntent = new Intent(android.content.Intent.ACTION_SEND);
         shareIntent.setType(MimeTypeList.typeForName(name).getType() + "/*");
         shareIntent.putExtra(Intent.EXTRA_STREAM, uri);
-        shareIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+        // To avoid java.lang.SecurityException: Permission Denial
+        shareIntent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION | Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
         context.startActivity(Intent.createChooser(shareIntent, context.getString(R.string.context_share)));
     }
 
@@ -1028,6 +1113,29 @@ public class FileUtil {
             out.close();
         } catch (IOException e) {
             logError("IOException saving content.", e);
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * Saves some text in a file received as content Uri.
+     *
+     * @param contentResolver Needed content resolver to open the file descriptor.
+     * @param contentUri      Content Uri in which the content has to be saved.
+     * @param content         Content text to save in the content uri.
+     * @return True if everything goes well in the save process, false otherwise.
+     */
+    public static boolean saveTextOnContentUri(ContentResolver contentResolver, Uri contentUri, String content) {
+        try {
+            ParcelFileDescriptor file =  contentResolver.openFileDescriptor(contentUri, "w");
+            FileOutputStream fileOutputStream = new FileOutputStream(file.getFileDescriptor());
+            fileOutputStream.write(content.getBytes());
+            fileOutputStream.close();
+            file.close();
+        } catch (IOException e) {
+            logError("IOException creating RK file", e);
             return false;
         }
 

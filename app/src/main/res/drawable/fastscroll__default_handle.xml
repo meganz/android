@@ -7,8 +7,8 @@
     </item>
     <item
         android:drawable="@drawable/ic_scroll_white"
-        android:bottom="12dp"
+        android:bottom="10dp"
         android:left="10dp"
-        android:right="20dp"
-        android:top="12dp"/>
+        android:right="10dp"
+        android:top="10dp"/>
 </layer-list>

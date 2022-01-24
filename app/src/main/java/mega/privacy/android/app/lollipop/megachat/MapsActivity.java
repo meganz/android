@@ -442,11 +442,8 @@ public class MapsActivity extends PasscodeActivity implements ActivityCompat.OnR
 
         final double latitude = location.getLatLng().getLatitude();
         final double longitude = location.getLatLng().getLongitude();
-        final int mapWidth = screenOrientation == Configuration.ORIENTATION_PORTRAIT
-                ? outMetrics.widthPixels
-                : outMetrics.heightPixels;
 
-        mapHandler.createSnapshot(latitude, longitude, mapWidth);
+        mapHandler.createSnapshot(latitude, longitude, outMetrics.widthPixels);
     }
 
     public void dismissProgressBar() {
@@ -490,7 +487,7 @@ public class MapsActivity extends PasscodeActivity implements ActivityCompat.OnR
 
     @Override
     public void onBackPressed() {
-        if (psaWebBrowser.consumeBack()) return;
+        if (psaWebBrowser != null && psaWebBrowser.consumeBack()) return;
         super.onBackPressed();
         this.finish();
     }

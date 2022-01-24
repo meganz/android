@@ -11,6 +11,7 @@ import android.net.wifi.WifiManager;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.PowerManager;
+
 import androidx.annotation.Nullable;
 import androidx.core.app.NotificationCompat;
 
@@ -23,17 +24,15 @@ import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaChatApi;
 import nz.mega.sdk.MegaChatApiAndroid;
-import nz.mega.sdk.MegaChatApiJava;
-import nz.mega.sdk.MegaChatError;
-import nz.mega.sdk.MegaChatRequest;
-import nz.mega.sdk.MegaChatRequestListenerInterface;
 import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
 
-import static mega.privacy.android.app.utils.LogUtil.*;
+import static mega.privacy.android.app.utils.LogUtil.logDebug;
+import static mega.privacy.android.app.utils.LogUtil.logError;
+import static mega.privacy.android.app.utils.LogUtil.logWarning;
 
-public class IncomingCallService extends Service implements MegaRequestListenerInterface, MegaChatRequestListenerInterface {
+public class IncomingCallService extends Service implements MegaRequestListenerInterface {
 
     public static final String NOTIFICATION_CHANNEL_ID = "10099";
     public static final int notificationId = 1086;
@@ -198,7 +197,7 @@ public class IncomingCallService extends Service implements MegaRequestListenerI
 
                 } else if (ret == MegaChatApi.INIT_ERROR) {
                     logDebug("condition ret == MegaChatApi.INIT_ERROR");
-                    megaChatApi.logout(this);
+                    megaChatApi.logout();
                 } else {
                     logDebug("Chat correctly initialized");
                 }
@@ -230,45 +229,14 @@ public class IncomingCallService extends Service implements MegaRequestListenerI
                 megaApiFolder.setAccountAuth(megaApi.getAccountAuth());
                 logDebug("Calling fetchNodes from MegaFireBaseMessagingService");
                 megaApi.fetchNodes(this);
+
+                // Get cookies settings after login.
+                MegaApplication.getInstance().checkEnabledCookies();
             } else {
                 logError("ERROR: " + e.getErrorString());
             }
         } else if (request.getType() == MegaRequest.TYPE_FETCH_NODES) {
-            if (e.getErrorCode() == MegaError.API_OK) {
-                logDebug("OK fetch nodes");
-                logDebug("Chat --> connectInBackground");
-                megaChatApi.connectInBackground(this);
-            } else {
-                logError("ERROR: " + e.getErrorString());
-            }
-        }
-    }
-
-    @Override
-    public void onRequestTemporaryError(MegaApiJava api, MegaRequest request, MegaError e) {
-        logWarning("onRequestTemporary: " + request.getRequestString());
-    }
-
-    @Override
-    public void onRequestStart(MegaChatApiJava api, MegaChatRequest request) {
-
-    }
-
-    @Override
-    public void onRequestUpdate(MegaChatApiJava api, MegaChatRequest request) {
-
-    }
-
-    @Override
-    public void onRequestFinish(MegaChatApiJava api, MegaChatRequest request, MegaChatError e) {
-        logDebug("onRequestFinish: " + request.getRequestString() + " result: " + e.getErrorString());
-
-        if (request.getType() == MegaChatRequest.TYPE_CONNECT) {
-//            MegaApplication.isFireBaseConnection=false;
-            logDebug("TYPE CONNECT");
-            //megaChatApi.setBackgroundStatus(true, this);
-            if (e.getErrorCode() == MegaChatError.ERROR_OK) {
-                logDebug("Connected to chat!");
+            if(e.getErrorCode() == MegaError.API_OK) {
                 if (showMessageNotificationAfterPush) {
                     showMessageNotificationAfterPush = false;
                     megaChatApi.pushReceived(beep);
@@ -277,15 +245,13 @@ public class IncomingCallService extends Service implements MegaRequestListenerI
                     logDebug("Login do not started by CHAT message");
                 }
             } else {
-                logError("ERROR WHEN CONNECTING" + e.getErrorString());
+                logDebug(request.getRequestString() + " failed. Error code: " + e.getErrorCode() + ", error string: " + e.getErrorString());
             }
-        } else if (request.getType() == MegaChatRequest.TYPE_SET_BACKGROUND_STATUS) {
-            logDebug("TYPE SETBACKGROUNDSTATUS");
         }
     }
 
     @Override
-    public void onRequestTemporaryError(MegaChatApiJava api, MegaChatRequest request, MegaChatError e) {
-
+    public void onRequestTemporaryError(MegaApiJava api, MegaRequest request, MegaError e) {
+        logWarning("onRequestTemporary: " + request.getRequestString());
     }
 }

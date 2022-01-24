@@ -23,12 +23,8 @@ import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.core.Completable
 import io.reactivex.rxjava3.kotlin.subscribeBy
 import io.reactivex.rxjava3.schedulers.Schedulers
-import mega.privacy.android.app.DatabaseHandler
-import mega.privacy.android.app.MegaApplication
-import mega.privacy.android.app.MimeTypeList
-import mega.privacy.android.app.R
+import mega.privacy.android.app.*
 import mega.privacy.android.app.activities.WebViewActivity
-import mega.privacy.android.app.textEditor.TextEditorActivity
 import mega.privacy.android.app.components.saver.AutoPlayInfo
 import mega.privacy.android.app.constants.BroadcastConstants
 import mega.privacy.android.app.interfaces.ActivityLauncher
@@ -42,8 +38,8 @@ import mega.privacy.android.app.lollipop.FileExplorerActivityLollipop
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop.DrawerItem
 import mega.privacy.android.app.lollipop.PdfViewerActivityLollipop
-import mega.privacy.android.app.lollipop.ZipBrowserActivityLollipop
 import mega.privacy.android.app.lollipop.listeners.MultipleRequestListener
+import mega.privacy.android.app.textEditor.TextEditorActivity
 import mega.privacy.android.app.textEditor.TextEditorViewModel.Companion.EDIT_MODE
 import mega.privacy.android.app.textEditor.TextEditorViewModel.Companion.MODE
 import mega.privacy.android.app.textEditor.TextEditorViewModel.Companion.VIEW_MODE
@@ -58,6 +54,7 @@ import mega.privacy.android.app.utils.StringResourcesUtils.getString
 import mega.privacy.android.app.utils.TextUtil.isTextEmpty
 import mega.privacy.android.app.utils.TimeUtils.formatLongDateTime
 import mega.privacy.android.app.utils.Util.*
+import mega.privacy.android.app.zippreview.ui.ZipBrowserActivity
 import nz.mega.sdk.*
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 import java.io.*
@@ -1406,18 +1403,9 @@ object MegaNodeUtil {
     ) {
         val mime = MimeTypeList.typeForName(autoPlayInfo.nodeName)
         when {
-            mime.isZip -> {
-                val zipFile = File(autoPlayInfo.localPath)
-
-                val intentZip = Intent(context, ZipBrowserActivityLollipop::class.java)
-                intentZip.putExtra(
-                    ZipBrowserActivityLollipop.EXTRA_PATH_ZIP, zipFile.absolutePath
-                )
-                intentZip.putExtra(
-                    ZipBrowserActivityLollipop.EXTRA_HANDLE_ZIP, autoPlayInfo.nodeHandle
-                )
-
-                activityLauncher.launchActivity(intentZip)
+            // // ZIP file on SD card can't not be created by `new java.util.zip.ZipFile(path)`.
+            mime.isZip && !SDCardUtils.isLocalFolderOnSDCard(context, autoPlayInfo.localPath) -> {
+                openZip(context, activityLauncher, autoPlayInfo.localPath, autoPlayInfo.nodeHandle)
             }
             mime.isPdf -> {
                 val pdfIntent = Intent(context, PdfViewerActivityLollipop::class.java)
@@ -1478,32 +1466,97 @@ object MegaNodeUtil {
                     if (isIntentAvailable(context, mediaIntent)) {
                         activityLauncher.launchActivity(mediaIntent)
                     } else {
-                        sendFile(context, autoPlayInfo, activityLauncher, snackbarShower)
+                        sendFile(
+                            context,
+                            autoPlayInfo.nodeName,
+                            autoPlayInfo.localPath,
+                            activityLauncher,
+                            snackbarShower
+                        )
                     }
                 }
             }
             else -> {
-                try {
-                    val viewIntent = Intent(Intent.ACTION_VIEW)
-
-                    if (!setLocalIntentParams(
-                            context, autoPlayInfo.nodeName, viewIntent,
-                            autoPlayInfo.localPath, false, snackbarShower
-                        )
-                    ) {
-                        return
-                    }
-
-                    viewIntent.flags = Intent.FLAG_GRANT_READ_URI_PERMISSION
-                    if (isIntentAvailable(context, viewIntent)) {
-                        activityLauncher.launchActivity(viewIntent)
-                    } else {
-                        sendFile(context, autoPlayInfo, activityLauncher, snackbarShower)
-                    }
-                } catch (e: Exception) {
-                    snackbarShower.showSnackbar(getString(R.string.general_already_downloaded))
-                }
+                launchActionView(
+                    context,
+                    autoPlayInfo.nodeName,
+                    autoPlayInfo.localPath,
+                    activityLauncher,
+                    snackbarShower
+                )
             }
+        }
+    }
+
+    /**
+     * Launch ZipBrowserActivityLollipop to preview a zip file.
+     *
+     * @param context Android context.
+     * @param activityLauncher interface to launch activity.
+     * @param zipFilePath The local path of the zip file.
+     * @param nodeHandle The handle of the corresponding node.
+     */
+    @JvmStatic
+    fun openZip(
+        context: Context,
+        activityLauncher: ActivityLauncher,
+        zipFilePath: String,
+        nodeHandle: Long
+    ) {
+        val intentZip = Intent(context, ZipBrowserActivity::class.java)
+        intentZip.putExtra(
+            ZipBrowserActivity.EXTRA_PATH_ZIP, zipFilePath
+        )
+        intentZip.putExtra(
+            ZipBrowserActivity.EXTRA_HANDLE_ZIP, nodeHandle
+        )
+
+        activityLauncher.launchActivity(intentZip)
+    }
+
+    /**
+     * For the node that cannot be opened in-app.
+     * Launch an intent with ACTION_VIEW and let user choose to use which app to open it.
+     *
+     * @param context Android context
+     * @param nodeName Name of the node.
+     * @param localPath Local path of the node.
+     * @param activityLauncher interface to launch activity
+     * @param snackbarShower interface to show snackbar
+     */
+    @JvmStatic
+    fun launchActionView(
+        context: Context,
+        nodeName: String,
+        localPath: String,
+        activityLauncher: ActivityLauncher,
+        snackbarShower: SnackbarShower
+    ) {
+        try {
+            val viewIntent = Intent(Intent.ACTION_VIEW)
+
+            if (!setLocalIntentParams(
+                    context, nodeName, viewIntent,
+                    localPath, false, snackbarShower
+                )
+            ) {
+                return
+            }
+
+            viewIntent.flags = Intent.FLAG_GRANT_READ_URI_PERMISSION
+            if (isIntentAvailable(context, viewIntent)) {
+                activityLauncher.launchActivity(viewIntent)
+            } else {
+                sendFile(
+                    context,
+                    nodeName,
+                    localPath,
+                    activityLauncher,
+                    snackbarShower
+                )
+            }
+        } catch (e: Exception) {
+            snackbarShower.showSnackbar(getString(R.string.general_already_downloaded))
         }
     }
 
@@ -1511,21 +1564,23 @@ object MegaNodeUtil {
      * Create an Intent with ACTION_SEND for an auto play file.
      *
      * @param context Android context
-     * @param autoPlayInfo auto play file info
+     * @param nodeName Name of the node.
+     * @param localPath Local path of the node.
      * @param activityLauncher interface to launch activity
      * @param snackbarShower interface to show snackbar
      */
     private fun sendFile(
         context: Context,
-        autoPlayInfo: AutoPlayInfo,
+        nodeName: String,
+        localPath: String,
         activityLauncher: ActivityLauncher,
         snackbarShower: SnackbarShower
     ) {
         val intentShare = Intent(Intent.ACTION_SEND)
 
         if (!setLocalIntentParams(
-                context, autoPlayInfo.nodeName, intentShare,
-                autoPlayInfo.localPath, false, snackbarShower
+                context, nodeName, intentShare,
+                localPath, false, snackbarShower
             )
         ) {
             return
@@ -1700,5 +1755,67 @@ object MegaNodeUtil {
                     LogUtil.logError(error.message)
                 }
             )
+    }
+
+    /**
+     * Handle the event when a node is tapped.
+     *
+     * @param context Android context
+     * @param node The node tapped.
+     * @param nodeDownloader Function/Methd for downloading node.
+     * @param activityLauncher interface to launch activity
+     * @param snackbarShower interface to show snackbar
+     */
+    @JvmStatic
+    fun onNodeTapped(
+        context: Context,
+        node: MegaNode,
+        nodeDownloader : (node: MegaNode) -> Unit,
+        activityLauncher: ActivityLauncher,
+        snackbarShower: SnackbarShower
+    ) {
+        val possibleLocalFile = getTappedNodeLocalFile(node)
+
+        if (possibleLocalFile != null) {
+            logDebug("The node is already downloaded, found in local.")
+
+            // ZIP file on SD card can't not be created by `new java.util.zip.ZipFile(path)`.
+            if (MimeTypeList.typeForName(node.name).isZip && !SDCardUtils.isLocalFolderOnSDCard(
+                    context,
+                    possibleLocalFile
+                )
+            ) {
+                logDebug("The file is zip, open in-app.")
+                openZip(
+                    context,
+                    activityLauncher, possibleLocalFile, node.handle
+                )
+            } else {
+                logDebug("The file cannot be opened in-app.")
+                launchActionView(
+                    context,
+                    node.name,
+                    possibleLocalFile,
+                    activityLauncher,
+                    snackbarShower
+                )
+            }
+        } else {
+            nodeDownloader(node)
+        }
+    }
+
+    @JvmStatic
+    fun containsMediaFile(handle: Long): Boolean {
+        val megaApi = MegaApplication.getInstance().megaApi
+        val parent = megaApi.getNodeByHandle(handle)
+        val children: List<MegaNode?>? = megaApi.getChildren(parent)
+
+        children?.forEach {
+            val mime = MimeTypeList.typeForName(it?.name)
+            if (mime.isImage || mime.isVideoReproducible) return true
+        }
+
+        return false
     }
 }

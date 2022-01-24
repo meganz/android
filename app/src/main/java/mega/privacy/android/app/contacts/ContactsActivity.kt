@@ -16,7 +16,9 @@ import mega.privacy.android.app.contacts.requests.ContactRequestsFragment
 import mega.privacy.android.app.databinding.ActivityContactsBinding
 import mega.privacy.android.app.interfaces.SnackbarShower
 import mega.privacy.android.app.utils.ExtraUtils.extraNotNull
+import mega.privacy.android.app.utils.StringResourcesUtils
 import mega.privacy.android.app.utils.Util
+import java.util.*
 
 /**
  * Activity that represents the entire UI around contacts for the current user.
@@ -99,18 +101,30 @@ class ContactsActivity : PasscodeActivity(), SnackbarShower {
     private fun setupNavigation() {
         val navController = getNavController()
 
-        navController.setGraph(
-            navController.navInflater.inflate(R.navigation.nav_contacts).apply {
-                startDestination = when {
-                    showGroups -> R.id.contact_groups
-                    showSentRequests || showReceivedRequests -> R.id.contact_requests
-                    else -> R.id.contact_list
-                }
-            },
-            intent.extras
-        )
-
         NavigationUI.setupActionBarWithNavController(this, navController, appBarConfiguration)
+
+        navController.apply {
+            navController.setGraph(
+                navController.navInflater.inflate(R.navigation.nav_contacts).apply {
+                    startDestination = when {
+                        showGroups -> R.id.contact_groups
+                        showSentRequests || showReceivedRequests -> R.id.contact_requests
+                        else -> R.id.contact_list
+                    }
+                },
+                intent.extras
+            )
+
+            addOnDestinationChangedListener { _, _, _ ->
+                supportActionBar?.title = StringResourcesUtils.getString(
+                    when (this.currentDestination?.id) {
+                        R.id.contact_requests -> R.string.section_requests
+                        R.id.contact_groups -> R.string.section_groups
+                        else -> R.string.section_contacts
+                    }
+                ).uppercase(Locale.getDefault())
+            }
+        }
     }
 
     override fun showSnackbar(type: Int, content: String?, chatId: Long) {

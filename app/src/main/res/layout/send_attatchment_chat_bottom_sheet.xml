@@ -92,7 +92,7 @@
                     android:paddingBottom="2dp"
                     android:paddingTop="2dp"
                     android:layout_marginStart="32dp"
-                    android:text="@string/attachment_upload_panel_from_device"
+                    android:text="@string/attachment_upload_panel_photo"
                     android:textAppearance="?attr/textAppearanceSubtitle1" />
             </LinearLayout>
 

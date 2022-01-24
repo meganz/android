@@ -1,21 +1,23 @@
 package mega.privacy.android.app.mediaplayer.trackinfo
 
-import android.app.Activity
 import android.content.Context
-import androidx.hilt.lifecycle.ViewModelInject
+import android.util.Log
+import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.google.android.exoplayer2.*
 import com.google.android.exoplayer2.trackselection.DefaultTrackSelector
-import dagger.hilt.android.qualifiers.ActivityContext
+import dagger.hilt.android.lifecycle.HiltViewModel
+import dagger.hilt.android.qualifiers.ApplicationContext
+import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.core.Completable
 import io.reactivex.rxjava3.schedulers.Schedulers
 import mega.privacy.android.app.DatabaseHandler
 import mega.privacy.android.app.arch.BaseRxViewModel
-import mega.privacy.android.app.mediaplayer.service.Metadata
-import mega.privacy.android.app.mediaplayer.service.MetadataExtractor
 import mega.privacy.android.app.di.MegaApi
 import mega.privacy.android.app.listeners.MegaRequestFinishListener
+import mega.privacy.android.app.mediaplayer.service.Metadata
+import mega.privacy.android.app.mediaplayer.service.MetadataExtractor
 import mega.privacy.android.app.utils.Constants.OFFLINE_ADAPTER
 import mega.privacy.android.app.utils.FileUtil
 import mega.privacy.android.app.utils.FileUtil.JPG_EXTENSION
@@ -33,16 +35,16 @@ import nz.mega.sdk.MegaApiAndroid
 import java.io.File
 import java.util.concurrent.Callable
 import java.util.concurrent.TimeUnit
+import javax.inject.Inject
 
 /**
  * ViewModel for track (audio node) info UI logic.
  */
-class TrackInfoViewModel @ViewModelInject constructor(
+@HiltViewModel
+class TrackInfoViewModel @Inject constructor(
     @MegaApi private val megaApi: MegaApiAndroid,
     private val dbHandler: DatabaseHandler,
-    // we need call legacy code OfflineUtils.saveOffline to save node for offline, which require
-    // activity :(
-    @ActivityContext private val context: Context,
+    @ApplicationContext private val context: Context,
 ) : BaseRxViewModel() {
     private val _metadata = MutableLiveData<Pair<Metadata, String>>()
     val metadata: LiveData<Pair<Metadata, String>> = _metadata
@@ -52,6 +54,9 @@ class TrackInfoViewModel @ViewModelInject constructor(
 
     private var trackInfoArgs: TrackInfoFragmentArgs? = null
     private var metadataOnlyPlayer: Player? = null
+
+    private val _offlineRemoveSnackBarShow = MutableLiveData<Boolean>()
+    val offlineRemoveSnackBarShow: LiveData<Boolean> = _offlineRemoveSnackBarShow
 
     private val createThumbnailRequest = MegaRequestFinishListener({
         _nodeInfo.notifyObserver()
@@ -75,7 +80,7 @@ class TrackInfoViewModel @ViewModelInject constructor(
 
     private fun loadMetadata(args: TrackInfoFragmentArgs) {
         val trackSelector = DefaultTrackSelector(context)
-        val exoPlayer = SimpleExoPlayer.Builder(context, DefaultRenderersFactory(context))
+        val exoPlayer = ExoPlayer.Builder(context, DefaultRenderersFactory(context))
             .setTrackSelector(trackSelector)
             .setLoadControl(
                 DefaultLoadControl.Builder()
@@ -87,7 +92,7 @@ class TrackInfoViewModel @ViewModelInject constructor(
 
         metadataOnlyPlayer = exoPlayer
 
-        exoPlayer.addListener(MetadataExtractor(trackSelector) { title, artist, album ->
+        exoPlayer.addListener(MetadataExtractor { title, artist, album ->
             val duration = exoPlayer.duration
             val durationText = if (duration == C.TIME_UNSET) {
                 ""
@@ -188,7 +193,7 @@ class TrackInfoViewModel @ViewModelInject constructor(
      *
      * @param available whether this node should be available offline
      */
-    fun makeAvailableOffline(available: Boolean) {
+    fun makeAvailableOffline(available: Boolean, activity: FragmentActivity) {
         val args = trackInfoArgs ?: return
 
         add(
@@ -199,7 +204,7 @@ class TrackInfoViewModel @ViewModelInject constructor(
                     } else {
                         val node = megaApi.getNodeByHandle(args.handle) ?: return@Callable
                         val offlineParent =
-                            getOfflineParentFile(context, args.adapterType, node, megaApi)
+                            getOfflineParentFile(activity, args.adapterType, node, megaApi)
 
                         if (isFileAvailable(offlineParent)) {
                             val offlineFile = File(offlineParent, node.name)
@@ -222,11 +227,16 @@ class TrackInfoViewModel @ViewModelInject constructor(
                             )
                         }
 
-                        saveOffline(offlineParent, node, context as Activity)
+                        // we need call legacy code OfflineUtils.saveOffline to save node for offline, which require
+                        // activity :(
+                        saveOffline(offlineParent, node, activity)
                     }
                 })
                 .subscribeOn(Schedulers.io())
-                .subscribe(IGNORE, logErr("TrackInfoViewModel toggleAvailableOffline"))
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe({
+                    _offlineRemoveSnackBarShow.value = !available
+                }, logErr("TrackInfoViewModel toggleAvailableOffline"))
         )
     }
 

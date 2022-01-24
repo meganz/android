@@ -35,6 +35,7 @@ import android.widget.TextView;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Stack;
 
 import mega.privacy.android.app.MegaPreferences;
@@ -48,6 +49,7 @@ import mega.privacy.android.app.lollipop.adapters.MegaSharedFolderLollipopAdapte
 import mega.privacy.android.app.lollipop.controllers.ContactController;
 import mega.privacy.android.app.lollipop.controllers.NodeController;
 import mega.privacy.android.app.modalbottomsheet.FileContactsListBottomSheetDialogFragment;
+import mega.privacy.android.app.utils.StringResourcesUtils;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaContactRequest;
 import nz.mega.sdk.MegaEvent;
@@ -330,7 +332,7 @@ public class FileContactListActivityLollipop extends PasscodeActivity implements
 			if(aB != null) {
 				aB.setDisplayHomeAsUpEnabled(true);
 				aB.setDisplayShowHomeEnabled(true);
-				aB.setTitle(node.getName().toUpperCase());
+				aB.setTitle(node.getName());
 				aB.setSubtitle(R.string.file_properties_shared_folder_select_contact);
 			}
 
@@ -562,7 +564,7 @@ public class FileContactListActivityLollipop extends PasscodeActivity implements
 	@Override
 	public void onBackPressed() {
 		logDebug("onBackPressed");
-		if (psaWebBrowser.consumeBack()) return;
+		if (psaWebBrowser != null && psaWebBrowser.consumeBack()) return;
 		retryConnectionsAndSignalPresence();
 
 		if (adapter.getPositionClicked() != -1){
@@ -579,7 +581,9 @@ public class FileContactListActivityLollipop extends PasscodeActivity implements
 				emptyImage.setVisibility(View.GONE);
 				emptyText.setVisibility(View.GONE);
 				if (parentHandle == -1){
-					aB.setTitle(getString(R.string.file_properties_shared_folder_select_contact));
+					aB.setTitle(StringResourcesUtils.getString(R.string.file_properties_shared_folder_select_contact)
+							.toUpperCase(Locale.getDefault()));
+
 					aB.setLogo(R.drawable.ic_action_navigation_accept_white);
 					supportInvalidateOptionsMenu();
 					adapter.setShareList(listContacts);

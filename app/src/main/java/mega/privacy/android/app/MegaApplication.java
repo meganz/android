@@ -38,6 +38,7 @@ import androidx.multidex.MultiDexApplication;
 import com.facebook.drawee.backends.pipeline.Fresco;
 import com.jeremyliao.liveeventbus.LiveEventBus;
 
+import io.reactivex.rxjava3.plugins.RxJavaPlugins;
 import mega.privacy.android.app.di.MegaApi;
 import mega.privacy.android.app.di.MegaApiFolder;
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
@@ -73,6 +74,8 @@ import mega.privacy.android.app.lollipop.megachat.AppRTCAudioManager;
 import mega.privacy.android.app.lollipop.megachat.BadgeIntentService;
 import mega.privacy.android.app.meeting.CallService;
 import mega.privacy.android.app.meeting.listeners.MeetingListener;
+import mega.privacy.android.app.middlelayer.reporter.CrashReporter;
+import mega.privacy.android.app.middlelayer.reporter.PerformanceReporter;
 import mega.privacy.android.app.objects.PasscodeManagement;
 import mega.privacy.android.app.receivers.NetworkStateReceiver;
 import mega.privacy.android.app.utils.CUBackupInitializeChecker;
@@ -141,7 +144,6 @@ public class MegaApplication extends MultiDexApplication implements Application.
 
 	private static PushNotificationSettingManagement pushNotificationSettingManagement;
 	private static TransfersManagement transfersManagement;
-	private static PasscodeManagement passcodeManagement;
 	private static ChatManagement chatManagement;
 
 	@MegaApi
@@ -160,6 +162,12 @@ public class MegaApplication extends MultiDexApplication implements Application.
 	SortOrderManagement sortOrderManagement;
 	@Inject
 	MyAccountInfo myAccountInfo;
+	@Inject
+	PasscodeManagement passcodeManagement;
+	@Inject
+	CrashReporter crashReporter;
+	@Inject
+	PerformanceReporter performanceReporter;
 
 	String localIpAddress = "";
 	BackgroundRequestListener requestListener;
@@ -251,7 +259,7 @@ public class MegaApplication extends MultiDexApplication implements Application.
 
 	@Override
 	public void onActivityCreated(@NonNull Activity activity, @Nullable Bundle savedInstanceState) {
-
+    	initLoggers();
 	}
 
 	@Override
@@ -522,10 +530,7 @@ public class MegaApplication extends MultiDexApplication implements Application.
 						backgroundStatus = megaChatApi.getBackgroundStatus();
 						logDebug("backgroundStatus_activityVisible: " + backgroundStatus);
 						if (backgroundStatus != -1 && backgroundStatus != 0) {
-							MegaHandleList callsInProgress = megaChatApi.getChatCalls(MegaChatCall.CALL_STATUS_IN_PROGRESS);
-							if (callsInProgress == null || callsInProgress.size() <= 0) {
-								megaChatApi.setBackgroundStatus(false);
-							}
+							megaChatApi.setBackgroundStatus(false);
 						}
 					}
 
@@ -549,9 +554,10 @@ public class MegaApplication extends MultiDexApplication implements Application.
 		}
 	};
 
-	public void handleUncaughtException(Thread thread, Throwable e) {
-		logFatal("UNCAUGHT EXCEPTION", e);
-		e.printStackTrace();
+	public void handleUncaughtException(Throwable throwable) {
+		logFatal("UNCAUGHT EXCEPTION", throwable);
+		throwable.printStackTrace();
+		crashReporter.report(throwable);
 	}
 
 	private final Observer<MegaChatCall> callStatusObserver = call -> {
@@ -622,9 +628,12 @@ public class MegaApplication extends MultiDexApplication implements Application.
 		if (chatRoom != null && call.getCallCompositionChange() == 1 && call.getNumParticipants() > 1) {
 			logDebug("Stop sound");
 			if (megaChatApi.getMyUserHandle() == call.getPeeridCallCompositionChange()) {
+				clearIncomingCallNotification(call.getCallId());
+				getChatManagement().removeValues(call.getChatid());
 				stopService(new Intent(getInstance(), IncomingCallService.class));
-				removeRTCAudioManagerRingIn();
-				LiveEventBus.get(EVENT_CALL_ANSWERED_IN_ANOTHER_CLIENT, Long.class).post(call.getChatid());
+				if (call.getStatus() == CALL_STATUS_USER_NO_PRESENT) {
+					LiveEventBus.get(EVENT_CALL_ANSWERED_IN_ANOTHER_CLIENT, Long.class).post(call.getChatid());
+				}
 			}
 		}
 	};
@@ -640,6 +649,10 @@ public class MegaApplication extends MultiDexApplication implements Application.
 		if (isRinging) {
 			logDebug("Is incoming call");
 			incomingCall(listAllCalls, call.getChatid(), callStatus);
+		} else {
+			clearIncomingCallNotification(call.getCallId());
+			getChatManagement().removeValues(call.getChatid());
+			stopService(new Intent(getInstance(), IncomingCallService.class));
 		}
 	};
 
@@ -717,13 +730,9 @@ public class MegaApplication extends MultiDexApplication implements Application.
 
 		ThemeHelper.INSTANCE.initTheme(this);
 
-		// Setup handler for uncaught exceptions.
-		Thread.setDefaultUncaughtExceptionHandler(new Thread.UncaughtExceptionHandler() {
-			@Override
-			public void uncaughtException(Thread thread, Throwable e) {
-				handleUncaughtException(thread, e);
-			}
-		});
+		// Setup handler and RxJava for uncaught exceptions.
+		Thread.setDefaultUncaughtExceptionHandler((thread, e) -> handleUncaughtException(e));
+		RxJavaPlugins.setErrorHandler(this::handleUncaughtException);
 
 		registerActivityLifecycleCallbacks(this);
 
@@ -732,8 +741,7 @@ public class MegaApplication extends MultiDexApplication implements Application.
 		keepAliveHandler.postAtTime(keepAliveRunnable, System.currentTimeMillis()+interval);
 		keepAliveHandler.postDelayed(keepAliveRunnable, interval);
 
-		initLoggerSDK();
-		initLoggerKarere();
+		initLoggers();
 
 		checkAppUpgrade();
 
@@ -747,7 +755,6 @@ public class MegaApplication extends MultiDexApplication implements Application.
         storageState = dbH.getStorageState();
         pushNotificationSettingManagement = new PushNotificationSettingManagement();
         transfersManagement = new TransfersManagement();
-        passcodeManagement = new PasscodeManagement(0, true);
         chatManagement = new ChatManagement();
 
 		//Logout check resumed pending transfers
@@ -832,6 +839,27 @@ public class MegaApplication extends MultiDexApplication implements Application.
 		ContextUtils.initialize(getApplicationContext());
 
 		Fresco.initialize(this);
+
+		// Try to initialize the loggers again in order to avoid have them uninitialized
+		// in case they failed to initialize before for some reason.
+		initLoggers();
+	}
+
+	/**
+	 * Initializes loggers if app storage is available and if are not initialized yet.
+	 */
+	private void initLoggers() {
+		if (getExternalFilesDir(null) == null) {
+			return;
+		}
+
+		if (!isLoggerSDKInitialized()) {
+			initLoggerSDK();
+		}
+
+		if (!isLoggerKarereInitialized()) {
+			initLoggerKarere();
+		}
 	}
 
 	public void askForFullAccountInfo(){
@@ -1009,6 +1037,10 @@ public class MegaApplication extends MultiDexApplication implements Application.
 				.subscribe((cookies, throwable) -> {
 					if (throwable == null) {
 						setAdvertisingCookiesEnabled(cookies.contains(CookieType.ADVERTISEMENT));
+
+						boolean analyticsCookiesEnabled = cookies.contains(CookieType.ANALYTICS);
+						crashReporter.setEnabled(analyticsCookiesEnabled);
+						performanceReporter.setEnabled(analyticsCookiesEnabled);
 					}
 				});
 	}
@@ -1033,14 +1065,6 @@ public class MegaApplication extends MultiDexApplication implements Application.
 	public boolean isActivityVisible() {
 		logDebug("Activity visible? => " + (currentActivity != null));
 		return getCurrentActivity() != null;
-	}
-
-	public static void setFirstConnect(boolean firstConnect){
-		MegaApplication.firstConnect = firstConnect;
-	}
-
-	public static boolean isFirstConnect(){
-		return firstConnect;
 	}
 
 	public static boolean isShowInfoChatMessages() {
@@ -1257,7 +1281,7 @@ public class MegaApplication extends MultiDexApplication implements Application.
 		else if (request.getType() == MegaChatRequest.TYPE_LOGOUT) {
 			logDebug("CHAT_TYPE_LOGOUT: " + e.getErrorCode() + "__" + e.getErrorString());
 
-			sortOrderManagement.resetDefaults();
+			resetDefaults();
 
 			try{
 				if (megaChatApi != null){
@@ -1797,7 +1821,16 @@ public class MegaApplication extends MultiDexApplication implements Application.
 
 	public void launchCallActivity(MegaChatCall call) {
 		logDebug("Show the call screen: " + callStatusToString(call.getStatus()) + ", callId = " + call.getCallId());
-		openMeetingRinging(this, call.getChatid());
+		openMeetingRinging(this, call.getChatid(), passcodeManagement);
+	}
+
+	/**
+	 * Resets all SingleObjects to their default values.
+	 */
+	private void resetDefaults() {
+		sortOrderManagement.resetDefaults();
+		passcodeManagement.resetDefaults();
+		myAccountInfo.resetDefaults();
 	}
 
 	public static boolean isShowRichLinkWarning() {
@@ -1943,10 +1976,6 @@ public class MegaApplication extends MultiDexApplication implements Application.
 
 	public static void setUserWaitingForCall(long userWaitingForCall) {
 		MegaApplication.userWaitingForCall = userWaitingForCall;
-	}
-
-	public static PasscodeManagement getPasscodeManagement() {
-		return passcodeManagement;
 	}
 
 	public static boolean areAdvertisingCookiesEnabled() {

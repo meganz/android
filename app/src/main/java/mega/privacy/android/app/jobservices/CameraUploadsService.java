@@ -55,14 +55,11 @@ import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.receivers.NetworkTypeChangeReceiver;
 import mega.privacy.android.app.sync.cusync.CuSyncManager;
 import mega.privacy.android.app.utils.JobUtil;
+import mega.privacy.android.app.utils.StringResourcesUtils;
 import mega.privacy.android.app.utils.conversion.VideoCompressionCallback;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaChatApiAndroid;
-import nz.mega.sdk.MegaChatApiJava;
-import nz.mega.sdk.MegaChatError;
-import nz.mega.sdk.MegaChatRequest;
-import nz.mega.sdk.MegaChatRequestListenerInterface;
 import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaNodeList;
@@ -98,7 +95,7 @@ import static mega.privacy.android.app.utils.CameraUploadUtil.*;
 import static nz.mega.sdk.MegaApiJava.INVALID_HANDLE;
 import static nz.mega.sdk.MegaApiJava.USER_ATTR_CAMERA_UPLOADS_FOLDER;
 
-public class CameraUploadsService extends Service implements NetworkTypeChangeReceiver.OnNetworkTypeChangeCallback, MegaChatRequestListenerInterface, MegaRequestListenerInterface, MegaTransferListenerInterface, VideoCompressionCallback {
+public class CameraUploadsService extends Service implements NetworkTypeChangeReceiver.OnNetworkTypeChangeCallback, MegaRequestListenerInterface, MegaTransferListenerInterface, VideoCompressionCallback {
 
     private static final int LOCAL_FOLDER_REMINDER_PRIMARY = 1908;
     private static final int LOCAL_FOLDER_REMINDER_SECONDARY = 1909;
@@ -194,7 +191,6 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
     private Intent mIntent, batteryIntent;
     private PendingIntent mPendingIntent;
     private String tempRoot;
-    private Context mContext;
     private VideoCompressor mVideoCompressor;
 
     private BroadcastReceiver pauseReceiver = new BroadcastReceiver() {
@@ -240,6 +236,7 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
 
     @Override
     public void onCreate() {
+        startForegroundNotification();
         registerReceiver(chargingStopReceiver, new IntentFilter(Intent.ACTION_POWER_DISCONNECTED));
         registerReceiver(batteryInfoReceiver, new IntentFilter(Intent.ACTION_BATTERY_CHANGED));
         registerReceiver(pauseReceiver, new IntentFilter(BROADCAST_ACTION_INTENT_UPDATE_PAUSE_NOTIFICATION));
@@ -309,10 +306,7 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
     public int onStartCommand(Intent intent, int flags, int startId) {
         logDebug("Starting CU service (flags: " + flags + ", startId: " + startId + ")");
         isServiceRunning = true;
-        mContext = getApplicationContext();
-        mNotificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
-        Notification notification = createNotification(getString(R.string.section_photo_sync), getString(R.string.settings_camera_notif_initializing_title), null, false);
-        startForeground(notificationId, notification);
+        startForegroundNotification();
         initService();
 
         if (megaApi == null) {
@@ -346,6 +340,20 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
         logDebug("Start service here, creating new working thread.");
         startWorkerThread();
         return START_NOT_STICKY;
+    }
+
+    /**
+     * Show a foreground notification.
+     * It's a requirement of Android system for foreground service.
+     * Should call this both when "onCreate" and "onStartCommand".
+     */
+    private void startForegroundNotification() {
+        if(mNotificationManager == null) {
+            mNotificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+        }
+
+        Notification notification = createNotification(getString(R.string.section_photo_sync), getString(R.string.settings_camera_notif_initializing_title), null, false);
+        startForeground(notificationId, notification);
     }
 
     private void registerNetworkTypeChangeReceiver() {
@@ -1250,9 +1258,9 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
         }
 
         int wifiLockMode = WifiManager.WIFI_MODE_FULL_HIGH_PERF;
-        WifiManager wifiManager = (WifiManager) mContext.getSystemService(Context.WIFI_SERVICE);
+        WifiManager wifiManager = (WifiManager) (getApplicationContext().getSystemService(Context.WIFI_SERVICE));
         lock = wifiManager.createWifiLock(wifiLockMode, "MegaDownloadServiceWifiLock");
-        PowerManager pm = (PowerManager) mContext.getSystemService(Context.POWER_SERVICE);
+        PowerManager pm = (PowerManager) getSystemService(Context.POWER_SERVICE);
         wl = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "MegaDownloadServicePowerLock:");
 
         if (!wl.isHeld()) {
@@ -1380,28 +1388,6 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
     }
 
     @Override
-    public void onRequestStart(MegaChatApiJava api, MegaChatRequest request) {
-
-    }
-
-    @Override
-    public void onRequestUpdate(MegaChatApiJava api, MegaChatRequest request) {
-
-    }
-
-    @Override
-    public void onRequestFinish(MegaChatApiJava api, MegaChatRequest request, MegaChatError e) {
-        if (request.getType() == MegaChatRequest.TYPE_CONNECT) {
-            setLoginState(false);
-        }
-    }
-
-    @Override
-    public void onRequestTemporaryError(MegaChatApiJava api, MegaChatRequest request, MegaChatError e) {
-
-    }
-
-    @Override
     public void onRequestStart(MegaApiJava api, MegaRequest request) {
 
     }
@@ -1430,6 +1416,9 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
                 megaApiFolder.setAccountAuth(megaApi.getAccountAuth());
                 logDebug("Fast login OK, Calling fetchNodes from CameraSyncService");
                 megaApi.fetchNodes(this);
+
+                // Get cookies settings after login.
+                MegaApplication.getInstance().checkEnabledCookies();
             } else {
                 logError("ERROR: " + e.getErrorString());
                 setLoginState(false);
@@ -1438,7 +1427,6 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
         } else if (request.getType() == MegaRequest.TYPE_FETCH_NODES) {
             if (e.getErrorCode() == MegaError.API_OK) {
                 logDebug("fetch nodes ok");
-                megaChatApi.connectInBackground(this);
                 setLoginState(false);
                 logDebug("Start service here MegaRequest.TYPE_FETCH_NODES");
                 startWorkerThread();
@@ -1810,7 +1798,7 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
     }
 
     private boolean shouldStartVideoCompression(long queueSize) {
-        if (isChargingRequired(queueSize) && !isCharging(mContext)) {
+        if (isChargingRequired(queueSize) && !isCharging(this)) {
             logDebug("Should not start video compression.");
             return false;
         }
@@ -1922,9 +1910,9 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
                     .putExtra(PENDING_TRANSFERS, pendingTransfers));
 
             if (megaApi.areTransfersPaused(MegaTransfer.TYPE_UPLOAD)) {
-                message = getResources().getQuantityString(R.plurals.upload_service_paused_notification, totalTransfers, inProgress, totalTransfers);
+                message = StringResourcesUtils.getString(R.string.upload_service_notification_paused, inProgress, totalTransfers);
             } else {
-                message = getResources().getQuantityString(R.plurals.upload_service_notification, totalTransfers, inProgress, totalTransfers);
+                message = StringResourcesUtils.getString(R.string.upload_service_notification, inProgress, totalTransfers);
             }
         }
 
@@ -1941,7 +1929,7 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
             mNotificationManager.createNotificationChannel(channel);
         }
 
-        mBuilder = new NotificationCompat.Builder(mContext, notificationChannelId);
+        mBuilder = new NotificationCompat.Builder(this, notificationChannelId);
         mBuilder.setSmallIcon(R.drawable.ic_stat_camera_sync)
                 .setOngoing(false)
                 .setContentTitle(title)
@@ -1963,7 +1951,7 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
 
     private void showProgressNotification(int progressPercent, PendingIntent pendingIntent, String message, String subText, String contentText) {
         mNotification = null;
-        mBuilder = new NotificationCompat.Builder(mContext, notificationChannelId);
+        mBuilder = new NotificationCompat.Builder(this, notificationChannelId);
         mBuilder.setSmallIcon(R.drawable.ic_stat_camera_sync)
                 .setProgress(100, progressPercent, false)
                 .setContentIntent(pendingIntent)
@@ -1998,9 +1986,9 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
         Intent intent = new Intent(this, ManagerActivityLollipop.class);
         intent.setAction(ACTION_OVERQUOTA_STORAGE);
 
-        NotificationCompat.Builder builder = new NotificationCompat.Builder(mContext, OVER_QUOTA_NOTIFICATION_CHANNEL_ID);
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(this, OVER_QUOTA_NOTIFICATION_CHANNEL_ID);
         builder.setSmallIcon(R.drawable.ic_stat_camera_sync)
-                .setContentIntent(PendingIntent.getActivity(mContext, 0, intent, 0))
+                .setContentIntent(PendingIntent.getActivity(this, 0, intent, 0))
                 .setAutoCancel(true)
                 .setTicker(contentText)
                 .setContentTitle(message)

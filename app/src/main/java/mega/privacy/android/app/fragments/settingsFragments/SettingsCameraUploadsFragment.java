@@ -40,17 +40,19 @@ import mega.privacy.android.app.lollipop.FileExplorerActivityLollipop;
 import mega.privacy.android.app.lollipop.FileStorageActivityLollipop;
 import mega.privacy.android.app.utils.ColorUtils;
 import mega.privacy.android.app.sync.cusync.CuSyncManager;
+import mega.privacy.android.app.utils.SDCardUtils;
 import nz.mega.sdk.MegaNode;
 
 import static mega.privacy.android.app.constants.BroadcastConstants.ACTION_REFRESH_CAMERA_UPLOADS_SETTING_SUBTITLE;
 import static mega.privacy.android.app.constants.SettingsConstants.*;
 import static mega.privacy.android.app.utils.CameraUploadUtil.*;
 import static mega.privacy.android.app.utils.Constants.*;
+import static mega.privacy.android.app.utils.FileUtil.isBasedOnFileStorage;
 import static mega.privacy.android.app.utils.FileUtil.isFileAvailable;
 import static mega.privacy.android.app.utils.JobUtil.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.MegaNodeUtil.isNodeInRubbishOrDeleted;
-import static mega.privacy.android.app.utils.PermissionUtils.*;
+import static mega.privacy.android.app.utils.permission.PermissionUtils.*;
 import static mega.privacy.android.app.utils.SDCardUtils.getSDCardDirName;
 import static mega.privacy.android.app.utils.TextUtil.isTextEmpty;
 import static mega.privacy.android.app.utils.Util.*;
@@ -1148,7 +1150,8 @@ public class SettingsCameraUploadsFragment extends SettingsBaseFragment {
                     return;
                 }
 
-                isExternalSDCardCU = Boolean.parseBoolean(prefs.getCameraFolderExternalSDCard());
+                isExternalSDCardCU = SDCardUtils.isLocalFolderOnSDCard(context, cameraPath) && !isBasedOnFileStorage();
+                dbH.setCameraFolderExternalSDCard(isExternalSDCardCU);
                 camSyncLocalPath = isExternalSDCardCU ? getSDCardDirName(Uri.parse(prefs.getUriExternalSDCard())) : cameraPath;
                 prefs.setCamSyncLocalPath(camSyncLocalPath);
                 dbH.setCamSyncLocalPath(camSyncLocalPath);
@@ -1184,7 +1187,8 @@ public class SettingsCameraUploadsFragment extends SettingsBaseFragment {
                     return;
                 }
 
-                isExternalSDCardMU = dbH.getMediaFolderExternalSdCard();
+                isExternalSDCardMU = SDCardUtils.isLocalFolderOnSDCard(context, secondaryPath) && !isBasedOnFileStorage();
+                dbH.setMediaFolderExternalSdCard(isExternalSDCardMU);
                 localSecondaryFolderPath = isExternalSDCardMU ? getSDCardDirName(Uri.parse(dbH.getUriMediaExternalSdCard())) : secondaryPath;
                 dbH.setSecondaryFolderPath(localSecondaryFolderPath);
                 prefs.setLocalPathSecondaryFolder(localSecondaryFolderPath);

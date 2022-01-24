@@ -1,25 +1,26 @@
 package mega.privacy.android.app.fragments.homepage.documents
 
-import androidx.hilt.lifecycle.ViewModelInject
 import androidx.lifecycle.*
 import com.jeremyliao.liveeventbus.LiveEventBus
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.fragments.homepage.NodeItem
 import mega.privacy.android.app.fragments.homepage.TypedFilesRepository
-import mega.privacy.android.app.utils.Constants
+import mega.privacy.android.app.globalmanagement.SortOrderManagement
 import mega.privacy.android.app.utils.Constants.EVENT_NODES_CHANGE
 import mega.privacy.android.app.utils.Constants.INVALID_POSITION
 import mega.privacy.android.app.utils.TextUtil
 import nz.mega.sdk.MegaApiJava
-import nz.mega.sdk.MegaApiJava.ORDER_DEFAULT_ASC
+import javax.inject.Inject
 
-class DocumentsViewModel @ViewModelInject constructor(
-    private val repository: TypedFilesRepository
+@HiltViewModel
+class DocumentsViewModel @Inject constructor(
+    private val repository: TypedFilesRepository,
+    private val sortOrderManagement: SortOrderManagement
 ) : ViewModel() {
 
     private var _query = MutableLiveData<String>()
 
-    private var order: Int = ORDER_DEFAULT_ASC
     var isList = true
     var skipNextAutoScroll = false
     var searchMode = false
@@ -34,9 +35,9 @@ class DocumentsViewModel @ViewModelInject constructor(
     private var pendingLoad = false
 
     val items: LiveData<List<NodeItem>> = _query.switchMap {
-        if (forceUpdate) {
+        if (forceUpdate || repository.fileNodeItems.value == null) {
             viewModelScope.launch {
-                repository.getFiles(MegaApiJava.FILE_TYPE_DOCUMENT, order)
+                repository.getFiles(MegaApiJava.FILE_TYPE_DOCUMENT, sortOrderManagement.getOrderCloud())
             }
         } else {
             repository.emitFiles()
@@ -89,6 +90,7 @@ class DocumentsViewModel @ViewModelInject constructor(
         items.observeForever(loadFinishedObserver)
         LiveEventBus.get(EVENT_NODES_CHANGE, Boolean::class.java)
             .observeForever(nodesChangeObserver)
+        loadDocuments(true)
     }
 
     /**
@@ -96,9 +98,8 @@ class DocumentsViewModel @ViewModelInject constructor(
      * @param forceUpdate True if retrieve all nodes by calling API
      * , false if filter current nodes by searchQuery
      */
-    fun loadDocuments(forceUpdate: Boolean = false, order: Int = this.order) {
+    fun loadDocuments(forceUpdate: Boolean = false) {
         this.forceUpdate = forceUpdate
-        this.order = order
 
         if (loadInProgress) {
             pendingLoad = true

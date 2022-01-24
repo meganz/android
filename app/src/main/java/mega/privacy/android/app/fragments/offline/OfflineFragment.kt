@@ -24,7 +24,6 @@ import androidx.recyclerview.widget.GridLayoutManager.SpanSizeLookup
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.OnScrollListener
-import com.jeremyliao.liveeventbus.LiveEventBus
 import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.MimeTypeList
 import mega.privacy.android.app.R
@@ -51,6 +50,7 @@ import mega.privacy.android.app.utils.LogUtil.logError
 import mega.privacy.android.app.utils.OfflineUtils.getOfflineFile
 import mega.privacy.android.app.utils.StringUtils.toSpannedHtmlText
 import mega.privacy.android.app.utils.Util.*
+import mega.privacy.android.app.zippreview.ui.ZipBrowserActivity
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
 import java.io.File
@@ -409,7 +409,7 @@ class OfflineFragment : Fragment(), ActionMode.Callback, Scrollable {
 
         viewModel.showSortedBy.observe(viewLifecycleOwner, EventObserver {
             callManager { manager ->
-                manager.showNewSortByPanel(ORDER_CLOUD)
+                manager.showNewSortByPanel(ORDER_OFFLINE)
             }
         })
 
@@ -417,12 +417,12 @@ class OfflineFragment : Fragment(), ActionMode.Callback, Scrollable {
 
         sortByHeaderViewModel.showDialogEvent.observe(viewLifecycleOwner, EventObserver {
             callManager { manager ->
-                manager.showNewSortByPanel(ORDER_CLOUD)
+                manager.showNewSortByPanel(ORDER_OFFLINE)
             }
         })
 
         sortByHeaderViewModel.orderChangeEvent.observe(viewLifecycleOwner, EventObserver {
-            viewModel.setOrder(it)
+            viewModel.setOrder(it.third)
             adapter?.notifyItemChanged(0)
         })
 
@@ -541,13 +541,13 @@ class OfflineFragment : Fragment(), ActionMode.Callback, Scrollable {
         when {
             mime.isZip -> {
                 logDebug("MimeTypeList ZIP")
-                val intentZip = Intent(context, ZipBrowserActivityLollipop::class.java)
-                intentZip.action = ZipBrowserActivityLollipop.ACTION_OPEN_ZIP_FILE
+                val intentZip = Intent(context, ZipBrowserActivity::class.java)
+                intentZip.action = ZipBrowserActivity.ACTION_OPEN_ZIP_FILE
                 intentZip.putExtra(
-                    ZipBrowserActivityLollipop.EXTRA_ZIP_FILE_TO_OPEN,
+                    ZipBrowserActivity.EXTRA_ZIP_FILE_TO_OPEN,
                     viewModel.path
                 )
-                intentZip.putExtra(ZipBrowserActivityLollipop.EXTRA_PATH_ZIP, file.absolutePath)
+                intentZip.putExtra(ZipBrowserActivity.EXTRA_PATH_ZIP, file.absolutePath)
                 startActivity(intentZip)
             }
             mime.isImage -> {

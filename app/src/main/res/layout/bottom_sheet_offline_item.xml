@@ -235,7 +235,7 @@
                     android:paddingTop="2dp"
                     android:src="@drawable/ic_remove"
                     android:visibility="visible"
-                    app:tint="@color/red_600_red_300" />
+                    app:tint="?android:attr/textColorSecondary" />
 
                 <TextView
                     android:id="@+id/option_delete_offline_text"
@@ -245,7 +245,7 @@
                     android:paddingTop="2dp"
                     android:layout_marginLeft="18dp"
                     android:text="@string/context_delete_offline"
-                    android:textAppearance="@style/TextAppearance.Mega.Subtitle1.Red" />
+                    android:textAppearance="?attr/textAppearanceSubtitle1" />
             </LinearLayout>
 
         </LinearLayout>

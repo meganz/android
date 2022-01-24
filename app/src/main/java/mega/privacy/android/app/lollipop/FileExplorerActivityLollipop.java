@@ -1,7 +1,9 @@
 package mega.privacy.android.app.lollipop;
 
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
@@ -10,6 +12,7 @@ import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.tabs.TabLayout;
+import com.jeremyliao.liveeventbus.LiveEventBus;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
@@ -102,6 +105,7 @@ import nz.mega.sdk.MegaUser;
 import nz.mega.sdk.MegaUserAlert;
 
 import static android.webkit.URLUtil.*;
+import static mega.privacy.android.app.constants.EventConstants.EVENT_UPDATE_VIEW_MODE;
 import static mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil.isBottomSheetDialogShown;
 import static mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuotaPaywallWarning;
 import static mega.privacy.android.app.utils.ChatUtil.createAttachmentPendingMessage;
@@ -199,8 +203,6 @@ public class FileExplorerActivityLollipop extends TransfersManagementActivity
 	private MenuItem createFolderMenuItem;
 	private MenuItem newChatMenuItem;
 	private MenuItem searchMenuItem;
-	private MenuItem gridListMenuItem;
-	private MenuItem sortByMenuItem;
 	private boolean isList = true;
 
 	private FrameLayout cloudDriveFrameLayout;
@@ -296,16 +298,7 @@ public class FileExplorerActivityLollipop extends TransfersManagementActivity
 	public void onRequestFinish(MegaChatApiJava api, MegaChatRequest request, MegaChatError e) {
 		logDebug("onRequestFinish(CHAT)");
 
-		if (request.getType() == MegaChatRequest.TYPE_CONNECT){
-			MegaApplication.setLoggingIn(false);
-			if(e.getErrorCode()==MegaChatError.ERROR_OK){
-				logDebug("Connected to chat!");
-			}
-			else{
-				logWarning("ERROR WHEN CONNECTING " + e.getErrorString());
-			}
-		}
-		else if(request.getType() == MegaChatRequest.TYPE_CREATE_CHATROOM){
+        if(request.getType() == MegaChatRequest.TYPE_CREATE_CHATROOM){
 			logDebug("Create chat request finish.");
 			onRequestFinishCreateChat(e.getErrorCode(), request.getChatHandle(), false);
 		}
@@ -609,6 +602,7 @@ public class FileExplorerActivityLollipop extends TransfersManagementActivity
 		getWindow().setFlags(WindowManager.LayoutParams.FLAG_WATCH_OUTSIDE_TOUCH, WindowManager.LayoutParams.FLAG_WATCH_OUTSIDE_TOUCH);
 		getWindow().setFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL, WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL);
 
+		LiveEventBus.get(EVENT_UPDATE_VIEW_MODE, Boolean.class).observe(this, this::refreshViewNodes);
 	}
 	
 	private void afterLoginAndFetch(){
@@ -925,17 +919,6 @@ public class FileExplorerActivityLollipop extends TransfersManagementActivity
 		}
 	}
 
-	private void setGridListAction () {
-		if (isList) {
-			gridListMenuItem.setTitle(R.string.action_grid);
-			gridListMenuItem.setIcon(R.drawable.ic_thumbnail_view);
-		}
-		else {
-			gridListMenuItem.setTitle(R.string.action_list);
-			gridListMenuItem.setIcon(R.drawable.ic_list_view);
-		}
-	}
-
 	private boolean isSearchMultiselect() {
 		if (multiselect) {
 			cDriveExplorer = getCloudExplorerFragment();
@@ -958,16 +941,10 @@ public class FileExplorerActivityLollipop extends TransfersManagementActivity
 	    searchMenuItem = menu.findItem(R.id.cab_menu_search);
 	    createFolderMenuItem = menu.findItem(R.id.cab_menu_create_folder);
 	    newChatMenuItem = menu.findItem(R.id.cab_menu_new_chat);
-	    gridListMenuItem = menu.findItem(R.id.cab_menu_grid_list);
-	    sortByMenuItem = menu.findItem(R.id.cab_menu_sort);
-	   	setGridListAction();
-	   	sortByMenuItem.setIcon(ContextCompat.getDrawable(this, R.drawable.ic_sort));
 
 	    searchMenuItem.setVisible(false);
 		createFolderMenuItem.setVisible(false);
 		newChatMenuItem.setVisible(false);
-		gridListMenuItem.setVisible(true);
-		sortByMenuItem.setVisible(false);
 
 		searchView = (SearchView) searchMenuItem.getActionView();
 
@@ -987,8 +964,6 @@ public class FileExplorerActivityLollipop extends TransfersManagementActivity
 
 				if (isSearchMultiselect()) {
 					hideTabs(true, isCloudVisible() ? CLOUD_FRAGMENT : INCOMING_FRAGMENT);
-					gridListMenuItem.setVisible(false);
-					sortByMenuItem.setVisible(false);
 				} else {
 					hideTabs(true, CHAT_FRAGMENT);
 					chatExplorer = getChatExplorerFragment();
@@ -1102,7 +1077,6 @@ public class FileExplorerActivityLollipop extends TransfersManagementActivity
 
 			if(index==0){
 				if(isChatFirst){
-					gridListMenuItem.setVisible(false);
 					searchMenuItem.setVisible(true);
 					createFolderMenuItem.setVisible(false);
 					newChatMenuItem.setVisible(false);
@@ -1112,7 +1086,6 @@ public class FileExplorerActivityLollipop extends TransfersManagementActivity
 					setCreateFolderVisibility();
 					newChatMenuItem.setVisible(false);
 					if (multiselect) {
-						sortByMenuItem.setVisible(true);
 						cDriveExplorer = getCloudExplorerFragment();
 						searchMenuItem.setVisible(cDriveExplorer != null && !cDriveExplorer.isFolderEmpty());
 					}
@@ -1154,7 +1127,6 @@ public class FileExplorerActivityLollipop extends TransfersManagementActivity
 					}
 					newChatMenuItem.setVisible(false);
 					if (multiselect) {
-						sortByMenuItem.setVisible(true);
 						searchMenuItem.setVisible(iSharesExplorer != null && !iSharesExplorer.isFolderEmpty());
 					}
 				}
@@ -1190,7 +1162,6 @@ public class FileExplorerActivityLollipop extends TransfersManagementActivity
 					newChatMenuItem.setVisible(false);
 				}
 				else{
-					gridListMenuItem.setVisible(false);
 					searchMenuItem.setVisible(true);
 					createFolderMenuItem.setVisible(false);
 					newChatMenuItem.setVisible(false);
@@ -1235,13 +1206,8 @@ public class FileExplorerActivityLollipop extends TransfersManagementActivity
 							break;
 						}
 						case CHAT_FRAGMENT:{
-							gridListMenuItem.setVisible(false);
 							newChatMenuItem.setVisible(false);
 							searchMenuItem.setVisible(true);
-							break;
-						}
-						case IMPORT_FRAGMENT: {
-							gridListMenuItem.setVisible(false);
 							break;
 						}
 					}
@@ -1313,7 +1279,7 @@ public class FileExplorerActivityLollipop extends TransfersManagementActivity
 			aB.setSubtitle(null);
 		}
 
-		if(tabShown==NO_TABS){
+		if (tabShown == NO_TABS || mTabsAdapterExplorer == null) {
 			if (importFileF) {
 				if (importFragmentSelected != -1) {
 					switch (importFragmentSelected) {
@@ -1324,7 +1290,7 @@ public class FileExplorerActivityLollipop extends TransfersManagementActivity
 									setRootTitle();
 									aB.setSubtitle(R.string.general_select_to_download);
 								} else {
-									aB.setTitle(megaApi.getNodeByHandle(cDriveExplorer.getParentHandle()).getName().toUpperCase());
+									aB.setTitle(megaApi.getNodeByHandle(cDriveExplorer.getParentHandle()).getName());
 								}
 							}
 							break;
@@ -1399,7 +1365,7 @@ public class FileExplorerActivityLollipop extends TransfersManagementActivity
 						setRootTitle();
 					}
 					else{
-						aB.setTitle(megaApi.getNodeByHandle(((CloudDriveExplorerFragmentLollipop)f).getParentHandle()).getName().toUpperCase());
+						aB.setTitle(megaApi.getNodeByHandle(((CloudDriveExplorerFragmentLollipop)f).getParentHandle()).getName());
 					}
 				}
 				showFabButton(false);
@@ -1497,7 +1463,7 @@ public class FileExplorerActivityLollipop extends TransfersManagementActivity
 	@Override
 	public void onBackPressed() {
 		logDebug("tabShown: " + tabShown);
-		if (psaWebBrowser.consumeBack()) return;
+		if (psaWebBrowser != null && psaWebBrowser.consumeBack()) return;
 		retryConnectionsAndSignalPresence();
 
 		cDriveExplorer = getCloudExplorerFragment();
@@ -2161,6 +2127,9 @@ public class FileExplorerActivityLollipop extends TransfersManagementActivity
 				logDebug("Setting account auth token for folder links.");
 				megaApiFolder.setAccountAuth(megaApi.getAccountAuth());
 				megaApi.fetchNodes(this);
+
+                // Get cookies settings after login.
+                MegaApplication.getInstance().checkEnabledCookies();
 			}
 		}
 		else if (request.getType() == MegaRequest.TYPE_FETCH_NODES){
@@ -2181,14 +2150,6 @@ public class FileExplorerActivityLollipop extends TransfersManagementActivity
 				dbH.saveCredentials(credentials);
 				
 				loginLoggingIn.setVisibility(View.GONE);
-
-				logDebug("Chat --> connect");
-				if ((megaChatApi.getInitState() != MegaChatApi.INIT_ERROR)) {
-					logDebug("Connection goes!!!");
-					megaChatApi.connect(this);
-				} else {
-					logWarning("Not launch connect: " + megaChatApi.getInitState());
-				}
 
 				MegaApplication.setLoggingIn(false);
 				afterLoginAndFetch();
@@ -2358,14 +2319,6 @@ public class FileExplorerActivityLollipop extends TransfersManagementActivity
 					logWarning("Online but not megaApi");
 					showErrorAlertDialog(getString(R.string.error_server_connection_problem), false, this);
 				}
-				break;
-			}
-			case R.id.cab_menu_grid_list:{
-				refreshViewNodes();
-				break;
-			}
-			case R.id.cab_menu_sort:{
-				showSortByPanel();
 				break;
 			}
 		}
@@ -2623,10 +2576,10 @@ public class FileExplorerActivityLollipop extends TransfersManagementActivity
 
 	}
 
-	@Override
-	public void onChatInitStateUpdate(MegaChatApiJava api, int newState) {
+    @Override
+    public void onChatInitStateUpdate(MegaChatApiJava api, int newState) {
 
-	}
+    }
 
 	@Override
 	public void onChatOnlineStatusUpdate(MegaChatApiJava api, long userhandle, int status, boolean inProgress) {
@@ -2731,57 +2684,21 @@ public class FileExplorerActivityLollipop extends TransfersManagementActivity
 		}
 	}
 
-	private void refreshViewNodes () {
-		isList = !isList;
-		dbH.setPreferredViewList(isList);
-		updateManagerView();
-		refreshView();
-		supportInvalidateOptionsMenu();
-	}
+	private void refreshViewNodes (boolean isList) {
+		this.isList = isList;
 
-	private void refreshView () {
-		if (viewPagerExplorer != null && tabShown != NO_TABS) {
-			cDriveExplorer = (CloudDriveExplorerFragmentLollipop) getSupportFragmentManager().findFragmentByTag(getFragmentTag(R.id.explorer_tabs_pager, 0));
-			iSharesExplorer = (IncomingSharesExplorerFragmentLollipop) getSupportFragmentManager().findFragmentByTag(getFragmentTag(R.id.explorer_tabs_pager, 0));
-		} else {
-			cDriveExplorer =  getCloudExplorerFragment();
-			iSharesExplorer = getIncomingExplorerFragment();
-		}
+		cDriveExplorer =  getCloudExplorerFragment();
+		iSharesExplorer = getIncomingExplorerFragment();
 
 		if (cDriveExplorer != null) {
-			FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-			ft.detach(cDriveExplorer);
-			ft.attach(cDriveExplorer);
-			ft.commitAllowingStateLoss();
+			getSupportFragmentManager().beginTransaction().detach(cDriveExplorer).commitNowAllowingStateLoss();
+			getSupportFragmentManager().beginTransaction().attach(cDriveExplorer).commitNowAllowingStateLoss();
 		}
 
 		if (iSharesExplorer != null) {
-			FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-			ft.detach(iSharesExplorer);
-			ft.attach(iSharesExplorer);
-			ft.commitAllowingStateLoss();
+			getSupportFragmentManager().beginTransaction().detach(iSharesExplorer).commitNowAllowingStateLoss();
+			getSupportFragmentManager().beginTransaction().attach(iSharesExplorer).commitNowAllowingStateLoss();
 		}
-
-		if (viewPagerExplorer != null && tabShown != NO_TABS) {
-			if (currentAction.equals(ACTION_SELECT_FOLDER_TO_SHARE) ||
-					currentAction.equals(ACTION_UPLOAD_TO_CLOUD)) {
-				updateAdapterExplorer(false, DEFAULT_TAB_TO_REMOVE);
-			} else if (currentAction.equals(ACTION_MULTISELECT_FILE) ||
-					currentAction.equals(ACTION_PICK_MOVE_FOLDER) ||
-					currentAction.equals(ACTION_PICK_COPY_FOLDER) ||
-					currentAction.equals(ACTION_CHOOSE_MEGA_FOLDER_SYNC) ||
-					currentAction.equals(ACTION_PICK_IMPORT_FOLDER)) {
-				updateAdapterExplorer(false, CHAT_TAB);
-			} else if (isChatFirst) {
-				updateAdapterExplorer(true, DEFAULT_TAB_TO_REMOVE);
-			}
-		}
-	}
-
-	private void updateManagerView () {
-		Intent intent = new Intent(BROADCAST_ACTION_INTENT_UPDATE_VIEW);
-		intent.putExtra("isList", isList);
-		sendBroadcast(intent);
 	}
 
 	public void collapseSearchView () {

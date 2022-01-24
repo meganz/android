@@ -10,19 +10,20 @@
         android:id="@+id/file_list_saved_offline"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_centerVertical="true"
         android:background="@null"
-        android:src="@drawable/ic_cloud_saved_offline"
-        app:tint="@color/red_500_red_300"
-        tools:ignore="ContentDescription" />
+        android:src="@drawable/ic_offline_indicator"
+        android:layout_alignParentEnd="true"
+        android:layout_marginEnd="45dp"
+        android:layout_marginTop="40dp"
+        tools:ignore="ContentDescription"
+        app:tint="?android:attr/textColorSecondary"/>
 
     <RelativeLayout
         android:id="@+id/container_thumbnail"
         android:layout_width="48dp"
         android:layout_height="match_parent"
         android:layout_centerVertical="true"
-        android:layout_margin="0dp"
-        android:layout_toEndOf="@+id/file_list_saved_offline"
+        android:layout_marginStart="16dp"
         android:padding="0dp">
 
         <ImageView
@@ -84,7 +85,7 @@
             android:layout_height="wrap_content"
             android:ellipsize="middle"
             android:singleLine="true"
-            android:textAppearance="?attr/textAppearanceSubtitle1" />
+            style="@style/textAppearanceSubtitle1" />
 
         <ImageView
             android:id="@+id/img_label"

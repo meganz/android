@@ -109,7 +109,7 @@ class ManageChatHistoryActivity : PasscodeActivity(), View.OnClickListener {
         val actionBar = supportActionBar
         actionBar?.setDisplayHomeAsUpEnabled(true)
         actionBar?.setHomeButtonEnabled(true)
-        actionBar?.title = getString(R.string.title_properties_manage_chat).toUpperCase(Locale.getDefault())
+        actionBar?.title = getString(R.string.title_properties_manage_chat).uppercase(Locale.getDefault())
 
         binding.historyRetentionSwitch.isClickable = false
         binding.historyRetentionSwitch.isChecked = false
@@ -204,20 +204,20 @@ class ManageChatHistoryActivity : PasscodeActivity(), View.OnClickListener {
             StringResourcesUtils.getQuantityString(
                 R.plurals.retention_time_picker_hours,
                 value
-            ).toLowerCase(Locale.getDefault()),
+            ).lowercase(Locale.getDefault()),
             StringResourcesUtils.getQuantityString(
                 R.plurals.retention_time_picker_days,
                 value
-            ).toLowerCase(Locale.getDefault()),
+            ).lowercase(Locale.getDefault()),
             StringResourcesUtils.getQuantityString(
                 R.plurals.retention_time_picker_weeks,
                 value
-            ).toLowerCase(Locale.getDefault()),
+            ).lowercase(Locale.getDefault()),
             StringResourcesUtils.getQuantityString(
                 R.plurals.retention_time_picker_months,
                 value
-            ).toLowerCase(Locale.getDefault()),
-            StringResourcesUtils.getString(R.string.retention_time_picker_year).toLowerCase(Locale.getDefault())
+            ).lowercase(Locale.getDefault()),
+            StringResourcesUtils.getString(R.string.retention_time_picker_year).lowercase(Locale.getDefault())
         )
         binding.textPicker.displayedValues = arrayString
     }

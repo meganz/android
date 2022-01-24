@@ -11,54 +11,99 @@
 
         <variable
             name="viewModel"
-            type="mega.privacy.android.app.fragments.homepage.photos.PhotosViewModel" />
+            type="mega.privacy.android.app.fragments.managerFragments.cu.PhotosViewModel" />
     </data>
 
-    <androidx.constraintlayout.widget.ConstraintLayout
+    <RelativeLayout
+        android:id="@+id/cu_container"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
         <include
-            android:id="@+id/empty_hint"
-            layout="@layout/empty_result_files"
-            app:showHint="@{viewModel.items.empty}" />
+            android:id="@+id/fragment_photos_first_login"
+            layout="@layout/fragment_photos_first_login"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
 
-        <mega.privacy.android.app.components.NewGridRecyclerView
-            android:id="@+id/photo_list"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            android:columnWidth="@dimen/photo_item_width"
-            android:paddingBottom="@dimen/grid_node_list_padding_bottom"
-            app:items="@{viewModel.items}"
-            app:layout_constraintBottom_toTopOf="@id/mini_audio_player"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:visibleGone="@{!viewModel.items.empty}" />
+        <RelativeLayout
+            android:id="@+id/fragment_photos_grid"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
 
-        <mega.privacy.android.app.components.scrollBar.FastScroller
-            android:id="@+id/scroller"
-            android:layout_width="wrap_content"
-            android:layout_height="0dp"
-            android:orientation="vertical"
-            app:layout_constraintBottom_toTopOf="@id/mini_audio_player"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:visibleGone="@{viewModel.items.size() > (viewModel.searchMode ? Constants.MIN_ITEMS_SCROLLBAR : Constants.MIN_ITEMS_SCROLLBAR_GRID)}" />
+            <RelativeLayout
+                android:id="@+id/empty_hint"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:visibility="gone">
 
-        <com.google.android.exoplayer2.ui.PlayerView
-            android:id="@+id/mini_audio_player"
-            android:layout_width="0dp"
-            android:layout_height="@dimen/audio_player_mini_controller_height"
-            android:background="?attr/colorPrimary"
-            android:visibility="gone"
-            app:controller_layout_id="@layout/audio_player_control_in_mini_player"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:player_layout_id="@layout/audio_player_view_controller_only"
-            app:surface_type="none"
-            tools:visibility="visible" />
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_above="@+id/empty_enable_cu_button">
 
-    </androidx.constraintlayout.widget.ConstraintLayout>
+                    <ImageView
+                        android:id="@+id/empty_hint_image"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerInParent="true"
+                        android:layout_centerHorizontal="true"
+                        android:src="@drawable/ic_zero_data_cu"
+                        tools:visibility="visible" />
+
+                    <TextView
+                        android:id="@+id/empty_hint_text"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_below="@+id/empty_hint_image"
+                        android:layout_centerHorizontal="true"
+                        android:layout_marginTop="8dp"
+                        android:gravity="center_horizontal"
+                        android:textAppearance="@style/TextAppearance.Mega.Body2.Secondary.Variant.AllCaps"
+                        tools:text="@string/no_results_found" />
+
+                </RelativeLayout>
+
+                <Button
+                    android:id="@+id/empty_enable_cu_button"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentBottom="true"
+                    android:layout_marginStart="16dp"
+                    android:layout_marginEnd="16dp"
+                    android:layout_marginBottom="40dp"
+                    android:text="@string/settings_camera_upload_on" />
+
+            </RelativeLayout>
+
+            <TextView
+                android:id="@+id/upload_progress"
+                android:layout_width="match_parent"
+                android:layout_height="36dp"
+                android:layout_marginBottom="8dp"
+                android:clipToPadding="false"
+                android:gravity="center_vertical"
+                android:paddingStart="16dp"
+                android:paddingEnd="16dp"
+                android:textAppearance="@style/TextAppearance.Mega.Subtitle2.Normal.Grey87White87"
+                android:visibility="gone"
+                tools:text="Upload in progress, 300 files pending" />
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/cu_list"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_below="@+id/upload_progress"
+                android:clipToPadding="false"
+                android:paddingBottom="@dimen/grid_node_list_padding_bottom"
+                app:galleryItems="@{viewModel.items}"
+                app:visibleGone="@{!viewModel.items.empty}"/>
+
+            <mega.privacy.android.app.components.scrollBar.FastScroller
+                android:id="@+id/scroller"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_alignParentEnd="true"
+                android:orientation="vertical" />
+        </RelativeLayout>
+    </RelativeLayout>
 </layout>

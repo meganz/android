@@ -55,6 +55,7 @@ import java.util.List;
 import java.util.ListIterator;
 import androidx.lifecycle.Observer;
 
+import dagger.hilt.android.AndroidEntryPoint;
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
@@ -69,10 +70,11 @@ import mega.privacy.android.app.lollipop.controllers.ChatController;
 import mega.privacy.android.app.lollipop.listeners.ChatNonContactNameListener;
 import mega.privacy.android.app.lollipop.managerSections.RotatableFragment;
 import mega.privacy.android.app.lollipop.megachat.chatAdapters.MegaListChatLollipopAdapter;
+import mega.privacy.android.app.objects.PasscodeManagement;
 import mega.privacy.android.app.utils.AskForDisplayOverDialog;
 import mega.privacy.android.app.utils.ColorUtils;
 import mega.privacy.android.app.utils.HighLightHintHelper;
-import mega.privacy.android.app.utils.PermissionUtils;
+import mega.privacy.android.app.utils.permission.PermissionUtils;
 import mega.privacy.android.app.utils.TimeUtils;
 import mega.privacy.android.app.utils.Util;
 import mega.privacy.android.app.utils.contacts.MegaContactGetter;
@@ -90,9 +92,12 @@ import static mega.privacy.android.app.utils.CallUtil.*;
 import static mega.privacy.android.app.utils.ChatUtil.*;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
-import static mega.privacy.android.app.utils.PermissionUtils.*;
+import static mega.privacy.android.app.utils.permission.PermissionUtils.*;
 import static mega.privacy.android.app.utils.Util.*;
 
+import javax.inject.Inject;
+
+@AndroidEntryPoint
 public class RecentChatsFragmentLollipop extends RotatableFragment implements View.OnClickListener, MegaContactGetter.MegaContactUpdater {
 
     private static final String BUNDLE_RECYCLER_LAYOUT = "classname.recycler.layout";
@@ -101,6 +106,9 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
      *  MAX_LINES is the max line setting of the snack bar */
     public static final int DURATION = 4000;
     public static final int MAX_LINES = 3;
+
+    @Inject
+    PasscodeManagement passcodeManagement;
 
     MegaApiAndroid megaApi;
     MegaChatApiAndroid megaChatApi;
@@ -116,7 +124,7 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
     LinearLayoutManager mLayoutManager;
     FastScroller fastScroller;
 
-    ArrayList<MegaChatListItem> chats;
+    ArrayList<MegaChatListItem> chats = new ArrayList<>();
 
     FilterChatsTask filterChatsTask;
 
@@ -562,7 +570,8 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
 
                     if (adapterList == null) {
                         logWarning("AdapterList is NULL");
-                        adapterList = new MegaListChatLollipopAdapter(context, this, chats, listView, MegaListChatLollipopAdapter.ADAPTER_RECENT_CHATS);
+                        adapterList = new MegaListChatLollipopAdapter(context, this, chats,
+                                listView, MegaListChatLollipopAdapter.ADAPTER_RECENT_CHATS);
                     } else {
                         adapterList.setChats(chats);
                     }
@@ -732,7 +741,7 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
             case R.id.call_in_progress_layout: {
                 logDebug("call_in_progress_layout");
                 if (checkPermissionsCall()) {
-                    returnActiveCall(context);
+                    returnActiveCall(context, passcodeManagement);
                 }
                 break;
             }
@@ -1528,7 +1537,7 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
                 if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     if (checkPermissionsCall()) {
                         logDebug("REQUEST_CAMERA -> returnTheCall");
-                        returnActiveCall(context);
+                        returnActiveCall(context, passcodeManagement);
                     }
                 }
                 break;
@@ -1537,7 +1546,7 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
                 if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     if (checkPermissionsCall()) {
                         logDebug("RECORD_AUDIO -> returnTheCall");
-                        returnActiveCall(context);
+                        returnActiveCall(context, passcodeManagement);
                     }
                 }
                 break;
@@ -1794,7 +1803,7 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
 
     class FilterChatsTask extends AsyncTask<String, Void, Void> {
 
-        ArrayList<MegaChatListItem> filteredChats;
+        ArrayList<MegaChatListItem> filteredChats = new ArrayList<>();
         int archivedSize = 0;
 
         @Override
@@ -1814,11 +1823,7 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
             }
 
             if (!chatsToSearch.isEmpty()) {
-                if (filteredChats == null) {
-                    filteredChats = new ArrayList<>();
-                } else {
-                    filteredChats.clear();
-                }
+                filteredChats.clear();
                 for (MegaChatListItem chat : chatsToSearch) {
                     if (getTitleChat(chat).toLowerCase().contains(strings[0].toLowerCase())) {
                         filteredChats.add(chat);

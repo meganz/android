@@ -1,9 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- Full description text of the app in the Google Play page of the app (character limit 4000) -->
-    <string name="full_description_text">MEGA ofrece un servicio de almacenamiento en la nube y de chat cifrado y controlado por el usuario a través del navegador y de la aplicación para dispositivos móviles. A diferencia de otros proveedores de almacenamiento en la nube, tus datos son cifrados y descifrados únicamente en tus dispositivos y nunca por nosotros.\n\nSube tus archivos desde tu smartphone o tablet, luego busca, almacena, descarga, muestra, reproduce, comparte, renombra o elimina tus archivos en cualquier momento, desde cualquier dispositivo, en cualquier lugar. Comparte carpetas con tus contactos y comprueba sus actualizaciones en tiempo real. El cifrado nos impide conocer o restablecer tu contraseña, por lo que DEBES recordarla (o tener una copia de seguridad de tu Clave de recuperación) o perderás el acceso a tus archivos almacenados.\n\nLas videollamadas cifradas punto a punto de MEGA permiten una privacidad absoluta y llevan estando disponibles en el navegador desde 2016. Se proporcionan también en nuestra app para móvil, con el historial de chat accesible a través de múltiples dispositivos. Además los usuarios pueden añadir fácilmente archivos a un chat directamente desde su nube de MEGA.\n\nMEGA brinda un almacenamiento gratuito de 50 GB sujeto al programa de logros para todos los usuarios registrados, y ofrece planes de pago con límites mucho más amplios:\n\n\nSuscripción Pro LITE: 4,99€ al mes o 49,99€ al año, con 400 GB de espacio de almacenamiento y 1 TB de cuota de transferencia al mes.\nSuscripción Pro I: 9,99€ al mes o 99,99€ al año, con 2 TB de espacio de almacenamiento y 2 TB de cuota de transferencia al mes.\nSuscripción Pro II: 19,99€ al mes o 199,99€ al año, con 8 TB de espacio de almacenamiento y 8 TB de cuota de transferencia al mes.\nSuscripción Pro III: 29,99€ al mes o 299,99€ al año, con 16 TB de espacio de almacenamiento y 16 TB de cuota de transferencia al mes.\n\nLa suscripción se renueva automáticamente con la misma duración y precio elegidos inicialmente. Para gestionar tu suscripción, ve a la Play Store en tu dispositivo móvil, inicia sesión con tu Google ID (si aún no lo has hecho) y luego pulsa en la aplicación de MEGA. Desde aquí, podrás gestionar tu suscripción.\n\nPermisos de la aplicación:\nWRITE_EXTERNAL_STORAGE -&gt; Descarga tus archivos de MEGA a tu dispositivo y sube archivos desde tu dispositivo a MEGA\nCAMERA -&gt; Haz fotos y súbelas a MEGA\nREAD_CONTACTS -&gt; Añade contactos desde tu dispositivo a MEGA\nRECORD_AUDIO y CAPTURE_VIDEO_OUTPUT (micrófono y cámara) -&gt; MEGA proporciona llamadas y videollamadas cifradas punto a punto\n\n\nPara que los usuarios confíen plenamente en el sistema de MEGA, todo el código del cliente es público y los ingenieros de seguridad podrán evaluar nuestro proceso de cifrado. El código de nuestra aplicación móvil se encuentra en: https://github.com/meganz/android \n\nPara obtener más información, consulta nuestro sitio web:\nhttps://mega.nz/terms \n\n\nDesde ordenador - https://mega.nz/</string>
-    <!-- Short description text of the app in the Google Play page of the app (character limit 80) -->
-    <string name="short_description_text">MEGA es almacenamiento en la nube con privacidad permanente y segura.</string>
     <!-- PRO Lite account -->
     <string name="prolite_account">Pro Lite</string>
     <!-- Name of the MEGA PDF Viewer. Keep uppercase. -->
@@ -70,8 +66,6 @@
     <string name="general_error_word">Error</string>
     <!-- when clicking into a menu whose functionality is not yet implemented -->
     <string name="general_not_yet_implemented">Todavía no implementado</string>
-    <!-- when any file or folder is selected -->
-    <string name="error_no_selection">No se ha seleccionado ningún archivo o carpeta</string>
     <!-- when trying to download a file that is already downloaded in the device -->
     <string name="general_already_downloaded">Descargado anteriormente</string>
     <!-- when trying to upload a file that is already uploaded in the folder -->
@@ -104,8 +98,6 @@
     <string name="action_create_folder">Nueva carpeta</string>
     <!-- Option which allows create a new text file -->
     <string name="action_create_txt">Crear nuevo archivo de texto</string>
-    <!-- Menu option to open a link. Also title of the dialog to open a link. -->
-    <string name="action_open_link">Abrir enlace</string>
     <!-- Menu item -->
     <string name="action_settings">Ajustes</string>
     <!-- Search button -->
@@ -266,7 +258,7 @@
         <item quantity="other">Se cancelarán las transferencias seleccionadas.</item>
     </plurals>
     <!-- The name of every users root drive in the cloud of MEGA. -->
-    <string name="section_cloud_drive">Mi nube</string>
+    <string name="section_cloud_drive">Nube</string>
     <!-- Label to reference a recents section -->
     <string name="section_recents">Recientes</string>
     <!-- title of the screen where the secondary media images are uploaded, and name of the folder where the secondary media images are uploaded -->
@@ -635,10 +627,6 @@
     <string name="upload_to_audio">Audio</string>
     <!-- Title of the button in the contact info screen to start a video call -->
     <string name="upload_to_video">Vídeo</string>
-    <!-- upload to. Then choose to browse the file system to choose a file -->
-    <string name="upload_to_filesystem">Elegir del sistema de archivos</string>
-    <!-- upload to. Then choose to browse the file system to choose a file -->
-    <string name="upload_to_filesystem_from">Escoge de</string>
     <!-- Label for the current uploaded size of a file. For example, 3 files, 50KB uploaded -->
     <string name="upload_uploaded">subido</string>
     <!-- Status text at the beginning of an upload, Status text at the beginning of an upload for 2 or more files -->
@@ -1005,8 +993,6 @@
     <string name="settings_disable_logs">Logs desactivados</string>
     <!-- Snackbar error message triggered by host error when user is trying to setup MEGA Camera Uploads folder in settings page -->
     <string name="error_unable_to_setup_cloud_folder">No se puede configurar la carpeta de la cámara en MEGA</string>
-    <!-- Message displayed when the user denies the required permissions during the logs activation -->
-    <string name="logs_not_enabled_permissions">Los logs no se han activado porque has denegado los permisos requeridos</string>
     <!-- Option in the sliding panel to open the folder which contains the file selected after performing a search -->
     <string name="search_open_location">Abrir ubicación</string>
     <!-- message when a temporary error on logging in is due to SDK is waiting for the server to complete a request due to an API lock -->
@@ -1432,7 +1418,7 @@
     <!-- settings of the chat to choose the status -->
     <string name="settings_chat_vibration">Vibración</string>
     <!-- Button text shown on SMS verification page, if the user wants to logout current suspended account and login with another account, user can press this button to logout -->
-    <string name="sms_logout">[A]Cierra sesión[/A] para usar MEGA con otra cuenta</string>
+    <string name="sms_logout">[A]Cierra sesión[/A] para usar otra cuenta de MEGA.</string>
     <!-- On SMS verification page, if the user presses the logout button, a dialog with this text will show to ask for user’s confirmation. -->
     <string name="confirm_logout_from_sms_verification">¿Quieres cerrar sesión y salir de tu cuenta?</string>
     <!-- Text shown when a message has been deleted in the chat -->
@@ -1619,26 +1605,14 @@
     <string name="paused_transfers_title">Transferencias pausadas</string>
     <!-- message shown in the screen when there are not any active transfer -->
     <string name="completed_transfers_empty">No hay transferencias completadas</string>
-    <!-- Text of the notification shown when the upload service is running, Plural -->
-    <plurals name="upload_service_notification">
-        <item quantity="one">Subiendo %1$d de %2$d archivo</item>
-        <item quantity="other">Subiendo %1$d de %2$d archivos</item>
-    </plurals>
-    <!-- Text of the notification shown when the upload service is running, Plural -->
-    <plurals name="upload_service_paused_notification">
-        <item quantity="one">Subiendo %1$d de %2$d archivo (en pausa)</item>
-        <item quantity="other">Subiendo %1$d de %2$d archivos (en pausa)</item>
-    </plurals>
-    <!-- Text of the notification shown when the folder upload service is running, Text of the notification shown when the folder upload service is running - plural e.g. Uploading 1 of 2 folders -->
-    <plurals name="folder_upload_service_notification">
-        <item quantity="one">Subiendo %1$d de %2$d carpeta</item>
-        <item quantity="other">Subiendo %1$d de %2$d carpetas</item>
-    </plurals>
-    <!-- Text of the notification shown when the folder upload service is running, Text of the notification shown when the folder upload service is running - plural e.g. Uploading 1 of 2 folders -->
-    <plurals name="folder_upload_service_paused_notification">
-        <item quantity="one">Subiendo %1$d de %2$d carpeta (en pausa)</item>
-        <item quantity="other">Subiendo %1$d de %2$d carpetas (en pausa)</item>
-    </plurals>
+    <!-- Text of the notification shown when the upload service is running: e.g. Uploading files: 1 of 10 -->
+    <string name="upload_service_notification">Subiendo archivos: %1$d de %2$d</string>
+    <!-- Text of the notification shown when the upload service is paused: e.g. Uploading files: 1 of 10 (paused)-->
+    <string name="upload_service_notification_paused">Subiendo archivos: %1$d de %2$d (en pausa)</string>
+    <!-- Text of the notification shown when the folder upload service is running, e.g. Uploading folders 1 of 2 -->
+    <string name="folder_upload_service_notification">Subiendo carpetas: %1$d de %2$d</string>
+    <!-- Text of the notification shown when the folder upload service is paused, e.g. Uploading folders 1 of 2 (paused) -->
+    <string name="folder_upload_service_notification_paused">Subiendo carpetas: %1$d de %2$d (en pausa)</string>
     <!-- Text of the notification shown when the upload service has finished, Plural -->
     <plurals name="upload_service_final_notification">
         <item quantity="one">%1$d archivo subido</item>
@@ -1686,16 +1660,10 @@
         <item quantity="one">%1$d archivo no descargado</item>
         <item quantity="other">%1$d archivos no descargados</item>
     </plurals>
-    <!-- Text of the notification shown when the download service is running, Plural -->
-    <plurals name="download_service_notification">
-        <item quantity="one">Descargando %1$d de %2$d archivo</item>
-        <item quantity="other">Descargando %1$d de %2$d archivos</item>
-    </plurals>
-    <!-- Text of the notification shown when the download service is paused, Plural -->
-    <plurals name="download_service_paused_notification">
-        <item quantity="one">Bajando %1$d de %2$d archivo (en pausa)</item>
-        <item quantity="other">Bajando %1$d de %2$d archivos (en pausa)</item>
-    </plurals>
+    <!-- Text of the notification shown when the download service is running -->
+    <string name="download_service_notification">Descargando archivos: %1$d de %2$d</string>
+    <!-- Text of the notification shown when the download service is paused -->
+    <string name="download_service_notification_paused">Descargando archivos: %1$d de %2$d (en pausa)</string>
     <!-- Title of the alert when the transfer quota is exceeded. -->
     <string name="title_depleted_transfer_overquota">Cuota de transferencia insuficiente</string>
     <!-- Text of the alert when the transfer quota is depleted. The placeholder indicates the time left for the transfer quota to be reset. For instance: 30m 45s -->
@@ -1716,13 +1684,13 @@
     <!-- Menu option to choose to add file or folders to Cloud Drive -->
     <string name="add_to_cloud">Importar</string>
     <!-- Menu option to choose to add file to Cloud Drive in the chat -->
-    <string name="add_to_cloud_node_chat">Añadir a Mi nube</string>
+    <string name="add_to_cloud_node_chat">Añadir a la Nube</string>
     <!-- Menu option -->
     <string name="general_view_contacts">Ver contactos</string>
     <!-- Message displayed when a file has been successfully imported to Cloud Drive -->
-    <string name="import_success_message">Añadido a Mi nube</string>
+    <string name="import_success_message">Añadido a la Nube</string>
     <!-- Menu option -->
-    <string name="import_success_error">No se ha podido añadir a Mi nube</string>
+    <string name="import_success_error">No se ha podido añadir a la Nube</string>
     <!-- Label in login screen to inform about the chat initialization proccess -->
     <string name="chat_connecting">Conectando&#8230;</string>
     <!-- message when trying to invite a contact with a pending request -->
@@ -1799,7 +1767,7 @@
     <!--  -->
     <string name="no_files_selected_warning">Ningún archivo seleccionado</string>
     <!--  -->
-    <string name="attachment_upload_panel_from_cloud">Desde Mi nube</string>
+    <string name="attachment_upload_panel_from_cloud">Desde la Nube</string>
     <!--  -->
     <string name="attachment_upload_panel_contact">Contacto</string>
     <!--  -->
@@ -2040,7 +2008,7 @@
     <!-- Label to include info of the user email in the feedback form -->
     <string name="user_account_feedback">Cuenta de usuario</string>
     <!-- Label shown in MEGA pdf-viewer when it open a PDF save in smartphone storage -->
-    <string name="save_to_mega">Guardar en \nMi nube</string>
+    <string name="save_to_mega">Guardar en mi \nNube</string>
     <!-- Error message when creating a chat one to one with a contact that already has a chat -->
     <string name="chat_already_exists">El chat ya existe</string>
     <!-- before sharing a file, has to be downloaded -->
@@ -2150,7 +2118,7 @@
     <!-- Text of the empty screen when there are not elements in  Inbox -->
     <string name="context_empty_inbox">[B]No hay archivos en la [/B][A]bandeja de entrada[/A]</string>
     <!-- Text of the empty screen when there are not elements in Cloud Drive -->
-    <string name="context_empty_cloud_drive">[B]No hay archivos en tu [/B][A]nube[/A]</string>
+    <string name="context_empty_cloud_drive">[B]No hay archivos en tu [/B][A]Nube[/A]</string>
     <!-- Text of the empty screen when there are not elements in Saved for Offline -->
     <string name="context_empty_offline">[B]No hay archivos [/B][A]sin conexión[/A]</string>
     <!-- Text of the empty screen when there are not contacts. No dot at the end because is for an empty state. The format placeholders are to showing it in different colors. -->
@@ -2802,16 +2770,12 @@
     <string name="message_set_chat_private">[A]%1$s[/A][B] ha activado la rotación de la clave de cifrado.[/B]</string>
     <!-- error message shown when a chat link is invalid -->
     <string name="invalid_chat_link">Esta conversación ya no está disponible.</string>
-    <!-- error message shown when a chat link is not well formed -->
-    <string name="invalid_chat_link_args">Enlace de chat inválido</string>
     <!-- When it is creating a new group chat, this option permits to establish it private or public -->
     <string name="ekr_label">Rotación de la clave de cifrado</string>
     <!-- Text of the dialog to change a public chat to private (enable encryption key rotation) -->
     <string name="ekr_explanation">La rotación de la clave de cifrado es un poco más segura, pero no te permite crear un enlace de chat y los nuevos participantes no verán los mensajes anteriores.</string>
     <!-- Text of the dialog to change a public chat to private (enable encryption key rotation) -->
     <string name="subtitle_chat_message_enabled_ERK">La rotación de la clave de cifrado es un poco más segura, pero no te permite crear un enlace de chat y los nuevos participantes no verán los mensajes anteriores.</string>
-    <!-- Menu item -->
-    <string name="action_open_chat_link">Abrir enlace de chat</string>
     <!-- Message shown when a contact request has not been sent because the invitation has been sent before -->
     <string name="invite_not_sent_already_sent">La invitación para %s se ha enviado anteriormente y se puede consultar en la pestaña Solicitudes enviadas.</string>
     <!-- Label shown to indicate the QR is saving in Cloud Drive -->
@@ -3126,8 +3090,6 @@
     </plurals>
     <!-- Title of a chat message that contains geolocation info -->
     <string name="title_geolocation_message">Ubicación fijada</string>
-    <!-- Text of the button to indicate an attachment upload from file system -->
-    <string name="attachment_upload_panel_from_device">Desde el sistema de archivos</string>
     <!-- Alert shown when a num of files have not been sent because of any error occurs, Plural of file. 2 files -->
     <plurals name="num_files_not_send">
         <item quantity="one">No se ha podido enviar %d archivo a %d chats</item>
@@ -3197,7 +3159,7 @@
     <!-- Title of second tour screen -->
     <string name="title_tour_two">Chat cifrado</string>
     <!-- Content of second tour screen -->
-    <string name="content_tour_two">Chat totalmente cifrado con llamadas y videollamadas, chat de grupo y capacidad de compartir archivos con tu Cloud Drive.</string>
+    <string name="content_tour_two">Chat totalmente cifrado con llamadas y videollamadas, chat de grupo y capacidad de compartir archivos con tu Nube.</string>
     <!-- Title of third tour screen -->
     <string name="title_tour_three">Crea tu propia red</string>
     <!-- Content of third tour screen -->
@@ -3270,22 +3232,6 @@
     <string name="text_join_call">Para unirte a esta llamada tienes que finalizar tu llamada actual.</string>
     <!-- Text of the dialog shown when you want to join a group call but you are in another active call -->
     <string name="text_join_another_call">Para unirte a esta llamada, tienes que colgar o dejar en espera la llamada actual.</string>
-    <!-- Hint shown in the open chat link alert dialog -->
-    <string name="hint_enter_chat_link">Introducir el enlace de chat</string>
-    <!-- Hint shown in the open link alert dialog -->
-    <string name="hint_paste_link">Pegar enlace</string>
-    <!-- Error shown when it tries to open an invalid file or folder link -->
-    <string name="invalid_file_folder_link">Enlace de archivo o carpeta no válido</string>
-    <!-- Error shown when it tries to open an invalid file or folder link and the text view is empty -->
-    <string name="invalid_file_folder_link_empty">Por favor, introduce un enlace válido de archivo o carpeta</string>
-    <!-- Error shown when it tries to open an invalid chat link and the text view is empty -->
-    <string name="invalid_chat_link_empty">Por favor introduce un enlace de chat válido</string>
-    <!-- Error shown when it tries to open a chat link from the Cloud Drive section -->
-    <string name="valid_chat_link">Has pegado un enlace de chat.</string>
-    <!-- Error shown when it tries to open a contact link from the Cloud Drive section -->
-    <string name="valid_contact_link">Has pegado un enlace de contacto.</string>
-    <!-- Menu item -->
-    <string name="action_open_contact_link">Abrir enlace de contacto</string>
     <!-- Explanation of the dialog shown to share a chat link -->
     <string name="copy_link_explanation">Las personas pueden unirse a tu grupo usando este enlace.</string>
     <!-- Label that indicates the creation of a chat link -->
@@ -3748,7 +3694,7 @@
     <!-- Explanation of a warning recommending upgrade to Pro in relation to link available options -->
     <string name="link_upgrade_pro_explanation">Los usuarios Pro tienen acceso exclusivo a una capa adicional de seguridad para los enlace que hace que la cuenta sea aún más segura.</string>
     <!-- Meaning of links decryption key -->
-    <string name="decryption_key_explanation">Nuestro sistema de cifrado punto a punto requiere una clave única generada automáticamente para este archivo. El enlace se crea por defecto con esta clave pero puedes exportala por separado para más seguridad.</string>
+    <string name="decryption_key_explanation">Nuestro sistema de cifrado punto a punto requiere una clave única generada automáticamente para este archivo o carpeta. El enlace se crea por defecto con esta clave pero puedes exportarla por separado para más seguridad.</string>
     <!-- Reset password label -->
     <string name="reset_password_label">Restablecer contraseña</string>
     <!-- Warning show to the user when has enable to send the decryption key of a link separately and tries to share the link -->
@@ -3768,7 +3714,7 @@
     <!-- Context menu item. Allows user to delete file/folder from favourites -->
     <string name="file_properties_unfavourite">Eliminar favorito</string>
     <!-- Context menu item. Allows to mark file/folder with own color label -->
-    <string name="file_properties_label">Etiqueta&#8230;</string>
+    <string name="file_properties_label">Etiqueta</string>
     <!-- Information text to let’s the user know that they can remove a colour from a folder or file that was already marked. -->
     <string name="action_remove_label">Eliminar etiqueta</string>
     <!-- Title text to show label selector. -->
@@ -3800,19 +3746,13 @@
     <!-- Preferences screen item title for cookie settings -->
     <string name="settings_about_cookie_settings">Ajustes de Cookies</string>
     <!-- Cookie dialog title -->
-    <string name="dialog_cookie_alert_title">Antes de continuar</string>
+    <string name="dialog_cookie_alert_title">Tu privacidad</string>
     <!-- Cookie dialog message. Please, keep the placeholders to format the string. -->
-    <string name="dialog_cookie_alert_message">Utilizamos el almacenamiento local y tecnologías similares (“Cookies”) para ofrecerte nuestros servicios, mejorar tu experiencia al usarlos y personalizar los anuncios que ves, incluso a través de terceros. Acepta el uso de Cookies o personalizalo en los ajustes. Encuentra más información al respecto en nuestra [A]Política de cookies[/A].</string>
+    <string name="dialog_cookie_alert_message">Utilizamos cookies y tecnologías similares (“Cookies”) para ofrecerte nuestros servicios y mejorar tu experiencia al usarlos. Acepta el uso de Cookies o personalizalo en los ajustes. Encuentra más información al respecto en nuestra [A]Política de cookies[/A].</string>
     <!-- Cookie dialog message showed when there are unsaved settings. -->
     <string name="dialog_cookie_alert_unsaved">Ajustes de Cookies no guardados.</string>
     <!-- Snackbar message showed when there settings has been saved successfully. -->
     <string name="dialog_cookie_snackbar_saved">Los cambios en los Ajustes de Cookies han sido guardados</string>
-    <!-- Cookie dialog third party first subtitle -->
-    <string name="dialog_cookie_thirdparty_subtitle1">Cookies publicitarias de Google</string>
-    <!-- Cookie dialog third party second subtitle -->
-    <string name="dialog_cookie_thirdparty_subtitle2">Categoría: Cookies publicitarias</string>
-    <!-- Cookie dialog third party message. Please, keep the placeholders to format the string. -->
-    <string name="dialog_cookie_thirdparty_message">Utilizado por Google para:\n• personalizar los anuncios que Google muestra en el nuestro y en otros servicios y sitios web, en función de cosas como tu ubicación y como las páginas web que hayas visitado anteriormente;\n• controlar la frecuencia con la que se te muestran determinados anuncios\n• proporcionar prevención de fraude y;\n• determinar cuándo toques en un anuncio en concreto y monitorear las acciones que realizas en respuesta a ese anuncio.\nhttps://policies.google.com/technologies/partner-sites</string>
     <!-- Preference screen item title -->
     <string name="preference_cookies_accept">Aceptar Cookies</string>
     <!-- Preference screen item title -->
@@ -3820,21 +3760,9 @@
     <!-- Preference screen item summary -->
     <string name="preference_cookies_essential_summary">Esenciales para el funcionamiento de nuestros servicios y para un acceso seguro. Por esta razón, no requieren consentimiento.</string>
     <!-- Preference screen item title -->
-    <string name="preference_cookies_preference_title">Cookies funcionales</string>
-    <!-- Preference screen item summary -->
-    <string name="preference_cookies_preference_summary">Permiten recordar tus ajustes de pantalla y de formato. Si no aceptas estas Cookies, no podremos recordar algunas cosas, como tu formato de pantalla preferido.</string>
-    <!-- Preference screen item title -->
     <string name="preference_cookies_performance_title">Cookies de análisis y rendimiento</string>
     <!-- Preference screen item summary -->
     <string name="preference_cookies_performance_summary">Sirven para entender cómo utilizas nuestros servicios y nos proporcionan datos que podemos utilizar para realizar mejoras. No aceptar estas Cookies significará que tendremos menos datos disponibles para mejorar el servicio.</string>
-    <!-- Preference screen item title -->
-    <string name="preference_cookies_advertising_title">Cookies publicitarias</string>
-    <!-- Preference screen item summary -->
-    <string name="preference_cookies_advertising_summary">Utilizadas por nosotros y nuestros socios publicitarios para personalizar los anuncios que ves en nuestros servicios y en otros sitios web en función de tu historial de navegación. No aceptar estas Cookies significa que mostraremos anuncios menos relevantes.</string>
-    <!-- Preference screen item title -->
-    <string name="preference_cookies_thirdparty_title">Cookies de terceros</string>
-    <!-- Preference screen item summary. Please, keep the placeholders to format the string. -->
-    <string name="preference_cookies_thirdparty_summary">Controladas por terceros, las usamos para proporcionar las funcionalidades descritas anteriormente. No aceptar estas Cookies tendrá distintas implicaciones en función del tipo de Cookie de terceros. Pulsa en “Más información” a continuación para obtener detalles sobre todas las Cookies de terceros que utilizamos.</string>
     <!-- Preference screen item state description -->
     <string name="preference_cookies_always_on">Activas por defecto</string>
     <!-- Menu option that allows the user to scan document and upload it directly to MEGA. -->
@@ -3863,7 +3791,7 @@
     <string name="file_created">Archivo creado</string>
     <!-- Warning indicating a file was not created successfully -->
     <string name="file_creation_failed">No se ha podido crear el archivo. Inténtalo de nuevo.</string>
-    <!-- Label indicating a file was saved to some folder. e.g.: File saved to Cloud Drive -->
+    <!-- Label indicating a file was saved to some folder. e.g.: File saved to Cloud Drive. "Cloud Drive" is the only destination for the time being, thus any article isn't needed -->
     <string name="file_saved_to">Archivo guardado en %1$s</string>
     <!-- Warning indicating a file was not saved to some folder. e.g.: File not saved to Cloud Drive. Try again -->
     <string name="file_saved_to_failed">No se ha podido guardar el archivo en %1$s. Inténtalo de nuevo.</string>
@@ -3978,8 +3906,6 @@
     </plurals>
     <!-- Button of the warning dialog indicating the renamed name file extension is not the same to confirm the change. -->
     <string name="action_change_anyway">Cambiar de todos modos</string>
-    <!-- Snackbar text to display if the user doesn't grant the permission to access all files on a device with Android 11 or higher -->
-    <string name="snackbar_storage_permission_denied_android_11">Se necesita permiso de acceso al almacenamiento.</string>
     <!-- String to show the transfer quota and the used space in My Account section. E.g.: -->
     <string name="used_storage_transfer">%1$s / %2$s</string>
     <!-- String to show the transfer quota and the used space in My Account section -->
@@ -4059,7 +3985,7 @@
     <!-- General label for microphone -->
     <string name="general_mic">Mic</string>
     <!-- General label for microphone muted -->
-    <string name="general_mic_mute">Tu micrófono está silenciado</string>
+    <string name="general_mic_mute">Tu micrófono está apagado</string>
     <!-- General label for microphone unmuted -->
     <string name="general_mic_unmute">Tu micrófono está encendido</string>
     <!-- General label for camera -->
@@ -4077,9 +4003,9 @@
     <!-- General label for headphone on-->
     <string name="general_headphone_on">Auriculares activados</string>
     <!-- General label for speaker on-->
-    <string name="general_speaker_on">Altavoz activado</string>
+    <string name="general_speaker_on">El altavoz está encendido</string>
     <!-- General label for speaker off-->
-    <string name="general_speaker_off">Altavoz desactivado</string>
+    <string name="general_speaker_off">El altavoz está apagado</string>
     <!-- Label for end meeting-->
     <string name="meeting_end">Finalizar</string>
     <!-- Invite contacts as participants of the meeting-->
@@ -4174,4 +4100,50 @@
     <string name="main_view">Vista principal</string>
     <!-- Warning in Offline section alerting all the Offline files will be deleted after logout. -->
     <string name="offline_warning">Si cierras sesión, el contenido sin conexión será eliminado.</string>
+    <!-- Settings category which contains all preferences related to user interface. -->
+    <string name="user_interface_setting">Interfaz de usuario</string>
+    <!-- Setting which allows to choose the start screen. -->
+    <string name="start_screen_setting">Pantalla de inicio</string>
+    <!-- Setting which allows to hide or show the recent activity. -->
+    <string name="hide_recent_setting">Ocultar actividad reciente</string>
+    <!-- Context of a setting which allows to hide or show the recent activity. -->
+    <string name="hide_recent_setting_context">Ocultar la actividad reciente en la sección Inicio.</string>
+    <!-- Title of a dialog informing the start screen can be modified. -->
+    <string name="choose_start_screen_title">Elegir la pantalla de inicio</string>
+    <!-- Test of a dialog informing the start screen can be modified. -->
+    <string name="choose_start_screen_text">Cambiar los ajustes para elegir qué pantalla se abrirá la próxima vez que inicies la aplicación de MEGA.</string>
+    <!-- Action button which allows to change a setting. -->
+    <string name="change_setting_action">Cambiar ajustes</string>
+    <!-- Subtitle of the settings page where the start screen can be chosen. -->
+    <string name="configure_start_screen">Configurar la pantalla de inicio predeterminada</string>
+    <!-- Homepage section. -->
+    <string name="home_section">Inicio</string>
+    <!-- Action button which allows to show the recent activity. -->
+    <string name="show_activity_action">Mostrar actividad</string>
+    <!-- Text informing the recent activity is hidden. -->
+    <string name="recents_activity_hidden">[B]Actividad reciente[/B] oculta</string>
+    <!-- Alert informing the user can choose the video quality for Camera Uploads Videos -->
+    <string name="video_quality_info">Ahorra espacio disminuyendo la calidad de vídeo en los ajustes de las Subidas de la cámara.</string>
+    <!-- Label indicating video original quality -->
+    <string name="original_quality">Calidad original</string>
+    <!-- Settings label which allows to enable or disable fingerprint unlock. -->
+    <string name="setting_fingerprint">Huella digital</string>
+    <!-- Title of the dialog which allows to enable the fingerprint unlock. -->
+    <string name="title_enable_fingerprint">Confirmar la huella para desbloquear</string>
+    <!-- Title of the dialog which allows to unlock the app with the fingerprint. -->
+    <string name="title_unlock_fingerprint">Desbloquear usando la huella</string>
+    <!-- Button of the dialog which allows to unlock the app with the fingerprint. Gives the option to unlock with the passcode instead -->
+    <string name="action_use_passcode">Usar código</string>
+    <!-- Message informing the fingerprint was enabled successfully -->
+    <string name="confirmation_fingerprint_enabled">Huella confirmada</string>
+    <!-- Warning indicating an image (GIF) cannot be inserted in an input text. Same string than the one shown by the system when it detects this behaviour on its own. -->
+    <string name="image_insertion_not_allowed">MEGA no admite la inserción de imágenes aquí</string>
+    <!-- The label under the button of viewing all images screen -->
+    <string name="section_images">Imágenes</string>
+    <!-- Title of the dialog warning the user about disable file versioning. -->
+    <string name="disable_versioning_label">Desactivar versionado de archivos</string>
+    <!-- Warning of the dialog informing the user about disable file versioning. -->
+    <string name="disable_versioning_warning">Our file versioning feature ensures that we keep older copies of your files around if you replace them with newer versions. If you disable File Versioning you will no longer have this protection; the old copy will be lost when you replace it.</string>
+    <!-- Warning informing the user the folder location is trying to open no longer exists. -->
+    <string name="location_not_exist">This location no longer exists.</string>
 </resources>

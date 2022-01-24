@@ -5,28 +5,23 @@ import android.os.Handler
 import android.os.Looper
 import androidx.lifecycle.MutableLiveData
 import kotlinx.coroutines.delay
-import mega.privacy.android.app.fragments.homepage.photos.PhotoNodeItem
 import mega.privacy.android.app.listeners.BaseListener
-import mega.privacy.android.app.utils.FileUtil
-import mega.privacy.android.app.utils.ThumbnailUtilsLollipop
-import mega.privacy.android.app.utils.Util
+import mega.privacy.android.app.utils.*
 import nz.mega.sdk.*
 import java.io.File
-import java.time.LocalDate
-import java.time.YearMonth
-import java.time.format.DateTimeFormatter
+import java.time.format.DateTimeFormatter.ofPattern
 import java.util.*
 import kotlin.collections.LinkedHashMap
 
 /**
  * Data fetcher for fetching typed files
  */
-class TypedNodesFetcher(
+open class TypedNodesFetcher(
     private val context: Context,
     private val megaApi: MegaApiAndroid,
     private val type: Int = MegaApiJava.FILE_TYPE_DEFAULT,
     private val order: Int = MegaApiJava.ORDER_DEFAULT_ASC,
-    private val selectedNodesMap: LinkedHashMap<Any, NodeItem>
+    private val selectedNodesMap: LinkedHashMap<Any, out NodeItem>
 ) {
     val result = MutableLiveData<List<NodeItem>>()
 
@@ -35,12 +30,12 @@ class TypedNodesFetcher(
      * the order of putting. Moreover, it has a quick element search[O(1)] (for
      * the callback of megaApi.getThumbnail())
      */
-    private val fileNodesMap: LinkedHashMap<Any, NodeItem> = LinkedHashMap()
+    val fileNodesMap: LinkedHashMap<Any, NodeItem> = LinkedHashMap()
 
     /** Refresh rate limit */
-    private var waitingForRefresh = false
+    var waitingForRefresh = false
 
-    private val getThumbnailNodes = mutableMapOf<MegaNode, String>()
+    val getThumbnailNodes = mutableMapOf<MegaNode, String>()
 
     /**
      * Throttle for updating the LiveData
@@ -57,7 +52,7 @@ class TypedNodesFetcher(
         )
     }
 
-    private fun getThumbnailFile(node: MegaNode) = File(
+    fun getThumbnailFile(node: MegaNode) = File(
         ThumbnailUtilsLollipop.getThumbFolder(context),
         node.base64Handle.plus(FileUtil.JPG_EXTENSION)
     )
@@ -86,57 +81,19 @@ class TypedNodesFetcher(
      * Get all nodes items
      */
     suspend fun getNodeItems() {
-        var lastModifyDate: LocalDate? = null
-
-        for (node in getMegaNodes()) {
+        for (node in getMegaNodes(order, type)) {
             val thumbnail = getThumbnail(node)
-            val modifyDate = Util.fromEpoch(node.modificationTime)
-            val dateString = DateTimeFormatter.ofPattern("MMM uuuu").format(modifyDate)
-
-            // Photo "Month-Year" section headers
-            if (type == MegaApiJava.FILE_TYPE_PHOTO && (lastModifyDate == null
-                        || YearMonth.from(lastModifyDate) != YearMonth.from(
-                    modifyDate
-                ))
-            ) {
-                lastModifyDate = modifyDate
-                // RandomUUID() can ensure non-repetitive values in practical purpose
-                fileNodesMap[UUID.randomUUID()] = PhotoNodeItem(
-                    PhotoNodeItem.TYPE_TITLE,
-                    -1,
-                    null,
-                    -1,
-                    dateString,
-                    null,
-                    false
-                )
-            }
-
+            val dateString = ofPattern("MMMM uuuu").format(Util.fromEpoch(node.modificationTime))
             val selected = selectedNodesMap[node.handle]?.selected ?: false
-            var nodeItem: NodeItem?
 
-            if (type == MegaApiJava.FILE_TYPE_PHOTO) {
-                nodeItem = PhotoNodeItem(
-                    PhotoNodeItem.TYPE_PHOTO,
-                    -1,
-                    node,
-                    -1,
-                    dateString,
-                    thumbnail,
-                    selected
-                )
-            } else {
-                nodeItem = NodeItem(
-                    node,
-                    -1,
-                    type == MegaApiJava.FILE_TYPE_VIDEO,
-                    dateString,
-                    thumbnail,
-                    selected
-                )
-            }
-
-            fileNodesMap[node.handle] = nodeItem
+            fileNodesMap[node.handle] = NodeItem(
+                node,
+                -1,
+                type == MegaApiJava.FILE_TYPE_VIDEO,
+                dateString,
+                thumbnail,
+                selected
+            )
         }
 
         result.postValue(ArrayList(fileNodesMap.values))
@@ -144,7 +101,7 @@ class TypedNodesFetcher(
         getThumbnailsFromServer()
     }
 
-    private suspend fun getThumbnailsFromServer() {
+    suspend fun getThumbnailsFromServer() {
         for (item in getThumbnailNodes) {
             megaApi.getThumbnail(
                 item.key,
@@ -173,12 +130,12 @@ class TypedNodesFetcher(
         }
     }
 
-    private fun getMegaNodes(): List<MegaNode> =
+    open fun getMegaNodes(order: Int, type: Int): List<MegaNode> =
         megaApi.searchByType(order, type, MegaApiJava.SEARCH_TARGET_ROOTNODE)
 
     companion object {
-        private const val UPDATE_DATA_THROTTLE_TIME =
+        const val UPDATE_DATA_THROTTLE_TIME =
             500L   // 500ms, user can see the update of photos instantly
-        private const val GET_THUMBNAIL_THROTTLE = 10L // 10ms
+        const val GET_THUMBNAIL_THROTTLE = 10L // 10ms
     }
 }

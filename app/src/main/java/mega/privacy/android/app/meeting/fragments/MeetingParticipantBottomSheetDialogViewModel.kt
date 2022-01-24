@@ -4,8 +4,8 @@ import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.widget.TextView
-import androidx.hilt.lifecycle.ViewModelInject
 import androidx.lifecycle.ViewModel
+import dagger.hilt.android.lifecycle.HiltViewModel
 import mega.privacy.android.app.R
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop
 import mega.privacy.android.app.lollipop.controllers.ChatController
@@ -16,11 +16,13 @@ import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.StringResourcesUtils
 import nz.mega.sdk.MegaChatApiAndroid
 import nz.mega.sdk.MegaChatPeerList
+import javax.inject.Inject
 
 /**
  * ViewModel for [MeetingParticipantBottomSheetDialogFragment]
  */
-class MeetingParticipantBottomSheetDialogViewModel @ViewModelInject constructor(
+@HiltViewModel
+class MeetingParticipantBottomSheetDialogViewModel @Inject constructor(
     private val megaChatApi: MegaChatApiAndroid
 ) : ViewModel() {
 
@@ -88,13 +90,38 @@ class MeetingParticipantBottomSheetDialogViewModel @ViewModelInject constructor(
     fun showContactInfoOrEditProfile(): Boolean = !isGuest &&
             !isParticipantGuest() && (participant?.isContact == true || participant?.isMe == true)
 
-
     /**
      * Determine if show the divider between info item and option items
      *
      * @return if should show return true, else false
      */
-    fun showDividerContactInfo(): Boolean = showAddContact() || showContactInfoOrEditProfile()
+    fun showDividerContactInfo(): Boolean = (showAddContact() || showContactInfoOrEditProfile())
+            && (showSendMessage() || showPinItem() || showMakeModeratorItem() || showRemoveItem())
+
+
+    /**
+     * Determine if show the divider between seng message item and option items
+     *
+     * @return if should show return true, else false
+     */
+    fun showDividerSendMessage(): Boolean =
+        showSendMessage() && (showPinItem() || showMakeModeratorItem() || showRemoveItem())
+
+
+    /**
+     * Determine if show the divider between ping to speaker item and option items
+     *
+     * @return if should show return true, else false
+     */
+    fun showDividerPingToSpeaker(): Boolean =
+        showPinItem() && (showMakeModeratorItem() || showRemoveItem())
+
+    /**
+     * Determine if show the divider between make moderator item and option items
+     *
+     * @return if should show return true, else false
+     */
+    fun showDividerMakeModerator(): Boolean = showMakeModeratorItem() && showRemoveItem()
 
     /**
      * Determine if show the `Edit Profile` item

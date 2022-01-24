@@ -48,6 +48,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 
 import mega.privacy.android.app.DatabaseHandler;
@@ -57,6 +58,7 @@ import mega.privacy.android.app.UserCredentials;
 import mega.privacy.android.app.components.ListenScrollChangesHelper;
 import mega.privacy.android.app.utils.MegaProgressDialogUtil;
 import mega.privacy.android.app.utils.ColorUtils;
+import mega.privacy.android.app.utils.StringResourcesUtils;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaError;
@@ -192,7 +194,9 @@ public class MyCodeFragment extends Fragment implements View.OnClickListener{
         }
 
         if(aB!=null){
-            aB.setTitle(getString(R.string.section_qr_code));
+            aB.setTitle(StringResourcesUtils.getString(R.string.section_qr_code)
+                    .toUpperCase(Locale.getDefault()));
+
             aB.setHomeButtonEnabled(true);
             aB.setDisplayHomeAsUpEnabled(true);
         }

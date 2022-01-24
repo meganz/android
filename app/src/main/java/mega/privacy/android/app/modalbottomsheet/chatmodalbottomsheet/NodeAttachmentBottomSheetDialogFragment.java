@@ -1,7 +1,5 @@
 package mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet;
 
-import android.annotation.SuppressLint;
-import android.app.Dialog;
 import android.content.res.Configuration;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -23,10 +21,10 @@ import mega.privacy.android.app.R;
 import mega.privacy.android.app.interfaces.SnackbarShower;
 import mega.privacy.android.app.lollipop.controllers.ChatController;
 import mega.privacy.android.app.lollipop.megachat.AndroidMegaChatMessage;
-import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.NodeAttachmentHistoryActivity;
 import mega.privacy.android.app.modalbottomsheet.BaseBottomSheetDialogFragment;
 import mega.privacy.android.app.utils.StringResourcesUtils;
+import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaChatMessage;
 import nz.mega.sdk.MegaChatRoom;
 import nz.mega.sdk.MegaNode;
@@ -211,7 +209,7 @@ public class NodeAttachmentBottomSheetDialogFragment extends BaseBottomSheetDial
     public void onClick(View v) {
 
         if (!isOnline(requireContext())) {
-            ((ChatActivityLollipop) requireActivity()).showSnackbar(SNACKBAR_TYPE, getString(R.string.error_server_connection_problem), INVALID_HANDLE);
+            ((NodeAttachmentHistoryActivity) requireActivity()).showSnackbar(SNACKBAR_TYPE, getString(R.string.error_server_connection_problem), INVALID_HANDLE);
             return;
         }
 
@@ -225,7 +223,7 @@ public class NodeAttachmentBottomSheetDialogFragment extends BaseBottomSheetDial
                     logWarning("The selected node is NULL");
                     return;
                 }
-                ((ChatActivityLollipop) requireActivity()).downloadNodeList(nodeList);
+                ((NodeAttachmentHistoryActivity) requireActivity()).downloadNodeList(nodeList);
                 break;
 
             case R.id.option_import_layout:
@@ -246,6 +244,8 @@ public class NodeAttachmentBottomSheetDialogFragment extends BaseBottomSheetDial
                 if (availableOffline(requireContext(), node)) {
                     MegaOffline mOffDelete = dbH.findByHandle(node.getHandle());
                     removeOffline(mOffDelete, dbH, requireContext());
+                    Util.showSnackbar(
+                            getActivity(), getResources().getString(R.string.file_removed_offline));
                 } else if (requireActivity() instanceof SnackbarShower) {
                     ArrayList<AndroidMegaChatMessage> messages = new ArrayList<>();
                     messages.add(message);

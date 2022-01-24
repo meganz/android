@@ -1,5 +1,6 @@
 package mega.privacy.android.app.fragments.homepage
 
+import android.view.View
 import androidx.core.view.isVisible
 import androidx.databinding.ViewDataBinding
 import androidx.recyclerview.widget.RecyclerView
@@ -43,7 +44,8 @@ class NodeViewHolder(private val binding: ViewDataBinding) :
                 }
                 is SortByHeaderBinding -> {
                     this.orderNameStringId =
-                        SortByHeaderViewModel.orderNameMap[sortByHeaderViewModel.order]!!
+                        SortByHeaderViewModel.orderNameMap[sortByHeaderViewModel.order.first]!!
+                    this.enterMediaDiscovery.isVisible = false
                     this.sortByHeaderViewModel = sortByHeaderViewModel
                 }
             }

@@ -64,6 +64,36 @@ sudo apt install build-essential swig automake libtool autoconf cmake
 
 10. Open the project with Android Studio, let it build the project and hit _*Run*_.
 
+#### macOS setup
+
+To build jni libs on macOS, you need install these dependencies via brew:
+
+    `brew install bash gnu-sed gnu-tar autoconf automake cmake coreutils libtool swig wget xz`
+
+Then reboot MacOS to ensure newly installed latest bash(v5.x) overrides default v3.x in PATH
+
+Then edit PATH env (Please make sure the gnu paths are setup in front of $PATH):
+
+    `export PATH="/usr/local/opt/gnu-tar/libexec/gnubin:$PATH"`
+    `export PATH="/usr/local/opt/gnu-sed/libexec/gnubin:$PATH"`
+
+Then download and setup NDK follow guides above, then run this command to build:
+
+    `bash ./build.sh all`
+
+
+##### If the build script fails to detect cmake when building ffmpeg extension on a mac
+
+1. In Android studio, open the SDK manager (Or through Settings>Appearance & Behaviour>System Settings>Android SDK)
+2. Go to the SDK Tools tab
+3. Check the "Show package details" box
+4. Expand the CMake section in the list
+5. Select 3.10.2.4988404
+6. Click "OK"
+7. Add the following to your PATH:
+    `export PATH="/Users/{USERNAME}/Library/Android/sdk/cmake/3.10.2.4988404/bin:$PATH"`
+8. Retry the build
+
 ### Notice
 
 To use the *geolocation feature* you need a *Google Maps API key*:

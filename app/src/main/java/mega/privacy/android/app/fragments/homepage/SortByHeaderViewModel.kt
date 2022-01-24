@@ -1,25 +1,38 @@
 package mega.privacy.android.app.fragments.homepage
 
-import android.content.Context
-import android.content.Intent
-import androidx.hilt.lifecycle.ViewModelInject
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModel
 import com.jeremyliao.liveeventbus.LiveEventBus
-import dagger.hilt.android.qualifiers.ApplicationContext
+import dagger.hilt.android.lifecycle.HiltViewModel
 import mega.privacy.android.app.R
-import mega.privacy.android.app.utils.Constants
+import mega.privacy.android.app.constants.EventConstants.EVENT_SHOW_MEDIA_DISCOVERY
+import mega.privacy.android.app.constants.EventConstants.EVENT_UPDATE_VIEW_MODE
+import mega.privacy.android.app.globalmanagement.SortOrderManagement
 import mega.privacy.android.app.utils.Constants.EVENT_LIST_GRID_CHANGE
 import mega.privacy.android.app.utils.Constants.EVENT_ORDER_CHANGE
 import nz.mega.sdk.MegaApiJava.*
+import javax.inject.Inject
 
-class SortByHeaderViewModel @ViewModelInject constructor(
-    @ApplicationContext private val context: Context
+/**
+ * ViewModel in charge of manage actions from sub-headers in which view mode (list or grid)
+ * and sort by options can be changed.
+ */
+@HiltViewModel
+class SortByHeaderViewModel @Inject constructor(
+    sortOrderManagement: SortOrderManagement
 ) : ViewModel() {
 
-    var order = ORDER_DEFAULT_ASC
+    /* Triple<Int, Int, Int>:
+        - First: Cloud order
+        - Second: Others order (Incoming root)
+        - Third: Offline order */
+    var order = Triple(
+        sortOrderManagement.getOrderCloud(),
+        sortOrderManagement.getOrderOthers(),
+        sortOrderManagement.getOrderOffline()
+    )
         private set
     var isList = true
         private set
@@ -27,13 +40,13 @@ class SortByHeaderViewModel @ViewModelInject constructor(
     private val _showDialogEvent = MutableLiveData<Event<Unit>>()
     val showDialogEvent: LiveData<Event<Unit>> = _showDialogEvent
 
-    private val _orderChangeEvent = MutableLiveData<Event<Int>>()
-    val orderChangeEvent: LiveData<Event<Int>> = _orderChangeEvent
+    private val _orderChangeEvent = MutableLiveData<Event<Triple<Int, Int, Int>>>()
+    val orderChangeEvent: LiveData<Event<Triple<Int, Int, Int>>> = _orderChangeEvent
 
     private val _listGridChangeEvent = MutableLiveData<Event<Boolean>>()
     val listGridChangeEvent: LiveData<Event<Boolean>> = _listGridChangeEvent
 
-    private val orderChangeObserver = Observer<Int> {
+    private val orderChangeObserver = Observer<Triple<Int, Int, Int>> {
         order = it
         _orderChangeEvent.value = Event(it)
     }
@@ -45,8 +58,9 @@ class SortByHeaderViewModel @ViewModelInject constructor(
 
     init {
         // Use "sticky" to observe the value set in ManagerActivity onCreate()
-        LiveEventBus.get(EVENT_ORDER_CHANGE, Int::class.java)
-            .observeStickyForever(orderChangeObserver)
+        @Suppress("UNCHECKED_CAST")
+        LiveEventBus.get(EVENT_ORDER_CHANGE)
+            .observeStickyForever(orderChangeObserver as Observer<Any>)
         LiveEventBus.get(
             EVENT_LIST_GRID_CHANGE,
             Boolean::class.java
@@ -58,19 +72,27 @@ class SortByHeaderViewModel @ViewModelInject constructor(
     }
 
     fun switchListGrid() {
-        val intent = Intent(Constants.BROADCAST_ACTION_INTENT_UPDATE_VIEW)
-        intent.putExtra(Constants.INTENT_EXTRA_KEY_IS_LIST, !isList)
-        context.sendBroadcast(intent)
+        LiveEventBus.get(EVENT_UPDATE_VIEW_MODE, Boolean::class.java).post(!isList)
+    }
+
+    /**
+     * Enter media discovery view.
+     */
+    fun enterMediaDiscovery() {
+        LiveEventBus.get(EVENT_SHOW_MEDIA_DISCOVERY, Unit::class.java).post(Unit)
     }
 
     override fun onCleared() {
-        LiveEventBus.get(EVENT_ORDER_CHANGE, Int::class.java)
-            .removeObserver(orderChangeObserver)
+        @Suppress("UNCHECKED_CAST")
+        LiveEventBus.get(EVENT_ORDER_CHANGE)
+            .removeObserver(orderChangeObserver as Observer<Any>)
         LiveEventBus.get(
             EVENT_LIST_GRID_CHANGE,
             Boolean::class.java
         ).removeObserver(listGridChangeObserver)
     }
+
+    fun getOrderMap(): HashMap<Int, Int> = orderNameMap
 
     companion object {
         val orderNameMap = hashMapOf(
@@ -79,7 +101,9 @@ class SortByHeaderViewModel @ViewModelInject constructor(
             ORDER_MODIFICATION_ASC to R.string.sortby_date,
             ORDER_MODIFICATION_DESC to R.string.sortby_date,
             ORDER_SIZE_ASC to R.string.sortby_size,
-            ORDER_SIZE_DESC to R.string.sortby_size
+            ORDER_SIZE_DESC to R.string.sortby_size,
+            ORDER_FAV_ASC to R.string.file_properties_favourite,
+            ORDER_LABEL_ASC to R.string.title_label
         )
     }
 }

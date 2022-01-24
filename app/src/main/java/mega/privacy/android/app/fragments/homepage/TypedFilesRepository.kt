@@ -14,7 +14,7 @@ import javax.inject.Singleton
 
 @Singleton
 class TypedFilesRepository @Inject constructor(
-    @ApplicationContext private val context: Context,
+    @ApplicationContext val context: Context,
     @MegaApi private val megaApi: MegaApiAndroid
 ) {
     /** Live Data to notify the query result*/
@@ -26,6 +26,9 @@ class TypedFilesRepository @Inject constructor(
     /** The selected nodes in action mode */
     private val selectedNodesMap: LinkedHashMap<Any, NodeItem> = LinkedHashMap()
 
+    /**
+     * Using a node fetcher for the new request, and link fileNodeItems to its result.
+     */
     suspend fun getFiles(type: Int, order: Int) {
         preserveSelectedItems()
 

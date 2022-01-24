@@ -621,6 +621,7 @@ class HomepageFragment : Fragment() {
         }
     }
 
+    @Suppress("deprecation") // TODO Migrate to registerForActivityResult()
     private fun openNewChatActivity() = doIfOnline(true) {
         val intent = Intent(activity, AddContactActivityLollipop::class.java).apply {
             putExtra(KEY_CONTACT_TYPE, CONTACT_TYPE_MEGA)
@@ -734,6 +735,9 @@ class HomepageFragment : Fragment() {
      * Showing the full screen mask by adding the mask layout to the window content
      */
     private fun addMask() {
+        requireActivity().window.statusBarColor =
+            ContextCompat.getColor(requireContext(), R.color.grey_600_085_dark_grey_070)
+
         windowContent?.addView(fabMaskLayoutDataBinding.root)
     }
 
@@ -741,6 +745,9 @@ class HomepageFragment : Fragment() {
      * Removing the full screen mask
      */
     private fun removeMask() {
+        requireActivity().window.statusBarColor =
+            ContextCompat.getColor(requireContext(), android.R.color.transparent)
+
         windowContent?.removeView(fabMaskLayoutDataBinding.root)
     }
 

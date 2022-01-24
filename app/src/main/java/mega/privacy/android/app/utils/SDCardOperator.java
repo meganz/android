@@ -19,6 +19,7 @@ import java.util.Map;
 
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
+import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaNode;
@@ -191,7 +192,12 @@ public class SDCardOperator {
             df.delete();
         }
 
-        Uri uri = parent.createFile(null, name).getUri();
+        DocumentFile targetFile = parent.createFile(MimeTypeList.typeForName(name).getType(), name);
+        if(targetFile == null) {
+            throw new IOException("Create file on SD card failed.");
+        }
+
+        Uri uri = targetFile.getUri();
         OutputStream os = null;
         InputStream is = null;
 
@@ -233,7 +239,12 @@ public class SDCardOperator {
             df.delete();
         }
 
-        Uri uri = parent.createFile(null, name).getUri();
+        DocumentFile targetFile = parent.createFile(MimeTypeList.typeForName(name).getType(), name);
+        if(targetFile == null) {
+            throw new IOException("Create file on SD card failed.");
+        }
+
+        Uri uri = targetFile.getUri();
         OutputStream os = null;
         InputStream is = null;
 

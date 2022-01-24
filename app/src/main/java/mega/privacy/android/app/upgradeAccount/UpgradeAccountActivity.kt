@@ -17,6 +17,7 @@ import mega.privacy.android.app.utils.*
 import mega.privacy.android.app.utils.Constants.*
 import mega.privacy.android.app.utils.StringUtils.toSpannedHtmlText
 import nz.mega.sdk.MegaApiJava
+import java.util.*
 
 class UpgradeAccountActivity : ChooseAccountActivity() {
 
@@ -59,6 +60,9 @@ class UpgradeAccountActivity : ChooseAccountActivity() {
     }
 
     private fun setupView() {
+        supportActionBar?.title = StringResourcesUtils.getString(R.string.action_upgrade_account)
+            .uppercase(Locale.getDefault())
+
         binding.titleMyAccountType.isVisible = true
         binding.chooseAccountFreeLayout.isVisible = false
 

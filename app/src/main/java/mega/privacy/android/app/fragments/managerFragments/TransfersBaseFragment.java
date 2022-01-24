@@ -32,11 +32,13 @@ public class TransfersBaseFragment extends RotatableFragment {
 
     protected ManagerActivityLollipop managerActivity;
 
+    protected SimpleDividerItemDecoration itemDecoration;
+
     protected View initView(LayoutInflater inflater, ViewGroup container) {
         View v = inflater.inflate(R.layout.fragment_transfers, container, false);
 
         listView = v.findViewById(R.id.transfers_list_view);
-        listView.addItemDecoration(new SimpleDividerItemDecoration(context));
+        listView.addItemDecoration(itemDecoration = new SimpleDividerItemDecoration(context));
         mLayoutManager = new LinearLayoutManager(context);
         listView.setLayoutManager(mLayoutManager);
         listView.setHasFixedSize(true);

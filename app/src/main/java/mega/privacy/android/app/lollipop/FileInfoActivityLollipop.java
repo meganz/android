@@ -82,6 +82,7 @@ import mega.privacy.android.app.utils.LocationInfo;
 import mega.privacy.android.app.utils.CameraUploadUtil;
 import mega.privacy.android.app.utils.ContactUtil;
 import mega.privacy.android.app.utils.StringResourcesUtils;
+import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaContactRequest;
 import nz.mega.sdk.MegaError;
@@ -360,7 +361,7 @@ public class FileInfoActivityLollipop extends PasscodeActivity implements OnClic
         node = megaApi.getNodeByHandle(node.getHandle());
 
         if (node != null && collapsingToolbar != null) {
-            collapsingToolbar.setTitle(node.getName().toUpperCase());
+            collapsingToolbar.setTitle(node.getName());
         }
     }
 
@@ -639,7 +640,7 @@ public class FileInfoActivityLollipop extends PasscodeActivity implements OnClic
         if (extras != null){
             from = extras.getInt("from");
             if(from==FROM_INCOMING_SHARES){
-                firstIncomingLevel = extras.getBoolean("firstLevel");
+                firstIncomingLevel = extras.getBoolean(INTENT_EXTRA_KEY_FIRST_LEVEL);
             }
 
             long handleNode = extras.getLong("handle", -1);
@@ -668,7 +669,7 @@ public class FileInfoActivityLollipop extends PasscodeActivity implements OnClic
 
             String name = node.getName();
 
-            collapsingToolbar.setTitle(name.toUpperCase());
+            collapsingToolbar.setTitle(name);
             if (nC == null) {
                 nC = new NodeController(this);
             }
@@ -762,6 +763,21 @@ public class FileInfoActivityLollipop extends PasscodeActivity implements OnClic
             setActionBarDrawablesColorFilter(getResources().getColor(R.color.grey_087_white_087));
         }
 
+        //Location Layout
+        locationLayout = findViewById(R.id.file_properties_location_layout);
+        locationTextView = findViewById(R.id.file_properties_info_data_location);
+
+        LocationInfo locationInfo = getNodeLocationInfo(adapterType, from == FROM_INCOMING_SHARES,
+                node.getHandle());
+        if (locationInfo != null) {
+            locationTextView.setText(locationInfo.getLocation());
+            locationTextView.setOnClickListener(v -> {
+                handleLocationClick(this, adapterType, locationInfo);
+            });
+        } else {
+            locationLayout.setVisibility(View.GONE);
+        }
+
         if(savedInstanceState != null){
             long handle = savedInstanceState.getLong(KEY_SELECTED_SHARE_HANDLE, INVALID_HANDLE);
             if(handle == INVALID_HANDLE || node == null){
@@ -777,21 +793,6 @@ public class FileInfoActivityLollipop extends PasscodeActivity implements OnClic
 
             nodeAttacher.restoreState(savedInstanceState);
             nodeSaver.restoreState(savedInstanceState);
-        }
-
-        //Location Layout
-        locationLayout = findViewById(R.id.file_properties_location_layout);
-        locationTextView = findViewById(R.id.file_properties_info_data_location);
-
-        LocationInfo locationInfo = getNodeLocationInfo(adapterType, from == FROM_INCOMING_SHARES,
-                node.getHandle());
-        if (locationInfo != null) {
-            locationTextView.setText(locationInfo.getLocation());
-            locationTextView.setOnClickListener(v -> {
-                handleLocationClick(this, adapterType, locationInfo);
-            });
-        } else {
-            locationLayout.setVisibility(View.GONE);
         }
 	}
 
@@ -1426,8 +1427,9 @@ public class FileInfoActivityLollipop extends PasscodeActivity implements OnClic
 						offlineSwitch.setChecked(false);
 						mOffDelete = dbH.findByHandle(handle);
                         removeOffline(mOffDelete, dbH, this);
-						supportInvalidateOptionsMenu();
-					}
+                        Util.showSnackbar(this,
+                                getResources().getString(R.string.file_removed_offline));
+                    }
 					else{
                         logDebug("NOT Checked");
                         isRemoveOffline = false;
@@ -1440,17 +1442,20 @@ public class FileInfoActivityLollipop extends PasscodeActivity implements OnClic
 
 						if (isFileAvailable(destination) && destination.isDirectory()){
 							File offlineFile = new File(destination, node.getName());
-							if (isFileAvailable(offlineFile) && node.getSize() == offlineFile.length() && offlineFile.getName().equals(node.getName())){ //This means that is already available offline
-								return;
-							}
+                            if (isFileAvailable(offlineFile)
+                                    && node.getSize() == offlineFile.length()
+                                    && offlineFile.getName().equals(node.getName())) {
+                                //This means that is already available offline
+                                return;
+                            }
 						}
 
                         logDebug("Handle to save for offline : " + node.getHandle());
                         saveOffline(destination, node, fileInfoActivityLollipop);
 
-						supportInvalidateOptionsMenu();
-					}
-				}
+                    }
+                    supportInvalidateOptionsMenu();
+                }
 				else{
                     logDebug("Not owner");
 					if (!isChecked){
@@ -2275,7 +2280,7 @@ public class FileInfoActivityLollipop extends PasscodeActivity implements OnClic
 
 	@Override
 	public void onBackPressed() {
-        if (psaWebBrowser.consumeBack()) return;
+        if (psaWebBrowser != null && psaWebBrowser.consumeBack()) return;
         retryConnectionsAndSignalPresence();
 
         if(isRemoveOffline){

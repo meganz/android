@@ -15,7 +15,6 @@ import mega.privacy.android.app.utils.LogUtil
 import mega.privacy.android.app.utils.Util
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
 
-
 @AndroidEntryPoint
 class JoinMeetingAsGuestFragment : AbstractMeetingOnBoardingFragment() {
 

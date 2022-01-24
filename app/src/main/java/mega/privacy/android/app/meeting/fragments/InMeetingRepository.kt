@@ -59,24 +59,6 @@ class InMeetingRepository @Inject constructor(
     }
 
     /**
-     * Method for starting a meeting
-     *
-     * @param chatId chat ID
-     * @param enableAudio if Audio is enabled
-     * @param enableVideo if Video is enabled
-     * @param listener MegaChatRequestListenerInterface
-     */
-    fun answerCall(
-        chatId: Long,
-        enableVideo: Boolean,
-        enableAudio: Boolean,
-        listener: MegaChatRequestListenerInterface
-    ) {
-        logDebug("Answering call with video enable $enableVideo and audio enable $enableAudio")
-        megaChatApi.answerChatCall(chatId, enableVideo, enableAudio, listener)
-    }
-
-    /**
      * Get a call from a chat id
      *
      * @param chatId chat ID
@@ -428,10 +410,6 @@ class InMeetingRepository @Inject constructor(
         }
     }
 
-    fun fetchNodes(listener: MegaRequestListenerInterface) = megaApi.fetchNodes(listener)
-
-    fun chatConnect(listener: MegaChatRequestListenerInterface) = megaChatApi.connect(listener)
-
     fun openChatPreview(link: String, listener: MegaChatRequestListenerInterface) =
         megaChatApi.openChatPreview(link, listener)
 
@@ -466,18 +444,6 @@ class InMeetingRepository @Inject constructor(
             audio,
             video,
             isGuest = megaApi.isEphemeralPlusPlus
-        )
-    }
-
-    fun updateChatPermissions(
-        chatId: Long, peerId: Long,
-        listener: MegaChatRequestListenerInterface?
-    ) {
-        megaChatApi.updateChatPermissions(
-            chatId,
-            peerId,
-            MegaChatRoom.PRIV_MODERATOR,
-            listener
         )
     }
 
