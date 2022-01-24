@@ -120,15 +120,17 @@ class FileBackupManager(
      * @param currentParentHandle The parent node
      * @return The type of node
      */
-    fun checkSubBackupNode(megaNodes: ArrayList<MegaNode>?, currentParentHandle: MegaNode?): Int {
-        if (megaNodes != null) {
+    fun checkSubBackupNode(megaNodes: ArrayList<MegaNode?>?, currentParentHandle: MegaNode?): Int {
+        megaNodes?.let {
             if (megaNodes.size > 0) {
                 val handleList = ArrayList<Long>()
                 for (i in megaNodes.indices) {
-                    val node: MegaNode = megaNodes[i]
-                    handleList.add(node.handle)
+                    val node: MegaNode? = megaNodes[i]
+                    node?.let {
+                        handleList.add(node.handle)
+                        return checkBackupNodeTypeInList(megaApi, handleList)
+                    }
                 }
-                return checkBackupNodeTypeInList(megaApi, handleList)
             } else {
                 // for empty folder
                 if (currentParentHandle != null) {
