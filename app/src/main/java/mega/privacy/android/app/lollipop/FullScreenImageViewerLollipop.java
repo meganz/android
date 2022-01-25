@@ -40,6 +40,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import kotlin.Unit;
 import mega.privacy.android.app.DatabaseHandler;
@@ -49,6 +50,7 @@ import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.activities.PasscodeActivity;
 import mega.privacy.android.app.components.ExtendedViewPager;
+import mega.privacy.android.app.gallery.repository.fetcher.MediaFetcher;
 import mega.privacy.android.app.utils.MegaProgressDialogUtil;
 import mega.privacy.android.app.components.TouchImageView;
 import mega.privacy.android.app.components.attacher.MegaAttacher;
@@ -997,11 +999,17 @@ public class FullScreenImageViewerLollipop extends PasscodeActivity
 		} else if (isInRootLinksLevel(adapterType, parentNodeHandle)) {
 			getImageHandles(megaApi.getPublicLinks(orderGetChildren), savedInstanceState);
 		} else if (adapterType == PHOTOS_BROWSE_ADAPTER) {
-			// TODO: use constants
-			getImageHandles(megaApi.searchByType(orderGetChildren, FILE_TYPE_PHOTO, SEARCH_TARGET_ROOTNODE), savedInstanceState);
+			getImageHandles(megaApi.searchByType(orderGetChildren, FILE_TYPE_PHOTO, SEARCH_TARGET_ROOTNODE).stream()
+                    .filter(megaNode -> MimeTypeList.typeForName(megaNode.getName()).isImage())
+                    .collect(Collectors.toList()), savedInstanceState);
 		} else if (adapterType == PHOTO_SYNC_ADAPTER) {
-			getImageHandles(new MegaNodeRepo(megaApi, dbH).getCuChildren(orderGetChildren), savedInstanceState, true);
-		} else {
+			getImageHandles(new MegaNodeRepo(megaApi, dbH).getFilteredCuChildren(orderGetChildren), savedInstanceState, true);
+        } else if (adapterType == MEDIA_BROWSE_ADAPTER) {
+            List<MegaNode> list = MediaFetcher.getCachedResults();
+            if (list != null) {
+                getImageHandles(list, savedInstanceState, true);
+            }
+        } else {
 			if (parentNodeHandle == INVALID_HANDLE){
 				switch(adapterType){
 					case RUBBISH_BIN_ADAPTER:{

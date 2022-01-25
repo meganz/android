@@ -200,7 +200,6 @@ import static mega.privacy.android.app.constants.BroadcastConstants.*;
 import static mega.privacy.android.app.constants.EventConstants.EVENT_CALL_COMPOSITION_CHANGE;
 import static mega.privacy.android.app.constants.EventConstants.EVENT_CALL_ON_HOLD_CHANGE;
 import static mega.privacy.android.app.constants.EventConstants.EVENT_CALL_STATUS_CHANGE;
-import static mega.privacy.android.app.constants.EventConstants.EVENT_MEETING_INVITE;
 import static mega.privacy.android.app.constants.EventConstants.EVENT_SESSION_ON_HOLD_CHANGE;
 import static mega.privacy.android.app.lollipop.megachat.AndroidMegaRichLinkMessage.*;
 import static mega.privacy.android.app.lollipop.megachat.MapsActivity.*;
@@ -3463,11 +3462,6 @@ public class ChatActivityLollipop extends PasscodeActivity
             final List<String> contactsData = intent.getStringArrayListExtra(AddContactActivityLollipop.EXTRA_CONTACTS);
             if (contactsData != null) {
                 new InviteToChatRoomListener(this).inviteToChat(chatRoom.getChatId(), contactsData);
-
-                // Invite participants, check
-                if(participatingInACall()){
-                    LiveEventBus.get(EVENT_MEETING_INVITE, Boolean.class).post(true);
-                }
             }
         }
         else if (requestCode == REQUEST_CODE_SELECT_IMPORT_FOLDER && resultCode == RESULT_OK) {
@@ -9154,18 +9148,9 @@ public class ChatActivityLollipop extends PasscodeActivity
 
                 if(chatRoom.isGroup()){
                     if (anotherActiveCall == null && anotherOnHoldCall == null) {
-                        long callerHandle = callInThisChat.getCaller();
-                        String callerFullName = chatC.getParticipantFullName(callerHandle);
-                        String textLayout;
-                        if (callerHandle != MEGACHAT_INVALID_HANDLE && !isTextEmpty(callerFullName)) {
-                            if(chatRoom.isMeeting()) {
-                                textLayout = getString(R.string.join_meeting_layout_in_group_call, callerFullName);
-                            } else {
-                                textLayout = getString(R.string.join_call_layout_in_group_call, callerFullName);
-                            }
-                        } else {
-                            textLayout = getString(R.string.join_call_layout);
-                        }
+                        String textLayout = getString(chatRoom.isMeeting() ?
+                                R.string.join_meeting_layout_in_group_call :
+                                R.string.join_call_layout_in_group_call);
                         tapToReturnLayout(callInThisChat, textLayout);
                     }else{
                         updateCallInProgressLayout(anotherActiveCall != null ? anotherActiveCall : anotherOnHoldCall,

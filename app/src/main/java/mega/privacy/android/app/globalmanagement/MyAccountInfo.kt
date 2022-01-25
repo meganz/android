@@ -334,7 +334,7 @@ class MyAccountInfo @Inject constructor(
         }
 
         firstLetter = fullName[0].toString() + ""
-        firstLetter = firstLetter?.toUpperCase(Locale.getDefault())
+        firstLetter = firstLetter?.uppercase(Locale.getDefault())
     }
 
     fun setProductAccounts(p: MegaPricing, c: MegaCurrency) {

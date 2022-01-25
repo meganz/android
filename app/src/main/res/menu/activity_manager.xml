@@ -63,6 +63,14 @@
         android:visible="false"
         app:showAsAction="never" />
 
+    <item
+        android:id="@+id/action_open_link"
+        android:icon="@drawable/ic_action_bar_null"
+        android:orderInCategory="110"
+        android:title="@string/action_open_link"
+        android:visible="false"
+        app:showAsAction="never" />
+
 	<item
 		android:id="@+id/action_enable_select"
 		android:orderInCategory="110"
@@ -70,14 +78,6 @@
 		android:icon="@drawable/ic_action_bar_null"
 		app:showAsAction="never"
 		android:visible="false"/>
-
-    <item
-        android:id="@+id/action_menu_sort_by"
-        android:icon="@drawable/ic_action_bar_null"
-        android:orderInCategory="115"
-        android:title="@string/action_sort_by"
-        android:visible="false"
-        app:showAsAction="never" />
 
     <item
         android:id="@+id/action_menu_do_not_disturb"

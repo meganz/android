@@ -288,6 +288,7 @@ public class Constants {
     public static final String INTENT_EXTRA_KEY_INSIDE = "inside";
     public static final String INTENT_EXTRA_KEY_IS_URL = "isUrl";
     public static final String INTENT_EXTRA_KEY_POSITION = "position";
+    public static final String INTENT_EXTRA_KEY_IS_FOLDER_LINK = "isFolderLink";
     public static final String INTENT_EXTRA_KEY_ORDER_GET_CHILDREN = "orderGetChildren";
     public static final String INTENT_EXTRA_KEY_PARENT_NODE_HANDLE = "parentNodeHandle";
     public static final String INTENT_EXTRA_KEY_HANDLES_NODES_SEARCH = "handlesNodesSearch";
@@ -358,6 +359,7 @@ public class Constants {
     public static final int VIDEO_SEARCH_ADAPTER = 2033;
     public static final int RECENTS_BUCKET_ADAPTER = 2034;
     public static final int VERSIONS_ADAPTER = 2035;
+    public static final int MEDIA_BROWSE_ADAPTER = 2036;
 
     public static final int VIEWER_FROM_PHOTOS = 1;
     public static final int VIEWER_FROM_INCOMING_SHARES = 2;
@@ -435,9 +437,7 @@ public class Constants {
     public static final String NOTIFICATION_CHANNEL_DOWNLOAD_ID = "DownloadServiceNotification";
     public static final String NOTIFICATION_CHANNEL_DOWNLOAD_NAME = "MEGA Download";
     public static final String NOTIFICATION_CHANNEL_UPLOAD_ID = "UploadServiceNotification";
-    public static final String NOTIFICATION_CHANNEL_UPLOAD_ID_FOLDER = "FolderUploadServiceNotification";
     public static final String NOTIFICATION_CHANNEL_UPLOAD_NAME = "MEGA File Upload";
-    public static final String NOTIFICATION_CHANNEL_UPLOAD_NAME_FOLDER = "MEGA Folder Upload";
     public static final String NOTIFICATION_CHANNEL_CAMERA_UPLOADS_ID = "CameraUploadsServiceNotification";
     public static final String NOTIFICATION_CHANNEL_CAMERA_UPLOADS_NAME = "MEGA Camera Uploads";
     public static final String NOTIFICATION_CHANNEL_CHAT_ID = "ChatNotification";
@@ -557,10 +557,9 @@ public class Constants {
     public static final int NOT_SPACE_SNACKBAR_TYPE = 3;
     public static final int PERMISSIONS_TYPE = 4;
     public static final int INVITE_CONTACT_TYPE = 5;
-    public static final int SNACKBAR_IMCOMPATIBILITY_TYPE = 6;
-    public static final int DISMISS_ACTION_SNACKBAR = 7;
-    public static final int OPEN_FILE_SNACKBAR_TYPE = 8;
-    public static final int SENT_REQUESTS_TYPE = 9;
+    public static final int DISMISS_ACTION_SNACKBAR = 6;
+    public static final int OPEN_FILE_SNACKBAR_TYPE = 7;
+    public static final int SENT_REQUESTS_TYPE = 8;
 
     public static final int INFO_ANIMATION = 3000;
     public static final int QUICK_INFO_ANIMATION = 500;
