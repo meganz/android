@@ -508,14 +508,11 @@ object MegaNodeUtil {
      * @return The root parent MegaNode
      */
     @JvmStatic
-    fun getRootParentNode(node: MegaNode): MegaNode {
-        val megaApi = MegaApplication.getInstance().megaApi
+    fun MegaApiJava.getRootParentNode(node: MegaNode): MegaNode {
         var rootParent = node
-
-        while (megaApi.getParentNode(rootParent) != null) {
-            rootParent = megaApi.getParentNode(rootParent)
+        while (getParentNode(rootParent) != null) {
+            rootParent = getParentNode(rootParent)
         }
-
         return rootParent
     }
 
@@ -1289,7 +1286,7 @@ object MegaNodeUtil {
             val node = megaApi.getNodeByHandle(handle) ?: return null
 
             val parent = megaApi.getParentNode(node)
-            val topAncestor = getRootParentNode(node)
+            val topAncestor = megaApi.getRootParentNode(node)
 
             val inCloudDrive = topAncestor.handle == megaApi.rootNode.handle
                     || topAncestor.handle == megaApi.rubbishNode.handle
@@ -1818,4 +1815,48 @@ object MegaNodeUtil {
 
         return false
     }
+
+    fun MegaNode.getFileName(): String =
+        "$base64Handle.${MimeTypeList.typeForName(name)?.extension}"
+
+    fun MegaNode.getThumbnailFileName(): String =
+        "$base64Handle${JPG_EXTENSION}"
+
+    fun MegaNode.isImage(): Boolean =
+        this.isFile && MimeTypeList.typeForName(name).isImage
+
+    fun MegaNode.isGif(): Boolean =
+        this.isFile && MimeTypeList.typeForName(name).isGIF
+
+    fun MegaNode.isVideo(): Boolean =
+        this.isFile && (MimeTypeList.typeForName(name).isVideoReproducible ||
+                MimeTypeList.typeForName(name).isMp4Video)
+
+    fun MegaNode.getLastAvailableTime(): Long =
+        when {
+            creationTime > 1 -> creationTime
+            modificationTime > 1 -> modificationTime
+            publicLinkCreationTime > 1 -> publicLinkCreationTime
+            else -> INVALID_VALUE.toLong()
+        }
+
+    /**
+     * Check if a specific MegaNode is valid for Image Viewer
+     *
+     * @return  True if it's valid, false otherwise
+     */
+    @JvmStatic
+    fun MegaNode.isValidForImageViewer(): Boolean =
+        isFile && (isImage() || isGif() || isVideo())
+
+    /**
+     * Check if a specific MegaOffline is valid for Image Viewer
+     *
+     * @return  True if it's valid, false otherwise
+     */
+    @JvmStatic
+    fun MegaOffline.isValidForImageViewer(): Boolean =
+            !isFolder && (MimeTypeList.typeForName(name).isImage
+                    || MimeTypeList.typeForName(name).isGIF
+                    || (MimeTypeList.typeForName(name).isVideoReproducible || MimeTypeList.typeForName(name).isMp4Video))
 }

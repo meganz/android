@@ -98,8 +98,6 @@
     <string name="action_create_folder">Neuen Ordner erstellen</string>
     <!-- Option which allows create a new text file -->
     <string name="action_create_txt">Neue Textdatei erstellen</string>
-    <!-- Menu option to open a link. Also title of the dialog to open a link. -->
-    <string name="action_open_link">Link öffnen</string>
     <!-- Menu item -->
     <string name="action_settings">Einstellungen</string>
     <!-- Search button -->
@@ -995,8 +993,6 @@
     <string name="settings_disable_logs">Logging deaktiviert</string>
     <!-- Snackbar error message triggered by host error when user is trying to setup MEGA Camera Uploads folder in settings page -->
     <string name="error_unable_to_setup_cloud_folder">Der Zielordner für Kamerauploads konnte nicht erstellt werden</string>
-    <!-- Message displayed when the user denies the required permissions during the logs activation -->
-    <string name="logs_not_enabled_permissions">Logging konnten wegen mangelnder Berechtigungen nicht aktiviert werden</string>
     <!-- Option in the sliding panel to open the folder which contains the file selected after performing a search -->
     <string name="search_open_location">Ordner öffnen</string>
     <!-- message when a temporary error on logging in is due to SDK is waiting for the server to complete a request due to an API lock -->
@@ -1708,9 +1704,9 @@
     <!-- text_copyright_alert_title -->
     <string name="copyright_alert_title">Hinweis zur Wahrung von Urheberrechten</string>
     <!-- text_copyright_alert_first_paragraph -->
-    <string name="copyright_alert_first_paragraph">MEGA respektiert die Urheberrechte Dritter und erwartet von seinen Nutzern die Einhaltung aller relevanten Copyright-Gesetze.</string>
+    <string name="copyright_alert_first_paragraph">MEGA respektiert die Urheberrechte Dritter und erwartet von Nutzern der MEGA Cloud die Einhaltung aller relevanten Copyright-Gesetze.</string>
     <!-- text_copyright_alert_second_paragraph -->
-    <string name="copyright_alert_second_paragraph">Es ist Ihnen strikt untersagt, den MEGA-Clouddienst zur Verletzung von Urheberrechten zu missbrauchen. Sie dürfen Dateien, Daten oder Inhalte, die die Urheber- oder andere Eigentumsrechte Dritte verletzen, nicht uploaden, speichern, teilen, anzeigen, streamen, verteilen, emailen, verlinken, übertragen oder in irgendeiner anderen Form zugänglich machen.</string>
+    <string name="copyright_alert_second_paragraph">Es ist Ihnen strikt untersagt, den Dienst MEGA Cloud zur Verletzung von Urheberrechten zu missbrauchen. Sie dürfen Dateien, Daten oder Inhalte, die die Urheber- oder andere Eigentumsrechte Dritte verletzen, nicht uploaden, speichern, teilen, anzeigen, streamen, verteilen, emailen, verlinken, übertragen oder in irgendeiner anderen Form zugänglich machen.</string>
     <!-- text of the Agree button -->
     <string name="copyright_alert_agree_button">Einverstanden</string>
     <!-- text of the Disagree button -->
@@ -2642,13 +2638,13 @@
     <!-- Text of the dialog shown when the storage of a FREE account is almost full -->
     <string name="text_almost_full_warning">Ihr Cloud Drive ist fast voll. Wechseln Sie auf Pro und erhalten Sie bis zu %1$s Speicherplatz und %2$s Transfervolumen.</string>
     <!-- Text of the dialog shown when the storage of a PRO I or II account is almost full -->
-    <string name="text_almost_full_warning_pro_account">Ihr Cloud-Speicher ist voll. Wechseln Sie auf Pro und erhalten Sie bis zu %1$s Specherplatz und %2$s Transfervolumen.</string>
+    <string name="text_almost_full_warning_pro_account">Ihr Cloud Drive ist voll. Wechseln Sie auf Pro und erhalten Sie bis zu %1$s Specherplatz und %2$s Transfervolumen.</string>
     <!-- Text of the dialog shown when the storage of a PRO III account is almost full -->
     <string name="text_almost_full_warning_pro3_account">Ihr Cloud Drive ist fast voll. Benötigen Sie noch mehr Speicherplatz? Bitte setzen Sie sich mit dem MEGA-Kundendienst in Verbindung, der Ihnen gerne ein individuelles Angebot unterbreitet.</string>
     <!-- Text of the dialog shown when the storage of a FREE account is full -->
-    <string name="text_storage_full_warning">Ihr Cloud-Speicher ist voll. Wechseln Sie auf Pro und erhalten Sie bis zu %1$s Specherplatz und %2$s Transfervolumen.</string>
+    <string name="text_storage_full_warning">Ihr Cloud Drive ist voll. Wechseln Sie auf Pro und erhalten Sie bis zu %1$s Specherplatz und %2$s Transfervolumen.</string>
     <!-- Text of the dialog shown when the storage of a PRO I or II account is full -->
-    <string name="text_storage_full_warning_pro_account">Ihr Cloud-Speicher ist voll. Wechseln Sie auf Pro und erhalten Sie bis zu %1$s Specherplatz und %2$s Transfervolumen.</string>
+    <string name="text_storage_full_warning_pro_account">Ihr Cloud Drive ist voll. Wechseln Sie auf Pro und erhalten Sie bis zu %1$s Specherplatz und %2$s Transfervolumen.</string>
     <!-- Text of the dialog shown when the storage of a PRO III account is full -->
     <string name="text_storage_full_warning_pro3_account">Ihr Cloud Drive ist voll. Benötigen Sie noch mehr Speicherplatz? Bitte setzen Sie sich mit dem MEGA-Kundendienst in Verbindung, der Ihnen gerne ein individuelles Angebot unterbreitet.</string>
     <!-- Button of the dialog shown when the storage is almost full to see the available PRO plans -->
@@ -2774,16 +2770,12 @@
     <string name="message_set_chat_private">[A]%1$s[/A][B] hat Schlüsselrotation aktiviert.[/B]</string>
     <!-- error message shown when a chat link is invalid -->
     <string name="invalid_chat_link">Diese Unterhaltung ist nicht mehr verfügbar</string>
-    <!-- error message shown when a chat link is not well formed -->
-    <string name="invalid_chat_link_args">Chatlink ungültig</string>
     <!-- When it is creating a new group chat, this option permits to establish it private or public -->
     <string name="ekr_label">Schlüsselrotation</string>
     <!-- Text of the dialog to change a public chat to private (enable encryption key rotation) -->
     <string name="ekr_explanation">Schlüsselrotation ist etwas sicherer. Allerdings ist durch ihre Aktivierung die Benutzung von Chatlinks nicht mehr möglich. Auch sehen neu hinzugekommene Teilnehmer nicht mehr den gesamten Chatverlauf.</string>
     <!-- Text of the dialog to change a public chat to private (enable encryption key rotation) -->
     <string name="subtitle_chat_message_enabled_ERK">Schlüsselrotation ist etwas sicherer. Allerdings ist durch ihre Aktivierung die Benutzung von Chatlinks nicht mehr möglich. Auch sehen neu hinzugekommene Teilnehmer nicht mehr den gesamten Chatverlauf.</string>
-    <!-- Menu item -->
-    <string name="action_open_chat_link">Chatlink öffnen.</string>
     <!-- Message shown when a contact request has not been sent because the invitation has been sent before -->
     <string name="invite_not_sent_already_sent">Die Einladung an %s wurde bereits verschickt und kann unter “Gesendete Anfragen” verwaltet werden.</string>
     <!-- Label shown to indicate the QR is saving in Cloud Drive -->
@@ -3240,22 +3232,6 @@
     <string name="text_join_call">Um an dieser Konferenz teilnehmen zu können, müssen Sie zunächst auflegen.</string>
     <!-- Text of the dialog shown when you want to join a group call but you are in another active call -->
     <string name="text_join_another_call">Zur Teilnahme müssen Sie das bestehende Gespräch beenden oder halten</string>
-    <!-- Hint shown in the open chat link alert dialog -->
-    <string name="hint_enter_chat_link">Chatlink eingeben</string>
-    <!-- Hint shown in the open link alert dialog -->
-    <string name="hint_paste_link">Link einfügen</string>
-    <!-- Error shown when it tries to open an invalid file or folder link -->
-    <string name="invalid_file_folder_link">Ungültiger Datei- oder Ordnerlink</string>
-    <!-- Error shown when it tries to open an invalid file or folder link and the text view is empty -->
-    <string name="invalid_file_folder_link_empty">Bitte geben Sie einen gültigen Datei- oder Ordnerlink ein</string>
-    <!-- Error shown when it tries to open an invalid chat link and the text view is empty -->
-    <string name="invalid_chat_link_empty">Bitte geben Sie einen gültigen Chatlink ein</string>
-    <!-- Error shown when it tries to open a chat link from the Cloud Drive section -->
-    <string name="valid_chat_link">Sie haben einen Chatlink eingefügt</string>
-    <!-- Error shown when it tries to open a contact link from the Cloud Drive section -->
-    <string name="valid_contact_link">Sie haben einen Kontaktlink eingefügt</string>
-    <!-- Menu item -->
-    <string name="action_open_contact_link">Kontaktlink öffnen</string>
     <!-- Explanation of the dialog shown to share a chat link -->
     <string name="copy_link_explanation">Über diesen Link können Dritte der Unterhaltung beitreten</string>
     <!-- Label that indicates the creation of a chat link -->
@@ -4009,9 +3985,9 @@
     <!-- General label for microphone -->
     <string name="general_mic">Mikrofon</string>
     <!-- General label for microphone muted -->
-    <string name="general_mic_mute">Ihr Mikrofon ist stummgeschaltet</string>
+    <string name="general_mic_mute">Ihr Mikrofon ist ausgeschaltet</string>
     <!-- General label for microphone unmuted -->
-    <string name="general_mic_unmute">Ihr Mikrofon ist aktiviert</string>
+    <string name="general_mic_unmute">Ihr Mikrofon ist eingeschaltet</string>
     <!-- General label for camera -->
     <string name="general_camera">Kamera</string>
     <!-- General label for camera enable -->
@@ -4027,9 +4003,9 @@
     <!-- General label for headphone on-->
     <string name="general_headphone_on">Kopfhörer ist aktiv</string>
     <!-- General label for speaker on-->
-    <string name="general_speaker_on">Lautsprecher ist eingeschaltet</string>
+    <string name="general_speaker_on">Ihr Lautsprecher ist eingeschaltet</string>
     <!-- General label for speaker off-->
-    <string name="general_speaker_off">Lautsprecher ist ausgeschaltet</string>
+    <string name="general_speaker_off">Ihr Lautsprecher ist ausgeschaltet</string>
     <!-- Label for end meeting-->
     <string name="meeting_end">Beenden</string>
     <!-- Invite contacts as participants of the meeting-->
