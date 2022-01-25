@@ -40,21 +40,32 @@ import org.jetbrains.annotations.Nullable;
 
 import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
+import com.google.common.primitives.Longs;
 
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.ListIterator;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
+import dagger.hilt.android.AndroidEntryPoint;
+import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
+import io.reactivex.rxjava3.schedulers.Schedulers;
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
+import mega.privacy.android.app.utils.MegaNodeUtil;
 import mega.privacy.android.app.utils.MegaProgressDialogUtil;
 import mega.privacy.android.app.components.NewGridRecyclerView;
 import mega.privacy.android.app.components.SimpleDividerItemDecoration;
 import mega.privacy.android.app.components.saver.NodeSaver;
+import mega.privacy.android.app.fragments.settingsFragments.cookie.data.CookieType;
+import mega.privacy.android.app.generalusecase.FilePrepareUseCase;
+import mega.privacy.android.app.imageviewer.ImageViewerActivity;
 import mega.privacy.android.app.interfaces.SnackbarShower;
 import mega.privacy.android.app.interfaces.StoreDataBeforeForward;
 import mega.privacy.android.app.listeners.CreateChatListener;
@@ -103,8 +114,12 @@ import static mega.privacy.android.app.utils.FileUtil.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.MegaApiUtils.*;
 import static mega.privacy.android.app.utils.Util.*;
+import static nz.mega.sdk.MegaApiJava.INVALID_HANDLE;
 import static nz.mega.sdk.MegaApiJava.STORAGE_STATE_PAYWALL;
 
+import javax.inject.Inject;
+
+@AndroidEntryPoint
 public class NodeAttachmentHistoryActivity extends PasscodeActivity
         implements MegaChatRequestListenerInterface, MegaRequestListenerInterface, OnClickListener,
         MegaChatListenerInterface, MegaChatNodeHistoryListenerInterface,
@@ -693,37 +708,22 @@ public class NodeAttachmentHistoryActivity extends PasscodeActivity
     }
 
     public void showFullScreenViewer(long msgId) {
-        logDebug("Message ID: " + msgId);
-        int position = 0;
-        boolean positionFound = false;
-        List<Long> ids = new ArrayList<>();
-        for (int i = 0; i < messages.size(); i++) {
-            MegaChatMessage msg = messages.get(i);
-            ids.add(msg.getMsgId());
+        long currentNodeHandle = INVALID_HANDLE;
+        List<Long> messageIds = new ArrayList<>();
 
-            if (msg.getMsgId() == msgId) {
-                positionFound = true;
-            }
-            if (!positionFound) {
-                MegaNodeList nodeList = msg.getMegaNodeList();
-                if (nodeList.size() == 1) {
-                    MegaNode node = nodeList.get(0);
-                    if (MimeTypeList.typeForName(node.getName()).isImage()) {
-                        position++;
-                    }
-                }
+        for (MegaChatMessage message : messages) {
+            messageIds.add(message.getMsgId());
+            if (message.getMsgId() == msgId) {
+                currentNodeHandle = message.getMegaNodeList().get(0).getHandle();
             }
         }
 
-        Intent intent = new Intent(this, ChatFullScreenImageViewer.class);
-        intent.putExtra("position", position);
-        intent.putExtra("chatId", chatId);
-
-        long[] array = new long[ids.size()];
-        for (int i = 0; i < ids.size(); i++) {
-            array[i] = ids.get(i);
-        }
-        intent.putExtra("messageIds", array);
+        Intent intent = ImageViewerActivity.getIntentForChatMessages(
+                this,
+                chatId,
+                Longs.toArray(messageIds),
+                currentNodeHandle
+        );
         startActivity(intent);
     }
 

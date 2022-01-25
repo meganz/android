@@ -45,7 +45,7 @@ import mega.privacy.android.app.RecentsItem;
 import mega.privacy.android.app.components.HeaderItemDecoration;
 import mega.privacy.android.app.components.TopSnappedStickyLayoutManager;
 import mega.privacy.android.app.components.scrollBar.FastScroller;
-import mega.privacy.android.app.lollipop.FullScreenImageViewerLollipop;
+import mega.privacy.android.app.imageviewer.ImageViewerActivity;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.PdfViewerActivityLollipop;
 import mega.privacy.android.app.lollipop.adapters.RecentsAdapter;
@@ -384,17 +384,21 @@ public class RecentsFragment extends Fragment implements StickyHeaderHandler {
         Intent intent;
 
         if (MimeTypeList.typeForName(node.getName()).isImage()) {
-            intent = new Intent(context, FullScreenImageViewerLollipop.class);
-            intent.putExtra(INTENT_EXTRA_KEY_ADAPTER_TYPE, RECENTS_ADAPTER);
-            intent.putExtra(HANDLE, node.getHandle());
-            if (isMedia) {
-                intent.putExtra(NODE_HANDLES, getBucketNodeHandles(true));
+            long[] bucket = getBucketNodeHandles(true);
+            if (isMedia && bucket != null && bucket.length > 0) {
+                intent = ImageViewerActivity.getIntentForChildren(
+                        requireContext(),
+                        bucket
+                );
+            } else {
+                intent = ImageViewerActivity.getIntentForSingleNode(
+                        requireContext(),
+                        node.getHandle()
+                );
             }
 
-            intent.putExtra(INTENT_EXTRA_KEY_HANDLE, node.getHandle());
             putThumbnailLocation(intent, listView, index, VIEWER_FROM_RECETS, adapter);
-
-            context.startActivity(intent);
+            startActivity(intent);
             ((ManagerActivityLollipop) context).overridePendingTransition(0, 0);
             return;
         }

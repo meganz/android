@@ -3856,8 +3856,6 @@
     <string name="error_share_owner_storage_quota">Share owner is over storage quota.</string>
     <!-- A message shown when uploading, copying or moving something to an incoming share and the owner’s account is over its storage quota. -->
     <string name="warning_share_owner_storage_quota">The file cannot be sent as the target user is over their storage quota.</string>
-    <!-- Content to show in a Snackbar to tip the incompatibility-->
-    <string name="version_incompatibility">We are upgrading MEGAchat. Your calls might not be connected due to version incompatibility unless all parties update their MEGA apps to the latest version.</string>
     <!-- Message displayed when multiple download starts and 1 file has already been downloaded before and 1 file is being downloaded -->
     <string name="file_already_downloaded_and_file_pending_download">1 file already downloaded. 1 file pending.</string>
     <!-- Message displayed when multiple download starts and 1 file has already been downloaded before and multiple files are being downloaded. Placeholder: number of files -->
@@ -4136,6 +4134,10 @@
     <string name="confirmation_fingerprint_enabled">Your fingerprint is confirmed</string>
     <!-- Warning indicating an image (GIF) cannot be inserted in an input text. Same string than the one shown by the system when it detects this behaviour on its own. -->
     <string name="image_insertion_not_allowed">MEGA does not support image insertion here</string>
+    <!-- title for the settings to enable high resolution images when on mobile data -->
+    <string name="settings_mobile_data_resoluton_title">Use mobile data to preview high resolution images</string>
+    <!-- summary for the settings to enable high resolution images when on mobile data -->
+    <string name="settings_mobile_data_resoluton_summary">Use mobile data to load high resolution images when previewing. If disabled, the original image will only be loaded when you zoom in.</string>
     <!-- The label under the button of viewing all images screen -->
     <string name="section_images">Images</string>
     <!-- Title of the dialog warning the user about disable file versioning. -->
