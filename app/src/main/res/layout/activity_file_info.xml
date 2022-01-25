@@ -11,7 +11,7 @@
     <com.google.android.material.appbar.AppBarLayout
         android:id="@+id/app_bar"
         android:layout_width="match_parent"
-        android:layout_height="168dp"
+        android:layout_height="182dp"
         android:fitsSystemWindows="true">
 
         <net.opacapp.multilinecollapsingtoolbar.CollapsingToolbarLayout
@@ -28,7 +28,7 @@
             app:expandedTitleMarginTop="50dp"
             app:expandedTitleTextAppearance="?attr/textAppearanceSubtitle1"
             app:layout_scrollFlags="scroll|exitUntilCollapsed"
-            app:lineSpacingMultiplier="1.2"
+            app:lineSpacingMultiplier="1"
             app:maxLines="3">
 
             <RelativeLayout
@@ -80,9 +80,9 @@
                 android:id="@+id/file_properties_permission_info"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_gravity="left|bottom"
-                android:layout_marginLeft="72dp"
-                android:layout_marginBottom="15dp"
+                android:layout_gravity="start|bottom"
+                android:layout_marginStart="72dp"
+                android:layout_marginBottom="5dp"
                 android:textAppearance="@style/TextAppearance.Mega.Body2.Secondary.Variant2" />
 
             <androidx.appcompat.widget.Toolbar
