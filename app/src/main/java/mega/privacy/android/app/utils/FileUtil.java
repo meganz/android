@@ -1141,5 +1141,19 @@ public class FileUtil {
 
         return true;
     }
+
+    /**
+     * Delete file without throwing exceptions.
+     *
+     * @param file  File to be deleted
+     * @return      True if it was deleted successfully, false otherwise
+     */
+    public static boolean deleteFileSafely(File file) {
+        try {
+            return file.delete();
+        } catch (Exception ignored) {
+            return false;
+        }
+    }
 }
 

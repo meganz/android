@@ -1,5 +1,8 @@
 package mega.privacy.android.app.modalbottomsheet.nodelabel;
 
+import static mega.privacy.android.app.utils.Constants.HANDLE;
+import static nz.mega.sdk.MegaApiJava.INVALID_HANDLE;
+
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -14,7 +17,6 @@ import mega.privacy.android.app.databinding.BottomSheetNodeLabelBinding;
 import mega.privacy.android.app.modalbottomsheet.BaseBottomSheetDialogFragment;
 import nz.mega.sdk.MegaNode;
 
-import static mega.privacy.android.app.utils.Constants.HANDLE;
 import static mega.privacy.android.app.utils.LogUtil.logError;
 
 public class NodeLabelBottomSheetDialogFragment extends BaseBottomSheetDialogFragment {
@@ -47,7 +49,7 @@ public class NodeLabelBottomSheetDialogFragment extends BaseBottomSheetDialogFra
             return;
         }
 
-        node = megaApi.getNodeByHandle(arguments.getLong(HANDLE));
+        node = megaApi.getNodeByHandle(arguments.getLong(HANDLE, INVALID_HANDLE));
         showCurrentNodeLabel();
 
         binding.radioGroupLabel.setOnCheckedChangeListener((group, checkedId) -> updateNodeLabel(checkedId));

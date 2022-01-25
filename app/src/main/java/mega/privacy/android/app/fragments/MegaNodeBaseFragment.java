@@ -52,8 +52,8 @@ import mega.privacy.android.app.fragments.homepage.EventObserver;
 import mega.privacy.android.app.fragments.homepage.SortByHeaderViewModel;
 import mega.privacy.android.app.fragments.managerFragments.LinksFragment;
 import mega.privacy.android.app.globalmanagement.SortOrderManagement;
+import mega.privacy.android.app.imageviewer.ImageViewerActivity;
 import mega.privacy.android.app.interfaces.SnackbarShower;
-import mega.privacy.android.app.lollipop.FullScreenImageViewerLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.PdfViewerActivityLollipop;
 import mega.privacy.android.app.lollipop.adapters.MegaNodeAdapter;
@@ -464,14 +464,12 @@ public abstract class MegaNodeBaseFragment extends RotatableFragment {
         boolean internalIntent = false;
 
         if (mimeType.isImage()) {
-            intent = new Intent(context, FullScreenImageViewerLollipop.class);
-            intent.putExtra("placeholder", adapter.getPlaceholderCount());
-            intent.putExtra("position", position);
-            intent.putExtra("adapterType", fragmentAdapter);
-            intent.putExtra("isFolderLink", false);
-            intent.putExtra("parentNodeHandle", getParentHandle(fragmentAdapter));
-            intent.putExtra("orderGetChildren", getIntentOrder(fragmentAdapter));
-            intent.putExtra(INTENT_EXTRA_KEY_HANDLE, node.getHandle());
+            intent = ImageViewerActivity.getIntentForParentNode(
+                    requireContext(),
+                    getParentHandle(fragmentAdapter),
+                    getIntentOrder(fragmentAdapter),
+                    node.getHandle()
+            );
 
             launchIntent(intent, true, position);
         } else if (mimeType.isVideoReproducible() || mimeType.isAudio()) {

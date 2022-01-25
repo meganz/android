@@ -97,6 +97,7 @@ public class SettingsConstants {
     public static final String KEY_FILE_VERSIONS = "settings_file_management_file_version";
     public static final String KEY_CLEAR_VERSIONS = "settings_file_management_clear_version";
     public static final String KEY_AUTO_PLAY_SWITCH = "auto_play_switch";
+    public static final String KEY_MOBILE_DATA_HIGH_RESOLUTION = "setting_mobile_data_high_resolution";
 
     /* User interface settings */
     public static final String KEY_START_SCREEN = "settings_start_screen";
