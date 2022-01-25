@@ -19,7 +19,7 @@
             android:layout_width="144dp"
             android:layout_height="144dp"
             android:layout_centerHorizontal="true"
-            android:src="@drawable/empty_offline_portrait" />
+            android:src="@drawable/ic_zero_data_offline" />
 
         <TextView
             android:id="@+id/empty_hint_text"

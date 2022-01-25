@@ -155,4 +155,6 @@
     <dimen name="image_mini_avatar_text_size">12sp</dimen>
     <dimen name="image_link_avatar_size">44dp</dimen>
     <dimen name="image_link_avatar_text_size">22sp</dimen>
+
+    <dimen name="image_viewer_pager_margin">16dp</dimen>
 </resources>

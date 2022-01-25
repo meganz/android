@@ -318,4 +318,6 @@ open class BaseBottomSheetDialogFragment : BottomSheetDialogFragment(), Activity
     override fun launchActivityForResult(intent: Intent, requestCode: Int) {
         startActivityForResult(intent, requestCode)
     }
+
+    protected open fun shouldSetStatusBarColor(): Boolean = true
 }

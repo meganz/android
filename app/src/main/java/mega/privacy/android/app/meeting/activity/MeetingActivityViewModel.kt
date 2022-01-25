@@ -14,7 +14,6 @@ import mega.privacy.android.app.constants.EventConstants.EVENT_AUDIO_OUTPUT_CHAN
 import mega.privacy.android.app.constants.EventConstants.EVENT_CHAT_TITLE_CHANGE
 import mega.privacy.android.app.constants.EventConstants.EVENT_LINK_RECOVERED
 import mega.privacy.android.app.constants.EventConstants.EVENT_MEETING_CREATED
-import mega.privacy.android.app.constants.EventConstants.EVENT_MEETING_INVITE
 import mega.privacy.android.app.constants.EventConstants.EVENT_NETWORK_CHANGE
 import mega.privacy.android.app.listeners.BaseListener
 import mega.privacy.android.app.listeners.InviteToChatRoomListener
@@ -527,7 +526,6 @@ class MeetingActivityViewModel @Inject constructor(
             val contactsData: List<String>? =
                 intent.getStringArrayListExtra(AddContactActivityLollipop.EXTRA_CONTACTS)
             if (contactsData != null) {
-                LiveEventBus.get(EVENT_MEETING_INVITE, Boolean::class.java).post(true)
                 currentChatId.value?.let {
                     InviteToChatRoomListener(context).inviteToChat(it, contactsData)
                     _snackBarLiveData.value = getString(R.string.invite_sent)
