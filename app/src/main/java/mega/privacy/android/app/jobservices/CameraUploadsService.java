@@ -121,6 +121,9 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
     public static boolean isCreatingPrimary;
     public static boolean isCreatingSecondary;
 
+    // If during camera upload setting process, set true to block the service running.
+    private static boolean bInCameraUploadsSetting = false;
+
     private NotificationCompat.Builder mBuilder;
     private NotificationManager mNotificationManager;
 
@@ -997,7 +1000,7 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
             return BATTERY_STATE_LOW;
         }
 
-        if (CameraUploadsPreferencesActivity.isInCameraUploadsSetting()){
+        if (isInCameraUploadsSetting()){
             logWarning("Camera uploads setting is in progress");
             return SHOULD_RUN_STATE_FAILED;
         }
@@ -2222,5 +2225,21 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
         int level = intent.getIntExtra(BatteryManager.EXTRA_LEVEL, -1);
         logDebug("Device battery level is " + level);
         return level <= LOW_BATTERY_LEVEL && !isCharging(CameraUploadsService.this);
+    }
+
+    /**
+     * Check if camera uploads setting is in progress
+     * @return - true : During camera uploads setting
+     *         - false : not in camera uploads setting
+     */
+    private boolean isInCameraUploadsSetting() {
+        return bInCameraUploadsSetting;
+    }
+
+    /**
+     * Set to true if camera uploads setting is in progress, otherwise false.
+     */
+    static public void setInCameraUploadsSetting(boolean duringSettingProgress) {
+        bInCameraUploadsSetting = duringSettingProgress;
     }
 }

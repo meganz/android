@@ -15,6 +15,7 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.fragments.settingsFragments.SettingsCameraUploadsFragment;
+import mega.privacy.android.app.jobservices.CameraUploadsService;
 import mega.privacy.android.app.utils.Util;
 
 import static mega.privacy.android.app.constants.BroadcastConstants.*;
@@ -26,9 +27,6 @@ public class CameraUploadsPreferencesActivity extends PreferencesBaseActivity {
 
     private SettingsCameraUploadsFragment sttCameraUploads;
     private AlertDialog businessCUAlert;
-
-    // During camera uploads setting, this variable should be set to true
-    private static boolean bInCameraUploadsSetting = false;
 
     private BroadcastReceiver networkReceiver = new BroadcastReceiver() {
         @Override
@@ -127,7 +125,7 @@ public class CameraUploadsPreferencesActivity extends PreferencesBaseActivity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        bInCameraUploadsSetting = true;
+        CameraUploadsService.setInCameraUploadsSetting(true);
 
         setTitle(R.string.section_photo_sync);
         sttCameraUploads = new SettingsCameraUploadsFragment();
@@ -171,13 +169,7 @@ public class CameraUploadsPreferencesActivity extends PreferencesBaseActivity {
         }
     }
 
-    /**
-     * Check if camera uploads setting is in progress
-     * @return true - During camera uploads setting / false - not in camera uploads setting
-     */
-    static public boolean isInCameraUploadsSetting(){
-        return bInCameraUploadsSetting;
-    }
+
 
     /**
      * Method for enabling Camera Uploads.
@@ -244,7 +236,7 @@ public class CameraUploadsPreferencesActivity extends PreferencesBaseActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        bInCameraUploadsSetting = false;
+        CameraUploadsService.setInCameraUploadsSetting(false);
         unregisterReceiver(networkReceiver);
         unregisterReceiver(cameraUploadDestinationReceiver);
         unregisterReceiver(enableDisableCameraUploadReceiver);
