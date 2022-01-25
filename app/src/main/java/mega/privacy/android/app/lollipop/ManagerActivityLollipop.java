@@ -280,6 +280,7 @@ import static mega.privacy.android.app.modalbottomsheet.UploadBottomSheetDialogF
 import static mega.privacy.android.app.sync.fileBackups.FileBackupManager.BackupDialogState.BACKUP_DIALOG_SHOW_CONFIRM;
 import static mega.privacy.android.app.sync.fileBackups.FileBackupManager.BackupDialogState.BACKUP_DIALOG_SHOW_NONE;
 import static mega.privacy.android.app.sync.fileBackups.FileBackupManager.BackupDialogState.BACKUP_DIALOG_SHOW_WARNING;
+import static mega.privacy.android.app.sync.fileBackups.FileBackupManager.OperationType.OPERATION_EXECUTE;
 import static mega.privacy.android.app.utils.AlertDialogUtil.dismissAlertDialogIfExists;
 import static mega.privacy.android.app.utils.AlertDialogUtil.isAlertDialogShown;
 import static mega.privacy.android.app.utils.AlertsAndWarnings.askForCustomizedPlan;
@@ -11623,13 +11624,17 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 	 * Create the instance of FileBackupManager
 	 */
 	private void initFileBackupManager() {
-		fileBackupManager = new FileBackupManager(this, (actionType, result, handle) -> {
+		fileBackupManager = new FileBackupManager(this, (actionType, operationType, result, handle) -> {
 			if (actionType == ACTION_MOVE_TO_BACKUP) {
-				showMovementResult(result, handle);
+				if (operationType == OPERATION_EXECUTE) {
+					showMovementResult(result, handle);
+				}
 			} else if (actionType == ACTION_BACKUP_FAB) {
-				if (isBottomSheetDialogShown(bottomSheetDialogFragment)) return;
-				bottomSheetDialogFragment = UploadBottomSheetDialogFragment.newInstance(GENERAL_UPLOAD);
-				bottomSheetDialogFragment.show(getSupportFragmentManager(), bottomSheetDialogFragment.getTag());
+				if (operationType == OPERATION_EXECUTE) {
+					if (isBottomSheetDialogShown(bottomSheetDialogFragment)) return;
+					bottomSheetDialogFragment = UploadBottomSheetDialogFragment.newInstance(GENERAL_UPLOAD);
+					bottomSheetDialogFragment.show(getSupportFragmentManager(), bottomSheetDialogFragment.getTag());
+				}
 			} else {
 				logDebug("Nothing to do for actionType = " + actionType);
 			}

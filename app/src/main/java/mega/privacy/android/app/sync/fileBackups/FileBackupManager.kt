@@ -16,6 +16,8 @@ import mega.privacy.android.app.lollipop.controllers.NodeController
 import mega.privacy.android.app.sync.fileBackups.FileBackupManager.BackupDialogState.BACKUP_DIALOG_SHOW_CONFIRM
 import mega.privacy.android.app.sync.fileBackups.FileBackupManager.BackupDialogState.BACKUP_DIALOG_SHOW_NONE
 import mega.privacy.android.app.sync.fileBackups.FileBackupManager.BackupDialogState.BACKUP_DIALOG_SHOW_WARNING
+import mega.privacy.android.app.sync.fileBackups.FileBackupManager.OperationType.OPERATION_CANCEL
+import mega.privacy.android.app.sync.fileBackups.FileBackupManager.OperationType.OPERATION_EXECUTE
 import mega.privacy.android.app.usecase.MoveNodeUseCase
 import mega.privacy.android.app.usecase.data.MoveRequestResult
 import mega.privacy.android.app.utils.Constants.NAME
@@ -52,10 +54,16 @@ class FileBackupManager(
 ) {
 
     object BackupDialogState {
-        // end for Meeting
         const val BACKUP_DIALOG_SHOW_NONE = -1
         const val BACKUP_DIALOG_SHOW_WARNING = 0
         const val BACKUP_DIALOG_SHOW_CONFIRM = 1
+    }
+
+    object OperationType {
+        const val OPERATION_NONE = -1
+        const val OPERATION_CANCEL = 0
+        const val OPERATION_CONFIRMED = 1
+        const val OPERATION_EXECUTE = 2
     }
 
     private val megaApplication = MegaApplication.getInstance()
@@ -127,10 +135,10 @@ class FileBackupManager(
                 for (i in megaNodes.indices) {
                     val node: MegaNode? = megaNodes[i]
                     node?.let {
-                        handleList.add(node.handle)
-                        return checkBackupNodeTypeInList(megaApi, handleList)
+                        handleList.add(it.handle)
                     }
                 }
+                return checkBackupNodeTypeInList(megaApi, handleList)
             } else {
                 // for empty folder
                 if (currentParentHandle != null) {
@@ -213,7 +221,7 @@ class FileBackupManager(
         val actionBackupNodeCallback = object: ActionBackupNodeCallback {
             override fun actionCancel(dialog: DialogInterface?, actionType: Int) {
                 initBackupWarningState()
-                actionBackupListener?.actionBackupResult(actionType)
+                actionBackupListener?.actionBackupResult(actionType, OPERATION_CANCEL)
             }
 
             override fun actionExecute(
@@ -239,6 +247,7 @@ class FileBackupManager(
                                     if (throwable == null && result != null) {
                                         actionBackupListener?.actionBackupResult(
                                             ACTION_MOVE_TO_BACKUP,
+                                            OPERATION_EXECUTE,
                                             result,
                                             handles[0]
                                         )
@@ -263,7 +272,7 @@ class FileBackupManager(
                     )
 
                     ACTION_BACKUP_FAB -> {
-                        actionBackupListener?.actionBackupResult(ACTION_BACKUP_FAB)
+                        actionBackupListener?.actionBackupResult(ACTION_BACKUP_FAB, OPERATION_EXECUTE)
                     }
                     else -> {}
                 }
@@ -328,7 +337,7 @@ class FileBackupManager(
         val actionBackupNodeCallback = object : ActionBackupNodeCallback {
             override fun actionCancel(dialog: DialogInterface?, actionType: Int) {
                 initBackupWarningState()
-                actionBackupListener?.actionBackupResult(actionType)
+                actionBackupListener?.actionBackupResult(actionType, OPERATION_CANCEL)
             }
 
             override fun actionExecute(
@@ -370,6 +379,7 @@ class FileBackupManager(
                                     if (throwable == null && result != null) {
                                         actionBackupListener?.actionBackupResult(
                                             ACTION_MOVE_TO_BACKUP,
+                                            OPERATION_EXECUTE,
                                             result,
                                             handles[0]
                                         )
@@ -386,7 +396,7 @@ class FileBackupManager(
                         ).post(true)
                     }
                     ACTION_BACKUP_FAB -> {
-                        actionBackupListener?.actionBackupResult(ACTION_BACKUP_FAB)
+                        actionBackupListener?.actionBackupResult(ACTION_BACKUP_FAB, OPERATION_EXECUTE)
                     }
                     else -> {}
                 }
