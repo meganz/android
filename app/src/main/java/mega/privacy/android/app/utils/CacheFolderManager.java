@@ -96,6 +96,10 @@ public final class CacheFolderManager {
         return getCacheFile(context, PREVIEW_FOLDER, fileName);
     }
 
+    public static File buildThumbnailFile(Context context, String fileName) {
+        return getCacheFile(context, THUMBNAIL_FOLDER, fileName);
+    }
+
     public static File buildAvatarFile(Context context, String fileName) {
         return getCacheFile(context, AVATAR_FOLDER, fileName);
     }

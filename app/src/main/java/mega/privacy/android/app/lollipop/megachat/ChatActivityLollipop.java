@@ -67,6 +67,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
+import com.google.common.primitives.Longs;
 import com.jeremyliao.liveeventbus.LiveEventBus;
 
 import org.jetbrains.annotations.NotNull;
@@ -91,6 +92,7 @@ import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.ShareInfo;
 import mega.privacy.android.app.activities.GiphyPickerActivity;
+import mega.privacy.android.app.imageviewer.ImageViewerActivity;
 import mega.privacy.android.app.components.ChatManagement;
 import mega.privacy.android.app.contacts.usecase.InviteContactUseCase;
 import mega.privacy.android.app.usecase.GetAvatarUseCase;
@@ -200,7 +202,6 @@ import static mega.privacy.android.app.constants.BroadcastConstants.*;
 import static mega.privacy.android.app.constants.EventConstants.EVENT_CALL_COMPOSITION_CHANGE;
 import static mega.privacy.android.app.constants.EventConstants.EVENT_CALL_ON_HOLD_CHANGE;
 import static mega.privacy.android.app.constants.EventConstants.EVENT_CALL_STATUS_CHANGE;
-import static mega.privacy.android.app.constants.EventConstants.EVENT_MEETING_INVITE;
 import static mega.privacy.android.app.constants.EventConstants.EVENT_SESSION_ON_HOLD_CHANGE;
 import static mega.privacy.android.app.lollipop.megachat.AndroidMegaRichLinkMessage.*;
 import static mega.privacy.android.app.lollipop.megachat.MapsActivity.*;
@@ -3463,11 +3464,6 @@ public class ChatActivityLollipop extends PasscodeActivity
             final List<String> contactsData = intent.getStringArrayListExtra(AddContactActivityLollipop.EXTRA_CONTACTS);
             if (contactsData != null) {
                 new InviteToChatRoomListener(this).inviteToChat(chatRoom.getChatId(), contactsData);
-
-                // Invite participants, check
-                if(participatingInACall()){
-                    LiveEventBus.get(EVENT_MEETING_INVITE, Boolean.class).post(true);
-                }
             }
         }
         else if (requestCode == REQUEST_CODE_SELECT_IMPORT_FOLDER && resultCode == RESULT_OK) {
@@ -5166,7 +5162,7 @@ public class ChatActivityLollipop extends PasscodeActivity
                                     if (MimeTypeList.typeForName(node.getName()).isImage()){
                                         if(node.hasPreview()){
                                             logDebug("Show full screen viewer");
-                                            showFullScreenViewer(m.getMessage().getMsgId(), screenPosition);
+                                            showFullScreenViewer(m.getMessage().getMsgId());
                                         }
                                         else{
                                             logDebug("Image without preview - open with");
@@ -5534,46 +5530,35 @@ public class ChatActivityLollipop extends PasscodeActivity
         this.startActivity(intentOpenChat);
     }
 
-    public void showFullScreenViewer(long msgId, int[] screenPosition){
-        logDebug("showFullScreenViewer");
+    public void showFullScreenViewer(long msgId) {
         int position = 0;
-        boolean positionFound = false;
-        List<Long> ids = new ArrayList<>();
-        for(int i=0; i<messages.size();i++){
+        long currentNodeHandle = INVALID_HANDLE;
+        List<Long> messageIds = new ArrayList<>();
+
+        for (int i = 0; i < messages.size(); i++) {
             AndroidMegaChatMessage androidMessage = messages.get(i);
-            if(!androidMessage.isUploading()){
-                MegaChatMessage msg = androidMessage.getMessage();
-
-                if(msg.getType()==MegaChatMessage.TYPE_NODE_ATTACHMENT){
-                    ids.add(msg.getMsgId());
-
-                    if(msg.getMsgId()==msgId){
-                        positionFound=true;
-                    }
-                    if(!positionFound){
-                        MegaNodeList nodeList = msg.getMegaNodeList();
-                        if(nodeList.size()==1){
-                            MegaNode node = nodeList.get(0);
-                            if(MimeTypeList.typeForName(node.getName()).isImage()){
-                                position++;
-                            }
-                        }
+            if (!androidMessage.isUploading()) {
+                MegaChatMessage message = androidMessage.getMessage();
+                if (message.getType() == MegaChatMessage.TYPE_NODE_ATTACHMENT) {
+                    messageIds.add(message.getMsgId());
+                    if (message.getMsgId() == msgId) {
+                        currentNodeHandle = message.getMegaNodeList().get(0).getHandle();
+                        position = i;
                     }
                 }
             }
         }
 
-        Intent intent = new Intent(this, ChatFullScreenImageViewer.class);
-        intent.putExtra("position", position);
-        intent.putExtra("chatId", idChat);
-        intent.putExtra("screenPosition", screenPosition);
-        long[] array = new long[ids.size()];
-        for(int i = 0; i < ids.size(); i++) {
-            array[i] = ids.get(i);
-        }
-        intent.putExtra("messageIds", array);
+        Intent intent = ImageViewerActivity.getIntentForChatMessages(
+                this,
+                idChat,
+                Longs.toArray(messageIds),
+                currentNodeHandle
+        );
+
         startActivity(intent);
         overridePendingTransition(0,0);
+
         if (adapter !=  null) {
             adapter.setNodeAttachmentVisibility(false, holder_imageDrag, position);
         }

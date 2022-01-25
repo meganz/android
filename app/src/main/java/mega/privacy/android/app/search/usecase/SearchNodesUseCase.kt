@@ -242,4 +242,19 @@ class SearchNodesUseCase @Inject constructor(
         } else {
             megaApi.searchOnPublicLinks(query, megaCancelToken, sortOrderManagement.getOrderCloud())
         }
+
+    /**
+     * Search nodes on public links containing a search string in their name
+     *
+     * @param query         Search string. The search is case-insensitive
+     * @param order         Order for the returned list
+     * @return              Single containing the resulting list of Nodes
+     */
+    fun searchPublicLink(
+        query: String,
+        order: Int = MegaApiJava.ORDER_NONE
+    ): Single<List<MegaNode>> =
+        Single.fromCallable {
+            megaApi.searchOnPublicLinks(query, null, order)
+        }
 }

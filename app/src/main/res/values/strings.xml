@@ -2169,7 +2169,7 @@
     <!-- Message error shown when trying to log in on an account has been suspended due to multiple breaches of Terms of Service -->
     <string name="account_suspended_multiple_breaches_ToS">Your account has been suspended due to multiple breaches of MEGA’s Terms of Service. Please check your email inbox.</string>
     <!-- Message error shown when trying to log in on an account has been suspended due to breach of Terms of Service -->
-    <string name="account_suspended_breache_ToS">Your account was terminated due to a breach of MEGA’s Terms of Service including, but not limited to, clause 15.</string>
+    <string name="account_suspended_breache_ToS">Your account was terminated due to a breach of MEGA\’s Terms of Service including, but not limited to, clause 15.</string>
     <!-- In a chat conversation when you try to send device’s images but images are still loading -->
     <string name="file_storage_loading">Loading files</string>
     <!-- In a chat conversation when you try to send device’s images but there aren’t available images -->
@@ -2583,7 +2583,10 @@
     <!-- Settings preference title to show file versions info of the account -->
     <string name="settings_file_management_file_versions_title">File versions</string>
     <!-- Settings preference subtitle to show file versions info of the account -->
-    <string name="settings_file_management_file_versions_subtitle">%1$d file versions, taking a total of %2$s</string>
+    <plurals name="settings_file_management_file_versions_subtitle">
+        <item quantity="one">1 file version, taking a total of %2$s</item>
+        <item quantity="other">%1$d file versions, taking a total of %2$s</item>
+    </plurals>
     <!-- Title of the section File management on Settings section -->
     <string name="settings_file_management_category">File Management</string>
     <!-- Option in Settings to delete all the versions of the account -->
@@ -3849,8 +3852,6 @@
     <string name="error_share_owner_storage_quota">Share owner is over storage quota.</string>
     <!-- A message shown when uploading, copying or moving something to an incoming share and the owner’s account is over its storage quota. -->
     <string name="warning_share_owner_storage_quota">The file cannot be sent as the target user is over their storage quota.</string>
-    <!-- Content to show in a Snackbar to tip the incompatibility-->
-    <string name="version_incompatibility">We are upgrading MEGAchat. Your calls might not be connected due to version incompatibility unless all parties update their MEGA apps to the latest version.</string>
     <!-- Message displayed when multiple download starts and 1 file has already been downloaded before and 1 file is being downloaded -->
     <string name="file_already_downloaded_and_file_pending_download">1 file already downloaded. 1 file pending.</string>
     <!-- Message displayed when multiple download starts and 1 file has already been downloaded before and multiple files are being downloaded. Placeholder: number of files -->
@@ -4129,6 +4130,10 @@
     <string name="confirmation_fingerprint_enabled">Your fingerprint is confirmed</string>
     <!-- Warning indicating an image (GIF) cannot be inserted in an input text. Same string than the one shown by the system when it detects this behaviour on its own. -->
     <string name="image_insertion_not_allowed">MEGA does not support image insertion here</string>
+    <!-- title for the settings to enable high resolution images when on mobile data -->
+    <string name="settings_mobile_data_resoluton_title">Use mobile data to preview high resolution images</string>
+    <!-- summary for the settings to enable high resolution images when on mobile data -->
+    <string name="settings_mobile_data_resoluton_summary">Use mobile data to load high resolution images when previewing. If disabled, the original image will only be loaded when you zoom in.</string>
     <!-- The label under the button of viewing all images screen -->
     <string name="section_images">Images</string>
     <!-- Title of the dialog warning the user about disable file versioning. -->
@@ -4141,4 +4146,30 @@
     <string name="contact_already_invited">%1$s previously invited.</string>
     <!-- Warning shown informing the contact request has been sent and can be managed in sent requests section. -->
     <string name="contact_invited">Invite sent successfully. See sent requests.</string>
+    <!-- Message when file available offline. -->
+    <string name="file_available_offline">File available Offline</string>
+    <!-- Message when file removed from offline. -->
+    <string name="file_removed_offline">File removed from Offline</string>
+    <!-- Menu option to open a link. Also title of the dialog to open a link. -->
+    <string name="action_open_link">Open link</string>
+    <!-- error message shown when a chat link is not well formed. -->
+    <string name="invalid_chat_link_args">Invalid chat link</string>
+    <!-- Menu option to open a chat link. -->
+    <string name="action_open_chat_link">Open chat link</string>
+    <!-- Hint shown in the open chat link alert dialog. -->
+    <string name="hint_enter_chat_link">Enter chat link</string>
+    <!-- Hint shown in the open link alert dialog. -->
+    <string name="hint_paste_link">Paste link</string>
+    <!-- Error shown when it tries to open an invalid file or folder link .-->
+    <string name="invalid_file_folder_link">Invalid file or folder link</string>
+    <!-- Error shown when it tries to open an invalid file or folder link and the text view is empty. -->
+    <string name="invalid_file_folder_link_empty">Please enter a valid file or folder link</string>
+    <!-- Error shown when it tries to open an invalid chat link and the text view is empty. -->
+    <string name="invalid_chat_link_empty">Please enter a valid chat link</string>
+    <!-- Error shown when it tries to open a chat link from the Cloud Drive section. -->
+    <string name="valid_chat_link">You have pasted a chat link.</string>
+    <!-- Error shown when it tries to open a contact link from the Cloud Drive section. -->
+    <string name="valid_contact_link">You have pasted a contact link.</string>
+    <!-- Action button to open a contact link.-->
+    <string name="action_open_contact_link">Open contact link</string>
 </resources>

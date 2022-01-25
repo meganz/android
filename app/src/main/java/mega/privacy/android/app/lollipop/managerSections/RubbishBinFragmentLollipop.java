@@ -60,7 +60,7 @@ import mega.privacy.android.app.fragments.homepage.EventObserver;
 import mega.privacy.android.app.fragments.homepage.SortByHeaderViewModel;
 import mega.privacy.android.app.globalmanagement.SortOrderManagement;
 import mega.privacy.android.app.lollipop.DrawerItem;
-import mega.privacy.android.app.lollipop.FullScreenImageViewerLollipop;
+import mega.privacy.android.app.imageviewer.ImageViewerActivity;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.PdfViewerActivityLollipop;
 import mega.privacy.android.app.lollipop.adapters.MegaNodeAdapter;
@@ -630,24 +630,14 @@ public class RubbishBinFragmentLollipop extends Fragment{
 			else{
 				//Is FILE
 				if (MimeTypeList.typeForName(nodes.get(position).getName()).isImage()){
-					Intent intent = new Intent(context, FullScreenImageViewerLollipop.class);
-					//Put flag to notify FullScreenImageViewerLollipop.
-					intent.putExtra("placeholder", adapter.getPlaceholderCount());
-					intent.putExtra("position", position);
-					intent.putExtra("adapterType", RUBBISH_BIN_ADAPTER);
-					if (megaApi.getParentNode(nodes.get(position)).getType() == MegaNode.TYPE_RUBBISH){
-						intent.putExtra("parentNodeHandle", -1L);
-					}
-					else{
-						intent.putExtra("parentNodeHandle", megaApi.getParentNode(nodes.get(position)).getHandle());
-					}
-
-					intent.putExtra("orderGetChildren", sortOrderManagement.getOrderCloud());
-
-					intent.putExtra(INTENT_EXTRA_KEY_HANDLE, nodes.get(position).getHandle());
+					Intent intent = ImageViewerActivity.getIntentForParentNode(
+							requireContext(),
+							megaApi.getParentNode(nodes.get(position)).getHandle(),
+							sortOrderManagement.getOrderCloud(),
+							nodes.get(position).getHandle()
+					);
 					putThumbnailLocation(intent, recyclerView, position, VIEWER_FROM_RUBBISH_BIN, adapter);
-
-					context.startActivity(intent);
+					startActivity(intent);
 					((ManagerActivityLollipop) context).overridePendingTransition(0,0);
 				}
 				else if (MimeTypeList.typeForName(nodes.get(position).getName()).isVideoReproducible() || MimeTypeList.typeForName(nodes.get(position).getName()).isAudio() ){

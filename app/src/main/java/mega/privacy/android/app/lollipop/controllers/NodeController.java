@@ -192,8 +192,8 @@ public class NodeController {
         }
     }
 
-    public MegaNode getParent (MegaNode node) {
-        return MegaNodeUtil.getRootParentNode(node);
+    public MegaNode getParent(MegaNode node) {
+        return MegaNodeUtil.getRootParentNode(megaApi, node);
     }
 
     public int getIncomingLevel(MegaNode node) {
