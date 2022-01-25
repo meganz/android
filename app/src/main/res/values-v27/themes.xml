@@ -3,9 +3,4 @@
     <style name="Theme.Mega" parent="Base.Theme.Mega" >
         <item name="android:windowLightNavigationBar">true</item>
     </style>
-
-    <style name="Theme.Dark.FullScreen.Draggable" parent="Base.Theme.Dark.FullScreen.Draggable">
-        <!-- For devices which have notch -->
-        <item name="android:windowLayoutInDisplayCutoutMode">shortEdges</item>
-    </style>
 </resources>

@@ -1,14 +1,11 @@
 package mega.privacy.android.app.modalbottomsheet;
 
 import android.annotation.SuppressLint;
-import android.content.Intent;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.core.content.FileProvider;
 
 import android.view.LayoutInflater;
 import android.view.View;
@@ -16,7 +13,6 @@ import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.facebook.drawee.view.SimpleDraweeView;
 import java.io.File;
@@ -26,12 +22,11 @@ import mega.privacy.android.app.MegaOffline;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
+import mega.privacy.android.app.utils.OfflineUtils;
 
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.FileUtil.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
-import static mega.privacy.android.app.utils.MegaApiUtils.*;
-import static mega.privacy.android.app.utils.OfflineUtils.*;
 import static mega.privacy.android.app.utils.Util.*;
 
 public class OfflineOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogFragment implements View.OnClickListener {
@@ -90,7 +85,7 @@ public class OfflineOptionsBottomSheetDialogFragment extends BaseBottomSheetDial
             nodeName.setText(nodeOffline.getName());
 
             logDebug("Set node info");
-            file = getOfflineFile(requireContext(), nodeOffline);
+            file = OfflineUtils.getOfflineFile(requireContext(), nodeOffline);
             if (!isFileAvailable(file)) return;
 
             if (file.isDirectory()) {
@@ -140,10 +135,10 @@ public class OfflineOptionsBottomSheetDialogFragment extends BaseBottomSheetDial
                 }
                 break;
             case R.id.option_open_with_layout:
-                openWith();
+                OfflineUtils.openWithOffline(requireContext(), Long.valueOf(nodeOffline.getHandle()));
                 break;
             case R.id.option_share_layout:
-                shareOfflineNode(requireContext(), nodeOffline);
+                OfflineUtils.shareOfflineNode(requireContext(), Long.valueOf(nodeOffline.getHandle()));
                 break;
             case R.id.option_download_layout:
                 ((ManagerActivityLollipop) requireActivity()).saveOfflineNodesToDevice(
@@ -157,33 +152,6 @@ public class OfflineOptionsBottomSheetDialogFragment extends BaseBottomSheetDial
         }
 
         setStateBottomSheetBehaviorHidden();
-    }
-
-    private void openWith() {
-        if (MimeTypeList.typeForName(nodeOffline.getName()).isURL()) {
-            Uri uri = Uri.parse(getURLOfflineFileContent(file));
-
-            if (uri != null) {
-                startActivity(new Intent(Intent.ACTION_VIEW).setData(uri));
-                return;
-            }
-        }
-
-        String type = MimeTypeList.typeForName(nodeOffline.getName()).getType();
-        Intent mediaIntent = new Intent(Intent.ACTION_VIEW);
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            mediaIntent.setDataAndType(FileProvider.getUriForFile(requireContext(), AUTHORITY_STRING_FILE_PROVIDER, file), type);
-        } else {
-            mediaIntent.setDataAndType(Uri.fromFile(file), type);
-        }
-        mediaIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-
-        if (isIntentAvailable(requireContext(), mediaIntent)) {
-            startActivity(mediaIntent);
-        } else {
-            Toast.makeText(requireContext(), getResources().getString(R.string.intent_not_available), Toast.LENGTH_LONG).show();
-        }
     }
 
     @Override
