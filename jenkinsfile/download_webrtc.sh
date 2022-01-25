@@ -28,7 +28,7 @@ function download_webrtc {
     URL=$1
     cd ${WEBRTC_DOWNLOAD_PATH}
     rm -fr *
-    echo "  webrtc URL: $URL"
+    echo "  WebRTC URL: $URL"
     echo
     echo ">>> downloading..."
     mega-get $URL
@@ -40,10 +40,10 @@ function download_webrtc {
     echo
     # echo "unzipped content: $FOLDER"
     if test -f "$FOLDER/libwebrtc_arm64.a"; then
-        echo ">>> webrtc folder found!"
-        pwd
+        echo ">>> WebRTC folder found!"
+        echo "  $(pwd)"
         echo ">>> copying WebRTC to target folder"
-        cp -frv "webrtc"  ${WORKSPACE}/app/src/main/jni/megachat/
+        cp -fr "webrtc"  ${WORKSPACE}/app/src/main/jni/megachat/
     else
         echo ">>> WebRTC not in root of zip file. Go down to subfolder...."
         cd $FOLDER
