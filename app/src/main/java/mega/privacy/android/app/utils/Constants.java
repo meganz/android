@@ -279,6 +279,7 @@ public class Constants {
     public static final String BROADCAST_ACTION_INTENT_UPDATE_USER_DATA = "BROADCAST_ACTION_INTENT_UPDATE_USER_DATA";
 
     public static final String INTENT_EXTRA_KEY_HANDLE = "HANDLE";
+    public static final String INTENT_EXTRA_KEY_OFFLINE_HANDLE = "INTENT_EXTRA_KEY_OFFLINE_HANDLE";
     public static final String INTENT_EXTRA_KEY_FILE_NAME = "FILENAME";
     public static final String INTENT_EXTRA_KEY_SCREEN_POSITION = "screenPosition";
     public static final String INTENT_EXTRA_KEY_SCREEN_POSITION_FOR_SWIPE_DISMISS = "screenPositionForSwipeDismiss";
@@ -301,6 +302,7 @@ public class Constants {
     public static final String INTENT_EXTRA_KEY_REBUILD_PLAYLIST = "REBUILD_PLAYLIST";
     public static final String INTENT_EXTRA_KEY_FROM = "from";
     public static final String INTENT_EXTRA_KEY_COPY_FROM = "COPY_FROM";
+    public static final String INTENT_EXTRA_KEY_IMPORT_CHAT = "HANDLES_IMPORT_CHAT";
     public static final String INTENT_EXTRA_KEY_MOVE_FROM = "MOVE_FROM";
     public static final String INTENT_EXTRA_KEY_MOVE_HANDLES = "MOVE_HANDLES";
     public static final String INTENT_EXTRA_KEY_MOVE_TO = "MOVE_TO";
@@ -323,6 +325,7 @@ public class Constants {
     public static final String INTENT_EXTRA_KEY_TOOL_BAR_TITLE = "aBtitle";
     public static final String INTENT_EXTRA_IS_FROM_MEETING = "extra_is_from_meeting";
     public static final String INTENT_EXTRA_MEETING_PARTICIPANTS = "participants_in_a_meeting";
+    public static final String INTENT_EXTRA_KEY_URI = "INTENT_EXTRA_KEY_URI";
 
     public static final int FILE_BROWSER_ADAPTER = 2000;
     public static final int CONTACT_FILE_ADAPTER = 2001;
@@ -360,6 +363,7 @@ public class Constants {
     public static final int RECENTS_BUCKET_ADAPTER = 2034;
     public static final int VERSIONS_ADAPTER = 2035;
     public static final int MEDIA_BROWSE_ADAPTER = 2036;
+    public static final int FROM_IMAGE_VIEWER = 2036;
 
     public static final int VIEWER_FROM_PHOTOS = 1;
     public static final int VIEWER_FROM_INCOMING_SHARES = 2;
@@ -514,6 +518,7 @@ public class Constants {
     public static final String APP_DATA_SEPARATOR = "-";
     //Indicates the data after it, is a new AppData due to a repeated transfer
     public static final String APP_DATA_REPEATED_TRANSFER_SEPARATOR = "!";
+    public static final String APP_DATA_BACKGROUND_TRANSFER = "BACKGROUND_TRANSFER";
 
     public static final String AVATAR_PRIMARY_COLOR = "AVATAR_PRIMARY_COLOR";
     public static final String AVATAR_GROUP_CHAT_COLOR = "AVATAR_GROUP_CHAT_COLOR";
