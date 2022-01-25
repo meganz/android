@@ -189,17 +189,12 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".lollipop.FullScreenImageViewerLollipop"
-            android:label="@string/full_screen_image_viewer_label"
+            android:name="mega.privacy.android.app.imageviewer.ImageViewerActivity"
+            android:label=""
             android:launchMode="singleTop"
-            android:theme="@style/Theme.Dark.FullScreen.Draggable"
-            android:uiOptions="splitActionBarWhenNarrow"></activity>
-        <activity
-            android:name=".lollipop.megachat.ChatFullScreenImageViewer"
-            android:label="@string/full_screen_image_viewer_label"
-            android:launchMode="singleTop"
-            android:theme="@style/Theme.Dark.FullScreen.Draggable"
-            android:uiOptions="splitActionBarWhenNarrow"></activity>
+            android:theme="@style/Theme.Mega.FullScreen.ImageViewer"
+            android:windowSoftInputMode="stateHidden|adjustResize" />
+
         <activity
             android:name=".lollipop.ContactFileListActivityLollipop"
             android:label="@string/contact_properties_activity"
@@ -342,6 +337,7 @@
             android:label="@string/app_name"></activity>
         <activity
             android:name=".activities.OfflineFileInfoActivity"
+            android:launchMode="singleTop"
             android:label="@string/app_name" />
         <activity
             android:name=".lollipop.VersionsFileActivity"
@@ -393,8 +389,9 @@
         </activity>
         <activity
             android:name=".mediaplayer.VideoPlayerActivity"
-            android:theme="@style/Theme.Dark.FullScreen.Draggable"
-            android:windowSoftInputMode="adjustNothing" />
+            android:windowSoftInputMode="adjustNothing"
+            android:theme="@style/Theme.Mega.FullScreen" />
+
         <activity
             android:name=".mediaplayer.AudioPlayerActivity"
             android:launchMode="singleTop"

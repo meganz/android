@@ -50,11 +50,7 @@ import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaChatApi;
 import nz.mega.sdk.MegaChatApiAndroid;
-import nz.mega.sdk.MegaChatApiJava;
-import nz.mega.sdk.MegaChatError;
 import nz.mega.sdk.MegaChatListItem;
-import nz.mega.sdk.MegaChatRequest;
-import nz.mega.sdk.MegaChatRequestListenerInterface;
 import nz.mega.sdk.MegaChatRoom;
 import nz.mega.sdk.MegaUser;
 
@@ -237,41 +233,7 @@ public class ChatExplorerFragment extends Fragment implements CheckScrollInterfa
             addedItemsSaved = new ArrayList<>();
         }
 
-        int connectionState = megaChatApi.getConnectionState();
-        logDebug("connection state: " + connectionState);
-        //need to reconnect to load the chat rooms list room properly.
-        if(connectionState == MegaChatApi.DISCONNECTED) {
-            megaChatApi.connect(new MegaChatRequestListenerInterface() {
-
-                @Override
-                public void onRequestStart(MegaChatApiJava api, MegaChatRequest request) {
-                    showConnecting();
-                }
-
-                @Override
-                public void onRequestUpdate(MegaChatApiJava api, MegaChatRequest request) {
-
-                }
-
-                @Override
-                public void onRequestFinish(MegaChatApiJava api, MegaChatRequest request, MegaChatError e) {
-                    if (e.getErrorCode() == MegaChatError.ERROR_OK) {
-                        emptyTextView.setVisibility(View.GONE);
-                        logDebug("Connected to chat!");
-                        setChats();
-                    } else {
-                        logWarning("ERROR WHEN CONNECTING " + e.getErrorString());
-                    }
-                }
-
-                @Override
-                public void onRequestTemporaryError(MegaChatApiJava api, MegaChatRequest request, MegaChatError e) {
-
-                }
-            });
-        } else {
-            setChats();
-        }
+        setChats();
 
         return v;
     }
@@ -306,11 +268,6 @@ public class ChatExplorerFragment extends Fragment implements CheckScrollInterfa
             Toolbar tB = ((ChatExplorerActivity) context).findViewById(R.id.toolbar_chat_explorer);
             Util.changeToolBarElevationForDarkMode((ChatExplorerActivity) context, tB, canScroll);
         }
-    }
-
-    private void showConnecting() {
-        String textToShow = context.getString(R.string.chat_connecting);
-        emptyTextView.setText(textToShow);
     }
 
     private void setFirstLayoutVisibility (int visibility) {
@@ -381,6 +338,7 @@ public class ChatExplorerFragment extends Fragment implements CheckScrollInterfa
     public void setChats(){
         logDebug("setChats");
 
+        emptyTextView.setVisibility(View.GONE);
         contentLayout.setVisibility(View.GONE);
         progressBar.setVisibility(View.VISIBLE);
         new RecoverItemsTask().execute();

@@ -1,8 +1,10 @@
 package mega.privacy.android.app.di
 
 import android.content.Context
+import android.content.SharedPreferences
 import android.content.pm.PackageInfo
 import android.content.pm.PackageManager.NameNotFoundException
+import androidx.preference.PreferenceManager
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -61,4 +63,9 @@ class AppModule {
     fun provideDbHandler(@ApplicationContext context: Context): DatabaseHandler {
         return DatabaseHandler.getDbHandler(context)
     }
+
+    @Singleton
+    @Provides
+    fun providePreferences(@ApplicationContext context: Context): SharedPreferences =
+        PreferenceManager.getDefaultSharedPreferences(context)
 }
