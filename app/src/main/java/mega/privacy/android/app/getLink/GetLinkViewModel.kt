@@ -141,7 +141,7 @@ class GetLinkViewModel @Inject constructor(
      * @param expiryDate Expiry date to export.
      */
     fun exportWithTimestamp(expiryDate: Int) {
-        exportNodeUseCase.exportWithTimestamp(node, expiryDate)
+        exportNodeUseCase.export(node, expiryDate)
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeBy(

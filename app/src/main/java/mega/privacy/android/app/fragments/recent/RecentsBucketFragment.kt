@@ -20,7 +20,7 @@ import mega.privacy.android.app.components.dragger.DragToExitSupport.Companion.o
 import mega.privacy.android.app.components.dragger.DragToExitSupport.Companion.putThumbnailLocation
 import mega.privacy.android.app.databinding.FragmentRecentBucketBinding
 import mega.privacy.android.app.fragments.BaseFragment
-import mega.privacy.android.app.lollipop.FullScreenImageViewerLollipop
+import mega.privacy.android.app.imageviewer.ImageViewerActivity
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop
 import mega.privacy.android.app.lollipop.PdfViewerActivityLollipop
 import mega.privacy.android.app.lollipop.adapters.MultipleBucketAdapter
@@ -293,16 +293,20 @@ class RecentsBucketFragment : BaseFragment() {
         index: Int,
         node: MegaNode
     ) {
-        val intent = Intent(activity, FullScreenImageViewerLollipop::class.java)
-
-        intent.putExtra(INTENT_EXTRA_KEY_ADAPTER_TYPE, RECENTS_BUCKET_ADAPTER)
-
-        intent.putExtra(INTENT_EXTRA_KEY_HANDLE, node.handle)
+        val handles = getNodesHandles(true)
+        val intent = if (handles != null && handles.isNotEmpty()) {
+            ImageViewerActivity.getIntentForChildren(
+                requireContext(),
+                handles,
+                node.handle
+            )
+        } else {
+            ImageViewerActivity.getIntentForSingleNode(
+                requireContext(),
+                node.handle
+            )
+        }
         putThumbnailLocation(intent, listView, index, VIEWER_FROM_RECETS_BUCKET, adapter!!)
-
-        intent.putExtra(HANDLE, node.handle)
-        intent.putExtra(NODE_HANDLES, getNodesHandles(true))
-
         startActivity(intent)
         activity?.overridePendingTransition(0, 0)
     }
