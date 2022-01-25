@@ -557,10 +557,9 @@ public class Constants {
     public static final int NOT_SPACE_SNACKBAR_TYPE = 3;
     public static final int PERMISSIONS_TYPE = 4;
     public static final int INVITE_CONTACT_TYPE = 5;
-    public static final int SNACKBAR_IMCOMPATIBILITY_TYPE = 6;
-    public static final int DISMISS_ACTION_SNACKBAR = 7;
-    public static final int OPEN_FILE_SNACKBAR_TYPE = 8;
-    public static final int SENT_REQUESTS_TYPE = 9;
+    public static final int DISMISS_ACTION_SNACKBAR = 6;
+    public static final int OPEN_FILE_SNACKBAR_TYPE = 7;
+    public static final int SENT_REQUESTS_TYPE = 8;
 
     public static final int INFO_ANIMATION = 3000;
     public static final int QUICK_INFO_ANIMATION = 500;
