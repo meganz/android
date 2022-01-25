@@ -51,6 +51,7 @@ public class SettingsFileManagementFragment extends SettingsBaseFragment {
     private Preference fileVersionsFileManagement;
     private Preference clearVersionsFileManagement;
     private SwitchPreferenceCompat autoPlaySwitch;
+    private SwitchPreferenceCompat mobileDataHighResolution;
 
     private AlertDialog disableVersionsWarning;
 
@@ -81,6 +82,9 @@ public class SettingsFileManagementFragment extends SettingsBaseFragment {
         autoPlaySwitch = findPreference(KEY_AUTO_PLAY_SWITCH);
         autoPlaySwitch.setOnPreferenceClickListener(this);
         autoPlaySwitch.setChecked(prefs.isAutoPlayEnabled());
+
+        mobileDataHighResolution = findPreference(KEY_MOBILE_DATA_HIGH_RESOLUTION);
+        mobileDataHighResolution.setOnPreferenceClickListener(this);
 
         if (megaApi.serverSideRubbishBinAutopurgeEnabled()) {
             megaApi.getRubbishBinAutopurgePeriod(new GetAttrUserListener(context));
