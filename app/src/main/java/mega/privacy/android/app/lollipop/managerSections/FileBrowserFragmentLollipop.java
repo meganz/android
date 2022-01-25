@@ -669,15 +669,17 @@ public class FileBrowserFragmentLollipop extends RotatableFragment{
     }
 
     @Override
-    public void onAttach(@NonNull Context context) {
+	public void onAttach(@NonNull Context context) {
 		logDebug("onAttach");
 
-        super.onAttach(context);
-        this.context = context;
-        aB = ((AppCompatActivity)context).getSupportActionBar();
-		fileBackupManager = new FileBackupManager(getActivity(), (actionType, operationType, result, handle) ->
-				logDebug("Nothing to do for actionType = " + actionType));
-    }
+		super.onAttach(context);
+		this.context = context;
+		aB = ((AppCompatActivity) context).getSupportActionBar();
+		fileBackupManager = new FileBackupManager(
+				requireActivity(),
+				(actionType, operationType, result, handle) -> logDebug("Nothing to do for actionType = " + actionType)
+		);
+	}
 
     @Override
 	public void onDestroy() {

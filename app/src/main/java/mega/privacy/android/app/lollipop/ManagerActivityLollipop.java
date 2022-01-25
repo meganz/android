@@ -6417,7 +6417,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 	 *
 	 * @param handleList handleList handles list of the nodes that selected
 	 */
-	public void chooseLocationToPutNodes(final ArrayList<Long> handleList) {
+	public void moveBackupNode(final ArrayList<Long> handleList) {
 		logDebug("MyBackup + NodeOptionsBottomSheetDialogFragment Move a backup folder or file");
 		fileBackupManager.moveBackup(nC, handleList);
 	}

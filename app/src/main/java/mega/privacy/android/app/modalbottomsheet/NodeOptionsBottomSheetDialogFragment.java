@@ -1155,7 +1155,7 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
                 break;
 
             case R.id.option_backup_move_layout:
-                ((ManagerActivityLollipop) requireActivity()).chooseLocationToPutNodes(handleList);
+                ((ManagerActivityLollipop) requireActivity()).moveBackupNode(handleList);
                 dismissAllowingStateLoss();
                 break;
 
