@@ -35,6 +35,10 @@ import mega.privacy.android.app.utils.Util
  */
 class UploadFolderActivity : PasscodeActivity(), Scrollable {
 
+    companion object {
+        private const val SHADOW = 0.5f
+    }
+
     private val viewModel: UploadFolderViewModel by viewModels()
     private val sortByHeaderViewModel: SortByHeaderViewModel by viewModels()
     private lateinit var binding: ActivityUploadFolderBinding
@@ -46,7 +50,7 @@ class UploadFolderActivity : PasscodeActivity(), Scrollable {
         FolderContentAdapter(sortByHeaderViewModel, ::onClick, ::onLongClick)
     }
 
-    private val toolbarElevation by lazy { resources.getDimension(R.dimen.toolbar_elevation) }
+    private val elevation by lazy { resources.getDimension(R.dimen.toolbar_elevation) }
     private val itemDecoration by lazy {
         PositionDividerItemDecoration(
             this,
@@ -101,6 +105,9 @@ class UploadFolderActivity : PasscodeActivity(), Scrollable {
             setDisplayHomeAsUpEnabled(true)
         }
 
+        binding.emptyHintImage.isVisible = false
+        binding.emptyHintText.isVisible = false
+
         binding.list.apply {
             addOnScrollListener(object : RecyclerView.OnScrollListener() {
 
@@ -112,6 +119,7 @@ class UploadFolderActivity : PasscodeActivity(), Scrollable {
 
             adapter = folderContentAdapter
             setHasFixedSize(true)
+            isVisible = false
         }
 
         binding.fastscroll.setRecyclerView(binding.list)
@@ -126,6 +134,22 @@ class UploadFolderActivity : PasscodeActivity(), Scrollable {
         binding.uploadButton.setOnClickListener {
             setResult(RESULT_OK)
             finish()
+        }
+
+        showProgress(true)
+    }
+
+    private fun showProgress(show: Boolean) {
+        binding.progressBar.isVisible = show
+        val shadow = if (show) SHADOW else 1f
+        binding.list.alpha = shadow
+        binding.cancelButton.apply {
+            alpha = shadow
+            isEnabled = !show
+        }
+        binding.uploadButton.apply {
+            alpha = shadow
+            isEnabled = !show
         }
     }
 
@@ -155,6 +179,7 @@ class UploadFolderActivity : PasscodeActivity(), Scrollable {
     }
 
     private fun showFolderContent(folderContent: List<FolderContent>) {
+//        showProgress(false)
         val isEmpty = folderContent.isEmpty()
         binding.emptyHintImage.isVisible = isEmpty
         binding.emptyHintText.isVisible = isEmpty
@@ -195,7 +220,10 @@ class UploadFolderActivity : PasscodeActivity(), Scrollable {
     private fun onClick(itemClicked: FolderContent.Data, position: Int) {
         when {
             actionMode != null -> onLongClick(itemClicked, position)
-            itemClicked.isFolder -> viewModel.folderClick(itemClicked)
+            itemClicked.isFolder -> {
+                showProgress(true)
+                viewModel.folderClick(itemClicked)
+            }
         }
     }
 
@@ -274,8 +302,9 @@ class UploadFolderActivity : PasscodeActivity(), Scrollable {
     override fun checkScroll() {
         val showElevation =
             binding.list.canScrollVertically(RecyclerView.NO_POSITION) || actionMode != null
+                    || binding.progressBar.isVisible
 
-        binding.toolbar.elevation = if (showElevation) toolbarElevation else 0F
+        binding.appBar.elevation = if (showElevation) elevation else 0F
         if (Util.isDarkMode(this@UploadFolderActivity)) {
             val color =
                 if (showElevation) R.color.action_mode_background else R.color.dark_grey
