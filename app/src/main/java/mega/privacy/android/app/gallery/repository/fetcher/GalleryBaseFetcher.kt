@@ -4,7 +4,7 @@ import android.content.Context
 import android.os.Handler
 import android.os.Looper
 import kotlinx.coroutines.delay
-import mega.privacy.android.app.MimeTypeThumbnail
+import mega.privacy.android.app.MimeTypeList
 import mega.privacy.android.app.fragments.homepage.TypedNodesFetcher
 import mega.privacy.android.app.gallery.data.GalleryItem
 import mega.privacy.android.app.gallery.data.GalleryItem.Companion.TYPE_HEADER
@@ -155,7 +155,7 @@ abstract class GalleryBaseFetcher(
 
 
             val selected = selectedNodesMap[node.handle]?.selected ?: false
-            val mime = MimeTypeThumbnail.typeForName(node.name)
+            val mime = MimeTypeList.typeForName(node.name)
             fileNodesMap[node.handle] = GalleryItem(
                 node,
                 INVALID_POSITION,
@@ -234,7 +234,7 @@ abstract class GalleryBaseFetcher(
                 continue
             }
 
-            if (shouldAdd(MimeTypeThumbnail.typeForName(node.name))) {
+            if (shouldAdd(MimeTypeList.typeForName(node.name))) {
                 // when not in search mode, index used by viewer is index in all siblings,
                 // including non image/video nodes
                 filteredNodes.add(node)
@@ -243,7 +243,7 @@ abstract class GalleryBaseFetcher(
         return filteredNodes
     }
 
-    protected fun shouldAdd(mime: MimeTypeThumbnail) = mime.isImage || mime.isVideoReproducible
+    protected fun shouldAdd(mime: MimeTypeList) = mime.isImage || mime.isVideoReproducible
 
     /**
      * Sub class to implement their own get node method by their own strategy
