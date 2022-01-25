@@ -74,10 +74,6 @@ import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaChatApi;
 import nz.mega.sdk.MegaChatApiAndroid;
-import nz.mega.sdk.MegaChatApiJava;
-import nz.mega.sdk.MegaChatError;
-import nz.mega.sdk.MegaChatRequest;
-import nz.mega.sdk.MegaChatRequestListenerInterface;
 import nz.mega.sdk.MegaContactRequest;
 import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaEvent;
@@ -105,7 +101,7 @@ import static nz.mega.sdk.MegaApiJava.*;
  * This activity is launched by 3rd apps, for example, when compose email pick attachments from MEGA.
  */
 @SuppressLint("NewApi") 
-public class FileProviderActivity extends PasscodeFileProviderActivity implements OnClickListener, MegaRequestListenerInterface, MegaGlobalListenerInterface, MegaTransferListenerInterface, MegaChatRequestListenerInterface, View.OnFocusChangeListener, View.OnLongClickListener {
+public class FileProviderActivity extends PasscodeFileProviderActivity implements OnClickListener, MegaRequestListenerInterface, MegaGlobalListenerInterface, MegaTransferListenerInterface, View.OnFocusChangeListener, View.OnLongClickListener {
 
 	public static final int INVALID_TAB = -1;
 	public static final int CLOUD_TAB = 0;
@@ -293,7 +289,7 @@ public class FileProviderActivity extends PasscodeFileProviderActivity implement
 							logDebug("Condition ret == MegaChatApi.INIT_NO_CACHE");
 						} else if (ret == MegaChatApi.INIT_ERROR) {
 							logWarning("Condition ret == MegaChatApi.INIT_ERROR");
-							megaChatApi.logout(this);
+							megaChatApi.logout();
 						} else {
 							logDebug("Chat correctly initialized");
 						}
@@ -1230,34 +1226,6 @@ public class FileProviderActivity extends PasscodeFileProviderActivity implement
 		onKeysGenerated(lastEmail, lastPassword);
 	}
 
-	@Override
-	public void onRequestStart(MegaChatApiJava api, MegaChatRequest request) {
-
-	}
-
-	@Override
-	public void onRequestUpdate(MegaChatApiJava api, MegaChatRequest request) {
-
-	}
-
-	@Override
-	public void onRequestFinish(MegaChatApiJava api, MegaChatRequest request, MegaChatError e) {
-		if (request.getType() == MegaChatRequest.TYPE_CONNECT) {
-			MegaApplication.setLoggingIn(false);
-
-			if (e.getErrorCode() == MegaChatError.ERROR_OK) {
-				logDebug("Connected to chat!");
-			} else {
-				logError("ERROR WHEN CONNECTING " + e.getErrorString());
-			}
-		}
-	}
-
-	@Override
-	public void onRequestTemporaryError(MegaChatApiJava api, MegaChatRequest request, MegaChatError e) {
-
-	}
-
 	private void onKeysGenerated(String email, String password) {
 		logDebug("Key generation finished");
 
@@ -1306,7 +1274,7 @@ public class FileProviderActivity extends PasscodeFileProviderActivity implement
 				megaApi.login(lastEmail, lastPassword, this);
 			} else {
 				logError("ERROR INIT CHAT: " + ret);
-				megaChatApi.logout(this);
+				megaChatApi.logout();
 			}
 		}
 	}
@@ -1502,14 +1470,6 @@ public class FileProviderActivity extends PasscodeFileProviderActivity implement
 
 				setContentView(R.layout.activity_file_provider);
 				tabShown = CLOUD_TAB;
-
-				logDebug("Chat --> connect");
-				if ((megaChatApi.getInitState() != MegaChatApi.INIT_ERROR)) {
-					logDebug("Connection goes!!!");
-					megaChatApi.connect(this);
-				} else {
-					logDebug("Not launch connect: " + megaChatApi.getInitState());
-				}
 
 				MegaApplication.setLoggingIn(false);
 				afterFetchNodes();

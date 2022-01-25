@@ -8,6 +8,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.View.GONE
 import android.view.View.VISIBLE
+import android.view.WindowManager
 import android.view.inputmethod.EditorInfo
 import android.widget.EditText
 import android.widget.TextView
@@ -30,15 +31,22 @@ import mega.privacy.android.app.textEditor.TextEditorViewModel.Companion.CREATE_
 import mega.privacy.android.app.textEditor.TextEditorViewModel.Companion.MODE
 import mega.privacy.android.app.utils.AlertsAndWarnings.showForeignStorageOverQuotaWarningDialog
 import mega.privacy.android.app.utils.ColorUtils.setErrorAwareInputAppearance
-import mega.privacy.android.app.utils.Constants.*
+import mega.privacy.android.app.utils.Constants.FROM_HOME_PAGE
+import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_FILE_NAME
+import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_HANDLE
+import mega.privacy.android.app.utils.Constants.NODE_NAME_REGEX
+import mega.privacy.android.app.utils.Constants.SNACKBAR_TYPE
 import mega.privacy.android.app.utils.FileUtil.TXT_EXTENSION
 import mega.privacy.android.app.utils.MegaNodeUtil.getRootParentNode
 import mega.privacy.android.app.utils.RunOnUIThreadUtils.runDelay
 import mega.privacy.android.app.utils.StringResourcesUtils.getString
 import mega.privacy.android.app.utils.TextUtil.getCursorPositionOfName
 import mega.privacy.android.app.utils.TextUtil.isTextEmpty
-import mega.privacy.android.app.utils.Util.*
-import nz.mega.documentscanner.utils.ViewUtils.hideKeyboard
+import mega.privacy.android.app.utils.Util.SHOW_IM_DELAY
+import mega.privacy.android.app.utils.Util.isOffline
+import mega.privacy.android.app.utils.Util.isOnline
+import mega.privacy.android.app.utils.ViewUtils.hideKeyboard
+import mega.privacy.android.app.utils.ViewUtils.showSoftKeyboardDelayed
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
 import nz.mega.sdk.MegaNode
 import java.util.*
@@ -221,6 +229,7 @@ object MegaNodeDialogUtil {
      *                              - TYPE_NEW_URL_FILE: Create new URL file action.
      * @return The created dialog.
      */
+    @Suppress("DEPRECATION")
     private fun setFinalValuesAndShowDialog(
         context: Context,
         node: MegaNode?,
@@ -238,6 +247,9 @@ object MegaNodeDialogUtil {
 
         dialog.apply {
             setOnShowListener {
+                window?.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_NAVIGATION)
+                window?.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS)
+
                 val typeText = findViewById<EmojiEditText>(R.id.type_text)
                 val errorText = findViewById<TextView>(R.id.error_text)
 
@@ -265,7 +277,7 @@ object MegaNodeDialogUtil {
                         TYPE_NEW_TXT_FILE -> {
                             setHint(R.string.context_new_file_name)
                             setText(TXT_EXTENSION)
-                            runDelay(SHOW_IM_DELAY.toLong()) { setSelection(0) }
+                            runDelay(SHOW_IM_DELAY) { setSelection(0) }
                         }
                     }
 
@@ -295,7 +307,8 @@ object MegaNodeDialogUtil {
                         )
                     }
 
-                showKeyboardDelayed(typeText)
+                typeText?.requestFocus()
+                typeText?.showSoftKeyboardDelayed()
             }
         }.show()
 
@@ -609,7 +622,7 @@ object MegaNodeDialogUtil {
         val node = megaApi.getNodeByHandle(handle) ?: return
         val rubbishNode = megaApi.rubbishNode
 
-        if (rubbishNode.handle != getRootParentNode(node).handle) {
+        if (rubbishNode.handle != megaApi.getRootParentNode(node).handle) {
             MaterialAlertDialogBuilder(activity, R.style.ThemeOverlay_Mega_MaterialAlertDialog)
                 .setMessage(getString(R.string.confirmation_move_to_rubbish))
                 .setPositiveButton(getString(R.string.general_move)) { _, _ ->
