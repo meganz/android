@@ -207,9 +207,6 @@ pipeline {
 
                         cd "${WORKSPACE}/jenkinsfile/"
                         bash download_webrtc.sh
-                        
-                        echo "finish testing download_webrtc.sh"
-                        exit 1 
 
                         mkdir -p "${BUILD_LIB_DOWNLOAD_FOLDER}"
                         cd "${BUILD_LIB_DOWNLOAD_FOLDER}"
