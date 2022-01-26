@@ -70,8 +70,8 @@ class SortByBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
     @SuppressLint("SetTextI18n")
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         val sortByName = getString(R.string.sortby_name)
-        val sortByAsc = getString(R.string.sortby_name_ascending).toLowerCase(Locale.ROOT)
-        val sortByDesc = getString(R.string.sortby_name_descending).toLowerCase(Locale.ROOT)
+        val sortByAsc = getString(R.string.sortby_name_ascending).lowercase(Locale.ROOT)
+        val sortByDesc = getString(R.string.sortby_name_descending).lowercase(Locale.ROOT)
         binding.sortByNameAsc.text = "$sortByName ($sortByAsc)"
         binding.sortByNameDesc.text = "$sortByName ($sortByDesc)"
 

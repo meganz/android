@@ -9,6 +9,8 @@ import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.R
 import mega.privacy.android.app.databinding.FragmentImagesBinding
 import mega.privacy.android.app.fragments.homepage.*
+import mega.privacy.android.app.fragments.managerFragments.cu.*
+import mega.privacy.android.app.fragments.managerFragments.cu.PhotosFragment.*
 import mega.privacy.android.app.gallery.data.GalleryItem
 import mega.privacy.android.app.gallery.fragment.BaseZoomFragment
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop

@@ -80,6 +80,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
+import android.view.ViewTreeObserver;
 import android.view.Window;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
@@ -91,7 +92,6 @@ import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-import android.widget.TextView.OnEditorActionListener;
 
 import com.ittianyu.bottomnavigationviewex.BottomNavigationViewEx;
 import com.jeremyliao.liveeventbus.LiveEventBus;
@@ -141,6 +141,7 @@ import mega.privacy.android.app.UserCredentials;
 import mega.privacy.android.app.exportRK.ExportRecoveryKeyActivity;
 import mega.privacy.android.app.myAccount.MyAccountActivity;
 import mega.privacy.android.app.myAccount.usecase.CheckPasswordReminderUseCase;
+import mega.privacy.android.app.sync.fileBackups.FileBackupManager;
 import mega.privacy.android.app.upgradeAccount.UpgradeAccountActivity;
 import mega.privacy.android.app.globalmanagement.MyAccountInfo;
 import mega.privacy.android.app.listeners.LoadPreviewListener;
@@ -233,6 +234,7 @@ import mega.privacy.android.app.utils.ContactUtil;
 import mega.privacy.android.app.utils.LastShowSMSDialogTimeChecker;
 import mega.privacy.android.app.utils.MegaNodeDialogUtil;
 import mega.privacy.android.app.utils.LinksUtil;
+import mega.privacy.android.app.utils.MegaNodeUtil;
 import mega.privacy.android.app.utils.StringResourcesUtils;
 import mega.privacy.android.app.utils.TextUtil;
 import mega.privacy.android.app.utils.ThumbnailUtilsLollipop;
@@ -286,10 +288,22 @@ import static mega.privacy.android.app.fragments.settingsFragments.startSceen.ut
 import static mega.privacy.android.app.lollipop.PermissionsFragment.PERMISSIONS_FRAGMENT;
 import static mega.privacy.android.app.modalbottomsheet.UploadBottomSheetDialogFragment.GENERAL_UPLOAD;
 import static mega.privacy.android.app.modalbottomsheet.UploadBottomSheetDialogFragment.HOMEPAGE_UPLOAD;
+import static mega.privacy.android.app.sync.fileBackups.FileBackupManager.BackupDialogState.BACKUP_DIALOG_SHOW_CONFIRM;
+import static mega.privacy.android.app.sync.fileBackups.FileBackupManager.BackupDialogState.BACKUP_DIALOG_SHOW_NONE;
+import static mega.privacy.android.app.sync.fileBackups.FileBackupManager.BackupDialogState.BACKUP_DIALOG_SHOW_WARNING;
+import static mega.privacy.android.app.sync.fileBackups.FileBackupManager.OperationType.OPERATION_EXECUTE;
 import static mega.privacy.android.app.utils.AlertDialogUtil.dismissAlertDialogIfExists;
 import static mega.privacy.android.app.utils.AlertDialogUtil.isAlertDialogShown;
 import static mega.privacy.android.app.utils.AlertsAndWarnings.askForCustomizedPlan;
 import static mega.privacy.android.app.utils.AlertsAndWarnings.showForeignStorageOverQuotaWarningDialog;
+import static mega.privacy.android.app.utils.MegaNodeDialogUtil.ACTION_BACKUP_FAB;
+import static mega.privacy.android.app.utils.MegaNodeDialogUtil.ACTION_BACKUP_SHARE_FOLDER;
+import static mega.privacy.android.app.utils.MegaNodeDialogUtil.ACTION_MOVE_TO_BACKUP;
+import static mega.privacy.android.app.utils.MegaNodeDialogUtil.BACKUP_ACTION_TYPE;
+import static mega.privacy.android.app.utils.MegaNodeDialogUtil.BACKUP_DIALOG_WARN;
+import static mega.privacy.android.app.utils.MegaNodeDialogUtil.BACKUP_HANDLED_ITEM;
+import static mega.privacy.android.app.utils.MegaNodeDialogUtil.BACKUP_HANDLED_NODE;
+import static mega.privacy.android.app.utils.MegaNodeDialogUtil.BACKUP_NODE_TYPE;
 import static mega.privacy.android.app.utils.MegaNodeDialogUtil.IS_NEW_TEXT_FILE_SHOWN;
 import static mega.privacy.android.app.utils.MegaNodeDialogUtil.NEW_TEXT_FILE_TEXT;
 import static mega.privacy.android.app.utils.MegaNodeDialogUtil.checkNewTextFileDialogState;
@@ -297,6 +311,7 @@ import static mega.privacy.android.app.utils.ConstantsUrl.RECOVERY_URL;
 import static mega.privacy.android.app.utils.MegaNodeDialogUtil.showRenameNodeDialog;
 import static mega.privacy.android.app.utils.MegaProgressDialogUtil.createProgressDialog;
 import static mega.privacy.android.app.utils.MegaProgressDialogUtil.showProcessFileDialog;
+import static mega.privacy.android.app.utils.MegaTransferUtils.isBackgroundTransfer;
 import static mega.privacy.android.app.utils.OfflineUtils.*;
 import static mega.privacy.android.app.constants.BroadcastConstants.*;
 import static mega.privacy.android.app.constants.IntentConstants.*;
@@ -326,6 +341,7 @@ import static mega.privacy.android.app.utils.permission.PermissionUtils.hasPermi
 import static mega.privacy.android.app.utils.permission.PermissionUtils.requestPermission;
 import static nz.mega.sdk.MegaApiJava.*;
 import static nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE;
+import static nz.mega.sdk.MegaShare.ACCESS_READ;
 
 @AndroidEntryPoint
 @SuppressWarnings( "deprecation" )
@@ -352,8 +368,10 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
     public static final String NEW_CREATION_ACCOUNT = "NEW_CREATION_ACCOUNT";
     public static final String JOINING_CHAT_LINK = "JOINING_CHAT_LINK";
     public static final String LINK_JOINING_CHAT_LINK = "LINK_JOINING_CHAT_LINK";
-    public static final String CONNECTED = "CONNECTED";
     private static final String PROCESS_FILE_DIALOG_SHOWN = "PROGRESS_DIALOG_SHOWN";
+    private static final String OPEN_LINK_DIALOG_SHOWN = "OPEN_LINK_DIALOG_SHOWN";
+	private static final String OPEN_LINK_TEXT = "OPEN_LINK_TEXT";
+	private static final String OPEN_LINK_ERROR = "OPEN_LINK_ERROR";
 
 	public static final int ERROR_TAB = -1;
 	public static final int INCOMING_TAB = 0;
@@ -678,6 +696,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 	private MenuItem scanQRcodeMenuItem;
 	private MenuItem returnCallMenuItem;
 	private MenuItem openMeetingMenuItem;
+	private MenuItem openLinkMenuItem;
 	private Chronometer chronometerMenuItem;
 	private LinearLayout layoutCallMenuItem;
 
@@ -709,8 +728,6 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 	int bottomNavigationCurrentItem = -1;
 	View chatBadge;
 	View callBadge;
-
-	private boolean connected;
 
 	private boolean joiningToChatLink;
 	private String linkJoinToChatLink;
@@ -750,6 +767,12 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 		}
 	};
 
+	private final Observer<Boolean> fileBackupChangedObserver = change -> {
+		if (change) {
+			megaApi.getMyBackupsFolder(this);
+		}
+	};
+
 	private boolean isBusinessGraceAlertShown;
 	private AlertDialog businessGraceAlert;
 	private boolean isBusinessCUAlertShown;
@@ -757,6 +780,16 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 
 	private BottomSheetDialogFragment bottomSheetDialogFragment;
 	private PsaViewHolder psaViewHolder;
+
+	private AlertDialog openLinkDialog;
+	private boolean openLinkDialogIsErrorShown = false;
+	private EditText openLinkText;
+	private RelativeLayout openLinkError;
+	private TextView openLinkErrorText;
+	private Button openLinkOpenButton;
+	private static final int LINK_DIALOG_MEETING = 1;
+	private static final int LINK_DIALOG_CHAT = 2;
+	private int chatLinkDialogType = LINK_DIALOG_CHAT;
 
 	// for Meeting
 	boolean isFabExpanded = false;
@@ -771,6 +804,15 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 	private ViewGroup windowContent;
 	private final ArrayList<View> fabs = new ArrayList<>();
 	// end for Meeting
+
+	// Backup warning dialog
+	private AlertDialog backupWarningDialog;
+	private ArrayList<Long> backupHandleList;
+	private int backupDialogType = BACKUP_DIALOG_SHOW_NONE;
+	private Long backupNodeHandle;
+	private int backupNodeType;
+	private int backupActionType;
+
 	/**
 	 * Broadcast to update the completed transfers tab.
 	 */
@@ -1040,6 +1082,8 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 		if (finish) finish();
 	};
 
+	private FileBackupManager fileBackupManager;
+
 	/**
 	 * Method for updating the visible elements related to a call.
 	 *
@@ -1282,6 +1326,13 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 		outState.putBoolean("isStorageStatusDialogShown", isStorageStatusDialogShown);
 		outState.putInt("comesFromNotificationDeepBrowserTreeIncoming", comesFromNotificationDeepBrowserTreeIncoming);
 
+		if (isAlertDialogShown(openLinkDialog)) {
+			outState.putBoolean(OPEN_LINK_DIALOG_SHOWN, true);
+			outState.putBoolean(OPEN_LINK_ERROR, openLinkDialogIsErrorShown);
+			outState.putString(OPEN_LINK_TEXT, openLinkText != null && openLinkText.getText() != null
+					? openLinkText.getText().toString() : "");
+		}
+
 		outState.putBoolean(BUSINESS_GRACE_ALERT_SHOWN, isBusinessGraceAlertShown);
 		if (isBusinessCUAlertShown) {
 			outState.putBoolean(BUSINESS_CU_ALERT_SHOWN, isBusinessCUAlertShown);
@@ -1291,7 +1342,6 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 		outState.putInt(TYPE_CALL_PERMISSION, typesCameraPermission);
 		outState.putBoolean(JOINING_CHAT_LINK, joiningToChatLink);
 		outState.putString(LINK_JOINING_CHAT_LINK, linkJoinToChatLink);
-		outState.putBoolean(CONNECTED, connected);
 		outState.putBoolean(KEY_IS_FAB_EXPANDED, isFabExpanded);
 
 		if (getCameraUploadFragment() != null) {
@@ -1309,6 +1359,25 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 		mdF = (MediaDiscoveryFragment) getSupportFragmentManager().findFragmentByTag(FragmentTag.MEDIA_DISCOVERY.getTag());
 		if (mdF != null) {
 			getSupportFragmentManager().putFragment(outState, FragmentTag.MEDIA_DISCOVERY.getTag(), mdF);
+		}
+
+		backupWarningDialog = fileBackupManager.getBackupWarningDialog();
+		if(backupWarningDialog != null && backupWarningDialog.isShowing()){
+			backupHandleList = fileBackupManager.getBackupHandleList();
+			backupNodeHandle = fileBackupManager.getBackupNodeHandle();
+			backupNodeType = fileBackupManager.getBackupNodeType();
+			backupActionType = fileBackupManager.getBackupActionType();
+			backupDialogType = fileBackupManager.getBackupDialogType();
+
+			if(backupHandleList != null) {
+				outState.putSerializable(BACKUP_HANDLED_ITEM, backupHandleList);
+			}
+
+			outState.putLong(BACKUP_HANDLED_NODE, backupNodeHandle);
+			outState.putInt(BACKUP_NODE_TYPE, backupNodeType);
+			outState.putInt(BACKUP_ACTION_TYPE, backupActionType);
+			outState.putInt(BACKUP_DIALOG_WARN, backupDialogType);
+			backupWarningDialog.dismiss();
 		}
 	}
 
@@ -1347,6 +1416,8 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 		boolean selectDrawerItemPending = true;
 
 		getLifecycle().addObserver(cookieDialogHandler);
+
+		boolean openLinkDialogIsShown = false;
 
 		if(savedInstanceState!=null){
 			logDebug("Bundle is NOT NULL");
@@ -1399,13 +1470,13 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 			storageState = savedInstanceState.getInt("storageState", MegaApiJava.STORAGE_STATE_UNKNOWN);
 			isStorageStatusDialogShown = savedInstanceState.getBoolean("isStorageStatusDialogShown", false);
 			comesFromNotificationDeepBrowserTreeIncoming = savedInstanceState.getInt("comesFromNotificationDeepBrowserTreeIncoming", -1);
+			openLinkDialogIsShown = savedInstanceState.getBoolean(OPEN_LINK_DIALOG_SHOWN, false);
 			isBusinessGraceAlertShown = savedInstanceState.getBoolean(BUSINESS_GRACE_ALERT_SHOWN, false);
 			isBusinessCUAlertShown = savedInstanceState.getBoolean(BUSINESS_CU_ALERT_SHOWN, false);
 			isTransferOverQuotaWarningShown = savedInstanceState.getBoolean(TRANSFER_OVER_QUOTA_SHOWN, false);
 			typesCameraPermission = savedInstanceState.getInt(TYPE_CALL_PERMISSION, INVALID_TYPE_PERMISSIONS);
 			joiningToChatLink = savedInstanceState.getBoolean(JOINING_CHAT_LINK, false);
 			linkJoinToChatLink = savedInstanceState.getString(LINK_JOINING_CHAT_LINK);
-			connected = savedInstanceState.getBoolean(CONNECTED, false);
 			isFabExpanded = savedInstanceState.getBoolean(KEY_IS_FAB_EXPANDED, false);
 			isInMDMode = savedInstanceState.getBoolean(STATE_KEY_IS_IN_MD_MODE, false);
 
@@ -1416,6 +1487,13 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 			if (savedInstanceState.getBoolean(PROCESS_FILE_DIALOG_SHOWN, false)) {
 				processFileDialog = showProcessFileDialog(this,null);
 			}
+
+			// Backup warning dialog
+			backupHandleList = (ArrayList<Long>) savedInstanceState.getSerializable(BACKUP_HANDLED_ITEM);
+			backupNodeHandle = savedInstanceState.getLong(BACKUP_HANDLED_NODE, -1);
+			backupNodeType = savedInstanceState.getInt(BACKUP_NODE_TYPE, -1);
+			backupActionType = savedInstanceState.getInt(BACKUP_ACTION_TYPE, -1);
+			backupDialogType = savedInstanceState.getInt(BACKUP_DIALOG_WARN, BACKUP_DIALOG_SHOW_NONE);
 		}
 		else{
 			logDebug("Bundle is NULL");
@@ -1488,6 +1566,8 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 
 		LiveEventBus.get(EVENT_FINISH_ACTIVITY, Boolean.class).observeForever(finishObserver);
 
+		LiveEventBus.get(EVENT_MY_BACKUPS_FOLDER_CHANGED, Boolean.class).observeForever(fileBackupChangedObserver);
+
         smsDialogTimeChecker = new LastShowSMSDialogTimeChecker(this);
         nC = new NodeController(this);
 		cC = new ContactController(this);
@@ -1526,7 +1606,9 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 	    display.getMetrics(outMetrics);
 	    float density  = getResources().getDisplayMetrics().density;
 
-	    if (dbH.getEphemeral() != null){
+		initFileBackupManager();
+
+		if (dbH.getEphemeral() != null){
             refreshSession();
             return;
 		}
@@ -1597,6 +1679,8 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 		setContentView(R.layout.activity_manager);
 
 		observePsa();
+
+		megaApi.getMyBackupsFolder(this);
 
 		//Set toolbar
 		abL = (AppBarLayout) findViewById(R.id.app_bar_layout);
@@ -1702,6 +1786,18 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
         navigationDrawerAddPhoneContainer = findViewById(R.id.navigation_drawer_add_phone_number_container);
 
         addPhoneNumberButton = findViewById(R.id.navigation_drawer_add_phone_number_button);
+        addPhoneNumberButton.getViewTreeObserver().addOnPreDrawListener(
+        	new ViewTreeObserver.OnPreDrawListener() {
+        		@Override
+				public boolean onPreDraw() {
+					if (addPhoneNumberButton.getLayout().getLineCount() > 1) {
+						findViewById(R.id.navigation_drawer_add_phone_number_icon).setVisibility(View.GONE);
+					}
+					addPhoneNumberButton.getViewTreeObserver().removeOnPreDrawListener(this);
+					return false;
+				}
+			}
+		);
         addPhoneNumberButton.setOnClickListener(this);
 
         addPhoneNumberLabel = findViewById(R.id.navigation_drawer_add_phone_number_label);
@@ -2278,9 +2374,9 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 						linkJoinToChatLink = getIntent().getDataString();
 						joiningToChatLink = true;
 
-						if (connected) {
-							megaChatApi.checkChatLink(linkJoinToChatLink, new LoadPreviewListener(ManagerActivityLollipop.this, ManagerActivityLollipop.this, CHECK_LINK_TYPE_UNKNOWN_LINK));
-						}
+						if(megaChatApi.getConnectionState() == MegaChatApi.CONNECTED) {
+                            megaChatApi.checkChatLink(linkJoinToChatLink, new LoadPreviewListener(ManagerActivityLollipop.this, ManagerActivityLollipop.this, CHECK_LINK_TYPE_UNKNOWN_LINK));
+                        }
 
 						getIntent().setAction(null);
 						setIntent(null);
@@ -2378,17 +2474,16 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 	        }
 
 			logDebug("Check if there any unread chat");
-			if (megaChatApi != null) {
-				logDebug("Connect to chat!: " + megaChatApi.getInitState());
-				if ((megaChatApi.getInitState() != MegaChatApi.INIT_ERROR)) {
-					logDebug("Connection goes!!!");
-					megaChatApi.connect(this);
-				} else {
-					logWarning("Not launch connect: " + megaChatApi.getInitState());
-				}
-			} else {
-				logError("megaChatApi is NULL");
-			}
+            if (joiningToChatLink && !isTextEmpty(linkJoinToChatLink)) {
+                megaChatApi.checkChatLink(linkJoinToChatLink, new LoadPreviewListener(ManagerActivityLollipop.this, ManagerActivityLollipop.this, CHECK_LINK_TYPE_UNKNOWN_LINK));
+            }
+
+            if(drawerItem == DrawerItem.CHAT){
+                rChatFL = (RecentChatsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.RECENT_CHAT.getTag());
+                if(rChatFL!=null){
+                    rChatFL.onlineStatusUpdate(megaChatApi.getOnlineStatus());
+                }
+            }
 			setChatBadge();
 
 			logDebug("Check if there any INCOMING pendingRequest contacts");
@@ -2512,6 +2607,16 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 
 		checkInitialScreens();
 
+		if (openLinkDialogIsShown) {
+			showOpenLinkDialog();
+			String text = savedInstanceState.getString(OPEN_LINK_TEXT, "");
+			openLinkText.setText(text);
+			openLinkText.setSelection(text.length());
+			if (savedInstanceState.getBoolean(OPEN_LINK_ERROR, false)) {
+				openLink(text);
+			}
+		}
+
 		if (drawerItem == DrawerItem.TRANSFERS && isTransferOverQuotaWarningShown) {
             showTransfersTransferOverQuotaWarning();
         }
@@ -2524,6 +2629,15 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 
 		logDebug("END onCreate");
 		new RatingHandlerImpl(this).showRatingBaseOnTransaction();
+
+		// Show backup dialog
+		if (backupDialogType == BACKUP_DIALOG_SHOW_WARNING) {
+			fileBackupManager.actWithBackupTips(backupHandleList, megaApi.getNodeByHandle(backupNodeHandle), backupNodeType, backupActionType);
+		} else if (backupDialogType == BACKUP_DIALOG_SHOW_CONFIRM) {
+			fileBackupManager.confirmationActionForBackup(backupHandleList, megaApi.getNodeByHandle(backupNodeHandle), backupNodeType, backupActionType);
+		} else {
+			logDebug("Backup warning dialog is not show");
+		}
 	}
 
 	/**
@@ -2665,6 +2779,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 			return;
 		}
 
+		dismissAlertDialogIfExists(openLinkDialog);
 		logDebug("Handle to invite a contact: " + handle);
 
 		inviteContactUseCase.getContactLink(handle)
@@ -3478,6 +3593,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 		unregisterReceiver(updateCUSettingsReceiver);
 		unregisterReceiver(cuUpdateReceiver);
 		LiveEventBus.get(EVENT_FINISH_ACTIVITY, Boolean.class).removeObserver(finishObserver);
+		LiveEventBus.get(EVENT_MY_BACKUPS_FOLDER_CHANGED, Boolean.class).removeObserver( fileBackupChangedObserver);
 
 		destroyPayments();
 
@@ -3495,6 +3611,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 		}
 
 		dismissAlertDialogIfExists(processFileDialog);
+        dismissAlertDialogIfExists(openLinkDialog);
 
 		nodeSaver.destroy();
 
@@ -5268,6 +5385,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 		chronometerMenuItem = rootView.findViewById(R.id.chrono_menu);
 		chronometerMenuItem.setVisibility(View.GONE);
 		MenuItem moreMenuItem = menu.findItem(R.id.action_more);
+		openLinkMenuItem = menu.findItem(R.id.action_open_link);
 
 		rootView.setOnClickListener(v1 -> onOptionsItemSelected(returnCallMenuItem));
 
@@ -5290,6 +5408,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 			switch (drawerItem) {
 				case CLOUD_DRIVE:
 					if (!isInMDMode) {
+						openLinkMenuItem.setVisible(isFirstNavigationLevel());
 						moreMenuItem.setVisible(!isFirstNavigationLevel());
 
 						if (isCloudAdded() && fbFLol.getItemCount() > 0) {
@@ -5373,6 +5492,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 					} else {
 						openMeetingMenuItem.setVisible(true);
 						doNotDisturbMenuItem.setVisible(true);
+						openLinkMenuItem.setVisible(true);
 
 						if (getChatsFragment() != null && rChatFL.getItemCount() > 0) {
 							searchMenuItem.setVisible(true);
@@ -5580,6 +5700,10 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
                 hideItemsWhenSearchSelected();
                 return true;
 			}
+			case R.id.action_open_link:
+				showOpenLinkDialog();
+				return true;
+
 		    case R.id.action_menu_cancel_all_transfers:{
 		    	showConfirmationCancelAllTransfers();
 		    	return true;
@@ -5728,6 +5852,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 			clearRubbishBinMenuitem.setVisible(false);
 			searchMenuItem.setVisible(false);
 			openMeetingMenuItem.setVisible(false);
+			openLinkMenuItem.setVisible(false);
 		}
 	}
 
@@ -6355,6 +6480,21 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 		this.isClearRubbishBin = value;
 	}
 
+	/**
+	 * Move folders or files that belong to "My backups"
+	 *
+	 * @param handleList handleList handles list of the nodes that selected
+	 */
+	public void moveBackupNode(final ArrayList<Long> handleList) {
+		logDebug("MyBackup + NodeOptionsBottomSheetDialogFragment Move a backup folder or file");
+		fileBackupManager.moveBackup(nC, handleList);
+	}
+
+	/**
+	 * Delete folders or files that included "My backup"
+	 *
+	 * @param handleList handleList handles list of the nodes that selected
+	 */
 	public void askConfirmationMoveToRubbish(final ArrayList<Long> handleList){
 		logDebug("askConfirmationMoveToRubbish");
 		isClearRubbishBin=false;
@@ -6368,6 +6508,10 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 					p = megaApi.getParentNode(p);
 				}
 				if (p.getHandle() != megaApi.getRubbishNode().getHandle()){
+					if (fileBackupManager.removeBackup(moveNodeUseCase, handleList)) {
+						return;
+					}
+
 					MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this);
 					if (getPrimaryFolderHandle() == handle && CameraUploadUtil.isPrimaryEnabled()) {
 						builder.setMessage(getResources().getString(R.string.confirmation_move_cu_folder_to_rubbish));
@@ -6419,6 +6563,13 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 			return;
 		}
 
+	}
+
+	public void showWarningDialogOfShare(final MegaNode p, int nodeType, int actionType){
+		logDebug("showWarningDialogOfShareFolder");
+		if (actionType == ACTION_BACKUP_SHARE_FOLDER) {
+			fileBackupManager.shareBackupFolder(nC, p, nodeType, actionType);
+		}
 	}
 
 	/**
@@ -6516,6 +6667,210 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 		builder.setPositiveButton(R.string.delete_account, dialogClickListener);
 		builder.setNegativeButton(R.string.general_dismiss, dialogClickListener);
 		builder.show();
+	}
+
+	/**
+	 * Shows an error in the Open link dialog.
+	 *
+	 * @param show  True if should show an error.
+	 * @param error Error value to identify and show the corresponding error.
+	 */
+	private void showOpenLinkError(boolean show, int error) {
+		if (openLinkDialog != null) {
+			if (show) {
+				openLinkDialogIsErrorShown = true;
+				ColorUtils.setErrorAwareInputAppearance(openLinkText, true);
+				openLinkError.setVisibility(View.VISIBLE);
+				if (drawerItem == DrawerItem.CLOUD_DRIVE) {
+					if (openLinkText.getText().toString().isEmpty()) {
+						openLinkErrorText.setText(R.string.invalid_file_folder_link_empty);
+						return;
+					}
+					switch (error) {
+						case CHAT_LINK: {
+							openLinkText.setTextColor(ColorUtils.getThemeColor(this,
+									android.R.attr.textColorPrimary));
+							openLinkErrorText.setText(R.string.valid_chat_link);
+							openLinkOpenButton.setText(R.string.action_open_chat_link);
+							break;
+						}
+						case CONTACT_LINK: {
+							openLinkText.setTextColor(ColorUtils.getThemeColor(this,
+									android.R.attr.textColorPrimary));
+							openLinkErrorText.setText(R.string.valid_contact_link);
+							openLinkOpenButton.setText(R.string.action_open_contact_link);
+							break;
+						}
+						case ERROR_LINK: {
+							openLinkErrorText.setText(R.string.invalid_file_folder_link);
+							break;
+						}
+					}
+				} else if (drawerItem == DrawerItem.CHAT) {
+					if (openLinkText.getText().toString().isEmpty()) {
+						openLinkErrorText.setText(chatLinkDialogType == LINK_DIALOG_CHAT ?
+								R.string.invalid_chat_link_empty : R.string.invalid_meeting_link_empty);
+						return;
+					}
+					openLinkErrorText.setText(chatLinkDialogType == LINK_DIALOG_CHAT ?
+							R.string.invalid_chat_link_args : R.string.invalid_meeting_link_args);
+				}
+			} else {
+				openLinkDialogIsErrorShown = false;
+				if (openLinkError.getVisibility() == View.VISIBLE) {
+					ColorUtils.setErrorAwareInputAppearance(openLinkText, false);
+					openLinkError.setVisibility(View.GONE);
+					openLinkOpenButton.setText(R.string.context_open_link);
+				}
+			}
+		}
+	}
+
+	/**
+	 * Opens a links via Open link dialog.
+	 *
+	 * @param link The link to open.
+	 */
+	private void openLink(String link) {
+		// Password link
+		if (matchRegexs(link, PASSWORD_LINK_REGEXS)) {
+			dismissAlertDialogIfExists(openLinkDialog);
+			Intent openLinkIntent = new Intent(this, OpenPasswordLinkActivity.class);
+			openLinkIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+			openLinkIntent.setData(Uri.parse(link));
+			startActivity(openLinkIntent);
+			return;
+		}
+
+		if (drawerItem == DrawerItem.CLOUD_DRIVE) {
+			int linkType = nC.importLink(link);
+			if (openLinkError.getVisibility() == View.VISIBLE) {
+				switch (linkType) {
+					case CHAT_LINK: {
+						logDebug("Open chat link: correct chat link");
+						// Identify the link is a meeting or normal chat link
+						megaChatApi.checkChatLink(link, new LoadPreviewListener(ManagerActivityLollipop.this, ManagerActivityLollipop.this, CHECK_LINK_TYPE_UNKNOWN_LINK));
+						dismissAlertDialogIfExists(openLinkDialog);
+						break;
+					}
+					case CONTACT_LINK: {
+						logDebug("Open contact link: correct contact link");
+						String[] s = link.split("C!");
+						if (s.length > 1) {
+							long handle = MegaApiAndroid.base64ToHandle(s[1].trim());
+							openContactLink(handle);
+							dismissAlertDialogIfExists(openLinkDialog);
+						}
+						break;
+					}
+				}
+			} else {
+				switch (linkType) {
+					case FILE_LINK:
+					case FOLDER_LINK: {
+						logDebug("Do nothing: correct file or folder link");
+						dismissAlertDialogIfExists(openLinkDialog);
+						break;
+					}
+					case CHAT_LINK:
+					case CONTACT_LINK:
+					case ERROR_LINK: {
+						logWarning("Show error: invalid link or correct chat or contact link");
+						showOpenLinkError(true, linkType);
+						break;
+					}
+				}
+			}
+		} else if (drawerItem == DrawerItem.CHAT) {
+			megaChatApi.checkChatLink(link, new LoadPreviewListener(ManagerActivityLollipop.this, ManagerActivityLollipop.this, CHECK_LINK_TYPE_UNKNOWN_LINK));
+		}
+	}
+
+	/**
+	 * Shows an Open link dialog.
+	 */
+	private void showOpenLinkDialog() {
+		MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this);
+		LayoutInflater inflater = getLayoutInflater();
+		View v = inflater.inflate(R.layout.dialog_error_hint, null);
+		builder.setView(v).setPositiveButton(R.string.context_open_link, null)
+				.setNegativeButton(R.string.general_cancel, null);
+
+		openLinkText = v.findViewById(R.id.text);
+
+		openLinkText.addTextChangedListener(new TextWatcher() {
+			@Override
+			public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+			}
+
+			@Override
+			public void onTextChanged(CharSequence s, int start, int before, int count) {
+			}
+
+			@Override
+			public void afterTextChanged(Editable s) {
+				showOpenLinkError(false, 0);
+			}
+		});
+
+		openLinkText.setOnEditorActionListener((v1, actionId, event) -> {
+			if (actionId == EditorInfo.IME_ACTION_DONE) {
+				hideKeyboardView(managerActivity, v1, 0);
+				openLink(openLinkText.getText().toString());
+				return true;
+			}
+			return false;
+		});
+
+		Util.showKeyboardDelayed(openLinkText);
+
+		openLinkError = v.findViewById(R.id.error);
+		openLinkErrorText = v.findViewById(R.id.error_text);
+
+		if (drawerItem == DrawerItem.CLOUD_DRIVE) {
+			builder.setTitle(R.string.action_open_link);
+			openLinkText.setHint(R.string.hint_paste_link);
+		} else if (drawerItem == DrawerItem.CHAT) {
+			Fragment fragment = getSupportFragmentManager()
+					.findFragmentByTag(MeetingBottomSheetDialogFragment.TAG);
+			if (fragment != null) {
+				builder.setTitle(R.string.paste_meeting_link_guest_dialog_title)
+						.setMessage(StringResourcesUtils.getString(
+								R.string.paste_meeting_link_guest_instruction));
+				openLinkText.setHint(R.string.meeting_link);
+				chatLinkDialogType = LINK_DIALOG_MEETING;
+			} else {
+				builder.setTitle(R.string.action_open_chat_link);
+				openLinkText.setHint(R.string.hint_enter_chat_link);
+				chatLinkDialogType = LINK_DIALOG_CHAT;
+			}
+		}
+
+		openLinkDialog = builder.create();
+		openLinkDialog.setCanceledOnTouchOutside(false);
+
+		try {
+			openLinkDialog.show();
+			openLinkText.requestFocus();
+
+			// Set onClickListeners for buttons after showing the dialog would prevent
+			// the dialog from dismissing automatically on clicking the buttons
+			openLinkOpenButton = openLinkDialog.getButton(AlertDialog.BUTTON_POSITIVE);
+			openLinkOpenButton.setOnClickListener((view) -> {
+				hideKeyboard(managerActivity, 0);
+				openLink(openLinkText.getText().toString());
+			});
+			openLinkDialog.setOnKeyListener((dialog, keyCode, event) -> {
+				if (keyCode == KeyEvent.KEYCODE_BACK && event.getRepeatCount() == 0) {
+					dismissAlertDialogIfExists(openLinkDialog);
+					return true;
+				}
+
+				return false;
+			});
+		} catch (Exception e) {
+			logError("Exception showing Open Link dialog", e);
+		}
 	}
 
 	public void showChatLink(String link) {
@@ -6958,6 +7313,8 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 	public void onJoinMeeting() {
 		if(CallUtil.participatingInACall()){
 			showConfirmationInACall(this, StringResourcesUtils.getString(R.string.text_join_call), passcodeManagement);
+		} else {
+			showOpenLinkDialog();
 		}
 	}
 
@@ -7385,6 +7742,28 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 		bottomSheetDialogFragment.show(getSupportFragmentManager(), bottomSheetDialogFragment.getTag());
 	}
 
+	/**
+	 * Shows the upload bottom sheet fragment taking into account the upload type received as param.
+	 *
+	 * @param uploadType Indicates the type of upload:
+	 *                   - GENERAL_UPLOAD if nothing special has to be taken into account.
+	 *                   - DOCUMENTS_UPLOAD if an upload from Documents section.
+	 * @param actionType Indicates the action to backup folder or file (move, remove, add, create etc.)
+	 */
+	public void showUploadPanelForBackup(int uploadType, int actionType) {
+		if (!hasPermissions(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
+			requestPermission(this, REQUEST_READ_WRITE_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE);
+			return;
+		}
+
+		// isInBackup Indicates if the current node is under "My backup"
+		if (fileBackupManager.fabForBackup(fbFLol.getNodeList(), getCurrentParentNode(getCurrentParentHandle(), INVALID_VALUE), actionType)) {
+			return;
+		}
+
+		showUploadPanel(uploadType);
+	}
+
 	public void updateAccountDetailsVisibleInfo(){
 		logDebug("updateAccountDetailsVisibleInfo");
 		if(isFinishing()){
@@ -7802,6 +8181,8 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 
 						onNodesSharedUpdate();
 						LiveEventBus.get(EVENT_NODES_CHANGE).post(false);
+						Util.showSnackbar(ManagerActivityLollipop.this,
+								getResources().getString(R.string.file_removed_offline));
 					}
 				})
 				.setNegativeButton(R.string.general_cancel, null)
@@ -7977,6 +8358,10 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 				//One file to share
 				final long nodeHandle = intent.getLongExtra(AddContactActivityLollipop.EXTRA_NODE_HANDLE, -1);
 
+				if (fileBackupManager.shareFolder(nC, new long[]{nodeHandle}, contactsData, ACCESS_READ)) {
+					return;
+				}
+
 				MaterialAlertDialogBuilder dialogBuilder = new MaterialAlertDialogBuilder(this);
 				dialogBuilder.setTitle(getString(R.string.file_properties_shared_folder_permissions));
 				final CharSequence[] items = {getString(R.string.file_properties_shared_folder_read_only), getString(R.string.file_properties_shared_folder_read_write), getString(R.string.file_properties_shared_folder_full_access)};
@@ -7991,6 +8376,10 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 			else if(multiselectIntent==1){
 				//Several folders to share
 				final long[] nodeHandles = intent.getLongArrayExtra(AddContactActivityLollipop.EXTRA_NODE_HANDLE);
+
+				if (fileBackupManager.shareFolder(nC, nodeHandles, contactsData, ACCESS_READ)) {
+					return;
+				}
 
 				MaterialAlertDialogBuilder dialogBuilder = new MaterialAlertDialogBuilder(this);
 				dialogBuilder.setTitle(getString(R.string.file_properties_shared_folder_permissions));
@@ -8029,6 +8418,10 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 			final long[] moveHandles = intent.getLongArrayExtra("MOVE_HANDLES");
 			final long toHandle = intent.getLongExtra("MOVE_TO", 0);
 
+			if (fileBackupManager.moveToBackup(moveNodeUseCase, moveHandles, toHandle)) {
+				return;
+			}
+
 			moveNodeUseCase.move(moveHandles, toHandle)
 					.subscribeOn(Schedulers.io())
 					.observeOn(AndroidSchedulers.mainThread())
@@ -8048,6 +8441,10 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 			}
 			final long[] copyHandles = intent.getLongArrayExtra("COPY_HANDLES");
 			final long toHandle = intent.getLongExtra("COPY_TO", 0);
+
+			if (fileBackupManager.copyNodesToBackups(nC, copyHandles, toHandle)) {
+				return;
+			}
 
 			nC.copyNodes(copyHandles, toHandle);
 		} else if (requestCode == REQUEST_CODE_REFRESH_API_SERVER && resultCode == RESULT_OK) {
@@ -8351,7 +8748,6 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 
 				uploadServiceIntent.putExtra(UploadService.EXTRA_FOLDERPATH, folderPath);
 				uploadServiceIntent.putExtra(UploadService.EXTRA_PARENT_HASH, parentNode.getHandle());
-				uploadServiceIntent.putExtra(UploadService.EXTRA_UPLOAD_COUNT, paths.size());
 				startService(uploadServiceIntent);
 			}
 		}
@@ -8960,7 +9356,6 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 					intent.putExtra(UploadService.EXTRA_NAME, info.getTitle());
 					intent.putExtra(UploadService.EXTRA_LAST_MODIFIED, info.getLastModified());
 					intent.putExtra(UploadService.EXTRA_PARENT_HASH, parentNode.getHandle());
-					intent.putExtra(UploadService.EXTRA_UPLOAD_COUNT, infos.size());
 					startService(intent);
 				}
 			}
@@ -9075,35 +9470,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 		if(request.getType() == MegaChatRequest.TYPE_CREATE_CHATROOM){
 			logDebug("Create chat request finish");
 			onRequestFinishCreateChat(e.getErrorCode(), request.getChatHandle());
-		} else if (request.getType() == MegaChatRequest.TYPE_CONNECT){
-			logDebug("Connecting chat finished");
-
-			if (MegaApplication.isFirstConnect()){
-				logDebug("Set first connect to false");
-				MegaApplication.setFirstConnect(false);
-			}
-
-			if(e.getErrorCode()==MegaChatError.ERROR_OK){
-				logDebug("CONNECT CHAT finished ");
-				connected = true;
-
-				if (joiningToChatLink && !isTextEmpty(linkJoinToChatLink)) {
-					megaChatApi.checkChatLink(linkJoinToChatLink, new LoadPreviewListener(ManagerActivityLollipop.this, ManagerActivityLollipop.this, CHECK_LINK_TYPE_UNKNOWN_LINK));
-				}
-
-				if(drawerItem == DrawerItem.CHAT){
-					rChatFL = (RecentChatsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.RECENT_CHAT.getTag());
-					if(rChatFL!=null){
-						rChatFL.onlineStatusUpdate(megaChatApi.getOnlineStatus());
-					}
-				}
-			}
-			else{
-				logError("ERROR WHEN CONNECTING " + e.getErrorString());
-//				showSnackbar(getString(R.string.chat_connection_error));
-			}
-		}
-		else if (request.getType() == MegaChatRequest.TYPE_DISCONNECT){
+		} else if (request.getType() == MegaChatRequest.TYPE_DISCONNECT){
 			if(e.getErrorCode()==MegaChatError.ERROR_OK){
 				logDebug("DISConnected from chat!");
 			}
@@ -9322,6 +9689,12 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 			}
             else if(request.getParamType() == MegaApiJava.USER_ATTR_DISABLE_VERSIONS){
 				MegaApplication.setDisableFileVersions(request.getFlag());
+			}
+			else if (request.getParamType() == USER_ATTR_MY_BACKUPS_FOLDER) {
+				if (e.getErrorCode() == MegaError.API_OK) {
+					logDebug("requesting myBackupHandle");
+					MegaNodeUtil.myBackupHandle = request.getNodeHandle();
+				}
 			}
         } else if (request.getType() == MegaRequest.TYPE_GET_CANCEL_LINK) {
             logDebug("TYPE_GET_CANCEL_LINK");
@@ -10095,7 +10468,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 	public void onTransferStart(MegaApiJava api, MegaTransfer transfer) {
 		logDebug("onTransferStart: " + transfer.getNotificationNumber()+ "-" + transfer.getNodeHandle() + " - " + transfer.getTag());
 
-		if(transfer.isStreamingTransfer()){
+		if (transfer.isStreamingTransfer() || isBackgroundTransfer(transfer)) {
 			return;
 		}
 
@@ -10117,7 +10490,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 	@Override
 	public void onTransferFinish(MegaApiJava api, MegaTransfer transfer, MegaError e) {
 		logDebug("onTransferFinish: " + transfer.getNodeHandle() + " - " + transfer.getTag() + "- " +transfer.getNotificationNumber());
-		if(transfer.isStreamingTransfer()){
+		if(transfer.isStreamingTransfer() || isBackgroundTransfer(transfer)){
 			return;
 		}
 
@@ -10172,7 +10545,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 	@Override
 	public void onTransferUpdate(MegaApiJava api, MegaTransfer transfer) {
 
-		if(transfer.isStreamingTransfer()){
+		if(transfer.isStreamingTransfer() || isBackgroundTransfer(transfer)){
 			return;
 		}
 
@@ -10508,13 +10881,12 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 		}
 	}
 
-	@Override
-	public void onChatInitStateUpdate(MegaChatApiJava api, int newState) {
-		logDebug("New state: " + newState);
-		if (newState == MegaChatApi.INIT_ERROR) {
-			// chat cannot initialize, disable chat completely
-		}
-	}
+    @Override
+    public void onChatInitStateUpdate(MegaChatApiJava api, int newState) {
+        if (newState == MegaChatApi.INIT_ERROR) {
+            // chat cannot initialize, disable chat completely
+        }
+    }
 
 	@Override
 	public void onChatOnlineStatusUpdate(MegaChatApiJava api, long userHandle, int status, boolean inProgress) {
@@ -11206,7 +11578,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 	 * @param node	the node to open its location
 	 */
 	public void viewNodeInFolder(MegaNode node) {
-		MegaNode parentNode = getRootParentNode(node);
+		MegaNode parentNode = MegaNodeUtil.getRootParentNode(megaApi, node);
 		if (parentNode.getHandle() == megaApi.getRootNode().getHandle()) {
 			parentHandleBrowser = node.getParentHandle();
 			refreshFragment(FragmentTag.CLOUD_DRIVE.getTag());
@@ -11438,12 +11810,17 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 			logDebug("It's a chat");
 			showChatLink(link);
 		}
+
+		dismissAlertDialogIfExists(openLinkDialog);
 	}
 
 	@Override
 	public void onErrorLoadingPreview(int errorCode) {
 		if (errorCode == MegaChatError.ERROR_NOENT) {
+			dismissAlertDialogIfExists(openLinkDialog);
 			showAlert(this, getString(R.string.invalid_chat_link), getString(R.string.title_alert_chat_link_error));
+		} else {
+			showOpenLinkError(true, 0);
 		}
 	}
 
@@ -11508,4 +11885,25 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
     public boolean getOpenSettingsStorage() {
         return openSettingsStorage;
     }
+
+	/**
+	 * Create the instance of FileBackupManager
+	 */
+	private void initFileBackupManager() {
+		fileBackupManager = new FileBackupManager(this, (actionType, operationType, result, handle) -> {
+			if (actionType == ACTION_MOVE_TO_BACKUP) {
+				if (operationType == OPERATION_EXECUTE) {
+					showMovementResult(result, handle);
+				}
+			} else if (actionType == ACTION_BACKUP_FAB) {
+				if (operationType == OPERATION_EXECUTE) {
+					if (isBottomSheetDialogShown(bottomSheetDialogFragment)) return;
+					bottomSheetDialogFragment = UploadBottomSheetDialogFragment.newInstance(GENERAL_UPLOAD);
+					bottomSheetDialogFragment.show(getSupportFragmentManager(), bottomSheetDialogFragment.getTag());
+				}
+			} else {
+				logDebug("Nothing to do for actionType = " + actionType);
+			}
+		});
+	}
 }
