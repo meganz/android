@@ -4,7 +4,7 @@
 #WORKSPACE="/Users/robin/work/android"
 
 # local variables
-LIB_DOWNLOAD_ROOT="$HOME/mega_android_ci_download"
+LIB_DOWNLOAD_ROOT="$WORKSPACE/mega_android_ci_download"
 WEBRTC_DOWNLOAD_PATH="${LIB_DOWNLOAD_ROOT}/webrtc_download"
 BUILD_SH="${WORKSPACE}/app/src/main/jni/build.sh"
 SAMPLE_LIB_FILE="libwebrtc_arm64.a"
