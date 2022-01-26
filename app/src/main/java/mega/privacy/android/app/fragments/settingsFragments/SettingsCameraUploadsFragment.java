@@ -449,33 +449,6 @@ public class SettingsCameraUploadsFragment extends SettingsBaseFragment {
         disableCameraUploadUIProcess();
     }
 
-    /**
-     * Start the camera upload service
-     */
-    public void startCU() {
-        boolean cuEnabled;
-        prefs = dbH.getPreferences();
-
-        if (prefs != null) {
-            cuEnabled = Boolean.parseBoolean(prefs.getCamSyncEnabled());
-            if (cuEnabled) {
-                logDebug("Enable CU.");
-                String[] PERMISSIONS = {
-                        android.Manifest.permission.READ_EXTERNAL_STORAGE
-                };
-
-                if (!hasPermissions(context, PERMISSIONS)) {
-                    requestPermission((CameraUploadsPreferencesActivity) context, REQUEST_CAMERA_UPLOAD, PERMISSIONS);
-                } else {
-                    ((CameraUploadsPreferencesActivity) context).checkIfShouldShowBusinessCUAlert();
-                }
-            } else {
-                logDebug("Disable CU.");
-                disableCameraUpload();
-            }
-        }
-    }
-
     @Override
     public boolean onPreferenceClick(Preference preference) {
 

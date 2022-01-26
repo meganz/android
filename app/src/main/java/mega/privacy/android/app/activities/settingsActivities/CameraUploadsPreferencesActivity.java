@@ -6,7 +6,6 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
-import android.view.MenuItem;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
@@ -28,7 +27,7 @@ public class CameraUploadsPreferencesActivity extends PreferencesBaseActivity {
     private SettingsCameraUploadsFragment sttCameraUploads;
     private AlertDialog businessCUAlert;
 
-    private BroadcastReceiver networkReceiver = new BroadcastReceiver() {
+    private final BroadcastReceiver networkReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
             logDebug("Network broadcast received!");
@@ -45,7 +44,7 @@ public class CameraUploadsPreferencesActivity extends PreferencesBaseActivity {
         }
     };
 
-    private BroadcastReceiver updateCUSettingsReceiver = new BroadcastReceiver() {
+    private final BroadcastReceiver updateCUSettingsReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
             if (intent == null || intent.getAction() == null || sttCameraUploads == null)
@@ -57,16 +56,13 @@ public class CameraUploadsPreferencesActivity extends PreferencesBaseActivity {
                     break;
 
                 case ACTION_REFRESH_CAMERA_UPLOADS_MEDIA_SETTING:
-                    if(sttCameraUploads.isVisible()){
-                        return;
-                    }
                     sttCameraUploads.disableMediaUploadUIProcess();
                     break;
             }
         }
     };
 
-    private BroadcastReceiver enableDisableCameraUploadReceiver = new BroadcastReceiver() {
+    private final BroadcastReceiver enableDisableCameraUploadReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
             if (intent == null || intent.getAction() == null || sttCameraUploads == null)
@@ -84,7 +80,7 @@ public class CameraUploadsPreferencesActivity extends PreferencesBaseActivity {
         }
     };
 
-    private BroadcastReceiver cameraUploadDestinationReceiver = new BroadcastReceiver() {
+    private final BroadcastReceiver cameraUploadDestinationReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
             if (intent == null || intent.getAction() == null || sttCameraUploads == null)
@@ -98,7 +94,7 @@ public class CameraUploadsPreferencesActivity extends PreferencesBaseActivity {
         }
     };
 
-    private BroadcastReceiver receiverCUAttrChanged = new BroadcastReceiver() {
+    private final BroadcastReceiver receiverCUAttrChanged = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
             if (intent == null || intent.getAction() == null || sttCameraUploads == null)
@@ -112,7 +108,7 @@ public class CameraUploadsPreferencesActivity extends PreferencesBaseActivity {
         }
     };
 
-    private BroadcastReceiver reEnableCameraUploadsPreferenceReceiver = new BroadcastReceiver() {
+    private final BroadcastReceiver reEnableCameraUploadsPreferenceReceiver = new BroadcastReceiver() {
 
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -157,19 +153,14 @@ public class CameraUploadsPreferencesActivity extends PreferencesBaseActivity {
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        switch (requestCode) {
-            case REQUEST_CAMERA_UPLOAD: {
-                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    checkIfShouldShowBusinessCUAlert();
-                } else {
-                    Util.showSnackbar(this, getString(R.string.on_refuse_storage_permission));
-                }
-                break;
+        if (requestCode == REQUEST_CAMERA_UPLOAD) {
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                checkIfShouldShowBusinessCUAlert();
+            } else {
+                Util.showSnackbar(this, getString(R.string.on_refuse_storage_permission));
             }
         }
     }
-
-
 
     /**
      * Method for enabling Camera Uploads.
@@ -177,29 +168,6 @@ public class CameraUploadsPreferencesActivity extends PreferencesBaseActivity {
     private void enableCU() {
         if (sttCameraUploads != null) {
             sttCameraUploads.enableCameraUpload();
-        }
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-        if (item.getItemId() == android.R.id.home) {
-            startCU();
-        }
-        return super.onOptionsItemSelected(item);
-    }
-
-    @Override
-    public void onBackPressed() {
-        startCU();
-        super.onBackPressed();
-    }
-
-    /**
-     * Start the camera upload service
-     */
-    private void startCU(){
-        if (sttCameraUploads != null) {
-            sttCameraUploads.startCU();
         }
     }
 

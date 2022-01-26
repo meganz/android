@@ -73,6 +73,10 @@ class PhotosFragment : BaseZoomFragment() {
                 val prefs = dbH.preferences
 
                 if (result.data != null) {
+                    // Set isFirstLogin to false after selecting a folder for upload
+                    mManagerActivity.isFirstLogin = false
+                    viewModel.setEnableCUShown(false)
+
                     val cameraPath: String? =
                         result.data?.getStringExtra(FileStorageActivityLollipop.EXTRA_PATH)
 
@@ -187,8 +191,6 @@ class PhotosFragment : BaseZoomFragment() {
             binding.fragmentPhotosFirstLogin.cellularConnectionSwitch.isChecked,
             binding.fragmentPhotosFirstLogin.uploadVideosSwitch.isChecked
         )
-        mManagerActivity.isFirstLogin = false
-        viewModel.setEnableCUShown(false)
 
         showCameraUploadSettingDialog()
     }
@@ -278,6 +280,8 @@ class PhotosFragment : BaseZoomFragment() {
                 binding.fragmentPhotosFirstLogin.qualityText.visibility =
                     if (isChecked) View.VISIBLE else View.GONE
             }
+
+            setupCameraUploadDialog()
             handlePhotosMenuUpdate(false)
             return
         }
@@ -293,13 +297,14 @@ class PhotosFragment : BaseZoomFragment() {
         setupTimePanel()
         setupListAdapter(currentZoom, viewModel.items.value)
         subscribeObservers()
+    }
 
+    /**
+     * Check the status of dialog and show it when needed.
+     */
+    private fun setupCameraUploadDialog() {
         if (dialogIsShowing) {
-            if (alertDialog == null) {
-                showCameraUploadSettingDialog()
-            } else {
-                alertDialog?.show()
-            }
+            showCameraUploadSettingDialog()
         }
     }
 
@@ -521,27 +526,34 @@ class PhotosFragment : BaseZoomFragment() {
      * Show the dialog that can direct to the Camera Upload settings.
      */
     private fun showCameraUploadSettingDialog() {
-        alertDialog = MaterialAlertDialogBuilder(requireContext())
-            .setTitle(R.string.title_dcim_folder_dialog)
-            .setMessage(R.string.content_dcim_folder_dialog)
-            .setPositiveButton(R.string.action_settings) { dialog, _ ->
-                enableCameraUpload(
-                    dialog,
-                    true
-                )
-            }
-            .setNegativeButton(R.string.general_cancel) { dialog, _ ->
-                enableCameraUpload(
-                    dialog,
-                    false
-                )
-            }
-            .create()
-            .also {
-                it.show()
-                it.setCanceledOnTouchOutside(false)
-                dialogIsShowing = true
-            }
+        // Set true to block the camera upload service
+        CameraUploadsService.setInCameraUploadsSetting(true)
+        if (alertDialog != null) {
+            alertDialog?.show()
+            dialogIsShowing = true
+        } else {
+            alertDialog = MaterialAlertDialogBuilder(requireContext())
+                .setTitle(R.string.title_dcim_folder_dialog)
+                .setMessage(R.string.content_dcim_folder_dialog)
+                .setPositiveButton(R.string.action_settings) { dialog, _ ->
+                    enableCameraUpload(
+                        dialog,
+                        true
+                    )
+                }
+                .setNegativeButton(R.string.general_cancel) { dialog, _ ->
+                    enableCameraUpload(
+                        dialog,
+                        false
+                    )
+                }
+                .create()
+                .also {
+                    it.show()
+                    it.setCanceledOnTouchOutside(false)
+                    dialogIsShowing = true
+                }
+        }
     }
 
     /**
@@ -560,9 +572,11 @@ class PhotosFragment : BaseZoomFragment() {
                 FileStorageActivityLollipop.PickFolderType.CU_FOLDER.folderType
             )
             startForResult.launch(intent)
-            // Set true to block the camera upload service
-            CameraUploadsService.setInCameraUploadsSetting(true)
         } else {
+            // Set isFirstLogin to false when the user cancels the dialog, then start uploading
+            mManagerActivity.isFirstLogin = false
+            viewModel.setEnableCUShown(false)
+            CameraUploadsService.setInCameraUploadsSetting(false)
             startCU()
         }
         dialog.dismiss()
