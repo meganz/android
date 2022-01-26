@@ -80,6 +80,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
+import android.view.ViewTreeObserver;
 import android.view.Window;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
@@ -1716,6 +1717,18 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
         navigationDrawerAddPhoneContainer = findViewById(R.id.navigation_drawer_add_phone_number_container);
 
         addPhoneNumberButton = findViewById(R.id.navigation_drawer_add_phone_number_button);
+        addPhoneNumberButton.getViewTreeObserver().addOnPreDrawListener(
+        	new ViewTreeObserver.OnPreDrawListener() {
+        		@Override
+				public boolean onPreDraw() {
+					if (addPhoneNumberButton.getLayout().getLineCount() > 1) {
+						findViewById(R.id.navigation_drawer_add_phone_number_icon).setVisibility(View.GONE);
+					}
+					addPhoneNumberButton.getViewTreeObserver().removeOnPreDrawListener(this);
+					return false;
+				}
+			}
+		);
         addPhoneNumberButton.setOnClickListener(this);
 
         addPhoneNumberLabel = findViewById(R.id.navigation_drawer_add_phone_number_label);
