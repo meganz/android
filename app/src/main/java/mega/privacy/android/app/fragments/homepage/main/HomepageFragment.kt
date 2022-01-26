@@ -144,7 +144,12 @@ class HomepageFragment : Fragment() {
                 else -> return@with
             }
 
-            findNavController().navigate(direction)
+            findNavController().run {
+                // Determine current destination whether is HomePageFragment
+                if (currentDestination?.id == R.id.homepageFragment) {
+                    navigate(direction)
+                }
+            }
         }
     }
 
