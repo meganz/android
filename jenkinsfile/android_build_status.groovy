@@ -205,7 +205,7 @@ pipeline {
                 gitlabCommitStatus(name: 'Download Dependency Lib for SDK') {
                     sh """
 
-                        cd jenkins
+                        cd "${WORKSPACE}/jenkins"
                         bash download_webrtc.sh
                         
                         echo "finish testing download_webrtc.sh"
