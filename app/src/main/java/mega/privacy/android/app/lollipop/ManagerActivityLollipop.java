@@ -11652,7 +11652,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 					@Override
 					public void onLeave() {
 					}
-				}).show(getSupportFragmentManager(),
+				}, false).show(getSupportFragmentManager(),
 						MeetingHasEndedDialogFragment.TAG);
 			} else {
 				CallUtil.checkMeetingInProgress(ManagerActivityLollipop.this, ManagerActivityLollipop.this, chatId, isFromOpenChatPreview, link, request.getMegaHandleList(), request.getText(), alreadyExist, request.getUserHandle(), passcodeManagement);

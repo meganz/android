@@ -43,6 +43,7 @@ import static mega.privacy.android.app.constants.EventConstants.EVENT_CALL_ON_HO
 import static mega.privacy.android.app.constants.EventConstants.EVENT_CALL_STATUS_CHANGE;
 import static mega.privacy.android.app.constants.EventConstants.EVENT_CHAT_TITLE_CHANGE;
 import static mega.privacy.android.app.constants.EventConstants.EVENT_ENTER_IN_MEETING;
+import static mega.privacy.android.app.constants.EventConstants.EVENT_REMOVE_CALL_NOTIFICATION;
 import static mega.privacy.android.app.utils.AvatarUtil.*;
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
 import static mega.privacy.android.app.utils.CallUtil.*;
@@ -96,9 +97,11 @@ public class CallService extends Service{
         }
     };
 
-    private final Observer<Boolean> isInMeetingObserver = b -> {
-        isInMeeting = b;
-        updateNotificationContent();
+    private final Observer<Long> removeNotificationObserver = callId -> {
+        MegaChatCall call = MegaApplication.getInstance().getMegaChatApi().getChatCallByCallId(callId);
+        if(call != null){
+            removeNotification(call.getChatid());
+        }
     };
 
     private final Observer<Long> callAnsweredInAnotherClientObserver = chatId -> {
@@ -122,7 +125,7 @@ public class CallService extends Service{
         LiveEventBus.get(EVENT_CALL_STATUS_CHANGE, MegaChatCall.class).observeForever(callStatusObserver);
         LiveEventBus.get(EVENT_CALL_ON_HOLD_CHANGE, MegaChatCall.class).observeForever(callOnHoldObserver);
         LiveEventBus.get(EVENT_CHAT_TITLE_CHANGE, MegaChatRoom.class).observeForever(titleMeetingChangeObserver);
-        LiveEventBus.get(EVENT_ENTER_IN_MEETING, Boolean.class).observeForever(isInMeetingObserver);
+        LiveEventBus.get(EVENT_REMOVE_CALL_NOTIFICATION, Long.class).observeForever(removeNotificationObserver);
         LiveEventBus.get(EVENT_CALL_ANSWERED_IN_ANOTHER_CLIENT, Long.class).observeForever(callAnsweredInAnotherClientObserver);
     }
 
@@ -452,7 +455,7 @@ public class CallService extends Service{
         LiveEventBus.get(EVENT_CALL_STATUS_CHANGE, MegaChatCall.class).removeObserver(callStatusObserver);
         LiveEventBus.get(EVENT_CALL_ON_HOLD_CHANGE, MegaChatCall.class).removeObserver(callOnHoldObserver);
         LiveEventBus.get(EVENT_CHAT_TITLE_CHANGE, MegaChatRoom.class).removeObserver(titleMeetingChangeObserver);
-        LiveEventBus.get(EVENT_ENTER_IN_MEETING, Boolean.class).removeObserver(isInMeetingObserver);
+        LiveEventBus.get(EVENT_REMOVE_CALL_NOTIFICATION, Long.class).removeObserver(removeNotificationObserver);
         LiveEventBus.get(EVENT_CALL_ANSWERED_IN_ANOTHER_CLIENT, Long.class).removeObserver(callAnsweredInAnotherClientObserver);
 
         cancelNotification();
