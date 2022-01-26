@@ -1655,10 +1655,6 @@
     <string name="upload_service_notification">Загрузка файлов: %1$d из %2$d</string>
     <!-- Text of the notification shown when the upload service is paused: e.g. Uploading files: 1 of 10 (paused)-->
     <string name="upload_service_notification_paused">Загрузка файлов: %1$d из %2$d (пауза)</string>
-    <!-- Text of the notification shown when the folder upload service is running, e.g. Uploading folders 1 of 2 -->
-    <string name="folder_upload_service_notification">Загрузка файлов: %1$d из %2$d</string>
-    <!-- Text of the notification shown when the folder upload service is paused, e.g. Uploading folders 1 of 2 (paused) -->
-    <string name="folder_upload_service_notification_paused">Загрузка файлов: %1$d из %2$d (пауза)</string>
     <!-- Text of the notification shown when the upload service has finished, Plural -->
     <plurals name="upload_service_final_notification">
         <item quantity="one">Загружен %1$d файл</item>
@@ -1672,13 +1668,6 @@
         <item quantity="few">%1$d файла уже загружены</item>
         <item quantity="many">%1$d файлов уже загружено</item>
         <item quantity="other">%1$d файла уже загружено</item>
-    </plurals>
-    <!-- Text of the notification shown when the folder upload service has finished, Text of the notification shown when the folder upload service has finished - plural  e.g. Uploaded 2 folders -->
-    <plurals name="folder_upload_service_final_notification">
-        <item quantity="one">Загружена %1$d папка</item>
-        <item quantity="few">Загружено %1$d папки</item>
-        <item quantity="many">Загружено %1$d папок</item>
-        <item quantity="other">Загружено %1$d папки</item>
     </plurals>
     <!-- label for the total file size of multiple files and/or folders (no need to put the colon punctuation in the translation) -->
     <string name="general_total_size">Полный объём: %1$s</string>
@@ -2692,7 +2681,12 @@
     <!-- Settings preference title to show file versions info of the account -->
     <string name="settings_file_management_file_versions_title">Версии файлов</string>
     <!-- Settings preference subtitle to show file versions info of the account -->
-    <string name="settings_file_management_file_versions_subtitle">Версии файлов: %1$d, всего %2$s</string>
+    <plurals name="settings_file_management_file_versions_subtitle">
+        <item quantity="one">1 версия файлов, занимающая %2$s</item>
+        <item quantity="few">%1$d версии файлов, занимающие %2$s</item>
+        <item quantity="many">%1$d версий файлов, занимающих %2$s</item>
+        <item quantity="other">%1$d версии файлов, занимающие %2$s</item>
+    </plurals>
     <!-- Title of the section File management on Settings section -->
     <string name="settings_file_management_category">Управление файлами</string>
     <!-- Option in Settings to delete all the versions of the account -->
@@ -3320,8 +3314,8 @@
     <string name="not_allow_play_alert">Невозможно воспроизвести мультимедийные файлы во время разговора.</string>
     <!-- Text shown in the list of chats when there is a call in progress but I am not on it -->
     <string name="ongoing_call_messages">Текущий звонок</string>
-    <!-- Title of the layout to join a group call from the chat screen. The placeholder indicates the user who initiated the call -->
-    <string name="join_call_layout_in_group_call">%s начал групповой звонок. Коснитесь, чтобы присоединиться.</string>
+    <!-- Title of the layout to join a group call from the chat screen. -->
+    <string name="join_call_layout_in_group_call">Присоединиться к текущему групповому звонку.</string>
     <!-- Title of the layout to return to a call -->
     <string name="call_in_progress_layout">Коснитесь, чтобы вернуться</string>
     <!-- message displayed when you try to start a call but it is not possible because you are already on a call -->
@@ -3708,8 +3702,8 @@
     <string name="section_documents">Документы</string>
     <!-- Label of the floating action button of opening the new chat conversation -->
     <string name="fab_label_new_chat">Новый чат</string>
-    <!-- Text that indicates that there’s no photo to show -->
-    <string name="homepage_empty_hint_photos">Фотографий не найдено</string>
+    <!-- Text that indicates that there’s no image to show in image section -->
+    <string name="homepage_empty_hint_photos">[A]Изображения[/A] [B]не[/B] [B]найдены[/B]</string>
     <!-- Text that indicates that there’s no document to show -->
     <string name="homepage_empty_hint_documents">Документы не найдены</string>
     <!-- Text that indicates that there’s no audio to show -->
@@ -3984,7 +3978,7 @@
     <!-- Settings hint that indicates the audio will still be played in background if the app is backgrounded -->
     <string name="settings_background_play_hint">Воспроизведение в фоновом режиме</string>
     <!-- Text of the empty screen when there are no elements in Photos -->
-    <string name="photos_empty">[B]Нет[/B] [A]фотографий[/A]</string>
+    <string name="photos_empty">[A]Фотографии[/A] [B]не[/B] [B]найдены[/B]</string>
     <!-- Text to show as subtitle of Enable camera uploads screen -->
     <string name="enable_cu_subtitle">Автоматически загружать фото и видео на облачный диск.</string>
     <!-- Text of a button on Camera Uploads section to show all the content of the section-->
@@ -4020,8 +4014,6 @@
     <string name="error_share_owner_storage_quota">Владелец общего ресурса превысил квоту на хранение.</string>
     <!-- A message shown when uploading, copying or moving something to an incoming share and the owner’s account is over its storage quota. -->
     <string name="warning_share_owner_storage_quota">Файл не может быть отправлен, поскольку получатель превысил квоту на хранение.</string>
-    <!-- Content to show in a Snackbar to tip the incompatibility-->
-    <string name="version_incompatibility">Мы обновляем MEGAchat. Ваши звонки могут не быть соединены из-за несовместимости версий, пока все участники не обновят свои приложения MEGA до последней версии.</string>
     <!-- Message displayed when multiple download starts and 1 file has already been downloaded before and 1 file is being downloaded -->
     <string name="file_already_downloaded_and_file_pending_download">1 файл уже скачан. 1 файл в ожидании.</string>
     <!-- Message displayed when multiple download starts and 1 file has already been downloaded before and multiple files are being downloaded. Placeholder: number of files -->
@@ -4248,8 +4240,8 @@
     <string name="be_new_moderator">Вы новый модератор.</string>
     <!-- the content of snack bar when copied meeting link-->
     <string name="copied_meeting_link">Ссылка на встречу скопирована.</string>
-    <!-- Title of the layout to join a meeting from the chat screen. The placeholder indicates the user who initiated the meeting -->
-    <string name="join_meeting_layout_in_group_call">%s начал встречу. Нажмите, чтобы присоединиться.</string>
+    <!-- Title of the layout to join a meeting from the chat screen. -->
+    <string name="join_meeting_layout_in_group_call">Присоединиться к текущей встрече.</string>
     <!-- Title of fifth tour screen -->
     <string name="title_tour_five">MEGA-встреча</string>
     <!-- Content of fourth tour screen -->
@@ -4324,4 +4316,38 @@
     <string name="disable_versioning_warning">Наша функция управления версиями файлов гарантирует, что мы сохраним старые копии ваших файлов, если вы замените их более новыми версиями. Если вы отключите управление версиями файлов, у вас больше не будет этой защиты; при замене старая копия будет потеряна.</string>
     <!-- Warning informing the user the folder location is trying to open no longer exists. -->
     <string name="location_not_exist">Эта папка больше не существует.</string>
+    <!-- Warning shown informing the contact has been previously invited. The placeholder is to show the name of the contact. -->
+    <string name="contact_already_invited">You have already invited %1$s</string>
+    <!-- Warning shown informing the contact request has been sent and can be managed in sent requests section. -->
+    <string name="contact_invited">Приглашение успешно отправлено. Смотрите отправленные запросы.</string>
+    <!-- Message when file available offline. -->
+    <string name="file_available_offline">Файл доступен локально</string>
+    <!-- Message when file removed from offline. -->
+    <string name="file_removed_offline">Файл удалён из локальных</string>
+    <!-- Menu option to open a link. Also title of the dialog to open a link. -->
+    <string name="action_open_link">Открыть ссылку</string>
+    <!-- error message shown when a chat link is not well formed. -->
+    <string name="invalid_chat_link_args">Неверная ссылка на чат</string>
+    <!-- Menu option to open a chat link. -->
+    <string name="action_open_chat_link">Открыть ссылку на чат</string>
+    <!-- Hint shown in the open chat link alert dialog. -->
+    <string name="hint_enter_chat_link">Введите ссылку на чат</string>
+    <!-- Hint shown in the open link alert dialog. -->
+    <string name="hint_paste_link">Вставьте ссылку</string>
+    <!-- Error shown when it tries to open an invalid file or folder link .-->
+    <string name="invalid_file_folder_link">Недействительная ссылка на файл или папку</string>
+    <!-- Error shown when it tries to open an invalid file or folder link and the text view is empty. -->
+    <string name="invalid_file_folder_link_empty">Введите действительную ссылку на файл или папку</string>
+    <!-- Error shown when it tries to open an invalid chat link and the text view is empty. -->
+    <string name="invalid_chat_link_empty">Введите действительную ссылку на чат</string>
+    <!-- Error shown when it tries to open a chat link from the Cloud Drive section. -->
+    <string name="valid_chat_link">Вы вставили ссылку на чат</string>
+    <!-- Error shown when it tries to open a contact link from the Cloud Drive section. -->
+    <string name="valid_contact_link">Вы вставили ссылку на контакт</string>
+    <!-- Action button to open a contact link.-->
+    <string name="action_open_contact_link">Открыть ссылку на контакт</string>
+    <!-- title for the settings to enable high resolution images when on mobile data -->
+    <string name="settings_mobile_data_resoluton_title">Использовать мобильные данные для превью изображений с высоким разрешением</string>
+    <!-- summary for the settings to enable high resolution images when on mobile data -->
+    <string name="settings_mobile_data_resoluton_summary">Разрешить использование мобильных данных для загрузки изображений с высоким разрешением при предварительном просмотре. Если этот параметр отключён, исходное изображение будет загружено только при увеличении масштаба.</string>
 </resources>

@@ -4130,10 +4130,6 @@
     <string name="confirmation_fingerprint_enabled">Your fingerprint is confirmed</string>
     <!-- Warning indicating an image (GIF) cannot be inserted in an input text. Same string than the one shown by the system when it detects this behaviour on its own. -->
     <string name="image_insertion_not_allowed">MEGA does not support image insertion here</string>
-    <!-- title for the settings to enable high resolution images when on mobile data -->
-    <string name="settings_mobile_data_resoluton_title">Use mobile data to preview high resolution images</string>
-    <!-- summary for the settings to enable high resolution images when on mobile data -->
-    <string name="settings_mobile_data_resoluton_summary">Use mobile data to load high resolution images when previewing. If disabled, the original image will only be loaded when you zoom in.</string>
     <!-- The label under the button of viewing all images screen -->
     <string name="section_images">Images</string>
     <!-- Title of the dialog warning the user about disable file versioning. -->
@@ -4143,7 +4139,7 @@
     <!-- Warning informing the user the folder location is trying to open no longer exists. -->
     <string name="location_not_exist">This location no longer exists.</string>
     <!-- Warning shown informing the contact has been previously invited. The placeholder is to show the name of the contact. -->
-    <string name="contact_already_invited">%1$s previously invited.</string>
+    <string name="contact_already_invited">You have already invited %1$s</string>
     <!-- Warning shown informing the contact request has been sent and can be managed in sent requests section. -->
     <string name="contact_invited">Invite sent successfully. See sent requests.</string>
     <!-- Message when file available offline. -->
@@ -4172,4 +4168,8 @@
     <string name="valid_contact_link">You have pasted a contact link.</string>
     <!-- Action button to open a contact link.-->
     <string name="action_open_contact_link">Open contact link</string>
+    <!-- title for the settings to enable high resolution images when on mobile data -->
+    <string name="settings_mobile_data_resoluton_title">Use mobile data to preview high resolution images</string>
+    <!-- summary for the settings to enable high resolution images when on mobile data -->
+    <string name="settings_mobile_data_resoluton_summary">Allow the use of mobile data to load high resolution images when previewing. If disabled, the original image will only be loaded when you zoom in.</string>
 </resources>
