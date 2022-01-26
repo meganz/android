@@ -1,5 +1,6 @@
 package mega.privacy.android.app.upload
 
+import android.net.Uri
 import androidx.documentfile.provider.DocumentFile
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -15,6 +16,7 @@ import mega.privacy.android.app.upload.usecase.GetFolderContentUseCase
 import mega.privacy.android.app.utils.LogUtil.logWarning
 import mega.privacy.android.app.utils.notifyObserver
 import nz.mega.sdk.MegaApiJava
+import java.util.ArrayList
 import javax.inject.Inject
 
 /**
@@ -206,5 +208,23 @@ class UploadFolderViewModel @Inject constructor(
         }
 
         folderItems.value = searchResult
+    }
+
+    fun upload(): ArrayList<Uri> {
+        val uploadList = ArrayList<Uri>()
+
+        if (selectedItems.value?.isEmpty() == false) {
+            selectedItems.value?.forEach { item ->
+                uploadList.add(item.uri)
+            }
+        } else {
+            folderItems.value?.forEach { item ->
+                if (item is FolderContent.Data) {
+                    uploadList.add(item.uri)
+                }
+            }
+        }
+
+        return uploadList
     }
 }

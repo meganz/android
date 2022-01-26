@@ -1116,7 +1116,7 @@ public class FileStorageActivityLollipop extends PasscodeActivity implements OnC
 				if (isAndroid11OrUpper()) {
 					//This is always true since REQUEST_PICK_CU_FOLDER is only requested in that situation
 					StorageManager storageManager = (StorageManager) getSystemService(Context.STORAGE_SERVICE);
-					File file = storageManager.getPrimaryStorageVolume().getDirectory();
+					File file = storageManager.getStorageVolume(uri).getDirectory();
 					String[] split = uri.getPath().split(":");
 
 					if (file != null && split.length == 2) {

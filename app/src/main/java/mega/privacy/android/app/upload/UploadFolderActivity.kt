@@ -4,6 +4,7 @@ import android.animation.Animator
 import android.animation.AnimatorInflater
 import android.animation.AnimatorSet
 import android.app.Activity
+import android.content.Intent
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
@@ -38,6 +39,7 @@ class UploadFolderActivity : PasscodeActivity(), Scrollable {
 
     companion object {
         private const val SHADOW = 0.5f
+        const val UPLOAD_RESULTS = "UPLOAD_RESULTS"
     }
 
     private val viewModel: UploadFolderViewModel by viewModels()
@@ -156,12 +158,15 @@ class UploadFolderActivity : PasscodeActivity(), Scrollable {
         }
 
         binding.uploadButton.setOnClickListener {
-            setResult(RESULT_OK)
+            setResult(
+                RESULT_OK,
+                Intent().putParcelableArrayListExtra(UPLOAD_RESULTS, viewModel.upload())
+            )
+
             finish()
         }
 
         showProgress(true)
-        checkScroll()
     }
 
     private fun showProgress(show: Boolean) {
@@ -177,6 +182,8 @@ class UploadFolderActivity : PasscodeActivity(), Scrollable {
             alpha = shadow
             isEnabled = !show
         }
+
+        checkScroll()
     }
 
     fun setupObservers() {

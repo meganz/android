@@ -8136,7 +8136,21 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 		} else if (requestCode == REQUEST_CODE_GET_FOLDER) {
 			getFolder(this, resultCode, intent);
 		} else if (requestCode == REQUEST_CODE_GET_FOLDER_CONTENT) {
+			if (resultCode != RESULT_OK) {
+				return;
+			}
 
+			intent.setAction(Intent.ACTION_GET_CONTENT);
+			processFileDialog = showProcessFileDialog(this,intent);
+
+			filePrepareUseCase.prepareFiles(intent)
+					.subscribeOn(Schedulers.io())
+					.observeOn(AndroidSchedulers.mainThread())
+					.subscribe((shareInfo, throwable) -> {
+						if (throwable == null) {
+							onIntentProcessed(shareInfo);
+						}
+					});
 		} else if (requestCode == WRITE_SD_CARD_REQUEST_CODE && resultCode == RESULT_OK) {
 
 			if (!hasPermissions(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)) {

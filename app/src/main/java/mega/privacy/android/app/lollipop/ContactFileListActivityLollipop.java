@@ -688,7 +688,27 @@ public class ContactFileListActivityLollipop extends PasscodeActivity
 		}  else if (requestCode == REQUEST_CODE_GET_FOLDER) {
 			getFolder(this, resultCode, intent);
 		} else if (requestCode == REQUEST_CODE_GET_FOLDER_CONTENT) {
+			if (resultCode != RESULT_OK) {
+				return;
+			}
 
+			intent.setAction(Intent.ACTION_GET_CONTENT);
+
+			try {
+				statusDialog = createProgressDialog(this, getQuantityString(R.plurals.upload_prepare, 1));
+				statusDialog.show();
+			} catch (Exception e) {
+				return;
+			}
+
+			filePrepareUseCase.prepareFiles(intent)
+					.subscribeOn(Schedulers.io())
+					.observeOn(AndroidSchedulers.mainThread())
+					.subscribe((shareInfo, throwable) -> {
+						if (throwable == null) {
+							onIntentProcessed(shareInfo);
+						}
+					});
 		} else if (requestCode == REQUEST_CODE_SELECT_FOLDER && resultCode == RESULT_OK) {
 			if (intent == null) {
 				return;
