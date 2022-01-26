@@ -32,6 +32,7 @@ import mega.privacy.android.app.utils.LogUtil.logWarning
 import mega.privacy.android.app.utils.MegaNodeUtil.getFileName
 import mega.privacy.android.app.utils.MegaNodeUtil.getThumbnailFileName
 import mega.privacy.android.app.utils.MegaNodeUtil.isImage
+import mega.privacy.android.app.utils.MegaNodeUtil.isNodeFileValid
 import mega.privacy.android.app.utils.MegaNodeUtil.isVideo
 import mega.privacy.android.app.utils.MegaTransferUtils.getNumPendingDownloadsNonBackground
 import mega.privacy.android.app.utils.OfflineUtils
@@ -126,14 +127,13 @@ class GetImageUseCase @Inject constructor(
                 node == null -> emitter.onError(IllegalArgumentException("Node is null"))
                 !node.isFile -> emitter.onError(IllegalArgumentException("Node is not a file"))
                 else -> {
-                    val hasReadAccess = megaApi.getAccess(node) != MegaShare.ACCESS_UNKNOWN
-                    val isFullSizeRequired = hasReadAccess && (fullSize || !node.isImage())
+                    val isFullSizeRequired = fullSize || !node.isImage()
 
                     val thumbnailFile = if (node.hasThumbnail()) buildThumbnailFile(context, node.getThumbnailFileName()) else null
                     val previewFile = if (node.hasPreview() || node.isVideo()) buildPreviewFile(context, node.getThumbnailFileName()) else null
-                    val fullFile = if (hasReadAccess) buildTempFile(context, node.getFileName()) else null
+                    val fullFile = buildTempFile(context, node.getFileName())
 
-                    if (fullFile?.exists() == true && fullFile.length() != node.size) {
+                    if (!node.isNodeFileValid(fullFile)) {
                         FileUtil.deleteFileSafely(fullFile)
                     }
 
@@ -148,7 +148,7 @@ class GetImageUseCase @Inject constructor(
                         image.previewUri = getVideoPreviewImage(node.getThumbnailFileName(), fullFile.toUri()).blockingGetOrNull()
                     }
 
-                    if ((!hasReadAccess && previewFile?.exists() == true) || (fullFile?.exists() == true && (previewFile == null || previewFile.exists()))) {
+                    if (fullFile?.exists() == true && (previewFile == null || previewFile.exists())) {
                         image.isFullyLoaded = true
                         emitter.onNext(image)
                         emitter.onComplete()
@@ -201,7 +201,7 @@ class GetImageUseCase @Inject constructor(
                             ))
                     }
 
-                    if (isFullSizeRequired && fullFile != null && !fullFile.exists()) {
+                    if (isFullSizeRequired && !fullFile.exists()) {
                         val listener = OptionalMegaTransferListenerInterface(
                             onTransferStart = { transfer ->
                                 if (emitter.isCancelled) return@OptionalMegaTransferListenerInterface
@@ -212,10 +212,27 @@ class GetImageUseCase @Inject constructor(
                             onTransferFinish = { _: MegaTransfer, error: MegaError ->
                                 if (emitter.isCancelled) return@OptionalMegaTransferListenerInterface
 
+                                image.transferTag = null
+
                                 when (error.errorCode) {
-                                    API_OK, API_EEXIST -> {
+                                    API_OK -> {
                                         image.fullSizeUri = fullFile.toUri()
-                                        image.transferTag = null
+                                        image.isFullyLoaded = true
+                                        emitter.onNext(image)
+                                        emitter.onComplete()
+                                    }
+                                    API_EEXIST -> {
+                                        if (node.isNodeFileValid(fullFile)) {
+                                            image.fullSizeUri = fullFile.toUri()
+                                            image.isFullyLoaded = true
+                                            emitter.onNext(image)
+                                            emitter.onComplete()
+                                        } else {
+                                            FileUtil.deleteFileSafely(fullFile)
+                                            emitter.onError(IllegalStateException("File exists but is not valid"))
+                                        }
+                                    }
+                                    API_ENOENT -> {
                                         image.isFullyLoaded = true
                                         emitter.onNext(image)
                                         emitter.onComplete()
@@ -304,7 +321,7 @@ class GetImageUseCase @Inject constructor(
     fun getImageUri(imageUri: Uri): Flowable<ImageResult> =
         Flowable.fromCallable {
             val file = imageUri.toFile()
-            if (file.exists()) {
+            if (file.exists() && file.canRead()) {
                 ImageResult(
                     fullSizeUri = file.toUri(),
                     isFullyLoaded = true
