@@ -150,6 +150,7 @@ FLAC_SHA1="2bdbb56b128a780a5d998e230f2f4f6eb98f33ee"
 FLAC_EXT_LIBRARY=exoplayer-extension-flac-${EXOPLAYER_VERSION}.aar
 
 WEBRTC_DOWNLOAD_URL=https://mega.nz/file/RsMEgZqA#s0P754Ua7AqvWwamCeyrvNcyhmPjHTQQIxtqziSU4HI
+# Expected SHA1 checksum of "megachat/webrtc/libwebrtc_arm64.a" in downloaded WebRTC library
 WEBRTC_SHA1=0755036bf7afd622e96289468fd753e20213cf01
 
 function setupEnv()
