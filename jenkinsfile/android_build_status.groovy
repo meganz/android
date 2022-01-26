@@ -75,7 +75,7 @@ def getMEGAchatBranch() {
 }
 
 pipeline {
-    agent { label 'mac-slave||mac-jenkins-slave'}
+    agent { label 'mac-jenkins-slave'}
     options {
         // Stop the build early in case of compile or test failures
         skipStagesAfterUnstable()
