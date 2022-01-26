@@ -10,6 +10,7 @@ import android.view.MenuItem
 import android.widget.ImageView
 import androidx.activity.viewModels
 import androidx.appcompat.view.ActionMode
+import androidx.appcompat.widget.SearchView
 import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.documentfile.provider.DocumentFile
@@ -51,12 +52,18 @@ class UploadFolderActivity : PasscodeActivity(), Scrollable {
     }
 
     private val elevation by lazy { resources.getDimension(R.dimen.toolbar_elevation) }
+    private val elevationColor by lazy {
+        ContextCompat.getColor(this, R.color.action_mode_background)
+    }
+    private val noElevationColor by lazy { ContextCompat.getColor(this, R.color.dark_grey) }
     private val itemDecoration by lazy {
         PositionDividerItemDecoration(
             this,
             resources.displayMetrics
         )
     }
+
+    private lateinit var searchMenuItem: MenuItem
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -70,18 +77,35 @@ class UploadFolderActivity : PasscodeActivity(), Scrollable {
         if (savedInstanceState == null) {
             intent.data?.let { uri ->
                 DocumentFile.fromTreeUri(this@UploadFolderActivity, uri)?.let { documentFile ->
-                    viewModel.retrieveFolderContent(documentFile, sortByHeaderViewModel.order.third)
+                    viewModel.retrieveFolderContent(
+                        documentFile,
+                        sortByHeaderViewModel.order.third,
+                        sortByHeaderViewModel.isList
+                    )
                 }
             }
         }
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
-        menuInflater.inflate(R.menu.activity_upload_folder, menu)
-        menu?.findItem(R.id.action_search)?.setupSearchView { query ->
-            viewModel.search(query)
+        val finalMenu = menu ?: return super.onCreateOptionsMenu(menu)
+
+        menuInflater.inflate(R.menu.activity_upload_folder, finalMenu)
+        searchMenuItem = finalMenu.findItem(R.id.action_search).apply {
+            setupSearchView { query ->
+                showProgress(true)
+                viewModel.search(query)
+            }
+
+            val query = viewModel.getQuery()
+
+            if (!isActionViewExpanded && query != null) {
+                expandActionView()
+                (actionView as SearchView).setQuery(query, false)
+            }
         }
-        return super.onCreateOptionsMenu(menu)
+
+        return super.onCreateOptionsMenu(finalMenu)
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -137,12 +161,14 @@ class UploadFolderActivity : PasscodeActivity(), Scrollable {
         }
 
         showProgress(true)
+        checkScroll()
     }
 
     private fun showProgress(show: Boolean) {
         binding.progressBar.isVisible = show
         val shadow = if (show) SHADOW else 1f
         binding.list.alpha = shadow
+        binding.actionsView.alpha = shadow
         binding.cancelButton.apply {
             alpha = shadow
             isEnabled = !show
@@ -171,6 +197,7 @@ class UploadFolderActivity : PasscodeActivity(), Scrollable {
 
         sortByHeaderViewModel.listGridChangeEvent.observe(this, EventObserver { isList ->
             switchListGrid(isList)
+            viewModel.isList = isList
         })
     }
 
@@ -179,12 +206,20 @@ class UploadFolderActivity : PasscodeActivity(), Scrollable {
     }
 
     private fun showFolderContent(folderContent: List<FolderContent>) {
-//        showProgress(false)
+        if (viewModel.isSearchInProgress()) {
+            return
+        }
+
+        showProgress(false)
         val isEmpty = folderContent.isEmpty()
         binding.emptyHintImage.isVisible = isEmpty
         binding.emptyHintText.isVisible = isEmpty
         binding.list.isVisible = !isEmpty
         folderContentAdapter.submitList(folderContent)
+
+        if (viewModel.getQuery() == null && this::searchMenuItem.isInitialized) {
+            searchMenuItem.isVisible = !isEmpty
+        }
     }
 
     private fun updateActionMode(selectedItems: List<FolderContent.Data>) {
@@ -219,6 +254,7 @@ class UploadFolderActivity : PasscodeActivity(), Scrollable {
 
     private fun onClick(itemClicked: FolderContent.Data, position: Int) {
         when {
+            binding.progressBar.isVisible -> return
             actionMode != null -> onLongClick(itemClicked, position)
             itemClicked.isFolder -> {
                 showProgress(true)
@@ -228,8 +264,13 @@ class UploadFolderActivity : PasscodeActivity(), Scrollable {
     }
 
     private fun onLongClick(itemClicked: FolderContent.Data, position: Int) {
-        animate(listOf(position))
-        viewModel.itemLongClick(itemClicked)
+        when {
+            binding.progressBar.isVisible -> return
+            else -> {
+                animate(listOf(position))
+                viewModel.itemLongClick(itemClicked)
+            }
+        }
     }
 
     private fun animate(positions: List<Int>) {
@@ -305,11 +346,11 @@ class UploadFolderActivity : PasscodeActivity(), Scrollable {
                     || binding.progressBar.isVisible
 
         binding.appBar.elevation = if (showElevation) elevation else 0F
+
         if (Util.isDarkMode(this@UploadFolderActivity)) {
-            val color =
-                if (showElevation) R.color.action_mode_background else R.color.dark_grey
-            window.statusBarColor =
-                ContextCompat.getColor(this@UploadFolderActivity, color)
+            val color = if (showElevation) elevationColor else noElevationColor
+            window.statusBarColor = color
+            binding.toolbar.setBackgroundColor(color)
         }
     }
 }

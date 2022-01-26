@@ -5,43 +5,79 @@ import io.reactivex.rxjava3.kotlin.blockingSubscribeBy
 import mega.privacy.android.app.upload.list.data.FolderContent
 import nz.mega.sdk.MegaApiJava.*
 import java.io.FileNotFoundException
+import java.util.*
 import javax.inject.Inject
 import kotlin.collections.ArrayList
+import kotlin.collections.HashMap
 
 class GetFolderContentUseCase @Inject constructor() {
 
-    fun get(folderContent: FolderContent.Data, order: Int): Single<MutableList<FolderContent>> =
+    private fun get(currentFolder: FolderContent.Data): Single<List<FolderContent.Data>> =
         Single.create { emitter ->
-            val listFiles = folderContent.document.listFiles()
+            val listFiles = currentFolder.document.listFiles()
             if (listFiles.isNullOrEmpty()) {
                 emitter.onError(FileNotFoundException("Empty folder"))
             } else {
-                val folderContentList = ArrayList<FolderContent>()
-                folderContentList.add(FolderContent.Header())
+                val folderContentList = mutableListOf<FolderContent.Data>()
 
                 listFiles.forEach { file ->
-                    folderContentList.add(FolderContent.Data(folderContent, file))
+                    folderContentList.add(FolderContent.Data(currentFolder, file))
                 }
 
-                reorder(folderContentList, order).blockingSubscribeBy(
-                    onError = { emitter.onError(FileNotFoundException("Empty folder")) },
-                    onSuccess = { finalContentList -> emitter.onSuccess(finalContentList) }
-                )
+                emitter.onSuccess(folderContentList)
             }
         }
 
-    fun reorder(folderContent: MutableList<FolderContent>, order: Int): Single<MutableList<FolderContent>> =
+    fun get(
+        currentFolder: FolderContent.Data,
+        order: Int,
+        isList: Boolean
+    ): Single<MutableList<FolderContent>> =
         Single.create { emitter ->
-            if (folderContent.isEmpty()) {
+            get(currentFolder).blockingSubscribeBy(
+                onError = { emitter.onError(FileNotFoundException("Empty folder")) },
+                onSuccess = { results ->
+                    completeAndReorder(results, order, isList).blockingSubscribeBy(
+                        onError = { error -> emitter.onError(error) },
+                        onSuccess = { finalContentList -> emitter.onSuccess(finalContentList) }
+                    )
+                }
+            )
+        }
+
+    private fun completeAndReorder(
+        folderItems: List<FolderContent.Data>,
+        order: Int,
+        isList: Boolean
+    ): Single<MutableList<FolderContent>> =
+        Single.create { emitter ->
+            val results = mutableListOf<FolderContent>().apply {
+                add(FolderContent.Header())
+                addAll(folderItems)
+            }
+
+            reorder(results, order, isList).blockingSubscribeBy(
+                onError = { emitter.onError(FileNotFoundException("Empty folder")) },
+                onSuccess = { finalSearchList -> emitter.onSuccess(finalSearchList) }
+            )
+        }
+
+    fun reorder(
+        folderItems: MutableList<FolderContent>,
+        order: Int,
+        isList: Boolean
+    ): Single<MutableList<FolderContent>> =
+        Single.create { emitter ->
+            if (folderItems.isEmpty()) {
                 emitter.onError(FileNotFoundException("Empty folder"))
             } else {
                 val folders = ArrayList<FolderContent.Data>()
                 val files = ArrayList<FolderContent.Data>()
                 val finalContent = ArrayList<FolderContent>()
                 //Add the header, it has not to be ordered
-                finalContent.add(folderContent[0])
+                finalContent.add(folderItems[0])
 
-                folderContent.forEach { item ->
+                folderItems.forEach { item ->
                     if (item is FolderContent.Data && item.isFolder) {
                         folders.add(item)
                     } else if (item is FolderContent.Data) {
@@ -77,9 +113,87 @@ class GetFolderContentUseCase @Inject constructor() {
                 }
 
                 finalContent.addAll(folders)
-                finalContent.add(FolderContent.Separator())
+
+                if (!isList) {
+                    finalContent.add(FolderContent.Separator())
+                }
+
                 finalContent.addAll(files)
                 emitter.onSuccess(finalContent)
             }
+        }
+
+    fun reorder(
+        folderContent: HashMap<FolderContent.Data?, MutableList<FolderContent>>,
+        currentFolder: FolderContent.Data?,
+        order: Int,
+        isList: Boolean
+    ): Single<HashMap<FolderContent.Data?, MutableList<FolderContent>>> =
+        Single.create { emitter ->
+            if (folderContent.isEmpty()) {
+                emitter.onError(FileNotFoundException("Empty folder content"))
+                return@create
+            }
+
+            folderContent.forEach { item ->
+                if (currentFolder != null && item.key != currentFolder) {
+                    reorder(item.value, order, isList).blockingSubscribeBy(
+                        onSuccess = { finalContentList ->
+                            folderContent[item.key] = finalContentList
+                        }
+                    )
+                }
+            }
+
+            emitter.onSuccess(folderContent)
+        }
+
+    private fun search(
+        query: String,
+        currentFolder: FolderContent.Data
+    ): Single<MutableList<FolderContent.Data>> =
+        Single.create { emitter ->
+            val searchResults = mutableListOf<FolderContent.Data>()
+
+            get(currentFolder).blockingSubscribeBy(
+                onError = { emitter.onError(FileNotFoundException("Empty folder")) },
+                onSuccess = { folderContentList ->
+                    folderContentList.forEach { item ->
+                        if (item.isFolder) {
+                            search(query, item).blockingSubscribeBy(
+                                onSuccess = { results -> searchResults.addAll(results) }
+                            )
+                        }
+                    }
+
+                    searchResults.addAll(folderContentList.filter {
+                        it.name?.lowercase(Locale.getDefault())
+                            ?.contains(query.lowercase(Locale.getDefault())) == true
+                    })
+                }
+            )
+
+            if (searchResults.isEmpty()) {
+                emitter.onError(FileNotFoundException("Empty search"))
+            } else {
+                emitter.onSuccess(searchResults)
+            }
+        }
+
+    fun search(
+        query: String,
+        currentFolder: FolderContent.Data,
+        order: Int,
+        isList: Boolean
+    ): Single<MutableList<FolderContent>> =
+        Single.create { emitter ->
+            search(query, currentFolder).blockingSubscribeBy(
+                onError = { error -> emitter.onError(error) },
+                onSuccess = { results ->
+                    completeAndReorder(results, order, isList).blockingSubscribeBy(
+                        onError = { emitter.onError(FileNotFoundException("Empty search")) },
+                        onSuccess = { finalSearchList -> emitter.onSuccess(finalSearchList) }
+                    )
+                })
         }
 }

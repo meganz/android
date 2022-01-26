@@ -30,7 +30,10 @@
                 style="?android:attr/progressBarStyleHorizontal"
                 android:paddingBottom="0dp"
                 android:layout_width="match_parent"
-                android:layout_height="4dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="-5dp"
+                android:layout_marginBottom="-7dp"
+                android:progressTint="@color/teal_300_teal_200"
                 android:indeterminate="true" />
 
         </com.google.android.material.appbar.AppBarLayout>
