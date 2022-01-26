@@ -97,10 +97,6 @@ pipeline {
         CONSOLE_LOG_FILE = "console.txt"
 
         BUILD_LIB_DOWNLOAD_FOLDER = '${WORKSPACE}/mega_build_download'
-        // webrtc lib link and file name may change with time. Update these 2 values if build fails.
-        WEBRTC_LIB_URL = "https://mega.nz/file/RsMEgZqA#s0P754Ua7AqvWwamCeyrvNcyhmPjHTQQIxtqziSU4HI"
-        WEBRTC_LIB_FILE = 'WebRTC_NDKr21_p21_branch-heads4405_v2.zip'
-        WEBRTC_LIB_UNZIPPED = 'webrtc_unzipped'
 
         GOOGLE_MAP_API_URL = "https://mega.nz/#!1tcl3CrL!i23zkmx7ibnYy34HQdsOOFAPOqQuTo1-2iZ5qFlU7-k"
         GOOGLE_MAP_API_FILE = 'default_google_maps_api.zip'
@@ -208,22 +204,17 @@ pipeline {
                 }
                 gitlabCommitStatus(name: 'Download Dependency Lib for SDK') {
                     sh """
+
+                        cd jenkins
+                        bash download_webrtc.sh
+                        
+                        echo "finish testing download_webrtc.sh"
+                        exit 1 
+
                         mkdir -p "${BUILD_LIB_DOWNLOAD_FOLDER}"
                         cd "${BUILD_LIB_DOWNLOAD_FOLDER}"
                         pwd
                         ls -lh
-                
-                        ## check if webrtc exists
-                        if test -f "${BUILD_LIB_DOWNLOAD_FOLDER}/${WEBRTC_LIB_FILE}"; then
-                            echo "${WEBRTC_LIB_FILE} already downloaded. Skip downloading."
-                        else
-                            echo "downloading webrtc"
-                            mega-get ${WEBRTC_LIB_URL}
-                
-                            echo "unzipping webrtc"
-                            rm -fr ${WEBRTC_LIB_UNZIPPED}
-                            unzip ${WEBRTC_LIB_FILE} -d ${WEBRTC_LIB_UNZIPPED}
-                        fi
                 
                         ## check default Google API
                         if test -f "${BUILD_LIB_DOWNLOAD_FOLDER}/${GOOGLE_MAP_API_FILE}"; then
@@ -241,13 +232,8 @@ pipeline {
                 
                         cd ${WORKSPACE}
                         pwd
-                        # apply dependency patches
-                        rm -fr app/src/main/jni/megachat/webrtc
-                
-                        ## ATTENTION: sometimes the downloaded webrtc zip has a enclosing folder. like below.
-                        ## so we might need to adjust below path when there is a new webrtc zip
-                        cp -fr ${BUILD_LIB_DOWNLOAD_FOLDER}/${WEBRTC_LIB_UNZIPPED}/webrtc_branch-heads4405/webrtc app/src/main/jni/megachat/
-                        
+
+                        echo "apply dependency patches"
                         rm -fr app/src/debug
                         rm -fr app/src/release
                         cp -fr ${BUILD_LIB_DOWNLOAD_FOLDER}/${GOOGLE_MAP_API_UNZIPPED}/* app/src/

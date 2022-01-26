@@ -1,7 +1,7 @@
 
 
 # env variables from Jenkins
-WORKSPACE="/Users/robin/work/android"
+#WORKSPACE="/Users/robin/work/android"
 
 # local variables
 LIB_DOWNLOAD_ROOT="$HOME/mega_android_ci_download"
@@ -11,13 +11,6 @@ SAMPLE_LIB_FILE="libwebrtc_arm64.a"
 WEBRTC_LIB_FILE=${WORKSPACE}/app/src/main/jni/megachat/webrtc/${SAMPLE_LIB_FILE}
 
 mkdir -p "${WEBRTC_DOWNLOAD_PATH}"
-
-function get_property_from_build_script {
-    FILE_PATH=$1
-    PROPERTY_KEY=$2
-    VALUE=$(cat "${FILE_PATH}" | grep -E ^"${PROPERTY_KEY}".* | cut -d'=' -f2)
-    echo $VALUE
-}
 
 function download_webrtc {
 
@@ -64,14 +57,14 @@ function download_webrtc {
 
 echo
 echo ">>> Reading WebRTC info from build.sh"
-WEBRTC_LIB_SHA1=$(get_property_from_build_script "${BUILD_SH}"  "WEBRTC_SHA1")
-WEBRTC_DOWNLOAD_URL=$(get_property_from_build_script "${BUILD_SH}"  "WEBRTC_DOWNLOAD_URL")
+WEBRTC_LIB_SHA1=$(cat "${BUILD_SH}" | grep -E ^"WEBRTC_SHA1".* | cut -d'=' -f2)
+WEBRTC_DOWNLOAD_URL=$(cat "${BUILD_SH}" | grep -E ^"WEBRTC_DOWNLOAD_URL".* | cut -d'=' -f2)
 echo "  WEBRTC_DOWNLOAD_URL=${WEBRTC_DOWNLOAD_URL}"
 echo "  WEBRTC_LIB_SHA1=${WEBRTC_LIB_SHA1}"
 
 if test -f "${WEBRTC_LIB_FILE}"; then
     TMP_WEBRTC_SHA1=`shasum ${WEBRTC_LIB_FILE} | cut -d " " -f 1`
-    echo "  Sample Lib File exist=${WEBRTC_LIB_FILE}"
+    echo "  Sample_Lib_File_Exist=${WEBRTC_LIB_FILE}"
     echo "  Actual_SHA1=${TMP_WEBRTC_SHA1}"
     echo
     # echo "TMP_WEBRTC_SHA1=${TMP_WEBRTC_SHA1}"
