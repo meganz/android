@@ -58,6 +58,7 @@ import mega.privacy.android.app.utils.StringResourcesUtils;
 import mega.privacy.android.app.utils.conversion.VideoCompressionCallback;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
+import nz.mega.sdk.MegaChatApi;
 import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaNode;
@@ -1069,6 +1070,28 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
             running = true;
             setLoginState(true);
             megaApi.fastLogin(credentials.getSession(), this);
+            if (megaChatApi == null) {
+                megaChatApi = ((MegaApplication) getApplication()).getMegaChatApi();
+            }
+
+            int ret = megaChatApi.getInitState();
+            if (ret == MegaChatApi.INIT_NOT_DONE || ret == MegaChatApi.INIT_ERROR) {
+                ret = megaChatApi.init(credentials.getSession());
+                logDebug("result of init ---> " + ret);
+                switch (ret) {
+                    case MegaChatApi.INIT_NO_CACHE:
+                        logDebug("condition ret == MegaChatApi.INIT_NO_CACHE");
+                        break;
+                    case MegaChatApi.INIT_ERROR:
+                        logDebug("condition ret == MegaChatApi.INIT_ERROR");
+                        megaChatApi.logout();
+                        break;
+                    default:
+                        logDebug("Chat correctly initialized");
+                        break;
+                }
+            }
+
             return LOGIN_IN;
         }
 

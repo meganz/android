@@ -1095,21 +1095,22 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
             int ret = megaChatApi.getInitState();
             if (ret == MegaChatApi.INIT_NOT_DONE || ret == MegaChatApi.INIT_ERROR) {
                 logDebug("INIT STATE: " + ret);
-
                 ret = megaChatApi.init(gSession);
-
                 logDebug("result of init ---> " + ret);
+
                 chatSettings = dbH.getChatSettings();
-                if (ret == MegaChatApi.INIT_NO_CACHE) {
-                    logDebug("condition ret == MegaChatApi.INIT_NO_CACHE");
-                } else if (ret == MegaChatApi.INIT_ERROR) {
-                    // chat cannot initialize, disable chat completely
-                    logDebug("condition ret == MegaChatApi.INIT_ERROR");
-                    megaChatApi.logout(new ChatLogoutListener(getContext()));
-                } else {
-                    logDebug("condition ret == OK -- chat correctly initialized");
+                switch (ret) {
+                    case MegaChatApi.INIT_NO_CACHE:
+                        logDebug("condition ret == MegaChatApi.INIT_NO_CACHE");
+                        break;
+                    case MegaChatApi.INIT_ERROR:
+                        logDebug("condition ret == MegaChatApi.INIT_ERROR");
+                        megaChatApi.logout(new ChatLogoutListener(getContext()));
+                        break;
+                    default:
+                        logDebug("condition ret == OK -- chat correctly initialized");
+                        break;
                 }
-                logDebug("After init: " + ret);
             } else {
                 logDebug("Do not init, chat already initialized: " + ret);
             }
@@ -1323,16 +1324,23 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
             if (ret == MegaChatApi.INIT_NOT_DONE || ret == MegaChatApi.INIT_ERROR) {
                 ret = megaChatApi.init(null);
                 logDebug("result of init ---> " + ret);
-                if (ret == MegaChatApi.INIT_WAITING_NEW_SESSION) {
-                    logDebug("condition ret == MegaChatApi.INIT_WAITING_NEW_SESSION");
-                    disableLoginButton();
-                    megaApi.login(lastEmail, lastPassword, this);
-                } else {
-                    logWarning("ERROR INIT CHAT: " + ret);
-                    megaChatApi.logout(new ChatLogoutListener(getContext()));
 
-                    disableLoginButton();
-                    megaApi.login(lastEmail, lastPassword, this);
+                switch (ret) {
+                    case MegaChatApi.INIT_WAITING_NEW_SESSION:
+                        logDebug("condition ret == MegaChatApi.INIT_WAITING_NEW_SESSION");
+                        disableLoginButton();
+                        megaApi.login(lastEmail, lastPassword, this);
+                        break;
+                    case MegaChatApi.INIT_ERROR:
+                        logWarning("ERROR INIT CHAT: " + ret);
+                        megaChatApi.logout(new ChatLogoutListener(getContext()));
+
+                        disableLoginButton();
+                        megaApi.login(lastEmail, lastPassword, this);
+                        break;
+                    default:
+                        logDebug("Chat correctly initialized");
+                        break;
                 }
             }
         }

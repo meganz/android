@@ -144,7 +144,6 @@ public class PushMessageHanlder implements MegaRequestListenerInterface {
                     } else {
                         logDebug("RootNode is NOT null - wait CALLDATA:onChatCallUpdate");
                         int ret = megaChatApi.getInitState();
-                        logDebug("result of init ---> " + ret);
                         int status = megaChatApi.getOnlineStatus();
                         logDebug("online status ---> " + status);
                         int connectionState = megaChatApi.getConnectionState();

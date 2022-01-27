@@ -1784,9 +1784,10 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
         	new ViewTreeObserver.OnPreDrawListener() {
         		@Override
 				public boolean onPreDraw() {
-					if (addPhoneNumberButton.getLayout().getLineCount() > 1) {
+        			if(addPhoneNumberButton.getLayout() != null && addPhoneNumberButton.getLayout().getLineCount() > 1){
 						findViewById(R.id.navigation_drawer_add_phone_number_icon).setVisibility(View.GONE);
 					}
+
 					addPhoneNumberButton.getViewTreeObserver().removeOnPreDrawListener(this);
 					return false;
 				}
@@ -1993,15 +1994,21 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 				String gSession = credentials.getSession();
 				int ret = megaChatApi.getInitState();
 				logDebug("In Offline mode - Init chat is: " + ret);
-				if (ret == 0 || ret == MegaChatApi.INIT_ERROR) {
+				if (ret == MegaChatApi.INIT_NOT_DONE || ret == MegaChatApi.INIT_ERROR) {
 					ret = megaChatApi.init(gSession);
-					logDebug("After init: " + ret);
-					if (ret == MegaChatApi.INIT_NO_CACHE) {
-						logDebug("condition ret == MegaChatApi.INIT_NO_CACHE");
-					} else if (ret == MegaChatApi.INIT_ERROR) {
-						logWarning("condition ret == MegaChatApi.INIT_ERROR");
-					} else {
-						logDebug("Chat correctly initialized");
+					logDebug("result of init ---> " + ret);
+
+					switch (ret) {
+						case MegaChatApi.INIT_NO_CACHE:
+							logDebug("condition ret == MegaChatApi.INIT_NO_CACHE");
+							break;
+						case MegaChatApi.INIT_ERROR:
+							logDebug("condition ret == MegaChatApi.INIT_ERROR");
+							megaChatApi.logout(this);
+							break;
+						default:
+							logDebug("Chat correctly initialized");
+							break;
 					}
 				} else {
 					logDebug("Offline mode: Do not init, chat already initialized");
@@ -2994,6 +3001,10 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 		}
 
 		super.onResume();
+
+		if (shouldRefreshSessionDueToSDK() || shouldRefreshSessionDueToKarere()) {
+			return;
+		}
 
 //		dbH.setShowNotifOff(true);
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {

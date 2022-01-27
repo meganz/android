@@ -187,7 +187,6 @@ public class IncomingCallService extends Service implements MegaRequestListenerI
             }
 
             int ret = megaChatApi.getInitState();
-
             if (ret == MegaChatApi.INIT_NOT_DONE || ret == MegaChatApi.INIT_ERROR) {
                 ret = megaChatApi.init(gSession);
                 logDebug("result of init ---> " + ret);
@@ -201,7 +200,23 @@ public class IncomingCallService extends Service implements MegaRequestListenerI
                 } else {
                     logDebug("Chat correctly initialized");
                 }
+            } else if (ret == MegaChatApi.INIT_OFFLINE_SESSION) {
+                retryPendingConnections();
             }
+        }
+    }
+
+    private void retryPendingConnections() {
+        logDebug("retryPendingConnections");
+        try {
+            if (megaApi != null) {
+                megaApi.retryPendingConnections();
+            }
+            if (megaChatApi != null) {
+                megaChatApi.retryPendingConnections(false, null);
+            }
+        } catch (Exception e) {
+            logError("Exception", e);
         }
     }
 

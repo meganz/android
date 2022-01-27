@@ -45,7 +45,6 @@ import mega.privacy.android.app.components.transferWidget.TransfersManagement;
 import mega.privacy.android.app.fragments.offline.OfflineFragment;
 import mega.privacy.android.app.lollipop.LoginActivityLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
-import mega.privacy.android.app.lollipop.megachat.ChatSettings;
 import mega.privacy.android.app.notifications.TransferOverQuotaNotification;
 import mega.privacy.android.app.objects.SDTransfer;
 import mega.privacy.android.app.service.iar.RatingHandlerImpl;
@@ -121,7 +120,6 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 	MegaApiAndroid megaApi;
 	MegaApiAndroid megaApiFolder;
 	MegaChatApiAndroid megaChatApi;
-	ChatSettings chatSettings;
 
 	ArrayList<Intent> pendingIntents = new ArrayList<Intent>();
 
@@ -371,14 +369,17 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 					if (ret == MegaChatApi.INIT_NOT_DONE || ret == MegaChatApi.INIT_ERROR) {
 						ret = megaChatApi.init(gSession);
 						logDebug("result of init ---> " + ret);
-						chatSettings = dbH.getChatSettings();
-						if (ret == MegaChatApi.INIT_NO_CACHE) {
-							logDebug("condition ret == MegaChatApi.INIT_NO_CACHE");
-						} else if (ret == MegaChatApi.INIT_ERROR) {
-							logDebug("condition ret == MegaChatApi.INIT_ERROR");
-							megaChatApi.logout();
-						} else {
-							logDebug("Chat correctly initialized");
+						switch (ret) {
+							case MegaChatApi.INIT_NO_CACHE:
+								logDebug("condition ret == MegaChatApi.INIT_NO_CACHE");
+								break;
+							case MegaChatApi.INIT_ERROR:
+								logDebug("condition ret == MegaChatApi.INIT_ERROR");
+								megaChatApi.logout();
+								break;
+							default:
+								logDebug("Chat correctly initialized");
+								break;
 						}
 					}
 
