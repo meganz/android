@@ -536,9 +536,18 @@ public class CloudDriveExplorerFragmentLollipop extends RotatableFragment implem
 
 		int lastFirstVisiblePosition;
 		if (((FileExplorerActivityLollipop) context).isList()) {
-			lastFirstVisiblePosition = mLayoutManager == null ? 0 : mLayoutManager.findFirstCompletelyVisibleItemPosition();
+			if(mLayoutManager == null){
+				logError("mLayoutManager is null");
+				mLayoutManager = new LinearLayoutManager(context);
+				recyclerView.setLayoutManager(mLayoutManager);
+			}
+			lastFirstVisiblePosition = mLayoutManager.findFirstCompletelyVisibleItemPosition();
 		} else {
-            lastFirstVisiblePosition = gridLayoutManager == null ? 0 : gridLayoutManager.findFirstCompletelyVisibleItemPosition();
+			if(gridLayoutManager == null){
+				logError("gridLayoutManager is null");
+				gridLayoutManager = (CustomizedGridLayoutManager) recyclerView.getLayoutManager();
+			}
+            lastFirstVisiblePosition = gridLayoutManager.findFirstCompletelyVisibleItemPosition();
 		}
 
 		logDebug("Push to stack " + lastFirstVisiblePosition + " position");
@@ -585,9 +594,18 @@ public class CloudDriveExplorerFragmentLollipop extends RotatableFragment implem
 
 			int lastFirstVisiblePosition;
 			if (((FileExplorerActivityLollipop)context).isList()) {
-				lastFirstVisiblePosition = mLayoutManager == null ? 0 : mLayoutManager.findFirstCompletelyVisibleItemPosition();
+				if (mLayoutManager == null) {
+					logError("mLayoutManager is null");
+					mLayoutManager = new LinearLayoutManager(context);
+					recyclerView.setLayoutManager(mLayoutManager);
+				}
+				lastFirstVisiblePosition = mLayoutManager.findFirstCompletelyVisibleItemPosition();
 			} else {
-				lastFirstVisiblePosition = gridLayoutManager == null ? 0 : gridLayoutManager.findFirstCompletelyVisibleItemPosition();
+				if(gridLayoutManager == null){
+					logError("gridLayoutManager is null");
+					gridLayoutManager = (CustomizedGridLayoutManager) recyclerView.getLayoutManager();
+				}
+				lastFirstVisiblePosition = gridLayoutManager.findFirstCompletelyVisibleItemPosition();
 			}
 
 			logDebug("Push to stack " + lastFirstVisiblePosition + " position");
