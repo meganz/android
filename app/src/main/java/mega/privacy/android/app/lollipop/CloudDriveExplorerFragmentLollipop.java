@@ -536,18 +536,8 @@ public class CloudDriveExplorerFragmentLollipop extends RotatableFragment implem
 
 		int lastFirstVisiblePosition;
 		if (((FileExplorerActivityLollipop) context).isList()) {
-			if(mLayoutManager == null){
-				logError("mLayoutManager is null");
-				mLayoutManager = new LinearLayoutManager(context);
-				recyclerView.setLayoutManager(mLayoutManager);
-			}
 			lastFirstVisiblePosition = mLayoutManager == null ? 0 : mLayoutManager.findFirstCompletelyVisibleItemPosition();
-		}
-		else {
-			if(gridLayoutManager == null){
-				logError("gridLayoutManager is null");
-				gridLayoutManager = (CustomizedGridLayoutManager) recyclerView.getLayoutManager();
-			}
+		} else {
             lastFirstVisiblePosition = gridLayoutManager == null ? 0 : gridLayoutManager.findFirstCompletelyVisibleItemPosition();
 		}
 
@@ -595,18 +585,8 @@ public class CloudDriveExplorerFragmentLollipop extends RotatableFragment implem
 
 			int lastFirstVisiblePosition;
 			if (((FileExplorerActivityLollipop)context).isList()) {
-				if (mLayoutManager == null) {
-					logError("mLayoutManager is null");
-					mLayoutManager = new LinearLayoutManager(context);
-					recyclerView.setLayoutManager(mLayoutManager);
-				}
 				lastFirstVisiblePosition = mLayoutManager == null ? 0 : mLayoutManager.findFirstCompletelyVisibleItemPosition();
-			}
-			else {
-				if (gridLayoutManager == null) {
-					logError("gridLayoutManager is null");
-					gridLayoutManager = (CustomizedGridLayoutManager) recyclerView.getLayoutManager();
-				}
+			} else {
 				lastFirstVisiblePosition = gridLayoutManager == null ? 0 : gridLayoutManager.findFirstCompletelyVisibleItemPosition();
 			}
 
