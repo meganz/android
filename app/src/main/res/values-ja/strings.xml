@@ -66,8 +66,6 @@
     <string name="general_error_word">エラー</string>
     <!-- when clicking into a menu whose functionality is not yet implemented -->
     <string name="general_not_yet_implemented">まだ実装されていません</string>
-    <!-- when any file or folder is selected -->
-    <string name="error_no_selection">ファイルまたはフォルダが選択されていません</string>
     <!-- when trying to download a file that is already downloaded in the device -->
     <string name="general_already_downloaded">ダウンロード済み</string>
     <!-- when trying to upload a file that is already uploaded in the folder -->
@@ -100,8 +98,6 @@
     <string name="action_create_folder">新規フォルダを作成</string>
     <!-- Option which allows create a new text file -->
     <string name="action_create_txt">新規テキストファイルを作成</string>
-    <!-- Menu option to open a link. Also title of the dialog to open a link. -->
-    <string name="action_open_link">リンクを開く</string>
     <!-- Menu item -->
     <string name="action_settings">設定</string>
     <!-- Search button -->
@@ -622,10 +618,6 @@
     <string name="upload_to_audio">音声</string>
     <!-- Title of the button in the contact info screen to start a video call -->
     <string name="upload_to_video">動画</string>
-    <!-- upload to. Then choose to browse the file system to choose a file -->
-    <string name="upload_to_filesystem">ファイルシステムから選択</string>
-    <!-- upload to. Then choose to browse the file system to choose a file -->
-    <string name="upload_to_filesystem_from">以下から選択：</string>
     <!-- Label for the current uploaded size of a file. For example, 3 files, 50KB uploaded -->
     <string name="upload_uploaded">アップロード済み</string>
     <!-- Status text at the beginning of an upload, Status text at the beginning of an upload for 2 or more files -->
@@ -989,8 +981,6 @@
     <string name="settings_disable_logs">ログが無効になりました</string>
     <!-- Snackbar error message triggered by host error when user is trying to setup MEGA Camera Uploads folder in settings page -->
     <string name="error_unable_to_setup_cloud_folder">MEGAカメラアップロードフォルダをセットアップできません</string>
-    <!-- Message displayed when the user denies the required permissions during the logs activation -->
-    <string name="logs_not_enabled_permissions">必要な権限を拒否したため、ログは有効になっていません</string>
     <!-- Option in the sliding panel to open the folder which contains the file selected after performing a search -->
     <string name="search_open_location">場所を開く</string>
     <!-- message when a temporary error on logging in is due to SDK is waiting for the server to complete a request due to an API lock -->
@@ -1410,7 +1400,7 @@
     <!-- settings of the chat to choose the status -->
     <string name="settings_chat_vibration">バイブレーション</string>
     <!-- Button text shown on SMS verification page, if the user wants to logout current suspended account and login with another account, user can press this button to logout -->
-    <string name="sms_logout">[A]ログアウト[/A]して、別のアカウントでMEGAを使用します</string>
+    <string name="sms_logout">MEGAアカウントを切り替えるには[A]ログアウト[/A]します</string>
     <!-- On SMS verification page, if the user presses the logout button, a dialog with this text will show to ask for user’s confirmation. -->
     <string name="confirm_logout_from_sms_verification">現在のアカウントからログアウトしてもよろしいですか？</string>
     <!-- Text shown when a message has been deleted in the chat -->
@@ -2729,16 +2719,12 @@
     <string name="message_set_chat_private">[A]%1$s[/A][B]さんが暗号化キーローテーションを有効にしました。[/B]</string>
     <!-- error message shown when a chat link is invalid -->
     <string name="invalid_chat_link">この会話は利用できなくなりました</string>
-    <!-- error message shown when a chat link is not well formed -->
-    <string name="invalid_chat_link_args">チャットリンクが無効です</string>
     <!-- When it is creating a new group chat, this option permits to establish it private or public -->
     <string name="ekr_label">暗号化キーローテーション</string>
     <!-- Text of the dialog to change a public chat to private (enable encryption key rotation) -->
     <string name="ekr_explanation">暗号化キーローテーションでは安全性が少し高まりますが、チャットリンクを作成できず、新規参加者は過去のメッセージを見れません。</string>
     <!-- Text of the dialog to change a public chat to private (enable encryption key rotation) -->
     <string name="subtitle_chat_message_enabled_ERK">暗号化キーローテーションでは安全性が少し高まりますが、チャットリンクを作成できず、新規参加者は過去のメッセージを見れません。</string>
-    <!-- Menu item -->
-    <string name="action_open_chat_link">チャットリンクを開く</string>
     <!-- Message shown when a contact request has not been sent because the invitation has been sent before -->
     <string name="invite_not_sent_already_sent">%sさんに連絡するための招待状は以前に送信され、「送信済み要求」タブで照会できます。</string>
     <!-- Label shown to indicate the QR is saving in Cloud Drive -->
@@ -3041,8 +3027,6 @@
     </plurals>
     <!-- Title of a chat message that contains geolocation info -->
     <string name="title_geolocation_message">ピン留めされた場所</string>
-    <!-- Text of the button to indicate an attachment upload from file system -->
-    <string name="attachment_upload_panel_from_device">ファイルシステムから</string>
     <!-- Alert shown when a num of files have not been sent because of any error occurs, Plural of file. 2 files -->
     <plurals name="num_files_not_send">
         <item quantity="other">%d個のファイルが%dチャットに送信されませんでした</item>
@@ -3179,22 +3163,6 @@
     <string name="text_join_call">この通話に参加するには、現在の通話を終了する必要があります。</string>
     <!-- Text of the dialog shown when you want to join a group call but you are in another active call -->
     <string name="text_join_another_call">この通話に参加するには、現在の通話を終了または保留する必要があります。</string>
-    <!-- Hint shown in the open chat link alert dialog -->
-    <string name="hint_enter_chat_link">チャットリンクを入力</string>
-    <!-- Hint shown in the open link alert dialog -->
-    <string name="hint_paste_link">リンクを貼り付ける</string>
-    <!-- Error shown when it tries to open an invalid file or folder link -->
-    <string name="invalid_file_folder_link">ファイルまたはフォルダリンクが無効です</string>
-    <!-- Error shown when it tries to open an invalid file or folder link and the text view is empty -->
-    <string name="invalid_file_folder_link_empty">有効なファイルまたはフォルダのリンクをご入力ください</string>
-    <!-- Error shown when it tries to open an invalid chat link and the text view is empty -->
-    <string name="invalid_chat_link_empty">有効なチャットリンクをご入力ください</string>
-    <!-- Error shown when it tries to open a chat link from the Cloud Drive section -->
-    <string name="valid_chat_link">チャットリンクを貼り付けました。</string>
-    <!-- Error shown when it tries to open a contact link from the Cloud Drive section -->
-    <string name="valid_contact_link">連絡先リンクを貼り付けました。</string>
-    <!-- Menu item -->
-    <string name="action_open_contact_link">連絡先リンクを開く</string>
     <!-- Explanation of the dialog shown to share a chat link -->
     <string name="copy_link_explanation">このリンクを使用すると、人々はあなたのグループに参加できます。</string>
     <!-- Label that indicates the creation of a chat link -->
@@ -3666,7 +3634,7 @@
     <!-- Context menu item. Allows user to delete file/folder from favourites -->
     <string name="file_properties_unfavourite">お気に入りを削除</string>
     <!-- Context menu item. Allows to mark file/folder with own color label -->
-    <string name="file_properties_label">ラベル&#8230;</string>
+    <string name="file_properties_label">ラベル</string>
     <!-- Information text to let’s the user know that they can remove a colour from a folder or file that was already marked. -->
     <string name="action_remove_label">ラベルを削除</string>
     <!-- Title text to show label selector. -->
@@ -3698,19 +3666,13 @@
     <!-- Preferences screen item title for cookie settings -->
     <string name="settings_about_cookie_settings">クッキーの設定</string>
     <!-- Cookie dialog title -->
-    <string name="dialog_cookie_alert_title">続行する前に</string>
+    <string name="dialog_cookie_alert_title">お客様のプライバシー</string>
     <!-- Cookie dialog message. Please, keep the placeholders to format the string. -->
-    <string name="dialog_cookie_alert_message">当社は、ローカルストレージおよび同様のテクノロジー（「クッキー」）を使用して、お客様にサービスをご提供し、当社サービスのエクスペリエンスを向上させ、サードパーティを介して表示される広告を含め、お客様がご覧になる広告をカスタマイズいたします。ご訪問の最初から当社によるクッキーの使用を受け入れるか、クッキーの設定でクッキーをカスタマイズしてください。詳細については、当社の[A]クッキーポリシー[/A]をご覧ください。</string>
+    <string name="dialog_cookie_alert_message">当社は、お客様に当社のサービスをご提供し、その利便性を高めるために、クッキー（Cookie）および類似の技術（以下、「クッキー」）を使用いたします。お客様がご訪問された最初から当社のクッキーの使用を受け入れるか、クッキー設定でクッキーをカスタマイズしてください。詳しくは、当社の[A]クッキーポリシー[/A]をご覧ください。</string>
     <!-- Cookie dialog message showed when there are unsaved settings. -->
     <string name="dialog_cookie_alert_unsaved">保存されていないクッキーの設定</string>
     <!-- Snackbar message showed when there settings has been saved successfully. -->
     <string name="dialog_cookie_snackbar_saved">クッキー設定の変更が保存されました</string>
-    <!-- Cookie dialog third party first subtitle -->
-    <string name="dialog_cookie_thirdparty_subtitle1">Google広告クッキー</string>
-    <!-- Cookie dialog third party second subtitle -->
-    <string name="dialog_cookie_thirdparty_subtitle2">カテゴリ：広告クッキー</string>
-    <!-- Cookie dialog third party message. Please, keep the placeholders to format the string. -->
-    <string name="dialog_cookie_thirdparty_message">Googleが使用する目的：\n・現在地や以前にアクセスした他のウェブサイトなどに基づいて、当社および他のサービスやウェブサイトにGoogleが表示する広告をカスタマイズします。\n・特定の広告が表示される頻度を監視します。\n・不正防止を提供いたします。さらに、\n・特定の広告をタップするタイミングを決定し、その広告に応じて実行する次のアクションを追跡します。\nhttps://policies.google.com/technologies/partner-sites</string>
     <!-- Preference screen item title -->
     <string name="preference_cookies_accept">クッキーを受け入れる</string>
     <!-- Preference screen item title -->
@@ -3718,21 +3680,9 @@
     <!-- Preference screen item summary -->
     <string name="preference_cookies_essential_summary">必須クッキーは、重要な機能と当社サービスへの安全なアクセスをご提供するのに不可欠なクッキーです。このため、同意は必要ありません。</string>
     <!-- Preference screen item title -->
-    <string name="preference_cookies_preference_title">お好みのクッキー</string>
-    <!-- Preference screen item summary -->
-    <string name="preference_cookies_preference_summary">ご選択された特定の表示とフォーマット設定を当社が覚えておけるようにするクッキーです。これらのクッキーを受け入れない場合、ご希望の画面レイアウトなど、当社は覚えておくことができません。</string>
-    <!-- Preference screen item title -->
     <string name="preference_cookies_performance_title">パフォーマンスとアナリティクスのクッキー</string>
     <!-- Preference screen item summary -->
     <string name="preference_cookies_performance_summary">お客様が当社サービスをどのようにご使用になられているのかを理解し、改善に使用できるデータをご提供いただくのに役立つクッキーです。これらのクッキーを受け入れない場合、当社が設計を改善するのに役立つデータが少なくなります。</string>
-    <!-- Preference screen item title -->
-    <string name="preference_cookies_advertising_title">広告クッキー</string>
-    <!-- Preference screen item summary -->
-    <string name="preference_cookies_advertising_summary">当社および当社が承認した広告パートナーが、閲覧履歴に基づいて、当社サービスおよび他のウェブサイトに表示される広告をカスタマイズするために使用いたします。これらのクッキーを受け入れない場合、関連性の低い広告が表示される可能性があります。</string>
-    <!-- Preference screen item title -->
-    <string name="preference_cookies_thirdparty_title">サードパーティのクッキー</string>
-    <!-- Preference screen item summary. Please, keep the placeholders to format the string. -->
-    <string name="preference_cookies_thirdparty_summary">これらは、当社以外の者が管理するクッキーです。これらのクッキーを使用して、上記の種類の機能をご提供いたします。これらのクッキーを受け入れない場合、各サードパーティのクッキーの種類に応じて異なる影響が生じます。当社が使用するサードパーティの全クッキーの詳細については、以下の「詳細情報」をタップしてください。</string>
     <!-- Preference screen item state description -->
     <string name="preference_cookies_always_on">常にオン</string>
     <!-- Menu option that allows the user to scan document and upload it directly to MEGA. -->
@@ -4101,4 +4051,10 @@
     <string name="image_insertion_not_allowed">MEGAはここでの画像挿入をサポートしておりません</string>
     <!-- The label under the button of viewing all images screen -->
     <string name="section_images">画像</string>
+    <!-- Title of the dialog warning the user about disable file versioning. -->
+    <string name="disable_versioning_label">ファイルのバージョン管理を無効にする</string>
+    <!-- Warning of the dialog informing the user about disable file versioning. -->
+    <string name="disable_versioning_warning">当社のファイルのバージョン管理機能により、ユーザー様のファイルが新しいバージョンに置き換えられても、古いコピーを維持することができます。ファイルのバージョン管理を無効にすると、この保護機能は使えなくなります。また、置き換えた際に、古いコピーは失われます。</string>
+    <!-- Warning informing the user the folder location is trying to open no longer exists. -->
+    <string name="location_not_exist">この場所はもう存在しません。</string>
 </resources>

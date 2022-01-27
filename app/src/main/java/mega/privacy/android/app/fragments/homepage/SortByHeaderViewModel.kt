@@ -1,23 +1,26 @@
 package mega.privacy.android.app.fragments.homepage
 
-import androidx.hilt.lifecycle.ViewModelInject
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModel
 import com.jeremyliao.liveeventbus.LiveEventBus
+import dagger.hilt.android.lifecycle.HiltViewModel
 import mega.privacy.android.app.R
+import mega.privacy.android.app.constants.EventConstants.EVENT_SHOW_MEDIA_DISCOVERY
 import mega.privacy.android.app.constants.EventConstants.EVENT_UPDATE_VIEW_MODE
 import mega.privacy.android.app.globalmanagement.SortOrderManagement
 import mega.privacy.android.app.utils.Constants.EVENT_LIST_GRID_CHANGE
 import mega.privacy.android.app.utils.Constants.EVENT_ORDER_CHANGE
 import nz.mega.sdk.MegaApiJava.*
+import javax.inject.Inject
 
 /**
  * ViewModel in charge of manage actions from sub-headers in which view mode (list or grid)
  * and sort by options can be changed.
  */
-class SortByHeaderViewModel @ViewModelInject constructor(
+@HiltViewModel
+class SortByHeaderViewModel @Inject constructor(
     sortOrderManagement: SortOrderManagement
 ) : ViewModel() {
 
@@ -70,6 +73,13 @@ class SortByHeaderViewModel @ViewModelInject constructor(
 
     fun switchListGrid() {
         LiveEventBus.get(EVENT_UPDATE_VIEW_MODE, Boolean::class.java).post(!isList)
+    }
+
+    /**
+     * Enter media discovery view.
+     */
+    fun enterMediaDiscovery() {
+        LiveEventBus.get(EVENT_SHOW_MEDIA_DISCOVERY, Unit::class.java).post(Unit)
     }
 
     override fun onCleared() {

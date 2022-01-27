@@ -136,11 +136,11 @@ PDFVIEWER_DOWNLOAD_URL=https://github.com/barteksc/PdfiumAndroid/archive/pdfium-
 PDFVIEWER_SHA1="9c346de2fcf328c65c7047f03357a049dc55b403"
 
 EXOPLAYER=ExoPlayer
-EXOPLAYER_VERSION=2.12.1
+EXOPLAYER_VERSION=2.16.0
 EXOPLAYER_SOURCE_FILE=ExoPlayer-r${EXOPLAYER_VERSION}.zip
 EXOPLAYER_SOURCE_FOLDER=ExoPlayer-r${EXOPLAYER_VERSION}
 EXOPLAYER_DOWNLOAD_URL=https://github.com/google/ExoPlayer/archive/r${EXOPLAYER_VERSION}.zip
-EXOPLAYER_SHA1="a6476469ada55d089ea2523e3e78528dc4032e00"
+EXOPLAYER_SHA1="8e1fe0e78761f372455c909ce19a50a6d7b0e183"
 FFMPEG_VERSION=4.2
 FFMPEG_EXT_LIBRARY=exoplayer-extension-ffmpeg-${EXOPLAYER_VERSION}.aar
 FLAC_VERSION=1.3.2
@@ -148,6 +148,10 @@ FLAC_SOURCE_FILE=flac-${FLAC_VERSION}.tar.xz
 FLAC_DOWNLOAD_URL=https://ftp.osuosl.org/pub/xiph/releases/flac/${FLAC_SOURCE_FILE}
 FLAC_SHA1="2bdbb56b128a780a5d998e230f2f4f6eb98f33ee"
 FLAC_EXT_LIBRARY=exoplayer-extension-flac-${EXOPLAYER_VERSION}.aar
+
+WEBRTC_DOWNLOAD_URL=https://mega.nz/file/RsMEgZqA#s0P754Ua7AqvWwamCeyrvNcyhmPjHTQQIxtqziSU4HI
+# Expected SHA1 checksum of "megachat/webrtc/libwebrtc_arm64.a" in downloaded WebRTC library
+WEBRTC_SHA1=0755036bf7afd622e96289468fd753e20213cf01
 
 function setupEnv()
 {
@@ -491,10 +495,10 @@ echo "* MediaInfo is ready"
 
 echo "* Checking WebRTC"
 if grep ^DISABLE_WEBRTC Application.mk | grep --quiet false; then
-    WEBRTCSHA1=`sha1sum megachat/webrtc/libwebrtc_arm64.a | cut -d " " -f 1`
+    TMP_WEBRTC_SHA1=`sha1sum megachat/webrtc/libwebrtc_arm64.a | cut -d " " -f 1`
 
-    if [ ! -d megachat/webrtc/include ] || [ $WEBRTCSHA1  != "0755036bf7afd622e96289468fd753e20213cf01" ]; then
-        echo "ERROR: WebRTC not ready. Please download it from this link: https://mega.nz/file/RsMEgZqA#s0P754Ua7AqvWwamCeyrvNcyhmPjHTQQIxtqziSU4HI"
+    if [ ! -d megachat/webrtc/include ] || [ "$TMP_WEBRTC_SHA1"  != $WEBRTC_SHA1 ]; then
+        echo "ERROR: WebRTC not ready. Please download it from this link: ${WEBRTC_DOWNLOAD_URL}"
         echo "and uncompress it in megachat/webrtc"
         exit 1
     else

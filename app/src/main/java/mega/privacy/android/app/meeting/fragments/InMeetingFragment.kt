@@ -27,7 +27,6 @@ import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.jeremyliao.liveeventbus.LiveEventBus
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.*
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
 import mega.privacy.android.app.components.twemoji.EmojiTextView
@@ -42,8 +41,6 @@ import mega.privacy.android.app.constants.EventConstants.EVENT_ERROR_STARTING_CA
 import mega.privacy.android.app.constants.EventConstants.EVENT_LOCAL_NETWORK_QUALITY_CHANGE
 import mega.privacy.android.app.constants.EventConstants.EVENT_MEETING_AVATAR_CHANGE
 import mega.privacy.android.app.constants.EventConstants.EVENT_MEETING_GET_AVATAR
-import mega.privacy.android.app.constants.EventConstants.EVENT_MEETING_INCOMPATIBILITY_SHOW
-import mega.privacy.android.app.constants.EventConstants.EVENT_MEETING_INVITE
 import mega.privacy.android.app.constants.EventConstants.EVENT_NOT_OUTGOING_CALL
 import mega.privacy.android.app.constants.EventConstants.EVENT_PRIVILEGES_CHANGE
 import mega.privacy.android.app.constants.EventConstants.EVENT_REMOTE_AVFLAGS_CHANGE
@@ -76,11 +73,6 @@ import mega.privacy.android.app.meeting.activity.MeetingActivity.Companion.MEETI
 import mega.privacy.android.app.meeting.activity.MeetingActivity.Companion.MEETING_ACTION_START
 import mega.privacy.android.app.meeting.activity.MeetingActivity.Companion.MEETING_IS_GUEST
 import mega.privacy.android.app.meeting.adapter.Participant
-import mega.privacy.android.app.meeting.fragments.InMeetingViewModel.Companion.STATE_CANCEL
-import mega.privacy.android.app.meeting.fragments.InMeetingViewModel.Companion.STATE_FINISH
-import mega.privacy.android.app.meeting.fragments.InMeetingViewModel.Companion.STATE_INVITE
-import mega.privacy.android.app.meeting.fragments.InMeetingViewModel.Companion.STATE_NEW
-import mega.privacy.android.app.meeting.fragments.InMeetingViewModel.Companion.STATE_RESUME
 import mega.privacy.android.app.meeting.listeners.AnswerChatCallListener
 import mega.privacy.android.app.meeting.listeners.BottomFloatingPanelListener
 import mega.privacy.android.app.meeting.listeners.StartChatCallListener
@@ -104,8 +96,6 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
     @Inject
     lateinit var passcodeManagement: PasscodeManagement
 
-    private var bCountDownTimerStart: Boolean = false
-    private var bInviteSent: Boolean = false
     val args: InMeetingFragmentArgs by navArgs()
 
     // Views
@@ -138,6 +128,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
 
     private var micIsEnable = false
     private var camIsEnable = false
+    private var speakerIsEnable = false
     private var meetingLink: String = ""
     private var isManualModeView = false
     private var isWaitingForAnswerCall = false
@@ -154,12 +145,6 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
     private var lastTouch: Long = 0
     private lateinit var dragTouchListener: OnDragTouchListener
     private var bannerShouldBeShown = false
-
-    // For snack bar
-    private var shiftY = -1f // Record the shift of floatingWindowFragment to Snackbar
-    private var bSnackbarShown = false // The compatibility snack bar is shown or not
-    private var snackbarTop: Int = -1
-    private var snackbarBottom: Int = -1
 
     private lateinit var binding: InMeetingFragmentBinding
 
@@ -572,36 +557,6 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
             }
         }
 
-    private val inviteObserver =
-        Observer<Boolean> { invite ->
-            if (invite && !bInviteSent) {
-                bInviteSent = true
-
-                if (STATE_FINISH != inMeetingViewModel.shouldShowWarningMessage()) {
-                    inMeetingViewModel.updateShowWarningMessage(STATE_INVITE)
-                    launchTimer()
-                }
-            }
-        }
-
-    private val incompatibilitySnackbarObserver = Observer<Boolean> {
-        // calculate the position of floating window related to snack bar
-        bSnackbarShown = it
-        if (bSnackbarShown) {
-            meetingActivity.snackbar.view.post {
-                snackbarTop = meetingActivity.snackbar.view.top
-                snackbarBottom = meetingActivity.snackbar.view.bottom
-                adjustPositionOfFloatingWindow(
-                    bConsiderSnackbar = true,
-                    bTop = false,
-                    bBottom = true
-                )
-            }
-        } else {
-            adjustPositionOfFloatingWindow(bConsiderSnackbar = true, bTop = false, bBottom = true)
-        }
-    }
-
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -740,39 +695,35 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
                                     MegaRequest.TYPE_CREATE_ACCOUNT,
                                     onSuccess = { _, _, _ ->
                                         logDebug("Action guest. Create ephemeral Account, done")
-                                        inMeetingViewModel.chatConnect(
+                                        inMeetingViewModel.openChatPreview(
+                                            meetingLink,
                                             SimpleChatRequestListener(
-                                                MegaChatRequest.TYPE_CONNECT,
-                                                onSuccess = { _, _, _ ->
-                                                    logDebug("Action guest. Connect to chat, done")
-                                                    inMeetingViewModel.openChatPreview(
-                                                        meetingLink,
-                                                        SimpleChatRequestListener(
-                                                            MegaChatRequest.TYPE_LOAD_PREVIEW,
-                                                            onSuccess = { _, request, _ ->
-                                                                logDebug(
-                                                                    "Action guest. Open chat preview, done. Param type: ${request.paramType}, Chat id: ${request.chatHandle}, Flag: ${request.flag}, Call id: ${
-                                                                        request.megaHandleList?.get(
-                                                                            0
-                                                                        )
-                                                                    }"
-                                                                )
-                                                                MegaApplication.getChatManagement()
-                                                                    .setOpeningMeetingLink(
-                                                                        request.chatHandle,
-                                                                        true
-                                                                    )
+                                                MegaChatRequest.TYPE_LOAD_PREVIEW,
+                                                onSuccess = { _, request, _ ->
+                                                    logDebug(
+                                                        "Action guest. Open chat preview, done. Param type: ${request.paramType}, Chat id: ${request.chatHandle}, Flag: ${request.flag}, Call id: ${
+                                                            request.megaHandleList?.get(
+                                                                0
+                                                            )
+                                                        }"
+                                                    )
+                                                    MegaApplication.getChatManagement()
+                                                        .setOpeningMeetingLink(
+                                                            request.chatHandle,
+                                                            true
+                                                        )
 
-                                                                camIsEnable =
-                                                                    sharedModel.cameraLiveData.value!!
-                                                                inMeetingViewModel.joinPublicChat(
-                                                                    args.chatId,
-                                                                    AutoJoinPublicChatListener(
-                                                                        context,
-                                                                        this@InMeetingFragment
-                                                                    )
-                                                                )
-                                                            })
+                                                    camIsEnable =
+                                                        sharedModel.cameraLiveData.value!!
+                                                    speakerIsEnable =
+                                                        sharedModel.speakerLiveData.value!! == AppRTCAudioManager.AudioDevice.SPEAKER_PHONE
+
+                                                    inMeetingViewModel.joinPublicChat(
+                                                        args.chatId,
+                                                        AutoJoinPublicChatListener(
+                                                            context,
+                                                            this@InMeetingFragment
+                                                        )
                                                     )
                                                 })
                                         )
@@ -916,12 +867,6 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
         @Suppress("UNCHECKED_CAST")
         LiveEventBus.get(EVENT_CHAT_CONNECTION_STATUS)
             .observe(this, chatConnectionStatusObserver as Observer<Any>)
-        @Suppress("UNCHECKED_CAST")
-        LiveEventBus.get(EVENT_MEETING_INVITE)
-            .observe(this, inviteObserver as Observer<Any>)
-        @Suppress("UNCHECKED_CAST")
-        LiveEventBus.get(EVENT_MEETING_INCOMPATIBILITY_SHOW)
-            .observeSticky(this, incompatibilitySnackbarObserver as Observer<Any>)
     }
 
     private fun initToolbar() {
@@ -1055,6 +1000,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
 
         sharedModel.speakerLiveData.observe(viewLifecycleOwner) {
             logDebug("Speaker status has changed to $it")
+            speakerIsEnable = it == AppRTCAudioManager.AudioDevice.SPEAKER_PHONE
             updateSpeaker(it)
         }
 
@@ -1098,29 +1044,6 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
         sharedModel.snackBarLiveData.observe(viewLifecycleOwner) {
             if (it.isNotEmpty()) {
                 showSnackbar(SNACKBAR_TYPE, it, MEGACHAT_INVALID_HANDLE)
-                if (bInviteSent) {
-                    bInviteSent = false
-                    val count = inMeetingViewModel.participants.value
-                    if (count != null) {
-                        val participantsCount = getParticipantsCount()
-                        if (participantsCount == 0L && count.size == 0) {
-                            if (STATE_FINISH != inMeetingViewModel.shouldShowWarningMessage()) {
-                                logDebug("launchTimer() for no participant join in after Invite")
-                                inMeetingViewModel.updateShowWarningMessage(STATE_INVITE)
-                                launchTimer()
-                            }
-                        } else if (participantsCount > 0 && count.size < participantsCount.toInt()) {
-                            if (STATE_FINISH != inMeetingViewModel.shouldShowWarningMessage()) {
-                                logDebug("launchTimer() for not all participants join in after Invite")
-                                inMeetingViewModel.updateShowWarningMessage(STATE_INVITE)
-                                launchTimer()
-                            }
-                        } else {
-                            logDebug("noting to do")
-                        }
-                    }
-
-                }
             }
         }
 
@@ -1134,21 +1057,6 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
         sharedModel.notificationNetworkState.observe(viewLifecycleOwner) { haveConnection ->
             inMeetingViewModel.updateNetworkStatus(haveConnection)
             checkInfoBanner(TYPE_NO_CONNECTION)
-        }
-
-        inMeetingViewModel.updateUI.observe(viewLifecycleOwner) {
-            if (it) {
-                inMeetingViewModel.updateShowWarningMessage(STATE_FINISH)
-                showSnackbar(
-                    SNACKBAR_IMCOMPATIBILITY_TYPE,
-                    StringResourcesUtils.getString(
-                        R.string.version_incompatibility
-                    ),
-                    MEGACHAT_INVALID_HANDLE
-                )
-                LiveEventBus.get(EVENT_MEETING_INCOMPATIBILITY_SHOW, Boolean::class.java)
-                    .post(true)
-            }
         }
     }
 
@@ -1249,7 +1157,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
         }
 
         // Need not consider the snack bar
-        adjustPositionOfFloatingWindow(bConsiderSnackbar = false, bTop = true, bBottom = true)
+        adjustPositionOfFloatingWindow(bTop = true, bBottom = true)
 
         lastTouch = System.currentTimeMillis()
     }
@@ -1275,18 +1183,15 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
     }
 
     /**
-     * Method to control the position of the floating window in relation to the toolbar, bottom sheet panel and Snackbar
+     * Method to control the position of the floating window in relation to the toolbar, bottom sheet panel
      *
-     * @param bConsiderSnackbar Calculate the position of floating window including snack bar or not
      * @param bTop Calculate the position related to top
      * @param bBottom Calculate the position related to bottom
      */
     private fun adjustPositionOfFloatingWindow(
-        bConsiderSnackbar: Boolean,
         bTop: Boolean = false,
         bBottom: Boolean = true
     ) {
-
         var isIntersect: Boolean
         var isIntersectPreviously: Boolean
 
@@ -1307,47 +1212,24 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
                 }
             }
             if (bBottom) {
-                // Control the position of the floating window in relation to the bottom sheet panel and snack bar
-                if (bSnackbarShown && bConsiderSnackbar) {
-                    // The snack bar is shown and should consider the position of the snack bar
-                    val bottom = this.y + this.height
-                    val top = this.y
+                // When the bottom panel is expanded, keep the current position
+                if (bottomFloatingPanelViewHolder.getState() == BottomSheetBehavior.STATE_EXPANDED) {
+                    return
+                }
 
-                    meetingActivity.snackbar.view.post {
-                        // When there is an intersection between the floating window and the snack bar, move the floating window up.
-                        if (meetingActivity.snackbar.isShown && ((top.toInt() until bottom.toInt()) intersect (snackbarTop until snackbarBottom)).isNotEmpty()) {
-                            shiftY = bottom - min(floatingBottomSheet.top, snackbarTop)
-                            this.moveY(this.y - shiftY)
-                        }
-                    }
-                } else {
-                    if (shiftY > 0 && !bSnackbarShown) {
-                        // When the snack bar dismissed, restore the position of the floating window.
-                        this.moveY(this.y + shiftY)
-                        shiftY = -1f
-                    }
+                val bottom = this.y + this.height
+                val top = floatingBottomSheet.top
+                val margin1 = bottom - top
 
-                    // When the bottom panel is expanded, keep the current position
-                    if (bottomFloatingPanelViewHolder.getState() == BottomSheetBehavior.STATE_EXPANDED) {
-                        return
-                    }
+                isIntersect = margin1 > 0
+                if (floatingBottomSheet.isVisible && isIntersect) {
+                    this.moveY(this.y - margin1)
+                }
 
-                    val bottom = this.y + this.height
-                    val top = floatingBottomSheet.top
-                    val margin1 = bottom - top
-
-                    isIntersect = margin1 > 0
-                    if (floatingBottomSheet.isVisible && isIntersect) {
-                        this.moveY(this.y - margin1)
-                    }
-
-                    if (!bSnackbarShown) {
-                        val margin2 = previousY + this.height - floatingBottomSheet.top
-                        isIntersectPreviously = margin2 > 0
-                        if (!floatingBottomSheet.isVisible && isIntersectPreviously && previousY >= 0) {
-                            this.moveY(previousY)
-                        }
-                    }
+                val margin2 = previousY + this.height - floatingBottomSheet.top
+                isIntersectPreviously = margin2 > 0
+                if (!floatingBottomSheet.isVisible && isIntersectPreviously && previousY >= 0) {
+                    this.moveY(previousY)
                 }
             }
         }
@@ -1707,7 +1589,6 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
         meetingActivity.snackbar?.let {
             floatingWindowContainer.post {
                 adjustPositionOfFloatingWindow(
-                    bConsiderSnackbar = true,
                     bTop = false,
                     bBottom = true
                 )
@@ -1904,14 +1785,8 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
                             it.text =
                                 StringResourcesUtils.getString(R.string.outgoing_call_starting)
                         }
-                        logDebug("launchTimer() for chatroom that is not a meeting")
-                        launchTimer()
                         return
                     }
-
-                    logDebug("cancel launchTimer() for chatroom is not a meeting")
-                    cancelCountDownTimer()
-                    meetingActivity.snackbar?.dismiss()
                 }
 
                 toolbarSubtitle?.let {
@@ -1925,40 +1800,6 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
                 }
             }
         }
-    }
-
-    /**
-     * Start Timer for 26s and show layout for version incompatibility
-     */
-    private fun launchTimer() {
-        if (!bCountDownTimerStart) {
-            // Not a moderator, need not show warning message
-            if (!inMeetingViewModel.isModerator()) {
-                logDebug("launchTimer - Not a moderator, need not show warning message")
-                return
-            }
-            // Message has been shown, no duplicate count down
-            when (val state = inMeetingViewModel.shouldShowWarningMessage()) {
-                STATE_NEW -> {
-                    inMeetingViewModel.updateShowWarningMessage(STATE_NEW)
-                }
-                STATE_FINISH, STATE_CANCEL -> {
-                    logDebug("launchTimer - Message has been shown or canceled, state = $state")
-                    return
-                }
-            }
-            val timer = inMeetingViewModel.restoreCurrentTimer()
-            logDebug("launchTimer - restoreCurrentTimer to $timer")
-            bCountDownTimerStart = true
-            inMeetingViewModel.startCountDown()
-        }
-    }
-
-    /**
-     * Cancel the countdown timer for incompatibility warning display
-     */
-    private fun cancelCountDownTimer() {
-        inMeetingViewModel.cancelCountDownTimer()
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
@@ -2086,31 +1927,6 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
         inMeetingViewModel.participants.observe(viewLifecycleOwner) { participants ->
             participants?.let {
                 updatePanelParticipantList(it.toMutableList())
-
-                // Check current the count of participants
-                val participantsCount = getParticipantsCount()
-                val count = it.size
-                if (participantsCount > 0 && count == participantsCount.toInt()) {
-                    // If all participants in, stop timer and save config to prevent new warning msg for this chatID
-                    logDebug("Cancel launchTimer when all participants in")
-                    cancelCountDownTimer()
-
-                    if (STATE_FINISH != inMeetingViewModel.shouldShowWarningMessage()) {
-                        bCountDownTimerStart = false
-                        inMeetingViewModel.updateShowWarningMessage(STATE_CANCEL)
-                    }
-
-                    meetingActivity.snackbar?.dismiss()
-                    LiveEventBus.get(EVENT_MEETING_INCOMPATIBILITY_SHOW, Boolean::class.java)
-                        .post(false)
-                }
-                if (participantsCount > 0 && count < participantsCount.toInt()) {
-                    val currentStep = inMeetingViewModel.shouldShowWarningMessage()
-                    if (STATE_FINISH != currentStep && STATE_CANCEL != currentStep) {
-                        logDebug("launchTimer - when not all participants in")
-                        launchTimer()
-                    }
-                }
             }
         }
 
@@ -2290,7 +2106,6 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
             // Delay a bit to wait for 'bannerMuteLayout' finish layouting, otherwise, its bottom is 0.
             RunOnUIThreadUtils.runDelay(10) {
                 adjustPositionOfFloatingWindow(
-                    bConsiderSnackbar = false,
                     bTop = true,
                     bBottom = false
                 )
@@ -2722,7 +2537,6 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
         disableCamera()
         removeUI()
         logDebug("Finishing the activity")
-        meetingActivity.snackbar?.dismiss()
         meetingActivity.finish()
     }
 
@@ -2783,7 +2597,6 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
         meetingActivity.startActivityForResult(
             inviteParticipantIntent, REQUEST_ADD_PARTICIPANTS
         )
-        bInviteSent = false
     }
 
     /**
@@ -2845,7 +2658,6 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
         super.onDestroy()
 
         sharedModel.hideSnackBar()
-        inMeetingViewModel.hideSnackBarWarningMsg()
         bannerAnotherCallLayout.isVisible = false
         bannerParticipant?.isVisible = false
         bannerInfo?.isVisible = false
@@ -2863,23 +2675,11 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
         super.onResume()
         MegaApplication.getInstance().startProximitySensor()
         checkChildFragments()
-
-        // The same chatId and the timer is paused, so resume it
-        if (STATE_RESUME == inMeetingViewModel.shouldShowWarningMessage()) {
-            logDebug("launchTimer when onResume")
-            launchTimer()
-        }
     }
 
     override fun onPause() {
         super.onPause()
-        logDebug("Cancel launchTimer when onPause and update STATE_RESUME")
-        cancelCountDownTimer()
-
-        val state = inMeetingViewModel.shouldShowWarningMessage()
-        if (state != STATE_FINISH && state != STATE_CANCEL) {
-            inMeetingViewModel.updateShowWarningMessage(STATE_RESUME)
-        }
+        MegaApplication.getInstance().unregisterProximitySensor()
     }
 
     override fun onStop() {
@@ -2953,6 +2753,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
             inMeetingViewModel.answerChatCall(
                 camIsEnable,
                 micIsEnable,
+                speakerIsEnable,
                 AnswerChatCallListener(requireContext(), this)
             )
         }

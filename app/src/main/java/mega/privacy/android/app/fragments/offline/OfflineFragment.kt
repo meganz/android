@@ -24,7 +24,6 @@ import androidx.recyclerview.widget.GridLayoutManager.SpanSizeLookup
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.OnScrollListener
-import com.jeremyliao.liveeventbus.LiveEventBus
 import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.MimeTypeList
 import mega.privacy.android.app.R
@@ -40,6 +39,7 @@ import mega.privacy.android.app.fragments.homepage.SortByHeaderViewModel
 import mega.privacy.android.app.fragments.homepage.disableRecyclerViewAnimator
 import mega.privacy.android.app.fragments.homepage.main.HomepageFragmentDirections
 import mega.privacy.android.app.globalmanagement.SortOrderManagement
+import mega.privacy.android.app.imageviewer.ImageViewerActivity
 import mega.privacy.android.app.lollipop.*
 import mega.privacy.android.app.textEditor.TextEditorActivity
 import mega.privacy.android.app.utils.*
@@ -51,6 +51,7 @@ import mega.privacy.android.app.utils.LogUtil.logError
 import mega.privacy.android.app.utils.OfflineUtils.getOfflineFile
 import mega.privacy.android.app.utils.StringUtils.toSpannedHtmlText
 import mega.privacy.android.app.utils.Util.*
+import mega.privacy.android.app.zippreview.ui.ZipBrowserActivity
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
 import java.io.File
@@ -541,29 +542,23 @@ class OfflineFragment : Fragment(), ActionMode.Callback, Scrollable {
         when {
             mime.isZip -> {
                 logDebug("MimeTypeList ZIP")
-                val intentZip = Intent(context, ZipBrowserActivityLollipop::class.java)
-                intentZip.action = ZipBrowserActivityLollipop.ACTION_OPEN_ZIP_FILE
+                val intentZip = Intent(context, ZipBrowserActivity::class.java)
+                intentZip.action = ZipBrowserActivity.ACTION_OPEN_ZIP_FILE
                 intentZip.putExtra(
-                    ZipBrowserActivityLollipop.EXTRA_ZIP_FILE_TO_OPEN,
+                    ZipBrowserActivity.EXTRA_ZIP_FILE_TO_OPEN,
                     viewModel.path
                 )
-                intentZip.putExtra(ZipBrowserActivityLollipop.EXTRA_PATH_ZIP, file.absolutePath)
+                intentZip.putExtra(ZipBrowserActivity.EXTRA_PATH_ZIP, file.absolutePath)
                 startActivity(intentZip)
             }
             mime.isImage -> {
-                val intent = Intent(context, FullScreenImageViewerLollipop::class.java)
-                intent.putExtra(INTENT_EXTRA_KEY_POSITION, position)
-                intent.putExtra(INTENT_EXTRA_KEY_ADAPTER_TYPE, OFFLINE_ADAPTER)
-                intent.putExtra(INTENT_EXTRA_KEY_PARENT_NODE_HANDLE, INVALID_HANDLE)
-                intent.putExtra(INTENT_EXTRA_KEY_OFFLINE_PATH_DIRECTORY, file.parent)
-
-                intent.putExtra(INTENT_EXTRA_KEY_HANDLE, node.node.handle)
-                putThumbnailLocation(intent, recyclerView!!, position, VIEWER_FROM_OFFLINE, adapter!!)
-
-                intent.putExtra(
-                    INTENT_EXTRA_KEY_ARRAY_OFFLINE, ArrayList(adapter!!.getOfflineNodes())
+                val handles = adapter!!.getOfflineNodes().map { it.handle.toLong() }.toLongArray()
+                val intent = ImageViewerActivity.getIntentForOfflineChildren(
+                    requireContext(),
+                    handles,
+                    node.node.handle.toLongOrNull()
                 )
-
+                putThumbnailLocation(intent, recyclerView!!, position, VIEWER_FROM_OFFLINE, adapter!!)
                 startActivity(intent)
                 requireActivity().overridePendingTransition(0, 0)
             }

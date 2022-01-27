@@ -66,8 +66,6 @@
     <string name="general_error_word">Erro</string>
     <!-- when clicking into a menu whose functionality is not yet implemented -->
     <string name="general_not_yet_implemented">Não implementado</string>
-    <!-- when any file or folder is selected -->
-    <string name="error_no_selection">Nenhum arquivo ou pasta foi selecionado</string>
     <!-- when trying to download a file that is already downloaded in the device -->
     <string name="general_already_downloaded">Já foi baixado</string>
     <!-- when trying to upload a file that is already uploaded in the folder -->
@@ -100,8 +98,6 @@
     <string name="action_create_folder">Criar nova pasta</string>
     <!-- Option which allows create a new text file -->
     <string name="action_create_txt">Criar um arquivo de texto novo</string>
-    <!-- Menu option to open a link. Also title of the dialog to open a link. -->
-    <string name="action_open_link">Abrir link</string>
     <!-- Menu item -->
     <string name="action_settings">Configurações</string>
     <!-- Search button -->
@@ -631,10 +627,6 @@
     <string name="upload_to_audio">Áudio</string>
     <!-- Title of the button in the contact info screen to start a video call -->
     <string name="upload_to_video">Vídeo</string>
-    <!-- upload to. Then choose to browse the file system to choose a file -->
-    <string name="upload_to_filesystem">Selecionar do sistema de arquivos</string>
-    <!-- upload to. Then choose to browse the file system to choose a file -->
-    <string name="upload_to_filesystem_from">Selecionar do</string>
     <!-- Label for the current uploaded size of a file. For example, 3 files, 50KB uploaded -->
     <string name="upload_uploaded">enviado</string>
     <!-- Status text at the beginning of an upload, Status text at the beginning of an upload for 2 or more files -->
@@ -1001,8 +993,6 @@
     <string name="settings_disable_logs">Os logs foram desativados</string>
     <!-- Snackbar error message triggered by host error when user is trying to setup MEGA Camera Uploads folder in settings page -->
     <string name="error_unable_to_setup_cloud_folder">Não foi possível configurar a pasta para os Uploads da câmera no MEGA</string>
-    <!-- Message displayed when the user denies the required permissions during the logs activation -->
-    <string name="logs_not_enabled_permissions">Os logs não foram ativados porque você não proporcionou as permissões necessárias</string>
     <!-- Option in the sliding panel to open the folder which contains the file selected after performing a search -->
     <string name="search_open_location">Abrir localização</string>
     <!-- message when a temporary error on logging in is due to SDK is waiting for the server to complete a request due to an API lock -->
@@ -1428,7 +1418,7 @@
     <!-- settings of the chat to choose the status -->
     <string name="settings_chat_vibration">Vibrar</string>
     <!-- Button text shown on SMS verification page, if the user wants to logout current suspended account and login with another account, user can press this button to logout -->
-    <string name="sms_logout">[A]Fazer logout[/A] para usar o MEGA com outra conta</string>
+    <string name="sms_logout">[A]Fazer logout[/A] para trocar de conta MEGA</string>
     <!-- On SMS verification page, if the user presses the logout button, a dialog with this text will show to ask for user’s confirmation. -->
     <string name="confirm_logout_from_sms_verification">Você tem certeza de que quer fazer logout desta conta?</string>
     <!-- Text shown when a message has been deleted in the chat -->
@@ -2780,16 +2770,12 @@
     <string name="message_set_chat_private">[A]%1$s[/A][B] ativou a rotação da chave de criptografia.[/B]</string>
     <!-- error message shown when a chat link is invalid -->
     <string name="invalid_chat_link">Já não é possível acessar este chat</string>
-    <!-- error message shown when a chat link is not well formed -->
-    <string name="invalid_chat_link_args">Link de chat inválido</string>
     <!-- When it is creating a new group chat, this option permits to establish it private or public -->
     <string name="ekr_label">Rotação da chave de criptografia</string>
     <!-- Text of the dialog to change a public chat to private (enable encryption key rotation) -->
     <string name="ekr_explanation">A rotação da chave de criptografia é um pouco mais segura, mas não permite que você crie um link do chat, e os novos participantes não verão as mensagens anteriores.</string>
     <!-- Text of the dialog to change a public chat to private (enable encryption key rotation) -->
     <string name="subtitle_chat_message_enabled_ERK">A rotação da chave de criptografia é um pouco mais segura, mas não permite que você crie um link do chat, e os novos participantes não verão as mensagens anteriores.</string>
-    <!-- Menu item -->
-    <string name="action_open_chat_link">Abrir o link do chat</string>
     <!-- Message shown when a contact request has not been sent because the invitation has been sent before -->
     <string name="invite_not_sent_already_sent">A solicitação de contato a %s já foi enviada anteriormente e pode ser consultada na aba Solicitações enviadas.</string>
     <!-- Label shown to indicate the QR is saving in Cloud Drive -->
@@ -3104,8 +3090,6 @@
     </plurals>
     <!-- Title of a chat message that contains geolocation info -->
     <string name="title_geolocation_message">Fixar localização</string>
-    <!-- Text of the button to indicate an attachment upload from file system -->
-    <string name="attachment_upload_panel_from_device">Do sistema de arquivos</string>
     <!-- Alert shown when a num of files have not been sent because of any error occurs, Plural of file. 2 files -->
     <plurals name="num_files_not_send">
         <item quantity="one">%d arquivo não foi enviado para %d chats</item>
@@ -3248,22 +3232,6 @@
     <string name="text_join_call">Para participar dessa chamada, você precisa finalizar a sua chamada atual.</string>
     <!-- Text of the dialog shown when you want to join a group call but you are in another active call -->
     <string name="text_join_another_call">Para participar dessa chamada, você precisa finalizar ou colocar em espera a chamada atual.</string>
-    <!-- Hint shown in the open chat link alert dialog -->
-    <string name="hint_enter_chat_link">Digite o link do chat</string>
-    <!-- Hint shown in the open link alert dialog -->
-    <string name="hint_paste_link">Colar link</string>
-    <!-- Error shown when it tries to open an invalid file or folder link -->
-    <string name="invalid_file_folder_link">Link de arquivo/pasta inválido</string>
-    <!-- Error shown when it tries to open an invalid file or folder link and the text view is empty -->
-    <string name="invalid_file_folder_link_empty">Digite um link de arquivo/pasta válido</string>
-    <!-- Error shown when it tries to open an invalid chat link and the text view is empty -->
-    <string name="invalid_chat_link_empty">Digite um link de chat válido</string>
-    <!-- Error shown when it tries to open a chat link from the Cloud Drive section -->
-    <string name="valid_chat_link">Você digitou um link de chat.</string>
-    <!-- Error shown when it tries to open a contact link from the Cloud Drive section -->
-    <string name="valid_contact_link">Você digitou um link de contato.</string>
-    <!-- Menu item -->
-    <string name="action_open_contact_link">Abrir link de contato</string>
     <!-- Explanation of the dialog shown to share a chat link -->
     <string name="copy_link_explanation">Outras pessoas podem participar do seu grupo usando este link.</string>
     <!-- Label that indicates the creation of a chat link -->
@@ -3746,7 +3714,7 @@
     <!-- Context menu item. Allows user to delete file/folder from favourites -->
     <string name="file_properties_unfavourite">Remover favorito</string>
     <!-- Context menu item. Allows to mark file/folder with own color label -->
-    <string name="file_properties_label">Etiqueta&#8230;</string>
+    <string name="file_properties_label">Etiqueta</string>
     <!-- Information text to let’s the user know that they can remove a colour from a folder or file that was already marked. -->
     <string name="action_remove_label">Remover etiqueta</string>
     <!-- Title text to show label selector. -->
@@ -3778,19 +3746,13 @@
     <!-- Preferences screen item title for cookie settings -->
     <string name="settings_about_cookie_settings">Configurações de cookies</string>
     <!-- Cookie dialog title -->
-    <string name="dialog_cookie_alert_title">Antes de continuar</string>
+    <string name="dialog_cookie_alert_title">A sua privacidade</string>
     <!-- Cookie dialog message. Please, keep the placeholders to format the string. -->
-    <string name="dialog_cookie_alert_message">Usamos armazenamento local e tecnologias semelhantes (“cookies”) para levar os nossos serviços a você, melhorar a sua experiência com os nossos serviços e personalizar os anúncios que você visualiza, inclusive por meio de terceiros. Você pode aceitar o nosso uso dos cookies desde o início da sua visita ou personalizar os cookies nas Configurações de cookies. Para mais informações, acesse a nossa [A]Política de cookies[/A].</string>
+    <string name="dialog_cookie_alert_message">Usamos Cookies e tecnologias semelhantes (“Cookies”) para fornecer e melhorar a sua experiência com os nossos serviços. Você pode aceitar o nosso uso de Cookies desde o início da sua visita ou personalizar os Cookies nas Configurações de Cookies. Para mais informações, acesse a nossa [A]Política de Cookies[/A].</string>
     <!-- Cookie dialog message showed when there are unsaved settings. -->
     <string name="dialog_cookie_alert_unsaved">As configurações dos cookies não foram salvas.</string>
     <!-- Snackbar message showed when there settings has been saved successfully. -->
     <string name="dialog_cookie_snackbar_saved">As alterações nas configurações dos cookies foram salvas</string>
-    <!-- Cookie dialog third party first subtitle -->
-    <string name="dialog_cookie_thirdparty_subtitle1">Cookies de publicidade do Google</string>
-    <!-- Cookie dialog third party second subtitle -->
-    <string name="dialog_cookie_thirdparty_subtitle2">Categoria: Cookies de publicidade</string>
-    <!-- Cookie dialog third party message. Please, keep the placeholders to format the string. -->
-    <string name="dialog_cookie_thirdparty_message">Usados pelo Google para:\n• personalizar os anúncios que o Google exibe nos nossos e em outros serviços e sites, com base em aspectos como a sua localização e outros sites que você já visitou;\n• monitorar a freqüência com que alguns anúncios são exibidos;\n• proporcionar prevenção de fraude;; e\n• determinar quando você toca em um anúncio específico e rastrear as ações que você realiza a continuação, em resposta a esse anúncio.\nhttps://policies.google.com/technologies/partner-sites</string>
     <!-- Preference screen item title -->
     <string name="preference_cookies_accept">Aceitar cookies</string>
     <!-- Preference screen item title -->
@@ -3798,21 +3760,9 @@
     <!-- Preference screen item summary -->
     <string name="preference_cookies_essential_summary">São essenciais para poder proporcionar funções importantes e acesso seguro aos nossos serviços. Por este motivo, não requerem consentimento.</string>
     <!-- Preference screen item title -->
-    <string name="preference_cookies_preference_title">Cookies de preferência</string>
-    <!-- Preference screen item summary -->
-    <string name="preference_cookies_preference_summary">Permitem que nós lembremos de certas configurações de visualização e formatação que você escolher. Não aceitar esses cookies fará com que não sejamos capazes de lembrar algumas coisas, como o seu layout de tela preferido.</string>
-    <!-- Preference screen item title -->
     <string name="preference_cookies_performance_title">Cookies de desempenho e análise</string>
     <!-- Preference screen item summary -->
     <string name="preference_cookies_performance_summary">Ajudam que nós possamos entender como você usa os nossos serviços, e nos proporciona dados que poderão ser usados para fazer aprimoramentos. Não aceitar esses cookies fará com que tenhamos menos dados disponíveis para ajudar a desenvolver melhorias.</string>
-    <!-- Preference screen item title -->
-    <string name="preference_cookies_advertising_title">Cookies de publicidade</string>
-    <!-- Preference screen item summary -->
-    <string name="preference_cookies_advertising_summary">São usados por nós e pelos nossos parceiros de publicidade oficiais para personalizar os anúncios que você vê nos nossos serviços e em outros sites, com base no seu histórico de navegação. Não aceitar esses cookies significa que os anúncios mostrados poderão ser menos relevantes.</string>
-    <!-- Preference screen item title -->
-    <string name="preference_cookies_thirdparty_title">Cookies de terceiros</string>
-    <!-- Preference screen item summary. Please, keep the placeholders to format the string. -->
-    <string name="preference_cookies_thirdparty_summary">Esses são cookies controlados por outras pessoas diferentes de nós; usamos esses cookies para fornecer os tipos de funções descritos acima. Não aceitar esses cookies poderá ter implicações diferentes, dependendo do tipo de cada cookie de terceiros. Pressione “Mais informações” abaixo para obter detalhes sobre todos os cookies de terceiros que usamos.</string>
     <!-- Preference screen item state description -->
     <string name="preference_cookies_always_on">Sempre ativo</string>
     <!-- Menu option that allows the user to scan document and upload it directly to MEGA. -->
@@ -4035,9 +3985,9 @@
     <!-- General label for microphone -->
     <string name="general_mic">Microfone</string>
     <!-- General label for microphone muted -->
-    <string name="general_mic_mute">O seu microfone está silenciado</string>
+    <string name="general_mic_mute">O seu microfone está desativado</string>
     <!-- General label for microphone unmuted -->
-    <string name="general_mic_unmute">O seu microfone já não está silenciado</string>
+    <string name="general_mic_unmute">O seu microfone está ativado</string>
     <!-- General label for camera -->
     <string name="general_camera">Câmera</string>
     <!-- General label for camera enable -->
@@ -4190,4 +4140,10 @@
     <string name="image_insertion_not_allowed">O MEGA não suporta a inserção de imagens aqui</string>
     <!-- The label under the button of viewing all images screen -->
     <string name="section_images">Imagens</string>
+    <!-- Title of the dialog warning the user about disable file versioning. -->
+    <string name="disable_versioning_label">Desativar o controle das versões de arquivos</string>
+    <!-- Warning of the dialog informing the user about disable file versioning. -->
+    <string name="disable_versioning_warning">Nosso recurso de controle de versão de arquivos garante que manteremos cópias mais antigas se você substituí-las por versões mais recentes. Se você desativar o Controle de Versão de Arquivos, não terá mais essa proteção; a cópia antiga será perdida quando você a substituir.</string>
+    <!-- Warning informing the user the folder location is trying to open no longer exists. -->
+    <string name="location_not_exist">Esta localização não existe mais.</string>
 </resources>

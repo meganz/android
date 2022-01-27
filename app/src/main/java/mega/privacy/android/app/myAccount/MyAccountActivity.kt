@@ -37,7 +37,7 @@ import mega.privacy.android.app.utils.LogUtil.logError
 import mega.privacy.android.app.utils.MenuUtils.toggleAllMenuItemsVisibility
 import mega.privacy.android.app.utils.StringResourcesUtils
 import mega.privacy.android.app.utils.Util.*
-import nz.mega.documentscanner.utils.ViewUtils.hideKeyboard
+import mega.privacy.android.app.utils.ViewUtils.hideKeyboard
 import nz.mega.sdk.MegaError.API_OK
 import java.util.*
 
@@ -562,7 +562,7 @@ class MyAccountActivity : PasscodeActivity(), MyAccountFragment.MessageResultCal
 
                 editLayout.hint =
                     StringResourcesUtils.getString(R.string.edit_text_insert_pass)
-                        .capitalize(Locale.ROOT)
+                        .replaceFirstChar { it.uppercase(Locale.ROOT) }
 
                 textField.apply {
                     setOnEditorActionListener { _, actionId, _ ->

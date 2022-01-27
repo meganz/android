@@ -65,6 +65,7 @@ import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.MimeTypeThumbnail;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.activities.PasscodeActivity;
+import mega.privacy.android.app.utils.MegaNodeUtil;
 import mega.privacy.android.app.utils.MegaProgressDialogUtil;
 import mega.privacy.android.app.components.SimpleDividerItemDecoration;
 import mega.privacy.android.app.components.attacher.MegaAttacher;
@@ -82,6 +83,7 @@ import mega.privacy.android.app.utils.LocationInfo;
 import mega.privacy.android.app.utils.CameraUploadUtil;
 import mega.privacy.android.app.utils.ContactUtil;
 import mega.privacy.android.app.utils.StringResourcesUtils;
+import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaContactRequest;
 import nz.mega.sdk.MegaError;
@@ -639,7 +641,7 @@ public class FileInfoActivityLollipop extends PasscodeActivity implements OnClic
         if (extras != null){
             from = extras.getInt("from");
             if(from==FROM_INCOMING_SHARES){
-                firstIncomingLevel = extras.getBoolean("firstLevel");
+                firstIncomingLevel = extras.getBoolean(INTENT_EXTRA_KEY_FIRST_LEVEL);
             }
 
             long handleNode = extras.getLong("handle", -1);
@@ -869,7 +871,7 @@ public class FileInfoActivityLollipop extends PasscodeActivity implements OnClic
         MegaNode parent = megaApi.getNodeByHandle(node.getHandle());
 
         if (parent != null) {
-            parent = getRootParentNode(parent);
+            parent = MegaNodeUtil.getRootParentNode(megaApi, parent);
 
             if (parent.getHandle() == megaApi.getRubbishNode().getHandle()) {
                 deleteMenuItem.setVisible(true);
@@ -1426,8 +1428,9 @@ public class FileInfoActivityLollipop extends PasscodeActivity implements OnClic
 						offlineSwitch.setChecked(false);
 						mOffDelete = dbH.findByHandle(handle);
                         removeOffline(mOffDelete, dbH, this);
-						supportInvalidateOptionsMenu();
-					}
+                        Util.showSnackbar(this,
+                                getResources().getString(R.string.file_removed_offline));
+                    }
 					else{
                         logDebug("NOT Checked");
                         isRemoveOffline = false;
@@ -1440,17 +1443,20 @@ public class FileInfoActivityLollipop extends PasscodeActivity implements OnClic
 
 						if (isFileAvailable(destination) && destination.isDirectory()){
 							File offlineFile = new File(destination, node.getName());
-							if (isFileAvailable(offlineFile) && node.getSize() == offlineFile.length() && offlineFile.getName().equals(node.getName())){ //This means that is already available offline
-								return;
-							}
+                            if (isFileAvailable(offlineFile)
+                                    && node.getSize() == offlineFile.length()
+                                    && offlineFile.getName().equals(node.getName())) {
+                                //This means that is already available offline
+                                return;
+                            }
 						}
 
                         logDebug("Handle to save for offline : " + node.getHandle());
                         saveOffline(destination, node, fileInfoActivityLollipop);
 
-						supportInvalidateOptionsMenu();
-					}
-				}
+                    }
+                    supportInvalidateOptionsMenu();
+                }
 				else{
                     logDebug("Not owner");
 					if (!isChecked){
@@ -2275,7 +2281,7 @@ public class FileInfoActivityLollipop extends PasscodeActivity implements OnClic
 
 	@Override
 	public void onBackPressed() {
-        if (psaWebBrowser.consumeBack()) return;
+        if (psaWebBrowser != null && psaWebBrowser.consumeBack()) return;
         retryConnectionsAndSignalPresence();
 
         if(isRemoveOffline){

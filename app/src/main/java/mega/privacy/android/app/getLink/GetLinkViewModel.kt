@@ -1,9 +1,9 @@
 package mega.privacy.android.app.getLink
 
 import android.content.Intent
-import androidx.hilt.lifecycle.ViewModelInject
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import dagger.hilt.android.lifecycle.HiltViewModel
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.kotlin.addTo
 import io.reactivex.rxjava3.kotlin.subscribeBy
@@ -27,6 +27,7 @@ import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaNode
 import java.text.SimpleDateFormat
 import java.util.*
+import javax.inject.Inject
 
 /**
  * View Model used for manage data related to get or manage a link.
@@ -38,7 +39,8 @@ import java.util.*
  * @property encryptLinkWithPasswordUseCase Use case to encrypt a link with a password.
  * @property exportNodeUseCase              Use case to export a node.
  */
-class GetLinkViewModel @ViewModelInject constructor(
+@HiltViewModel
+class GetLinkViewModel @Inject constructor(
     @MegaApi private val megaApi: MegaApiAndroid,
     private val dbH: DatabaseHandler,
     private val encryptLinkWithPasswordUseCase: EncryptLinkWithPasswordUseCase,
@@ -98,7 +100,7 @@ class GetLinkViewModel @ViewModelInject constructor(
         if (!this::linkFragmentTitle.isInitialized) {
             linkFragmentTitle =
                 if (node.isExported) {
-                    getString(R.string.edit_link_option).toUpperCase(Locale.getDefault())
+                    getString(R.string.edit_link_option).uppercase(Locale.getDefault())
                 } else {
                     getQuantityString(R.plurals.get_links, 1)
                 }
@@ -139,7 +141,7 @@ class GetLinkViewModel @ViewModelInject constructor(
      * @param expiryDate Expiry date to export.
      */
     fun exportWithTimestamp(expiryDate: Int) {
-        exportNodeUseCase.exportWithTimestamp(node, expiryDate)
+        exportNodeUseCase.export(node, expiryDate)
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeBy(

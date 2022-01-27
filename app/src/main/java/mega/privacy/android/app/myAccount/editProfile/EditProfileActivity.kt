@@ -253,7 +253,7 @@ class EditProfileActivity : PasscodeActivity(), PhotoBottomSheetDialogFragment.P
 
         LiveEventBus.get(EVENT_USER_NAME_UPDATED, Boolean::class.java).observe(this) {
             binding.headerLayout.firstLineToolbar.text =
-                viewModel.getName().toUpperCase(Locale.getDefault())
+                viewModel.getName().uppercase(Locale.getDefault())
         }
 
         LiveEventBus.get(EVENT_USER_EMAIL_UPDATED, Boolean::class.java).observe(this) {
@@ -273,7 +273,7 @@ class EditProfileActivity : PasscodeActivity(), PhotoBottomSheetDialogFragment.P
     private fun updateName(success: Boolean) {
         binding.progressBar.isVisible = false
         binding.headerLayout.firstLineToolbar.text =
-            viewModel.getName().toUpperCase(Locale.getDefault())
+            viewModel.getName().uppercase(Locale.getDefault())
 
         showSnackbar(
             StringResourcesUtils.getString(
@@ -434,7 +434,7 @@ class EditProfileActivity : PasscodeActivity(), PhotoBottomSheetDialogFragment.P
         firstLineTextMaxWidthExpanded = outMetrics.widthPixels - dp2px(108f, outMetrics)
         binding.headerLayout.firstLineToolbar.apply {
             setMaxWidthEmojis(firstLineTextMaxWidthExpanded)
-            text = viewModel.getName().toUpperCase(Locale.getDefault())
+            text = viewModel.getName().uppercase(Locale.getDefault())
             textSize = NAME_SIZE
         }
 

@@ -34,8 +34,11 @@ import static mega.privacy.android.app.listeners.ShareListener.*;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.MegaApiUtils.*;
+import static mega.privacy.android.app.utils.MegaNodeDialogUtil.BACKUP_NONE;
+import static mega.privacy.android.app.utils.MegaNodeUtil.checkBackupNodeTypeByHandle;
 import static mega.privacy.android.app.utils.StringResourcesUtils.getString;
 import static mega.privacy.android.app.utils.Util.*;
+import static nz.mega.sdk.MegaShare.ACCESS_READ;
 
 public class NodeController {
 
@@ -139,33 +142,6 @@ public class NodeController {
         ((ManagerActivityLollipop) context).startActivityForResult(intent, REQUEST_CODE_SELECT_FOLDER_TO_MOVE);
     }
 
-    public void moveNodes(long[] moveHandles, long toHandle){
-        logDebug("moveNodes");
-
-        if(!isOnline(context)){
-            ((SnackbarShower) context).showSnackbar(SNACKBAR_TYPE, getString(R.string.error_server_connection_problem), -1);
-            return;
-        }
-
-        MegaNode parent = megaApi.getNodeByHandle(toHandle);
-        if(parent!=null){
-            MultipleRequestListener moveMultipleListener = new MultipleRequestListener(MULTIPLE_MOVE, context);
-
-            if(moveHandles.length>1){
-                logDebug("MOVE multiple: " + moveHandles.length);
-
-                for(int i=0; i<moveHandles.length;i++){
-                    megaApi.moveNode(megaApi.getNodeByHandle(moveHandles[i]), parent, moveMultipleListener);
-                }
-            }
-            else{
-                logDebug("MOVE single");
-
-                megaApi.moveNode(megaApi.getNodeByHandle(moveHandles[0]), parent, (ManagerActivityLollipop) context);
-            }
-        }
-    }
-
     public void checkIfNodesAreMine(List<MegaNode> nodes, ArrayList<MegaNode> ownerNodes, ArrayList<MegaNode> notOwnerNodes) {
         MegaNode currentNode;
 
@@ -218,8 +194,8 @@ public class NodeController {
         }
     }
 
-    public MegaNode getParent (MegaNode node) {
-        return MegaNodeUtil.getRootParentNode(node);
+    public MegaNode getParent(MegaNode node) {
+        return MegaNodeUtil.getRootParentNode(megaApi, node);
     }
 
     public int getIncomingLevel(MegaNode node) {
@@ -346,47 +322,6 @@ public class NodeController {
         intent.putExtra("MULTISELECT", 0);
         intent.putExtra(AddContactActivityLollipop.EXTRA_NODE_HANDLE, node.getHandle());
         ((ManagerActivityLollipop) context).startActivityForResult(intent, REQUEST_CODE_SELECT_CONTACT);
-    }
-
-    public void moveToTrash(final ArrayList<Long> handleList, boolean moveToRubbish){
-        logDebug("moveToTrash: " + moveToRubbish);
-
-        MultipleRequestListener moveMultipleListener = null;
-        MegaNode parent;
-        //Check if the node is not yet in the rubbish bin (if so, remove it)
-        if(handleList!=null){
-            if(handleList.size()>1){
-                logDebug("MOVE multiple: " + handleList.size());
-                if (moveToRubbish){
-                    moveMultipleListener = new MultipleRequestListener(MULTIPLE_SEND_RUBBISH, context);
-                }
-                else{
-                    moveMultipleListener = new MultipleRequestListener(MULTIPLE_MOVE, context);
-                }
-                for (int i=0;i<handleList.size();i++){
-                    if (moveToRubbish){
-                        megaApi.moveNode(megaApi.getNodeByHandle(handleList.get(i)), megaApi.getRubbishNode(), moveMultipleListener);
-
-                    }
-                    else{
-                        megaApi.remove(megaApi.getNodeByHandle(handleList.get(i)), moveMultipleListener);
-                    }
-                }
-            }
-            else{
-                logDebug("MOVE single");
-                if (moveToRubbish){
-                    megaApi.moveNode(megaApi.getNodeByHandle(handleList.get(0)), megaApi.getRubbishNode(), ((ManagerActivityLollipop) context));
-                }
-                else{
-                    megaApi.remove(megaApi.getNodeByHandle(handleList.get(0)), ((ManagerActivityLollipop) context));
-                }
-            }
-        }
-        else{
-            logWarning("handleList NULL");
-            return;
-        }
     }
 
     public void openFolderFromSearch(long folderHandle){
@@ -609,15 +544,23 @@ public class NodeController {
 
         if (nodeHandles == null || nodeHandles.length == 0) return;
 
-        for (int i = 0; i < nodeHandles.length; i++) {
-            shareFolder(megaApi.getNodeByHandle(nodeHandles[i]), contactsData, permissions);
+        for (long nodeHandle : nodeHandles) {
+            shareFolder(megaApi.getNodeByHandle(nodeHandle), contactsData, permissions);
         }
     }
 
     public void shareFolder(MegaNode node, String email, int permissions, ShareListener shareListener) {
         if (node == null || email == null) return;
 
-        megaApi.share(node, email, permissions, shareListener);
+        int nodeType = checkBackupNodeTypeByHandle(megaApi, node);
+        logDebug("MyBackup + shareFolders nodeType = " + nodeType);
+
+        if (nodeType == BACKUP_NONE) {
+            megaApi.share(node, email, permissions, shareListener);
+        } else {
+            megaApi.share(node, email, ACCESS_READ, shareListener);
+        }
+
     }
 
     public void cleanRubbishBin(){

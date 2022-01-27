@@ -66,8 +66,6 @@
     <string name="general_error_word">Error</string>
     <!-- when clicking into a menu whose functionality is not yet implemented -->
     <string name="general_not_yet_implemented">Not yet implemented</string>
-    <!-- when any file or folder is selected -->
-    <string name="error_no_selection">No file or folder selected</string>
     <!-- when trying to download a file that is already downloaded in the device -->
     <string name="general_already_downloaded">Already downloaded</string>
     <!-- when trying to upload a file that is already uploaded in the folder -->
@@ -93,15 +91,13 @@
     <!-- confirmation message before sending an invitation to a contact -->
     <string name="confirmation_add_contact">Do you want to send an invitation to %s?</string>
     <!-- Button where the user can sign off or logout -->
-    <string name="action_logout">Logout</string>
+    <string name="action_logout">Log&#160;out</string>
     <!-- Item menu option upon right click on one or multiple files. -->
     <string name="action_add">Upload</string>
     <!-- Menu item -->
     <string name="action_create_folder">Create new folder</string>
     <!-- Option which allows create a new text file -->
     <string name="action_create_txt">Create new text file</string>
-    <!-- Menu option to open a link. Also title of the dialog to open a link. -->
-    <string name="action_open_link">Open link</string>
     <!-- Menu item -->
     <string name="action_settings">Settings</string>
     <!-- Search button -->
@@ -131,7 +127,7 @@
     <!-- Menu item to change from grid view to list view -->
     <string name="action_list">List view</string>
     <!-- Title of the preference Recovery key on Settings section -->
-    <string name="action_export_master_key">Backup Recovery Key</string>
+    <string name="action_export_master_key">Back up Recovery Key</string>
     <!-- Menu item to let the user cancel subscriptions -->
     <string name="action_cancel_subscriptions">Cancel subscription</string>
     <!-- success message when the subscription has been canceled correctly -->
@@ -163,7 +159,7 @@
     <!-- Press back while login to cancel current login process. -->
     <string name="confirm_cancel_login">Are you sure that you want to cancel the current login process?</string>
     <!-- Login button -->
-    <string name="login_text">Log in</string>
+    <string name="login_text">Log&#160;in</string>
     <!-- email label -->
     <string name="email_text">Email</string>
     <!-- password label -->
@@ -631,10 +627,6 @@
     <string name="upload_to_audio">Audio</string>
     <!-- Title of the button in the contact info screen to start a video call -->
     <string name="upload_to_video">Video</string>
-    <!-- upload to. Then choose to browse the file system to choose a file -->
-    <string name="upload_to_filesystem">Pick from File System</string>
-    <!-- upload to. Then choose to browse the file system to choose a file -->
-    <string name="upload_to_filesystem_from">Pick from</string>
     <!-- Label for the current uploaded size of a file. For example, 3 files, 50KB uploaded -->
     <string name="upload_uploaded">uploaded</string>
     <!-- Status text at the beginning of an upload, Status text at the beginning of an upload for 2 or more files -->
@@ -1000,7 +992,7 @@
     <!-- Confirmation message when disabling logs in the app -->
     <string name="settings_disable_logs">Logs are now disabled</string>
     <!-- Snackbar error message triggered by host error when user is trying to setup MEGA Camera Uploads folder in settings page -->
-    <string name="error_unable_to_setup_cloud_folder">Unable to setup MEGA Camera Uploads folder</string>
+    <string name="error_unable_to_setup_cloud_folder">Unable to set up MEGA Camera Uploads folder</string>
     <!-- Option in the sliding panel to open the folder which contains the file selected after performing a search -->
     <string name="search_open_location">Open location</string>
     <!-- message when a temporary error on logging in is due to SDK is waiting for the server to complete a request due to an API lock -->
@@ -1018,7 +1010,7 @@
     <!-- Type of account info added to the feedback email sent to support -->
     <string name="my_account_prolite_feedback_email">Pro Lite Account</string>
     <!--  -->
-    <string name="backup_title">Backup your Recovery Key</string>
+    <string name="backup_title">Back up your Recovery Key</string>
     <!-- Subtitle of the screen to backup the master key -->
     <string name="backup_subtitle">Your password unlocks your Recovery Key</string>
     <!-- First paragraph of the screen to backup the master key -->
@@ -1206,11 +1198,11 @@
     <!-- Error message shown when opening a folder link which doesn’t exist -->
     <string name="general_error_folder_not_found">Folder link unavailable</string>
     <!-- Error message shown when opening a folder link which has been removed due to ToS/AUP violation -->
-    <string name="folder_link_unavaible_ToS_violation">The folder link has been removed because of a ToS/AUP violation.</string>
+    <string name="folder_link_unavaible_ToS_violation">The folder link has been removed because of a ToS or AUP violation.</string>
     <!-- Error message shown when opening a file link which doesn’t exist -->
     <string name="general_error_file_not_found">File link unavailable</string>
     <!-- Error message shown when opening a file link which has been removed due to ToS/AUP violation -->
-    <string name="file_link_unavaible_ToS_violation">The file link has been removed because of a ToS/AUP violation.</string>
+    <string name="file_link_unavaible_ToS_violation">The file link has been removed because of a ToS or AUP violation.</string>
     <!-- Error message shown when opening a folder link or file link which has been corrupt or deformed -->
     <string name="link_broken">This URL is corrupt or deformed. The link you are trying to access does not exist.</string>
     <!-- Title of the screen after creating the account. That screen asks the user to confirm the account by checking the email -->
@@ -1426,7 +1418,7 @@
     <!-- settings of the chat to choose the status -->
     <string name="settings_chat_vibration">Vibration</string>
     <!-- Button text shown on SMS verification page, if the user wants to logout current suspended account and login with another account, user can press this button to logout -->
-    <string name="sms_logout">[A]Logout[/A] to use MEGA with another account</string>
+    <string name="sms_logout">[A]Log out[/A] to switch MEGA accounts</string>
     <!-- On SMS verification page, if the user presses the logout button, a dialog with this text will show to ask for user’s confirmation. -->
     <string name="confirm_logout_from_sms_verification">Are you sure that you want to log out of the current account?</string>
     <!-- Text shown when a message has been deleted in the chat -->
@@ -1617,10 +1609,6 @@
     <string name="upload_service_notification">Uploading files: %1$d of %2$d</string>
     <!-- Text of the notification shown when the upload service is paused: e.g. Uploading files: 1 of 10 (paused)-->
     <string name="upload_service_notification_paused">Uploading files: %1$d of %2$d (paused)</string>
-    <!-- Text of the notification shown when the folder upload service is running, e.g. Uploading folders 1 of 2 -->
-    <string name="folder_upload_service_notification">Uploading folders: %1$d of %2$d</string>
-    <!-- Text of the notification shown when the folder upload service is paused, e.g. Uploading folders 1 of 2 (paused) -->
-    <string name="folder_upload_service_notification_paused">Uploading folders: %1$d of %2$d (paused)</string>
     <!-- Text of the notification shown when the upload service has finished, Plural -->
     <plurals name="upload_service_final_notification">
         <item quantity="one">Uploaded %1$d file</item>
@@ -1630,11 +1618,6 @@
     <plurals name="upload_service_notification_already_uploaded">
         <item quantity="one">1 file already uploaded</item>
         <item quantity="other">%1$d files already uploaded</item>
-    </plurals>
-    <!-- Text of the notification shown when the folder upload service has finished, Text of the notification shown when the folder upload service has finished - plural  e.g. Uploaded 2 folders -->
-    <plurals name="folder_upload_service_final_notification">
-        <item quantity="one">Uploaded %1$d folder</item>
-        <item quantity="other">Uploaded %1$d folders</item>
     </plurals>
     <!-- label for the total file size of multiple files and/or folders (no need to put the colon punctuation in the translation) -->
     <string name="general_total_size">Total size: %1$s</string>
@@ -1712,9 +1695,9 @@
     <!-- text_copyright_alert_title -->
     <string name="copyright_alert_title">Copyright warning to all users</string>
     <!-- text_copyright_alert_first_paragraph -->
-    <string name="copyright_alert_first_paragraph">MEGA respects the copyrights of others and requires that users of the MEGA cloud service comply with the laws of copyright.</string>
+    <string name="copyright_alert_first_paragraph">MEGA respects the copyrights of others and requires that users of the MEGA Cloud service comply with the laws of copyright.</string>
     <!-- text_copyright_alert_second_paragraph -->
-    <string name="copyright_alert_second_paragraph">You are strictly prohibited from using the MEGA cloud service to infringe copyrights. You may not upload, download, store, share, display, stream, distribute, email, link to, transmit or otherwise make available any files, data or content that infringes any copyright or other proprietary rights of any person or entity.</string>
+    <string name="copyright_alert_second_paragraph">You are strictly prohibited from using the MEGA Cloud service to infringe copyrights. You may not upload, download, store, share, display, stream, distribute, email, link to, transmit or otherwise make available any files, data or content that infringes any copyright or other proprietary rights of any person or entity.</string>
     <!-- text of the Agree button -->
     <string name="copyright_alert_agree_button">Agree</string>
     <!-- text of the Disagree button -->
@@ -1917,13 +1900,13 @@
     <!-- Error shown when the user writes a email with an incorrect format -->
     <string name="invalid_email_to_invite">Email is malformed</string>
     <!-- info paragraph about the achievement install megasync -->
-    <string name="paragraph_info_achievement_install_desktop">When you install MEGA desktop app you get %1$s of complimentary storage space, valid for 365 days. MEGA desktop app is available for Windows, macOS and most Linux distros.</string>
+    <string name="paragraph_info_achievement_install_desktop">When you install the MEGA Desktop App you get %1$s of complimentary storage space, valid for 365 days. The MEGA Desktop App is available for Windows, macOS and most Linux distributions.</string>
     <!-- info paragraph about the achievement install mobile app -->
     <string name="paragraph_info_achievement_install_mobile_app">When you install the MEGA Mobile App you get %1$s of complimentary storage space, valid for 365 days. We provide mobile apps for iOS and Android.</string>
     <!-- info paragraph about the achievement ‘add phone number’. Placeholder 1: bonus storage space e.g. 20GB. Placeholder 2: bonus transfer quota e.g. 50GB -->
     <string name="paragraph_info_achievement_add_phone">When you verify your phone number you get %1$s of complimentary storage space, valid for 365 days.</string>
     <!-- info paragraph about the completed achievement install megasync -->
-    <string name="result_paragraph_info_achievement_install_desktop">You have received %1$s storage space for installing our MEGA desktop app.</string>
+    <string name="result_paragraph_info_achievement_install_desktop">You have received %1$s storage space for installing our MEGA Desktop App.</string>
     <!-- info paragraph about the completed achievement install mobile app -->
     <string name="result_paragraph_info_achievement_install_mobile_app">You have received %1$s storage space for installing the MEGA Mobile App.</string>
     <!-- info paragraph about the completed achievement of ‘add phone number’. Placeholder 1: bonus storage space e.g. 20GB. Placeholder 2: bonus transfer quota e.g. 50GB -->
@@ -2186,7 +2169,7 @@
     <!-- Message error shown when trying to log in on an account has been suspended due to multiple breaches of Terms of Service -->
     <string name="account_suspended_multiple_breaches_ToS">Your account has been suspended due to multiple breaches of MEGA’s Terms of Service. Please check your email inbox.</string>
     <!-- Message error shown when trying to log in on an account has been suspended due to breach of Terms of Service -->
-    <string name="account_suspended_breache_ToS">Your account was terminated due to a breach of MEGA’s Terms of Service including, but not limited to, clause 15.</string>
+    <string name="account_suspended_breache_ToS">Your account was terminated due to a breach of MEGA\’s Terms of Service including, but not limited to, clause 15.</string>
     <!-- In a chat conversation when you try to send device’s images but images are still loading -->
     <string name="file_storage_loading">Loading files</string>
     <!-- In a chat conversation when you try to send device’s images but there aren’t available images -->
@@ -2320,7 +2303,7 @@
     <!-- Message shown to the user when is testing her password and it is correct -->
     <string name="test_pwd_accepted">Password accepted</string>
     <!-- Message shown to the user when is testing her password and it is wrong -->
-    <string name="test_pwd_wrong">Wrong password.\nBackup your Recovery Key as soon as possible!</string>
+    <string name="test_pwd_wrong">Wrong password.\nBack up your Recovery Key as soon as possible!</string>
     <!-- Text of the dialog ‘Recovery Key exported’ when the user wants logout -->
     <string name="recovery_key_exported_dialog_text_logout">You are about to log out, please test your password to ensure you remember it.\nIf you lose your password, you will lose access to your MEGA data.</string>
     <!-- Option that permits user copy to clipboard -->
@@ -2328,7 +2311,7 @@
     <!-- Option that permits user export his recovery key -->
     <string name="option_export_recovery_key">Export Recovery Key</string>
     <!-- Option that permits user logout -->
-    <string name="proceed_to_logout">Proceed to logout</string>
+    <string name="proceed_to_logout">Proceed to log out</string>
     <!-- Title of the preference Recovery key on Settings section -->
     <string name="recovery_key_bottom_sheet">Recovery Key</string>
     <!-- Option that permits user save on File System -->
@@ -2364,7 +2347,7 @@
     <!-- Title of the category Security options on Settings section -->
     <string name="settings_security_options_title">Security</string>
     <!-- Title of the preference Recovery key on Settings section -->
-    <string name="settings_recovery_key_title">Backup Recovery Key</string>
+    <string name="settings_recovery_key_title">Back up Recovery Key</string>
     <!-- Summary of the preference Recovery key on Settings section -->
     <string name="settings_recovery_key_summary">Exporting the Recovery Key and keeping it in a secure location enables you to set a new password without data loss.</string>
     <!-- message when a temporary error on logging in is due to connectivity issues -->
@@ -2443,7 +2426,7 @@
     <!-- Text that explain how to do with Two-Factor Authentication QR -->
     <string name="explain_qr_seed_2fa_1">Scan or copy the seed to your Authenticator App.</string>
     <!-- Text that explain how to do with Two-Factor Authentication seed -->
-    <string name="explain_qr_seed_2fa_2">Be sure to backup this seed to a safe place in case you lose your device.</string>
+    <string name="explain_qr_seed_2fa_2">Be sure to back up this seed to a safe place in case you lose your device.</string>
     <!-- Text that explain how to confirm Two-Factor Authentication -->
     <string name="explain_confirm_2fa">Please enter the 6-digit code generated by your Authenticator App.</string>
     <!-- Text button -->
@@ -2600,7 +2583,10 @@
     <!-- Settings preference title to show file versions info of the account -->
     <string name="settings_file_management_file_versions_title">File versions</string>
     <!-- Settings preference subtitle to show file versions info of the account -->
-    <string name="settings_file_management_file_versions_subtitle">%1$d file versions, taking a total of %2$s</string>
+    <plurals name="settings_file_management_file_versions_subtitle">
+        <item quantity="one">1 file version, taking a total of %2$s</item>
+        <item quantity="other">%1$d file versions, taking a total of %2$s</item>
+    </plurals>
     <!-- Title of the section File management on Settings section -->
     <string name="settings_file_management_category">File Management</string>
     <!-- Option in Settings to delete all the versions of the account -->
@@ -2778,16 +2764,12 @@
     <string name="message_set_chat_private">[A]%1$s[/A][B] enabled encryption key rotation.[/B]</string>
     <!-- error message shown when a chat link is invalid -->
     <string name="invalid_chat_link">This conversation is no longer available</string>
-    <!-- error message shown when a chat link is not well formed -->
-    <string name="invalid_chat_link_args">Invalid chat link</string>
     <!-- When it is creating a new group chat, this option permits to establish it private or public -->
     <string name="ekr_label">Encryption key rotation</string>
     <!-- Text of the dialog to change a public chat to private (enable encryption key rotation) -->
     <string name="ekr_explanation">Encryption key rotation is slightly more secure, but does not allow you to create a chat link and new participants will not see past messages.</string>
     <!-- Text of the dialog to change a public chat to private (enable encryption key rotation) -->
     <string name="subtitle_chat_message_enabled_ERK">Encryption key rotation is slightly more secure, but does not allow you to create a chat link and new participants will not see past messages.</string>
-    <!-- Menu item -->
-    <string name="action_open_chat_link">Open chat link</string>
     <!-- Message shown when a contact request has not been sent because the invitation has been sent before -->
     <string name="invite_not_sent_already_sent">The invitation to contact %s has been sent before and can be consulted in the Sent Requests tab.</string>
     <!-- Label shown to indicate the QR is saving in Cloud Drive -->
@@ -2845,7 +2827,7 @@
     <!-- option to dispute taken down file or folder -->
     <string name="dispute_takendown_file">Dispute Takedown</string>
     <!-- Error shown when download a file that has violated ToS/AUP. -->
-    <string name="error_download_takendown_node">Not accessible due to ToS/AUP violation</string>
+    <string name="error_download_takendown_node">Not accessible due to ToS or AUP violation</string>
     <!-- Alert shown when some files were not downloaded due to ToS/AUP violation, Plural of taken down files. 2 files -->
     <plurals name="alert_taken_down_files">
         <item quantity="one">%d file was not downloaded due to ToS/AUP violation.</item>
@@ -2944,6 +2926,11 @@
         <item quantity="one">%1$d folders · 1 file</item>
         <item quantity="other">%1$d folders · %2$d files</item>
     </plurals>
+    <!-- Indicates the content of the backup folder -->
+    <plurals name="num_devices">
+        <item quantity="one">%d device</item>
+        <item quantity="other">%d devices</item>
+    </plurals>
     <!-- Subtitle of the historic notification for new additions inside an existing shared folder. Placeholders are: email who added the folders or files, number of folders added, number of files added -->
     <string name="subtitle_notification_added_folders_and_files">[A]%1$s[/A][B] added %2$s and %3$s[/B]</string>
     <!-- Subtitle of the historic notification for new additions inside an existing shared folder, Plural of file. 2 files -->
@@ -2985,7 +2972,7 @@
     <!-- Text of the empty screen for the notifications section -->
     <string name="context_empty_notifications">[B]No [/B][A]Notifications[/A]</string>
     <!-- Permissions screen title -->
-    <string name="general_setup_mega">Setup MEGA</string>
+    <string name="general_setup_mega">Set up MEGA</string>
     <!-- Permissions screen explanation -->
     <string name="setup_mega_explanation">MEGA needs your permission to access your media and files for sharing. Other access permissions may be needed for exchanging encrypted messages and to make secure calls.</string>
     <!-- Title of the screen asking permissions for files -->
@@ -3102,8 +3089,6 @@
     </plurals>
     <!-- Title of a chat message that contains geolocation info -->
     <string name="title_geolocation_message">Pinned Location</string>
-    <!-- Text of the button to indicate an attachment upload from file system -->
-    <string name="attachment_upload_panel_from_device">From File System</string>
     <!-- Alert shown when a num of files have not been sent because of any error occurs, Plural of file. 2 files -->
     <plurals name="num_files_not_send">
         <item quantity="one">%d file was not sent to %d chats</item>
@@ -3196,8 +3181,8 @@
     <string name="not_allow_play_alert">It is not possible to play media files while there is a call in progress.</string>
     <!-- Text shown in the list of chats when there is a call in progress but I am not on it -->
     <string name="ongoing_call_messages">Ongoing Call</string>
-    <!-- Title of the layout to join a group call from the chat screen. The placeholder indicates the user who initiated the call -->
-    <string name="join_call_layout_in_group_call">%s started a group call. Tap to join.</string>
+    <!-- Title of the layout to join a group call from the chat screen. -->
+    <string name="join_call_layout_in_group_call">Tap to join current group call.</string>
     <!-- Title of the layout to return to a call -->
     <string name="call_in_progress_layout">Tap to return to call</string>
     <!-- message displayed when you try to start a call but it is not possible because you are already on a call -->
@@ -3246,22 +3231,6 @@
     <string name="text_join_call">To join this call you have to end your current call.</string>
     <!-- Text of the dialog shown when you want to join a group call but you are in another active call -->
     <string name="text_join_another_call">To join this call you have to end or hold the current call.</string>
-    <!-- Hint shown in the open chat link alert dialog -->
-    <string name="hint_enter_chat_link">Enter chat link</string>
-    <!-- Hint shown in the open link alert dialog -->
-    <string name="hint_paste_link">Paste link</string>
-    <!-- Error shown when it tries to open an invalid file or folder link -->
-    <string name="invalid_file_folder_link">Invalid file or folder link</string>
-    <!-- Error shown when it tries to open an invalid file or folder link and the text view is empty -->
-    <string name="invalid_file_folder_link_empty">Please enter a valid file or folder link</string>
-    <!-- Error shown when it tries to open an invalid chat link and the text view is empty -->
-    <string name="invalid_chat_link_empty">Please enter a valid chat link</string>
-    <!-- Error shown when it tries to open a chat link from the Cloud Drive section -->
-    <string name="valid_chat_link">You have pasted a chat link.</string>
-    <!-- Error shown when it tries to open a contact link from the Cloud Drive section -->
-    <string name="valid_contact_link">You have pasted a contact link.</string>
-    <!-- Menu item -->
-    <string name="action_open_contact_link">Open contact link</string>
     <!-- Explanation of the dialog shown to share a chat link -->
     <string name="copy_link_explanation">People can join your group by using this link.</string>
     <!-- Label that indicates the creation of a chat link -->
@@ -3592,8 +3561,8 @@
     <string name="section_documents">Documents</string>
     <!-- Label of the floating action button of opening the new chat conversation -->
     <string name="fab_label_new_chat">New chat</string>
-    <!-- Text that indicates that there’s no photo to show -->
-    <string name="homepage_empty_hint_photos">No photos found</string>
+    <!-- Text that indicates that there’s no image to show in image section -->
+    <string name="homepage_empty_hint_photos">[B]No[/B] [A]Images[/A] [B]Found[/B]</string>
     <!-- Text that indicates that there’s no document to show -->
     <string name="homepage_empty_hint_documents">No documents found</string>
     <!-- Text that indicates that there’s no audio to show -->
@@ -3744,7 +3713,7 @@
     <!-- Context menu item. Allows user to delete file/folder from favourites -->
     <string name="file_properties_unfavourite">Remove favourite</string>
     <!-- Context menu item. Allows to mark file/folder with own color label -->
-    <string name="file_properties_label">Label&#8230;</string>
+    <string name="file_properties_label">Label</string>
     <!-- Information text to let’s the user know that they can remove a colour from a folder or file that was already marked. -->
     <string name="action_remove_label">Remove label</string>
     <!-- Title text to show label selector. -->
@@ -3854,9 +3823,9 @@
     <!-- Settings hint that indicates the audio will still be played in background if the app is backgrounded -->
     <string name="settings_background_play_hint">Playing on the background</string>
     <!-- Text of the empty screen when there are no elements in Photos -->
-    <string name="photos_empty">[B]No[/B] [A]Photos[/A]</string>
+    <string name="photos_empty">[B]No[/B] [A]Photos[/A] [B]Found[/B]</string>
     <!-- Text to show as subtitle of Enable camera uploads screen -->
-    <string name="enable_cu_subtitle">Automatically backup your photos and videos to your Cloud Drive.</string>
+    <string name="enable_cu_subtitle">Automatically back up your photos and videos to your Cloud Drive.</string>
     <!-- Text of a button on Camera Uploads section to show all the content of the section-->
     <string name="all_view_button">All</string>
     <!-- Text of a button on Camera Uploads section to show the content of the section organized by days-->
@@ -3888,8 +3857,6 @@
     <string name="error_share_owner_storage_quota">Share owner is over storage quota.</string>
     <!-- A message shown when uploading, copying or moving something to an incoming share and the owner’s account is over its storage quota. -->
     <string name="warning_share_owner_storage_quota">The file cannot be sent as the target user is over their storage quota.</string>
-    <!-- Content to show in a Snackbar to tip the incompatibility-->
-    <string name="version_incompatibility">We are upgrading MEGAchat. Your calls might not be connected due to version incompatibility unless all parties update their MEGA apps to the latest version.</string>
     <!-- Message displayed when multiple download starts and 1 file has already been downloaded before and 1 file is being downloaded -->
     <string name="file_already_downloaded_and_file_pending_download">1 file already downloaded. 1 file pending.</string>
     <!-- Message displayed when multiple download starts and 1 file has already been downloaded before and multiple files are being downloaded. Placeholder: number of files -->
@@ -3999,7 +3966,7 @@
     <!-- Item menu option upon right click on meeting. -->
     <string name="context_meeting">Meeting</string>
     <!-- Menu option that allows the user to start/join meeting. -->
-    <string name="start_join_meeting">Start/Join meeting</string>
+    <string name="start_join_meeting">Start or Join meeting</string>
     <!-- Label that create a meeting -->
     <string name="new_meeting">New meeting</string>
     <!-- Label that join a meeting -->
@@ -4100,8 +4067,8 @@
     <string name="be_new_moderator">You are the new moderator.</string>
     <!-- the content of snack bar when copied meeting link-->
     <string name="copied_meeting_link">Copied meeting link.</string>
-    <!-- Title of the layout to join a meeting from the chat screen. The placeholder indicates the user who initiated the meeting -->
-    <string name="join_meeting_layout_in_group_call">%s started a meeting. Tap to join.</string>
+    <!-- Title of the layout to join a meeting from the chat screen. -->
+    <string name="join_meeting_layout_in_group_call">Tap to join current meeting.</string>
     <!-- Title of fifth tour screen -->
     <string name="title_tour_five">MEGA Meeting</string>
     <!-- Content of fourth tour screen -->
@@ -4168,6 +4135,10 @@
     <string name="confirmation_fingerprint_enabled">Your fingerprint is confirmed</string>
     <!-- Warning indicating an image (GIF) cannot be inserted in an input text. Same string than the one shown by the system when it detects this behaviour on its own. -->
     <string name="image_insertion_not_allowed">MEGA does not support image insertion here</string>
+    <!-- title for the settings to enable high resolution images when on mobile data -->
+    <string name="settings_mobile_data_resoluton_title">Use mobile data to preview high resolution images</string>
+    <!-- summary for the settings to enable high resolution images when on mobile data -->
+    <string name="settings_mobile_data_resoluton_summary">Use mobile data to load high resolution images when previewing. If disabled, the original image will only be loaded when you zoom in.</string>
     <!-- The label under the button of viewing all images screen -->
     <string name="section_images">Images</string>
     <!-- Title of the dialog warning the user about disable file versioning. -->
@@ -4176,4 +4147,74 @@
     <string name="disable_versioning_warning">Our file versioning feature ensures that we keep older copies of your files around if you replace them with newer versions. If you disable File Versioning you will no longer have this protection; the old copy will be lost when you replace it.</string>
     <!-- Warning informing the user the folder location is trying to open no longer exists. -->
     <string name="location_not_exist">This location no longer exists.</string>
+    <!-- Warning shown informing the contact has been previously invited. The placeholder is to show the name of the contact. -->
+    <string name="contact_already_invited">%1$s previously invited.</string>
+    <!-- Warning shown informing the contact request has been sent and can be managed in sent requests section. -->
+    <string name="contact_invited">Invite sent successfully. See sent requests.</string>
+    <!-- Message when file available offline. -->
+    <string name="file_available_offline">File available Offline</string>
+    <!-- Message when file removed from offline. -->
+    <string name="file_removed_offline">File removed from Offline</string>
+    <!-- Menu option to open a link. Also title of the dialog to open a link. -->
+    <string name="action_open_link">Open link</string>
+    <!-- error message shown when a chat link is not well formed. -->
+    <string name="invalid_chat_link_args">Invalid chat link</string>
+    <!-- Menu option to open a chat link. -->
+    <string name="action_open_chat_link">Open chat link</string>
+    <!-- Hint shown in the open chat link alert dialog. -->
+    <string name="hint_enter_chat_link">Enter chat link</string>
+    <!-- Hint shown in the open link alert dialog. -->
+    <string name="hint_paste_link">Paste link</string>
+    <!-- Error shown when it tries to open an invalid file or folder link .-->
+    <string name="invalid_file_folder_link">Invalid file or folder link</string>
+    <!-- Error shown when it tries to open an invalid file or folder link and the text view is empty. -->
+    <string name="invalid_file_folder_link_empty">Please enter a valid file or folder link</string>
+    <!-- Error shown when it tries to open an invalid chat link and the text view is empty. -->
+    <string name="invalid_chat_link_empty">Please enter a valid chat link</string>
+    <!-- Error shown when it tries to open a chat link from the Cloud Drive section. -->
+    <string name="valid_chat_link">You have pasted a chat link.</string>
+    <!-- Error shown when it tries to open a contact link from the Cloud Drive section. -->
+    <string name="valid_contact_link">You have pasted a contact link.</string>
+    <!-- Action button to open a contact link.-->
+    <string name="action_open_contact_link">Open contact link</string>
+    <!-- If users want to move the root backup folder, all backups underneath it are disabled. Warning dialog will show to confirm -->
+    <string name="backup_move_root_folder">You are changing a default backup folder loacation. This may affect your ability to find your backup folder in the future. Please remember where it is located so that you can find it in the future.</string>
+    <!-- If users want to move the sub backup folder, all backups underneath it are disabled. Warning dialog will show to confirm -->
+    <string name="backup_move_sub_folder">Moving this folder changes the backup destination. The backup will be turned off for safety. Is this what you want to do? Backups can be re-enable with the MEGA Desktop App.</string>
+    <!-- If users want to delete the root backup folder, all backups underneath it are disabled. Warning dialog will show to confirm -->
+    <string name="backup_remove_root_folder">You are deleting your backups folder. This will remove all the backups you have set. Are you sure you want to do this?</string>
+    <!-- If users want to delete the sub backup folder, all backups underneath it are disabled. Warning dialog will show to confirm -->
+    <string name="backup_remove_sub_folder">Are you sure you want to delete your backup folder and disable backup you set?</string>
+    <!-- The title of warning dialog for single folder moving -->
+    <string name="backup_move_folder_title">Move \"%1s\"</string>
+    <!-- The title of warning dialog for single folder deleting -->
+    <string name="backup_remove_folder_title">Move \"%1s\" to Rubbish Bin</string>
+    <!-- The title of warning dialog for multi-folder moving -->
+    <string name="backup_move_multiple_folder_title">Move backup folders</string>
+    <!-- The title of warning dialog for single folder deleting -->
+    <string name="backup_remove_multiple_folder_title">Move backup folders to Rubbish Bin</string>
+    <!-- The confirm information of warning dialog for deleting -->
+    <string name="backup_disable_confirm">Disable backup</string>
+    <!-- The confirm information of warning dialog for moving "My backup" -->
+    <string name="backup_move_confirm">Move backup</string>
+    <!-- The confirm information of warning dialog for deleting -->
+    <string name="backup_action_confirm">Please type \"%1s\" to confirm this action</string>
+    <!-- when checking the input -->
+    <string name="error_backup_confirm_dont_match">Text entered does not match</string>
+    <!-- The title of confirm dialog for adding item to "My backup" -->
+    <string name="backup_add_confirm_title">Add item to \"%1s\"</string>
+    <!-- The title of warning dialog for adding item to "My backup" -->
+    <string name="backup_add_item_title">Setup backup</string>
+    <!-- If users want to add items to the "My backup" folder, Warning dialog will show to confirm -->
+    <string name="backup_add_item_to_root_text">To ensure this items added to your backup folder are automatically synchronised to the MEGA Cloud, please setup on desktop app.</string>
+    <!-- If users want to share items in the "My backup" folder, Warning dialog will show to confirm -->
+    <string name="backup_share_permission_title">Read-only</string>
+    <!-- If users want to share single backup folder, show below warning message -->
+    <string name="backup_share_permission_text">This folder can only be shared as read-only, as this is a backup folder, any changes to its content could disable the backup.</string>
+    <!-- If users want to add items to the "My backup" device folder, Warning dialog will show to confirm -->
+    <string name="backup_add_item_text">Adding items to this folder changes the backup destination. The backup will be turned off for safety. Is this what you want to do? Backups can be re-enable with the MEGA Desktop App.</string>
+    <!-- Share multi backup folders, show below warning message -->
+    <string name="backup_multi_share_permission_text">These folders can only be shared as read-only, as they are backup folders, any changes to their content could disable the backups.</string>
+    <!-- Share multi folders mix with backup and non-backup folders, show below warning message -->
+    <string name="backup_share_with_root_permission_text">Some folders shared are backup folders and read-only. Do you wish to continue?</string>
 </resources>

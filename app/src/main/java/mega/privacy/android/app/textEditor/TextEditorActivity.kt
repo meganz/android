@@ -46,7 +46,7 @@ import mega.privacy.android.app.utils.MegaNodeUtil.selectFolderToMove
 import mega.privacy.android.app.utils.MenuUtils.toggleAllMenuItemsVisibility
 import mega.privacy.android.app.utils.StringResourcesUtils
 import mega.privacy.android.app.utils.Util.*
-import nz.mega.documentscanner.utils.ViewUtils.hideKeyboard
+import mega.privacy.android.app.utils.ViewUtils.hideKeyboard
 import nz.mega.sdk.MegaChatApi
 import nz.mega.sdk.MegaShare
 import kotlin.math.roundToInt
@@ -177,7 +177,7 @@ class TextEditorActivity : PasscodeActivity(), SnackbarShower, Scrollable {
     }
 
     override fun onBackPressed() {
-        if (psaWebBrowser.consumeBack()) return
+        if (psaWebBrowser != null && psaWebBrowser.consumeBack()) return
         if (!viewModel.isViewMode() && viewModel.isFileEdited()) {
             binding.contentEditText.hideKeyboard()
             showDiscardChangesConfirmationDialog()

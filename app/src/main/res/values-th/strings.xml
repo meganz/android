@@ -66,8 +66,6 @@
     <string name="general_error_word">ผิดพลาด</string>
     <!-- when clicking into a menu whose functionality is not yet implemented -->
     <string name="general_not_yet_implemented">ยังไม่ได้ใช้</string>
-    <!-- when any file or folder is selected -->
-    <string name="error_no_selection">ยังไม่ได้เลือกไฟล์หรือโฟลเดอร์</string>
     <!-- when trying to download a file that is already downloaded in the device -->
     <string name="general_already_downloaded">ดาวน์โหลดมาแล้ว</string>
     <!-- when trying to upload a file that is already uploaded in the folder -->
@@ -100,8 +98,6 @@
     <string name="action_create_folder">สร้างโฟลเดอร์ใหม่</string>
     <!-- Option which allows create a new text file -->
     <string name="action_create_txt">สร้างไฟล์ข้อความใหม่</string>
-    <!-- Menu option to open a link. Also title of the dialog to open a link. -->
-    <string name="action_open_link">เปิดลิงก์</string>
     <!-- Menu item -->
     <string name="action_settings">ตั้งค่า</string>
     <!-- Search button -->
@@ -622,10 +618,6 @@
     <string name="upload_to_audio">เสียง</string>
     <!-- Title of the button in the contact info screen to start a video call -->
     <string name="upload_to_video">วิดีโอ</string>
-    <!-- upload to. Then choose to browse the file system to choose a file -->
-    <string name="upload_to_filesystem">เลือกจาก File System</string>
-    <!-- upload to. Then choose to browse the file system to choose a file -->
-    <string name="upload_to_filesystem_from">เลือกจาก</string>
     <!-- Label for the current uploaded size of a file. For example, 3 files, 50KB uploaded -->
     <string name="upload_uploaded">อัปโหลดแล้ว</string>
     <!-- Status text at the beginning of an upload, Status text at the beginning of an upload for 2 or more files -->
@@ -989,8 +981,6 @@
     <string name="settings_disable_logs">รายการบันทึกจะถูกปิดใช้งานในขณะนี้</string>
     <!-- Snackbar error message triggered by host error when user is trying to setup MEGA Camera Uploads folder in settings page -->
     <string name="error_unable_to_setup_cloud_folder">ไม่สามารถตั้งค่าโฟลเดอร์ MEGA อัปโหลดจากกล้องได้</string>
-    <!-- Message displayed when the user denies the required permissions during the logs activation -->
-    <string name="logs_not_enabled_permissions">ไฟล์บันทึกยังไม่ได้เปิดใช้งาน เนื่องจากคุณปฏิเสธสิทธิ์ดังกล่าว</string>
     <!-- Option in the sliding panel to open the folder which contains the file selected after performing a search -->
     <string name="search_open_location">เปิดตำแหน่งที่ตั้ง</string>
     <!-- message when a temporary error on logging in is due to SDK is waiting for the server to complete a request due to an API lock -->
@@ -2729,16 +2719,12 @@
     <string name="message_set_chat_private">[A]%1$s[/A][B] ได้เปิดใช้งานการหมุนเวียนคีย์เข้ารหัส[/B]</string>
     <!-- error message shown when a chat link is invalid -->
     <string name="invalid_chat_link">การสนทนานี้ไม่สามารถใช้งานได้อีกต่อไป</string>
-    <!-- error message shown when a chat link is not well formed -->
-    <string name="invalid_chat_link_args">ลิงก์แชทไม่ถูกต้อง</string>
     <!-- When it is creating a new group chat, this option permits to establish it private or public -->
     <string name="ekr_label">การหมุนเวียนคีย์เข้ารหัส</string>
     <!-- Text of the dialog to change a public chat to private (enable encryption key rotation) -->
     <string name="ekr_explanation">การหมุนเวียนคีย์เข้ารหัสมีความปลอดภัยในระดับหนึ่ง แต่จะไม่อนุญาตให้คุณสร้างลิงก์แชท และผู้เข้าร่วมใหม่จะไม่เห็นข้อความที่ผ่านมา</string>
     <!-- Text of the dialog to change a public chat to private (enable encryption key rotation) -->
     <string name="subtitle_chat_message_enabled_ERK">การหมุนเวียนคีย์เข้ารหัสมีความปลอดภัยในระดับหนึ่ง แต่จะไม่อนุญาตให้คุณสร้างลิงก์แชท และผู้เข้าร่วมใหม่จะไม่เห็นข้อความที่ผ่านมา</string>
-    <!-- Menu item -->
-    <string name="action_open_chat_link">เปิดลิงก์แชท</string>
     <!-- Message shown when a contact request has not been sent because the invitation has been sent before -->
     <string name="invite_not_sent_already_sent">คำเชิญให้ติดต่อ %s มีการส่งไปแล้วและสามารถดูได้ในแท็บคำขอที่ส่งแล้ว</string>
     <!-- Label shown to indicate the QR is saving in Cloud Drive -->
@@ -3041,8 +3027,6 @@
     </plurals>
     <!-- Title of a chat message that contains geolocation info -->
     <string name="title_geolocation_message">ตำแหน่งที่ปักหมุด</string>
-    <!-- Text of the button to indicate an attachment upload from file system -->
-    <string name="attachment_upload_panel_from_device">จากระบบไฟล์</string>
     <!-- Alert shown when a num of files have not been sent because of any error occurs, Plural of file. 2 files -->
     <plurals name="num_files_not_send">
         <item quantity="other">ไฟล์ %d รายการไม่ได้ถูกส่งไปยังแชท %d</item>
@@ -3179,22 +3163,6 @@
     <string name="text_join_call">ในการเข้าร่วมการโทรนี้คุณต้องวางสายปัจจุบันก่อน</string>
     <!-- Text of the dialog shown when you want to join a group call but you are in another active call -->
     <string name="text_join_another_call">หากต้องการเข้าร่วมสายนี้ คุณต้องวางสายหรือพักสายปัจจุบันไว้</string>
-    <!-- Hint shown in the open chat link alert dialog -->
-    <string name="hint_enter_chat_link">เข้าสู่ลิงก์แชท</string>
-    <!-- Hint shown in the open link alert dialog -->
-    <string name="hint_paste_link">วางลิงก์</string>
-    <!-- Error shown when it tries to open an invalid file or folder link -->
-    <string name="invalid_file_folder_link">ลิงก์ไฟล์หรือโฟลเดอร์ไม่ถูกต้อง</string>
-    <!-- Error shown when it tries to open an invalid file or folder link and the text view is empty -->
-    <string name="invalid_file_folder_link_empty">กรุณากรอกลิงก์ไฟล์หรือโฟลเดอร์ให้ถูกต้อง</string>
-    <!-- Error shown when it tries to open an invalid chat link and the text view is empty -->
-    <string name="invalid_chat_link_empty">กรุณากรอกลิงก์แชทให้ถูกต้อง</string>
-    <!-- Error shown when it tries to open a chat link from the Cloud Drive section -->
-    <string name="valid_chat_link">คุณได้วางลิงก์แชทแล้ว</string>
-    <!-- Error shown when it tries to open a contact link from the Cloud Drive section -->
-    <string name="valid_contact_link">คุณได้วางลิงก์ผู้ติดต่อแล้ว</string>
-    <!-- Menu item -->
-    <string name="action_open_contact_link">เปิดลิงก์ผู้ติดต่อ</string>
     <!-- Explanation of the dialog shown to share a chat link -->
     <string name="copy_link_explanation">ผู้คนสามารถเข้าร่วมกลุ่มของคุณโดยใช้ลิงก์นี้</string>
     <!-- Label that indicates the creation of a chat link -->
@@ -3646,7 +3614,7 @@
     <!-- Explanation of a warning recommending upgrade to Pro in relation to link available options -->
     <string name="link_upgrade_pro_explanation">ผู้ใช้ MEGA Pro สามารถเข้าถึงฟีเจอร์ด้านความปลอดภัยของลิงก์เพิ่มเติมได้โดยเฉพาะทำให้บัญชีของคุณปลอดภัยยิ่งขึ้น</string>
     <!-- Meaning of links decryption key -->
-    <string name="decryption_key_explanation">ระบบเข้ารหัสจากต้นทางถึงปลายทางของเรา มีการใช้คีย์เฉพาะที่สร้างขึ้นสำหรังไฟล์หรือโฟลเดอร์นี้โดยอัตโนมัติ ลิงก์ที่มีคีย์นี้จะถูกสร้างขึ้นตามค่าเริ่มต้น แต่คุณสามารถส่งออกคีย์ถอดรหัสแบบแยกต่างหากเพื่อเพิ่มระดับความปลอดภัยได้</string>
+    <string name="decryption_key_explanation">ระบบเข้ารหัสจากต้นทางถึงปลายทางของเรา มีการใช้คีย์เฉพาะที่สร้างขึ้นสำหรับไฟล์หรือโฟลเดอร์นี้โดยอัตโนมัติ ลิงก์ที่มีคีย์นี้จะถูกสร้างขึ้นตามค่าเริ่มต้น แต่คุณสามารถส่งออกคีย์ถอดรหัสแบบแยกต่างหากเพื่อเพิ่มระดับความปลอดภัยได้</string>
     <!-- Reset password label -->
     <string name="reset_password_label">รีเซ็ตรหัสผ่าน</string>
     <!-- Warning show to the user when has enable to send the decryption key of a link separately and tries to share the link -->
@@ -3666,7 +3634,7 @@
     <!-- Context menu item. Allows user to delete file/folder from favourites -->
     <string name="file_properties_unfavourite">ลบรายการโปรด</string>
     <!-- Context menu item. Allows to mark file/folder with own color label -->
-    <string name="file_properties_label">ป้ายกำกับ&#8230;</string>
+    <string name="file_properties_label">ป้ายกำกับ</string>
     <!-- Information text to let’s the user know that they can remove a colour from a folder or file that was already marked. -->
     <string name="action_remove_label">ลบป้ายกำกับ</string>
     <!-- Title text to show label selector. -->
@@ -3698,19 +3666,13 @@
     <!-- Preferences screen item title for cookie settings -->
     <string name="settings_about_cookie_settings">การตั้งค่าคุกกี้</string>
     <!-- Cookie dialog title -->
-    <string name="dialog_cookie_alert_title">ก่อนที่คุณจะดำเนินการต่อ</string>
+    <string name="dialog_cookie_alert_title">ความเป็นส่วนตัวของคุณ</string>
     <!-- Cookie dialog message. Please, keep the placeholders to format the string. -->
-    <string name="dialog_cookie_alert_message">เราได้มีการใช้คุกกี้และเทคโนโลยีที่คล้ายกัน (‘คุกกี้’) เพื่อให้บริการแก่คุณ ปรับปรุงประสบการณ์ของคุณด้วยบริการของเรา และปรับแต่งโฆษณาที่ปรากฎให้คุณเห็น รวมถึงผ่านบุคคลที่สาม ยอมรับการใช้คุกกี้ของเราตั้งแต่เริ่มเยี่ยมชมหรือปรับแต่งคุกกี้ในการตั้งค่าคุกกี้ อ่านเพิ่มเติมใน[A]นโยบายคุกกี้[/A]ของเรา</string>
+    <string name="dialog_cookie_alert_message">เราใช้คุกกี้และเทคโนโลยีที่คล้ายกัน (“คุกกี้”) เพื่อมอบและปรับปรุงประสบการณ์ของคุณกับบริการของเรา ยอมรับการใช้คุกกี้ของเราตั้งแต่เริ่มต้นการเยี่ยมชมของคุณ หรือปรับแต่งคุกกี้ในการตั้งค่าคุกกี้ อ่านเพิ่มเติมใน[A]นโยบายคุกกี้[/A]ของเรา</string>
     <!-- Cookie dialog message showed when there are unsaved settings. -->
     <string name="dialog_cookie_alert_unsaved">ยังไม่ได้บันทึกการตั้งค่าคุกกี้</string>
     <!-- Snackbar message showed when there settings has been saved successfully. -->
     <string name="dialog_cookie_snackbar_saved">บันทึกการเปลี่ยนแปลงการตั้งค่าคุกกี้แล้ว</string>
-    <!-- Cookie dialog third party first subtitle -->
-    <string name="dialog_cookie_thirdparty_subtitle1">คุกกี้สำหรับโฆษณาของ Google</string>
-    <!-- Cookie dialog third party second subtitle -->
-    <string name="dialog_cookie_thirdparty_subtitle2">หมวดหมู่: คุกกี้สำหรับโฆษณา</string>
-    <!-- Cookie dialog third party message. Please, keep the placeholders to format the string. -->
-    <string name="dialog_cookie_thirdparty_message">ใช้โดย Google เพื่อ:\n• ปรับแต่งโฆษณาที่ Google แสดงบนบริการของเราและเว็บไซต์อื่น ๆ ตามสิ่งต่าง ๆ เช่น ตำแหน่งที่ตั้งของคุณและเว็บไซต์อื่น ๆ ที่คุณเคยเข้าชม\n• ตรวจสอบว่าคุณแสดงโฆษณาบางรายการบ่อยเพียงใด\n• จัดให้มีการป้องกันการฉ้อโกง และ\n• กำหนดว่าเมื่อใดที่คุณแตะที่โฆษณาหนึ่ง ๆ จากนั้นจึงติดตามต่อเพื่อตอบสนองต่อโฆษณานั้นของคุณ\nhttps://policies.google.com/technologies/partner-sites</string>
     <!-- Preference screen item title -->
     <string name="preference_cookies_accept">ยอมรับการใช้งานคุกกี้</string>
     <!-- Preference screen item title -->
@@ -3718,21 +3680,9 @@
     <!-- Preference screen item summary -->
     <string name="preference_cookies_essential_summary">มีความจำเป็นต่อการให้บริการฟังก์ชันการทำงานที่สำคัญ และการเข้าถึงบริการของเราอย่างปลอดภัย ด้วยเหตุนี้จึงไม่ต้องขอความยินยอมจากคุณ</string>
     <!-- Preference screen item title -->
-    <string name="preference_cookies_preference_title">คุกกี้สำหรับกำหนดลักษณะ</string>
-    <!-- Preference screen item summary -->
-    <string name="preference_cookies_preference_summary">ช่วยให้เราจำการตั้งค่าการแสดงผลและการจัดรูปแบบที่คุณเลือกได้ การไม่ยอมรับคุกกี้เหล่านี้หมายความว่าเราจะจำบางสิ่งให้คุณไม่ได้ เช่น เค้าโครงหน้าจอที่คุณต้องการ เป็นต้น</string>
-    <!-- Preference screen item title -->
     <string name="preference_cookies_performance_title">คุกกี้สำหรับประสิทธิภาพและการวิเคราะห์</string>
     <!-- Preference screen item summary -->
     <string name="preference_cookies_performance_summary">ช่วยให้เราเข้าใจว่าคุณใช้บริการของเราอย่างไร และให้ข้อมูลที่เราสามารถใช้เพื่อปรับปรุง การไม่ยอมรับคุกกี้เหล่านี้จะทำให้เรามีข้อมูลเพื่อช่วยในการออกแบบการปรับปรุงผลิตภัณฑ์ของเราน้อยลง</string>
-    <!-- Preference screen item title -->
-    <string name="preference_cookies_advertising_title">คุกกี้สำหรับโฆษณา</string>
-    <!-- Preference screen item summary -->
-    <string name="preference_cookies_advertising_summary">ดำเนินการโดยเราและพันธมิตรโฆษณาที่ได้รับอนุมัติของเราเท่านั้น เพื่อปรับแต่งโฆษณาที่คุณเห็นในบริการของเราและบนเว็บไซต์อื่น ๆ ตามประวัติการเข้าชมของคุณ การไม่ยอมรับคุกกี้เหล่านี้หมายความว่าเราอาจแสดงโฆษณาที่มีความเกี่ยวข้องกับคุณน้อยลง</string>
-    <!-- Preference screen item title -->
-    <string name="preference_cookies_thirdparty_title">คุกกี้จากที่อื่น</string>
-    <!-- Preference screen item summary. Please, keep the placeholders to format the string. -->
-    <string name="preference_cookies_thirdparty_summary">คุกกี้เหล่านี้ถูกควบคุมโดยบุคคลอื่นที่ไม่ใช่เรา เราใช้คุกกี้เหล่านี้เพื่อจัดหาประเภทของฟังก์ชันที่อธิบายไว้ข้างต้นแล้ว การไม่ยอมรับคุกกี้เหล่านี้จะมีผลกระทบที่แตกต่างกันไป ขึ้นอยู่กับประเภทของคุกกี้แต่ละคุกกี้จากที่อื่น แตะที่ “ข้อมูลเพิ่มเติม” ด้านล่างเพื่อดูรายละเอียดเกี่ยวกับคุกกี้จากที่อื่นทั้งหมดที่เราใช้</string>
     <!-- Preference screen item state description -->
     <string name="preference_cookies_always_on">เปิดไว้เสมอ</string>
     <!-- Menu option that allows the user to scan document and upload it directly to MEGA. -->
@@ -4101,4 +4051,10 @@
     <string name="image_insertion_not_allowed">MEGA ไม่สนับสนุนการแทรกรูปภาพลงที่นี่</string>
     <!-- The label under the button of viewing all images screen -->
     <string name="section_images">รูปภาพ</string>
+    <!-- Title of the dialog warning the user about disable file versioning. -->
+    <string name="disable_versioning_label">ปิดใช้งานการจัดเตรียมไฟล์</string>
+    <!-- Warning of the dialog informing the user about disable file versioning. -->
+    <string name="disable_versioning_warning">ฟีเจอร์การกำหนดเวอร์ชันไฟล์ของเราช่วยให้มั่นใจได้ว่าเราจะเก็บสำเนาไฟล์เก่าของคุณไว้หากคุณแทนที่ด้วยเวอร์ชันที่ใหม่กว่า หากคุณปิดใช้งานการกำหนดเวอร์ชันไฟล์ คุณจะไม่ได้รับการป้องกันเกี่ยวกับเวอร์ชันไฟล์ใด ๆ ของคุณอีกต่อไป สำเนาเก่าจะหายไปเมื่อคุณเปลี่ยน</string>
+    <!-- Warning informing the user the folder location is trying to open no longer exists. -->
+    <string name="location_not_exist">ตำแหน่งที่ตั้งนี้ไม่มีอยู่แล้ว</string>
 </resources>

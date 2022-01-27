@@ -1,13 +1,15 @@
 package mega.privacy.android.app.di
 
 import android.content.Context
+import android.content.SharedPreferences
 import android.content.pm.PackageInfo
 import android.content.pm.PackageManager.NameNotFoundException
+import androidx.preference.PreferenceManager
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
-import dagger.hilt.android.components.ApplicationComponent
 import dagger.hilt.android.qualifiers.ApplicationContext
+import dagger.hilt.components.SingletonComponent
 import mega.privacy.android.app.BuildConfig
 import mega.privacy.android.app.DatabaseHandler
 import mega.privacy.android.app.MegaApplication
@@ -16,7 +18,7 @@ import nz.mega.sdk.MegaChatApiAndroid
 import javax.inject.Singleton
 
 @Module
-@InstallIn(ApplicationComponent::class)
+@InstallIn(SingletonComponent::class)
 class AppModule {
     @MegaApi
     @Singleton
@@ -61,4 +63,9 @@ class AppModule {
     fun provideDbHandler(@ApplicationContext context: Context): DatabaseHandler {
         return DatabaseHandler.getDbHandler(context)
     }
+
+    @Singleton
+    @Provides
+    fun providePreferences(@ApplicationContext context: Context): SharedPreferences =
+        PreferenceManager.getDefaultSharedPreferences(context)
 }

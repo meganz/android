@@ -92,8 +92,11 @@ class DragToExitSupport(
      * Observe thumbnail view location on screen.
      *
      * @param lifecycleOwner LifecycleOwner
+     * @param intent         Intent which contains ViewerFrom key
      */
-    fun observeThumbnailLocation(lifecycleOwner: LifecycleOwner) {
+    fun observeThumbnailLocation(lifecycleOwner: LifecycleOwner, intent: Intent?) {
+        viewerFrom = intent?.getIntExtra(INTENT_EXTRA_KEY_VIEWER_FROM, INVALID_VALUE) ?: INVALID_VALUE
+
         LiveEventBus.get(
             EVENT_DRAG_TO_EXIT_THUMBNAIL_LOCATION, ThumbnailLocationEvent::class.java
         ).observe(lifecycleOwner) {
@@ -121,7 +124,7 @@ class DragToExitSupport(
     fun runEnterAnimation(
         launchIntent: Intent,
         mainView: View,
-        animationCallback: (Boolean) -> Unit
+        animationCallback: ((Boolean) -> Unit)?
     ) {
         mainView.viewTreeObserver.addOnPreDrawListener(object : ViewTreeObserver.OnPreDrawListener {
             override fun onPreDraw(): Boolean {
@@ -148,9 +151,11 @@ class DragToExitSupport(
                         width = windowMetrics.bounds.width()
                         height = windowMetrics.bounds.height()
                     } else {
+                        val display = mainView.display ?: return false
                         val displayMetrics = DisplayMetrics()
+
                         @Suppress("DEPRECATION")
-                        mainView.display.getMetrics(displayMetrics)
+                        display.getMetrics(displayMetrics)
                         width = displayMetrics.widthPixels
                         height = displayMetrics.heightPixels
                     }
@@ -177,7 +182,7 @@ class DragToExitSupport(
                     draggableView?.screenPosition = newLoc
                 }
 
-                animationCallback(true)
+                animationCallback?.invoke(true)
 
                 mainView.pivotX = 0F
                 mainView.pivotY = 0F
@@ -196,7 +201,7 @@ class DragToExitSupport(
                     .translationY(0F)
                     .setInterpolator(DecelerateInterpolator())
                     .withEndAction {
-                        animationCallback(false)
+                        animationCallback?.invoke(false)
                         ivShadow?.isVisible = false
                     }
 

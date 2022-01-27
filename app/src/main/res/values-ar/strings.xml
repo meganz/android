@@ -66,8 +66,6 @@
     <string name="general_error_word">خطأ</string>
     <!-- when clicking into a menu whose functionality is not yet implemented -->
     <string name="general_not_yet_implemented">لم تنفذ بعد</string>
-    <!-- when any file or folder is selected -->
-    <string name="error_no_selection">لم يتم اختيار ملف أو مجلد</string>
     <!-- when trying to download a file that is already downloaded in the device -->
     <string name="general_already_downloaded">تم تنزيلها بالفعل</string>
     <!-- when trying to upload a file that is already uploaded in the folder -->
@@ -93,15 +91,13 @@
     <!-- confirmation message before sending an invitation to a contact -->
     <string name="confirmation_add_contact">هل تريد إرسال دعوة إلى %s؟</string>
     <!-- Button where the user can sign off or logout -->
-    <string name="action_logout">الخروج</string>
+    <string name="action_logout">تسجيل&#160;خروج</string>
     <!-- Item menu option upon right click on one or multiple files. -->
     <string name="action_add">رفع</string>
     <!-- Menu item -->
     <string name="action_create_folder">إنشاء مجلد جديد</string>
     <!-- Option which allows create a new text file -->
     <string name="action_create_txt">إنشاء ملف نصي جديد</string>
-    <!-- Menu option to open a link. Also title of the dialog to open a link. -->
-    <string name="action_open_link">فتح الرابط</string>
     <!-- Menu item -->
     <string name="action_settings">الإعدادات</string>
     <!-- Search button -->
@@ -667,10 +663,6 @@
     <string name="upload_to_audio">صوتي</string>
     <!-- Title of the button in the contact info screen to start a video call -->
     <string name="upload_to_video">فيديو</string>
-    <!-- upload to. Then choose to browse the file system to choose a file -->
-    <string name="upload_to_filesystem">اختيار من نظام الملف</string>
-    <!-- upload to. Then choose to browse the file system to choose a file -->
-    <string name="upload_to_filesystem_from">اختار من</string>
     <!-- Label for the current uploaded size of a file. For example, 3 files, 50KB uploaded -->
     <string name="upload_uploaded">تم الرفع</string>
     <!-- Status text at the beginning of an upload, Status text at the beginning of an upload for 2 or more files -->
@@ -1049,8 +1041,6 @@
     <string name="settings_disable_logs">السجلات معطلة الآن</string>
     <!-- Snackbar error message triggered by host error when user is trying to setup MEGA Camera Uploads folder in settings page -->
     <string name="error_unable_to_setup_cloud_folder">تعذر إعداد مجلد ميغا MEGA لترفيعات الكاميرا</string>
-    <!-- Message displayed when the user denies the required permissions during the logs activation -->
-    <string name="logs_not_enabled_permissions">لم يتم تمكين السجلات لأنك رفضت منح الأذونات المطلوبة</string>
     <!-- Option in the sliding panel to open the folder which contains the file selected after performing a search -->
     <string name="search_open_location">فتح الموقع</string>
     <!-- message when a temporary error on logging in is due to SDK is waiting for the server to complete a request due to an API lock -->
@@ -2984,16 +2974,12 @@
     <string name="message_set_chat_private">[A]%1$s[/A][B] بتمكين تدوير المفتاح المشفر.[/B]</string>
     <!-- error message shown when a chat link is invalid -->
     <string name="invalid_chat_link">هذه المحادثة لم تعد متوفرة.</string>
-    <!-- error message shown when a chat link is not well formed -->
-    <string name="invalid_chat_link_args">رابط المحادثة غير صالح</string>
     <!-- When it is creating a new group chat, this option permits to establish it private or public -->
     <string name="ekr_label">تدوير مفتاح التشفير</string>
     <!-- Text of the dialog to change a public chat to private (enable encryption key rotation) -->
     <string name="ekr_explanation">يعد تدوير مفتاح التشفير أكثر أمانًا إلى حد ما، ولكنه لا يسمح لك بإنشاء رابط محادثة ولن يرى المشاركون الجدد الرسائل السابقة.</string>
     <!-- Text of the dialog to change a public chat to private (enable encryption key rotation) -->
     <string name="subtitle_chat_message_enabled_ERK">يعد تدوير مفتاح التشفير أكثر أمانًا إلى حد ما، ولكنه لا يسمح لك بإنشاء رابط محادثة ولن يرى المشاركون الجدد الرسائل السابقة.</string>
-    <!-- Menu item -->
-    <string name="action_open_chat_link">افتح رابط المحادثة</string>
     <!-- Message shown when a contact request has not been sent because the invitation has been sent before -->
     <string name="invite_not_sent_already_sent">تم إرسال الدعوة لجهة الاتصال %s من قبل و يمكنك مراجعتها في صفحة الطلبات المرسلة.</string>
     <!-- Label shown to indicate the QR is saving in Cloud Drive -->
@@ -3356,8 +3342,6 @@
     </plurals>
     <!-- Title of a chat message that contains geolocation info -->
     <string name="title_geolocation_message">موقع مثبت</string>
-    <!-- Text of the button to indicate an attachment upload from file system -->
-    <string name="attachment_upload_panel_from_device">من نظام الملفات</string>
     <!-- Alert shown when a num of files have not been sent because of any error occurs, Plural of file. 2 files -->
     <plurals name="num_files_not_send">
         <item quantity="zero">لم يتم ارسال %d ملف إلى %d محادثة</item>
@@ -3524,22 +3508,6 @@
     <string name="text_join_call">للانضمام إلى هذه المكالمة يجب عليك إنهاء مكالمتك الحالية.</string>
     <!-- Text of the dialog shown when you want to join a group call but you are in another active call -->
     <string name="text_join_another_call">للانضمام إلى هذه المكالمة، يجب عليك إنهاء المكالمة الحالية أو تعليقها.</string>
-    <!-- Hint shown in the open chat link alert dialog -->
-    <string name="hint_enter_chat_link">ادخل رابط المحادثة</string>
-    <!-- Hint shown in the open link alert dialog -->
-    <string name="hint_paste_link">لصق رابط</string>
-    <!-- Error shown when it tries to open an invalid file or folder link -->
-    <string name="invalid_file_folder_link">رابط ملف أو مجلد غير صالح</string>
-    <!-- Error shown when it tries to open an invalid file or folder link and the text view is empty -->
-    <string name="invalid_file_folder_link_empty">الرجاء إدخال رابط ملف أو مجلد صالح</string>
-    <!-- Error shown when it tries to open an invalid chat link and the text view is empty -->
-    <string name="invalid_chat_link_empty">يرجى إدخال رابط محادثة صالح</string>
-    <!-- Error shown when it tries to open a chat link from the Cloud Drive section -->
-    <string name="valid_chat_link">لقد قمت بلصق رابط محادثة.</string>
-    <!-- Error shown when it tries to open a contact link from the Cloud Drive section -->
-    <string name="valid_contact_link">لقد قمت بلصق رابط جهة اتصال.</string>
-    <!-- Menu item -->
-    <string name="action_open_contact_link">فتح رابط جهة الاتصال</string>
     <!-- Explanation of the dialog shown to share a chat link -->
     <string name="copy_link_explanation">يمكن للأشخاص الانضمام إلى مجموعتك باستخدام هذا الرابط.</string>
     <!-- Label that indicates the creation of a chat link -->
@@ -4066,7 +4034,7 @@
     <!-- Context menu item. Allows user to delete file/folder from favourites -->
     <string name="file_properties_unfavourite">حذف المفضلة</string>
     <!-- Context menu item. Allows to mark file/folder with own color label -->
-    <string name="file_properties_label">وسم...</string>
+    <string name="file_properties_label">وسم</string>
     <!-- Information text to let’s the user know that they can remove a colour from a folder or file that was already marked. -->
     <string name="action_remove_label">إزالة الوسم</string>
     <!-- Title text to show label selector. -->
@@ -4098,19 +4066,13 @@
     <!-- Preferences screen item title for cookie settings -->
     <string name="settings_about_cookie_settings">إعدادات ملفات تعريف الارتباط Cookie</string>
     <!-- Cookie dialog title -->
-    <string name="dialog_cookie_alert_title">قبل أن تقوم بالمتابعة</string>
+    <string name="dialog_cookie_alert_title">خصوصيتك</string>
     <!-- Cookie dialog message. Please, keep the placeholders to format the string. -->
-    <string name="dialog_cookie_alert_message">نستخدم التخزين المحلي والتقنيات المماثلة (”ملفات تعريف الارتباط Cookies”) لتقديم خدماتنا لك، وتعزيز تجربتك مع خدماتنا، وتخصيص الإعلانات التي تراها، بما في ذلك من خلال جهات خارجية. اقبل استخدامنا لملفات تعريف الارتباط Cookies من بداية زيارتك أو قم بتخصيص ملفات تعريف الارتباط Cookies في إعدادات ملفات تعريف الارتباط Cookies . اقرأ المزيد في [A]سياسة ملفات تعريف الارتباط Cookies الخاصة بنا[/A].</string>
+    <string name="dialog_cookie_alert_message">نحن نستخدم ملفات تعريف الارتباط Cookies والتقنيات المماثلة  (’Cookies’) لتقديم وتعزيز تجربتك مع خدماتنا، وتخصيص الإعلانات التي تراها، بما في ذلك من خلال جهات خارجية. اقبل استخدامنا لملفات تعريف الارتباط Cookies من بداية زيارتك أو قم بتخصيص ملفات تعريف الارتباط في إعدادات ملفات تعريف الارتباط. اقرأ المزيد في [A]سياسة ملفات تعريف الارتباط Cookies[/A] الخاصة بنا.</string>
     <!-- Cookie dialog message showed when there are unsaved settings. -->
     <string name="dialog_cookie_alert_unsaved">إعدادات ملفات تعريف الارتباط Cookie غير محفوظة</string>
     <!-- Snackbar message showed when there settings has been saved successfully. -->
     <string name="dialog_cookie_snackbar_saved">تم حفظ تغييرات إعدادات ملفات تعريف الارتباط Cookie.</string>
-    <!-- Cookie dialog third party first subtitle -->
-    <string name="dialog_cookie_thirdparty_subtitle1">ملفات تعريف ارتباط Cookies إعلانات غوغل Google</string>
-    <!-- Cookie dialog third party second subtitle -->
-    <string name="dialog_cookie_thirdparty_subtitle2">التصنيف: ملفات تعريف الارتباط Cookies الإعلانية</string>
-    <!-- Cookie dialog third party message. Please, keep the placeholders to format the string. -->
-    <string name="dialog_cookie_thirdparty_message">مستخدم من قبل غوغل Google لـ:\n• تخصيص الإعلانات التي يعرضها غوغل Google على خدماتنا ومواقعنا الالكتروني وعلى خدمات ومواقع الكترونية أخرى، بناءً على أشياء أخرى مثل موقعك الجغرافي والمواقع الالكترونية التي زرتها سابقًا؛\n• مراقبة عدد مرات عرض إعلانات معينة؛ \n• توفير منع الاحتيال؛ و\n• تحديد وقت النقر فوق إعلان معين ثم تتبع الإجراءات التالية التي تتخذها ردًا على هذا الإعلان.\nhttps://policies.google.com/technologies/partner-sites</string>
     <!-- Preference screen item title -->
     <string name="preference_cookies_accept">قبول ملفات تعريف الارتباط Cookies</string>
     <!-- Preference screen item title -->
@@ -4118,21 +4080,9 @@
     <!-- Preference screen item summary -->
     <string name="preference_cookies_essential_summary">أساسية لتزويدك بوظائف مهمة والوصول الآمن إلى خدماتنا. لهذا السبب، لا يحتاجون إلى موافقة.</string>
     <!-- Preference screen item title -->
-    <string name="preference_cookies_preference_title">ملفات تعريف الارتباط Cookies المفضلة</string>
-    <!-- Preference screen item summary -->
-    <string name="preference_cookies_preference_summary">اسمح لنا بتذكر إعدادات عرض وتنسيق معينة تختارها. إن عدم قبول ملفات تعريف الارتباط Cookies هذه يعني أننا لن نتمكن من تذكر بعض الأشياء لك مثل نموذج الشاشة المفضل لديك.</string>
-    <!-- Preference screen item title -->
     <string name="preference_cookies_performance_title">أداء وتحليلات لملفات تعريف الارتباط Cookie</string>
     <!-- Preference screen item summary -->
     <string name="preference_cookies_performance_summary">ساعدنا في فهم كيفية استخدامك لخدماتنا وتزويدنا بالبيانات التي يمكننا استخدامها لإجراء تحسينات. يعني عدم قبول ملفات تعريف الارتباط Cookies هذه أننا سنحصل على بيانات متاحة أقل لنقوم بالمساعدة في تحسينات التصميم.</string>
-    <!-- Preference screen item title -->
-    <string name="preference_cookies_advertising_title">ملفات تعريف الارتباط Cookies الإعلانية</string>
-    <!-- Preference screen item summary -->
-    <string name="preference_cookies_advertising_summary">مستخدمة من قبلنا ومن قبل شركاؤنا الإعلانيون المعتمدون لتخصيص الإعلانات التي تراها على خدماتنا وعلى مواقع الويب الأخرى بناءً على سجل التصفح الخاص بك. يعني عدم قبول ملفات تعريف الارتباط هذه أننا قد نعرض إعلانات أقل صلة.</string>
-    <!-- Preference screen item title -->
-    <string name="preference_cookies_thirdparty_title">ملفات تعريف ارتباط Cookies تعود لطرف ثالث</string>
-    <!-- Preference screen item summary. Please, keep the placeholders to format the string. -->
-    <string name="preference_cookies_thirdparty_summary">هذه ملفات تعريف الارتباط Cookies المتحكم بها من قبل شخص آخر غيرنا؛ نستخدم ملفات تعريف الارتباط Cookies هذه لتوفير أنواع الوظائف الموضحة أعلاه. سيكون لعدم قبول ملفات تعريف الارتباط هذه آثار مختلفة اعتمادًا على نوع ملفات تعريف الارتباط لكل ملف تعريف ارتباط تابع لجهة خارجية. انقر فوق ”مزيد من المعلومات“ أدناه للحصول على تفاصيل حول جميع ملفات تعريف الارتباط Cookies للجهات الخارجية التي نستخدمها.</string>
     <!-- Preference screen item state description -->
     <string name="preference_cookies_always_on">دائما متاح</string>
     <!-- Menu option that allows the user to scan document and upload it directly to MEGA. -->
@@ -4546,4 +4496,10 @@
     <string name="image_insertion_not_allowed">ميغا MEGA لا تدعم إدراج الصور هنا</string>
     <!-- The label under the button of viewing all images screen -->
     <string name="section_images">صور</string>
+    <!-- Title of the dialog warning the user about disable file versioning. -->
+    <string name="disable_versioning_label">تعطيل إصدار نسخ للملف</string>
+    <!-- Warning of the dialog informing the user about disable file versioning. -->
+    <string name="disable_versioning_warning">تضمن ميزة نسخ الملفات لدينا الاحتفاظ بنسخ أقدم من ملفاتك إذا قمت باستبدالها بنسخ أحدث. إذا قمت بتعطيل ميزة نسخ الملفات File Versioning، فلن تتمتع بهذه الحماية بعد الآن؛ ستفقد النسخة القديمة عند استبدالها.</string>
+    <!-- Warning informing the user the folder location is trying to open no longer exists. -->
+    <string name="location_not_exist">هذا الموقع لم يعد موجوداً.</string>
 </resources>

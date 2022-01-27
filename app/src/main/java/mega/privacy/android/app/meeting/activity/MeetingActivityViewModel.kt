@@ -3,9 +3,9 @@ package mega.privacy.android.app.meeting.activity
 import android.content.Context
 import android.content.Intent
 import android.graphics.Bitmap
-import androidx.hilt.lifecycle.ViewModelInject
 import androidx.lifecycle.*
 import com.jeremyliao.liveeventbus.LiveEventBus
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.BaseActivity
 import mega.privacy.android.app.MegaApplication
@@ -14,7 +14,6 @@ import mega.privacy.android.app.constants.EventConstants.EVENT_AUDIO_OUTPUT_CHAN
 import mega.privacy.android.app.constants.EventConstants.EVENT_CHAT_TITLE_CHANGE
 import mega.privacy.android.app.constants.EventConstants.EVENT_LINK_RECOVERED
 import mega.privacy.android.app.constants.EventConstants.EVENT_MEETING_CREATED
-import mega.privacy.android.app.constants.EventConstants.EVENT_MEETING_INVITE
 import mega.privacy.android.app.constants.EventConstants.EVENT_NETWORK_CHANGE
 import mega.privacy.android.app.listeners.BaseListener
 import mega.privacy.android.app.listeners.InviteToChatRoomListener
@@ -36,14 +35,15 @@ import mega.privacy.android.app.utils.StringResourcesUtils.getString
 import mega.privacy.android.app.utils.VideoCaptureUtils
 import nz.mega.sdk.*
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
+import javax.inject.Inject
 
 /**
  * It's very common that two or more fragments in Meeting activity need to communicate with each other.
  * These fragments can share a ViewModel using their activity scope to handle this communication.
  * MeetingActivityViewModel shares state of Mic, Camera and Speaker for all Fragments
  */
-
-class MeetingActivityViewModel @ViewModelInject constructor(
+@HiltViewModel
+class MeetingActivityViewModel @Inject constructor(
     private val meetingActivityRepository: MeetingActivityRepository
 ) : ViewModel(), OpenVideoDeviceListener.OnOpenVideoDeviceCallback,
     DisableAudioVideoCallListener.OnDisableAudioVideoCallback {
@@ -526,7 +526,6 @@ class MeetingActivityViewModel @ViewModelInject constructor(
             val contactsData: List<String>? =
                 intent.getStringArrayListExtra(AddContactActivityLollipop.EXTRA_CONTACTS)
             if (contactsData != null) {
-                LiveEventBus.get(EVENT_MEETING_INVITE, Boolean::class.java).post(true)
                 currentChatId.value?.let {
                     InviteToChatRoomListener(context).inviteToChat(it, contactsData)
                     _snackBarLiveData.value = getString(R.string.invite_sent)
