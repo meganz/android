@@ -19,7 +19,6 @@ import mega.privacy.android.app.lollipop.FileExplorerActivityLollipop
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop
 import mega.privacy.android.app.utils.ColorUtils
 import mega.privacy.android.app.utils.Constants.*
-import mega.privacy.android.app.utils.Util.isOffline
 import mega.privacy.android.app.utils.callManager
 import nz.mega.sdk.MegaApiJava.*
 import java.util.*
