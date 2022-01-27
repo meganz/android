@@ -20,6 +20,7 @@ import nz.mega.sdk.MegaUserAlert;
 
 import static mega.privacy.android.app.constants.BroadcastConstants.*;
 import static mega.privacy.android.app.constants.EventConstants.EVENT_MEETING_AVATAR_CHANGE;
+import static mega.privacy.android.app.constants.EventConstants.EVENT_MY_BACKUPS_FOLDER_CHANGED;
 import static mega.privacy.android.app.constants.EventConstants.EVENT_USER_VISIBILITY_CHANGE;
 import static mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuotaPaywallWarning;
 import static mega.privacy.android.app.utils.Constants.ACTION_STORAGE_STATE_CHANGED;
@@ -28,6 +29,7 @@ import static mega.privacy.android.app.utils.Constants.EVENT_NOTIFICATION_COUNT_
 import static mega.privacy.android.app.utils.Constants.EXTRA_STORAGE_STATE;
 import static mega.privacy.android.app.utils.LogUtil.logDebug;
 import static nz.mega.sdk.MegaApiJava.USER_ATTR_CAMERA_UPLOADS_FOLDER;
+import static nz.mega.sdk.MegaApiJava.USER_ATTR_MY_BACKUPS_FOLDER;
 
 public class GlobalListener implements MegaGlobalListenerInterface {
 
@@ -89,6 +91,13 @@ public class GlobalListener implements MegaGlobalListenerInterface {
             // Receive the avatar change, send the event
             if (user.hasChanged(MegaUser.CHANGE_TYPE_AVATAR) && user.isOwnChange() == 0){
                 LiveEventBus.get(EVENT_MEETING_AVATAR_CHANGE, Long.class).post(user.getHandle());
+            }
+
+            if (user.hasChanged(MegaUser.CHANGE_TYPE_MY_BACKUPS_FOLDER) && isMyChange) {
+                //user has change backup attribute, need to update local ones
+                logDebug("MyBackup + Get backup attribute when change on other client.");
+                LiveEventBus.get(EVENT_MY_BACKUPS_FOLDER_CHANGED, Boolean.class).post(true);
+                break;
             }
         }
     }
