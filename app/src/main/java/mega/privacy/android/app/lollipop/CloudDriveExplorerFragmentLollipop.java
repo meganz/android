@@ -543,11 +543,8 @@ public class CloudDriveExplorerFragmentLollipop extends RotatableFragment implem
 			}
 			lastFirstVisiblePosition = mLayoutManager.findFirstCompletelyVisibleItemPosition();
 		} else {
-			if(gridLayoutManager == null){
-				logError("gridLayoutManager is null");
-				gridLayoutManager = (CustomizedGridLayoutManager) recyclerView.getLayoutManager();
-			}
-            lastFirstVisiblePosition = gridLayoutManager.findFirstCompletelyVisibleItemPosition();
+			// For grid view, just add null check
+            lastFirstVisiblePosition = gridLayoutManager == null ? 0 : gridLayoutManager.findFirstCompletelyVisibleItemPosition();
 		}
 
 		logDebug("Push to stack " + lastFirstVisiblePosition + " position");
@@ -601,11 +598,8 @@ public class CloudDriveExplorerFragmentLollipop extends RotatableFragment implem
 				}
 				lastFirstVisiblePosition = mLayoutManager.findFirstCompletelyVisibleItemPosition();
 			} else {
-				if(gridLayoutManager == null){
-					logError("gridLayoutManager is null");
-					gridLayoutManager = (CustomizedGridLayoutManager) recyclerView.getLayoutManager();
-				}
-				lastFirstVisiblePosition = gridLayoutManager.findFirstCompletelyVisibleItemPosition();
+				// For grid view, just add null check
+				lastFirstVisiblePosition = gridLayoutManager == null ? 0 : gridLayoutManager.findFirstCompletelyVisibleItemPosition();
 			}
 
 			logDebug("Push to stack " + lastFirstVisiblePosition + " position");
