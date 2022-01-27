@@ -18,9 +18,9 @@ sealed class FolderContent(val id: Long) {
 
     data class Data constructor(
         val parent: Data?,
-        val document: DocumentFile
+        val document: DocumentFile,
+        var isSelected: Boolean = false
     ) : FolderContent(document.uri.hashCode().toLong()) {
-        var isSelected = false
         val isFolder = document.isDirectory
         val name = document.name
         val uri = document.uri
@@ -37,10 +37,6 @@ sealed class FolderContent(val id: Long) {
 
         override fun getSectionTitle(): String =
             document.name?.substring(0, 1) ?: ""
-
-        fun longClick() {
-            isSelected = !isSelected
-        }
     }
 
     class Header : FolderContent(HEADER_ID.hashCode().toLong()) {

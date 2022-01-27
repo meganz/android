@@ -229,7 +229,7 @@ class UploadFolderActivity : PasscodeActivity(), Scrollable {
         }
     }
 
-    private fun updateActionMode(selectedItems: List<FolderContent.Data>) {
+    private fun updateActionMode(selectedItems: List<Int>) {
         when {
             selectedItems.isEmpty() -> {
                 actionMode?.finish()
@@ -265,6 +265,9 @@ class UploadFolderActivity : PasscodeActivity(), Scrollable {
             actionMode != null -> onLongClick(itemClicked, position)
             itemClicked.isFolder -> {
                 showProgress(true)
+                if (this::searchMenuItem.isInitialized) {
+                    searchMenuItem.collapseActionView()
+                }
                 viewModel.folderClick(itemClicked)
             }
         }
@@ -310,8 +313,7 @@ class UploadFolderActivity : PasscodeActivity(), Scrollable {
                 override fun onAnimationStart(animation: Animator?) {}
 
                 override fun onAnimationEnd(animation: Animator?) {
-                    folderContentAdapter.submitList(viewModel.getFolderContentItems()!!)
-                    folderContentAdapter.notifyDataSetChanged()
+                    viewModel.finishSelection()
                 }
 
                 override fun onAnimationCancel(animation: Animator?) {}

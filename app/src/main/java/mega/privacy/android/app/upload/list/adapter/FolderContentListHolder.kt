@@ -17,6 +17,7 @@ class FolderContentListHolder(
         binding.apply {
             if (item.isFolder) {
                 thumbnail.apply {
+                    hierarchy.setPlaceholderImage(R.drawable.ic_folder_list)
                     setActualImageResource(if (item.isSelected) R.drawable.ic_select_folder else R.drawable.ic_folder_list)
                 }
             } else {

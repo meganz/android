@@ -29,7 +29,7 @@ class UploadFolderViewModel @Inject constructor(
 
     private val currentFolder: MutableLiveData<FolderContent.Data> = MutableLiveData()
     private val folderItems: MutableLiveData<MutableList<FolderContent>> = MutableLiveData()
-    private val selectedItems: MutableLiveData<MutableList<FolderContent.Data>> = MutableLiveData()
+    private val selectedItems: MutableLiveData<MutableList<Int>> = MutableLiveData()
 
     private var order: Int = MegaApiJava.ORDER_DEFAULT_ASC
     private var isList: Boolean = true
@@ -40,7 +40,7 @@ class UploadFolderViewModel @Inject constructor(
 
     fun getCurrentFolder(): LiveData<FolderContent.Data> = currentFolder
     fun getFolderItems(): LiveData<MutableList<FolderContent>> = folderItems
-    fun getSelectedItems(): LiveData<MutableList<FolderContent.Data>> = selectedItems
+    fun getSelectedItems(): LiveData<MutableList<Int>> = selectedItems
 
     fun retrieveFolderContent(documentFile: DocumentFile, order: Int, isList: Boolean) {
         currentFolder.value = FolderContent.Data(null, documentFile)
@@ -49,9 +49,6 @@ class UploadFolderViewModel @Inject constructor(
         this.isList = isList
         setFolderItems()
     }
-
-    fun getFolderContentItems(): MutableList<FolderContent>? =
-        folderItems.value
 
     fun getQuery(): String? = query
 
@@ -74,9 +71,9 @@ class UploadFolderViewModel @Inject constructor(
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeBy(
                 onError = { folderItems.value = mutableListOf() },
-                onSuccess = { items ->
-                    folderItems.value = items
-                    folderContent[currentFolder.value] = items
+                onSuccess = { finalItems ->
+                    folderItems.value = finalItems
+                    folderContent[currentFolder.value] = finalItems
                 }
             )
             .addTo(composite)
@@ -165,24 +162,43 @@ class UploadFolderViewModel @Inject constructor(
     }
 
     fun itemLongClick(itemClicked: FolderContent.Data) {
+        val index = folderItems.value?.lastIndexOf(itemClicked) ?: INVALID_INDEX
+        if (index == INVALID_INDEX) {
+            return
+        }
+
+        selectedItems.value?.apply {
+            if (itemClicked.isSelected) {
+                remove(index)
+            } else {
+                add(index)
+            }
+
+            selectedItems.notifyObserver()
+        }
+    }
+
+    fun finishSelection() {
+        val finalList = mutableListOf<FolderContent>()
+
         folderItems.value?.apply {
-            val index = lastIndexOf(itemClicked)
+            for (item in this) {
+                if (item is FolderContent.Data) {
+                    val index = indexOf(item)
+                    val selected = selectedItems.value?.contains(index) ?: false
 
-            if (index != INVALID_INDEX) {
-                itemClicked.longClick()
-                set(index, itemClicked)
-
-                selectedItems.value?.apply {
-                    if (itemClicked.isSelected) {
-                        add(itemClicked)
+                    if (item.isSelected == selected) {
+                        finalList.add(item)
                     } else {
-                        remove(itemClicked)
+                        finalList.add(FolderContent.Data(item.parent, item.document, selected))
                     }
-
-                    selectedItems.notifyObserver()
+                } else {
+                    finalList.add(item)
                 }
             }
         }
+
+        folderItems.value = finalList
     }
 
     fun clearSelected(): List<Int> {
@@ -194,7 +210,6 @@ class UploadFolderViewModel @Inject constructor(
             for (item in this) {
                 if (item is FolderContent.Data && item.isSelected) {
                     positions.add(indexOf(item))
-                    item.longClick()
                 }
             }
         }
@@ -249,7 +264,7 @@ class UploadFolderViewModel @Inject constructor(
 
         if (selectedItems.value?.isEmpty() == false) {
             selectedItems.value?.forEach { item ->
-                uploadList.add(item.uri)
+                uploadList.add((folderItems.value?.get(item) as FolderContent.Data).uri)
             }
         } else {
             folderItems.value?.forEach { item ->
