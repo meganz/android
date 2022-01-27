@@ -7,6 +7,7 @@ import androidx.lifecycle.MutableLiveData
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
+import io.reactivex.rxjava3.core.Maybe
 import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.core.Single
 import io.reactivex.rxjava3.schedulers.Schedulers
@@ -48,7 +49,7 @@ class OfflineViewModel @Inject constructor(
 
     private val _nodes = MutableLiveData<Pair<List<OfflineNode>, Int>>()
     private val _nodeToOpen = MutableLiveData<Event<Pair<Int, OfflineNode>>>()
-    private val _actionBarTitle = MutableLiveData<String>()
+    private val _actionBarTitle = MutableLiveData<String?>()
     private val _actionMode = MutableLiveData<Boolean>()
     private val _nodesToAnimate = MutableLiveData<Set<Int>>()
     private val _pathLiveData = MutableLiveData<String>()
@@ -68,7 +69,7 @@ class OfflineViewModel @Inject constructor(
 
     val nodes: LiveData<Pair<List<OfflineNode>, Int>> = _nodes
     val nodeToOpen: LiveData<Event<Pair<Int, OfflineNode>>> = _nodeToOpen
-    val actionBarTitle: LiveData<String> = _actionBarTitle
+    val actionBarTitle: LiveData<String?> = _actionBarTitle
     val actionMode: LiveData<Boolean> = _actionMode
     val nodesToAnimate: LiveData<Set<Int>> = _nodesToAnimate
     val pathLiveData: LiveData<String> = _pathLiveData
@@ -113,10 +114,6 @@ class OfflineViewModel @Inject constructor(
                     logErr("OfflineViewModel showOptionsPanelAction")
                 )
         )
-    }
-
-    override fun onCleared() {
-        super.onCleared()
     }
 
     fun getSelectedNodes(): List<MegaOffline> {
@@ -325,10 +322,10 @@ class OfflineViewModel @Inject constructor(
 
         return when {
             query != null -> {
-                context.getString(R.string.action_search).toUpperCase(Locale.ROOT) + ": " + query
+                context.getString(R.string.action_search).uppercase(Locale.ROOT) + ": " + query
             }
             path == OFFLINE_ROOT || path == "" -> {
-                context.getString(R.string.section_saved_for_offline_new).toUpperCase(Locale.ROOT)
+                context.getString(R.string.section_saved_for_offline_new).uppercase(Locale.ROOT)
             }
             else -> {
                 val pathWithoutLastSlash = path.substring(0, path.length - 1)
@@ -401,16 +398,15 @@ class OfflineViewModel @Inject constructor(
     }
 
     fun processUrlFile(file: File) {
-        add(Single.fromCallable { return@fromCallable getURLOfflineFileContent(file) }
-            .subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribe({
-                if (it != null) {
-                    _urlFileOpenAsUrl.value = Event(it)
-                } else {
-                    _urlFileOpenAsFile.value = Event(file)
-                }
-            }, logErr("processUrlFile"))
+        add(
+            Maybe.fromCallable { return@fromCallable getURLOfflineFileContent(file) }
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(
+                    { _urlFileOpenAsUrl.value = Event(it) },
+                    { logErr("processUrlFile") },
+                    { _urlFileOpenAsFile.value = Event(file) }
+                )
         )
     }
 

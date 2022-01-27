@@ -23,7 +23,7 @@ public class MimeTypeThumbnail {
 		resources = new SparseArray<String[]>();
 		resources.put(R.drawable.ic_3d_thumbnail, new String[] {"3ds", "3dm", "max", "obj", });
 		resources.put(R.drawable.ic_aftereffects_thumbnail, new String[] {"aec", "aep", "aepx", "aes", "aet", "aetx", });
-		resources.put(R.drawable.ic_audio_thumbnail, new String[] {"aif", "aiff", "wav", "flac", "iff", "m4a", "wma", "oga", "ogg", "mp3", "3ga", "opus", });
+		resources.put(R.drawable.ic_audio_thumbnail, new String[] {"aif", "aiff", "wav", "flac", "iff", "m4a", "wma", "oga", "ogg", "mp3", "3ga", "opus", "weba"});
 		resources.put(R.drawable.ic_cad_thumbnail, new String[] {"dwg", "dxf", });
 		resources.put(R.drawable.ic_compressed_thumbnail, new String[] {"bz2", "gz", "rar", "tar", "tbz", "tgz", "zip", "deb", "udeb", "rpm", "air", "apk", "dmg", "7z", "bz", "bzip2", "cab", "lha", "gzip", "ace", "arc", "pkg", });
 		resources.put(R.drawable.database_thumbnail, new String[] {"accdb", "db", "dbf", "mdb", "pdb", "sql", });
@@ -110,77 +110,6 @@ public class MimeTypeThumbnail {
 		return new MimeTypeThumbnail(detectedType, extension);
 	}
 
-	public String getType() {
-		return type;
-	}
-	
-	public boolean isDocument(){
-		boolean r = type.startsWith("application/pdf") || type.startsWith("application/msword") || type.startsWith("application/vnd.ms-excel") || type.startsWith("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet") || type.startsWith("application/vnd.openxmlformats-officedocument.wordprocessingml.document") || type.startsWith("application/rtf") || type.startsWith(TYPE_TEXT_PLAIN);
-		
-		return r;
-	}
-	
-	/*
-	 * Check is MimeType of image type
-	 */
-	public boolean isImage() {
-		return type.startsWith("image/");
-	}
-	
-	public boolean isPdf(){
-		return type.startsWith("application/pdf");
-	}
-	
-	public boolean isZip(){
-		
-		if(type.startsWith("application/zip")||type.startsWith("multipart/x-zip")){
-			return true;
-		}
-		return false;
-		
-	}
-	
-
-	/*
-	 * Once a file is downloaded, prior to create the preview, check if the file is really an image
-	 */
-	public boolean isImage(String path){
-		BitmapFactory.Options options = new BitmapFactory.Options();
-		options.inJustDecodeBounds = true;
-		Bitmap bitmap = BitmapFactory.decodeFile(path, options);
-		if (options.outWidth != -1 && options.outHeight != -1) {
-		    // This is an image file.
-			return true;
-		}
-		else {
-		    // This is not an image file.
-			return false;
-		}
-	}
-	
-	/*
-	 * Check is MimeType of video type
-	 */
-	public boolean isVideo() {
-		return type.startsWith("video/") || extension.equals("mkv");
-	}
-
-	public boolean isVideoReproducible() {
-		return type.startsWith("video/") || extension.equals("mkv") || extension.equals("flv")
-				|| extension.equals("vob") || extension.equals("avi") || extension.equals("wmv")
-				|| extension.equals("mpg") || extension.equals("mts");
-	}
-
-	public boolean isVideoNotSupported() {
-		return extension.equals("flv") || extension.equals("avi") || extension.equals("wmv");
-	}
-	/*
-	 * Check is MimeType of audio type
-	 */
-	public boolean isAudio() {
-		return type.startsWith("audio/");
-	}
-
 	/*
 	 * Get Icon for current MimeType
 	 */
@@ -208,9 +137,5 @@ public class MimeTypeThumbnail {
 			}
 		}
 		return resId;
-	}
-
-	public boolean isGIF () {
-		return extension.equals("gif") || extension.equals("webp");
 	}
 }

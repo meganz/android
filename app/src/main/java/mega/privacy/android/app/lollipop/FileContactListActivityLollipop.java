@@ -24,6 +24,7 @@ import android.os.Looper;
 import android.text.format.DateUtils;
 import android.util.DisplayMetrics;
 import android.view.Display;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -59,6 +60,8 @@ import nz.mega.sdk.MegaShare;
 import nz.mega.sdk.MegaUser;
 import nz.mega.sdk.MegaUserAlert;
 
+import static mega.privacy.android.app.utils.MegaNodeDialogUtil.BACKUP_NONE;
+import static mega.privacy.android.app.utils.MegaNodeUtil.checkBackupNodeTypeByHandle;
 import static mega.privacy.android.app.utils.MegaProgressDialogUtil.createProgressDialog;
 import static mega.privacy.android.app.listeners.ShareListener.*;
 import static mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil.*;
@@ -648,6 +651,11 @@ public class FileContactListActivityLollipop extends PasscodeActivity implements
 	public void changePermissions(){
 		logDebug("changePermissions");
 		notifyDataSetChanged();
+		int nodeType = checkBackupNodeTypeByHandle(megaApi, node);
+		if (nodeType != BACKUP_NONE) {
+			showWarningDialog();
+			return;
+		}
 		dialogBuilder.setTitle(getString(R.string.file_properties_shared_folder_permissions));
 		final CharSequence[] items = {getString(R.string.file_properties_shared_folder_read_only), getString(R.string.file_properties_shared_folder_read_write), getString(R.string.file_properties_shared_folder_full_access)};
 		dialogBuilder.setSingleChoiceItems(items, selectedShare.getAccess(), (dialog, item) -> {
@@ -658,7 +666,34 @@ public class FileContactListActivityLollipop extends PasscodeActivity implements
 		permissionsDialog = dialogBuilder.create();
 		permissionsDialog.show();
 	}
-	
+
+	/**
+	 * Show the warning dialog when change the permissions of this folder
+	 * @return The dialog
+	 */
+	private AlertDialog showWarningDialog() {
+		DialogInterface.OnClickListener  dialogClickListener =
+				(dialog, which) -> {
+					dialog.dismiss();
+				};
+		LayoutInflater layout = this.getLayoutInflater();
+		View view = layout.inflate(R.layout.dialog_backup_operate_tip, null);
+		TextView tvTitle = view.findViewById(R.id.title);
+		TextView tvContent = view.findViewById(R.id.backup_tip_content);
+		tvTitle.setText(R.string.backup_share_permission_title);
+		tvContent.setText(R.string.backup_share_permission_text);
+		AlertDialog.Builder builder = new MaterialAlertDialogBuilder(this)
+				.setView(view);
+		builder.setPositiveButton(
+				getString(R.string.button_permission_info),
+				dialogClickListener
+		);
+		AlertDialog dialog = builder.show();
+		dialog.setCancelable(false);
+		dialog.setCanceledOnTouchOutside(false);
+		return dialog;
+	}
+
 	public void setPositionClicked(int positionClicked){
 		if (adapter != null){
 			adapter.setPositionClicked(positionClicked);

@@ -17,5 +17,14 @@
         android:title="@string/action_grid"
         android:visible="true"
         app:iconTint="?attr/colorControlNormal"
+        app:showAsAction="always" />
+
+    <item
+        android:id="@+id/action_menu_sort_by"
+        android:icon="@drawable/ic_dots_vertical_white"
+        android:orderInCategory="95"
+        android:title="@string/action_sort_by"
+        app:iconTint="?attr/colorControlNormal"
+        android:visible="true"
         app:showAsAction="ifRoom" />
 </menu>

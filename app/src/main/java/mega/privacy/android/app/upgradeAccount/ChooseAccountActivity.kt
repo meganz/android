@@ -83,7 +83,7 @@ open class ChooseAccountActivity : PasscodeActivity(), Scrollable {
             setHomeButtonEnabled(true)
             setDisplayHomeAsUpEnabled(true)
             title = StringResourcesUtils.getString(R.string.choose_account_fragment)
-                .toUpperCase(Locale.getDefault())
+                .uppercase(Locale.getDefault())
         }
 
         ListenScrollChangesHelper().addViewToListen(
