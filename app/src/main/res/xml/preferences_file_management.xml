@@ -4,6 +4,16 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:background="@color/white">
 
+    <androidx.preference.SwitchPreferenceCompat
+        android:key="setting_mobile_data_high_resolution"
+        android:summary="@string/settings_mobile_data_resoluton_summary"
+        android:title="@string/settings_mobile_data_resoluton_title"
+        app:singleLineTitle="false"
+        app:defaultValue="true"
+        app:allowDividerAbove="true"
+        app:allowDividerBelow="true"
+        app:iconSpaceReserved="false" />
+
     <androidx.preference.Preference
         android:key="settings_file_management_offline"
         android:title="@string/settings_advanced_features_offline"

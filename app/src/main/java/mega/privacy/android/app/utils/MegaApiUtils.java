@@ -15,7 +15,6 @@ import java.util.List;
 import java.util.regex.Pattern;
 
 import mega.privacy.android.app.MegaApplication;
-import mega.privacy.android.app.R;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaChatApiAndroid;
@@ -27,6 +26,7 @@ import static mega.privacy.android.app.utils.CacheFolderManager.*;
 import static mega.privacy.android.app.utils.FileUtil.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.TextUtil.getFolderInfo;
+import static mega.privacy.android.app.utils.TextUtil.isTextEmpty;
 
 
 public class MegaApiUtils {
@@ -58,6 +58,21 @@ public class MegaApiUtils {
         MegaApiJava megaApi = MegaApplication.getInstance().getMegaApi();
 
         return getFolderInfo(megaApi.getNumChildFolders(n), megaApi.getNumChildFiles(n));
+    }
+
+    /**
+     * Get the number of device node in backup folder
+     * @param subBackupNodes The node list of MyBackup folder
+     * @return the number of device node
+     */
+    public static int getMegaNodeBackupDeviceInfo(ArrayList<MegaNode> subBackupNodes) {
+        int device = 0;
+        for (MegaNode n : subBackupNodes) {
+            if (!isTextEmpty(n.getDeviceId())) {
+                device++;
+            }
+        }
+        return device;
     }
 
     /**

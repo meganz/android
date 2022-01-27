@@ -157,20 +157,11 @@
         </activity>
 
         <activity
-            android:name="mega.privacy.android.app.lollipop.FullScreenImageViewerLollipop"
-            android:label="@string/full_screen_image_viewer_label"
+            android:name="mega.privacy.android.app.imageviewer.ImageViewerActivity"
+            android:label=""
             android:launchMode="singleTop"
-            android:uiOptions="splitActionBarWhenNarrow"
-            android:theme="@style/Theme.Dark.FullScreen.Draggable">
-        </activity>
-
-        <activity
-            android:name="mega.privacy.android.app.lollipop.megachat.ChatFullScreenImageViewer"
-            android:label="@string/full_screen_image_viewer_label"
-            android:launchMode="singleTop"
-            android:uiOptions="splitActionBarWhenNarrow"
-            android:theme="@style/Theme.Dark.FullScreen.Draggable">
-        </activity>
+            android:theme="@style/Theme.Mega.FullScreen.ImageViewer"
+            android:windowSoftInputMode="stateHidden|adjustResize" />
 
         <activity
             android:name="mega.privacy.android.app.lollipop.ContactFileListActivityLollipop"
@@ -358,6 +349,7 @@
         </activity>
         <activity
             android:name=".activities.OfflineFileInfoActivity"
+            android:launchMode="singleTop"
             android:label="@string/app_name" />
 
         <activity
@@ -408,7 +400,7 @@
         <activity
             android:name=".mediaplayer.VideoPlayerActivity"
             android:windowSoftInputMode="adjustNothing"
-            android:theme="@style/Theme.Dark.FullScreen.Draggable" />
+            android:theme="@style/Theme.Mega.FullScreen" />
 
         <activity
             android:name=".mediaplayer.AudioPlayerActivity"

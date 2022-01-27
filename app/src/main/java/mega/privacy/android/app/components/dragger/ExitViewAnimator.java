@@ -11,8 +11,7 @@ import androidx.core.view.ViewPropertyAnimatorListenerAdapter;
 import androidx.core.view.ViewPropertyAnimatorUpdateListener;
 
 import com.facebook.drawee.view.SimpleDraweeView;
-
-import mega.privacy.android.app.components.TouchImageView;
+import com.facebook.samples.zoomable.ZoomableDraweeView;
 
 import static mega.privacy.android.app.utils.Constants.LOCATION_INDEX_LEFT;
 import static mega.privacy.android.app.utils.Constants.LOCATION_INDEX_TOP;
@@ -29,17 +28,18 @@ public class ExitViewAnimator<D extends DraggableView> extends ReturnOriginViewA
 
         float scaleX;
         float scaleY;
-        TouchImageView touchImageView = null;
         ImageView imageView;
         SurfaceView surfaceView;
 
         if (currentView != null) {
             if (screenPosition != null) {
-                if (currentView instanceof TouchImageView) {
-                    touchImageView = (TouchImageView) currentView;
-                    scaleX = ((float) screenPosition[2]) / touchImageView.getImageWidth();
-                    scaleY = ((float) screenPosition[3]) / touchImageView.getImageHeight();
-                    logDebug("Scale: " + scaleX + " " + scaleY + " dimensions: " + touchImageView.getImageWidth() + " " + touchImageView.getImageHeight() + " position: " + screenPosition[0] + " " + screenPosition[1]);
+                if (currentView instanceof ZoomableDraweeView) {
+                    ZoomableDraweeView zoomableDraweeView = (ZoomableDraweeView) currentView;
+                    RectF bounds = new RectF();
+                    zoomableDraweeView.getHierarchy().getActualImageBounds(bounds);
+                    scaleX = ((float) screenPosition[2]) / (bounds.right - bounds.left);
+                    scaleY = ((float) screenPosition[3]) / (bounds.bottom - bounds.top);
+                    logDebug("ZoomableDraweeView scale: " + scaleX + " " + scaleY);
                 }
                 else if (currentView instanceof SimpleDraweeView){
                     SimpleDraweeView simpleDraweeView = (SimpleDraweeView) currentView;
@@ -162,7 +162,7 @@ public class ExitViewAnimator<D extends DraggableView> extends ReturnOriginViewA
                             listener.showPreviousHiddenThumbnail();
 
                             DraggableView.DraggableViewListener dragListener = draggableView.getDragListener();
-                            if (dragListener != null) {
+                            if (dragListener != null && screenPosition != null) {
                                 dragListener.onDraggedEnded(draggableView, direction);
                                 dragListener.onDrag(draggableView, screenPosition[0], screenPosition[1]);
                             }
