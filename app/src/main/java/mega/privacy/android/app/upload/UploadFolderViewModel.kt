@@ -32,7 +32,7 @@ class UploadFolderViewModel @Inject constructor(
     private val selectedItems: MutableLiveData<MutableList<FolderContent.Data>> = MutableLiveData()
 
     private var order: Int = MegaApiJava.ORDER_DEFAULT_ASC
-    var isList: Boolean = true
+    private var isList: Boolean = true
     private var query: String? = null
     private var folderContent = HashMap<FolderContent.Data?, MutableList<FolderContent>>()
     private var searchResults =
@@ -124,6 +124,40 @@ class UploadFolderViewModel @Inject constructor(
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeBy(
                     onError = { error -> logWarning("Cannot reorder", error) },
+                    onSuccess = { newFolderContent -> folderContent = newFolderContent }
+                )
+                .addTo(composite)
+        }
+    }
+
+    fun setIsList(newIsList: Boolean) {
+        if (newIsList != isList) {
+            isList = newIsList
+
+            if (!folderItems.value.isNullOrEmpty()) {
+                getFolderContentUseCase.switchView(folderItems.value!!, isList)
+                    .subscribeOn(Schedulers.single())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribeBy(
+                        onError = { error -> logWarning("No switch view.", error) },
+                        onSuccess = { items ->
+                            folderItems.value = items
+
+                            if (query == null && folderContent.containsKey(currentFolder.value!!)) {
+                                folderContent[currentFolder.value] = items
+                            }
+                        }
+                    )
+                    .addTo(composite)
+            }
+
+            val folder: FolderContent.Data? = if (query == null) currentFolder.value else null
+
+            getFolderContentUseCase.switchView(folderContent, folder, isList)
+                .subscribeOn(Schedulers.single())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeBy(
+                    onError = { error -> logWarning("Cannot switch view.", error) },
                     onSuccess = { newFolderContent -> folderContent = newFolderContent }
                 )
                 .addTo(composite)

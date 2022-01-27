@@ -204,7 +204,7 @@ class UploadFolderActivity : PasscodeActivity(), Scrollable {
 
         sortByHeaderViewModel.listGridChangeEvent.observe(this, EventObserver { isList ->
             switchListGrid(isList)
-            viewModel.isList = isList
+            viewModel.setIsList(isList)
         })
     }
 
