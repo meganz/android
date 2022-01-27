@@ -80,13 +80,8 @@ import mega.privacy.android.app.utils.AlertsAndWarnings;
 import mega.privacy.android.app.utils.StringResourcesUtils;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
-import nz.mega.sdk.MegaChatApi;
 import nz.mega.sdk.MegaChatApiAndroid;
-import nz.mega.sdk.MegaChatApiJava;
-import nz.mega.sdk.MegaChatError;
 import nz.mega.sdk.MegaChatMessage;
-import nz.mega.sdk.MegaChatRequest;
-import nz.mega.sdk.MegaChatRequestListenerInterface;
 import nz.mega.sdk.MegaContactRequest;
 import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaEvent;
@@ -117,6 +112,7 @@ import static mega.privacy.android.app.utils.Constants.FROM_INCOMING_SHARES;
 import static mega.privacy.android.app.utils.Constants.HIGH_PRIORITY_TRANSFER;
 import static mega.privacy.android.app.utils.Constants.INBOX_ADAPTER;
 import static mega.privacy.android.app.utils.Constants.INCOMING_SHARES_ADAPTER;
+import static mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_FIRST_LEVEL;
 import static mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_NEED_STOP_HTTP_SERVER;
 import static mega.privacy.android.app.utils.Constants.MAX_BUFFER_16MB;
 import static mega.privacy.android.app.utils.Constants.MAX_BUFFER_32MB;
@@ -157,7 +153,7 @@ import static nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE;
 
 public class PdfViewerActivityLollipop extends PasscodeActivity
         implements MegaGlobalListenerInterface, OnPageChangeListener, OnLoadCompleteListener,
-        OnPageErrorListener, MegaRequestListenerInterface, MegaChatRequestListenerInterface,
+        OnPageErrorListener, MegaRequestListenerInterface,
         MegaTransferListenerInterface, ActionNodeCallback, SnackbarShower {
 
     MegaApplication app = null;
@@ -1533,7 +1529,7 @@ public class PdfViewerActivityLollipop extends PasscodeActivity
             }
             if (type == INCOMING_SHARES_ADAPTER || fromIncoming) {
                 i.putExtra("from", FROM_INCOMING_SHARES);
-                i.putExtra("firstLevel", false);
+                i.putExtra(INTENT_EXTRA_KEY_FIRST_LEVEL, false);
             }
             else if(type == INBOX_ADAPTER){
                 i.putExtra("from", FROM_INBOX);
@@ -1897,13 +1893,6 @@ public class PdfViewerActivityLollipop extends PasscodeActivity
 
                 dbH.saveCredentials(credentials);
 
-                logDebug("Chat enabled-->connect");
-                if ((megaChatApi.getInitState() != MegaChatApi.INIT_ERROR)) {
-                    logDebug("Connection goes!!!");
-                    megaChatApi.connect(this);
-                } else {
-                    logDebug("Not launch connect: " + megaChatApi.getInitState());
-                }
                 MegaApplication.setLoggingIn(false);
                 download();
             }
@@ -1958,36 +1947,6 @@ public class PdfViewerActivityLollipop extends PasscodeActivity
     @Override
     public void onRequestTemporaryError(MegaApiJava api, MegaRequest request, MegaError e) {
         logWarning("onRequestTemporaryError");
-    }
-
-    @Override
-    public void onRequestStart(MegaChatApiJava api, MegaChatRequest request) {
-
-    }
-
-    @Override
-    public void onRequestUpdate(MegaChatApiJava api, MegaChatRequest request) {
-
-    }
-
-    @Override
-    public void onRequestFinish(MegaChatApiJava api, MegaChatRequest request, MegaChatError e) {
-        logDebug("onRequestFinish - MegaChatApi");
-
-        if (request.getType() == MegaChatRequest.TYPE_CONNECT){
-            MegaApplication.setLoggingIn(false);
-            if(e.getErrorCode()==MegaChatError.ERROR_OK){
-                logDebug("Connected to chat!");
-            }
-            else{
-                logError("ERROR WHEN CONNECTING " + e.getErrorString());
-            }
-        }
-    }
-
-    @Override
-    public void onRequestTemporaryError(MegaChatApiJava api, MegaChatRequest request, MegaChatError e) {
-
     }
 
     @Override

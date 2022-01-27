@@ -111,7 +111,6 @@ public class Constants {
     public static final int MULTIPLE_REMOVE_CONTACT_SHARED_FOLDER = 9;
     public static final int MULTIPLE_CHAT_IMPORT = 10;
     public static final int MULTIPLE_CHANGE_PERMISSION = 12;
-    public static final int MULTIPLE_RESTORED_FROM_RUBBISH = 13;
 
     public static final int CANCEL_ACCOUNT_2FA = 4000;
     public static final int CHANGE_MAIL_2FA = 4001;
@@ -280,6 +279,7 @@ public class Constants {
     public static final String BROADCAST_ACTION_INTENT_UPDATE_USER_DATA = "BROADCAST_ACTION_INTENT_UPDATE_USER_DATA";
 
     public static final String INTENT_EXTRA_KEY_HANDLE = "HANDLE";
+    public static final String INTENT_EXTRA_KEY_OFFLINE_HANDLE = "INTENT_EXTRA_KEY_OFFLINE_HANDLE";
     public static final String INTENT_EXTRA_KEY_FILE_NAME = "FILENAME";
     public static final String INTENT_EXTRA_KEY_SCREEN_POSITION = "screenPosition";
     public static final String INTENT_EXTRA_KEY_SCREEN_POSITION_FOR_SWIPE_DISMISS = "screenPositionForSwipeDismiss";
@@ -289,6 +289,7 @@ public class Constants {
     public static final String INTENT_EXTRA_KEY_INSIDE = "inside";
     public static final String INTENT_EXTRA_KEY_IS_URL = "isUrl";
     public static final String INTENT_EXTRA_KEY_POSITION = "position";
+    public static final String INTENT_EXTRA_KEY_IS_FOLDER_LINK = "isFolderLink";
     public static final String INTENT_EXTRA_KEY_ORDER_GET_CHILDREN = "orderGetChildren";
     public static final String INTENT_EXTRA_KEY_PARENT_NODE_HANDLE = "parentNodeHandle";
     public static final String INTENT_EXTRA_KEY_HANDLES_NODES_SEARCH = "handlesNodesSearch";
@@ -301,6 +302,7 @@ public class Constants {
     public static final String INTENT_EXTRA_KEY_REBUILD_PLAYLIST = "REBUILD_PLAYLIST";
     public static final String INTENT_EXTRA_KEY_FROM = "from";
     public static final String INTENT_EXTRA_KEY_COPY_FROM = "COPY_FROM";
+    public static final String INTENT_EXTRA_KEY_IMPORT_CHAT = "HANDLES_IMPORT_CHAT";
     public static final String INTENT_EXTRA_KEY_MOVE_FROM = "MOVE_FROM";
     public static final String INTENT_EXTRA_KEY_MOVE_HANDLES = "MOVE_HANDLES";
     public static final String INTENT_EXTRA_KEY_MOVE_TO = "MOVE_TO";
@@ -323,6 +325,7 @@ public class Constants {
     public static final String INTENT_EXTRA_KEY_TOOL_BAR_TITLE = "aBtitle";
     public static final String INTENT_EXTRA_IS_FROM_MEETING = "extra_is_from_meeting";
     public static final String INTENT_EXTRA_MEETING_PARTICIPANTS = "participants_in_a_meeting";
+    public static final String INTENT_EXTRA_KEY_URI = "INTENT_EXTRA_KEY_URI";
 
     public static final int FILE_BROWSER_ADAPTER = 2000;
     public static final int CONTACT_FILE_ADAPTER = 2001;
@@ -359,6 +362,8 @@ public class Constants {
     public static final int VIDEO_SEARCH_ADAPTER = 2033;
     public static final int RECENTS_BUCKET_ADAPTER = 2034;
     public static final int VERSIONS_ADAPTER = 2035;
+    public static final int MEDIA_BROWSE_ADAPTER = 2036;
+    public static final int FROM_IMAGE_VIEWER = 2036;
 
     public static final int VIEWER_FROM_PHOTOS = 1;
     public static final int VIEWER_FROM_INCOMING_SHARES = 2;
@@ -436,9 +441,7 @@ public class Constants {
     public static final String NOTIFICATION_CHANNEL_DOWNLOAD_ID = "DownloadServiceNotification";
     public static final String NOTIFICATION_CHANNEL_DOWNLOAD_NAME = "MEGA Download";
     public static final String NOTIFICATION_CHANNEL_UPLOAD_ID = "UploadServiceNotification";
-    public static final String NOTIFICATION_CHANNEL_UPLOAD_ID_FOLDER = "FolderUploadServiceNotification";
     public static final String NOTIFICATION_CHANNEL_UPLOAD_NAME = "MEGA File Upload";
-    public static final String NOTIFICATION_CHANNEL_UPLOAD_NAME_FOLDER = "MEGA Folder Upload";
     public static final String NOTIFICATION_CHANNEL_CAMERA_UPLOADS_ID = "CameraUploadsServiceNotification";
     public static final String NOTIFICATION_CHANNEL_CAMERA_UPLOADS_NAME = "MEGA Camera Uploads";
     public static final String NOTIFICATION_CHANNEL_CHAT_ID = "ChatNotification";
@@ -515,6 +518,7 @@ public class Constants {
     public static final String APP_DATA_SEPARATOR = "-";
     //Indicates the data after it, is a new AppData due to a repeated transfer
     public static final String APP_DATA_REPEATED_TRANSFER_SEPARATOR = "!";
+    public static final String APP_DATA_BACKGROUND_TRANSFER = "BACKGROUND_TRANSFER";
 
     public static final String AVATAR_PRIMARY_COLOR = "AVATAR_PRIMARY_COLOR";
     public static final String AVATAR_GROUP_CHAT_COLOR = "AVATAR_GROUP_CHAT_COLOR";
@@ -558,9 +562,9 @@ public class Constants {
     public static final int NOT_SPACE_SNACKBAR_TYPE = 3;
     public static final int PERMISSIONS_TYPE = 4;
     public static final int INVITE_CONTACT_TYPE = 5;
-    public static final int SNACKBAR_IMCOMPATIBILITY_TYPE = 6;
-    public static final int DISMISS_ACTION_SNACKBAR = 7;
-    public static final int OPEN_FILE_SNACKBAR_TYPE = 8;
+    public static final int DISMISS_ACTION_SNACKBAR = 6;
+    public static final int OPEN_FILE_SNACKBAR_TYPE = 7;
+    public static final int SENT_REQUESTS_TYPE = 8;
 
     public static final int INFO_ANIMATION = 3000;
     public static final int QUICK_INFO_ANIMATION = 500;
@@ -922,4 +926,5 @@ public class Constants {
     public static final int AVATAR_CHANGE = 1;
 
     public static final int CLICKS_ENABLE_DEBUG = 5;
+    public static final int FIRST_NAVIGATION_LEVEL = 0;
 }

@@ -24,6 +24,7 @@ import mega.privacy.android.app.lollipop.megachat.AndroidMegaChatMessage;
 import mega.privacy.android.app.lollipop.megachat.NodeAttachmentHistoryActivity;
 import mega.privacy.android.app.modalbottomsheet.BaseBottomSheetDialogFragment;
 import mega.privacy.android.app.utils.StringResourcesUtils;
+import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaChatMessage;
 import nz.mega.sdk.MegaChatRoom;
 import nz.mega.sdk.MegaNode;
@@ -243,6 +244,8 @@ public class NodeAttachmentBottomSheetDialogFragment extends BaseBottomSheetDial
                 if (availableOffline(requireContext(), node)) {
                     MegaOffline mOffDelete = dbH.findByHandle(node.getHandle());
                     removeOffline(mOffDelete, dbH, requireContext());
+                    Util.showSnackbar(
+                            getActivity(), getResources().getString(R.string.file_removed_offline));
                 } else if (requireActivity() instanceof SnackbarShower) {
                     ArrayList<AndroidMegaChatMessage> messages = new ArrayList<>();
                     messages.add(message);

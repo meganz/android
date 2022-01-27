@@ -48,7 +48,10 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import java.util.Stack;
+import java.util.function.ToLongFunction;
+import java.util.stream.LongStream;
 
 import javax.inject.Inject;
 
@@ -59,6 +62,8 @@ import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.TransfersManagementActivity;
+import mega.privacy.android.app.utils.LogUtil;
+import mega.privacy.android.app.imageviewer.ImageViewerActivity;
 import mega.privacy.android.app.utils.MegaProgressDialogUtil;
 import mega.privacy.android.app.components.SimpleDividerItemDecoration;
 import mega.privacy.android.app.components.saver.NodeSaver;
@@ -307,6 +312,10 @@ public class FolderLinkActivityLollipop extends TransfersManagementActivity impl
 
 			case R.id.share_link:
 				shareLink(this, url);
+				break;
+
+			case R.id.action_more:
+				showOptionsPanel(megaApiFolder.getNodeByHandle(parentHandle));
 				break;
 		}
 
@@ -765,10 +774,12 @@ public class FolderLinkActivityLollipop extends TransfersManagementActivity impl
 									Intent backIntent;
 									boolean closedChat = MegaApplication.isClosedChat();
 									if(closedChat){
-										if(folderLinkActivity != null)
-											backIntent = new Intent(folderLinkActivity, ManagerActivityLollipop.class);
-										else
-											backIntent = new Intent(FolderLinkActivityLollipop.this, ManagerActivityLollipop.class);
+										backIntent = new Intent(
+												Objects.requireNonNullElse(
+														folderLinkActivity,
+														FolderLinkActivityLollipop.this
+												),
+												ManagerActivityLollipop.class);
 
 										startActivity(backIntent);
 									}
@@ -800,10 +811,12 @@ public class FolderLinkActivityLollipop extends TransfersManagementActivity impl
 								Intent backIntent;
 								boolean closedChat = MegaApplication.isClosedChat();
 								if(closedChat){
-									if(folderLinkActivity != null)
-										backIntent = new Intent(folderLinkActivity, ManagerActivityLollipop.class);
-									else
-										backIntent = new Intent(FolderLinkActivityLollipop.this, ManagerActivityLollipop.class);
+									backIntent = new Intent(
+											Objects.requireNonNullElse(
+													folderLinkActivity,
+													FolderLinkActivityLollipop.this
+											),
+											ManagerActivityLollipop.class);
 									startActivity(backIntent);
 								}
 
@@ -886,7 +899,14 @@ public class FolderLinkActivityLollipop extends TransfersManagementActivity impl
 											dialog.dismiss();
 											boolean closedChat = MegaApplication.isClosedChat();
 											if(closedChat){
-												Intent backIntent = new Intent(folderLinkActivity, ManagerActivityLollipop.class);
+												Intent backIntent;
+												backIntent = new Intent(
+														Objects.requireNonNullElse(
+																folderLinkActivity,
+																FolderLinkActivityLollipop.this
+														),
+														ManagerActivityLollipop.class
+												);
 												startActivity(backIntent);
 											}
 
@@ -1028,7 +1048,14 @@ public class FolderLinkActivityLollipop extends TransfersManagementActivity impl
 									dialog.dismiss();
 									boolean closedChat = MegaApplication.isClosedChat();
 									if(closedChat){
-										Intent backIntent = new Intent(folderLinkActivity, ManagerActivityLollipop.class);
+										Intent backIntent;
+										backIntent = new Intent(
+												Objects.requireNonNullElse(
+														folderLinkActivity,
+														FolderLinkActivityLollipop.this
+												),
+												ManagerActivityLollipop.class
+										);
 										startActivity(backIntent);
 									}
 
@@ -1071,7 +1098,14 @@ public class FolderLinkActivityLollipop extends TransfersManagementActivity impl
 									dialog.dismiss();
 									boolean closedChat = MegaApplication.isClosedChat();
 									if(closedChat){
-										Intent backIntent = new Intent(folderLinkActivity, ManagerActivityLollipop.class);
+										Intent backIntent;
+										backIntent = new Intent(
+												Objects.requireNonNullElse(
+														folderLinkActivity,
+														FolderLinkActivityLollipop.this
+												),
+												ManagerActivityLollipop.class
+										);
 										startActivity(backIntent);
 									}
 									finish();
@@ -1261,23 +1295,14 @@ public class FolderLinkActivityLollipop extends TransfersManagementActivity impl
 				}
 			}
 			else{
-				if (MimeTypeList.typeForName(nodes.get(position).getName()).isImage()){
-					Intent intent = new Intent(this, FullScreenImageViewerLollipop.class);
-					intent.putExtra("position", position);
-					intent.putExtra("adapterType", FOLDER_LINK_ADAPTER);
-
-					MegaNode parent = megaApiFolder.getParentNode(nodes.get(position));
-					intent.putExtra("parentNodeHandle",
-							parent == null || parent.getType() == MegaNode.TYPE_ROOT
-									? INVALID_HANDLE
-									: parent.getHandle());
-
-					intent.putExtra("orderGetChildren", orderGetChildren);
-					intent.putExtra("isFolderLink", true);
-
-					intent.putExtra(INTENT_EXTRA_KEY_HANDLE, nodes.get(position).getHandle());
+				if (MimeTypeList.typeForName(nodes.get(position).getName()).isImage()) {
+					long[] children = nodes.stream().mapToLong(MegaNode::getHandle).toArray();
+					Intent intent = ImageViewerActivity.getIntentForChildren(
+							this,
+							children,
+							nodes.get(position).getHandle()
+					);
 					putThumbnailLocation(intent, listView, position, VIEWER_FROM_FOLDER_LINK, adapterList);
-
 					startActivity(intent);
 					overridePendingTransition(0,0);
 				}
@@ -1308,7 +1333,16 @@ public class FolderLinkActivityLollipop extends TransfersManagementActivity impl
 					mediaIntent.putExtra("FILENAME", file.getName());
 					putThumbnailLocation(mediaIntent, listView, position, VIEWER_FROM_FOLDER_LINK, adapterList);
 					mediaIntent.putExtra("adapterType", FOLDER_LINK_ADAPTER);
-					if (megaApiFolder.getParentNode(nodes.get(position)).getType() == MegaNode.TYPE_ROOT){
+
+					MegaNode parentNode = megaApiFolder.getParentNode(nodes.get(position));
+
+					//Null check validation.
+					if (parentNode == null) {
+						LogUtil.logError(nodes.get(position).getName() + "'s parent node is null");
+						return;
+					}
+
+					if (parentNode.getType() == MegaNode.TYPE_ROOT){
 						mediaIntent.putExtra("parentNodeHandle", -1L);
 					}
 					else{
@@ -1420,7 +1454,7 @@ public class FolderLinkActivityLollipop extends TransfersManagementActivity impl
 	@Override
 	public void onBackPressed() {
 		logDebug("onBackPressed");
-		if (psaWebBrowser.consumeBack()) return;
+		if (psaWebBrowser != null && psaWebBrowser.consumeBack()) return;
 		retryConnectionsAndSignalPresence();
 
 		if (fileLinkFolderLink){
@@ -1635,7 +1669,7 @@ public class FolderLinkActivityLollipop extends TransfersManagementActivity impl
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		getMenuInflater().inflate(R.menu.file_folder_link_action, menu);
-
+		menu.findItem(R.id.action_more).setVisible(true);
 		return super.onCreateOptionsMenu(menu);
 	}
 }

@@ -426,7 +426,7 @@ public class InviteContactActivity extends PasscodeActivity implements ContactIn
     @Override
     public void onBackPressed() {
         logDebug("onBackPressed");
-        if (psaWebBrowser.consumeBack()) return;
+        if (psaWebBrowser != null && psaWebBrowser.consumeBack()) return;
         finish();
     }
 

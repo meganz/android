@@ -45,7 +45,7 @@ class ReplyContactRequestUseCase @Inject constructor(
         Completable.create { emitter ->
             val contactRequest = megaApi.getContactRequestByHandle(requestHandle)
 
-            if (!contactRequest.isOutgoing) {
+            if (contactRequest != null && !contactRequest.isOutgoing) {
                 megaApi.replyContactRequest(
                     contactRequest,
                     action,
@@ -79,7 +79,7 @@ class ReplyContactRequestUseCase @Inject constructor(
         Completable.create { emitter ->
             val contactRequest = megaApi.getContactRequestByHandle(requestHandle)
 
-            if (contactRequest.isOutgoing) {
+            if (contactRequest != null && contactRequest.isOutgoing) {
                 megaApi.inviteContact(
                     contactRequest.targetEmail,
                     contactRequest.sourceMessage,

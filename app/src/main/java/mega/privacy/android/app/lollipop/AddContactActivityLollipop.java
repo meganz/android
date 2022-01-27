@@ -326,9 +326,13 @@ public class AddContactActivityLollipop extends PasscodeActivity implements View
             boolean found;
             shareContacts.clear();
 
-            ShareContactInfo lastItem = filteredContactsShare.get(filteredContactsShare.size() - 1);
-            if (lastItem.isProgress()) {
-                inProgressPosition = filteredContactsShare.size() - 1;
+            if (!filteredContactsShare.isEmpty()) {
+                int pos = filteredContactsShare.size() - 1;
+                ShareContactInfo lastItem = filteredContactsShare.get(pos);
+
+                if (lastItem.isProgress()) {
+                    inProgressPosition = pos;
+                }
             }
 
             if (filteredContactsPhone != null && !filteredContactsPhone.isEmpty()) {
@@ -3148,7 +3152,7 @@ public class AddContactActivityLollipop extends PasscodeActivity implements View
 
     @Override
     public void onBackPressed() {
-        if (psaWebBrowser.consumeBack()) return;
+        if (psaWebBrowser != null && psaWebBrowser.consumeBack()) return;
         retryConnectionsAndSignalPresence();
 
         if (onNewGroup) {
@@ -3318,6 +3322,7 @@ public class AddContactActivityLollipop extends PasscodeActivity implements View
         newGroupLayout.setVisibility(View.VISIBLE);
         if (createNewChatLink) {
             findViewById(R.id.ekr_layout).setVisibility(View.GONE);
+            newMeetingButton.setVisibility(View.GONE);
         }
         setSendInvitationVisibility();
         setMegaAdapterContacts(addedContactsMEGA, MegaContactsLollipopAdapter.ITEM_VIEW_TYPE_LIST_GROUP_CHAT);

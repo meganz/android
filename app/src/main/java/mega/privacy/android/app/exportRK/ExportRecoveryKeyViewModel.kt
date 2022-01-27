@@ -44,7 +44,7 @@ class ExportRecoveryKeyViewModel @Inject constructor(
      * @param activity Current activity.
      * @param action   Action to perform after copy finishes.
      */
-    fun copyRK(activity: Activity, action: (String) -> Unit) {
+    fun copyRK(activity: Activity, action: (String?) -> Unit) {
         val textRK = exportRK()
 
         if (!isTextEmpty(textRK)) {
@@ -57,7 +57,7 @@ class ExportRecoveryKeyViewModel @Inject constructor(
     /**
      * Exports the Recovery Key
      */
-    private fun exportRK(): String {
+    private fun exportRK(): String? {
         val textRK = megaApi.exportMasterKey()
 
         if (!isTextEmpty(textRK)) {
@@ -115,14 +115,18 @@ class ExportRecoveryKeyViewModel @Inject constructor(
         }
 
         if (isAndroid11OrUpper()) {
+            val exportedRK = exportRK()
+
             saveRKAction?.invoke(
-                if (saveTextOnContentUri(
+                when {
+                    exportedRK.isNullOrEmpty() -> GENERAL_ERROR
+                    saveTextOnContentUri(
                         activity.contentResolver,
                         data.data,
-                        exportRK()
-                    )
-                ) RK_EXPORTED
-                else GENERAL_ERROR
+                        exportedRK
+                    ) -> RK_EXPORTED
+                    else -> GENERAL_ERROR
+                }
             )
         } else {
             val parentPath: String =
