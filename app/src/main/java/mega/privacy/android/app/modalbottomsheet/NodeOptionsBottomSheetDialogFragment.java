@@ -46,6 +46,8 @@ import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.FileUtil.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.MegaApiUtils.*;
+import static mega.privacy.android.app.utils.MegaNodeDialogUtil.ACTION_BACKUP_SHARE_FOLDER;
+import static mega.privacy.android.app.utils.MegaNodeDialogUtil.BACKUP_NONE;
 import static mega.privacy.android.app.utils.MegaNodeUtil.*;
 import static mega.privacy.android.app.utils.OfflineUtils.*;
 import static mega.privacy.android.app.utils.StringResourcesUtils.getQuantityString;
@@ -165,6 +167,10 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
         TextView optionLeaveShares = contentView.findViewById(R.id.leave_share_option);
         TextView optionRubbishBin = contentView.findViewById(R.id.rubbish_bin_option);
         TextView optionRemove = contentView.findViewById(R.id.remove_option);
+//      backup
+        RelativeLayout optionMoveBackup = contentView.findViewById(R.id.option_backup_move_layout);
+        TextView optionCopyBackup = contentView.findViewById(R.id.backup_copy_option);
+        RelativeLayout optionRubbishBinBackup = contentView.findViewById(R.id.option_backup_rubbish_bin_layout);
 
         optionEdit.setOnClickListener(this);
         optionLabel.setOnClickListener(this);
@@ -188,6 +194,9 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
         optionRemove.setOnClickListener(this);
         optionOpenFolder.setOnClickListener(this);
         optionOpenWith.setOnClickListener(this);
+        optionMoveBackup.setOnClickListener(this);
+        optionCopyBackup.setOnClickListener(this);
+        optionRubbishBinBackup.setOnClickListener(this);
 
         TextView viewInFolder = contentView.findViewById(R.id.view_in_folder_option);
         if (mMode == MODE6) {
@@ -314,12 +323,8 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
 
                 offlineSwitch.setChecked(availableOffline(requireContext(), node));
                 optionInfo.setVisibility(View.VISIBLE);
-                optionRubbishBin.setVisibility(View.VISIBLE);
-                optionLink.setVisibility(View.VISIBLE);
 
-                optionRename.setVisibility(View.VISIBLE);
-                optionMove.setVisibility(View.VISIBLE);
-                optionCopy.setVisibility(View.VISIBLE);
+                optionLink.setVisibility(View.VISIBLE);
 
                 optionLabel.setVisibility(View.VISIBLE);
                 optionFavourite.setVisibility(View.VISIBLE);
@@ -329,6 +334,33 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
                     optionGallery.setVisibility(View.VISIBLE);
                 } else {
                     optionGallery.setVisibility(View.GONE);
+                }
+
+                // Check if sub folder of "My Backup"
+                ArrayList<Long> handleList = new ArrayList<>();
+                handleList.add(node.getHandle());
+                int nodeType = checkBackupNodeTypeInList(megaApi, handleList);
+                if(nodeType != BACKUP_NONE) {
+                    counterModify--;
+                    optionRename.setVisibility(View.GONE);
+                    counterModify--;
+                    optionMove.setVisibility(View.GONE);
+                    counterModify--;
+                    optionCopy.setVisibility(View.GONE);
+                    optionRubbishBin.setVisibility(View.GONE);
+
+                    optionMoveBackup.setVisibility(View.VISIBLE);
+                    optionCopyBackup.setVisibility(View.VISIBLE);
+                    optionRubbishBinBackup.setVisibility(View.VISIBLE);
+                } else{
+                    optionRename.setVisibility(View.VISIBLE);
+                    optionMove.setVisibility(View.VISIBLE);
+                    optionCopy.setVisibility(View.VISIBLE);
+                    optionRubbishBin.setVisibility(View.VISIBLE);
+
+                    optionMoveBackup.setVisibility(View.GONE);
+                    optionCopyBackup.setVisibility(View.GONE);
+                    optionRubbishBinBackup.setVisibility(View.GONE);
                 }
 
                 //Hide
@@ -1011,6 +1043,7 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
         handleList.add(node.getHandle());
 
         Intent i;
+        int nodeType;
 
         switch (v.getId()) {
             case R.id.download_option:
@@ -1084,14 +1117,18 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
                 break;
 
             case R.id.share_folder_option:
-                if (isOutShare(node)) {
-                    i = new Intent(requireContext(), FileContactListActivityLollipop.class);
-                    i.putExtra(NAME, node.getHandle());
-                    startActivity(i);
+                nodeType = checkBackupNodeTypeByHandle(megaApi, node);
+                if (nodeType != BACKUP_NONE) {
+                    ((ManagerActivityLollipop) requireActivity()).showWarningDialogOfShare(node, nodeType, ACTION_BACKUP_SHARE_FOLDER);
                 } else {
-                    nC.selectContactToShareFolder(node);
+                    if (isOutShare(node)) {
+                        i = new Intent(requireContext(), FileContactListActivityLollipop.class);
+                        i.putExtra(NAME, node.getHandle());
+                        startActivity(i);
+                    } else {
+                        nC.selectContactToShareFolder(node);
+                    }
                 }
-
                 dismissAllowingStateLoss();
                 break;
 
@@ -1120,13 +1157,20 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
                 dismissAllowingStateLoss();
                 break;
 
+            case R.id.option_backup_move_layout:
+                ((ManagerActivityLollipop) requireActivity()).moveBackupNode(handleList);
+                dismissAllowingStateLoss();
+                break;
+
             case R.id.copy_option:
+            case R.id.backup_copy_option:
                 nC.chooseLocationToCopyNodes(handleList);
                 dismissAllowingStateLoss();
                 break;
 
             case R.id.rubbish_bin_option:
             case R.id.remove_option:
+            case R.id.option_backup_rubbish_bin_layout:
                 ((ManagerActivityLollipop) requireActivity()).askConfirmationMoveToRubbish(handleList);
                 break;
 
