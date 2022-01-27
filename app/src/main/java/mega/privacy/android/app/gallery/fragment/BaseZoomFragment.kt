@@ -4,7 +4,6 @@ import android.animation.Animator
 import android.animation.AnimatorInflater
 import android.animation.AnimatorSet
 import android.annotation.SuppressLint
-import android.content.Intent
 import android.content.res.Configuration
 import android.os.Bundle
 import android.view.*
@@ -39,7 +38,7 @@ import mega.privacy.android.app.gallery.data.GalleryCard
 import mega.privacy.android.app.gallery.data.GalleryItem
 import mega.privacy.android.app.gallery.data.GalleryItemSizeConfig
 import mega.privacy.android.app.gallery.ui.GalleryViewModel
-import mega.privacy.android.app.lollipop.FullScreenImageViewerLollipop
+import mega.privacy.android.app.imageviewer.ImageViewerActivity
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop
 import mega.privacy.android.app.modalbottomsheet.NodeOptionsBottomSheetDialogFragment
 import mega.privacy.android.app.utils.*
@@ -52,7 +51,7 @@ import mega.privacy.android.app.utils.ZoomUtil.getMargin
 import mega.privacy.android.app.utils.ZoomUtil.getSelectedFrameMargin
 import mega.privacy.android.app.utils.ZoomUtil.getSelectedFrameWidth
 import mega.privacy.android.app.utils.ZoomUtil.setMargin
-import nz.mega.sdk.MegaApiJava
+import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 import nz.mega.sdk.MegaChatApiJava
 import java.util.ArrayList
 
@@ -231,7 +230,7 @@ abstract class BaseZoomFragment : BaseFragment(), GestureScaleCallback,
 
     private fun setupNavigation() {
         itemOperationViewModel.openItemEvent.observe(viewLifecycleOwner, EventObserver {
-            openPhoto(getOrder(), it as GalleryItem)
+            openPhoto(it as GalleryItem)
         })
 
         itemOperationViewModel.showNodeItemOptionsEvent.observe(viewLifecycleOwner, EventObserver {
@@ -348,7 +347,7 @@ abstract class BaseZoomFragment : BaseFragment(), GestureScaleCallback,
                 val node = gridAdapter.getNodeAtPosition(photoPosition)
                 node?.let {
                     RunOnUIThreadUtils.post {
-                        openPhoto(getOrder(), it)
+                        openPhoto(it)
                     }
                 }
             }
@@ -379,40 +378,32 @@ abstract class BaseZoomFragment : BaseFragment(), GestureScaleCallback,
             .withEndAction { viewTypePanel.layoutParams = params }.start()
     }
 
-    private fun openPhoto(order: Int, nodeItem: GalleryItem) {
-        listView.findViewHolderForLayoutPosition(nodeItem.index)?.itemView?.findViewById<ImageView>(
-            R.id.thumbnail
-        )?.also {
-            val intent = Intent(context, FullScreenImageViewerLollipop::class.java)
+    private fun openPhoto(nodeItem: GalleryItem) {
+        listView.findViewHolderForLayoutPosition(nodeItem.index)
+            ?.itemView?.findViewById<ImageView>(R.id.thumbnail)?.also {
+                val parentNodeHandle = nodeItem.node?.parentHandle ?: return
+                val nodeHandle = nodeItem.node?.handle ?: INVALID_HANDLE
 
-            intent.putExtra(Constants.INTENT_EXTRA_KEY_POSITION, nodeItem.indexForViewer)
-            intent.putExtra(
-                Constants.INTENT_EXTRA_KEY_ORDER_GET_CHILDREN,
-                order
-            )
-
-            intent.putExtra(
-                Constants.INTENT_EXTRA_KEY_ADAPTER_TYPE,
-                adapterType
-            )
-
-            intent.putExtra(
-                Constants.INTENT_EXTRA_KEY_HANDLE,
-                nodeItem.node?.handle ?: MegaApiJava.INVALID_HANDLE
-            )
-            (listView.adapter as? DragThumbnailGetter)?.let {
-                DragToExitSupport.putThumbnailLocation(
-                    intent,
-                    listView,
-                    nodeItem.index,
-                    Constants.VIEWER_FROM_PHOTOS,
-                    it
+                val intent = ImageViewerActivity.getIntentForParentNode(
+                    requireContext(),
+                    parentNodeHandle,
+                    getOrder(),
+                    nodeHandle
                 )
-            }
 
-            startActivity(intent)
-            mManagerActivity.overridePendingTransition(0, 0)
-        }
+                (listView.adapter as? DragThumbnailGetter)?.let { getter ->
+                    DragToExitSupport.putThumbnailLocation(
+                        intent,
+                        listView,
+                        nodeItem.index,
+                        Constants.VIEWER_FROM_PHOTOS,
+                        getter
+                    )
+                }
+
+                startActivity(intent)
+                mManagerActivity.overridePendingTransition(0, 0)
+            }
     }
 
     fun gridAdapterHasData() = viewModel.items.value?.isNotEmpty()?:false

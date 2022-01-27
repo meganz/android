@@ -65,6 +65,7 @@ import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.MimeTypeThumbnail;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.activities.PasscodeActivity;
+import mega.privacy.android.app.utils.MegaNodeUtil;
 import mega.privacy.android.app.utils.MegaProgressDialogUtil;
 import mega.privacy.android.app.components.SimpleDividerItemDecoration;
 import mega.privacy.android.app.components.attacher.MegaAttacher;
@@ -870,7 +871,7 @@ public class FileInfoActivityLollipop extends PasscodeActivity implements OnClic
         MegaNode parent = megaApi.getNodeByHandle(node.getHandle());
 
         if (parent != null) {
-            parent = getRootParentNode(parent);
+            parent = MegaNodeUtil.getRootParentNode(megaApi, parent);
 
             if (parent.getHandle() == megaApi.getRubbishNode().getHandle()) {
                 deleteMenuItem.setVisible(true);

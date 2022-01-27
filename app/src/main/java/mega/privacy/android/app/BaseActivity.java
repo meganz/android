@@ -21,7 +21,6 @@ import static mega.privacy.android.app.constants.BroadcastConstants.OFFLINE_AVAI
 import static mega.privacy.android.app.constants.BroadcastConstants.SNACKBAR_TEXT;
 import static mega.privacy.android.app.constants.BroadcastConstants.TRANSFER_TYPE;
 import static mega.privacy.android.app.constants.BroadcastConstants.UPLOAD_TRANSFER;
-import static mega.privacy.android.app.constants.EventConstants.EVENT_MEETING_INCOMPATIBILITY_SHOW;
 import static mega.privacy.android.app.constants.EventConstants.EVENT_PURCHASES_UPDATED;
 import static mega.privacy.android.app.lollipop.LoginFragmentLollipop.NAME_USER_LOCKED;
 import static mega.privacy.android.app.middlelayer.iab.BillingManager.RequestCode.REQ_CODE_BUY;
@@ -48,7 +47,6 @@ import static mega.privacy.android.app.utils.Constants.PERMISSIONS_TYPE;
 import static mega.privacy.android.app.utils.Constants.REMOVED_BUSINESS_ACCOUNT_BLOCK;
 import static mega.privacy.android.app.utils.Constants.SENT_REQUESTS_TYPE;
 import static mega.privacy.android.app.utils.Constants.SMS_VERIFICATION_ACCOUNT_BLOCK;
-import static mega.privacy.android.app.utils.Constants.SNACKBAR_IMCOMPATIBILITY_TYPE;
 import static mega.privacy.android.app.utils.Constants.SNACKBAR_TYPE;
 import static mega.privacy.android.app.utils.Constants.VISIBLE_FRAGMENT;
 import static mega.privacy.android.app.utils.Constants.WEAK_PROTECTION_ACCOUNT_BLOCK;
@@ -841,9 +839,6 @@ public class BaseActivity extends AppCompatActivity implements ActivityLauncher,
                 case MUTE_NOTIFICATIONS_SNACKBAR_TYPE:
                     snackbar = Snackbar.make(view, R.string.notifications_are_already_muted, Snackbar.LENGTH_LONG);
                     break;
-                case SNACKBAR_IMCOMPATIBILITY_TYPE:
-                    snackbar = Snackbar.make(view, !isTextEmpty(s) ? s : getString(R.string.sent_as_message), Snackbar.LENGTH_INDEFINITE);
-                    break;
                 case DISMISS_ACTION_SNACKBAR:
                     snackbar = Snackbar.make(view, s, Snackbar.LENGTH_INDEFINITE);
                     break;
@@ -897,17 +892,6 @@ public class BaseActivity extends AppCompatActivity implements ActivityLauncher,
                 snackbar.setAction(R.string.contact_invite, new SnackbarNavigateOption(view.getContext(), type, userEmail));
                 snackbar.show();
                 break;
-
-            case SNACKBAR_IMCOMPATIBILITY_TYPE: {
-                TextView snackbarTextView = snackbar.getView().findViewById(com.google.android.material.R.id.snackbar_text);
-                snackbarTextView.setMaxLines(5);
-                snackbar.setAction(R.string.general_ok, v -> {
-                    snackbar.dismiss();
-                    LiveEventBus.get(EVENT_MEETING_INCOMPATIBILITY_SHOW, Boolean.class).post(false);
-                });
-                snackbar.show();
-                break;
-            }
 
             case DISMISS_ACTION_SNACKBAR:
                 snackbar.setAction(R.string.general_ok, new SnackbarNavigateOption(view.getContext(), type));
