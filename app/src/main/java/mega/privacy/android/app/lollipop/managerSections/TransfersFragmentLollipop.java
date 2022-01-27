@@ -33,6 +33,7 @@ import static mega.privacy.android.app.lollipop.ManagerActivityLollipop.PENDING_
 import static mega.privacy.android.app.utils.Constants.INVALID_POSITION;
 import static mega.privacy.android.app.utils.Constants.SNACKBAR_TYPE;
 import static mega.privacy.android.app.utils.LogUtil.*;
+import static mega.privacy.android.app.utils.MegaTransferUtils.isBackgroundTransfer;
 import static mega.privacy.android.app.utils.Util.*;
 import static nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE;
 import static nz.mega.sdk.MegaTransfer.STATE_COMPLETING;
@@ -171,7 +172,7 @@ public class TransfersFragmentLollipop extends TransfersBaseFragment implements 
 
 		for (int i = 0; i < managerActivity.transfersInProgress.size(); i++) {
 			MegaTransfer transfer = megaApi.getTransferByTag(managerActivity.transfersInProgress.get(i));
-			if (transfer != null && !transfer.isStreamingTransfer()) {
+			if (transfer != null && !transfer.isStreamingTransfer() && !isBackgroundTransfer(transfer)) {
 				tL.add(transfer);
 			}
 		}
@@ -279,7 +280,7 @@ public class TransfersFragmentLollipop extends TransfersBaseFragment implements 
 	 * @param transfer	transfer to add
 	 */
 	public void transferStart(MegaTransfer transfer) {
-		if (transfer.isStreamingTransfer()) {
+		if (transfer.isStreamingTransfer() || isBackgroundTransfer(transfer)) {
 			return;
 		}
 

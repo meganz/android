@@ -40,6 +40,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Set;
 
 import mega.privacy.android.app.components.saver.AutoPlayInfo;
 import mega.privacy.android.app.fragments.offline.OfflineFragment;
@@ -58,10 +60,6 @@ import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaCancelToken;
 import nz.mega.sdk.MegaChatApi;
 import nz.mega.sdk.MegaChatApiAndroid;
-import nz.mega.sdk.MegaChatApiJava;
-import nz.mega.sdk.MegaChatError;
-import nz.mega.sdk.MegaChatRequest;
-import nz.mega.sdk.MegaChatRequestListenerInterface;
 import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaRequest;
@@ -81,6 +79,9 @@ import static mega.privacy.android.app.utils.CacheFolderManager.*;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.FileUtil.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
+import static mega.privacy.android.app.utils.MegaTransferUtils.getNumPendingDownloadsNonBackground;
+import static mega.privacy.android.app.utils.MegaTransferUtils.isBackgroundTransfer;
+import static mega.privacy.android.app.utils.MegaTransferUtils.isVoiceClipType;
 import static mega.privacy.android.app.utils.OfflineUtils.*;
 import static mega.privacy.android.app.utils.SDCardUtils.getSDCardTargetPath;
 import static mega.privacy.android.app.utils.SDCardUtils.getSDCardTargetUri;
@@ -96,7 +97,7 @@ import javax.inject.Inject;
  * Background service to download files
  */
 @AndroidEntryPoint
-public class DownloadService extends Service implements MegaTransferListenerInterface, MegaRequestListenerInterface, MegaChatRequestListenerInterface {
+public class DownloadService extends Service implements MegaTransferListenerInterface, MegaRequestListenerInterface {
 
 	// Action to stop download
 	public static final String ACTION_CANCEL = "CANCEL_DOWNLOAD";
@@ -114,6 +115,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 	public static final String EXTRA_OPEN_FILE = "OPEN_FILE";
 	public static final String EXTRA_CONTENT_URI = "CONTENT_URI";
 	public static final String EXTRA_DOWNLOAD_BY_TAP = "EXTRA_DOWNLOAD_BY_TAP";
+	public static final String EXTRA_DOWNLOAD_FOR_OFFLINE = "EXTRA_DOWNLOAD_FOR_OFFLINE";
 
 	@Inject
 	TransfersManagement transfersManagement;
@@ -150,6 +152,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 	DatabaseHandler dbH = null;
 
 	int transfersCount = 0;
+	Set<Integer> backgroundTransfers = new HashSet<>();
 
 	HashMap<Long, Uri> storeToAdvacedDevices;
 	HashMap<Long, Boolean> fromMediaViewers;
@@ -173,6 +176,8 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 
 	// the flag to determine the rating dialog is showed for this download action
 	private boolean isRatingShowed;
+
+	private boolean isDownloadForOffline;
 
     /**
      * Contains the info of a node that to be opened in-app.
@@ -235,7 +240,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 	}
 
 	private void startForeground() {
-		if (megaApi.getNumPendingDownloads() <= 0) {
+		if (getNumPendingDownloadsNonBackground(megaApi) <= 0) {
 			return;
 		}
 
@@ -317,10 +322,6 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 		return START_NOT_STICKY;
 	}
 
-	private boolean isVoiceClipType(String value) {
-		return value != null && value.contains(APP_DATA_VOICE_CLIP);
-	}
-
 	protected void onHandleIntent(final Intent intent) {
 		logDebug("onHandleIntent");
 		this.intent = intent;
@@ -340,7 +341,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 					continue;
 				}
 
-				if (!isVoiceClipType(transfer.getAppData())) {
+				if (!isVoiceClipType(transfer) && !isBackgroundTransfer(transfer)) {
 					transfersManagement.checkIfTransferIsPaused(transfer);
 					transfersCount++;
 				}
@@ -358,6 +359,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 
         long hash = intent.getLongExtra(EXTRA_HASH, -1);
         String url = intent.getStringExtra(EXTRA_URL);
+        isDownloadForOffline = intent.getBooleanExtra(EXTRA_DOWNLOAD_FOR_OFFLINE, false);
         boolean isFolderLink = intent.getBooleanExtra(EXTRA_FOLDER_LINK, false);
         openFile = intent.getBooleanExtra(EXTRA_OPEN_FILE, true);
         downloadByTap = intent.getBooleanExtra(EXTRA_DOWNLOAD_BY_TAP, false);
@@ -400,14 +402,14 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 							logDebug("condition ret == MegaChatApi.INIT_NO_CACHE");
 						} else if (ret == MegaChatApi.INIT_ERROR) {
 							logDebug("condition ret == MegaChatApi.INIT_ERROR");
-							megaChatApi.logout(this);
+							megaChatApi.logout();
 						} else {
 							logDebug("Chat correctly initialized");
 						}
 					}
 
 					pendingIntents.add(intent);
-					if (!isVoiceClipType(type)) {
+					if (type == null || (!type.contains(APP_DATA_VOICE_CLIP) && !type.contains(APP_DATA_BACKGROUND_TRANSFER))) {
 						updateProgressNotification();
 					}
 
@@ -471,7 +473,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 			logDebug("checkCurrentFile == false");
 
 			alreadyDownloaded++;
-            if (megaApi.getNumPendingDownloads() == 0){
+            if (getNumPendingDownloadsNonBackground(megaApi) == 0){
                 onQueueComplete(currentDocument.getHandle());
             }
 
@@ -523,8 +525,9 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 			}
 
 			logDebug("CurrentDocument is not null");
+
 			if (isTextEmpty(appData)) {
-				appData = isVoiceClipType(type) ? APP_DATA_VOICE_CLIP : "";
+				appData = type != null && type.contains(APP_DATA_VOICE_CLIP) ? APP_DATA_VOICE_CLIP : "";
 			}
 
 			String localPath = currentDir.getAbsolutePath() + "/";
@@ -579,26 +582,32 @@ public class DownloadService extends Service implements MegaTransferListenerInte
         showCompleteNotification(handle);
 		stopForeground();
 		rootNode = null;
-		int total = megaApi.getNumPendingDownloads();
-		logDebug("onQueueComplete: total of files before reset " + total);
-		if(total <= 0){
+		int pendingDownloads = getNumPendingDownloadsNonBackground(megaApi);
+		logDebug("onQueueComplete: total of files before reset " + pendingDownloads);
+		if(pendingDownloads <= 0){
 			logDebug("onQueueComplete: reset total downloads");
 			// When download a single file by tapping it, and auto play is enabled.
-            if (megaApi.getTotalDownloads() == 1 && Boolean.parseBoolean(dbH.getAutoPlayEnabled()) && autoPlayInfo != null && downloadByTap) {
+			int totalDownloads = megaApi.getTotalDownloads() - backgroundTransfers.size();
+			if (totalDownloads == 1 && Boolean.parseBoolean(dbH.getAutoPlayEnabled()) && autoPlayInfo != null && downloadByTap) {
                 sendBroadcast(new Intent(BROADCAST_ACTION_INTENT_SHOWSNACKBAR_TRANSFERS_FINISHED)
                         .putExtra(TRANSFER_TYPE, DOWNLOAD_TRANSFER_OPEN)
                         .putExtra(NODE_NAME, autoPlayInfo.getNodeName())
                         .putExtra(NODE_HANDLE, autoPlayInfo.getNodeHandle())
                         .putExtra(NUMBER_FILES, 1)
                         .putExtra(NODE_LOCAL_PATH, autoPlayInfo.getLocalPath()));
-            } else if (megaApi.getTotalDownloads() > 0) {
-				sendBroadcast(new Intent(BROADCAST_ACTION_INTENT_SHOWSNACKBAR_TRANSFERS_FINISHED)
+            } else if (totalDownloads > 0) {
+            	Intent intent = new Intent(BROADCAST_ACTION_INTENT_SHOWSNACKBAR_TRANSFERS_FINISHED)
 						.putExtra(TRANSFER_TYPE, DOWNLOAD_TRANSFER)
-						.putExtra(NUMBER_FILES, megaApi.getTotalDownloads()));
+						.putExtra(NUMBER_FILES, totalDownloads);
+            	if (isDownloadForOffline) {
+            		intent.putExtra(OFFLINE_AVAILABLE, true);
+				}
+				sendBroadcast(intent);
 			}
 			sendBroadcast(new Intent(BROADCAST_ACTION_INTENT_TRANSFER_UPDATE));
 
 			megaApi.resetTotalDownloads();
+			backgroundTransfers.clear();
 			errorEBloqued = 0;
 			errorCount = 0;
 			alreadyDownloaded = 0;
@@ -652,7 +661,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 		logDebug("showCompleteNotification");
 		String notificationTitle, size;
 
-        int totalDownloads = megaApi.getTotalDownloads();
+        int totalDownloads = megaApi.getTotalDownloads() - backgroundTransfers.size();
 
 		if(alreadyDownloaded>0 && errorCount>0){
 			int totalNumber = totalDownloads + errorCount + alreadyDownloaded;
@@ -973,9 +982,8 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 	 */
 	@SuppressLint("NewApi")
 	private void updateProgressNotification() {
-
-		int pendingTransfers = megaApi.getNumPendingDownloads();
-        int totalTransfers = megaApi.getTotalDownloads();
+		int pendingTransfers = getNumPendingDownloadsNonBackground(megaApi);
+        int totalTransfers = megaApi.getTotalDownloads() - backgroundTransfers.size();
 
         long totalSizePendingTransfer = megaApi.getTotalDownloadBytes();
         long totalSizeTransferred = megaApi.getTotalDownloadedBytes();
@@ -1163,7 +1171,11 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 	private void doOnTransferStart(MegaTransfer transfer) {
 		logDebug("Download start: " + transfer.getNodeHandle() + ", totalDownloads: " + megaApi.getTotalDownloads());
 
-		if (transfer.isStreamingTransfer() || isVoiceClipType(transfer.getAppData())) return;
+		if (transfer.isStreamingTransfer() || isVoiceClipType(transfer)) return;
+		if (isBackgroundTransfer(transfer)) {
+			backgroundTransfers.add(transfer.getTag());
+			return;
+		}
 
 		if (transfer.getType() == TYPE_DOWNLOAD) {
 			String appData = transfer.getAppData();
@@ -1204,17 +1216,17 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 			sendBroadcast(new Intent(BROADCAST_ACTION_INTENT_BUSINESS_EXPIRED));
 		}
 
-		if(transfer.getType()== TYPE_DOWNLOAD){
+		if (transfer.getType() == TYPE_DOWNLOAD) {
+			boolean isVoiceClip = isVoiceClipType(transfer);
+			boolean isBackgroundTransfer = isBackgroundTransfer(transfer);
 
-			boolean isVoiceClip = isVoiceClipType(transfer.getAppData());
-
-			if(!isVoiceClip) transfersCount--;
+			if(!isVoiceClip && !isBackgroundTransfer) transfersCount--;
 
 			String path = transfer.getPath();
 			String targetPath = getSDCardTargetPath(transfer.getAppData());
 
 			if (!transfer.isFolderTransfer()) {
-				if (!isVoiceClip) {
+				if (!isVoiceClip && !isBackgroundTransfer) {
 					AndroidCompletedTransfer completedTransfer = new AndroidCompletedTransfer(transfer, error);
 					if (!isTextEmpty(targetPath)) {
 						completedTransfer.setPath(targetPath);
@@ -1228,7 +1240,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 					transfersManagement.setFailedTransfers(true);
 				}
 
-				if (!isVoiceClip) {
+				if (!isVoiceClip && !isBackgroundTransfer) {
 					updateProgressNotification();
 				}
 			}
@@ -1348,9 +1360,9 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 				}
 			}
 
-			if(isVoiceClip) return;
+			if(isVoiceClip || isBackgroundTransfer) return;
 
-			if (megaApi.getNumPendingDownloads() == 0 && transfersCount==0){
+			if (getNumPendingDownloadsNonBackground(megaApi) == 0 && transfersCount==0){
 				onQueueComplete(transfer.getNodeHandle());
 			}
 		}
@@ -1427,7 +1439,11 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 				DownloadService.this.cancel();
 				return;
 			}
-			if(transfer.isStreamingTransfer() || isVoiceClipType(transfer.getAppData())) return;
+			if(transfer.isStreamingTransfer() || isVoiceClipType(transfer)) return;
+			if (isBackgroundTransfer(transfer)) {
+				backgroundTransfers.add(transfer.getTag());
+				return;
+			}
 
 			transfersManagement.checkScanningTransferOnUpdate(transfer);
 
@@ -1454,7 +1470,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 		logWarning("Download Temporary Error - Node Handle: " + transfer.getNodeHandle() +
 				"\nError: " + e.getErrorCode() + " " + e.getErrorString());
 
-		if (transfer.isStreamingTransfer()) {
+		if (transfer.isStreamingTransfer() || isBackgroundTransfer(transfer)) {
 			return;
 		}
 
@@ -1528,8 +1544,6 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 		}
 		else if (request.getType() == MegaRequest.TYPE_FETCH_NODES){
 			if (e.getErrorCode() == MegaError.API_OK){
-				logDebug("Chat --> connect");
-				megaChatApi.connectInBackground(this);
 				isLoggingIn = false;
 				MegaApplication.setLoggingIn(isLoggingIn);
 
@@ -1602,37 +1616,6 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 	public boolean onTransferData(MegaApiJava api, MegaTransfer transfer, byte[] buffer)
 	{
 		return true;
-	}
-
-	@Override
-	public void onRequestStart(MegaChatApiJava api, MegaChatRequest request) {
-
-	}
-
-	@Override
-	public void onRequestUpdate(MegaChatApiJava api, MegaChatRequest request) {
-
-	}
-
-	@Override
-	public void onRequestFinish(MegaChatApiJava api, MegaChatRequest request, MegaChatError e) {
-		if (request.getType() == MegaChatRequest.TYPE_CONNECT){
-
-			isLoggingIn = false;
-			MegaApplication.setLoggingIn(isLoggingIn);
-
-			if(e.getErrorCode()==MegaChatError.ERROR_OK){
-				logDebug("Connected to chat!");
-			}
-			else{
-				logError("ERROR WHEN CONNECTING " + e.getErrorString());
-			}
-		}
-	}
-
-	@Override
-	public void onRequestTemporaryError(MegaChatApiJava api, MegaChatRequest request, MegaChatError e) {
-
 	}
 
 	private void refreshOfflineFragment(){

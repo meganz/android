@@ -99,4 +99,5 @@ public class BroadcastConstants {
     public static final String NODE_NAME = "NODE_NAME";
     public static final String NODE_HANDLE = "NODE_HANDLE";
     public static final String NODE_LOCAL_PATH = "NODE_LOCAL_PATH";
+    public static final String OFFLINE_AVAILABLE = "OFFLINE_AVAILABLE";
 }

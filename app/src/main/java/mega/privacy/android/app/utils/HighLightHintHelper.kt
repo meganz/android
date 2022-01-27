@@ -322,7 +322,8 @@ class HighLightHintHelper(private val activity: Activity) {
      */
     fun showHintForMeetingText(targetViewId: Int, onDismissCallback: () -> Unit) {
         val target = activity.findViewById<View>(targetViewId)
-        if (target == null) {
+        // Can't find target view or it is invisible.
+        if (target == null || (target.width == 0 && target.height == 0)) {
             LogUtil.logError("TargetView is null. Can't view with id $targetViewId in $activity")
             return
         }

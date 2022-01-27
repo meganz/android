@@ -13,6 +13,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.view.Display;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -47,6 +48,7 @@ import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.TransfersManagementActivity;
+import mega.privacy.android.app.imageviewer.ImageViewerActivity;
 import mega.privacy.android.app.utils.MegaProgressDialogUtil;
 import mega.privacy.android.app.components.saver.NodeSaver;
 import mega.privacy.android.app.interfaces.SnackbarShower;
@@ -710,20 +712,8 @@ public class FileLinkActivityLollipop extends TransfersManagementActivity implem
 		logDebug("showFile");
 		String serializeString = document.serialize();
 		if(MimeTypeList.typeForName(document.getName()).isImage()){
-			logDebug("Is image");
-			Intent intent = new Intent(this, FullScreenImageViewerLollipop.class);
-			intent.putExtra(EXTRA_SERIALIZE_STRING, serializeString);
-			intent.putExtra("position", 0);
-			intent.putExtra(URL_FILE_LINK, url);
-			intent.putExtra("adapterType", FILE_LINK_ADAPTER);
-			intent.putExtra("parentNodeHandle", -1L);
-			intent.putExtra("orderGetChildren", MegaApiJava.ORDER_DEFAULT_ASC);
-			intent.putExtra("isFileLink", true);
-
-			intent.putExtra(INTENT_EXTRA_KEY_HANDLE, document.getHandle());
-
+			Intent intent = ImageViewerActivity.getIntentForSingleNode(this, url);
 			startActivity(intent);
-
 		}else if (MimeTypeList.typeForName(document.getName()).isVideoReproducible() || MimeTypeList.typeForName(document.getName()).isAudio() ){
 			logDebug("Is video");
 
