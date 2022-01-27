@@ -149,6 +149,10 @@ FLAC_DOWNLOAD_URL=https://ftp.osuosl.org/pub/xiph/releases/flac/${FLAC_SOURCE_FI
 FLAC_SHA1="2bdbb56b128a780a5d998e230f2f4f6eb98f33ee"
 FLAC_EXT_LIBRARY=exoplayer-extension-flac-${EXOPLAYER_VERSION}.aar
 
+WEBRTC_DOWNLOAD_URL=https://mega.nz/file/A4pxxQoJ#OoAuL0SKIGuWkw6iSrSPHRMF0-Ri7BSF64IDeIWq-qs
+# Expected SHA1 checksum of "megachat/webrtc/libwebrtc_arm64.a" in downloaded WebRTC library
+WEBRTC_SHA1=194b94c1eeb3eda1e4d77eb4dd26fc0c3134f102
+
 function setupEnv()
 {
     local ABI="${1}"
@@ -491,10 +495,10 @@ echo "* MediaInfo is ready"
 
 echo "* Checking WebRTC"
 if grep ^DISABLE_WEBRTC Application.mk | grep --quiet false; then
-    WEBRTCSHA1=`sha1sum megachat/webrtc/libwebrtc_arm64.a | cut -d " " -f 1`
+    TMP_WEBRTC_SHA1=`sha1sum megachat/webrtc/libwebrtc_arm64.a | cut -d " " -f 1`
 
-    if [ ! -d megachat/webrtc/include ] || [ $WEBRTCSHA1  != "194b94c1eeb3eda1e4d77eb4dd26fc0c3134f102" ]; then
-        echo "ERROR: WebRTC not ready. Please download it from this link: https://mega.nz/file/A4pxxQoJ#OoAuL0SKIGuWkw6iSrSPHRMF0-Ri7BSF64IDeIWq-qs"
+    if [ ! -d megachat/webrtc/include ] || [ "$TMP_WEBRTC_SHA1"  != $WEBRTC_SHA1 ]; then
+        echo "ERROR: WebRTC not ready. Please download it from this link: ${WEBRTC_DOWNLOAD_URL}"
         echo "and uncompress it in megachat/webrtc"
         exit 1
     else
