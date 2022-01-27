@@ -50,6 +50,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.Stack;
+import java.util.function.ToLongFunction;
+import java.util.stream.LongStream;
 
 import javax.inject.Inject;
 
@@ -61,6 +63,7 @@ import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.TransfersManagementActivity;
 import mega.privacy.android.app.utils.LogUtil;
+import mega.privacy.android.app.imageviewer.ImageViewerActivity;
 import mega.privacy.android.app.utils.MegaProgressDialogUtil;
 import mega.privacy.android.app.components.SimpleDividerItemDecoration;
 import mega.privacy.android.app.components.saver.NodeSaver;
@@ -1292,23 +1295,14 @@ public class FolderLinkActivityLollipop extends TransfersManagementActivity impl
 				}
 			}
 			else{
-				if (MimeTypeList.typeForName(nodes.get(position).getName()).isImage()){
-					Intent intent = new Intent(this, FullScreenImageViewerLollipop.class);
-					intent.putExtra("position", position);
-					intent.putExtra("adapterType", FOLDER_LINK_ADAPTER);
-
-					MegaNode parent = megaApiFolder.getParentNode(nodes.get(position));
-					intent.putExtra("parentNodeHandle",
-							parent == null || parent.getType() == MegaNode.TYPE_ROOT
-									? INVALID_HANDLE
-									: parent.getHandle());
-
-					intent.putExtra("orderGetChildren", orderGetChildren);
-					intent.putExtra("isFolderLink", true);
-
-					intent.putExtra(INTENT_EXTRA_KEY_HANDLE, nodes.get(position).getHandle());
+				if (MimeTypeList.typeForName(nodes.get(position).getName()).isImage()) {
+					long[] children = nodes.stream().mapToLong(MegaNode::getHandle).toArray();
+					Intent intent = ImageViewerActivity.getIntentForChildren(
+							this,
+							children,
+							nodes.get(position).getHandle()
+					);
 					putThumbnailLocation(intent, listView, position, VIEWER_FROM_FOLDER_LINK, adapterList);
-
 					startActivity(intent);
 					overridePendingTransition(0,0);
 				}

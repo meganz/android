@@ -9,7 +9,6 @@ import android.graphics.drawable.ColorDrawable;
 
 import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
-import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AlertDialog;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -984,10 +983,21 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
             holder.imageView.setLayoutParams(params);
 
             holder.textViewFileSize.setVisibility(View.VISIBLE);
-            holder.textViewFileSize.setText(type == FOLDER_LINK_ADAPTER
-                    ? getMegaNodeFolderLinkInfo(node)
-                    : getMegaNodeFolderInfo(node));
-
+            if(node.getHandle() == myBackupHandle){
+                ArrayList<MegaNode> subBackupNodes = megaApi.getChildren(node);
+                if (subBackupNodes != null && subBackupNodes.size() > 0) {
+                    int device = getMegaNodeBackupDeviceInfo(subBackupNodes);
+                    holder.textViewFileSize.setText(getQuantityString(R.plurals.num_devices, device, device));
+                } else {
+                    holder.textViewFileSize.setText(type == FOLDER_LINK_ADAPTER
+                            ? getMegaNodeFolderLinkInfo(node)
+                            : getMegaNodeFolderInfo(node));
+                }
+            } else {
+                holder.textViewFileSize.setText(type == FOLDER_LINK_ADAPTER
+                        ? getMegaNodeFolderLinkInfo(node)
+                        : getMegaNodeFolderInfo(node));
+            }
             holder.versionsIcon.setVisibility(View.GONE);
 
             setFolderListSelected(holder, position, getFolderIcon(node, type == OUTGOING_SHARES_ADAPTER ? ManagerActivityLollipop.DrawerItem.SHARED_ITEMS : ManagerActivityLollipop.DrawerItem.CLOUD_DRIVE));
