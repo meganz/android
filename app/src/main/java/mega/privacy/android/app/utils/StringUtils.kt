@@ -8,7 +8,6 @@ import androidx.core.text.HtmlCompat
 import mega.privacy.android.app.R
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaStringMap
-import java.lang.Exception
 
 object StringUtils {
 
@@ -40,6 +39,12 @@ object StringUtils {
      */
     fun String.decodeBase64(): String =
         Base64.decode(this, Base64.DEFAULT).toString(Charsets.UTF_8)
+
+    /**
+     * Encode String to Base64
+     */
+    fun String.encodeBase64(): String =
+        Base64.encodeToString(this.toByteArray(Charsets.UTF_8), Base64.NO_WRAP)
 
     /**
      * Decode each alias within MegaStringMap into a Map<Long, String>

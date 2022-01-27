@@ -50,6 +50,18 @@
                 app:layout_constraintStart_toEndOf="@id/sorted_by"/>
         </androidx.constraintlayout.widget.ConstraintLayout>
 
+        <ImageView
+            android:id="@+id/enter_media_discovery"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="10dp"
+            android:layout_marginEnd="12dp"
+            android:onClick="@{() -> sortByHeaderViewModel.enterMediaDiscovery()}"
+            android:src="@drawable/ic_media_discovery"
+            app:tint="?android:attr/textColorSecondary"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@id/list_mode_switch"
+            app:layout_constraintTop_toTopOf="parent" />
 
         <ImageView
             android:id="@+id/list_mode_switch"
@@ -63,5 +75,6 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
+
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

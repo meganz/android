@@ -98,8 +98,6 @@
     <string name="action_create_folder">Nieuwe map creëren</string>
     <!-- Option which allows create a new text file -->
     <string name="action_create_txt">Creëer nieuw tekst bestand</string>
-    <!-- Menu option to open a link. Also title of the dialog to open a link. -->
-    <string name="action_open_link">Link openen</string>
     <!-- Menu item -->
     <string name="action_settings">Instellingen</string>
     <!-- Search button -->
@@ -995,8 +993,6 @@
     <string name="settings_disable_logs">Logs zijn nu uitgeschakeld</string>
     <!-- Snackbar error message triggered by host error when user is trying to setup MEGA Camera Uploads folder in settings page -->
     <string name="error_unable_to_setup_cloud_folder">Kan de map MEGA Camera Uploads niet instellen</string>
-    <!-- Message displayed when the user denies the required permissions during the logs activation -->
-    <string name="logs_not_enabled_permissions">Logs zijn niet ingeschakeld omdat u de vereiste rechten heeft geweigerd</string>
     <!-- Option in the sliding panel to open the folder which contains the file selected after performing a search -->
     <string name="search_open_location">Locatie openen</string>
     <!-- message when a temporary error on logging in is due to SDK is waiting for the server to complete a request due to an API lock -->
@@ -1913,13 +1909,13 @@
     <!-- Error shown when the user writes a email with an incorrect format -->
     <string name="invalid_email_to_invite">Email is misvormed</string>
     <!-- info paragraph about the achievement install megasync -->
-    <string name="paragraph_info_achievement_install_desktop">Wanneer u de MEGA desktop applicatie installeert krijgt u %1$s aan extra opslag ruimte, geldig voor 365 dagen. De MEGA desktop applicatie is beschikbaar voor Windows, macOS en de meeste Linux distributies.</string>
+    <string name="paragraph_info_achievement_install_desktop">Wanneer u de MEGA Desktop Applicatie installeert krijgt u %1$s aan extra opslag ruimte, geldig voor 365 dagen. De MEGA Desktop Applicatie is beschikbaar voor Windows, macOS en de meeste Linux distributies.</string>
     <!-- info paragraph about the achievement install mobile app -->
     <string name="paragraph_info_achievement_install_mobile_app">Wanneer u de MEGA Mobile Applicatie installeert, krijgt u %1$s gratis  opslagruimte, 365 dagen geldig. Wij bieden mobiele applicaties voor iOS en Android.</string>
     <!-- info paragraph about the achievement ‘add phone number’. Placeholder 1: bonus storage space e.g. 20GB. Placeholder 2: bonus transfer quota e.g. 50GB -->
     <string name="paragraph_info_achievement_add_phone">Wanneer u uw telefoonnummer verifieert krijgt u %1$s aan extra opslagruimte, geldig voor 365 dagen.</string>
     <!-- info paragraph about the completed achievement install megasync -->
-    <string name="result_paragraph_info_achievement_install_desktop">U heeft %1$s opslagruimte ontvangen voor het installeren van onze MEGA desktop applicatie.</string>
+    <string name="result_paragraph_info_achievement_install_desktop">U heeft %1$s opslagruimte ontvangen voor het installeren van onze MEGA Desktop Applicatie.</string>
     <!-- info paragraph about the completed achievement install mobile app -->
     <string name="result_paragraph_info_achievement_install_mobile_app">U heeft %1$s opslagruimte gekregen voor het installeren van de MEGA Mobile Applicatie.</string>
     <!-- info paragraph about the completed achievement of ‘add phone number’. Placeholder 1: bonus storage space e.g. 20GB. Placeholder 2: bonus transfer quota e.g. 50GB -->
@@ -1943,7 +1939,7 @@
     <!-- Menu item -->
     <string name="settings_help">Help</string>
     <!-- Settings preference title for help centre -->
-    <string name="settings_help_centre">Help Centrum</string>
+    <string name="settings_help_centre">Helpcentrum</string>
     <!-- Settings preference title for send feedback -->
     <string name="settings_help_preference">Verstuur feedback</string>
     <!-- mail subject -->
@@ -2024,7 +2020,7 @@
     <!-- Message show when a call cannot be established -->
     <string name="call_error">Er is een fout opgetreden en de oproep kan niet worden verbonden.</string>
     <!-- Title of dialog to evaluate the app -->
-    <string name="title_evaluate_the_app_panel">Vind u de MEGA mobiele applicatie leuk?</string>
+    <string name="title_evaluate_the_app_panel">Vind u de MEGA-Mobiele Applicatie leuk?</string>
     <!-- Label to show rate the app -->
     <string name="rate_the_app_panel">Ja, geef deze applicatie uw mening</string>
     <!-- Label to show send feedback -->
@@ -2358,7 +2354,7 @@
     <!-- menu option to loop video or audio file -->
     <string name="context_loop_video">Herhaling</string>
     <!-- Title of the category Security options on Settings section -->
-    <string name="settings_security_options_title">Veiligheid</string>
+    <string name="settings_security_options_title">Beveiliging</string>
     <!-- Title of the preference Recovery key on Settings section -->
     <string name="settings_recovery_key_title">Reservekopie Herstelsleutel</string>
     <!-- Summary of the preference Recovery key on Settings section -->
@@ -2774,16 +2770,12 @@
     <string name="message_set_chat_private">[A]%1$s[/A][B] coderingssleutelrotatie ingeschakeld.[/B]</string>
     <!-- error message shown when a chat link is invalid -->
     <string name="invalid_chat_link">Dit gesprek is niet langer beschikbaar</string>
-    <!-- error message shown when a chat link is not well formed -->
-    <string name="invalid_chat_link_args">Ongeldige Gesprekslink</string>
     <!-- When it is creating a new group chat, this option permits to establish it private or public -->
     <string name="ekr_label">Coderingssleutel rotatie</string>
     <!-- Text of the dialog to change a public chat to private (enable encryption key rotation) -->
     <string name="ekr_explanation">Het roteren van de coderingssleutel is iets veiliger, maar u kunt geen chatlink maken en nieuwe deelnemers zullen geen eerdere berichten zien.</string>
     <!-- Text of the dialog to change a public chat to private (enable encryption key rotation) -->
     <string name="subtitle_chat_message_enabled_ERK">Het omwisselen van de coderingssleutel is iets veiliger, maar u kunt geen chatlink maken en nieuwe deelnemers zullen geen eerdere berichten zien.</string>
-    <!-- Menu item -->
-    <string name="action_open_chat_link">Gesprekslink Openen</string>
     <!-- Message shown when a contact request has not been sent because the invitation has been sent before -->
     <string name="invite_not_sent_already_sent">De uitnodiging naar contact %s was al verzonden en kan gezien worden in de Verzonden Verzoeken tabblad.</string>
     <!-- Label shown to indicate the QR is saving in Cloud Drive -->
@@ -3240,22 +3232,6 @@
     <string name="text_join_call">Om aan te sluiten bij deze oproep moet u uw huidige oproep beëindigen.</string>
     <!-- Text of the dialog shown when you want to join a group call but you are in another active call -->
     <string name="text_join_another_call">Om toe te treden tot dit gesprek moet u het huidige gesprek stoppen of in de wacht zetten.</string>
-    <!-- Hint shown in the open chat link alert dialog -->
-    <string name="hint_enter_chat_link">Gesprekslink invoeren</string>
-    <!-- Hint shown in the open link alert dialog -->
-    <string name="hint_paste_link">Link plakken</string>
-    <!-- Error shown when it tries to open an invalid file or folder link -->
-    <string name="invalid_file_folder_link">Ongeldig bestand of map koppeling</string>
-    <!-- Error shown when it tries to open an invalid file or folder link and the text view is empty -->
-    <string name="invalid_file_folder_link_empty">Voer een geldige bestand of map link in</string>
-    <!-- Error shown when it tries to open an invalid chat link and the text view is empty -->
-    <string name="invalid_chat_link_empty">Voer een geldige gesprek link in</string>
-    <!-- Error shown when it tries to open a chat link from the Cloud Drive section -->
-    <string name="valid_chat_link">U heeft een gesprekslink gekplakt.</string>
-    <!-- Error shown when it tries to open a contact link from the Cloud Drive section -->
-    <string name="valid_contact_link">U heeft een contact link geplakt.</string>
-    <!-- Menu item -->
-    <string name="action_open_contact_link">Contact link openen</string>
     <!-- Explanation of the dialog shown to share a chat link -->
     <string name="copy_link_explanation">Personen kunnen aansluiten tot uw groep door deze link te gebruiken.</string>
     <!-- Label that indicates the creation of a chat link -->
@@ -3269,7 +3245,7 @@
     <!-- Text of the empty screen when there are not chat conversations -->
     <string name="recent_chat_empty_text">Begin met veilig chatten met uw contacten door gebruik van end-to-end encryptie</string>
     <!-- Text sent to recipients to invite to be contact. Placeholder: contact link url. -->
-    <string name="invite_contacts_to_start_chat_text_message">Hoi. Voer veilige gesprekken op MEGA met mij en krijg 20 GB gratis cloudopslag.%1$s</string>
+    <string name="invite_contacts_to_start_chat_text_message">Hoi. Voer veilige gesprekken op MEGA met mij en krijg 20 GB gratis cloud opslag.%1$s</string>
     <!-- In some cases, a user may try to get the link for a chat room, but if such is not set by an operator - it would say ‘not link available’ and not auto create it. -->
     <string name="no_chat_link_available">Geen gesprekslink beschikbaar.</string>
     <!-- Alert shown when it has been deleted successfully a chat link -->
@@ -3766,7 +3742,7 @@
     <!-- Action to get more information -->
     <string name="action_more_information">Meer Informatie</string>
     <!-- Preferences screen item title for Cookie Policy -->
-    <string name="settings_about_cookie_policy">Cookie Beleid</string>
+    <string name="settings_about_cookie_policy">Cookiebeleid</string>
     <!-- Preferences screen item title for cookie settings -->
     <string name="settings_about_cookie_settings">Cookie Instellingen</string>
     <!-- Cookie dialog title -->
@@ -4107,7 +4083,7 @@
     <!-- the title of join without account on left meeting page-->
     <string name="left_meeting_join_title">Uw privacy is belangrijk</string>
     <!-- the content of join without account on left meeting page-->
-    <string name="left_meeting_join_content">Word lid van het grootste veilige cloudopslag- en samenwerkingsplatform ter wereld.</string>
+    <string name="left_meeting_join_content">Word lid van het grootste veilige cloud opslag- en samenwerkingsplatform ter wereld.</string>
     <!-- the bonus title of join without account on left meeting page-->
     <string name="left_meeting_bonus_title">Krijg 20 GB gratis</string>
     <!-- the bonus content of join without account on left meeting page-->

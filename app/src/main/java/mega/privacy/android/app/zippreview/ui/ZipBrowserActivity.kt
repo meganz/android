@@ -12,6 +12,7 @@ import androidx.activity.viewModels
 import androidx.appcompat.app.ActionBar
 import androidx.appcompat.app.AlertDialog
 import androidx.core.content.FileProvider
+import androidx.core.net.toUri
 import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -23,7 +24,7 @@ import mega.privacy.android.app.components.SimpleDividerItemDecoration
 import mega.privacy.android.app.components.dragger.DragToExitSupport
 import mega.privacy.android.app.components.dragger.DragToExitSupport.*
 import mega.privacy.android.app.databinding.ActivityZipBrowserBinding
-import mega.privacy.android.app.lollipop.FullScreenImageViewerLollipop
+import mega.privacy.android.app.imageviewer.ImageViewerActivity
 import mega.privacy.android.app.lollipop.PdfViewerActivityLollipop
 import mega.privacy.android.app.textEditor.TextEditorActivity
 import mega.privacy.android.app.utils.*
@@ -99,7 +100,7 @@ class ZipBrowserActivity : PasscodeActivity() {
         actionBar?.apply {
             setHomeButtonEnabled(true)
             setDisplayHomeAsUpEnabled(true)
-            title = (StringResourcesUtils.getString(R.string.zip_browser_activity).toUpperCase(
+            title = (StringResourcesUtils.getString(R.string.zip_browser_activity).uppercase(
                 Locale.getDefault()
             ))
         }
@@ -197,7 +198,7 @@ class ZipBrowserActivity : PasscodeActivity() {
             .setMessage(StringResourcesUtils.getString(R.string.error_fail_to_open_file_general))
             .setPositiveButton(
                 StringResourcesUtils.getString(R.string.general_ok)
-                    .toUpperCase(Locale.getDefault())
+                    .uppercase(Locale.getDefault())
             ) { _: DialogInterface?, _: Int -> }
             .show()
     }
@@ -256,16 +257,8 @@ class ZipBrowserActivity : PasscodeActivity() {
      */
     private fun imageFileOpen(position: Int, file: File) {
         logDebug("isImage")
-        val intent =
-            Intent(this@ZipBrowserActivity, FullScreenImageViewerLollipop::class.java)
-        intent.apply {
-            putExtra(INTENT_EXTRA_KEY_POSITION, position)
-            putExtra(INTENT_EXTRA_KEY_ADAPTER_TYPE, ZIP_ADAPTER)
-            putExtra(INTENT_EXTRA_KEY_IS_FOLDER_LINK, false)
-            putExtra(INTENT_EXTRA_KEY_PARENT_NODE_HANDLE, -1L)
-            putExtra(INTENT_EXTRA_KEY_OFFLINE_PATH_DIRECTORY, file.absolutePath)
-            putExtra(INTENT_EXTRA_KEY_ORDER_GET_CHILDREN, MegaApiJava.ORDER_DEFAULT_ASC)
-        }
+
+        val intent = ImageViewerActivity.getIntentForSingleFile(this, file.toUri())
         DragToExitSupport.putThumbnailLocation(
             intent,
             recyclerView,
