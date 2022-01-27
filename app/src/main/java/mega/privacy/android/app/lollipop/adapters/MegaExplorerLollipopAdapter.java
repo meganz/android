@@ -54,6 +54,7 @@ import static mega.privacy.android.app.utils.FileUtil.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.MegaApiUtils.*;
 import static mega.privacy.android.app.utils.MegaNodeUtil.*;
+import static mega.privacy.android.app.utils.StringResourcesUtils.getQuantityString;
 import static mega.privacy.android.app.utils.TimeUtils.*;
 import static mega.privacy.android.app.utils.Util.*;
 import static mega.privacy.android.app.utils.ContactUtil.*;
@@ -303,7 +304,17 @@ public class MegaExplorerLollipopAdapter extends RecyclerView.Adapter<MegaExplor
             holder.itemView.setOnLongClickListener(null);
             holder.itemView.setOnClickListener(this);
             holder.permissionsIcon.setVisibility(View.GONE);
-            holder.textViewFileSize.setText(getMegaNodeFolderInfo(node));
+            if(node.getHandle() == myBackupHandle){
+                ArrayList<MegaNode> subBackupNodes = megaApi.getChildren(node);
+                if (subBackupNodes != null && subBackupNodes.size() > 0) {
+                    int device = getMegaNodeBackupDeviceInfo(subBackupNodes);
+                    holder.textViewFileSize.setText(getQuantityString(R.plurals.num_devices, device, device));
+                } else {
+                    holder.textViewFileSize.setText(getMegaNodeFolderInfo(node));
+                }
+            } else {
+                holder.textViewFileSize.setText(getMegaNodeFolderInfo(node));
+            }
             holder.imageView.setImageResource(getFolderIcon(node, DrawerItem.CLOUD_DRIVE));
 
             if(node.isInShare()){

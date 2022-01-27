@@ -984,10 +984,21 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
             holder.imageView.setLayoutParams(params);
 
             holder.textViewFileSize.setVisibility(View.VISIBLE);
-            holder.textViewFileSize.setText(type == FOLDER_LINK_ADAPTER
-                    ? getMegaNodeFolderLinkInfo(node)
-                    : getMegaNodeFolderInfo(node));
-
+            if(node.getHandle() == myBackupHandle){
+                ArrayList<MegaNode> subBackupNodes = megaApi.getChildren(node);
+                if (subBackupNodes != null && subBackupNodes.size() > 0) {
+                    int device = getMegaNodeBackupDeviceInfo(subBackupNodes);
+                    holder.textViewFileSize.setText(getQuantityString(R.plurals.num_devices, device, device));
+                } else {
+                    holder.textViewFileSize.setText(type == FOLDER_LINK_ADAPTER
+                            ? getMegaNodeFolderLinkInfo(node)
+                            : getMegaNodeFolderInfo(node));
+                }
+            } else {
+                holder.textViewFileSize.setText(type == FOLDER_LINK_ADAPTER
+                        ? getMegaNodeFolderLinkInfo(node)
+                        : getMegaNodeFolderInfo(node));
+            }
             holder.versionsIcon.setVisibility(View.GONE);
 
             setFolderListSelected(holder, position, getFolderIcon(node, type == OUTGOING_SHARES_ADAPTER ? DrawerItem.SHARED_ITEMS : DrawerItem.CLOUD_DRIVE));

@@ -1,19 +1,21 @@
 package mega.privacy.android.app.lollipop.listeners;
 
-import android.content.Context;
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import static mega.privacy.android.app.modalbottomsheet.UploadBottomSheetDialogFragment.GENERAL_UPLOAD;
+import static mega.privacy.android.app.utils.Constants.SNACKBAR_TYPE;
+import static mega.privacy.android.app.utils.LogUtil.logDebug;
+import static mega.privacy.android.app.utils.MegaNodeDialogUtil.ACTION_BACKUP_FAB;
+import static mega.privacy.android.app.utils.Util.isOnline;
 
+import android.content.Context;
 import android.view.View;
+
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.lollipop.ContactFileListActivityLollipop;
 import mega.privacy.android.app.lollipop.DrawerItem;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.utils.Util;
-
-import static mega.privacy.android.app.utils.Constants.*;
-import static mega.privacy.android.app.utils.LogUtil.*;
-import static mega.privacy.android.app.utils.Util.*;
 
 public class FabButtonListener implements FloatingActionButton.OnClickListener{
 
@@ -35,6 +37,15 @@ public class FabButtonListener implements FloatingActionButton.OnClickListener{
                     drawerItem = ((ManagerActivityLollipop)context).getDrawerItem();
                     switch (drawerItem){
                         case CLOUD_DRIVE:
+                            logDebug("Cloud Drive SECTION");
+                            if(!isOnline(context)){
+                                if(context instanceof ManagerActivityLollipop){
+                                    ((ManagerActivityLollipop) context).showSnackbar(SNACKBAR_TYPE, context.getString(R.string.error_server_connection_problem), -1);
+                                }
+                                return;
+                            }
+                            ((ManagerActivityLollipop)context).showUploadPanelForBackup(GENERAL_UPLOAD, ACTION_BACKUP_FAB);
+                            break;
                         case SEARCH:
                         case SHARED_ITEMS:{
                             logDebug("Cloud Drive SECTION");
