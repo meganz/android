@@ -4,7 +4,6 @@ import android.view.View
 import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.behavior.HideBottomViewOnScrollBehavior
-import mega.privacy.android.app.utils.Constants.SCROLLING_UP_DIRECTION
 
 /**
  * CoordinatorLayout behaviour to hide some view when a list is scrolled
@@ -27,7 +26,8 @@ class CustomHideBottomViewOnScrollBehaviour<V : View> : HideBottomViewOnScrollBe
             return
         }
 
-        if(target.canScrollVertically(SCROLLING_UP_DIRECTION)) {
+        // ListView goes up.
+        if(dyConsumed > 0) {
             slideDown(child)
         } else {
             slideUp(child)

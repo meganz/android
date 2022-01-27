@@ -3,21 +3,30 @@ package mega.privacy.android.app.utils
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Context
+import android.content.DialogInterface
+import android.content.DialogInterface.BUTTON_NEGATIVE
 import android.content.DialogInterface.BUTTON_POSITIVE
 import android.content.Intent
 import android.os.Bundle
+import android.text.Editable
+import android.text.TextWatcher
+import android.view.LayoutInflater
 import android.view.View.GONE
 import android.view.View.VISIBLE
+import android.view.WindowManager
 import android.view.inputmethod.EditorInfo
 import android.widget.EditText
 import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
 import androidx.core.widget.doAfterTextChanged
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.google.android.material.textfield.TextInputEditText
+import com.google.android.material.textfield.TextInputLayout
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.MimeTypeList
 import mega.privacy.android.app.R
 import mega.privacy.android.app.components.twemoji.EmojiEditText
+import mega.privacy.android.app.interfaces.ActionBackupNodeCallback
 import mega.privacy.android.app.interfaces.ActionNodeCallback
 import mega.privacy.android.app.interfaces.SnackbarShower
 import mega.privacy.android.app.interfaces.showSnackbar
@@ -30,15 +39,23 @@ import mega.privacy.android.app.textEditor.TextEditorViewModel.Companion.CREATE_
 import mega.privacy.android.app.textEditor.TextEditorViewModel.Companion.MODE
 import mega.privacy.android.app.utils.AlertsAndWarnings.showForeignStorageOverQuotaWarningDialog
 import mega.privacy.android.app.utils.ColorUtils.setErrorAwareInputAppearance
-import mega.privacy.android.app.utils.Constants.*
+import mega.privacy.android.app.utils.Constants.FROM_HOME_PAGE
+import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_FILE_NAME
+import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_HANDLE
+import mega.privacy.android.app.utils.Constants.NODE_NAME_REGEX
+import mega.privacy.android.app.utils.Constants.SNACKBAR_TYPE
 import mega.privacy.android.app.utils.FileUtil.TXT_EXTENSION
+import mega.privacy.android.app.utils.LogUtil.logDebug
 import mega.privacy.android.app.utils.MegaNodeUtil.getRootParentNode
 import mega.privacy.android.app.utils.RunOnUIThreadUtils.runDelay
 import mega.privacy.android.app.utils.StringResourcesUtils.getString
 import mega.privacy.android.app.utils.TextUtil.getCursorPositionOfName
 import mega.privacy.android.app.utils.TextUtil.isTextEmpty
-import mega.privacy.android.app.utils.Util.*
-import nz.mega.documentscanner.utils.ViewUtils.hideKeyboard
+import mega.privacy.android.app.utils.Util.SHOW_IM_DELAY
+import mega.privacy.android.app.utils.Util.isOffline
+import mega.privacy.android.app.utils.Util.isOnline
+import mega.privacy.android.app.utils.ViewUtils.hideKeyboard
+import mega.privacy.android.app.utils.ViewUtils.showSoftKeyboardDelayed
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
 import nz.mega.sdk.MegaNode
 import java.util.*
@@ -54,6 +71,32 @@ object MegaNodeDialogUtil {
     private const val ERROR_EMPTY_EXTENSION = "ERROR_EMPTY_EXTENSION"
     private const val ERROR_DIFFERENT_EXTENSION = "ERROR_DIFFERENT_EXTENSION"
     private const val NO_ERROR = "NO_ERROR"
+
+    // Backup warning dialog
+    const val BACKUP_HANDLED_ITEM: String = "BackupHandleItem"
+    const val BACKUP_HANDLED_NODE = "BackupHandleNode"
+    const val BACKUP_NODE_TYPE = "BackupNodeType"
+    const val BACKUP_ACTION_TYPE = "BackupActionType"
+    const val BACKUP_DIALOG_WARN = "BackupDialogWarn"
+
+    // Backup node type
+    const val BACKUP_NONE = -1 // The folder is not belong to the MyBackup
+    const val BACKUP_ROOT = 0 // MyBackup folder
+    const val BACKUP_DEVICE = 1 // Device folder
+    const val BACKUP_FOLDER = 2 // Backup folders underneath device folders
+    const val BACKUP_FOLDER_CHILD = 3 // All backups underneath BACKUP_FOLDER
+
+    // For backup node actions
+    const val ACTION_BACKUP_NONE = -1
+    const val ACTION_BACKUP_MOVE = 0
+    const val ACTION_BACKUP_REMOVE = 1
+    const val ACTION_BACKUP_FAB = 2
+    const val ACTION_BACKUP_SHARE_FOLDER = 6
+    const val ACTION_MENU_BACKUP_SHARE_FOLDER = 7
+    const val ACTION_BACKUP_SHARE = 9
+    const val ACTION_BACKUP_COPY = 12
+    const val ACTION_MOVE_TO_BACKUP = 13
+    const val ACTION_COPY_TO_BACKUP = 14
 
     /**
      * Creates and shows a TYPE_RENAME dialog to rename a node.
@@ -221,6 +264,7 @@ object MegaNodeDialogUtil {
      *                              - TYPE_NEW_URL_FILE: Create new URL file action.
      * @return The created dialog.
      */
+    @Suppress("DEPRECATION")
     private fun setFinalValuesAndShowDialog(
         context: Context,
         node: MegaNode?,
@@ -238,6 +282,9 @@ object MegaNodeDialogUtil {
 
         dialog.apply {
             setOnShowListener {
+                window?.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_NAVIGATION)
+                window?.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS)
+
                 val typeText = findViewById<EmojiEditText>(R.id.type_text)
                 val errorText = findViewById<TextView>(R.id.error_text)
 
@@ -265,7 +312,7 @@ object MegaNodeDialogUtil {
                         TYPE_NEW_TXT_FILE -> {
                             setHint(R.string.context_new_file_name)
                             setText(TXT_EXTENSION)
-                            runDelay(SHOW_IM_DELAY.toLong()) { setSelection(0) }
+                            runDelay(SHOW_IM_DELAY) { setSelection(0) }
                         }
                     }
 
@@ -295,7 +342,8 @@ object MegaNodeDialogUtil {
                         )
                     }
 
-                showKeyboardDelayed(typeText)
+                typeText?.requestFocus()
+                typeText?.showSoftKeyboardDelayed()
             }
         }.show()
 
@@ -371,7 +419,7 @@ object MegaNodeDialogUtil {
 
                             val oldMimeType = MimeTypeList.typeForName(node.name)
                             var newExtension = MimeTypeList.typeForName(typedString).extension
-                            if (newExtension == typedString.toLowerCase(Locale.ROOT)) newExtension =
+                            if (newExtension == typedString.lowercase(Locale.ROOT)) newExtension =
                                 ""
 
                             when (if (node.isFolder) NO_ERROR else isValidRenameDialogValue(
@@ -609,11 +657,14 @@ object MegaNodeDialogUtil {
         val node = megaApi.getNodeByHandle(handle) ?: return
         val rubbishNode = megaApi.rubbishNode
 
-        if (rubbishNode.handle != getRootParentNode(node).handle) {
+        if (rubbishNode.handle != megaApi.getRootParentNode(node).handle) {
             MaterialAlertDialogBuilder(activity, R.style.ThemeOverlay_Mega_MaterialAlertDialog)
                 .setMessage(getString(R.string.confirmation_move_to_rubbish))
                 .setPositiveButton(getString(R.string.general_move)) { _, _ ->
-                    val progress = MegaProgressDialogUtil.createProgressDialog(activity,getString(R.string.context_move_to_trash))
+                    val progress = MegaProgressDialogUtil.createProgressDialog(
+                        activity,
+                        getString(R.string.context_move_to_trash)
+                    )
 
                     megaApi.moveNode(
                         node, rubbishNode,
@@ -622,7 +673,9 @@ object MegaNodeDialogUtil {
 
                             when {
                                 success -> activity.finish()
-                                isForeignOverQuota -> showForeignStorageOverQuotaWarningDialog(activity)
+                                isForeignOverQuota -> showForeignStorageOverQuotaWarningDialog(
+                                    activity
+                                )
                                 else -> snackbarShower.showSnackbar(getString(R.string.context_no_moved))
                             }
                         })
@@ -635,7 +688,10 @@ object MegaNodeDialogUtil {
             MaterialAlertDialogBuilder(activity, R.style.ThemeOverlay_Mega_MaterialAlertDialog)
                 .setMessage(getString(R.string.confirmation_delete_from_mega))
                 .setPositiveButton(getString(R.string.general_remove)) { _, _ ->
-                    val progress = MegaProgressDialogUtil.createProgressDialog(activity, getString(R.string.context_delete_from_mega))
+                    val progress = MegaProgressDialogUtil.createProgressDialog(
+                        activity,
+                        getString(R.string.context_delete_from_mega)
+                    )
 
                     megaApi.remove(node, RemoveListener {
                         progress.dismiss()
@@ -685,5 +741,397 @@ object MegaNodeDialogUtil {
         }
 
         return existingNode != null
+    }
+
+    /**
+     * Show the warning dialog when moving or deleting folders with "My backup" folder
+     * @param handleList handle list of the nodes that selected
+     * @param pNodeBackup Can not be null, for the actions:
+     * ACTION_COPY_TO_BACKUP            - The destination node belongs to "My backups"
+     * ACTION_BACKUP_REMOVE             - The root of backup node in handleList,
+     *                                    otherwise one of the node in handleList
+     * ACTION_MOVE_TO_BACKUP            - The destination node belongs to "My backups"
+     * ACTION_BACKUP_MOVE               - The root of backup node in handleList,
+     *                                    otherwise one of the node in handleList
+     * ACTION_MENU_BACKUP_SHARE_FOLDER  - The root of backup node
+     * ACTION_BACKUP_SHARE_FOLDER       - The node that select for share.
+     * ACTION_BACKUP_FAB                - if the folder is empty, pNodeBackup is the parent node of empty folder,
+     *                                    otherwise one of the node in handleList.
+     * @param nodeType the type of the backup node - BACKUP_NONE / BACKUP_ROOT / BACKUP_DEVICE / BACKUP_FOLDER / BACKUP_FOLDER_CHILD
+     * @param actionType Indicates the action to backup folder or file:
+     *                                  - ACTION_COPY_TO_BACKUP
+     *                                  - ACTION_BACKUP_REMOVE
+     *                                  - ACTION_MOVE_TO_BACKUP
+     *                                  - ACTION_BACKUP_MOVE
+     *                                  - ACTION_MENU_BACKUP_SHARE_FOLDER
+     *                                  - ACTION_BACKUP_SHARE_FOLDER
+     *                                  - ACTION_BACKUP_FAB
+     */
+    @JvmStatic
+    fun showTipDialogWithBackup(
+        activity: Activity,
+        actionBackupNodeCallback: ActionBackupNodeCallback,
+        handleList: ArrayList<Long>?,
+        pNodeBackup: MegaNode,
+        nodeType: Int,
+        actionType: Int
+    ): AlertDialog {
+
+        logDebug("MyBackup + actWithBackupTips nodeType = $nodeType")
+        logDebug("MyBackup + actWithBackupTips actionType = $actionType")
+        if (handleList != null) {
+            logDebug("MyBackup + handleList.size = " + handleList.size)
+        }
+
+        val dialogClickListener =
+            DialogInterface.OnClickListener { dialog: DialogInterface?, which: Int ->
+                when (which) {
+                    BUTTON_POSITIVE -> {
+                        if(actionType == ACTION_BACKUP_SHARE_FOLDER
+                            || actionType == ACTION_MENU_BACKUP_SHARE_FOLDER
+                            || actionType == ACTION_BACKUP_SHARE
+                            || (actionType == ACTION_COPY_TO_BACKUP && (nodeType == BACKUP_ROOT || nodeType == BACKUP_DEVICE))
+                            || (actionType == ACTION_MOVE_TO_BACKUP && (nodeType == BACKUP_ROOT || nodeType == BACKUP_DEVICE))
+                            || (actionType == ACTION_BACKUP_FAB && nodeType != BACKUP_FOLDER_CHILD)) {
+                            logDebug("MyBackup + showTipDialogWithBackup / actionExecute")
+                            actionBackupNodeCallback.actionExecute(
+                                handleList,
+                                pNodeBackup,
+                                nodeType,
+                                actionType)
+                        } else {
+                            logDebug("MyBackup + showTipDialogWithBackup / actionConfirmed")
+                            actionBackupNodeCallback.actionConfirmed(
+                                handleList,
+                                pNodeBackup,
+                                nodeType,
+                                actionType
+                            )
+                        }
+                    }
+                    BUTTON_NEGATIVE -> {
+                        logDebug("MyBackup + showTipDialogWithBackup / actionCancel")
+                        actionBackupNodeCallback.actionCancel(dialog, actionType)
+                    }
+                }
+            }
+        val layout: LayoutInflater = activity.layoutInflater
+        val view = layout.inflate(R.layout.dialog_backup_operate_tip, null)
+        val tvTitle = view.findViewById<TextView>(R.id.title)
+        val tvContent = view.findViewById<TextView>(R.id.backup_tip_content)
+        val nodeName = pNodeBackup.name
+
+        when (actionType) {
+            ACTION_BACKUP_FAB -> {
+                if(nodeType == BACKUP_DEVICE) {
+                    tvTitle.text = getString(R.string.backup_add_item_title)
+                    tvContent.setText(R.string.backup_add_item_to_root_text)
+                } else {
+                    val displayName = getString(R.string.backup_add_confirm_title, nodeName)
+                    tvTitle.text = displayName
+                    tvContent.setText(R.string.backup_add_item_text)
+                }
+            }
+            ACTION_COPY_TO_BACKUP, ACTION_MOVE_TO_BACKUP -> {
+                if (nodeType == BACKUP_ROOT || nodeType == BACKUP_DEVICE || nodeType == BACKUP_FOLDER) {
+                    tvTitle.text = getString(R.string.backup_add_item_title)
+                    tvContent.setText(R.string.backup_add_item_to_root_text)
+                } else {
+                    val displayName = getString(R.string.backup_add_confirm_title, nodeName)
+                    tvTitle.text = displayName
+                    tvContent.setText(R.string.backup_add_item_text)
+                }
+            }
+            ACTION_BACKUP_MOVE -> {
+                if (nodeType == BACKUP_ROOT) {
+                    // Move root folder of backup
+                    val displayName = getString(R.string.backup_move_folder_title, nodeName)
+                    tvTitle.text = displayName
+                    tvContent.setText(R.string.backup_move_root_folder)
+
+                } else if (nodeType == BACKUP_DEVICE || nodeType == BACKUP_FOLDER || nodeType == BACKUP_FOLDER_CHILD) {
+                    // Move sub folder of backup
+                    if (handleList != null) {
+                        tvTitle.text = if (handleList.size == 1) {
+                            getString(R.string.backup_move_folder_title, nodeName)
+                        } else {
+                            getString(R.string.backup_move_multiple_folder_title)
+                        }
+                    }
+                    tvContent.setText(R.string.backup_move_sub_folder)
+                } else {
+                    logDebug("Not in the backup folder")
+                }
+            }
+            ACTION_BACKUP_REMOVE -> {
+                if (nodeType == BACKUP_ROOT) {
+                    // Move root folder of backup to rubbish bin
+                    val displayName = getString(R.string.backup_remove_folder_title, nodeName)
+                    tvTitle.text = displayName
+                    tvContent.setText(R.string.backup_remove_root_folder)
+                } else if (nodeType == BACKUP_DEVICE || nodeType == BACKUP_FOLDER || nodeType == BACKUP_FOLDER_CHILD) {
+                    // Move sub folder of backup to rubbish bin
+                    if (handleList != null) {
+                        tvTitle.text = if (handleList.size == 1) {
+                            getString(R.string.backup_remove_folder_title, nodeName)
+                        } else {
+                            getString(R.string.backup_remove_multiple_folder_title)
+                        }
+                    }
+                    tvContent.setText(R.string.backup_remove_sub_folder)
+                } else {
+                    logDebug("Not in the backup folder")
+                }
+            }
+            ACTION_BACKUP_SHARE, ACTION_BACKUP_SHARE_FOLDER, ACTION_MENU_BACKUP_SHARE_FOLDER -> {
+                tvTitle.setText(R.string.backup_share_permission_title)
+                tvContent.setText(R.string.backup_share_permission_text)
+                handleList?.let {
+                    val nodeSize = it.size
+                    if(nodeSize > 1) {
+                        when (nodeType) {
+                            BACKUP_ROOT -> {
+                                tvContent.setText(R.string.backup_share_with_root_permission_text)
+                            }
+                            else -> tvContent.setText(R.string.backup_multi_share_permission_text)
+                        }
+                    }
+                }
+            }
+        }
+        val builder = MaterialAlertDialogBuilder(activity)
+            .setView(view)
+        when (actionType) {
+            ACTION_BACKUP_SHARE, ACTION_BACKUP_SHARE_FOLDER, ACTION_MENU_BACKUP_SHARE_FOLDER -> {
+                if (handleList!=null) {
+                    val nodeSize = handleList.size
+                    if(nodeSize > 1 && nodeType == BACKUP_ROOT) {
+                        builder.setPositiveButton(
+                            getString(R.string.general_positive_button),
+                            dialogClickListener
+                        )
+                        builder.setNegativeButton(
+                            getString(R.string.general_cancel),
+                            dialogClickListener
+                        )
+                    } else {
+                        builder.setPositiveButton(
+                            getString(R.string.button_permission_info),
+                            dialogClickListener
+                        )
+                    }
+                } else {
+                    builder.setPositiveButton(
+                        getString(R.string.button_permission_info),
+                        dialogClickListener
+                    )
+                }
+            }
+            else -> {
+                builder.setPositiveButton(
+                    getString(R.string.button_continue),
+                    dialogClickListener
+                )
+                builder.setNegativeButton(
+                    getString(R.string.general_cancel),
+                    dialogClickListener
+                )
+            }
+        }
+        val dialog = builder.show()
+        dialog.setCancelable(false)
+        dialog.setCanceledOnTouchOutside(false)
+        return dialog
+    }
+
+    /**
+     * Show the confirm dialog when moving or deleting folders with "My backup" folder
+     * @param handleList handle list of the nodes that selected
+     * @param pNodeBackup Can not be null, for the actions:
+     * ACTION_COPY_TO_BACKUP            - The destination node belongs to "My backups"
+     * ACTION_BACKUP_REMOVE             - The root of backup node in handleList,
+     *                                    otherwise one of the node in handleList
+     * ACTION_MOVE_TO_BACKUP            - The destination node belongs to "My backups"
+     * ACTION_BACKUP_MOVE               - The root of backup node in handleList,
+     *                                    otherwise one of the node in handleList
+     * ACTION_MENU_BACKUP_SHARE_FOLDER  - The root of backup node
+     * ACTION_BACKUP_SHARE_FOLDER       - The node that select for share.
+     * ACTION_BACKUP_FAB                - if the folder is empty, pNodeBackup is the parent node of empty folder,
+     *                                    otherwise one of the node in handleList.
+     * @param nodeType the type of the backup node - BACKUP_NONE / BACKUP_ROOT / BACKUP_DEVICE / BACKUP_FOLDER / BACKUP_FOLDER_CHILD
+     * @param actionType Indicates the action to backup folder or file:
+     *                                  - ACTION_COPY_TO_BACKUP
+     *                                  - ACTION_BACKUP_REMOVE
+     *                                  - ACTION_MOVE_TO_BACKUP
+     *                                  - ACTION_BACKUP_MOVE
+     *                                  - ACTION_MENU_BACKUP_SHARE_FOLDER
+     *                                  - ACTION_BACKUP_SHARE_FOLDER
+     *                                  - ACTION_BACKUP_FAB
+     */
+    @JvmStatic
+    fun showConfirmDialogWithBackup(
+        activity: Activity,
+        actionBackupNodeCallback: ActionBackupNodeCallback,
+        handleList: ArrayList<Long>?,
+        pNodeBackup: MegaNode,
+        nodeType: Int,
+        actionType: Int
+    ): AlertDialog {
+        val layout: LayoutInflater = activity.layoutInflater
+        val view = layout.inflate(R.layout.dialog_backup_action_confirm, null)
+        val tvTitle = view.findViewById<TextView>(R.id.title)
+        val tvConfirmString = view.findViewById<TextView>(R.id.confirm_string)
+        val editTextLayout: TextInputLayout = view.findViewById(R.id.confirm_text_layout)
+        val editText: TextInputEditText = view.findViewById(R.id.confirm_text)
+        editText.addTextChangedListener(object : TextWatcher {
+            override fun beforeTextChanged(charSequence: CharSequence, i: Int, i1: Int, i2: Int) {}
+            override fun onTextChanged(charSequence: CharSequence, i: Int, i1: Int, i2: Int) {}
+            override fun afterTextChanged(editable: Editable) {
+                editTextLayout.error = null
+                editTextLayout.setHintTextAppearance(R.style.TextAppearance_Design_Hint)
+            }
+        })
+
+        var checkStr = getString(R.string.backup_disable_confirm)
+        var confirmInfo = getString(R.string.backup_action_confirm, checkStr)
+        tvConfirmString.text = confirmInfo
+
+
+        val nodeName = pNodeBackup.name
+
+        when (actionType) {
+            ACTION_COPY_TO_BACKUP, ACTION_MOVE_TO_BACKUP, ACTION_BACKUP_FAB -> {
+                // Add
+                tvTitle.text = getString(R.string.backup_add_confirm_title, nodeName)
+            }
+            ACTION_BACKUP_MOVE -> {
+                if (nodeType == BACKUP_ROOT) {
+                    // Move root folder of backup
+                    tvTitle.text = getString(R.string.backup_move_folder_title, nodeName)
+                    checkStr = getString(R.string.backup_move_confirm)
+                    confirmInfo = getString(R.string.backup_action_confirm, checkStr)
+                    tvConfirmString.text = confirmInfo
+                    editTextLayout.hint = checkStr
+                } else if (nodeType == BACKUP_DEVICE || nodeType == BACKUP_FOLDER || nodeType == BACKUP_FOLDER_CHILD) {
+                    // Move sub folder of backup
+                    if (handleList != null) {
+                        tvTitle.text = if (handleList.size == 1) {
+                            getString(R.string.backup_move_folder_title, nodeName)
+                        } else {
+                            getString(R.string.backup_move_multiple_folder_title)
+                        }
+                    }
+                } else {
+                    logDebug("Not in the backup folder")
+                }
+            }
+            ACTION_BACKUP_REMOVE -> {
+                if (nodeType == BACKUP_ROOT) {
+                    // Move root folder of backup to rubbish bin
+                    tvTitle.text = getString(R.string.backup_remove_folder_title, nodeName)
+                } else if (nodeType == BACKUP_DEVICE || nodeType == BACKUP_FOLDER || nodeType == BACKUP_FOLDER_CHILD) {
+                    // Move sub folder of backup to rubbish bin
+                    if (handleList != null) {
+                        tvTitle.text = if (handleList.size == 1) {
+                            getString(R.string.backup_remove_folder_title, nodeName)
+                        } else {
+                            getString(R.string.backup_remove_multiple_folder_title)
+                        }
+                    }
+                } else {
+                    logDebug("Not in the backup folder")
+                }
+            }
+        }
+
+        val builder = MaterialAlertDialogBuilder(activity)
+            .setView(view)
+            .setPositiveButton(getString(R.string.general_move), null)
+            .setNegativeButton(getString(R.string.general_cancel), null)
+
+        if (handleList == null) {
+            builder.setPositiveButton(getString(R.string.general_add), null)
+        } else {
+            builder.setPositiveButton(getString(R.string.general_move), null)
+        }
+        val dialog = builder.create()
+        dialog.setOnShowListener {
+            val button =
+                dialog.getButton(BUTTON_POSITIVE)
+            button.setOnClickListener {
+                val strEditText =
+                    Objects.requireNonNull(editText.text)
+                        .toString()
+                when (actionType) {
+                    ACTION_BACKUP_MOVE -> {
+                        if (nodeType == BACKUP_ROOT && getString(R.string.backup_move_confirm) == strEditText) {
+                            logDebug("MyBackup + showConfirmDialogWithBackup / actionExecute")
+                            actionBackupNodeCallback.actionExecute(
+                                handleList,
+                                pNodeBackup,
+                                nodeType,
+                                actionType
+                            )
+                            //Dismiss once everything is OK.
+                            dialog.dismiss()
+                        } else if (nodeType == BACKUP_DEVICE || nodeType == BACKUP_FOLDER || nodeType == BACKUP_FOLDER_CHILD) {
+                            if (getString(R.string.backup_disable_confirm) == strEditText) {
+                                logDebug("MyBackup + showConfirmDialogWithBackup / actionExecute")
+                                actionBackupNodeCallback.actionExecute(
+                                    handleList,
+                                    pNodeBackup,
+                                    nodeType,
+                                    actionType
+                                )
+                                //Dismiss once everything is OK.
+                                dialog.dismiss()
+                            } else {
+                                showErrorInfo(editText, editTextLayout)
+                            }
+                        } else {
+                            showErrorInfo(editText, editTextLayout)
+                        }
+                    }
+                    else -> {
+                        if (getString(R.string.backup_disable_confirm) == strEditText) {
+                            logDebug("MyBackup + showConfirmDialogWithBackup / actionExecute")
+                            actionBackupNodeCallback.actionExecute(
+                                handleList,
+                                pNodeBackup,
+                                nodeType,
+                                actionType
+                            )
+                            //Dismiss once everything is OK.
+                            dialog.dismiss()
+                        } else {
+                            showErrorInfo(editText, editTextLayout)
+                        }
+                    }
+                }
+            }
+
+            val buttonCancel =
+                dialog.getButton(BUTTON_NEGATIVE)
+            buttonCancel.setOnClickListener {
+                logDebug("MyBackup + showConfirmDialogWithBackup / actionCancel")
+                actionBackupNodeCallback.actionCancel(dialog, actionType)
+                dialog.dismiss()
+            }
+
+        }
+        dialog.show()
+        dialog.setCancelable(false)
+        dialog.setCanceledOnTouchOutside(false)
+        return dialog
+    }
+
+    private fun showErrorInfo(
+        editText: TextInputEditText,
+        editTextLayout: TextInputLayout
+    ) {
+        editText.requestFocus()
+        editTextLayout.error =
+            getString(R.string.error_backup_confirm_dont_match)
+        editTextLayout.setHintTextAppearance(R.style.TextAppearance_InputHint_Error)
     }
 }

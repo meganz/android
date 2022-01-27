@@ -23,6 +23,8 @@ import static mega.privacy.android.app.utils.LogUtil.logWarning;
 import static mega.privacy.android.app.utils.TextUtil.isTextEmpty;
 import static mega.privacy.android.app.utils.Util.matchRegexs;
 
+import androidx.fragment.app.Fragment;
+
 public class LinksUtil {
 
     private static final String REQUIRES_TRANSFER_SESSION = "fm/";
@@ -191,6 +193,28 @@ public class LinksUtil {
      */
     public static void showGetLinkActivity(Activity activity, long[] handles) {
         activity.startActivity(new Intent(activity, GetLinkActivity.class)
+                .putExtra(HANDLE_LIST, handles));
+    }
+
+    /**
+     * Launches an intent to show get link activity.
+     *
+     * @param fragment Fragment which launches the intent.
+     * @param handle   identifier of the node to get or manage its link.
+     */
+    public static void showGetLinkActivity(Fragment fragment, long handle) {
+        fragment.startActivity(new Intent(fragment.getContext(), GetLinkActivity.class)
+                .putExtra(HANDLE, handle));
+    }
+
+    /**
+     * Launches an intent to show get link activity and get several links.
+     *
+     * @param fragment Fragment which launches the intent.
+     * @param handles  List of handles to get their link.
+     */
+    public static void showGetLinkActivity(Fragment fragment, long[] handles) {
+        fragment.startActivity(new Intent(fragment.getContext(), GetLinkActivity.class)
                 .putExtra(HANDLE_LIST, handles));
     }
 }
