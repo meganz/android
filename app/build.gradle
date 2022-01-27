@@ -212,6 +212,7 @@ dependencies {
     implementation "com.facebook.fresco:animated-gif:$frescoVersion"
     implementation "com.facebook.fresco:animated-webp:$frescoVersion"
     implementation "com.facebook.fresco:webpsupport:$frescoVersion"
+    implementation files('src/main/libs/fresco-zoomable.aar')
 
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlinVersion"
 
