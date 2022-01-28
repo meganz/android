@@ -2926,6 +2926,11 @@
         <item quantity="one">%1$d folders · 1 file</item>
         <item quantity="other">%1$d folders · %2$d files</item>
     </plurals>
+    <!-- Indicates the content of the backup folder -->
+    <plurals name="num_devices">
+        <item quantity="one">%d device</item>
+        <item quantity="other">%d devices</item>
+    </plurals>
     <!-- Subtitle of the historic notification for new additions inside an existing shared folder. Placeholders are: email who added the folders or files, number of folders added, number of files added -->
     <string name="subtitle_notification_added_folders_and_files">[A]%1$s[/A][B] added %2$s and %3$s[/B]</string>
     <!-- Subtitle of the historic notification for new additions inside an existing shared folder, Plural of file. 2 files -->
@@ -4172,4 +4177,44 @@
     <string name="settings_mobile_data_resoluton_title">Use mobile data to preview high resolution images</string>
     <!-- summary for the settings to enable high resolution images when on mobile data -->
     <string name="settings_mobile_data_resoluton_summary">Allow the use of mobile data to load high resolution images when previewing. If disabled, the original image will only be loaded when you zoom in.</string>
+    <!-- If users want to move the root backup folder, all backups underneath it are disabled. Warning dialog will show to confirm -->
+    <string name="backup_move_root_folder">You are changing a default backup folder loacation. This may affect your ability to find your backup folder in the future. Please remember where it is located so that you can find it in the future.</string>
+    <!-- If users want to move the sub backup folder, all backups underneath it are disabled. Warning dialog will show to confirm -->
+    <string name="backup_move_sub_folder">Moving this folder changes the backup destination. The backup will be turned off for safety. Is this what you want to do? Backups can be re-enable with the MEGA Desktop App.</string>
+    <!-- If users want to delete the root backup folder, all backups underneath it are disabled. Warning dialog will show to confirm -->
+    <string name="backup_remove_root_folder">You are deleting your backups folder. This will remove all the backups you have set. Are you sure you want to do this?</string>
+    <!-- If users want to delete the sub backup folder, all backups underneath it are disabled. Warning dialog will show to confirm -->
+    <string name="backup_remove_sub_folder">Are you sure you want to delete your backup folder and disable backup you set?</string>
+    <!-- The title of warning dialog for single folder moving -->
+    <string name="backup_move_folder_title">Move \"%1s\"</string>
+    <!-- The title of warning dialog for single folder deleting -->
+    <string name="backup_remove_folder_title">Move \"%1s\" to Rubbish Bin</string>
+    <!-- The title of warning dialog for multi-folder moving -->
+    <string name="backup_move_multiple_folder_title">Move backup folders</string>
+    <!-- The title of warning dialog for single folder deleting -->
+    <string name="backup_remove_multiple_folder_title">Move backup folders to Rubbish Bin</string>
+    <!-- The confirm information of warning dialog for deleting -->
+    <string name="backup_disable_confirm">Disable backup</string>
+    <!-- The confirm information of warning dialog for moving "My backup" -->
+    <string name="backup_move_confirm">Move backup</string>
+    <!-- The confirm information of warning dialog for deleting -->
+    <string name="backup_action_confirm">Please type \"%1s\" to confirm this action</string>
+    <!-- when checking the input -->
+    <string name="error_backup_confirm_dont_match">Text entered does not match</string>
+    <!-- The title of confirm dialog for adding item to "My backup" -->
+    <string name="backup_add_confirm_title">Add item to \"%1s\"</string>
+    <!-- The title of warning dialog for adding item to "My backup" -->
+    <string name="backup_add_item_title">Setup backup</string>
+    <!-- If users want to add items to the "My backup" folder, Warning dialog will show to confirm -->
+    <string name="backup_add_item_to_root_text">To ensure this items added to your backup folder are automatically synchronised to the MEGA Cloud, please setup on desktop app.</string>
+    <!-- If users want to share items in the "My backup" folder, Warning dialog will show to confirm -->
+    <string name="backup_share_permission_title">Read-only</string>
+    <!-- If users want to share single backup folder, show below warning message -->
+    <string name="backup_share_permission_text">This folder can only be shared as read-only, as this is a backup folder, any changes to its content could disable the backup.</string>
+    <!-- If users want to add items to the "My backup" device folder, Warning dialog will show to confirm -->
+    <string name="backup_add_item_text">Adding items to this folder changes the backup destination. The backup will be turned off for safety. Is this what you want to do? Backups can be re-enable with the MEGA Desktop App.</string>
+    <!-- Share multi backup folders, show below warning message -->
+    <string name="backup_multi_share_permission_text">These folders can only be shared as read-only, as they are backup folders, any changes to their content could disable the backups.</string>
+    <!-- Share multi folders mix with backup and non-backup folders, show below warning message -->
+    <string name="backup_share_with_root_permission_text">Some folders shared are backup folders and read-only. Do you wish to continue?</string>
 </resources>
