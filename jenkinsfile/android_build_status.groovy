@@ -141,7 +141,6 @@ pipeline {
                 if (env.BRANCH_NAME.startsWith('MR-') && shouldSkip(env.GITLAB_OA_TITLE)) {
                     def mrNumber = env.BRANCH_NAME.replace('MR-', '')
                     withCredentials([usernamePassword(credentialsId: 'Gitlab-Access-Token', usernameVariable: 'USERNAME', passwordVariable: 'TOKEN')]) {
-                        final String response = sh(script: 'curl -s --request POST --header PRIVATE-TOKEN:$TOKEN --form file=@console.txt https://code.developers.mega.co.nz/api/v4/projects/199/uploads', returnStdout: true).trim()
                         env.MARKDOWN_LINK = ":raising_hand: Android Pipeline Build Skipped! <BR/> Newly triggered builds will resume after you have removed <b>Draft:</b> or <b>WIP:</b> from the beginning of MR title."
                         env.MERGE_REQUEST_URL = "https://code.developers.mega.co.nz/api/v4/projects/199/merge_requests/${mrNumber}/notes"
                         sh 'curl --request POST --header PRIVATE-TOKEN:$TOKEN --form body=\"${MARKDOWN_LINK}\" ${MERGE_REQUEST_URL}'
