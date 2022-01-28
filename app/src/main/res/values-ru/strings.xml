@@ -4167,7 +4167,7 @@
     <!-- Label for hold meeting -->
     <string name="meeting_hold">Удержать</string>
     <!-- General label for speaker -->
-    <string name="general_speaker">Докладчик</string>
+    <string name="general_speaker">Динамик</string>
     <!-- General label for headphone-->
     <string name="general_headphone">Наушники</string>
     <!-- General label for headphone on-->
@@ -4317,7 +4317,7 @@
     <!-- Warning informing the user the folder location is trying to open no longer exists. -->
     <string name="location_not_exist">Эта папка больше не существует.</string>
     <!-- Warning shown informing the contact has been previously invited. The placeholder is to show the name of the contact. -->
-    <string name="contact_already_invited">You have already invited %1$s</string>
+    <string name="contact_already_invited">Вы уже пригласили %1$s</string>
     <!-- Warning shown informing the contact request has been sent and can be managed in sent requests section. -->
     <string name="contact_invited">Приглашение успешно отправлено. Смотрите отправленные запросы.</string>
     <!-- Message when file available offline. -->

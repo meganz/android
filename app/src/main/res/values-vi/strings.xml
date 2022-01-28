@@ -4080,7 +4080,7 @@
     <!-- Action button to open a contact link.-->
     <string name="action_open_contact_link">Mở đường liên kết sổ liên lạc</string>
     <!-- title for the settings to enable high resolution images when on mobile data -->
-    <string name="settings_mobile_data_resoluton_title">Use mobile data to preview high resolution images</string>
+    <string name="settings_mobile_data_resoluton_title">Dùng mạng internet di động để tải ảnh xem trước độ phân giải cao</string>
     <!-- summary for the settings to enable high resolution images when on mobile data -->
-    <string name="settings_mobile_data_resoluton_summary">CHo phép sử dụng mạng di động để tải độ phân giải cao khi xem qua hình ảnh. Nếu tắt đi, chất lượng ảnh gốc sẽ chỉ được tải khi bạn phóng vào hình ảnh để xem.</string>
+    <string name="settings_mobile_data_resoluton_summary">Cho phép sử dụng mạng di động để tải độ phân giải cao khi duyệt hình ảnh. Nếu tắt đi, chất lượng ảnh gốc sẽ chỉ được tải khi bạn phóng vào hình ảnh để xem.</string>
 </resources>

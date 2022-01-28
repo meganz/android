@@ -1402,7 +1402,7 @@
     <!-- chat message when a participant was removed from a group chat -->
     <string name="message_remove_participant">[A]%1$s[/A][B] wurde von [/B][C]%2$s[/C] aus dem Gruppenchat entfernt</string>
     <!-- Message shown when a participant change the title of a group chat. -->
-    <string name="change_title_messages">[A]%1$s[/A][B] hat den Namen des Gruppenchats auf [/B][C]“%2$s”[/C] geändert</string>
+    <string name="change_title_messages">[A]%1$s[/A][B] hat den Namen des Gruppenchats auf [/B][C]„%2$s“[/C] geändert</string>
     <!-- chat message when a participant left a group chat -->
     <string name="message_participant_left_group_chat">[A]%1$s[/A][B] hat den Gruppenchat verlassen[/B]</string>
     <!-- chat message alert when the message have to been manually -->
@@ -1434,7 +1434,7 @@
     <!-- chat message when a participant was removed from a group chat -->
     <string name="non_format_message_remove_participant">%1$s wurde von %2$s aus dem Gruppenchat entfernt</string>
     <!-- Message shown when a participant change the title of a group chat. -->
-    <string name="non_format_change_title_messages">%1$s hat den Titel auf “%2$s” geändert</string>
+    <string name="non_format_change_title_messages">%1$s hat den Titel auf „%2$s“ geändert</string>
     <!-- chat message when a participant left a group chat -->
     <string name="non_format_message_participant_left_group_chat">%1$s hat den Gruppenchat verlassen</string>
     <!-- success alert when the user copy some messages to the clipboard -->
@@ -2402,7 +2402,7 @@
     <!-- title of the notification for a new incoming contact request -->
     <string name="title_new_contact_request_notification">Neue Kontaktanfrage</string>
     <!-- Hint shown in the field to write a message in the chat screen (chat with customized title) -->
-    <string name="type_message_hint_with_title">Nachricht an “%s”&#8230;</string>
+    <string name="type_message_hint_with_title">Nachricht an „%s“&#8230;</string>
     <!-- Empty state message shown in the screen when there are not any active transfer -->
     <string name="transfers_empty_new">[B]Keine laufenden[/B][A] Transfers[/A][B].[/B]</string>
     <!-- Empty state message shown in the screen when there are not any active transfer -->
@@ -2410,7 +2410,7 @@
     <!-- Empty state text that indicates that a folder is currently empty -->
     <string name="file_browser_empty_folder_new">[B]Leerer[/B][A] Ordner[/A][B].[/B]</string>
     <!-- Hint shown in the field to write a message in the chat screen (chat with customized title) -->
-    <string name="type_message_hint_with_customized_title">Nachricht an “%s”&#8230;</string>
+    <string name="type_message_hint_with_customized_title">Nachricht an „%s“&#8230;</string>
     <!-- Hint shown in the field to write a message in the chat screen (chat with default title) -->
     <string name="type_message_hint_with_default_title">Nachricht an %s&#8230;</string>
     <!-- Title of setting Two-Factor Authentication -->
@@ -2771,7 +2771,7 @@
     <!-- Text of the dialog to change a public chat to private (enable encryption key rotation) -->
     <string name="subtitle_chat_message_enabled_ERK">Schlüsselrotation ist etwas sicherer. Allerdings ist durch ihre Aktivierung die Benutzung von Chatlinks nicht mehr möglich. Auch sehen neu hinzugekommene Teilnehmer nicht mehr den gesamten Chatverlauf.</string>
     <!-- Message shown when a contact request has not been sent because the invitation has been sent before -->
-    <string name="invite_not_sent_already_sent">Die Einladung an %s wurde bereits verschickt und kann unter “Gesendete Anfragen” verwaltet werden.</string>
+    <string name="invite_not_sent_already_sent">Die Einladung an %s wurde bereits verschickt und kann unter „Gesendete Anfragen“ verwaltet werden.</string>
     <!-- Label shown to indicate the QR is saving in Cloud Drive -->
     <string name="save_qr_cloud_drive">%s wird im Cloud Drive gespeichert&#8230;</string>
     <!-- General label for folders -->
@@ -3742,7 +3742,7 @@
     <!-- Cookie dialog title -->
     <string name="dialog_cookie_alert_title">Ihre Privatsphäre</string>
     <!-- Cookie dialog message. Please, keep the placeholders to format the string. -->
-    <string name="dialog_cookie_alert_message">Im Rahmen der technischen Umsetzung unserer Dienstleistungen nutzen wir Cookies und verwandte Technologien (\“Cookies\“). Sie können unserer Cookie-Nutzung sofort zustimmen oder sie im Detail konfigurieren. Weitere Informationen dazu in unseren [A]Cookie-Regelungen[/A].</string>
+    <string name="dialog_cookie_alert_message">Im Rahmen der technischen Umsetzung unserer Dienstleistungen nutzen wir Cookies und verwandte Technologien („Cookies“). Sie können unserer Cookie-Nutzung sofort zustimmen oder sie im Detail konfigurieren. Weitere Informationen dazu in unseren [A]Cookie-Regelungen[/A].</string>
     <!-- Cookie dialog message showed when there are unsaved settings. -->
     <string name="dialog_cookie_alert_unsaved">Cookie-Einstellungen noch nicht gespeichert.</string>
     <!-- Snackbar message showed when there settings has been saved successfully. -->
