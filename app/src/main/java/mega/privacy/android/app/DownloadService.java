@@ -48,6 +48,7 @@ import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.notifications.TransferOverQuotaNotification;
 import mega.privacy.android.app.objects.SDTransfer;
 import mega.privacy.android.app.service.iar.RatingHandlerImpl;
+import mega.privacy.android.app.utils.ChatUtil;
 import mega.privacy.android.app.utils.SDCardOperator;
 import mega.privacy.android.app.utils.StringResourcesUtils;
 import mega.privacy.android.app.utils.ThumbnailUtilsLollipop;
@@ -360,28 +361,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 					isLoggingIn = true;
 					MegaApplication.setLoggingIn(isLoggingIn);
 
-					if (megaChatApi == null) {
-						megaChatApi = ((MegaApplication) getApplication()).getMegaChatApi();
-					}
-
-					int ret = megaChatApi.getInitState();
-
-					if (ret == MegaChatApi.INIT_NOT_DONE || ret == MegaChatApi.INIT_ERROR) {
-						ret = megaChatApi.init(gSession);
-						logDebug("result of init ---> " + ret);
-						switch (ret) {
-							case MegaChatApi.INIT_NO_CACHE:
-								logDebug("condition ret == MegaChatApi.INIT_NO_CACHE");
-								break;
-							case MegaChatApi.INIT_ERROR:
-								logDebug("condition ret == MegaChatApi.INIT_ERROR");
-								megaChatApi.logout();
-								break;
-							default:
-								logDebug("Chat correctly initialized");
-								break;
-						}
-					}
+					ChatUtil.initMegaChatApi(gSession);
 
 					pendingIntents.add(intent);
 					if (type == null || (!type.contains(APP_DATA_VOICE_CLIP) && !type.contains(APP_DATA_BACKGROUND_TRANSFER))) {

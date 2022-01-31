@@ -47,6 +47,7 @@ import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
+import mega.privacy.android.app.UserCredentials;
 import mega.privacy.android.app.activities.ManageChatHistoryActivity;
 import mega.privacy.android.app.components.MarqueeTextView;
 import mega.privacy.android.app.components.twemoji.EmojiEditText;
@@ -55,6 +56,7 @@ import mega.privacy.android.app.components.twemoji.EmojiRange;
 import mega.privacy.android.app.components.twemoji.EmojiTextView;
 import mega.privacy.android.app.components.twemoji.EmojiUtilsShortcodes;
 import mega.privacy.android.app.interfaces.ChatManagementCallback;
+import mega.privacy.android.app.listeners.ChatLogoutListener;
 import mega.privacy.android.app.listeners.ExportListener;
 import mega.privacy.android.app.listeners.SetRetentionTimeListener;
 import mega.privacy.android.app.lollipop.controllers.ChatController;
@@ -1889,5 +1891,32 @@ public class ChatUtil {
         }
 
         return INVALID_POSITION;
+    }
+
+    /**
+     * Method to get the initial state of megaChatApi and, if necessary, initiates it.
+     *
+     * @param session User session
+     */
+    public static void initMegaChatApi(String session) {
+        MegaChatApiAndroid megaChatApi = MegaApplication.getInstance().getMegaChatApi();
+
+        int state = megaChatApi.getInitState();
+        if (state == MegaChatApi.INIT_NOT_DONE || state == MegaChatApi.INIT_ERROR) {
+            state = megaChatApi.init(session);
+            logDebug("result of init ---> " + state);
+            switch (state) {
+                case MegaChatApi.INIT_NO_CACHE:
+                    logDebug("INIT_NO_CACHE");
+                    break;
+                case MegaChatApi.INIT_ERROR:
+                    logDebug("INIT_ERROR");
+                    megaChatApi.logout();
+                    break;
+                default:
+                    logDebug("Chat correctly initialized");
+                    break;
+            }
+        }
     }
 }
