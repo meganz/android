@@ -28,8 +28,10 @@ import mega.privacy.android.app.modalbottomsheet.SortByBottomSheetDialogFragment
 import mega.privacy.android.app.uploadFolder.list.adapter.FolderContentAdapter
 import mega.privacy.android.app.uploadFolder.list.data.FolderContent
 import mega.privacy.android.app.utils.Constants
+import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_PARENT_NODE_HANDLE
 import mega.privacy.android.app.utils.MenuUtils.setupSearchView
 import mega.privacy.android.app.utils.Util
+import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 
 /**
  * Activity which shows the content of a local folder picked via system picker to upload all its content
@@ -81,6 +83,7 @@ class UploadFolderActivity : PasscodeActivity(), Scrollable {
                 DocumentFile.fromTreeUri(this@UploadFolderActivity, uri)?.let { documentFile ->
                     viewModel.retrieveFolderContent(
                         documentFile,
+                        intent.getLongExtra(INTENT_EXTRA_KEY_PARENT_NODE_HANDLE, INVALID_HANDLE),
                         sortByHeaderViewModel.order.third,
                         sortByHeaderViewModel.isList
                     )
@@ -158,12 +161,15 @@ class UploadFolderActivity : PasscodeActivity(), Scrollable {
         }
 
         binding.uploadButton.setOnClickListener {
-            setResult(
-                RESULT_OK,
-                Intent().putParcelableArrayListExtra(UPLOAD_RESULTS, viewModel.upload())
-            )
+            showProgress(true)
+            viewModel.upload(this) { uploadItems ->
+                setResult(
+                    RESULT_OK,
+                    Intent().putExtra(UPLOAD_RESULTS, uploadItems)
+                )
 
-            finish()
+                finish()
+            }
         }
 
         showProgress(true)

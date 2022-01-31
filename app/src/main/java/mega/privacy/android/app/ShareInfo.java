@@ -9,8 +9,6 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Environment;
-import android.os.storage.StorageManager;
 import android.provider.MediaStore;
 
 import java.io.BufferedOutputStream;
@@ -31,12 +29,9 @@ import java.util.List;
 
 import mega.privacy.android.app.lollipop.FileExplorerActivityLollipop;
 import mega.privacy.android.app.lollipop.PdfViewerActivityLollipop;
-import mega.privacy.android.app.utils.SDCardOperator;
 
-import static mega.privacy.android.app.uploadFolder.UploadFolderActivity.UPLOAD_RESULTS;
 import static mega.privacy.android.app.utils.FileUtil.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
-import static mega.privacy.android.app.utils.TextUtil.isTextEmpty;
 
 import androidx.documentfile.provider.DocumentFile;
 
@@ -141,8 +136,7 @@ public class ShareInfo implements Serializable {
 				return processIntentMultiple(intent, context);
 			}
 		}
-		else if (intent.getClipData() != null
-				|| intent.getParcelableArrayListExtra(UPLOAD_RESULTS) != null) {
+		else if (intent.getClipData() != null) {
 			if(Intent.ACTION_GET_CONTENT.equals(intent.getAction())) {
 				logDebug("Multiple ACTION_GET_CONTENT");
 				return processGetContentMultiple(intent, context);
@@ -191,7 +185,6 @@ public class ShareInfo implements Serializable {
 	public static List<ShareInfo> processGetContentMultiple(Intent intent, Context context) {
 		logDebug("processGetContentMultiple");
 		ArrayList<ShareInfo> result = new ArrayList<>();
-		ArrayList<Uri> uploadResults = intent.getParcelableArrayListExtra(UPLOAD_RESULTS);
 		ClipData cD = intent.getClipData();
 
 		if (cD != null && cD.getItemCount() != 0) {
@@ -208,15 +201,6 @@ public class ShareInfo implements Serializable {
 					continue;
 				}
 				result.add(info);
-			}
-		} else if (uploadResults != null) {
-			for (Uri uri : uploadResults) {
-				ShareInfo info = new ShareInfo();
-				info.processUri(uri, context);
-
-				if (info.file != null) {
-					result.add(info);
-				}
 			}
 		} else {
 			logWarning("ClipData or uploadResults NUll or size=0");
@@ -266,7 +250,7 @@ public class ShareInfo implements Serializable {
 	/*
 	 * Get info from Uri
 	 */
-	private void processUri(Uri uri, Context context) {
+	public void processUri(Uri uri, Context context) {
 		logDebug("processUri: " + uri);
 		// getting input stream
 		inputStream = null;
@@ -560,57 +544,6 @@ public class ShareInfo implements Serializable {
 		if(contentURI == null) return null;
 	    String path = null;
 	    Cursor cursor = null;
-		DocumentFile documentFile = DocumentFile.fromTreeUri(context, contentURI);
-
-		if (documentFile != null && documentFile.isDirectory()) {
-			SDCardOperator operator = null;
-
-			try {
-				operator = new SDCardOperator(context);
-			} catch (SDCardOperator.SDCardException e) {
-				logError("Error creating SDCardOperator", e);
-			}
-
-			if (operator != null) {
-				String volumePath = operator.getSDCardRoot();
-
-				if (volumePath != null) {
-					final String[] split = volumePath.split(File.separator);
-					if (split.length > 0 && contentURI.toString().contains(split[split.length - 1])) {
-						//SD card folder
-						String pathString = getFullPathFromTreeUri(contentURI, context);
-
-						if (isTextEmpty(pathString)) {
-							logWarning("getFullPathFromTreeUri is Null.");
-							return null;
-						}
-
-						return pathString;
-					}
-				} else {
-					logWarning("volumePath is null");
-				}
-			} else {
-				logDebug("operator is null");
-			}
-
-			//Primary storage
-			StorageManager storageManager = (StorageManager) context.getSystemService(Context.STORAGE_SERVICE);
-			File file;
-			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-				file = storageManager.getStorageVolume(contentURI).getDirectory();
-			} else {
-				file = Environment.getExternalStorageDirectory();
-			}
-
-			String[] split = contentURI.getPath().split(":");
-
-			if (file != null && split.length == 2) {
-				return file.getAbsolutePath() + File.separator + split[1];
-			} else {
-				return null;
-			}
-		}
 
 		try {
 			cursor = context.getContentResolver().query(contentURI, null, null, null, null);

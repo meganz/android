@@ -1,18 +1,31 @@
 package mega.privacy.android.app.uploadFolder.usecase
 
+import android.content.Context
+import com.anggrayudi.storage.file.getAbsolutePath
 import io.reactivex.rxjava3.core.Single
 import io.reactivex.rxjava3.kotlin.blockingSubscribeBy
+import mega.privacy.android.app.ShareInfo
 import mega.privacy.android.app.components.textFormatter.TextFormatterUtils.INVALID_INDEX
+import mega.privacy.android.app.di.MegaApi
 import mega.privacy.android.app.uploadFolder.list.data.FolderContent
+import mega.privacy.android.app.uploadFolder.list.data.UploadFolderResult
+import mega.privacy.android.app.usecase.CreateFolderUseCase
+import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava.*
+import nz.mega.sdk.MegaNode
+import java.io.File
 import java.io.FileNotFoundException
+import java.lang.NullPointerException
 import java.security.InvalidParameterException
 import java.util.*
 import javax.inject.Inject
 import kotlin.collections.ArrayList
 import kotlin.collections.HashMap
 
-class GetFolderContentUseCase @Inject constructor() {
+class GetFolderContentUseCase @Inject constructor(
+    @MegaApi private val megaApi: MegaApiAndroid,
+    private val createFolderUseCase: CreateFolderUseCase
+) {
 
     private fun get(currentFolder: FolderContent.Data): Single<List<FolderContent.Data>> =
         Single.create { emitter ->
@@ -45,6 +58,119 @@ class GetFolderContentUseCase @Inject constructor() {
                     )
                 }
             )
+        }
+
+    private fun getUris(
+        context: Context,
+        parentNode: MegaNode,
+        parentFolder: String,
+        folderItem: FolderContent.Data,
+        isSelection: Boolean
+    ): Single<ArrayList<UploadFolderResult>> =
+        Single.create { emitter ->
+            if (folderItem.isFolder) {
+                val uris = ArrayList<UploadFolderResult>()
+
+                get(folderItem).blockingSubscribeBy(
+                    onError = { error -> emitter.onError(error) },
+                    onSuccess = { folderContent ->
+                        folderContent.forEach { item ->
+                            getUris(context, parentNode, parentFolder, item, isSelection)
+                                .blockingSubscribeBy(onSuccess = { urisResult ->
+                                    uris.addAll(urisResult)
+                                })
+                        }
+
+                        emitter.onSuccess(uris)
+                    }
+                )
+            } else {
+                val filePath = folderItem.document.getAbsolutePath(context).split(parentFolder)[1]
+                var folderTree = filePath.substring(0, filePath.lastIndexOf(File.separator))
+
+                if (!isSelection) {
+                    folderTree = parentFolder + folderTree
+                }
+
+                val info = ShareInfo().apply { processUri(folderItem.uri, context) }
+
+                if (folderTree.isEmpty()) {
+                    emitter.onSuccess(
+                        arrayListOf(
+                            UploadFolderResult(
+                                info.fileAbsolutePath,
+                                folderItem.name!!,
+                                folderItem.lastModified,
+                                parentNode.handle
+                            )
+                        )
+                    )
+                } else {
+                    createFolderUseCase.createTree(parentNode, folderTree).blockingSubscribeBy(
+                        onError = { error -> emitter.onError(error) },
+                        onSuccess = { parentNodeResult ->
+                            emitter.onSuccess(
+                                arrayListOf(
+                                    UploadFolderResult(
+                                        info.fileAbsolutePath,
+                                        folderItem.name!!,
+                                        folderItem.lastModified,
+                                        parentNodeResult.handle
+                                    )
+                                )
+                            )
+                        }
+                    )
+                }
+            }
+        }
+
+    fun getUris(
+        context: Context,
+        parentNodeHandle: Long,
+        parentFolder: String,
+        selectedItems: MutableList<Int>?,
+        folderItems: MutableList<FolderContent>?
+    ): Single<ArrayList<UploadFolderResult>> =
+        Single.create { emitter ->
+            if (folderItems == null) {
+                emitter.onError(FileNotFoundException("Empty folder"))
+                return@create
+            }
+
+            val parentNode = megaApi.getNodeByHandle(parentNodeHandle)
+
+            if (parentNode == null) {
+                emitter.onError(NullPointerException("Parent node does not exist"))
+                return@create
+            }
+
+            val uris = ArrayList<UploadFolderResult>()
+
+            if (!selectedItems.isNullOrEmpty()) {
+                selectedItems.forEach { selected ->
+                    getUris(
+                        context,
+                        parentNode,
+                        parentFolder,
+                        (folderItems[selected] as FolderContent.Data),
+                        true
+                    ).blockingSubscribeBy(onSuccess = { urisResult -> uris.addAll(urisResult) })
+                }
+            } else {
+                folderItems.forEach { item ->
+                    if (item is FolderContent.Data) {
+                        getUris(context, parentNode, parentFolder, item, false)
+                            .blockingSubscribeBy(onSuccess = { urisResult -> uris.addAll(urisResult) })
+                    }
+                }
+            }
+
+            if (uris.isEmpty()) {
+                emitter.onError(FileNotFoundException("Empty folder"))
+            } else {
+                emitter.onSuccess(uris)
+            }
         }
 
     private fun completeAndReorder(

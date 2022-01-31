@@ -1,6 +1,6 @@
 package mega.privacy.android.app.uploadFolder
 
-import android.net.Uri
+import android.content.Context
 import androidx.documentfile.provider.DocumentFile
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -12,10 +12,13 @@ import io.reactivex.rxjava3.schedulers.Schedulers
 import mega.privacy.android.app.arch.BaseRxViewModel
 import mega.privacy.android.app.components.textFormatter.TextFormatterUtils.INVALID_INDEX
 import mega.privacy.android.app.uploadFolder.list.data.FolderContent
+import mega.privacy.android.app.uploadFolder.list.data.UploadFolderResult
 import mega.privacy.android.app.uploadFolder.usecase.GetFolderContentUseCase
+import mega.privacy.android.app.utils.LogUtil.logError
 import mega.privacy.android.app.utils.LogUtil.logWarning
 import mega.privacy.android.app.utils.notifyObserver
 import nz.mega.sdk.MegaApiJava
+import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 import java.util.ArrayList
 import javax.inject.Inject
 
@@ -31,6 +34,8 @@ class UploadFolderViewModel @Inject constructor(
     private val folderItems: MutableLiveData<MutableList<FolderContent>> = MutableLiveData()
     private val selectedItems: MutableLiveData<MutableList<Int>> = MutableLiveData()
 
+    private lateinit var parentFolder: String
+    private var parentHandle: Long = INVALID_HANDLE
     private var order: Int = MegaApiJava.ORDER_DEFAULT_ASC
     private var isList: Boolean = true
     private var query: String? = null
@@ -42,9 +47,16 @@ class UploadFolderViewModel @Inject constructor(
     fun getFolderItems(): LiveData<MutableList<FolderContent>> = folderItems
     fun getSelectedItems(): LiveData<MutableList<Int>> = selectedItems
 
-    fun retrieveFolderContent(documentFile: DocumentFile, order: Int, isList: Boolean) {
+    fun retrieveFolderContent(
+        documentFile: DocumentFile,
+        parentHandle: Long,
+        order: Int,
+        isList: Boolean
+    ) {
+        parentFolder = documentFile.name.toString()
         currentFolder.value = FolderContent.Data(null, documentFile)
         selectedItems.value = mutableListOf()
+        this.parentHandle = parentHandle
         this.order = order
         this.isList = isList
         setFolderItems()
@@ -249,21 +261,19 @@ class UploadFolderViewModel @Inject constructor(
         folderItems.value = searchResult
     }
 
-    fun upload(): ArrayList<Uri> {
-        val uploadList = ArrayList<Uri>()
-
-        if (selectedItems.value?.isEmpty() == false) {
-            selectedItems.value?.forEach { item ->
-                uploadList.add((folderItems.value?.get(item) as FolderContent.Data).uri)
-            }
-        } else {
-            folderItems.value?.forEach { item ->
-                if (item is FolderContent.Data) {
-                    uploadList.add(item.uri)
-                }
-            }
-        }
-
-        return uploadList
+    fun upload(context: Context, upload: (ArrayList<UploadFolderResult>) -> Unit) {
+        getFolderContentUseCase.getUris(
+            context,
+            parentHandle,
+            parentFolder,
+            selectedItems.value,
+            folderItems.value
+        ).subscribeOn(Schedulers.single())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribeBy(
+                onError = { error -> logError("Cannot upload anything", error) },
+                onSuccess = { uploadResult -> upload.invoke(uploadResult) }
+            )
+            .addTo(composite)
     }
 }

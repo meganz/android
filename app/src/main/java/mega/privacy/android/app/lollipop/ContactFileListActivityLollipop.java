@@ -61,6 +61,7 @@ import mega.privacy.android.app.utils.AlertDialogUtil;
 import mega.privacy.android.app.utils.AlertsAndWarnings;
 import mega.privacy.android.app.utils.MegaNodeDialogUtil;
 import mega.privacy.android.app.utils.StringResourcesUtils;
+import mega.privacy.android.app.utils.UploadUtil;
 import nz.mega.documentscanner.DocumentScannerActivity;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaContactRequest;
@@ -686,29 +687,9 @@ public class ContactFileListActivityLollipop extends PasscodeActivity
 						}
 					});
 		}  else if (requestCode == REQUEST_CODE_GET_FOLDER) {
-			getFolder(this, resultCode, intent);
+			getFolder(this, resultCode, intent, parentHandle);
 		} else if (requestCode == REQUEST_CODE_GET_FOLDER_CONTENT) {
-			if (resultCode != RESULT_OK) {
-				return;
-			}
-
-			intent.setAction(Intent.ACTION_GET_CONTENT);
-
-			try {
-				statusDialog = createProgressDialog(this, getQuantityString(R.plurals.upload_prepare, 1));
-				statusDialog.show();
-			} catch (Exception e) {
-				return;
-			}
-
-			filePrepareUseCase.prepareFiles(intent)
-					.subscribeOn(Schedulers.io())
-					.observeOn(AndroidSchedulers.mainThread())
-					.subscribe((shareInfo, throwable) -> {
-						if (throwable == null) {
-							onIntentProcessed(shareInfo);
-						}
-					});
+			UploadUtil.uploadFolder(this, resultCode, intent);
 		} else if (requestCode == REQUEST_CODE_SELECT_FOLDER && resultCode == RESULT_OK) {
 			if (intent == null) {
 				return;
