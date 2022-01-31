@@ -77,10 +77,6 @@ open class PasscodeActivity : BaseActivity() {
     override fun onResume() {
         super.onResume()
 
-        if (shouldRefreshSessionDueToSDK() || shouldRefreshSessionDueToKarere()) {
-            return
-        }
-
         ignoringDueToChatNotification = shouldIgnoreDueToChatNotification()
 
         if (isDisabled || ignoringDueToChatNotification) {

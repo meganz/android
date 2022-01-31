@@ -3002,10 +3002,6 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 
 		super.onResume();
 
-		if (shouldRefreshSessionDueToSDK() || shouldRefreshSessionDueToKarere()) {
-			return;
-		}
-
 //		dbH.setShowNotifOff(true);
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
 			queryIfNotificationsAreOn();

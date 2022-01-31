@@ -137,10 +137,6 @@ public class TransfersManagementActivity extends PasscodeActivity {
     protected void onResume() {
         super.onResume();
 
-        if (shouldRefreshSessionDueToSDK() || shouldRefreshSessionDueToKarere()) {
-            return;
-        }
-
         if (transfersWidget != null) {
             transfersWidget.update();
         }
