@@ -1,4 +1,4 @@
-package mega.privacy.android.app.upload.list.adapter
+package mega.privacy.android.app.uploadFolder.list.adapter
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
@@ -11,7 +11,7 @@ import mega.privacy.android.app.databinding.ItemFolderContentGridBinding
 import mega.privacy.android.app.databinding.ItemGridSeparatorBinding
 import mega.privacy.android.app.databinding.SortByHeaderBinding
 import mega.privacy.android.app.fragments.homepage.SortByHeaderViewModel
-import mega.privacy.android.app.upload.list.data.FolderContent
+import mega.privacy.android.app.uploadFolder.list.data.FolderContent
 import mega.privacy.android.app.utils.AdapterUtils.isValidPosition
 
 class FolderContentAdapter(

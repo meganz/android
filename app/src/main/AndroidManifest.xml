@@ -695,7 +695,7 @@
         </activity>
 
         <activity
-            android:name="mega.privacy.android.app.upload.UploadFolderActivity"
+            android:name="mega.privacy.android.app.uploadFolder.UploadFolderActivity"
             android:launchMode="singleTop"
             android:windowSoftInputMode="adjustNothing"/>
 

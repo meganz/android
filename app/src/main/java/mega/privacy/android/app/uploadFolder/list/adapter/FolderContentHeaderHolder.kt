@@ -1,4 +1,4 @@
-package mega.privacy.android.app.upload.list.adapter
+package mega.privacy.android.app.uploadFolder.list.adapter
 
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.RecyclerView

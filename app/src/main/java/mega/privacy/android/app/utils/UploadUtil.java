@@ -12,7 +12,7 @@ import java.io.File;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.UploadService;
-import mega.privacy.android.app.upload.UploadFolderActivity;
+import mega.privacy.android.app.uploadFolder.UploadFolderActivity;
 import nz.mega.sdk.MegaApiAndroid;
 
 import static mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuotaPaywallWarning;

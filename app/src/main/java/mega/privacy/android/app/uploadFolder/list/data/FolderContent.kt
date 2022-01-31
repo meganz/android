@@ -1,4 +1,4 @@
-package mega.privacy.android.app.upload.list.data
+package mega.privacy.android.app.uploadFolder.list.data
 
 import androidx.documentfile.provider.DocumentFile
 import androidx.recyclerview.widget.DiffUtil

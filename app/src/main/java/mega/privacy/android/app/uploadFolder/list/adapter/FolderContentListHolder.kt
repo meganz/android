@@ -1,4 +1,4 @@
-package mega.privacy.android.app.upload.list.adapter
+package mega.privacy.android.app.uploadFolder.list.adapter
 
 import android.net.Uri
 import androidx.recyclerview.widget.RecyclerView
@@ -7,7 +7,7 @@ import com.facebook.imagepipeline.request.ImageRequestBuilder
 import mega.privacy.android.app.MimeTypeList
 import mega.privacy.android.app.R
 import mega.privacy.android.app.databinding.ItemFolderContentBinding
-import mega.privacy.android.app.upload.list.data.FolderContent
+import mega.privacy.android.app.uploadFolder.list.data.FolderContent
 
 class FolderContentListHolder(
     private val binding: ItemFolderContentBinding

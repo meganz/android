@@ -33,7 +33,7 @@ import mega.privacy.android.app.lollipop.FileExplorerActivityLollipop;
 import mega.privacy.android.app.lollipop.PdfViewerActivityLollipop;
 import mega.privacy.android.app.utils.SDCardOperator;
 
-import static mega.privacy.android.app.upload.UploadFolderActivity.UPLOAD_RESULTS;
+import static mega.privacy.android.app.uploadFolder.UploadFolderActivity.UPLOAD_RESULTS;
 import static mega.privacy.android.app.utils.FileUtil.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.TextUtil.isTextEmpty;

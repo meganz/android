@@ -1,4 +1,4 @@
-package mega.privacy.android.app.upload.list.adapter
+package mega.privacy.android.app.uploadFolder.list.adapter
 
 import android.graphics.drawable.Animatable
 import android.net.Uri
@@ -16,7 +16,7 @@ import mega.privacy.android.app.MimeTypeThumbnail
 import mega.privacy.android.app.R
 import mega.privacy.android.app.databinding.ItemFolderContentGridBinding
 import mega.privacy.android.app.listeners.OptionalRequestListener
-import mega.privacy.android.app.upload.list.data.FolderContent
+import mega.privacy.android.app.uploadFolder.list.data.FolderContent
 import mega.privacy.android.app.utils.Util
 
 class FolderContentGridHolder(

@@ -1,9 +1,9 @@
-package mega.privacy.android.app.upload.usecase
+package mega.privacy.android.app.uploadFolder.usecase
 
 import io.reactivex.rxjava3.core.Single
 import io.reactivex.rxjava3.kotlin.blockingSubscribeBy
 import mega.privacy.android.app.components.textFormatter.TextFormatterUtils.INVALID_INDEX
-import mega.privacy.android.app.upload.list.data.FolderContent
+import mega.privacy.android.app.uploadFolder.list.data.FolderContent
 import nz.mega.sdk.MegaApiJava.*
 import java.io.FileNotFoundException
 import java.security.InvalidParameterException

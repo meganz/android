@@ -1,4 +1,4 @@
-package mega.privacy.android.app.upload
+package mega.privacy.android.app.uploadFolder
 
 import android.net.Uri
 import androidx.documentfile.provider.DocumentFile
@@ -11,8 +11,8 @@ import io.reactivex.rxjava3.kotlin.subscribeBy
 import io.reactivex.rxjava3.schedulers.Schedulers
 import mega.privacy.android.app.arch.BaseRxViewModel
 import mega.privacy.android.app.components.textFormatter.TextFormatterUtils.INVALID_INDEX
-import mega.privacy.android.app.upload.list.data.FolderContent
-import mega.privacy.android.app.upload.usecase.GetFolderContentUseCase
+import mega.privacy.android.app.uploadFolder.list.data.FolderContent
+import mega.privacy.android.app.uploadFolder.usecase.GetFolderContentUseCase
 import mega.privacy.android.app.utils.LogUtil.logWarning
 import mega.privacy.android.app.utils.notifyObserver
 import nz.mega.sdk.MegaApiJava
@@ -183,15 +183,12 @@ class UploadFolderViewModel @Inject constructor(
 
         folderItems.value?.apply {
             for (item in this) {
-                if (item is FolderContent.Data) {
-                    val index = indexOf(item)
-                    val selected = selectedItems.value?.contains(index) ?: false
+                val index = indexOf(item)
+                val selected = selectedItems.value?.contains(index) ?: false
 
-                    if (item.isSelected == selected) {
-                        finalList.add(item)
-                    } else {
-                        finalList.add(FolderContent.Data(item.parent, item.document, selected))
-                    }
+                if (item is FolderContent.Data && item.isSelected != selected) {
+                    val newItem = FolderContent.Data(item.parent, item.document, selected)
+                    finalList.add(newItem)
                 } else {
                     finalList.add(item)
                 }
@@ -202,18 +199,11 @@ class UploadFolderViewModel @Inject constructor(
     }
 
     fun clearSelected(): List<Int> {
-        selectedItems.value = mutableListOf()
-
-        val positions = mutableListOf<Int>()
-
-        folderItems.value?.apply {
-            for (item in this) {
-                if (item is FolderContent.Data && item.isSelected) {
-                    positions.add(indexOf(item))
-                }
-            }
+        val positions = mutableListOf<Int>().apply {
+            addAll(selectedItems.value!!)
         }
 
+        selectedItems.value?.clear()
         return positions
     }
 

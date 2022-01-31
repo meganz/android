@@ -1,4 +1,4 @@
-package mega.privacy.android.app.upload
+package mega.privacy.android.app.uploadFolder
 
 import android.animation.Animator
 import android.animation.AnimatorInflater
@@ -25,8 +25,8 @@ import mega.privacy.android.app.fragments.homepage.EventObserver
 import mega.privacy.android.app.fragments.homepage.SortByHeaderViewModel
 import mega.privacy.android.app.interfaces.Scrollable
 import mega.privacy.android.app.modalbottomsheet.SortByBottomSheetDialogFragment.Companion.newInstance
-import mega.privacy.android.app.upload.list.adapter.FolderContentAdapter
-import mega.privacy.android.app.upload.list.data.FolderContent
+import mega.privacy.android.app.uploadFolder.list.adapter.FolderContentAdapter
+import mega.privacy.android.app.uploadFolder.list.data.FolderContent
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.MenuUtils.setupSearchView
 import mega.privacy.android.app.utils.Util
