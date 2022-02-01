@@ -136,6 +136,11 @@ android {
             }
         }
     }
+
+    configurations {
+        implementation.exclude module:'protolite-well-known-types'
+        implementation.exclude module:'protobuf-javalite'
+    }
 }
 
 dependencies {
