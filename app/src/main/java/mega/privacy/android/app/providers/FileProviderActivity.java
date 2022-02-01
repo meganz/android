@@ -65,6 +65,7 @@ import mega.privacy.android.app.activities.WebViewActivity;
 import mega.privacy.android.app.components.CustomViewPager;
 import mega.privacy.android.app.components.EditTextPIN;
 import mega.privacy.android.app.utils.AlertDialogUtil;
+import mega.privacy.android.app.utils.ChatUtil;
 import mega.privacy.android.app.utils.MegaProgressDialogUtil;
 import mega.privacy.android.app.lollipop.providers.CloudDriveProviderFragmentLollipop;
 import mega.privacy.android.app.lollipop.providers.IncomingSharesProviderFragmentLollipop;
@@ -280,20 +281,7 @@ public class FileProviderActivity extends PasscodeFileProviderActivity implement
 
 					}
 
-					int ret = megaChatApi.getInitState();
-
-					if (ret == MegaChatApi.INIT_NOT_DONE || ret == MegaChatApi.INIT_ERROR) {
-						ret = megaChatApi.init(gSession);
-						logDebug("Result of init ---> " + ret);
-						if (ret == MegaChatApi.INIT_NO_CACHE) {
-							logDebug("Condition ret == MegaChatApi.INIT_NO_CACHE");
-						} else if (ret == MegaChatApi.INIT_ERROR) {
-							logWarning("Condition ret == MegaChatApi.INIT_ERROR");
-							megaChatApi.logout();
-						} else {
-							logDebug("Chat correctly initialized");
-						}
-					}
+					ChatUtil.initMegaChatApi(gSession);
 
 					megaApi.fastLogin(gSession, this);
 				}

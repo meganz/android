@@ -8528,10 +8528,6 @@ public class ChatActivityLollipop extends PasscodeActivity
         super.onResume();
        stopService(new Intent(this, KeepAliveService.class));
 
-       if (shouldRefreshSessionDueToSDK() || shouldRefreshSessionDueToKarere()) {
-           return;
-       }
-
         if(idChat!=-1 && chatRoom!=null) {
 
             setNodeAttachmentVisible();

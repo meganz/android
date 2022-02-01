@@ -77,6 +77,7 @@ import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaChatContainsMeta;
 import nz.mega.sdk.MegaChatListItem;
 import nz.mega.sdk.MegaChatMessage;
+import nz.mega.sdk.MegaChatRequestListenerInterface;
 import nz.mega.sdk.MegaChatRoom;
 import nz.mega.sdk.MegaHandleList;
 import nz.mega.sdk.MegaNode;
@@ -1899,6 +1900,16 @@ public class ChatUtil {
      * @param session User session
      */
     public static void initMegaChatApi(String session) {
+        initMegaChatApi(session, null);
+    }
+
+    /**
+     * Method to get the initial state of megaChatApi and, if necessary, initiates it.
+     *
+     * @param session User session
+     * @param listener MegaChat listener for logout request.
+     */
+    public static void initMegaChatApi(String session, MegaChatRequestListenerInterface listener) {
         MegaChatApiAndroid megaChatApi = MegaApplication.getInstance().getMegaChatApi();
 
         int state = megaChatApi.getInitState();
@@ -1911,7 +1922,7 @@ public class ChatUtil {
                     break;
                 case MegaChatApi.INIT_ERROR:
                     logDebug("INIT_ERROR");
-                    megaChatApi.logout();
+                    megaChatApi.logout(listener);
                     break;
                 default:
                     logDebug("Chat correctly initialized");

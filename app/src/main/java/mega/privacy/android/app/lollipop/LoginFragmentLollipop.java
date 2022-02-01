@@ -69,6 +69,7 @@ import mega.privacy.android.app.lollipop.megachat.ChatSettings;
 import mega.privacy.android.app.middlelayer.push.PushMessageHanlder;
 import mega.privacy.android.app.providers.FileProviderActivity;
 import mega.privacy.android.app.upgradeAccount.ChooseAccountActivity;
+import mega.privacy.android.app.utils.ChatUtil;
 import mega.privacy.android.app.utils.ColorUtils;
 import mega.privacy.android.app.utils.StringResourcesUtils;
 import mega.privacy.android.app.utils.permission.PermissionUtils;
@@ -1092,28 +1093,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                 megaChatApi = ((MegaApplication) ((Activity) context).getApplication()).getMegaChatApi();
             }
 
-            int ret = megaChatApi.getInitState();
-            if (ret == MegaChatApi.INIT_NOT_DONE || ret == MegaChatApi.INIT_ERROR) {
-                logDebug("INIT STATE: " + ret);
-                ret = megaChatApi.init(gSession);
-                logDebug("result of init ---> " + ret);
-
-                chatSettings = dbH.getChatSettings();
-                switch (ret) {
-                    case MegaChatApi.INIT_NO_CACHE:
-                        logDebug("condition ret == MegaChatApi.INIT_NO_CACHE");
-                        break;
-                    case MegaChatApi.INIT_ERROR:
-                        logDebug("condition ret == MegaChatApi.INIT_ERROR");
-                        megaChatApi.logout(new ChatLogoutListener(getContext()));
-                        break;
-                    default:
-                        logDebug("condition ret == OK -- chat correctly initialized");
-                        break;
-                }
-            } else {
-                logDebug("Do not init, chat already initialized: " + ret);
-            }
+            ChatUtil.initMegaChatApi(gSession, new ChatLogoutListener(getContext()));
 
             disableLoginButton();
 

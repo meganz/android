@@ -1997,27 +1997,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 			UserCredentials credentials = dbH.getCredentials();
 			if (credentials != null) {
 				String gSession = credentials.getSession();
-				int ret = megaChatApi.getInitState();
-				logDebug("In Offline mode - Init chat is: " + ret);
-				if (ret == MegaChatApi.INIT_NOT_DONE || ret == MegaChatApi.INIT_ERROR) {
-					ret = megaChatApi.init(gSession);
-					logDebug("result of init ---> " + ret);
-
-					switch (ret) {
-						case MegaChatApi.INIT_NO_CACHE:
-							logDebug("condition ret == MegaChatApi.INIT_NO_CACHE");
-							break;
-						case MegaChatApi.INIT_ERROR:
-							logDebug("condition ret == MegaChatApi.INIT_ERROR");
-							megaChatApi.logout(this);
-							break;
-						default:
-							logDebug("Chat correctly initialized");
-							break;
-					}
-				} else {
-					logDebug("Offline mode: Do not init, chat already initialized");
-				}
+				ChatUtil.initMegaChatApi(gSession, this);
 			}
 
 			return;
