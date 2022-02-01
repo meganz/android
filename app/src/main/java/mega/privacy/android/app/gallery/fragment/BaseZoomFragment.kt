@@ -744,7 +744,7 @@ abstract class BaseZoomFragment : BaseFragment(), GestureScaleCallback,
      *
      * @return true is initialized, false is not initialized
      */
-    fun isGridAdapterIsInitialized():Boolean{
+    fun isGridAdapterInitialized():Boolean{
         return this::gridAdapter.isInitialized
     }
 }

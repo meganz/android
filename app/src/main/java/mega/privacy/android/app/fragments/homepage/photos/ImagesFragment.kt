@@ -86,7 +86,7 @@ class ImagesFragment : BaseZoomFragment() {
 
     private fun subscribeObservers() {
         viewModel.items.observe(viewLifecycleOwner) {
-            if (isGridAdapterIsInitialized()){
+            if (isGridAdapterInitialized()){
                 gridAdapter.submitList(it)
             }
             actionModeViewModel.setNodesData(it.filter { nodeItem -> nodeItem.type == GalleryItem.TYPE_IMAGE })
