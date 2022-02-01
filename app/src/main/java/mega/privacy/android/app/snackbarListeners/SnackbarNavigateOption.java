@@ -5,16 +5,15 @@ import android.content.Intent;
 import android.view.View;
 
 import mega.privacy.android.app.MegaApplication;
+import mega.privacy.android.app.imageviewer.ImageViewerActivity;
 import mega.privacy.android.app.contacts.ContactsActivity;
 import mega.privacy.android.app.lollipop.ContactFileListActivityLollipop;
 import mega.privacy.android.app.lollipop.ContactInfoActivityLollipop;
 import mega.privacy.android.app.lollipop.FileInfoActivityLollipop;
-import mega.privacy.android.app.lollipop.FullScreenImageViewerLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.PdfViewerActivityLollipop;
 import mega.privacy.android.app.lollipop.controllers.ContactController;
 import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop;
-import mega.privacy.android.app.lollipop.megachat.ChatFullScreenImageViewer;
 import mega.privacy.android.app.utils.Constants;
 import static mega.privacy.android.app.utils.Constants.*;
 
@@ -94,8 +93,8 @@ public class SnackbarNavigateOption implements View.OnClickListener {
 
         context.startActivity(intent);
 
-        if (context instanceof FullScreenImageViewerLollipop) {
-            ((FullScreenImageViewerLollipop) context).finish();
+        if (context instanceof ImageViewerActivity) {
+            ((ImageViewerActivity) context).finish();
         } else if (context instanceof PdfViewerActivityLollipop) {
             ((PdfViewerActivityLollipop) context).finish();
         } else if (context instanceof FileInfoActivityLollipop) {
@@ -104,8 +103,6 @@ public class SnackbarNavigateOption implements View.OnClickListener {
             ((ContactFileListActivityLollipop) context).finish();
         } else if (context instanceof ChatActivityLollipop) {
             ((ChatActivityLollipop) context).finish();
-        } else if (context instanceof ChatFullScreenImageViewer) {
-            ((ChatFullScreenImageViewer) context).finish();
         } else if (context instanceof ContactInfoActivityLollipop) {
             ((ContactInfoActivityLollipop) context).finish();
         }

@@ -51,6 +51,7 @@ public class SettingsFileManagementFragment extends SettingsBaseFragment {
     private Preference fileVersionsFileManagement;
     private Preference clearVersionsFileManagement;
     private SwitchPreferenceCompat autoPlaySwitch;
+    private SwitchPreferenceCompat mobileDataHighResolution;
 
     private AlertDialog disableVersionsWarning;
 
@@ -81,6 +82,9 @@ public class SettingsFileManagementFragment extends SettingsBaseFragment {
         autoPlaySwitch = findPreference(KEY_AUTO_PLAY_SWITCH);
         autoPlaySwitch.setOnPreferenceClickListener(this);
         autoPlaySwitch.setChecked(prefs.isAutoPlayEnabled());
+
+        mobileDataHighResolution = findPreference(KEY_MOBILE_DATA_HIGH_RESOLUTION);
+        mobileDataHighResolution.setOnPreferenceClickListener(this);
 
         if (megaApi.serverSideRubbishBinAutopurgeEnabled()) {
             megaApi.getRubbishBinAutopurgePeriod(new GetAttrUserListener(context));
@@ -205,7 +209,7 @@ public class SettingsFileManagementFragment extends SettingsBaseFragment {
         int numVersions = myAccountInfo.getNumVersions();
         logDebug("Num versions: " + numVersions);
         String previousVersions = myAccountInfo.getFormattedPreviousVersionsSize();
-        String text = getString(R.string.settings_file_management_file_versions_subtitle, numVersions, previousVersions);
+        String text = StringResourcesUtils.getQuantityString(R.plurals.settings_file_management_file_versions_subtitle, numVersions, numVersions, previousVersions);
         logDebug("Previous versions: " + previousVersions);
         fileVersionsFileManagement.setSummary(text);
 
@@ -220,7 +224,7 @@ public class SettingsFileManagementFragment extends SettingsBaseFragment {
      * Method for reset the version information.
      */
     public void resetVersionsInfo() {
-        String text = getString(R.string.settings_file_management_file_versions_subtitle, 0, "0 B");
+        String text = StringResourcesUtils.getQuantityString(R.plurals.settings_file_management_file_versions_subtitle, 0, 0, "0 B");
         fileVersionsFileManagement.setSummary(text);
         getPreferenceScreen().removePreference(clearVersionsFileManagement);
     }

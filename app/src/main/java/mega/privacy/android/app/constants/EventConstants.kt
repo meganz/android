@@ -30,9 +30,8 @@ object EventConstants {
     const val EVENT_AUDIO_OUTPUT_CHANGE = "audio_output_change"
     const val EVENT_MEETING_CREATED = "meeting_created"
     const val EVENT_LINK_RECOVERED = "meeting_link_recovered"
-    const val EVENT_MEETING_INVITE = "meeting_invite"
-    const val EVENT_MEETING_INCOMPATIBILITY_SHOW = "meeting_incompatibility"
     const val EVENT_ENABLE_OR_DISABLE_LOCAL_VIDEO_CHANGE = "enable_or_disable_local_video_change"
+    const val EVENT_REMOVE_CALL_NOTIFICATION = "remove_call_notification"
 
     /** Event Keys related to sessions*/
     const val EVENT_SESSION_STATUS_CHANGE = "session_status_change"
@@ -58,4 +57,7 @@ object EventConstants {
 
     const val EVENT_UPDATE_VIEW_MODE = "EVENT_UPDATE_VIEW_MODE"
     const val EVENT_SHOW_MEDIA_DISCOVERY = "EVENT_SHOW_MEDIA_DISCOVERY"
+
+    /** Event Keys related to file backup*/
+    const val EVENT_MY_BACKUPS_FOLDER_CHANGED = "EVENT_MY_BACKUPS_FOLDER_CHANGED"
 }

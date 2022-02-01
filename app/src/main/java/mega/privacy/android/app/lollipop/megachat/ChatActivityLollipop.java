@@ -67,6 +67,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
+import com.google.common.primitives.Longs;
 import com.jeremyliao.liveeventbus.LiveEventBus;
 
 import org.jetbrains.annotations.NotNull;
@@ -91,6 +92,7 @@ import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.ShareInfo;
 import mega.privacy.android.app.activities.GiphyPickerActivity;
+import mega.privacy.android.app.imageviewer.ImageViewerActivity;
 import mega.privacy.android.app.components.ChatManagement;
 import mega.privacy.android.app.contacts.usecase.InviteContactUseCase;
 import mega.privacy.android.app.usecase.GetAvatarUseCase;
@@ -200,7 +202,6 @@ import static mega.privacy.android.app.constants.BroadcastConstants.*;
 import static mega.privacy.android.app.constants.EventConstants.EVENT_CALL_COMPOSITION_CHANGE;
 import static mega.privacy.android.app.constants.EventConstants.EVENT_CALL_ON_HOLD_CHANGE;
 import static mega.privacy.android.app.constants.EventConstants.EVENT_CALL_STATUS_CHANGE;
-import static mega.privacy.android.app.constants.EventConstants.EVENT_MEETING_INVITE;
 import static mega.privacy.android.app.constants.EventConstants.EVENT_SESSION_ON_HOLD_CHANGE;
 import static mega.privacy.android.app.lollipop.megachat.AndroidMegaRichLinkMessage.*;
 import static mega.privacy.android.app.lollipop.megachat.MapsActivity.*;
@@ -675,6 +676,7 @@ public class ChatActivityLollipop extends PasscodeActivity
         openMeetingInProgress(this, chatId, true, passcodeManagement);
     }
 
+
     @Override
     public void onErrorAnsweredCall(int errorCode) {
         callInProgressLayout.setEnabled(true);
@@ -733,7 +735,7 @@ public class ChatActivityLollipop extends PasscodeActivity
                     @Override
                     public void onLeave() {
                     }
-                }).show(getSupportFragmentManager(),
+                }, false).show(getSupportFragmentManager(),
                         MeetingHasEndedDialogFragment.TAG);
             } else  {
                 CallUtil.checkMeetingInProgress(ChatActivityLollipop.this, ChatActivityLollipop.this, chatId, isFromOpenChatPreview, link, request.getMegaHandleList(), request.getText(), alreadyExist, request.getUserHandle(), passcodeManagement);
@@ -3463,11 +3465,6 @@ public class ChatActivityLollipop extends PasscodeActivity
             final List<String> contactsData = intent.getStringArrayListExtra(AddContactActivityLollipop.EXTRA_CONTACTS);
             if (contactsData != null) {
                 new InviteToChatRoomListener(this).inviteToChat(chatRoom.getChatId(), contactsData);
-
-                // Invite participants, check
-                if(participatingInACall()){
-                    LiveEventBus.get(EVENT_MEETING_INVITE, Boolean.class).post(true);
-                }
             }
         }
         else if (requestCode == REQUEST_CODE_SELECT_IMPORT_FOLDER && resultCode == RESULT_OK) {
@@ -3824,10 +3821,15 @@ public class ChatActivityLollipop extends PasscodeActivity
     public void showJoinCallDialog(long callInThisChat, MegaChatCall anotherCall, boolean existsMoreThanOneCall) {
         LayoutInflater inflater = getLayoutInflater();
         View dialogLayout = inflater.inflate(R.layout.join_call_dialog, null);
+        TextView joinCallDialogTitle = dialogLayout.findViewById(R.id.join_call_dialog_title);
+        joinCallDialogTitle.setText(chatRoom.isGroup() ? R.string.title_join_call : R.string.title_join_one_to_one_call);
+
         final Button holdJoinButton = dialogLayout.findViewById(R.id.hold_join_button);
         final Button endJoinButton = dialogLayout.findViewById(R.id.end_join_button);
         final Button cancelButton = dialogLayout.findViewById(R.id.cancel_button);
 
+        holdJoinButton.setText(chatRoom.isGroup() ? R.string.hold_and_join_call_incoming : R.string.hold_and_answer_call_incoming);
+        endJoinButton.setText(chatRoom.isGroup() ? R.string.end_and_join_call_incoming : R.string.end_and_answer_call_incoming);
         holdJoinButton.setVisibility(existsMoreThanOneCall ? View.GONE : View.VISIBLE);
 
         MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this, R.style.ThemeOverlay_Mega_MaterialAlertDialog);
@@ -3917,10 +3919,10 @@ public class ChatActivityLollipop extends PasscodeActivity
                         returnCall(this, chatRoom.getChatId(), passcodeManagement);
                     }
 
-                } else if (chatRoom.isGroup()) {
+                } else {
                     ArrayList<Long> numCallsParticipating = getCallsParticipating();
                     if (numCallsParticipating == null || numCallsParticipating.isEmpty())
-                        return;
+                        break;
 
                     if (numCallsParticipating.size() == 1) {
                         MegaChatCall anotherCall = getAnotherActiveCall(chatRoom.getChatId());
@@ -5166,7 +5168,7 @@ public class ChatActivityLollipop extends PasscodeActivity
                                     if (MimeTypeList.typeForName(node.getName()).isImage()){
                                         if(node.hasPreview()){
                                             logDebug("Show full screen viewer");
-                                            showFullScreenViewer(m.getMessage().getMsgId(), screenPosition);
+                                            showFullScreenViewer(m.getMessage().getMsgId());
                                         }
                                         else{
                                             logDebug("Image without preview - open with");
@@ -5534,46 +5536,35 @@ public class ChatActivityLollipop extends PasscodeActivity
         this.startActivity(intentOpenChat);
     }
 
-    public void showFullScreenViewer(long msgId, int[] screenPosition){
-        logDebug("showFullScreenViewer");
+    public void showFullScreenViewer(long msgId) {
         int position = 0;
-        boolean positionFound = false;
-        List<Long> ids = new ArrayList<>();
-        for(int i=0; i<messages.size();i++){
+        long currentNodeHandle = INVALID_HANDLE;
+        List<Long> messageIds = new ArrayList<>();
+
+        for (int i = 0; i < messages.size(); i++) {
             AndroidMegaChatMessage androidMessage = messages.get(i);
-            if(!androidMessage.isUploading()){
-                MegaChatMessage msg = androidMessage.getMessage();
-
-                if(msg.getType()==MegaChatMessage.TYPE_NODE_ATTACHMENT){
-                    ids.add(msg.getMsgId());
-
-                    if(msg.getMsgId()==msgId){
-                        positionFound=true;
-                    }
-                    if(!positionFound){
-                        MegaNodeList nodeList = msg.getMegaNodeList();
-                        if(nodeList.size()==1){
-                            MegaNode node = nodeList.get(0);
-                            if(MimeTypeList.typeForName(node.getName()).isImage()){
-                                position++;
-                            }
-                        }
+            if (!androidMessage.isUploading()) {
+                MegaChatMessage message = androidMessage.getMessage();
+                if (message.getType() == MegaChatMessage.TYPE_NODE_ATTACHMENT) {
+                    messageIds.add(message.getMsgId());
+                    if (message.getMsgId() == msgId) {
+                        currentNodeHandle = message.getMegaNodeList().get(0).getHandle();
+                        position = i;
                     }
                 }
             }
         }
 
-        Intent intent = new Intent(this, ChatFullScreenImageViewer.class);
-        intent.putExtra("position", position);
-        intent.putExtra("chatId", idChat);
-        intent.putExtra("screenPosition", screenPosition);
-        long[] array = new long[ids.size()];
-        for(int i = 0; i < ids.size(); i++) {
-            array[i] = ids.get(i);
-        }
-        intent.putExtra("messageIds", array);
+        Intent intent = ImageViewerActivity.getIntentForChatMessages(
+                this,
+                idChat,
+                Longs.toArray(messageIds),
+                currentNodeHandle
+        );
+
         startActivity(intent);
         overridePendingTransition(0,0);
+
         if (adapter !=  null) {
             adapter.setNodeAttachmentVisibility(false, holder_imageDrag, position);
         }
@@ -9152,42 +9143,36 @@ public class ChatActivityLollipop extends PasscodeActivity
                 if(chatRoom == null)
                     break;
 
-                if(chatRoom.isGroup()){
-                    if (anotherActiveCall == null && anotherOnHoldCall == null) {
+                if (anotherActiveCall == null && anotherOnHoldCall == null) {
+                    String textLayout = getString((callInThisChat.isRinging() || !megaApi.isChatNotifiable(idChat)) ?
+                            R.string.call_in_progress_layout :
+                            R.string.join_call_layout);
+
+                    if (chatRoom.isGroup()) {
                         long callerHandle = callInThisChat.getCaller();
                         String callerFullName = chatC.getParticipantFullName(callerHandle);
-                        String textLayout;
                         if (callerHandle != MEGACHAT_INVALID_HANDLE && !isTextEmpty(callerFullName)) {
-                            if(chatRoom.isMeeting()) {
-                                textLayout = getString(R.string.join_meeting_layout_in_group_call, callerFullName);
-                            } else {
-                                textLayout = getString(R.string.join_call_layout_in_group_call, callerFullName);
-                            }
+                            textLayout = getString(chatRoom.isMeeting() ?
+                                    R.string.join_meeting_layout_in_group_call :
+                                    R.string.join_call_layout_in_group_call, callerFullName);
                         } else {
                             textLayout = getString(R.string.join_call_layout);
                         }
-                        tapToReturnLayout(callInThisChat, textLayout);
-                    }else{
-                        updateCallInProgressLayout(anotherActiveCall != null ? anotherActiveCall : anotherOnHoldCall,
-                                getString(R.string.call_in_progress_layout));
-                        returnCallOnHoldButton.setVisibility(View.VISIBLE);
-                        returnCallOnHoldButtonText.setText(getResources().getString(R.string.title_join_call));
-                        returnCallOnHoldButtonIcon.setImageResource(R.drawable.ic_call_chat);
-                    }
-                }else{
-                    if (anotherActiveCall == null && anotherOnHoldCall == null) {
-                        if(callInThisChat.getNumParticipants()>1){
-                            hideCallBar(callInThisChat);
-                            break;
-                        }
-                        String textLayout = getString((callInThisChat.isRinging() || !megaApi.isChatNotifiable(idChat)) ?
-                                R.string.call_in_progress_layout :
-                                R.string.join_call_layout);
-                        tapToReturnLayout(callInThisChat, textLayout);
+                    } else if (callInThisChat.getNumParticipants() > 1) {
+                        hideCallBar(callInThisChat);
                         break;
                     }
+
+                    tapToReturnLayout(callInThisChat, textLayout);
+                } else {
                     updateCallInProgressLayout(anotherActiveCall != null ? anotherActiveCall : anotherOnHoldCall,
-                                getString(R.string.call_in_progress_layout));
+                            getString(R.string.call_in_progress_layout));
+
+                    returnCallOnHoldButton.setVisibility(View.VISIBLE);
+                    returnCallOnHoldButtonIcon.setImageResource(R.drawable.ic_call_chat);
+                    returnCallOnHoldButtonText.setText(getResources().getString(chatRoom.isGroup() ?
+                            R.string.title_join_call :
+                            R.string.title_join_one_to_one_call));
                 }
                 break;
 

@@ -98,8 +98,6 @@
     <string name="action_create_folder">建立新資料夾</string>
     <!-- Option which allows create a new text file -->
     <string name="action_create_txt">建立新的文字檔案</string>
-    <!-- Menu option to open a link. Also title of the dialog to open a link. -->
-    <string name="action_open_link">打開連結</string>
     <!-- Menu item -->
     <string name="action_settings">設定</string>
     <!-- Search button -->
@@ -983,8 +981,6 @@
     <string name="settings_disable_logs">日誌已關閉</string>
     <!-- Snackbar error message triggered by host error when user is trying to setup MEGA Camera Uploads folder in settings page -->
     <string name="error_unable_to_setup_cloud_folder">無法設定MEGA相機上傳資料夾</string>
-    <!-- Message displayed when the user denies the required permissions during the logs activation -->
-    <string name="logs_not_enabled_permissions">因為您拒絕所需要的權限，因此未啟用日誌功能。</string>
     <!-- Option in the sliding panel to open the folder which contains the file selected after performing a search -->
     <string name="search_open_location">開啟位置</string>
     <!-- message when a temporary error on logging in is due to SDK is waiting for the server to complete a request due to an API lock -->
@@ -1590,10 +1586,6 @@
     <string name="upload_service_notification">正在上傳檔案：%2$d之%1$d個</string>
     <!-- Text of the notification shown when the upload service is paused: e.g. Uploading files: 1 of 10 (paused)-->
     <string name="upload_service_notification_paused">正在上傳檔案：%2$d之%1$d個（已暫停）</string>
-    <!-- Text of the notification shown when the folder upload service is running, e.g. Uploading folders 1 of 2 -->
-    <string name="folder_upload_service_notification">正在上傳資料夾：%2$d之%1$d個</string>
-    <!-- Text of the notification shown when the folder upload service is paused, e.g. Uploading folders 1 of 2 (paused) -->
-    <string name="folder_upload_service_notification_paused">正在上傳資料夾：%2$d之%1$d個（已暫停）</string>
     <!-- Text of the notification shown when the upload service has finished, Plural -->
     <plurals name="upload_service_final_notification">
         <item quantity="other">已上傳%1$d個檔案</item>
@@ -1601,10 +1593,6 @@
     <!-- Text of the notification shown when the upload service has finished, Plural -->
     <plurals name="upload_service_notification_already_uploaded">
         <item quantity="other">已上傳%1$d個檔案</item>
-    </plurals>
-    <!-- Text of the notification shown when the folder upload service has finished, Text of the notification shown when the folder upload service has finished - plural  e.g. Uploaded 2 folders -->
-    <plurals name="folder_upload_service_final_notification">
-        <item quantity="other">已上傳%1$d個資料夾</item>
     </plurals>
     <!-- label for the total file size of multiple files and/or folders (no need to put the colon punctuation in the translation) -->
     <string name="general_total_size">總空間：%1$s</string>
@@ -2546,7 +2534,9 @@
     <!-- Settings preference title to show file versions info of the account -->
     <string name="settings_file_management_file_versions_title">檔案版本</string>
     <!-- Settings preference subtitle to show file versions info of the account -->
-    <string name="settings_file_management_file_versions_subtitle">%1$d個檔案版本，總共%2$s</string>
+    <plurals name="settings_file_management_file_versions_subtitle">
+        <item quantity="other">%1$d個檔案版本，總共%2$s</item>
+    </plurals>
     <!-- Title of the section File management on Settings section -->
     <string name="settings_file_management_category">檔案管理</string>
     <!-- Option in Settings to delete all the versions of the account -->
@@ -2723,16 +2713,12 @@
     <string name="message_set_chat_private">[A]%1$s[/A][B]開啟加密金鑰輪替。[/B]</string>
     <!-- error message shown when a chat link is invalid -->
     <string name="invalid_chat_link">這個對話已無法再使用</string>
-    <!-- error message shown when a chat link is not well formed -->
-    <string name="invalid_chat_link_args">無效的對話連結</string>
     <!-- When it is creating a new group chat, this option permits to establish it private or public -->
     <string name="ekr_label">加密金鑰輪替</string>
     <!-- Text of the dialog to change a public chat to private (enable encryption key rotation) -->
     <string name="ekr_explanation">加密金鑰輪替更安全一些，但是不允許您建立對話連結，而且新加入的與會者將看不到舊的訊息。</string>
     <!-- Text of the dialog to change a public chat to private (enable encryption key rotation) -->
     <string name="subtitle_chat_message_enabled_ERK">加密金鑰輪替更安全一些，但是不允許您建立對話連結，而且新加入的與會者將看不到舊的訊息。</string>
-    <!-- Menu item -->
-    <string name="action_open_chat_link">開啟對話連結</string>
     <!-- Message shown when a contact request has not been sent because the invitation has been sent before -->
     <string name="invite_not_sent_already_sent">給聯絡人%s的邀請之前已發送過，可在已發送請求的頁面中查看。</string>
     <!-- Label shown to indicate the QR is saving in Cloud Drive -->
@@ -3121,8 +3107,8 @@
     <string name="not_allow_play_alert">正在通話時無法播放影音檔案。</string>
     <!-- Text shown in the list of chats when there is a call in progress but I am not on it -->
     <string name="ongoing_call_messages">正在進行中的通話</string>
-    <!-- Title of the layout to join a group call from the chat screen. The placeholder indicates the user who initiated the call -->
-    <string name="join_call_layout_in_group_call">%s發起了群組通話。點擊即可加入。</string>
+    <!-- Title of the layout to join a group call from the chat screen. -->
+    <string name="join_call_layout_in_group_call">點擊加入當前群組通話。</string>
     <!-- Title of the layout to return to a call -->
     <string name="call_in_progress_layout">點擊即可返回通話</string>
     <!-- message displayed when you try to start a call but it is not possible because you are already on a call -->
@@ -3171,22 +3157,6 @@
     <string name="text_join_call">如要加入此通話，您必須先結束目前的通話。</string>
     <!-- Text of the dialog shown when you want to join a group call but you are in another active call -->
     <string name="text_join_another_call">如要加入此通話，您必須先結束或保留目前的通話。</string>
-    <!-- Hint shown in the open chat link alert dialog -->
-    <string name="hint_enter_chat_link">輸入對話連結</string>
-    <!-- Hint shown in the open link alert dialog -->
-    <string name="hint_paste_link">貼上連結</string>
-    <!-- Error shown when it tries to open an invalid file or folder link -->
-    <string name="invalid_file_folder_link">無效的檔案或資料夾連結</string>
-    <!-- Error shown when it tries to open an invalid file or folder link and the text view is empty -->
-    <string name="invalid_file_folder_link_empty">請輸入有效的檔案或資料夾連結</string>
-    <!-- Error shown when it tries to open an invalid chat link and the text view is empty -->
-    <string name="invalid_chat_link_empty">請輸入有效的對話連結</string>
-    <!-- Error shown when it tries to open a chat link from the Cloud Drive section -->
-    <string name="valid_chat_link">您已貼上一個對話連結。</string>
-    <!-- Error shown when it tries to open a contact link from the Cloud Drive section -->
-    <string name="valid_contact_link">您已貼上一個連絡人連結。</string>
-    <!-- Menu item -->
-    <string name="action_open_contact_link">打開連絡人連結</string>
     <!-- Explanation of the dialog shown to share a chat link -->
     <string name="copy_link_explanation">人們可以使用此連結加入您的群組。</string>
     <!-- Label that indicates the creation of a chat link -->
@@ -3513,8 +3483,8 @@
     <string name="section_documents">文件</string>
     <!-- Label of the floating action button of opening the new chat conversation -->
     <string name="fab_label_new_chat">新的對話</string>
-    <!-- Text that indicates that there’s no photo to show -->
-    <string name="homepage_empty_hint_photos">找不到照片</string>
+    <!-- Text that indicates that there’s no image to show in image section -->
+    <string name="homepage_empty_hint_photos">[B]沒有[/B][A]圖片[/A][B]被找到[/B]</string>
     <!-- Text that indicates that there’s no document to show -->
     <string name="homepage_empty_hint_documents">找不到文件</string>
     <!-- Text that indicates that there’s no audio to show -->
@@ -3768,7 +3738,7 @@
     <!-- Settings hint that indicates the audio will still be played in background if the app is backgrounded -->
     <string name="settings_background_play_hint">在背景中播放</string>
     <!-- Text of the empty screen when there are no elements in Photos -->
-    <string name="photos_empty">[B]沒有[/B] [A]相片[/A]</string>
+    <string name="photos_empty">[B]沒有[/B][A]相片[/A][B]被找到[/B]</string>
     <!-- Text to show as subtitle of Enable camera uploads screen -->
     <string name="enable_cu_subtitle">自動備份相片與影片到您的MEGA雲端硬碟。</string>
     <!-- Text of a button on Camera Uploads section to show all the content of the section-->
@@ -3801,8 +3771,6 @@
     <string name="error_share_owner_storage_quota">共享的擁有者已超出其空間配額。</string>
     <!-- A message shown when uploading, copying or moving something to an incoming share and the owner’s account is over its storage quota. -->
     <string name="warning_share_owner_storage_quota">由於接收者的儲存空間不足，您無法傳送此檔案。</string>
-    <!-- Content to show in a Snackbar to tip the incompatibility-->
-    <string name="version_incompatibility">我們正在升級MEGAchat。由於版本不相容，除非所有與會者將他們的MEGA應用程式更新至最新版本，否則您的通話可能無法接通。</string>
     <!-- Message displayed when multiple download starts and 1 file has already been downloaded before and 1 file is being downloaded -->
     <string name="file_already_downloaded_and_file_pending_download">1個檔案已下載。1個檔案待處理。</string>
     <!-- Message displayed when multiple download starts and 1 file has already been downloaded before and multiple files are being downloaded. Placeholder: number of files -->
@@ -4005,8 +3973,8 @@
     <string name="be_new_moderator">您是新的主持人。</string>
     <!-- the content of snack bar when copied meeting link-->
     <string name="copied_meeting_link">複製會議連結。</string>
-    <!-- Title of the layout to join a meeting from the chat screen. The placeholder indicates the user who initiated the meeting -->
-    <string name="join_meeting_layout_in_group_call">%s發起一場會議。點擊加入。</string>
+    <!-- Title of the layout to join a meeting from the chat screen. -->
+    <string name="join_meeting_layout_in_group_call">點擊加入當前會議。</string>
     <!-- Title of fifth tour screen -->
     <string name="title_tour_five">MEGA會議</string>
     <!-- Content of fourth tour screen -->
@@ -4081,4 +4049,38 @@
     <string name="disable_versioning_warning">我們的檔案版本管理功能確保當您用較新版本的檔案替換舊的版本時，我們仍保留您舊版本的檔案。如果您停用檔案版本管理功能，您將不再有此保護；當您用新的檔案替換舊檔案時，舊版本檔案將遺失。</string>
     <!-- Warning informing the user the folder location is trying to open no longer exists. -->
     <string name="location_not_exist">此位置已不存在。</string>
+    <!-- Warning shown informing the contact has been previously invited. The placeholder is to show the name of the contact. -->
+    <string name="contact_already_invited">您已邀請過%1$s</string>
+    <!-- Warning shown informing the contact request has been sent and can be managed in sent requests section. -->
+    <string name="contact_invited">邀請發送成功。查看已發送的邀請。</string>
+    <!-- Message when file available offline. -->
+    <string name="file_available_offline">檔案可離線存取</string>
+    <!-- Message when file removed from offline. -->
+    <string name="file_removed_offline">檔案已從離線存取移除</string>
+    <!-- Menu option to open a link. Also title of the dialog to open a link. -->
+    <string name="action_open_link">打開連結</string>
+    <!-- error message shown when a chat link is not well formed. -->
+    <string name="invalid_chat_link_args">無效的對話連結</string>
+    <!-- Menu option to open a chat link. -->
+    <string name="action_open_chat_link">開啟對話連結</string>
+    <!-- Hint shown in the open chat link alert dialog. -->
+    <string name="hint_enter_chat_link">輸入對話連結</string>
+    <!-- Hint shown in the open link alert dialog. -->
+    <string name="hint_paste_link">貼上連結</string>
+    <!-- Error shown when it tries to open an invalid file or folder link .-->
+    <string name="invalid_file_folder_link">無效的檔案或資料夾連結</string>
+    <!-- Error shown when it tries to open an invalid file or folder link and the text view is empty. -->
+    <string name="invalid_file_folder_link_empty">請輸入有效的檔案或資料夾連結</string>
+    <!-- Error shown when it tries to open an invalid chat link and the text view is empty. -->
+    <string name="invalid_chat_link_empty">請輸入有效的對話連結</string>
+    <!-- Error shown when it tries to open a chat link from the Cloud Drive section. -->
+    <string name="valid_chat_link">您已貼上一個對話連結。</string>
+    <!-- Error shown when it tries to open a contact link from the Cloud Drive section. -->
+    <string name="valid_contact_link">您已貼上一個連絡人連結。</string>
+    <!-- Action button to open a contact link.-->
+    <string name="action_open_contact_link">打開連絡人連結</string>
+    <!-- title for the settings to enable high resolution images when on mobile data -->
+    <string name="settings_mobile_data_resoluton_title">使用行動數據預覽高解析度影像</string>
+    <!-- summary for the settings to enable high resolution images when on mobile data -->
+    <string name="settings_mobile_data_resoluton_summary">允許預覽時使用行動數據載入高解析度影像。如果停用，則只有在放大檢視時才會載入原始尺寸影像。</string>
 </resources>

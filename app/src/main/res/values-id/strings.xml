@@ -98,8 +98,6 @@
     <string name="action_create_folder">Buat folder baru</string>
     <!-- Option which allows create a new text file -->
     <string name="action_create_txt">Buat file teks baru</string>
-    <!-- Menu option to open a link. Also title of the dialog to open a link. -->
-    <string name="action_open_link">Buka link</string>
     <!-- Menu item -->
     <string name="action_settings">Pengaturan</string>
     <!-- Search button -->
@@ -983,8 +981,6 @@
     <string name="settings_disable_logs">Logs sekarang dinonaktifkan</string>
     <!-- Snackbar error message triggered by host error when user is trying to setup MEGA Camera Uploads folder in settings page -->
     <string name="error_unable_to_setup_cloud_folder">Tidak dapat mengatur folder Unggah Kamera MEGA</string>
-    <!-- Message displayed when the user denies the required permissions during the logs activation -->
-    <string name="logs_not_enabled_permissions">Log belum diaktifkan karena anda menolak izin yang diperlukan</string>
     <!-- Option in the sliding panel to open the folder which contains the file selected after performing a search -->
     <string name="search_open_location">Buka lokasi</string>
     <!-- message when a temporary error on logging in is due to SDK is waiting for the server to complete a request due to an API lock -->
@@ -1590,10 +1586,6 @@
     <string name="upload_service_notification">Mengunggah file: %1$d dari %2$d</string>
     <!-- Text of the notification shown when the upload service is paused: e.g. Uploading files: 1 of 10 (paused)-->
     <string name="upload_service_notification_paused">Mengunggah file: %1$d dari %2$d (dijeda)</string>
-    <!-- Text of the notification shown when the folder upload service is running, e.g. Uploading folders 1 of 2 -->
-    <string name="folder_upload_service_notification">Mengunggah folder: %1$d dari %2$d</string>
-    <!-- Text of the notification shown when the folder upload service is paused, e.g. Uploading folders 1 of 2 (paused) -->
-    <string name="folder_upload_service_notification_paused">Mengunggah folder: %1$d dari %2$d (dijeda)</string>
     <!-- Text of the notification shown when the upload service has finished, Plural -->
     <plurals name="upload_service_final_notification">
         <item quantity="other">%1$d file terunggah</item>
@@ -1601,10 +1593,6 @@
     <!-- Text of the notification shown when the upload service has finished, Plural -->
     <plurals name="upload_service_notification_already_uploaded">
         <item quantity="other">%1$d file sudah diunggah</item>
-    </plurals>
-    <!-- Text of the notification shown when the folder upload service has finished, Text of the notification shown when the folder upload service has finished - plural  e.g. Uploaded 2 folders -->
-    <plurals name="folder_upload_service_final_notification">
-        <item quantity="other">Folder %1$d yang diunggah</item>
     </plurals>
     <!-- label for the total file size of multiple files and/or folders (no need to put the colon punctuation in the translation) -->
     <string name="general_total_size">Ukuran total: %1$s</string>
@@ -2546,7 +2534,9 @@
     <!-- Settings preference title to show file versions info of the account -->
     <string name="settings_file_management_file_versions_title">Versi file</string>
     <!-- Settings preference subtitle to show file versions info of the account -->
-    <string name="settings_file_management_file_versions_subtitle">Versi file %1$d, mengambil total %2$s</string>
+    <plurals name="settings_file_management_file_versions_subtitle">
+        <item quantity="other">%1$dversi file, dengan total  %2$s</item>
+    </plurals>
     <!-- Title of the section File management on Settings section -->
     <string name="settings_file_management_category">Pengelolaan File</string>
     <!-- Option in Settings to delete all the versions of the account -->
@@ -2580,7 +2570,7 @@
     <!-- Label shown when the user wants to add contacts into a chat conversation -->
     <string name="send_contacts">Kirim kontak</string>
     <!-- Title of the alert when the account have been logged out from another client -->
-    <string name="title_alert_logged_out">Keluar</string>
+    <string name="title_alert_logged_out">Telah Keluar</string>
     <!-- Text shown to indicate user that his account has already been confirmed -->
     <string name="account_confirmed">Akun anda telah diaktifasi. Silahkan masuk akun anda</string>
     <!-- Text shown to indicate user that his account should be confirmed typing his password -->
@@ -2723,16 +2713,12 @@
     <string name="message_set_chat_private">[A]%1$s[/A][B] mengaktifkan rotasi kunci enkripsi.[/B]</string>
     <!-- error message shown when a chat link is invalid -->
     <string name="invalid_chat_link">Percakapan ini tidak lagi tersedia</string>
-    <!-- error message shown when a chat link is not well formed -->
-    <string name="invalid_chat_link_args">Tautan obrolan tidak valid</string>
     <!-- When it is creating a new group chat, this option permits to establish it private or public -->
     <string name="ekr_label">Rotasi kunci enkripsi</string>
     <!-- Text of the dialog to change a public chat to private (enable encryption key rotation) -->
     <string name="ekr_explanation">Rotasi kunci enkripsi sedikit lebih aman, tetapi tidak memungkinkan anda membuat tautan obrolan dan peserta baru tidak akan melihat pesan sebelumnya.</string>
     <!-- Text of the dialog to change a public chat to private (enable encryption key rotation) -->
     <string name="subtitle_chat_message_enabled_ERK">Rotasi kunci enkripsi sedikit lebih aman, tetapi tidak memungkinkan anda membuat tautan obrolan dan peserta baru tidak akan melihat pesan sebelumnya.</string>
-    <!-- Menu item -->
-    <string name="action_open_chat_link">Buka tautan obrolan</string>
     <!-- Message shown when a contact request has not been sent because the invitation has been sent before -->
     <string name="invite_not_sent_already_sent">Undangan untuk menghubungi %s telah dikirim sebelumnya dan dapat dikonsultasikan di tab Permintaan Terkirim.</string>
     <!-- Label shown to indicate the QR is saving in Cloud Drive -->
@@ -3121,8 +3107,8 @@
     <string name="not_allow_play_alert">Memutar file media tidak dapat dilakukan saat ada panggilan yang sedang berlangsung.</string>
     <!-- Text shown in the list of chats when there is a call in progress but I am not on it -->
     <string name="ongoing_call_messages">Panggilan Berlangsung</string>
-    <!-- Title of the layout to join a group call from the chat screen. The placeholder indicates the user who initiated the call -->
-    <string name="join_call_layout_in_group_call">%s memulai panggilan grup. Ketuk untuk bergabung.</string>
+    <!-- Title of the layout to join a group call from the chat screen. -->
+    <string name="join_call_layout_in_group_call">Ketuk untuk bergabung dengan panggilan grup saat ini.</string>
     <!-- Title of the layout to return to a call -->
     <string name="call_in_progress_layout">Ketuk untuk kembali ke panggilan</string>
     <!-- message displayed when you try to start a call but it is not possible because you are already on a call -->
@@ -3171,22 +3157,6 @@
     <string name="text_join_call">Untuk bergabung dengan panggilan ini, anda harus mengakhiri panggilan anda saat ini.</string>
     <!-- Text of the dialog shown when you want to join a group call but you are in another active call -->
     <string name="text_join_another_call">Untuk bergabung dengan panggilan ini, anda harus mengakhiri atau menahan panggilan saat ini.</string>
-    <!-- Hint shown in the open chat link alert dialog -->
-    <string name="hint_enter_chat_link">Masukkan tautan obrolan</string>
-    <!-- Hint shown in the open link alert dialog -->
-    <string name="hint_paste_link">Tempel tautan</string>
-    <!-- Error shown when it tries to open an invalid file or folder link -->
-    <string name="invalid_file_folder_link">Tautan file atau folder tidak valid</string>
-    <!-- Error shown when it tries to open an invalid file or folder link and the text view is empty -->
-    <string name="invalid_file_folder_link_empty">Silakan masukkan tautan file atau folder yang valid</string>
-    <!-- Error shown when it tries to open an invalid chat link and the text view is empty -->
-    <string name="invalid_chat_link_empty">Silakan masukkan tautan obrolan yang valid</string>
-    <!-- Error shown when it tries to open a chat link from the Cloud Drive section -->
-    <string name="valid_chat_link">Anda telah menempelkan tautan obrolan.</string>
-    <!-- Error shown when it tries to open a contact link from the Cloud Drive section -->
-    <string name="valid_contact_link">Anda telah menempelkan tautan kontak.</string>
-    <!-- Menu item -->
-    <string name="action_open_contact_link">Buka tautan kontak</string>
     <!-- Explanation of the dialog shown to share a chat link -->
     <string name="copy_link_explanation">Orang-orang dapat bergabung dengan grup anda dengan menggunakan tautan ini.</string>
     <!-- Label that indicates the creation of a chat link -->
@@ -3513,8 +3483,8 @@
     <string name="section_documents">Dokumen</string>
     <!-- Label of the floating action button of opening the new chat conversation -->
     <string name="fab_label_new_chat">Obrolan baru</string>
-    <!-- Text that indicates that there’s no photo to show -->
-    <string name="homepage_empty_hint_photos">Tidak ada foto yang ditemukan</string>
+    <!-- Text that indicates that there’s no image to show in image section -->
+    <string name="homepage_empty_hint_photos">[B]Tidak ada[/B] [A]Gambar[/A] [B]Ditemukan[/B]</string>
     <!-- Text that indicates that there’s no document to show -->
     <string name="homepage_empty_hint_documents">Tidak ada dokumen yang ditemukan</string>
     <!-- Text that indicates that there’s no audio to show -->
@@ -3768,7 +3738,7 @@
     <!-- Settings hint that indicates the audio will still be played in background if the app is backgrounded -->
     <string name="settings_background_play_hint">Bermain di latar belakang</string>
     <!-- Text of the empty screen when there are no elements in Photos -->
-    <string name="photos_empty">[B]Tidak ada[/B] [A]Foto[/A]</string>
+    <string name="photos_empty">[B]Tidak ada[/B] [A]Foto[/A] [B]Ditemukan[/B]</string>
     <!-- Text to show as subtitle of Enable camera uploads screen -->
     <string name="enable_cu_subtitle">Cadangkan foto dan video anda ke Penyimpanan Cloud anda secara otomatis.</string>
     <!-- Text of a button on Camera Uploads section to show all the content of the section-->
@@ -3801,8 +3771,6 @@
     <string name="error_share_owner_storage_quota">Pemilik berbagi melebihi kuota penyimpanan.</string>
     <!-- A message shown when uploading, copying or moving something to an incoming share and the owner’s account is over its storage quota. -->
     <string name="warning_share_owner_storage_quota">File tidak dapat dikirim karena pengguna target melebihi kuota penyimpanan mereka.</string>
-    <!-- Content to show in a Snackbar to tip the incompatibility-->
-    <string name="version_incompatibility">Kami sedang meningkatkan MEGAchat. Panggilan anda mungkin tidak terhubung karena ketidakcocokan versi kecuali semua pihak memperbarui aplikasi MEGA mereka ke versi terbaru.</string>
     <!-- Message displayed when multiple download starts and 1 file has already been downloaded before and 1 file is being downloaded -->
     <string name="file_already_downloaded_and_file_pending_download">1 file sudah diunduh. 1 file tertunda.</string>
     <!-- Message displayed when multiple download starts and 1 file has already been downloaded before and multiple files are being downloaded. Placeholder: number of files -->
@@ -4005,8 +3973,8 @@
     <string name="be_new_moderator">Anda adalah moderator baru.</string>
     <!-- the content of snack bar when copied meeting link-->
     <string name="copied_meeting_link">Tautan pertemuan disalin.</string>
-    <!-- Title of the layout to join a meeting from the chat screen. The placeholder indicates the user who initiated the meeting -->
-    <string name="join_meeting_layout_in_group_call">%smemulai sebuah pertemuan. Ketuk untuk bergabung.</string>
+    <!-- Title of the layout to join a meeting from the chat screen. -->
+    <string name="join_meeting_layout_in_group_call">Ketuk untuk bergabung dengan rapat saat ini.</string>
     <!-- Title of fifth tour screen -->
     <string name="title_tour_five">MEGA Pertemuan</string>
     <!-- Content of fourth tour screen -->
@@ -4080,5 +4048,39 @@
     <!-- Warning of the dialog informing the user about disable file versioning. -->
     <string name="disable_versioning_warning">Fitur pembuatan versi file kami memastikan bahwa kami menyimpan salinan lama dari file anda jika anda menggantinya dengan versi yang lebih baru. Jika anda menonaktifkan Pembuatan Versi File, anda tidak akan lagi memiliki perlindungan ini; salinan lama akan hilang saat anda menggantinya.</string>
     <!-- Warning informing the user the folder location is trying to open no longer exists. -->
-    <string name="location_not_exist">This location no longer exists.</string>
+    <string name="location_not_exist">Lokasi ini tidak ada lagi.</string>
+    <!-- Warning shown informing the contact has been previously invited. The placeholder is to show the name of the contact. -->
+    <string name="contact_already_invited">Anda sudah mengundang %1$s</string>
+    <!-- Warning shown informing the contact request has been sent and can be managed in sent requests section. -->
+    <string name="contact_invited">Undangan berhasil dikirim. Lihat permintaan terkirim.</string>
+    <!-- Message when file available offline. -->
+    <string name="file_available_offline">File tersedia Offline</string>
+    <!-- Message when file removed from offline. -->
+    <string name="file_removed_offline">File dihapus dari Offline</string>
+    <!-- Menu option to open a link. Also title of the dialog to open a link. -->
+    <string name="action_open_link">Buka tautan</string>
+    <!-- error message shown when a chat link is not well formed. -->
+    <string name="invalid_chat_link_args">Tautan obrolan tidak valid</string>
+    <!-- Menu option to open a chat link. -->
+    <string name="action_open_chat_link">Buka tautan obrolan</string>
+    <!-- Hint shown in the open chat link alert dialog. -->
+    <string name="hint_enter_chat_link">Masukkan tautan obrolan</string>
+    <!-- Hint shown in the open link alert dialog. -->
+    <string name="hint_paste_link">Tempel tautan</string>
+    <!-- Error shown when it tries to open an invalid file or folder link .-->
+    <string name="invalid_file_folder_link">Tautan file atau folder tidak valid</string>
+    <!-- Error shown when it tries to open an invalid file or folder link and the text view is empty. -->
+    <string name="invalid_file_folder_link_empty">Silakan masukkan tautan file atau folder yang valid</string>
+    <!-- Error shown when it tries to open an invalid chat link and the text view is empty. -->
+    <string name="invalid_chat_link_empty">Silakan masukkan tautan obrolan yang valid</string>
+    <!-- Error shown when it tries to open a chat link from the Cloud Drive section. -->
+    <string name="valid_chat_link">Anda telah menempelkan tautan obrolan.</string>
+    <!-- Error shown when it tries to open a contact link from the Cloud Drive section. -->
+    <string name="valid_contact_link">Anda telah menempelkan tautan kontak.</string>
+    <!-- Action button to open a contact link.-->
+    <string name="action_open_contact_link">Buka tautan kontak</string>
+    <!-- title for the settings to enable high resolution images when on mobile data -->
+    <string name="settings_mobile_data_resoluton_title">Gunakan data seluler untuk melihat pratinjau gambar resolusi tinggi</string>
+    <!-- summary for the settings to enable high resolution images when on mobile data -->
+    <string name="settings_mobile_data_resoluton_summary">Izinkan penggunaan data seluler untuk memuat gambar resolusi tinggi saat melihat pratinjau. Jika dinonaktifkan, gambar asli hanya akan dimuat saat anda memperbesar.</string>
 </resources>

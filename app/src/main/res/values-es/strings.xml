@@ -98,8 +98,6 @@
     <string name="action_create_folder">Nueva carpeta</string>
     <!-- Option which allows create a new text file -->
     <string name="action_create_txt">Crear nuevo archivo de texto</string>
-    <!-- Menu option to open a link. Also title of the dialog to open a link. -->
-    <string name="action_open_link">Abrir enlace</string>
     <!-- Menu item -->
     <string name="action_settings">Ajustes</string>
     <!-- Search button -->
@@ -995,8 +993,6 @@
     <string name="settings_disable_logs">Logs desactivados</string>
     <!-- Snackbar error message triggered by host error when user is trying to setup MEGA Camera Uploads folder in settings page -->
     <string name="error_unable_to_setup_cloud_folder">No se puede configurar la carpeta de la cámara en MEGA</string>
-    <!-- Message displayed when the user denies the required permissions during the logs activation -->
-    <string name="logs_not_enabled_permissions">Los logs no se han activado porque has denegado los permisos requeridos</string>
     <!-- Option in the sliding panel to open the folder which contains the file selected after performing a search -->
     <string name="search_open_location">Abrir ubicación</string>
     <!-- message when a temporary error on logging in is due to SDK is waiting for the server to complete a request due to an API lock -->
@@ -1422,7 +1418,7 @@
     <!-- settings of the chat to choose the status -->
     <string name="settings_chat_vibration">Vibración</string>
     <!-- Button text shown on SMS verification page, if the user wants to logout current suspended account and login with another account, user can press this button to logout -->
-    <string name="sms_logout">[A]Cierra sesión[/A] para usar MEGA con otra cuenta</string>
+    <string name="sms_logout">[A]Cierra sesión[/A] para usar otra cuenta de MEGA.</string>
     <!-- On SMS verification page, if the user presses the logout button, a dialog with this text will show to ask for user’s confirmation. -->
     <string name="confirm_logout_from_sms_verification">¿Quieres cerrar sesión y salir de tu cuenta?</string>
     <!-- Text shown when a message has been deleted in the chat -->
@@ -1613,10 +1609,6 @@
     <string name="upload_service_notification">Subiendo archivos: %1$d de %2$d</string>
     <!-- Text of the notification shown when the upload service is paused: e.g. Uploading files: 1 of 10 (paused)-->
     <string name="upload_service_notification_paused">Subiendo archivos: %1$d de %2$d (en pausa)</string>
-    <!-- Text of the notification shown when the folder upload service is running, e.g. Uploading folders 1 of 2 -->
-    <string name="folder_upload_service_notification">Subiendo carpetas: %1$d de %2$d</string>
-    <!-- Text of the notification shown when the folder upload service is paused, e.g. Uploading folders 1 of 2 (paused) -->
-    <string name="folder_upload_service_notification_paused">Subiendo carpetas: %1$d de %2$d (en pausa)</string>
     <!-- Text of the notification shown when the upload service has finished, Plural -->
     <plurals name="upload_service_final_notification">
         <item quantity="one">%1$d archivo subido</item>
@@ -1626,11 +1618,6 @@
     <plurals name="upload_service_notification_already_uploaded">
         <item quantity="one">1 archivo ya subido</item>
         <item quantity="other">%1$d archivos ya subidos</item>
-    </plurals>
-    <!-- Text of the notification shown when the folder upload service has finished, Text of the notification shown when the folder upload service has finished - plural  e.g. Uploaded 2 folders -->
-    <plurals name="folder_upload_service_final_notification">
-        <item quantity="one">%1$d carpeta subida</item>
-        <item quantity="other">%1$d carpetas subidas</item>
     </plurals>
     <!-- label for the total file size of multiple files and/or folders (no need to put the colon punctuation in the translation) -->
     <string name="general_total_size">Tamaño total: %1$s</string>
@@ -2596,7 +2583,10 @@
     <!-- Settings preference title to show file versions info of the account -->
     <string name="settings_file_management_file_versions_title">Versiones de archivos</string>
     <!-- Settings preference subtitle to show file versions info of the account -->
-    <string name="settings_file_management_file_versions_subtitle">%1$d versiones de archivo, con un total de %2$s</string>
+    <plurals name="settings_file_management_file_versions_subtitle">
+        <item quantity="one">1 versión de archivo, con un total de %2$s</item>
+        <item quantity="other">%1$d versiones de archivo, con un total de %2$s</item>
+    </plurals>
     <!-- Title of the section File management on Settings section -->
     <string name="settings_file_management_category">Gestión de archivos</string>
     <!-- Option in Settings to delete all the versions of the account -->
@@ -2774,16 +2764,12 @@
     <string name="message_set_chat_private">[A]%1$s[/A][B] ha activado la rotación de la clave de cifrado.[/B]</string>
     <!-- error message shown when a chat link is invalid -->
     <string name="invalid_chat_link">Esta conversación ya no está disponible.</string>
-    <!-- error message shown when a chat link is not well formed -->
-    <string name="invalid_chat_link_args">Enlace de chat inválido</string>
     <!-- When it is creating a new group chat, this option permits to establish it private or public -->
     <string name="ekr_label">Rotación de la clave de cifrado</string>
     <!-- Text of the dialog to change a public chat to private (enable encryption key rotation) -->
     <string name="ekr_explanation">La rotación de la clave de cifrado es un poco más segura, pero no te permite crear un enlace de chat y los nuevos participantes no verán los mensajes anteriores.</string>
     <!-- Text of the dialog to change a public chat to private (enable encryption key rotation) -->
     <string name="subtitle_chat_message_enabled_ERK">La rotación de la clave de cifrado es un poco más segura, pero no te permite crear un enlace de chat y los nuevos participantes no verán los mensajes anteriores.</string>
-    <!-- Menu item -->
-    <string name="action_open_chat_link">Abrir enlace de chat</string>
     <!-- Message shown when a contact request has not been sent because the invitation has been sent before -->
     <string name="invite_not_sent_already_sent">La invitación para %s se ha enviado anteriormente y se puede consultar en la pestaña Solicitudes enviadas.</string>
     <!-- Label shown to indicate the QR is saving in Cloud Drive -->
@@ -3190,8 +3176,8 @@
     <string name="not_allow_play_alert">No es posible reproducir archivos multimedia mientras hay una llamada en curso.</string>
     <!-- Text shown in the list of chats when there is a call in progress but I am not on it -->
     <string name="ongoing_call_messages">Llamada en curso</string>
-    <!-- Title of the layout to join a group call from the chat screen. The placeholder indicates the user who initiated the call -->
-    <string name="join_call_layout_in_group_call">%s ha empezado una llamada de grupo. Toca para unirte.</string>
+    <!-- Title of the layout to join a group call from the chat screen. -->
+    <string name="join_call_layout_in_group_call">Toca para unirte a la llamada.</string>
     <!-- Title of the layout to return to a call -->
     <string name="call_in_progress_layout">Toca para volver a la llamada</string>
     <!-- message displayed when you try to start a call but it is not possible because you are already on a call -->
@@ -3240,22 +3226,6 @@
     <string name="text_join_call">Para unirte a esta llamada tienes que finalizar tu llamada actual.</string>
     <!-- Text of the dialog shown when you want to join a group call but you are in another active call -->
     <string name="text_join_another_call">Para unirte a esta llamada, tienes que colgar o dejar en espera la llamada actual.</string>
-    <!-- Hint shown in the open chat link alert dialog -->
-    <string name="hint_enter_chat_link">Introducir el enlace de chat</string>
-    <!-- Hint shown in the open link alert dialog -->
-    <string name="hint_paste_link">Pegar enlace</string>
-    <!-- Error shown when it tries to open an invalid file or folder link -->
-    <string name="invalid_file_folder_link">Enlace de archivo o carpeta no válido</string>
-    <!-- Error shown when it tries to open an invalid file or folder link and the text view is empty -->
-    <string name="invalid_file_folder_link_empty">Por favor, introduce un enlace válido de archivo o carpeta</string>
-    <!-- Error shown when it tries to open an invalid chat link and the text view is empty -->
-    <string name="invalid_chat_link_empty">Por favor introduce un enlace de chat válido</string>
-    <!-- Error shown when it tries to open a chat link from the Cloud Drive section -->
-    <string name="valid_chat_link">Has pegado un enlace de chat.</string>
-    <!-- Error shown when it tries to open a contact link from the Cloud Drive section -->
-    <string name="valid_contact_link">Has pegado un enlace de contacto.</string>
-    <!-- Menu item -->
-    <string name="action_open_contact_link">Abrir enlace de contacto</string>
     <!-- Explanation of the dialog shown to share a chat link -->
     <string name="copy_link_explanation">Las personas pueden unirse a tu grupo usando este enlace.</string>
     <!-- Label that indicates the creation of a chat link -->
@@ -3586,8 +3556,8 @@
     <string name="section_documents">Documentos</string>
     <!-- Label of the floating action button of opening the new chat conversation -->
     <string name="fab_label_new_chat">Nuevo chat</string>
-    <!-- Text that indicates that there’s no photo to show -->
-    <string name="homepage_empty_hint_photos">No se han encontrado fotos</string>
+    <!-- Text that indicates that there’s no image to show in image section -->
+    <string name="homepage_empty_hint_photos">[B]No[/B] [B]hay[/B] [A]imágenes[/A]</string>
     <!-- Text that indicates that there’s no document to show -->
     <string name="homepage_empty_hint_documents">No se han encontrado documentos</string>
     <!-- Text that indicates that there’s no audio to show -->
@@ -3848,7 +3818,7 @@
     <!-- Settings hint that indicates the audio will still be played in background if the app is backgrounded -->
     <string name="settings_background_play_hint">Reproducción en segundo plano</string>
     <!-- Text of the empty screen when there are no elements in Photos -->
-    <string name="photos_empty">[B]No hay[/B] [A]fotos[/A]</string>
+    <string name="photos_empty">[B]No[/B] [B]hay[/B] [A]fotos[/A]</string>
     <!-- Text to show as subtitle of Enable camera uploads screen -->
     <string name="enable_cu_subtitle">Realiza una copia de seguridad automática de tus fotos y videos en tu Nube.</string>
     <!-- Text of a button on Camera Uploads section to show all the content of the section-->
@@ -3882,8 +3852,6 @@
     <string name="error_share_owner_storage_quota">El propietario de la carpeta compartida ha superado la cuota de almacenamiento disponible.</string>
     <!-- A message shown when uploading, copying or moving something to an incoming share and the owner’s account is over its storage quota. -->
     <string name="warning_share_owner_storage_quota">El archivo no se puede enviar porque el destinatario ha superado su límite de almacenamiento.</string>
-    <!-- Content to show in a Snackbar to tip the incompatibility-->
-    <string name="version_incompatibility">Estamos actualizando MEGAchat. Es posible que la llamada no se conecte correctamente por problemas de incompatibilidad de versiones a menos que todos los participantes actualicen la app de MEGA a la última versión.</string>
     <!-- Message displayed when multiple download starts and 1 file has already been downloaded before and 1 file is being downloaded -->
     <string name="file_already_downloaded_and_file_pending_download">1 archivo descargado anteriormente. 1 archivo pendiente.</string>
     <!-- Message displayed when multiple download starts and 1 file has already been downloaded before and multiple files are being downloaded. Placeholder: number of files -->
@@ -4009,7 +3977,7 @@
     <!-- General label for microphone -->
     <string name="general_mic">Mic</string>
     <!-- General label for microphone muted -->
-    <string name="general_mic_mute">Tu micrófono está silenciado</string>
+    <string name="general_mic_mute">Tu micrófono está apagado</string>
     <!-- General label for microphone unmuted -->
     <string name="general_mic_unmute">Tu micrófono está encendido</string>
     <!-- General label for camera -->
@@ -4027,9 +3995,9 @@
     <!-- General label for headphone on-->
     <string name="general_headphone_on">Auriculares activados</string>
     <!-- General label for speaker on-->
-    <string name="general_speaker_on">Altavoz activado</string>
+    <string name="general_speaker_on">El altavoz está encendido</string>
     <!-- General label for speaker off-->
-    <string name="general_speaker_off">Altavoz desactivado</string>
+    <string name="general_speaker_off">El altavoz está apagado</string>
     <!-- Label for end meeting-->
     <string name="meeting_end">Finalizar</string>
     <!-- Invite contacts as participants of the meeting-->
@@ -4094,8 +4062,8 @@
     <string name="be_new_moderator">Eres el nuevo moderador.</string>
     <!-- the content of snack bar when copied meeting link-->
     <string name="copied_meeting_link">Enlace de reunión copiado.</string>
-    <!-- Title of the layout to join a meeting from the chat screen. The placeholder indicates the user who initiated the meeting -->
-    <string name="join_meeting_layout_in_group_call">%s ha empezado una reunión. Toca para unirte.</string>
+    <!-- Title of the layout to join a meeting from the chat screen. -->
+    <string name="join_meeting_layout_in_group_call">Toca para unirte a la reunión.</string>
     <!-- Title of fifth tour screen -->
     <string name="title_tour_five">MEGA Meeting</string>
     <!-- Content of fourth tour screen -->
@@ -4167,7 +4135,41 @@
     <!-- Title of the dialog warning the user about disable file versioning. -->
     <string name="disable_versioning_label">Desactivar versionado de archivos</string>
     <!-- Warning of the dialog informing the user about disable file versioning. -->
-    <string name="disable_versioning_warning">Our file versioning feature ensures that we keep older copies of your files around if you replace them with newer versions. If you disable File Versioning you will no longer have this protection; the old copy will be lost when you replace it.</string>
+    <string name="disable_versioning_warning">El control de versiones te permite mantener copias antiguas de tus archivos si los reemplazas con versiones nuevas. Si desactivas el control de versiones, ya no tendrás esta posibilidad; la copia anterior se perderá cuando la reemplaces.</string>
     <!-- Warning informing the user the folder location is trying to open no longer exists. -->
-    <string name="location_not_exist">This location no longer exists.</string>
+    <string name="location_not_exist">Esta ubicación ya no existe.</string>
+    <!-- Warning shown informing the contact has been previously invited. The placeholder is to show the name of the contact. -->
+    <string name="contact_already_invited">You have already invited %1$s</string>
+    <!-- Warning shown informing the contact request has been sent and can be managed in sent requests section. -->
+    <string name="contact_invited">Se ha enviado la invitación. Ver las solicitudes enviadas.</string>
+    <!-- Message when file available offline. -->
+    <string name="file_available_offline">Archivo disponible sin conexión</string>
+    <!-- Message when file removed from offline. -->
+    <string name="file_removed_offline">Archivo eliminado de Sin conexión</string>
+    <!-- Menu option to open a link. Also title of the dialog to open a link. -->
+    <string name="action_open_link">Abrir enlace</string>
+    <!-- error message shown when a chat link is not well formed. -->
+    <string name="invalid_chat_link_args">Enlace de chat inválido</string>
+    <!-- Menu option to open a chat link. -->
+    <string name="action_open_chat_link">Abrir enlace de chat</string>
+    <!-- Hint shown in the open chat link alert dialog. -->
+    <string name="hint_enter_chat_link">Introducir el enlace de chat</string>
+    <!-- Hint shown in the open link alert dialog. -->
+    <string name="hint_paste_link">Pegar enlace</string>
+    <!-- Error shown when it tries to open an invalid file or folder link .-->
+    <string name="invalid_file_folder_link">Enlace de archivo o carpeta no válido</string>
+    <!-- Error shown when it tries to open an invalid file or folder link and the text view is empty. -->
+    <string name="invalid_file_folder_link_empty">Por favor, introduce un enlace válido de archivo o carpeta</string>
+    <!-- Error shown when it tries to open an invalid chat link and the text view is empty. -->
+    <string name="invalid_chat_link_empty">Por favor introduce un enlace de chat válido</string>
+    <!-- Error shown when it tries to open a chat link from the Cloud Drive section. -->
+    <string name="valid_chat_link">Has pegado un enlace de chat.</string>
+    <!-- Error shown when it tries to open a contact link from the Cloud Drive section. -->
+    <string name="valid_contact_link">Has pegado un enlace de contacto.</string>
+    <!-- Action button to open a contact link.-->
+    <string name="action_open_contact_link">Abrir enlace de contacto</string>
+    <!-- title for the settings to enable high resolution images when on mobile data -->
+    <string name="settings_mobile_data_resoluton_title">Usa los datos móviles para la vista previa de imágenes de alta resolución</string>
+    <!-- summary for the settings to enable high resolution images when on mobile data -->
+    <string name="settings_mobile_data_resoluton_summary">Permite el uso de datos móviles para cargar imágenes de alta resolución al obtener una vista previa. Si está opción está desactivada, la imagen original solo se cargará cuando hagas zoom.</string>
 </resources>

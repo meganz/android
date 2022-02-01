@@ -10,7 +10,6 @@ import android.widget.TextView;
 
 import mega.privacy.android.app.activities.PasscodeActivity;
 import mega.privacy.android.app.activities.WebViewActivity;
-import mega.privacy.android.app.listeners.ConnectListener;
 import mega.privacy.android.app.listeners.LoadPreviewListener;
 import mega.privacy.android.app.listeners.QueryRecoveryLinkListener;
 import mega.privacy.android.app.lollipop.FileLinkActivityLollipop;
@@ -181,7 +180,7 @@ public class OpenLinkActivity extends PasscodeActivity implements MegaRequestLis
 					}
 
 					if (initResult != MegaChatApi.INIT_ERROR) {
-						megaChatApi.connect(new ConnectListener(this));
+						finishAfterConnect();
                     } else {
                         logError("Open chat url:initAnonymous:INIT_ERROR");
                         setError(getString(R.string.error_chat_link_init_error));
@@ -553,14 +552,13 @@ public class OpenLinkActivity extends PasscodeActivity implements MegaRequestLis
 					new MeetingHasEndedDialogFragment(new MeetingHasEndedDialogFragment.ClickCallback() {
 						@Override
 						public void onViewMeetingChat() {
-							goToChatActivity();
 						}
 
 						@Override
 						public void onLeave() {
 							goToGuestLeaveMeetingActivity();
 						}
-					}).show(getSupportFragmentManager(),
+					}, true).show(getSupportFragmentManager(),
 							MeetingHasEndedDialogFragment.TAG);
 				} else if (isFromOpenChatPreview) {
 					logDebug("Meeting is in progress, open join meeting");
