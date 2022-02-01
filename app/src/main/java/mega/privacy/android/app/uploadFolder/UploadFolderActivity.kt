@@ -10,12 +10,14 @@ import android.view.Menu
 import android.view.MenuItem
 import android.widget.ImageView
 import androidx.activity.viewModels
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.view.ActionMode
 import androidx.appcompat.widget.SearchView
 import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.documentfile.provider.DocumentFile
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.PasscodeActivity
 import mega.privacy.android.app.components.CustomizedGridLayoutManager
@@ -27,9 +29,12 @@ import mega.privacy.android.app.interfaces.Scrollable
 import mega.privacy.android.app.modalbottomsheet.SortByBottomSheetDialogFragment.Companion.newInstance
 import mega.privacy.android.app.uploadFolder.list.adapter.FolderContentAdapter
 import mega.privacy.android.app.uploadFolder.list.data.FolderContent
+import mega.privacy.android.app.uploadFolder.list.data.UploadFolderResult
+import mega.privacy.android.app.utils.AlertDialogUtil.isAlertDialogShown
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_PARENT_NODE_HANDLE
 import mega.privacy.android.app.utils.MenuUtils.setupSearchView
+import mega.privacy.android.app.utils.StringResourcesUtils
 import mega.privacy.android.app.utils.Util
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 
@@ -43,6 +48,7 @@ class UploadFolderActivity : PasscodeActivity(), Scrollable {
         private const val WAIT_TIME_TO_UPDATE = 150L
         private const val SHADOW = 0.5f
         const val UPLOAD_RESULTS = "UPLOAD_RESULTS"
+        private const val CANCEL_UPLOADS_SHOWN = "CANCEL_UPLOADS_SHOWN"
     }
 
     private val viewModel: UploadFolderViewModel by viewModels()
@@ -69,6 +75,7 @@ class UploadFolderActivity : PasscodeActivity(), Scrollable {
     }
 
     private lateinit var searchMenuItem: MenuItem
+    private var cancelUploadsDialog: AlertDialog? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -90,7 +97,19 @@ class UploadFolderActivity : PasscodeActivity(), Scrollable {
                     )
                 }
             }
+        } else if (savedInstanceState.getBoolean(CANCEL_UPLOADS_SHOWN, false)) {
+            showCancelUploadsDialog()
         }
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        outState.putBoolean(CANCEL_UPLOADS_SHOWN, isAlertDialogShown(cancelUploadsDialog))
+        super.onSaveInstanceState(outState)
+    }
+
+    override fun onDestroy() {
+        cancelUploadsDialog?.dismiss()
+        super.onDestroy()
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
@@ -98,16 +117,21 @@ class UploadFolderActivity : PasscodeActivity(), Scrollable {
 
         menuInflater.inflate(R.menu.activity_upload_folder, finalMenu)
         searchMenuItem = finalMenu.findItem(R.id.action_search).apply {
-            setupSearchView { query ->
-                showProgress(true)
-                viewModel.search(query)
-            }
+            val isProcessingUpload = viewModel.isProcessingUpload()
+            isVisible = !isProcessingUpload
 
-            val query = viewModel.getQuery()
+            if (!isProcessingUpload) {
+                setupSearchView { query ->
+                    showProgress(true)
+                    viewModel.search(query)
+                }
 
-            if (!isActionViewExpanded && query != null) {
-                expandActionView()
-                (actionView as SearchView).setQuery(query, false)
+                val query = viewModel.getQuery()
+
+                if (!isActionViewExpanded && query != null) {
+                    expandActionView()
+                    (actionView as SearchView).setQuery(query, false)
+                }
             }
         }
 
@@ -123,8 +147,9 @@ class UploadFolderActivity : PasscodeActivity(), Scrollable {
     }
 
     override fun onBackPressed() {
-        if (viewModel.back()) {
-            super.onBackPressed()
+        when {
+            viewModel.isProcessingUpload() -> showCancelUploadsDialog()
+            viewModel.back() -> super.onBackPressed()
         }
     }
 
@@ -163,17 +188,19 @@ class UploadFolderActivity : PasscodeActivity(), Scrollable {
 
         binding.uploadButton.setOnClickListener {
             showProgress(true)
-            viewModel.upload(this) { uploadItems ->
-                setResult(
-                    RESULT_OK,
-                    Intent().putExtra(UPLOAD_RESULTS, uploadItems)
-                )
-
-                finish()
-            }
+            viewModel.upload(this)
+            actionMode?.finish()
+            invalidateOptionsMenu()
         }
 
         showProgress(true)
+    }
+
+    private fun uploadContent(uploadItems: ArrayList<UploadFolderResult>) {
+        if (!isAlertDialogShown(cancelUploadsDialog)) {
+            setResult(RESULT_OK, Intent().putExtra(UPLOAD_RESULTS, uploadItems))
+            finish()
+        }
     }
 
     private fun showProgress(show: Boolean) {
@@ -197,6 +224,7 @@ class UploadFolderActivity : PasscodeActivity(), Scrollable {
         viewModel.getCurrentFolder().observe(this, ::showCurrentFolder)
         viewModel.getFolderItems().observe(this, ::showFolderContent)
         viewModel.getSelectedItems().observe(this, ::updateActionMode)
+        viewModel.getUploadResults().observe(this, ::uploadContent)
 
         sortByHeaderViewModel.showDialogEvent.observe(this, EventObserver {
             newInstance(Constants.ORDER_OFFLINE, false).apply {
@@ -255,9 +283,12 @@ class UploadFolderActivity : PasscodeActivity(), Scrollable {
                 override fun onActionItemClicked(mode: ActionMode?, item: MenuItem?): Boolean = true
 
                 override fun onDestroyActionMode(mode: ActionMode?) {
-                    animate(viewModel.clearSelected())
                     actionMode = null
-                    checkScroll()
+
+                    if (!viewModel.isProcessingUpload()) {
+                        animate(viewModel.clearSelected())
+                        checkScroll()
+                    }
                 }
             })
         }
@@ -371,5 +402,30 @@ class UploadFolderActivity : PasscodeActivity(), Scrollable {
             window.statusBarColor = color
             binding.toolbar.setBackgroundColor(color)
         }
+    }
+
+
+    /**
+     * Shows a confirmation dialog before cancel all scanning transfers.
+     */
+    private fun showCancelUploadsDialog() {
+        cancelUploadsDialog = MaterialAlertDialogBuilder(this)
+            .setTitle(StringResourcesUtils.getString(R.string.cancel_uploads))
+            .setMessage(StringResourcesUtils.getString(R.string.cancel_uploads_warning))
+            .setPositiveButton(StringResourcesUtils.getString(R.string.action_proceed)) { _, _ ->
+                viewModel.cancelUpload()
+                setResult(RESULT_CANCELED)
+                finish()
+            }
+            .setNegativeButton(StringResourcesUtils.getString(R.string.general_cancel)) { _, _ ->
+                cancelUploadsDialog?.dismiss()
+                viewModel.proceedWithUpload()
+            }
+            .create()
+            .apply {
+                setCancelable(false)
+                setCanceledOnTouchOutside(false)
+                show()
+            }
     }
 }

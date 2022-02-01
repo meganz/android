@@ -145,31 +145,39 @@ class GetFolderContentUseCase @Inject constructor(
                 return@create
             }
 
-            val uris = ArrayList<UploadFolderResult>()
+            val results = ArrayList<UploadFolderResult>()
 
             if (!selectedItems.isNullOrEmpty()) {
                 selectedItems.forEach { selected ->
+                    if (emitter.isDisposed) {
+                        return@create
+                    }
+
                     getUris(
                         context,
                         parentNode,
                         parentFolder,
                         (folderItems[selected] as FolderContent.Data),
                         true
-                    ).blockingSubscribeBy(onSuccess = { urisResult -> uris.addAll(urisResult) })
+                    ).blockingSubscribeBy(onSuccess = { result -> results.addAll(result) })
                 }
             } else {
                 folderItems.forEach { item ->
+                    if (emitter.isDisposed) {
+                        return@create
+                    }
+
                     if (item is FolderContent.Data) {
                         getUris(context, parentNode, parentFolder, item, false)
-                            .blockingSubscribeBy(onSuccess = { urisResult -> uris.addAll(urisResult) })
+                            .blockingSubscribeBy(onSuccess = { result -> results.addAll(result) })
                     }
                 }
             }
 
-            if (uris.isEmpty()) {
-                emitter.onError(FileNotFoundException("Empty folder"))
-            } else {
-                emitter.onSuccess(uris)
+            when {
+                emitter.isDisposed -> return@create
+                results.isEmpty() -> emitter.onError(FileNotFoundException("Empty folder"))
+                else -> emitter.onSuccess(results)
             }
         }
 

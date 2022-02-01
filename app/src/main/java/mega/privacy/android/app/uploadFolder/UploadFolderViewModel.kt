@@ -6,6 +6,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
+import io.reactivex.rxjava3.disposables.Disposable
 import io.reactivex.rxjava3.kotlin.addTo
 import io.reactivex.rxjava3.kotlin.subscribeBy
 import io.reactivex.rxjava3.schedulers.Schedulers
@@ -33,6 +34,7 @@ class UploadFolderViewModel @Inject constructor(
     private val currentFolder: MutableLiveData<FolderContent.Data> = MutableLiveData()
     private val folderItems: MutableLiveData<MutableList<FolderContent>> = MutableLiveData()
     private val selectedItems: MutableLiveData<MutableList<Int>> = MutableLiveData()
+    private val uploadResults: MutableLiveData<ArrayList<UploadFolderResult>> = MutableLiveData()
 
     private lateinit var parentFolder: String
     private var parentHandle: Long = INVALID_HANDLE
@@ -40,6 +42,7 @@ class UploadFolderViewModel @Inject constructor(
     private var isList: Boolean = true
     private var query: String? = null
     private var isPendingToFinishSelection = false
+    private var uploadDisposable: Disposable? = null
     private var folderContent = HashMap<FolderContent.Data?, MutableList<FolderContent>>()
     private var searchResults =
         HashMap<FolderContent.Data, HashMap<String, MutableList<FolderContent>>>()
@@ -47,6 +50,7 @@ class UploadFolderViewModel @Inject constructor(
     fun getCurrentFolder(): LiveData<FolderContent.Data> = currentFolder
     fun getFolderItems(): LiveData<MutableList<FolderContent>> = folderItems
     fun getSelectedItems(): LiveData<MutableList<Int>> = selectedItems
+    fun getUploadResults(): LiveData<ArrayList<UploadFolderResult>> = uploadResults
 
     fun retrieveFolderContent(
         documentFile: DocumentFile,
@@ -62,6 +66,8 @@ class UploadFolderViewModel @Inject constructor(
         this.isList = isList
         setFolderItems()
     }
+
+    fun isProcessingUpload(): Boolean = uploadDisposable != null
 
     fun getQuery(): String? = query
 
@@ -277,8 +283,8 @@ class UploadFolderViewModel @Inject constructor(
         folderItems.value = searchResult
     }
 
-    fun upload(context: Context, upload: (ArrayList<UploadFolderResult>) -> Unit) {
-        getFolderContentUseCase.getUris(
+    fun upload(context: Context) {
+        uploadDisposable = getFolderContentUseCase.getUris(
             context,
             parentHandle,
             parentFolder,
@@ -288,8 +294,18 @@ class UploadFolderViewModel @Inject constructor(
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeBy(
                 onError = { error -> logError("Cannot upload anything", error) },
-                onSuccess = { uploadResult -> upload.invoke(uploadResult) }
+                onSuccess = { uploadResult -> uploadResults.value = uploadResult }
             )
             .addTo(composite)
+    }
+
+    fun cancelUpload() {
+        uploadDisposable?.dispose()
+    }
+
+    fun proceedWithUpload() {
+        if (!uploadResults.value.isNullOrEmpty()) {
+            uploadResults.notifyObserver()
+        }
     }
 }
