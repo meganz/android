@@ -15,6 +15,7 @@ package mega.privacy.android.app.meeting;
 
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.PorterDuff;
@@ -202,6 +203,8 @@ public class MegaSurfaceRenderer implements Callback, TextureView.SurfaceTexture
         Canvas canvas = isGroup ? myTexture.lockCanvas() : surfaceHolder.lockCanvas();
 
         if (canvas == null) return;
+        canvas.drawColor(Color.TRANSPARENT, PorterDuff.Mode.MULTIPLY);
+
 
         if (isLocal && isFrontCameraInUse()) {
             canvas.scale(-1, 1);
@@ -216,52 +219,7 @@ public class MegaSurfaceRenderer implements Callback, TextureView.SurfaceTexture
         } else {
             paint = null;
         }
-
         canvas.drawBitmap(bitmap, srcRect, dstRect, paint);
-
-        if (isGroup) {
-            myTexture.unlockCanvasAndPost(canvas);
-        } else {
-            surfaceHolder.unlockCanvasAndPost(canvas);
-        }
-    }
-
-    /**
-     *  Draw video frames for meeting
-     *
-     * @param isGroup Indicates if the current meeting is group meeting
-     * @param isFrontCamera Indicates if the frames are from the local camera and using the front camera.
-     */
-    public void drawBitmapForMeeting(boolean isGroup, boolean isFrontCamera) {
-        if (bitmap == null || (isGroup && myTexture == null) || (!isGroup && surfaceHolder == null))
-            return;
-
-        Canvas canvas = isGroup ? myTexture.lockCanvas() : surfaceHolder.lockCanvas();
-
-        if (canvas == null) return;
-
-        canvas.save();
-
-        if (isSmallCamera) {
-            paint.reset();
-            paint.setAlpha(alpha);
-            paint.setXfermode(modesrcover);
-            canvas.drawRoundRect(dstRectf, dp2px(CORNER_RADIUS, outMetrics), dp2px(CORNER_RADIUS, outMetrics), paint);
-            paint.setXfermode(modesrcin);
-        } else {
-            paint = null;
-        }
-
-        if (isFrontCamera) {
-            Matrix m = new Matrix();
-            m.postScale(-1, 1);
-            Bitmap newBitmap = Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), m, true);
-            canvas.drawBitmap(newBitmap, srcRect, dstRect, paint);
-        } else {
-            canvas.drawBitmap(bitmap, srcRect, dstRect, paint);
-        }
-
-        canvas.restore();
 
         if (isGroup) {
             myTexture.unlockCanvasAndPost(canvas);

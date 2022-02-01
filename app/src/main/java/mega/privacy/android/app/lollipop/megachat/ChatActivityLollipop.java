@@ -734,7 +734,7 @@ public class ChatActivityLollipop extends PasscodeActivity
                     @Override
                     public void onLeave() {
                     }
-                }).show(getSupportFragmentManager(),
+                }, false).show(getSupportFragmentManager(),
                         MeetingHasEndedDialogFragment.TAG);
             } else  {
                 CallUtil.checkMeetingInProgress(ChatActivityLollipop.this, ChatActivityLollipop.this, chatId, isFromOpenChatPreview, link, request.getMegaHandleList(), request.getText(), alreadyExist, request.getUserHandle(), passcodeManagement);
