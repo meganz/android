@@ -40,6 +40,7 @@ import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 class UploadFolderActivity : PasscodeActivity(), Scrollable {
 
     companion object {
+        private const val WAIT_TIME_TO_UPDATE = 150L
         private const val SHADOW = 0.5f
         const val UPLOAD_RESULTS = "UPLOAD_RESULTS"
     }
@@ -223,12 +224,14 @@ class UploadFolderActivity : PasscodeActivity(), Scrollable {
             return
         }
 
-        showProgress(false)
         val isEmpty = folderContent.isEmpty()
         binding.emptyHintImage.isVisible = isEmpty
         binding.emptyHintText.isVisible = isEmpty
-        binding.list.isVisible = !isEmpty
         folderContentAdapter.submitList(folderContent)
+        binding.list.apply {
+            isVisible = !isEmpty
+            postDelayed({ showProgress(false) }, WAIT_TIME_TO_UPDATE)
+        }
 
         if (viewModel.getQuery() == null && this::searchMenuItem.isInitialized) {
             searchMenuItem.isVisible = !isEmpty
@@ -249,10 +252,7 @@ class UploadFolderActivity : PasscodeActivity(), Scrollable {
                     return true
                 }
 
-                override fun onActionItemClicked(mode: ActionMode?, item: MenuItem?): Boolean {
-
-                    return true
-                }
+                override fun onActionItemClicked(mode: ActionMode?, item: MenuItem?): Boolean = true
 
                 override fun onDestroyActionMode(mode: ActionMode?) {
                     animate(viewModel.clearSelected())
@@ -290,13 +290,17 @@ class UploadFolderActivity : PasscodeActivity(), Scrollable {
     }
 
     private fun animate(positions: List<Int>) {
+        if (positions.isEmpty()) {
+            return
+        }
+
         animatorSet?.run { if (isStarted) end() }
         val animatorList = mutableListOf<Animator>()
 
         positions.forEach { position ->
             binding.list.findViewHolderForAdapterPosition(position)?.apply {
                 val imageView: ImageView = when {
-                    sortByHeaderViewModel.isList -> itemView.findViewById(R.id.thumbnail)
+                    sortByHeaderViewModel.isList -> itemView.findViewById(R.id.selected_icon)
                     else -> {
                         itemView.setBackgroundResource(R.drawable.background_item_grid_selected)
                         itemView.findViewById(R.id.selected_icon)
@@ -319,7 +323,7 @@ class UploadFolderActivity : PasscodeActivity(), Scrollable {
                 override fun onAnimationStart(animation: Animator?) {}
 
                 override fun onAnimationEnd(animation: Animator?) {
-                    viewModel.finishSelection()
+                    viewModel.checkSelection()
                 }
 
                 override fun onAnimationCancel(animation: Animator?) {}

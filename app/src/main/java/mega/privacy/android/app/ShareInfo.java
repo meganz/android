@@ -33,8 +33,6 @@ import mega.privacy.android.app.lollipop.PdfViewerActivityLollipop;
 import static mega.privacy.android.app.utils.FileUtil.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 
-import androidx.documentfile.provider.DocumentFile;
-
 
 /*
  * Helper class to process shared files from other activities

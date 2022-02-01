@@ -17,23 +17,10 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.databinding.ItemFolderContentGridBinding
 import mega.privacy.android.app.listeners.OptionalRequestListener
 import mega.privacy.android.app.uploadFolder.list.data.FolderContent
-import mega.privacy.android.app.utils.Util
 
 class FolderContentGridHolder(
     private val binding: ItemFolderContentGridBinding
 ) : RecyclerView.ViewHolder(binding.root) {
-
-    companion object {
-        private const val THUMBNAIL_PADDING = 1F
-        private const val PLACEHOLDER_HORIZONTAL_PADDING = 39F
-        private const val PLACEHOLDER_TOP_PADDING = 22F
-        private const val PLACEHOLDER_BOTTOM_PADDING = 21F
-    }
-
-    private val thumbnailPadding by lazy { Util.dp2px(THUMBNAIL_PADDING) }
-    private val placeHolderHorizontalPadding by lazy { Util.dp2px(PLACEHOLDER_HORIZONTAL_PADDING) }
-    private val placeHolderTopPadding by lazy { Util.dp2px(PLACEHOLDER_TOP_PADDING) }
-    private val placeHolderBottomPadding by lazy { Util.dp2px(PLACEHOLDER_BOTTOM_PADDING) }
 
     fun bind(item: FolderContent.Data) {
         binding.apply {
@@ -51,23 +38,20 @@ class FolderContentGridHolder(
                     text = item.name
                 }
 
+                fileIcon.isVisible = false
                 fileThumbnail.isVisible = false
                 thumbnailSeparator.isVisible = false
                 fileName.isVisible = false
             } else {
                 folderThumbnail.isVisible = false
                 folderName.isVisible = false
+                fileIcon.apply {
+                    isVisible = true
+                    setImageResource(MimeTypeThumbnail.typeForName(item.name).iconResourceId)
+                }
                 fileThumbnail.apply {
-                    setPadding(
-                        placeHolderHorizontalPadding,
-                        placeHolderTopPadding,
-                        placeHolderHorizontalPadding,
-                        placeHolderBottomPadding
-                    )
-
                     setImageURI(null as Uri?)
                     isVisible = true
-                    hierarchy.setPlaceholderImage(MimeTypeThumbnail.typeForName(item.name).iconResourceId)
 
                     val type = MimeTypeList.typeForName(item.name)
                     if (type.isVideo || type.isImage) {
@@ -113,10 +97,8 @@ class FolderContentGridHolder(
     }
 
     private fun ItemFolderContentGridBinding.showVideo(type: MimeTypeList) {
-        fileThumbnail.apply {
-            setPadding(thumbnailPadding, thumbnailPadding, thumbnailPadding, 0)
-
-            if (type.isVideo) {
+        if (type.isVideo) {
+            fileThumbnail.apply {
                 videoView.isVisible = true
                 videoIcon.isVisible = true
             }

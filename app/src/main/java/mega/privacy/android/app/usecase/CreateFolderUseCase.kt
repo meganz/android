@@ -40,11 +40,13 @@ class CreateFolderUseCase @Inject constructor(
             val folderNames = folderTree.split(File.separator)
 
             (if (folderNames.isNullOrEmpty()) listOf(folderTree)
-            else folderNames).forEach { folder ->
-                create(newParent, folder).blockingSubscribeBy(
-                    onError = { error -> emitter.onError(error) },
-                    onSuccess = { parentResult -> newParent = parentResult }
-                )
+            else folderNames).forEach { folderName ->
+                if (folderName.isNotEmpty()) {
+                    create(newParent, folderName).blockingSubscribeBy(
+                        onError = { error -> emitter.onError(error) },
+                        onSuccess = { parentResult -> newParent = parentResult }
+                    )
+                }
             }
 
             emitter.onSuccess(newParent)

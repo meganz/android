@@ -20,7 +20,8 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/folder_name"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        tools:ignore="ContentDescription" />
 
     <TextView
         android:id="@+id/folder_name"
@@ -35,6 +36,17 @@
         app:layout_constraintStart_toEndOf="@+id/folder_thumbnail"
         app:layout_constraintTop_toTopOf="parent"
         tools:text="Folder 02" />
+
+    <ImageView
+        android:id="@+id/file_icon"
+        android:layout_width="96dp"
+        android:layout_height="96dp"
+        android:scaleType="fitCenter"
+        app:layout_constraintBottom_toBottomOf="@+id/file_thumbnail"
+        app:layout_constraintEnd_toEndOf="@+id/file_thumbnail"
+        app:layout_constraintStart_toStartOf="@+id/file_thumbnail"
+        app:layout_constraintTop_toTopOf="@+id/file_thumbnail"
+        tools:ignore="ContentDescription" />
 
     <com.facebook.drawee.view.SimpleDraweeView
         android:id="@+id/file_thumbnail"

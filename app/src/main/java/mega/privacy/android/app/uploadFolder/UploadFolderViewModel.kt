@@ -39,6 +39,7 @@ class UploadFolderViewModel @Inject constructor(
     private var order: Int = MegaApiJava.ORDER_DEFAULT_ASC
     private var isList: Boolean = true
     private var query: String? = null
+    private var isPendingToFinishSelection = false
     private var folderContent = HashMap<FolderContent.Data?, MutableList<FolderContent>>()
     private var searchResults =
         HashMap<FolderContent.Data, HashMap<String, MutableList<FolderContent>>>()
@@ -180,18 +181,25 @@ class UploadFolderViewModel @Inject constructor(
         }
 
         selectedItems.value?.apply {
-            if (itemClicked.isSelected) {
-                remove(index)
-            } else {
-                add(index)
+            when {
+                !itemClicked.isSelected -> add(index)
+                size == 1 -> isPendingToFinishSelection = true
+                else -> remove(index)
             }
+        }
 
+        if (!isPendingToFinishSelection) {
             selectedItems.notifyObserver()
+            finishSelection()
         }
     }
 
-    fun finishSelection() {
+    private fun finishSelection(remove: Boolean = false) {
         val finalList = mutableListOf<FolderContent>()
+
+        if (remove) {
+            selectedItems.value?.clear()
+        }
 
         folderItems.value?.apply {
             for (item in this) {
@@ -210,12 +218,20 @@ class UploadFolderViewModel @Inject constructor(
         folderItems.value = finalList
     }
 
+    fun checkSelection() {
+        if (isPendingToFinishSelection) {
+            isPendingToFinishSelection = false
+            finishSelection(true)
+            selectedItems.notifyObserver()
+        }
+    }
+
     fun clearSelected(): List<Int> {
         val positions = mutableListOf<Int>().apply {
             addAll(selectedItems.value!!)
         }
 
-        selectedItems.value?.clear()
+        finishSelection(true)
         return positions
     }
 

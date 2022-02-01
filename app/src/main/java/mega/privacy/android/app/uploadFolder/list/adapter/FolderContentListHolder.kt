@@ -1,6 +1,7 @@
 package mega.privacy.android.app.uploadFolder.list.adapter
 
 import android.net.Uri
+import androidx.core.view.isVisible
 import androidx.recyclerview.widget.RecyclerView
 import com.facebook.imagepipeline.request.ImageRequest
 import com.facebook.imagepipeline.request.ImageRequestBuilder
@@ -15,23 +16,28 @@ class FolderContentListHolder(
 
     fun bind(item: FolderContent.Data) {
         binding.apply {
-            if (item.isFolder) {
-                thumbnail.apply {
-                    hierarchy.setPlaceholderImage(R.drawable.ic_folder_list)
-                    setActualImageResource(if (item.isSelected) R.drawable.ic_select_folder else R.drawable.ic_folder_list)
-                }
-            } else {
-                thumbnail.apply {
-                    hierarchy.setPlaceholderImage(MimeTypeList.typeForName(item.name).iconResourceId)
+            val isSelected = item.isSelected
+            selectedIcon.isVisible = isSelected
 
-                    if (item.isSelected) {
-                        setActualImageResource(R.drawable.ic_select_folder)
+            thumbnail.apply {
+                isVisible = !isSelected
+
+                if (!isSelected) {
+                    if (item.isFolder) {
+                        hierarchy.setPlaceholderImage(R.drawable.ic_folder_list)
+                        setActualImageResource(R.drawable.ic_folder_list)
                     } else {
-                        setImageURI(null as Uri?)
-                        setImageRequest(
-                            ImageRequestBuilder.fromRequest(ImageRequest.fromUri(item.uri))
-                                .setLocalThumbnailPreviewsEnabled(true).build()
-                        )
+                        hierarchy.setPlaceholderImage(MimeTypeList.typeForName(item.name).iconResourceId)
+
+                        if (item.isSelected) {
+                            setActualImageResource(R.drawable.ic_select_folder)
+                        } else {
+                            setImageURI(null as Uri?)
+                            setImageRequest(
+                                ImageRequestBuilder.fromRequest(ImageRequest.fromUri(item.uri))
+                                    .setLocalThumbnailPreviewsEnabled(true).build()
+                            )
+                        }
                     }
                 }
             }
