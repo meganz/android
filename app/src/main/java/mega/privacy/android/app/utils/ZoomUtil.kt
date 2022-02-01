@@ -36,9 +36,9 @@ object ZoomUtil {
 
     // Span count landscape
     private const val SPAN_COUNT_LANDSCAPE_OUT_2X = 24
-    private const val SPAN_COUNT_LANDSCAPE_OUT_1X = 7
+    private const val SPAN_COUNT_LANDSCAPE_OUT_1X = 9
     private const val SPAN_COUNT_LANDSCAPE_DEFAULT = 5
-    private const val SPAN_COUNT_LANDSCAPE_IN_1X = SPAN_COUNT_PORTRAIT_IN_1X
+    private const val SPAN_COUNT_LANDSCAPE_IN_1X = 2
 
     private fun getPortraitSpanCount(zoom: Int) = when (zoom) {
         ZOOM_IN_1X -> SPAN_COUNT_PORTRAIT_IN_1X
@@ -108,15 +108,20 @@ object ZoomUtil {
         }
     }
 
-    fun getItemWidth(context: Context, outMetrics: DisplayMetrics, zoom: Int, spanCount: Int) =
-            if (zoom == ZOOM_IN_1X) {
-                outMetrics.widthPixels
-            } else {
-                ((outMetrics.widthPixels - getMargin(
-                        context,
-                        zoom
-                ) * spanCount * 2) - getMargin(context, zoom) * 2) / spanCount
-            }
+    fun getItemWidth(context: Context, outMetrics: DisplayMetrics, zoom: Int, spanCount: Int, isPortrait: Boolean) =
+        if (zoom == ZOOM_IN_1X && isPortrait) {
+            outMetrics.widthPixels
+        } else if (zoom == ZOOM_IN_1X) {
+            (outMetrics.widthPixels - getMargin(
+                context,
+                zoom
+            ) * spanCount * 2) / spanCount
+        } else {
+            ((outMetrics.widthPixels - getMargin(
+                context,
+                zoom
+            ) * spanCount * 2) - getMargin(context, zoom) * 2) / spanCount
+        }
 
     fun resetZoomLevel() {
         PHOTO_ZOOM_LEVEL = ZOOM_DEFAULT

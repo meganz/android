@@ -5,6 +5,7 @@ import android.graphics.PixelFormat
 import android.util.DisplayMetrics
 import android.view.SurfaceHolder
 import android.view.SurfaceView
+import com.github.barteksc.pdfviewer.util.MathUtils.min
 import mega.privacy.android.app.meeting.MegaSurfaceRenderer
 import mega.privacy.android.app.utils.Constants.INVALID_DIMENSION
 import mega.privacy.android.app.utils.VideoCaptureUtils
@@ -33,7 +34,6 @@ class IndividualCallVideoListener(
     private var bitmap: Bitmap? = null
     private var viewWidth = 0
     private var viewHeight = 0
-    private var isFrontCameraInUse = true
 
     fun setAlpha(alpha: Int) {
         renderer.setAlpha(alpha)
@@ -53,42 +53,49 @@ class IndividualCallVideoListener(
 
         // viewWidth != surfaceView.width || viewHeight != surfaceView.height
         // Re-calculate the camera preview ratio when surface view size changed
-        if((isFloatingWindow &&
-                    (this.width != width || this.height != height || viewWidth != renderer.surfaceWidth || viewHeight != renderer.surfaceHeight)) ||
-            (!isFloatingWindow && (this.width != width || this.height != height))){
-
+        if (this.width != width || this.height != height
+            || viewWidth != surfaceView.width || viewHeight != surfaceView.height) {
             this.width = width
             this.height = height
-
-            viewWidth = renderer.surfaceWidth
-            viewHeight = renderer.surfaceHeight
-
             val holder = surfaceView.holder
-            if (holder != null) {
+
+            if(holder != null){
                 val viewWidth = surfaceView.width
                 val viewHeight = surfaceView.height
 
                 if (viewWidth != 0 && viewHeight != 0) {
+                    var holderWidth = min(viewWidth, width)
+                    var holderHeight = holderWidth * viewHeight / viewWidth
+
+                    if (holderHeight > viewHeight) {
+                        holderHeight = viewHeight
+                        holderWidth = holderHeight * viewWidth / viewHeight
+                    }
+
                     bitmap = renderer.createBitmap(width, height)
+
+                    if(!isLocal){
+                        holder.setFixedSize(holderWidth, holderHeight)
+                    }
+
                 } else {
                     this.width = INVALID_DIMENSION
                     this.height = INVALID_DIMENSION
                 }
             }
-
-            isFrontCameraInUse = VideoCaptureUtils.isFrontCameraInUse()
         }
 
         if (bitmap == null) return
 
         bitmap!!.copyPixelsFromBuffer(ByteBuffer.wrap(byteBuffer))
         if (VideoCaptureUtils.isVideoAllowed()) {
-            renderer.drawBitmapForMeeting(false, isLocal && isFrontCameraInUse)
+            renderer.drawBitmap(isLocal, false)
         }
     }
 
     init {
         isLocal = clientId == MEGACHAT_INVALID_HANDLE
+
         this.isFloatingWindow = isFloatingWindow
 
         if ((isFloatingWindow && isLocal) || !isOneToOneCall) {
