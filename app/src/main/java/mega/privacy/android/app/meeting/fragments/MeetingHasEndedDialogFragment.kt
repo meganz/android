@@ -8,7 +8,7 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import mega.privacy.android.app.R
 import mega.privacy.android.app.utils.StringResourcesUtils
 
-class MeetingHasEndedDialogFragment(private val clickCallback: ClickCallback) :
+class MeetingHasEndedDialogFragment(private val clickCallback: ClickCallback, private val isFromGuest: Boolean) :
     DialogFragment() {
 
     interface ClickCallback {
@@ -19,9 +19,15 @@ class MeetingHasEndedDialogFragment(private val clickCallback: ClickCallback) :
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         val builder = MaterialAlertDialogBuilder(requireContext())
 
-        builder.setMessage(StringResourcesUtils.getString(R.string.meeting_has_ended))
-            .setPositiveButton(R.string.general_cancel, null)
-            .setNegativeButton(R.string.view_meeting_chat, null)
+        if (isFromGuest) {
+            builder.setMessage(StringResourcesUtils.getString(R.string.meeting_has_ended))
+                .setPositiveButton(R.string.general_ok, null)
+
+        } else {
+            builder.setMessage(StringResourcesUtils.getString(R.string.meeting_has_ended))
+                .setPositiveButton(R.string.general_cancel, null)
+                .setNegativeButton(R.string.view_meeting_chat, null)
+        }
 
         val dialog = builder.create()
         dialog.show()
@@ -32,9 +38,11 @@ class MeetingHasEndedDialogFragment(private val clickCallback: ClickCallback) :
             dismiss()
         }
 
-        dialog.getButton(AlertDialog.BUTTON_NEGATIVE).setOnClickListener {
-            clickCallback.onViewMeetingChat()
-            dismiss()
+        if (!isFromGuest) {
+            dialog.getButton(AlertDialog.BUTTON_NEGATIVE).setOnClickListener {
+                clickCallback.onViewMeetingChat()
+                dismiss()
+            }
         }
 
         return dialog
