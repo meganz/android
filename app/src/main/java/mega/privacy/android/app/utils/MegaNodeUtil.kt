@@ -23,12 +23,8 @@ import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.core.Completable
 import io.reactivex.rxjava3.kotlin.subscribeBy
 import io.reactivex.rxjava3.schedulers.Schedulers
-import mega.privacy.android.app.DatabaseHandler
-import mega.privacy.android.app.MegaApplication
-import mega.privacy.android.app.MimeTypeList
-import mega.privacy.android.app.R
+import mega.privacy.android.app.*
 import mega.privacy.android.app.activities.WebViewActivity
-import mega.privacy.android.app.textEditor.TextEditorActivity
 import mega.privacy.android.app.components.saver.AutoPlayInfo
 import mega.privacy.android.app.constants.BroadcastConstants
 import mega.privacy.android.app.interfaces.ActivityLauncher
@@ -42,8 +38,8 @@ import mega.privacy.android.app.lollipop.FileExplorerActivityLollipop
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop.DrawerItem
 import mega.privacy.android.app.lollipop.PdfViewerActivityLollipop
-import mega.privacy.android.app.lollipop.ZipBrowserActivityLollipop
 import mega.privacy.android.app.lollipop.listeners.MultipleRequestListener
+import mega.privacy.android.app.textEditor.TextEditorActivity
 import mega.privacy.android.app.textEditor.TextEditorViewModel.Companion.EDIT_MODE
 import mega.privacy.android.app.textEditor.TextEditorViewModel.Companion.MODE
 import mega.privacy.android.app.textEditor.TextEditorViewModel.Companion.VIEW_MODE
@@ -53,14 +49,12 @@ import mega.privacy.android.app.utils.FileUtil.*
 import mega.privacy.android.app.utils.LogUtil.logDebug
 import mega.privacy.android.app.utils.LogUtil.logWarning
 import mega.privacy.android.app.utils.MegaApiUtils.isIntentAvailable
-import mega.privacy.android.app.utils.MegaNodeUtil.launchActionView
-import mega.privacy.android.app.utils.MegaNodeUtil.manageURLNode
-import mega.privacy.android.app.utils.MegaNodeUtil.openZip
 import mega.privacy.android.app.utils.StringResourcesUtils.getQuantityString
 import mega.privacy.android.app.utils.StringResourcesUtils.getString
 import mega.privacy.android.app.utils.TextUtil.isTextEmpty
 import mega.privacy.android.app.utils.TimeUtils.formatLongDateTime
 import mega.privacy.android.app.utils.Util.*
+import mega.privacy.android.app.zippreview.ui.ZipBrowserActivity
 import nz.mega.sdk.*
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 import java.io.*
@@ -514,14 +508,11 @@ object MegaNodeUtil {
      * @return The root parent MegaNode
      */
     @JvmStatic
-    fun getRootParentNode(node: MegaNode): MegaNode {
-        val megaApi = MegaApplication.getInstance().megaApi
+    fun MegaApiJava.getRootParentNode(node: MegaNode): MegaNode {
         var rootParent = node
-
-        while (megaApi.getParentNode(rootParent) != null) {
-            rootParent = megaApi.getParentNode(rootParent)
+        while (getParentNode(rootParent) != null) {
+            rootParent = getParentNode(rootParent)
         }
-
         return rootParent
     }
 
@@ -1295,7 +1286,7 @@ object MegaNodeUtil {
             val node = megaApi.getNodeByHandle(handle) ?: return null
 
             val parent = megaApi.getParentNode(node)
-            val topAncestor = getRootParentNode(node)
+            val topAncestor = megaApi.getRootParentNode(node)
 
             val inCloudDrive = topAncestor.handle == megaApi.rootNode.handle
                     || topAncestor.handle == megaApi.rubbishNode.handle
@@ -1509,12 +1500,12 @@ object MegaNodeUtil {
         zipFilePath: String,
         nodeHandle: Long
     ) {
-        val intentZip = Intent(context, ZipBrowserActivityLollipop::class.java)
+        val intentZip = Intent(context, ZipBrowserActivity::class.java)
         intentZip.putExtra(
-            ZipBrowserActivityLollipop.EXTRA_PATH_ZIP, zipFilePath
+            ZipBrowserActivity.EXTRA_PATH_ZIP, zipFilePath
         )
         intentZip.putExtra(
-            ZipBrowserActivityLollipop.EXTRA_HANDLE_ZIP, nodeHandle
+            ZipBrowserActivity.EXTRA_HANDLE_ZIP, nodeHandle
         )
 
         activityLauncher.launchActivity(intentZip)
@@ -1810,4 +1801,62 @@ object MegaNodeUtil {
             nodeDownloader(node)
         }
     }
+
+    @JvmStatic
+    fun containsMediaFile(handle: Long): Boolean {
+        val megaApi = MegaApplication.getInstance().megaApi
+        val parent = megaApi.getNodeByHandle(handle)
+        val children: List<MegaNode?>? = megaApi.getChildren(parent)
+
+        children?.forEach {
+            val mime = MimeTypeList.typeForName(it?.name)
+            if (mime.isImage || mime.isVideoReproducible) return true
+        }
+
+        return false
+    }
+
+    fun MegaNode.getFileName(): String =
+        "$base64Handle.${MimeTypeList.typeForName(name)?.extension}"
+
+    fun MegaNode.getThumbnailFileName(): String =
+        "$base64Handle${JPG_EXTENSION}"
+
+    fun MegaNode.isImage(): Boolean =
+        this.isFile && MimeTypeList.typeForName(name).isImage
+
+    fun MegaNode.isGif(): Boolean =
+        this.isFile && MimeTypeList.typeForName(name).isGIF
+
+    fun MegaNode.isVideo(): Boolean =
+        this.isFile && (MimeTypeList.typeForName(name).isVideoReproducible ||
+                MimeTypeList.typeForName(name).isMp4Video)
+
+    fun MegaNode.getLastAvailableTime(): Long =
+        when {
+            creationTime > 1 -> creationTime
+            modificationTime > 1 -> modificationTime
+            publicLinkCreationTime > 1 -> publicLinkCreationTime
+            else -> INVALID_VALUE.toLong()
+        }
+
+    /**
+     * Check if a specific MegaNode is valid for Image Viewer
+     *
+     * @return  True if it's valid, false otherwise
+     */
+    @JvmStatic
+    fun MegaNode.isValidForImageViewer(): Boolean =
+        isFile && (isImage() || isGif() || isVideo())
+
+    /**
+     * Check if a specific MegaOffline is valid for Image Viewer
+     *
+     * @return  True if it's valid, false otherwise
+     */
+    @JvmStatic
+    fun MegaOffline.isValidForImageViewer(): Boolean =
+            !isFolder && (MimeTypeList.typeForName(name).isImage
+                    || MimeTypeList.typeForName(name).isGIF
+                    || (MimeTypeList.typeForName(name).isVideoReproducible || MimeTypeList.typeForName(name).isMp4Video))
 }

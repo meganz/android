@@ -1,5 +1,6 @@
 package mega.privacy.android.app.fragments.offline
 
+import androidx.core.view.isVisible
 import mega.privacy.android.app.databinding.SortByHeaderBinding
 import mega.privacy.android.app.fragments.homepage.SortByHeaderViewModel
 
@@ -15,6 +16,7 @@ class OfflineSortedByViewHolder(
             this.orderNameStringId =
                 SortByHeaderViewModel.orderNameMap[sortByViewModel.order.third]!!
             this.sortByHeaderViewModel = sortByViewModel
+            this.enterMediaDiscovery.isVisible = false
         }
     }
 

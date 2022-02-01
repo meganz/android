@@ -570,7 +570,8 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
 
                     if (adapterList == null) {
                         logWarning("AdapterList is NULL");
-                        adapterList = new MegaListChatLollipopAdapter(context, this, chats, listView, MegaListChatLollipopAdapter.ADAPTER_RECENT_CHATS);
+                        adapterList = new MegaListChatLollipopAdapter(context, this, chats,
+                                listView, MegaListChatLollipopAdapter.ADAPTER_RECENT_CHATS);
                     } else {
                         adapterList.setChats(chats);
                     }
