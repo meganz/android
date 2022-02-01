@@ -715,7 +715,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 	RelativeLayout inboxSection;
 	RelativeLayout contactsSection;
 	RelativeLayout notificationsSection;
-	private RelativeLayout transfersSection;
+	private RelativeLayout rubbishBinSection;
 	RelativeLayout settingsSection;
 	Button upgradeAccount;
 	TextView contactsSectionText;
@@ -1770,9 +1770,10 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 		notificationsSectionText = (TextView) findViewById(R.id.notification_section_text);
         contactsSectionText = (TextView) findViewById(R.id.contacts_section_text);
 		findViewById(R.id.offline_section).setOnClickListener(this);
-		transfersSection = findViewById(R.id.transfers_section);
+		RelativeLayout transfersSection = findViewById(R.id.transfers_section);
 		transfersSection.setOnClickListener(this);
-		findViewById(R.id.rubbish_bin_section).setOnClickListener(this);
+		rubbishBinSection = findViewById(R.id.rubbish_bin_section);
+		rubbishBinSection.setOnClickListener(this);
         settingsSection = findViewById(R.id.settings_section);
         settingsSection.setOnClickListener(this);
         upgradeAccount = (Button) findViewById(R.id.upgrade_navigation_view);
@@ -4148,20 +4149,15 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 				drawerItem = getStartDrawerItem(this);
 
 				if (bNV != null) {
-					Menu bNVMenu = bNV.getMenu();
-					if (bNVMenu != null) {
-						disableNavigationViewMenu(bNVMenu);
-					}
+					disableNavigationViewMenu(bNV.getMenu());
 				}
 
 				selectDrawerItemLollipop(drawerItem);
 			} else {
 				if (bNV != null) {
-					Menu bNVMenu = bNV.getMenu();
-					if (bNVMenu != null) {
-						disableNavigationViewMenu(bNVMenu);
-					}
+					disableNavigationViewMenu(bNV.getMenu());
 				}
+
 				logDebug("Change to OFFLINE MODE");
 				clickDrawerItemLollipop(drawerItem);
 			}
@@ -4170,47 +4166,46 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 		}catch(Exception e){}
 	}
 
-	public void clickDrawerItemLollipop(DrawerItem item){
+	public void clickDrawerItemLollipop(DrawerItem item) {
 		logDebug("Item: " + item);
 		Menu bNVMenu = bNV.getMenu();
-		if (bNVMenu != null){
-			if(item==null){
-				drawerMenuItem = bNVMenu.findItem(R.id.bottom_navigation_item_cloud_drive);
-				onNavigationItemSelected(drawerMenuItem);
-				return;
+
+		if (item == null) {
+			drawerMenuItem = bNVMenu.findItem(R.id.bottom_navigation_item_cloud_drive);
+			onNavigationItemSelected(drawerMenuItem);
+			return;
+		}
+
+		drawerLayout.closeDrawer(Gravity.LEFT);
+
+		switch (item) {
+			case CLOUD_DRIVE: {
+				setBottomNavigationMenuItemChecked(CLOUD_DRIVE_BNV);
+				break;
 			}
-
-			drawerLayout.closeDrawer(Gravity.LEFT);
-
-			switch (item){
-				case CLOUD_DRIVE:{
-					setBottomNavigationMenuItemChecked(CLOUD_DRIVE_BNV);
-					break;
-				}
-				case HOMEPAGE: {
-					setBottomNavigationMenuItemChecked(HOME_BNV);
-					break;
-				}
-				case PHOTOS:{
-					setBottomNavigationMenuItemChecked(PHOTOS_BNV);
-					break;
-				}
-				case SHARED_ITEMS:{
-					setBottomNavigationMenuItemChecked(SHARED_ITEMS_BNV);
-					break;
-				}
-				case CHAT:{
-					setBottomNavigationMenuItemChecked(CHAT_BNV);
-					break;
-				}
-				case SETTINGS:
-				case SEARCH:
-				case TRANSFERS:
-				case NOTIFICATIONS:
-				case INBOX:{
-					setBottomNavigationMenuItemChecked(NO_BNV);
-					break;
-				}
+			case HOMEPAGE: {
+				setBottomNavigationMenuItemChecked(HOME_BNV);
+				break;
+			}
+			case PHOTOS: {
+				setBottomNavigationMenuItemChecked(PHOTOS_BNV);
+				break;
+			}
+			case SHARED_ITEMS: {
+				setBottomNavigationMenuItemChecked(SHARED_ITEMS_BNV);
+				break;
+			}
+			case CHAT: {
+				setBottomNavigationMenuItemChecked(CHAT_BNV);
+				break;
+			}
+			case SETTINGS:
+			case SEARCH:
+			case TRANSFERS:
+			case NOTIFICATIONS:
+			case INBOX: {
+				setBottomNavigationMenuItemChecked(NO_BNV);
+				break;
 			}
 		}
 	}
@@ -8822,6 +8817,11 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 			setNotificationsTitleSection();
 		}
 
+		if (rubbishBinSection != null) {
+			rubbishBinSection.setEnabled(false);
+			((TextView) rubbishBinSection.findViewById(R.id.rubbish_bin_section_text)).setAlpha(0.38F);
+		}
+
 		if (upgradeAccount != null) {
 			upgradeAccount.setEnabled(false);
 		}
@@ -8907,6 +8907,11 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 
 			notificationsSectionText.setAlpha(1F);
 			setNotificationsTitleSection();
+		}
+
+		if (rubbishBinSection != null) {
+			rubbishBinSection.setEnabled(true);
+			((TextView) rubbishBinSection.findViewById(R.id.rubbish_bin_section_text)).setAlpha(1F);
 		}
 
 		if (upgradeAccount != null) {
