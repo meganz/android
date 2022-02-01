@@ -738,4 +738,13 @@ abstract class BaseZoomFragment : BaseFragment(), GestureScaleCallback,
             ZoomUtil.getSpanCount(isPortrait, zoomViewModel.getCurrentZoom())
         }
     }
+
+    /**
+     * Check gridAdapter is initialized
+     *
+     * @return true is initialized, false is not initialized
+     */
+    fun isGridAdapterIsInitialized():Boolean{
+        return this::gridAdapter.isInitialized
+    }
 }
