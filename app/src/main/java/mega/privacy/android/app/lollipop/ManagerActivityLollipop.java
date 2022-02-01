@@ -27,6 +27,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.provider.ContactsContract;
+import android.text.Layout;
 import android.text.TextUtils;
 import androidx.annotation.NonNull;
 import androidx.core.content.res.ResourcesCompat;
@@ -1784,10 +1785,13 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
         	new ViewTreeObserver.OnPreDrawListener() {
         		@Override
 				public boolean onPreDraw() {
-					if (addPhoneNumberButton.getLayout().getLineCount() > 1) {
-						findViewById(R.id.navigation_drawer_add_phone_number_icon).setVisibility(View.GONE);
+					Layout buttonLayout = addPhoneNumberButton.getLayout();
+					if (buttonLayout != null) {
+						if (buttonLayout.getLineCount() > 1) {
+							findViewById(R.id.navigation_drawer_add_phone_number_icon).setVisibility(View.GONE);
+						}
+						addPhoneNumberButton.getViewTreeObserver().removeOnPreDrawListener(this);
 					}
-					addPhoneNumberButton.getViewTreeObserver().removeOnPreDrawListener(this);
 					return false;
 				}
 			}
