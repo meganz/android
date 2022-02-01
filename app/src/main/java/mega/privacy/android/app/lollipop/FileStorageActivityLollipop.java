@@ -47,6 +47,8 @@ import android.widget.Toast;
 
 import org.jetbrains.annotations.NotNull;
 
+import com.anggrayudi.storage.file.DocumentFileUtils;
+import com.anggrayudi.storage.file.StorageId;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
 import java.io.File;
@@ -90,6 +92,7 @@ public class FileStorageActivityLollipop extends PasscodeActivity implements OnC
 	public static final String PICK_FOLDER_TYPE = "PICK_FOLDER_TYPE";
 	private static final int REQUEST_SAVE_RK = 1122;
 	private static final int REQUEST_PICK_CU_FOLDER = 1133;
+	private static final int REQUEST_PICK_DOWNLOAD_FOLDER = 1144;
 
 	public enum PickFolderType {
 		CU_FOLDER("CU_FOLDER"),
@@ -376,7 +379,9 @@ public class FileStorageActivityLollipop extends PasscodeActivity implements OnC
 
 		prefs = dbH.getPreferences();
 
-		if (fromSaveRecoveryKey && isAndroid11OrUpper()) {
+		if (pickFolderType == PickFolderType.DOWNLOAD_FOLDER) {
+			openPickDownloadFolderFromSystem();
+		} else if (fromSaveRecoveryKey && isAndroid11OrUpper()) {
 			createRKFile();
 		} else if (isCUOrMUFolder && isAndroid11OrUpper()) {
 			openPickCUFolderFromSystem();
@@ -422,6 +427,14 @@ public class FileStorageActivityLollipop extends PasscodeActivity implements OnC
 	private void openPickCUFolderFromSystem() {
 		startActivityForResult(new Intent(Intent.ACTION_OPEN_DOCUMENT_TREE)
 				.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION), REQUEST_PICK_CU_FOLDER);
+	}
+
+	/**
+	 * Opens the file picker in order to allow the user choose a default download location.
+	 */
+	private void openPickDownloadFolderFromSystem() {
+		startActivityForResult(new Intent(Intent.ACTION_OPEN_DOCUMENT_TREE)
+				.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION), REQUEST_PICK_DOWNLOAD_FOLDER);
 	}
 
 	/**
@@ -1130,6 +1143,27 @@ public class FileStorageActivityLollipop extends PasscodeActivity implements OnC
 
 			//If resultCode is not Activity.RESULT_OK, means cancelled, so only finish.
 			finish();
+		} else if (requestCode == REQUEST_PICK_DOWNLOAD_FOLDER) {
+			if (intent != null && resultCode == Activity.RESULT_OK) {
+				Uri uri = intent.getData();
+				getContentResolver().takePersistableUriPermission(uri, Intent.FLAG_GRANT_READ_URI_PERMISSION | Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
+				DocumentFile documentFile = DocumentFile.fromTreeUri(this, uri);
+				if (documentFile == null) {
+					logError("Documentfile is null");
+					finish();
+					return;
+				}
+
+				path = new File(DocumentFileUtils.getAbsolutePath(documentFile, this));
+				if (DocumentFileUtils.getId(documentFile) != StorageId.PRIMARY) {
+					dbH.setSDCardUri(uri.toString());
+				}
+
+				finishPickFolder();
+			} else {
+				//If resultCode is not Activity.RESULT_OK, means cancelled, so only finish.
+				finish();
+			}
 		}
     }
 

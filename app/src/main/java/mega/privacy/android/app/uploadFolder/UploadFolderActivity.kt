@@ -417,7 +417,7 @@ class UploadFolderActivity : PasscodeActivity(), Scrollable {
                 setResult(RESULT_CANCELED)
                 finish()
             }
-            .setNegativeButton(StringResourcesUtils.getString(R.string.general_cancel)) { _, _ ->
+            .setNegativeButton(StringResourcesUtils.getString(R.string.general_dismiss)) { _, _ ->
                 cancelUploadsDialog?.dismiss()
                 viewModel.proceedWithUpload()
             }

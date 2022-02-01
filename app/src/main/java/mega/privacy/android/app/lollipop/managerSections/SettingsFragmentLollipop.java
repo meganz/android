@@ -147,11 +147,6 @@ public class SettingsFragmentLollipop extends SettingsBaseFragment {
         storageCategory = findPreference(CATEGORY_STORAGE);
         nestedDownloadLocation = findPreference(KEY_STORAGE_DOWNLOAD);
         nestedDownloadLocation.setOnPreferenceClickListener(this);
-
-        if (isAndroid11OrUpper()) {
-            storageCategory.removePreference(nestedDownloadLocation);
-        }
-
         fileManagementPrefence = findPreference(KEY_STORAGE_FILE_MANAGEMENT);
         fileManagementPrefence.setOnPreferenceClickListener(this);
 

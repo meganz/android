@@ -558,10 +558,6 @@ public class FileUtil {
     }
 
     public static String getDownloadLocation() {
-        if (isAndroid11OrUpper()) {
-            return buildDefaultDownloadDir(MegaApplication.getInstance()).getAbsolutePath();
-        }
-
         DatabaseHandler dbH = DatabaseHandler.getDbHandler(MegaApplication.getInstance());
         MegaPreferences prefs = dbH.getPreferences();
 
