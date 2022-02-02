@@ -437,7 +437,7 @@ class ImageViewerActivity : BaseActivity(), PermissionRequester, SnackbarShower 
                     !item.isFromRubbishBin && (imageItem.isOffline || (imageItem.isFromChat() && (imageItem.nodeItem.hasOwnerAccess || !imageItem.nodePublicLink.isNullOrBlank())))
 
                 findItem(R.id.action_download)?.isVisible =
-                    !item.isFromRubbishBin
+                    !item.isFromRubbishBin && item.handle > INVALID_HANDLE
 
                 findItem(R.id.action_save_gallery)?.isVisible =
                     isSaveToGalleryCompatible() && !item.isExternalNode && !item.isFromRubbishBin
@@ -449,7 +449,7 @@ class ImageViewerActivity : BaseActivity(), PermissionRequester, SnackbarShower 
                     isOnline && !item.isExternalNode && item.node != null && !item.isFromRubbishBin && viewModel.isUserLoggedIn() && item.hasReadAccess
 
                 findItem(R.id.action_more)?.isVisible =
-                    item.handle != INVALID_HANDLE
+                    item.handle > INVALID_HANDLE
             }
         } else {
             logWarning("Null MegaNodeItem")
