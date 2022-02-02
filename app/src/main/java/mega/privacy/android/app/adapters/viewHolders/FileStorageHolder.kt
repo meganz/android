@@ -12,7 +12,7 @@ class FileStorageHolder(private val binding: ItemFileStorageBinding) :
     RecyclerView.ViewHolder(binding.root) {
 
 
-    fun bind(context: Context, item: FileGalleryItem, firstItem: Boolean) {
+    fun bind(context: Context, item: FileGalleryItem) {
         binding.apply {
             if (item.isImage) {
                 imageThumbnail.isVisible = true

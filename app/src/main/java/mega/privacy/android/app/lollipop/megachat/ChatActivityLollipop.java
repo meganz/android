@@ -174,6 +174,7 @@ import mega.privacy.android.app.utils.StringResourcesUtils;
 import mega.privacy.android.app.utils.TextUtil;
 import mega.privacy.android.app.utils.TimeUtils;
 import mega.privacy.android.app.utils.Util;
+import nz.mega.documentscanner.DocumentScannerActivity;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaChatApi;
@@ -203,6 +204,7 @@ import nz.mega.sdk.MegaTransfer;
 import nz.mega.sdk.MegaTransferData;
 import nz.mega.sdk.MegaUser;
 
+import static android.view.MotionEvent.ACTION_DOWN;
 import static android.view.ViewGroup.LayoutParams.MATCH_PARENT;
 import static android.view.ViewGroup.LayoutParams.WRAP_CONTENT;
 import static mega.privacy.android.app.activities.GiphyPickerActivity.GIF_DATA;
@@ -842,6 +844,9 @@ public class ChatActivityLollipop extends PasscodeActivity
         enableCallMenuItems(true);
     }
 
+    /**
+     * Method for detecting when the keyboard is opened or closed
+     */
     public void setKeyboardVisibilityListener() {
         final View parentView = ((ViewGroup) findViewById(android.R.id.content)).getChildAt(0);
         if (parentView == null) {
@@ -862,10 +867,9 @@ public class ChatActivityLollipop extends PasscodeActivity
                 parentView.getWindowVisibleDisplayFrame(rect);
                 int heightDiff = parentView.getRootView().getHeight() - (rect.bottom - rect.top);
                 boolean isShown = heightDiff >= estimatedKeyboardHeight;
-
-                if (isShown == alreadyOpen) {
+                if (isShown == alreadyOpen)
                     return;
-                }
+
                 alreadyOpen = isShown;
 
                 if (emojiKeyboard != null) {
@@ -1239,6 +1243,7 @@ public class ChatActivityLollipop extends PasscodeActivity
         hideEditMsgLayout();
 
         expandCollapseInputTextLayout.setOnClickListener(this);
+        expandCollapseInputTextIcon.setOnClickListener(this);
         expandCollapseInputTextLayout.setVisibility(View.GONE);
 
         emptyLayout = findViewById(R.id.empty_messages_layout);
@@ -1418,7 +1423,9 @@ public class ChatActivityLollipop extends PasscodeActivity
         });
 
         textChat.setOnTouchListener((v, event) -> {
-            showLetterKB();
+            if (event.getAction() == ACTION_DOWN) {
+                showLetterKB();
+            }
             return true;
         });
 
@@ -3661,6 +3668,15 @@ public class ChatActivityLollipop extends PasscodeActivity
             }
         } else if (requestCode == REQUEST_CODE_PICK_GIF && resultCode == RESULT_OK && intent != null) {
             sendGiphyMessageFromGifData(intent.getParcelableExtra(GIF_DATA));
+        } else if (requestCode == REQUEST_CODE_SCAN_DOCUMENT) {
+            if (resultCode == RESULT_OK) {
+                String savedDestination = intent.getStringExtra(DocumentScannerActivity.EXTRA_PICKED_SAVE_DESTINATION);
+                Intent fileIntent = new Intent(this, FileExplorerActivityLollipop.class);
+                fileIntent.setAction(FileExplorerActivityLollipop.ACTION_UPLOAD_TO_CHAT);
+                fileIntent.putExtra(Intent.EXTRA_STREAM, intent.getData());
+                fileIntent.setType(intent.getType());
+                startActivity(fileIntent);
+            }
         } else{
             logError("Error onActivityResult");
         }
@@ -3983,6 +3999,7 @@ public class ChatActivityLollipop extends PasscodeActivity
                 break;
 
             case R.id.expand_input_text_rl:
+            case R.id.expand_input_text_icon:
                 isInputTextExpanded = !isInputTextExpanded;
                 checkExpandOrCollapseInputText();
                 break;
@@ -4410,7 +4427,12 @@ public class ChatActivityLollipop extends PasscodeActivity
         cancelEdit.setVisibility(View.GONE);
     }
 
-    private void editMsgUI(String written){
+    /**
+     * Method to display the UI for editing a message
+     *
+     * @param written text to be edited
+     */
+    private void editMsgUI(String written) {
         editMsgLayout.setVisibility(View.VISIBLE);
         cancelEdit.setVisibility(View.VISIBLE);
         editMsgText.setText(written);
@@ -7663,8 +7685,6 @@ public class ChatActivityLollipop extends PasscodeActivity
     }
 
     public void showSendAttachmentBottomSheet(){
-        logDebug("showSendAttachmentBottomSheet");
-
         if (isBottomSheetDialogShown(bottomSheetDialogFragment)) return;
 
         bottomSheetDialogFragment = new SendAttachmentChatBottomSheetDialogFragment();
@@ -7672,8 +7692,6 @@ public class ChatActivityLollipop extends PasscodeActivity
     }
 
     public void showUploadingAttachmentBottomSheet(AndroidMegaChatMessage message, int position){
-        logDebug("showUploadingAttachmentBottomSheet: "+position);
-
         if (message == null || message.getPendingMessage() == null
                 || message.getPendingMessage().getState() == PendingMessageSingle.STATE_COMPRESSING
                 || isBottomSheetDialogShown(bottomSheetDialogFragment)) {
@@ -7714,6 +7732,11 @@ public class ChatActivityLollipop extends PasscodeActivity
         if (isBottomSheetDialogShown(bottomSheetDialogFragment)) {
             return;
         }
+
+        if (emojiKeyboard != null) {
+            emojiKeyboard.hideBothKeyboard(this);
+        }
+
         bottomSheetDialogFragment = new ChatRoomToolbarBottomSheetDialogFragment();
         bottomSheetDialogFragment.show(getSupportFragmentManager(),
                 bottomSheetDialogFragment.getTag());
@@ -7724,6 +7747,10 @@ public class ChatActivityLollipop extends PasscodeActivity
 
         if (message == null || isBottomSheetDialogShown(bottomSheetDialogFragment))
             return;
+
+        if (emojiKeyboard != null) {
+            emojiKeyboard.hideBothKeyboard(this);
+        }
 
         selectedMessageId = message.getMessage().getMsgId();
 
@@ -7804,6 +7831,14 @@ public class ChatActivityLollipop extends PasscodeActivity
         }
 
         return INVALID_POSITION;
+    }
+
+    public void scanDocument() {
+        String[] saveDestinations = {
+                StringResourcesUtils.getString(R.string.section_chat)
+        };
+        Intent intent = DocumentScannerActivity.getIntent(this, saveDestinations);
+        startActivityForResult(intent, REQUEST_CODE_SCAN_DOCUMENT);
     }
 
     /**
@@ -9290,7 +9325,13 @@ public class ChatActivityLollipop extends PasscodeActivity
             return;
         }
         if (msgsReceived != null && msgsReceived.size() > 0) {
-            unreadBadgeText.setText(msgsReceived.size() + "");
+            int numOfNewMessages = msgsReceived.size();
+            numOfNewMessages = numOfNewMessages - 99;
+            if (numOfNewMessages > 0) {
+                unreadBadgeText.setText("+" + (msgsReceived.size() - numOfNewMessages));
+            } else {
+                unreadBadgeText.setText(msgsReceived.size() + "");
+            }
             unreadBadgeLayout.setVisibility(View.VISIBLE);
         } else {
             unreadBadgeLayout.setVisibility(View.GONE);

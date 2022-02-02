@@ -1,97 +1,137 @@
 package mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet
 
 import android.Manifest
-import android.annotation.SuppressLint
-import android.app.Dialog
 import android.content.pm.PackageManager
 import android.os.Build
+import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
+import android.view.ViewGroup
 import android.widget.LinearLayout
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.material.bottomsheet.BottomSheetBehavior
+import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import mega.privacy.android.app.R
 import mega.privacy.android.app.adapters.FileStorageAdapter
 import mega.privacy.android.app.databinding.BottomSheetChatRoomToolbarBinding
+import mega.privacy.android.app.interfaces.ChatRoomToolbarBottomSheetDialogActionListener
 import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop
 import mega.privacy.android.app.lollipop.megachat.FileGalleryItem
-import mega.privacy.android.app.lollipop.tasks.FetchDeviceGalleryTask
-import mega.privacy.android.app.modalbottomsheet.BaseBottomSheetDialogFragment
-import mega.privacy.android.app.utils.Constants
-import mega.privacy.android.app.utils.FileUtil
-import mega.privacy.android.app.utils.Util
+import mega.privacy.android.app.utils.*
 import java.util.*
 
-class ChatRoomToolbarBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
+/**
+ * Bottom Sheet Dialog which shows the chat options
+ */
+class ChatRoomToolbarBottomSheetDialogFragment : BottomSheetDialogFragment() {
 
     private lateinit var binding: BottomSheetChatRoomToolbarBinding
+
     private var downloadLocationDefaultPath: String? = null
     private var mPhotoUris: ArrayList<FileGalleryItem>? = null
     private lateinit var adapter: FileStorageAdapter
 
     lateinit var mainLinearLayout :LinearLayout
+    private lateinit var listener: ChatRoomToolbarBottomSheetDialogActionListener
 
-    @SuppressLint("SetTextI18n", "RestrictedApi")
-    override fun setupDialog(dialog: Dialog, style: Int) {
-        super.setupDialog(dialog, style)
 
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View {
+        binding = BottomSheetChatRoomToolbarBinding.inflate(layoutInflater, container, false)
         downloadLocationDefaultPath = FileUtil.getDownloadLocation()
-
-        binding = BottomSheetChatRoomToolbarBinding.inflate(
-            LayoutInflater.from(context),
-            null,
-            false
-        )
-        val chatActivity = requireActivity() as ChatActivityLollipop
-
-        contentView = binding.root
         mainLinearLayout = binding.linearLayout
 
         mPhotoUris = ArrayList<FileGalleryItem>()
 
+        checkPermissionsDialog()
+
+        return binding.root
+    }
+
+    override fun onStart() {
+        super.onStart()
+
+        val dialog = dialog ?: return
+        BottomSheetBehavior.from(dialog.findViewById(R.id.design_bottom_sheet)).state =
+            BottomSheetBehavior.STATE_EXPANDED
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        setupButtons()
+        //setupListView()
+        //setupListAdapter()
+
+        super.onViewCreated(view, savedInstanceState)
+    }
+
+    /**
+     * Setup option buttons according to the current MegaUser.
+     *
+     * @param megaUser  MegaUser to be shown
+     */
+    private fun setupButtons() {
+        val chatActivity = requireActivity() as ChatActivityLollipop
+
         binding.optionGallery.setOnClickListener{
             chatActivity.sendFromFileSystem()
-            setStateBottomSheetBehaviorHidden()
+            dismiss()
+
         }
 
         binding.optionFile.setOnClickListener{
             chatActivity.sendFromCloud()
-            setStateBottomSheetBehaviorHidden()
+            dismiss()
+
         }
 
         binding.optionVoice.setOnClickListener{
             chatActivity.optionCall(false)
-            setStateBottomSheetBehaviorHidden()
+            dismiss()
+
         }
 
         binding.optionVideo.setOnClickListener{
             chatActivity.optionCall(true)
-            setStateBottomSheetBehaviorHidden()
+            dismiss()
+
         }
 
         binding.optionScan.setOnClickListener{
-            setStateBottomSheetBehaviorHidden()
+            chatActivity.scanDocument()
+            dismiss()
+
         }
 
         binding.optionGif.setOnClickListener{
             chatActivity.sendGif()
-            setStateBottomSheetBehaviorHidden()
+            dismiss()
+
         }
 
         binding.optionLocation.setOnClickListener{
             chatActivity.sendLocation()
-            setStateBottomSheetBehaviorHidden()
+            dismiss()
+
         }
 
         binding.optionContact.setOnClickListener{
             chatActivity.chooseContactsDialog()
-            setStateBottomSheetBehaviorHidden()
-        }
+            dismiss()
 
-        setupListView()
-        setupListAdapter()
+        }
+    }
+
+    /**
+     * Show node permission dialog to ask for Node permissions.
+     */
+    private fun checkPermissionsDialog() {
+        val chatActivity = requireActivity() as ChatActivityLollipop
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             val hasStoragePermission = ContextCompat.checkSelfPermission(
@@ -105,14 +145,10 @@ class ChatRoomToolbarBottomSheetDialogFragment : BaseBottomSheetDialogFragment()
                     Constants.REQUEST_READ_STORAGE
                 )
             } else {
-                uploadGallery()
+               // uploadGallery()
             }
         }
 
-        dialog.setContentView(contentView)
-
-        //mBehavior = BottomSheetBehavior.from(mainLinearLayout.parent as View)
-        //mBehavior.state = BottomSheetBehavior.STATE_EXPANDED
     }
 
     private fun setupListView() {
@@ -137,7 +173,7 @@ class ChatRoomToolbarBottomSheetDialogFragment : BaseBottomSheetDialogFragment()
 
     fun uploadGallery() {
         setNodes(mPhotoUris!!)
-        FetchDeviceGalleryTask(context).execute()
+        //FetchDeviceGalleryTask(context).execute()
         checkAdapterItems(false)
     }
 

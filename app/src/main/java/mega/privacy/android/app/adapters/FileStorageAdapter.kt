@@ -26,7 +26,7 @@ class FileStorageAdapter (
     }
 
     override fun onBindViewHolder(holder: FileStorageHolder, position: Int) {
-        holder.bind(context, files!![position], false)
+        holder.bind(context, files!![position])
         holder.itemView.setOnClickListener(this@FileStorageAdapter)
     }
 

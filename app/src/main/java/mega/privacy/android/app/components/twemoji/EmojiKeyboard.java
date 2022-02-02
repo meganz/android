@@ -77,12 +77,12 @@ public class EmojiKeyboard extends LinearLayout {
         requestLayout();
     }
 
-    public void initEmoji(Activity context, EmojiEditTextInterface editText, ImageButton emojiIcon) {
+    public void initEmoji(Activity activity, EmojiEditTextInterface editText, ImageButton emojiIcon) {
         this.editInterface = editText;
         this.emojiIcon = emojiIcon;
         DisplayMetrics outMetrics = new DisplayMetrics();
-        context.getWindowManager().getDefaultDisplay().getMetrics(outMetrics);
-        initializeCommonVariables(TYPE_EMOJI, (outMetrics.heightPixels / 2) - getActionBarHeight(context, getResources()));
+        activity.getWindowManager().getDefaultDisplay().getMetrics(outMetrics);
+        initializeCommonVariables(TYPE_EMOJI, (outMetrics.heightPixels / 2) - getActionBarHeight(activity, getResources()));
     }
 
     public void initReaction(int height) {
@@ -182,7 +182,6 @@ public class EmojiKeyboard extends LinearLayout {
     public void hideLetterKeyboard() {
         if (!isLetterKeyboardShown || !(editInterface instanceof View)) return;
 
-        logDebug("hideLetterKeyboard() ");
         View view = (View) editInterface;
         view.clearFocus();
         Util.hideKeyboardView(view.getContext(), view, 0);
