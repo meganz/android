@@ -14,6 +14,13 @@ import mega.privacy.android.app.fragments.homepage.SortByHeaderViewModel
 import mega.privacy.android.app.uploadFolder.list.data.FolderContent
 import mega.privacy.android.app.utils.AdapterUtils.isValidPosition
 
+/**
+ * RecyclerView's ListAdapter to show FolderContent.
+ *
+ * @property sortByViewModel     ViewModel to manage changes on "Sort by" header.
+ * @property onClickCallback     Callback to be called when an item is clicked.
+ * @property onLongClickCallback Callback to be called when an item is long clicked.
+ */
 class FolderContentAdapter(
     private val sortByViewModel: SortByHeaderViewModel,
     private val onClickCallback: (FolderContent.Data, Int) -> Unit,
@@ -120,6 +127,14 @@ class FolderContentAdapter(
     override fun getSectionTitle(position: Int): String =
         getItem(position).getSectionTitle()
 
+    /**
+     * Gets the numbers of spans a grid holder should occupy. It depends on the type of view holder:
+     * VIEW_TYPE_HEADER and VIEW_TYPE_GRID_SEPARATOR should occupy all the spans of the row (spanCount),
+     * otherwise only one span.
+     *
+     * @param spanCount The number of spans of each row.
+     * @return The number of spans a grid holder should ocuppy.
+     */
     fun getSpanSizeLookup(spanCount: Int): SpanSizeLookup =
         object : SpanSizeLookup() {
             override fun getSpanSize(position: Int): Int =

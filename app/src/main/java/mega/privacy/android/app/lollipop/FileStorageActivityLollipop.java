@@ -4,22 +4,18 @@ import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.ContentResolver;
-import android.content.Context;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.net.Uri;
-import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
-import android.os.Looper;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.ActionBar;
-import androidx.appcompat.view.ActionMode;
 import androidx.core.content.FileProvider;
 import androidx.core.text.HtmlCompat;
 import androidx.documentfile.provider.DocumentFile;
@@ -193,8 +189,6 @@ public class FileStorageActivityLollipop extends PasscodeActivity implements OnC
 	private boolean isSetDownloadLocationShown;
 	private boolean confirmationChecked;
 
-	private Handler handler;
-
 	private boolean pickingFromSDCard;
 	private boolean isChoosingStorage;
 
@@ -280,8 +274,6 @@ public class FileStorageActivityLollipop extends PasscodeActivity implements OnC
 					REQUEST_WRITE_STORAGE,
 					Manifest.permission.WRITE_EXTERNAL_STORAGE);
 		}
-
-	    handler = new Handler();
 
 		setContentView(R.layout.activity_filestorage);
 		
@@ -659,12 +651,6 @@ public class FileStorageActivityLollipop extends PasscodeActivity implements OnC
 	public void onConfigurationChanged(Configuration newConfig) {
 		super.onConfigurationChanged(newConfig);
 		emptyImageView.setImageResource(isScreenInPortrait(this) ? R.drawable.empty_folder_portrait : R.drawable.empty_folder_landscape);
-	}
-
-	@Override
-	protected void onDestroy() {
-		super.onDestroy();
-		handler.removeCallbacksAndMessages(null);
 	}
 
 	@Override
@@ -1087,63 +1073,19 @@ public class FileStorageActivityLollipop extends PasscodeActivity implements OnC
 				logDebug("Folder picked from system picker");
 				Uri uri = intent.getData();
 				getContentResolver().takePersistableUriPermission(uri, Intent.FLAG_GRANT_READ_URI_PERMISSION);
+				boolean isPrimary = setPathAndCheckIfIsPrimary(uri);
 
-				SDCardOperator operator = null;
-
-				try {
-					operator = new SDCardOperator(this);
-				} catch (SDCardOperator.SDCardException e) {
-					logError("Error creating SDCardOperator", e);
-				}
-
-				if (operator != null) {
-					String volumePath = operator.getSDCardRoot();
-
-					if (volumePath != null) {
-						final String[] split = volumePath.split(File.separator);
-						if (split.length > 0 && uri.toString().contains(split[split.length - 1])) {
-							//SD card folder
-							String pathString = getFullPathFromTreeUri(uri, this);
-
-							if (isTextEmpty(pathString)) {
-								logWarning("getFullPathFromTreeUri is Null.");
-								return;
-							}
-
-							path = new File(pathString);
-
-							if (pickFolderType.equals(PickFolderType.CU_FOLDER)) {
-								dbH.setCameraFolderExternalSDCard(true);
-								dbH.setUriExternalSDCard(uri.toString());
-							} else if (pickFolderType.equals(PickFolderType.MU_FOLDER)) {
-								dbH.setMediaFolderExternalSdCard(true);
-								dbH.setUriMediaExternalSdCard(uri.toString());
-							}
-
-							finishPickFolder();
-							return;
-						}
-					} else {
-						logWarning("volumePath is null");
-					}
-				} else {
-					logDebug("operator is null");
-				}
-
-				//Primary storage
-				if (isAndroid11OrUpper()) {
-					//This is always true since REQUEST_PICK_CU_FOLDER is only requested in that situation
-					StorageManager storageManager = (StorageManager) getSystemService(Context.STORAGE_SERVICE);
-					File file = storageManager.getStorageVolume(uri).getDirectory();
-					String[] split = uri.getPath().split(":");
-
-					if (file != null && split.length == 2) {
-						path = new File(file.getAbsolutePath() + File.separator + split[1]);
-						finishPickFolder();
-					} else {
-						logError("Error getting primary storage path");
+				if (!isPrimary) {
+					if (pickFolderType.equals(PickFolderType.CU_FOLDER)) {
+						dbH.setCameraFolderExternalSDCard(true);
+						dbH.setUriExternalSDCard(uri.toString());
+					} else if (pickFolderType.equals(PickFolderType.MU_FOLDER)) {
+						dbH.setMediaFolderExternalSdCard(true);
+						dbH.setUriMediaExternalSdCard(uri.toString());
 					}
 				}
+
+				finishPickFolder();
 			}
 
 			//If resultCode is not Activity.RESULT_OK, means cancelled, so only finish.
@@ -1152,15 +1094,9 @@ public class FileStorageActivityLollipop extends PasscodeActivity implements OnC
 			if (intent != null && resultCode == Activity.RESULT_OK) {
 				Uri uri = intent.getData();
 				getContentResolver().takePersistableUriPermission(uri, Intent.FLAG_GRANT_READ_URI_PERMISSION | Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
-				DocumentFile documentFile = DocumentFile.fromTreeUri(this, uri);
-				if (documentFile == null) {
-					logError("Documentfile is null");
-					finish();
-					return;
-				}
+				boolean isPrimary = setPathAndCheckIfIsPrimary(uri);
 
-				path = new File(DocumentFileUtils.getAbsolutePath(documentFile, this));
-				if (DocumentFileUtils.getId(documentFile) != StorageId.PRIMARY) {
+				if (!isPrimary) {
 					dbH.setSDCardUri(uri.toString());
 				}
 
@@ -1171,6 +1107,25 @@ public class FileStorageActivityLollipop extends PasscodeActivity implements OnC
 			}
 		}
     }
+
+	/**
+	 * Sets as path the picked folder and checks if the chosen path is in the primary storage.
+	 *
+	 * @param uri The Uri to set as path.
+	 * @return True if the chosen path is in the primary storage, false otherwise.
+	 */
+	private boolean setPathAndCheckIfIsPrimary(Uri uri) {
+		DocumentFile documentFile = DocumentFile.fromTreeUri(this, uri);
+		if (documentFile == null) {
+			logError("DocumentFile is null");
+			finish();
+			return true;
+		}
+
+		path = new File(DocumentFileUtils.getAbsolutePath(documentFile, this));
+
+		return DocumentFileUtils.getId(documentFile).equals(StorageId.PRIMARY);
+	}
 
 	/**
 	 * Shows a warning indicating no SD card was detected.

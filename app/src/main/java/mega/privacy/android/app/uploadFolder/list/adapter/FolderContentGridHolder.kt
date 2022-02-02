@@ -18,6 +18,11 @@ import mega.privacy.android.app.databinding.ItemFolderContentGridBinding
 import mega.privacy.android.app.listeners.OptionalRequestListener
 import mega.privacy.android.app.uploadFolder.list.data.FolderContent
 
+/**
+ * RecyclerView's ViewHolder to show FolderContent Data info in a grid view.
+ *
+ * @property binding    Item's view binding
+ */
 class FolderContentGridHolder(
     private val binding: ItemFolderContentGridBinding
 ) : RecyclerView.ViewHolder(binding.root) {
@@ -96,6 +101,11 @@ class FolderContentGridHolder(
         }
     }
 
+    /**
+     * If the item is a video, then shows the video items.
+     *
+     * @param type MimeTypeList object to check if the item is a video.
+     */
     private fun ItemFolderContentGridBinding.showVideo(type: MimeTypeList) {
         if (type.isVideo) {
             fileThumbnail.apply {

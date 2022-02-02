@@ -126,7 +126,7 @@ class UploadFolderActivity : PasscodeActivity(), Scrollable {
                     viewModel.search(query)
                 }
 
-                val query = viewModel.getQuery()
+                val query = viewModel.query
 
                 if (!isActionViewExpanded && query != null) {
                     expandActionView()
@@ -196,13 +196,11 @@ class UploadFolderActivity : PasscodeActivity(), Scrollable {
         showProgress(true)
     }
 
-    private fun uploadContent(uploadItems: ArrayList<UploadFolderResult>) {
-        if (!isAlertDialogShown(cancelUploadsDialog)) {
-            setResult(RESULT_OK, Intent().putExtra(UPLOAD_RESULTS, uploadItems))
-            finish()
-        }
-    }
-
+    /**
+     * Shows or hides the progress view.
+     *
+     * @param show True if should show it, false otherwise.
+     */
     private fun showProgress(show: Boolean) {
         binding.progressBar.isVisible = show
         val shadow = if (show) SHADOW else 1f
@@ -243,10 +241,20 @@ class UploadFolderActivity : PasscodeActivity(), Scrollable {
         })
     }
 
+    /**
+     * Updates the action bar title with the current folder name.
+     *
+     * @param currentFolder Current folder.
+     */
     private fun showCurrentFolder(currentFolder: FolderContent.Data) {
         supportActionBar?.title = currentFolder.name
     }
 
+    /**
+     * Shows the content of the current folder.
+     *
+     * @param folderContent Content to show.
+     */
     private fun showFolderContent(folderContent: List<FolderContent>) {
         if (viewModel.isSearchInProgress()) {
             return
@@ -261,11 +269,16 @@ class UploadFolderActivity : PasscodeActivity(), Scrollable {
             postDelayed({ showProgress(false) }, WAIT_TIME_TO_UPDATE)
         }
 
-        if (viewModel.getQuery() == null && this::searchMenuItem.isInitialized) {
+        if (viewModel.query == null && this::searchMenuItem.isInitialized) {
             searchMenuItem.isVisible = !isEmpty
         }
     }
 
+    /**
+     * Updates the action mode depending on if there are selected items or not.
+     *
+     * @param selectedItems List of selected items.
+     */
     private fun updateActionMode(selectedItems: List<Int>) {
         when {
             selectedItems.isEmpty() -> {
@@ -296,6 +309,24 @@ class UploadFolderActivity : PasscodeActivity(), Scrollable {
         actionMode?.title = selectedItems.size.toString()
     }
 
+    /**
+     * Sets the final result of the activity and finishes it.
+     *
+     * @param uploadItems   List of UploadFolderResult to set as activity result.
+     */
+    private fun uploadContent(uploadItems: ArrayList<UploadFolderResult>) {
+        if (!isAlertDialogShown(cancelUploadsDialog)) {
+            setResult(RESULT_OK, Intent().putExtra(UPLOAD_RESULTS, uploadItems))
+            finish()
+        }
+    }
+
+    /**
+     * Performs the click on some item.
+     *
+     * @param itemClicked   Clicked item.
+     * @param position      Position of the clicked item in the adapter.
+     */
     private fun onClick(itemClicked: FolderContent.Data, position: Int) {
         when {
             binding.progressBar.isVisible -> return
@@ -310,6 +341,12 @@ class UploadFolderActivity : PasscodeActivity(), Scrollable {
         }
     }
 
+    /**
+     * Performs the long click on some item.
+     *
+     * @param itemClicked   Clicked item.
+     * @param position      Position of the clicked item in the adapter.
+     */
     private fun onLongClick(itemClicked: FolderContent.Data, position: Int) {
         when {
             binding.progressBar.isVisible -> return
@@ -320,6 +357,11 @@ class UploadFolderActivity : PasscodeActivity(), Scrollable {
         }
     }
 
+    /**
+     * Animates some positions of the adapter when they are selected or un-selected.
+     *
+     * @param positions Adapter positions to animate.
+     */
     private fun animate(positions: List<Int>) {
         if (positions.isEmpty()) {
             return
@@ -368,6 +410,11 @@ class UploadFolderActivity : PasscodeActivity(), Scrollable {
         }
     }
 
+    /**
+     * Switches the view from list to grid and vice versa.
+     *
+     * @param isList True if the view should be list, false if should be grid.
+     */
     private fun switchListGrid(isList: Boolean) {
         binding.list.apply {
             if (isList) {
@@ -389,21 +436,6 @@ class UploadFolderActivity : PasscodeActivity(), Scrollable {
             }
         }
     }
-
-    override fun checkScroll() {
-        val showElevation =
-            binding.list.canScrollVertically(RecyclerView.NO_POSITION) || actionMode != null
-                    || binding.progressBar.isVisible
-
-        binding.appBar.elevation = if (showElevation) elevation else 0F
-
-        if (Util.isDarkMode(this@UploadFolderActivity)) {
-            val color = if (showElevation) elevationColor else noElevationColor
-            window.statusBarColor = color
-            binding.toolbar.setBackgroundColor(color)
-        }
-    }
-
 
     /**
      * Shows a confirmation dialog before cancel all scanning transfers.
@@ -427,5 +459,19 @@ class UploadFolderActivity : PasscodeActivity(), Scrollable {
                 setCanceledOnTouchOutside(false)
                 show()
             }
+    }
+
+    override fun checkScroll() {
+        val showElevation =
+            binding.list.canScrollVertically(RecyclerView.NO_POSITION) || actionMode != null
+                    || binding.progressBar.isVisible
+
+        binding.appBar.elevation = if (showElevation) elevation else 0F
+
+        if (Util.isDarkMode(this@UploadFolderActivity)) {
+            val color = if (showElevation) elevationColor else noElevationColor
+            window.statusBarColor = color
+            binding.toolbar.setBackgroundColor(color)
+        }
     }
 }

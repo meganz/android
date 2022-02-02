@@ -10,6 +10,11 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.databinding.ItemFolderContentBinding
 import mega.privacy.android.app.uploadFolder.list.data.FolderContent
 
+/**
+ * RecyclerView's ViewHolder to show FolderContent Data info in a list view.
+ *
+ * @property binding    Item's view binding
+ */
 class FolderContentListHolder(
     private val binding: ItemFolderContentBinding
 ) : RecyclerView.ViewHolder(binding.root) {

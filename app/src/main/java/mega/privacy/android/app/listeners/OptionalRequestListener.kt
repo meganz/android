@@ -3,6 +3,9 @@ package mega.privacy.android.app.listeners
 import com.facebook.imagepipeline.listener.RequestListener
 import com.facebook.imagepipeline.request.ImageRequest
 
+/**
+ * RequestListener with optional callbacks.
+ */
 class OptionalRequestListener(
     private val onProducerStart: ((String?, String?) -> Unit)? = null,
     private val onProducerEvent: ((String?, String?, String?) -> Unit)? = null,

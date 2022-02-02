@@ -40,7 +40,7 @@ class UploadFolderViewModel @Inject constructor(
     private var parentHandle: Long = INVALID_HANDLE
     private var order: Int = MegaApiJava.ORDER_DEFAULT_ASC
     private var isList: Boolean = true
-    private var query: String? = null
+    var query: String? = null
     private var isPendingToFinishSelection = false
     private var uploadDisposable: Disposable? = null
     private var folderContent = HashMap<FolderContent.Data?, MutableList<FolderContent>>()
@@ -52,6 +52,14 @@ class UploadFolderViewModel @Inject constructor(
     fun getSelectedItems(): LiveData<MutableList<Int>> = selectedItems
     fun getUploadResults(): LiveData<ArrayList<UploadFolderResult>> = uploadResults
 
+    /**
+     * Initializes the view model with the initial data.
+     *
+     * @param documentFile  DocumentFile picked.
+     * @param parentHandle  Handle of the parent node in which the content will be uploaded.
+     * @param order         Current order.
+     * @param isList        True if the view is list, false if it is grid.
+     */
     fun retrieveFolderContent(
         documentFile: DocumentFile,
         parentHandle: Long,
@@ -67,17 +75,35 @@ class UploadFolderViewModel @Inject constructor(
         setFolderItems()
     }
 
+    /**
+     * Checks if it is processing the upload.
+     *
+     * @return True if the upload disposable is not null, false otherwise.
+     */
     fun isProcessingUpload(): Boolean = uploadDisposable != null
 
-    fun getQuery(): String? = query
-
+    /**
+     * Checks if there is a search in progress.
+     *
+     * @return True if there is a search in progress, false otherwise.
+     */
     fun isSearchInProgress(): Boolean =
         !query.isNullOrEmpty() && !isSearchAlreadyDone()
 
+
+    /**
+     * Checks if a search has been already done.
+     *
+     * @return True if the search has been alredy done, false otherwise.
+     */
     private fun isSearchAlreadyDone(): Boolean =
         searchResults.containsKey(currentFolder.value)
                 && searchResults[currentFolder.value]!!.containsKey(query)
 
+    /**
+     * Updates the current folder items with the current folder content.
+     * If the content is already get, only sets it. If not, requests it.
+     */
     private fun setFolderItems() {
         val items = folderContent[currentFolder.value]
         if (items != null) {
@@ -98,11 +124,21 @@ class UploadFolderViewModel @Inject constructor(
             .addTo(composite)
     }
 
+    /**
+     * Performs a click in a folder item.
+     *
+     * @param folderClicked The clicked folder.
+     */
     fun folderClick(folderClicked: FolderContent.Data) {
         currentFolder.value = folderClicked
         setFolderItems()
     }
 
+    /**
+     * Performs the back action.
+     *
+     * @return True if it is already in the parent folder, false otherwise.
+     */
     fun back(): Boolean =
         if (currentFolder.value?.parent == null) {
             true
@@ -112,6 +148,11 @@ class UploadFolderViewModel @Inject constructor(
             false
         }
 
+    /**
+     * Updates the order.
+     *
+     * @param newOrder The new order to set.
+     */
     fun setOrder(newOrder: Int) {
         if (newOrder != order) {
             order = newOrder
@@ -146,6 +187,11 @@ class UploadFolderViewModel @Inject constructor(
         }
     }
 
+    /**
+     * Updates the view type.
+     *
+     * @param newIsList True if the new view type is list, false if is grid.
+     */
     fun setIsList(newIsList: Boolean) {
         if (newIsList != isList) {
             isList = newIsList
@@ -180,6 +226,12 @@ class UploadFolderViewModel @Inject constructor(
         }
     }
 
+    /**
+     * Performs a long click in an item and adds or removes an item to the selected list
+     * depending on its previous state.
+     *
+     * @param itemClicked   The clicked item.
+     */
     fun itemLongClick(itemClicked: FolderContent.Data) {
         val index = folderItems.value?.lastIndexOf(itemClicked) ?: INVALID_INDEX
         if (index == INVALID_INDEX) {
@@ -200,6 +252,11 @@ class UploadFolderViewModel @Inject constructor(
         }
     }
 
+    /**
+     * Finishes the select action, updating the selected items in the folder items.
+     *
+     * @param remove True if the selection has been removed, false otherwise.
+     */
     private fun finishSelection(remove: Boolean = false) {
         val finalList = mutableListOf<FolderContent>()
 
@@ -224,6 +281,9 @@ class UploadFolderViewModel @Inject constructor(
         folderItems.value = finalList
     }
 
+    /**
+     * Checks if it is pending to finish the select mode. If so, finishes it.
+     */
     fun checkSelection() {
         if (isPendingToFinishSelection) {
             isPendingToFinishSelection = false
@@ -232,6 +292,9 @@ class UploadFolderViewModel @Inject constructor(
         }
     }
 
+    /**
+     * Removes all selections.
+     */
     fun clearSelected(): List<Int> {
         val positions = mutableListOf<Int>().apply {
             addAll(selectedItems.value!!)
@@ -241,6 +304,12 @@ class UploadFolderViewModel @Inject constructor(
         return positions
     }
 
+    /**
+     * Performs a search in the folder content.
+     * If the search is already done, only updates the folder items. If not, requests it.
+     *
+     * @param newQuery  Text to set as filter.
+     */
     fun search(newQuery: String?) {
         query = newQuery
 
@@ -265,6 +334,14 @@ class UploadFolderViewModel @Inject constructor(
         }
     }
 
+    /**
+     * Updates the folder items with the search result and includes it if needed in the map of
+     * search results.
+     *
+     * @param folder        Folder in which the search was carried out.
+     * @param query         Text used as filter.
+     * @param searchResult  List of the content as the search result.
+     */
     private fun addSearchValue(
         folder: FolderContent.Data,
         query: String,
@@ -283,8 +360,13 @@ class UploadFolderViewModel @Inject constructor(
         folderItems.value = searchResult
     }
 
+    /**
+     * Begins the process to upload the selected or all the current folder items.
+     *
+     * @param context   Required to get the absolute path of items.
+     */
     fun upload(context: Context) {
-        uploadDisposable = getFolderContentUseCase.getUris(
+        uploadDisposable = getFolderContentUseCase.getContentToUpload(
             context,
             parentHandle,
             parentFolder,
@@ -299,10 +381,16 @@ class UploadFolderViewModel @Inject constructor(
             .addTo(composite)
     }
 
+    /**
+     * Cancels the current upload process.
+     */
     fun cancelUpload() {
         uploadDisposable?.dispose()
     }
 
+    /**
+     * If the upload results are already get, then notifies the observer to proceed with the upload.
+     */
     fun proceedWithUpload() {
         if (!uploadResults.value.isNullOrEmpty()) {
             uploadResults.notifyObserver()

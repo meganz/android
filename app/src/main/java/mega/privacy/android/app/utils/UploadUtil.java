@@ -106,9 +106,12 @@ public class UploadUtil {
     }
 
     /**
-     * Opens the system file picker to choose a folder to upload.
+     * Opens the UploadFolderActivity to choose a folder content to upload.
      *
-     * @param activity Activity to start the Intent.
+     * @param activity     Activity to start the Intent.
+     * @param resultCode   Result code of the onActivityResult.
+     * @param data         Intent received in onActivityResult with the picked folder.
+     * @param parentHandle Parent handle in which the folder content will be uploaded.
      */
     public static void getFolder(Activity activity, int resultCode, Intent data, long parentHandle) {
         if (resultCode != RESULT_OK || data == null || data.getData() == null) {
@@ -125,6 +128,13 @@ public class UploadUtil {
                 Constants.REQUEST_CODE_GET_FOLDER_CONTENT);
     }
 
+    /**
+     * Uploads the result obtained from UploadFolderActivity.
+     *
+     * @param activity   Activity to start the Intent.
+     * @param resultCode Result code of the onActivityResult with the content to upload.
+     * @param data       Intent received in onActivityResult with the .
+     */
     @SuppressWarnings("unchecked")
     public static void uploadFolder(Activity activity, int resultCode, Intent data) {
         if (resultCode != RESULT_OK || data == null) {

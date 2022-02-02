@@ -22,11 +22,23 @@ import javax.inject.Inject
 import kotlin.collections.ArrayList
 import kotlin.collections.HashMap
 
+/**
+ * Use case to manage the content of a folder which is going to be uploaded.
+ *
+ * @property megaApi                MegaApi required to make the requests to the SDK.
+ * @property createFolderUseCase    Use case to create folders.
+ */
 class GetFolderContentUseCase @Inject constructor(
     @MegaApi private val megaApi: MegaApiAndroid,
     private val createFolderUseCase: CreateFolderUseCase
 ) {
 
+    /**
+     * Gets the content of a FolderContent Data. It should represent a folder.
+     *
+     * @param currentFolder Current FolderContent Data from which the content has to be get.
+     * @return Single with the list of FolderContent Data representing files and folders.
+     */
     private fun get(currentFolder: FolderContent.Data): Single<List<FolderContent.Data>> =
         Single.create { emitter ->
             val listFiles = currentFolder.document.listFiles()
@@ -43,6 +55,16 @@ class GetFolderContentUseCase @Inject constructor(
             }
         }
 
+    /**
+     * Gets the content of a FolderContent Data. It should represent a folder.
+     * Reorders the list as per [order] and completes the list with the FolderContent Header and
+     * FolderContent Separator if needed.
+     *
+     * @param currentFolder Current FolderContent Data from which the content has to be get.
+     * @param order         Order the list has to fulfill.
+     * @param isList        True if the view is list, false if is grid.
+     * @return Single with the list of FolderContent representing files, folders, header and separator if needed.
+     */
     fun get(
         currentFolder: FolderContent.Data,
         order: Int,
@@ -60,7 +82,17 @@ class GetFolderContentUseCase @Inject constructor(
             )
         }
 
-    private fun getUris(
+    /**
+     * Gets the content to upload.
+     *
+     * @param context       Context required to get the absolute path.
+     * @param parentNode    MegaNode in which the content will be uploaded.
+     * @param parentFolder  Name of the parent folder of the item.
+     * @param folderItem    Item to be managed.
+     * @param isSelection   True if only some of the items has to be managed, false otherwise.
+     * @return Single with a list of UploadFolderResult.
+     */
+    private fun getContentToUpload(
         context: Context,
         parentNode: MegaNode,
         parentFolder: String,
@@ -75,7 +107,7 @@ class GetFolderContentUseCase @Inject constructor(
                     onError = { error -> emitter.onError(error) },
                     onSuccess = { folderContent ->
                         folderContent.forEach { item ->
-                            getUris(context, parentNode, parentFolder, item, isSelection)
+                            getContentToUpload(context, parentNode, parentFolder, item, isSelection)
                                 .blockingSubscribeBy(onSuccess = { urisResult ->
                                     uris.addAll(urisResult)
                                 })
@@ -125,7 +157,17 @@ class GetFolderContentUseCase @Inject constructor(
             }
         }
 
-    fun getUris(
+    /**
+     * Gets the content to upload.
+     *
+     * @param context           Context required to get the absolute path.
+     * @param parentNodeHandle  Handle of the parent node in which the content will be uploaded.
+     * @param parentFolder      Name of the parent folder of the item.
+     * @param selectedItems     List of the selected items' positions if any.
+     * @param folderItems       List of the content to be uploaded.
+     * @return Single with a list of UploadFolderResult.
+     */
+    fun getContentToUpload(
         context: Context,
         parentNodeHandle: Long,
         parentFolder: String,
@@ -153,7 +195,7 @@ class GetFolderContentUseCase @Inject constructor(
                         return@create
                     }
 
-                    getUris(
+                    getContentToUpload(
                         context,
                         parentNode,
                         parentFolder,
@@ -168,7 +210,7 @@ class GetFolderContentUseCase @Inject constructor(
                     }
 
                     if (item is FolderContent.Data) {
-                        getUris(context, parentNode, parentFolder, item, false)
+                        getContentToUpload(context, parentNode, parentFolder, item, false)
                             .blockingSubscribeBy(onSuccess = { result -> results.addAll(result) })
                     }
                 }
@@ -181,6 +223,16 @@ class GetFolderContentUseCase @Inject constructor(
             }
         }
 
+    /**
+     * Reorders the list as per [order] and completes it with the FolderContent Header
+     * and FolderContent Separator if needed.
+     * The FolderContent Separator is only included if the view type is grid.
+     *
+     * @param folderItems   List of folder content, only FolderContent Data.
+     * @param order         Order the list has to fulfill.
+     * @param isList        True if the view is list, false if is grid.
+     * @return Single with the completed and reordered list.
+     */
     private fun completeAndReorder(
         folderItems: List<FolderContent.Data>,
         order: Int,
@@ -198,6 +250,15 @@ class GetFolderContentUseCase @Inject constructor(
             )
         }
 
+    /**
+     * Reorders the list as per [order] and completes it with the a FolderContent Separator if needed.
+     * The FolderContent Separator is only included if the view type is grid.
+     *
+     * @param folderItems   List of folder content, only FolderContent Header abd FolderContent Data.
+     * @param order         Order the list has to fulfill.
+     * @param isList        True if the view is list, false if is grid.
+     * @return Single with the completed and reordered list.
+     */
     fun reorder(
         folderItems: MutableList<FolderContent>,
         order: Int,
@@ -259,6 +320,15 @@ class GetFolderContentUseCase @Inject constructor(
             }
         }
 
+    /**
+     * Reorders the map as per [order] and completes it with the a FolderContent Separator if needed.
+     * The FolderContent Separator is only included if the view type is grid.
+     *
+     * @param folderContent Map of folder content.
+     * @param order         Order the list has to fulfill.
+     * @param isList        True if the view is list, false if is grid.
+     * @return Single with the completed and reordered map.
+     */
     fun reorder(
         folderContent: HashMap<FolderContent.Data?, MutableList<FolderContent>>,
         currentFolder: FolderContent.Data?,
@@ -284,6 +354,14 @@ class GetFolderContentUseCase @Inject constructor(
             emitter.onSuccess(folderContent)
         }
 
+    /**
+     * Adds or removes the FolderContent Separator in the list depending on if the current view type
+     * is list or grid.
+     *
+     * @param folderItems   List of folder content.
+     * @param isList        True if the view type is list, false if is grid.
+     * @return Single with the updated list.
+     */
     fun switchView(
         folderItems: MutableList<FolderContent>,
         isList: Boolean
@@ -331,6 +409,15 @@ class GetFolderContentUseCase @Inject constructor(
             emitter.onSuccess(folderItems)
         }
 
+    /**
+     * Adds or removes the FolderContent Separator in the map depending on if the current view type
+     * is list or grid.
+     *
+     * @param folderContent Map of folder content.
+     * @param currentFolder Current folder to avoid processing it again.
+     * @param isList        True if the view type is list, false if is grid.
+     * @return Single with the updated map.
+     */
     fun switchView(
         folderContent: HashMap<FolderContent.Data?, MutableList<FolderContent>>,
         currentFolder: FolderContent.Data?,
@@ -355,6 +442,13 @@ class GetFolderContentUseCase @Inject constructor(
             emitter.onSuccess(folderContent)
         }
 
+    /**
+     * Filters the folder content by name as per the received [query].
+     *
+     * @param query         Text which has to appear in all the search results.
+     * @param currentFolder Current folder in which the search has to be carried out.
+     * @return Single with the list of filtered FolderContent Data representing files and folders.
+     */
     private fun search(
         query: String,
         currentFolder: FolderContent.Data
@@ -387,6 +481,15 @@ class GetFolderContentUseCase @Inject constructor(
             }
         }
 
+    /**
+     * Filters the folder content by name as per the received [query].
+     *
+     * @param query         Text which has to appear in all the search results.
+     * @param currentFolder Current folder in which the search has to be carried out.
+     * @param order         Order the list has to fulfill.
+     * @param isList        True if the view type is list, false if is grid.
+     * @return Single with the filtered list of FolderContent representing files, folders, header and separator if needed.
+     */
     fun search(
         query: String,
         currentFolder: FolderContent.Data,
