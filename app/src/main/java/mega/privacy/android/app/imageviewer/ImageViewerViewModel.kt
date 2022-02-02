@@ -115,9 +115,9 @@ class ImageViewerViewModel @Inject constructor(
             .subscribeAndUpdateImages()
     }
 
-    fun retrieveSingleImage(imageUri: Uri) {
-        getImageHandlesUseCase.get(imageUri = imageUri)
-            .subscribeAndUpdateImages()
+    fun retrieveFileImage(imageUri: Uri, showNearbyFiles: Boolean? = false, currentNodeHandle: Long? = null) {
+        getImageHandlesUseCase.get(imageFileUri = imageUri, showNearbyFiles = showNearbyFiles)
+            .subscribeAndUpdateImages(currentNodeHandle)
     }
 
     fun retrieveImagesFromParent(

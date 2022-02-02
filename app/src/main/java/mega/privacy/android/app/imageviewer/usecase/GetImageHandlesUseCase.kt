@@ -3,6 +3,7 @@ package mega.privacy.android.app.imageviewer.usecase
 import android.content.Context
 import android.net.Uri
 import androidx.core.net.toFile
+import androidx.core.net.toUri
 import dagger.hilt.android.qualifiers.ApplicationContext
 import io.reactivex.rxjava3.core.Single
 import mega.privacy.android.app.di.MegaApi
@@ -10,6 +11,8 @@ import mega.privacy.android.app.imageviewer.data.ImageItem
 import mega.privacy.android.app.usecase.GetChatMessageUseCase
 import mega.privacy.android.app.usecase.GetNodeUseCase
 import mega.privacy.android.app.usecase.data.MegaNodeItem
+import mega.privacy.android.app.utils.FileUtil
+import mega.privacy.android.app.utils.LogUtil.logWarning
 import mega.privacy.android.app.utils.MegaNodeUtil.isValidForImageViewer
 import mega.privacy.android.app.utils.RxUtil.blockingGetOrNull
 import mega.privacy.android.app.utils.TextUtil
@@ -18,6 +21,7 @@ import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 import nz.mega.sdk.MegaApiJava.ORDER_PHOTO_ASC
 import nz.mega.sdk.MegaNode
+import java.io.File
 import javax.inject.Inject
 
 /**
@@ -37,14 +41,15 @@ class GetImageHandlesUseCase @Inject constructor(
 ) {
 
     /**
-     * Use case to retrieve image node handles given different sources
+     * Use case to retrieve ImageItems given different sources
      *
      * @param nodeHandles       Image node handles
      * @param parentNodeHandle  Parent node to retrieve every other child
      * @param nodeFileLinks     Node public link
      * @param chatRoomId        Node Chat Message Room Id
      * @param chatMessageIds    Node Chat Message Ids
-     * @param imageUri          Image file uri
+     * @param imageFileUri      Image file uri
+     * @param showNearbyFiles   Show nearby image files from current parent file
      * @param sortOrder         Node search order
      * @param isOffline         Flag to check if it's offline node
      * @return                  Single with image nodes
@@ -55,9 +60,10 @@ class GetImageHandlesUseCase @Inject constructor(
         nodeFileLinks: List<String>? = null,
         chatRoomId: Long? = null,
         chatMessageIds: LongArray? = null,
-        imageUri: Uri? = null,
+        imageFileUri: Uri? = null,
+        showNearbyFiles: Boolean? = false,
         sortOrder: Int? = ORDER_PHOTO_ASC,
-        isOffline: Boolean = false
+        isOffline: Boolean? = false
     ): Single<List<ImageItem>> =
         Single.fromCallable {
             val items = mutableListOf<ImageItem>()
@@ -71,7 +77,7 @@ class GetImageHandlesUseCase @Inject constructor(
                     }
                 }
                 nodeHandles?.isNotEmpty() == true -> {
-                    if (isOffline) {
+                    if (isOffline == true) {
                         items.addOfflineNodeHandles(nodeHandles)
                     } else {
                         items.addNodeHandles(nodeHandles)
@@ -81,8 +87,8 @@ class GetImageHandlesUseCase @Inject constructor(
                     items.addNodeFileLinks(nodeFileLinks)
                 chatRoomId != null && chatMessageIds?.isNotEmpty() == true ->
                     items.addChatChildren(chatRoomId, chatMessageIds)
-                imageUri != null ->
-                    items.addImageUri(imageUri)
+                imageFileUri != null ->
+                    items.addFileImageUris(imageFileUri, showNearbyFiles)
                 else -> {
                     error("Invalid parameters")
                 }
@@ -167,28 +173,48 @@ class GetImageHandlesUseCase @Inject constructor(
     }
 
     /**
-     * Add Image Uri to a list of ImageItem given its image file uri
+     * Add Images to a list of ImageItem given an image file uri
      *
-     * @param imageUri  Image file uri to retrieve image from
+     * @param imageFileUri      Image file uri to retrieve images from
+     * @param showNearbyFiles   Show nearby image files from current parent file
      */
-    private fun MutableList<ImageItem>.addImageUri(imageUri: Uri) {
-        val file = imageUri.toFile()
-        if (file.exists() && file.canRead()) {
-            val fileTime = TimeUtils.formatLongDateTime(file.lastModified())
-            val fileSize = file.length().toString()
-            val nodeItem = MegaNodeItem(
-                handle = INVALID_HANDLE,
-                name = file.name,
-                infoText = TextUtil.getFileInfo(fileSize, fileTime)
-            )
+    private fun MutableList<ImageItem>.addFileImageUris(
+        imageFileUri: Uri,
+        showNearbyFiles: Boolean? = false
+    ) {
+        var imageUris = listOf(imageFileUri)
+        if (showNearbyFiles == true) {
+            try {
+                val nearbyImages = imageFileUri.toFile().parentFile?.listFiles()?.map(File::toUri)
+                if (!nearbyImages.isNullOrEmpty()) {
+                    imageUris = nearbyImages
+                }
+            } catch (ignored: Exception) {
+                logWarning(ignored.stackTraceToString())
+            }
+        }
 
-            this.add(
-                ImageItem(
-                    INVALID_HANDLE,
-                    nodeItem = nodeItem,
-                    imageResult = getImageUseCase.getImageUri(imageUri).blockingFirst()
+        imageUris.forEach { imageUri ->
+            val file = imageUri.toFile()
+            if (file.exists() && file.canRead()) {
+                val fakeHandle = FileUtil.getFileFakeHandle(file)
+                val fileTime = TimeUtils.formatLongDateTime(file.lastModified())
+                val fileSize = file.length().toString()
+
+                this.add(
+                    ImageItem(
+                        fakeHandle,
+                        nodeItem = MegaNodeItem(
+                            handle = fakeHandle,
+                            name = file.name,
+                            infoText = TextUtil.getFileInfo(fileSize, fileTime)
+                        ),
+                        imageResult = getImageUseCase.getImageUri(imageUri).blockingFirst()
+                    )
                 )
-            )
+            } else {
+                logWarning("File ($file) can't be read or doesn't exist")
+            }
         }
     }
 }
