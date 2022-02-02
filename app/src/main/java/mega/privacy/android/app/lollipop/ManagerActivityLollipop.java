@@ -445,12 +445,12 @@ import nz.mega.sdk.MegaUserAlert;
 @AndroidEntryPoint
 @SuppressWarnings("deprecation")
 public class ManagerActivityLollipop extends TransfersManagementActivity
-        implements MegaRequestListenerInterface, MegaChatListenerInterface,
-        MegaChatRequestListenerInterface, OnNavigationItemSelectedListener,
-        MegaGlobalListenerInterface, MegaTransferListenerInterface, OnClickListener,
-        BottomNavigationView.OnNavigationItemSelectedListener, UploadBottomSheetDialogActionListener,
-        ChatManagementCallback, ActionNodeCallback, SnackbarShower,
-        MeetingBottomSheetDialogActionListener, LoadPreviewListener.OnPreviewLoadedCallback {
+		implements MegaRequestListenerInterface, MegaChatListenerInterface,
+		MegaChatRequestListenerInterface, OnNavigationItemSelectedListener,
+		MegaGlobalListenerInterface, MegaTransferListenerInterface, OnClickListener,
+		BottomNavigationView.OnNavigationItemSelectedListener, UploadBottomSheetDialogActionListener,
+		ChatManagementCallback, ActionNodeCallback, SnackbarShower,
+		MeetingBottomSheetDialogActionListener, LoadPreviewListener.OnPreviewLoadedCallback {
 
     private static final String TRANSFER_OVER_QUOTA_SHOWN = "TRANSFER_OVER_QUOTA_SHOWN";
 
@@ -11852,24 +11852,24 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
         }
     }
 
-    /**
-     * Create the instance of FileBackupManager
-     */
-    private void initFileBackupManager() {
-        fileBackupManager = new FileBackupManager(this, (actionType, operationType, result, handle) -> {
-            if (actionType == ACTION_MOVE_TO_BACKUP) {
-                if (operationType == OPERATION_EXECUTE) {
-                    showMovementResult(result, handle);
-                }
-            } else if (actionType == ACTION_BACKUP_FAB) {
-                if (operationType == OPERATION_EXECUTE) {
-                    if (isBottomSheetDialogShown(bottomSheetDialogFragment)) return;
-                    bottomSheetDialogFragment = UploadBottomSheetDialogFragment.newInstance(GENERAL_UPLOAD);
-                    bottomSheetDialogFragment.show(getSupportFragmentManager(), bottomSheetDialogFragment.getTag());
-                }
-            } else {
-                logDebug("Nothing to do for actionType = " + actionType);
-            }
-        });
-    }
+	/**
+	 * Create the instance of FileBackupManager
+	 */
+	private void initFileBackupManager() {
+		fileBackupManager = new FileBackupManager(this, (actionType, operationType, result, handle) -> {
+			if (actionType == ACTION_MOVE_TO_BACKUP) {
+				if (operationType == OPERATION_EXECUTE) {
+					showMovementResult(result, handle);
+				}
+			} else if (actionType == ACTION_BACKUP_FAB) {
+				if (operationType == OPERATION_EXECUTE) {
+					if (isBottomSheetDialogShown(bottomSheetDialogFragment)) return;
+					bottomSheetDialogFragment = UploadBottomSheetDialogFragment.newInstance(GENERAL_UPLOAD);
+					bottomSheetDialogFragment.show(getSupportFragmentManager(), bottomSheetDialogFragment.getTag());
+				}
+			} else {
+				logDebug("Nothing to do for actionType = " + actionType);
+			}
+		});
+	}
 }

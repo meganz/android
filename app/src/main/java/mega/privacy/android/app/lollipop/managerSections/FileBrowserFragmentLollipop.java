@@ -1,5 +1,6 @@
 package mega.privacy.android.app.lollipop.managerSections;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.ActivityManager;
 import android.content.Context;
@@ -53,7 +54,6 @@ import dagger.hilt.android.AndroidEntryPoint;
 import kotlin.Unit;
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
-import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.CustomizedGridLayoutManager;
@@ -133,7 +133,6 @@ public class FileBrowserFragmentLollipop extends RotatableFragment{
 	Display display;
 
 	DatabaseHandler dbH;
-	MegaPreferences prefs;
 
 	ArrayList<MegaNode> nodes;
 	public ActionMode actionMode;
@@ -457,8 +456,7 @@ public class FileBrowserFragmentLollipop extends RotatableFragment{
 
 	public static FileBrowserFragmentLollipop newInstance() {
 		logDebug("newInstance");
-		FileBrowserFragmentLollipop fragment = new FileBrowserFragmentLollipop();
-		return fragment;
+		return new FileBrowserFragmentLollipop();
 	}
 
 	@Override
@@ -491,7 +489,7 @@ public class FileBrowserFragmentLollipop extends RotatableFragment{
 	}
 
 	@Override
-	public View onCreateView(LayoutInflater inflater, final ViewGroup container, Bundle savedInstanceState) {
+	public View onCreateView(@NonNull LayoutInflater inflater, final ViewGroup container, Bundle savedInstanceState) {
 		logDebug("onCreateView");
 		if (!isAdded()) {
 			return null;
@@ -547,7 +545,7 @@ public class FileBrowserFragmentLollipop extends RotatableFragment{
 			recyclerView.addItemDecoration(new PositionDividerItemDecoration(requireContext(), getOutMetrics()));
 			recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
 				@Override
-				public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+				public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
 					super.onScrolled(recyclerView, dx, dy);
 					checkScroll();
 				}
@@ -589,7 +587,7 @@ public class FileBrowserFragmentLollipop extends RotatableFragment{
         } else {
 			logDebug("Grid View");
             v = inflater.inflate(R.layout.fragment_filebrowsergrid,container,false);
-            recyclerView = (NewGridRecyclerView)v.findViewById(R.id.file_grid_view_browser);
+            recyclerView = v.findViewById(R.id.file_grid_view_browser);
             fastScroller = v.findViewById(R.id.fastscroll);
 
             recyclerView.setPadding(0,0,0,scaleHeightPx(80,outMetrics));
@@ -601,7 +599,7 @@ public class FileBrowserFragmentLollipop extends RotatableFragment{
             recyclerView.setItemAnimator(new DefaultItemAnimator());
 			recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
 				@Override
-				public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+				public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
 					super.onScrolled(recyclerView, dx, dy);
 					checkScroll();
 				}
@@ -660,16 +658,8 @@ public class FileBrowserFragmentLollipop extends RotatableFragment{
 		observeDragSupportEvents(getViewLifecycleOwner(), recyclerView, VIEWER_FROM_FILE_BROWSER);
 	}
 
-	@Override
-    public void onAttach(Activity activity) {
-		logDebug("onAttach");
-        super.onAttach(activity);
-        context = activity;
-        aB = ((AppCompatActivity)activity).getSupportActionBar();
-    }
-
     @Override
-	public void onAttach(@NonNull Context context) {
+    public void onAttach(@NonNull Context context) {
 		logDebug("onAttach");
 
 		super.onAttach(context);
@@ -723,17 +713,16 @@ public class FileBrowserFragmentLollipop extends RotatableFragment{
 			startActivity(intent);
 			((ManagerActivityLollipop) context).overridePendingTransition(0, 0);
 		} else if (MimeTypeList.typeForName(node.getName()).isVideoReproducible() || MimeTypeList.typeForName(node.getName()).isAudio()) {
-			MegaNode file = node;
 
-			String mimeType = MimeTypeList.typeForName(file.getName()).getType();
+			String mimeType = MimeTypeList.typeForName(node.getName()).getType();
 
 			Intent mediaIntent;
 			boolean internalIntent;
 			boolean opusFile = false;
-			if (MimeTypeList.typeForName(file.getName()).isVideoNotSupported() || MimeTypeList.typeForName(file.getName()).isAudioNotSupported()) {
+			if (MimeTypeList.typeForName(node.getName()).isVideoNotSupported() || MimeTypeList.typeForName(node.getName()).isAudioNotSupported()) {
 				mediaIntent = new Intent(Intent.ACTION_VIEW);
 				internalIntent = false;
-				String[] s = file.getName().split("\\.");
+				String[] s = node.getName().split("\\.");
 				if (s != null && s.length > 1 && s[s.length - 1].equals("opus")) {
 					opusFile = true;
 				}
@@ -743,18 +732,23 @@ public class FileBrowserFragmentLollipop extends RotatableFragment{
 			}
 			mediaIntent.putExtra("position", position);
 			mediaIntent.putExtra("placeholder", adapter.getPlaceholderCount());
-			if (megaApi.getParentNode(node).getType() == MegaNode.TYPE_ROOT) {
-				mediaIntent.putExtra("parentNodeHandle", -1L);
-			} else {
-				mediaIntent.putExtra("parentNodeHandle", megaApi.getParentNode(node).getHandle());
+
+			MegaNode megaNode = megaApi.getParentNode(node);
+			if(megaNode != null) {
+				if (megaNode.getType() == MegaNode.TYPE_ROOT) {
+					mediaIntent.putExtra("parentNodeHandle", -1L);
+				} else {
+					mediaIntent.putExtra("parentNodeHandle", megaApi.getParentNode(node).getHandle());
+				}
 			}
+
 			mediaIntent.putExtra("orderGetChildren", sortOrderManagement.getOrderCloud());
 			mediaIntent.putExtra("adapterType", FILE_BROWSER_ADAPTER);
 			putThumbnailLocation(mediaIntent, recyclerView, position, VIEWER_FROM_FILE_BROWSER, adapter);
 
-			mediaIntent.putExtra("FILENAME", file.getName());
+			mediaIntent.putExtra("FILENAME", node.getName());
 
-			String localPath = getLocalFile(file);
+			String localPath = getLocalFile(node);
 
 			if (localPath != null) {
 				File mediaFile = new File(localPath);
@@ -766,7 +760,7 @@ public class FileBrowserFragmentLollipop extends RotatableFragment{
 						logDebug("itemClick:ERROR:NULLmediaFileUri");
 						((ManagerActivityLollipop) context).showSnackbar(SNACKBAR_TYPE, getString(R.string.general_text_error), -1);
 					} else {
-						mediaIntent.setDataAndType(mediaFileUri, MimeTypeList.typeForName(file.getName()).getType());
+						mediaIntent.setDataAndType(mediaFileUri, MimeTypeList.typeForName(node.getName()).getType());
 					}
 				} else {
 					Uri mediaFileUri = Uri.fromFile(mediaFile);
@@ -774,7 +768,7 @@ public class FileBrowserFragmentLollipop extends RotatableFragment{
 						logError("itemClick:ERROR:NULLmediaFileUri");
 						((ManagerActivityLollipop) context).showSnackbar(SNACKBAR_TYPE, getString(R.string.general_text_error), -1);
 					} else {
-						mediaIntent.setDataAndType(mediaFileUri, MimeTypeList.typeForName(file.getName()).getType());
+						mediaIntent.setDataAndType(mediaFileUri, MimeTypeList.typeForName(node.getName()).getType());
 					}
 				}
 				mediaIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
@@ -800,7 +794,7 @@ public class FileBrowserFragmentLollipop extends RotatableFragment{
 					megaApi.httpServerSetMaxBufferSize(MAX_BUFFER_16MB);
 				}
 
-				String url = megaApi.httpServerGetLocalLink(file);
+				String url = megaApi.httpServerGetLocalLink(node);
 				if (url != null) {
 					Uri parsedUri = Uri.parse(url);
 					if (parsedUri != null) {
@@ -814,7 +808,7 @@ public class FileBrowserFragmentLollipop extends RotatableFragment{
 					((ManagerActivityLollipop) context).showSnackbar(SNACKBAR_TYPE, getString(R.string.general_text_error), -1);
 				}
 			}
-			mediaIntent.putExtra("HANDLE", file.getHandle());
+			mediaIntent.putExtra("HANDLE", node.getHandle());
 			if (opusFile) {
 				mediaIntent.setDataAndType(mediaIntent.getData(), "audio/*");
 			}
@@ -838,23 +832,22 @@ public class FileBrowserFragmentLollipop extends RotatableFragment{
 			manageURLNode(context, megaApi, node);
 		} else if (MimeTypeList.typeForName(node.getName()).isPdf()) {
 			logDebug("itemClick:isFile:isPdf");
-			MegaNode file = node;
 
-			String mimeType = MimeTypeList.typeForName(file.getName()).getType();
+			String mimeType = MimeTypeList.typeForName(node.getName()).getType();
 
 			Intent pdfIntent = new Intent(context, PdfViewerActivityLollipop.class);
 
 			pdfIntent.putExtra("inside", true);
 			pdfIntent.putExtra("adapterType", FILE_BROWSER_ADAPTER);
 
-			String localPath = getLocalFile(file);
+			String localPath = getLocalFile(node);
 
 			if (localPath != null) {
 				File mediaFile = new File(localPath);
 				if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && localPath.contains(Environment.getExternalStorageDirectory().getPath())) {
-					pdfIntent.setDataAndType(FileProvider.getUriForFile(context, "mega.privacy.android.app.providers.fileprovider", mediaFile), MimeTypeList.typeForName(file.getName()).getType());
+					pdfIntent.setDataAndType(FileProvider.getUriForFile(context, "mega.privacy.android.app.providers.fileprovider", mediaFile), MimeTypeList.typeForName(node.getName()).getType());
 				} else {
-					pdfIntent.setDataAndType(Uri.fromFile(mediaFile), MimeTypeList.typeForName(file.getName()).getType());
+					pdfIntent.setDataAndType(Uri.fromFile(mediaFile), MimeTypeList.typeForName(node.getName()).getType());
 				}
 				pdfIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
 			} else {
@@ -875,10 +868,21 @@ public class FileBrowserFragmentLollipop extends RotatableFragment{
 					megaApi.httpServerSetMaxBufferSize(MAX_BUFFER_16MB);
 				}
 
-				String url = megaApi.httpServerGetLocalLink(file);
-				pdfIntent.setDataAndType(Uri.parse(url), mimeType);
+				String url = megaApi.httpServerGetLocalLink(node);
+				if (url != null) {
+					Uri parsedUri = Uri.parse(url);
+					if (parsedUri != null) {
+						pdfIntent.setDataAndType(parsedUri, mimeType);
+					} else {
+						logError("itemClick:ERROR:httpServerGetLocalLink");
+						((ManagerActivityLollipop) context).showSnackbar(SNACKBAR_TYPE, getString(R.string.general_text_error), -1);
+					}
+				} else {
+					logError("itemClick:ERROR:httpServerGetLocalLink");
+					((ManagerActivityLollipop) context).showSnackbar(SNACKBAR_TYPE, getString(R.string.general_text_error), -1);
+				}
 			}
-			pdfIntent.putExtra("HANDLE", file.getHandle());
+			pdfIntent.putExtra("HANDLE", node.getHandle());
 			putThumbnailLocation(pdfIntent, recyclerView, position, VIEWER_FROM_FILE_BROWSER, adapter);
 			if (isIntentAvailable(context, pdfIntent)) {
 				context.startActivity(pdfIntent);
@@ -914,7 +918,7 @@ public class FileBrowserFragmentLollipop extends RotatableFragment{
 			if (nodes.get(position).isFolder()){
 				MegaNode n = nodes.get(position);
 
-				int lastFirstVisiblePosition = 0;
+				int lastFirstVisiblePosition;
 				if(((ManagerActivityLollipop)context).isList){
 					lastFirstVisiblePosition = mLayoutManager.findFirstCompletelyVisibleItemPosition();
 					logDebug("lastFirstVisiblePosition: "+lastFirstVisiblePosition);
@@ -985,6 +989,7 @@ public class FileBrowserFragmentLollipop extends RotatableFragment{
 							+ "\'>");
                     textToShow = textToShow.replace("[/B]","</font>");
                 } catch (Exception e) {
+					logError(e.getMessage());
                 }
 				Spanned result = HtmlCompat.fromHtml(textToShow, HtmlCompat.FROM_HTML_MODE_LEGACY);
                 emptyTextViewFirst.setText(result);
@@ -1006,8 +1011,9 @@ public class FileBrowserFragmentLollipop extends RotatableFragment{
 							+ "\'>");
                     textToShow = textToShow.replace("[/B]","</font>");
                 } catch (Exception e) {
+					logError(e.getMessage());
                 }
-                Spanned result = null;
+                Spanned result;
                 if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
                     result = Html.fromHtml(textToShow,Html.FROM_HTML_MODE_LEGACY);
                 } else {
@@ -1216,8 +1222,9 @@ public class FileBrowserFragmentLollipop extends RotatableFragment{
 								+ "\'>");
 						textToShow = textToShow.replace("[/B]","</font>");
 					} catch (Exception e) {
+						logError(e.getMessage());
 					}
-					Spanned result = null;
+					Spanned result;
 					if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
 						result = Html.fromHtml(textToShow,Html.FROM_HTML_MODE_LEGACY);
 					} else {
@@ -1242,8 +1249,9 @@ public class FileBrowserFragmentLollipop extends RotatableFragment{
 								+ "\'>");
 						textToShow = textToShow.replace("[/B]","</font>");
 					} catch (Exception e) {
+						logError(e.getMessage());
 					}
-					Spanned result = null;
+					Spanned result;
 					if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
 						result = Html.fromHtml(textToShow,Html.FROM_HTML_MODE_LEGACY);
 					} else {
@@ -1288,6 +1296,7 @@ public class FileBrowserFragmentLollipop extends RotatableFragment{
     }
 
 	//refresh list when item updated
+	@SuppressLint("NotifyDataSetChanged")
 	public void refresh(long handle) {
 		if (handle == -1) {
 			return;
