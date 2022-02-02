@@ -20,6 +20,14 @@
             type="Boolean" />
 
         <variable
+            name="position"
+            type="Integer" />
+
+        <variable
+            name="holder"
+            type="mega.privacy.android.app.mediaplayer.playlist.PlaylistViewHolder" />
+
+        <variable
             name="itemOperation"
             type="mega.privacy.android.app.mediaplayer.playlist.PlaylistItemOperation" />
     </data>
@@ -28,7 +36,7 @@
         android:layout_width="match_parent"
         android:layout_height="72dp"
         android:background="@{highlight ? @color/grey_800 : @color/dark_grey }"
-        android:onClick="@{() -> itemOperation.onItemClick(item)}">
+        android:onClick="@{(view) -> itemOperation.onItemClick(view, item, holder, position)}">
 
         <com.facebook.drawee.view.SimpleDraweeView
             android:layout_width="48dp"
@@ -38,7 +46,17 @@
             android:scaleType="fitCenter"
             app:apDefaultThumbnail="@{MimeTypeList.typeForName(item.nodeName).iconResourceId}"
             app:apThumbnail="@{item.thumbnail}"
+            android:visibility="@{item.isSelected ? View.INVISIBLE : View.VISIBLE}"
             app:roundedCornerRadius="4dp" />
+
+        <ImageView
+            android:id="@+id/image_selected"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_gravity="center_vertical"
+            android:layout_marginStart="12dp"
+            android:visibility="@{item.isSelected ? View.VISIBLE : View.GONE}"
+            android:src="@drawable/ic_select_folder"/>
 
         <TextView
             android:layout_width="wrap_content"
@@ -54,17 +72,19 @@
             tools:text="Music.mp3" />
 
         <ImageView
+            android:id="@+id/transfers_list_option_reorder"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:layout_gravity="center_vertical|end"
             android:background="@null"
-            android:onClick="@{() -> itemOperation.removeItem(item)}"
             android:paddingStart="10dp"
             android:paddingEnd="10dp"
-            android:src="@drawable/ic_close_grey"
+            android:src="@drawable/ic_reorder"
+            android:onClick="@{(view) -> itemOperation.onItemClick(view, item, holder, position)}"
             app:tint="@color/white_alpha_054" />
 
         <View
+            android:id="@+id/view_decorators"
             android:layout_width="match_parent"
             android:layout_height="1dp"
             android:layout_gravity="bottom"

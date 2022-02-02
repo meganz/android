@@ -23,5 +23,5 @@
         android:fitsSystemWindows="true"
         android:minHeight="?attr/actionBarSize"
         app:popupTheme="@style/ThemeOverlay.AppCompat.DayNight"
-        app:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar" />
+        app:theme="@style/VideoPlaylistActionBar" />
 </FrameLayout>

@@ -4149,6 +4149,8 @@
     <string name="contact_already_invited">You have already invited %1$s</string>
     <!-- Warning shown informing the contact request has been sent and can be managed in sent requests section. -->
     <string name="contact_invited">Invite sent successfully. See sent requests.</string>
+    <!-- Title of the menu when the select tracks on playlist page-->
+    <string name="title_select_tracks">Select tracks</string>
     <!-- Message when file available offline. -->
     <string name="file_available_offline">File available Offline</string>
     <!-- Message when file removed from offline. -->
