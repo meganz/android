@@ -260,8 +260,6 @@ class MeetingActivity : BaseActivity() {
                 passcodeUtil.pauseUpdate()
             }
         }
-
-        sendQuitCallEvent()
     }
 
     override fun onResume() {
@@ -294,7 +292,6 @@ class MeetingActivity : BaseActivity() {
                 // Prevent guest from quitting the call by pressing back
                 if (!isGuest) {
                     currentFragment.removeUI()
-                    sendQuitCallEvent()
                 }
             }
             is MakeModeratorFragment -> {
@@ -315,11 +312,6 @@ class MeetingActivity : BaseActivity() {
             MegaApplication.getInstance().removeRTCAudioManager()
         }
     }
-
-    private fun sendQuitCallEvent() = LiveEventBus.get(
-        EVENT_ENTER_IN_MEETING,
-        Boolean::class.java
-    ).post(false)
 
     override fun dispatchKeyEvent(event: KeyEvent): Boolean {
         return when (event.keyCode) {

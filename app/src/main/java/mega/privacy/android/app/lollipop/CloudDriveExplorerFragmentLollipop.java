@@ -37,6 +37,7 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Stack;
 
 import javax.inject.Inject;
@@ -88,7 +89,6 @@ public class CloudDriveExplorerFragmentLollipop extends RotatableFragment implem
 	private MegaApiAndroid megaApi;
 	private ArrayList<MegaNode> nodes;
 	private ArrayList<MegaNode> searchNodes;
-	private DisplayMetrics metrics;
 
 	private long parentHandle = -1;
 
@@ -97,7 +97,6 @@ public class CloudDriveExplorerFragmentLollipop extends RotatableFragment implem
 
 	private int modeCloud;
 	private boolean selectFile=false;
-	private MegaPreferences prefs;
 	private DatabaseHandler dbH;
 	private ActionMode actionMode;
 
@@ -112,10 +111,7 @@ public class CloudDriveExplorerFragmentLollipop extends RotatableFragment implem
 	private TextView emptyTextViewFirst;
 
 	private Button optionButton;
-	private Button cancelButton;
 	private FloatingActionButton fabSelect;
-
-	private ArrayList<Long> nodeHandleMoveCopy;
 
 	private Stack<Integer> lastPositionStack;
 
@@ -221,11 +217,7 @@ public class CloudDriveExplorerFragmentLollipop extends RotatableFragment implem
 						if(selectFile){
 							if(((FileExplorerActivityLollipop)context).isMultiselect()){
 								MegaNode node = megaApi.getNodeByHandle(parentHandle);
-								if(selected.size() == megaApi.getNumChildFiles(node)){
-									menu.findItem(R.id.cab_menu_select_all).setVisible(false);
-								}else{
-									menu.findItem(R.id.cab_menu_select_all).setVisible(true);
-								}
+								menu.findItem(R.id.cab_menu_select_all).setVisible(selected.size() != megaApi.getNumChildFiles(node));
 							}
 						}
 					}else{
@@ -234,11 +226,6 @@ public class CloudDriveExplorerFragmentLollipop extends RotatableFragment implem
 
 					unselect.setTitle(getString(R.string.action_unselect_all));
 					unselect.setVisible(true);
-
-//					menu.findItem(R.id.cab_menu_select_all).setVisible(true);
-//					unselect.setTitle(getString(R.string.action_unselect_all));
-//					unselect.setVisible(true);
-
 				}
 			}
 			else{
@@ -253,8 +240,7 @@ public class CloudDriveExplorerFragmentLollipop extends RotatableFragment implem
 
 	public static CloudDriveExplorerFragmentLollipop newInstance() {
 		logDebug("newInstance");
-		CloudDriveExplorerFragmentLollipop fragment = new CloudDriveExplorerFragmentLollipop();
-		return fragment;
+		return new CloudDriveExplorerFragmentLollipop();
 	}
 
 	@Override
@@ -315,9 +301,9 @@ public class CloudDriveExplorerFragmentLollipop extends RotatableFragment implem
 				new EventObserver<>(this::showSortByPanel));
 
 		View v = inflater.inflate(R.layout.fragment_fileexplorerlist, container, false);
-		Display display = getActivity().getWindowManager().getDefaultDisplay();
+		Display display = requireActivity().getWindowManager().getDefaultDisplay();
 
-		metrics = new DisplayMetrics();
+		DisplayMetrics metrics = new DisplayMetrics();
 		display.getMetrics(metrics);
 
 		contentLayout = v.findViewById(R.id.content_layout);
@@ -327,7 +313,7 @@ public class CloudDriveExplorerFragmentLollipop extends RotatableFragment implem
 		optionButton = v.findViewById(R.id.action_text);
 		optionButton.setOnClickListener(this);
 
-		cancelButton = v.findViewById(R.id.cancel_text);
+		Button cancelButton = v.findViewById(R.id.cancel_text);
 		cancelButton.setOnClickListener(this);
 		cancelButton.setText(StringResourcesUtils.getString(R.string.general_cancel));
 		fabSelect = v.findViewById(R.id.fab_select);
@@ -349,7 +335,7 @@ public class CloudDriveExplorerFragmentLollipop extends RotatableFragment implem
 
 		recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
 			@Override
-			public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+			public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
 				super.onScrolled(recyclerView, dx, dy);
 				checkScroll();
 			}
@@ -509,9 +495,9 @@ public class CloudDriveExplorerFragmentLollipop extends RotatableFragment implem
 	}
 
 	@Override
-    public void onAttach(Activity activity) {
-        super.onAttach(activity);
-        context = activity;
+    public void onAttach(Context mContext) {
+        super.onAttach(mContext);
+        context = mContext;
     }
 
 	@Override
@@ -526,7 +512,7 @@ public class CloudDriveExplorerFragmentLollipop extends RotatableFragment implem
 				if (((FileExplorerActivityLollipop) context).isMultiselect()) {
 					logDebug("Send several files to chat");
 					if (adapter.getSelectedItemCount() > 0) {
-						long handles[] = adapter.getSelectedHandles();
+						long[] handles = adapter.getSelectedHandles();
 						((FileExplorerActivityLollipop) context).buttonClick(handles);
 					} else {
 						((FileExplorerActivityLollipop) context).showSnackbar(getString(R.string.no_files_selected_warning));
@@ -548,12 +534,17 @@ public class CloudDriveExplorerFragmentLollipop extends RotatableFragment implem
 	public void navigateToFolder(long handle) {
 		logDebug("Handle: " + handle);
 
-		int lastFirstVisiblePosition = 0;
+		int lastFirstVisiblePosition;
 		if (((FileExplorerActivityLollipop) context).isList()) {
+			if(mLayoutManager == null){
+				logError("mLayoutManager is null");
+				mLayoutManager = new LinearLayoutManager(context);
+				recyclerView.setLayoutManager(mLayoutManager);
+			}
 			lastFirstVisiblePosition = mLayoutManager.findFirstCompletelyVisibleItemPosition();
-		}
-		else {
-			lastFirstVisiblePosition = gridLayoutManager.findFirstCompletelyVisibleItemPosition();
+		} else {
+			// For grid view, just add null check
+            lastFirstVisiblePosition = gridLayoutManager == null ? 0 : gridLayoutManager.findFirstCompletelyVisibleItemPosition();
 		}
 
 		logDebug("Push to stack " + lastFirstVisiblePosition + " position");
@@ -598,12 +589,17 @@ public class CloudDriveExplorerFragmentLollipop extends RotatableFragment implem
 
 			((FileExplorerActivityLollipop) context).hideTabs(true, CLOUD_FRAGMENT);
 
-			int lastFirstVisiblePosition = 0;
+			int lastFirstVisiblePosition;
 			if (((FileExplorerActivityLollipop)context).isList()) {
+				if (mLayoutManager == null) {
+					logError("mLayoutManager is null");
+					mLayoutManager = new LinearLayoutManager(context);
+					recyclerView.setLayoutManager(mLayoutManager);
+				}
 				lastFirstVisiblePosition = mLayoutManager.findFirstCompletelyVisibleItemPosition();
-			}
-			else {
-				lastFirstVisiblePosition = gridLayoutManager.findFirstCompletelyVisibleItemPosition();
+			} else {
+				// For grid view, just add null check
+				lastFirstVisiblePosition = gridLayoutManager == null ? 0 : gridLayoutManager.findFirstCompletelyVisibleItemPosition();
 			}
 
 			logDebug("Push to stack " + lastFirstVisiblePosition + " position");
@@ -622,11 +618,7 @@ public class CloudDriveExplorerFragmentLollipop extends RotatableFragment implem
 				activateButton(true);
 			} else if (modeCloud == FileExplorerActivityLollipop.MOVE || modeCloud == FileExplorerActivityLollipop.COPY) {
 				MegaNode parent = ((FileExplorerActivityLollipop) context).parentMoveCopy();
-				if (parent != null && parent.getHandle() == parentHandle) {
-					activateButton(false);
-				} else {
-					activateButton(true);
-				}
+                activateButton(parent == null || parent.getHandle() != parentHandle);
 			}
 
 		}
@@ -691,11 +683,7 @@ public class CloudDriveExplorerFragmentLollipop extends RotatableFragment implem
 			if((modeCloud == FileExplorerActivityLollipop.MOVE) || (modeCloud == FileExplorerActivityLollipop.COPY)){
 				MegaNode parent = ((FileExplorerActivityLollipop)context).parentMoveCopy();
 				if(parent != null){
-					if(parent.getHandle() == parentNode.getHandle()) {
-						activateButton(false);
-					}else{
-						activateButton(true);
-					}
+                    activateButton(parent.getHandle() != parentNode.getHandle());
 				}else{
 					activateButton(true);
 
@@ -793,9 +781,6 @@ public class CloudDriveExplorerFragmentLollipop extends RotatableFragment implem
 				folders++;
 			}
 		}
-
-
-		Resources res = getActivity().getResources();
 
 		String title;
 		int sum=files+folders;

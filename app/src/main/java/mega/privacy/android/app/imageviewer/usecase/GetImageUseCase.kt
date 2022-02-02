@@ -357,6 +357,7 @@ class GetImageUseCase @Inject constructor(
                 bitmap.compress(Bitmap.CompressFormat.JPEG, 75, this)
                 close()
             }
+            bitmap.recycle()
 
             previewFile.toUri()
         }
