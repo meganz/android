@@ -250,15 +250,36 @@ public class FileStorageActivityLollipop extends PasscodeActivity implements OnC
 	@SuppressLint("NewApi") @Override
 	protected void onCreate(Bundle savedInstanceState) {
 		logDebug("onCreate");
+		requestWindowFeature(Window.FEATURE_NO_TITLE);
+		super.onCreate(savedInstanceState);
+
+		Intent intent = getIntent();
+		prompt = intent.getStringExtra(EXTRA_PROMPT);
+		if (prompt != null) {
+			showSnackbar(viewContainer, prompt);
+		}
+		fromSettings = intent.getBooleanExtra(EXTRA_FROM_SETTINGS, true);
+		fromSaveRecoveryKey = intent.getBooleanExtra(EXTRA_SAVE_RECOVERY_KEY, false);
+
+		setPickFolderType(intent.getStringExtra(PICK_FOLDER_TYPE));
+
+		if (pickFolderType == PickFolderType.DOWNLOAD_FOLDER) {
+			openPickDownloadFolderFromSystem();
+			return;
+		} else if (fromSaveRecoveryKey && isAndroid11OrUpper()) {
+			createRKFile();
+			return;
+		} else if (isCUOrMUFolder && isAndroid11OrUpper()) {
+			openPickCUFolderFromSystem();
+			return;
+		}
+
 		boolean hasStoragePermission = hasPermissions(this, Manifest.permission.WRITE_EXTERNAL_STORAGE);
 		if (!hasStoragePermission) {
 			requestPermission(this,
 					REQUEST_WRITE_STORAGE,
 					Manifest.permission.WRITE_EXTERNAL_STORAGE);
 		}
-
-		requestWindowFeature(Window.FEATURE_NO_TITLE);
-		super.onCreate(savedInstanceState);
 
 	    handler = new Handler();
 
@@ -270,16 +291,6 @@ public class FileStorageActivityLollipop extends PasscodeActivity implements OnC
 		aB = getSupportActionBar();
 		aB.setDisplayHomeAsUpEnabled(true);
 		aB.setDisplayShowHomeEnabled(true);
-
-		Intent intent = getIntent();
-		prompt = intent.getStringExtra(EXTRA_PROMPT);
-		if (prompt != null) {
-			showSnackbar(viewContainer, prompt);
-		}
-		fromSettings = intent.getBooleanExtra(EXTRA_FROM_SETTINGS, true);
-		fromSaveRecoveryKey = intent.getBooleanExtra(EXTRA_SAVE_RECOVERY_KEY, false);
-
-		setPickFolderType(intent.getStringExtra(PICK_FOLDER_TYPE));
 
 		File[] fs = getExternalFilesDirs(null);
 		hasSDCard = fs.length > 1 && fs[1] != null;
@@ -379,13 +390,7 @@ public class FileStorageActivityLollipop extends PasscodeActivity implements OnC
 
 		prefs = dbH.getPreferences();
 
-		if (pickFolderType == PickFolderType.DOWNLOAD_FOLDER) {
-			openPickDownloadFolderFromSystem();
-		} else if (fromSaveRecoveryKey && isAndroid11OrUpper()) {
-			createRKFile();
-		} else if (isCUOrMUFolder && isAndroid11OrUpper()) {
-			openPickCUFolderFromSystem();
-		} else if (mode == Mode.BROWSE_FILES) {
+		if (mode == Mode.BROWSE_FILES) {
 			if (intent.getExtras() != null) {
 				String extraPath = intent.getExtras().getString(EXTRA_PATH);
 				if (!isTextEmpty(extraPath)) {
