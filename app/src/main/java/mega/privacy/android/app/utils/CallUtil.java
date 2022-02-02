@@ -1316,7 +1316,8 @@ public class CallUtil {
     public static void incomingCall(MegaHandleList listAllCalls, long incomingCallChatId, int callStatus) {
         logDebug("Chat ID of incoming call is " + incomingCallChatId);
         if (!MegaApplication.getInstance().getMegaApi().isChatNotifiable(incomingCallChatId) ||
-                MegaApplication.getChatManagement().isNotificationShown(incomingCallChatId)){
+                MegaApplication.getChatManagement().isNotificationShown(incomingCallChatId) ||
+                !CallUtil.areNotificationsSettingsEnabled()) {
             logDebug("The chat is not notifiable or the notification is already being displayed");
             return;
         }
@@ -1450,5 +1451,19 @@ public class CallUtil {
         }
 
         return checkPermissionsCall(context, INVALID_TYPE_PERMISSIONS);
+    }
+
+    /**
+     * Method to find out if device's notification settings are enabled
+     *
+     * @return True, if they are enabled. False, if they are not.
+     */
+    public static boolean areNotificationsSettingsEnabled() {
+        NotificationManager notificationManager = (NotificationManager) MegaApplication.getInstance().getApplicationContext().getSystemService(Context.NOTIFICATION_SERVICE);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            return notificationManager.areNotificationsEnabled();
+        }
+
+        return true;
     }
 }
