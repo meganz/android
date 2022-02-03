@@ -535,16 +535,16 @@ class PhotosFragment : BaseZoomFragment() {
             alertDialog = MaterialAlertDialogBuilder(requireContext())
                 .setTitle(R.string.title_dcim_folder_dialog)
                 .setMessage(R.string.content_dcim_folder_dialog)
-                .setPositiveButton(R.string.action_settings) { dialog, _ ->
-                    enableCameraUpload(
-                        dialog,
-                        true
-                    )
-                }
-                .setNegativeButton(R.string.general_cancel) { dialog, _ ->
+                .setPositiveButton(R.string.button_continue) { dialog, _ ->
                     enableCameraUpload(
                         dialog,
                         false
+                    )
+                }
+                .setNegativeButton(R.string.general_select_to_download) { dialog, _ ->
+                    enableCameraUpload(
+                        dialog,
+                        true
                     )
                 }
                 .create()
