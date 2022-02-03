@@ -51,29 +51,9 @@ abstract class GalleryBaseFetcher(
     }
 
     private fun getPreviewFile(node: MegaNode) = File(
-        PreviewUtils.getPreviewFolder(context),
+        previewFolder,
         node.base64Handle.plus(FileUtil.JPG_EXTENSION)
     )
-
-    /**
-     * Get the thumbnail of the file.
-     */
-    private fun getThumbnail(node: MegaNode): File? {
-        val thumbFile = getThumbnailFile(node)
-
-        return if (thumbFile.exists()) {
-            thumbFile
-        } else {
-            // Note down the nodes and going to get their thumbnails from the server
-            // as soon as the getGalleryItems finished. (Don't start the getting operation here
-            // for avoiding potential ConcurrentModification issue)
-            if (node.hasThumbnail()) {
-                getThumbnailNodes[node] = thumbFile.absolutePath
-            }
-
-            null
-        }
-    }
 
     /**
      * Get the preview of the file.
@@ -153,15 +133,13 @@ abstract class GalleryBaseFetcher(
                 }
             }
 
-
             val selected = selectedNodesMap[node.handle]?.selected ?: false
-            val mime = MimeTypeList.typeForName(node.name)
             fileNodesMap[node.handle] = GalleryItem(
                 node,
                 INVALID_POSITION,
                 INVALID_POSITION,
                 thumbnail,
-                if (mime.isImage) TYPE_IMAGE else TYPE_VIDEO,
+                if (node.duration == -1) TYPE_IMAGE else TYPE_VIDEO,
                 dateString,
                 null,
                 null,
