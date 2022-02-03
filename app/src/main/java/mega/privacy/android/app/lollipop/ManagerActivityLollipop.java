@@ -3381,9 +3381,8 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 					String parentPath = intent.getStringExtra(FileStorageActivityLollipop.EXTRA_PATH);
 
 					if (parentPath != null){
-						String sdCardUriString = intent.getStringExtra(FileStorageActivityLollipop.EXTRA_SD_URI);
 						AccountController ac = new AccountController(this);
-						ac.exportMK(parentPath, sdCardUriString);
+						ac.exportMK(parentPath);
 					}
 				}
 				else  if (getIntent().getAction().equals(ACTION_RECOVERY_KEY_COPY_TO_CLIPBOARD)){
@@ -8593,11 +8592,10 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 
 			if (parentPath != null){
 				String path = parentPath + File.separator + getRecoveryKeyFileName();
-				String sdCardUriString = intent.getStringExtra(FileStorageActivityLollipop.EXTRA_SD_URI);
 
 				logDebug("REQUEST_DOWNLOAD_FOLDER:path to download: "+path);
 				AccountController ac = new AccountController(this);
-				ac.exportMK(path, sdCardUriString);
+				ac.exportMK(path);
 			}
 		}
 
@@ -11578,7 +11576,6 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 				Intent intent = new Intent(this, FileStorageActivityLollipop.class);
 				intent.setAction(FileStorageActivityLollipop.Mode.BROWSE_FILES.getAction());
 				intent.putExtra(FileStorageActivityLollipop.EXTRA_PATH, transfer.getPath());
-				intent.putExtra(FileStorageActivityLollipop.EXTRA_FROM_SETTINGS, false);
 				startActivity(intent);
 			}
 		} else if (transfer.getType() == MegaTransfer.TYPE_UPLOAD) {

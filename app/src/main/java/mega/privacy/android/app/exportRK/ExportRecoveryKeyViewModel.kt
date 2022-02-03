@@ -114,60 +114,14 @@ class ExportRecoveryKeyViewModel @Inject constructor(
             return
         }
 
-        if (isAndroid11OrUpper()) {
-            val exportedRK = exportRK()
-
-            saveRKAction?.invoke(
-                when {
-                    exportedRK.isNullOrEmpty() -> GENERAL_ERROR
-                    saveTextOnContentUri(
-                        activity.contentResolver,
-                        data.data,
-                        exportedRK
-                    ) -> RK_EXPORTED
-                    else -> GENERAL_ERROR
-                }
-            )
-        } else {
-            val parentPath: String =
-                data.getStringExtra(FileStorageActivityLollipop.EXTRA_PATH) ?: return
-
-            saveRKOnChosenPath(
-                activity,
-                parentPath + File.separator + getRecoveryKeyFileName(),
-                data.getStringExtra(FileStorageActivityLollipop.EXTRA_SD_URI)
-            )
-        }
-    }
-
-    /**
-     * Saves the Recovery Key on chosen path.
-     *
-     * @param context         Current context.
-     * @param path            The selected location to save the file.
-     * @param sdCardUriString If the selected location is on SD card,
-     *                        need the uri to grant SD card write permission.
-     */
-    private fun saveRKOnChosenPath(context: Context, path: String, sdCardUriString: String?) {
-        if (isOffline(context)) {
-            return
-        }
-
-        if (thereIsNotEnoughFreeSpace(path)) {
-            saveRKAction?.invoke(ERROR_NO_SPACE)
-            return
-        }
-
-        val textRK = exportRK()
-
-        if (isTextEmpty(textRK)) {
-            saveRKAction?.invoke(GENERAL_ERROR)
-            return
-        }
+        val exportedRK = exportRK()
 
         saveRKAction?.invoke(
-            if (saveTextOnFile(context, textRK, path, sdCardUriString)) RK_EXPORTED
-            else GENERAL_ERROR
+            when {
+                exportedRK.isNullOrEmpty() -> GENERAL_ERROR
+                saveTextOnContentUri(activity.contentResolver, data.data, exportedRK) -> RK_EXPORTED
+                else -> GENERAL_ERROR
+            }
         )
     }
 }

@@ -2,15 +2,11 @@ package mega.privacy.android.app.lollipop;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
-import android.app.Activity;
-import android.content.ContentResolver;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Environment;
-import android.os.Handler;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
@@ -23,15 +19,9 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.appcompat.widget.Toolbar;
 
-import android.os.storage.StorageManager;
-import android.os.storage.StorageVolume;
 import android.provider.DocumentsContract;
-import android.view.KeyEvent;
-import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.View.OnClickListener;
 import android.view.Window;
 import android.widget.Button;
 import android.widget.CheckBox;
@@ -39,9 +29,6 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-import android.widget.Toast;
-
-import org.jetbrains.annotations.NotNull;
 
 import com.anggrayudi.storage.file.DocumentFileUtils;
 import com.anggrayudi.storage.file.StorageId;
@@ -52,35 +39,27 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Locale;
 import java.util.Stack;
 
-import kotlin.Unit;
 import mega.privacy.android.app.FileDocument;
 import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.activities.PasscodeActivity;
 import mega.privacy.android.app.components.SimpleDividerItemDecoration;
-import mega.privacy.android.app.interfaces.ActionNodeCallback;
+import mega.privacy.android.app.interfaces.Scrollable;
 import mega.privacy.android.app.lollipop.adapters.FileStorageLollipopAdapter;
 import mega.privacy.android.app.utils.ColorUtils;
-import mega.privacy.android.app.utils.RunOnUIThreadUtils;
-import mega.privacy.android.app.utils.SDCardOperator;
-import mega.privacy.android.app.utils.SDCardUtils;
-import mega.privacy.android.app.utils.StringResourcesUtils;
 
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.FileUtil.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.MegaApiUtils.*;
-import static mega.privacy.android.app.utils.MegaNodeDialogUtil.showNewFolderDialog;
 import static mega.privacy.android.app.utils.permission.PermissionUtils.*;
 import static mega.privacy.android.app.utils.TextUtil.*;
 import static mega.privacy.android.app.utils.Util.*;
 
-public class FileStorageActivityLollipop extends PasscodeActivity implements OnClickListener,
-		ActionNodeCallback, CheckScrollInterface {
+public class FileStorageActivityLollipop extends PasscodeActivity implements Scrollable {
 
 	private static final String IS_SET_DOWNLOAD_LOCATION_SHOWN = "IS_SET_DOWNLOAD_LOCATION_SHOWN";
 	private static final String IS_CONFIRMATION_CHECKED = "IS_CONFIRMATION_CHECKED";
@@ -96,7 +75,7 @@ public class FileStorageActivityLollipop extends PasscodeActivity implements OnC
 		DOWNLOAD_FOLDER("DOWNLOAD_FOLDER"),
 		NONE_ONLY_DOWNLOAD("NONE_ONLY_DOWNLOAD");
 
-		private String folderType;
+		private final String folderType;
 
 		PickFolderType(String folderType) {
 			this.folderType = folderType;
@@ -111,12 +90,8 @@ public class FileStorageActivityLollipop extends PasscodeActivity implements OnC
 	public static final String EXTRA_SIZE = "filesize";
 	public static final String EXTRA_SERIALIZED_NODES = "serialized_nodes";
 	public static final String EXTRA_DOCUMENT_HASHES = "document_hash";
-	public static final String EXTRA_FROM_SETTINGS = "from_settings";
 	public static final String EXTRA_SAVE_RECOVERY_KEY = "save_recovery_key";
-	public static final String EXTRA_BUTTON_PREFIX = "button_prefix";
 	public static final String EXTRA_PATH = "filepath";
-	// Currently for exporting recovery key use.
-	public static final String EXTRA_SD_URI = "sdcarduri";
 	public static final String EXTRA_FILES = "fileslist";
     public static final String EXTRA_PROMPT = "prompt";
 
@@ -127,7 +102,7 @@ public class FileStorageActivityLollipop extends PasscodeActivity implements OnC
 		//Browse files
 		BROWSE_FILES("ACTION_BROWSE_FILES");
 
-		private String action;
+		private final String action;
 
 		Mode(String action) {
 			this.action = action;
@@ -148,34 +123,20 @@ public class FileStorageActivityLollipop extends PasscodeActivity implements OnC
 
 	private MegaPreferences prefs;
 	private Mode mode;
-	
-	private MenuItem newFolderMenuItem;
-	
 	private File path;
 	private File root;
 	private RelativeLayout viewContainer;
-	private Button button;
 	private TextView contentText;
 	private RecyclerView listView;
 	private LinearLayoutManager mLayoutManager;
-	private Button cancelButton;
 	private ImageView emptyImageView;
 	private TextView emptyTextView;
-	private LinearLayout buttonsContainer;
 
-	private LinearLayout rootLevelLayout;
-	private RelativeLayout internalStorageLayout;
-	private RelativeLayout externalStorageLayout;
-	
-	private Boolean fromSettings, fromSaveRecoveryKey;
 	private PickFolderType pickFolderType;
 	private boolean isCUOrMUFolder;
-	private String sdRoot;
-	private boolean hasSDCard;
     private String prompt;
 
 	private Stack<Integer> lastPositionStack;
-	
 	private String url;
 	private long size;
 	private long[] documentHashes;
@@ -189,58 +150,19 @@ public class FileStorageActivityLollipop extends PasscodeActivity implements OnC
 	private boolean isSetDownloadLocationShown;
 	private boolean confirmationChecked;
 
-	private boolean pickingFromSDCard;
-	private boolean isChoosingStorage;
-
-    /**
-     * Pass to exporting recovery key operation.
-     */
-	private String sdCardUriString;
-
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		logDebug("onOptionsItemSelected");
 
 		// Handle presses on the action bar items
-        switch (item.getItemId()) {
-            case android.R.id.home:
-                onBackPressed();
-                return true;
+		if (item.getItemId() == android.R.id.home) {
+			onBackPressed();
+			return true;
+		}
 
-            case R.id.cab_menu_create_folder:
-				showNewFolderDialog(this, this);
-                return true;
-
-            default:
-                return super.onOptionsItemSelected(item);
-        }
+		return super.onOptionsItemSelected(item);
 	}
-	
-	@Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-		logDebug("onCreateOptionsMenuLollipop");
-		
-		
-		// Inflate the menu items for use in the action bar
-	    MenuInflater inflater = getMenuInflater();
-	    inflater.inflate(R.menu.file_storage_action, menu);
-	    getSupportActionBar().setDisplayShowCustomEnabled(true);
-	    
-	    newFolderMenuItem = menu.findItem(R.id.cab_menu_create_folder);
-	    newFolderMenuItem.setVisible(!isChoosingStorage && mode == Mode.PICK_FOLDER);
-	    
-	    return super.onCreateOptionsMenu(menu);
-	}
-	
-	@Override
-    public boolean onPrepareOptionsMenu(Menu menu) {
-		logDebug("onPrepareOptionsMenu");
 
-		newFolderMenuItem.setVisible(!isChoosingStorage && mode == Mode.PICK_FOLDER);
-
-		return super.onPrepareOptionsMenu(menu);
-	}
-	
 	@SuppressLint("NewApi") @Override
 	protected void onCreate(Bundle savedInstanceState) {
 		logDebug("onCreate");
@@ -252,19 +174,17 @@ public class FileStorageActivityLollipop extends PasscodeActivity implements OnC
 		if (prompt != null) {
 			showSnackbar(viewContainer, prompt);
 		}
-		fromSettings = intent.getBooleanExtra(EXTRA_FROM_SETTINGS, true);
-		fromSaveRecoveryKey = intent.getBooleanExtra(EXTRA_SAVE_RECOVERY_KEY, false);
 
 		setPickFolderType(intent.getStringExtra(PICK_FOLDER_TYPE));
 
-		if (pickFolderType == PickFolderType.DOWNLOAD_FOLDER) {
-			openPickDownloadFolderFromSystem();
-			return;
-		} else if (fromSaveRecoveryKey && isAndroid11OrUpper()) {
+		if (intent.getBooleanExtra(EXTRA_SAVE_RECOVERY_KEY, false)) {
 			createRKFile();
 			return;
-		} else if (isCUOrMUFolder && isAndroid11OrUpper()) {
+		} else if (isCUOrMUFolder) {
 			openPickCUFolderFromSystem();
+			return;
+		} else if (pickFolderType == PickFolderType.DOWNLOAD_FOLDER) {
+			openPickDownloadFolderFromSystem();
 			return;
 		}
 
@@ -276,7 +196,7 @@ public class FileStorageActivityLollipop extends PasscodeActivity implements OnC
 		}
 
 		setContentView(R.layout.activity_filestorage);
-		
+
 		//Set toolbar
 		tB = findViewById(R.id.toolbar_filestorage);
 		setSupportActionBar(tB);
@@ -284,62 +204,32 @@ public class FileStorageActivityLollipop extends PasscodeActivity implements OnC
 		aB.setDisplayHomeAsUpEnabled(true);
 		aB.setDisplayShowHomeEnabled(true);
 
-		File[] fs = getExternalFilesDirs(null);
-		hasSDCard = fs.length > 1 && fs[1] != null;
-		
 		mode = Mode.getFromIntent(intent);
+
 		if (mode == Mode.PICK_FOLDER) {
-			documentHashes = intent.getExtras().getLongArray(EXTRA_DOCUMENT_HASHES);
+			if (intent.getExtras() != null) {
+				documentHashes = intent.getExtras().getLongArray(EXTRA_DOCUMENT_HASHES);
+				url = intent.getExtras().getString(EXTRA_URL);
+				size = intent.getExtras().getLong(EXTRA_SIZE);
+			}
+
 			serializedNodes = intent.getStringArrayListExtra(EXTRA_SERIALIZED_NODES);
-			url = intent.getExtras().getString(EXTRA_URL);
-			size = intent.getExtras().getLong(EXTRA_SIZE);
-			aB.setTitle(getString(R.string.general_select_to_download).toUpperCase());
 		} else if (mode == Mode.BROWSE_FILES) {
 			aB.setTitle(getString(R.string.browse_files_label).toUpperCase());
-		} else{
-			aB.setTitle(getString(R.string.general_select_to_upload).toUpperCase());
 		}
-		
+
 		if (savedInstanceState != null) {
 			if (savedInstanceState.containsKey(PATH)) {
 				path = new File(savedInstanceState.getString(PATH));
 			}
 
-			fromSaveRecoveryKey = savedInstanceState.getBoolean(EXTRA_SAVE_RECOVERY_KEY, false);
-
 			isSetDownloadLocationShown = savedInstanceState.getBoolean(IS_SET_DOWNLOAD_LOCATION_SHOWN, false);
 			confirmationChecked = savedInstanceState.getBoolean(IS_CONFIRMATION_CHECKED, false);
 		}
-		
+
         viewContainer = findViewById(R.id.file_storage_container);
 		contentText = findViewById(R.id.file_storage_content_text);
 		listView = findViewById(R.id.file_storage_list_view);
-
-		buttonsContainer = findViewById(R.id.options_file_storage_layout);
-
-		cancelButton = findViewById(R.id.file_storage_cancel_button);
-		cancelButton.setOnClickListener(this);
-		cancelButton.setText(getString(R.string.general_cancel).toUpperCase(Locale.getDefault()));
-
-		button = findViewById(R.id.file_storage_button);
-		button.setOnClickListener(this);
-
-		if (fromSaveRecoveryKey) {
-			button.setText(getString(R.string.save_action).toUpperCase(Locale.getDefault()));
-		} else if (fromSettings) {
-			button.setText(getString(R.string.general_select).toUpperCase(Locale.getDefault()));
-		} else if (mode == Mode.PICK_FOLDER) {
-			button.setText(getString(R.string.general_save_to_device).toUpperCase(Locale.getDefault()));
-		} else if (mode == Mode.BROWSE_FILES) {
-			buttonsContainer.setVisibility(View.GONE);
-		}
-
-		rootLevelLayout = findViewById(R.id.root_level_layout);
-		rootLevelLayout.setVisibility(View.GONE);
-		internalStorageLayout = findViewById(R.id.internal_storage_layout);
-		internalStorageLayout.setOnClickListener(this);
-		externalStorageLayout = findViewById(R.id.external_storage_layout);
-		externalStorageLayout.setOnClickListener(this);
 
 		emptyImageView = findViewById(R.id.file_storage_empty_image);
 		emptyTextView = findViewById(R.id.file_storage_empty_text);
@@ -372,7 +262,7 @@ public class FileStorageActivityLollipop extends PasscodeActivity implements OnC
 				checkScroll();
 			}
 		});
-		
+
 		if (adapter == null){
 			adapter = new FileStorageLollipopAdapter(this, mode);
 			listView.setAdapter(adapter);
@@ -390,10 +280,6 @@ public class FileStorageActivityLollipop extends PasscodeActivity implements OnC
 				}
 			}
 		    checkPath();
-		} else if (hasSDCard) {
-			showRootWithSDView(true);
-		} else {
-			openPickFromInternalStorage();
 		}
 
 		if (isSetDownloadLocationShown) {
@@ -455,174 +341,11 @@ public class FileStorageActivityLollipop extends PasscodeActivity implements OnC
 	}
 
 	/**
-	 * Sets the view to pick from Internal Storage.
-	 */
-	private void openPickFromInternalStorage() {
-		if (isAndroid11OrUpper() && mode == Mode.PICK_FOLDER) {
-			path = buildDefaultDownloadDir(this);
-			path.mkdirs();
-			finishPickFolder();
-			return;
-		}
-
-		pickingFromSDCard = false;
-		root = buildExternalStorageFile("");
-
-		if (pickFolderType.equals(PickFolderType.CU_FOLDER) && Environment.getExternalStorageDirectory() != null) {
-			path = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM);
-		} else if (pickFolderType.equals(PickFolderType.MU_FOLDER) && Environment.getExternalStorageDirectory() != null) {
-			path = Environment.getExternalStorageDirectory();
-		} else if (prefs != null && prefs.getLastFolderUpload() != null) {
-			path = new File(prefs.getLastFolderUpload());
-		}
-
-		if (path == null) {
-			path = buildDefaultDownloadDir(this);
-		}
-
-		path.mkdirs();
-
-		checkPath();
-	}
-
-	/**
-	 * Sets the view to pick from SD card.
-	 */
-	private void openPickFromSDCard() {
-		pickingFromSDCard = true;
-
-		SDCardOperator sdCardOperator;
-		try {
-			sdCardOperator = new SDCardOperator(this);
-		} catch (SDCardOperator.SDCardException e) {
-			e.printStackTrace();
-			logError("Initialize SDCardOperator failed", e);
-			//sd card is not available, choose internal storage location
-			showRootWithSDView(false);
-			openPickFromInternalStorage();
-			return;
-		}
-
-		String sdCardRoot = sdCardOperator.getSDCardRoot();
-
-		if (isBasedOnFileStorage()) {
-			try {
-				sdCardOperator.initDocumentFileRoot(dbH.getSDCardUri());
-				sdRoot = sdCardRoot;
-			} catch (SDCardOperator.SDCardException e) {
-				e.printStackTrace();
-				logError("SDCardOperator initDocumentFileRoot failed, requestSDCardPermission", e);
-				requestSDCardPermission(sdCardRoot);
-			}
-		} else {
-			requestSDCardPermission(sdCardRoot);
-		}
-
-		if (sdRoot != null) {
-			openSDCardPath();
-		}
-	}
-
-	/**
-	 * Opens a SD card path.
-	 */
-	private void openSDCardPath() {
-		path = new File(sdRoot);
-		showRootWithSDView(false);
-		checkPath();
-	}
-
-	/**
-	 * Requests SD card permissions.
-	 *
-	 * @param sdCardRoot	the root path of the SD card.¡
-	 */
-	private void requestSDCardPermission(String sdCardRoot) {
-		Intent intent = null;
-		if (isBasedOnFileStorage()) {
-			StorageManager sm = getSystemService(StorageManager.class);
-			if (sm != null) {
-				StorageVolume volume = sm.getStorageVolume(new File(sdCardRoot));
-				if (volume != null) {
-					intent = volume.createAccessIntent(null);
-				}
-			}
-		}
-
-        //for below N or above P, open SAF
-        if (intent == null) intent = openSAFIntent();
-
-        logDebug("Request SD card write permission with intent: " + intent);
-
-        try {
-            /*
-                A small number of devices(the device's OS version should be >= N and < Q) cannot handle
-                Intent { act=android.os.storage.action.OPEN_EXTERNAL_DIRECTORY launchParam=MultiScreenLaunchParams { mDisplayId=0 mBaseDisplayId=0 mFlags=0 }}.
-             */
-            startActivityForResult(intent, REQUEST_CODE_TREE);
-        } catch (Exception e) {
-            logError("Start request SD card uri activity error. Current OS version: " + Build.VERSION.SDK_INT, e);
-            if (isBasedOnFileStorage()) {
-                // Try to request SD card uri with SAF.
-				// The toast is showing on SAF.
-                Toast.makeText(this,StringResourcesUtils.getString(R.string.ask_for_select_sdcard_root),Toast.LENGTH_LONG).show();
-                startActivityForResult(openSAFIntent(), REQUEST_CODE_TREE);
-            } else {
-                // Should never happen.
-                e.printStackTrace();
-            }
-        }
-    }
-
-    /**
-     * Get an Intent which access SD card via SAF and grant the uri.
-     *
-     * @return The Intent launches SAF.
-     */
-    private Intent openSAFIntent() {
-        Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT_TREE);
-        intent.addFlags(Intent.FLAG_GRANT_PERSISTABLE_URI_PERMISSION);
-        return intent;
-    }
-
-	/**
-	 * Shows or hides the root view with Internal storage and External storage.
-	 *
-	 * @param show	true if the root with both storages has to be shown, false otherwise
-	 */
-	private void showRootWithSDView(boolean show) {
-		if (show) {
-			isChoosingStorage = true;
-			// Avoid crash if `contentText` is null due any reason. For more info see AND-12958.
-			if (contentText == null) {
-				contentText = findViewById(R.id.file_storage_content_text);
-			}
-			if (contentText != null) {
-				contentText.setText(String.format("%s%s", SEPARATOR, getString(R.string.storage_root_label)));
-			}
-
-			rootLevelLayout.setVisibility(View.VISIBLE);
-			buttonsContainer.setVisibility(View.GONE);
-			showEmptyState();
-		} else {
-			isChoosingStorage = false;
-			rootLevelLayout.setVisibility(View.GONE);
-			buttonsContainer.setVisibility(View.VISIBLE);
-		}
-
-		invalidateOptionsMenu();
-	}
-
-	/**
 	 * Shows the empty view or the list view depending on if there are items in the adapter.
 	 * Hides both if the root view with Internal storage and External storage is shown.
 	 */
 	private void showEmptyState() {
-		if (rootLevelLayout.getVisibility() == View.VISIBLE) {
-			listView.setVisibility(View.GONE);
-			emptyImageView.setVisibility(View.GONE);
-			emptyTextView.setVisibility(View.GONE);
-		} else if (adapter != null && adapter.getItemCount() > 0) {
+		if (adapter != null && adapter.getItemCount() > 0) {
 			listView.setVisibility(View.VISIBLE);
 			emptyImageView.setVisibility(View.GONE);
 			emptyTextView.setVisibility(View.GONE);
@@ -658,13 +381,13 @@ public class FileStorageActivityLollipop extends PasscodeActivity implements OnC
 		if (path != null) {
 			state.putString(PATH, path.getAbsolutePath());
 		}
-		state.putBoolean(EXTRA_SAVE_RECOVERY_KEY, fromSaveRecoveryKey);
+
 		state.putBoolean(IS_SET_DOWNLOAD_LOCATION_SHOWN, isSetDownloadLocationShown);
 		state.putBoolean(IS_CONFIRMATION_CHECKED, confirmationChecked);
 
 		super.onSaveInstanceState(state);
 	}
-	
+
 	/*
 	 * Open new folder
 	 * @param newPath New folder path
@@ -672,7 +395,7 @@ public class FileStorageActivityLollipop extends PasscodeActivity implements OnC
 	@SuppressLint("NewApi")
 	private void changeFolder(File newPath) {
 		logDebug("New path: " + newPath);
-		
+
 		setFiles(newPath);
 		path = newPath;
 
@@ -686,7 +409,7 @@ public class FileStorageActivityLollipop extends PasscodeActivity implements OnC
 
 		invalidateOptionsMenu();
 	}
-	
+
 	/*
 	 * Update file list for new folder
 	 */
@@ -731,40 +454,6 @@ public class FileStorageActivityLollipop extends PasscodeActivity implements OnC
 				return o1.isFolder() ? -1 : 1;
 			}
 			return o1.getName().compareToIgnoreCase(o2.getName());
-		}
-	}
-
-	@Override
-	public void onClick(View v) {
-		logDebug("onClick");
-
-		switch (v.getId()) {
-			case R.id.file_storage_button:
-                //don't record last upload folder for SD card upload
-                if(!hasSDCard) {
-                    dbH.setLastUploadFolder(path.getAbsolutePath());
-                }
-				if (mode == Mode.PICK_FOLDER) {
-					if (!isCUOrMUFolder && dbH.getCredentials() != null && dbH.getAskSetDownloadLocation()) {
-						showConfirmationSaveInSameLocation();
-					} else {
-						finishPickFolder();
-					}
-				}
-				break;
-
-			case R.id.file_storage_cancel_button:
-				finish();
-				break;
-
-			case R.id.internal_storage_layout:
-				showRootWithSDView(false);
-				openPickFromInternalStorage();
-				break;
-
-			case R.id.external_storage_layout:
-				openPickFromSDCard();
-				break;
 		}
 	}
 
@@ -823,22 +512,12 @@ public class FileStorageActivityLollipop extends PasscodeActivity implements OnC
 	private void finishPickFolder() {
 		Intent intent = new Intent();
 		intent.putExtra(EXTRA_PATH, path.getAbsolutePath());
-		intent.putExtra(EXTRA_SD_URI, sdCardUriString);
 		intent.putExtra(EXTRA_DOCUMENT_HASHES, documentHashes);
 		intent.putStringArrayListExtra(EXTRA_SERIALIZED_NODES, serializedNodes);
 		intent.putExtra(EXTRA_URL, url);
 		intent.putExtra(EXTRA_SIZE, size);
 		setResult(RESULT_OK, intent);
 		finish();
-	}
-
-	@Override
-	public boolean onKeyDown(int keyCode, KeyEvent event) {
-	    if ( keyCode == KeyEvent.KEYCODE_MENU ) {
-	        // do nothing
-	        return true;
-	    }
-	    return super.onKeyDown(keyCode, event);
 	}
 
 	public void itemClick(int position) {
@@ -880,200 +559,53 @@ public class FileStorageActivityLollipop extends PasscodeActivity implements OnC
 			}
 		}
 	}
-	
-	/*
-	 * Set selected files to pass to the caller activity and finish this
-	 * activity
-	 */
-	private void setResultFiles(ArrayList<String> files) {
-		logDebug(files.size() + "files selected");
-		Intent intent = new Intent();
-		intent.putStringArrayListExtra(EXTRA_FILES, files);
-		intent.putExtra(EXTRA_PATH, path.getAbsolutePath());
-		setResult(RESULT_OK, intent);
-		finish();
-	}
-	
+
 	@Override
 	public void onBackPressed() {
 		if (psaWebBrowser != null && psaWebBrowser.consumeBack()) return;
 		retryConnectionsAndSignalPresence();
 
 		// Finish activity if at the root
-		boolean isRoot;
-		if (hasSDCard && !mode.equals(Mode.BROWSE_FILES)) {
-			isRoot = rootLevelLayout.getVisibility() == View.VISIBLE;
-		} else {
-			isRoot = path.equals(root);
-		}
-
-		if (isRoot) {
+		if (path.equals(root)) {
 			super.onBackPressed();
-			// Go one level higher otherwise
-		} else if (hasSDCard && ((pickingFromSDCard && path.equals(new File(sdRoot)) || !pickingFromSDCard && path.equals(root)))) {
-			path = null;
-			showRootWithSDView(true);
 		} else {
+			// Go one level higher otherwise
 			changeFolder(path.getParentFile());
 			int lastVisiblePosition = 0;
-			if(!lastPositionStack.empty()){
+			if (!lastPositionStack.empty()) {
 				lastVisiblePosition = lastPositionStack.pop();
 			}
 
-			if(lastVisiblePosition>=0){
+			if (lastVisiblePosition >= 0) {
 				mLayoutManager.scrollToPositionWithOffset(lastVisiblePosition, 0);
 			}
 		}
 	}
 
 	@Override
-	public void finishRenameActionWithSuccess(@NonNull String newName) {
-		//No action needed
-	}
-
-	@Override
-	public void actionConfirmed() {
-		//No update needed
-	}
-
-	@Override
-	public void createFolder(@NotNull String value) {
-		logDebug(value + " Of value");
-        SDCardOperator sdCardOperator = null;
-        try {
-            sdCardOperator = new SDCardOperator(this);
-        } catch (SDCardOperator.SDCardException e) {
-            e.printStackTrace();
-            logError("Initialize SDCardOperator failed", e);
-        }
-
-        if (sdCardOperator != null && SDCardOperator.isSDCardPath(path.getAbsolutePath())) {
-            try {
-                sdCardOperator.initDocumentFileRoot(dbH.getSDCardUri());
-                sdCardOperator.createFolder(path.getAbsolutePath(), value);
-            } catch (SDCardOperator.SDCardException e) {
-                e.printStackTrace();
-                logError("SDCardOperator initDocumentFileRoot failed", e);
-                showErrorAlertDialog(getString(R.string.error_io_problem), true, this);
-            }
-        } else {
-            createFolderWithFile(value);
-        }
-
-        setFiles(path);
-    }
-
-    private void createFolderWithFile(String value) {
-        File newFolder = new File(path, value);
-        newFolder.mkdir();
-        newFolder.setReadable(true, false);
-        newFolder.setExecutable(true, false);
-    }
-
-	@Override
 	public void onActivityResult(int requestCode, int resultCode, Intent intent) {
 		super.onActivityResult(requestCode, resultCode, intent);
 
-		if (requestCode == REQUEST_CODE_TREE) {
-			if (intent == null) {
-				logWarning("intent NULL");
-				if (resultCode != Activity.RESULT_OK) {
-					if (isBasedOnFileStorage()) {
-						showSnackbar(viewContainer, getString(R.string.download_requires_permission));
-					}
-				} else {
-					onCannotWriteOnSDCard();
-				}
-				return;
-			}
-
-			Uri treeUri = intent.getData();
-			if (treeUri == null) {
-				logWarning("tree uri is null!");
-				onCannotWriteOnSDCard();
-				return;
-			}
-
-            /*
-                If a device's OS version is >= N and < Q, the granted SD card uri MUST be root uri,
-                then user can select any location on SD card as donwload location.
-
-                But if the uri is not root(it may happen when user request uri from SAF,
-                because user can select any folder and just grant the uri for the selected folder),
-                need to force the user to select SD card root on SAF.
-             */
-            if (isBasedOnFileStorage() && SDCardUtils.isNotRootUri(treeUri)) {
-				showSnackbar(viewContainer, StringResourcesUtils.getString(R.string.ask_for_select_sdcard_root));
-				RunOnUIThreadUtils.INSTANCE.runDelay(1500, () -> {
-                    startActivityForResult(openSAFIntent(), REQUEST_CODE_TREE);
-                    return Unit.INSTANCE;
-                });
-                return;
-            }
-
-            ContentResolver contentResolver = getContentResolver();
-			contentResolver.takePersistableUriPermission(treeUri, Intent.FLAG_GRANT_READ_URI_PERMISSION | Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
-			DocumentFile pickedDir = DocumentFile.fromTreeUri(this, treeUri);
-			if (pickedDir == null || !pickedDir.canWrite()) {
-				logWarning("PickedDir null or cannot write.");
-				return;
-			}
-
-			SDCardOperator sdCardOperator = null;
-			try {
-				sdCardOperator = new SDCardOperator(this);
-			} catch (SDCardOperator.SDCardException e) {
-				e.printStackTrace();
-				logError("SDCardOperator initialize failed", e);
-			}
-
-			if (sdCardOperator == null) {
-				onCannotWriteOnSDCard();
-				return;
-			}
-
-            String uriString = treeUri.toString();
-            if (isBasedOnFileStorage()) {
-                // The uri is SD card root uri.
-                dbH.setSDCardUri(uriString);
-                sdRoot = sdCardOperator.getSDCardRoot();
-                openSDCardPath();
-            } else {
-                String pathString = getFullPathFromTreeUri(treeUri, this);
-
-                if (isTextEmpty(pathString)) {
-                    logWarning("getFullPathFromTreeUri is Null.");
-                    return;
-                }
-
-                path = new File(pathString);
-
-                if (pickFolderType.equals(PickFolderType.CU_FOLDER)) {
-                    dbH.setUriExternalSDCard(uriString);
-                } else if (pickFolderType.equals(PickFolderType.MU_FOLDER)) {
-                    dbH.setUriMediaExternalSdCard(uriString);
-                } else if (fromSaveRecoveryKey) {
-                    // For temporary use, don't store the uri to database.
-                    sdCardUriString = uriString;
-                } else {
-                    dbH.setSDCardUri(uriString);
-                }
-
-                finishPickFolder();
-            }
-        } else if (requestCode == REQUEST_SAVE_RK) {
-			if (intent != null && resultCode == Activity.RESULT_OK) {
-				setResult(RESULT_OK, new Intent().setData(intent.getData()));
-			}
-
+		if (resultCode != RESULT_OK || intent == null) {
 			//If resultCode is not Activity.RESULT_OK, means cancelled, so only finish.
+			logDebug("Result code: " + resultCode);
 			finish();
-		} else if (requestCode == REQUEST_PICK_CU_FOLDER) {
-			if (intent != null && resultCode == Activity.RESULT_OK) {
+			return;
+		}
+
+		Uri uri = intent.getData();
+		boolean isPrimary;
+
+		switch (requestCode) {
+			case REQUEST_SAVE_RK:
+				setResult(RESULT_OK, new Intent().setData(uri));
+				finish();
+				break;
+
+			case REQUEST_PICK_CU_FOLDER:
 				logDebug("Folder picked from system picker");
-				Uri uri = intent.getData();
 				getContentResolver().takePersistableUriPermission(uri, Intent.FLAG_GRANT_READ_URI_PERMISSION);
-				boolean isPrimary = setPathAndCheckIfIsPrimary(uri);
+				isPrimary = setPathAndCheckIfIsPrimary(uri);
 
 				if (!isPrimary) {
 					if (pickFolderType.equals(PickFolderType.CU_FOLDER)) {
@@ -1086,27 +618,20 @@ public class FileStorageActivityLollipop extends PasscodeActivity implements OnC
 				}
 
 				finishPickFolder();
-			}
+				break;
 
-			//If resultCode is not Activity.RESULT_OK, means cancelled, so only finish.
-			finish();
-		} else if (requestCode == REQUEST_PICK_DOWNLOAD_FOLDER) {
-			if (intent != null && resultCode == Activity.RESULT_OK) {
-				Uri uri = intent.getData();
+			case REQUEST_PICK_DOWNLOAD_FOLDER:
 				getContentResolver().takePersistableUriPermission(uri, Intent.FLAG_GRANT_READ_URI_PERMISSION | Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
-				boolean isPrimary = setPathAndCheckIfIsPrimary(uri);
+				isPrimary = setPathAndCheckIfIsPrimary(uri);
 
 				if (!isPrimary) {
 					dbH.setSDCardUri(uri.toString());
 				}
 
 				finishPickFolder();
-			} else {
-				//If resultCode is not Activity.RESULT_OK, means cancelled, so only finish.
-				finish();
-			}
+				break;
 		}
-    }
+	}
 
 	/**
 	 * Sets as path the picked folder and checks if the chosen path is in the primary storage.
@@ -1125,14 +650,6 @@ public class FileStorageActivityLollipop extends PasscodeActivity implements OnC
 		path = new File(DocumentFileUtils.getAbsolutePath(documentFile, this));
 
 		return DocumentFileUtils.getId(documentFile).equals(StorageId.PRIMARY);
-	}
-
-	/**
-	 * Shows a warning indicating no SD card was detected.
-	 */
-	private void onCannotWriteOnSDCard() {
-		showSnackbar(viewContainer, getString(R.string.no_external_SD_card_detected));
-		new Handler().postDelayed(this::openPickFromInternalStorage, 2000);
 	}
 
 	public void changeActionBarElevation(boolean withElevation) {

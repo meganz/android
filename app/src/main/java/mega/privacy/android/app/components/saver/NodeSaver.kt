@@ -30,7 +30,6 @@ import mega.privacy.android.app.utils.LogUtil.logDebug
 import mega.privacy.android.app.utils.LogUtil.logWarning
 import mega.privacy.android.app.utils.MegaNodeUtil.autoPlayNode
 import mega.privacy.android.app.utils.OfflineUtils.getOfflineFile
-import mega.privacy.android.app.utils.permission.PermissionUtils.hasPermissions
 import mega.privacy.android.app.utils.RunOnUIThreadUtils.post
 import mega.privacy.android.app.utils.RxUtil.logErr
 import mega.privacy.android.app.utils.SDCardOperator
@@ -38,6 +37,7 @@ import mega.privacy.android.app.utils.StringResourcesUtils.getString
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.Util.getSizeString
 import mega.privacy.android.app.utils.Util.storeDownloadLocationIfNeeded
+import mega.privacy.android.app.utils.permission.PermissionUtils.hasPermissions
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaApiJava.nodeListToArray
 import nz.mega.sdk.MegaNode
@@ -542,8 +542,7 @@ class NodeSaver(
         prompt: String?, activityLauncher: ActivityLauncher
     ) {
         val intent = Intent(PICK_FOLDER.action)
-        intent.putExtra(EXTRA_BUTTON_PREFIX, getString(R.string.general_select))
-        intent.putExtra(EXTRA_FROM_SETTINGS, false)
+        intent.putExtra(PICK_FOLDER_TYPE, PickFolderType.DOWNLOAD_FOLDER.folderType)
         intent.setClass(app, FileStorageActivityLollipop::class.java)
 
         if (prompt != null) {

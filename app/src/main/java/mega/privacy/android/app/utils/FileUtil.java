@@ -1085,10 +1085,9 @@ public class FileUtil {
      * @param context         Current context.
      * @param content         The content to store.
      * @param path            The selected location to save the file.
-     * @param sdCardUriString If the selected location is on SD card, need the uri to grant SD card write permission.
      * @return True if content was correctly saved, false otherwise.
      */
-    public static boolean saveTextOnFile(Context context, String content, String path, String sdCardUriString) {
+    public static boolean saveTextOnFile(Context context, String content, String path) {
         try {
             // If export the file to SD card.
             if (SDCardUtils.isLocalFolderOnSDCard(context, path)) {
@@ -1102,8 +1101,7 @@ public class FileUtil {
                 // Copy to target location on SD card.
                 SDCardOperator sdCardOperator = new SDCardOperator(context);
                 DatabaseHandler dbH = DatabaseHandler.getDbHandler(context);
-                // If the `sdCardUriString` is null, get SD card root uri from database.
-                sdCardOperator.initDocumentFileRoot(sdCardUriString == null ? dbH.getSDCardUri() : sdCardUriString);
+                sdCardOperator.initDocumentFileRoot(dbH.getSDCardUri());
                 sdCardOperator.moveFile(path.substring(0, path.lastIndexOf(File.separator)), temp);
 
                 // Delete the temp file.
