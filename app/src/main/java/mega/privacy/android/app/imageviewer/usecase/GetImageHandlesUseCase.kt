@@ -94,9 +94,7 @@ class GetImageHandlesUseCase @Inject constructor(
                 }
             }
 
-            if (items.isNotEmpty()) {
-                items
-            } else {
+            items.ifEmpty {
                 error("Invalid image handles")
             }
         }

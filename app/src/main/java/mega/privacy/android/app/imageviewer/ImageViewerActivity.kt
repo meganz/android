@@ -440,7 +440,7 @@ class ImageViewerActivity : BaseActivity(), PermissionRequester, SnackbarShower 
                     !item.isFromRubbishBin && item.handle > INVALID_HANDLE
 
                 findItem(R.id.action_save_gallery)?.isVisible =
-                    isSaveToGalleryCompatible() && !item.isExternalNode && !item.isFromRubbishBin
+                    isSaveToGalleryCompatible() && !item.isExternalNode && !item.isFromRubbishBin && item.node != null
 
                 findItem(R.id.action_get_link)?.isVisible =
                     isOnline && item.hasOwnerAccess && !item.isFromRubbishBin && !item.isExternalNode
