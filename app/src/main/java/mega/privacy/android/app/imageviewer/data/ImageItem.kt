@@ -24,6 +24,9 @@ data class ImageItem constructor(
     val isOffline: Boolean = false
 ) {
 
+    fun isFromChat(): Boolean =
+        chatMessageId != null || chatRoomId != null
+
     class DiffCallback : DiffUtil.ItemCallback<ImageItem>() {
         override fun areItemsTheSame(oldItem: ImageItem, newItem: ImageItem) =
             oldItem.handle == newItem.handle

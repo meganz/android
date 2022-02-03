@@ -34,8 +34,11 @@ import static mega.privacy.android.app.listeners.ShareListener.*;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.MegaApiUtils.*;
+import static mega.privacy.android.app.utils.MegaNodeDialogUtil.BACKUP_NONE;
+import static mega.privacy.android.app.utils.MegaNodeUtil.checkBackupNodeTypeByHandle;
 import static mega.privacy.android.app.utils.StringResourcesUtils.getString;
 import static mega.privacy.android.app.utils.Util.*;
+import static nz.mega.sdk.MegaShare.ACCESS_READ;
 
 public class NodeController {
 
@@ -541,15 +544,23 @@ public class NodeController {
 
         if (nodeHandles == null || nodeHandles.length == 0) return;
 
-        for (int i = 0; i < nodeHandles.length; i++) {
-            shareFolder(megaApi.getNodeByHandle(nodeHandles[i]), contactsData, permissions);
+        for (long nodeHandle : nodeHandles) {
+            shareFolder(megaApi.getNodeByHandle(nodeHandle), contactsData, permissions);
         }
     }
 
     public void shareFolder(MegaNode node, String email, int permissions, ShareListener shareListener) {
         if (node == null || email == null) return;
 
-        megaApi.share(node, email, permissions, shareListener);
+        int nodeType = checkBackupNodeTypeByHandle(megaApi, node);
+        logDebug("MyBackup + shareFolders nodeType = " + nodeType);
+
+        if (nodeType == BACKUP_NONE) {
+            megaApi.share(node, email, permissions, shareListener);
+        } else {
+            megaApi.share(node, email, ACCESS_READ, shareListener);
+        }
+
     }
 
     public void cleanRubbishBin(){

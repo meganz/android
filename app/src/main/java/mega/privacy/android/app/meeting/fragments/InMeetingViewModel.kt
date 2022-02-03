@@ -18,6 +18,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
 import mega.privacy.android.app.components.twemoji.EmojiTextView
+import mega.privacy.android.app.constants.EventConstants
 import mega.privacy.android.app.constants.EventConstants.EVENT_CALL_STATUS_CHANGE
 import mega.privacy.android.app.constants.EventConstants.EVENT_UPDATE_CALL
 import mega.privacy.android.app.fragments.homepage.Event
@@ -1345,6 +1346,12 @@ class InMeetingViewModel @Inject constructor(
      */
     fun leaveMeeting() {
         _callLiveData.value?.let {
+            if(amIAGuest()){
+                LiveEventBus.get(
+                    EventConstants.EVENT_REMOVE_CALL_NOTIFICATION,
+                    Long::class.java
+                ).post(it.callId)
+            }
             inMeetingRepository.leaveMeeting(
                 it.callId,
                 HangChatCallListener(MegaApplication.getInstance(), this)
