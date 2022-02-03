@@ -71,6 +71,9 @@ sealed class FolderContent(val id: Long) {
         override fun getSectionTitle(): String = ""
     }
 
+    /**
+     * Diff callback used to compare FolderContent items before perform an update in the RecyclerView.
+     */
     class DiffCallback : DiffUtil.ItemCallback<FolderContent>() {
         override fun areItemsTheSame(
             oldContent: FolderContent,

@@ -94,7 +94,7 @@ class UploadFolderViewModel @Inject constructor(
     /**
      * Checks if a search has been already done.
      *
-     * @return True if the search has been alredy done, false otherwise.
+     * @return True if the search has been already done, false otherwise.
      */
     private fun isSearchAlreadyDone(): Boolean =
         searchResults.containsKey(currentFolder.value)

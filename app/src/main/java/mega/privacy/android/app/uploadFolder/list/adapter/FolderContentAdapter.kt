@@ -133,7 +133,7 @@ class FolderContentAdapter(
      * otherwise only one span.
      *
      * @param spanCount The number of spans of each row.
-     * @return The number of spans a grid holder should ocuppy.
+     * @return The number of spans a grid holder should occupy.
      */
     fun getSpanSizeLookup(spanCount: Int): SpanSizeLookup =
         object : SpanSizeLookup() {
