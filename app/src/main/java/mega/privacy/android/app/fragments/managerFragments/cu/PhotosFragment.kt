@@ -31,6 +31,7 @@ import mega.privacy.android.app.utils.*
 import mega.privacy.android.app.utils.ColorUtils.DARK_IMAGE_ALPHA
 import mega.privacy.android.app.utils.ColorUtils.setImageViewAlphaIfDark
 import mega.privacy.android.app.utils.Constants.PHOTO_SYNC_ADAPTER
+import mega.privacy.android.app.utils.LogUtil.logDebug
 import mega.privacy.android.app.utils.ZoomUtil.PHOTO_ZOOM_LEVEL
 import mega.privacy.android.app.utils.permission.PermissionUtils.hasPermissions
 import mega.privacy.android.app.utils.permission.PermissionUtils.requestPermission
@@ -66,41 +67,16 @@ class PhotosFragment : BaseZoomFragment() {
                 false
             )
         }
+
         startForResult =
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result: ActivityResult ->
             if (result.resultCode == Activity.RESULT_OK) {
-                LogUtil.logDebug("resultCode = ${result.resultCode}")
-                val prefs = dbH.preferences
-
-                if (result.data != null) {
-                    // Set isFirstLogin to false after selecting a folder for upload
-                    mManagerActivity.isFirstLogin = false
-                    viewModel.setEnableCUShown(false)
-
-                    val cameraPath: String? =
-                        result.data?.getStringExtra(FileStorageActivityLollipop.EXTRA_PATH)
-
-                    cameraPath?.let {
-                        val isExternalSDCardCU = SDCardUtils.isLocalFolderOnSDCard(
-                            context,
-                            cameraPath
-                        ) && !FileUtil.isBasedOnFileStorage()
-
-                        val camSyncLocalPath =
-                            if (isExternalSDCardCU) SDCardUtils.getSDCardDirName(
-                                Uri.parse(
-                                    prefs.uriExternalSDCard
-                                )
-                            ) else cameraPath
-
-                        prefs.camSyncLocalPath = camSyncLocalPath
-                        dbH.setCamSyncLocalPath(camSyncLocalPath)
-                        dbH.setCamSyncEnabled(true)
-                        // Set false to unblock the camera upload service
-                        CameraUploadsService.setInCameraUploadsSetting(false)
-                    }
-                }
+                logDebug("resultCode = ${result.resultCode}")
+                setCameraUploadLocalPath(result)
                 startCU()
+            } else {
+                // Set false to unblock the camera upload service
+                CameraUploadsService.setInCameraUploadsSetting(false)
             }
         }
     }
@@ -201,9 +177,47 @@ class PhotosFragment : BaseZoomFragment() {
         }
 
         Handler(Looper.getMainLooper()).postDelayed({
-            LogUtil.logDebug("Starting CU")
+            logDebug("Starting CU")
             JobUtil.startCameraUploadService(context)
         }, 1000)
+    }
+
+    /**
+     * Set the local path for camera uploading
+     *
+     * @param result An instance obtained form Activity.onActivityResult that contains the path info
+     */
+    private fun setCameraUploadLocalPath(result: ActivityResult) {
+        val prefs = dbH.preferences
+        // Set false to unblock the camera upload service
+        CameraUploadsService.setInCameraUploadsSetting(false)
+
+        if (result.data != null) {
+            // Set isFirstLogin to false after selecting a folder for upload
+            mManagerActivity.isFirstLogin = false
+            viewModel.setEnableCUShown(false)
+
+            val cameraPath: String? =
+                result.data?.getStringExtra(FileStorageActivityLollipop.EXTRA_PATH)
+
+            cameraPath?.let {
+                val isExternalSDCardCU = SDCardUtils.isLocalFolderOnSDCard(
+                    context,
+                    cameraPath
+                ) && !FileUtil.isBasedOnFileStorage()
+
+                val camSyncLocalPath =
+                    if (isExternalSDCardCU) SDCardUtils.getSDCardDirName(
+                        Uri.parse(
+                            prefs.uriExternalSDCard
+                        )
+                    ) else cameraPath
+
+                prefs.camSyncLocalPath = camSyncLocalPath
+                dbH.setCamSyncLocalPath(camSyncLocalPath)
+                dbH.setCamSyncEnabled(true)
+            }
+        }
     }
 
     /**
@@ -528,6 +542,7 @@ class PhotosFragment : BaseZoomFragment() {
     private fun showCameraUploadSettingDialog() {
         // Set true to block the camera upload service
         CameraUploadsService.setInCameraUploadsSetting(true)
+
         if (alertDialog != null) {
             alertDialog?.show()
             dialogIsShowing = true
