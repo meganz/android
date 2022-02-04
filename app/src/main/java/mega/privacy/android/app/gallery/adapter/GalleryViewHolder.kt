@@ -7,8 +7,10 @@ import androidx.core.content.ContextCompat
 import androidx.databinding.ViewDataBinding
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.facebook.drawee.backends.pipeline.Fresco
 import com.facebook.drawee.generic.RoundingParams
 import com.facebook.drawee.view.SimpleDraweeView
+import com.facebook.imagepipeline.request.ImageRequestBuilder
 import mega.privacy.android.app.R
 import mega.privacy.android.app.databinding.ItemGalleryImageBinding
 import mega.privacy.android.app.databinding.ItemGalleryTitleBinding
@@ -46,7 +48,12 @@ class GalleryViewHolder(
             // doesn't call setVisibility when dismissed
             thumbnail.visibility = View.VISIBLE
             if (item.thumbnail != null) {
-                thumbnail.setImageURI(Uri.fromFile(item.thumbnail))
+                val request = ImageRequestBuilder.newBuilderWithSource(Uri.fromFile(item.thumbnail)).build()
+                val controller = Fresco.newDraweeControllerBuilder()
+                    .setImageRequest(request)
+                    .setOldController(thumbnail.controller)
+                    .build()
+                thumbnail.controller = controller
             } else {
                 thumbnail.setActualImageResource(R.drawable.ic_image_thumbnail)
             }

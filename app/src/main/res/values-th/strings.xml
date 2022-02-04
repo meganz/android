@@ -1586,10 +1586,6 @@
     <string name="upload_service_notification">กำลังอัปโหลดไฟล์: %1$d จาก %2$d</string>
     <!-- Text of the notification shown when the upload service is paused: e.g. Uploading files: 1 of 10 (paused)-->
     <string name="upload_service_notification_paused">กำลังอัปโหลดไฟล์: %1$d จาก %2$d (หยุดชั่วคราว)</string>
-    <!-- Text of the notification shown when the folder upload service is running, e.g. Uploading folders 1 of 2 -->
-    <string name="folder_upload_service_notification">กำลังอัปโหลดโฟลเดอร์: %1$d จาก %2$d</string>
-    <!-- Text of the notification shown when the folder upload service is paused, e.g. Uploading folders 1 of 2 (paused) -->
-    <string name="folder_upload_service_notification_paused">กำลังอัปโหลดโฟลเดอร์: %1$d จาก %2$d (หยุดชั่วคราว)</string>
     <!-- Text of the notification shown when the upload service has finished, Plural -->
     <plurals name="upload_service_final_notification">
         <item quantity="other">อัปโหลดแล้ว %1$d ไฟล์</item>
@@ -1597,10 +1593,6 @@
     <!-- Text of the notification shown when the upload service has finished, Plural -->
     <plurals name="upload_service_notification_already_uploaded">
         <item quantity="other">อัปโหลดไฟล์แล้ว %1$d ไฟล์</item>
-    </plurals>
-    <!-- Text of the notification shown when the folder upload service has finished, Text of the notification shown when the folder upload service has finished - plural  e.g. Uploaded 2 folders -->
-    <plurals name="folder_upload_service_final_notification">
-        <item quantity="other">อัปโหลดแล้ว %1$d โฟลเดอร์</item>
     </plurals>
     <!-- label for the total file size of multiple files and/or folders (no need to put the colon punctuation in the translation) -->
     <string name="general_total_size">ขนาดทั้งหมด: %1$s</string>
@@ -2542,7 +2534,10 @@
     <!-- Settings preference title to show file versions info of the account -->
     <string name="settings_file_management_file_versions_title">ไฟล์เวอร์ชัน</string>
     <!-- Settings preference subtitle to show file versions info of the account -->
-    <string name="settings_file_management_file_versions_subtitle">%1$d เวอร์ชันไฟล์ รวมทั้งหมด %2$s</string>
+    <plurals name="settings_file_management_file_versions_subtitle">
+        <item quantity="one">1 file version, taking a total of %2$s</item>
+        <item quantity="other">%1$d file versions, taking a total of %2$s</item>
+    </plurals>
     <!-- Title of the section File management on Settings section -->
     <string name="settings_file_management_category">การจัดการไฟล์</string>
     <!-- Option in Settings to delete all the versions of the account -->
@@ -3113,8 +3108,8 @@
     <string name="not_allow_play_alert">ไม่สามารถเล่นไฟล์มีเดียขณะกำลังโทรได้</string>
     <!-- Text shown in the list of chats when there is a call in progress but I am not on it -->
     <string name="ongoing_call_messages">สายที่กำลังโทร</string>
-    <!-- Title of the layout to join a group call from the chat screen. The placeholder indicates the user who initiated the call -->
-    <string name="join_call_layout_in_group_call">%s เริ่มการโทรกลุ่ม แตะเพื่อเข้าร่วม</string>
+    <!-- Title of the layout to join a group call from the chat screen. -->
+    <string name="join_call_layout_in_group_call">Tap to join current group call.</string>
     <!-- Title of the layout to return to a call -->
     <string name="call_in_progress_layout">แตะเพื่อกลับไปที่การโทร</string>
     <!-- message displayed when you try to start a call but it is not possible because you are already on a call -->
@@ -3489,8 +3484,8 @@
     <string name="section_documents">เอกสาร</string>
     <!-- Label of the floating action button of opening the new chat conversation -->
     <string name="fab_label_new_chat">แชทใหม่</string>
-    <!-- Text that indicates that there’s no photo to show -->
-    <string name="homepage_empty_hint_photos">ไม่พบรูปถ่าย</string>
+    <!-- Text that indicates that there’s no image to show in image section -->
+    <string name="homepage_empty_hint_photos">[B]No[/B] [A]Images[/A] [B]Found[/B]</string>
     <!-- Text that indicates that there’s no document to show -->
     <string name="homepage_empty_hint_documents">ไม่พบเอกสาร</string>
     <!-- Text that indicates that there’s no audio to show -->
@@ -3744,7 +3739,7 @@
     <!-- Settings hint that indicates the audio will still be played in background if the app is backgrounded -->
     <string name="settings_background_play_hint">เล่นเป็นเบื้องหลัง</string>
     <!-- Text of the empty screen when there are no elements in Photos -->
-    <string name="photos_empty">[B]ไม่มี[/B] [A]รูปถ่าย[/A]</string>
+    <string name="photos_empty">[B]No[/B] [A]Photos[/A] [B]Found[/B]</string>
     <!-- Text to show as subtitle of Enable camera uploads screen -->
     <string name="enable_cu_subtitle">สำรองรูปภาพและวิดีโอของคุณไปยังคลาวด์ไดร์ฟโดยอัตโนมัติ</string>
     <!-- Text of a button on Camera Uploads section to show all the content of the section-->
@@ -3777,8 +3772,6 @@
     <string name="error_share_owner_storage_quota">เจ้าของการแชร์ได้ใช้พื้นที่เก็บข้อมูลเกินโควต้า</string>
     <!-- A message shown when uploading, copying or moving something to an incoming share and the owner’s account is over its storage quota. -->
     <string name="warning_share_owner_storage_quota">ไม่สามารถส่งไฟล์ไปยังผู้ใช้ปลายทางได้ เนื่องจากเกินโควต้าการจัดเก็บข้อมูลแล้ว</string>
-    <!-- Content to show in a Snackbar to tip the incompatibility-->
-    <string name="version_incompatibility">เรากำลังอัปเกรด MEGAchat การโทรของคุณอาจไม่เชื่อมต่อเนื่องจากเวอร์ชันที่เข้ากันไม่ได้ เว้นแต่ทุกฝ่ายจะอัปเดตแอป MEGA เป็นเวอร์ชันล่าสุดแล้ว</string>
     <!-- Message displayed when multiple download starts and 1 file has already been downloaded before and 1 file is being downloaded -->
     <string name="file_already_downloaded_and_file_pending_download">ดาวน์โหลดแล้ว 1 ไฟล์ อยู่ระหว่างดำเนินการ 1 ไฟล์</string>
     <!-- Message displayed when multiple download starts and 1 file has already been downloaded before and multiple files are being downloaded. Placeholder: number of files -->
@@ -3981,8 +3974,8 @@
     <string name="be_new_moderator">คุณเป็นผู้ดูแลคนใหม่</string>
     <!-- the content of snack bar when copied meeting link-->
     <string name="copied_meeting_link">คัดลอกลิงก์การประชุมแล้ว</string>
-    <!-- Title of the layout to join a meeting from the chat screen. The placeholder indicates the user who initiated the meeting -->
-    <string name="join_meeting_layout_in_group_call">%sเริ่มการประชุม แตะเพื่อเข้าร่วม</string>
+    <!-- Title of the layout to join a meeting from the chat screen. -->
+    <string name="join_meeting_layout_in_group_call">Tap to join current meeting.</string>
     <!-- Title of fifth tour screen -->
     <string name="title_tour_five">MEGA การประชุม</string>
     <!-- Content of fourth tour screen -->
@@ -4057,4 +4050,38 @@
     <string name="disable_versioning_warning">ฟีเจอร์การกำหนดเวอร์ชันไฟล์ของเราช่วยให้มั่นใจได้ว่าเราจะเก็บสำเนาไฟล์เก่าของคุณไว้หากคุณแทนที่ด้วยเวอร์ชันที่ใหม่กว่า หากคุณปิดใช้งานการกำหนดเวอร์ชันไฟล์ คุณจะไม่ได้รับการป้องกันเกี่ยวกับเวอร์ชันไฟล์ใด ๆ ของคุณอีกต่อไป สำเนาเก่าจะหายไปเมื่อคุณเปลี่ยน</string>
     <!-- Warning informing the user the folder location is trying to open no longer exists. -->
     <string name="location_not_exist">ตำแหน่งที่ตั้งนี้ไม่มีอยู่แล้ว</string>
+    <!-- Warning shown informing the contact has been previously invited. The placeholder is to show the name of the contact. -->
+    <string name="contact_already_invited">You have already invited %1$s</string>
+    <!-- Warning shown informing the contact request has been sent and can be managed in sent requests section. -->
+    <string name="contact_invited">ส่งคำเชิญเรียบร้อยแล้ว ดูได้ที่คำขอที่ส่งแล้ว</string>
+    <!-- Message when file available offline. -->
+    <string name="file_available_offline">ไฟล์พร้อมใช้งานออฟไลน์แล้ว</string>
+    <!-- Message when file removed from offline. -->
+    <string name="file_removed_offline">ไฟล์ถูกลบออกจากออฟไลน์แล้ว</string>
+    <!-- Menu option to open a link. Also title of the dialog to open a link. -->
+    <string name="action_open_link">เปิดลิงก์</string>
+    <!-- error message shown when a chat link is not well formed. -->
+    <string name="invalid_chat_link_args">ลิงก์แชทไม่ถูกต้อง</string>
+    <!-- Menu option to open a chat link. -->
+    <string name="action_open_chat_link">เปิดลิงก์แชท</string>
+    <!-- Hint shown in the open chat link alert dialog. -->
+    <string name="hint_enter_chat_link">เข้าสู่ลิงก์แชท</string>
+    <!-- Hint shown in the open link alert dialog. -->
+    <string name="hint_paste_link">วางลิงก์</string>
+    <!-- Error shown when it tries to open an invalid file or folder link .-->
+    <string name="invalid_file_folder_link">ลิงก์ไฟล์หรือโฟลเดอร์ไม่ถูกต้อง</string>
+    <!-- Error shown when it tries to open an invalid file or folder link and the text view is empty. -->
+    <string name="invalid_file_folder_link_empty">กรุณากรอกลิงก์ไฟล์หรือโฟลเดอร์ให้ถูกต้อง</string>
+    <!-- Error shown when it tries to open an invalid chat link and the text view is empty. -->
+    <string name="invalid_chat_link_empty">กรุณากรอกลิงก์แชทให้ถูกต้อง</string>
+    <!-- Error shown when it tries to open a chat link from the Cloud Drive section. -->
+    <string name="valid_chat_link">คุณได้วางลิงก์แชทแล้ว</string>
+    <!-- Error shown when it tries to open a contact link from the Cloud Drive section. -->
+    <string name="valid_contact_link">คุณได้วางลิงก์ผู้ติดต่อแล้ว</string>
+    <!-- Action button to open a contact link.-->
+    <string name="action_open_contact_link">เปิดลิงก์ผู้ติดต่อ</string>
+    <!-- title for the settings to enable high resolution images when on mobile data -->
+    <string name="settings_mobile_data_resoluton_title">Use mobile data to preview high resolution images</string>
+    <!-- summary for the settings to enable high resolution images when on mobile data -->
+    <string name="settings_mobile_data_resoluton_summary">อนุญาตให้ใช้ข้อมูลมือถือเพื่อโหลดภาพความละเอียดสูงเมื่อดูตัวอย่าง หากปิดใช้งาน รูปภาพต้นฉบับจะถูกโหลดเมื่อคุณซูมภาพเท่านั้น</string>
 </resources>
