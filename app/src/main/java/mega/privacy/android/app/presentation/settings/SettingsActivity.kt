@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
+import androidx.fragment.app.FragmentResultListener
 import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
 import dagger.hilt.android.AndroidEntryPoint
@@ -46,14 +47,6 @@ class SettingsActivity : AppCompatActivity(),
         outState.putCharSequence(TITLE_TAG, title)
     }
 
-//    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-//        if (item.itemId == android.R.id.home){
-//            onBackPressed()
-//            return true
-//        }
-//        return super.onOptionsItemSelected(item)
-//    }
-
     override fun onSupportNavigateUp(): Boolean {
         if (supportFragmentManager.popBackStackImmediate()) {
             return true
@@ -72,13 +65,19 @@ class SettingsActivity : AppCompatActivity(),
             pref.fragment
         ).apply {
             arguments = args
-            setTargetFragment(caller, 0)
         }
         // Replace the existing Fragment with the new Fragment
         supportFragmentManager.beginTransaction()
             .replace(R.id.settings, fragment)
             .addToBackStack(null)
             .commit()
+
+        if(caller is FragmentResultListener){
+            supportFragmentManager.setFragmentResultListener(pref.key, this, caller)
+//            In the calling fragment, implement FragmentResultListener to handle results for a specific preference key
+//            In the Called Fragment, setFragmentResult using the preference key to pass back any results
+        }
+
         title = pref.title
         return true
     }
