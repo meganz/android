@@ -2,11 +2,9 @@ package mega.privacy.android.app.data.repository
 
 import android.content.Context
 import dagger.hilt.android.qualifiers.ApplicationContext
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import mega.privacy.android.app.MegaApplication
-import mega.privacy.android.app.constants.EventConstants
-import mega.privacy.android.app.data.facade.EventBusFacade
+import mega.privacy.android.app.data.gateway.MonitorMultiFactorAuth
 import mega.privacy.android.app.di.MegaApi
 import mega.privacy.android.app.domain.entity.UserAccount
 import mega.privacy.android.app.domain.exception.MegaException
@@ -24,7 +22,7 @@ class DefaultAccountRepository @Inject constructor(
     private val myAccountInfo: MyAccountInfo,
     @MegaApi private val sdk: MegaApiAndroid,
     @ApplicationContext private val context: Context,
-    private val eventBusFacade: EventBusFacade,
+    private val monitorMultiFactorAuth: MonitorMultiFactorAuth,
 ) : AccountRepository {
     override fun getUserAccount(): UserAccount {
         return UserAccount(
@@ -91,11 +89,8 @@ class DefaultAccountRepository @Inject constructor(
         }
     }
 
-    @OptIn(ExperimentalCoroutinesApi::class)
     override fun monitorMultiFactorAuthChanges(): Flow<Boolean> {
-        val event = EventConstants.EVENT_2FA_UPDATED
-        val type = Boolean::class.java
-        return eventBusFacade.getEventFlow(event, type)
+        return monitorMultiFactorAuth.getEvents()
     }
 
     override suspend fun requestDeleteAccountLink() {

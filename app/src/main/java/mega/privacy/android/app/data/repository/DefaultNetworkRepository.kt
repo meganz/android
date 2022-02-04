@@ -7,21 +7,19 @@ import android.net.NetworkCapabilities
 import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.core.content.ContextCompat.getSystemService
-import androidx.lifecycle.Observer
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.map
-import mega.privacy.android.app.constants.EventConstants
-import mega.privacy.android.app.data.facade.EventBusFacade
+import mega.privacy.android.app.data.gateway.MonitorNetworkConnectivityChange
 import mega.privacy.android.app.domain.entity.ConnectivityState
 import mega.privacy.android.app.domain.repository.NetworkRepository
 import javax.inject.Inject
 
 class DefaultNetworkRepository @Inject constructor(
     @ApplicationContext private val context: Context,
-    private val eventBusFacade: EventBusFacade,
+    private val monitorNetworkConnectivityChange: MonitorNetworkConnectivityChange,
 ) : NetworkRepository {
 
     private val connectivityManager = getSystemService(context, ConnectivityManager::class.java)
@@ -99,10 +97,7 @@ class DefaultNetworkRepository @Inject constructor(
     }
 
     private fun monitorConnectivity(): Flow<ConnectivityState> {
-        return eventBusFacade.getEventFlow(
-                EventConstants.EVENT_NETWORK_CHANGE,
-                Boolean::class.java
-            ).map { connected ->
+        return monitorNetworkConnectivityChange.getEvents().map { connected ->
             val metered = connectivityManager?.isActiveNetworkMetered
             if (connected && metered != null) {
                 ConnectivityState.Connected(metered)

@@ -7,15 +7,14 @@ import kotlinx.coroutines.flow.Flow
 import mega.privacy.android.app.DatabaseHandler
 import mega.privacy.android.app.MegaAttributes
 import mega.privacy.android.app.MegaPreferences
-import mega.privacy.android.app.constants.EventConstants
-import mega.privacy.android.app.data.facade.EventBusFacade
+import mega.privacy.android.app.data.gateway.MonitorHideRecentActivity
+import mega.privacy.android.app.data.gateway.MonitorStartScreen
 import mega.privacy.android.app.di.MegaApi
 import mega.privacy.android.app.domain.exception.MegaException
 import mega.privacy.android.app.domain.exception.SettingNotFoundException
 import mega.privacy.android.app.domain.repository.SettingsRepository
 import mega.privacy.android.app.fragments.settingsFragments.startSceen.util.StartScreenUtil
 import mega.privacy.android.app.utils.FileUtil
-import mega.privacy.android.app.utils.LogUtil
 import mega.privacy.android.app.utils.LogUtil.*
 import mega.privacy.android.app.utils.SharedPreferenceConstants
 import mega.privacy.android.app.utils.Util
@@ -27,8 +26,13 @@ class DefaultSettingsRepository @Inject constructor(
     private val databaseHandler: DatabaseHandler,
     @ApplicationContext private val context: Context,
     @MegaApi private val sdk: MegaApiAndroid,
-    private val eventBusFacade: EventBusFacade,
+    private val monitorStartScreen: MonitorStartScreen,
+    private val monitorHideRecentActivity: MonitorHideRecentActivity,
 ) : SettingsRepository {
+
+    /*
+    Duplicate constants used here to remove dependency on LogUtil static class.
+     */
     private val logPreferences = "LOG_PREFERENCES"
     private val karereLogs = "KARERE_LOGS"
     private val sdkLogs = "SDK_LOGS"
@@ -70,7 +74,14 @@ class DefaultSettingsRepository @Inject constructor(
                                 continuation.resumeWith(Result.success(request!!.flag))
                             }
                             MegaError.API_ENOENT -> {
-                                continuation.resumeWith(Result.failure(SettingNotFoundException(e.errorCode, e.errorString)))
+                                continuation.resumeWith(
+                                    Result.failure(
+                                        SettingNotFoundException(
+                                            e.errorCode,
+                                            e.errorString
+                                        )
+                                    )
+                                )
                             }
                             else -> {
                                 continuation.resumeWith(
@@ -117,7 +128,7 @@ class DefaultSettingsRepository @Inject constructor(
 
     override fun setChatLoggingEnabled(enabled: Boolean) {
         if (!enabled) {
-           logInfo("Karere logs are now disabled - App Version: " + Util.getVersion())
+            logInfo("Karere logs are now disabled - App Version: " + Util.getVersion())
         }
 
         context.getSharedPreferences(LOG_PREFERENCES, Context.MODE_PRIVATE).edit()
@@ -193,7 +204,7 @@ class DefaultSettingsRepository @Inject constructor(
         }
     }
 
-    private fun isSetAutoAcceptQRResponse(request: MegaRequest?)=
+    private fun isSetAutoAcceptQRResponse(request: MegaRequest?) =
         request?.type == MegaRequest.TYPE_SET_ATTR_USER && request.paramType == MegaApiJava.USER_ATTR_CONTACT_LINK_VERIFICATION
 
     private fun getUiPreferences(): SharedPreferences {
@@ -209,14 +220,10 @@ class DefaultSettingsRepository @Inject constructor(
     override fun getPreferences(): MegaPreferences = databaseHandler.preferences
 
     override fun monitorStartScreen(): Flow<Int> {
-        val event = EventConstants.EVENT_UPDATE_START_SCREEN
-        val type = Int::class.java
-        return eventBusFacade.getEventFlow(event, type)
+        return monitorStartScreen.getEvents()
     }
 
     override fun monitorHideRecentActivity(): Flow<Boolean> {
-        val event = EventConstants.EVENT_UPDATE_HIDE_RECENT_ACTIVITY
-        val type = Boolean::class.java
-        return eventBusFacade.getEventFlow(event, type)
+        return monitorHideRecentActivity.getEvents()
     }
 }

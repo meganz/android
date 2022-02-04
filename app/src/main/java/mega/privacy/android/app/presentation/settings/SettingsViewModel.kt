@@ -132,10 +132,10 @@ class SettingsViewModel @Inject constructor(
     suspend fun deleteAccount(): Boolean {
         return kotlin.runCatching { requestAccountDeletion() }
             .fold(
-                { return true },
+                { true },
                 { e ->
                     LogUtil.logError( "Error when asking for the cancellation link: ${e.message}")
-                    return false
+                    false
                 }
             )
     }
