@@ -16,14 +16,16 @@ import java.util.*
  * @property index the index used for seek to this item
  * @property type item type
  * @property size size of the node
+ * @property isSelected Whether the item is selected
  */
 data class PlaylistItem(
     val nodeHandle: Long,
     val nodeName: String,
     val thumbnail: File?,
-    val index: Int,
+    var index: Int,
     val type: Int,
     val size: Long,
+    var isSelected: Boolean = false
 ) {
     /**
      * Create a new instance with the specified index and item type,
@@ -31,13 +33,14 @@ data class PlaylistItem(
      *
      * @param index new index
      * @param type item type
+     * @param isSelected Whether the item is selected
      * @return the new instance
      */
-    fun finalizeItem(index: Int, type: Int): PlaylistItem {
+    fun finalizeItem(index: Int, type: Int, isSelected: Boolean = false): PlaylistItem {
         return PlaylistItem(
             nodeHandle, nodeName,
             if (thumbnail?.exists() == true) thumbnail else null,
-            index, type, size
+            index, type, size, isSelected
         )
     }
 
@@ -48,7 +51,7 @@ data class PlaylistItem(
      * @return the new instance
      */
     fun updateNodeName(newName: String) =
-        PlaylistItem(nodeHandle, newName, thumbnail, index, type, size)
+        PlaylistItem(nodeHandle, newName, thumbnail, index, type, size, isSelected)
 
     companion object {
         const val TYPE_PREVIOUS = 1
