@@ -5,9 +5,7 @@ import android.content.Intent
 import android.text.method.LinkMovementMethod
 import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.LifecycleObserver
-import androidx.lifecycle.OnLifecycleEvent
+import androidx.lifecycle.*
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.disposables.CompositeDisposable
@@ -29,12 +27,11 @@ import javax.inject.Inject
 /**
  * Cookie dialog handler class to manage Cookie Dialog visibility based on view's lifecycle.
  */
-@Suppress("DEPRECATION")
 class CookieDialogHandler @Inject constructor(
     private val getCookieSettingsUseCase: GetCookieSettingsUseCase,
     private val updateCookieSettingsUseCase: UpdateCookieSettingsUseCase,
     private val checkCookieBannerEnabledUseCase: CheckCookieBannerEnabledUseCase
-) : LifecycleObserver {
+) : LifecycleEventObserver {
 
     private val disposable = CompositeDisposable()
     private var dialog: AlertDialog? = null
@@ -125,7 +122,6 @@ class CookieDialogHandler @Inject constructor(
             )
     }
 
-    @OnLifecycleEvent(Lifecycle.Event.ON_RESUME)
     fun onResume() {
         if (dialog?.isShowing == true) {
             checkDialogSettings { showDialog ->
@@ -134,10 +130,17 @@ class CookieDialogHandler @Inject constructor(
         }
     }
 
-    @OnLifecycleEvent(Lifecycle.Event.ON_DESTROY)
     fun onDestroy() {
         disposable.clear()
         dialog?.dismiss()
         dialog = null
+    }
+
+    override fun onStateChanged(source: LifecycleOwner, event: Lifecycle.Event) {
+        when(event){
+            Lifecycle.Event.ON_RESUME -> onResume()
+            Lifecycle.Event.ON_DESTROY -> onDestroy()
+            else -> return
+        }
     }
 }
