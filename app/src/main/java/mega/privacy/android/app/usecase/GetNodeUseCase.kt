@@ -118,7 +118,7 @@ class GetNodeUseCase @Inject constructor(
             val isAvailableOffline = isNodeAvailableOffline(node.handle).blockingGetOrNull() ?: false
             val hasVersions = megaApi.hasVersions(node)
 
-            val isMine = node.owner != INVALID_HANDLE && node.owner == megaApi.myUserHandle.toLongOrNull()
+            val isMine = node.owner != INVALID_HANDLE && node.owner == megaApi.myUserHandleBinary
             val isExternalNode = node.isPublic || node.isForeign || !isMine
             val rootParentNode = megaApi.getRootParentNode(node)
             val isFromIncoming = rootParentNode.isInShare

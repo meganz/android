@@ -698,6 +698,11 @@
             android:label="@string/title_duplicated_items"
             android:launchMode="singleTop"/>
 
+        <activity
+            android:name="mega.privacy.android.app.uploadFolder.UploadFolderActivity"
+            android:launchMode="singleTop"
+            android:windowSoftInputMode="adjustNothing"/>
+
     </application>
 
 </manifest>

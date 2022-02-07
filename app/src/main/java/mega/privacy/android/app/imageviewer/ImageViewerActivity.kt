@@ -24,11 +24,11 @@ import mega.privacy.android.app.components.dragger.DragToExitSupport
 import mega.privacy.android.app.components.saver.NodeSaver
 import mega.privacy.android.app.databinding.ActivityImageViewerBinding
 import mega.privacy.android.app.imageviewer.adapter.ImageViewerAdapter
+import mega.privacy.android.app.imageviewer.data.ImageItem
 import mega.privacy.android.app.imageviewer.dialog.ImageBottomSheetDialogFragment
 import mega.privacy.android.app.interfaces.PermissionRequester
 import mega.privacy.android.app.interfaces.SnackbarShower
 import mega.privacy.android.app.interfaces.showSnackbar
-import mega.privacy.android.app.usecase.data.MegaNodeItem
 import mega.privacy.android.app.utils.AlertsAndWarnings.showSaveToDeviceConfirmDialog
 import mega.privacy.android.app.utils.Constants.*
 import mega.privacy.android.app.utils.ContextUtils.isLowMemory
@@ -36,7 +36,9 @@ import mega.privacy.android.app.utils.LinksUtil
 import mega.privacy.android.app.utils.LogUtil.logError
 import mega.privacy.android.app.utils.LogUtil.logWarning
 import mega.privacy.android.app.utils.MegaNodeDialogUtil.showRenameNodeDialog
+import mega.privacy.android.app.utils.MegaNodeUtil
 import mega.privacy.android.app.utils.NetworkUtil.isOnline
+import mega.privacy.android.app.utils.OfflineUtils
 import mega.privacy.android.app.utils.SdkRestrictionUtils.isSaveToGalleryCompatible
 import mega.privacy.android.app.utils.StringResourcesUtils
 import mega.privacy.android.app.utils.ViewUtils.waitForLayout
@@ -360,7 +362,7 @@ class ImageViewerActivity : BaseActivity(), PermissionRequester, SnackbarShower 
             }
             binding.progress.hide()
         }
-        viewModel.onCurrentImageNode().observe(this, ::showCurrentImageInfo)
+        viewModel.onCurrentImageItem().observe(this, ::showCurrentImageInfo)
         viewModel.onShowToolbar().observe(this, ::changeToolbarVisibility)
         viewModel.onSnackbarMessage().observe(this) { message ->
             bottomSheet?.dismissAllowingStateLoss()
@@ -415,11 +417,15 @@ class ImageViewerActivity : BaseActivity(), PermissionRequester, SnackbarShower 
      *
      * @param item  Image item to show
      */
-    private fun showCurrentImageInfo(item: MegaNodeItem?) {
-        if (item != null) {
+    private fun showCurrentImageInfo(imageItem: ImageItem?) {
+        if (imageItem?.nodeItem != null) {
+            val item = imageItem.nodeItem
             binding.txtTitle.text = item.name
             binding.toolbar.menu?.apply {
                 val isOnline = isOnline()
+
+                findItem(R.id.action_share)?.isVisible =
+                    !item.isFromRubbishBin && (imageItem.isOffline || (imageItem.isFromChat() && (imageItem.nodeItem.hasOwnerAccess || !imageItem.nodePublicLink.isNullOrBlank())))
 
                 findItem(R.id.action_download)?.isVisible =
                     !item.isFromRubbishBin
@@ -464,11 +470,29 @@ class ImageViewerActivity : BaseActivity(), PermissionRequester, SnackbarShower 
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        val nodeItem = viewModel.getCurrentNode() ?: return true
+        val imageItem = viewModel.getCurrentImageItem() ?: return true
+        val nodeItem = imageItem.nodeItem ?: return true
 
         return when (item.itemId) {
             android.R.id.home -> {
                 onBackPressed()
+                true
+            }
+            R.id.action_share -> {
+                when {
+                    imageItem.isOffline ->
+                        OfflineUtils.shareOfflineNode(this, nodeItem.handle)
+                    !imageItem.nodePublicLink.isNullOrBlank() ->
+                        MegaNodeUtil.shareLink(this, imageItem.nodePublicLink)
+                    imageItem.nodeItem.node != null ->
+                        viewModel.shareNode(imageItem.nodeItem.node).observe(this) { link ->
+                            if (!link.isNullOrBlank()) {
+                                MegaNodeUtil.shareLink(this, link)
+                            }
+                        }
+                    else ->
+                        logWarning("Node cannot be shared")
+                }
                 true
             }
             R.id.action_download -> {
