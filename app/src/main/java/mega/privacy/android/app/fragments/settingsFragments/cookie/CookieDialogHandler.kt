@@ -29,6 +29,7 @@ import javax.inject.Inject
 /**
  * Cookie dialog handler class to manage Cookie Dialog visibility based on view's lifecycle.
  */
+@Suppress("DEPRECATION")
 class CookieDialogHandler @Inject constructor(
     private val getCookieSettingsUseCase: GetCookieSettingsUseCase,
     private val updateCookieSettingsUseCase: UpdateCookieSettingsUseCase,

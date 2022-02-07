@@ -1,5 +1,6 @@
 package mega.privacy.android.app.mediaplayer.service
 
+import android.annotation.SuppressLint
 import android.app.Notification
 import android.app.PendingIntent
 import android.content.Context
@@ -38,6 +39,7 @@ import mega.privacy.android.app.utils.LogUtil.logError
 import nz.mega.sdk.MegaApiAndroid
 import javax.inject.Inject
 
+@Suppress("DEPRECATION")
 @AndroidEntryPoint
 open class MediaPlayerService : LifecycleService(), LifecycleObserver {
 
@@ -220,6 +222,7 @@ open class MediaPlayerService : LifecycleService(), LifecycleObserver {
                 return meta.title ?: meta.nodeName
             }
 
+            @SuppressLint("UnspecifiedImmutableFlag")
             @Nullable
             override fun createCurrentContentIntent(player: Player): PendingIntent? {
                 val intent = Intent(applicationContext, AudioPlayerActivity::class.java)
