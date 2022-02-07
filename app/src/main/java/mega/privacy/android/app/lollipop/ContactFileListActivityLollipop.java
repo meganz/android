@@ -588,7 +588,7 @@ public class ContactFileListActivityLollipop extends PasscodeActivity
 	protected void onActivityResult(int requestCode, int resultCode, Intent intent) {
 		super.onActivityResult(requestCode, resultCode, intent);
 
-        if (nodeSaver.handleActivityResult(requestCode, resultCode, intent)) {
+        if (nodeSaver.handleActivityResult(this, requestCode, resultCode, intent)) {
             return;
         }
 

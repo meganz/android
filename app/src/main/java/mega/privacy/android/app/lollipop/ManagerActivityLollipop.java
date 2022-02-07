@@ -8245,7 +8245,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 	protected void onActivityResult(int requestCode, int resultCode, Intent intent) {
 		logDebug("Request code: " + requestCode + ", Result code:" + resultCode);
 
-		if (nodeSaver.handleActivityResult(requestCode, resultCode, intent)) {
+		if (nodeSaver.handleActivityResult(this, requestCode, resultCode, intent)) {
 			return;
 		}
 
