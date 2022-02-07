@@ -136,7 +136,9 @@ import static mega.privacy.android.app.utils.OfflineUtils.removeOffline;
 import static mega.privacy.android.app.utils.OfflineUtils.saveOffline;
 import static mega.privacy.android.app.utils.TextUtil.isTextEmpty;
 import static mega.privacy.android.app.utils.TimeUtils.getHumanizedTime;
-import static mega.privacy.android.app.utils.UploadUtil.chooseFromDevice;
+import static mega.privacy.android.app.utils.UploadUtil.chooseFiles;
+import static mega.privacy.android.app.utils.UploadUtil.chooseFolder;
+import static mega.privacy.android.app.utils.UploadUtil.getFolder;
 import static mega.privacy.android.app.utils.UploadUtil.uploadTakePicture;
 import static mega.privacy.android.app.utils.Util.ONTRANSFERUPDATE_REFRESH_MILLIS;
 import static mega.privacy.android.app.utils.Util.canVoluntaryVerifyPhoneNumber;
@@ -407,6 +409,7 @@ import mega.privacy.android.app.utils.StringResourcesUtils;
 import mega.privacy.android.app.utils.TextUtil;
 import mega.privacy.android.app.utils.ThumbnailUtilsLollipop;
 import mega.privacy.android.app.utils.TimeUtils;
+import mega.privacy.android.app.utils.UploadUtil;
 import mega.privacy.android.app.utils.Util;
 import mega.privacy.android.app.utils.contacts.MegaContactGetter;
 import mega.privacy.android.app.zippreview.ui.ZipBrowserActivity;
@@ -3428,23 +3431,26 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
                 } else if (getIntent().getAction().equals(ACTION_REQUEST_DOWNLOAD_FOLDER_LOGOUT)) {
                     String parentPath = intent.getStringExtra(FileStorageActivityLollipop.EXTRA_PATH);
 
-                    if (parentPath != null) {
-                        String sdCardUriString = intent.getStringExtra(FileStorageActivityLollipop.EXTRA_SD_URI);
-                        AccountController ac = new AccountController(this);
-                        ac.exportMK(parentPath, sdCardUriString);
-                    }
-                } else if (getIntent().getAction().equals(ACTION_RECOVERY_KEY_COPY_TO_CLIPBOARD)) {
-                    AccountController ac = new AccountController(this);
-                    if (getIntent().getBooleanExtra("logout", false)) {
-                        ac.copyMK(true);
-                    } else {
-                        ac.copyMK(false);
-                    }
-                } else if (getIntent().getAction().equals(ACTION_REFRESH_API_SERVER)) {
-                    update2FAEnableState();
-                } else if (getIntent().getAction().equals(ACTION_OPEN_FOLDER)) {
-                    logDebug("Open after LauncherFileExplorerActivityLollipop ");
-                    long handleIntent = getIntent().getLongExtra(INTENT_EXTRA_KEY_PARENT_HANDLE, -1);
+					if (parentPath != null){
+						AccountController ac = new AccountController(this);
+						ac.exportMK(parentPath);
+					}
+				}
+				else  if (getIntent().getAction().equals(ACTION_RECOVERY_KEY_COPY_TO_CLIPBOARD)){
+					AccountController ac = new AccountController(this);
+					if (getIntent().getBooleanExtra("logout", false)) {
+						ac.copyMK(true);
+					}
+					else {
+						ac.copyMK(false);
+					}
+				}
+				else if (getIntent().getAction().equals(ACTION_REFRESH_API_SERVER)){
+					update2FAEnableState();
+				}
+				else if (getIntent().getAction().equals(ACTION_OPEN_FOLDER)) {
+					logDebug("Open after LauncherFileExplorerActivityLollipop ");
+					long handleIntent = getIntent().getLongExtra(INTENT_EXTRA_KEY_PARENT_HANDLE, -1);
 
                     if (getIntent().getBooleanExtra(SHOW_MESSAGE_UPLOAD_STARTED, false)) {
                         int numberUploads = getIntent().getIntExtra(NUMBER_UPLOADS, 1);
@@ -7008,10 +7014,15 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
         presenceStatusDialog.show();
     }
 
-    @Override
-    public void uploadFromDevice() {
-        chooseFromDevice(this);
-    }
+	@Override
+	public void uploadFiles() {
+		chooseFiles(this);
+	}
+
+	@Override
+	public void uploadFolder() {
+		chooseFolder(this);
+	}
 
     @Override
     public void takePictureAndUpload() {
@@ -8315,11 +8326,11 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
             return;
         }
 
-        if (requestCode == REQUEST_CODE_GET && resultCode == RESULT_OK) {
-            if (intent == null) {
-                logWarning("Intent NULL");
-                return;
-            }
+        if (requestCode == REQUEST_CODE_GET_FILES && resultCode == RESULT_OK) {
+			if (intent == null) {
+				logWarning("Intent NULL");
+				return;
+			}
 
             logDebug("Intent action: " + intent.getAction());
             logDebug("Intent type: " + intent.getType());
@@ -8327,15 +8338,19 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
             intent.setAction(Intent.ACTION_GET_CONTENT);
             processFileDialog = showProcessFileDialog(this, intent);
 
-            filePrepareUseCase.prepareFiles(intent)
-                    .subscribeOn(Schedulers.io())
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .subscribe((shareInfo, throwable) -> {
-                        if (throwable == null) {
-                            onIntentProcessed(shareInfo);
-                        }
-                    });
-        } else if (requestCode == WRITE_SD_CARD_REQUEST_CODE && resultCode == RESULT_OK) {
+			filePrepareUseCase.prepareFiles(intent)
+					.subscribeOn(Schedulers.io())
+					.observeOn(AndroidSchedulers.mainThread())
+					.subscribe((shareInfo, throwable) -> {
+						if (throwable == null) {
+							onIntentProcessed(shareInfo);
+						}
+					});
+		} else if (requestCode == REQUEST_CODE_GET_FOLDER) {
+			getFolder(this, resultCode, intent, getCurrentParentHandle());
+		} else if (requestCode == REQUEST_CODE_GET_FOLDER_CONTENT) {
+        	UploadUtil.uploadFolder(this, resultCode, intent);
+		} else if (requestCode == WRITE_SD_CARD_REQUEST_CODE && resultCode == RESULT_OK) {
 
             if (!hasPermissions(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
                 requestPermission(this,
@@ -8630,16 +8645,17 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
         } else if (requestCode == REQUEST_DOWNLOAD_FOLDER && resultCode == RESULT_OK) {
             String parentPath = intent.getStringExtra(FileStorageActivityLollipop.EXTRA_PATH);
 
-            if (parentPath != null) {
-                String path = parentPath + File.separator + getRecoveryKeyFileName();
-                String sdCardUriString = intent.getStringExtra(FileStorageActivityLollipop.EXTRA_SD_URI);
+			if (parentPath != null){
+				String path = parentPath + File.separator + getRecoveryKeyFileName();
 
-                logDebug("REQUEST_DOWNLOAD_FOLDER:path to download: " + path);
-                AccountController ac = new AccountController(this);
-                ac.exportMK(path, sdCardUriString);
-            }
-        } else if (requestCode == REQUEST_CODE_FILE_INFO && resultCode == RESULT_OK) {
-            if (isCloudAdded()) {
+				logDebug("REQUEST_DOWNLOAD_FOLDER:path to download: "+path);
+				AccountController ac = new AccountController(this);
+				ac.exportMK(path);
+			}
+		}
+
+		else if(requestCode == REQUEST_CODE_FILE_INFO && resultCode == RESULT_OK){
+		    if(isCloudAdded()){
                 long handle = intent.getLongExtra(NODE_HANDLE, -1);
                 fbFLol.refresh(handle);
             }
@@ -11538,19 +11554,18 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
                     return;
                 }
 
-                Intent intent = new Intent(this, FileStorageActivityLollipop.class);
-                intent.setAction(FileStorageActivityLollipop.Mode.BROWSE_FILES.getAction());
-                intent.putExtra(FileStorageActivityLollipop.EXTRA_PATH, transfer.getPath());
-                intent.putExtra(FileStorageActivityLollipop.EXTRA_FROM_SETTINGS, false);
-                startActivity(intent);
-            }
-        } else if (transfer.getType() == MegaTransfer.TYPE_UPLOAD) {
-            MegaNode node = megaApi.getNodeByHandle(Long.parseLong(transfer.getNodeHandle()));
-            if (node == null) {
-                showSnackbar(SNACKBAR_TYPE, getString(!isOnline(this) ? R.string.error_server_connection_problem
-                        : R.string.warning_folder_not_exists), MEGACHAT_INVALID_HANDLE);
-                return;
-            }
+				Intent intent = new Intent(this, FileStorageActivityLollipop.class);
+				intent.setAction(FileStorageActivityLollipop.Mode.BROWSE_FILES.getAction());
+				intent.putExtra(FileStorageActivityLollipop.EXTRA_PATH, transfer.getPath());
+				startActivity(intent);
+			}
+		} else if (transfer.getType() == MegaTransfer.TYPE_UPLOAD) {
+			MegaNode node = megaApi.getNodeByHandle(Long.parseLong(transfer.getNodeHandle()));
+			if (node == null) {
+				showSnackbar(SNACKBAR_TYPE, getString(!isOnline(this) ? R.string.error_server_connection_problem
+						: R.string.warning_folder_not_exists), MEGACHAT_INVALID_HANDLE);
+				return;
+			}
 
             viewNodeInFolder(node);
         }

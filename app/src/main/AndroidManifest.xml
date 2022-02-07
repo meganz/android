@@ -626,7 +626,14 @@
         <activity
             android:name=".activities.settingsActivities.StartScreenPreferencesActivity"
             android:label="@string/start_screen_setting"
-            android:launchMode="singleTop"></activity>
+            android:launchMode="singleTop">
+        </activity>
+
+        <activity
+            android:name="mega.privacy.android.app.uploadFolder.UploadFolderActivity"
+            android:launchMode="singleTop"
+            android:windowSoftInputMode="adjustNothing"/>
+
     </application>
 
 </manifest>

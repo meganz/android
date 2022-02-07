@@ -256,6 +256,7 @@ dependencies {
     implementation "com.jeremyliao:live-event-bus-x:$liveEventBus"
 
     implementation "androidx.biometric:biometric:$biometricVersion"
+    implementation "com.anggrayudi:storage:$simpleStorageVersion"
 
     //GMS
     gmsImplementation 'com.android.billingclient:billing:3.0.2'
