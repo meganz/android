@@ -54,6 +54,8 @@ import mega.privacy.android.app.lollipop.ChangePasswordActivityLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.TwoFactorAuthenticationActivity;
 import mega.privacy.android.app.lollipop.VerifyTwoFactorActivity;
+import mega.privacy.android.app.lollipop.managerSections.settings.Settings;
+import mega.privacy.android.app.lollipop.managerSections.settings.SettingsFragment;
 import mega.privacy.android.app.mediaplayer.service.AudioPlayerService;
 import mega.privacy.android.app.mediaplayer.service.MediaPlayerService;
 import mega.privacy.android.app.mediaplayer.service.MediaPlayerServiceBinder;
@@ -76,7 +78,8 @@ import static nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE;
 
 @AndroidEntryPoint
 @SuppressLint("NewApi")
-public class SettingsFragmentLollipop extends SettingsBaseFragment {
+@SuppressWarnings( "deprecation" )
+public class SettingsFragmentLollipop extends SettingsBaseFragment implements Settings {
 
     private static final String EVALUATE_APP_DIALOG_SHOW = "EvaluateAppDialogShow";
 
@@ -122,7 +125,7 @@ public class SettingsFragmentLollipop extends SettingsBaseFragment {
 
     private final ServiceConnection mediaServiceConnection = new ServiceConnection() {
         @Override
-        public void onServiceConnected(ComponentName name, IBinder service)    {
+        public void onServiceConnected(ComponentName name, IBinder service) {
             playerService = ((MediaPlayerServiceBinder) service).getService();
         }
 
@@ -147,11 +150,6 @@ public class SettingsFragmentLollipop extends SettingsBaseFragment {
         storageCategory = findPreference(CATEGORY_STORAGE);
         nestedDownloadLocation = findPreference(KEY_STORAGE_DOWNLOAD);
         nestedDownloadLocation.setOnPreferenceClickListener(this);
-
-        if (isAndroid11OrUpper()) {
-            storageCategory.removePreference(nestedDownloadLocation);
-        }
-
         fileManagementPrefence = findPreference(KEY_STORAGE_FILE_MANAGEMENT);
         fileManagementPrefence.setOnPreferenceClickListener(this);
 
@@ -669,10 +667,10 @@ public class SettingsFragmentLollipop extends SettingsBaseFragment {
             //Send feedback option:
             StringBuilder body = new StringBuilder();
             body.append(getString(R.string.setting_feedback_body))
-            .append("\n\n\n\n\n\n\n\n\n\n\n")
-            .append(getString(R.string.settings_feedback_body_device_model)).append("  ").append(getDeviceName()).append("\n")
-            .append(getString(R.string.settings_feedback_body_android_version)).append("  ").append(Build.VERSION.RELEASE).append(" ").append(Build.DISPLAY).append("\n")
-            .append(getString(R.string.user_account_feedback)).append("  ").append(megaApi.getMyEmail());
+                    .append("\n\n\n\n\n\n\n\n\n\n\n")
+                    .append(getString(R.string.settings_feedback_body_device_model)).append("  ").append(getDeviceName()).append("\n")
+                    .append(getString(R.string.settings_feedback_body_android_version)).append("  ").append(Build.VERSION.RELEASE).append(" ").append(Build.DISPLAY).append("\n")
+                    .append(getString(R.string.user_account_feedback)).append("  ").append(megaApi.getMyEmail());
 
             body.append(" (");
             switch (myAccountInfo.getAccountType()) {
@@ -703,7 +701,7 @@ public class SettingsFragmentLollipop extends SettingsBaseFragment {
 
             Intent emailIntent = new Intent(Intent.ACTION_SEND);
             emailIntent.setType(TYPE_TEXT_PLAIN);
-            emailIntent.putExtra(Intent.EXTRA_EMAIL, new String[] {MAIL_ANDROID});
+            emailIntent.putExtra(Intent.EXTRA_EMAIL, new String[]{MAIL_ANDROID});
             emailIntent.putExtra(Intent.EXTRA_SUBJECT, subject);
             emailIntent.putExtra(Intent.EXTRA_TEXT, body.toString());
             startActivity(Intent.createChooser(emailIntent, " "));
@@ -749,5 +747,62 @@ public class SettingsFragmentLollipop extends SettingsBaseFragment {
 
     public void setAutoacceptSetting(boolean autoAccept) {
         this.autoAccept = autoAccept;
+    }
+
+
+    // Call original functions from interface calls
+    @Override
+    public int getNumberOfClicksKarere() {
+        return numberOfClicksKarere;
+    }
+
+    @Override
+    public void setNumberOfClicksKarere(int numberOfClicksKarere) {
+        this.numberOfClicksKarere = numberOfClicksKarere;
+    }
+
+    @Override
+    public int getNumberOfClicksAppVersion() {
+        return numberOfClicksAppVersion;
+    }
+
+    @Override
+    public void setNumberOfClicksAppVersion(int numberOfClicksAppVersion) {
+        this.numberOfClicksAppVersion = numberOfClicksAppVersion;
+    }
+
+    @Override
+    public int getNumberOfClicksSDK() {
+        return numberOfClicksSDK;
+    }
+
+    @Override
+    public void setNumberOfClicksSDK(int numberOfClicksSDK) {
+        this.numberOfClicksSDK = numberOfClicksSDK;
+    }
+
+    @Override
+    public boolean getSetAutoAccept() {
+        return getSetAutoaccept();
+    }
+
+    @Override
+    public void setSetAutoAccept(boolean setAutoAccept) {
+        setSetAutoaccept(setAutoAccept);
+    }
+
+    @Override
+    public boolean getAutoAcceptSetting() {
+        return getAutoacceptSetting();
+    }
+
+    @Override
+    public void setAutoAcceptSetting(boolean autoAcceptSetting) {
+        setAutoacceptSetting(autoAcceptSetting);
+    }
+
+    @Override
+    public void setValueOfAutoAccept(boolean autoAccept) {
+        setValueOfAutoaccept(autoAccept);
     }
 }

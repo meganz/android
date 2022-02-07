@@ -1543,7 +1543,7 @@
         <item quantity="other">%2$d 个文件中的 %1$d 个文件</item>
     </plurals>
     <!-- Progress text shown when user stop upload/download and the app is waiting for async response -->
-    <string name="label_process_finishing">即将结束&#8230;&#8230;</string>
+    <string name="label_process_finishing">即将结束&#8230;</string>
     <!-- positive button on dialog to view a contact -->
     <string name="option_to_transfer_manager">查看</string>
     <!-- Label of the modal bottom sheet to pause all transfers -->
@@ -1586,10 +1586,6 @@
     <string name="upload_service_notification">正在上传%2$d个文件中的第%1$d个</string>
     <!-- Text of the notification shown when the upload service is paused: e.g. Uploading files: 1 of 10 (paused)-->
     <string name="upload_service_notification_paused">正在上传%2$d个文件中的第%1$d个（已暂停）</string>
-    <!-- Text of the notification shown when the folder upload service is running, e.g. Uploading folders 1 of 2 -->
-    <string name="folder_upload_service_notification">正在上传%2$d个文件夹中的第%1$d个</string>
-    <!-- Text of the notification shown when the folder upload service is paused, e.g. Uploading folders 1 of 2 (paused) -->
-    <string name="folder_upload_service_notification_paused">正在上传%2$d个文件夹中的第%1$d个（已暂停）</string>
     <!-- Text of the notification shown when the upload service has finished, Plural -->
     <plurals name="upload_service_final_notification">
         <item quantity="other">已上传%1$d个文件</item>
@@ -1597,10 +1593,6 @@
     <!-- Text of the notification shown when the upload service has finished, Plural -->
     <plurals name="upload_service_notification_already_uploaded">
         <item quantity="other">已上传%1$d个文件</item>
-    </plurals>
-    <!-- Text of the notification shown when the folder upload service has finished, Text of the notification shown when the folder upload service has finished - plural  e.g. Uploaded 2 folders -->
-    <plurals name="folder_upload_service_final_notification">
-        <item quantity="other">%1$d个文件夹已上传</item>
     </plurals>
     <!-- label for the total file size of multiple files and/or folders (no need to put the colon punctuation in the translation) -->
     <string name="general_total_size">共 %1$s</string>
@@ -2051,7 +2043,7 @@
     <!-- Text of dialog shown when a contact request has not been sent with QR code because of some error -->
     <string name="invite_not_sent_text_error">发生错误，邀请未发送。</string>
     <!-- Text of alert dialog informing that the qr is generating -->
-    <string name="generatin_qr">正在生成二维码&#8230;&#8230;</string>
+    <string name="generatin_qr">正在生成二维码&#8230;</string>
     <!-- Title of QR code scan menu item -->
     <string name="menu_item_scan_code">扫描二维码</string>
     <!-- get the contact link and copy it -->
@@ -2530,7 +2522,7 @@
     <!-- Label shown when the user wants to share something with other contacts -->
     <string name="share_with">分享</string>
     <!-- Message shown while the contact list from the device and from MEGA is being read and then shown to the user -->
-    <string name="contacts_list_empty_text_loading_share">正在加载联系人&#8230;&#8230;</string>
+    <string name="contacts_list_empty_text_loading_share">正在加载联系人&#8230;</string>
     <!-- Title of the screen New Group -->
     <string name="title_new_group">新群组</string>
     <!-- Subtitle of the screen New Group -->
@@ -2542,7 +2534,9 @@
     <!-- Settings preference title to show file versions info of the account -->
     <string name="settings_file_management_file_versions_title">文件版本</string>
     <!-- Settings preference subtitle to show file versions info of the account -->
-    <string name="settings_file_management_file_versions_subtitle">%1$d 文件版本，总计 %2$s</string>
+    <plurals name="settings_file_management_file_versions_subtitle">
+        <item quantity="other">%1$d个文件版本，共占用%2$s</item>
+    </plurals>
     <!-- Title of the section File management on Settings section -->
     <string name="settings_file_management_category">文件管理</string>
     <!-- Option in Settings to delete all the versions of the account -->
@@ -2618,9 +2612,9 @@
     <!-- Title of file explorer to send a link -->
     <string name="title_file_explorer_send_link">发送链接给&#8230;</string>
     <!-- Title of chat explorer to send a link or file to a chat -->
-    <string name="title_chat_explorer">发送至&#8230;&#8230;</string>
+    <string name="title_chat_explorer">发送至&#8230;</string>
     <!-- Title of cloud explorer to upload a link or file -->
-    <string name="title_cloud_explorer">上传至&#8230;&#8230;</string>
+    <string name="title_cloud_explorer">上传至&#8230;</string>
     <!-- More button in contact info page -->
     <string name="contact_info_button_more">更多</string>
     <!-- Section title to select a file to perform an action, more files -->
@@ -2728,7 +2722,7 @@
     <!-- Message shown when a contact request has not been sent because the invitation has been sent before -->
     <string name="invite_not_sent_already_sent">邀请已发送至联系人%s，可在‘发送请求’选项卡中查阅。</string>
     <!-- Label shown to indicate the QR is saving in Cloud Drive -->
-    <string name="save_qr_cloud_drive">正在保存%s至云盘&#8230;&#8230;</string>
+    <string name="save_qr_cloud_drive">正在保存%s至云盘&#8230;</string>
     <!-- General label for folders -->
     <string name="general_folders">文件夹</string>
     <!-- General label for files -->
@@ -2992,7 +2986,7 @@
     <!-- Error message shown when a file cannot be opened by other app using the open with option menu -->
     <string name="error_open_file_with">发生错误，无法使用该应用程序打开此文件。</string>
     <!-- Subtitle of the call screen when a incoming call is just starting -->
-    <string name="incoming_call_starting">来电&#8230;&#8230;</string>
+    <string name="incoming_call_starting">来电&#8230;</string>
     <!-- Subtitle of the call screen when a outgoing call is just starting -->
     <string name="outgoing_call_starting">正在通话中&#8230;</string>
     <!-- Content of a invalid meta message -->
@@ -3050,7 +3044,7 @@
     <!-- In APP, text used to ask for access to contacts -->
     <string name="grant_mega_access_contacts">授予MEGA访问您的通讯录的权限，即可发现您在MEGA上的联系人。</string>
     <!-- Getting registered contacts -->
-    <string name="get_registered_contacts">正在加载MEGA联系人&#8230;&#8230;</string>
+    <string name="get_registered_contacts">正在加载MEGA联系人&#8230;</string>
     <!-- Alert shown when some content have not been sent because of any error occurs -->
     <string name="content_not_send">该内容未发送至%d个聊天</string>
     <!-- Label shown when a new group chat has been created correctly -->
@@ -3113,8 +3107,8 @@
     <string name="not_allow_play_alert">无法在通话进行时播放媒体文件。</string>
     <!-- Text shown in the list of chats when there is a call in progress but I am not on it -->
     <string name="ongoing_call_messages">正在进行通话</string>
-    <!-- Title of the layout to join a group call from the chat screen. The placeholder indicates the user who initiated the call -->
-    <string name="join_call_layout_in_group_call">%s已开始群组通话。点击加入。</string>
+    <!-- Title of the layout to join a group call from the chat screen. -->
+    <string name="join_call_layout_in_group_call">点击加入当前群组通话。</string>
     <!-- Title of the layout to return to a call -->
     <string name="call_in_progress_layout">点击返回通话</string>
     <!-- message displayed when you try to start a call but it is not possible because you are already on a call -->
@@ -3204,7 +3198,7 @@
     <!-- Title of popup when user click ‘Share’ button on invite contact page -->
     <string name="invite_contact_chooser_title">邀请好友通过</string>
     <!-- Action button label -->
-    <string name="invite_contact_action_button">邀请好友通过&#8230;&#8230;</string>
+    <string name="invite_contact_action_button">邀请好友通过&#8230;</string>
     <!-- Message displayed when multiple download starts and all files has already been downloaded before. Placeholder: number of files -->
     <plurals name="file_already_downloaded">
         <item quantity="other">已下载%d个文件。</item>
@@ -3362,7 +3356,7 @@
     <!-- Text shown in a call when the own internet connection is of low quality -->
     <string name="poor_internet_connection_message">当前网络连接不佳</string>
     <!-- Text is displayed while a voice clip is being recorded -->
-    <string name="recording_layout">正在录音&#8230;&#8230;</string>
+    <string name="recording_layout">正在录音&#8230;</string>
     <!-- Text shown for the action create new file -->
     <string name="create_new_file_action">创建新文档</string>
     <!-- Error title shown when you are trying to do an action with a file or folder and you don’t have the necessary permissions -->
@@ -3384,7 +3378,7 @@
     <!-- Title of a screen to browse files -->
     <string name="browse_files_label">浏览文件</string>
     <!-- Title of the File Provider activity -->
-    <string name="file_provider_title">添加附件&#8230;&#8230;</string>
+    <string name="file_provider_title">添加附件&#8230;</string>
     <!-- Title of an inactive chat which was recently created (today or yesterday). Placeholder is to show the specific creation day. e.g. Chat created today -->
     <string name="inactive_chat_title_2">聊天创建于%s</string>
     <!-- Title of an inactive chat. Placeholder is to show the creation date and time -->
@@ -3489,8 +3483,8 @@
     <string name="section_documents">文档</string>
     <!-- Label of the floating action button of opening the new chat conversation -->
     <string name="fab_label_new_chat">创建新的聊天对话</string>
-    <!-- Text that indicates that there’s no photo to show -->
-    <string name="homepage_empty_hint_photos">无照片</string>
+    <!-- Text that indicates that there’s no image to show in image section -->
+    <string name="homepage_empty_hint_photos">[B]未[/B][B]找到[/B][A]图片[/A]</string>
     <!-- Text that indicates that there’s no document to show -->
     <string name="homepage_empty_hint_documents">无文档</string>
     <!-- Text that indicates that there’s no audio to show -->
@@ -3706,7 +3700,7 @@
     <!-- Action discard -->
     <string name="discard_close_action">放弃并关闭</string>
     <!-- Label indicating saving a file is in progress -->
-    <string name="saving_file">正在保存文件&#8230;&#8230;</string>
+    <string name="saving_file">正在保存文件&#8230;</string>
     <!-- Label indicating a file was created successfully -->
     <string name="file_created">文件已创建</string>
     <!-- Warning indicating a file was not created successfully -->
@@ -3744,7 +3738,7 @@
     <!-- Settings hint that indicates the audio will still be played in background if the app is backgrounded -->
     <string name="settings_background_play_hint">后台播放</string>
     <!-- Text of the empty screen when there are no elements in Photos -->
-    <string name="photos_empty">[B]无[/B][A]照片[/A]</string>
+    <string name="photos_empty">[B]未[/B][B]找到[/B][A]照片[/A]</string>
     <!-- Text to show as subtitle of Enable camera uploads screen -->
     <string name="enable_cu_subtitle">自动备份您的照片和视频到您的云盘。</string>
     <!-- Text of a button on Camera Uploads section to show all the content of the section-->
@@ -3777,8 +3771,6 @@
     <string name="error_share_owner_storage_quota">共享所有者帐户已超出存储空间。</string>
     <!-- A message shown when uploading, copying or moving something to an incoming share and the owner’s account is over its storage quota. -->
     <string name="warning_share_owner_storage_quota">由于目标用户帐户已超出其存储空间，无法发送此文件。</string>
-    <!-- Content to show in a Snackbar to tip the incompatibility-->
-    <string name="version_incompatibility">我们正在升级MEGAchat。请所有参会者将MEGA App更新至最新版本，否则您的通话可能无法连接。</string>
     <!-- Message displayed when multiple download starts and 1 file has already been downloaded before and 1 file is being downloaded -->
     <string name="file_already_downloaded_and_file_pending_download">已下载1个文件。1个文件待处理。</string>
     <!-- Message displayed when multiple download starts and 1 file has already been downloaded before and multiple files are being downloaded. Placeholder: number of files -->
@@ -3981,8 +3973,8 @@
     <string name="be_new_moderator">您是新的主持人。</string>
     <!-- the content of snack bar when copied meeting link-->
     <string name="copied_meeting_link">会议链接已复制。</string>
-    <!-- Title of the layout to join a meeting from the chat screen. The placeholder indicates the user who initiated the meeting -->
-    <string name="join_meeting_layout_in_group_call">%s已开始一场会议。点击加入。</string>
+    <!-- Title of the layout to join a meeting from the chat screen. -->
+    <string name="join_meeting_layout_in_group_call">点击加入当前会议。</string>
     <!-- Title of fifth tour screen -->
     <string name="title_tour_five">MEGA会议</string>
     <!-- Content of fourth tour screen -->
@@ -4057,4 +4049,38 @@
     <string name="disable_versioning_warning">我们的文件版本管理功能可确保在您更新现有文件时会保留您文件的早期版本。如果您停用文件版本管理，您将不再拥有此保护；这意味着当您更新现有文件时，旧版本文件将被覆盖并替换。</string>
     <!-- Warning informing the user the folder location is trying to open no longer exists. -->
     <string name="location_not_exist">此位置已不存在。</string>
+    <!-- Warning shown informing the contact has been previously invited. The placeholder is to show the name of the contact. -->
+    <string name="contact_already_invited">You have already invited %1$s</string>
+    <!-- Warning shown informing the contact request has been sent and can be managed in sent requests section. -->
+    <string name="contact_invited">邀请发送成功。查看发送请求。</string>
+    <!-- Message when file available offline. -->
+    <string name="file_available_offline">文件可离线使用</string>
+    <!-- Message when file removed from offline. -->
+    <string name="file_removed_offline">文件已从离线中移除</string>
+    <!-- Menu option to open a link. Also title of the dialog to open a link. -->
+    <string name="action_open_link">打开链接</string>
+    <!-- error message shown when a chat link is not well formed. -->
+    <string name="invalid_chat_link_args">无效聊天链接</string>
+    <!-- Menu option to open a chat link. -->
+    <string name="action_open_chat_link">打开聊天链接</string>
+    <!-- Hint shown in the open chat link alert dialog. -->
+    <string name="hint_enter_chat_link">输入聊天链接</string>
+    <!-- Hint shown in the open link alert dialog. -->
+    <string name="hint_paste_link">粘贴链接</string>
+    <!-- Error shown when it tries to open an invalid file or folder link .-->
+    <string name="invalid_file_folder_link">无效文件或文件夹链接</string>
+    <!-- Error shown when it tries to open an invalid file or folder link and the text view is empty. -->
+    <string name="invalid_file_folder_link_empty">请输入一个有效的文件或文件夹链接</string>
+    <!-- Error shown when it tries to open an invalid chat link and the text view is empty. -->
+    <string name="invalid_chat_link_empty">请输入一个有效的聊天链接</string>
+    <!-- Error shown when it tries to open a chat link from the Cloud Drive section. -->
+    <string name="valid_chat_link">您已粘贴聊天链接。</string>
+    <!-- Error shown when it tries to open a contact link from the Cloud Drive section. -->
+    <string name="valid_contact_link">您已粘贴联系人链接。</string>
+    <!-- Action button to open a contact link.-->
+    <string name="action_open_contact_link">打开联系人链接</string>
+    <!-- title for the settings to enable high resolution images when on mobile data -->
+    <string name="settings_mobile_data_resoluton_title">使用移动数据预览高分辨率图像</string>
+    <!-- summary for the settings to enable high resolution images when on mobile data -->
+    <string name="settings_mobile_data_resoluton_summary">允许在预览时使用移动数据加载高分辨率图片。若关闭此选项，则只有在放大时才会加载原始图片。</string>
 </resources>
