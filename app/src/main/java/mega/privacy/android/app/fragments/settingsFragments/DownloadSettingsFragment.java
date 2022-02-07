@@ -108,7 +108,7 @@ public class DownloadSettingsFragment extends SettingsBaseFragment {
     private void toSelectFolder() {
         Intent intent = new Intent(context, FileStorageActivityLollipop.class);
         intent.setAction(FileStorageActivityLollipop.Mode.PICK_FOLDER.getAction());
-        intent.putExtra(FileStorageActivityLollipop.EXTRA_FROM_SETTINGS, true);
+        intent.putExtra(FileStorageActivityLollipop.PICK_FOLDER_TYPE, FileStorageActivityLollipop.PickFolderType.DOWNLOAD_FOLDER.getFolderType());
         startActivityForResult(intent, REQUEST_DOWNLOAD_FOLDER);
     }
 }

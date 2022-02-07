@@ -27,6 +27,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.provider.ContactsContract;
+import android.text.Editable;
 import android.text.Layout;
 import android.text.TextUtils;
 import androidx.annotation.NonNull;
@@ -65,7 +66,6 @@ import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.widget.SearchView;
 
-import android.text.Editable;
 import android.text.Html;
 import android.text.Spanned;
 import android.text.TextWatcher;
@@ -215,6 +215,7 @@ import mega.privacy.android.app.modalbottomsheet.SortByBottomSheetDialogFragment
 import mega.privacy.android.app.modalbottomsheet.UploadBottomSheetDialogFragment;
 import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.ChatBottomSheetDialogFragment;
 import mega.privacy.android.app.service.iar.RatingHandlerImpl;
+import mega.privacy.android.app.uploadFolder.list.data.UploadFolderResult;
 import mega.privacy.android.app.usecase.GetNodeUseCase;
 import mega.privacy.android.app.usecase.MoveNodeUseCase;
 import mega.privacy.android.app.usecase.RemoveNodeUseCase;
@@ -239,6 +240,7 @@ import mega.privacy.android.app.utils.MegaNodeUtil;
 import mega.privacy.android.app.utils.StringResourcesUtils;
 import mega.privacy.android.app.utils.TextUtil;
 import mega.privacy.android.app.utils.ThumbnailUtilsLollipop;
+import mega.privacy.android.app.utils.UploadUtil;
 import mega.privacy.android.app.utils.Util;
 import mega.privacy.android.app.utils.TimeUtils;
 import mega.privacy.android.app.utils.contacts.MegaContactGetter;
@@ -293,6 +295,7 @@ import static mega.privacy.android.app.sync.fileBackups.FileBackupManager.Backup
 import static mega.privacy.android.app.sync.fileBackups.FileBackupManager.BackupDialogState.BACKUP_DIALOG_SHOW_NONE;
 import static mega.privacy.android.app.sync.fileBackups.FileBackupManager.BackupDialogState.BACKUP_DIALOG_SHOW_WARNING;
 import static mega.privacy.android.app.sync.fileBackups.FileBackupManager.OperationType.OPERATION_EXECUTE;
+import static mega.privacy.android.app.uploadFolder.UploadFolderActivity.UPLOAD_RESULTS;
 import static mega.privacy.android.app.utils.AlertDialogUtil.dismissAlertDialogIfExists;
 import static mega.privacy.android.app.utils.AlertDialogUtil.isAlertDialogShown;
 import static mega.privacy.android.app.utils.AlertsAndWarnings.askForCustomizedPlan;
@@ -351,8 +354,8 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 		MegaChatRequestListenerInterface, OnNavigationItemSelectedListener,
 		MegaGlobalListenerInterface, MegaTransferListenerInterface, OnClickListener,
 		BottomNavigationView.OnNavigationItemSelectedListener, UploadBottomSheetDialogActionListener,
-		ChatManagementCallback, ActionNodeCallback, SnackbarShower,
-		MeetingBottomSheetDialogActionListener, LoadPreviewListener.OnPreviewLoadedCallback, SettingsActivity {
+		ChatManagementCallback, ActionNodeCallback, MeetingBottomSheetDialogActionListener,
+		LoadPreviewListener.OnPreviewLoadedCallback, SettingsActivity {
 
 	private static final String TRANSFER_OVER_QUOTA_SHOWN = "TRANSFER_OVER_QUOTA_SHOWN";
 
@@ -3378,9 +3381,8 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 					String parentPath = intent.getStringExtra(FileStorageActivityLollipop.EXTRA_PATH);
 
 					if (parentPath != null){
-						String sdCardUriString = intent.getStringExtra(FileStorageActivityLollipop.EXTRA_SD_URI);
 						AccountController ac = new AccountController(this);
-						ac.exportMK(parentPath, sdCardUriString);
+						ac.exportMK(parentPath);
 					}
 				}
 				else  if (getIntent().getAction().equals(ACTION_RECOVERY_KEY_COPY_TO_CLIPBOARD)){
@@ -6952,8 +6954,13 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 	}
 
 	@Override
-	public void uploadFromDevice() {
-		chooseFromDevice(this);
+	public void uploadFiles() {
+		chooseFiles(this);
+	}
+
+	@Override
+	public void uploadFolder() {
+		chooseFolder(this);
 	}
 
 	@Override
@@ -8251,7 +8258,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 			return;
 		}
 
-        if (requestCode == REQUEST_CODE_GET && resultCode == RESULT_OK) {
+        if (requestCode == REQUEST_CODE_GET_FILES && resultCode == RESULT_OK) {
 			if (intent == null) {
 				logWarning("Intent NULL");
 				return;
@@ -8271,6 +8278,10 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 							onIntentProcessed(shareInfo);
 						}
 					});
+		} else if (requestCode == REQUEST_CODE_GET_FOLDER) {
+			getFolder(this, resultCode, intent, getCurrentParentHandle());
+		} else if (requestCode == REQUEST_CODE_GET_FOLDER_CONTENT) {
+        	UploadUtil.uploadFolder(this, resultCode, intent);
 		} else if (requestCode == WRITE_SD_CARD_REQUEST_CODE && resultCode == RESULT_OK) {
 
 			if (!hasPermissions(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
@@ -8581,11 +8592,10 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 
 			if (parentPath != null){
 				String path = parentPath + File.separator + getRecoveryKeyFileName();
-				String sdCardUriString = intent.getStringExtra(FileStorageActivityLollipop.EXTRA_SD_URI);
 
 				logDebug("REQUEST_DOWNLOAD_FOLDER:path to download: "+path);
 				AccountController ac = new AccountController(this);
-				ac.exportMK(path, sdCardUriString);
+				ac.exportMK(path);
 			}
 		}
 
@@ -11566,7 +11576,6 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 				Intent intent = new Intent(this, FileStorageActivityLollipop.class);
 				intent.setAction(FileStorageActivityLollipop.Mode.BROWSE_FILES.getAction());
 				intent.putExtra(FileStorageActivityLollipop.EXTRA_PATH, transfer.getPath());
-				intent.putExtra(FileStorageActivityLollipop.EXTRA_FROM_SETTINGS, false);
 				startActivity(intent);
 			}
 		} else if (transfer.getType() == MegaTransfer.TYPE_UPLOAD) {
