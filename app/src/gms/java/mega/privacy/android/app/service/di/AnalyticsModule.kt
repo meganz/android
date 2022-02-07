@@ -40,6 +40,12 @@ class AnalyticsModule {
     fun providePerformanceReporter(firebasePerformance: FirebasePerformance): PerformanceReporter =
         FirebasePerformanceReporter(firebasePerformance)
 
+    /**
+     * If the default app was not initialized, FirebaseApp.getInstance() throws an [IllegalStateException].
+     * Then if that happens, it is needed to initialize the app before getting the instance.
+     *
+     * @param context   Application context.
+     */
     private fun initializeFirebaseIfNeeded(context: Context) {
         try {
             FirebaseApp.getInstance()
