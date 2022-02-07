@@ -1093,7 +1093,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                 megaChatApi = ((MegaApplication) ((Activity) context).getApplication()).getMegaChatApi();
             }
 
-            ChatUtil.initMegaChatApi(gSession, new ChatLogoutListener(getContext()));
+            ChatUtil.initMegaChatApi(gSession, new ChatLogoutListener(requireActivity()));
 
             disableLoginButton();
 
