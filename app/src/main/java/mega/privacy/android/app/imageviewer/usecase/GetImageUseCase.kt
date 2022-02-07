@@ -133,7 +133,7 @@ class GetImageUseCase @Inject constructor(
                     val previewFile = if (node.hasPreview() || node.isVideo()) buildPreviewFile(context, node.getThumbnailFileName()) else null
                     val fullFile = if (hasReadAccess) buildTempFile(context, node.getFileName()) else null
 
-                    if (fullFile?.exists() == true && fullFile.length() != node.size) {
+                    if (fullFile?.exists() == true && (!fullFile.canRead() || fullFile.length() != node.size)) {
                         FileUtil.deleteFileSafely(fullFile)
                     }
 
@@ -340,6 +340,7 @@ class GetImageUseCase @Inject constructor(
                 bitmap.compress(Bitmap.CompressFormat.JPEG, 75, this)
                 close()
             }
+            bitmap.recycle()
 
             previewFile.toUri()
         }

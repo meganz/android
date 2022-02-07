@@ -84,8 +84,8 @@ public class QRCodeSaveBottomSheetDialogFragment extends BaseBottomSheetDialogFr
 
     private void saveToFileSystem() {
         Intent intent = new Intent(getActivity(), FileStorageActivityLollipop.class);
+        intent.putExtra(FileStorageActivityLollipop.PICK_FOLDER_TYPE, FileStorageActivityLollipop.PickFolderType.DOWNLOAD_FOLDER.getFolderType());
         intent.setAction(FileStorageActivityLollipop.Mode.PICK_FOLDER.getAction());
-        intent.putExtra(FileStorageActivityLollipop.EXTRA_FROM_SETTINGS, true);
         ((QRCodeActivity) getActivity()).startActivityForResult(intent, REQUEST_DOWNLOAD_FOLDER);
     }
 }

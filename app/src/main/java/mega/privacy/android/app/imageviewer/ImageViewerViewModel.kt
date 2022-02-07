@@ -90,11 +90,11 @@ class ImageViewerViewModel @Inject constructor(
     fun onCurrentPosition(): LiveData<Pair<Int, Int>> =
         currentPosition.map { position -> Pair(position, images.value?.size ?: 0) }
 
-    fun onCurrentImageNode(): LiveData<MegaNodeItem?> =
-        currentPosition.map { images.value?.getOrNull(it)?.nodeItem }
+    fun onCurrentImageItem(): LiveData<ImageItem?> =
+        currentPosition.map { images.value?.getOrNull(it) }
 
-    fun getCurrentNode(): MegaNodeItem? =
-        currentPosition.value?.let { images.value?.getOrNull(it)?.nodeItem }
+    fun getCurrentImageItem(): ImageItem? =
+        currentPosition.value?.let { images.value?.getOrNull(it) }
 
     fun getImageItem(nodeHandle: Long): ImageItem? =
         images.value?.find { it.handle == nodeHandle }
@@ -389,7 +389,7 @@ class ImageViewerViewModel @Inject constructor(
             if (items.isNullOrEmpty()) {
                 0
             } else {
-                val currentPositionNewIndex = newItems.indexOfFirst { it.handle == getCurrentNode()?.handle }
+                val currentPositionNewIndex = newItems.indexOfFirst { it.handle == getCurrentImageItem()?.handle }
                 val currentItemPosition = currentPosition.value ?: 0
                 when {
                     currentPositionNewIndex != INVALID_POSITION ->
