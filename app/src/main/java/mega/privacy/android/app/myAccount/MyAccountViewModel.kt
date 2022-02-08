@@ -115,7 +115,7 @@ class MyAccountViewModel @Inject constructor(
 
     fun getName(): String = myAccountInfo.fullName
 
-    fun getEmail(): String = megaApi.myEmail
+    fun getEmail(): String? = megaApi.myEmail
 
     fun getAccountType(): Int = myAccountInfo.accountType
 

@@ -106,6 +106,7 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -162,6 +163,9 @@ public class BaseActivity extends AppCompatActivity implements ActivityLauncher,
     private static final String EXPIRED_BUSINESS_ALERT_SHOWN = "EXPIRED_BUSINESS_ALERT_SHOWN";
     private static final String TRANSFER_OVER_QUOTA_WARNING_SHOWN = "TRANSFER_OVER_QUOTA_WARNING_SHOWN";
     private static final String RESUME_TRANSFERS_WARNING_SHOWN = "RESUME_TRANSFERS_WARNING_SHOWN";
+    private static final String SET_DOWNLOAD_LOCATION_SHOWN = "SET_DOWNLOAD_LOCATION_SHOWN";
+    private static final String IS_CONFIRMATION_CHECKED = "IS_CONFIRMATION_CHECKED";
+    private static final String DOWNLOAD_LOCATION = "DOWNLOAD_LOCATION";
     private static final String UPGRADE_ALERT_SHOWN = "UPGRADE_ALERT_SHOWN";
     private static final String EVENT_PURCHASES_UPDATED = "EVENT_PURCHASES_UPDATED";
     private static final String PURCHASE_TYPE = "PURCHASE_TYPE";
@@ -197,6 +201,10 @@ public class BaseActivity extends AppCompatActivity implements ActivityLauncher,
     private boolean isGeneralTransferOverQuotaWarningShown;
     private AlertDialog transferGeneralOverQuotaWarning;
     private Snackbar snackbar;
+
+    private AlertDialog setDownloadLocationDialog;
+    private boolean confirmationChecked;
+    private String downloadLocation;
 
     private AlertDialog upgradeAlert;
     private PurchaseType purchaseType;
@@ -322,6 +330,11 @@ public class BaseActivity extends AppCompatActivity implements ActivityLauncher,
                 showResumeTransfersWarning(this);
             }
 
+            if (savedInstanceState.getBoolean(SET_DOWNLOAD_LOCATION_SHOWN, false)) {
+                confirmationChecked = savedInstanceState.getBoolean(IS_CONFIRMATION_CHECKED, false);
+                showConfirmationSaveInSameLocation(savedInstanceState.getString(DOWNLOAD_LOCATION));
+            }
+
             if (savedInstanceState.getBoolean(UPGRADE_ALERT_SHOWN, false)) {
                 purchaseType = (PurchaseType) savedInstanceState.getSerializable(PURCHASE_TYPE);
                 showQueryPurchasesResult();
@@ -386,6 +399,9 @@ public class BaseActivity extends AppCompatActivity implements ActivityLauncher,
         outState.putBoolean(EXPIRED_BUSINESS_ALERT_SHOWN, isExpiredBusinessAlertShown);
         outState.putBoolean(TRANSFER_OVER_QUOTA_WARNING_SHOWN, isGeneralTransferOverQuotaWarningShown);
         outState.putBoolean(RESUME_TRANSFERS_WARNING_SHOWN, isResumeTransfersWarningShown);
+        outState.putBoolean(SET_DOWNLOAD_LOCATION_SHOWN, isAlertDialogShown(setDownloadLocationDialog));
+        outState.putBoolean(IS_CONFIRMATION_CHECKED, confirmationChecked);
+        outState.putString(DOWNLOAD_LOCATION, downloadLocation);
         outState.putBoolean(UPGRADE_ALERT_SHOWN, isAlertDialogShown(upgradeAlert));
         outState.putSerializable(PURCHASE_TYPE, purchaseType);
 
@@ -435,6 +451,7 @@ public class BaseActivity extends AppCompatActivity implements ActivityLauncher,
         dismissAlertDialogIfExists(transferGeneralOverQuotaWarning);
         dismissAlertDialogIfExists(transferGeneralOverQuotaWarning);
         dismissAlertDialogIfExists(resumeTransfersWarning);
+        dismissAlertDialogIfExists(setDownloadLocationDialog);
         dismissAlertDialogIfExists(upgradeAlert);
 
         LiveEventBus.get(EVENT_PSA, Psa.class).removeObserver(psaObserver);
@@ -1454,6 +1471,52 @@ public class BaseActivity extends AppCompatActivity implements ActivityLauncher,
     public void showSnackbar(int type, @Nullable String content, long chatId) {
         View rootView = getRootViewFromContext(this);
         showSnackbar(type, rootView, content, chatId);
+    }
+
+    /**
+     * Shows a dialog when the user is selecting the download location.
+     * It asks if they want to set the current chosen location as default.
+     * It the user enables the checkbox, the dialog should not appear again.
+     *
+     * @param path Download path to set as default location.
+     */
+    public void showConfirmationSaveInSameLocation(String path){
+        if (isAlertDialogShown(setDownloadLocationDialog)) {
+            return;
+        }
+
+        downloadLocation = path;
+
+        MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this);
+        View v = getLayoutInflater().inflate(R.layout.dialog_general_confirmation, null);
+        builder.setView(v);
+
+        TextView text = v.findViewById(R.id.confirmation_text);
+        text.setText(R.string.confirmation_download_location);
+
+        Button cancelButton = v.findViewById(R.id.negative_button);
+        cancelButton.setText(R.string.general_negative_button);
+        cancelButton.setOnClickListener(v2 -> setDownloadLocationDialog.dismiss());
+
+        Button confirmationButton = v.findViewById(R.id.positive_button);
+        confirmationButton.setText(R.string.general_yes);
+        confirmationButton.setOnClickListener(v3 -> {
+            setDownloadLocationDialog.dismiss();
+            dbH.setStorageAskAlways(false);
+            dbH.setStorageDownloadLocation(path);
+        });
+
+        CheckBox checkBox = v.findViewById(R.id.confirmation_checkbox);
+        checkBox.setChecked(confirmationChecked);
+
+        LinearLayout checkBoxLayout = v.findViewById(R.id.confirmation_checkbox_layout);
+        checkBoxLayout.setOnClickListener(v1 -> checkBox.setChecked(!checkBox.isChecked()));
+
+        setDownloadLocationDialog = builder.setCancelable(false)
+                .setOnDismissListener(dialog -> dbH.setAskSetDownloadLocation(!checkBox.isChecked()))
+                .create();
+
+        setDownloadLocationDialog.show();
     }
 
     /**
