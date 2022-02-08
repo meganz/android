@@ -262,7 +262,7 @@
                                 android:layout_height="wrap_content"
                                 android:layout_centerInParent="true"
                                 android:background="@null"
-                                android:src="@drawable/ic_select_image"
+                                android:src="@drawable/ic_gif_toolbar"
                                 app:tint="@color/grey_054_white_054" />
                         </RelativeLayout>
 
@@ -279,22 +279,6 @@
                                 android:layout_centerInParent="true"
                                 android:background="@null"
                                 android:src="@drawable/attach_file"
-                                app:tint="@color/grey_054_white_054" />
-                        </RelativeLayout>
-
-                        <RelativeLayout
-                            android:id="@+id/rl_gif_chat"
-                            android:layout_width="56dp"
-                            android:layout_height="match_parent"
-                            android:layout_weight="1">
-
-                            <ImageButton
-                                android:id="@+id/gif_chat"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_centerInParent="true"
-                                android:background="@null"
-                                android:src="@drawable/ic_gif_toolbar"
                                 app:tint="@color/grey_054_white_054" />
                         </RelativeLayout>
 

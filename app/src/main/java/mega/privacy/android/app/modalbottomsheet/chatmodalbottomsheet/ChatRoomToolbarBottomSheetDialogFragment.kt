@@ -11,6 +11,7 @@ import android.widget.LinearLayout
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.GridLayoutManager
+import mega.privacy.android.app.utils.StringResourcesUtils.getQuantityString
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
@@ -34,7 +35,6 @@ class ChatRoomToolbarBottomSheetDialogFragment : BottomSheetDialogFragment() {
     private var mPhotoUris: ArrayList<FileGalleryItem>? = null
     private lateinit var adapter: FileStorageAdapter
 
-    lateinit var mainLinearLayout :LinearLayout
     private lateinit var listener: ChatRoomToolbarBottomSheetDialogActionListener
 
 
@@ -43,9 +43,13 @@ class ChatRoomToolbarBottomSheetDialogFragment : BottomSheetDialogFragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
+
+        listener = requireActivity() as ChatRoomToolbarBottomSheetDialogActionListener
+
         binding = BottomSheetChatRoomToolbarBinding.inflate(layoutInflater, container, false)
         downloadLocationDefaultPath = FileUtil.getDownloadLocation()
-        mainLinearLayout = binding.linearLayout
+
+        binding.textFile.text = getQuantityString(R.plurals.general_num_files, 1)
 
         mPhotoUris = ArrayList<FileGalleryItem>()
 
@@ -76,54 +80,44 @@ class ChatRoomToolbarBottomSheetDialogFragment : BottomSheetDialogFragment() {
      * @param megaUser  MegaUser to be shown
      */
     private fun setupButtons() {
-        val chatActivity = requireActivity() as ChatActivityLollipop
-
         binding.optionGallery.setOnClickListener{
-            chatActivity.sendFromFileSystem()
+            listener?.showGallery()
             dismiss()
-
         }
 
         binding.optionFile.setOnClickListener{
-            chatActivity.sendFromCloud()
+            listener?.sendFile()
             dismiss()
-
         }
 
         binding.optionVoice.setOnClickListener{
-            chatActivity.optionCall(false)
+            listener?.startCall(false)
             dismiss()
-
         }
 
         binding.optionVideo.setOnClickListener{
-            chatActivity.optionCall(true)
+            listener?.startCall(true)
             dismiss()
-
         }
 
         binding.optionScan.setOnClickListener{
-            chatActivity.scanDocument()
+            listener?.scanDocument()
             dismiss()
-
         }
 
         binding.optionGif.setOnClickListener{
-            chatActivity.sendGif()
+            listener?.sendGIF()
             dismiss()
-
         }
 
         binding.optionLocation.setOnClickListener{
-            chatActivity.sendLocation()
+            listener?.sendLocation()
             dismiss()
-
         }
 
         binding.optionContact.setOnClickListener{
-            chatActivity.chooseContactsDialog()
+            listener?.sendContact()
             dismiss()
-
         }
     }
 

@@ -1,7 +1,5 @@
 package mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet;
 
-import android.annotation.SuppressLint;
-import android.app.Dialog;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -27,8 +25,6 @@ public class SendAttachmentChatBottomSheetDialogFragment extends BaseBottomSheet
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         contentView.findViewById(R.id.send_attachment_chat_from_cloud_layout).setOnClickListener(this);
         contentView.findViewById(R.id.send_attachment_chat_from_filesystem_layout).setOnClickListener(this);
-        contentView.findViewById(R.id.send_attachment_chat_contact_layout).setOnClickListener(this);
-        contentView.findViewById(R.id.send_attachment_chat_location_layout).setOnClickListener(this);
         super.onViewCreated(view, savedInstanceState);
     }
 
@@ -41,14 +37,6 @@ public class SendAttachmentChatBottomSheetDialogFragment extends BaseBottomSheet
 
             case R.id.send_attachment_chat_from_filesystem_layout:
                 ((ChatActivityLollipop) requireActivity()).sendFromFileSystem();
-                break;
-
-            case R.id.send_attachment_chat_contact_layout:
-                ((ChatActivityLollipop) requireActivity()).chooseContactsDialog();
-                break;
-
-            case R.id.send_attachment_chat_location_layout:
-                ((ChatActivityLollipop) requireActivity()).sendLocation();
                 break;
         }
 

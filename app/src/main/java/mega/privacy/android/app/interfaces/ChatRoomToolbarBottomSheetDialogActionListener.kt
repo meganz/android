@@ -1,18 +1,20 @@
 package mega.privacy.android.app.interfaces
 
+/*
+ * This interface is to define what methods should
+ * implement when having ChatRoomToolbarBottomSheetDialogFragment
+ */
 interface ChatRoomToolbarBottomSheetDialogActionListener {
 
-    fun sendFileFromCloudDrive()
+    fun takePicture()
 
-    fun sendFileFromFileSystem()
+    fun showGallery()
+
+    fun sendFile()
 
     fun startCall(videoOn: Boolean)
 
     fun scanDocument()
-
-    fun takePicture()
-
-    fun sendVoiceClip()
 
     fun sendGIF()
 

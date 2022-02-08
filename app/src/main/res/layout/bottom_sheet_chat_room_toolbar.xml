@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/linear_layout"
     android:layout_width="match_parent"
@@ -7,57 +7,68 @@
     android:orientation="vertical"
     android:paddingBottom="9dp">
 
-        <!-- GALLERY -->
-        <RelativeLayout
-            android:id="@+id/gallery_rl"
-            android:layout_width="match_parent"
-            android:layout_height="88dp"
-            android:layout_marginTop="4dp"
-            android:layout_marginBottom="24dp"
-            android:layout_marginEnd="2dp"
-            android:layout_marginStart="2dp">
+    <RelativeLayout
+        android:id="@+id/gallery_rl"
+        android:layout_width="match_parent"
+        android:layout_height="88dp"
+        android:layout_marginStart="2dp"
+        android:layout_marginTop="4dp"
+        android:layout_marginEnd="2dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
 
-            <TextView
-                android:id="@+id/empty_gallery"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_centerInParent="true"
-                android:layout_centerHorizontal="true"
-                android:layout_centerVertical="true"
-                android:text="@string/file_storage_loading"
-                android:textAppearance="@style/TextAppearance.Mega.Headline6.Secondary"
-                android:visibility="gone" />
+        <TextView
+            android:id="@+id/empty_gallery"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:layout_centerHorizontal="true"
+            android:layout_centerVertical="true"
+            android:text="@string/file_storage_loading"
+            android:textAppearance="@style/TextAppearance.Mega.Headline6.Secondary"
+            android:visibility="gone" />
 
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/recycler_view_gallery"
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                android:choiceMode="multipleChoice"
-                android:clipToPadding="false"
-                android:scrollbars="horizontal" />
-        </RelativeLayout>
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/recycler_view_gallery"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:choiceMode="multipleChoice"
+            android:clipToPadding="false"
+            android:scrollbars="horizontal" />
+    </RelativeLayout>
 
-        <!-- OPTIONS -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="230dp"
+        android:orientation="vertical"
+        android:paddingTop="24dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/gallery_rl">
+
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:layout_marginBottom="20dp"
-            android:baselineAligned="false">
+            android:layout_height="86dp"
+            android:layout_marginBottom="11dp"
+            android:baselineAligned="false"
+            android:orientation="horizontal">
+
             <RelativeLayout
                 android:id="@+id/option_gallery"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center"
+                android:layout_gravity="top"
                 android:layout_weight="1"
                 android:gravity="center">
+
                 <RelativeLayout
                     android:id="@+id/gallery_icon"
-                    android:layout_width="40dp"
-                    android:layout_height="40dp"
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
                     android:layout_centerHorizontal="true"
-                    android:background="@drawable/rounded_background"
-                    android:layout_marginBottom="8dp">
+                    android:layout_marginBottom="8dp"
+                    android:background="@drawable/rounded_background">
 
                     <ImageView
                         android:layout_width="24dp"
@@ -65,33 +76,36 @@
                         android:layout_centerInParent="true"
                         android:adjustViewBounds="true"
                         android:background="@null"
-                        android:src="@drawable/ic_select_image"
-                        app:tint="?attr/textColorHint" />
+                        android:src="@drawable/ic_picture"
+                        app:tint="?android:attr/textColorSecondary" />
                 </RelativeLayout>
+
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_centerHorizontal="true"
-                    android:text="Gallery"
                     android:layout_below="@id/gallery_icon"
+                    android:layout_centerHorizontal="true"
+                    android:text="@string/chat_room_toolbar_gallery_option"
                     android:textColor="?android:attr/textColorSecondary"
-                    android:textSize="11sp"/>
+                    android:textSize="11sp" />
             </RelativeLayout>
 
             <RelativeLayout
                 android:id="@+id/option_file"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center"
+                android:layout_gravity="top"
                 android:layout_weight="1"
                 android:gravity="center">
+
                 <RelativeLayout
                     android:id="@+id/file_icon"
-                    android:layout_width="40dp"
-                    android:layout_height="40dp"
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
                     android:layout_centerHorizontal="true"
-                    android:background="@drawable/rounded_background"
-                    android:layout_marginBottom="8dp">
+                    android:layout_marginBottom="8dp"
+                    android:background="@drawable/rounded_background">
+
                     <ImageView
                         android:layout_width="24dp"
                         android:layout_height="24dp"
@@ -99,32 +113,35 @@
                         android:adjustViewBounds="true"
                         android:background="@null"
                         android:src="@drawable/ic_pick_cloud_drive"
-                        app:tint="?attr/textColorHint" />
+                        app:tint="?android:attr/textColorSecondary" />
                 </RelativeLayout>
+
                 <TextView
+                    android:id="@+id/text_file"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_centerHorizontal="true"
-                    android:text="File"
                     android:layout_below="@id/file_icon"
+                    android:layout_centerHorizontal="true"
                     android:textColor="?android:attr/textColorSecondary"
-                    android:textSize="11sp"/>
+                    android:textSize="11sp" />
             </RelativeLayout>
 
             <RelativeLayout
                 android:id="@+id/option_voice"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center"
+                android:layout_gravity="top"
                 android:layout_weight="1"
                 android:gravity="center">
+
                 <RelativeLayout
                     android:id="@+id/voice_icon"
-                    android:layout_width="40dp"
-                    android:layout_height="40dp"
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
                     android:layout_centerHorizontal="true"
-                    android:background="@drawable/rounded_background"
-                    android:layout_marginBottom="8dp">
+                    android:layout_marginBottom="8dp"
+                    android:background="@drawable/rounded_background">
+
                     <ImageView
                         android:layout_width="24dp"
                         android:layout_height="24dp"
@@ -132,32 +149,35 @@
                         android:adjustViewBounds="true"
                         android:background="@null"
                         android:src="@drawable/ic_phone_white"
-                        app:tint="?attr/textColorHint" />
+                        app:tint="?android:attr/textColorSecondary" />
                 </RelativeLayout>
+
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_centerHorizontal="true"
-                    android:text="Voice"
                     android:layout_below="@id/voice_icon"
+                    android:layout_centerHorizontal="true"
+                    android:text="@string/chat_room_toolbar_voice_call_option"
                     android:textColor="?android:attr/textColorSecondary"
-                    android:textSize="11sp"/>
+                    android:textSize="11sp" />
             </RelativeLayout>
 
             <RelativeLayout
                 android:id="@+id/option_video"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center"
+                android:layout_gravity="top"
                 android:layout_weight="1"
                 android:gravity="center">
+
                 <RelativeLayout
                     android:id="@+id/video_icon"
-                    android:layout_width="40dp"
-                    android:layout_height="40dp"
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
                     android:layout_centerHorizontal="true"
-                    android:background="@drawable/rounded_background"
-                    android:layout_marginBottom="8dp">
+                    android:layout_marginBottom="8dp"
+                    android:background="@drawable/rounded_background">
+
                     <ImageView
                         android:layout_width="24dp"
                         android:layout_height="24dp"
@@ -165,72 +185,79 @@
                         android:adjustViewBounds="true"
                         android:background="@null"
                         android:src="@drawable/ic_videocam_white"
-                        app:tint="?attr/textColorHint" />
+                        app:tint="?android:attr/textColorSecondary" />
                 </RelativeLayout>
+
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_centerHorizontal="true"
-                    android:text="Video"
                     android:layout_below="@id/video_icon"
+                    android:layout_centerHorizontal="true"
+                    android:text="@string/upload_to_video"
                     android:textColor="?android:attr/textColorSecondary"
-                    android:textSize="11sp"/>
+                    android:textSize="11sp" />
             </RelativeLayout>
 
         </LinearLayout>
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:baselineAligned="false">
+            android:layout_height="86dp"
+            android:baselineAligned="false"
+            android:orientation="horizontal">
+
             <RelativeLayout
                 android:id="@+id/option_scan"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center"
+                android:layout_gravity="top"
                 android:layout_weight="1"
                 android:gravity="center">
+
                 <RelativeLayout
                     android:id="@+id/scan_icon"
-                    android:layout_width="40dp"
-                    android:layout_height="40dp"
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
                     android:layout_centerHorizontal="true"
-                    android:background="@drawable/rounded_background"
-                    android:layout_marginBottom="8dp">
+                    android:layout_marginBottom="8dp"
+                    android:background="@drawable/rounded_background">
+
                     <ImageView
                         android:layout_width="24dp"
                         android:layout_height="24dp"
                         android:layout_centerInParent="true"
                         android:adjustViewBounds="true"
                         android:background="@null"
-                        android:src="@drawable/ic_scan_document"
-                        app:tint="?attr/textColorHint" />
+                        android:src="@drawable/ic_scan_toolbar"
+                        app:tint="?android:attr/textColorSecondary" />
                 </RelativeLayout>
+
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_centerHorizontal="true"
-                    android:text="Scan"
                     android:layout_below="@id/scan_icon"
+                    android:layout_centerHorizontal="true"
+                    android:text="@string/chat_room_toolbar_scan_option"
                     android:textColor="?android:attr/textColorSecondary"
-                    android:textSize="11sp"/>
+                    android:textSize="11sp" />
             </RelativeLayout>
 
             <RelativeLayout
                 android:id="@+id/option_gif"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center"
+                android:layout_gravity="top"
                 android:layout_weight="1"
                 android:gravity="center">
+
                 <RelativeLayout
                     android:id="@+id/gif_icon"
-                    android:layout_width="40dp"
-                    android:layout_height="40dp"
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
                     android:layout_centerHorizontal="true"
-                    android:background="@drawable/rounded_background"
-                    android:layout_marginBottom="8dp">
+                    android:layout_marginBottom="8dp"
+                    android:background="@drawable/rounded_background">
+
                     <ImageView
                         android:layout_width="24dp"
                         android:layout_height="24dp"
@@ -238,65 +265,71 @@
                         android:adjustViewBounds="true"
                         android:background="@null"
                         android:src="@drawable/ic_gif_toolbar"
-                        app:tint="?attr/textColorHint" />
+                        app:tint="?android:attr/textColorSecondary" />
                 </RelativeLayout>
+
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_centerHorizontal="true"
-                    android:text="GIF"
                     android:layout_below="@id/gif_icon"
+                    android:layout_centerHorizontal="true"
+                    android:text="@string/chat_room_toolbar_gif_option"
                     android:textColor="?android:attr/textColorSecondary"
-                    android:textSize="11sp"/>
+                    android:textSize="11sp" />
             </RelativeLayout>
 
             <RelativeLayout
                 android:id="@+id/option_location"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center"
+                android:layout_gravity="top"
                 android:layout_weight="1"
                 android:gravity="center">
+
                 <RelativeLayout
                     android:id="@+id/location_icon"
-                    android:layout_width="40dp"
-                    android:layout_height="40dp"
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
                     android:layout_centerHorizontal="true"
-                    android:background="@drawable/rounded_background"
-                    android:layout_marginBottom="8dp">
+                    android:layout_marginBottom="8dp"
+                    android:background="@drawable/rounded_background">
+
                     <ImageView
                         android:layout_width="24dp"
                         android:layout_height="24dp"
                         android:layout_centerInParent="true"
                         android:adjustViewBounds="true"
                         android:background="@null"
-                        android:src="@drawable/ic_outline_location"
-                        app:tint="?attr/textColorHint" />
+                        android:src="@drawable/ic_location_small"
+                        app:tint="?android:attr/textColorSecondary" />
                 </RelativeLayout>
+
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_centerHorizontal="true"
-                    android:text="Location"
                     android:layout_below="@id/location_icon"
+                    android:layout_centerHorizontal="true"
+                    android:text="@string/file_properties_info_location"
                     android:textColor="?android:attr/textColorSecondary"
-                    android:textSize="11sp"/>
+                    android:textSize="11sp" />
             </RelativeLayout>
 
             <RelativeLayout
                 android:id="@+id/option_contact"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center"
+                android:layout_gravity="top"
                 android:layout_weight="1"
                 android:gravity="center">
+
                 <RelativeLayout
                     android:id="@+id/contact_icon"
-                    android:layout_width="40dp"
-                    android:layout_height="40dp"
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
                     android:layout_centerHorizontal="true"
-                    android:background="@drawable/rounded_background"
-                    android:layout_marginBottom="8dp">
+                    android:layout_marginBottom="8dp"
+                    android:background="@drawable/rounded_background">
+
                     <ImageView
                         android:layout_width="24dp"
                         android:layout_height="24dp"
@@ -304,18 +337,21 @@
                         android:adjustViewBounds="true"
                         android:background="@null"
                         android:src="@drawable/ic_send_contact"
-                        app:tint="?attr/textColorHint" />
+                        app:tint="?android:attr/textColorSecondary" />
                 </RelativeLayout>
+
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_centerHorizontal="true"
-                    android:text="Contact"
                     android:layout_below="@id/contact_icon"
+                    android:layout_centerHorizontal="true"
+                    android:text="@string/attachment_upload_panel_contact"
                     android:textColor="?android:attr/textColorSecondary"
-                    android:textSize="11sp"/>
+                    android:textSize="11sp" />
             </RelativeLayout>
 
         </LinearLayout>
 
     </LinearLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>
