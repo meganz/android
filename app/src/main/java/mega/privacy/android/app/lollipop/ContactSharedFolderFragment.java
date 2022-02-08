@@ -19,7 +19,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.ImageView;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -344,13 +343,13 @@ public class ContactSharedFolderFragment extends ContactFileBaseFragment {
             
             // Rename
             if(selected.size() == 1){
-                if ((megaApi.checkAccess(selected.get(0), MegaShare.ACCESS_FULL).getErrorCode() == MegaError.API_OK) || (megaApi.checkAccess(selected.get(0), MegaShare.ACCESS_READWRITE).getErrorCode() == MegaError.API_OK)) {
+                if ((megaApi.checkAccessErrorExtended(selected.get(0), MegaShare.ACCESS_FULL).getErrorCode() == MegaError.API_OK) || (megaApi.checkAccessErrorExtended(selected.get(0), MegaShare.ACCESS_READWRITE).getErrorCode() == MegaError.API_OK)) {
                     showRename = true;
                 }
             }
             
             if (selected.size() > 0) {
-                if ((megaApi.checkAccess(selected.get(0), MegaShare.ACCESS_FULL).getErrorCode() == MegaError.API_OK) || (megaApi.checkAccess(selected.get(0), MegaShare.ACCESS_READWRITE).getErrorCode() == MegaError.API_OK)) {
+                if ((megaApi.checkAccessErrorExtended(selected.get(0), MegaShare.ACCESS_FULL).getErrorCode() == MegaError.API_OK) || (megaApi.checkAccessErrorExtended(selected.get(0), MegaShare.ACCESS_READWRITE).getErrorCode() == MegaError.API_OK)) {
                     showMove = true;
                 }
             }
@@ -360,11 +359,11 @@ public class ContactSharedFolderFragment extends ContactFileBaseFragment {
                 // Rename
                 if(selected.size() == 1) {
                     
-                    if((megaApi.checkAccess(selected.get(0), MegaShare.ACCESS_FULL).getErrorCode() == MegaError.API_OK)){
+                    if((megaApi.checkAccessErrorExtended(selected.get(0), MegaShare.ACCESS_FULL).getErrorCode() == MegaError.API_OK)){
                         showMove = true;
                         showRename = true;
                     }
-                    else if(megaApi.checkAccess(selected.get(0), MegaShare.ACCESS_READWRITE).getErrorCode() == MegaError.API_OK){
+                    else if(megaApi.checkAccessErrorExtended(selected.get(0), MegaShare.ACCESS_READWRITE).getErrorCode() == MegaError.API_OK){
                         showMove = false;
                         showRename = false;
                     }
@@ -375,7 +374,7 @@ public class ContactSharedFolderFragment extends ContactFileBaseFragment {
                 }
                 
                 for(int i=0; i<selected.size();i++)	{
-                    if(megaApi.checkMove(selected.get(i), megaApi.getRubbishNode()).getErrorCode() != MegaError.API_OK)	{
+                    if(megaApi.checkMoveErrorExtended(selected.get(i), megaApi.getRubbishNode()).getErrorCode() != MegaError.API_OK)	{
                         showMove = false;
                         break;
                     }
@@ -385,7 +384,7 @@ public class ContactSharedFolderFragment extends ContactFileBaseFragment {
                     showTrash = true;
                 }
                 for(int i=0; i<selected.size(); i++){
-                    if((megaApi.checkAccess(selected.get(i), MegaShare.ACCESS_FULL).getErrorCode() != MegaError.API_OK)){
+                    if((megaApi.checkAccessErrorExtended(selected.get(i), MegaShare.ACCESS_FULL).getErrorCode() != MegaError.API_OK)){
                         showTrash = false;
                         break;
                     }

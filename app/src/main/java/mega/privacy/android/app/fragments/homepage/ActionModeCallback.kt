@@ -92,7 +92,7 @@ class ActionModeCallback constructor(
             StringResourcesUtils.getQuantityString(R.plurals.get_links, selectedNodes.size)
 
         if (selectedNodes.size == 1
-            && megaApi.checkAccess(selectedNodes[0], MegaShare.ACCESS_OWNER).errorCode
+            && megaApi.checkAccessErrorExtended(selectedNodes[0], MegaShare.ACCESS_OWNER).errorCode
             == MegaError.API_OK
         ) {
             if (selectedNodes[0]!!.isExported) {
