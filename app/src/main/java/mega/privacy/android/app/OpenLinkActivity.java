@@ -550,14 +550,13 @@ public class OpenLinkActivity extends PasscodeActivity implements MegaRequestLis
 					new MeetingHasEndedDialogFragment(new MeetingHasEndedDialogFragment.ClickCallback() {
 						@Override
 						public void onViewMeetingChat() {
-							goToChatActivity();
 						}
 
 						@Override
 						public void onLeave() {
 							goToGuestLeaveMeetingActivity();
 						}
-					}).show(getSupportFragmentManager(),
+					}, true).show(getSupportFragmentManager(),
 							MeetingHasEndedDialogFragment.TAG);
 				} else if (isFromOpenChatPreview) {
 					logDebug("Meeting is in progress, open join meeting");

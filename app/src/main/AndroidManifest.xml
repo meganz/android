@@ -320,7 +320,7 @@
             android:windowSoftInputMode="adjustResize|stateVisible"/>
 
         <activity
-            android:name="mega.privacy.android.app.lollipop.ZipBrowserActivityLollipop"
+            android:name="mega.privacy.android.app.zippreview.ui.ZipBrowserActivity"
             android:label="@string/zip_browser_activity"
             android:configChanges="orientation|screenSize">
         </activity>
@@ -710,6 +710,11 @@
             android:label="@string/start_screen_setting"
             android:launchMode="singleTop">
         </activity>
+
+        <activity
+            android:name="mega.privacy.android.app.uploadFolder.UploadFolderActivity"
+            android:launchMode="singleTop"
+            android:windowSoftInputMode="adjustNothing"/>
 
     </application>
 

@@ -21,7 +21,7 @@
             android:paddingEnd="16dp"
             android:text="@string/take_photo_avatar_panel"
             android:textAppearance="?attr/textAppearanceSubtitle1"
-            app:drawableStartCompat="@drawable/ic_media"
+            app:drawableStartCompat="@drawable/ic_capture"
             app:drawableTint="?android:attr/textColorSecondary" />
 
         <TextView

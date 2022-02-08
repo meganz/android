@@ -173,7 +173,7 @@ class GetImageHandlesUseCase @Inject constructor(
      */
     private fun MutableList<ImageItem>.addImageUri(imageUri: Uri) {
         val file = imageUri.toFile()
-        if (file.exists()) {
+        if (file.exists() && file.canRead()) {
             val fileTime = TimeUtils.formatLongDateTime(file.lastModified())
             val fileSize = file.length().toString()
             val nodeItem = MegaNodeItem(

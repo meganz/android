@@ -14,7 +14,7 @@
     <com.google.android.exoplayer2.ui.PlayerView
         android:id="@+id/player_view"
         android:layout_width="match_parent"
-        android:layout_height="115dp"
+        android:layout_height="130dp"
         android:layout_gravity="bottom"
         app:controller_layout_id="@layout/audio_player_control_in_playlist"
         app:player_layout_id="@layout/audio_player_view_controller_only"

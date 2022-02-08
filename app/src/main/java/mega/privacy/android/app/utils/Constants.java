@@ -14,7 +14,7 @@ public class Constants {
     public static final int BOOT_JOB_ID = 10097;
     public static final int CU_SYNC_INACTIVE_HEARTBEAT_JOB_ID = 10098;
 
-    public static final int REQUEST_CODE_GET = 1000;
+    public static final int REQUEST_CODE_GET_FILES = 1000;
     public static final int REQUEST_CODE_SELECT_FOLDER_TO_MOVE = 1001;
     public static final int REQUEST_CODE_SELECT_FOLDER_TO_COPY = 1002;
     public static final int REQUEST_CODE_GET_LOCAL = 1003;
@@ -51,6 +51,8 @@ public class Constants {
     public static final int REQUEST_CODE_SEND_LINK = 1035;
     public static final int REQUEST_CODE_SCAN_DOCUMENT = 1036;
     public static final int REQUEST_CODE_SEND_SEVERAL_LINKS = 1037;
+    public static final int REQUEST_CODE_GET_FOLDER = 1038;
+    public static final int REQUEST_CODE_GET_FOLDER_CONTENT = 1039;
 
     public static final String ACTION_REFRESH_AFTER_BLOCKED = "ACTION_REFRESH_AFTER_BLOCKED";
     public static final String ACTION_REFRESH = "ACTION_REFRESH";
