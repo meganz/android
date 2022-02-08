@@ -63,6 +63,9 @@ object ViewUtils {
      * multiple times.
      *
      * The debounce interval is specified by [MINIMUM_DEBOUNCE_INTERVAL].
+     *
+     * @param action - Lambda parameter that defines an action when the [View] is clicked
+     * and when it is under the debounce interval
      */
     fun View.debounceClick(action: () -> Unit) {
         setOnClickListener {
