@@ -19,19 +19,21 @@ import mega.privacy.android.app.contacts.requests.data.ContactRequestItem
 import mega.privacy.android.app.di.MegaApi
 import mega.privacy.android.app.listeners.OptionalMegaRequestListenerInterface
 import mega.privacy.android.app.usecase.GetGlobalChangesUseCase
-import mega.privacy.android.app.usecase.GetGlobalChangesUseCase.*
+import mega.privacy.android.app.usecase.GetGlobalChangesUseCase.Result
 import mega.privacy.android.app.utils.AvatarUtil
 import mega.privacy.android.app.utils.Constants.INVALID_POSITION
 import mega.privacy.android.app.utils.ErrorUtils.toThrowable
 import mega.privacy.android.app.utils.LogUtil.logError
 import mega.privacy.android.app.utils.view.TextDrawable
-import nz.mega.sdk.*
-import nz.mega.sdk.MegaApiJava.*
-import nz.mega.sdk.MegaChatApi.*
+import nz.mega.sdk.MegaApiAndroid
+import nz.mega.sdk.MegaApiJava.USER_ATTR_AVATAR
+import nz.mega.sdk.MegaApiJava.USER_ATTR_FIRSTNAME
+import nz.mega.sdk.MegaChatApiAndroid
+import nz.mega.sdk.MegaContactRequest
 import nz.mega.sdk.MegaContactRequest.STATUS_REMINDED
 import nz.mega.sdk.MegaContactRequest.STATUS_UNRESOLVED
+import nz.mega.sdk.MegaError
 import java.io.File
-import java.util.*
 import javax.inject.Inject
 
 /**
@@ -98,7 +100,7 @@ class GetContactRequestsUseCase @Inject constructor(
                 onNext = { change ->
                     if (emitter.isCancelled) return@subscribeBy
 
-                    if (change is Result.OnContactRequestsUpdate) {
+                    if (change is Result.OnContactRequestsUpdate && !change.contactRequests.isNullOrEmpty()) {
                         change.contactRequests.forEach { request ->
                             when (request.status) {
                                 STATUS_UNRESOLVED -> {
