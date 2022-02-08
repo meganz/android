@@ -10,7 +10,6 @@ import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
-import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.ActionBar;
 import androidx.core.content.FileProvider;
 import androidx.core.text.HtmlCompat;
@@ -23,16 +22,12 @@ import android.provider.DocumentsContract;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
-import android.widget.Button;
-import android.widget.CheckBox;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.anggrayudi.storage.file.DocumentFileUtils;
 import com.anggrayudi.storage.file.StorageId;
-import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -61,8 +56,6 @@ import static mega.privacy.android.app.utils.Util.*;
 
 public class FileStorageActivityLollipop extends PasscodeActivity implements Scrollable {
 
-	private static final String IS_SET_DOWNLOAD_LOCATION_SHOWN = "IS_SET_DOWNLOAD_LOCATION_SHOWN";
-	private static final String IS_CONFIRMATION_CHECKED = "IS_CONFIRMATION_CHECKED";
 	private static final String PATH = "PATH";
 	public static final String PICK_FOLDER_TYPE = "PICK_FOLDER_TYPE";
 	private static final int REQUEST_SAVE_RK = 1122;
@@ -146,10 +139,6 @@ public class FileStorageActivityLollipop extends PasscodeActivity implements Scr
 	private Toolbar tB;
 	private ActionBar aB;
 
-	private AlertDialog setDownloadLocationDialog;
-	private boolean isSetDownloadLocationShown;
-	private boolean confirmationChecked;
-
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		logDebug("onOptionsItemSelected");
@@ -218,13 +207,8 @@ public class FileStorageActivityLollipop extends PasscodeActivity implements Scr
 			aB.setTitle(getString(R.string.browse_files_label).toUpperCase());
 		}
 
-		if (savedInstanceState != null) {
-			if (savedInstanceState.containsKey(PATH)) {
-				path = new File(savedInstanceState.getString(PATH));
-			}
-
-			isSetDownloadLocationShown = savedInstanceState.getBoolean(IS_SET_DOWNLOAD_LOCATION_SHOWN, false);
-			confirmationChecked = savedInstanceState.getBoolean(IS_CONFIRMATION_CHECKED, false);
+		if (savedInstanceState != null && savedInstanceState.containsKey(PATH)) {
+			path = new File(savedInstanceState.getString(PATH));
 		}
 
         viewContainer = findViewById(R.id.file_storage_container);
@@ -280,10 +264,6 @@ public class FileStorageActivityLollipop extends PasscodeActivity implements Scr
 				}
 			}
 		    checkPath();
-		}
-
-		if (isSetDownloadLocationShown) {
-			showConfirmationSaveInSameLocation();
 		}
 	}
 
@@ -382,9 +362,6 @@ public class FileStorageActivityLollipop extends PasscodeActivity implements Scr
 			state.putString(PATH, path.getAbsolutePath());
 		}
 
-		state.putBoolean(IS_SET_DOWNLOAD_LOCATION_SHOWN, isSetDownloadLocationShown);
-		state.putBoolean(IS_CONFIRMATION_CHECKED, confirmationChecked);
-
 		super.onSaveInstanceState(state);
 	}
 
@@ -455,58 +432,6 @@ public class FileStorageActivityLollipop extends PasscodeActivity implements Scr
 			}
 			return o1.getName().compareToIgnoreCase(o2.getName());
 		}
-	}
-
-	/**
-	 * This dialog is shown when the user is selecting the download location.
-	 * It asks if they want to set the current chosen location as default.
-	 * It the user enables the checkbox, the dialog should not appear again.
-	 *
-	 */
-	private void showConfirmationSaveInSameLocation(){
-		if (setDownloadLocationDialog != null && setDownloadLocationDialog.isShowing()) {
-			return;
-		}
-
-		if (prefs == null) {
-			prefs = dbH.getPreferences();
-		}
-
-		MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this, R.style.ThemeOverlay_Mega_MaterialAlertDialog);
-		View v = getLayoutInflater().inflate(R.layout.dialog_general_confirmation, null);
-		builder.setView(v);
-
-		TextView text = v.findViewById(R.id.confirmation_text);
-		text.setText(R.string.confirmation_download_location);
-
-		Button cancelButton = v.findViewById(R.id.negative_button);
-		cancelButton.setText(R.string.general_negative_button);
-		cancelButton.setOnClickListener(v2 -> setDownloadLocationDialog.dismiss());
-
-		Button confirmationButton = v.findViewById(R.id.positive_button);
-		confirmationButton.setText(R.string.general_yes);
-		confirmationButton.setOnClickListener(v3 -> {
-			setDownloadLocationDialog.dismiss();
-			dbH.setStorageAskAlways(false);
-			dbH.setStorageDownloadLocation(path.getAbsolutePath());
-			prefs.setStorageDownloadLocation(path.getAbsolutePath());
-		});
-
-		CheckBox checkBox = v.findViewById(R.id.confirmation_checkbox);
-		checkBox.setChecked(confirmationChecked);
-
-		LinearLayout checkBoxLayout = v.findViewById(R.id.confirmation_checkbox_layout);
-		checkBoxLayout.setOnClickListener(v1 -> checkBox.setChecked(!checkBox.isChecked()));
-
-		builder.setCancelable(false);
-		builder.setOnDismissListener(dialog -> {
-			isSetDownloadLocationShown = false;
-			dbH.setAskSetDownloadLocation(!checkBox.isChecked());
-			finishPickFolder();
-		});
-		setDownloadLocationDialog = builder.create();
-		setDownloadLocationDialog.show();
-		isSetDownloadLocationShown = true;
 	}
 
 	private void finishPickFolder() {
