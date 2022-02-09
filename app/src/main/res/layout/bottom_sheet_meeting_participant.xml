@@ -128,7 +128,7 @@
                 android:id="@+id/remove_moderator"
                 style="@style/BottomSheetItem"
                 android:show="@{viewModel.showRemoveModeratorItem()}"
-                android:text="@string/make_moderator"
+                android:text="@string/remove_moderator"
                 app:drawableStartCompat="@drawable/ic_moderator" />
 
             <View
