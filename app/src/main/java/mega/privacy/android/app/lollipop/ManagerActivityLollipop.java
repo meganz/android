@@ -299,6 +299,12 @@ import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.OpenPasswordLinkActivity;
 import mega.privacy.android.app.Product;
 import mega.privacy.android.app.R;
+import mega.privacy.android.app.fragments.managerFragments.cu.PhotosFragment;
+import mega.privacy.android.app.gallery.ui.MediaDiscoveryFragment;
+import mega.privacy.android.app.objects.PasscodeManagement;
+import mega.privacy.android.app.fragments.homepage.documents.DocumentsFragment;
+import mega.privacy.android.app.generalusecase.FilePrepareUseCase;
+import mega.privacy.android.app.smsVerification.SMSVerificationActivity;
 import mega.privacy.android.app.ShareInfo;
 import mega.privacy.android.app.TransfersManagementActivity;
 import mega.privacy.android.app.UploadService;
@@ -664,38 +670,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
         }
     }
 
-    public enum DrawerItem {
-        CLOUD_DRIVE, PHOTOS, HOMEPAGE, CHAT, SHARED_ITEMS, NOTIFICATIONS,
-        SETTINGS, INBOX, SEARCH, TRANSFERS, RUBBISH_BIN, ASK_PERMISSIONS;
-
-        public String getTitle(Context context) {
-            switch (this) {
-                case CLOUD_DRIVE:
-                    return context.getString(R.string.section_cloud_drive);
-                case PHOTOS:
-                    return context.getString(R.string.sortby_type_photo_first);
-                case INBOX:
-                    return context.getString(R.string.section_inbox);
-                case SHARED_ITEMS:
-                    return context.getString(R.string.title_shared_items);
-                case SETTINGS:
-                    return context.getString(R.string.action_settings);
-                case SEARCH:
-                    return context.getString(R.string.action_search);
-                case TRANSFERS:
-                    return context.getString(R.string.section_transfers);
-                case CHAT:
-                    return context.getString(R.string.section_chat);
-                case RUBBISH_BIN:
-                    return context.getString(R.string.section_rubbish_bin);
-                case NOTIFICATIONS:
-                    return context.getString(R.string.title_properties_chat_contact_notifications);
-            }
-            return null;
-        }
-    }
-
-    public boolean turnOnNotifications = false;
+	public boolean turnOnNotifications = false;
 
     private int searchSharedTab = -1;
     private DrawerItem searchDrawerItem = null;
@@ -8074,8 +8049,9 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
             drawerLayout.closeDrawer(Gravity.LEFT);
         }
 
-        startActivity(new Intent(this, UpgradeAccountActivity.class));
-    }
+		startActivity(new Intent(this, UpgradeAccountActivity.class));
+		myAccountInfo.setUpgradeOpenedFrom(MyAccountInfo.UpgradeFrom.MANAGER);
+	}
 
     public void navigateToAchievements() {
         logDebug("navigateToAchievements");
@@ -11259,14 +11235,15 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
     public void markNotificationsSeen(boolean fromAndroidNotification) {
         logDebug("fromAndroidNotification: " + fromAndroidNotification);
 
-        if (fromAndroidNotification) {
-            megaApi.acknowledgeUserAlerts();
-        } else {
-            if (drawerItem == ManagerActivityLollipop.DrawerItem.NOTIFICATIONS && app.isActivityVisible()) {
-                megaApi.acknowledgeUserAlerts();
-            }
-        }
-    }
+		if(fromAndroidNotification){
+			megaApi.acknowledgeUserAlerts();
+		}
+		else{
+			if(drawerItem == DrawerItem.NOTIFICATIONS && app.isActivityVisible()){
+				megaApi.acknowledgeUserAlerts();
+			}
+		}
+	}
 
     public void showKeyboardForSearch() {
         showKeyboardDelayed(searchView.findViewById(R.id.search_src_text));

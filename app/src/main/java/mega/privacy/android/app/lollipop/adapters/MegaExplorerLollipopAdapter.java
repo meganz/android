@@ -35,9 +35,9 @@ import mega.privacy.android.app.components.scrollBar.SectionTitleProvider;
 import mega.privacy.android.app.databinding.SortByHeaderBinding;
 import mega.privacy.android.app.fragments.homepage.SortByHeaderViewModel;
 import mega.privacy.android.app.lollipop.CloudDriveExplorerFragmentLollipop;
+import mega.privacy.android.app.lollipop.DrawerItem;
 import mega.privacy.android.app.lollipop.FileExplorerActivityLollipop;
 import mega.privacy.android.app.lollipop.IncomingSharesExplorerFragmentLollipop;
-import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.utils.ColorUtils;
 import mega.privacy.android.app.utils.MegaNodeUtil;
 import mega.privacy.android.app.utils.ThumbnailUtilsLollipop;
@@ -315,7 +315,7 @@ public class MegaExplorerLollipopAdapter extends RecyclerView.Adapter<MegaExplor
             } else {
                 holder.textViewFileSize.setText(getMegaNodeFolderInfo(node));
             }
-            holder.imageView.setImageResource(getFolderIcon(node, ManagerActivityLollipop.DrawerItem.CLOUD_DRIVE));
+            holder.imageView.setImageResource(getFolderIcon(node, DrawerItem.CLOUD_DRIVE));
 
             if(node.isInShare()){
                 if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
@@ -432,7 +432,7 @@ public class MegaExplorerLollipopAdapter extends RecyclerView.Adapter<MegaExplor
 
             holder.itemView.setOnLongClickListener(null);
 
-            holder.folderIcon.setImageResource(getFolderIcon(node, ManagerActivityLollipop.DrawerItem.CLOUD_DRIVE));
+            holder.folderIcon.setImageResource(getFolderIcon(node, DrawerItem.CLOUD_DRIVE));
             holder.itemView.setOnClickListener(this);
             holder.folderName.setTextColor(ColorUtils.getThemeColor(context, android.R.attr.textColorPrimary));
         }

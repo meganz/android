@@ -805,4 +805,11 @@ class MyAccountViewModel @Inject constructor(
             snackbarShower.showSnackbar(result)
         }
     }
+
+    /**
+     * Sets the Upgrade screen has been opened from My account section.
+     */
+    fun setOpenUpgradeFrom() {
+        myAccountInfo.upgradeOpenedFrom = MyAccountInfo.UpgradeFrom.ACCOUNT
+    }
 }
