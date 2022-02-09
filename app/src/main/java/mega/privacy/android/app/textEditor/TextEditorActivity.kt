@@ -237,7 +237,7 @@ class TextEditorActivity : PasscodeActivity(), SnackbarShower, Scrollable {
             return
         }
 
-        if (nodeSaver.handleActivityResult(requestCode, resultCode, data)) {
+        if (nodeSaver.handleActivityResult(this, requestCode, resultCode, data)) {
             return
         }
 

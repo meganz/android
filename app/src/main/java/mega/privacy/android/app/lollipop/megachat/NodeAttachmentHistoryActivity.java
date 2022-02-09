@@ -1057,7 +1057,7 @@ public class NodeAttachmentHistoryActivity extends PasscodeActivity
         super.onActivityResult(requestCode, resultCode, intent);
         logDebug("Result Code: " + resultCode);
 
-        if (nodeSaver.handleActivityResult(requestCode, resultCode, intent)) {
+        if (nodeSaver.handleActivityResult(this, requestCode, resultCode, intent)) {
             return;
         }
 
