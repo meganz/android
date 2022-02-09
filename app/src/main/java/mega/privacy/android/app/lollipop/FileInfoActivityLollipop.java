@@ -1848,7 +1848,7 @@ public class FileInfoActivityLollipop extends PasscodeActivity implements OnClic
             return;
         }
 
-        if (nodeSaver.handleActivityResult(requestCode, resultCode, intent)) {
+        if (nodeSaver.handleActivityResult(this, requestCode, resultCode, intent)) {
             return;
         }
 

@@ -1,0 +1,182 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <com.google.android.material.appbar.MaterialToolbar
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <ScrollView
+        android:id="@+id/scrollview"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:fillViewport="true">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/content_view"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <TextView
+                android:id="@+id/payment_methods"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="start|center_vertical"
+                android:paddingStart="16dp"
+                android:paddingTop="8dp"
+                android:paddingEnd="16dp"
+                android:paddingBottom="8dp"
+                android:text="@string/payment_methods"
+                android:textAppearance="@style/TextAppearance.Mega.Subtitle2.Normal.Grey87White87"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <TextView
+                android:id="@+id/payment_type"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="start|center_vertical"
+                android:padding="16dp"
+                android:textAppearance="@style/TextAppearance.Mega.Subtitle1.20sp.Orange400Orange300"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/payment_methods"
+                tools:text="Pro Lite" />
+
+            <ImageView
+                android:id="@+id/wallet_icon"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/payment_type"
+                tools:ignore="ContentDescription"
+                tools:src="@drawable/ic_google_wallet" />
+
+            <TextView
+                android:id="@+id/wallet_text"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:layout_marginEnd="16dp"
+                android:textAppearance="@style/TextAppearance.Mega.Subtitle1.Grey54White54"
+                app:layout_constraintBottom_toTopOf="@id/wallet_separator"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toEndOf="@+id/wallet_icon"
+                app:layout_constraintTop_toBottomOf="@+id/payment_type"
+                tools:text="Google Pay (subscription)" />
+
+            <View
+                android:id="@+id/wallet_separator"
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="5dp"
+                android:layout_marginEnd="16dp"
+                android:background="@color/grey_012_white_012"
+                app:layout_constraintTop_toBottomOf="@+id/wallet_icon" />
+
+            <TextView
+                android:id="@+id/billing_period"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:gravity="start|center_vertical"
+                android:paddingStart="16dp"
+                android:paddingTop="8dp"
+                android:paddingEnd="16dp"
+                android:paddingBottom="8dp"
+                android:text="@string/billing_period_title"
+                android:textAppearance="@style/TextAppearance.Mega.Subtitle2.Normal.Grey87White87"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/wallet_separator" />
+
+            <RadioButton
+                android:id="@+id/monthly_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="10dp"
+                android:layout_marginTop="15dp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/billing_period" />
+
+            <TextView
+                android:id="@+id/monthly_text"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="16dp"
+                android:textAppearance="@style/TextAppearance.Mega.Subtitle1.18sp.Grey54White54"
+                app:layout_constraintBottom_toBottomOf="@+id/monthly_button"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toEndOf="@+id/monthly_button"
+                app:layout_constraintTop_toTopOf="@+id/monthly_button"
+                tools:text="Billed monthly 4,99€/ month" />
+
+            <View
+                android:id="@+id/month_separator"
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="5dp"
+                android:layout_marginEnd="16dp"
+                android:background="@color/grey_012_white_012"
+                app:layout_constraintTop_toBottomOf="@+id/monthly_button" />
+
+            <RadioButton
+                android:id="@+id/yearly_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="10dp"
+                android:layout_marginTop="20dp"
+                android:checked="true"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/monthly_button" />
+
+            <TextView
+                android:id="@+id/yearly_text"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="16dp"
+                android:textAppearance="@style/TextAppearance.Mega.Subtitle1.18sp.Grey54White54"
+                app:layout_constraintBottom_toBottomOf="@+id/yearly_button"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toEndOf="@+id/yearly_button"
+                app:layout_constraintTop_toTopOf="@+id/yearly_button"
+                tools:text="Billed yearly 4,99€/ month" />
+
+            <View
+                android:id="@+id/year_separator"
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="5dp"
+                android:layout_marginEnd="16dp"
+                android:background="@color/grey_012_white_012"
+                app:layout_constraintTop_toBottomOf="@+id/yearly_button" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/proceed_button"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="62dp"
+                android:layout_marginEnd="16dp"
+                android:layout_marginBottom="62dp"
+                android:text="@string/proceed"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/year_separator"
+                app:layout_constraintVertical_bias="1" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+    </ScrollView>
+
+</LinearLayout>

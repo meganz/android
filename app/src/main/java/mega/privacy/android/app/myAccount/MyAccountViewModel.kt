@@ -115,7 +115,7 @@ class MyAccountViewModel @Inject constructor(
 
     fun getName(): String = myAccountInfo.fullName
 
-    fun getEmail(): String = megaApi.myEmail
+    fun getEmail(): String? = megaApi.myEmail
 
     fun getAccountType(): Int = myAccountInfo.accountType
 
@@ -804,5 +804,12 @@ class MyAccountViewModel @Inject constructor(
         if (this::snackbarShower.isInitialized) {
             snackbarShower.showSnackbar(result)
         }
+    }
+
+    /**
+     * Sets the Upgrade screen has been opened from My account section.
+     */
+    fun setOpenUpgradeFrom() {
+        myAccountInfo.upgradeOpenedFrom = MyAccountInfo.UpgradeFrom.ACCOUNT
     }
 }
