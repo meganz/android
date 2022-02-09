@@ -4140,8 +4140,6 @@
     <string name="contact_already_invited">You have already invited %1$s</string>
     <!-- Warning shown informing the contact request has been sent and can be managed in sent requests section. -->
     <string name="contact_invited">Invite sent successfully. See sent requests.</string>
-    <!-- Title of the menu when the select tracks on playlist page-->
-    <string name="title_select_tracks">Select tracks</string>
     <!-- Message when file available offline. -->
     <string name="file_available_offline">File available Offline</string>
     <!-- Message when file removed from offline. -->
@@ -4219,6 +4217,8 @@
     </plurals>
     <!-- Title of the button when you want to answer a one to one call -->
     <string name="title_join_one_to_one_call">Answer call</string>
+    <!-- Title of the menu when the select tracks on playlist page-->
+    <string name="title_select_tracks">Select tracks</string>
     <!-- Action button to upload files. -->
     <string name="upload_files">Upload files</string>
     <!-- Action button to upload a folder. -->
@@ -4226,7 +4226,7 @@
     <!-- Title of the dialog warning the user about cancel uploads. -->
     <string name="cancel_uploads">Cancel uploads</string>
     <!-- Warning alerting user if proceed with the action all the uploads will be cancelled. -->
-    <string name="cancel_uploads_warning">Interrupting the upload process will result on all your uploads being cancelled.</string>
+    <string name="cancel_uploads_warning">Interrupting the upload process will result in all your uploads being cancelled.</string>
     <!-- Button to proceed with action. -->
     <string name="action_proceed">Proceed</string>
 </resources>

@@ -1726,8 +1726,6 @@
     <string name="attachment_upload_panel_from_cloud">Lấy từ Ổ Mây</string>
     <!--  -->
     <string name="attachment_upload_panel_contact">Tên liên lạc</string>
-    <!--  -->
-    <string name="attachment_upload_panel_photo">Lấy từ trong điện thoại</string>
     <!-- Button and title of dialog shown when the user wants to delete permanently their account. -->
     <string name="delete_account">Xoá tài khoản</string>
     <!-- Text shown in the alert dialog to confirm the deletion of an account -->
@@ -4083,4 +4081,62 @@
     <string name="settings_mobile_data_resoluton_title">Dùng mạng internet di động để tải ảnh xem trước độ phân giải cao</string>
     <!-- summary for the settings to enable high resolution images when on mobile data -->
     <string name="settings_mobile_data_resoluton_summary">Cho phép sử dụng mạng di động để tải độ phân giải cao khi duyệt hình ảnh. Nếu tắt đi, chất lượng ảnh gốc sẽ chỉ được tải khi bạn phóng vào hình ảnh để xem.</string>
+    <!-- If users want to move the root backup folder, all backups underneath it are disabled. Warning dialog will show to confirm -->
+    <string name="backup_move_root_folder">Bạn đang tiến hành thay đổi vị trí mặc định cho thư mục lưu trữ dự phòng. Việc này có thể ảnh hưởng đến khả năng truy tìm thư mục lưu trữ trong tương lai. Xin ghi nhớ vị trí mà bạn dời thư mục đi để không bị lạc mất dữ liệu.</string>
+    <!-- If users want to move the sub backup folder, all backups underneath it are disabled. Warning dialog will show to confirm -->
+    <string name="backup_move_sub_folder">Moving this folder changes the destination of one or more configured backups and may have unintended consequences. The backups will be turned off for your safety. Backups can be re-enabled with the MEGA Desktop App. Do you want to proceed?</string>
+    <!-- If users want to delete the root backup folder, all backups underneath it are disabled. Warning dialog will show to confirm -->
+    <string name="backup_remove_root_folder">Bạn đang tiến hành xóa đi thư mục chứa bản lưu trữ. Việc này sẽ xóa tất cả các lưu dự phòng bạn đã đặt. Bạn có chắc muốn thực hiện việc này không?</string>
+    <!-- If users want to delete the sub backup folder, all backups underneath it are disabled. Warning dialog will show to confirm -->
+    <string name="backup_remove_sub_folder">Bạn có chắc muốn xóa thư mục chứa bản lưu trữ và tắt việc lưu dự phòng có liên quan hay không?</string>
+    <!-- The title of warning dialog for single folder moving -->
+    <string name="backup_move_folder_title">Di chuyển “%1s”</string>
+    <!-- The title of warning dialog for single folder deleting -->
+    <string name="backup_remove_folder_title">Di chuyển “%1s” vào Thùng Rác</string>
+    <!-- The title of warning dialog for multi-folder moving -->
+    <string name="backup_move_multiple_folder_title">Di chuyển các thư mục lưu dự phòng</string>
+    <!-- The title of warning dialog for single folder deleting -->
+    <string name="backup_remove_multiple_folder_title">Di chuyển các thư mục lưu dự phòng vào Thùng Rác</string>
+    <!-- The confirm information of warning dialog for deleting -->
+    <string name="backup_disable_confirm">Tat luu du phong</string>
+    <!-- The confirm information of warning dialog for moving "My backup" -->
+    <string name="backup_move_confirm">Di chuyen ban luu tru</string>
+    <!-- The confirm information of warning dialog for deleting -->
+    <string name="backup_action_confirm">Xin điền “%1s” để xác nhận hành động này</string>
+    <!-- when checking the input -->
+    <string name="error_backup_confirm_dont_match">chữ đã nhập không trùng khớp</string>
+    <!-- The title of confirm dialog for adding item to "My backup" -->
+    <string name="backup_add_confirm_title">Thêm mục vào “%1s”</string>
+    <!-- The title of warning dialog for adding item to "My backup" -->
+    <string name="backup_add_item_title">Cài đặt lưu dự phòng</string>
+    <!-- If users want to add items to the "My backup" folder, Warning dialog will show to confirm -->
+    <string name="backup_add_item_to_root_text">To ensure these items added to your backup folder are automatically synchronised to the MEGA Cloud, please set them up in the MEGA Desktop App.</string>
+    <!-- If users want to share items in the "My backup" folder, Warning dialog will show to confirm -->
+    <string name="backup_share_permission_title">Chỉ-được-xem</string>
+    <!-- If users want to share items in the "My backup" folder, Warning dialog will show to confirm -->
+    <string name="backup_share_permission_text">Thư mục này được chia sẻ dưới dạng chỉ-được-xem bởi vì là thư mục lưu dự phòng, bất kỳ thay đổi trong nội dung sẽ vô hiệu hóa việc sao lưu dự phòng.</string>
+    <!-- If users want to add items to the "My backup" device folder, Warning dialog will show to confirm -->
+    <string name="backup_add_item_text">Items in this folder are part of a configured backup and are synchronised to a local folder. Taking this action will break the synchronisation and disable the backup. The backup can be re-enabled with the MEGA Desktop App. Are you sure you want to proceed?</string>
+    <!-- Share multi backup folders, show below warning message -->
+    <string name="backup_multi_share_permission_text">Các thư mục này được chia sẻ dưới dạng chỉ-được-xem bởi vì đây là các thư mục lưu dự phòng, bất kỳ thay đổi trong nội dung sẽ vô hiệu hóa việc sao lưu dự phòng.</string>
+    <!-- Share multi folders mix with backup and non-backup folders, show below warning message -->
+    <string name="backup_share_with_root_permission_text">Vài trong các thư mục chia sẻ này là thư mục lưu dự phòng và chỉ-được-xem. Bạn có muốn tiếp tục không?</string>
+    <!-- Indicates the content of the backup folder -->
+    <plurals name="num_devices">
+        <item quantity="other">%d thiết bị</item>
+    </plurals>
+    <!-- Title of the button when you want to answer a one to one call -->
+    <string name="title_join_one_to_one_call">Trả lời cuộc gọi</string>
+    <!-- Title of the menu when the select tracks on playlist page-->
+    <string name="title_select_tracks">Select tracks</string>
+    <!-- Action button to upload files. -->
+    <string name="upload_files">Upload files</string>
+    <!-- Action button to upload a folder. -->
+    <string name="upload_folder">Upload folder</string>
+    <!-- Title of the dialog warning the user about cancel uploads. -->
+    <string name="cancel_uploads">Cancel uploads</string>
+    <!-- Warning alerting user if proceed with the action all the uploads will be cancelled. -->
+    <string name="cancel_uploads_warning">Interrupting the upload process will result in all your uploads being cancelled.</string>
+    <!-- Button to proceed with action. -->
+    <string name="action_proceed">Tiến hành</string>
 </resources>
