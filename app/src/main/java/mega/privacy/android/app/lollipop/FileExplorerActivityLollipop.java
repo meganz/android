@@ -60,6 +60,7 @@ import mega.privacy.android.app.ShareInfo;
 import mega.privacy.android.app.TransfersManagementActivity;
 import mega.privacy.android.app.UploadService;
 import mega.privacy.android.app.UserCredentials;
+import mega.privacy.android.app.utils.ChatUtil;
 import mega.privacy.android.app.utils.MegaProgressDialogUtil;
 import mega.privacy.android.app.generalusecase.FilePrepareUseCase;
 import mega.privacy.android.app.interfaces.ActionNodeCallback;
@@ -73,7 +74,6 @@ import mega.privacy.android.app.lollipop.adapters.MegaNodeAdapter;
 import mega.privacy.android.app.lollipop.listeners.CreateGroupChatWithPublicLink;
 import mega.privacy.android.app.lollipop.megachat.ChatExplorerFragment;
 import mega.privacy.android.app.lollipop.megachat.ChatExplorerListItem;
-import mega.privacy.android.app.lollipop.megachat.ChatSettings;
 import mega.privacy.android.app.lollipop.megachat.ChatUploadService;
 import mega.privacy.android.app.lollipop.megachat.PendingMessageSingle;
 import mega.privacy.android.app.modalbottomsheet.SortByBottomSheetDialogFragment;
@@ -227,8 +227,6 @@ public class FileExplorerActivityLollipop extends TransfersManagementActivity
 	
 	private Handler handler;
 
-	private ChatSettings chatSettings;
-	
 	private int tabShown = CLOUD_TAB;
 
 	private ArrayList<MegaChatRoom> chatListItems = new ArrayList<>();
@@ -573,21 +571,7 @@ public class FileExplorerActivityLollipop extends TransfersManagementActivity
 				prepareNodesText.setVisibility(View.GONE);
 				gSession = credentials.getSession();
 
-				int ret = megaChatApi.getInitState();
-
-				if (ret == MegaChatApi.INIT_NOT_DONE || ret == MegaChatApi.INIT_ERROR) {
-					ret = megaChatApi.init(gSession);
-					logDebug("Result of init ---> " + ret);
-					chatSettings = dbH.getChatSettings();
-					if (ret == MegaChatApi.INIT_NO_CACHE) {
-						logDebug("Condition ret == MegaChatApi.INIT_NO_CACHE");
-					} else if (ret == MegaChatApi.INIT_ERROR) {
-						logDebug("Condition ret == MegaChatApi.INIT_ERROR");
-						megaChatApi.logout(this);
-					} else {
-						logDebug("onCreate: Chat correctly initialized");
-					}
-				}
+				ChatUtil.initMegaChatApi(gSession, this);
 
 				megaApi.fastLogin(gSession, this);
 			}

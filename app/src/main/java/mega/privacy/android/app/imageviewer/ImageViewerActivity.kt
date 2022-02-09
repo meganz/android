@@ -569,7 +569,7 @@ class ImageViewerActivity : BaseActivity(), PermissionRequester, SnackbarShower 
     @Suppress("deprecation")
     override fun onActivityResult(requestCode: Int, resultCode: Int, intent: Intent?) {
         when {
-            nodeSaver?.handleActivityResult(requestCode, resultCode, intent) == true ->
+            nodeSaver?.handleActivityResult(this, requestCode, resultCode, intent) == true ->
                 return
             nodeAttacher?.handleActivityResult(requestCode, resultCode, intent, this) == true ->
                 return

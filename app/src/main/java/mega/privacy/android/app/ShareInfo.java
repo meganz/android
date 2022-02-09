@@ -175,39 +175,38 @@ public class ShareInfo implements Serializable {
 		return path.contains("../") || path.contains(APP_PRIVATE_DIR1)
 				|| path.contains(APP_PRIVATE_DIR2);
 	}
-	
+
 	/*
 	 * Process Multiple files from GET_CONTENT Intent
 	 */
 	@SuppressLint("NewApi")
-	public static List<ShareInfo> processGetContentMultiple(Intent intent,Context context) {
+	public static List<ShareInfo> processGetContentMultiple(Intent intent, Context context) {
 		logDebug("processGetContentMultiple");
-		ArrayList<ShareInfo> result = new ArrayList<ShareInfo>();
+		ArrayList<ShareInfo> result = new ArrayList<>();
 		ClipData cD = intent.getClipData();
-		if(cD!=null&&cD.getItemCount()!=0){
-		
-            for(int i = 0; i < cD.getItemCount(); i++){
-            	ClipData.Item item = cD.getItemAt(i);
-            	Uri uri = item.getUri();
+
+		if (cD != null && cD.getItemCount() != 0) {
+			for (int i = 0; i < cD.getItemCount(); i++) {
+				ClipData.Item item = cD.getItemAt(i);
+				Uri uri = item.getUri();
 				logDebug("ClipData uri: " + uri);
-            	if (uri == null)
-    				continue;
+				if (uri == null)
+					continue;
 				logDebug("Uri: " + uri.toString());
-    			ShareInfo info = new ShareInfo();
-    			info.processUri(uri, context);
-    			if (info.file == null) {
-    				continue;
-    			}
-    			result.add(info);
-            }
-		}
-		else{
-			logWarning("ClipData NUll or size=0");
+				ShareInfo info = new ShareInfo();
+				info.processUri(uri, context);
+				if (info.file == null) {
+					continue;
+				}
+				result.add(info);
+			}
+		} else {
+			logWarning("ClipData or uploadResults NUll or size=0");
 			return null;
 		}
-		
+
 		intent.setAction(FileExplorerActivityLollipop.ACTION_PROCESSED);
-		
+
 		return result;
 	}
 	
@@ -249,7 +248,7 @@ public class ShareInfo implements Serializable {
 	/*
 	 * Get info from Uri
 	 */
-	private void processUri(Uri uri, Context context) {
+	public void processUri(Uri uri, Context context) {
 		logDebug("processUri: " + uri);
 		// getting input stream
 		inputStream = null;
@@ -543,6 +542,7 @@ public class ShareInfo implements Serializable {
 		if(contentURI == null) return null;
 	    String path = null;
 	    Cursor cursor = null;
+
 		try {
 			cursor = context.getContentResolver().query(contentURI, null, null, null, null);
 		    if(cursor == null) return null;

@@ -61,6 +61,7 @@ import mega.privacy.android.app.utils.AlertDialogUtil;
 import mega.privacy.android.app.utils.AlertsAndWarnings;
 import mega.privacy.android.app.utils.MegaNodeDialogUtil;
 import mega.privacy.android.app.utils.StringResourcesUtils;
+import mega.privacy.android.app.utils.UploadUtil;
 import nz.mega.documentscanner.DocumentScannerActivity;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaContactRequest;
@@ -198,8 +199,13 @@ public class ContactFileListActivityLollipop extends PasscodeActivity
 	}
 
 	@Override
-	public void uploadFromDevice() {
-		chooseFromDevice(this);
+	public void uploadFiles() {
+		chooseFiles(this);
+	}
+
+	@Override
+	public void uploadFolder() {
+		chooseFolder(this);
 	}
 
 	@Override
@@ -582,7 +588,7 @@ public class ContactFileListActivityLollipop extends PasscodeActivity
 	protected void onActivityResult(int requestCode, int resultCode, Intent intent) {
 		super.onActivityResult(requestCode, resultCode, intent);
 
-        if (nodeSaver.handleActivityResult(requestCode, resultCode, intent)) {
+        if (nodeSaver.handleActivityResult(this, requestCode, resultCode, intent)) {
             return;
         }
 
@@ -659,7 +665,7 @@ public class ContactFileListActivityLollipop extends PasscodeActivity
 							showMovementResult(result, moveHandles[0]);
 						}
 					});
-		} else if (requestCode == REQUEST_CODE_GET && resultCode == RESULT_OK) {
+		} else if (requestCode == REQUEST_CODE_GET_FILES && resultCode == RESULT_OK) {
 			if (intent == null) {
 				return;
 			}
@@ -680,6 +686,10 @@ public class ContactFileListActivityLollipop extends PasscodeActivity
 							onIntentProcessed(shareInfo);
 						}
 					});
+		}  else if (requestCode == REQUEST_CODE_GET_FOLDER) {
+			getFolder(this, resultCode, intent, parentHandle);
+		} else if (requestCode == REQUEST_CODE_GET_FOLDER_CONTENT) {
+			UploadUtil.uploadFolder(this, resultCode, intent);
 		} else if (requestCode == REQUEST_CODE_SELECT_FOLDER && resultCode == RESULT_OK) {
 			if (intent == null) {
 				return;

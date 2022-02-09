@@ -3452,7 +3452,7 @@ public class ChatActivityLollipop extends PasscodeActivity
     protected void onActivityResult(int requestCode, int resultCode, Intent intent) {
         logDebug("resultCode: " + resultCode);
 
-        if (nodeSaver.handleActivityResult(requestCode, resultCode, intent)) {
+        if (nodeSaver.handleActivityResult(this, requestCode, resultCode, intent)) {
             return;
         }
 
@@ -3496,7 +3496,7 @@ public class ChatActivityLollipop extends PasscodeActivity
         else if (requestCode == REQUEST_CODE_SELECT_FILE && resultCode == RESULT_OK) {
             nodeAttacher.handleSelectFileResult(intent, idChat, this, this);
         }
-        else if (requestCode == REQUEST_CODE_GET && resultCode == RESULT_OK) {
+        else if (requestCode == REQUEST_CODE_GET_FILES && resultCode == RESULT_OK) {
             if (intent == null) {
                 logWarning("Return.....");
                 return;
@@ -4192,7 +4192,7 @@ public class ChatActivityLollipop extends PasscodeActivity
         intent.putExtra(FROM_MEGA_APP, true);
         intent.setType("*/*");
 
-        startActivityForResult(Intent.createChooser(intent, null), REQUEST_CODE_GET);
+        startActivityForResult(Intent.createChooser(intent, null), REQUEST_CODE_GET_FILES);
     }
 
     public void sendMessage(String text){
@@ -8533,6 +8533,7 @@ public class ChatActivityLollipop extends PasscodeActivity
     public void onResume(){
         super.onResume();
        stopService(new Intent(this, KeepAliveService.class));
+
         if(idChat!=-1 && chatRoom!=null) {
 
             setNodeAttachmentVisible();

@@ -20,6 +20,7 @@ import android.webkit.MimeTypeMap;
 
 import androidx.annotation.Nullable;
 import androidx.core.content.FileProvider;
+import androidx.documentfile.provider.DocumentFile;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -558,10 +559,6 @@ public class FileUtil {
     }
 
     public static String getDownloadLocation() {
-        if (isAndroid11OrUpper()) {
-            return buildDefaultDownloadDir(MegaApplication.getInstance()).getAbsolutePath();
-        }
-
         DatabaseHandler dbH = DatabaseHandler.getDbHandler(MegaApplication.getInstance());
         MegaPreferences prefs = dbH.getPreferences();
 
@@ -959,6 +956,29 @@ public class FileUtil {
     }
 
     /**
+     * Gets the string to show as content of a folder.
+     *
+     * @param documentFile The folder to get its string content.
+     * @return The string to show as content of the folder.
+     */
+    public static String getFileFolderInfo(DocumentFile documentFile) {
+        DocumentFile[] fList = documentFile.listFiles();
+
+        int numFolders = 0;
+        int numFiles = 0;
+
+        for (DocumentFile d : fList) {
+            if (d.isDirectory()) {
+                numFolders++;
+            } else {
+                numFiles++;
+            }
+        }
+
+        return getFolderInfo(numFolders, numFiles);
+    }
+
+    /**
      * Gets the total size of a File.
      *
      * @param file The File to get its total size.
@@ -1066,10 +1086,9 @@ public class FileUtil {
      * @param context         Current context.
      * @param content         The content to store.
      * @param path            The selected location to save the file.
-     * @param sdCardUriString If the selected location is on SD card, need the uri to grant SD card write permission.
      * @return True if content was correctly saved, false otherwise.
      */
-    public static boolean saveTextOnFile(Context context, String content, String path, String sdCardUriString) {
+    public static boolean saveTextOnFile(Context context, String content, String path) {
         try {
             // If export the file to SD card.
             if (SDCardUtils.isLocalFolderOnSDCard(context, path)) {
@@ -1083,8 +1102,7 @@ public class FileUtil {
                 // Copy to target location on SD card.
                 SDCardOperator sdCardOperator = new SDCardOperator(context);
                 DatabaseHandler dbH = DatabaseHandler.getDbHandler(context);
-                // If the `sdCardUriString` is null, get SD card root uri from database.
-                sdCardOperator.initDocumentFileRoot(sdCardUriString == null ? dbH.getSDCardUri() : sdCardUriString);
+                sdCardOperator.initDocumentFileRoot(dbH.getSDCardUri());
                 sdCardOperator.moveFile(path.substring(0, path.lastIndexOf(File.separator)), temp);
 
                 // Delete the temp file.
