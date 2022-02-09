@@ -196,12 +196,12 @@ class ImageViewerViewModel @Inject constructor(
      * You must be observing the requested Image to get the updated result.
      *
      * @param nodeHandle    Image node handle to be loaded.
-     * @param fullSize      Flag to request full size image.
-     * @param highPriority  Flag to request full image with high priority.
+     * @param fullSize      Flag to request full size image despite data/size requirements.
+     * @param highPriority  Flag to request image with high priority.
      */
     fun loadSingleImage(nodeHandle: Long, fullSize: Boolean, highPriority: Boolean) {
         val imageItem = images.value?.find { it.handle == nodeHandle }
-        val isFullSizeRequired = fullSize || images.value?.size == 1
+        val fullSizeRequired = fullSize || images.value?.size == 1
 
         val subscription = when {
             imageItem == null
@@ -210,15 +210,15 @@ class ImageViewerViewModel @Inject constructor(
                     && imageItem.imageResult.previewUri != null) ->
                 return
             imageItem.nodePublicLink?.isNotBlank() == true ->
-                getImageUseCase.get(imageItem.nodePublicLink, isFullSizeRequired, highPriority)
+                getImageUseCase.get(imageItem.nodePublicLink, fullSizeRequired, highPriority)
             imageItem.chatMessageId != null && imageItem.chatRoomId != null ->
-                getImageUseCase.get(imageItem.chatRoomId, imageItem.chatMessageId, isFullSizeRequired, highPriority)
+                getImageUseCase.get(imageItem.chatRoomId, imageItem.chatMessageId, fullSizeRequired, highPriority)
             imageItem.isOffline ->
                 getImageUseCase.getOffline(imageItem.handle)
             imageItem.handle != INVALID_HANDLE ->
-                getImageUseCase.get(nodeHandle, isFullSizeRequired, highPriority)
+                getImageUseCase.get(nodeHandle, fullSizeRequired, highPriority)
             imageItem.nodeItem?.node != null ->
-                getImageUseCase.get(imageItem.nodeItem.node, isFullSizeRequired, highPriority)
+                getImageUseCase.get(imageItem.nodeItem.node, fullSizeRequired, highPriority)
             else ->
                 return // Image file uri with no handle
         }

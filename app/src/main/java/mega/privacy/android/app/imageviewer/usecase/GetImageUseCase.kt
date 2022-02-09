@@ -1,6 +1,7 @@
 package mega.privacy.android.app.imageviewer.usecase
 
 import android.content.Context
+import android.content.SharedPreferences
 import android.graphics.Bitmap
 import android.media.ThumbnailUtils.createVideoThumbnail
 import android.net.Uri
@@ -15,6 +16,7 @@ import io.reactivex.rxjava3.core.Single
 import mega.privacy.android.app.DownloadService
 import mega.privacy.android.app.MimeTypeList
 import mega.privacy.android.app.components.transferWidget.TransfersManagement
+import mega.privacy.android.app.constants.SettingsConstants
 import mega.privacy.android.app.di.MegaApi
 import mega.privacy.android.app.errors.BusinessAccountOverdueMegaError
 import mega.privacy.android.app.errors.QuotaOverdueMegaError
@@ -31,10 +33,10 @@ import mega.privacy.android.app.utils.FileUtil
 import mega.privacy.android.app.utils.LogUtil.logWarning
 import mega.privacy.android.app.utils.MegaNodeUtil.getFileName
 import mega.privacy.android.app.utils.MegaNodeUtil.getThumbnailFileName
-import mega.privacy.android.app.utils.MegaNodeUtil.isImage
 import mega.privacy.android.app.utils.MegaNodeUtil.isNodeFileValid
 import mega.privacy.android.app.utils.MegaNodeUtil.isVideo
 import mega.privacy.android.app.utils.MegaTransferUtils.getNumPendingDownloadsNonBackground
+import mega.privacy.android.app.utils.NetworkUtil.isMeteredConnection
 import mega.privacy.android.app.utils.OfflineUtils
 import mega.privacy.android.app.utils.RxUtil.blockingGetOrNull
 import mega.privacy.android.app.utils.StringUtils.encodeBase64
@@ -56,15 +58,25 @@ class GetImageUseCase @Inject constructor(
     @ApplicationContext private val context: Context,
     @MegaApi private val megaApi: MegaApiAndroid,
     private val getNodeUseCase: GetNodeUseCase,
-    private val getChatMessageUseCase: GetChatMessageUseCase
+    private val getChatMessageUseCase: GetChatMessageUseCase,
+    private val preferences: SharedPreferences
 ) {
+
+    companion object {
+        private const val SIZE_1_MB = 1024 * 1024 * 1L
+        private const val SIZE_50_MB = SIZE_1_MB * 50L
+    }
+
+    private val isMobileDataAllowed: Boolean by lazy {
+        preferences.getBoolean(SettingsConstants.KEY_MOBILE_DATA_HIGH_RESOLUTION, true)
+    }
 
     /**
      * Get an ImageResult given a Node handle.
      *
      * @param nodeHandle    Image Node handle to request.
-     * @param fullSize      Flag to request full size image.
-     * @param highPriority  Flag to request full image with high priority.
+     * @param fullSize      Flag to request full size image despite data/size requirements.
+     * @param highPriority  Flag to request image with high priority.
      * @return              Flowable which emits Uri for every image, from low to high resolution.
      */
     fun get(
@@ -79,8 +91,8 @@ class GetImageUseCase @Inject constructor(
      * Get an ImageResult given a Node file link.
      *
      * @param nodeFileLink  Image Node file link.
-     * @param fullSize      Flag to request full size image.
-     * @param highPriority  Flag to request full image with high priority.
+     * @param fullSize      Flag to request full size image despite data/size requirements.
+     * @param highPriority  Flag to request image with high priority.
      * @return              Flowable which emits Uri for every image, from low to high resolution.
      */
     fun get(
@@ -96,8 +108,8 @@ class GetImageUseCase @Inject constructor(
      *
      * @param chatRoomId        Chat Message Room Id
      * @param chatMessageId     Chat Message Id
-     * @param fullSize          Flag to request full size image.
-     * @param highPriority      Flag to request full image with high priority.
+     * @param fullSize          Flag to request full size image despite data/size requirements.
+     * @param highPriority      Flag to request image with high priority.
      * @return                  Flowable which emits Uri for every image, from low to high resolution.
      */
     fun get(
@@ -113,8 +125,8 @@ class GetImageUseCase @Inject constructor(
      * Get an ImageResult given a Node.
      *
      * @param node          Image Node to request.
-     * @param fullSize      Flag to request full size image.
-     * @param highPriority  Flag to request full image with high priority.
+     * @param fullSize      Flag to request full size image despite data/size requirements.
+     * @param highPriority  Flag to request image with high priority.
      * @return              Flowable which emits Uri for every image, from low to high resolution.
      */
     fun get(
@@ -127,7 +139,12 @@ class GetImageUseCase @Inject constructor(
                 node == null -> emitter.onError(IllegalArgumentException("Node is null"))
                 !node.isFile -> emitter.onError(IllegalArgumentException("Node is not a file"))
                 else -> {
-                    val isFullSizeRequired = fullSize || !node.isImage()
+                    val fullSizeRequired = when {
+                        node.isVideo() -> false
+                        node.size <= SIZE_1_MB -> true
+                        node.size in SIZE_1_MB..SIZE_50_MB -> fullSize || isMobileDataAllowed || !context.isMeteredConnection()
+                        else -> false
+                    }
 
                     val thumbnailFile = if (node.hasThumbnail()) buildThumbnailFile(context, node.getThumbnailFileName()) else null
                     val previewFile = if (node.hasPreview() || node.isVideo()) buildPreviewFile(context, node.getThumbnailFileName()) else null
@@ -148,7 +165,7 @@ class GetImageUseCase @Inject constructor(
                         image.previewUri = getVideoPreviewImage(node.getThumbnailFileName(), fullFile.toUri()).blockingGetOrNull()
                     }
 
-                    if (fullFile?.exists() == true && (previewFile == null || previewFile.exists())) {
+                    if ((!fullSizeRequired && previewFile?.exists() == true) || node.isNodeFileValid(fullFile)) {
                         image.isFullyLoaded = true
                         emitter.onNext(image)
                         emitter.onComplete()
@@ -185,14 +202,14 @@ class GetImageUseCase @Inject constructor(
 
                                     if (error.errorCode == API_OK) {
                                         image.previewUri = previewFile.toUri()
-                                        if (isFullSizeRequired) {
+                                        if (fullSizeRequired) {
                                             emitter.onNext(image)
                                         } else {
                                             image.isFullyLoaded = true
                                             emitter.onNext(image)
                                             emitter.onComplete()
                                         }
-                                    } else if (!isFullSizeRequired) {
+                                    } else if (!fullSizeRequired) {
                                         emitter.onError(error.toThrowable())
                                     } else {
                                         logWarning(error.toThrowable().stackTraceToString())
@@ -201,7 +218,7 @@ class GetImageUseCase @Inject constructor(
                             ))
                     }
 
-                    if (isFullSizeRequired && !fullFile.exists()) {
+                    if (fullSizeRequired && !fullFile.exists()) {
                         val listener = OptionalMegaTransferListenerInterface(
                             onTransferStart = { transfer ->
                                 if (emitter.isCancelled) return@OptionalMegaTransferListenerInterface

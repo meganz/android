@@ -30,6 +30,7 @@ import mega.privacy.android.app.imageviewer.dialog.ImageBottomSheetDialogFragmen
 import mega.privacy.android.app.interfaces.PermissionRequester
 import mega.privacy.android.app.interfaces.SnackbarShower
 import mega.privacy.android.app.interfaces.showSnackbar
+import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.AlertsAndWarnings.showSaveToDeviceConfirmDialog
 import mega.privacy.android.app.utils.Constants.*
 import mega.privacy.android.app.utils.ContextUtils.isLowMemory
@@ -551,6 +552,23 @@ class ImageViewerActivity : BaseActivity(), PermissionRequester, SnackbarShower 
 
     fun attachNode(node: MegaNode) {
         nodeAttacher?.attachNode(node)
+    }
+
+    fun launchVideoScreen(node: MegaNode) {
+        val intent = Util.getMediaIntent(this, node.name).apply {
+            putExtra(INTENT_EXTRA_KEY_POSITION, 0)
+            putExtra(INTENT_EXTRA_KEY_HANDLE, node.handle)
+            putExtra(INTENT_EXTRA_KEY_FILE_NAME, node.name)
+            putExtra(INTENT_EXTRA_KEY_ADAPTER_TYPE, FROM_IMAGE_VIEWER)
+
+            val localPath = FileUtil.getLocalFile(node)
+            if (FileUtil.isLocalFile(node, megaApi, localPath)) {
+                FileUtil.setLocalIntentParams(this@ImageViewerActivity, node, this, localPath, false, this@ImageViewerActivity)
+            } else {
+                FileUtil.setStreamingIntentParams(this@ImageViewerActivity, node, megaApi, this, this@ImageViewerActivity)
+            }
+        }
+        startActivity(intent)
     }
 
     fun showRenameDialog(node: MegaNode) {
