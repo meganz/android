@@ -52,7 +52,7 @@ ext {
     versionCode = 424
 
     // Sdk and tools
-    compileSdkVersion = 30
+    compileSdkVersion = 31
     minSdkVersion = 21
     targetSdkVersion = 30
     buildToolsVerion = '30.0.2'
