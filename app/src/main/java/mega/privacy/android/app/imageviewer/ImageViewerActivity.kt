@@ -554,20 +554,31 @@ class ImageViewerActivity : BaseActivity(), PermissionRequester, SnackbarShower 
         nodeAttacher?.attachNode(node)
     }
 
-    fun launchVideoScreen(node: MegaNode) {
-        val intent = Util.getMediaIntent(this, node.name).apply {
-            putExtra(INTENT_EXTRA_KEY_POSITION, 0)
-            putExtra(INTENT_EXTRA_KEY_HANDLE, node.handle)
-            putExtra(INTENT_EXTRA_KEY_FILE_NAME, node.name)
-            putExtra(INTENT_EXTRA_KEY_ADAPTER_TYPE, FROM_IMAGE_VIEWER)
+    fun launchVideoScreen(imageItem: ImageItem) {
+        val nodeHandle = imageItem.handle
+        val nodeName = imageItem.nodeItem?.name ?: return
 
+        val intent = Util.getMediaIntent(this, nodeName).apply {
+            putExtra(INTENT_EXTRA_KEY_POSITION, 0)
+            putExtra(INTENT_EXTRA_KEY_HANDLE, nodeHandle)
+            putExtra(INTENT_EXTRA_KEY_FILE_NAME, nodeName)
+            putExtra(INTENT_EXTRA_KEY_ADAPTER_TYPE, FROM_IMAGE_VIEWER)
+            addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP)
+        }
+
+        if (imageItem.isOffline) {
+            val localPath = imageItem.imageResult?.fullSizeUri?.toFile()?.absolutePath ?: return
+            FileUtil.setLocalIntentParams(this, nodeName, intent, localPath, false, this)
+        } else {
+            val node = imageItem.nodeItem.node ?: return
             val localPath = FileUtil.getLocalFile(node)
             if (FileUtil.isLocalFile(node, megaApi, localPath)) {
-                FileUtil.setLocalIntentParams(this@ImageViewerActivity, node, this, localPath, false, this@ImageViewerActivity)
+                FileUtil.setLocalIntentParams(this, nodeName, intent, localPath, false, this)
             } else {
-                FileUtil.setStreamingIntentParams(this@ImageViewerActivity, node, megaApi, this, this@ImageViewerActivity)
+                FileUtil.setStreamingIntentParams(this, node, megaApi, intent, this)
             }
         }
+
         startActivity(intent)
     }
 

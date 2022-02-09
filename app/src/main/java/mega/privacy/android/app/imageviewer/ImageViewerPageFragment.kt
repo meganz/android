@@ -23,7 +23,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.R
 import mega.privacy.android.app.databinding.PageImageViewerBinding
 import mega.privacy.android.app.imageviewer.data.ImageItem
-import mega.privacy.android.app.utils.Constants.*
+import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_HANDLE
 import mega.privacy.android.app.utils.ContextUtils.getScreenSize
 import mega.privacy.android.app.utils.ExtraUtils.extra
 import mega.privacy.android.app.utils.LogUtil.logError
@@ -179,7 +179,7 @@ class ImageViewerPageFragment : Fragment() {
         } else if (imageItem.imageResult.isFullyLoaded) {
             binding.image.post {
                 if (imageItem.imageResult.isVideo) {
-                    showVideoButton(imageItem)
+                    showVideoButton()
                 }
                 binding.progress.hide()
             }
@@ -196,7 +196,7 @@ class ImageViewerPageFragment : Fragment() {
             if (imageItem?.imageResult?.isFullyLoaded == true) {
                 binding.image.post {
                     if (imageItem.imageResult.isVideo) {
-                        showVideoButton(imageItem)
+                        showVideoButton()
                     }
                     binding.progress.hide()
                 }
@@ -216,7 +216,7 @@ class ImageViewerPageFragment : Fragment() {
             if (imageItem?.imageResult?.isFullyLoaded == true) {
                 binding.image.post {
                     if (imageItem.imageResult.isVideo) {
-                        showVideoButton(imageItem)
+                        showVideoButton()
                     }
                     binding.progress.hide()
                 }
@@ -224,28 +224,28 @@ class ImageViewerPageFragment : Fragment() {
         }
     }
 
-    private fun showVideoButton(imageItem: ImageItem) {
+    private fun showVideoButton() {
         if (binding.btnVideo.isVisible && viewModel.isToolbarShown()) return
-        val node = imageItem.nodeItem?.node ?: return
 
         viewModel.switchToolbar(true)
-        binding.btnVideo.setOnClickListener {
-            (activity as? ImageViewerActivity?)?.launchVideoScreen(node)
-        }
+        binding.btnVideo.setOnClickListener { launchVideoScreen() }
         binding.btnVideo.isVisible = true
         binding.image.apply {
             setAllowTouchInterceptionWhileZoomed(true)
             setZoomingEnabled(false)
             setTapListener(object : GestureDetector.SimpleOnGestureListener() {
                 override fun onSingleTapUp(e: MotionEvent?): Boolean {
-                    (activity as? ImageViewerActivity?)?.launchVideoScreen(node)
+                    launchVideoScreen()
                     return true
                 }
             })
-            setOnClickListener {
-                (activity as? ImageViewerActivity?)?.launchVideoScreen(node)
-            }
+            setOnClickListener { launchVideoScreen() }
         }
+    }
+
+    private fun launchVideoScreen() {
+        val imageItem = viewModel.getImageItem(nodeHandle!!) ?: return
+        (activity as? ImageViewerActivity?)?.launchVideoScreen(imageItem)
     }
 
     private fun Uri.toImageRequest(): ImageRequest? =
