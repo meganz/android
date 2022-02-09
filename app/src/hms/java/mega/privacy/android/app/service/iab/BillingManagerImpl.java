@@ -105,7 +105,7 @@ public class BillingManagerImpl implements BillingManager {
     /**
      * Icon res id.
      */
-    public static final int PAY_METHOD_ICON_RES_ID = R.drawable.huawei_wallet_ic;
+    public static final int PAY_METHOD_ICON_RES_ID = R.drawable.ic_huawei_wallet;
 
     /**
      * Payment gatewat for HMS.

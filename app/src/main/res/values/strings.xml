@@ -4236,7 +4236,7 @@
     <!-- Button to proceed with a payment -->
     <string name="proceed">Proceed</string>
     <!-- Message informing the upgrade was processed correctly. Placeholder: type of subscription e.g: Pro Lite monthly -->
-    <string name="successful_upgrade">Thank you for your %1$s subscription!</string>
+    <string name="successful_upgrade">Thank you for subscribing to %1$s!</string>
     <!-- Pro Lite monthly subscription -->
     <string name="pro_lite_monthly">Pro Lite monthly</string>
     <!-- Pro Lite yearly subscription -->
