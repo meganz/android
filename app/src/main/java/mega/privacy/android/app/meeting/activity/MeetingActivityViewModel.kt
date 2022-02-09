@@ -563,17 +563,19 @@ class MeetingActivityViewModel @Inject constructor(
     }
 
     /**
-     * Give moderator permissions to a call participant.
+     * Give permissions to a call participant.
      *
      * @param userHandle User handle of a participant
+     * @param permission type of permit to be assigned to the participant
      * @param listener MegaChatRequestListenerInterface
      */
     fun giveModeratorPermissions(
         userHandle: Long,
+        permission: Int,
         listener: MegaChatRequestListenerInterface? = null
     ) {
         currentChatId.value?.let {
-            meetingActivityRepository.giveModeratorPermissions(it, userHandle, listener)
+            meetingActivityRepository.giveModeratorPermissions(it, userHandle, permission, listener)
         }
     }
 }
