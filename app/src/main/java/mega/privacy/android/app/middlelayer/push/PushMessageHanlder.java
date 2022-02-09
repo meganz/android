@@ -16,6 +16,7 @@ import mega.privacy.android.app.UserCredentials;
 import mega.privacy.android.app.fcm.IncomingCallService;
 import mega.privacy.android.app.fcm.KeepAliveService;
 import mega.privacy.android.app.middlelayer.BuildFlavorHelper;
+import mega.privacy.android.app.utils.ChatUtil;
 import mega.privacy.android.app.utils.TextUtil;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
@@ -230,26 +231,7 @@ public class PushMessageHanlder implements MegaRequestListenerInterface {
                 }
             }
 
-            if (megaChatApi == null) {
-                megaChatApi = app.getMegaChatApi();
-            }
-
-            int ret = megaChatApi.getInitState();
-
-            if (ret == MegaChatApi.INIT_NOT_DONE || ret == MegaChatApi.INIT_ERROR) {
-                ret = megaChatApi.init(gSession);
-                logDebug("result of init ---> " + ret);
-                if (ret == MegaChatApi.INIT_NO_CACHE) {
-                    logDebug("condition ret == MegaChatApi.INIT_NO_CACHE");
-
-                } else if (ret == MegaChatApi.INIT_ERROR) {
-                    logDebug("condition ret == MegaChatApi.INIT_ERROR");
-                    megaChatApi.logout();
-
-                } else {
-                    logDebug("Chat correctly initialized");
-                }
-            }
+            ChatUtil.initMegaChatApi(gSession);
         }
     }
 

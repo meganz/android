@@ -1803,6 +1803,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 						}
 						addPhoneNumberButton.getViewTreeObserver().removeOnPreDrawListener(this);
 					}
+
 					return false;
 				}
 			}
@@ -2006,21 +2007,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 			UserCredentials credentials = dbH.getCredentials();
 			if (credentials != null) {
 				String gSession = credentials.getSession();
-				int ret = megaChatApi.getInitState();
-				logDebug("In Offline mode - Init chat is: " + ret);
-				if (ret == 0 || ret == MegaChatApi.INIT_ERROR) {
-					ret = megaChatApi.init(gSession);
-					logDebug("After init: " + ret);
-					if (ret == MegaChatApi.INIT_NO_CACHE) {
-						logDebug("condition ret == MegaChatApi.INIT_NO_CACHE");
-					} else if (ret == MegaChatApi.INIT_ERROR) {
-						logWarning("condition ret == MegaChatApi.INIT_ERROR");
-					} else {
-						logDebug("Chat correctly initialized");
-					}
-				} else {
-					logDebug("Offline mode: Do not init, chat already initialized");
-				}
+				ChatUtil.initMegaChatApi(gSession, this);
 			}
 
 			return;
@@ -8019,6 +8006,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 		}
 
 		startActivity(new Intent(this, UpgradeAccountActivity.class));
+		myAccountInfo.setUpgradeOpenedFrom(MyAccountInfo.UpgradeFrom.MANAGER);
 	}
 
 	public void navigateToAchievements(){
@@ -8240,7 +8228,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 	protected void onActivityResult(int requestCode, int resultCode, Intent intent) {
 		logDebug("Request code: " + requestCode + ", Result code:" + resultCode);
 
-		if (nodeSaver.handleActivityResult(requestCode, resultCode, intent)) {
+		if (nodeSaver.handleActivityResult(this, requestCode, resultCode, intent)) {
 			return;
 		}
 

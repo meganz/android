@@ -646,7 +646,7 @@ public class FolderLinkActivityLollipop extends TransfersManagementActivity impl
 			return;
 		}
 
-		if (nodeSaver.handleActivityResult(requestCode, resultCode, intent)) {
+		if (nodeSaver.handleActivityResult(this, requestCode, resultCode, intent)) {
 			return;
 		}
 

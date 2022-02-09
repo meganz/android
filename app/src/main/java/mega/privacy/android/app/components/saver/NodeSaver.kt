@@ -14,10 +14,7 @@ import io.reactivex.rxjava3.disposables.CompositeDisposable
 import io.reactivex.rxjava3.kotlin.addTo
 import io.reactivex.rxjava3.kotlin.subscribeBy
 import io.reactivex.rxjava3.schedulers.Schedulers
-import mega.privacy.android.app.DatabaseHandler
-import mega.privacy.android.app.MegaApplication
-import mega.privacy.android.app.MegaOffline
-import mega.privacy.android.app.R
+import mega.privacy.android.app.*
 import mega.privacy.android.app.interfaces.*
 import mega.privacy.android.app.lollipop.FileStorageActivityLollipop
 import mega.privacy.android.app.lollipop.FileStorageActivityLollipop.*
@@ -374,13 +371,19 @@ class NodeSaver(
      *
      * It should be called in onActivityResult.
      *
-     * @param requestCode the requestCode from onActivityResult
-     * @param resultCode the resultCode from onActivityResult
-     * @param intent the intent from onActivityResult
+     * @param activity      Activity required to show a confirmation dialog.
+     * @param requestCode   The requestCode from onActivityResult.
+     * @param resultCode    The resultCode from onActivityResult.
+     * @param intent        The intent from onActivityResult.
      * @return whether NodeSaver handles this result, if this method return false,
      * fragment/app should handle the result by other code.
      */
-    fun handleActivityResult(requestCode: Int, resultCode: Int, intent: Intent?): Boolean {
+    fun handleActivityResult(
+        activity: Activity,
+        requestCode: Int,
+        resultCode: Int,
+        intent: Intent?
+    ): Boolean {
         if (saving == Saving.Companion.NOTHING) {
             return false
         }
@@ -397,7 +400,10 @@ class NodeSaver(
                 logWarning("parentPath null")
                 return false
             }
-            storeDownloadLocationIfNeeded(parentPath)
+
+            if (dbHandler.credentials != null && dbHandler.askSetDownloadLocation && activity is BaseActivity) {
+                activity.showConfirmationSaveInSameLocation(parentPath)
+            }
 
             Completable
                 .fromCallable {

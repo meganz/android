@@ -53,11 +53,13 @@ import mega.privacy.android.app.listeners.SetAttrUserListener;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.receivers.NetworkTypeChangeReceiver;
 import mega.privacy.android.app.sync.cusync.CuSyncManager;
+import mega.privacy.android.app.utils.ChatUtil;
 import mega.privacy.android.app.utils.JobUtil;
 import mega.privacy.android.app.utils.StringResourcesUtils;
 import mega.privacy.android.app.utils.conversion.VideoCompressionCallback;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
+import nz.mega.sdk.MegaChatApi;
 import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaNode;
@@ -1070,6 +1072,9 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
             running = true;
             setLoginState(true);
             megaApi.fastLogin(credentials.getSession(), this);
+
+            ChatUtil.initMegaChatApi(credentials.getSession());
+
             return LOGIN_IN;
         }
 
