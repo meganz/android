@@ -724,6 +724,8 @@ public class CallUtil {
                 return "TERM_CODE_ERROR";
             case MegaChatCall.TERM_CODE_REJECT:
                 return "TERM_CODE_REJECT";
+            case MegaChatCall.TERM_CODE_NO_PARTICIPATE:
+                return "TERM_CODE_NO_PARTICIPATE";
             default:
                 return String.valueOf(termCode);
         }
