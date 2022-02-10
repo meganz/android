@@ -24,10 +24,10 @@ class GetGlobalChangesUseCase @Inject constructor(
 ) {
 
     sealed class Result {
-        data class OnUsersUpdate(val users: List<MegaUser>) : Result()
+        data class OnUsersUpdate(val users: List<MegaUser>?) : Result()
         data class OnUserAlertsUpdate(val userAlerts: List<MegaUserAlert>?) : Result()
         data class OnNodesUpdate(val nodes: List<MegaNode>?) : Result()
-        data class OnContactRequestsUpdate(val contactRequests: List<MegaContactRequest>) : Result()
+        data class OnContactRequestsUpdate(val contactRequests: List<MegaContactRequest>?) : Result()
         data class OnEvent(val event: MegaEvent) : Result()
         object OnReloadNeeded : Result()
         object OnAccountUpdate : Result()

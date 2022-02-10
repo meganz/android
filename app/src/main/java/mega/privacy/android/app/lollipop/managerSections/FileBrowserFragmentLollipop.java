@@ -64,6 +64,7 @@ import mega.privacy.android.app.fragments.homepage.EventObserver;
 import mega.privacy.android.app.fragments.homepage.SortByHeaderViewModel;
 import mega.privacy.android.app.gallery.ui.MediaDiscoveryFragment;
 import mega.privacy.android.app.globalmanagement.SortOrderManagement;
+import mega.privacy.android.app.lollipop.DrawerItem;
 import mega.privacy.android.app.imageviewer.ImageViewerActivity;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.PdfViewerActivityLollipop;
@@ -1125,7 +1126,7 @@ public class FileBrowserFragmentLollipop extends RotatableFragment{
 			if (((ManagerActivityLollipop) context).comesFromNotifications && ((ManagerActivityLollipop) context).comesFromNotificationHandle == (((ManagerActivityLollipop)context).getParentHandleBrowser())) {
 				((ManagerActivityLollipop) context).comesFromNotifications = false;
 				((ManagerActivityLollipop) context).comesFromNotificationHandle = -1;
-				((ManagerActivityLollipop) context).selectDrawerItemLollipop(ManagerActivityLollipop.DrawerItem.NOTIFICATIONS);
+				((ManagerActivityLollipop) context).selectDrawerItemLollipop(DrawerItem.NOTIFICATIONS);
 				((ManagerActivityLollipop)context).setParentHandleBrowser(((ManagerActivityLollipop)context).comesFromNotificationHandleSaved);
 				((ManagerActivityLollipop)context).comesFromNotificationHandleSaved = -1;
 				((ManagerActivityLollipop) context).refreshCloudDrive();
