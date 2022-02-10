@@ -136,28 +136,28 @@
                 <data android:host="mega.co.nz" android:scheme="https" > </data>
             </intent-filter>
 
-            <intent-filter android:exported="true">
+            <intent-filter>
                 <action android:name="android.intent.action.VIEW" ></action>
                 <category android:name="android.intent.category.DEFAULT" ></category>
                 <category android:name="android.intent.category.BROWSABLE" ></category>
                 <data android:host="www.mega.co.nz" android:scheme="https" > </data>
             </intent-filter>
 
-            <intent-filter android:exported="true">
+            <intent-filter>
                 <action android:name="android.intent.action.VIEW" ></action>
                 <category android:name="android.intent.category.DEFAULT" ></category>
                 <category android:name="android.intent.category.BROWSABLE" ></category>
                 <data android:host="mega.nz" android:scheme="https" > </data>
             </intent-filter>
 
-            <intent-filter android:exported="true">
+            <intent-filter>
                 <action android:name="android.intent.action.VIEW" ></action>
                 <category android:name="android.intent.category.DEFAULT" ></category>
                 <category android:name="android.intent.category.BROWSABLE" ></category>
                 <data android:host="www.mega.nz" android:scheme="https" > </data>
             </intent-filter>
 
-            <intent-filter android:exported="true">
+            <intent-filter>
                 <action android:name="android.intent.action.VIEW" ></action>
                 <category android:name="android.intent.category.DEFAULT" ></category>
                 <category android:name="android.intent.category.BROWSABLE" ></category>
@@ -691,6 +691,11 @@
         <activity
             android:name="mega.privacy.android.app.upgradeAccount.ChooseAccountActivity"
             android:label="@string/choose_account_fragment"
+            android:launchMode="singleTop" />
+
+        <activity
+            android:name="mega.privacy.android.app.upgradeAccount.PaymentActivity"
+            android:label="@string/payment"
             android:launchMode="singleTop" />
 
         <receiver android:name=".psa.AlarmReceiver"

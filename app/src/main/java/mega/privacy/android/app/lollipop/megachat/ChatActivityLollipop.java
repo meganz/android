@@ -3458,7 +3458,7 @@ public class ChatActivityLollipop extends PasscodeActivity
     protected void onActivityResult(int requestCode, int resultCode, Intent intent) {
         logDebug("resultCode: " + resultCode);
 
-        if (nodeSaver.handleActivityResult(requestCode, resultCode, intent)) {
+        if (nodeSaver.handleActivityResult(this, requestCode, resultCode, intent)) {
             return;
         }
 
@@ -8539,6 +8539,7 @@ public class ChatActivityLollipop extends PasscodeActivity
     public void onResume(){
         super.onResume();
        stopService(new Intent(this, KeepAliveService.class));
+
         if(idChat!=-1 && chatRoom!=null) {
 
             setNodeAttachmentVisible();

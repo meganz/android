@@ -1,5 +1,6 @@
 package mega.privacy.android.app.mediaplayer.service
 
+import android.annotation.SuppressLint
 import android.app.Notification
 import android.app.PendingIntent
 import android.content.Context
@@ -39,7 +40,7 @@ import nz.mega.sdk.MegaApiAndroid
 import javax.inject.Inject
 
 @AndroidEntryPoint
-open class MediaPlayerService : LifecycleService(), LifecycleObserver {
+open class MediaPlayerService : LifecycleService(), LifecycleEventObserver {
 
     @MegaApi
     @Inject
@@ -457,7 +458,6 @@ open class MediaPlayerService : LifecycleService(), LifecycleObserver {
         viewModel.resetRetryState()
     }
 
-    @OnLifecycleEvent(Lifecycle.Event.ON_START)
     fun onMoveToForeground() {
         if (needPlayWhenGoForeground) {
             setPlayWhenReady(true)
@@ -465,7 +465,6 @@ open class MediaPlayerService : LifecycleService(), LifecycleObserver {
         }
     }
 
-    @OnLifecycleEvent(Lifecycle.Event.ON_STOP)
     fun onMoveToBackground() {
         if ((!viewModel.backgroundPlayEnabled() || !viewModel.audioPlayer) && playing()) {
             setPlayWhenReady(false)
@@ -549,6 +548,14 @@ open class MediaPlayerService : LifecycleService(), LifecycleObserver {
             val audioPlayerIntent = Intent(context, AudioPlayerService::class.java)
             audioPlayerIntent.putExtra(INTENT_EXTRA_KEY_COMMAND, COMMAND_STOP)
             context.startService(audioPlayerIntent)
+        }
+    }
+
+    override fun onStateChanged(source: LifecycleOwner, event: Lifecycle.Event) {
+        when(event){
+            Lifecycle.Event.ON_START -> onMoveToForeground()
+            Lifecycle.Event.ON_STOP -> onMoveToBackground()
+            else -> return
         }
     }
 }

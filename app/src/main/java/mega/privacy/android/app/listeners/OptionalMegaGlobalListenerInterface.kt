@@ -6,16 +6,16 @@ import nz.mega.sdk.*
  * MegaGlobalListenerInterface with optional callbacks.
  */
 class OptionalMegaGlobalListenerInterface(
-    private val onUsersUpdate: ((ArrayList<MegaUser>) -> Unit)? = null,
+    private val onUsersUpdate: ((ArrayList<MegaUser>?) -> Unit)? = null,
     private val onUserAlertsUpdate: ((ArrayList<MegaUserAlert>?) -> Unit)? = null,
     private val onNodesUpdate: ((ArrayList<MegaNode>?) -> Unit)? = null,
     private val onReloadNeeded: (() -> Unit)? = null,
     private val onAccountUpdate: (() -> Unit)? = null,
-    private val onContactRequestsUpdate: ((ArrayList<MegaContactRequest>) -> Unit)? = null,
+    private val onContactRequestsUpdate: ((ArrayList<MegaContactRequest>?) -> Unit)? = null,
     private val onEvent: ((MegaEvent) -> Unit)? = null
 ) : MegaGlobalListenerInterface {
 
-    override fun onUsersUpdate(api: MegaApiJava, users: ArrayList<MegaUser>) {
+    override fun onUsersUpdate(api: MegaApiJava, users: ArrayList<MegaUser>?) {
         onUsersUpdate?.invoke(users)
     }
 
@@ -37,7 +37,7 @@ class OptionalMegaGlobalListenerInterface(
 
     override fun onContactRequestsUpdate(
         api: MegaApiJava,
-        requests: ArrayList<MegaContactRequest>
+        requests: ArrayList<MegaContactRequest>?
     ) {
         onContactRequestsUpdate?.invoke(requests)
     }

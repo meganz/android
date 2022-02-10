@@ -129,10 +129,10 @@ import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.OpenPasswordLinkActivity;
 import mega.privacy.android.app.Product;
 import mega.privacy.android.app.R;
+import mega.privacy.android.app.fragments.managerFragments.cu.PhotosFragment;
 import mega.privacy.android.app.gallery.ui.MediaDiscoveryFragment;
 import mega.privacy.android.app.objects.PasscodeManagement;
 import mega.privacy.android.app.fragments.homepage.documents.DocumentsFragment;
-import mega.privacy.android.app.fragments.managerFragments.cu.PhotosFragment;
 import mega.privacy.android.app.generalusecase.FilePrepareUseCase;
 import mega.privacy.android.app.smsVerification.SMSVerificationActivity;
 import mega.privacy.android.app.ShareInfo;
@@ -539,28 +539,6 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
                 case SMS_VERIFICATION: return "svF";
 				case LINKS: return "lF";
 				case MEDIA_DISCOVERY: return "mdF";
-			}
-			return null;
-		}
-	}
-
-	public enum DrawerItem {
-		CLOUD_DRIVE, PHOTOS, HOMEPAGE, CHAT, SHARED_ITEMS, NOTIFICATIONS,
-		SETTINGS, INBOX, SEARCH, TRANSFERS, RUBBISH_BIN, ASK_PERMISSIONS;
-
-		public String getTitle(Context context) {
-			switch(this)
-			{
-				case CLOUD_DRIVE: return context.getString(R.string.section_cloud_drive);
-				case PHOTOS: return context.getString(R.string.sortby_type_photo_first);
-				case INBOX: return context.getString(R.string.section_inbox);
-				case SHARED_ITEMS: return context.getString(R.string.title_shared_items);
-				case SETTINGS: return context.getString(R.string.action_settings);
-				case SEARCH: return context.getString(R.string.action_search);
-				case TRANSFERS: return context.getString(R.string.section_transfers);
-				case CHAT: return context.getString(R.string.section_chat);
-				case RUBBISH_BIN: return context.getString(R.string.section_rubbish_bin);
-				case NOTIFICATIONS: return context.getString(R.string.title_properties_chat_contact_notifications);
 			}
 			return null;
 		}
@@ -1819,6 +1797,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 						}
 						addPhoneNumberButton.getViewTreeObserver().removeOnPreDrawListener(this);
 					}
+
 					return false;
 				}
 			}
@@ -2022,21 +2001,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 			UserCredentials credentials = dbH.getCredentials();
 			if (credentials != null) {
 				String gSession = credentials.getSession();
-				int ret = megaChatApi.getInitState();
-				logDebug("In Offline mode - Init chat is: " + ret);
-				if (ret == 0 || ret == MegaChatApi.INIT_ERROR) {
-					ret = megaChatApi.init(gSession);
-					logDebug("After init: " + ret);
-					if (ret == MegaChatApi.INIT_NO_CACHE) {
-						logDebug("condition ret == MegaChatApi.INIT_NO_CACHE");
-					} else if (ret == MegaChatApi.INIT_ERROR) {
-						logWarning("condition ret == MegaChatApi.INIT_ERROR");
-					} else {
-						logDebug("Chat correctly initialized");
-					}
-				} else {
-					logDebug("Offline mode: Do not init, chat already initialized");
-				}
+				ChatUtil.initMegaChatApi(gSession, this);
 			}
 
 			return;
@@ -8060,6 +8025,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 		}
 
 		startActivity(new Intent(this, UpgradeAccountActivity.class));
+		myAccountInfo.setUpgradeOpenedFrom(MyAccountInfo.UpgradeFrom.MANAGER);
 	}
 
 	public void navigateToAchievements(){
@@ -8281,7 +8247,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 	protected void onActivityResult(int requestCode, int resultCode, Intent intent) {
 		logDebug("Request code: " + requestCode + ", Result code:" + resultCode);
 
-		if (nodeSaver.handleActivityResult(requestCode, resultCode, intent)) {
+		if (nodeSaver.handleActivityResult(this, requestCode, resultCode, intent)) {
 			return;
 		}
 
@@ -11330,7 +11296,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 			megaApi.acknowledgeUserAlerts();
 		}
 		else{
-			if(drawerItem == ManagerActivityLollipop.DrawerItem.NOTIFICATIONS && app.isActivityVisible()){
+			if(drawerItem == DrawerItem.NOTIFICATIONS && app.isActivityVisible()){
 				megaApi.acknowledgeUserAlerts();
 			}
 		}
