@@ -31,7 +31,7 @@
     <RelativeLayout
         android:id="@+id/participant_list_name_rl"
         android:layout_width="0dp"
-        android:layout_height="55dp"
+        android:layout_height="wrap_content"
         android:layout_marginStart="13dp"
         android:gravity="center_vertical"
         android:visibility="visible"
