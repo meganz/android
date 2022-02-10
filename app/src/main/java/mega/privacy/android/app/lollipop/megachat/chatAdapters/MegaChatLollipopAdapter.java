@@ -76,6 +76,7 @@ import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.activities.GiphyViewerActivity;
 import mega.privacy.android.app.contacts.usecase.InviteContactUseCase;
+import mega.privacy.android.app.lollipop.DrawerItem;
 import mega.privacy.android.app.mediaplayer.service.MediaPlayerService;
 import mega.privacy.android.app.components.EqualSpacingItemDecoration;
 import mega.privacy.android.app.components.RoundedImageView;
@@ -84,7 +85,6 @@ import mega.privacy.android.app.components.twemoji.EmojiTextView;
 import mega.privacy.android.app.components.twemoji.reaction.AutoFitRecyclerView;
 import mega.privacy.android.app.components.voiceClip.DetectorSeekBar;
 import mega.privacy.android.app.listeners.GetPeerAttributesListener;
-import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.adapters.ReactionAdapter;
 import mega.privacy.android.app.lollipop.adapters.RotatableAdapter;
 import mega.privacy.android.app.lollipop.controllers.ChatController;
@@ -3461,7 +3461,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                     }
                     ((ViewHolderMessageChat) holder).urlOwnMessageDescription.setText(getSizeString(node.getSize()));
                 } else {
-                    holder.urlOwnMessageImage.setImageResource(getFolderIcon(node, ManagerActivityLollipop.DrawerItem.CLOUD_DRIVE));
+                    holder.urlOwnMessageImage.setImageResource(getFolderIcon(node, DrawerItem.CLOUD_DRIVE));
                     ((ViewHolderMessageChat) holder).urlOwnMessageDescription.setText(androidMessage.getRichLinkMessage().getFolderContent());
                 }
             } else {

@@ -27,6 +27,7 @@ import mega.privacy.android.app.MegaOffline;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.interfaces.SnackbarShower;
+import mega.privacy.android.app.lollipop.DrawerItem;
 import mega.privacy.android.app.lollipop.FileContactListActivityLollipop;
 import mega.privacy.android.app.lollipop.FileInfoActivityLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
@@ -83,7 +84,7 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
 
     private TextView nodeInfo;
 
-    private ManagerActivityLollipop.DrawerItem drawerItem;
+    private DrawerItem drawerItem;
 
     public NodeOptionsBottomSheetDialogFragment(int mode) {
         if (mode >= MODE0 && mode <= MODE6) {
@@ -1079,7 +1080,7 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
                 i = new Intent(requireContext(), FileInfoActivityLollipop.class);
                 i.putExtra(HANDLE, node.getHandle());
 
-                if (drawerItem == ManagerActivityLollipop.DrawerItem.SHARED_ITEMS) {
+                if (drawerItem == DrawerItem.SHARED_ITEMS) {
                     if (((ManagerActivityLollipop) requireActivity()).getTabItemShares() == 0) {
                         i.putExtra("from", FROM_INCOMING_SHARES);
                         i.putExtra(INTENT_EXTRA_KEY_FIRST_LEVEL,
@@ -1087,11 +1088,11 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
                     } else if (((ManagerActivityLollipop) requireActivity()).getTabItemShares() == 1) {
                         i.putExtra("adapterType", OUTGOING_SHARES_ADAPTER);
                     }
-                } else if (drawerItem == ManagerActivityLollipop.DrawerItem.INBOX) {
+                } else if (drawerItem == DrawerItem.INBOX) {
                     if (((ManagerActivityLollipop) requireActivity()).getTabItemShares() == 0) {
                         i.putExtra("from", FROM_INBOX);
                     }
-                } else if (drawerItem == ManagerActivityLollipop.DrawerItem.SEARCH) {
+                } else if (drawerItem == DrawerItem.SEARCH) {
                     if (nC.nodeComesFromIncoming(node)) {
                         i.putExtra("from", FROM_INCOMING_SHARES);
                         int dBT = nC.getIncomingLevel(node);
@@ -1280,7 +1281,7 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
         outState.putInt(SAVED_STATE_KEY_MODE, mMode);
     }
 
-    private void mapDrawerItemToMode(ManagerActivityLollipop.DrawerItem drawerItem) {
+    private void mapDrawerItemToMode(DrawerItem drawerItem) {
         switch (drawerItem) {
             case CLOUD_DRIVE:
                 mMode = MODE1;
