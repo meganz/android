@@ -135,7 +135,7 @@ class MakeModeratorFragment : MeetingBaseFragment() {
      * Method for initialising UI elements
      */
     private fun setupView() {
-        logDebug("Update toolbar elements");
+        logDebug("Update toolbar elements")
         binding.btCancel.setOnClickListener { cancel() }
         binding.btOk.setOnClickListener { makeModerators() }
 
@@ -305,7 +305,7 @@ class MakeModeratorFragment : MeetingBaseFragment() {
     private fun makeModerators() {
         // Get the list and assign the user in the list to moderator
         selectedParticipants.forEach {
-            sharedModel.giveModeratorPermissions(it.peerId, MegaChatRoom.PRIV_MODERATOR)
+            sharedModel.changeParticipantPermissions(it.peerId, MegaChatRoom.PRIV_MODERATOR)
         }
 
         disableLocalCamera()

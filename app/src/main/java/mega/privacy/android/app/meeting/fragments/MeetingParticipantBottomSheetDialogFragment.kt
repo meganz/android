@@ -105,14 +105,14 @@ class MeetingParticipantBottomSheetDialogFragment : BaseBottomSheetDialogFragmen
 
         listenAction(binding.makeModerator) {
             // Make moderator
-            sharedViewModel.giveModeratorPermissions(
+            sharedViewModel.changeParticipantPermissions(
                 participantItem.peerId, MegaChatRoom.PRIV_MODERATOR
             )
         }
 
         listenAction(binding.removeModerator) {
             // Remove moderator
-            sharedViewModel.giveModeratorPermissions(
+            sharedViewModel.changeParticipantPermissions(
                 participantItem.peerId, MegaChatRoom.PRIV_STANDARD
             )
         }

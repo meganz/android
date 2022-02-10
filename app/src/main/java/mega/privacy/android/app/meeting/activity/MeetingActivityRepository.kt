@@ -241,14 +241,14 @@ class MeetingActivityRepository @Inject constructor(
     }
 
     /**
-     * Give permissions to a call participant.
+     * Change permissions to a call participant.
      *
      * @param chatId Chat ID of the call
      * @param userHandle user handle of a participant
      * @param permission type of permit to be assigned to the participant
      * @param listener MegaChatRequestListenerInterface
      */
-    fun giveModeratorPermissions(
+    fun changeParticipantPermissions(
         chatId: Long,
         userHandle: Long,
         permission: Int,
