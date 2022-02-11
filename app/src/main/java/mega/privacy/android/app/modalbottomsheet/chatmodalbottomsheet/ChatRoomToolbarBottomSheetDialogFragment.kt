@@ -21,6 +21,7 @@ import mega.privacy.android.app.databinding.BottomSheetChatRoomToolbarBinding
 import mega.privacy.android.app.interfaces.ChatRoomToolbarBottomSheetDialogActionListener
 import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop
 import mega.privacy.android.app.lollipop.megachat.FileGalleryItem
+import mega.privacy.android.app.lollipop.tasks.FetchDeviceGalleryTask
 import mega.privacy.android.app.utils.*
 import java.util.*
 
@@ -36,7 +37,6 @@ class ChatRoomToolbarBottomSheetDialogFragment : BottomSheetDialogFragment() {
     private lateinit var adapter: FileStorageAdapter
 
     private lateinit var listener: ChatRoomToolbarBottomSheetDialogActionListener
-
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -68,54 +68,52 @@ class ChatRoomToolbarBottomSheetDialogFragment : BottomSheetDialogFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         setupButtons()
-        //setupListView()
-        //setupListAdapter()
+        setupListView()
+        setupListAdapter()
 
         super.onViewCreated(view, savedInstanceState)
     }
 
     /**
      * Setup option buttons according to the current MegaUser.
-     *
-     * @param megaUser  MegaUser to be shown
      */
     private fun setupButtons() {
-        binding.optionGallery.setOnClickListener{
+        binding.optionGallery.setOnClickListener {
             listener?.showGallery()
             dismiss()
         }
 
-        binding.optionFile.setOnClickListener{
+        binding.optionFile.setOnClickListener {
             listener?.sendFile()
             dismiss()
         }
 
-        binding.optionVoice.setOnClickListener{
+        binding.optionVoice.setOnClickListener {
             listener?.startCall(false)
             dismiss()
         }
 
-        binding.optionVideo.setOnClickListener{
+        binding.optionVideo.setOnClickListener {
             listener?.startCall(true)
             dismiss()
         }
 
-        binding.optionScan.setOnClickListener{
+        binding.optionScan.setOnClickListener {
             listener?.scanDocument()
             dismiss()
         }
 
-        binding.optionGif.setOnClickListener{
+        binding.optionGif.setOnClickListener {
             listener?.sendGIF()
             dismiss()
         }
 
-        binding.optionLocation.setOnClickListener{
+        binding.optionLocation.setOnClickListener {
             listener?.sendLocation()
             dismiss()
         }
 
-        binding.optionContact.setOnClickListener{
+        binding.optionContact.setOnClickListener {
             listener?.sendContact()
             dismiss()
         }
@@ -139,7 +137,7 @@ class ChatRoomToolbarBottomSheetDialogFragment : BottomSheetDialogFragment() {
                     Constants.REQUEST_READ_STORAGE
                 )
             } else {
-               // uploadGallery()
+                // uploadGallery()
             }
         }
 
@@ -149,10 +147,12 @@ class ChatRoomToolbarBottomSheetDialogFragment : BottomSheetDialogFragment() {
         val mLayoutManager: RecyclerView.LayoutManager =
             GridLayoutManager(context, 1, GridLayoutManager.HORIZONTAL, false)
 
-        binding.recyclerViewGallery.clipToPadding = false
-        binding.recyclerViewGallery.setHasFixedSize(true)
-        binding.recyclerViewGallery.setItemAnimator(Util.noChangeRecyclerViewItemAnimator())
-        binding.recyclerViewGallery.setLayoutManager(mLayoutManager)
+        binding.recyclerViewGallery?.apply {
+            clipToPadding = false
+            setHasFixedSize(true)
+            setItemAnimator(Util.noChangeRecyclerViewItemAnimator())
+            setLayoutManager(mLayoutManager)
+        }
     }
 
 
@@ -167,7 +167,7 @@ class ChatRoomToolbarBottomSheetDialogFragment : BottomSheetDialogFragment() {
 
     fun uploadGallery() {
         setNodes(mPhotoUris!!)
-        //FetchDeviceGalleryTask(context).execute()
+        FetchDeviceGalleryTask(context).execute()
         checkAdapterItems(false)
     }
 
@@ -191,7 +191,7 @@ class ChatRoomToolbarBottomSheetDialogFragment : BottomSheetDialogFragment() {
         binding.emptyGallery.visibility = View.GONE
     }
 
-    fun updateFiles(files: List<FileGalleryItem>?){
+    fun updateFiles(files: List<FileGalleryItem>?) {
         if (files!!.isNotEmpty()) {
             mPhotoUris!!.clear()
             mPhotoUris!!.addAll(files)

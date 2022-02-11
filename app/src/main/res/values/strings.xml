@@ -4146,8 +4146,6 @@
     <string name="chat_room_toolbar_voice_clip_option">Voice clip</string>
     <!-- Title of the gif option displayed in the chat room toolbar -->
     <string name="chat_room_toolbar_gif_option">Gif</string>
-    <!-- Title of the menu when the select tracks on playlist page-->
-    <string name="title_select_tracks">Select tracks</string>
     <!-- Message when file available offline. -->
     <string name="file_available_offline">File available Offline</string>
     <!-- Message when file removed from offline. -->
