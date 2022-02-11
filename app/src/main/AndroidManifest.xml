@@ -677,6 +677,11 @@
             android:label="@string/choose_account_fragment"
             android:launchMode="singleTop" />
 
+        <activity
+            android:name="mega.privacy.android.app.upgradeAccount.PaymentActivity"
+            android:label="@string/payment"
+            android:launchMode="singleTop" />
+
         <receiver android:name=".psa.AlarmReceiver">
             <intent-filter>
                 <action android:name="android.intent.action.checking.psa" />
@@ -693,6 +698,11 @@
             android:label="@string/start_screen_setting"
             android:launchMode="singleTop">
         </activity>
+
+        <activity
+            android:name="mega.privacy.android.app.uploadFolder.UploadFolderActivity"
+            android:launchMode="singleTop"
+            android:windowSoftInputMode="adjustNothing"/>
 
     </application>
 

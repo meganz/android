@@ -161,7 +161,7 @@ class GetContactsUseCase @Inject constructor(
                 onNext = { change ->
                     if (emitter.isCancelled) return@subscribeBy
 
-                    if (change is OnUsersUpdate) {
+                    if (change is OnUsersUpdate && !change.users.isNullOrEmpty()) {
                         change.users.forEach { user ->
                             val index = contacts.indexOfFirst { it.email == user.email }
                             if (index != INVALID_POSITION) {

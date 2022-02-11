@@ -45,10 +45,10 @@ import mega.privacy.android.app.components.transferWidget.TransfersManagement;
 import mega.privacy.android.app.fragments.offline.OfflineFragment;
 import mega.privacy.android.app.lollipop.LoginActivityLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
-import mega.privacy.android.app.lollipop.megachat.ChatSettings;
 import mega.privacy.android.app.notifications.TransferOverQuotaNotification;
 import mega.privacy.android.app.objects.SDTransfer;
 import mega.privacy.android.app.service.iar.RatingHandlerImpl;
+import mega.privacy.android.app.utils.ChatUtil;
 import mega.privacy.android.app.utils.SDCardOperator;
 import mega.privacy.android.app.utils.StringResourcesUtils;
 import mega.privacy.android.app.utils.ThumbnailUtilsLollipop;
@@ -121,7 +121,6 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 	MegaApiAndroid megaApi;
 	MegaApiAndroid megaApiFolder;
 	MegaChatApiAndroid megaChatApi;
-	ChatSettings chatSettings;
 
 	ArrayList<Intent> pendingIntents = new ArrayList<Intent>();
 
@@ -362,25 +361,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 					isLoggingIn = true;
 					MegaApplication.setLoggingIn(isLoggingIn);
 
-					if (megaChatApi == null) {
-						megaChatApi = ((MegaApplication) getApplication()).getMegaChatApi();
-					}
-
-					int ret = megaChatApi.getInitState();
-
-					if (ret == MegaChatApi.INIT_NOT_DONE || ret == MegaChatApi.INIT_ERROR) {
-						ret = megaChatApi.init(gSession);
-						logDebug("result of init ---> " + ret);
-						chatSettings = dbH.getChatSettings();
-						if (ret == MegaChatApi.INIT_NO_CACHE) {
-							logDebug("condition ret == MegaChatApi.INIT_NO_CACHE");
-						} else if (ret == MegaChatApi.INIT_ERROR) {
-							logDebug("condition ret == MegaChatApi.INIT_ERROR");
-							megaChatApi.logout();
-						} else {
-							logDebug("Chat correctly initialized");
-						}
-					}
+					ChatUtil.initMegaChatApi(gSession);
 
 					pendingIntents.add(intent);
 					if (type == null || (!type.contains(APP_DATA_VOICE_CLIP) && !type.contains(APP_DATA_BACKGROUND_TRANSFER))) {
@@ -581,7 +562,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 			}
 			sendBroadcast(new Intent(BROADCAST_ACTION_INTENT_TRANSFER_UPDATE));
 
-			megaApi.resetTotalDownloads();
+			megaApi.resetCompletedDownloads();
 			backgroundTransfers.clear();
 			errorEBloqued = 0;
 			errorCount = 0;

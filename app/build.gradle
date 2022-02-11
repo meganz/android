@@ -214,7 +214,6 @@ dependencies {
     implementation 'com.budiyev.android:code-scanner:1.8.3'
     implementation 'me.leolin:ShortcutBadger:1.1.22@aar'
     implementation 'com.brandongogetap:stickyheaders:0.6.1'
-    implementation 'com.github.ittianyu:BottomNavigationViewEx:2.0.4'
     implementation 'androidx.multidex:multidex:2.0.1'
     implementation 'androidx.emoji:emoji-appcompat:1.1.0'
     implementation 'androidx.preference:preference-ktx:1.1.1'
@@ -252,6 +251,7 @@ dependencies {
     implementation "com.jeremyliao:live-event-bus-x:$liveEventBus"
 
     implementation "androidx.biometric:biometric:$biometricVersion"
+    implementation "com.anggrayudi:storage:$simpleStorageVersion"
 
     //GMS
     gmsImplementation 'com.android.billingclient:billing:3.0.2'

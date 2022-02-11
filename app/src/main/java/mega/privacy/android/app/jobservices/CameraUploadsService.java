@@ -53,11 +53,13 @@ import mega.privacy.android.app.listeners.SetAttrUserListener;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.receivers.NetworkTypeChangeReceiver;
 import mega.privacy.android.app.sync.cusync.CuSyncManager;
+import mega.privacy.android.app.utils.ChatUtil;
 import mega.privacy.android.app.utils.JobUtil;
 import mega.privacy.android.app.utils.StringResourcesUtils;
 import mega.privacy.android.app.utils.conversion.VideoCompressionCallback;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
+import nz.mega.sdk.MegaChatApi;
 import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaNode;
@@ -881,7 +883,7 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
         logDebug("Stopping foreground!");
 
         if (megaApi.getNumPendingUploads() <= 0) {
-            megaApi.resetTotalUploads();
+            megaApi.resetCompletedUploads();
         }
         totalUploaded = 0;
         totalToUpload = 0;
@@ -1069,6 +1071,9 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
             running = true;
             setLoginState(true);
             megaApi.fastLogin(credentials.getSession(), this);
+
+            ChatUtil.initMegaChatApi(credentials.getSession());
+
             return LOGIN_IN;
         }
 
@@ -1434,7 +1439,7 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
             if (e.getErrorCode() == MegaError.API_OK) {
                 new Handler().postDelayed(() -> {
                     if (megaApi.getNumPendingUploads() <= 0) {
-                        megaApi.resetTotalUploads();
+                        megaApi.resetCompletedUploads();
                     }
                 }, 200);
             } else {
@@ -1442,7 +1447,7 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
             }
         } else if (request.getType() == MegaRequest.TYPE_CANCEL_TRANSFERS) {
             if (e.getErrorCode() == MegaError.API_OK && megaApi.getNumPendingUploads() <= 0) {
-                megaApi.resetTotalUploads();
+                megaApi.resetCompletedUploads();
             }
         } else if (request.getType() == MegaRequest.TYPE_PAUSE_TRANSFERS) {
             logDebug("Pausetransfer false received");
@@ -1760,7 +1765,7 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
     private void startVideoCompression() {
         List<SyncRecord> fullList = dbH.findVideoSyncRecordsByState(STATUS_TO_COMPRESS);
         if (megaApi.getNumPendingUploads() <= 0) {
-            megaApi.resetTotalUploads();
+            megaApi.resetCompletedUploads();
         }
         totalUploaded = 0;
         totalToUpload = 0;

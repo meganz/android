@@ -1848,7 +1848,7 @@ public class FileInfoActivityLollipop extends PasscodeActivity implements OnClic
             return;
         }
 
-        if (nodeSaver.handleActivityResult(requestCode, resultCode, intent)) {
+        if (nodeSaver.handleActivityResult(this, requestCode, resultCode, intent)) {
             return;
         }
 
@@ -2523,7 +2523,7 @@ public class FileInfoActivityLollipop extends PasscodeActivity implements OnClic
         int resource;
 
         if (node.isFolder()) {
-            resource = getFolderIcon(node, adapterType == OUTGOING_SHARES_ADAPTER ? ManagerActivityLollipop.DrawerItem.SHARED_ITEMS : ManagerActivityLollipop.DrawerItem.CLOUD_DRIVE);
+            resource = getFolderIcon(node, adapterType == OUTGOING_SHARES_ADAPTER ? DrawerItem.SHARED_ITEMS : DrawerItem.CLOUD_DRIVE);
         } else {
             resource = MimeTypeThumbnail.typeForName(node.getName()).getIconResourceId();
         }
