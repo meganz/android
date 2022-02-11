@@ -636,14 +636,7 @@ public class Util {
 	 */
 	@SuppressLint("NewApi")
 	public static void setViewAlpha(View view, float alpha) {
-		if (Build.VERSION.SDK_INT >= 11) {
-			view.setAlpha(alpha);
-		} else {
-			AlphaAnimation anim = new AlphaAnimation(alpha, alpha);
-			anim.setDuration(0);
-			anim.setFillAfter(true);
-			view.startAnimation(anim);
-		}
+		view.setAlpha(alpha);
 	}
 	
 	/*
@@ -694,19 +687,11 @@ public class Util {
 				  String interfaceName = intf.getName();
 
 				  // Ensure get the IP from the current active network interface
-				  if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-					  ConnectivityManager cm =
-							  (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
-					  String activeInterfaceName = cm.getLinkProperties(cm.getActiveNetwork()).getInterfaceName();
-					  if (interfaceName.compareTo(activeInterfaceName) != 0) {
-					  	continue;
-					  }
-				  }
-				  else {
-					  if ((isOnWifi(context) && !interfaceName.contains("wlan") && !interfaceName.contains("ath")) ||
-							  (isOnMobileData(context) && !interfaceName.contains("data") && !interfaceName.contains("rmnet"))) {
-					  	continue;
-					  }
+				  ConnectivityManager cm =
+						  (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+				  String activeInterfaceName = cm.getLinkProperties(cm.getActiveNetwork()).getInterfaceName();
+				  if (interfaceName.compareTo(activeInterfaceName) != 0) {
+					  continue;
 				  }
 
 				  for (Enumeration<InetAddress> enumIpAddr = intf.getInetAddresses(); enumIpAddr.hasMoreElements();) {
@@ -727,12 +712,7 @@ public class Util {
 		final Intent batteryIntent = context.registerReceiver(null, new IntentFilter(Intent.ACTION_BATTERY_CHANGED));
 		int status = batteryIntent.getIntExtra(BatteryManager.EXTRA_PLUGGED, -1);
 
-		if (Build.VERSION.SDK_INT < 17) {
-			return status == BatteryManager.BATTERY_PLUGGED_AC || status == BatteryManager.BATTERY_PLUGGED_USB;
-		} else {
-			return status == BatteryManager.BATTERY_PLUGGED_AC || status == BatteryManager.BATTERY_PLUGGED_USB || status == BatteryManager.BATTERY_PLUGGED_WIRELESS;
-		}
-
+		return status == BatteryManager.BATTERY_PLUGGED_AC || status == BatteryManager.BATTERY_PLUGGED_USB || status == BatteryManager.BATTERY_PLUGGED_WIRELESS;
 	}
 
     /**
@@ -1665,20 +1645,11 @@ public class Util {
 	public static boolean isTopActivity(String className, Context context) {
 		ActivityManager am = (ActivityManager)context.getSystemService(ACTIVITY_SERVICE);
 
-		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-			List<ActivityManager.AppTask> tasks = am.getAppTasks();
-			for (ActivityManager.AppTask task : tasks) {
-				ActivityManager.RecentTaskInfo taskInfo = task.getTaskInfo();
-				if (taskInfo.id != -1) {  // Task is running
-					return taskInfo.topActivity.getClassName().contains(className);
-				}
-			}
-		} else {
-			List<ActivityManager.RunningTaskInfo> runningTaskInfos = am.getRunningTasks(100);
-			for (ActivityManager.RunningTaskInfo info : runningTaskInfos) {
-				if (info.topActivity.getClassName().contains(className)) {
-					return true;
-				}
+		List<ActivityManager.AppTask> tasks = am.getAppTasks();
+		for (ActivityManager.AppTask task : tasks) {
+			ActivityManager.RecentTaskInfo taskInfo = task.getTaskInfo();
+			if (taskInfo.id != -1) {  // Task is running
+				return taskInfo.topActivity.getClassName().contains(className);
 			}
 		}
 
