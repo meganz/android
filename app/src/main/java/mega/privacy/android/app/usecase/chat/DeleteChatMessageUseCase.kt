@@ -1,4 +1,4 @@
-package mega.privacy.android.app.usecase
+package mega.privacy.android.app.usecase.chat
 
 import android.content.Context
 import dagger.hilt.android.qualifiers.ApplicationContext

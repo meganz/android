@@ -8,8 +8,8 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import io.reactivex.rxjava3.core.Single
 import mega.privacy.android.app.di.MegaApi
 import mega.privacy.android.app.imageviewer.data.ImageItem
-import mega.privacy.android.app.usecase.DeleteChatMessageUseCase
-import mega.privacy.android.app.usecase.GetChatMessageUseCase
+import mega.privacy.android.app.usecase.chat.DeleteChatMessageUseCase
+import mega.privacy.android.app.usecase.chat.GetChatMessageUseCase
 import mega.privacy.android.app.usecase.GetNodeUseCase
 import mega.privacy.android.app.usecase.data.MegaNodeItem
 import mega.privacy.android.app.utils.FileUtil

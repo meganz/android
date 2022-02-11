@@ -17,6 +17,7 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.OfflineFileInfoActivity
+import mega.privacy.android.app.activities.contract.ChatExplorerForwardActivityContract
 import mega.privacy.android.app.activities.contract.SelectFolderToCopyActivityContract
 import mega.privacy.android.app.activities.contract.SelectFolderToImportActivityContract
 import mega.privacy.android.app.activities.contract.SelectFolderToMoveActivityContract
@@ -28,16 +29,19 @@ import mega.privacy.android.app.lollipop.FileInfoActivityLollipop
 import mega.privacy.android.app.modalbottomsheet.BaseBottomSheetDialogFragment
 import mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil
 import mega.privacy.android.app.modalbottomsheet.nodelabel.NodeLabelBottomSheetDialogFragment
-import mega.privacy.android.app.utils.*
 import mega.privacy.android.app.utils.Constants.*
 import mega.privacy.android.app.utils.ExtraUtils.extra
+import mega.privacy.android.app.utils.LinksUtil
 import mega.privacy.android.app.utils.LogUtil.logWarning
+import mega.privacy.android.app.utils.MegaNodeUtil
 import mega.privacy.android.app.utils.MegaNodeUtil.getNodeLabelColor
 import mega.privacy.android.app.utils.MegaNodeUtil.getNodeLabelDrawable
 import mega.privacy.android.app.utils.MegaNodeUtil.getNodeLabelText
 import mega.privacy.android.app.utils.NetworkUtil.isOnline
+import mega.privacy.android.app.utils.OfflineUtils
 import mega.privacy.android.app.utils.SdkRestrictionUtils.isSaveToGalleryCompatible
-import mega.privacy.android.app.utils.StringResourcesUtils.*
+import mega.privacy.android.app.utils.StringResourcesUtils
+import mega.privacy.android.app.utils.StringResourcesUtils.getQuantityString
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 import nz.mega.sdk.MegaNode
 
@@ -72,6 +76,7 @@ class ImageBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
     private lateinit var selectMoveFolderLauncher: ActivityResultLauncher<LongArray>
     private lateinit var selectCopyFolderLauncher: ActivityResultLauncher<LongArray>
     private lateinit var selectImportFolderLauncher: ActivityResultLauncher<LongArray>
+    private lateinit var selectChatLauncher: ActivityResultLauncher<ChatExplorerForwardActivityContract.Params>
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -189,6 +194,17 @@ class ImageBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
                     ModalBottomSheetUtil.openWith(requireActivity(), node)
                 }
                 dismissAllowingStateLoss()
+            }
+
+            // Forward
+            optionForward.isVisible = imageItem.isFromChat() && nodeItem.hasFullAccess
+            optionForward.setOnClickListener {
+                selectChatLauncher.launch(
+                    ChatExplorerForwardActivityContract.Params(
+                        messageIds = longArrayOf(imageItem.chatMessageId!!),
+                        chatRoomId = imageItem.chatRoomId!!
+                    )
+                )
             }
 
             // Download
@@ -332,7 +348,7 @@ class ImageBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
                     .show()
             }
 
-            // Remove
+            // Chat Remove
             optionChatRemove.setOnClickListener {
                 MaterialAlertDialogBuilder(requireContext())
                     .setMessage(StringResourcesUtils.getString(R.string.confirmation_delete_one_message))
@@ -350,12 +366,12 @@ class ImageBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
 
             // Separators
             separatorLabel.isVisible = optionLabelLayout.isVisible || optionInfo.isVisible
-            separatorOpen.isVisible = optionOpenWith.isVisible
+            separatorOpen.isVisible = optionOpenWith.isVisible || optionForward.isVisible
             separatorOffline.isVisible = optionOfflineLayout.isVisible || optionShare.isVisible
             separatorShare.isVisible = optionShare.isVisible || optionSendToChat.isVisible || optionManageLink.isVisible
             separatorRestore.isVisible = optionRestore.isVisible
             separatorCopy.isVisible = (optionRename.isVisible || optionCopy.isVisible || optionMove.isVisible)
-                    && (optionRestore.isVisible || optionRubbishBin.isVisible)
+                    && (optionRestore.isVisible || optionRubbishBin.isVisible || optionChatRemove.isVisible)
         }
     }
 
@@ -385,6 +401,11 @@ class ImageBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
                 if (copyHandle != null && copyHandle != INVALID_HANDLE && toHandle != INVALID_HANDLE) {
                     viewModel.copyNode(copyHandle, toHandle)
                 }
+            }
+        }
+        selectChatLauncher = registerForActivityResult(ChatExplorerForwardActivityContract()) { result ->
+            result?.selectedChats?.forEach { chatRoomId ->
+                viewModel.forwardChatMessage(nodeHandle!!, chatRoomId)
             }
         }
     }

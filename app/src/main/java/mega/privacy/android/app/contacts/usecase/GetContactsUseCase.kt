@@ -15,8 +15,8 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.contacts.list.data.ContactItem
 import mega.privacy.android.app.di.MegaApi
 import mega.privacy.android.app.listeners.OptionalMegaRequestListenerInterface
-import mega.privacy.android.app.usecase.GetChatChangesUseCase
-import mega.privacy.android.app.usecase.GetChatChangesUseCase.Result.*
+import mega.privacy.android.app.usecase.chat.GetChatChangesUseCase
+import mega.privacy.android.app.usecase.chat.GetChatChangesUseCase.Result.*
 import mega.privacy.android.app.usecase.GetGlobalChangesUseCase
 import mega.privacy.android.app.usecase.GetGlobalChangesUseCase.Result.OnUsersUpdate
 import mega.privacy.android.app.utils.AvatarUtil
@@ -35,7 +35,6 @@ import nz.mega.sdk.MegaApiJava.*
 import nz.mega.sdk.MegaChatApi.*
 import nz.mega.sdk.MegaUser.VISIBILITY_VISIBLE
 import java.io.File
-import java.util.*
 import javax.inject.Inject
 
 /**

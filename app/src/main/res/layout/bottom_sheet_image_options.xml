@@ -131,6 +131,12 @@
                 android:text="@string/external_play"
                 app:drawableStartCompat="@drawable/ic_open_with" />
 
+            <TextView
+                android:id="@+id/option_forward"
+                style="@style/BottomSheetOption"
+                android:text="@string/forward_menu_item"
+                app:drawableStartCompat="@drawable/ic_forward" />
+
             <View
                 android:id="@+id/separator_open"
                 android:layout_width="match_parent"

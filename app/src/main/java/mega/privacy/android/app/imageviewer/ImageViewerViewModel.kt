@@ -26,7 +26,8 @@ import mega.privacy.android.app.usecase.GetGlobalChangesUseCase
 import mega.privacy.android.app.usecase.GetGlobalChangesUseCase.Result
 import mega.privacy.android.app.usecase.GetNodeUseCase
 import mega.privacy.android.app.usecase.LoggedInUseCase
-import mega.privacy.android.app.usecase.DeleteChatMessageUseCase
+import mega.privacy.android.app.usecase.chat.DeleteChatMessageUseCase
+import mega.privacy.android.app.usecase.chat.ForwardChatMessageUseCase
 import mega.privacy.android.app.usecase.data.MegaNodeItem
 import mega.privacy.android.app.utils.Constants.INVALID_POSITION
 import mega.privacy.android.app.utils.LogUtil.logError
@@ -60,7 +61,8 @@ class ImageViewerViewModel @Inject constructor(
     private val exportNodeUseCase: ExportNodeUseCase,
     private val cancelTransferUseCase: CancelTransferUseCase,
     private val loggedInUseCase: LoggedInUseCase,
-    private val deleteChatMessageUseCase: DeleteChatMessageUseCase
+    private val deleteChatMessageUseCase: DeleteChatMessageUseCase,
+    private val forwardChatMessageUseCase: ForwardChatMessageUseCase
 ) : BaseRxViewModel() {
 
     private val images = MutableLiveData<List<ImageItem>?>()
@@ -431,6 +433,13 @@ class ImageViewerViewModel @Inject constructor(
                 removeImageItemAt(index)
 
                 snackbarMessage.value = getString(R.string.context_correctly_removed)
+            }
+    }
+
+    fun forwardChatMessage(nodeHandle: Long, chatRoomId: Long) {
+        forwardChatMessageUseCase.attach(chatRoomId, nodeHandle)
+            .subscribeAndComplete {
+                snackbarMessage.value = getString(R.string.messages_forwarded_success)
             }
     }
 

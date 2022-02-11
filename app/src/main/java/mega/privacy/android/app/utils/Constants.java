@@ -610,6 +610,7 @@ public class Constants {
     public static final String SELECTED_CHATS = "SELECTED_CHATS";
     public static final String SELECTED_USERS = "SELECTED_USERS";
     public static final String ID_MESSAGES = "ID_MESSAGES";
+    public static final String ID_CHAT_FROM = "ID_CHAT_FROM";
     public static final String USER_HANDLES = "USER_HANDLES";
     public static final String URL_FILE_LINK = "URL_FILE_LINK";
     public static final String OPEN_SCAN_QR = "OPEN_SCAN_QR";
