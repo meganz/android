@@ -611,11 +611,8 @@ abstract class BaseZoomFragment : BaseFragment(), GestureScaleCallback,
         )
 
         StyleUtils.setTextStyle(
-            context,
-            textView,
-            if (enabled) R.style.TextAppearance_Mega_Subtitle2_Medium_WhiteGrey87 else R.style.TextAppearance_Mega_Subtitle2_Normal_Grey87White87,
-            if (enabled) R.color.white_grey_087 else R.color.grey_087_white_087,
-            false
+            textView = textView,
+            textAppearance = if (enabled) R.style.TextAppearance_Mega_Subtitle2_Medium_WhiteGrey87 else R.style.TextAppearance_Mega_Subtitle2_Normal_Grey87White87,
         )
     }
 
