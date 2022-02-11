@@ -26,6 +26,7 @@ import mega.privacy.android.app.usecase.GetGlobalChangesUseCase
 import mega.privacy.android.app.usecase.GetGlobalChangesUseCase.Result
 import mega.privacy.android.app.usecase.GetNodeUseCase
 import mega.privacy.android.app.usecase.LoggedInUseCase
+import mega.privacy.android.app.usecase.DeleteChatMessageUseCase
 import mega.privacy.android.app.usecase.data.MegaNodeItem
 import mega.privacy.android.app.utils.Constants.INVALID_POSITION
 import mega.privacy.android.app.utils.LogUtil.logError
@@ -59,6 +60,7 @@ class ImageViewerViewModel @Inject constructor(
     private val exportNodeUseCase: ExportNodeUseCase,
     private val cancelTransferUseCase: CancelTransferUseCase,
     private val loggedInUseCase: LoggedInUseCase,
+    private val deleteChatMessageUseCase: DeleteChatMessageUseCase
 ) : BaseRxViewModel() {
 
     private val images = MutableLiveData<List<ImageItem>?>()
@@ -364,18 +366,19 @@ class ImageViewerViewModel @Inject constructor(
         }
     }
 
-    fun removeOfflineNode(nodeHandle: Long, activity: Activity) {
-        getNodeUseCase.removeOfflineNode(nodeHandle, activity)
-            .subscribeAndComplete {
-                val currentIndex = images.value?.indexOfFirst { it.handle == nodeHandle } ?: INVALID_POSITION
-                if (currentIndex != INVALID_POSITION) {
-                    val items = images.value!!.toMutableList().apply {
-                        removeAt(currentIndex)
-                    }
-                    images.value = items.toList()
-                    calculateNewPosition(items)
-                }
+    /**
+     * Remove ImageItem from main list given an Index.
+     *
+     * @param index    Node Handle to be removed from the list
+     */
+    private fun removeImageItemAt(index: Int) {
+        if (index != INVALID_POSITION) {
+            val items = images.value!!.toMutableList().apply {
+                removeAt(index)
             }
+            images.value = items.toList()
+            calculateNewPosition(items)
+        }
     }
 
     /**
@@ -406,10 +409,28 @@ class ImageViewerViewModel @Inject constructor(
         updateCurrentPosition(newPosition, true)
     }
 
+    fun removeOfflineNode(nodeHandle: Long, activity: Activity) {
+        getNodeUseCase.removeOfflineNode(nodeHandle, activity)
+            .subscribeAndComplete {
+                val index = images.value?.indexOfFirst { it.handle == nodeHandle } ?: INVALID_POSITION
+                removeImageItemAt(index)
+            }
+    }
+
     fun removeLink(nodeHandle: Long) {
         exportNodeUseCase.disableExport(nodeHandle)
             .subscribeAndComplete {
                 snackbarMessage.value = getQuantityString(R.plurals.context_link_removal_success, 1)
+            }
+    }
+
+    fun removeChatMessage(chatRoomId: Long, messageId: Long) {
+        deleteChatMessageUseCase.delete(chatRoomId, messageId)
+            .subscribeAndComplete {
+                val index = images.value?.indexOfFirst { it.chatRoomId == chatRoomId && it.chatMessageId == messageId } ?: INVALID_POSITION
+                removeImageItemAt(index)
+
+                snackbarMessage.value = getString(R.string.context_correctly_removed)
             }
     }
 

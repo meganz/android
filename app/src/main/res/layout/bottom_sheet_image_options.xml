@@ -262,6 +262,14 @@
                 tools:visibility="visible" />
 
             <TextView
+                android:id="@+id/option_chat_remove"
+                style="@style/BottomSheetOption.Red"
+                android:text="@string/context_remove"
+                android:visibility="gone"
+                app:drawableStartCompat="@drawable/ic_remove"
+                tools:visibility="visible" />
+
+            <TextView
                 android:id="@+id/option_rubbish_bin"
                 style="@style/BottomSheetOption.Red"
                 android:text="@string/context_move_to_trash"

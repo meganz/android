@@ -8,6 +8,7 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import io.reactivex.rxjava3.core.Single
 import mega.privacy.android.app.di.MegaApi
 import mega.privacy.android.app.imageviewer.data.ImageItem
+import mega.privacy.android.app.usecase.DeleteChatMessageUseCase
 import mega.privacy.android.app.usecase.GetChatMessageUseCase
 import mega.privacy.android.app.usecase.GetNodeUseCase
 import mega.privacy.android.app.usecase.data.MegaNodeItem
@@ -37,7 +38,8 @@ class GetImageHandlesUseCase @Inject constructor(
     @MegaApi private val megaApi: MegaApiAndroid,
     private val getChatMessageUseCase: GetChatMessageUseCase,
     private val getNodeUseCase: GetNodeUseCase,
-    private val getImageUseCase: GetImageUseCase
+    private val getImageUseCase: GetImageUseCase,
+    private val deleteChatMessageUseCase: DeleteChatMessageUseCase
 ) {
 
     /**
@@ -165,7 +167,15 @@ class GetImageHandlesUseCase @Inject constructor(
         messageIds.forEach { messageId ->
             val node = getChatMessageUseCase.getChatNode(chatRoomId, messageId).blockingGetOrNull()
             if (node?.isValidForImageViewer() == true) {
-                this.add(ImageItem(node.handle, chatRoomId = chatRoomId, chatMessageId = messageId))
+                val canBeDeleted = deleteChatMessageUseCase.check(chatRoomId, messageId).blockingGetOrNull() ?: false
+                this.add(
+                    ImageItem(
+                        node.handle,
+                        chatRoomId = chatRoomId,
+                        chatMessageId = messageId,
+                        isChatDeletable = canBeDeleted
+                    )
+                )
             }
         }
     }

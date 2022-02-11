@@ -332,6 +332,22 @@ class ImageBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
                     .show()
             }
 
+            // Remove
+            optionChatRemove.setOnClickListener {
+                MaterialAlertDialogBuilder(requireContext())
+                    .setMessage(StringResourcesUtils.getString(R.string.confirmation_delete_one_message))
+                    .setPositiveButton(StringResourcesUtils.getString(R.string.general_remove)) { _, _ ->
+                        viewModel.removeChatMessage(imageItem.chatRoomId!!, imageItem.chatMessageId!!)
+                        dismissAllowingStateLoss()
+                    }
+                    .setNegativeButton(
+                        StringResourcesUtils.getString(R.string.general_cancel),
+                        null
+                    )
+                    .show()
+            }
+            optionChatRemove.isVisible = imageItem.isChatDeletable && imageItem.isFromChat() && nodeItem.hasFullAccess
+
             // Separators
             separatorLabel.isVisible = optionLabelLayout.isVisible || optionInfo.isVisible
             separatorOpen.isVisible = optionOpenWith.isVisible
