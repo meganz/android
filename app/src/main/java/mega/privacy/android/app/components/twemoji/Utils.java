@@ -12,20 +12,8 @@ import android.view.View;
 import android.view.ViewTreeObserver;
 import android.widget.PopupWindow;
 
-import static android.os.Build.VERSION.SDK_INT;
-import static android.os.Build.VERSION_CODES.JELLY_BEAN;
-
 final class Utils {
   static final int DONT_UPDATE_FLAG = -1;
-
-  @TargetApi(JELLY_BEAN) static void removeOnGlobalLayoutListener(final View v, final ViewTreeObserver.OnGlobalLayoutListener listener) {
-    if (SDK_INT < JELLY_BEAN) {
-      //noinspection deprecation
-      v.getViewTreeObserver().removeGlobalOnLayoutListener(listener);
-    } else {
-      v.getViewTreeObserver().removeOnGlobalLayoutListener(listener);
-    }
-  }
 
   @NonNull static <T> T checkNotNull(@Nullable final T reference, final String message) {
     if (reference == null) {
