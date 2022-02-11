@@ -4,17 +4,20 @@ import android.graphics.Bitmap
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.ListAdapter
+import androidx.recyclerview.widget.RecyclerView
 import mega.privacy.android.app.databinding.ItemParticipantChatListBinding
+import mega.privacy.android.app.meeting.fragments.InMeetingViewModel
 import mega.privacy.android.app.meeting.listeners.BottomFloatingPanelListener
-import mega.privacy.android.app.utils.Constants.AVATAR_CHANGE
-import mega.privacy.android.app.utils.Constants.NAME_CHANGE
+import mega.privacy.android.app.utils.Constants.*
 
 class ParticipantsAdapter(
-    private val listener: BottomFloatingPanelListener
-) : ListAdapter<Participant, ParticipantViewHolder>(ParticipantDiffCallback()) {
+    private val viewModel: InMeetingViewModel,
+    private val listener: BottomFloatingPanelListener,
+    private val recyclerView: RecyclerView?
+    ) : ListAdapter<Participant, ParticipantViewHolder>(ParticipantDiffCallback()) {
 
     override fun onBindViewHolder(holder: ParticipantViewHolder, position: Int) {
-        holder.bind(getItem(position))
+        holder.bind(viewModel, getItem(position))
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ParticipantViewHolder {
@@ -114,6 +117,58 @@ class ParticipantsAdapter(
         val index = localList.indexOf(participant)
 
         notifyItemChanged(index, participant)
+    }
+
+    /**
+     * Method to update the UI when one's own permissions have been changed
+     *
+     * @param isModerator True, if I have moderator permissions. False, if not.
+     */
+    fun updateOwnPermissions(isModerator: Boolean) {
+        val localList = this.currentList
+        if (localList.isNullOrEmpty()) {
+            return
+        }
+
+        val myParticipant = this.currentList.filter { it.isMe }
+        if (!myParticipant.isNullOrEmpty()) {
+            val me = myParticipant.last()
+            val index = localList.indexOf(me)
+            if (index >= 0 && me != null) {
+                me.isModerator = isModerator
+                notifyItemChanged(index, me)
+            }
+        }
+
+        val otherParticipants = this.currentList.filter { !it.isMe }
+        if (otherParticipants.isNullOrEmpty()) {
+            return
+        }
+
+        otherParticipants.iterator().forEach { participant ->
+            val index = localList.indexOf(participant)
+            if (index >= 0 && participant != null) {
+                getHolderAtPosition(index)?.let {
+                    it.checkParticipantsOptions(participant)
+                }
+            }
+        }
+    }
+
+    /**
+     * Get the ParticipantViewHolder from a position
+     *
+     * @param position The participant position
+     * @return ParticipantViewHolder
+     */
+    private fun getHolderAtPosition(position: Int): ParticipantViewHolder? {
+        this.recyclerView?.let { recyclerview ->
+            recyclerview.findViewHolderForAdapterPosition(position)?.let {
+                return it as ParticipantViewHolder
+            }
+        }
+
+        return null
     }
 
     /**

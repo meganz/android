@@ -1825,6 +1825,13 @@ class InMeetingViewModel @Inject constructor(
     fun amIAGuest(): Boolean = inMeetingRepository.amIAGuest()
 
     /**
+     * Determine if I am a moderator
+     *
+     * @return True, if I am a moderator. False if not
+     */
+    fun amIAModerator(): Boolean = getOwnPrivileges() == MegaChatRoom.PRIV_MODERATOR
+
+    /**
      * Determine if the participant has standard privileges
      *
      * @param peerId User handle of a participant
@@ -2143,5 +2150,22 @@ class InMeetingViewModel @Inject constructor(
             meetingActivity,
             MegaApplication.getInstance().megaApi
         )
+    }
+
+    /**
+     * Method that controls whether a participant's options (3 dots) should be enabled or not
+     *
+     * @param participant The participant to be checked
+     * @return True, if should be enabled. False, if not
+     */
+    fun shouldParticipantsOptionBeVisible(participant: Participant): Boolean {
+        if ((!amIAModerator() && participant.isGuest) ||
+            (amIAGuest() && participant.isMe) ||
+            (!amIAModerator() && amIAGuest() && !participant.isMe)
+        ) {
+            return false;
+        }
+
+        return true;
     }
 }

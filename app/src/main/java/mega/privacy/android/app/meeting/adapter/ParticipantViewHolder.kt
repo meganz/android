@@ -6,6 +6,8 @@ import androidx.core.view.isVisible
 import androidx.recyclerview.widget.RecyclerView
 import mega.privacy.android.app.R
 import mega.privacy.android.app.databinding.ItemParticipantChatListBinding
+import mega.privacy.android.app.meeting.fragments.InMeetingViewModel
+import nz.mega.sdk.MegaChatApiJava
 
 /**
  * When use DataBinding here, when user fling the RecyclerView, the bottom sheet will have
@@ -16,18 +18,31 @@ class ParticipantViewHolder(
     private val onParticipantOption: (Int) -> Unit
 ) : RecyclerView.ViewHolder(binding.root) {
 
-    init {
-        binding.participantListThreeDots.setOnClickListener {
-            onParticipantOption(bindingAdapterPosition)
-        }
+    private var peerId = MegaChatApiJava.MEGACHAT_INVALID_HANDLE
+    private var clientId = MegaChatApiJava.MEGACHAT_INVALID_HANDLE
+    lateinit var viewModel: InMeetingViewModel
 
+    init {
+        binding.participantListThreeDots.setOnClickListener(null)
+        binding.participantListThreeDots.alpha = BUTTON_DISABLED
         binding.verifiedIcon.isVisible = false
         binding.participantListPermissions.isVisible = false
         binding.participantListContent.isVisible = false
         binding.callOptions.isVisible = true
     }
 
-    fun bind(participant: Participant) {
+    fun bind(
+        inMeetingViewModel: InMeetingViewModel,
+        participant: Participant
+    ) {
+
+        this.viewModel = inMeetingViewModel
+
+        peerId = participant.peerId
+        clientId = participant.clientId
+
+        checkParticipantsOptions(participant)
+
         binding.participantListThumbnail.setImageBitmap(participant.avatar)
         binding.participantListName.text =
             participant.getDisplayName(binding.participantListName.context)
@@ -76,5 +91,31 @@ class ParticipantViewHolder(
             binding.participantListVideo.setImageResource(R.drawable.ic_video_off_grey_red)
             binding.participantListVideo.colorFilter = null
         }
+    }
+
+    /**
+     * Updating the visibility of participants' options
+     *
+     * @param participant Participant from who will control whether his 3 dots should be shown or not
+     */
+    fun checkParticipantsOptions(participant: Participant) {
+        if (participant.peerId != peerId || participant.clientId != clientId) return
+
+        if (this.viewModel.shouldParticipantsOptionBeVisible(participant)) {
+            binding.participantListThreeDots.setOnClickListener {
+                onParticipantOption(bindingAdapterPosition)
+            }
+
+            binding.participantListThreeDots.alpha = BUTTON_ENABLED
+        } else {
+            binding.participantListThreeDots.setOnClickListener(null)
+            binding.participantListThreeDots.alpha = BUTTON_DISABLED
+        }
+    }
+
+    companion object {
+        const val BUTTON_ENABLED = 1f
+        const val BUTTON_DISABLED = 0.5f
+
     }
 }

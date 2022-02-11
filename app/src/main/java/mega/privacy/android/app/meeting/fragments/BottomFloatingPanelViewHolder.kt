@@ -64,7 +64,8 @@ class BottomFloatingPanelViewHolder(
     private var savedCamState: Boolean = false
     private var savedSpeakerState: AppRTCAudioManager.AudioDevice =
         AppRTCAudioManager.AudioDevice.NONE
-    private val participantsAdapter = ParticipantsAdapter(listener)
+    private val participantsAdapter =
+        ParticipantsAdapter(inMeetingViewModel, listener, floatingPanelView.participants)
 
     private var currentHeight = 0
 
@@ -688,8 +689,7 @@ class BottomFloatingPanelViewHolder(
      * @param ownPrivileges current privilege
      */
     fun updatePrivilege(ownPrivileges: Int) {
-        participantsAdapter.updateIcon(
-            ParticipantsAdapter.MODERATOR,
+        participantsAdapter.updateOwnPermissions(
             ownPrivileges == MegaChatRoom.PRIV_MODERATOR
         )
         updateShareAndInviteButton()
