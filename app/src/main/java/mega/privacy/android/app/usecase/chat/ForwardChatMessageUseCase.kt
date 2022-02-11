@@ -1,7 +1,5 @@
 package mega.privacy.android.app.usecase.chat
 
-import android.content.Context
-import dagger.hilt.android.qualifiers.ApplicationContext
 import io.reactivex.rxjava3.core.Completable
 import mega.privacy.android.app.listeners.OptionalMegaChatRequestListenerInterface
 import mega.privacy.android.app.utils.ErrorUtils.toThrowable
@@ -15,13 +13,12 @@ import javax.inject.Inject
  * @property megaChatApi    Mega Chat API needed to get message information.
  */
 class ForwardChatMessageUseCase @Inject constructor(
-    @ApplicationContext private val context: Context,
     private val megaChatApi: MegaChatApiAndroid
 ) {
 
-    fun attach(chatRoomId: Long, nodeHandle: Long): Completable =
+    fun attach(toChatRoomId: Long, nodeHandle: Long): Completable =
         Completable.create { emitter ->
-            megaChatApi.attachNode(chatRoomId, nodeHandle, OptionalMegaChatRequestListenerInterface(
+            megaChatApi.attachNode(toChatRoomId, nodeHandle, OptionalMegaChatRequestListenerInterface(
                 onRequestFinish = { _, error ->
                     if (error.errorCode == MegaChatError.ERROR_OK) {
                         emitter.onComplete()

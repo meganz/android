@@ -436,8 +436,9 @@ class ImageViewerViewModel @Inject constructor(
             }
     }
 
-    fun forwardChatMessage(nodeHandle: Long, chatRoomId: Long) {
-        forwardChatMessageUseCase.attach(chatRoomId, nodeHandle)
+    fun forwardChatMessage(chatMessageId: Long, toChatRoomId: Long) {
+        val nodeHandle = images.value?.find { it.chatMessageId == chatMessageId }?.handle ?: return
+        forwardChatMessageUseCase.attach(toChatRoomId, nodeHandle)
             .subscribeAndComplete {
                 snackbarMessage.value = getString(R.string.messages_forwarded_success)
             }

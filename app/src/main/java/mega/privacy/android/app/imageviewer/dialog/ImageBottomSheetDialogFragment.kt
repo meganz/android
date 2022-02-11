@@ -405,7 +405,7 @@ class ImageBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
         }
         selectChatLauncher = registerForActivityResult(ChatExplorerForwardActivityContract()) { result ->
             result?.selectedChats?.forEach { chatRoomId ->
-                viewModel.forwardChatMessage(nodeHandle!!, chatRoomId)
+                viewModel.forwardChatMessage(result.messageIds?.first()!!, chatRoomId)
             }
         }
     }
