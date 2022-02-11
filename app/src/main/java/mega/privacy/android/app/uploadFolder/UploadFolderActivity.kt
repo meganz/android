@@ -442,16 +442,15 @@ class UploadFolderActivity : PasscodeActivity(), Scrollable {
      */
     private fun showCancelUploadsDialog() {
         cancelUploadsDialog = MaterialAlertDialogBuilder(this)
-            .setTitle(StringResourcesUtils.getString(R.string.cancel_uploads))
-            .setMessage(StringResourcesUtils.getString(R.string.cancel_uploads_warning))
-            .setPositiveButton(StringResourcesUtils.getString(R.string.action_proceed)) { _, _ ->
+            .setMessage(StringResourcesUtils.getString(R.string.cancel_uploads))
+            .setPositiveButton(StringResourcesUtils.getString(R.string.action_do_not_cancel)) { _, _ ->
+                cancelUploadsDialog?.dismiss()
+                viewModel.proceedWithUpload()
+            }
+            .setNegativeButton(StringResourcesUtils.getString(R.string.action_cancel_upload)) { _, _ ->
                 viewModel.cancelUpload()
                 setResult(RESULT_CANCELED)
                 finish()
-            }
-            .setNegativeButton(StringResourcesUtils.getString(R.string.general_dismiss)) { _, _ ->
-                cancelUploadsDialog?.dismiss()
-                viewModel.proceedWithUpload()
             }
             .create()
             .apply {

@@ -883,7 +883,7 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
         logDebug("Stopping foreground!");
 
         if (megaApi.getNumPendingUploads() <= 0) {
-            megaApi.resetTotalUploads();
+            megaApi.resetCompletedUploads();
         }
         totalUploaded = 0;
         totalToUpload = 0;
@@ -1439,7 +1439,7 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
             if (e.getErrorCode() == MegaError.API_OK) {
                 new Handler().postDelayed(() -> {
                     if (megaApi.getNumPendingUploads() <= 0) {
-                        megaApi.resetTotalUploads();
+                        megaApi.resetCompletedUploads();
                     }
                 }, 200);
             } else {
@@ -1447,7 +1447,7 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
             }
         } else if (request.getType() == MegaRequest.TYPE_CANCEL_TRANSFERS) {
             if (e.getErrorCode() == MegaError.API_OK && megaApi.getNumPendingUploads() <= 0) {
-                megaApi.resetTotalUploads();
+                megaApi.resetCompletedUploads();
             }
         } else if (request.getType() == MegaRequest.TYPE_PAUSE_TRANSFERS) {
             logDebug("Pausetransfer false received");
@@ -1765,7 +1765,7 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
     private void startVideoCompression() {
         List<SyncRecord> fullList = dbH.findVideoSyncRecordsByState(STATUS_TO_COMPRESS);
         if (megaApi.getNumPendingUploads() <= 0) {
-            megaApi.resetTotalUploads();
+            megaApi.resetCompletedUploads();
         }
         totalUploaded = 0;
         totalToUpload = 0;

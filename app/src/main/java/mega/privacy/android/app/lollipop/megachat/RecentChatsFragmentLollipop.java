@@ -4,11 +4,9 @@ import android.Manifest;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.os.AsyncTask;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -19,13 +17,10 @@ import com.jeremyliao.liveeventbus.LiveEventBus;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.view.ActionMode;
 import androidx.core.text.HtmlCompat;
-import androidx.preference.PreferenceManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import android.text.SpannableString;
@@ -62,6 +57,7 @@ import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.ChatDividerItemDecoration;
 import mega.privacy.android.app.components.scrollBar.FastScroller;
 import mega.privacy.android.app.lollipop.AddContactActivityLollipop;
+import mega.privacy.android.app.lollipop.DrawerItem;
 import mega.privacy.android.app.lollipop.InviteContactActivity;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.adapters.ContactsHorizontalAdapter;
@@ -915,7 +911,7 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
         }
 
         if (context instanceof ManagerActivityLollipop) {
-            if (!(((ManagerActivityLollipop) context).getDrawerItem() == ManagerActivityLollipop.DrawerItem.CHAT)) {
+            if (!(((ManagerActivityLollipop) context).getDrawerItem() == DrawerItem.CHAT)) {
                 logWarning("Not CHAT shown!");
                 return;
             }
