@@ -4390,13 +4390,15 @@
     <string name="backup_share_with_root_permission_text">Niektóre udostępnione foldery to foldery kopii zapasowych i tylko do odczytu. Czy chcesz kontynuować?</string>
     <!-- Indicates the content of the backup folder -->
     <plurals name="num_devices">
-        <item quantity="one">%d device</item>
-        <item quantity="other">%d devices</item>
+        <item quantity="one">%d urządzenie</item>
+        <item quantity="few">%d urządzenia</item>
+        <item quantity="many">%d urządzenia</item>
+        <item quantity="other">%d urządzenia</item>
     </plurals>
     <!-- Title of the button when you want to answer a one to one call -->
     <string name="title_join_one_to_one_call">Odbierz połączenie</string>
     <!-- Title of the menu when the select tracks on playlist page-->
-    <string name="title_select_tracks">Select tracks</string>
+    <string name="title_select_tracks">Wybrane ścieżki</string>
     <!-- Action button to upload files. -->
     <string name="upload_files">Wgraj pliki</string>
     <!-- Action button to upload a folder. -->
