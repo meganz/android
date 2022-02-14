@@ -76,6 +76,11 @@ public class ImportFilesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
 
     private OnImportFilesAdapterFooterListener onImportFilesAdapterFooterListener;
 
+    /**
+     * Listener for the user action on RecycleView footer
+     *
+     * @param listener Instance of OnImportFilesAdapterFooterListener
+     */
     public void setFooterListener(OnImportFilesAdapterFooterListener listener) {
         onImportFilesAdapterFooterListener = listener;
     }
