@@ -161,20 +161,16 @@ class ImageViewerPageFragment : Fragment() {
 
         if (mainImageUri == null && lowImageUri == null) return
         val mainImageRequest = mainImageUri?.toImageRequest()
-        val lowImageRequest = lowImageUri?.toImageRequest()
-
-        val newController = Fresco.newDraweeControllerBuilder()
-            .setLowResImageRequest(lowImageRequest)
+        val newControllerBuilder = Fresco.newDraweeControllerBuilder()
             .setImageRequest(mainImageRequest)
-            .build()
+            .apply { lowImageUri?.toImageRequest()?.let(::setLowResImageRequest) }
+        val newController = newControllerBuilder.build()
 
         if (binding.image.controller?.isSameImageRequest(newController) != true) {
-            binding.image.controller = Fresco.newDraweeControllerBuilder()
+            binding.image.controller = newControllerBuilder
                 .setOldController(binding.image.controller)
                 .setControllerListener(controllerListener)
                 .setAutoPlayAnimations(true)
-                .setLowResImageRequest(lowImageRequest)
-                .setImageRequest(mainImageRequest)
                 .build()
         } else if (imageItem.imageResult.isFullyLoaded) {
             binding.image.post {
