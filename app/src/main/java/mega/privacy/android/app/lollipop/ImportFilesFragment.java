@@ -23,21 +23,16 @@ import mega.privacy.android.app.lollipop.adapters.ImportFilesAdapter;
 import mega.privacy.android.app.utils.StringResourcesUtils;
 
 import static android.text.TextUtils.isEmpty;
-import static android.view.View.GONE;
-import static android.view.View.VISIBLE;
-import static mega.privacy.android.app.lollipop.adapters.ImportFilesAdapter.MAX_VISIBLE_ITEMS_AT_BEGINNING;
 import static mega.privacy.android.app.utils.Constants.NODE_NAME_REGEX;
 import static mega.privacy.android.app.utils.Constants.SCROLLING_UP_DIRECTION;
 
-public class ImportFilesFragment extends BaseFragment {
+public class ImportFilesFragment extends BaseFragment implements ImportFilesAdapter.OnImportFilesAdapterFooterListener {
 
     public static final String THUMB_FOLDER = "ImportFilesThumb";
 
     private FragmentImportFilesBinding binding;
 
     private ImportFilesAdapter adapter;
-
-    boolean areItemsVisible = false;
 
     private List<ShareInfo> filePreparedInfos;
 
@@ -77,16 +72,8 @@ public class ImportFilesFragment extends BaseFragment {
                 (v, scrollX, scrollY, oldScrollX, oldScrollY) -> changeActionBarElevation());
 
         binding.fileListView.setLayoutManager(new LinearLayoutManager(requireContext()));
-        binding.cloudDriveButton.setOnClickListener(v ->
-                confirmImport(FileExplorerActivityLollipop.CLOUD_FRAGMENT));
-        binding.chatButton.setOnClickListener(v ->
-                confirmImport(FileExplorerActivityLollipop.CHAT_FRAGMENT));
-        binding.showMoreLayout.setOnClickListener(v -> showMoreClick());
 
         if (filePreparedInfos != null) {
-            binding.showMoreLayout.setVisibility(filePreparedInfos.size() <= MAX_VISIBLE_ITEMS_AT_BEGINNING
-                    ? GONE : VISIBLE);
-
             binding.contentText.setText(getResources().getQuantityString(R.plurals.general_num_files, filePreparedInfos.size()));
 
             if (adapter == null) {
@@ -94,9 +81,8 @@ public class ImportFilesFragment extends BaseFragment {
             }
 
             adapter.setImportNameFiles(getNameFiles());
-            areItemsVisible = binding.showMoreLayout.getVisibility() != VISIBLE;
-            adapter.setItemsVisibility(areItemsVisible);
             binding.fileListView.setAdapter(adapter);
+            adapter.setFooterListener(this);
         }
 
         super.onViewCreated(view, savedInstanceState);
@@ -143,24 +129,18 @@ public class ImportFilesFragment extends BaseFragment {
         }
     }
 
-    private void showMoreClick() {
-        areItemsVisible = !areItemsVisible;
-
-        if (areItemsVisible) {
-            binding.showMoreText.setText(StringResourcesUtils.getString(R.string.general_show_less));
-            binding.showMoreImage.setImageResource(R.drawable.ic_expand);
-        } else {
-            binding.showMoreText.setText(StringResourcesUtils.getString(R.string.general_show_more));
-            binding.showMoreImage.setImageResource(R.drawable.ic_collapse_acc);
-        }
-
-        if (adapter != null) {
-            adapter.setItemsVisibility(areItemsVisible);
-        }
-    }
-
     private HashMap<String, String> getNameFiles() {
         return ((FileExplorerActivityLollipop) context).getNameFiles();
+    }
+
+    @Override
+    public void onClickCloudDriveButton() {
+        confirmImport(FileExplorerActivityLollipop.CLOUD_FRAGMENT);
+    }
+
+    @Override
+    public void onClickChatButton() {
+        confirmImport(FileExplorerActivityLollipop.CHAT_FRAGMENT);
     }
 
     class GetNamesAsyncTask extends AsyncTask<Void, Void, Void> {
