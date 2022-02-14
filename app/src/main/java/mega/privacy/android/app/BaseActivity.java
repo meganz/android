@@ -64,6 +64,7 @@ import static mega.privacy.android.app.utils.TimeUtils.createAndShowCountDownTim
 import static mega.privacy.android.app.utils.TimeUtils.getHumanizedTime;
 import static mega.privacy.android.app.utils.Util.dp2px;
 import static mega.privacy.android.app.utils.Util.getRootViewFromContext;
+import static mega.privacy.android.app.utils.Util.isAndroid11OrUpper;
 import static mega.privacy.android.app.utils.Util.isTopActivity;
 import static mega.privacy.android.app.utils.Util.setAppFontSize;
 import static mega.privacy.android.app.utils.Util.showErrorAlertDialog;
@@ -1454,7 +1455,7 @@ public class BaseActivity extends AppCompatActivity implements ActivityLauncher,
      * @param path Download path to set as default location.
      */
     public void showConfirmationSaveInSameLocation(String path){
-        if (isAlertDialogShown(setDownloadLocationDialog)) {
+        if (isAndroid11OrUpper() || isAlertDialogShown(setDownloadLocationDialog)) {
             return;
         }
 
