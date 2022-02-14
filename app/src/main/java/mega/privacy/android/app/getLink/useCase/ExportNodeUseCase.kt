@@ -61,8 +61,6 @@ class ExportNodeUseCase @Inject constructor(
                 return@create
             }
 
-            val withExpirationTime = expireTime != null && expireTime > 0
-
             if (node.isExported && !node.isExpired && node.expirationTime == expireTime) {
                 emitter.onSuccess(node.publicLink)
                 return@create
@@ -81,8 +79,8 @@ class ExportNodeUseCase @Inject constructor(
                 }
             )
 
-            if (withExpirationTime) {
-                megaApi.exportNode(node, expireTime!!.toInt(), listener)
+            if (expireTime != null && expireTime > 0) {
+                megaApi.exportNode(node, expireTime.toInt(), listener)
             } else {
                 megaApi.exportNode(node, listener)
             }
