@@ -8,7 +8,6 @@ import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
 import android.view.ViewGroup
-import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.viewModels
 import androidx.constraintlayout.widget.ConstraintSet
 import androidx.core.content.ContextCompat
@@ -21,7 +20,6 @@ import com.facebook.drawee.backends.pipeline.Fresco
 import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.BaseActivity
 import mega.privacy.android.app.R
-import mega.privacy.android.app.activities.contract.ChatExplorerForwardActivityContract
 import mega.privacy.android.app.components.attacher.MegaAttacher
 import mega.privacy.android.app.components.dragger.DragToExitSupport
 import mega.privacy.android.app.components.saver.NodeSaver
@@ -244,7 +242,6 @@ class ImageViewerActivity : BaseActivity(), PermissionRequester, SnackbarShower 
     private var dragToExit: DragToExitSupport? = null
 
     private lateinit var binding: ActivityImageViewerBinding
-    private lateinit var selectChatLauncher: ActivityResultLauncher<ChatExplorerForwardActivityContract.Params>
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -406,12 +403,6 @@ class ImageViewerActivity : BaseActivity(), PermissionRequester, SnackbarShower 
                 }
             }
         }
-
-        selectChatLauncher = registerForActivityResult(ChatExplorerForwardActivityContract()) { result ->
-            result?.selectedChats?.forEach { chatRoomId ->
-                viewModel.forwardChatMessage(result.messageIds?.first()!!, chatRoomId)
-            }
-        }
     }
 
     private fun setupAttachers(savedInstanceState: Bundle?) {
@@ -445,7 +436,7 @@ class ImageViewerActivity : BaseActivity(), PermissionRequester, SnackbarShower 
                 val isOnline = isOnline()
 
                 findItem(R.id.action_forward)?.isVisible =
-                    imageItem.isFromChat() && item.hasFullAccess
+                    imageItem.isFromChat()
 
                 findItem(R.id.action_share)?.isVisible =
                     !item.isFromRubbishBin && (imageItem.isOffline || (imageItem.isFromChat() && (imageItem.nodeItem.hasOwnerAccess || !imageItem.nodePublicLink.isNullOrBlank())))
@@ -460,7 +451,7 @@ class ImageViewerActivity : BaseActivity(), PermissionRequester, SnackbarShower 
                     isOnline && item.hasOwnerAccess && !item.isFromRubbishBin && !item.isExternalNode
 
                 findItem(R.id.action_send_to_chat)?.isVisible =
-                    isOnline && !item.isExternalNode && item.node != null && !item.isFromRubbishBin && viewModel.isUserLoggedIn() && item.hasReadAccess
+                    isOnline && !item.isExternalNode && item.node != null && !item.isFromRubbishBin && viewModel.isUserLoggedIn() && item.hasReadAccess && !imageItem.isFromChat()
 
                 findItem(R.id.action_more)?.isVisible =
                     item.handle > INVALID_HANDLE
@@ -502,12 +493,7 @@ class ImageViewerActivity : BaseActivity(), PermissionRequester, SnackbarShower 
                 true
             }
             R.id.action_forward -> {
-                selectChatLauncher.launch(
-                    ChatExplorerForwardActivityContract.Params(
-                        messageIds = longArrayOf(imageItem.chatMessageId!!),
-                        chatRoomId = imageItem.chatRoomId!!
-                    )
-                )
+                nodeItem.node?.let(::attachNode)
                 true
             }
             R.id.action_share -> {

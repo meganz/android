@@ -17,7 +17,6 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.OfflineFileInfoActivity
-import mega.privacy.android.app.activities.contract.ChatExplorerForwardActivityContract
 import mega.privacy.android.app.activities.contract.SelectFolderToCopyActivityContract
 import mega.privacy.android.app.activities.contract.SelectFolderToImportActivityContract
 import mega.privacy.android.app.activities.contract.SelectFolderToMoveActivityContract
@@ -76,7 +75,6 @@ class ImageBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
     private lateinit var selectMoveFolderLauncher: ActivityResultLauncher<LongArray>
     private lateinit var selectCopyFolderLauncher: ActivityResultLauncher<LongArray>
     private lateinit var selectImportFolderLauncher: ActivityResultLauncher<LongArray>
-    private lateinit var selectChatLauncher: ActivityResultLauncher<ChatExplorerForwardActivityContract.Params>
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -197,14 +195,10 @@ class ImageBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
             }
 
             // Forward
-            optionForward.isVisible = imageItem.isFromChat() && nodeItem.hasFullAccess
+            optionForward.isVisible = imageItem.isFromChat()
             optionForward.setOnClickListener {
-                selectChatLauncher.launch(
-                    ChatExplorerForwardActivityContract.Params(
-                        messageIds = longArrayOf(imageItem.chatMessageId!!),
-                        chatRoomId = imageItem.chatRoomId!!
-                    )
-                )
+                (activity as? ImageViewerActivity?)?.attachNode(node!!)
+                dismissAllowingStateLoss()
             }
 
             // Download
@@ -263,7 +257,7 @@ class ImageBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
                 (activity as? ImageViewerActivity?)?.attachNode(node!!)
                 dismissAllowingStateLoss()
             }
-            optionSendToChat.isVisible = isOnline && isUserLoggedIn && !nodeItem.isExternalNode && node != null && !nodeItem.isFromRubbishBin && nodeItem.hasReadAccess
+            optionSendToChat.isVisible = isOnline && isUserLoggedIn && !nodeItem.isExternalNode && node != null && !nodeItem.isFromRubbishBin && nodeItem.hasReadAccess && !imageItem.isFromChat()
 
             // Share
             optionShare.isVisible = !nodeItem.isFromRubbishBin && (imageItem.isOffline || nodeItem.hasOwnerAccess || !imageItem.nodePublicLink.isNullOrBlank())
@@ -401,11 +395,6 @@ class ImageBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
                 if (copyHandle != null && copyHandle != INVALID_HANDLE && toHandle != INVALID_HANDLE) {
                     viewModel.copyNode(copyHandle, toHandle)
                 }
-            }
-        }
-        selectChatLauncher = registerForActivityResult(ChatExplorerForwardActivityContract()) { result ->
-            result?.selectedChats?.forEach { chatRoomId ->
-                viewModel.forwardChatMessage(result.messageIds?.first()!!, chatRoomId)
             }
         }
     }
