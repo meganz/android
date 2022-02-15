@@ -13,7 +13,6 @@ import android.media.Ringtone;
 import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Build;
-import android.service.notification.StatusBarNotification;
 import android.view.View;
 import android.widget.RemoteViews;
 
@@ -238,14 +237,13 @@ public final class ChatAdvancedNotificationBuilder {
 
         notificationBuilder.setStyle(inboxStyle);
 
-        if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.N_MR1) {
-            //API 25 = Android 7.1
-            notificationBuilder.setPriority(Notification.PRIORITY_HIGH);
-        } else {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            // Use NotificationManager for devices running Android Nougat or above (API >= 24)
             notificationBuilder.setPriority(NotificationManager.IMPORTANCE_HIGH);
+        } else {
+            // Otherwise, use NotificationCompat for devices running Android Marshmallow (API 23)
+            notificationBuilder.setPriority(NotificationCompat.PRIORITY_HIGH);
         }
-
-//        notificationBuilder.setFullScreenIntent(pendingIntent, true);
 
         for (int i = 0; i < chats.size(); i++) {
             if (MegaApplication.getOpenChatId() != chats.get(i).getChatId()) {
@@ -1141,11 +1139,12 @@ public final class ChatAdvancedNotificationBuilder {
 
             notificationBuilder.setColor(ContextCompat.getColor(context, R.color.red_600_red_300));
 
-            if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.N_MR1) {
-                //API 25 = Android 7.1
-                notificationBuilder.setPriority(Notification.PRIORITY_HIGH);
-            } else {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                // Use NotificationManager for devices running Android Nougat or above (API >= 24)
                 notificationBuilder.setPriority(NotificationManager.IMPORTANCE_HIGH);
+            } else {
+                // Otherwise, use NotificationCompat for devices running Android Marshmallow (API 23)
+                notificationBuilder.setPriority(NotificationCompat.PRIORITY_HIGH);
             }
 
             if (!isTextEmpty(chatC.getParticipantEmail(chat.getPeerHandle(0)))) {
