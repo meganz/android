@@ -99,4 +99,10 @@ abstract class SettingsModule {
     abstract fun bindSetChatLoggingEnabled(
         useCase: DefaultSetChatLoggingEnabled
     ): SetChatLoggingEnabled
+
+    @Binds
+    abstract fun bindGetFolderVersionInfo(
+        implementation: DefaultGetFolderVersionInfo
+    ): GetFolderVersionInfo
+
 }
