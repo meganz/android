@@ -75,6 +75,7 @@ import android.text.Html;
 import android.text.Spanned;
 import android.text.TextWatcher;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.util.Pair;
 import android.view.Display;
 import android.view.Gravity;
@@ -713,7 +714,6 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 	TextView contactsSectionText;
 	TextView notificationsSectionText;
 	int bottomNavigationCurrentItem = -1;
-	BadgeDrawable chatBadge;
 	View callBadge;
 
 	private boolean joiningToChatLink;
@@ -2606,6 +2606,8 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 	}
 
 	private void updateState(HomeState homeState) {
+		Log.d("ManagerFragmentLollipop", String.format("New HomeState observed: %s", homeState.toString()));
+		BadgeDrawable chatBadge = bNV.getOrCreateBadge(R.id.bottom_navigation_item_chat);
 		if (homeState.getDisplayChatCount()){
 			chatBadge.setNumber(homeState.getUnreadNotificationsCount());
 			chatBadge.setVisible(true);
@@ -2621,7 +2623,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 	}
 
 	private void configureBottomNavBadges() {
-		chatBadge = bNV.getOrCreateBadge(R.id.bottom_navigation_item_chat);
+		BadgeDrawable chatBadge = bNV.getOrCreateBadge(R.id.bottom_navigation_item_chat);
 		chatBadge.setBackgroundColor(getResources().getColor(R.color.red_600_red_300));
 		chatBadge.setMaxCharacterCount(2);
 
