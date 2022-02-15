@@ -187,6 +187,7 @@ public final class ContactsAdvancedNotificationBuilder implements MegaRequestLis
 
         NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(context)
                 .setSmallIcon(R.drawable.ic_stat_notify)
+                .setColor(ContextCompat.getColor(context,R.color.red_600_red_300))
                 .setContentIntent(pendingIntent)
                 .setAutoCancel(true);
 
@@ -194,22 +195,18 @@ public final class ContactsAdvancedNotificationBuilder implements MegaRequestLis
 
         notificationBuilder.setShowWhen(true);
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP){
-            notificationBuilder.setColor(ContextCompat.getColor(context,R.color.red_600_red_300));
-        }
-
         Uri defaultSoundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
         notificationBuilder.setSound(defaultSoundUri);
         notificationBuilder.setVibrate(new long[] {0, 500});
 
         notificationBuilder.setStyle(inboxStyle);
 
-        if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.N_MR1){
-            //API 25 = Android 7.1
-            notificationBuilder.setPriority(Notification.PRIORITY_HIGH);
-        }
-        else{
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            // Use NotificationManager for devices running Android Nougat or above (API >= 24)
             notificationBuilder.setPriority(NotificationManager.IMPORTANCE_HIGH);
+        } else {
+            // Otherwise, use NotificationCompat for devices running Android Marshmallow (API 23)
+            notificationBuilder.setPriority(NotificationCompat.PRIORITY_HIGH);
         }
 
         for(int i=0;i<icr.size();i++)
@@ -317,16 +314,13 @@ public final class ContactsAdvancedNotificationBuilder implements MegaRequestLis
 
             Notification.Builder notificationBuilder = new Notification.Builder(context)
                     .setSmallIcon(R.drawable.ic_stat_notify)
+                    .setColor(ContextCompat.getColor(context, R.color.red_600_red_300))
                     .setContentTitle(context.getString(R.string.title_contact_request_notification))
                     .setContentText(notificationContent)
                     .setStyle(new Notification.BigTextStyle().bigText(notificationContent))
                     .setAutoCancel(true)
                     .setContentIntent(pendingIntent)
                     .setGroup(GROUP_KEY_IPC);
-
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                notificationBuilder.setColor(ContextCompat.getColor(context, R.color.red_600_red_300));
-            }
 
             if (beep) {
                 Uri defaultSoundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
@@ -338,13 +332,8 @@ public final class ContactsAdvancedNotificationBuilder implements MegaRequestLis
             if (largeIcon != null) {
                 notificationBuilder.setLargeIcon(largeIcon);
             }
-
-            if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.N_MR1) {
-                //API 25 = Android 7.1
-                notificationBuilder.setPriority(Notification.PRIORITY_HIGH);
-            } else {
-                notificationBuilder.setPriority(NotificationManager.IMPORTANCE_HIGH);
-            }
+            
+            notificationBuilder.setPriority(Notification.PRIORITY_HIGH);
 
             return notificationBuilder.build();
         }
@@ -407,15 +396,12 @@ public final class ContactsAdvancedNotificationBuilder implements MegaRequestLis
 
             Notification.Builder notificationBuilder = new Notification.Builder(context)
                     .setSmallIcon(R.drawable.ic_stat_notify)
+                    .setColor(ContextCompat.getColor(context, R.color.red_600_red_300))
                     .setContentTitle(title)
                     .setContentText(email)
                     .setAutoCancel(true)
                     .setContentIntent(pendingIntent)
                     .setGroup(GROUP_KEY_APC);
-
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                notificationBuilder.setColor(ContextCompat.getColor(context, R.color.red_600_red_300));
-            }
 
             Uri defaultSoundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
             notificationBuilder.setSound(defaultSoundUri);
@@ -426,12 +412,7 @@ public final class ContactsAdvancedNotificationBuilder implements MegaRequestLis
                 notificationBuilder.setLargeIcon(largeIcon);
             }
 
-            if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.N_MR1) {
-                //API 25 = Android 7.1
-                notificationBuilder.setPriority(Notification.PRIORITY_HIGH);
-            } else {
-                notificationBuilder.setPriority(NotificationManager.IMPORTANCE_HIGH);
-            }
+            notificationBuilder.setPriority(Notification.PRIORITY_HIGH);
 
             return notificationBuilder.build();
         }
@@ -481,20 +462,13 @@ public final class ContactsAdvancedNotificationBuilder implements MegaRequestLis
         else {
 
             NotificationCompat.Builder builder = new NotificationCompat.Builder(context);
-
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                builder.setColor(ContextCompat.getColor(context, R.color.red_600_red_300));
-            }
             builder.setSmallIcon(R.drawable.ic_stat_notify)
+                    .setColor(ContextCompat.getColor(context, R.color.red_600_red_300))
                     .setShowWhen(true)
                     .setGroup(groupKey)
                     .setGroupSummary(true)
                     .setAutoCancel(true)
                     .setContentIntent(pendingIntent);
-
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                builder.setColor(ContextCompat.getColor(context, R.color.red_600_red_300));
-            }
 
             return builder.build();
         }
@@ -531,15 +505,12 @@ public final class ContactsAdvancedNotificationBuilder implements MegaRequestLis
             NotificationCompat.Builder builder = new NotificationCompat.Builder(context);
 
             builder.setSmallIcon(R.drawable.ic_stat_notify)
+                    .setColor(ContextCompat.getColor(context, R.color.red_600_red_300))
                     .setShowWhen(true)
                     .setGroup(groupKey)
                     .setGroupSummary(true)
                     .setAutoCancel(true)
                     .setContentIntent(pendingIntent);
-
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                builder.setColor(ContextCompat.getColor(context, R.color.red_600_red_300));
-            }
 
             return builder.build();
         }
@@ -613,14 +584,11 @@ public final class ContactsAdvancedNotificationBuilder implements MegaRequestLis
 
             mBuilderCompat
                     .setSmallIcon(R.drawable.ic_stat_notify)
+                    .setColor(ContextCompat.getColor(context, R.color.red_600_red_300))
                     .setContentIntent(pendingIntent)
                     .setAutoCancel(true).setTicker(title)
                     .setContentTitle(title).setContentText(email)
                     .setOngoing(false);
-
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                mBuilderCompat.setColor(ContextCompat.getColor(context, R.color.red_600_red_300));
-            }
 
             Uri defaultSoundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
             mBuilderCompat.setSound(defaultSoundUri);
@@ -631,11 +599,12 @@ public final class ContactsAdvancedNotificationBuilder implements MegaRequestLis
                 mBuilderCompat.setLargeIcon(largeIcon);
             }
 
-            if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.N_MR1) {
-                //API 25 = Android 7.1
-                mBuilderCompat.setPriority(Notification.PRIORITY_HIGH);
-            } else {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                // Use NotificationManager for devices running Android Nougat or above (API >= 24)
                 mBuilderCompat.setPriority(NotificationManager.IMPORTANCE_HIGH);
+            } else {
+                // Otherwise, use NotificationCompat for devices running Android Marshmallow (API 23)
+                mBuilderCompat.setPriority(NotificationCompat.PRIORITY_HIGH);
             }
 
             notificationManager.notify(NOTIFICATION_GENERAL_PUSH_CHAT, mBuilderCompat.build());
