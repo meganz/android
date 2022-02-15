@@ -26,13 +26,4 @@ public class Utils {
         float minimum = Math.max(min, value);
         return Math.min(minimum, max);
     }
-
-    public static void setBackground(View view, Drawable drawable){
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
-            view.setBackground(drawable);
-        } else {
-            view.setBackgroundDrawable(drawable);
-        }
-    }
-
 }
