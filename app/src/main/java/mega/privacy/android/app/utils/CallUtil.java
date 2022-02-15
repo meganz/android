@@ -710,7 +710,7 @@ public class CallUtil {
      * Method for showing the appropriate string depending on the value of termination code for the call
      *
      * @param termCode The termination code
-     * @return The appropriate string
+     * @return The appropriate string corresponding to the termination code
      */
     public static String terminationCodeForCallToString(int termCode) {
         switch (termCode) {
