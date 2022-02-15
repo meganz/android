@@ -109,12 +109,29 @@ class SettingsViewModelTest {
             .map { it.chatEnabled }
             .distinctUntilChanged()
             .test {
-                assertThat(awaitItem()).isFalse()
                 assertThat(awaitItem()).isTrue()
 
                 isChatLoggedInValue.tryEmit(false)
 
                 assertThat(awaitItem()).isFalse()
+            }
+    }
+
+    @Test
+    fun `test that chat is enabled by default`() = runTest{
+        underTest.uiState
+            .map { it.chatEnabled }
+            .test {
+                assertThat(awaitItem()).isTrue()
+            }
+    }
+
+    @Test
+    fun `test that camera uploads is enabled by default`() = runTest{
+        underTest.uiState
+            .map { it.cameraUploadEnabled }
+            .test {
+                assertThat(awaitItem()).isTrue()
             }
     }
 }

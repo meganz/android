@@ -148,7 +148,7 @@ class SettingsFragmentTest {
 
 
         @Provides
-        fun provideIsChatLoggedIn(): IsChatLoggedIn = mock { on { invoke() }.thenReturn(emptyFlow())}
+        fun provideIsChatLoggedIn(): IsChatLoggedIn = mock { on { invoke() }.thenReturn(flowOf(true))}
 
         @Provides
         fun provideSetLoggingEnabled(): SetLoggingEnabled = mock()
@@ -280,14 +280,6 @@ class SettingsFragmentTest {
             .check(withRowContaining(withText(R.string.download_location)))
     }
 
-    @Test
-    @SdkSuppress(minSdkVersion = 30)
-    fun test_that_download_location_is_excluded_post_30() {
-        launchFragmentInHiltContainer<SettingsFragment>()
-
-        onPreferences()
-            .check(withNoRowContaining(withText(R.string.download_location)))
-    }
 
     @Test
     fun test_that_activated_delete_has_100_percent_alpha() {
@@ -346,7 +338,11 @@ class SettingsFragmentTest {
         whenever(TestSettingsModule.canDeleteAccount(userAccount)).thenReturn(true)
         whenever(TestSettingsModule.isMultiFactorAuthAvailable()).thenReturn(true)
         whenever(TestSettingsModule.isOnline()).thenReturn(flowOf(false))
+
+
         launchFragmentInHiltContainer<SettingsFragment>()
+
+
 
         onPreferences()
             .check(

@@ -45,8 +45,8 @@ class SettingsViewModel @Inject constructor(
             multiFactorVisible = false,
             deleteAccountVisible = false,
             deleteEnabled = false,
-            cameraUploadEnabled = false,
-            chatEnabled = false,
+            cameraUploadEnabled = true,
+            chatEnabled = true,
             startScreen = 0,
             hideRecentActivityChecked = false,
         )
