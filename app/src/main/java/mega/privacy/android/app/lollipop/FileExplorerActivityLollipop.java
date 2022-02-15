@@ -2731,18 +2731,18 @@ public class FileExplorerActivityLollipop extends TransfersManagementActivity
 		return nameFiles;
 	}
 
-	public ManagerActivityLollipop.DrawerItem getCurrentItem() {
+	public DrawerItem getCurrentItem() {
 		if (viewPagerExplorer != null) {
 			if (viewPagerExplorer.getCurrentItem() == 0) {
 				cDriveExplorer = getCloudExplorerFragment();
 				if (cDriveExplorer != null) {
-					return ManagerActivityLollipop.DrawerItem.CLOUD_DRIVE;
+					return DrawerItem.CLOUD_DRIVE;
 				}
 			}
 			else {
 				iSharesExplorer = getIncomingExplorerFragment();
 				if (iSharesExplorer != null) {
-					return ManagerActivityLollipop.DrawerItem.SHARED_ITEMS;
+					return DrawerItem.SHARED_ITEMS;
 				}
 			}
 		}
