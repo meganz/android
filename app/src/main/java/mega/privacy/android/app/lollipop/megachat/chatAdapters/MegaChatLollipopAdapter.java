@@ -3433,14 +3433,6 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             holder.urlOwnMessageIcon.setImageResource(R.drawable.ic_launcher);
             holder.urlOwnMessageIcon.setVisibility(View.VISIBLE);
 
-            holder.urlOwnMessageText.setTextColor(Color.WHITE);
-            holder.urlOwnMessageText.setLinkTextColor(Color.WHITE);
-
-            if (!MegaChatApi.hasUrl(messageContent)) {
-                holder.urlOwnMessageText.setText(getFormattedText(messageContent));
-            } else {
-                holder.urlOwnMessageText.setText(messageContent);
-            }
             holder.urlOwnMessageText.setLinksClickable(false);
             Linkify.addLinks(holder.urlOwnMessageText, Linkify.WEB_URLS);
             holder.urlOwnMessageText.setOnClickListener(this);
@@ -3602,6 +3594,8 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             holder.urlContactMessageIcon.setImageResource(R.drawable.ic_launcher);
             holder.urlContactMessageIcon.setVisibility(View.VISIBLE);
 
+            holder.urlContactMessageText.setLinksClickable(false);
+            Linkify.addLinks(holder.urlContactMessageText, Linkify.WEB_URLS);
             holder.urlContactMessageText.setOnClickListener(this);
             holder.urlContactMessageText.setOnLongClickListener(this);
 
