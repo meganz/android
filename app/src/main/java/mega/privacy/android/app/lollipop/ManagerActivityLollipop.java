@@ -94,7 +94,6 @@ import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import com.ittianyu.bottomnavigationviewex.BottomNavigationViewEx;
 import com.jeremyliao.liveeventbus.LiveEventBus;
 
 import org.jetbrains.annotations.NotNull;
@@ -551,7 +550,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 	private DrawerItem drawerItem;
 	static MenuItem drawerMenuItem = null;
 	LinearLayout fragmentLayout;
-	BottomNavigationViewEx bNV;
+	BottomNavigationView bNV;
 	NavigationView nV;
 	RelativeLayout usedSpaceLayout;
 	private EmojiTextView nVDisplayName;
@@ -1693,12 +1692,8 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 
         fragmentLayout = (LinearLayout) findViewById(R.id.fragment_layout);
 
-        bNV = (BottomNavigationViewEx) findViewById(R.id.bottom_navigation_view);
+        bNV = (BottomNavigationView) findViewById(R.id.bottom_navigation_view);
 		bNV.setOnNavigationItemSelectedListener(this);
-		bNV.enableAnimation(false);
-		bNV.enableItemShiftingMode(false);
-		bNV.enableShiftingMode(false);
-		bNV.setTextVisibility(false);
 
 		miniAudioPlayerController = new MiniAudioPlayerController(
 				findViewById(R.id.mini_audio_player),
