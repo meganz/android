@@ -120,24 +120,24 @@ public class PushMessageHanlder implements MegaRequestListenerInterface {
                     //If true - wait until connection finish
                     //If false, no need to change it
                     logDebug("Flag showMessageNotificationAfterPush: " + showMessageNotificationAfterPush);
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                        PowerManager pm = (PowerManager) app.getSystemService(Context.POWER_SERVICE);
-                        boolean isIdle = pm.isDeviceIdleMode();
-                        if ((!app.isActivityVisible() && megaApi.getRootNode() == null) || isIdle) {
-                            logDebug("Launch foreground service!");
-                            awakeCpu(false);
 
-                            if (BuildFlavorHelper.INSTANCE.isGMS()) {
-                                app.startService(new Intent(app, IncomingCallService.class));
-                                return;
-                            } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                                // For HMS build flavor, have to startForegroundService.
-                                // Android doesn't allow the app to launch background service if the app is not launched by FCM high priority push message.
-                                app.startForegroundService(new Intent(app, IncomingCallService.class));
-                                return;
-                            }
+                    PowerManager pm = (PowerManager) app.getSystemService(Context.POWER_SERVICE);
+                    boolean isIdle = pm.isDeviceIdleMode();
+                    if ((!app.isActivityVisible() && megaApi.getRootNode() == null) || isIdle) {
+                        logDebug("Launch foreground service!");
+                        awakeCpu(false);
+
+                        if (BuildFlavorHelper.INSTANCE.isGMS()) {
+                            app.startService(new Intent(app, IncomingCallService.class));
+                            return;
+                        } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                            // For HMS build flavor, have to startForegroundService.
+                            // Android doesn't allow the app to launch background service if the app is not launched by FCM high priority push message.
+                            app.startForegroundService(new Intent(app, IncomingCallService.class));
+                            return;
                         }
                     }
+
                     String gSession = credentials.getSession();
                     if (megaApi.getRootNode() == null) {
                         logWarning("RootNode = null");
