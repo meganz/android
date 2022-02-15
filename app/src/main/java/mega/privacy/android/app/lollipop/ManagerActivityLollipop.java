@@ -264,7 +264,6 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.navigation.NavigationView;
 import com.google.android.material.navigation.NavigationView.OnNavigationItemSelectedListener;
 import com.google.android.material.tabs.TabLayout;
-import com.ittianyu.bottomnavigationviewex.BottomNavigationViewEx;
 import com.jeremyliao.liveeventbus.LiveEventBus;
 
 import org.jetbrains.annotations.NotNull;
@@ -672,20 +671,20 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 
 	public boolean turnOnNotifications = false;
 
-    private int searchSharedTab = -1;
-    private DrawerItem searchDrawerItem = null;
-    private DrawerItem drawerItem;
-    static MenuItem drawerMenuItem = null;
-    LinearLayout fragmentLayout;
-    BottomNavigationViewEx bNV;
-    NavigationView nV;
-    RelativeLayout usedSpaceLayout;
-    private EmojiTextView nVDisplayName;
-    TextView nVEmail;
-    TextView businessLabel;
-    RoundedImageView nVPictureProfile;
-    TextView spaceTV;
-    ProgressBar usedSpacePB;
+	private int searchSharedTab = -1;
+	private DrawerItem searchDrawerItem = null;
+	private DrawerItem drawerItem;
+	static MenuItem drawerMenuItem = null;
+	LinearLayout fragmentLayout;
+	BottomNavigationView bNV;
+	NavigationView nV;
+	RelativeLayout usedSpaceLayout;
+	private EmojiTextView nVDisplayName;
+	TextView nVEmail;
+	TextView businessLabel;
+	RoundedImageView nVPictureProfile;
+	TextView spaceTV;
+	ProgressBar usedSpacePB;
 
     private MiniAudioPlayerController miniAudioPlayerController;
 
@@ -1793,12 +1792,8 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 
         fragmentLayout = (LinearLayout) findViewById(R.id.fragment_layout);
 
-        bNV = (BottomNavigationViewEx) findViewById(R.id.bottom_navigation_view);
-        bNV.setOnNavigationItemSelectedListener(this);
-        bNV.enableAnimation(false);
-        bNV.enableItemShiftingMode(false);
-        bNV.enableShiftingMode(false);
-        bNV.setTextVisibility(false);
+        bNV = (BottomNavigationView) findViewById(R.id.bottom_navigation_view);
+		bNV.setOnNavigationItemSelectedListener(this);
 
         miniAudioPlayerController = new MiniAudioPlayerController(
                 findViewById(R.id.mini_audio_player),

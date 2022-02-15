@@ -593,7 +593,7 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 		totalUploadsCompleted = 0;
 
 		if(megaApi.getNumPendingUploads()<=0){
-			megaApi.resetTotalUploads();
+			megaApi.resetCompletedUploads();
 		}
 
 		if (fileExplorerUpload) {
