@@ -434,7 +434,7 @@ class ImageViewerViewModel @Inject constructor(
             }
     }
 
-    fun shareNode(node: MegaNode): LiveData<String?> {
+    fun exportNode(node: MegaNode): LiveData<String?> {
         val result = MutableLiveData<String?>()
         exportNodeUseCase.export(node)
             .subscribeOn(Schedulers.io())

@@ -500,10 +500,12 @@ class ImageViewerActivity : BaseActivity(), PermissionRequester, SnackbarShower 
                 when {
                     imageItem.isOffline ->
                         OfflineUtils.shareOfflineNode(this, nodeItem.handle)
+                    imageItem.imageResult?.fullSizeUri?.toFile()?.exists() == true ->
+                        FileUtil.shareFile(this, imageItem.imageResult.fullSizeUri!!.toFile())
                     !imageItem.nodePublicLink.isNullOrBlank() ->
                         MegaNodeUtil.shareLink(this, imageItem.nodePublicLink)
                     imageItem.nodeItem.node != null ->
-                        viewModel.shareNode(imageItem.nodeItem.node).observe(this) { link ->
+                        viewModel.exportNode(imageItem.nodeItem.node).observe(this) { link ->
                             if (!link.isNullOrBlank()) {
                                 MegaNodeUtil.shareLink(this, link)
                             }

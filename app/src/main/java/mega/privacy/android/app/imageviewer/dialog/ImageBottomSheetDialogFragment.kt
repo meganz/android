@@ -8,6 +8,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.activity.result.ActivityResultLauncher
 import androidx.core.content.res.ResourcesCompat
+import androidx.core.net.toFile
 import androidx.core.view.isVisible
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.viewModels
@@ -30,6 +31,7 @@ import mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil
 import mega.privacy.android.app.modalbottomsheet.nodelabel.NodeLabelBottomSheetDialogFragment
 import mega.privacy.android.app.utils.Constants.*
 import mega.privacy.android.app.utils.ExtraUtils.extra
+import mega.privacy.android.app.utils.FileUtil
 import mega.privacy.android.app.utils.LinksUtil
 import mega.privacy.android.app.utils.LogUtil.logWarning
 import mega.privacy.android.app.utils.MegaNodeUtil
@@ -265,10 +267,12 @@ class ImageBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
                 when {
                     imageItem.isOffline ->
                         OfflineUtils.shareOfflineNode(context, nodeItem.handle)
+                    imageItem.imageResult?.fullSizeUri?.toFile()?.exists() == true ->
+                        FileUtil.shareFile(context, imageItem.imageResult.fullSizeUri!!.toFile())
                     !imageItem.nodePublicLink.isNullOrBlank() ->
                         MegaNodeUtil.shareLink(requireActivity(), imageItem.nodePublicLink)
                     node != null ->
-                        viewModel.shareNode(node).observe(viewLifecycleOwner) { link ->
+                        viewModel.exportNode(node).observe(viewLifecycleOwner) { link ->
                             if (!link.isNullOrBlank()) {
                                 MegaNodeUtil.shareLink(requireActivity(), link)
                             }
