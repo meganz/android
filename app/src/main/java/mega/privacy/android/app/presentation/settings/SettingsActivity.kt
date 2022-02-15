@@ -2,8 +2,10 @@ package mega.privacy.android.app.presentation.settings
 
 import android.content.Context
 import android.content.Intent
+import android.content.res.Configuration
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.WindowInsetsControllerCompat
 import androidx.fragment.app.FragmentResultListener
 import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
@@ -12,6 +14,7 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.settings.SettingsFragment.Companion.INITIAL_PREFERENCE
 import mega.privacy.android.app.presentation.settings.SettingsFragment.Companion.NAVIGATE_TO_INITIAL_PREFERENCE
 import mega.privacy.android.app.presentation.settings.model.TargetPreference
+import org.jetbrains.anko.configuration
 
 private const val TITLE_TAG = "settingsActivityTitle"
 
@@ -39,6 +42,11 @@ class SettingsActivity : AppCompatActivity(),
             }
         }
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
+
+        WindowInsetsControllerCompat(window, window.decorView).isAppearanceLightStatusBars = when(configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK){
+            Configuration.UI_MODE_NIGHT_YES -> false
+            else ->  true
+        }
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
