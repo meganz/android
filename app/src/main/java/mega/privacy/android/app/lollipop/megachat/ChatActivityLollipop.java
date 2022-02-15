@@ -4028,13 +4028,9 @@ public class ChatActivityLollipop extends PasscodeActivity
                             emojiKeyboard.hideBothKeyboard(this);
                         }
 
-                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                            boolean hasStoragePermission = hasPermissions(this, Manifest.permission.READ_EXTERNAL_STORAGE);
-                            if (!hasStoragePermission) {
-                                requestPermission(this, REQUEST_READ_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE);
-                            } else {
-                                this.attachFromFileStorage();
-                            }
+                        boolean hasStoragePermission = hasPermissions(this, Manifest.permission.READ_EXTERNAL_STORAGE);
+                        if (!hasStoragePermission) {
+                            requestPermission(this, REQUEST_READ_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE);
                         } else {
                             this.attachFromFileStorage();
                         }
@@ -8744,31 +8740,24 @@ public class ChatActivityLollipop extends PasscodeActivity
     }
 
     public void updateNavigationToolbarIcon(){
+        if(!chatC.isInAnonymousMode()){
+            int numberUnread = megaChatApi.getUnreadChats();
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-
-            if(!chatC.isInAnonymousMode()){
-                int numberUnread = megaChatApi.getUnreadChats();
-
-                if(numberUnread==0){
-                    aB.setHomeAsUpIndicator(upArrow);
-                }
-                else{
-
-                    badgeDrawable.setProgress(1.0f);
-
-                    if(numberUnread>9){
-                        badgeDrawable.setText("9+");
-                    }
-                    else{
-                        badgeDrawable.setText(numberUnread+"");
-                    }
-
-                    aB.setHomeAsUpIndicator(badgeDrawable);
-                }
+            if(numberUnread==0){
+                aB.setHomeAsUpIndicator(upArrow);
             }
             else{
-                aB.setHomeAsUpIndicator(upArrow);
+
+                badgeDrawable.setProgress(1.0f);
+
+                if(numberUnread>9){
+                    badgeDrawable.setText("9+");
+                }
+                else{
+                    badgeDrawable.setText(numberUnread+"");
+                }
+
+                aB.setHomeAsUpIndicator(badgeDrawable);
             }
         }
         else{
