@@ -557,7 +557,7 @@ class GetLinkFragment : BaseFragment(), DatePickerDialog.OnDateSetListener, Scro
         val date = cal.time
         val dfTimestamp = SimpleDateFormat("yyyyMMdd", Locale.getDefault())
         val dateString = dfTimestamp.format(date) + LAST_MINUTE
-        val timestamp = calculateTimestamp(dateString).toInt()
+        val timestamp = calculateTimestamp(dateString)
 
         viewModel.exportWithTimestamp(timestamp)
     }
