@@ -2734,10 +2734,23 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
         isBusinessGraceAlertShown = true;
     }
 
+	/**
+	 * If the account is business and not a master user, it shows a warning.
+	 * Otherwise proceeds to enable CU.
+	 */
 	public void checkIfShouldShowBusinessCUAlert() {
 		if (megaApi.isBusinessAccount() && !megaApi.isMasterBusinessAccount()) {
 			showBusinessCUAlert();
-		} else if (getCameraUploadFragment() != null){
+		} else {
+			enableCUClicked();
+		}
+	}
+
+	/**
+	 * Proceeds to enable CU action.
+	 */
+	private void enableCUClicked() {
+		if (getCameraUploadFragment() != null){
 			if (cuFragment.isEnableCUFragmentShown()) {
 				cuFragment.enableCu();
 			} else {
@@ -2746,6 +2759,9 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 		}
 	}
 
+	/**
+	 * Shows a warning to business users about the risks of enabling CU.
+	 */
     private void showBusinessCUAlert() {
         if (businessCUAlert != null && businessCUAlert.isShowing()) {
             return;
@@ -2754,12 +2770,8 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 		MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this);
 		builder.setTitle(R.string.section_photo_sync)
 				.setMessage(R.string.camera_uploads_business_alert)
-				.setNegativeButton(R.string.general_cancel, (dialog, which) -> { })
-				.setPositiveButton(R.string.general_enable, (dialog, which) -> {
-					if (getCameraUploadFragment() != null) {
-						cuFragment.enableCUClick();
-					}
-				})
+				.setNegativeButton(R.string.general_cancel, null)
+				.setPositiveButton(R.string.general_enable, (dialog, which) -> enableCUClicked())
 				.setCancelable(false)
 				.setOnDismissListener(dialog -> isBusinessCUAlertShown = false);
 
