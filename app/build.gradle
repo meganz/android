@@ -157,12 +157,6 @@ android {
     }
 }
 
-// See https://dagger.dev/hilt/gradle-setup#gradle-plugin-local-tests
-hilt {
-    enableTransformForLocalTests = true
-}
-
-
 dependencies {
     implementation fileTree(dir: "$rootProject.projectDir/app/src/main/jni/ExoPlayer/", include: ['*.aar'])
 
