@@ -145,6 +145,7 @@
             <TextView
                 android:id="@+id/properties_option"
                 style="@style/BottomSheetOption"
+                android:text="@string/general_info"
                 app:drawableStartCompat="@drawable/info_ic"/>
 
             <TextView

@@ -76,4 +76,13 @@ object ViewUtils {
             }
         }
     }
+
+    /**
+     * Checks if a view is visible.
+     *
+     * @return True if the view is visible, false otherwise.
+     */
+    @JvmStatic
+    fun View.isVisible(): Boolean =
+        visibility == View.VISIBLE
 }
