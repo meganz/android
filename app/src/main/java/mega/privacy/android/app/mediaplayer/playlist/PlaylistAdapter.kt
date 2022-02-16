@@ -7,13 +7,13 @@ import android.view.MotionEvent
 import android.view.ViewGroup
 import android.view.animation.Animation
 import android.view.animation.AnimationUtils
+import android.widget.FrameLayout
 import android.widget.ImageView
+import androidx.core.view.isVisible
 import androidx.recyclerview.widget.ListAdapter
 import mega.privacy.android.app.R
 import mega.privacy.android.app.databinding.ItemAudioPlaylistBinding
-import mega.privacy.android.app.databinding.ItemAudioPlaylistHeaderBinding
 import mega.privacy.android.app.databinding.ItemVideoPlaylistBinding
-import mega.privacy.android.app.databinding.ItemVideoPlaylistHeaderBinding
 
 /**
  * RecyclerView adapter for playlist screen.
@@ -34,60 +34,51 @@ class PlaylistAdapter(
         const val ANIMATION_DURATION = 250L
     }
 
+    private var playingPosition: Int = 0
+
     override fun getItemViewType(position: Int): Int {
         return getItem(position).type
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PlaylistViewHolder {
-        return when (viewType) {
-            PlaylistItem.TYPE_PREVIOUS_HEADER,
-            PlaylistItem.TYPE_PLAYING_HEADER,
-            PlaylistItem.TYPE_NEXT_HEADER -> {
-                if (isAudioPlayer) {
-                    AudioPlaylistHeaderHolder(
-                        ItemAudioPlaylistHeaderBinding.inflate(
-                            LayoutInflater.from(parent.context), parent, false
-                        )
-                    )
-                } else {
-                    VideoPlaylistHeaderHolder(
-                        ItemVideoPlaylistHeaderBinding.inflate(
-                            LayoutInflater.from(parent.context), parent, false
-                        )
-                    )
-                }
-            }
-            else -> {
-                if (isAudioPlayer) {
-                    AudioPlaylistItemHolder(
-                        ItemAudioPlaylistBinding.inflate(
-                            LayoutInflater.from(parent.context), parent, false
-                        )
-                    )
-                } else {
-                    VideoPlaylistItemHolder(
-                        ItemVideoPlaylistBinding.inflate(
-                            LayoutInflater.from(parent.context), parent, false
-                        )
-                    )
-                }
-            }
+        return if (isAudioPlayer) {
+            AudioPlaylistItemHolder(
+                ItemAudioPlaylistBinding.inflate(
+                    LayoutInflater.from(parent.context), parent, false
+                )
+            )
+        } else {
+            VideoPlaylistItemHolder(
+                ItemVideoPlaylistBinding.inflate(
+                    LayoutInflater.from(parent.context), parent, false
+                )
+            )
         }
     }
 
     @SuppressLint("ClickableViewAccessibility")
     override fun onBindViewHolder(holder: PlaylistViewHolder, position: Int) {
-        if (holder is AudioPlaylistItemHolder || holder is VideoPlaylistItemHolder) {
-            //Added the touch listener for reorder icon to implement drag feature
-            holder.itemView.findViewById<ImageView>(R.id.transfers_list_option_reorder)
-                .setOnTouchListener { _, event ->
-                    if (event.action == MotionEvent.ACTION_DOWN) {
-                        dragStartListener.onDragStarted(holder)
-                    }
-                    false
+        //Added the touch listener for reorder icon to implement drag feature
+        holder.itemView.findViewById<ImageView>(R.id.transfers_list_option_reorder)
+            .setOnTouchListener { _, event ->
+                if (event.action == MotionEvent.ACTION_DOWN) {
+                    dragStartListener.onDragStarted(holder)
                 }
+                false
+            }
+        val playlistItem = getItem(holder.absoluteAdapterPosition)
+        val currentPosition = holder.absoluteAdapterPosition
+
+        if (playlistItem.type == PlaylistItem.TYPE_PLAYING) {
+            playingPosition = holder.absoluteAdapterPosition
         }
-        holder.bind(paused, getItem(position), itemOperation, holder, position)
+
+        holder.itemView.findViewById<FrameLayout>(R.id.header_layout).isVisible =
+            playlistItem.headerIsVisible
+        holder.itemView.findViewById<FrameLayout>(R.id.next_layout).isVisible =
+            currentPosition != itemCount - 1 && playlistItem.type == PlaylistItem.TYPE_PLAYING
+
+        holder.bind(paused, playlistItem, itemOperation, holder, currentPosition)
     }
 
     /**
@@ -114,4 +105,10 @@ class PlaylistAdapter(
                 .startAnimation(flipAnimation)
         }
     }
+
+    /**
+     * Get the position of playing item
+     * @return the position of playing item
+     */
+    fun getPlayingPosition() = playingPosition
 }

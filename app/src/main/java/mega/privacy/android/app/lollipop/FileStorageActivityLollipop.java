@@ -173,6 +173,13 @@ public class FileStorageActivityLollipop extends PasscodeActivity implements Scr
 			openPickCUFolderFromSystem();
 			return;
 		} else if (pickFolderType == PickFolderType.DOWNLOAD_FOLDER) {
+			if (isAndroid11OrUpper()) {
+				path = buildDefaultDownloadDir(this);
+				path.mkdirs();
+				finishPickFolder();
+				return;
+			}
+
 			openPickDownloadFolderFromSystem();
 			return;
 		}
@@ -297,7 +304,8 @@ public class FileStorageActivityLollipop extends PasscodeActivity implements Scr
 	 */
 	private void openPickDownloadFolderFromSystem() {
 		startActivityForResult(new Intent(Intent.ACTION_OPEN_DOCUMENT_TREE)
-				.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION), REQUEST_PICK_DOWNLOAD_FOLDER);
+						.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION | Intent.FLAG_GRANT_WRITE_URI_PERMISSION),
+				REQUEST_PICK_DOWNLOAD_FOLDER);
 	}
 
 	/**
@@ -573,8 +581,9 @@ public class FileStorageActivityLollipop extends PasscodeActivity implements Scr
 		}
 
 		path = new File(DocumentFileUtils.getAbsolutePath(documentFile, this));
+		String documentId = DocumentFileUtils.getId(documentFile);
 
-		return DocumentFileUtils.getId(documentFile).equals(StorageId.PRIMARY);
+		return documentId.equals(StorageId.PRIMARY) || documentId.contains(StorageId.PRIMARY);
 	}
 
 	public void changeActionBarElevation(boolean withElevation) {

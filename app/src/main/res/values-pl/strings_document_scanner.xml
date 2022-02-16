@@ -45,7 +45,7 @@
     <!-- Snackbar text for incorrect name -->
     <string name="scan_snackbar_incorrect_name">Proszę poprawić nazwę pliku przed kontynuowaniem</string>
     <!-- Dialog message showing file progress -->
-    <string name="scan_dialog_progress">Przygotowywanie %1$s. Proszę czekać...</string>
+    <string name="scan_dialog_progress">Przygotowywanie %1$s. Proszę czekać&#8230;</string>
     <!-- Error shown when the user writes a character not allowed -->
     <string name="scan_snackbar_invalid_characters">Następujące znaki są niedozwolone: ” * / : &lt; &gt; ? \ |</string>
 </resources>
