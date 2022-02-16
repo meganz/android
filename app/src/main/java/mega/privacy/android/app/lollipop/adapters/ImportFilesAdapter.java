@@ -70,7 +70,7 @@ public class ImportFilesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
     List<ShareInfo> filesPartial = new ArrayList<>();
     HashMap<String, String> names;
 
-    boolean areItemsVisible = false;
+    private boolean areItemsVisible = false;
 
     private int positionWithFocus = INVALID_POSITION;
 
