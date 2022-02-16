@@ -948,6 +948,8 @@ public class BaseActivity extends AppCompatActivity implements ActivityLauncher,
                 break;
 
             case DISMISS_ACTION_SNACKBAR:
+                TextView snackbarTextView = snackbar.getView().findViewById(com.google.android.material.R.id.snackbar_text);
+                snackbarTextView.setMaxLines(5);
                 snackbar.setAction(R.string.general_ok, new SnackbarNavigateOption(view.getContext(), type));
                 snackbar.show();
                 break;
