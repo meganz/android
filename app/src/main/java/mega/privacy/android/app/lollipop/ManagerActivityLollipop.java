@@ -1,5 +1,7 @@
 package mega.privacy.android.app.lollipop;
 
+import static androidx.lifecycle.LifecycleOwnerKt.getLifecycleScope;
+
 import android.Manifest;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
@@ -33,10 +35,13 @@ import android.text.TextUtils;
 import androidx.annotation.NonNull;
 import androidx.core.content.res.ResourcesCompat;
 import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.NavOptions;
 import com.google.android.material.appbar.MaterialToolbar;
 import androidx.core.text.HtmlCompat;
 import androidx.lifecycle.Lifecycle;
+
+import com.google.android.material.badge.BadgeDrawable;
 import com.google.android.material.bottomnavigation.BottomNavigationItemView;
 import com.google.android.material.bottomnavigation.BottomNavigationMenuView;
 import com.google.android.material.appbar.AppBarLayout;
@@ -70,6 +75,7 @@ import android.text.Html;
 import android.text.Spanned;
 import android.text.TextWatcher;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.util.Pair;
 import android.view.Display;
 import android.view.Gravity;
@@ -94,7 +100,6 @@ import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import com.ittianyu.bottomnavigationviewex.BottomNavigationViewEx;
 import com.jeremyliao.liveeventbus.LiveEventBus;
 
 import org.jetbrains.annotations.NotNull;
@@ -129,11 +134,13 @@ import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.OpenPasswordLinkActivity;
 import mega.privacy.android.app.Product;
 import mega.privacy.android.app.R;
+import mega.privacy.android.app.fragments.managerFragments.cu.PhotosFragment;
 import mega.privacy.android.app.gallery.ui.MediaDiscoveryFragment;
 import mega.privacy.android.app.objects.PasscodeManagement;
 import mega.privacy.android.app.fragments.homepage.documents.DocumentsFragment;
-import mega.privacy.android.app.fragments.managerFragments.cu.PhotosFragment;
 import mega.privacy.android.app.generalusecase.FilePrepareUseCase;
+import mega.privacy.android.app.presentation.home.HomeViewModel;
+import mega.privacy.android.app.presentation.home.model.HomeState;
 import mega.privacy.android.app.smsVerification.SMSVerificationActivity;
 import mega.privacy.android.app.ShareInfo;
 import mega.privacy.android.app.TransfersManagementActivity;
@@ -167,7 +174,6 @@ import mega.privacy.android.app.activities.OfflineFileInfoActivity;
 import mega.privacy.android.app.fragments.offline.OfflineFragment;
 import mega.privacy.android.app.globalmanagement.SortOrderManagement;
 import mega.privacy.android.app.interfaces.ActionNodeCallback;
-import mega.privacy.android.app.interfaces.SnackbarShower;
 import mega.privacy.android.app.interfaces.ChatManagementCallback;
 import mega.privacy.android.app.interfaces.MeetingBottomSheetDialogActionListener;
 import mega.privacy.android.app.fragments.settingsFragments.cookie.CookieDialogHandler;
@@ -215,7 +221,6 @@ import mega.privacy.android.app.modalbottomsheet.SortByBottomSheetDialogFragment
 import mega.privacy.android.app.modalbottomsheet.UploadBottomSheetDialogFragment;
 import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.ChatBottomSheetDialogFragment;
 import mega.privacy.android.app.service.iar.RatingHandlerImpl;
-import mega.privacy.android.app.uploadFolder.list.data.UploadFolderResult;
 import mega.privacy.android.app.usecase.GetNodeUseCase;
 import mega.privacy.android.app.usecase.MoveNodeUseCase;
 import mega.privacy.android.app.usecase.RemoveNodeUseCase;
@@ -295,7 +300,6 @@ import static mega.privacy.android.app.sync.fileBackups.FileBackupManager.Backup
 import static mega.privacy.android.app.sync.fileBackups.FileBackupManager.BackupDialogState.BACKUP_DIALOG_SHOW_NONE;
 import static mega.privacy.android.app.sync.fileBackups.FileBackupManager.BackupDialogState.BACKUP_DIALOG_SHOW_WARNING;
 import static mega.privacy.android.app.sync.fileBackups.FileBackupManager.OperationType.OPERATION_EXECUTE;
-import static mega.privacy.android.app.uploadFolder.UploadFolderActivity.UPLOAD_RESULTS;
 import static mega.privacy.android.app.utils.AlertDialogUtil.dismissAlertDialogIfExists;
 import static mega.privacy.android.app.utils.AlertDialogUtil.isAlertDialogShown;
 import static mega.privacy.android.app.utils.AlertsAndWarnings.askForCustomizedPlan;
@@ -417,6 +421,8 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 	RemoveNodeUseCase removeNodeUseCase;
 	@Inject
 	GetNodeUseCase getNodeUseCase;
+
+	HomeViewModel viewModel;
 
 	public ArrayList<Integer> transfersInProgress;
 	public MegaTransferData transferData;
@@ -542,28 +548,6 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 		}
 	}
 
-	public enum DrawerItem {
-		CLOUD_DRIVE, PHOTOS, HOMEPAGE, CHAT, SHARED_ITEMS, NOTIFICATIONS,
-		SETTINGS, INBOX, SEARCH, TRANSFERS, RUBBISH_BIN, ASK_PERMISSIONS;
-
-		public String getTitle(Context context) {
-			switch(this)
-			{
-				case CLOUD_DRIVE: return context.getString(R.string.section_cloud_drive);
-				case PHOTOS: return context.getString(R.string.sortby_type_photo_first);
-				case INBOX: return context.getString(R.string.section_inbox);
-				case SHARED_ITEMS: return context.getString(R.string.title_shared_items);
-				case SETTINGS: return context.getString(R.string.action_settings);
-				case SEARCH: return context.getString(R.string.action_search);
-				case TRANSFERS: return context.getString(R.string.section_transfers);
-				case CHAT: return context.getString(R.string.section_chat);
-				case RUBBISH_BIN: return context.getString(R.string.section_rubbish_bin);
-				case NOTIFICATIONS: return context.getString(R.string.title_properties_chat_contact_notifications);
-			}
-			return null;
-		}
-	}
-
 	public boolean turnOnNotifications = false;
 
 	private int searchSharedTab = -1;
@@ -571,7 +555,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 	private DrawerItem drawerItem;
 	static MenuItem drawerMenuItem = null;
 	LinearLayout fragmentLayout;
-	BottomNavigationViewEx bNV;
+	BottomNavigationView bNV;
 	NavigationView nV;
 	RelativeLayout usedSpaceLayout;
 	private EmojiTextView nVDisplayName;
@@ -730,7 +714,6 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 	TextView contactsSectionText;
 	TextView notificationsSectionText;
 	int bottomNavigationCurrentItem = -1;
-	View chatBadge;
 	View callBadge;
 
 	private boolean joiningToChatLink;
@@ -1401,6 +1384,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 //		Importantly though, they are restored in the base Activity class's onCreate().
 //		Thus if you call super.onCreate() first, all of the rest of your onCreate() method will execute after your Fragments have been restored.
 		super.onCreate(savedInstanceState);
+		viewModel = new ViewModelProvider(this).get(HomeViewModel.class);
 		logDebug("onCreate after call super");
 
 		// This block for solving the issue below:
@@ -1698,12 +1682,8 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 
         fragmentLayout = (LinearLayout) findViewById(R.id.fragment_layout);
 
-        bNV = (BottomNavigationViewEx) findViewById(R.id.bottom_navigation_view);
+        bNV = (BottomNavigationView) findViewById(R.id.bottom_navigation_view);
 		bNV.setOnNavigationItemSelectedListener(this);
-		bNV.enableAnimation(false);
-		bNV.enableItemShiftingMode(false);
-		bNV.enableShiftingMode(false);
-		bNV.setTextVisibility(false);
 
 		miniAudioPlayerController = new MiniAudioPlayerController(
 				findViewById(R.id.mini_audio_player),
@@ -1815,17 +1795,8 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 		badgeDrawable = new BadgeDrawerArrowDrawable(managerActivity, R.color.red_600_red_300,
 				R.color.white_dark_grey, R.color.white_dark_grey);
 
-		BottomNavigationMenuView menuView = (BottomNavigationMenuView) bNV.getChildAt(0);
-		// Navi button Chat
-		BottomNavigationItemView itemView = (BottomNavigationItemView) menuView.getChildAt(3);
-		chatBadge = LayoutInflater.from(this).inflate(R.layout.bottom_chat_badge, menuView, false);
-		itemView.addView(chatBadge);
-		setChatBadge();
-
-		callBadge = LayoutInflater.from(this).inflate(R.layout.bottom_call_badge, menuView, false);
-		itemView.addView(callBadge);
-		callBadge.setVisibility(View.GONE);
-		setCallBadge();
+		configureBottomNavBadges();
+		viewModel.getHomeStateLiveData().observe(this, this::updateState);
 
 		usedSpaceLayout = findViewById(R.id.nv_used_space_layout);
 
@@ -2479,7 +2450,6 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
                     rChatFL.onlineStatusUpdate(megaChatApi.getOnlineStatus());
                 }
             }
-			setChatBadge();
 
 			logDebug("Check if there any INCOMING pendingRequest contacts");
 			setContactTitleSection();
@@ -2634,6 +2604,36 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 			logDebug("Backup warning dialog is not show");
 		}
 	}
+
+	private void updateState(HomeState homeState) {
+		Log.d("ManagerFragmentLollipop", String.format("New HomeState observed: %s", homeState.toString()));
+		BadgeDrawable chatBadge = bNV.getOrCreateBadge(R.id.bottom_navigation_item_chat);
+		if (homeState.getDisplayChatCount()){
+			chatBadge.setNumber(homeState.getUnreadNotificationsCount());
+			chatBadge.setVisible(true);
+		}else {
+			chatBadge.setVisible(false);
+		}
+
+		if (homeState.getDisplayCallBadge() && isOnline(this)){
+			callBadge.setVisibility(View.VISIBLE);
+		} else {
+			callBadge.setVisibility(View.GONE);
+		}
+	}
+
+	private void configureBottomNavBadges() {
+		BadgeDrawable chatBadge = bNV.getOrCreateBadge(R.id.bottom_navigation_item_chat);
+		chatBadge.setBackgroundColor(getResources().getColor(R.color.red_600_red_300));
+		chatBadge.setMaxCharacterCount(2);
+
+		BottomNavigationMenuView menuView = (BottomNavigationMenuView) bNV.getChildAt(0);
+		BottomNavigationItemView itemView = (BottomNavigationItemView) menuView.getChildAt(3);
+		callBadge = LayoutInflater.from(this).inflate(R.layout.bottom_call_badge, menuView, false);
+		itemView.addView(callBadge);
+		callBadge.setVisibility(View.GONE);
+	}
+
 
 	/**
 	 * Checks which screen should be shown when an user is logins.
@@ -8011,6 +8011,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 		}
 
 		startActivity(new Intent(this, UpgradeAccountActivity.class));
+		myAccountInfo.setUpgradeOpenedFrom(MyAccountInfo.UpgradeFrom.MANAGER);
 	}
 
 	public void navigateToAchievements(){
@@ -10882,7 +10883,6 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 
 		if (item.hasChanged(MegaChatListItem.CHANGE_TYPE_UNREAD_COUNT)) {
 			logDebug("Change unread count: " + item.getUnreadCount());
-			setChatBadge();
 			updateNavigationToolbarIcon();
 		}
 	}
@@ -11105,36 +11105,6 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 		notificationsSectionText.setText(result);
 	}
 
-	public void setChatBadge() {
-		if(megaChatApi != null) {
-			int numberUnread = megaChatApi.getUnreadChats();
-			if (numberUnread == 0) {
-				chatBadge.setVisibility(View.GONE);
-			}
-			else {
-				chatBadge.setVisibility(View.VISIBLE);
-				if (numberUnread > 9) {
-					((TextView) chatBadge.findViewById(R.id.chat_badge_text)).setText("9+");
-				}
-				else {
-					((TextView) chatBadge.findViewById(R.id.chat_badge_text)).setText("" + numberUnread);
-				}
-			}
-		}
-		else {
-			chatBadge.setVisibility(View.GONE);
-		}
-	}
-
-	private void setCallBadge(){
-		if (!isOnline(this) || megaChatApi == null || megaChatApi.getNumCalls() <= 0 || (megaChatApi.getNumCalls() == 1 && participatingInACall())) {
-			callBadge.setVisibility(View.GONE);
-			return;
-		}
-
-		callBadge.setVisibility(View.VISIBLE);
-	}
-
 	public String getDeviceName() {
 		String manufacturer = Build.MANUFACTURER;
 		String model = Build.MODEL;
@@ -11281,7 +11251,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 			megaApi.acknowledgeUserAlerts();
 		}
 		else{
-			if(drawerItem == ManagerActivityLollipop.DrawerItem.NOTIFICATIONS && app.isActivityVisible()){
+			if(drawerItem == DrawerItem.NOTIFICATIONS && app.isActivityVisible()){
 				megaApi.acknowledgeUserAlerts();
 			}
 		}
@@ -11431,7 +11401,6 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 	 * and it is in Cloud Drive section, Recents section, Incoming section, Outgoing section or in the chats list.
 	 */
 	private void setCallWidget() {
-		setCallBadge();
 
 		if (drawerItem == DrawerItem.SETTINGS || drawerItem == DrawerItem.SEARCH
 				|| drawerItem == DrawerItem.TRANSFERS || drawerItem == DrawerItem.NOTIFICATIONS

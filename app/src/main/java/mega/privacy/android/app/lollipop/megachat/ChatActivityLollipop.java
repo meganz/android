@@ -96,6 +96,7 @@ import mega.privacy.android.app.imageviewer.ImageViewerActivity;
 import mega.privacy.android.app.components.ChatManagement;
 import mega.privacy.android.app.contacts.usecase.InviteContactUseCase;
 import mega.privacy.android.app.usecase.GetAvatarUseCase;
+import mega.privacy.android.app.usecase.GetPublicLinkInformationUseCase;
 import mega.privacy.android.app.utils.MegaProgressDialogUtil;
 import mega.privacy.android.app.generalusecase.FilePrepareUseCase;
 import mega.privacy.android.app.listeners.CreateChatListener;
@@ -327,6 +328,8 @@ public class ChatActivityLollipop extends PasscodeActivity
     InviteContactUseCase inviteContactUseCase;
     @Inject
     GetAvatarUseCase getAvatarUseCase;
+    @Inject
+    GetPublicLinkInformationUseCase getPublicLinkInformationUseCase;
 
     private int currentRecordButtonState;
     private String mOutputFilePath;
@@ -5981,10 +5984,15 @@ public class ChatActivityLollipop extends PasscodeActivity
             return MEGA_FILE_LINK;
         } else {
             logDebug("isFolderLink");
+            getPublicLinkInformationUseCase.get(link)
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe((richLink, throwable) -> {
+                        if (throwable == null) {
+                            setRichLinkInfo(msg.getMsgId(), richLink);
+                        }
+                    });
 
-            MegaApiAndroid megaApiFolder = getLocalMegaApiFolder();
-            listener = new ChatLinkInfoListener(this, msg.getMsgId(), megaApi, megaApiFolder);
-            megaApiFolder.loginToFolder(link, listener);
             return MEGA_FOLDER_LINK;
         }
     }

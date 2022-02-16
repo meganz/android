@@ -39,12 +39,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -67,6 +62,7 @@ import mega.privacy.android.app.components.scrollBar.FastScroller;
 import mega.privacy.android.app.imageviewer.ImageViewerActivity;
 import mega.privacy.android.app.fragments.homepage.EventObserver;
 import mega.privacy.android.app.fragments.homepage.SortByHeaderViewModel;
+import mega.privacy.android.app.lollipop.DrawerItem;
 import mega.privacy.android.app.search.callback.SearchActionsCallback;
 import mega.privacy.android.app.search.usecase.SearchNodesUseCase;
 import mega.privacy.android.app.globalmanagement.SortOrderManagement;
@@ -635,7 +631,7 @@ public class SearchFragmentLollipop extends RotatableFragment implements SearchA
 
 		String query = ((ManagerActivityLollipop) context).getSearchQuery();
 		long parentHandleSearch = ((ManagerActivityLollipop) context).getParentHandleSearch();
-		ManagerActivityLollipop.DrawerItem drawerItem = ((ManagerActivityLollipop) context).getSearchDrawerItem();
+		DrawerItem drawerItem = ((ManagerActivityLollipop) context).getSearchDrawerItem();
 		int sharesTab = ((ManagerActivityLollipop) context).getSearchSharedTab();
 		boolean isFirstNavigationLevel = ((ManagerActivityLollipop) context).isFirstNavigationLevel();
 
@@ -651,7 +647,7 @@ public class SearchFragmentLollipop extends RotatableFragment implements SearchA
 				});
 	}
 
-	private long getParentHandleForSearch(ManagerActivityLollipop.DrawerItem drawerItem) {
+	private long getParentHandleForSearch(DrawerItem drawerItem) {
 		if (drawerItem == null) {
 			logWarning("DrawerItem is null.");
 			return megaApi.getRootNode().getHandle();
