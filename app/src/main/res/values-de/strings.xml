@@ -4216,17 +4216,17 @@
         <item quantity="other">%d Geräte</item>
     </plurals>
     <!-- Title of the button when you want to answer a one to one call -->
-    <string name="title_join_one_to_one_call">Answer call</string>
+    <string name="title_join_one_to_one_call">Annehmen</string>
     <!-- Title of the menu when the select tracks on playlist page-->
-    <string name="title_select_tracks">Select tracks</string>
+    <string name="title_select_tracks">Titel auswählen</string>
     <!-- Action button to upload files. -->
-    <string name="upload_files">Upload files</string>
+    <string name="upload_files">Dateien hochladen</string>
     <!-- Action button to upload a folder. -->
-    <string name="upload_folder">Upload folder</string>
+    <string name="upload_folder">Ordner hochladen</string>
     <!-- Title of the dialog warning the user about cancel uploads. -->
     <string name="cancel_uploads">Cancel uploads</string>
     <!-- Warning alerting user if proceed with the action all the uploads will be cancelled. -->
-    <string name="cancel_uploads_warning">Interrupting the upload process will result in all your uploads being cancelled.</string>
+    <string name="cancel_uploads_warning">Wenn Sie den Upload unterbrechen, werden alle Ihre Uploads abgebrochen.</string>
     <!-- Button to proceed with action. -->
-    <string name="action_proceed">Proceed</string>
+    <string name="action_proceed">Fortfahren</string>
 </resources>

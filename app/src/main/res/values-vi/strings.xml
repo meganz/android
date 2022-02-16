@@ -229,7 +229,7 @@
     <!-- Does the user already have a MEGA account -->
     <string name="already_account">Bạn đã tạo một tài khoản rồi?</string>
     <!-- warning dialog -->
-    <string name="create_account_no_terms">Bạn phải chấp thuận Điều Khoản Dịch Vụ.</string>
+    <string name="create_account_no_terms">Bạn phải chấp thuận Điều Khoản Dịch Vụ</string>
     <!-- warning dialog, for user do not tick checkbox of understanding the danger of losing password -->
     <string name="create_account_no_top">Khách hàng cần phải đồng ý rằng là đã hiểu được rủi ro sẽ xáy ra khi mất mật khẩu</string>
     <!-- Warning message when the first name is a required field to submit a form. For example during the create account process. -->
@@ -241,7 +241,7 @@
     <!-- when creating the account -->
     <string name="error_passwords_dont_match">Hai mật khẩu này không trùng khớp</string>
     <!-- when creating the account -->
-    <string name="error_email_registered">Địa chỉ email này đã đăng ký từ trước với MEGA.</string>
+    <string name="error_email_registered">Địa chỉ email này đã đăng ký từ trước với MEGA</string>
     <!--  -->
     <string name="create_account_creating_account">Đang kết nối đến máy chủ: Đang tạo tài khoản</string>
     <!--  -->
@@ -1008,7 +1008,7 @@
     <!-- Third paragraph of the screen to backup the master key -->
     <string name="backup_third_paragraph">Các kẻ tấn công không thể nào truy cập vào tài khoản của bạn chỉ với mã-khóa không thôi. Thủ tục đặt lại mật khẩu yêu cầu bạn phải có mã-khóa master và quyền truy cập vào email của bạn.</string>
     <!-- Sentence to inform the user the available actions in the screen to backup the master key -->
-    <string name="backup_action">Sao chép Mã Phục Hồi vào bảng nhớ tạm hoặc lưu lại mã dưới dạng tệp tin chữ</string>
+    <string name="backup_action">Sao chép Mã Phục Hồi vào bảng nhớ tạm hoặc lưu lại mã dưới dạng tệp tin chữ.</string>
     <!-- Action of a button to save something -->
     <string name="save_action">Lưu</string>
     <!-- Alert message when the master key has been successfully copied to the ClipBoard -->
@@ -2051,7 +2051,7 @@
     <!-- Text shown when it has been created the QR code successfully -->
     <string name="qrcode_create_successfully">Mã ảnh QR đã được tạo thành công</string>
     <!-- Text shown in QR code scan fragment to help and guide the user in the action -->
-    <string name="qrcode_scan_help">So thẳng hàng camera với mã QR để tiến hành quét.</string>
+    <string name="qrcode_scan_help">So thẳng hàng camera với mã QR để tiến hành quét</string>
     <!-- positive button on dialog to view a contact -->
     <string name="contact_view">Xem</string>
     <!-- Item menu option to reproduce audio or video in external reproductors -->
@@ -3029,7 +3029,7 @@
     </plurals>
     <!-- Alert shown when a num of messages have not been sent because of any error occurs, Plural of file. 2 files -->
     <plurals name="num_messages_not_send">
-        <item quantity="other">%d tin nhắn chưa được gửi thành công tới %d cuộc chát.</item>
+        <item quantity="other">%d tin nhắn chưa được gửi thành công tới %d cuộc chát</item>
     </plurals>
     <!-- How many local contacts have been on MEGA, Plural of local contact. 2 contacts -->
     <plurals name="quantity_of_local_contact">
