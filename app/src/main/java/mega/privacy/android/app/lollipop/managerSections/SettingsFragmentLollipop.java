@@ -194,8 +194,13 @@ public class SettingsFragmentLollipop extends SettingsBaseFragment implements Se
         chatPreference.setOnPreferenceClickListener(this);
 
         storageCategory = findPreference(CATEGORY_STORAGE);
-        nestedDownloadLocation = findPreference(KEY_STORAGE_DOWNLOAD);
-        nestedDownloadLocation.setOnPreferenceClickListener(this);
+
+        //Some changes are harder to toggle with feature flags, eg. layout file changes. To prevent a crash the original code had to be changed here.
+        if (!isAndroid11OrUpper()) {
+            nestedDownloadLocation = findPreference(KEY_STORAGE_DOWNLOAD);
+            nestedDownloadLocation.setOnPreferenceClickListener(this);
+        }
+
         fileManagementPrefence = findPreference(KEY_STORAGE_FILE_MANAGEMENT);
         fileManagementPrefence.setOnPreferenceClickListener(this);
 

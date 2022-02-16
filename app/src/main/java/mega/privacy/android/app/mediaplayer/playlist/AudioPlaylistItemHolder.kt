@@ -15,11 +15,14 @@ class AudioPlaylistItemHolder(private val binding: ItemAudioPlaylistBinding) :
         holder: PlaylistViewHolder,
         position: Int
     ) {
-        binding.item = item
-        binding.highlight = item.type == PlaylistItem.TYPE_NEXT
-        binding.paused = paused
-        binding.itemOperation = itemOperation
-        binding.holder = holder
-        binding.position = position
+        with(binding) {
+            this.item = item
+            highlight = item.type == PlaylistItem.TYPE_NEXT
+            this.paused = paused
+            this.itemOperation = itemOperation
+            this.holder = holder
+            this.position = position
+            name = PlaylistItem.getHeaderName(item.type, paused)
+        }
     }
 }

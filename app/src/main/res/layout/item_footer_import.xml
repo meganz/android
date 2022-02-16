@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/item_import_layout"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <RelativeLayout
+        android:id="@+id/show_more_layout"
+        android:layout_width="match_parent"
+        android:layout_height="36dp"
+        android:layout_marginTop="8dp">
+
+        <TextView
+            android:id="@+id/show_more_text"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_alignParentStart="true"
+            android:layout_centerVertical="true"
+            android:layout_marginEnd="16dp"
+            android:layout_toStartOf="@id/show_more_image"
+            android:gravity="start|center_vertical"
+            android:text="@string/general_show_more"
+            android:textAppearance="@style/TextAppearance.Mega.Subtitle2.Normal.AccentColor" />
+
+        <ImageView
+            android:id="@+id/show_more_image"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_centerVertical="true"
+            android:layout_marginEnd="16dp"
+            android:src="@drawable/ic_collapse_acc"
+            tools:ignore="ContentDescription" />
+
+        <include layout="@layout/view_relative_layout_separator"/>
+
+    </RelativeLayout>
+
+    <TextView
+        android:id="@+id/choose_destination"
+        android:layout_width="match_parent"
+        android:layout_height="36dp"
+        android:layout_below="@+id/show_more_layout"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="16dp"
+        android:gravity="start|center_vertical"
+        android:text="@string/choose_destionation"
+        android:textAppearance="@style/TextAppearance.Mega.Subtitle2.Normal.Grey" />
+
+    <Button
+        android:id="@+id/cloud_drive_button"
+        style="@style/Widget.Mega.Button.Transparent"
+        android:layout_marginStart="-16dp"
+        android:layout_below="@+id/choose_destination"
+        android:layout_marginTop="8dp"
+        android:text="@string/section_cloud_drive" />
+
+    <Button
+        android:id="@+id/chat_button"
+        style="@style/Widget.Mega.Button.Transparent"
+        android:layout_marginStart="-16dp"
+        android:layout_below="@+id/cloud_drive_button"
+        android:layout_marginTop="12dp"
+        android:text="@string/section_chat" />
+</RelativeLayout>

@@ -7,7 +7,7 @@
     <!-- Label to show that an error related with an denied access occurs during a SDK operation. -->
     <string name="error_access">Truy cập bị từ chối</string>
     <!-- Label to show that an error related to a non-existent resource occurs during a Mega Chat operation. -->
-    <string name="error_noent">Nguồn dữ liệu không tồn tại</string>
+    <string name="error_noent">Nguồn dữ liệu không tồn tại.</string>
     <!-- Label to show that an error related to an already existing resource occurs during a Mega Chat operation. -->
     <string name="error_exist">Nguồn dữ liệu đã có sẵn.</string>
     <!-- Label to show that an error related with an unknown error occurs during a SDK operation. -->
