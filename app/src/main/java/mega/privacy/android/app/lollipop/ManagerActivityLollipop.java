@@ -7692,15 +7692,15 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 	}
 
 	public void showNewSortByPanel(int orderType) {
-		showNewSortByPanel(orderType, false);
-	}
-
-	public void showNewSortByPanel(int orderType, boolean isIncomingRootOrder) {
 		if (isBottomSheetDialogShown(bottomSheetDialogFragment)) {
 			return;
 		}
 
-		bottomSheetDialogFragment = SortByBottomSheetDialogFragment.newInstance(orderType, isIncomingRootOrder);
+		if (orderType == ORDER_OTHERS && deepBrowserTreeIncoming > 0) {
+			orderType = ORDER_CLOUD;
+		}
+
+		bottomSheetDialogFragment = SortByBottomSheetDialogFragment.newInstance(orderType);
 
 		bottomSheetDialogFragment.show(getSupportFragmentManager(),
 				bottomSheetDialogFragment.getTag());
