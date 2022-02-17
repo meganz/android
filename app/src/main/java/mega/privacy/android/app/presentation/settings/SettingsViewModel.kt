@@ -72,7 +72,7 @@ class SettingsViewModel @Inject constructor(
                     .map { available ->
                         { state: SettingsState -> state.copy(multiFactorVisible = available) }
                     },
-                flowOf(fetchAutoAcceptQRLinks())
+                flowOf(kotlin.runCatching{ fetchAutoAcceptQRLinks() }.getOrDefault(false))
                     .map { enabled ->
                         { state: SettingsState -> state.copy(autoAcceptChecked = enabled) }
                     },

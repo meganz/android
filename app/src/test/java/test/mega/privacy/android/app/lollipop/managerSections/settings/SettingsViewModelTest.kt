@@ -10,6 +10,7 @@ import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import mega.privacy.android.app.domain.entity.UserAccount
+import mega.privacy.android.app.domain.exception.SettingNotFoundException
 import mega.privacy.android.app.domain.usecase.FetchAutoAcceptQRLinks
 import mega.privacy.android.app.domain.usecase.IsChatLoggedIn
 import mega.privacy.android.app.domain.usecase.ToggleAutoAcceptQRLinks
@@ -132,6 +133,17 @@ class SettingsViewModelTest {
             .map { it.cameraUploadEnabled }
             .test {
                 assertThat(awaitItem()).isTrue()
+            }
+    }
+
+    @Test
+    fun `test that an error on fetching QR setting returns false instead`() = runTest{
+        whenever(fetchAutoAcceptQRLinks()).thenAnswer { throw SettingNotFoundException() }
+
+        underTest.uiState
+            .map { it.autoAcceptChecked }
+            .test {
+                assertThat(awaitItem()).isFalse()
             }
     }
 }

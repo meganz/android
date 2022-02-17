@@ -10,13 +10,14 @@ class DefaultToggleAutoAcceptQRLinks @Inject constructor(
 ) : ToggleAutoAcceptQRLinks {
     override suspend fun invoke(): Boolean {
         return kotlin.runCatching {
-            val currentValue = fetchAutoAcceptQRLinks()
-            return settingsRepository.setAutoAcceptQR(!currentValue)
-        }.onFailure { error ->
+            fetchAutoAcceptQRLinks()
+        }.onSuccess { current ->
+            return settingsRepository.setAutoAcceptQR(!current)
+        }.recover { error ->
             if (error is SettingNotFoundException) {
-                return settingsRepository.setAutoAcceptQR(false)
+                return settingsRepository.setAutoAcceptQR(true)
             }
             throw error
-        }.getOrDefault(false)
+        }.getOrThrow()
     }
 }
