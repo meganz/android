@@ -2795,35 +2795,46 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
         isBusinessGraceAlertShown = true;
     }
 
-    public void checkIfShouldShowBusinessCUAlert() {
-        if (megaApi.isBusinessAccount() && !megaApi.isMasterBusinessAccount()) {
-            showBusinessCUAlert();
-        } else if (getCameraUploadFragment() != null) {
-            if (cuFragment.isEnableCUFragmentShown()) {
-                cuFragment.enableCu();
-            } else {
-                cuFragment.enableCUClick();
-            }
-        }
-    }
+	/**
+	 * If the account is business and not a master user, it shows a warning.
+	 * Otherwise proceeds to enable CU.
+	 */
+	public void checkIfShouldShowBusinessCUAlert() {
+		if (megaApi.isBusinessAccount() && !megaApi.isMasterBusinessAccount()) {
+			showBusinessCUAlert();
+		} else {
+			enableCUClicked();
+		}
+	}
 
+	/**
+	 * Proceeds to enable CU action.
+	 */
+	private void enableCUClicked() {
+		if (getCameraUploadFragment() != null){
+			if (cuFragment.isEnableCUFragmentShown()) {
+				cuFragment.enableCu();
+			} else {
+				cuFragment.enableCUClick();
+			}
+		}
+	}
+
+	/**
+	 * Shows a warning to business users about the risks of enabling CU.
+	 */
     private void showBusinessCUAlert() {
         if (businessCUAlert != null && businessCUAlert.isShowing()) {
             return;
         }
 
-        MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this);
-        builder.setTitle(R.string.section_photo_sync)
-                .setMessage(R.string.camera_uploads_business_alert)
-                .setNegativeButton(R.string.general_cancel, (dialog, which) -> {
-                })
-                .setPositiveButton(R.string.general_enable, (dialog, which) -> {
-                    if (getCameraUploadFragment() != null) {
-                        cuFragment.enableCUClick();
-                    }
-                })
-                .setCancelable(false)
-                .setOnDismissListener(dialog -> isBusinessCUAlertShown = false);
+		MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this);
+		builder.setTitle(R.string.section_photo_sync)
+				.setMessage(R.string.camera_uploads_business_alert)
+				.setNegativeButton(R.string.general_cancel, null)
+				.setPositiveButton(R.string.general_enable, (dialog, which) -> enableCUClicked())
+				.setCancelable(false)
+				.setOnDismissListener(dialog -> isBusinessCUAlertShown = false);
 
         businessCUAlert = builder.create();
         businessCUAlert.show();
