@@ -116,9 +116,7 @@ public class ContactFileListBottomSheetDialogFragment extends BaseBottomSheetDia
             nodeThumb.setImageResource(R.drawable.ic_folder_incoming);
             nodeInfo.setText(getMegaNodeFolderInfo(node));
 
-            if (firstLevel || parentHandle == INVALID_HANDLE) {
-                optionLeave.setVisibility(View.VISIBLE);
-
+            if (!node.isTakenDown() && (firstLevel || parentHandle == INVALID_HANDLE)) {
                 switch (accessLevel) {
                     case MegaShare.ACCESS_FULL:
                         nodeIcon.setImageResource(R.drawable.ic_shared_fullaccess);
@@ -132,8 +130,6 @@ public class ContactFileListBottomSheetDialogFragment extends BaseBottomSheetDia
                         nodeIcon.setImageResource(R.drawable.ic_shared_read_write);
                         break;
                 }
-
-                nodeIconLayout.setVisibility(View.VISIBLE);
             } else {
                 optionLeave.setVisibility(View.GONE);
                 nodeIconLayout.setVisibility(View.GONE);
@@ -155,13 +151,8 @@ public class ContactFileListBottomSheetDialogFragment extends BaseBottomSheetDia
 
         switch (accessLevel) {
             case MegaShare.ACCESS_FULL:
-                optionMove.setVisibility(View.GONE);
-                optionRename.setVisibility(View.VISIBLE);
-
                 if (firstLevel || parentHandle == INVALID_HANDLE) {
                     optionRubbish.setVisibility(View.GONE);
-                } else {
-                    optionRubbish.setVisibility(View.VISIBLE);
                 }
 
                 break;
@@ -172,6 +163,11 @@ public class ContactFileListBottomSheetDialogFragment extends BaseBottomSheetDia
                 optionRename.setVisibility(View.GONE);
                 optionRubbish.setVisibility(View.GONE);
                 break;
+        }
+
+        if (node.isTakenDown()) {
+            optionDownload.setVisibility(View.GONE);
+            optionCopy.setVisibility(View.GONE);
         }
 
         if (optionInfo.getVisibility() == View.GONE || (optionDownload.getVisibility() == View.GONE && optionCopy.getVisibility() == View.GONE
