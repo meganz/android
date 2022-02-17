@@ -476,18 +476,58 @@ class InMeetingViewModel @Inject constructor(
     fun updateParticipantsNameOrAvatar(peerId: Long, typeChange: Int): MutableSet<Participant> {
         val listWithChanges = mutableSetOf<Participant>()
         inMeetingRepository.getChatRoom(currentChatId)?.let {
-            participants.value?.let { listParticipants ->
-                val iterator = listParticipants.iterator()
-                iterator.forEach {
-                    if (it.peerId == peerId) {
-                        when (typeChange) {
-                            NAME_CHANGE -> it.name = getParticipantFullName(peerId)
-                            AVATAR_CHANGE -> it.avatar = getAvatarBitmap(peerId)
-                        }
-                        listWithChanges.add(it)
+            participants.value = participants.value?.map { participant ->
+                return@map when {
+                    participant.peerId == peerId && typeChange == NAME_CHANGE -> {
+                        listWithChanges.add(participant)
+                        participant.copy(name = getParticipantFullName(peerId))
                     }
+
+                    participant.peerId == peerId && typeChange == AVATAR_CHANGE -> {
+                        listWithChanges.add(participant)
+                        participant.copy(avatar = getAvatarBitmap(peerId))
+                    }
+                    else -> participant
                 }
-            }
+            }?.toMutableList()
+        }
+
+        return listWithChanges
+    }
+
+    /**
+     * Method that makes the necessary changes to the participant list when my own privileges have changed.
+     */
+    fun updateOwnPrivileges() {
+        inMeetingRepository.getChatRoom(currentChatId)?.let {
+            participants.value = participants.value?.map { participant ->
+                return@map participant.copy(
+                    hasOptionsAllowed = shouldParticipantsOptionBeVisible(
+                        participant.isMe,
+                        participant.isGuest
+                    )
+                )
+            }?.toMutableList()
+        }
+    }
+
+    /**
+     * Method for updating participant privileges
+     *
+     * @return list of participants with changes
+     */
+    fun updateParticipantsPrivileges(): MutableSet<Participant> {
+        val listWithChanges = mutableSetOf<Participant>()
+        inMeetingRepository.getChatRoom(currentChatId)?.let {
+            participants.value = participants.value?.map { participant ->
+                return@map when {
+                    participant.isModerator != isParticipantModerator(participant.peerId) -> {
+                        listWithChanges.add(participant)
+                        participant.copy(isModerator = isParticipantModerator(participant.peerId))
+                    }
+                    else -> participant
+                }
+            }?.toMutableList()
         }
 
         return listWithChanges
@@ -823,29 +863,6 @@ class InMeetingViewModel @Inject constructor(
     }
 
     /**
-     * Method for updating participant privileges
-     *
-     * @return list of participants with changes
-     */
-    fun updateParticipantsPrivileges(): MutableSet<Participant> {
-        val listWithChanges = mutableSetOf<Participant>()
-        inMeetingRepository.getChatRoom(currentChatId)?.let {
-            participants.value?.let { listParticipants ->
-                val iterator = listParticipants.iterator()
-                iterator.forEach {
-                    val isModerator = isParticipantModerator(it.peerId)
-                    if (it.isModerator != isModerator) {
-                        it.isModerator = isModerator
-                        listWithChanges.add(it)
-                    }
-                }
-            }
-        }
-
-        return listWithChanges
-    }
-
-    /**
      * Method for updating the speaking participant
      *
      * @param peerId User handle of a participant
@@ -973,6 +990,8 @@ class InMeetingViewModel @Inject constructor(
                 isGuest = true
             }
 
+            val hasOptionsAllowed = shouldParticipantsOptionBeVisible(false, isGuest)
+
             logDebug("Participant created")
             return Participant(
                 session.peerid,
@@ -988,7 +1007,8 @@ class InMeetingViewModel @Inject constructor(
                 hasHiRes,
                 null,
                 false,
-                isGuest
+                isGuest,
+                hasOptionsAllowed = hasOptionsAllowed
             )
         }
 
@@ -1767,12 +1787,18 @@ class InMeetingViewModel @Inject constructor(
      * @param video local video
      * @return
      */
-    fun getMyOwnInfo(audio: Boolean, video: Boolean): Participant =
-        inMeetingRepository.getMyInfo(
+    fun getMyOwnInfo(audio: Boolean, video: Boolean): Participant {
+        val participant = inMeetingRepository.getMyInfo(
             getOwnPrivileges() == MegaChatRoom.PRIV_MODERATOR,
             audio,
             video
         )
+        participant.hasOptionsAllowed =
+            shouldParticipantsOptionBeVisible(participant.isMe, participant.isGuest)
+
+        return participant;
+    }
+
 
     /**
      * Determine if should hide or show the share link and invite button
@@ -2155,17 +2181,21 @@ class InMeetingViewModel @Inject constructor(
     /**
      * Method that controls whether a participant's options (3 dots) should be enabled or not
      *
-     * @param participant The participant to be checked
+     * @param participantIsMe If the participant is me
+     * @param participantIsGuest If the participant is a guest
      * @return True, if should be enabled. False, if not
      */
-    fun shouldParticipantsOptionBeVisible(participant: Participant): Boolean {
-        if ((!amIAModerator() && participant.isGuest) ||
-            (amIAGuest() && participant.isMe) ||
-            (!amIAModerator() && amIAGuest() && !participant.isMe)
+    private fun shouldParticipantsOptionBeVisible(
+        participantIsMe: Boolean,
+        participantIsGuest: Boolean
+    ): Boolean {
+        if ((!amIAModerator() && participantIsGuest) ||
+            (amIAGuest() && participantIsMe) ||
+            (!amIAModerator() && amIAGuest() && !participantIsMe)
         ) {
             return false;
         }
 
-        return true;
+        return true
     }
 }
