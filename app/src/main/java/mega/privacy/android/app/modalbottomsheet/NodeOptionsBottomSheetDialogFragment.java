@@ -410,6 +410,9 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
                     optionRestoreFromRubbish.setVisibility(View.GONE);
                 }
 
+                optionLabel.setVisibility(View.GONE);
+                optionFavourite.setVisibility(View.GONE);
+
                 nodeIconLayout.setVisibility(View.GONE);
 
                 //Hide

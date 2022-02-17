@@ -146,7 +146,7 @@ class ImageBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
             optionInfo.isVisible = isUserLoggedIn && !nodeItem.isExternalNode && nodeItem.hasReadAccess
 
             // Favorite
-            if (node != null) {
+            if (node != null && !nodeItem.isFromRubbishBin) {
                 val favoriteText = if (node.isFavourite) R.string.file_properties_unfavourite else R.string.file_properties_favourite
                 val favoriteDrawable = if (node.isFavourite) R.drawable.ic_remove_favourite else R.drawable.ic_add_favourite
                 optionFavorite.text = StringResourcesUtils.getString(favoriteText)
@@ -160,7 +160,7 @@ class ImageBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
             }
 
             // Label
-            if (node != null) {
+            if (node != null && !nodeItem.isFromRubbishBin) {
                 val labelColor = ResourcesCompat.getColor(resources, getNodeLabelColor(node.label), null)
                 val labelDrawable = getNodeLabelDrawable(node.label, resources)
                 optionLabelCurrent.setCompoundDrawablesRelativeWithIntrinsicBounds(
