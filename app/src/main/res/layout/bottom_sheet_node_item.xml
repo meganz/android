@@ -226,6 +226,27 @@
                 android:layout_marginStart="72dp"
                 android:background="@color/grey_012_white_012" />
 
+            <LinearLayout
+                android:id="@+id/dispute_option"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:visibility="gone"
+                tools:visibility="visible">
+
+                <TextView
+                    style="@style/BottomSheetOption"
+                    android:text="@string/dispute_takendown_file"
+                    app:drawableStartCompat="@drawable/ic_input_warning"/>
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:layout_marginStart="72dp"
+                    android:background="@color/grey_012_white_012" />
+
+            </LinearLayout>
+
             <TextView
                 android:id="@+id/open_with_option"
                 style="@style/BottomSheetOption"

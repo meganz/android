@@ -2,6 +2,7 @@ package mega.privacy.android.app.modalbottomsheet;
 
 import android.content.Intent;
 import android.graphics.drawable.Drawable;
+import android.net.Uri;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -26,6 +27,7 @@ import java.util.List;
 import mega.privacy.android.app.MegaOffline;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
+import mega.privacy.android.app.activities.WebViewActivity;
 import mega.privacy.android.app.interfaces.SnackbarShower;
 import mega.privacy.android.app.lollipop.DrawerItem;
 import mega.privacy.android.app.lollipop.FileContactListActivityLollipop;
@@ -288,6 +290,15 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
         }
 
         if (isTakenDown) {
+            contentView.findViewById(R.id.dispute_option).setVisibility(View.VISIBLE);
+            contentView.findViewById(R.id.dispute_option).setOnClickListener(v -> {
+                startActivity(new Intent(requireContext(), WebViewActivity.class)
+                        .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
+                        .setData(Uri.parse(DISPUTE_URL)));
+
+                dismiss();
+            });
+
             counterSave--;
             optionDownload.setVisibility(View.GONE);
             if (ViewUtils.isVisible(optionOffline)) {
