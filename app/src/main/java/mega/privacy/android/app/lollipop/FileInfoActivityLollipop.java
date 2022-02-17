@@ -676,7 +676,7 @@ public class FileInfoActivityLollipop extends PasscodeActivity implements OnClic
             }
             MegaNode parent = nC.getParent(node);
 
-            if (parent.getHandle() != megaApi.getRubbishNode().getHandle()) {
+            if (!node.isTakenDown() && parent.getHandle() != megaApi.getRubbishNode().getHandle()) {
                 offlineSwitch.setEnabled(true);
                 offlineSwitch.setOnCheckedChangeListener((view, isChecked) -> onClick(view));
                 availableOfflineView.setTextColor(ContextCompat.getColor(this, R.color.grey_087_white_087));
@@ -876,17 +876,19 @@ public class FileInfoActivityLollipop extends PasscodeActivity implements OnClic
             if (parent.getHandle() == megaApi.getRubbishNode().getHandle()) {
                 deleteMenuItem.setVisible(true);
             } else {
-                if (!node.isFolder()) {
+                if (!node.isTakenDown() && !node.isFolder()) {
                     sendToChatMenuItem.setVisible(true);
                     sendToChatMenuItem.setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
                 }
 
                 if (from == FROM_INCOMING_SHARES) {
-                    downloadMenuItem.setVisible(true);
-                    downloadMenuItem.setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
-                    leaveMenuItem.setVisible(firstIncomingLevel);
-                    leaveMenuItem.setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
-                    copyMenuItem.setVisible(true);
+                    if (!node.isTakenDown()) {
+                        downloadMenuItem.setVisible(true);
+                        downloadMenuItem.setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
+                        leaveMenuItem.setVisible(firstIncomingLevel);
+                        leaveMenuItem.setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
+                        copyMenuItem.setVisible(true);
+                    }
 
                     switch (megaApi.getAccess(node)) {
                         case MegaShare.ACCESS_OWNER:
@@ -900,26 +902,29 @@ public class FileInfoActivityLollipop extends PasscodeActivity implements OnClic
                             break;
                     }
                 } else {
-                    downloadMenuItem.setVisible(true);
+                    if (!node.isTakenDown()) {
+                        downloadMenuItem.setVisible(true);
 
-                    if (node.isFolder()) {
-                        shareMenuItem.setVisible(true);
-                        shareMenuItem.setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
-                    }
+                        if (node.isFolder()) {
+                            shareMenuItem.setVisible(true);
+                            shareMenuItem.setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
+                        }
 
-                    if (node.isExported()) {
-                        editLinkMenuItem.setVisible(true);
-                        removeLinkMenuItem.setVisible(true);
-                        removeLinkMenuItem.setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
-                    } else {
-                        getLinkMenuItem.setVisible(true);
-                        getLinkMenuItem.setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
+                        if (node.isExported()) {
+                            editLinkMenuItem.setVisible(true);
+                            removeLinkMenuItem.setVisible(true);
+                            removeLinkMenuItem.setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
+                        } else {
+                            getLinkMenuItem.setVisible(true);
+                            getLinkMenuItem.setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
+                        }
+
+                        copyMenuItem.setVisible(true);
                     }
 
                     rubbishMenuItem.setVisible(true);
                     renameMenuItem.setVisible(true);
                     moveMenuItem.setVisible(true);
-                    copyMenuItem.setVisible(true);
                 }
             }
         }
@@ -1113,7 +1118,7 @@ public class FileInfoActivityLollipop extends PasscodeActivity implements OnClic
 
 		boolean result=true;
 
-		if(node.isExported()){
+		if(!node.isTakenDown() && node.isExported()){
 			publicLink=true;
             dividerLinkLayout.setVisibility(View.VISIBLE);
 			publicLinkLayout.setVisibility(View.VISIBLE);
@@ -2110,7 +2115,7 @@ public class FileInfoActivityLollipop extends PasscodeActivity implements OnClic
 			return;
 		}
 
-		if(node.isExported()){
+		if(!node.isTakenDown() && node.isExported()){
             logDebug("Node HAS public link");
 			publicLink=true;
             dividerLinkLayout.setVisibility(View.VISIBLE);
