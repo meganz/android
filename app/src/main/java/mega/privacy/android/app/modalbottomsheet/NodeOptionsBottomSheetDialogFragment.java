@@ -119,11 +119,13 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
             }
         }
 
+        nC = new NodeController(requireActivity());
+
         if (megaApi.isInRubbish(node)) {
             mMode = MODE2;
+        } else if (nC.nodeComesFromIncoming(node)) {
+            mMode = MODE4;
         }
-
-        nC = new NodeController(requireActivity());
 
         return contentView;
     }
@@ -135,8 +137,6 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
 
         nodeInfo = contentView.findViewById(R.id.node_info_text);
         ImageView nodeVersionsIcon = contentView.findViewById(R.id.node_info_versions_icon);
-        RelativeLayout nodeIconLayout = contentView.findViewById(R.id.node_relative_layout_icon);
-        ImageView nodeIcon = contentView.findViewById(R.id.node_icon);
         ImageView permissionsIcon = contentView.findViewById(R.id.permissions_icon);
 
         LinearLayout optionEdit = contentView.findViewById(R.id.edit_file_option);
@@ -224,9 +224,6 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
         LinearLayout separatorDownload = contentView.findViewById(R.id.separator_download_options);
         LinearLayout separatorShares = contentView.findViewById(R.id.separator_share_options);
         LinearLayout separatorModify = contentView.findViewById(R.id.separator_modify_options);
-
-        nodeIconLayout.setVisibility(View.GONE);
-        permissionsIcon.setVisibility(View.GONE);
 
         if (!isScreenInPortrait(requireContext())) {
             logDebug("Landscape configuration");
@@ -383,6 +380,8 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
 
         switch (mMode) {
             case MODE1:
+            case MODE3:
+            case MODE5:
                 logDebug("show Cloud bottom sheet");
 
                 // Check if sub folder of "My Backup"
@@ -405,7 +404,6 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
                     optionRubbishBinBackup.setVisibility(View.VISIBLE);
                 }
 
-                //Hide
                 optionRemove.setVisibility(View.GONE);
                 optionLeaveShares.setVisibility(View.GONE);
                 counterOpen--;
@@ -428,9 +426,6 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
                 optionLabel.setVisibility(View.GONE);
                 optionFavourite.setVisibility(View.GONE);
 
-                nodeIconLayout.setVisibility(View.GONE);
-
-                //Hide
                 if (ViewUtils.isVisible(optionOpenWith)) {
                     counterOpen--;
                     optionOpenWith.setVisibility(View.GONE);
@@ -485,33 +480,12 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
                 }
                 break;
 
-            case MODE3:
-                //Hide
-                if (ViewUtils.isVisible(optionClearShares)) {
-                    counterShares--;
-                    optionClearShares.setVisibility(View.GONE);
-                }
-                optionRemove.setVisibility(View.GONE);
-                optionLeaveShares.setVisibility(View.GONE);
-                counterOpen--;
-                optionOpenFolder.setVisibility(View.GONE);
-                if (ViewUtils.isVisible(optionShareFolder)) {
-                    counterShares--;
-                    optionShareFolder.setVisibility(View.GONE);
-                }
-                counterModify--;
-                optionRestoreFromRubbish.setVisibility(View.GONE);
-
-                break;
-
             case MODE4:
                 int tabSelected = ((ManagerActivityLollipop) requireActivity()).getTabItemShares();
-                if (tabSelected == 0) {
+                if (tabSelected == 0 || nC.nodeComesFromIncoming(node)) {
                     logDebug("showOptionsPanelIncoming");
                     long incomingParentHandle = ((ManagerActivityLollipop) requireActivity()).getParentHandleIncoming();
                     boolean isParentNode = node.getHandle() == incomingParentHandle;
-
-                    nodeIconLayout.setVisibility(View.GONE);
 
                     optionRemove.setVisibility(View.GONE);
                     if (ViewUtils.isVisible(optionShareFolder)) {
@@ -524,7 +498,7 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
                         optionClearShares.setVisibility(View.GONE);
                     }
 
-                    int dBT = ((ManagerActivityLollipop) requireActivity()).getDeepBrowserTreeIncoming();
+                    int dBT = nC.getIncomingLevel(node);
                     logDebug("DeepTree value:" + dBT);
 
                     if (dBT > FIRST_NAVIGATION_LEVEL && !isParentNode) {
@@ -616,8 +590,6 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
 
                     counterModify--;
                     optionMove.setVisibility(View.GONE);
-
-                    //Hide
                     optionRemove.setVisibility(View.GONE);
                     optionLeaveShares.setVisibility(View.GONE);
                 } else if (tabSelected == 2) {
@@ -630,8 +602,6 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
 
                     counterModify--;
                     optionMove.setVisibility(View.GONE);
-
-                    //Hide
                     optionRemove.setVisibility(View.GONE);
                     optionLeaveShares.setVisibility(View.GONE);
                 }
@@ -643,126 +613,11 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
 
                 break;
 
-            case MODE5:
-                int dBT = nC.getIncomingLevel(node);
-                if (nC.nodeComesFromIncoming(node)) {
-                    logDebug("dBT: " + dBT);
-
-                    nodeIconLayout.setVisibility(View.VISIBLE);
-
-                    logDebug("Node: " + node.getName() + " " + accessLevel);
-
-                    optionRemove.setVisibility(View.GONE);
-                    if (ViewUtils.isVisible(optionShareFolder)) {
-                        counterShares--;
-                        optionShareFolder.setVisibility(View.GONE);
-                    }
-
-                    if (ViewUtils.isVisible(optionClearShares)) {
-                        counterShares--;
-                        optionClearShares.setVisibility(View.GONE);
-                    }
-
-                    counterModify--;
-                    optionRestoreFromRubbish.setVisibility(View.GONE);
-
-                    logDebug("DeepTree value:" + dBT);
-                    if (dBT > FIRST_NAVIGATION_LEVEL) {
-                        optionLeaveShares.setVisibility(View.GONE);
-                        nodeIconLayout.setVisibility(View.GONE);
-                    } else {
-                        //Show the owner of the shared folder
-                        showOwnerSharedFolder();
-                        optionLeaveShares.setVisibility(isTakenDown ? View.GONE : View.VISIBLE);
-
-                        switch (accessLevel) {
-                            case MegaShare.ACCESS_FULL:
-                                logDebug("LEVEL 0 - access FULL");
-                                nodeIcon.setImageResource(R.drawable.ic_shared_fullaccess);
-                                break;
-
-                            case MegaShare.ACCESS_READ:
-                                logDebug("LEVEL 0 - access read");
-                                nodeIcon.setImageResource(R.drawable.ic_shared_read);
-                                break;
-
-                            case MegaShare.ACCESS_READWRITE:
-                                logDebug("LEVEL 0 - readwrite");
-                                nodeIcon.setImageResource(R.drawable.ic_shared_read_write);
-                                break;
-                        }
-                    }
-
-                    if (ViewUtils.isVisible(optionLink)) {
-                        counterShares--;
-                        optionLink.setVisibility(View.GONE);
-                    }
-
-                    if (ViewUtils.isVisible(optionRemoveLink)) {
-                        counterShares--;
-                        optionRemoveLink.setVisibility(View.GONE);
-                    }
-
-                    switch (accessLevel) {
-                        case MegaShare.ACCESS_FULL:
-                            logDebug("access FULL");
-
-                            if (dBT <= FIRST_NAVIGATION_LEVEL) {
-                                optionRubbishBin.setVisibility(View.GONE);
-                                counterModify--;
-                                optionMove.setVisibility(View.GONE);
-                            }
-
-                            break;
-
-                        case MegaShare.ACCESS_READ:
-                            logDebug("access read");
-                            optionLabel.setVisibility(View.GONE);
-                            optionFavourite.setVisibility(View.GONE);
-                            counterModify--;
-                            optionRename.setVisibility(View.GONE);
-                            counterModify--;
-                            optionMove.setVisibility(View.GONE);
-                            optionRubbishBin.setVisibility(View.GONE);
-                            break;
-
-                        case MegaShare.ACCESS_READWRITE:
-                            logDebug("readwrite");
-                            optionLabel.setVisibility(View.GONE);
-                            optionFavourite.setVisibility(View.GONE);
-                            counterModify--;
-                            optionRename.setVisibility(View.GONE);
-                            counterModify--;
-                            optionMove.setVisibility(View.GONE);
-                            optionRubbishBin.setVisibility(View.GONE);
-                            break;
-                    }
-                } else {
-                    MegaNode parent = nC.getParent(node);
-                    if (parent.getHandle() != megaApi.getRubbishNode().getHandle()) {
-                        optionRemove.setVisibility(View.GONE);
-                    } else {
-                        optionRubbishBin.setVisibility(View.GONE);
-                    }
-
-                    //Hide
-                    counterModify--;
-                    optionMove.setVisibility(View.GONE);
-                    if (ViewUtils.isVisible(optionClearShares)) {
-                        counterShares--;
-                        optionClearShares.setVisibility(View.GONE);
-                    }
-                    optionLeaveShares.setVisibility(View.GONE);
-                    counterModify--;
-                    optionRestoreFromRubbish.setVisibility(View.GONE);
-                }
-                break;
             case MODE6:
                 if (ViewUtils.isVisible(optionShareFolder)) {
                     counterShares--;
                     optionShareFolder.setVisibility(View.GONE);
                 }
-                nodeIconLayout.setVisibility(View.GONE);
                 if (ViewUtils.isVisible(optionClearShares)) {
                     counterShares--;
                     optionClearShares.setVisibility(View.GONE);
@@ -790,15 +645,10 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
                             counterShares--;
                             optionLink.setVisibility(View.GONE);
                         }
-                        nodeIconLayout.setVisibility(View.GONE);
                         if (ViewUtils.isVisible(optionRemoveLink)) {
                             counterShares--;
                             optionRemoveLink.setVisibility(View.GONE);
                         }
-                        break;
-
-                    case MegaShare.ACCESS_FULL:
-                    case MegaShare.ACCESS_OWNER:
                         break;
                 }
                 break;
