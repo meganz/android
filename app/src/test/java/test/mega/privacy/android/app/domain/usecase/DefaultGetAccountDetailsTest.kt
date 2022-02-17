@@ -10,7 +10,7 @@ import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
-class GetAccountDetailsTest {
+class DefaultGetAccountDetailsTest {
 private lateinit var underTest: GetAccountDetails
     private val accountRepository = mock<AccountRepository>()
 

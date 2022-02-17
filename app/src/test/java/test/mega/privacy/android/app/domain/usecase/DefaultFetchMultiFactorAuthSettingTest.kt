@@ -13,7 +13,7 @@ import org.junit.Test
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
 
-class FetchMultiFactorAuthSettingTest {
+class DefaultFetchMultiFactorAuthSettingTest {
     private lateinit var underTest: FetchMultiFactorAuthSetting
     private val accountRepository = mock<AccountRepository>()
 

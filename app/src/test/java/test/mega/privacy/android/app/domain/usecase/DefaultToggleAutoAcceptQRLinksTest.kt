@@ -1,6 +1,5 @@
 package test.mega.privacy.android.app.domain.usecase
 
-import android.provider.Settings
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
@@ -13,7 +12,6 @@ import org.junit.Assert.assertThrows
 import org.junit.Before
 import org.junit.Test
 import org.mockito.kotlin.*
-import java.lang.Exception
 
 class DefaultToggleAutoAcceptQRLinksTest {
     private lateinit var underTest: ToggleAutoAcceptQRLinks
