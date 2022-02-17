@@ -119,6 +119,10 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
             }
         }
 
+        if (megaApi.isInRubbish(node)) {
+            mMode = MODE2;
+        }
+
         nC = new NodeController(requireActivity());
 
         return contentView;
@@ -640,72 +644,6 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
                 break;
 
             case MODE5:
-                if (megaApi.isInRubbish(node)) {
-                    restoreNode = megaApi.getNodeByHandle(node.getRestoreHandle());
-
-                    if (!megaApi.isInRubbish(node) || restoreNode == null || megaApi.isInRubbish(restoreNode)) {
-                        counterModify--;
-                        optionRestoreFromRubbish.setVisibility(View.GONE);
-                    }
-
-                    nodeIconLayout.setVisibility(View.GONE);
-
-                    //Hide
-                    if (ViewUtils.isVisible(optionOpenWith)) {
-                        counterOpen--;
-                        optionOpenWith.setVisibility(View.GONE);
-                    }
-                    counterModify--;
-                    optionMove.setVisibility(View.GONE);
-                    counterModify--;
-                    optionRename.setVisibility(View.GONE);
-                    if (ViewUtils.isVisible(optionCopy)) {
-                        counterModify--;
-                        optionCopy.setVisibility(View.GONE);
-                    }
-                    if (ViewUtils.isVisible(optionClearShares)) {
-                        counterShares--;
-                        optionClearShares.setVisibility(View.GONE);
-                    }
-                    optionLeaveShares.setVisibility(View.GONE);
-                    optionRubbishBin.setVisibility(View.GONE);
-                    if (ViewUtils.isVisible(optionShare)) {
-                        counterShares--;
-                        optionShare.setVisibility(View.GONE);
-                    }
-                    if (ViewUtils.isVisible(optionShareFolder)) {
-                        counterShares--;
-                        optionShareFolder.setVisibility(View.GONE);
-                    }
-                    if (ViewUtils.isVisible(optionLink)) {
-                        counterShares--;
-                        optionLink.setVisibility(View.GONE);
-                    }
-                    if (ViewUtils.isVisible(optionRemoveLink)) {
-                        counterShares--;
-                        optionRemoveLink.setVisibility(View.GONE);
-                    }
-                    counterOpen--;
-                    optionOpenFolder.setVisibility(View.GONE);
-                    if (ViewUtils.isVisible(optionDownload)) {
-                        counterSave--;
-                        optionDownload.setVisibility(View.GONE);
-                    }
-                    if (ViewUtils.isVisible(optionGallery)) {
-                        counterSave--;
-                        optionGallery.setVisibility(View.GONE);
-                    }
-                    if (ViewUtils.isVisible(optionOffline)) {
-                        counterSave--;
-                        optionOffline.setVisibility(View.GONE);
-                    }
-                    if (ViewUtils.isVisible(optionSendChat)) {
-                        counterShares--;
-                        optionSendChat.setVisibility(View.GONE);
-                    }
-                    break;
-                }
-
                 int dBT = nC.getIncomingLevel(node);
                 if (nC.nodeComesFromIncoming(node)) {
                     logDebug("dBT: " + dBT);
