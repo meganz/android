@@ -1726,8 +1726,6 @@
     <string name="attachment_upload_panel_from_cloud">クラウドドライブから</string>
     <!--  -->
     <string name="attachment_upload_panel_contact">連絡先</string>
-    <!--  -->
-    <string name="attachment_upload_panel_photo">端末から</string>
     <!-- Button and title of dialog shown when the user wants to delete permanently their account. -->
     <string name="delete_account">アカウントを削除</string>
     <!-- Text shown in the alert dialog to confirm the deletion of an account -->
@@ -2043,7 +2041,7 @@
     <!-- Text of dialog shown when a contact request has not been sent with QR code because of some error -->
     <string name="invite_not_sent_text_error">エラーが発生し、招待状が送信されておりません。</string>
     <!-- Text of alert dialog informing that the qr is generating -->
-    <string name="generatin_qr">QRコードの生成中...</string>
+    <string name="generatin_qr">QRコードの生成中&#8230;</string>
     <!-- Title of QR code scan menu item -->
     <string name="menu_item_scan_code">QRコードをスキャン</string>
     <!-- get the contact link and copy it -->
@@ -4083,4 +4081,62 @@
     <string name="settings_mobile_data_resoluton_title">モバイルデータを利用して高解像度の画像をプレビュー</string>
     <!-- summary for the settings to enable high resolution images when on mobile data -->
     <string name="settings_mobile_data_resoluton_summary">モバイルデータを利用して、プレビュー時に高解像度の画像を読み込みます。無効にすると、ズームインしたときに元の画像のみが読み込まれます。</string>
+    <!-- If users want to move the root backup folder, all backups underneath it are disabled. Warning dialog will show to confirm -->
+    <string name="backup_move_root_folder">デフォルトのバックアップフォルダの場所を変更しています。これにより、将来的にバックアップフォルダを見つけることが難しくなる場合があります。どこにあるのかを覚えておいて、今後も見つけられるようにしてください。</string>
+    <!-- If users want to move the sub backup folder, all backups underneath it are disabled. Warning dialog will show to confirm -->
+    <string name="backup_move_sub_folder">このフォルダを移動すると、1つまたは複数のバックアップ先が変更され、意図しない結果になる可能性があります。バックアップは安全のためにオフにされます。バックアップはMEGAデスクトップアプリで再度有効にすることができます。続行してもよろしいですか？</string>
+    <!-- If users want to delete the root backup folder, all backups underneath it are disabled. Warning dialog will show to confirm -->
+    <string name="backup_remove_root_folder">バックアップフォルダを削除します。これにより、設定したすべてのバックアップが削除されます。本当にこれを行ってもよろしいですか？</string>
+    <!-- If users want to delete the sub backup folder, all backups underneath it are disabled. Warning dialog will show to confirm -->
+    <string name="backup_remove_sub_folder">バックアップフォルダを削除して、関連するバックアップを無効にしてもよろしいですか？</string>
+    <!-- The title of warning dialog for single folder moving -->
+    <string name="backup_move_folder_title">「%1s」を移動</string>
+    <!-- The title of warning dialog for single folder deleting -->
+    <string name="backup_remove_folder_title">「%1s」をごみ箱に移動</string>
+    <!-- The title of warning dialog for multi-folder moving -->
+    <string name="backup_move_multiple_folder_title">バックアップフォルダを移動</string>
+    <!-- The title of warning dialog for single folder deleting -->
+    <string name="backup_remove_multiple_folder_title">バックアップフォルダをごみ箱に移動</string>
+    <!-- The confirm information of warning dialog for deleting -->
+    <string name="backup_disable_confirm">バックアップを無効にする</string>
+    <!-- The confirm information of warning dialog for moving "My backup" -->
+    <string name="backup_move_confirm">バックアップを移動</string>
+    <!-- The confirm information of warning dialog for deleting -->
+    <string name="backup_action_confirm">このアクションを確認するために「%1s」を入力してください</string>
+    <!-- when checking the input -->
+    <string name="error_backup_confirm_dont_match">入力されたテキストが一致しません</string>
+    <!-- The title of confirm dialog for adding item to "My backup" -->
+    <string name="backup_add_confirm_title">項目を「%1s」に追加</string>
+    <!-- The title of warning dialog for adding item to "My backup" -->
+    <string name="backup_add_item_title">バックアップを設定してください</string>
+    <!-- If users want to add items to the "My backup" folder, Warning dialog will show to confirm -->
+    <string name="backup_add_item_to_root_text">バックアップフォルダに追加された項目が自動的にMEGAクラウドに同期されるようにするには、MEGAデスクトップアプリで設定してください。</string>
+    <!-- If users want to share items in the "My backup" folder, Warning dialog will show to confirm -->
+    <string name="backup_share_permission_title">読み取り専用</string>
+    <!-- If users want to share items in the "My backup" folder, Warning dialog will show to confirm -->
+    <string name="backup_share_permission_text">このフォルダは読み取り専用としてのみ共有することができます。なぜなら、これはバックアップ用のフォルダであり、コンテンツを変更するとバックアップが無効になる可能性があるからです。</string>
+    <!-- If users want to add items to the "My backup" device folder, Warning dialog will show to confirm -->
+    <string name="backup_add_item_text">このフォルダ内の項目は、構成されたバックアップの一部であり、ローカルフォルダに同期されます。この操作を行うと同期が解除され、バックアップが無効になります。 バックアップはMEGAデスクトップアプリで再度有効にすることができます。続行してもよろしいですか？</string>
+    <!-- Share multi backup folders, show below warning message -->
+    <string name="backup_multi_share_permission_text">これらのフォルダは読み取り専用としてのみ共有することができます。なぜなら、これらはバックアップ用のフォルダであり、コンテンツを変更するとバックアップが無効になる可能性があるからです。</string>
+    <!-- Share multi folders mix with backup and non-backup folders, show below warning message -->
+    <string name="backup_share_with_root_permission_text">共有されているフォルダの中には、バックアップフォルダや読み取り専用のフォルダもあります。続行しますか？</string>
+    <!-- Indicates the content of the backup folder -->
+    <plurals name="num_devices">
+        <item quantity="other">%d端末</item>
+    </plurals>
+    <!-- Title of the button when you want to answer a one to one call -->
+    <string name="title_join_one_to_one_call">通話に応答</string>
+    <!-- Title of the menu when the select tracks on playlist page-->
+    <string name="title_select_tracks">トラックを選択</string>
+    <!-- Action button to upload files. -->
+    <string name="upload_files">ファイルをアップロード</string>
+    <!-- Action button to upload a folder. -->
+    <string name="upload_folder">フォルダをアップロード</string>
+    <!-- Title of the dialog warning the user about cancel uploads. -->
+    <string name="cancel_uploads">アップロードをキャンセル</string>
+    <!-- Warning alerting user if proceed with the action all the uploads will be cancelled. -->
+    <string name="cancel_uploads_warning">アップロード処理を中断すると、アップロードがすべてキャンセルされます。</string>
+    <!-- Button to proceed with action. -->
+    <string name="action_proceed">進む</string>
 </resources>
