@@ -2340,8 +2340,6 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
                 }
             }
         }
-
-        bottomFloatingPanelViewHolder.updateRemoteAudioVideo(session)
     }
 
     /**
