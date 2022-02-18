@@ -50,11 +50,11 @@ import nz.mega.sdk.MegaNode
 @AndroidEntryPoint
 class ImageBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
 
+    private enum class AlertDialogType { TYPE_REMOVE_LINK, TYPE_RUBBISH_BIN, TYPE_REMOVE_CHAT_NODE }
+
     companion object {
         private const val TAG = "ImageBottomSheetDialogFragment"
-        private const val STATE_REMOVE_LINK_DIALOG = "STATE_REMOVE_LINK_DIALOG"
-        private const val STATE_RUBBISH_BIN_DIALOG = "STATE_RUBBISH_BIN_DIALOG"
-        private const val STATE_REMOVE_CHAT_NODE_DIALOG = "STATE_REMOVE_CHAT_NODE_DIALOG"
+        private const val STATE_ALERT_DIALOG_TYPE = "STATE_ALERT_DIALOG_TYPE"
 
         /**
          * Main method to create a ImageBottomSheetDialogFragment.
@@ -72,9 +72,8 @@ class ImageBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
 
     private val viewModel by viewModels<ImageViewerViewModel>({ requireActivity() })
     private val nodeHandle: Long? by extra(INTENT_EXTRA_KEY_HANDLE)
-    private var removeLinkDialog: Dialog? = null
-    private var rubbishBinDialog: Dialog? = null
-    private var removeChatNodeDialog: Dialog? = null
+    private var alertDialog: Dialog? = null
+    private var alertDialogType: AlertDialogType? = null
 
     private lateinit var binding: BottomSheetImageOptionsBinding
     private lateinit var selectMoveFolderLauncher: ActivityResultLauncher<LongArray>
@@ -104,29 +103,23 @@ class ImageBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
         super.onViewCreated(view, savedInstanceState)
     }
 
-    override fun onDestroyView() {
-        removeLinkDialog?.dismiss()
-        rubbishBinDialog?.dismiss()
-        removeChatNodeDialog?.dismiss()
-        super.onDestroyView()
-    }
-
     override fun onViewStateRestored(savedInstanceState: Bundle?) {
         super.onViewStateRestored(savedInstanceState)
-        when {
-            savedInstanceState?.getBoolean(STATE_REMOVE_LINK_DIALOG, false) == true ->
-                showRemoveChatLinkDialog()
-            savedInstanceState?.getBoolean(STATE_RUBBISH_BIN_DIALOG, false) == true ->
-                showRubbishBinDialog()
-            savedInstanceState?.getBoolean(STATE_REMOVE_CHAT_NODE_DIALOG, false) == true ->
-                showRemoveChatNodeDialog()
+        if (savedInstanceState?.containsKey(STATE_ALERT_DIALOG_TYPE) == true) {
+            val dialogType = AlertDialogType.values()[savedInstanceState.getInt(STATE_ALERT_DIALOG_TYPE)]
+            binding.root.post { showAlertDialog(dialogType) }
         }
     }
 
+    override fun onDestroyView() {
+        alertDialog?.dismiss()
+        super.onDestroyView()
+    }
+
     override fun onSaveInstanceState(outState: Bundle) {
-        outState.putBoolean(STATE_REMOVE_LINK_DIALOG, removeLinkDialog?.isShowing == true)
-        outState.putBoolean(STATE_RUBBISH_BIN_DIALOG, rubbishBinDialog?.isShowing == true)
-        outState.putBoolean(STATE_REMOVE_CHAT_NODE_DIALOG, removeChatNodeDialog?.isShowing == true)
+        if (alertDialog?.isShowing == true && alertDialogType != null) {
+            outState.putInt(STATE_ALERT_DIALOG_TYPE, alertDialogType!!.ordinal)
+        }
         super.onSaveInstanceState(outState)
     }
 
@@ -273,7 +266,7 @@ class ImageBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
             optionManageLink.setOnClickListener {
                 LinksUtil.showGetLinkActivity(this@ImageBottomSheetDialogFragment, nodeItem.handle)
             }
-            optionRemoveLink.setOnClickListener { showRemoveChatLinkDialog() }
+            optionRemoveLink.setOnClickListener { showAlertDialog(AlertDialogType.TYPE_REMOVE_LINK) }
             optionManageLink.isVisible = isOnline && nodeItem.hasOwnerAccess && !nodeItem.isFromRubbishBin && !imageItem.isFromChat()
             optionRemoveLink.isVisible = optionManageLink.isVisible && node?.isExported == true
 
@@ -343,10 +336,10 @@ class ImageBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
             } else {
                 optionRubbishBin.setText(R.string.context_move_to_trash)
             }
-            optionRubbishBin.setOnClickListener { showRubbishBinDialog() }
+            optionRubbishBin.setOnClickListener { showAlertDialog(AlertDialogType.TYPE_RUBBISH_BIN) }
 
             // Chat Remove
-            optionChatRemove.setOnClickListener { showRemoveChatNodeDialog() }
+            optionChatRemove.setOnClickListener { showAlertDialog(AlertDialogType.TYPE_REMOVE_CHAT_NODE) }
             optionChatRemove.isVisible = imageItem.isChatDeletable && imageItem.isFromChat() && nodeItem.hasFullAccess
 
             // Separators
@@ -357,63 +350,6 @@ class ImageBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
             separatorRestore.isVisible = optionRestore.isVisible
             separatorCopy.isVisible = (optionRename.isVisible || optionCopy.isVisible || optionMove.isVisible)
                     && (optionRestore.isVisible || optionRubbishBin.isVisible || optionChatRemove.isVisible)
-        }
-    }
-
-    private fun showRemoveChatNodeDialog() {
-        val imageItem = viewModel.getImageItem(nodeHandle!!)
-        if (removeChatNodeDialog?.isShowing != true && imageItem != null) {
-            removeChatNodeDialog = MaterialAlertDialogBuilder(requireContext())
-                .setMessage(StringResourcesUtils.getString(R.string.confirmation_delete_one_message))
-                .setPositiveButton(StringResourcesUtils.getString(R.string.general_remove)) { _, _ ->
-                    viewModel.removeChatMessage(imageItem.chatRoomId!!, imageItem.chatMessageId!!)
-                    dismissAllowingStateLoss()
-                }
-                .setNegativeButton(
-                    StringResourcesUtils.getString(R.string.general_cancel),
-                    null
-                )
-                .show()
-        }
-    }
-
-    private fun showRubbishBinDialog() {
-        val nodeItem = viewModel.getImageItem(nodeHandle!!)?.nodeItem
-        if (rubbishBinDialog?.isShowing != true && nodeItem != null) {
-            val buttonText: Int
-            val messageText: Int
-            if (nodeItem.isFromRubbishBin) {
-                buttonText = R.string.general_remove
-                messageText = R.string.confirmation_delete_from_mega
-            } else {
-                buttonText = R.string.general_move
-                messageText = R.string.confirmation_move_to_rubbish
-            }
-            rubbishBinDialog = MaterialAlertDialogBuilder(requireContext())
-                .setMessage(StringResourcesUtils.getString(messageText))
-                .setPositiveButton(StringResourcesUtils.getString(buttonText)) { _, _ ->
-                    if (nodeItem.isFromRubbishBin) {
-                        viewModel.removeNode(nodeItem.handle)
-                    } else {
-                        viewModel.moveNodeToRubbishBin(nodeItem.handle)
-                    }
-                    dismissAllowingStateLoss()
-                }
-                .setNegativeButton(StringResourcesUtils.getString(R.string.general_cancel), null)
-                .show()
-        }
-    }
-
-    private fun showRemoveChatLinkDialog() {
-        val nodeItem = viewModel.getImageItem(nodeHandle!!)?.nodeItem
-        if (removeLinkDialog?.isShowing != true && nodeItem != null) {
-            removeLinkDialog = MaterialAlertDialogBuilder(requireContext())
-                .setMessage(getQuantityString(R.plurals.remove_links_warning_text, 1))
-                .setPositiveButton(StringResourcesUtils.getString(R.string.general_remove)) { _, _ ->
-                    viewModel.removeLink(nodeItem.handle)
-                }
-                .setNegativeButton(StringResourcesUtils.getString(R.string.general_cancel), null)
-                .show()
         }
     }
 
@@ -443,6 +379,68 @@ class ImageBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
                 if (copyHandle != null && copyHandle != INVALID_HANDLE && toHandle != INVALID_HANDLE) {
                     viewModel.copyNode(copyHandle, toHandle)
                 }
+            }
+        }
+    }
+
+    /**
+     * Show Alert Dialog based on specific action to the node
+     *
+     * @param type  Alert Dialog Type of action
+     */
+    private fun showAlertDialog(type: AlertDialogType) {
+        val imageItem = viewModel.getImageItem(nodeHandle!!) ?: return
+        alertDialog?.dismiss()
+        alertDialogType = type
+        when(type) {
+            AlertDialogType.TYPE_REMOVE_LINK -> {
+                alertDialog = MaterialAlertDialogBuilder(requireContext())
+                    .setMessage(getQuantityString(R.plurals.remove_links_warning_text, 1))
+                    .setPositiveButton(StringResourcesUtils.getString(R.string.general_remove)) { _, _ ->
+                        viewModel.removeLink(imageItem.handle)
+                        dismissAllowingStateLoss()
+                    }
+                    .setNegativeButton(StringResourcesUtils.getString(R.string.general_cancel), null)
+                    .show()
+            }
+            AlertDialogType.TYPE_RUBBISH_BIN -> {
+                val isFromRubbishBin = imageItem.nodeItem?.isFromRubbishBin ?: return
+                val buttonText: Int
+                val messageText: Int
+
+                if (isFromRubbishBin) {
+                    buttonText = R.string.general_remove
+                    messageText = R.string.confirmation_delete_from_mega
+                } else {
+                    buttonText = R.string.general_move
+                    messageText = R.string.confirmation_move_to_rubbish
+                }
+
+                alertDialog = MaterialAlertDialogBuilder(requireContext())
+                    .setMessage(StringResourcesUtils.getString(messageText))
+                    .setPositiveButton(StringResourcesUtils.getString(buttonText)) { _, _ ->
+                        if (isFromRubbishBin) {
+                            viewModel.removeNode(imageItem.handle)
+                        } else {
+                            viewModel.moveNodeToRubbishBin(imageItem.handle)
+                        }
+                        dismissAllowingStateLoss()
+                    }
+                    .setNegativeButton(StringResourcesUtils.getString(R.string.general_cancel), null)
+                    .show()
+            }
+            AlertDialogType.TYPE_REMOVE_CHAT_NODE -> {
+                alertDialog = MaterialAlertDialogBuilder(requireContext())
+                    .setMessage(StringResourcesUtils.getString(R.string.confirmation_delete_one_message))
+                    .setPositiveButton(StringResourcesUtils.getString(R.string.general_remove)) { _, _ ->
+                        viewModel.removeChatMessage(imageItem.chatRoomId!!, imageItem.chatMessageId!!)
+                        dismissAllowingStateLoss()
+                    }
+                    .setNegativeButton(
+                        StringResourcesUtils.getString(R.string.general_cancel),
+                        null
+                    )
+                    .show()
             }
         }
     }
