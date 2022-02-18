@@ -308,11 +308,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
             }
         }
 
-        val ownParticipant = inMeetingViewModel.getMyOwnInfo(
-            sharedModel.micLiveData.value ?: false,
-            sharedModel.cameraLiveData.value ?: false,
-        )
-        bottomFloatingPanelViewHolder.updateMeetingType(ownParticipant)
+        bottomFloatingPanelViewHolder.updatePanel(false)
     }
 
     private val callCompositionObserver = Observer<MegaChatCall> {
@@ -2229,6 +2225,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
             }
         }
 
+        bottomFloatingPanelViewHolder.updateCamIcon(isCamOn)
         updateParticipantsBottomPanel()
         checkSwapCameraMenuItemVisibility()
         controlVideoLocalOneToOneCall(isCamOn)
@@ -2402,12 +2399,6 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
             }
         }
     }
-
-    private fun getOwnParticipant(): Participant =
-        inMeetingViewModel.getMyOwnInfo(
-            sharedModel.micLiveData.value ?: false,
-            sharedModel.cameraLiveData.value ?: false,
-        )
 
     /**
      * Method that checks if several participants privileges has changed and updates the UI
@@ -2736,6 +2727,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
         micIsEnable = sharedModel.micLiveData.value!!
         bottomFloatingPanelViewHolder.updateCamIcon(camIsEnable)
         bottomFloatingPanelViewHolder.updateMicIcon(micIsEnable)
+        updateParticipantsBottomPanel()
     }
 
     /**
@@ -2789,17 +2781,6 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
     override fun onErrorJoinedChat(chatId: Long, userHandle: Long, error: Int) {
         logDebug("Error joining the meeting so close it, error code is $error")
         finishActivity()
-    }
-
-    private fun updatePanelParticipantList(list: MutableList<Participant> = mutableListOf()) {
-      /*  bottomFloatingPanelViewHolder
-            .setParticipants(
-                list,
-                inMeetingViewModel.getMyOwnInfo(
-                    sharedModel.micLiveData.value ?: false,
-                    sharedModel.cameraLiveData.value ?: false
-                )
-            )*/
     }
 
     /**

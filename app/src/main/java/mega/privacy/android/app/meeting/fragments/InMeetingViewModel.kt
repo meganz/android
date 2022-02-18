@@ -480,7 +480,10 @@ class InMeetingViewModel @Inject constructor(
                 return@map when {
                     participant.peerId == peerId && typeChange == NAME_CHANGE -> {
                         listWithChanges.add(participant)
-                        participant.copy(name = getParticipantFullName(peerId))
+                        participant.copy(
+                            name = getParticipantFullName(peerId),
+                            avatar = getAvatarBitmap(peerId)
+                        )
                     }
 
                     participant.peerId == peerId && typeChange == AVATAR_CHANGE -> {
@@ -1263,17 +1266,18 @@ class InMeetingViewModel @Inject constructor(
      * @return True, if there have been changes. False, otherwise
      */
     fun changesInRemoteVideoFlag(session: MegaChatSession): Boolean {
-        val iterator = participants.value?.iterator()
-        iterator?.let { participant ->
-            participant.forEach {
-                if (it.peerId == session.peerid && it.clientId == session.clientid && it.isVideoOn != session.hasVideo()) {
-                    it.isVideoOn = session.hasVideo()
-                    return true
+        var hasChanged = false
+        participants.value = participants.value?.map { participant ->
+            return@map when {
+                participant.peerId == session.peerid && participant.clientId == session.clientid && participant.isVideoOn != session.hasVideo() -> {
+                    hasChanged = true
+                    participant.copy(isVideoOn = session.hasVideo())
                 }
+                else -> participant
             }
-        }
+        }?.toMutableList()
 
-        return false
+        return hasChanged
     }
 
     /**
@@ -1283,17 +1287,18 @@ class InMeetingViewModel @Inject constructor(
      * @return True, if there have been changes. False, otherwise
      */
     fun changesInRemoteAudioFlag(session: MegaChatSession): Boolean {
-        val iterator = participants.value?.iterator()
-        iterator?.let { participant ->
-            participant.forEach {
-                if (it.peerId == session.peerid && it.clientId == session.clientid && it.isAudioOn != session.hasAudio()) {
-                    it.isAudioOn = session.hasAudio()
-                    return true
+        var hasChanged = false
+        participants.value = participants.value?.map { participant ->
+            return@map when {
+                participant.peerId == session.peerid && participant.clientId == session.clientid && participant.isAudioOn != session.hasAudio() -> {
+                    hasChanged = true
+                    participant.copy(isAudioOn = session.hasAudio())
                 }
+                else -> participant
             }
-        }
+        }?.toMutableList()
 
-        return false
+        return hasChanged
     }
 
     /**
@@ -1785,7 +1790,7 @@ class InMeetingViewModel @Inject constructor(
      *
      * @param audio local audio
      * @param video local video
-     * @return
+     * @return Me as a Participant
      */
     fun getMyOwnInfo(audio: Boolean, video: Boolean): Participant {
         val participant = inMeetingRepository.getMyInfo(
@@ -1796,7 +1801,7 @@ class InMeetingViewModel @Inject constructor(
         participant.hasOptionsAllowed =
             shouldParticipantsOptionBeVisible(participant.isMe, participant.isGuest)
 
-        return participant;
+        return participant
     }
 
 
@@ -1920,14 +1925,14 @@ class InMeetingViewModel @Inject constructor(
             return
 
         inMeetingRepository.getChatRoom(currentChatId)?.let {
-            participants.value?.let { listParticipants ->
-                val iterator = listParticipants.iterator()
-                iterator.forEach {
-                    if (it.peerId == handler) {
-                        it.isGuest = false
+            participants.value = participants.value?.map { participant ->
+                return@map when (participant.peerId) {
+                    handler -> {
+                        participant.copy(isGuest = false)
                     }
+                    else -> participant
                 }
-            }
+            }?.toMutableList()
         }
     }
 
@@ -2193,7 +2198,7 @@ class InMeetingViewModel @Inject constructor(
             (amIAGuest() && participantIsMe) ||
             (!amIAModerator() && amIAGuest() && !participantIsMe)
         ) {
-            return false;
+            return false
         }
 
         return true

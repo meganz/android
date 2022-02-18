@@ -183,7 +183,7 @@ class BottomFloatingPanelViewHolder(
      *
      * @param shouldExpand determine if should expand panel when update
      */
-    private fun updatePanel(shouldExpand: Boolean = true) {
+    fun updatePanel(shouldExpand: Boolean = true) {
         if (shouldExpand) {
             collapse()
         }
@@ -401,14 +401,6 @@ class BottomFloatingPanelViewHolder(
                 listener.onInviteParticipants()
             }
         }
-    }
-
-    /**
-     * When the meeting change, will update the panel
-     */
-    fun updateMeetingType(myOwnInfo: Participant) {
-        updatePanel(false)
-        updateShareAndInviteButton()
     }
 
     /**
