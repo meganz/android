@@ -11,7 +11,7 @@ import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
-class RefreshPasscodeLockPreferenceTest {
+class DefaultRefreshPasscodeLockPreferenceTest {
 
 private lateinit var underTest: RefreshPasscodeLockPreference
 

@@ -4,12 +4,8 @@ import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
-import mega.privacy.android.app.data.repository.DefaultAccountRepository
-import mega.privacy.android.app.data.repository.DefaultChatRepository
-import mega.privacy.android.app.data.repository.DefaultSettingsRepository
-import mega.privacy.android.app.domain.repository.AccountRepository
-import mega.privacy.android.app.domain.repository.ChatRepository
-import mega.privacy.android.app.domain.repository.SettingsRepository
+import mega.privacy.android.app.data.repository.*
+import mega.privacy.android.app.domain.repository.*
 
 @Module
 @InstallIn(SingletonComponent::class)
@@ -22,6 +18,12 @@ abstract class RepositoryModule {
     abstract fun bindAccountRepository(repository: DefaultAccountRepository): AccountRepository
 
     @Binds
+    abstract fun bindNetworkRepository(repository: DefaultNetworkRepository): NetworkRepository
+
+    @Binds
     abstract fun bindChatRepository(repository: DefaultChatRepository): ChatRepository
+
+    @Binds
+    abstract fun bindFilesRepository(implementation: MegaFilesRepository): FilesRepository
 
 }
