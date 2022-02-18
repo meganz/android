@@ -6,7 +6,6 @@ import androidx.core.view.isVisible
 import androidx.recyclerview.widget.RecyclerView
 import mega.privacy.android.app.R
 import mega.privacy.android.app.databinding.ItemParticipantChatListBinding
-import mega.privacy.android.app.utils.LogUtil.logDebug
 
 /**
  * When use DataBinding here, when user fling the RecyclerView, the bottom sheet will have

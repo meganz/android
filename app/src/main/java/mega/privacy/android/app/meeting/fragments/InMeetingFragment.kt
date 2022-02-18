@@ -2231,7 +2231,10 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
         controlVideoLocalOneToOneCall(isCamOn)
     }
 
-    fun updateParticipantsBottomPanel(){
+    /*
+     * Method for updating the list of participants in the bottom panel
+     */
+    fun updateParticipantsBottomPanel() {
         inMeetingViewModel.participants.value?.let { participants ->
             bottomFloatingPanelViewHolder
                 .updateParticipants(
@@ -2370,7 +2373,6 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
      */
     private fun updateParticipantInfo(peerId: Long, type: Int) {
         logDebug("Participant's name has changed")
-
         val listParticipants = inMeetingViewModel.updateParticipantsNameOrAvatar(peerId, type)
         if (listParticipants.isNotEmpty()) {
             gridViewCallFragment?.let {

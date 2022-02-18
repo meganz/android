@@ -993,8 +993,6 @@ class InMeetingViewModel @Inject constructor(
                 isGuest = true
             }
 
-            val hasOptionsAllowed = shouldParticipantsOptionBeVisible(false, isGuest)
-
             logDebug("Participant created")
             return Participant(
                 session.peerid,
@@ -1011,7 +1009,7 @@ class InMeetingViewModel @Inject constructor(
                 null,
                 false,
                 isGuest,
-                hasOptionsAllowed = hasOptionsAllowed
+                hasOptionsAllowed = shouldParticipantsOptionBeVisible(false, isGuest)
             )
         }
 

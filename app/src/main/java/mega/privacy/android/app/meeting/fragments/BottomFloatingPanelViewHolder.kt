@@ -64,7 +64,7 @@ class BottomFloatingPanelViewHolder(
     private var savedSpeakerState: AppRTCAudioManager.AudioDevice =
         AppRTCAudioManager.AudioDevice.NONE
 
-    private var participantsAdapter: ParticipantsAdapter = ParticipantsAdapter(listener)
+    private var participantsAdapter = ParticipantsAdapter(listener)
 
     private var currentHeight = 0
 
@@ -252,7 +252,7 @@ class BottomFloatingPanelViewHolder(
      * Init Participants and update the list, and update the text showing participants size
      *
      * @param participants newest participant list
-     *  @param myOwnParticipant  me as a participant
+     * @param myOwnParticipant me as a participant
      */
     fun setParticipantsPanel(
         participants: MutableList<Participant>,
@@ -268,7 +268,7 @@ class BottomFloatingPanelViewHolder(
      * Update participants list
      *
      * @param participants newest participant list
-     *  @param myOwnParticipant  me as a participant
+     * @param myOwnParticipant me as a participant
      */
     fun updateParticipants(participants: MutableList<Participant>, myOwnParticipant: Participant) {
         participants.add(myOwnParticipant)
