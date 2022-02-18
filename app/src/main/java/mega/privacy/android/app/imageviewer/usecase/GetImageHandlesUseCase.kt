@@ -8,9 +8,9 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import io.reactivex.rxjava3.core.Single
 import mega.privacy.android.app.di.MegaApi
 import mega.privacy.android.app.imageviewer.data.ImageItem
+import mega.privacy.android.app.usecase.GetNodeUseCase
 import mega.privacy.android.app.usecase.chat.DeleteChatMessageUseCase
 import mega.privacy.android.app.usecase.chat.GetChatMessageUseCase
-import mega.privacy.android.app.usecase.GetNodeUseCase
 import mega.privacy.android.app.usecase.data.MegaNodeItem
 import mega.privacy.android.app.utils.FileUtil
 import mega.privacy.android.app.utils.LogUtil.logWarning
@@ -205,7 +205,7 @@ class GetImageHandlesUseCase @Inject constructor(
 
         imageUris.forEach { imageUri ->
             val file = imageUri.toFile()
-            if (file.exists() && file.canRead()) {
+            if (FileUtil.isValidForImageViewer(file)) {
                 val fakeHandle = FileUtil.getFileFakeHandle(file)
                 val fileTime = TimeUtils.formatLongDateTime(file.lastModified())
                 val fileSize = file.length().toString()

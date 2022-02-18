@@ -1199,5 +1199,21 @@ public class FileUtil {
             return INVALID_HANDLE;
         }
     }
+
+    /**
+     * Check if a specific file is valid for Image Viewer
+     *
+     * @param file  File to be checked
+     * @return      True if it's valid, false otherwise
+     */
+    public static boolean isValidForImageViewer(File file) {
+        if (file.exists() && file.canRead()) {
+            MimeTypeList mimeTypeList = MimeTypeList.typeForName(file.getName());
+            return mimeTypeList.isImage() || mimeTypeList.isGIF()
+                    || mimeTypeList.isVideoReproducible() || mimeTypeList.isMp4Video();
+        } else {
+            return false;
+        }
+    }
 }
 

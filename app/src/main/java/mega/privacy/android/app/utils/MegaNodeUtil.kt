@@ -2106,5 +2106,5 @@ object MegaNodeUtil {
      */
     @JvmStatic
     fun MegaNode.isNodeFileValid(nodeFile: File?): Boolean =
-        nodeFile?.exists() == true && nodeFile.canRead() && nodeFile.length() != this.size
+        nodeFile?.exists() == true && nodeFile.canRead() && nodeFile.length() == this.size
 }
