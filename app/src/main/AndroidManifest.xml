@@ -129,7 +129,8 @@
             android:exported="true"
             android:launchMode="singleTask"
             android:screenOrientation="portrait" >
-            <intent-filter android:exported="true">
+
+            <intent-filter android:autoVerify="true">
                 <action android:name="android.intent.action.VIEW" ></action>
                 <category android:name="android.intent.category.DEFAULT" ></category>
                 <category android:name="android.intent.category.BROWSABLE" ></category>
@@ -143,7 +144,7 @@
                 <data android:host="www.mega.co.nz" android:scheme="https" > </data>
             </intent-filter>
 
-            <intent-filter>
+            <intent-filter android:autoVerify="true">
                 <action android:name="android.intent.action.VIEW" ></action>
                 <category android:name="android.intent.category.DEFAULT" ></category>
                 <category android:name="android.intent.category.BROWSABLE" ></category>
