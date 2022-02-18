@@ -21,6 +21,7 @@ public class AndroidMegaRichLinkMessage {
 
     private String url;
     private String server;
+    private String folderName;
     private String folderContent;
     private MegaNode node = null;
     private boolean isFile;
@@ -29,9 +30,19 @@ public class AndroidMegaRichLinkMessage {
     private String title;
     private long numParticipants;
 
+    public AndroidMegaRichLinkMessage (String url, String folderContent, String folderName){
+        this.url = url;
+
+        Uri uri = Uri.parse(url);
+        this.server = uri.getAuthority();
+        this.folderContent = folderContent;
+        this.folderName = folderName;
+    }
+
     public AndroidMegaRichLinkMessage (String url, MegaNode node){
         this.node = node;
         this.url = url;
+        this.isFile = true;
 
         Uri uri = Uri.parse(url);
         this.server = uri.getAuthority();
@@ -81,12 +92,12 @@ public class AndroidMegaRichLinkMessage {
         this.folderContent = folderContent;
     }
 
-    public boolean isFile() {
-        return isFile;
+    public String getFolderName() {
+        return folderName;
     }
 
-    public void setFile(boolean file) {
-        isFile = file;
+    public boolean isFile() {
+        return isFile;
     }
 
     public static String[] extractMegaLinks(String text) {
