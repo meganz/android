@@ -23,6 +23,10 @@ import static mega.privacy.android.app.constants.BroadcastConstants.TRANSFER_TYP
 import static mega.privacy.android.app.constants.BroadcastConstants.UPLOAD_TRANSFER;
 import static mega.privacy.android.app.lollipop.LoginFragmentLollipop.NAME_USER_LOCKED;
 import static mega.privacy.android.app.middlelayer.iab.BillingManager.RequestCode.REQ_CODE_BUY;
+import static mega.privacy.android.app.service.iab.BillingManagerImpl.SKU_PRO_III_YEAR;
+import static mega.privacy.android.app.service.iab.BillingManagerImpl.SKU_PRO_II_YEAR;
+import static mega.privacy.android.app.service.iab.BillingManagerImpl.SKU_PRO_I_YEAR;
+import static mega.privacy.android.app.service.iab.BillingManagerImpl.SKU_PRO_LITE_YEAR;
 import static mega.privacy.android.app.utils.AlertsAndWarnings.showResumeTransfersWarning;
 import static mega.privacy.android.app.utils.Constants.ACCOUNT_NOT_BLOCKED;
 import static mega.privacy.android.app.utils.Constants.ACTION_SHOW_UPGRADE_ACCOUNT;
@@ -61,6 +65,7 @@ import static mega.privacy.android.app.utils.TimeUtils.createAndShowCountDownTim
 import static mega.privacy.android.app.utils.TimeUtils.getHumanizedTime;
 import static mega.privacy.android.app.utils.Util.dp2px;
 import static mega.privacy.android.app.utils.Util.getRootViewFromContext;
+import static mega.privacy.android.app.utils.Util.isAndroid11OrUpper;
 import static mega.privacy.android.app.utils.Util.isTopActivity;
 import static mega.privacy.android.app.utils.Util.setAppFontSize;
 import static mega.privacy.android.app.utils.Util.showErrorAlertDialog;
@@ -944,6 +949,8 @@ public class BaseActivity extends AppCompatActivity implements ActivityLauncher,
                 break;
 
             case DISMISS_ACTION_SNACKBAR:
+                TextView snackbarTextView = snackbar.getView().findViewById(com.google.android.material.R.id.snackbar_text);
+                snackbarTextView.setMaxLines(5);
                 snackbar.setAction(R.string.general_ok, new SnackbarNavigateOption(view.getContext(), type));
                 snackbar.show();
                 break;
@@ -1481,7 +1488,7 @@ public class BaseActivity extends AppCompatActivity implements ActivityLauncher,
      * @param path Download path to set as default location.
      */
     public void showConfirmationSaveInSameLocation(String path){
-        if (isAlertDialogShown(setDownloadLocationDialog)) {
+        if (isAndroid11OrUpper() || isAlertDialogShown(setDownloadLocationDialog)) {
             return;
         }
 
@@ -1559,24 +1566,32 @@ public class BaseActivity extends AppCompatActivity implements ActivityLauncher,
                     int color = R.color.red_600_red_300;
                     int image;
                     int purchaseText;
+                    String activeSubscriptionSku = myAccountInfo.getActiveSubscription() != null
+                            ? myAccountInfo.getActiveSubscription().getSku() : "";
 
                     switch (myAccountInfo.getLevelInventory()) {
                         case PRO_I:
                             account = R.string.pro1_account;
                             image = R.drawable.ic_pro_i_big_crest;
-                            purchaseText = R.string.pro_i_monthly;
+                            purchaseText = SKU_PRO_I_YEAR.equals(activeSubscriptionSku)
+                                    ? R.string.pro_i_yearly
+                                    : R.string.pro_i_monthly;
                             break;
 
                         case PRO_II:
                             account = R.string.pro2_account;
                             image = R.drawable.ic_pro_ii_big_crest;
-                            purchaseText = R.string.pro_ii_monthly;
+                            purchaseText = SKU_PRO_II_YEAR.equals(activeSubscriptionSku)
+                                    ? R.string.pro_ii_yearly
+                                    : R.string.pro_ii_monthly;
                             break;
 
                         case PRO_III:
                             account = R.string.pro3_account;
                             image = R.drawable.ic_pro_iii_big_crest;
-                            purchaseText = R.string.pro_iii_monthly;
+                            purchaseText = SKU_PRO_III_YEAR.equals(activeSubscriptionSku)
+                                    ? R.string.pro_iii_yearly
+                                    : R.string.pro_iii_monthly;
                             break;
 
                         case PRO_LITE:
@@ -1584,7 +1599,9 @@ public class BaseActivity extends AppCompatActivity implements ActivityLauncher,
                             account = R.string.prolite_account;
                             color = R.color.orange_400_orange_300;
                             image = R.drawable.ic_lite_big_crest;
-                            purchaseText = R.string.pro_lite_monthly;
+                            purchaseText = SKU_PRO_LITE_YEAR.equals(activeSubscriptionSku)
+                                    ? R.string.pro_lite_yearly
+                                    : R.string.pro_lite_monthly;
                             break;
                     }
 

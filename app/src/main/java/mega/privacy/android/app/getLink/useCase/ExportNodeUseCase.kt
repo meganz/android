@@ -29,7 +29,7 @@ class ExportNodeUseCase @Inject constructor(
      * @param expireTime The time to set as expiry date.
      * @return Single<String> The link if the request finished with success, error if not.
      */
-    fun export(nodeHandle: Long, expireTime: Int? = null): Single<String> =
+    fun export(nodeHandle: Long, expireTime: Long? = null): Single<String> =
         getNodeUseCase.get(nodeHandle).flatMap { export(it, expireTime) }
 
     /**
@@ -54,13 +54,14 @@ class ExportNodeUseCase @Inject constructor(
      * @param expireTime The time to set as expiry date.
      * @return Single<String> The link if the request finished with success, error if not.
      */
-    fun export(node: MegaNode?, expireTime: Int? = null): Single<String> =
+    fun export(node: MegaNode?, expireTime: Long? = null): Single<String> =
         Single.create { emitter ->
-            if (node == null) {
-                emitter.onError(IllegalArgumentException("Null node"))
+            if (node == null || node.isTakenDown) {
+                emitter.onError(IllegalArgumentException("Not available node"))
                 return@create
             }
-            if (node.isExported && !node.isExpired && !node.isTakenDown) {
+
+            if (node.isExported && !node.isExpired && node.expirationTime == expireTime) {
                 emitter.onSuccess(node.publicLink)
                 return@create
             }
@@ -79,7 +80,7 @@ class ExportNodeUseCase @Inject constructor(
             )
 
             if (expireTime != null && expireTime > 0) {
-                megaApi.exportNode(node, expireTime, listener)
+                megaApi.exportNode(node, expireTime.toInt(), listener)
             } else {
                 megaApi.exportNode(node, listener)
             }
