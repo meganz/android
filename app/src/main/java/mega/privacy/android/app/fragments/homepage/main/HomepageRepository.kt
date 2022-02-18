@@ -16,6 +16,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.di.MegaApi
+import mega.privacy.android.app.globalmanagement.MyAccountInfo
 import mega.privacy.android.app.listeners.BaseListener
 import mega.privacy.android.app.utils.AvatarUtil
 import mega.privacy.android.app.utils.AvatarUtil.getCircleAvatar
@@ -30,8 +31,8 @@ import javax.inject.Singleton
 
 @Singleton
 class HomepageRepository @Inject constructor(
+    private val myAccountInfo: MyAccountInfo,
     @MegaApi private val megaApi: MegaApiAndroid,
-    private val megaChatApi: MegaChatApiAndroid,
     @ApplicationContext private val context: Context
 ) {
 
@@ -62,7 +63,7 @@ class HomepageRepository @Inject constructor(
 
     suspend fun getDefaultAvatar(): Bitmap = withContext(Dispatchers.IO) {
         AvatarUtil.getDefaultAvatar(
-            getColorAvatar(megaApi.myUser), megaChatApi.myFullname, Constants.AVATAR_SIZE, true
+            getColorAvatar(megaApi.myUser), myAccountInfo.fullName, Constants.AVATAR_SIZE, true
         )
     }
 

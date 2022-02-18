@@ -329,13 +329,6 @@ public class UploadService extends Service implements MegaTransferListenerInterf
                     + APP_DATA_INDICATOR + fromHome;
 
             megaApi.startUploadWithTopPriority(file.getAbsolutePath(), parentNode, appData, true, nameInMEGA);
-        } else if (file.isDirectory()) {
-            // Folder upload
-            if (nameInMEGA != null) {
-                megaApi.startUpload(file.getAbsolutePath(), parentNode, nameInMEGA);
-            } else {
-                megaApi.startUpload(file.getAbsolutePath(), parentNode);
-            }
         } else if (nameInMEGAEdited != null) {
             // File upload with edited name
             megaApi.startUpload(file.getAbsolutePath(), parentNode, nameInMEGAEdited);
@@ -345,12 +338,10 @@ public class UploadService extends Service implements MegaTransferListenerInterf
             } else {
                 megaApi.startUpload(file.getAbsolutePath(), parentNode);
             }
+        } else if (nameInMEGA != null) {
+            megaApi.startUpload(file.getAbsolutePath(), parentNode, nameInMEGA, lastModified / 1000);
         } else {
-            if (nameInMEGA != null) {
-                megaApi.startUpload(file.getAbsolutePath(), parentNode, nameInMEGA, lastModified / 1000);
-            } else {
-                megaApi.startUpload(file.getAbsolutePath(), parentNode, lastModified / 1000);
-            }
+            megaApi.startUpload(file.getAbsolutePath(), parentNode, lastModified / 1000);
         }
     }
 
@@ -388,7 +379,7 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 
         if (megaApi.getNumPendingUploads() <= 0) {
 			logDebug("Reset total uploads");
-            megaApi.resetTotalUploads();
+            megaApi.resetCompletedUploads();
         }
 
         resetUploadNumbers();

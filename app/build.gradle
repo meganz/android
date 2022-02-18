@@ -54,17 +54,28 @@ android {
         resValue ("string", "sdk_version", "\"${getSdkGitHash()}\"")
         resValue ("string", "karere_version", "\"${getKarereGitHash()}\"")
 
-        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        testInstrumentationRunner "test.mega.privacy.android.app.HiltTestRunner"
     }
 
-    sourceSets.main {
-        java {
-            srcDirs += 'src/main/jni/mega/sdk/bindings/java'
-            srcDirs += 'src/main/jni/megachat/sdk/bindings/java'
-            exclude '**/MegaApiSwing.java'
+    sourceSets {
+         main {
+            java {
+                srcDirs += 'src/main/jni/mega/sdk/bindings/java'
+                srcDirs += 'src/main/jni/megachat/sdk/bindings/java'
+                exclude '**/MegaApiSwing.java'
+            }
+            jni.srcDirs = [] //disable automatic ndk-build
+            jniLibs.srcDir 'src/main/libs'
+            // This is not necessary unless you have precompiled libraries in your project.
         }
-        jni.srcDirs = [] //disable automatic ndk-build
-        jniLibs.srcDir 'src/main/libs' // This is not necessary unless you have precompiled libraries in your project.
+
+        test {
+//            Add this once Robolectric tests work
+//            java.srcDir 'src/sharedTest/java'
+        }
+        androidTest {
+            java.srcDir 'src/sharedTest/java'
+        }
     }
 
     buildTypes {
@@ -138,6 +149,12 @@ android {
             }
         }
     }
+
+    configurations.all {
+        resolutionStrategy {
+            force 'androidx.test:monitor:1.4.0'
+        }
+    }
 }
 
 dependencies {
@@ -170,12 +187,16 @@ dependencies {
     implementation "androidx.navigation:navigation-fragment-ktx:$navigationVersion"
     implementation "androidx.navigation:navigation-ui-ktx:$navigationVersion"
 
+
+    implementation "androidx.preference:preference-ktx:$preferenceVersion"
+
     // Kotlin
     implementation "androidx.core:core-ktx:$ktxVersion"
     implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlinVersion"
 
     // Hilt
     implementation "com.google.dagger:hilt-android:$hiltVersion"
+    implementation 'androidx.preference:preference:1.1.1'
     kapt "com.google.dagger:hilt-android-compiler:$hiltVersion"
     implementation "androidx.hilt:hilt-lifecycle-viewmodel:$hiltAndroidXVersion"
     kapt "androidx.hilt:hilt-compiler:$hiltAndroidXCompilerVersion"
@@ -191,7 +212,6 @@ dependencies {
     implementation 'com.budiyev.android:code-scanner:1.8.3'
     implementation 'me.leolin:ShortcutBadger:1.1.22@aar'
     implementation 'com.brandongogetap:stickyheaders:0.6.1'
-    implementation 'com.github.ittianyu:BottomNavigationViewEx:2.0.4'
     implementation 'androidx.multidex:multidex:2.0.1'
     implementation 'androidx.emoji:emoji-appcompat:1.1.0'
     implementation 'androidx.preference:preference-ktx:1.1.1'
@@ -229,6 +249,7 @@ dependencies {
     implementation "com.jeremyliao:live-event-bus-x:$liveEventBus"
 
     implementation "androidx.biometric:biometric:$biometricVersion"
+    implementation "com.anggrayudi:storage:$simpleStorageVersion"
 
     //GMS
     gmsImplementation 'com.android.billingclient:billing:3.0.2'
@@ -265,10 +286,31 @@ dependencies {
     testImplementation "androidx.test.ext:junit-ktx:$androidxTestExtVersion"
     testImplementation "org.mockito:mockito-core:$mockitoVersion"
     testImplementation "org.mockito.kotlin:mockito-kotlin:$mockitoKotlinVersion"
+    testImplementation "org.jetbrains.kotlinx:kotlinx-coroutines-test:$coroutineTestVersion"
+    testImplementation "org.jetbrains.kotlin:kotlin-test:$kotlinVersion"
+    testImplementation "app.cash.turbine:turbine:$turbineVersion"
+    testImplementation "androidx.test.espresso:espresso-core:$espressoVersion"
+    testImplementation "androidx.test.espresso:espresso-intents:$espressoVersion"
+    testImplementation "com.google.dagger:hilt-android-testing:$hiltVersion"
+    testImplementation "org.jetbrains.kotlinx:kotlinx-coroutines-test:$coroutineTestVersion"
+    testImplementation "org.jetbrains.kotlin:kotlin-test:$kotlinVersion"
+    testImplementation "app.cash.turbine:turbine:$turbineVersion"
 
     androidTestImplementation "androidx.test.ext:junit:$androidxTestExtVersion"
     androidTestImplementation "com.google.truth:truth:$truthVersion"
     androidTestImplementation "androidx.test.espresso:espresso-core:$espressoVersion"
+    androidTestImplementation "com.google.dagger:hilt-android-testing:$hiltVersion"
+    androidTestImplementation "org.mockito:mockito-core:$mockitoVersion"
+    androidTestImplementation "org.mockito.kotlin:mockito-kotlin:$mockitoKotlinVersion"
+    androidTestImplementation "org.mockito:mockito-android:$mockitoVersion"
+    androidTestImplementation ("androidx.test.espresso:espresso-contrib:$espressoVersion") {
+        exclude group: 'org.checkerframework', module: 'checker'
+        exclude module: "protobuf-lite"
+    }
+    androidTestImplementation "androidx.test.espresso:espresso-intents:$espressoVersion"
+
+    kaptAndroidTest "com.google.dagger:hilt-android-compiler:$hiltVersion"
+    debugImplementation "androidx.fragment:fragment-testing:$fragmentTestingVersion"
 }
 
 def taskRequests = gradle.getStartParameter().getTaskRequests().toString()

@@ -727,9 +727,9 @@
     <!-- Setting to allow the user to select the preferred passcode type -->
     <string name="settings_passcode_option">Toegangscode-opties</string>
     <!-- Helper text to explain why we have this `Require me to plug in` setting, placeholder - 100 to 1000 in MB -->
-    <string name="settings_camera_upload_charging_helper_label">Videocompressie gebruikt aanzienlijke hoeveelheden stroom. Sluit uw apparaat aan om op te laden als de te comprimeren video’s groter zijn dan %s.</string>
+    <string name="settings_camera_upload_charging_helper_label">Videocompressie gebruikt aanzienlijke hoeveelheden stroom. Sluit uw apparaat aan om op te laden als de te comprimeren video\’s groter zijn dan %s.</string>
     <!-- Helper text to explain the things to note if enable the feature of including GPS info -->
-    <string name="settings_camera_upload_include_gps_helper_label">Indien ingeschakeld, wordt locatie-informatie bij uw foto’s gevoegd. Wees voorzichtig bij het delen ervan.</string>
+    <string name="settings_camera_upload_include_gps_helper_label">Indien ingeschakeld, wordt locatie-informatie bij uw foto\’s gevoegd. Wees voorzichtig bij het delen ervan.</string>
     <!-- Settings category title for cache and offline files -->
     <string name="settings_advanced_features">Geavanceerd</string>
     <!-- Settings preference title for cache -->
@@ -1609,10 +1609,6 @@
     <string name="upload_service_notification">Bestanden uploaden: %1$d van %2$d</string>
     <!-- Text of the notification shown when the upload service is paused: e.g. Uploading files: 1 of 10 (paused)-->
     <string name="upload_service_notification_paused">Bestanden uploaden:%1$d van %2$d (gepauzeerd)</string>
-    <!-- Text of the notification shown when the folder upload service is running, e.g. Uploading folders 1 of 2 -->
-    <string name="folder_upload_service_notification">Mappen uploaden: %1$d van %2$d</string>
-    <!-- Text of the notification shown when the folder upload service is paused, e.g. Uploading folders 1 of 2 (paused) -->
-    <string name="folder_upload_service_notification_paused">Mappen uploaden: %1$d van %2$d (gepauzeerd)</string>
     <!-- Text of the notification shown when the upload service has finished, Plural -->
     <plurals name="upload_service_final_notification">
         <item quantity="one">%1$d bestand geüpload</item>
@@ -1622,11 +1618,6 @@
     <plurals name="upload_service_notification_already_uploaded">
         <item quantity="one">1 bestand al geüpload</item>
         <item quantity="other">%1$d bestanden al geüpload</item>
-    </plurals>
-    <!-- Text of the notification shown when the folder upload service has finished, Text of the notification shown when the folder upload service has finished - plural  e.g. Uploaded 2 folders -->
-    <plurals name="folder_upload_service_final_notification">
-        <item quantity="one">%1$d map geüpload</item>
-        <item quantity="other">%1$d mappen geüpload</item>
     </plurals>
     <!-- label for the total file size of multiple files and/or folders (no need to put the colon punctuation in the translation) -->
     <string name="general_total_size">Totale grootte: %1$s</string>
@@ -1731,7 +1722,7 @@
     <!-- error message -->
     <string name="context_link_action_error">Link actie mislukt. Probeer later nogmaals.</string>
     <!-- title of the dialog shown when sending or sharing a folder -->
-    <string name="title_write_user_email">Schrijf de gebruiker’s e-mail</string>
+    <string name="title_write_user_email">Schrijf de gebruiker\’s e-mail</string>
     <!-- title of the screen to see the details of several node attachments -->
     <string name="activity_title_files_attached">Bestanden bijgevoegd</string>
     <!-- title of the screen to see the details of several contact attachments -->
@@ -1770,8 +1761,6 @@
     <string name="attachment_upload_panel_from_cloud">Van Cloud Schijf</string>
     <!--  -->
     <string name="attachment_upload_panel_contact">Contact</string>
-    <!--  -->
-    <string name="attachment_upload_panel_photo">Van apparaat</string>
     <!-- Button and title of dialog shown when the user wants to delete permanently their account. -->
     <string name="delete_account">Account verwijderen</string>
     <!-- Text shown in the alert dialog to confirm the deletion of an account -->
@@ -2423,11 +2412,11 @@
     <!-- Hint shown in the field to write a message in the chat screen (chat with default title) -->
     <string name="type_message_hint_with_default_title">Schrijf bericht naar %s&#8230;</string>
     <!-- Title of setting Two-Factor Authentication -->
-    <string name="settings_2fa">Twee-Stap’s Authenticatie</string>
+    <string name="settings_2fa">Twee-Stap\’s Authenticatie</string>
     <!-- Subtitle of setting Two-Factor Authentication when the preference is disabled -->
-    <string name="setting_subtitle_2fa">Twee-Stap’s Authenticatie is een tweede laag aan beveiliging voor uw account</string>
+    <string name="setting_subtitle_2fa">Twee-Stap\’s Authenticatie is een tweede laag aan beveiliging voor uw account</string>
     <!-- Title of the screen Two-Factor Authentication -->
-    <string name="title_2fa">Waarom heeft u twee-stap’s authenticatie nodig?</string>
+    <string name="title_2fa">Waarom heeft u twee-stap\’s authenticatie nodig?</string>
     <!--  -->
     <string name="two_factor_authentication_explain">Twee-stap authenticatie is een tweede laag aan beveiliging voor uw account. Wat betekent dat zelfs als iemand uw wachtwoord weet ze geen toegang kunnen krijgen, zonder ook toegang te hebben tot de 6 cijferige code waar alleen u toegang tot heeft.</string>
     <!-- Button that permits user begin with the process of enable Two-Factor Authentication -->
@@ -2447,7 +2436,7 @@
     <!-- Text of the alert dialog to inform the user when an error occurs when try to enable seed or QR of Two-Factor Authentication -->
     <string name="qr_seed_text_error">Een fout heeft opgetreden bij het genereren van de seed of QR code, probeer nogmaals.</string>
     <!-- Title of the screen shown when the user enabled correctly Two-Factor Authentication -->
-    <string name="title_2fa_enabled">Twee-Stap’s Authenticatie Ingeschakeld</string>
+    <string name="title_2fa_enabled">Twee-Stap\’s Authenticatie Ingeschakeld</string>
     <!-- Description of the screen shown when the user enabled correctly Two-Factor Authentication -->
     <string name="description_2fa_enabled">De volgende keer dat u inlogt in uw account wordt u gevraagd een 6-cijferige code in te voeren die gegeven is door uw Authenticatie Applicatie.</string>
     <!-- Recommendation displayed after enable Two-Factor Authentication -->
@@ -2479,7 +2468,7 @@
     <!-- Text of the button which action is to show the authentication apps -->
     <string name="open_app_button">Openen in</string>
     <!-- message when trying to open a link that contains the seed to enable Two-Factor Authentication but there isn’t any app that open it -->
-    <string name="intent_not_available_2fa">Er is geen enkele beschikbare applicatie om Twee-Stap’s Authenticatie op uw apparaat in te schakelen.</string>
+    <string name="intent_not_available_2fa">Er is geen enkele beschikbare applicatie om Twee-Stap\’s Authenticatie op uw apparaat in te schakelen.</string>
     <!-- Text button -->
     <string name="general_close">Sluiten</string>
     <!-- Label shown when Two-Factor Authentication has been enabled to alert user that has to back up his Recovery Key before finish the process -->
@@ -2592,7 +2581,10 @@
     <!-- Settings preference title to show file versions info of the account -->
     <string name="settings_file_management_file_versions_title">Bestandsversies</string>
     <!-- Settings preference subtitle to show file versions info of the account -->
-    <string name="settings_file_management_file_versions_subtitle">%1$d bestandsversies, hebben een totaal van %2$s</string>
+    <plurals name="settings_file_management_file_versions_subtitle">
+        <item quantity="one">1 bestandversie, gebruikt een totaal van %2$s</item>
+        <item quantity="other">%1$d bestandsversies, gebruiken een totaal van %2$s</item>
+    </plurals>
     <!-- Title of the section File management on Settings section -->
     <string name="settings_file_management_category">Bestandsbeheer</string>
     <!-- Option in Settings to delete all the versions of the account -->
@@ -3182,8 +3174,8 @@
     <string name="not_allow_play_alert">Het is niet mogelijk om media bestanden af te spelen terwijl een oproep wordt uitgevoerd.</string>
     <!-- Text shown in the list of chats when there is a call in progress but I am not on it -->
     <string name="ongoing_call_messages">Lopend Gesprek</string>
-    <!-- Title of the layout to join a group call from the chat screen. The placeholder indicates the user who initiated the call -->
-    <string name="join_call_layout_in_group_call">%s begon een groep oproep. Tik om aan te sluiten.</string>
+    <!-- Title of the layout to join a group call from the chat screen. -->
+    <string name="join_call_layout_in_group_call">Tik om aan te sluiten tot de huidige groep oproep.</string>
     <!-- Title of the layout to return to a call -->
     <string name="call_in_progress_layout">Tik om terug te bellen</string>
     <!-- message displayed when you try to start a call but it is not possible because you are already on a call -->
@@ -3562,8 +3554,8 @@
     <string name="section_documents">Documenten</string>
     <!-- Label of the floating action button of opening the new chat conversation -->
     <string name="fab_label_new_chat">Nieuw gesprek</string>
-    <!-- Text that indicates that there’s no photo to show -->
-    <string name="homepage_empty_hint_photos">Geen foto’s gevonden</string>
+    <!-- Text that indicates that there’s no image to show in image section -->
+    <string name="homepage_empty_hint_photos">[B]Geen[/B] [A]Afbeeldingen[/A] [B]Gevonden[/B]</string>
     <!-- Text that indicates that there’s no document to show -->
     <string name="homepage_empty_hint_documents">Geen documenten gevonden</string>
     <!-- Text that indicates that there’s no audio to show -->
@@ -3824,9 +3816,9 @@
     <!-- Settings hint that indicates the audio will still be played in background if the app is backgrounded -->
     <string name="settings_background_play_hint">Afspelen op de achtergrond</string>
     <!-- Text of the empty screen when there are no elements in Photos -->
-    <string name="photos_empty">[B]Geen[/B] [A]Foto’s[/A]</string>
+    <string name="photos_empty">[B]Geen[/B] [A]Foto\’s[/A] [B]Gevonden[/B]</string>
     <!-- Text to show as subtitle of Enable camera uploads screen -->
-    <string name="enable_cu_subtitle">Automatisch een backup van uw foto’s en video’s maken naar uw Cloud Schijf.</string>
+    <string name="enable_cu_subtitle">Automatisch een backup van uw foto\’s en video\’s maken naar uw Cloud Schijf.</string>
     <!-- Text of a button on Camera Uploads section to show all the content of the section-->
     <string name="all_view_button">Alle</string>
     <!-- Text of a button on Camera Uploads section to show the content of the section organized by days-->
@@ -3858,8 +3850,6 @@
     <string name="error_share_owner_storage_quota">Gedeelde gebruiker is over opslag tegoed.</string>
     <!-- A message shown when uploading, copying or moving something to an incoming share and the owner’s account is over its storage quota. -->
     <string name="warning_share_owner_storage_quota">Het bestand kan niet worden verstuurd omdat de doelgebruiker zijn opslagtegoed heeft overschreden.</string>
-    <!-- Content to show in a Snackbar to tip the incompatibility-->
-    <string name="version_incompatibility">We upgraden MEGAchat. Uw gesprekken zijn mogelijk niet verbonden vanwege incompatibiliteit met versies, tenzij alle partijen hun MEGA-applicaties updaten naar de nieuwste versie.</string>
     <!-- Message displayed when multiple download starts and 1 file has already been downloaded before and 1 file is being downloaded -->
     <string name="file_already_downloaded_and_file_pending_download">1 bestand al gedownload. 1 bestand wachtend.</string>
     <!-- Message displayed when multiple download starts and 1 file has already been downloaded before and multiple files are being downloaded. Placeholder: number of files -->
@@ -3979,7 +3969,7 @@
     <!-- Button that join a meeting as guest -->
     <string name="btn_join_meeting_as_guest">Aansluiten als gast</string>
     <!-- Hint shown to guide user on meeting name -->
-    <string name="type_meeting_name">%s’s vergadering</string>
+    <string name="type_meeting_name">%s\’s vergadering</string>
     <!-- General label for reject the call. -->
     <string name="general_reject">Ophangen</string>
     <!-- General label for microphone -->
@@ -4070,8 +4060,8 @@
     <string name="be_new_moderator">U bent de nieuwe gespreksleider.</string>
     <!-- the content of snack bar when copied meeting link-->
     <string name="copied_meeting_link">Gekopieerde vergaderingslink.</string>
-    <!-- Title of the layout to join a meeting from the chat screen. The placeholder indicates the user who initiated the meeting -->
-    <string name="join_meeting_layout_in_group_call">%s is een vergadering begonnen. Tik om mee te doen.</string>
+    <!-- Title of the layout to join a meeting from the chat screen. -->
+    <string name="join_meeting_layout_in_group_call">Tik om aan te sluiten tot de huidige vergadering.</string>
     <!-- Title of fifth tour screen -->
     <string name="title_tour_five">MEGA Vergadering</string>
     <!-- Content of fourth tour screen -->
@@ -4146,4 +4136,97 @@
     <string name="disable_versioning_warning">Onze functie voor bestandsversies zorgt ervoor dat we oudere kopieën van uw bestanden bewaren als u ze vervangt door nieuwere versies. Als u Bestandsversiebeheer uitschakelt, heeft u deze bescherming niet meer; de oude kopie gaat verloren wanneer u deze vervangt.</string>
     <!-- Warning informing the user the folder location is trying to open no longer exists. -->
     <string name="location_not_exist">Deze locatie bestaat niet langer.</string>
+    <!-- Warning shown informing the contact has been previously invited. The placeholder is to show the name of the contact. -->
+    <string name="contact_already_invited">U heeft %1$s al uitgenodigd</string>
+    <!-- Warning shown informing the contact request has been sent and can be managed in sent requests section. -->
+    <string name="contact_invited">Uitnodiging succesvol verzonden. Zie verzonden verzoeken.</string>
+    <!-- Message when file available offline. -->
+    <string name="file_available_offline">Bestand Offline beschikbaar</string>
+    <!-- Message when file removed from offline. -->
+    <string name="file_removed_offline">Bestand verwijderd van Offline</string>
+    <!-- Menu option to open a link. Also title of the dialog to open a link. -->
+    <string name="action_open_link">Link openen</string>
+    <!-- error message shown when a chat link is not well formed. -->
+    <string name="invalid_chat_link_args">Ongeldige Gesprekslink</string>
+    <!-- Menu option to open a chat link. -->
+    <string name="action_open_chat_link">Gesprekskoppeling Openen</string>
+    <!-- Hint shown in the open chat link alert dialog. -->
+    <string name="hint_enter_chat_link">Gesprekslink invoeren</string>
+    <!-- Hint shown in the open link alert dialog. -->
+    <string name="hint_paste_link">Link plakken</string>
+    <!-- Error shown when it tries to open an invalid file or folder link .-->
+    <string name="invalid_file_folder_link">Ongeldig bestand of map link</string>
+    <!-- Error shown when it tries to open an invalid file or folder link and the text view is empty. -->
+    <string name="invalid_file_folder_link_empty">Voer een geldige bestand of map link in</string>
+    <!-- Error shown when it tries to open an invalid chat link and the text view is empty. -->
+    <string name="invalid_chat_link_empty">Voer een geldige gesprekslink in</string>
+    <!-- Error shown when it tries to open a chat link from the Cloud Drive section. -->
+    <string name="valid_chat_link">U heeft een gesprekslink gekplakt.</string>
+    <!-- Error shown when it tries to open a contact link from the Cloud Drive section. -->
+    <string name="valid_contact_link">U heeft een contact link geplakt.</string>
+    <!-- Action button to open a contact link.-->
+    <string name="action_open_contact_link">Contact link openen</string>
+    <!-- title for the settings to enable high resolution images when on mobile data -->
+    <string name="settings_mobile_data_resoluton_title">Mobiele data gebruiken om afbeeldingen met hoge resolutie te bekijken</string>
+    <!-- summary for the settings to enable high resolution images when on mobile data -->
+    <string name="settings_mobile_data_resoluton_summary">Sta het gebruik van mobiele data toe om afbeeldingen met een hoge resolutie te laden bij het bekijken van een voorbeeld. Indien uitgeschakeld, wordt de originele afbeelding alleen geladen wanneer u inzoomt.</string>
+    <!-- If users want to move the root backup folder, all backups underneath it are disabled. Warning dialog will show to confirm -->
+    <string name="backup_move_root_folder">U wijzigt een standaardlocatie voor de back-up map. Dit kan van invloed zijn op uw vermogen om uw back-upmap in de toekomst te vinden. Onthoud waar het zich bevindt, zodat u het in de toekomst kunt vinden.</string>
+    <!-- If users want to move the sub backup folder, all backups underneath it are disabled. Warning dialog will show to confirm -->
+    <string name="backup_move_sub_folder">Het verplaatsen van deze map verandert de bestemming van één of meer geconfigureerde back-ups en kan onbedoelde gevolgen hebben. De back-ups worden voor uw veiligheid uitgeschakeld. Back-ups kunnen opnieuw worden ingeschakeld met de MEGA Desktop Applicatie. Wilt u doorgaan?</string>
+    <!-- If users want to delete the root backup folder, all backups underneath it are disabled. Warning dialog will show to confirm -->
+    <string name="backup_remove_root_folder">U verwijdert uw back-up map. Hiermee worden alle back-ups verwijderd die u hebt ingesteld. Weet u zeker dat u dit wilt doen?</string>
+    <!-- If users want to delete the sub backup folder, all backups underneath it are disabled. Warning dialog will show to confirm -->
+    <string name="backup_remove_sub_folder">Weet u zeker dat u uw back-up map wilt verwijderen en de door u ingestelde back-up wilt uitschakelen?</string>
+    <!-- The title of warning dialog for single folder moving -->
+    <string name="backup_move_folder_title">Verplaats “%1s”</string>
+    <!-- The title of warning dialog for single folder deleting -->
+    <string name="backup_remove_folder_title">Verplaats “%1s” naar Prullenbak</string>
+    <!-- The title of warning dialog for multi-folder moving -->
+    <string name="backup_move_multiple_folder_title">Verplaats back-up mappen</string>
+    <!-- The title of warning dialog for single folder deleting -->
+    <string name="backup_remove_multiple_folder_title">Verplaats back-up mappen naar Prullenbak</string>
+    <!-- The confirm information of warning dialog for deleting -->
+    <string name="backup_disable_confirm">Back-up uitschakelen</string>
+    <!-- The confirm information of warning dialog for moving "My backup" -->
+    <string name="backup_move_confirm">Verplaats back-up</string>
+    <!-- The confirm information of warning dialog for deleting -->
+    <string name="backup_action_confirm">Typ a.u.b. “%1s” om deze actie te bevestigen</string>
+    <!-- when checking the input -->
+    <string name="error_backup_confirm_dont_match">Ingevoerde tekst komt niet overeen</string>
+    <!-- The title of confirm dialog for adding item to "My backup" -->
+    <string name="backup_add_confirm_title">Artikel toevoegen naar “%1s”</string>
+    <!-- The title of warning dialog for adding item to "My backup" -->
+    <string name="backup_add_item_title">Back-up Instellen</string>
+    <!-- If users want to add items to the "My backup" folder, Warning dialog will show to confirm -->
+    <string name="backup_add_item_to_root_text">Om ervoor te zorgen dat deze items die aan uw back-up map worden toegevoegd, automatisch worden gesynchroniseerd met de MEGA Cloud. Gelieve deze in te stellen in de MEGA Desktop Applicatie.</string>
+    <!-- If users want to share items in the "My backup" folder, Warning dialog will show to confirm -->
+    <string name="backup_share_permission_title">Alleen-lezen</string>
+    <!-- If users want to share items in the "My backup" folder, Warning dialog will show to confirm -->
+    <string name="backup_share_permission_text">Deze map kan alleen als alleen-lezen worden gedeeld, aangezien dit een back-upmap is, kunnen wijzigingen in de inhoud de back-up uitschakelen.</string>
+    <!-- If users want to add items to the "My backup" device folder, Warning dialog will show to confirm -->
+    <string name="backup_add_item_text">Items in deze map maken deel uit van een geconfigureerde back-up en worden gesynchroniseerd met een lokale map. Als u deze actie uitvoert, wordt de synchronisatie verbroken en wordt de back-up uitgeschakeld. De back-up kan opnieuw worden ingeschakeld met de MEGA Desktop Applicatie. Weet u zeker dat u verder wilt gaan?</string>
+    <!-- Share multi backup folders, show below warning message -->
+    <string name="backup_multi_share_permission_text">Deze mappen kunnen alleen als alleen-lezen worden gedeeld, aangezien het back-up mappen zijn, kunnen wijzigingen in de inhoud de back-ups uitschakelen.</string>
+    <!-- Share multi folders mix with backup and non-backup folders, show below warning message -->
+    <string name="backup_share_with_root_permission_text">Sommige gedeelde mappen zijn back-up mappen en alleen-lezen. Wilt u doorgaan?</string>
+    <!-- Indicates the content of the backup folder -->
+    <plurals name="num_devices">
+        <item quantity="one">%d apparaat</item>
+        <item quantity="other">%d apparaten</item>
+    </plurals>
+    <!-- Title of the button when you want to answer a one to one call -->
+    <string name="title_join_one_to_one_call">Oproep beantwoorden</string>
+    <!-- Title of the menu when the select tracks on playlist page-->
+    <string name="title_select_tracks">Selecteer nummers</string>
+    <!-- Action button to upload files. -->
+    <string name="upload_files">Bestanden uploaden</string>
+    <!-- Action button to upload a folder. -->
+    <string name="upload_folder">Map uploaden</string>
+    <!-- Title of the dialog warning the user about cancel uploads. -->
+    <string name="cancel_uploads">Uploads annuleren</string>
+    <!-- Warning alerting user if proceed with the action all the uploads will be cancelled. -->
+    <string name="cancel_uploads_warning">Als u het uploadproces onderbreekt, worden al uw uploads geannuleerd.</string>
+    <!-- Button to proceed with action. -->
+    <string name="action_proceed">Doorgaan</string>
 </resources>

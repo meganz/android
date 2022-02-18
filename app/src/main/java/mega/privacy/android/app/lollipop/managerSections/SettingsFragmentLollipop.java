@@ -1,5 +1,68 @@
 package mega.privacy.android.app.lollipop.managerSections;
 
+import static mega.privacy.android.app.constants.EventConstants.EVENT_UPDATE_HIDE_RECENT_ACTIVITY;
+import static mega.privacy.android.app.constants.EventConstants.EVENT_UPDATE_START_SCREEN;
+import static mega.privacy.android.app.constants.SettingsConstants.CATEGORY_ABOUT;
+import static mega.privacy.android.app.constants.SettingsConstants.CATEGORY_SECURITY;
+import static mega.privacy.android.app.constants.SettingsConstants.CATEGORY_STORAGE;
+import static mega.privacy.android.app.constants.SettingsConstants.KEY_2FA;
+import static mega.privacy.android.app.constants.SettingsConstants.KEY_ABOUT_APP_VERSION;
+import static mega.privacy.android.app.constants.SettingsConstants.KEY_ABOUT_CODE_LINK;
+import static mega.privacy.android.app.constants.SettingsConstants.KEY_ABOUT_COOKIE_POLICY;
+import static mega.privacy.android.app.constants.SettingsConstants.KEY_ABOUT_KARERE_VERSION;
+import static mega.privacy.android.app.constants.SettingsConstants.KEY_ABOUT_PRIVACY_POLICY;
+import static mega.privacy.android.app.constants.SettingsConstants.KEY_ABOUT_SDK_VERSION;
+import static mega.privacy.android.app.constants.SettingsConstants.KEY_ABOUT_TOS;
+import static mega.privacy.android.app.constants.SettingsConstants.KEY_APPEARNCE_COLOR_THEME;
+import static mega.privacy.android.app.constants.SettingsConstants.KEY_AUDIO_BACKGROUND_PLAY_ENABLED;
+import static mega.privacy.android.app.constants.SettingsConstants.KEY_CANCEL_ACCOUNT;
+import static mega.privacy.android.app.constants.SettingsConstants.KEY_CHANGE_PASSWORD;
+import static mega.privacy.android.app.constants.SettingsConstants.KEY_COOKIE_SETTINGS;
+import static mega.privacy.android.app.constants.SettingsConstants.KEY_FEATURES;
+import static mega.privacy.android.app.constants.SettingsConstants.KEY_FEATURES_CAMERA_UPLOAD;
+import static mega.privacy.android.app.constants.SettingsConstants.KEY_FEATURES_CHAT;
+import static mega.privacy.android.app.constants.SettingsConstants.KEY_HELP_CENTRE;
+import static mega.privacy.android.app.constants.SettingsConstants.KEY_HELP_SEND_FEEDBACK;
+import static mega.privacy.android.app.constants.SettingsConstants.KEY_HIDE_RECENT_ACTIVITY;
+import static mega.privacy.android.app.constants.SettingsConstants.KEY_PASSCODE_LOCK;
+import static mega.privacy.android.app.constants.SettingsConstants.KEY_QR_CODE_AUTO_ACCEPT;
+import static mega.privacy.android.app.constants.SettingsConstants.KEY_RECOVERY_KEY;
+import static mega.privacy.android.app.constants.SettingsConstants.KEY_SECURITY_ADVANCED;
+import static mega.privacy.android.app.constants.SettingsConstants.KEY_START_SCREEN;
+import static mega.privacy.android.app.constants.SettingsConstants.KEY_STORAGE_DOWNLOAD;
+import static mega.privacy.android.app.constants.SettingsConstants.KEY_STORAGE_FILE_MANAGEMENT;
+import static mega.privacy.android.app.fragments.settingsFragments.startSceen.util.StartScreenUtil.HOME_BNV;
+import static mega.privacy.android.app.service.PlatformConstantsKt.RATE_APP_URL;
+import static mega.privacy.android.app.utils.Constants.BUSINESS;
+import static mega.privacy.android.app.utils.Constants.CLICKS_ENABLE_DEBUG;
+import static mega.privacy.android.app.utils.Constants.DISABLE_2FA;
+import static mega.privacy.android.app.utils.Constants.FREE;
+import static mega.privacy.android.app.utils.Constants.MAIL_ANDROID;
+import static mega.privacy.android.app.utils.Constants.PRO_I;
+import static mega.privacy.android.app.utils.Constants.PRO_II;
+import static mega.privacy.android.app.utils.Constants.PRO_III;
+import static mega.privacy.android.app.utils.Constants.PRO_LITE;
+import static mega.privacy.android.app.utils.Constants.SCROLLING_UP_DIRECTION;
+import static mega.privacy.android.app.utils.Constants.SNACKBAR_TYPE;
+import static mega.privacy.android.app.utils.Constants.TYPE_TEXT_PLAIN;
+import static mega.privacy.android.app.utils.DBUtil.callToAccountDetails;
+import static mega.privacy.android.app.utils.FileUtil.buildDefaultDownloadDir;
+import static mega.privacy.android.app.utils.LogUtil.areKarereLogsEnabled;
+import static mega.privacy.android.app.utils.LogUtil.areSDKLogsEnabled;
+import static mega.privacy.android.app.utils.LogUtil.logDebug;
+import static mega.privacy.android.app.utils.LogUtil.logWarning;
+import static mega.privacy.android.app.utils.LogUtil.setStatusLoggerKarere;
+import static mega.privacy.android.app.utils.LogUtil.setStatusLoggerSDK;
+import static mega.privacy.android.app.utils.SharedPreferenceConstants.HIDE_RECENT_ACTIVITY;
+import static mega.privacy.android.app.utils.SharedPreferenceConstants.PREFERRED_START_SCREEN;
+import static mega.privacy.android.app.utils.SharedPreferenceConstants.USER_INTERFACE_PREFERENCES;
+import static mega.privacy.android.app.utils.Util.getDeviceName;
+import static mega.privacy.android.app.utils.Util.isAndroid11OrUpper;
+import static mega.privacy.android.app.utils.Util.isOnline;
+import static mega.privacy.android.app.utils.Util.scaleHeightPx;
+import static mega.privacy.android.app.utils.Util.scaleWidthPx;
+import static nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE;
+
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.ComponentName;
@@ -10,6 +73,13 @@ import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.IBinder;
+import android.util.DisplayMetrics;
+import android.view.Display;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.CheckedTextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -19,14 +89,6 @@ import androidx.preference.Preference;
 import androidx.preference.PreferenceCategory;
 import androidx.preference.SwitchPreferenceCompat;
 import androidx.recyclerview.widget.RecyclerView;
-
-import android.os.IBinder;
-import android.util.DisplayMetrics;
-import android.view.Display;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.CheckedTextView;
 
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.jeremyliao.liveeventbus.LiveEventBus;
@@ -39,8 +101,6 @@ import dagger.hilt.android.AndroidEntryPoint;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.activities.WebViewActivity;
-import mega.privacy.android.app.activities.settingsActivities.StartScreenPreferencesActivity;
-import mega.privacy.android.app.exportRK.ExportRecoveryKeyActivity;
 import mega.privacy.android.app.activities.settingsActivities.AdvancedPreferencesActivity;
 import mega.privacy.android.app.activities.settingsActivities.CameraUploadsPreferencesActivity;
 import mega.privacy.android.app.activities.settingsActivities.ChatPreferencesActivity;
@@ -48,35 +108,24 @@ import mega.privacy.android.app.activities.settingsActivities.CookiePreferencesA
 import mega.privacy.android.app.activities.settingsActivities.DownloadPreferencesActivity;
 import mega.privacy.android.app.activities.settingsActivities.FileManagementPreferencesActivity;
 import mega.privacy.android.app.activities.settingsActivities.PasscodePreferencesActivity;
+import mega.privacy.android.app.activities.settingsActivities.StartScreenPreferencesActivity;
+import mega.privacy.android.app.exportRK.ExportRecoveryKeyActivity;
 import mega.privacy.android.app.fragments.settingsFragments.SettingsBaseFragment;
 import mega.privacy.android.app.globalmanagement.MyAccountInfo;
 import mega.privacy.android.app.lollipop.ChangePasswordActivityLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.TwoFactorAuthenticationActivity;
 import mega.privacy.android.app.lollipop.VerifyTwoFactorActivity;
+import mega.privacy.android.app.lollipop.managerSections.settings.Settings;
 import mega.privacy.android.app.mediaplayer.service.AudioPlayerService;
 import mega.privacy.android.app.mediaplayer.service.MediaPlayerService;
 import mega.privacy.android.app.mediaplayer.service.MediaPlayerServiceBinder;
 import mega.privacy.android.app.utils.ThemeHelper;
 
-import static mega.privacy.android.app.constants.EventConstants.EVENT_UPDATE_HIDE_RECENT_ACTIVITY;
-import static mega.privacy.android.app.constants.EventConstants.EVENT_UPDATE_START_SCREEN;
-import static mega.privacy.android.app.constants.SettingsConstants.*;
-import static mega.privacy.android.app.fragments.settingsFragments.startSceen.util.StartScreenUtil.HOME_BNV;
-import static mega.privacy.android.app.service.PlatformConstantsKt.RATE_APP_URL;
-import static mega.privacy.android.app.utils.Constants.*;
-import static mega.privacy.android.app.utils.DBUtil.callToAccountDetails;
-import static mega.privacy.android.app.utils.FileUtil.buildDefaultDownloadDir;
-import static mega.privacy.android.app.utils.LogUtil.*;
-import static mega.privacy.android.app.utils.SharedPreferenceConstants.HIDE_RECENT_ACTIVITY;
-import static mega.privacy.android.app.utils.SharedPreferenceConstants.PREFERRED_START_SCREEN;
-import static mega.privacy.android.app.utils.SharedPreferenceConstants.USER_INTERFACE_PREFERENCES;
-import static mega.privacy.android.app.utils.Util.*;
-import static nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE;
-
 @AndroidEntryPoint
 @SuppressLint("NewApi")
-public class SettingsFragmentLollipop extends SettingsBaseFragment {
+@SuppressWarnings( "deprecation" )
+public class SettingsFragmentLollipop extends SettingsBaseFragment implements Settings {
 
     private static final String EVALUATE_APP_DIALOG_SHOW = "EvaluateAppDialogShow";
 
@@ -122,7 +171,7 @@ public class SettingsFragmentLollipop extends SettingsBaseFragment {
 
     private final ServiceConnection mediaServiceConnection = new ServiceConnection() {
         @Override
-        public void onServiceConnected(ComponentName name, IBinder service)    {
+        public void onServiceConnected(ComponentName name, IBinder service) {
             playerService = ((MediaPlayerServiceBinder) service).getService();
         }
 
@@ -145,11 +194,11 @@ public class SettingsFragmentLollipop extends SettingsBaseFragment {
         chatPreference.setOnPreferenceClickListener(this);
 
         storageCategory = findPreference(CATEGORY_STORAGE);
-        nestedDownloadLocation = findPreference(KEY_STORAGE_DOWNLOAD);
-        nestedDownloadLocation.setOnPreferenceClickListener(this);
 
-        if (isAndroid11OrUpper()) {
-            storageCategory.removePreference(nestedDownloadLocation);
+        //Some changes are harder to toggle with feature flags, eg. layout file changes. To prevent a crash the original code had to be changed here.
+        if (!isAndroid11OrUpper()) {
+            nestedDownloadLocation = findPreference(KEY_STORAGE_DOWNLOAD);
+            nestedDownloadLocation.setOnPreferenceClickListener(this);
         }
 
         fileManagementPrefence = findPreference(KEY_STORAGE_FILE_MANAGEMENT);
@@ -669,10 +718,10 @@ public class SettingsFragmentLollipop extends SettingsBaseFragment {
             //Send feedback option:
             StringBuilder body = new StringBuilder();
             body.append(getString(R.string.setting_feedback_body))
-            .append("\n\n\n\n\n\n\n\n\n\n\n")
-            .append(getString(R.string.settings_feedback_body_device_model)).append("  ").append(getDeviceName()).append("\n")
-            .append(getString(R.string.settings_feedback_body_android_version)).append("  ").append(Build.VERSION.RELEASE).append(" ").append(Build.DISPLAY).append("\n")
-            .append(getString(R.string.user_account_feedback)).append("  ").append(megaApi.getMyEmail());
+                    .append("\n\n\n\n\n\n\n\n\n\n\n")
+                    .append(getString(R.string.settings_feedback_body_device_model)).append("  ").append(getDeviceName()).append("\n")
+                    .append(getString(R.string.settings_feedback_body_android_version)).append("  ").append(Build.VERSION.RELEASE).append(" ").append(Build.DISPLAY).append("\n")
+                    .append(getString(R.string.user_account_feedback)).append("  ").append(megaApi.getMyEmail());
 
             body.append(" (");
             switch (myAccountInfo.getAccountType()) {
@@ -703,7 +752,7 @@ public class SettingsFragmentLollipop extends SettingsBaseFragment {
 
             Intent emailIntent = new Intent(Intent.ACTION_SEND);
             emailIntent.setType(TYPE_TEXT_PLAIN);
-            emailIntent.putExtra(Intent.EXTRA_EMAIL, new String[] {MAIL_ANDROID});
+            emailIntent.putExtra(Intent.EXTRA_EMAIL, new String[]{MAIL_ANDROID});
             emailIntent.putExtra(Intent.EXTRA_SUBJECT, subject);
             emailIntent.putExtra(Intent.EXTRA_TEXT, body.toString());
             startActivity(Intent.createChooser(emailIntent, " "));
@@ -749,5 +798,62 @@ public class SettingsFragmentLollipop extends SettingsBaseFragment {
 
     public void setAutoacceptSetting(boolean autoAccept) {
         this.autoAccept = autoAccept;
+    }
+
+
+    // Call original functions from interface calls
+    @Override
+    public int getNumberOfClicksKarere() {
+        return numberOfClicksKarere;
+    }
+
+    @Override
+    public void setNumberOfClicksKarere(int numberOfClicksKarere) {
+        this.numberOfClicksKarere = numberOfClicksKarere;
+    }
+
+    @Override
+    public int getNumberOfClicksAppVersion() {
+        return numberOfClicksAppVersion;
+    }
+
+    @Override
+    public void setNumberOfClicksAppVersion(int numberOfClicksAppVersion) {
+        this.numberOfClicksAppVersion = numberOfClicksAppVersion;
+    }
+
+    @Override
+    public int getNumberOfClicksSDK() {
+        return numberOfClicksSDK;
+    }
+
+    @Override
+    public void setNumberOfClicksSDK(int numberOfClicksSDK) {
+        this.numberOfClicksSDK = numberOfClicksSDK;
+    }
+
+    @Override
+    public boolean getSetAutoAccept() {
+        return getSetAutoaccept();
+    }
+
+    @Override
+    public void setSetAutoAccept(boolean setAutoAccept) {
+        setSetAutoaccept(setAutoAccept);
+    }
+
+    @Override
+    public boolean getAutoAcceptSetting() {
+        return getAutoacceptSetting();
+    }
+
+    @Override
+    public void setAutoAcceptSetting(boolean autoAcceptSetting) {
+        setAutoacceptSetting(autoAcceptSetting);
+    }
+
+    @Override
+    public void setValueOfAutoAccept(boolean autoAccept) {
+        setValueOfAutoaccept(autoAccept);
     }
 }

@@ -1586,10 +1586,6 @@
     <string name="upload_service_notification">파일 업로드 중: %2$d 중 %1$d</string>
     <!-- Text of the notification shown when the upload service is paused: e.g. Uploading files: 1 of 10 (paused)-->
     <string name="upload_service_notification_paused">파일 업로드 중: %2$d 중 %1$d (일시정지됨)</string>
-    <!-- Text of the notification shown when the folder upload service is running, e.g. Uploading folders 1 of 2 -->
-    <string name="folder_upload_service_notification">폴더 업로드 중: %2$d 중 %1$d</string>
-    <!-- Text of the notification shown when the folder upload service is paused, e.g. Uploading folders 1 of 2 (paused) -->
-    <string name="folder_upload_service_notification_paused">폴더 업로드 중: %2$d 중 %1$d (일시정지됨)</string>
     <!-- Text of the notification shown when the upload service has finished, Plural -->
     <plurals name="upload_service_final_notification">
         <item quantity="other">파일 %1$d개 업로드됨</item>
@@ -1597,10 +1593,6 @@
     <!-- Text of the notification shown when the upload service has finished, Plural -->
     <plurals name="upload_service_notification_already_uploaded">
         <item quantity="other">%1$d개의 파일이 이미 업로드 되었습니다</item>
-    </plurals>
-    <!-- Text of the notification shown when the folder upload service has finished, Text of the notification shown when the folder upload service has finished - plural  e.g. Uploaded 2 folders -->
-    <plurals name="folder_upload_service_final_notification">
-        <item quantity="other">폴더 %1$d개 업로드됨</item>
     </plurals>
     <!-- label for the total file size of multiple files and/or folders (no need to put the colon punctuation in the translation) -->
     <string name="general_total_size">전체 크기: %1$s</string>
@@ -1734,8 +1726,6 @@
     <string name="attachment_upload_panel_from_cloud">클라우드 드라이브에서</string>
     <!--  -->
     <string name="attachment_upload_panel_contact">연락처</string>
-    <!--  -->
-    <string name="attachment_upload_panel_photo">장치에서</string>
     <!-- Button and title of dialog shown when the user wants to delete permanently their account. -->
     <string name="delete_account">계정 삭제</string>
     <!-- Text shown in the alert dialog to confirm the deletion of an account -->
@@ -2051,7 +2041,7 @@
     <!-- Text of dialog shown when a contact request has not been sent with QR code because of some error -->
     <string name="invite_not_sent_text_error">오류가 발생하여 초대장이 발송되지 않았습니다.</string>
     <!-- Text of alert dialog informing that the qr is generating -->
-    <string name="generatin_qr">QR 코드 생성중...</string>
+    <string name="generatin_qr">QR 코드 생성중&#8230;</string>
     <!-- Title of QR code scan menu item -->
     <string name="menu_item_scan_code">QR 코드 스캔</string>
     <!-- get the contact link and copy it -->
@@ -2542,7 +2532,9 @@
     <!-- Settings preference title to show file versions info of the account -->
     <string name="settings_file_management_file_versions_title">파일 버전</string>
     <!-- Settings preference subtitle to show file versions info of the account -->
-    <string name="settings_file_management_file_versions_subtitle">총 %2$s 중 %1$d개의 파일 버전을 사용중</string>
+    <plurals name="settings_file_management_file_versions_subtitle">
+        <item quantity="other">%1$d개의 파일 버전이 있으며, 총 %2$s를 사용 중입니다.</item>
+    </plurals>
     <!-- Title of the section File management on Settings section -->
     <string name="settings_file_management_category">파일 관리</string>
     <!-- Option in Settings to delete all the versions of the account -->
@@ -3113,8 +3105,8 @@
     <string name="not_allow_play_alert">통화가 진행중일 때에는 미디어 파일을 재생할 수 없습니다.</string>
     <!-- Text shown in the list of chats when there is a call in progress but I am not on it -->
     <string name="ongoing_call_messages">진행중인 통화</string>
-    <!-- Title of the layout to join a group call from the chat screen. The placeholder indicates the user who initiated the call -->
-    <string name="join_call_layout_in_group_call">%s님이 그룹 통화를 시작하였습니다. 참여하려면 탭하세요.</string>
+    <!-- Title of the layout to join a group call from the chat screen. -->
+    <string name="join_call_layout_in_group_call">현재 그룹 통화에 참여하려면 탭 하세요.</string>
     <!-- Title of the layout to return to a call -->
     <string name="call_in_progress_layout">통화로 돌아가려면 탭하세요</string>
     <!-- message displayed when you try to start a call but it is not possible because you are already on a call -->
@@ -3489,8 +3481,8 @@
     <string name="section_documents">문서</string>
     <!-- Label of the floating action button of opening the new chat conversation -->
     <string name="fab_label_new_chat">새 대화</string>
-    <!-- Text that indicates that there’s no photo to show -->
-    <string name="homepage_empty_hint_photos">사진 없음</string>
+    <!-- Text that indicates that there’s no image to show in image section -->
+    <string name="homepage_empty_hint_photos">[B]발견된[/B] [A]이미지[/A] [B]없음[/B]</string>
     <!-- Text that indicates that there’s no document to show -->
     <string name="homepage_empty_hint_documents">문서가 없습니다</string>
     <!-- Text that indicates that there’s no audio to show -->
@@ -3744,7 +3736,7 @@
     <!-- Settings hint that indicates the audio will still be played in background if the app is backgrounded -->
     <string name="settings_background_play_hint">백그라운드에서 재생 중</string>
     <!-- Text of the empty screen when there are no elements in Photos -->
-    <string name="photos_empty">[A]사진[/A] [B]없음[/B]</string>
+    <string name="photos_empty">[B]발견된[/B] [A]사진[/A] [B]없음[/B]</string>
     <!-- Text to show as subtitle of Enable camera uploads screen -->
     <string name="enable_cu_subtitle">클라우드 드라이브에 자동으로 사진과 동영상을 백업하세요.</string>
     <!-- Text of a button on Camera Uploads section to show all the content of the section-->
@@ -3777,8 +3769,6 @@
     <string name="error_share_owner_storage_quota">공유 소유자의 저장소 할당량 초과.</string>
     <!-- A message shown when uploading, copying or moving something to an incoming share and the owner’s account is over its storage quota. -->
     <string name="warning_share_owner_storage_quota">대상 이용자의 저장소 할당량이 초과되어 파일을 전송할 수 없습니다.</string>
-    <!-- Content to show in a Snackbar to tip the incompatibility-->
-    <string name="version_incompatibility">MEGAchat을 업그레이드하고 있습니다. 모든 참가자들이 MEGA 앱을 최신 버전으로 업데이트할 때까지 버전 호환성 문제로 통화가 연결되지 않을 수 있습니다.</string>
     <!-- Message displayed when multiple download starts and 1 file has already been downloaded before and 1 file is being downloaded -->
     <string name="file_already_downloaded_and_file_pending_download">파일 1개 이미 다운로드 됨. 파일 1개 대기 중.</string>
     <!-- Message displayed when multiple download starts and 1 file has already been downloaded before and multiple files are being downloaded. Placeholder: number of files -->
@@ -3950,7 +3940,7 @@
     <!-- Subtitle of the meeting screen-->
     <string name="duration_meeting">시간</string>
     <!-- The question in on-boarding screen asking if the user is going to join meeting as guest-->
-    <string name="join_meeting_as_guest">손님으로 회의에 참가</string>
+    <string name="join_meeting_as_guest">손님으로 회의에 참석</string>
     <!-- The title of the paste meeting link dialog for guest-->
     <string name="paste_meeting_link_guest_dialog_title">회의에 초대 되었습니다.</string>
     <!-- Tell the guest to paste the meeting link in the edit box-->
@@ -3981,8 +3971,8 @@
     <string name="be_new_moderator">당신은 새 중재자입니다.</string>
     <!-- the content of snack bar when copied meeting link-->
     <string name="copied_meeting_link">회의 링크 복사됨</string>
-    <!-- Title of the layout to join a meeting from the chat screen. The placeholder indicates the user who initiated the meeting -->
-    <string name="join_meeting_layout_in_group_call">%s님이 회의를 시작하였습니다. 참가하려면 탭하세요.</string>
+    <!-- Title of the layout to join a meeting from the chat screen. -->
+    <string name="join_meeting_layout_in_group_call">현재 회의에 참여하려면 탭 하세요.</string>
     <!-- Title of fifth tour screen -->
     <string name="title_tour_five">MEGA 회의</string>
     <!-- Content of fourth tour screen -->
@@ -4057,4 +4047,96 @@
     <string name="disable_versioning_warning">파일 버전 관리 기능은 만약 파일을 새 버전으로 교체했을 경우 오래된 버전을 유지합니다. 만약 비활성화하면 이러한 보호를 더이상 받지 못 합니다; 파일을 교체할 때 이전 버전이 사라집니다.</string>
     <!-- Warning informing the user the folder location is trying to open no longer exists. -->
     <string name="location_not_exist">이 위치가 더 이상 존재하지 않습니다.</string>
+    <!-- Warning shown informing the contact has been previously invited. The placeholder is to show the name of the contact. -->
+    <string name="contact_already_invited">당신은 이미 %1$s님을 초대하였습니다</string>
+    <!-- Warning shown informing the contact request has been sent and can be managed in sent requests section. -->
+    <string name="contact_invited">초대장을 성공적으로 보냈습니다. 보낸 요청을 확인하세요.</string>
+    <!-- Message when file available offline. -->
+    <string name="file_available_offline">파일을 오프라인에서 이용할 수 있음</string>
+    <!-- Message when file removed from offline. -->
+    <string name="file_removed_offline">파일이 오프라인에서 제거됨</string>
+    <!-- Menu option to open a link. Also title of the dialog to open a link. -->
+    <string name="action_open_link">링크 열기</string>
+    <!-- error message shown when a chat link is not well formed. -->
+    <string name="invalid_chat_link_args">잘못된 대화 링크</string>
+    <!-- Menu option to open a chat link. -->
+    <string name="action_open_chat_link">대화 링크 열기</string>
+    <!-- Hint shown in the open chat link alert dialog. -->
+    <string name="hint_enter_chat_link">대화 링크 입력</string>
+    <!-- Hint shown in the open link alert dialog. -->
+    <string name="hint_paste_link">링크 붙여넣기</string>
+    <!-- Error shown when it tries to open an invalid file or folder link .-->
+    <string name="invalid_file_folder_link">유효하지 않은 파일 또는 폴더 링크</string>
+    <!-- Error shown when it tries to open an invalid file or folder link and the text view is empty. -->
+    <string name="invalid_file_folder_link_empty">유효한 파일 또는 폴더 링크를 입력하세요</string>
+    <!-- Error shown when it tries to open an invalid chat link and the text view is empty. -->
+    <string name="invalid_chat_link_empty">유효한 대화 링크를 입력하세요</string>
+    <!-- Error shown when it tries to open a chat link from the Cloud Drive section. -->
+    <string name="valid_chat_link">대화 링크를 붙여넣었습니다.</string>
+    <!-- Error shown when it tries to open a contact link from the Cloud Drive section. -->
+    <string name="valid_contact_link">연락처 링크를 붙여넣었습니다.</string>
+    <!-- Action button to open a contact link.-->
+    <string name="action_open_contact_link">연락처 링크 열기</string>
+    <!-- title for the settings to enable high resolution images when on mobile data -->
+    <string name="settings_mobile_data_resoluton_title">고해상도 이미지를 미리 보기하는 데에 모바일 데이터 사용</string>
+    <!-- summary for the settings to enable high resolution images when on mobile data -->
+    <string name="settings_mobile_data_resoluton_summary">미리 보기를 할 때 고해상도 이미지를 불러오기 위해 모바일 데이터를 사용하는 것을 허용하세요. 만약 비활성화 하면, 확대할 때만 원래 이미지를 불러옵니다.</string>
+    <!-- If users want to move the root backup folder, all backups underneath it are disabled. Warning dialog will show to confirm -->
+    <string name="backup_move_root_folder">기본 백업 폴더 위치를 변경하려고 합니다. 이것은 나중에 당신의 백업 폴더를 찾을 수 있는지 여부에 영향을 미칩니다. 나중에 찾을 수 있도록 어디에 위치했는지 기억하세요.</string>
+    <!-- If users want to move the sub backup folder, all backups underneath it are disabled. Warning dialog will show to confirm -->
+    <string name="backup_move_sub_folder">이 폴더의 이동은 하나 이상의 구성된 백업의 대상을 변경하며 의도하지 않은 결과를 초래할 수 있습니다. 안전을 위해 백업을 꺼야 합니다. 백업은 MEGA 데스크톱 앱에서 다시 활성화할 수 있습니다. 진행하시겠습니까?</string>
+    <!-- If users want to delete the root backup folder, all backups underneath it are disabled. Warning dialog will show to confirm -->
+    <string name="backup_remove_root_folder">백업 폴더를 삭제하려고 합니다. 이것은 당신이 설정한 모든 백업을 삭제합니다. 정말 하시겠습니까?</string>
+    <!-- If users want to delete the sub backup folder, all backups underneath it are disabled. Warning dialog will show to confirm -->
+    <string name="backup_remove_sub_folder">정말 백업 폴더를 삭제하고 연관된 백업을 비활성화 하시겠습니까?</string>
+    <!-- The title of warning dialog for single folder moving -->
+    <string name="backup_move_folder_title">“%1s” 이동</string>
+    <!-- The title of warning dialog for single folder deleting -->
+    <string name="backup_remove_folder_title">“%1s”을/를 휴지통으로 이동</string>
+    <!-- The title of warning dialog for multi-folder moving -->
+    <string name="backup_move_multiple_folder_title">백업 폴더 이동</string>
+    <!-- The title of warning dialog for single folder deleting -->
+    <string name="backup_remove_multiple_folder_title">백업 폴더를 휴지통으로 이동</string>
+    <!-- The confirm information of warning dialog for deleting -->
+    <string name="backup_disable_confirm">백업 비활성화</string>
+    <!-- The confirm information of warning dialog for moving "My backup" -->
+    <string name="backup_move_confirm">백업 이동</string>
+    <!-- The confirm information of warning dialog for deleting -->
+    <string name="backup_action_confirm">이 행동을 승인하려면 “%1s”을/를 입력하세요.</string>
+    <!-- when checking the input -->
+    <string name="error_backup_confirm_dont_match">입력한 문자가 일치하지 않습니다</string>
+    <!-- The title of confirm dialog for adding item to "My backup" -->
+    <string name="backup_add_confirm_title">“%1s”에 항목 추가</string>
+    <!-- The title of warning dialog for adding item to "My backup" -->
+    <string name="backup_add_item_title">백업 설정</string>
+    <!-- If users want to add items to the "My backup" folder, Warning dialog will show to confirm -->
+    <string name="backup_add_item_to_root_text">이 항목들이 백업 폴더에 추가되어 MEGA 클라우드와 자동으로 동기화 되었는지 확실히 하려면, MEGA 데스크톱 앱에서 설정하세요.</string>
+    <!-- If users want to share items in the "My backup" folder, Warning dialog will show to confirm -->
+    <string name="backup_share_permission_title">읽기 전용</string>
+    <!-- If users want to share items in the "My backup" folder, Warning dialog will show to confirm -->
+    <string name="backup_share_permission_text">이 폴더는 읽기 전용으로만 공유할 수 있습니다; 이 폴더는 백업 폴더이므로, 이 항목에 대한 어떠한 변경은 백업을 비활성화 할 수 있습니다.</string>
+    <!-- If users want to add items to the "My backup" device folder, Warning dialog will show to confirm -->
+    <string name="backup_add_item_text">이 폴더 안의 항목은 구성된 백업의 일부이며 로컬 폴더로 동기화 됩니다. 이 행동을 하면 동기화가 깨지고 백업이 비활성화 됩니다. 백업은 MEGA 데스크톱 앱에서 다시 활성화할 수 있습니다. 계속 하시겠습니까?</string>
+    <!-- Share multi backup folders, show below warning message -->
+    <string name="backup_multi_share_permission_text">이 폴더들은 읽기 전용으로만 공유할 수 있습니다; 이 폴더들은 백업 폴더이므로, 이 항목에 대한 어떠한 변경은 백업을 비활성화 할 수 있습니다.</string>
+    <!-- Share multi folders mix with backup and non-backup folders, show below warning message -->
+    <string name="backup_share_with_root_permission_text">일부 공유된 폴더가 백업 폴더이거나 읽기 전용입니다. 계속 하시겠습니까?</string>
+    <!-- Indicates the content of the backup folder -->
+    <plurals name="num_devices">
+        <item quantity="other">장치 %d개</item>
+    </plurals>
+    <!-- Title of the button when you want to answer a one to one call -->
+    <string name="title_join_one_to_one_call">전화 받기</string>
+    <!-- Title of the menu when the select tracks on playlist page-->
+    <string name="title_select_tracks">트랙 선택</string>
+    <!-- Action button to upload files. -->
+    <string name="upload_files">파일 업로드</string>
+    <!-- Action button to upload a folder. -->
+    <string name="upload_folder">폴더 업로드</string>
+    <!-- Title of the dialog warning the user about cancel uploads. -->
+    <string name="cancel_uploads">업로드 취소</string>
+    <!-- Warning alerting user if proceed with the action all the uploads will be cancelled. -->
+    <string name="cancel_uploads_warning">업로드 과정을 중단하는 것은 모든 업로드를 취소시킵니다.</string>
+    <!-- Button to proceed with action. -->
+    <string name="action_proceed">진행</string>
 </resources>

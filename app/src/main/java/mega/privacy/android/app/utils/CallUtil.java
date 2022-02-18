@@ -339,6 +339,24 @@ public class CallUtil {
     }
 
     /**
+     * Method to know if I am participating in the call with another client
+     *
+     * @param call The MegaChatCall
+     * @return True, if I am participating. False, if not
+     */
+    public static boolean CheckIfIAmParticipatingWithAnotherClient(MegaChatCall call) {
+        MegaHandleList listPeers = call.getPeeridParticipants();
+        if (listPeers != null && listPeers.size() > 0) {
+            for (int i = 0; i < listPeers.size(); i++) {
+                if (listPeers.get(i) == MegaApplication.getInstance().getMegaApi().getMyUserHandleBinary())
+                    return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
      * Method to know if I can join a one-to-one call
      *
      * @param chatId The chat id of the call I want to join
@@ -1316,7 +1334,8 @@ public class CallUtil {
     public static void incomingCall(MegaHandleList listAllCalls, long incomingCallChatId, int callStatus) {
         logDebug("Chat ID of incoming call is " + incomingCallChatId);
         if (!MegaApplication.getInstance().getMegaApi().isChatNotifiable(incomingCallChatId) ||
-                MegaApplication.getChatManagement().isNotificationShown(incomingCallChatId)){
+                MegaApplication.getChatManagement().isNotificationShown(incomingCallChatId) ||
+                !CallUtil.areNotificationsSettingsEnabled()) {
             logDebug("The chat is not notifiable or the notification is already being displayed");
             return;
         }
@@ -1450,5 +1469,19 @@ public class CallUtil {
         }
 
         return checkPermissionsCall(context, INVALID_TYPE_PERMISSIONS);
+    }
+
+    /**
+     * Method to find out if device's notification settings are enabled
+     *
+     * @return True, if they are enabled. False, if they are not.
+     */
+    public static boolean areNotificationsSettingsEnabled() {
+        NotificationManager notificationManager = (NotificationManager) MegaApplication.getInstance().getApplicationContext().getSystemService(Context.NOTIFICATION_SERVICE);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            return notificationManager.areNotificationsEnabled();
+        }
+
+        return true;
     }
 }

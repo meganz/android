@@ -486,7 +486,6 @@ public class SettingsCameraUploadsFragment extends SettingsBaseFragment {
             case KEY_CAMERA_UPLOAD_CAMERA_FOLDER:
                 intent = new Intent(context, FileStorageActivityLollipop.class);
                 intent.setAction(FileStorageActivityLollipop.Mode.PICK_FOLDER.getAction());
-                intent.putExtra(FileStorageActivityLollipop.EXTRA_FROM_SETTINGS, true);
                 intent.putExtra(FileStorageActivityLollipop.PICK_FOLDER_TYPE, FileStorageActivityLollipop.PickFolderType.CU_FOLDER.getFolderType());
                 startActivityForResult(intent, REQUEST_CAMERA_FOLDER);
                 break;
@@ -541,7 +540,6 @@ public class SettingsCameraUploadsFragment extends SettingsBaseFragment {
             case KEY_LOCAL_SECONDARY_MEDIA_FOLDER:
                 intent = new Intent(context, FileStorageActivityLollipop.class);
                 intent.setAction(FileStorageActivityLollipop.Mode.PICK_FOLDER.getAction());
-                intent.putExtra(FileStorageActivityLollipop.EXTRA_FROM_SETTINGS, true);
                 intent.putExtra(FileStorageActivityLollipop.PICK_FOLDER_TYPE, FileStorageActivityLollipop.PickFolderType.MU_FOLDER.getFolderType());
                 startActivityForResult(intent, REQUEST_LOCAL_SECONDARY_MEDIA_FOLDER);
                 break;

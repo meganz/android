@@ -96,8 +96,8 @@
 
             <ImageView
                 android:id="@+id/file_grid_icon_for_file"
-                android:layout_width="88dp"
-                android:layout_height="88dp"
+                android:layout_width="96dp"
+                android:layout_height="96dp"
                 android:layout_centerHorizontal="true"
                 android:layout_centerVertical="true"
                 android:background="@null"

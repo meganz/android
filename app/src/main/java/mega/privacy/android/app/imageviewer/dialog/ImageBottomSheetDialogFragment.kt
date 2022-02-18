@@ -109,7 +109,6 @@ class ImageBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
         val imageUri = imageItem.imageResult?.getLowestResolutionAvailableUri()
         val isUserLoggedIn = viewModel.isUserLoggedIn()
         val isOnline = requireContext().isOnline()
-        val isFromChat = imageItem.chatMessageId != null
 
         binding.apply {
             imgThumbnail.controller = Fresco.newDraweeControllerBuilder()
@@ -151,7 +150,7 @@ class ImageBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
                 val favoriteText = if (node.isFavourite) R.string.file_properties_unfavourite else R.string.file_properties_favourite
                 val favoriteDrawable = if (node.isFavourite) R.drawable.ic_remove_favourite else R.drawable.ic_add_favourite
                 optionFavorite.text = StringResourcesUtils.getString(favoriteText)
-                optionFavorite.isVisible = isOnline && nodeItem.hasFullAccess && !isFromChat
+                optionFavorite.isVisible = isOnline && nodeItem.hasFullAccess && !imageItem.isFromChat()
                 optionFavorite.setCompoundDrawablesWithIntrinsicBounds(favoriteDrawable, 0, 0, 0)
                 optionFavorite.setOnClickListener {
                     viewModel.markNodeAsFavorite(nodeItem.handle, !node.isFavourite)
@@ -173,7 +172,7 @@ class ImageBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
                 optionLabelCurrent.setTextColor(labelColor)
                 optionLabelCurrent.text = getNodeLabelText(node.label)
                 optionLabelCurrent.isVisible = node.label != MegaNode.NODE_LBL_UNKNOWN
-                optionLabelLayout.isVisible = isOnline && nodeItem.hasFullAccess && !isFromChat
+                optionLabelLayout.isVisible = isOnline && nodeItem.hasFullAccess && !imageItem.isFromChat()
                 optionLabelLayout.setOnClickListener {
                     NodeLabelBottomSheetDialogFragment.newInstance(nodeItem.handle).show(childFragmentManager, TAG)
                 }
@@ -182,7 +181,7 @@ class ImageBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
             }
 
             // Open with
-            optionOpenWith.isVisible = isUserLoggedIn && !nodeItem.isExternalNode && !nodeItem.isFromRubbishBin && nodeItem.hasReadAccess && !isFromChat
+            optionOpenWith.isVisible = isUserLoggedIn && !nodeItem.isExternalNode && !nodeItem.isFromRubbishBin && nodeItem.hasReadAccess && !imageItem.isFromChat()
             optionOpenWith.setOnClickListener {
                 if (imageItem.isOffline) {
                     OfflineUtils.openWithOffline(requireActivity(), nodeItem.handle)
@@ -240,7 +239,7 @@ class ImageBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
                     .setNegativeButton(StringResourcesUtils.getString(R.string.general_cancel), null)
                     .show()
             }
-            optionManageLink.isVisible = isOnline && nodeItem.hasOwnerAccess && !nodeItem.isFromRubbishBin && !isFromChat
+            optionManageLink.isVisible = isOnline && nodeItem.hasOwnerAccess && !nodeItem.isFromRubbishBin && !imageItem.isFromChat()
             optionRemoveLink.isVisible = optionManageLink.isVisible && node?.isExported == true
 
             // Send to contact
@@ -271,13 +270,13 @@ class ImageBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
             optionRename.setOnClickListener {
                 (activity as? ImageViewerActivity?)?.showRenameDialog(node!!)
             }
-            optionRename.isVisible = isOnline && !nodeItem.isFromRubbishBin && nodeItem.hasFullAccess && !isFromChat
+            optionRename.isVisible = isOnline && !nodeItem.isFromRubbishBin && nodeItem.hasFullAccess && !imageItem.isFromChat()
 
             // Move
             optionMove.setOnClickListener {
                 selectMoveFolderLauncher.launch(longArrayOf(nodeItem.handle))
             }
-            optionMove.isVisible = isOnline && !nodeItem.isFromRubbishBin && nodeItem.hasFullAccess && !isFromChat
+            optionMove.isVisible = isOnline && !nodeItem.isFromRubbishBin && nodeItem.hasFullAccess && !imageItem.isFromChat()
 
             // Copy
             optionCopy.setOnClickListener {
@@ -301,7 +300,7 @@ class ImageBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
             optionRestore.isVisible = isOnline && nodeItem.isFromRubbishBin && node != null && node.restoreHandle != INVALID_HANDLE
 
             // Rubbish bin
-            optionRubbishBin.isVisible = isOnline && nodeItem.hasFullAccess && !isFromChat
+            optionRubbishBin.isVisible = isOnline && nodeItem.hasFullAccess && !imageItem.isFromChat()
             if (nodeItem.isFromRubbishBin) {
                 optionRubbishBin.setText(R.string.general_remove)
             } else {

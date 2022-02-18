@@ -1,5 +1,6 @@
 package mega.privacy.android.app.mediaplayer.service
 
+import android.annotation.SuppressLint
 import android.app.Notification
 import android.app.PendingIntent
 import android.content.Context
@@ -38,8 +39,9 @@ import mega.privacy.android.app.utils.LogUtil.logError
 import nz.mega.sdk.MegaApiAndroid
 import javax.inject.Inject
 
+@Suppress("DEPRECATION")
 @AndroidEntryPoint
-open class MediaPlayerService : LifecycleService(), LifecycleObserver {
+open class MediaPlayerService : LifecycleService(), LifecycleEventObserver {
 
     @MegaApi
     @Inject
@@ -220,12 +222,13 @@ open class MediaPlayerService : LifecycleService(), LifecycleObserver {
                 return meta.title ?: meta.nodeName
             }
 
+            @SuppressLint("UnspecifiedImmutableFlag")
             @Nullable
             override fun createCurrentContentIntent(player: Player): PendingIntent? {
                 val intent = Intent(applicationContext, AudioPlayerActivity::class.java)
                 intent.putExtra(INTENT_EXTRA_KEY_REBUILD_PLAYLIST, false)
                 return PendingIntent.getActivity(
-                    applicationContext, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT
+                    applicationContext, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
                 )
             }
 
@@ -457,7 +460,6 @@ open class MediaPlayerService : LifecycleService(), LifecycleObserver {
         viewModel.resetRetryState()
     }
 
-    @OnLifecycleEvent(Lifecycle.Event.ON_START)
     fun onMoveToForeground() {
         if (needPlayWhenGoForeground) {
             setPlayWhenReady(true)
@@ -465,7 +467,6 @@ open class MediaPlayerService : LifecycleService(), LifecycleObserver {
         }
     }
 
-    @OnLifecycleEvent(Lifecycle.Event.ON_STOP)
     fun onMoveToBackground() {
         if ((!viewModel.backgroundPlayEnabled() || !viewModel.audioPlayer) && playing()) {
             setPlayWhenReady(false)
@@ -549,6 +550,14 @@ open class MediaPlayerService : LifecycleService(), LifecycleObserver {
             val audioPlayerIntent = Intent(context, AudioPlayerService::class.java)
             audioPlayerIntent.putExtra(INTENT_EXTRA_KEY_COMMAND, COMMAND_STOP)
             context.startService(audioPlayerIntent)
+        }
+    }
+
+    override fun onStateChanged(source: LifecycleOwner, event: Lifecycle.Event) {
+        when(event){
+            Lifecycle.Event.ON_START -> onMoveToForeground()
+            Lifecycle.Event.ON_STOP -> onMoveToBackground()
+            else -> return
         }
     }
 }

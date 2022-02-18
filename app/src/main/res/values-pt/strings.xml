@@ -1609,10 +1609,6 @@
     <string name="upload_service_notification">Fazendo upload de arquivos:%1$d de %2$d</string>
     <!-- Text of the notification shown when the upload service is paused: e.g. Uploading files: 1 of 10 (paused)-->
     <string name="upload_service_notification_paused">Fazendo upload de arquivos: %1$d de %2$d (pausado)</string>
-    <!-- Text of the notification shown when the folder upload service is running, e.g. Uploading folders 1 of 2 -->
-    <string name="folder_upload_service_notification">Fazendo upload de pastas: %1$d de %2$d</string>
-    <!-- Text of the notification shown when the folder upload service is paused, e.g. Uploading folders 1 of 2 (paused) -->
-    <string name="folder_upload_service_notification_paused">Fazendo upload de arquivos: %1$d de %2$d (pausado)</string>
     <!-- Text of the notification shown when the upload service has finished, Plural -->
     <plurals name="upload_service_final_notification">
         <item quantity="one">Upload de %1$d arquivo concluído</item>
@@ -1622,11 +1618,6 @@
     <plurals name="upload_service_notification_already_uploaded">
         <item quantity="one">Já tinha sido feito o upload de 1 arquivo</item>
         <item quantity="other">Já tinha sido feito o upload de %1$d arquivos</item>
-    </plurals>
-    <!-- Text of the notification shown when the folder upload service has finished, Text of the notification shown when the folder upload service has finished - plural  e.g. Uploaded 2 folders -->
-    <plurals name="folder_upload_service_final_notification">
-        <item quantity="one">Upload de %1$d pasta concluído</item>
-        <item quantity="other">Upload de %1$d pastas concluído</item>
     </plurals>
     <!-- label for the total file size of multiple files and/or folders (no need to put the colon punctuation in the translation) -->
     <string name="general_total_size">Tamanho total: %1$s</string>
@@ -1770,8 +1761,6 @@
     <string name="attachment_upload_panel_from_cloud">Da Nuvem de arquivos</string>
     <!--  -->
     <string name="attachment_upload_panel_contact">Contato</string>
-    <!--  -->
-    <string name="attachment_upload_panel_photo">Do seu dispositivo</string>
     <!-- Button and title of dialog shown when the user wants to delete permanently their account. -->
     <string name="delete_account">Excluir conta</string>
     <!-- Text shown in the alert dialog to confirm the deletion of an account -->
@@ -2592,7 +2581,10 @@
     <!-- Settings preference title to show file versions info of the account -->
     <string name="settings_file_management_file_versions_title">Versões de arquivos</string>
     <!-- Settings preference subtitle to show file versions info of the account -->
-    <string name="settings_file_management_file_versions_subtitle">%1$d versões do arquivos, ocupando um total de %2$s</string>
+    <plurals name="settings_file_management_file_versions_subtitle">
+        <item quantity="one">1 arquivo com versão, ocupando um total de %2$s</item>
+        <item quantity="other">%1$d versões de arquivos, ocupando um total de %2$s</item>
+    </plurals>
     <!-- Title of the section File management on Settings section -->
     <string name="settings_file_management_category">Gerenciamento de arquivos</string>
     <!-- Option in Settings to delete all the versions of the account -->
@@ -3182,8 +3174,8 @@
     <string name="not_allow_play_alert">Não é possível reproduzir arquivos multimídia enquanto houver uma chamada em andamento.</string>
     <!-- Text shown in the list of chats when there is a call in progress but I am not on it -->
     <string name="ongoing_call_messages">Chamada em andamento</string>
-    <!-- Title of the layout to join a group call from the chat screen. The placeholder indicates the user who initiated the call -->
-    <string name="join_call_layout_in_group_call">%s iniciou uma chamada em grupo. Pressione para participar.</string>
+    <!-- Title of the layout to join a group call from the chat screen. -->
+    <string name="join_call_layout_in_group_call">Toque para entrar na chamada em grupo atual.</string>
     <!-- Title of the layout to return to a call -->
     <string name="call_in_progress_layout">Pressione para voltar à chamada</string>
     <!-- message displayed when you try to start a call but it is not possible because you are already on a call -->
@@ -3562,8 +3554,8 @@
     <string name="section_documents">Documentos</string>
     <!-- Label of the floating action button of opening the new chat conversation -->
     <string name="fab_label_new_chat">Novo chat</string>
-    <!-- Text that indicates that there’s no photo to show -->
-    <string name="homepage_empty_hint_photos">Não há fotos</string>
+    <!-- Text that indicates that there’s no image to show in image section -->
+    <string name="homepage_empty_hint_photos">[B]Não[/B] [A]Há[/A] [B]Imagens[/B]</string>
     <!-- Text that indicates that there’s no document to show -->
     <string name="homepage_empty_hint_documents">Não há documentos</string>
     <!-- Text that indicates that there’s no audio to show -->
@@ -3824,7 +3816,7 @@
     <!-- Settings hint that indicates the audio will still be played in background if the app is backgrounded -->
     <string name="settings_background_play_hint">Reproduzindo em segundo plano</string>
     <!-- Text of the empty screen when there are no elements in Photos -->
-    <string name="photos_empty">[B]Não há [/B][A]Fotos[/A]</string>
+    <string name="photos_empty">[B]Não[/B] [B]Há[/B] [A]Fotos[/A]</string>
     <!-- Text to show as subtitle of Enable camera uploads screen -->
     <string name="enable_cu_subtitle">Faça o backup automático de fotos e vídeos na sua Nuvem.</string>
     <!-- Text of a button on Camera Uploads section to show all the content of the section-->
@@ -3858,8 +3850,6 @@
     <string name="error_share_owner_storage_quota">O proprietário da pasta compartilhada excedeu a cota de armazenamento disponível</string>
     <!-- A message shown when uploading, copying or moving something to an incoming share and the owner’s account is over its storage quota. -->
     <string name="warning_share_owner_storage_quota">Não foi possível enviar o arquivo porque destinatário ultrapassou o seu limite de armazenamento.</string>
-    <!-- Content to show in a Snackbar to tip the incompatibility-->
-    <string name="version_incompatibility">Estamos atualizando o MEGAchat. As suas chamadas podem não ser estabelecidas devido a uma incompatibilidade com a versão do aplicativo, a menos que todos os participantes atualizem os seus aplicativos do MEGA à versão mais recente.</string>
     <!-- Message displayed when multiple download starts and 1 file has already been downloaded before and 1 file is being downloaded -->
     <string name="file_already_downloaded_and_file_pending_download">Já foi feito o download de 1 arquivo. 1 arquivo pendente.</string>
     <!-- Message displayed when multiple download starts and 1 file has already been downloaded before and multiple files are being downloaded. Placeholder: number of files -->
@@ -4070,8 +4060,8 @@
     <string name="be_new_moderator">Você é o novo moderador.</string>
     <!-- the content of snack bar when copied meeting link-->
     <string name="copied_meeting_link">O link da reunião foi copiado</string>
-    <!-- Title of the layout to join a meeting from the chat screen. The placeholder indicates the user who initiated the meeting -->
-    <string name="join_meeting_layout_in_group_call">%scomeçou uma reunião. Toque aqui para entrar.</string>
+    <!-- Title of the layout to join a meeting from the chat screen. -->
+    <string name="join_meeting_layout_in_group_call">Toque para entrar na reunião atual.</string>
     <!-- Title of fifth tour screen -->
     <string name="title_tour_five">MEGA Meeting</string>
     <!-- Content of fourth tour screen -->
@@ -4146,4 +4136,97 @@
     <string name="disable_versioning_warning">Nosso recurso de controle de versão de arquivos garante que manteremos cópias mais antigas se você substituí-las por versões mais recentes. Se você desativar o Controle de Versão de Arquivos, não terá mais essa proteção; a cópia antiga será perdida quando você a substituir.</string>
     <!-- Warning informing the user the folder location is trying to open no longer exists. -->
     <string name="location_not_exist">Esta localização não existe mais.</string>
+    <!-- Warning shown informing the contact has been previously invited. The placeholder is to show the name of the contact. -->
+    <string name="contact_already_invited">Você já convidou %1$s</string>
+    <!-- Warning shown informing the contact request has been sent and can be managed in sent requests section. -->
+    <string name="contact_invited">Convite enviado com sucesso. Consulte solicitações enviadas.</string>
+    <!-- Message when file available offline. -->
+    <string name="file_available_offline">Arquivo disponível Offline</string>
+    <!-- Message when file removed from offline. -->
+    <string name="file_removed_offline">Arquivo removido de Offline</string>
+    <!-- Menu option to open a link. Also title of the dialog to open a link. -->
+    <string name="action_open_link">Abrir link</string>
+    <!-- error message shown when a chat link is not well formed. -->
+    <string name="invalid_chat_link_args">Link de chat inválido</string>
+    <!-- Menu option to open a chat link. -->
+    <string name="action_open_chat_link">Abrir o link do chat</string>
+    <!-- Hint shown in the open chat link alert dialog. -->
+    <string name="hint_enter_chat_link">Digite o link do chat</string>
+    <!-- Hint shown in the open link alert dialog. -->
+    <string name="hint_paste_link">Colar link</string>
+    <!-- Error shown when it tries to open an invalid file or folder link .-->
+    <string name="invalid_file_folder_link">Link de arquivo/pasta inválido</string>
+    <!-- Error shown when it tries to open an invalid file or folder link and the text view is empty. -->
+    <string name="invalid_file_folder_link_empty">Digite um link de arquivo/pasta válido</string>
+    <!-- Error shown when it tries to open an invalid chat link and the text view is empty. -->
+    <string name="invalid_chat_link_empty">Digite um link de chat válido</string>
+    <!-- Error shown when it tries to open a chat link from the Cloud Drive section. -->
+    <string name="valid_chat_link">Você digitou um link de chat.</string>
+    <!-- Error shown when it tries to open a contact link from the Cloud Drive section. -->
+    <string name="valid_contact_link">Você digitou um link de contato.</string>
+    <!-- Action button to open a contact link.-->
+    <string name="action_open_contact_link">Abrir link de contato</string>
+    <!-- title for the settings to enable high resolution images when on mobile data -->
+    <string name="settings_mobile_data_resoluton_title">Permitir o uso de dados móveis para visualizar imagens de alta resolução</string>
+    <!-- summary for the settings to enable high resolution images when on mobile data -->
+    <string name="settings_mobile_data_resoluton_summary">Permitir o uso de dados móveis para carregar imagens de alta resolução durante a visualização. Se esta opção for desativada, a imagem original só será carregada quando você aumentar o zoom.</string>
+    <!-- If users want to move the root backup folder, all backups underneath it are disabled. Warning dialog will show to confirm -->
+    <string name="backup_move_root_folder">Você está a ponto de alterar a localização de uma pasta de backup predeterminada. Ao fazer isso, você poderá ter dificuldades para localizar esta pasta de backup. Assegure-se de lembrar onde ela está localizada para poder encontrá-la no futuro.</string>
+    <!-- If users want to move the sub backup folder, all backups underneath it are disabled. Warning dialog will show to confirm -->
+    <string name="backup_move_sub_folder">Mover esta pasta altera o destino de um ou mais backups configurados e pode ter consequências não intencionais. Os backups serão desativados para a sua segurança. Os backups podem ser reativados com o Aplicativo do MEGA para Desktop. Você quer continuar?</string>
+    <!-- If users want to delete the root backup folder, all backups underneath it are disabled. Warning dialog will show to confirm -->
+    <string name="backup_remove_root_folder">Você está a ponto de excluir a sua pasta de backup. Ao fazer isso, serão removidos todos os backups que você configurou. Você tem certeza de que quer fazer isso?</string>
+    <!-- If users want to delete the sub backup folder, all backups underneath it are disabled. Warning dialog will show to confirm -->
+    <string name="backup_remove_sub_folder">Você tem certeza de que quer excluir a sua pasta de backup e desativar o backup associado a ela?</string>
+    <!-- The title of warning dialog for single folder moving -->
+    <string name="backup_move_folder_title">Mover “%1s”</string>
+    <!-- The title of warning dialog for single folder deleting -->
+    <string name="backup_remove_folder_title">Mover “%1s” à Lixeira</string>
+    <!-- The title of warning dialog for multi-folder moving -->
+    <string name="backup_move_multiple_folder_title">Mover pastas de backup</string>
+    <!-- The title of warning dialog for single folder deleting -->
+    <string name="backup_remove_multiple_folder_title">Mover as pastas de backup para a Lixeira</string>
+    <!-- The confirm information of warning dialog for deleting -->
+    <string name="backup_disable_confirm">Desativar backup</string>
+    <!-- The confirm information of warning dialog for moving "My backup" -->
+    <string name="backup_move_confirm">Mover backup</string>
+    <!-- The confirm information of warning dialog for deleting -->
+    <string name="backup_action_confirm">Digite “%1s” para confirmar</string>
+    <!-- when checking the input -->
+    <string name="error_backup_confirm_dont_match">O texto digitado não corresponde</string>
+    <!-- The title of confirm dialog for adding item to "My backup" -->
+    <string name="backup_add_confirm_title">Adicionar este item a “%1s”</string>
+    <!-- The title of warning dialog for adding item to "My backup" -->
+    <string name="backup_add_item_title">Configurar o backup</string>
+    <!-- If users want to add items to the "My backup" folder, Warning dialog will show to confirm -->
+    <string name="backup_add_item_to_root_text">Para garantir que esses itens adicionados à sua pasta de backup sejam sincronizados automaticamente com a Nuvem do MEGA, por favor, configure-os no Aplicativo do MEGA para Desktop.</string>
+    <!-- If users want to share items in the "My backup" folder, Warning dialog will show to confirm -->
+    <string name="backup_share_permission_title">Somente leitura</string>
+    <!-- If users want to share items in the "My backup" folder, Warning dialog will show to confirm -->
+    <string name="backup_share_permission_text">Esta pasta só pode ser compartilhada como somente leitura porque é uma pasta de backup. Qualquer alteração no seu conteúdo pode desativar o backup.</string>
+    <!-- If users want to add items to the "My backup" device folder, Warning dialog will show to confirm -->
+    <string name="backup_add_item_text">Os itens nessa pasta fazem parte de um backup configurado e são sincronizados com uma pasta local. Esta ação interromperá a sincronização e desativará o backup. O backup pode ser reativado com o Aplicativo do MEGA para Desktop. Você tem certeza de que quer continuar?</string>
+    <!-- Share multi backup folders, show below warning message -->
+    <string name="backup_multi_share_permission_text">Essas pastas só podem ser compartilhadas como somente leitura porque são pastas de backup. Qualquer alteração no seu conteúdo pode desativar o backup.</string>
+    <!-- Share multi folders mix with backup and non-backup folders, show below warning message -->
+    <string name="backup_share_with_root_permission_text">Algumas das pastas compartilhadas são pastas de backup e, portanto, somente leitura. Você quer continuar?</string>
+    <!-- Indicates the content of the backup folder -->
+    <plurals name="num_devices">
+        <item quantity="one">%d dispositivo</item>
+        <item quantity="other">%d dispositivos</item>
+    </plurals>
+    <!-- Title of the button when you want to answer a one to one call -->
+    <string name="title_join_one_to_one_call">Atender chamada</string>
+    <!-- Title of the menu when the select tracks on playlist page-->
+    <string name="title_select_tracks">Selecionar faixas</string>
+    <!-- Action button to upload files. -->
+    <string name="upload_files">Enviar arquivos</string>
+    <!-- Action button to upload a folder. -->
+    <string name="upload_folder">Enviar pasta</string>
+    <!-- Title of the dialog warning the user about cancel uploads. -->
+    <string name="cancel_uploads">Cancelar uploads</string>
+    <!-- Warning alerting user if proceed with the action all the uploads will be cancelled. -->
+    <string name="cancel_uploads_warning">A interrupção do processo de upload resultará no cancelamento de todos os seus uploads.</string>
+    <!-- Button to proceed with action. -->
+    <string name="action_proceed">Continuar</string>
 </resources>

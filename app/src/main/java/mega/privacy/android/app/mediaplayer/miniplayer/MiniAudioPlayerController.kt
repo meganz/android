@@ -23,10 +23,11 @@ import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_REBUILD_PLAYLIS
  * @param playerView the ExoPlayer view
  * @param onPlayerVisibilityChanged a callback for mini player view visibility change
  */
+@Suppress("DEPRECATION")
 class MiniAudioPlayerController constructor(
     private val playerView: PlayerView,
     private val onPlayerVisibilityChanged: (() -> Unit)? = null,
-) : LifecycleObserver {
+) : LifecycleEventObserver {
     private val context = playerView.context
 
     private val trackName = playerView.findViewById<TextView>(R.id.track_name)
@@ -103,7 +104,15 @@ class MiniAudioPlayerController constructor(
         }
     }
 
-    @OnLifecycleEvent(Lifecycle.Event.ON_RESUME)
+    override fun onStateChanged(source: LifecycleOwner, event: Lifecycle.Event) {
+        when(event){
+            Lifecycle.Event.ON_RESUME -> onResume()
+            Lifecycle.Event.ON_PAUSE -> onPause()
+            Lifecycle.Event.ON_DESTROY -> onDestroy()
+            else -> return
+        }
+    }
+
     fun onResume() {
         val service = playerService
         if (service != null) {
@@ -112,12 +121,10 @@ class MiniAudioPlayerController constructor(
         playerView.onResume()
     }
 
-    @OnLifecycleEvent(Lifecycle.Event.ON_PAUSE)
     fun onPause() {
         playerView.onPause()
     }
 
-    @OnLifecycleEvent(Lifecycle.Event.ON_DESTROY)
     fun onDestroy() {
         audioPlayerPlaying.removeObserver(audioPlayerPlayingObserver)
         onAudioPlayerServiceStopped()
@@ -173,4 +180,6 @@ class MiniAudioPlayerController constructor(
             audioPlayerPlaying.value = playing
         }
     }
+
+
 }

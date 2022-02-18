@@ -693,9 +693,9 @@
     <!-- Dialog title, to explain why MEGA needs the ’display over other apps’ permission (Android 10) -->
     <string name="ask_for_display_over_title">Permettre les notifications pour les appels MEGA entrants</string>
     <!-- Dialog message, to explain why MEGA needs the ’display over other apps’ permission (Android 10) -->
-    <string name="ask_for_display_over_msg">Veuillez accorder à MEGA la permission de s’afficher par-dessus d’autres applis pour les appels.</string>
+    <string name="ask_for_display_over_msg">Veuillez accorder à MEGA l’autorisation de s’afficher par-dessus d’autres applis pour les appels.</string>
     <!-- Prompt text shows when the user doesn’t want to make MEGA grant the ’display over other apps’ permission for now (Android 10) -->
-    <string name="ask_for_display_over_explain">Vous pouvez toujours accorder les permissions dans les paramètres de l’appareil.</string>
+    <string name="ask_for_display_over_explain">Vous pouvez toujours accorder les autorisations dans les Paramètres de l’appareil.</string>
     <!-- the options of how to upload, but in an array. needed for the settings, how to upload the camera images. only when Wi-Fi connected -->
     <string name="cam_sync_wifi">Wi-Fi seulement</string>
     <!-- the options of how to upload, but in an array. needed for the settings, how to upload the camera images. when Wi-Fi connected and using data plan -->
@@ -1020,7 +1020,7 @@
     <!-- Third paragraph of the screen to backup the master key -->
     <string name="backup_third_paragraph">Un assaillant externe ne peut pas accéder à votre compte avec seulement votre clé. Une réinitialisation du mot de passe exige à la fois la clé et l’accès à votre compte de courriel.</string>
     <!-- Sentence to inform the user the available actions in the screen to backup the master key -->
-    <string name="backup_action">Copiez la Clé de récupération dans le presse-papiers ou enregistrez-la comme fichier texte</string>
+    <string name="backup_action">Copiez la Clé de récupération dans le presse-papiers ou enregistrez-la comme fichier texte.</string>
     <!-- Action of a button to save something -->
     <string name="save_action">Enregistrer</string>
     <!-- Alert message when the master key has been successfully copied to the ClipBoard -->
@@ -1609,10 +1609,6 @@
     <string name="upload_service_notification">Téléversement de fichiers&#160;: %1$d de %2$d</string>
     <!-- Text of the notification shown when the upload service is paused: e.g. Uploading files: 1 of 10 (paused)-->
     <string name="upload_service_notification_paused">Téléversement de fichiers&#160;: %1$d de %2$d (en pause)</string>
-    <!-- Text of the notification shown when the folder upload service is running, e.g. Uploading folders 1 of 2 -->
-    <string name="folder_upload_service_notification">Téléversement de dossiers&#160;: %1$d de %2$d</string>
-    <!-- Text of the notification shown when the folder upload service is paused, e.g. Uploading folders 1 of 2 (paused) -->
-    <string name="folder_upload_service_notification_paused">Téléversement de dossiers&#160;: %1$d de %2$d (en pause)</string>
     <!-- Text of the notification shown when the upload service has finished, Plural -->
     <plurals name="upload_service_final_notification">
         <item quantity="one">%1$d fichier a été téléversé</item>
@@ -1622,11 +1618,6 @@
     <plurals name="upload_service_notification_already_uploaded">
         <item quantity="one">1 fichier est déjà téléversé</item>
         <item quantity="other">%1$d fichiers sont déjà téléversés</item>
-    </plurals>
-    <!-- Text of the notification shown when the folder upload service has finished, Text of the notification shown when the folder upload service has finished - plural  e.g. Uploaded 2 folders -->
-    <plurals name="folder_upload_service_final_notification">
-        <item quantity="one">%1$d dossier a été téléversé</item>
-        <item quantity="other">%1$d dossiers ont été téléversés</item>
     </plurals>
     <!-- label for the total file size of multiple files and/or folders (no need to put the colon punctuation in the translation) -->
     <string name="general_total_size">Taille totale : %1$s</string>
@@ -1770,8 +1761,6 @@
     <string name="attachment_upload_panel_from_cloud">Du Disque nuagique</string>
     <!--  -->
     <string name="attachment_upload_panel_contact">Contact</string>
-    <!--  -->
-    <string name="attachment_upload_panel_photo">De l’appareil</string>
     <!-- Button and title of dialog shown when the user wants to delete permanently their account. -->
     <string name="delete_account">Supprimer le compte</string>
     <!-- Text shown in the alert dialog to confirm the deletion of an account -->
@@ -2034,7 +2023,7 @@
     <!-- Dialog title to ask download to internal storage or external storage. -->
     <string name="title_select_download_location">Choisir l’emplacement de téléchargement</string>
     <!-- Title of the section to invite contacts if the user has denied the contacts permmissions -->
-    <string name="no_contacts_permissions">Aucune permission de contact n’a été accordée</string>
+    <string name="no_contacts_permissions">Aucune autorisation de contact n’a été accordée</string>
     <!-- Option of the sliding panel to go to QR code section -->
     <string name="choose_qr_option_panel">Mon code QR</string>
     <!-- Title of the screen that shows the options to the QR code -->
@@ -2592,7 +2581,10 @@
     <!-- Settings preference title to show file versions info of the account -->
     <string name="settings_file_management_file_versions_title">Versions de fichiers</string>
     <!-- Settings preference subtitle to show file versions info of the account -->
-    <string name="settings_file_management_file_versions_subtitle">%1$d versions de fichiers, qui occupent %2$s au total</string>
+    <plurals name="settings_file_management_file_versions_subtitle">
+        <item quantity="one">1 version de fichier, qui occupe %2$s au total</item>
+        <item quantity="other">%1$d versions de fichiers, qui occupent %2$s au total</item>
+    </plurals>
     <!-- Title of the section File management on Settings section -->
     <string name="settings_file_management_category">Gestion des fichiers</string>
     <!-- Option in Settings to delete all the versions of the account -->
@@ -2827,9 +2819,9 @@
     <!-- Subtitle of folder takedown historic notification -->
     <string name="subtitle_folder_takedown_notification">[A]Votre dossier [B]%s[/B] partagé publiquement[/A][C] a été retiré.[/C]</string>
     <!-- Popup notification text on mouse-over of taken down file. -->
-    <string name="message_file_takedown_pop_out_notification">Ce fichier a été l’objet d’un avis de retrait.</string>
+    <string name="message_file_takedown_pop_out_notification">Ce fichier a fait l’objet d’un avis de retrait.</string>
     <!-- Popup notification text on mouse-over taken down folder. -->
-    <string name="message_folder_takedown_pop_out_notification">Ce dossier a été l’objet d’un avis de retrait.</string>
+    <string name="message_folder_takedown_pop_out_notification">Ce dossier a fait l’objet d’un avis de retrait.</string>
     <!-- option to dispute taken down file or folder -->
     <string name="dispute_takendown_file">Contester le retrait</string>
     <!-- Error shown when download a file that has violated ToS/AUP. -->
@@ -3182,8 +3174,8 @@
     <string name="not_allow_play_alert">Il est impossible de lire des fichiers multimédias alors qu’un appel est en cours.</string>
     <!-- Text shown in the list of chats when there is a call in progress but I am not on it -->
     <string name="ongoing_call_messages">Appel en cours</string>
-    <!-- Title of the layout to join a group call from the chat screen. The placeholder indicates the user who initiated the call -->
-    <string name="join_call_layout_in_group_call">%s a commencé un appel de groupe. Touchez pour vous y joindre.</string>
+    <!-- Title of the layout to join a group call from the chat screen. -->
+    <string name="join_call_layout_in_group_call">Toucher pour vous joindre à l’appel de groupe en cours.</string>
     <!-- Title of the layout to return to a call -->
     <string name="call_in_progress_layout">Toucher pour reprendre l’appel</string>
     <!-- message displayed when you try to start a call but it is not possible because you are already on a call -->
@@ -3209,9 +3201,9 @@
     <!-- The text of the notification button that is displayed when there is a call in progress, another call is received and ignored. -->
     <string name="ignore_call_incoming">Ignorer</string>
     <!-- Subtitle of the call screen when a user muted the current individual call. The placeholder indicates the user who muted the call -->
-    <string name="muted_contact_micro">%s a mis l’appel en sourdine</string>
+    <string name="muted_contact_micro">%s a désactivé le micro pour cet appel</string>
     <!-- Subtitle of the call screen when I muted the current individual call -->
-    <string name="muted_own_micro">En sourdine</string>
+    <string name="muted_own_micro">Le micro est désactivé</string>
     <!-- Subtitle of the call screen when the call is on hold -->
     <string name="call_on_hold">L’appel est en attente</string>
     <!-- Subtitle of the call screen when a participant puts the call on hold. The placeholder indicates the user who put the call on hold -->
@@ -3562,8 +3554,8 @@
     <string name="section_documents">Documents</string>
     <!-- Label of the floating action button of opening the new chat conversation -->
     <string name="fab_label_new_chat">Nouvelle conversation</string>
-    <!-- Text that indicates that there’s no photo to show -->
-    <string name="homepage_empty_hint_photos">Aucune photo n’a été trouvée</string>
+    <!-- Text that indicates that there’s no image to show in image section -->
+    <string name="homepage_empty_hint_photos">[B]Aucune[/B] [A]image[/A] [B]n’a été trouvée[/B]</string>
     <!-- Text that indicates that there’s no document to show -->
     <string name="homepage_empty_hint_documents">Aucun document n’a été trouvé</string>
     <!-- Text that indicates that there’s no audio to show -->
@@ -3824,7 +3816,7 @@
     <!-- Settings hint that indicates the audio will still be played in background if the app is backgrounded -->
     <string name="settings_background_play_hint">Lecture en arrière-plan</string>
     <!-- Text of the empty screen when there are no elements in Photos -->
-    <string name="photos_empty">[B]Aucune[/B] [A]photo[/A]</string>
+    <string name="photos_empty">[B]Aucune[/B] [A]photo[/A] [B]n’a été trouvée[/B]</string>
     <!-- Text to show as subtitle of Enable camera uploads screen -->
     <string name="enable_cu_subtitle">Sauvegardez automatiquement vos photos et vos vidéos dans votre Disque nuagique.</string>
     <!-- Text of a button on Camera Uploads section to show all the content of the section-->
@@ -3858,8 +3850,6 @@
     <string name="error_share_owner_storage_quota">Le propriétaire du partage a dépassé son quota d’espace de stockage.</string>
     <!-- A message shown when uploading, copying or moving something to an incoming share and the owner’s account is over its storage quota. -->
     <string name="warning_share_owner_storage_quota">Le fichier ne peut pas être envoyé, car l’utilisateur cible a dépassé son quota d’espace de stockage.</string>
-    <!-- Content to show in a Snackbar to tip the incompatibility-->
-    <string name="version_incompatibility">Nous mettons MEGAchat à niveau. Vos appels pourraient ne pas être connectés en raison d’incompatibilité des versions, à moins qu’appelant et appelés aient aussi mis à niveau leurs applis&#160;MEGA vers la version la plus récente.</string>
     <!-- Message displayed when multiple download starts and 1 file has already been downloaded before and 1 file is being downloaded -->
     <string name="file_already_downloaded_and_file_pending_download">1 fichier est déjà téléchargé, 1 fichier est en attente.</string>
     <!-- Message displayed when multiple download starts and 1 file has already been downloaded before and multiple files are being downloaded. Placeholder: number of files -->
@@ -4070,8 +4060,8 @@
     <string name="be_new_moderator">Vous êtes le nouveau modérateur.</string>
     <!-- the content of snack bar when copied meeting link-->
     <string name="copied_meeting_link">Le lien de la réunion a été copié.</string>
-    <!-- Title of the layout to join a meeting from the chat screen. The placeholder indicates the user who initiated the meeting -->
-    <string name="join_meeting_layout_in_group_call">%s a commencé une réunion. Toucher pour vous y joindre.</string>
+    <!-- Title of the layout to join a meeting from the chat screen. -->
+    <string name="join_meeting_layout_in_group_call">Toucher pour vous joindre à la réunion en cours.</string>
     <!-- Title of fifth tour screen -->
     <string name="title_tour_five">Réunion&#160;MEGA</string>
     <!-- Content of fourth tour screen -->
@@ -4146,4 +4136,97 @@
     <string name="disable_versioning_warning">Notre fonction de versionnage des fichiers fait en sorte que nous conservons les anciennes versions de vos fichiers si vous les remplacez par de nouvelles versions. Si vous désactivez le versionnage des fichiers, vous ne profiterez plus de cette protection ; l’ancienne copie sera perdue quand vous la remplacerez.</string>
     <!-- Warning informing the user the folder location is trying to open no longer exists. -->
     <string name="location_not_exist">Cet emplacement n’existe plus.</string>
+    <!-- Warning shown informing the contact has been previously invited. The placeholder is to show the name of the contact. -->
+    <string name="contact_already_invited">Vous avez déjà invité %1$s.</string>
+    <!-- Warning shown informing the contact request has been sent and can be managed in sent requests section. -->
+    <string name="contact_invited">L\’invitation a été envoyée avec succès. Consultez les demandes envoyées.</string>
+    <!-- Message when file available offline. -->
+    <string name="file_available_offline">Le fichier est accessible Hors ligne</string>
+    <!-- Message when file removed from offline. -->
+    <string name="file_removed_offline">Le fichier a été supprimé de Hors&#160;ligne</string>
+    <!-- Menu option to open a link. Also title of the dialog to open a link. -->
+    <string name="action_open_link">Ouvrir un lien</string>
+    <!-- error message shown when a chat link is not well formed. -->
+    <string name="invalid_chat_link_args">Le lien de conversation est invalide</string>
+    <!-- Menu option to open a chat link. -->
+    <string name="action_open_chat_link">Ouvrir un lien de conversation</string>
+    <!-- Hint shown in the open chat link alert dialog. -->
+    <string name="hint_enter_chat_link">Saisissez le lien de conversation</string>
+    <!-- Hint shown in the open link alert dialog. -->
+    <string name="hint_paste_link">Copiez le lien</string>
+    <!-- Error shown when it tries to open an invalid file or folder link .-->
+    <string name="invalid_file_folder_link">Le lien de fichier ou de dossier est invalide</string>
+    <!-- Error shown when it tries to open an invalid file or folder link and the text view is empty. -->
+    <string name="invalid_file_folder_link_empty">Veuillez saisir un lien de fichier ou de dossier valide</string>
+    <!-- Error shown when it tries to open an invalid chat link and the text view is empty. -->
+    <string name="invalid_chat_link_empty">Veuillez saisir un lien de conversation valide</string>
+    <!-- Error shown when it tries to open a chat link from the Cloud Drive section. -->
+    <string name="valid_chat_link">Vous avez collé un lien de conversation.</string>
+    <!-- Error shown when it tries to open a contact link from the Cloud Drive section. -->
+    <string name="valid_contact_link">Vous avez collé un lien de contact.</string>
+    <!-- Action button to open a contact link.-->
+    <string name="action_open_contact_link">Ouvrir le lien de contact</string>
+    <!-- title for the settings to enable high resolution images when on mobile data -->
+    <string name="settings_mobile_data_resoluton_title">Utiliser les données mobiles pour prévisualiser les images en haute résolution</string>
+    <!-- summary for the settings to enable high resolution images when on mobile data -->
+    <string name="settings_mobile_data_resoluton_summary">Permettre l’utilisation des données mobiles pour charger des images à haute résolution lors de l’aperçu. Si cette option est désactivée, l’image originale ne sera chargée que lors d’un zoom avant.</string>
+    <!-- If users want to move the root backup folder, all backups underneath it are disabled. Warning dialog will show to confirm -->
+    <string name="backup_move_root_folder">Vous êtes en train de changer l’emplacement par défaut du dossier de sauvegarde. Cela pourrait affecter votre capacité à le trouver à l’avenir. Veuillez mémoriser son emplacement afin de pouvoir le trouver ultérieurement.</string>
+    <!-- If users want to move the sub backup folder, all backups underneath it are disabled. Warning dialog will show to confirm -->
+    <string name="backup_move_sub_folder">Déplacer ce dossier change la destination d’une ou de plusieurs sauvegardes configurées et pourrait avoir des conséquences inattendues. Les sauvegardes seront désactivées par sécurité. Les sauvegardes peuvent être réactivées grâce à l’appli&#160; MEGA pour ordinateur. Voulez-vous poursuivre ?</string>
+    <!-- If users want to delete the root backup folder, all backups underneath it are disabled. Warning dialog will show to confirm -->
+    <string name="backup_remove_root_folder">Vous êtes en train de supprimer votre dossier de sauvegarde. Cela supprimera toutes les sauvegardes que vous avez définies. Confirmez-vous cette action ?</string>
+    <!-- If users want to delete the sub backup folder, all backups underneath it are disabled. Warning dialog will show to confirm -->
+    <string name="backup_remove_sub_folder">Confirmez-vous que vous voulez supprimer votre dossier de sauvegarde et désactiver les sauvegardes qui y sont associées ?</string>
+    <!-- The title of warning dialog for single folder moving -->
+    <string name="backup_move_folder_title">Déplacer «&#160;%1s&#160;»</string>
+    <!-- The title of warning dialog for single folder deleting -->
+    <string name="backup_remove_folder_title">Déplacer «&#160;%1s&#160;» vers la Corbeille</string>
+    <!-- The title of warning dialog for multi-folder moving -->
+    <string name="backup_move_multiple_folder_title">Déplacer les dossiers de sauvegarde</string>
+    <!-- The title of warning dialog for single folder deleting -->
+    <string name="backup_remove_multiple_folder_title">Déplacer les dossiers de sauvegarde vers la corbeille</string>
+    <!-- The confirm information of warning dialog for deleting -->
+    <string name="backup_disable_confirm">Désactiver la sauvegarde</string>
+    <!-- The confirm information of warning dialog for moving "My backup" -->
+    <string name="backup_move_confirm">Déplacer la sauvegarde</string>
+    <!-- The confirm information of warning dialog for deleting -->
+    <string name="backup_action_confirm">Veuillez taper «&#160;%1s&#160;» pour confirmer cette action</string>
+    <!-- when checking the input -->
+    <string name="error_backup_confirm_dont_match">Le texte saisi ne correspond pas</string>
+    <!-- The title of confirm dialog for adding item to "My backup" -->
+    <string name="backup_add_confirm_title">Ajouter un élément à «&#160;%1s&#160;»</string>
+    <!-- The title of warning dialog for adding item to "My backup" -->
+    <string name="backup_add_item_title">Configurer la sauvegarde</string>
+    <!-- If users want to add items to the "My backup" folder, Warning dialog will show to confirm -->
+    <string name="backup_add_item_to_root_text">Pour faire en sorte que ces éléments ajoutés à votre dossier de sauvegarde sont automatiquement synchronisés vers le Nuage&#160;MEGA, veuillez le paramétrer dans l’Appli&#160;MEGA pour ordinateur.</string>
+    <!-- If users want to share items in the "My backup" folder, Warning dialog will show to confirm -->
+    <string name="backup_share_permission_title">En lecture seule</string>
+    <!-- If users want to share items in the "My backup" folder, Warning dialog will show to confirm -->
+    <string name="backup_share_permission_text">Ce dossier ne peut être partagé qu’en lecture seule, car c’est un dossier de sauvegarde. Tout changement apporté à son contenu pourrait désactiver la sauvegarde.</string>
+    <!-- If users want to add items to the "My backup" device folder, Warning dialog will show to confirm -->
+    <string name="backup_add_item_text">Les éléments dans ce dossier font partie d’une sauvegarde configurée et sont synchronisés vers un dossier local. Cette action brisera la synchronisation et désactivera la sauvegarde. La sauvegarde peut être réactivée grâce à l’Appli&#160;MEGA pour ordinateur. Voulez-vous vraiment poursuivre ?</string>
+    <!-- Share multi backup folders, show below warning message -->
+    <string name="backup_multi_share_permission_text">Ces dossiers ne peuvent être partagés qu’en lecture seule ; comme ce sont des dossiers de sauvegarde, tout changement apporté à leur contenu pourrait désactiver les sauvegardes.</string>
+    <!-- Share multi folders mix with backup and non-backup folders, show below warning message -->
+    <string name="backup_share_with_root_permission_text">Certains dossiers partagés sont des dossiers de sauvegarde et en lecture seule. Souhaitez-vous poursuivre ?</string>
+    <!-- Indicates the content of the backup folder -->
+    <plurals name="num_devices">
+        <item quantity="one">%d appareil</item>
+        <item quantity="other">%d appareils</item>
+    </plurals>
+    <!-- Title of the button when you want to answer a one to one call -->
+    <string name="title_join_one_to_one_call">Répondre à l’appel</string>
+    <!-- Title of the menu when the select tracks on playlist page-->
+    <string name="title_select_tracks">Sélectionner des pièces</string>
+    <!-- Action button to upload files. -->
+    <string name="upload_files">Téléverser des fichiers</string>
+    <!-- Action button to upload a folder. -->
+    <string name="upload_folder">Téléverser un dossier</string>
+    <!-- Title of the dialog warning the user about cancel uploads. -->
+    <string name="cancel_uploads">Annuler les téléversements</string>
+    <!-- Warning alerting user if proceed with the action all the uploads will be cancelled. -->
+    <string name="cancel_uploads_warning">L’interruption du processus de téléversement entraînera l’annulation de tous vos téléversements.</string>
+    <!-- Button to proceed with action. -->
+    <string name="action_proceed">Poursuivre</string>
 </resources>

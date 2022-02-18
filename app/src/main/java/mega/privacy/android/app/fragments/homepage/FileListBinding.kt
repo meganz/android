@@ -5,6 +5,7 @@ import android.net.Uri
 import android.view.View
 import android.view.ViewGroup
 import android.widget.FrameLayout
+import androidx.core.content.ContextCompat
 import androidx.databinding.BindingAdapter
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
@@ -65,12 +66,14 @@ fun setListItemThumbnail(
     with(imageView) {
         when {
             selected -> {
-                setActualImageResource(R.drawable.ic_select_folder)
+                hierarchy.setOverlayImage(ContextCompat.getDrawable(context, R.drawable.ic_select_folder))
             }
             isFileAvailable(file) -> {
+                hierarchy.setOverlayImage(null)
                 setImageURI(Uri.fromFile(file))
             }
             else -> {
+                hierarchy.setOverlayImage(null)
                 setActualImageResource(defaultThumbnail)
             }
         }

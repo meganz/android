@@ -31,6 +31,7 @@ object EventConstants {
     const val EVENT_MEETING_CREATED = "meeting_created"
     const val EVENT_LINK_RECOVERED = "meeting_link_recovered"
     const val EVENT_ENABLE_OR_DISABLE_LOCAL_VIDEO_CHANGE = "enable_or_disable_local_video_change"
+    const val EVENT_REMOVE_CALL_NOTIFICATION = "remove_call_notification"
 
     /** Event Keys related to sessions*/
     const val EVENT_SESSION_STATUS_CHANGE = "session_status_change"
@@ -48,7 +49,6 @@ object EventConstants {
     const val EVENT_UPDATE_SCROLL = "EVENT_UPDATE_SCROLL"
     const val EVENT_PERFORM_SCROLL = "EVENT_PERFORM_SCROLL"
     const val EVENT_REFRESH_PHONE_NUMBER = "EVENT_REFRESH_PHONE_NUMBER"
-    const val EVENT_PURCHASES_UPDATED = "EVENT_PURCHASES_UPDATED"
     const val EVENT_2FA_UPDATED = "EVENT_2FA_UPDATED"
 
     const val EVENT_UPDATE_HIDE_RECENT_ACTIVITY = "EVENT_UPDATE_HIDE_RECENT_ACTIVITY"
