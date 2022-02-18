@@ -198,7 +198,6 @@ class ImageViewerActivity : BaseActivity(), PermissionRequester, SnackbarShower 
          * @param context           Required to build the Intent.
          * @param imageFileUri      Image file uri to be shown.
          * @param showNearbyFiles   Show nearby files from current parent file.
-         * @param currentFakeHandle Current file fake handle.
          * @return                  Image Viewer Intent.
          */
         @JvmStatic
@@ -426,7 +425,7 @@ class ImageViewerActivity : BaseActivity(), PermissionRequester, SnackbarShower 
     /**
      * Populate current image information to bottom texts and toolbar options.
      *
-     * @param item  Image item to show
+     * @param imageItem  Image item to show
      */
     private fun showCurrentImageInfo(imageItem: ImageItem?) {
         if (imageItem?.nodeItem != null) {

@@ -44,12 +44,15 @@ import javax.inject.Inject
  * This is shared between ImageViewerActivity behaving as the main container and
  * each individual ImageViewerPageFragment representing a single image within the ViewPager.
  *
- * @property getImageUseCase        Needed to retrieve each individual image based on a node.
- * @property getImageHandlesUseCase Needed to retrieve node handles given sent params.
- * @property getNodeUseCase         Needed to retrieve each individual node based on a node handle,
- *                                  as well as each individual node action required by the menu.
- * @property exportNodeUseCase      Needed to export image node on demand.
- * @property cancelTransferUseCase  Needed to cancel current full image transfer if needed.
+ * @property getImageUseCase            Needed to retrieve each individual image based on a node
+ * @property getImageHandlesUseCase     Needed to retrieve node handles given sent params
+ * @property getGlobalChangesUseCase    Use case required to get node changes
+ * @property getNodeUseCase             Needed to retrieve each individual node based on a node handle,
+ *                                      as well as each individual node action required by the menu
+ * @property exportNodeUseCase          Needed to export image node on demand
+ * @property cancelTransferUseCase      Needed to cancel current full image transfer if needed
+ * @property loggedInUseCase            UseCase required to check when the user is already logged in
+ * @property deleteChatMessageUseCase   UseCase required to delete current chat node message
  */
 @HiltViewModel
 class ImageViewerViewModel @Inject constructor(

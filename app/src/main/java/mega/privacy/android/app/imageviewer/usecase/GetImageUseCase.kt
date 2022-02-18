@@ -53,6 +53,7 @@ import javax.inject.Inject
  * @property megaApi                MegaAPI required for node requests
  * @property getNodeUseCase         NodeUseCase required to retrieve node information
  * @property getChatMessageUseCase  ChatMessageUseCase required to retrieve node information
+ * @property preferences            App preferences to get Mobile Data high resolution setting
  */
 class GetImageUseCase @Inject constructor(
     @ApplicationContext private val context: Context,

@@ -32,6 +32,7 @@ import javax.inject.Inject
  * @property megaApi                    MegaAPI required for node requests
  * @property getChatMessageUseCase      ChatMessageUseCase required to retrieve chat node information
  * @property getNodeUseCase             NodeUseCase required to retrieve node information
+ * @property deleteChatMessageUseCase   UseCase required to delete current chat node message
  */
 class GetImageHandlesUseCase @Inject constructor(
     @ApplicationContext private val context: Context,

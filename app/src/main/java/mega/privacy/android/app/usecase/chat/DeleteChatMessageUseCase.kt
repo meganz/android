@@ -21,6 +21,13 @@ class DeleteChatMessageUseCase @Inject constructor(
     private val megaChatApi: MegaChatApiAndroid
 ) {
 
+    /**
+     * Delete an existing Mega Chat message
+     *
+     * @param chatRoomId    MegaChatHandle that identifies the chat room
+     * @param messageId     MegaChatHandle that identifies the message
+     * @return              Completable
+     */
     fun delete(chatRoomId: Long, messageId: Long): Completable =
         Completable.fromAction {
             val message = megaChatApi.getMessage(chatRoomId, messageId)
