@@ -26,7 +26,9 @@ data class Participant(
     var videoListener: GroupVideoListener? = null,
     // Flag for selected for assign moderator
     var isChosenForAssign: Boolean = false,
-    var isGuest: Boolean = false
+    var isGuest: Boolean = false,
+    var hasOptionsAllowed: Boolean = true
+
 ) : Serializable {
 
     /**
