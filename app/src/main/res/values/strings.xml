@@ -716,6 +716,10 @@
     <string name="camera_notif_secondary_local_unavailable">Media Uploads have been disabled. Your local folder is unavailable.</string>
     <!-- notification camera uploads complete -->
     <string name="settings_camera_notif_complete">Camera uploads complete</string>
+    <!-- Title of DCIM folder warning dialog -->
+    <string name="title_dcim_folder_dialog">DCIM folder</string>
+    <!-- Content of DCIM folder warning dialog -->
+    <string name="content_dcim_folder_dialog">MEGA uploads your images from the gallery. To change the upload location please go to Camera Upload settings. </string>
     <!-- settings of the Appearance section -->
     <string name="settings_appearance">Appearance</string>
     <!-- settings of the Features section -->
