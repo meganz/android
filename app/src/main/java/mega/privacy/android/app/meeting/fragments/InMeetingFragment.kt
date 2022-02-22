@@ -85,7 +85,6 @@ import mega.privacy.android.app.utils.Util.isOnline
 import mega.privacy.android.app.utils.permission.*
 import nz.mega.sdk.*
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
-import java.lang.Integer.min
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -223,14 +222,15 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
                                 MEGACHAT_INVALID_HANDLE
                             )
                         }
-                        bottomFloatingPanelViewHolder.updatePrivilege(inMeetingViewModel.getOwnPrivileges())
+
+                        inMeetingViewModel.updateOwnPrivileges()
+                        bottomFloatingPanelViewHolder.updateShareAndInviteButton()
                     }
 
                     if (item.hasChanged(MegaChatListItem.CHANGE_TYPE_PARTICIPANTS)) {
                         logDebug("Change in the privileges of a participant")
                         inMeetingViewModel.updateParticipantsPrivileges().run {
                             updateRemotePrivileges(this)
-                            bottomFloatingPanelViewHolder.updateRemotePrivileges(this)
                         }
                     }
                 }
@@ -307,7 +307,8 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
                 showMeetingInfoFragment()
             }
         }
-        bottomFloatingPanelViewHolder.updateMeetingType()
+
+        bottomFloatingPanelViewHolder.updatePanel(false)
     }
 
     private val callCompositionObserver = Observer<MegaChatCall> {
@@ -1921,12 +1922,17 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
                 resources.displayMetrics
             )
 
-        updatePanelParticipantList()
-
         //Observer the participant List
         inMeetingViewModel.participants.observe(viewLifecycleOwner) { participants ->
             participants?.let {
-                updatePanelParticipantList(it.toMutableList())
+                bottomFloatingPanelViewHolder
+                    .setParticipantsPanel(
+                        it.toMutableList(),
+                        inMeetingViewModel.getMyOwnInfo(
+                            sharedModel.micLiveData.value ?: false,
+                            sharedModel.cameraLiveData.value ?: false
+                        )
+                    )
             }
         }
 
@@ -1979,6 +1985,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
      */
     private fun updateLocalAudio(isMicOn: Boolean) {
         bottomFloatingPanelViewHolder.updateMicIcon(isMicOn)
+        updateParticipantsBottomPanel()
         showMuteBanner()
     }
 
@@ -2219,8 +2226,25 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
         }
 
         bottomFloatingPanelViewHolder.updateCamIcon(isCamOn)
+        updateParticipantsBottomPanel()
         checkSwapCameraMenuItemVisibility()
         controlVideoLocalOneToOneCall(isCamOn)
+    }
+
+    /*
+     * Method for updating the list of participants in the bottom panel
+     */
+    fun updateParticipantsBottomPanel() {
+        inMeetingViewModel.participants.value?.let { participants ->
+            bottomFloatingPanelViewHolder
+                .updateParticipants(
+                    participants.toMutableList(),
+                    inMeetingViewModel.getMyOwnInfo(
+                        sharedModel.micLiveData.value ?: false,
+                        sharedModel.cameraLiveData.value ?: false
+                    )
+                )
+        }
     }
 
     /**
@@ -2316,8 +2340,6 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
                 }
             }
         }
-
-        bottomFloatingPanelViewHolder.updateRemoteAudioVideo(session)
     }
 
     /**
@@ -2364,8 +2386,6 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
                 }
             }
         }
-
-        bottomFloatingPanelViewHolder.updateParticipantInfo(peerId, type)
 
         if (type == AVATAR_CHANGE) {
             individualCallFragment?.let {
@@ -2709,6 +2729,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
         micIsEnable = sharedModel.micLiveData.value!!
         bottomFloatingPanelViewHolder.updateCamIcon(camIsEnable)
         bottomFloatingPanelViewHolder.updateMicIcon(micIsEnable)
+        updateParticipantsBottomPanel()
     }
 
     /**
@@ -2762,17 +2783,6 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
     override fun onErrorJoinedChat(chatId: Long, userHandle: Long, error: Int) {
         logDebug("Error joining the meeting so close it, error code is $error")
         finishActivity()
-    }
-
-    private fun updatePanelParticipantList(list: MutableList<Participant> = mutableListOf()) {
-        bottomFloatingPanelViewHolder
-            .setParticipants(
-                list,
-                inMeetingViewModel.getMyOwnInfo(
-                    sharedModel.micLiveData.value ?: false,
-                    sharedModel.cameraLiveData.value ?: false
-                )
-            )
     }
 
     /**
