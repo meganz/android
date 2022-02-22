@@ -29,18 +29,13 @@ class SortByBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
 
     companion object {
         private const val ORDER_TYPE = "ORDER_TYPE"
-        private const val IS_INCOMING_ROOT_ORDER = "IS_INCOMING_ROOT_ORDER"
 
         @JvmStatic
-        fun newInstance(
-            orderType: Int,
-            isIncomingRootOrder: Boolean = false
-        ): SortByBottomSheetDialogFragment {
+        fun newInstance(orderType: Int): SortByBottomSheetDialogFragment {
             val fragment = SortByBottomSheetDialogFragment()
             val args = Bundle()
 
             args.putInt(ORDER_TYPE, orderType)
-            args.putBoolean(IS_INCOMING_ROOT_ORDER, isIncomingRootOrder)
             fragment.arguments = args
 
             return fragment
@@ -76,7 +71,6 @@ class SortByBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
         binding.sortByNameDesc.text = "$sortByName ($sortByDesc)"
 
         orderType = arguments?.getInt(ORDER_TYPE)!!
-        isIncomingRootOrder = arguments?.getBoolean(IS_INCOMING_ROOT_ORDER)!!
 
         oldOrder = when (orderType) {
             ORDER_CLOUD -> sortOrderManagement.getOrderCloud()

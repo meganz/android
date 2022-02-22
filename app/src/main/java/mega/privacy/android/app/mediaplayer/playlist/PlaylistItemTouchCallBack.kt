@@ -1,26 +1,30 @@
 package mega.privacy.android.app.mediaplayer.playlist
 
 import android.graphics.Canvas
-import android.view.View
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
-import mega.privacy.android.app.R
 import mega.privacy.android.app.mediaplayer.service.MediaPlayerServiceViewModel
+import mega.privacy.android.app.utils.Util
 
 /**
  * Implement the reorder playlist by drag the item
  * @param adapter PlaylistAdapter
  * @param playerViewModel MediaPlayerServiceViewModel
+ * @param playlistItemDecoration customized item decoration
  */
 class PlaylistItemTouchCallBack(
     private val adapter: PlaylistAdapter,
-    private val playerViewModel: MediaPlayerServiceViewModel
+    private val playerViewModel: MediaPlayerServiceViewModel,
+    private val playlistItemDecoration: PlaylistItemDecoration
 ) : ItemTouchHelper.Callback() {
     companion object {
         // Set the item's opacity for 95% when dragging
         private const val ALPHA_MOVING = 0.95f
         // Recover the opacity after dragged
         private const val ALPHA_FINISHED = 1f
+
+        private const val ELEVATION = 2f
+        private const val ELEVATION_ZERO = 0f
     }
 
     private var isDragging = true
@@ -45,14 +49,14 @@ class PlaylistItemTouchCallBack(
         val targetPosition = target.absoluteAdapterPosition
         playerViewModel.run {
             // Only allow to reorder items of next list
-            if (currentPosition > getNextHeaderPosition()
-                && targetPosition > getNextHeaderPosition()) {
+            if (currentPosition > getPlayingPosition()
+                && targetPosition > getPlayingPosition()) {
                 isUpdatePlaySource = true
                 swapItems(currentPosition, targetPosition)
                 adapter.notifyItemMoved(currentPosition, targetPosition)
             }
         }
-        return false
+        return true
     }
 
     override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
@@ -67,14 +71,16 @@ class PlaylistItemTouchCallBack(
         actionState: Int,
         isCurrentlyActive: Boolean
     ) {
-        recyclerView.post{
+        recyclerView.post {
             when {
                 isDragging -> {
-                    startCustomAnimator(viewHolder, ALPHA_MOVING, View.GONE)
+                    recyclerView.removeItemDecoration(playlistItemDecoration)
+                    startCustomAnimator(viewHolder, ALPHA_MOVING, ELEVATION)
                     isDragging = false
                 }
                 isDragFinished -> {
-                    startCustomAnimator(viewHolder, ALPHA_FINISHED, View.VISIBLE)
+                    recyclerView.addItemDecoration(playlistItemDecoration)
+                    startCustomAnimator(viewHolder, ALPHA_FINISHED)
                     isDragging = true
                     isDragFinished = false
                 }
@@ -101,17 +107,16 @@ class PlaylistItemTouchCallBack(
      * Start the custom animator
      * @param viewHolder RecyclerView.ViewHolder
      * @param alpha the alpha of item view
-     * @param visibility the visibility of item decorator
+     * @param elevation elevation
      */
     private fun startCustomAnimator(
         viewHolder: RecyclerView.ViewHolder,
         alpha: Float,
-        visibility: Int
+        elevation: Float = ELEVATION_ZERO
     ) {
-        // According the item whether is moving to display or hide the decorator of RecycleView
-        viewHolder.itemView.findViewById<View>(R.id.view_decorators).visibility = visibility
         val animator = viewHolder.itemView.animate()
         viewHolder.itemView.alpha = alpha
+        viewHolder.itemView.translationZ = Util.dp2px(elevation).toFloat()
         animator.start()
     }
 }

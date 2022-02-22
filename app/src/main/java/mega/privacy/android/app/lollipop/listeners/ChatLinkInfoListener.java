@@ -87,14 +87,12 @@ public class ChatLinkInfoListener implements MegaRequestListenerInterface, MegaC
                     String link = request.getLink();
 
                     richLinkMessage = new AndroidMegaRichLinkMessage(link, null);
-                    richLinkMessage.setFile(true);
                     ((ChatActivityLollipop) context).setRichLinkInfo(msgId, richLinkMessage);
                 }
                 else if(e.getErrorCode() == MegaError.API_EARGS) {
                     String link = request.getLink();
 
                     richLinkMessage = new AndroidMegaRichLinkMessage(link, null);
-                    richLinkMessage.setFile(true);
                     ((ChatActivityLollipop) context).setRichLinkInfo(msgId, richLinkMessage);
                 }
             }

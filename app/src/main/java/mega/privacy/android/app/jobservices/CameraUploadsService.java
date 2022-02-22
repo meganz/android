@@ -47,6 +47,7 @@ import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.UserCredentials;
 import mega.privacy.android.app.VideoCompressor;
+import mega.privacy.android.app.activities.settingsActivities.CameraUploadsPreferencesActivity;
 import mega.privacy.android.app.listeners.CreateFolderListener;
 import mega.privacy.android.app.listeners.GetCuAttributeListener;
 import mega.privacy.android.app.listeners.SetAttrUserListener;
@@ -121,6 +122,9 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
     public static boolean uploadingInProgress;
     public static boolean isCreatingPrimary;
     public static boolean isCreatingSecondary;
+
+    // If during camera upload setting process, set true to block the service running.
+    private static boolean bInCameraUploadsSetting = false;
 
     private NotificationCompat.Builder mBuilder;
     private NotificationManager mNotificationManager;
@@ -883,7 +887,7 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
         logDebug("Stopping foreground!");
 
         if (megaApi.getNumPendingUploads() <= 0) {
-            megaApi.resetCompletedUploads();
+            megaApi.resetTotalUploads();
         }
         totalUploaded = 0;
         totalToUpload = 0;
@@ -996,6 +1000,11 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
 
         if (isDeviceLowOnBattery(batteryIntent)) {
             return BATTERY_STATE_LOW;
+        }
+
+        if (isInCameraUploadsSetting()){
+            logWarning("Camera uploads setting is in progress");
+            return SHOULD_RUN_STATE_FAILED;
         }
 
         prefs = dbH.getPreferences();
@@ -1439,7 +1448,7 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
             if (e.getErrorCode() == MegaError.API_OK) {
                 new Handler().postDelayed(() -> {
                     if (megaApi.getNumPendingUploads() <= 0) {
-                        megaApi.resetCompletedUploads();
+                        megaApi.resetTotalUploads();
                     }
                 }, 200);
             } else {
@@ -1447,7 +1456,7 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
             }
         } else if (request.getType() == MegaRequest.TYPE_CANCEL_TRANSFERS) {
             if (e.getErrorCode() == MegaError.API_OK && megaApi.getNumPendingUploads() <= 0) {
-                megaApi.resetCompletedUploads();
+                megaApi.resetTotalUploads();
             }
         } else if (request.getType() == MegaRequest.TYPE_PAUSE_TRANSFERS) {
             logDebug("Pausetransfer false received");
@@ -1765,7 +1774,7 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
     private void startVideoCompression() {
         List<SyncRecord> fullList = dbH.findVideoSyncRecordsByState(STATUS_TO_COMPRESS);
         if (megaApi.getNumPendingUploads() <= 0) {
-            megaApi.resetCompletedUploads();
+            megaApi.resetTotalUploads();
         }
         totalUploaded = 0;
         totalToUpload = 0;
@@ -2221,5 +2230,21 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
         int level = intent.getIntExtra(BatteryManager.EXTRA_LEVEL, -1);
         logDebug("Device battery level is " + level);
         return level <= LOW_BATTERY_LEVEL && !isCharging(CameraUploadsService.this);
+    }
+
+    /**
+     * Check if camera uploads setting is in progress
+     * @return - true : During camera uploads setting
+     *         - false : not in camera uploads setting
+     */
+    private boolean isInCameraUploadsSetting() {
+        return bInCameraUploadsSetting;
+    }
+
+    /**
+     * Set to true if camera uploads setting is in progress, otherwise false.
+     */
+    static public void setInCameraUploadsSetting(boolean duringSettingProgress) {
+        bInCameraUploadsSetting = duringSettingProgress;
     }
 }

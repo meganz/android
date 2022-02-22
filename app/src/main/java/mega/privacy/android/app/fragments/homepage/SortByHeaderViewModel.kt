@@ -92,9 +92,8 @@ class SortByHeaderViewModel @Inject constructor(
         ).removeObserver(listGridChangeObserver)
     }
 
-    fun getOrderMap(): HashMap<Int, Int> = orderNameMap
-
     companion object {
+        @JvmStatic
         val orderNameMap = hashMapOf(
             ORDER_DEFAULT_ASC to R.string.sortby_name,
             ORDER_DEFAULT_DESC to R.string.sortby_name,

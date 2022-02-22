@@ -476,18 +476,61 @@ class InMeetingViewModel @Inject constructor(
     fun updateParticipantsNameOrAvatar(peerId: Long, typeChange: Int): MutableSet<Participant> {
         val listWithChanges = mutableSetOf<Participant>()
         inMeetingRepository.getChatRoom(currentChatId)?.let {
-            participants.value?.let { listParticipants ->
-                val iterator = listParticipants.iterator()
-                iterator.forEach {
-                    if (it.peerId == peerId) {
-                        when (typeChange) {
-                            NAME_CHANGE -> it.name = getParticipantFullName(peerId)
-                            AVATAR_CHANGE -> it.avatar = getAvatarBitmap(peerId)
-                        }
-                        listWithChanges.add(it)
+            participants.value = participants.value?.map { participant ->
+                return@map when {
+                    participant.peerId == peerId && typeChange == NAME_CHANGE -> {
+                        listWithChanges.add(participant)
+                        participant.copy(
+                            name = getParticipantFullName(peerId),
+                            avatar = getAvatarBitmap(peerId)
+                        )
                     }
+
+                    participant.peerId == peerId && typeChange == AVATAR_CHANGE -> {
+                        listWithChanges.add(participant)
+                        participant.copy(avatar = getAvatarBitmap(peerId))
+                    }
+                    else -> participant
                 }
-            }
+            }?.toMutableList()
+        }
+
+        return listWithChanges
+    }
+
+    /**
+     * Method that makes the necessary changes to the participant list when my own privileges have changed.
+     */
+    fun updateOwnPrivileges() {
+        inMeetingRepository.getChatRoom(currentChatId)?.let {
+            participants.value = participants.value?.map { participant ->
+                return@map participant.copy(
+                    hasOptionsAllowed = shouldParticipantsOptionBeVisible(
+                        participant.isMe,
+                        participant.isGuest
+                    )
+                )
+            }?.toMutableList()
+        }
+    }
+
+    /**
+     * Method for updating participant privileges
+     *
+     * @return list of participants with changes
+     */
+    fun updateParticipantsPrivileges(): MutableSet<Participant> {
+        val listWithChanges = mutableSetOf<Participant>()
+        inMeetingRepository.getChatRoom(currentChatId)?.let {
+            participants.value = participants.value?.map { participant ->
+                return@map when {
+                    participant.isModerator != isParticipantModerator(participant.peerId) -> {
+                        listWithChanges.add(participant)
+                        participant.copy(isModerator = isParticipantModerator(participant.peerId))
+                    }
+                    else -> participant
+                }
+            }?.toMutableList()
         }
 
         return listWithChanges
@@ -823,29 +866,6 @@ class InMeetingViewModel @Inject constructor(
     }
 
     /**
-     * Method for updating participant privileges
-     *
-     * @return list of participants with changes
-     */
-    fun updateParticipantsPrivileges(): MutableSet<Participant> {
-        val listWithChanges = mutableSetOf<Participant>()
-        inMeetingRepository.getChatRoom(currentChatId)?.let {
-            participants.value?.let { listParticipants ->
-                val iterator = listParticipants.iterator()
-                iterator.forEach {
-                    val isModerator = isParticipantModerator(it.peerId)
-                    if (it.isModerator != isModerator) {
-                        it.isModerator = isModerator
-                        listWithChanges.add(it)
-                    }
-                }
-            }
-        }
-
-        return listWithChanges
-    }
-
-    /**
      * Method for updating the speaking participant
      *
      * @param peerId User handle of a participant
@@ -988,7 +1008,8 @@ class InMeetingViewModel @Inject constructor(
                 hasHiRes,
                 null,
                 false,
-                isGuest
+                isGuest,
+                hasOptionsAllowed = shouldParticipantsOptionBeVisible(false, isGuest)
             )
         }
 
@@ -1243,17 +1264,18 @@ class InMeetingViewModel @Inject constructor(
      * @return True, if there have been changes. False, otherwise
      */
     fun changesInRemoteVideoFlag(session: MegaChatSession): Boolean {
-        val iterator = participants.value?.iterator()
-        iterator?.let { participant ->
-            participant.forEach {
-                if (it.peerId == session.peerid && it.clientId == session.clientid && it.isVideoOn != session.hasVideo()) {
-                    it.isVideoOn = session.hasVideo()
-                    return true
+        var hasChanged = false
+        participants.value = participants.value?.map { participant ->
+            return@map when {
+                participant.peerId == session.peerid && participant.clientId == session.clientid && participant.isVideoOn != session.hasVideo() -> {
+                    hasChanged = true
+                    participant.copy(isVideoOn = session.hasVideo())
                 }
+                else -> participant
             }
-        }
+        }?.toMutableList()
 
-        return false
+        return hasChanged
     }
 
     /**
@@ -1263,17 +1285,18 @@ class InMeetingViewModel @Inject constructor(
      * @return True, if there have been changes. False, otherwise
      */
     fun changesInRemoteAudioFlag(session: MegaChatSession): Boolean {
-        val iterator = participants.value?.iterator()
-        iterator?.let { participant ->
-            participant.forEach {
-                if (it.peerId == session.peerid && it.clientId == session.clientid && it.isAudioOn != session.hasAudio()) {
-                    it.isAudioOn = session.hasAudio()
-                    return true
+        var hasChanged = false
+        participants.value = participants.value?.map { participant ->
+            return@map when {
+                participant.peerId == session.peerid && participant.clientId == session.clientid && participant.isAudioOn != session.hasAudio() -> {
+                    hasChanged = true
+                    participant.copy(isAudioOn = session.hasAudio())
                 }
+                else -> participant
             }
-        }
+        }?.toMutableList()
 
-        return false
+        return hasChanged
     }
 
     /**
@@ -1765,14 +1788,20 @@ class InMeetingViewModel @Inject constructor(
      *
      * @param audio local audio
      * @param video local video
-     * @return
+     * @return Me as a Participant
      */
-    fun getMyOwnInfo(audio: Boolean, video: Boolean): Participant =
-        inMeetingRepository.getMyInfo(
+    fun getMyOwnInfo(audio: Boolean, video: Boolean): Participant {
+        val participant = inMeetingRepository.getMyInfo(
             getOwnPrivileges() == MegaChatRoom.PRIV_MODERATOR,
             audio,
             video
         )
+        participant.hasOptionsAllowed =
+            shouldParticipantsOptionBeVisible(participant.isMe, participant.isGuest)
+
+        return participant
+    }
+
 
     /**
      * Determine if should hide or show the share link and invite button
@@ -1823,6 +1852,13 @@ class InMeetingViewModel @Inject constructor(
      * @return True, if I am a guest. False if not
      */
     fun amIAGuest(): Boolean = inMeetingRepository.amIAGuest()
+
+    /**
+     * Determine if I am a moderator
+     *
+     * @return True, if I am a moderator. False if not
+     */
+    fun amIAModerator(): Boolean = getOwnPrivileges() == MegaChatRoom.PRIV_MODERATOR
 
     /**
      * Determine if the participant has standard privileges
@@ -1887,14 +1923,14 @@ class InMeetingViewModel @Inject constructor(
             return
 
         inMeetingRepository.getChatRoom(currentChatId)?.let {
-            participants.value?.let { listParticipants ->
-                val iterator = listParticipants.iterator()
-                iterator.forEach {
-                    if (it.peerId == handler) {
-                        it.isGuest = false
+            participants.value = participants.value?.map { participant ->
+                return@map when (participant.peerId) {
+                    handler -> {
+                        participant.copy(isGuest = false)
                     }
+                    else -> participant
                 }
-            }
+            }?.toMutableList()
         }
     }
 
@@ -2143,5 +2179,26 @@ class InMeetingViewModel @Inject constructor(
             meetingActivity,
             MegaApplication.getInstance().megaApi
         )
+    }
+
+    /**
+     * Method that controls whether a participant's options (3 dots) should be enabled or not
+     *
+     * @param participantIsMe If the participant is me
+     * @param participantIsGuest If the participant is a guest
+     * @return True, if should be enabled. False, if not
+     */
+    private fun shouldParticipantsOptionBeVisible(
+        participantIsMe: Boolean,
+        participantIsGuest: Boolean
+    ): Boolean {
+        if ((!amIAModerator() && participantIsGuest) ||
+            (amIAGuest() && participantIsMe) ||
+            (!amIAModerator() && amIAGuest() && !participantIsMe)
+        ) {
+            return false
+        }
+
+        return true
     }
 }

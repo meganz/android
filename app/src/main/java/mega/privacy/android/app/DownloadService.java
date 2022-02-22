@@ -562,7 +562,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 			}
 			sendBroadcast(new Intent(BROADCAST_ACTION_INTENT_TRANSFER_UPDATE));
 
-			megaApi.resetCompletedDownloads();
+			megaApi.resetTotalDownloads();
 			backgroundTransfers.clear();
 			errorEBloqued = 0;
 			errorCount = 0;
