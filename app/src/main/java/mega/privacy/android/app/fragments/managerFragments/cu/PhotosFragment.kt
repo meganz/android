@@ -581,7 +581,6 @@ class PhotosFragment : BaseZoomFragment() {
         if (needSettings) {
             val intent = Intent(activity, FileStorageActivityLollipop::class.java)
             intent.action = FileStorageActivityLollipop.Mode.PICK_FOLDER.action
-            intent.putExtra(FileStorageActivityLollipop.EXTRA_FROM_SETTINGS, true)
             intent.putExtra(
                 FileStorageActivityLollipop.PICK_FOLDER_TYPE,
                 FileStorageActivityLollipop.PickFolderType.CU_FOLDER.folderType
