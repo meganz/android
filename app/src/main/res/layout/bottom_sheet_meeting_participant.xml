@@ -113,18 +113,6 @@
                 android:show="@{viewModel.showDividerSendMessage()}" />
 
             <TextView
-                android:id="@+id/ping_to_speaker"
-                style="@style/BottomSheetItem"
-                android:show="@{viewModel.showPinItem()}"
-                android:text="@string/pin_to_speaker"
-                app:drawableStartCompat="@drawable/ic_speaker_view" />
-
-            <View
-                android:id="@+id/divider_ping_to_speaker"
-                style="@style/BottomSheetItemDivider"
-                android:show="@{viewModel.showDividerPingToSpeaker()}" />
-
-            <TextView
                 android:id="@+id/make_moderator"
                 style="@style/BottomSheetItem"
                 android:show="@{viewModel.showMakeModeratorItem()}"
@@ -135,6 +123,30 @@
                 android:id="@+id/divider_make_moderator"
                 style="@style/BottomSheetItemDivider"
                 android:show="@{viewModel.showDividerMakeModerator()}" />
+
+            <TextView
+                android:id="@+id/remove_moderator"
+                style="@style/BottomSheetItem"
+                android:show="@{viewModel.showRemoveModeratorItem()}"
+                android:text="@string/remove_moderator"
+                app:drawableStartCompat="@drawable/ic_moderator" />
+
+            <View
+                android:id="@+id/divider_remove_moderator"
+                style="@style/BottomSheetItemDivider"
+                android:show="@{viewModel.showDividerRemoveModerator()}" />
+
+            <TextView
+                android:id="@+id/ping_to_speaker"
+                style="@style/BottomSheetItem"
+                android:show="@{viewModel.showPinItem()}"
+                android:text="@string/pin_to_speaker"
+                app:drawableStartCompat="@drawable/ic_speaker_view" />
+
+            <View
+                android:id="@+id/divider_ping_to_speaker"
+                style="@style/BottomSheetItemDivider"
+                android:show="@{viewModel.showDividerPingToSpeaker()}" />
 
             <TextView
                 android:id="@+id/remove_participant"

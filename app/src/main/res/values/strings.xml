@@ -716,6 +716,10 @@
     <string name="camera_notif_secondary_local_unavailable">Media Uploads have been disabled. Your local folder is unavailable.</string>
     <!-- notification camera uploads complete -->
     <string name="settings_camera_notif_complete">Camera uploads complete</string>
+    <!-- Title of DCIM folder warning dialog -->
+    <string name="title_dcim_folder_dialog">DCIM folder</string>
+    <!-- Content of DCIM folder warning dialog -->
+    <string name="content_dcim_folder_dialog">MEGA uploads your images from the gallery. To change the upload location please go to Camera Upload settings. </string>
     <!-- settings of the Appearance section -->
     <string name="settings_appearance">Appearance</string>
     <!-- settings of the Features section -->
@@ -4249,6 +4253,8 @@
     <string name="pro_iii_monthly">Pro III monthly</string>
     <!-- Pro III yearly subscription -->
     <string name="pro_iii_yearly">Pro III yearly</string>
+    <!-- Remove moderator permission and assign standard permission to a meeting participant-->
+    <string name="remove_moderator">Remove moderator</string>
     <!-- Action button which will cancel uploads. -->
     <string name="action_cancel_upload">Cancel upload</string>
     <!-- Action button which will dismiss the dialog and will not cancel the action. -->

@@ -379,7 +379,7 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 
         if (megaApi.getNumPendingUploads() <= 0) {
 			logDebug("Reset total uploads");
-            megaApi.resetCompletedUploads();
+            megaApi.resetTotalUploads();
         }
 
         resetUploadNumbers();

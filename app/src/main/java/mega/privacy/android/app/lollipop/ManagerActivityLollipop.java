@@ -1892,7 +1892,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 						addPhoneNumberButton.getViewTreeObserver().removeOnPreDrawListener(this);
 					}
 
-					return false;
+					return true;
 				}
 			}
 		);
@@ -7742,17 +7742,17 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
         bottomSheetDialogFragment = new OfflineOptionsBottomSheetDialogFragment();
         bottomSheetDialogFragment.show(getSupportFragmentManager(), bottomSheetDialogFragment.getTag());
     }
+    
+	public void showNewSortByPanel(int orderType) {
+		if (isBottomSheetDialogShown(bottomSheetDialogFragment)) {
+			return;
+		}
 
-    public void showNewSortByPanel(int orderType) {
-        showNewSortByPanel(orderType, false);
-    }
+		if (orderType == ORDER_OTHERS && deepBrowserTreeIncoming > 0) {
+			orderType = ORDER_CLOUD;
+		}
 
-    public void showNewSortByPanel(int orderType, boolean isIncomingRootOrder) {
-        if (isBottomSheetDialogShown(bottomSheetDialogFragment)) {
-            return;
-        }
-
-        bottomSheetDialogFragment = SortByBottomSheetDialogFragment.newInstance(orderType, isIncomingRootOrder);
+		bottomSheetDialogFragment = SortByBottomSheetDialogFragment.newInstance(orderType);
 
         bottomSheetDialogFragment.show(getSupportFragmentManager(),
                 bottomSheetDialogFragment.getTag());
