@@ -387,7 +387,7 @@ class GetImageUseCase @Inject constructor(
         val currentTransfers = megaApi.getNumPendingDownloadsNonBackground()
         val isServiceRunning = TransfersManagement.isServiceRunning(DownloadService::class.java)
         if (currentTransfers == 0 && !isServiceRunning) {
-            megaApi.resetCompletedDownloads()
+            megaApi.resetTotalDownloads()
         }
     }
 }

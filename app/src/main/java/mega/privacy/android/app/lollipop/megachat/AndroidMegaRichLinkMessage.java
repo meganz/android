@@ -42,6 +42,7 @@ public class AndroidMegaRichLinkMessage {
     public AndroidMegaRichLinkMessage (String url, MegaNode node){
         this.node = node;
         this.url = url;
+        this.isFile = true;
 
         Uri uri = Uri.parse(url);
         this.server = uri.getAuthority();
@@ -97,10 +98,6 @@ public class AndroidMegaRichLinkMessage {
 
     public boolean isFile() {
         return isFile;
-    }
-
-    public void setFile(boolean file) {
-        isFile = file;
     }
 
     public static String[] extractMegaLinks(String text) {
