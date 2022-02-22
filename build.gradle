@@ -49,7 +49,7 @@ task clean(type: Delete) {
 ext {
     // App
     appVersion = "6.2"
-    versionCode = 426
+    versionCode = 427
 
     // Sdk and tools
     compileSdkVersion = 30
