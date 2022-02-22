@@ -575,8 +575,9 @@ class ImageViewerActivity : BaseActivity(), PermissionRequester, SnackbarShower 
             addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP)
         }
 
-        if (imageItem.isOffline) {
-            val localPath = imageItem.imageResult?.fullSizeUri?.toFile()?.absolutePath ?: return
+        val existingFile = imageItem.imageResult?.fullSizeUri?.toFile()
+        if (existingFile?.exists() == true && existingFile.canRead()) {
+            val localPath = existingFile.absolutePath ?: return
             FileUtil.setLocalIntentParams(this, nodeName, intent, localPath, false, this)
         } else {
             val node = imageItem.nodeItem.node ?: return

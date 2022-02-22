@@ -340,9 +340,16 @@ class GetImageUseCase @Inject constructor(
         Flowable.fromCallable {
             val file = imageUri.toFile()
             if (file.exists() && file.canRead()) {
+                val isVideo = MimeTypeList.typeForName(file.name).isVideo
+                var previewUri: Uri? = null
+                if (isVideo) {
+                    val previewName = "${(file.name + file.length()).encodeBase64()}${FileUtil.JPG_EXTENSION}"
+                    previewUri = getVideoPreviewImage(previewName, file.toUri()).blockingGetOrNull()
+                }
                 ImageResult(
+                    previewUri = previewUri,
                     fullSizeUri = file.toUri(),
-                    isVideo = MimeTypeList.typeForName(file.name).isVideo,
+                    isVideo = isVideo,
                     isFullyLoaded = true
                 )
             } else {
