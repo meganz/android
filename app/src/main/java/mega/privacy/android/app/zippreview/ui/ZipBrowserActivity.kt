@@ -20,7 +20,7 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import mega.privacy.android.app.MimeTypeList
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.PasscodeActivity
-import mega.privacy.android.app.components.SimpleDividerItemDecoration
+import mega.privacy.android.app.components.ChatDividerItemDecoration
 import mega.privacy.android.app.components.dragger.DragToExitSupport
 import mega.privacy.android.app.components.dragger.DragToExitSupport.*
 import mega.privacy.android.app.databinding.ActivityZipBrowserBinding
@@ -108,7 +108,7 @@ class ZipBrowserActivity : PasscodeActivity() {
         recyclerView = zipBrowserBinding.zipListViewBrowser.also {
             it.setPadding(0, 0, 0, recycleViewBottomPadding())
             it.clipToPadding = false
-            it.addItemDecoration(SimpleDividerItemDecoration(this))
+            it.addItemDecoration(ChatDividerItemDecoration(this, outMetrics))
             it.layoutManager = LinearLayoutManager(this)
             it.setHasFixedSize(true)
             it.itemAnimator = DefaultItemAnimator()

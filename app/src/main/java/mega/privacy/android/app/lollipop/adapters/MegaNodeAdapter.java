@@ -176,13 +176,13 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
             this.binding = binding;
         }
 
-        private void bind(SortByHeaderViewModel sortByHeaderViewModel) {
-            binding.setSortByHeaderViewModel(sortByHeaderViewModel);
-            binding.setOrderNameStringId(sortByHeaderViewModel.getOrderMap()
+        private void bind() {
+            binding.setSortByHeaderViewModel(sortByViewModel);
+            binding.setOrderNameStringId(SortByHeaderViewModel.getOrderNameMap()
                     .get(type == INCOMING_SHARES_ADAPTER
                             && ((ManagerActivityLollipop) context).getDeepBrowserTreeIncoming() == 0
-                            ? sortByHeaderViewModel.getOrder().getSecond()
-                            : sortByHeaderViewModel.getOrder().getFirst()));
+                            ? sortByViewModel.getOrder().getSecond()
+                            : sortByViewModel.getOrder().getFirst()));
 
             binding.listModeSwitch.setVisibility(type == LINKS_ADAPTER
                     ? View.GONE
@@ -755,7 +755,7 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
 
         switch (getItemViewType(position)) {
             case ITEM_VIEW_TYPE_HEADER:
-                ((ViewHolderSortBy) holder).bind(sortByViewModel);
+                ((ViewHolderSortBy) holder).bind();
                 break;
 
             case ITEM_VIEW_TYPE_LIST:

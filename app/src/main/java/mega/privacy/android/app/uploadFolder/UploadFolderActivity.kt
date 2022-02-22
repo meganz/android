@@ -225,7 +225,7 @@ class UploadFolderActivity : PasscodeActivity(), Scrollable {
         viewModel.getUploadResults().observe(this, ::uploadContent)
 
         sortByHeaderViewModel.showDialogEvent.observe(this, EventObserver {
-            newInstance(Constants.ORDER_OFFLINE, false).apply {
+            newInstance(Constants.ORDER_OFFLINE).apply {
                 show(supportFragmentManager, this.tag)
             }
         })
