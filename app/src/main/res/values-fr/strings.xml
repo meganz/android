@@ -1761,8 +1761,6 @@
     <string name="attachment_upload_panel_from_cloud">Du Disque nuagique</string>
     <!--  -->
     <string name="attachment_upload_panel_contact">Contact</string>
-    <!--  -->
-    <string name="attachment_upload_panel_photo">De l’appareil</string>
     <!-- Button and title of dialog shown when the user wants to delete permanently their account. -->
     <string name="delete_account">Supprimer le compte</string>
     <!-- Text shown in the alert dialog to confirm the deletion of an account -->
@@ -4172,4 +4170,63 @@
     <string name="settings_mobile_data_resoluton_title">Utiliser les données mobiles pour prévisualiser les images en haute résolution</string>
     <!-- summary for the settings to enable high resolution images when on mobile data -->
     <string name="settings_mobile_data_resoluton_summary">Permettre l’utilisation des données mobiles pour charger des images à haute résolution lors de l’aperçu. Si cette option est désactivée, l’image originale ne sera chargée que lors d’un zoom avant.</string>
+    <!-- If users want to move the root backup folder, all backups underneath it are disabled. Warning dialog will show to confirm -->
+    <string name="backup_move_root_folder">Vous êtes en train de changer l’emplacement par défaut du dossier de sauvegarde. Cela pourrait affecter votre capacité à le trouver à l’avenir. Veuillez mémoriser son emplacement afin de pouvoir le trouver ultérieurement.</string>
+    <!-- If users want to move the sub backup folder, all backups underneath it are disabled. Warning dialog will show to confirm -->
+    <string name="backup_move_sub_folder">Déplacer ce dossier change la destination d’une ou de plusieurs sauvegardes configurées et pourrait avoir des conséquences inattendues. Les sauvegardes seront désactivées par sécurité. Les sauvegardes peuvent être réactivées grâce à l’appli&#160; MEGA pour ordinateur. Voulez-vous poursuivre ?</string>
+    <!-- If users want to delete the root backup folder, all backups underneath it are disabled. Warning dialog will show to confirm -->
+    <string name="backup_remove_root_folder">Vous êtes en train de supprimer votre dossier de sauvegarde. Cela supprimera toutes les sauvegardes que vous avez définies. Confirmez-vous cette action ?</string>
+    <!-- If users want to delete the sub backup folder, all backups underneath it are disabled. Warning dialog will show to confirm -->
+    <string name="backup_remove_sub_folder">Confirmez-vous que vous voulez supprimer votre dossier de sauvegarde et désactiver les sauvegardes qui y sont associées ?</string>
+    <!-- The title of warning dialog for single folder moving -->
+    <string name="backup_move_folder_title">Déplacer «&#160;%1s&#160;»</string>
+    <!-- The title of warning dialog for single folder deleting -->
+    <string name="backup_remove_folder_title">Déplacer «&#160;%1s&#160;» vers la Corbeille</string>
+    <!-- The title of warning dialog for multi-folder moving -->
+    <string name="backup_move_multiple_folder_title">Déplacer les dossiers de sauvegarde</string>
+    <!-- The title of warning dialog for single folder deleting -->
+    <string name="backup_remove_multiple_folder_title">Déplacer les dossiers de sauvegarde vers la corbeille</string>
+    <!-- The confirm information of warning dialog for deleting -->
+    <string name="backup_disable_confirm">Désactiver la sauvegarde</string>
+    <!-- The confirm information of warning dialog for moving "My backup" -->
+    <string name="backup_move_confirm">Déplacer la sauvegarde</string>
+    <!-- The confirm information of warning dialog for deleting -->
+    <string name="backup_action_confirm">Veuillez taper «&#160;%1s&#160;» pour confirmer cette action</string>
+    <!-- when checking the input -->
+    <string name="error_backup_confirm_dont_match">Le texte saisi ne correspond pas</string>
+    <!-- The title of confirm dialog for adding item to "My backup" -->
+    <string name="backup_add_confirm_title">Ajouter un élément à «&#160;%1s&#160;»</string>
+    <!-- The title of warning dialog for adding item to "My backup" -->
+    <string name="backup_add_item_title">Configurer la sauvegarde</string>
+    <!-- If users want to add items to the "My backup" folder, Warning dialog will show to confirm -->
+    <string name="backup_add_item_to_root_text">Pour faire en sorte que ces éléments ajoutés à votre dossier de sauvegarde sont automatiquement synchronisés vers le Nuage&#160;MEGA, veuillez le paramétrer dans l’Appli&#160;MEGA pour ordinateur.</string>
+    <!-- If users want to share items in the "My backup" folder, Warning dialog will show to confirm -->
+    <string name="backup_share_permission_title">En lecture seule</string>
+    <!-- If users want to share items in the "My backup" folder, Warning dialog will show to confirm -->
+    <string name="backup_share_permission_text">Ce dossier ne peut être partagé qu’en lecture seule, car c’est un dossier de sauvegarde. Tout changement apporté à son contenu pourrait désactiver la sauvegarde.</string>
+    <!-- If users want to add items to the "My backup" device folder, Warning dialog will show to confirm -->
+    <string name="backup_add_item_text">Les éléments dans ce dossier font partie d’une sauvegarde configurée et sont synchronisés vers un dossier local. Cette action brisera la synchronisation et désactivera la sauvegarde. La sauvegarde peut être réactivée grâce à l’Appli&#160;MEGA pour ordinateur. Voulez-vous vraiment poursuivre ?</string>
+    <!-- Share multi backup folders, show below warning message -->
+    <string name="backup_multi_share_permission_text">Ces dossiers ne peuvent être partagés qu’en lecture seule ; comme ce sont des dossiers de sauvegarde, tout changement apporté à leur contenu pourrait désactiver les sauvegardes.</string>
+    <!-- Share multi folders mix with backup and non-backup folders, show below warning message -->
+    <string name="backup_share_with_root_permission_text">Certains dossiers partagés sont des dossiers de sauvegarde et en lecture seule. Souhaitez-vous poursuivre ?</string>
+    <!-- Indicates the content of the backup folder -->
+    <plurals name="num_devices">
+        <item quantity="one">%d appareil</item>
+        <item quantity="other">%d appareils</item>
+    </plurals>
+    <!-- Title of the button when you want to answer a one to one call -->
+    <string name="title_join_one_to_one_call">Répondre à l’appel</string>
+    <!-- Title of the menu when the select tracks on playlist page-->
+    <string name="title_select_tracks">Sélectionner des pièces</string>
+    <!-- Action button to upload files. -->
+    <string name="upload_files">Téléverser des fichiers</string>
+    <!-- Action button to upload a folder. -->
+    <string name="upload_folder">Téléverser un dossier</string>
+    <!-- Title of the dialog warning the user about cancel uploads. -->
+    <string name="cancel_uploads">Annuler les téléversements</string>
+    <!-- Warning alerting user if proceed with the action all the uploads will be cancelled. -->
+    <string name="cancel_uploads_warning">L’interruption du processus de téléversement entraînera l’annulation de tous vos téléversements.</string>
+    <!-- Button to proceed with action. -->
+    <string name="action_proceed">Poursuivre</string>
 </resources>

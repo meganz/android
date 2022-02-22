@@ -2098,4 +2098,13 @@ object MegaNodeUtil {
             !isFolder && (MimeTypeList.typeForName(name).isImage
                     || MimeTypeList.typeForName(name).isGIF
                     || (MimeTypeList.typeForName(name).isVideoReproducible || MimeTypeList.typeForName(name).isMp4Video))
+
+    /**
+     * Check if provided node File is the expected one
+     *
+     * @param nodeFile  File to be checked
+     */
+    @JvmStatic
+    fun MegaNode.isNodeFileValid(nodeFile: File?): Boolean =
+        nodeFile?.exists() == true && nodeFile.canRead() && nodeFile.length() == this.size
 }

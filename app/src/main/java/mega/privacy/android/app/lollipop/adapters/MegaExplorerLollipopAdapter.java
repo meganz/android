@@ -146,13 +146,13 @@ public class MegaExplorerLollipopAdapter extends RecyclerView.Adapter<MegaExplor
             this.binding = binding;
         }
 
-        private void bind(SortByHeaderViewModel sortByHeaderViewModel) {
-            binding.setSortByHeaderViewModel(sortByHeaderViewModel);
-            binding.setOrderNameStringId(sortByHeaderViewModel.getOrderMap()
+        private void bind() {
+            binding.setSortByHeaderViewModel(sortByViewModel);
+            binding.setOrderNameStringId(SortByHeaderViewModel.getOrderNameMap()
                     .get(fragment instanceof IncomingSharesExplorerFragmentLollipop
                             && parentHandle == INVALID_HANDLE
-                            ? sortByHeaderViewModel.getOrder().getSecond()
-                            : sortByHeaderViewModel.getOrder().getFirst()));
+                            ? sortByViewModel.getOrder().getSecond()
+                            : sortByViewModel.getOrder().getFirst()));
 
             binding.enterMediaDiscovery.setVisibility(View.GONE);
         }
@@ -260,7 +260,7 @@ public class MegaExplorerLollipopAdapter extends RecyclerView.Adapter<MegaExplor
 	public void onBindViewHolder(ViewHolderExplorerLollipop holder, int position){
 	    switch (getItemViewType(position)) {
             case ITEM_VIEW_TYPE_HEADER:
-                ((ViewHolderSortBy) holder).bind(sortByViewModel);
+                ((ViewHolderSortBy) holder).bind();
                 break;
 
             case ITEM_VIEW_TYPE_LIST:

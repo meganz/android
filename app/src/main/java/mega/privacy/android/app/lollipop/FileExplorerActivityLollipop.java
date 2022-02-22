@@ -2,7 +2,6 @@ package mega.privacy.android.app.lollipop;
 
 import android.content.Context;
 import android.content.Intent;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import com.google.android.material.appbar.AppBarLayout;
@@ -17,6 +16,7 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.core.content.ContextCompat;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.viewpager.widget.ViewPager;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.widget.SearchView;
@@ -280,6 +280,8 @@ public class FileExplorerActivityLollipop extends TransfersManagementActivity
 
 	private BottomSheetDialogFragment bottomSheetDialogFragment;
 
+	private FileExplorerActivityLollipopViewModel mViewModel;
+
 	@Override
 	public void onRequestStart(MegaChatApiJava api, MegaChatRequest request) {
 
@@ -335,76 +337,52 @@ public class FileExplorerActivityLollipop extends TransfersManagementActivity
 		showSnackbar(type, fragmentContainer, content, chatId);
 	}
 
-	/*
-	 * Background task to process files for uploading
-	 */
-	private class OwnFilePrepareTask extends AsyncTask<Intent, Void, List<ShareInfo>> {
-		Context context;
-		
-		OwnFilePrepareTask(Context context){
-			this.context = context;
-		}
-		
-		@Override
-        @SuppressWarnings("unchecked")
-		protected List<ShareInfo> doInBackground(Intent... params) {
-			logDebug("OwnFilePrepareTask: doInBackground");
-            Intent intent = params[0];
-            List<ShareInfo> shareInfos = (List<ShareInfo>) intent.getSerializableExtra(EXTRA_SHARE_INFOS);
-            if(shareInfos != null) {
-                return  shareInfos;
-            }
-            return ShareInfo.processIntent(intent, context);
+	private void onProcessAsyncInfo(List<ShareInfo> info) {
+		if (info == null || info.isEmpty()) {
+			logWarning("Selected items list is null or empty.");
+			finishFileExplorer();
+			return;
 		}
 
-		@Override
-		protected void onPostExecute(List<ShareInfo> info) {
-			if (info == null || info.isEmpty()) {
-				logWarning("Selected items list is null or empty.");
-				finishFileExplorer();
-				return;
+		filePreparedInfos = info;
+		if(needLogin) {
+			Intent loginIntent = new Intent(FileExplorerActivityLollipop.this, LoginActivityLollipop.class);
+			loginIntent.putExtra(VISIBLE_FRAGMENT, LOGIN_FRAGMENT);
+			loginIntent.putExtra(EXTRA_SHARE_ACTION, getIntent().getAction());
+			loginIntent.putExtra(EXTRA_SHARE_TYPE, getIntent().getType());
+			loginIntent.putExtra(EXTRA_SHARE_INFOS,new ArrayList<>(info));
+			// close previous login page
+			loginIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+			loginIntent.setAction(ACTION_FILE_EXPLORER_UPLOAD);
+			needLogin = false;
+			startActivity(loginIntent);
+			finish();
+			return;
+		}
+		if (action != null && getIntent() != null) {
+			getIntent().setAction(action);
+		}
+		if (importFileF) {
+			if (importFragmentSelected != -1) {
+				chooseFragment(importFragmentSelected);
+			} else if (ACTION_UPLOAD_TO_CHAT.equals(action)) {
+				chooseFragment(CHAT_FRAGMENT);
+			} else {
+				chooseFragment(IMPORT_FRAGMENT);
 			}
 
-			filePreparedInfos = info;
-			if(needLogin) {
-                Intent loginIntent = new Intent(FileExplorerActivityLollipop.this, LoginActivityLollipop.class);
-                loginIntent.putExtra(VISIBLE_FRAGMENT, LOGIN_FRAGMENT);
-                loginIntent.putExtra(EXTRA_SHARE_ACTION, getIntent().getAction());
-                loginIntent.putExtra(EXTRA_SHARE_TYPE, getIntent().getType());
-                loginIntent.putExtra(EXTRA_SHARE_INFOS,new ArrayList<>(info));
-                // close previous login page
-                loginIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                loginIntent.setAction(ACTION_FILE_EXPLORER_UPLOAD);
-                needLogin = false;
-                startActivity(loginIntent);
-                finish();
-                return;
-            }
-			if (action != null && getIntent() != null) {
-				getIntent().setAction(action);
-			}
-			if (importFileF) {
-				if (importFragmentSelected != -1) {
-					chooseFragment(importFragmentSelected);
-                } else if (ACTION_UPLOAD_TO_CHAT.equals(action)) {
-                    chooseFragment(CHAT_FRAGMENT);
-                } else {
-                    chooseFragment(IMPORT_FRAGMENT);
-                }
-
-				if (statusDialog != null) {
-					try {
-						statusDialog.dismiss();
-					}
-					catch(Exception ex){}
+			if (statusDialog != null) {
+				try {
+					statusDialog.dismiss();
 				}
+				catch(Exception ex){}
 			}
-			else {
-				onIntentProcessed();
-			}
-		}			
+		}
+		else {
+			onIntentProcessed();
+		}
 	}
-	
+
 	@Override
 	public boolean onKeyDown(int keyCode, KeyEvent event) {
 	    if ( keyCode == KeyEvent.KEYCODE_MENU ) {
@@ -420,6 +398,9 @@ public class FileExplorerActivityLollipop extends TransfersManagementActivity
 		requestWindowFeature(Window.FEATURE_NO_TITLE);
 		logDebug("onCreate first");
 		super.onCreate(savedInstanceState);
+
+		mViewModel = new ViewModelProvider(this).get(FileExplorerActivityLollipopViewModel.class);
+		mViewModel.info.observe(this, this::onProcessAsyncInfo);
 
 		if(savedInstanceState!=null){
 			logDebug("Bundle is NOT NULL");
@@ -492,8 +473,8 @@ public class FileExplorerActivityLollipop extends TransfersManagementActivity
 				finish();
 			} else {
 				needLogin = true;
-				OwnFilePrepareTask ownFilePrepareTask = new OwnFilePrepareTask(this);
-				ownFilePrepareTask.execute(getIntent());
+
+				mViewModel.ownFilePrepareTask(this,getIntent());
 				createAndShowProgressDialog(false, getQuantityString(R.plurals.upload_prepare, 1));
 			}
 
@@ -698,8 +679,8 @@ public class FileExplorerActivityLollipop extends TransfersManagementActivity
 					action = intent.getAction();
 
 					cloudDriveFrameLayout = (FrameLayout) findViewById(R.id.cloudDriveFrameLayout);
-					OwnFilePrepareTask ownFilePrepareTask = new OwnFilePrepareTask(this);
-					ownFilePrepareTask.execute(getIntent());
+
+					mViewModel.ownFilePrepareTask(this,getIntent());
 					createAndShowProgressDialog(false, getQuantityString(R.plurals.upload_prepare, 1));
 
 					cloudDriveFrameLayout.setVisibility(View.VISIBLE);
@@ -905,9 +886,7 @@ public class FileExplorerActivityLollipop extends TransfersManagementActivity
 		if (multiselect) {
 			cDriveExplorer = getCloudExplorerFragment();
 			iSharesExplorer = getIncomingExplorerFragment();
-			if (isCloudVisible() || isIncomingVisible()) {
-				return true;
-			}
+			return isCloudVisible() || isIncomingVisible();
 		}
 		return false;
 	}
@@ -1436,8 +1415,7 @@ public class FileExplorerActivityLollipop extends TransfersManagementActivity
 	protected void onResume() {
 		super.onResume();
 		if (getIntent() != null && mode == UPLOAD && folderSelected && filePreparedInfos == null) {
-			OwnFilePrepareTask ownFilePrepareTask = new OwnFilePrepareTask(this);
-			ownFilePrepareTask.execute(getIntent());
+			mViewModel.ownFilePrepareTask(this,getIntent());
 			createAndShowProgressDialog(false, getQuantityString(R.plurals.upload_prepare, 1));
 		}
 	}
@@ -1683,7 +1661,6 @@ public class FileExplorerActivityLollipop extends TransfersManagementActivity
 		if (folderSelected) {
 			if (infos == null) {
 				showSnackbar(getString(R.string.upload_can_not_open));
-				return;
 			}
 			else {
 				if (app.getStorageState() == STORAGE_STATE_PAYWALL) {
@@ -1852,8 +1829,7 @@ public class FileExplorerActivityLollipop extends TransfersManagementActivity
 			}
 
 			if (filePreparedInfos == null){
-				OwnFilePrepareTask ownFilePrepareTask = new OwnFilePrepareTask(this);
-				ownFilePrepareTask.execute(getIntent());
+				mViewModel.ownFilePrepareTask(this,getIntent());
 				createAndShowProgressDialog(false, getQuantityString(R.plurals.upload_prepare, 1));
 			}
 			else{
@@ -2223,7 +2199,7 @@ public class FileExplorerActivityLollipop extends TransfersManagementActivity
 				logWarning("IOException deleting childThumbDir.", e);
 			}
 		}
-		
+		mViewModel.shutdownExecutorService();
 		super.onDestroy();
 	}
 
@@ -2895,9 +2871,9 @@ public class FileExplorerActivityLollipop extends TransfersManagementActivity
 
 		if (getIncomingExplorerFragment() != null && deepBrowserTree == 0
 				&& viewPagerExplorer != null && viewPagerExplorer.getCurrentItem() == INCOMING_TAB) {
-			bottomSheetDialogFragment = SortByBottomSheetDialogFragment.newInstance(ORDER_OTHERS, true);
+			bottomSheetDialogFragment = SortByBottomSheetDialogFragment.newInstance(ORDER_OTHERS);
 		} else {
-			bottomSheetDialogFragment = SortByBottomSheetDialogFragment.newInstance(ORDER_CLOUD, false);
+			bottomSheetDialogFragment = SortByBottomSheetDialogFragment.newInstance(ORDER_CLOUD);
 		}
 
 		bottomSheetDialogFragment.show(getSupportFragmentManager(),

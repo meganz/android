@@ -1761,8 +1761,6 @@
     <string name="attachment_upload_panel_from_cloud">Van Cloud Schijf</string>
     <!--  -->
     <string name="attachment_upload_panel_contact">Contact</string>
-    <!--  -->
-    <string name="attachment_upload_panel_photo">Van apparaat</string>
     <!-- Button and title of dialog shown when the user wants to delete permanently their account. -->
     <string name="delete_account">Account verwijderen</string>
     <!-- Text shown in the alert dialog to confirm the deletion of an account -->
@@ -4139,7 +4137,7 @@
     <!-- Warning informing the user the folder location is trying to open no longer exists. -->
     <string name="location_not_exist">Deze locatie bestaat niet langer.</string>
     <!-- Warning shown informing the contact has been previously invited. The placeholder is to show the name of the contact. -->
-    <string name="contact_already_invited">You have already invited %1$s</string>
+    <string name="contact_already_invited">U heeft %1$s al uitgenodigd</string>
     <!-- Warning shown informing the contact request has been sent and can be managed in sent requests section. -->
     <string name="contact_invited">Uitnodiging succesvol verzonden. Zie verzonden verzoeken.</string>
     <!-- Message when file available offline. -->
@@ -4172,4 +4170,63 @@
     <string name="settings_mobile_data_resoluton_title">Mobiele data gebruiken om afbeeldingen met hoge resolutie te bekijken</string>
     <!-- summary for the settings to enable high resolution images when on mobile data -->
     <string name="settings_mobile_data_resoluton_summary">Sta het gebruik van mobiele data toe om afbeeldingen met een hoge resolutie te laden bij het bekijken van een voorbeeld. Indien uitgeschakeld, wordt de originele afbeelding alleen geladen wanneer u inzoomt.</string>
+    <!-- If users want to move the root backup folder, all backups underneath it are disabled. Warning dialog will show to confirm -->
+    <string name="backup_move_root_folder">U wijzigt een standaardlocatie voor de back-up map. Dit kan van invloed zijn op uw vermogen om uw back-upmap in de toekomst te vinden. Onthoud waar het zich bevindt, zodat u het in de toekomst kunt vinden.</string>
+    <!-- If users want to move the sub backup folder, all backups underneath it are disabled. Warning dialog will show to confirm -->
+    <string name="backup_move_sub_folder">Het verplaatsen van deze map verandert de bestemming van één of meer geconfigureerde back-ups en kan onbedoelde gevolgen hebben. De back-ups worden voor uw veiligheid uitgeschakeld. Back-ups kunnen opnieuw worden ingeschakeld met de MEGA Desktop Applicatie. Wilt u doorgaan?</string>
+    <!-- If users want to delete the root backup folder, all backups underneath it are disabled. Warning dialog will show to confirm -->
+    <string name="backup_remove_root_folder">U verwijdert uw back-up map. Hiermee worden alle back-ups verwijderd die u hebt ingesteld. Weet u zeker dat u dit wilt doen?</string>
+    <!-- If users want to delete the sub backup folder, all backups underneath it are disabled. Warning dialog will show to confirm -->
+    <string name="backup_remove_sub_folder">Weet u zeker dat u uw back-up map wilt verwijderen en de door u ingestelde back-up wilt uitschakelen?</string>
+    <!-- The title of warning dialog for single folder moving -->
+    <string name="backup_move_folder_title">Verplaats “%1s”</string>
+    <!-- The title of warning dialog for single folder deleting -->
+    <string name="backup_remove_folder_title">Verplaats “%1s” naar Prullenbak</string>
+    <!-- The title of warning dialog for multi-folder moving -->
+    <string name="backup_move_multiple_folder_title">Verplaats back-up mappen</string>
+    <!-- The title of warning dialog for single folder deleting -->
+    <string name="backup_remove_multiple_folder_title">Verplaats back-up mappen naar Prullenbak</string>
+    <!-- The confirm information of warning dialog for deleting -->
+    <string name="backup_disable_confirm">Back-up uitschakelen</string>
+    <!-- The confirm information of warning dialog for moving "My backup" -->
+    <string name="backup_move_confirm">Verplaats back-up</string>
+    <!-- The confirm information of warning dialog for deleting -->
+    <string name="backup_action_confirm">Typ a.u.b. “%1s” om deze actie te bevestigen</string>
+    <!-- when checking the input -->
+    <string name="error_backup_confirm_dont_match">Ingevoerde tekst komt niet overeen</string>
+    <!-- The title of confirm dialog for adding item to "My backup" -->
+    <string name="backup_add_confirm_title">Artikel toevoegen naar “%1s”</string>
+    <!-- The title of warning dialog for adding item to "My backup" -->
+    <string name="backup_add_item_title">Back-up Instellen</string>
+    <!-- If users want to add items to the "My backup" folder, Warning dialog will show to confirm -->
+    <string name="backup_add_item_to_root_text">Om ervoor te zorgen dat deze items die aan uw back-up map worden toegevoegd, automatisch worden gesynchroniseerd met de MEGA Cloud. Gelieve deze in te stellen in de MEGA Desktop Applicatie.</string>
+    <!-- If users want to share items in the "My backup" folder, Warning dialog will show to confirm -->
+    <string name="backup_share_permission_title">Alleen-lezen</string>
+    <!-- If users want to share items in the "My backup" folder, Warning dialog will show to confirm -->
+    <string name="backup_share_permission_text">Deze map kan alleen als alleen-lezen worden gedeeld, aangezien dit een back-upmap is, kunnen wijzigingen in de inhoud de back-up uitschakelen.</string>
+    <!-- If users want to add items to the "My backup" device folder, Warning dialog will show to confirm -->
+    <string name="backup_add_item_text">Items in deze map maken deel uit van een geconfigureerde back-up en worden gesynchroniseerd met een lokale map. Als u deze actie uitvoert, wordt de synchronisatie verbroken en wordt de back-up uitgeschakeld. De back-up kan opnieuw worden ingeschakeld met de MEGA Desktop Applicatie. Weet u zeker dat u verder wilt gaan?</string>
+    <!-- Share multi backup folders, show below warning message -->
+    <string name="backup_multi_share_permission_text">Deze mappen kunnen alleen als alleen-lezen worden gedeeld, aangezien het back-up mappen zijn, kunnen wijzigingen in de inhoud de back-ups uitschakelen.</string>
+    <!-- Share multi folders mix with backup and non-backup folders, show below warning message -->
+    <string name="backup_share_with_root_permission_text">Sommige gedeelde mappen zijn back-up mappen en alleen-lezen. Wilt u doorgaan?</string>
+    <!-- Indicates the content of the backup folder -->
+    <plurals name="num_devices">
+        <item quantity="one">%d apparaat</item>
+        <item quantity="other">%d apparaten</item>
+    </plurals>
+    <!-- Title of the button when you want to answer a one to one call -->
+    <string name="title_join_one_to_one_call">Oproep beantwoorden</string>
+    <!-- Title of the menu when the select tracks on playlist page-->
+    <string name="title_select_tracks">Selecteer nummers</string>
+    <!-- Action button to upload files. -->
+    <string name="upload_files">Bestanden uploaden</string>
+    <!-- Action button to upload a folder. -->
+    <string name="upload_folder">Map uploaden</string>
+    <!-- Title of the dialog warning the user about cancel uploads. -->
+    <string name="cancel_uploads">Uploads annuleren</string>
+    <!-- Warning alerting user if proceed with the action all the uploads will be cancelled. -->
+    <string name="cancel_uploads_warning">Als u het uploadproces onderbreekt, worden al uw uploads geannuleerd.</string>
+    <!-- Button to proceed with action. -->
+    <string name="action_proceed">Doorgaan</string>
 </resources>
