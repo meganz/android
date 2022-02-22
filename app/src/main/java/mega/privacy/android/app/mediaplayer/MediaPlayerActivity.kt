@@ -419,6 +419,8 @@ abstract class MediaPlayerActivity : PasscodeActivity(), SnackbarShower, Activit
             R.id.playlist -> {
                 menu.toggleAllMenuItemsVisibility(false)
                 searchMenuItem?.isVisible = true
+                // Display the select option
+                menu.findItem(R.id.select).isVisible = true
             }
             R.id.main_player, R.id.track_info -> {
                 if (adapterType == OFFLINE_ADAPTER) {
@@ -506,6 +508,9 @@ abstract class MediaPlayerActivity : PasscodeActivity(), SnackbarShower, Activit
                 searchMenuItem?.isVisible = false
 
                 menu.findItem(R.id.save_to_device).isVisible = true
+                // Hide the select, select all, and clear options
+                menu.findItem(R.id.select).isVisible = false
+                menu.findItem(R.id.remove).isVisible = false
 
                 menu.findItem(R.id.properties).isVisible = currentFragment == R.id.main_player
 
@@ -839,7 +844,7 @@ abstract class MediaPlayerActivity : PasscodeActivity(), SnackbarShower, Activit
             return
         }
 
-        if (nodeSaver.handleActivityResult(requestCode, resultCode, data)) {
+        if (nodeSaver.handleActivityResult(this, requestCode, resultCode, data)) {
             return
         }
 

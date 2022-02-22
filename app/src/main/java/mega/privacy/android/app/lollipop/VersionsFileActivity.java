@@ -363,7 +363,7 @@ public class VersionsFileActivity extends PasscodeActivity implements MegaReques
 	protected void onActivityResult(int requestCode, int resultCode, @androidx.annotation.Nullable Intent data) {
 		super.onActivityResult(requestCode, resultCode, data);
 
-		nodeSaver.handleActivityResult(requestCode, resultCode, data);
+		nodeSaver.handleActivityResult(this, requestCode, resultCode, data);
 	}
 
 	@Override

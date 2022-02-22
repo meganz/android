@@ -676,6 +676,7 @@ public class ChatActivityLollipop extends PasscodeActivity
         openMeetingInProgress(this, chatId, true, passcodeManagement);
     }
 
+
     @Override
     public void onErrorAnsweredCall(int errorCode) {
         callInProgressLayout.setEnabled(true);
@@ -734,7 +735,7 @@ public class ChatActivityLollipop extends PasscodeActivity
                     @Override
                     public void onLeave() {
                     }
-                }).show(getSupportFragmentManager(),
+                }, false).show(getSupportFragmentManager(),
                         MeetingHasEndedDialogFragment.TAG);
             } else  {
                 CallUtil.checkMeetingInProgress(ChatActivityLollipop.this, ChatActivityLollipop.this, chatId, isFromOpenChatPreview, link, request.getMegaHandleList(), request.getText(), alreadyExist, request.getUserHandle(), passcodeManagement);
@@ -3451,7 +3452,7 @@ public class ChatActivityLollipop extends PasscodeActivity
     protected void onActivityResult(int requestCode, int resultCode, Intent intent) {
         logDebug("resultCode: " + resultCode);
 
-        if (nodeSaver.handleActivityResult(requestCode, resultCode, intent)) {
+        if (nodeSaver.handleActivityResult(this, requestCode, resultCode, intent)) {
             return;
         }
 
@@ -3495,7 +3496,7 @@ public class ChatActivityLollipop extends PasscodeActivity
         else if (requestCode == REQUEST_CODE_SELECT_FILE && resultCode == RESULT_OK) {
             nodeAttacher.handleSelectFileResult(intent, idChat, this, this);
         }
-        else if (requestCode == REQUEST_CODE_GET && resultCode == RESULT_OK) {
+        else if (requestCode == REQUEST_CODE_GET_FILES && resultCode == RESULT_OK) {
             if (intent == null) {
                 logWarning("Return.....");
                 return;
@@ -3820,10 +3821,15 @@ public class ChatActivityLollipop extends PasscodeActivity
     public void showJoinCallDialog(long callInThisChat, MegaChatCall anotherCall, boolean existsMoreThanOneCall) {
         LayoutInflater inflater = getLayoutInflater();
         View dialogLayout = inflater.inflate(R.layout.join_call_dialog, null);
+        TextView joinCallDialogTitle = dialogLayout.findViewById(R.id.join_call_dialog_title);
+        joinCallDialogTitle.setText(chatRoom.isGroup() ? R.string.title_join_call : R.string.title_join_one_to_one_call);
+
         final Button holdJoinButton = dialogLayout.findViewById(R.id.hold_join_button);
         final Button endJoinButton = dialogLayout.findViewById(R.id.end_join_button);
         final Button cancelButton = dialogLayout.findViewById(R.id.cancel_button);
 
+        holdJoinButton.setText(chatRoom.isGroup() ? R.string.hold_and_join_call_incoming : R.string.hold_and_answer_call_incoming);
+        endJoinButton.setText(chatRoom.isGroup() ? R.string.end_and_join_call_incoming : R.string.end_and_answer_call_incoming);
         holdJoinButton.setVisibility(existsMoreThanOneCall ? View.GONE : View.VISIBLE);
 
         MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this, R.style.ThemeOverlay_Mega_MaterialAlertDialog);
@@ -3913,10 +3919,10 @@ public class ChatActivityLollipop extends PasscodeActivity
                         returnCall(this, chatRoom.getChatId(), passcodeManagement);
                     }
 
-                } else if (chatRoom.isGroup()) {
+                } else {
                     ArrayList<Long> numCallsParticipating = getCallsParticipating();
                     if (numCallsParticipating == null || numCallsParticipating.isEmpty())
-                        return;
+                        break;
 
                     if (numCallsParticipating.size() == 1) {
                         MegaChatCall anotherCall = getAnotherActiveCall(chatRoom.getChatId());
@@ -4186,7 +4192,7 @@ public class ChatActivityLollipop extends PasscodeActivity
         intent.putExtra(FROM_MEGA_APP, true);
         intent.setType("*/*");
 
-        startActivityForResult(Intent.createChooser(intent, null), REQUEST_CODE_GET);
+        startActivityForResult(Intent.createChooser(intent, null), REQUEST_CODE_GET_FILES);
     }
 
     public void sendMessage(String text){
@@ -8527,6 +8533,7 @@ public class ChatActivityLollipop extends PasscodeActivity
     public void onResume(){
         super.onResume();
        stopService(new Intent(this, KeepAliveService.class));
+
         if(idChat!=-1 && chatRoom!=null) {
 
             setNodeAttachmentVisible();
@@ -9137,33 +9144,36 @@ public class ChatActivityLollipop extends PasscodeActivity
                 if(chatRoom == null)
                     break;
 
-                if(chatRoom.isGroup()){
-                    if (anotherActiveCall == null && anotherOnHoldCall == null) {
-                        String textLayout = getString(chatRoom.isMeeting() ?
-                                R.string.join_meeting_layout_in_group_call :
-                                R.string.join_call_layout_in_group_call);
-                        tapToReturnLayout(callInThisChat, textLayout);
-                    }else{
-                        updateCallInProgressLayout(anotherActiveCall != null ? anotherActiveCall : anotherOnHoldCall,
-                                getString(R.string.call_in_progress_layout));
-                        returnCallOnHoldButton.setVisibility(View.VISIBLE);
-                        returnCallOnHoldButtonText.setText(getResources().getString(R.string.title_join_call));
-                        returnCallOnHoldButtonIcon.setImageResource(R.drawable.ic_call_chat);
-                    }
-                }else{
-                    if (anotherActiveCall == null && anotherOnHoldCall == null) {
-                        if(callInThisChat.getNumParticipants()>1){
-                            hideCallBar(callInThisChat);
-                            break;
+                if (anotherActiveCall == null && anotherOnHoldCall == null) {
+                    String textLayout = getString((callInThisChat.isRinging() || !megaApi.isChatNotifiable(idChat)) ?
+                            R.string.call_in_progress_layout :
+                            R.string.join_call_layout);
+
+                    if (chatRoom.isGroup()) {
+                        long callerHandle = callInThisChat.getCaller();
+                        String callerFullName = chatC.getParticipantFullName(callerHandle);
+                        if (callerHandle != MEGACHAT_INVALID_HANDLE && !isTextEmpty(callerFullName)) {
+                            textLayout = getString(chatRoom.isMeeting() ?
+                                    R.string.join_meeting_layout_in_group_call :
+                                    R.string.join_call_layout_in_group_call, callerFullName);
+                        } else {
+                            textLayout = getString(R.string.join_call_layout);
                         }
-                        String textLayout = getString((callInThisChat.isRinging() || !megaApi.isChatNotifiable(idChat)) ?
-                                R.string.call_in_progress_layout :
-                                R.string.join_call_layout);
-                        tapToReturnLayout(callInThisChat, textLayout);
+                    } else if (callInThisChat.getNumParticipants() > 1) {
+                        hideCallBar(callInThisChat);
                         break;
                     }
+
+                    tapToReturnLayout(callInThisChat, textLayout);
+                } else {
                     updateCallInProgressLayout(anotherActiveCall != null ? anotherActiveCall : anotherOnHoldCall,
-                                getString(R.string.call_in_progress_layout));
+                            getString(R.string.call_in_progress_layout));
+
+                    returnCallOnHoldButton.setVisibility(View.VISIBLE);
+                    returnCallOnHoldButtonIcon.setImageResource(R.drawable.ic_call_chat);
+                    returnCallOnHoldButtonText.setText(getResources().getString(chatRoom.isGroup() ?
+                            R.string.title_join_call :
+                            R.string.title_join_one_to_one_call));
                 }
                 break;
 

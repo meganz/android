@@ -1,11 +1,8 @@
 package mega.privacy.android.app.mediaplayer.playlist
 
 import mega.privacy.android.app.R
-import mega.privacy.android.app.utils.Constants.INVALID_SIZE
-import mega.privacy.android.app.utils.Constants.INVALID_VALUE
 import mega.privacy.android.app.utils.StringResourcesUtils.getString
 import java.io.File
-import java.util.*
 
 /**
  * UI data class for playlist screen.
@@ -16,14 +13,18 @@ import java.util.*
  * @property index the index used for seek to this item
  * @property type item type
  * @property size size of the node
+ * @property isSelected Whether the item is selected
+ * @property headerIsVisible the header of item if is visible
  */
 data class PlaylistItem(
     val nodeHandle: Long,
     val nodeName: String,
     val thumbnail: File?,
-    val index: Int,
+    var index: Int,
     val type: Int,
     val size: Long,
+    var isSelected: Boolean = false,
+    var headerIsVisible: Boolean = false
 ) {
     /**
      * Create a new instance with the specified index and item type,
@@ -31,13 +32,14 @@ data class PlaylistItem(
      *
      * @param index new index
      * @param type item type
+     * @param isSelected Whether the item is selected
      * @return the new instance
      */
-    fun finalizeItem(index: Int, type: Int): PlaylistItem {
+    fun finalizeItem(index: Int, type: Int, isSelected: Boolean = false): PlaylistItem {
         return PlaylistItem(
             nodeHandle, nodeName,
             if (thumbnail?.exists() == true) thumbnail else null,
-            index, type, size
+            index, type, size, isSelected
         )
     }
 
@@ -48,35 +50,24 @@ data class PlaylistItem(
      * @return the new instance
      */
     fun updateNodeName(newName: String) =
-        PlaylistItem(nodeHandle, newName, thumbnail, index, type, size)
+        PlaylistItem(nodeHandle, newName, thumbnail, index, type, size, isSelected)
 
     companion object {
         const val TYPE_PREVIOUS = 1
-        const val TYPE_PREVIOUS_HEADER = 2
-        const val TYPE_PLAYING = 3
-        const val TYPE_PLAYING_HEADER = 4
-        const val TYPE_NEXT = 5
-        const val TYPE_NEXT_HEADER = 6
-
-        // We can't use the same handle (INVALID_HANDLE) for multiple header items,
-        // which will cause display issue when PlaylistItemDiffCallback use
-        // handle for areItemsTheSame.
-        // RandomUUID() can ensure non-repetitive values in practical purpose.
-        private val previousHeaderHandle = UUID.randomUUID().leastSignificantBits
-        private val playingHeaderHandle = UUID.randomUUID().leastSignificantBits
-        private val nextHeaderHandle = UUID.randomUUID().leastSignificantBits
+        const val TYPE_PLAYING = 2
+        const val TYPE_NEXT = 3
 
         /**
-         * Create an item for headers.
-         *
+         * Get name of item header
          * @param type item type
-         * @param paused if the audio player is paused, only used for TYPE_PLAYING_HEADER
+         * @param paused media whether is paused
+         * @return the name of header
          */
-        fun headerItem(type: Int, paused: Boolean = false): PlaylistItem {
-            val name = getString(
+        fun getHeaderName(type: Int, paused: Boolean = false): String {
+            return getString(
                 when (type) {
-                    TYPE_PREVIOUS_HEADER -> R.string.general_previous
-                    TYPE_NEXT_HEADER -> R.string.general_next
+                    TYPE_PREVIOUS -> R.string.general_previous
+                    TYPE_NEXT -> R.string.general_next
                     else -> {
                         if (paused) {
                             R.string.audio_player_now_playing_paused
@@ -86,14 +77,6 @@ data class PlaylistItem(
                     }
                 }
             )
-
-            val handle = when (type) {
-                TYPE_PREVIOUS_HEADER -> previousHeaderHandle
-                TYPE_NEXT_HEADER -> nextHeaderHandle
-                else -> playingHeaderHandle
-            }
-
-            return PlaylistItem(handle, name, null, INVALID_VALUE, type, INVALID_SIZE)
         }
     }
 }

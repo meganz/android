@@ -118,9 +118,8 @@ public class AccountController {
      * Export recovery key file to a selected location on file system.
      *
      * @param path The selected location.
-     * @param sdCardUriString If the selected location is on SD card, need the uri to grant SD card write permission.
      */
-    public void exportMK(String path, String sdCardUriString) {
+    public void exportMK(String path) {
         logDebug("exportMK");
         if (isOffline(context)) {
             return;
@@ -149,7 +148,7 @@ public class AccountController {
             return;
         }
 
-        if (saveTextOnFile(context, key, path, sdCardUriString)) {
+        if (saveTextOnFile(context, key, path)) {
             showSnackbar(context, getString(R.string.save_MK_confirmation));
 
             if (context instanceof TestPasswordActivity) {
