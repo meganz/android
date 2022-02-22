@@ -1892,7 +1892,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 						addPhoneNumberButton.getViewTreeObserver().removeOnPreDrawListener(this);
 					}
 
-					return false;
+					return true;
 				}
 			}
 		);
