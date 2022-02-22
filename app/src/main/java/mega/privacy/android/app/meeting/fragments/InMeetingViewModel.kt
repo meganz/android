@@ -979,7 +979,12 @@ class InMeetingViewModel @Inject constructor(
                 }
             }
 
-            val isModerator = isParticipantModerator(session.peerid)
+            val isModerator = if (isMe(session.peerid)) {
+                getOwnPrivileges() == MegaChatRoom.PRIV_MODERATOR
+            } else {
+                isParticipantModerator(session.peerid)
+            }
+
             val isContact = isMyContact(session.peerid)
             val hasHiRes = needHiRes(status)
             val name = getParticipantName(session.peerid)
