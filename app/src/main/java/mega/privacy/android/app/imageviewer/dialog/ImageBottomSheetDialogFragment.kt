@@ -13,7 +13,9 @@ import androidx.core.view.isVisible
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.viewModels
 import com.facebook.drawee.backends.pipeline.Fresco
-import com.facebook.imagepipeline.request.ImageRequest
+import com.facebook.imagepipeline.common.ResizeOptions
+import com.facebook.imagepipeline.common.RotationOptions
+import com.facebook.imagepipeline.request.ImageRequestBuilder
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.R
@@ -39,7 +41,6 @@ import mega.privacy.android.app.utils.MegaNodeUtil
 import mega.privacy.android.app.utils.MegaNodeUtil.getNodeLabelColor
 import mega.privacy.android.app.utils.MegaNodeUtil.getNodeLabelDrawable
 import mega.privacy.android.app.utils.MegaNodeUtil.getNodeLabelText
-import mega.privacy.android.app.utils.NetworkUtil.isOnline
 import mega.privacy.android.app.utils.OfflineUtils
 import mega.privacy.android.app.utils.StringResourcesUtils
 import mega.privacy.android.app.utils.StringResourcesUtils.getQuantityString
@@ -111,15 +112,22 @@ class ImageBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
 
         val node = imageItem.nodeItem.node
         val nodeItem = imageItem.nodeItem
-        val imageUri = imageItem.imageResult?.getLowestResolutionAvailableUri()
         val isUserLoggedIn = viewModel.isUserLoggedIn()
-        val isOnline = requireContext().isOnline()
 
         binding.apply {
-            imgThumbnail.controller = Fresco.newDraweeControllerBuilder()
-                .setImageRequest(ImageRequest.fromUri(imageUri))
-                .setOldController(binding.imgThumbnail.controller)
-                .build()
+            imgThumbnail.post {
+                imgThumbnail.controller = Fresco.newDraweeControllerBuilder()
+                    .setImageRequest(
+                        ImageRequestBuilder.newBuilderWithSource(imageItem.imageResult?.getLowestResolutionAvailableUri())
+                            .setRotationOptions(RotationOptions.autoRotate())
+                            .setResizeOptions(
+                                ResizeOptions.forDimensions(imgThumbnail.width, imgThumbnail.height)
+                            )
+                            .build()
+                    )
+                    .setOldController(binding.imgThumbnail.controller)
+                    .build()
+            }
 
             txtName.text = nodeItem.name
             txtInfo.text = nodeItem.infoText
