@@ -39,6 +39,7 @@ import mega.privacy.android.app.utils.Constants.*
 import mega.privacy.android.app.utils.ExtraUtils.extra
 import mega.privacy.android.app.utils.LinksUtil
 import mega.privacy.android.app.utils.LogUtil.logWarning
+import mega.privacy.android.app.utils.FileUtil
 import mega.privacy.android.app.utils.MegaNodeUtil
 import mega.privacy.android.app.utils.MegaNodeUtil.getNodeLabelColor
 import mega.privacy.android.app.utils.MegaNodeUtil.getNodeLabelDrawable
@@ -193,7 +194,7 @@ class ImageBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
                 optionFavorite.text = StringResourcesUtils.getString(favoriteText)
                 optionFavorite.setCompoundDrawablesWithIntrinsicBounds(favoriteDrawable, 0, 0, 0)
                 optionFavorite.setOnClickListener {
-                    viewModel.markNodeAsFavorite(nodeItem.handle, !node!!.isFavourite)
+                    viewModel.markNodeAsFavorite(nodeItem.handle, !node.isFavourite)
                 }
             }
 
@@ -233,7 +234,7 @@ class ImageBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
             }
 
             // Forward
-            optionForward.isVisible = imageItem.isFromChat()
+            optionForward.isVisible = imageItem.shouldShowForwardOption()
             optionForward.setOnClickListener {
                 (activity as? ImageViewerActivity?)?.attachNode(node!!)
                 dismissAllowingStateLoss()

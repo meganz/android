@@ -430,7 +430,7 @@ class ImageViewerActivity : BaseActivity(), PermissionRequester, SnackbarShower 
         if (imageItem?.nodeItem != null) {
             binding.txtTitle.text = imageItem.nodeItem.name
             binding.toolbar.menu?.apply {
-                findItem(R.id.action_forward)?.isVisible = imageItem.isFromChat()
+                findItem(R.id.action_forward)?.isVisible = imageItem.shouldShowForwardOption()
                 findItem(R.id.action_share)?.isVisible = imageItem.isFromChat() && imageItem.shouldShowShareOption()
                 findItem(R.id.action_download)?.isVisible = imageItem.shouldShowDownloadOption()
                 findItem(R.id.action_save_gallery)?.isVisible = imageItem.shouldShowSaveToGalleryOption()

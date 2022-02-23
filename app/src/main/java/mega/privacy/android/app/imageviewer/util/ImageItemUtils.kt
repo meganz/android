@@ -21,12 +21,15 @@ fun ImageItem.shouldShowOpenWithOption(isUserLoggedIn: Boolean): Boolean =
     isUserLoggedIn && nodeItem?.hasReadAccess == true && nodeItem.node?.isTakenDown != true
             && !nodeItem.isFromRubbishBin && !nodeItem.isExternalNode && !isFromChat()
 
+fun ImageItem.shouldShowForwardOption(): Boolean =
+    isFromChat()
+
 fun ImageItem.shouldShowDownloadOption(): Boolean =
     nodeItem?.node?.isTakenDown != true && nodeItem?.isFromRubbishBin != true
 
 fun ImageItem.shouldShowSaveToGalleryOption(): Boolean =
-    isSaveToGalleryCompatible() && nodeItem?.node?.isTakenDown != true
-            && nodeItem?.isFromRubbishBin != true && nodeItem?.isExternalNode != true
+    isSaveToGalleryCompatible() && nodeItem?.node != null && !nodeItem.node.isTakenDown
+            && !nodeItem.isFromRubbishBin && !nodeItem.isExternalNode
 
 fun ImageItem.shouldShowOfflineOption(): Boolean =
     !isOffline && nodeItem?.node?.isTakenDown != true && nodeItem?.isFromRubbishBin != true
@@ -40,7 +43,7 @@ fun ImageItem.shouldShowRemoveLinkOption(): Boolean =
 
 fun ImageItem.shouldShowSendToContactOption(isUserLoggedIn: Boolean): Boolean =
     isUserLoggedIn && nodeItem?.hasReadAccess == true && !nodeItem.isFromRubbishBin
-            && nodeItem.node?.isTakenDown != true && !nodeItem.isExternalNode
+            && nodeItem.node?.isTakenDown != true && !nodeItem.isExternalNode && !isFromChat()
 
 fun ImageItem.shouldShowShareOption(): Boolean =
     nodeItem?.node?.isTakenDown != true && nodeItem?.isFromRubbishBin != true
