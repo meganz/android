@@ -310,14 +310,14 @@ class ImageBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
 
             // Copy
             optionCopy.setOnClickListener {
-                if (nodeItem.isExternalNode) {
+                if (nodeItem.isExternalNode || imageItem.isFromChat()) {
                     selectImportFolderLauncher.launch(longArrayOf(nodeItem.handle))
                 } else {
                     selectCopyFolderLauncher.launch(longArrayOf(nodeItem.handle))
                 }
             }
-            val copyAction = if (nodeItem.isExternalNode) R.string.general_import else R.string.context_copy
-            val copyDrawable = if (nodeItem.isExternalNode) R.drawable.ic_import_to_cloud_white else R.drawable.ic_menu_copy
+            val copyAction = if (nodeItem.isExternalNode) R.string.general_import else if (imageItem.isFromChat()) R.string.add_to_cloud_node_chat else R.string.context_copy
+            val copyDrawable = if (nodeItem.isExternalNode || imageItem.isFromChat()) R.drawable.ic_import_to_cloud_white else R.drawable.ic_menu_copy
             optionCopy.setCompoundDrawablesWithIntrinsicBounds(copyDrawable, 0, 0, 0)
             optionCopy.text = StringResourcesUtils.getString(copyAction)
             optionCopy.isVisible = isOnline && isUserLoggedIn && !nodeItem.isFromRubbishBin && !imageItem.isOffline
