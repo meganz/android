@@ -425,19 +425,19 @@ class ImageViewerActivity : BaseActivity(), PermissionRequester, SnackbarShower 
                 val isOnline = isOnline()
 
                 findItem(R.id.action_share)?.isVisible =
-                    !item.isFromRubbishBin && (imageItem.isOffline || (imageItem.isFromChat() && (imageItem.nodeItem.hasOwnerAccess || !imageItem.nodePublicLink.isNullOrBlank())))
+                    !item.isFromRubbishBin && item.node?.isTakenDown == false && (imageItem.isOffline || (imageItem.isFromChat() && (imageItem.nodeItem.hasOwnerAccess || !imageItem.nodePublicLink.isNullOrBlank())))
 
                 findItem(R.id.action_download)?.isVisible =
-                    !item.isFromRubbishBin
+                    item.node?.isTakenDown == false && !item.isFromRubbishBin
 
                 findItem(R.id.action_save_gallery)?.isVisible =
-                    isSaveToGalleryCompatible() && !item.isExternalNode && !item.isFromRubbishBin
+                    item.node?.isTakenDown == false && isSaveToGalleryCompatible() && !item.isExternalNode && !item.isFromRubbishBin
 
                 findItem(R.id.action_get_link)?.isVisible =
-                    isOnline && item.hasOwnerAccess && !item.isFromRubbishBin && !item.isExternalNode
+                    item.node?.isTakenDown == false && isOnline && item.hasOwnerAccess && !item.isFromRubbishBin && !item.isExternalNode
 
                 findItem(R.id.action_send_to_chat)?.isVisible =
-                    isOnline && !item.isExternalNode && item.node != null && !item.isFromRubbishBin && viewModel.isUserLoggedIn() && item.hasReadAccess
+                    isOnline && !item.isExternalNode && item.node != null && !item.node.isTakenDown && !item.isFromRubbishBin && viewModel.isUserLoggedIn() && item.hasReadAccess
 
                 findItem(R.id.action_more)?.isVisible =
                     item.handle != INVALID_HANDLE

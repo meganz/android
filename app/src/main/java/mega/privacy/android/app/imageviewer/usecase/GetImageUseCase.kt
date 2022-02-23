@@ -127,7 +127,7 @@ class GetImageUseCase @Inject constructor(
                 !node.isFile -> emitter.onError(IllegalArgumentException("Node is not a file"))
                 else -> {
                     val hasReadAccess = megaApi.getAccess(node) != MegaShare.ACCESS_UNKNOWN
-                    val isFullSizeRequired = hasReadAccess && (fullSize || !node.isImage())
+                    val isFullSizeRequired = !node.isTakenDown && hasReadAccess && (fullSize || !node.isImage())
 
                     val thumbnailFile = if (node.hasThumbnail()) buildThumbnailFile(context, node.getThumbnailFileName()) else null
                     val previewFile = if (node.hasPreview() || node.isVideo()) buildPreviewFile(context, node.getThumbnailFileName()) else null
