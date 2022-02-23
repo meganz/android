@@ -22,7 +22,6 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.PasscodeActivity
 import mega.privacy.android.app.components.ChatDividerItemDecoration
 import mega.privacy.android.app.components.dragger.DragToExitSupport
-import mega.privacy.android.app.components.dragger.DragToExitSupport.*
 import mega.privacy.android.app.databinding.ActivityZipBrowserBinding
 import mega.privacy.android.app.imageviewer.ImageViewerActivity
 import mega.privacy.android.app.lollipop.PdfViewerActivityLollipop
@@ -32,7 +31,6 @@ import mega.privacy.android.app.utils.Constants.*
 import mega.privacy.android.app.utils.LogUtil.logDebug
 import mega.privacy.android.app.utils.MegaProgressDialogUtil.createProgressDialog
 import mega.privacy.android.app.zippreview.viewmodel.ZipBrowserViewModel
-import mega.privacy.android.app.zippreview.viewmodel.ZipBrowserViewModel.StatusItemClicked.*
 import mega.privacy.android.app.zippreview.domain.FileType
 import nz.mega.sdk.MegaApiJava
 import java.io.File
@@ -258,7 +256,7 @@ class ZipBrowserActivity : PasscodeActivity() {
     private fun imageFileOpen(position: Int, file: File) {
         logDebug("isImage")
 
-        val intent = ImageViewerActivity.getIntentForSingleFile(this, file.toUri())
+        val intent = ImageViewerActivity.getIntentForFile(this, file.toUri(), true)
         DragToExitSupport.putThumbnailLocation(
             intent,
             recyclerView,

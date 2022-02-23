@@ -11,6 +11,7 @@ import mega.privacy.android.app.di.MegaApi
 import mega.privacy.android.app.di.MegaApiFolder
 import mega.privacy.android.app.errors.BusinessAccountOverdueMegaError
 import mega.privacy.android.app.listeners.OptionalMegaRequestListenerInterface
+import mega.privacy.android.app.usecase.chat.GetChatMessageUseCase
 import mega.privacy.android.app.usecase.data.MegaNodeItem
 import mega.privacy.android.app.utils.*
 import mega.privacy.android.app.utils.ErrorUtils.toThrowable
@@ -118,8 +119,8 @@ class GetNodeUseCase @Inject constructor(
             val isAvailableOffline = isNodeAvailableOffline(node.handle).blockingGetOrNull() ?: false
             val hasVersions = megaApi.hasVersions(node)
 
-            val isMine = node.owner != INVALID_HANDLE && node.owner == megaApi.myUserHandleBinary
-            val isExternalNode = node.isPublic || node.isForeign || !isMine
+            val isMine = hasOwnerAccess || (node.owner != INVALID_HANDLE && node.owner == megaApi.myUserHandleBinary)
+            val isExternalNode = !isMine && (node.isPublic || node.isForeign)
             val rootParentNode = megaApi.getRootParentNode(node)
             val isFromIncoming = rootParentNode.isInShare
             var isFromRubbishBin = false

@@ -328,6 +328,7 @@ public class Constants {
     public static final String INTENT_EXTRA_IS_FROM_MEETING = "extra_is_from_meeting";
     public static final String INTENT_EXTRA_MEETING_PARTICIPANTS = "participants_in_a_meeting";
     public static final String INTENT_EXTRA_KEY_URI = "INTENT_EXTRA_KEY_URI";
+    public static final String INTENT_EXTRA_KEY_SHOW_NEARBY_FILES = "INTENT_EXTRA_KEY_SHOW_NEARBY_FILES";
 
     public static final int FILE_BROWSER_ADAPTER = 2000;
     public static final int CONTACT_FILE_ADAPTER = 2001;
@@ -609,6 +610,7 @@ public class Constants {
     public static final String SELECTED_CHATS = "SELECTED_CHATS";
     public static final String SELECTED_USERS = "SELECTED_USERS";
     public static final String ID_MESSAGES = "ID_MESSAGES";
+    public static final String ID_CHAT_FROM = "ID_CHAT_FROM";
     public static final String USER_HANDLES = "USER_HANDLES";
     public static final String URL_FILE_LINK = "URL_FILE_LINK";
     public static final String OPEN_SCAN_QR = "OPEN_SCAN_QR";
