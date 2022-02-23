@@ -82,13 +82,13 @@ object ZoomUtil {
     }
 
     fun getSelectedFrameWidth(context: Context, zoom: Int) = when (zoom) {
-        ZOOM_DEFAULT -> context.resources.getDimensionPixelSize(R.dimen.cu_fragment_ic_selected_size_large)
+        ZOOM_DEFAULT, ZOOM_IN_1X -> context.resources.getDimensionPixelSize(R.dimen.cu_fragment_ic_selected_size_large)
         ZOOM_OUT_1X -> context.resources.getDimensionPixelSize(R.dimen.cu_fragment_ic_selected_size_small)
         else -> 0
     }
 
     fun getSelectedFrameMargin(context: Context, zoom: Int) = when (zoom) {
-        ZOOM_DEFAULT -> context.resources.getDimensionPixelSize(R.dimen.cu_fragment_ic_selected_margin_large)
+        ZOOM_DEFAULT, ZOOM_IN_1X -> context.resources.getDimensionPixelSize(R.dimen.cu_fragment_ic_selected_margin_large)
         ZOOM_OUT_1X -> context.resources.getDimensionPixelSize(R.dimen.cu_fragment_ic_selected_margin_small)
         else -> 0
     }
