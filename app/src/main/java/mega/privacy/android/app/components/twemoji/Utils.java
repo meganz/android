@@ -1,6 +1,5 @@
 package mega.privacy.android.app.components.twemoji;
 
-import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.Context;
 import android.content.ContextWrapper;
@@ -9,7 +8,6 @@ import android.graphics.Rect;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import android.view.View;
-import android.view.ViewTreeObserver;
 import android.widget.PopupWindow;
 
 final class Utils {
