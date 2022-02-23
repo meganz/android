@@ -11,6 +11,7 @@ import android.view.ViewGroup
 import androidx.activity.viewModels
 import androidx.constraintlayout.widget.ConstraintSet
 import androidx.core.content.ContextCompat
+import androidx.core.net.toFile
 import androidx.core.view.*
 import androidx.viewpager2.widget.MarginPageTransformer
 import androidx.viewpager2.widget.ViewPager2
@@ -30,9 +31,11 @@ import mega.privacy.android.app.imageviewer.util.*
 import mega.privacy.android.app.interfaces.PermissionRequester
 import mega.privacy.android.app.interfaces.SnackbarShower
 import mega.privacy.android.app.interfaces.showSnackbar
+import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.AlertsAndWarnings.showSaveToDeviceConfirmDialog
 import mega.privacy.android.app.utils.Constants.*
 import mega.privacy.android.app.utils.ContextUtils.isLowMemory
+import mega.privacy.android.app.utils.FileUtil
 import mega.privacy.android.app.utils.LinksUtil
 import mega.privacy.android.app.utils.LogUtil.logError
 import mega.privacy.android.app.utils.LogUtil.logWarning
@@ -189,19 +192,22 @@ class ImageViewerActivity : BaseActivity(), PermissionRequester, SnackbarShower 
             }
 
         /**
-         * Get Image Viewer intent to show a single image file.
+         * Get Image Viewer intent to show image files.
          *
-         * @param context       Required to build the Intent.
-         * @param fileUri       Image file uri.
-         * @return              Image Viewer Intent.
+         * @param context           Required to build the Intent.
+         * @param imageFileUri      Image file uri to be shown.
+         * @param showNearbyFiles   Show nearby files from current parent file.
+         * @return                  Image Viewer Intent.
          */
         @JvmStatic
-        fun getIntentForSingleFile(
+        fun getIntentForFile(
             context: Context,
-            fileUri: Uri
+            imageFileUri: Uri,
+            showNearbyFiles: Boolean = false
         ): Intent =
             Intent(context, ImageViewerActivity::class.java).apply {
-                putExtra(INTENT_EXTRA_KEY_URI, fileUri)
+                putExtra(INTENT_EXTRA_KEY_URI, imageFileUri)
+                putExtra(INTENT_EXTRA_KEY_SHOW_NEARBY_FILES, showNearbyFiles)
             }
     }
 
@@ -215,6 +221,7 @@ class ImageViewerActivity : BaseActivity(), PermissionRequester, SnackbarShower 
     private val chatRoomId: Long? by extra(INTENT_EXTRA_KEY_CHAT_ID)
     private val chatMessagesId: LongArray? by extra(INTENT_EXTRA_KEY_MSG_ID)
     private val imageFileUri: Uri? by extra(INTENT_EXTRA_KEY_URI)
+    private val showNearbyFiles: Boolean? by extra(INTENT_EXTRA_KEY_SHOW_NEARBY_FILES)
 
     private val viewModel by viewModels<ImageViewerViewModel>()
     private val pagerAdapter by lazy { ImageViewerAdapter(this) }
@@ -228,10 +235,11 @@ class ImageViewerActivity : BaseActivity(), PermissionRequester, SnackbarShower 
 
     private var pageCallbackSet = false
     private var bottomSheet: ImageBottomSheetDialogFragment? = null
-    private lateinit var binding: ActivityImageViewerBinding
     private var nodeSaver: NodeSaver? = null
     private var nodeAttacher: MegaAttacher? = null
     private var dragToExit: DragToExitSupport? = null
+
+    private lateinit var binding: ActivityImageViewerBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -337,8 +345,10 @@ class ImageViewerActivity : BaseActivity(), PermissionRequester, SnackbarShower 
                     viewModel.retrieveSingleImage(nodeFileLink!!)
                 nodeHandle != null && nodeHandle != INVALID_HANDLE ->
                     viewModel.retrieveSingleImage(nodeHandle!!)
-                imageFileUri != null ->
-                    viewModel.retrieveSingleImage(imageFileUri!!)
+                imageFileUri != null -> {
+                    val fakeHandle = FileUtil.getFileFakeHandle(imageFileUri!!.toFile())
+                    viewModel.retrieveFileImage(imageFileUri!!, showNearbyFiles, fakeHandle)
+                }
                 else ->
                     error("Invalid params")
             }
@@ -420,6 +430,7 @@ class ImageViewerActivity : BaseActivity(), PermissionRequester, SnackbarShower 
         if (imageItem?.nodeItem != null) {
             binding.txtTitle.text = imageItem.nodeItem.name
             binding.toolbar.menu?.apply {
+                findItem(R.id.action_forward)?.isVisible = imageItem.isFromChat()
                 findItem(R.id.action_share)?.isVisible = imageItem.isFromChat() && imageItem.shouldShowShareOption()
                 findItem(R.id.action_download)?.isVisible = imageItem.shouldShowDownloadOption()
                 findItem(R.id.action_save_gallery)?.isVisible = imageItem.shouldShowSaveToGalleryOption()
@@ -463,14 +474,20 @@ class ImageViewerActivity : BaseActivity(), PermissionRequester, SnackbarShower 
                 onBackPressed()
                 true
             }
+            R.id.action_forward -> {
+                nodeItem.node?.let(::attachNode)
+                true
+            }
             R.id.action_share -> {
                 when {
                     imageItem.isOffline ->
                         OfflineUtils.shareOfflineNode(this, nodeItem.handle)
+                    imageItem.imageResult?.fullSizeUri?.toFile()?.exists() == true ->
+                        FileUtil.shareFile(this, imageItem.imageResult.fullSizeUri!!.toFile())
                     !imageItem.nodePublicLink.isNullOrBlank() ->
                         MegaNodeUtil.shareLink(this, imageItem.nodePublicLink)
                     imageItem.nodeItem.node != null ->
-                        viewModel.shareNode(imageItem.nodeItem.node).observe(this) { link ->
+                        viewModel.exportNode(imageItem.nodeItem.node).observe(this) { link ->
                             if (!link.isNullOrBlank()) {
                                 MegaNodeUtil.shareLink(this, link)
                             }
@@ -527,6 +544,35 @@ class ImageViewerActivity : BaseActivity(), PermissionRequester, SnackbarShower 
 
     fun attachNode(node: MegaNode) {
         nodeAttacher?.attachNode(node)
+    }
+
+    fun launchVideoScreen(imageItem: ImageItem) {
+        val nodeHandle = imageItem.handle
+        val nodeName = imageItem.nodeItem?.name ?: return
+
+        val intent = Util.getMediaIntent(this, nodeName).apply {
+            putExtra(INTENT_EXTRA_KEY_POSITION, 0)
+            putExtra(INTENT_EXTRA_KEY_HANDLE, nodeHandle)
+            putExtra(INTENT_EXTRA_KEY_FILE_NAME, nodeName)
+            putExtra(INTENT_EXTRA_KEY_ADAPTER_TYPE, FROM_IMAGE_VIEWER)
+            addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP)
+        }
+
+        val existingFile = imageItem.imageResult?.fullSizeUri?.toFile()
+        if (existingFile?.exists() == true && existingFile.canRead()) {
+            val localPath = existingFile.absolutePath ?: return
+            FileUtil.setLocalIntentParams(this, nodeName, intent, localPath, false, this)
+        } else {
+            val node = imageItem.nodeItem.node ?: return
+            val localPath = FileUtil.getLocalFile(node)
+            if (FileUtil.isLocalFile(node, megaApi, localPath)) {
+                FileUtil.setLocalIntentParams(this, nodeName, intent, localPath, false, this)
+            } else {
+                FileUtil.setStreamingIntentParams(this, node, megaApi, intent, this)
+            }
+        }
+
+        startActivity(intent)
     }
 
     fun showRenameDialog(node: MegaNode) {

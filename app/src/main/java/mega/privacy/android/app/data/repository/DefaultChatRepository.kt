@@ -11,6 +11,36 @@ import javax.inject.Inject
 class DefaultChatRepository @Inject constructor(
     private val chatApi: MegaChatApiAndroid
 ) : ChatRepository {
+    override fun notifyChatLogout(): Flow<Boolean> {
+        return callbackFlow {
+            val listener = object : MegaChatRequestListenerInterface{
+                override fun onRequestStart(api: MegaChatApiJava?, request: MegaChatRequest?) {}
+
+                override fun onRequestUpdate(api: MegaChatApiJava?, request: MegaChatRequest?) {}
+
+                override fun onRequestFinish(
+                    api: MegaChatApiJava?,
+                    request: MegaChatRequest?,
+                    e: MegaChatError?
+                ) {
+                   if (request?.type == MegaChatRequest.TYPE_LOGOUT){
+                       if (e?.errorCode == MegaError.API_OK){
+                           trySend(true)
+                       }
+                   }
+                }
+
+                override fun onRequestTemporaryError(
+                    api: MegaChatApiJava?,
+                    request: MegaChatRequest?,
+                    e: MegaChatError?
+                ) {}
+            }
+            chatApi.addChatRequestListener(listener)
+
+            awaitClose{ chatApi.removeChatRequestListener(listener) }
+        }
+    }
     override suspend fun getUnreadNotificationCount(): Int {
         return chatApi.unreadChats
     }

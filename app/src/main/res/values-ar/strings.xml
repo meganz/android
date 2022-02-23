@@ -1901,8 +1901,6 @@
     <string name="attachment_upload_panel_from_cloud">من السواقة السحابية</string>
     <!--  -->
     <string name="attachment_upload_panel_contact">جهة اتصال</string>
-    <!--  -->
-    <string name="attachment_upload_panel_photo">من الجهاز</string>
     <!-- Button and title of dialog shown when the user wants to delete permanently their account. -->
     <string name="delete_account">حذف الحساب</string>
     <!-- Text shown in the alert dialog to confirm the deletion of an account -->
@@ -4100,7 +4098,7 @@
     <!-- Action discard -->
     <string name="discard_close_action">تجاهل وأغلق</string>
     <!-- Label indicating saving a file is in progress -->
-    <string name="saving_file">جارٍ حفظ الملف ...</string>
+    <string name="saving_file">جارٍ حفظ الملف&#8230;</string>
     <!-- Label indicating a file was created successfully -->
     <string name="file_created">تم إنشاء الملف</string>
     <!-- Warning indicating a file was not created successfully -->
@@ -4495,7 +4493,7 @@
     <!-- Warning informing the user the folder location is trying to open no longer exists. -->
     <string name="location_not_exist">هذا الموقع لم يعد موجوداً.</string>
     <!-- Warning shown informing the contact has been previously invited. The placeholder is to show the name of the contact. -->
-    <string name="contact_already_invited">You have already invited %1$s</string>
+    <string name="contact_already_invited">لقد قمت بالفعل بدعوة %1$s</string>
     <!-- Warning shown informing the contact request has been sent and can be managed in sent requests section. -->
     <string name="contact_invited">تم إرسال الدعوة بنجاح. انظر إلى الطلبات المرسلة.</string>
     <!-- Message when file available offline. -->
@@ -4528,4 +4526,67 @@
     <string name="settings_mobile_data_resoluton_title">استخدم بيانات الهاتف المحمول لعرض الصور عالية الدقة</string>
     <!-- summary for the settings to enable high resolution images when on mobile data -->
     <string name="settings_mobile_data_resoluton_summary">اسمح باستخدام بيانات الهاتف المحمول لتحميل صور عالية الدقة عند العرض. في حال تعطيله سيتم تحميل الصورة الأصلية فقط عند تقريب الصورة.</string>
+    <!-- If users want to move the root backup folder, all backups underneath it are disabled. Warning dialog will show to confirm -->
+    <string name="backup_move_root_folder">أنت تقوم بتغيير موقع مجلد النسخ الاحتياطي الافتراضي. قد يؤثر ذلك على قدرتك على العثور على مجلد النسخ الاحتياطي في المستقبل. يرجى تذكر مكانه حتى تتمكن من العثور عليه في المستقبل.</string>
+    <!-- If users want to move the sub backup folder, all backups underneath it are disabled. Warning dialog will show to confirm -->
+    <string name="backup_move_sub_folder">يؤدي نقل هذا المجلد إلى تغيير وجهة واحدة أو أكثر من النسخ الاحتياطية وقد يكون له عواقب غير مقصودة. سيتم إيقاف النسخ الاحتياطية حفاظًا على سلامتك. يمكن إعادة تمكين النسخ الاحتياطية باستخدام تطبيق ميغا للحاسوب المكتبي MEGA Desktop App. هل تريد المتابعة؟</string>
+    <!-- If users want to delete the root backup folder, all backups underneath it are disabled. Warning dialog will show to confirm -->
+    <string name="backup_remove_root_folder">أنت تقوم بحذف مجلد النسخ الاحتياطي. سيؤدي هذا إلى حذف جميع النسخ الاحتياطية التي قمت بتعيينها. هل انت متأكد من أنك تريد أن تفعل هذا؟</string>
+    <!-- If users want to delete the sub backup folder, all backups underneath it are disabled. Warning dialog will show to confirm -->
+    <string name="backup_remove_sub_folder">هل أنت متأكد أنك تريد حذف مجلد النسخ الاحتياطي وتعطيل النسخة الاحتياطية المرتبطة به؟</string>
+    <!-- The title of warning dialog for single folder moving -->
+    <string name="backup_move_folder_title">نقل “%1s”</string>
+    <!-- The title of warning dialog for single folder deleting -->
+    <string name="backup_remove_folder_title">نقل “%1s” إلى سلة المحذوفات</string>
+    <!-- The title of warning dialog for multi-folder moving -->
+    <string name="backup_move_multiple_folder_title">انقل مجلدات النسخ الاحتياطي</string>
+    <!-- The title of warning dialog for single folder deleting -->
+    <string name="backup_remove_multiple_folder_title">انقل مجلدات النسخ الاحتياطي إلى سلة المحذوفات</string>
+    <!-- The confirm information of warning dialog for deleting -->
+    <string name="backup_disable_confirm">تعطيل النسخ الاحتياطي</string>
+    <!-- The confirm information of warning dialog for moving "My backup" -->
+    <string name="backup_move_confirm">نقل النسخ الاحتياطي</string>
+    <!-- The confirm information of warning dialog for deleting -->
+    <string name="backup_action_confirm">الرجاء كتابة “%1s” لتأكيد هذا الإجراء</string>
+    <!-- when checking the input -->
+    <string name="error_backup_confirm_dont_match">النص المدخل غير متطابق</string>
+    <!-- The title of confirm dialog for adding item to "My backup" -->
+    <string name="backup_add_confirm_title">إضافة عنصر إلى “%1s”</string>
+    <!-- The title of warning dialog for adding item to "My backup" -->
+    <string name="backup_add_item_title">شغل النسخ الاحتياطي</string>
+    <!-- If users want to add items to the "My backup" folder, Warning dialog will show to confirm -->
+    <string name="backup_add_item_to_root_text">للتأكد من أن هذه العناصر المضافة إلى مجلد النسخ الاحتياطي تتم مزامنتها تلقائيًا مع سحابة ميغا MEGA، يرجى إعدادها في تطبيق الحاسوب المكتبي MEGA Desktop App.</string>
+    <!-- If users want to share items in the "My backup" folder, Warning dialog will show to confirm -->
+    <string name="backup_share_permission_title">للقراءة فقط</string>
+    <!-- If users want to share items in the "My backup" folder, Warning dialog will show to confirm -->
+    <string name="backup_share_permission_text">لا يمكن مشاركة هذا المجلد إلا للقراءة فقط ؛ نظرًا لأن هذا مجلد نسخ احتياطي ، فإن أي تغييرات تطرأ على محتواه قد تؤدي إلى تعطيل النسخ الاحتياطي.</string>
+    <!-- If users want to add items to the "My backup" device folder, Warning dialog will show to confirm -->
+    <string name="backup_add_item_text">العناصر الموجودة في هذا المجلد هي جزء من نسخة احتياطية تم مزامنتها مع مجلد محلي. سيؤدي اتخاذ هذا الإجراء إلى تعطيل المزامنة وتعطيل النسخ الاحتياطي. يمكن إعادة تمكين النسخ الاحتياطي باستخدام تطبيق ميغا للحاسوب المكتبي MEGA Desktop App. هل انت متأكد انك تريد المتابعة؟</string>
+    <!-- Share multi backup folders, show below warning message -->
+    <string name="backup_multi_share_permission_text">يمكن مشاركة هذه المجلدات للقراءة فقط لأنها مجلدات نسخ احتياطي، قد تؤدي أي تغييرات في محتواها إلى تعطيل النسخ الاحتياطية.</string>
+    <!-- Share multi folders mix with backup and non-backup folders, show below warning message -->
+    <string name="backup_share_with_root_permission_text">بعض المجلدات المشاركة هي مجلدات نسخ احتياطي وقراءة فقط. هل ترغب في الاستمرار؟</string>
+    <!-- Indicates the content of the backup folder -->
+    <plurals name="num_devices">
+        <item quantity="zero">%d جهاز</item>
+        <item quantity="one">%d جهاز</item>
+        <item quantity="two">%d جهازان</item>
+        <item quantity="few">%d أجهزة</item>
+        <item quantity="many">%d جهازاً</item>
+        <item quantity="other">%d جهاز</item>
+    </plurals>
+    <!-- Title of the button when you want to answer a one to one call -->
+    <string name="title_join_one_to_one_call">أجب الاتصال</string>
+    <!-- Title of the menu when the select tracks on playlist page-->
+    <string name="title_select_tracks">اختر مسارات موسيقية</string>
+    <!-- Action button to upload files. -->
+    <string name="upload_files">ترفيع ملفات</string>
+    <!-- Action button to upload a folder. -->
+    <string name="upload_folder">ترفيع مجلد</string>
+    <!-- Title of the dialog warning the user about cancel uploads. -->
+    <string name="cancel_uploads">إلغاء الترفيعات</string>
+    <!-- Warning alerting user if proceed with the action all the uploads will be cancelled. -->
+    <string name="cancel_uploads_warning">سيؤدي مقاطعة عملية الترفيع إلى إلغاء جميع عمليات الترفيع الخاصة بك.</string>
+    <!-- Button to proceed with action. -->
+    <string name="action_proceed">تابع</string>
 </resources>
