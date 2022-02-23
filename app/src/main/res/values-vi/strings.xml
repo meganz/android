@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0"?>
 <resources>
     <!-- PRO Lite account -->
     <string name="prolite_account">Pro Lite</string>
@@ -129,11 +129,11 @@
     <!-- Title of the preference Recovery key on Settings section -->
     <string name="action_export_master_key">Sao lưu Mã Phục Hồi</string>
     <!-- Menu item to let the user cancel subscriptions -->
-    <string name="action_cancel_subscriptions">Hủy thuê bao</string>
+    <string name="action_cancel_subscriptions">Hủy gói dịch vụ</string>
     <!-- success message when the subscription has been canceled correctly -->
-    <string name="cancel_subscription_ok">Gói thuê bao đã bị hủy</string>
+    <string name="cancel_subscription_ok">Gói dịch vụ đã bị hủy</string>
     <!-- error message when the subscription has not been canceled successfully -->
-    <string name="cancel_subscription_error">Có rắc rối trong việc hủy bỏ gói hạng thuê bao. Xin liên hệ với support&#64;mega.nz để được nhận giúp đỡ</string>
+    <string name="cancel_subscription_error">Có rắc rối trong việc hủy bỏ gói dịch vụ. Xin liên hệ với support&#64;mega.nz để được nhận giúp đỡ</string>
     <!-- Menu item to kill all opened sessions -->
     <string name="action_kill_all_sessions">Đóng các phiên khác lại</string>
     <!-- Message after kill all opened sessions -->
@@ -577,7 +577,7 @@
     <!-- error message when emptying the RB -->
     <string name="rubbish_bin_no_emptied">Lỗi phát sinh. Không dọn được Thùng Rác</string>
     <!-- dialog cancel subscriptions -->
-    <string name="dialog_cancel_subscriptions">Quý khách đang chuẩn bị hủy bỏ gói thành viên MEGA. Xin vui lòng cho chúng tôi biết lý do để chúng tôi cải thiện và làm vừa lòng quý khách.</string>
+    <string name="dialog_cancel_subscriptions">Quý khách đang chuẩn bị hủy bỏ gói dịch vụ MEGA. Xin vui lòng cho chúng tôi biết lý do để chúng tôi cải thiện và làm vừa lòng quý khách.</string>
     <!-- hint cancel subscriptions dialog -->
     <string name="hint_cancel_subscriptions">Viết lời phản hồi ở đây</string>
     <!-- send cancel subscriptions dialog -->
@@ -585,13 +585,13 @@
     <!-- confirmation cancel subscriptions dialog -->
     <string name="confirmation_cancel_subscriptions">Cảm ơn lời nhận xét của quý khách. Quý khách có muốn hủy gói dịch vụ MEGA ngay không?</string>
     <!-- provide a reason to cancel subscriptions dialog -->
-    <string name="reason_cancel_subscriptions">Quá trình hủy bỏ hạng tài khoản PRO và ngưng trả phí chưa thể tiếp tục vì quý khách chưa điền lý do</string>
+    <string name="reason_cancel_subscriptions">Quá trình hủy bỏ gói dịch vụ và ngưng trả phí không thể tiếp tục vì quý khách chưa điền lý do</string>
     <!-- Confirmation message of the dialog shown when a subscription has been processed successfully -->
     <string name="message_user_purchased_subscription">Xin cảm ơn. Giao dịch thanh toán của quý khách đang được tiến hành. Xin gửi email cho chúng tôi tại support&#64;mega.co.nz nếu tài khoản không nâng cấp sau 24 giờ.</string>
     <!-- Pop up message shows when user purchased a lower level of subscription -->
-    <string name="message_user_purchased_subscription_down_grade">Thuê bao mới sẽ bắt đầu có hiệu lực ngay sau khi thuê bao hiện tại hết hạn, giá mới cũng sẽ được tự thanh toán ngay lúc đó.</string>
+    <string name="message_user_purchased_subscription_down_grade">Gói dịch vụ mới sẽ bắt đầu có hiệu lực ngay sau khi gói hiện tại hết hạn, giá mới cũng sẽ được tự thanh toán ngay lúc đó.</string>
     <!-- Pop up message shows when user purchased a subscription with a payment method that can not be processed in real time, e.g. voucher -->
-    <string name="message_user_payment_pending">Thuê bao sẽ bắt đầu có hiệu lực ngay sau khi Google hoàn tất xác thực giao dịch.</string>
+    <string name="message_user_payment_pending">Gói dịch vụ sẽ bắt đầu có hiệu lực ngay sau khi Google hoàn tất xác thực giao dịch.</string>
     <!--  -->
     <string name="subscription_type_monthly">Hàng tháng</string>
     <!--  -->
@@ -685,12 +685,12 @@
     <!-- Dialog message, to explain why MEGA needs the ’display over other apps’ permission (Android 10) -->
     <string name="ask_for_display_over_msg">Xin cấp phép cho MEGA hiển thị nổi bật trên các app khác để báo cuộc gọi.</string>
     <!-- Prompt text shows when the user doesn’t want to make MEGA grant the ’display over other apps’ permission for now (Android 10) -->
-    <string name="ask_for_display_over_explain">You can still manually grant permissions in the device Settings.</string>
+    <string name="ask_for_display_over_explain">Bạn vẫn có thể đi vào phần Cài Đặt của thiết bị khi muốn bật tính năng này.</string>
     <!-- the options of how to upload, but in an array. needed for the settings, how to upload the camera images. only when Wi-Fi connected -->
     <string name="cam_sync_wifi">Chỉ lúc dùng Wi-Fi</string>
     <!-- the options of how to upload, but in an array. needed for the settings, how to upload the camera images. when Wi-Fi connected and using data plan -->
     <string name="cam_sync_data">Dùng WiFi và mạng di động</string>
-    <!-- The upload of the user’s photos orvideos from their specified album is in progress. -->
+    <!-- The upload of the user’s photos or videos from their specified album is in progress. -->
     <string name="cam_sync_syncing">Đang thực hiện Camera Uploads</string>
     <!-- confirmation question for cancelling the camera uploads -->
     <string name="cam_sync_cancel_sync">Có chắc muốn ngưng tính năng Camera Uploads?</string>
@@ -1655,7 +1655,7 @@
     <!-- message when trying to invite a contact with a pending request -->
     <string name="context_contact_already_invited">%s đã được mời rồi. Xem lại các lời yêu cầu đang chờ.</string>
     <!-- Hint text explaining that you can change the email and resend the create account link to the new email address -->
-    <string name="confirm_email_misspelled">If you have misspelt your email address, correct it and tap [A]Resend[A].</string>
+    <string name="confirm_email_misspelled">Nếu địa chỉ email bị viết sai, sửa lại cho đúng và chạm vào [A]Gửi lại[A].</string>
     <!-- Button to resend the create account email to a new email address in case the previous email address was misspelled -->
     <string name="confirm_email_misspelled_resend">Gửi lại</string>
     <!-- Text shown after the confirmation email has been sent to the new email address -->
@@ -1865,7 +1865,7 @@
     <!-- info paragraph about the achievement install megasync -->
     <string name="paragraph_info_achievement_install_desktop">Sau khi cài đặt MEGA trên máy tính, bạn sẽ nhận được thêm %1$s vào không gian lưu trữ, có hạn sử dụng là 365 ngày. MEGA còn có apps dành cho Windows, macOS và đa số các máy Linux distros.</string>
     <!-- info paragraph about the achievement install mobile app -->
-    <string name="paragraph_info_achievement_install_mobile_app">When you install the MEGA Mobile App you get %1$s of complimentary storage space, valid for 365 days. We provide mobile apps for iOS and Android.</string>
+    <string name="paragraph_info_achievement_install_mobile_app">Sau khi cài đặt App MEGA cho Di Động, bạn sẽ nhận được thêm %1$s vào không gian lưu trữ, hạn sử dụng là 365 ngày. MEGA còn có ứng dụng di động dành cho iOS và Android..</string>
     <!-- info paragraph about the achievement ‘add phone number’. Placeholder 1: bonus storage space e.g. 20GB. Placeholder 2: bonus transfer quota e.g. 50GB -->
     <string name="paragraph_info_achievement_add_phone">Sau khi xác thực số điện thoại bạn sẽ nhận được thêm %1$s vào không gian lưu trữ, hạn sử dụng là 365 ngày.</string>
     <!-- info paragraph about the completed achievement install megasync -->
@@ -2816,9 +2816,9 @@
     <!-- Option of one-off (year) billing. Placeholder: purchase price. -->
     <string name="billed_one_off_year">[A]Một lần duy nhất (năm)[/A] %s</string>
     <!-- Option of monthly billing period. Placeholder: purchase price -->
-    <string name="billed_monthly_text">[A]Hằng tháng[/A] giá %s/tháng</string>
+    <string name="billed_monthly_text">[A]Mua hằng tháng[/A] %s/tháng</string>
     <!-- Option of yearly billing period. Placeholder: purchase price -->
-    <string name="billed_yearly_text">[A]Hằng năm[/A] giá %s/năm</string>
+    <string name="billed_yearly_text">[A]Mua thường niên[/A] %s/năm</string>
     <!-- dialog option cancel in alert dialog -->
     <string name="button_cancel">Hủy</string>
     <!-- dialog option continue in alert dialog -->
@@ -2830,7 +2830,7 @@
     <!-- Capital letters. Text of the label of a new historic notifications -->
     <string name="new_label_notification_item">MỚI</string>
     <!-- When user is on PRO 3 plan, we will display an extra label to notify user that they can still contact support to have a customised plan. -->
-    <string name="label_custom_plan">Để nâng cấp thuê bao hiện tại, quý khách xin liên hệ bộ trợ giúp để mua [A]gói cước theo nhu cầu[/A].</string>
+    <string name="label_custom_plan">Để nâng cấp gói dịch vụ đăng ký hiện tại, quý khách xin liên hệ bộ trợ giúp để mua [A]gói theo nhu cầu[/A].</string>
     <!-- Input field description in the create file dialog. -->
     <string name="context_new_file_name_hint">tên tệp tin</string>
     <!-- Option in Settings section to enable the last active connection in chat -->
@@ -2896,13 +2896,13 @@
     <!-- Label to show the price of each plan in the upgrade account section -->
     <string name="type_month">[A]Giá từ[/A] %s / [A]tháng[/A] *</string>
     <!-- the meaning of the asterisk in monthly* and annually* payment -->
-    <string name="upgrade_comment">* Các gói thuê bao tự định kỳ đều có thể hủy bỏ bất cứ khi nào khách hành muốn, trước ngày đầu chu kỳ.</string>
+    <string name="upgrade_comment">* Các gói dịch vụ tự định kỳ đều có thể hủy bỏ bất cứ khi nào khách hành muốn, trước ngày đầu chu kỳ.</string>
     <!-- Message shown when a call starts. -->
     <string name="call_started_messages">Cuộc Gọi Đã Bắt Đầu</string>
     <!-- Title of the dialog to inform about a SSL error -->
     <string name="ssl_error_dialog_title">SSL key bị lỗi</string>
     <!-- Text of the dialog to inform about a SSL error -->
-    <string name="ssl_error_dialog_text">MEGA is unable to establish a secure connection using SSL. You may be on a public Wi-Fi network with additional requirements.</string>
+    <string name="ssl_error_dialog_text">MEGA không khởi tạo được kết nối an ninh qua phương thức SSL. Thiết bị bạn đang sử dụng có thể đang dùng mạng Wi-Fi công cộng có yêu cầu một số điều kiện khi kết nối.</string>
     <!-- Text of the empty screen for the notifications section -->
     <string name="context_empty_notifications">[B]Không có [/B][A]Thông Báo[/A]</string>
     <!-- Permissions screen title -->
@@ -4133,10 +4133,40 @@
     <string name="upload_files">Tải lên tệp tin</string>
     <!-- Action button to upload a folder. -->
     <string name="upload_folder">Tải lên thư mục</string>
-    <!-- Title of the dialog warning the user about cancel uploads. -->
-    <string name="cancel_uploads">Cancel uploads</string>
-    <!-- Warning alerting user if proceed with the action all the uploads will be cancelled. -->
-    <string name="cancel_uploads_warning">Gián đoạn quá trình tải lên sẽ làm cho các phiên tải lên bị hủy bỏ.</string>
-    <!-- Button to proceed with action. -->
-    <string name="action_proceed">Tiến hành</string>
+    <!-- Text of the dialog warning the user about cancel uploads. -->
+    <string name="cancel_uploads">Hủy tải lên?</string>
+    <!-- Title of the Payments screen -->
+    <string name="payment">Thanh toán</string>
+    <!-- Label indicating payment methods -->
+    <string name="payment_methods">Phương thức thanh toán</string>
+    <!-- Button to proceed with a payment -->
+    <string name="proceed">Tiến hành</string>
+    <!-- Message informing the upgrade was processed correctly. Placeholder: type of subscription e.g: Pro Lite monthly -->
+    <string name="successful_upgrade">Cảm ơn quý khách đã mua đăng ký sử dụng gói %1$s</string>
+    <!-- Pro Lite monthly subscription -->
+    <string name="pro_lite_monthly">Pro Lite hằng tháng</string>
+    <!-- Pro Lite yearly subscription -->
+    <string name="pro_lite_yearly">Pro Lite thường niên</string>
+    <!-- Pro I monthly subscription -->
+    <string name="pro_i_monthly">Pro I hằng tháng</string>
+    <!-- Pro I yearly subscription -->
+    <string name="pro_i_yearly">Pro I thường niên</string>
+    <!-- Pro II monthly subscription -->
+    <string name="pro_ii_monthly">Pro II hằng tháng</string>
+    <!-- Pro II yearly subscription -->
+    <string name="pro_ii_yearly">Pro II thường niên</string>
+    <!-- Pro III monthly subscription -->
+    <string name="pro_iii_monthly">Pro III hằng tháng</string>
+    <!-- Pro III yearly subscription -->
+    <string name="pro_iii_yearly">Pro III thường niên</string>
+    <!-- Action button which will cancel uploads. -->
+    <string name="action_cancel_upload">Hủy tải lên</string>
+    <!-- Action button which will dismiss the dialog and will not cancel the action. -->
+    <string name="action_do_not_cancel">Đừng hủy</string>
+    <!-- Remove moderator permission and assign standard permission to a meeting participant-->
+    <string name="remove_moderator">Tước quyền điều hành</string>
+    <!-- Title of DCIM folder warning dialog -->
+    <string name="title_dcim_folder_dialog">Thư mục DCIM</string>
+    <!-- Content of DCIM folder warning dialog -->
+    <string name="content_dcim_folder_dialog">MEGA tải lên các hình ảnh có trong thư viện ảnh của thiết bị. Để thay đổi vị trí lấy hình ảnh để tải lên xin vào phần thiết đặt của Camera Upload.</string>
 </resources>
