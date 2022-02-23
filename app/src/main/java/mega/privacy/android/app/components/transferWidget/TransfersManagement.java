@@ -33,6 +33,7 @@ import static mega.privacy.android.app.utils.LogUtil.logWarning;
 import static mega.privacy.android.app.utils.SDCardUtils.checkSDCardCompletedTransfers;
 import static mega.privacy.android.app.utils.StringResourcesUtils.getString;
 
+import static nz.mega.sdk.MegaApiJava.STORAGE_STATE_RED;
 import static nz.mega.sdk.MegaTransfer.TYPE_DOWNLOAD;
 import static nz.mega.sdk.MegaTransfer.TYPE_UPLOAD;
 
@@ -159,6 +160,15 @@ public class TransfersManagement {
      */
     public static boolean isOnTransferOverQuota() {
         return MegaApplication.getInstance().getMegaApi().getBandwidthOverquotaDelay() > 0;
+    }
+
+    /**
+     * Checks if it is on storage over quota.
+     *
+     * @return True if it is on storage over quota, false otherwise.
+     */
+    public static boolean isStorageOverQuota() {
+        return MegaApplication.getInstance().getStorageState() == STORAGE_STATE_RED;
     }
 
     /**
