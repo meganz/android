@@ -1295,9 +1295,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 	        FileOutputStream fileOutputStream = new FileOutputStream(pfd.getFileDescriptor());
 
 	    	InputStream in = new FileInputStream(sourceLocation);
-//
-//	        OutputStream out = new FileOutputStream(targetLocation);
-//
+
 	        // Copy the bits from instream to outstream
 	        byte[] buf = new byte[1024];
 	        int len;
@@ -1305,10 +1303,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 	        	fileOutputStream.write(buf, 0, len);
 	        }
 	        in.close();
-//	        out.close();
 
-
-//	        fileOutputStream.write(("Overwritten by MyCloud at " + System.currentTimeMillis() + "\n").getBytes());
 	        // Let the document provider know you're done by closing the stream.
 	        fileOutputStream.close();
 	        pfd.close();
@@ -1445,7 +1440,6 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 				logError("ERROR: " + e.getErrorString());
 				isLoggingIn = false;
 				MegaApplication.setLoggingIn(isLoggingIn);
-//				finish();
 			}
 		}
 		else if (request.getType() == MegaRequest.TYPE_FETCH_NODES){
@@ -1462,7 +1456,6 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 				logError("ERROR: " + e.getErrorString());
 				isLoggingIn = false;
 				MegaApplication.setLoggingIn(isLoggingIn);
-//				finish();
 			}
 		} else {
 			logDebug("Public node received");

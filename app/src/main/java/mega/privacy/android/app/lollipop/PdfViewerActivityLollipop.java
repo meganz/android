@@ -2052,7 +2052,6 @@ public class PdfViewerActivityLollipop extends PasscodeActivity
             MegaNode node = megaApi.getNodeByHandle(handleToDownload);
             if(node!=null){
 
-//				File newFile =  new File(externalPath+"/"+node.getName());
                 File newFile =  new File(node.getName());
                 logDebug("File: " + newFile.getPath());
                 Intent intent = new Intent(Intent.ACTION_CREATE_DOCUMENT);

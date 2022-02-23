@@ -47,7 +47,6 @@ import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.UserCredentials;
 import mega.privacy.android.app.VideoCompressor;
-import mega.privacy.android.app.activities.settingsActivities.CameraUploadsPreferencesActivity;
 import mega.privacy.android.app.listeners.CreateFolderListener;
 import mega.privacy.android.app.listeners.GetCuAttributeListener;
 import mega.privacy.android.app.listeners.SetAttrUserListener;

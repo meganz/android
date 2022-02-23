@@ -2268,7 +2268,6 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
             MegaMessageService.getToken(this);
             nVEmail.setVisibility(View.VISIBLE);
             nVEmail.setText(megaApi.getMyEmail());
-//				megaApi.getUserData(this);
             megaApi.getUserAttribute(MegaApiJava.USER_ATTR_FIRSTNAME, this);
             megaApi.getUserAttribute(MegaApiJava.USER_ATTR_LASTNAME, this);
 
@@ -3200,13 +3199,9 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 
         Intent intent = getIntent();
 
-//    	dbH = new DatabaseHandler(getApplicationContext());
         dbH = DatabaseHandler.getDbHandler(getApplicationContext());
         if (dbH.getCredentials() == null) {
             if (!openLink) {
-//				megaApi.localLogout();
-//				AccountController aC = new AccountController(this);
-//				aC.logout(this, megaApi, megaChatApi, false);
                 return;
             } else {
                 logDebug("Not credentials");
@@ -3252,19 +3247,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
                     intentZip.putExtra(ZipBrowserActivity.EXTRA_PATH_ZIP, pathZip);
                     startActivity(intentZip);
                 }
-//    			else if(getIntent().getAction().equals(ManagerActivityLollipop.ACTION_OPEN_PDF)){
-//
-//    				String pathPdf=intent.getExtras().getString(EXTRA_PATH_PDF);
-//
-//    			    File pdfFile = new File(pathPdf);
-//
-//    			    Intent intentPdf = new Intent();
-//    			    intentPdf.setDataAndType(Uri.fromFile(pdfFile), "application/pdf");
-//    			    intentPdf.setClass(this, OpenPDFActivity.class);
-//    			    intentPdf.setAction("android.intent.action.VIEW");
-//    				this.startActivity(intentPdf);
-//
-//    			}
+
                 if (getIntent().getAction().equals(ACTION_IMPORT_LINK_FETCH_NODES)) {
                     logDebug("ACTION_IMPORT_LINK_FETCH_NODES");
 
@@ -3411,7 +3394,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 						ac.exportMK(parentPath);
 					}
 				}
-				else  if (getIntent().getAction().equals(ACTION_RECOVERY_KEY_COPY_TO_CLIPBOARD)){
+				else if (getIntent().getAction().equals(ACTION_RECOVERY_KEY_COPY_TO_CLIPBOARD)){
 					AccountController ac = new AccountController(this);
 					if (getIntent().getBooleanExtra("logout", false)) {
 						ac.copyMK(true);
@@ -3518,8 +3501,6 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 
     public void openChat(long chatId, String text) {
         logDebug("Chat ID: " + chatId);
-//		drawerItem=DrawerItem.CHAT;
-//		selectDrawerItemLollipop(drawerItem);
 
         if (chatId != -1) {
             MegaChatRoom chat = megaChatApi.getChatRoom(chatId);
@@ -5139,8 +5120,8 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
         try {
             enable2FADialog.show();
         } catch (Exception e) {
+            e.printStackTrace();
         }
-        ;
         isEnable2FADialogShown = true;
     }
 
@@ -5724,7 +5705,6 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
                         }
                     } else if (drawerItem == DrawerItem.SEARCH) {
                         if (getSearchFragment() != null) {
-//		    				sFLol.onBackPressed();
                             onBackPressed();
                             return true;
                         }
@@ -8403,8 +8383,6 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 
             final int multiselectIntent = intent.getIntExtra("MULTISELECT", -1);
 
-            //if (megaContacts){
-
             if (multiselectIntent == 0) {
                 //One file to share
                 final long nodeHandle = intent.getLongExtra(AddContactActivityLollipop.EXTRA_NODE_HANDLE, -1);
@@ -9485,10 +9463,6 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
     @Override
     public void onRequestStart(MegaChatApiJava api, MegaChatRequest request) {
         logDebug("onRequestStart(CHAT): " + request.getRequestString());
-//		if (request.getType() == MegaChatRequest.TYPE_INITIALIZE){
-//			MegaApiAndroid.setLoggerObject(new AndroidLogger());
-////			MegaChatApiAndroid.setLoggerObject(new AndroidChatLogger());
-//		}
     }
 
     @Override

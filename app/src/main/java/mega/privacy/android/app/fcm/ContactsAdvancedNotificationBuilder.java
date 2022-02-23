@@ -90,7 +90,6 @@ public final class ContactsAdvancedNotificationBuilder implements MegaRequestLis
             long ts = cr.getModificationTime()*1000;
             Date crDate = new Date(ts);
             long diff = currentDate.getTime() - crDate.getTime();
-//            float days = (diff / (1000*60*60*24));
             long diffDays = TimeUnit.DAYS.convert(diff, TimeUnit.MILLISECONDS);
             if(diffDays<14){
                 finalIcr.add(cr);

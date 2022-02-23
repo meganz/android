@@ -1,7 +1,5 @@
 package mega.privacy.android.app.components.scrollBar;
 
-import android.graphics.drawable.Drawable;
-import android.os.Build;
 import android.view.View;
 
 public class Utils {

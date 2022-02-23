@@ -467,7 +467,6 @@ public class FileLinkActivityLollipop extends TransfersManagementActivity implem
 					dbH.setLastPublicHandleType(MegaApiJava.AFFILIATE_TYPE_FILE_FOLDER);
 				}
 
-//				nameView.setText(document.getName());
 				collapsingToolbar.setTitle(document.getName());
 
 				sizeTextView.setText(getSizeString(document.getSize()));

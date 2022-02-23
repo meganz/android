@@ -89,8 +89,6 @@ public class LoginActivityLollipop extends BaseActivity implements MegaRequestLi
     static boolean isBackFromLoginPage;
     static boolean isFetchingNodes;
 
-    private static boolean clipboardRead;
-
     private BroadcastReceiver updateMyAccountReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -222,7 +220,6 @@ public class LoginActivityLollipop extends BaseActivity implements MegaRequestLi
                 switch (visibleFragment) {
                     case LOGIN_FRAGMENT: {
                         if (loginFragment != null && loginFragment.isAdded()) {
-//                            loginFragment.returnToLogin();
                             onBackPressed();
                         }
                         break;

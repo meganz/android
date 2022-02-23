@@ -6,7 +6,6 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.res.ColorStateList;
 import android.content.res.TypedArray;
-import android.os.Build;
 import android.os.Build.VERSION;
 import android.os.Build.VERSION_CODES;
 import android.os.Parcel;
@@ -1491,11 +1490,6 @@ public class HomepageBottomSheetBehavior<V extends View> extends CoordinatorLayo
                 callbacks.get(i).onSlide(bottomSheet, slideOffset);
             }
         }
-    }
-
-    @VisibleForTesting
-    int getPeekHeightMin() {
-        return peekHeightMin;
     }
 
     /**

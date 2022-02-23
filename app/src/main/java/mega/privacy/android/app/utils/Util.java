@@ -53,7 +53,6 @@ import android.telephony.TelephonyManager;
 import androidx.core.content.FileProvider;
 import androidx.core.content.res.ResourcesCompat;
 import androidx.core.graphics.drawable.DrawableCompat;
-import androidx.preference.PreferenceManager;
 import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -69,7 +68,6 @@ import android.view.ViewGroup;
 import android.view.ViewParent;
 import android.view.Window;
 import android.view.WindowInsetsController;
-import android.view.animation.AlphaAnimation;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -110,7 +108,6 @@ import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.interfaces.SnackbarShower;
-import mega.privacy.android.app.lollipop.FileInfoActivityLollipop;
 import mega.privacy.android.app.mediaplayer.AudioPlayerActivity;
 import mega.privacy.android.app.mediaplayer.VideoPlayerActivity;
 import nz.mega.sdk.MegaApiAndroid;
@@ -141,7 +138,6 @@ public class Util {
 	public static float dpHeightAbs = 592;
 	
 	public static double percScreenLogin = 0.596283784; //The dimension of the grey zone (Login and Tour)
-	public static double percScreenLoginReturning = 0.8;
 	
 	// Debug flag to enable logging and some other things
 	public static boolean DEBUG = false;
@@ -257,7 +253,6 @@ public class Util {
 		else{
 			return false;
 		}
-//		return true;
 	}
 
     public static String toCDATA(String src) {
@@ -269,8 +264,6 @@ public class Util {
                     .replaceAll("<","&lt;")
                     .replaceAll(">","&gt;");
             //another solution
-//            src = src.replaceAll("]]>", "] ]>");
-//            src = "<![CDATA[" + src + "]]>";
         }
         src = converterShortCodes(src);
         return src;

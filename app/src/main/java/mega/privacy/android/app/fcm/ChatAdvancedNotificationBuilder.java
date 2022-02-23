@@ -512,40 +512,6 @@ public final class ChatAdvancedNotificationBuilder {
             notificationBuilderO.setPriority(NotificationManager.IMPORTANCE_HIGH);
         }
 
-//        NotificationCompat.BigTextStyle bigTextStyle = new NotificationCompat.BigTextStyle();
-
-//        if(chat.isGroup()){
-//
-//            if(msgUserHandle!=-1){
-//                String nameAction = getParticipantShortName(msgUserHandle);
-//
-//                if(nameAction.isEmpty()){
-//                    notificationBuilder.setContentText(msgContent);
-//                    bigTextStyle.bigText(msgContent);
-//                }
-//                else{
-//                    String source = "<b>"+nameAction+": </b>"+msgContent;
-//
-//                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-//                        notificationContent = Html.fromHtml(source,Html.FROM_HTML_MODE_LEGACY);
-//                    } else {
-//                        notificationContent = Html.fromHtml(source);
-//                    }
-//                    notificationBuilder.setContentText(notificationContent);
-//                    bigTextStyle.bigText(notificationContent);
-//                }
-//            }
-//            else{
-//                notificationBuilder.setContentText(msgContent);
-//                bigTextStyle.bigText(msgContent);
-//            }
-//
-//        }
-//        else{
-//            notificationBuilder.setContentText(msgContent);
-//            bigTextStyle.bigText(msgContent);
-//        }
-
         Bitmap largeIcon = setUserAvatar(chat);
         if(largeIcon!=null){
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
@@ -555,8 +521,6 @@ public final class ChatAdvancedNotificationBuilder {
                 notificationBuilder.setLargeIcon(largeIcon);
             }
         }
-
-//        notificationBuilder.setStyle(bigTextStyle);
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             return notificationBuilderO.build();

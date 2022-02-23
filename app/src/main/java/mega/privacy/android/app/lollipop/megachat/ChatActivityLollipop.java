@@ -3706,7 +3706,6 @@ public class ChatActivityLollipop extends PasscodeActivity
                             logDebug("DOCUMENT: " + document.getHandle());
                             document = chatC.authorizeNodeIfPreview(document, chatRoom);
                             if (target != null) {
-//                            MegaNode autNode = megaApi.authorizeNode(document);
                                 megaApi.copyNode(document, target, listener);
                             } else {
                                 logError("TARGET: null");
@@ -3764,7 +3763,7 @@ public class ChatActivityLollipop extends PasscodeActivity
             removePendingMsg(pendMsg);
             retryNodeAttachment(pendMsg.getNodeHandle());
         } else {
-            ////Retry to send
+            // Retry to send
             File f = new File(pendMsg.getFilePath());
             if (!f.exists()) {
                 showSnackbar(SNACKBAR_TYPE, StringResourcesUtils.getQuantityString(R.plurals.messages_forwarded_error_not_available,
@@ -3772,7 +3771,7 @@ public class ChatActivityLollipop extends PasscodeActivity
                 return;
             }
 
-            //Remove the old message from the UI and DB
+            // Remove the old message from the UI and DB
             removePendingMsg(pendMsg);
             PendingMessageSingle pMsgSingle = createAttachmentPendingMessage(idChat,
                     f.getAbsolutePath(), f.getName(), false);
@@ -5210,7 +5209,6 @@ public class ChatActivityLollipop extends PasscodeActivity
                                             logDebug("localPath != null");
 
                                             File mediaFile = new File(localPath);
-                                            //mediaIntent.setDataAndType(Uri.parse(localPath), mimeType);
                                             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && localPath.contains(Environment.getExternalStorageDirectory().getPath())) {
                                                 logDebug("FileProviderOption");
                                                 Uri mediaFileUri = FileProvider.getUriForFile(this, "mega.privacy.android.app.providers.fileprovider", mediaFile);
@@ -6073,8 +6071,6 @@ public class ChatActivityLollipop extends PasscodeActivity
                                 dbH.removePendingMessageById(idMsg);
                                 if(resultModify==-1){
                                     logDebug("Node attachment message not in list -> resultModify -1");
-//                            AndroidMegaChatMessage msgToAppend = new AndroidMegaChatMessage(msg);
-//                            appendMessagePosition(msgToAppend);
                                 }
                                 else{
                                     logDebug("Modify attachment");
@@ -6135,8 +6131,6 @@ public class ChatActivityLollipop extends PasscodeActivity
                     logDebug("lastMessageSeen is -1");
                     lastSeenReceived=true;
                 }
-
-//                megaChatApi.setMessageSeen(idChat, msg.getMsgId());
 
                 if(positionToScroll>=0){
                     positionToScroll++;
@@ -6987,7 +6981,6 @@ public class ChatActivityLollipop extends PasscodeActivity
             }
         }
 
-//        indexToChange = 2;
         if(indexToChange != messages.size()-1){
             logDebug("Clear history of confirmed messages: " + indexToChange);
 
@@ -7379,14 +7372,12 @@ public class ChatActivityLollipop extends PasscodeActivity
 
                 if (userHandleToCompare == myUserHandle) {
                     logDebug("MY message!!");
-//                log("MY message!!: "+messageToShow.getContent());
                     if ((previousMessage.getMessage().getType() == MegaChatMessage.TYPE_PRIV_CHANGE) || (previousMessage.getMessage().getType() == MegaChatMessage.TYPE_ALTER_PARTICIPANTS)) {
                         previousUserHandleToCompare = previousMessage.getMessage().getHandleOfAction();
                     } else {
                         previousUserHandleToCompare = previousMessage.getMessage().getUserHandle();
                     }
 
-//                    log("previous message: "+previousMessage.getContent());
                     if (previousUserHandleToCompare == myUserHandle) {
                         logDebug("Last message and previous is mine");
                         //The last two messages are mine
@@ -7449,7 +7440,6 @@ public class ChatActivityLollipop extends PasscodeActivity
 
                 } else {
                     logDebug("NOT MY message!! - CONTACT");
-//                    log("previous message: "+previousMessage.getContent());
 
                     if ((previousMessage.getMessage().getType() == MegaChatMessage.TYPE_PRIV_CHANGE) || (previousMessage.getMessage().getType() == MegaChatMessage.TYPE_ALTER_PARTICIPANTS)) {
                         previousUserHandleToCompare = previousMessage.getMessage().getHandleOfAction();

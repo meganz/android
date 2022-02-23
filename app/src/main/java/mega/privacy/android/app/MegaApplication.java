@@ -2,7 +2,6 @@ package mega.privacy.android.app;
 
 import android.app.Activity;
 import android.app.Application;
-import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -190,7 +189,6 @@ public class MegaApplication extends MultiDexApplication implements Application.
 
 	private static boolean isLoggingIn = false;
 	private static boolean isLoggingOut = false;
-	private static boolean firstConnect = true;
 
 	private static boolean showInfoChatMessages = false;
 
