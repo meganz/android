@@ -5032,7 +5032,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 
         switch (drawerItem) {
             case CLOUD_DRIVE: {
-                if (fbFLol != null) {
+                if (fbFLol != null && fbFLol.isResumed()) {
                     fbFLol.checkScroll();
                 }
                 break;
