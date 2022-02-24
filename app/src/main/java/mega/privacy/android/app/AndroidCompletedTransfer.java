@@ -67,24 +67,6 @@ public class AndroidCompletedTransfer implements Parcelable {
         this.parentHandle = transfer.getParentHandle();
     }
 
-    private String getErrorString(MegaTransfer transfer, MegaError error) {
-        switch (error.getErrorCode()) {
-            case API_EOVERQUOTA:
-                return transfer.isForeignOverquota()
-                        ? getString(R.string.error_share_owner_storage_quota)
-                        : getTranslatedErrorString(error);
-
-            case API_EBLOCKED:
-                MegaNode node = MegaApplication.getInstance().getMegaApi().getNodeByHandle(transfer.getNodeHandle());
-                return node != null && node.isTakenDown()
-                        ? getString(R.string.tos_aup_violation)
-                        : getTranslatedErrorString(error);
-
-            default:
-                return getTranslatedErrorString(error);
-        }
-    }
-
     public AndroidCompletedTransfer(SDTransfer transfer) {
         this.fileName = transfer.getName();
         this.type = MegaTransfer.TYPE_DOWNLOAD;
@@ -241,6 +223,31 @@ public class AndroidCompletedTransfer implements Parcelable {
 
         setIsOfflineFile(false);
         return "";
+    }
+
+    /**
+     * Gets the error string to show as cause of the failure.
+     *
+     * @param transfer  MegaTransfer to get its error.
+     * @param error     MegaError of the transfer.
+     * @return The error to show as cause of the failure.
+     */
+    private String getErrorString(MegaTransfer transfer, MegaError error) {
+        switch (error.getErrorCode()) {
+            case API_EOVERQUOTA:
+                return transfer.isForeignOverquota()
+                        ? getString(R.string.error_share_owner_storage_quota)
+                        : getTranslatedErrorString(error);
+
+            case API_EBLOCKED:
+                MegaNode node = MegaApplication.getInstance().getMegaApi().getNodeByHandle(transfer.getNodeHandle());
+                return node != null && node.isTakenDown()
+                        ? getString(R.string.tos_aup_violation)
+                        : getTranslatedErrorString(error);
+
+            default:
+                return getTranslatedErrorString(error);
+        }
     }
 
     protected AndroidCompletedTransfer(Parcel in) {
