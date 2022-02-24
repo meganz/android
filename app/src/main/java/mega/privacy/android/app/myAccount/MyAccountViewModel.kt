@@ -5,7 +5,6 @@ import android.app.Activity
 import android.app.Activity.RESULT_OK
 import android.content.Context
 import android.content.Intent
-import android.os.Build
 import android.util.Patterns
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -418,42 +417,40 @@ class MyAccountViewModel @Inject constructor(
      * @param activity Current activity.
      */
     fun capturePhoto(activity: Activity) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            val hasStoragePermission: Boolean = hasPermissions(
+        val hasStoragePermission: Boolean = hasPermissions(
+            activity,
+            Manifest.permission.WRITE_EXTERNAL_STORAGE
+        )
+        val hasCameraPermission: Boolean = hasPermissions(
+            activity,
+            Manifest.permission.CAMERA
+        )
+
+        if (!hasStoragePermission && !hasCameraPermission) {
+            requestPermission(
                 activity,
-                Manifest.permission.WRITE_EXTERNAL_STORAGE
-            )
-            val hasCameraPermission: Boolean = hasPermissions(
-                activity,
+                REQUEST_WRITE_STORAGE,
+                Manifest.permission.WRITE_EXTERNAL_STORAGE,
                 Manifest.permission.CAMERA
             )
 
-            if (!hasStoragePermission && !hasCameraPermission) {
-                requestPermission(
-                    activity,
-                    REQUEST_WRITE_STORAGE,
-                    Manifest.permission.WRITE_EXTERNAL_STORAGE,
-                    Manifest.permission.CAMERA
-                )
+            return
+        } else if (!hasStoragePermission) {
+            requestPermission(
+                activity,
+                REQUEST_WRITE_STORAGE,
+                Manifest.permission.WRITE_EXTERNAL_STORAGE
+            )
 
-                return
-            } else if (!hasStoragePermission) {
-                requestPermission(
-                    activity,
-                    REQUEST_WRITE_STORAGE,
-                    Manifest.permission.WRITE_EXTERNAL_STORAGE
-                )
+            return
+        } else if (!hasCameraPermission) {
+            requestPermission(
+                activity,
+                REQUEST_CAMERA,
+                Manifest.permission.CAMERA
+            )
 
-                return
-            } else if (!hasCameraPermission) {
-                requestPermission(
-                    activity,
-                    REQUEST_CAMERA,
-                    Manifest.permission.CAMERA
-                )
-
-                return
-            }
+            return
         }
 
         Util.checkTakePicture(activity, TAKE_PICTURE_PROFILE_CODE)

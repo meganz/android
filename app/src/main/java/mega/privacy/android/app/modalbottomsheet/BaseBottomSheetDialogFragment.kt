@@ -281,7 +281,7 @@ open class BaseBottomSheetDialogFragment : BottomSheetDialogFragment(), Activity
 
                 metrics.bounds.height() - insets.bottom - insets.top
             }
-            Build.VERSION.SDK_INT >= Build.VERSION_CODES.M -> {
+            else -> {
                 val windowInsets = requireActivity().window.decorView.rootWindowInsets
 
                 if (windowInsets != null) {
@@ -294,7 +294,6 @@ open class BaseBottomSheetDialogFragment : BottomSheetDialogFragment(), Activity
                     getRealScreenSize().y - getStatusBarHeight() - getNavigationBarHeight()
                 }
             }
-            else -> getRealScreenSize().y - getStatusBarHeight() - getNavigationBarHeight()
         }
 
     /**

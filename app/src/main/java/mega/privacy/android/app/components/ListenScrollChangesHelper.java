@@ -2,7 +2,6 @@ package mega.privacy.android.app.components;
 
 import android.annotation.SuppressLint;
 import android.graphics.Point;
-import android.os.Build;
 import android.view.View;
 import android.view.ViewTreeObserver;
 
@@ -17,23 +16,9 @@ public class ListenScrollChangesHelper {
         if (view == null || listener == null)
             return;
 
-        // Fall-back to native solution on newer Android devices.
-        if (useNativeScrollChangeListener()) {
-            view.setOnScrollChangeListener(new OnScrollChangeListenerAdapter(listener));
-            mViewToListenerMap.put(view, null);
-            return;
-        }
-
-        if (!mViewToListenerMap.containsKey(view)) {
-            // Handle case, when previously added view has the same ViewTreeObserver.
-            view.getViewTreeObserver().removeOnScrollChangedListener(mObserverOnScrollChangedListener);
-            view.getViewTreeObserver().addOnScrollChangedListener(mObserverOnScrollChangedListener);
-
-            view.removeOnLayoutChangeListener(mLayoutChangeListener);
-            view.addOnLayoutChangeListener(mLayoutChangeListener);
-        }
-        Item item = new Item(new Point(view.getScrollX(), view.getScrollY()), listener, view.getViewTreeObserver());
-        mViewToListenerMap.put(view, item);
+        // Use native scrolling on newer Android devices.
+        view.setOnScrollChangeListener(new OnScrollChangeListenerAdapter(listener));
+        mViewToListenerMap.put(view, null);
     }
 
     @SuppressLint("NewApi")
@@ -42,11 +27,7 @@ public class ListenScrollChangesHelper {
             return;
 
         view.removeOnLayoutChangeListener(mLayoutChangeListener);
-        if (useNativeScrollChangeListener()) {
-            view.setOnScrollChangeListener(null);
-        } else if (!haveAnotherViewWithSameObserver(view)) {
-            view.getViewTreeObserver().removeOnScrollChangedListener(mObserverOnScrollChangedListener);
-        }
+        view.setOnScrollChangeListener(null);
         mViewToListenerMap.remove(view);
     }
 
@@ -54,14 +35,6 @@ public class ListenScrollChangesHelper {
         for (View view : mViewToListenerMap.keySet()) {
             removeViewToListen(view);
         }
-    }
-
-    private boolean haveAnotherViewWithSameObserver(View view) {
-        for (Map.Entry<View, Item> entry : mViewToListenerMap.entrySet()) {
-            if (entry.getKey() != view && entry.getKey().getViewTreeObserver() == view.getViewTreeObserver())
-                return true;
-        }
-        return false;
     }
 
     // If ViewTreeObserver is not alive, it will throw exception on call to any method except isAlive().
@@ -75,10 +48,6 @@ public class ListenScrollChangesHelper {
         if (observer.isAlive()) {
             observer.removeOnScrollChangedListener(listener);
         }
-    }
-
-    private static boolean useNativeScrollChangeListener() {
-        return (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M);
     }
 
     private final ViewTreeObserver.OnScrollChangedListener mObserverOnScrollChangedListener = new ViewTreeObserver.OnScrollChangedListener() {
