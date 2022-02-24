@@ -63,4 +63,7 @@
         </RelativeLayout>
 
     </RelativeLayout>
+
+    <include layout="@layout/general_progress_bar"/>
+
 </RelativeLayout>
