@@ -81,10 +81,12 @@ open class TypedNodesFetcher(
     }
 
     /**
-     * Get all nodes items
+     * Get all nodes items.
+     *
+     * @param cancelToken   MegaCancelToken to cancel the fetch at any time.
      */
-    suspend fun getNodeItems() {
-        for (node in getMegaNodes(order, type)) {
+    suspend fun getNodeItems(cancelToken: MegaCancelToken) {
+        for (node in getMegaNodes(cancelToken, order, type)) {
             val thumbnail = getThumbnail(node)
             val dateString = ofPattern("MMMM uuuu").format(Util.fromEpoch(node.modificationTime))
             val selected = selectedNodesMap[node.handle]?.selected ?: false
@@ -133,8 +135,15 @@ open class TypedNodesFetcher(
         }
     }
 
-    fun getMegaNodes(order: Int, type: Int): List<MegaNode> =
-        megaApi.searchByType(order, type, MegaApiJava.SEARCH_TARGET_ROOTNODE)
+    /**
+     * Gets a list of nodes given an order and type.
+     *
+     * @param cancelToken   MegaCancelToken to cancel the search at any time.
+     * @param order         Order to get nodes.
+     * @param type          Type of nodes.
+     */
+    fun getMegaNodes(cancelToken: MegaCancelToken, order: Int, type: Int): List<MegaNode> =
+        megaApi.searchByType(cancelToken, order, type, MegaApiJava.SEARCH_TARGET_ROOTNODE)
 
     companion object {
         const val UPDATE_DATA_THROTTLE_TIME =

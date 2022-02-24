@@ -3632,7 +3632,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 
     private void cancelSearch() {
         if (getSearchFragment() != null) {
-            sFLol.cancelPreviousSearch();
+            sFLol.cancelSearch();
         }
     }
 

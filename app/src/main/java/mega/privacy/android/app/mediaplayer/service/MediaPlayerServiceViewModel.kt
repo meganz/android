@@ -21,6 +21,7 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.constants.SettingsConstants.*
 import mega.privacy.android.app.listeners.MegaRequestFinishListener
 import mega.privacy.android.app.mediaplayer.playlist.PlaylistItem
+import mega.privacy.android.app.search.callback.SearchCallback
 import mega.privacy.android.app.utils.Constants.*
 import mega.privacy.android.app.utils.ContactUtil.getMegaUserNameDB
 import mega.privacy.android.app.utils.FileUtil.*
@@ -54,7 +55,7 @@ class MediaPlayerServiceViewModel(
     private val megaApi: MegaApiAndroid,
     private val megaApiFolder: MegaApiAndroid,
     private val dbHandler: DatabaseHandler,
-) : ExposedShuffleOrder.ShuffleChangeListener, MegaTransferListenerInterface {
+) : ExposedShuffleOrder.ShuffleChangeListener, MegaTransferListenerInterface, SearchCallback.Data {
     private val compositeDisposable = CompositeDisposable()
 
     private val preferences = context.defaultSharedPreferences
@@ -604,7 +605,7 @@ class MediaPlayerServiceViewModel(
 
     private fun buildPlaylistForAudio(intent: Intent, firstPlayHandle: Long) {
         val order = intent.getIntExtra(INTENT_EXTRA_KEY_ORDER_GET_CHILDREN, ORDER_DEFAULT_ASC)
-        initNewSearch()
+        cancelToken = initNewSearch()
         buildPlaylistFromNodes(
             megaApi, megaApi.searchByType(cancelToken!!, order, FILE_TYPE_AUDIO, SEARCH_TARGET_ROOTNODE),
             firstPlayHandle
@@ -613,19 +614,19 @@ class MediaPlayerServiceViewModel(
 
     private fun buildPlaylistForVideos(intent: Intent, firstPlayHandle: Long) {
         val order = intent.getIntExtra(INTENT_EXTRA_KEY_ORDER_GET_CHILDREN, ORDER_DEFAULT_ASC)
-        initNewSearch()
+        cancelToken = initNewSearch()
         buildPlaylistFromNodes(
             megaApi, megaApi.searchByType(cancelToken!!, order, FILE_TYPE_VIDEO, SEARCH_TARGET_ROOTNODE),
             firstPlayHandle
         )
     }
 
-    private fun initNewSearch() {
+    override fun initNewSearch(): MegaCancelToken {
         cancelSearch()
-        cancelToken = MegaCancelToken.createInstance()
+        return MegaCancelToken.createInstance()
     }
 
-    fun cancelSearch() {
+    override fun cancelSearch() {
         cancelToken?.cancel()
     }
 

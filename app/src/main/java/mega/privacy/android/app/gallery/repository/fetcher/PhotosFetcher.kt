@@ -5,6 +5,7 @@ import mega.privacy.android.app.DatabaseHandler
 import mega.privacy.android.app.gallery.data.GalleryItem
 import mega.privacy.android.app.utils.LogUtil
 import nz.mega.sdk.MegaApiAndroid
+import nz.mega.sdk.MegaCancelToken
 import nz.mega.sdk.MegaNode
 import nz.mega.sdk.MegaNodeList
 import java.util.*
@@ -22,7 +23,7 @@ class PhotosFetcher(
         selectedNodesMap = selectedNodesMap,
         zoom = zoom
 ) {
-    override fun getNodes(): List<MegaNode> = getFilteredChildren(getCuChildren())
+    override fun getNodes(cancelToken: MegaCancelToken?): List<MegaNode> = getFilteredChildren(getCuChildren())
 
     private fun getCuChildren(): List<MegaNode> {
         var cuNode: MegaNode? = null

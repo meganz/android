@@ -121,6 +121,11 @@ class PhotosFragment : BaseZoomFragment() {
         initAfterViewCreated()
     }
 
+    override fun onDestroyView() {
+        viewModel.cancelSearch()
+        super.onDestroyView()
+    }
+
     fun onBackPressed() = when {
         mManagerActivity.isFirstNavigationLevel -> {
             if (selectedView != ALL_VIEW) {

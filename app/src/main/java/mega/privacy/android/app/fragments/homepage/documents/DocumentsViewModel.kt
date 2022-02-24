@@ -7,17 +7,19 @@ import kotlinx.coroutines.launch
 import mega.privacy.android.app.fragments.homepage.NodeItem
 import mega.privacy.android.app.fragments.homepage.TypedFilesRepository
 import mega.privacy.android.app.globalmanagement.SortOrderManagement
+import mega.privacy.android.app.search.callback.SearchCallback
 import mega.privacy.android.app.utils.Constants.EVENT_NODES_CHANGE
 import mega.privacy.android.app.utils.Constants.INVALID_POSITION
 import mega.privacy.android.app.utils.TextUtil
 import nz.mega.sdk.MegaApiJava
+import nz.mega.sdk.MegaCancelToken
 import javax.inject.Inject
 
 @HiltViewModel
 class DocumentsViewModel @Inject constructor(
     private val repository: TypedFilesRepository,
     private val sortOrderManagement: SortOrderManagement
-) : ViewModel() {
+) : ViewModel(), SearchCallback.Data {
 
     private var _query = MutableLiveData<String>()
 
@@ -34,10 +36,17 @@ class DocumentsViewModel @Inject constructor(
     // Whether another documents loading should be executed after current loading
     private var pendingLoad = false
 
+    private var cancelToken: MegaCancelToken? = null
+
     val items: LiveData<List<NodeItem>> = _query.switchMap {
         if (forceUpdate || repository.fileNodeItems.value == null) {
             viewModelScope.launch {
-                repository.getFiles(MegaApiJava.FILE_TYPE_DOCUMENT, sortOrderManagement.getOrderCloud())
+                cancelToken = initNewSearch()
+                repository.getFiles(
+                    cancelToken!!,
+                    MegaApiJava.FILE_TYPE_DOCUMENT,
+                    sortOrderManagement.getOrderCloud()
+                )
             }
         } else {
             repository.emitFiles()
@@ -132,5 +141,14 @@ class DocumentsViewModel @Inject constructor(
         LiveEventBus.get(EVENT_NODES_CHANGE, Boolean::class.java)
             .removeObserver(nodesChangeObserver)
         items.removeObserver(loadFinishedObserver)
+    }
+
+    override fun initNewSearch(): MegaCancelToken {
+        cancelSearch()
+        return MegaCancelToken.createInstance()
+    }
+
+    override fun cancelSearch() {
+        cancelToken?.cancel()
     }
 }

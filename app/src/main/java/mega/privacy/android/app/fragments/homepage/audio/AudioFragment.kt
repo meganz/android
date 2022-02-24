@@ -11,7 +11,6 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.view.ActionMode
-import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
@@ -104,6 +103,11 @@ class AudioFragment : Fragment(), HomepageSearchable {
 
             actionModeViewModel.setNodesData(it.filter { nodeItem -> nodeItem.node != null })
         }
+    }
+
+    override fun onDestroyView() {
+        viewModel.cancelSearch()
+        super.onDestroyView()
     }
 
     private fun setupEmptyHint() {
