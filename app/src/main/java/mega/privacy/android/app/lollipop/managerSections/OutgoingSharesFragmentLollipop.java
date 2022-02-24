@@ -386,8 +386,9 @@ public class OutgoingSharesFragmentLollipop extends MegaNodeBaseFragment {
 	@Override
 	protected void setEmptyView() {
 		String textToShow = null;
+		MegaNode rootNode = megaApi.getRootNode();
 
-		if (megaApi.getRootNode().getHandle() == managerActivity.getParentHandleOutgoing()
+		if (rootNode != null && rootNode.getHandle() == managerActivity.getParentHandleOutgoing()
 				|| managerActivity.getParentHandleOutgoing() == -1) {
 			if (isScreenInPortrait(context)) {
 				emptyImageView.setImageResource(R.drawable.empty_outgoing_portrait);
