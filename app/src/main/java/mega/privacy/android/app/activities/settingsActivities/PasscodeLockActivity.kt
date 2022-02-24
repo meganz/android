@@ -711,11 +711,7 @@ class PasscodeLockActivity : BaseActivity() {
                 .build()
         }
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            biometricPrompt.authenticate(promptInfo, CryptoObject(getCipher()))
-        } else {
-            biometricPrompt.authenticate(promptInfo)
-        }
+        biometricPrompt.authenticate(promptInfo, CryptoObject(getCipher()))
     }
 
     /**

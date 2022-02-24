@@ -131,6 +131,12 @@
                 android:text="@string/external_play"
                 app:drawableStartCompat="@drawable/ic_open_with" />
 
+            <TextView
+                android:id="@+id/option_forward"
+                style="@style/BottomSheetOption"
+                android:text="@string/forward_menu_item"
+                app:drawableStartCompat="@drawable/ic_forward" />
+
             <View
                 android:id="@+id/separator_open"
                 android:layout_width="match_parent"
@@ -257,6 +263,14 @@
                 android:id="@+id/option_offline_remove"
                 style="@style/BottomSheetOption.Red"
                 android:text="@string/context_delete_offline"
+                android:visibility="gone"
+                app:drawableStartCompat="@drawable/ic_remove"
+                tools:visibility="visible" />
+
+            <TextView
+                android:id="@+id/option_chat_remove"
+                style="@style/BottomSheetOption.Red"
+                android:text="@string/context_remove"
                 android:visibility="gone"
                 app:drawableStartCompat="@drawable/ic_remove"
                 tools:visibility="visible" />

@@ -4,6 +4,7 @@ import android.content.Context;
 import android.net.Uri;
 import android.os.AsyncTask;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.widget.AppCompatEditText;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -15,7 +16,10 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.EditorInfo;
+import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.RelativeLayout;
+import android.widget.TextView;
 
 import com.facebook.drawee.view.SimpleDraweeView;
 import com.google.android.material.textfield.TextInputLayout;
@@ -23,6 +27,7 @@ import com.google.android.material.textfield.TextInputLayout;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
@@ -32,6 +37,7 @@ import mega.privacy.android.app.ShareInfo;
 import mega.privacy.android.app.components.twemoji.EmojiEditText;
 import mega.privacy.android.app.lollipop.FileExplorerActivityLollipop;
 import mega.privacy.android.app.lollipop.ImportFilesFragment;
+import mega.privacy.android.app.utils.StringResourcesUtils;
 import nz.mega.sdk.MegaApiAndroid;
 
 import static android.view.View.GONE;
@@ -46,10 +52,12 @@ import static mega.privacy.android.app.utils.TextUtil.isTextEmpty;
 import static mega.privacy.android.app.utils.ThumbnailUtils.*;
 import static mega.privacy.android.app.utils.Util.*;
 
-public class ImportFilesAdapter extends RecyclerView.Adapter<ImportFilesAdapter.ViewHolderImportFiles> implements View.OnClickListener {
+public class ImportFilesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> implements View.OnClickListener {
     public static final int MAX_VISIBLE_ITEMS_AT_BEGINNING = 4;
     private static final int LATEST_VISIBLE_ITEM_POSITION_AT_BEGINNING = 3;
-    private static final int ITEM_HEIGHT = 80;
+
+    public static final int ITEM_TYPE_CONTENT = 1;
+    public static final int ITEM_TYPE_BOTTOM = 2;
 
     Context context;
     Object fragment;
@@ -58,11 +66,24 @@ public class ImportFilesAdapter extends RecyclerView.Adapter<ImportFilesAdapter.
     MegaApiAndroid megaApi;
 
     List<ShareInfo> files;
+    List<ShareInfo> filesAll;
+    List<ShareInfo> filesPartial = new ArrayList<>();
     HashMap<String, String> names;
 
-    private boolean itemsVisible = false;
+    private boolean areItemsVisible = false;
 
     private int positionWithFocus = INVALID_POSITION;
+
+    private OnImportFilesAdapterFooterListener onImportFilesAdapterFooterListener;
+
+    /**
+     * Listener for the user action on RecycleView footer
+     *
+     * @param listener Instance of OnImportFilesAdapterFooterListener
+     */
+    public void setFooterListener(OnImportFilesAdapterFooterListener listener) {
+        onImportFilesAdapterFooterListener = listener;
+    }
 
     class ThumbnailsTask extends AsyncTask<Object, Void, Void> {
 
@@ -121,138 +142,216 @@ public class ImportFilesAdapter extends RecyclerView.Adapter<ImportFilesAdapter.
     public ImportFilesAdapter(Context context, Object fragment, List<ShareInfo> files, HashMap<String, String> names) {
         this.context = context;
         this.fragment = fragment;
-        this.files = files;
+        this.filesAll = files;
         this.names = names;
 
         Display display = ((FileExplorerActivityLollipop) context).getWindowManager().getDefaultDisplay();
         outMetrics = new DisplayMetrics();
         display.getMetrics(outMetrics);
 
+        this.files = files;
+        if (files.size() > MAX_VISIBLE_ITEMS_AT_BEGINNING) {
+            filesPartial.clear();
+            for (int i = 0; i < MAX_VISIBLE_ITEMS_AT_BEGINNING; i++) {
+                filesPartial.add(files.get(i));
+            }
+            this.files = filesPartial;
+        }
         if (megaApi == null) {
             megaApi = MegaApplication.getInstance().getMegaApi();
         }
     }
 
-    ViewHolderImportFiles holder;
+    /**
+     * Get the size of the content list
+     *
+     * @return the size of the list
+     */
+    public int getContentItemCount(){
+        if (files == null) {
+            return 0;
+        }
+        return files.size();
+    }
 
-    @NotNull
-    @Override
-    public ViewHolderImportFiles onCreateViewHolder(ViewGroup parent, int viewType) {
-
-        View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_import, parent, false);
-
-        holder = new ViewHolderImportFiles(v);
-
-        holder.itemLayout = v.findViewById(R.id.item_import_layout);
-        holder.thumbnail = v.findViewById(R.id.thumbnail_file);
-        holder.nameLayout = v.findViewById(R.id.text_file_layout);
-        holder.name = v.findViewById(R.id.text_file);
-        holder.editButton = v.findViewById(R.id.edit_icon_layout);
-        holder.editButton.setOnClickListener(this);
-        holder.editButton.setTag(holder);
-        holder.separator = v.findViewById(R.id.separator);
-
-        return holder;
+    /**
+     * Check whether the current item is a footer view
+     * @param position  The position of the item within the adapter's data set.
+     * @return true if the the current item is a footer view
+     */
+    public boolean isBottomView(int position) {
+        return position >= getContentItemCount();
     }
 
     @Override
-    public void onBindViewHolder(ViewHolderImportFiles holder, int position) {
-        ShareInfo file = (ShareInfo) getItem(position);
+    public int getItemViewType(int position) {
+        int dataItemCount = getContentItemCount();
+        if (position >= dataItemCount) {
+            // Footer view
+            return ITEM_TYPE_BOTTOM;
+        } else {
+            // Content view
+            return ITEM_TYPE_CONTENT;
+        }
+    }
 
-        holder.currentPosition = position;
-        holder.name.setText(names.get(file.getTitle()));
-        holder.name.setOnFocusChangeListener((v1, hasFocus) -> {
-                    holder.editButton.setVisibility(hasFocus ? GONE : VISIBLE);
+    @NotNull
+    @Override
+    public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+        if (viewType == ITEM_TYPE_BOTTOM) {
+            View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_footer_import, parent, false);
+            BottomViewHolder bottomViewHolder = new BottomViewHolder(v);
 
-                    if (!hasFocus) {
-                        String name = file.getTitle();
-                        String newName = holder.name.getText() != null
-                                ? holder.name.getText().toString() : null;
+            bottomViewHolder.showMore = v.findViewById(R.id.show_more_layout);
+            bottomViewHolder.showMoreText = v.findViewById(R.id.show_more_text);
+            bottomViewHolder.showMoreImage = v.findViewById(R.id.show_more_image);
+            bottomViewHolder.cloudDriveButton = v.findViewById(R.id.cloud_drive_button);
+            bottomViewHolder.chatButton = v.findViewById(R.id.chat_button);
 
-                        names.put(name, newName);
-                        ((FileExplorerActivityLollipop) context).setNameFiles(names);
-                        updateNameLayout(holder.nameLayout, holder.name);
-                    } else {
-                        positionWithFocus = position;
-                    }
+            return bottomViewHolder;
+        } else {
+            View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_import, parent, false);
+            ViewHolderImportFiles holder = new ViewHolderImportFiles(v);
+
+            holder.itemLayout = v.findViewById(R.id.item_import_layout);
+            holder.thumbnail = v.findViewById(R.id.thumbnail_file);
+            holder.nameLayout = v.findViewById(R.id.text_file_layout);
+            holder.name = v.findViewById(R.id.text_file);
+            holder.editButton = v.findViewById(R.id.edit_icon_layout);
+            holder.editButton.setOnClickListener(this);
+            holder.editButton.setTag(holder);
+            holder.separator = v.findViewById(R.id.separator);
+
+            return holder;
+        }
+    }
+
+    @Override
+    public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
+        if (holder instanceof BottomViewHolder) {
+            ((BottomViewHolder)holder).showMore.setVisibility(filesAll.size() <= MAX_VISIBLE_ITEMS_AT_BEGINNING
+                    ? GONE : VISIBLE);
+            ((BottomViewHolder)holder).showMore.setOnClickListener(show->{
+                areItemsVisible = !areItemsVisible;
+
+                if (areItemsVisible) {
+                    ((BottomViewHolder)holder).showMoreText.setText(StringResourcesUtils.getString(R.string.general_show_less));
+                    ((BottomViewHolder)holder).showMoreImage.setImageResource(R.drawable.ic_expand);
+                } else {
+                    ((BottomViewHolder)holder).showMoreText.setText(StringResourcesUtils.getString(R.string.general_show_more));
+                    ((BottomViewHolder)holder).showMoreImage.setImageResource(R.drawable.ic_collapse_acc);
                 }
-        );
+                setDataList(areItemsVisible);
+            });
+            ((BottomViewHolder) holder).cloudDriveButton.setOnClickListener(l ->
+                    onImportFilesAdapterFooterListener.onClickCloudDriveButton());
+            ((BottomViewHolder) holder).chatButton.setOnClickListener(l ->
+                    onImportFilesAdapterFooterListener.onClickChatButton());
+        } else {
+            ShareInfo file = (ShareInfo) getItem(position);
+            ((ViewHolderImportFiles) holder).currentPosition = position;
+            ((ViewHolderImportFiles) holder).name.setText(names.get(file.getTitle()));
+            ((ViewHolderImportFiles) holder).name.setOnFocusChangeListener((v1, hasFocus) -> {
+                ((ViewHolderImportFiles) holder).editButton.setVisibility(hasFocus ? GONE : VISIBLE);
 
-        holder.name.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+                        if (!hasFocus) {
+                            String name = file.getTitle();
+                            String newName = ((ViewHolderImportFiles) holder).name.getText() != null
+                                    ? ((ViewHolderImportFiles) holder).name.getText().toString() : null;
 
+                            names.put(name, newName);
+                            ((FileExplorerActivityLollipop) context).setNameFiles(names);
+                            updateNameLayout(((ViewHolderImportFiles) holder).nameLayout, ((ViewHolderImportFiles) holder).name);
+                        } else {
+                            positionWithFocus = position;
+                        }
+                    }
+            );
+
+            ((ViewHolderImportFiles) holder).name.addTextChangedListener(new TextWatcher() {
+                @Override
+                public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+                }
+
+                @Override
+                public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+                }
+
+                @Override
+                public void afterTextChanged(Editable s) {
+                    ((ViewHolderImportFiles) holder).nameLayout.setErrorEnabled(false);
+                }
+            });
+
+            ((ViewHolderImportFiles) holder).name.setImeOptions(EditorInfo.IME_ACTION_DONE);
+            ((ViewHolderImportFiles) holder).name.setOnEditorActionListener((v, actionId, event) -> {
+                if (actionId == EditorInfo.IME_ACTION_DONE) {
+                    hideKeyboardView(context, v, 0);
+                    v.clearFocus();
+                    return true;
+                }
+
+                return false;
+            });
+
+            updateNameLayout(((ViewHolderImportFiles) holder).nameLayout, ((ViewHolderImportFiles) holder).name);
+
+            ((ViewHolderImportFiles) holder).thumbnail.setVisibility(VISIBLE);
+
+            Uri uri = null;
+
+            if (typeForName(file.getTitle()).isImage()
+                    || typeForName(file.getTitle()).isVideo()
+                    || typeForName(file.getTitle()).isVideoReproducible()) {
+                File thumb = getThumbnail(file);
+
+                if (thumb.exists()) {
+                    uri = Uri.parse(thumb.getAbsolutePath());
+
+                    if (uri != null) {
+                        ((ViewHolderImportFiles) holder).thumbnail.setImageURI(Uri.fromFile(thumb));
+                    }
+                } else {
+                    new ThumbnailsTask().execute(file, holder);
+                }
             }
 
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-
+            if (uri == null) {
+                ((ViewHolderImportFiles) holder).thumbnail.setImageResource(typeForName(file.getTitle()).getIconResourceId());
             }
 
-            @Override
-            public void afterTextChanged(Editable s) {
-                holder.nameLayout.setErrorEnabled(false);
-            }
-        });
-
-        holder.name.setImeOptions(EditorInfo.IME_ACTION_DONE);
-        holder.name.setOnEditorActionListener((v, actionId, event) -> {
-            if (actionId == EditorInfo.IME_ACTION_DONE) {
-                hideKeyboardView(context, v, 0);
-                v.clearFocus();
-                return true;
-            }
-
-            return false;
-        });
-
-        updateNameLayout(holder.nameLayout, holder.name);
-
-        holder.thumbnail.setVisibility(VISIBLE);
-
-        Uri uri = null;
-
-        if (typeForName(file.getTitle()).isImage()
-                || typeForName(file.getTitle()).isVideo()
-                || typeForName(file.getTitle()).isVideoReproducible()) {
-            File thumb = getThumbnail(file);
-
-            if (thumb.exists()) {
-                uri = Uri.parse(thumb.getAbsolutePath());
-
-                if (uri != null) {
-                    holder.thumbnail.setImageURI(Uri.fromFile(thumb));
+            if (files.size() > MAX_VISIBLE_ITEMS_AT_BEGINNING) {
+                if (position == getItemCount() - 2 ) {
+                    ((ViewHolderImportFiles) holder).separator.setVisibility(GONE);
+                } else {
+                    ((ViewHolderImportFiles) holder).separator.setVisibility(VISIBLE);
                 }
             } else {
-                new ThumbnailsTask().execute(file, holder);
+                if (getItemCount() == 2){
+                    ((ViewHolderImportFiles) holder).separator.setVisibility(GONE);
+                } else if (filesAll.size() > MAX_VISIBLE_ITEMS_AT_BEGINNING && position == LATEST_VISIBLE_ITEM_POSITION_AT_BEGINNING){
+                    ((ViewHolderImportFiles) holder).separator.setVisibility(GONE);
+                } else {
+                    ((ViewHolderImportFiles) holder).separator.setVisibility(VISIBLE);
+                }
             }
         }
+    }
 
-        if (uri == null) {
-            holder.thumbnail.setImageResource(typeForName(file.getTitle()).getIconResourceId());
-        }
-
-        RelativeLayout.LayoutParams params;
-
-        if (position >= MAX_VISIBLE_ITEMS_AT_BEGINNING && !itemsVisible) {
-            holder.itemLayout.setVisibility(GONE);
-            params = new RelativeLayout.LayoutParams(0, 0);
+    /**
+     * Switch the data source between partial list and whole list
+     *
+     * @param areItemsVisible True if showing whole list, false otherwise.
+     */
+    private void setDataList(boolean areItemsVisible) {
+        if(areItemsVisible) {
+            files = filesAll;
         } else {
-            holder.itemLayout.setVisibility(VISIBLE);
-            params = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
-                    dp2px(ITEM_HEIGHT, outMetrics));
+            files = filesPartial;
         }
-
-        holder.itemLayout.setLayoutParams(params);
-
-        if (getItemCount() > MAX_VISIBLE_ITEMS_AT_BEGINNING
-                && ((itemsVisible && position == getItemCount() - 1)
-                || (!itemsVisible && position == LATEST_VISIBLE_ITEM_POSITION_AT_BEGINNING))
-                || getItemCount() == 1) {
-            holder.separator.setVisibility(GONE);
-        } else {
-            holder.separator.setVisibility(VISIBLE);
-        }
+        notifyDataSetChanged();
     }
 
     /**
@@ -281,10 +380,13 @@ public class ImportFilesAdapter extends RecyclerView.Adapter<ImportFilesAdapter.
 
     @Override
     public int getItemCount() {
+        //The number of bottom Views
+        int mBottomCount = 1;
+
         if (files == null) {
-            return 0;
+            return mBottomCount;
         }
-        return files.size();
+        return files.size() + mBottomCount;
     }
 
     public Object getItem(int position) {
@@ -301,9 +403,18 @@ public class ImportFilesAdapter extends RecyclerView.Adapter<ImportFilesAdapter.
         notifyDataSetChanged();
     }
 
-    public void setItemsVisibility(boolean visibles) {
-        this.itemsVisible = visibles;
-        notifyDataSetChanged();
+    /**
+     * Bottom ViewHolder
+     */
+    public static class BottomViewHolder extends RecyclerView.ViewHolder {
+        RelativeLayout showMore;
+        TextView showMoreText;
+        ImageView showMoreImage;
+        Button cloudDriveButton;
+        Button chatButton;
+        public BottomViewHolder(View itemView) {
+            super(itemView);
+        }
     }
 
     public static class ViewHolderImportFiles extends RecyclerView.ViewHolder {
@@ -357,5 +468,21 @@ public class ImportFilesAdapter extends RecyclerView.Adapter<ImportFilesAdapter.
         holder.name.clearFocus();
         hideKeyboardView(context, holder.name, 0);
         positionWithFocus = INVALID_POSITION;
+    }
+
+    /**
+     * This interface is to define what methods the activity
+     * should implement when clicking the buttons in footer view
+     */
+    public interface OnImportFilesAdapterFooterListener {
+        /**
+         * Click the cloud drive button
+         */
+        void onClickCloudDriveButton();
+
+        /**
+         * Click the chat button
+         */
+        void onClickChatButton();
     }
 }

@@ -59,7 +59,6 @@ import mega.privacy.android.app.utils.StringResourcesUtils;
 import mega.privacy.android.app.utils.conversion.VideoCompressionCallback;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
-import nz.mega.sdk.MegaChatApi;
 import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaNode;
@@ -121,6 +120,9 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
     public static boolean uploadingInProgress;
     public static boolean isCreatingPrimary;
     public static boolean isCreatingSecondary;
+
+    // If during camera upload setting process, set true to block the service running.
+    private static boolean bInCameraUploadsSetting = false;
 
     private NotificationCompat.Builder mBuilder;
     private NotificationManager mNotificationManager;
@@ -999,6 +1001,11 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
             return BATTERY_STATE_LOW;
         }
 
+        if (isInCameraUploadsSetting()){
+            logWarning("Camera uploads setting is in progress");
+            return SHOULD_RUN_STATE_FAILED;
+        }
+
         prefs = dbH.getPreferences();
         if (prefs == null) {
             logWarning("Not defined, so not enabled");
@@ -1099,11 +1106,9 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
      */
     private void localFolderUnavailableNotification(int resId, int notiId) {
         boolean isShowing = false;
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            for (StatusBarNotification notification : mNotificationManager.getActiveNotifications()) {
-                if (notification.getId() == notiId) {
-                    isShowing = true;
-                }
+        for (StatusBarNotification notification : mNotificationManager.getActiveNotifications()) {
+            if (notification.getId() == notiId) {
+                isShowing = true;
             }
         }
         if (!isShowing) {
@@ -2222,5 +2227,21 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
         int level = intent.getIntExtra(BatteryManager.EXTRA_LEVEL, -1);
         logDebug("Device battery level is " + level);
         return level <= LOW_BATTERY_LEVEL && !isCharging(CameraUploadsService.this);
+    }
+
+    /**
+     * Check if camera uploads setting is in progress
+     * @return - true : During camera uploads setting
+     *         - false : not in camera uploads setting
+     */
+    private boolean isInCameraUploadsSetting() {
+        return bInCameraUploadsSetting;
+    }
+
+    /**
+     * Set to true if camera uploads setting is in progress, otherwise false.
+     */
+    static public void setInCameraUploadsSetting(boolean duringSettingProgress) {
+        bInCameraUploadsSetting = duringSettingProgress;
     }
 }

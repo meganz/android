@@ -15,15 +15,12 @@ import static mega.privacy.android.app.utils.Util.*;
 
 public class LogUtil {
 
-    private static final String LOG_PREFERENCES = "LOG_PREFERENCES";
-    private static final String SDK_LOGS = "SDK_LOGS";
-    private static final String KARERE_LOGS = "KARERE_LOGS";
+    public static final String LOG_PREFERENCES = "LOG_PREFERENCES";
+    public static final String SDK_LOGS = "SDK_LOGS";
+    public static final String KARERE_LOGS = "KARERE_LOGS";
 
     private static AndroidLogger loggerSDK = null;
     private static AndroidChatLogger loggerKarere = null;
-
-    private static boolean statusLoggerSDK = false;
-    private static boolean statusLoggerKarere = false;
 
     /**
      * Send a log message with FATAL level to the logging system.
@@ -116,7 +113,7 @@ public class LogUtil {
      * @param message  Message for the logging system.
      */
     private static void log(int logLevel, String message) {
-        if (!Util.DEBUG && !statusLoggerSDK && !statusLoggerKarere) {
+        if (!Util.DEBUG && !getStatusLoggerSDK() && !getStatusLoggerKarere()) {
             return;
         }
 
@@ -140,7 +137,7 @@ public class LogUtil {
      * @param printStackTrace Flag to print the stack trace of the exception.
      */
     private static void log(int logLevel, String message, Throwable exception, boolean printStackTrace) {
-        if (!Util.DEBUG && !statusLoggerSDK && !statusLoggerKarere) {
+        if (!Util.DEBUG && !getStatusLoggerSDK() && !getStatusLoggerKarere()) {
             return;
         }
 
@@ -173,7 +170,6 @@ public class LogUtil {
         }
 
         updateSDKLogs(enabled);
-        statusLoggerSDK = enabled;
         if (enabled) {
             MegaApiAndroid.setLogLevel(MegaApiAndroid.LOG_LEVEL_MAX);
             logInfo("SDK logs are now enabled - App Version: " + getVersion());
@@ -189,8 +185,9 @@ public class LogUtil {
      * @return True if enabled or false if disabled.
      */
     public static boolean getStatusLoggerSDK(){
-        return statusLoggerSDK;
+        return areSDKLogsEnabled();
     }
+
 
     /**
      * Enables or disables the Karere logs depending on the "enabled" parameter.
@@ -203,7 +200,6 @@ public class LogUtil {
         }
 
         updateKarereLogs(enabled);
-        statusLoggerKarere = enabled;
         if (enabled) {
             MegaChatApiAndroid.setLogLevel(MegaChatApiAndroid.LOG_LEVEL_MAX);
             logInfo("Karere logs are now enabled - App Version: " + getVersion());
@@ -219,7 +215,7 @@ public class LogUtil {
      * @return True if enabled or false if disabled.
      */
     public static boolean getStatusLoggerKarere(){
-        return statusLoggerKarere;
+        return areKarereLogsEnabled();
     }
 
     /**
@@ -230,9 +226,8 @@ public class LogUtil {
             loggerSDK = new AndroidLogger(AndroidLogger.LOG_FILE_NAME);
         }
 
-        statusLoggerSDK = areSDKLogsEnabled();
         MegaApiAndroid.addLoggerObject(loggerSDK);
-        MegaApiAndroid.setLogLevel(DEBUG || statusLoggerSDK ? MegaApiAndroid.LOG_LEVEL_MAX : MegaApiAndroid.LOG_LEVEL_FATAL);
+        MegaApiAndroid.setLogLevel(DEBUG || getStatusLoggerSDK() ? MegaApiAndroid.LOG_LEVEL_MAX : MegaApiAndroid.LOG_LEVEL_FATAL);
         logInfo("SDK logger initialized");
     }
 
@@ -255,9 +250,8 @@ public class LogUtil {
             loggerKarere = new AndroidChatLogger(AndroidChatLogger.LOG_FILE_NAME);
         }
 
-        statusLoggerKarere = areKarereLogsEnabled();
         MegaChatApiAndroid.setLoggerObject(loggerKarere);
-        MegaChatApiAndroid.setLogLevel(DEBUG || statusLoggerKarere ? MegaChatApiAndroid.LOG_LEVEL_MAX : MegaChatApiAndroid.LOG_LEVEL_ERROR);
+        MegaChatApiAndroid.setLogLevel(DEBUG || getStatusLoggerKarere() ? MegaChatApiAndroid.LOG_LEVEL_MAX : MegaChatApiAndroid.LOG_LEVEL_ERROR);
         logInfo("Karere logger initialized");
     }
 

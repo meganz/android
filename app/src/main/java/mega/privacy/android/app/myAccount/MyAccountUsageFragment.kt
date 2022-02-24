@@ -76,20 +76,11 @@ class MyAccountUsageFragment : Fragment(), Scrollable {
         )
 
         paymentAlertBinding.renewExpiryText.setTextStyle(
-            requireContext(),
-            R.style.TextAppearance_Mega_Subtitle2_Normal_Grey54White54,
-            R.color.grey_054_white_054,
-            false
+            textAppearance = R.style.TextAppearance_Mega_Subtitle2_Normal_Grey54White54,
         )
 
         paymentAlertBinding.renewExpiryDateText.apply {
-            setTextStyle(
-                requireContext(),
-                R.style.TextAppearance_Mega_Subtitle2_Normal_Grey87White,
-                R.color.grey_087_white,
-                false
-            )
-
+            setTextStyle(textAppearance = R.style.TextAppearance_Mega_Subtitle2_Normal_Grey87White)
             (layoutParams as RelativeLayout.LayoutParams).topMargin = 0
         }
 

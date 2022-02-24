@@ -11,6 +11,7 @@ import mega.privacy.android.app.activities.PasscodeActivity
 import mega.privacy.android.app.components.transferWidget.TransferWidget
 import mega.privacy.android.app.constants.BroadcastConstants.*
 import mega.privacy.android.app.constants.EventConstants.EVENT_SHOW_SCANNING_TRANSFERS_DIALOG
+import mega.privacy.android.app.lollipop.DrawerItem
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop.PENDING_TAB
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop.TRANSFERS_TAB
@@ -130,7 +131,7 @@ open class TransfersManagementActivity : PasscodeActivity() {
         transfersWidgetLayout.findViewById<View>(R.id.transfers_button)
             .setOnClickListener {
                 if (context is ManagerActivityLollipop) {
-                    context.drawerItem = ManagerActivityLollipop.DrawerItem.TRANSFERS
+                    context.drawerItem = DrawerItem.TRANSFERS
                     context.selectDrawerItemLollipop(context.drawerItem)
                 } else {
                     openTransfersSection()

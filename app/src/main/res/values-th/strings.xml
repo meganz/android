@@ -1726,8 +1726,6 @@
     <string name="attachment_upload_panel_from_cloud">จากคลาวด์ไดรฟ์</string>
     <!--  -->
     <string name="attachment_upload_panel_contact">ผู้ติดต่อ</string>
-    <!--  -->
-    <string name="attachment_upload_panel_photo">จากอุปกรณ์</string>
     <!-- Button and title of dialog shown when the user wants to delete permanently their account. -->
     <string name="delete_account">ลบบัญชี</string>
     <!-- Text shown in the alert dialog to confirm the deletion of an account -->
@@ -2535,8 +2533,7 @@
     <string name="settings_file_management_file_versions_title">ไฟล์เวอร์ชัน</string>
     <!-- Settings preference subtitle to show file versions info of the account -->
     <plurals name="settings_file_management_file_versions_subtitle">
-        <item quantity="one">1 file version, taking a total of %2$s</item>
-        <item quantity="other">%1$d file versions, taking a total of %2$s</item>
+        <item quantity="other">%1$d เวอร์ชันไฟล์ รวมทั้งหมด %2$s</item>
     </plurals>
     <!-- Title of the section File management on Settings section -->
     <string name="settings_file_management_category">การจัดการไฟล์</string>
@@ -4084,4 +4081,62 @@
     <string name="settings_mobile_data_resoluton_title">Use mobile data to preview high resolution images</string>
     <!-- summary for the settings to enable high resolution images when on mobile data -->
     <string name="settings_mobile_data_resoluton_summary">อนุญาตให้ใช้ข้อมูลมือถือเพื่อโหลดภาพความละเอียดสูงเมื่อดูตัวอย่าง หากปิดใช้งาน รูปภาพต้นฉบับจะถูกโหลดเมื่อคุณซูมภาพเท่านั้น</string>
+    <!-- If users want to move the root backup folder, all backups underneath it are disabled. Warning dialog will show to confirm -->
+    <string name="backup_move_root_folder">คุณกำลังเปลี่ยนตำแหน่งโฟลเดอร์สำรองเริ่มต้น ซึ่งอาจส่งผลต่อความสามารถในการค้นหาโฟลเดอร์สำรองของคุณในอนาคตได้ กรุณาอย่าลืมว่าตำแหน่งโฟลเดอร์อยู่ที่ใดเพื่อให้คุณสามารถค้นหาได้ในอนาคต</string>
+    <!-- If users want to move the sub backup folder, all backups underneath it are disabled. Warning dialog will show to confirm -->
+    <string name="backup_move_sub_folder">การย้ายโฟลเดอร์นี้จะเปลี่ยนปลายทางการสำรองข้อมูลที่กำหนดค่าไว้ตั้งแต่หนึ่งรายการขึ้นไป และอาจมีผลตามมาที่ไม่คาดคิด การสำรองข้อมูลจะถูกปิดเพื่อความปลอดภัยของคุณ การสำรองข้อมูลสามารถเปิดใช้งานได้อีกครั้งด้วยแอป MEGA บนเดสก์ทอป คุณต้องการดำเนินการต่อหรือไม่</string>
+    <!-- If users want to delete the root backup folder, all backups underneath it are disabled. Warning dialog will show to confirm -->
+    <string name="backup_remove_root_folder">คุณกำลังลบโฟลเดอร์ข้อมูลสำรองของคุณ การดำเนินการนี้จะลบข้อมูลสำรองทั้งหมดที่คุณตั้งค่าไว้ คุณแน่ใจหรือไม่ว่าต้องการดำเนินการต่อ</string>
+    <!-- If users want to delete the sub backup folder, all backups underneath it are disabled. Warning dialog will show to confirm -->
+    <string name="backup_remove_sub_folder">Are you sure you want to delete your backup folder and disable the associated backup?</string>
+    <!-- The title of warning dialog for single folder moving -->
+    <string name="backup_move_folder_title">ย้าย “%1s”</string>
+    <!-- The title of warning dialog for single folder deleting -->
+    <string name="backup_remove_folder_title">ย้าย “%1s” ไปที่ถังขยะ</string>
+    <!-- The title of warning dialog for multi-folder moving -->
+    <string name="backup_move_multiple_folder_title">ย้ายโฟลเดอร์สำรองข้อมูล</string>
+    <!-- The title of warning dialog for single folder deleting -->
+    <string name="backup_remove_multiple_folder_title">ย้ายโฟลเดอร์สำรองข้อมูลไปที่ถังขยะ</string>
+    <!-- The confirm information of warning dialog for deleting -->
+    <string name="backup_disable_confirm">ปิดสำรองข้อมูล</string>
+    <!-- The confirm information of warning dialog for moving "My backup" -->
+    <string name="backup_move_confirm">ย้ายข้อมูลสำรอง</string>
+    <!-- The confirm information of warning dialog for deleting -->
+    <string name="backup_action_confirm">กรุณาพิมพ์ “%1s” เพื่อยืนยันการดำเนินการนี้</string>
+    <!-- when checking the input -->
+    <string name="error_backup_confirm_dont_match">ข้อความที่คุณกรอกไม่ตรงกัน</string>
+    <!-- The title of confirm dialog for adding item to "My backup" -->
+    <string name="backup_add_confirm_title">เพิ่มรายการไปที่ “%1s”</string>
+    <!-- The title of warning dialog for adding item to "My backup" -->
+    <string name="backup_add_item_title">ตั้งค่าการสำรองข้อมูล</string>
+    <!-- If users want to add items to the "My backup" folder, Warning dialog will show to confirm -->
+    <string name="backup_add_item_to_root_text">To ensure these items added to your backup folder are automatically synchronised to the MEGA Cloud, please set them up in the MEGA Desktop App.</string>
+    <!-- If users want to share items in the "My backup" folder, Warning dialog will show to confirm -->
+    <string name="backup_share_permission_title">อ่านอย่างเดียว</string>
+    <!-- If users want to share items in the "My backup" folder, Warning dialog will show to confirm -->
+    <string name="backup_share_permission_text">โฟลเดอร์นี้สามารถแชร์เป็นแบบอ่านอย่างเดียวเท่านั้น เนื่องจากเป็นโฟลเดอร์ที่ใช้สำรองข้อมูล การเปลี่ยนแปลงใด ๆ ในเนื้อหาอาจเป็นการปิดใช้งานสำรองข้อมูลได้</string>
+    <!-- If users want to add items to the "My backup" device folder, Warning dialog will show to confirm -->
+    <string name="backup_add_item_text">รายการในโฟลเดอร์นี้เป็นส่วนหนึ่งของการสำรองข้อมูลที่ได้กำหนดค่าและซิงโครไนซ์กับโฟลเดอร์ในเครื่องไว้ การดำเนินการนี้จะหยุดการซิงโครไนซ์และปิดใช้งานการสำรองข้อมูล การสำรองข้อมูลสามารถเปิดใช้งานได้อีกครั้งด้วยแอพ MEGA บนเดสก์ทอป คุณแน่ใจหรือไม่ว่าต้องการดำเนินการต่อ</string>
+    <!-- Share multi backup folders, show below warning message -->
+    <string name="backup_multi_share_permission_text">โฟลเดอร์เหล่านี้สามารถแชร์เป็นแบบอ่านอย่างเดียวเท่านั้น เนื่องจากเป็นโฟลเดอร์ที่ใช้สำรองข้อมูล การเปลี่ยนแปลงใด ๆ ในเนื้อหาอาจเป็นการปิดใช้งานสำรองข้อมูลได้</string>
+    <!-- Share multi folders mix with backup and non-backup folders, show below warning message -->
+    <string name="backup_share_with_root_permission_text">บางโฟลเดอร์ที่จะแชร์นั้น เป็นโฟลเดอร์ที่ใช้สำรองข้อมูลและจะเป็นแบบอ่านอย่างเดียวเท่านั้น คุณต้องการดำเนินการต่อหรือไม่</string>
+    <!-- Indicates the content of the backup folder -->
+    <plurals name="num_devices">
+        <item quantity="other">%d อุปกรณ์</item>
+    </plurals>
+    <!-- Title of the button when you want to answer a one to one call -->
+    <string name="title_join_one_to_one_call">Answer call</string>
+    <!-- Title of the menu when the select tracks on playlist page-->
+    <string name="title_select_tracks">Select tracks</string>
+    <!-- Action button to upload files. -->
+    <string name="upload_files">Upload files</string>
+    <!-- Action button to upload a folder. -->
+    <string name="upload_folder">Upload folder</string>
+    <!-- Title of the dialog warning the user about cancel uploads. -->
+    <string name="cancel_uploads">Cancel uploads</string>
+    <!-- Warning alerting user if proceed with the action all the uploads will be cancelled. -->
+    <string name="cancel_uploads_warning">Interrupting the upload process will result in all your uploads being cancelled.</string>
+    <!-- Button to proceed with action. -->
+    <string name="action_proceed">Proceed</string>
 </resources>

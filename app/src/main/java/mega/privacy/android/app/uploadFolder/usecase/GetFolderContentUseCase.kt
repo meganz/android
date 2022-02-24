@@ -10,6 +10,7 @@ import mega.privacy.android.app.di.MegaApi
 import mega.privacy.android.app.uploadFolder.list.data.FolderContent
 import mega.privacy.android.app.uploadFolder.list.data.UploadFolderResult
 import mega.privacy.android.app.usecase.CreateFolderUseCase
+import mega.privacy.android.app.utils.LogUtil.logWarning
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava.*
 import nz.mega.sdk.MegaNode
@@ -108,9 +109,11 @@ class GetFolderContentUseCase @Inject constructor(
                     onSuccess = { folderContent ->
                         folderContent.forEach { item ->
                             getContentToUpload(context, parentNode, parentFolder, item, isSelection)
-                                .blockingSubscribeBy(onSuccess = { urisResult ->
-                                    uris.addAll(urisResult)
-                                })
+                                .blockingSubscribeBy(
+                                    onError = { error -> logWarning("Ignored error", error) },
+                                    onSuccess = { urisResult ->
+                                        uris.addAll(urisResult)
+                                    })
                         }
 
                         emitter.onSuccess(uris)
@@ -201,7 +204,10 @@ class GetFolderContentUseCase @Inject constructor(
                         parentFolder,
                         (folderItems[selected] as FolderContent.Data),
                         true
-                    ).blockingSubscribeBy(onSuccess = { result -> results.addAll(result) })
+                    ).blockingSubscribeBy(
+                        onError = { error -> logWarning("Ignored error", error) },
+                        onSuccess = { result -> results.addAll(result) }
+                    )
                 }
             } else {
                 folderItems.forEach { item ->
@@ -211,7 +217,9 @@ class GetFolderContentUseCase @Inject constructor(
 
                     if (item is FolderContent.Data) {
                         getContentToUpload(context, parentNode, parentFolder, item, false)
-                            .blockingSubscribeBy(onSuccess = { result -> results.addAll(result) })
+                            .blockingSubscribeBy(
+                                onError = { error -> logWarning("Ignored error", error) },
+                                onSuccess = { result -> results.addAll(result) })
                     }
                 }
             }
@@ -344,6 +352,7 @@ class GetFolderContentUseCase @Inject constructor(
             folderContent.forEach { item ->
                 if (currentFolder != null && item.key != currentFolder) {
                     reorder(item.value, order, isList).blockingSubscribeBy(
+                        onError = { error -> logWarning("Ignored error", error) },
                         onSuccess = { finalContentList ->
                             folderContent[item.key] = finalContentList
                         }
@@ -432,6 +441,7 @@ class GetFolderContentUseCase @Inject constructor(
             folderContent.forEach { item ->
                 if (currentFolder != null && item.key != currentFolder) {
                     switchView(item.value, isList).blockingSubscribeBy(
+                        onError = { error -> logWarning("Ignored error", error) },
                         onSuccess = { finalContentList ->
                             folderContent[item.key] = finalContentList
                         }
@@ -462,6 +472,7 @@ class GetFolderContentUseCase @Inject constructor(
                     folderContentList.forEach { item ->
                         if (item.isFolder) {
                             search(query, item).blockingSubscribeBy(
+                                onError = { error -> logWarning("Ignored error", error) },
                                 onSuccess = { results -> searchResults.addAll(results) }
                             )
                         }

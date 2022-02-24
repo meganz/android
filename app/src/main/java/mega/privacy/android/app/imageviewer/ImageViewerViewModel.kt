@@ -26,6 +26,7 @@ import mega.privacy.android.app.usecase.GetGlobalChangesUseCase
 import mega.privacy.android.app.usecase.GetGlobalChangesUseCase.Result
 import mega.privacy.android.app.usecase.GetNodeUseCase
 import mega.privacy.android.app.usecase.LoggedInUseCase
+import mega.privacy.android.app.usecase.chat.DeleteChatMessageUseCase
 import mega.privacy.android.app.usecase.data.MegaNodeItem
 import mega.privacy.android.app.utils.Constants.INVALID_POSITION
 import mega.privacy.android.app.utils.LogUtil.logError
@@ -43,12 +44,15 @@ import javax.inject.Inject
  * This is shared between ImageViewerActivity behaving as the main container and
  * each individual ImageViewerPageFragment representing a single image within the ViewPager.
  *
- * @property getImageUseCase        Needed to retrieve each individual image based on a node.
- * @property getImageHandlesUseCase Needed to retrieve node handles given sent params.
- * @property getNodeUseCase         Needed to retrieve each individual node based on a node handle,
- *                                  as well as each individual node action required by the menu.
- * @property exportNodeUseCase      Needed to export image node on demand.
- * @property cancelTransferUseCase  Needed to cancel current full image transfer if needed.
+ * @property getImageUseCase            Needed to retrieve each individual image based on a node
+ * @property getImageHandlesUseCase     Needed to retrieve node handles given sent params
+ * @property getGlobalChangesUseCase    Use case required to get node changes
+ * @property getNodeUseCase             Needed to retrieve each individual node based on a node handle,
+ *                                      as well as each individual node action required by the menu
+ * @property exportNodeUseCase          Needed to export image node on demand
+ * @property cancelTransferUseCase      Needed to cancel current full image transfer if needed
+ * @property loggedInUseCase            UseCase required to check when the user is already logged in
+ * @property deleteChatMessageUseCase   UseCase required to delete current chat node message
  */
 @HiltViewModel
 class ImageViewerViewModel @Inject constructor(
@@ -59,6 +63,7 @@ class ImageViewerViewModel @Inject constructor(
     private val exportNodeUseCase: ExportNodeUseCase,
     private val cancelTransferUseCase: CancelTransferUseCase,
     private val loggedInUseCase: LoggedInUseCase,
+    private val deleteChatMessageUseCase: DeleteChatMessageUseCase
 ) : BaseRxViewModel() {
 
     private val images = MutableLiveData<List<ImageItem>?>()
@@ -115,9 +120,9 @@ class ImageViewerViewModel @Inject constructor(
             .subscribeAndUpdateImages()
     }
 
-    fun retrieveSingleImage(imageUri: Uri) {
-        getImageHandlesUseCase.get(imageUri = imageUri)
-            .subscribeAndUpdateImages()
+    fun retrieveFileImage(imageUri: Uri, showNearbyFiles: Boolean? = false, currentNodeHandle: Long? = null) {
+        getImageHandlesUseCase.get(imageFileUri = imageUri, showNearbyFiles = showNearbyFiles)
+            .subscribeAndUpdateImages(currentNodeHandle)
     }
 
     fun retrieveImagesFromParent(
@@ -196,12 +201,12 @@ class ImageViewerViewModel @Inject constructor(
      * You must be observing the requested Image to get the updated result.
      *
      * @param nodeHandle    Image node handle to be loaded.
-     * @param fullSize      Flag to request full size image.
-     * @param highPriority  Flag to request full image with high priority.
+     * @param fullSize      Flag to request full size image despite data/size requirements.
+     * @param highPriority  Flag to request image with high priority.
      */
     fun loadSingleImage(nodeHandle: Long, fullSize: Boolean, highPriority: Boolean) {
         val imageItem = images.value?.find { it.handle == nodeHandle }
-        val isFullSizeRequired = fullSize || images.value?.size == 1
+        val fullSizeRequired = fullSize || images.value?.size == 1
 
         val subscription = when {
             imageItem == null
@@ -210,15 +215,15 @@ class ImageViewerViewModel @Inject constructor(
                     && imageItem.imageResult.previewUri != null) ->
                 return
             imageItem.nodePublicLink?.isNotBlank() == true ->
-                getImageUseCase.get(imageItem.nodePublicLink, isFullSizeRequired, highPriority)
+                getImageUseCase.get(imageItem.nodePublicLink, fullSizeRequired, highPriority)
             imageItem.chatMessageId != null && imageItem.chatRoomId != null ->
-                getImageUseCase.get(imageItem.chatRoomId, imageItem.chatMessageId, isFullSizeRequired, highPriority)
+                getImageUseCase.get(imageItem.chatRoomId, imageItem.chatMessageId, fullSizeRequired, highPriority)
             imageItem.isOffline ->
                 getImageUseCase.getOffline(imageItem.handle)
             imageItem.handle != INVALID_HANDLE ->
-                getImageUseCase.get(nodeHandle, isFullSizeRequired, highPriority)
+                getImageUseCase.get(nodeHandle, fullSizeRequired, highPriority)
             imageItem.nodeItem?.node != null ->
-                getImageUseCase.get(imageItem.nodeItem.node, isFullSizeRequired, highPriority)
+                getImageUseCase.get(imageItem.nodeItem.node, fullSizeRequired, highPriority)
             else ->
                 return // Image file uri with no handle
         }
@@ -364,18 +369,19 @@ class ImageViewerViewModel @Inject constructor(
         }
     }
 
-    fun removeOfflineNode(nodeHandle: Long, activity: Activity) {
-        getNodeUseCase.removeOfflineNode(nodeHandle, activity)
-            .subscribeAndComplete {
-                val currentIndex = images.value?.indexOfFirst { it.handle == nodeHandle } ?: INVALID_POSITION
-                if (currentIndex != INVALID_POSITION) {
-                    val items = images.value!!.toMutableList().apply {
-                        removeAt(currentIndex)
-                    }
-                    images.value = items.toList()
-                    calculateNewPosition(items)
-                }
+    /**
+     * Remove ImageItem from main list given an Index.
+     *
+     * @param index    Node Handle to be removed from the list
+     */
+    private fun removeImageItemAt(index: Int) {
+        if (index != INVALID_POSITION) {
+            val items = images.value!!.toMutableList().apply {
+                removeAt(index)
             }
+            images.value = items.toList()
+            calculateNewPosition(items)
+        }
     }
 
     /**
@@ -406,6 +412,14 @@ class ImageViewerViewModel @Inject constructor(
         updateCurrentPosition(newPosition, true)
     }
 
+    fun removeOfflineNode(nodeHandle: Long, activity: Activity) {
+        getNodeUseCase.removeOfflineNode(nodeHandle, activity)
+            .subscribeAndComplete {
+                val index = images.value?.indexOfFirst { it.handle == nodeHandle } ?: INVALID_POSITION
+                removeImageItemAt(index)
+            }
+    }
+
     fun removeLink(nodeHandle: Long) {
         exportNodeUseCase.disableExport(nodeHandle)
             .subscribeAndComplete {
@@ -413,7 +427,17 @@ class ImageViewerViewModel @Inject constructor(
             }
     }
 
-    fun shareNode(node: MegaNode): LiveData<String?> {
+    fun removeChatMessage(chatRoomId: Long, messageId: Long) {
+        deleteChatMessageUseCase.delete(chatRoomId, messageId)
+            .subscribeAndComplete {
+                val index = images.value?.indexOfFirst { it.chatRoomId == chatRoomId && it.chatMessageId == messageId } ?: INVALID_POSITION
+                removeImageItemAt(index)
+
+                snackbarMessage.value = getString(R.string.context_correctly_removed)
+            }
+    }
+
+    fun exportNode(node: MegaNode): LiveData<String?> {
         val result = MutableLiveData<String?>()
         exportNodeUseCase.export(node)
             .subscribeOn(Schedulers.io())

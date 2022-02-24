@@ -1726,8 +1726,6 @@
     <string name="attachment_upload_panel_from_cloud">从云盘</string>
     <!--  -->
     <string name="attachment_upload_panel_contact">联系人</string>
-    <!--  -->
-    <string name="attachment_upload_panel_photo">从设备</string>
     <!-- Button and title of dialog shown when the user wants to delete permanently their account. -->
     <string name="delete_account">删除帐户</string>
     <!-- Text shown in the alert dialog to confirm the deletion of an account -->
@@ -4050,7 +4048,7 @@
     <!-- Warning informing the user the folder location is trying to open no longer exists. -->
     <string name="location_not_exist">此位置已不存在。</string>
     <!-- Warning shown informing the contact has been previously invited. The placeholder is to show the name of the contact. -->
-    <string name="contact_already_invited">You have already invited %1$s</string>
+    <string name="contact_already_invited">您已经邀请了%1$s</string>
     <!-- Warning shown informing the contact request has been sent and can be managed in sent requests section. -->
     <string name="contact_invited">邀请发送成功。查看发送请求。</string>
     <!-- Message when file available offline. -->
@@ -4083,4 +4081,62 @@
     <string name="settings_mobile_data_resoluton_title">使用移动数据预览高分辨率图像</string>
     <!-- summary for the settings to enable high resolution images when on mobile data -->
     <string name="settings_mobile_data_resoluton_summary">允许在预览时使用移动数据加载高分辨率图片。若关闭此选项，则只有在放大时才会加载原始图片。</string>
+    <!-- If users want to move the root backup folder, all backups underneath it are disabled. Warning dialog will show to confirm -->
+    <string name="backup_move_root_folder">您正在更改默认备份文件夹位置。这可能会影响您将来查找备份文件夹。请牢记此位置以便日后可以找到它。</string>
+    <!-- If users want to move the sub backup folder, all backups underneath it are disabled. Warning dialog will show to confirm -->
+    <string name="backup_move_sub_folder">移动此文件夹会更改一个或多个已配置备份的目标，并可能导致异常情况。为了安全起见，备份将停止。您可以通过MEGA 桌面应用程序重新开启备份。您确定要继续吗？</string>
+    <!-- If users want to delete the root backup folder, all backups underneath it are disabled. Warning dialog will show to confirm -->
+    <string name="backup_remove_root_folder">备份文件夹将会被删除。此操作将删除您设置的所有备份。您确定要继续吗？</string>
+    <!-- If users want to delete the sub backup folder, all backups underneath it are disabled. Warning dialog will show to confirm -->
+    <string name="backup_remove_sub_folder">您确定要删除备份文件夹并停用已关联的备份吗？</string>
+    <!-- The title of warning dialog for single folder moving -->
+    <string name="backup_move_folder_title">移动“%1s”</string>
+    <!-- The title of warning dialog for single folder deleting -->
+    <string name="backup_remove_folder_title">移动“%1s”到垃圾桶</string>
+    <!-- The title of warning dialog for multi-folder moving -->
+    <string name="backup_move_multiple_folder_title">移动备份文件夹</string>
+    <!-- The title of warning dialog for single folder deleting -->
+    <string name="backup_remove_multiple_folder_title">移动备份文件夹到垃圾桶</string>
+    <!-- The confirm information of warning dialog for deleting -->
+    <string name="backup_disable_confirm">停用备份</string>
+    <!-- The confirm information of warning dialog for moving "My backup" -->
+    <string name="backup_move_confirm">移动备份</string>
+    <!-- The confirm information of warning dialog for deleting -->
+    <string name="backup_action_confirm">请输入“%1s”确认此操作</string>
+    <!-- when checking the input -->
+    <string name="error_backup_confirm_dont_match">输入的文字不匹配</string>
+    <!-- The title of confirm dialog for adding item to "My backup" -->
+    <string name="backup_add_confirm_title">添加项目到“%1s”</string>
+    <!-- The title of warning dialog for adding item to "My backup" -->
+    <string name="backup_add_item_title">设置备份</string>
+    <!-- If users want to add items to the "My backup" folder, Warning dialog will show to confirm -->
+    <string name="backup_add_item_to_root_text">为确保添加到您备份文件夹的这些项目自动同步到MEGA云盘，请在MEGA桌面应用程序中进行设置。</string>
+    <!-- If users want to share items in the "My backup" folder, Warning dialog will show to confirm -->
+    <string name="backup_share_permission_title">只读</string>
+    <!-- If users want to share items in the "My backup" folder, Warning dialog will show to confirm -->
+    <string name="backup_share_permission_text">由于这是备份文件夹，只能以只读方式共享，对其内容的任何更改都可能会禁用备份。</string>
+    <!-- If users want to add items to the "My backup" device folder, Warning dialog will show to confirm -->
+    <string name="backup_add_item_text">此文件夹中的项目是配置备份的一部分并已同步到本地文件夹。执行此操作将中断同步并禁用备份。您可以通过MEGA桌面应用程序重新开启备份。您确定要继续吗？</string>
+    <!-- Share multi backup folders, show below warning message -->
+    <string name="backup_multi_share_permission_text">由于这些是备份文件夹，只能以只读方式共享，对其内容的任何更改都可能会禁用备份。</string>
+    <!-- Share multi folders mix with backup and non-backup folders, show below warning message -->
+    <string name="backup_share_with_root_permission_text">某些共享文件夹是备份文件夹和只读文件夹。您确定要继续吗？</string>
+    <!-- Indicates the content of the backup folder -->
+    <plurals name="num_devices">
+        <item quantity="other">%d&#64;个设备</item>
+    </plurals>
+    <!-- Title of the button when you want to answer a one to one call -->
+    <string name="title_join_one_to_one_call">接听电话</string>
+    <!-- Title of the menu when the select tracks on playlist page-->
+    <string name="title_select_tracks">选择曲目</string>
+    <!-- Action button to upload files. -->
+    <string name="upload_files">上传文件</string>
+    <!-- Action button to upload a folder. -->
+    <string name="upload_folder">上传文件夹</string>
+    <!-- Title of the dialog warning the user about cancel uploads. -->
+    <string name="cancel_uploads">取消上传</string>
+    <!-- Warning alerting user if proceed with the action all the uploads will be cancelled. -->
+    <string name="cancel_uploads_warning">中断上传过程将取消您的所有上传。</string>
+    <!-- Button to proceed with action. -->
+    <string name="action_proceed">继续</string>
 </resources>

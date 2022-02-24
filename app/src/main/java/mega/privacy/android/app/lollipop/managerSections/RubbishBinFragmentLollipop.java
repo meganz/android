@@ -38,17 +38,10 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Stack;
 
 import javax.inject.Inject;
@@ -66,6 +59,7 @@ import mega.privacy.android.app.components.PositionDividerItemDecoration;
 import mega.privacy.android.app.fragments.homepage.EventObserver;
 import mega.privacy.android.app.fragments.homepage.SortByHeaderViewModel;
 import mega.privacy.android.app.globalmanagement.SortOrderManagement;
+import mega.privacy.android.app.lollipop.DrawerItem;
 import mega.privacy.android.app.imageviewer.ImageViewerActivity;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.PdfViewerActivityLollipop;
@@ -876,7 +870,7 @@ public class RubbishBinFragmentLollipop extends Fragment{
 		if (((ManagerActivityLollipop) context).comesFromNotifications && ((ManagerActivityLollipop) context).comesFromNotificationHandle == (((ManagerActivityLollipop)context).getParentHandleRubbish())) {
 			((ManagerActivityLollipop) context).comesFromNotifications = false;
 			((ManagerActivityLollipop) context).comesFromNotificationHandle = -1;
-			((ManagerActivityLollipop) context).selectDrawerItemLollipop(ManagerActivityLollipop.DrawerItem.NOTIFICATIONS);
+			((ManagerActivityLollipop) context).selectDrawerItemLollipop(DrawerItem.NOTIFICATIONS);
 			((ManagerActivityLollipop)context).setParentHandleRubbish(((ManagerActivityLollipop)context).comesFromNotificationHandleSaved);
 			((ManagerActivityLollipop)context).comesFromNotificationHandleSaved = -1;
 

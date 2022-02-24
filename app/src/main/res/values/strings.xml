@@ -716,6 +716,10 @@
     <string name="camera_notif_secondary_local_unavailable">Media Uploads have been disabled. Your local folder is unavailable.</string>
     <!-- notification camera uploads complete -->
     <string name="settings_camera_notif_complete">Camera uploads complete</string>
+    <!-- Title of DCIM folder warning dialog -->
+    <string name="title_dcim_folder_dialog">DCIM folder</string>
+    <!-- Content of DCIM folder warning dialog -->
+    <string name="content_dcim_folder_dialog">MEGA uploads your images from the gallery. To change the upload location please go to Camera Upload settings. </string>
     <!-- settings of the Appearance section -->
     <string name="settings_appearance">Appearance</string>
     <!-- settings of the Features section -->
@@ -4140,8 +4144,6 @@
     <string name="contact_already_invited">You have already invited %1$s</string>
     <!-- Warning shown informing the contact request has been sent and can be managed in sent requests section. -->
     <string name="contact_invited">Invite sent successfully. See sent requests.</string>
-    <!-- Title of the menu when the select tracks on playlist page-->
-    <string name="title_select_tracks">Select tracks</string>
     <!-- Message when file available offline. -->
     <string name="file_available_offline">File available Offline</string>
     <!-- Message when file removed from offline. -->
@@ -4219,16 +4221,14 @@
     </plurals>
     <!-- Title of the button when you want to answer a one to one call -->
     <string name="title_join_one_to_one_call">Answer call</string>
+    <!-- Title of the menu when the select tracks on playlist page-->
+    <string name="title_select_tracks">Select tracks</string>
     <!-- Action button to upload files. -->
     <string name="upload_files">Upload files</string>
     <!-- Action button to upload a folder. -->
     <string name="upload_folder">Upload folder</string>
-    <!-- Title of the dialog warning the user about cancel uploads. -->
-    <string name="cancel_uploads">Cancel uploads</string>
-    <!-- Warning alerting user if proceed with the action all the uploads will be cancelled. -->
-    <string name="cancel_uploads_warning">Interrupting the upload process will result on all your uploads being cancelled.</string>
-    <!-- Button to proceed with action. -->
-    <string name="action_proceed">Proceed</string>
+    <!-- Text of the dialog warning the user about cancel uploads. -->
+    <string name="cancel_uploads">Cancel upload?</string>
     <!-- Title of the Payments screen -->
     <string name="payment">Payment</string>
     <!-- Label indicating payment methods -->
@@ -4236,7 +4236,7 @@
     <!-- Button to proceed with a payment -->
     <string name="proceed">Proceed</string>
     <!-- Message informing the upgrade was processed correctly. Placeholder: type of subscription e.g: Pro Lite monthly -->
-    <string name="successful_upgrade">Thank you for subscribing to %1$s!</string>
+    <string name="successful_upgrade">Thank you for your %1$s subscription!</string>
     <!-- Pro Lite monthly subscription -->
     <string name="pro_lite_monthly">Pro Lite monthly</string>
     <!-- Pro Lite yearly subscription -->
@@ -4253,6 +4253,12 @@
     <string name="pro_iii_monthly">Pro III monthly</string>
     <!-- Pro III yearly subscription -->
     <string name="pro_iii_yearly">Pro III yearly</string>
+    <!-- Remove moderator permission and assign standard permission to a meeting participant-->
+    <string name="remove_moderator">Remove moderator</string>
+    <!-- Action button which will cancel uploads. -->
+    <string name="action_cancel_upload">Cancel upload</string>
+    <!-- Action button which will dismiss the dialog and will not cancel the action. -->
+    <string name="action_do_not_cancel">Don’t cancel</string>
     <!-- Warning of the scanning transfers dialog. It warns about not closing the app because the transfers will be lost. -->
     <string name="warning_scanning_transfers">Please do not close the application.</string>
     <!-- Stage of the scanning transfers dialog indicating transfers are scanning. -->

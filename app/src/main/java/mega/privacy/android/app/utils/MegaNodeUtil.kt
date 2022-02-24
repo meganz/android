@@ -36,7 +36,7 @@ import mega.privacy.android.app.listeners.MoveListener
 import mega.privacy.android.app.listeners.RemoveListener
 import mega.privacy.android.app.lollipop.FileExplorerActivityLollipop
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop
-import mega.privacy.android.app.lollipop.ManagerActivityLollipop.DrawerItem
+import mega.privacy.android.app.lollipop.DrawerItem
 import mega.privacy.android.app.lollipop.PdfViewerActivityLollipop
 import mega.privacy.android.app.lollipop.listeners.MultipleRequestListener
 import mega.privacy.android.app.textEditor.TextEditorActivity
@@ -2098,4 +2098,13 @@ object MegaNodeUtil {
             !isFolder && (MimeTypeList.typeForName(name).isImage
                     || MimeTypeList.typeForName(name).isGIF
                     || (MimeTypeList.typeForName(name).isVideoReproducible || MimeTypeList.typeForName(name).isMp4Video))
+
+    /**
+     * Check if provided node File is the expected one
+     *
+     * @param nodeFile  File to be checked
+     */
+    @JvmStatic
+    fun MegaNode.isNodeFileValid(nodeFile: File?): Boolean =
+        nodeFile?.exists() == true && nodeFile.canRead() && nodeFile.length() == this.size
 }

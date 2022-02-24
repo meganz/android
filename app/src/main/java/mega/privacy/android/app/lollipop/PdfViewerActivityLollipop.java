@@ -337,7 +337,7 @@ public class PdfViewerActivityLollipop extends PasscodeActivity
 
         pdfviewerContainer = (RelativeLayout) findViewById(R.id.pdf_viewer_container);
 
-        if (Build.VERSION.SDK_INT >= 26) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             StrictMode.VmPolicy.Builder builder = new StrictMode.VmPolicy.Builder();
             StrictMode.setVmPolicy(builder.build());
         }
@@ -2051,7 +2051,6 @@ public class PdfViewerActivityLollipop extends PasscodeActivity
             MegaNode node = megaApi.getNodeByHandle(handleToDownload);
             if(node!=null){
 
-//				File newFile =  new File(externalPath+"/"+node.getName());
                 File newFile =  new File(node.getName());
                 logDebug("File: " + newFile.getPath());
                 Intent intent = new Intent(Intent.ACTION_CREATE_DOCUMENT);

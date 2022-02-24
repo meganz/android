@@ -13,7 +13,6 @@ import android.media.Ringtone;
 import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Build;
-import android.service.notification.StatusBarNotification;
 import android.view.View;
 import android.widget.RemoteViews;
 
@@ -222,9 +221,7 @@ public final class ChatAdvancedNotificationBuilder {
 
         NotificationCompat.InboxStyle inboxStyle = new NotificationCompat.InboxStyle();
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            notificationBuilder.setColor(ContextCompat.getColor(context, R.color.red_600_red_300));
-        }
+        notificationBuilder.setColor(ContextCompat.getColor(context, R.color.red_600_red_300));
 
         notificationBuilder.setShowWhen(true);
 
@@ -240,14 +237,13 @@ public final class ChatAdvancedNotificationBuilder {
 
         notificationBuilder.setStyle(inboxStyle);
 
-        if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.N_MR1) {
-            //API 25 = Android 7.1
-            notificationBuilder.setPriority(Notification.PRIORITY_HIGH);
-        } else {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            // Use NotificationManager for devices running Android Nougat or above (API >= 24)
             notificationBuilder.setPriority(NotificationManager.IMPORTANCE_HIGH);
+        } else {
+            // Otherwise, use NotificationCompat for devices running Android Marshmallow (API 23)
+            notificationBuilder.setPriority(NotificationCompat.PRIORITY_HIGH);
         }
-
-//        notificationBuilder.setFullScreenIntent(pendingIntent, true);
 
         for (int i = 0; i < chats.size(); i++) {
             if (MegaApplication.getOpenChatId() != chats.get(i).getChatId()) {
@@ -441,9 +437,7 @@ public final class ChatAdvancedNotificationBuilder {
                     .setShowWhen(true)
                     .setGroup(groupKey);
 
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                notificationBuilder.setColor(ContextCompat.getColor(context, R.color.red_600_red_300));
-            }
+            notificationBuilder.setColor(ContextCompat.getColor(context, R.color.red_600_red_300));
 
             messagingStyleContent = new Notification.MessagingStyle(getTitleChat(chat));
         }
@@ -515,46 +509,8 @@ public final class ChatAdvancedNotificationBuilder {
             //API 25 = Android 7.1
             notificationBuilder.setPriority(Notification.PRIORITY_HIGH);
         } else {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                notificationBuilderO.setPriority(NotificationManager.IMPORTANCE_HIGH);
-            } else {
-                notificationBuilder.setPriority(NotificationManager.IMPORTANCE_HIGH);
-            }
+            notificationBuilderO.setPriority(NotificationManager.IMPORTANCE_HIGH);
         }
-
-//        NotificationCompat.BigTextStyle bigTextStyle = new NotificationCompat.BigTextStyle();
-
-//        if(chat.isGroup()){
-//
-//            if(msgUserHandle!=-1){
-//                String nameAction = getParticipantShortName(msgUserHandle);
-//
-//                if(nameAction.isEmpty()){
-//                    notificationBuilder.setContentText(msgContent);
-//                    bigTextStyle.bigText(msgContent);
-//                }
-//                else{
-//                    String source = "<b>"+nameAction+": </b>"+msgContent;
-//
-//                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-//                        notificationContent = Html.fromHtml(source,Html.FROM_HTML_MODE_LEGACY);
-//                    } else {
-//                        notificationContent = Html.fromHtml(source);
-//                    }
-//                    notificationBuilder.setContentText(notificationContent);
-//                    bigTextStyle.bigText(notificationContent);
-//                }
-//            }
-//            else{
-//                notificationBuilder.setContentText(msgContent);
-//                bigTextStyle.bigText(msgContent);
-//            }
-//
-//        }
-//        else{
-//            notificationBuilder.setContentText(msgContent);
-//            bigTextStyle.bigText(msgContent);
-//        }
 
         Bitmap largeIcon = setUserAvatar(chat);
         if(largeIcon!=null){
@@ -565,8 +521,6 @@ public final class ChatAdvancedNotificationBuilder {
                 notificationBuilder.setLargeIcon(largeIcon);
             }
         }
-
-//        notificationBuilder.setStyle(bigTextStyle);
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             return notificationBuilderO.build();
@@ -691,12 +645,10 @@ public final class ChatAdvancedNotificationBuilder {
                 return notificationBuilderO.build();
             }
         }
-        else{
+        else {
             NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(context);
 
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                notificationBuilder.setColor(ContextCompat.getColor(context, R.color.red_600_red_300));
-            }
+            notificationBuilder.setColor(ContextCompat.getColor(context, R.color.red_600_red_300));
 
             notificationBuilder.setSmallIcon(R.drawable.ic_stat_notify)
                     .setShowWhen(true)
@@ -801,11 +753,6 @@ public final class ChatAdvancedNotificationBuilder {
      */
     private void showIncomingCallNotification(MegaChatCall callToAnswer, MegaChatCall callInProgress) {
         logDebug("Call to answer ID: " + callToAnswer.getChatid() + ", Call in progress ID: " + callInProgress.getChatid());
-
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP_MR1){
-            logWarning("Not supported incoming call notification: " + Build.VERSION.SDK_INT);
-            return;
-        }
 
         long chatIdCallToAnswer = callToAnswer.getChatid();
         long chatIdCallInProgress = callInProgress.getChatid();
@@ -956,11 +903,6 @@ public final class ChatAdvancedNotificationBuilder {
      */
     public void showOneCallNotification(MegaChatCall callToAnswer) {
         logDebug("Call to answer ID: " + callToAnswer.getChatid());
-
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP_MR1) {
-            logWarning("Not supported incoming call notification: " + Build.VERSION.SDK_INT);
-            return;
-        }
 
         long chatIdCallToAnswer = callToAnswer.getChatid();
         MegaChatRoom chatToAnswer = megaChatApi.getChatRoom(chatIdCallToAnswer);
@@ -1159,24 +1101,21 @@ public final class ChatAdvancedNotificationBuilder {
                     .setSound(defaultSoundUri)
                     .setContentIntent(pendingIntent);
 
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                notificationBuilder.setColor(ContextCompat.getColor(context, R.color.red_600_red_300));
-            }
+            notificationBuilder.setColor(ContextCompat.getColor(context, R.color.red_600_red_300));
 
-            if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.N_MR1) {
-                //API 25 = Android 7.1
-                notificationBuilder.setPriority(Notification.PRIORITY_HIGH);
-            } else {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                // Use NotificationManager for devices running Android Nougat or above (API >= 24)
                 notificationBuilder.setPriority(NotificationManager.IMPORTANCE_HIGH);
+            } else {
+                // Otherwise, use NotificationCompat for devices running Android Marshmallow (API 23)
+                notificationBuilder.setPriority(NotificationCompat.PRIORITY_HIGH);
             }
 
             if (!isTextEmpty(chatC.getParticipantEmail(chat.getPeerHandle(0)))) {
 
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                    Bitmap largeIcon = setUserAvatar(chat);
-                    if (largeIcon != null) {
-                        notificationBuilder.setLargeIcon(largeIcon);
-                    }
+                Bitmap largeIcon = setUserAvatar(chat);
+                if (largeIcon != null) {
+                    notificationBuilder.setLargeIcon(largeIcon);
                 }
             }
 
