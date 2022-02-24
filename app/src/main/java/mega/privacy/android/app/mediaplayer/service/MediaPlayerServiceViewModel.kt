@@ -143,6 +143,8 @@ class MediaPlayerServiceViewModel(
     private var playSourceChanged: MutableList<MediaItem> = mutableListOf()
     private var playingPosition = 0
 
+    private var cancelToken: MegaCancelToken? = null
+
     init {
         compositeDisposable.add(
             createThumbnailFinished.throttleLatest(1, TimeUnit.SECONDS, true)
@@ -602,18 +604,29 @@ class MediaPlayerServiceViewModel(
 
     private fun buildPlaylistForAudio(intent: Intent, firstPlayHandle: Long) {
         val order = intent.getIntExtra(INTENT_EXTRA_KEY_ORDER_GET_CHILDREN, ORDER_DEFAULT_ASC)
+        initNewSearch()
         buildPlaylistFromNodes(
-            megaApi, megaApi.searchByType(order, FILE_TYPE_AUDIO, SEARCH_TARGET_ROOTNODE),
+            megaApi, megaApi.searchByType(cancelToken!!, order, FILE_TYPE_AUDIO, SEARCH_TARGET_ROOTNODE),
             firstPlayHandle
         )
     }
 
     private fun buildPlaylistForVideos(intent: Intent, firstPlayHandle: Long) {
         val order = intent.getIntExtra(INTENT_EXTRA_KEY_ORDER_GET_CHILDREN, ORDER_DEFAULT_ASC)
+        initNewSearch()
         buildPlaylistFromNodes(
-            megaApi, megaApi.searchByType(order, FILE_TYPE_VIDEO, SEARCH_TARGET_ROOTNODE),
+            megaApi, megaApi.searchByType(cancelToken!!, order, FILE_TYPE_VIDEO, SEARCH_TARGET_ROOTNODE),
             firstPlayHandle
         )
+    }
+
+    private fun initNewSearch() {
+        cancelSearch()
+        cancelToken = MegaCancelToken.createInstance()
+    }
+
+    fun cancelSearch() {
+        cancelToken?.cancel()
     }
 
     private fun buildPlaylistFromHandles(handles: List<Long>, firstPlayHandle: Long) {

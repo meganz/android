@@ -414,6 +414,7 @@ open class MediaPlayerService : LifecycleService(), LifecycleEventObserver {
     override fun onDestroy() {
         super.onDestroy()
 
+        viewModel.cancelSearch()
         mainHandler.removeCallbacks(resumePlayRunnable)
 
         if (initialized) {
