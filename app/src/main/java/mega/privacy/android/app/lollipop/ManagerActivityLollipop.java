@@ -133,6 +133,7 @@ import static mega.privacy.android.app.utils.MegaTransferUtils.isBackgroundTrans
 import static mega.privacy.android.app.utils.OfflineUtils.removeInitialOfflinePath;
 import static mega.privacy.android.app.utils.OfflineUtils.removeOffline;
 import static mega.privacy.android.app.utils.OfflineUtils.saveOffline;
+import static mega.privacy.android.app.utils.StringResourcesUtils.getQuantityString;
 import static mega.privacy.android.app.utils.TextUtil.isTextEmpty;
 import static mega.privacy.android.app.utils.TimeUtils.getHumanizedTime;
 import static mega.privacy.android.app.utils.UploadUtil.chooseFiles;
@@ -920,6 +921,11 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
     private Long backupNodeHandle;
     private int backupNodeType;
     private int backupActionType;
+
+    // Version removed
+    private int versionsToRemove = 0;
+    private int versionsRemoved = 0;
+    private int errorVersionRemove = 0;
 
     /**
      * Broadcast to update the completed transfers tab.
@@ -8654,6 +8660,18 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
                         break;
                 }
             }
+        } else if (requestCode == REQUEST_CODE_DELETE_VERSIONS_HISTORY && resultCode == RESULT_OK) {
+            if (!isOnline(this)) {
+                Util.showErrorAlertDialog(getString(R.string.error_server_connection_problem), false, this);
+                return;
+            }
+            if (intent.getBooleanExtra(VersionsFileActivity.KEY_DELETE_VERSION_HISTORY, false)) {
+                ArrayList<MegaNode> versions = megaApi.getVersions(selectedNode);
+                versionsToRemove = versions.size() - 1;
+                for (int i = 1; i < versions.size(); i++) {
+                    megaApi.removeVersion(versions.get(i), this);
+                }
+            }
         } else {
             logWarning("No request code processed");
             super.onActivityResult(requestCode, resultCode, intent);
@@ -9917,6 +9935,38 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 
             } else {
                 logError("ERROR requesting version info of the account");
+            }
+        } else if (request.getType() == MegaRequest.TYPE_REMOVE){
+            if (versionsToRemove > 0) {
+                logDebug("Remove request finished");
+                if (e.getErrorCode() == MegaError.API_OK){
+                    versionsRemoved++;
+                } else{
+                    errorVersionRemove++;
+                }
+
+                if (versionsRemoved + errorVersionRemove == versionsToRemove) {
+                    if (versionsRemoved == versionsToRemove) {
+                        showSnackbar(SNACKBAR_TYPE, getString(R.string.version_history_deleted), -1);
+                    } else {
+                        showSnackbar(SNACKBAR_TYPE, getString(R.string.version_history_deleted_erroneously)
+                                        + "\n" + getQuantityString(R.plurals.versions_deleted_succesfully, versionsRemoved, versionsRemoved)
+                                        + "\n" + getQuantityString(R.plurals.versions_not_deleted, errorVersionRemove, errorVersionRemove),
+                                MEGACHAT_INVALID_HANDLE);
+                    }
+                    versionsToRemove = 0;
+                    versionsRemoved = 0;
+                    errorVersionRemove = 0;
+                }
+            } else {
+                logDebug("Remove request finished");
+                if (e.getErrorCode() == MegaError.API_OK){
+                    finish();
+                } else if (e.getErrorCode() == MegaError.API_EMASTERONLY) {
+                    showSnackbar(SNACKBAR_TYPE, e.getErrorString(), -1);
+                } else{
+                    showSnackbar(SNACKBAR_TYPE, getString(R.string.context_no_removed), -1);
+                }
             }
         }
     }
