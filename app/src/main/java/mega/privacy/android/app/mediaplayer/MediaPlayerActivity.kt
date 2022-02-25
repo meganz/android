@@ -6,7 +6,6 @@ import android.content.Intent
 import android.content.ServiceConnection
 import android.graphics.Color
 import android.graphics.PixelFormat
-import android.os.Build
 import android.os.Bundle
 import android.os.IBinder
 import android.view.*
@@ -17,6 +16,7 @@ import androidx.appcompat.app.ActionBar
 import androidx.appcompat.widget.SearchView
 import androidx.appcompat.widget.Toolbar
 import androidx.core.content.ContextCompat
+import androidx.core.view.*
 import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
 import com.google.android.exoplayer2.util.Util.startForegroundService
@@ -29,8 +29,7 @@ import mega.privacy.android.app.activities.PasscodeActivity
 import mega.privacy.android.app.components.attacher.MegaAttacher
 import mega.privacy.android.app.components.dragger.DragToExitSupport
 import mega.privacy.android.app.components.saver.NodeSaver
-import mega.privacy.android.app.databinding.ActivityAudioPlayerBinding
-import mega.privacy.android.app.databinding.ActivityVideoPlayerBinding
+import mega.privacy.android.app.databinding.ActivityMediaPlayerBinding
 import mega.privacy.android.app.di.MegaApi
 import mega.privacy.android.app.interfaces.ActionNodeCallback
 import mega.privacy.android.app.interfaces.ActivityLauncher
@@ -157,27 +156,18 @@ abstract class MediaPlayerActivity : PasscodeActivity(), SnackbarShower, Activit
 
         val isAudioPlayer = isAudioPlayer(intent)
 
-        if (isAudioPlayer) {
-            val binding = ActivityAudioPlayerBinding.inflate(layoutInflater)
-            setContentView(binding.root)
+        val binding = ActivityMediaPlayerBinding.inflate(layoutInflater)
+        setContentView(binding.root)
 
-            rootLayout = binding.rootLayout
-            toolbar = binding.toolbar
+        rootLayout = binding.rootLayout
+        toolbar = binding.toolbar
+
+        if (isAudioPlayer()) {
+            toolbar.setBackgroundColor(Color.TRANSPARENT)
         } else {
-            val binding = ActivityVideoPlayerBinding.inflate(layoutInflater)
-            setContentView(dragToExit.wrapContentView(binding.root))
-
-            rootLayout = binding.rootLayout
-            toolbar = binding.toolbar
-
-            toolbar.setTitleTextColor(ContextCompat.getColor(this, R.color.white_alpha_087))
-
             MediaPlayerService.pauseAudioPlayer(this)
-
             dragToExit.observeThumbnailLocation(this, intent)
         }
-
-        toolbar.setBackgroundColor(Color.TRANSPARENT)
 
         val navHostFragment =
             supportFragmentManager.findFragmentById(R.id.nav_host_fragment) as NavHostFragment
@@ -214,24 +204,6 @@ abstract class MediaPlayerActivity : PasscodeActivity(), SnackbarShower, Activit
             post {
                 getFragmentFromNavHost(R.id.nav_host_fragment, MediaPlayerFragment::class.java)
                     ?.runEnterAnimation(dragToExit)
-            }
-        }
-
-        @Suppress("DEPRECATION")
-        if (!isAudioPlayer) {
-            window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
-            window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS)
-
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-                window?.setDecorFitsSystemWindows(false)
-            } else {
-                window.addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN)
-                window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS)
-            }
-        } else if (!Util.isDarkMode(this)) {
-            with(window) {
-                clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS)
-                decorView.systemUiVisibility = (window.decorView.systemUiVisibility or View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR)
             }
         }
 
@@ -869,7 +841,7 @@ abstract class MediaPlayerActivity : PasscodeActivity(), SnackbarShower, Activit
         searchMenuItem?.collapseActionView()
     }
 
-    fun hideToolbar(animate: Boolean = true, hideStatusBar: Boolean = true) {
+    fun hideToolbar(animate: Boolean = true) {
         if (animate) {
             toolbar.animate()
                 .translationY(-toolbar.measuredHeight.toFloat())
@@ -878,21 +850,6 @@ abstract class MediaPlayerActivity : PasscodeActivity(), SnackbarShower, Activit
         } else {
             toolbar.animate().cancel()
             toolbar.translationY = -toolbar.measuredHeight.toFloat()
-        }
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-            if (!isAudioPlayer() && hideStatusBar) {
-                window?.setDecorFitsSystemWindows(false)
-            } else {
-                window?.setDecorFitsSystemWindows(true)
-            }
-        } else {
-            @Suppress("DEPRECATION")
-            if (!isAudioPlayer() && hideStatusBar) {
-                window.addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN)
-            } else {
-                window.clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN)
-            }
         }
     }
 
@@ -906,15 +863,6 @@ abstract class MediaPlayerActivity : PasscodeActivity(), SnackbarShower, Activit
             toolbar.animate().cancel()
             toolbar.translationY = 0F
         }
-
-        if (!isAudioPlayer()) {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-                window?.setDecorFitsSystemWindows(false)
-            } else {
-                @Suppress("DEPRECATION")
-                window.clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN)
-            }
-        }
     }
 
     fun setupToolbarColors(showElevation: Boolean = false) {
@@ -923,12 +871,30 @@ abstract class MediaPlayerActivity : PasscodeActivity(), SnackbarShower, Activit
         @ColorRes val toolbarBackgroundColor: Int
         @ColorInt val statusBarColor: Int
         val toolbarElevation: Float
+        val isVideoPlayerMainView = !isAudioPlayer() && isMainPlayer
+
+
+        WindowCompat.setDecorFitsSystemWindows(window, !isVideoPlayerMainView)
+
+        rootLayout.post {
+            // Apply system bars top and bottom insets
+            ViewCompat.setOnApplyWindowInsetsListener(rootLayout) { _, windowInsets ->
+                val insets = windowInsets.getInsets(WindowInsetsCompat.Type.systemBars())
+                toolbar.updatePadding(0, if (isVideoPlayerMainView) insets.top else 0, 0, 0)
+                WindowInsetsCompat.CONSUMED
+            }
+        }
 
         when {
             isAudioPlayer() && isMainPlayer -> {
                 toolbarElevation = 0F
                 toolbarBackgroundColor = android.R.color.transparent
                 statusBarColor = ContextCompat.getColor(this, R.color.grey_020_grey_800)
+            }
+            isVideoPlayerMainView -> {
+                toolbarElevation = 0F
+                toolbarBackgroundColor = R.color.white_alpha_070_grey_alpha_070
+                statusBarColor = ContextCompat.getColor(this, android.R.color.transparent)
             }
             isDarkMode -> {
                 toolbarElevation = 0F
@@ -955,11 +921,7 @@ abstract class MediaPlayerActivity : PasscodeActivity(), SnackbarShower, Activit
                 } else {
                     android.R.color.transparent
                 }
-                statusBarColor = if (isAudioPlayer()) {
-                    ContextCompat.getColor(this, R.color.white_dark_grey)
-                } else {
-                    ContextCompat.getColor(this, R.color.black)
-                }
+                statusBarColor = ContextCompat.getColor(this, R.color.white_dark_grey)
             }
         }
 

@@ -192,7 +192,7 @@
             android:name="mega.privacy.android.app.imageviewer.ImageViewerActivity"
             android:label=""
             android:launchMode="singleTop"
-            android:theme="@style/Theme.Mega.FullScreen.ImageViewer"
+            android:theme="@style/Theme.Mega.FullScreen.Viewer"
             android:windowSoftInputMode="stateHidden|adjustResize" />
 
         <activity
@@ -390,7 +390,7 @@
         <activity
             android:name=".mediaplayer.VideoPlayerActivity"
             android:windowSoftInputMode="adjustNothing"
-            android:theme="@style/Theme.Mega.FullScreen" />
+            android:theme="@style/Theme.Mega.FullScreen.Viewer" />
 
         <activity
             android:name=".mediaplayer.AudioPlayerActivity"
