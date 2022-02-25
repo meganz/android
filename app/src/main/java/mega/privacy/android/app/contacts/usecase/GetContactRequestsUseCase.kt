@@ -96,37 +96,43 @@ class GetContactRequestsUseCase @Inject constructor(
                 }
             )
 
-            val globalSubscription = getGlobalChangesUseCase.get().subscribeBy(
-                onNext = { change ->
-                    if (emitter.isCancelled) return@subscribeBy
+            val globalSubscription = getGlobalChangesUseCase.get()
+                .filter { it is Result.OnContactRequestsUpdate }
+                .map { (it as Result.OnContactRequestsUpdate).contactRequests ?: emptyList() }
+                .subscribeBy(
+                    onNext = { contactRequests ->
+                        if (emitter.isCancelled) return@subscribeBy
 
-                    if (change is Result.OnContactRequestsUpdate && !change.contactRequests.isNullOrEmpty()) {
-                        change.contactRequests.forEach { request ->
-                            when (request.status) {
-                                STATUS_UNRESOLVED -> {
-                                    if (requestItems.any { it.handle == request.handle }) return@forEach
+                        if (contactRequests.isNotEmpty()) {
+                            contactRequests.forEach { request ->
+                                when (request.status) {
+                                    STATUS_UNRESOLVED -> {
+                                        if (requestItems.any { it.handle == request.handle }) return@forEach
 
-                                    val newRequestItem = request.toContactRequestItem().apply {
-                                        val userImageFile = AvatarUtil.getUserAvatarFile(context, email)?.absolutePath
-                                        megaApi.getUserAvatar(email, userImageFile, userAttrsListener)
-                                        megaApi.getUserAttribute(email, USER_ATTR_FIRSTNAME, userAttrsListener)
+                                        val newRequestItem = request.toContactRequestItem().apply {
+                                            val userImageFile = AvatarUtil.getUserAvatarFile(context, email)?.absolutePath
+                                            megaApi.getUserAvatar(email, userImageFile, userAttrsListener)
+                                            megaApi.getUserAttribute(email, USER_ATTR_FIRSTNAME, userAttrsListener)
+                                        }
+
+                                        requestItems.add(newRequestItem)
                                     }
-
-                                    requestItems.add(newRequestItem)
-                                }
-                                STATUS_REMINDED -> {
-                                    // do nothing
-                                }
-                                else -> {
-                                    requestItems.removeIf { it.handle == request.handle }
+                                    STATUS_REMINDED -> {
+                                        // do nothing
+                                    }
+                                    else -> {
+                                        requestItems.removeIf { it.handle == request.handle }
+                                    }
                                 }
                             }
-                        }
 
-                        emitter.onNext(requestItems)
+                            emitter.onNext(requestItems)
+                        }
+                    },
+                    onError = { error ->
+                        logError(error.stackTraceToString())
                     }
-                }
-            )
+                )
 
             requestItems.forEach { request ->
                 if (request.avatarUri == null) {
@@ -155,15 +161,17 @@ class GetContactRequestsUseCase @Inject constructor(
                 emitter.onNext(requestsSize.first)
             })
 
-            val globalSubscription = getGlobalChangesUseCase.get().subscribeBy(
-                onNext = { change ->
-                    if (emitter.isCancelled) return@subscribeBy
-
-                    if (change is Result.OnContactRequestsUpdate) {
+            val globalSubscription = getGlobalChangesUseCase.get()
+                .filter { change -> change is Result.OnContactRequestsUpdate }
+                .subscribeBy(
+                    onNext = {
+                        if (emitter.isCancelled) return@subscribeBy
                         emitter.onNext(megaApi.incomingContactRequests.size)
+                    },
+                    onError = { error ->
+                        logError(error.stackTraceToString())
                     }
-                }
-            )
+                )
 
             emitter.setCancellable {
                 globalSubscription.dispose()
