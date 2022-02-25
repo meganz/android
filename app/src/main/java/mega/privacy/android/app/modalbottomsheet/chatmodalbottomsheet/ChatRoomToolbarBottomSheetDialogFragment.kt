@@ -7,9 +7,9 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.LinearLayout
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.GridLayoutManager
 import mega.privacy.android.app.utils.StringResourcesUtils.getQuantityString
 import androidx.recyclerview.widget.RecyclerView
@@ -21,8 +21,8 @@ import mega.privacy.android.app.databinding.BottomSheetChatRoomToolbarBinding
 import mega.privacy.android.app.interfaces.ChatRoomToolbarBottomSheetDialogActionListener
 import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop
 import mega.privacy.android.app.lollipop.megachat.FileGalleryItem
-import mega.privacy.android.app.lollipop.tasks.FetchDeviceGalleryTask
 import mega.privacy.android.app.utils.*
+import mega.privacy.android.app.utils.LogUtil.logDebug
 import java.util.*
 
 /**
@@ -37,6 +37,7 @@ class ChatRoomToolbarBottomSheetDialogFragment : BottomSheetDialogFragment() {
     private lateinit var adapter: FileStorageAdapter
 
     private lateinit var listener: ChatRoomToolbarBottomSheetDialogActionListener
+    val viewModel: ChatRoomToolbarGalleryViewModel by activityViewModels()
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -53,13 +54,16 @@ class ChatRoomToolbarBottomSheetDialogFragment : BottomSheetDialogFragment() {
 
         mPhotoUris = ArrayList<FileGalleryItem>()
 
-        checkPermissionsDialog()
-
         return binding.root
     }
 
     override fun onStart() {
         super.onStart()
+
+        viewModel.imagesLiveData.observe(viewLifecycleOwner) {
+            adapter.setNodes(it)
+            checkAdapterItems(true)
+        }
 
         val dialog = dialog ?: return
         BottomSheetBehavior.from(dialog.findViewById(R.id.design_bottom_sheet)).state =
@@ -68,6 +72,7 @@ class ChatRoomToolbarBottomSheetDialogFragment : BottomSheetDialogFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         setupButtons()
+        checkPermissionsDialog()
         setupListView()
         setupListAdapter()
 
@@ -137,7 +142,7 @@ class ChatRoomToolbarBottomSheetDialogFragment : BottomSheetDialogFragment() {
                     Constants.REQUEST_READ_STORAGE
                 )
             } else {
-                // uploadGallery()
+                 uploadGallery()
             }
         }
 
@@ -158,24 +163,19 @@ class ChatRoomToolbarBottomSheetDialogFragment : BottomSheetDialogFragment() {
 
     private fun setupListAdapter() {
         context?.let {
-            adapter = FileStorageAdapter(it, mPhotoUris)
-
+            adapter = FileStorageAdapter(it)
         }
         adapter.setHasStableIds(true)
         binding.recyclerViewGallery.adapter = adapter
     }
 
     fun uploadGallery() {
-        setNodes(mPhotoUris!!)
-        FetchDeviceGalleryTask(context).execute()
-        checkAdapterItems(false)
+        logDebug("**************** uploadGallery");
+        viewModel.getAllImages()
+
+
     }
 
-    fun setNodes(photosUrisReceived: ArrayList<FileGalleryItem>) {
-        this.mPhotoUris = photosUrisReceived
-        adapter.setNodes(mPhotoUris)
-        checkAdapterItems(true)
-    }
 
     private fun checkAdapterItems(fileLoaded: Boolean) {
         if (adapter.itemCount == 0) {

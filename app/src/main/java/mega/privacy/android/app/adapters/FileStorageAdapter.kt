@@ -7,13 +7,12 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import mega.privacy.android.app.adapters.viewHolders.FileStorageHolder
 import mega.privacy.android.app.databinding.ItemFileStorageBinding
-import mega.privacy.android.app.lollipop.megachat.FileGalleryItem
 
 class FileStorageAdapter (
-    var context: Context,
-    private var files: ArrayList<FileGalleryItem>?,
+    var context: Context
 ) :
     RecyclerView.Adapter<FileStorageHolder>(), View.OnClickListener {
+    private var files: List<String>? = null
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): FileStorageHolder {
         val inflater = LayoutInflater.from(parent.context)
@@ -22,21 +21,22 @@ class FileStorageAdapter (
     }
 
     override fun getItemCount(): Int {
-        return files!!.size
+        return if (files.isNullOrEmpty())
+            0
+        else
+            files!!.size
     }
 
     override fun onBindViewHolder(holder: FileStorageHolder, position: Int) {
-        holder.bind(context, files!![position])
+        files?.get(position)?.let { holder.bind(context, it) }
         holder.itemView.setOnClickListener(this@FileStorageAdapter)
     }
 
-    fun setNodes(files: ArrayList<FileGalleryItem>?) {
+    fun setNodes(files: List<String>?) {
         this.files = files
         notifyDataSetChanged()
     }
 
     override fun onClick(v: View?) {
-//        val holder = v?.tag as FileStorageHolder
-        //(context as TimeZonePickerActivity).sendTimeZone(holder.timezone)
     }
 }
