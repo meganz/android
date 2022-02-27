@@ -562,7 +562,7 @@
     <style name="BottomSheetItem">
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">@dimen/bottom_sheet_item_height</item>
-        <item name="android:drawablePadding">@dimen/bottom_sheet_item_drawable_padding</item>   
+        <item name="android:drawablePadding">@dimen/bottom_sheet_item_drawable_padding</item>
         <item name="android:gravity">center_vertical</item>
         <item name="android:paddingStart">@dimen/bottom_sheet_item_padding_horizontal</item>
         <item name="android:paddingEnd">@dimen/bottom_sheet_item_padding_horizontal</item>
