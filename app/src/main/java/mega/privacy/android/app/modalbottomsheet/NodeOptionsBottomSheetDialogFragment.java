@@ -1,5 +1,6 @@
 package mega.privacy.android.app.modalbottomsheet;
 
+import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
@@ -31,6 +32,7 @@ import mega.privacy.android.app.lollipop.DrawerItem;
 import mega.privacy.android.app.lollipop.FileContactListActivityLollipop;
 import mega.privacy.android.app.lollipop.FileInfoActivityLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
+import mega.privacy.android.app.lollipop.VersionsFileActivity;
 import mega.privacy.android.app.lollipop.controllers.NodeController;
 import mega.privacy.android.app.utils.MegaNodeUtil;
 import mega.privacy.android.app.utils.StringResourcesUtils;
@@ -198,6 +200,7 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
         optionMoveBackup.setOnClickListener(this);
         optionCopyBackup.setOnClickListener(this);
         optionRubbishBinBackup.setOnClickListener(this);
+        optionVersionsLayout.setOnClickListener(this);
 
         TextView viewInFolder = contentView.findViewById(R.id.view_in_folder_option);
         if (mMode == MODE6) {
@@ -1033,6 +1036,7 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
         }
     }
 
+    @SuppressLint("NonConstantResourceId")
     @Override
     public void onClick(View v) {
         if (node == null) {
@@ -1197,6 +1201,11 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
             case R.id.edit_file_option:
                 manageEditTextFileIntent(requireContext(), node, getAdapterType());
                 break;
+            case R.id.option_versions_layout:
+                Intent version = new Intent(getActivity(), VersionsFileActivity.class);
+                version.putExtra("handle", node.getHandle());
+                requireActivity().startActivityForResult(version, REQUEST_CODE_DELETE_VERSIONS_HISTORY);
+                break;
         }
 
         setStateBottomSheetBehaviorHidden();
@@ -1274,7 +1283,7 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
     }
 
     @Override
-    public void onSaveInstanceState(Bundle outState) {
+    public void onSaveInstanceState(@NonNull Bundle outState) {
         super.onSaveInstanceState(outState);
         long handle = node.getHandle();
         outState.putLong(HANDLE, handle);
