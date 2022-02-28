@@ -52,6 +52,8 @@ class ChooseUpgradeAccountViewModel @Inject constructor(
 
     fun getProductAccounts(): ArrayList<Product>? = myAccountInfo.productAccounts
 
+    fun isBillingAvailable(): Boolean = !myAccountInfo.availableSkus.isNullOrEmpty()
+
     fun checkProductAccounts(): ArrayList<Product>? {
         val productAccounts = getProductAccounts()
 

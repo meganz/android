@@ -116,6 +116,12 @@ class UpgradeAccountActivity : ChooseAccountActivity() {
      * @param upgradeType Selected payment plan.
      */
     override fun onUpgradeClick(upgradeType: Int) {
+        if(!viewModel.isBillingAvailable()) {
+            LogUtil.logWarning("Billing not available")
+            showBillingWarning()
+            return
+        }
+
         if (viewModel.getPaymentBitSet() == null) {
             LogUtil.logWarning("PaymentBitSet Null")
             return

@@ -26,6 +26,10 @@ import java.util.*
 
 open class ChooseAccountActivity : PasscodeActivity(), Scrollable {
 
+    companion object {
+        private const val BILLING_WARNING_SHOWN = "BILLING_WARNING_SHOWN"
+    }
+
     protected lateinit var binding: ActivityChooseUpgradeAccountBinding
     protected val viewModel by viewModels<ChooseUpgradeAccountViewModel>()
 
@@ -52,9 +56,15 @@ open class ChooseAccountActivity : PasscodeActivity(), Scrollable {
         setContentView(binding.root)
 
         viewModel.refreshAccountInfo()
-        initPayments()
         setupView()
         setupObservers()
+        initPayments()
+
+        if (savedInstanceState != null
+            && savedInstanceState.getBoolean(BILLING_WARNING_SHOWN, false)
+        ) {
+            showBillingWarning()
+        }
     }
 
     override fun onDestroy() {
@@ -77,6 +87,11 @@ open class ChooseAccountActivity : PasscodeActivity(), Scrollable {
         return super.onOptionsItemSelected(item)
     }
 
+    override fun onSaveInstanceState(outState: Bundle) {
+        outState.putBoolean(BILLING_WARNING_SHOWN, binding.billingWarningLayout.isVisible)
+        super.onSaveInstanceState(outState)
+    }
+
     private fun setupView() {
         setSupportActionBar(binding.toolbar)
         supportActionBar?.apply {
@@ -84,6 +99,11 @@ open class ChooseAccountActivity : PasscodeActivity(), Scrollable {
             setDisplayHomeAsUpEnabled(true)
             title = StringResourcesUtils.getString(R.string.choose_account_fragment)
                 .uppercase(Locale.getDefault())
+        }
+
+        binding.billingWarningClose.setOnClickListener {
+            binding.billingWarningLayout.isVisible = false
+            checkScroll()
         }
 
         ListenScrollChangesHelper().addViewToListen(
@@ -128,6 +148,14 @@ open class ChooseAccountActivity : PasscodeActivity(), Scrollable {
         checkScroll()
     }
 
+    /**
+     * Shows a warning when the billing is not available.
+     */
+    fun showBillingWarning() {
+        binding.billingWarningLayout.isVisible = true
+        checkScroll()
+    }
+
     private fun setupObservers() {
         registerReceiver(
             updateMyAccountReceiver,
@@ -140,6 +168,7 @@ open class ChooseAccountActivity : PasscodeActivity(), Scrollable {
             return
 
         val withElevation = binding.scrollView.canScrollVertically(SCROLLING_UP_DIRECTION)
+                || binding.billingWarningLayout.isVisible
         val elevation = resources.getDimension(R.dimen.toolbar_elevation)
 
         ColorUtils.changeStatusBarColorForElevation(this, withElevation)
