@@ -14,7 +14,6 @@ import androidx.annotation.ColorInt
 import androidx.annotation.ColorRes
 import androidx.appcompat.app.ActionBar
 import androidx.appcompat.widget.SearchView
-import androidx.appcompat.widget.Toolbar
 import androidx.core.content.ContextCompat
 import androidx.core.view.*
 import androidx.navigation.NavController
@@ -81,9 +80,9 @@ abstract class MediaPlayerActivity : PasscodeActivity(), SnackbarShower, Activit
     @Inject
     lateinit var megaChatApi: MegaChatApiAndroid
 
-    private lateinit var rootLayout: ViewGroup
-    private lateinit var toolbar: Toolbar
     private val viewModel: MediaPlayerViewModel by viewModels()
+
+    private lateinit var binding: ActivityMediaPlayerBinding
 
     private lateinit var actionBar: ActionBar
     private lateinit var navController: NavController
@@ -156,14 +155,11 @@ abstract class MediaPlayerActivity : PasscodeActivity(), SnackbarShower, Activit
 
         val isAudioPlayer = isAudioPlayer(intent)
 
-        val binding = ActivityMediaPlayerBinding.inflate(layoutInflater)
+        binding = ActivityMediaPlayerBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        rootLayout = binding.rootLayout
-        toolbar = binding.toolbar
-
         if (isAudioPlayer()) {
-            toolbar.setBackgroundColor(Color.TRANSPARENT)
+            binding.toolbar.setBackgroundColor(Color.TRANSPARENT)
         } else {
             MediaPlayerService.pauseAudioPlayer(this)
             dragToExit.observeThumbnailLocation(this, intent)
@@ -250,13 +246,13 @@ abstract class MediaPlayerActivity : PasscodeActivity(), SnackbarShower, Activit
     }
 
     private fun setupToolbar() {
-        setSupportActionBar(toolbar)
+        setSupportActionBar(binding.toolbar)
         actionBar = supportActionBar!!
         actionBar.setHomeButtonEnabled(true)
         actionBar.setDisplayHomeAsUpEnabled(true)
         actionBar.title = ""
 
-        toolbar.setNavigationOnClickListener {
+        binding.toolbar.setNavigationOnClickListener {
             onBackPressed()
         }
     }
@@ -834,7 +830,7 @@ abstract class MediaPlayerActivity : PasscodeActivity(), SnackbarShower, Activit
     }
 
     fun setToolbarTitle(title: String) {
-        toolbar.title = title
+        binding.toolbar.title = title
     }
 
     fun closeSearch() {
@@ -843,25 +839,25 @@ abstract class MediaPlayerActivity : PasscodeActivity(), SnackbarShower, Activit
 
     fun hideToolbar(animate: Boolean = true) {
         if (animate) {
-            toolbar.animate()
-                .translationY(-toolbar.measuredHeight.toFloat())
+            binding.toolbar.animate()
+                .translationY(-binding.toolbar.measuredHeight.toFloat())
                 .setDuration(MEDIA_PLAYER_TOOLBAR_SHOW_HIDE_DURATION_MS)
                 .start()
         } else {
-            toolbar.animate().cancel()
-            toolbar.translationY = -toolbar.measuredHeight.toFloat()
+            binding.toolbar.animate().cancel()
+            binding.toolbar.translationY = -binding.toolbar.measuredHeight.toFloat()
         }
     }
 
     fun showToolbar(animate: Boolean = true) {
         if (animate) {
-            toolbar.animate()
+            binding.toolbar.animate()
                 .translationY(0F)
                 .setDuration(MEDIA_PLAYER_TOOLBAR_SHOW_HIDE_DURATION_MS)
                 .start()
         } else {
-            toolbar.animate().cancel()
-            toolbar.translationY = 0F
+            binding.toolbar.animate().cancel()
+            binding.toolbar.translationY = 0F
         }
     }
 
@@ -876,11 +872,11 @@ abstract class MediaPlayerActivity : PasscodeActivity(), SnackbarShower, Activit
 
         WindowCompat.setDecorFitsSystemWindows(window, !isVideoPlayerMainView)
 
-        rootLayout.post {
+        binding.rootLayout.post {
             // Apply system bars top and bottom insets
-            ViewCompat.setOnApplyWindowInsetsListener(rootLayout) { _, windowInsets ->
+            ViewCompat.setOnApplyWindowInsetsListener(binding.rootLayout) { _, windowInsets ->
                 val insets = windowInsets.getInsets(WindowInsetsCompat.Type.systemBars())
-                toolbar.updatePadding(0, if (isVideoPlayerMainView) insets.top else 0, 0, 0)
+                binding.toolbar.updatePadding(0, if (isVideoPlayerMainView) insets.top else 0, 0, 0)
                 WindowInsetsCompat.CONSUMED
             }
         }
@@ -926,8 +922,8 @@ abstract class MediaPlayerActivity : PasscodeActivity(), SnackbarShower, Activit
         }
 
         window.statusBarColor = statusBarColor
-        toolbar.setBackgroundColor(ContextCompat.getColor(this, toolbarBackgroundColor))
-        toolbar.elevation = toolbarElevation
+        binding.toolbar.setBackgroundColor(ContextCompat.getColor(this, toolbarBackgroundColor))
+        binding.toolbar.elevation = toolbarElevation
     }
 
     fun setDraggable(draggable: Boolean) {
@@ -948,7 +944,7 @@ abstract class MediaPlayerActivity : PasscodeActivity(), SnackbarShower, Activit
     }
 
     override fun showSnackbar(type: Int, content: String?, chatId: Long) {
-        showSnackbar(type, rootLayout, content, chatId)
+        showSnackbar(type, binding.rootLayout, content, chatId)
     }
 
     override fun launchActivity(intent: Intent) {
