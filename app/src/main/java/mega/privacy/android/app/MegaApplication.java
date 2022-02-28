@@ -4,7 +4,6 @@ import android.app.Activity;
 import android.app.ActivityManager;
 import android.app.Application;
 import android.app.ApplicationExitInfo;
-import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -203,7 +202,6 @@ public class MegaApplication extends MultiDexApplication implements Application.
 
 	private static boolean isLoggingIn = false;
 	private static boolean isLoggingOut = false;
-	private static boolean firstConnect = true;
 
 	private static boolean showInfoChatMessages = false;
 
@@ -1235,6 +1233,7 @@ public class MegaApplication extends MultiDexApplication implements Application.
 			else {
 				NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(this)
 						.setSmallIcon(R.drawable.ic_stat_notify)
+						.setColor(ContextCompat.getColor(this, R.color.red_600_red_300))
 						.setContentTitle(notificationTitle)
 						.setContentText(notificationContent)
 						.setStyle(new NotificationCompat.BigTextStyle()
@@ -1243,26 +1242,18 @@ public class MegaApplication extends MultiDexApplication implements Application.
 						.setSound(defaultSoundUri)
 						.setContentIntent(pendingIntent);
 
-				if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-					notificationBuilder.setColor(ContextCompat.getColor(this, R.color.red_600_red_300));
-				}
-
 				Drawable d;
 
-				if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-					d = getResources().getDrawable(R.drawable.ic_folder_incoming, getTheme());
-				} else {
-					d = ContextCompat.getDrawable(this, R.drawable.ic_folder_incoming);
-				}
+				d = getResources().getDrawable(R.drawable.ic_folder_incoming, getTheme());
 
 				notificationBuilder.setLargeIcon(((BitmapDrawable) d).getBitmap());
 
-
-				if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.N_MR1) {
-					//API 25 = Android 7.1
-					notificationBuilder.setPriority(Notification.PRIORITY_HIGH);
-				} else {
+				if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+					// Use NotificationManager for devices running Android Nougat or above (API >= 24)
 					notificationBuilder.setPriority(NotificationManager.IMPORTANCE_HIGH);
+				} else {
+					// Otherwise, use NotificationCompat for devices running Android Marshmallow (API 23)
+					notificationBuilder.setPriority(NotificationCompat.PRIORITY_HIGH);
 				}
 
 				NotificationManager notificationManager =

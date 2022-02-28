@@ -9,11 +9,9 @@ import android.graphics.Bitmap;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.DisplayMetrics;
-import android.util.Log;
 import android.view.Display;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -469,7 +467,6 @@ public class FileLinkActivityLollipop extends TransfersManagementActivity implem
 					dbH.setLastPublicHandleType(MegaApiJava.AFFILIATE_TYPE_FILE_FOLDER);
 				}
 
-//				nameView.setText(document.getName());
 				collapsingToolbar.setTitle(document.getName());
 
 				sizeTextView.setText(getSizeString(document.getSize()));
@@ -661,16 +658,14 @@ public class FileLinkActivityLollipop extends TransfersManagementActivity implem
 				{
 					showSnackbar(SNACKBAR_TYPE, getString(R.string.context_no_copied));
 					Intent intent = new Intent(this, ManagerActivityLollipop.class);
-			        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB)
-			        	intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
+					intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
 					startActivity(intent);
 					finish();
 				}							
 				
 			}else{
 				Intent intent = new Intent(this, ManagerActivityLollipop.class);
-		        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB)
-		        	intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
+				intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
 				startActivity(intent);
 				finish();
 			}

@@ -520,29 +520,16 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 
             notification = mBuilderCompat.build();
         }
-        else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            mBuilder
-                    .setSmallIcon(R.drawable.ic_stat_notify)
-                    .setColor(ContextCompat.getColor(this, R.color.red_600_red_300))
-                    .setProgress(100, progressPercent, false)
-                    .setContentIntent(pendingIntent)
-                    .setOngoing(true).setContentTitle(message).setSubText(info)
-                    .setContentText(actionString)
-                    .setOnlyAlertOnce(true);
-            notification = mBuilder.build();
-        }
         else {
             mBuilder
                     .setSmallIcon(R.drawable.ic_stat_notify)
+                    .setColor(ContextCompat.getColor(this,R.color.red_600_red_300))
                     .setProgress(100, progressPercent, false)
                     .setContentIntent(pendingIntent)
                     .setOngoing(true).setContentTitle(message).setContentInfo(info)
                     .setContentText(actionString)
                     .setOnlyAlertOnce(true);
 
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP){
-                mBuilder.setColor(ContextCompat.getColor(this,R.color.red_600_red_300));
-            }
             notification = mBuilder.build();
         }
 

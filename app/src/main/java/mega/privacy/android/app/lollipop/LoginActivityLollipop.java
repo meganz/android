@@ -7,7 +7,6 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.graphics.Rect;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 
@@ -89,8 +88,6 @@ public class LoginActivityLollipop extends BaseActivity implements MegaRequestLi
 
     static boolean isBackFromLoginPage;
     static boolean isFetchingNodes;
-
-    private static boolean clipboardRead;
 
     private BroadcastReceiver updateMyAccountReceiver = new BroadcastReceiver() {
         @Override
@@ -223,7 +220,6 @@ public class LoginActivityLollipop extends BaseActivity implements MegaRequestLi
                 switch (visibleFragment) {
                     case LOGIN_FRAGMENT: {
                         if (loginFragment != null && loginFragment.isAdded()) {
-//                            loginFragment.returnToLogin();
                             onBackPressed();
                         }
                         break;
@@ -666,8 +662,8 @@ public class LoginActivityLollipop extends BaseActivity implements MegaRequestLi
         parentView.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
 
             private boolean alreadyOpen;
-            private final int defaultKeyboardHeightDP = 100;
-            private final int EstimatedKeyboardDP = defaultKeyboardHeightDP + (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP ? 48 : 0);
+            private static final int defaultKeyboardHeightDP = 100;
+            private static final int EstimatedKeyboardDP = defaultKeyboardHeightDP + 48;
             private final Rect rect = new Rect();
 
             @Override

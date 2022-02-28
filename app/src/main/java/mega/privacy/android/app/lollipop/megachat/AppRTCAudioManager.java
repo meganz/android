@@ -324,9 +324,7 @@ public class AppRTCAudioManager {
                 break;
 
             case RINGER_MODE_NORMAL:
-                if (audioManager.getStreamVolume(AudioManager.STREAM_RING) == 0 &&
-                        Build.VERSION.SDK_INT >= Build.VERSION_CODES.M &&
-                        audioManager.isStreamMute(AudioManager.STREAM_RING)) {
+                if (audioManager.getStreamVolume(AudioManager.STREAM_RING) == 0 && audioManager.isStreamMute(AudioManager.STREAM_RING)) {
                     stopVibration();
                 } else {
                     startVibration();
@@ -395,27 +393,15 @@ public class AppRTCAudioManager {
             return;
         }
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            if (isNeccesaryMute && !audioManager.isStreamMute(AudioManager.STREAM_RING)) {
-                audioManager.adjustStreamVolume(AudioManager.STREAM_RING, AudioManager.ADJUST_MUTE, 0);
-                stopVibration();
+        if (isNeccesaryMute && !audioManager.isStreamMute(AudioManager.STREAM_RING)) {
+            audioManager.adjustStreamVolume(AudioManager.STREAM_RING, AudioManager.ADJUST_MUTE, 0);
+            stopVibration();
 
-                if (participatingInACall()) {
-                    MegaApplication.getInstance().removeRTCAudioManagerRingIn();
-                }
-            } else if (!isNeccesaryMute && audioManager.isStreamMute(AudioManager.STREAM_RING)) {
-                adjustStreamVolume();
+            if (participatingInACall()) {
+                MegaApplication.getInstance().removeRTCAudioManagerRingIn();
             }
-        } else {
-            audioManager.setStreamMute(AudioManager.STREAM_RING, isNeccesaryMute);
-            if (isNeccesaryMute) {
-                if (participatingInACall()) {
-                    MegaApplication.getInstance().removeRTCAudioManagerRingIn();
-                }
-                stopVibration();
-            } else {
-                checkVibration();
-            }
+        } else if (!isNeccesaryMute && audioManager.isStreamMute(AudioManager.STREAM_RING)) {
+            adjustStreamVolume();
         }
     }
 
@@ -831,25 +817,21 @@ public class AppRTCAudioManager {
      */
     @Deprecated
     private boolean hasWiredHeadset() {
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
-            return audioManager.isWiredHeadsetOn();
-        } else {
-            final AudioDeviceInfo[] devices = audioManager.getDevices(AudioManager.GET_DEVICES_ALL);
-            for (AudioDeviceInfo device : devices) {
-                final int type = device.getType();
-                if (type == AudioDeviceInfo.TYPE_WIRED_HEADSET) {
-                    logDebug("Found wired headset");
-                    return true;
-                }
-
-                if (type == AudioDeviceInfo.TYPE_USB_DEVICE) {
-                    logDebug("Found USB audio device");
-                    return true;
-                }
+        final AudioDeviceInfo[] devices = audioManager.getDevices(AudioManager.GET_DEVICES_ALL);
+        for (AudioDeviceInfo device : devices) {
+            final int type = device.getType();
+            if (type == AudioDeviceInfo.TYPE_WIRED_HEADSET) {
+                logDebug("Found wired headset");
+                return true;
             }
 
-            return false;
+            if (type == AudioDeviceInfo.TYPE_USB_DEVICE) {
+                logDebug("Found USB audio device");
+                return true;
+            }
         }
+
+        return false;
     }
 
     public void changeUserSelectedAudioDeviceForHeadphone(AudioDevice device){

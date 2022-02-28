@@ -47,7 +47,6 @@ import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.UserCredentials;
 import mega.privacy.android.app.VideoCompressor;
-import mega.privacy.android.app.activities.settingsActivities.CameraUploadsPreferencesActivity;
 import mega.privacy.android.app.listeners.CreateFolderListener;
 import mega.privacy.android.app.listeners.GetCuAttributeListener;
 import mega.privacy.android.app.listeners.SetAttrUserListener;
@@ -60,7 +59,6 @@ import mega.privacy.android.app.utils.StringResourcesUtils;
 import mega.privacy.android.app.utils.conversion.VideoCompressionCallback;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
-import nz.mega.sdk.MegaChatApi;
 import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaNode;
@@ -1107,11 +1105,9 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
      */
     private void localFolderUnavailableNotification(int resId, int notiId) {
         boolean isShowing = false;
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            for (StatusBarNotification notification : mNotificationManager.getActiveNotifications()) {
-                if (notification.getId() == notiId) {
-                    isShowing = true;
-                }
+        for (StatusBarNotification notification : mNotificationManager.getActiveNotifications()) {
+            if (notification.getId() == notiId) {
+                isShowing = true;
             }
         }
         if (!isShowing) {

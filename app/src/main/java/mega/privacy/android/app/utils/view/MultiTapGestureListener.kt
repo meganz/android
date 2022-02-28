@@ -32,7 +32,7 @@ class MultiTapGestureListener constructor(
         return super.onScroll(e1, e2, distanceX, distanceY)
     }
 
-    override fun onDoubleTapEvent(e: MotionEvent?): Boolean {
+    override fun onDoubleTapEvent(e: MotionEvent): Boolean {
         onZoomCallback.invoke()
         return super.onDoubleTapEvent(e)
     }
