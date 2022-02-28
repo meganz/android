@@ -218,10 +218,7 @@ public class PDFView extends RelativeLayout {
     private boolean annotationRendering = false;
 
     /**
-     * True if the view should render during scaling<br/>
-     * Can not be forced on older API versions (< Build.VERSION_CODES.KITKAT) as the GestureDetector does
-     * not detect scrolling while scaling.<br/>
-     * False otherwise
+     * True if the view should render during scaling and False if otherwise
      */
     private boolean renderDuringScale = false;
 

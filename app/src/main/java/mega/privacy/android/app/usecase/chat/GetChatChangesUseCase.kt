@@ -1,4 +1,4 @@
-package mega.privacy.android.app.usecase
+package mega.privacy.android.app.usecase.chat
 
 import io.reactivex.rxjava3.core.BackpressureStrategy
 import io.reactivex.rxjava3.core.Flowable

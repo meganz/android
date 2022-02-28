@@ -361,7 +361,12 @@ public class FileStorageActivityLollipop extends PasscodeActivity implements Scr
 	@Override
 	public void onConfigurationChanged(Configuration newConfig) {
 		super.onConfigurationChanged(newConfig);
-		emptyImageView.setImageResource(isScreenInPortrait(this) ? R.drawable.empty_folder_portrait : R.drawable.empty_folder_landscape);
+
+		if (emptyImageView != null) {
+			emptyImageView.setImageResource(isScreenInPortrait(this)
+					? R.drawable.empty_folder_portrait
+					: R.drawable.empty_folder_landscape);
+		}
 	}
 
 	@Override

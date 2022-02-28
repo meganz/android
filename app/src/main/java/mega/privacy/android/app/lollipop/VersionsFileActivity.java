@@ -65,6 +65,8 @@ public class VersionsFileActivity extends PasscodeActivity implements MegaReques
 	private static final String SELECTED_NODE_HANDLE = "SELECTED_NODE_HANDLE";
 	private static final String SELECTED_POSITION =  "SELECTED_POSITION";
 
+	public static final String KEY_DELETE_VERSION_HISTORY = "deleteVersionHistory";
+
 	ActionBar aB;
     MaterialToolbar tB;
 
@@ -459,7 +461,7 @@ public class VersionsFileActivity extends PasscodeActivity implements MegaReques
 
 	void deleteVersionHistory () {
 		Intent intent = new Intent();
-		intent.putExtra("deleteVersionHistory", true);
+		intent.putExtra(KEY_DELETE_VERSION_HISTORY, true);
 		setResult(RESULT_OK, intent);
 		finish();
 	}

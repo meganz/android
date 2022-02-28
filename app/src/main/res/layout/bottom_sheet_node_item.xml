@@ -155,6 +155,7 @@
 
             <LinearLayout
                 android:id="@+id/option_versions_layout"
+                android:background="?selectableItemBackground"
                 android:layout_width="match_parent"
                 android:layout_height="50dp"
                 android:gravity="center_vertical"
@@ -163,7 +164,7 @@
 
                 <TextView
                     android:id="@+id/versions_option"
-                    style="@style/BottomSheetOption"
+                    style="@style/BottomSheetOptionWithoutBackground"
                     android:layout_weight="1"
                     android:text="@string/title_section_versions"
                     app:drawableStartCompat="@drawable/ic_g_version" />

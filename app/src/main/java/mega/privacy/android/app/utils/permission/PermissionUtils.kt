@@ -178,20 +178,16 @@ object PermissionUtils {
      */
     @JvmStatic
     fun hasPermissions(context: Context?, vararg permissions: String): Boolean {
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
-            return true
-        }
         if (context != null) {
             for (permission in permissions) {
                 // In Android 11+ WRITE_EXTERNAL_STORAGE doesn't grant any addition access so can assume it has been granted
-                if (Build.VERSION.SDK_INT < Build.VERSION_CODES.R || permission != Manifest.permission.WRITE_EXTERNAL_STORAGE) {
-                    if (ContextCompat.checkSelfPermission(
-                            context,
-                            permission
-                        ) != PackageManager.PERMISSION_GRANTED
-                    ) {
-                        return false
-                    }
+                if ((Build.VERSION.SDK_INT < Build.VERSION_CODES.R || permission != Manifest.permission.WRITE_EXTERNAL_STORAGE) &&
+                    ContextCompat.checkSelfPermission(
+                        context,
+                        permission
+                    ) != PackageManager.PERMISSION_GRANTED
+                ) {
+                    return false
                 }
             }
         }
