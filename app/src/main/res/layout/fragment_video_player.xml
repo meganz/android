@@ -8,7 +8,9 @@
         android:id="@+id/player_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:background="?attr/colorPrimary"
         app:controller_layout_id="@layout/video_player_control"
+        app:shutter_background_color="?attr/colorPrimary"
         app:surface_type="surface_view" />
 
     <ProgressBar
