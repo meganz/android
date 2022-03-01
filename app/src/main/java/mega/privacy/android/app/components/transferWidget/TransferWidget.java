@@ -127,7 +127,7 @@ public class TransferWidget {
     public void updateState() {
         if (MegaApplication.getTransfersManagement().areTransfersPaused()) {
             setPausedTransfers();
-        } else if (isStorageOverQuota()){
+        } else if (isOverQuota()){
             setOverQuotaTransfers();
         } else {
             setProgressTransfers();
@@ -167,7 +167,7 @@ public class TransferWidget {
      * Sets the state of the widget as paused.
      */
     private void setPausedTransfers() {
-        if (isOnTransferOverQuota()) return;
+        if (isOverQuota()) return;
 
         progressBar.setProgressDrawable(getDrawable(R.drawable.thin_circular_progress_bar));
         updateStatus(getDrawable(R.drawable.ic_transfers_paused));
