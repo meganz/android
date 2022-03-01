@@ -345,13 +345,17 @@ class ImageBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
             }
 
             // Rubbish bin
-            optionRubbishBin.isVisible = imageItem.shouldShowRubbishBinOption()
-            if (nodeItem.isFromRubbishBin) {
-                optionRubbishBin.setText(R.string.general_remove)
-            } else {
-                optionRubbishBin.setText(R.string.context_move_to_trash)
+            optionRubbishBin.apply {
+                isVisible = imageItem.shouldShowRubbishBinOption()
+                if (nodeItem.isFromRubbishBin) {
+                    setText(R.string.general_remove)
+                    setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_remove, 0, 0, 0);
+                } else {
+                    setText(R.string.context_move_to_trash)
+                    setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_rubbish_bin, 0, 0, 0);
+                }
+                setOnClickListener { showAlertDialog(AlertDialogType.TYPE_RUBBISH_BIN) }
             }
-            optionRubbishBin.setOnClickListener { showAlertDialog(AlertDialogType.TYPE_RUBBISH_BIN) }
 
             // Chat Remove
             optionChatRemove.setOnClickListener { showAlertDialog(AlertDialogType.TYPE_REMOVE_CHAT_NODE) }
