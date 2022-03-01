@@ -10,6 +10,7 @@
 
 package mega.privacy.android.app.lollipop.megachat;
 
+import android.Manifest;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -47,6 +48,7 @@ import static mega.privacy.android.app.utils.CallUtil.*;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.ChatUtil.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
+import static mega.privacy.android.app.utils.permission.PermissionUtils.hasPermissions;
 
 import androidx.annotation.RequiresApi;
 
@@ -118,7 +120,13 @@ public class AppRTCAudioManager {
     public void startBluetooth() {
         if (bluetoothManager == null){
             logDebug("Starting bluetooth");
-            bluetoothManager = AppRTCBluetoothManager.create(apprtcContext, this);
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                if (hasPermissions(apprtcContext, Manifest.permission.BLUETOOTH_CONNECT)) {
+                    bluetoothManager = AppRTCBluetoothManager.create(apprtcContext, this);
+                }
+            } else {
+                bluetoothManager = AppRTCBluetoothManager.create(apprtcContext, this);
+            }
         }
     }
     public void stopBluetooth() {
@@ -205,9 +213,9 @@ public class AppRTCAudioManager {
     }
 
     private void setValues() {
-        if ((typeAudioManager != AUDIO_MANAGER_CALL_RINGING && typeAudioManager != AUDIO_MANAGER_CALL_OUTGOING) ||
-                bluetoothManager.getState() == AppRTCBluetoothManager.State.HEADSET_AVAILABLE ||
-                bluetoothManager.getState() == AppRTCBluetoothManager.State.SCO_CONNECTING) {
+        if ((typeAudioManager != AUDIO_MANAGER_CALL_RINGING && typeAudioManager != AUDIO_MANAGER_CALL_OUTGOING)
+                || (bluetoothManager != null && bluetoothManager.getState() == AppRTCBluetoothManager.State.HEADSET_AVAILABLE)
+                || (bluetoothManager != null && bluetoothManager.getState() == AppRTCBluetoothManager.State.SCO_CONNECTING)) {
             return;
         }
         setAudioManagerValues();
@@ -837,25 +845,29 @@ public class AppRTCAudioManager {
     public void updateAudioDeviceState() {
         startBluetooth();
         ThreadUtils.checkIsOnMainThread();
-        logDebug("Update audio device state. Wired headset " + hasWiredHeadset + ", Bluetooth " + bluetoothManager.getState());
+        if (bluetoothManager != null) {
+            logDebug("Update audio device state. Wired headset " + hasWiredHeadset + ", Bluetooth " + bluetoothManager.getState());
+        }
         logDebug("Device status:. available " + audioDevices + ", selected " + selectedAudioDevice + ", user selected " + userSelectedAudioDevice);
         // Check if any Bluetooth headset is connected. The internal BT state will
         // change accordingly.
-        if (bluetoothManager.getState() == AppRTCBluetoothManager.State.HEADSET_AVAILABLE
-                || bluetoothManager.getState() == AppRTCBluetoothManager.State.HEADSET_UNAVAILABLE
-                || bluetoothManager.getState() == AppRTCBluetoothManager.State.SCO_DISCONNECTING) {
-            bluetoothManager.updateDevice();
+        if (bluetoothManager != null) {
+            if (bluetoothManager.getState() == AppRTCBluetoothManager.State.HEADSET_AVAILABLE
+                    || bluetoothManager.getState() == AppRTCBluetoothManager.State.HEADSET_UNAVAILABLE
+                    || bluetoothManager.getState() == AppRTCBluetoothManager.State.SCO_DISCONNECTING) {
+                bluetoothManager.updateDevice();
+            }
         }
-
         // Update the set of available audio devices.
         Set<AudioDevice> newAudioDevices = new HashSet<>();
 
-        if (bluetoothManager.getState() == AppRTCBluetoothManager.State.SCO_CONNECTED
-                || bluetoothManager.getState() == AppRTCBluetoothManager.State.SCO_CONNECTING
-                || bluetoothManager.getState() == AppRTCBluetoothManager.State.HEADSET_AVAILABLE) {
-            newAudioDevices.add(AudioDevice.BLUETOOTH);
+        if (bluetoothManager != null) {
+            if (bluetoothManager.getState() == AppRTCBluetoothManager.State.SCO_CONNECTED
+                    || bluetoothManager.getState() == AppRTCBluetoothManager.State.SCO_CONNECTING
+                    || bluetoothManager.getState() == AppRTCBluetoothManager.State.HEADSET_AVAILABLE) {
+                newAudioDevices.add(AudioDevice.BLUETOOTH);
+            }
         }
-
         if (hasWiredHeadset) {
             // If a wired headset is connected, then it is the only possible option.
             newAudioDevices.add(AudioDevice.WIRED_HEADSET);
@@ -881,9 +893,11 @@ public class AppRTCAudioManager {
             audioDeviceSetUpdated = true;
         }
 
-        if (bluetoothManager.getState() == AppRTCBluetoothManager.State.HEADSET_UNAVAILABLE && userSelectedAudioDevice == AudioDevice.BLUETOOTH) {
-            logWarning("Bluetooth is not available");
-            userSelectedAudioDevice = AudioDevice.EARPIECE;
+        if (bluetoothManager != null) {
+            if (bluetoothManager.getState() == AppRTCBluetoothManager.State.HEADSET_UNAVAILABLE && userSelectedAudioDevice == AudioDevice.BLUETOOTH) {
+                logWarning("Bluetooth is not available");
+                userSelectedAudioDevice = AudioDevice.EARPIECE;
+            }
         }
 
         if (userSelectedAudioDevice == AudioDevice.NONE) {
@@ -891,14 +905,14 @@ public class AppRTCAudioManager {
                 userSelectedAudioDevice = AudioDevice.SPEAKER_PHONE;
             } else if (hasWiredHeadset) {
                 userSelectedAudioDevice = AudioDevice.WIRED_HEADSET;
-            } else if (bluetoothManager.getState() == AppRTCBluetoothManager.State.HEADSET_AVAILABLE) {
+            } else if (bluetoothManager != null && bluetoothManager.getState() == AppRTCBluetoothManager.State.HEADSET_AVAILABLE) {
                 userSelectedAudioDevice = AudioDevice.BLUETOOTH;
             } else {
                 userSelectedAudioDevice = AudioDevice.EARPIECE;
             }
         } else if (hasWiredHeadset && userSelectedAudioDevice != AudioDevice.SPEAKER_PHONE) {
             userSelectedAudioDevice = AudioDevice.WIRED_HEADSET;
-        } else if (bluetoothManager.getState() == AppRTCBluetoothManager.State.HEADSET_AVAILABLE && userSelectedAudioDevice != AudioDevice.SPEAKER_PHONE) {
+        } else if (bluetoothManager != null && bluetoothManager.getState() == AppRTCBluetoothManager.State.HEADSET_AVAILABLE && userSelectedAudioDevice != AudioDevice.SPEAKER_PHONE) {
             userSelectedAudioDevice = AudioDevice.BLUETOOTH;
         } else if (userSelectedAudioDevice != AudioDevice.SPEAKER_PHONE) {
             userSelectedAudioDevice = AudioDevice.EARPIECE;
@@ -906,32 +920,32 @@ public class AppRTCAudioManager {
 
         // Need to start Bluetooth if it is available and user either selected it explicitly or
         // user did not select any output device.
-        boolean needBluetoothAudioStart =
-                bluetoothManager.getState() == AppRTCBluetoothManager.State.HEADSET_AVAILABLE
-                        && (userSelectedAudioDevice == AudioDevice.EARPIECE
-                        || userSelectedAudioDevice == AudioDevice.BLUETOOTH);
+        boolean needBluetoothAudioStart = bluetoothManager != null
+                && (bluetoothManager.getState() == AppRTCBluetoothManager.State.HEADSET_AVAILABLE
+                && (userSelectedAudioDevice == AudioDevice.EARPIECE
+                || userSelectedAudioDevice == AudioDevice.BLUETOOTH));
 
         // Need to stop Bluetooth audio if user selected different device and
         // Bluetooth SCO connection is established or in the process.
-        boolean needBluetoothAudioStop =
-                (bluetoothManager.getState() == AppRTCBluetoothManager.State.SCO_CONNECTED
+        boolean needBluetoothAudioStop = bluetoothManager != null
+                && (bluetoothManager.getState() == AppRTCBluetoothManager.State.SCO_CONNECTED
                         || bluetoothManager.getState() == AppRTCBluetoothManager.State.SCO_CONNECTING)
                         && (userSelectedAudioDevice != AudioDevice.EARPIECE
                         && userSelectedAudioDevice != AudioDevice.BLUETOOTH);
 
-        if (bluetoothManager.getState() == AppRTCBluetoothManager.State.HEADSET_AVAILABLE
+        if (bluetoothManager != null && (bluetoothManager.getState() == AppRTCBluetoothManager.State.HEADSET_AVAILABLE
                 || bluetoothManager.getState() == AppRTCBluetoothManager.State.SCO_CONNECTING
-                || bluetoothManager.getState() == AppRTCBluetoothManager.State.SCO_CONNECTED) {
+                || bluetoothManager.getState() == AppRTCBluetoothManager.State.SCO_CONNECTED)) {
             logDebug("Need Bluetooth audio. Start " + needBluetoothAudioStart + ". Stop " + needBluetoothAudioStop + ". Bluetooth state " + bluetoothManager.getState());
         }
 
         // Start or stop Bluetooth SCO connection given states set earlier.
-        if (needBluetoothAudioStop) {
+        if (bluetoothManager != null && needBluetoothAudioStop) {
             bluetoothManager.stopScoAudio();
             bluetoothManager.updateDevice();
         }
 
-        if (needBluetoothAudioStart && !needBluetoothAudioStop) {
+        if (bluetoothManager != null && needBluetoothAudioStart && !needBluetoothAudioStop) {
             // Attempt to start Bluetooth SCO audio (takes a few second to start).
             if (!bluetoothManager.startScoAudio()) {
                 // Remove BLUETOOTH from list of available devices since SCO failed.
@@ -948,7 +962,7 @@ public class AppRTCAudioManager {
         // Update selected audio device.
         AudioDevice newAudioDevice;
 
-        if (bluetoothManager.getState() == AppRTCBluetoothManager.State.SCO_CONNECTED) {
+        if (bluetoothManager != null && bluetoothManager.getState() == AppRTCBluetoothManager.State.SCO_CONNECTED) {
             // If a Bluetooth is connected, then it should be used as output audio
             // device. Note that it is not sufficient that a headset is available;
             // an active SCO channel must also be up and running.

@@ -287,10 +287,10 @@ class MediaPlayerFragment : Fragment() {
         }
     }
 
-    private fun hideToolbar(animate: Boolean = true, hideStatusBar: Boolean = true) {
+    private fun hideToolbar(animate: Boolean = true) {
         toolbarVisible = false
 
-        (requireActivity() as MediaPlayerActivity).hideToolbar(animate, hideStatusBar)
+        (requireActivity() as MediaPlayerActivity).hideToolbar(animate)
     }
 
     private fun showToolbar() {
@@ -331,7 +331,7 @@ class MediaPlayerFragment : Fragment() {
     }
 
     private fun updateViewForAnimation() {
-        hideToolbar(animate = false, hideStatusBar = false)
+        hideToolbar(animate = false)
         videoPlayerVH?.hideController()
 
         videoPlayerVH?.binding?.root?.setBackgroundColor(Color.TRANSPARENT)

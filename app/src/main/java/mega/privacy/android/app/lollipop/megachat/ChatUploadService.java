@@ -804,7 +804,7 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 		String actionString = isOverquota == 0 ? getString(R.string.chat_upload_title_notification) :
 				getString(R.string.general_show_info);
 
-		PendingIntent pendingIntent = PendingIntent.getActivity(ChatUploadService.this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+		PendingIntent pendingIntent = PendingIntent.getActivity(ChatUploadService.this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
 		Notification notification;
 
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
@@ -1518,7 +1518,7 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 			mBuilderCompat
 					.setSmallIcon(R.drawable.ic_stat_notify)
 					.setColor(ContextCompat.getColor(this,R.color.red_600_red_300))
-					.setContentIntent(PendingIntent.getActivity(getApplicationContext(), 0, intent, 0))
+					.setContentIntent(PendingIntent.getActivity(getApplicationContext(), 0, intent, PendingIntent.FLAG_IMMUTABLE))
 					.setAutoCancel(true).setTicker(contentText)
 					.setContentTitle(message).setContentText(contentText)
 					.setOngoing(false);
@@ -1529,7 +1529,7 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 			mBuilder
 					.setColor(ContextCompat.getColor(this,R.color.red_600_red_300))
 					.setSmallIcon(R.drawable.ic_stat_notify)
-					.setContentIntent(PendingIntent.getActivity(getApplicationContext(), 0, intent, 0))
+					.setContentIntent(PendingIntent.getActivity(getApplicationContext(), 0, intent, PendingIntent.FLAG_IMMUTABLE))
 					.setAutoCancel(true).setTicker(contentText)
 					.setContentTitle(message).setContentText(contentText)
 					.setOngoing(false);

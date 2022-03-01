@@ -52,6 +52,8 @@ import static mega.privacy.android.app.fragments.settingsFragments.startSceen.ut
 import static mega.privacy.android.app.fragments.settingsFragments.startSceen.util.StartScreenUtil.shouldCloseApp;
 import static mega.privacy.android.app.lollipop.FileInfoActivityLollipop.NODE_HANDLE;
 import static mega.privacy.android.app.lollipop.PermissionsFragment.PERMISSIONS_FRAGMENT;
+import static mega.privacy.android.app.meeting.activity.MeetingActivity.MEETING_ACTION_CREATE;
+import static mega.privacy.android.app.meeting.activity.MeetingActivity.MEETING_ACTION_JOIN;
 import static mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil.isBottomSheetDialogShown;
 import static mega.privacy.android.app.modalbottomsheet.UploadBottomSheetDialogFragment.GENERAL_UPLOAD;
 import static mega.privacy.android.app.modalbottomsheet.UploadBottomSheetDialogFragment.HOMEPAGE_UPLOAD;
@@ -133,6 +135,7 @@ import static mega.privacy.android.app.utils.MegaTransferUtils.isBackgroundTrans
 import static mega.privacy.android.app.utils.OfflineUtils.removeInitialOfflinePath;
 import static mega.privacy.android.app.utils.OfflineUtils.removeOffline;
 import static mega.privacy.android.app.utils.OfflineUtils.saveOffline;
+import static mega.privacy.android.app.utils.StringResourcesUtils.getQuantityString;
 import static mega.privacy.android.app.utils.TextUtil.isTextEmpty;
 import static mega.privacy.android.app.utils.TimeUtils.getHumanizedTime;
 import static mega.privacy.android.app.utils.UploadUtil.chooseFiles;
@@ -908,6 +911,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
     private static float FAB_DEFAULT_ANGEL = 0f;
     private static float FAB_ROTATE_ANGEL = 135f;
     private static String KEY_IS_FAB_EXPANDED = "isFabExpanded";
+    private static String MEETING_TYPE = MEETING_ACTION_CREATE;
     private View fabMaskLayout;
     private ViewGroup windowContent;
     private final ArrayList<View> fabs = new ArrayList<>();
@@ -920,6 +924,11 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
     private Long backupNodeHandle;
     private int backupNodeType;
     private int backupActionType;
+
+    // Version removed
+    private int versionsToRemove = 0;
+    private int versionsRemoved = 0;
+    private int errorVersionRemove = 0;
 
     /**
      * Broadcast to update the completed transfers tab.
@@ -1316,6 +1325,20 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
                 if ((typesCameraPermission == RETURN_CALL_PERMISSIONS || typesCameraPermission == START_CALL_PERMISSIONS) &&
                         grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     controlCallPermissions();
+                }
+                break;
+
+            case REQUEST_BT_CONNECT:
+                logDebug("get Bluetooth Connect permission");
+                if(permissions.length == 0) {
+                    return;
+                }
+                if (grantResults[0] == PackageManager.PERMISSION_GRANTED){
+                    if (MEETING_TYPE.equals(MEETING_ACTION_CREATE)) {
+                        openMeetingToCreate(this);
+                    }
+                } else {
+                    showSnackbar(PERMISSIONS_TYPE, getString(R.string.meeting_bluetooth_connect_required_permissions_warning), INVALID_HANDLE);
                 }
                 break;
         }
@@ -5032,7 +5055,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 
         switch (drawerItem) {
             case CLOUD_DRIVE: {
-                if (fbFLol != null) {
+                if (fbFLol != null && fbFLol.isResumed()) {
                     fbFLol.checkScroll();
                 }
                 break;
@@ -7332,6 +7355,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 
     @Override
     public void onJoinMeeting() {
+        MEETING_TYPE = MEETING_ACTION_JOIN;
         if (CallUtil.participatingInACall()) {
             showConfirmationInACall(this, StringResourcesUtils.getString(R.string.text_join_call), passcodeManagement);
         } else {
@@ -7341,11 +7365,29 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 
     @Override
     public void onCreateMeeting() {
+        MEETING_TYPE = MEETING_ACTION_CREATE;
         if (CallUtil.participatingInACall()) {
             showConfirmationInACall(this, StringResourcesUtils.getString(R.string.ongoing_call_content), passcodeManagement);
         } else {
+            // For android 12, need android.permission.BLUETOOTH_CONNECT permission
+            if (requestBluetoothPermission()) return;
             openMeetingToCreate(this);
         }
+    }
+
+    /**
+     * Request Bluetooth Connect Permission for Meeting and Call when SDK >= 31
+     * @return false : permission granted, needn't request / true: should request permission
+     */
+    private boolean requestBluetoothPermission() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            boolean hasPermission = hasPermissions(this, Manifest.permission.BLUETOOTH_CONNECT);
+            if (!hasPermission) {
+                requestPermission(this, REQUEST_BT_CONNECT, Manifest.permission.BLUETOOTH_CONNECT);
+                return true;
+            }
+        }
+        return false;
     }
 
     public void showConfirmationRemoveAllSharingContacts(final List<MegaNode> shares) {
@@ -8654,6 +8696,18 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
                         break;
                 }
             }
+        } else if (requestCode == REQUEST_CODE_DELETE_VERSIONS_HISTORY && resultCode == RESULT_OK) {
+            if (!isOnline(this)) {
+                Util.showErrorAlertDialog(getString(R.string.error_server_connection_problem), false, this);
+                return;
+            }
+            if (intent.getBooleanExtra(VersionsFileActivity.KEY_DELETE_VERSION_HISTORY, false)) {
+                ArrayList<MegaNode> versions = megaApi.getVersions(selectedNode);
+                versionsToRemove = versions.size() - 1;
+                for (int i = 1; i < versions.size(); i++) {
+                    megaApi.removeVersion(versions.get(i), this);
+                }
+            }
         } else {
             logWarning("No request code processed");
             super.onActivityResult(requestCode, resultCode, intent);
@@ -9917,6 +9971,38 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 
             } else {
                 logError("ERROR requesting version info of the account");
+            }
+        } else if (request.getType() == MegaRequest.TYPE_REMOVE){
+            if (versionsToRemove > 0) {
+                logDebug("Remove request finished");
+                if (e.getErrorCode() == MegaError.API_OK){
+                    versionsRemoved++;
+                } else{
+                    errorVersionRemove++;
+                }
+
+                if (versionsRemoved + errorVersionRemove == versionsToRemove) {
+                    if (versionsRemoved == versionsToRemove) {
+                        showSnackbar(SNACKBAR_TYPE, getString(R.string.version_history_deleted), -1);
+                    } else {
+                        showSnackbar(SNACKBAR_TYPE, getString(R.string.version_history_deleted_erroneously)
+                                        + "\n" + getQuantityString(R.plurals.versions_deleted_succesfully, versionsRemoved, versionsRemoved)
+                                        + "\n" + getQuantityString(R.plurals.versions_not_deleted, errorVersionRemove, errorVersionRemove),
+                                MEGACHAT_INVALID_HANDLE);
+                    }
+                    versionsToRemove = 0;
+                    versionsRemoved = 0;
+                    errorVersionRemove = 0;
+                }
+            } else {
+                logDebug("Remove request finished");
+                if (e.getErrorCode() == MegaError.API_OK){
+                    finish();
+                } else if (e.getErrorCode() == MegaError.API_EMASTERONLY) {
+                    showSnackbar(SNACKBAR_TYPE, e.getErrorString(), -1);
+                } else{
+                    showSnackbar(SNACKBAR_TYPE, getString(R.string.context_no_removed), -1);
+                }
             }
         }
     }

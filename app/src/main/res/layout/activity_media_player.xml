@@ -4,8 +4,7 @@
     android:id="@+id/root_layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/dark_grey"
-    android:fitsSystemWindows="true">
+    android:background="?attr/colorPrimary">
 
     <androidx.fragment.app.FragmentContainerView
         android:id="@+id/nav_host_fragment"
@@ -21,7 +20,5 @@
         android:layout_height="wrap_content"
         android:elevation="0dp"
         android:fitsSystemWindows="true"
-        android:minHeight="?attr/actionBarSize"
-        app:popupTheme="@style/ThemeOverlay.AppCompat.DayNight"
-        app:theme="@style/VideoPlaylistActionBar" />
+        android:minHeight="?attr/actionBarSize" />
 </FrameLayout>
