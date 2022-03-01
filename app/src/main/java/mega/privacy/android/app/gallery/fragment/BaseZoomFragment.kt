@@ -44,8 +44,7 @@ import mega.privacy.android.app.modalbottomsheet.NodeOptionsBottomSheetDialogFra
 import mega.privacy.android.app.utils.*
 import mega.privacy.android.app.utils.Constants.MIN_ITEMS_SCROLLBAR
 import mega.privacy.android.app.utils.Constants.ORDER_CAMERA
-import mega.privacy.android.app.utils.ZoomUtil.ZOOM_DEFAULT
-import mega.privacy.android.app.utils.ZoomUtil.ZOOM_OUT_1X
+import mega.privacy.android.app.utils.ZoomUtil.ZOOM_OUT_2X
 import mega.privacy.android.app.utils.ZoomUtil.getItemWidth
 import mega.privacy.android.app.utils.ZoomUtil.getMargin
 import mega.privacy.android.app.utils.ZoomUtil.getSelectedFrameMargin
@@ -412,7 +411,7 @@ abstract class BaseZoomFragment : BaseFragment(), GestureScaleCallback,
 
     private fun observeItemLongClick() =
         actionModeViewModel.longClick.observe(viewLifecycleOwner, EventObserver {
-            if (zoomViewModel.getCurrentZoom() == ZOOM_DEFAULT || zoomViewModel.getCurrentZoom() == ZOOM_OUT_1X) {
+            if (zoomViewModel.getCurrentZoom() != ZOOM_OUT_2X) {
                 doIfOnline { actionModeViewModel.enterActionMode(it) }
                 animateBottomView()
             }
