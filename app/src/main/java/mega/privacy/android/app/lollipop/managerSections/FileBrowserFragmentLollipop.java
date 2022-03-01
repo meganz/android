@@ -414,13 +414,6 @@ public class FileBrowserFragmentLollipop extends RotatableFragment{
 				control.removeShare().setVisible(true);
 			}
 
-			if (mediaCounter == selected.size()) {
-				control.saveToGallery().setVisible(true)
-						.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
-			} else {
-				control.saveToGallery().setVisible(false);
-			}
-
 			control.trash().setVisible(showTrash);
 
 			control.shareOut().setVisible(true);
