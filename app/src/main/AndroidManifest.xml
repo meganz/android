@@ -53,8 +53,16 @@
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
     <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
     <uses-permission android:name="android.permission.USE_FULL_SCREEN_INTENT" />
-    <uses-permission android:name="android.permission.USE_BIOMETRIC" /> <!-- <uses-permission android:name="android.permission.READ_CALL_LOG"/> -->
+    <uses-permission android:name="android.permission.USE_BIOMETRIC" />
+
+    <!-- For apps targeting Android 12 (API level 31) and higher,
+    apps must have the Manifest.permission.SCHEDULE_EXACT_ALARM permission
+    in order to use any APIs for setting exact alarms -->
+    <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" />
+    <uses-permission android:name="android.permission.BLUETOOTH_CONNECT" />
+    <!-- <uses-permission android:name="android.permission.READ_CALL_LOG"/> -->
     <!-- <uses-permission android:name="android.permission.WRITE_CALL_LOG"/> -->
+
     <queries>
 
         <!-- Camera -->
@@ -119,6 +127,7 @@
         <activity
             android:name=".lollipop.ManagerActivityLollipop"
             android:label="@string/app_name"
+            android:exported="true"
             android:launchMode="singleTop"
             android:windowSoftInputMode="adjustNothing">
             <intent-filter>
@@ -137,9 +146,10 @@
             android:label="@string/app_name"></activity>
         <activity
             android:name=".OpenLinkActivity"
+            android:exported="true"
             android:launchMode="singleTask"
             android:screenOrientation="portrait">
-            <intent-filter>
+            <intent-filter android:autoVerify="true">
                 <action android:name="android.intent.action.VIEW" />
 
                 <category android:name="android.intent.category.DEFAULT" />
@@ -159,7 +169,7 @@
                     android:host="www.mega.co.nz"
                     android:scheme="https"></data>
             </intent-filter>
-            <intent-filter>
+            <intent-filter android:autoVerify="true">
                 <action android:name="android.intent.action.VIEW" />
 
                 <category android:name="android.intent.category.DEFAULT" />
@@ -206,6 +216,7 @@
             android:launchMode="singleTop"></activity>
         <activity
             android:name=".lollipop.FileExplorerActivityLollipop"
+            android:exported="true"
             android:label="@string/app_name"
             android:launchMode="singleTask"
             android:windowSoftInputMode="adjustNothing">
@@ -238,6 +249,7 @@
             android:label="@string/app_name"></activity>
         <activity
             android:name=".providers.FileProviderActivity"
+            android:exported="false"
             android:label="@string/app_name"
             android:screenOrientation="locked">
             <intent-filter>
@@ -347,6 +359,7 @@
             android:label="@string/app_name"></activity>
         <activity
             android:name=".lollipop.PdfViewerActivityLollipop"
+            android:exported="true"
             android:label="@string/pdf_app_name"
             android:launchMode="singleTop">
             <intent-filter>
@@ -534,7 +547,8 @@
         </receiver>
         <receiver
             android:name=".receivers.CameraEventReceiver"
-            android:enabled="true">
+            android:enabled="true"
+            android:exported="false">
             <intent-filter>
                 <action android:name="com.android.camera.NEW_PICTURE" />
                 <action android:name="android.hardware.action.NEW_PICTURE" />
@@ -546,21 +560,24 @@
         </receiver>
         <receiver
             android:name=".receivers.NetworkStateReceiver"
-            android:enabled="true">
+            android:enabled="true"
+            android:exported="false">
             <intent-filter>
                 <action android:name="android.net.conn.CONNECTIVITY_CHANGE" />
             </intent-filter>
         </receiver>
         <receiver
             android:name=".receivers.ChargeEventReceiver"
-            android:enabled="true">
+            android:enabled="true"
+            android:exported="false">
             <intent-filter>
                 <action android:name="android.intent.action.ACTION_POWER_CONNECTED" />
             </intent-filter>
         </receiver>
         <receiver
             android:name=".receivers.BootEventReceiver"
-            android:enabled="true">
+            android:enabled="true"
+            android:exported="false">
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
             </intent-filter>
@@ -579,6 +596,7 @@
         <activity
             android:name=".lollipop.megachat.MapsActivity"
             android:configChanges="orientation|screenSize"
+            android:exported="false"
             android:label="@string/title_activity_maps"
             android:windowSoftInputMode="adjustNothing">
             <meta-data
@@ -618,7 +636,8 @@
             android:label="@string/payment"
             android:launchMode="singleTop" />
 
-        <receiver android:name=".psa.AlarmReceiver">
+        <receiver android:name=".psa.AlarmReceiver"
+            android:exported="false" >
             <intent-filter>
                 <action android:name="android.intent.action.checking.psa" />
             </intent-filter>

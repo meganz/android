@@ -648,7 +648,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 		intent.setAction(ACTION_SHOW_TRANSFERS);
 		intent.putExtra(TRANSFERS_TAB, COMPLETED_TAB);
 
-		PendingIntent pendingIntent = PendingIntent.getActivity(getApplicationContext(), 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+		PendingIntent pendingIntent = PendingIntent.getActivity(getApplicationContext(), 0, intent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
 
 		if (totalDownloads != 1) {
 			logDebug("Show notification");
@@ -984,14 +984,14 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 				contentText = getString(R.string.download_touch_to_cancel);
 				intent = new Intent(DownloadService.this, LoginActivityLollipop.class);
 				intent.setAction(ACTION_CANCEL_DOWNLOAD);
-				pendingIntent = PendingIntent.getActivity(DownloadService.this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+				pendingIntent = PendingIntent.getActivity(DownloadService.this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
 			}
 			else{
 				contentText = getString(R.string.download_touch_to_show);
 				intent = new Intent(DownloadService.this, ManagerActivityLollipop.class);
 				intent.setAction(ACTION_SHOW_TRANSFERS);
 				intent.putExtra(TRANSFERS_TAB, PENDING_TAB);
-				pendingIntent = PendingIntent.getActivity(DownloadService.this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+				pendingIntent = PendingIntent.getActivity(DownloadService.this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
 			}
 
 			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {

@@ -1,10 +1,12 @@
 package mega.privacy.android.app.lollipop;
 
+import android.Manifest;
 import android.app.Activity;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.DisplayMetrics;
@@ -18,6 +20,8 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ScrollView;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
@@ -29,11 +33,11 @@ import androidx.viewpager.widget.ViewPager;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.textfield.TextInputLayout;
 
+import mega.privacy.android.app.BaseActivity;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.TourImageAdapter;
 import mega.privacy.android.app.components.LoopViewPager;
-import mega.privacy.android.app.meeting.fragments.MeetingHasEndedDialogFragment;
 import mega.privacy.android.app.meeting.fragments.PasteMeetingLinkGuestDialogFragment;
 import mega.privacy.android.app.utils.TextUtil;
 
@@ -42,8 +46,11 @@ import static mega.privacy.android.app.utils.Constants.ACTION_RESET_PASS_FROM_LI
 import static mega.privacy.android.app.utils.Constants.ACTION_RESET_PASS_FROM_PARK_ACCOUNT;
 import static mega.privacy.android.app.utils.Constants.CREATE_ACCOUNT_FRAGMENT;
 import static mega.privacy.android.app.utils.Constants.LOGIN_FRAGMENT;
+import static mega.privacy.android.app.utils.Constants.PERMISSIONS_TYPE;
 import static mega.privacy.android.app.utils.LogUtil.logDebug;
 import static mega.privacy.android.app.utils.LogUtil.logError;
+import static mega.privacy.android.app.utils.permission.PermissionUtils.hasPermissions;
+import static nz.mega.sdk.MegaApiJava.INVALID_HANDLE;
 
 public class TourFragmentLollipop extends Fragment implements View.OnClickListener{
 
@@ -61,6 +68,7 @@ public class TourFragmentLollipop extends Fragment implements View.OnClickListen
     private Button bRegister;
     private Button bLogin;
     private ScrollView baseContainer;
+    private ActivityResultLauncher<String> joinMeetingAsGuestLauncher = null;
 
     public static TourFragmentLollipop newInstance(@Nullable String recoveryKeyUrl, @Nullable String parkAccountUrl) {
         TourFragmentLollipop fragment = new TourFragmentLollipop();
@@ -299,11 +307,31 @@ public class TourFragmentLollipop extends Fragment implements View.OnClickListen
                 break;
             case R.id.join_meeting_as_guest:
                 logDebug("onJoinMeetingAsGuestClick");
-                MegaApplication.setLoggingOut(false);
-                new PasteMeetingLinkGuestDialogFragment().show(getChildFragmentManager(),
-                        PasteMeetingLinkGuestDialogFragment.TAG);
+                if (requestBluetoothPermission()) {
+                    if (joinMeetingAsGuestLauncher != null) {
+                        joinMeetingAsGuestLauncher.launch(Manifest.permission.BLUETOOTH_CONNECT);
+                    }
+                } else {
+                    MegaApplication.setLoggingOut(false);
+                    new PasteMeetingLinkGuestDialogFragment().show(getChildFragmentManager(),
+                            PasteMeetingLinkGuestDialogFragment.TAG);
+                }
                 break;
         }
+    }
+
+    /**
+     * Request Bluetooth Connect Permission for Meeting and Call when SDK >= 31
+     * @return false : permission granted, needn't request / true: should request permission
+     */
+    private boolean requestBluetoothPermission() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            boolean hasPermission = hasPermissions(this.requireContext(), Manifest.permission.BLUETOOTH_CONNECT);
+            if (!hasPermission) {
+                return true;
+            }
+        }
+        return false;
     }
 
     @Override
@@ -311,6 +339,20 @@ public class TourFragmentLollipop extends Fragment implements View.OnClickListen
         logDebug("onAttach");
         super.onAttach(context);
         this.context = context;
+
+        joinMeetingAsGuestLauncher = registerForActivityResult(
+                new ActivityResultContracts.RequestPermission(),
+                result -> {
+                    if (result) {
+                        logDebug("onActivityResult: PERMISSION GRANTED");
+                        MegaApplication.setLoggingOut(false);
+                        new PasteMeetingLinkGuestDialogFragment().show(getChildFragmentManager(),
+                                PasteMeetingLinkGuestDialogFragment.TAG);
+                    } else {
+                        logDebug("onActivityResult: PERMISSION DENIED");
+                        ((BaseActivity)getActivity()).showSnackbar(PERMISSIONS_TYPE, getString(R.string.meeting_bluetooth_connect_required_permissions_warning), INVALID_HANDLE);
+                    }
+                });
     }
 
     @Override
