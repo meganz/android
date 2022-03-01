@@ -38,7 +38,6 @@ import mega.privacy.android.app.utils.MegaNodeUtil.getNodeLabelColor
 import mega.privacy.android.app.utils.MegaNodeUtil.getNodeLabelDrawable
 import mega.privacy.android.app.utils.MegaNodeUtil.getNodeLabelText
 import mega.privacy.android.app.utils.NetworkUtil.isOnline
-import mega.privacy.android.app.utils.SdkRestrictionUtils.isSaveToGalleryCompatible
 import mega.privacy.android.app.utils.StringResourcesUtils.getQuantityString
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 import nz.mega.sdk.MegaNode
@@ -231,15 +230,8 @@ class ImageBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
                 if (nodeItem.isAvailableOffline) {
                     (activity as? ImageViewerActivity?)?.saveOfflineNode(nodeItem.handle)
                 } else if (node != null) {
-                    (activity as? ImageViewerActivity?)?.saveNode(node, false)
+                    (activity as? ImageViewerActivity?)?.saveNode(node)
                 }
-                dismissAllowingStateLoss()
-            }
-
-            // Save to Gallery
-            optionGallery.isVisible = isSaveToGalleryCompatible() && !nodeItem.isExternalNode && !nodeItem.isFromRubbishBin && node != null
-            optionGallery.setOnClickListener {
-                (activity as? ImageViewerActivity?)?.saveNode(node!!, false)
                 dismissAllowingStateLoss()
             }
 

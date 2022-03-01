@@ -182,9 +182,6 @@ public class CloudStorageOptionControlUtil {
     menu.findItem(R.id.cab_menu_download).setVisible(control.saveToDevice.visible);
     menu.findItem(R.id.cab_menu_download).setShowAsAction(control.saveToDevice.showAsAction);
 
-    menu.findItem(R.id.cab_menu_save_gallery).setVisible(!isAndroid11OrUpper() && control.saveToGallery.visible);
-    menu.findItem(R.id.cab_menu_save_gallery).setShowAsAction(control.saveToGallery.showAsAction);
-
     menu.findItem(R.id.cab_menu_share_link).setVisible(control.getLink.visible);
     menu.findItem(R.id.cab_menu_share_link).setShowAsAction(control.getLink.showAsAction);
 
