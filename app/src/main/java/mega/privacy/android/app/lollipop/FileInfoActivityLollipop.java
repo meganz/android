@@ -904,6 +904,7 @@ public class FileInfoActivityLollipop extends PasscodeActivity implements OnClic
                 } else {
                     if (!node.isTakenDown()) {
                         downloadMenuItem.setVisible(true);
+                        downloadMenuItem.setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
 
                         if (node.isFolder()) {
                             shareMenuItem.setVisible(true);

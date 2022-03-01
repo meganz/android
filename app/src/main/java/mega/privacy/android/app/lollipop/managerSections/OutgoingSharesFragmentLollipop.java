@@ -8,11 +8,9 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
 import java.util.ArrayList;
 import java.util.List;
 
-import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.NewGridRecyclerView;
 import mega.privacy.android.app.fragments.MegaNodeBaseFragment;
@@ -25,7 +23,7 @@ import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaShare;
 
 import static mega.privacy.android.app.lollipop.ManagerActivityLollipop.OUTGOING_TAB;
-import static mega.privacy.android.app.utils.MegaNodeUtil.areAllFileNodes;
+import static mega.privacy.android.app.utils.MegaNodeUtil.areAllFileNodesAndNotTakenDown;
 import static mega.privacy.android.app.utils.SortUtil.*;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
@@ -66,7 +64,7 @@ public class OutgoingSharesFragmentLollipop extends MegaNodeBaseFragment {
 			CloudStorageOptionControlUtil.Control control =
 					new CloudStorageOptionControlUtil.Control();
 
-			if (selected.size() == 1) {
+			if (selected.size() == 1 && !selected.get(0).isTakenDown()) {
 				if (megaApi.checkAccess(selected.get(0), MegaShare.ACCESS_OWNER).getErrorCode()
 						== MegaError.API_OK) {
 					if (selected.get(0).isExported()) {
@@ -85,22 +83,37 @@ public class OutgoingSharesFragmentLollipop extends MegaNodeBaseFragment {
 							.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
 				}
 
-				if (MegaNodeUtil.isOutShare(selected.get(0))) {
+				if (selected.get(0).isOutShare()) {
 					control.removeShare().setVisible(true);
 				}
-			} else {
-				control.removeShare().setVisible(true)
-						.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
 			}
 
-			control.shareOut().setVisible(true)
-					.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+			boolean areAllNotTakenDown = MegaNodeUtil.areAllNotTakenDown(selected);
 
-			if (managerActivity.getDeepBrowserTreeOutgoing() > 0) {
-				if (areAllFileNodes(selected)) {
-					control.sendToChat().setVisible(true)
+			if (areAllNotTakenDown) {
+				if (managerActivity.getParentHandleOutgoing() == INVALID_HANDLE) {
+					control.removeShare().setVisible(true)
 							.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
 				}
+
+				control.shareOut().setVisible(true)
+						.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+
+				if (managerActivity.getDeepBrowserTreeOutgoing() > 0) {
+					if (areAllFileNodesAndNotTakenDown(selected)) {
+						control.sendToChat().setVisible(true)
+								.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+					}
+				}
+
+				control.copy().setVisible(true);
+				if (control.alwaysActionCount() < CloudStorageOptionControlUtil.MAX_ACTION_COUNT) {
+					control.copy().setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+				} else {
+					control.copy().setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
+				}
+			} else {
+				control.saveToDevice().setVisible(false);
 			}
 
 			if (selected.size() == 1
@@ -111,13 +124,6 @@ public class OutgoingSharesFragmentLollipop extends MegaNodeBaseFragment {
 				} else {
 					control.rename().setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
 				}
-			}
-
-			control.copy().setVisible(true);
-			if (control.alwaysActionCount() < CloudStorageOptionControlUtil.MAX_ACTION_COUNT) {
-				control.copy().setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
-			} else {
-				control.copy().setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
 			}
 
 			control.selectAll().setVisible(notAllNodesSelected());

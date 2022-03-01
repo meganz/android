@@ -24,9 +24,10 @@ import nz.mega.sdk.MegaNode;
 
 import static mega.privacy.android.app.lollipop.ManagerActivityLollipop.INCOMING_TAB;
 import static mega.privacy.android.app.utils.MegaNodeUtil.allHaveFullAccess;
-import static mega.privacy.android.app.utils.MegaNodeUtil.areAllFileNodes;
+import static mega.privacy.android.app.utils.MegaNodeUtil.areAllFileNodesAndNotTakenDown;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
+import static mega.privacy.android.app.utils.MegaNodeUtil.areAllNotTakenDown;
 import static mega.privacy.android.app.utils.Util.*;
 import static nz.mega.sdk.MegaApiJava.*;
 import static nz.mega.sdk.MegaError.API_OK;
@@ -67,11 +68,9 @@ public class IncomingSharesFragmentLollipop extends MegaNodeBaseFragment {
 			if (managerActivity.getDeepBrowserTreeIncoming() == 0) {
 				control.leaveShare().setVisible(true)
 						.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
-			} else {
-				if (areAllFileNodes(selected)) {
-					control.sendToChat().setVisible(true)
-							.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
-				}
+			} else if (areAllFileNodesAndNotTakenDown(selected)) {
+				control.sendToChat().setVisible(true)
+						.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
 			}
 
 			if (selected.size() == 1
@@ -95,11 +94,15 @@ public class IncomingSharesFragmentLollipop extends MegaNodeBaseFragment {
 				}
 			}
 
-			control.copy().setVisible(true);
-			if (control.alwaysActionCount() < CloudStorageOptionControlUtil.MAX_ACTION_COUNT) {
-				control.copy().setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+			if (areAllNotTakenDown(selected)) {
+				control.copy().setVisible(true);
+				if (control.alwaysActionCount() < CloudStorageOptionControlUtil.MAX_ACTION_COUNT) {
+					control.copy().setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+				} else {
+					control.copy().setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
+				}
 			} else {
-				control.copy().setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
+				control.saveToDevice().setVisible(false);
 			}
 
 			control.selectAll().setVisible(notAllNodesSelected());

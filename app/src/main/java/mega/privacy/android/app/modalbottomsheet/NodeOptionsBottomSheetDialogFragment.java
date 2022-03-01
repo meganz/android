@@ -415,6 +415,8 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
             case MODE2:
                 logDebug("show Rubbish bottom sheet");
 
+                optionEdit.setVisibility(View.GONE);
+
                 long restoreHandle = node.getRestoreHandle();
                 MegaNode restoreNode = megaApi.getNodeByHandle(restoreHandle);
                 if (restoreHandle == INVALID_HANDLE || !megaApi.isInRubbish(node)
