@@ -853,7 +853,7 @@ public class NodeAttachmentHistoryActivity extends PasscodeActivity
                         MegaNodeList megaNodeList = messagesSelected.get(i).getMegaNodeList();
                         list.add(megaNodeList);
                     }
-                    nodeSaver.saveNodeLists(list, false, false, false, true, false);
+                    nodeSaver.saveNodeLists(list, false, false, false, true);
                     break;
                 }
                 case R.id.chat_cab_menu_import: {
@@ -1544,7 +1544,7 @@ public class NodeAttachmentHistoryActivity extends PasscodeActivity
     }
 
     public void downloadNodeList(MegaNodeList nodeList) {
-        nodeSaver.saveNodeLists(Collections.singletonList(nodeList), false, false, false, true, false);
+        nodeSaver.saveNodeLists(Collections.singletonList(nodeList), false, false, false, true);
     }
 }
 

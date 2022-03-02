@@ -145,8 +145,6 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
 //      optionLabel
         LinearLayout optionLabel = contentView.findViewById(R.id.option_label_layout);
         TextView optionLabelCurrent = contentView.findViewById(R.id.option_label_current);
-//      optionGallery
-        TextView optionGallery = contentView.findViewById(R.id.gallery_option);
 //      counterSave
         TextView optionDownload = contentView.findViewById(R.id.download_option);
         LinearLayout optionOffline = contentView.findViewById(R.id.option_offline_layout);
@@ -177,7 +175,6 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
 
         optionEdit.setOnClickListener(this);
         optionLabel.setOnClickListener(this);
-        optionGallery.setOnClickListener(this);
         optionFavourite.setOnClickListener(this);
         optionDownload.setOnClickListener(this);
         optionOffline.setOnClickListener(this);
@@ -333,13 +330,6 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
                 optionLabel.setVisibility(View.VISIBLE);
                 optionFavourite.setVisibility(View.VISIBLE);
 
-                MimeTypeList nodeMime = MimeTypeList.typeForName(node.getName());
-                if (!isAndroid11OrUpper() && (nodeMime.isImage() || nodeMime.isVideo())) {
-                    optionGallery.setVisibility(View.VISIBLE);
-                } else {
-                    optionGallery.setVisibility(View.GONE);
-                }
-
                 // Check if sub folder of "My Backup"
                 ArrayList<Long> handleList = new ArrayList<>();
                 handleList.add(node.getHandle());
@@ -425,7 +415,6 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
                 optionOpenFolder.setVisibility(View.GONE);
                 counterSave--;
                 optionDownload.setVisibility(View.GONE);
-                optionGallery.setVisibility(View.GONE);
                 counterSave--;
                 optionOffline.setVisibility(View.GONE);
                 counterShares--;
@@ -757,7 +746,6 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
                     optionOpenFolder.setVisibility(View.GONE);
                     counterSave--;
                     optionDownload.setVisibility(View.GONE);
-                    optionGallery.setVisibility(View.GONE);
                     counterSave--;
                     optionOffline.setVisibility(View.GONE);
                     counterShares--;
@@ -1062,10 +1050,6 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
 
             case R.id.option_label_layout:
                 ((ManagerActivityLollipop) requireActivity()).showNodeLabelsPanel(node);
-                break;
-
-            case R.id.gallery_option:
-                ((ManagerActivityLollipop) requireActivity()).saveNodesToGallery(Collections.singletonList(node));
                 break;
 
             case R.id.file_properties_switch:

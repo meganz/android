@@ -42,7 +42,6 @@ import mega.privacy.android.app.utils.MegaNodeDialogUtil.showRenameNodeDialog
 import mega.privacy.android.app.utils.MegaNodeUtil
 import mega.privacy.android.app.utils.NetworkUtil.isOnline
 import mega.privacy.android.app.utils.OfflineUtils
-import mega.privacy.android.app.utils.SdkRestrictionUtils.isSaveToGalleryCompatible
 import mega.privacy.android.app.utils.StringResourcesUtils
 import mega.privacy.android.app.utils.ViewUtils.waitForLayout
 import nz.mega.documentscanner.utils.IntentUtils.extra
@@ -443,9 +442,6 @@ class ImageViewerActivity : BaseActivity(), PermissionRequester, SnackbarShower 
                 findItem(R.id.action_download)?.isVisible =
                     !item.isFromRubbishBin && item.handle > INVALID_HANDLE
 
-                findItem(R.id.action_save_gallery)?.isVisible =
-                    isSaveToGalleryCompatible() && !item.isExternalNode && !item.isFromRubbishBin && item.node != null
-
                 findItem(R.id.action_get_link)?.isVisible =
                     isOnline && item.hasOwnerAccess && !item.isFromRubbishBin && !item.isExternalNode
 
@@ -518,12 +514,8 @@ class ImageViewerActivity : BaseActivity(), PermissionRequester, SnackbarShower 
                 if (nodeItem.isAvailableOffline) {
                     saveOfflineNode(nodeItem.handle)
                 } else if (nodeItem.node != null) {
-                    saveNode(nodeItem.node, false)
+                    saveNode(nodeItem.node)
                 }
-                true
-            }
-            R.id.action_save_gallery -> {
-                nodeItem.node?.let { saveNode(it, true) }
                 true
             }
             R.id.action_get_link -> {
@@ -544,14 +536,13 @@ class ImageViewerActivity : BaseActivity(), PermissionRequester, SnackbarShower 
         }
     }
 
-    fun saveNode(node: MegaNode, downloadToGallery: Boolean) {
+    fun saveNode(node: MegaNode) {
         nodeSaver?.saveNode(
             node,
             highPriority = false,
             isFolderLink = node.isForeign,
             fromMediaViewer = true,
-            needSerialize = true,
-            downloadToGallery = downloadToGallery
+            needSerialize = true
         )
     }
 

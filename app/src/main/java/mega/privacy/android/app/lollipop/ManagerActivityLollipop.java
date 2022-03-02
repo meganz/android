@@ -7437,17 +7437,8 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
      * @param node Node to be downloaded.
      */
     public Unit saveNodeByTap(MegaNode node) {
-        nodeSaver.saveNodes(Collections.singletonList(node), true, false, false, false, false, true);
+        nodeSaver.saveNodes(Collections.singletonList(node), true, false, false, false, true);
         return null;
-    }
-
-    /**
-     * Save nodes to gallery.
-     *
-     * @param nodes nodes to save
-     */
-    public void saveNodesToGallery(List<MegaNode> nodes) {
-        nodeSaver.saveNodes(nodes, false, false, false, true, true);
     }
 
     /**
