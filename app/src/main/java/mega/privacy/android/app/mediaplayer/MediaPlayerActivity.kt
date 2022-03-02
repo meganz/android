@@ -877,6 +877,7 @@ abstract class MediaPlayerActivity : PasscodeActivity(), SnackbarShower, Activit
             ViewCompat.setOnApplyWindowInsetsListener(binding.rootLayout) { _, windowInsets ->
                 val insets = windowInsets.getInsets(WindowInsetsCompat.Type.systemBars())
                 binding.toolbar.updatePadding(0, if (isVideoPlayerMainView) insets.top else 0, 0, 0)
+                binding.rootLayout.updatePadding(0, 0, 0, if (isVideoPlayerMainView) insets.bottom else 0)
                 WindowInsetsCompat.CONSUMED
             }
         }
