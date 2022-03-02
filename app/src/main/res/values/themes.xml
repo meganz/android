@@ -133,7 +133,7 @@
         <item name="android:windowLayoutInDisplayCutoutMode" tools:targetApi="o_mr1">shortEdges</item>
     </style>
 
-    <style name="Theme.Mega.FullScreen.ImageViewer">
+    <style name="Theme.Mega.FullScreen.Viewer">
         <item name="android:statusBarColor">@android:color/transparent</item>
         <item name="android:navigationBarColor">@android:color/transparent</item>
         <item name="android:windowLightStatusBar" tools:targetApi="m">@bool/isLightTheme</item>

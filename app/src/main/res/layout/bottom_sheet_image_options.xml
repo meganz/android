@@ -163,12 +163,6 @@
                 android:text="@string/general_save_to_device"
                 app:drawableStartCompat="@drawable/ic_save_to_device" />
 
-            <TextView
-                android:id="@+id/option_gallery"
-                style="@style/BottomSheetOption"
-                android:text="@string/general_save_to_gallery"
-                app:drawableStartCompat="@drawable/ic_save_gallery" />
-
             <LinearLayout
                 android:id="@+id/option_offline_layout"
                 android:layout_width="match_parent"

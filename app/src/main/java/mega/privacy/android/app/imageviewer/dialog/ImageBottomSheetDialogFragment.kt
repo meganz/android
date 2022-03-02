@@ -246,15 +246,8 @@ class ImageBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
                 if (nodeItem.isAvailableOffline) {
                     (activity as? ImageViewerActivity?)?.saveOfflineNode(nodeItem.handle)
                 } else if (node != null) {
-                    (activity as? ImageViewerActivity?)?.saveNode(node, false)
+                    (activity as? ImageViewerActivity?)?.saveNode(node)
                 }
-                dismissAllowingStateLoss()
-            }
-
-            // Save to Gallery
-            optionGallery.isVisible = imageItem.shouldShowSaveToGalleryOption()
-            optionGallery.setOnClickListener {
-                (activity as? ImageViewerActivity?)?.saveNode(node!!, false)
                 dismissAllowingStateLoss()
             }
 

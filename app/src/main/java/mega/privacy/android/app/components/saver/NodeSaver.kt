@@ -125,7 +125,6 @@ class NodeSaver(
      * @param isFolderLink whether this download is a folder link
      * @param fromMediaViewer whether this download is from media viewer
      * @param needSerialize whether this download need serialize
-     * @param downloadToGallery whether nodes should be downloaded into gallery
      */
     @JvmOverloads
     fun saveHandle(
@@ -133,16 +132,14 @@ class NodeSaver(
         highPriority: Boolean = false,
         isFolderLink: Boolean = false,
         fromMediaViewer: Boolean = false,
-        needSerialize: Boolean = false,
-        downloadToGallery: Boolean = false
+        needSerialize: Boolean = false
     ) {
         saveHandles(
             listOf(handle),
             highPriority,
             isFolderLink,
             fromMediaViewer,
-            needSerialize,
-            downloadToGallery
+            needSerialize
         )
     }
 
@@ -155,7 +152,6 @@ class NodeSaver(
      * @param isFolderLink whether this download is a folder link
      * @param fromMediaViewer whether this download is from media viewer
      * @param needSerialize whether this download need serialize
-     * @param downloadToGallery whether this download to gallery or not
      */
     @JvmOverloads
     fun saveHandles(
@@ -163,8 +159,7 @@ class NodeSaver(
         highPriority: Boolean = false,
         isFolderLink: Boolean = false,
         fromMediaViewer: Boolean = false,
-        needSerialize: Boolean = false,
-        downloadToGallery: Boolean = false
+        needSerialize: Boolean = false
     ) {
         save {
             val nodes = ArrayList<MegaNode>()
@@ -183,8 +178,7 @@ class NodeSaver(
                 isFolderLink = isFolderLink,
                 nodes = nodes,
                 fromMediaViewer = fromMediaViewer,
-                needSerialize = needSerialize,
-                downloadToGallery = downloadToGallery
+                needSerialize = needSerialize
             )
         }
     }
@@ -197,7 +191,6 @@ class NodeSaver(
      * @param isFolderLink whether this download is a folder link
      * @param fromMediaViewer whether this download is from media viewer
      * @param needSerialize whether this download need serialize
-     * @param downloadToGallery whether this download to gallery or not
      */
     @JvmOverloads
     fun saveNode(
@@ -205,10 +198,9 @@ class NodeSaver(
         highPriority: Boolean = false,
         isFolderLink: Boolean = false,
         fromMediaViewer: Boolean = false,
-        needSerialize: Boolean = false,
-        downloadToGallery: Boolean = false
+        needSerialize: Boolean = false
     ) {
-        saveNodes(listOf(node), highPriority, isFolderLink, fromMediaViewer, needSerialize, downloadToGallery)
+        saveNodes(listOf(node), highPriority, isFolderLink, fromMediaViewer, needSerialize)
     }
 
     /**
@@ -219,7 +211,6 @@ class NodeSaver(
      * @param isFolderLink whether this download is a folder link
      * @param fromMediaViewer whether this download is from media viewer
      * @param needSerialize whether this download need serialize
-     * @param downloadToGallery whether nodes should be downloaded into gallery
      */
     @JvmOverloads
     fun saveNodeLists(
@@ -227,8 +218,7 @@ class NodeSaver(
         highPriority: Boolean = false,
         isFolderLink: Boolean = false,
         fromMediaViewer: Boolean = false,
-        needSerialize: Boolean = false,
-        downloadToGallery: Boolean = false
+        needSerialize: Boolean = false
     ) {
         save {
             val nodes = ArrayList<MegaNode>()
@@ -241,7 +231,7 @@ class NodeSaver(
 
             MegaNodeSaving(
                 nodesTotalSize(nodes), highPriority, isFolderLink, nodes, fromMediaViewer,
-                needSerialize, downloadToGallery = downloadToGallery
+                needSerialize
             )
         }
     }
@@ -254,7 +244,6 @@ class NodeSaver(
      * @param isFolderLink whether this download is a folder link
      * @param fromMediaViewer whether this download is from media viewer
      * @param needSerialize whether this download need serialize
-     * @param downloadToGallery whether this download is download to gallery
      * @param downloadByTap whether this download is triggered by tap
      */
     @JvmOverloads
@@ -264,13 +253,12 @@ class NodeSaver(
         isFolderLink: Boolean = false,
         fromMediaViewer: Boolean = false,
         needSerialize: Boolean = false,
-        downloadToGallery: Boolean = false,
         downloadByTap: Boolean = false
     ) {
         save {
             MegaNodeSaving(
                 nodesTotalSize(nodes), highPriority, isFolderLink, nodes, fromMediaViewer,
-                needSerialize,  downloadToGallery = downloadToGallery, downloadByTap = downloadByTap
+                needSerialize, downloadByTap = downloadByTap
             )
         }
     }
@@ -534,13 +522,10 @@ class NodeSaver(
     }
 
     private fun doSave() {
-        if (!saving.downloadToGallery() && Util.askMe()) {
+        if (Util.askMe()) {
             requestLocalFolder(null, activityLauncher)
         } else {
-            checkSizeBeforeDownload(
-                if (saving.downloadToGallery()) getCameraFolder().absolutePath
-                else getDownloadLocation()
-            )
+            checkSizeBeforeDownload(getDownloadLocation())
         }
     }
 

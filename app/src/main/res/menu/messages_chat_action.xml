@@ -35,14 +35,6 @@
         app:showAsAction="always" />
 
     <item
-        android:id="@+id/chat_cab_menu_download_gallery"
-        android:title="@string/general_save_to_gallery"
-        android:orderInCategory="105"
-        android:icon="@drawable/ic_save_gallery"
-        app:iconTint="?attr/colorSecondary"
-        app:showAsAction="always" />
-
-    <item
         android:id="@+id/chat_cab_menu_invite"
         android:title="@string/contact_invite"
         android:orderInCategory="105"

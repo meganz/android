@@ -1,5 +1,6 @@
 package mega.privacy.android.app.modalbottomsheet;
 
+import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
@@ -33,6 +34,7 @@ import mega.privacy.android.app.lollipop.DrawerItem;
 import mega.privacy.android.app.lollipop.FileContactListActivityLollipop;
 import mega.privacy.android.app.lollipop.FileInfoActivityLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
+import mega.privacy.android.app.lollipop.VersionsFileActivity;
 import mega.privacy.android.app.lollipop.controllers.NodeController;
 import mega.privacy.android.app.utils.MegaNodeUtil;
 import mega.privacy.android.app.utils.StringResourcesUtils;
@@ -150,8 +152,6 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
 //      optionLabel
         LinearLayout optionLabel = contentView.findViewById(R.id.option_label_layout);
         TextView optionLabelCurrent = contentView.findViewById(R.id.option_label_current);
-//      optionGallery
-        TextView optionGallery = contentView.findViewById(R.id.gallery_option);
 //      counterSave
         TextView optionDownload = contentView.findViewById(R.id.download_option);
         LinearLayout optionOffline = contentView.findViewById(R.id.option_offline_layout);
@@ -182,7 +182,6 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
 
         optionEdit.setOnClickListener(this);
         optionLabel.setOnClickListener(this);
-        optionGallery.setOnClickListener(this);
         optionFavourite.setOnClickListener(this);
         optionDownload.setOnClickListener(this);
         optionOffline.setOnClickListener(this);
@@ -205,6 +204,7 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
         optionMoveBackup.setOnClickListener(this);
         optionCopyBackup.setOnClickListener(this);
         optionRubbishBinBackup.setOnClickListener(this);
+        optionVersionsLayout.setOnClickListener(this);
 
         TextView viewInFolder = contentView.findViewById(R.id.view_in_folder_option);
         if (mMode == MODE6) {
@@ -216,7 +216,7 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
         }
 
         int counterOpen = 2;
-        int counterSave = 3;
+        int counterSave = 2;
         int counterShares = 6;
         int counterModify = 4;
 
@@ -306,18 +306,8 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
                 counterSave--;
                 optionOffline.setVisibility(View.GONE);
             }
-            counterSave--;
-            optionGallery.setVisibility(View.GONE);
         } else {
             offlineSwitch.setChecked(availableOffline(requireContext(), node));
-
-            MimeTypeList nodeMime = MimeTypeList.typeForName(node.getName());
-            if (!isAndroid11OrUpper() && (nodeMime.isImage() || nodeMime.isVideo())) {
-                optionGallery.setVisibility(View.VISIBLE);
-            } else {
-                counterSave--;
-                optionGallery.setVisibility(View.GONE);
-            }
         }
 
         optionLabel.setVisibility(isTakenDown ? View.GONE : View.VISIBLE);
@@ -446,6 +436,7 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
                 }
                 optionLeaveShares.setVisibility(View.GONE);
                 optionRubbishBin.setVisibility(View.GONE);
+
                 if (ViewUtils.isVisible(optionShare)) {
                     counterShares--;
                     optionShare.setVisibility(View.GONE);
@@ -467,10 +458,6 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
                 if (ViewUtils.isVisible(optionDownload)) {
                     counterSave--;
                     optionDownload.setVisibility(View.GONE);
-                }
-                if (ViewUtils.isVisible(optionGallery)) {
-                    counterSave--;
-                    optionGallery.setVisibility(View.GONE);
                 }
                 if (ViewUtils.isVisible(optionOffline)) {
                     counterSave--;
@@ -698,6 +685,7 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
         }
     }
 
+    @SuppressLint("NonConstantResourceId")
     @Override
     public void onClick(View v) {
         if (node == null) {
@@ -723,10 +711,6 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
 
             case R.id.option_label_layout:
                 ((ManagerActivityLollipop) requireActivity()).showNodeLabelsPanel(node);
-                break;
-
-            case R.id.gallery_option:
-                ((ManagerActivityLollipop) requireActivity()).saveNodesToGallery(Collections.singletonList(node));
                 break;
 
             case R.id.file_properties_switch:
@@ -862,6 +846,11 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
             case R.id.edit_file_option:
                 manageEditTextFileIntent(requireContext(), node, getAdapterType());
                 break;
+            case R.id.option_versions_layout:
+                Intent version = new Intent(getActivity(), VersionsFileActivity.class);
+                version.putExtra("handle", node.getHandle());
+                requireActivity().startActivityForResult(version, REQUEST_CODE_DELETE_VERSIONS_HISTORY);
+                break;
         }
 
         setStateBottomSheetBehaviorHidden();
@@ -939,7 +928,7 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
     }
 
     @Override
-    public void onSaveInstanceState(Bundle outState) {
+    public void onSaveInstanceState(@NonNull Bundle outState) {
         super.onSaveInstanceState(outState);
         long handle = node.getHandle();
         outState.putLong(HANDLE, handle);

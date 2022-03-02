@@ -1,7 +1,6 @@
 package mega.privacy.android.app.imageviewer.util
 
 import mega.privacy.android.app.imageviewer.data.ImageItem
-import mega.privacy.android.app.utils.SdkRestrictionUtils.isSaveToGalleryCompatible
 import nz.mega.sdk.MegaApiJava
 
 fun ImageItem.shouldShowInfoOption(isUserLoggedIn: Boolean): Boolean =
@@ -26,10 +25,6 @@ fun ImageItem.shouldShowForwardOption(): Boolean =
 
 fun ImageItem.shouldShowDownloadOption(): Boolean =
     nodeItem?.node?.isTakenDown != true && nodeItem?.isFromRubbishBin != true
-
-fun ImageItem.shouldShowSaveToGalleryOption(): Boolean =
-    isSaveToGalleryCompatible() && nodeItem?.node != null && !nodeItem.node.isTakenDown
-            && !nodeItem.isFromRubbishBin && !nodeItem.isExternalNode
 
 fun ImageItem.shouldShowOfflineOption(): Boolean =
     !isOffline && nodeItem?.node?.isTakenDown != true && nodeItem?.isFromRubbishBin != true

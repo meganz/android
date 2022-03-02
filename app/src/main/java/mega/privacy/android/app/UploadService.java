@@ -411,7 +411,7 @@ public class UploadService extends Service implements MegaTransferListenerInterf
             mBuilderCompatO
                     .setSmallIcon(R.drawable.ic_stat_notify)
                     .setColor(ContextCompat.getColor(MegaApplication.getInstance(), R.color.red_600_red_300))
-                    .setContentIntent(PendingIntent.getActivity(getApplicationContext(),0,intent,PendingIntent.FLAG_UPDATE_CURRENT))
+                    .setContentIntent(PendingIntent.getActivity(getApplicationContext(),0,intent,PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE))
                     .setAutoCancel(true).setTicker(notificationTitle)
                     .setContentTitle(notificationTitle).setContentText(size)
                     .setOngoing(false);
@@ -421,7 +421,7 @@ public class UploadService extends Service implements MegaTransferListenerInterf
             mBuilderCompat
                     .setSmallIcon(R.drawable.ic_stat_notify)
                     .setColor(ContextCompat.getColor(MegaApplication.getInstance(), R.color.red_600_red_300))
-                    .setContentIntent(PendingIntent.getActivity(getApplicationContext(),0,intent,PendingIntent.FLAG_UPDATE_CURRENT))
+                    .setContentIntent(PendingIntent.getActivity(getApplicationContext(),0,intent,PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE))
                     .setAutoCancel(true).setTicker(notificationTitle)
                     .setContentTitle(notificationTitle).setContentText(size)
                     .setOngoing(false);
@@ -500,7 +500,7 @@ public class UploadService extends Service implements MegaTransferListenerInterf
         }
 
         intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
-        PendingIntent pendingIntent = PendingIntent.getActivity(UploadService.this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+        PendingIntent pendingIntent = PendingIntent.getActivity(UploadService.this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
         Notification notification;
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
@@ -520,29 +520,16 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 
             notification = mBuilderCompat.build();
         }
-        else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            mBuilder
-                    .setSmallIcon(R.drawable.ic_stat_notify)
-                    .setColor(ContextCompat.getColor(this, R.color.red_600_red_300))
-                    .setProgress(100, progressPercent, false)
-                    .setContentIntent(pendingIntent)
-                    .setOngoing(true).setContentTitle(message).setSubText(info)
-                    .setContentText(actionString)
-                    .setOnlyAlertOnce(true);
-            notification = mBuilder.build();
-        }
         else {
             mBuilder
                     .setSmallIcon(R.drawable.ic_stat_notify)
+                    .setColor(ContextCompat.getColor(this,R.color.red_600_red_300))
                     .setProgress(100, progressPercent, false)
                     .setContentIntent(pendingIntent)
                     .setOngoing(true).setContentTitle(message).setContentInfo(info)
                     .setContentText(actionString)
                     .setOnlyAlertOnce(true);
 
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP){
-                mBuilder.setColor(ContextCompat.getColor(this,R.color.red_600_red_300));
-            }
             notification = mBuilder.build();
         }
 
@@ -1017,7 +1004,7 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 
 			mBuilderCompatO
 					.setSmallIcon(R.drawable.ic_stat_notify)
-					.setContentIntent(PendingIntent.getActivity(getApplicationContext(), 0, intent, PendingIntent.FLAG_UPDATE_CURRENT))
+					.setContentIntent(PendingIntent.getActivity(getApplicationContext(), 0, intent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE))
 					.setAutoCancel(true).setTicker(contentText)
 					.setContentTitle(message).setContentText(contentText)
 					.setOngoing(false);
@@ -1027,7 +1014,7 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 		else {
 			mBuilderCompat
 					.setSmallIcon(R.drawable.ic_stat_notify)
-					.setContentIntent(PendingIntent.getActivity(getApplicationContext(), 0, intent, PendingIntent.FLAG_UPDATE_CURRENT))
+					.setContentIntent(PendingIntent.getActivity(getApplicationContext(), 0, intent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE))
 					.setAutoCancel(true).setTicker(contentText)
 					.setContentTitle(message).setContentText(contentText)
 					.setOngoing(false);

@@ -2,6 +2,7 @@ package mega.privacy.android.app.components.transferWidget;
 
 import static android.view.View.GONE;
 import static android.view.View.VISIBLE;
+import static mega.privacy.android.app.components.transferWidget.TransfersManagement.isStorageOverQuota;
 import static mega.privacy.android.app.components.transferWidget.TransfersManagement.isOnTransferOverQuota;
 import static mega.privacy.android.app.utils.MegaTransferUtils.getNumPendingDownloadsNonBackground;
 import static nz.mega.sdk.MegaTransfer.TYPE_DOWNLOAD;
@@ -126,7 +127,7 @@ public class TransferWidget {
     public void updateState() {
         if (MegaApplication.getTransfersManagement().areTransfersPaused()) {
             setPausedTransfers();
-        } else if (isOnTransferOverQuota() && megaApi.getNumPendingUploads() <= 0){
+        } else if (isOverQuota()){
             setOverQuotaTransfers();
         } else {
             setProgressTransfers();
@@ -140,7 +141,7 @@ public class TransferWidget {
     private void setProgressTransfers() {
         if (MegaApplication.getTransfersManagement().thereAreFailedTransfers()) {
             updateStatus(getDrawable(R.drawable.ic_transfers_error));
-        } else if (isOnTransferOverQuota()) {
+        } else if (isOverQuota()) {
             updateStatus(getDrawable(R.drawable.ic_transfers_overquota));
         } else if (status.getVisibility() != GONE){
             status.setVisibility(GONE);
@@ -150,10 +151,23 @@ public class TransferWidget {
     }
 
     /**
+     * Checks if should show transfer or storage over quota state.
+     *
+     * @return True if should show over quota state, false otherwise.
+     */
+    private boolean isOverQuota() {
+        boolean isTransferOverQuota = isOnTransferOverQuota();
+        boolean isStorageOverQuota = isStorageOverQuota();
+
+        return (isTransferOverQuota && (megaApi.getNumPendingUploads() <= 0 || isStorageOverQuota))
+                || (isStorageOverQuota && (megaApi.getNumPendingDownloads() <= 0));
+    }
+
+    /**
      * Sets the state of the widget as paused.
      */
     private void setPausedTransfers() {
-        if (isOnTransferOverQuota()) return;
+        if (isOverQuota()) return;
 
         progressBar.setProgressDrawable(getDrawable(R.drawable.thin_circular_progress_bar));
         updateStatus(getDrawable(R.drawable.ic_transfers_paused));
@@ -171,7 +185,7 @@ public class TransferWidget {
      * Sets the state of the widget as failed.
      */
     private void setFailedTransfers() {
-        if (isOnTransferOverQuota()) return;
+        if (isOverQuota()) return;
 
         if (transfersWidget.getVisibility() != VISIBLE) {
             transfersWidget.setVisibility(VISIBLE);

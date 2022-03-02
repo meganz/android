@@ -433,7 +433,6 @@ class ImageViewerActivity : BaseActivity(), PermissionRequester, SnackbarShower 
                 findItem(R.id.action_forward)?.isVisible = imageItem.shouldShowForwardOption()
                 findItem(R.id.action_share)?.isVisible = imageItem.isFromChat() && imageItem.shouldShowShareOption()
                 findItem(R.id.action_download)?.isVisible = imageItem.shouldShowDownloadOption()
-                findItem(R.id.action_save_gallery)?.isVisible = imageItem.shouldShowSaveToGalleryOption()
                 findItem(R.id.action_get_link)?.isVisible = imageItem.shouldShowManageLinkOption()
                 findItem(R.id.action_send_to_chat)?.isVisible = imageItem.shouldShowSendToContactOption(viewModel.isUserLoggedIn())
                 findItem(R.id.action_more)?.isVisible = imageItem.nodeItem.handle != INVALID_HANDLE
@@ -501,12 +500,8 @@ class ImageViewerActivity : BaseActivity(), PermissionRequester, SnackbarShower 
                 if (nodeItem.isAvailableOffline) {
                     saveOfflineNode(nodeItem.handle)
                 } else if (nodeItem.node != null) {
-                    saveNode(nodeItem.node, false)
+                    saveNode(nodeItem.node)
                 }
-                true
-            }
-            R.id.action_save_gallery -> {
-                nodeItem.node?.let { saveNode(it, true) }
                 true
             }
             R.id.action_get_link -> {
@@ -527,14 +522,13 @@ class ImageViewerActivity : BaseActivity(), PermissionRequester, SnackbarShower 
         }
     }
 
-    fun saveNode(node: MegaNode, downloadToGallery: Boolean) {
+    fun saveNode(node: MegaNode) {
         nodeSaver?.saveNode(
             node,
             highPriority = false,
             isFolderLink = node.isForeign,
             fromMediaViewer = true,
-            needSerialize = true,
-            downloadToGallery = downloadToGallery
+            needSerialize = true
         )
     }
 
