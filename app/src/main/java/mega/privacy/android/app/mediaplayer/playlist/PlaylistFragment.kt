@@ -131,7 +131,6 @@ class PlaylistFragment : Fragment(), PlaylistItemOperation, DragStartListener {
             adapter = PlaylistAdapter(
                 it,
                 this,
-                (requireActivity() as MediaPlayerActivity).isAudioPlayer(),
                 dragStartListener = this
             )
         }
@@ -151,23 +150,10 @@ class PlaylistFragment : Fragment(), PlaylistItemOperation, DragStartListener {
                 }
             })
 
-            if (!isAudioPlayer) {
-                setBackgroundResource(R.color.grey_800)
-            }
-
             requireContext().run {
-                // Add the different divider for different area of audio and video playlist
                 itemDecoration = PlaylistItemDecoration(
-                    if (isAudioPlayer) {
-                        getDrawable(R.drawable.playlist_divider_layer)
-                    } else {
-                        getDrawable(R.drawable.playlist_divider_layer_video)
-                    },
-                    if (isAudioPlayer) {
-                        getDrawable(R.drawable.playlist_divider_layer_next)
-                    } else {
-                        getDrawable(R.drawable.playlist_divider_layer_next_video)
-                    },
+                    getDrawable(R.drawable.playlist_divider_layer),
+                    getDrawable(R.drawable.playlist_divider_layer_next),
                     this@PlaylistFragment.adapter
                 )
             }

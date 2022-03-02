@@ -3,6 +3,7 @@ package mega.privacy.android.app.notifications;
 
 import android.app.IntentService;
 import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.content.Intent;
 
 import androidx.annotation.Nullable;

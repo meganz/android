@@ -131,7 +131,7 @@ public class TransferWidget {
     public void updateState() {
         if (transfersManagement.areTransfersPaused()) {
             setPausedTransfers();
-        } else if (transfersManagement.isOnTransferOverQuota() && megaApi.getNumPendingUploads() <= 0){
+        } else if (isOverQuota()){
             setOverQuotaTransfers();
         } else {
             setProgressTransfers();
@@ -145,7 +145,7 @@ public class TransferWidget {
     private void setProgressTransfers() {
         if (transfersManagement.thereAreFailedTransfers()) {
             updateStatus(getDrawable(R.drawable.ic_transfers_error));
-        } else if (transfersManagement.isOnTransferOverQuota()) {
+        } else if (isOverQuota()) {
             updateStatus(getDrawable(R.drawable.ic_transfers_overquota));
         } else if (status.getVisibility() != GONE){
             status.setVisibility(GONE);
@@ -155,10 +155,23 @@ public class TransferWidget {
     }
 
     /**
+     * Checks if should show transfer or storage over quota state.
+     *
+     * @return True if should show over quota state, false otherwise.
+     */
+    private boolean isOverQuota() {
+        boolean isTransferOverQuota = transfersManagement.isOnTransferOverQuota();
+        boolean isStorageOverQuota = transfersManagement.isStorageOverQuota();
+
+        return (isTransferOverQuota && (megaApi.getNumPendingUploads() <= 0 || isStorageOverQuota))
+                || (isStorageOverQuota && (megaApi.getNumPendingDownloads() <= 0));
+    }
+
+    /**
      * Sets the state of the widget as paused.
      */
     private void setPausedTransfers() {
-        if (transfersManagement.isOnTransferOverQuota()) return;
+        if (isOverQuota()) return;
 
         progressBar.setProgressDrawable(getDrawable(R.drawable.thin_circular_progress_bar));
         updateStatus(getDrawable(R.drawable.ic_transfers_paused));
@@ -176,7 +189,7 @@ public class TransferWidget {
      * Sets the state of the widget as failed.
      */
     private void setFailedTransfers() {
-        if (transfersManagement.isOnTransferOverQuota()) return;
+        if (isOverQuota()) return;
 
         if (transfersWidget.getVisibility() != VISIBLE) {
             transfersWidget.setVisibility(VISIBLE);

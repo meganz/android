@@ -57,6 +57,7 @@ public class PermissionsFragment extends Fragment implements View.OnClickListene
     private boolean readGranted;
     private boolean cameraGranted;
     private boolean microphoneGranted;
+    private boolean bluetoothConnectGranted;
     private boolean contactsGranted;
 
     private int[] mImages;
@@ -129,6 +130,9 @@ public class PermissionsFragment extends Fragment implements View.OnClickListene
             writeGranted = hasPermissions(this.getActivity(), Manifest.permission.WRITE_EXTERNAL_STORAGE);
             cameraGranted = hasPermissions(this.getActivity(), Manifest.permission.CAMERA);
             microphoneGranted = hasPermissions(this.getActivity(), Manifest.permission.RECORD_AUDIO);
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                bluetoothConnectGranted = hasPermissions(this.getActivity(), Manifest.permission.BLUETOOTH_CONNECT);
+            }
             contactsGranted = hasPermissions(this.getActivity(), Manifest.permission.READ_CONTACTS);
 
             if (!readGranted || !writeGranted) {
@@ -211,7 +215,7 @@ public class PermissionsFragment extends Fragment implements View.OnClickListene
         titleDisplay.setText(mTitles[permission]);
         subtitleDisplay.setText(mSubtitles[permission]);
         // access contacts
-        if(permission == 3) {
+        if(permission == 4) {
             explanationDisplay.setVisibility(View.VISIBLE);
         } else {
             explanationDisplay.setVisibility(View.GONE);
@@ -233,7 +237,6 @@ public class PermissionsFragment extends Fragment implements View.OnClickListene
                 askForCallsPermissions();
                 break;
             }
-
             case CONTACTS: {
                 askForContactsPermissions();
                 break;
@@ -268,11 +271,31 @@ public class PermissionsFragment extends Fragment implements View.OnClickListene
     }
 
     void askForCallsPermissions() {
-        if (!microphoneGranted) {
-            logDebug("RECORD_AUDIO");
-            requestPermission((ManagerActivityLollipop) context,
-                    PERMISSIONS_FRAGMENT,
-                    Manifest.permission.RECORD_AUDIO);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            if (!microphoneGranted && !bluetoothConnectGranted) {
+                logDebug("RECORD_AUDIO && BLUETOOTH_CONNECT");
+                requestPermission((ManagerActivityLollipop) context,
+                        PERMISSIONS_FRAGMENT,
+                        Manifest.permission.RECORD_AUDIO,
+                        Manifest.permission.BLUETOOTH_CONNECT);
+            } else if(!microphoneGranted) {
+                logDebug("RECORD_AUDIO");
+                requestPermission((ManagerActivityLollipop) context,
+                        PERMISSIONS_FRAGMENT,
+                        Manifest.permission.RECORD_AUDIO);
+            } else if(!bluetoothConnectGranted) {
+                logDebug("BLUETOOTH_CONNECT");
+                requestPermission((ManagerActivityLollipop) context,
+                        PERMISSIONS_FRAGMENT,
+                        Manifest.permission.BLUETOOTH_CONNECT);
+            }
+        } else {
+            if (!microphoneGranted) {
+                logDebug("RECORD_AUDIO");
+                requestPermission((ManagerActivityLollipop) context,
+                        PERMISSIONS_FRAGMENT,
+                        Manifest.permission.RECORD_AUDIO);
+            }
         }
     }
 
@@ -295,11 +318,7 @@ public class PermissionsFragment extends Fragment implements View.OnClickListene
     }
 
     public boolean askingForMicrophoneAndWriteCallsLog() {
-        if (!microphoneGranted) {
-            return true;
-        } else {
-            return false;
-        }
+        return !microphoneGranted;
     }
 
     public int getCurrentPermission() {

@@ -1054,15 +1054,15 @@ public class CallUtil {
         intentMeeting.setAction(MEETING_ACTION_IN);
         intentMeeting.putExtra(MEETING_CHAT_ID, chatIdCallToAnswer);
         intentMeeting.putExtra(MEETING_IS_GUEST, isGuest);
-        return PendingIntent.getActivity(context, requestCode, intentMeeting, PendingIntent.FLAG_UPDATE_CURRENT);
+        return PendingIntent.getActivity(context, requestCode, intentMeeting, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
     }
 
     public static PendingIntent getPendingIntentMeetingRinging(Context context, long chatIdCallToAnswer, int requestCode) {
-        Intent intentMeeting = new Intent(context, MeetingActivity.class);
+        Intent intentMeeting = new Intent(context.getApplicationContext(), MeetingActivity.class);
         intentMeeting.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         intentMeeting.setAction(MEETING_ACTION_RINGING);
         intentMeeting.putExtra(MEETING_CHAT_ID, chatIdCallToAnswer);
-        return PendingIntent.getActivity(context, requestCode, intentMeeting, PendingIntent.FLAG_UPDATE_CURRENT);
+        return PendingIntent.getActivity(context, requestCode, intentMeeting, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
     }
 
     /**

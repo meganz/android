@@ -1,29 +1,37 @@
 package mega.privacy.android.app;
 
 import android.app.Activity;
+import android.app.ActivityManager;
 import android.app.Application;
+import android.app.ApplicationExitInfo;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
+import android.app.usage.UsageStatsManager;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.pm.ApplicationInfo;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.media.AudioManager;
 import android.media.RingtoneManager;
+import android.net.ConnectivityManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.PowerManager;
+import android.os.StrictMode;
 import android.text.Html;
 import android.text.Spanned;
+import android.util.Config;
 import android.util.Pair;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.annotation.RequiresApi;
 import androidx.core.app.NotificationCompat;
 import androidx.core.content.ContextCompat;
 import androidx.core.provider.FontRequest;
@@ -51,7 +59,10 @@ import mega.privacy.android.app.globalmanagement.TransfersManagement;
 import mega.privacy.android.app.listeners.GlobalChatListener;
 import org.webrtc.ContextUtils;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Locale;
 
 import dagger.hilt.android.HiltAndroidApp;
@@ -77,6 +88,7 @@ import mega.privacy.android.app.meeting.listeners.MeetingListener;
 import mega.privacy.android.app.middlelayer.reporter.CrashReporter;
 import mega.privacy.android.app.middlelayer.reporter.PerformanceReporter;
 import mega.privacy.android.app.objects.PasscodeManagement;
+import mega.privacy.android.app.protobuf.TombstoneProtos;
 import mega.privacy.android.app.receivers.NetworkStateReceiver;
 import mega.privacy.android.app.utils.CUBackupInitializeChecker;
 import mega.privacy.android.app.utils.CallUtil;
@@ -107,7 +119,8 @@ import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
 import nz.mega.sdk.MegaShare;
 import nz.mega.sdk.MegaUser;
-
+import static android.app.ApplicationExitInfo.REASON_CRASH_NATIVE;
+import static android.media.AudioManager.STREAM_RING;
 import static mega.privacy.android.app.constants.EventConstants.EVENT_FINISH_ACTIVITY;
 import static mega.privacy.android.app.constants.BroadcastConstants.ACTION_TYPE;
 import static mega.privacy.android.app.constants.EventConstants.EVENT_CALL_ANSWERED_IN_ANOTHER_CLIENT;
@@ -744,6 +757,11 @@ public class MegaApplication extends MultiDexApplication implements Application.
 		initLoggers();
 
 		checkAppUpgrade();
+		checkMegaStandbyBucket();
+		getTombstoneInfo();
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+			checkForUnsafeIntentLaunch();
+		}
 
 		setupMegaApi();
 		setupMegaApiFolder();
@@ -788,7 +806,7 @@ public class MegaApplication extends MultiDexApplication implements Application.
 
 		networkStateReceiver = new NetworkStateReceiver();
 		networkStateReceiver.addListener(this);
-		registerReceiver(networkStateReceiver, new IntentFilter(android.net.ConnectivityManager.CONNECTIVITY_ACTION));
+		registerReceiver(networkStateReceiver, new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION));
 
 		LiveEventBus.get(EVENT_CALL_STATUS_CHANGE, MegaChatCall.class).observeForever(callStatusObserver);
 		LiveEventBus.get(EVENT_RINGING_STATUS_CHANGE, MegaChatCall.class).observeForever(callRingingStatusObserver);
@@ -1181,7 +1199,7 @@ public class MegaApplication extends MultiDexApplication implements Application.
 			intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 			intent.setAction(ACTION_INCOMING_SHARED_FOLDER_NOTIFICATION);
 			PendingIntent pendingIntent = PendingIntent.getActivity(this, 0 /* Request code */, intent,
-					PendingIntent.FLAG_ONE_SHOT);
+					PendingIntent.FLAG_ONE_SHOT | PendingIntent.FLAG_IMMUTABLE);
 
 			Uri defaultSoundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
             String notificationTitle;
@@ -1663,6 +1681,73 @@ public class MegaApplication extends MultiDexApplication implements Application.
 			}
 		} catch (Exception e) {
 			logError("EXCEPTION when showing missed call notification", e);
+		}
+	}
+
+	/**
+	 * Get the current standby bucket of the app.
+	 * The system determines the standby state of the app based on app usage patterns.
+	 *
+	 * @return the current standby bucket of the app：
+	 * STANDBY_BUCKET_ACTIVE,
+	 * STANDBY_BUCKET_WORKING_SET,
+	 * STANDBY_BUCKET_FREQUENT,
+	 * STANDBY_BUCKET_RARE,
+	 * STANDBY_BUCKET_RESTRICTED,
+	 * STANDBY_BUCKET_NEVER
+	 */
+	public int checkMegaStandbyBucket(){
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+			UsageStatsManager usageStatsManager = (UsageStatsManager) getSystemService(USAGE_STATS_SERVICE);
+			if (usageStatsManager != null) {
+				int standbyBucket = usageStatsManager.getAppStandbyBucket();
+				logDebug("getAppStandbyBucket(): " +standbyBucket);
+				return standbyBucket;
+			}
+		}
+		return  -1;
+	}
+
+	/**
+	 * Get the tombstone information.
+	 */
+	public void getTombstoneInfo(){
+		new Thread(() -> {
+			logDebug("getTombstoneInfo");
+			ActivityManager activityManager = (ActivityManager)getSystemService(Context.ACTIVITY_SERVICE);
+			List<ApplicationExitInfo> exitReasons;
+			if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.R) {
+				exitReasons = activityManager.getHistoricalProcessExitReasons(/* packageName = */ null, /* pid = */ 0, /* maxNum = */ 3);
+				for (ApplicationExitInfo aei : exitReasons) {
+					if (aei.getReason() == REASON_CRASH_NATIVE) {
+						// Get the tombstone input stream.
+						try {
+							InputStream tombstoneInputStream = aei.getTraceInputStream();
+							if(tombstoneInputStream != null) {
+								// The tombstone parser built with protoc uses the tombstone schema, then parses the trace.
+								TombstoneProtos.Tombstone tombstone = TombstoneProtos.Tombstone.parseFrom(tombstoneInputStream);
+								logError("Tombstone Info" + tombstone.toString());
+								tombstoneInputStream.close();
+							}
+						} catch (IOException e) {
+							e.printStackTrace();
+						}
+					}
+				}
+			}
+		}).start();
+	}
+
+	@RequiresApi(api = Build.VERSION_CODES.S)
+	private void checkForUnsafeIntentLaunch() {
+		boolean isDebug = ((this.getApplicationInfo().flags &
+				ApplicationInfo.FLAG_DEBUGGABLE) != 0);
+		if (isDebug) {
+			StrictMode.setVmPolicy(new StrictMode.VmPolicy.Builder()
+					// Other StrictMode checks that you've previously added.
+					.detectUnsafeIntentLaunch()
+					.penaltyLog()
+					.build());
 		}
 	}
 

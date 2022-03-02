@@ -50,12 +50,12 @@ public class TransferOverQuotaNotification {
             intent.setAction(ACTION_LOG_IN);
         }
 
-        PendingIntent pendingIntent = PendingIntent.getService(app.getApplicationContext(), 0, intent, PendingIntent.FLAG_CANCEL_CURRENT);
-        PendingIntent dismissIntent = PendingIntent.getService(app.getApplicationContext(), 0, new Intent(app.getApplicationContext(), DownloadNotificationIntentService.class), PendingIntent.FLAG_CANCEL_CURRENT);
+        PendingIntent pendingIntent = PendingIntent.getService(app.getApplicationContext(), 0, intent, PendingIntent.FLAG_CANCEL_CURRENT | PendingIntent.FLAG_IMMUTABLE);
+        PendingIntent dismissIntent = PendingIntent.getService(app.getApplicationContext(), 0, new Intent(app.getApplicationContext(), DownloadNotificationIntentService.class), PendingIntent.FLAG_CANCEL_CURRENT | PendingIntent.FLAG_IMMUTABLE);
 
         Intent clickIntent = new Intent(app.getApplicationContext(), DownloadNotificationIntentService.class);
         clickIntent.setAction(ACTION_SHOW_TRANSFERS);
-        PendingIntent clickPendingIntent = PendingIntent.getService(app.getApplicationContext(), 0, clickIntent, PendingIntent.FLAG_CANCEL_CURRENT);
+        PendingIntent clickPendingIntent = PendingIntent.getService(app.getApplicationContext(), 0, clickIntent, PendingIntent.FLAG_CANCEL_CURRENT | PendingIntent.FLAG_IMMUTABLE);
 
         RemoteViews customView = new RemoteViews(app.getPackageName(), R.layout.notification_transfer_over_quota);
         customView.setTextViewText(R.id.content_text, app.getString(R.string.current_text_depleted_transfer_overquota, getHumanizedTime(megaApi.getBandwidthOverquotaDelay())));

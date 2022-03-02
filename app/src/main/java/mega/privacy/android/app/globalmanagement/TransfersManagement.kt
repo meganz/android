@@ -27,14 +27,14 @@ import mega.privacy.android.app.utils.SDCardUtils
 import mega.privacy.android.app.utils.StringResourcesUtils.getString
 import mega.privacy.android.app.utils.Util.isOnline
 import nz.mega.sdk.MegaApiAndroid
+import nz.mega.sdk.MegaApiJava.STORAGE_STATE_RED
 import nz.mega.sdk.MegaCancelToken
 import nz.mega.sdk.MegaNode
 import nz.mega.sdk.MegaTransfer
 import nz.mega.sdk.MegaTransfer.*
-import java.lang.Exception
-import java.util.ArrayList
 import javax.inject.Inject
 import javax.inject.Singleton
+
 
 @Singleton
 class TransfersManagement @Inject constructor(
@@ -286,6 +286,15 @@ class TransfersManagement @Inject constructor(
      * @return True if it is on transfer over quota, false otherwise.
      */
     fun isOnTransferOverQuota(): Boolean = megaApi.bandwidthOverquotaDelay > 0
+
+    /**
+     * Checks if it is on storage over quota.
+     *
+     * @return True if it is on storage over quota, false otherwise.
+     */
+    fun isStorageOverQuota(): Boolean =
+        MegaApplication.getInstance().storageState == STORAGE_STATE_RED
+
 
     /**
      * Sets if the widget has to be shown depending on if it is on transfer over quota

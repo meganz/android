@@ -112,7 +112,6 @@ public class GeneralChatMessageBottomSheet extends BaseBottomSheetDialogFragment
         LinearLayout infoFileSeparator = contentView.findViewById(R.id.info_file_separator);
         RelativeLayout optionImport = contentView.findViewById(R.id.option_import_layout);
         RelativeLayout optionDownload = contentView.findViewById(R.id.option_download_layout);
-        TextView optionGallery = contentView.findViewById(R.id.gallery_option);
         LinearLayout optionSaveOffline = contentView.findViewById(R.id.option_save_offline_layout);
         SwitchMaterial offlineSwitch = contentView.findViewById(R.id.file_properties_switch);
         LinearLayout deleteSeparator = contentView.findViewById(R.id.delete_separator);
@@ -131,7 +130,6 @@ public class GeneralChatMessageBottomSheet extends BaseBottomSheetDialogFragment
         optionInviteContact.setOnClickListener(this);
         optionImport.setOnClickListener(this);
         optionDownload.setOnClickListener(this);
-        optionGallery.setOnClickListener(this);
         optionSaveOffline.setOnClickListener(this);
         optionDelete.setOnClickListener(this);
 
@@ -171,7 +169,6 @@ public class GeneralChatMessageBottomSheet extends BaseBottomSheetDialogFragment
             infoFileSeparator.setVisibility(View.GONE);
             optionImport.setVisibility(View.GONE);
             optionDownload.setVisibility(View.GONE);
-            optionGallery.setVisibility(View.GONE);
             optionSaveOffline.setVisibility(View.GONE);
             deleteSeparator.setVisibility(View.GONE);
             optionDelete.setVisibility(View.GONE);
@@ -249,17 +246,6 @@ public class GeneralChatMessageBottomSheet extends BaseBottomSheetDialogFragment
             optionOpenWith.setVisibility(!isRemovedOrPendingMsg && typeMessage == MegaChatMessage.TYPE_NODE_ATTACHMENT ? View.VISIBLE : View.GONE);
 
             optionDownload.setVisibility(!isRemovedOrPendingMsg && typeMessage == MegaChatMessage.TYPE_NODE_ATTACHMENT ? View.VISIBLE : View.GONE);
-
-            if (!isAndroid11OrUpper() && node != null && node.isFile() && !isRemovedOrPendingMsg) {
-                MimeTypeList nodeMime = MimeTypeList.typeForName(node.getName());
-                if (nodeMime.isImage() || nodeMime.isVideo()) {
-                    optionGallery.setVisibility(View.VISIBLE);
-                } else {
-                    optionGallery.setVisibility(View.GONE);
-                }
-            } else {
-                optionGallery.setVisibility(View.GONE);
-            }
 
             optionImport.setVisibility(!isRemovedOrPendingMsg && typeMessage == MegaChatMessage.TYPE_NODE_ATTACHMENT && !chatC.isInAnonymousMode() ? View.VISIBLE : View.GONE);
             boolean shouldShowOfflineOption = typeMessage == MegaChatMessage.TYPE_NODE_ATTACHMENT && !chatC.isInAnonymousMode();
@@ -468,14 +454,6 @@ public class GeneralChatMessageBottomSheet extends BaseBottomSheetDialogFragment
                     return;
                 }
                 ((ChatActivityLollipop) requireActivity()).downloadNodeList(nodeList);
-                break;
-
-            case R.id.gallery_option:
-                if (node == null) {
-                    logWarning("The selected node is NULL");
-                    return;
-                }
-                ((ChatActivityLollipop) requireActivity()).saveNodesToGallery(Collections.singletonList(node));
                 break;
 
             case R.id.option_import_layout:

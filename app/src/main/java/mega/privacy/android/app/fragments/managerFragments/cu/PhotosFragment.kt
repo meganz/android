@@ -130,7 +130,7 @@ class PhotosFragment : BaseZoomFragment() {
             0
         }
 
-        isEnableCUFragmentShown() -> {
+        isEnablePhotosFragmentShown() -> {
             skipCUSetup()
             1
         }
@@ -224,7 +224,7 @@ class PhotosFragment : BaseZoomFragment() {
      * Refresh view and layout after CU enabled or disabled.
      */
     fun refreshViewLayout() {
-        if (isEnableCUFragmentShown()) {
+        if (isEnablePhotosFragmentShown()) {
             showEnablePage()
             createCameraUploadsViewForFirstLogin()
         } else {
@@ -355,7 +355,7 @@ class PhotosFragment : BaseZoomFragment() {
     private fun subscribeObservers() {
         viewModel.items.observe(viewLifecycleOwner) {
             // On enable CU page, don't update layout and view.
-            if (isEnableCUFragmentShown() || !mManagerActivity.isInPhotosPage) return@observe
+            if (isEnablePhotosFragmentShown() || !mManagerActivity.isInPhotosPage) return@observe
 
             // Order changed.
             if (order != viewModel.getOrder()) {
@@ -417,10 +417,10 @@ class PhotosFragment : BaseZoomFragment() {
     private fun isShowMenu() =
         gridAdapterHasData() && actionMode == null && selectedView == ALL_VIEW && !viewModel.isEnableCUShown()
 
-    fun isEnableCUFragmentShown() = viewModel.isEnableCUShown()
+    fun isEnablePhotosFragmentShown() = viewModel.isEnableCUShown()
 
     fun shouldShowFullInfoAndOptions() =
-        !isEnableCUFragmentShown() && selectedView == ALL_VIEW
+        !isEnablePhotosFragmentShown() && selectedView == ALL_VIEW
 
     /**
      * First make all the buttons unselected,

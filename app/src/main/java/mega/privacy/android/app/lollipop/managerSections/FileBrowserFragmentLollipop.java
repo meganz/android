@@ -314,12 +314,6 @@ public class FileBrowserFragmentLollipop extends RotatableFragment{
 				case R.id.cab_menu_remove_share:
 					((ManagerActivityLollipop) context).showConfirmationRemoveAllSharingContacts(documents);
 					break;
-
-				case R.id.cab_menu_save_gallery:
-					((ManagerActivityLollipop) context).saveNodesToGallery(adapter.getArrayListSelectedNodes());
-					clearSelections();
-					hideMultipleSelect();
-					break;
 			}
 			return true;
 		}
@@ -421,13 +415,6 @@ public class FileBrowserFragmentLollipop extends RotatableFragment{
 
 			if (showRemoveShare) {
 				control.removeShare().setVisible(true);
-			}
-
-			if (mediaCounter == selected.size()) {
-				control.saveToGallery().setVisible(true)
-						.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
-			} else {
-				control.saveToGallery().setVisible(false);
 			}
 
 			control.trash().setVisible(showTrash);

@@ -613,7 +613,7 @@ public class FileExplorerActivityLollipop extends TransfersManagementActivity
 				mode = MOVE;
 				moveFromHandles = intent.getLongArrayExtra("MOVE_FROM");
 
-				if (moveFromHandles != null) {
+				if (moveFromHandles != null && moveFromHandles.length > 0) {
 					MegaNode moveNode = megaApi.getNodeByHandle(moveFromHandles[0]);
 					parentMoveCopy = megaApi.getParentNode(moveNode);
 				}
