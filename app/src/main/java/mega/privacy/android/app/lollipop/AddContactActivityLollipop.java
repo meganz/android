@@ -554,13 +554,12 @@ public class AddContactActivityLollipop extends PasscodeActivity implements View
                                     queryContactsShare.add(contactShare);
                                     numMega++;
                                 }
-                            }
-                            else {
-                                if (contactShare.getPhoneContactInfo().getEmail().toLowerCase().contains(inputString.toLowerCase())
-                                        || contactShare.getPhoneContactInfo().getName().toLowerCase().contains(inputString.toLowerCase())) {
-                                    queryContactsShare.add(contactShare);
-                                    numPhone++;
-                                }
+                            } else if (contactShare.getPhoneContactInfo() != null
+                                    && ((contactShare.getPhoneContactInfo().getEmail() != null && contactShare.getPhoneContactInfo().getEmail().toLowerCase().contains(inputString.toLowerCase()))
+                                    || (contactShare.getPhoneContactInfo().getName() != null && contactShare.getPhoneContactInfo().getName().toLowerCase().contains(inputString.toLowerCase())))) {
+
+                                queryContactsShare.add(contactShare);
+                                numPhone++;
                             }
                         }
                     }
@@ -1583,7 +1582,9 @@ public class AddContactActivityLollipop extends PasscodeActivity implements View
             megaApi.removeGlobalListener(this);
         }
 
-        highLightHintHelper.dismissPopupWindow();
+        if (highLightHintHelper != null) {
+            highLightHintHelper.dismissPopupWindow();
+        }
     }
 
     @Override
