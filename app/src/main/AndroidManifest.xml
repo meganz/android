@@ -154,10 +154,10 @@
 
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
-
-                <data
-                    android:host="mega.co.nz"
-                    android:scheme="https"></data>
+                <!-- Use separate scheme and host data tags entries for this intent-filter definition -->
+                <!-- Please keep this format, otherwise it will cause web intent verification error-->
+                <data android:host="mega.co.nz" />
+                <data android:scheme="https" />
             </intent-filter>
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
@@ -174,10 +174,10 @@
 
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
-
-                <data
-                    android:host="mega.nz"
-                    android:scheme="https"></data>
+                <!-- Use separate scheme and host data tags entries for this intent-filter definition -->
+                <!-- Please keep this format, otherwise it will cause web intent verification error-->
+                <data android:host="mega.nz" />
+                <data android:scheme="https" />
             </intent-filter>
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
