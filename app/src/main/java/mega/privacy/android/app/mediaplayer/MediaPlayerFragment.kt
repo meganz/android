@@ -239,31 +239,30 @@ class MediaPlayerFragment : Fragment() {
         playerView: PlayerView,
         videoPlayer: Boolean
     ) {
-        playerView.player = player
+        with(playerView) {
+            this.player = player
 
-        playerView.useController = true
-        playerView.controllerShowTimeoutMs = 0
+            useController = true
+            controllerShowTimeoutMs = 0
 
-        playerView.setRepeatToggleModes(
-            if (videoPlayer)
-                RepeatModeUtil.REPEAT_TOGGLE_MODE_NONE
-            else
-                RepeatModeUtil.REPEAT_TOGGLE_MODE_ONE or RepeatModeUtil.REPEAT_TOGGLE_MODE_ALL
-        )
+            setRepeatToggleModes(
+                if (videoPlayer)
+                    RepeatModeUtil.REPEAT_TOGGLE_MODE_NONE
+                else
+                    RepeatModeUtil.REPEAT_TOGGLE_MODE_ONE or RepeatModeUtil.REPEAT_TOGGLE_MODE_ALL
+            )
 
-        playerView.controllerHideOnTouch = videoPlayer
-        playerView.setShowShuffleButton(!videoPlayer)
-
-        playerView.showController()
-
-        playerView.setOnClickListener {
-            if (toolbarVisible) {
-                hideToolbar()
-            } else {
-                delayHideToolbarCanceled = true
-
-                showToolbar()
+            controllerHideOnTouch = videoPlayer
+            setShowShuffleButton(!videoPlayer)
+            setControllerVisibilityListener { visibility ->
+                if (visibility == View.VISIBLE) {
+                    showToolbar()
+                } else {
+                    hideToolbar()
+                }
             }
+
+            showController()
         }
 
         updateLoadingAnimation(player.playbackState)
