@@ -3,7 +3,6 @@ package mega.privacy.android.app.utils
 import android.content.Context
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
-import android.os.Build
 import androidx.annotation.RequiresPermission
 
 object NetworkUtil {
@@ -17,13 +16,9 @@ object NetworkUtil {
     @RequiresPermission(android.Manifest.permission.ACCESS_NETWORK_STATE)
     fun Context.isOnline(): Boolean {
         val connectivityManager = (getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager)
-        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            val activeNetwork = connectivityManager.activeNetwork ?: return false
-            val capabilities = connectivityManager.getNetworkCapabilities(activeNetwork)
-            capabilities?.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET) ?: false
-        } else {
-            connectivityManager.activeNetworkInfo?.isConnected == true
-        }
+        val activeNetwork = connectivityManager.activeNetwork ?: return false
+        val capabilities = connectivityManager.getNetworkCapabilities(activeNetwork)
+        return capabilities?.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET) ?: false
     }
 
     /**

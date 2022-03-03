@@ -28,8 +28,8 @@ import mega.privacy.android.app.components.twemoji.reaction.*;
 import mega.privacy.android.app.components.twemoji.EmojiImageView;
 import mega.privacy.android.app.components.twemoji.EmojiRange;
 import mega.privacy.android.app.components.twemoji.EmojiUtils;
+import mega.privacy.android.app.lollipop.megachat.ChatActivity;
 import mega.privacy.android.app.lollipop.megachat.chatAdapters.InfoReactionPagerAdapter;
-import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaHandleList;
@@ -85,8 +85,8 @@ public class InfoReactionsBottomSheet extends BottomSheetDialogFragment implemen
             messageId = savedInstanceState.getLong(MESSAGE_ID, MEGACHAT_INVALID_HANDLE);
             reactionSelected = savedInstanceState.getString(REACTION_SELECTED);
         } else {
-            chatId = ((ChatActivityLollipop) context).idChat;
-            messageId = ((ChatActivityLollipop) context).selectedMessageId;
+            chatId = ((ChatActivity) context).idChat;
+            messageId = ((ChatActivity) context).selectedMessageId;
         }
     }
 

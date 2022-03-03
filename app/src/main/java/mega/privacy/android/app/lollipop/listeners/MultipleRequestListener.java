@@ -3,9 +3,7 @@ package mega.privacy.android.app.lollipop.listeners;
 import android.content.Context;
 
 import mega.privacy.android.app.R;
-import mega.privacy.android.app.lollipop.ContactFileListActivityLollipop;
-import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
-import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop;
+import mega.privacy.android.app.lollipop.megachat.ChatActivity;
 import mega.privacy.android.app.lollipop.megachat.NodeAttachmentHistoryActivity;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaContactRequest;
@@ -47,12 +45,7 @@ public class MultipleRequestListener implements MegaRequestListenerInterface {
 
     @Override
     public void onRequestTemporaryError(MegaApiJava api, MegaRequest request, MegaError e) {
-
         logWarning("Counter: " + counter);
-//			MegaNode node = megaApi.getNodeByHandle(request.getNodeHandle());
-//			if(node!=null){
-//				log("onRequestTemporaryError: "+node.getName());
-//			}
     }
 
     @Override
@@ -81,10 +74,6 @@ public class MultipleRequestListener implements MegaRequestListenerInterface {
         int requestType = request.getType();
         logDebug("Counter: " + counter);
         logDebug("Error: " + error);
-//			MegaNode node = megaApi.getNodeByHandle(request.getNodeHandle());
-//			if(node!=null){
-//				log("onRequestTemporaryError: "+node.getName());
-//			}
         if(counter==0){
             switch (requestType) {
                 case  MegaRequest.TYPE_MOVE:{
@@ -230,8 +219,8 @@ public class MultipleRequestListener implements MegaRequestListenerInterface {
                     break;
             }
 
-            if (context instanceof ChatActivityLollipop) {
-                ((ChatActivityLollipop) context).removeProgressDialog();
+            if (context instanceof ChatActivity) {
+                ((ChatActivity) context).removeProgressDialog();
             } else if (context instanceof NodeAttachmentHistoryActivity) {
                 ((NodeAttachmentHistoryActivity) context).removeProgressDialog();
             }

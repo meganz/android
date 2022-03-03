@@ -3,7 +3,7 @@ package mega.privacy.android.app.listeners;
 import android.content.Context;
 
 import mega.privacy.android.app.R;
-import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop;
+import mega.privacy.android.app.lollipop.megachat.ChatActivity;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaChatApiJava;
 import nz.mega.sdk.MegaChatError;
@@ -25,8 +25,8 @@ public class TruncateHistoryListener extends ChatBaseListener {
 
         if (e.getErrorCode() == MegaError.API_OK) {
             Util.showSnackbar(context, getString(R.string.clear_history_success));
-            if (context instanceof ChatActivityLollipop) {
-                ((ChatActivityLollipop) context).hideMessageJump();
+            if (context instanceof ChatActivity) {
+                ((ChatActivity) context).hideMessageJump();
             }
         } else {
             Util.showSnackbar(context, getString(R.string.clear_history_error));

@@ -26,7 +26,7 @@ import mega.privacy.android.app.databinding.BottomSheetImageOptionsBinding
 import mega.privacy.android.app.imageviewer.ImageViewerActivity
 import mega.privacy.android.app.imageviewer.ImageViewerViewModel
 import mega.privacy.android.app.imageviewer.data.ImageItem
-import mega.privacy.android.app.lollipop.FileInfoActivityLollipop
+import mega.privacy.android.app.lollipop.FileInfoActivity
 import mega.privacy.android.app.modalbottomsheet.BaseBottomSheetDialogFragment
 import mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil
 import mega.privacy.android.app.modalbottomsheet.nodelabel.NodeLabelBottomSheetDialogFragment
@@ -38,7 +38,6 @@ import mega.privacy.android.app.utils.MegaNodeUtil.getNodeLabelColor
 import mega.privacy.android.app.utils.MegaNodeUtil.getNodeLabelDrawable
 import mega.privacy.android.app.utils.MegaNodeUtil.getNodeLabelText
 import mega.privacy.android.app.utils.NetworkUtil.isOnline
-import mega.privacy.android.app.utils.SdkRestrictionUtils.isSaveToGalleryCompatible
 import mega.privacy.android.app.utils.StringResourcesUtils.getQuantityString
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 import nz.mega.sdk.MegaNode
@@ -162,7 +161,7 @@ class ImageBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
                         putExtra(HANDLE, nodeItem.handle.toString())
                     }
                 } else {
-                    Intent(context, FileInfoActivityLollipop::class.java).apply {
+                    Intent(context, FileInfoActivity::class.java).apply {
                         putExtra(HANDLE, nodeItem.handle)
                         putExtra(NAME, nodeItem.name)
                     }
@@ -231,15 +230,8 @@ class ImageBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
                 if (nodeItem.isAvailableOffline) {
                     (activity as? ImageViewerActivity?)?.saveOfflineNode(nodeItem.handle)
                 } else if (node != null) {
-                    (activity as? ImageViewerActivity?)?.saveNode(node, false)
+                    (activity as? ImageViewerActivity?)?.saveNode(node)
                 }
-                dismissAllowingStateLoss()
-            }
-
-            // Save to Gallery
-            optionGallery.isVisible = isSaveToGalleryCompatible() && !nodeItem.isExternalNode && !nodeItem.isFromRubbishBin && node != null
-            optionGallery.setOnClickListener {
-                (activity as? ImageViewerActivity?)?.saveNode(node!!, false)
                 dismissAllowingStateLoss()
             }
 
@@ -310,14 +302,14 @@ class ImageBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
 
             // Copy
             optionCopy.setOnClickListener {
-                if (nodeItem.isExternalNode) {
+                if (nodeItem.isExternalNode || imageItem.isFromChat()) {
                     selectImportFolderLauncher.launch(longArrayOf(nodeItem.handle))
                 } else {
                     selectCopyFolderLauncher.launch(longArrayOf(nodeItem.handle))
                 }
             }
-            val copyAction = if (nodeItem.isExternalNode) R.string.general_import else R.string.context_copy
-            val copyDrawable = if (nodeItem.isExternalNode) R.drawable.ic_import_to_cloud_white else R.drawable.ic_menu_copy
+            val copyAction = if (nodeItem.isExternalNode) R.string.general_import else if (imageItem.isFromChat()) R.string.add_to_cloud_node_chat else R.string.context_copy
+            val copyDrawable = if (nodeItem.isExternalNode || imageItem.isFromChat()) R.drawable.ic_import_to_cloud_white else R.drawable.ic_menu_copy
             optionCopy.setCompoundDrawablesWithIntrinsicBounds(copyDrawable, 0, 0, 0)
             optionCopy.text = StringResourcesUtils.getString(copyAction)
             optionCopy.isVisible = isOnline && isUserLoggedIn && !nodeItem.isFromRubbishBin && !imageItem.isOffline

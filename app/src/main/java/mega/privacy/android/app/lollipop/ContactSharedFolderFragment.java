@@ -72,7 +72,7 @@ public class ContactSharedFolderFragment extends ContactFileBaseFragment {
             moreButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    Intent i = new Intent(getContext(),ContactFileListActivityLollipop.class);
+                    Intent i = new Intent(getContext(), ContactFileListActivity.class);
                     i.putExtra(NAME, userEmail);
                     getContext().startActivity(i);
                 }
@@ -124,7 +124,7 @@ public class ContactSharedFolderFragment extends ContactFileBaseFragment {
     
     public void showOptionsPanel(MegaNode sNode) {
         logDebug("Node handle: " + sNode.getHandle());
-        ((ContactInfoActivityLollipop)context).showOptionsPanel(sNode);
+        ((ContactInfoActivity)context).showOptionsPanel(sNode);
     }
     
     public void clearSelections() {
@@ -162,7 +162,7 @@ public class ContactSharedFolderFragment extends ContactFileBaseFragment {
         if (megaApi.getNodeByHandle(parentHandle) == null) {
             parentHandle = -1;
             this.parentHandle = -1;
-            ((ContactInfoActivityLollipop)context).setParentHandle(parentHandle);
+            ((ContactInfoActivity)context).setParentHandle(parentHandle);
             adapter.setParentHandle(parentHandle);
             
             ArrayList<MegaNode> fullList = megaApi.getInShares(contact);
@@ -196,7 +196,7 @@ public class ContactSharedFolderFragment extends ContactFileBaseFragment {
                 updateActionModeTitle();
             }
         } else {
-            Intent i = new Intent(getContext(),ContactFileListActivityLollipop.class);
+            Intent i = new Intent(getContext(), ContactFileListActivity.class);
             i.putExtra(NAME, userEmail);
             i.putExtra("node_position",position);
             getContext().startActivity(i);
@@ -264,7 +264,7 @@ public class ContactSharedFolderFragment extends ContactFileBaseFragment {
             
             switch (item.getItemId()) {
                 case R.id.cab_menu_download: {
-                    ((ContactInfoActivityLollipop)context).downloadFile(documents);
+                    ((ContactInfoActivity)context).downloadFile(documents);
                     break;
                 }
                 case R.id.cab_menu_copy: {
@@ -273,7 +273,7 @@ public class ContactSharedFolderFragment extends ContactFileBaseFragment {
                         handleList.add(documents.get(i).getHandle());
                     }
                     
-                    ((ContactInfoActivityLollipop)context).showCopyLollipop(handleList);
+                    ((ContactInfoActivity)context).showCopy(handleList);
                     break;
                 }
                 case R.id.cab_menu_select_all:{
@@ -299,7 +299,7 @@ public class ContactSharedFolderFragment extends ContactFileBaseFragment {
                     for (int i=0;i<documents.size();i++){
                         handleList.add(documents.get(i).getHandle());
                     }
-                    ((ContactInfoActivityLollipop)(context)).askConfirmationMoveToRubbish(handleList);
+                    ((ContactInfoActivity)(context)).askConfirmationMoveToRubbish(handleList);
                     break;
                 }
                 case R.id.cab_menu_rename: {
@@ -309,10 +309,6 @@ public class ContactSharedFolderFragment extends ContactFileBaseFragment {
                     break;
                 }
             }
-//            if(item.getItemId() != R.id.cab_menu_select_all) {
-//                actionMode.finish();
-//                return true;
-//            }
             return false;
         }
         
@@ -380,7 +376,7 @@ public class ContactSharedFolderFragment extends ContactFileBaseFragment {
                     }
                 }
                 
-                if(!((ContactInfoActivityLollipop)context).isEmptyParentHandleStack()){
+                if(!((ContactInfoActivity)context).isEmptyParentHandleStack()){
                     showTrash = true;
                 }
                 for(int i=0; i<selected.size(); i++){

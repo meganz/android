@@ -12,7 +12,7 @@ import androidx.savedstate.SavedStateRegistry
 import dagger.hilt.android.qualifiers.ActivityContext
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.di.MegaApi
-import mega.privacy.android.app.lollipop.ManagerActivityLollipop
+import mega.privacy.android.app.lollipop.ManagerActivity
 import mega.privacy.android.app.objects.PasscodeManagement
 import mega.privacy.android.app.utils.Constants.ACTION_CHAT_NOTIFICATION_MESSAGE
 import mega.privacy.android.app.utils.Constants.CHAT_ID
@@ -49,7 +49,7 @@ class PasscodeFacade @Inject constructor(
 
     /**
      * Used to disable passcode.
-     * E.g.: PdfViewerActivityLollipop when it is opened from outside the app.
+     * E.g.: PdfViewerActivity when it is opened from outside the app.
      */
     private var isDisabled = false
 
@@ -132,8 +132,8 @@ class PasscodeFacade @Inject constructor(
     /**
      * Checks if should proceed with passcode check due to a chat notification message.
      *
-     * If the app is opening a chat notification message, means first the ManagerActivityLollipop
-     * will be opened and then ChatActivityLollipop. That also means the passcode would be shown
+     * If the app is opening a chat notification message, means first the ManagerActivity
+     * will be opened and then ChatActivity. That also means the passcode would be shown
      * first, and then the chat room. This will cause the user could interact with the app,
      * without having to enter the passcode. This will cause too the passcode will be shown after
      * the chat room and the app be closed. Which results in bad a behavior.
@@ -144,7 +144,7 @@ class PasscodeFacade @Inject constructor(
      * @return True if should proceed with the passcode check, false otherwise.
      */
     private fun shouldIgnoreDueToChatNotification(): Boolean =
-        context is ManagerActivityLollipop
+        context is ManagerActivity
                 && ACTION_CHAT_NOTIFICATION_MESSAGE == context.intent?.action
                 && MEGACHAT_INVALID_HANDLE != context.intent?.getLongExtra(CHAT_ID, MEGACHAT_INVALID_HANDLE)
 

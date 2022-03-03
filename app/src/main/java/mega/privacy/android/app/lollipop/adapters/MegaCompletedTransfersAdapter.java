@@ -22,7 +22,7 @@ import mega.privacy.android.app.AndroidCompletedTransfer;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
-import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
+import mega.privacy.android.app.lollipop.ManagerActivity;
 import mega.privacy.android.app.utils.ColorUtils;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaNode;
@@ -30,7 +30,7 @@ import nz.mega.sdk.MegaNode;
 import static mega.privacy.android.app.utils.Constants.THUMB_CORNER_RADIUS_DP;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.ThumbnailUtils.*;
-import static mega.privacy.android.app.utils.ThumbnailUtilsLollipop.getRoundedBitmap;
+import static mega.privacy.android.app.utils.ThumbnailUtils.getRoundedBitmap;
 import static mega.privacy.android.app.utils.Util.*;
 import static nz.mega.sdk.MegaTransfer.*;
 
@@ -200,7 +200,7 @@ public class MegaCompletedTransfersAdapter extends RecyclerView.Adapter<MegaComp
 		switch (v.getId()) {
 			case R.id.transfers_list_item_layout:
 				if (holder.currentPosition >= 0 && holder.currentPosition < getItemCount()) {
-					((ManagerActivityLollipop) context).showManageTransferOptionsPanel(getItem(holder.currentPosition));
+					((ManagerActivity) context).showManageTransferOptionsPanel(getItem(holder.currentPosition));
 				}
 				break;
 		}

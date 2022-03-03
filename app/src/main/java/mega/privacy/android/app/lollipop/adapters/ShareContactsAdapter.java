@@ -16,7 +16,7 @@ import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.RoundedImageView;
 import mega.privacy.android.app.components.twemoji.EmojiTextView;
-import mega.privacy.android.app.lollipop.AddContactActivityLollipop;
+import mega.privacy.android.app.lollipop.AddContactActivity;
 import mega.privacy.android.app.lollipop.ShareContactInfo;
 import nz.mega.sdk.MegaApiAndroid;
 
@@ -164,7 +164,7 @@ public class ShareContactsAdapter extends RecyclerView.Adapter<ShareContactsAdap
             }
             switch (view.getId()) {
                 case R.id.item_layout_chip: {
-                    ((AddContactActivityLollipop) context).deleteContact(currentPosition);
+                    ((AddContactActivity) context).deleteContact(currentPosition);
                     break;
                 }
             }

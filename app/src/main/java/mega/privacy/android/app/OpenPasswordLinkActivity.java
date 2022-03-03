@@ -10,8 +10,8 @@ import android.widget.ProgressBar;
 
 import mega.privacy.android.app.listeners.PasswordLinkListener;
 import mega.privacy.android.app.lollipop.DecryptAlertDialog;
-import mega.privacy.android.app.lollipop.FileLinkActivityLollipop;
-import mega.privacy.android.app.lollipop.FolderLinkActivityLollipop;
+import mega.privacy.android.app.lollipop.FileLinkActivity;
+import mega.privacy.android.app.lollipop.FolderLinkActivity;
 import mega.privacy.android.app.activities.PasscodeActivity;
 import nz.mega.sdk.MegaError;
 
@@ -106,11 +106,11 @@ public class OpenPasswordLinkActivity extends PasscodeActivity
 
 			if (matchRegexs(decryptedLink, FOLDER_LINK_REGEXS)) {
 				logDebug("Folder link url");
-				intent = new Intent(OpenPasswordLinkActivity.this, FolderLinkActivityLollipop.class);
+				intent = new Intent(OpenPasswordLinkActivity.this, FolderLinkActivity.class);
 				intent.setAction(ACTION_OPEN_MEGA_FOLDER_LINK);
 			} else if (matchRegexs(decryptedLink, FILE_LINK_REGEXS)) {
 				logDebug("Open link url");
-				intent = new Intent(OpenPasswordLinkActivity.this, FileLinkActivityLollipop.class);
+				intent = new Intent(OpenPasswordLinkActivity.this, FileLinkActivity.class);
 				intent.setAction(ACTION_OPEN_MEGA_LINK);
 			}
 

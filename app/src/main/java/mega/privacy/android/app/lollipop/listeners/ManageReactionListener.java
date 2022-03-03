@@ -2,7 +2,7 @@ package mega.privacy.android.app.lollipop.listeners;
 
 import android.content.Context;
 import mega.privacy.android.app.listeners.ChatBaseListener;
-import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop;
+import mega.privacy.android.app.lollipop.megachat.ChatActivity;
 import nz.mega.sdk.MegaChatApiJava;
 import nz.mega.sdk.MegaChatError;
 import nz.mega.sdk.MegaChatRequest;
@@ -33,8 +33,8 @@ public class ManageReactionListener extends ChatBaseListener {
             case MegaChatError.ERROR_OK:
                 MegaHandleList listUsers = api.getReactionUsers(chatId, msgId, reaction);
                 int count = listUsers != null ? (int) listUsers.size() : 0;
-                if (context instanceof ChatActivityLollipop) {
-                    ((ChatActivityLollipop) context).updateReactionAdapter(api.getMessage(chatId, msgId), reaction, count);
+                if (context instanceof ChatActivity) {
+                    ((ChatActivity) context).updateReactionAdapter(api.getMessage(chatId, msgId), reaction, count);
                 }
                 break;
 
@@ -46,8 +46,8 @@ public class ManageReactionListener extends ChatBaseListener {
 
             case MegaChatError.ERROR_TOOMANY:
                 long numberOfError = request.getNumber();
-                if (context instanceof ChatActivityLollipop && (numberOfError == REACTION_ERROR_TYPE_USER || numberOfError == REACTION_ERROR_TYPE_MESSAGE)) {
-                    ((ChatActivityLollipop) context).createLimitReactionsAlertDialog(numberOfError);
+                if (context instanceof ChatActivity && (numberOfError == REACTION_ERROR_TYPE_USER || numberOfError == REACTION_ERROR_TYPE_MESSAGE)) {
+                    ((ChatActivity) context).createLimitReactionsAlertDialog(numberOfError);
                 }
                 break;
         }

@@ -47,7 +47,7 @@ public class ArchivedChatsActivity extends PasscodeActivity implements MegaChatR
     Toolbar tB;
     ActionBar aB;
     FrameLayout fragmentContainer;
-    RecentChatsFragmentLollipop archivedChatsFragment;
+    RecentChatsFragment archivedChatsFragment;
     FloatingActionButton fab;
 
     private BadgeDrawerArrowDrawable badgeDrawable;
@@ -111,7 +111,7 @@ public class ArchivedChatsActivity extends PasscodeActivity implements MegaChatR
         updateNavigationToolbarIcon();
 
         if (archivedChatsFragment ==null) {
-            archivedChatsFragment = RecentChatsFragmentLollipop.newInstance();
+            archivedChatsFragment = RecentChatsFragment.newInstance();
         }
 
         if (savedInstanceState != null) {

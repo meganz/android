@@ -8,7 +8,7 @@ import mega.privacy.android.app.BaseActivity
 import mega.privacy.android.app.R
 import mega.privacy.android.app.constants.EventConstants
 import mega.privacy.android.app.databinding.ActivityGuestLeaveMeetingBinding
-import mega.privacy.android.app.lollipop.LoginActivityLollipop
+import mega.privacy.android.app.lollipop.LoginActivity
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.StringResourcesUtils
 import mega.privacy.android.app.utils.Util
@@ -51,7 +51,7 @@ class LeftMeetingActivity : BaseActivity() {
      *
      */
     private fun createAccount() {
-        val createAccountIntent = Intent(this, LoginActivityLollipop::class.java)
+        val createAccountIntent = Intent(this, LoginActivity::class.java)
         createAccountIntent.putExtra(Constants.VISIBLE_FRAGMENT, Constants.CREATE_ACCOUNT_FRAGMENT)
         startActivity(createAccountIntent)
         finish()

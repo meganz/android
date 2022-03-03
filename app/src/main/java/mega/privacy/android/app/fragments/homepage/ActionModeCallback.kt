@@ -4,7 +4,7 @@ import android.view.Menu
 import android.view.MenuItem
 import androidx.appcompat.view.ActionMode
 import mega.privacy.android.app.R
-import mega.privacy.android.app.lollipop.ManagerActivityLollipop
+import mega.privacy.android.app.lollipop.ManagerActivity
 import mega.privacy.android.app.lollipop.controllers.NodeController
 import mega.privacy.android.app.utils.*
 import nz.mega.sdk.MegaApiAndroid
@@ -14,7 +14,7 @@ import nz.mega.sdk.MegaShare
 import java.util.*
 
 class ActionModeCallback constructor(
-    private val mainActivity: ManagerActivityLollipop,
+    private val mainActivity: ManagerActivity,
     private val viewModel: ActionModeViewModel,
     private val megaApi: MegaApiAndroid
 ) : ActionMode.Callback {

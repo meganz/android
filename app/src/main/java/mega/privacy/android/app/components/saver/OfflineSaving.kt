@@ -52,8 +52,6 @@ class OfflineSaving(
 
     override fun fromMediaViewer() = fromMediaViewer
 
-    override fun downloadToGallery() = false
-
     override fun doDownload(
         megaApi: MegaApiAndroid,
         megaApiFolder: MegaApiAndroid,

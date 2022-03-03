@@ -15,8 +15,8 @@ import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.R
 import mega.privacy.android.app.databinding.BottomSheetSortByBinding
 import mega.privacy.android.app.globalmanagement.SortOrderManagement
-import mega.privacy.android.app.lollipop.FileExplorerActivityLollipop
-import mega.privacy.android.app.lollipop.ManagerActivityLollipop
+import mega.privacy.android.app.lollipop.FileExplorerActivity
+import mega.privacy.android.app.lollipop.ManagerActivity
 import mega.privacy.android.app.utils.ColorUtils
 import mega.privacy.android.app.utils.Constants.*
 import mega.privacy.android.app.utils.callManager
@@ -193,9 +193,9 @@ class SortByBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
                         )
                     )
 
-                if (requireActivity() is ManagerActivityLollipop) {
-                    (requireActivity() as ManagerActivityLollipop).refreshCloudOrder(order)
-                } else if (requireActivity() is FileExplorerActivityLollipop) {
+                if (requireActivity() is ManagerActivity) {
+                    (requireActivity() as ManagerActivity).refreshCloudOrder(order)
+                } else if (requireActivity() is FileExplorerActivity) {
                     updateFileExplorerOrder(order)
                 }
             }
@@ -220,9 +220,9 @@ class SortByBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
                         )
                     )
 
-                if (requireActivity() is ManagerActivityLollipop) {
-                    (requireActivity() as ManagerActivityLollipop).refreshOthersOrder()
-                } else if (requireActivity() is FileExplorerActivityLollipop) {
+                if (requireActivity() is ManagerActivity) {
+                    (requireActivity() as ManagerActivity).refreshOthersOrder()
+                } else if (requireActivity() is FileExplorerActivity) {
                     updateFileExplorerOrder(order)
                 }
             }
@@ -247,7 +247,7 @@ class SortByBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
     }
 
     private fun updateFileExplorerOrder(order: Int) {
-        (requireActivity() as FileExplorerActivityLollipop).refreshOrderNodes(order)
+        (requireActivity() as FileExplorerActivity).refreshOrderNodes(order)
 
         requireActivity().sendBroadcast(
             Intent(BROADCAST_ACTION_INTENT_UPDATE_ORDER).putExtra(

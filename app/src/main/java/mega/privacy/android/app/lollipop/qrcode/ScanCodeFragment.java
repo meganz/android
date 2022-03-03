@@ -3,7 +3,6 @@ package mega.privacy.android.app.lollipop.qrcode;
 import android.app.Activity;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
@@ -39,7 +38,6 @@ import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.RoundedImageView;
-import mega.privacy.android.app.lollipop.ContactInfoActivityLollipop;
 import mega.privacy.android.app.utils.ContactUtil;
 import mega.privacy.android.app.utils.StringResourcesUtils;
 import nz.mega.sdk.MegaApiAndroid;
@@ -50,13 +48,9 @@ import nz.mega.sdk.MegaUser;
 
 import static android.graphics.Color.WHITE;
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
-import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 
-//import me.dm7.barcodescanner.zxing.ZXingScannerView;
-
-
-public class ScanCodeFragment extends Fragment implements /*ZXingScannerView.ResultHandler, */View.OnClickListener{
+public class ScanCodeFragment extends Fragment implements View.OnClickListener{
 
     public static int DEFAULT_AVATAR_WIDTH_HEIGHT = 150;
     public static int WIDTH = 500;
@@ -76,7 +70,6 @@ public class ScanCodeFragment extends Fragment implements /*ZXingScannerView.Res
 
     private Context context;
 
-//    public static ZXingScannerView scannerView;
     public CodeScanner codeScanner;
     CodeScannerView codeScannerView;
 
@@ -165,8 +158,6 @@ public class ScanCodeFragment extends Fragment implements /*ZXingScannerView.Res
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         logDebug("onCreateView");
 
-//        scannerView = new ZXingScannerView(getActivity());
-
         View view = inflater.inflate(R.layout.fragment_scan_code, container, false);
 
         invalidCode = (TextView) view.findViewById(R.id.invalid_code_text);
@@ -225,7 +216,6 @@ public class ScanCodeFragment extends Fragment implements /*ZXingScannerView.Res
             showAlertDialog(dialogTitleContent, dialogTextContent, success, printEmail);
         }
 
-//        return scannerView;
         return view;
     }
 
@@ -267,17 +257,12 @@ public class ScanCodeFragment extends Fragment implements /*ZXingScannerView.Res
     public void onStart(){
         logDebug("onStart");
         super.onStart();
-//        scannerView.setAutoFocus(true);
-//        scannerView.startCamera();
     }
 
     @Override
     public void onResume() {
         logDebug("onResume");
         super.onResume();
-//        scannerView.setAutoFocus(true);
-//        scannerView.startCamera();
-//        scannerView.setResultHandler(this);
         codeScanner.startPreview();
     }
 
@@ -285,7 +270,6 @@ public class ScanCodeFragment extends Fragment implements /*ZXingScannerView.Res
     public void onPause() {
         logDebug("onPause");
         super.onPause();
-//        scannerView.stopCamera();
         codeScanner.releaseResources();
     }
 
@@ -380,15 +364,10 @@ public class ScanCodeFragment extends Fragment implements /*ZXingScannerView.Res
                 @Override
                 public void onDismiss(DialogInterface dialog) {
                     logDebug("onDismiss");
-//                scannerView.setAutoFocus(true);
-//                scannerView.startCamera();
-//                onResume();
                     inviteShown = false;
                     codeScanner.startPreview();
                 }
             });
-
-//        scannerView.stopCamera();
         }
     }
 
@@ -421,7 +400,6 @@ public class ScanCodeFragment extends Fragment implements /*ZXingScannerView.Res
             }
             case R.id.dialog_invite_button: {
                 dialogshown = false;
-//                scannerView.stopCamera();
                 codeScanner.releaseResources();
                 if (requestedAlertDialog != null){
                     requestedAlertDialog.dismiss();
@@ -430,9 +408,6 @@ public class ScanCodeFragment extends Fragment implements /*ZXingScannerView.Res
                     getActivity().finish();
                 }
                 else {
-//                    scannerView.setAutoFocus(true);
-//                    scannerView.startCamera();
-//                    onResume();
                     codeScanner.startPreview();
                 }
                 break;
@@ -520,7 +495,6 @@ public class ScanCodeFragment extends Fragment implements /*ZXingScannerView.Res
             logDebug("Call to getUserAvatar");
             logDebug("DO NOT Retry!");
             megaApi.getUserAvatar(myEmail, avatar.getPath(), (QRCodeActivity) context);
-//            setDefaultAvatar();
         }
     }
 
@@ -676,7 +650,6 @@ public class ScanCodeFragment extends Fragment implements /*ZXingScannerView.Res
                 }
             });
             contactName.setText(contactNameContent);
-//            setAvatar();
         }
         inviteAlertDialog.show();
         inviteShown = true;
