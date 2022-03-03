@@ -700,7 +700,7 @@
     <string name="cam_sync_wifi">Wi-Fi only</string>
     <!-- the options of how to upload, but in an array. needed for the settings, how to upload the camera images. when Wi-Fi connected and using data plan -->
     <string name="cam_sync_data">Wi-Fi or mobile data</string>
-    <!-- The upload of the user’s photos orvideos from their specified album is in progress. -->
+    <!-- The upload of the user’s photos or videos from their specified album is in progress. -->
     <string name="cam_sync_syncing">Camera Uploads in progress</string>
     <!-- confirmation question for cancelling the camera uploads -->
     <string name="cam_sync_cancel_sync">Do you want to stop Camera Uploads?</string>
@@ -1761,8 +1761,6 @@
     <string name="attachment_upload_panel_from_cloud">From Cloud Drive</string>
     <!--  -->
     <string name="attachment_upload_panel_contact">Contact</string>
-    <!--  -->
-    <string name="attachment_upload_panel_photo">From device</string>
     <!-- Button and title of dialog shown when the user wants to delete permanently their account. -->
     <string name="delete_account">Delete account</string>
     <!-- Text shown in the alert dialog to confirm the deletion of an account -->
@@ -2870,9 +2868,9 @@
     <!-- Option of one-off (year) billing. Placeholder: purchase price. -->
     <string name="billed_one_off_year">[A]One-off (year)[/A] %s</string>
     <!-- Option of monthly billing period. Placeholder: purchase price -->
-    <string name="billed_monthly_text">[A]Monthly[/A] %s/month</string>
+    <string name="billed_monthly_text">[A]Billed monthly[/A] %s/month</string>
     <!-- Option of yearly billing period. Placeholder: purchase price -->
-    <string name="billed_yearly_text">[A]Yearly[/A] %s/year</string>
+    <string name="billed_yearly_text">[A]Billed yearly[/A] %s/year</string>
     <!-- dialog option cancel in alert dialog -->
     <string name="button_cancel">Cancel</string>
     <!-- dialog option continue in alert dialog -->
@@ -2925,11 +2923,6 @@
     <plurals name="num_folders_num_files">
         <item quantity="one">%1$d folders · 1 file</item>
         <item quantity="other">%1$d folders · %2$d files</item>
-    </plurals>
-    <!-- Indicates the content of the backup folder -->
-    <plurals name="num_devices">
-        <item quantity="one">%d device</item>
-        <item quantity="other">%d devices</item>
     </plurals>
     <!-- Subtitle of the historic notification for new additions inside an existing shared folder. Placeholders are: email who added the folders or files, number of folders added, number of files added -->
     <string name="subtitle_notification_added_folders_and_files">[A]%1$s[/A][B] added %2$s and %3$s[/B]</string>
@@ -3814,8 +3807,6 @@
     <string name="same_item_name_warning">There is already an item with the same name</string>
     <!-- Label of the option menu. When clicking this button, the app shows the info of the related item, e.g. file, folder, contact, chat, etc. -->
     <string name="general_info">Info</string>
-    <!-- Item menu option upon right click on one image or video to save it to device gallery -->
-    <string name="general_save_to_gallery">Save to gallery</string>
     <!-- settings of the Media section -->
     <string name="settings_media">Media</string>
     <!-- settings title of the Media section -->
@@ -4055,6 +4046,8 @@
     <string name="button_permission_info">Got it</string>
     <!-- Warning show to the user when the app needs permissions to get the best meeting experience and the user has denied them.-->
     <string name="meeting_required_permissions_warning">Go to Settings to allow MEGA to access your camera and microphone.</string>
+    <!-- Warning show to the user when the app needs bluetooth connect permissions to get the best meeting experience and the user has denied them.-->
+    <string name="meeting_bluetooth_connect_required_permissions_warning">Go to Settings to grant MEGA permission to access your nearby devices using Bluetooth.</string>
     <!-- The button text in the meeting ended alert dialog. Click the button to open the group chat screen of the meeting-->
     <string name="view_meeting_chat">View meeting chat</string>
     <!-- the content of tips when the user uses the meeting first time-->
@@ -4143,14 +4136,10 @@
     <string name="disable_versioning_warning">Our file versioning feature ensures that we keep older copies of your files around if you replace them with newer versions. If you disable File Versioning you will no longer have this protection; the old copy will be lost when you replace it.</string>
     <!-- Warning informing the user the folder location is trying to open no longer exists. -->
     <string name="location_not_exist">This location no longer exists.</string>
-    <!-- Title of the button when you want to answer a one to one call -->
-    <string name="title_join_one_to_one_call">Answer call</string>
     <!-- Warning shown informing the contact has been previously invited. The placeholder is to show the name of the contact. -->
     <string name="contact_already_invited">You have already invited %1$s</string>
     <!-- Warning shown informing the contact request has been sent and can be managed in sent requests section. -->
     <string name="contact_invited">Invite sent successfully. See sent requests.</string>
-    <!-- Title of the menu when the select tracks on playlist page-->
-    <string name="title_select_tracks">Select tracks</string>
     <!-- Message when file available offline. -->
     <string name="file_available_offline">File available Offline</string>
     <!-- Message when file removed from offline. -->
@@ -4182,17 +4171,17 @@
     <!-- summary for the settings to enable high resolution images when on mobile data -->
     <string name="settings_mobile_data_resoluton_summary">Allow the use of mobile data to load high resolution images when previewing. If disabled, the original image will only be loaded when you zoom in.</string>
     <!-- If users want to move the root backup folder, all backups underneath it are disabled. Warning dialog will show to confirm -->
-    <string name="backup_move_root_folder">You are changing a default backup folder loacation. This may affect your ability to find your backup folder in the future. Please remember where it is located so that you can find it in the future.</string>
+    <string name="backup_move_root_folder">You are changing a default backup folder location. This may affect your ability to find your backup folder in the future. Please remember where it is located so that you can find it in the future.</string>
     <!-- If users want to move the sub backup folder, all backups underneath it are disabled. Warning dialog will show to confirm -->
-    <string name="backup_move_sub_folder">Moving this folder changes the backup destination. The backup will be turned off for safety. Is this what you want to do? Backups can be re-enable with the MEGA Desktop App.</string>
+    <string name="backup_move_sub_folder">Moving this folder changes the destination of one or more configured backups and may have unintended consequences. The backups will be turned off for your safety. Backups can be re-enabled with the MEGA Desktop App. Do you want to proceed?</string>
     <!-- If users want to delete the root backup folder, all backups underneath it are disabled. Warning dialog will show to confirm -->
     <string name="backup_remove_root_folder">You are deleting your backups folder. This will remove all the backups you have set. Are you sure you want to do this?</string>
     <!-- If users want to delete the sub backup folder, all backups underneath it are disabled. Warning dialog will show to confirm -->
-    <string name="backup_remove_sub_folder">Are you sure you want to delete your backup folder and disable backup you set?</string>
+    <string name="backup_remove_sub_folder">Are you sure you want to delete your backup folder and disable the associated backup?</string>
     <!-- The title of warning dialog for single folder moving -->
-    <string name="backup_move_folder_title">Move \"%1s\"</string>
+    <string name="backup_move_folder_title">Move “%1s”</string>
     <!-- The title of warning dialog for single folder deleting -->
-    <string name="backup_remove_folder_title">Move \"%1s\" to Rubbish Bin</string>
+    <string name="backup_remove_folder_title">Move “%1s” to Rubbish Bin</string>
     <!-- The title of warning dialog for multi-folder moving -->
     <string name="backup_move_multiple_folder_title">Move backup folders</string>
     <!-- The title of warning dialog for single folder deleting -->
@@ -4202,23 +4191,84 @@
     <!-- The confirm information of warning dialog for moving "My backup" -->
     <string name="backup_move_confirm">Move backup</string>
     <!-- The confirm information of warning dialog for deleting -->
-    <string name="backup_action_confirm">Please type \"%1s\" to confirm this action</string>
+    <string name="backup_action_confirm">Please type “%1s” to confirm this action</string>
     <!-- when checking the input -->
     <string name="error_backup_confirm_dont_match">Text entered does not match</string>
     <!-- The title of confirm dialog for adding item to "My backup" -->
-    <string name="backup_add_confirm_title">Add item to \"%1s\"</string>
+    <string name="backup_add_confirm_title">Add item to “%1s”</string>
     <!-- The title of warning dialog for adding item to "My backup" -->
-    <string name="backup_add_item_title">Setup backup</string>
+    <string name="backup_add_item_title">Set up backup</string>
     <!-- If users want to add items to the "My backup" folder, Warning dialog will show to confirm -->
-    <string name="backup_add_item_to_root_text">To ensure this items added to your backup folder are automatically synchronised to the MEGA Cloud, please setup on desktop app.</string>
+    <string name="backup_add_item_to_root_text">To ensure these items added to your backup folder are automatically synchronised to the MEGA Cloud, please set them up in the MEGA Desktop App.</string>
     <!-- If users want to share items in the "My backup" folder, Warning dialog will show to confirm -->
     <string name="backup_share_permission_title">Read-only</string>
-    <!-- If users want to share single backup folder, show below warning message -->
-    <string name="backup_share_permission_text">This folder can only be shared as read-only, as this is a backup folder, any changes to its content could disable the backup.</string>
+    <!-- If users want to share items in the "My backup" folder, Warning dialog will show to confirm -->
+    <string name="backup_share_permission_text">This folder can only be shared as read-only; as this is a backup folder, any changes to its content could disable the backup.</string>
     <!-- If users want to add items to the "My backup" device folder, Warning dialog will show to confirm -->
-    <string name="backup_add_item_text">Adding items to this folder changes the backup destination. The backup will be turned off for safety. Is this what you want to do? Backups can be re-enable with the MEGA Desktop App.</string>
+    <string name="backup_add_item_text">Items in this folder are part of a configured backup and are synchronised to a local folder. Taking this action will break the synchronisation and disable the backup. The backup can be re-enabled with the MEGA Desktop App. Are you sure you want to proceed?</string>
     <!-- Share multi backup folders, show below warning message -->
-    <string name="backup_multi_share_permission_text">These folders can only be shared as read-only, as they are backup folders, any changes to their content could disable the backups.</string>
+    <string name="backup_multi_share_permission_text">These folders can only be shared as read-only; as they are backup folders, any changes to their content could disable the backups.</string>
     <!-- Share multi folders mix with backup and non-backup folders, show below warning message -->
     <string name="backup_share_with_root_permission_text">Some folders shared are backup folders and read-only. Do you wish to continue?</string>
+    <!-- Indicates the content of the backup folder -->
+    <plurals name="num_devices">
+        <item quantity="one">%d device</item>
+        <item quantity="other">%d devices</item>
+    </plurals>
+    <!-- Title of the button when you want to answer a one to one call -->
+    <string name="title_join_one_to_one_call">Answer call</string>
+    <!-- Title of the menu when the select tracks on playlist page-->
+    <string name="title_select_tracks">Select tracks</string>
+    <!-- Action button to upload files. -->
+    <string name="upload_files">Upload files</string>
+    <!-- Action button to upload a folder. -->
+    <string name="upload_folder">Upload folder</string>
+    <!-- Text of the dialog warning the user about cancel uploads. -->
+    <string name="cancel_uploads">Cancel upload?</string>
+    <!-- Title of the Payments screen -->
+    <string name="payment">Payment</string>
+    <!-- Label indicating payment methods -->
+    <string name="payment_methods">Payment methods</string>
+    <!-- Button to proceed with a payment -->
+    <string name="proceed">Proceed</string>
+    <!-- Message informing the upgrade was processed correctly. Placeholder: type of subscription e.g: Pro Lite monthly -->
+    <string name="successful_upgrade">Thank you for your %1$s subscription!</string>
+    <!-- Pro Lite monthly subscription -->
+    <string name="pro_lite_monthly">Pro Lite monthly</string>
+    <!-- Pro Lite yearly subscription -->
+    <string name="pro_lite_yearly">Pro Lite yearly</string>
+    <!-- Pro I monthly subscription -->
+    <string name="pro_i_monthly">Pro I monthly</string>
+    <!-- Pro I yearly subscription -->
+    <string name="pro_i_yearly">Pro I yearly</string>
+    <!-- Pro II monthly subscription -->
+    <string name="pro_ii_monthly">Pro II monthly</string>
+    <!-- Pro II yearly subscription -->
+    <string name="pro_ii_yearly">Pro II yearly</string>
+    <!-- Pro III monthly subscription -->
+    <string name="pro_iii_monthly">Pro III monthly</string>
+    <!-- Pro III yearly subscription -->
+    <string name="pro_iii_yearly">Pro III yearly</string>
+    <!-- Action button which will cancel uploads. -->
+    <string name="action_cancel_upload">Cancel upload</string>
+    <!-- Action button which will dismiss the dialog and will not cancel the action. -->
+    <string name="action_do_not_cancel">Don’t cancel</string>
+    <!-- Title message of existing subscription dialog -->
+    <string name="title_existing_subscription">Buy new subscription?</string>
+    <!-- Text of buy new subscription button -->
+    <string name="button_buy_new_subscription">Buy new subscription</string>
+    <!-- Dialog message when the existing subscription is from Android platform (Google and Huawei)  -->
+    <string name="message_subscription_from_android_platform">You already have a subscription. If you buy another one you will be charged twice. To avoid this, cancel your current subscription through %1$s. Visit our Help Centre for more information.</string>
+    <!-- Dialog message when the existing subscription is from iTunes  -->
+    <string name="message_subscription_from_itunes">You already have a subscription. If you buy another one you will be charged twice. To avoid this, cancel your current subscription from your iTunes account. Visit our Help Centre for more information.</string>
+    <!-- Dialog message when the existing subscription is from other platform (Stripe and ECP)  -->
+    <string name="message_subscription_from_other_platform">You already have a subscription. If you buy another one, you will be charged twice. To avoid this, cancel your current subscription by going to MEGA in a desktop or mobile web browser. Visit our Help Centre for more information.</string>
+    <!-- Remove moderator permission and assign standard permission to a meeting participant-->
+    <string name="remove_moderator">Remove moderator</string>
+    <!-- Title of DCIM folder warning dialog -->
+    <string name="title_dcim_folder_dialog">DCIM folder</string>
+    <!-- Content of DCIM folder warning dialog -->
+    <string name="content_dcim_folder_dialog">MEGA uploads your images from the gallery. To change the upload location please go to Camera Upload settings.</string>
+    <!-- Error shown when download a file that has violated ToS/AUP. -->
+    <string name="tos_aup_violation">ToS/AUP violation</string>
 </resources>

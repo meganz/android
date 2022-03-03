@@ -1831,8 +1831,6 @@
     <string name="attachment_upload_panel_from_cloud">Из облачного диска</string>
     <!--  -->
     <string name="attachment_upload_panel_contact">Контакт</string>
-    <!--  -->
-    <string name="attachment_upload_panel_photo">Из устройства</string>
     <!-- Button and title of dialog shown when the user wants to delete permanently their account. -->
     <string name="delete_account">Удалить аккаунт</string>
     <!-- Text shown in the alert dialog to confirm the deletion of an account -->
@@ -4350,4 +4348,65 @@
     <string name="settings_mobile_data_resoluton_title">Использовать мобильные данные для превью изображений с высоким разрешением</string>
     <!-- summary for the settings to enable high resolution images when on mobile data -->
     <string name="settings_mobile_data_resoluton_summary">Разрешить использование мобильных данных для загрузки изображений с высоким разрешением при предварительном просмотре. Если этот параметр отключён, исходное изображение будет загружено только при увеличении масштаба.</string>
+    <!-- If users want to move the root backup folder, all backups underneath it are disabled. Warning dialog will show to confirm -->
+    <string name="backup_move_root_folder">Вы меняете расположение папки резервного копирования по умолчанию. Из-за этого её может быть сложнее найти в будущем. Пожалуйста, запомните, где она находится, чтобы не потерять.</string>
+    <!-- If users want to move the sub backup folder, all backups underneath it are disabled. Warning dialog will show to confirm -->
+    <string name="backup_move_sub_folder">Перемещение этой папки изменяет место назначения одной или нескольких настроенных резервных копий и может иметь непредвиденные последствия. Резервное копирование будет отключено в целях вашей безопасности. Резервное копирование можно повторно включить с помощью настольного приложения MEGA. Хотите продолжить?</string>
+    <!-- If users want to delete the root backup folder, all backups underneath it are disabled. Warning dialog will show to confirm -->
+    <string name="backup_remove_root_folder">Вы удаляете папку с резервными копиями. Это удалит все созданные вами резервные копии. Вы уверены, что хотите это сделать?</string>
+    <!-- If users want to delete the sub backup folder, all backups underneath it are disabled. Warning dialog will show to confirm -->
+    <string name="backup_remove_sub_folder">Вы действительно хотите удалить папку резервного копирования и отключить связанное резервное копирование?</string>
+    <!-- The title of warning dialog for single folder moving -->
+    <string name="backup_move_folder_title">Перемещение папки «%1s»</string>
+    <!-- The title of warning dialog for single folder deleting -->
+    <string name="backup_remove_folder_title">Перемещение папки «%1s» в корзину</string>
+    <!-- The title of warning dialog for multi-folder moving -->
+    <string name="backup_move_multiple_folder_title">Перемещение папок резервных копий</string>
+    <!-- The title of warning dialog for single folder deleting -->
+    <string name="backup_remove_multiple_folder_title">Перемещение папки резервных копий в корзину</string>
+    <!-- The confirm information of warning dialog for deleting -->
+    <string name="backup_disable_confirm">Отключить</string>
+    <!-- The confirm information of warning dialog for moving "My backup" -->
+    <string name="backup_move_confirm">Переместить</string>
+    <!-- The confirm information of warning dialog for deleting -->
+    <string name="backup_action_confirm">Пожалуйста, введите «%1s», чтобы продолжить</string>
+    <!-- when checking the input -->
+    <string name="error_backup_confirm_dont_match">Введённый текст не подходит</string>
+    <!-- The title of confirm dialog for adding item to "My backup" -->
+    <string name="backup_add_confirm_title">Добавление элемента в папку «%1s»</string>
+    <!-- The title of warning dialog for adding item to "My backup" -->
+    <string name="backup_add_item_title">Настройка резервного копирования</string>
+    <!-- If users want to add items to the "My backup" folder, Warning dialog will show to confirm -->
+    <string name="backup_add_item_to_root_text">Чтобы элементы в папке резервного копирования автоматически синхронизировались с облаком MEGA, настройте его в настольном приложении.</string>
+    <!-- If users want to share items in the "My backup" folder, Warning dialog will show to confirm -->
+    <string name="backup_share_permission_title">Только чтение</string>
+    <!-- If users want to share items in the "My backup" folder, Warning dialog will show to confirm -->
+    <string name="backup_share_permission_text">Эта папка доступна только для чтения. Поскольку это папка резервных копий, любые изменения её содержимого могут отключить резервное копирование.</string>
+    <!-- If users want to add items to the "My backup" device folder, Warning dialog will show to confirm -->
+    <string name="backup_add_item_text">Элементы в этой папке являются частью настроенной резервной копии и синхронизируются с локальной папкой. Выполнение этого действия нарушит синхронизацию и отключит резервное копирование. Резервное копирование можно повторно включить с помощью настольного приложения MEGA. Вы действительно хотите продолжить?</string>
+    <!-- Share multi backup folders, show below warning message -->
+    <string name="backup_multi_share_permission_text">Эти папки могут быть доступны только для чтения; это папки резервных копий, поэтому любые изменения их содержимого могут отключить резервное копирование.</string>
+    <!-- Share multi folders mix with backup and non-backup folders, show below warning message -->
+    <string name="backup_share_with_root_permission_text">Некоторые папки, которыми вы собираетесь поделиться, являются папками резервных копий и предназначены только для чтения. Продолжить?</string>
+    <!-- Indicates the content of the backup folder -->
+    <plurals name="num_devices">
+        <item quantity="one">%d устройство</item>
+        <item quantity="few">%d устройства</item>
+        <item quantity="many">%d устройств</item>
+        <item quantity="other">%d устройства</item>
+    </plurals>
+    <!-- Title of the button when you want to answer a one to one call -->
+    <string name="title_join_one_to_one_call">Ответить на звонок</string>
+    <!-- Title of the menu when the select tracks on playlist page-->
+    <string name="title_select_tracks">Выбор треков</string>
+    <!-- Action button to upload files. -->
+    <string name="upload_files">Загрузить файлы</string>
+    <!-- Action button to upload a folder. -->
+    <string name="upload_folder">Загрузить папку</string>
+    <!-- Title of the dialog warning the user about cancel uploads. -->
+    <string name="cancel_uploads">Отмена загрузки</string>
+    <!-- Warning alerting user if proceed with the action all the uploads will be cancelled. -->
+    <string name="cancel_uploads_warning">Если прервать процесс загрузки, все ваши загрузки будут отменены.</string>
+    <!-- Button to proceed with action. -->
+    <string name="action_proceed">Продолжить</string>
 </resources>

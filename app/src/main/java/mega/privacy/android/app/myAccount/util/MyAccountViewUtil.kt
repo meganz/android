@@ -1,6 +1,5 @@
 package mega.privacy.android.app.myAccount.util
 
-import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import mega.privacy.android.app.R
 import mega.privacy.android.app.databinding.MyAccountPaymentInfoContainerBinding
@@ -198,23 +197,12 @@ object MyAccountViewUtil {
             )
 
             setTextStyle(
-                context,
-                when {
+                textAppearance = when {
                     expandedView && expired -> R.style.TextAppearance_Mega_Body2_Red400Red300
                     expandedView -> R.style.TextAppearance_Mega_Body2_Amber800Amber700
                     expired -> R.style.TextAppearance_Mega_Body2_Red400
                     else -> R.style.TextAppearance_Mega_Body2_Amber400
-                },
-                ContextCompat.getColor(
-                    context,
-                    when {
-                        expandedView && expired -> R.color.red_400_red_300
-                        expandedView -> R.color.amber_800_amber_700
-                        expired -> R.color.red_400
-                        else -> R.color.amber_400
-                    }
-                ),
-                false
+                }
             )
         }
     }

@@ -61,9 +61,9 @@ import mega.privacy.android.app.lollipop.controllers.ChatController;
 import mega.privacy.android.app.components.twemoji.emoji.Emoji;
 import mega.privacy.android.app.lollipop.listeners.ManageReactionListener;
 import mega.privacy.android.app.lollipop.megachat.AndroidMegaChatMessage;
-import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop;
+import mega.privacy.android.app.lollipop.megachat.ChatActivity;
 import mega.privacy.android.app.lollipop.megachat.ChatSettings;
-import mega.privacy.android.app.lollipop.megachat.GroupChatInfoActivityLollipop;
+import mega.privacy.android.app.lollipop.megachat.GroupChatInfoActivity;
 import mega.privacy.android.app.lollipop.megachat.NodeAttachmentHistoryActivity;
 import mega.privacy.android.app.lollipop.megachat.PendingMessageSingle;
 import mega.privacy.android.app.lollipop.megachat.RemovedMessage;
@@ -75,6 +75,7 @@ import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaChatContainsMeta;
 import nz.mega.sdk.MegaChatListItem;
 import nz.mega.sdk.MegaChatMessage;
+import nz.mega.sdk.MegaChatRequestListenerInterface;
 import nz.mega.sdk.MegaChatRoom;
 import nz.mega.sdk.MegaHandleList;
 import nz.mega.sdk.MegaNode;
@@ -187,10 +188,10 @@ public class ChatUtil {
         MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(context, R.style.ThemeOverlay_Mega_MaterialAlertDialog);
         LayoutInflater inflater = null;
 
-        if (context instanceof GroupChatInfoActivityLollipop) {
-            inflater = ((GroupChatInfoActivityLollipop) context).getLayoutInflater();
-        } else if (context instanceof ChatActivityLollipop) {
-            inflater = ((ChatActivityLollipop) context).getLayoutInflater();
+        if (context instanceof GroupChatInfoActivity) {
+            inflater = ((GroupChatInfoActivity) context).getLayoutInflater();
+        } else if (context instanceof ChatActivity) {
+            inflater = ((ChatActivity) context).getLayoutInflater();
         }
 
         View v = inflater.inflate(R.layout.chat_link_share_dialog, null);
@@ -207,8 +208,8 @@ public class ChatUtil {
             android.content.ClipboardManager clipboard = (android.content.ClipboardManager) context.getSystemService(Context.CLIPBOARD_SERVICE);
             android.content.ClipData clip = android.content.ClipData.newPlainText(COPIED_TEXT_LABEL, chatLink);
             clipboard.setPrimaryClip(clip);
-            if (context instanceof ChatActivityLollipop) {
-                ((ChatActivityLollipop) context).showSnackbar(SNACKBAR_TYPE, context.getString(R.string.chat_link_copied_clipboard), MEGACHAT_INVALID_HANDLE);
+            if (context instanceof ChatActivity) {
+                ((ChatActivity) context).showSnackbar(SNACKBAR_TYPE, context.getString(R.string.chat_link_copied_clipboard), MEGACHAT_INVALID_HANDLE);
 
             }
             dismissShareChatLinkDialog(context, shareLinkDialog);
@@ -239,8 +240,8 @@ public class ChatUtil {
     private static void dismissShareChatLinkDialog(Context context, AlertDialog shareLinkDialog) {
         try {
             shareLinkDialog.dismiss();
-            if (context instanceof ChatActivityLollipop) {
-                ((ChatActivityLollipop) context).setShareLinkDialogDismissed(true);
+            if (context instanceof ChatActivity) {
+                ((ChatActivity) context).setShareLinkDialogDismissed(true);
             }
         } catch (Exception e) {
         }
@@ -251,8 +252,8 @@ public class ChatUtil {
         builder.setTitle(R.string.action_delete_link)
                 .setMessage(R.string.context_remove_chat_link_warning_text)
                 .setPositiveButton(R.string.delete_button, (dialog, which) -> {
-                    if (context instanceof GroupChatInfoActivityLollipop) {
-                        ((GroupChatInfoActivityLollipop) context).removeChatLink();
+                    if (context instanceof GroupChatInfoActivity) {
+                        ((GroupChatInfoActivity) context).removeChatLink();
                     }
                 })
                 .setNegativeButton(R.string.general_cancel, null).show();
@@ -459,7 +460,7 @@ public class ChatUtil {
      * @param isFromKeyboard If it's from the keyboard.
      */
     public static void addReactionInMsg(Context context, long chatId, long messageId, Emoji emoji, boolean isFromKeyboard) {
-        if (!(context instanceof ChatActivityLollipop)) {
+        if (!(context instanceof ChatActivity)) {
             logWarning("Incorrect context");
             return;
         }
@@ -485,7 +486,7 @@ public class ChatUtil {
      * @param isFromKeyboard If it's from the keyboard.
      */
     public static void addReactionInMsg(Context context, long chatId, long messageId, String reaction, boolean isFromKeyboard) {
-        if (!(context instanceof ChatActivityLollipop)) {
+        if (!(context instanceof ChatActivity)) {
             logWarning("Incorrect context");
             return;
         }
@@ -1889,5 +1890,42 @@ public class ChatUtil {
         }
 
         return INVALID_POSITION;
+    }
+
+    /**
+     * Method to get the initial state of megaChatApi and, if necessary, initiates it.
+     *
+     * @param session User session
+     */
+    public static void initMegaChatApi(String session) {
+        initMegaChatApi(session, null);
+    }
+
+    /**
+     * Method to get the initial state of megaChatApi and, if necessary, initiates it.
+     *
+     * @param session User session
+     * @param listener MegaChat listener for logout request.
+     */
+    public static void initMegaChatApi(String session, MegaChatRequestListenerInterface listener) {
+        MegaChatApiAndroid megaChatApi = MegaApplication.getInstance().getMegaChatApi();
+
+        int state = megaChatApi.getInitState();
+        if (state == MegaChatApi.INIT_NOT_DONE || state == MegaChatApi.INIT_ERROR) {
+            state = megaChatApi.init(session);
+            logDebug("result of init ---> " + state);
+            switch (state) {
+                case MegaChatApi.INIT_NO_CACHE:
+                    logDebug("INIT_NO_CACHE");
+                    break;
+                case MegaChatApi.INIT_ERROR:
+                    logDebug("INIT_ERROR");
+                    megaChatApi.logout(listener);
+                    break;
+                default:
+                    logDebug("Chat correctly initialized");
+                    break;
+            }
+        }
     }
 }

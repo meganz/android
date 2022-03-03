@@ -549,8 +549,6 @@ public class TwoFactorAuthenticationActivity extends PasscodeActivity implements
             scrollContainerVerify.setVisibility(View.GONE);
             scrollContainer2FAEnabled.setVisibility(View.GONE);
         }
-
-//        megaApi.multiFactorAuthCheck(megaApi.getMyEmail(), this);
     }
 
     void showScanOrCopyLayout () {
@@ -870,15 +868,9 @@ public class TwoFactorAuthenticationActivity extends PasscodeActivity implements
                 break;
             }
             case R.id.container_rk_2fa:
-//                {
-//                update2FASetting();
-//                RecoveryKeyBottomSheetDialogFragment recoveryKeyBottomSheetDialogFragment = new RecoveryKeyBottomSheetDialogFragment();
-//                recoveryKeyBottomSheetDialogFragment.show(getSupportFragmentManager(), recoveryKeyBottomSheetDialogFragment.getTag());
-//                break;
-//            }
             case R.id.button_export_rk:{
                 update2FASetting();
-                Intent intent = new Intent(this, ManagerActivityLollipop.class);
+                Intent intent = new Intent(this, ManagerActivity.class);
                 intent.setAction(ACTION_RECOVERY_KEY_EXPORTED);
                 intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                 startActivity(intent);
@@ -1001,7 +993,6 @@ public class TwoFactorAuthenticationActivity extends PasscodeActivity implements
                 logDebug("MegaError.API_OK");
                 seed = request.getText();
                 if (seed != null){
-//                    seedText.setText(seed.toUpperCase());
                     qrProgressBar.setVisibility(View.VISIBLE);
                     generate2FAQR();
                 }
@@ -1032,8 +1023,6 @@ public class TwoFactorAuthenticationActivity extends PasscodeActivity implements
                 logError("An error ocurred trying to enable Two-Factor Authentication");
                 showSnackbar(getString(R.string.error_enable_2fa));
             }
-
-//            megaApi.multiFactorAuthCheck(megaApi.getMyEmail(), this);
         }
         else if (request.getType() == MegaRequest.TYPE_MULTI_FACTOR_AUTH_CHECK){
             if (e.getErrorCode() == MegaError.API_OK){
@@ -1132,17 +1121,15 @@ public class TwoFactorAuthenticationActivity extends PasscodeActivity implements
 
         if (requestCode == REQUEST_DOWNLOAD_FOLDER && resultCode == RESULT_OK){
             logDebug("REQUEST_DOWNLOAD_FOLDER");
-            String parentPath = intent.getStringExtra(FileStorageActivityLollipop.EXTRA_PATH);
-            String sdCardUriString = intent.getStringExtra(FileStorageActivityLollipop.EXTRA_SD_URI);
+            String parentPath = intent.getStringExtra(FileStorageActivity.EXTRA_PATH);
 
             if (parentPath != null){
                 logDebug("parentPath no NULL");
 
                 parentPath = parentPath + File.separator + getRecoveryKeyFileName();
 
-                Intent newIntent = new Intent(this, ManagerActivityLollipop.class);
-                newIntent.putExtra(FileStorageActivityLollipop.EXTRA_PATH, parentPath);
-                newIntent.putExtra(FileStorageActivityLollipop.EXTRA_SD_URI, sdCardUriString);
+                Intent newIntent = new Intent(this, ManagerActivity.class);
+                newIntent.putExtra(FileStorageActivity.EXTRA_PATH, parentPath);
                 newIntent.setAction(ACTION_REQUEST_DOWNLOAD_FOLDER_LOGOUT);
                 startActivity(newIntent);
             }

@@ -5,7 +5,9 @@ package mega.privacy.android.app.interfaces;
  * should implement when having UploadBottomSheetDialog
  */
 public interface UploadBottomSheetDialogActionListener {
-    void uploadFromDevice();
+    void uploadFiles();
+
+    void uploadFolder();
 
     void takePictureAndUpload();
 

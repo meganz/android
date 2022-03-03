@@ -14,7 +14,7 @@ public class Constants {
     public static final int BOOT_JOB_ID = 10097;
     public static final int CU_SYNC_ACTIVE_HEARTBEAT_JOB_ID = 10098;
 
-    public static final int REQUEST_CODE_GET = 1000;
+    public static final int REQUEST_CODE_GET_FILES = 1000;
     public static final int REQUEST_CODE_SELECT_FOLDER_TO_MOVE = 1001;
     public static final int REQUEST_CODE_SELECT_FOLDER_TO_COPY = 1002;
     public static final int REQUEST_CODE_GET_LOCAL = 1003;
@@ -51,6 +51,8 @@ public class Constants {
     public static final int REQUEST_CODE_SEND_LINK = 1035;
     public static final int REQUEST_CODE_SCAN_DOCUMENT = 1036;
     public static final int REQUEST_CODE_SEND_SEVERAL_LINKS = 1037;
+    public static final int REQUEST_CODE_GET_FOLDER = 1038;
+    public static final int REQUEST_CODE_GET_FOLDER_CONTENT = 1039;
 
     public static final String ACTION_REFRESH_AFTER_BLOCKED = "ACTION_REFRESH_AFTER_BLOCKED";
     public static final String ACTION_REFRESH = "ACTION_REFRESH";
@@ -162,6 +164,7 @@ public class Constants {
     public static final int REQUEST_WRITE_STORAGE_TAKE_PICTURE = 14;
 
     public static final int LOCATION_PERMISSION_REQUEST_CODE = 15;
+    public static final int REQUEST_BT_CONNECT = 16;
 
     public static final int TYPE_START_RECORD = 1;
     public static final int TYPE_END_RECORD = 2;
@@ -326,6 +329,7 @@ public class Constants {
     public static final String INTENT_EXTRA_IS_FROM_MEETING = "extra_is_from_meeting";
     public static final String INTENT_EXTRA_MEETING_PARTICIPANTS = "participants_in_a_meeting";
     public static final String INTENT_EXTRA_KEY_URI = "INTENT_EXTRA_KEY_URI";
+    public static final String INTENT_EXTRA_KEY_SHOW_NEARBY_FILES = "INTENT_EXTRA_KEY_SHOW_NEARBY_FILES";
 
     public static final int FILE_BROWSER_ADAPTER = 2000;
     public static final int CONTACT_FILE_ADAPTER = 2001;
@@ -607,6 +611,7 @@ public class Constants {
     public static final String SELECTED_CHATS = "SELECTED_CHATS";
     public static final String SELECTED_USERS = "SELECTED_USERS";
     public static final String ID_MESSAGES = "ID_MESSAGES";
+    public static final String ID_CHAT_FROM = "ID_CHAT_FROM";
     public static final String USER_HANDLES = "USER_HANDLES";
     public static final String URL_FILE_LINK = "URL_FILE_LINK";
     public static final String OPEN_SCAN_QR = "OPEN_SCAN_QR";

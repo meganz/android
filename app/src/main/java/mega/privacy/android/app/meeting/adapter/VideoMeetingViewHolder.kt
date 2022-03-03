@@ -2,7 +2,7 @@ package mega.privacy.android.app.meeting.adapter
 
 import android.content.res.Configuration
 import android.view.ViewGroup
-import androidx.constraintlayout.widget.ConstraintLayout
+import android.widget.LinearLayout
 import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.GridLayoutManager
@@ -84,11 +84,11 @@ class VideoMeetingViewHolder(
             }
 
 
-            (binding.muteIcon.layoutParams as ConstraintLayout.LayoutParams).apply {
+            (binding.muteIcon.layoutParams as LinearLayout.LayoutParams).apply {
                 bottomMargin = 0
             }
 
-            (binding.moderatorIcon.layoutParams as ConstraintLayout.LayoutParams).apply {
+            (binding.moderatorIcon.layoutParams as LinearLayout.LayoutParams).apply {
                 bottomMargin = 0
             }
 

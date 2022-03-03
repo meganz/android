@@ -1,5 +1,5 @@
 package mega.privacy.android.app.featuretoggle
 
 object SettingsFragmentRefactorToggle {
-    var enabled = false
+    var enabled = true
 }

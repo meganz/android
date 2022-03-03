@@ -276,7 +276,7 @@
                                 android:layout_height="wrap_content"
                                 android:layout_gravity="center"
                                 android:background="@null"
-                                android:src="@drawable/ic_media"
+                                android:src="@drawable/ic_capture"
                                 app:tint="@color/grey_054_white_054" />
 
                     </FrameLayout>

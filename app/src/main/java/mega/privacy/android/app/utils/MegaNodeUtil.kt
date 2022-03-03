@@ -34,10 +34,10 @@ import mega.privacy.android.app.listeners.CopyListener
 import mega.privacy.android.app.listeners.ExportListener
 import mega.privacy.android.app.listeners.MoveListener
 import mega.privacy.android.app.listeners.RemoveListener
-import mega.privacy.android.app.lollipop.FileExplorerActivityLollipop
-import mega.privacy.android.app.lollipop.ManagerActivityLollipop
-import mega.privacy.android.app.lollipop.ManagerActivityLollipop.DrawerItem
-import mega.privacy.android.app.lollipop.PdfViewerActivityLollipop
+import mega.privacy.android.app.lollipop.FileExplorerActivity
+import mega.privacy.android.app.lollipop.ManagerActivity
+import mega.privacy.android.app.lollipop.DrawerItem
+import mega.privacy.android.app.lollipop.PdfViewerActivity
 import mega.privacy.android.app.lollipop.listeners.MultipleRequestListener
 import mega.privacy.android.app.textEditor.TextEditorActivity
 import mega.privacy.android.app.textEditor.TextEditorViewModel.Companion.EDIT_MODE
@@ -1160,15 +1160,15 @@ object MegaNodeUtil {
     }
 
     /**
-     * Start FileExplorerActivityLollipop to select folder to move nodes.
+     * Start [FileExplorerActivity] to select folder to move nodes.
      *
      * @param activity current Android activity
      * @param handles handles to move
      */
     @JvmStatic
     fun selectFolderToMove(activity: Activity, handles: LongArray) {
-        val intent = Intent(activity, FileExplorerActivityLollipop::class.java)
-        intent.action = FileExplorerActivityLollipop.ACTION_PICK_MOVE_FOLDER
+        val intent = Intent(activity, FileExplorerActivity::class.java)
+        intent.action = FileExplorerActivity.ACTION_PICK_MOVE_FOLDER
         intent.putExtra(INTENT_EXTRA_KEY_MOVE_FROM, handles)
         activity.startActivityForResult(intent, REQUEST_CODE_SELECT_FOLDER_TO_MOVE)
     }
@@ -1229,7 +1229,7 @@ object MegaNodeUtil {
     }
 
     /**
-     * Start FileExplorerActivityLollipop to select folder to copy nodes.
+     * Start [FileExplorerActivity] to select folder to copy nodes.
      *
      * @param activity current Android activity
      * @param handles handles to copy
@@ -1241,8 +1241,8 @@ object MegaNodeUtil {
             return
         }
 
-        val intent = Intent(activity, FileExplorerActivityLollipop::class.java)
-        intent.action = FileExplorerActivityLollipop.ACTION_PICK_COPY_FOLDER
+        val intent = Intent(activity, FileExplorerActivity::class.java)
+        intent.action = FileExplorerActivity.ACTION_PICK_COPY_FOLDER
         intent.putExtra(INTENT_EXTRA_KEY_COPY_FROM, handles)
         activity.startActivityForResult(intent, REQUEST_CODE_SELECT_FOLDER_TO_COPY)
     }
@@ -1437,7 +1437,7 @@ object MegaNodeUtil {
      */
     @JvmStatic
     fun handleLocationClick(activity: Activity, adapterType: Int, location: LocationInfo) {
-        val intent = Intent(activity, ManagerActivityLollipop::class.java)
+        val intent = Intent(activity, ManagerActivity::class.java)
 
         intent.action = ACTION_OPEN_FOLDER
         intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
@@ -1495,7 +1495,7 @@ object MegaNodeUtil {
                 openZip(context, activityLauncher, autoPlayInfo.localPath, autoPlayInfo.nodeHandle)
             }
             mime.isPdf -> {
-                val pdfIntent = Intent(context, PdfViewerActivityLollipop::class.java)
+                val pdfIntent = Intent(context, PdfViewerActivity::class.java)
                 pdfIntent.putExtra(INTENT_EXTRA_KEY_HANDLE, autoPlayInfo.nodeHandle)
 
                 if (!setLocalIntentParams(
@@ -1576,7 +1576,7 @@ object MegaNodeUtil {
     }
 
     /**
-     * Launch ZipBrowserActivityLollipop to preview a zip file.
+     * Launch [ZipBrowserActivity] to preview a zip file.
      *
      * @param context Android context.
      * @param activityLauncher interface to launch activity.
@@ -2098,4 +2098,13 @@ object MegaNodeUtil {
             !isFolder && (MimeTypeList.typeForName(name).isImage
                     || MimeTypeList.typeForName(name).isGIF
                     || (MimeTypeList.typeForName(name).isVideoReproducible || MimeTypeList.typeForName(name).isMp4Video))
+
+    /**
+     * Check if provided node File is the expected one
+     *
+     * @param nodeFile  File to be checked
+     */
+    @JvmStatic
+    fun MegaNode.isNodeFileValid(nodeFile: File?): Boolean =
+        nodeFile?.exists() == true && nodeFile.canRead() && nodeFile.length() == this.size
 }

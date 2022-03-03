@@ -43,6 +43,7 @@ import java.util.List;
 
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
+import mega.privacy.android.app.lollipop.ManagerActivity;
 import mega.privacy.android.app.middlelayer.iab.BillingManager;
 import mega.privacy.android.app.middlelayer.iab.BillingUpdatesListener;
 import mega.privacy.android.app.middlelayer.iab.MegaPurchase;
@@ -98,7 +99,7 @@ public class BillingManagerImpl implements PurchasesUpdatedListener, BillingMana
     /** Public key for verify purchase. */
     private static final String PUBLIC_KEY = BASE64_ENCODED_PUBLIC_KEY_1 + BASE64_ENCODED_PUBLIC_KEY_2 + BASE64_ENCODED_PUBLIC_KEY_3 + BASE64_ENCODED_PUBLIC_KEY_4 + BASE64_ENCODED_PUBLIC_KEY_5;
     public static final int PAY_METHOD_RES_ID = R.string.payment_method_google_wallet;
-    public static final int PAY_METHOD_ICON_RES_ID = R.drawable.google_wallet_ic;
+    public static final int PAY_METHOD_ICON_RES_ID = R.drawable.ic_google_wallet;
     public static final String SIGNATURE_ALGORITHM = "SHA1withRSA";
     public static final int PAYMENT_GATEWAY = MegaApiJava.PAYMENT_METHOD_GOOGLE_WALLET;
 
@@ -114,7 +115,7 @@ public class BillingManagerImpl implements PurchasesUpdatedListener, BillingMana
      * Handles all the interactions with Play Store (via Billing library), maintains connection to
      * it through BillingClient and caches temporary states/data if needed.
      *
-     * @param activity        The Context, here's {@link mega.privacy.android.app.lollipop.ManagerActivityLollipop}
+     * @param activity        The Context, here's {@link ManagerActivity}
      * @param updatesListener The callback, when billing status update. {@link BillingUpdatesListener}
      */
     public BillingManagerImpl(Activity activity, BillingUpdatesListener updatesListener) {

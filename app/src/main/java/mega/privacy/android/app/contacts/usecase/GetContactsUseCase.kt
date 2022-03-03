@@ -15,10 +15,9 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.contacts.list.data.ContactItem
 import mega.privacy.android.app.di.MegaApi
 import mega.privacy.android.app.listeners.OptionalMegaRequestListenerInterface
-import mega.privacy.android.app.usecase.GetChatChangesUseCase
-import mega.privacy.android.app.usecase.GetChatChangesUseCase.Result.*
+import mega.privacy.android.app.usecase.chat.GetChatChangesUseCase
+import mega.privacy.android.app.usecase.chat.GetChatChangesUseCase.Result.*
 import mega.privacy.android.app.usecase.GetGlobalChangesUseCase
-import mega.privacy.android.app.usecase.GetGlobalChangesUseCase.Result.OnUsersUpdate
 import mega.privacy.android.app.utils.AvatarUtil
 import mega.privacy.android.app.utils.Constants.INVALID_POSITION
 import mega.privacy.android.app.utils.ErrorUtils.toThrowable
@@ -35,7 +34,6 @@ import nz.mega.sdk.MegaApiJava.*
 import nz.mega.sdk.MegaChatApi.*
 import nz.mega.sdk.MegaUser.VISIBILITY_VISIBLE
 import java.io.File
-import java.util.*
 import javax.inject.Inject
 
 /**
@@ -157,12 +155,14 @@ class GetContactsUseCase @Inject constructor(
                 }
             )
 
-            val globalSubscription = getGlobalChangesUseCase.get().subscribeBy(
-                onNext = { change ->
-                    if (emitter.isCancelled) return@subscribeBy
+            val globalSubscription = getGlobalChangesUseCase.get()
+                .filter { it is GetGlobalChangesUseCase.Result.OnUsersUpdate }
+                .map { (it as GetGlobalChangesUseCase.Result.OnUsersUpdate).users ?: emptyList() }
+                .subscribeBy(
+                    onNext = { users ->
+                        if (emitter.isCancelled) return@subscribeBy
 
-                    if (change is OnUsersUpdate) {
-                        change.users.forEach { user ->
+                        users.forEach { user ->
                             val index = contacts.indexOfFirst { it.email == user.email }
                             if (index != INVALID_POSITION) {
                                 when {
@@ -185,9 +185,11 @@ class GetContactsUseCase @Inject constructor(
                                 emitter.onNext(contacts.sortedAlphabetically())
                             }
                         }
+                    },
+                    onError = { error ->
+                        logError(error.stackTraceToString())
                     }
-                }
-            )
+                )
 
             contacts.forEach { it.requestMissingFields(userAttrsListener) }
 

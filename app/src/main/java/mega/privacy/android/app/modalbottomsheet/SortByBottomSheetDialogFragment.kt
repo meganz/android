@@ -15,8 +15,8 @@ import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.R
 import mega.privacy.android.app.databinding.BottomSheetSortByBinding
 import mega.privacy.android.app.globalmanagement.SortOrderManagement
-import mega.privacy.android.app.lollipop.FileExplorerActivityLollipop
-import mega.privacy.android.app.lollipop.ManagerActivityLollipop
+import mega.privacy.android.app.lollipop.FileExplorerActivity
+import mega.privacy.android.app.lollipop.ManagerActivity
 import mega.privacy.android.app.utils.ColorUtils
 import mega.privacy.android.app.utils.Constants.*
 import mega.privacy.android.app.utils.callManager
@@ -29,18 +29,13 @@ class SortByBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
 
     companion object {
         private const val ORDER_TYPE = "ORDER_TYPE"
-        private const val IS_INCOMING_ROOT_ORDER = "IS_INCOMING_ROOT_ORDER"
 
         @JvmStatic
-        fun newInstance(
-            orderType: Int,
-            isIncomingRootOrder: Boolean = false
-        ): SortByBottomSheetDialogFragment {
+        fun newInstance(orderType: Int): SortByBottomSheetDialogFragment {
             val fragment = SortByBottomSheetDialogFragment()
             val args = Bundle()
 
             args.putInt(ORDER_TYPE, orderType)
-            args.putBoolean(IS_INCOMING_ROOT_ORDER, isIncomingRootOrder)
             fragment.arguments = args
 
             return fragment
@@ -76,7 +71,6 @@ class SortByBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
         binding.sortByNameDesc.text = "$sortByName ($sortByDesc)"
 
         orderType = arguments?.getInt(ORDER_TYPE)!!
-        isIncomingRootOrder = arguments?.getBoolean(IS_INCOMING_ROOT_ORDER)!!
 
         oldOrder = when (orderType) {
             ORDER_CLOUD -> sortOrderManagement.getOrderCloud()
@@ -199,9 +193,9 @@ class SortByBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
                         )
                     )
 
-                if (requireActivity() is ManagerActivityLollipop) {
-                    (requireActivity() as ManagerActivityLollipop).refreshCloudOrder(order)
-                } else if (requireActivity() is FileExplorerActivityLollipop) {
+                if (requireActivity() is ManagerActivity) {
+                    (requireActivity() as ManagerActivity).refreshCloudOrder(order)
+                } else if (requireActivity() is FileExplorerActivity) {
                     updateFileExplorerOrder(order)
                 }
             }
@@ -226,9 +220,9 @@ class SortByBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
                         )
                     )
 
-                if (requireActivity() is ManagerActivityLollipop) {
-                    (requireActivity() as ManagerActivityLollipop).refreshOthersOrder()
-                } else if (requireActivity() is FileExplorerActivityLollipop) {
+                if (requireActivity() is ManagerActivity) {
+                    (requireActivity() as ManagerActivity).refreshOthersOrder()
+                } else if (requireActivity() is FileExplorerActivity) {
                     updateFileExplorerOrder(order)
                 }
             }
@@ -253,7 +247,7 @@ class SortByBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
     }
 
     private fun updateFileExplorerOrder(order: Int) {
-        (requireActivity() as FileExplorerActivityLollipop).refreshOrderNodes(order)
+        (requireActivity() as FileExplorerActivity).refreshOrderNodes(order)
 
         requireActivity().sendBroadcast(
             Intent(BROADCAST_ACTION_INTENT_UPDATE_ORDER).putExtra(

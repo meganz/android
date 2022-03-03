@@ -1,7 +1,6 @@
 //copyright: https://stackoverflow.com/questions/34927748/android-5-0-documentfile-from-tree-uri/36162691#36162691
 package mega.privacy.android.app.utils;
 
-import android.annotation.TargetApi;
 import android.app.ActivityManager;
 import android.content.ContentResolver;
 import android.content.Context;
@@ -20,6 +19,7 @@ import android.webkit.MimeTypeMap;
 
 import androidx.annotation.Nullable;
 import androidx.core.content.FileProvider;
+import androidx.documentfile.provider.DocumentFile;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -60,6 +60,7 @@ import static mega.privacy.android.app.utils.OfflineUtils.getOfflineFile;
 import static mega.privacy.android.app.utils.TimeUtils.formatLongDateTime;
 import static mega.privacy.android.app.utils.Util.getSizeString;
 import static mega.privacy.android.app.utils.Util.isAndroid11OrUpper;
+import static nz.mega.sdk.MegaApiJava.INVALID_HANDLE;
 import static nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE;
 
 public class FileUtil {
@@ -558,7 +559,9 @@ public class FileUtil {
 
     public static String getDownloadLocation() {
         if (isAndroid11OrUpper()) {
-            return buildDefaultDownloadDir(MegaApplication.getInstance()).getAbsolutePath();
+            File file = buildDefaultDownloadDir(MegaApplication.getInstance());
+            file.mkdirs();
+            return file.getAbsolutePath();
         }
 
         DatabaseHandler dbH = DatabaseHandler.getDbHandler(MegaApplication.getInstance());
@@ -883,7 +886,6 @@ public class FileUtil {
         }
     }
 
-    @TargetApi(Build.VERSION_CODES.LOLLIPOP)
     private static String getVolumeIdFromTreeUri(final Uri treeUri) {
         final String docId = DocumentsContract.getTreeDocumentId(treeUri);
         final String[] split = docId.split(":");
@@ -891,8 +893,6 @@ public class FileUtil {
         else return null;
     }
 
-
-    @TargetApi(Build.VERSION_CODES.LOLLIPOP)
     private static String getDocumentPathFromTreeUri(final Uri treeUri) {
         final String docId = DocumentsContract.getTreeDocumentId(treeUri);
         final String[] split = docId.split(":");
@@ -948,6 +948,29 @@ public class FileUtil {
 
         for (File f : fList) {
             if (f.isDirectory()) {
+                numFolders++;
+            } else {
+                numFiles++;
+            }
+        }
+
+        return getFolderInfo(numFolders, numFiles);
+    }
+
+    /**
+     * Gets the string to show as content of a folder.
+     *
+     * @param documentFile The folder to get its string content.
+     * @return The string to show as content of the folder.
+     */
+    public static String getFileFolderInfo(DocumentFile documentFile) {
+        DocumentFile[] fList = documentFile.listFiles();
+
+        int numFolders = 0;
+        int numFiles = 0;
+
+        for (DocumentFile d : fList) {
+            if (d.isDirectory()) {
                 numFolders++;
             } else {
                 numFiles++;
@@ -1065,10 +1088,9 @@ public class FileUtil {
      * @param context         Current context.
      * @param content         The content to store.
      * @param path            The selected location to save the file.
-     * @param sdCardUriString If the selected location is on SD card, need the uri to grant SD card write permission.
      * @return True if content was correctly saved, false otherwise.
      */
-    public static boolean saveTextOnFile(Context context, String content, String path, String sdCardUriString) {
+    public static boolean saveTextOnFile(Context context, String content, String path) {
         try {
             // If export the file to SD card.
             if (SDCardUtils.isLocalFolderOnSDCard(context, path)) {
@@ -1082,8 +1104,7 @@ public class FileUtil {
                 // Copy to target location on SD card.
                 SDCardOperator sdCardOperator = new SDCardOperator(context);
                 DatabaseHandler dbH = DatabaseHandler.getDbHandler(context);
-                // If the `sdCardUriString` is null, get SD card root uri from database.
-                sdCardOperator.initDocumentFileRoot(sdCardUriString == null ? dbH.getSDCardUri() : sdCardUriString);
+                sdCardOperator.initDocumentFileRoot(dbH.getSDCardUri());
                 sdCardOperator.moveFile(path.substring(0, path.lastIndexOf(File.separator)), temp);
 
                 // Delete the temp file.
@@ -1152,6 +1173,41 @@ public class FileUtil {
         try {
             return file.delete();
         } catch (Exception ignored) {
+            return false;
+        }
+    }
+
+    /**
+     * Return file fake handle
+     *
+     * @param file  File to get fake handle from
+     * @return      Fake handle or INVALID_HANDLE if it couldn't be created
+     */
+    public static long getFileFakeHandle(File file) {
+        try {
+            int hashCode = file.hashCode();
+            if (hashCode > 0) {
+                return hashCode * -1;
+            } else {
+                return hashCode;
+            }
+        } catch (Exception ignored) {
+            return INVALID_HANDLE;
+        }
+    }
+
+    /**
+     * Check if a specific file is valid for Image Viewer
+     *
+     * @param file  File to be checked
+     * @return      True if it's valid, false otherwise
+     */
+    public static boolean isValidForImageViewer(File file) {
+        if (file.exists() && file.canRead()) {
+            MimeTypeList mimeTypeList = MimeTypeList.typeForName(file.getName());
+            return mimeTypeList.isImage() || mimeTypeList.isGIF()
+                    || mimeTypeList.isVideoReproducible() || mimeTypeList.isMp4Video();
+        } else {
             return false;
         }
     }

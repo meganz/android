@@ -21,7 +21,7 @@ import android.widget.FrameLayout;
 import java.util.ArrayList;
 
 import mega.privacy.android.app.R;
-import mega.privacy.android.app.lollipop.AddContactActivityLollipop;
+import mega.privacy.android.app.lollipop.AddContactActivity;
 import mega.privacy.android.app.activities.PasscodeActivity;
 import mega.privacy.android.app.lollipop.listeners.CreateGroupChatWithPublicLink;
 import nz.mega.sdk.MegaChatApi;
@@ -161,7 +161,7 @@ public class ChatExplorerActivity extends PasscodeActivity implements View.OnCli
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        logDebug("onCreateOptionsMenuLollipop");
+        logDebug("onCreateOptionsMenu");
 
         // Inflate the menu items for use in the action bar
         MenuInflater inflater = getMenuInflater();
@@ -249,7 +249,7 @@ public class ChatExplorerActivity extends PasscodeActivity implements View.OnCli
                             showSnackbar(getString(R.string.no_contacts_invite));
                         }
                         else{
-                            Intent in = new Intent(this, AddContactActivityLollipop.class);
+                            Intent in = new Intent(this, AddContactActivity.class);
                             in.putExtra("contactType", CONTACT_TYPE_MEGA);
                             startActivityForResult(in, REQUEST_CREATE_CHAT);
                         }
@@ -277,7 +277,7 @@ public class ChatExplorerActivity extends PasscodeActivity implements View.OnCli
                 return;
             }
 
-            final ArrayList<String> contactsData = intent.getStringArrayListExtra(AddContactActivityLollipop.EXTRA_CONTACTS);
+            final ArrayList<String> contactsData = intent.getStringArrayListExtra(AddContactActivity.EXTRA_CONTACTS);
 
             if (contactsData != null){
                 if(contactsData.size()==1){
@@ -298,13 +298,13 @@ public class ChatExplorerActivity extends PasscodeActivity implements View.OnCli
                     }
                     logDebug("Create group chat with participants: " + peers.size());
 
-                    final String chatTitle = intent.getStringExtra(AddContactActivityLollipop.EXTRA_CHAT_TITLE);
-                    final boolean isEKR = intent.getBooleanExtra(AddContactActivityLollipop.EXTRA_EKR, false);
+                    final String chatTitle = intent.getStringExtra(AddContactActivity.EXTRA_CHAT_TITLE);
+                    final boolean isEKR = intent.getBooleanExtra(AddContactActivity.EXTRA_EKR, false);
                     if (isEKR) {
                         megaChatApi.createChat(true, peers, chatTitle, this);
                     }
                     else {
-                        final boolean chatLink = intent.getBooleanExtra(AddContactActivityLollipop.EXTRA_CHAT_LINK, false);
+                        final boolean chatLink = intent.getBooleanExtra(AddContactActivity.EXTRA_CHAT_LINK, false);
 
                         if(chatLink){
                             if(chatTitle!=null && !chatTitle.isEmpty()){
@@ -432,7 +432,7 @@ public class ChatExplorerActivity extends PasscodeActivity implements View.OnCli
                         break;
                     }
 
-                    Intent intent = new Intent(this, AddContactActivityLollipop.class);
+                    Intent intent = new Intent(this, AddContactActivity.class);
                     intent.putExtra("contactType", CONTACT_TYPE_MEGA);
                     intent.putExtra("onlyCreateGroup", true);
                     startActivityForResult(intent, REQUEST_CREATE_CHAT);

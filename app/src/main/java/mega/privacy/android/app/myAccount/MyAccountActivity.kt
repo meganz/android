@@ -26,7 +26,7 @@ import mega.privacy.android.app.databinding.ActivityMyAccountBinding
 import mega.privacy.android.app.databinding.DialogErrorInputEditTextBinding
 import mega.privacy.android.app.databinding.DialogErrorPasswordInputEditTextBinding
 import mega.privacy.android.app.interfaces.SnackbarShower
-import mega.privacy.android.app.lollipop.ChangePasswordActivityLollipop
+import mega.privacy.android.app.lollipop.ChangePasswordActivity
 import mega.privacy.android.app.upgradeAccount.UpgradeAccountActivity
 import mega.privacy.android.app.utils.AlertDialogUtil.isAlertDialogShown
 import mega.privacy.android.app.utils.AlertDialogUtil.quitEditTextError
@@ -131,6 +131,8 @@ class MyAccountActivity : PasscodeActivity(), MyAccountFragment.MessageResultCal
                 Intent(this, UpgradeAccountActivity::class.java)
                     .putExtra(EXTRA_ACCOUNT_TYPE, accountType)
             )
+
+            viewModel.setOpenUpgradeFrom()
 
             intent.removeExtra(EXTRA_ACCOUNT_TYPE)
         }
@@ -252,7 +254,10 @@ class MyAccountActivity : PasscodeActivity(), MyAccountFragment.MessageResultCal
             R.id.action_change_pass -> navController.navigate(R.id.action_my_account_to_change_password)
             R.id.action_export_MK -> navController.navigate(R.id.action_my_account_to_export_recovery_key)
             R.id.action_refresh -> viewModel.refresh(this)
-            R.id.action_upgrade_account -> navController.navigate(R.id.action_my_account_to_upgrade)
+            R.id.action_upgrade_account -> {
+                navController.navigate(R.id.action_my_account_to_upgrade)
+                viewModel.setOpenUpgradeFrom()
+            }
             R.id.action_cancel_subscriptions -> showCancelSubscriptions()
             R.id.action_logout -> viewModel.logout(this)
         }
@@ -628,7 +633,7 @@ class MyAccountActivity : PasscodeActivity(), MyAccountFragment.MessageResultCal
                 R.string.pin_lock_enter
             ) { _, _ ->
                 startActivity(
-                    Intent(this, ChangePasswordActivityLollipop::class.java)
+                    Intent(this, ChangePasswordActivity::class.java)
                         .setAction(ACTION_RESET_PASS_FROM_LINK)
                         .setData(intent.data)
                         .putExtra(EXTRA_MASTER_KEY, viewModel.getMasterKey())

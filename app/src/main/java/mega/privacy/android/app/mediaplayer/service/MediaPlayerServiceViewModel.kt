@@ -33,7 +33,7 @@ import mega.privacy.android.app.utils.RxUtil.logErr
 import mega.privacy.android.app.utils.StringResourcesUtils.getString
 import mega.privacy.android.app.utils.StringUtils.isTextEmpty
 import mega.privacy.android.app.utils.TextUtil
-import mega.privacy.android.app.utils.ThumbnailUtilsLollipop.getThumbFolder
+import mega.privacy.android.app.utils.ThumbnailUtils.getThumbFolder
 import mega.privacy.android.app.utils.Util.isOnline
 import nz.mega.sdk.*
 import nz.mega.sdk.MegaApiJava.*
@@ -141,8 +141,7 @@ class MediaPlayerServiceViewModel(
     private var needStopStreamingServer = false
 
     private var playSourceChanged: MutableList<MediaItem> = mutableListOf()
-    private var nextHeaderPosition = 0
-    private var numberOfHeader = 0
+    private var playingPosition = 0
 
     init {
         compositeDisposable.add(
@@ -754,7 +753,6 @@ class MediaPlayerServiceViewModel(
 
         if (mediaItems.isNotEmpty()) {
             _playerSource.postValue(Triple(mediaItems, firstPlayIndex, null))
-
             postPlaylistItems()
         }
 
@@ -857,29 +855,15 @@ class MediaPlayerServiceViewModel(
         val hasPrevious = playingIndex > 0
         val hasNext = playingIndex < playlistItems.size - 1
 
-        var offset = 0
         var scrollPosition = playingIndex
 
         if (hasPrevious) {
-            items.add(0, PlaylistItem.headerItem(PlaylistItem.TYPE_PREVIOUS_HEADER))
-            offset++
-            scrollPosition++
+            items[0].headerIsVisible = true
         }
 
-        items.add(
-            playingIndex + offset,
-            PlaylistItem.headerItem(PlaylistItem.TYPE_PLAYING_HEADER, paused)
-        )
-        offset += 2
-        // Saved the header number of current playlist
-        numberOfHeader = offset
+        items[playingIndex].headerIsVisible = true
         if (hasNext) {
-            items.add(
-                playingIndex + offset,
-                PlaylistItem.headerItem(PlaylistItem.TYPE_NEXT_HEADER)
-            )
-            // Saved the position of the next header
-            nextHeaderPosition = playingIndex + offset
+            playingPosition = playingIndex
         }
         logDebug("doPostPlaylistItems post ${items.size} items")
         if (!isScroll) {
@@ -937,9 +921,10 @@ class MediaPlayerServiceViewModel(
             itemsSelectedMap.forEach {
                 removeItem(it.value.nodeHandle)
             }
-            _playerSource.value?.first
             itemsSelectedMap.clear()
-            updatePlaySource()
+            if (playlistItems.isNotEmpty()) {
+                updatePlaySource()
+            }
             _itemsSelectedCount.value = itemsSelectedMap.size
             _isActionMode.value = false
         }
@@ -1074,18 +1059,15 @@ class MediaPlayerServiceViewModel(
      */
     fun swapItems(current: Int, target: Int) {
         playlistItems.run {
-            // The UI list includes the header, position needs to minus the number of header
-            val currentInPlaylist = current - numberOfHeader
-            val targetInPlaylist = target - numberOfHeader
-            Collections.swap(this, currentInPlaylist, targetInPlaylist)
+            Collections.swap(this, current, target)
             // Keep the index for swap items to keep the play order is correct
-            val index = this[currentInPlaylist].index
-            this[currentInPlaylist].index = this[targetInPlaylist].index
-            this[targetInPlaylist].index = index
+            val index = this[current].index
+            this[current].index = this[target].index
+            this[target].index = index
         }
         initPlayerSourceChanged()
         // Swap the items of play source
-        Collections.swap(playSourceChanged, current - numberOfHeader, target - numberOfHeader)
+        Collections.swap(playSourceChanged, current, target)
     }
 
     /**
@@ -1107,17 +1089,17 @@ class MediaPlayerServiceViewModel(
         newPlayerSource.addAll(playSourceChanged)
         _playerSource.value?.run {
             _playerSource.value =
-                copy(first = newPlayerSource, second = nextHeaderPosition - numberOfHeader)
+                copy(first = newPlayerSource, second = playingPosition)
             playSourceChanged.clear()
         }
     }
 
     /**
-     * Get the position of next header
-     * @return the position of next header
+     * Get the position of playing item
+     * @return the position of playing item
      */
-    fun getNextHeaderPosition(): Int {
-        return nextHeaderPosition
+    fun getPlayingPosition(): Int {
+        return playingPosition
     }
 
     private fun initPlayerSourceChanged() {

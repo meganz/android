@@ -21,11 +21,6 @@ abstract class SettingsModule {
     ): CanDeleteAccount
 
     @Binds
-    abstract fun bindRefreshUserAccount(
-        useCase: DefaultRefreshUserAccount
-    ): RefreshUserAccount
-
-    @Binds
     abstract fun bindRefreshPasscodeLockPreference(
         useCase: DefaultRefreshPasscodeLockPreference
     ): RefreshPasscodeLockPreference
@@ -57,13 +52,13 @@ abstract class SettingsModule {
 
     @Binds
     abstract fun bindFetchContactLinksOption(
-        useCase: DefaultFetchContactLinksOption
-    ): FetchContactLinksOption
+        useCase: DefaultFetchAutoAcceptQRLinks
+    ): FetchAutoAcceptQRLinks
 
     @Binds
-    abstract fun bindPerformMultiFactorAuthCheck(
-        useCase: DefaultPerformMultiFactorAuthCheck
-    ): PerformMultiFactorAuthCheck
+    abstract fun bindFetchMultiFactorAuthSetting(
+        useCase: DefaultFetchMultiFactorAuthSetting
+    ): FetchMultiFactorAuthSetting
 
     @Binds
     abstract fun bindGetStartScreen(
@@ -72,7 +67,42 @@ abstract class SettingsModule {
 
     @Binds
     abstract fun bindShouldHideRecentActivity(
-        useCase: DefaultShouldHideRecentActivity
-    ): ShouldHideRecentActivity
+        useCase: DefaultIsHideRecentActivityEnabled
+    ): IsHideRecentActivityEnabled
+
+    @Binds
+    abstract fun bindToggleAutoAcceptQRLinks(
+        useCase: DefaultToggleAutoAcceptQRLinks
+    ): ToggleAutoAcceptQRLinks
+
+    @Binds
+    abstract fun bindIsOnline(
+        useCase: DefaultIsOnline
+    ): IsOnline
+
+    @Binds
+    abstract fun bindRequestAccountDeletion(
+        useCase: DefaultRequestAccountDeletion
+    ): RequestAccountDeletion
+
+    @Binds
+    abstract fun bindIsChatLoggedIn(
+        useCase: DefaultIsChatLoggedIn
+    ): IsChatLoggedIn
+
+    @Binds
+    abstract fun bindSetLoggingEnabled(
+        useCase: DefaultSetLoggingEnabled
+    ): SetLoggingEnabled
+
+    @Binds
+    abstract fun bindSetChatLoggingEnabled(
+        useCase: DefaultSetChatLoggingEnabled
+    ): SetChatLoggingEnabled
+
+    @Binds
+    abstract fun bindGetFolderVersionInfo(
+        implementation: DefaultGetFolderVersionInfo
+    ): GetFolderVersionInfo
 
 }

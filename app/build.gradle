@@ -150,18 +150,17 @@ android {
         }
     }
 
-    configurations.all {
-        resolutionStrategy {
-            force 'androidx.test:monitor:1.4.0'
+    configurations {
+        implementation.exclude module: 'protolite-well-known-types'
+        implementation.exclude module: 'protobuf-javalite'
+
+        all {
+            resolutionStrategy {
+                force 'androidx.test:monitor:1.4.0'
+            }
         }
     }
 }
-
-// See https://dagger.dev/hilt/gradle-setup#gradle-plugin-local-tests
-hilt {
-    enableTransformForLocalTests = true
-}
-
 
 dependencies {
     implementation fileTree(dir: "$rootProject.projectDir/app/src/main/jni/ExoPlayer/", include: ['*.aar'])
@@ -193,12 +192,16 @@ dependencies {
     implementation "androidx.navigation:navigation-fragment-ktx:$navigationVersion"
     implementation "androidx.navigation:navigation-ui-ktx:$navigationVersion"
 
+
+    implementation "androidx.preference:preference-ktx:$preferenceVersion"
+
     // Kotlin
     implementation "androidx.core:core-ktx:$ktxVersion"
     implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlinVersion"
 
     // Hilt
     implementation "com.google.dagger:hilt-android:$hiltVersion"
+    implementation 'androidx.preference:preference:1.1.1'
     kapt "com.google.dagger:hilt-android-compiler:$hiltVersion"
     implementation "androidx.hilt:hilt-lifecycle-viewmodel:$hiltAndroidXVersion"
     kapt "androidx.hilt:hilt-compiler:$hiltAndroidXCompilerVersion"
@@ -214,7 +217,6 @@ dependencies {
     implementation 'com.budiyev.android:code-scanner:1.8.3'
     implementation 'me.leolin:ShortcutBadger:1.1.22@aar'
     implementation 'com.brandongogetap:stickyheaders:0.6.1'
-    implementation 'com.github.ittianyu:BottomNavigationViewEx:2.0.4'
     implementation 'androidx.multidex:multidex:2.0.1'
     implementation 'androidx.emoji:emoji-appcompat:1.1.0'
     implementation 'androidx.preference:preference-ktx:1.1.1'
@@ -237,6 +239,7 @@ dependencies {
     implementation "com.facebook.fresco:animated-gif:$frescoVersion"
     implementation "com.facebook.fresco:animated-webp:$frescoVersion"
     implementation "com.facebook.fresco:webpsupport:$frescoVersion"
+    implementation "com.facebook.infer.annotation:infer-annotation:0.18.0"
     implementation files('src/main/libs/fresco-zoomable.aar')
 
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlinVersion"
@@ -252,6 +255,7 @@ dependencies {
     implementation "com.jeremyliao:live-event-bus-x:$liveEventBus"
 
     implementation "androidx.biometric:biometric:$biometricVersion"
+    implementation "com.anggrayudi:storage:$simpleStorageVersion"
 
     // (Java only)
     implementation "androidx.work:work-runtime:$workVersion"
@@ -271,16 +275,19 @@ dependencies {
     gmsImplementation 'com.google.firebase:firebase-perf-ktx'
     //HMS
     hmsImplementation "com.huawei.agconnect:agconnect-core:$huaweiServicesVersion"
-    hmsImplementation 'com.huawei.hms:push:4.0.2.300'
-    hmsImplementation 'com.huawei.hms:location:6.2.0.300'
-    hmsImplementation 'com.huawei.hms:maps:6.0.1.304'
-    hmsImplementation 'com.huawei.hms:iap:4.0.2.300'
-    hmsImplementation 'com.huawei.hms:hianalytics:5.2.0.301'
-    hmsImplementation 'com.huawei.agconnect:agconnect-crash:1.5.1.300'
+    hmsImplementation 'com.huawei.hms:push:6.1.0.300'
+    hmsImplementation 'com.huawei.hms:location:6.3.0.300'
+    hmsImplementation 'com.huawei.hms:maps:6.3.0.302'
+    hmsImplementation 'com.huawei.hms:iap:6.3.0.300'
+    hmsImplementation 'com.huawei.hms:hianalytics:6.3.2.300'
+    hmsImplementation 'com.huawei.agconnect:agconnect-crash:1.6.3.300'
 
     // Play Core
     implementation("com.google.android.play:core:1.10.0")
     implementation("com.google.android.play:core-ktx:1.8.1")
+
+    // protobuf-java for tombstone debug
+    implementation 'com.google.protobuf:protobuf-java:3.15.3'
 
     // Testing dependencies
     testImplementation "junit:junit:$junitVersion"
@@ -293,10 +300,15 @@ dependencies {
     testImplementation "androidx.test.ext:junit-ktx:$androidxTestExtVersion"
     testImplementation "org.mockito:mockito-core:$mockitoVersion"
     testImplementation "org.mockito.kotlin:mockito-kotlin:$mockitoKotlinVersion"
+    testImplementation "org.jetbrains.kotlinx:kotlinx-coroutines-test:$coroutineTestVersion"
+    testImplementation "org.jetbrains.kotlin:kotlin-test:$kotlinVersion"
+    testImplementation "app.cash.turbine:turbine:$turbineVersion"
     testImplementation "androidx.test.espresso:espresso-core:$espressoVersion"
     testImplementation "androidx.test.espresso:espresso-intents:$espressoVersion"
     testImplementation "com.google.dagger:hilt-android-testing:$hiltVersion"
-
+    testImplementation "org.jetbrains.kotlinx:kotlinx-coroutines-test:$coroutineTestVersion"
+    testImplementation "org.jetbrains.kotlin:kotlin-test:$kotlinVersion"
+    testImplementation "app.cash.turbine:turbine:$turbineVersion"
 
     androidTestImplementation "androidx.test.ext:junit:$androidxTestExtVersion"
     androidTestImplementation "com.google.truth:truth:$truthVersion"
@@ -307,6 +319,7 @@ dependencies {
     androidTestImplementation "org.mockito:mockito-android:$mockitoVersion"
     androidTestImplementation ("androidx.test.espresso:espresso-contrib:$espressoVersion") {
         exclude group: 'org.checkerframework', module: 'checker'
+        exclude module: "protobuf-lite"
     }
     androidTestImplementation "androidx.test.espresso:espresso-intents:$espressoVersion"
 

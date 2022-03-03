@@ -38,7 +38,7 @@ import mega.privacy.android.app.utils.StringResourcesUtils
 import mega.privacy.android.app.utils.TextUtil
 import mega.privacy.android.app.utils.TextUtil.isTextEmpty
 import mega.privacy.android.app.utils.ThumbnailUtils
-import mega.privacy.android.app.utils.ThumbnailUtilsLollipop.getRoundedBitmap
+import mega.privacy.android.app.utils.ThumbnailUtils.getRoundedBitmap
 import mega.privacy.android.app.utils.Util.*
 import java.text.SimpleDateFormat
 import java.util.*
@@ -557,7 +557,7 @@ class GetLinkFragment : BaseFragment(), DatePickerDialog.OnDateSetListener, Scro
         val date = cal.time
         val dfTimestamp = SimpleDateFormat("yyyyMMdd", Locale.getDefault())
         val dateString = dfTimestamp.format(date) + LAST_MINUTE
-        val timestamp = calculateTimestamp(dateString).toInt()
+        val timestamp = calculateTimestamp(dateString)
 
         viewModel.exportWithTimestamp(timestamp)
     }

@@ -1,7 +1,6 @@
 package mega.privacy.android.app.mediaplayer.trackinfo
 
 import android.content.Context
-import android.util.Log
 import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -26,7 +25,7 @@ import mega.privacy.android.app.utils.MegaNodeUtil.getNodeLocationInfo
 import mega.privacy.android.app.utils.OfflineUtils.*
 import mega.privacy.android.app.utils.RxUtil.IGNORE
 import mega.privacy.android.app.utils.RxUtil.logErr
-import mega.privacy.android.app.utils.ThumbnailUtilsLollipop.getThumbFolder
+import mega.privacy.android.app.utils.ThumbnailUtils.getThumbFolder
 import mega.privacy.android.app.utils.TimeUtils.formatLongDateTime
 import mega.privacy.android.app.utils.Util.getSizeString
 import mega.privacy.android.app.utils.Util.isOnline

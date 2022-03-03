@@ -16,7 +16,6 @@ import java.util.Stack;
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MegaPreferences;
-import mega.privacy.android.app.R;
 import mega.privacy.android.app.lollipop.adapters.MegaNodeAdapter;
 import mega.privacy.android.app.lollipop.adapters.RotatableAdapter;
 import mega.privacy.android.app.lollipop.managerSections.RotatableFragment;
@@ -29,8 +28,7 @@ import static mega.privacy.android.app.utils.FileUtil.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 
 public class ContactFileBaseFragment extends RotatableFragment {
-    
-    public static int REQUEST_CODE_GET = 1000;
+
     public static int REQUEST_CODE_GET_LOCAL = 1003;
     public static int REQUEST_CODE_SELECT_COPY_FOLDER = 1002;
     public static int REQUEST_CODE_SELECT_MOVE_FOLDER = 1001;

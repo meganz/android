@@ -20,6 +20,7 @@ import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.UserCredentials;
 import mega.privacy.android.app.lollipop.megachat.ChatSettings;
+import mega.privacy.android.app.utils.ChatUtil;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaChatApi;
@@ -182,26 +183,8 @@ public class IncomingCallService extends Service implements MegaRequestListenerI
                 }
             }
 
-            if (megaChatApi == null) {
-                megaChatApi = ((MegaApplication) getApplication()).getMegaChatApi();
-            }
-
-            int ret = megaChatApi.getInitState();
-
-            if (ret == MegaChatApi.INIT_NOT_DONE || ret == MegaChatApi.INIT_ERROR) {
-                ret = megaChatApi.init(gSession);
-                logDebug("result of init ---> " + ret);
-                chatSettings = dbH.getChatSettings();
-                if (ret == MegaChatApi.INIT_NO_CACHE) {
-                    logDebug("condition ret == MegaChatApi.INIT_NO_CACHE");
-
-                } else if (ret == MegaChatApi.INIT_ERROR) {
-                    logDebug("condition ret == MegaChatApi.INIT_ERROR");
-                    megaChatApi.logout();
-                } else {
-                    logDebug("Chat correctly initialized");
-                }
-            }
+            ChatUtil.initMegaChatApi(gSession);
+            chatSettings = dbH.getChatSettings();
         }
     }
 

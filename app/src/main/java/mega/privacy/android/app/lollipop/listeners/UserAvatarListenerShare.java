@@ -8,7 +8,7 @@ import android.graphics.BitmapFactory;
 import java.io.File;
 
 import mega.privacy.android.app.lollipop.adapters.ShareContactsHeaderAdapter;
-import mega.privacy.android.app.utils.ThumbnailUtilsLollipop;
+import mega.privacy.android.app.utils.ThumbnailUtils;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaRequest;
@@ -20,9 +20,9 @@ import static mega.privacy.android.app.utils.FileUtil.*;
 public class UserAvatarListenerShare implements MegaRequestListenerInterface {
 
     Context context;
-    ShareContactsHeaderAdapter.ViewHolderShareContactsLollipop holder;
+    ShareContactsHeaderAdapter.ViewHolderShareContacts holder;
 
-    public UserAvatarListenerShare(Context context, ShareContactsHeaderAdapter.ViewHolderShareContactsLollipop holder) {
+    public UserAvatarListenerShare(Context context, ShareContactsHeaderAdapter.ViewHolderShareContacts holder) {
         this.context = context;
         this.holder = holder;
     }
@@ -49,7 +49,7 @@ public class UserAvatarListenerShare implements MegaRequestListenerInterface {
                             avatar.delete();
                         }
                         else{
-                            bitmap = ThumbnailUtilsLollipop.getRoundedRectBitmap(context, bitmap, 3);
+                            bitmap = ThumbnailUtils.getRoundedRectBitmap(context, bitmap, 3);
                             holder.avatar.setImageBitmap(bitmap);
                         }
                     }

@@ -4,12 +4,15 @@ import android.content.Context
 import android.text.Spanned
 import androidx.core.content.ContextCompat
 import androidx.core.text.HtmlCompat
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import dagger.hilt.android.lifecycle.HiltViewModel
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.Product
 import mega.privacy.android.app.R
 import mega.privacy.android.app.arch.BaseRxViewModel
 import mega.privacy.android.app.globalmanagement.MyAccountInfo
+import mega.privacy.android.app.service.iab.BillingManagerImpl
 import mega.privacy.android.app.utils.ColorUtils.getColorHexString
 import mega.privacy.android.app.utils.Constants.*
 import mega.privacy.android.app.utils.DBUtil.callToPaymentMethods
@@ -20,6 +23,7 @@ import mega.privacy.android.app.utils.StringResourcesUtils.getString
 import mega.privacy.android.app.utils.Util.getSizeStringGBBased
 import mega.privacy.android.app.utils.billing.PaymentUtils.getSku
 import mega.privacy.android.app.utils.billing.PaymentUtils.getSkuDetails
+import nz.mega.sdk.MegaApiJava
 import java.text.NumberFormat
 import java.util.*
 import javax.inject.Inject
@@ -27,11 +31,39 @@ import javax.inject.Inject
 @HiltViewModel
 class ChooseUpgradeAccountViewModel @Inject constructor(
     private val myAccountInfo: MyAccountInfo
-) : BaseRxViewModel(){
+) : BaseRxViewModel() {
 
     companion object {
         const val TYPE_STORAGE_LABEL = 0
         const val TYPE_TRANSFER_LABEL = 1
+
+        const val NOT_SUBSCRIBED = 0
+        const val MONTHLY_SUBSCRIBED = 1
+        const val YEARLY_SUBSCRIBED = 2
+    }
+
+    private val _currentSubscription = MutableLiveData<Pair<Int, SubscriptionMethod?>>()
+    val currentSubscription: LiveData<Pair<Int, SubscriptionMethod?>>
+        get() = _currentSubscription
+
+    /**
+     * Check the current subscription
+     * @param upgradeType upgrade type
+     */
+    fun subscriptionCheck(upgradeType: Int){
+        SubscriptionMethod.values().firstOrNull {
+            // Determines the current account if has the subscription and the current subscription
+            // platform if is same as current payment platform.
+            if (BillingManagerImpl.PAYMENT_GATEWAY == MegaApiJava.PAYMENT_METHOD_GOOGLE_WALLET) {
+                it.methodId != MegaApiJava.PAYMENT_METHOD_GOOGLE_WALLET
+                        && it.methodId == myAccountInfo.subscriptionMethodId
+            } else {
+                it.methodId != MegaApiJava.PAYMENT_METHOD_HUAWEI_WALLET
+                        && it.methodId == myAccountInfo.subscriptionMethodId
+            }
+        }.run {
+            _currentSubscription.value = Pair(upgradeType, this)
+        }
     }
 
     fun isGettingInfo(): Boolean =
@@ -102,7 +134,7 @@ class ChooseUpgradeAccountViewModel @Inject constructor(
         format.currency = Currency.getInstance(currency)
 
         var stringPrice = format.format(price)
-        var color = getColorHexString(context, R.color.grey_900_grey_100)
+        var color = getColorHexString(context, R.color.grey_087_white_087)
 
         if (monthlyBasePrice) {
             if (product.months != 1) {
@@ -171,4 +203,46 @@ class ChooseUpgradeAccountViewModel @Inject constructor(
             else -> ""
         }
     }
+
+    /**
+     * Gets the subscription depending on the upgrade type.
+     *
+     * @param upgradeType Type of upgrade.
+     * @return The subscription type:
+     *          - MONTHLY_SUBSCRIBED if already subscribed to the monthly plan
+     *          - YEARLY_SUBSCRIBED if already subscribed to the yearly plan
+     *          - NOT_SUBSCRIBED if not subscribed.
+     */
+    fun getSubscription(upgradeType: Int): Int =
+        when (upgradeType) {
+            PRO_I -> {
+                when {
+                    isPurchasedAlready(BillingManagerImpl.SKU_PRO_I_MONTH) -> MONTHLY_SUBSCRIBED
+                    isPurchasedAlready(BillingManagerImpl.SKU_PRO_I_YEAR) -> YEARLY_SUBSCRIBED
+                    else -> NOT_SUBSCRIBED
+                }
+            }
+            PRO_II -> {
+                when {
+                    isPurchasedAlready(BillingManagerImpl.SKU_PRO_II_MONTH) -> MONTHLY_SUBSCRIBED
+                    isPurchasedAlready(BillingManagerImpl.SKU_PRO_II_YEAR) -> YEARLY_SUBSCRIBED
+                    else -> NOT_SUBSCRIBED
+                }
+            }
+            PRO_III -> {
+                when {
+                    isPurchasedAlready(BillingManagerImpl.SKU_PRO_III_MONTH) -> MONTHLY_SUBSCRIBED
+                    isPurchasedAlready(BillingManagerImpl.SKU_PRO_III_YEAR) -> YEARLY_SUBSCRIBED
+                    else -> NOT_SUBSCRIBED
+                }
+            }
+            PRO_LITE -> {
+                when {
+                    isPurchasedAlready(BillingManagerImpl.SKU_PRO_LITE_MONTH) -> MONTHLY_SUBSCRIBED
+                    isPurchasedAlready(BillingManagerImpl.SKU_PRO_LITE_YEAR) -> YEARLY_SUBSCRIBED
+                    else -> NOT_SUBSCRIBED
+                }
+            }
+            else -> NOT_SUBSCRIBED
+        }
 }
