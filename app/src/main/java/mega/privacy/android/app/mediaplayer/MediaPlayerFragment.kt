@@ -255,10 +255,18 @@ class MediaPlayerFragment : Fragment() {
             controllerHideOnTouch = videoPlayer
             setShowShuffleButton(!videoPlayer)
             setControllerVisibilityListener { visibility ->
-                if (visibility == View.VISIBLE) {
-                    showToolbar()
-                } else {
+                if (visibility == View.VISIBLE && !toolbarVisible) {
+                    hideController()
+                }
+            }
+
+            setOnClickListener {
+                if (toolbarVisible) {
                     hideToolbar()
+                } else {
+                    delayHideToolbarCanceled = true
+
+                    showToolbar()
                 }
             }
 
