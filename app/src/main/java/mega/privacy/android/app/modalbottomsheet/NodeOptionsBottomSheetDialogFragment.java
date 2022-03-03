@@ -29,9 +29,9 @@ import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.interfaces.SnackbarShower;
 import mega.privacy.android.app.lollipop.DrawerItem;
-import mega.privacy.android.app.lollipop.FileContactListActivityLollipop;
-import mega.privacy.android.app.lollipop.FileInfoActivityLollipop;
-import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
+import mega.privacy.android.app.lollipop.FileContactListActivity;
+import mega.privacy.android.app.lollipop.FileInfoActivity;
+import mega.privacy.android.app.lollipop.ManagerActivity;
 import mega.privacy.android.app.lollipop.VersionsFileActivity;
 import mega.privacy.android.app.lollipop.controllers.NodeController;
 import mega.privacy.android.app.utils.MegaNodeUtil;
@@ -41,9 +41,9 @@ import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaShare;
 import nz.mega.sdk.MegaUser;
 
-import static mega.privacy.android.app.lollipop.ManagerActivityLollipop.INCOMING_TAB;
-import static mega.privacy.android.app.lollipop.ManagerActivityLollipop.LINKS_TAB;
-import static mega.privacy.android.app.lollipop.ManagerActivityLollipop.OUTGOING_TAB;
+import static mega.privacy.android.app.lollipop.ManagerActivity.INCOMING_TAB;
+import static mega.privacy.android.app.lollipop.ManagerActivity.LINKS_TAB;
+import static mega.privacy.android.app.lollipop.ManagerActivity.OUTGOING_TAB;
 import static mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil.*;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.FileUtil.*;
@@ -107,14 +107,14 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
         if (savedInstanceState != null) {
             long handle = savedInstanceState.getLong(HANDLE, INVALID_HANDLE);
             node = megaApi.getNodeByHandle(handle);
-            if (requireActivity() instanceof ManagerActivityLollipop) {
-                drawerItem = ((ManagerActivityLollipop) requireActivity()).getDrawerItem();
+            if (requireActivity() instanceof ManagerActivity) {
+                drawerItem = ((ManagerActivity) requireActivity()).getDrawerItem();
             }
             mMode = savedInstanceState.getInt(SAVED_STATE_KEY_MODE, MODE0);
         } else {
-            if (requireActivity() instanceof ManagerActivityLollipop) {
-                node = ((ManagerActivityLollipop) requireActivity()).getSelectedNode();
-                drawerItem = ((ManagerActivityLollipop) requireActivity()).getDrawerItem();
+            if (requireActivity() instanceof ManagerActivity) {
+                node = ((ManagerActivity) requireActivity()).getSelectedNode();
+                drawerItem = ((ManagerActivity) requireActivity()).getDrawerItem();
             }
         }
 
@@ -469,10 +469,10 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
 
             case MODE4:
 
-                int tabSelected = ((ManagerActivityLollipop) requireActivity()).getTabItemShares();
+                int tabSelected = ((ManagerActivity) requireActivity()).getTabItemShares();
                 if (tabSelected == 0) {
                     logDebug("showOptionsPanelIncoming");
-                    long incomingParentHandle = ((ManagerActivityLollipop) requireActivity()).getParentHandleIncoming();
+                    long incomingParentHandle = ((ManagerActivity) requireActivity()).getParentHandleIncoming();
                     boolean isParentNode = node.getHandle() == incomingParentHandle;
 
                     if (node.isFolder()) {
@@ -498,7 +498,7 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
                     counterShares--;
                     optionShareFolder.setVisibility(View.GONE);
 
-                    int dBT = ((ManagerActivityLollipop) requireActivity()).getDeepBrowserTreeIncoming();
+                    int dBT = ((ManagerActivity) requireActivity()).getDeepBrowserTreeIncoming();
                     logDebug("DeepTree value:" + dBT);
 
                     if (dBT > FIRST_NAVIGATION_LEVEL && !isParentNode) {
@@ -611,7 +611,7 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
                         optionRemoveLink.setVisibility(View.GONE);
                     }
 
-                    if (((ManagerActivityLollipop) requireActivity()).getDeepBrowserTreeOutgoing() == FIRST_NAVIGATION_LEVEL) {
+                    if (((ManagerActivity) requireActivity()).getDeepBrowserTreeOutgoing() == FIRST_NAVIGATION_LEVEL) {
                         optionClearShares.setVisibility(View.VISIBLE);
 
                         //Show the number of contacts who shared the folder
@@ -1040,7 +1040,7 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
 
         switch (v.getId()) {
             case R.id.download_option:
-                ((ManagerActivityLollipop) requireActivity()).saveNodesToDevice(
+                ((ManagerActivity) requireActivity()).saveNodesToDevice(
                         Collections.singletonList(node), false, false, false, false);
                 break;
 
@@ -1049,7 +1049,7 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
                 break;
 
             case R.id.option_label_layout:
-                ((ManagerActivityLollipop) requireActivity()).showNodeLabelsPanel(node);
+                ((ManagerActivity) requireActivity()).showNodeLabelsPanel(node);
                 break;
 
             case R.id.file_properties_switch:
@@ -1065,19 +1065,19 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
                 break;
 
             case R.id.properties_option:
-                i = new Intent(requireContext(), FileInfoActivityLollipop.class);
+                i = new Intent(requireContext(), FileInfoActivity.class);
                 i.putExtra(HANDLE, node.getHandle());
 
                 if (drawerItem == DrawerItem.SHARED_ITEMS) {
-                    if (((ManagerActivityLollipop) requireActivity()).getTabItemShares() == 0) {
+                    if (((ManagerActivity) requireActivity()).getTabItemShares() == 0) {
                         i.putExtra("from", FROM_INCOMING_SHARES);
                         i.putExtra(INTENT_EXTRA_KEY_FIRST_LEVEL,
-                                ((ManagerActivityLollipop) requireActivity()).getDeepBrowserTreeIncoming() <= FIRST_NAVIGATION_LEVEL);
-                    } else if (((ManagerActivityLollipop) requireActivity()).getTabItemShares() == 1) {
+                                ((ManagerActivity) requireActivity()).getDeepBrowserTreeIncoming() <= FIRST_NAVIGATION_LEVEL);
+                    } else if (((ManagerActivity) requireActivity()).getTabItemShares() == 1) {
                         i.putExtra("adapterType", OUTGOING_SHARES_ADAPTER);
                     }
                 } else if (drawerItem == DrawerItem.INBOX) {
-                    if (((ManagerActivityLollipop) requireActivity()).getTabItemShares() == 0) {
+                    if (((ManagerActivity) requireActivity()).getTabItemShares() == 0) {
                         i.putExtra("from", FROM_INBOX);
                     }
                 } else if (drawerItem == DrawerItem.SEARCH) {
@@ -1094,24 +1094,24 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
                 break;
 
             case R.id.link_option:
-                ((ManagerActivityLollipop) requireActivity()).showGetLinkActivity(node.getHandle());
+                ((ManagerActivity) requireActivity()).showGetLinkActivity(node.getHandle());
                 break;
 
             case R.id.view_in_folder_option:
-                ((ManagerActivityLollipop) requireActivity()).viewNodeInFolder(node);
+                ((ManagerActivity) requireActivity()).viewNodeInFolder(node);
                 break;
 
             case R.id.remove_link_option:
-                ((ManagerActivityLollipop) requireActivity()).showConfirmationRemovePublicLink(node);
+                ((ManagerActivity) requireActivity()).showConfirmationRemovePublicLink(node);
                 break;
 
             case R.id.share_folder_option:
                 nodeType = checkBackupNodeTypeByHandle(megaApi, node);
                 if (nodeType != BACKUP_NONE) {
-                    ((ManagerActivityLollipop) requireActivity()).showWarningDialogOfShare(node, nodeType, ACTION_BACKUP_SHARE_FOLDER);
+                    ((ManagerActivity) requireActivity()).showWarningDialogOfShare(node, nodeType, ACTION_BACKUP_SHARE_FOLDER);
                 } else {
                     if (isOutShare(node)) {
-                        i = new Intent(requireContext(), FileContactListActivityLollipop.class);
+                        i = new Intent(requireContext(), FileContactListActivity.class);
                         i.putExtra(NAME, node.getHandle());
                         startActivity(i);
                     } else {
@@ -1123,7 +1123,7 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
 
             case R.id.clear_share_option:
                 ArrayList<MegaShare> shareList = megaApi.getOutShares(node);
-                ((ManagerActivityLollipop) requireActivity()).showConfirmationRemoveAllSharingContacts(shareList, node);
+                ((ManagerActivity) requireActivity()).showConfirmationRemoveAllSharingContacts(shareList, node);
                 break;
 
             case R.id.leave_share_option:
@@ -1132,12 +1132,12 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
                 break;
 
             case R.id.send_chat_option:
-                ((ManagerActivityLollipop) requireActivity()).attachNodeToChats(node);
+                ((ManagerActivity) requireActivity()).attachNodeToChats(node);
                 dismissAllowingStateLoss();
                 break;
 
             case R.id.rename_option:
-                ((ManagerActivityLollipop) requireActivity()).showRenameDialog(node);
+                ((ManagerActivity) requireActivity()).showRenameDialog(node);
 
                 break;
 
@@ -1147,7 +1147,7 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
                 break;
 
             case R.id.option_backup_move_layout:
-                ((ManagerActivityLollipop) requireActivity()).moveBackupNode(handleList);
+                ((ManagerActivity) requireActivity()).moveBackupNode(handleList);
                 dismissAllowingStateLoss();
                 break;
 
@@ -1160,7 +1160,7 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
             case R.id.rubbish_bin_option:
             case R.id.remove_option:
             case R.id.option_backup_rubbish_bin_layout:
-                ((ManagerActivityLollipop) requireActivity()).askConfirmationMoveToRubbish(handleList);
+                ((ManagerActivity) requireActivity()).askConfirmationMoveToRubbish(handleList);
                 break;
 
             case R.id.open_folder_option:
@@ -1175,7 +1175,7 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
             case R.id.restore_option:
                 List<MegaNode> nodes = new ArrayList<>();
                 nodes.add(node);
-                ((ManagerActivityLollipop) requireActivity()).restoreFromRubbish(nodes);
+                ((ManagerActivity) requireActivity()).restoreFromRubbish(nodes);
                 break;
 
             case R.id.share_option:
@@ -1199,19 +1199,19 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
         switch (drawerItem) {
             case CLOUD_DRIVE:
             case RUBBISH_BIN:
-                ((ManagerActivityLollipop) requireActivity()).onNodesCloudDriveUpdate();
+                ((ManagerActivity) requireActivity()).onNodesCloudDriveUpdate();
                 break;
 
             case INBOX:
-                ((ManagerActivityLollipop) requireActivity()).onNodesInboxUpdate();
+                ((ManagerActivity) requireActivity()).onNodesInboxUpdate();
                 break;
 
             case SHARED_ITEMS:
-                ((ManagerActivityLollipop) requireActivity()).onNodesSharedUpdate();
+                ((ManagerActivity) requireActivity()).onNodesSharedUpdate();
                 break;
 
             case SEARCH:
-                ((ManagerActivityLollipop) requireActivity()).onNodesSearchUpdate();
+                ((ManagerActivity) requireActivity()).onNodesSearchUpdate();
                 break;
 
             case HOMEPAGE:
@@ -1234,7 +1234,7 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
                 break;
 
             case SHARED_ITEMS:
-                if (((ManagerActivityLollipop) requireActivity()).getTabItemShares() == 0) {
+                if (((ManagerActivity) requireActivity()).getTabItemShares() == 0) {
                     adapterType = FROM_INCOMING_SHARES;
                     break;
                 }
@@ -1306,7 +1306,7 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
                 return INBOX_ADAPTER;
 
             case MODE4:
-                switch (((ManagerActivityLollipop) requireActivity()).getTabItemShares()) {
+                switch (((ManagerActivity) requireActivity()).getTabItemShares()) {
                     case INCOMING_TAB:
                         return INCOMING_SHARES_ADAPTER;
                     case OUTGOING_TAB:

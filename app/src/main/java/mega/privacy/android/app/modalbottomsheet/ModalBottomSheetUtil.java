@@ -30,7 +30,7 @@ import static mega.privacy.android.app.utils.StringResourcesUtils.getString;
 
 import static mega.privacy.android.app.utils.ThumbnailUtils.getThumbnailFromCache;
 import static mega.privacy.android.app.utils.ThumbnailUtils.getThumbnailFromFolder;
-import static mega.privacy.android.app.utils.ThumbnailUtilsLollipop.getRoundedBitmap;
+import static mega.privacy.android.app.utils.ThumbnailUtils.getRoundedBitmap;
 import static mega.privacy.android.app.utils.Util.dp2px;
 
 public class ModalBottomSheetUtil {

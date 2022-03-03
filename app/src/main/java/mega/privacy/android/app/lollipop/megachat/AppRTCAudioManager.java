@@ -109,7 +109,7 @@ public class AppRTCAudioManager {
         this.typeAudioManager = type;
         isTemporary = false;
         start(statusSpeaker);
-        if (apprtcContext instanceof ChatActivityLollipop) {
+        if (apprtcContext instanceof ChatActivity) {
             registerProximitySensor();
         }
 
@@ -177,7 +177,7 @@ public class AppRTCAudioManager {
 
                 if ((apprtcContext instanceof MegaApplication && MegaApplication.isSpeakerOn &&
                         (bluetoothManager == null || bluetoothManager.getState() != AppRTCBluetoothManager.State.SCO_CONNECTED)) ||
-                        apprtcContext instanceof ChatActivityLollipop) {
+                        apprtcContext instanceof ChatActivity) {
                     logDebug("Disabling the speakerphone:");
                     selectAudioDevice(AudioDevice.EARPIECE, true);
                 }
@@ -189,7 +189,7 @@ public class AppRTCAudioManager {
 
             if ((apprtcContext instanceof MegaApplication && MegaApplication.isSpeakerOn &&
                     (bluetoothManager == null || bluetoothManager.getState() != AppRTCBluetoothManager.State.SCO_CONNECTED)) ||
-                    apprtcContext instanceof ChatActivityLollipop) {
+                    apprtcContext instanceof ChatActivity) {
                 logDebug("Enabling the speakerphone: ");
                 selectAudioDevice(AudioDevice.SPEAKER_PHONE, true);
             }

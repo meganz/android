@@ -30,11 +30,11 @@ import mega.privacy.android.app.OpenLinkActivity;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.UploadService;
 import mega.privacy.android.app.listeners.LogoutListener;
+import mega.privacy.android.app.lollipop.ManagerActivity;
 import mega.privacy.android.app.mediaplayer.service.MediaPlayerService;
 import mega.privacy.android.app.mediaplayer.service.MediaPlayerServiceViewModel;
 import mega.privacy.android.app.jobservices.SyncRecord;
-import mega.privacy.android.app.lollipop.FileStorageActivityLollipop;
-import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
+import mega.privacy.android.app.lollipop.FileStorageActivity;
 import mega.privacy.android.app.lollipop.TestPasswordActivity;
 import mega.privacy.android.app.lollipop.TwoFactorAuthenticationActivity;
 import mega.privacy.android.app.lollipop.VerifyTwoFactorActivity;
@@ -75,19 +75,19 @@ public class AccountController {
     }
 
     public void resetPass(String myEmail){
-        megaApi.resetPassword(myEmail, true, (ManagerActivityLollipop)context);
+        megaApi.resetPassword(myEmail, true, (ManagerActivity)context);
     }
 
     public void deleteAccount(){
         logDebug("deleteAccount");
-        if (((ManagerActivityLollipop) context).is2FAEnabled()){
+        if (((ManagerActivity) context).is2FAEnabled()){
             Intent intent = new Intent(context, VerifyTwoFactorActivity.class);
             intent.putExtra(VerifyTwoFactorActivity.KEY_VERIFY_TYPE, CANCEL_ACCOUNT_2FA);
 
             context.startActivity(intent);
         }
         else {
-            megaApi.cancelAccount((ManagerActivityLollipop) context);
+            megaApi.cancelAccount((ManagerActivity) context);
         }
     }
 
@@ -127,16 +127,16 @@ public class AccountController {
 
         String key = megaApi.exportMasterKey();
 
-        if (context instanceof ManagerActivityLollipop) {
-            megaApi.masterKeyExported((ManagerActivityLollipop) context);
+        if (context instanceof ManagerActivity) {
+            megaApi.masterKeyExported((ManagerActivity) context);
         } else if (context instanceof TestPasswordActivity) {
             ((TestPasswordActivity) context).incrementRequests();
             megaApi.masterKeyExported((TestPasswordActivity) context);
         }
 
         if (!hasPermissions(context, Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
-            if (context instanceof ManagerActivityLollipop) {
-                requestPermission((ManagerActivityLollipop) context, REQUEST_WRITE_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE);
+            if (context instanceof ManagerActivity) {
+                requestPermission((ManagerActivity) context, REQUEST_WRITE_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE);
             } else if (context instanceof TestPasswordActivity) {
                 requestPermission((TestPasswordActivity) context, REQUEST_WRITE_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE);
             }
@@ -170,9 +170,9 @@ public class AccountController {
     public void copyMK(boolean logout){
         logDebug("copyMK");
         String key = megaApi.exportMasterKey();
-        if (context instanceof ManagerActivityLollipop) {
+        if (context instanceof ManagerActivity) {
             if (key != null) {
-                megaApi.masterKeyExported((ManagerActivityLollipop) context);
+                megaApi.masterKeyExported((ManagerActivity) context);
                 android.content.ClipboardManager clipboard = (android.content.ClipboardManager) context.getSystemService(Context.CLIPBOARD_SERVICE);
                 android.content.ClipData clip = android.content.ClipData.newPlainText("Copied Text", key);
                 clipboard.setPrimaryClip(clip);
@@ -180,11 +180,11 @@ public class AccountController {
                     showConfirmDialogRecoveryKeySaved();
                 }
                 else {
-                    showAlert(((ManagerActivityLollipop) context), context.getString(R.string.copy_MK_confirmation), null);
+                    showAlert(((ManagerActivity) context), context.getString(R.string.copy_MK_confirmation), null);
                 }
             }
             else {
-                showAlert(((ManagerActivityLollipop) context), context.getString(R.string.general_text_error), null);
+                showAlert(((ManagerActivity) context), context.getString(R.string.general_text_error), null);
             }
         }
         else if (context instanceof TestPasswordActivity) {
@@ -209,23 +209,23 @@ public class AccountController {
     }
 
     public static void saveRkToFileSystem(Activity activity) {
-        Intent intent = new Intent(activity, FileStorageActivityLollipop.class)
-                .setAction(FileStorageActivityLollipop.Mode.PICK_FOLDER.getAction())
-                .putExtra(FileStorageActivityLollipop.EXTRA_SAVE_RECOVERY_KEY, true);
+        Intent intent = new Intent(activity, FileStorageActivity.class)
+                .setAction(FileStorageActivity.Mode.PICK_FOLDER.getAction())
+                .putExtra(FileStorageActivity.EXTRA_SAVE_RECOVERY_KEY, true);
 
         activity.startActivityForResult(intent, REQUEST_DOWNLOAD_FOLDER);
     }
 
     public void copyRkToClipboard () {
         logDebug("copyRkToClipboard");
-        if (context instanceof  ManagerActivityLollipop) {
+        if (context instanceof ManagerActivity) {
             copyMK(false);
         }
         else if (context instanceof TestPasswordActivity) {
             copyMK(((TestPasswordActivity) context).isLogout());
         }
         else if (context instanceof TwoFactorAuthenticationActivity) {
-            Intent intent = new Intent(context, ManagerActivityLollipop.class);
+            Intent intent = new Intent(context, ManagerActivity.class);
             intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
             intent.setAction(ACTION_RECOVERY_KEY_COPY_TO_CLIPBOARD);
             intent.putExtra("logout", false);
@@ -257,7 +257,7 @@ public class AccountController {
             }
         }
         else {
-            showAlert(((ManagerActivityLollipop) context), context.getString(R.string.general_text_error), null);
+            showAlert(((ManagerActivity) context), context.getString(R.string.general_text_error), null);
         }
 
         return null;
@@ -427,8 +427,8 @@ public class AccountController {
             megaApi = MegaApplication.getInstance().getMegaApi();
         }
 
-        if (context instanceof ManagerActivityLollipop) {
-            megaApi.logout((ManagerActivityLollipop) context);
+        if (context instanceof ManagerActivity) {
+            megaApi.logout((ManagerActivity) context);
         } else if (context instanceof OpenLinkActivity) {
             megaApi.logout((OpenLinkActivity) context);
         } else if (context instanceof TestPasswordActivity) {

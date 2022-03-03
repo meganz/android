@@ -37,7 +37,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 
-import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
+import mega.privacy.android.app.lollipop.ManagerActivity;
 import mega.privacy.android.app.service.iar.RatingHandlerImpl;
 import mega.privacy.android.app.utils.StringResourcesUtils;
 import mega.privacy.android.app.utils.ThumbnailUtils;
@@ -52,7 +52,7 @@ import nz.mega.sdk.MegaTransferListenerInterface;
 
 import static mega.privacy.android.app.components.transferWidget.TransfersManagement.*;
 import static mega.privacy.android.app.constants.BroadcastConstants.*;
-import static mega.privacy.android.app.lollipop.ManagerActivityLollipop.*;
+import static mega.privacy.android.app.lollipop.ManagerActivity.*;
 import static mega.privacy.android.app.lollipop.qrcode.MyCodeFragment.QR_IMAGE_FILE_NAME;
 import static mega.privacy.android.app.textEditor.TextEditorUtil.getCreationOrEditorText;
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
@@ -64,7 +64,7 @@ import static mega.privacy.android.app.utils.Util.*;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.PreviewUtils.*;
-import static mega.privacy.android.app.utils.ThumbnailUtilsLollipop.*;
+import static mega.privacy.android.app.utils.ThumbnailUtils.*;
 
 /*
  * Service to Upload files
@@ -395,7 +395,7 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 	}
 
     private void notifyNotification(String notificationTitle,String size,int notificationId,String channelId,String channelName) {
-        Intent intent = new Intent(UploadService.this, ManagerActivityLollipop.class);
+        Intent intent = new Intent(UploadService.this, ManagerActivity.class);
         intent.setAction(ACTION_SHOW_TRANSFERS);
         intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
         intent.putExtra(TRANSFERS_TAB, COMPLETED_TAB);
@@ -482,7 +482,7 @@ public class UploadService extends Service implements MegaTransferListenerInterf
     }
 
     private void notifyProgressNotification(int progressPercent, String message, String info, String actionString){
-        Intent intent = new Intent(UploadService.this, ManagerActivityLollipop.class);
+        Intent intent = new Intent(UploadService.this, ManagerActivity.class);
         switch (isOverquota) {
             case OVERQUOTA_STORAGE_STATE:
                 intent.setAction(ACTION_OVERQUOTA_STORAGE);
@@ -986,7 +986,7 @@ public class UploadService extends Service implements MegaTransferListenerInterf
         String contentText = getString(R.string.download_show_info);
 		String message = getString(R.string.overquota_alert_title);
 
-		Intent intent = new Intent(this, ManagerActivityLollipop.class);
+		Intent intent = new Intent(this, ManagerActivity.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
         if (isOverquota == OVERQUOTA_STORAGE_STATE) {
             intent.setAction(ACTION_OVERQUOTA_STORAGE);

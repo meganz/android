@@ -284,7 +284,7 @@ public class OfflineUtils {
     }
 
     public static File getThumbnailFile(Context context, String handle) {
-        File thumbDir = ThumbnailUtilsLollipop.getThumbFolder(context);
+        File thumbDir = ThumbnailUtils.getThumbFolder(context);
         String thumbName = Base64.encodeToString(handle.getBytes(), Base64.DEFAULT);
         return new File(thumbDir, thumbName + JPG_EXTENSION);
     }

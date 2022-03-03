@@ -26,7 +26,7 @@ import mega.privacy.android.app.databinding.ActivityMyAccountBinding
 import mega.privacy.android.app.databinding.DialogErrorInputEditTextBinding
 import mega.privacy.android.app.databinding.DialogErrorPasswordInputEditTextBinding
 import mega.privacy.android.app.interfaces.SnackbarShower
-import mega.privacy.android.app.lollipop.ChangePasswordActivityLollipop
+import mega.privacy.android.app.lollipop.ChangePasswordActivity
 import mega.privacy.android.app.upgradeAccount.UpgradeAccountActivity
 import mega.privacy.android.app.utils.AlertDialogUtil.isAlertDialogShown
 import mega.privacy.android.app.utils.AlertDialogUtil.quitEditTextError
@@ -633,7 +633,7 @@ class MyAccountActivity : PasscodeActivity(), MyAccountFragment.MessageResultCal
                 R.string.pin_lock_enter
             ) { _, _ ->
                 startActivity(
-                    Intent(this, ChangePasswordActivityLollipop::class.java)
+                    Intent(this, ChangePasswordActivity::class.java)
                         .setAction(ACTION_RESET_PASS_FROM_LINK)
                         .setData(intent.data)
                         .putExtra(EXTRA_MASTER_KEY, viewModel.getMasterKey())
