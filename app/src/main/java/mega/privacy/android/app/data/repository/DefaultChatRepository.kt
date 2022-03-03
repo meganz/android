@@ -4,7 +4,6 @@ import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
 import mega.privacy.android.app.domain.entity.*
-import mega.privacy.android.app.domain.repository.ChatRepository
 import nz.mega.sdk.*
 import javax.inject.Inject
 
