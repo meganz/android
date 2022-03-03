@@ -163,7 +163,7 @@ public class ChatReactionsView extends RelativeLayout implements View.OnClickLis
                 break;
 
             case R.id.icon_more_reactions:
-                ((ChatActivityLollipop) context).showReactionBottomSheet(messagesSelected.get(0), positionMessage, null);
+                ((ChatActivity) context).showReactionBottomSheet(messagesSelected.get(0), positionMessage, null);
                 break;
         }
     }
@@ -196,6 +196,6 @@ public class ChatReactionsView extends RelativeLayout implements View.OnClickLis
         }
 
         parent.closeDialog();
-        ((ChatActivityLollipop) context).hideBottomSheet();
+        ((ChatActivity) context).hideBottomSheet();
     }
 }

@@ -16,7 +16,7 @@ import androidx.core.content.ContextCompat
 import androidx.core.content.PermissionChecker
 import androidx.fragment.app.Fragment
 import mega.privacy.android.app.R
-import mega.privacy.android.app.lollipop.ManagerActivityLollipop
+import mega.privacy.android.app.lollipop.ManagerActivity
 import mega.privacy.android.app.utils.LogUtil
 import mega.privacy.android.app.utils.Util
 
@@ -157,7 +157,7 @@ object PermissionUtils {
             try {
                 context.startActivity(intent)
             } catch (e: Exception) {
-                if (context is ManagerActivityLollipop) {
+                if (context is ManagerActivity) {
                     // in case few devices cannot handle 'ACTION_APPLICATION_DETAILS_SETTINGS' action.
                     Util.showSnackbar(
                         context,

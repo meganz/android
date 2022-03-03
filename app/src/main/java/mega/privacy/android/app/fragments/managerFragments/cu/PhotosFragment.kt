@@ -25,8 +25,8 @@ import mega.privacy.android.app.databinding.FragmentPhotosBinding
 import mega.privacy.android.app.gallery.data.GalleryItem
 import mega.privacy.android.app.gallery.fragment.BaseZoomFragment
 import mega.privacy.android.app.jobservices.CameraUploadsService
-import mega.privacy.android.app.lollipop.FileStorageActivityLollipop
-import mega.privacy.android.app.lollipop.ManagerActivityLollipop
+import mega.privacy.android.app.lollipop.FileStorageActivity
+import mega.privacy.android.app.lollipop.ManagerActivity
 import mega.privacy.android.app.utils.*
 import mega.privacy.android.app.utils.ColorUtils.DARK_IMAGE_ALPHA
 import mega.privacy.android.app.utils.ColorUtils.setImageViewAlphaIfDark
@@ -198,7 +198,7 @@ class PhotosFragment : BaseZoomFragment() {
             viewModel.setEnableCUShown(false)
 
             val cameraPath: String? =
-                result.data?.getStringExtra(FileStorageActivityLollipop.EXTRA_PATH)
+                result.data?.getStringExtra(FileStorageActivity.EXTRA_PATH)
 
             cameraPath?.let {
                 val isExternalSDCardCU = SDCardUtils.isLocalFolderOnSDCard(
@@ -524,7 +524,7 @@ class PhotosFragment : BaseZoomFragment() {
     }
 
     fun isInPhotosPage(): Boolean {
-        return activity as ManagerActivityLollipop? != null && (activity as ManagerActivityLollipop?)!!.isInPhotosPage
+        return activity as ManagerActivity? != null && (activity as ManagerActivity?)!!.isInPhotosPage
     }
 
     private fun handlePhotosMenuUpdate(isShowMenu: Boolean) {
@@ -579,11 +579,11 @@ class PhotosFragment : BaseZoomFragment() {
      */
     private fun enableCameraUpload(dialog: DialogInterface, needSettings: Boolean) {
         if (needSettings) {
-            val intent = Intent(activity, FileStorageActivityLollipop::class.java)
-            intent.action = FileStorageActivityLollipop.Mode.PICK_FOLDER.action
+            val intent = Intent(activity, FileStorageActivity::class.java)
+            intent.action = FileStorageActivity.Mode.PICK_FOLDER.action
             intent.putExtra(
-                FileStorageActivityLollipop.PICK_FOLDER_TYPE,
-                FileStorageActivityLollipop.PickFolderType.CU_FOLDER.folderType
+                FileStorageActivity.PICK_FOLDER_TYPE,
+                FileStorageActivity.PickFolderType.CU_FOLDER.folderType
             )
             startForResult.launch(intent)
         } else {

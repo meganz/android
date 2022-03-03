@@ -6,8 +6,8 @@ import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentPagerAdapter;
 
 import mega.privacy.android.app.R;
-import mega.privacy.android.app.lollipop.managerSections.CompletedTransfersFragmentLollipop;
-import mega.privacy.android.app.lollipop.managerSections.TransfersFragmentLollipop;
+import mega.privacy.android.app.lollipop.managerSections.CompletedTransfersFragment;
+import mega.privacy.android.app.lollipop.managerSections.TransfersFragment;
 
 import static mega.privacy.android.app.utils.LogUtil.*;
 
@@ -26,10 +26,10 @@ public class TransfersPageAdapter extends FragmentPagerAdapter {
         logDebug("Position: " + position);
         switch (position){
             case 0: {
-                return TransfersFragmentLollipop.newInstance();
+                return TransfersFragment.newInstance();
             }
             case 1:{
-                return CompletedTransfersFragmentLollipop.newInstance();
+                return CompletedTransfersFragment.newInstance();
             }
         }
         return null;

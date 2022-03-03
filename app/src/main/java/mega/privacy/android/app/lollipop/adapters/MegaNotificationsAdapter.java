@@ -8,7 +8,6 @@ import androidx.recyclerview.widget.RecyclerView;
 import android.text.Html;
 import android.text.Spanned;
 import android.util.DisplayMetrics;
-import android.util.Log;
 import android.util.TypedValue;
 import android.view.Display;
 import android.view.LayoutInflater;
@@ -26,7 +25,7 @@ import java.util.ArrayList;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.listeners.GetUserEmailListener;
-import mega.privacy.android.app.lollipop.managerSections.NotificationsFragmentLollipop;
+import mega.privacy.android.app.lollipop.managerSections.NotificationsFragment;
 import mega.privacy.android.app.lollipop.megachat.NonContactInfo;
 import mega.privacy.android.app.utils.ColorUtils;
 import nz.mega.sdk.MegaApiAndroid;
@@ -59,9 +58,9 @@ public class MegaNotificationsAdapter extends RecyclerView.Adapter<MegaNotificat
 
 	DisplayMetrics outMetrics;
 
-	private NotificationsFragmentLollipop fragment;
+	private NotificationsFragment fragment;
 
-	public MegaNotificationsAdapter(Context _context, NotificationsFragmentLollipop _fragment, ArrayList<MegaUserAlert> _notifications, RecyclerView _listView) {
+	public MegaNotificationsAdapter(Context _context, NotificationsFragment _fragment, ArrayList<MegaUserAlert> _notifications, RecyclerView _listView) {
 		this.context = _context;
 		this.notifications = _notifications;
 		this.fragment = _fragment;

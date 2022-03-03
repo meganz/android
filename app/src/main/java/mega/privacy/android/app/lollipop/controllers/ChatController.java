@@ -23,14 +23,13 @@ import mega.privacy.android.app.listeners.CopyListener;
 import mega.privacy.android.app.listeners.ExportListener;
 import mega.privacy.android.app.listeners.GetAttrUserListener;
 import mega.privacy.android.app.listeners.TruncateHistoryListener;
-import mega.privacy.android.app.lollipop.ContactInfoActivityLollipop;
-import mega.privacy.android.app.lollipop.FileExplorerActivityLollipop;
-import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
+import mega.privacy.android.app.lollipop.FileExplorerActivity;
+import mega.privacy.android.app.lollipop.ManagerActivity;
 import mega.privacy.android.app.lollipop.megachat.AndroidMegaChatMessage;
 import mega.privacy.android.app.lollipop.megachat.ArchivedChatsActivity;
-import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop;
+import mega.privacy.android.app.lollipop.megachat.ChatActivity;
 import mega.privacy.android.app.lollipop.megachat.ChatExplorerActivity;
-import mega.privacy.android.app.lollipop.megachat.GroupChatInfoActivityLollipop;
+import mega.privacy.android.app.lollipop.megachat.GroupChatInfoActivity;
 import mega.privacy.android.app.lollipop.megachat.NodeAttachmentHistoryActivity;
 import mega.privacy.android.app.lollipop.megachat.NonContactInfo;
 import mega.privacy.android.app.utils.Constants;
@@ -109,8 +108,8 @@ public class ChatController {
         Intent i = new Intent(context, ChatExplorerActivity.class);
         i.putExtra(USER_HANDLES, longArray);
 
-        if(context instanceof ManagerActivityLollipop){
-            ((ManagerActivityLollipop) context).startActivityForResult(i, REQUEST_CODE_SELECT_CHAT);
+        if(context instanceof ManagerActivity){
+            ((ManagerActivity) context).startActivityForResult(i, REQUEST_CODE_SELECT_CHAT);
         }
     }
 
@@ -127,15 +126,15 @@ public class ChatController {
 
     public void archiveChat(long chatId){
         logDebug("Chat ID: " + chatId);
-        if(context instanceof ManagerActivityLollipop){
-            megaChatApi.archiveChat(chatId, true, (ManagerActivityLollipop) context);
+        if(context instanceof ManagerActivity){
+            megaChatApi.archiveChat(chatId, true, (ManagerActivity) context);
         }
     }
 
     public void archiveChat(MegaChatListItem chatItem){
         logDebug("Chat ID: " + chatItem.getChatId());
-        if(context instanceof ManagerActivityLollipop){
-            megaChatApi.archiveChat(chatItem.getChatId(), !chatItem.isArchived(), (ManagerActivityLollipop) context);
+        if(context instanceof ManagerActivity){
+            megaChatApi.archiveChat(chatItem.getChatId(), !chatItem.isArchived(), (ManagerActivity) context);
         }
         else if(context instanceof ArchivedChatsActivity){
             megaChatApi.archiveChat(chatItem.getChatId(), !chatItem.isArchived(), (ArchivedChatsActivity) context);
@@ -144,18 +143,18 @@ public class ChatController {
 
     public void archiveChat(MegaChatRoom chat){
         logDebug("Chat ID: " + chat.getChatId());
-        if(context instanceof GroupChatInfoActivityLollipop){
+        if(context instanceof GroupChatInfoActivity){
 
-            megaChatApi.archiveChat(chat.getChatId(), !chat.isArchived(),(GroupChatInfoActivityLollipop) context);
+            megaChatApi.archiveChat(chat.getChatId(), !chat.isArchived(),(GroupChatInfoActivity) context);
         }
-        else if(context instanceof ChatActivityLollipop){
-            megaChatApi.archiveChat(chat.getChatId(), !chat.isArchived(),(ChatActivityLollipop) context);
+        else if(context instanceof ChatActivity){
+            megaChatApi.archiveChat(chat.getChatId(), !chat.isArchived(),(ChatActivity) context);
         }
     }
 
     public void archiveChats(ArrayList<MegaChatListItem> chats){
         logDebug("Chat ID: " + chats.size());
-        if(context instanceof ManagerActivityLollipop){
+        if(context instanceof ManagerActivity){
             for(int i=0; i<chats.size(); i++){
                 megaChatApi.archiveChat(chats.get(i).getChatId(), !chats.get(i).isArchived(),null);
             }
@@ -212,9 +211,9 @@ public class ChatController {
 
         if (messageToDelete == null) {
             logDebug("The message cannot be deleted");
-        } else if (context instanceof ChatActivityLollipop) {
+        } else if (context instanceof ChatActivity) {
             logDebug("The message has been deleted");
-            ((ChatActivityLollipop) context).updatingRemovedMessage(message);
+            ((ChatActivity) context).updatingRemovedMessage(message);
         }
     }
 
@@ -230,7 +229,7 @@ public class ChatController {
 
     public void alterParticipantsPermissions(long chatid, long uh, int privilege){
         logDebug("Chat ID: " + chatid + ", User (uh): " + uh + ", Priv: " + privilege);
-        megaChatApi.updateChatPermissions(chatid, uh, privilege, (GroupChatInfoActivityLollipop) context);
+        megaChatApi.updateChatPermissions(chatid, uh, privilege, (GroupChatInfoActivity) context);
     }
 
     public void removeParticipant(long chatid, long uh){
@@ -238,12 +237,12 @@ public class ChatController {
         if(context==null){
             logWarning("Context is NULL");
         }
-        megaChatApi.removeFromChat(chatid, uh, (GroupChatInfoActivityLollipop) context);
+        megaChatApi.removeFromChat(chatid, uh, (GroupChatInfoActivity) context);
     }
 
     public void changeTitle(long chatid, String title){
-        if(context instanceof GroupChatInfoActivityLollipop){
-            megaChatApi.setChatTitle(chatid, title, (GroupChatInfoActivityLollipop) context);
+        if(context instanceof GroupChatInfoActivity){
+            megaChatApi.setChatTitle(chatid, title, (GroupChatInfoActivity) context);
         }
     }
 
@@ -1031,8 +1030,8 @@ public class ChatController {
     public void importNodesFromMessages(ArrayList<MegaChatMessage> messages){
         logDebug("importNodesFromMessages");
 
-        Intent intent = new Intent(context, FileExplorerActivityLollipop.class);
-        intent.setAction(FileExplorerActivityLollipop.ACTION_PICK_IMPORT_FOLDER);
+        Intent intent = new Intent(context, FileExplorerActivity.class);
+        intent.setAction(FileExplorerActivity.ACTION_PICK_IMPORT_FOLDER);
 
         long[] longArray = new long[messages.size()];
         for (int i = 0; i < messages.size(); i++) {
@@ -1048,8 +1047,8 @@ public class ChatController {
     public void importNodesFromAndroidMessages(ArrayList<AndroidMegaChatMessage> messages, int typeImport){
         logDebug("importNodesFromAndroidMessages");
 
-        Intent intent = new Intent(context, FileExplorerActivityLollipop.class);
-        intent.setAction(FileExplorerActivityLollipop.ACTION_PICK_IMPORT_FOLDER);
+        Intent intent = new Intent(context, FileExplorerActivity.class);
+        intent.setAction(FileExplorerActivity.ACTION_PICK_IMPORT_FOLDER);
 
         long[] longArray = new long[messages.size()];
         for (int i = 0; i < messages.size(); i++) {
@@ -1057,11 +1056,11 @@ public class ChatController {
         }
         intent.putExtra("HANDLES_IMPORT_CHAT", longArray);
 
-        if(context instanceof  ChatActivityLollipop){
+        if(context instanceof ChatActivity){
             if (typeImport == IMPORT_TO_SHARE_OPTION) {
-                ((ChatActivityLollipop) context).importNodeToShare(messages, exportListener);
+                ((ChatActivity) context).importNodeToShare(messages, exportListener);
             } else {
-                ((ChatActivityLollipop) context).startActivityForResult(intent, REQUEST_CODE_SELECT_IMPORT_FOLDER);
+                ((ChatActivity) context).startActivityForResult(intent, REQUEST_CODE_SELECT_IMPORT_FOLDER);
             }
         }
         else if(context instanceof  NodeAttachmentHistoryActivity){
@@ -1091,10 +1090,10 @@ public class ChatController {
 
         }
 
-        if (!messagesToImport.isEmpty() && context instanceof ChatActivityLollipop) {
-            ((ChatActivityLollipop) context).storedUnhandledData(messagesSelected, messagesToImport);
-            ((ChatActivityLollipop) context).setExportListener(exportListener);
-            ((ChatActivityLollipop) context).handleStoredData();
+        if (!messagesToImport.isEmpty() && context instanceof ChatActivity) {
+            ((ChatActivity) context).storedUnhandledData(messagesSelected, messagesToImport);
+            ((ChatActivity) context).setExportListener(exportListener);
+            ((ChatActivity) context).handleStoredData();
         }
     }
 
@@ -1128,9 +1127,9 @@ public class ChatController {
             forwardMessages(messagesSelected, idChat);
         }
         else{
-            if (context instanceof ChatActivityLollipop) {
-                ((ChatActivityLollipop) context).storedUnhandledData(messagesSelected, messagesToImport);
-                ((ChatActivityLollipop) context).handleStoredData();
+            if (context instanceof ChatActivity) {
+                ((ChatActivity) context).storedUnhandledData(messagesSelected, messagesToImport);
+                ((ChatActivity) context).handleStoredData();
             } else if (context instanceof NodeAttachmentHistoryActivity) {
                 ((NodeAttachmentHistoryActivity) context).storedUnhandledData(messagesSelected, messagesToImport);
                 if (existsMyChatFilesFolder()) {
@@ -1214,8 +1213,8 @@ public class ChatController {
         i.putExtra(ID_MESSAGES, idMessages);
         i.putExtra("ID_CHAT_FROM", idChat);
         i.setAction(ACTION_FORWARD_MESSAGES);
-        if(context instanceof  ChatActivityLollipop){
-            ((ChatActivityLollipop) context).startActivityForResult(i, REQUEST_CODE_SELECT_CHAT);
+        if(context instanceof ChatActivity){
+            ((ChatActivity) context).startActivityForResult(i, REQUEST_CODE_SELECT_CHAT);
         }
         else if(context instanceof  NodeAttachmentHistoryActivity){
             ((NodeAttachmentHistoryActivity) context).startActivityForResult(i, REQUEST_CODE_SELECT_CHAT);

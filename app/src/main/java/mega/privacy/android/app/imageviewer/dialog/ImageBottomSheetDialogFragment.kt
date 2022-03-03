@@ -31,7 +31,7 @@ import mega.privacy.android.app.imageviewer.ImageViewerActivity
 import mega.privacy.android.app.imageviewer.ImageViewerViewModel
 import mega.privacy.android.app.imageviewer.data.ImageItem
 import mega.privacy.android.app.imageviewer.util.*
-import mega.privacy.android.app.lollipop.FileInfoActivityLollipop
+import mega.privacy.android.app.lollipop.FileInfoActivity
 import mega.privacy.android.app.modalbottomsheet.BaseBottomSheetDialogFragment
 import mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil
 import mega.privacy.android.app.modalbottomsheet.nodelabel.NodeLabelBottomSheetDialogFragment
@@ -177,7 +177,7 @@ class ImageBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
                         putExtra(HANDLE, nodeItem.handle.toString())
                     }
                 } else {
-                    Intent(context, FileInfoActivityLollipop::class.java).apply {
+                    Intent(context, FileInfoActivity::class.java).apply {
                         putExtra(HANDLE, nodeItem.handle)
                         putExtra(NAME, nodeItem.name)
                     }

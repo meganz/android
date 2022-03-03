@@ -9,7 +9,7 @@ import java.io.File;
 
 import mega.privacy.android.app.lollipop.megachat.chatAdapters.MegaChipChatExplorerAdapter;
 import mega.privacy.android.app.lollipop.megachat.chatAdapters.MegaListChatExplorerAdapter;
-import mega.privacy.android.app.lollipop.megachat.chatAdapters.MegaListChatLollipopAdapter;
+import mega.privacy.android.app.lollipop.megachat.chatAdapters.MegaListChatAdapter;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaRequest;
@@ -41,8 +41,8 @@ public class ChatUserAvatarListener implements MegaRequestListenerInterface {
         if (e.getErrorCode() == MegaError.API_OK){
             Bitmap bitmap;
             String email;
-            if(holder instanceof MegaListChatLollipopAdapter.ViewHolderChatList){
-                MegaListChatLollipopAdapter.ViewHolderNormalChatList viewHolder = (MegaListChatLollipopAdapter.ViewHolderNormalChatList) holder;
+            if(holder instanceof MegaListChatAdapter.ViewHolderChatList){
+                MegaListChatAdapter.ViewHolderNormalChatList viewHolder = (MegaListChatAdapter.ViewHolderNormalChatList) holder;
                 if(viewHolder !=null && viewHolder.getContactMail()!=null && request.getEmail()!=null){
                     email = viewHolder.getContactMail();
                     if (email.compareTo(request.getEmail()) == 0){

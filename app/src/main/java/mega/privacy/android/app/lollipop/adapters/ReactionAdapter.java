@@ -24,7 +24,7 @@ import mega.privacy.android.app.components.twemoji.EmojiUtils;
 import mega.privacy.android.app.components.twemoji.emoji.Emoji;
 import mega.privacy.android.app.components.twemoji.reaction.ReactionImageView;
 import mega.privacy.android.app.lollipop.megachat.AndroidMegaChatMessage;
-import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop;
+import mega.privacy.android.app.lollipop.megachat.ChatActivity;
 import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaChatRoom;
 
@@ -276,12 +276,12 @@ public class ReactionAdapter extends RecyclerView.Adapter<ReactionAdapter.ViewHo
         ViewHolderReaction holder = (ViewHolderReaction) v.getTag();
         if (holder == null || holder.getAdapterPosition() < 0 ||
                 !shouldReactionBeClicked(megaChatApi.getChatRoom(chatId)) ||
-                ((ChatActivityLollipop) context).isMultiselectOn())
+                ((ChatActivity) context).isMultiselectOn())
             return;
 
         switch (v.getId()) {
             case R.id.more_reactions_layout:
-                ((ChatActivityLollipop) context).openReactionBottomSheet(chatId, megaMessage);
+                ((ChatActivity) context).openReactionBottomSheet(chatId, megaMessage);
                 break;
             case R.id.item_reaction_layout:
                 if (holder.itemEmojiReaction.getEmoji() == null) {
@@ -297,7 +297,7 @@ public class ReactionAdapter extends RecyclerView.Adapter<ReactionAdapter.ViewHo
     public boolean onLongClick(View v) {
         ViewHolderReaction holder = (ViewHolderReaction) v.getTag();
         if (holder == null || !chatRoom.isGroup() ||
-                ((ChatActivityLollipop) context).isMultiselectOn())
+                ((ChatActivity) context).isMultiselectOn())
             return true;
 
         int currentPosition = holder.getAdapterPosition();
@@ -308,7 +308,7 @@ public class ReactionAdapter extends RecyclerView.Adapter<ReactionAdapter.ViewHo
 
         switch (v.getId()) {
             case R.id.item_reaction_layout:
-                ((ChatActivityLollipop) context).openInfoReactionBottomSheet(chatId, megaMessage, holder.reaction);
+                ((ChatActivity) context).openInfoReactionBottomSheet(chatId, megaMessage, holder.reaction);
                 break;
         }
 

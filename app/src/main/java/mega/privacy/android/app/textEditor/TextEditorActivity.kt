@@ -31,7 +31,7 @@ import mega.privacy.android.app.databinding.ActivityTextFileEditorBinding
 import mega.privacy.android.app.interfaces.Scrollable
 import mega.privacy.android.app.interfaces.ActionNodeCallback
 import mega.privacy.android.app.interfaces.SnackbarShower
-import mega.privacy.android.app.lollipop.FileExplorerActivityLollipop
+import mega.privacy.android.app.lollipop.FileExplorerActivity
 import mega.privacy.android.app.lollipop.controllers.ChatController
 import mega.privacy.android.app.utils.AlertsAndWarnings.showSaveToDeviceConfirmDialog
 import mega.privacy.android.app.textEditor.TextEditorViewModel.Companion.VIEW_MODE
@@ -612,8 +612,8 @@ class TextEditorActivity : PasscodeActivity(), SnackbarShower, Scrollable {
      */
     @Suppress("deprecation") // TODO Migrate to registerForActivityResult()
     private fun importNode() {
-        val intent = Intent(this, FileExplorerActivityLollipop::class.java)
-        intent.action = FileExplorerActivityLollipop.ACTION_PICK_IMPORT_FOLDER
+        val intent = Intent(this, FileExplorerActivity::class.java)
+        intent.action = FileExplorerActivity.ACTION_PICK_IMPORT_FOLDER
         startActivityForResult(intent, REQUEST_CODE_SELECT_IMPORT_FOLDER)
     }
 

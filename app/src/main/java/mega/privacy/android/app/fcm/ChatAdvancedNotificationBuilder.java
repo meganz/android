@@ -30,7 +30,7 @@ import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.listeners.GetPeerAttributesListener;
-import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
+import mega.privacy.android.app.lollipop.ManagerActivity;
 import mega.privacy.android.app.lollipop.controllers.ChatController;
 import mega.privacy.android.app.lollipop.megachat.ChatSettings;
 import mega.privacy.android.app.meeting.CallNotificationIntentService;
@@ -187,7 +187,7 @@ public final class ChatAdvancedNotificationBuilder {
         PendingIntent pendingIntent = null;
 
         if (chats.size() > 1) {
-            Intent intent = new Intent(context, ManagerActivityLollipop.class);
+            Intent intent = new Intent(context, ManagerActivity.class);
             intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
             intent.setAction(ACTION_CHAT_SUMMARY);
             intent.putExtra(CHAT_ID, MEGACHAT_INVALID_HANDLE);
@@ -205,7 +205,7 @@ public final class ChatAdvancedNotificationBuilder {
                 }
             });
         } else if (chats.size() == 1) {
-            Intent intent = new Intent(context, ManagerActivityLollipop.class);
+            Intent intent = new Intent(context, ManagerActivity.class);
             intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
             intent.setAction(ACTION_CHAT_NOTIFICATION_MESSAGE);
             intent.putExtra(CHAT_ID, chats.get(0).getChatId());
@@ -376,7 +376,7 @@ public final class ChatAdvancedNotificationBuilder {
     }
 
     public Notification buildNotification(Uri uriParameter, String vibration, String groupKey, MegaChatRoom chat, ArrayList<MegaChatMessage> unreadMessageList) {
-        Intent intent = new Intent(context, ManagerActivityLollipop.class);
+        Intent intent = new Intent(context, ManagerActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         intent.setAction(ACTION_CHAT_NOTIFICATION_MESSAGE);
         intent.putExtra(CHAT_ID, chat.getChatId());
@@ -587,7 +587,7 @@ public final class ChatAdvancedNotificationBuilder {
     }
 
     public Notification buildSummary (String groupKey, boolean beep){
-        Intent intent = new Intent(context, ManagerActivityLollipop.class);
+        Intent intent = new Intent(context, ManagerActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         intent.setAction(ACTION_CHAT_SUMMARY);
         intent.putExtra(CHAT_ID, MEGACHAT_INVALID_HANDLE);
@@ -1064,7 +1064,7 @@ public final class ChatAdvancedNotificationBuilder {
         String notificationCallId = MegaApiJava.userHandleToBase64(chatCallId);
         int notificationId = (notificationCallId).hashCode() + NOTIFICATION_MISSED_CALL;
 
-        Intent intent = new Intent(context, ManagerActivityLollipop.class);
+        Intent intent = new Intent(context, ManagerActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         intent.setAction(ACTION_CHAT_NOTIFICATION_MESSAGE);
         intent.putExtra(CHAT_ID, chat.getChatId());

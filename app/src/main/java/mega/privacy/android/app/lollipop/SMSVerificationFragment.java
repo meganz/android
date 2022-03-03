@@ -32,7 +32,7 @@ public class SMSVerificationFragment extends Fragment implements View.OnClickLis
 
     private Context context;
 
-    private ManagerActivityLollipop managerActivity;
+    private ManagerActivity managerActivity;
 
     private MegaApiJava megaApi;
 
@@ -70,8 +70,8 @@ public class SMSVerificationFragment extends Fragment implements View.OnClickLis
     public void onAttach(Context context) {
         super.onAttach(context);
         this.context = context;
-        if (context instanceof ManagerActivityLollipop) {
-            this.managerActivity = (ManagerActivityLollipop) context;
+        if (context instanceof ManagerActivity) {
+            this.managerActivity = (ManagerActivity) context;
         }
     }
 

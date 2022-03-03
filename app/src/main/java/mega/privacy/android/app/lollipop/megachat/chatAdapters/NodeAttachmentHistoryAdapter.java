@@ -2,7 +2,6 @@ package mega.privacy.android.app.lollipop.megachat.chatAdapters;
 
 import android.app.Activity;
 import android.content.Context;
-import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
@@ -37,7 +36,6 @@ import mega.privacy.android.app.lollipop.controllers.ChatController;
 import mega.privacy.android.app.lollipop.listeners.ChatNonContactNameListener;
 import mega.privacy.android.app.lollipop.megachat.NodeAttachmentHistoryActivity;
 import mega.privacy.android.app.utils.ThumbnailUtils;
-import mega.privacy.android.app.utils.ThumbnailUtilsLollipop;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaChatMessage;
@@ -46,7 +44,7 @@ import nz.mega.sdk.MegaNode;
 import static mega.privacy.android.app.utils.FileUtil.*;
 import static mega.privacy.android.app.utils.ChatUtil.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
-import static mega.privacy.android.app.utils.ThumbnailUtilsLollipop.*;
+import static mega.privacy.android.app.utils.ThumbnailUtils.*;
 import static mega.privacy.android.app.utils.TimeUtils.*;
 import static mega.privacy.android.app.utils.Util.*;
 
@@ -59,7 +57,6 @@ public class NodeAttachmentHistoryAdapter extends RecyclerView.Adapter<NodeAttac
     MegaApiAndroid megaApi;
     MegaChatApiAndroid megaChatApi;
 
-    //	int positionClicked;
     ArrayList<MegaChatMessage> messages;
 
     Object fragment;
@@ -238,7 +235,7 @@ public class NodeAttachmentHistoryAdapter extends RecyclerView.Adapter<NodeAttac
     public void selectAll() {
         for (int i = 0;i < messages.size();i++) {
             if (!isItemChecked(i)) {
-                //Exlude placeholder.
+                //Exclude placeholder.
                 if (messages.get(i) != null) {
                     toggleAllSelection(i);
                 }
@@ -250,7 +247,7 @@ public class NodeAttachmentHistoryAdapter extends RecyclerView.Adapter<NodeAttac
         logDebug("clearSelections");
         for (int i = 0;i < messages.size();i++) {
             if (isItemChecked(i)) {
-                //Exlude placeholder.
+                //Exclude placeholder.
                 if (messages.get(i) != null) {
                     toggleAllSelection(i);
                 }
@@ -258,18 +255,6 @@ public class NodeAttachmentHistoryAdapter extends RecyclerView.Adapter<NodeAttac
         }
     }
 
-    //	public void clearSelections() {
-//		if(selectedItems!=null){
-//			selectedItems.clear();
-//			for (int i= 0; i<this.getItemCount();i++) {
-//				if (isItemChecked(i)) {
-//					toggleAllSelection(i);
-//				}
-//			}
-//		}
-//		notifyDataSetChanged();
-//	}
-//
     private boolean isItemChecked(int position) {
         return selectedItems.get(position);
     }
@@ -462,12 +447,10 @@ public class NodeAttachmentHistoryAdapter extends RecyclerView.Adapter<NodeAttac
         holder.thumbLayoutForFile.setBackgroundColor(Color.TRANSPARENT);
 
         if (multipleSelect && isItemChecked(position)) {
-//                    holder.itemLayout.setForeground(ContextCompat.getDrawable(context,R.drawable.background_item_grid_selected));
             holder.itemLayout.setBackground(ContextCompat.getDrawable(context,R.drawable.background_item_grid_selected));
             holder.fileGridSelected.setVisibility(View.VISIBLE);
 
         } else {
-//                    holder.itemLayout.setForeground(new ColorDrawable());
             holder.itemLayout.setBackground(ContextCompat.getDrawable(context,R.drawable.background_item_grid));
             holder.fileGridSelected.setVisibility(View.GONE);
         }
@@ -485,18 +468,10 @@ public class NodeAttachmentHistoryAdapter extends RecyclerView.Adapter<NodeAttac
 
         if (node.hasThumbnail()) {
 
-//				DisplayMetrics dm = new DisplayMetrics();
-//				float px = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 56, dm);
-//
-//				RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) holder.imageView.getLayoutParams();
-//				params.width = ViewGroup.LayoutParams.MATCH_PARENT;
-//				params.height = ViewGroup.LayoutParams.MATCH_PARENT;
-//				holder.imageView.setLayoutParams(params);
-
             Bitmap temp = ThumbnailUtils.getThumbnailFromCache(node);
 
             if (temp != null) {
-                thumb = ThumbnailUtilsLollipop.getRoundedRectBitmap(context,temp,2);
+                thumb = ThumbnailUtils.getRoundedRectBitmap(context,temp,2);
                 holder.fileGridIconForFile.setVisibility(View.GONE);
                 holder.imageViewThumb.setVisibility(View.VISIBLE);
                 holder.imageViewThumb.setImageBitmap(thumb);
@@ -506,7 +481,7 @@ public class NodeAttachmentHistoryAdapter extends RecyclerView.Adapter<NodeAttac
                 temp = ThumbnailUtils.getThumbnailFromFolder(node,context);
 
                 if (temp != null) {
-                    thumb = ThumbnailUtilsLollipop.getRoundedRectBitmap(context,temp,2);
+                    thumb = ThumbnailUtils.getRoundedRectBitmap(context,temp,2);
                     holder.fileGridIconForFile.setVisibility(View.GONE);
                     holder.imageViewThumb.setVisibility(View.VISIBLE);
                     holder.imageViewThumb.setImageBitmap(thumb);
@@ -514,13 +489,13 @@ public class NodeAttachmentHistoryAdapter extends RecyclerView.Adapter<NodeAttac
 
                 } else {
                     try {
-                        temp = ThumbnailUtilsLollipop.getThumbnailFromMegaGrid(node,context,holder,megaApi,this);
+                        temp = ThumbnailUtils.getThumbnailFromMegaGrid(node,context,holder,megaApi,this);
 
                     } catch (Exception e) {
                     } // Too many AsyncTasks
 
                     if (temp != null) {
-                        thumb = ThumbnailUtilsLollipop.getRoundedRectBitmap(context,temp,2);
+                        thumb = ThumbnailUtils.getRoundedRectBitmap(context,temp,2);
                         holder.imageViewIcon.setVisibility(View.GONE);
                         holder.imageViewThumb.setVisibility(View.VISIBLE);
                         holder.imageViewThumb.setImageBitmap(thumb);
@@ -531,9 +506,8 @@ public class NodeAttachmentHistoryAdapter extends RecyclerView.Adapter<NodeAttac
         } else {
             Bitmap temp = ThumbnailUtils.getThumbnailFromCache(node);
 
-//				thumb = getThumbnailFromCache(node);
             if (temp != null) {
-                thumb = ThumbnailUtilsLollipop.getRoundedRectBitmap(context,temp,2);
+                thumb = ThumbnailUtils.getRoundedRectBitmap(context,temp,2);
                 holder.fileGridIconForFile.setVisibility(View.GONE);
                 holder.imageViewThumb.setVisibility(View.VISIBLE);
                 holder.imageViewThumb.setImageBitmap(thumb);
@@ -542,14 +516,14 @@ public class NodeAttachmentHistoryAdapter extends RecyclerView.Adapter<NodeAttac
                 temp = ThumbnailUtils.getThumbnailFromFolder(node,context);
 
                 if (temp != null) {
-                    thumb = ThumbnailUtilsLollipop.getRoundedRectBitmap(context,temp,2);
+                    thumb = ThumbnailUtils.getRoundedRectBitmap(context,temp,2);
                     holder.fileGridIconForFile.setVisibility(View.GONE);
                     holder.imageViewThumb.setVisibility(View.VISIBLE);
                     holder.imageViewThumb.setImageBitmap(thumb);
                     holder.thumbLayoutForFile.setBackgroundColor(ContextCompat.getColor(context,R.color.grey_010));
                 } else {
                     try {
-                        ThumbnailUtilsLollipop.createThumbnailGrid(context,node,holder,megaApi,this);
+                        ThumbnailUtils.createThumbnailGrid(context,node,holder,megaApi,this);
                     } catch (Exception e) {
                     } // Too many AsyncTasks
                 }
@@ -790,7 +764,6 @@ public class NodeAttachmentHistoryAdapter extends RecyclerView.Adapter<NodeAttac
 
         ViewHolderBrowser holder = (ViewHolderBrowser)view.getTag();
         int currentPosition = holder.getAdapterPosition();
-//        Toast.makeText(context,"pos:" + currentPosition ,Toast.LENGTH_SHORT ).show();
 
         ((NodeAttachmentHistoryActivity)context).activateActionMode();
         ((NodeAttachmentHistoryActivity)context).itemClick(currentPosition);
