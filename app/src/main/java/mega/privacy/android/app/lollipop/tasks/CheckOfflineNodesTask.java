@@ -14,9 +14,9 @@ import static mega.privacy.android.app.utils.FileUtil.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.OfflineUtils.*;
 
-/*
-	 * Background task to verify the offline nodes
-	 */
+/**
+ * Background task to verify the offline nodes
+ */
 public class CheckOfflineNodesTask extends AsyncTask<String, Void, String> {
     Context context;
     DatabaseHandler dbH;
@@ -79,13 +79,4 @@ public class CheckOfflineNodesTask extends AsyncTask<String, Void, String> {
 
         return null;
     }
-
-//		@Override
-//        protected void onPostExecute(String result) {
-//			log("onPostExecute -Async Task CheckOfflineNodesTask");
-//			//update the content label of the Rubbish Bin Fragment
-//			if(rbFLol!=null){
-//					rbFLol.setContentText();
-//			}
-//        }
 }

@@ -16,9 +16,9 @@ import io.reactivex.rxjava3.kotlin.subscribeBy
 import io.reactivex.rxjava3.schedulers.Schedulers
 import mega.privacy.android.app.*
 import mega.privacy.android.app.interfaces.*
-import mega.privacy.android.app.lollipop.FileStorageActivityLollipop
-import mega.privacy.android.app.lollipop.FileStorageActivityLollipop.*
-import mega.privacy.android.app.lollipop.FileStorageActivityLollipop.Mode.PICK_FOLDER
+import mega.privacy.android.app.lollipop.FileStorageActivity
+import mega.privacy.android.app.lollipop.FileStorageActivity.*
+import mega.privacy.android.app.lollipop.FileStorageActivity.Mode.PICK_FOLDER
 import mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuotaPaywallWarning
 import mega.privacy.android.app.utils.CacheFolderManager.buildVoiceClipFile
 import mega.privacy.android.app.utils.Constants.*
@@ -354,7 +354,7 @@ class NodeSaver(
     }
 
     /**
-     * Handle app result from FileStorageActivityLollipop launched by requestLocalFolder,
+     * Handle app result from [FileStorageActivity] launched by requestLocalFolder,
      * and take actions according to the state and result.
      *
      * It should be called in onActivityResult.
@@ -534,7 +534,7 @@ class NodeSaver(
     ) {
         val intent = Intent(PICK_FOLDER.action)
         intent.putExtra(PICK_FOLDER_TYPE, PickFolderType.DOWNLOAD_FOLDER.folderType)
-        intent.setClass(app, FileStorageActivityLollipop::class.java)
+        intent.setClass(app, FileStorageActivity::class.java)
 
         if (prompt != null) {
             intent.putExtra(EXTRA_PROMPT, prompt)

@@ -17,7 +17,7 @@
             android:id="@+id/toolbar_settings"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
-            tools:context=".ManagerActivityLollipop" />
+            tools:context=".lollipop.ManagerActivity" />
 
     </com.google.android.material.appbar.AppBarLayout>
 

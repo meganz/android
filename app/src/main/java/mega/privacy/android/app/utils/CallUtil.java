@@ -32,15 +32,15 @@ import mega.privacy.android.app.R;
 import mega.privacy.android.app.interfaces.SnackbarShower;
 import mega.privacy.android.app.listeners.CreateChatListener;
 import mega.privacy.android.app.listeners.LoadPreviewListener;
+import mega.privacy.android.app.lollipop.ContactInfoActivity;
+import mega.privacy.android.app.lollipop.ManagerActivity;
 import mega.privacy.android.app.lollipop.megachat.AppRTCAudioManager;
+import mega.privacy.android.app.lollipop.megachat.ChatActivity;
 import mega.privacy.android.app.meeting.listeners.DisableAudioVideoCallListener;
 import mega.privacy.android.app.meeting.listeners.StartChatCallListener;
-import mega.privacy.android.app.lollipop.AddContactActivityLollipop;
-import mega.privacy.android.app.lollipop.ContactInfoActivityLollipop;
+import mega.privacy.android.app.lollipop.AddContactActivity;
 import mega.privacy.android.app.lollipop.InviteContactActivity;
-import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.controllers.ChatController;
-import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop;
 import mega.privacy.android.app.meeting.activity.MeetingActivity;
 import mega.privacy.android.app.objects.PasscodeManagement;
 import nz.mega.sdk.MegaApiAndroid;
@@ -433,12 +433,12 @@ public class CallUtil {
 
         callInProgressLayout.setVisibility(View.VISIBLE);
 
-        if (context instanceof ManagerActivityLollipop) {
-            ((ManagerActivityLollipop) context).changeAppBarElevation(true,
-                    ManagerActivityLollipop.ELEVATION_CALL_IN_PROGRESS);
+        if (context instanceof ManagerActivity) {
+            ((ManagerActivity) context).changeAppBarElevation(true,
+                    ManagerActivity.ELEVATION_CALL_IN_PROGRESS);
         }
-        if (context instanceof ContactInfoActivityLollipop) {
-            ((ContactInfoActivityLollipop) context).changeToolbarLayoutElevation();
+        if (context instanceof ContactInfoActivity) {
+            ((ContactInfoActivity) context).changeToolbarLayoutElevation();
         }
     }
 
@@ -492,12 +492,12 @@ public class CallUtil {
     private static void hideCallInProgressLayout(Context context, final RelativeLayout callInProgressLayout, final Chronometer callInProgressChrono) {
         callInProgressLayout.setVisibility(View.GONE);
         activateChrono(false, callInProgressChrono, null);
-        if (context instanceof ManagerActivityLollipop) {
-            ((ManagerActivityLollipop) context).changeAppBarElevation(false,
-                    ManagerActivityLollipop.ELEVATION_CALL_IN_PROGRESS);
+        if (context instanceof ManagerActivity) {
+            ((ManagerActivity) context).changeAppBarElevation(false,
+                    ManagerActivity.ELEVATION_CALL_IN_PROGRESS);
         }
-        if (context instanceof ContactInfoActivityLollipop) {
-            ((ContactInfoActivityLollipop) context).changeToolbarLayoutElevation();
+        if (context instanceof ContactInfoActivity) {
+            ((ContactInfoActivity) context).changeToolbarLayoutElevation();
         }
     }
 
@@ -584,12 +584,12 @@ public class CallUtil {
         }
         if (callInProgressLayout != null && callInProgressLayout.getVisibility() == View.VISIBLE) {
             callInProgressLayout.setVisibility(View.GONE);
-            if (context instanceof ManagerActivityLollipop) {
-                ((ManagerActivityLollipop) context).changeAppBarElevation(false,
-                        ManagerActivityLollipop.ELEVATION_CALL_IN_PROGRESS);
+            if (context instanceof ManagerActivity) {
+                ((ManagerActivity) context).changeAppBarElevation(false,
+                        ManagerActivity.ELEVATION_CALL_IN_PROGRESS);
             }
-            if (context instanceof ContactInfoActivityLollipop) {
-                ((ContactInfoActivityLollipop) context).changeToolbarLayoutElevation();
+            if (context instanceof ContactInfoActivity) {
+                ((ContactInfoActivity) context).changeToolbarLayoutElevation();
             }
         }
     }
@@ -761,8 +761,8 @@ public class CallUtil {
 
     public static boolean checkConnection(Context context) {
         if (!isOnline(context)) {
-            if (context instanceof ContactInfoActivityLollipop) {
-                ((ContactInfoActivityLollipop) context).showSnackbar(SNACKBAR_TYPE, context.getString(R.string.error_server_connection_problem), -1);
+            if (context instanceof ContactInfoActivity) {
+                ((ContactInfoActivity) context).showSnackbar(SNACKBAR_TYPE, context.getString(R.string.error_server_connection_problem), -1);
             }
             return false;
         }
@@ -836,13 +836,13 @@ public class CallUtil {
                 case DialogInterface.BUTTON_POSITIVE:
                     logDebug("Open camera and lost the camera in the call");
                     disableLocalCamera();
-                    if (activity instanceof ChatActivityLollipop && action.equals(ACTION_TAKE_PICTURE)) {
-                        ((ChatActivityLollipop) activity).controlCamera();
+                    if (activity instanceof ChatActivity && action.equals(ACTION_TAKE_PICTURE)) {
+                        ((ChatActivity) activity).controlCamera();
                     }
-                    if (activity instanceof ManagerActivityLollipop) {
+                    if (activity instanceof ManagerActivity) {
                         switch (action) {
                             case ACTION_OPEN_QR:
-                                ((ManagerActivityLollipop) activity).openQR(openScanQR);
+                                ((ManagerActivity) activity).openQR(openScanQR);
                                 break;
                             case ACTION_TAKE_PICTURE:
                                 takePicture(activity, TAKE_PHOTO_CODE);
@@ -852,8 +852,8 @@ public class CallUtil {
                                 break;
                         }
                     }
-                    if (activity instanceof AddContactActivityLollipop && action.equals(ACTION_OPEN_QR)) {
-                        ((AddContactActivityLollipop) activity).initScanQR();
+                    if (activity instanceof AddContactActivity && action.equals(ACTION_OPEN_QR)) {
+                        ((AddContactActivity) activity).initScanQR();
                     }
                     if (activity instanceof InviteContactActivity && action.equals(ACTION_OPEN_QR)) {
                         ((InviteContactActivity) activity).initScanQR();
@@ -1140,8 +1140,8 @@ public class CallUtil {
             if (activity == null)
                 return false;
 
-            if (activity instanceof ManagerActivityLollipop) {
-                ((ManagerActivityLollipop) activity).setTypesCameraPermission(typePermission);
+            if (activity instanceof ManagerActivity) {
+                ((ManagerActivity) activity).setTypesCameraPermission(typePermission);
             }
             requestPermission(activity, REQUEST_CAMERA, Manifest.permission.CAMERA);
             return false;
@@ -1152,8 +1152,8 @@ public class CallUtil {
             if (activity == null)
                 return false;
 
-            if (activity instanceof ManagerActivityLollipop) {
-                ((ManagerActivityLollipop) activity).setTypesCameraPermission(typePermission);
+            if (activity instanceof ManagerActivity) {
+                ((ManagerActivity) activity).setTypesCameraPermission(typePermission);
             }
             requestPermission(activity, REQUEST_RECORD_AUDIO, Manifest.permission.RECORD_AUDIO);
             return false;

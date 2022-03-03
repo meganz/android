@@ -16,7 +16,7 @@ import mega.privacy.android.app.utils.Util.dpWidthAbs
 import mega.privacy.android.app.utils.getScreenWidth
 
 /**
- * Zip list adapter, replacement of ZipListAdapterLollipop.java
+ * Zip list adapter
  * @param onItemClick item click event listener
  */
 class ZipListAdapter(private val onItemClick: (zipInfoUIO: ZipInfoUIO, position: Int) -> Unit) :

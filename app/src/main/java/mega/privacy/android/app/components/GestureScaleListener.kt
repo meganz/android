@@ -1,7 +1,6 @@
 package mega.privacy.android.app.components
 
 import android.view.ScaleGestureDetector
-import mega.privacy.android.app.lollipop.ManagerActivityLollipop
 
 /**
  * Listener to detect scale end event.

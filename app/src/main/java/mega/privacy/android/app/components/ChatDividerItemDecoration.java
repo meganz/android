@@ -9,7 +9,7 @@ import android.view.View;
 
 import mega.privacy.android.app.R;
 
-import static mega.privacy.android.app.lollipop.megachat.chatAdapters.MegaListChatLollipopAdapter.*;
+import static mega.privacy.android.app.lollipop.megachat.chatAdapters.MegaListChatAdapter.*;
 
 public class ChatDividerItemDecoration extends RecyclerView.ItemDecoration {
     DisplayMetrics outMetrics;

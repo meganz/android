@@ -78,9 +78,9 @@ import mega.privacy.android.app.fcm.KeepAliveService;
 import mega.privacy.android.app.listeners.GetAttrUserListener;
 import mega.privacy.android.app.listeners.GetCuAttributeListener;
 import mega.privacy.android.app.listeners.GlobalListener;
+import mega.privacy.android.app.lollipop.ManagerActivity;
 import mega.privacy.android.app.lollipop.controllers.AccountController;
-import mega.privacy.android.app.lollipop.LoginActivityLollipop;
-import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
+import mega.privacy.android.app.lollipop.LoginActivity;
 import mega.privacy.android.app.lollipop.megachat.AppRTCAudioManager;
 import mega.privacy.android.app.lollipop.megachat.BadgeIntentService;
 import mega.privacy.android.app.meeting.CallService;
@@ -1195,7 +1195,7 @@ public class MegaApplication extends MultiDexApplication implements Application.
 			String notificationChannelId = NOTIFICATION_CHANNEL_CLOUDDRIVE_ID;
 			String notificationChannelName = NOTIFICATION_CHANNEL_CLOUDDRIVE_NAME;
 
-			Intent intent = new Intent(this, ManagerActivityLollipop.class);
+			Intent intent = new Intent(this, ManagerActivity.class);
 			intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 			intent.setAction(ACTION_INCOMING_SHARED_FOLDER_NOTIFICATION);
 			PendingIntent pendingIntent = PendingIntent.getActivity(this, 0 /* Request code */, intent,
@@ -1329,7 +1329,7 @@ public class MegaApplication extends MultiDexApplication implements Application.
 						return;
 					}
 
-					Intent loginIntent = new Intent(this, LoginActivityLollipop.class);
+					Intent loginIntent = new Intent(this, LoginActivity.class);
 
 					if (getUrlConfirmationLink() != null) {
 						loginIntent.putExtra(VISIBLE_FRAGMENT,  LOGIN_FRAGMENT);
@@ -1360,7 +1360,7 @@ public class MegaApplication extends MultiDexApplication implements Application.
 
 				if(isActivityVisible()){
 					logDebug("Launch intent to login screen");
-					Intent tourIntent = new Intent(this, LoginActivityLollipop.class);
+					Intent tourIntent = new Intent(this, LoginActivity.class);
 					tourIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
 					this.startActivity(tourIntent);
 				}

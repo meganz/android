@@ -50,7 +50,7 @@ import mega.privacy.android.app.VideoCompressor;
 import mega.privacy.android.app.listeners.CreateFolderListener;
 import mega.privacy.android.app.listeners.GetCuAttributeListener;
 import mega.privacy.android.app.listeners.SetAttrUserListener;
-import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
+import mega.privacy.android.app.lollipop.ManagerActivity;
 import mega.privacy.android.app.receivers.NetworkTypeChangeReceiver;
 import mega.privacy.android.app.sync.cusync.CuSyncManager;
 import mega.privacy.android.app.utils.ChatUtil;
@@ -79,8 +79,8 @@ import static android.content.ContentResolver.QUERY_ARG_SQL_SORT_ORDER;
 import static mega.privacy.android.app.constants.SettingsConstants.*;
 import static mega.privacy.android.app.jobservices.SyncRecord.*;
 import static mega.privacy.android.app.listeners.CreateFolderListener.ExtraAction.INIT_CU;
-import static mega.privacy.android.app.lollipop.ManagerActivityLollipop.PENDING_TAB;
-import static mega.privacy.android.app.lollipop.ManagerActivityLollipop.TRANSFERS_TAB;
+import static mega.privacy.android.app.lollipop.ManagerActivity.PENDING_TAB;
+import static mega.privacy.android.app.lollipop.ManagerActivity.TRANSFERS_TAB;
 import static mega.privacy.android.app.receivers.NetworkTypeChangeReceiver.MOBILE;
 import static mega.privacy.android.app.utils.ImageProcessor.*;
 import static mega.privacy.android.app.utils.JobUtil.*;
@@ -731,7 +731,7 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
                             finish();
                             String title = getString(R.string.title_out_of_space);
                             String message = getString(R.string.error_not_enough_free_space);
-                            Intent intent = new Intent(this, ManagerActivityLollipop.class);
+                            Intent intent = new Intent(this, ManagerActivity.class);
                             PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent,  PendingIntent.FLAG_IMMUTABLE);
                             showNotification(title, message, pendingIntent, true);
                             return;
@@ -1317,7 +1317,7 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
             }
         }
         // end new logic
-        mIntent = new Intent(this, ManagerActivityLollipop.class);
+        mIntent = new Intent(this, ManagerActivity.class);
         mIntent.setAction(ACTION_CANCEL_CAM_SYNC);
         mIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
         mIntent.putExtra(TRANSFERS_TAB, PENDING_TAB);
@@ -1791,7 +1791,7 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
         } else {
             logDebug("Compression queue bigger than setting, show notification to user.");
             finish();
-            Intent intent = new Intent(this, ManagerActivityLollipop.class);
+            Intent intent = new Intent(this, ManagerActivity.class);
             intent.setAction(ACTION_SHOW_SETTINGS);
             PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_IMMUTABLE);
             String title = getString(R.string.title_compression_size_over_limit);
@@ -1814,7 +1814,7 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
     public void onInsufficientSpace() {
         logWarning("Insufficient space for video compression.");
         finish();
-        Intent intent = new Intent(this, ManagerActivityLollipop.class);
+        Intent intent = new Intent(this, ManagerActivity.class);
         PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_IMMUTABLE);
         String title = getResources().getString(R.string.title_out_of_space);
         String message = getResources().getString(R.string.message_out_of_space);
@@ -1988,7 +1988,7 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
         String contentText = getString(R.string.download_show_info);
         String message = getString(R.string.overquota_alert_title);
 
-        Intent intent = new Intent(this, ManagerActivityLollipop.class);
+        Intent intent = new Intent(this, ManagerActivity.class);
         intent.setAction(ACTION_OVERQUOTA_STORAGE);
 
         NotificationCompat.Builder builder = new NotificationCompat.Builder(this, OVER_QUOTA_NOTIFICATION_CHANNEL_ID);

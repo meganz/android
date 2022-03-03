@@ -30,7 +30,7 @@ import mega.privacy.android.app.R;
 import mega.privacy.android.app.fragments.settingsFragments.SettingsFileManagementFragment;
 import mega.privacy.android.app.globalmanagement.MyAccountInfo;
 import mega.privacy.android.app.listeners.SetAttrUserListener;
-import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
+import mega.privacy.android.app.lollipop.ManagerActivity;
 import mega.privacy.android.app.lollipop.controllers.NodeController;
 import mega.privacy.android.app.lollipop.tasks.ManageOfflineTask;
 import mega.privacy.android.app.utils.AlertDialogUtil;
@@ -314,7 +314,7 @@ public class FileManagementPreferencesActivity extends PreferencesBaseActivity {
     }
 
     private void showUpgradeAccount() {
-        Intent upgradeIntent = new Intent(this, ManagerActivityLollipop.class);
+        Intent upgradeIntent = new Intent(this, ManagerActivity.class);
         upgradeIntent.setAction(ACTION_SHOW_UPGRADE_ACCOUNT);
         startActivity(upgradeIntent);
     }

@@ -21,7 +21,7 @@ import java.util.Collections;
 import mega.privacy.android.app.MegaOffline;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
-import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
+import mega.privacy.android.app.lollipop.ManagerActivity;
 import mega.privacy.android.app.utils.OfflineUtils;
 
 import static mega.privacy.android.app.utils.Constants.*;
@@ -43,8 +43,8 @@ public class OfflineOptionsBottomSheetDialogFragment extends BaseBottomSheetDial
         if (savedInstanceState != null) {
             String handle = savedInstanceState.getString(HANDLE);
             nodeOffline = dbH.findByHandle(handle);
-        } else if (requireActivity() instanceof ManagerActivityLollipop) {
-            nodeOffline = ((ManagerActivityLollipop) requireActivity()).getSelectedOfflineNode();
+        } else if (requireActivity() instanceof ManagerActivity) {
+            nodeOffline = ((ManagerActivity) requireActivity()).getSelectedOfflineNode();
         }
 
         return contentView;
@@ -128,8 +128,8 @@ public class OfflineOptionsBottomSheetDialogFragment extends BaseBottomSheetDial
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.option_delete_offline_layout:
-                if (requireActivity() instanceof ManagerActivityLollipop) {
-                    ((ManagerActivityLollipop) requireActivity())
+                if (requireActivity() instanceof ManagerActivity) {
+                    ((ManagerActivity) requireActivity())
                             .showConfirmationRemoveFromOffline(nodeOffline,
                                     this::setStateBottomSheetBehaviorHidden);
                 }
@@ -141,11 +141,11 @@ public class OfflineOptionsBottomSheetDialogFragment extends BaseBottomSheetDial
                 OfflineUtils.shareOfflineNode(requireContext(), Long.valueOf(nodeOffline.getHandle()));
                 break;
             case R.id.option_download_layout:
-                ((ManagerActivityLollipop) requireActivity()).saveOfflineNodesToDevice(
+                ((ManagerActivity) requireActivity()).saveOfflineNodesToDevice(
                         Collections.singletonList(nodeOffline));
                 break;
             case R.id.option_properties_layout:
-                ((ManagerActivityLollipop) requireActivity()).showOfflineFileInfo(nodeOffline);
+                ((ManagerActivity) requireActivity()).showOfflineFileInfo(nodeOffline);
                 break;
             default:
                 break;

@@ -20,7 +20,7 @@ import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.globalmanagement.TransfersManagement;
 import mega.privacy.android.app.lollipop.DrawerItem;
-import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
+import mega.privacy.android.app.lollipop.ManagerActivity;
 import mega.privacy.android.app.utils.ColorUtils;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
@@ -86,8 +86,8 @@ public class TransferWidget {
      *                          - MegaTransfer.TYPE_UPLOAD if upload transfer
      */
     public void update(int transferType) {
-        if (context instanceof ManagerActivityLollipop) {
-            if (((ManagerActivityLollipop) context).getDrawerItem() == DrawerItem.TRANSFERS) {
+        if (context instanceof ManagerActivity) {
+            if (((ManagerActivity) context).getDrawerItem() == DrawerItem.TRANSFERS) {
                 transfersManagement.setFailedTransfers(false);
             }
 
@@ -114,7 +114,7 @@ public class TransferWidget {
      * @return True if the widget is on a file management section in ManagerActivity, false otherwise.
      */
     private boolean isOnFileManagementManagerSection() {
-        DrawerItem drawerItem = ((ManagerActivityLollipop) context).getDrawerItem();
+        DrawerItem drawerItem = ((ManagerActivity) context).getDrawerItem();
 
         return drawerItem != DrawerItem.TRANSFERS
                 && drawerItem != DrawerItem.SETTINGS
@@ -122,7 +122,7 @@ public class TransferWidget {
                 && drawerItem != DrawerItem.CHAT
                 && drawerItem != DrawerItem.RUBBISH_BIN
                 && drawerItem != DrawerItem.PHOTOS
-                && !((ManagerActivityLollipop) context).isInImagesPage();
+                && !((ManagerActivity) context).isInImagesPage();
     }
 
     /**

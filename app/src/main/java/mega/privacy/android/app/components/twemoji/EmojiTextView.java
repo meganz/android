@@ -271,7 +271,7 @@ public class EmojiTextView extends AppCompatTextView implements EmojiTexViewInte
     /**
      * Control whether this icon should be visible, and also update the max width of the whole text.
      *
-     * In ContactInfoActivityLollipop, we will display the icon and allow bigger max width if the
+     * In ContactInfoActivity, we will display the icon and allow bigger max width if the
      * tool bar is expanded, and hide the icon and set a smaller max width if the tool bar is
      * collapsed.
      *

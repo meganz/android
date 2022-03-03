@@ -23,7 +23,7 @@ import mega.privacy.android.app.generalusecase.FilePrepareUseCase
 import mega.privacy.android.app.globalmanagement.MyAccountInfo
 import mega.privacy.android.app.interfaces.SnackbarShower
 import mega.privacy.android.app.interfaces.showSnackbar
-import mega.privacy.android.app.lollipop.LoginActivityLollipop
+import mega.privacy.android.app.lollipop.LoginActivity
 import mega.privacy.android.app.lollipop.TestPasswordActivity
 import mega.privacy.android.app.lollipop.VerifyTwoFactorActivity
 import mega.privacy.android.app.lollipop.controllers.AccountController
@@ -221,12 +221,12 @@ class MyAccountViewModel @Inject constructor(
     }
 
     /**
-     * Launches the LoginActivityLollipop activity to perform an account refresh.
+     * Launches [LoginActivity] to perform an account refresh.
      *
      * @param activity Current activity.
      */
     fun refresh(activity: Activity) {
-        val intent = Intent(activity, LoginActivityLollipop::class.java)
+        val intent = Intent(activity, LoginActivity::class.java)
         intent.putExtra(VISIBLE_FRAGMENT, LOGIN_FRAGMENT)
         intent.action = ACTION_REFRESH
 
