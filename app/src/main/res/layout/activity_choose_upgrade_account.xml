@@ -32,12 +32,11 @@
         <ImageButton
             android:id="@+id/billing_warning_close"
             style="@style/Widget.Mega.Button.Transparent"
-            android:layout_width="12dp"
-            android:layout_height="12dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:layout_alignParentEnd="true"
-            android:layout_marginTop="16dp"
-            android:layout_marginEnd="16dp"
-            android:src="@drawable/ic_remove"
+            android:layout_marginTop="1dp"
+            android:src="@drawable/ic_remove_warning"
             app:tint="@color/grey_alpha_087_yellow_700"
             tools:ignore="ContentDescription" />
 
