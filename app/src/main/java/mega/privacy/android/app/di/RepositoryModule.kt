@@ -25,5 +25,8 @@ abstract class RepositoryModule {
     abstract fun bindNetworkRepository(repository: DefaultNetworkRepository): NetworkRepository
 
     @Binds
+    abstract fun bindChatRepository(repository: DefaultChatRepository): ChatRepository
+
+    @Binds
     abstract fun bindFilesRepository(implementation: MegaFilesRepository): FilesRepository
 }
