@@ -449,7 +449,6 @@ import nz.mega.sdk.MegaUserAlert;
 
 import static mega.privacy.android.app.utils.CallUtil.*;
 
-
 @AndroidEntryPoint
 @SuppressWarnings("deprecation")
 public class ManagerActivityLollipop extends TransfersManagementActivity

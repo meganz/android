@@ -22,8 +22,8 @@ class DefaultChatRepository @Inject constructor(
                     request: MegaChatRequest?,
                     e: MegaChatError?
                 ) {
-                    if (request?.type == MegaChatRequest.TYPE_LOGOUT){
-                        if (e?.errorCode == MegaError.API_OK){
+                    if (request?.type == MegaChatRequest.TYPE_LOGOUT) {
+                        if (e?.errorCode == MegaError.API_OK) {
                             trySend(true)
                         }
                     }

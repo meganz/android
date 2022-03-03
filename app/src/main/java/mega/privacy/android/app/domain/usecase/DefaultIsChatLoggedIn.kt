@@ -7,7 +7,6 @@ import kotlinx.coroutines.flow.map
 import mega.privacy.android.app.domain.repository.ChatRepository
 import javax.inject.Inject
 
-
 class DefaultIsChatLoggedIn @Inject constructor(private val chatRepository: ChatRepository) : IsChatLoggedIn {
     override fun invoke(): Flow<Boolean> {
         return flow {
