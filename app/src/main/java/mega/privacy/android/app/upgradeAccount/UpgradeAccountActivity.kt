@@ -13,6 +13,12 @@ import java.util.*
 
 class UpgradeAccountActivity : ChooseAccountActivity() {
 
+    companion object {
+        const val SUBSCRIPTION_FROM_ITUNES = 10
+        const val SUBSCRIPTION_FROM_ANDROID_PLATFORM = 11
+        const val SUBSCRIPTION_FROM_OTHER_PLATFORM = 12
+    }
+
     override fun manageUpdateReceiver(action: Int) {
         super.manageUpdateReceiver(action)
 
@@ -24,6 +30,14 @@ class UpgradeAccountActivity : ChooseAccountActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setupView()
+        viewModel.currentSubscription.observe(this) {
+            it.second?.run {
+                showSubscriptionDialog(it.first, it.second)
+            } ?: run{
+                startActivity(Intent(this, PaymentActivity::class.java)
+                    .putExtra(UPGRADE_TYPE, it.first))
+            }
+        }
     }
 
     override fun onBackPressed() {
@@ -116,20 +130,59 @@ class UpgradeAccountActivity : ChooseAccountActivity() {
      * @param upgradeType Selected payment plan.
      */
     override fun onUpgradeClick(upgradeType: Int) {
-        if(!viewModel.isBillingAvailable()) {
-            LogUtil.logWarning("Billing not available")
-            showBillingWarning()
-            return
+        with(viewModel) {
+            if (!isBillingAvailable()) {
+                LogUtil.logWarning("Billing not available")
+                showBillingWarning()
+                return
+            }
+
+            if (getPaymentBitSet() == null) {
+                LogUtil.logWarning("PaymentBitSet Null")
+                return
+            }
+
+            refreshAccountInfo()
+            subscriptionCheck(upgradeType)
         }
+    }
 
-        if (viewModel.getPaymentBitSet() == null) {
-            LogUtil.logWarning("PaymentBitSet Null")
-            return
+    /**
+     * Show the existing subscription dialog
+     * @param upgradeType upgrade type
+     * @param subscriptionMethod SubscriptionMethod
+     */
+    private fun showSubscriptionDialog(upgradeType: Int, subscriptionMethod: SubscriptionMethod?) {
+        subscriptionMethod?.run {
+            VerticalLayoutButtonDialog(
+                context = this@UpgradeAccountActivity,
+                title = StringResourcesUtils.getString(R.string.title_existing_subscription),
+                message = when (platformType) {
+                    SUBSCRIPTION_FROM_ANDROID_PLATFORM -> {
+                        StringResourcesUtils.getString(
+                            R.string.message_subscription_from_android_platform,
+                            methodName
+                        )
+                    }
+                    SUBSCRIPTION_FROM_ITUNES -> {
+                        StringResourcesUtils.getString(R.string.message_subscription_from_itunes)
+                    }
+                    else -> {
+                        StringResourcesUtils.getString(R.string.message_subscription_from_other_platform)
+                    }
+                },
+                positiveButtonTitle = StringResourcesUtils.getString(R.string.button_buy_new_subscription),
+                onPositiveButtonClicked = {
+                    startActivity(
+                        Intent(this@UpgradeAccountActivity, PaymentActivity::class.java)
+                            .putExtra(UPGRADE_TYPE, upgradeType)
+                    )
+                    it.dismiss()
+                },
+                onDismissClicked = {
+                    it.dismiss()
+                }
+            ).show()
         }
-
-
-        viewModel.refreshAccountInfo()
-        startActivity(Intent(this, PaymentActivity::class.java)
-            .putExtra(UPGRADE_TYPE, upgradeType))
     }
 }

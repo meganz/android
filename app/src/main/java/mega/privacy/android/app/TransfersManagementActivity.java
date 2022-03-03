@@ -9,13 +9,13 @@ import android.widget.RelativeLayout;
 import mega.privacy.android.app.components.transferWidget.TransferWidget;
 import mega.privacy.android.app.components.transferWidget.TransfersManagement;
 import mega.privacy.android.app.lollipop.DrawerItem;
-import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
+import mega.privacy.android.app.lollipop.ManagerActivity;
 import mega.privacy.android.app.activities.PasscodeActivity;
 
 import static mega.privacy.android.app.components.transferWidget.TransfersManagement.*;
 import static mega.privacy.android.app.constants.BroadcastConstants.*;
-import static mega.privacy.android.app.lollipop.ManagerActivityLollipop.PENDING_TAB;
-import static mega.privacy.android.app.lollipop.ManagerActivityLollipop.TRANSFERS_TAB;
+import static mega.privacy.android.app.lollipop.ManagerActivity.PENDING_TAB;
+import static mega.privacy.android.app.lollipop.ManagerActivity.TRANSFERS_TAB;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 
@@ -84,11 +84,11 @@ public class TransfersManagementActivity extends PasscodeActivity {
     protected void setTransfersWidgetLayout(RelativeLayout transfersWidgetLayout, Context context) {
         transfersWidget = new TransferWidget(this, transfersWidgetLayout);
         transfersWidgetLayout.findViewById(R.id.transfers_button).setOnClickListener(v -> {
-            if (context instanceof ManagerActivityLollipop) {
-                ((ManagerActivityLollipop) context)
+            if (context instanceof ManagerActivity) {
+                ((ManagerActivity) context)
                         .setDrawerItem(DrawerItem.TRANSFERS);
-                ((ManagerActivityLollipop) context)
-                        .selectDrawerItemLollipop(((ManagerActivityLollipop) context).getDrawerItem());
+                ((ManagerActivity) context)
+                        .selectDrawerItem(((ManagerActivity) context).getDrawerItem());
             } else {
                 openTransfersSection();
             }
@@ -109,7 +109,7 @@ public class TransfersManagementActivity extends PasscodeActivity {
             return;
         }
 
-        Intent intent = new Intent(this, ManagerActivityLollipop.class);
+        Intent intent = new Intent(this, ManagerActivity.class);
         intent.setAction(ACTION_SHOW_TRANSFERS);
         intent.putExtra(TRANSFERS_TAB, PENDING_TAB);
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);

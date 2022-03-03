@@ -264,7 +264,6 @@ public class VersionsFileActivity extends PasscodeActivity implements MegaReques
 		tB = findViewById(R.id.toolbar_versions_file);
 		setSupportActionBar(tB);
 		aB = getSupportActionBar();
-//			aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
 		aB.setDisplayHomeAsUpEnabled(true);
 		aB.setDisplayShowHomeEnabled(true);
 		aB.setTitle(getString(R.string.title_section_versions).toUpperCase());
@@ -606,7 +605,7 @@ public class VersionsFileActivity extends PasscodeActivity implements MegaReques
 	public void onClick(View v) {
 		switch (v.getId()){		
 			case R.id.file_contact_list_layout:{
-				Intent i = new Intent(this, ManagerActivityLollipop.class);
+				Intent i = new Intent(this, ManagerActivity.class);
 				i.setAction(ACTION_REFRESH_PARENTHANDLE_BROWSER);
 				i.putExtra("parentHandle", node.getHandle());
 				startActivity(i);

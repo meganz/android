@@ -20,7 +20,7 @@ import mega.privacy.android.app.utils.ColorUtils;
 import mega.privacy.android.app.utils.MegaNodeUtil;
 import nz.mega.sdk.MegaNode;
 
-import static mega.privacy.android.app.lollipop.ManagerActivityLollipop.LINKS_TAB;
+import static mega.privacy.android.app.lollipop.ManagerActivity.LINKS_TAB;
 import static mega.privacy.android.app.lollipop.adapters.MegaNodeAdapter.*;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.LogUtil.*;

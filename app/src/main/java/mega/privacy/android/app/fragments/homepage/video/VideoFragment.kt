@@ -11,7 +11,6 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.view.ActionMode
-import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
@@ -29,9 +28,8 @@ import mega.privacy.android.app.components.dragger.DragToExitSupport.Companion.p
 import mega.privacy.android.app.databinding.FragmentVideoBinding
 import mega.privacy.android.app.di.MegaApi
 import mega.privacy.android.app.fragments.homepage.*
-import mega.privacy.android.app.fragments.homepage.BaseNodeItemAdapter.Companion.TYPE_HEADER
 import mega.privacy.android.app.globalmanagement.SortOrderManagement
-import mega.privacy.android.app.lollipop.ManagerActivityLollipop
+import mega.privacy.android.app.lollipop.ManagerActivity
 import mega.privacy.android.app.mediaplayer.miniplayer.MiniAudioPlayerController
 import mega.privacy.android.app.modalbottomsheet.NodeOptionsBottomSheetDialogFragment.MODE1
 import mega.privacy.android.app.modalbottomsheet.NodeOptionsBottomSheetDialogFragment.MODE5
@@ -202,7 +200,7 @@ class VideoFragment : Fragment(), HomepageSearchable {
 
     private fun setupActionMode() {
         actionModeCallback = ActionModeCallback(
-            requireActivity() as ManagerActivityLollipop, actionModeViewModel, megaApi
+            requireActivity() as ManagerActivity, actionModeViewModel, megaApi
         )
 
         observeItemLongClick()
@@ -392,10 +390,12 @@ class VideoFragment : Fragment(), HomepageSearchable {
         val localPath = FileUtil.getLocalFile(file)
         var paramsSetSuccessfully = if (FileUtil.isLocalFile(node, megaApi, localPath)) {
             FileUtil.setLocalIntentParams(context, node, intent, localPath, false,
-                requireActivity() as ManagerActivityLollipop)
+                requireActivity() as ManagerActivity
+            )
         } else {
             FileUtil.setStreamingIntentParams(context, node, megaApi, intent,
-                requireActivity() as ManagerActivityLollipop)
+                requireActivity() as ManagerActivity
+            )
         }
 
         if (paramsSetSuccessfully && FileUtil.isOpusFile(node)) {
@@ -413,11 +413,9 @@ class VideoFragment : Fragment(), HomepageSearchable {
         }
 
         if (paramsSetSuccessfully) {
+            startActivity(intent)
             if (internalIntent) {
-                startActivity(intent)
                 requireActivity().overridePendingTransition(0, 0)
-            } else {
-                startActivity(intent)
             }
         } else {
             LogUtil.logWarning("itemClick:noAvailableIntent")

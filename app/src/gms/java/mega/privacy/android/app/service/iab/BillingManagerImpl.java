@@ -43,6 +43,7 @@ import java.util.List;
 
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
+import mega.privacy.android.app.lollipop.ManagerActivity;
 import mega.privacy.android.app.middlelayer.iab.BillingManager;
 import mega.privacy.android.app.middlelayer.iab.BillingUpdatesListener;
 import mega.privacy.android.app.middlelayer.iab.MegaPurchase;
@@ -114,7 +115,7 @@ public class BillingManagerImpl implements PurchasesUpdatedListener, BillingMana
      * Handles all the interactions with Play Store (via Billing library), maintains connection to
      * it through BillingClient and caches temporary states/data if needed.
      *
-     * @param activity        The Context, here's {@link mega.privacy.android.app.lollipop.ManagerActivityLollipop}
+     * @param activity        The Context, here's {@link ManagerActivity}
      * @param updatesListener The callback, when billing status update. {@link BillingUpdatesListener}
      */
     public BillingManagerImpl(Activity activity, BillingUpdatesListener updatesListener) {

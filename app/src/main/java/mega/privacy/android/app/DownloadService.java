@@ -42,15 +42,15 @@ import java.util.Set;
 import mega.privacy.android.app.components.saver.AutoPlayInfo;
 import mega.privacy.android.app.components.transferWidget.TransfersManagement;
 import mega.privacy.android.app.fragments.offline.OfflineFragment;
-import mega.privacy.android.app.lollipop.LoginActivityLollipop;
-import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
+import mega.privacy.android.app.lollipop.LoginActivity;
+import mega.privacy.android.app.lollipop.ManagerActivity;
 import mega.privacy.android.app.notifications.TransferOverQuotaNotification;
 import mega.privacy.android.app.objects.SDTransfer;
 import mega.privacy.android.app.service.iar.RatingHandlerImpl;
 import mega.privacy.android.app.utils.ChatUtil;
 import mega.privacy.android.app.utils.SDCardOperator;
 import mega.privacy.android.app.utils.StringResourcesUtils;
-import mega.privacy.android.app.utils.ThumbnailUtilsLollipop;
+import mega.privacy.android.app.utils.ThumbnailUtils;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaChatApiAndroid;
@@ -64,7 +64,7 @@ import nz.mega.sdk.MegaTransferListenerInterface;
 
 import static mega.privacy.android.app.components.transferWidget.TransfersManagement.*;
 import static mega.privacy.android.app.constants.BroadcastConstants.*;
-import static mega.privacy.android.app.lollipop.ManagerActivityLollipop.*;
+import static mega.privacy.android.app.lollipop.ManagerActivity.*;
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.FileUtil.*;
@@ -644,11 +644,11 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 			size = getString(R.string.general_total_size, totalBytes);
 		}
 
-		Intent intent = new Intent(getApplicationContext(), ManagerActivityLollipop.class);
+		Intent intent = new Intent(getApplicationContext(), ManagerActivity.class);
 		intent.setAction(ACTION_SHOW_TRANSFERS);
 		intent.putExtra(TRANSFERS_TAB, COMPLETED_TAB);
 
-		PendingIntent pendingIntent = PendingIntent.getActivity(getApplicationContext(), 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+		PendingIntent pendingIntent = PendingIntent.getActivity(getApplicationContext(), 0, intent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
 
 		if (totalDownloads != 1) {
 			logDebug("Show notification");
@@ -982,16 +982,16 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 
 			if(dbH.getCredentials()==null){
 				contentText = getString(R.string.download_touch_to_cancel);
-				intent = new Intent(DownloadService.this, LoginActivityLollipop.class);
+				intent = new Intent(DownloadService.this, LoginActivity.class);
 				intent.setAction(ACTION_CANCEL_DOWNLOAD);
-				pendingIntent = PendingIntent.getActivity(DownloadService.this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+				pendingIntent = PendingIntent.getActivity(DownloadService.this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
 			}
 			else{
 				contentText = getString(R.string.download_touch_to_show);
-				intent = new Intent(DownloadService.this, ManagerActivityLollipop.class);
+				intent = new Intent(DownloadService.this, ManagerActivity.class);
 				intent.setAction(ACTION_SHOW_TRANSFERS);
 				intent.putExtra(TRANSFERS_TAB, PENDING_TAB);
-				pendingIntent = PendingIntent.getActivity(DownloadService.this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+				pendingIntent = PendingIntent.getActivity(DownloadService.this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
 			}
 
 			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
@@ -1200,7 +1200,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 						if (videoNode != null){
 							if(!videoNode.hasThumbnail()){
                                 logDebug("The video has not thumb");
-								ThumbnailUtilsLollipop.createThumbnailVideo(this, path, megaApi, transfer.getNodeHandle());
+								ThumbnailUtils.createThumbnailVideo(this, path, megaApi, transfer.getNodeHandle());
 							}
 						}
 						else{

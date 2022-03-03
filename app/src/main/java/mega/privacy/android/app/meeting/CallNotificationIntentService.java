@@ -2,6 +2,7 @@ package mega.privacy.android.app.meeting;
 
 import android.app.IntentService;
 import android.content.Intent;
+import android.os.Build;
 
 import dagger.hilt.android.AndroidEntryPoint;
 import mega.privacy.android.app.MegaApplication;
@@ -164,8 +165,10 @@ public class CallNotificationIntentService extends IntentService implements Hang
         openMeetingInProgress(this, chatIdIncomingCall, true, passcodeManagement);
         clearIncomingCallNotification(callIdIncomingCall);
         stopSelf();
-        Intent closeIntent = new Intent(Intent.ACTION_CLOSE_SYSTEM_DIALOGS);
-        this.sendBroadcast(closeIntent);
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.S) {
+            Intent closeIntent = new Intent(Intent.ACTION_CLOSE_SYSTEM_DIALOGS);
+            this.sendBroadcast(closeIntent);
+        }
     }
 
     @Override

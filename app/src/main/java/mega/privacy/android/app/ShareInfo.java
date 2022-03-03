@@ -27,8 +27,8 @@ import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.List;
 
-import mega.privacy.android.app.lollipop.FileExplorerActivityLollipop;
-import mega.privacy.android.app.lollipop.PdfViewerActivityLollipop;
+import mega.privacy.android.app.lollipop.FileExplorerActivity;
+import mega.privacy.android.app.lollipop.PdfViewerActivity;
 
 import static mega.privacy.android.app.utils.FileUtil.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
@@ -98,7 +98,7 @@ public class ShareInfo implements Serializable {
 	public static List<ShareInfo> processIntent(Intent intent, Context context) {
 		logDebug(intent.getAction() + " of action");
 		
-		if (intent.getAction() == null || intent.getAction().equals(FileExplorerActivityLollipop.ACTION_PROCESSED)||intent.getAction().equals(FileExplorerActivityLollipop.ACTION_PROCESSED)) {
+		if (intent.getAction() == null || intent.getAction().equals(FileExplorerActivity.ACTION_PROCESSED)||intent.getAction().equals(FileExplorerActivity.ACTION_PROCESSED)) {
 			return null;
 		}
 		if (context == null) {
@@ -145,11 +145,7 @@ public class ShareInfo implements Serializable {
 			Uri dataUri = intent.getData();
 			if (dataUri == null) {
 				logWarning("Data uri is null");
-//
-//				if(Intent.ACTION_GET_CONTENT.equals(intent.getAction())) {
-//					log("Multiple ACTION_GET_CONTENT");
-//					return processGetContentMultiple(intent, context);
-//				}
+
 				return null;
 			}
 
@@ -164,7 +160,7 @@ public class ShareInfo implements Serializable {
 			logWarning("Share info file is null");
 			return null;
 		}
-		intent.setAction(FileExplorerActivityLollipop.ACTION_PROCESSED);
+		intent.setAction(FileExplorerActivity.ACTION_PROCESSED);
 		
 		ArrayList<ShareInfo> result = new ArrayList<ShareInfo>();
 		result.add(shareInfo);
@@ -205,7 +201,7 @@ public class ShareInfo implements Serializable {
 			return null;
 		}
 
-		intent.setAction(FileExplorerActivityLollipop.ACTION_PROCESSED);
+		intent.setAction(FileExplorerActivity.ACTION_PROCESSED);
 
 		return result;
 	}
@@ -240,7 +236,7 @@ public class ShareInfo implements Serializable {
 			result.add(info);
 		}
 
-		intent.setAction(FileExplorerActivityLollipop.ACTION_PROCESSED);
+		intent.setAction(FileExplorerActivity.ACTION_PROCESSED);
 
 		return result;
 	}
@@ -330,7 +326,7 @@ public class ShareInfo implements Serializable {
                 return;
             }
 			logDebug("Internal No path traversal: " + title);
-            if (context instanceof PdfViewerActivityLollipop
+            if (context instanceof PdfViewerActivity
 					|| (mIntent != null && mIntent.getType() != null && mIntent.getType().equals("application/pdf"))) {
 				title = addPdfFileExtension(title);
             }
@@ -373,7 +369,6 @@ public class ShareInfo implements Serializable {
 					String [] s1 = p.split("/ORIGINAL");
 					if (s1.length > 1){
 						path = s1[0];
-//						path.replaceAll("%20", " ");
 						try {
 							path = URLDecoder.decode(path, "UTF-8");
 						} catch (UnsupportedEncodingException e) {
@@ -390,7 +385,6 @@ public class ShareInfo implements Serializable {
 			}
 			catch(Exception e){
 				logError("Error when creating File!", e);
-//					log(e.getMessage());
 			}
 			if((file != null) && file.exists() && file.canRead()) {
 				size = file.length();

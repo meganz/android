@@ -3,7 +3,7 @@ package mega.privacy.android.app.lollipop.listeners;
 import android.content.Context;
 import android.media.AudioManager;
 
-import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop;
+import mega.privacy.android.app.lollipop.megachat.ChatActivity;
 
 public class AudioFocusListener implements AudioManager.OnAudioFocusChangeListener{
 
@@ -19,8 +19,8 @@ public class AudioFocusListener implements AudioManager.OnAudioFocusChangeListen
                 break;
             case AudioManager.AUDIOFOCUS_LOSS:
             case AudioManager.AUDIOFOCUS_LOSS_TRANSIENT:
-                if (context instanceof ChatActivityLollipop) {
-                    ((ChatActivityLollipop) context).cancelRecording();
+                if (context instanceof ChatActivity) {
+                    ((ChatActivity) context).cancelRecording();
                 }
                 break;
         }

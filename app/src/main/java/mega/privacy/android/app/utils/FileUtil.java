@@ -1,7 +1,6 @@
 //copyright: https://stackoverflow.com/questions/34927748/android-5-0-documentfile-from-tree-uri/36162691#36162691
 package mega.privacy.android.app.utils;
 
-import android.annotation.TargetApi;
 import android.app.ActivityManager;
 import android.content.ContentResolver;
 import android.content.Context;
@@ -887,7 +886,6 @@ public class FileUtil {
         }
     }
 
-    @TargetApi(Build.VERSION_CODES.LOLLIPOP)
     private static String getVolumeIdFromTreeUri(final Uri treeUri) {
         final String docId = DocumentsContract.getTreeDocumentId(treeUri);
         final String[] split = docId.split(":");
@@ -895,8 +893,6 @@ public class FileUtil {
         else return null;
     }
 
-
-    @TargetApi(Build.VERSION_CODES.LOLLIPOP)
     private static String getDocumentPathFromTreeUri(final Uri treeUri) {
         final String docId = DocumentsContract.getTreeDocumentId(treeUri);
         final String[] split = docId.split(":");

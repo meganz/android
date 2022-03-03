@@ -17,7 +17,7 @@ import mega.privacy.android.app.constants.BroadcastConstants.INVALID_ACTION
 import mega.privacy.android.app.constants.IntentConstants
 import mega.privacy.android.app.databinding.ActivityChooseUpgradeAccountBinding
 import mega.privacy.android.app.interfaces.Scrollable
-import mega.privacy.android.app.lollipop.ManagerActivityLollipop
+import mega.privacy.android.app.lollipop.ManagerActivity
 import mega.privacy.android.app.utils.*
 import mega.privacy.android.app.utils.ColorUtils.getColorHexString
 import mega.privacy.android.app.utils.Constants.*
@@ -294,10 +294,10 @@ open class ChooseAccountActivity : PasscodeActivity(), Scrollable {
      * @param upgradeType Selected payment plan.
      */
     protected open fun onUpgradeClick(upgradeType: Int) {
-        val intent = Intent(this, ManagerActivityLollipop::class.java)
+        val intent = Intent(this, ManagerActivity::class.java)
             .putExtra(IntentConstants.EXTRA_FIRST_LOGIN, true)
             .putExtra(IntentConstants.EXTRA_NEW_ACCOUNT, true)
-            .putExtra(ManagerActivityLollipop.NEW_CREATION_ACCOUNT, true)
+            .putExtra(ManagerActivity.NEW_CREATION_ACCOUNT, true)
             .putExtra(IntentConstants.EXTRA_UPGRADE_ACCOUNT, upgradeType != FREE)
             .putExtra(IntentConstants.EXTRA_ACCOUNT_TYPE, upgradeType)
 

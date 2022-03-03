@@ -20,11 +20,11 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import mega.privacy.android.app.MimeTypeList
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.PasscodeActivity
-import mega.privacy.android.app.components.ChatDividerItemDecoration
+import mega.privacy.android.app.components.SimpleDividerItemDecoration
 import mega.privacy.android.app.components.dragger.DragToExitSupport
 import mega.privacy.android.app.databinding.ActivityZipBrowserBinding
 import mega.privacy.android.app.imageviewer.ImageViewerActivity
-import mega.privacy.android.app.lollipop.PdfViewerActivityLollipop
+import mega.privacy.android.app.lollipop.PdfViewerActivity
 import mega.privacy.android.app.textEditor.TextEditorActivity
 import mega.privacy.android.app.utils.*
 import mega.privacy.android.app.utils.Constants.*
@@ -37,7 +37,7 @@ import java.io.File
 import java.util.*
 
 /**
- * Display the zip file content, replacement of ZipBrowserActivityLollipop.java
+ * Display the zip file content
  */
 class ZipBrowserActivity : PasscodeActivity() {
     companion object {
@@ -106,7 +106,7 @@ class ZipBrowserActivity : PasscodeActivity() {
         recyclerView = zipBrowserBinding.zipListViewBrowser.also {
             it.setPadding(0, 0, 0, recycleViewBottomPadding())
             it.clipToPadding = false
-            it.addItemDecoration(ChatDividerItemDecoration(this, outMetrics))
+            it.addItemDecoration(SimpleDividerItemDecoration(this))
             it.layoutManager = LinearLayoutManager(this)
             it.setHasFixedSize(true)
             it.itemAnimator = DefaultItemAnimator()
@@ -361,7 +361,7 @@ class ZipBrowserActivity : PasscodeActivity() {
     private fun MimeTypeList.pdfFileOpen(file: File, position: Int) {
         logDebug("Pdf file")
         val pdfIntent =
-            Intent(this@ZipBrowserActivity, PdfViewerActivityLollipop::class.java)
+            Intent(this@ZipBrowserActivity, PdfViewerActivity::class.java)
         pdfIntent.apply {
             putExtra(INTENT_EXTRA_KEY_INSIDE, true)
             putExtra(INTENT_EXTRA_KEY_ADAPTER_TYPE, ZIP_ADAPTER)

@@ -12,7 +12,7 @@ import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.ShareInfo;
 import mega.privacy.android.app.UploadService;
-import mega.privacy.android.app.lollipop.FileStorageActivityLollipop;
+import mega.privacy.android.app.lollipop.FileStorageActivity;
 import mega.privacy.android.app.lollipop.qrcode.QRCodeActivity;
 import nz.mega.sdk.MegaNode;
 
@@ -83,9 +83,9 @@ public class QRCodeSaveBottomSheetDialogFragment extends BaseBottomSheetDialogFr
     }
 
     private void saveToFileSystem() {
-        Intent intent = new Intent(getActivity(), FileStorageActivityLollipop.class);
-        intent.putExtra(FileStorageActivityLollipop.PICK_FOLDER_TYPE, FileStorageActivityLollipop.PickFolderType.DOWNLOAD_FOLDER.getFolderType());
-        intent.setAction(FileStorageActivityLollipop.Mode.PICK_FOLDER.getAction());
+        Intent intent = new Intent(getActivity(), FileStorageActivity.class);
+        intent.putExtra(FileStorageActivity.PICK_FOLDER_TYPE, FileStorageActivity.PickFolderType.DOWNLOAD_FOLDER.getFolderType());
+        intent.setAction(FileStorageActivity.Mode.PICK_FOLDER.getAction());
         ((QRCodeActivity) getActivity()).startActivityForResult(intent, REQUEST_DOWNLOAD_FOLDER);
     }
 }
