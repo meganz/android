@@ -17,12 +17,12 @@ import mega.privacy.android.app.listeners.CleanRubbishBinListener;
 import mega.privacy.android.app.listeners.ExportListener;
 import mega.privacy.android.app.listeners.RemoveVersionsListener;
 import mega.privacy.android.app.listeners.ShareListener;
-import mega.privacy.android.app.lollipop.AddContactActivityLollipop;
+import mega.privacy.android.app.lollipop.AddContactActivity;
 import mega.privacy.android.app.lollipop.DrawerItem;
-import mega.privacy.android.app.lollipop.FileExplorerActivityLollipop;
-import mega.privacy.android.app.lollipop.FileLinkActivityLollipop;
-import mega.privacy.android.app.lollipop.FolderLinkActivityLollipop;
-import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
+import mega.privacy.android.app.lollipop.FileExplorerActivity;
+import mega.privacy.android.app.lollipop.FileLinkActivity;
+import mega.privacy.android.app.lollipop.FolderLinkActivity;
+import mega.privacy.android.app.lollipop.ManagerActivity;
 import mega.privacy.android.app.lollipop.listeners.MultipleRequestListener;
 import mega.privacy.android.app.lollipop.megachat.AndroidMegaRichLinkMessage;
 import mega.privacy.android.app.utils.MegaNodeUtil;
@@ -79,14 +79,14 @@ public class NodeController {
 
     public void chooseLocationToCopyNodes(ArrayList<Long> handleList){
         logDebug("chooseLocationToCopyNodes");
-        Intent intent = new Intent(context, FileExplorerActivityLollipop.class);
-        intent.setAction(FileExplorerActivityLollipop.ACTION_PICK_COPY_FOLDER);
+        Intent intent = new Intent(context, FileExplorerActivity.class);
+        intent.setAction(FileExplorerActivity.ACTION_PICK_COPY_FOLDER);
         long[] longArray = new long[handleList.size()];
         for (int i=0; i<handleList.size(); i++){
             longArray[i] = handleList.get(i);
         }
         intent.putExtra("COPY_FROM", longArray);
-        ((ManagerActivityLollipop) context).startActivityForResult(intent, REQUEST_CODE_SELECT_FOLDER_TO_COPY);
+        ((ManagerActivity) context).startActivityForResult(intent, REQUEST_CODE_SELECT_FOLDER_TO_COPY);
     }
 
     public void copyNodes(long[] copyHandles, long toHandle) {
@@ -118,12 +118,12 @@ public class NodeController {
                 MegaNode cN = megaApi.getNodeByHandle(copyHandles[0]);
                 if (cN != null){
                     logDebug("cN != null");
-                    megaApi.copyNode(cN, parent, (ManagerActivityLollipop) context);
+                    megaApi.copyNode(cN, parent, (ManagerActivity) context);
                 }
                 else{
                     logWarning("cN == null");
-                    if(context instanceof ManagerActivityLollipop){
-                        ((ManagerActivityLollipop)context).copyError();
+                    if(context instanceof ManagerActivity){
+                        ((ManagerActivity)context).copyError();
                     }
                 }
             }
@@ -133,14 +133,14 @@ public class NodeController {
 
     public void chooseLocationToMoveNodes(ArrayList<Long> handleList){
         logDebug("chooseLocationToMoveNodes");
-        Intent intent = new Intent(context, FileExplorerActivityLollipop.class);
-        intent.setAction(FileExplorerActivityLollipop.ACTION_PICK_MOVE_FOLDER);
+        Intent intent = new Intent(context, FileExplorerActivity.class);
+        intent.setAction(FileExplorerActivity.ACTION_PICK_MOVE_FOLDER);
         long[] longArray = new long[handleList.size()];
         for (int i=0; i<handleList.size(); i++){
             longArray[i] = handleList.get(i);
         }
         intent.putExtra("MOVE_FROM", longArray);
-        ((ManagerActivityLollipop) context).startActivityForResult(intent, REQUEST_CODE_SELECT_FOLDER_TO_MOVE);
+        ((ManagerActivity) context).startActivityForResult(intent, REQUEST_CODE_SELECT_FOLDER_TO_MOVE);
     }
 
     public void checkIfNodesAreMine(List<MegaNode> nodes, ArrayList<MegaNode> ownerNodes, ArrayList<MegaNode> notOwnerNodes) {
@@ -228,14 +228,14 @@ public class NodeController {
 
         // Download link
         if (AndroidMegaRichLinkMessage.isFileLink(url)) {
-            Intent openFileIntent = new Intent(context, FileLinkActivityLollipop.class);
+            Intent openFileIntent = new Intent(context, FileLinkActivity.class);
             openFileIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
             openFileIntent.setAction(ACTION_OPEN_MEGA_LINK);
             openFileIntent.setData(Uri.parse(url));
-            ((ManagerActivityLollipop) context).startActivity(openFileIntent);
+            ((ManagerActivity) context).startActivity(openFileIntent);
             return FILE_LINK;
         } else if (AndroidMegaRichLinkMessage.isFolderLink(url)) {
-            Intent openFolderIntent = new Intent(context, FolderLinkActivityLollipop.class);
+            Intent openFolderIntent = new Intent(context, FolderLinkActivity.class);
             openFolderIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
             openFolderIntent.setAction(ACTION_OPEN_MEGA_FOLDER_LINK);
             openFolderIntent.setData(Uri.parse(url));
@@ -298,7 +298,7 @@ public class NodeController {
         }
 
         Intent intent = new Intent();
-        intent.setClass(context, AddContactActivityLollipop.class);
+        intent.setClass(context, AddContactActivity.class);
         intent.putExtra("contactType", CONTACT_TYPE_BOTH);
 
         long[] handles=new long[handleList.size()];
@@ -307,28 +307,28 @@ public class NodeController {
             handles[j]=handleList.get(i);
             j++;
         }
-        intent.putExtra(AddContactActivityLollipop.EXTRA_NODE_HANDLE, handles);
+        intent.putExtra(AddContactActivity.EXTRA_NODE_HANDLE, handles);
         //Multiselect=1 (multiple folders)
         intent.putExtra("MULTISELECT", 1);
-        ((ManagerActivityLollipop) context).startActivityForResult(intent, REQUEST_CODE_SELECT_CONTACT);
+        ((ManagerActivity) context).startActivityForResult(intent, REQUEST_CODE_SELECT_CONTACT);
     }
 
     public void selectContactToShareFolder(MegaNode node){
         logDebug("shareFolder");
 
         Intent intent = new Intent();
-        intent.setClass(context, AddContactActivityLollipop.class);
+        intent.setClass(context, AddContactActivity.class);
         intent.putExtra("contactType", CONTACT_TYPE_BOTH);
         //Multiselect=0
         intent.putExtra("MULTISELECT", 0);
-        intent.putExtra(AddContactActivityLollipop.EXTRA_NODE_HANDLE, node.getHandle());
-        ((ManagerActivityLollipop) context).startActivityForResult(intent, REQUEST_CODE_SELECT_CONTACT);
+        intent.putExtra(AddContactActivity.EXTRA_NODE_HANDLE, node.getHandle());
+        ((ManagerActivity) context).startActivityForResult(intent, REQUEST_CODE_SELECT_CONTACT);
     }
 
     public void openFolderFromSearch(long folderHandle){
         logDebug("openFolderFromSearch: " + folderHandle);
-        ((ManagerActivityLollipop)context).textSubmitted = true;
-        ((ManagerActivityLollipop)context).openFolderRefresh = true;
+        ((ManagerActivity)context).textSubmitted = true;
+        ((ManagerActivity)context).openFolderRefresh = true;
         boolean firstNavigationLevel=true;
         int access = -1;
         DrawerItem drawerItem = DrawerItem.CLOUD_DRIVE;
@@ -345,18 +345,18 @@ public class NodeController {
                             drawerItem = DrawerItem.CLOUD_DRIVE;
                             logDebug("Navigate to TAB CLOUD first level" + parentIntentN.getName());
                             firstNavigationLevel=true;
-                            ((ManagerActivityLollipop) context).setParentHandleBrowser(parentIntentN.getHandle());
+                            ((ManagerActivity) context).setParentHandleBrowser(parentIntentN.getHandle());
                         }
                         else if(parentIntentN.getHandle()==megaApi.getRubbishNode().getHandle()){
                             drawerItem = DrawerItem.RUBBISH_BIN;
                             logDebug("Navigate to TAB RUBBISH first level" + parentIntentN.getName());
                             firstNavigationLevel=true;
-                            ((ManagerActivityLollipop) context).setParentHandleRubbish(parentIntentN.getHandle());
+                            ((ManagerActivity) context).setParentHandleRubbish(parentIntentN.getHandle());
                         }
                         else if(parentIntentN.getHandle()==megaApi.getInboxNode().getHandle()){
                             logDebug("Navigate to INBOX first level" + parentIntentN.getName());
                             firstNavigationLevel=true;
-                            ((ManagerActivityLollipop) context).setParentHandleInbox(parentIntentN.getHandle());
+                            ((ManagerActivity) context).setParentHandleInbox(parentIntentN.getHandle());
                             drawerItem = DrawerItem.INBOX;
                         }
                         else{
@@ -368,28 +368,28 @@ public class NodeController {
                                     //ROOT NODE
                                     drawerItem = DrawerItem.CLOUD_DRIVE;
                                     logDebug("Navigate to TAB CLOUD with parentHandle");
-                                    ((ManagerActivityLollipop) context).setParentHandleBrowser(parentIntentN.getHandle());
+                                    ((ManagerActivity) context).setParentHandleBrowser(parentIntentN.getHandle());
                                     firstNavigationLevel=false;
                                     break;
                                 }
                                 case 1:{
                                     logDebug("Navigate to TAB RUBBISH");
                                     drawerItem = DrawerItem.RUBBISH_BIN;
-                                    ((ManagerActivityLollipop) context).setParentHandleRubbish(parentIntentN.getHandle());
+                                    ((ManagerActivity) context).setParentHandleRubbish(parentIntentN.getHandle());
                                     firstNavigationLevel=false;
                                     break;
                                 }
                                 case 2:{
                                     logDebug("Navigate to INBOX WITH parentHandle");
                                     drawerItem = DrawerItem.INBOX;
-                                    ((ManagerActivityLollipop) context).setParentHandleInbox(parentIntentN.getHandle());
+                                    ((ManagerActivity) context).setParentHandleInbox(parentIntentN.getHandle());
                                     firstNavigationLevel=false;
                                     break;
                                 }
                                 case -1:{
                                     drawerItem = DrawerItem.CLOUD_DRIVE;
                                     logDebug("Navigate to TAB CLOUD general");
-                                    ((ManagerActivityLollipop) context).setParentHandleBrowser(-1);
+                                    ((ManagerActivity) context).setParentHandleBrowser(-1);
                                     firstNavigationLevel=true;
                                     break;
                                 }
@@ -405,23 +405,23 @@ public class NodeController {
                         drawerItem = DrawerItem.SHARED_ITEMS;
                         if(parentIntentN.getHandle()==-1){
                             logDebug("Level 0 of Incoming");
-                            ((ManagerActivityLollipop) context).setParentHandleIncoming(-1);
-                            ((ManagerActivityLollipop) context).setDeepBrowserTreeIncoming(0);
+                            ((ManagerActivity) context).setParentHandleIncoming(-1);
+                            ((ManagerActivity) context).setDeepBrowserTreeIncoming(0);
                             firstNavigationLevel=true;
                         }
                         else{
                             firstNavigationLevel=false;
-                            ((ManagerActivityLollipop) context).setParentHandleIncoming(parentIntentN.getHandle());
+                            ((ManagerActivity) context).setParentHandleIncoming(parentIntentN.getHandle());
                             int deepBrowserTreeIncoming = calculateDeepBrowserTreeIncoming(parentIntentN, context);
-                            ((ManagerActivityLollipop) context).setDeepBrowserTreeIncoming(deepBrowserTreeIncoming);
+                            ((ManagerActivity) context).setDeepBrowserTreeIncoming(deepBrowserTreeIncoming);
                             logDebug("After calculating deepBrowserTreeIncoming: " + deepBrowserTreeIncoming);
                         }
-                        ((ManagerActivityLollipop) context).setTabItemShares(0);
+                        ((ManagerActivity) context).setTabItemShares(0);
                         break;
                     }
                     default: {
                         logDebug("DEFAULT: The intent set the parentHandleBrowser to " + parentIntentN.getHandle());
-                        ((ManagerActivityLollipop) context).setParentHandleBrowser(parentIntentN.getHandle());
+                        ((ManagerActivity) context).setParentHandleBrowser(parentIntentN.getHandle());
                         drawerItem = DrawerItem.CLOUD_DRIVE;
                         firstNavigationLevel=true;
                         break;
@@ -432,14 +432,14 @@ public class NodeController {
                 logWarning("Parent is already NULL");
 
                 drawerItem = DrawerItem.SHARED_ITEMS;
-                ((ManagerActivityLollipop) context).setParentHandleIncoming(-1);
-                ((ManagerActivityLollipop) context).setDeepBrowserTreeIncoming(0);
+                ((ManagerActivity) context).setParentHandleIncoming(-1);
+                ((ManagerActivity) context).setDeepBrowserTreeIncoming(0);
                 firstNavigationLevel=true;
-                ((ManagerActivityLollipop) context).setTabItemShares(0);
+                ((ManagerActivity) context).setTabItemShares(0);
             }
-            ((ManagerActivityLollipop) context).setFirstNavigationLevel(firstNavigationLevel);
-            ((ManagerActivityLollipop) context).setDrawerItem(drawerItem);
-            ((ManagerActivityLollipop) context).selectDrawerItemLollipop(drawerItem);
+            ((ManagerActivity) context).setFirstNavigationLevel(firstNavigationLevel);
+            ((ManagerActivity) context).setDrawerItem(drawerItem);
+            ((ManagerActivity) context).selectDrawerItem(drawerItem);
         }
     }
 

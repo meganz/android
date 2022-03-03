@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/grey_alpha_050">
+    android:background="@color/white_050_grey_050">
 
     <View
         android:id="@+id/play_pause_placeholder"
@@ -20,7 +20,7 @@
         android:layout_width="64dp"
         android:layout_height="64dp"
         android:background="@null"
-        android:src="@drawable/video_player_play"
+        android:src="@drawable/media_player_play"
         app:layout_constraintStart_toStartOf="@id/play_pause_placeholder"
         app:layout_constraintTop_toTopOf="@id/play_pause_placeholder" />
 
@@ -29,7 +29,7 @@
         android:layout_width="64dp"
         android:layout_height="64dp"
         android:background="@null"
-        android:src="@drawable/video_player_pause"
+        android:src="@drawable/media_player_pause"
         app:layout_constraintStart_toStartOf="@id/play_pause_placeholder"
         app:layout_constraintTop_toTopOf="@id/play_pause_placeholder"
         tools:visibility="invisible" />
@@ -38,7 +38,7 @@
         android:id="@id/exo_prev"
         style="@style/AudioPlayerButton"
         android:layout_marginEnd="10dp"
-        android:src="@drawable/video_player_prev"
+        android:src="@drawable/media_player_prev"
         app:layout_constraintBottom_toBottomOf="@id/play_pause_placeholder"
         app:layout_constraintEnd_toStartOf="@id/play_pause_placeholder"
         app:layout_constraintTop_toTopOf="@id/play_pause_placeholder" />
@@ -47,7 +47,7 @@
         android:id="@+id/exo_rew"
         style="@style/AudioPlayerButton"
         android:layout_marginEnd="10dp"
-        android:src="@drawable/video_player_15_minus"
+        android:src="@drawable/media_player_15_minus"
         app:layout_constraintBottom_toBottomOf="@id/exo_prev"
         app:layout_constraintEnd_toStartOf="@id/exo_prev"
         app:layout_constraintTop_toTopOf="@id/exo_prev" />
@@ -56,7 +56,7 @@
         android:id="@id/exo_next"
         style="@style/AudioPlayerButton"
         android:layout_marginStart="10dp"
-        android:src="@drawable/video_player_next"
+        android:src="@drawable/media_player_next"
         app:layout_constraintBottom_toBottomOf="@id/play_pause_placeholder"
         app:layout_constraintStart_toEndOf="@id/play_pause_placeholder"
         app:layout_constraintTop_toTopOf="@id/play_pause_placeholder" />
@@ -65,10 +65,19 @@
         android:id="@+id/exo_ffwd"
         style="@style/AudioPlayerButton"
         android:layout_marginStart="10dp"
-        android:src="@drawable/video_player_15_plus"
+        android:src="@drawable/media_player_15_plus"
         app:layout_constraintBottom_toBottomOf="@id/exo_next"
         app:layout_constraintStart_toEndOf="@id/exo_next"
         app:layout_constraintTop_toTopOf="@id/exo_next" />
+
+    <View
+        android:id="@+id/controls_view"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toTopOf="@+id/exo_progress"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:background="@color/white_alpha_070_grey_alpha_070"/>
 
     <com.google.android.exoplayer2.ui.DefaultTimeBar
         android:id="@id/exo_progress"
@@ -87,7 +96,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
-        android:textColor="@color/white"
+        android:textColor="@color/grey_038_white_038"
         android:textSize="12sp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/exo_progress"
@@ -98,7 +107,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginEnd="8dp"
-        android:textColor="@color/white"
+        android:textColor="@color/grey_038_white_038"
         android:textSize="12sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@id/exo_progress"
@@ -112,7 +121,7 @@
         android:ellipsize="marquee"
         android:gravity="center"
         android:singleLine="true"
-        android:textColor="@color/white"
+        android:textColor="?android:attr/textColorPrimary"
         android:textSize="16sp"
         app:layout_constraintBottom_toBottomOf="@id/playlist"
         app:layout_constraintEnd_toEndOf="parent"
@@ -126,7 +135,7 @@
         android:layout_marginEnd="10dp"
         android:layout_marginBottom="10dp"
         android:enabled="false"
-        android:src="@drawable/video_player_playlist"
+        android:src="@drawable/media_player_playlist"
         android:visibility="invisible"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"

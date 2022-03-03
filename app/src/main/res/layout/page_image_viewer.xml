@@ -18,7 +18,7 @@
         android:layout_height="64dp"
         android:layout_gravity="center"
         android:background="@null"
-        android:src="@drawable/video_player_play"
+        android:src="@drawable/media_player_play"
         android:visibility="invisible"
         tools:visibility="visible" />
 

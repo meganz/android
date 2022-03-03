@@ -436,16 +436,6 @@
                     android:textAppearance="?attr/textAppearanceSubtitle1" />
             </RelativeLayout>
 
-            <TextView
-                android:id="@+id/gallery_option"
-                style="@style/BottomSheetOption"
-                android:drawablePadding="26dp"
-                android:paddingStart="22dp"
-                android:text="@string/general_save_to_gallery"
-                android:visibility="gone"
-                app:drawableStartCompat="@drawable/ic_save_gallery"
-                tools:visibility="visible" />
-
             <LinearLayout
                 android:id="@+id/option_save_offline_layout"
                 android:layout_width="match_parent"

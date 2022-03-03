@@ -32,15 +32,6 @@
         app:showAsAction="always" />
 
     <item
-        android:id="@+id/action_save_gallery"
-        android:icon="@drawable/ic_save_gallery"
-        android:orderInCategory="120"
-        android:title="@string/general_save_to_gallery"
-        android:visible="false"
-        app:iconTint="?attr/colorControlNormal"
-        app:showAsAction="always" />
-
-    <item
         android:id="@+id/action_get_link"
         android:icon="@drawable/link_ic_white"
         android:orderInCategory="130"

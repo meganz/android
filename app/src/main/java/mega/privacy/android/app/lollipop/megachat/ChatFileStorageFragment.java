@@ -156,7 +156,6 @@ public class ChatFileStorageFragment extends BottomSheetDialogFragment{
 
             }else{
                 adapter.setDimensionPhotos(dimImages);
-                //adapter.setNodes(mPhotoUris);
                 setNodes(mPhotoUris);
             }
 
@@ -292,13 +291,13 @@ public class ChatFileStorageFragment extends BottomSheetDialogFragment{
     public void sendImages(){
         String filePath;
         if (isMultipleselect()) {
-            ((ChatActivityLollipop) getActivity()).setIsWaitingForMoreFiles(true);
+            ((ChatActivity) getActivity()).setIsWaitingForMoreFiles(true);
             for (int i = 0; i < posSelected.size(); i++) {
                 filePath = imagesPath.get(posSelected.get(i));
                 if (i == posSelected.size() - 1) {
-                    ((ChatActivityLollipop) getActivity()).setIsWaitingForMoreFiles(false);
+                    ((ChatActivity) getActivity()).setIsWaitingForMoreFiles(false);
                 }
-                ((ChatActivityLollipop) getActivity()).uploadPictureOrVoiceClip(filePath);
+                ((ChatActivity) getActivity()).uploadPictureOrVoiceClip(filePath);
             }
             clearSelections();
             hideMultipleSelect();
@@ -363,7 +362,6 @@ public class ChatFileStorageFragment extends BottomSheetDialogFragment{
 
             ChatFileStorageFragment context = mContextWeakReference.get();
             if (context != null) {
-                //context.mProgressDialog.dismiss();
                 if (photoUris != null && photoUris.size() > 0) {
                     context.mPhotoUris.clear();
                     context.mPhotoUris.addAll(photoUris);

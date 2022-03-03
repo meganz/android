@@ -27,7 +27,7 @@ import mega.privacy.android.app.di.MegaApi
 import mega.privacy.android.app.fragments.homepage.*
 import mega.privacy.android.app.fragments.homepage.BaseNodeItemAdapter.Companion.TYPE_HEADER
 import mega.privacy.android.app.globalmanagement.SortOrderManagement
-import mega.privacy.android.app.lollipop.ManagerActivityLollipop
+import mega.privacy.android.app.lollipop.ManagerActivity
 import mega.privacy.android.app.mediaplayer.miniplayer.MiniAudioPlayerController
 import mega.privacy.android.app.modalbottomsheet.NodeOptionsBottomSheetDialogFragment.MODE1
 import mega.privacy.android.app.modalbottomsheet.NodeOptionsBottomSheetDialogFragment.MODE5
@@ -233,10 +233,12 @@ class AudioFragment : Fragment(), HomepageSearchable {
         val localPath = getLocalFile(file)
         var paramsSetSuccessfully = if (isLocalFile(node, megaApi, localPath)) {
             setLocalIntentParams(activity, node, intent, localPath, false,
-                requireActivity() as ManagerActivityLollipop)
+                requireActivity() as ManagerActivity
+            )
         } else {
             setStreamingIntentParams(activity, node, megaApi, intent,
-                requireActivity() as ManagerActivityLollipop)
+                requireActivity() as ManagerActivity
+            )
         }
 
         if (paramsSetSuccessfully && isOpusFile(node)) {
@@ -253,11 +255,7 @@ class AudioFragment : Fragment(), HomepageSearchable {
         }
 
         if (paramsSetSuccessfully) {
-            if (internalIntent) {
-                startActivity(intent)
-            } else {
-                startActivity(intent)
-            }
+            startActivity(intent)
         } else {
             logWarning("itemClick:noAvailableIntent")
             showSnackbar(
@@ -302,7 +300,7 @@ class AudioFragment : Fragment(), HomepageSearchable {
 
     private fun setupActionMode() {
         actionModeCallback = ActionModeCallback(
-            requireActivity() as ManagerActivityLollipop, actionModeViewModel, megaApi
+            requireActivity() as ManagerActivity, actionModeViewModel, megaApi
         )
 
         observeItemLongClick()

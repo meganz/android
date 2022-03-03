@@ -25,8 +25,8 @@ import mega.privacy.android.app.databinding.FragmentPhotosBinding
 import mega.privacy.android.app.gallery.data.GalleryItem
 import mega.privacy.android.app.gallery.fragment.BaseZoomFragment
 import mega.privacy.android.app.jobservices.CameraUploadsService
-import mega.privacy.android.app.lollipop.FileStorageActivityLollipop
-import mega.privacy.android.app.lollipop.ManagerActivityLollipop
+import mega.privacy.android.app.lollipop.FileStorageActivity
+import mega.privacy.android.app.lollipop.ManagerActivity
 import mega.privacy.android.app.utils.*
 import mega.privacy.android.app.utils.ColorUtils.DARK_IMAGE_ALPHA
 import mega.privacy.android.app.utils.ColorUtils.setImageViewAlphaIfDark
@@ -135,7 +135,7 @@ class PhotosFragment : BaseZoomFragment() {
             0
         }
 
-        isEnableCUFragmentShown() -> {
+        isEnablePhotosFragmentShown() -> {
             skipCUSetup()
             1
         }
@@ -203,7 +203,7 @@ class PhotosFragment : BaseZoomFragment() {
             viewModel.setEnableCUShown(false)
 
             val cameraPath: String? =
-                result.data?.getStringExtra(FileStorageActivityLollipop.EXTRA_PATH)
+                result.data?.getStringExtra(FileStorageActivity.EXTRA_PATH)
 
             cameraPath?.let {
                 val isExternalSDCardCU = SDCardUtils.isLocalFolderOnSDCard(
@@ -229,7 +229,7 @@ class PhotosFragment : BaseZoomFragment() {
      * Refresh view and layout after CU enabled or disabled.
      */
     fun refreshViewLayout() {
-        if (isEnableCUFragmentShown()) {
+        if (isEnablePhotosFragmentShown()) {
             showEnablePage()
             createCameraUploadsViewForFirstLogin()
         } else {
@@ -360,7 +360,7 @@ class PhotosFragment : BaseZoomFragment() {
     private fun subscribeObservers() {
         viewModel.items.observe(viewLifecycleOwner) {
             // On enable CU page, don't update layout and view.
-            if (isEnableCUFragmentShown() || !mManagerActivity.isInPhotosPage) return@observe
+            if (isEnablePhotosFragmentShown() || !mManagerActivity.isInPhotosPage) return@observe
 
             // Order changed.
             if (order != viewModel.getOrder()) {
@@ -422,10 +422,10 @@ class PhotosFragment : BaseZoomFragment() {
     private fun isShowMenu() =
         gridAdapterHasData() && actionMode == null && selectedView == ALL_VIEW && !viewModel.isEnableCUShown()
 
-    fun isEnableCUFragmentShown() = viewModel.isEnableCUShown()
+    fun isEnablePhotosFragmentShown() = viewModel.isEnableCUShown()
 
     fun shouldShowFullInfoAndOptions() =
-        !isEnableCUFragmentShown() && selectedView == ALL_VIEW
+        !isEnablePhotosFragmentShown() && selectedView == ALL_VIEW
 
     /**
      * First make all the buttons unselected,
@@ -529,7 +529,7 @@ class PhotosFragment : BaseZoomFragment() {
     }
 
     fun isInPhotosPage(): Boolean {
-        return activity as ManagerActivityLollipop? != null && (activity as ManagerActivityLollipop?)!!.isInPhotosPage
+        return activity as ManagerActivity? != null && (activity as ManagerActivity?)!!.isInPhotosPage
     }
 
     private fun handlePhotosMenuUpdate(isShowMenu: Boolean) {
@@ -584,11 +584,11 @@ class PhotosFragment : BaseZoomFragment() {
      */
     private fun enableCameraUpload(dialog: DialogInterface, needSettings: Boolean) {
         if (needSettings) {
-            val intent = Intent(activity, FileStorageActivityLollipop::class.java)
-            intent.action = FileStorageActivityLollipop.Mode.PICK_FOLDER.action
+            val intent = Intent(activity, FileStorageActivity::class.java)
+            intent.action = FileStorageActivity.Mode.PICK_FOLDER.action
             intent.putExtra(
-                FileStorageActivityLollipop.PICK_FOLDER_TYPE,
-                FileStorageActivityLollipop.PickFolderType.CU_FOLDER.folderType
+                FileStorageActivity.PICK_FOLDER_TYPE,
+                FileStorageActivity.PickFolderType.CU_FOLDER.folderType
             )
             startForResult.launch(intent)
         } else {

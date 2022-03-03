@@ -5,7 +5,7 @@ import mega.privacy.android.app.di.MegaApi
 import mega.privacy.android.app.fragments.managerFragments.LinksFragment.getLinksOrderCloud
 import mega.privacy.android.app.globalmanagement.SortOrderManagement
 import mega.privacy.android.app.lollipop.DrawerItem
-import mega.privacy.android.app.lollipop.ManagerActivityLollipop.*
+import mega.privacy.android.app.lollipop.ManagerActivity.*
 import mega.privacy.android.app.utils.Constants.INVALID_VALUE
 import mega.privacy.android.app.utils.SortUtil.sortByNameAscending
 import mega.privacy.android.app.utils.SortUtil.sortByNameDescending

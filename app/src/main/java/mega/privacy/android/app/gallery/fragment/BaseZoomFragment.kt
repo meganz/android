@@ -39,13 +39,12 @@ import mega.privacy.android.app.gallery.data.GalleryItem
 import mega.privacy.android.app.gallery.data.GalleryItemSizeConfig
 import mega.privacy.android.app.gallery.ui.GalleryViewModel
 import mega.privacy.android.app.imageviewer.ImageViewerActivity
-import mega.privacy.android.app.lollipop.ManagerActivityLollipop
+import mega.privacy.android.app.lollipop.ManagerActivity
 import mega.privacy.android.app.modalbottomsheet.NodeOptionsBottomSheetDialogFragment
 import mega.privacy.android.app.utils.*
 import mega.privacy.android.app.utils.Constants.MIN_ITEMS_SCROLLBAR
 import mega.privacy.android.app.utils.Constants.ORDER_CAMERA
-import mega.privacy.android.app.utils.ZoomUtil.ZOOM_DEFAULT
-import mega.privacy.android.app.utils.ZoomUtil.ZOOM_OUT_1X
+import mega.privacy.android.app.utils.ZoomUtil.ZOOM_OUT_2X
 import mega.privacy.android.app.utils.ZoomUtil.getItemWidth
 import mega.privacy.android.app.utils.ZoomUtil.getMargin
 import mega.privacy.android.app.utils.ZoomUtil.getSelectedFrameMargin
@@ -77,7 +76,7 @@ abstract class BaseZoomFragment : BaseFragment(), GestureScaleCallback,
         const val VIEW_TYPE = "VIEW_TYPE"
     }
 
-    protected lateinit var mManagerActivity: ManagerActivityLollipop
+    protected lateinit var mManagerActivity: ManagerActivity
 
     // View type panel
     protected lateinit var viewTypePanel: View
@@ -153,7 +152,7 @@ abstract class BaseZoomFragment : BaseFragment(), GestureScaleCallback,
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        mManagerActivity = activity as ManagerActivityLollipop
+        mManagerActivity = activity as ManagerActivity
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -412,7 +411,7 @@ abstract class BaseZoomFragment : BaseFragment(), GestureScaleCallback,
 
     private fun observeItemLongClick() =
         actionModeViewModel.longClick.observe(viewLifecycleOwner, EventObserver {
-            if (zoomViewModel.getCurrentZoom() == ZOOM_DEFAULT || zoomViewModel.getCurrentZoom() == ZOOM_OUT_1X) {
+            if (zoomViewModel.getCurrentZoom() != ZOOM_OUT_2X) {
                 doIfOnline { actionModeViewModel.enterActionMode(it) }
                 animateBottomView()
             }
@@ -518,7 +517,7 @@ abstract class BaseZoomFragment : BaseFragment(), GestureScaleCallback,
         if (Util.isOnline(context)) {
             operation()
         } else {
-            val activity = activity as ManagerActivityLollipop
+            val activity = activity as ManagerActivity
 
             activity.hideKeyboardSearch()  // Make the snack bar visible to the user
             activity.showSnackbar(

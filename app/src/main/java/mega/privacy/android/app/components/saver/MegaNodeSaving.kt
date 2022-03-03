@@ -29,7 +29,6 @@ class MegaNodeSaving(
     private val fromMediaViewer: Boolean,
     private val needSerialize: Boolean,
     private val isVoiceClip: Boolean = false,
-    private val downloadToGallery: Boolean = false,
     private val downloadByTap: Boolean = false
 ) : Saving() {
 
@@ -59,8 +58,6 @@ class MegaNodeSaving(
     }
 
     override fun fromMediaViewer() = fromMediaViewer
-
-    override fun downloadToGallery() = downloadToGallery
 
     override fun doDownload(
         megaApi: MegaApiAndroid,

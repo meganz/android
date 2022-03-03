@@ -5,8 +5,8 @@ import android.os.Bundle;
 import java.util.ArrayList;
 
 import mega.privacy.android.app.fragments.BaseFragment;
-import mega.privacy.android.app.lollipop.FileExplorerActivityLollipop;
-import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
+import mega.privacy.android.app.lollipop.FileExplorerActivity;
+import mega.privacy.android.app.lollipop.ManagerActivity;
 import mega.privacy.android.app.lollipop.adapters.RotatableAdapter;
 
 import static mega.privacy.android.app.utils.LogUtil.*;
@@ -92,10 +92,10 @@ public abstract class RotatableFragment extends BaseFragment {
     }
 
     private boolean isList() {
-        if (getActivity() instanceof ManagerActivityLollipop) {
-            return ((ManagerActivityLollipop) getActivity()).isList();
-        } else if (getActivity() instanceof FileExplorerActivityLollipop) {
-            return ((FileExplorerActivityLollipop) getActivity()).isList();
+        if (getActivity() instanceof ManagerActivity) {
+            return ((ManagerActivity) getActivity()).isList();
+        } else if (getActivity() instanceof FileExplorerActivity) {
+            return ((FileExplorerActivity) getActivity()).isList();
         }
 
         return false;
