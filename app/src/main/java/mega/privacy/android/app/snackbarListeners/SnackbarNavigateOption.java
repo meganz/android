@@ -7,13 +7,13 @@ import android.view.View;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.imageviewer.ImageViewerActivity;
 import mega.privacy.android.app.contacts.ContactsActivity;
-import mega.privacy.android.app.lollipop.ContactFileListActivityLollipop;
-import mega.privacy.android.app.lollipop.ContactInfoActivityLollipop;
-import mega.privacy.android.app.lollipop.FileInfoActivityLollipop;
-import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
-import mega.privacy.android.app.lollipop.PdfViewerActivityLollipop;
+import mega.privacy.android.app.lollipop.ContactFileListActivity;
+import mega.privacy.android.app.lollipop.ContactInfoActivity;
+import mega.privacy.android.app.lollipop.FileInfoActivity;
+import mega.privacy.android.app.lollipop.ManagerActivity;
+import mega.privacy.android.app.lollipop.PdfViewerActivity;
 import mega.privacy.android.app.lollipop.controllers.ContactController;
-import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop;
+import mega.privacy.android.app.lollipop.megachat.ChatActivity;
 import mega.privacy.android.app.utils.Constants;
 import static mega.privacy.android.app.utils.Constants.*;
 
@@ -55,31 +55,31 @@ public class SnackbarNavigateOption implements View.OnClickListener {
             return;
         }
 
-        if (context instanceof ManagerActivityLollipop) {
+        if (context instanceof ManagerActivity) {
             if (type == MUTE_NOTIFICATIONS_SNACKBAR_TYPE) {
                 MegaApplication.getPushNotificationSettingManagement().controlMuteNotifications(context, NOTIFICATIONS_ENABLED, null);
             } else if (isSentAsMessageSnackbar) {
-                ((ManagerActivityLollipop) context).moveToChatSection(idChat);
+                ((ManagerActivity) context).moveToChatSection(idChat);
             } else {
-                ((ManagerActivityLollipop) context).moveToSettingsSectionStorage();
+                ((ManagerActivity) context).moveToSettingsSectionStorage();
             }
 
             return;
         }
 
-        if(context instanceof ChatActivityLollipop){
+        if(context instanceof ChatActivity){
             switch (type) {
                 case INVITE_CONTACT_TYPE:
                     new ContactController(context).inviteContact(userEmail);
                     return;
 
                 case SENT_REQUESTS_TYPE:
-                    ((ChatActivityLollipop) context).startActivity(ContactsActivity.getSentRequestsIntent(context));
+                    ((ChatActivity) context).startActivity(ContactsActivity.getSentRequestsIntent(context));
                     return;
             }
         }
 
-        Intent intent = new Intent(context, ManagerActivityLollipop.class);
+        Intent intent = new Intent(context, ManagerActivity.class);
 
         if (isSentAsMessageSnackbar) {
             intent.setAction(Constants.ACTION_CHAT_NOTIFICATION_MESSAGE);
@@ -95,16 +95,16 @@ public class SnackbarNavigateOption implements View.OnClickListener {
 
         if (context instanceof ImageViewerActivity) {
             ((ImageViewerActivity) context).finish();
-        } else if (context instanceof PdfViewerActivityLollipop) {
-            ((PdfViewerActivityLollipop) context).finish();
-        } else if (context instanceof FileInfoActivityLollipop) {
-            ((FileInfoActivityLollipop) context).finish();
-        } else if (context instanceof ContactFileListActivityLollipop) {
-            ((ContactFileListActivityLollipop) context).finish();
-        } else if (context instanceof ChatActivityLollipop) {
-            ((ChatActivityLollipop) context).finish();
-        } else if (context instanceof ContactInfoActivityLollipop) {
-            ((ContactInfoActivityLollipop) context).finish();
+        } else if (context instanceof PdfViewerActivity) {
+            ((PdfViewerActivity) context).finish();
+        } else if (context instanceof FileInfoActivity) {
+            ((FileInfoActivity) context).finish();
+        } else if (context instanceof ContactFileListActivity) {
+            ((ContactFileListActivity) context).finish();
+        } else if (context instanceof ChatActivity) {
+            ((ChatActivity) context).finish();
+        } else if (context instanceof ContactInfoActivity) {
+            ((ContactInfoActivity) context).finish();
         }
     }
 }

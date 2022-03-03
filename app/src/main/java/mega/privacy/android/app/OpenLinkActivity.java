@@ -12,12 +12,12 @@ import mega.privacy.android.app.activities.PasscodeActivity;
 import mega.privacy.android.app.activities.WebViewActivity;
 import mega.privacy.android.app.listeners.LoadPreviewListener;
 import mega.privacy.android.app.listeners.QueryRecoveryLinkListener;
-import mega.privacy.android.app.lollipop.FileLinkActivityLollipop;
-import mega.privacy.android.app.lollipop.FolderLinkActivityLollipop;
-import mega.privacy.android.app.lollipop.LoginActivityLollipop;
-import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
+import mega.privacy.android.app.lollipop.FileLinkActivity;
+import mega.privacy.android.app.lollipop.FolderLinkActivity;
+import mega.privacy.android.app.lollipop.LoginActivity;
+import mega.privacy.android.app.lollipop.ManagerActivity;
 import mega.privacy.android.app.lollipop.controllers.AccountController;
-import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop;
+import mega.privacy.android.app.lollipop.megachat.ChatActivity;
 import mega.privacy.android.app.meeting.activity.LeftMeetingActivity;
 import mega.privacy.android.app.meeting.fragments.MeetingHasEndedDialogFragment;
 import mega.privacy.android.app.utils.CallUtil;
@@ -120,7 +120,7 @@ public class OpenLinkActivity extends PasscodeActivity implements MegaRequestLis
 		if (matchRegexs(url, FILE_LINK_REGEXS)) {
 			logDebug("Open link url");
 
-			Intent openFileIntent = new Intent(this, FileLinkActivityLollipop.class);
+			Intent openFileIntent = new Intent(this, FileLinkActivity.class);
 			openFileIntent.putExtra(OPENED_FROM_CHAT, intent.getBooleanExtra(OPENED_FROM_CHAT, false));
 			openFileIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 			openFileIntent.setAction(ACTION_OPEN_MEGA_LINK);
@@ -147,7 +147,7 @@ public class OpenLinkActivity extends PasscodeActivity implements MegaRequestLis
         if (matchRegexs(url, FOLDER_LINK_REGEXS)) {
 			logDebug("Folder link url");
 
-			Intent openFolderIntent = new Intent(this, FolderLinkActivityLollipop.class);
+			Intent openFolderIntent = new Intent(this, FolderLinkActivity.class);
 			openFolderIntent.putExtra(OPENED_FROM_CHAT, intent.getBooleanExtra(OPENED_FROM_CHAT, false));
 			openFolderIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 			openFolderIntent.setAction(ACTION_OPEN_MEGA_FOLDER_LINK);
@@ -165,7 +165,7 @@ public class OpenLinkActivity extends PasscodeActivity implements MegaRequestLis
 			if (dbH != null) {
 				if (isLoggedIn) {
 					logDebug("Logged IN");
-					Intent openChatLinkIntent = new Intent(this, ManagerActivityLollipop.class);
+					Intent openChatLinkIntent = new Intent(this, ManagerActivity.class);
 					openChatLinkIntent.setAction(ACTION_OPEN_CHAT_LINK);
 					openChatLinkIntent.setData(Uri.parse(url));
 					startActivity(openChatLinkIntent);
@@ -212,7 +212,7 @@ public class OpenLinkActivity extends PasscodeActivity implements MegaRequestLis
 					setError(getString(R.string.log_out_warning));
 				} else {
 					logDebug("Not logged");
-					Intent createAccountIntent = new Intent(this, LoginActivityLollipop.class);
+					Intent createAccountIntent = new Intent(this, LoginActivity.class);
 					createAccountIntent.putExtra(VISIBLE_FRAGMENT, CREATE_ACCOUNT_FRAGMENT);
 					startActivity(createAccountIntent);
 					finish();
@@ -228,7 +228,7 @@ public class OpenLinkActivity extends PasscodeActivity implements MegaRequestLis
 			if (dbH != null) {
 				if (isLoggedIn) {
 					logDebug("Logged IN"); //Check fetch nodes is already done in ManagerActivity
-					Intent exportIntent = new Intent(this, ManagerActivityLollipop.class);
+					Intent exportIntent = new Intent(this, ManagerActivity.class);
 					exportIntent.setAction(ACTION_EXPORT_MASTER_KEY);
 					startActivity(exportIntent);
 					finish();
@@ -247,7 +247,7 @@ public class OpenLinkActivity extends PasscodeActivity implements MegaRequestLis
 			if (dbH != null) {
 				if (isLoggedIn) {
 					logDebug("Logged IN"); //Check fetch nodes is already done in ManagerActivity
-					Intent chatIntent = new Intent(this, ManagerActivityLollipop.class);
+					Intent chatIntent = new Intent(this, ManagerActivity.class);
 					chatIntent.setAction(ACTION_CHAT_SUMMARY);
 					startActivity(chatIntent);
 					finish();
@@ -267,7 +267,7 @@ public class OpenLinkActivity extends PasscodeActivity implements MegaRequestLis
 				if (isLoggedIn) {
 					if (needsRefreshSession) {
 						logDebug("Go to Login to fetch nodes");
-						Intent cancelAccountIntent = new Intent(this, LoginActivityLollipop.class);
+						Intent cancelAccountIntent = new Intent(this, LoginActivity.class);
 						cancelAccountIntent.putExtra(VISIBLE_FRAGMENT, LOGIN_FRAGMENT);
 						cancelAccountIntent.setAction(ACTION_CANCEL_ACCOUNT);
 						cancelAccountIntent.setData(Uri.parse(url));
@@ -276,7 +276,7 @@ public class OpenLinkActivity extends PasscodeActivity implements MegaRequestLis
 
 					} else {
 						logDebug("Logged IN");
-						startActivity(new Intent(this, ManagerActivityLollipop.class)
+						startActivity(new Intent(this, ManagerActivity.class)
 								.setAction(ACTION_CANCEL_ACCOUNT)
 								.setData(Uri.parse(url)));
 					}
@@ -296,7 +296,7 @@ public class OpenLinkActivity extends PasscodeActivity implements MegaRequestLis
 				if (isLoggedIn) {
 					if (needsRefreshSession) {
 						logDebug("Go to Login to fetch nodes");
-						Intent changeMailIntent = new Intent(this, LoginActivityLollipop.class);
+						Intent changeMailIntent = new Intent(this, LoginActivity.class);
 						changeMailIntent.putExtra(VISIBLE_FRAGMENT, LOGIN_FRAGMENT);
 						changeMailIntent.setAction(ACTION_CHANGE_MAIL);
 						changeMailIntent.setData(Uri.parse(url));
@@ -304,7 +304,7 @@ public class OpenLinkActivity extends PasscodeActivity implements MegaRequestLis
 						finish();
 
 					} else {
-						startActivity(new Intent(this, ManagerActivityLollipop.class)
+						startActivity(new Intent(this, ManagerActivity.class)
 								.setAction(ACTION_CHANGE_MAIL)
 								.setData(Uri.parse(url)));
 					}
@@ -324,7 +324,7 @@ public class OpenLinkActivity extends PasscodeActivity implements MegaRequestLis
 				if (isLoggedIn) {
 					if (needsRefreshSession) {
 						logDebug("Go to Login to fetch nodes");
-						Intent resetPassIntent = new Intent(this, LoginActivityLollipop.class);
+						Intent resetPassIntent = new Intent(this, LoginActivity.class);
 						resetPassIntent.putExtra(VISIBLE_FRAGMENT, LOGIN_FRAGMENT);
 						resetPassIntent.setAction(ACTION_RESET_PASS);
 						resetPassIntent.setData(Uri.parse(url));
@@ -333,7 +333,7 @@ public class OpenLinkActivity extends PasscodeActivity implements MegaRequestLis
 
 					} else {
 						logDebug("Logged IN");
-						Intent resetPassIntent = new Intent(this, ManagerActivityLollipop.class);
+						Intent resetPassIntent = new Intent(this, ManagerActivity.class);
 						resetPassIntent.setAction(ACTION_RESET_PASS);
 						resetPassIntent.setData(Uri.parse(url));
 						startActivity(resetPassIntent);
@@ -355,7 +355,7 @@ public class OpenLinkActivity extends PasscodeActivity implements MegaRequestLis
 				if (isLoggedIn) {
 					if (needsRefreshSession) {
 						logDebug("Go to Login to fetch nodes");
-						Intent ipcIntent = new Intent(this, LoginActivityLollipop.class);
+						Intent ipcIntent = new Intent(this, LoginActivity.class);
 						ipcIntent.putExtra(VISIBLE_FRAGMENT, LOGIN_FRAGMENT);
 						ipcIntent.setAction(ACTION_IPC);
 						startActivity(ipcIntent);
@@ -363,7 +363,7 @@ public class OpenLinkActivity extends PasscodeActivity implements MegaRequestLis
 
 					} else {
 						logDebug("Logged IN");
-						Intent ipcIntent = new Intent(this, ManagerActivityLollipop.class);
+						Intent ipcIntent = new Intent(this, ManagerActivity.class);
 						ipcIntent.setAction(ACTION_IPC);
 						startActivity(ipcIntent);
 						finish();
@@ -387,7 +387,7 @@ public class OpenLinkActivity extends PasscodeActivity implements MegaRequestLis
 		if (matchRegexs(url, HANDLE_LINK_REGEXS)) {
 			logDebug("Handle link url");
 
-			Intent handleIntent = new Intent(this, ManagerActivityLollipop.class);
+			Intent handleIntent = new Intent(this, ManagerActivity.class);
 			handleIntent.setAction(ACTION_OPEN_HANDLE_NODE);
 			handleIntent.setData(Uri.parse(url));
 			startActivity(handleIntent);
@@ -401,7 +401,7 @@ public class OpenLinkActivity extends PasscodeActivity implements MegaRequestLis
 				if (isLoggedIn) {
 					String[] s = url.split("C!");
 					long handle = MegaApiAndroid.base64ToHandle(s[1].trim());
-					Intent inviteContact = new Intent(this, ManagerActivityLollipop.class);
+					Intent inviteContact = new Intent(this, ManagerActivity.class);
 					inviteContact.setAction(ACTION_OPEN_CONTACTS_SECTION);
 					inviteContact.putExtra(CONTACT_HANDLE, handle);
 					startActivity(inviteContact);
@@ -424,7 +424,7 @@ public class OpenLinkActivity extends PasscodeActivity implements MegaRequestLis
 	}
 
 	private void goToChatActivity() {
-		Intent intent = new Intent(this, ChatActivityLollipop.class);
+		Intent intent = new Intent(this, ChatActivity.class);
 		intent.setAction(ACTION_OPEN_CHAT_LINK);
 		intent.setData(Uri.parse(url));
 		startActivity(intent);
@@ -479,7 +479,7 @@ public class OpenLinkActivity extends PasscodeActivity implements MegaRequestLis
 
 				AccountController.logoutConfirmed(this);
 
-				Intent confirmIntent = new Intent(this, LoginActivityLollipop.class);
+				Intent confirmIntent = new Intent(this, LoginActivity.class);
 				confirmIntent.putExtra(VISIBLE_FRAGMENT, LOGIN_FRAGMENT);
 				confirmIntent.putExtra(EXTRA_CONFIRMATION, urlConfirmationLink);
 				confirmIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);

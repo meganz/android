@@ -35,11 +35,10 @@ import mega.privacy.android.app.databinding.FabMaskLayoutBinding
 import mega.privacy.android.app.databinding.FragmentHomepageBinding
 import mega.privacy.android.app.fragments.homepage.banner.BannerAdapter
 import mega.privacy.android.app.fragments.homepage.banner.BannerClickHandler
-import mega.privacy.android.app.interfaces.Scrollable
 import mega.privacy.android.app.fragments.settingsFragments.startSceen.util.StartScreenUtil.notAlertAnymoreAboutStartScreen
 import mega.privacy.android.app.fragments.settingsFragments.startSceen.util.StartScreenUtil.shouldShowStartScreenDialog
-import mega.privacy.android.app.lollipop.AddContactActivityLollipop
-import mega.privacy.android.app.lollipop.ManagerActivityLollipop
+import mega.privacy.android.app.lollipop.AddContactActivity
+import mega.privacy.android.app.lollipop.ManagerActivity
 import mega.privacy.android.app.utils.AlertDialogUtil.isAlertDialogShown
 import mega.privacy.android.app.utils.ColorUtils
 import mega.privacy.android.app.utils.ColorUtils.getThemeColor
@@ -175,7 +174,7 @@ class HomepageFragment : Fragment() {
             }
         }
 
-        (activity as? ManagerActivityLollipop)?.adjustTransferWidgetPositionInHomepage()
+        (activity as? ManagerActivity)?.adjustTransferWidgetPositionInHomepage()
 
         return rootView
     }
@@ -191,7 +190,7 @@ class HomepageFragment : Fragment() {
         setupBottomSheetBehavior()
         setupFabs()
 
-        (activity as? ManagerActivityLollipop)?.adjustTransferWidgetPositionInHomepage()
+        (activity as? ManagerActivity)?.adjustTransferWidgetPositionInHomepage()
 
         requireContext().registerReceiver(
             networkReceiver, IntentFilter(BROADCAST_ACTION_INTENT_CONNECTIVITY_CHANGE)
@@ -307,7 +306,7 @@ class HomepageFragment : Fragment() {
      * Set click listeners, observe the changes of chat status, notification count
      */
     private fun setupSearchView() {
-        val activity = activity as ManagerActivityLollipop
+        val activity = activity as ManagerActivity
 
         searchInputView = viewDataBinding.searchView
         searchInputView.attachNavigationDrawerToMenuButton(
@@ -617,7 +616,7 @@ class HomepageFragment : Fragment() {
         if (isOnline(context) && !viewModel.isRootNodeNull()) {
             operation()
         } else if (showSnackBar) {
-            (activity as ManagerActivityLollipop).showSnackbar(
+            (activity as ManagerActivity).showSnackbar(
                 SNACKBAR_TYPE,
                 getString(R.string.error_server_connection_problem),
                 MEGACHAT_INVALID_HANDLE
@@ -627,7 +626,7 @@ class HomepageFragment : Fragment() {
 
     @Suppress("deprecation") // TODO Migrate to registerForActivityResult()
     private fun openNewChatActivity() = doIfOnline(true) {
-        val intent = Intent(activity, AddContactActivityLollipop::class.java).apply {
+        val intent = Intent(activity, AddContactActivity::class.java).apply {
             putExtra(KEY_CONTACT_TYPE, CONTACT_TYPE_MEGA)
         }
 
@@ -635,7 +634,7 @@ class HomepageFragment : Fragment() {
     }
 
     private fun showUploadPanel() = doIfOnline(true) {
-        (activity as ManagerActivityLollipop).showUploadPanel()
+        (activity as ManagerActivity).showUploadPanel()
     }
 
     private fun fabMainClickCallback() = if (isFabExpanded) {

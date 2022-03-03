@@ -7,9 +7,9 @@ import android.widget.TextView
 import androidx.lifecycle.ViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import mega.privacy.android.app.R
-import mega.privacy.android.app.lollipop.ManagerActivityLollipop
+import mega.privacy.android.app.lollipop.ManagerActivity
 import mega.privacy.android.app.lollipop.controllers.ChatController
-import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop
+import mega.privacy.android.app.lollipop.megachat.ChatActivity
 import mega.privacy.android.app.meeting.adapter.Participant
 import mega.privacy.android.app.meeting.fragments.MeetingParticipantBottomSheetDialogFragment.Companion.EXTRA_FROM_MEETING
 import mega.privacy.android.app.utils.Constants
@@ -200,7 +200,7 @@ class MeetingParticipantBottomSheetDialogViewModel @Inject constructor(
      * @param activity the current activity
      */
     fun editProfile(activity: Activity) {
-        val editProfile = Intent(activity, ManagerActivityLollipop::class.java)
+        val editProfile = Intent(activity, ManagerActivity::class.java)
         editProfile.putExtra(EXTRA_FROM_MEETING, true)
         editProfile.action = Constants.ACTION_SHOW_MY_ACCOUNT
         activity.startActivity(editProfile)
@@ -220,7 +220,7 @@ class MeetingParticipantBottomSheetDialogViewModel @Inject constructor(
                 peers.addPeer(it, MegaChatPeerList.PRIV_STANDARD)
                 megaChatApi.createChat(false, peers, null)
             } else {
-                val intentOpenChat = Intent(activity, ChatActivityLollipop::class.java)
+                val intentOpenChat = Intent(activity, ChatActivity::class.java)
                 intentOpenChat.action = Constants.ACTION_CHAT_SHOW_MESSAGES
                 intentOpenChat.putExtra(Constants.CHAT_ID, chat.chatId)
                 activity.startActivity(intentOpenChat)

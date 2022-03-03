@@ -11,7 +11,7 @@ import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.constants.EventConstants.EVENT_MY_BACKUPS_FOLDER_CHANGED
 import mega.privacy.android.app.interfaces.ActionBackupListener
 import mega.privacy.android.app.interfaces.ActionBackupNodeCallback
-import mega.privacy.android.app.lollipop.FileContactListActivityLollipop
+import mega.privacy.android.app.lollipop.FileContactListActivity
 import mega.privacy.android.app.lollipop.controllers.NodeController
 import mega.privacy.android.app.sync.fileBackups.FileBackupManager.BackupDialogState.BACKUP_DIALOG_SHOW_CONFIRM
 import mega.privacy.android.app.sync.fileBackups.FileBackupManager.BackupDialogState.BACKUP_DIALOG_SHOW_NONE
@@ -259,7 +259,7 @@ class FileBackupManager(
                     ACTION_BACKUP_SHARE_FOLDER -> if (isOutShare(pNodeBackup)) {
                         val i = Intent(
                             activity,
-                            FileContactListActivityLollipop::class.java
+                            FileContactListActivity::class.java
                         )
                         i.putExtra(NAME, pNodeBackup.handle)
                         activity.startActivity(i)

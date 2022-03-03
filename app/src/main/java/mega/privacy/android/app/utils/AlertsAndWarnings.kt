@@ -14,8 +14,8 @@ import mega.privacy.android.app.BaseActivity
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.OverDiskQuotaPaywallActivity
-import mega.privacy.android.app.lollipop.LoginActivityLollipop
-import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop
+import mega.privacy.android.app.lollipop.LoginActivity
+import mega.privacy.android.app.lollipop.megachat.ChatActivity
 import mega.privacy.android.app.utils.StringResourcesUtils.getString
 
 object AlertsAndWarnings {
@@ -44,7 +44,7 @@ object AlertsAndWarnings {
         val app = MegaApplication.getInstance()
 
         // If app is doing login, the ODQ will be displayed at login finish
-        if (app.currentActivity is LoginActivityLollipop && !loginFinished) {
+        if (app.currentActivity is LoginActivity && !loginFinished) {
             return
         }
 
@@ -81,7 +81,7 @@ object AlertsAndWarnings {
             .setPositiveButton(getString(R.string.button_resume_individual_transfer)) { dialog, _ ->
                 MegaApplication.getInstance().megaApi.pauseTransfers(false)
 
-                if (context is ChatActivityLollipop) {
+                if (context is ChatActivity) {
                     context.updatePausedUploadingMessages()
                 }
 

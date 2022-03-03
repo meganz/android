@@ -35,7 +35,7 @@ import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.ShareInfo;
 import mega.privacy.android.app.components.twemoji.EmojiEditText;
-import mega.privacy.android.app.lollipop.FileExplorerActivityLollipop;
+import mega.privacy.android.app.lollipop.FileExplorerActivity;
 import mega.privacy.android.app.lollipop.ImportFilesFragment;
 import mega.privacy.android.app.utils.StringResourcesUtils;
 import nz.mega.sdk.MegaApiAndroid;
@@ -145,7 +145,7 @@ public class ImportFilesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
         this.filesAll = files;
         this.names = names;
 
-        Display display = ((FileExplorerActivityLollipop) context).getWindowManager().getDefaultDisplay();
+        Display display = ((FileExplorerActivity) context).getWindowManager().getDefaultDisplay();
         outMetrics = new DisplayMetrics();
         display.getMetrics(outMetrics);
 
@@ -260,7 +260,7 @@ public class ImportFilesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
                                     ? ((ViewHolderImportFiles) holder).name.getText().toString() : null;
 
                             names.put(name, newName);
-                            ((FileExplorerActivityLollipop) context).setNameFiles(names);
+                            ((FileExplorerActivity) context).setNameFiles(names);
                             updateNameLayout(((ViewHolderImportFiles) holder).nameLayout, ((ViewHolderImportFiles) holder).name);
                         } else {
                             positionWithFocus = position;
