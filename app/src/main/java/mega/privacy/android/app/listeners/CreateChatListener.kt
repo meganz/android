@@ -5,7 +5,7 @@ import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
 import mega.privacy.android.app.interfaces.SnackbarShower
 import mega.privacy.android.app.interfaces.showSnackbar
-import mega.privacy.android.app.lollipop.listeners.MultipleForwardChatProcessor
+import mega.privacy.android.app.main.listeners.MultipleForwardChatProcessor
 import mega.privacy.android.app.utils.StringResourcesUtils.getQuantityString
 import mega.privacy.android.app.utils.StringResourcesUtils.getString
 import nz.mega.sdk.*

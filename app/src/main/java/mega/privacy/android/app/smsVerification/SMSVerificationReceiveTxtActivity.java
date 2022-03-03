@@ -46,7 +46,7 @@ import nz.mega.sdk.MegaRequestListenerInterface;
 
 import static mega.privacy.android.app.constants.EventConstants.EVENT_REFRESH_PHONE_NUMBER;
 import static mega.privacy.android.app.smsVerification.SMSVerificationActivity.*;
-import static mega.privacy.android.app.lollipop.LoginFragment.*;
+import static mega.privacy.android.app.main.LoginFragment.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 
 public class SMSVerificationReceiveTxtActivity extends PasscodeActivity implements MegaRequestListenerInterface, View.OnClickListener, View.OnLongClickListener, View.OnFocusChangeListener {

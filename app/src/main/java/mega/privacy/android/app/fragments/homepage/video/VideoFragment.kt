@@ -29,7 +29,7 @@ import mega.privacy.android.app.databinding.FragmentVideoBinding
 import mega.privacy.android.app.di.MegaApi
 import mega.privacy.android.app.fragments.homepage.*
 import mega.privacy.android.app.globalmanagement.SortOrderManagement
-import mega.privacy.android.app.lollipop.ManagerActivity
+import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.mediaplayer.miniplayer.MiniAudioPlayerController
 import mega.privacy.android.app.modalbottomsheet.NodeOptionsBottomSheetDialogFragment.MODE1
 import mega.privacy.android.app.modalbottomsheet.NodeOptionsBottomSheetDialogFragment.MODE5

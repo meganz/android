@@ -6,7 +6,7 @@ import mega.privacy.android.app.interfaces.AttachNodeToChatListener
 import mega.privacy.android.app.interfaces.SnackbarShower
 import mega.privacy.android.app.interfaces.showSnackbar
 import mega.privacy.android.app.interfaces.showSnackbarWithChat
-import mega.privacy.android.app.lollipop.megachat.AndroidMegaChatMessage
+import mega.privacy.android.app.main.megachat.AndroidMegaChatMessage
 import mega.privacy.android.app.utils.StringResourcesUtils.getQuantityString
 import mega.privacy.android.app.utils.StringResourcesUtils.getString
 import nz.mega.sdk.MegaChatApiJava

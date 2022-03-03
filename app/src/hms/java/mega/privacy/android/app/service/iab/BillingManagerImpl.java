@@ -126,7 +126,7 @@ public class BillingManagerImpl implements BillingManager {
      * Handles all the interactions with Play Store (via Billing library), maintains connection to
      * it through BillingClient and caches temporary states/data if needed.
      *
-     * @param activity        The Context, here's {@link mega.privacy.android.app.lollipop.ManagerActivity}
+     * @param activity        The Context, here's {@link mega.privacy.android.app.main.ManagerActivity}
      * @param updatesListener The callback, when billing status update. {@link BillingUpdatesListener}
      */
     public BillingManagerImpl(Activity activity, BillingUpdatesListener updatesListener) {

@@ -31,7 +31,7 @@ import mega.privacy.android.app.imageviewer.ImageViewerActivity
 import mega.privacy.android.app.imageviewer.ImageViewerViewModel
 import mega.privacy.android.app.imageviewer.data.ImageItem
 import mega.privacy.android.app.imageviewer.util.*
-import mega.privacy.android.app.lollipop.FileInfoActivity
+import mega.privacy.android.app.main.FileInfoActivity
 import mega.privacy.android.app.modalbottomsheet.BaseBottomSheetDialogFragment
 import mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil
 import mega.privacy.android.app.modalbottomsheet.nodelabel.NodeLabelBottomSheetDialogFragment

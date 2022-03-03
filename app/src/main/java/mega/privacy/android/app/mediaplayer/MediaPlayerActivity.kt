@@ -36,10 +36,10 @@ import mega.privacy.android.app.interfaces.ActivityLauncher
 import mega.privacy.android.app.interfaces.SnackbarShower
 import mega.privacy.android.app.interfaces.showSnackbar
 import mega.privacy.android.app.listeners.BaseListener
-import mega.privacy.android.app.lollipop.FileExplorerActivity
-import mega.privacy.android.app.lollipop.FileInfoActivity
-import mega.privacy.android.app.lollipop.controllers.ChatController
-import mega.privacy.android.app.lollipop.controllers.NodeController
+import mega.privacy.android.app.main.FileExplorerActivity
+import mega.privacy.android.app.main.FileInfoActivity
+import mega.privacy.android.app.main.controllers.ChatController
+import mega.privacy.android.app.main.controllers.NodeController
 import mega.privacy.android.app.mediaplayer.service.AudioPlayerService
 import mega.privacy.android.app.mediaplayer.service.MediaPlayerService
 import mega.privacy.android.app.mediaplayer.service.MediaPlayerServiceBinder

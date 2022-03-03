@@ -9,8 +9,8 @@ import kotlinx.coroutines.withContext
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.di.MegaApi
 import mega.privacy.android.app.listeners.BaseListener
-import mega.privacy.android.app.lollipop.controllers.ChatController
-import mega.privacy.android.app.lollipop.megachat.AppRTCAudioManager
+import mega.privacy.android.app.main.controllers.ChatController
+import mega.privacy.android.app.main.megachat.AppRTCAudioManager
 import mega.privacy.android.app.meeting.listeners.IndividualCallVideoListener
 import mega.privacy.android.app.meeting.listeners.MeetingAvatarListener
 import mega.privacy.android.app.utils.*
