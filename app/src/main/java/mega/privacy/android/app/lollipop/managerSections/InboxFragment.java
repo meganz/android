@@ -67,6 +67,7 @@ import mega.privacy.android.app.lollipop.adapters.MegaNodeAdapter;
 import mega.privacy.android.app.lollipop.adapters.RotatableAdapter;
 import mega.privacy.android.app.lollipop.controllers.NodeController;
 import mega.privacy.android.app.utils.ColorUtils;
+import mega.privacy.android.app.utils.MegaNodeUtil;
 import mega.privacy.android.app.utils.StringResourcesUtils;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaError;
@@ -78,6 +79,7 @@ import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.FileUtil.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.MegaApiUtils.*;
+import static mega.privacy.android.app.utils.MegaNodeUtil.areAllFileNodesAndNotTakenDown;
 import static mega.privacy.android.app.utils.MegaNodeUtil.manageTextFileIntent;
 import static mega.privacy.android.app.utils.MegaNodeUtil.manageURLNode;
 import static mega.privacy.android.app.utils.MegaNodeUtil.onNodeTapped;
@@ -104,7 +106,6 @@ public class InboxFragment extends RotatableFragment{
 	Stack<Integer> lastPositionStack;
 	
 	MegaApiAndroid megaApi;
-	boolean allFiles = true;
 	String downloadLocationDefaultPath;
 	
 	private ActionMode actionMode;
@@ -245,6 +246,7 @@ public class InboxFragment extends RotatableFragment{
 			menu.findItem(R.id.cab_menu_share_link)
 					.setTitle(StringResourcesUtils.getQuantityString(R.plurals.get_links, selected.size()));
 
+			boolean areAllNotTakenDown = MegaNodeUtil.areAllNotTakenDown(selected);
 			boolean showDownload = false;
 			boolean showSendToChat = false;
 			boolean showRename = false;
@@ -279,11 +281,11 @@ public class InboxFragment extends RotatableFragment{
 				else{
 					showRename = false;
 				}
-				allFiles = true;
-				showDownload = true;
+
+				showDownload = areAllNotTakenDown;
 				showTrash = true;
 				showMove = true;
-				showCopy = true;
+				showCopy = areAllNotTakenDown;
 				for(int i=0; i<selected.size();i++)	{
 					if(megaApi.checkMove(selected.get(i), megaApi.getInboxNode()).getErrorCode() != MegaError.API_OK)	{
 						showTrash = false;
@@ -292,13 +294,7 @@ public class InboxFragment extends RotatableFragment{
 					}
 				}
 				//showSendToChat
-				for(int i=0; i<selected.size();i++)	{
-					if(!selected.get(i).isFile()){
-						allFiles = false;
-					}
-				}
-
-				showSendToChat = allFiles;
+				showSendToChat = areAllFileNodesAndNotTakenDown(selected);
 			}
 			else{
 				menu.findItem(R.id.cab_menu_select_all).setVisible(true);

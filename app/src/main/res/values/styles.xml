@@ -694,7 +694,4 @@
         <item name="android:letterSpacing">0.0004</item>
     </style>
 
-    <style name="VideoPlaylistActionBar" parent="@style/ThemeOverlay.AppCompat.Dark.ActionBar">
-        <item name="actionModeBackground">@color/black</item>
-    </style>
 </resources>
