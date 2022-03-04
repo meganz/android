@@ -28,7 +28,6 @@ import mega.privacy.android.app.meeting.listeners.BottomFloatingPanelListener
 import mega.privacy.android.app.utils.LogUtil.logDebug
 import mega.privacy.android.app.utils.StringResourcesUtils.getString
 import mega.privacy.android.app.utils.Util
-import nz.mega.sdk.MegaChatRoom
 import nz.mega.sdk.MegaChatSession
 
 /**
@@ -64,7 +63,8 @@ class BottomFloatingPanelViewHolder(
     private var savedCamState: Boolean = false
     private var savedSpeakerState: AppRTCAudioManager.AudioDevice =
         AppRTCAudioManager.AudioDevice.NONE
-    private val participantsAdapter = ParticipantsAdapter(listener)
+
+    private var participantsAdapter = ParticipantsAdapter(listener)
 
     private var currentHeight = 0
 
@@ -183,7 +183,7 @@ class BottomFloatingPanelViewHolder(
      *
      * @param shouldExpand determine if should expand panel when update
      */
-    private fun updatePanel(shouldExpand: Boolean = true) {
+    fun updatePanel(shouldExpand: Boolean = true) {
         if (shouldExpand) {
             collapse()
         }
@@ -252,21 +252,33 @@ class BottomFloatingPanelViewHolder(
      * Init Participants and update the list, and update the text showing participants size
      *
      * @param participants newest participant list
+     * @param myOwnParticipant me as a participant
      */
-    fun setParticipants(participants: MutableList<Participant>, myOwnInfo: Participant) {
-        participants.add(myOwnInfo)
+    fun setParticipantsPanel(
+        participants: MutableList<Participant>,
+        myOwnParticipant: Participant
+    ) {
+        updateParticipants(participants, myOwnParticipant)
+        floatingPanelView.participantsNum.text = getString(
+            R.string.participants_number, participants.size
+        )
+    }
 
+    /**
+     * Update participants list
+     *
+     * @param participants newest participant list
+     * @param myOwnParticipant me as a participant
+     */
+    fun updateParticipants(participants: MutableList<Participant>, myOwnParticipant: Participant) {
+        participants.add(myOwnParticipant)
         participantsAdapter.submitList(
             participants.sortedWith(
                 compareBy(
-                    { !it.isModerator },
                     { !it.isMe },
+                    { !it.isModerator },
                     { it.name })
             ).toMutableList()
-        )
-
-        floatingPanelView.participantsNum.text = getString(
-            R.string.participants_number, participants.size
         )
     }
 
@@ -389,14 +401,6 @@ class BottomFloatingPanelViewHolder(
                 listener.onInviteParticipants()
             }
         }
-    }
-
-    /**
-     * When the meeting change, will update the panel
-     */
-    fun updateMeetingType() {
-        updatePanel(false)
-        updatePrivilege(inMeetingViewModel.getOwnPrivileges())
     }
 
     /**
@@ -579,7 +583,6 @@ class BottomFloatingPanelViewHolder(
     fun updateMicIcon(micOn: Boolean) {
         savedMicState = micOn
         floatingPanelView.fabMic.isOn = micOn
-        participantsAdapter.updateIcon(ParticipantsAdapter.MIC, micOn)
     }
 
     /**
@@ -590,7 +593,6 @@ class BottomFloatingPanelViewHolder(
     fun updateCamIcon(camOn: Boolean) {
         savedCamState = camOn
         floatingPanelView.fabCam.isOn = camOn
-        participantsAdapter.updateIcon(ParticipantsAdapter.CAM, camOn)
     }
 
     /**
@@ -683,43 +685,6 @@ class BottomFloatingPanelViewHolder(
     }
 
     /**
-     * Update UI for privilege changing
-     *
-     * @param ownPrivileges current privilege
-     */
-    fun updatePrivilege(ownPrivileges: Int) {
-        participantsAdapter.updateIcon(
-            ParticipantsAdapter.MODERATOR,
-            ownPrivileges == MegaChatRoom.PRIV_MODERATOR
-        )
-        updateShareAndInviteButton()
-    }
-
-    /**
-     * Check changes in remote A/V flags
-     *
-     * @param session MegaChatSession
-     */
-    fun updateRemoteAudioVideo(session: MegaChatSession) {
-        participantsAdapter.updateParticipantAudioVideo(session.peerid, session.clientid)
-    }
-
-    /**
-     * Check changes in remote chat privileges
-     *
-     * @param updateParticipantsPrivileges List of participants to be updated
-     */
-    fun updateRemotePrivileges(updateParticipantsPrivileges: MutableSet<Participant>) {
-        updateParticipantsPrivileges.forEach { participant ->
-            participantsAdapter.updateParticipantPermission(
-                participant.peerId,
-                participant.clientId,
-                inMeetingViewModel.isParticipantModerator(participant.peerId)
-            )
-        }
-    }
-
-    /**
      * The updating function for views
      *
      * @param view the target view
@@ -785,21 +750,6 @@ class BottomFloatingPanelViewHolder(
      */
     fun updateCamPermissionWaring(isGranted: Boolean) {
         floatingPanelView.camWarning.isVisible = !isGranted
-    }
-
-    /**
-     * Method that checks if a participant's name or avatar has changed and updates the UI
-     *
-     * @param peerId user handle that has changed
-     * @param type the type of change, name or avatar
-     */
-    fun updateParticipantInfo(peerId: Long, type: Int) {
-        participantsAdapter.updateParticipantInfo(
-            peerId,
-            type,
-            inMeetingViewModel.getParticipantFullName(peerId),
-            inMeetingViewModel.getAvatarBitmap(peerId)
-        )
     }
 
     companion object {

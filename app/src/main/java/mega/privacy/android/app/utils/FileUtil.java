@@ -1,7 +1,6 @@
 //copyright: https://stackoverflow.com/questions/34927748/android-5-0-documentfile-from-tree-uri/36162691#36162691
 package mega.privacy.android.app.utils;
 
-import android.annotation.TargetApi;
 import android.app.ActivityManager;
 import android.content.ContentResolver;
 import android.content.Context;
@@ -61,6 +60,7 @@ import static mega.privacy.android.app.utils.OfflineUtils.getOfflineFile;
 import static mega.privacy.android.app.utils.TimeUtils.formatLongDateTime;
 import static mega.privacy.android.app.utils.Util.getSizeString;
 import static mega.privacy.android.app.utils.Util.isAndroid11OrUpper;
+import static nz.mega.sdk.MegaApiJava.INVALID_HANDLE;
 import static nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE;
 
 public class FileUtil {
@@ -558,6 +558,12 @@ public class FileUtil {
     }
 
     public static String getDownloadLocation() {
+        if (isAndroid11OrUpper()) {
+            File file = buildDefaultDownloadDir(MegaApplication.getInstance());
+            file.mkdirs();
+            return file.getAbsolutePath();
+        }
+
         DatabaseHandler dbH = DatabaseHandler.getDbHandler(MegaApplication.getInstance());
         MegaPreferences prefs = dbH.getPreferences();
 
@@ -880,7 +886,6 @@ public class FileUtil {
         }
     }
 
-    @TargetApi(Build.VERSION_CODES.LOLLIPOP)
     private static String getVolumeIdFromTreeUri(final Uri treeUri) {
         final String docId = DocumentsContract.getTreeDocumentId(treeUri);
         final String[] split = docId.split(":");
@@ -888,8 +893,6 @@ public class FileUtil {
         else return null;
     }
 
-
-    @TargetApi(Build.VERSION_CODES.LOLLIPOP)
     private static String getDocumentPathFromTreeUri(final Uri treeUri) {
         final String docId = DocumentsContract.getTreeDocumentId(treeUri);
         final String[] split = docId.split(":");
@@ -1170,6 +1173,41 @@ public class FileUtil {
         try {
             return file.delete();
         } catch (Exception ignored) {
+            return false;
+        }
+    }
+
+    /**
+     * Return file fake handle
+     *
+     * @param file  File to get fake handle from
+     * @return      Fake handle or INVALID_HANDLE if it couldn't be created
+     */
+    public static long getFileFakeHandle(File file) {
+        try {
+            int hashCode = file.hashCode();
+            if (hashCode > 0) {
+                return hashCode * -1;
+            } else {
+                return hashCode;
+            }
+        } catch (Exception ignored) {
+            return INVALID_HANDLE;
+        }
+    }
+
+    /**
+     * Check if a specific file is valid for Image Viewer
+     *
+     * @param file  File to be checked
+     * @return      True if it's valid, false otherwise
+     */
+    public static boolean isValidForImageViewer(File file) {
+        if (file.exists() && file.canRead()) {
+            MimeTypeList mimeTypeList = MimeTypeList.typeForName(file.getName());
+            return mimeTypeList.isImage() || mimeTypeList.isGIF()
+                    || mimeTypeList.isVideoReproducible() || mimeTypeList.isMp4Video();
+        } else {
             return false;
         }
     }

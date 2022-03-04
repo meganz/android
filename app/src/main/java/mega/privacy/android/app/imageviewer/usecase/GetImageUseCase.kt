@@ -1,6 +1,7 @@
 package mega.privacy.android.app.imageviewer.usecase
 
 import android.content.Context
+import android.content.SharedPreferences
 import android.graphics.Bitmap
 import android.media.ThumbnailUtils.createVideoThumbnail
 import android.net.Uri
@@ -15,14 +16,15 @@ import io.reactivex.rxjava3.core.Single
 import mega.privacy.android.app.DownloadService
 import mega.privacy.android.app.MimeTypeList
 import mega.privacy.android.app.components.transferWidget.TransfersManagement
+import mega.privacy.android.app.constants.SettingsConstants
 import mega.privacy.android.app.di.MegaApi
 import mega.privacy.android.app.errors.BusinessAccountOverdueMegaError
 import mega.privacy.android.app.errors.QuotaOverdueMegaError
 import mega.privacy.android.app.imageviewer.data.ImageResult
 import mega.privacy.android.app.listeners.OptionalMegaRequestListenerInterface
 import mega.privacy.android.app.listeners.OptionalMegaTransferListenerInterface
-import mega.privacy.android.app.usecase.GetChatMessageUseCase
 import mega.privacy.android.app.usecase.GetNodeUseCase
+import mega.privacy.android.app.usecase.chat.GetChatMessageUseCase
 import mega.privacy.android.app.utils.CacheFolderManager.*
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.ContextUtils.getScreenSize
@@ -31,9 +33,10 @@ import mega.privacy.android.app.utils.FileUtil
 import mega.privacy.android.app.utils.LogUtil.logWarning
 import mega.privacy.android.app.utils.MegaNodeUtil.getFileName
 import mega.privacy.android.app.utils.MegaNodeUtil.getThumbnailFileName
-import mega.privacy.android.app.utils.MegaNodeUtil.isImage
+import mega.privacy.android.app.utils.MegaNodeUtil.isNodeFileValid
 import mega.privacy.android.app.utils.MegaNodeUtil.isVideo
 import mega.privacy.android.app.utils.MegaTransferUtils.getNumPendingDownloadsNonBackground
+import mega.privacy.android.app.utils.NetworkUtil.isMeteredConnection
 import mega.privacy.android.app.utils.OfflineUtils
 import mega.privacy.android.app.utils.RxUtil.blockingGetOrNull
 import mega.privacy.android.app.utils.StringUtils.encodeBase64
@@ -50,20 +53,31 @@ import javax.inject.Inject
  * @property megaApi                MegaAPI required for node requests
  * @property getNodeUseCase         NodeUseCase required to retrieve node information
  * @property getChatMessageUseCase  ChatMessageUseCase required to retrieve node information
+ * @property preferences            App preferences to get Mobile Data high resolution setting
  */
 class GetImageUseCase @Inject constructor(
     @ApplicationContext private val context: Context,
     @MegaApi private val megaApi: MegaApiAndroid,
     private val getNodeUseCase: GetNodeUseCase,
-    private val getChatMessageUseCase: GetChatMessageUseCase
+    private val getChatMessageUseCase: GetChatMessageUseCase,
+    private val preferences: SharedPreferences
 ) {
+
+    companion object {
+        private const val SIZE_1_MB = 1024 * 1024 * 1L
+        private const val SIZE_50_MB = SIZE_1_MB * 50L
+    }
+
+    private val isMobileDataAllowed: Boolean by lazy {
+        preferences.getBoolean(SettingsConstants.KEY_MOBILE_DATA_HIGH_RESOLUTION, true)
+    }
 
     /**
      * Get an ImageResult given a Node handle.
      *
      * @param nodeHandle    Image Node handle to request.
-     * @param fullSize      Flag to request full size image.
-     * @param highPriority  Flag to request full image with high priority.
+     * @param fullSize      Flag to request full size image despite data/size requirements.
+     * @param highPriority  Flag to request image with high priority.
      * @return              Flowable which emits Uri for every image, from low to high resolution.
      */
     fun get(
@@ -78,8 +92,8 @@ class GetImageUseCase @Inject constructor(
      * Get an ImageResult given a Node file link.
      *
      * @param nodeFileLink  Image Node file link.
-     * @param fullSize      Flag to request full size image.
-     * @param highPriority  Flag to request full image with high priority.
+     * @param fullSize      Flag to request full size image despite data/size requirements.
+     * @param highPriority  Flag to request image with high priority.
      * @return              Flowable which emits Uri for every image, from low to high resolution.
      */
     fun get(
@@ -95,8 +109,8 @@ class GetImageUseCase @Inject constructor(
      *
      * @param chatRoomId        Chat Message Room Id
      * @param chatMessageId     Chat Message Id
-     * @param fullSize          Flag to request full size image.
-     * @param highPriority      Flag to request full image with high priority.
+     * @param fullSize          Flag to request full size image despite data/size requirements.
+     * @param highPriority      Flag to request image with high priority.
      * @return                  Flowable which emits Uri for every image, from low to high resolution.
      */
     fun get(
@@ -112,8 +126,8 @@ class GetImageUseCase @Inject constructor(
      * Get an ImageResult given a Node.
      *
      * @param node          Image Node to request.
-     * @param fullSize      Flag to request full size image.
-     * @param highPriority  Flag to request full image with high priority.
+     * @param fullSize      Flag to request full size image despite data/size requirements.
+     * @param highPriority  Flag to request image with high priority.
      * @return              Flowable which emits Uri for every image, from low to high resolution.
      */
     fun get(
@@ -126,14 +140,18 @@ class GetImageUseCase @Inject constructor(
                 node == null -> emitter.onError(IllegalArgumentException("Node is null"))
                 !node.isFile -> emitter.onError(IllegalArgumentException("Node is not a file"))
                 else -> {
-                    val hasReadAccess = megaApi.getAccess(node) != MegaShare.ACCESS_UNKNOWN
-                    val isFullSizeRequired = hasReadAccess && (fullSize || !node.isImage())
+                    val fullSizeRequired = when {
+                        node.isTakenDown || node.isVideo() -> false
+                        node.size <= SIZE_1_MB -> true
+                        node.size in SIZE_1_MB..SIZE_50_MB -> fullSize || isMobileDataAllowed || !context.isMeteredConnection()
+                        else -> false
+                    }
 
                     val thumbnailFile = if (node.hasThumbnail()) buildThumbnailFile(context, node.getThumbnailFileName()) else null
                     val previewFile = if (node.hasPreview() || node.isVideo()) buildPreviewFile(context, node.getThumbnailFileName()) else null
-                    val fullFile = if (hasReadAccess) buildTempFile(context, node.getFileName()) else null
+                    val fullFile = buildTempFile(context, node.getFileName())
 
-                    if (fullFile?.exists() == true && (!fullFile.canRead() || fullFile.length() != node.size)) {
+                    if (!node.isNodeFileValid(fullFile)) {
                         FileUtil.deleteFileSafely(fullFile)
                     }
 
@@ -148,7 +166,7 @@ class GetImageUseCase @Inject constructor(
                         image.previewUri = getVideoPreviewImage(node.getThumbnailFileName(), fullFile.toUri()).blockingGetOrNull()
                     }
 
-                    if ((!hasReadAccess && previewFile?.exists() == true) || (fullFile?.exists() == true && (previewFile == null || previewFile.exists()))) {
+                    if ((!fullSizeRequired && previewFile?.exists() == true) || node.isNodeFileValid(fullFile)) {
                         image.isFullyLoaded = true
                         emitter.onNext(image)
                         emitter.onComplete()
@@ -185,14 +203,14 @@ class GetImageUseCase @Inject constructor(
 
                                     if (error.errorCode == API_OK) {
                                         image.previewUri = previewFile.toUri()
-                                        if (isFullSizeRequired) {
+                                        if (fullSizeRequired) {
                                             emitter.onNext(image)
                                         } else {
                                             image.isFullyLoaded = true
                                             emitter.onNext(image)
                                             emitter.onComplete()
                                         }
-                                    } else if (!isFullSizeRequired) {
+                                    } else if (!fullSizeRequired) {
                                         emitter.onError(error.toThrowable())
                                     } else {
                                         logWarning(error.toThrowable().stackTraceToString())
@@ -201,7 +219,7 @@ class GetImageUseCase @Inject constructor(
                             ))
                     }
 
-                    if (isFullSizeRequired && fullFile != null && !fullFile.exists()) {
+                    if (fullSizeRequired && !fullFile.exists()) {
                         val listener = OptionalMegaTransferListenerInterface(
                             onTransferStart = { transfer ->
                                 if (emitter.isCancelled) return@OptionalMegaTransferListenerInterface
@@ -212,10 +230,27 @@ class GetImageUseCase @Inject constructor(
                             onTransferFinish = { _: MegaTransfer, error: MegaError ->
                                 if (emitter.isCancelled) return@OptionalMegaTransferListenerInterface
 
+                                image.transferTag = null
+
                                 when (error.errorCode) {
-                                    API_OK, API_EEXIST -> {
+                                    API_OK -> {
                                         image.fullSizeUri = fullFile.toUri()
-                                        image.transferTag = null
+                                        image.isFullyLoaded = true
+                                        emitter.onNext(image)
+                                        emitter.onComplete()
+                                    }
+                                    API_EEXIST -> {
+                                        if (node.isNodeFileValid(fullFile)) {
+                                            image.fullSizeUri = fullFile.toUri()
+                                            image.isFullyLoaded = true
+                                            emitter.onNext(image)
+                                            emitter.onComplete()
+                                        } else {
+                                            FileUtil.deleteFileSafely(fullFile)
+                                            emitter.onError(IllegalStateException("File exists but is not valid"))
+                                        }
+                                    }
+                                    API_ENOENT -> {
                                         image.isFullyLoaded = true
                                         emitter.onNext(image)
                                         emitter.onComplete()
@@ -304,9 +339,17 @@ class GetImageUseCase @Inject constructor(
     fun getImageUri(imageUri: Uri): Flowable<ImageResult> =
         Flowable.fromCallable {
             val file = imageUri.toFile()
-            if (file.exists()) {
+            if (file.exists() && file.canRead()) {
+                val isVideo = MimeTypeList.typeForName(file.name).isVideo
+                var previewUri: Uri? = null
+                if (isVideo) {
+                    val previewName = "${(file.name + file.length()).encodeBase64()}${FileUtil.JPG_EXTENSION}"
+                    previewUri = getVideoPreviewImage(previewName, file.toUri()).blockingGetOrNull()
+                }
                 ImageResult(
+                    previewUri = previewUri,
                     fullSizeUri = file.toUri(),
+                    isVideo = isVideo,
                     isFullyLoaded = true
                 )
             } else {
@@ -352,7 +395,7 @@ class GetImageUseCase @Inject constructor(
         val currentTransfers = megaApi.getNumPendingDownloadsNonBackground()
         val isServiceRunning = TransfersManagement.isServiceRunning(DownloadService::class.java)
         if (currentTransfers == 0 && !isServiceRunning) {
-            megaApi.resetCompletedDownloads()
+            megaApi.resetTotalDownloads()
         }
     }
 }

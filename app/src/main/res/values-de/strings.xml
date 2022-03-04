@@ -1402,7 +1402,7 @@
     <!-- chat message when a participant was removed from a group chat -->
     <string name="message_remove_participant">[A]%1$s[/A][B] wurde von [/B][C]%2$s[/C] aus dem Gruppenchat entfernt</string>
     <!-- Message shown when a participant change the title of a group chat. -->
-    <string name="change_title_messages">[A]%1$s[/A][B] hat den Namen des Gruppenchats auf [/B][C]„%2$s“[/C] geändert</string>
+    <string name="change_title_messages">[A]%1$s[/A][B] hat den Gruppenchat in [/B][C]„%2$s“[/C] umbenannt</string>
     <!-- chat message when a participant left a group chat -->
     <string name="message_participant_left_group_chat">[A]%1$s[/A][B] hat den Gruppenchat verlassen[/B]</string>
     <!-- chat message alert when the message have to been manually -->
@@ -1434,7 +1434,7 @@
     <!-- chat message when a participant was removed from a group chat -->
     <string name="non_format_message_remove_participant">%1$s wurde von %2$s aus dem Gruppenchat entfernt</string>
     <!-- Message shown when a participant change the title of a group chat. -->
-    <string name="non_format_change_title_messages">%1$s hat den Titel auf „%2$s“ geändert</string>
+    <string name="non_format_change_title_messages">%1$s hat den Gruppenchat in „%2$s“ umbenannt</string>
     <!-- chat message when a participant left a group chat -->
     <string name="non_format_message_participant_left_group_chat">%1$s hat den Gruppenchat verlassen</string>
     <!-- success alert when the user copy some messages to the clipboard -->
@@ -1761,8 +1761,6 @@
     <string name="attachment_upload_panel_from_cloud">Aus dem Cloud Drive</string>
     <!--  -->
     <string name="attachment_upload_panel_contact">Kontakt</string>
-    <!--  -->
-    <string name="attachment_upload_panel_photo">Vom Gerät</string>
     <!-- Button and title of dialog shown when the user wants to delete permanently their account. -->
     <string name="delete_account">Account löschen</string>
     <!-- Text shown in the alert dialog to confirm the deletion of an account -->
@@ -1788,7 +1786,7 @@
     <!-- label to indicate the state of an upload in chat -->
     <string name="attachment_uploading_state_uploading">Upload&#8230;</string>
     <!--  -->
-    <string name="attachment_uploading_state_compressing">Komprimierung...</string>
+    <string name="attachment_uploading_state_compressing">Komprimierung&#8230;</string>
     <!--  -->
     <string name="attachment_uploading_state_error">Fehler: Nicht versandt</string>
     <!-- When a multiple download is started, some of the files could have already been downloaded before. This message shows the number of files that has already been downloaded and the number of files pending -->
@@ -2660,7 +2658,7 @@
     <!-- Title of the button in the contact info screen to start a video call -->
     <string name="video_button">Video</string>
     <!-- Title of file explorer to send a link -->
-    <string name="title_file_explorer_send_link">Link senden an...</string>
+    <string name="title_file_explorer_send_link">Link senden an&#8230;</string>
     <!-- Title of chat explorer to send a link or file to a chat -->
     <string name="title_chat_explorer">Zielchat wählen</string>
     <!-- Title of cloud explorer to upload a link or file -->
@@ -3177,7 +3175,7 @@
     <!-- Text shown in the list of chats when there is a call in progress but I am not on it -->
     <string name="ongoing_call_messages">Laufendes Gespräch</string>
     <!-- Title of the layout to join a group call from the chat screen. -->
-    <string name="join_call_layout_in_group_call">Tap to join current group call.</string>
+    <string name="join_call_layout_in_group_call">Antippen, um der laufenden Konferenz beizutreten.</string>
     <!-- Title of the layout to return to a call -->
     <string name="call_in_progress_layout">Zum Gespräch zurückkehren</string>
     <!-- message displayed when you try to start a call but it is not possible because you are already on a call -->
@@ -3427,7 +3425,7 @@
     <!-- Text shown in a call when the own internet connection is of low quality -->
     <string name="poor_internet_connection_message">Schlechte Verbindung</string>
     <!-- Text is displayed while a voice clip is being recorded -->
-    <string name="recording_layout">Aufnahme...</string>
+    <string name="recording_layout">Aufnahme&#8230;</string>
     <!-- Text shown for the action create new file -->
     <string name="create_new_file_action">Neue Datei erstellen</string>
     <!-- Error title shown when you are trying to do an action with a file or folder and you don’t have the necessary permissions -->
@@ -3449,7 +3447,7 @@
     <!-- Title of a screen to browse files -->
     <string name="browse_files_label">Dateibrowser</string>
     <!-- Title of the File Provider activity -->
-    <string name="file_provider_title">Hinzufügen von...</string>
+    <string name="file_provider_title">Hinzufügen von&#8230;</string>
     <!-- Title of an inactive chat which was recently created (today or yesterday). Placeholder is to show the specific creation day. e.g. Chat created today -->
     <string name="inactive_chat_title_2">Chat %s erstellt</string>
     <!-- Title of an inactive chat. Placeholder is to show the creation date and time -->
@@ -3557,7 +3555,7 @@
     <!-- Label of the floating action button of opening the new chat conversation -->
     <string name="fab_label_new_chat">Neuer Chat</string>
     <!-- Text that indicates that there’s no image to show in image section -->
-    <string name="homepage_empty_hint_photos">[B]No[/B] [A]Images[/A] [B]Found[/B]</string>
+    <string name="homepage_empty_hint_photos">[B]Keine[/B] [A]Bilder[/A] [B]vorhanden[/B]</string>
     <!-- Text that indicates that there’s no document to show -->
     <string name="homepage_empty_hint_documents">Keine Dokumente vorhanden</string>
     <!-- Text that indicates that there’s no audio to show -->
@@ -3780,7 +3778,7 @@
     <!-- Action discard -->
     <string name="discard_close_action">Löschen und schließen</string>
     <!-- Label indicating saving a file is in progress -->
-    <string name="saving_file">Datei wird gespeichert...</string>
+    <string name="saving_file">Datei wird gespeichert&#8230;</string>
     <!-- Label indicating a file was created successfully -->
     <string name="file_created">Datei erstellt</string>
     <!-- Warning indicating a file was not created successfully -->
@@ -3818,7 +3816,7 @@
     <!-- Settings hint that indicates the audio will still be played in background if the app is backgrounded -->
     <string name="settings_background_play_hint">Wiedergabe im Hintergrund</string>
     <!-- Text of the empty screen when there are no elements in Photos -->
-    <string name="photos_empty">[B]No[/B] [A]Photos[/A] [B]Found[/B]</string>
+    <string name="photos_empty">[B]Keine[/B] [A]Fotos[/A] [B]vorhanden[/B]</string>
     <!-- Text to show as subtitle of Enable camera uploads screen -->
     <string name="enable_cu_subtitle">Automatisches Backup Ihrer Fotos und Videos in Ihr Cloud Drive.</string>
     <!-- Text of a button on Camera Uploads section to show all the content of the section-->
@@ -4063,7 +4061,7 @@
     <!-- the content of snack bar when copied meeting link-->
     <string name="copied_meeting_link">Meetinglink kopiert.</string>
     <!-- Title of the layout to join a meeting from the chat screen. -->
-    <string name="join_meeting_layout_in_group_call">Tap to join current meeting.</string>
+    <string name="join_meeting_layout_in_group_call">Antippen, um dem laufenden Meeting beizutreten.</string>
     <!-- Title of fifth tour screen -->
     <string name="title_tour_five">MEGA-Meeting</string>
     <!-- Content of fourth tour screen -->
@@ -4135,17 +4133,17 @@
     <!-- Title of the dialog warning the user about disable file versioning. -->
     <string name="disable_versioning_label">Dateiversionierung deaktivieren</string>
     <!-- Warning of the dialog informing the user about disable file versioning. -->
-    <string name="disable_versioning_warning">Our file versioning feature ensures that we keep older copies of your files around if you replace them with newer versions. If you disable File Versioning you will no longer have this protection; the old copy will be lost when you replace it.</string>
+    <string name="disable_versioning_warning">Unsere Dateiversionierung speichert ältere Kopien Ihrer Dateien, wenn Sie sie durch neuere Versionen ersetzen. Wenn Sie die Dateiversionierung deaktivieren, haben Sie diese Sicherheit nicht mehr: Wenn Sie eine Datei überschreiben, geht die alte Version verloren.</string>
     <!-- Warning informing the user the folder location is trying to open no longer exists. -->
-    <string name="location_not_exist">This location no longer exists.</string>
+    <string name="location_not_exist">Dieser Speicherort existiert nicht mehr.</string>
     <!-- Warning shown informing the contact has been previously invited. The placeholder is to show the name of the contact. -->
-    <string name="contact_already_invited">You have already invited %1$s</string>
+    <string name="contact_already_invited">Sie haben %1$s bereits eingeladen</string>
     <!-- Warning shown informing the contact request has been sent and can be managed in sent requests section. -->
-    <string name="contact_invited">Invite sent successfully. See sent requests.</string>
+    <string name="contact_invited">Einladung erfolgreich versandt. Siehe Gesendete Anfragen.</string>
     <!-- Message when file available offline. -->
-    <string name="file_available_offline">File available Offline</string>
+    <string name="file_available_offline">Datei offline verfügbar</string>
     <!-- Message when file removed from offline. -->
-    <string name="file_removed_offline">File removed from Offline</string>
+    <string name="file_removed_offline">Datei nicht mehr offline verfügbar</string>
     <!-- Menu option to open a link. Also title of the dialog to open a link. -->
     <string name="action_open_link">Link öffnen</string>
     <!-- error message shown when a chat link is not well formed. -->
@@ -4172,4 +4170,63 @@
     <string name="settings_mobile_data_resoluton_title">Bei mobiler Datenverbindung hochauflösende Vorschaubilder anzeigen</string>
     <!-- summary for the settings to enable high resolution images when on mobile data -->
     <string name="settings_mobile_data_resoluton_summary">Originaldatei für ungezoomete Bildansicht verwenden. Das Deaktivieren dieser Option führt zu grobpixeliger Darstellung hochauflösender Bilder, bis Sie in sie hineinzoomen.</string>
+    <!-- If users want to move the root backup folder, all backups underneath it are disabled. Warning dialog will show to confirm -->
+    <string name="backup_move_root_folder">Sie sind dabei, den Speicherort eines Standard-Backup-Ordners zu ändern. Dies kann es Ihnen erschweren, Ihren Backup-Ordner später zu finden. Bitte merken Sie sich den Speicherort, damit Sie den Ordner in Zukunft wiederfinden.</string>
+    <!-- If users want to move the sub backup folder, all backups underneath it are disabled. Warning dialog will show to confirm -->
+    <string name="backup_move_sub_folder">Durch Verschieben dieses Ordners wird das Ziel einer oder mehrerer konfigurierter Backups geändert. Dies kann unbeabsichtigte Folgen haben. Die Backups werden zur Sicherheit deaktiviert. Sie können die Backups in der MEGA Desktop-App erneut aktivieren. Fortfahren?</string>
+    <!-- If users want to delete the root backup folder, all backups underneath it are disabled. Warning dialog will show to confirm -->
+    <string name="backup_remove_root_folder">Sie sind dabei, Ihren Backup-Ordner zu löschen. Dadurch werden alle eingerichteten Backups entfernt. Sind Sie sicher, dass Sie fortfahren möchten?</string>
+    <!-- If users want to delete the sub backup folder, all backups underneath it are disabled. Warning dialog will show to confirm -->
+    <string name="backup_remove_sub_folder">Möchten Sie Ihren Backup-Ordner wirklich löschen und das dazugehörige Backup deaktivieren?</string>
+    <!-- The title of warning dialog for single folder moving -->
+    <string name="backup_move_folder_title">„%1s“ verschieben</string>
+    <!-- The title of warning dialog for single folder deleting -->
+    <string name="backup_remove_folder_title">„%1s“ in den Papierkorb verschieben</string>
+    <!-- The title of warning dialog for multi-folder moving -->
+    <string name="backup_move_multiple_folder_title">Backup-Ordner verschieben</string>
+    <!-- The title of warning dialog for single folder deleting -->
+    <string name="backup_remove_multiple_folder_title">Backup-Ordner in den Papierkorb verschieben</string>
+    <!-- The confirm information of warning dialog for deleting -->
+    <string name="backup_disable_confirm">Backup deaktivieren</string>
+    <!-- The confirm information of warning dialog for moving "My backup" -->
+    <string name="backup_move_confirm">Backup verschieben</string>
+    <!-- The confirm information of warning dialog for deleting -->
+    <string name="backup_action_confirm">Bitte geben Sie „%1s“ ein, um diese Aktion zu bestätigen</string>
+    <!-- when checking the input -->
+    <string name="error_backup_confirm_dont_match">Der eingegebene Text ist nicht korrekt</string>
+    <!-- The title of confirm dialog for adding item to "My backup" -->
+    <string name="backup_add_confirm_title">Element zu „%1s“ hinzufügen</string>
+    <!-- The title of warning dialog for adding item to "My backup" -->
+    <string name="backup_add_item_title">Backup einrichten</string>
+    <!-- If users want to add items to the "My backup" folder, Warning dialog will show to confirm -->
+    <string name="backup_add_item_to_root_text">Damit die Elemente, die Sie Ihrem Backup-Ordner hinzugefügt haben, automatisch mit der MEGA Cloud synchronisiert werden, richten Sie sie bitte in der MEGA Desktop-App ein.</string>
+    <!-- If users want to share items in the "My backup" folder, Warning dialog will show to confirm -->
+    <string name="backup_share_permission_title">Nur lesen</string>
+    <!-- If users want to share items in the "My backup" folder, Warning dialog will show to confirm -->
+    <string name="backup_share_permission_text">Dieser Ordner kann nur schreibgeschützt freigegeben werden, da es sich um einen Backup-Ordner handelt. Änderungen am Inhalt des Ordners könnten dazu führen, dass das Backup deaktiviert wird.</string>
+    <!-- If users want to add items to the "My backup" device folder, Warning dialog will show to confirm -->
+    <string name="backup_add_item_text">Der Inhalt dieses Ordners ist Bestandteil eines konfigurierten Backups und wird mit einem lokalen Ordner synchronisiert. Durch diesen Vorgang wird die Synchronisierung abgebrochen und das Backup deaktiviert. Sie können das Backup in der MEGA Desktop-App erneut aktivieren. Fortfahren?</string>
+    <!-- Share multi backup folders, show below warning message -->
+    <string name="backup_multi_share_permission_text">Diese Ordner können nur schreibgeschützt freigegeben werden, da es sich um Backup-Ordner handelt. Änderungen am Inhalt der Ordner könnten dazu führen, dass die Backups deaktiviert werden.</string>
+    <!-- Share multi folders mix with backup and non-backup folders, show below warning message -->
+    <string name="backup_share_with_root_permission_text">Einige freigegebene Ordner sind Backup-Ordner und daher schreibgeschützt. Möchten Sie fortfahren?</string>
+    <!-- Indicates the content of the backup folder -->
+    <plurals name="num_devices">
+        <item quantity="one">%d Gerät</item>
+        <item quantity="other">%d Geräte</item>
+    </plurals>
+    <!-- Title of the button when you want to answer a one to one call -->
+    <string name="title_join_one_to_one_call">Annehmen</string>
+    <!-- Title of the menu when the select tracks on playlist page-->
+    <string name="title_select_tracks">Titel auswählen</string>
+    <!-- Action button to upload files. -->
+    <string name="upload_files">Dateien hochladen</string>
+    <!-- Action button to upload a folder. -->
+    <string name="upload_folder">Ordner hochladen</string>
+    <!-- Title of the dialog warning the user about cancel uploads. -->
+    <string name="cancel_uploads">Cancel uploads</string>
+    <!-- Warning alerting user if proceed with the action all the uploads will be cancelled. -->
+    <string name="cancel_uploads_warning">Wenn Sie den Upload unterbrechen, werden alle Ihre Uploads abgebrochen.</string>
+    <!-- Button to proceed with action. -->
+    <string name="action_proceed">Fortfahren</string>
 </resources>

@@ -96,6 +96,9 @@ class MyAccountInfo @Inject constructor(
 
     var upgradeOpenedFrom = UpgradeFrom.MANAGER
 
+    // Added the subscriptionMethodId parameter for subscription dialog
+    var subscriptionMethodId = -1
+
     /**
      * Resets all values by default.
      * It's mandatory to add here any new attribute included
@@ -202,6 +205,7 @@ class MyAccountInfo @Inject constructor(
             usedStorage = accountInfo.storageUsed
             usedFormatted = getSizeString(usedStorage)
             usedPercentage = 0
+            subscriptionMethodId = accountInfo.subscriptionMethodId
 
             if (totalStorage != 0L) {
                 usedPercentage = (100 * usedStorage / totalStorage).toInt()
@@ -401,8 +405,8 @@ class MyAccountInfo @Inject constructor(
 
             return Base64.encodeToString(encodeHash, Base64.DEFAULT)
         } catch (e: NoSuchAlgorithmException) {
-            e.printStackTrace();
-            logError("Generate obfuscated account Id failed.", e);
+            e.printStackTrace()
+            logError("Generate obfuscated account Id failed.", e)
         }
 
         return null

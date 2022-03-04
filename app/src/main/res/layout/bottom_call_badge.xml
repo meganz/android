@@ -4,18 +4,13 @@
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <RelativeLayout
-        android:id="@+id/rl_badge_call"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="top|center_horizontal"
-        android:layout_marginLeft="10dp">
         <ImageView
             android:id="@+id/badge_call_image"
-            android:layout_width="14dp"
-            android:layout_height="14dp"
-            android:layout_centerInParent="true"
+            android:layout_width="16dp"
+            android:layout_height="16dp"
+            android:layout_gravity="center"
+            android:layout_marginStart="14dp"
+            android:layout_marginBottom="12dp"
             app:srcCompat="@drawable/ic_bottom_navigation_ongoing_group_call_green"
             android:gravity="center" />
-    </RelativeLayout>
 </FrameLayout>

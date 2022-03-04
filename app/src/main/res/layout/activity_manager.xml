@@ -164,14 +164,15 @@
                 android:visibility="gone"
                 tools:visibility="visible" />
 
-            <com.ittianyu.bottomnavigationviewex.BottomNavigationViewEx
+            <com.google.android.material.bottomnavigation.BottomNavigationView
                 android:id="@+id/bottom_navigation_view"
                 style="@style/Widget.MaterialComponents.BottomNavigationView.PrimarySurface"
                 android:layout_width="match_parent"
                 android:layout_height="@dimen/bottom_navigation_view_height"
                 android:background="@color/grey_020_dark_grey"
                 app:itemIconTint="@drawable/bottom_navigation_item_tint"
-                app:menu="@menu/bottom_navigation_items" />
+                app:menu="@menu/bottom_navigation_items"
+                app:labelVisibilityMode="unlabeled"/>
 
         </LinearLayout>
 

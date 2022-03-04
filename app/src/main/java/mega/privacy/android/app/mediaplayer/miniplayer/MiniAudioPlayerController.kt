@@ -23,6 +23,7 @@ import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_REBUILD_PLAYLIS
  * @param playerView the ExoPlayer view
  * @param onPlayerVisibilityChanged a callback for mini player view visibility change
  */
+@Suppress("DEPRECATION")
 class MiniAudioPlayerController constructor(
     private val playerView: PlayerView,
     private val onPlayerVisibilityChanged: (() -> Unit)? = null,

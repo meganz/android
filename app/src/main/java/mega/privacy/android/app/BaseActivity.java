@@ -21,7 +21,7 @@ import static mega.privacy.android.app.constants.BroadcastConstants.OFFLINE_AVAI
 import static mega.privacy.android.app.constants.BroadcastConstants.SNACKBAR_TEXT;
 import static mega.privacy.android.app.constants.BroadcastConstants.TRANSFER_TYPE;
 import static mega.privacy.android.app.constants.BroadcastConstants.UPLOAD_TRANSFER;
-import static mega.privacy.android.app.lollipop.LoginFragmentLollipop.NAME_USER_LOCKED;
+import static mega.privacy.android.app.lollipop.LoginFragment.NAME_USER_LOCKED;
 import static mega.privacy.android.app.middlelayer.iab.BillingManager.RequestCode.REQ_CODE_BUY;
 import static mega.privacy.android.app.service.iab.BillingManagerImpl.SKU_PRO_III_YEAR;
 import static mega.privacy.android.app.service.iab.BillingManagerImpl.SKU_PRO_II_YEAR;
@@ -65,6 +65,7 @@ import static mega.privacy.android.app.utils.TimeUtils.createAndShowCountDownTim
 import static mega.privacy.android.app.utils.TimeUtils.getHumanizedTime;
 import static mega.privacy.android.app.utils.Util.dp2px;
 import static mega.privacy.android.app.utils.Util.getRootViewFromContext;
+import static mega.privacy.android.app.utils.Util.isAndroid11OrUpper;
 import static mega.privacy.android.app.utils.Util.isTopActivity;
 import static mega.privacy.android.app.utils.Util.setAppFontSize;
 import static mega.privacy.android.app.utils.Util.showErrorAlertDialog;
@@ -129,8 +130,8 @@ import mega.privacy.android.app.interfaces.ActivityLauncher;
 import mega.privacy.android.app.interfaces.PermissionRequester;
 import mega.privacy.android.app.interfaces.SnackbarShower;
 import mega.privacy.android.app.listeners.ChatLogoutListener;
-import mega.privacy.android.app.lollipop.LoginActivityLollipop;
-import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
+import mega.privacy.android.app.lollipop.LoginActivity;
+import mega.privacy.android.app.lollipop.ManagerActivity;
 import mega.privacy.android.app.meeting.activity.MeetingActivity;
 import mega.privacy.android.app.middlelayer.iab.BillingManager;
 import mega.privacy.android.app.middlelayer.iab.BillingUpdatesListener;
@@ -312,7 +313,7 @@ public class BaseActivity extends AppCompatActivity implements ActivityLauncher,
             } else if (this instanceof UpgradeAccountActivity) {
                 finish();
             } else if ((this instanceof MyAccountActivity && myAccountInfo.isUpgradeFromAccount())
-                    || (this instanceof ManagerActivityLollipop && myAccountInfo.isUpgradeFromManager())) {
+                    || (this instanceof ManagerActivity && myAccountInfo.isUpgradeFromManager())) {
                 purchaseType = (PurchaseType) type;
                 showQueryPurchasesResult();
             }
@@ -948,6 +949,8 @@ public class BaseActivity extends AppCompatActivity implements ActivityLauncher,
                 break;
 
             case DISMISS_ACTION_SNACKBAR:
+                TextView snackbarTextView = snackbar.getView().findViewById(com.google.android.material.R.id.snackbar_text);
+                snackbarTextView.setMaxLines(5);
                 snackbar.setAction(R.string.general_ok, new SnackbarNavigateOption(view.getContext(), type));
                 snackbar.show();
                 break;
@@ -1226,7 +1229,7 @@ public class BaseActivity extends AppCompatActivity implements ActivityLauncher,
      * Launches an intent to navigate to Login screen.
      */
     protected void navigateToLogin() {
-        Intent intent = new Intent(this, LoginActivityLollipop.class);
+        Intent intent = new Intent(this, LoginActivity.class);
         intent.putExtra(VISIBLE_FRAGMENT, LOGIN_FRAGMENT);
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         startActivity(intent);
@@ -1236,7 +1239,7 @@ public class BaseActivity extends AppCompatActivity implements ActivityLauncher,
      * Launches an intent to navigate to Upgrade Account screen.
      */
     public void navigateToUpgradeAccount() {
-        Intent intent = new Intent(this, ManagerActivityLollipop.class);
+        Intent intent = new Intent(this, ManagerActivity.class);
         intent.setAction(ACTION_SHOW_UPGRADE_ACCOUNT);
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         startActivity(intent);
@@ -1485,7 +1488,7 @@ public class BaseActivity extends AppCompatActivity implements ActivityLauncher,
      * @param path Download path to set as default location.
      */
     public void showConfirmationSaveInSameLocation(String path){
-        if (isAlertDialogShown(setDownloadLocationDialog)) {
+        if (isAndroid11OrUpper() || isAlertDialogShown(setDownloadLocationDialog)) {
             return;
         }
 

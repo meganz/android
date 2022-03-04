@@ -4,7 +4,6 @@ import android.content.ContentUris;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.Color;
 import android.provider.ContactsContract;
 import androidx.recyclerview.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -33,7 +32,7 @@ import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.AvatarUtil.*;
 import static mega.privacy.android.app.utils.FileUtil.*;
 
-public class InvitationContactsAdapter extends RecyclerView.Adapter<InvitationContactsAdapter.ViewHolderPhoneContactsLollipop> implements MegaRequestListenerInterface {
+public class InvitationContactsAdapter extends RecyclerView.Adapter<InvitationContactsAdapter.ViewHolderPhoneContacts> implements MegaRequestListenerInterface {
 
     private final static String IMAGE_EXTENSION = ".jpg";
     private final static int HEADER_HOLDER_ID = -1;
@@ -73,14 +72,14 @@ public class InvitationContactsAdapter extends RecyclerView.Adapter<InvitationCo
 
     }
 
-    public class ViewHolderPhoneContactsLollipop extends RecyclerView.ViewHolder implements View.OnClickListener {
+    public class ViewHolderPhoneContacts extends RecyclerView.ViewHolder implements View.OnClickListener {
         private RelativeLayout contactLayout;
         private TextView contactNameTextView, displayLabelTextView, headerTextView;
         private RoundedImageView imageView;
         private long contactId;
         private String contactName, displayLabel;
 
-        private ViewHolderPhoneContactsLollipop(View itemView) {
+        private ViewHolderPhoneContacts(View itemView) {
             super(itemView);
             itemView.setOnClickListener(this);
         }
@@ -141,7 +140,7 @@ public class InvitationContactsAdapter extends RecyclerView.Adapter<InvitationCo
     }
 
     @Override
-    public ViewHolderPhoneContactsLollipop onCreateViewHolder(ViewGroup parentView, int viewType) {
+    public ViewHolderPhoneContacts onCreateViewHolder(ViewGroup parentView, int viewType) {
         switch (viewType) {
             case TYPE_MEGA_CONTACT_HEADER:
             case TYPE_PHONE_CONTACT_HEADER:
@@ -154,7 +153,7 @@ public class InvitationContactsAdapter extends RecyclerView.Adapter<InvitationCo
     }
 
     @Override
-    public void onBindViewHolder(ViewHolderPhoneContactsLollipop holder, int position) {
+    public void onBindViewHolder(ViewHolderPhoneContacts holder, int position) {
         InvitationContactInfo contact = getItem(position);
         int type = contact.getType();
         switch (type) {
@@ -171,20 +170,20 @@ public class InvitationContactsAdapter extends RecyclerView.Adapter<InvitationCo
         }
     }
 
-    private ViewHolderPhoneContactsLollipop createHeaderHolder(ViewGroup parentView) {
+    private ViewHolderPhoneContacts createHeaderHolder(ViewGroup parentView) {
         logDebug("create Header Holder");
         View rowView = inflater.inflate(R.layout.contact_list_section_header, parentView, false);
-        ViewHolderPhoneContactsLollipop holder = new ViewHolderPhoneContactsLollipop(rowView);
+        ViewHolderPhoneContacts holder = new ViewHolderPhoneContacts(rowView);
         holder.headerTextView = rowView.findViewById(R.id.section_header);
         holder.contactId = HEADER_HOLDER_ID;
         rowView.setTag(holder);
         return holder;
     }
 
-    private ViewHolderPhoneContactsLollipop createContactHolder(ViewGroup parentView) {
+    private ViewHolderPhoneContacts createContactHolder(ViewGroup parentView) {
         logDebug("create Contact Holder");
         View rowView = inflater.inflate(R.layout.contact_explorer_item, parentView, false);
-        ViewHolderPhoneContactsLollipop holder = new ViewHolderPhoneContactsLollipop(rowView);
+        ViewHolderPhoneContacts holder = new ViewHolderPhoneContacts(rowView);
         holder.contactLayout = rowView.findViewById(R.id.contact_list_item_layout);
         holder.contactNameTextView = rowView.findViewById(R.id.contact_explorer_name);
         holder.displayLabelTextView = rowView.findViewById(R.id.contact_explorer_phone_mail);
@@ -193,11 +192,11 @@ public class InvitationContactsAdapter extends RecyclerView.Adapter<InvitationCo
         return holder;
     }
 
-    private void bindHeader(ViewHolderPhoneContactsLollipop holder, InvitationContactInfo contact) {
+    private void bindHeader(ViewHolderPhoneContacts holder, InvitationContactInfo contact) {
         holder.headerTextView.setText(contact.getName());
     }
 
-    private void bindContact(ViewHolderPhoneContactsLollipop holder, InvitationContactInfo contact, boolean isMegaContact) {
+    private void bindContact(ViewHolderPhoneContacts holder, InvitationContactInfo contact, boolean isMegaContact) {
         holder.displayLabel = contact.getDisplayInfo();
         holder.contactName = contact.getName();
         holder.contactId = contact.getId();

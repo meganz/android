@@ -1726,8 +1726,6 @@
     <string name="attachment_upload_panel_from_cloud">Dari Cloud Drive</string>
     <!--  -->
     <string name="attachment_upload_panel_contact">Kontak</string>
-    <!--  -->
-    <string name="attachment_upload_panel_photo">Dari perangkat</string>
     <!-- Button and title of dialog shown when the user wants to delete permanently their account. -->
     <string name="delete_account">Hapus akun</string>
     <!-- Text shown in the alert dialog to confirm the deletion of an account -->
@@ -4083,4 +4081,62 @@
     <string name="settings_mobile_data_resoluton_title">Gunakan data seluler untuk melihat pratinjau gambar resolusi tinggi</string>
     <!-- summary for the settings to enable high resolution images when on mobile data -->
     <string name="settings_mobile_data_resoluton_summary">Izinkan penggunaan data seluler untuk memuat gambar resolusi tinggi saat melihat pratinjau. Jika dinonaktifkan, gambar asli hanya akan dimuat saat anda memperbesar.</string>
+    <!-- If users want to move the root backup folder, all backups underneath it are disabled. Warning dialog will show to confirm -->
+    <string name="backup_move_root_folder">Anda mengubah lokasi folder cadangan default. Ini dapat memengaruhi kemampuan anda untuk menemukan folder cadangan di masa mendatang. Harap ingat di mana letaknya sehingga anda dapat menemukannya di masa depan.</string>
+    <!-- If users want to move the sub backup folder, all backups underneath it are disabled. Warning dialog will show to confirm -->
+    <string name="backup_move_sub_folder">Memindahkan folder ini akan mengubah tujuan dari satu atau beberapa cadangan yang dikonfigurasi dan mungkin memiliki konsekuensi yang tidak diinginkan. Pencadangan akan dimatikan demi keselamatan anda. Pencadangan dapat diaktifkan kembali dengan Aplikasi Desktop MEGA. Apakah anda ingin melanjutkan??</string>
+    <!-- If users want to delete the root backup folder, all backups underneath it are disabled. Warning dialog will show to confirm -->
+    <string name="backup_remove_root_folder">Anda menghapus folder cadangan anda. Ini akan menghapus semua cadangan yang telah anda atur. Apakah anda yakin ingin melakukan ini?</string>
+    <!-- If users want to delete the sub backup folder, all backups underneath it are disabled. Warning dialog will show to confirm -->
+    <string name="backup_remove_sub_folder">Apakah anda yakin ingin menghapus folder cadangan dan menonaktifkan cadangan terkait?</string>
+    <!-- The title of warning dialog for single folder moving -->
+    <string name="backup_move_folder_title">Pindahkan “%1s”</string>
+    <!-- The title of warning dialog for single folder deleting -->
+    <string name="backup_remove_folder_title">Pindahkan “%1s” ke Tempat Sampah</string>
+    <!-- The title of warning dialog for multi-folder moving -->
+    <string name="backup_move_multiple_folder_title">Pindahkan folder cadangan</string>
+    <!-- The title of warning dialog for single folder deleting -->
+    <string name="backup_remove_multiple_folder_title">Pindahkan folder cadangan ke Tempat Sampah</string>
+    <!-- The confirm information of warning dialog for deleting -->
+    <string name="backup_disable_confirm">Nonaktifkan cadangan</string>
+    <!-- The confirm information of warning dialog for moving "My backup" -->
+    <string name="backup_move_confirm">Pindahkan cadangan</string>
+    <!-- The confirm information of warning dialog for deleting -->
+    <string name="backup_action_confirm">Tolong ketik “%1s” untuk mengkonfirmasi tindakan ini</string>
+    <!-- when checking the input -->
+    <string name="error_backup_confirm_dont_match">teks yang dimasukkan tidak cocok</string>
+    <!-- The title of confirm dialog for adding item to "My backup" -->
+    <string name="backup_add_confirm_title">Tambahkan item ke “%1s”</string>
+    <!-- The title of warning dialog for adding item to "My backup" -->
+    <string name="backup_add_item_title">Siapkan cadangan</string>
+    <!-- If users want to add items to the "My backup" folder, Warning dialog will show to confirm -->
+    <string name="backup_add_item_to_root_text">Untuk memastikan item yang ditambahkan ke folder cadangan anda secara otomatis disinkronkan ke MEGA Cloud, silakan atur di Aplikasi Desktop MEGA.</string>
+    <!-- If users want to share items in the "My backup" folder, Warning dialog will show to confirm -->
+    <string name="backup_share_permission_title">Hanya-baca</string>
+    <!-- If users want to share items in the "My backup" folder, Warning dialog will show to confirm -->
+    <string name="backup_share_permission_text">Folder ini hanya dapat dibagikan sebagai hanya-baca; karena ini adalah folder cadangan, perubahan apa pun pada kontennya dapat menonaktifkan cadangan.</string>
+    <!-- If users want to add items to the "My backup" device folder, Warning dialog will show to confirm -->
+    <string name="backup_add_item_text">Item dalam folder ini adalah bagian dari cadangan yang dikonfigurasi dan disinkronkan ke folder lokal. Mengambil tindakan ini akan merusak sinkronisasi dan menonaktifkan pencadangan. Pencadangan dapat diaktifkan kembali dengan Aplikasi Desktop MEGA. Apakah anda yakin ingin melanjutkan??</string>
+    <!-- Share multi backup folders, show below warning message -->
+    <string name="backup_multi_share_permission_text">Folder ini hanya dapat dibagikan sebagai hanya-baca; karena merupakan folder cadangan, perubahan apa pun pada kontennya dapat menonaktifkan pencadangan.</string>
+    <!-- Share multi folders mix with backup and non-backup folders, show below warning message -->
+    <string name="backup_share_with_root_permission_text">Beberapa folder yang dibagikan adalah folder cadangan dan hanya-baca. Apakah anda ingin melanjutkan?</string>
+    <!-- Indicates the content of the backup folder -->
+    <plurals name="num_devices">
+        <item quantity="other">%d perangkat</item>
+    </plurals>
+    <!-- Title of the button when you want to answer a one to one call -->
+    <string name="title_join_one_to_one_call">Jawab panggilan</string>
+    <!-- Title of the menu when the select tracks on playlist page-->
+    <string name="title_select_tracks">Pilih trek</string>
+    <!-- Action button to upload files. -->
+    <string name="upload_files">Unggah berkas</string>
+    <!-- Action button to upload a folder. -->
+    <string name="upload_folder">Unggah folder</string>
+    <!-- Title of the dialog warning the user about cancel uploads. -->
+    <string name="cancel_uploads">Batalkan unggahan</string>
+    <!-- Warning alerting user if proceed with the action all the uploads will be cancelled. -->
+    <string name="cancel_uploads_warning">Mengganggu proses unggahan akan mengakibatkan semua unggahan anda dibatalkan.</string>
+    <!-- Button to proceed with action. -->
+    <string name="action_proceed">Melanjutkan</string>
 </resources>

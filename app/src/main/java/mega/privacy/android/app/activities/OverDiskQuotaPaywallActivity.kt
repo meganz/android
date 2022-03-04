@@ -19,7 +19,7 @@ import mega.privacy.android.app.constants.IntentConstants.Companion.EXTRA_ACCOUN
 import mega.privacy.android.app.constants.IntentConstants.Companion.EXTRA_ASK_PERMISSIONS
 import mega.privacy.android.app.constants.IntentConstants.Companion.EXTRA_UPGRADE_ACCOUNT
 import mega.privacy.android.app.globalmanagement.MyAccountInfo
-import mega.privacy.android.app.lollipop.ManagerActivityLollipop
+import mega.privacy.android.app.lollipop.ManagerActivity
 import mega.privacy.android.app.myAccount.usecase.GetUserDataUseCase
 
 import mega.privacy.android.app.utils.ColorUtils
@@ -104,7 +104,7 @@ class OverDiskQuotaPaywallActivity : PasscodeActivity(), View.OnClickListener{
                     if (dbH?.preferences?.firstTime != null) {
                         askPermissions = dbH?.preferences?.firstTime?.toBoolean()
                     }
-                    val intent = Intent(applicationContext, ManagerActivityLollipop::class.java)
+                    val intent = Intent(applicationContext, ManagerActivity::class.java)
                             .putExtra(EXTRA_ASK_PERMISSIONS, askPermissions)
                     startActivity(intent)
                 }
@@ -113,7 +113,7 @@ class OverDiskQuotaPaywallActivity : PasscodeActivity(), View.OnClickListener{
             R.id.upgrade_button -> {
                 logInfo("Starting upgrade process after Over Disk Quota Paywall")
 
-                val intent = Intent(applicationContext, ManagerActivityLollipop::class.java)
+                val intent = Intent(applicationContext, ManagerActivity::class.java)
                         .putExtra(EXTRA_UPGRADE_ACCOUNT, true)
                         .putExtra(EXTRA_ACCOUNT_TYPE, proPlanNeeded)
                 startActivity(intent)

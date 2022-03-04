@@ -79,7 +79,7 @@ import java.util.Collections;
 import java.util.List;
 
 import mega.privacy.android.app.R;
-import mega.privacy.android.app.lollipop.PdfViewerActivityLollipop;
+import mega.privacy.android.app.lollipop.PdfViewerActivity;
 
 import static mega.privacy.android.app.utils.LogUtil.logError;
 import static mega.privacy.android.app.utils.Util.*;
@@ -114,7 +114,7 @@ public class PDFView extends RelativeLayout {
     private float midZoom = DEFAULT_MID_SCALE;
     private float maxZoom = DEFAULT_MAX_SCALE;
 
-    private PdfViewerActivityLollipop pdfViewer;
+    private PdfViewerActivity pdfViewer;
 
     /**
      * START - scrolling in first page direction
@@ -218,10 +218,7 @@ public class PDFView extends RelativeLayout {
     private boolean annotationRendering = false;
 
     /**
-     * True if the view should render during scaling<br/>
-     * Can not be forced on older API versions (< Build.VERSION_CODES.KITKAT) as the GestureDetector does
-     * not detect scrolling while scaling.<br/>
-     * False otherwise
+     * True if the view should render during scaling and False if otherwise
      */
     private boolean renderDuringScale = false;
 
@@ -240,7 +237,7 @@ public class PDFView extends RelativeLayout {
     public PDFView(Context context, AttributeSet set) {
         super(context, set);
 
-        pdfViewer = (PdfViewerActivityLollipop) getContext();
+        pdfViewer = (PdfViewerActivity) getContext();
 
         renderingHandlerThread = new HandlerThread("PDF renderer");
 

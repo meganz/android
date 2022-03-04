@@ -8,16 +8,12 @@ import androidx.fragment.app.viewModels
 import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.R
 import mega.privacy.android.app.databinding.FragmentImagesBinding
-import mega.privacy.android.app.fragments.homepage.*
-import mega.privacy.android.app.fragments.managerFragments.cu.*
-import mega.privacy.android.app.fragments.managerFragments.cu.PhotosFragment.*
 import mega.privacy.android.app.gallery.data.GalleryItem
 import mega.privacy.android.app.gallery.fragment.BaseZoomFragment
-import mega.privacy.android.app.lollipop.ManagerActivityLollipop
+import mega.privacy.android.app.lollipop.ManagerActivity
 import mega.privacy.android.app.utils.*
 import mega.privacy.android.app.utils.Constants.*
 import nz.mega.sdk.MegaApiJava.ORDER_MODIFICATION_DESC
-import java.util.*
 
 @AndroidEntryPoint
 class ImagesFragment : BaseZoomFragment() {
@@ -140,13 +136,13 @@ class ImagesFragment : BaseZoomFragment() {
     fun loadPhotos() = viewModel.loadPhotos(true)
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
-        if (activity as ManagerActivityLollipop? != null && (activity as ManagerActivityLollipop?)!!.isInImagesPage) {
+        if (activity as ManagerActivity? != null && (activity as ManagerActivity?)!!.isInImagesPage) {
             super.onCreateOptionsMenu(menu, inflater)
         }
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        if (activity as ManagerActivityLollipop? != null && (activity as ManagerActivityLollipop?)!!.isInImagesPage) {
+        if (activity as ManagerActivity? != null && (activity as ManagerActivity?)!!.isInImagesPage) {
             return super.onOptionsItemSelected(item)
         }
         return true

@@ -31,7 +31,7 @@ import mega.privacy.android.app.components.dragger.DragThumbnailGetter;
 import mega.privacy.android.app.components.scrollBar.SectionTitleProvider;
 import mega.privacy.android.app.fragments.homepage.main.HomepageFragment;
 import mega.privacy.android.app.fragments.homepage.main.HomepageFragmentDirections;
-import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
+import mega.privacy.android.app.lollipop.ManagerActivity;
 import mega.privacy.android.app.utils.ColorUtils;
 import mega.privacy.android.app.utils.Util;
 import mega.privacy.android.app.fragments.recent.RecentsFragment;
@@ -347,11 +347,11 @@ public class RecentsAdapter extends RecyclerView.Adapter<RecentsAdapter.ViewHold
         switch (v.getId()) {
             case R.id.three_dots: {
                 if (!isOnline(context)) {
-                    ((ManagerActivityLollipop) context).showSnackbar(SNACKBAR_TYPE, context.getString(R.string.error_server_connection_problem), -1);
+                    ((ManagerActivity) context).showSnackbar(SNACKBAR_TYPE, context.getString(R.string.error_server_connection_problem), -1);
                     break;
                 }
                 if (node != null) {
-                    ((ManagerActivityLollipop) context).showNodeOptionsPanel(node, MODE6);
+                    ((ManagerActivity) context).showNodeOptionsPanel(node, MODE6);
                 }
                 break;
             }

@@ -1726,8 +1726,6 @@
     <string name="attachment_upload_panel_from_cloud">從雲端空間</string>
     <!--  -->
     <string name="attachment_upload_panel_contact">聯絡人</string>
-    <!--  -->
-    <string name="attachment_upload_panel_photo">從裝置</string>
     <!-- Button and title of dialog shown when the user wants to delete permanently their account. -->
     <string name="delete_account">刪除帳戶</string>
     <!-- Text shown in the alert dialog to confirm the deletion of an account -->
@@ -4083,4 +4081,62 @@
     <string name="settings_mobile_data_resoluton_title">使用行動數據預覽高解析度影像</string>
     <!-- summary for the settings to enable high resolution images when on mobile data -->
     <string name="settings_mobile_data_resoluton_summary">允許預覽時使用行動數據載入高解析度影像。如果停用，則只有在放大檢視時才會載入原始尺寸影像。</string>
+    <!-- If users want to move the root backup folder, all backups underneath it are disabled. Warning dialog will show to confirm -->
+    <string name="backup_move_root_folder">您正在更改預設備份資料夾位置。這可能會影響您將來查找備份資料夾。所以請記住它的位置以便將來可以找到它。</string>
+    <!-- If users want to move the sub backup folder, all backups underneath it are disabled. Warning dialog will show to confirm -->
+    <string name="backup_move_sub_folder">移動此資料夾會更改一個或多個已設定備份的目的地，並可能導致不可預期情況。為了安全起見，備份將停止。您可以透過MEGA桌面應用程式重新啟用備份。您確定要繼續嗎？</string>
+    <!-- If users want to delete the root backup folder, all backups underneath it are disabled. Warning dialog will show to confirm -->
+    <string name="backup_remove_root_folder">您正在刪除您的備份資料夾。這將刪除您設定的所有備份。你確定要這麼做嗎？</string>
+    <!-- If users want to delete the sub backup folder, all backups underneath it are disabled. Warning dialog will show to confirm -->
+    <string name="backup_remove_sub_folder">您確定要刪除您的備份資料夾並且停用相關的備份嗎？</string>
+    <!-- The title of warning dialog for single folder moving -->
+    <string name="backup_move_folder_title">移動“%1s”</string>
+    <!-- The title of warning dialog for single folder deleting -->
+    <string name="backup_remove_folder_title">移動“%1s”至垃圾筒</string>
+    <!-- The title of warning dialog for multi-folder moving -->
+    <string name="backup_move_multiple_folder_title">移動備份資料夾</string>
+    <!-- The title of warning dialog for single folder deleting -->
+    <string name="backup_remove_multiple_folder_title">移動備份資料夾至垃圾筒</string>
+    <!-- The confirm information of warning dialog for deleting -->
+    <string name="backup_disable_confirm">停用備份</string>
+    <!-- The confirm information of warning dialog for moving "My backup" -->
+    <string name="backup_move_confirm">移動備份</string>
+    <!-- The confirm information of warning dialog for deleting -->
+    <string name="backup_action_confirm">請輸入“%1s”確認此操作</string>
+    <!-- when checking the input -->
+    <string name="error_backup_confirm_dont_match">輸入的文字不符</string>
+    <!-- The title of confirm dialog for adding item to "My backup" -->
+    <string name="backup_add_confirm_title">新增項目到“%1s”</string>
+    <!-- The title of warning dialog for adding item to "My backup" -->
+    <string name="backup_add_item_title">設定備份</string>
+    <!-- If users want to add items to the "My backup" folder, Warning dialog will show to confirm -->
+    <string name="backup_add_item_to_root_text">為確保加到您備份資料夾的這些項目有自動同步到MEGA雲端，請在MEGA桌面應用程式上進行設定。</string>
+    <!-- If users want to share items in the "My backup" folder, Warning dialog will show to confirm -->
+    <string name="backup_share_permission_title">僅能讀取</string>
+    <!-- If users want to share items in the "My backup" folder, Warning dialog will show to confirm -->
+    <string name="backup_share_permission_text">因為這是一個備份資料夾，所以只能以讀取權限進行共享，變更當中任何內容可能會停用備份。</string>
+    <!-- If users want to add items to the "My backup" device folder, Warning dialog will show to confirm -->
+    <string name="backup_add_item_text">此資料夾中的項目是備份設定中的一部份而且已同步至本機資料夾。執行此操作將中斷同步並停用備份。您可以透過MEGA桌面應用程式重新啟用備份。您確定要繼續嗎？</string>
+    <!-- Share multi backup folders, show below warning message -->
+    <string name="backup_multi_share_permission_text">因為這些是備份資料夾，所以只能以讀取權限進行共享，變更當中任何內容可能會停用備份。</string>
+    <!-- Share multi folders mix with backup and non-backup folders, show below warning message -->
+    <string name="backup_share_with_root_permission_text">某些共享資料夾是備份資料夾而且只能讀取。您確定要繼續嗎？</string>
+    <!-- Indicates the content of the backup folder -->
+    <plurals name="num_devices">
+        <item quantity="other">%d個裝置</item>
+    </plurals>
+    <!-- Title of the button when you want to answer a one to one call -->
+    <string name="title_join_one_to_one_call">接聽來電</string>
+    <!-- Title of the menu when the select tracks on playlist page-->
+    <string name="title_select_tracks">選擇曲目</string>
+    <!-- Action button to upload files. -->
+    <string name="upload_files">上傳檔案</string>
+    <!-- Action button to upload a folder. -->
+    <string name="upload_folder">上傳資料夾</string>
+    <!-- Title of the dialog warning the user about cancel uploads. -->
+    <string name="cancel_uploads">取消上傳</string>
+    <!-- Warning alerting user if proceed with the action all the uploads will be cancelled. -->
+    <string name="cancel_uploads_warning">中斷上傳程序將導致您所有的上傳被取消。</string>
+    <!-- Button to proceed with action. -->
+    <string name="action_proceed">繼續</string>
 </resources>

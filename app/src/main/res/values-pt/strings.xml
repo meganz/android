@@ -1761,8 +1761,6 @@
     <string name="attachment_upload_panel_from_cloud">Da Nuvem de arquivos</string>
     <!--  -->
     <string name="attachment_upload_panel_contact">Contato</string>
-    <!--  -->
-    <string name="attachment_upload_panel_photo">Do seu dispositivo</string>
     <!-- Button and title of dialog shown when the user wants to delete permanently their account. -->
     <string name="delete_account">Excluir conta</string>
     <!-- Text shown in the alert dialog to confirm the deletion of an account -->
@@ -4172,4 +4170,63 @@
     <string name="settings_mobile_data_resoluton_title">Permitir o uso de dados móveis para visualizar imagens de alta resolução</string>
     <!-- summary for the settings to enable high resolution images when on mobile data -->
     <string name="settings_mobile_data_resoluton_summary">Permitir o uso de dados móveis para carregar imagens de alta resolução durante a visualização. Se esta opção for desativada, a imagem original só será carregada quando você aumentar o zoom.</string>
+    <!-- If users want to move the root backup folder, all backups underneath it are disabled. Warning dialog will show to confirm -->
+    <string name="backup_move_root_folder">Você está a ponto de alterar a localização de uma pasta de backup predeterminada. Ao fazer isso, você poderá ter dificuldades para localizar esta pasta de backup. Assegure-se de lembrar onde ela está localizada para poder encontrá-la no futuro.</string>
+    <!-- If users want to move the sub backup folder, all backups underneath it are disabled. Warning dialog will show to confirm -->
+    <string name="backup_move_sub_folder">Mover esta pasta altera o destino de um ou mais backups configurados e pode ter consequências não intencionais. Os backups serão desativados para a sua segurança. Os backups podem ser reativados com o Aplicativo do MEGA para Desktop. Você quer continuar?</string>
+    <!-- If users want to delete the root backup folder, all backups underneath it are disabled. Warning dialog will show to confirm -->
+    <string name="backup_remove_root_folder">Você está a ponto de excluir a sua pasta de backup. Ao fazer isso, serão removidos todos os backups que você configurou. Você tem certeza de que quer fazer isso?</string>
+    <!-- If users want to delete the sub backup folder, all backups underneath it are disabled. Warning dialog will show to confirm -->
+    <string name="backup_remove_sub_folder">Você tem certeza de que quer excluir a sua pasta de backup e desativar o backup associado a ela?</string>
+    <!-- The title of warning dialog for single folder moving -->
+    <string name="backup_move_folder_title">Mover “%1s”</string>
+    <!-- The title of warning dialog for single folder deleting -->
+    <string name="backup_remove_folder_title">Mover “%1s” à Lixeira</string>
+    <!-- The title of warning dialog for multi-folder moving -->
+    <string name="backup_move_multiple_folder_title">Mover pastas de backup</string>
+    <!-- The title of warning dialog for single folder deleting -->
+    <string name="backup_remove_multiple_folder_title">Mover as pastas de backup para a Lixeira</string>
+    <!-- The confirm information of warning dialog for deleting -->
+    <string name="backup_disable_confirm">Desativar backup</string>
+    <!-- The confirm information of warning dialog for moving "My backup" -->
+    <string name="backup_move_confirm">Mover backup</string>
+    <!-- The confirm information of warning dialog for deleting -->
+    <string name="backup_action_confirm">Digite “%1s” para confirmar</string>
+    <!-- when checking the input -->
+    <string name="error_backup_confirm_dont_match">O texto digitado não corresponde</string>
+    <!-- The title of confirm dialog for adding item to "My backup" -->
+    <string name="backup_add_confirm_title">Adicionar este item a “%1s”</string>
+    <!-- The title of warning dialog for adding item to "My backup" -->
+    <string name="backup_add_item_title">Configurar o backup</string>
+    <!-- If users want to add items to the "My backup" folder, Warning dialog will show to confirm -->
+    <string name="backup_add_item_to_root_text">Para garantir que esses itens adicionados à sua pasta de backup sejam sincronizados automaticamente com a Nuvem do MEGA, por favor, configure-os no Aplicativo do MEGA para Desktop.</string>
+    <!-- If users want to share items in the "My backup" folder, Warning dialog will show to confirm -->
+    <string name="backup_share_permission_title">Somente leitura</string>
+    <!-- If users want to share items in the "My backup" folder, Warning dialog will show to confirm -->
+    <string name="backup_share_permission_text">Esta pasta só pode ser compartilhada como somente leitura porque é uma pasta de backup. Qualquer alteração no seu conteúdo pode desativar o backup.</string>
+    <!-- If users want to add items to the "My backup" device folder, Warning dialog will show to confirm -->
+    <string name="backup_add_item_text">Os itens nessa pasta fazem parte de um backup configurado e são sincronizados com uma pasta local. Esta ação interromperá a sincronização e desativará o backup. O backup pode ser reativado com o Aplicativo do MEGA para Desktop. Você tem certeza de que quer continuar?</string>
+    <!-- Share multi backup folders, show below warning message -->
+    <string name="backup_multi_share_permission_text">Essas pastas só podem ser compartilhadas como somente leitura porque são pastas de backup. Qualquer alteração no seu conteúdo pode desativar o backup.</string>
+    <!-- Share multi folders mix with backup and non-backup folders, show below warning message -->
+    <string name="backup_share_with_root_permission_text">Algumas das pastas compartilhadas são pastas de backup e, portanto, somente leitura. Você quer continuar?</string>
+    <!-- Indicates the content of the backup folder -->
+    <plurals name="num_devices">
+        <item quantity="one">%d dispositivo</item>
+        <item quantity="other">%d dispositivos</item>
+    </plurals>
+    <!-- Title of the button when you want to answer a one to one call -->
+    <string name="title_join_one_to_one_call">Atender chamada</string>
+    <!-- Title of the menu when the select tracks on playlist page-->
+    <string name="title_select_tracks">Selecionar faixas</string>
+    <!-- Action button to upload files. -->
+    <string name="upload_files">Enviar arquivos</string>
+    <!-- Action button to upload a folder. -->
+    <string name="upload_folder">Enviar pasta</string>
+    <!-- Title of the dialog warning the user about cancel uploads. -->
+    <string name="cancel_uploads">Cancelar uploads</string>
+    <!-- Warning alerting user if proceed with the action all the uploads will be cancelled. -->
+    <string name="cancel_uploads_warning">A interrupção do processo de upload resultará no cancelamento de todos os seus uploads.</string>
+    <!-- Button to proceed with action. -->
+    <string name="action_proceed">Continuar</string>
 </resources>

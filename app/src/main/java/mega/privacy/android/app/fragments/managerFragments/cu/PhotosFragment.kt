@@ -2,13 +2,21 @@ package mega.privacy.android.app.fragments.managerFragments.cu
 
 import android.Manifest
 import android.app.Activity
+import android.content.DialogInterface
+import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.view.*
+import androidx.activity.result.ActivityResult
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.appcompat.app.AlertDialog
 import androidx.core.text.HtmlCompat
 import androidx.core.view.isVisible
 import androidx.fragment.app.viewModels
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
@@ -16,16 +24,18 @@ import mega.privacy.android.app.components.ListenScrollChangesHelper
 import mega.privacy.android.app.databinding.FragmentPhotosBinding
 import mega.privacy.android.app.gallery.data.GalleryItem
 import mega.privacy.android.app.gallery.fragment.BaseZoomFragment
-import mega.privacy.android.app.lollipop.ManagerActivityLollipop
+import mega.privacy.android.app.jobservices.CameraUploadsService
+import mega.privacy.android.app.lollipop.FileStorageActivity
+import mega.privacy.android.app.lollipop.ManagerActivity
 import mega.privacy.android.app.utils.*
 import mega.privacy.android.app.utils.ColorUtils.DARK_IMAGE_ALPHA
 import mega.privacy.android.app.utils.ColorUtils.setImageViewAlphaIfDark
 import mega.privacy.android.app.utils.Constants.PHOTO_SYNC_ADAPTER
+import mega.privacy.android.app.utils.LogUtil.logDebug
 import mega.privacy.android.app.utils.ZoomUtil.PHOTO_ZOOM_LEVEL
 import mega.privacy.android.app.utils.permission.PermissionUtils.hasPermissions
 import mega.privacy.android.app.utils.permission.PermissionUtils.requestPermission
 import nz.mega.sdk.MegaChatApiJava
-import java.util.*
 
 @AndroidEntryPoint
 class PhotosFragment : BaseZoomFragment() {
@@ -39,9 +49,44 @@ class PhotosFragment : BaseZoomFragment() {
      */
     private var order = 0
 
+    private var alertDialog: AlertDialog? = null
+    private var dialogIsShowing = false
+
+    private lateinit var startForResult: ActivityResultLauncher<Intent>
+
+    companion object {
+        private const val DIALOG_IS_SHOWING = "DIALOG_IS_SHOWING"
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         order = viewModel.getOrder()
+        if (savedInstanceState != null) {
+            dialogIsShowing = savedInstanceState.getBoolean(
+                DIALOG_IS_SHOWING,
+                false
+            )
+        }
+
+        startForResult =
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result: ActivityResult ->
+            if (result.resultCode == Activity.RESULT_OK) {
+                logDebug("resultCode = ${result.resultCode}")
+                setCameraUploadLocalPath(result)
+                startCU()
+            } else {
+                // Set false to unblock the camera upload service
+                CameraUploadsService.setInCameraUploadsSetting(false)
+            }
+        }
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        outState.putBoolean(
+            DIALOG_IS_SHOWING,
+            dialogIsShowing
+        )
+        super.onSaveInstanceState(outState)
     }
 
     override fun onCreateView(
@@ -85,7 +130,7 @@ class PhotosFragment : BaseZoomFragment() {
             0
         }
 
-        isEnableCUFragmentShown() -> {
+        isEnablePhotosFragmentShown() -> {
             skipCUSetup()
             1
         }
@@ -122,9 +167,8 @@ class PhotosFragment : BaseZoomFragment() {
             binding.fragmentPhotosFirstLogin.cellularConnectionSwitch.isChecked,
             binding.fragmentPhotosFirstLogin.uploadVideosSwitch.isChecked
         )
-        mManagerActivity.isFirstLogin = false
-        viewModel.setEnableCUShown(false)
-        startCU()
+
+        showCameraUploadSettingDialog()
     }
 
     private fun startCU() {
@@ -133,16 +177,54 @@ class PhotosFragment : BaseZoomFragment() {
         }
 
         Handler(Looper.getMainLooper()).postDelayed({
-            LogUtil.logDebug("Starting CU")
+            logDebug("Starting CU")
             JobUtil.startCameraUploadService(context)
         }, 1000)
+    }
+
+    /**
+     * Set the local path for camera uploading
+     *
+     * @param result An instance obtained form Activity.onActivityResult that contains the path info
+     */
+    private fun setCameraUploadLocalPath(result: ActivityResult) {
+        val prefs = dbH.preferences
+        // Set false to unblock the camera upload service
+        CameraUploadsService.setInCameraUploadsSetting(false)
+
+        if (result.data != null) {
+            // Set isFirstLogin to false after selecting a folder for upload
+            mManagerActivity.isFirstLogin = false
+            viewModel.setEnableCUShown(false)
+
+            val cameraPath: String? =
+                result.data?.getStringExtra(FileStorageActivity.EXTRA_PATH)
+
+            cameraPath?.let {
+                val isExternalSDCardCU = SDCardUtils.isLocalFolderOnSDCard(
+                    context,
+                    cameraPath
+                ) && !FileUtil.isBasedOnFileStorage()
+
+                val camSyncLocalPath =
+                    if (isExternalSDCardCU) SDCardUtils.getSDCardDirName(
+                        Uri.parse(
+                            prefs.uriExternalSDCard
+                        )
+                    ) else cameraPath
+
+                prefs.camSyncLocalPath = camSyncLocalPath
+                dbH.setCamSyncLocalPath(camSyncLocalPath)
+                dbH.setCamSyncEnabled(true)
+            }
+        }
     }
 
     /**
      * Refresh view and layout after CU enabled or disabled.
      */
     fun refreshViewLayout() {
-        if (isEnableCUFragmentShown()) {
+        if (isEnablePhotosFragmentShown()) {
             showEnablePage()
             createCameraUploadsViewForFirstLogin()
         } else {
@@ -212,6 +294,8 @@ class PhotosFragment : BaseZoomFragment() {
                 binding.fragmentPhotosFirstLogin.qualityText.visibility =
                     if (isChecked) View.VISIBLE else View.GONE
             }
+
+            setupCameraUploadDialog()
             handlePhotosMenuUpdate(false)
             return
         }
@@ -227,6 +311,15 @@ class PhotosFragment : BaseZoomFragment() {
         setupTimePanel()
         setupListAdapter(currentZoom, viewModel.items.value)
         subscribeObservers()
+    }
+
+    /**
+     * Check the status of dialog and show it when needed.
+     */
+    private fun setupCameraUploadDialog() {
+        if (dialogIsShowing) {
+            showCameraUploadSettingDialog()
+        }
     }
 
     private fun setupBinding() {
@@ -262,7 +355,7 @@ class PhotosFragment : BaseZoomFragment() {
     private fun subscribeObservers() {
         viewModel.items.observe(viewLifecycleOwner) {
             // On enable CU page, don't update layout and view.
-            if (isEnableCUFragmentShown() || !mManagerActivity.isInPhotosPage) return@observe
+            if (isEnablePhotosFragmentShown() || !mManagerActivity.isInPhotosPage) return@observe
 
             // Order changed.
             if (order != viewModel.getOrder()) {
@@ -287,9 +380,10 @@ class PhotosFragment : BaseZoomFragment() {
         }
 
         viewModel.camSyncEnabled().observe(
-            viewLifecycleOwner, {
-                updateEnableCUButtons(cuEnabled = it)
-            })
+            viewLifecycleOwner
+        ) {
+            updateEnableCUButtons(cuEnabled = it)
+        }
     }
 
     /**
@@ -323,10 +417,10 @@ class PhotosFragment : BaseZoomFragment() {
     private fun isShowMenu() =
         gridAdapterHasData() && actionMode == null && selectedView == ALL_VIEW && !viewModel.isEnableCUShown()
 
-    fun isEnableCUFragmentShown() = viewModel.isEnableCUShown()
+    fun isEnablePhotosFragmentShown() = viewModel.isEnableCUShown()
 
     fun shouldShowFullInfoAndOptions() =
-        !isEnableCUFragmentShown() && selectedView == ALL_VIEW
+        !isEnablePhotosFragmentShown() && selectedView == ALL_VIEW
 
     /**
      * First make all the buttons unselected,
@@ -430,7 +524,7 @@ class PhotosFragment : BaseZoomFragment() {
     }
 
     fun isInPhotosPage(): Boolean {
-        return activity as ManagerActivityLollipop? != null && (activity as ManagerActivityLollipop?)!!.isInPhotosPage
+        return activity as ManagerActivity? != null && (activity as ManagerActivity?)!!.isInPhotosPage
     }
 
     private fun handlePhotosMenuUpdate(isShowMenu: Boolean) {
@@ -441,4 +535,66 @@ class PhotosFragment : BaseZoomFragment() {
     }
 
     override fun getOrder() = viewModel.getOrder()
+
+    /**
+     * Show the dialog that can direct to the Camera Upload settings.
+     */
+    private fun showCameraUploadSettingDialog() {
+        // Set true to block the camera upload service
+        CameraUploadsService.setInCameraUploadsSetting(true)
+
+        if (alertDialog != null) {
+            alertDialog?.show()
+            dialogIsShowing = true
+        } else {
+            alertDialog = MaterialAlertDialogBuilder(requireContext())
+                .setTitle(R.string.title_dcim_folder_dialog)
+                .setMessage(R.string.content_dcim_folder_dialog)
+                .setPositiveButton(R.string.button_continue) { dialog, _ ->
+                    enableCameraUpload(
+                        dialog,
+                        false
+                    )
+                }
+                .setNegativeButton(R.string.general_select_to_download) { dialog, _ ->
+                    enableCameraUpload(
+                        dialog,
+                        true
+                    )
+                }
+                .create()
+                .also {
+                    it.show()
+                    it.setCanceledOnTouchOutside(false)
+                    dialogIsShowing = true
+                }
+        }
+    }
+
+    /**
+     * Enable camera upload
+     *
+     * @param dialog The dialog that was dismissed will be passed into the method
+     * @param needSettings Need redirect to Settings or not
+     */
+    private fun enableCameraUpload(dialog: DialogInterface, needSettings: Boolean) {
+        if (needSettings) {
+            val intent = Intent(activity, FileStorageActivity::class.java)
+            intent.action = FileStorageActivity.Mode.PICK_FOLDER.action
+            intent.putExtra(
+                FileStorageActivity.PICK_FOLDER_TYPE,
+                FileStorageActivity.PickFolderType.CU_FOLDER.folderType
+            )
+            startForResult.launch(intent)
+        } else {
+            // Set isFirstLogin to false when the user cancels the dialog, then start uploading
+            mManagerActivity.isFirstLogin = false
+            viewModel.setEnableCUShown(false)
+            CameraUploadsService.setInCameraUploadsSetting(false)
+            startCU()
+        }
+        dialog.dismiss()
+        dialogIsShowing = false
+    }
+
 }

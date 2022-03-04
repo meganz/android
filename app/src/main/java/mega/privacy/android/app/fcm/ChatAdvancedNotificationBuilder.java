@@ -13,7 +13,6 @@ import android.media.Ringtone;
 import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Build;
-import android.service.notification.StatusBarNotification;
 import android.view.View;
 import android.widget.RemoteViews;
 
@@ -31,10 +30,11 @@ import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.listeners.GetPeerAttributesListener;
-import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
+import mega.privacy.android.app.lollipop.ManagerActivity;
 import mega.privacy.android.app.lollipop.controllers.ChatController;
 import mega.privacy.android.app.lollipop.megachat.ChatSettings;
 import mega.privacy.android.app.meeting.CallNotificationIntentService;
+import mega.privacy.android.app.meeting.activity.MeetingActivity;
 import mega.privacy.android.app.utils.CallUtil;
 import mega.privacy.android.app.utils.StringResourcesUtils;
 import nz.mega.sdk.MegaApiAndroid;
@@ -187,11 +187,11 @@ public final class ChatAdvancedNotificationBuilder {
         PendingIntent pendingIntent = null;
 
         if (chats.size() > 1) {
-            Intent intent = new Intent(context, ManagerActivityLollipop.class);
+            Intent intent = new Intent(context, ManagerActivity.class);
             intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
             intent.setAction(ACTION_CHAT_SUMMARY);
             intent.putExtra(CHAT_ID, MEGACHAT_INVALID_HANDLE);
-            pendingIntent = PendingIntent.getActivity(context, (int) chats.get(0).getChatId(), intent, PendingIntent.FLAG_ONE_SHOT);
+            pendingIntent = PendingIntent.getActivity(context, (int) chats.get(0).getChatId(), intent, PendingIntent.FLAG_ONE_SHOT | PendingIntent.FLAG_IMMUTABLE);
 
             //Order by last interaction
             Collections.sort(chats, new Comparator<MegaChatListItem>() {
@@ -205,11 +205,11 @@ public final class ChatAdvancedNotificationBuilder {
                 }
             });
         } else if (chats.size() == 1) {
-            Intent intent = new Intent(context, ManagerActivityLollipop.class);
+            Intent intent = new Intent(context, ManagerActivity.class);
             intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
             intent.setAction(ACTION_CHAT_NOTIFICATION_MESSAGE);
             intent.putExtra(CHAT_ID, chats.get(0).getChatId());
-            pendingIntent = PendingIntent.getActivity(context, (int) chats.get(0).getChatId(), intent, PendingIntent.FLAG_ONE_SHOT);
+            pendingIntent = PendingIntent.getActivity(context, (int) chats.get(0).getChatId(), intent, PendingIntent.FLAG_ONE_SHOT | PendingIntent.FLAG_IMMUTABLE);
         } else {
             logError("ERROR:chatSIZE=0:return");
             return;
@@ -222,9 +222,7 @@ public final class ChatAdvancedNotificationBuilder {
 
         NotificationCompat.InboxStyle inboxStyle = new NotificationCompat.InboxStyle();
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            notificationBuilder.setColor(ContextCompat.getColor(context, R.color.red_600_red_300));
-        }
+        notificationBuilder.setColor(ContextCompat.getColor(context, R.color.red_600_red_300));
 
         notificationBuilder.setShowWhen(true);
 
@@ -240,14 +238,13 @@ public final class ChatAdvancedNotificationBuilder {
 
         notificationBuilder.setStyle(inboxStyle);
 
-        if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.N_MR1) {
-            //API 25 = Android 7.1
-            notificationBuilder.setPriority(Notification.PRIORITY_HIGH);
-        } else {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            // Use NotificationManager for devices running Android Nougat or above (API >= 24)
             notificationBuilder.setPriority(NotificationManager.IMPORTANCE_HIGH);
+        } else {
+            // Otherwise, use NotificationCompat for devices running Android Marshmallow (API 23)
+            notificationBuilder.setPriority(NotificationCompat.PRIORITY_HIGH);
         }
-
-//        notificationBuilder.setFullScreenIntent(pendingIntent, true);
 
         for (int i = 0; i < chats.size(); i++) {
             if (MegaApplication.getOpenChatId() != chats.get(i).getChatId()) {
@@ -379,11 +376,11 @@ public final class ChatAdvancedNotificationBuilder {
     }
 
     public Notification buildNotification(Uri uriParameter, String vibration, String groupKey, MegaChatRoom chat, ArrayList<MegaChatMessage> unreadMessageList) {
-        Intent intent = new Intent(context, ManagerActivityLollipop.class);
+        Intent intent = new Intent(context, ManagerActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         intent.setAction(ACTION_CHAT_NOTIFICATION_MESSAGE);
         intent.putExtra(CHAT_ID, chat.getChatId());
-        PendingIntent pendingIntent = PendingIntent.getActivity(context, (int) chat.getChatId(), intent, PendingIntent.FLAG_ONE_SHOT);
+        PendingIntent pendingIntent = PendingIntent.getActivity(context, (int) chat.getChatId(), intent, PendingIntent.FLAG_ONE_SHOT | PendingIntent.FLAG_IMMUTABLE);
 
         String title;
         int unreadMessages = chat.getUnreadCount();
@@ -441,9 +438,7 @@ public final class ChatAdvancedNotificationBuilder {
                     .setShowWhen(true)
                     .setGroup(groupKey);
 
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                notificationBuilder.setColor(ContextCompat.getColor(context, R.color.red_600_red_300));
-            }
+            notificationBuilder.setColor(ContextCompat.getColor(context, R.color.red_600_red_300));
 
             messagingStyleContent = new Notification.MessagingStyle(getTitleChat(chat));
         }
@@ -515,46 +510,8 @@ public final class ChatAdvancedNotificationBuilder {
             //API 25 = Android 7.1
             notificationBuilder.setPriority(Notification.PRIORITY_HIGH);
         } else {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                notificationBuilderO.setPriority(NotificationManager.IMPORTANCE_HIGH);
-            } else {
-                notificationBuilder.setPriority(NotificationManager.IMPORTANCE_HIGH);
-            }
+            notificationBuilderO.setPriority(NotificationManager.IMPORTANCE_HIGH);
         }
-
-//        NotificationCompat.BigTextStyle bigTextStyle = new NotificationCompat.BigTextStyle();
-
-//        if(chat.isGroup()){
-//
-//            if(msgUserHandle!=-1){
-//                String nameAction = getParticipantShortName(msgUserHandle);
-//
-//                if(nameAction.isEmpty()){
-//                    notificationBuilder.setContentText(msgContent);
-//                    bigTextStyle.bigText(msgContent);
-//                }
-//                else{
-//                    String source = "<b>"+nameAction+": </b>"+msgContent;
-//
-//                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-//                        notificationContent = Html.fromHtml(source,Html.FROM_HTML_MODE_LEGACY);
-//                    } else {
-//                        notificationContent = Html.fromHtml(source);
-//                    }
-//                    notificationBuilder.setContentText(notificationContent);
-//                    bigTextStyle.bigText(notificationContent);
-//                }
-//            }
-//            else{
-//                notificationBuilder.setContentText(msgContent);
-//                bigTextStyle.bigText(msgContent);
-//            }
-//
-//        }
-//        else{
-//            notificationBuilder.setContentText(msgContent);
-//            bigTextStyle.bigText(msgContent);
-//        }
 
         Bitmap largeIcon = setUserAvatar(chat);
         if(largeIcon!=null){
@@ -565,8 +522,6 @@ public final class ChatAdvancedNotificationBuilder {
                 notificationBuilder.setLargeIcon(largeIcon);
             }
         }
-
-//        notificationBuilder.setStyle(bigTextStyle);
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             return notificationBuilderO.build();
@@ -632,11 +587,11 @@ public final class ChatAdvancedNotificationBuilder {
     }
 
     public Notification buildSummary (String groupKey, boolean beep){
-        Intent intent = new Intent(context, ManagerActivityLollipop.class);
+        Intent intent = new Intent(context, ManagerActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         intent.setAction(ACTION_CHAT_SUMMARY);
         intent.putExtra(CHAT_ID, MEGACHAT_INVALID_HANDLE);
-        PendingIntent pendingIntent = PendingIntent.getActivity(context, 0 , intent, PendingIntent.FLAG_ONE_SHOT);
+        PendingIntent pendingIntent = PendingIntent.getActivity(context, 0 , intent, PendingIntent.FLAG_ONE_SHOT | PendingIntent.FLAG_IMMUTABLE);
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             if (!beep) {
@@ -691,12 +646,10 @@ public final class ChatAdvancedNotificationBuilder {
                 return notificationBuilderO.build();
             }
         }
-        else{
+        else {
             NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(context);
 
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                notificationBuilder.setColor(ContextCompat.getColor(context, R.color.red_600_red_300));
-            }
+            notificationBuilder.setColor(ContextCompat.getColor(context, R.color.red_600_red_300));
 
             notificationBuilder.setSmallIcon(R.drawable.ic_stat_notify)
                     .setShowWhen(true)
@@ -790,7 +743,7 @@ public final class ChatAdvancedNotificationBuilder {
         intent.putExtra(CHAT_ID_OF_INCOMING_CALL, chatIdCallToAnswer);
         intent.setAction(type);
         int requestCode = notificationId + getNumberRequestNotifications(type, chatIdCallInProgress);
-        return PendingIntent.getService(context, requestCode, intent, PendingIntent.FLAG_CANCEL_CURRENT);
+        return PendingIntent.getService(context, requestCode, intent, PendingIntent.FLAG_CANCEL_CURRENT | PendingIntent.FLAG_IMMUTABLE);
     }
 
     /**
@@ -801,11 +754,6 @@ public final class ChatAdvancedNotificationBuilder {
      */
     private void showIncomingCallNotification(MegaChatCall callToAnswer, MegaChatCall callInProgress) {
         logDebug("Call to answer ID: " + callToAnswer.getChatid() + ", Call in progress ID: " + callInProgress.getChatid());
-
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP_MR1){
-            logWarning("Not supported incoming call notification: " + Build.VERSION.SDK_INT);
-            return;
-        }
 
         long chatIdCallToAnswer = callToAnswer.getChatid();
         long chatIdCallInProgress = callInProgress.getChatid();
@@ -957,11 +905,6 @@ public final class ChatAdvancedNotificationBuilder {
     public void showOneCallNotification(MegaChatCall callToAnswer) {
         logDebug("Call to answer ID: " + callToAnswer.getChatid());
 
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP_MR1) {
-            logWarning("Not supported incoming call notification: " + Build.VERSION.SDK_INT);
-            return;
-        }
-
         long chatIdCallToAnswer = callToAnswer.getChatid();
         MegaChatRoom chatToAnswer = megaChatApi.getChatRoom(chatIdCallToAnswer);
         int notificationId = getCallNotificationId(callToAnswer.getCallId());
@@ -969,11 +912,22 @@ public final class ChatAdvancedNotificationBuilder {
         PendingIntent intentIgnore = getPendingIntent(MEGACHAT_INVALID_HANDLE, chatIdCallToAnswer, CallNotificationIntentService.IGNORE, notificationId);
         PendingIntent callScreen = getPendingIntentMeetingRinging(context, callToAnswer.getChatid(), notificationId + ONE_REQUEST_NEEDED);
 
-        Intent answerIntent = new Intent(context, CallNotificationIntentService.class);
-        answerIntent.putExtra(CHAT_ID_OF_CURRENT_CALL, MEGACHAT_INVALID_HANDLE);
-        answerIntent.putExtra(CHAT_ID_OF_INCOMING_CALL, callToAnswer.getChatid());
-        answerIntent.setAction(CallNotificationIntentService.ANSWER);
-        PendingIntent intentAnswer = PendingIntent.getService(context, notificationId + ONE_REQUEST_NEEDED, answerIntent, PendingIntent.FLAG_CANCEL_CURRENT);
+        Intent answerIntent;
+        PendingIntent intentAnswer;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            // Notification trampoline restrictions
+            answerIntent = new Intent(context, MeetingActivity.class);
+            answerIntent.putExtra(CHAT_ID_OF_CURRENT_CALL, MEGACHAT_INVALID_HANDLE);
+            answerIntent.putExtra(CHAT_ID_OF_INCOMING_CALL, callToAnswer.getChatid());
+            answerIntent.setAction(CallNotificationIntentService.ANSWER);
+            intentAnswer = PendingIntent.getActivity(context, notificationId + ONE_REQUEST_NEEDED, answerIntent, PendingIntent.FLAG_CANCEL_CURRENT | PendingIntent.FLAG_IMMUTABLE);
+        } else {
+            answerIntent = new Intent(context, CallNotificationIntentService.class);
+            answerIntent.putExtra(CHAT_ID_OF_CURRENT_CALL, MEGACHAT_INVALID_HANDLE);
+            answerIntent.putExtra(CHAT_ID_OF_INCOMING_CALL, callToAnswer.getChatid());
+            answerIntent.setAction(CallNotificationIntentService.ANSWER);
+            intentAnswer = PendingIntent.getService(context, notificationId + ONE_REQUEST_NEEDED, answerIntent, PendingIntent.FLAG_CANCEL_CURRENT | PendingIntent.FLAG_IMMUTABLE);
+        }
 
         Bitmap avatarIcon = setUserAvatar(chatToAnswer);
 
@@ -1110,11 +1064,11 @@ public final class ChatAdvancedNotificationBuilder {
         String notificationCallId = MegaApiJava.userHandleToBase64(chatCallId);
         int notificationId = (notificationCallId).hashCode() + NOTIFICATION_MISSED_CALL;
 
-        Intent intent = new Intent(context, ManagerActivityLollipop.class);
+        Intent intent = new Intent(context, ManagerActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         intent.setAction(ACTION_CHAT_NOTIFICATION_MESSAGE);
         intent.putExtra(CHAT_ID, chat.getChatId());
-        PendingIntent pendingIntent = PendingIntent.getActivity(context, (int)chat.getChatId() , intent, PendingIntent.FLAG_ONE_SHOT);
+        PendingIntent pendingIntent = PendingIntent.getActivity(context, (int)chat.getChatId() , intent, PendingIntent.FLAG_ONE_SHOT | PendingIntent.FLAG_IMMUTABLE);
 
         long[] pattern = {0, 1000};
 
@@ -1159,24 +1113,21 @@ public final class ChatAdvancedNotificationBuilder {
                     .setSound(defaultSoundUri)
                     .setContentIntent(pendingIntent);
 
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                notificationBuilder.setColor(ContextCompat.getColor(context, R.color.red_600_red_300));
-            }
+            notificationBuilder.setColor(ContextCompat.getColor(context, R.color.red_600_red_300));
 
-            if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.N_MR1) {
-                //API 25 = Android 7.1
-                notificationBuilder.setPriority(Notification.PRIORITY_HIGH);
-            } else {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                // Use NotificationManager for devices running Android Nougat or above (API >= 24)
                 notificationBuilder.setPriority(NotificationManager.IMPORTANCE_HIGH);
+            } else {
+                // Otherwise, use NotificationCompat for devices running Android Marshmallow (API 23)
+                notificationBuilder.setPriority(NotificationCompat.PRIORITY_HIGH);
             }
 
             if (!isTextEmpty(chatC.getParticipantEmail(chat.getPeerHandle(0)))) {
 
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                    Bitmap largeIcon = setUserAvatar(chat);
-                    if (largeIcon != null) {
-                        notificationBuilder.setLargeIcon(largeIcon);
-                    }
+                Bitmap largeIcon = setUserAvatar(chat);
+                if (largeIcon != null) {
+                    notificationBuilder.setLargeIcon(largeIcon);
                 }
             }
 

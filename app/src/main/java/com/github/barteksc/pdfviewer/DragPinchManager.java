@@ -15,10 +15,8 @@
  */
 package com.github.barteksc.pdfviewer;
 
-import android.app.Activity;
 import android.graphics.PointF;
 import android.graphics.RectF;
-import android.util.Log;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.ScaleGestureDetector;
@@ -29,8 +27,7 @@ import com.github.barteksc.pdfviewer.scroll.ScrollHandle;
 import com.shockwave.pdfium.PdfDocument;
 import com.shockwave.pdfium.util.SizeF;
 
-import mega.privacy.android.app.lollipop.PdfViewerActivityLollipop;
-import mega.privacy.android.app.utils.Util;
+import mega.privacy.android.app.lollipop.PdfViewerActivity;
 
 import static com.github.barteksc.pdfviewer.util.Constants.Pinch.MAXIMUM_ZOOM;
 import static com.github.barteksc.pdfviewer.util.Constants.Pinch.MINIMUM_ZOOM;
@@ -74,14 +71,10 @@ class DragPinchManager implements GestureDetector.OnGestureListener, GestureDete
         if (!onTapHandled && !linkTapped) {
             ScrollHandle ps = pdfView.getScrollHandle();
             if (ps != null && !pdfView.documentFitsView()) {
-//                if (!ps.shown()) {
-                    ps.show();
-//                } else {
-//                    ps.hide();
-//                }
+                ps.show();
             }
         }
-        ((PdfViewerActivityLollipop) pdfView.getContext()).setToolbarVisibility();
+        ((PdfViewerActivity) pdfView.getContext()).setToolbarVisibility();
         pdfView.performClick();
         return true;
     }
@@ -152,8 +145,8 @@ class DragPinchManager implements GestureDetector.OnGestureListener, GestureDete
     public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX, float distanceY) {
         scrolling = true;
 
-        if (((PdfViewerActivityLollipop) pdfView.getContext()).isToolbarVisible()){
-            ((PdfViewerActivityLollipop) pdfView.getContext()).setToolbarVisibilityHide(200L);
+        if (((PdfViewerActivity) pdfView.getContext()).isToolbarVisible()){
+            ((PdfViewerActivity) pdfView.getContext()).setToolbarVisibilityHide(200L);
         }
 
         if (pdfView.isZooming() || pdfView.isSwipeEnabled()) {

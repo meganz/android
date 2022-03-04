@@ -1831,8 +1831,6 @@
     <string name="attachment_upload_panel_from_cloud">Z dysku</string>
     <!--  -->
     <string name="attachment_upload_panel_contact">Kontakt</string>
-    <!--  -->
-    <string name="attachment_upload_panel_photo">Z urządzenia</string>
     <!-- Button and title of dialog shown when the user wants to delete permanently their account. -->
     <string name="delete_account">Usuń konto</string>
     <!-- Text shown in the alert dialog to confirm the deletion of an account -->
@@ -2157,7 +2155,7 @@
     <!-- Text of dialog shown when a contact request has not been sent with QR code because of some error -->
     <string name="invite_not_sent_text_error">Wystąpił błąd i zaproszenie nie zostało wysłane.</string>
     <!-- Text of alert dialog informing that the qr is generating -->
-    <string name="generatin_qr">Generowanie kodu QR...</string>
+    <string name="generatin_qr">Generowanie kodu QR&#8230;</string>
     <!-- Title of QR code scan menu item -->
     <string name="menu_item_scan_code">Skanowanie kodu QR</string>
     <!-- get the contact link and copy it -->
@@ -4317,7 +4315,7 @@
     <!-- Warning informing the user the folder location is trying to open no longer exists. -->
     <string name="location_not_exist">Ta lokalizacja już nie istnieje.</string>
     <!-- Warning shown informing the contact has been previously invited. The placeholder is to show the name of the contact. -->
-    <string name="contact_already_invited">You have already invited %1$s</string>
+    <string name="contact_already_invited">Zaprosiłeś już %1$s</string>
     <!-- Warning shown informing the contact request has been sent and can be managed in sent requests section. -->
     <string name="contact_invited">Przenieś foldery kopii zapasowejZaproszenie zostało wysłane pomyślnie. Zobacz wysłane żądania.</string>
     <!-- Message when file available offline. -->
@@ -4350,4 +4348,65 @@
     <string name="settings_mobile_data_resoluton_title">Wykorzystaj dane mobilne do podglądu obrazów w wysokiej rozdzielczości</string>
     <!-- summary for the settings to enable high resolution images when on mobile data -->
     <string name="settings_mobile_data_resoluton_summary">Zezwalaj na używanie danych mobilnych do ładowania obrazów o wysokiej rozdzielczości podczas podglądu. Jeśli wyłączone, oryginalny obraz zostanie załadowany tylko po powiększeniu.</string>
+    <!-- If users want to move the root backup folder, all backups underneath it are disabled. Warning dialog will show to confirm -->
+    <string name="backup_move_root_folder">Zmieniasz domyślną lokalizację folderu kopii zapasowych. Może to wpłynąć na możliwość znalezienia folderu kopii zapasowych w przyszłości. Zapamiętaj, gdzie on się znajduje, aby móc go znaleźć w przyszłości.</string>
+    <!-- If users want to move the sub backup folder, all backups underneath it are disabled. Warning dialog will show to confirm -->
+    <string name="backup_move_sub_folder">Przeniesienie tego folderu zmienia miejsce docelowe jednej lub więcej skonfigurowanych kopii zapasowych i może mieć niezamierzone skutki. Kopie zapasowe zostaną wyłączone dla Twojego bezpieczeństwa. Kopie zapasowe mogą być ponownie włączone za pomocą aplikacji MEGA Desktop App. Czy chcesz kontynuować?</string>
+    <!-- If users want to delete the root backup folder, all backups underneath it are disabled. Warning dialog will show to confirm -->
+    <string name="backup_remove_root_folder">Usuwasz folder kopii zapasowych. Spowoduje to usunięcie wszystkich kopii zapasowych, które ustawiłeś. Czy na pewno chcesz to zrobić?</string>
+    <!-- If users want to delete the sub backup folder, all backups underneath it are disabled. Warning dialog will show to confirm -->
+    <string name="backup_remove_sub_folder">Czy na pewno chcesz usunąć folder kopii zapasowej i wyłączyć powiązaną z nim kopię zapasową?</string>
+    <!-- The title of warning dialog for single folder moving -->
+    <string name="backup_move_folder_title">Przenieś “%1s”</string>
+    <!-- The title of warning dialog for single folder deleting -->
+    <string name="backup_remove_folder_title">Przenieś “%1s”&#160;do kosza</string>
+    <!-- The title of warning dialog for multi-folder moving -->
+    <string name="backup_move_multiple_folder_title">Przenoszenie folderów kopii zapasowych</string>
+    <!-- The title of warning dialog for single folder deleting -->
+    <string name="backup_remove_multiple_folder_title">Przenieś foldery kopii zapasowych do Kosza</string>
+    <!-- The confirm information of warning dialog for deleting -->
+    <string name="backup_disable_confirm">Wyłączenie tworzenia kopii zapasowej</string>
+    <!-- The confirm information of warning dialog for moving "My backup" -->
+    <string name="backup_move_confirm">Przenieść kopię zapasową</string>
+    <!-- The confirm information of warning dialog for deleting -->
+    <string name="backup_action_confirm">Proszę wpisać “%1s”, aby potwierdzić tę czynność</string>
+    <!-- when checking the input -->
+    <string name="error_backup_confirm_dont_match">wprowadzony tekst nie pasuje</string>
+    <!-- The title of confirm dialog for adding item to "My backup" -->
+    <string name="backup_add_confirm_title">Dodaj element do “%1s”</string>
+    <!-- The title of warning dialog for adding item to "My backup" -->
+    <string name="backup_add_item_title">Skonfiguruj kopię zapasową</string>
+    <!-- If users want to add items to the "My backup" folder, Warning dialog will show to confirm -->
+    <string name="backup_add_item_to_root_text">Aby te elementy dodane do folderu kopii zapasowych były automatycznie synchronizowane z MEGA Cloud, należy je skonfigurować w aplikacji MEGA Desktop App.</string>
+    <!-- If users want to share items in the "My backup" folder, Warning dialog will show to confirm -->
+    <string name="backup_share_permission_title">Tylko odczyt</string>
+    <!-- If users want to share items in the "My backup" folder, Warning dialog will show to confirm -->
+    <string name="backup_share_permission_text">Ten folder może być udostępniony tylko do odczytu, ponieważ jest to folder kopii zapasowej, wszelkie zmiany jego zawartości mogą uniemożliwić tworzenie kopii zapasowej.</string>
+    <!-- If users want to add items to the "My backup" device folder, Warning dialog will show to confirm -->
+    <string name="backup_add_item_text">Elementy w tym folderze są częścią skonfigurowanej kopii zapasowej i są synchronizowane z folderem lokalnym. Podjęcie tej akcji przerwie synchronizację i wyłączy kopię zapasową. Kopia zapasowa może być ponownie włączona za pomocą aplikacji MEGA Desktop App. Czy na pewno chcesz kontynuować?</string>
+    <!-- Share multi backup folders, show below warning message -->
+    <string name="backup_multi_share_permission_text">Te foldery mogą być udostępniane tylko do odczytu, ponieważ są to foldery kopii zapasowych, wszelkie zmiany w ich zawartości mogą uniemożliwić tworzenie kopii zapasowych.</string>
+    <!-- Share multi folders mix with backup and non-backup folders, show below warning message -->
+    <string name="backup_share_with_root_permission_text">Niektóre udostępnione foldery to foldery kopii zapasowych i tylko do odczytu. Czy chcesz kontynuować?</string>
+    <!-- Indicates the content of the backup folder -->
+    <plurals name="num_devices">
+        <item quantity="one">%d urządzenie</item>
+        <item quantity="few">%d urządzenia</item>
+        <item quantity="many">%d urządzenia</item>
+        <item quantity="other">%d urządzenia</item>
+    </plurals>
+    <!-- Title of the button when you want to answer a one to one call -->
+    <string name="title_join_one_to_one_call">Odbierz połączenie</string>
+    <!-- Title of the menu when the select tracks on playlist page-->
+    <string name="title_select_tracks">Wybrane ścieżki</string>
+    <!-- Action button to upload files. -->
+    <string name="upload_files">Wgraj pliki</string>
+    <!-- Action button to upload a folder. -->
+    <string name="upload_folder">Wgraj katalog</string>
+    <!-- Title of the dialog warning the user about cancel uploads. -->
+    <string name="cancel_uploads">Anuluj wgrywanie</string>
+    <!-- Warning alerting user if proceed with the action all the uploads will be cancelled. -->
+    <string name="cancel_uploads_warning">Przerwanie procesu przesyłania spowoduje anulowanie wszystkich przesłanych plików.</string>
+    <!-- Button to proceed with action. -->
+    <string name="action_proceed">Kontynuuj</string>
 </resources>

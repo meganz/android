@@ -37,7 +37,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 
-import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
+import mega.privacy.android.app.lollipop.ManagerActivity;
 import mega.privacy.android.app.service.iar.RatingHandlerImpl;
 import mega.privacy.android.app.utils.StringResourcesUtils;
 import mega.privacy.android.app.utils.ThumbnailUtils;
@@ -52,7 +52,7 @@ import nz.mega.sdk.MegaTransferListenerInterface;
 
 import static mega.privacy.android.app.components.transferWidget.TransfersManagement.*;
 import static mega.privacy.android.app.constants.BroadcastConstants.*;
-import static mega.privacy.android.app.lollipop.ManagerActivityLollipop.*;
+import static mega.privacy.android.app.lollipop.ManagerActivity.*;
 import static mega.privacy.android.app.lollipop.qrcode.MyCodeFragment.QR_IMAGE_FILE_NAME;
 import static mega.privacy.android.app.textEditor.TextEditorUtil.getCreationOrEditorText;
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
@@ -64,7 +64,7 @@ import static mega.privacy.android.app.utils.Util.*;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.PreviewUtils.*;
-import static mega.privacy.android.app.utils.ThumbnailUtilsLollipop.*;
+import static mega.privacy.android.app.utils.ThumbnailUtils.*;
 
 /*
  * Service to Upload files
@@ -379,7 +379,7 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 
         if (megaApi.getNumPendingUploads() <= 0) {
 			logDebug("Reset total uploads");
-            megaApi.resetCompletedUploads();
+            megaApi.resetTotalUploads();
         }
 
         resetUploadNumbers();
@@ -395,7 +395,7 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 	}
 
     private void notifyNotification(String notificationTitle,String size,int notificationId,String channelId,String channelName) {
-        Intent intent = new Intent(UploadService.this, ManagerActivityLollipop.class);
+        Intent intent = new Intent(UploadService.this, ManagerActivity.class);
         intent.setAction(ACTION_SHOW_TRANSFERS);
         intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
         intent.putExtra(TRANSFERS_TAB, COMPLETED_TAB);
@@ -411,7 +411,7 @@ public class UploadService extends Service implements MegaTransferListenerInterf
             mBuilderCompatO
                     .setSmallIcon(R.drawable.ic_stat_notify)
                     .setColor(ContextCompat.getColor(MegaApplication.getInstance(), R.color.red_600_red_300))
-                    .setContentIntent(PendingIntent.getActivity(getApplicationContext(),0,intent,PendingIntent.FLAG_UPDATE_CURRENT))
+                    .setContentIntent(PendingIntent.getActivity(getApplicationContext(),0,intent,PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE))
                     .setAutoCancel(true).setTicker(notificationTitle)
                     .setContentTitle(notificationTitle).setContentText(size)
                     .setOngoing(false);
@@ -421,7 +421,7 @@ public class UploadService extends Service implements MegaTransferListenerInterf
             mBuilderCompat
                     .setSmallIcon(R.drawable.ic_stat_notify)
                     .setColor(ContextCompat.getColor(MegaApplication.getInstance(), R.color.red_600_red_300))
-                    .setContentIntent(PendingIntent.getActivity(getApplicationContext(),0,intent,PendingIntent.FLAG_UPDATE_CURRENT))
+                    .setContentIntent(PendingIntent.getActivity(getApplicationContext(),0,intent,PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE))
                     .setAutoCancel(true).setTicker(notificationTitle)
                     .setContentTitle(notificationTitle).setContentText(size)
                     .setOngoing(false);
@@ -482,7 +482,7 @@ public class UploadService extends Service implements MegaTransferListenerInterf
     }
 
     private void notifyProgressNotification(int progressPercent, String message, String info, String actionString){
-        Intent intent = new Intent(UploadService.this, ManagerActivityLollipop.class);
+        Intent intent = new Intent(UploadService.this, ManagerActivity.class);
         switch (isOverquota) {
             case OVERQUOTA_STORAGE_STATE:
                 intent.setAction(ACTION_OVERQUOTA_STORAGE);
@@ -500,7 +500,7 @@ public class UploadService extends Service implements MegaTransferListenerInterf
         }
 
         intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
-        PendingIntent pendingIntent = PendingIntent.getActivity(UploadService.this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+        PendingIntent pendingIntent = PendingIntent.getActivity(UploadService.this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
         Notification notification;
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
@@ -520,29 +520,16 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 
             notification = mBuilderCompat.build();
         }
-        else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            mBuilder
-                    .setSmallIcon(R.drawable.ic_stat_notify)
-                    .setColor(ContextCompat.getColor(this, R.color.red_600_red_300))
-                    .setProgress(100, progressPercent, false)
-                    .setContentIntent(pendingIntent)
-                    .setOngoing(true).setContentTitle(message).setSubText(info)
-                    .setContentText(actionString)
-                    .setOnlyAlertOnce(true);
-            notification = mBuilder.build();
-        }
         else {
             mBuilder
                     .setSmallIcon(R.drawable.ic_stat_notify)
+                    .setColor(ContextCompat.getColor(this,R.color.red_600_red_300))
                     .setProgress(100, progressPercent, false)
                     .setContentIntent(pendingIntent)
                     .setOngoing(true).setContentTitle(message).setContentInfo(info)
                     .setContentText(actionString)
                     .setOnlyAlertOnce(true);
 
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP){
-                mBuilder.setColor(ContextCompat.getColor(this,R.color.red_600_red_300));
-            }
             notification = mBuilder.build();
         }
 
@@ -999,7 +986,7 @@ public class UploadService extends Service implements MegaTransferListenerInterf
         String contentText = getString(R.string.download_show_info);
 		String message = getString(R.string.overquota_alert_title);
 
-		Intent intent = new Intent(this, ManagerActivityLollipop.class);
+		Intent intent = new Intent(this, ManagerActivity.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
         if (isOverquota == OVERQUOTA_STORAGE_STATE) {
             intent.setAction(ACTION_OVERQUOTA_STORAGE);
@@ -1017,7 +1004,7 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 
 			mBuilderCompatO
 					.setSmallIcon(R.drawable.ic_stat_notify)
-					.setContentIntent(PendingIntent.getActivity(getApplicationContext(), 0, intent, PendingIntent.FLAG_UPDATE_CURRENT))
+					.setContentIntent(PendingIntent.getActivity(getApplicationContext(), 0, intent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE))
 					.setAutoCancel(true).setTicker(contentText)
 					.setContentTitle(message).setContentText(contentText)
 					.setOngoing(false);
@@ -1027,7 +1014,7 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 		else {
 			mBuilderCompat
 					.setSmallIcon(R.drawable.ic_stat_notify)
-					.setContentIntent(PendingIntent.getActivity(getApplicationContext(), 0, intent, PendingIntent.FLAG_UPDATE_CURRENT))
+					.setContentIntent(PendingIntent.getActivity(getApplicationContext(), 0, intent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE))
 					.setAutoCancel(true).setTicker(contentText)
 					.setContentTitle(message).setContentText(contentText)
 					.setOngoing(false);

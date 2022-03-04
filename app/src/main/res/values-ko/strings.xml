@@ -1726,8 +1726,6 @@
     <string name="attachment_upload_panel_from_cloud">클라우드 드라이브에서</string>
     <!--  -->
     <string name="attachment_upload_panel_contact">연락처</string>
-    <!--  -->
-    <string name="attachment_upload_panel_photo">장치에서</string>
     <!-- Button and title of dialog shown when the user wants to delete permanently their account. -->
     <string name="delete_account">계정 삭제</string>
     <!-- Text shown in the alert dialog to confirm the deletion of an account -->
@@ -2043,7 +2041,7 @@
     <!-- Text of dialog shown when a contact request has not been sent with QR code because of some error -->
     <string name="invite_not_sent_text_error">오류가 발생하여 초대장이 발송되지 않았습니다.</string>
     <!-- Text of alert dialog informing that the qr is generating -->
-    <string name="generatin_qr">QR 코드 생성중...</string>
+    <string name="generatin_qr">QR 코드 생성중&#8230;</string>
     <!-- Title of QR code scan menu item -->
     <string name="menu_item_scan_code">QR 코드 스캔</string>
     <!-- get the contact link and copy it -->
@@ -4050,7 +4048,7 @@
     <!-- Warning informing the user the folder location is trying to open no longer exists. -->
     <string name="location_not_exist">이 위치가 더 이상 존재하지 않습니다.</string>
     <!-- Warning shown informing the contact has been previously invited. The placeholder is to show the name of the contact. -->
-    <string name="contact_already_invited">You have already invited %1$s</string>
+    <string name="contact_already_invited">당신은 이미 %1$s님을 초대하였습니다</string>
     <!-- Warning shown informing the contact request has been sent and can be managed in sent requests section. -->
     <string name="contact_invited">초대장을 성공적으로 보냈습니다. 보낸 요청을 확인하세요.</string>
     <!-- Message when file available offline. -->
@@ -4080,7 +4078,65 @@
     <!-- Action button to open a contact link.-->
     <string name="action_open_contact_link">연락처 링크 열기</string>
     <!-- title for the settings to enable high resolution images when on mobile data -->
-    <string name="settings_mobile_data_resoluton_title">Use mobile data to preview high resolution images</string>
+    <string name="settings_mobile_data_resoluton_title">고해상도 이미지를 미리 보기하는 데에 모바일 데이터 사용</string>
     <!-- summary for the settings to enable high resolution images when on mobile data -->
     <string name="settings_mobile_data_resoluton_summary">미리 보기를 할 때 고해상도 이미지를 불러오기 위해 모바일 데이터를 사용하는 것을 허용하세요. 만약 비활성화 하면, 확대할 때만 원래 이미지를 불러옵니다.</string>
+    <!-- If users want to move the root backup folder, all backups underneath it are disabled. Warning dialog will show to confirm -->
+    <string name="backup_move_root_folder">기본 백업 폴더 위치를 변경하려고 합니다. 이것은 나중에 당신의 백업 폴더를 찾을 수 있는지 여부에 영향을 미칩니다. 나중에 찾을 수 있도록 어디에 위치했는지 기억하세요.</string>
+    <!-- If users want to move the sub backup folder, all backups underneath it are disabled. Warning dialog will show to confirm -->
+    <string name="backup_move_sub_folder">이 폴더의 이동은 하나 이상의 구성된 백업의 대상을 변경하며 의도하지 않은 결과를 초래할 수 있습니다. 안전을 위해 백업을 꺼야 합니다. 백업은 MEGA 데스크톱 앱에서 다시 활성화할 수 있습니다. 진행하시겠습니까?</string>
+    <!-- If users want to delete the root backup folder, all backups underneath it are disabled. Warning dialog will show to confirm -->
+    <string name="backup_remove_root_folder">백업 폴더를 삭제하려고 합니다. 이것은 당신이 설정한 모든 백업을 삭제합니다. 정말 하시겠습니까?</string>
+    <!-- If users want to delete the sub backup folder, all backups underneath it are disabled. Warning dialog will show to confirm -->
+    <string name="backup_remove_sub_folder">정말 백업 폴더를 삭제하고 연관된 백업을 비활성화 하시겠습니까?</string>
+    <!-- The title of warning dialog for single folder moving -->
+    <string name="backup_move_folder_title">“%1s” 이동</string>
+    <!-- The title of warning dialog for single folder deleting -->
+    <string name="backup_remove_folder_title">“%1s”을/를 휴지통으로 이동</string>
+    <!-- The title of warning dialog for multi-folder moving -->
+    <string name="backup_move_multiple_folder_title">백업 폴더 이동</string>
+    <!-- The title of warning dialog for single folder deleting -->
+    <string name="backup_remove_multiple_folder_title">백업 폴더를 휴지통으로 이동</string>
+    <!-- The confirm information of warning dialog for deleting -->
+    <string name="backup_disable_confirm">백업 비활성화</string>
+    <!-- The confirm information of warning dialog for moving "My backup" -->
+    <string name="backup_move_confirm">백업 이동</string>
+    <!-- The confirm information of warning dialog for deleting -->
+    <string name="backup_action_confirm">이 행동을 승인하려면 “%1s”을/를 입력하세요.</string>
+    <!-- when checking the input -->
+    <string name="error_backup_confirm_dont_match">입력한 문자가 일치하지 않습니다</string>
+    <!-- The title of confirm dialog for adding item to "My backup" -->
+    <string name="backup_add_confirm_title">“%1s”에 항목 추가</string>
+    <!-- The title of warning dialog for adding item to "My backup" -->
+    <string name="backup_add_item_title">백업 설정</string>
+    <!-- If users want to add items to the "My backup" folder, Warning dialog will show to confirm -->
+    <string name="backup_add_item_to_root_text">이 항목들이 백업 폴더에 추가되어 MEGA 클라우드와 자동으로 동기화 되었는지 확실히 하려면, MEGA 데스크톱 앱에서 설정하세요.</string>
+    <!-- If users want to share items in the "My backup" folder, Warning dialog will show to confirm -->
+    <string name="backup_share_permission_title">읽기 전용</string>
+    <!-- If users want to share items in the "My backup" folder, Warning dialog will show to confirm -->
+    <string name="backup_share_permission_text">이 폴더는 읽기 전용으로만 공유할 수 있습니다; 이 폴더는 백업 폴더이므로, 이 항목에 대한 어떠한 변경은 백업을 비활성화 할 수 있습니다.</string>
+    <!-- If users want to add items to the "My backup" device folder, Warning dialog will show to confirm -->
+    <string name="backup_add_item_text">이 폴더 안의 항목은 구성된 백업의 일부이며 로컬 폴더로 동기화 됩니다. 이 행동을 하면 동기화가 깨지고 백업이 비활성화 됩니다. 백업은 MEGA 데스크톱 앱에서 다시 활성화할 수 있습니다. 계속 하시겠습니까?</string>
+    <!-- Share multi backup folders, show below warning message -->
+    <string name="backup_multi_share_permission_text">이 폴더들은 읽기 전용으로만 공유할 수 있습니다; 이 폴더들은 백업 폴더이므로, 이 항목에 대한 어떠한 변경은 백업을 비활성화 할 수 있습니다.</string>
+    <!-- Share multi folders mix with backup and non-backup folders, show below warning message -->
+    <string name="backup_share_with_root_permission_text">일부 공유된 폴더가 백업 폴더이거나 읽기 전용입니다. 계속 하시겠습니까?</string>
+    <!-- Indicates the content of the backup folder -->
+    <plurals name="num_devices">
+        <item quantity="other">장치 %d개</item>
+    </plurals>
+    <!-- Title of the button when you want to answer a one to one call -->
+    <string name="title_join_one_to_one_call">전화 받기</string>
+    <!-- Title of the menu when the select tracks on playlist page-->
+    <string name="title_select_tracks">트랙 선택</string>
+    <!-- Action button to upload files. -->
+    <string name="upload_files">파일 업로드</string>
+    <!-- Action button to upload a folder. -->
+    <string name="upload_folder">폴더 업로드</string>
+    <!-- Title of the dialog warning the user about cancel uploads. -->
+    <string name="cancel_uploads">업로드 취소</string>
+    <!-- Warning alerting user if proceed with the action all the uploads will be cancelled. -->
+    <string name="cancel_uploads_warning">업로드 과정을 중단하는 것은 모든 업로드를 취소시킵니다.</string>
+    <!-- Button to proceed with action. -->
+    <string name="action_proceed">진행</string>
 </resources>
