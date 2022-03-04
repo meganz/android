@@ -229,7 +229,7 @@
     <!-- Text placed on the checkbox to make sure user agree that understand the danger of losing password -->
     <string name="top">Je comprends que [B]si je perds mon mot de passe, je pourrais perdre mes données[/B]. En apprendre davantage sur le [A]chiffrement de bout en bout de MEGA[/A].</string>
     <!-- Does the user already have a MEGA account -->
-    <string name="already_account">Avez-vous un compte ?</string>
+    <string name="already_account">Avez-vous déjà un compte ?</string>
     <!-- warning dialog -->
     <string name="create_account_no_terms">Vous devez accepter nos Conditions générales d’utilisation</string>
     <!-- warning dialog, for user do not tick checkbox of understanding the danger of losing password -->

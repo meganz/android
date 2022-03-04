@@ -3616,15 +3616,15 @@
     <!-- Button which action is share the password of a link -->
     <string name="button_share_password">共享密碼</string>
     <!-- String to share a link with its decryption key separately. Please keep the place holders, are to set the link and the key. Example: Link: https://mega.nz/file/kC42xRSK#Ud2QsvpIVYmCd1a9QUhk42wXv10jCSyPSWnXEwYX2VE Key: asfAFG3345g -->
-    <string name="share_link_with_key">連結: %1$s\n\n金鑰: %2$s</string>
+    <string name="share_link_with_key">連結：%1$s\n\n金鑰：%2$s</string>
     <!-- String to share a link protected with password with its password.Please keep the place holders, are to set the link and the password. Example: Link: https://mega.nz/file/kC42xRSK#Ud2QsvpIVYmCd1a9QUhk42wXv10jCSyPSWnXEwYX2VE Password: asfAFG3345g -->
     <string name="share_link_with_password">連結： %1$s\n\n密碼： %2$s</string>
     <!-- Warning show to the user when the app needs permissions to share files and the user has denied them. -->
     <string name="files_required_permissions_warning">MEGA需要您的授權才能存取您的檔案進行共享。</string>
     <!-- Context menu item. Allows user to add file/folder to favourites -->
-    <string name="file_properties_favourite">喜歡</string>
+    <string name="file_properties_favourite">收藏</string>
     <!-- Context menu item. Allows user to delete file/folder from favourites -->
-    <string name="file_properties_unfavourite">移除喜歡</string>
+    <string name="file_properties_unfavourite">移除收藏</string>
     <!-- Context menu item. Allows to mark file/folder with own color label -->
     <string name="file_properties_label">標籤</string>
     <!-- Information text to let’s the user know that they can remove a colour from a folder or file that was already marked. -->

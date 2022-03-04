@@ -2890,7 +2890,7 @@
     <!--  -->
     <string name="custom_subtitle_of_group_chat">%1$s と %2$d その他</string>
     <!-- Error when the user tries to get a public chat link for a chat with the default title -->
-    <string name="message_error_set_title_get_link">このチャット用のリンクを作成する前に、説明を設定する必要があります。</string>
+    <string name="message_error_set_title_get_link">このチャット用のリンクを作成する前に、説明を設定する必要があります：</string>
     <!-- success alert when the user copy a chat link to the clipboard -->
     <string name="chat_link_copied_clipboard">チャットリンクをクリップボードにコピーしました</string>
     <!-- Label to show the price of each plan in the upgrade account section -->

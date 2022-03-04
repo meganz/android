@@ -1064,7 +1064,7 @@
     <!-- Error message when a user attempts to change their email without an active login session. -->
     <string name="change_email_not_logged_in">Você precisa estar logado para completar a sua mudança de email. Por favor, faça login novamente com o seu endereço de email atual e, em seguida, toque novamente no link de confirmação.</string>
     <!-- Text displayed to inform that the email was successfully changed. Please keep the placeholder, it will be replaced with the new email address. -->
-    <string name="email_changed">Parabéns, o novo email desta conta no MEGA é %1$s</string>
+    <string name="email_changed">Parabéns, o novo email desta conta no MEGA é: %1$s</string>
     <!-- Error when the user leaves empty the password field -->
     <string name="invalid_string">Incorreto</string>
     <!-- Text of the toast when the user enters invalid text which is neither a valid phone number nor a valid email -->

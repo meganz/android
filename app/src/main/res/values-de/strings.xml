@@ -1064,7 +1064,7 @@
     <!-- Error message when a user attempts to change their email without an active login session. -->
     <string name="change_email_not_logged_in">Um Ihre E-Mail-Adresse zu ändern, müssen Sie angemeldet sein. Bitte melden Sie sich mit Ihrer aktuellen E-Mail-Adresse an und tippen Sie anschließend erneut auf Ihren Bestätigungslink.</string>
     <!-- Text displayed to inform that the email was successfully changed. Please keep the placeholder, it will be replaced with the new email address. -->
-    <string name="email_changed">Die neue E-Mail-Adresse Ihres MEGA-Accounts ist %1$s</string>
+    <string name="email_changed">Die neue E-Mail-Adresse Ihres MEGA-Accounts ist: %1$s</string>
     <!-- Error when the user leaves empty the password field -->
     <string name="invalid_string">Ungültig</string>
     <!-- Text of the toast when the user enters invalid text which is neither a valid phone number nor a valid email -->
