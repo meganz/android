@@ -76,14 +76,16 @@ abstract class GalleryBaseFetcher(
     }
 
     /**
-     * Get all nodes items
+     * Get all nodes items.
+     *
+     * @param cancelToken   MegaCancelToken to cancel the search at any time.
      */
-    suspend fun getGalleryItems() {
+    suspend fun getGalleryItems(cancelToken: MegaCancelToken) {
         var lastYearDate: LocalDate? = null
         var lastMonthDate: LocalDate? = null
         var lastDayDate: LocalDate? = null
 
-        for (node in getNodes()) {
+        for (node in getNodes(cancelToken)) {
             val thumbnail = if (zoom == ZoomUtil.ZOOM_IN_1X) {
                 getPreview(node)
             } else {
@@ -225,6 +227,8 @@ abstract class GalleryBaseFetcher(
 
     /**
      * Sub class to implement their own get node method by their own strategy
+     *
+     * @param cancelToken   MegaCancelToken to cancel the search at any time.
      */
-    abstract fun getNodes(): List<MegaNode>
+    abstract fun getNodes(cancelToken: MegaCancelToken? = null): List<MegaNode>
 }

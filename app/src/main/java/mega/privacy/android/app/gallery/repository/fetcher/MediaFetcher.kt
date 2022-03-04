@@ -3,6 +3,7 @@ package mega.privacy.android.app.gallery.repository.fetcher
 import android.content.Context
 import mega.privacy.android.app.gallery.data.GalleryItem
 import nz.mega.sdk.MegaApiAndroid
+import nz.mega.sdk.MegaCancelToken
 import nz.mega.sdk.MegaNode
 import nz.mega.sdk.MegaNodeList
 import java.util.*
@@ -26,7 +27,7 @@ class MediaFetcher(
         var cachedResults : List<MegaNode>? = null
     }
 
-    override fun getNodes(): List<MegaNode> {
+    override fun getNodes(cancelToken: MegaCancelToken?): List<MegaNode> {
         cachedResults = getFilteredChildren(getChildren())
         return cachedResults!!
     }
