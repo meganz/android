@@ -156,11 +156,12 @@ abstract class MediaPlayerActivity : PasscodeActivity(), SnackbarShower, Activit
         val isAudioPlayer = isAudioPlayer(intent)
 
         binding = ActivityMediaPlayerBinding.inflate(layoutInflater)
-        setContentView(binding.root)
 
         if (isAudioPlayer()) {
+            setContentView(binding.root)
             binding.toolbar.setBackgroundColor(Color.TRANSPARENT)
         } else {
+            setContentView(dragToExit.wrapContentView(binding.root))
             MediaPlayerService.pauseAudioPlayer(this)
             dragToExit.observeThumbnailLocation(this, intent)
         }

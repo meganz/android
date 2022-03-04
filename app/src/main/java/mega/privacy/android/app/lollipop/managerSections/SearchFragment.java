@@ -91,8 +91,8 @@ import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.FileUtil.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.MegaApiUtils.*;
-import static mega.privacy.android.app.utils.MegaNodeUtil.allHaveOwnerAccess;
-import static mega.privacy.android.app.utils.MegaNodeUtil.areAllFileNodes;
+import static mega.privacy.android.app.utils.MegaNodeUtil.allHaveOwnerAccessAndNotTakenDown;
+import static mega.privacy.android.app.utils.MegaNodeUtil.areAllFileNodesAndNotTakenDown;
 import static mega.privacy.android.app.utils.MegaNodeUtil.manageTextFileIntent;
 import static mega.privacy.android.app.utils.MegaNodeUtil.manageURLNode;
 import static mega.privacy.android.app.utils.MegaNodeUtil.onNodeTapped;
@@ -320,14 +320,16 @@ public class SearchFragment extends RotatableFragment implements SearchCallback.
 			
 			// Link
 			if ((selected.size() == 1) && (megaApi.checkAccess(selected.get(0), MegaShare.ACCESS_OWNER).getErrorCode() == MegaError.API_OK)) {
-				if (selected.get(0).isExported()) {
-					//Node has public link
-					showRemoveLink = true;
-					showEditLink = true;
-				} else {
-					showLink = true;
+				if (!selected.get(0).isTakenDown()) {
+					if (selected.get(0).isExported()) {
+						//Node has public link
+						showRemoveLink = true;
+						showEditLink = true;
+					} else {
+						showLink = true;
+					}
 				}
-			} else if (allHaveOwnerAccess(selected)) {
+			} else if (allHaveOwnerAccessAndNotTakenDown(selected)) {
 				showLink = true;
 			}
 
@@ -338,15 +340,22 @@ public class SearchFragment extends RotatableFragment implements SearchCallback.
 				showMove = true;
 				showCopy = true;
 
+				//showSendToChat
+				showSendToChat = areAllFileNodesAndNotTakenDown(selected);
+
 				for(int i=0; i<selected.size();i++)	{
 					if(megaApi.checkMove(selected.get(i), megaApi.getRubbishNode()).getErrorCode() != MegaError.API_OK)	{
 						showTrash = false;
 						showMove = false;
 						break;
 					}
+
+					if (selected.get(i).isTakenDown()) {
+						showDownload = false;
+						showCopy = false;
+						showSendToChat = false;
+					}
 				}
-				//showSendToChat
-				showSendToChat = areAllFileNodes(selected);
 
 				if(selected.size()==adapter.getItemCount()){
 					menu.findItem(R.id.cab_menu_select_all).setVisible(false);

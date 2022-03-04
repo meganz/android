@@ -141,7 +141,7 @@ class GetImageUseCase @Inject constructor(
                 !node.isFile -> emitter.onError(IllegalArgumentException("Node is not a file"))
                 else -> {
                     val fullSizeRequired = when {
-                        node.isVideo() -> false
+                        node.isTakenDown || node.isVideo() -> false
                         node.size <= SIZE_1_MB -> true
                         node.size in SIZE_1_MB..SIZE_50_MB -> fullSize || isMobileDataAllowed || !context.isMeteredConnection()
                         else -> false
