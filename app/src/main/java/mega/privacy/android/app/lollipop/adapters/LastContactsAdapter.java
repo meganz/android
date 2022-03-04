@@ -18,9 +18,8 @@ import java.util.List;
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
-import mega.privacy.android.app.lollipop.ContactInfoActivityLollipop;
 import mega.privacy.android.app.lollipop.listeners.UserAvatarListener;
-import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop;
+import mega.privacy.android.app.lollipop.megachat.ChatActivity;
 import mega.privacy.android.app.utils.ContactUtil;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaChatApiAndroid;
@@ -95,7 +94,7 @@ public class LastContactsAdapter extends RecyclerView.Adapter<LastContactsAdapte
         if (chat == null) {
             ContactUtil.openContactInfoActivity(context, contact.getEmail());
         } else {
-            Intent intentOpenChat = new Intent(context,ChatActivityLollipop.class);
+            Intent intentOpenChat = new Intent(context, ChatActivity.class);
             intentOpenChat.setAction(ACTION_CHAT_SHOW_MESSAGES);
             intentOpenChat.putExtra(CHAT_ID,chat.getChatId());
             intentOpenChat.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
@@ -192,7 +191,7 @@ public class LastContactsAdapter extends RecyclerView.Adapter<LastContactsAdapte
         return (total / colCount) + 1;
     }
     
-    public static class ViewHolder extends MegaContactsLollipopAdapter.ViewHolderContacts {
+    public static class ViewHolder extends MegaContactsAdapter.ViewHolderContacts {
         
         public ImageView avatarImage;
         

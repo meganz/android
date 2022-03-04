@@ -10,18 +10,18 @@ import android.widget.TextView;
 import java.util.List;
 
 import mega.privacy.android.app.R;
-import mega.privacy.android.app.lollipop.CountryCodePickerActivityLollipop;
+import mega.privacy.android.app.lollipop.CountryCodePickerActivity;
 
 public class CountryListAdapter extends RecyclerView.Adapter<CountryListAdapter.CountryHolder> {
     
     public interface CountrySelectedCallback{
-        void onCountrySelected(CountryCodePickerActivityLollipop.Country country);
+        void onCountrySelected(CountryCodePickerActivity.Country country);
     }
 
-    private List<CountryCodePickerActivityLollipop.Country> countries;
+    private List<CountryCodePickerActivity.Country> countries;
     private CountrySelectedCallback callback;
 
-    public CountryListAdapter(List<CountryCodePickerActivityLollipop.Country> countries) {
+    public CountryListAdapter(List<CountryCodePickerActivity.Country> countries) {
         this.countries = countries;
     }
     
@@ -39,7 +39,7 @@ public class CountryListAdapter extends RecyclerView.Adapter<CountryListAdapter.
 
             @Override
             public void onClick(View v) {
-                CountryCodePickerActivityLollipop.Country country = countries.get(holder.getAdapterPosition());
+                CountryCodePickerActivity.Country country = countries.get(holder.getAdapterPosition());
                 if(callback != null){
                     callback.onCountrySelected(country);
                 }
@@ -49,13 +49,13 @@ public class CountryListAdapter extends RecyclerView.Adapter<CountryListAdapter.
         return holder;
     }
 
-    public CountryCodePickerActivityLollipop.Country getItem(int position) {
+    public CountryCodePickerActivity.Country getItem(int position) {
         return countries.get(position);
     }
 
     @Override
     public void onBindViewHolder(@NonNull CountryListAdapter.CountryHolder holder,int position) {
-        CountryCodePickerActivityLollipop.Country country = getItem(position);
+        CountryCodePickerActivity.Country country = getItem(position);
         String name = country.getName();
         String code =country.getCode();
         String nameAndCode = name + " (" + code +  ")";
@@ -68,7 +68,7 @@ public class CountryListAdapter extends RecyclerView.Adapter<CountryListAdapter.
         return countries.size();
     }
 
-    public void refresh(List<CountryCodePickerActivityLollipop.Country> countries){
+    public void refresh(List<CountryCodePickerActivity.Country> countries){
         this.countries = countries;
         notifyDataSetChanged();
     }

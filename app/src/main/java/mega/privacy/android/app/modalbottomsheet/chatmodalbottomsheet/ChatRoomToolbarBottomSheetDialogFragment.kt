@@ -19,7 +19,7 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.adapters.FileStorageAdapter
 import mega.privacy.android.app.databinding.BottomSheetChatRoomToolbarBinding
 import mega.privacy.android.app.interfaces.ChatRoomToolbarBottomSheetDialogActionListener
-import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop
+import mega.privacy.android.app.lollipop.megachat.ChatActivity
 import mega.privacy.android.app.lollipop.megachat.FileGalleryItem
 import mega.privacy.android.app.utils.*
 import mega.privacy.android.app.utils.LogUtil.logDebug
@@ -128,7 +128,7 @@ class ChatRoomToolbarBottomSheetDialogFragment : BottomSheetDialogFragment() {
      * Show node permission dialog to ask for Node permissions.
      */
     private fun checkPermissionsDialog() {
-        val chatActivity = requireActivity() as ChatActivityLollipop
+        val chatActivity = requireActivity() as ChatActivity
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             val hasStoragePermission = ContextCompat.checkSelfPermission(

@@ -7,8 +7,8 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
-import mega.privacy.android.app.lollipop.megachat.chatAdapters.MegaChatLollipopAdapter;
-import mega.privacy.android.app.lollipop.megachat.chatAdapters.MegaListChatLollipopAdapter;
+import mega.privacy.android.app.lollipop.megachat.chatAdapters.MegaChatAdapter;
+import mega.privacy.android.app.lollipop.megachat.chatAdapters.MegaListChatAdapter;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaChatApiJava;
 import nz.mega.sdk.MegaChatError;
@@ -96,9 +96,9 @@ public class ChatNonContactNameListener implements MegaChatRequestListenerInterf
                 return;
             }
 
-            if(adapter instanceof MegaChatLollipopAdapter && holder == null){
+            if(adapter instanceof MegaChatAdapter && holder == null){
                 logWarning("holder is NULL");
-                holder = ((MegaChatLollipopAdapter)adapter).queryIfHolderNull(pos);
+                holder = ((MegaChatAdapter)adapter).queryIfHolderNull(pos);
                 if (holder == null) {
                     logWarning("holder is NULL");
                     return;
@@ -144,10 +144,10 @@ public class ChatNonContactNameListener implements MegaChatRequestListenerInterf
     private void updateAdapter() {
         if (receivedFirstName || receivedLastName || receivedEmail) {
             logDebug("updateAdapter");
-            if (adapter instanceof MegaChatLollipopAdapter) {
+            if (adapter instanceof MegaChatAdapter) {
                 adapter.notifyItemChanged(holder.getAdapterPosition());
-            } else if (adapter instanceof MegaListChatLollipopAdapter) {
-                ((MegaListChatLollipopAdapter) adapter).updateNonContactName(holder.getAdapterPosition(), this.userHandle);
+            } else if (adapter instanceof MegaListChatAdapter) {
+                ((MegaListChatAdapter) adapter).updateNonContactName(holder.getAdapterPosition(), this.userHandle);
             }
 
             receivedFirstName = false;

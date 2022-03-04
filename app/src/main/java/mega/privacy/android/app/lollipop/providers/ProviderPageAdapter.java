@@ -23,10 +23,10 @@ public class ProviderPageAdapter extends FragmentPagerAdapter {
         logDebug("position: " + position);
         switch (position){
             case 0: {
-                return CloudDriveProviderFragmentLollipop.newInstance();
+                return CloudDriveProviderFragment.newInstance();
             }
             case 1:{
-                return IncomingSharesProviderFragmentLollipop.newInstance();
+                return IncomingSharesProviderFragment.newInstance();
             }
         }
         return null;

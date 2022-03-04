@@ -35,8 +35,8 @@ import mega.privacy.android.app.interfaces.ActivityLauncher
 import mega.privacy.android.app.interfaces.SnackbarShower
 import mega.privacy.android.app.interfaces.showSnackbar
 import mega.privacy.android.app.listeners.BaseListener
-import mega.privacy.android.app.lollipop.FileExplorerActivityLollipop
-import mega.privacy.android.app.lollipop.FileInfoActivityLollipop
+import mega.privacy.android.app.lollipop.FileExplorerActivity
+import mega.privacy.android.app.lollipop.FileInfoActivity
 import mega.privacy.android.app.lollipop.controllers.ChatController
 import mega.privacy.android.app.lollipop.controllers.NodeController
 import mega.privacy.android.app.mediaplayer.service.AudioPlayerService
@@ -156,11 +156,12 @@ abstract class MediaPlayerActivity : PasscodeActivity(), SnackbarShower, Activit
         val isAudioPlayer = isAudioPlayer(intent)
 
         binding = ActivityMediaPlayerBinding.inflate(layoutInflater)
-        setContentView(binding.root)
 
         if (isAudioPlayer()) {
+            setContentView(binding.root)
             binding.toolbar.setBackgroundColor(Color.TRANSPARENT)
         } else {
+            setContentView(dragToExit.wrapContentView(binding.root))
             MediaPlayerService.pauseAudioPlayer(this)
             dragToExit.observeThumbnailLocation(this, intent)
         }
@@ -598,7 +599,7 @@ abstract class MediaPlayerActivity : PasscodeActivity(), SnackbarShower, Activit
 
                         logDebug("onOptionsItemSelected properties offline handle $playingHandle")
                     } else {
-                        intent = Intent(this, FileInfoActivityLollipop::class.java)
+                        intent = Intent(this, FileInfoActivity::class.java)
                         intent.putExtra(HANDLE, playingHandle)
 
                         val node = megaApi.getNodeByHandle(playingHandle)
@@ -633,8 +634,8 @@ abstract class MediaPlayerActivity : PasscodeActivity(), SnackbarShower, Activit
                 return true
             }
             R.id.chat_import -> {
-                val intent = Intent(this, FileExplorerActivityLollipop::class.java)
-                intent.action = FileExplorerActivityLollipop.ACTION_PICK_IMPORT_FOLDER
+                val intent = Intent(this, FileExplorerActivity::class.java)
+                intent.action = FileExplorerActivity.ACTION_PICK_IMPORT_FOLDER
                 startActivityForResult(intent, REQUEST_CODE_SELECT_IMPORT_FOLDER)
                 return true
             }
@@ -877,6 +878,7 @@ abstract class MediaPlayerActivity : PasscodeActivity(), SnackbarShower, Activit
             ViewCompat.setOnApplyWindowInsetsListener(binding.rootLayout) { _, windowInsets ->
                 val insets = windowInsets.getInsets(WindowInsetsCompat.Type.systemBars())
                 binding.toolbar.updatePadding(0, if (isVideoPlayerMainView) insets.top else 0, 0, 0)
+                binding.rootLayout.updatePadding(0, 0, 0, if (isVideoPlayerMainView) insets.bottom else 0)
                 WindowInsetsCompat.CONSUMED
             }
         }

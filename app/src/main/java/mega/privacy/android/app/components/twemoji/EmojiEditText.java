@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.res.TypedArray;
 import android.graphics.Paint;
 import android.os.Build;
+import android.text.Editable;
 import android.text.InputFilter;
 import android.util.AttributeSet;
 import android.view.KeyEvent;
@@ -19,12 +20,14 @@ import androidx.core.view.inputmethod.InputConnectionCompat;
 
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.twemoji.emoji.Emoji;
-import mega.privacy.android.app.lollipop.AddContactActivityLollipop;
-import mega.privacy.android.app.lollipop.megachat.GroupChatInfoActivityLollipop;
+
+import mega.privacy.android.app.lollipop.AddContactActivity;
+import mega.privacy.android.app.lollipop.megachat.GroupChatInfoActivity;
 import mega.privacy.android.app.utils.TextUtil;
 
 import static mega.privacy.android.app.utils.ChatUtil.getMaxAllowed;
-import static mega.privacy.android.app.utils.LogUtil.logDebug;
+
+import java.util.Objects;
 
 public class EmojiEditText extends AppCompatEditText implements EmojiEditTextInterface {
     private float emojiSize;
@@ -68,7 +71,7 @@ public class EmojiEditText extends AppCompatEditText implements EmojiEditTextInt
         final float defaultEmojiSize = fontMetrics.descent - fontMetrics.ascent;
         EmojiManager.getInstance().replaceWithImages(mContext, getText(), emojiSize, defaultEmojiSize);
 
-        if (mContext instanceof GroupChatInfoActivityLollipop || mContext instanceof AddContactActivityLollipop) {
+        if (mContext instanceof GroupChatInfoActivity || mContext instanceof AddContactActivity) {
             setFilters(new InputFilter[]{new InputFilter.LengthFilter(getMaxAllowed(getText()))});
             super.onTextChanged(getText(), start, lengthBefore, lengthAfter);
 
@@ -82,10 +85,8 @@ public class EmojiEditText extends AppCompatEditText implements EmojiEditTextInt
     @Override
     @CallSuper
     public boolean isTextEmpty() {
-        if(TextUtil.isTextEmpty(getText().toString())){
-            return true;
-        }
-        return false;
+        Editable text = getText();
+        return text != null && TextUtil.isTextEmpty(text.toString());
     }
     @Override
     @CallSuper
@@ -97,7 +98,7 @@ public class EmojiEditText extends AppCompatEditText implements EmojiEditTextInt
             if (start < 0) {
                 append(emoji.getUnicode());
             } else {
-                getText().replace(Math.min(start, end), Math.max(start, end), emoji.getUnicode(), 0, emoji.getUnicode().length());
+                Objects.requireNonNull(getText()).replace(Math.min(start, end), Math.max(start, end), emoji.getUnicode(), 0, emoji.getUnicode().length());
             }
         }
     }

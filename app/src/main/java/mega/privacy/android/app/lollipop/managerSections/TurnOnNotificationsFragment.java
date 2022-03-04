@@ -15,7 +15,7 @@ import android.widget.TextView;
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
-import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
+import mega.privacy.android.app.lollipop.ManagerActivity;
 import mega.privacy.android.app.utils.ColorUtils;
 import nz.mega.sdk.MegaApiAndroid;
 
@@ -53,7 +53,7 @@ public class TurnOnNotificationsFragment extends Fragment implements View.OnClic
         }
 
         dbH.setShowNotifOff(false);
-        ((ManagerActivityLollipop) context).turnOnNotifications = true;
+        ((ManagerActivity) context).turnOnNotifications = true;
     }
 
     @Override
@@ -122,7 +122,7 @@ public class TurnOnNotificationsFragment extends Fragment implements View.OnClic
     public void onClick(View v) {
         switch (v.getId()){
             case R.id.turnOnNotifications_fragment_container: {
-                ((ManagerActivityLollipop) context).deleteTurnOnNotificationsFragment();
+                ((ManagerActivity) context).deleteTurnOnNotificationsFragment();
                 break;
             }
         }

@@ -29,7 +29,7 @@ import mega.privacy.android.app.activities.settingsActivities.*
 import mega.privacy.android.app.constants.EventConstants.EVENT_UPDATE_HIDE_RECENT_ACTIVITY
 import mega.privacy.android.app.constants.SettingsConstants.*
 import mega.privacy.android.app.exportRK.ExportRecoveryKeyActivity
-import mega.privacy.android.app.lollipop.ChangePasswordActivityLollipop
+import mega.privacy.android.app.lollipop.ChangePasswordActivity
 import mega.privacy.android.app.lollipop.TwoFactorAuthenticationActivity
 import mega.privacy.android.app.lollipop.VerifyTwoFactorActivity
 import mega.privacy.android.app.mediaplayer.service.AudioPlayerService
@@ -234,7 +234,7 @@ class SettingsFragment : SharedPreferences.OnSharedPreferenceChangeListener, Pre
             KEY_CHANGE_PASSWORD -> startActivity(
                 Intent(
                     context,
-                    ChangePasswordActivityLollipop::class.java
+                    ChangePasswordActivity::class.java
                 )
             )
             KEY_2FA -> if (viewModel.uiState.value.multiFactorAuthChecked) {

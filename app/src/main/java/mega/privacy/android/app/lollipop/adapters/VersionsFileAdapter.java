@@ -3,8 +3,6 @@ package mega.privacy.android.app.lollipop.adapters;
 import android.app.Activity;
 import android.content.Context;
 import android.graphics.Bitmap;
-import android.graphics.Color;
-import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.recyclerview.widget.RecyclerView.ViewHolder;
 import android.util.DisplayMetrics;
@@ -21,17 +19,14 @@ import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.List;
-import java.util.Locale;
 
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.lollipop.VersionsFileActivity;
-import mega.privacy.android.app.utils.ThumbnailUtilsLollipop;
+import mega.privacy.android.app.utils.ThumbnailUtils;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaShare;
@@ -49,7 +44,6 @@ public class VersionsFileAdapter extends RecyclerView.Adapter<VersionsFileAdapte
 	Context context;
 	MegaApiAndroid megaApi;
 
-//	int positionClicked;
 	ArrayList<MegaNode> nodes;
 
 	long parentHandle = -1;
@@ -188,18 +182,6 @@ public class VersionsFileAdapter extends RecyclerView.Adapter<VersionsFileAdapte
 		}
 	}
 
-//	public void clearSelections() {
-//		if(selectedItems!=null){
-//			selectedItems.clear();
-//			for (int i= 0; i<this.getItemCount();i++) {
-//				if (isItemChecked(i)) {
-//					toggleAllSelection(i);
-//				}
-//			}
-//		}
-//		notifyDataSetChanged();
-//	}
-//
 	private boolean isItemChecked(int position) {
         return selectedItems.get(position);
     }
@@ -252,7 +234,6 @@ public class VersionsFileAdapter extends RecyclerView.Adapter<VersionsFileAdapte
 	public void setNodes(ArrayList<MegaNode> nodes) {
 		logDebug("setNodes");
 		this.nodes = nodes;
-//		contentTextFragment.setText(getInfoFolder(node));
 		notifyDataSetChanged();
 	}
 
@@ -380,7 +361,7 @@ public class VersionsFileAdapter extends RecyclerView.Adapter<VersionsFileAdapte
 
 					} else {
 						try {
-							thumb = ThumbnailUtilsLollipop.getThumbnailFromMegaList(node, context, holder, megaApi, this);
+							thumb = ThumbnailUtils.getThumbnailFromMegaList(node, context, holder, megaApi, this);
 						} catch (Exception e) {
 						} // Too many AsyncTasks
 
@@ -430,7 +411,7 @@ public class VersionsFileAdapter extends RecyclerView.Adapter<VersionsFileAdapte
 						holder.imageView.setLayoutParams(paramsLarge);
 
 						try {
-							ThumbnailUtilsLollipop.createThumbnailList(context, node,holder, megaApi, this);
+							ThumbnailUtils.createThumbnailList(context, node,holder, megaApi, this);
 						} catch (Exception e) {
 						} // Too many AsyncTasks
 					}
@@ -479,7 +460,7 @@ public class VersionsFileAdapter extends RecyclerView.Adapter<VersionsFileAdapte
 
 						} else {
 							try {
-								thumb = ThumbnailUtilsLollipop.getThumbnailFromMegaList(node, context, holder, megaApi, this);
+								thumb = ThumbnailUtils.getThumbnailFromMegaList(node, context, holder, megaApi, this);
 							} catch (Exception e) {
 							} // Too many AsyncTasks
 
@@ -531,7 +512,7 @@ public class VersionsFileAdapter extends RecyclerView.Adapter<VersionsFileAdapte
 
 							if (MimeTypeList.typeForName(node.getName()).isImage()) {
 								try {
-									ThumbnailUtilsLollipop.createThumbnailList(context, node, holder, megaApi, this);
+									ThumbnailUtils.createThumbnailList(context, node, holder, megaApi, this);
 								} catch (Exception e) {
 								}
 							}
@@ -540,10 +521,6 @@ public class VersionsFileAdapter extends RecyclerView.Adapter<VersionsFileAdapte
 				}
 			}
 		}
-	}
-
-	private String getItemNode(int position) {
-		return nodes.get(position).getName();
 	}
 
 	@Override

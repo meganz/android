@@ -119,6 +119,19 @@
             </LinearLayout>
 
             <View
+                android:id="@+id/separator_dispute"
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginStart="72dp"
+                android:background="@color/grey_012_white_012" />
+
+            <TextView
+                android:id="@+id/option_dispute"
+                style="@style/BottomSheetOption"
+                android:text="@string/dispute_takendown_file"
+                app:drawableStartCompat="@drawable/ic_input_warning" />
+
+            <View
                 android:id="@+id/separator_label"
                 android:layout_width="match_parent"
                 android:layout_height="1dp"
@@ -149,12 +162,6 @@
                 style="@style/BottomSheetOption"
                 android:text="@string/general_save_to_device"
                 app:drawableStartCompat="@drawable/ic_save_to_device" />
-
-            <TextView
-                android:id="@+id/option_gallery"
-                style="@style/BottomSheetOption"
-                android:text="@string/general_save_to_gallery"
-                app:drawableStartCompat="@drawable/ic_save_gallery" />
 
             <LinearLayout
                 android:id="@+id/option_offline_layout"

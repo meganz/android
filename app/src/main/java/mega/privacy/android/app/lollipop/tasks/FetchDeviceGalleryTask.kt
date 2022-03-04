@@ -8,7 +8,7 @@ import android.os.Build
 import android.provider.MediaStore
 import androidx.annotation.RequiresApi
 import com.facebook.common.util.UriUtil
-import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop
+import mega.privacy.android.app.lollipop.megachat.ChatActivity
 import mega.privacy.android.app.lollipop.megachat.FileGalleryItem
 import mega.privacy.android.app.utils.LogUtil.logDebug
 import mega.privacy.android.app.utils.LogUtil.logError
@@ -18,7 +18,7 @@ class FetchDeviceGalleryTask(var context: Context?) :
     AsyncTask<Void?, Void?, List<FileGalleryItem>?>() {
 
     override fun onPostExecute(photoUris: List<FileGalleryItem>?) {
-        (context as ChatActivityLollipop).showGallery(photoUris as ArrayList<FileGalleryItem>?)
+        (context as ChatActivity).showGallery(photoUris as ArrayList<FileGalleryItem>?)
     }
 
     @RequiresApi(Build.VERSION_CODES.Q)

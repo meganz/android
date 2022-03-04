@@ -6,7 +6,7 @@ import android.os.Handler;
 
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
-import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
+import mega.privacy.android.app.lollipop.ManagerActivity;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaError;
@@ -27,9 +27,9 @@ public class RemoveVersionsListener extends BaseListener {
         if (e.getErrorCode() == MegaError.API_OK) {
             Util.showSnackbar(context, context.getString(R.string.success_delete_versions));
             MegaApplication.getInstance().sendBroadcast(new Intent(ACTION_RESET_VERSION_INFO_SETTING));
-            if (context instanceof ManagerActivityLollipop) {
+            if (context instanceof ManagerActivity) {
                 final Handler handler = new Handler();
-                handler.postDelayed(() -> ((ManagerActivityLollipop) context).updateAccountStorageInfo(), 8000);
+                handler.postDelayed(() -> ((ManagerActivity) context).updateAccountStorageInfo(), 8000);
             }
         } else {
             Util.showSnackbar(context, context.getString(R.string.error_delete_versions));

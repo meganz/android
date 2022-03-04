@@ -50,7 +50,6 @@ public class CloudStorageOptionControlUtil {
     private final Option removeShare;
     private final Option rename;
     private final Option saveToDevice;
-    private final Option saveToGallery;
     private final Option getLink;
     private final Option manageLink;
     private final Option shareFolder;
@@ -70,7 +69,6 @@ public class CloudStorageOptionControlUtil {
       removeShare = new Option(false);
       rename = new Option(false);
       saveToDevice = new Option(true, MenuItem.SHOW_AS_ACTION_ALWAYS);
-      saveToGallery = new Option(false);
       getLink = new Option(false);
       manageLink = new Option(false);
       shareFolder = new Option(false);
@@ -82,9 +80,8 @@ public class CloudStorageOptionControlUtil {
       trash = new Option(true);
 
       options = Arrays.asList(
-          selectAll, clearSelection, removeLink, removeShare, rename, saveToDevice, saveToGallery,
-          getLink, manageLink, shareFolder, sendToChat, shareOut, move, copy, leaveShare, trash
-      );
+              selectAll, clearSelection, removeLink, removeShare, rename, saveToDevice, getLink,
+              manageLink, shareFolder, sendToChat, shareOut, move, copy, leaveShare, trash);
     }
 
     public Option selectAll() {
@@ -109,10 +106,6 @@ public class CloudStorageOptionControlUtil {
 
     public Option saveToDevice() {
       return saveToDevice;
-    }
-
-    public Option saveToGallery() {
-      return saveToGallery;
     }
 
     public Option getLink() {
@@ -181,9 +174,6 @@ public class CloudStorageOptionControlUtil {
 
     menu.findItem(R.id.cab_menu_download).setVisible(control.saveToDevice.visible);
     menu.findItem(R.id.cab_menu_download).setShowAsAction(control.saveToDevice.showAsAction);
-
-    menu.findItem(R.id.cab_menu_save_gallery).setVisible(!isAndroid11OrUpper() && control.saveToGallery.visible);
-    menu.findItem(R.id.cab_menu_save_gallery).setShowAsAction(control.saveToGallery.showAsAction);
 
     menu.findItem(R.id.cab_menu_share_link).setVisible(control.getLink.visible);
     menu.findItem(R.id.cab_menu_share_link).setShowAsAction(control.getLink.showAsAction);

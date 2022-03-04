@@ -9,7 +9,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import mega.privacy.android.app.R;
-import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop;
+import mega.privacy.android.app.lollipop.megachat.ChatActivity;
 import mega.privacy.android.app.modalbottomsheet.BaseBottomSheetDialogFragment;
 
 public class SendAttachmentChatBottomSheetDialogFragment extends BaseBottomSheetDialogFragment implements View.OnClickListener {
@@ -32,11 +32,11 @@ public class SendAttachmentChatBottomSheetDialogFragment extends BaseBottomSheet
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.send_attachment_chat_from_cloud_layout:
-                ((ChatActivityLollipop) requireActivity()).sendFromCloud();
+                ((ChatActivity) requireActivity()).sendFromCloud();
                 break;
 
             case R.id.send_attachment_chat_from_filesystem_layout:
-                ((ChatActivityLollipop) requireActivity()).sendFromFileSystem();
+                ((ChatActivity) requireActivity()).sendFromFileSystem();
                 break;
         }
 
