@@ -16,7 +16,6 @@ import android.view.Display;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -30,7 +29,7 @@ import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.RoundedImageView;
 import mega.privacy.android.app.lollipop.InviteContactActivity;
 import mega.privacy.android.app.lollipop.listeners.UserAvatarListener;
-import mega.privacy.android.app.lollipop.megachat.RecentChatsFragmentLollipop;
+import mega.privacy.android.app.lollipop.megachat.RecentChatsFragment;
 import mega.privacy.android.app.utils.contacts.MegaContactGetter;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaContactRequest;
@@ -45,7 +44,7 @@ public class ContactsHorizontalAdapter extends RecyclerView.Adapter<ContactsHori
 
     private Activity context;
 
-    private RecentChatsFragmentLollipop recentChatsFragment;
+    private RecentChatsFragment recentChatsFragment;
 
     private List<MegaContactGetter.MegaContact> contacts;
 
@@ -53,7 +52,7 @@ public class ContactsHorizontalAdapter extends RecyclerView.Adapter<ContactsHori
 
     private AlertDialog sendInvitationDialog;
 
-    public ContactsHorizontalAdapter(Activity context, RecentChatsFragmentLollipop recentChatsFragment, List<MegaContactGetter.MegaContact> data) {
+    public ContactsHorizontalAdapter(Activity context, RecentChatsFragment recentChatsFragment, List<MegaContactGetter.MegaContact> data) {
         this.context = context;
         this.contacts = data;
         if (megaApi == null) {
@@ -190,7 +189,7 @@ public class ContactsHorizontalAdapter extends RecyclerView.Adapter<ContactsHori
         return contacts.get(position);
     }
 
-    public static class ContactViewHolder extends MegaContactsLollipopAdapter.ViewHolderContacts {
+    public static class ContactViewHolder extends MegaContactsAdapter.ViewHolderContacts {
 
         TextView textViewName;
         TextView inviteMore;

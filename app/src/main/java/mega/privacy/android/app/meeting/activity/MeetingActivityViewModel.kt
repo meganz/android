@@ -17,7 +17,7 @@ import mega.privacy.android.app.constants.EventConstants.EVENT_MEETING_CREATED
 import mega.privacy.android.app.constants.EventConstants.EVENT_NETWORK_CHANGE
 import mega.privacy.android.app.listeners.BaseListener
 import mega.privacy.android.app.listeners.InviteToChatRoomListener
-import mega.privacy.android.app.lollipop.AddContactActivityLollipop
+import mega.privacy.android.app.lollipop.AddContactActivity
 import mega.privacy.android.app.lollipop.listeners.CreateGroupChatWithPublicLink
 import mega.privacy.android.app.lollipop.megachat.AppRTCAudioManager
 import mega.privacy.android.app.meeting.listeners.DisableAudioVideoCallListener
@@ -524,7 +524,7 @@ class MeetingActivityViewModel @Inject constructor(
         if (requestCode == REQUEST_ADD_PARTICIPANTS && resultCode == BaseActivity.RESULT_OK) {
             logDebug("Participants successfully added")
             val contactsData: List<String>? =
-                intent.getStringArrayListExtra(AddContactActivityLollipop.EXTRA_CONTACTS)
+                intent.getStringArrayListExtra(AddContactActivity.EXTRA_CONTACTS)
             if (contactsData != null) {
                 currentChatId.value?.let {
                     InviteToChatRoomListener(context).inviteToChat(it, contactsData)

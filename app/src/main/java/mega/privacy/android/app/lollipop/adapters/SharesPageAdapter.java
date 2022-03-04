@@ -7,9 +7,9 @@ import androidx.fragment.app.FragmentStatePagerAdapter;
 
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.fragments.managerFragments.LinksFragment;
-import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
-import mega.privacy.android.app.lollipop.managerSections.IncomingSharesFragmentLollipop;
-import mega.privacy.android.app.lollipop.managerSections.OutgoingSharesFragmentLollipop;
+import mega.privacy.android.app.lollipop.ManagerActivity;
+import mega.privacy.android.app.lollipop.managerSections.IncomingSharesFragment;
+import mega.privacy.android.app.lollipop.managerSections.OutgoingSharesFragment;
 
 import static mega.privacy.android.app.utils.LogUtil.*;
 
@@ -28,23 +28,23 @@ public class SharesPageAdapter extends FragmentStatePagerAdapter {
         logDebug("Position: " + position);
         switch (position) {
             case 0:
-                IncomingSharesFragmentLollipop isF = (IncomingSharesFragmentLollipop) ((ManagerActivityLollipop) context).getSupportFragmentManager().findFragmentByTag(ManagerActivityLollipop.FragmentTag.INCOMING_SHARES.getTag());
+                IncomingSharesFragment isF = (IncomingSharesFragment) ((ManagerActivity) context).getSupportFragmentManager().findFragmentByTag(ManagerActivity.FragmentTag.INCOMING_SHARES.getTag());
                 if (isF != null) {
                     return isF;
                 }
 
-                return IncomingSharesFragmentLollipop.newInstance();
+                return IncomingSharesFragment.newInstance();
 
             case 1:
-                OutgoingSharesFragmentLollipop osF = (OutgoingSharesFragmentLollipop) ((ManagerActivityLollipop) context).getSupportFragmentManager().findFragmentByTag(ManagerActivityLollipop.FragmentTag.OUTGOING_SHARES.getTag());
+                OutgoingSharesFragment osF = (OutgoingSharesFragment) ((ManagerActivity) context).getSupportFragmentManager().findFragmentByTag(ManagerActivity.FragmentTag.OUTGOING_SHARES.getTag());
                 if (osF != null) {
                     return osF;
                 }
 
-                return OutgoingSharesFragmentLollipop.newInstance();
+                return OutgoingSharesFragment.newInstance();
 
             case 2:
-                LinksFragment lF = (LinksFragment) ((ManagerActivityLollipop) context).getSupportFragmentManager().findFragmentByTag(ManagerActivityLollipop.FragmentTag.LINKS.getTag());
+                LinksFragment lF = (LinksFragment) ((ManagerActivity) context).getSupportFragmentManager().findFragmentByTag(ManagerActivity.FragmentTag.LINKS.getTag());
                 if (lF != null) {
                     return lF;
                 }

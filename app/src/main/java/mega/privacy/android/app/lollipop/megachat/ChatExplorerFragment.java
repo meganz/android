@@ -42,7 +42,7 @@ import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.PositionDividerItemDecoration;
 import mega.privacy.android.app.components.SimpleDividerItemDecoration;
 import mega.privacy.android.app.lollipop.CheckScrollInterface;
-import mega.privacy.android.app.lollipop.FileExplorerActivityLollipop;
+import mega.privacy.android.app.lollipop.FileExplorerActivity;
 import mega.privacy.android.app.lollipop.megachat.chatAdapters.MegaChipChatExplorerAdapter;
 import mega.privacy.android.app.lollipop.megachat.chatAdapters.MegaListChatExplorerAdapter;
 import mega.privacy.android.app.utils.ColorUtils;
@@ -54,7 +54,7 @@ import nz.mega.sdk.MegaChatListItem;
 import nz.mega.sdk.MegaChatRoom;
 import nz.mega.sdk.MegaUser;
 
-import static mega.privacy.android.app.lollipop.FileExplorerActivityLollipop.CHAT_FRAGMENT;
+import static mega.privacy.android.app.lollipop.FileExplorerActivity.CHAT_FRAGMENT;
 import static mega.privacy.android.app.utils.Constants.SCROLLING_UP_DIRECTION;
 import static mega.privacy.android.app.utils.ContactUtil.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
@@ -127,8 +127,8 @@ public class ChatExplorerFragment extends Fragment implements CheckScrollInterfa
             megaChatApi = ((MegaApplication) ((Activity) context).getApplication()).getMegaChatApi();
             if (context instanceof ChatExplorerActivity) {
                 megaChatApi.addChatListener((ChatExplorerActivity) context);
-            } else if (context instanceof FileExplorerActivityLollipop) {
-                megaChatApi.addChatListener((FileExplorerActivityLollipop) context);
+            } else if (context instanceof FileExplorerActivity) {
+                megaChatApi.addChatListener((FileExplorerActivity) context);
             }
         }
 
@@ -159,7 +159,7 @@ public class ChatExplorerFragment extends Fragment implements CheckScrollInterfa
         addLayout = v.findViewById(R.id.linear_layout_add);
         addedList = v.findViewById(R.id.contact_adds_recycler_view);
         newGroupButton = v.findViewById(R.id.new_group_button);
-        if (context instanceof ChatExplorerActivity || context instanceof FileExplorerActivityLollipop) {
+        if (context instanceof ChatExplorerActivity || context instanceof FileExplorerActivity) {
             addLayout.setVisibility(View.VISIBLE);
             addedLayoutManager = new LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false);
             addedList.setLayoutManager(addedLayoutManager);
@@ -170,8 +170,8 @@ public class ChatExplorerFragment extends Fragment implements CheckScrollInterfa
             if (context instanceof ChatExplorerActivity) {
                 newGroupButton.setOnClickListener((ChatExplorerActivity) context);
             }
-            else if (context instanceof FileExplorerActivityLollipop) {
-                newGroupButton.setOnClickListener((FileExplorerActivityLollipop) context);
+            else if (context instanceof FileExplorerActivity) {
+                newGroupButton.setOnClickListener((FileExplorerActivity) context);
             }
             setFirstLayoutVisibility(View.VISIBLE);
         }
@@ -246,7 +246,7 @@ public class ChatExplorerFragment extends Fragment implements CheckScrollInterfa
         boolean addLayoutVisible = (addLayout != null && addLayout.getVisibility() == View.VISIBLE);
         float elevation = getResources().getDimension(R.dimen.toolbar_elevation);
 
-        if (context instanceof FileExplorerActivityLollipop) {
+        if (context instanceof FileExplorerActivity) {
             if (addLayoutVisible && canScroll) {
                 if (Util.isDarkMode(context)) {
                     addLayout.setBackgroundColor(ColorUtils.getColorForElevation(context, elevation));
@@ -261,7 +261,7 @@ public class ChatExplorerFragment extends Fragment implements CheckScrollInterfa
                 }
             }
 
-            ((FileExplorerActivityLollipop) context).changeActionBarElevation(canScroll, CHAT_FRAGMENT);
+            ((FileExplorerActivity) context).changeActionBarElevation(canScroll, CHAT_FRAGMENT);
         } else if (context instanceof ChatExplorerActivity && addLayoutVisible) {
             addLayout.setElevation(canScroll ? getResources().getDimension(R.dimen.toolbar_elevation) : 0);
 
@@ -313,8 +313,8 @@ public class ChatExplorerFragment extends Fragment implements CheckScrollInterfa
             if (context instanceof ChatExplorerActivity) {
                 megaChatApi.removeChatListener((ChatExplorerActivity) context);
             }
-            else if (context instanceof FileExplorerActivityLollipop) {
-                megaChatApi.removeChatListener((FileExplorerActivityLollipop) context);
+            else if (context instanceof FileExplorerActivity) {
+                megaChatApi.removeChatListener((FileExplorerActivity) context);
             }
         }
     }
@@ -386,8 +386,8 @@ public class ChatExplorerFragment extends Fragment implements CheckScrollInterfa
             if (context instanceof ChatExplorerActivity) {
                 ((ChatExplorerActivity) context).collapseSearchView();
             }
-            else if (context instanceof FileExplorerActivityLollipop){
-                ((FileExplorerActivityLollipop) context).collapseSearchView();
+            else if (context instanceof FileExplorerActivity){
+                ((FileExplorerActivity) context).collapseSearchView();
             }
             if (!adapterList.getItems().equals(items)) {
                 adapterList.setItems(items);
@@ -414,13 +414,13 @@ public class ChatExplorerFragment extends Fragment implements CheckScrollInterfa
                 ((ChatExplorerActivity)context).showFabButton(true);
                 ((ChatExplorerActivity)context).setToolbarSubtitle(getString(R.string.selected_items, addedItems.size()));
             }
-            else if (context instanceof FileExplorerActivityLollipop){
+            else if (context instanceof FileExplorerActivity){
                 if (addedItems.size() == 1) {
-                    ((FileExplorerActivityLollipop) context).hideTabs(true, CHAT_FRAGMENT);
+                    ((FileExplorerActivity) context).hideTabs(true, CHAT_FRAGMENT);
                 }
 
-                ((FileExplorerActivityLollipop)context).showFabButton(true);
-                ((FileExplorerActivityLollipop)context).setToolbarSubtitle(getString(R.string.selected_items, addedItems.size()));
+                ((FileExplorerActivity)context).showFabButton(true);
+                ((FileExplorerActivity)context).setToolbarSubtitle(getString(R.string.selected_items, addedItems.size()));
             }
         }
         else if (addedItems.contains(item)) {
@@ -581,9 +581,9 @@ public class ChatExplorerFragment extends Fragment implements CheckScrollInterfa
                     ((ChatExplorerActivity)context).showFabButton(true);
                     ((ChatExplorerActivity)context).setToolbarSubtitle(getString(R.string.selected_items, addedItems.size()));
                 }
-                else if (context instanceof FileExplorerActivityLollipop){
-                    ((FileExplorerActivityLollipop)context).showFabButton(true);
-                    ((FileExplorerActivityLollipop)context).setToolbarSubtitle(getString(R.string.selected_items, addedItems.size()));
+                else if (context instanceof FileExplorerActivity){
+                    ((FileExplorerActivity)context).showFabButton(true);
+                    ((FileExplorerActivity)context).setToolbarSubtitle(getString(R.string.selected_items, addedItems.size()));
                 }
             }
             else {
@@ -592,10 +592,10 @@ public class ChatExplorerFragment extends Fragment implements CheckScrollInterfa
                     ((ChatExplorerActivity)context).showFabButton(false);
                     ((ChatExplorerActivity)context).setToolbarSubtitle(null);
                 }
-                else if (context instanceof FileExplorerActivityLollipop){
-                    ((FileExplorerActivityLollipop) context).hideTabs(false, CHAT_FRAGMENT);
-                    ((FileExplorerActivityLollipop)context).showFabButton(false);
-                    ((FileExplorerActivityLollipop)context).setToolbarSubtitle(null);
+                else if (context instanceof FileExplorerActivity){
+                    ((FileExplorerActivity) context).hideTabs(false, CHAT_FRAGMENT);
+                    ((FileExplorerActivity)context).showFabButton(false);
+                    ((FileExplorerActivity)context).setToolbarSubtitle(null);
                 }
             }
         }
@@ -721,8 +721,8 @@ public class ChatExplorerFragment extends Fragment implements CheckScrollInterfa
                                         if (context instanceof ChatExplorerActivity) {
                                             megaChatApi.requestLastGreen(handle, (ChatExplorerActivity) context);
                                         }
-                                        else if (context instanceof FileExplorerActivityLollipop) {
-                                            megaChatApi.requestLastGreen(handle, (FileExplorerActivityLollipop) context);
+                                        else if (context instanceof FileExplorerActivity) {
+                                            megaChatApi.requestLastGreen(handle, (FileExplorerActivity) context);
                                         }
                                     }
                                 }
@@ -797,8 +797,8 @@ public class ChatExplorerFragment extends Fragment implements CheckScrollInterfa
             if(context instanceof  ChatExplorerActivity){
                 ((ChatExplorerActivity)context).setToolbarSubtitle(null);
             }
-            else if (context instanceof FileExplorerActivityLollipop){
-                ((FileExplorerActivityLollipop)context).setToolbarSubtitle(null);
+            else if (context instanceof FileExplorerActivity){
+                ((FileExplorerActivity)context).setToolbarSubtitle(null);
             }
         }
         else {
@@ -808,17 +808,17 @@ public class ChatExplorerFragment extends Fragment implements CheckScrollInterfa
                 ((ChatExplorerActivity)context).showFabButton(true);
                 ((ChatExplorerActivity)context).setToolbarSubtitle(getString(R.string.selected_items, addedItems.size()));
             }
-            else if (context instanceof FileExplorerActivityLollipop){
-                ((FileExplorerActivityLollipop) context).showFabButton(true);
-                ((FileExplorerActivityLollipop) context).setToolbarSubtitle(getString(R.string.selected_items, addedItems.size()));
+            else if (context instanceof FileExplorerActivity){
+                ((FileExplorerActivity) context).showFabButton(true);
+                ((FileExplorerActivity) context).setToolbarSubtitle(getString(R.string.selected_items, addedItems.size()));
             }
         }
 
         if (context instanceof ChatExplorerActivity) {
             ((ChatExplorerActivity) context).isPendingToOpenSearchView();
         }
-        else if (context instanceof FileExplorerActivityLollipop) {
-            ((FileExplorerActivityLollipop) context).isPendingToOpenSearchView();
+        else if (context instanceof FileExplorerActivity) {
+            ((FileExplorerActivity) context).isPendingToOpenSearchView();
         }
         contentLayout.setVisibility(View.VISIBLE);
         progressBar.setVisibility(View.GONE);
@@ -847,8 +847,8 @@ public class ChatExplorerFragment extends Fragment implements CheckScrollInterfa
 
         @Override
         protected void onPostExecute(Void aVoid) {
-            if (context instanceof FileExplorerActivityLollipop && !addedItems.isEmpty()) {
-                ((FileExplorerActivityLollipop) context).hideTabs(true, CHAT_FRAGMENT);
+            if (context instanceof FileExplorerActivity && !addedItems.isEmpty()) {
+                ((FileExplorerActivity) context).hideTabs(true, CHAT_FRAGMENT);
             }
 
             setFinalViews();
@@ -932,8 +932,8 @@ public class ChatExplorerFragment extends Fragment implements CheckScrollInterfa
             if(context instanceof  ChatExplorerActivity){
                 ((ChatExplorerActivity)context).showFabButton(false);
             }
-            else if (context instanceof FileExplorerActivityLollipop){
-                ((FileExplorerActivityLollipop)context).showFabButton(false);
+            else if (context instanceof FileExplorerActivity){
+                ((FileExplorerActivity)context).showFabButton(false);
             }
         }
         else{
@@ -961,8 +961,8 @@ public class ChatExplorerFragment extends Fragment implements CheckScrollInterfa
                 if(context instanceof  ChatExplorerActivity){
                     ((ChatExplorerActivity)context).showFabButton(true);
                 }
-                else if (context instanceof FileExplorerActivityLollipop){
-                    ((FileExplorerActivityLollipop)context).showFabButton(true);
+                else if (context instanceof FileExplorerActivity){
+                    ((FileExplorerActivity)context).showFabButton(true);
                 }
             }
         }

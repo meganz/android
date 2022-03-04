@@ -10,8 +10,8 @@ import android.widget.TextView;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.RoundedImageView;
 import mega.privacy.android.app.components.twemoji.EmojiTextView;
-import mega.privacy.android.app.lollipop.FileContactListActivityLollipop;
-import mega.privacy.android.app.lollipop.FileInfoActivityLollipop;
+import mega.privacy.android.app.lollipop.FileContactListActivity;
+import mega.privacy.android.app.lollipop.FileInfoActivity;
 import mega.privacy.android.app.utils.ContactUtil;
 import mega.privacy.android.app.utils.StringResourcesUtils;
 import nz.mega.sdk.MegaShare;
@@ -44,16 +44,16 @@ public class FileContactsListBottomSheetDialogFragment extends BaseBottomSheetDi
                     nonContactEmail = email;
                 }
             }
-        } else if (requireActivity() instanceof FileContactListActivityLollipop) {
-            share = ((FileContactListActivityLollipop) requireActivity()).getSelectedShare();
-            contact = ((FileContactListActivityLollipop) requireActivity()).getSelectedContact();
+        } else if (requireActivity() instanceof FileContactListActivity) {
+            share = ((FileContactListActivity) requireActivity()).getSelectedShare();
+            contact = ((FileContactListActivity) requireActivity()).getSelectedContact();
 
             if (contact == null) {
                 nonContactEmail = share.getUser();
             }
-        } else if (requireActivity() instanceof FileInfoActivityLollipop) {
-            share = ((FileInfoActivityLollipop) requireActivity()).getSelectedShare();
-            contact = ((FileInfoActivityLollipop) requireActivity()).getSelectedContact();
+        } else if (requireActivity() instanceof FileInfoActivity) {
+            share = ((FileInfoActivity) requireActivity()).getSelectedShare();
+            contact = ((FileInfoActivity) requireActivity()).getSelectedContact();
 
             if (contact == null) {
                 nonContactEmail = share.getUser();
@@ -126,18 +126,18 @@ public class FileContactsListBottomSheetDialogFragment extends BaseBottomSheetDi
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.file_contact_list_option_permissions_layout:
-                if (requireActivity() instanceof FileContactListActivityLollipop) {
-                    ((FileContactListActivityLollipop) requireActivity()).changePermissions();
-                } else if (requireActivity() instanceof FileInfoActivityLollipop) {
-                    ((FileInfoActivityLollipop) requireActivity()).changePermissions();
+                if (requireActivity() instanceof FileContactListActivity) {
+                    ((FileContactListActivity) requireActivity()).changePermissions();
+                } else if (requireActivity() instanceof FileInfoActivity) {
+                    ((FileInfoActivity) requireActivity()).changePermissions();
                 }
                 break;
 
             case R.id.file_contact_list_option_delete_layout:
-                if (requireActivity() instanceof FileContactListActivityLollipop) {
-                    ((FileContactListActivityLollipop) requireActivity()).removeFileContactShare();
-                } else if (requireActivity() instanceof FileInfoActivityLollipop) {
-                    ((FileInfoActivityLollipop) requireActivity()).removeFileContactShare();
+                if (requireActivity() instanceof FileContactListActivity) {
+                    ((FileContactListActivity) requireActivity()).removeFileContactShare();
+                } else if (requireActivity() instanceof FileInfoActivity) {
+                    ((FileInfoActivity) requireActivity()).removeFileContactShare();
                 }
                 break;
 

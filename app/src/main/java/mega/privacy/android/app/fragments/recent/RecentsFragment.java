@@ -33,7 +33,6 @@ import com.brandongogetap.stickyheaders.exposed.StickyHeaderHandler;
 import com.jeremyliao.liveeventbus.LiveEventBus;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import mega.privacy.android.app.MegaApplication;
@@ -46,8 +45,8 @@ import mega.privacy.android.app.components.HeaderItemDecoration;
 import mega.privacy.android.app.components.TopSnappedStickyLayoutManager;
 import mega.privacy.android.app.components.scrollBar.FastScroller;
 import mega.privacy.android.app.imageviewer.ImageViewerActivity;
-import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
-import mega.privacy.android.app.lollipop.PdfViewerActivityLollipop;
+import mega.privacy.android.app.lollipop.ManagerActivity;
+import mega.privacy.android.app.lollipop.PdfViewerActivity;
 import mega.privacy.android.app.lollipop.adapters.RecentsAdapter;
 import mega.privacy.android.app.utils.StringResourcesUtils;
 import nz.mega.sdk.MegaApiAndroid;
@@ -114,14 +113,14 @@ public class RecentsFragment extends Fragment implements StickyHeaderHandler {
     public void onStart() {
         super.onStart();
 
-        ((ManagerActivityLollipop) requireActivity()).pagerRecentsFragmentOpened(this);
+        ((ManagerActivity) requireActivity()).pagerRecentsFragmentOpened(this);
     }
 
     @Override
     public void onStop() {
         super.onStop();
 
-        ((ManagerActivityLollipop) requireActivity()).pagerRecentsFragmentClosed(this);
+        ((ManagerActivity) requireActivity()).pagerRecentsFragmentClosed(this);
     }
 
     @Override
@@ -257,7 +256,7 @@ public class RecentsFragment extends Fragment implements StickyHeaderHandler {
                 .getBoolean(HIDE_RECENT_ACTIVITY, false);
 
         setRecentsView(hideRecentActivity);
-        ((ManagerActivityLollipop) context).setToolbarTitle();
+        ((ManagerActivity) context).setToolbarTitle();
     }
 
     /**
@@ -399,7 +398,7 @@ public class RecentsFragment extends Fragment implements StickyHeaderHandler {
 
             putThumbnailLocation(intent, listView, index, VIEWER_FROM_RECETS, adapter);
             startActivity(intent);
-            ((ManagerActivityLollipop) context).overridePendingTransition(0, 0);
+            ((ManagerActivity) context).overridePendingTransition(0, 0);
             return;
         }
 
@@ -424,10 +423,10 @@ public class RecentsFragment extends Fragment implements StickyHeaderHandler {
 
             if (isLocalFile(node, megaApi, localPath)) {
                 paramsSetSuccessfully = setLocalIntentParams(context, node, intent, localPath,
-                        false, (ManagerActivityLollipop) requireActivity());
+                        false, (ManagerActivity) requireActivity());
             } else {
                 paramsSetSuccessfully = setStreamingIntentParams(context, node, megaApi, intent,
-                        (ManagerActivityLollipop) requireActivity());
+                        (ManagerActivity) requireActivity());
             }
 
             if (paramsSetSuccessfully && isOpusFile(node)) {
@@ -438,16 +437,16 @@ public class RecentsFragment extends Fragment implements StickyHeaderHandler {
         } else if (MimeTypeList.typeForName(node.getName()).isURL()) {
             manageURLNode(context, megaApi, node);
         } else if (MimeTypeList.typeForName(node.getName()).isPdf()) {
-            intent = new Intent(context, PdfViewerActivityLollipop.class);
+            intent = new Intent(context, PdfViewerActivity.class);
             intent.putExtra(INTENT_EXTRA_KEY_INSIDE, true);
             intent.putExtra(INTENT_EXTRA_KEY_ADAPTER_TYPE, RECENTS_ADAPTER);
 
             if (isLocalFile(node, megaApi, localPath)) {
                 paramsSetSuccessfully = setLocalIntentParams(context, node, intent, localPath,
-                        false, (ManagerActivityLollipop) requireActivity());
+                        false, (ManagerActivity) requireActivity());
             } else {
                 paramsSetSuccessfully = setStreamingIntentParams(context, node, megaApi, intent,
-                        (ManagerActivityLollipop) requireActivity());
+                        (ManagerActivity) requireActivity());
             }
 
             launchIntent(intent, paramsSetSuccessfully, node, index);
@@ -455,7 +454,7 @@ public class RecentsFragment extends Fragment implements StickyHeaderHandler {
             manageTextFileIntent(requireContext(), node, RECENTS_ADAPTER);
         } else {
             logDebug("itemClick:isFile:otherOption");
-            onNodeTapped(context, node, ((ManagerActivityLollipop) requireActivity())::saveNodeByTap, (ManagerActivityLollipop) requireActivity(), (ManagerActivityLollipop) requireActivity());
+            onNodeTapped(context, node, ((ManagerActivity) requireActivity())::saveNodeByTap, (ManagerActivity) requireActivity(), (ManagerActivity) requireActivity());
         }
     }
 
@@ -470,7 +469,7 @@ public class RecentsFragment extends Fragment implements StickyHeaderHandler {
     private void launchIntent(Intent intent, boolean paramsSetSuccessfully, MegaNode node ,int position) {
         if (intent != null && !isIntentAvailable(context, intent)) {
             paramsSetSuccessfully = false;
-            ((ManagerActivityLollipop) context).showSnackbar(SNACKBAR_TYPE, getString(R.string.intent_not_available), -1);
+            ((ManagerActivity) context).showSnackbar(SNACKBAR_TYPE, getString(R.string.intent_not_available), -1);
         }
 
         if (intent != null && paramsSetSuccessfully) {
@@ -478,7 +477,7 @@ public class RecentsFragment extends Fragment implements StickyHeaderHandler {
             putThumbnailLocation(intent, listView, position, VIEWER_FROM_RECETS, adapter);
 
             context.startActivity(intent);
-            ((ManagerActivityLollipop) context).overridePendingTransition(0, 0);
+            ((ManagerActivity) context).overridePendingTransition(0, 0);
         }
     }
 

@@ -7,7 +7,7 @@ import android.graphics.Bitmap;
 import java.io.File;
 
 import mega.privacy.android.app.lollipop.megachat.AndroidMegaRichLinkMessage;
-import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop;
+import mega.privacy.android.app.lollipop.megachat.ChatActivity;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaChatApiJava;
@@ -52,7 +52,7 @@ public class ChatLinkInfoListener implements MegaRequestListenerInterface, MegaC
 
             if (request.getType() == MegaRequest.TYPE_GET_ATTR_FILE){
                 if (e.getErrorCode() == MegaError.API_OK){
-                    ((ChatActivityLollipop) context).setRichLinkImage(msgId);
+                    ((ChatActivity) context).setRichLinkImage(msgId);
                 }
             }
             else if (request.getType() == MegaRequest.TYPE_GET_PUBLIC_NODE) {
@@ -61,7 +61,7 @@ public class ChatLinkInfoListener implements MegaRequestListenerInterface, MegaC
 
                 richLinkMessage = new AndroidMegaRichLinkMessage(link, document);
 
-                ((ChatActivityLollipop) context).setRichLinkInfo(msgId, richLinkMessage);
+                ((ChatActivity) context).setRichLinkInfo(msgId, richLinkMessage);
 
                 //Get preview of file
                 if (document.isFile()) {
@@ -87,13 +87,13 @@ public class ChatLinkInfoListener implements MegaRequestListenerInterface, MegaC
                     String link = request.getLink();
 
                     richLinkMessage = new AndroidMegaRichLinkMessage(link, null);
-                    ((ChatActivityLollipop) context).setRichLinkInfo(msgId, richLinkMessage);
+                    ((ChatActivity) context).setRichLinkInfo(msgId, richLinkMessage);
                 }
                 else if(e.getErrorCode() == MegaError.API_EARGS) {
                     String link = request.getLink();
 
                     richLinkMessage = new AndroidMegaRichLinkMessage(link, null);
-                    ((ChatActivityLollipop) context).setRichLinkInfo(msgId, richLinkMessage);
+                    ((ChatActivity) context).setRichLinkInfo(msgId, richLinkMessage);
                 }
             }
         }
@@ -122,12 +122,12 @@ public class ChatLinkInfoListener implements MegaRequestListenerInterface, MegaC
 
                 richLinkMessage = new AndroidMegaRichLinkMessage(link, request.getText(), request.getNumber());
 
-                ((ChatActivityLollipop) context).setRichLinkInfo(msgId, richLinkMessage);
+                ((ChatActivity) context).setRichLinkInfo(msgId, richLinkMessage);
             }
             else{
                 //Invalid link
                 richLinkMessage = new AndroidMegaRichLinkMessage(link, "", -1);
-                ((ChatActivityLollipop) context).setRichLinkInfo(msgId, richLinkMessage);
+                ((ChatActivity) context).setRichLinkInfo(msgId, richLinkMessage);
 
             }
         }

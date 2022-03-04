@@ -6,11 +6,11 @@ import android.content.Intent;
 import android.util.Pair;
 import com.jeremyliao.liveeventbus.LiveEventBus;
 
-import mega.privacy.android.app.lollipop.FileExplorerActivityLollipop;
-import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
-import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop;
+import mega.privacy.android.app.lollipop.FileExplorerActivity;
+import mega.privacy.android.app.lollipop.ManagerActivity;
+import mega.privacy.android.app.lollipop.megachat.ChatActivity;
 import mega.privacy.android.app.lollipop.megachat.ChatExplorerActivity;
-import mega.privacy.android.app.lollipop.megachat.GroupChatInfoActivityLollipop;
+import mega.privacy.android.app.lollipop.megachat.GroupChatInfoActivity;
 import nz.mega.sdk.MegaChatApiJava;
 import nz.mega.sdk.MegaChatError;
 import nz.mega.sdk.MegaChatRequest;
@@ -58,17 +58,17 @@ public class CreateGroupChatWithPublicLink implements MegaChatRequestListenerInt
                 }
             }
             else{
-                if(context instanceof ManagerActivityLollipop){
-                    ((ManagerActivityLollipop) context).onRequestFinishCreateChat(e.getErrorCode(), request.getChatHandle());
+                if(context instanceof ManagerActivity){
+                    ((ManagerActivity) context).onRequestFinishCreateChat(e.getErrorCode(), request.getChatHandle());
                 }
-                else if(context instanceof FileExplorerActivityLollipop){
-                    ((FileExplorerActivityLollipop) context).onRequestFinishCreateChat(e.getErrorCode(), request.getChatHandle(), false);
+                else if(context instanceof FileExplorerActivity){
+                    ((FileExplorerActivity) context).onRequestFinishCreateChat(e.getErrorCode(), request.getChatHandle(), false);
                 }
                 else if(context instanceof ChatExplorerActivity){
                     ((ChatExplorerActivity) context).onRequestFinishCreateChat(e.getErrorCode(), request.getChatHandle(), false);
                 }
-                else if(context instanceof GroupChatInfoActivityLollipop){
-                    ((GroupChatInfoActivityLollipop) context).onRequestFinishCreateChat(e.getErrorCode(), request.getChatHandle(), false);
+                else if(context instanceof GroupChatInfoActivity){
+                    ((GroupChatInfoActivity) context).onRequestFinishCreateChat(e.getErrorCode(), request.getChatHandle(), false);
                 }
             }
         }
@@ -80,22 +80,22 @@ public class CreateGroupChatWithPublicLink implements MegaChatRequestListenerInt
               if (request.getNumRetry() == 1) {
                    logDebug("Chat link exported");
 
-                   if(context instanceof ManagerActivityLollipop){
-                       Intent intent = new Intent(context, ChatActivityLollipop.class);
+                   if(context instanceof ManagerActivity){
+                       Intent intent = new Intent(context, ChatActivity.class);
                        intent.setAction(ACTION_CHAT_SHOW_MESSAGES);
                        intent.putExtra(CHAT_ID, request.getChatHandle());
                        intent.putExtra("PUBLIC_LINK", e.getErrorCode());
                        intent.putExtra(CHAT_LINK_EXTRA, request.getText());
                        context.startActivity(intent);
                    }
-                   else if(context instanceof FileExplorerActivityLollipop){
-                       ((FileExplorerActivityLollipop) context).onRequestFinishCreateChat(e.getErrorCode(), request.getChatHandle(), true);
+                   else if(context instanceof FileExplorerActivity){
+                       ((FileExplorerActivity) context).onRequestFinishCreateChat(e.getErrorCode(), request.getChatHandle(), true);
                    }
                    else if(context instanceof ChatExplorerActivity){
                        ((ChatExplorerActivity) context).onRequestFinishCreateChat(e.getErrorCode(), request.getChatHandle(), true);
                    }
-                   else if(context instanceof GroupChatInfoActivityLollipop){
-                       ((GroupChatInfoActivityLollipop) context).onRequestFinishCreateChat(e.getErrorCode(), request.getChatHandle(), true);
+                   else if(context instanceof GroupChatInfoActivity){
+                       ((GroupChatInfoActivity) context).onRequestFinishCreateChat(e.getErrorCode(), request.getChatHandle(), true);
                    }
                 }
             }

@@ -261,8 +261,8 @@ public class TestPasswordActivity extends PasscodeActivity implements View.OnCli
             passwordErrorImage.setImageDrawable(icon);
             testPasswordbackupRecoveryKeyButton.setTextColor(ContextCompat.getColor(this, R.color.red_600_red_300));
             if (counter == 3) {
-                Intent intent = new Intent(this, ChangePasswordActivityLollipop.class);
-                intent.putExtra(ChangePasswordActivityLollipop.KEY_IS_LOGOUT, isLogout());
+                Intent intent = new Intent(this, ChangePasswordActivity.class);
+                intent.putExtra(ChangePasswordActivity.KEY_IS_LOGOUT, isLogout());
                 startActivity(intent);
                 onBackPressed();
             }
@@ -279,7 +279,7 @@ public class TestPasswordActivity extends PasscodeActivity implements View.OnCli
 
         if (requestCode == REQUEST_DOWNLOAD_FOLDER && resultCode == RESULT_OK){
             logDebug("REQUEST_DOWNLOAD_FOLDER");
-            String parentPath = intent.getStringExtra(FileStorageActivityLollipop.EXTRA_PATH);
+            String parentPath = intent.getStringExtra(FileStorageActivity.EXTRA_PATH);
 
             if (parentPath != null){
                 logDebug("parentPath no NULL");
