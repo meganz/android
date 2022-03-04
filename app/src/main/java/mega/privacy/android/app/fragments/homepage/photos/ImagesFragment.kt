@@ -39,6 +39,11 @@ class ImagesFragment : BaseZoomFragment() {
         subscribeObservers()
     }
 
+    override fun onDestroyView() {
+        viewModel.cancelSearch()
+        super.onDestroyView()
+    }
+
     private fun setupBinding() {
         binding.apply {
             viewModel = this@ImagesFragment.viewModel

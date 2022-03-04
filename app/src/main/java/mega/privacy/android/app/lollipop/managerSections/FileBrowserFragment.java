@@ -94,7 +94,7 @@ import static mega.privacy.android.app.utils.MegaNodeDialogUtil.BACKUP_HANDLED_I
 import static mega.privacy.android.app.utils.MegaNodeDialogUtil.BACKUP_HANDLED_NODE;
 import static mega.privacy.android.app.utils.MegaNodeDialogUtil.BACKUP_NODE_TYPE;
 import static mega.privacy.android.app.utils.MegaNodeDialogUtil.BACKUP_NONE;
-import static mega.privacy.android.app.utils.MegaNodeUtil.allHaveOwnerAccess;
+import static mega.privacy.android.app.utils.MegaNodeUtil.allHaveOwnerAccessAndNotTakenDown;
 import static mega.privacy.android.app.utils.MegaNodeUtil.manageTextFileIntent;
 import static mega.privacy.android.app.utils.MegaNodeUtil.manageURLNode;
 import static mega.privacy.android.app.utils.MegaNodeUtil.onNodeTapped;
@@ -351,16 +351,18 @@ public class FileBrowserFragment extends RotatableFragment{
 					new CloudStorageOptionControlUtil.Control();
 
 			if (selected.size() == 1) {
-				if (megaApi.checkAccessErrorExtended(selected.get(0), MegaShare.ACCESS_OWNER).getErrorCode()
-						== MegaError.API_OK) {
-					if (selected.get(0).isExported()) {
-						control.manageLink().setVisible(true)
-								.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+				if (!selected.get(0).isTakenDown()) {
+					if (megaApi.checkAccessErrorExtended(selected.get(0), MegaShare.ACCESS_OWNER).getErrorCode()
+							== MegaError.API_OK) {
+						if (selected.get(0).isExported()) {
+							control.manageLink().setVisible(true)
+									.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
 
-						control.removeLink().setVisible(true);
-					} else {
-						control.getLink().setVisible(true)
-								.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+							control.removeLink().setVisible(true);
+						} else {
+							control.getLink().setVisible(true)
+									.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+						}
 					}
 				}
 
@@ -368,7 +370,7 @@ public class FileBrowserFragment extends RotatableFragment{
 						== MegaError.API_OK) {
 					control.rename().setVisible(true);
 				}
-			} else if (allHaveOwnerAccess(selected)) {
+			} else if (allHaveOwnerAccessAndNotTakenDown(selected)) {
 				control.getLink().setVisible(true).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
 			}
 
@@ -376,18 +378,27 @@ public class FileBrowserFragment extends RotatableFragment{
 			boolean showShareFolder = true;
 			boolean showTrash = true;
 			boolean showRemoveShare = true;
+			boolean showShareOut = true;
+			boolean showCopy = true;
+			boolean showDownload = true;
 			int mediaCounter = 0;
 
 			for (MegaNode node : selected) {
-				if (!node.isFile()) {
+				if (node.isTakenDown()) {
+					showShareOut = false;
+					showCopy = false;
+					showDownload = false;
+				}
+
+				if (!node.isFile() || node.isTakenDown()) {
 					showSendToChat = false;
-				} else {
+				} else if (node.isFile()){
 					MimeTypeList nodeMime = MimeTypeList.typeForName(node.getName());
 					if (nodeMime.isImage() || nodeMime.isVideo()) {
 						mediaCounter++;
 					}
 				}
-				if (!node.isFolder() || (MegaNodeUtil.isOutShare(node) && selected.size() > 1)) {
+				if (node.isTakenDown() || !node.isFolder() || (MegaNodeUtil.isOutShare(node) && selected.size() > 1)) {
 					showShareFolder = false;
 				}
 				if (megaApi.checkMoveErrorExtended(node, megaApi.getRubbishNode()).getErrorCode()
@@ -395,7 +406,7 @@ public class FileBrowserFragment extends RotatableFragment{
 					showTrash = false;
 				}
 
-				if (!node.isFolder() ||  !MegaNodeUtil.isOutShare(node)) {
+				if (node.isTakenDown() || !node.isFolder() ||  !MegaNodeUtil.isOutShare(node)) {
 					showRemoveShare = false;
 				}
 			}
@@ -416,20 +427,28 @@ public class FileBrowserFragment extends RotatableFragment{
 
 			control.trash().setVisible(showTrash);
 
-			control.shareOut().setVisible(true);
-			if (control.alwaysActionCount() < CloudStorageOptionControlUtil.MAX_ACTION_COUNT) {
-				control.shareOut().setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+			if (showShareOut) {
+				control.shareOut().setVisible(true);
+				if (control.alwaysActionCount() < CloudStorageOptionControlUtil.MAX_ACTION_COUNT) {
+					control.shareOut().setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+				}
 			}
 
 			control.move().setVisible(true);
-			control.copy().setVisible(true);
 			if (selected.size() > 1
 					&& control.alwaysActionCount() < CloudStorageOptionControlUtil.MAX_ACTION_COUNT) {
 				control.move().setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
 			}
 
-			if (control.alwaysActionCount() < CloudStorageOptionControlUtil.MAX_ACTION_COUNT) {
-				control.copy().setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+			if (showCopy) {
+				control.copy().setVisible(true);
+				if (control.alwaysActionCount() < CloudStorageOptionControlUtil.MAX_ACTION_COUNT) {
+					control.copy().setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+				}
+			}
+
+			if (!showDownload) {
+				control.saveToDevice().setVisible(false);
 			}
 
 			control.selectAll()

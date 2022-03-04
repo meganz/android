@@ -72,6 +72,7 @@ import mega.privacy.android.app.interfaces.SnackbarShower;
 import mega.privacy.android.app.lollipop.adapters.MegaNodeAdapter;
 import mega.privacy.android.app.lollipop.listeners.FabButtonListener;
 import mega.privacy.android.app.utils.ColorUtils;
+import mega.privacy.android.app.utils.MegaNodeUtil;
 import mega.privacy.android.app.utils.StringResourcesUtils;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaError;
@@ -187,6 +188,7 @@ public class ContactFileListFragment extends ContactFileBaseFragment {
 			menu.findItem(R.id.cab_menu_share_link)
 					.setTitle(StringResourcesUtils.getQuantityString(R.plurals.get_links, selected.size()));
 
+			boolean areAllNotTakenDown = MegaNodeUtil.areAllNotTakenDown(selected);
 			boolean showRename = false;
 			boolean showMove = false;
 			boolean showTrash = false;
@@ -254,15 +256,17 @@ public class ContactFileListFragment extends ContactFileBaseFragment {
 				menu.findItem(R.id.cab_menu_unselect_all).setVisible(false);
 			}
 
-			menu.findItem(R.id.cab_menu_download).setVisible(true);
-			menu.findItem(R.id.cab_menu_download).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+			if (areAllNotTakenDown) {
+				menu.findItem(R.id.cab_menu_download).setVisible(true);
+				menu.findItem(R.id.cab_menu_download).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
 
-			menu.findItem(R.id.cab_menu_leave_multiple_share).setVisible(true);
-			menu.findItem(R.id.cab_menu_leave_multiple_share).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+				menu.findItem(R.id.cab_menu_leave_multiple_share).setVisible(true);
+				menu.findItem(R.id.cab_menu_leave_multiple_share).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+
+				menu.findItem(R.id.cab_menu_copy).setVisible(true);
+			}
 
 			menu.findItem(R.id.cab_menu_rename).setVisible(showRename);
-			menu.findItem(R.id.cab_menu_copy).setVisible(true);
-
 			menu.findItem(R.id.cab_menu_move).setVisible(showMove);
 			menu.findItem(R.id.cab_menu_share_link).setVisible(false);
 			menu.findItem(R.id.cab_menu_trash).setVisible(showTrash);

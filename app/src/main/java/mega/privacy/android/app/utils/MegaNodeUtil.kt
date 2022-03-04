@@ -725,15 +725,31 @@ object MegaNodeUtil {
     }
 
     /**
-     * Check if all nodes are file nodes.
+     * Check if all nodes are file nodes and not taken down.
      *
      * @param nodes nodes to check
-     * @return whether all nodes are file nodes
+     * @return whether all nodes are file nodes and not taken down.
      */
     @JvmStatic
-    fun areAllFileNodes(nodes: List<MegaNode>): Boolean {
+    fun areAllFileNodesAndNotTakenDown(nodes: List<MegaNode>): Boolean {
         for (node in nodes) {
-            if (!node.isFile) {
+            if (!node.isFile || node.isTakenDown) {
+                return false
+            }
+        }
+
+        return true
+    }
+
+    /**
+     * Check if all nodes are not taken down.
+     *
+     * @return True if all items are not taken down, false otherwise.
+     */
+    @JvmStatic
+    fun List<MegaNode?>.areAllNotTakenDown(): Boolean {
+        for (node in this) {
+            if (node?.isTakenDown == true) {
                 return false
             }
         }
@@ -760,17 +776,18 @@ object MegaNodeUtil {
     }
 
     /**
-     * Check if all nodes have owner access.
+     * Check if all nodes have owner access and are not taken down.
      *
      * @param nodes List of nodes to check.
-     * @return True if all nodes have owner access, false otherwise.
+     * @return True if all nodes have owner access and are not taken down, false otherwise.
      */
     @JvmStatic
-    fun allHaveOwnerAccess(nodes: List<MegaNode?>): Boolean {
+    fun allHaveOwnerAccessAndNotTakenDown(nodes: List<MegaNode?>): Boolean {
         val megaApi = MegaApplication.getInstance().megaApi
 
         for (node in nodes) {
-            if (megaApi.checkAccessErrorExtended(node, MegaShare.ACCESS_OWNER).errorCode != MegaError.API_OK) {
+            if (megaApi.checkAccessErrorExtended(node, MegaShare.ACCESS_OWNER).errorCode != MegaError.API_OK
+                || node?.isTakenDown == true) {
                 return false
             }
         }
