@@ -48,8 +48,8 @@ task clean(type: Delete) {
 // Define versions in a single place
 ext {
     // App
-    appVersion = "6.2"
-    versionCode = 427
+    appVersion = "6.3"
+    versionCode = 429
 
     // Sdk and tools
     compileSdkVersion = 31
@@ -94,8 +94,6 @@ ext {
     mockitoKotlinVersion = '4.0.0'
     espressoVersion = '3.4.0'
     exoPlayerVersion = '2.16.0'
-    coroutineTestVersion = '1.6.0'
-    turbineVersion = '0.7.0'
     fragmentTestingVersion = '1.4.1'
     preferenceVersion ='1.1.1'
     coroutineTestVersion = '1.6.0'

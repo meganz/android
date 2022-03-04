@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0"?>
 <resources>
     <!-- PRO Lite account -->
     <string name="prolite_account">Pro Lite</string>
@@ -720,7 +720,7 @@
     <string name="cam_sync_wifi">Tylko Wi-Fi</string>
     <!-- the options of how to upload, but in an array. needed for the settings, how to upload the camera images. when Wi-Fi connected and using data plan -->
     <string name="cam_sync_data">Wi-Fi lub komórkowa transmisja danych</string>
-    <!-- The upload of the user’s photos orvideos from their specified album is in progress. -->
+    <!-- The upload of the user’s photos or videos from their specified album is in progress. -->
     <string name="cam_sync_syncing">Przesyłanie z kamery w toku</string>
     <!-- confirmation question for cancelling the camera uploads -->
     <string name="cam_sync_cancel_sync">Czy chcesz zatrzymać wysyłanie z aparatu?</string>
@@ -2972,9 +2972,9 @@
     <!-- Option of one-off (year) billing. Placeholder: purchase price. -->
     <string name="billed_one_off_year">[A]Jednorazowo (rok)[/A] %s</string>
     <!-- Option of monthly billing period. Placeholder: purchase price -->
-    <string name="billed_monthly_text">[A]Miesięcznie[/A] %s/miesiąc</string>
+    <string name="billed_monthly_text">[A]Rozliczane miesięcznie[/A] %s/miesiąc</string>
     <!-- Option of yearly billing period. Placeholder: purchase price -->
-    <string name="billed_yearly_text">[A]Rocznie[/A] %s/rok</string>
+    <string name="billed_yearly_text">[A]Rozliczane rocznie[/A] %s/rok</string>
     <!-- dialog option cancel in alert dialog -->
     <string name="button_cancel">Anuluj</string>
     <!-- dialog option continue in alert dialog -->
@@ -4403,10 +4403,40 @@
     <string name="upload_files">Wgraj pliki</string>
     <!-- Action button to upload a folder. -->
     <string name="upload_folder">Wgraj katalog</string>
-    <!-- Title of the dialog warning the user about cancel uploads. -->
-    <string name="cancel_uploads">Anuluj wgrywanie</string>
-    <!-- Warning alerting user if proceed with the action all the uploads will be cancelled. -->
-    <string name="cancel_uploads_warning">Przerwanie procesu przesyłania spowoduje anulowanie wszystkich przesłanych plików.</string>
-    <!-- Button to proceed with action. -->
-    <string name="action_proceed">Kontynuuj</string>
+    <!-- Text of the dialog warning the user about cancel uploads. -->
+    <string name="cancel_uploads">Anulować wgrywanie?</string>
+    <!-- Title of the Payments screen -->
+    <string name="payment">Płatność</string>
+    <!-- Label indicating payment methods -->
+    <string name="payment_methods">Metody płatności</string>
+    <!-- Button to proceed with a payment -->
+    <string name="proceed">Kontynuuj</string>
+    <!-- Message informing the upgrade was processed correctly. Placeholder: type of subscription e.g: Pro Lite monthly -->
+    <string name="successful_upgrade">Dziękujemy za Twoją subskrypcję %1$s!</string>
+    <!-- Pro Lite monthly subscription -->
+    <string name="pro_lite_monthly">Pro Lite miesięcznie</string>
+    <!-- Pro Lite yearly subscription -->
+    <string name="pro_lite_yearly">Pro Lite rocznie</string>
+    <!-- Pro I monthly subscription -->
+    <string name="pro_i_monthly">Pro I miesięcznie</string>
+    <!-- Pro I yearly subscription -->
+    <string name="pro_i_yearly">Pro I rocznie</string>
+    <!-- Pro II monthly subscription -->
+    <string name="pro_ii_monthly">Pro II miesięcznie</string>
+    <!-- Pro II yearly subscription -->
+    <string name="pro_ii_yearly">Pro II rocznie</string>
+    <!-- Pro III monthly subscription -->
+    <string name="pro_iii_monthly">Pro III miesięcznie</string>
+    <!-- Pro III yearly subscription -->
+    <string name="pro_iii_yearly">Pro III rocznie</string>
+    <!-- Action button which will cancel uploads. -->
+    <string name="action_cancel_upload">Anuluj wgrywanie</string>
+    <!-- Action button which will dismiss the dialog and will not cancel the action. -->
+    <string name="action_do_not_cancel">Nie anuluj</string>
+    <!-- Remove moderator permission and assign standard permission to a meeting participant-->
+    <string name="remove_moderator">Usuń moderatora</string>
+    <!-- Title of DCIM folder warning dialog -->
+    <string name="title_dcim_folder_dialog">Katalog DCIM</string>
+    <!-- Content of DCIM folder warning dialog -->
+    <string name="content_dcim_folder_dialog">MEGA ładuje twoje zdjęcia z galerii. Aby zmienić lokalizację wysyłania, proszę przejść do ustawień wysyłania aparatu.</string>
 </resources>

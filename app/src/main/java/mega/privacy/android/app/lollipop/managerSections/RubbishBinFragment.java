@@ -78,6 +78,7 @@ import static mega.privacy.android.app.utils.MegaNodeUtil.manageTextFileIntent;
 import static mega.privacy.android.app.utils.MegaNodeUtil.manageURLNode;
 import static mega.privacy.android.app.utils.MegaNodeUtil.onNodeTapped;
 import static mega.privacy.android.app.utils.Util.*;
+import static nz.mega.sdk.MegaApiJava.INVALID_HANDLE;
 
 @AndroidEntryPoint
 public class RubbishBinFragment extends Fragment{
@@ -183,6 +184,24 @@ public class RubbishBinFragment extends Fragment{
 			menu.findItem(R.id.cab_menu_select_all)
 					.setVisible(adapter.getSelectedItemCount()
 							< adapter.getItemCount() - adapter.getPlaceholderCount());
+
+			boolean isRestoreVisible = true;
+			List<MegaNode> documents = adapter.getSelectedNodes();
+			for (MegaNode node : documents) {
+				long restoreHandle = node.getRestoreHandle();
+				if (restoreHandle == INVALID_HANDLE) {
+					isRestoreVisible = false;
+					break;
+				}
+
+				MegaNode restoreNode = megaApi.getNodeByHandle(restoreHandle);
+				if (restoreNode == null || megaApi.isInRubbish(restoreNode)) {
+					isRestoreVisible = false;
+					break;
+				}
+			}
+
+			menu.findItem(R.id.cab_menu_restore_from_rubbish).setVisible(isRestoreVisible);
 
 			return true;
 		}
