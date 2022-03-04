@@ -8,6 +8,7 @@ import android.util.TypedValue
 import android.view.LayoutInflater
 import android.view.View
 import android.widget.*
+import androidx.appcompat.app.AlertDialog
 import androidx.core.view.isVisible
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import mega.privacy.android.app.BaseActivity
@@ -207,4 +208,23 @@ object AlertsAndWarnings {
 
         context.startActivity(Intent.createChooser(emailIntent, " "))
     }
- }
+
+    /**
+     * Shows a taken down alert.
+     *
+     * @param activity   Required to create the dialog and finish the activity.
+     */
+    @JvmStatic
+    fun showTakenDownAlert(activity: Activity): AlertDialog =
+        MaterialAlertDialogBuilder(activity)
+            .setTitle(getString(R.string.general_not_available))
+            .setMessage(getString(R.string.error_download_takendown_node))
+            .setNegativeButton(getString(R.string.general_dismiss)) { _, _ ->
+                if (!activity.isFinishing) activity.finish()
+            }
+            .create().apply {
+                setCancelable(false)
+                show()
+            }
+
+}

@@ -16,7 +16,6 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.annotation.ColorRes
 import androidx.appcompat.app.AlertDialog
-import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.res.ResourcesCompat
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
@@ -1081,28 +1080,6 @@ object MegaNodeUtil {
         if (shouldStopServer) {
             megaApi.httpServerStop()
         }
-    }
-
-    /**
-     * Shows a taken down alert.
-     *
-     * @param activity the activity is the page where dialog is shown
-     */
-    @JvmStatic
-    fun showTakenDownAlert(activity: AppCompatActivity?) {
-        if (activity == null || activity.isFinishing || alertTakenDown != null && alertTakenDown!!.isShowing) {
-            return
-        }
-
-        val dialogBuilder = MaterialAlertDialogBuilder(activity)
-
-        dialogBuilder.setTitle(getString(R.string.general_not_available))
-            .setMessage(getString(R.string.error_download_takendown_node))
-            .setNegativeButton(getString(R.string.general_dismiss)) { _, _ -> activity.finish() }
-
-        alertTakenDown = dialogBuilder.create()
-        alertTakenDown!!.setCancelable(false)
-        alertTakenDown!!.show()
     }
 
     /**
