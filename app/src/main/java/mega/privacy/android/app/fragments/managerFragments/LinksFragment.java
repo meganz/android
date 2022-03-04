@@ -24,7 +24,7 @@ import static mega.privacy.android.app.lollipop.ManagerActivity.LINKS_TAB;
 import static mega.privacy.android.app.lollipop.adapters.MegaNodeAdapter.*;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
-import static mega.privacy.android.app.utils.MegaNodeUtil.areAllFileNodes;
+import static mega.privacy.android.app.utils.MegaNodeUtil.areAllFileNodesAndNotTakenDown;
 import static nz.mega.sdk.MegaApiJava.*;
 import static nz.mega.sdk.MegaError.API_OK;
 import static nz.mega.sdk.MegaShare.ACCESS_FULL;
@@ -64,22 +64,35 @@ public class LinksFragment extends MegaNodeBaseFragment {
             CloudStorageOptionControlUtil.Control control =
                 new CloudStorageOptionControlUtil.Control();
 
-            if (selected.size() == 1) {
-                control.manageLink().setVisible(true)
-                    .setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+            boolean areAllNotTakenDown = MegaNodeUtil.areAllNotTakenDown(selected);
 
-                control.removeLink().setVisible(true);
+            if (areAllNotTakenDown) {
+                if (selected.size() == 1) {
+                    control.manageLink().setVisible(true)
+                            .setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+
+                    control.removeLink().setVisible(true);
+                } else {
+                    control.removeLink().setVisible(true)
+                            .setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+                }
+
+                control.shareOut().setVisible(true)
+                        .setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+
+                if (areAllFileNodesAndNotTakenDown(selected)) {
+                    control.sendToChat().setVisible(true)
+                            .setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+                }
+
+                control.copy().setVisible(true);
+                if (control.alwaysActionCount() < CloudStorageOptionControlUtil.MAX_ACTION_COUNT) {
+                    control.copy().setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+                } else {
+                    control.copy().setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
+                }
             } else {
-                control.removeLink().setVisible(true)
-                    .setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
-            }
-
-            control.shareOut().setVisible(true)
-                .setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
-
-            if (areAllFileNodes(selected)) {
-                control.sendToChat().setVisible(true)
-                    .setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+                control.saveToDevice().setVisible(false);
             }
 
             if (selected.size() == 1
@@ -90,13 +103,6 @@ public class LinksFragment extends MegaNodeBaseFragment {
                 } else {
                     control.rename().setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
                 }
-            }
-
-            control.copy().setVisible(true);
-            if (control.alwaysActionCount() < CloudStorageOptionControlUtil.MAX_ACTION_COUNT) {
-                control.copy().setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
-            } else {
-                control.copy().setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
             }
 
             control.selectAll().setVisible(notAllNodesSelected());
