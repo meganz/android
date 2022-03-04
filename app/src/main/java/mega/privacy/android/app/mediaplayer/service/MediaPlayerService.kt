@@ -128,6 +128,13 @@ open class MediaPlayerService : LifecycleService(), LifecycleEventObserver {
                     val nodeName =
                         viewModel.getPlaylistItem(player.currentMediaItem?.mediaId)?.nodeName
                             ?: ""
+
+                    if (title.isNullOrEmpty() && artist.isNullOrEmpty()
+                        && album.isNullOrEmpty() && nodeName.isEmpty()
+                    ) {
+                        return@MetadataExtractor
+                    }
+
                     _metadata.value = Metadata(title, artist, album, nodeName)
 
                     playerNotificationManager?.invalidate()
