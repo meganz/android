@@ -35,8 +35,9 @@ class SettingsViewModelTest {
         accountTypeIdentifier = 0
     )
 
-    private  val isChatLoggedInValue = MutableStateFlow(true)
-    private val isChatLoggedIn = mock<IsChatLoggedIn> { on { invoke() }.thenReturn(isChatLoggedInValue) }
+    private val isChatLoggedInValue = MutableStateFlow(true)
+    private val isChatLoggedIn =
+        mock<IsChatLoggedIn> { on { invoke() }.thenReturn(isChatLoggedInValue) }
 
 
     @Before
@@ -49,8 +50,8 @@ class SettingsViewModelTest {
             getAccountDetails = mock { on { invoke(any()) }.thenReturn(userAccount) },
             canDeleteAccount = mock { on { invoke(userAccount) }.thenReturn(true) },
             refreshPasscodeLockPreference = mock(),
-            isLoggingEnabled = mock(),
-            isChatLoggingEnabled = mock(),
+            areSdkLogsEnabled = mock(),
+            areChatLogsEnabled = mock(),
             isCameraSyncEnabled = mock(),
             rootNodeExists = mock { on { invoke() }.thenReturn(true) },
             isMultiFactorAuthAvailable = mock { on { invoke() }.thenReturn(true) },
@@ -59,10 +60,10 @@ class SettingsViewModelTest {
             startScreen = mock { on { invoke() }.thenReturn(emptyFlow()) },
             isHideRecentActivityEnabled = mock { on { invoke() }.thenReturn(emptyFlow()) },
             toggleAutoAcceptQRLinks = toggleAutoAcceptQRLinks,
-            isOnline = mock { on { invoke() }.thenReturn(flowOf(true)) },
+            monitorConnectivity = mock { on { invoke() }.thenReturn(flowOf(true)) },
             requestAccountDeletion = mock(),
             isChatLoggedIn = isChatLoggedIn,
-            setLoggingEnabled = mock(),
+            setSdkLogsEnabled = mock(),
             setChatLoggingEnabled = mock(),
         )
     }
@@ -81,9 +82,9 @@ class SettingsViewModelTest {
             .map { it.autoAcceptChecked }
             .distinctUntilChanged()
             .test {
-            assertThat(awaitItem()).isFalse()
-            assertThat(awaitItem()).isTrue()
-        }
+                assertThat(awaitItem()).isFalse()
+                assertThat(awaitItem()).isTrue()
+            }
 
     }
 
@@ -95,16 +96,16 @@ class SettingsViewModelTest {
             .map { it.autoAcceptChecked }
             .distinctUntilChanged(Boolean::equals)
             .test {
-            assertThat(awaitItem()).isFalse()
-            assertThat(awaitItem()).isTrue()
-            underTest.toggleAutoAcceptPreference()
-            assertThat(awaitItem()).isFalse()
-        }
+                assertThat(awaitItem()).isFalse()
+                assertThat(awaitItem()).isTrue()
+                underTest.toggleAutoAcceptPreference()
+                assertThat(awaitItem()).isFalse()
+            }
 
     }
 
     @Test
-    fun `test that logging out of chat disables chat settings`() = runTest{
+    fun `test that logging out of chat disables chat settings`() = runTest {
 
         underTest.uiState
             .map { it.chatEnabled }
@@ -119,7 +120,7 @@ class SettingsViewModelTest {
     }
 
     @Test
-    fun `test that chat is enabled by default`() = runTest{
+    fun `test that chat is enabled by default`() = runTest {
         underTest.uiState
             .map { it.chatEnabled }
             .test {
@@ -128,7 +129,7 @@ class SettingsViewModelTest {
     }
 
     @Test
-    fun `test that camera uploads is enabled by default`() = runTest{
+    fun `test that camera uploads is enabled by default`() = runTest {
         underTest.uiState
             .map { it.cameraUploadEnabled }
             .test {
@@ -137,7 +138,7 @@ class SettingsViewModelTest {
     }
 
     @Test
-    fun `test that an error on fetching QR setting returns false instead`() = runTest{
+    fun `test that an error on fetching QR setting returns false instead`() = runTest {
         whenever(fetchAutoAcceptQRLinks()).thenAnswer { throw SettingNotFoundException() }
 
         underTest.uiState

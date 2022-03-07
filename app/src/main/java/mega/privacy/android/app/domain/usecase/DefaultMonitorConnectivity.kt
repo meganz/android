@@ -7,7 +7,12 @@ import kotlinx.coroutines.flow.map
 import mega.privacy.android.app.domain.repository.NetworkRepository
 import javax.inject.Inject
 
-class DefaultIsOnline @Inject constructor(private val networkRepository: NetworkRepository) : IsOnline {
+/**
+ * Default monitor connectivity
+ *
+ * @property networkRepository
+ */
+class DefaultMonitorConnectivity @Inject constructor(private val networkRepository: NetworkRepository) : MonitorConnectivity {
     override fun invoke(): Flow<Boolean> {
         return flow {
             emit(networkRepository.getCurrentConnectivityState().connected)
