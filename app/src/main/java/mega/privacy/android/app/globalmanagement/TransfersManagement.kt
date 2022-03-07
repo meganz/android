@@ -35,7 +35,6 @@ import nz.mega.sdk.MegaTransfer.*
 import javax.inject.Inject
 import javax.inject.Singleton
 
-
 @Singleton
 class TransfersManagement @Inject constructor(
     @MegaApi private val megaApi: MegaApiAndroid,

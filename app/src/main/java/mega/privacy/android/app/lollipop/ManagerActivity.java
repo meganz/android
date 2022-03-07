@@ -274,9 +274,6 @@ import com.jeremyliao.liveeventbus.LiveEventBus;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
@@ -3634,7 +3631,7 @@ public class ManagerActivity extends TransfersManagementActivity
 
 	private void cancelSearch() {
 		if (getSearchFragment() != null) {
-			searchFragment.cancelPreviousSearch();
+			searchFragment.cancelSearch();
 		}
 	}
 

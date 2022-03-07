@@ -36,6 +36,7 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Stack;
 
 import javax.inject.Inject;
@@ -53,7 +54,7 @@ import mega.privacy.android.app.components.PositionDividerItemDecoration;
 import mega.privacy.android.app.components.scrollBar.FastScroller;
 import mega.privacy.android.app.fragments.homepage.EventObserver;
 import mega.privacy.android.app.fragments.homepage.SortByHeaderViewModel;
-import mega.privacy.android.app.search.callback.SearchActionsCallback;
+import mega.privacy.android.app.search.callback.SearchCallback;
 import mega.privacy.android.app.search.usecase.SearchNodesUseCase;
 import mega.privacy.android.app.globalmanagement.SortOrderManagement;
 import mega.privacy.android.app.lollipop.adapters.MegaExplorerAdapter;
@@ -76,7 +77,7 @@ import static nz.mega.sdk.MegaApiJava.INVALID_HANDLE;
 
 @AndroidEntryPoint
 public class CloudDriveExplorerFragment extends RotatableFragment implements
-		OnClickListener, CheckScrollInterface, SearchActionsCallback {
+		OnClickListener, CheckScrollInterface, SearchCallback.View, SearchCallback.Data {
 
 	@Inject
 	SortOrderManagement sortOrderManagement;
@@ -879,11 +880,12 @@ public class CloudDriveExplorerFragment extends RotatableFragment implements
 				});
 	}
 
+	@NonNull
 	@Override
 	public MegaCancelToken initNewSearch() {
 		updateSearchProgressView(true);
-		cancelPreviousSearch();
-		return MegaCancelToken.createInstance();
+		cancelSearch();
+		return Objects.requireNonNull(MegaCancelToken.createInstance());
 	}
 
 	@Override
@@ -900,7 +902,7 @@ public class CloudDriveExplorerFragment extends RotatableFragment implements
 	}
 
 	@Override
-	public void cancelPreviousSearch() {
+	public void cancelSearch() {
 		if (searchCancelToken != null) {
 			searchCancelToken.cancel();
 		}
@@ -926,7 +928,7 @@ public class CloudDriveExplorerFragment extends RotatableFragment implements
 
 	public void closeSearch(boolean collapsedByClick) {
 		updateSearchProgressView(false);
-		cancelPreviousSearch();
+		cancelSearch();
 		if (!collapsedByClick) {
             searchNodes = null;
         }

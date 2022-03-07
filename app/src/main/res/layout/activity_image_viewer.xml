@@ -55,7 +55,6 @@
         app:layout_constraintStart_toStartOf="@id/bg_bottom"
         app:layout_constraintTop_toTopOf="@id/bg_bottom"
         app:layout_constraintVertical_chainStyle="packed"
-        app:layout_goneMarginBottom="16dp"
         tools:text="IMG_20171123_17221.jpg" />
 
     <TextView

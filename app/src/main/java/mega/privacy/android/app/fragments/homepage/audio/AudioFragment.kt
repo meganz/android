@@ -105,6 +105,11 @@ class AudioFragment : Fragment(), HomepageSearchable {
         }
     }
 
+    override fun onDestroyView() {
+        viewModel.cancelSearch()
+        super.onDestroyView()
+    }
+
     private fun setupEmptyHint() {
         binding.emptyHint.emptyHintImage.isVisible = false
         binding.emptyHint.emptyHintText.isVisible = false

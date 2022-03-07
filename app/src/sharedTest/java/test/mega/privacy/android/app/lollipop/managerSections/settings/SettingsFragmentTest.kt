@@ -15,12 +15,10 @@ import androidx.test.espresso.intent.Intents.intending
 import androidx.test.espresso.intent.matcher.IntentMatchers.hasComponent
 import androidx.test.espresso.matcher.ViewMatchers.*
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import androidx.test.filters.SdkSuppress
 import androidx.test.filters.Suppress
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
-import dagger.hilt.android.components.ViewModelComponent
 import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
 import dagger.hilt.android.testing.HiltTestApplication
@@ -34,8 +32,11 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.settingsActivities.FileManagementPreferencesActivity
 import mega.privacy.android.app.activities.settingsActivities.StartScreenPreferencesActivity
 import mega.privacy.android.app.constants.SettingsConstants
-import mega.privacy.android.app.di.SettingsModule
+import mega.privacy.android.app.di.LoggingModule
+import mega.privacy.android.app.di.settings.SettingsModule
+import mega.privacy.android.app.di.settings.SettingsUseCases
 import mega.privacy.android.app.domain.entity.UserAccount
+import mega.privacy.android.app.domain.repository.LoggingRepository
 import mega.privacy.android.app.domain.usecase.*
 import mega.privacy.android.app.presentation.settings.SettingsFragment
 import mega.privacy.android.app.utils.Constants
@@ -57,7 +58,7 @@ import test.mega.privacy.android.app.launchFragmentInHiltContainer
 
 @HiltAndroidTest
 @RunWith(AndroidJUnit4::class)
-@UninstallModules(SettingsModule::class)
+@UninstallModules(SettingsModule::class, SettingsUseCases::class, LoggingModule::class)
 class SettingsFragmentTest {
 
     @get:Rule(order = 0)
@@ -76,7 +77,7 @@ class SettingsFragmentTest {
     )
 
     @Module
-    @InstallIn(ViewModelComponent::class)
+    @InstallIn(SingletonComponent::class)
     object TestSettingsModule {
         val canDeleteAccount = mock<CanDeleteAccount>()
         val getStartScreen = mock<GetStartScreen>()
@@ -84,7 +85,7 @@ class SettingsFragmentTest {
         val fetchAutoAcceptQRLinks = mock<FetchAutoAcceptQRLinks>()
         val fetchMultiFactorAuthSetting = mock<FetchMultiFactorAuthSetting>()
         val getAccountDetails = mock<GetAccountDetails>()
-        val isOnline = mock<IsOnline>()
+        val monitorConnectivity = mock<MonitorConnectivity>()
         val rootNodeExists = mock<RootNodeExists>()
         val shouldHideRecentActivity = mock<IsHideRecentActivityEnabled>()
 
@@ -100,10 +101,10 @@ class SettingsFragmentTest {
             mock()
 
         @Provides
-        fun provideIsLoggingEnabled(): IsLoggingEnabled = mock()
+        fun provideIsLoggingEnabled(): AreSdkLogsEnabled = mock { on { invoke() }.thenReturn(flowOf(true))}
 
         @Provides
-        fun provideIsChatLoggingEnabled(): IsChatLoggingEnabled = mock()
+        fun provideIsChatLoggingEnabled(): AreChatLogsEnabled = mock { on { invoke() }.thenReturn(flowOf(true))}
 
         @Provides
         fun provideIsCameraSyncEnabled(): IsCameraSyncEnabled = mock()
@@ -141,7 +142,7 @@ class SettingsFragmentTest {
             mock()
 
         @Provides
-        fun provideIsOnline(): IsOnline = isOnline
+        fun provideMonitorConnectivity(): MonitorConnectivity = monitorConnectivity
 
         @Provides
         fun provideRequestAccountDeletion(): RequestAccountDeletion = mock()
@@ -151,10 +152,20 @@ class SettingsFragmentTest {
         fun provideIsChatLoggedIn(): IsChatLoggedIn = mock { on { invoke() }.thenReturn(flowOf(true))}
 
         @Provides
-        fun provideSetLoggingEnabled(): SetLoggingEnabled = mock()
+        fun provideSetLoggingEnabled(): SetSdkLogsEnabled = mock()
 
         @Provides
-        fun provideSetChatLoggingEnabled(): SetChatLoggingEnabled = mock()
+        fun provideSetChatLoggingEnabled(): SetChatLogsEnabled = mock()
+
+        @Provides
+        fun provideLoggingRepository(): LoggingRepository = mock()
+
+        @Provides
+        fun provideInitialiseLogging(): InitialiseLogging = mock()
+
+        @Provides
+        fun provideResetSdkLogger(): ResetSdkLogger = mock()
+
     }
 
     @Before
@@ -170,7 +181,7 @@ class SettingsFragmentTest {
 
         whenever(TestSettingsModule.canDeleteAccount(userAccount)).thenReturn(true)
         whenever(TestSettingsModule.isMultiFactorAuthAvailable()).thenReturn(true)
-        whenever(TestSettingsModule.isOnline()).thenReturn(flowOf(true))
+        whenever(TestSettingsModule.monitorConnectivity()).thenReturn(flowOf(true))
         whenever(TestSettingsModule.fetchMultiFactorAuthSetting()).thenReturn(flowOf())
         whenever(TestSettingsModule.getAccountDetails(any())).thenReturn(userAccount)
         whenever(TestSettingsModule.rootNodeExists()).thenReturn(true)
@@ -188,7 +199,7 @@ class SettingsFragmentTest {
             TestSettingsModule.fetchMultiFactorAuthSetting,
             TestSettingsModule.canDeleteAccount,
             TestSettingsModule.getAccountDetails,
-            TestSettingsModule.isOnline,
+            TestSettingsModule.monitorConnectivity,
             TestSettingsModule.rootNodeExists,
         )
     }
@@ -271,9 +282,9 @@ class SettingsFragmentTest {
         }
     }
 
+    @Suppress //"Pending issue regarding download location"
     @Test
-    @SdkSuppress(maxSdkVersion = 29)
-    fun test_that_download_location_is_included_pre_30() {
+    fun test_that_download_location_is_included() {
         launchFragmentInHiltContainer<SettingsFragment>()
 
         onPreferences()
@@ -300,7 +311,7 @@ class SettingsFragmentTest {
     @Test
     fun test_that_deactivated_delete_has_50_percent_alpha() {
         whenever(TestSettingsModule.canDeleteAccount(userAccount)).thenReturn(true)
-        whenever(TestSettingsModule.isOnline()).thenReturn(flowOf(false))
+        whenever(TestSettingsModule.monitorConnectivity()).thenReturn(flowOf(false))
         launchFragmentInHiltContainer<SettingsFragment>()
 
         onPreferences()
@@ -337,9 +348,7 @@ class SettingsFragmentTest {
     fun test_that_correct_fields_are_disable_when_offline() {
         whenever(TestSettingsModule.canDeleteAccount(userAccount)).thenReturn(true)
         whenever(TestSettingsModule.isMultiFactorAuthAvailable()).thenReturn(true)
-        whenever(TestSettingsModule.isOnline()).thenReturn(flowOf(false))
-
-
+        whenever(TestSettingsModule.monitorConnectivity()).thenReturn(flowOf(false))
         launchFragmentInHiltContainer<SettingsFragment>()
 
 

@@ -43,6 +43,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import java.util.Stack;
 import java.util.concurrent.CopyOnWriteArrayList;
 
@@ -63,8 +64,8 @@ import mega.privacy.android.app.imageviewer.ImageViewerActivity;
 import mega.privacy.android.app.fragments.homepage.EventObserver;
 import mega.privacy.android.app.fragments.homepage.SortByHeaderViewModel;
 import mega.privacy.android.app.lollipop.DrawerItem;
+import mega.privacy.android.app.search.callback.SearchCallback;
 import mega.privacy.android.app.lollipop.ManagerActivity;
-import mega.privacy.android.app.search.callback.SearchActionsCallback;
 import mega.privacy.android.app.search.usecase.SearchNodesUseCase;
 import mega.privacy.android.app.globalmanagement.SortOrderManagement;
 import mega.privacy.android.app.lollipop.PdfViewerActivity;
@@ -98,7 +99,8 @@ import static mega.privacy.android.app.utils.MegaNodeUtil.onNodeTapped;
 import static mega.privacy.android.app.utils.Util.*;
 
 @AndroidEntryPoint
-public class SearchFragment extends RotatableFragment implements SearchActionsCallback {
+public class SearchFragment extends RotatableFragment implements SearchCallback.View,
+		SearchCallback.Data {
 
 	public static final String ARRAY_SEARCH = "ARRAY_SEARCH";
 
@@ -687,11 +689,12 @@ public class SearchFragment extends RotatableFragment implements SearchActionsCa
 		}
 	}
 
+	@NonNull
 	@Override
 	public MegaCancelToken initNewSearch() {
 		updateSearchProgressView(true);
-		cancelPreviousSearch();
-		return MegaCancelToken.createInstance();
+		cancelSearch();
+		return Objects.requireNonNull(MegaCancelToken.createInstance());
 	}
 
 	@Override
@@ -708,7 +711,7 @@ public class SearchFragment extends RotatableFragment implements SearchActionsCa
 	}
 
 	@Override
-	public void cancelPreviousSearch() {
+	public void cancelSearch() {
 		if (searchCancelToken != null) {
 			searchCancelToken.cancel();
 		}
@@ -1046,7 +1049,7 @@ public class SearchFragment extends RotatableFragment implements SearchActionsCa
 	
 	public int onBackPressed(){
 		logDebug("onBackPressed");
-		cancelPreviousSearch();
+		cancelSearch();
 		int levelSearch = ((ManagerActivity)context).levelsSearch;
 
 		if (levelSearch >= 0) {
