@@ -19,7 +19,9 @@ import mega.privacy.android.app.sync.cusync.callback.UpdateBackupCallback
 import mega.privacy.android.app.utils.CameraUploadUtil
 import mega.privacy.android.app.utils.Constants.INVALID_NON_NULL_VALUE
 import mega.privacy.android.app.utils.Constants.INVALID_VALUE
-import mega.privacy.android.app.utils.LogUtil.*
+import mega.privacy.android.app.utils.LogUtil.logDebug
+import mega.privacy.android.app.utils.LogUtil.logError
+import mega.privacy.android.app.utils.LogUtil.logWarning
 import mega.privacy.android.app.utils.RxUtil.logErr
 import mega.privacy.android.app.utils.StringResourcesUtils
 import mega.privacy.android.app.utils.TextUtil
