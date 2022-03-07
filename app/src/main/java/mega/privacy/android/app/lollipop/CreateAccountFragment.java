@@ -47,6 +47,7 @@ import nz.mega.sdk.MegaRequestListenerInterface;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.Util.*;
+import static mega.privacy.android.app.utils.ViewUtils.removeLeadingAndTrailingSpaces;
 import static nz.mega.sdk.MegaApiJava.INVALID_HANDLE;
 
 public class CreateAccountFragment extends Fragment implements View.OnClickListener, MegaRequestListenerInterface, OnKeyboardVisibilityListener {
@@ -197,6 +198,11 @@ public class CreateAccountFragment extends Fragment implements View.OnClickListe
             @Override
             public void afterTextChanged(Editable editable) {
                 quitError(userEmail);
+            }
+        });
+        userEmail.setOnFocusChangeListener((v13, hasFocus) -> {
+            if (!hasFocus) {
+                removeLeadingAndTrailingSpaces(userEmail);
             }
         });
 
@@ -428,6 +434,7 @@ public class CreateAccountFragment extends Fragment implements View.OnClickListe
                 break;
 
             case R.id.button_create_account_create:
+                removeLeadingAndTrailingSpaces(userEmail);
                 submitForm();
                 break;
 

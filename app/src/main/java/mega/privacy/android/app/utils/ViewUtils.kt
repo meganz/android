@@ -5,6 +5,7 @@ import android.os.SystemClock
 import android.view.View
 import android.view.ViewTreeObserver.OnGlobalLayoutListener
 import android.view.inputmethod.InputMethodManager
+import androidx.appcompat.widget.AppCompatEditText
 import mega.privacy.android.app.utils.Util.SHOW_IM_DELAY
 import kotlin.math.abs
 
@@ -85,4 +86,15 @@ object ViewUtils {
     @JvmStatic
     fun View.isVisible(): Boolean =
         visibility == View.VISIBLE
+
+    /**
+     * Removes leading and trailing spaces from an AppCompatEditText.
+     */
+    @JvmStatic
+    fun AppCompatEditText.removeLeadingAndTrailingSpaces() {
+        if (text != null) {
+            val content = text.toString().trim()
+            setText(content)
+        }
+    }
 }
