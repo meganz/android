@@ -907,12 +907,12 @@ public class InboxFragment extends RotatableFragment {
 
             if (megaApi.getInboxNode().getHandle() == ((ManagerActivity) context).getParentHandleInbox() || ((ManagerActivity) context).getParentHandleInbox() == -1) {
                 if (context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
-                    emptyImageView.setImageResource(R.drawable.inbox_empty_landscape);
+                    emptyImageView.setImageResource(R.drawable.ic_zero_landscape_empty_folder);
                 } else {
-                    emptyImageView.setImageResource(R.drawable.inbox_empty);
+                    emptyImageView.setImageResource(R.drawable.ic_zero_portrait_empty_folder);
                 }
 
-                String textToShow = StringResourcesUtils.getString(R.string.context_empty_inbox);
+                String textToShow = StringResourcesUtils.getString(R.string.context_empty_vault);
                 try {
                     textToShow = textToShow.replace(
                             "[A]", "<font color=\'"

@@ -886,7 +886,7 @@ public class ManagerActivity extends TransfersManagementActivity
 
     private final Observer<Boolean> fileBackupChangedObserver = change -> {
         if (change) {
-            megaApi.getMyBackupsFolder(this);
+//            megaApi.getMyBackupsFolder(this);
         }
     };
 
@@ -1708,7 +1708,7 @@ public class ManagerActivity extends TransfersManagementActivity
 
         observePsa();
 
-        megaApi.getMyBackupsFolder(this);
+//        megaApi.getMyBackupsFolder(this);
 
         //Set toolbar
         abL = (AppBarLayout) findViewById(R.id.app_bar_layout);
@@ -9443,6 +9443,10 @@ public class ManagerActivity extends TransfersManagementActivity
                 if (e.getErrorCode() == MegaError.API_OK) {
                     Timber.d("requesting myBackupHandle");
                     MegaNodeUtil.myBackupHandle = request.getNodeHandle();
+//                    MegaNode pNode = megaApi.getParentNode(megaApi.getNodeByHandle(MegaNodeUtil.myBackupHandle));
+//                    String name = pNode.getName();
+//                    MegaNode pNode2 = megaApi.getParentNode(pNode);
+//                    String name2 = pNode2.getName();
                 }
             }
         } else if (request.getType() == MegaRequest.TYPE_GET_CANCEL_LINK) {

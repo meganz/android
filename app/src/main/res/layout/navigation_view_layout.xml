@@ -176,7 +176,7 @@
                     android:layout_height="wrap_content"
                     android:layout_centerVertical="true"
                     android:gravity="start|center_vertical"
-                    android:text="@string/section_inbox"
+                    android:text="@string/section_vault"
                     android:textAppearance="?attr/textAppearanceSubtitle2" />
 
                 <View
