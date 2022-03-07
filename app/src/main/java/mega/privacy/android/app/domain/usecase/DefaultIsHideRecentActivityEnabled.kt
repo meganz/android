@@ -6,6 +6,11 @@ import kotlinx.coroutines.flow.flow
 import mega.privacy.android.app.domain.repository.SettingsRepository
 import javax.inject.Inject
 
+/**
+ * Default is hide recent activity enabled
+ *
+ * @property settingsRepository
+ */
 class DefaultIsHideRecentActivityEnabled @Inject constructor(private val settingsRepository: SettingsRepository) : IsHideRecentActivityEnabled {
     override fun invoke(): Flow<Boolean> {
         return flow {

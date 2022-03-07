@@ -3,40 +3,48 @@ package mega.privacy.android.app.data.repository
 import android.content.Context
 import android.content.SharedPreferences
 import dagger.hilt.android.qualifiers.ApplicationContext
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.shareIn
 import mega.privacy.android.app.DatabaseHandler
 import mega.privacy.android.app.MegaAttributes
 import mega.privacy.android.app.MegaPreferences
+import mega.privacy.android.app.data.extensions.failWithError
+import mega.privacy.android.app.data.extensions.failWithException
+import mega.privacy.android.app.data.extensions.isTypeWithParam
+import mega.privacy.android.app.data.gateway.LoggingSettingsGateway
 import mega.privacy.android.app.data.gateway.MonitorHideRecentActivity
 import mega.privacy.android.app.data.gateway.MonitorStartScreen
+import mega.privacy.android.app.di.ApplicationScope
 import mega.privacy.android.app.di.MegaApi
-import mega.privacy.android.app.domain.exception.MegaException
 import mega.privacy.android.app.domain.exception.SettingNotFoundException
 import mega.privacy.android.app.domain.repository.SettingsRepository
 import mega.privacy.android.app.fragments.settingsFragments.startSceen.util.StartScreenUtil
+import mega.privacy.android.app.listeners.OptionalMegaRequestListenerInterface
 import mega.privacy.android.app.utils.FileUtil
-import mega.privacy.android.app.utils.LogUtil.*
+import mega.privacy.android.app.utils.LogUtil.logWarning
 import mega.privacy.android.app.utils.SharedPreferenceConstants
-import mega.privacy.android.app.utils.Util
-import nz.mega.sdk.*
+import nz.mega.sdk.MegaApiAndroid
+import nz.mega.sdk.MegaApiJava
+import nz.mega.sdk.MegaError
+import nz.mega.sdk.MegaRequest
 import javax.inject.Inject
+import kotlin.contracts.ExperimentalContracts
+import kotlin.coroutines.Continuation
 import kotlin.coroutines.suspendCoroutine
 
+@ExperimentalContracts
 class DefaultSettingsRepository @Inject constructor(
     private val databaseHandler: DatabaseHandler,
     @ApplicationContext private val context: Context,
     @MegaApi private val sdk: MegaApiAndroid,
     private val monitorStartScreen: MonitorStartScreen,
     private val monitorHideRecentActivity: MonitorHideRecentActivity,
+    private val loggingSettingsGateway: LoggingSettingsGateway,
+    @ApplicationScope private val appScope: CoroutineScope
 ) : SettingsRepository {
-
-    /*
-    Duplicate constants used here to remove dependency on LogUtil static class.
-     */
-    private val logPreferences = "LOG_PREFERENCES"
-    private val karereLogs = "KARERE_LOGS"
-    private val sdkLogs = "SDK_LOGS"
-
     init {
         initialisePreferences()
     }
@@ -58,57 +66,33 @@ class DefaultSettingsRepository @Inject constructor(
 
     override suspend fun fetchContactLinksOption(): Boolean {
         return suspendCoroutine { continuation ->
-            sdk.getContactLinksOption(object : MegaRequestListenerInterface {
-                override fun onRequestStart(api: MegaApiJava?, request: MegaRequest?) {}
-
-                override fun onRequestUpdate(api: MegaApiJava?, request: MegaRequest?) {}
-
-                override fun onRequestFinish(
-                    api: MegaApiJava?,
-                    request: MegaRequest?,
-                    e: MegaError?
-                ) {
-                    if (isFetchAutoAcceptQRResponse(request)) {
-                        when (e?.errorCode) {
-                            MegaError.API_OK -> {
-                                continuation.resumeWith(Result.success(request!!.flag))
-                            }
-                            MegaError.API_ENOENT -> {
-                                continuation.resumeWith(
-                                    Result.failure(
-                                        SettingNotFoundException(
-                                            e.errorCode,
-                                            e.errorString
-                                        )
-                                    )
-                                )
-                            }
-                            else -> {
-                                continuation.resumeWith(
-                                    Result.failure(
-                                        MegaException(
-                                            e?.errorCode,
-                                            e?.errorString
-                                        )
-                                    )
-                                )
-                            }
-                        }
-                    }
-                }
-
-                override fun onRequestTemporaryError(
-                    api: MegaApiJava?,
-                    request: MegaRequest?,
-                    e: MegaError?
-                ) {
-                }
-            })
+            sdk.getContactLinksOption(OptionalMegaRequestListenerInterface(
+                onRequestFinish = onGetContactLinksOptionRequestFinished(continuation)
+            ))
         }
     }
 
+    private fun onGetContactLinksOptionRequestFinished(continuation: Continuation<Boolean>) =
+        { request: MegaRequest, error: MegaError ->
+            if (isFetchAutoAcceptQRResponse(request)) {
+                when (error.errorCode) {
+                    MegaError.API_OK -> {
+                        continuation.resumeWith(Result.success(request.flag))
+                    }
+                    MegaError.API_ENOENT -> continuation.failWithException(SettingNotFoundException(
+                        error.errorCode,
+                        error.errorString
+                    ))
+                    else -> continuation.failWithError(error)
+                }
+            }
+        }
+
     private fun isFetchAutoAcceptQRResponse(request: MegaRequest?) =
-        request?.type == MegaRequest.TYPE_GET_ATTR_USER && request.paramType == MegaApiJava.USER_ATTR_CONTACT_LINK_VERIFICATION
+        request.isTypeWithParam(
+            MegaRequest.TYPE_GET_ATTR_USER,
+            MegaApiJava.USER_ATTR_CONTACT_LINK_VERIFICATION
+        )
 
     override fun getStartScreen(): Int {
         return getUiPreferences().getInt(
@@ -117,113 +101,62 @@ class DefaultSettingsRepository @Inject constructor(
         )
     }
 
-    override fun shouldHideRecentActivity(): Boolean {
-        return getUiPreferences().getBoolean(SharedPreferenceConstants.HIDE_RECENT_ACTIVITY, false)
-    }
-
-    override fun isChatLoggingEnabled(): Boolean {
-        return context.getSharedPreferences(logPreferences, Context.MODE_PRIVATE)
-            .getBoolean(karereLogs, false)
-    }
-
-    override fun setChatLoggingEnabled(enabled: Boolean) {
-        if (!enabled) {
-            logInfo("Karere logs are now disabled - App Version: " + Util.getVersion())
-        }
-
-        context.getSharedPreferences(LOG_PREFERENCES, Context.MODE_PRIVATE).edit()
-            .putBoolean(KARERE_LOGS, enabled).apply()
-
-        if (enabled) {
-            MegaChatApiAndroid.setLogLevel(MegaChatApiAndroid.LOG_LEVEL_MAX)
-            logInfo("Karere logs are now enabled - App Version: " + Util.getVersion())
-        } else {
-            MegaChatApiAndroid.setLogLevel(MegaChatApiAndroid.LOG_LEVEL_ERROR)
-        }
-    }
-
-    override fun isLoggingEnabled(): Boolean {
-        return context.getSharedPreferences(logPreferences, Context.MODE_PRIVATE)
-            .getBoolean(sdkLogs, false)
-    }
-
-    override fun setLoggingEnabled(enabled: Boolean) {
-        if (!enabled) {
-            logInfo("SDK logs are now disabled - App Version: " + Util.getVersion())
-        }
-
-        context.getSharedPreferences(LOG_PREFERENCES, Context.MODE_PRIVATE).edit()
-            .putBoolean(SDK_LOGS, enabled).apply()
-        if (enabled) {
-            MegaApiAndroid.setLogLevel(MegaApiAndroid.LOG_LEVEL_MAX)
-            logInfo("SDK logs are now enabled - App Version: " + Util.getVersion())
-        } else {
-            MegaApiAndroid.setLogLevel(MegaApiAndroid.LOG_LEVEL_FATAL)
-        }
-    }
+    override fun shouldHideRecentActivity(): Boolean =
+        getUiPreferences().getBoolean(SharedPreferenceConstants.HIDE_RECENT_ACTIVITY, false)
 
     override suspend fun setAutoAcceptQR(accept: Boolean): Boolean {
 
         return suspendCoroutine { continuation ->
-            sdk.setContactLinksOption(!accept, object : MegaRequestListenerInterface {
-                override fun onRequestStart(api: MegaApiJava?, request: MegaRequest?) {}
+            sdk.setContactLinksOption(!accept, OptionalMegaRequestListenerInterface(
+                onRequestFinish = onSetContactLinksOptionRequestFinished(continuation, accept)
+            ))
+        }
+    }
 
-                override fun onRequestUpdate(api: MegaApiJava?, request: MegaRequest?) {}
-
-                override fun onRequestFinish(
-                    api: MegaApiJava?,
-                    request: MegaRequest?,
-                    e: MegaError?
-                ) {
-                    if (isSetAutoAcceptQRResponse(request)) {
-                        when (e?.errorCode) {
-                            MegaError.API_OK -> {
-                                continuation.resumeWith(Result.success(accept))
-                            }
-                            else -> {
-                                continuation.resumeWith(
-                                    Result.failure(
-                                        MegaException(
-                                            e?.errorCode,
-                                            e?.errorString
-                                        )
-                                    )
-                                )
-                            }
-                        }
-                    }
+    private fun onSetContactLinksOptionRequestFinished(
+        continuation: Continuation<Boolean>,
+        accept: Boolean
+    ) = { request: MegaRequest, error: MegaError ->
+        if (isSetAutoAcceptQRResponse(request)) {
+            when (error.errorCode) {
+                MegaError.API_OK -> {
+                    continuation.resumeWith(Result.success(accept))
                 }
-
-                override fun onRequestTemporaryError(
-                    api: MegaApiJava?,
-                    request: MegaRequest?,
-                    e: MegaError?
-                ) {
-                }
-            })
+                else -> continuation.failWithError(error)
+            }
         }
     }
 
     private fun isSetAutoAcceptQRResponse(request: MegaRequest?) =
-        request?.type == MegaRequest.TYPE_SET_ATTR_USER && request.paramType == MegaApiJava.USER_ATTR_CONTACT_LINK_VERIFICATION
+        request.isTypeWithParam(
+            MegaRequest.TYPE_SET_ATTR_USER,
+            MegaApiJava.USER_ATTR_CONTACT_LINK_VERIFICATION
+        )
 
-    private fun getUiPreferences(): SharedPreferences {
-        return context
-            .getSharedPreferences(
-                SharedPreferenceConstants.USER_INTERFACE_PREFERENCES,
-                Context.MODE_PRIVATE
-            )
-    }
+    private fun getUiPreferences(): SharedPreferences =
+        context.getSharedPreferences(
+            SharedPreferenceConstants.USER_INTERFACE_PREFERENCES,
+            Context.MODE_PRIVATE
+        )
 
     override fun getAttributes(): MegaAttributes = databaseHandler.attributes
 
     override fun getPreferences(): MegaPreferences = databaseHandler.preferences
 
-    override fun monitorStartScreen(): Flow<Int> {
-        return monitorStartScreen.getEvents()
+    override fun monitorStartScreen(): Flow<Int> = monitorStartScreen.getEvents()
+
+    override fun monitorHideRecentActivity(): Flow<Boolean> = monitorHideRecentActivity.getEvents()
+
+    override fun isSdkLoggingEnabled(): SharedFlow<Boolean> = loggingSettingsGateway.isLoggingEnabled().shareIn(appScope, SharingStarted.WhileSubscribed(), replay = 1)
+
+    override suspend fun setSdkLoggingEnabled(enabled: Boolean) {
+        loggingSettingsGateway.setLoggingEnabled(enabled)
     }
 
-    override fun monitorHideRecentActivity(): Flow<Boolean> {
-        return monitorHideRecentActivity.getEvents()
+    override fun isChatLoggingEnabled(): Flow<Boolean> =
+        loggingSettingsGateway.isChatLoggingEnabled()
+
+    override suspend fun setChatLoggingEnabled(enabled: Boolean) {
+        loggingSettingsGateway.setChatLoggingEnabled(enabled)
     }
 }
