@@ -96,6 +96,7 @@ class DocumentsFragment : Fragment(), HomepageSearchable {
 
     override fun onDestroyView() {
         super.onDestroyView()
+        viewModel.cancelSearch()
         LiveEventBus.get(EVENT_FAB_CHANGE, Boolean::class.java)
             .removeObserver(fabChangeObserver)
     }

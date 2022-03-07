@@ -16,7 +16,6 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.annotation.ColorRes
 import androidx.appcompat.app.AlertDialog
-import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.res.ResourcesCompat
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
@@ -725,15 +724,31 @@ object MegaNodeUtil {
     }
 
     /**
-     * Check if all nodes are file nodes.
+     * Check if all nodes are file nodes and not taken down.
      *
      * @param nodes nodes to check
-     * @return whether all nodes are file nodes
+     * @return whether all nodes are file nodes and not taken down.
      */
     @JvmStatic
-    fun areAllFileNodes(nodes: List<MegaNode>): Boolean {
+    fun areAllFileNodesAndNotTakenDown(nodes: List<MegaNode>): Boolean {
         for (node in nodes) {
-            if (!node.isFile) {
+            if (!node.isFile || node.isTakenDown) {
+                return false
+            }
+        }
+
+        return true
+    }
+
+    /**
+     * Check if all nodes are not taken down.
+     *
+     * @return True if all items are not taken down, false otherwise.
+     */
+    @JvmStatic
+    fun List<MegaNode?>.areAllNotTakenDown(): Boolean {
+        for (node in this) {
+            if (node?.isTakenDown == true) {
                 return false
             }
         }
@@ -760,17 +775,18 @@ object MegaNodeUtil {
     }
 
     /**
-     * Check if all nodes have owner access.
+     * Check if all nodes have owner access and are not taken down.
      *
      * @param nodes List of nodes to check.
-     * @return True if all nodes have owner access, false otherwise.
+     * @return True if all nodes have owner access and are not taken down, false otherwise.
      */
     @JvmStatic
-    fun allHaveOwnerAccess(nodes: List<MegaNode?>): Boolean {
+    fun allHaveOwnerAccessAndNotTakenDown(nodes: List<MegaNode?>): Boolean {
         val megaApi = MegaApplication.getInstance().megaApi
 
         for (node in nodes) {
-            if (megaApi.checkAccess(node, MegaShare.ACCESS_OWNER).errorCode != MegaError.API_OK) {
+            if (megaApi.checkAccess(node, MegaShare.ACCESS_OWNER).errorCode != MegaError.API_OK
+                || node?.isTakenDown == true) {
                 return false
             }
         }
@@ -1064,28 +1080,6 @@ object MegaNodeUtil {
         if (shouldStopServer) {
             megaApi.httpServerStop()
         }
-    }
-
-    /**
-     * Shows a taken down alert.
-     *
-     * @param activity the activity is the page where dialog is shown
-     */
-    @JvmStatic
-    fun showTakenDownAlert(activity: AppCompatActivity?) {
-        if (activity == null || activity.isFinishing || alertTakenDown != null && alertTakenDown!!.isShowing) {
-            return
-        }
-
-        val dialogBuilder = MaterialAlertDialogBuilder(activity)
-
-        dialogBuilder.setTitle(getString(R.string.general_not_available))
-            .setMessage(getString(R.string.error_download_takendown_node))
-            .setNegativeButton(getString(R.string.general_dismiss)) { _, _ -> activity.finish() }
-
-        alertTakenDown = dialogBuilder.create()
-        alertTakenDown!!.setCancelable(false)
-        alertTakenDown!!.show()
     }
 
     /**

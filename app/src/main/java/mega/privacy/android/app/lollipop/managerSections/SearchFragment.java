@@ -43,6 +43,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import java.util.Stack;
 import java.util.concurrent.CopyOnWriteArrayList;
 
@@ -63,8 +64,8 @@ import mega.privacy.android.app.imageviewer.ImageViewerActivity;
 import mega.privacy.android.app.fragments.homepage.EventObserver;
 import mega.privacy.android.app.fragments.homepage.SortByHeaderViewModel;
 import mega.privacy.android.app.lollipop.DrawerItem;
+import mega.privacy.android.app.search.callback.SearchCallback;
 import mega.privacy.android.app.lollipop.ManagerActivity;
-import mega.privacy.android.app.search.callback.SearchActionsCallback;
 import mega.privacy.android.app.search.usecase.SearchNodesUseCase;
 import mega.privacy.android.app.globalmanagement.SortOrderManagement;
 import mega.privacy.android.app.lollipop.PdfViewerActivity;
@@ -90,15 +91,16 @@ import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.FileUtil.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.MegaApiUtils.*;
-import static mega.privacy.android.app.utils.MegaNodeUtil.allHaveOwnerAccess;
-import static mega.privacy.android.app.utils.MegaNodeUtil.areAllFileNodes;
+import static mega.privacy.android.app.utils.MegaNodeUtil.allHaveOwnerAccessAndNotTakenDown;
+import static mega.privacy.android.app.utils.MegaNodeUtil.areAllFileNodesAndNotTakenDown;
 import static mega.privacy.android.app.utils.MegaNodeUtil.manageTextFileIntent;
 import static mega.privacy.android.app.utils.MegaNodeUtil.manageURLNode;
 import static mega.privacy.android.app.utils.MegaNodeUtil.onNodeTapped;
 import static mega.privacy.android.app.utils.Util.*;
 
 @AndroidEntryPoint
-public class SearchFragment extends RotatableFragment implements SearchActionsCallback {
+public class SearchFragment extends RotatableFragment implements SearchCallback.View,
+		SearchCallback.Data {
 
 	public static final String ARRAY_SEARCH = "ARRAY_SEARCH";
 
@@ -318,14 +320,16 @@ public class SearchFragment extends RotatableFragment implements SearchActionsCa
 			
 			// Link
 			if ((selected.size() == 1) && (megaApi.checkAccess(selected.get(0), MegaShare.ACCESS_OWNER).getErrorCode() == MegaError.API_OK)) {
-				if (selected.get(0).isExported()) {
-					//Node has public link
-					showRemoveLink = true;
-					showEditLink = true;
-				} else {
-					showLink = true;
+				if (!selected.get(0).isTakenDown()) {
+					if (selected.get(0).isExported()) {
+						//Node has public link
+						showRemoveLink = true;
+						showEditLink = true;
+					} else {
+						showLink = true;
+					}
 				}
-			} else if (allHaveOwnerAccess(selected)) {
+			} else if (allHaveOwnerAccessAndNotTakenDown(selected)) {
 				showLink = true;
 			}
 
@@ -336,15 +340,22 @@ public class SearchFragment extends RotatableFragment implements SearchActionsCa
 				showMove = true;
 				showCopy = true;
 
+				//showSendToChat
+				showSendToChat = areAllFileNodesAndNotTakenDown(selected);
+
 				for(int i=0; i<selected.size();i++)	{
 					if(megaApi.checkMove(selected.get(i), megaApi.getRubbishNode()).getErrorCode() != MegaError.API_OK)	{
 						showTrash = false;
 						showMove = false;
 						break;
 					}
+
+					if (selected.get(i).isTakenDown()) {
+						showDownload = false;
+						showCopy = false;
+						showSendToChat = false;
+					}
 				}
-				//showSendToChat
-				showSendToChat = areAllFileNodes(selected);
 
 				if(selected.size()==adapter.getItemCount()){
 					menu.findItem(R.id.cab_menu_select_all).setVisible(false);
@@ -678,11 +689,12 @@ public class SearchFragment extends RotatableFragment implements SearchActionsCa
 		}
 	}
 
+	@NonNull
 	@Override
 	public MegaCancelToken initNewSearch() {
 		updateSearchProgressView(true);
-		cancelPreviousSearch();
-		return MegaCancelToken.createInstance();
+		cancelSearch();
+		return Objects.requireNonNull(MegaCancelToken.createInstance());
 	}
 
 	@Override
@@ -699,7 +711,7 @@ public class SearchFragment extends RotatableFragment implements SearchActionsCa
 	}
 
 	@Override
-	public void cancelPreviousSearch() {
+	public void cancelSearch() {
 		if (searchCancelToken != null) {
 			searchCancelToken.cancel();
 		}
@@ -1037,7 +1049,7 @@ public class SearchFragment extends RotatableFragment implements SearchActionsCa
 	
 	public int onBackPressed(){
 		logDebug("onBackPressed");
-		cancelPreviousSearch();
+		cancelSearch();
 		int levelSearch = ((ManagerActivity)context).levelsSearch;
 
 		if (levelSearch >= 0) {
