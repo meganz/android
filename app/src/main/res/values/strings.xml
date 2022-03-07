@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0"?>
 <resources>
     <!-- PRO Lite account -->
     <string name="prolite_account">Pro Lite</string>
@@ -4040,8 +4040,6 @@
     <string name="button_permission_info">Got it</string>
     <!-- Warning show to the user when the app needs permissions to get the best meeting experience and the user has denied them.-->
     <string name="meeting_required_permissions_warning">Go to Settings to allow MEGA to access your camera and microphone.</string>
-    <!-- Warning show to the user when the app needs bluetooth connect permissions to get the best meeting experience and the user has denied them.-->
-    <string name="meeting_bluetooth_connect_required_permissions_warning">Go to Settings to grant MEGA permission to access your nearby devices using Bluetooth.</string>
     <!-- The button text in the meeting ended alert dialog. Click the button to open the group chat screen of the meeting-->
     <string name="view_meeting_chat">View meeting chat</string>
     <!-- the content of tips when the user uses the meeting first time-->
@@ -4259,6 +4257,14 @@
     <string name="action_cancel_upload">Cancel upload</string>
     <!-- Action button which will dismiss the dialog and will not cancel the action. -->
     <string name="action_do_not_cancel">Don’t cancel</string>
+    <!-- Remove moderator permission and assign standard permission to a meeting participant-->
+    <string name="remove_moderator">Remove moderator</string>
+    <!-- Title of DCIM folder warning dialog -->
+    <string name="title_dcim_folder_dialog">DCIM folder</string>
+    <!-- Content of DCIM folder warning dialog -->
+    <string name="content_dcim_folder_dialog">MEGA uploads your images from the gallery. To change the upload location please go to Camera Upload settings.</string>
+    <!-- Error shown when download a file that has violated ToS/AUP. -->
+    <string name="tos_aup_violation">ToS/AUP violation</string>
     <!-- Title message of existing subscription dialog -->
     <string name="title_existing_subscription">Buy new subscription?</string>
     <!-- Text of buy new subscription button -->
@@ -4269,12 +4275,6 @@
     <string name="message_subscription_from_itunes">You already have a subscription. If you buy another one you will be charged twice. To avoid this, cancel your current subscription from your iTunes account. Visit our Help Centre for more information.</string>
     <!-- Dialog message when the existing subscription is from other platform (Stripe and ECP)  -->
     <string name="message_subscription_from_other_platform">You already have a subscription. If you buy another one, you will be charged twice. To avoid this, cancel your current subscription by going to MEGA in a desktop or mobile web browser. Visit our Help Centre for more information.</string>
-    <!-- Remove moderator permission and assign standard permission to a meeting participant-->
-    <string name="remove_moderator">Remove moderator</string>
-    <!-- Title of DCIM folder warning dialog -->
-    <string name="title_dcim_folder_dialog">DCIM folder</string>
-    <!-- Content of DCIM folder warning dialog -->
-    <string name="content_dcim_folder_dialog">MEGA uploads your images from the gallery. To change the upload location please go to Camera Upload settings.</string>
-    <!-- Error shown when download a file that has violated ToS/AUP. -->
-    <string name="tos_aup_violation">ToS/AUP violation</string>
+    <!-- Warning show to the user when the app needs bluetooth connect permissions to get the best meeting experience and the user has denied them.-->
+    <string name="meeting_bluetooth_connect_required_permissions_warning">Go to Settings to grant MEGA permission to access your nearby devices using Bluetooth.</string>
 </resources>

@@ -1,6 +1,7 @@
 package test.mega.privacy.android.app.domain.usecase
 
 import com.google.common.truth.Truth.assertThat
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.app.domain.entity.FolderVersionInfo
 import mega.privacy.android.app.domain.repository.FilesRepository
@@ -12,6 +13,7 @@ import org.junit.Test
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
 
+@ExperimentalCoroutinesApi
 class DefaultGetFolderVersionInfoTest {
     private lateinit var underTest: GetFolderVersionInfo
     private val filesRepository = mock<FilesRepository>()

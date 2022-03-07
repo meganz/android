@@ -3,6 +3,7 @@ package test.mega.privacy.android.app.domain.usecase
 
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.app.domain.repository.AccountRepository
@@ -13,6 +14,7 @@ import org.junit.Test
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
 
+@ExperimentalCoroutinesApi
 class DefaultFetchMultiFactorAuthSettingTest {
     private lateinit var underTest: FetchMultiFactorAuthSetting
     private val accountRepository = mock<AccountRepository>()

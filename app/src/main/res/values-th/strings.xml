@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0"?>
 <resources>
     <!-- PRO Lite account -->
     <string name="prolite_account">Pro Lite</string>
@@ -690,7 +690,7 @@
     <string name="cam_sync_wifi">Wi-Fi เท่านั้น</string>
     <!-- the options of how to upload, but in an array. needed for the settings, how to upload the camera images. when Wi-Fi connected and using data plan -->
     <string name="cam_sync_data">WiFi หรือข้อมูลมือถือ</string>
-    <!-- The upload of the user’s photos orvideos from their specified album is in progress. -->
+    <!-- The upload of the user’s photos or videos from their specified album is in progress. -->
     <string name="cam_sync_syncing">กำลังอัปโหลดภาพจากกล้อง</string>
     <!-- confirmation question for cancelling the camera uploads -->
     <string name="cam_sync_cancel_sync">คุณต้องการหยุดการอัปโหลดกล้องหรือไม่</string>
@@ -2816,9 +2816,9 @@
     <!-- Option of one-off (year) billing. Placeholder: purchase price. -->
     <string name="billed_one_off_year">[A]ครั้งเดียว (ปี)[/A] %s</string>
     <!-- Option of monthly billing period. Placeholder: purchase price -->
-    <string name="billed_monthly_text">[A]รายเดือน[/A] %s/เดือน</string>
+    <string name="billed_monthly_text">[A]Billed monthly[/A] %s/month</string>
     <!-- Option of yearly billing period. Placeholder: purchase price -->
-    <string name="billed_yearly_text">[A]รายปี[/A] %s/ปี</string>
+    <string name="billed_yearly_text">[A]Billed yearly[/A] %s/year</string>
     <!-- dialog option cancel in alert dialog -->
     <string name="button_cancel">ยกเลิก</string>
     <!-- dialog option continue in alert dialog -->
@@ -4133,10 +4133,40 @@
     <string name="upload_files">Upload files</string>
     <!-- Action button to upload a folder. -->
     <string name="upload_folder">Upload folder</string>
-    <!-- Title of the dialog warning the user about cancel uploads. -->
-    <string name="cancel_uploads">Cancel uploads</string>
-    <!-- Warning alerting user if proceed with the action all the uploads will be cancelled. -->
-    <string name="cancel_uploads_warning">Interrupting the upload process will result in all your uploads being cancelled.</string>
-    <!-- Button to proceed with action. -->
-    <string name="action_proceed">Proceed</string>
+    <!-- Text of the dialog warning the user about cancel uploads. -->
+    <string name="cancel_uploads">Cancel upload?</string>
+    <!-- Title of the Payments screen -->
+    <string name="payment">ชำระเงิน</string>
+    <!-- Label indicating payment methods -->
+    <string name="payment_methods">Payment methods</string>
+    <!-- Button to proceed with a payment -->
+    <string name="proceed">Proceed</string>
+    <!-- Message informing the upgrade was processed correctly. Placeholder: type of subscription e.g: Pro Lite monthly -->
+    <string name="successful_upgrade">ขอบคุณสำหรับการสมัครใช้งาน %1$s</string>
+    <!-- Pro Lite monthly subscription -->
+    <string name="pro_lite_monthly">Pro Lite แบบรายเดือน</string>
+    <!-- Pro Lite yearly subscription -->
+    <string name="pro_lite_yearly">Pro Lite แบบรายปี</string>
+    <!-- Pro I monthly subscription -->
+    <string name="pro_i_monthly">Pro I แบบรายเดือน</string>
+    <!-- Pro I yearly subscription -->
+    <string name="pro_i_yearly">Pro I แบบรายปี</string>
+    <!-- Pro II monthly subscription -->
+    <string name="pro_ii_monthly">Pro II แบบรายเดือน</string>
+    <!-- Pro II yearly subscription -->
+    <string name="pro_ii_yearly">Pro II แบบรายปี</string>
+    <!-- Pro III monthly subscription -->
+    <string name="pro_iii_monthly">Pro III แบบรายเดือน</string>
+    <!-- Pro III yearly subscription -->
+    <string name="pro_iii_yearly">Pro III แบบรายปี</string>
+    <!-- Action button which will cancel uploads. -->
+    <string name="action_cancel_upload">ยกเลิกอัปโหลด</string>
+    <!-- Action button which will dismiss the dialog and will not cancel the action. -->
+    <string name="action_do_not_cancel">Don’t cancel</string>
+    <!-- Remove moderator permission and assign standard permission to a meeting participant-->
+    <string name="remove_moderator">ลบออกจากการเป็นผู้ดูแล</string>
+    <!-- Title of DCIM folder warning dialog -->
+    <string name="title_dcim_folder_dialog">โฟลเดอร์ DCIM</string>
+    <!-- Content of DCIM folder warning dialog -->
+    <string name="content_dcim_folder_dialog">MEGA จะอัปโหลดรูปภาพของคุณจากแกลเลอรี่ หากต้องการเปลี่ยนตำแหน่งอัปโหลด กรุณาไปที่การตั้งค่าการอัปโหลดจากกล้อง</string>
 </resources>

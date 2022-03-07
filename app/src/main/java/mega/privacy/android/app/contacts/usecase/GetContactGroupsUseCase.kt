@@ -18,7 +18,7 @@ import mega.privacy.android.app.utils.AvatarUtil
 import mega.privacy.android.app.utils.ChatUtil
 import mega.privacy.android.app.utils.Constants.INVALID_POSITION
 import mega.privacy.android.app.utils.ErrorUtils.toThrowable
-import mega.privacy.android.app.utils.LogUtil.*
+import mega.privacy.android.app.utils.LogUtil.logError
 import mega.privacy.android.app.utils.view.TextDrawable
 import nz.mega.sdk.*
 import nz.mega.sdk.MegaApiJava.*

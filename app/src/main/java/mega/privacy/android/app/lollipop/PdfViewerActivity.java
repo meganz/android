@@ -97,7 +97,10 @@ import nz.mega.sdk.MegaUserAlert;
 
 import static mega.privacy.android.app.components.transferWidget.TransfersManagement.isOnTransferOverQuota;
 import static mega.privacy.android.app.lollipop.FileInfoActivity.TYPE_EXPORT_REMOVE;
+import static mega.privacy.android.app.utils.AlertDialogUtil.dismissAlertDialogIfExists;
+import static mega.privacy.android.app.utils.AlertDialogUtil.isAlertDialogShown;
 import static mega.privacy.android.app.utils.AlertsAndWarnings.showForeignStorageOverQuotaWarningDialog;
+import static mega.privacy.android.app.utils.AlertsAndWarnings.showTakenDownAlert;
 import static mega.privacy.android.app.utils.Constants.ACTION_OPEN_FOLDER;
 import static mega.privacy.android.app.utils.Constants.ACTION_OVERQUOTA_STORAGE;
 import static mega.privacy.android.app.utils.Constants.ACTION_PRE_OVERQUOTA_STORAGE;
@@ -142,7 +145,6 @@ import static mega.privacy.android.app.utils.MegaNodeDialogUtil.showRenameNodeDi
 import static mega.privacy.android.app.utils.MegaNodeUtil.shareLink;
 import static mega.privacy.android.app.utils.MegaNodeUtil.shareNode;
 import static mega.privacy.android.app.utils.MegaNodeUtil.showShareOption;
-import static mega.privacy.android.app.utils.MegaNodeUtil.showTakenDownAlert;
 import static mega.privacy.android.app.utils.MegaNodeUtil.showTakenDownNodeActionNotAvailableDialog;
 import static mega.privacy.android.app.utils.Util.getExternalCardPath;
 import static mega.privacy.android.app.utils.Util.getScaleW;
@@ -224,6 +226,8 @@ public class PdfViewerActivity extends PasscodeActivity
 
     boolean notChangePage = false;
     MegaNode currentDocument;
+
+    private AlertDialog takenDownDialog;
 
     private final BroadcastReceiver receiverToFinish = new BroadcastReceiver() {
         @Override
@@ -2002,6 +2006,8 @@ public class PdfViewerActivity extends PasscodeActivity
 
         nodeSaver.destroy();
 
+        dismissAlertDialogIfExists(takenDownDialog);
+
         super.onDestroy();
     }
 
@@ -2032,8 +2038,8 @@ public class PdfViewerActivity extends PasscodeActivity
                 logWarning("TRANSFER OVERQUOTA ERROR: " + e.getErrorCode());
                 showGeneralTransferOverQuotaWarning();
             }
-        } else if (e.getErrorCode() == MegaError.API_EBLOCKED) {
-            showTakenDownAlert(this);
+        } else if (e.getErrorCode() == MegaError.API_EBLOCKED && !isAlertDialogShown(takenDownDialog)) {
+            takenDownDialog = showTakenDownAlert(this);
         }
     }
 
@@ -2095,5 +2101,9 @@ public class PdfViewerActivity extends PasscodeActivity
 
     public int getMaxIntents() {
         return maxIntents;
+    }
+
+    public AlertDialog getTakenDownDialog() {
+        return takenDownDialog;
     }
 }
