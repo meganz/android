@@ -5,7 +5,7 @@ import mega.privacy.android.app.di.MegaApi
 import mega.privacy.android.app.fragments.managerFragments.LinksFragment.getLinksOrderCloud
 import mega.privacy.android.app.globalmanagement.SortOrderManagement
 import mega.privacy.android.app.lollipop.DrawerItem
-import mega.privacy.android.app.lollipop.ManagerActivityLollipop.*
+import mega.privacy.android.app.lollipop.ManagerActivity.*
 import mega.privacy.android.app.utils.Constants.INVALID_VALUE
 import mega.privacy.android.app.utils.SortUtil.sortByNameAscending
 import mega.privacy.android.app.utils.SortUtil.sortByNameDescending
@@ -241,20 +241,5 @@ class SearchNodesUseCase @Inject constructor(
             )
         } else {
             megaApi.searchOnPublicLinks(query, megaCancelToken, sortOrderManagement.getOrderCloud())
-        }
-
-    /**
-     * Search nodes on public links containing a search string in their name
-     *
-     * @param query         Search string. The search is case-insensitive
-     * @param order         Order for the returned list
-     * @return              Single containing the resulting list of Nodes
-     */
-    fun searchPublicLink(
-        query: String,
-        order: Int = MegaApiJava.ORDER_NONE
-    ): Single<List<MegaNode>> =
-        Single.fromCallable {
-            megaApi.searchOnPublicLinks(query, null, order)
         }
 }

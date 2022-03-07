@@ -192,6 +192,8 @@ dependencies {
     implementation "androidx.navigation:navigation-fragment-ktx:$navigationVersion"
     implementation "androidx.navigation:navigation-ui-ktx:$navigationVersion"
 
+    implementation "androidx.datastore:datastore-preferences:$datastoreVersion"
+
 
     implementation "androidx.preference:preference-ktx:$preferenceVersion"
 
@@ -284,6 +286,11 @@ dependencies {
     // protobuf-java for tombstone debug
     implementation 'com.google.protobuf:protobuf-java:3.15.3'
 
+    // Logging
+    implementation "org.slf4j:slf4j-api:$slf4jVersion"
+    implementation "com.github.tony19:logback-android:$logbackVersion"
+    implementation "com.jakewharton.timber:timber:$timberVersion"
+
     // Testing dependencies
     testImplementation "junit:junit:$junitVersion"
     testImplementation "com.google.truth:truth:$truthVersion"
@@ -295,9 +302,6 @@ dependencies {
     testImplementation "androidx.test.ext:junit-ktx:$androidxTestExtVersion"
     testImplementation "org.mockito:mockito-core:$mockitoVersion"
     testImplementation "org.mockito.kotlin:mockito-kotlin:$mockitoKotlinVersion"
-    testImplementation "org.jetbrains.kotlinx:kotlinx-coroutines-test:$coroutineTestVersion"
-    testImplementation "org.jetbrains.kotlin:kotlin-test:$kotlinVersion"
-    testImplementation "app.cash.turbine:turbine:$turbineVersion"
     testImplementation "androidx.test.espresso:espresso-core:$espressoVersion"
     testImplementation "androidx.test.espresso:espresso-intents:$espressoVersion"
     testImplementation "com.google.dagger:hilt-android-testing:$hiltVersion"

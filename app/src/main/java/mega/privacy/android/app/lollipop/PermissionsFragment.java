@@ -3,17 +3,12 @@ package mega.privacy.android.app.lollipop;
 import android.Manifest;
 import android.app.Activity;
 import android.content.Context;
-import android.content.Intent;
-import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import androidx.annotation.Nullable;
-import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.Fragment;
 import androidx.core.content.ContextCompat;
 
-import android.os.Environment;
-import android.provider.Settings;
 import android.util.DisplayMetrics;
 import android.view.Display;
 import android.view.LayoutInflater;
@@ -176,7 +171,7 @@ public class PermissionsFragment extends Fragment implements View.OnClickListene
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.not_now_button: {
-                ((ManagerActivityLollipop) context).destroyPermissionsFragment();
+                ((ManagerActivity) context).destroyPermissionsFragment();
                 break;
             }
             case R.id.setup_button: {
@@ -203,7 +198,7 @@ public class PermissionsFragment extends Fragment implements View.OnClickListene
                         setContent(currentPermission);
                         break;
                     } else {
-                        ((ManagerActivityLollipop) context).destroyPermissionsFragment();
+                        ((ManagerActivity) context).destroyPermissionsFragment();
                     }
                 }
             }
@@ -247,17 +242,17 @@ public class PermissionsFragment extends Fragment implements View.OnClickListene
     void askForMediaPermissions() {
         if (!readGranted && !writeGranted) {
             logDebug("WRITE_EXTERNAL_STORAGE and READ_EXTERNAL_STORAGE");
-            requestPermission((ManagerActivityLollipop) context,
+            requestPermission((ManagerActivity) context,
                     PERMISSIONS_FRAGMENT,
                     Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE);
         } else if (!writeGranted) {
             logDebug("WRITE_EXTERNAL_STORAGE");
-            requestPermission((ManagerActivityLollipop) context,
+            requestPermission((ManagerActivity) context,
                     PERMISSIONS_FRAGMENT,
                     Manifest.permission.WRITE_EXTERNAL_STORAGE);
         } else if (!readGranted) {
             logDebug("READ_EXTERNAL_STORAGE");
-            requestPermission((ManagerActivityLollipop) context,
+            requestPermission((ManagerActivity) context,
                     PERMISSIONS_FRAGMENT,
                     Manifest.permission.READ_EXTERNAL_STORAGE);
         }
@@ -266,7 +261,7 @@ public class PermissionsFragment extends Fragment implements View.OnClickListene
     void askForCameraPermission() {
         if (!cameraGranted) {
             logDebug("CAMERA");
-            requestPermission((ManagerActivityLollipop) context, PERMISSIONS_FRAGMENT, Manifest.permission.CAMERA);
+            requestPermission((ManagerActivity) context, PERMISSIONS_FRAGMENT, Manifest.permission.CAMERA);
         }
     }
 
@@ -274,25 +269,25 @@ public class PermissionsFragment extends Fragment implements View.OnClickListene
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
             if (!microphoneGranted && !bluetoothConnectGranted) {
                 logDebug("RECORD_AUDIO && BLUETOOTH_CONNECT");
-                requestPermission((ManagerActivityLollipop) context,
+                requestPermission((ManagerActivity) context,
                         PERMISSIONS_FRAGMENT,
                         Manifest.permission.RECORD_AUDIO,
                         Manifest.permission.BLUETOOTH_CONNECT);
             } else if(!microphoneGranted) {
                 logDebug("RECORD_AUDIO");
-                requestPermission((ManagerActivityLollipop) context,
+                requestPermission((ManagerActivity) context,
                         PERMISSIONS_FRAGMENT,
                         Manifest.permission.RECORD_AUDIO);
             } else if(!bluetoothConnectGranted) {
                 logDebug("BLUETOOTH_CONNECT");
-                requestPermission((ManagerActivityLollipop) context,
+                requestPermission((ManagerActivity) context,
                         PERMISSIONS_FRAGMENT,
                         Manifest.permission.BLUETOOTH_CONNECT);
             }
         } else {
             if (!microphoneGranted) {
                 logDebug("RECORD_AUDIO");
-                requestPermission((ManagerActivityLollipop) context,
+                requestPermission((ManagerActivity) context,
                         PERMISSIONS_FRAGMENT,
                         Manifest.permission.RECORD_AUDIO);
             }
@@ -302,7 +297,7 @@ public class PermissionsFragment extends Fragment implements View.OnClickListene
     void askForContactsPermissions() {
         if (!contactsGranted) {
             logDebug("Ask for CONTACT permission");
-            requestPermission((ManagerActivityLollipop) context, PERMISSIONS_FRAGMENT, Manifest.permission.READ_CONTACTS);
+            requestPermission((ManagerActivity) context, PERMISSIONS_FRAGMENT, Manifest.permission.READ_CONTACTS);
         }
     }
 
@@ -332,7 +327,7 @@ public class PermissionsFragment extends Fragment implements View.OnClickListene
         outState.putInt("numItems", numItems);
         outState.putInt("currentPermission", currentPermission);
         outState.putIntArray("items", items);
-        outState.putBoolean("microphoneGranted", hasPermissions((ManagerActivityLollipop) context, Manifest.permission.RECORD_AUDIO));
+        outState.putBoolean("microphoneGranted", hasPermissions((ManagerActivity) context, Manifest.permission.RECORD_AUDIO));
     }
 
     @Override

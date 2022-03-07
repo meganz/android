@@ -47,31 +47,20 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.ListIterator;
-import java.util.function.Function;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import dagger.hilt.android.AndroidEntryPoint;
-import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
-import io.reactivex.rxjava3.schedulers.Schedulers;
-import mega.privacy.android.app.DatabaseHandler;
-import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
-import mega.privacy.android.app.utils.MegaNodeUtil;
+import mega.privacy.android.app.lollipop.ManagerActivity;
 import mega.privacy.android.app.utils.MegaProgressDialogUtil;
 import mega.privacy.android.app.components.NewGridRecyclerView;
 import mega.privacy.android.app.components.SimpleDividerItemDecoration;
 import mega.privacy.android.app.components.saver.NodeSaver;
-import mega.privacy.android.app.fragments.settingsFragments.cookie.data.CookieType;
-import mega.privacy.android.app.generalusecase.FilePrepareUseCase;
 import mega.privacy.android.app.imageviewer.ImageViewerActivity;
 import mega.privacy.android.app.interfaces.SnackbarShower;
 import mega.privacy.android.app.interfaces.StoreDataBeforeForward;
 import mega.privacy.android.app.listeners.CreateChatListener;
-import mega.privacy.android.app.lollipop.LoginActivityLollipop;
-import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
-import mega.privacy.android.app.lollipop.PdfViewerActivityLollipop;
+import mega.privacy.android.app.lollipop.PdfViewerActivity;
 import mega.privacy.android.app.activities.PasscodeActivity;
 import mega.privacy.android.app.lollipop.controllers.ChatController;
 import mega.privacy.android.app.lollipop.listeners.MultipleForwardChatProcessor;
@@ -83,7 +72,6 @@ import mega.privacy.android.app.utils.ColorUtils;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaChatApi;
-import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaChatApiJava;
 import nz.mega.sdk.MegaChatError;
 import nz.mega.sdk.MegaChatListItem;
@@ -116,8 +104,6 @@ import static mega.privacy.android.app.utils.MegaApiUtils.*;
 import static mega.privacy.android.app.utils.Util.*;
 import static nz.mega.sdk.MegaApiJava.INVALID_HANDLE;
 import static nz.mega.sdk.MegaApiJava.STORAGE_STATE_PAYWALL;
-
-import javax.inject.Inject;
 
 @AndroidEntryPoint
 public class NodeAttachmentHistoryActivity extends PasscodeActivity
@@ -537,7 +523,6 @@ public class NodeAttachmentHistoryActivity extends PasscodeActivity
 
                             if (localPath != null) {
                                 File mediaFile = new File(localPath);
-                                //mediaIntent.setDataAndType(Uri.parse(localPath), mimeType);
                                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && localPath.contains(Environment.getExternalStorageDirectory().getPath())) {
                                     logDebug("FileProviderOption");
                                     Uri mediaFileUri = FileProvider.getUriForFile(this, "mega.privacy.android.app.providers.fileprovider", mediaFile);
@@ -615,7 +600,7 @@ public class NodeAttachmentHistoryActivity extends PasscodeActivity
                             logDebug("isFile:isPdf");
                             String mimeType = MimeTypeList.typeForName(node.getName()).getType();
                             logDebug("FILE HANDLE: " + node.getHandle() + ", TYPE: " + mimeType);
-                            Intent pdfIntent = new Intent(this, PdfViewerActivityLollipop.class);
+                            Intent pdfIntent = new Intent(this, PdfViewerActivity.class);
                             pdfIntent.putExtra("inside", true);
                             pdfIntent.putExtra("adapterType", FROM_CHAT);
                             pdfIntent.putExtra("msgId", m.getMsgId());
@@ -757,9 +742,8 @@ public class NodeAttachmentHistoryActivity extends PasscodeActivity
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.file_contact_list_layout: {
-                Intent i = new Intent(this, ManagerActivityLollipop.class);
+                Intent i = new Intent(this, ManagerActivity.class);
                 i.setAction(ACTION_REFRESH_PARENTHANDLE_BROWSER);
-                //i.putExtra("parentHandle", node.getHandle());
                 startActivity(i);
                 finish();
                 break;
@@ -897,7 +881,6 @@ public class NodeAttachmentHistoryActivity extends PasscodeActivity
             logDebug("onPrepareActionMode");
             List<MegaChatMessage> selected = adapter.getSelectedMessages();
             if (selected.size() != 0) {
-//                MenuItem unselect = menu.findItem(R.id.cab_menu_unselect_all);
 
                 MenuItem unselect = menu.findItem(R.id.cab_menu_unselect_all);
                 if (selected.size() == adapter.getItemCount()) {
@@ -1176,8 +1159,6 @@ public class NodeAttachmentHistoryActivity extends PasscodeActivity
                             logDebug("DOCUMENT HANDLE: " + document.getHandle());
                             document = chatC.authorizeNodeIfPreview(document, chatRoom);
                             if (target != null) {
-//                            MegaNode autNode = megaApi.authorizeNode(document);
-
                                 megaApi.copyNode(document, target, this);
                             } else {
                                 logError("TARGET: null");
@@ -1207,8 +1188,6 @@ public class NodeAttachmentHistoryActivity extends PasscodeActivity
                         if (document != null) {
                             logDebug("DOCUMENT HANDLE: " + document.getHandle());
                             if (target != null) {
-//                            MegaNode autNode = megaApi.authorizeNode(document);
-
                                 megaApi.copyNode(document, target, listener);
                             } else {
                                 logError("TARGET: null");
@@ -1303,13 +1282,13 @@ public class NodeAttachmentHistoryActivity extends PasscodeActivity
                     }
 
                     logWarning("OVERQUOTA ERROR: " + e.getErrorCode());
-                    Intent intent = new Intent(this, ManagerActivityLollipop.class);
+                    Intent intent = new Intent(this, ManagerActivity.class);
                     intent.setAction(ACTION_OVERQUOTA_STORAGE);
                     startActivity(intent);
                     finish();
                 } else if (e.getErrorCode() == MegaError.API_EGOINGOVERQUOTA) {
                     logWarning("OVERQUOTA ERROR: " + e.getErrorCode());
-                    Intent intent = new Intent(this, ManagerActivityLollipop.class);
+                    Intent intent = new Intent(this, ManagerActivity.class);
                     intent.setAction(ACTION_PRE_OVERQUOTA_STORAGE);
                     startActivity(intent);
                     finish();

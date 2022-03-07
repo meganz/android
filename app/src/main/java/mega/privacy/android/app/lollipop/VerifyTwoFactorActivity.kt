@@ -21,7 +21,9 @@ import mega.privacy.android.app.listeners.BaseListener
 import mega.privacy.android.app.lollipop.controllers.AccountController
 import mega.privacy.android.app.utils.Constants.*
 import mega.privacy.android.app.utils.ConstantsUrl.RECOVERY_URL
-import mega.privacy.android.app.utils.LogUtil.*
+import mega.privacy.android.app.utils.LogUtil.logDebug
+import mega.privacy.android.app.utils.LogUtil.logError
+import mega.privacy.android.app.utils.LogUtil.logWarning
 import mega.privacy.android.app.utils.StringResourcesUtils
 import mega.privacy.android.app.utils.Util.hideKeyboard
 import mega.privacy.android.app.utils.Util.showAlert
@@ -463,8 +465,6 @@ class VerifyTwoFactorActivity : PasscodeActivity() {
                 showAlert(R.string.general_text_error, R.string.error_disable_2fa)
             }
         }
-        // No need to check again. But in old code here checks again.
-        // megaApi.multiFactorAuthCheck(megaApi.myEmail, listener)
     }
 
     /**
@@ -477,14 +477,14 @@ class VerifyTwoFactorActivity : PasscodeActivity() {
                 window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN)
 
                 if (intent != null && intent.getBooleanExtra(
-                        ChangePasswordActivityLollipop.KEY_IS_LOGOUT,
+                        ChangePasswordActivity.KEY_IS_LOGOUT,
                         false
                     )
                 ) {
                     AccountController.logout(this, megaApi)
                 } else {
                     //Intent to MyAccount
-                    val resetPassIntent = Intent(this, ManagerActivityLollipop::class.java)
+                    val resetPassIntent = Intent(this, ManagerActivity::class.java)
                     resetPassIntent.action = ACTION_PASS_CHANGED
                     resetPassIntent.putExtra(RESULT, e.errorCode)
                     startActivity(resetPassIntent)

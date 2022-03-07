@@ -55,7 +55,7 @@ import mega.privacy.android.app.listeners.AutoJoinPublicChatListener
 import mega.privacy.android.app.listeners.ChatChangeVideoStreamListener
 import mega.privacy.android.app.listeners.SimpleChatRequestListener
 import mega.privacy.android.app.listeners.SimpleMegaRequestListener
-import mega.privacy.android.app.lollipop.AddContactActivityLollipop
+import mega.privacy.android.app.lollipop.AddContactActivity
 import mega.privacy.android.app.lollipop.megachat.AppRTCAudioManager
 import mega.privacy.android.app.mediaplayer.service.MediaPlayerService.Companion.pauseAudioPlayer
 import mega.privacy.android.app.mediaplayer.service.MediaPlayerService.Companion.resumeAudioPlayerIfNotInCall
@@ -80,7 +80,8 @@ import mega.privacy.android.app.objects.PasscodeManagement
 import mega.privacy.android.app.utils.*
 import mega.privacy.android.app.utils.ChatUtil.*
 import mega.privacy.android.app.utils.Constants.*
-import mega.privacy.android.app.utils.LogUtil.*
+import mega.privacy.android.app.utils.LogUtil.logDebug
+import mega.privacy.android.app.utils.LogUtil.logError
 import mega.privacy.android.app.utils.Util.isOnline
 import mega.privacy.android.app.utils.permission.*
 import nz.mega.sdk.*
@@ -2604,7 +2605,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
     override fun onInviteParticipants() {
         logDebug("chooseAddContactDialog")
         val inviteParticipantIntent =
-            Intent(meetingActivity, AddContactActivityLollipop::class.java).apply {
+            Intent(meetingActivity, AddContactActivity::class.java).apply {
                 putExtra(INTENT_EXTRA_KEY_CONTACT_TYPE, CONTACT_TYPE_MEGA)
                 putExtra(INTENT_EXTRA_KEY_CHAT, true)
                 putExtra(INTENT_EXTRA_IS_FROM_MEETING, true)

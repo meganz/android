@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0"?>
 <resources>
     <!-- PRO Lite account -->
     <string name="prolite_account">Pro Lite</string>
@@ -690,7 +690,7 @@
     <string name="cam_sync_wifi">只在WiFi連線</string>
     <!-- the options of how to upload, but in an array. needed for the settings, how to upload the camera images. when Wi-Fi connected and using data plan -->
     <string name="cam_sync_data">Wi-Fi或行動網路</string>
-    <!-- The upload of the user’s photos orvideos from their specified album is in progress. -->
+    <!-- The upload of the user’s photos or videos from their specified album is in progress. -->
     <string name="cam_sync_syncing">相機上傳正在進行中</string>
     <!-- confirmation question for cancelling the camera uploads -->
     <string name="cam_sync_cancel_sync">您想停用相機上傳功能嗎？</string>
@@ -3616,15 +3616,15 @@
     <!-- Button which action is share the password of a link -->
     <string name="button_share_password">共享密碼</string>
     <!-- String to share a link with its decryption key separately. Please keep the place holders, are to set the link and the key. Example: Link: https://mega.nz/file/kC42xRSK#Ud2QsvpIVYmCd1a9QUhk42wXv10jCSyPSWnXEwYX2VE Key: asfAFG3345g -->
-    <string name="share_link_with_key">連結: %1$s\n\n金鑰: %2$s</string>
+    <string name="share_link_with_key">連結：%1$s\n\n金鑰：%2$s</string>
     <!-- String to share a link protected with password with its password.Please keep the place holders, are to set the link and the password. Example: Link: https://mega.nz/file/kC42xRSK#Ud2QsvpIVYmCd1a9QUhk42wXv10jCSyPSWnXEwYX2VE Password: asfAFG3345g -->
-    <string name="share_link_with_password">連結: %1$s\n\n密碼: %2$s</string>
+    <string name="share_link_with_password">連結： %1$s\n\n密碼： %2$s</string>
     <!-- Warning show to the user when the app needs permissions to share files and the user has denied them. -->
     <string name="files_required_permissions_warning">MEGA需要您的授權才能存取您的檔案進行共享。</string>
     <!-- Context menu item. Allows user to add file/folder to favourites -->
-    <string name="file_properties_favourite">喜歡</string>
+    <string name="file_properties_favourite">收藏</string>
     <!-- Context menu item. Allows user to delete file/folder from favourites -->
-    <string name="file_properties_unfavourite">移除喜歡</string>
+    <string name="file_properties_unfavourite">移除收藏</string>
     <!-- Context menu item. Allows to mark file/folder with own color label -->
     <string name="file_properties_label">標籤</string>
     <!-- Information text to let’s the user know that they can remove a colour from a folder or file that was already marked. -->
@@ -4133,10 +4133,40 @@
     <string name="upload_files">上傳檔案</string>
     <!-- Action button to upload a folder. -->
     <string name="upload_folder">上傳資料夾</string>
-    <!-- Title of the dialog warning the user about cancel uploads. -->
-    <string name="cancel_uploads">取消上傳</string>
-    <!-- Warning alerting user if proceed with the action all the uploads will be cancelled. -->
-    <string name="cancel_uploads_warning">中斷上傳程序將導致您所有的上傳被取消。</string>
-    <!-- Button to proceed with action. -->
-    <string name="action_proceed">繼續</string>
+    <!-- Text of the dialog warning the user about cancel uploads. -->
+    <string name="cancel_uploads">取消上傳？</string>
+    <!-- Title of the Payments screen -->
+    <string name="payment">付款</string>
+    <!-- Label indicating payment methods -->
+    <string name="payment_methods">付款方式</string>
+    <!-- Button to proceed with a payment -->
+    <string name="proceed">繼續</string>
+    <!-- Message informing the upgrade was processed correctly. Placeholder: type of subscription e.g: Pro Lite monthly -->
+    <string name="successful_upgrade">感謝您訂閱%1$s！</string>
+    <!-- Pro Lite monthly subscription -->
+    <string name="pro_lite_monthly">Pro Lite 月方案</string>
+    <!-- Pro Lite yearly subscription -->
+    <string name="pro_lite_yearly">Pro Lite 年方案</string>
+    <!-- Pro I monthly subscription -->
+    <string name="pro_i_monthly">Pro I 月方案</string>
+    <!-- Pro I yearly subscription -->
+    <string name="pro_i_yearly">Pro I 年方案</string>
+    <!-- Pro II monthly subscription -->
+    <string name="pro_ii_monthly">Pro II 月方案</string>
+    <!-- Pro II yearly subscription -->
+    <string name="pro_ii_yearly">Pro II 年方案</string>
+    <!-- Pro III monthly subscription -->
+    <string name="pro_iii_monthly">Pro III 月方案</string>
+    <!-- Pro III yearly subscription -->
+    <string name="pro_iii_yearly">Pro III 年方案</string>
+    <!-- Action button which will cancel uploads. -->
+    <string name="action_cancel_upload">取消上傳</string>
+    <!-- Action button which will dismiss the dialog and will not cancel the action. -->
+    <string name="action_do_not_cancel">不要取消</string>
+    <!-- Remove moderator permission and assign standard permission to a meeting participant-->
+    <string name="remove_moderator">移除主持人</string>
+    <!-- Title of DCIM folder warning dialog -->
+    <string name="title_dcim_folder_dialog">DCIM資料夾</string>
+    <!-- Content of DCIM folder warning dialog -->
+    <string name="content_dcim_folder_dialog">MEGA預設會上傳您相簿裡的照片。如需更改上傳位置，請到相機上傳設定裡變更。</string>
 </resources>

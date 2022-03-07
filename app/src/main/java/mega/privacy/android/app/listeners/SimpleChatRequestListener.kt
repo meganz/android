@@ -1,6 +1,7 @@
 package mega.privacy.android.app.listeners
 
-import mega.privacy.android.app.utils.LogUtil.*
+import mega.privacy.android.app.utils.LogUtil.logDebug
+import mega.privacy.android.app.utils.LogUtil.logError
 import nz.mega.sdk.MegaChatApiJava
 import nz.mega.sdk.MegaChatError
 import nz.mega.sdk.MegaChatRequest

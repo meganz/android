@@ -26,6 +26,7 @@ import mega.privacy.android.app.databinding.ActivityImageViewerBinding
 import mega.privacy.android.app.imageviewer.adapter.ImageViewerAdapter
 import mega.privacy.android.app.imageviewer.data.ImageItem
 import mega.privacy.android.app.imageviewer.dialog.ImageBottomSheetDialogFragment
+import mega.privacy.android.app.imageviewer.util.*
 import mega.privacy.android.app.interfaces.PermissionRequester
 import mega.privacy.android.app.interfaces.SnackbarShower
 import mega.privacy.android.app.interfaces.showSnackbar
@@ -39,7 +40,6 @@ import mega.privacy.android.app.utils.LogUtil.logError
 import mega.privacy.android.app.utils.LogUtil.logWarning
 import mega.privacy.android.app.utils.MegaNodeDialogUtil.showRenameNodeDialog
 import mega.privacy.android.app.utils.MegaNodeUtil
-import mega.privacy.android.app.utils.NetworkUtil.isOnline
 import mega.privacy.android.app.utils.OfflineUtils
 import mega.privacy.android.app.utils.StringResourcesUtils
 import mega.privacy.android.app.utils.ViewUtils.waitForLayout
@@ -422,28 +422,14 @@ class ImageViewerActivity : BaseActivity(), PermissionRequester, SnackbarShower 
      */
     private fun showCurrentImageInfo(imageItem: ImageItem?) {
         if (imageItem?.nodeItem != null) {
-            val item = imageItem.nodeItem
-            binding.txtTitle.text = item.name
+            binding.txtTitle.text = imageItem.nodeItem.name
             binding.toolbar.menu?.apply {
-                val isOnline = isOnline()
-
-                findItem(R.id.action_forward)?.isVisible =
-                    imageItem.isFromChat()
-
-                findItem(R.id.action_share)?.isVisible =
-                    !item.isFromRubbishBin && (imageItem.isOffline || (imageItem.isFromChat() && (imageItem.nodeItem.hasOwnerAccess || !imageItem.nodePublicLink.isNullOrBlank())))
-
-                findItem(R.id.action_download)?.isVisible =
-                    !item.isFromRubbishBin && item.handle > INVALID_HANDLE
-
-                findItem(R.id.action_get_link)?.isVisible =
-                    isOnline && item.hasOwnerAccess && !item.isFromRubbishBin && !item.isExternalNode
-
-                findItem(R.id.action_send_to_chat)?.isVisible =
-                    isOnline && !item.isExternalNode && item.node != null && !item.isFromRubbishBin && viewModel.isUserLoggedIn() && item.hasReadAccess && !imageItem.isFromChat()
-
-                findItem(R.id.action_more)?.isVisible =
-                    item.handle > INVALID_HANDLE
+                findItem(R.id.action_forward)?.isVisible = imageItem.shouldShowForwardOption()
+                findItem(R.id.action_share)?.isVisible = imageItem.isFromChat() && imageItem.shouldShowShareOption()
+                findItem(R.id.action_download)?.isVisible = imageItem.shouldShowDownloadOption()
+                findItem(R.id.action_get_link)?.isVisible = imageItem.shouldShowManageLinkOption()
+                findItem(R.id.action_send_to_chat)?.isVisible = imageItem.shouldShowSendToContactOption(viewModel.isUserLoggedIn())
+                findItem(R.id.action_more)?.isVisible = imageItem.nodeItem.handle != INVALID_HANDLE
             }
         } else {
             logWarning("Null MegaNodeItem")

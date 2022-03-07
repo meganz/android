@@ -16,7 +16,6 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.annotation.ColorRes
 import androidx.appcompat.app.AlertDialog
-import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.res.ResourcesCompat
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
@@ -34,10 +33,10 @@ import mega.privacy.android.app.listeners.CopyListener
 import mega.privacy.android.app.listeners.ExportListener
 import mega.privacy.android.app.listeners.MoveListener
 import mega.privacy.android.app.listeners.RemoveListener
-import mega.privacy.android.app.lollipop.FileExplorerActivityLollipop
-import mega.privacy.android.app.lollipop.ManagerActivityLollipop
+import mega.privacy.android.app.lollipop.FileExplorerActivity
+import mega.privacy.android.app.lollipop.ManagerActivity
 import mega.privacy.android.app.lollipop.DrawerItem
-import mega.privacy.android.app.lollipop.PdfViewerActivityLollipop
+import mega.privacy.android.app.lollipop.PdfViewerActivity
 import mega.privacy.android.app.lollipop.listeners.MultipleRequestListener
 import mega.privacy.android.app.textEditor.TextEditorActivity
 import mega.privacy.android.app.textEditor.TextEditorViewModel.Companion.EDIT_MODE
@@ -725,15 +724,31 @@ object MegaNodeUtil {
     }
 
     /**
-     * Check if all nodes are file nodes.
+     * Check if all nodes are file nodes and not taken down.
      *
      * @param nodes nodes to check
-     * @return whether all nodes are file nodes
+     * @return whether all nodes are file nodes and not taken down.
      */
     @JvmStatic
-    fun areAllFileNodes(nodes: List<MegaNode>): Boolean {
+    fun areAllFileNodesAndNotTakenDown(nodes: List<MegaNode>): Boolean {
         for (node in nodes) {
-            if (!node.isFile) {
+            if (!node.isFile || node.isTakenDown) {
+                return false
+            }
+        }
+
+        return true
+    }
+
+    /**
+     * Check if all nodes are not taken down.
+     *
+     * @return True if all items are not taken down, false otherwise.
+     */
+    @JvmStatic
+    fun List<MegaNode?>.areAllNotTakenDown(): Boolean {
+        for (node in this) {
+            if (node?.isTakenDown == true) {
                 return false
             }
         }
@@ -760,17 +775,18 @@ object MegaNodeUtil {
     }
 
     /**
-     * Check if all nodes have owner access.
+     * Check if all nodes have owner access and are not taken down.
      *
      * @param nodes List of nodes to check.
-     * @return True if all nodes have owner access, false otherwise.
+     * @return True if all nodes have owner access and are not taken down, false otherwise.
      */
     @JvmStatic
-    fun allHaveOwnerAccess(nodes: List<MegaNode?>): Boolean {
+    fun allHaveOwnerAccessAndNotTakenDown(nodes: List<MegaNode?>): Boolean {
         val megaApi = MegaApplication.getInstance().megaApi
 
         for (node in nodes) {
-            if (megaApi.checkAccess(node, MegaShare.ACCESS_OWNER).errorCode != MegaError.API_OK) {
+            if (megaApi.checkAccess(node, MegaShare.ACCESS_OWNER).errorCode != MegaError.API_OK
+                || node?.isTakenDown == true) {
                 return false
             }
         }
@@ -1067,28 +1083,6 @@ object MegaNodeUtil {
     }
 
     /**
-     * Shows a taken down alert.
-     *
-     * @param activity the activity is the page where dialog is shown
-     */
-    @JvmStatic
-    fun showTakenDownAlert(activity: AppCompatActivity?) {
-        if (activity == null || activity.isFinishing || alertTakenDown != null && alertTakenDown!!.isShowing) {
-            return
-        }
-
-        val dialogBuilder = MaterialAlertDialogBuilder(activity)
-
-        dialogBuilder.setTitle(getString(R.string.general_not_available))
-            .setMessage(getString(R.string.error_download_takendown_node))
-            .setNegativeButton(getString(R.string.general_dismiss)) { _, _ -> activity.finish() }
-
-        alertTakenDown = dialogBuilder.create()
-        alertTakenDown!!.setCancelable(false)
-        alertTakenDown!!.show()
-    }
-
-    /**
      * show dialog
      *
      * @param isFolder        the clicked node
@@ -1160,15 +1154,15 @@ object MegaNodeUtil {
     }
 
     /**
-     * Start FileExplorerActivityLollipop to select folder to move nodes.
+     * Start [FileExplorerActivity] to select folder to move nodes.
      *
      * @param activity current Android activity
      * @param handles handles to move
      */
     @JvmStatic
     fun selectFolderToMove(activity: Activity, handles: LongArray) {
-        val intent = Intent(activity, FileExplorerActivityLollipop::class.java)
-        intent.action = FileExplorerActivityLollipop.ACTION_PICK_MOVE_FOLDER
+        val intent = Intent(activity, FileExplorerActivity::class.java)
+        intent.action = FileExplorerActivity.ACTION_PICK_MOVE_FOLDER
         intent.putExtra(INTENT_EXTRA_KEY_MOVE_FROM, handles)
         activity.startActivityForResult(intent, REQUEST_CODE_SELECT_FOLDER_TO_MOVE)
     }
@@ -1229,7 +1223,7 @@ object MegaNodeUtil {
     }
 
     /**
-     * Start FileExplorerActivityLollipop to select folder to copy nodes.
+     * Start [FileExplorerActivity] to select folder to copy nodes.
      *
      * @param activity current Android activity
      * @param handles handles to copy
@@ -1241,8 +1235,8 @@ object MegaNodeUtil {
             return
         }
 
-        val intent = Intent(activity, FileExplorerActivityLollipop::class.java)
-        intent.action = FileExplorerActivityLollipop.ACTION_PICK_COPY_FOLDER
+        val intent = Intent(activity, FileExplorerActivity::class.java)
+        intent.action = FileExplorerActivity.ACTION_PICK_COPY_FOLDER
         intent.putExtra(INTENT_EXTRA_KEY_COPY_FROM, handles)
         activity.startActivityForResult(intent, REQUEST_CODE_SELECT_FOLDER_TO_COPY)
     }
@@ -1437,7 +1431,7 @@ object MegaNodeUtil {
      */
     @JvmStatic
     fun handleLocationClick(activity: Activity, adapterType: Int, location: LocationInfo) {
-        val intent = Intent(activity, ManagerActivityLollipop::class.java)
+        val intent = Intent(activity, ManagerActivity::class.java)
 
         intent.action = ACTION_OPEN_FOLDER
         intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
@@ -1495,7 +1489,7 @@ object MegaNodeUtil {
                 openZip(context, activityLauncher, autoPlayInfo.localPath, autoPlayInfo.nodeHandle)
             }
             mime.isPdf -> {
-                val pdfIntent = Intent(context, PdfViewerActivityLollipop::class.java)
+                val pdfIntent = Intent(context, PdfViewerActivity::class.java)
                 pdfIntent.putExtra(INTENT_EXTRA_KEY_HANDLE, autoPlayInfo.nodeHandle)
 
                 if (!setLocalIntentParams(
@@ -1576,7 +1570,7 @@ object MegaNodeUtil {
     }
 
     /**
-     * Launch ZipBrowserActivityLollipop to preview a zip file.
+     * Launch [ZipBrowserActivity] to preview a zip file.
      *
      * @param context Android context.
      * @param activityLauncher interface to launch activity.

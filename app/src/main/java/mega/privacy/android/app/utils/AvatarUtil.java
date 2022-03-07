@@ -31,7 +31,7 @@ import mega.privacy.android.app.components.twemoji.EmojiManager;
 import mega.privacy.android.app.components.twemoji.EmojiRange;
 import mega.privacy.android.app.components.twemoji.EmojiUtils;
 import mega.privacy.android.app.components.twemoji.EmojiUtilsShortcodes;
-import mega.privacy.android.app.lollipop.AddContactActivityLollipop;
+import mega.privacy.android.app.lollipop.AddContactActivity;
 import mega.privacy.android.app.lollipop.ShareContactInfo;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaUser;
@@ -39,7 +39,7 @@ import static mega.privacy.android.app.utils.CacheFolderManager.*;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.FileUtil.*;
 import static mega.privacy.android.app.utils.TextUtil.isTextEmpty;
-import static mega.privacy.android.app.utils.ThumbnailUtilsLollipop.*;
+import static mega.privacy.android.app.utils.ThumbnailUtils.*;
 import static mega.privacy.android.app.utils.Util.*;
 import static nz.mega.sdk.MegaApiJava.INVALID_HANDLE;
 
@@ -277,7 +277,7 @@ public class AvatarUtil {
      * @return Bitmap with the default avatar built in.
      */
     public static Bitmap getAvatarShareContact(Context context, ShareContactInfo contact) {
-        String mail = ((AddContactActivityLollipop) context).getShareContactMail(contact);
+        String mail = ((AddContactActivity) context).getShareContactMail(contact);
         int color;
         if (contact.isPhoneContact()) {
             color = ContextCompat.getColor(context, R.color.grey_500_grey_400);

@@ -13,7 +13,7 @@ import androidx.annotation.Nullable;
 import androidx.core.app.NotificationCompat;
 
 import mega.privacy.android.app.R;
-import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
+import mega.privacy.android.app.lollipop.ManagerActivity;
 import mega.privacy.android.app.utils.Constants;
 
 import static mega.privacy.android.app.utils.Constants.ACTION_CHAT_NOTIFICATION_MESSAGE;
@@ -41,7 +41,7 @@ public class KeepAliveService extends Service {
     }
 
     public void createNotification(int smallIcon,String title) {
-        Intent intent = new Intent(this, ManagerActivityLollipop.class);
+        Intent intent = new Intent(this, ManagerActivity.class);
         intent.setAction(ACTION_CHAT_NOTIFICATION_MESSAGE)
                 .putExtra(EXTRA_MOVE_TO_CHAT_SECTION, true)
                 .setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);

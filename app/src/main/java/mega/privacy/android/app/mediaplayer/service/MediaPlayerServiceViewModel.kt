@@ -21,6 +21,7 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.constants.SettingsConstants.*
 import mega.privacy.android.app.listeners.MegaRequestFinishListener
 import mega.privacy.android.app.mediaplayer.playlist.PlaylistItem
+import mega.privacy.android.app.search.callback.SearchCallback
 import mega.privacy.android.app.utils.Constants.*
 import mega.privacy.android.app.utils.ContactUtil.getMegaUserNameDB
 import mega.privacy.android.app.utils.FileUtil.*
@@ -33,7 +34,7 @@ import mega.privacy.android.app.utils.RxUtil.logErr
 import mega.privacy.android.app.utils.StringResourcesUtils.getString
 import mega.privacy.android.app.utils.StringUtils.isTextEmpty
 import mega.privacy.android.app.utils.TextUtil
-import mega.privacy.android.app.utils.ThumbnailUtilsLollipop.getThumbFolder
+import mega.privacy.android.app.utils.ThumbnailUtils.getThumbFolder
 import mega.privacy.android.app.utils.Util.isOnline
 import nz.mega.sdk.*
 import nz.mega.sdk.MegaApiJava.*
@@ -54,7 +55,7 @@ class MediaPlayerServiceViewModel(
     private val megaApi: MegaApiAndroid,
     private val megaApiFolder: MegaApiAndroid,
     private val dbHandler: DatabaseHandler,
-) : ExposedShuffleOrder.ShuffleChangeListener, MegaTransferListenerInterface {
+) : ExposedShuffleOrder.ShuffleChangeListener, MegaTransferListenerInterface, SearchCallback.Data {
     private val compositeDisposable = CompositeDisposable()
 
     private val preferences = context.defaultSharedPreferences
@@ -142,6 +143,8 @@ class MediaPlayerServiceViewModel(
 
     private var playSourceChanged: MutableList<MediaItem> = mutableListOf()
     private var playingPosition = 0
+
+    private var cancelToken: MegaCancelToken? = null
 
     init {
         compositeDisposable.add(
@@ -602,18 +605,29 @@ class MediaPlayerServiceViewModel(
 
     private fun buildPlaylistForAudio(intent: Intent, firstPlayHandle: Long) {
         val order = intent.getIntExtra(INTENT_EXTRA_KEY_ORDER_GET_CHILDREN, ORDER_DEFAULT_ASC)
+        cancelToken = initNewSearch()
         buildPlaylistFromNodes(
-            megaApi, megaApi.searchByType(order, FILE_TYPE_AUDIO, SEARCH_TARGET_ROOTNODE),
+            megaApi, megaApi.searchByType(cancelToken!!, order, FILE_TYPE_AUDIO, SEARCH_TARGET_ROOTNODE),
             firstPlayHandle
         )
     }
 
     private fun buildPlaylistForVideos(intent: Intent, firstPlayHandle: Long) {
         val order = intent.getIntExtra(INTENT_EXTRA_KEY_ORDER_GET_CHILDREN, ORDER_DEFAULT_ASC)
+        cancelToken = initNewSearch()
         buildPlaylistFromNodes(
-            megaApi, megaApi.searchByType(order, FILE_TYPE_VIDEO, SEARCH_TARGET_ROOTNODE),
+            megaApi, megaApi.searchByType(cancelToken!!, order, FILE_TYPE_VIDEO, SEARCH_TARGET_ROOTNODE),
             firstPlayHandle
         )
+    }
+
+    override fun initNewSearch(): MegaCancelToken {
+        cancelSearch()
+        return MegaCancelToken.createInstance()
+    }
+
+    override fun cancelSearch() {
+        cancelToken?.cancel()
     }
 
     private fun buildPlaylistFromHandles(handles: List<Long>, firstPlayHandle: Long) {

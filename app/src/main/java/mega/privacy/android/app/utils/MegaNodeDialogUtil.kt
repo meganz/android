@@ -33,7 +33,7 @@ import mega.privacy.android.app.interfaces.showSnackbar
 import mega.privacy.android.app.listeners.MoveListener
 import mega.privacy.android.app.listeners.RemoveListener
 import mega.privacy.android.app.listeners.RenameListener
-import mega.privacy.android.app.lollipop.FileExplorerActivityLollipop
+import mega.privacy.android.app.lollipop.FileExplorerActivity
 import mega.privacy.android.app.textEditor.TextEditorActivity
 import mega.privacy.android.app.textEditor.TextEditorViewModel.Companion.CREATE_MODE
 import mega.privacy.android.app.textEditor.TextEditorViewModel.Companion.MODE
@@ -473,12 +473,12 @@ object MegaNodeDialogUtil {
                         actionNodeCallback?.createFolder(typedString)
                     }
                     TYPE_NEW_FILE -> {
-                        if (context is FileExplorerActivityLollipop) {
+                        if (context is FileExplorerActivity) {
                             context.createFile(typedString, data, node, false)
                         }
                     }
                     TYPE_NEW_URL_FILE -> {
-                        if (context is FileExplorerActivityLollipop) {
+                        if (context is FileExplorerActivity) {
                             context.createFile(typedString, data, node, true)
                         }
                     }

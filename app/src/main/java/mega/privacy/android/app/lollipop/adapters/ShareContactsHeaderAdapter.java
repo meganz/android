@@ -23,7 +23,7 @@ import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.RoundedImageView;
 import mega.privacy.android.app.components.scrollBar.SectionTitleProvider;
 import mega.privacy.android.app.components.twemoji.EmojiTextView;
-import mega.privacy.android.app.lollipop.AddContactActivityLollipop;
+import mega.privacy.android.app.lollipop.AddContactActivity;
 import mega.privacy.android.app.lollipop.ShareContactInfo;
 import mega.privacy.android.app.lollipop.listeners.UserAvatarListenerShare;
 import nz.mega.sdk.MegaApiAndroid;
@@ -38,7 +38,7 @@ import static mega.privacy.android.app.utils.FileUtil.*;
 import static mega.privacy.android.app.utils.Util.*;
 import static mega.privacy.android.app.utils.AvatarUtil.*;
 
-public class ShareContactsHeaderAdapter extends RecyclerView.Adapter<ShareContactsHeaderAdapter.ViewHolderShareContactsLollipop> implements View.OnClickListener, SectionTitleProvider {
+public class ShareContactsHeaderAdapter extends RecyclerView.Adapter<ShareContactsHeaderAdapter.ViewHolderShareContacts> implements View.OnClickListener, SectionTitleProvider {
 
     private Context mContext;
     OnItemClickListener mItemClickListener;
@@ -108,7 +108,7 @@ public class ShareContactsHeaderAdapter extends RecyclerView.Adapter<ShareContac
         return ITEM_VIEW_TYPE;
     }
 
-    public class ViewHolderShareContactsLollipop extends RecyclerView.ViewHolder implements View.OnClickListener{
+    public class ViewHolderShareContacts extends RecyclerView.ViewHolder implements View.OnClickListener{
 
         RelativeLayout itemProgress;
         RelativeLayout itemHeader;
@@ -122,7 +122,7 @@ public class ShareContactsHeaderAdapter extends RecyclerView.Adapter<ShareContac
         ImageView contactStateIcon;
         int currentPosition;
 
-        public ViewHolderShareContactsLollipop(View itemView) {
+        public ViewHolderShareContacts(View itemView) {
             super(itemView);
             itemView.setOnClickListener(this);
         }
@@ -137,7 +137,7 @@ public class ShareContactsHeaderAdapter extends RecyclerView.Adapter<ShareContac
     }
 
     @Override
-    public ShareContactsHeaderAdapter.ViewHolderShareContactsLollipop onCreateViewHolder(ViewGroup parent, int viewType) {
+    public ViewHolderShareContacts onCreateViewHolder(ViewGroup parent, int viewType) {
         LayoutInflater inflater = (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         Display display = ((Activity)mContext).getWindowManager().getDefaultDisplay();
         DisplayMetrics outMetrics = new DisplayMetrics ();
@@ -145,7 +145,7 @@ public class ShareContactsHeaderAdapter extends RecyclerView.Adapter<ShareContac
 
 
         View rowView = inflater.inflate(R.layout.item_contact_share, parent, false);
-        ViewHolderShareContactsLollipop holder = new ViewHolderShareContactsLollipop(rowView);
+        ViewHolderShareContacts holder = new ViewHolderShareContacts(rowView);
 
         holder.itemProgress = rowView.findViewById(R.id.item_progress);
 
@@ -173,7 +173,7 @@ public class ShareContactsHeaderAdapter extends RecyclerView.Adapter<ShareContac
     }
 
     @Override
-    public void onBindViewHolder(ShareContactsHeaderAdapter.ViewHolderShareContactsLollipop holder, int position) {
+    public void onBindViewHolder(ViewHolderShareContacts holder, int position) {
 
         ShareContactInfo contact = getItem(position);
 
@@ -194,7 +194,7 @@ public class ShareContactsHeaderAdapter extends RecyclerView.Adapter<ShareContac
                 holder.contactStateIcon.setVisibility(View.VISIBLE);
 
                 String name;
-                String mail = ((AddContactActivityLollipop) mContext).getShareContactMail(contact);
+                String mail = ((AddContactActivity) mContext).getShareContactMail(contact);
                 holder.mail = mail;
 
                 MegaUser user = megaApi.getContact(mail);
