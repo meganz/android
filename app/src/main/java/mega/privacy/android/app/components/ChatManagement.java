@@ -368,6 +368,11 @@ public class ChatManagement {
             return;
         }
 
+        if (CallUtil.CheckIfIAmParticipatingWithAnotherClient(call)) {
+            logDebug("I am participating with another client");
+            return;
+        }
+
         MegaChatRoom chatRoom = app.getMegaChatApi().getChatRoom(chatId);
         if (chatRoom == null) {
             logError("Chat is null");

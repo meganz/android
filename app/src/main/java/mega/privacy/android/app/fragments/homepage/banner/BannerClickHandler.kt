@@ -4,6 +4,7 @@ import android.content.Intent
 import android.net.Uri
 import mega.privacy.android.app.activities.WebViewActivity
 import mega.privacy.android.app.fragments.homepage.main.HomepageFragment
+import mega.privacy.android.app.lollipop.DrawerItem
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop
 import mega.privacy.android.app.lollipop.megaachievements.AchievementsActivity
 import mega.privacy.android.app.utils.LinksUtil
@@ -27,7 +28,7 @@ class BannerClickHandler(private val fragment: HomepageFragment) : BannerAdapter
             }
             SETTINGS -> {
                 (fragment.activity as ManagerActivityLollipop).selectDrawerItemLollipop(
-                    ManagerActivityLollipop.DrawerItem.SETTINGS)
+                    DrawerItem.SETTINGS)
             }
             TEXT_EDITOR -> {
                 (fragment.activity as ManagerActivityLollipop).showNewTextFileDialog(null)

@@ -10,8 +10,6 @@ import android.os.Bundle;
 import android.os.StatFs;
 import com.google.android.material.tabs.TabLayout;
 
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
 import androidx.core.content.FileProvider;
 import androidx.viewpager.widget.ViewPager;
 import androidx.appcompat.app.ActionBar;
@@ -36,6 +34,7 @@ import dagger.hilt.android.AndroidEntryPoint;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.globalmanagement.MyAccountInfo;
+import mega.privacy.android.app.lollipop.DrawerItem;
 import mega.privacy.android.app.lollipop.FileStorageActivityLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.activities.PasscodeActivity;
@@ -268,7 +267,7 @@ public class QRCodeActivity extends PasscodeActivity implements MegaRequestListe
             case R.id.qr_code_settings: {
                 Intent intent = new Intent(this, ManagerActivityLollipop.class);
                 Bundle bundle = new Bundle();
-                bundle.putSerializable("drawerItemQR", ManagerActivityLollipop.DrawerItem.SETTINGS);
+                bundle.putSerializable("drawerItemQR", DrawerItem.SETTINGS);
                 intent.putExtras(bundle);
                 intent.putExtra("fromQR", true);
                 intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);

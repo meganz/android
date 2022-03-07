@@ -6,7 +6,6 @@ import android.graphics.Bitmap;
 
 import java.io.File;
 
-import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.lollipop.megachat.AndroidMegaRichLinkMessage;
 import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop;
 import nz.mega.sdk.MegaApiAndroid;
@@ -21,7 +20,6 @@ import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
 
 import static mega.privacy.android.app.utils.LogUtil.*;
-import static mega.privacy.android.app.utils.TextUtil.getFolderInfo;
 import static mega.privacy.android.app.utils.ThumbnailUtils.*;
 
 public class ChatLinkInfoListener implements MegaRequestListenerInterface, MegaChatRequestListenerInterface {
@@ -29,21 +27,12 @@ public class ChatLinkInfoListener implements MegaRequestListenerInterface, MegaC
     Context context;
     long msgId;
     MegaApiAndroid megaApi;
-    MegaApiAndroid megaApiFolder;
     AndroidMegaRichLinkMessage richLinkMessage = null;
 
     public ChatLinkInfoListener(Context context, long msgId, MegaApiAndroid megaApi) {
         this.context = context;
         this.msgId = msgId;
         this.megaApi = megaApi;
-        this.megaApiFolder = null;
-    }
-
-    public ChatLinkInfoListener(Context context, long msgId, MegaApiAndroid megaApi, MegaApiAndroid megaApiFolder) {
-        this.context = context;
-        this.msgId = msgId;
-        this.megaApi = megaApi;
-        this.megaApiFolder = megaApiFolder;
     }
 
     @Override
@@ -89,74 +78,22 @@ public class ChatLinkInfoListener implements MegaRequestListenerInterface, MegaC
                     }
                 }
             }
-            else if (request.getType() == MegaRequest.TYPE_LOGIN) {
-
-                String link = request.getLink();
-
-                richLinkMessage = new AndroidMegaRichLinkMessage(link, null);
-
-                logDebug("Logged in. Setting account auth token for folder links.");
-                megaApiFolder.setAccountAuth(megaApi.getAccountAuth());
-
-                megaApiFolder.fetchNodes(this);
-
-                // Get cookies settings after login.
-                MegaApplication.getInstance().checkEnabledCookies();
-            } else if (request.getType() == MegaRequest.TYPE_FETCH_NODES) {
-                MegaNode rootNode = megaApiFolder.getRootNode();
-
-                if (rootNode != null && !request.getFlag()) {
-                    richLinkMessage.setNode(rootNode);
-                    String content = getFolderInfo(megaApiFolder.getNumChildFolders(rootNode),
-                            megaApiFolder.getNumChildFiles(rootNode));
-
-                    richLinkMessage.setFolderContent(content);
-
-                    ((ChatActivityLollipop) context).setRichLinkInfo(msgId, richLinkMessage);
-                }
-
-                megaApiFolder.logout();
-            }
         }
         else{
             logError("ERROR - Info of the public node not recovered");
 
-            if (request.getType() == MegaRequest.TYPE_LOGIN) {
+            if (request.getType() == MegaRequest.TYPE_GET_PUBLIC_NODE) {
                 if(e.getErrorCode() == MegaError.API_EINCOMPLETE){
                     String link = request.getLink();
 
                     richLinkMessage = new AndroidMegaRichLinkMessage(link, null);
-                    richLinkMessage.setFile(false);
                     ((ChatActivityLollipop) context).setRichLinkInfo(msgId, richLinkMessage);
                 }
                 else if(e.getErrorCode() == MegaError.API_EARGS) {
                     String link = request.getLink();
 
                     richLinkMessage = new AndroidMegaRichLinkMessage(link, null);
-                    richLinkMessage.setFile(false);
                     ((ChatActivityLollipop) context).setRichLinkInfo(msgId, richLinkMessage);
-                }
-                megaApiFolder.logout();
-            }
-            else if (request.getType() == MegaRequest.TYPE_GET_PUBLIC_NODE) {
-                if(e.getErrorCode() == MegaError.API_EINCOMPLETE){
-                    String link = request.getLink();
-
-                    richLinkMessage = new AndroidMegaRichLinkMessage(link, null);
-                    richLinkMessage.setFile(true);
-                    ((ChatActivityLollipop) context).setRichLinkInfo(msgId, richLinkMessage);
-                }
-                else if(e.getErrorCode() == MegaError.API_EARGS) {
-                    String link = request.getLink();
-
-                    richLinkMessage = new AndroidMegaRichLinkMessage(link, null);
-                    richLinkMessage.setFile(true);
-                    ((ChatActivityLollipop) context).setRichLinkInfo(msgId, richLinkMessage);
-                }
-            }
-            else{
-                if(megaApiFolder!=null){
-                    megaApiFolder.logout();
                 }
             }
         }

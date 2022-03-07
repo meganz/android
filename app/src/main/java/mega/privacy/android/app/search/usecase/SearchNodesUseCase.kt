@@ -1,16 +1,12 @@
 package mega.privacy.android.app.search.usecase
 
-import android.view.View
-import android.widget.ProgressBar
-import android.widget.RelativeLayout
-import androidx.recyclerview.widget.RecyclerView
 import io.reactivex.rxjava3.core.Single
 import mega.privacy.android.app.di.MegaApi
 import mega.privacy.android.app.fragments.managerFragments.LinksFragment.getLinksOrderCloud
 import mega.privacy.android.app.globalmanagement.SortOrderManagement
+import mega.privacy.android.app.lollipop.DrawerItem
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop.*
 import mega.privacy.android.app.utils.Constants.INVALID_VALUE
-import mega.privacy.android.app.utils.LogUtil
 import mega.privacy.android.app.utils.SortUtil.sortByNameAscending
 import mega.privacy.android.app.utils.SortUtil.sortByNameDescending
 import nz.mega.sdk.MegaApiAndroid

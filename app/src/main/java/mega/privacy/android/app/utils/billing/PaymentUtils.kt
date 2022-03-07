@@ -139,7 +139,7 @@ object PaymentUtils {
         val lastPublicHandle = attributes.lastPublicHandle
         val listener = OptionalMegaRequestListenerInterface(
             onRequestFinish = { _, error ->
-                if (error.errorCode == MegaError.API_OK) {
+                if (error.errorCode != MegaError.API_OK) {
                     logError("PURCHASE WRONG: ${error.errorString} (${error.errorCode})")
                 }
             }

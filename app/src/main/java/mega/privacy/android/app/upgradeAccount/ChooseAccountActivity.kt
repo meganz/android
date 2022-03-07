@@ -124,8 +124,6 @@ open class ChooseAccountActivity : PasscodeActivity(), Scrollable {
             }
         }
 
-        binding.semitransparentLayer.setOnClickListener { cancelClick() }
-
         refreshAccountInfo()
         checkScroll()
     }
@@ -135,20 +133,6 @@ open class ChooseAccountActivity : PasscodeActivity(), Scrollable {
             updateMyAccountReceiver,
             IntentFilter(BROADCAST_ACTION_INTENT_UPDATE_ACCOUNT_DETAILS)
         )
-    }
-
-    /**
-     * Hides the current selected payment plan.
-     */
-    protected fun cancelClick() {
-        checkScroll()
-
-        if (!Util.isDarkMode(this)) {
-            window.statusBarColor = ContextCompat.getColor(this, android.R.color.transparent)
-        }
-
-        binding.semitransparentLayer.isVisible = false
-        binding.availablePaymentMethods.isVisible = false
     }
 
     override fun checkScroll() {
@@ -173,7 +157,7 @@ open class ChooseAccountActivity : PasscodeActivity(), Scrollable {
         }
     }
 
-    protected open fun setPricingInfo() {
+    private fun setPricingInfo() {
         val productAccounts = viewModel.getProductAccounts()
 
         if (productAccounts == null) {

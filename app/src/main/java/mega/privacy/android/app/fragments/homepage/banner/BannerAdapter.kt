@@ -7,6 +7,7 @@ import com.zhpan.bannerview.BaseBannerAdapter
 import com.zhpan.bannerview.BaseViewHolder
 import mega.privacy.android.app.R
 import mega.privacy.android.app.fragments.homepage.main.HomePageViewModel
+import mega.privacy.android.app.utils.ViewUtils.debounceClick
 import nz.mega.sdk.MegaBanner
 
 class BannerAdapter(private val viewModel: HomePageViewModel)
@@ -32,20 +33,17 @@ class BannerAdapter(private val viewModel: HomePageViewModel)
         val title: TextView = holder.findViewById(R.id.textView_title)
         val description: TextView = holder.findViewById(R.id.textView_description)
         val image: SimpleDraweeView = holder.findViewById(R.id.draweeView_image)
-        background.setImageURI(data?.imageLocation.plus(data?.backgroundImage))
-        image.setImageURI(data?.imageLocation.plus(data?.image))
-        title.text = data?.title
-        description.text = data?.description
+        val dismissImage: ImageView = holder.findViewById(R.id.imageView_dismiss)
 
-        (holder.findViewById(R.id.imageView_dismiss) as ImageView).setOnClickListener {
-            data?.run {
-                viewModel.dismissBanner(data)
-            }
-        }
+        data?.let {
+            background.setImageURI(it.imageLocation.plus(it.backgroundImage))
+            image.setImageURI(it.imageLocation.plus(it.image))
+            title.text = it.title
+            description.text = it.description
 
-        data?.url?.let { link ->
-            holder.itemView.setOnClickListener {
-                clickBannerCallback?.actOnActionLink(link)
+            dismissImage.debounceClick { viewModel.dismissBanner(it) }
+            holder.itemView.debounceClick{
+                clickBannerCallback?.actOnActionLink(it.url)
             }
         }
     }

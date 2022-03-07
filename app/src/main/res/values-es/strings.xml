@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0"?>
 <resources>
     <!-- PRO Lite account -->
     <string name="prolite_account">Pro Lite</string>
@@ -700,7 +700,7 @@
     <string name="cam_sync_wifi">Solo Wi-Fi</string>
     <!-- the options of how to upload, but in an array. needed for the settings, how to upload the camera images. when Wi-Fi connected and using data plan -->
     <string name="cam_sync_data">Wi-Fi o plan de datos</string>
-    <!-- The upload of the user’s photos orvideos from their specified album is in progress. -->
+    <!-- The upload of the user’s photos or videos from their specified album is in progress. -->
     <string name="cam_sync_syncing">Subidas de la cámara en curso</string>
     <!-- confirmation question for cancelling the camera uploads -->
     <string name="cam_sync_cancel_sync">¿Quieres detener las Subidas de la cámara?</string>
@@ -2868,9 +2868,9 @@
     <!-- Option of one-off (year) billing. Placeholder: purchase price. -->
     <string name="billed_one_off_year">[A]Pago único (año)[/A] %s</string>
     <!-- Option of monthly billing period. Placeholder: purchase price -->
-    <string name="billed_monthly_text">[A]Mensual[/A] %s/mes</string>
+    <string name="billed_monthly_text">[A]Facturado mensualmente[/A] %s/mes</string>
     <!-- Option of yearly billing period. Placeholder: purchase price -->
-    <string name="billed_yearly_text">[A]Anual[/A] %s/año</string>
+    <string name="billed_yearly_text">[A]Facturado anualmente[/A]%s/año</string>
     <!-- dialog option cancel in alert dialog -->
     <string name="button_cancel">Cancelar</string>
     <!-- dialog option continue in alert dialog -->
@@ -4137,7 +4137,7 @@
     <!-- Warning informing the user the folder location is trying to open no longer exists. -->
     <string name="location_not_exist">Esta ubicación ya no existe.</string>
     <!-- Warning shown informing the contact has been previously invited. The placeholder is to show the name of the contact. -->
-    <string name="contact_already_invited">You have already invited %1$s</string>
+    <string name="contact_already_invited">Ya has invitado a %1$s</string>
     <!-- Warning shown informing the contact request has been sent and can be managed in sent requests section. -->
     <string name="contact_invited">Se ha enviado la invitación. Ver las solicitudes enviadas.</string>
     <!-- Message when file available offline. -->
@@ -4216,17 +4216,47 @@
         <item quantity="other">%d dispositivos</item>
     </plurals>
     <!-- Title of the button when you want to answer a one to one call -->
-    <string name="title_join_one_to_one_call">Answer call</string>
+    <string name="title_join_one_to_one_call">Contestar llamada</string>
     <!-- Title of the menu when the select tracks on playlist page-->
     <string name="title_select_tracks">Select tracks</string>
     <!-- Action button to upload files. -->
     <string name="upload_files">Subir archivos</string>
     <!-- Action button to upload a folder. -->
     <string name="upload_folder">Subir carpeta</string>
-    <!-- Title of the dialog warning the user about cancel uploads. -->
-    <string name="cancel_uploads">Cancelar subidas</string>
-    <!-- Warning alerting user if proceed with the action all the uploads will be cancelled. -->
-    <string name="cancel_uploads_warning">Si interrumpes este proceso, se cancelarán todas tus subidas.</string>
-    <!-- Button to proceed with action. -->
-    <string name="action_proceed">Continuar</string>
+    <!-- Text of the dialog warning the user about cancel uploads. -->
+    <string name="cancel_uploads">¿Cancelar subida?</string>
+    <!-- Title of the Payments screen -->
+    <string name="payment">Pago</string>
+    <!-- Label indicating payment methods -->
+    <string name="payment_methods">Métodos de pago</string>
+    <!-- Button to proceed with a payment -->
+    <string name="proceed">Continuar</string>
+    <!-- Message informing the upgrade was processed correctly. Placeholder: type of subscription e.g: Pro Lite monthly -->
+    <string name="successful_upgrade">¡Gracias por suscribirte al %1$s!</string>
+    <!-- Pro Lite monthly subscription -->
+    <string name="pro_lite_monthly">Pro Lite mensual</string>
+    <!-- Pro Lite yearly subscription -->
+    <string name="pro_lite_yearly">Pro Lite anual</string>
+    <!-- Pro I monthly subscription -->
+    <string name="pro_i_monthly">Pro I mensual</string>
+    <!-- Pro I yearly subscription -->
+    <string name="pro_i_yearly">Pro I anual</string>
+    <!-- Pro II monthly subscription -->
+    <string name="pro_ii_monthly">Pro II mensual</string>
+    <!-- Pro II yearly subscription -->
+    <string name="pro_ii_yearly">Pro II anual</string>
+    <!-- Pro III monthly subscription -->
+    <string name="pro_iii_monthly">Pro III mensual</string>
+    <!-- Pro III yearly subscription -->
+    <string name="pro_iii_yearly">Pro III anual</string>
+    <!-- Action button which will cancel uploads. -->
+    <string name="action_cancel_upload">Cancelar subida</string>
+    <!-- Action button which will dismiss the dialog and will not cancel the action. -->
+    <string name="action_do_not_cancel">No cancelar</string>
+    <!-- Remove moderator permission and assign standard permission to a meeting participant-->
+    <string name="remove_moderator">Eliminar moderador</string>
+    <!-- Title of DCIM folder warning dialog -->
+    <string name="title_dcim_folder_dialog">Carpeta DCIM</string>
+    <!-- Content of DCIM folder warning dialog -->
+    <string name="content_dcim_folder_dialog">MEGA sube tus imágenes desde la galería. Para cambiar la ubicación de las subidas, ve a los ajustes de las Subidas de la cámara.</string>
 </resources>

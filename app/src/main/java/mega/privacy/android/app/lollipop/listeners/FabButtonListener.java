@@ -13,13 +13,14 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.lollipop.ContactFileListActivityLollipop;
+import mega.privacy.android.app.lollipop.DrawerItem;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.utils.Util;
 
 public class FabButtonListener implements FloatingActionButton.OnClickListener{
 
     Context context;
-    ManagerActivityLollipop.DrawerItem drawerItem;
+    DrawerItem drawerItem;
 
     public FabButtonListener(Context context){
         logDebug("FabButtonListener created");

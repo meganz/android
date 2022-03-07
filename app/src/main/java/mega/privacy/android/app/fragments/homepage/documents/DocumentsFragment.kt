@@ -262,7 +262,7 @@ class DocumentsFragment : Fragment(), HomepageSearchable {
         })
 
     private fun observeSelectedItems() =
-        actionModeViewModel.selectedNodes.observe(viewLifecycleOwner, {
+        actionModeViewModel.selectedNodes.observe(viewLifecycleOwner) {
             if (it.isEmpty()) {
                 actionMode?.apply {
                     finish()
@@ -285,12 +285,12 @@ class DocumentsFragment : Fragment(), HomepageSearchable {
 
                 actionMode?.title = it.size.toString()
             }
-        })
+        }
 
     private fun observeAnimatedItems() {
         var animatorSet: AnimatorSet? = null
 
-        actionModeViewModel.animNodeIndices.observe(viewLifecycleOwner, {
+        actionModeViewModel.animNodeIndices.observe(viewLifecycleOwner) {
             animatorSet?.run {
                 // End the started animation if any, or the view may show messy as its property
                 // would be wrongly changed by multiple animations running at the same time
@@ -325,13 +325,6 @@ class DocumentsFragment : Fragment(), HomepageSearchable {
                     val itemView = viewHolder.itemView
 
                     val imageView: ImageView? = if (sortByHeaderViewModel.isList) {
-                        if (listAdapter.getItemViewType(pos) != TYPE_HEADER) {
-                            itemView.setBackgroundColor(
-                                ContextCompat.getColor(
-                                    requireContext(), R.color.new_multiselect_color
-                                )
-                            )
-                        }
                         itemView.findViewById(R.id.thumbnail)
                     } else {
                         if (gridAdapter.getItemViewType(pos) != TYPE_HEADER) {
@@ -354,7 +347,7 @@ class DocumentsFragment : Fragment(), HomepageSearchable {
 
             animatorSet?.playTogether(animatorList)
             animatorSet?.start()
-        })
+        }
     }
 
     private fun observeActionModeDestroy() =

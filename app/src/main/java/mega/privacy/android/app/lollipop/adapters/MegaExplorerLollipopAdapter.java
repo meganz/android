@@ -35,9 +35,9 @@ import mega.privacy.android.app.components.scrollBar.SectionTitleProvider;
 import mega.privacy.android.app.databinding.SortByHeaderBinding;
 import mega.privacy.android.app.fragments.homepage.SortByHeaderViewModel;
 import mega.privacy.android.app.lollipop.CloudDriveExplorerFragmentLollipop;
+import mega.privacy.android.app.lollipop.DrawerItem;
 import mega.privacy.android.app.lollipop.FileExplorerActivityLollipop;
 import mega.privacy.android.app.lollipop.IncomingSharesExplorerFragmentLollipop;
-import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.utils.ColorUtils;
 import mega.privacy.android.app.utils.MegaNodeUtil;
 import mega.privacy.android.app.utils.ThumbnailUtilsLollipop;
@@ -146,13 +146,13 @@ public class MegaExplorerLollipopAdapter extends RecyclerView.Adapter<MegaExplor
             this.binding = binding;
         }
 
-        private void bind(SortByHeaderViewModel sortByHeaderViewModel) {
-            binding.setSortByHeaderViewModel(sortByHeaderViewModel);
-            binding.setOrderNameStringId(sortByHeaderViewModel.getOrderMap()
+        private void bind() {
+            binding.setSortByHeaderViewModel(sortByViewModel);
+            binding.setOrderNameStringId(SortByHeaderViewModel.getOrderNameMap()
                     .get(fragment instanceof IncomingSharesExplorerFragmentLollipop
                             && parentHandle == INVALID_HANDLE
-                            ? sortByHeaderViewModel.getOrder().getSecond()
-                            : sortByHeaderViewModel.getOrder().getFirst()));
+                            ? sortByViewModel.getOrder().getSecond()
+                            : sortByViewModel.getOrder().getFirst()));
 
             binding.enterMediaDiscovery.setVisibility(View.GONE);
         }
@@ -260,7 +260,7 @@ public class MegaExplorerLollipopAdapter extends RecyclerView.Adapter<MegaExplor
 	public void onBindViewHolder(ViewHolderExplorerLollipop holder, int position){
 	    switch (getItemViewType(position)) {
             case ITEM_VIEW_TYPE_HEADER:
-                ((ViewHolderSortBy) holder).bind(sortByViewModel);
+                ((ViewHolderSortBy) holder).bind();
                 break;
 
             case ITEM_VIEW_TYPE_LIST:
@@ -315,7 +315,7 @@ public class MegaExplorerLollipopAdapter extends RecyclerView.Adapter<MegaExplor
             } else {
                 holder.textViewFileSize.setText(getMegaNodeFolderInfo(node));
             }
-            holder.imageView.setImageResource(getFolderIcon(node, ManagerActivityLollipop.DrawerItem.CLOUD_DRIVE));
+            holder.imageView.setImageResource(getFolderIcon(node, DrawerItem.CLOUD_DRIVE));
 
             if(node.isInShare()){
                 if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
@@ -432,7 +432,7 @@ public class MegaExplorerLollipopAdapter extends RecyclerView.Adapter<MegaExplor
 
             holder.itemView.setOnLongClickListener(null);
 
-            holder.folderIcon.setImageResource(getFolderIcon(node, ManagerActivityLollipop.DrawerItem.CLOUD_DRIVE));
+            holder.folderIcon.setImageResource(getFolderIcon(node, DrawerItem.CLOUD_DRIVE));
             holder.itemView.setOnClickListener(this);
             holder.folderName.setTextColor(ColorUtils.getThemeColor(context, android.R.attr.textColorPrimary));
         }

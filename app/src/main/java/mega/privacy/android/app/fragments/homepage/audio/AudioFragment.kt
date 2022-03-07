@@ -374,14 +374,6 @@ class AudioFragment : Fragment(), HomepageSearchable {
                     val itemView = viewHolder.itemView
 
                     val imageView: ImageView? = if (sortByHeaderViewModel.isList) {
-                        if (listAdapter.getItemViewType(pos) != TYPE_HEADER) {
-                            itemView.setBackgroundColor(
-                                ContextCompat.getColor(
-                                    requireContext(),
-                                    R.color.new_multiselect_color
-                                )
-                            )
-                        }
                         itemView.findViewById(R.id.thumbnail)
                     } else {
                         if (gridAdapter.getItemViewType(pos) != TYPE_HEADER) {

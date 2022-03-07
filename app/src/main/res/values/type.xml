@@ -37,8 +37,20 @@
         <item name="android:letterSpacing">0</item>
     </style>
 
-    <style name="TextAppearance.Mega.Subtitle1.Variant.18">
+    <style name="TextAppearance.Mega.Subtitle1.18sp">
         <item name="android:textSize">18sp</item>
+    </style>
+
+    <style name="TextAppearance.Mega.Subtitle1.18sp.Grey54White54">
+        <item name="android:textColor">@color/grey_054_white_054</item>
+    </style>
+
+    <style name="TextAppearance.Mega.Subtitle1.20sp">
+        <item name="android:textSize">20sp</item>
+    </style>
+
+    <style name="TextAppearance.Mega.Subtitle1.20sp.Orange400Orange300">
+        <item name="android:textColor">@color/orange_400_orange_300</item>
     </style>
 
     <style name="TextAppearance.Mega.Subtitle1.Variant2">
@@ -153,6 +165,10 @@
     <!-- For title in CollapsingToolbarLayout, text size must be lager than 16sp, otherwise maxLine=3 cannot take effect -->
     <style name="TextAppearance.Mega.Subtitle1.Medium.AllCaps.Variant">
         <item name="android:textSize">16.5sp</item>
+    </style>
+
+    <style name="TextAppearance.Mega.Subtitle1.Medium.20sp">
+        <item name="android:textSize">20sp</item>
     </style>
 
     <!-- Medium, normal, 16sp, 0px, textColorPrimary -->

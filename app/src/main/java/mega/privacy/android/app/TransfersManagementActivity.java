@@ -8,6 +8,7 @@ import android.widget.RelativeLayout;
 
 import mega.privacy.android.app.components.transferWidget.TransferWidget;
 import mega.privacy.android.app.components.transferWidget.TransfersManagement;
+import mega.privacy.android.app.lollipop.DrawerItem;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.activities.PasscodeActivity;
 
@@ -85,7 +86,7 @@ public class TransfersManagementActivity extends PasscodeActivity {
         transfersWidgetLayout.findViewById(R.id.transfers_button).setOnClickListener(v -> {
             if (context instanceof ManagerActivityLollipop) {
                 ((ManagerActivityLollipop) context)
-                        .setDrawerItem(ManagerActivityLollipop.DrawerItem.TRANSFERS);
+                        .setDrawerItem(DrawerItem.TRANSFERS);
                 ((ManagerActivityLollipop) context)
                         .selectDrawerItemLollipop(((ManagerActivityLollipop) context).getDrawerItem());
             } else {

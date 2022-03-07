@@ -483,12 +483,6 @@ class OfflineFragment : Fragment(), ActionMode.Callback, Scrollable {
 
                     val imageView: ImageView? = when (rvAdapter.getItemViewType(pos)) {
                         OfflineAdapter.TYPE_LIST -> {
-                            itemView.setBackgroundColor(
-                                ContextCompat.getColor(
-                                    binding.root.context,
-                                    R.color.new_multiselect_color
-                                )
-                            )
                             val thumbnail = itemView.findViewById<ImageView>(R.id.thumbnail)
                             val param = thumbnail.layoutParams as FrameLayout.LayoutParams
                             param.width = Util.dp2px(

@@ -18,6 +18,7 @@ import mega.privacy.android.app.listeners.ExportListener;
 import mega.privacy.android.app.listeners.RemoveVersionsListener;
 import mega.privacy.android.app.listeners.ShareListener;
 import mega.privacy.android.app.lollipop.AddContactActivityLollipop;
+import mega.privacy.android.app.lollipop.DrawerItem;
 import mega.privacy.android.app.lollipop.FileExplorerActivityLollipop;
 import mega.privacy.android.app.lollipop.FileLinkActivityLollipop;
 import mega.privacy.android.app.lollipop.FolderLinkActivityLollipop;
@@ -330,7 +331,7 @@ public class NodeController {
         ((ManagerActivityLollipop)context).openFolderRefresh = true;
         boolean firstNavigationLevel=true;
         int access = -1;
-        ManagerActivityLollipop.DrawerItem drawerItem = ManagerActivityLollipop.DrawerItem.CLOUD_DRIVE;
+        DrawerItem drawerItem = DrawerItem.CLOUD_DRIVE;
         if (folderHandle != -1) {
             MegaNode parentIntentN = megaApi.getParentNode(megaApi.getNodeByHandle(folderHandle));
             if (parentIntentN != null) {
@@ -341,13 +342,13 @@ public class NodeController {
                     case MegaShare.ACCESS_UNKNOWN: {
                         //Not incoming folder, check if Cloud or Rubbish tab
                         if(parentIntentN.getHandle()==megaApi.getRootNode().getHandle()){
-                            drawerItem = ManagerActivityLollipop.DrawerItem.CLOUD_DRIVE;
+                            drawerItem = DrawerItem.CLOUD_DRIVE;
                             logDebug("Navigate to TAB CLOUD first level" + parentIntentN.getName());
                             firstNavigationLevel=true;
                             ((ManagerActivityLollipop) context).setParentHandleBrowser(parentIntentN.getHandle());
                         }
                         else if(parentIntentN.getHandle()==megaApi.getRubbishNode().getHandle()){
-                            drawerItem = ManagerActivityLollipop.DrawerItem.RUBBISH_BIN;
+                            drawerItem = DrawerItem.RUBBISH_BIN;
                             logDebug("Navigate to TAB RUBBISH first level" + parentIntentN.getName());
                             firstNavigationLevel=true;
                             ((ManagerActivityLollipop) context).setParentHandleRubbish(parentIntentN.getHandle());
@@ -356,7 +357,7 @@ public class NodeController {
                             logDebug("Navigate to INBOX first level" + parentIntentN.getName());
                             firstNavigationLevel=true;
                             ((ManagerActivityLollipop) context).setParentHandleInbox(parentIntentN.getHandle());
-                            drawerItem = ManagerActivityLollipop.DrawerItem.INBOX;
+                            drawerItem = DrawerItem.INBOX;
                         }
                         else{
                             int parent = checkParentNodeToOpenFolder(parentIntentN.getHandle());
@@ -365,7 +366,7 @@ public class NodeController {
                             switch (parent){
                                 case 0:{
                                     //ROOT NODE
-                                    drawerItem = ManagerActivityLollipop.DrawerItem.CLOUD_DRIVE;
+                                    drawerItem = DrawerItem.CLOUD_DRIVE;
                                     logDebug("Navigate to TAB CLOUD with parentHandle");
                                     ((ManagerActivityLollipop) context).setParentHandleBrowser(parentIntentN.getHandle());
                                     firstNavigationLevel=false;
@@ -373,20 +374,20 @@ public class NodeController {
                                 }
                                 case 1:{
                                     logDebug("Navigate to TAB RUBBISH");
-                                    drawerItem = ManagerActivityLollipop.DrawerItem.RUBBISH_BIN;
+                                    drawerItem = DrawerItem.RUBBISH_BIN;
                                     ((ManagerActivityLollipop) context).setParentHandleRubbish(parentIntentN.getHandle());
                                     firstNavigationLevel=false;
                                     break;
                                 }
                                 case 2:{
                                     logDebug("Navigate to INBOX WITH parentHandle");
-                                    drawerItem = ManagerActivityLollipop.DrawerItem.INBOX;
+                                    drawerItem = DrawerItem.INBOX;
                                     ((ManagerActivityLollipop) context).setParentHandleInbox(parentIntentN.getHandle());
                                     firstNavigationLevel=false;
                                     break;
                                 }
                                 case -1:{
-                                    drawerItem = ManagerActivityLollipop.DrawerItem.CLOUD_DRIVE;
+                                    drawerItem = DrawerItem.CLOUD_DRIVE;
                                     logDebug("Navigate to TAB CLOUD general");
                                     ((ManagerActivityLollipop) context).setParentHandleBrowser(-1);
                                     firstNavigationLevel=true;
@@ -401,7 +402,7 @@ public class NodeController {
                     case MegaShare.ACCESS_READWRITE:
                     case MegaShare.ACCESS_FULL: {
                         logDebug("GO to INCOMING TAB: " + parentIntentN.getName());
-                        drawerItem = ManagerActivityLollipop.DrawerItem.SHARED_ITEMS;
+                        drawerItem = DrawerItem.SHARED_ITEMS;
                         if(parentIntentN.getHandle()==-1){
                             logDebug("Level 0 of Incoming");
                             ((ManagerActivityLollipop) context).setParentHandleIncoming(-1);
@@ -421,7 +422,7 @@ public class NodeController {
                     default: {
                         logDebug("DEFAULT: The intent set the parentHandleBrowser to " + parentIntentN.getHandle());
                         ((ManagerActivityLollipop) context).setParentHandleBrowser(parentIntentN.getHandle());
-                        drawerItem = ManagerActivityLollipop.DrawerItem.CLOUD_DRIVE;
+                        drawerItem = DrawerItem.CLOUD_DRIVE;
                         firstNavigationLevel=true;
                         break;
                     }
@@ -430,7 +431,7 @@ public class NodeController {
             else{
                 logWarning("Parent is already NULL");
 
-                drawerItem = ManagerActivityLollipop.DrawerItem.SHARED_ITEMS;
+                drawerItem = DrawerItem.SHARED_ITEMS;
                 ((ManagerActivityLollipop) context).setParentHandleIncoming(-1);
                 ((ManagerActivityLollipop) context).setDeepBrowserTreeIncoming(0);
                 firstNavigationLevel=true;

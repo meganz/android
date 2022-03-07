@@ -309,7 +309,10 @@ class MyAccountFragment : Fragment(), Scrollable {
             isEnabled = true
             text = StringResourcesUtils.getString(R.string.my_account_upgrade_pro)
 
-            setOnClickListener { findNavController().navigate(R.id.action_my_account_to_upgrade) }
+            setOnClickListener {
+                findNavController().navigate(R.id.action_my_account_to_upgrade)
+                viewModel.setOpenUpgradeFrom()
+            }
         }
 
         binding.accountTypeText.isVisible = true

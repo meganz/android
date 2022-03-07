@@ -132,6 +132,8 @@ class MyAccountActivity : PasscodeActivity(), MyAccountFragment.MessageResultCal
                     .putExtra(EXTRA_ACCOUNT_TYPE, accountType)
             )
 
+            viewModel.setOpenUpgradeFrom()
+
             intent.removeExtra(EXTRA_ACCOUNT_TYPE)
         }
 
@@ -252,7 +254,10 @@ class MyAccountActivity : PasscodeActivity(), MyAccountFragment.MessageResultCal
             R.id.action_change_pass -> navController.navigate(R.id.action_my_account_to_change_password)
             R.id.action_export_MK -> navController.navigate(R.id.action_my_account_to_export_recovery_key)
             R.id.action_refresh -> viewModel.refresh(this)
-            R.id.action_upgrade_account -> navController.navigate(R.id.action_my_account_to_upgrade)
+            R.id.action_upgrade_account -> {
+                navController.navigate(R.id.action_my_account_to_upgrade)
+                viewModel.setOpenUpgradeFrom()
+            }
             R.id.action_cancel_subscriptions -> showCancelSubscriptions()
             R.id.action_logout -> viewModel.logout(this)
         }
