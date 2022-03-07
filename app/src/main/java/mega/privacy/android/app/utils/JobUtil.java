@@ -1,7 +1,7 @@
 package mega.privacy.android.app.utils;
 
 import static mega.privacy.android.app.jobservices.CameraUploadsService.EXTRA_IGNORE_ATTR_CHECK;
-import static mega.privacy.android.app.sync.cusync.CuSyncManager.INACTIVE_HEARTBEAT_INTERVAL_SECONDS;
+import static mega.privacy.android.app.sync.cusync.CuSyncManager.INACTIVE_HEARTBEAT_INTERVAL_MINUTES;
 import static mega.privacy.android.app.utils.LogUtil.logDebug;
 import static mega.privacy.android.app.utils.permission.PermissionUtils.hasPermissions;
 
@@ -77,7 +77,7 @@ public class JobUtil {
     private static void scheduleCuSyncActiveHeartbeat(Context context) {
         logDebug("Schedule Cu Sync Active Heartbeat");
         PeriodicWorkRequest cuSyncActiveHeartbeatWorkRequest =
-                new PeriodicWorkRequest.Builder(SendRegularCuSyncHeartbeatWork.class, INACTIVE_HEARTBEAT_INTERVAL_SECONDS, TimeUnit.MINUTES)
+                new PeriodicWorkRequest.Builder(SendRegularCuSyncHeartbeatWork.class, INACTIVE_HEARTBEAT_INTERVAL_MINUTES, TimeUnit.MINUTES)
                         // Additional configuration
                         .addTag(HEART_BEAT_TAG)
                         .build();

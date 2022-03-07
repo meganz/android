@@ -444,8 +444,8 @@ public class SettingsCameraUploadsFragment extends SettingsBaseFragment {
      * and UI related process
      */
     public void disableCameraUpload() {
-        stopCameraUploadWork(this.getContext());
-        stopRegularCuSyncHeartbeatWork(this.getContext());
+        stopCameraUploadWork(getContext());
+        stopRegularCuSyncHeartbeatWork(getContext());
         disableCameraUploadSettingProcess();
         disableCameraUploadUIProcess();
     }
