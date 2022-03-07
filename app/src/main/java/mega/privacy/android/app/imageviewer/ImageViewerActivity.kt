@@ -8,7 +8,6 @@ import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
 import androidx.activity.viewModels
-import androidx.constraintlayout.widget.ConstraintSet
 import androidx.core.content.ContextCompat
 import androidx.core.net.toFile
 import androidx.core.view.*
@@ -301,8 +300,6 @@ class ImageViewerActivity : BaseActivity(), PermissionRequester, SnackbarShower 
         }
 
         binding.root.post {
-            val bottomBgHeight = binding.bgBottom.height
-
             // Apply system bars top and bottom insets
             ViewCompat.setOnApplyWindowInsetsListener(binding.root) { _, windowInsets ->
                 val insets = windowInsets.getInsets(WindowInsetsCompat.Type.systemBars())
@@ -371,14 +368,6 @@ class ImageViewerActivity : BaseActivity(), PermissionRequester, SnackbarShower 
                     positionPair.second
                 )
                 isVisible = positionPair.second > 1
-
-                if (!isVisible) {
-                    ConstraintSet().apply {
-                        clone(binding.motion)
-                        connect(R.id.txt_title, ConstraintSet.BOTTOM, R.id.motion, ConstraintSet.BOTTOM)
-                        applyTo(binding.motion)
-                    }
-                }
             }
 
             binding.viewPager.apply {
