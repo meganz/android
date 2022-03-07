@@ -1,21 +1,25 @@
 package mega.privacy.android.app;
 
+import mega.privacy.android.app.logging.LegacyLogUtil;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaLoggerInterface;
 
-import static mega.privacy.android.app.utils.LogUtil.*;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 public class AndroidLogger extends MegaLogger implements MegaLoggerInterface {
 
     public static final String LOG_FILE_NAME = "logSDK.txt";
+    private LegacyLogUtil legacyLogUtil;
 
-    public AndroidLogger(String fileName) {
+    public AndroidLogger(@Nullable String fileName, @NotNull LegacyLogUtil legacyLogUtil) {
         super(fileName);
+        this.legacyLogUtil = legacyLogUtil;
     }
 
     public void log(String time, int logLevel, String source, String message) {
         //save to log file
-        if (isReadyToWriteToFile(getStatusLoggerSDK())) {
+        if (isReadyToWriteToFile(legacyLogUtil.getStatusLoggerSdk())) {
             fileLogQueue.add(createMessage(time, logLevel, source, message));
         }
     }

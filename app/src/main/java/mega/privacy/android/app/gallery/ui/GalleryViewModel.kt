@@ -14,15 +14,17 @@ import mega.privacy.android.app.gallery.fragment.BaseZoomFragment.Companion.MONT
 import mega.privacy.android.app.gallery.fragment.BaseZoomFragment.Companion.YEARS_INDEX
 import mega.privacy.android.app.gallery.repository.GalleryItemRepository
 import mega.privacy.android.app.globalmanagement.SortOrderManagement
+import mega.privacy.android.app.search.callback.SearchCallback
 import mega.privacy.android.app.utils.Constants.EVENT_NODES_CHANGE
 import mega.privacy.android.app.utils.Constants.INVALID_POSITION
+import nz.mega.sdk.MegaCancelToken
 import nz.mega.sdk.MegaNode
 
 abstract class GalleryViewModel constructor(
     private val repository: GalleryItemRepository,
     private val sortOrderManagement: SortOrderManagement,
     savedStateHandle: SavedStateHandle? = null
-) : BaseRxViewModel() {
+) : BaseRxViewModel(), SearchCallback.Data {
 
     var currentHandle: Long? = null
 
@@ -41,6 +43,8 @@ abstract class GalleryViewModel constructor(
 
     private val _refreshCards = MutableLiveData(false)
     val refreshCards: LiveData<Boolean> = _refreshCards
+
+    private var cancelToken: MegaCancelToken? = null
 
     abstract var mZoom: Int
 
@@ -78,7 +82,8 @@ abstract class GalleryViewModel constructor(
     var items: LiveData<List<GalleryItem>> = liveDataRoot.switchMap {
         if (forceUpdate) {
             viewModelScope.launch {
-                repository.getFiles(sortOrderManagement.getOrderCamera(), mZoom, currentHandle)
+                cancelToken = initNewSearch()
+                repository.getFiles(cancelToken!!, sortOrderManagement.getOrderCamera(), mZoom, currentHandle)
             }
         } else {
             repository.emitFiles()
@@ -218,5 +223,14 @@ abstract class GalleryViewModel constructor(
                 return it.size
             }
         return 0
+    }
+
+    override fun initNewSearch(): MegaCancelToken {
+        cancelSearch()
+        return MegaCancelToken.createInstance()
+    }
+
+    override fun cancelSearch() {
+        cancelToken?.cancel()
     }
 }

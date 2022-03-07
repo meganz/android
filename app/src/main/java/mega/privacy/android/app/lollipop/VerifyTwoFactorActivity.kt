@@ -21,7 +21,9 @@ import mega.privacy.android.app.listeners.BaseListener
 import mega.privacy.android.app.lollipop.controllers.AccountController
 import mega.privacy.android.app.utils.Constants.*
 import mega.privacy.android.app.utils.ConstantsUrl.RECOVERY_URL
-import mega.privacy.android.app.utils.LogUtil.*
+import mega.privacy.android.app.utils.LogUtil.logDebug
+import mega.privacy.android.app.utils.LogUtil.logError
+import mega.privacy.android.app.utils.LogUtil.logWarning
 import mega.privacy.android.app.utils.StringResourcesUtils
 import mega.privacy.android.app.utils.Util.hideKeyboard
 import mega.privacy.android.app.utils.Util.showAlert

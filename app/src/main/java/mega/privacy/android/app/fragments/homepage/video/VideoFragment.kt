@@ -105,6 +105,11 @@ class VideoFragment : Fragment(), HomepageSearchable {
         observeDragSupportEvents(viewLifecycleOwner, listView, VIEWER_FROM_VIDEOS)
     }
 
+    override fun onDestroyView() {
+        viewModel.cancelSearch()
+        super.onDestroyView()
+    }
+
     private fun setupEmptyHint() {
         binding.emptyHint.emptyHintImage.isVisible = false
         binding.emptyHint.emptyHintText.isVisible = false

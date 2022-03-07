@@ -8,6 +8,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import mega.privacy.android.app.di.MegaApi
 import nz.mega.sdk.MegaApiAndroid
+import nz.mega.sdk.MegaCancelToken
 import java.util.*
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -28,8 +29,12 @@ class TypedFilesRepository @Inject constructor(
 
     /**
      * Using a node fetcher for the new request, and link fileNodeItems to its result.
+     *
+     * @param cancelToken   MegaCancelToken to cancel the fetch at any time.
+     * @param type          Type of nodes.
+     * @param order         Order to get nodes.
      */
-    suspend fun getFiles(type: Int, order: Int) {
+    suspend fun getFiles(cancelToken: MegaCancelToken, type: Int, order: Int) {
         preserveSelectedItems()
 
         // Create a node fetcher for the new request, and link fileNodeItems to its result.
@@ -38,7 +43,7 @@ class TypedFilesRepository @Inject constructor(
         fileNodeItems = nodesFetcher.result
 
         withContext(Dispatchers.IO) {
-            nodesFetcher.getNodeItems()
+            nodesFetcher.getNodeItems(cancelToken)
         }
     }
 
