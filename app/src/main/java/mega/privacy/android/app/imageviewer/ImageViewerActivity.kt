@@ -7,9 +7,7 @@ import android.net.Uri
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
-import android.view.ViewGroup
 import androidx.activity.viewModels
-import androidx.constraintlayout.widget.ConstraintSet
 import androidx.core.content.ContextCompat
 import androidx.core.net.toFile
 import androidx.core.view.*
@@ -302,26 +300,11 @@ class ImageViewerActivity : BaseActivity(), PermissionRequester, SnackbarShower 
         }
 
         binding.root.post {
-            val bottomBgHeight = binding.bgBottom.height
-
             // Apply system bars top and bottom insets
             ViewCompat.setOnApplyWindowInsetsListener(binding.root) { _, windowInsets ->
                 val insets = windowInsets.getInsets(WindowInsetsCompat.Type.systemBars())
-
                 binding.toolbar.updatePadding(0, insets.top, 0, 0)
-                binding.txtPageCount.updateLayoutParams<ViewGroup.MarginLayoutParams> { bottomMargin = insets.bottom }
-                binding.bgBottom.updateLayoutParams { height = bottomBgHeight + insets.bottom }
-
-                // Update margins on MotionsLayout's Scene
-                binding.motion.apply {
-                    constraintSetIds.forEach { id ->
-                        getConstraintSet(id).apply {
-                            setMargin(binding.txtPageCount.id, ConstraintSet.BOTTOM, insets.bottom)
-                            constrainHeight(binding.bgBottom.id, bottomBgHeight + insets.bottom)
-                        }
-                    }
-                }
-
+                binding.motion.updatePadding(insets.left, 0, insets.right, insets.bottom)
                 WindowInsetsCompat.CONSUMED
             }
         }
