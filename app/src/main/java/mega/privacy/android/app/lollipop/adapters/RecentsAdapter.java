@@ -3,6 +3,7 @@ package mega.privacy.android.app.lollipop.adapters;
 import android.content.Context;
 
 import androidx.annotation.NonNull;
+import androidx.navigation.NavDestination;
 import androidx.navigation.NavOptions;
 import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.RecyclerView;
@@ -364,7 +365,10 @@ public class RecentsAdapter extends RecyclerView.Adapter<RecentsAdapter.ViewHold
                 if (bucket == null) break;
 
                 ((RecentsFragment)fragment).getSelectedBucketModel().select(bucket, megaApi.getRecentActions());
-                Navigation.findNavController(v).navigate(HomepageFragmentDirections.Companion.actionHomepageToRecentBucket(),new NavOptions.Builder().build());
+                NavDestination currentDestination = Navigation.findNavController(v).getCurrentDestination();
+                if (currentDestination != null && currentDestination.getId() == R.id.homepageFragment) {
+                    Navigation.findNavController(v).navigate(HomepageFragmentDirections.Companion.actionHomepageToRecentBucket(), new NavOptions.Builder().build());
+                }
                 break;
             }
         }
