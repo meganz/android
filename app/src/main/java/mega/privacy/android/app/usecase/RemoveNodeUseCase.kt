@@ -5,6 +5,7 @@ import io.reactivex.rxjava3.core.Single
 import io.reactivex.rxjava3.kotlin.blockingSubscribeBy
 import mega.privacy.android.app.di.MegaApi
 import mega.privacy.android.app.listeners.OptionalMegaRequestListenerInterface
+import mega.privacy.android.app.usecase.MegaException.Companion.toMegaException
 import mega.privacy.android.app.usecase.data.RemoveRequestResult
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaError.API_OK
@@ -34,7 +35,7 @@ class RemoveNodeUseCase @Inject constructor(
                     if (error.errorCode == API_OK) {
                         emitter.onComplete()
                     } else {
-                        emitter.onError(MegaException(error.errorCode, error.errorString))
+                        emitter.onError(error.toMegaException())
                     }
                 })
             )

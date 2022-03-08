@@ -5,6 +5,7 @@ import io.reactivex.rxjava3.core.Single
 import io.reactivex.rxjava3.kotlin.blockingSubscribeBy
 import mega.privacy.android.app.di.MegaApi
 import mega.privacy.android.app.listeners.OptionalMegaRequestListenerInterface
+import mega.privacy.android.app.usecase.MegaException.Companion.toMegaException
 import mega.privacy.android.app.usecase.data.MoveRequestResult
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
@@ -39,7 +40,7 @@ class MoveNodeUseCase @Inject constructor(
                     if (error.errorCode == API_OK) {
                         emitter.onComplete()
                     } else {
-                        emitter.onError(MegaException(error.errorCode, error.errorString))
+                        emitter.onError(error.toMegaException())
                     }
                 })
             )
@@ -77,7 +78,7 @@ class MoveNodeUseCase @Inject constructor(
                     move(node, parentNode).blockingSubscribeBy(onError = { error ->
                         errorCount++
 
-                        if (error is MegaException && error.errorCode == API_EOVERQUOTA) {
+                        if (error is QuotaExceededMegaException) {
                             isForeignNode = megaApi.isForeignNode(parentNode.handle)
                         }
                     })
