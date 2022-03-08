@@ -24,6 +24,7 @@
     <color name="white_alpha_054">#8AFFFFFF</color>
     <color name="white_alpha_060">#99FFFFFF</color>
     <color name="white_alpha_070">#B3FFFFFF</color>
+    <color name="white_alpha_075">#BFFFFFFF</color>
     <color name="white_alpha_080">#CCFFFFFF</color>
     <color name="white_alpha_085">#D9FFFFFF</color>
     <color name="white_alpha_087">#DEFFFFFF</color>
@@ -501,5 +502,9 @@
 
     <color name="yellow_100_yellow_700_alpha_015">@color/yellow_100</color>
     <color name="grey_alpha_087_yellow_700">@color/grey_alpha_087</color>
+
+    <color name="grey_500_grey_300">@color/grey_500</color>
+    <color name="grey_900_white">@color/grey_900</color>
+    <color name="grey_700_white_alpha_075">@color/grey_700</color>
 
 </resources>

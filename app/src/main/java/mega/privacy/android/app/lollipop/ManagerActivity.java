@@ -8333,6 +8333,7 @@ public class ManagerActivity extends TransfersManagementActivity
                 return;
             }
 
+            @SuppressWarnings("unchecked")
             List<UploadFolderResult> nameCollisions = (List<UploadFolderResult>) intent.getSerializableExtra(COLLISION_RESULTS);
             if (nameCollisions == null || nameCollisions.isEmpty()) {
                 logDebug("No need to do anything more");

@@ -1,4 +1,4 @@
-<?xml version="1.0"?>
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
     <!-- PRO Lite account -->
     <string name="prolite_account">Pro Lite</string>
@@ -4272,21 +4272,19 @@
     <!-- Label cancel transfers. -->
     <string name="cancel_transfers">Cancel transfers</string>
     <!-- Warning informing what will happen if proceed on cancelling transfers. -->
-    <string name="warning_cancel_transfers">Interrupting the transfer process may render some of the items incomplete.</string>
+    <string name="warning_cancel_transfers">Interrupting this process may leave some of your transfers incomplete.</string>
     <!-- Button which dismisses the warning and proceeds with the cancel transfers action. -->
     <string name="button_proceed">Proceed</string>
     <!-- Warning informing transfers were cancelled. -->
-    <string name="transfers_cancelled">Transfers were cancelled.</string>
+    <string name="transfers_cancelled">Transfers have been cancelled.</string>
     <!-- Title of the screen where a name collision has been detected and some options to choose are shown to the user. -->
     <string name="title_duplicated_items">Duplicated items</string>
     <!-- Informs about a name collision, the file is trying to upload, move or copy already exists on the location. The placeholder is for the name of the file.-->
-    <string name="file_already_exists_in_location">A file named %1$s already exists in this location.</string>
+    <string name="file_already_exists_in_location">A file named [B]%1$s[/B] already exists in this location.</string>
     <!-- Header giving more context about a name collision, informing there are different option to choose for the file. -->
     <string name="choose_file">Select the file you want to keep</string>
     <!-- Header giving more context about a name collision, informing there are different option to choose. -->
     <string name="choose_folder">Select whether you want to merge the folders</string>
-    <!-- Informs about a name collision, the folder is trying to upload, move or copy already exists on the location. The placeholder is for the name of the folder. -->
-    <string name="folder_already_exists_in_location">The folder named %1$s already exists in this location.</string>
     <!-- Informs about what is expected after choose the option upload and replace for a name collision if file versioning is disabled. -->
     <string name="warning_upload_and_replace">The current version of the file will be replaced with the file you are uploading.</string>
     <!-- Upload and replace action button for a name collision. -->
@@ -4324,7 +4322,7 @@
     <!-- Option given to the user in a name collision. If is marked, then the action chosen will be applied for the rest of collisions. The placeholder is for the number of pending name collisions conflicts that remain unsolved. -->
     <string name="file_apply_for_all">Apply this option on the next %1$d conflicts</string>
     <!-- Informs about what is expected after choose the option copy and merge for a name collision. -->
-    <string name="warning_copy_and_merge">Merge the folder at the destination with the folder you are copying</string>
+    <string name="warning_copy_and_merge">Merge the folder at the destination with the folder you are copying.</string>
     <!-- Copy and merge action button for a name collision. -->
     <string name="copy_and_merge">Copy and merge</string>
     <!-- Informs about what is expected after choose the option move and merge for a name collision. -->
@@ -4339,4 +4337,6 @@
     <string name="skip_file">No files will be changed. You will keep the file below:</string>
     <!-- Informs about what is expected after choose the option "Don’t copy/move/upload" for folder name collisions. -->
     <string name="skip_folder">Skip this folder</string>
+    <!-- Informs about a name collision, the folder is trying to upload, move or copy already exists on the location. The placeholder is for the name of the folder. -->
+    <string name="folder_already_exists_in_location">A folder named [B]%1$s[/B] already exists in this location.</string>
 </resources>

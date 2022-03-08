@@ -29,6 +29,7 @@
                 android:id="@+id/already_exists_text"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:textAppearance="@style/TextAppearance.Mega.Subtitle1.Grey500Grey300"
                 app:layout_constraintTop_toTopOf="parent"
                 tools:text="A file named IMG000012.jpeg already exists in this location." />
 
@@ -37,6 +38,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="24dp"
+                android:textAppearance="@style/TextAppearance.Mega.Subtitle1.Medium.Grey900White"
                 app:layout_constraintTop_toBottomOf="@+id/already_exists_text"
                 tools:text="Select the file you want to keep" />
 
@@ -53,6 +55,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
+                android:textAppearance="@style/TextAppearance.Mega.Subtitle2.Normal.Grey700White075"
                 app:layout_constraintTop_toBottomOf="@+id/header_separator"
                 tools:text="The current version of the file will be replaced with the file you are uploading." />
 
@@ -60,8 +63,21 @@
                 android:id="@+id/learn_more"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:layout_constraintTop_toBottomOf="@+id/first_option_info"
-                android:text="@string/learn_more_option"/>
+                android:clickable="true"
+                android:focusable="true"
+                android:text="@string/learn_more_option"
+                android:textAppearance="@style/TextAppearance.Mega.Subtitle2.AccentColor"
+                app:layout_constraintTop_toBottomOf="@+id/first_option_info" />
+
+            <include
+                android:id="@+id/first_option_view"
+                layout="@layout/view_name_collision_option"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/learn_more" />
 
             <Button
                 android:id="@+id/first_option_button"
@@ -70,7 +86,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/first_option_info"
+                app:layout_constraintTop_toBottomOf="@+id/first_option_view"
                 tools:text="UPLOAD AND REPLACE" />
 
             <View
@@ -86,8 +102,19 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
+                android:textAppearance="@style/TextAppearance.Mega.Subtitle2.Normal.Grey700White075"
                 app:layout_constraintTop_toBottomOf="@+id/first_option_separator"
                 tools:text="No files will be changed. You will keep the file below:" />
+
+            <include
+                android:id="@+id/middle_option_view"
+                layout="@layout/view_name_collision_option"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/middle_option_info" />
 
             <Button
                 android:id="@+id/middle_option_button"
@@ -96,7 +123,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/middle_option_info"
+                app:layout_constraintTop_toBottomOf="@+id/middle_option_view"
                 tools:text="DON'T UPLOAD" />
 
             <View
@@ -112,8 +139,19 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
+                android:textAppearance="@style/TextAppearance.Mega.Subtitle2.Normal.Grey700White075"
                 app:layout_constraintTop_toBottomOf="@+id/middle_option_separator"
                 tools:text="The file you are uploading will be renamed as:" />
+
+            <include
+                android:id="@+id/last_option_view"
+                layout="@layout/view_name_collision_option"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/last_option_info" />
 
             <Button
                 android:id="@+id/last_option_button"
@@ -122,7 +160,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/last_option_info"
+                app:layout_constraintTop_toBottomOf="@+id/last_option_view"
                 tools:text="UPLOAD AND RENAME" />
 
             <CheckBox
@@ -130,6 +168,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="32dp"
+                android:textAppearance="@style/TextAppearance.Mega.Subtitle2.Normal.Grey700White075"
                 app:layout_constraintTop_toBottomOf="@+id/last_option_button"
                 tools:text="@string/file_apply_for_all" />
 

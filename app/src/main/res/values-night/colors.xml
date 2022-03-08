@@ -317,4 +317,8 @@
     <color name="yellow_100_yellow_700_alpha_015">@color/yellow_700_alpha_015</color>
     <color name="grey_alpha_087_yellow_700">@color/yellow_700</color>
 
+    <color name="grey_500_grey_300">@color/grey_300</color>
+    <color name="grey_900_white">@color/white</color>
+    <color name="grey_700_white_alpha_075">@color/white_alpha_075</color>
+
 </resources>
