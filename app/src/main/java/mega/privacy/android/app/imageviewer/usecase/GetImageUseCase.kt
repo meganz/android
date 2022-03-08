@@ -18,17 +18,15 @@ import mega.privacy.android.app.MimeTypeList
 import mega.privacy.android.app.components.transferWidget.TransfersManagement
 import mega.privacy.android.app.constants.SettingsConstants
 import mega.privacy.android.app.di.MegaApi
-import mega.privacy.android.app.errors.BusinessAccountOverdueMegaError
-import mega.privacy.android.app.errors.QuotaOverdueMegaError
 import mega.privacy.android.app.imageviewer.data.ImageResult
 import mega.privacy.android.app.listeners.OptionalMegaRequestListenerInterface
 import mega.privacy.android.app.listeners.OptionalMegaTransferListenerInterface
-import mega.privacy.android.app.usecase.GetNodeUseCase
+import mega.privacy.android.app.usecase.*
+import mega.privacy.android.app.usecase.MegaException.Companion.toMegaException
 import mega.privacy.android.app.usecase.chat.GetChatMessageUseCase
 import mega.privacy.android.app.utils.CacheFolderManager.*
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.ContextUtils.getScreenSize
-import mega.privacy.android.app.utils.ErrorUtils.toThrowable
 import mega.privacy.android.app.utils.FileUtil
 import mega.privacy.android.app.utils.LogUtil.logWarning
 import mega.privacy.android.app.utils.MegaNodeUtil.getFileName
@@ -41,7 +39,6 @@ import mega.privacy.android.app.utils.OfflineUtils
 import mega.privacy.android.app.utils.RxUtil.blockingGetOrNull
 import mega.privacy.android.app.utils.StringUtils.encodeBase64
 import nz.mega.sdk.*
-import nz.mega.sdk.MegaError.*
 import java.io.BufferedOutputStream
 import java.io.FileOutputStream
 import javax.inject.Inject
@@ -182,12 +179,13 @@ class GetImageUseCase @Inject constructor(
                             OptionalMegaRequestListenerInterface(
                                 onRequestFinish = { _: MegaRequest, error: MegaError ->
                                     if (emitter.isCancelled) return@OptionalMegaRequestListenerInterface
+                                    val megaException = error.toMegaException()
 
-                                    if (error.errorCode == API_OK) {
+                                    if (megaException is SuccessMegaException) {
                                         image.thumbnailUri = thumbnailFile.toUri()
                                         emitter.onNext(image)
                                     } else {
-                                        logWarning(error.toThrowable().stackTraceToString())
+                                        logWarning(megaException.stackTraceToString())
                                     }
                                 }
                             ))
@@ -200,8 +198,9 @@ class GetImageUseCase @Inject constructor(
                             OptionalMegaRequestListenerInterface(
                                 onRequestFinish = { _: MegaRequest, error: MegaError ->
                                     if (emitter.isCancelled) return@OptionalMegaRequestListenerInterface
+                                    val megaException = error.toMegaException()
 
-                                    if (error.errorCode == API_OK) {
+                                    if (megaException is SuccessMegaException) {
                                         image.previewUri = previewFile.toUri()
                                         if (fullSizeRequired) {
                                             emitter.onNext(image)
@@ -211,9 +210,9 @@ class GetImageUseCase @Inject constructor(
                                             emitter.onComplete()
                                         }
                                     } else if (!fullSizeRequired) {
-                                        emitter.onError(error.toThrowable())
+                                        emitter.onError(megaException)
                                     } else {
-                                        logWarning(error.toThrowable().stackTraceToString())
+                                        logWarning(megaException.stackTraceToString())
                                     }
                                 }
                             ))
@@ -232,14 +231,14 @@ class GetImageUseCase @Inject constructor(
 
                                 image.transferTag = null
 
-                                when (error.errorCode) {
-                                    API_OK -> {
+                                when (val megaException = error.toMegaException()) {
+                                    is SuccessMegaException -> {
                                         image.fullSizeUri = fullFile.toUri()
                                         image.isFullyLoaded = true
                                         emitter.onNext(image)
                                         emitter.onComplete()
                                     }
-                                    API_EEXIST -> {
+                                    is ResourceAlreadyExistsMegaException -> {
                                         if (node.isNodeFileValid(fullFile)) {
                                             image.fullSizeUri = fullFile.toUri()
                                             image.isFullyLoaded = true
@@ -247,27 +246,26 @@ class GetImageUseCase @Inject constructor(
                                             emitter.onComplete()
                                         } else {
                                             FileUtil.deleteFileSafely(fullFile)
-                                            emitter.onError(IllegalStateException("File exists but is not valid"))
+                                            emitter.onError(ResourceAlreadyExistsMegaException("File exists but is not valid"))
                                         }
                                     }
-                                    API_ENOENT -> {
+                                    is ResourceDoesNotExistMegaException -> {
                                         image.isFullyLoaded = true
                                         emitter.onNext(image)
                                         emitter.onComplete()
                                     }
-                                    API_EBUSINESSPASTDUE ->
-                                        emitter.onError(BusinessAccountOverdueMegaError())
                                     else ->
-                                        emitter.onError(error.toThrowable())
+                                        emitter.onError(megaException)
                                 }
 
                                 resetTotalDownloadsIfNeeded()
                             },
                             onTransferTemporaryError = { _, error ->
                                 if (emitter.isCancelled) return@OptionalMegaTransferListenerInterface
+                                val megaException = error.toMegaException()
 
-                                if (error.errorCode == API_EOVERQUOTA) {
-                                    emitter.onError(QuotaOverdueMegaError())
+                                if (megaException is QuotaExceededMegaException) {
+                                    emitter.onError(megaException)
                                 }
                             }
                         )
