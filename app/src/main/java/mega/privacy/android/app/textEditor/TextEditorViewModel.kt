@@ -24,9 +24,11 @@ import mega.privacy.android.app.arch.BaseRxViewModel
 import mega.privacy.android.app.components.saver.NodeSaver
 import mega.privacy.android.app.di.MegaApi
 import mega.privacy.android.app.di.MegaApiFolder
+import mega.privacy.android.app.domain.entity.NameCollision
 import mega.privacy.android.app.interfaces.ActivityLauncher
 import mega.privacy.android.app.interfaces.SnackbarShower
 import mega.privacy.android.app.listeners.ExportListener
+import mega.privacy.android.app.namecollision.NameCollisionActivity
 import mega.privacy.android.app.namecollision.usecase.CheckNameCollisionUseCase
 import mega.privacy.android.app.usecase.exception.MegaNodeException
 import mega.privacy.android.app.utils.*
@@ -444,23 +446,38 @@ class TextEditorViewModel @Inject constructor(
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeBy(
-                onComplete = {
-                    val uploadIntent = Intent(activity, UploadService::class.java)
-                        .putExtra(UploadService.EXTRA_UPLOAD_TXT, mode.value)
-                        .putExtra(FROM_HOME_PAGE, fromHome)
-                        .putExtra(UploadService.EXTRA_FILEPATH, tempFile.absolutePath)
-                        .putExtra(UploadService.EXTRA_NAME, fileName.value)
-                        .putExtra(UploadService.EXTRA_SIZE, tempFile.length())
-                        .putExtra(UploadService.EXTRA_PARENT_HASH, parentHandle)
-
-                    activity.startService(uploadIntent)
-                    activity.finish()
+                onSuccess = { handle ->
+                    val collision = NameCollision(
+                        handle,
+                        tempFile.absolutePath,
+                        fileName.value!!,
+                        tempFile.lastModified(),
+                        parentHandle
+                    )
+                    activity.startActivity(
+                        NameCollisionActivity.getIntentSingleItem(
+                            activity,
+                            collision
+                        )
+                    )
                 },
                 onError = { error ->
-                    if (error is MegaNodeException.ChildAlreadyExistsException) {
-                        //TODO notify view to show name collision activity
-                    } else {
-                        logError(error.message)
+                    when (error) {
+                        is MegaNodeException.ParentDoesNotExistException -> {
+                            logError(error.message)
+                        }
+                        is MegaNodeException.ChildDoesNotExistsException -> {
+                            val uploadIntent = Intent(activity, UploadService::class.java)
+                                .putExtra(UploadService.EXTRA_UPLOAD_TXT, mode.value)
+                                .putExtra(FROM_HOME_PAGE, fromHome)
+                                .putExtra(UploadService.EXTRA_FILEPATH, tempFile.absolutePath)
+                                .putExtra(UploadService.EXTRA_NAME, fileName.value)
+                                .putExtra(UploadService.EXTRA_SIZE, tempFile.length())
+                                .putExtra(UploadService.EXTRA_PARENT_HASH, parentHandle)
+
+                            activity.startService(uploadIntent)
+                            activity.finish()
+                        }
                     }
                 }
             )

@@ -1,10 +1,10 @@
 package mega.privacy.android.app.namecollision.usecase
 
-import io.reactivex.rxjava3.core.Completable
 import io.reactivex.rxjava3.core.Single
 import io.reactivex.rxjava3.kotlin.blockingSubscribeBy
 import mega.privacy.android.app.ShareInfo
 import mega.privacy.android.app.di.MegaApi
+import mega.privacy.android.app.domain.entity.NameCollision
 import mega.privacy.android.app.domain.exception.EmptyFolderException
 import mega.privacy.android.app.uploadFolder.list.data.UploadFolderResult
 import mega.privacy.android.app.usecase.exception.MegaNodeException
@@ -14,6 +14,9 @@ import nz.mega.sdk.MegaNode
 import java.util.ArrayList
 import javax.inject.Inject
 
+/**
+ * Use case for checking name collisions before uploading.
+ */
 class CheckNameCollisionUseCase @Inject constructor(
     @MegaApi private val megaApi: MegaApiAndroid
 ) {
@@ -23,10 +26,10 @@ class CheckNameCollisionUseCase @Inject constructor(
      *
      * @param name          Name of the node.
      * @param parentHandle  Handle of the parent node in which to look.
-     * @return Completable
+     * @return Single Long with the node handle with which there is a name collision.
      */
-    fun check(name: String, parentHandle: Long): Completable =
-        Completable.create { emitter ->
+    fun check(name: String, parentHandle: Long): Single<Long> =
+        Single.create { emitter ->
             val parentNode = if (parentHandle == INVALID_HANDLE) {
                 megaApi.rootNode
             } else {
@@ -35,7 +38,7 @@ class CheckNameCollisionUseCase @Inject constructor(
 
             check(name, parentNode).blockingSubscribeBy(
                 onError = { error -> emitter.onError(error) },
-                onComplete = { emitter.onComplete() }
+                onSuccess = { handle -> emitter.onSuccess(handle) }
             )
         }
 
@@ -44,10 +47,10 @@ class CheckNameCollisionUseCase @Inject constructor(
      *
      * @param name          Name of the node.
      * @param parentNode    Parent node in which to look.
-     * @return Completable
+     * @return Single Long with the node handle with which there is a name collision.
      */
-    fun check(name: String, parentNode: MegaNode?): Completable =
-        Completable.create { emitter ->
+    fun check(name: String, parentNode: MegaNode?): Single<Long> =
+        Single.create { emitter ->
             if (parentNode == null) {
                 emitter.onError(MegaNodeException.ParentDoesNotExistException())
                 return@create
@@ -56,9 +59,9 @@ class CheckNameCollisionUseCase @Inject constructor(
             val child = megaApi.getChildNode(parentNode, name)
 
             if (child != null) {
-                emitter.onError(MegaNodeException.ChildAlreadyExistsException())
+                emitter.onSuccess(child.handle)
             } else {
-                emitter.onComplete()
+                emitter.onError(MegaNodeException.ChildDoesNotExistsException())
             }
         }
 
@@ -69,42 +72,47 @@ class CheckNameCollisionUseCase @Inject constructor(
      * @param shareInfos    List of ShareInfo to check.
      * @param parentNode    Parent node in which to look.
      * @return Single<Pair<List<ShareInfo>, List<ShareInfo>>> containing:
-     *  - First:    List of ShareInfo with name collision.
+     *  - First:    List of NameCollision with name collisions.
      *  - Second:   List of ShareInfo without name collision.
      */
     fun check(
         shareInfos: List<ShareInfo>,
         parentNode: MegaNode?
-    ): Single<Pair<List<ShareInfo>, List<ShareInfo>>> =
+    ): Single<Pair<ArrayList<NameCollision>, List<ShareInfo>>> =
         Single.create { emitter ->
             if (parentNode == null) {
                 emitter.onError(MegaNodeException.ParentDoesNotExistException())
                 return@create
             }
 
-            val errors = ArrayList<ShareInfo>()
-            val completed = ArrayList<ShareInfo>()
-            var parentUnavailable = false
+            val collisions = ArrayList<NameCollision>()
+            val results = ArrayList<ShareInfo>()
 
             for (shareInfo in shareInfos) {
-                if (parentUnavailable) {
-                    emitter.onError(MegaNodeException.ParentDoesNotExistException())
-                    return@create
-                }
-
                 check(shareInfo.originalFileName, parentNode).blockingSubscribeBy(
                     onError = { error ->
-                        if (error is MegaNodeException.ChildAlreadyExistsException) {
-                            errors.add(shareInfo)
+                        if (error is MegaNodeException.ParentDoesNotExistException) {
+                            emitter.onError(error)
+                            return@blockingSubscribeBy
                         } else {
-                            parentUnavailable = true
+                            results.add(shareInfo)
                         }
                     },
-                    onComplete = { completed.add(shareInfo) }
+                    onSuccess = { handle ->
+                        collisions.add(
+                            NameCollision(
+                                handle,
+                                shareInfo.fileAbsolutePath,
+                                shareInfo.originalFileName,
+                                shareInfo.lastModified,
+                                parentNode.handle
+                            )
+                        )
+                    },
                 )
             }
 
-            emitter.onSuccess(Pair(errors, completed))
+            emitter.onSuccess(Pair(collisions, results))
         }
 
     /**
@@ -113,12 +121,12 @@ class CheckNameCollisionUseCase @Inject constructor(
      *
      * @param uploadResults    List of UploadFolderResult to check.
      * @return Single<Pair<List<UploadFolderResult>, List<UploadFolderResult>>> containing:
-     *  - First:    List of UploadFolderResult with name collision.
+     *  - First:    List of NameCollision with name collisions.
      *  - Second:   List of UploadFolderResult without name collision.
      */
     fun check(
         uploadResults: List<UploadFolderResult>
-    ): Single<Pair<List<UploadFolderResult>, List<UploadFolderResult>>> =
+    ): Single<Pair<ArrayList<NameCollision>, List<UploadFolderResult>>> =
         Single.create { emitter ->
             if (uploadResults.isEmpty()) {
                 emitter.onError(EmptyFolderException())
@@ -129,35 +137,40 @@ class CheckNameCollisionUseCase @Inject constructor(
                 return@create
             }
 
-            val errors = ArrayList<UploadFolderResult>()
-            val completed = ArrayList<UploadFolderResult>()
-            var parentUnavailable = false
+            val collisions = ArrayList<NameCollision>()
+            val results = ArrayList<UploadFolderResult>()
 
             for (uploadResult in uploadResults) {
                 if (emitter.isDisposed) {
                     return@create
                 }
 
-                if (parentUnavailable) {
-                    emitter.onError(MegaNodeException.ParentDoesNotExistException())
-                    return@create
-                }
-
                 check(uploadResult.name, uploadResult.parentHandle).blockingSubscribeBy(
                     onError = { error ->
-                        if (error is MegaNodeException.ChildAlreadyExistsException) {
-                            errors.add(uploadResult)
+                        if (error is MegaNodeException.ParentDoesNotExistException) {
+                            emitter.onError(error)
+                            return@blockingSubscribeBy
                         } else {
-                            parentUnavailable = true
+                            results.add(uploadResult)
                         }
                     },
-                    onComplete = { completed.add(uploadResult) }
+                    onSuccess = { handle ->
+                        collisions.add(
+                            NameCollision(
+                                handle,
+                                uploadResult.absolutePath,
+                                uploadResult.name,
+                                uploadResult.lastModified,
+                                uploadResult.parentHandle
+                            )
+                        )
+                    },
                 )
             }
 
             when {
                 emitter.isDisposed -> return@create
-                else -> emitter.onSuccess(Pair(errors, completed))
+                else -> emitter.onSuccess(Pair(collisions, results))
             }
         }
 }

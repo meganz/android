@@ -15,8 +15,10 @@ import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.ShareInfo;
 import mega.privacy.android.app.UploadService;
+import mega.privacy.android.app.domain.entity.NameCollision;
 import mega.privacy.android.app.lollipop.FileStorageActivity;
 import mega.privacy.android.app.lollipop.qrcode.QRCodeActivity;
+import mega.privacy.android.app.namecollision.NameCollisionActivity;
 import mega.privacy.android.app.namecollision.usecase.CheckNameCollisionUseCase;
 import mega.privacy.android.app.usecase.exception.MegaNodeException;
 import mega.privacy.android.app.utils.StringResourcesUtils;
@@ -88,26 +90,29 @@ public class QRCodeSaveBottomSheetDialogFragment extends BaseBottomSheetDialogFr
         checkNameCollisionUseCase.check(qrFile.getName(), parentNode)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(() -> {
-                            ShareInfo info = ShareInfo.infoFromFile(qrFile);
-                            if (info == null) {
-                                showSnackbar(requireActivity(), StringResourcesUtils.getString(R.string.error_upload_qr));
-                                return;
-                            }
+                .subscribe(handle -> {
+                            NameCollision collision = new NameCollision(handle, qrFile.getAbsolutePath(),
+                                    qrFile.getName(), qrFile.lastModified(), parentNode.getParentHandle());
 
-                            Intent intent = new Intent(requireActivity(), UploadService.class);
-                            intent.putExtra(UploadService.EXTRA_FILEPATH, info.getFileAbsolutePath());
-                            intent.putExtra(UploadService.EXTRA_NAME, info.getTitle());
-                            intent.putExtra(UploadService.EXTRA_PARENT_HASH, parentNode.getHandle());
-                            intent.putExtra(UploadService.EXTRA_SIZE, info.getSize());
-                            requireActivity().startService(intent);
-                            showSnackbar(requireActivity(), StringResourcesUtils.getString(R.string.save_qr_cloud_drive, qrFile.getName()));
+                            startActivity(NameCollisionActivity.getIntentSingleItem(requireActivity(), collision));
                         },
                         throwable -> {
-                            if (throwable instanceof MegaNodeException.ChildAlreadyExistsException) {
-                                //TODO Show name collision activity
-                            } else {
+                            if (throwable instanceof MegaNodeException.ParentDoesNotExistException) {
                                 showSnackbar(requireActivity(), StringResourcesUtils.getString(R.string.error_upload_qr));
+                            } else if (throwable instanceof MegaNodeException.ChildDoesNotExistsException){
+                                ShareInfo info = ShareInfo.infoFromFile(qrFile);
+                                if (info == null) {
+                                    showSnackbar(requireActivity(), StringResourcesUtils.getString(R.string.error_upload_qr));
+                                    return;
+                                }
+
+                                Intent intent = new Intent(requireActivity(), UploadService.class);
+                                intent.putExtra(UploadService.EXTRA_FILEPATH, info.getFileAbsolutePath());
+                                intent.putExtra(UploadService.EXTRA_NAME, info.getTitle());
+                                intent.putExtra(UploadService.EXTRA_PARENT_HASH, parentNode.getHandle());
+                                intent.putExtra(UploadService.EXTRA_SIZE, info.getSize());
+                                requireActivity().startService(intent);
+                                showSnackbar(requireActivity(), StringResourcesUtils.getString(R.string.save_qr_cloud_drive, qrFile.getName()));
                             }
                         });
     }

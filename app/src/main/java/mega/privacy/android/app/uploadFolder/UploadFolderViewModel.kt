@@ -12,6 +12,7 @@ import io.reactivex.rxjava3.kotlin.subscribeBy
 import io.reactivex.rxjava3.schedulers.Schedulers
 import mega.privacy.android.app.arch.BaseRxViewModel
 import mega.privacy.android.app.components.textFormatter.TextFormatterUtils.INVALID_INDEX
+import mega.privacy.android.app.domain.entity.NameCollision
 import mega.privacy.android.app.globalmanagement.TransfersManagement
 import mega.privacy.android.app.namecollision.usecase.CheckNameCollisionUseCase
 import mega.privacy.android.app.uploadFolder.list.data.FolderContent
@@ -37,7 +38,7 @@ class UploadFolderViewModel @Inject constructor(
     private val currentFolder: MutableLiveData<FolderContent.Data> = MutableLiveData()
     private val folderItems: MutableLiveData<MutableList<FolderContent>> = MutableLiveData()
     private val selectedItems: MutableLiveData<MutableList<Int>> = MutableLiveData()
-    private val uploadResult: MutableLiveData<Pair<List<UploadFolderResult>, List<UploadFolderResult>>> =
+    private val uploadResult: MutableLiveData<Pair<ArrayList<NameCollision>, List<UploadFolderResult>>> =
         MutableLiveData()
 
     private lateinit var parentFolder: String
@@ -55,7 +56,7 @@ class UploadFolderViewModel @Inject constructor(
     fun getCurrentFolder(): LiveData<FolderContent.Data> = currentFolder
     fun getFolderItems(): LiveData<MutableList<FolderContent>> = folderItems
     fun getSelectedItems(): LiveData<MutableList<Int>> = selectedItems
-    fun getUploadResult(): LiveData<Pair<List<UploadFolderResult>, List<UploadFolderResult>>> =
+    fun getUploadResult(): LiveData<Pair<ArrayList<NameCollision>, List<UploadFolderResult>>> =
         uploadResult
 
     /**

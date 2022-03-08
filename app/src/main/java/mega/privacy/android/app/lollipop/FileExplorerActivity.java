@@ -58,6 +58,8 @@ import mega.privacy.android.app.ShareInfo;
 import mega.privacy.android.app.TransfersManagementActivity;
 import mega.privacy.android.app.UploadService;
 import mega.privacy.android.app.UserCredentials;
+import mega.privacy.android.app.domain.entity.NameCollision;
+import mega.privacy.android.app.namecollision.NameCollisionActivity;
 import mega.privacy.android.app.namecollision.usecase.CheckNameCollisionUseCase;
 import mega.privacy.android.app.usecase.exception.MegaNodeException;
 import mega.privacy.android.app.utils.ChatUtil;
@@ -1689,11 +1691,11 @@ public class FileExplorerActivity extends TransfersManagementActivity
 						if (throwable != null) {
 							showSnackbar(StringResourcesUtils.getString(R.string.error_temporary_unavaible));
 						} else {
-							List<ShareInfo> collisions = result.getFirst();
+							ArrayList<NameCollision> collisions = result.getFirst();
 							List<ShareInfo> withoutCollisions = result.getSecond();
 
 							if (!collisions.isEmpty()) {
-								//TODO Show name collision activity
+								startActivity(NameCollisionActivity.getIntentForList(this, collisions));
 							}
 
 							if (!withoutCollisions.isEmpty()) {
@@ -1966,23 +1968,26 @@ public class FileExplorerActivity extends TransfersManagementActivity
 		checkNameCollisionUseCase.check(file.getName(), parentNode)
 				.subscribeOn(Schedulers.io())
 				.observeOn(AndroidSchedulers.mainThread())
-				.subscribe(() -> {
-							Intent intent = new Intent(this, UploadService.class);
-							intent.putExtra(UploadService.EXTRA_FILEPATH, file.getAbsolutePath());
-							intent.putExtra(UploadService.EXTRA_NAME, file.getName());
-							intent.putExtra(UploadService.EXTRA_PARENT_HASH, parentNode.getHandle());
-							intent.putExtra(UploadService.EXTRA_SIZE, file.getTotalSpace());
-							startService(intent);
+				.subscribe(handle -> {
+							NameCollision collision = new NameCollision(handle, file.getAbsolutePath(),
+									file.getName(), file.lastModified(), parentNode.getParentHandle());
 
-							logDebug("After UPLOAD click - back to Cloud");
-							this.backToCloud(parentNode.getHandle(), 1);
-							finishActivity();
+							startActivity(NameCollisionActivity.getIntentSingleItem(this, collision));
 						},
 						throwable -> {
-							if (throwable instanceof MegaNodeException.ChildAlreadyExistsException) {
-								//TODO Show name collision activity
-							} else {
+							if (throwable instanceof MegaNodeException.ParentDoesNotExistException) {
 								showSnackbar(StringResourcesUtils.getString(R.string.general_text_error));
+							} else if (throwable instanceof MegaNodeException.ChildDoesNotExistsException) {
+								Intent intent = new Intent(this, UploadService.class);
+								intent.putExtra(UploadService.EXTRA_FILEPATH, file.getAbsolutePath());
+								intent.putExtra(UploadService.EXTRA_NAME, file.getName());
+								intent.putExtra(UploadService.EXTRA_PARENT_HASH, parentNode.getHandle());
+								intent.putExtra(UploadService.EXTRA_SIZE, file.getTotalSpace());
+								startService(intent);
+
+								logDebug("After UPLOAD click - back to Cloud");
+								this.backToCloud(parentNode.getHandle(), 1);
+								finishActivity();
 							}
 						});
 	}

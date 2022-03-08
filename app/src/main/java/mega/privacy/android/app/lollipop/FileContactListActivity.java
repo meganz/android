@@ -48,11 +48,13 @@ import mega.privacy.android.app.ShareInfo;
 import mega.privacy.android.app.UploadService;
 import mega.privacy.android.app.activities.PasscodeActivity;
 import mega.privacy.android.app.components.SimpleDividerItemDecoration;
+import mega.privacy.android.app.domain.entity.NameCollision;
 import mega.privacy.android.app.listeners.ShareListener;
 import mega.privacy.android.app.lollipop.adapters.MegaSharedFolderAdapter;
 import mega.privacy.android.app.lollipop.controllers.ContactController;
 import mega.privacy.android.app.lollipop.controllers.NodeController;
 import mega.privacy.android.app.modalbottomsheet.FileContactsListBottomSheetDialogFragment;
+import mega.privacy.android.app.namecollision.NameCollisionActivity;
 import mega.privacy.android.app.namecollision.usecase.CheckNameCollisionUseCase;
 import mega.privacy.android.app.utils.AlertDialogUtil;
 import mega.privacy.android.app.utils.StringResourcesUtils;
@@ -751,11 +753,11 @@ public class FileContactListActivity extends PasscodeActivity implements OnClick
 					if (throwable != null) {
 						showSnackbar(StringResourcesUtils.getString(R.string.error_temporary_unavaible));
 					} else {
-						List<ShareInfo> collisions = result.getFirst();
+						ArrayList<NameCollision> collisions = result.getFirst();
 						List<ShareInfo> withoutCollisions = result.getSecond();
 
 						if (!collisions.isEmpty()) {
-							//TODO Show name collision activity
+							startActivity(NameCollisionActivity.getIntentForList(this, collisions));
 						}
 
 						if (!withoutCollisions.isEmpty()) {

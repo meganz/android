@@ -47,6 +47,7 @@ import mega.privacy.android.app.ShareInfo;
 import mega.privacy.android.app.UploadService;
 import mega.privacy.android.app.activities.PasscodeActivity;
 import mega.privacy.android.app.components.saver.NodeSaver;
+import mega.privacy.android.app.domain.entity.NameCollision;
 import mega.privacy.android.app.generalusecase.FilePrepareUseCase;
 import mega.privacy.android.app.interfaces.SnackbarShower;
 import mega.privacy.android.app.interfaces.ActionNodeCallback;
@@ -54,7 +55,7 @@ import mega.privacy.android.app.interfaces.UploadBottomSheetDialogActionListener
 import mega.privacy.android.app.lollipop.controllers.NodeController;
 import mega.privacy.android.app.modalbottomsheet.ContactFileListBottomSheetDialogFragment;
 import mega.privacy.android.app.modalbottomsheet.UploadBottomSheetDialogFragment;
-import mega.privacy.android.app.uploadFolder.list.data.UploadFolderResult;
+import mega.privacy.android.app.namecollision.NameCollisionActivity;
 import mega.privacy.android.app.usecase.GetNodeUseCase;
 import mega.privacy.android.app.usecase.MoveNodeUseCase;
 import mega.privacy.android.app.usecase.data.MoveRequestResult;
@@ -64,7 +65,6 @@ import mega.privacy.android.app.namecollision.usecase.CheckNameCollisionUseCase;
 import mega.privacy.android.app.utils.AlertsAndWarnings;
 import mega.privacy.android.app.utils.MegaNodeDialogUtil;
 import mega.privacy.android.app.utils.StringResourcesUtils;
-import mega.privacy.android.app.utils.UploadUtil;
 import nz.mega.documentscanner.DocumentScannerActivity;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaContactRequest;
@@ -77,7 +77,6 @@ import nz.mega.sdk.MegaRequestListenerInterface;
 import nz.mega.sdk.MegaUser;
 import nz.mega.sdk.MegaUserAlert;
 
-import static mega.privacy.android.app.uploadFolder.UploadFolderActivity.COLLISION_RESULTS;
 import static mega.privacy.android.app.utils.AlertDialogUtil.dismissAlertDialogIfExists;
 import static mega.privacy.android.app.utils.MegaProgressDialogUtil.createProgressDialog;
 import static mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil.*;
@@ -702,11 +701,12 @@ public class ContactFileListActivity extends PasscodeActivity
 			}
 
 			@SuppressWarnings("unchecked")
-			List<UploadFolderResult> nameCollisions = (List<UploadFolderResult>) intent.getSerializableExtra(COLLISION_RESULTS);
-			if (nameCollisions == null || nameCollisions.isEmpty()) {
+			ArrayList<NameCollision> collisions =
+					(ArrayList<NameCollision>) intent.getSerializableExtra(INTENT_EXTRA_COLLISION_RESULTS);
+			if (collisions == null || collisions.isEmpty()) {
 				logDebug("No need to do anything more");
 			} else {
-				//TODO Show name collision activity
+				startActivity(NameCollisionActivity.getIntentForList(this, collisions));
 			}
 		} else if (requestCode == REQUEST_CODE_SELECT_FOLDER && resultCode == RESULT_OK) {
 			if (intent == null) {
@@ -743,12 +743,17 @@ public class ContactFileListActivity extends PasscodeActivity
 					checkNameCollisionUseCase.check(file.getName(), parentHandle)
 							.subscribeOn(Schedulers.io())
 							.observeOn(AndroidSchedulers.mainThread())
-							.subscribe(() -> uploadFile(contactPropertiesMainActivity, file.getAbsolutePath(), parentHandle, megaApi),
+							.subscribe(handle -> {
+										NameCollision collision = new NameCollision(handle,
+												file.getAbsolutePath(), file.getName(),
+												file.lastModified(), parentHandle);
+										startActivity(NameCollisionActivity.getIntentSingleItem(this, collision));
+									},
 									throwable -> {
-										if (throwable instanceof MegaNodeException.ChildAlreadyExistsException) {
-											//TODO Show name collision activity
-										} else {
+										if (throwable instanceof MegaNodeException.ParentDoesNotExistException) {
 											showSnackbar(SNACKBAR_TYPE, StringResourcesUtils.getString(R.string.general_error));
+										} else if (throwable instanceof MegaNodeException.ChildDoesNotExistsException) {
+											uploadFile(contactPropertiesMainActivity, file.getAbsolutePath(), parentHandle, megaApi);
 										}
 									});
 				}
@@ -809,11 +814,11 @@ public class ContactFileListActivity extends PasscodeActivity
 						showErrorAlertDialog(StringResourcesUtils
 								.getString(R.string.error_temporary_unavaible), false, this);
 					} else {
-						List<ShareInfo> collisions = result.getFirst();
+						ArrayList<NameCollision> collisions = result.getFirst();
 						List<ShareInfo> withoutCollisions = result.getSecond();
 
 						if (!collisions.isEmpty()) {
-							//TODO Show name collision activity
+							startActivity(NameCollisionActivity.getIntentForList(this, collisions));
 						}
 
 						if (!withoutCollisions.isEmpty()) {

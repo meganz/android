@@ -61,7 +61,6 @@ import static mega.privacy.android.app.sync.fileBackups.FileBackupManager.Backup
 import static mega.privacy.android.app.sync.fileBackups.FileBackupManager.BackupDialogState.BACKUP_DIALOG_SHOW_NONE;
 import static mega.privacy.android.app.sync.fileBackups.FileBackupManager.BackupDialogState.BACKUP_DIALOG_SHOW_WARNING;
 import static mega.privacy.android.app.sync.fileBackups.FileBackupManager.OperationType.OPERATION_EXECUTE;
-import static mega.privacy.android.app.uploadFolder.UploadFolderActivity.COLLISION_RESULTS;
 import static mega.privacy.android.app.utils.AlertDialogUtil.dismissAlertDialogIfExists;
 import static mega.privacy.android.app.utils.AlertDialogUtil.isAlertDialogShown;
 import static mega.privacy.android.app.utils.AlertsAndWarnings.askForCustomizedPlan;
@@ -302,8 +301,10 @@ import mega.privacy.android.app.OpenPasswordLinkActivity;
 import mega.privacy.android.app.Product;
 import mega.privacy.android.app.R;
 
+import mega.privacy.android.app.domain.entity.NameCollision;
 import mega.privacy.android.app.fragments.managerFragments.cu.PhotosFragment;
 import mega.privacy.android.app.gallery.ui.MediaDiscoveryFragment;
+import mega.privacy.android.app.namecollision.NameCollisionActivity;
 import mega.privacy.android.app.objects.PasscodeManagement;
 import mega.privacy.android.app.fragments.homepage.documents.DocumentsFragment;
 import mega.privacy.android.app.generalusecase.FilePrepareUseCase;
@@ -393,7 +394,6 @@ import mega.privacy.android.app.sync.cusync.CuSyncManager;
 import mega.privacy.android.app.sync.fileBackups.FileBackupManager;
 import mega.privacy.android.app.upgradeAccount.UpgradeAccountActivity;
 
-import mega.privacy.android.app.uploadFolder.list.data.UploadFolderResult;
 import mega.privacy.android.app.usecase.GetNodeUseCase;
 import mega.privacy.android.app.usecase.MoveNodeUseCase;
 import mega.privacy.android.app.usecase.RemoveNodeUseCase;
@@ -415,7 +415,6 @@ import mega.privacy.android.app.utils.StringResourcesUtils;
 import mega.privacy.android.app.utils.TextUtil;
 import mega.privacy.android.app.utils.ThumbnailUtils;
 import mega.privacy.android.app.utils.TimeUtils;
-import mega.privacy.android.app.utils.UploadUtil;
 import mega.privacy.android.app.utils.Util;
 import mega.privacy.android.app.utils.contacts.MegaContactGetter;
 import mega.privacy.android.app.zippreview.ui.ZipBrowserActivity;
@@ -8334,11 +8333,12 @@ public class ManagerActivity extends TransfersManagementActivity
             }
 
             @SuppressWarnings("unchecked")
-            List<UploadFolderResult> nameCollisions = (List<UploadFolderResult>) intent.getSerializableExtra(COLLISION_RESULTS);
-            if (nameCollisions == null || nameCollisions.isEmpty()) {
+            ArrayList<NameCollision> collisions =
+                    (ArrayList<NameCollision>) intent.getSerializableExtra(INTENT_EXTRA_COLLISION_RESULTS);
+            if (collisions == null || collisions.isEmpty()) {
                 logDebug("No need to do anything more");
             } else {
-                //TODO Show name collision activity
+                startActivity(NameCollisionActivity.getIntentForList(this, collisions));
             }
 		} else if (requestCode == WRITE_SD_CARD_REQUEST_CODE && resultCode == RESULT_OK) {
 
@@ -8533,18 +8533,23 @@ public class ManagerActivity extends TransfersManagementActivity
             if (resultCode == Activity.RESULT_OK) {
             	long parentHandle = getCurrentParentHandle();
             	File file = getTemporalTakePictureFile(this);
-				if (file != null) {
-					checkNameCollisionUseCase.check(file.getName(), parentHandle)
-							.subscribeOn(Schedulers.io())
-							.observeOn(AndroidSchedulers.mainThread())
-							.subscribe(() -> uploadFile(managerActivity, file.getAbsolutePath(), parentHandle, megaApi),
-									throwable -> {
-										if (throwable instanceof MegaNodeException.ChildAlreadyExistsException) {
-											//TODO Show name collision activity
-										} else {
-											showSnackbar(SNACKBAR_TYPE, StringResourcesUtils.getString(R.string.general_error), MEGACHAT_INVALID_HANDLE);
-										}
-									});
+                if (file != null) {
+                    checkNameCollisionUseCase.check(file.getName(), parentHandle)
+                            .subscribeOn(Schedulers.io())
+                            .observeOn(AndroidSchedulers.mainThread())
+                            .subscribe(handle -> {
+                                        NameCollision collision = new NameCollision(handle,
+                                                file.getAbsolutePath(), file.getName(),
+                                                file.lastModified(), parentHandle);
+                                        startActivity(NameCollisionActivity.getIntentSingleItem(this, collision));
+                                    },
+                                    throwable -> {
+                                        if (throwable instanceof MegaNodeException.ParentDoesNotExistException) {
+                                            showSnackbar(SNACKBAR_TYPE, StringResourcesUtils.getString(R.string.general_error), MEGACHAT_INVALID_HANDLE);
+                                        } else if (throwable instanceof MegaNodeException.ChildDoesNotExistsException) {
+                                            uploadFile(managerActivity, file.getAbsolutePath(), parentHandle, megaApi);
+                                        }
+                                    });
 				}
             } else {
                 logWarning("TAKE_PHOTO_CODE--->ERROR!");
@@ -9424,11 +9429,11 @@ public class ManagerActivity extends TransfersManagementActivity
                     if (throwable != null) {
                         showSnackbar(SNACKBAR_TYPE, StringResourcesUtils.getString(R.string.error_temporary_unavaible), MEGACHAT_INVALID_HANDLE);
                     } else {
-                        List<ShareInfo> collisions = result.getFirst();
+                        ArrayList<NameCollision> collisions = result.getFirst();
                         List<ShareInfo> withoutCollisions = result.getSecond();
 
                         if (!collisions.isEmpty()) {
-                            //TODO Show name collision activity
+                            startActivity(NameCollisionActivity.getIntentForList(this, collisions));
                         }
 
                         if (!withoutCollisions.isEmpty()) {
@@ -9533,21 +9538,24 @@ public class ManagerActivity extends TransfersManagementActivity
         checkNameCollisionUseCase.check(file.getName(), parentNode)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(() -> {
-                            showSnackbar(SNACKBAR_TYPE, getResources().getQuantityString(R.plurals.upload_began, 1, 1), MEGACHAT_INVALID_HANDLE);
+                .subscribe(handle -> {
+                            NameCollision collision = new NameCollision(handle, file.getAbsolutePath(),
+                                    file.getName(), file.lastModified(), parentNode.getParentHandle());
 
-                            Intent intent = new Intent(this, UploadService.class);
-                            intent.putExtra(UploadService.EXTRA_FILEPATH, file.getAbsolutePath());
-                            intent.putExtra(UploadService.EXTRA_NAME, file.getName());
-                            intent.putExtra(UploadService.EXTRA_PARENT_HASH, parentNode.getHandle());
-                            intent.putExtra(UploadService.EXTRA_SIZE, file.getTotalSpace());
-                            startService(intent);
+                            startActivity(NameCollisionActivity.getIntentSingleItem(this, collision));
                         },
                         throwable -> {
-                            if (throwable instanceof MegaNodeException.ChildAlreadyExistsException) {
-                                //TODO Show name collision activity
-                            } else {
+                            if (throwable instanceof MegaNodeException.ParentDoesNotExistException) {
                                 showSnackbar(SNACKBAR_TYPE, StringResourcesUtils.getString(R.string.general_error), MEGACHAT_INVALID_HANDLE);
+                            } else if (throwable instanceof MegaNodeException.ChildDoesNotExistsException) {
+                                showSnackbar(SNACKBAR_TYPE, getResources().getQuantityString(R.plurals.upload_began, 1, 1), MEGACHAT_INVALID_HANDLE);
+
+                                Intent intent = new Intent(this, UploadService.class);
+                                intent.putExtra(UploadService.EXTRA_FILEPATH, file.getAbsolutePath());
+                                intent.putExtra(UploadService.EXTRA_NAME, file.getName());
+                                intent.putExtra(UploadService.EXTRA_PARENT_HASH, parentNode.getHandle());
+                                intent.putExtra(UploadService.EXTRA_SIZE, file.getTotalSpace());
+                                startService(intent);
                             }
                         });
     }

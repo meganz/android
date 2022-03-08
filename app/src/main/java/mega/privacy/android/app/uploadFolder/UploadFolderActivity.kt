@@ -26,6 +26,7 @@ import mega.privacy.android.app.components.CustomizedGridLayoutManager
 import mega.privacy.android.app.components.PositionDividerItemDecoration
 import mega.privacy.android.app.constants.EventConstants.EVENT_SCANNING_TRANSFERS_CANCELLED
 import mega.privacy.android.app.databinding.ActivityUploadFolderBinding
+import mega.privacy.android.app.domain.entity.NameCollision
 import mega.privacy.android.app.fragments.homepage.EventObserver
 import mega.privacy.android.app.fragments.homepage.SortByHeaderViewModel
 import mega.privacy.android.app.interfaces.Scrollable
@@ -49,7 +50,6 @@ class UploadFolderActivity : TransfersManagementActivity(), Scrollable {
     companion object {
         private const val WAIT_TIME_TO_UPDATE = 150L
         private const val SHADOW = 0.5f
-        const val COLLISION_RESULTS = "COLLISION_RESULTS"
     }
 
     private val viewModel: UploadFolderViewModel by viewModels()
@@ -307,21 +307,21 @@ class UploadFolderActivity : TransfersManagementActivity(), Scrollable {
      * @param uploadResult  Pair with two lists of UploadFolderResult, one with the name collisions
      * and other without them.
      */
-    private fun manageUploadResult(uploadResult: Pair<List<UploadFolderResult>, List<UploadFolderResult>>) {
-        val withoutCollisions = uploadResult.second
+    private fun manageUploadResult(uploadResult: Pair<ArrayList<NameCollision>, List<UploadFolderResult>>) {
+        val uploadResults = uploadResult.second
 
-        if (withoutCollisions.isNotEmpty()) {
+        if (uploadResults.isNotEmpty()) {
             showSnackbar(
                 SNACKBAR_TYPE,
                 StringResourcesUtils.getQuantityString(
                     R.plurals.upload_began,
-                    withoutCollisions.size,
-                    withoutCollisions.size
+                    uploadResults.size,
+                    uploadResults.size
                 ),
                 MEGACHAT_INVALID_HANDLE
             )
 
-            for (result in withoutCollisions) {
+            for (result in uploadResults) {
                 if (transfersManagement.shouldBreakTransfersProcessing()) {
                     break
                 }
@@ -336,7 +336,10 @@ class UploadFolderActivity : TransfersManagementActivity(), Scrollable {
             }
         }
 
-        setResult(RESULT_OK, Intent().putExtra(COLLISION_RESULTS, ArrayList(uploadResult.first)))
+        setResult(
+            RESULT_OK,
+            Intent().putExtra(INTENT_EXTRA_COLLISION_RESULTS, uploadResult.first)
+        )
         finish()
     }
 
