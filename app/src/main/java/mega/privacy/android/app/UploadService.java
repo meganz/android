@@ -73,7 +73,6 @@ import static mega.privacy.android.app.utils.Util.*;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.PreviewUtils.*;
-import static nz.mega.sdk.MegaRequest.TYPE_UPLOAD;
 import static mega.privacy.android.app.utils.ThumbnailUtils.*;
 
 import javax.inject.Inject;
@@ -359,14 +358,14 @@ public class UploadService extends Service implements MegaTransferListenerInterf
             String appData = APP_DATA_TXT_FILE + APP_DATA_INDICATOR + textFileMode
                     + APP_DATA_INDICATOR + intent.getBooleanExtra(FROM_HOME_PAGE, false);
 
-            megaApi.startUpload(file.getAbsolutePath(), parentNode, mTime, appData, fileName,
+            megaApi.startUpload(file.getAbsolutePath(), parentNode, fileName, mTime, appData,
                     true, true, null);
         } else {
             MegaCancelToken cancelToken = transfersManagement
-                    .addScanningTransfer(TYPE_UPLOAD, file.getAbsolutePath(), parentNode, file.isDirectory());
+                    .addScanningTransfer(MegaTransfer.TYPE_UPLOAD, file.getAbsolutePath(), parentNode, file.isDirectory());
 
             if (cancelToken != null) {
-                megaApi.startUpload(file.getAbsolutePath(), parentNode, mTime, null, fileName,
+                megaApi.startUpload(file.getAbsolutePath(), parentNode, fileName, mTime, null,
                         false, false, cancelToken);
             }
         }

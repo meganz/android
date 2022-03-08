@@ -54,9 +54,9 @@ class CheckNameCollisionUseCase @Inject constructor(
             val child = megaApi.getChildNode(parentNode, name)
 
             if (child != null) {
-                emitter.onComplete()
-            } else {
                 emitter.onError(MegaNodeException.ChildAlreadyExistsException())
+            } else {
+                emitter.onComplete()
             }
         }
 
