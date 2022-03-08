@@ -108,6 +108,7 @@ import static mega.privacy.android.app.utils.ConstantsUrl.RECOVERY_URL_EMAIL;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.TextUtil.isTextEmpty;
 import static mega.privacy.android.app.utils.Util.*;
+import static mega.privacy.android.app.utils.ViewUtils.removeLeadingAndTrailingSpaces;
 import static mega.privacy.android.app.utils.permission.PermissionUtils.hasPermissions;
 import static nz.mega.sdk.MegaApiJava.STORAGE_STATE_PAYWALL;
 
@@ -333,6 +334,12 @@ public class LoginFragment extends Fragment implements View.OnClickListener, Meg
             @Override
             public void afterTextChanged(Editable editable) {
                 quitError(et_user);
+            }
+        });
+
+        et_user.setOnFocusChangeListener((v12, hasFocus) -> {
+            if (!hasFocus) {
+                removeLeadingAndTrailingSpaces(et_user);
             }
         });
 
@@ -1409,6 +1416,7 @@ public class LoginFragment extends Fragment implements View.OnClickListener, Meg
                 loginClicked = true;
                 backWhileLogin = false;
                 LoginActivity.isBackFromLoginPage = false;
+                removeLeadingAndTrailingSpaces(et_user);
                 onLoginClick(v);
                 break;
             }
