@@ -8,16 +8,13 @@ import android.content.Intent;
 import android.net.Uri;
 
 import java.io.File;
-import java.util.List;
 
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.UploadService;
 import mega.privacy.android.app.uploadFolder.UploadFolderActivity;
-import mega.privacy.android.app.uploadFolder.list.data.UploadFolderResult;
 import nz.mega.sdk.MegaApiAndroid;
 
-import static mega.privacy.android.app.uploadFolder.UploadFolderActivity.UPLOAD_RESULTS;
 import static mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuotaPaywallWarning;
 import static mega.privacy.android.app.utils.CacheFolderManager.TEMPORAL_FOLDER;
 import static mega.privacy.android.app.utils.CacheFolderManager.buildTempFile;
@@ -26,7 +23,6 @@ import static mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_PARENT_N
 import static mega.privacy.android.app.utils.FileUtil.isFileAvailable;
 import static mega.privacy.android.app.utils.LogUtil.logDebug;
 import static mega.privacy.android.app.utils.LogUtil.logWarning;
-import static mega.privacy.android.app.utils.StringResourcesUtils.getQuantityString;
 import static nz.mega.sdk.MegaApiJava.STORAGE_STATE_PAYWALL;
 
 public class UploadUtil {
@@ -125,38 +121,6 @@ public class UploadUtil {
                         .setData(uri)
                         .putExtra(INTENT_EXTRA_KEY_PARENT_NODE_HANDLE, parentHandle),
                 Constants.REQUEST_CODE_GET_FOLDER_CONTENT);
-    }
-
-    /**
-     * Uploads the result obtained from UploadFolderActivity.
-     *
-     * @param activity   Activity to start the Intent.
-     * @param resultCode Result code of the onActivityResult with the content to upload.
-     * @param data       Intent received in onActivityResult with the .
-     */
-    @SuppressWarnings("unchecked")
-    public static void uploadFolder(Activity activity, int resultCode, Intent data) {
-        if (resultCode != RESULT_OK || data == null) {
-            logWarning("resultCode: " + resultCode);
-            return;
-        }
-
-        List<UploadFolderResult> uploadResults = (List<UploadFolderResult>) data.getSerializableExtra(UPLOAD_RESULTS);
-        if (uploadResults == null) {
-            logWarning("Upload results are null");
-            return;
-        }
-
-        for (UploadFolderResult result : uploadResults) {
-            activity.startService(new Intent(activity, UploadService.class)
-                    .putExtra(UploadService.EXTRA_FILEPATH, result.getAbsolutePath())
-                    .putExtra(UploadService.EXTRA_NAME, result.getName())
-                    .putExtra(UploadService.EXTRA_LAST_MODIFIED, result.getLastModified())
-                    .putExtra(UploadService.EXTRA_PARENT_HASH, result.getParentHandle()));
-        }
-
-        int size = uploadResults.size();
-        Util.showSnackbar(activity, getQuantityString(R.plurals.upload_began, size, size));
     }
 
     /** The method is to return sdcard root of the file

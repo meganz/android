@@ -61,6 +61,7 @@ import static mega.privacy.android.app.sync.fileBackups.FileBackupManager.Backup
 import static mega.privacy.android.app.sync.fileBackups.FileBackupManager.BackupDialogState.BACKUP_DIALOG_SHOW_NONE;
 import static mega.privacy.android.app.sync.fileBackups.FileBackupManager.BackupDialogState.BACKUP_DIALOG_SHOW_WARNING;
 import static mega.privacy.android.app.sync.fileBackups.FileBackupManager.OperationType.OPERATION_EXECUTE;
+import static mega.privacy.android.app.uploadFolder.UploadFolderActivity.COLLISION_RESULTS;
 import static mega.privacy.android.app.utils.AlertDialogUtil.dismissAlertDialogIfExists;
 import static mega.privacy.android.app.utils.AlertDialogUtil.isAlertDialogShown;
 import static mega.privacy.android.app.utils.AlertsAndWarnings.askForCustomizedPlan;
@@ -339,7 +340,6 @@ import mega.privacy.android.app.interfaces.ChatManagementCallback;
 import mega.privacy.android.app.interfaces.MeetingBottomSheetDialogActionListener;
 import mega.privacy.android.app.interfaces.UploadBottomSheetDialogActionListener;
 import mega.privacy.android.app.listeners.CancelTransferListener;
-import mega.privacy.android.app.listeners.ChatBaseListener;
 import mega.privacy.android.app.listeners.ExportListener;
 import mega.privacy.android.app.listeners.GetAttrUserListener;
 import mega.privacy.android.app.listeners.LoadPreviewListener;
@@ -393,6 +393,7 @@ import mega.privacy.android.app.sync.cusync.CuSyncManager;
 import mega.privacy.android.app.sync.fileBackups.FileBackupManager;
 import mega.privacy.android.app.upgradeAccount.UpgradeAccountActivity;
 
+import mega.privacy.android.app.uploadFolder.list.data.UploadFolderResult;
 import mega.privacy.android.app.usecase.GetNodeUseCase;
 import mega.privacy.android.app.usecase.MoveNodeUseCase;
 import mega.privacy.android.app.usecase.RemoveNodeUseCase;
@@ -8327,7 +8328,17 @@ public class ManagerActivity extends TransfersManagementActivity
 		} else if (requestCode == REQUEST_CODE_GET_FOLDER) {
 			getFolder(this, resultCode, intent, getCurrentParentHandle());
 		} else if (requestCode == REQUEST_CODE_GET_FOLDER_CONTENT) {
-        	UploadUtil.uploadFolder(this, resultCode, intent);
+            if (resultCode != RESULT_OK || intent == null) {
+                logWarning("resultCode: " + resultCode);
+                return;
+            }
+
+            List<UploadFolderResult> nameCollisions = (List<UploadFolderResult>) intent.getSerializableExtra(COLLISION_RESULTS);
+            if (nameCollisions == null || nameCollisions.isEmpty()) {
+                logDebug("No need to do anything more");
+            } else {
+                //TODO Show name collision activity
+            }
 		} else if (requestCode == WRITE_SD_CARD_REQUEST_CODE && resultCode == RESULT_OK) {
 
             if (!hasPermissions(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)) {

@@ -10,6 +10,7 @@ import com.jeremyliao.liveeventbus.LiveEventBus
 import mega.privacy.android.app.activities.PasscodeActivity
 import mega.privacy.android.app.components.transferWidget.TransferWidget
 import mega.privacy.android.app.constants.BroadcastConstants.*
+import mega.privacy.android.app.constants.EventConstants.EVENT_SCANNING_TRANSFERS_CANCELLED
 import mega.privacy.android.app.constants.EventConstants.EVENT_SHOW_SCANNING_TRANSFERS_DIALOG
 import mega.privacy.android.app.lollipop.DrawerItem
 import mega.privacy.android.app.lollipop.ManagerActivity
@@ -187,7 +188,7 @@ open class TransfersManagementActivity : PasscodeActivity() {
      * Shows a scanning transfers dialog.
      */
     private fun showScanningTransfersDialog() {
-        if (isAlertDialogShown(scanningTransfersDialog)) {
+        if (isActivityInBackground || isAlertDialogShown(scanningTransfersDialog)) {
             return
         }
 
@@ -210,14 +211,22 @@ open class TransfersManagementActivity : PasscodeActivity() {
      * Shows a confirmation dialog before cancel all scanning transfers.
      */
     private fun showCancelTransfersDialog() {
+        if (isActivityInBackground || isAlertDialogShown(cancelTransfersDialog)) {
+            return
+        }
+
         cancelTransfersDialog = MaterialAlertDialogBuilder(this)
             .setTitle(StringResourcesUtils.getString(R.string.cancel_transfers))
             .setMessage(StringResourcesUtils.getString(R.string.warning_cancel_transfers))
             .setPositiveButton(
                 StringResourcesUtils.getString(R.string.button_proceed)
             ) { _, _ ->
+                LiveEventBus.get(EVENT_SCANNING_TRANSFERS_CANCELLED, Boolean::class.java).post(true)
                 transfersManagement.cancelScanningTransfers()
-                Util.showSnackbar(this, StringResourcesUtils.getString(R.string.transfers_cancelled))
+                Util.showSnackbar(
+                    this,
+                    StringResourcesUtils.getString(R.string.transfers_cancelled)
+                )
             }
             .setNegativeButton(StringResourcesUtils.getString(R.string.general_dismiss), null)
             .create()
@@ -230,6 +239,10 @@ open class TransfersManagementActivity : PasscodeActivity() {
 
     override fun onResume() {
         super.onResume()
+
+        if (transfersManagement.shouldShowScanningTransfersDialog()) {
+            showScanningTransfersDialog()
+        }
 
         transfersWidget?.update()
     }

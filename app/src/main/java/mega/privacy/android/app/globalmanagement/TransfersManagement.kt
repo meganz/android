@@ -167,7 +167,7 @@ class TransfersManagement @Inject constructor(
 
     private val scanningTransfers = ArrayList<ScanningTransferData>()
     private var scanningTransfersToken: MegaCancelToken? = null
-    private var isProcessingSDCardFolders = false
+    private var isProcessingFolders = false
     private var shouldBreakTransfersProcessing = false
 
     init {
@@ -188,7 +188,7 @@ class TransfersManagement @Inject constructor(
         pausedTransfers.clear()
         scanningTransfers.clear()
         scanningTransfersToken = null
-        isProcessingSDCardFolders = false
+        isProcessingFolders = false
         shouldBreakTransfersProcessing = false
     }
 
@@ -452,7 +452,7 @@ class TransfersManagement @Inject constructor(
      */
     fun cancelScanningTransfers() {
         shouldBreakTransfersProcessing = true
-        isProcessingSDCardFolders = false
+        isProcessingFolders = false
         scanningTransfersToken?.cancel()
         scanningTransfersToken = null
         scanningTransfers.clear()
@@ -542,20 +542,20 @@ class TransfersManagement @Inject constructor(
     private fun isScanningTransfers(): Boolean = scanningTransfers.isNotEmpty()
 
     /**
-     * Updates the flag isProcessingSDCardFolders if needed and launches and event to show
+     * Updates the flag isProcessingFolders if needed and launches and event to show
      * or hide the scanning transfers dialog if so.
      *
-     * @param processing True if is processing SD card download folders, false otherwise.
+     * @param processing True if is processing folders, false otherwise.
      */
-    fun setIsProcessingSDCardFolders(processing: Boolean) {
+    fun setIsProcessingFolders(processing: Boolean) {
         when {
-            !isScanningTransfers() && !isProcessingSDCardFolders && processing -> {
-                isProcessingSDCardFolders = true
+            !isScanningTransfers() && !isProcessingFolders && processing -> {
+                isProcessingFolders = true
                 LiveEventBus.get(EVENT_SHOW_SCANNING_TRANSFERS_DIALOG, Boolean::class.java)
                     .post(true)
             }
             !processing -> {
-                isProcessingSDCardFolders = false
+                isProcessingFolders = false
                 LiveEventBus.get(EVENT_SHOW_SCANNING_TRANSFERS_DIALOG, Boolean::class.java)
                     .post(false)
             }
@@ -568,7 +568,7 @@ class TransfersManagement @Inject constructor(
      * @return True if should show the dialog, false otherwise.
      */
     fun shouldShowScanningTransfersDialog(): Boolean =
-        isProcessingSDCardFolders || isScanningTransfers()
+        isProcessingFolders || isScanningTransfers()
 
     /**
      * Sets shouldBreakTransfersProcessing to false after a second in order

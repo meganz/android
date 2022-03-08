@@ -444,6 +444,15 @@ public class BaseActivity extends AppCompatActivity implements ActivityLauncher,
         return !isPaused;
     }
 
+    /**
+     * Checks if the current activity is in background.
+     *
+     * @return True if the current activity is in background, false otherwise.
+     */
+    protected boolean isActivityInBackground() {
+        return isPaused;
+    }
+
     @Override
     protected void onDestroy() {
         unregisterReceiver(sslErrorReceiver);
@@ -652,7 +661,7 @@ public class BaseActivity extends AppCompatActivity implements ActivityLauncher,
         public void onReceive(Context context, Intent intent) {
             if (intent == null || intent.getAction() == null
                     || !intent.getAction().equals(ACTION_TRANSFER_OVER_QUOTA)
-                    || !isActivityInForeground()) {
+                    || isActivityInBackground()) {
                 return;
             }
 
@@ -670,7 +679,7 @@ public class BaseActivity extends AppCompatActivity implements ActivityLauncher,
             if (intent == null || intent.getAction() == null
                     || !intent.getAction().equals(BROADCAST_ACTION_RESUME_TRANSFERS)
                     || isResumeTransfersWarningShown()
-                    || !isActivityInForeground()) {
+                    || isActivityInBackground()) {
                 return;
             }
 
@@ -685,7 +694,7 @@ public class BaseActivity extends AppCompatActivity implements ActivityLauncher,
     protected BroadcastReceiver cookieSettingsReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            if (isPaused || !isActivityInForeground() || intent == null) {
+            if (isPaused || isActivityInBackground() || intent == null) {
                 return;
             }
 

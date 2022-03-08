@@ -12,6 +12,8 @@ import io.reactivex.rxjava3.kotlin.subscribeBy
 import io.reactivex.rxjava3.schedulers.Schedulers
 import mega.privacy.android.app.arch.BaseRxViewModel
 import mega.privacy.android.app.components.textFormatter.TextFormatterUtils.INVALID_INDEX
+import mega.privacy.android.app.globalmanagement.TransfersManagement
+import mega.privacy.android.app.namecollision.usecase.CheckNameCollisionUseCase
 import mega.privacy.android.app.uploadFolder.list.data.FolderContent
 import mega.privacy.android.app.uploadFolder.list.data.UploadFolderResult
 import mega.privacy.android.app.uploadFolder.usecase.GetFolderContentUseCase
@@ -20,7 +22,6 @@ import mega.privacy.android.app.utils.LogUtil.logWarning
 import mega.privacy.android.app.utils.notifyObserver
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
-import java.util.ArrayList
 import javax.inject.Inject
 
 /**
@@ -28,13 +29,16 @@ import javax.inject.Inject
  */
 @HiltViewModel
 class UploadFolderViewModel @Inject constructor(
-    private val getFolderContentUseCase: GetFolderContentUseCase
+    private val getFolderContentUseCase: GetFolderContentUseCase,
+    private val checkNameCollisionUseCase: CheckNameCollisionUseCase,
+    private val transfersManagement: TransfersManagement
 ) : BaseRxViewModel() {
 
     private val currentFolder: MutableLiveData<FolderContent.Data> = MutableLiveData()
     private val folderItems: MutableLiveData<MutableList<FolderContent>> = MutableLiveData()
     private val selectedItems: MutableLiveData<MutableList<Int>> = MutableLiveData()
-    private val uploadResults: MutableLiveData<ArrayList<UploadFolderResult>> = MutableLiveData()
+    private val uploadResult: MutableLiveData<Pair<List<UploadFolderResult>, List<UploadFolderResult>>> =
+        MutableLiveData()
 
     private lateinit var parentFolder: String
     private var parentHandle: Long = INVALID_HANDLE
@@ -42,7 +46,8 @@ class UploadFolderViewModel @Inject constructor(
     private var isList: Boolean = true
     var query: String? = null
     private var isPendingToFinishSelection = false
-    private var uploadDisposable: Disposable? = null
+    private var getContentDisposable: Disposable? = null
+    private var nameCollisionDisposable: Disposable? = null
     private var folderContent = HashMap<FolderContent.Data?, MutableList<FolderContent>>()
     private var searchResults =
         HashMap<FolderContent.Data, HashMap<String, MutableList<FolderContent>>>()
@@ -50,7 +55,8 @@ class UploadFolderViewModel @Inject constructor(
     fun getCurrentFolder(): LiveData<FolderContent.Data> = currentFolder
     fun getFolderItems(): LiveData<MutableList<FolderContent>> = folderItems
     fun getSelectedItems(): LiveData<MutableList<Int>> = selectedItems
-    fun getUploadResults(): LiveData<ArrayList<UploadFolderResult>> = uploadResults
+    fun getUploadResult(): LiveData<Pair<List<UploadFolderResult>, List<UploadFolderResult>>> =
+        uploadResult
 
     /**
      * Initializes the view model with the initial data.
@@ -74,13 +80,6 @@ class UploadFolderViewModel @Inject constructor(
         this.isList = isList
         setFolderItems()
     }
-
-    /**
-     * Checks if it is processing the upload.
-     *
-     * @return True if the upload disposable is not null, false otherwise.
-     */
-    fun isProcessingUpload(): Boolean = uploadDisposable != null
 
     /**
      * Checks if there is a search in progress.
@@ -366,7 +365,8 @@ class UploadFolderViewModel @Inject constructor(
      * @param context   Required to get the absolute path of items.
      */
     fun upload(context: Context) {
-        uploadDisposable = getFolderContentUseCase.getContentToUpload(
+        transfersManagement.setIsProcessingFolders(true)
+        getContentDisposable = getFolderContentUseCase.getContentToUpload(
             context,
             parentHandle,
             parentFolder,
@@ -375,8 +375,39 @@ class UploadFolderViewModel @Inject constructor(
         ).subscribeOn(Schedulers.single())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeBy(
+                onError = { error ->
+                    transfersManagement.setIsProcessingFolders(false)
+                    logError("Cannot upload anything", error)
+                },
+                onSuccess = { uploadResults ->
+                    if (transfersManagement.shouldBreakTransfersProcessing()) {
+                        return@subscribeBy
+                    }
+
+                    transfersManagement.setIsProcessingFolders(false)
+                    checkNameCollisions(uploadResults)
+                }
+            )
+            .addTo(composite)
+    }
+
+    /**
+     * Checks name collisions before starting the upload.
+     *
+     * @param uploadResults List of UploadFolderResult to upload.
+     */
+    private fun checkNameCollisions(uploadResults: ArrayList<UploadFolderResult>) {
+        nameCollisionDisposable = checkNameCollisionUseCase.check(uploadResults)
+            .subscribeOn(AndroidSchedulers.mainThread())
+            .subscribeBy(
                 onError = { error -> logError("Cannot upload anything", error) },
-                onSuccess = { uploadResult -> uploadResults.value = uploadResult }
+                onSuccess = { result ->
+                    if (transfersManagement.shouldBreakTransfersProcessing()) {
+                        return@subscribeBy
+                    }
+
+                    uploadResult.value = result
+                }
             )
             .addTo(composite)
     }
@@ -385,15 +416,9 @@ class UploadFolderViewModel @Inject constructor(
      * Cancels the current upload process.
      */
     fun cancelUpload() {
-        uploadDisposable?.dispose()
-    }
-
-    /**
-     * If the upload results are already get, then notifies the observer to proceed with the upload.
-     */
-    fun proceedWithUpload() {
-        if (!uploadResults.value.isNullOrEmpty()) {
-            uploadResults.notifyObserver()
+        if (transfersManagement.shouldBreakTransfersProcessing()) {
+            getContentDisposable?.dispose()
+            nameCollisionDisposable?.dispose()
         }
     }
 }

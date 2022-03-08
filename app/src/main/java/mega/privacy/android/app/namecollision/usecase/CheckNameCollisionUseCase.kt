@@ -5,6 +5,8 @@ import io.reactivex.rxjava3.core.Single
 import io.reactivex.rxjava3.kotlin.blockingSubscribeBy
 import mega.privacy.android.app.ShareInfo
 import mega.privacy.android.app.di.MegaApi
+import mega.privacy.android.app.domain.exception.EmptyFolderException
+import mega.privacy.android.app.uploadFolder.list.data.UploadFolderResult
 import mega.privacy.android.app.usecase.exception.MegaNodeException
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
@@ -103,5 +105,59 @@ class CheckNameCollisionUseCase @Inject constructor(
             }
 
             emitter.onSuccess(Pair(errors, completed))
+        }
+
+    /**
+     * Checks a list of UploadFolderResult in order to know which names already exist
+     * on the provided parent node.
+     *
+     * @param uploadResults    List of UploadFolderResult to check.
+     * @return Single<Pair<List<UploadFolderResult>, List<UploadFolderResult>>> containing:
+     *  - First:    List of UploadFolderResult with name collision.
+     *  - Second:   List of UploadFolderResult without name collision.
+     */
+    fun check(
+        uploadResults: List<UploadFolderResult>
+    ): Single<Pair<List<UploadFolderResult>, List<UploadFolderResult>>> =
+        Single.create { emitter ->
+            if (uploadResults.isEmpty()) {
+                emitter.onError(EmptyFolderException())
+                return@create
+            }
+
+            if (emitter.isDisposed) {
+                return@create
+            }
+
+            val errors = ArrayList<UploadFolderResult>()
+            val completed = ArrayList<UploadFolderResult>()
+            var parentUnavailable = false
+
+            for (uploadResult in uploadResults) {
+                if (emitter.isDisposed) {
+                    return@create
+                }
+
+                if (parentUnavailable) {
+                    emitter.onError(MegaNodeException.ParentDoesNotExistException())
+                    return@create
+                }
+
+                check(uploadResult.name, uploadResult.parentHandle).blockingSubscribeBy(
+                    onError = { error ->
+                        if (error is MegaNodeException.ChildAlreadyExistsException) {
+                            errors.add(uploadResult)
+                        } else {
+                            parentUnavailable = true
+                        }
+                    },
+                    onComplete = { completed.add(uploadResult) }
+                )
+            }
+
+            when {
+                emitter.isDisposed -> return@create
+                else -> emitter.onSuccess(Pair(errors, completed))
+            }
         }
 }

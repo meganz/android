@@ -86,7 +86,7 @@ class MegaNodeSaving(
             val targets = HashMap<Long, String>()
 
             if (node.type == MegaNode.TYPE_FOLDER && sdCardOperator != null && sdCardOperator.isSDCardDownload) {
-                app.transfersManagement.setIsProcessingSDCardFolders(true)
+                app.transfersManagement.setIsProcessingFolders(true)
                 sdCardOperator.buildFileStructure(targets, parentPath, api, node)
                 getDlList(api, dlFiles, node, File(sdCardOperator.downloadRoot, node.name))
             } else if (sdCardOperator != null && sdCardOperator.isSDCardDownload) {
@@ -174,7 +174,7 @@ class MegaNodeSaving(
             }
         }
 
-        app.transfersManagement.setIsProcessingSDCardFolders(false)
+        app.transfersManagement.setIsProcessingFolders(false)
 
         val message = when {
             numberOfNodesPending == 0 && numberOfNodesAlreadyDownloaded == 0 -> {

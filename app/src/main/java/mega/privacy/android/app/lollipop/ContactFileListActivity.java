@@ -54,6 +54,7 @@ import mega.privacy.android.app.interfaces.UploadBottomSheetDialogActionListener
 import mega.privacy.android.app.lollipop.controllers.NodeController;
 import mega.privacy.android.app.modalbottomsheet.ContactFileListBottomSheetDialogFragment;
 import mega.privacy.android.app.modalbottomsheet.UploadBottomSheetDialogFragment;
+import mega.privacy.android.app.uploadFolder.list.data.UploadFolderResult;
 import mega.privacy.android.app.usecase.GetNodeUseCase;
 import mega.privacy.android.app.usecase.MoveNodeUseCase;
 import mega.privacy.android.app.usecase.data.MoveRequestResult;
@@ -76,6 +77,7 @@ import nz.mega.sdk.MegaRequestListenerInterface;
 import nz.mega.sdk.MegaUser;
 import nz.mega.sdk.MegaUserAlert;
 
+import static mega.privacy.android.app.uploadFolder.UploadFolderActivity.COLLISION_RESULTS;
 import static mega.privacy.android.app.utils.AlertDialogUtil.dismissAlertDialogIfExists;
 import static mega.privacy.android.app.utils.MegaProgressDialogUtil.createProgressDialog;
 import static mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil.*;
@@ -694,7 +696,18 @@ public class ContactFileListActivity extends PasscodeActivity
 		}  else if (requestCode == REQUEST_CODE_GET_FOLDER) {
 			getFolder(this, resultCode, intent, parentHandle);
 		} else if (requestCode == REQUEST_CODE_GET_FOLDER_CONTENT) {
-			UploadUtil.uploadFolder(this, resultCode, intent);
+			if (resultCode != RESULT_OK || intent == null) {
+				logWarning("resultCode: " + resultCode);
+				return;
+			}
+
+			@SuppressWarnings("unchecked")
+			List<UploadFolderResult> nameCollisions = (List<UploadFolderResult>) intent.getSerializableExtra(COLLISION_RESULTS);
+			if (nameCollisions == null || nameCollisions.isEmpty()) {
+				logDebug("No need to do anything more");
+			} else {
+				//TODO Show name collision activity
+			}
 		} else if (requestCode == REQUEST_CODE_SELECT_FOLDER && resultCode == RESULT_OK) {
 			if (intent == null) {
 				return;

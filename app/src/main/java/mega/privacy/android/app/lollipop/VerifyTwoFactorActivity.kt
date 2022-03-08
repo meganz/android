@@ -236,7 +236,7 @@ class VerifyTwoFactorActivity : PasscodeActivity() {
         titleResId: Int,
         callback: () -> Unit = this::finish
     ) {
-        if (!this.isActivityInForeground) return
+        if (isActivityInBackground) return
 
         showAlert(
             this,
