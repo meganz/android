@@ -744,10 +744,9 @@ public class ContactFileListActivity extends PasscodeActivity
 							.subscribeOn(Schedulers.io())
 							.observeOn(AndroidSchedulers.mainThread())
 							.subscribe(handle -> {
-										NameCollision collision = new NameCollision(handle,
-												file.getAbsolutePath(), file.getName(),
-												file.lastModified(), parentHandle);
-										startActivity(NameCollisionActivity.getIntentSingleItem(this, collision));
+										NameCollision collision = new NameCollision(handle, file,
+												parentHandle, NameCollision.Type.UPLOAD);
+										startActivity(NameCollisionActivity.getIntentForSingleItem(this, collision));
 									},
 									throwable -> {
 										if (throwable instanceof MegaNodeException.ParentDoesNotExistException) {

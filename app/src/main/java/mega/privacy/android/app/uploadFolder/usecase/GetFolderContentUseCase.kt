@@ -135,6 +135,7 @@ class GetFolderContentUseCase @Inject constructor(
                             UploadFolderResult(
                                 info.fileAbsolutePath,
                                 folderItem.name!!,
+                                folderItem.size,
                                 folderItem.lastModified,
                                 parentNode.handle
                             )
@@ -149,6 +150,7 @@ class GetFolderContentUseCase @Inject constructor(
                                     UploadFolderResult(
                                         info.fileAbsolutePath,
                                         folderItem.name!!,
+                                        folderItem.size,
                                         folderItem.lastModified,
                                         parentNodeResult.handle
                                     )

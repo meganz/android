@@ -91,10 +91,10 @@ public class QRCodeSaveBottomSheetDialogFragment extends BaseBottomSheetDialogFr
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(handle -> {
-                            NameCollision collision = new NameCollision(handle, qrFile.getAbsolutePath(),
-                                    qrFile.getName(), qrFile.lastModified(), parentNode.getParentHandle());
+                            NameCollision collision = new NameCollision(handle, qrFile,
+                                    parentNode.getParentHandle(), NameCollision.Type.UPLOAD);
 
-                            startActivity(NameCollisionActivity.getIntentSingleItem(requireActivity(), collision));
+                            startActivity(NameCollisionActivity.getIntentForSingleItem(requireActivity(), collision));
                         },
                         throwable -> {
                             if (throwable instanceof MegaNodeException.ParentDoesNotExistException) {

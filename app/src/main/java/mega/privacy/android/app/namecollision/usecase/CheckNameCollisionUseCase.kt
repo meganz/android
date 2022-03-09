@@ -102,10 +102,9 @@ class CheckNameCollisionUseCase @Inject constructor(
                         collisions.add(
                             NameCollision(
                                 handle,
-                                shareInfo.fileAbsolutePath,
-                                shareInfo.originalFileName,
-                                shareInfo.lastModified,
-                                parentNode.handle
+                                shareInfo,
+                                parentNode.handle,
+                                NameCollision.Type.UPLOAD
                             )
                         )
                     },
@@ -156,13 +155,7 @@ class CheckNameCollisionUseCase @Inject constructor(
                     },
                     onSuccess = { handle ->
                         collisions.add(
-                            NameCollision(
-                                handle,
-                                uploadResult.absolutePath,
-                                uploadResult.name,
-                                uploadResult.lastModified,
-                                uploadResult.parentHandle
-                            )
+                            NameCollision(handle, uploadResult, NameCollision.Type.UPLOAD)
                         )
                     },
                 )

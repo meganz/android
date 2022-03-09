@@ -1969,10 +1969,10 @@ public class FileExplorerActivity extends TransfersManagementActivity
 				.subscribeOn(Schedulers.io())
 				.observeOn(AndroidSchedulers.mainThread())
 				.subscribe(handle -> {
-							NameCollision collision = new NameCollision(handle, file.getAbsolutePath(),
-									file.getName(), file.lastModified(), parentNode.getParentHandle());
+							NameCollision collision = new NameCollision(handle, file,
+									parentNode.getParentHandle(), NameCollision.Type.UPLOAD);
 
-							startActivity(NameCollisionActivity.getIntentSingleItem(this, collision));
+							startActivity(NameCollisionActivity.getIntentForSingleItem(this, collision));
 						},
 						throwable -> {
 							if (throwable instanceof MegaNodeException.ParentDoesNotExistException) {

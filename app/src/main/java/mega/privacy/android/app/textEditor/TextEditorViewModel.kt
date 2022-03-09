@@ -449,13 +449,12 @@ class TextEditorViewModel @Inject constructor(
                 onSuccess = { handle ->
                     val collision = NameCollision(
                         handle,
-                        tempFile.absolutePath,
-                        fileName.value!!,
-                        tempFile.lastModified(),
-                        parentHandle
+                        tempFile,
+                        parentHandle,
+                        NameCollision.Type.UPLOAD
                     )
                     activity.startActivity(
-                        NameCollisionActivity.getIntentSingleItem(
+                        NameCollisionActivity.getIntentForSingleItem(
                             activity,
                             collision
                         )
