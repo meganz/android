@@ -250,7 +250,7 @@ public class MultipleBucketAdapter extends RecyclerView.Adapter<MultipleBucketAd
     }
 
     private MegaNode getItemAtPosition(int pos) {
-        if (nodes == null || nodes.isEmpty() || pos >= nodes.size()) return null;
+        if (nodes == null || nodes.isEmpty() || pos >= nodes.size() || pos < 0) return null;
 
         return nodes.get(pos);
     }
@@ -273,7 +273,7 @@ public class MultipleBucketAdapter extends RecyclerView.Adapter<MultipleBucketAd
         MultipleBucketAdapter.ViewHolderMultipleBucket holder = (MultipleBucketAdapter.ViewHolderMultipleBucket) v.getTag();
         if (holder == null) return;
 
-        MegaNode node = getItemAtPosition(holder.getAdapterPosition());
+        MegaNode node = getItemAtPosition(holder.getAbsoluteAdapterPosition());
         if (node == null) return;
         switch (v.getId()) {
             case R.id.three_dots: {
