@@ -399,13 +399,12 @@ public class BillingManagerImpl implements PurchasesUpdatedListener, BillingMana
             @Override
             public void onBillingSetupFinished(BillingResult billingResult) {
                 logDebug("Response code is: " + billingResult.getResponseCode());
-                int BillingResponseCodeCode = billingResult.getResponseCode();
+                mIsServiceConnected = billingResult.getResponseCode() == BillingResponseCode.OK;
 
-                if (BillingResponseCodeCode == BillingResponseCode.OK) {
-                    mIsServiceConnected = true;
-                    if (executeOnSuccess != null) {
-                        executeOnSuccess.run();
-                    }
+                if (!mIsServiceConnected) {
+                    mBillingUpdatesListener.onBillingClientSetupFailed();
+                } else if (executeOnSuccess != null) {
+                    executeOnSuccess.run();
                 }
             }
 

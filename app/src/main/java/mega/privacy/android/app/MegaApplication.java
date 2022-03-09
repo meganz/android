@@ -954,14 +954,13 @@ public class MegaApplication extends MultiDexApplication implements Application.
         megaApi.creditCardQuerySubscriptions(null);
     }
 
+	public void askForPricing(){
+		megaApi.getPricing(null);
+	}
+
     public void askForPaymentMethods() {
         logDebug("askForPaymentMethods");
         megaApi.getPaymentMethods(null);
-    }
-
-    public void askForPricing() {
-
-        megaApi.getPricing(null);
     }
 
     public void askForAccountDetails() {

@@ -139,7 +139,10 @@ public class BillingManagerImpl implements BillingManager {
             logDebug("HMS IAP env is ready.");
             mBillingUpdatesListener.onBillingClientSetupFinished();
             queryPurchases();
-        }).addOnFailureListener(this::handleException);
+        }).addOnFailureListener(result -> {
+            handleException(result);
+            mBillingUpdatesListener.onBillingClientSetupFailed();
+        });
     }
 
     @Override
