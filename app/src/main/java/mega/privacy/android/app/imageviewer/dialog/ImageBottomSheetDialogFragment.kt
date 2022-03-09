@@ -50,7 +50,6 @@ import mega.privacy.android.app.utils.StringResourcesUtils.getQuantityString
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 import nz.mega.sdk.MegaNode
 
-
 /**
  * Bottom Sheet Dialog that represents the UI for a dialog containing image information.
  */

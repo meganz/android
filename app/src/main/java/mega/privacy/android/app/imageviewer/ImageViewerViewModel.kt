@@ -22,6 +22,7 @@ import mega.privacy.android.app.imageviewer.data.ImageResult
 import mega.privacy.android.app.imageviewer.usecase.GetImageHandlesUseCase
 import mega.privacy.android.app.imageviewer.usecase.GetImageUseCase
 import mega.privacy.android.app.usecase.CancelTransferUseCase
+import mega.privacy.android.app.usecase.MegaException
 import mega.privacy.android.app.usecase.GetGlobalChangesUseCase
 import mega.privacy.android.app.usecase.GetGlobalChangesUseCase.Result
 import mega.privacy.android.app.usecase.GetNodeUseCase
@@ -190,6 +191,9 @@ class ImageViewerViewModel @Inject constructor(
                 },
                 onError = { error ->
                     logError(error.stackTraceToString())
+                    if (error is MegaException && nodeHandle == getCurrentImageItem()?.handle) {
+                        snackbarMessage.value = error.getTranslatedErrorString()
+                    }
                 }
             )
             .addTo(composite)
@@ -238,6 +242,9 @@ class ImageViewerViewModel @Inject constructor(
                 },
                 onError = { error ->
                     logError(error.stackTraceToString())
+                    if (error is MegaException && nodeHandle == getCurrentImageItem()?.handle) {
+                        snackbarMessage.value = error.getTranslatedErrorString()
+                    }
                 }
             )
             .addTo(composite)
