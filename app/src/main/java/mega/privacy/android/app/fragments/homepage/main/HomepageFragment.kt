@@ -1,21 +1,21 @@
 package mega.privacy.android.app.fragments.homepage.main
 
-import android.animation.Animator
-import android.animation.AnimatorListenerAdapter
-import android.animation.AnimatorSet
-import android.animation.ObjectAnimator
+import android.animation.*
 import android.annotation.SuppressLint
 import android.content.*
 import android.graphics.Color
 import android.os.Bundle
 import android.view.*
 import android.view.View.OnClickListener
+import android.view.animation.Animation
+import android.widget.ImageView
 import androidx.appcompat.app.AlertDialog
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
 import androidx.viewpager2.widget.ViewPager2
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
@@ -31,6 +31,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.R
 import mega.privacy.android.app.components.search.FloatingSearchView
 import mega.privacy.android.app.constants.BroadcastConstants.ACTION_TYPE
+import mega.privacy.android.app.constants.EventConstants
 import mega.privacy.android.app.databinding.FabMaskLayoutBinding
 import mega.privacy.android.app.databinding.FragmentHomepageBinding
 import mega.privacy.android.app.fragments.homepage.banner.BannerAdapter
@@ -39,20 +40,24 @@ import mega.privacy.android.app.fragments.settingsFragments.startSceen.util.Star
 import mega.privacy.android.app.fragments.settingsFragments.startSceen.util.StartScreenUtil.shouldShowStartScreenDialog
 import mega.privacy.android.app.lollipop.AddContactActivity
 import mega.privacy.android.app.lollipop.ManagerActivity
+import mega.privacy.android.app.myAccount.usecase.GetUserDataUseCase
+import mega.privacy.android.app.usecase.call.GetCallUseCase
+import mega.privacy.android.app.utils.*
 import mega.privacy.android.app.utils.AlertDialogUtil.isAlertDialogShown
-import mega.privacy.android.app.utils.ColorUtils
+import mega.privacy.android.app.utils.CallUtil.callStatusToString
 import mega.privacy.android.app.utils.ColorUtils.getThemeColor
 import mega.privacy.android.app.utils.Constants.*
+import mega.privacy.android.app.utils.LogUtil.logDebug
 import mega.privacy.android.app.utils.RunOnUIThreadUtils.post
 import mega.privacy.android.app.utils.RunOnUIThreadUtils.runDelay
-import mega.privacy.android.app.utils.StringResourcesUtils
-import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.Util.isOnline
 import mega.privacy.android.app.utils.ViewUtils.waitForLayout
-import mega.privacy.android.app.utils.callManager
 import nz.mega.sdk.MegaBanner
 import nz.mega.sdk.MegaChatApi
+import nz.mega.sdk.MegaChatApiJava
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
+import nz.mega.sdk.MegaChatCall
+import javax.inject.Inject
 
 
 @AndroidEntryPoint
@@ -72,7 +77,15 @@ class HomepageFragment : Fragment() {
         private const val BOTTOM_SHEET_CORNER_SIZE = 8f  // 8dp
         private const val KEY_IS_BOTTOM_SHEET_EXPANDED = "isBottomSheetExpanded"
         private const val START_SCREEN_DIALOG_SHOWN = "START_SCREEN_DIALOG_SHOWN"
+        private const val ANIMATION_SCALE_X = 1.4f
+        private const val ANIMATION_SCALE_Y = 1.4f
+        private const val ANIMATION_ALPHA = 0F
+        private const val DURATION = 1300
+
     }
+
+    @Inject
+    lateinit var getCallUseCase: GetCallUseCase
 
     private val viewModel: HomePageViewModel by viewModels()
 
@@ -116,7 +129,8 @@ class HomepageFragment : Fragment() {
     }
 
     var isFabExpanded = false
-
+    var scaleDown: ObjectAnimator? = null
+    lateinit var ongoingIcon :ImageView
     /** The broadcast receiver for network connectivity.
      *  Switch the UI appearance between offline and online status
      */
@@ -151,6 +165,7 @@ class HomepageFragment : Fragment() {
             }
         }
     }
+
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -189,6 +204,7 @@ class HomepageFragment : Fragment() {
         setupBottomSheetUI()
         setupBottomSheetBehavior()
         setupFabs()
+        setupCallItem()
 
         (activity as? ManagerActivity)?.adjustTransferWidgetPositionInHomepage()
 
@@ -228,7 +244,36 @@ class HomepageFragment : Fragment() {
         LiveEventBus.get(EVENT_HOMEPAGE_VISIBILITY, Boolean::class.java)
             .removeObserver(homepageVisibilityChangeObserver)
 
+        hideCallItem()
         startScreenDialog?.dismiss()
+    }
+
+    private fun setupCallItem() {
+        ongoingIcon = viewDataBinding.searchView.findViewById(R.id.ongoing_call_radar)
+
+        scaleDown = ObjectAnimator.ofPropertyValuesHolder(
+            ongoingIcon,
+            PropertyValuesHolder.ofFloat("scaleX", ANIMATION_SCALE_X),
+            PropertyValuesHolder.ofFloat("scaleY", ANIMATION_SCALE_Y),
+            PropertyValuesHolder.ofFloat("alpha", ANIMATION_ALPHA)
+        )
+
+        scaleDown?.duration = DURATION.toLong()
+        scaleDown?.repeatCount = ObjectAnimator.INFINITE
+        scaleDown?.repeatMode = ObjectAnimator.RESTART
+    }
+
+    private fun showCallItem() {
+        scaleDown?.start()
+        ongoingIcon.isVisible = true
+    }
+
+    private fun hideCallItem() {
+        scaleDown?.removeAllListeners();
+        scaleDown?.end()
+        scaleDown?.cancel()
+        ongoingIcon.isVisible = false
+
     }
 
     /**
@@ -347,6 +392,17 @@ class HomepageFragment : Fragment() {
 
         searchInputView.setOnSearchInputClickListener {
             doIfOnline(false) { activity.homepageToSearch() }
+        }
+
+        viewModel.callStatus.observe(viewLifecycleOwner) {
+            when (it) {
+                MegaChatCall.CALL_STATUS_USER_NO_PRESENT, MegaChatCall.CALL_STATUS_DESTROYED -> {
+                    hideCallItem()
+                }
+                MegaChatCall.CALL_STATUS_CONNECTING, MegaChatCall.CALL_STATUS_JOINING, MegaChatCall.CALL_STATUS_IN_PROGRESS -> {
+                    showCallItem()
+                }
+            }
         }
     }
 

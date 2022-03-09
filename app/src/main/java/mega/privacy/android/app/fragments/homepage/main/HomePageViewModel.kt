@@ -9,12 +9,10 @@ import com.jeremyliao.liveeventbus.LiveEventBus
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.MegaApplication
+import mega.privacy.android.app.constants.EventConstants.EVENT_CALL_STATUS_CHANGE
 import mega.privacy.android.app.listeners.BaseListener
 import mega.privacy.android.app.utils.Constants.*
-import nz.mega.sdk.MegaApiJava
-import nz.mega.sdk.MegaBanner
-import nz.mega.sdk.MegaError
-import nz.mega.sdk.MegaRequest
+import nz.mega.sdk.*
 import javax.inject.Inject
 
 @HiltViewModel
@@ -25,12 +23,16 @@ class HomePageViewModel @Inject constructor(
     private val _notificationCount = MutableLiveData<Int>()
     private val _avatar = MutableLiveData<Bitmap>()
     private val _chatStatus = MutableLiveData<Int>()
+    private val _callStatus = MutableLiveData<Int>()
+
     private val _bannerList: MutableLiveData<MutableList<MegaBanner>?> =
         repository.getBannerListLiveData()
 
     val notificationCount: LiveData<Int> = _notificationCount
     val avatar: LiveData<Bitmap> = _avatar
     val chatStatus: LiveData<Int> = _chatStatus
+    val callStatus: LiveData<Int> = _callStatus
+
     val bannerList: LiveData<MutableList<MegaBanner>?> = _bannerList
 
     private val avatarChangeObserver = androidx.lifecycle.Observer<Boolean> {
@@ -45,6 +47,10 @@ class HomePageViewModel @Inject constructor(
         _chatStatus.value = it
     }
 
+    private val callStatusObserver = androidx.lifecycle.Observer<MegaChatCall> {
+        _callStatus.value = it.status
+    }
+
     init {
         LiveEventBus.get(EVENT_AVATAR_CHANGE, Boolean::class.java)
             .observeForever(avatarChangeObserver)
@@ -52,6 +58,8 @@ class HomePageViewModel @Inject constructor(
             .observeForever(notificationCountObserver)
         LiveEventBus.get(EVENT_CHAT_STATUS_CHANGE, Int::class.java)
             .observeForever(chatOnlineStatusObserver)
+        LiveEventBus.get(EVENT_CALL_STATUS_CHANGE, MegaChatCall::class.java)
+            .observeForever(callStatusObserver)
 
         // Show the default avatar (the Alphabet avatar) above all, then load the actual avatar
         showDefaultAvatar().invokeOnCompletion {
@@ -68,6 +76,8 @@ class HomePageViewModel @Inject constructor(
             .removeObserver(notificationCountObserver)
         LiveEventBus.get(EVENT_CHAT_STATUS_CHANGE, Int::class.java)
             .removeObserver(chatOnlineStatusObserver)
+        LiveEventBus.get(EVENT_CALL_STATUS_CHANGE, MegaChatCall::class.java)
+            .removeObserver(callStatusObserver)
     }
 
     private fun showDefaultAvatar() = viewModelScope.launch {
