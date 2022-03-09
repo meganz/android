@@ -1426,6 +1426,12 @@ public class BaseActivity extends AppCompatActivity implements ActivityLauncher,
     }
 
     @Override
+    public void onBillingClientSetupFailed() {
+        logWarning("Billing not available: Show pricing");
+        updatePricing(this);
+    }
+
+    @Override
     public void onPurchasesUpdated(boolean isFailed, int resultCode, List<MegaPurchase> purchases) {
         if (isFailed) {
             logWarning("Update purchase failed, with result code: " + resultCode);
