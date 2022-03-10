@@ -26,7 +26,7 @@ import mega.privacy.android.app.components.CustomizedGridLayoutManager
 import mega.privacy.android.app.components.PositionDividerItemDecoration
 import mega.privacy.android.app.constants.EventConstants.EVENT_SCANNING_TRANSFERS_CANCELLED
 import mega.privacy.android.app.databinding.ActivityUploadFolderBinding
-import mega.privacy.android.app.domain.entity.NameCollision
+import mega.privacy.android.app.namecollision.data.NameCollision
 import mega.privacy.android.app.fragments.homepage.EventObserver
 import mega.privacy.android.app.fragments.homepage.SortByHeaderViewModel
 import mega.privacy.android.app.interfaces.Scrollable

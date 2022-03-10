@@ -24,7 +24,7 @@ import mega.privacy.android.app.arch.BaseRxViewModel
 import mega.privacy.android.app.components.saver.NodeSaver
 import mega.privacy.android.app.di.MegaApi
 import mega.privacy.android.app.di.MegaApiFolder
-import mega.privacy.android.app.domain.entity.NameCollision
+import mega.privacy.android.app.namecollision.data.NameCollision
 import mega.privacy.android.app.interfaces.ActivityLauncher
 import mega.privacy.android.app.interfaces.SnackbarShower
 import mega.privacy.android.app.listeners.ExportListener

@@ -9,14 +9,17 @@ import androidx.activity.viewModels
 import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.RecyclerView
+import mega.privacy.android.app.MimeTypeList
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.PasscodeActivity
 import mega.privacy.android.app.constants.BroadcastConstants.ACTION_UPDATE_FILE_VERSIONS
 import mega.privacy.android.app.databinding.ActivityNameCollisionBinding
-import mega.privacy.android.app.domain.entity.NameCollision
+import mega.privacy.android.app.namecollision.data.NameCollision
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_COLLISION_RESULTS
 import mega.privacy.android.app.utils.StringResourcesUtils
+import mega.privacy.android.app.utils.TimeUtils.formatLongDateTime
 import mega.privacy.android.app.utils.Util
+import mega.privacy.android.app.utils.Util.getSizeString
 
 /**
  * Activity for showing name collisions and resolving them as per user's choices.
@@ -132,6 +135,16 @@ class NameCollisionActivity : PasscodeActivity() {
             else R.string.choose_folder
         )
 
+        binding.replaceUpdateMergeView.apply {
+            thumbnail.setActualImageResource(
+                if (isFile) MimeTypeList.typeForName(name).iconResourceId
+                else R.drawable.ic_folder_list
+            )
+            this.name.text = name
+            size.text = getSizeString(collision.size)
+            date.text = formatLongDateTime(collision.lastModified)
+        }
+
         binding.cancelInfo.text = StringResourcesUtils.getString(
             if (isFile) R.string.skip_file
             else R.string.skip_folder
@@ -161,15 +174,21 @@ class NameCollisionActivity : PasscodeActivity() {
 
         binding.cancelButton.text = StringResourcesUtils.getString(cancelButtonId)
 
-        if (isFile) {
-            binding.renameInfo.text = StringResourcesUtils.getString(renameInfoId)
-            binding.renameButton.text = StringResourcesUtils.getString(renameButtonId)
-        }
-
         binding.cancelSeparator.isVisible = !isFile
         binding.renameInfo.isVisible = !isFile
         binding.renameView.optionView.isVisible = !isFile
         binding.renameButton.isVisible = !isFile
+
+        if (isFile) {
+            binding.renameInfo.text = StringResourcesUtils.getString(renameInfoId)
+            binding.renameView.apply {
+                thumbnail.setActualImageResource(MimeTypeList.typeForName(name).iconResourceId)
+                this.name.text = name
+                size.isVisible = false
+                date.isVisible = false
+            }
+            binding.renameButton.text = StringResourcesUtils.getString(renameButtonId)
+        }
 
         binding.applyForAllCheck.isVisible = viewModel.getPendingCollisions() > 1
     }

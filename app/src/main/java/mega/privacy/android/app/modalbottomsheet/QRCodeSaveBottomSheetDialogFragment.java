@@ -15,7 +15,7 @@ import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.ShareInfo;
 import mega.privacy.android.app.UploadService;
-import mega.privacy.android.app.domain.entity.NameCollision;
+import mega.privacy.android.app.namecollision.data.NameCollision;
 import mega.privacy.android.app.namecollision.NameCollisionActivity;
 import mega.privacy.android.app.namecollision.usecase.CheckNameCollisionUseCase;
 import mega.privacy.android.app.usecase.exception.MegaNodeException;

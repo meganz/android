@@ -4,7 +4,7 @@ import io.reactivex.rxjava3.core.Single
 import io.reactivex.rxjava3.kotlin.blockingSubscribeBy
 import mega.privacy.android.app.ShareInfo
 import mega.privacy.android.app.di.MegaApi
-import mega.privacy.android.app.domain.entity.NameCollision
+import mega.privacy.android.app.namecollision.data.NameCollision
 import mega.privacy.android.app.domain.exception.EmptyFolderException
 import mega.privacy.android.app.uploadFolder.list.data.UploadFolderResult
 import mega.privacy.android.app.usecase.exception.MegaNodeException
@@ -15,7 +15,7 @@ import java.util.ArrayList
 import javax.inject.Inject
 
 /**
- * Use case for checking name collisions before uploading.
+ * Use case for checking name collisions before uploading, copying or moving.
  */
 class CheckNameCollisionUseCase @Inject constructor(
     @MegaApi private val megaApi: MegaApiAndroid

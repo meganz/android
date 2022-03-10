@@ -8,7 +8,7 @@ import io.reactivex.rxjava3.kotlin.subscribeBy
 import io.reactivex.rxjava3.schedulers.Schedulers
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.arch.BaseRxViewModel
-import mega.privacy.android.app.domain.entity.NameCollision
+import mega.privacy.android.app.namecollision.data.NameCollision
 import mega.privacy.android.app.myAccount.usecase.GetFileVersionsOptionUseCase
 import mega.privacy.android.app.utils.Constants.INVALID_VALUE
 import mega.privacy.android.app.utils.LogUtil

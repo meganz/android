@@ -47,7 +47,7 @@ import mega.privacy.android.app.ShareInfo;
 import mega.privacy.android.app.UploadService;
 import mega.privacy.android.app.activities.PasscodeActivity;
 import mega.privacy.android.app.components.saver.NodeSaver;
-import mega.privacy.android.app.domain.entity.NameCollision;
+import mega.privacy.android.app.namecollision.data.NameCollision;
 import mega.privacy.android.app.generalusecase.FilePrepareUseCase;
 import mega.privacy.android.app.interfaces.SnackbarShower;
 import mega.privacy.android.app.interfaces.ActionNodeCallback;

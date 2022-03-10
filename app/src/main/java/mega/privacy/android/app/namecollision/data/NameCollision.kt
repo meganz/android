@@ -1,5 +1,6 @@
-package mega.privacy.android.app.domain.entity
+package mega.privacy.android.app.namecollision.data
 
+import android.net.Uri
 import mega.privacy.android.app.ShareInfo
 import mega.privacy.android.app.uploadFolder.list.data.UploadFolderResult
 import nz.mega.sdk.MegaNode
@@ -7,14 +8,14 @@ import java.io.File
 import java.io.Serializable
 
 /**
- * Data class containing all the required to present a name collision for an upload, copy or movement.
+ * Data class containing all the required to create a [NameCollisionResult].
  *
- * @property collisionHandle    The node handle with which there is a name collision.
- * @property name               The name of the item to upload, copy or move.
- * @property size               The size of the item to upload, copy or move.
- * @property lastModified       The last modified date of the item to upload, copy or move.
- * @property parentHandle       The parent handle of the node in which the item has to be uploaded, copied or moved.
- * @property isFile             True if the item is a file, false if is a folder.
+ * @property collisionHandle        The node handle with which there is a name collision.
+ * @property name                   The name of the item to upload, copy or move.
+ * @property size                   The size of the item to upload, copy or move.
+ * @property lastModified           The last modified date of the item to upload, copy or move.
+ * @property parentHandle           The parent handle of the node in which the item has to be uploaded, copied or moved.
+ * @property isFile                 True if the item is a file, false if is a folder.
  */
 sealed class NameCollision : Serializable {
     abstract val collisionHandle: Long
@@ -47,10 +48,10 @@ sealed class NameCollision : Serializable {
         companion object {
 
             /**
-             * Gets a NameCollision.Upload from a File.
+             * Gets a [NameCollision.Upload] from a [File].
              *
              * @param collisionHandle   The node handle with which there is a name collision.
-             * @param file              The file from which the NameCollision.Upload will be get.
+             * @param file              The file from which the [NameCollision.Upload] will be get.
              * @param parentHandle      The parent handle of the node in which the file has to be uploaded.
              */
             @JvmStatic
@@ -65,10 +66,10 @@ sealed class NameCollision : Serializable {
                 )
 
             /**
-             * Gets a NameCollision.Upload from a ShareInfo.
+             * Gets a [NameCollision.Upload] from a [ShareInfo].
              *
              * @param collisionHandle   The node handle with which there is a name collision.
-             * @param shareInfo         The file from which the NameCollision.Upload will be get.
+             * @param shareInfo         The file from which the [NameCollision.Upload] will be get.
              * @param parentHandle      The parent handle of the node in which the file has to be uploaded.
              */
             @JvmStatic
@@ -86,10 +87,10 @@ sealed class NameCollision : Serializable {
             )
 
             /**
-             * Gets a NameCollision.Upload from an UploadFolderResult.
+             * Gets a [NameCollision.Upload] from an [UploadFolderResult].
              *
              * @param collisionHandle       The node handle with which there is a name collision.
-             * @param uploadFolderResult    The file from which the NameCollision.Upload will be get.
+             * @param uploadFolderResult    The file from which the [NameCollision.Upload] will be get.
              */
             @JvmStatic
             fun getUploadCollision(
@@ -107,7 +108,7 @@ sealed class NameCollision : Serializable {
     }
 
     /**
-     * Data class containing all the required to present a NameCollision.Copy.
+     * Data class containing all the required to present a copy name collision.
      *
      * @property collisionHandle    The node handle with which there is a name collision.
      * @property nodeHandle         The node handle of the node to copy.
@@ -129,10 +130,10 @@ sealed class NameCollision : Serializable {
         companion object {
 
             /**
-             * Gets a NameCollision.Copy from a MegaNode.
+             * Gets a [NameCollision.Copy] from a [MegaNode].
              *
              * @param collisionHandle   The node handle with which there is a name collision.
-             * @param node              The node from which the NameCollision.Copy will be get.
+             * @param node              The node from which the [NameCollision.Copy] will be get.
              * @param parentHandle      The parent handle of the node in which the file has to be copied.
              */
             @JvmStatic
@@ -150,7 +151,7 @@ sealed class NameCollision : Serializable {
     }
 
     /**
-     * Data class containing all the required to present a NameCollision.Movement.
+     * Data class containing all the required to present a movement name collision.
      *
      * @property collisionHandle    The node handle with which there is a name collision.
      * @property nodeHandle         The node handle of the node to move.
@@ -172,10 +173,10 @@ sealed class NameCollision : Serializable {
         companion object {
 
             /**
-             * Gets a NameCollision.Movement from a MegaNode.
+             * Gets a [NameCollision.Movement] from a [MegaNode].
              *
              * @param collisionHandle   The node handle with which there is a name collision.
-             * @param node              The node from which the NameCollision.Movement will be get.
+             * @param node              The node from which the [NameCollision.Movement] will be get.
              * @param parentHandle      The parent handle of the node in which the file has to be moved.
              */
             @JvmStatic

@@ -301,7 +301,7 @@ import mega.privacy.android.app.OpenPasswordLinkActivity;
 import mega.privacy.android.app.Product;
 import mega.privacy.android.app.R;
 
-import mega.privacy.android.app.domain.entity.NameCollision;
+import mega.privacy.android.app.namecollision.data.NameCollision;
 import mega.privacy.android.app.fragments.managerFragments.cu.PhotosFragment;
 import mega.privacy.android.app.gallery.ui.MediaDiscoveryFragment;
 import mega.privacy.android.app.namecollision.NameCollisionActivity;

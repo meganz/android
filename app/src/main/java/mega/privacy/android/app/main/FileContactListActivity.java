@@ -48,7 +48,7 @@ import mega.privacy.android.app.ShareInfo;
 import mega.privacy.android.app.UploadService;
 import mega.privacy.android.app.activities.PasscodeActivity;
 import mega.privacy.android.app.components.SimpleDividerItemDecoration;
-import mega.privacy.android.app.domain.entity.NameCollision;
+import mega.privacy.android.app.namecollision.data.NameCollision;
 import mega.privacy.android.app.listeners.ShareListener;
 import mega.privacy.android.app.main.adapters.MegaSharedFolderAdapter;
 import mega.privacy.android.app.main.controllers.ContactController;
