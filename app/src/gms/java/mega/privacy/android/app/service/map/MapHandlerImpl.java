@@ -37,13 +37,13 @@ import java.io.ByteArrayOutputStream;
 import java.util.List;
 
 import mega.privacy.android.app.R;
-import mega.privacy.android.app.lollipop.megachat.MapAddress;
-import mega.privacy.android.app.lollipop.megachat.MapsActivity;
+import mega.privacy.android.app.main.megachat.MapAddress;
+import mega.privacy.android.app.main.megachat.MapsActivity;
 import mega.privacy.android.app.middlelayer.map.AbstractMapHandler;
 import mega.privacy.android.app.middlelayer.map.MegaLatLng;
 
-import static mega.privacy.android.app.lollipop.megachat.MapsActivity.REQUEST_INTERVAL;
-import static mega.privacy.android.app.lollipop.megachat.MapsActivity.getAddresses;
+import static mega.privacy.android.app.main.megachat.MapsActivity.REQUEST_INTERVAL;
+import static mega.privacy.android.app.main.megachat.MapsActivity.getAddresses;
 import static mega.privacy.android.app.utils.LogUtil.*;
 
 @SuppressLint("MissingPermission")

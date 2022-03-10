@@ -19,7 +19,7 @@ import mega.privacy.android.app.constants.IntentConstants.Companion.EXTRA_ACCOUN
 import mega.privacy.android.app.constants.IntentConstants.Companion.EXTRA_ASK_PERMISSIONS
 import mega.privacy.android.app.constants.IntentConstants.Companion.EXTRA_UPGRADE_ACCOUNT
 import mega.privacy.android.app.globalmanagement.MyAccountInfo
-import mega.privacy.android.app.lollipop.ManagerActivity
+import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.myAccount.usecase.GetUserDataUseCase
 
 import mega.privacy.android.app.utils.ColorUtils

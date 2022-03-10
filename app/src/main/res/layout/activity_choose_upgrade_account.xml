@@ -1,4 +1,6 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/upgrade_account_container"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
@@ -8,11 +10,43 @@
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize" />
 
+    <RelativeLayout
+        android:id="@+id/billing_warning_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/yellow_100_yellow_700_alpha_015"
+        android:layout_below="@+id/toolbar"
+        android:visibility="gone">
+
+        <TextView
+            android:id="@+id/billing_warning_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentStart="true"
+            android:layout_centerVertical="true"
+            android:layout_margin="16dp"
+            android:layout_toStartOf="@+id/billing_warning_close"
+            android:text="@string/upgrade_billing_warning"
+            android:textAppearance="@style/TextAppearance.Mega.Caption.13sp.Grey87Yellow700" />
+
+        <ImageButton
+            android:id="@+id/billing_warning_close"
+            style="@style/Widget.Mega.Button.Transparent"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_marginTop="1dp"
+            android:src="@drawable/ic_remove_warning"
+            app:tint="@color/grey_alpha_087_yellow_700"
+            tools:ignore="ContentDescription" />
+
+    </RelativeLayout>
+
     <ScrollView
         android:id="@+id/scroll_view"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/toolbar">
+        android:layout_below="@+id/billing_warning_layout">
 
         <LinearLayout
             android:id="@+id/linear_layout_upgrade"

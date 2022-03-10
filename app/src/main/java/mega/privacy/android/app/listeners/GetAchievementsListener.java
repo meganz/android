@@ -5,7 +5,7 @@ import java.util.Calendar;
 import java.util.Date;
 
 import mega.privacy.android.app.MegaApplication;
-import mega.privacy.android.app.lollipop.megaachievements.ReferralBonus;
+import mega.privacy.android.app.main.megaachievements.ReferralBonus;
 import nz.mega.sdk.MegaAchievementsDetails;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaError;

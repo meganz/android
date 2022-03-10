@@ -3,13 +3,40 @@ package mega.privacy.android.app.domain.repository
 import kotlinx.coroutines.flow.Flow
 import mega.privacy.android.app.MegaAttributes
 import mega.privacy.android.app.MegaPreferences
-import nz.mega.sdk.MegaRequestListenerInterface
 
 /**
- * Settings repository - Data class for handling all calls relating to settings
+ * Settings repository - class for handling all calls relating to settings
  *
  */
-interface SettingsRepository {
+interface SettingsRepository{
+    /**
+     * Is sdk logging enabled
+     *
+     * @return flow that emits true if enabled else false
+     */
+    fun isSdkLoggingEnabled(): Flow<Boolean>
+
+    /**
+     * Set sdk logging enabled
+     *
+     * @param enabled
+     */
+    suspend fun setSdkLoggingEnabled(enabled: Boolean)
+
+    /**
+     * Is chat logging enabled
+     *
+     * @return flow that emits true if enabled else false
+     */
+    fun isChatLoggingEnabled(): Flow<Boolean>
+
+    /**
+     * Set chat logging enabled
+     *
+     * @param enabled
+     */
+    suspend fun setChatLoggingEnabled(enabled: Boolean)
+
     /**
      * Get attributes
      *
@@ -55,34 +82,6 @@ interface SettingsRepository {
      * @return true if option is enabled, else false
      */
     fun shouldHideRecentActivity(): Boolean
-
-    /**
-     * Is chat logging enabled
-     *
-     * @return true if option is enabled, else false
-     */
-    fun isChatLoggingEnabled(): Boolean
-
-    /**
-     * Set chat logging enabled/disabled
-     *
-     * @param enabled
-     */
-    fun setChatLoggingEnabled(enabled: Boolean)
-
-    /**
-     * Is logging enabled
-     *
-     * @return true if option is enabled, else false
-     */
-    fun isLoggingEnabled(): Boolean
-
-    /**
-     * Set logging enabled/disabled
-     *
-     * @param enabled
-     */
-    fun setLoggingEnabled(enabled: Boolean)
 
     /**
      * Set auto accept qr requests

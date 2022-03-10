@@ -6,7 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.core.view.isVisible
 import mega.privacy.android.app.databinding.BottomSheetPhotoBinding
-import mega.privacy.android.app.lollipop.controllers.AccountController
+import mega.privacy.android.app.main.controllers.AccountController
 
 class PhotoBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
 

@@ -1,0 +1,56 @@
+<configuration>
+
+    <property name="LOG_DIR" value="/storage/emulated/0/Android/data/mega.privacy.android.app/files/MEGA Logs" />
+
+
+    <!--    SDK Rolling File appender -->
+    <appender name="ROLLING" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <!-- active log file -->
+        <file>${LOG_DIR}/log.txt</file>
+        <encoder>
+            <pattern>%msg%n</pattern>
+        </encoder>
+
+        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+            <!-- daily rollover period -->
+            <fileNamePattern>${LOG_DIR}/log.%d.%i..zip</fileNamePattern>
+            <maxFileSize>10MB</maxFileSize>
+            <maxHistory>20</maxHistory>
+        </rollingPolicy>
+    </appender>
+
+    <!--    Chat Rolling File appender -->
+    <appender name="ROLLING_CHAT" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <!-- active log file -->
+        <file>${LOG_DIR}/logKarere.txt</file>
+        <encoder>
+            <pattern>%msg%n</pattern>
+        </encoder>
+
+        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+            <!-- daily rollover period -->
+            <fileNamePattern>${LOG_DIR}/logKarere.%d.%i..zip</fileNamePattern>
+            <maxFileSize>10MB</maxFileSize>
+            <maxHistory>20</maxHistory>
+        </rollingPolicy>
+    </appender>
+
+    <!--    logcat appender -->
+    <appender name="LOGCAT" class="ch.qos.logback.classic.android.LogcatAppender">
+        <encoder>
+            <pattern>%msg</pattern>
+        </encoder>
+    </appender>
+
+    <logger name="mega.privacy.android.app.logging.loggers.TimberMegaLogger" >
+        <appender-ref ref="ROLLING" />
+    </logger>
+
+    <logger name="mega.privacy.android.app.logging.loggers.ChatFileLogger" >
+        <appender-ref ref="ROLLING_CHAT" />
+    </logger>
+
+    <root level="DEBUG">
+        <appender-ref ref="LOGCAT" />
+    </root>
+</configuration>

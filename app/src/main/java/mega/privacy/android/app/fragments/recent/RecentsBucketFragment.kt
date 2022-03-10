@@ -21,9 +21,9 @@ import mega.privacy.android.app.components.dragger.DragToExitSupport.Companion.p
 import mega.privacy.android.app.databinding.FragmentRecentBucketBinding
 import mega.privacy.android.app.fragments.BaseFragment
 import mega.privacy.android.app.imageviewer.ImageViewerActivity
-import mega.privacy.android.app.lollipop.ManagerActivity
-import mega.privacy.android.app.lollipop.PdfViewerActivity
-import mega.privacy.android.app.lollipop.adapters.MultipleBucketAdapter
+import mega.privacy.android.app.main.ManagerActivity
+import mega.privacy.android.app.main.PdfViewerActivity
+import mega.privacy.android.app.main.adapters.MultipleBucketAdapter
 import mega.privacy.android.app.utils.*
 import mega.privacy.android.app.utils.Constants.*
 import mega.privacy.android.app.utils.LogUtil.logDebug

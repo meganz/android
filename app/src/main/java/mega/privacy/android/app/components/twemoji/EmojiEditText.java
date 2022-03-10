@@ -19,8 +19,8 @@ import androidx.core.view.inputmethod.InputConnectionCompat;
 
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.twemoji.emoji.Emoji;
-import mega.privacy.android.app.lollipop.AddContactActivity;
-import mega.privacy.android.app.lollipop.megachat.GroupChatInfoActivity;
+import mega.privacy.android.app.main.AddContactActivity;
+import mega.privacy.android.app.main.megachat.GroupChatInfoActivity;
 
 import static mega.privacy.android.app.utils.ChatUtil.getMaxAllowed;
 

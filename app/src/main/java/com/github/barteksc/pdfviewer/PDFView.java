@@ -79,8 +79,9 @@ import java.util.Collections;
 import java.util.List;
 
 import mega.privacy.android.app.R;
-import mega.privacy.android.app.lollipop.PdfViewerActivity;
+import mega.privacy.android.app.main.PdfViewerActivity;
 
+import static mega.privacy.android.app.utils.AlertDialogUtil.isAlertDialogShown;
 import static mega.privacy.android.app.utils.LogUtil.logError;
 import static mega.privacy.android.app.utils.Util.*;
 
@@ -716,6 +717,10 @@ public class PDFView extends RelativeLayout {
             return;
         }
 
+        if (isAlertDialogShown(pdfViewer.getTakenDownDialog())) {
+            return;
+        }
+
         AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
         builder.setCancelable(false);
 
@@ -802,7 +807,7 @@ public class PDFView extends RelativeLayout {
             onErrorListener.onError(t);
         } else {
             showErrorDialog(t);
-            Log.e("PDFView", "load pdf error", t);
+            logError("Load pdf error", t);
         }
     }
 

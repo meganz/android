@@ -25,7 +25,7 @@ import java.util.List;
 import java.util.Set;
 
 import mega.privacy.android.app.R;
-import mega.privacy.android.app.lollipop.InvitationContactInfo;
+import mega.privacy.android.app.main.InvitationContactInfo;
 import mega.privacy.android.app.utils.TextUtil;
 
 import static mega.privacy.android.app.utils.StringResourcesUtils.getString;
