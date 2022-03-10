@@ -1,7 +1,9 @@
 package mega.privacy.android.app.namecollision
 
+import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
+import android.content.IntentFilter
 import android.os.Bundle
 import androidx.activity.viewModels
 import androidx.core.content.ContextCompat
@@ -9,6 +11,7 @@ import androidx.core.view.isVisible
 import androidx.recyclerview.widget.RecyclerView
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.PasscodeActivity
+import mega.privacy.android.app.constants.BroadcastConstants.ACTION_UPDATE_FILE_VERSIONS
 import mega.privacy.android.app.databinding.ActivityNameCollisionBinding
 import mega.privacy.android.app.domain.entity.NameCollision
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_COLLISION_RESULTS
@@ -51,6 +54,14 @@ class NameCollisionActivity : PasscodeActivity() {
     }
     private val noElevationColor by lazy { ContextCompat.getColor(this, R.color.dark_grey) }
 
+    private val updateFileVersionsReceiver: BroadcastReceiver = object : BroadcastReceiver() {
+        override fun onReceive(context: Context, intent: Intent) {
+            if (ACTION_UPDATE_FILE_VERSIONS != intent.action) return
+
+            viewModel.fileVersioningUpdated()
+        }
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityNameCollisionBinding.inflate(layoutInflater)
@@ -66,6 +77,11 @@ class NameCollisionActivity : PasscodeActivity() {
 
         setupView()
         setupObservers()
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        unregisterReceiver(updateFileVersionsReceiver)
     }
 
     private fun setupView() {
@@ -94,6 +110,12 @@ class NameCollisionActivity : PasscodeActivity() {
 
     private fun setupObservers() {
         viewModel.getCurrentCollision().observe(this, ::showCollision)
+        viewModel.getFileVersioningInfo().observe(this, ::updateFileVersioningData)
+
+        registerReceiver(
+            updateFileVersionsReceiver,
+            IntentFilter(ACTION_UPDATE_FILE_VERSIONS)
+        )
     }
 
     private fun showCollision(collision: NameCollision) {
@@ -119,18 +141,18 @@ class NameCollisionActivity : PasscodeActivity() {
         val renameInfoId: Int
         val renameButtonId: Int
 
-        when (collision.type) {
-            NameCollision.Type.UPLOAD -> {
+        when (collision) {
+            is NameCollision.Upload -> {
                 cancelButtonId = R.string.do_not_upload
                 renameInfoId = R.string.warning_upload_and_rename
                 renameButtonId = R.string.upload_and_rename
             }
-            NameCollision.Type.COPY -> {
+            is NameCollision.Copy -> {
                 cancelButtonId = R.string.do_not_copy
                 renameInfoId = R.string.warning_copy_and_rename
                 renameButtonId = R.string.copy_and_rename
             }
-            NameCollision.Type.MOVE -> {
+            is NameCollision.Movement -> {
                 cancelButtonId = R.string.do_not_move
                 renameInfoId = R.string.warning_move_and_rename
                 renameButtonId = R.string.move_and_rename
@@ -150,5 +172,51 @@ class NameCollisionActivity : PasscodeActivity() {
         binding.renameButton.isVisible = !isFile
 
         binding.applyForAllCheck.isVisible = viewModel.getPendingCollisions() > 1
+    }
+
+    private fun updateFileVersioningData(fileVersioningInfo: Triple<Boolean, NameCollisionViewModel.NameCollisionType, Boolean>) {
+        val isFileVersioningEnabled = fileVersioningInfo.first
+        val isFile = fileVersioningInfo.third
+
+        binding.learnMore.isVisible = isFileVersioningEnabled
+
+        val replaceUpdateMergeInfoId: Int
+        val replaceUpdateMergeButtonId: Int
+
+        when (fileVersioningInfo.second) {
+            NameCollisionViewModel.NameCollisionType.UPLOAD -> {
+                replaceUpdateMergeInfoId = when {
+                    !isFile -> R.string.warning_upload_and_merge
+                    isFileVersioningEnabled -> R.string.warning_versioning_upload_and_update
+                    else -> R.string.warning_upload_and_replace
+                }
+                replaceUpdateMergeButtonId = when {
+                    !isFile -> R.string.upload_and_merge
+                    isFileVersioningEnabled -> R.string.upload_and_update
+                    else -> R.string.upload_and_replace
+                }
+            }
+            NameCollisionViewModel.NameCollisionType.COPY -> {
+                replaceUpdateMergeInfoId =
+                    if (isFile) R.string.warning_copy_and_replace
+                    else R.string.warning_copy_and_merge
+                replaceUpdateMergeButtonId =
+                    if (isFile) R.string.copy_and_replace
+                    else R.string.copy_and_merge
+            }
+            NameCollisionViewModel.NameCollisionType.MOVEMENT -> {
+                replaceUpdateMergeInfoId =
+                    if (isFile) R.string.warning_move_and_replace
+                    else R.string.warning_move_and_merge
+                replaceUpdateMergeButtonId =
+                    if (isFile) R.string.move_and_replace
+                    else R.string.move_and_merge
+            }
+        }
+
+        binding.replaceUpdateMergeInfo.text =
+            StringResourcesUtils.getString(replaceUpdateMergeInfoId)
+        binding.replaceUpdateMergeButton.text =
+            StringResourcesUtils.getString(replaceUpdateMergeButtonId)
     }
 }

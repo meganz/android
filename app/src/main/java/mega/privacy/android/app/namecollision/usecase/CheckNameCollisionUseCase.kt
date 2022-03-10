@@ -100,11 +100,10 @@ class CheckNameCollisionUseCase @Inject constructor(
                     },
                     onSuccess = { handle ->
                         collisions.add(
-                            NameCollision(
+                            NameCollision.Upload.getUploadCollision(
                                 handle,
                                 shareInfo,
-                                parentNode.handle,
-                                NameCollision.Type.UPLOAD
+                                parentNode.handle
                             )
                         )
                     },
@@ -155,7 +154,10 @@ class CheckNameCollisionUseCase @Inject constructor(
                     },
                     onSuccess = { handle ->
                         collisions.add(
-                            NameCollision(handle, uploadResult, NameCollision.Type.UPLOAD)
+                            NameCollision.Upload.getUploadCollision(
+                                handle,
+                                uploadResult
+                            )
                         )
                     },
                 )

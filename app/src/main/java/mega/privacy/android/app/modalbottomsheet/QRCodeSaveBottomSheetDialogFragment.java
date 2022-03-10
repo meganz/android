@@ -91,8 +91,8 @@ public class QRCodeSaveBottomSheetDialogFragment extends BaseBottomSheetDialogFr
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(handle -> {
-                            NameCollision collision = new NameCollision(handle, qrFile,
-                                    parentNode.getParentHandle(), NameCollision.Type.UPLOAD);
+                            NameCollision collision = NameCollision.Upload
+                                    .getUploadCollision(handle, qrFile, parentNode.getParentHandle());
 
                             startActivity(NameCollisionActivity.getIntentForSingleItem(requireActivity(), collision));
                         },

@@ -8538,8 +8538,9 @@ public class ManagerActivity extends TransfersManagementActivity
                             .subscribeOn(Schedulers.io())
                             .observeOn(AndroidSchedulers.mainThread())
                             .subscribe(handle -> {
-                                        NameCollision collision = new NameCollision(handle, file,
-                                                parentHandle, NameCollision.Type.UPLOAD);
+                                        NameCollision collision = NameCollision.Upload
+                                                .getUploadCollision(handle, file, parentHandle);
+
                                         startActivity(NameCollisionActivity.getIntentForSingleItem(this, collision));
                                     },
                                     throwable -> {
@@ -9538,8 +9539,8 @@ public class ManagerActivity extends TransfersManagementActivity
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(handle -> {
-                            NameCollision collision = new NameCollision(handle, file,
-                                    parentNode.getParentHandle(), NameCollision.Type.UPLOAD);
+                            NameCollision collision = NameCollision.Upload
+                                    .getUploadCollision(handle, file, parentNode.getParentHandle());
 
                             startActivity(NameCollisionActivity.getIntentForSingleItem(this, collision));
                         },

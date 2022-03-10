@@ -447,16 +447,10 @@ class TextEditorViewModel @Inject constructor(
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeBy(
                 onSuccess = { handle ->
-                    val collision = NameCollision(
-                        handle,
-                        tempFile,
-                        parentHandle,
-                        NameCollision.Type.UPLOAD
-                    )
                     activity.startActivity(
                         NameCollisionActivity.getIntentForSingleItem(
                             activity,
-                            collision
+                            NameCollision.Upload.getUploadCollision(handle, tempFile, parentHandle)
                         )
                     )
                 },

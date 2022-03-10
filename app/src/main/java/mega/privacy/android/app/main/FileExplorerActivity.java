@@ -1969,8 +1969,8 @@ public class FileExplorerActivity extends TransfersManagementActivity
 				.subscribeOn(Schedulers.io())
 				.observeOn(AndroidSchedulers.mainThread())
 				.subscribe(handle -> {
-							NameCollision collision = new NameCollision(handle, file,
-									parentNode.getParentHandle(), NameCollision.Type.UPLOAD);
+							NameCollision collision = NameCollision.Upload
+									.getUploadCollision(handle, file, parentNode.getParentHandle());
 
 							startActivity(NameCollisionActivity.getIntentForSingleItem(this, collision));
 						},

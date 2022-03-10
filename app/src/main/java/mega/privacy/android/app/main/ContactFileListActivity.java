@@ -744,8 +744,9 @@ public class ContactFileListActivity extends PasscodeActivity
 							.subscribeOn(Schedulers.io())
 							.observeOn(AndroidSchedulers.mainThread())
 							.subscribe(handle -> {
-										NameCollision collision = new NameCollision(handle, file,
-												parentHandle, NameCollision.Type.UPLOAD);
+										NameCollision collision = NameCollision.Upload
+												.getUploadCollision(handle, file, parentHandle);
+
 										startActivity(NameCollisionActivity.getIntentForSingleItem(this, collision));
 									},
 									throwable -> {
