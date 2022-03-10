@@ -11,8 +11,8 @@ import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.constants.EventConstants.EVENT_MY_BACKUPS_FOLDER_CHANGED
 import mega.privacy.android.app.interfaces.ActionBackupListener
 import mega.privacy.android.app.interfaces.ActionBackupNodeCallback
-import mega.privacy.android.app.lollipop.FileContactListActivity
-import mega.privacy.android.app.lollipop.controllers.NodeController
+import mega.privacy.android.app.main.FileContactListActivity
+import mega.privacy.android.app.main.controllers.NodeController
 import mega.privacy.android.app.sync.fileBackups.FileBackupManager.BackupDialogState.BACKUP_DIALOG_SHOW_CONFIRM
 import mega.privacy.android.app.sync.fileBackups.FileBackupManager.BackupDialogState.BACKUP_DIALOG_SHOW_NONE
 import mega.privacy.android.app.sync.fileBackups.FileBackupManager.BackupDialogState.BACKUP_DIALOG_SHOW_WARNING

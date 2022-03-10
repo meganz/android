@@ -23,11 +23,11 @@ import mega.privacy.android.app.generalusecase.FilePrepareUseCase
 import mega.privacy.android.app.globalmanagement.MyAccountInfo
 import mega.privacy.android.app.interfaces.SnackbarShower
 import mega.privacy.android.app.interfaces.showSnackbar
-import mega.privacy.android.app.lollipop.LoginActivity
-import mega.privacy.android.app.lollipop.TestPasswordActivity
-import mega.privacy.android.app.lollipop.VerifyTwoFactorActivity
-import mega.privacy.android.app.lollipop.controllers.AccountController
-import mega.privacy.android.app.lollipop.qrcode.QRCodeActivity
+import mega.privacy.android.app.main.LoginActivity
+import mega.privacy.android.app.main.TestPasswordActivity
+import mega.privacy.android.app.main.VerifyTwoFactorActivity
+import mega.privacy.android.app.main.controllers.AccountController
+import mega.privacy.android.app.main.qrcode.QRCodeActivity
 import mega.privacy.android.app.myAccount.usecase.*
 import mega.privacy.android.app.smsVerification.usecase.ResetPhoneNumberUseCase
 import mega.privacy.android.app.utils.CacheFolderManager

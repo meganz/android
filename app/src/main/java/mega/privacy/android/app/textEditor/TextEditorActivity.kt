@@ -31,8 +31,8 @@ import mega.privacy.android.app.databinding.ActivityTextFileEditorBinding
 import mega.privacy.android.app.interfaces.Scrollable
 import mega.privacy.android.app.interfaces.ActionNodeCallback
 import mega.privacy.android.app.interfaces.SnackbarShower
-import mega.privacy.android.app.lollipop.FileExplorerActivity
-import mega.privacy.android.app.lollipop.controllers.ChatController
+import mega.privacy.android.app.main.FileExplorerActivity
+import mega.privacy.android.app.main.controllers.ChatController
 import mega.privacy.android.app.utils.AlertsAndWarnings.showSaveToDeviceConfirmDialog
 import mega.privacy.android.app.textEditor.TextEditorViewModel.Companion.VIEW_MODE
 import mega.privacy.android.app.utils.ChatUtil.removeAttachmentMessage

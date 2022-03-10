@@ -16,9 +16,9 @@ import io.reactivex.rxjava3.kotlin.subscribeBy
 import io.reactivex.rxjava3.schedulers.Schedulers
 import mega.privacy.android.app.*
 import mega.privacy.android.app.interfaces.*
-import mega.privacy.android.app.lollipop.FileStorageActivity
-import mega.privacy.android.app.lollipop.FileStorageActivity.*
-import mega.privacy.android.app.lollipop.FileStorageActivity.Mode.PICK_FOLDER
+import mega.privacy.android.app.main.FileStorageActivity
+import mega.privacy.android.app.main.FileStorageActivity.*
+import mega.privacy.android.app.main.FileStorageActivity.Mode.PICK_FOLDER
 import mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuotaPaywallWarning
 import mega.privacy.android.app.utils.CacheFolderManager.buildVoiceClipFile
 import mega.privacy.android.app.utils.Constants.*

@@ -9,7 +9,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import mega.privacy.android.app.R;
-import mega.privacy.android.app.lollipop.FolderLinkActivity;
+import mega.privacy.android.app.main.FolderLinkActivity;
 import nz.mega.sdk.MegaNode;
 
 import static mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil.setNodeThumbnail;

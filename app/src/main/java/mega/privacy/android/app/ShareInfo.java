@@ -27,8 +27,8 @@ import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.List;
 
-import mega.privacy.android.app.lollipop.FileExplorerActivity;
-import mega.privacy.android.app.lollipop.PdfViewerActivity;
+import mega.privacy.android.app.main.FileExplorerActivity;
+import mega.privacy.android.app.main.PdfViewerActivity;
 
 import static mega.privacy.android.app.utils.FileUtil.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
