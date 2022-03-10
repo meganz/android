@@ -220,6 +220,7 @@ public class LoginActivity extends BaseActivity implements MegaRequestListenerIn
                 switch (visibleFragment) {
                     case LOGIN_FRAGMENT: {
                         if (loginFragment != null && loginFragment.isAdded()) {
+//                            loginFragment.returnToLogin();
                             onBackPressed();
                         }
                         break;
@@ -375,13 +376,9 @@ public class LoginActivity extends BaseActivity implements MegaRequestListenerIn
             finish();
         } else {
             logDebug("Start the Camera Uploads service");
-            handler.postDelayed(new Runnable() {
-
-                @Override
-                public void run() {
-                    logDebug("Now I start the service");
-                    scheduleCameraUploadJob(LoginActivity.this);
-                }
+            handler.postDelayed(() -> {
+                logDebug("Now I start the service");
+                scheduleCameraUploadJob(LoginActivity.this, true);
             }, time);
         }
     }
