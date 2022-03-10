@@ -285,8 +285,8 @@ class FloatingSearchView(context: Context, attrs: AttributeSet?) : FrameLayout(c
     private fun initOngoingCallButtonAnimation() {
         scaleDown = ObjectAnimator.ofPropertyValuesHolder(
             binding.ongoingCallRadar,
-            PropertyValuesHolder.ofFloat("scaleX", ANIMATION_SCALE_X),
-            PropertyValuesHolder.ofFloat("scaleY", ANIMATION_SCALE_Y),
+            PropertyValuesHolder.ofFloat("scaleX", ANIMATION_SCALE),
+            PropertyValuesHolder.ofFloat("scaleY", ANIMATION_SCALE),
             PropertyValuesHolder.ofFloat("alpha", ANIMATION_ALPHA)
         )
 
@@ -522,8 +522,7 @@ class FloatingSearchView(context: Context, attrs: AttributeSet?) : FrameLayout(c
         private const val MENU_BUTTON_PROGRESS_HAMBURGER = 0.0f
         private const val MAX_NOTIFICATION_COUNT = 9
         private const val MAX_NOTIFICATION_COUNT_TEXT = "9+"
-        private const val ANIMATION_SCALE_X = 1.4f
-        private const val ANIMATION_SCALE_Y = 1.4f
+        private const val ANIMATION_SCALE = 1.4f
         private const val ANIMATION_ALPHA = 0F
         private const val ANIMATION_DURATION:Long = 1300
     }

@@ -29,7 +29,6 @@ class HomePageViewModel @Inject constructor(
     private val _notificationCount = MutableLiveData<Int>()
     private val _avatar = MutableLiveData<Bitmap>()
     private val _chatStatus = MutableLiveData<Int>()
-
     private val _bannerList: MutableLiveData<MutableList<MegaBanner>?> =
         repository.getBannerListLiveData()
 
@@ -37,7 +36,6 @@ class HomePageViewModel @Inject constructor(
     val avatar: LiveData<Bitmap> = _avatar
     val chatStatus: LiveData<Int> = _chatStatus
     val showCallIcon: MutableLiveData<Boolean> = MutableLiveData()
-
     val bannerList: LiveData<MutableList<MegaBanner>?> = _bannerList
 
     private val avatarChangeObserver = androidx.lifecycle.Observer<Boolean> {
@@ -73,7 +71,6 @@ class HomePageViewModel @Inject constructor(
             )
             .addTo(composite)
 
-
         // Show the default avatar (the Alphabet avatar) above all, then load the actual avatar
         showDefaultAvatar().invokeOnCompletion {
             loadAvatar(true)
@@ -89,7 +86,6 @@ class HomePageViewModel @Inject constructor(
             .removeObserver(notificationCountObserver)
         LiveEventBus.get(EVENT_CHAT_STATUS_CHANGE, Int::class.java)
             .removeObserver(chatOnlineStatusObserver)
-
     }
 
     fun showCallIcon(): LiveData<Boolean> = showCallIcon

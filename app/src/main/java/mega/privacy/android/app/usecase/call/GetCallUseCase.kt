@@ -11,7 +11,7 @@ import java.util.ArrayList
 import javax.inject.Inject
 
 /**
- * Main use case to get a Mega Chat Call  get information about existing calls.
+ * Main use case to get a Mega Chat Call and get information about existing calls
  *
  * @property megaChatApi   Mega Chat API needed to get call information.
  */
@@ -74,7 +74,6 @@ class GetCallUseCase @Inject constructor(
                         listCalls.add(call)
                     }
                 }
-
             }
         }
 
