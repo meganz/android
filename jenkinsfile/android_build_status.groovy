@@ -74,6 +74,19 @@ def getMEGAchatBranch() {
     MEGACHAT_BRANCH = 'develop'
 }
 
+/**
+ * Fetch message of last commit from environment variable.
+ * @return the commit message text if GitLab plugin has sent a valid commit message,
+ *         otherwise return "N/A" normally when CI build is triggered by MR comment "jenkins rebuild".
+ */
+def getLastCommitMessage() {
+    def lastCommitMessage = env.GITLAB_OA_LAST_COMMIT_MESSAGE
+    if (lastCommitMessage == null) {
+        lastCommitMessage = "N/A"
+    }
+    return lastCommitMessage
+}
+
 pipeline {
     agent { label 'mac-jenkins-slave'}
     options {
@@ -92,18 +105,25 @@ pipeline {
         JAVA_HOME = "/opt/buildtools/zulu11.52.13-ca-jdk11.0.13-macosx"
         ANDROID_HOME = "/opt/buildtools/android-sdk"
 
+        // PATH for necessary commands
         PATH = "/opt/buildtools/android-sdk/cmake/3.10.2.4988404/bin:/Applications/MEGAcmd.app/Contents/MacOS:/opt/buildtools/zulu11.52.13-ca-jdk11.0.13-macosx/bin:/opt/brew/bin:/opt/brew/opt/gnu-sed/libexec/gnubin:/opt/brew/opt/gnu-tar/libexec/gnubin:/opt/buildtools/android-sdk/platform-tools:$PATH"
 
+        // Jenkins build log will be saved in this file.
         CONSOLE_LOG_FILE = "console.txt"
 
         BUILD_LIB_DOWNLOAD_FOLDER = '${WORKSPACE}/mega_build_download'
 
+        // Google map api
         GOOGLE_MAP_API_URL = "https://mega.nz/#!1tcl3CrL!i23zkmx7ibnYy34HQdsOOFAPOqQuTo1-2iZ5qFlU7-k"
         GOOGLE_MAP_API_FILE = 'default_google_maps_api.zip'
         GOOGLE_MAP_API_UNZIPPED = 'default_google_map_api_unzipped'
 
         // only build one architecture for SDK, to save build time. skipping "x86 armeabi-v7a x86_64"
         BUILD_ARCHS = "arm64-v8a"
+
+        // SDK build log. ${LOG_FILE} will be used by build.sh to export SDK build log.
+        SDK_LOG_FILE_NAME = "sdk_build_log.txt"
+        LOG_FILE = "${WORKSPACE}/${SDK_LOG_FILE_NAME}"
     }
     post {
         failure {
@@ -111,14 +131,29 @@ pipeline {
                 if (env.BRANCH_NAME.startsWith('MR-')) {
                     def mrNumber = env.BRANCH_NAME.replace('MR-', '')
 
+                    // download Jenkins console log
                     withCredentials([usernameColonPassword(credentialsId: 'Jenkins-Login', variable: 'CREDENTIALS')]) {
                         sh 'curl -u $CREDENTIALS ${BUILD_URL}/consoleText -o console.txt'
                     }
 
                     withCredentials([usernamePassword(credentialsId: 'Gitlab-Access-Token', usernameVariable: 'USERNAME', passwordVariable: 'TOKEN')]) {
-                        final String response = sh(script: 'curl -s --request POST --header PRIVATE-TOKEN:$TOKEN --form file=@console.txt https://code.developers.mega.co.nz/api/v4/projects/199/uploads', returnStdout: true).trim()
-                        def json = new groovy.json.JsonSlurperClassic().parseText(response)
-                        env.MARKDOWN_LINK = ":x: Build Failed <br />Build Log: ${json.markdown}"
+                        // upload Jenkins console log
+                        final String respJenkinsLog = sh(script: 'curl -s --request POST --header PRIVATE-TOKEN:$TOKEN --form file=@console.txt https://code.developers.mega.co.nz/api/v4/projects/199/uploads', returnStdout: true).trim()
+                        def jsonJenkinsLog = new groovy.json.JsonSlurperClassic().parseText(respJenkinsLog)
+
+                        // upload SDK build log if SDK build fails
+                        String sdkBuildMessage = ""
+                        if (BUILD_STEP == "Build SDK") {
+                            final String respSdkLog = sh(script: "curl -s --request POST --header PRIVATE-TOKEN:$TOKEN --form file=@${SDK_LOG_FILE_NAME} https://code.developers.mega.co.nz/api/v4/projects/199/uploads", returnStdout: true).trim()
+                            def jsonSdkLog = new groovy.json.JsonSlurperClassic().parseText(respSdkLog)
+                            sdkBuildMessage = "<br/>SDK Build failed. Log:${jsonSdkLog.markdown}"
+                        }
+
+                        env.MARKDOWN_LINK = ":x: Build Failed" +
+                                "<br/>Failure Stage: ${BUILD_STEP}" +
+                                "<br/>Last Commit Message: <b>${getLastCommitMessage()}</b>" +
+                                "<br/>Last Commit ID: ${env.GIT_COMMIT}" +
+                                "<br/>Build Log: ${jsonJenkinsLog.markdown}" + sdkBuildMessage
                         env.MERGE_REQUEST_URL = "https://code.developers.mega.co.nz/api/v4/projects/199/merge_requests/${mrNumber}/notes"
                         sh 'curl --request POST --header PRIVATE-TOKEN:$TOKEN --form body=\"${MARKDOWN_LINK}\" ${MERGE_REQUEST_URL}'
                     }
@@ -135,15 +170,27 @@ pipeline {
                 }
             }
         }
+
         success {
             script {
-                // If CI build is skipped due to Draft status, send a comment to MR
-                if (env.BRANCH_NAME.startsWith('MR-') && shouldSkip(env.GITLAB_OA_TITLE)) {
+                if (env.BRANCH_NAME.startsWith('MR-')) {
                     def mrNumber = env.BRANCH_NAME.replace('MR-', '')
-                    withCredentials([usernamePassword(credentialsId: 'Gitlab-Access-Token', usernameVariable: 'USERNAME', passwordVariable: 'TOKEN')]) {
-                        env.MARKDOWN_LINK = ":raising_hand: Android Pipeline Build Skipped! <BR/> Newly triggered builds will resume after you have removed <b>Draft:</b> or <b>WIP:</b> from the beginning of MR title."
-                        env.MERGE_REQUEST_URL = "https://code.developers.mega.co.nz/api/v4/projects/199/merge_requests/${mrNumber}/notes"
-                        sh 'curl --request POST --header PRIVATE-TOKEN:$TOKEN --form body=\"${MARKDOWN_LINK}\" ${MERGE_REQUEST_URL}'
+
+                    // If CI build is skipped due to Draft status, send a comment to MR
+                    if (shouldSkip(env.GITLAB_OA_TITLE)) {
+                        withCredentials([usernamePassword(credentialsId: 'Gitlab-Access-Token', usernameVariable: 'USERNAME', passwordVariable: 'TOKEN')]) {
+                            env.MARKDOWN_LINK = ":raising_hand: Android Pipeline Build Skipped! <BR/> Newly triggered builds will resume after you have removed <b>Draft:</b> or <b>WIP:</b> from the beginning of MR title."
+                            env.MERGE_REQUEST_URL = "https://code.developers.mega.co.nz/api/v4/projects/199/merge_requests/${mrNumber}/notes"
+                            sh 'curl --request POST --header PRIVATE-TOKEN:$TOKEN --form body=\"${MARKDOWN_LINK}\" ${MERGE_REQUEST_URL}'
+                        }
+                    } else {
+                        // always report build success to MR comment
+                        withCredentials([usernamePassword(credentialsId: 'Gitlab-Access-Token', usernameVariable: 'USERNAME', passwordVariable: 'TOKEN')]) {
+                            env.MARKDOWN_LINK = ":white_check_mark: Build Succeeded!" +
+                                    "<br/>Last Commit: <b>${getLastCommitMessage()}</b> (${env.GIT_COMMIT})"
+                            env.MERGE_REQUEST_URL = "https://code.developers.mega.co.nz/api/v4/projects/199/merge_requests/${mrNumber}/notes"
+                            sh 'curl --request POST --header PRIVATE-TOKEN:$TOKEN --form body=\"${MARKDOWN_LINK}\" ${MERGE_REQUEST_URL}'
+                        }
                     }
                 }
             }
@@ -248,6 +295,7 @@ pipeline {
                 }
                 gitlabCommitStatus(name: 'Build SDK') {
                     sh """
+                    rm -f ${LOG_FILE}
                     cd ${WORKSPACE}/app/src/main/jni
                     echo "=== START SDK BUILD===="
                     bash build.sh all

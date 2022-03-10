@@ -79,7 +79,7 @@ import java.util.Collections;
 import java.util.List;
 
 import mega.privacy.android.app.R;
-import mega.privacy.android.app.lollipop.PdfViewerActivity;
+import mega.privacy.android.app.main.PdfViewerActivity;
 
 import static mega.privacy.android.app.utils.AlertDialogUtil.isAlertDialogShown;
 import static mega.privacy.android.app.utils.LogUtil.logError;

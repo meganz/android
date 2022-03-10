@@ -14,6 +14,11 @@ public interface BillingUpdatesListener {
     void onBillingClientSetupFinished();
 
     /**
+     * Callback when billing client failed on setup.
+     */
+    void onBillingClientSetupFailed();
+
+    /**
      * Callback when a purchase completes.
      *
      * @param isFailed If the purchase is failed.

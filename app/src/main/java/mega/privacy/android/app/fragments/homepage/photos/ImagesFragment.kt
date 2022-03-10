@@ -10,7 +10,7 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.databinding.FragmentImagesBinding
 import mega.privacy.android.app.gallery.data.GalleryItem
 import mega.privacy.android.app.gallery.fragment.BaseZoomFragment
-import mega.privacy.android.app.lollipop.ManagerActivity
+import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.utils.*
 import mega.privacy.android.app.utils.Constants.*
 import nz.mega.sdk.MegaApiJava.ORDER_MODIFICATION_DESC

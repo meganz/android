@@ -4,9 +4,9 @@ import android.content.Intent
 import android.net.Uri
 import mega.privacy.android.app.activities.WebViewActivity
 import mega.privacy.android.app.fragments.homepage.main.HomepageFragment
-import mega.privacy.android.app.lollipop.DrawerItem
-import mega.privacy.android.app.lollipop.ManagerActivity
-import mega.privacy.android.app.lollipop.megaachievements.AchievementsActivity
+import mega.privacy.android.app.main.DrawerItem
+import mega.privacy.android.app.main.ManagerActivity
+import mega.privacy.android.app.main.megaachievements.AchievementsActivity
 import mega.privacy.android.app.utils.LinksUtil
 
 /**

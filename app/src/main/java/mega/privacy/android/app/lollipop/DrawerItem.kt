@@ -1,5 +1,0 @@
-package mega.privacy.android.app.lollipop
-
-enum class DrawerItem {
-    CLOUD_DRIVE, PHOTOS, HOMEPAGE, CHAT, SHARED_ITEMS, NOTIFICATIONS, SETTINGS, INBOX, SEARCH, TRANSFERS, RUBBISH_BIN, ASK_PERMISSIONS;
-}

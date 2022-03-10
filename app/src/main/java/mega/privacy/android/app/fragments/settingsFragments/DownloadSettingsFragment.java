@@ -9,7 +9,7 @@ import java.io.File;
 
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.TwoLineCheckPreference;
-import mega.privacy.android.app.lollipop.FileStorageActivity;
+import mega.privacy.android.app.main.FileStorageActivity;
 
 import static mega.privacy.android.app.constants.SettingsConstants.*;
 import static mega.privacy.android.app.utils.Constants.*;

@@ -44,8 +44,8 @@ import java.util.Set;
 import mega.privacy.android.app.components.saver.AutoPlayInfo;
 import mega.privacy.android.app.fragments.offline.OfflineFragment;
 import mega.privacy.android.app.globalmanagement.TransfersManagement;
-import mega.privacy.android.app.lollipop.LoginActivity;
-import mega.privacy.android.app.lollipop.ManagerActivity;
+import mega.privacy.android.app.main.LoginActivity;
+import mega.privacy.android.app.main.ManagerActivity;
 import mega.privacy.android.app.notifications.TransferOverQuotaNotification;
 import mega.privacy.android.app.objects.SDTransfer;
 import mega.privacy.android.app.service.iar.RatingHandlerImpl;
@@ -71,8 +71,7 @@ import static mega.privacy.android.app.globalmanagement.TransfersManagement.WAIT
 import static mega.privacy.android.app.globalmanagement.TransfersManagement.addCompletedTransfer;
 import static mega.privacy.android.app.globalmanagement.TransfersManagement.createInitialServiceNotification;
 import static mega.privacy.android.app.globalmanagement.TransfersManagement.launchTransferUpdateIntent;
-import static mega.privacy.android.app.lollipop.ManagerActivity.*;
-
+import static mega.privacy.android.app.main.ManagerActivity.*;
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.FileUtil.*;

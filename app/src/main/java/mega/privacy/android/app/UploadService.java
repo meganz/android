@@ -41,7 +41,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 
 import mega.privacy.android.app.globalmanagement.TransfersManagement;
-import mega.privacy.android.app.lollipop.ManagerActivity;
+import mega.privacy.android.app.main.ManagerActivity;
 import mega.privacy.android.app.service.iar.RatingHandlerImpl;
 import mega.privacy.android.app.utils.StringResourcesUtils;
 import mega.privacy.android.app.utils.ThumbnailUtils;
@@ -61,8 +61,8 @@ import static mega.privacy.android.app.globalmanagement.TransfersManagement.WAIT
 import static mega.privacy.android.app.globalmanagement.TransfersManagement.addCompletedTransfer;
 import static mega.privacy.android.app.globalmanagement.TransfersManagement.createInitialServiceNotification;
 import static mega.privacy.android.app.globalmanagement.TransfersManagement.launchTransferUpdateIntent;
-import static mega.privacy.android.app.lollipop.ManagerActivity.*;
-import static mega.privacy.android.app.lollipop.qrcode.MyCodeFragment.QR_IMAGE_FILE_NAME;
+import static mega.privacy.android.app.main.ManagerActivity.*;
+import static mega.privacy.android.app.main.qrcode.MyCodeFragment.QR_IMAGE_FILE_NAME;
 import static mega.privacy.android.app.textEditor.TextEditorUtil.getCreationOrEditorText;
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
 import static mega.privacy.android.app.utils.FileUtil.*;

@@ -19,7 +19,7 @@ import androidx.core.widget.doOnTextChanged
 import androidx.drawerlayout.widget.DrawerLayout
 import mega.privacy.android.app.R
 import mega.privacy.android.app.databinding.SearchQuerySectionBinding
-import mega.privacy.android.app.lollipop.megachat.BadgeDrawerArrowDrawable
+import mega.privacy.android.app.main.megachat.BadgeDrawerArrowDrawable
 import mega.privacy.android.app.utils.Util
 
 /**

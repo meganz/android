@@ -12,7 +12,7 @@ import android.widget.ListView
 import androidx.appcompat.app.AlertDialog
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import mega.privacy.android.app.R
-import mega.privacy.android.app.lollipop.LoginActivity
+import mega.privacy.android.app.main.LoginActivity
 import mega.privacy.android.app.utils.AlertDialogUtil.enableOrDisableDialogButton
 import mega.privacy.android.app.utils.Constants.*
 import mega.privacy.android.app.utils.StringResourcesUtils.getString

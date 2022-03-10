@@ -6,7 +6,7 @@ import android.net.Uri;
 
 import mega.privacy.android.app.OpenLinkActivity;
 import mega.privacy.android.app.R;
-import mega.privacy.android.app.lollipop.LoginActivity;
+import mega.privacy.android.app.main.LoginActivity;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaRequest;
