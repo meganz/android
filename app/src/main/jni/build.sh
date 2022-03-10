@@ -54,7 +54,10 @@ JAVA_OUTPUT_PATH=${BASE_PATH}/../java
 APP_PLATFORM=`grep APP_PLATFORM Application.mk | cut -d '=' -f 2`
 API_LEVEL=`echo ${APP_PLATFORM} | cut -d'-' -f2`
 JOBS=8
-LOG_FILE=/dev/null # Ensure you use a full path
+if [ -z "${LOG_FILE}" ]; then
+    # If no build log variable is defined, use below value.
+    LOG_FILE=/dev/null # Ensure you use a full path
+fi
 
 CRYPTOPP=cryptopp
 CRYPTOPP_VERSION=820
