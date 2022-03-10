@@ -3854,7 +3854,7 @@ public class ManagerActivity extends TransfersManagementActivity
             case INBOX: {
                 aB.setSubtitle(null);
                 if (viewModel.getState().getValue().getInboxParentHandle() == megaApi.getInboxNode().getHandle() || viewModel.getState().getValue().getInboxParentHandle() == -1) {
-                    aB.setTitle(getResources().getString(R.string.section_inbox));
+                    aB.setTitle(getResources().getString(R.string.section_vault));
                     viewModel.setIsFirstNavigationLevel(true);
                 } else {
                     MegaNode node = megaApi.getNodeByHandle(viewModel.getState().getValue().getInboxParentHandle());
@@ -6391,16 +6391,6 @@ public class ManagerActivity extends TransfersManagementActivity
                 imm.showSoftInput(view, InputMethodManager.SHOW_IMPLICIT);
             }
         }, 50);
-    }
-
-    /**
-     * Move folders or files that belong to "My backups"
-     *
-     * @param handleList handleList handles list of the nodes that selected
-     */
-    public void moveBackupNode(final ArrayList<Long> handleList) {
-        Timber.d("MyBackup + NodeOptionsBottomSheetDialogFragment Move a backup folder or file");
-        fileBackupManager.moveBackup(nC, handleList);
     }
 
     /**
@@ -9443,10 +9433,6 @@ public class ManagerActivity extends TransfersManagementActivity
                 if (e.getErrorCode() == MegaError.API_OK) {
                     Timber.d("requesting myBackupHandle");
                     MegaNodeUtil.myBackupHandle = request.getNodeHandle();
-//                    MegaNode pNode = megaApi.getParentNode(megaApi.getNodeByHandle(MegaNodeUtil.myBackupHandle));
-//                    String name = pNode.getName();
-//                    MegaNode pNode2 = megaApi.getParentNode(pNode);
-//                    String name2 = pNode2.getName();
                 }
             }
         } else if (request.getType() == MegaRequest.TYPE_GET_CANCEL_LINK) {

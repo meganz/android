@@ -247,21 +247,18 @@ public class FileBrowserFragment extends RotatableFragment {
                         handleList.add(documents.get(i).getHandle());
                     }
 
-                    if (!fileBackupManager.moveBackup(nC, handleList)) {
-                        nC.chooseLocationToMoveNodes(handleList);
-                    }
-
-                    clearSelections();
-                    hideMultipleSelect();
-                    break;
-                }
-                case R.id.cab_menu_share_folder: {
-                    //Check that all the selected options are folders
-                    for (int i = 0; i < documents.size(); i++) {
-                        if (documents.get(i).isFolder()) {
-                            handleList.add(documents.get(i).getHandle());
-                        }
-                    }
+					nC.chooseLocationToMoveNodes(handleList);
+					clearSelections();
+					hideMultipleSelect();
+					break;
+				}
+				case R.id.cab_menu_share_folder: {
+					//Check that all the selected options are folders
+					for (int i = 0; i < documents.size(); i++){
+						if (documents.get(i).isFolder()) {
+							handleList.add(documents.get(i).getHandle());
+						}
+					}
 
                     NodeController nC = new NodeController(context);
                     if (!fileBackupManager.shareBackupFolderInMenu(nC, handleList)) {

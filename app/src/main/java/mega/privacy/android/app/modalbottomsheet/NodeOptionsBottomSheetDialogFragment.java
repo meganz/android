@@ -1,5 +1,6 @@
 package mega.privacy.android.app.modalbottomsheet;
 
+import static mega.privacy.android.app.constants.EventConstants.EVENT_VAULT_ACTION;
 import static mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil.openWith;
 import static mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil.setNodeThumbnail;
 import static mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil.showCannotOpenFileDialog;
@@ -29,7 +30,9 @@ import static mega.privacy.android.app.utils.ContactUtil.getMegaUserNameDB;
 import static mega.privacy.android.app.utils.FileUtil.isFileAvailable;
 import static mega.privacy.android.app.utils.FileUtil.isFileDownloadedLatest;
 import static mega.privacy.android.app.utils.MegaApiUtils.getMegaNodeFolderInfo;
+import static mega.privacy.android.app.utils.MegaNodeDialogUtil.ACTION_BACKUP_REMOVE;
 import static mega.privacy.android.app.utils.MegaNodeDialogUtil.ACTION_BACKUP_SHARE_FOLDER;
+import static mega.privacy.android.app.utils.MegaNodeDialogUtil.BACKUP_FOLDER;
 import static mega.privacy.android.app.utils.MegaNodeDialogUtil.BACKUP_NONE;
 import static mega.privacy.android.app.utils.MegaNodeUtil.checkBackupNodeTypeByHandle;
 import static mega.privacy.android.app.utils.MegaNodeUtil.checkBackupNodeTypeInList;
@@ -248,10 +251,6 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
         TextView optionLeaveShares = contentView.findViewById(R.id.leave_share_option);
         TextView optionRubbishBin = contentView.findViewById(R.id.rubbish_bin_option);
         TextView optionRemove = contentView.findViewById(R.id.remove_option);
-//      backup
-        RelativeLayout optionMoveBackup = contentView.findViewById(R.id.option_backup_move_layout);
-        TextView optionCopyBackup = contentView.findViewById(R.id.backup_copy_option);
-        RelativeLayout optionRubbishBinBackup = contentView.findViewById(R.id.option_backup_rubbish_bin_layout);
 
         optionEdit.setOnClickListener(this);
         optionLabel.setOnClickListener(this);
@@ -275,9 +274,7 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
         optionOpenFolder.setOnClickListener(this);
         optionSlideshow.setOnClickListener(this);
         optionOpenWith.setOnClickListener(this);
-        optionMoveBackup.setOnClickListener(this);
-        optionCopyBackup.setOnClickListener(this);
-        optionRubbishBinBackup.setOnClickListener(this);
+
         optionVersionsLayout.setOnClickListener(this);
 
         TextView viewInFolder = contentView.findViewById(R.id.view_in_folder_option);
@@ -450,31 +447,33 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
 
         switch (mMode) {
             case CLOUD_DRIVE_MODE:
-            case INBOX_MODE:
             case SEARCH_MODE:
                 Timber.d("show Cloud bottom sheet");
+
+                optionRemove.setVisibility(View.GONE);
+                optionLeaveShares.setVisibility(View.GONE);
+                counterOpen--;
+                optionOpenFolder.setVisibility(View.GONE);
+                counterModify--;
+                optionRestoreFromRubbish.setVisibility(View.GONE);
+                break;
+            case INBOX_MODE:
+                Timber.d("show Vault bottom sheet");
 
                 // Check if sub folder of "My Backup"
                 ArrayList<Long> handleList = new ArrayList<>();
                 handleList.add(node.getHandle());
                 int nodeType = checkBackupNodeTypeInList(megaApi, handleList);
-                if (nodeType != BACKUP_NONE) {
-                    counterModify--;
-                    optionRename.setVisibility(View.GONE);
-                    counterModify--;
-                    optionMove.setVisibility(View.GONE);
-                    if (ViewUtils.isVisible(optionCopy)) {
-                        counterModify--;
-                        optionCopy.setVisibility(View.GONE);
-                    }
-                    optionRubbishBin.setVisibility(View.GONE);
 
-                    optionMoveBackup.setVisibility(View.VISIBLE);
-                    optionCopyBackup.setVisibility(isTakenDown ? View.GONE : View.VISIBLE);
-                    optionRubbishBinBackup.setVisibility(View.VISIBLE);
-                }
+                optionFavourite.setVisibility(View.GONE);
+                optionLabel.setVisibility(View.GONE);
+                counterModify--;
+                optionRename.setVisibility(View.GONE);
+                counterModify--;
+                optionMove.setVisibility(View.GONE);
+                optionRubbishBin.setVisibility(View.GONE);
 
-                optionRemove.setVisibility(View.GONE);
+                optionRemove.setVisibility(nodeType == BACKUP_FOLDER ? View.VISIBLE : View.GONE);
                 optionLeaveShares.setVisibility(View.GONE);
                 counterOpen--;
                 optionOpenFolder.setVisibility(View.GONE);
@@ -904,21 +903,22 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
                 dismissAllowingStateLoss();
                 break;
 
-            case R.id.option_backup_move_layout:
-                ((ManagerActivity) requireActivity()).moveBackupNode(handleList);
-                dismissAllowingStateLoss();
-                break;
-
             case R.id.copy_option:
-            case R.id.backup_copy_option:
                 nC.chooseLocationToCopyNodes(handleList);
                 dismissAllowingStateLoss();
                 break;
 
             case R.id.rubbish_bin_option:
-            case R.id.remove_option:
-            case R.id.option_backup_rubbish_bin_layout:
                 ((ManagerActivity) requireActivity()).askConfirmationMoveToRubbish(handleList);
+                break;
+
+            case R.id.remove_option:
+                if (mMode == INBOX_MODE) {
+                    Timber.d("Remove node in Vault");
+                    LiveEventBus.get(EVENT_VAULT_ACTION, Integer.class).post(ACTION_BACKUP_REMOVE);
+                } else {
+                    ((ManagerActivity) requireActivity()).askConfirmationMoveToRubbish(handleList);
+                }
                 break;
 
             case R.id.option_slideshow:

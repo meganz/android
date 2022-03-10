@@ -2,6 +2,7 @@ package mega.privacy.android.app.main.managerSections;
 
 import static mega.privacy.android.app.components.dragger.DragToExitSupport.observeDragSupportEvents;
 import static mega.privacy.android.app.components.dragger.DragToExitSupport.putThumbnailLocation;
+import static mega.privacy.android.app.constants.EventConstants.EVENT_VAULT_ACTION;
 import static mega.privacy.android.app.utils.Constants.BUFFER_COMP;
 import static mega.privacy.android.app.utils.Constants.INBOX_ADAPTER;
 import static mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_NEED_STOP_HTTP_SERVER;
@@ -13,6 +14,7 @@ import static mega.privacy.android.app.utils.Constants.VIEWER_FROM_INBOX;
 import static mega.privacy.android.app.utils.FileUtil.getDownloadLocation;
 import static mega.privacy.android.app.utils.FileUtil.getLocalFile;
 import static mega.privacy.android.app.utils.MegaApiUtils.isIntentAvailable;
+import static mega.privacy.android.app.utils.MegaNodeDialogUtil.ACTION_BACKUP_REMOVE;
 import static mega.privacy.android.app.utils.MegaNodeUtil.areAllFileNodesAndNotTakenDown;
 import static mega.privacy.android.app.utils.MegaNodeUtil.manageTextFileIntent;
 import static mega.privacy.android.app.utils.MegaNodeUtil.manageURLNode;
@@ -87,6 +89,7 @@ import mega.privacy.android.app.main.adapters.MegaNodeAdapter;
 import mega.privacy.android.app.main.adapters.RotatableAdapter;
 import mega.privacy.android.app.main.controllers.NodeController;
 import mega.privacy.android.app.presentation.inbox.InboxViewModel;
+import mega.privacy.android.app.sync.fileBackups.FileBackupManager;
 import mega.privacy.android.app.utils.ColorUtils;
 import mega.privacy.android.app.utils.MegaNodeUtil;
 import mega.privacy.android.app.utils.StringResourcesUtils;
@@ -94,6 +97,8 @@ import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaNode;
 import timber.log.Timber;
+
+import com.jeremyliao.liveeventbus.LiveEventBus;
 
 @AndroidEntryPoint
 public class InboxFragment extends RotatableFragment {
@@ -135,6 +140,9 @@ public class InboxFragment extends RotatableFragment {
     protected RotatableAdapter getAdapter() {
         return adapter;
     }
+	final boolean vaultReadOnly = true;
+
+	private FileBackupManager fileBackupManager;
 
     public void activateActionMode() {
         Timber.d("activateActionMode");
@@ -287,40 +295,45 @@ public class InboxFragment extends RotatableFragment {
                     unselect.setVisible(true);
                 }
 
-                if (selected.size() == 1) {
-                    showRename = true;
-                } else {
-                    showRename = false;
-                }
+				if (!vaultReadOnly) {
+					showRename = selected.size() == 1;
+				}
 
-                showDownload = areAllNotTakenDown;
-                showTrash = true;
-                showMove = true;
-                showCopy = areAllNotTakenDown;
-                for (int i = 0; i < selected.size(); i++) {
-                    if (megaApi.checkMoveErrorExtended(selected.get(i), megaApi.getInboxNode()).getErrorCode() != MegaError.API_OK) {
-                        showTrash = false;
-                        showMove = false;
-                        break;
-                    }
-                }
-                //showSendToChat
-                showSendToChat = areAllFileNodesAndNotTakenDown(selected);
-            } else {
-                menu.findItem(R.id.cab_menu_select_all).setVisible(true);
-                menu.findItem(R.id.cab_menu_unselect_all).setVisible(false);
-            }
+				showDownload = areAllNotTakenDown;
+				showCopy = areAllNotTakenDown;
+
+				if (!vaultReadOnly) {
+					showTrash = true;
+					showMove = true;
+
+					for(int i = 0; i < selected.size(); i++)	{
+						if(megaApi.checkMoveErrorExtended(selected.get(i), megaApi.getInboxNode()).getErrorCode() != MegaError.API_OK)	{
+							showTrash = false;
+							showMove = false;
+							break;
+						}
+					}
+				}
+
+				//showSendToChat
+				showSendToChat = areAllFileNodesAndNotTakenDown(selected);
+			}
+			else{
+				menu.findItem(R.id.cab_menu_select_all).setVisible(true);
+				menu.findItem(R.id.cab_menu_unselect_all).setVisible(false);
+			}
 
             menu.findItem(R.id.cab_menu_download).setVisible(showDownload);
             if (showDownload) {
                 menu.findItem(R.id.cab_menu_download).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
             }
 
-            menu.findItem(R.id.cab_menu_send_to_chat).setVisible(showSendToChat);
-            if (showSendToChat) {
-                menu.findItem(R.id.cab_menu_send_to_chat).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
-            }
-            menu.findItem(R.id.cab_menu_rename).setVisible(showRename);
+			menu.findItem(R.id.cab_menu_send_to_chat).setVisible(showSendToChat);
+			if (showSendToChat) {
+				menu.findItem(R.id.cab_menu_send_to_chat).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+			}
+
+			menu.findItem(R.id.cab_menu_rename).setVisible(showRename);
 
             menu.findItem(R.id.cab_menu_copy).setVisible(showCopy);
             if (showCopy) {
@@ -385,12 +398,13 @@ public class InboxFragment extends RotatableFragment {
         prefs = dbH.getPreferences();
         downloadLocationDefaultPath = getDownloadLocation();
 
-        lastPositionStack = new Stack<>();
+		lastPositionStack = new Stack<>();
 
-        if (megaApi == null) {
-            megaApi = ((MegaApplication) ((Activity) context).getApplication()).getMegaApi();
-        }
-    }
+		if (megaApi == null) {
+			megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();
+		}
+		fileBackupManager = new FileBackupManager(requireActivity(), null);
+	}
 
     public void checkScroll() {
         if (recyclerView != null) {
@@ -529,12 +543,13 @@ public class InboxFragment extends RotatableFragment {
         }
     }
 
-    @Override
-    public void onViewCreated(@NonNull View view, @Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
-
-        observeDragSupportEvents(getViewLifecycleOwner(), recyclerView, VIEWER_FROM_INBOX);
-    }
+	@Override
+	public void onViewCreated(@NonNull View view, @Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
+		super.onViewCreated(view, savedInstanceState);
+		LiveEventBus.get(EVENT_VAULT_ACTION, Integer.class)
+				.observe(getViewLifecycleOwner(),this::backupActionObserver);
+		observeDragSupportEvents(getViewLifecycleOwner(), recyclerView, VIEWER_FROM_INBOX);
+	}
 
     public void refresh() {
         Timber.d("refresh");
@@ -974,10 +989,22 @@ public class InboxFragment extends RotatableFragment {
         }
     }
 
-    public int getItemCount() {
-        if (adapter != null) {
-            return adapter.getItemCount();
-        }
-        return 0;
-    }
+	public int getItemCount() {
+		if (adapter != null) {
+			return adapter.getItemCount();
+		}
+		return 0;
+	}
+
+	/**
+	 * Process the action for backup nodes.
+	 *
+	 * @param action The actions for backup nodes
+	 */
+	private void backupActionObserver(int action) {
+		if (action == ACTION_BACKUP_REMOVE && fileBackupManager != null) {
+			// Show the warning dialog
+			fileBackupManager.actWithBackupTips(ACTION_BACKUP_REMOVE);
+		}
+	}
 }
