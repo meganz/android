@@ -19,7 +19,7 @@ import mega.privacy.android.app.AndroidCompletedTransfer;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.databinding.BottomSheetManageTransferBinding;
-import mega.privacy.android.app.lollipop.ManagerActivity;
+import mega.privacy.android.app.main.ManagerActivity;
 import mega.privacy.android.app.utils.ColorUtils;
 import mega.privacy.android.app.utils.StringResourcesUtils;
 import nz.mega.sdk.MegaNode;

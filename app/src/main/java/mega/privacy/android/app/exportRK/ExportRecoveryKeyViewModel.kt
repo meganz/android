@@ -8,7 +8,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import mega.privacy.android.app.arch.BaseRxViewModel
 import mega.privacy.android.app.di.MegaApi
 import mega.privacy.android.app.exportRK.ExportRecoveryKeyActivity.Companion.WRITE_STORAGE_TO_SAVE_RK
-import mega.privacy.android.app.lollipop.controllers.AccountController
+import mega.privacy.android.app.main.controllers.AccountController
 import mega.privacy.android.app.utils.Constants.REQUEST_DOWNLOAD_FOLDER
 import mega.privacy.android.app.utils.FileUtil.*
 import mega.privacy.android.app.utils.LogUtil.logWarning

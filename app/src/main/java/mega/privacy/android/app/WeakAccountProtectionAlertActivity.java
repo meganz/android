@@ -17,9 +17,9 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
 import mega.privacy.android.app.listeners.ResendVerificationEmailListener;
 import mega.privacy.android.app.listeners.WhyAmIBlockedListener;
-import mega.privacy.android.app.lollipop.LoginActivity;
+import mega.privacy.android.app.main.LoginActivity;
 import mega.privacy.android.app.activities.PasscodeActivity;
-import mega.privacy.android.app.lollipop.controllers.AccountController;
+import mega.privacy.android.app.main.controllers.AccountController;
 
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.LogUtil.*;

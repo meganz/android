@@ -4,7 +4,7 @@ import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import androidx.activity.result.contract.ActivityResultContract
-import mega.privacy.android.app.lollipop.FileExplorerActivity
+import mega.privacy.android.app.main.FileExplorerActivity
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_IMPORT_CHAT
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_IMPORT_TO
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE

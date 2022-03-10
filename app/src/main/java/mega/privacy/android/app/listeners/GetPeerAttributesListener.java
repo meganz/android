@@ -6,11 +6,11 @@ import java.util.HashMap;
 
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.fcm.ChatAdvancedNotificationBuilder;
-import mega.privacy.android.app.lollipop.controllers.ChatController;
-import mega.privacy.android.app.lollipop.megachat.ChatActivity;
-import mega.privacy.android.app.lollipop.megachat.GroupChatInfoActivity;
-import mega.privacy.android.app.lollipop.megachat.MegaChatParticipant;
-import mega.privacy.android.app.lollipop.megachat.chatAdapters.MegaChatAdapter;
+import mega.privacy.android.app.main.controllers.ChatController;
+import mega.privacy.android.app.main.megachat.ChatActivity;
+import mega.privacy.android.app.main.megachat.GroupChatInfoActivity;
+import mega.privacy.android.app.main.megachat.MegaChatParticipant;
+import mega.privacy.android.app.main.megachat.chatAdapters.MegaChatAdapter;
 import nz.mega.sdk.MegaChatApiJava;
 import nz.mega.sdk.MegaChatError;
 import nz.mega.sdk.MegaChatRequest;

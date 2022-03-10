@@ -9,7 +9,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import mega.privacy.android.app.R;
-import mega.privacy.android.app.lollipop.megachat.ChatActivity;
+import mega.privacy.android.app.main.megachat.ChatActivity;
 import mega.privacy.android.app.modalbottomsheet.BaseBottomSheetDialogFragment;
 
 public class SendAttachmentChatBottomSheetDialogFragment extends BaseBottomSheetDialogFragment implements View.OnClickListener {
