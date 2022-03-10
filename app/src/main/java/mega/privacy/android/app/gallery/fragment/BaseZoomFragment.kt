@@ -340,13 +340,6 @@ abstract class BaseZoomFragment : BaseFragment(), GestureScaleCallback,
                 newViewClicked(ALL_VIEW)
                 val photoPosition = gridAdapter.getNodePosition(card.node.handle)
                 layoutManager.scrollToPosition(photoPosition)
-
-                val node = gridAdapter.getNodeAtPosition(photoPosition)
-                node?.let {
-                    RunOnUIThreadUtils.post {
-                        openPhoto(it)
-                    }
-                }
             }
             MONTHS_VIEW -> {
                 newViewClicked(DAYS_VIEW)
