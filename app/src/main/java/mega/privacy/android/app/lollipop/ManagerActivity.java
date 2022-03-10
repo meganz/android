@@ -5891,7 +5891,7 @@ public class ManagerActivity extends TransfersManagementActivity
         }
     }
 
-    private void returnCallWithPermissions() {
+    public void returnCallWithPermissions() {
         if (checkPermissionsCall(this, RETURN_CALL_PERMISSIONS)) {
             returnActiveCall(this, passcodeManagement);
         }

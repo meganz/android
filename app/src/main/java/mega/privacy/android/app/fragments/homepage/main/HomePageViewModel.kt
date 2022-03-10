@@ -3,27 +3,32 @@ package mega.privacy.android.app.fragments.homepage.main
 import android.graphics.Bitmap
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.jeremyliao.liveeventbus.LiveEventBus
 import dagger.hilt.android.lifecycle.HiltViewModel
+import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
+import io.reactivex.rxjava3.kotlin.addTo
+import io.reactivex.rxjava3.kotlin.subscribeBy
+import io.reactivex.rxjava3.schedulers.Schedulers
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.MegaApplication
-import mega.privacy.android.app.constants.EventConstants.EVENT_CALL_STATUS_CHANGE
+import mega.privacy.android.app.arch.BaseRxViewModel
 import mega.privacy.android.app.listeners.BaseListener
+import mega.privacy.android.app.usecase.call.GetCallUseCase
 import mega.privacy.android.app.utils.Constants.*
+import mega.privacy.android.app.utils.LogUtil.logError
 import nz.mega.sdk.*
 import javax.inject.Inject
 
 @HiltViewModel
 class HomePageViewModel @Inject constructor(
-    private val repository: HomepageRepository
-) : ViewModel() {
+    private val repository: HomepageRepository,
+    getCallUseCase: GetCallUseCase
+) : BaseRxViewModel() {
 
     private val _notificationCount = MutableLiveData<Int>()
     private val _avatar = MutableLiveData<Bitmap>()
     private val _chatStatus = MutableLiveData<Int>()
-    private val _callStatus = MutableLiveData<Int>()
 
     private val _bannerList: MutableLiveData<MutableList<MegaBanner>?> =
         repository.getBannerListLiveData()
@@ -31,7 +36,7 @@ class HomePageViewModel @Inject constructor(
     val notificationCount: LiveData<Int> = _notificationCount
     val avatar: LiveData<Bitmap> = _avatar
     val chatStatus: LiveData<Int> = _chatStatus
-    val callStatus: LiveData<Int> = _callStatus
+    val showCallIcon: MutableLiveData<Boolean> = MutableLiveData()
 
     val bannerList: LiveData<MutableList<MegaBanner>?> = _bannerList
 
@@ -47,10 +52,6 @@ class HomePageViewModel @Inject constructor(
         _chatStatus.value = it
     }
 
-    private val callStatusObserver = androidx.lifecycle.Observer<MegaChatCall> {
-        _callStatus.value = it.status
-    }
-
     init {
         LiveEventBus.get(EVENT_AVATAR_CHANGE, Boolean::class.java)
             .observeForever(avatarChangeObserver)
@@ -58,8 +59,20 @@ class HomePageViewModel @Inject constructor(
             .observeForever(notificationCountObserver)
         LiveEventBus.get(EVENT_CHAT_STATUS_CHANGE, Int::class.java)
             .observeForever(chatOnlineStatusObserver)
-        LiveEventBus.get(EVENT_CALL_STATUS_CHANGE, MegaChatCall::class.java)
-            .observeForever(callStatusObserver)
+
+        getCallUseCase.isThereAnOngoingCall()
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribeBy(
+                onNext = {
+                    showCallIcon.value = it
+                },
+                onError = { error ->
+                    logError(error.stackTraceToString())
+                }
+            )
+            .addTo(composite)
+
 
         // Show the default avatar (the Alphabet avatar) above all, then load the actual avatar
         showDefaultAvatar().invokeOnCompletion {
@@ -76,9 +89,10 @@ class HomePageViewModel @Inject constructor(
             .removeObserver(notificationCountObserver)
         LiveEventBus.get(EVENT_CHAT_STATUS_CHANGE, Int::class.java)
             .removeObserver(chatOnlineStatusObserver)
-        LiveEventBus.get(EVENT_CALL_STATUS_CHANGE, MegaChatCall::class.java)
-            .removeObserver(callStatusObserver)
+
     }
+
+    fun showCallIcon(): LiveData<Boolean> = showCallIcon
 
     private fun showDefaultAvatar() = viewModelScope.launch {
         _avatar.value = repository.getDefaultAvatar()

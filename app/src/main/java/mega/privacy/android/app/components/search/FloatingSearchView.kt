@@ -1,5 +1,7 @@
 package mega.privacy.android.app.components.search
 
+import android.animation.ObjectAnimator
+import android.animation.PropertyValuesHolder
 import android.animation.ValueAnimator
 import android.app.Activity
 import android.content.Context
@@ -15,6 +17,7 @@ import androidx.annotation.NonNull
 import androidx.core.content.ContextCompat
 import androidx.core.view.GravityCompat
 import androidx.core.view.ViewCompat
+import androidx.core.view.isVisible
 import androidx.core.widget.doOnTextChanged
 import androidx.drawerlayout.widget.DrawerLayout
 import mega.privacy.android.app.R
@@ -61,6 +64,9 @@ class FloatingSearchView(context: Context, attrs: AttributeSet?) : FrameLayout(c
 
     private val drawerListener = DrawerListener()
 
+    // Ongoing call button animator
+    var scaleDown: ObjectAnimator? = null
+
     init {
         addView(binding.root)
 
@@ -68,6 +74,7 @@ class FloatingSearchView(context: Context, attrs: AttributeSet?) : FrameLayout(c
         initClearButton()
         initSearchInput()
         initLeftAction()
+        initOngoingCallButtonAnimation()
     }
 
     /**
@@ -222,6 +229,33 @@ class FloatingSearchView(context: Context, attrs: AttributeSet?) : FrameLayout(c
         }
     }
 
+    /**
+     * Set the ongoing call button visibility and start/stop the animation
+     *
+     * @param visibility True, if ongoing call button should be visible. False, otherwise
+     */
+    fun setOngoingCallVisibility(visibility: Boolean) {
+        binding.ongoingCallLayout.isVisible = visibility
+        if (visibility) {
+            scaleDown?.start()
+        } else {
+            stopCallAnimation()
+        }
+    }
+
+    /**
+     *  Method to stop the animation of the ongoing call button
+     */
+    fun stopCallAnimation() {
+        scaleDown?.removeAllListeners();
+        scaleDown?.end()
+        scaleDown?.cancel()
+    }
+
+    fun setOngoingCallClickListener(listener: OnClickListener) {
+        binding.ongoingCallLayout.setOnClickListener(listener)
+    }
+
     fun setAvatarClickListener(listener: OnClickListener) {
         binding.avatarImage.setOnClickListener(listener)
     }
@@ -246,6 +280,19 @@ class FloatingSearchView(context: Context, attrs: AttributeSet?) : FrameLayout(c
                 clearSearchActionListener?.onClearSearchClicked()
             }
         }
+    }
+
+    private fun initOngoingCallButtonAnimation() {
+        scaleDown = ObjectAnimator.ofPropertyValuesHolder(
+            binding.ongoingCallRadar,
+            PropertyValuesHolder.ofFloat("scaleX", ANIMATION_SCALE_X),
+            PropertyValuesHolder.ofFloat("scaleY", ANIMATION_SCALE_Y),
+            PropertyValuesHolder.ofFloat("alpha", ANIMATION_ALPHA)
+        )
+
+        scaleDown?.duration = ANIMATION_DURATION
+        scaleDown?.repeatCount = ObjectAnimator.INFINITE
+        scaleDown?.repeatMode = ObjectAnimator.RESTART
     }
 
     private fun initSearchInput() {
@@ -475,5 +522,9 @@ class FloatingSearchView(context: Context, attrs: AttributeSet?) : FrameLayout(c
         private const val MENU_BUTTON_PROGRESS_HAMBURGER = 0.0f
         private const val MAX_NOTIFICATION_COUNT = 9
         private const val MAX_NOTIFICATION_COUNT_TEXT = "9+"
+        private const val ANIMATION_SCALE_X = 1.4f
+        private const val ANIMATION_SCALE_Y = 1.4f
+        private const val ANIMATION_ALPHA = 0F
+        private const val ANIMATION_DURATION:Long = 1300
     }
 }
