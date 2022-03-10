@@ -4,8 +4,8 @@ import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import mega.privacy.android.app.R
-import mega.privacy.android.app.lollipop.LoginActivity
-import mega.privacy.android.app.lollipop.controllers.AccountController
+import mega.privacy.android.app.main.LoginActivity
+import mega.privacy.android.app.main.controllers.AccountController
 import mega.privacy.android.app.meeting.activity.LeftMeetingActivity
 import mega.privacy.android.app.meeting.activity.MeetingActivity
 import mega.privacy.android.app.utils.Constants.SNACKBAR_TYPE

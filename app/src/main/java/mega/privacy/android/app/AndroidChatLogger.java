@@ -2,16 +2,20 @@ package mega.privacy.android.app;
 
 import android.util.Log;
 
+import mega.privacy.android.app.logging.LegacyLogUtil;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaChatLoggerInterface;
 
-import static mega.privacy.android.app.utils.LogUtil.*;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 public class AndroidChatLogger extends MegaLogger implements MegaChatLoggerInterface {
     public static final String LOG_FILE_NAME = "logKarere.txt";
+    private LegacyLogUtil legacyLogUtil;
 
-    public AndroidChatLogger(String fileName) {
+    public AndroidChatLogger(@Nullable String fileName, @NotNull LegacyLogUtil legacyLogUtil) {
         super(fileName);
+        this.legacyLogUtil = legacyLogUtil;
     }
 
     public void log(int logLevel, String message) {
@@ -22,7 +26,7 @@ public class AndroidChatLogger extends MegaLogger implements MegaChatLoggerInter
         }
 
         //save to log file
-        if (isReadyToWriteToFile(getStatusLoggerKarere())) {
+        if (isReadyToWriteToFile(legacyLogUtil.getStatusLoggerKarere())) {
             fileLogQueue.add(message);
         }
     }

@@ -14,11 +14,11 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.SimpleDividerItemDecoration;
-import mega.privacy.android.app.lollipop.ManagerActivity;
+import mega.privacy.android.app.main.ManagerActivity;
 import mega.privacy.android.app.utils.ColorUtils;
 import mega.privacy.android.app.utils.Util;
-import mega.privacy.android.app.lollipop.adapters.RotatableAdapter;
-import mega.privacy.android.app.lollipop.managerSections.RotatableFragment;
+import mega.privacy.android.app.main.adapters.RotatableAdapter;
+import mega.privacy.android.app.main.managerSections.RotatableFragment;
 
 import static mega.privacy.android.app.components.transferWidget.TransfersManagement.isOnTransferOverQuota;
 

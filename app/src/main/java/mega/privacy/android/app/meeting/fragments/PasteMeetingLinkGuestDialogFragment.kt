@@ -16,7 +16,7 @@ import androidx.fragment.app.DialogFragment
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import mega.privacy.android.app.OpenLinkActivity
 import mega.privacy.android.app.R
-import mega.privacy.android.app.lollipop.megachat.AndroidMegaRichLinkMessage
+import mega.privacy.android.app.main.megachat.AndroidMegaRichLinkMessage
 import mega.privacy.android.app.utils.ColorUtils.setErrorAwareInputAppearance
 import mega.privacy.android.app.utils.StringResourcesUtils
 import mega.privacy.android.app.utils.Util

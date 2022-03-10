@@ -7,9 +7,9 @@ import android.widget.TextView
 import androidx.lifecycle.ViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import mega.privacy.android.app.R
-import mega.privacy.android.app.lollipop.ManagerActivity
-import mega.privacy.android.app.lollipop.controllers.ChatController
-import mega.privacy.android.app.lollipop.megachat.ChatActivity
+import mega.privacy.android.app.main.ManagerActivity
+import mega.privacy.android.app.main.controllers.ChatController
+import mega.privacy.android.app.main.megachat.ChatActivity
 import mega.privacy.android.app.meeting.adapter.Participant
 import mega.privacy.android.app.meeting.fragments.MeetingParticipantBottomSheetDialogFragment.Companion.EXTRA_FROM_MEETING
 import mega.privacy.android.app.utils.Constants
