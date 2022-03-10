@@ -1,7 +1,5 @@
 package mega.privacy.android.app;
 
-import static android.media.MediaCodecInfo.CodecProfileLevel.AVCProfileBaseline;
-
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.media.MediaCodec;
@@ -19,7 +17,7 @@ import java.nio.ByteBuffer;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.atomic.AtomicReference;
 
-import mega.privacy.android.app.lollipop.megachat.ChatUploadService;
+import mega.privacy.android.app.main.megachat.ChatUploadService;
 import mega.privacy.android.app.utils.conversion.VideoCompressionCallback;
 
 import static mega.privacy.android.app.constants.SettingsConstants.VIDEO_QUALITY_HIGH;

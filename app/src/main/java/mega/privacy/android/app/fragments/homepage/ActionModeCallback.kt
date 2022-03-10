@@ -4,8 +4,8 @@ import android.view.Menu
 import android.view.MenuItem
 import androidx.appcompat.view.ActionMode
 import mega.privacy.android.app.R
-import mega.privacy.android.app.lollipop.ManagerActivity
-import mega.privacy.android.app.lollipop.controllers.NodeController
+import mega.privacy.android.app.main.ManagerActivity
+import mega.privacy.android.app.main.controllers.NodeController
 import mega.privacy.android.app.utils.*
 import mega.privacy.android.app.utils.MegaNodeUtil.areAllNotTakenDown
 import nz.mega.sdk.MegaApiAndroid

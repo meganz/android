@@ -41,8 +41,8 @@ import mega.privacy.android.app.activities.settingsActivities.FileManagementPref
 import mega.privacy.android.app.globalmanagement.MyAccountInfo;
 import mega.privacy.android.app.listeners.GetAttrUserListener;
 import mega.privacy.android.app.listeners.SetAttrUserListener;
-import mega.privacy.android.app.lollipop.tasks.ManageCacheTask;
-import mega.privacy.android.app.lollipop.tasks.ManageOfflineTask;
+import mega.privacy.android.app.main.tasks.ManageCacheTask;
+import mega.privacy.android.app.main.tasks.ManageOfflineTask;
 import mega.privacy.android.app.presentation.settings.filesettings.FilePreferencesViewModel;
 import mega.privacy.android.app.presentation.settings.filesettings.model.FilePreferencesState;
 import mega.privacy.android.app.utils.StringResourcesUtils;

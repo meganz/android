@@ -101,7 +101,6 @@ import android.os.PowerManager;
 import android.os.StrictMode;
 import android.text.Html;
 import android.text.Spanned;
-import android.util.Config;
 import android.util.Pair;
 
 import androidx.annotation.NonNull;
@@ -157,12 +156,11 @@ import mega.privacy.android.app.listeners.GlobalChatListener;
 import mega.privacy.android.app.listeners.GlobalListener;
 import mega.privacy.android.app.logging.InitialiseLoggingUseCaseJavaWrapper;
 import mega.privacy.android.app.logging.LegacyLogUtil;
-import mega.privacy.android.app.lollipop.controllers.AccountController;
-import mega.privacy.android.app.lollipop.ManagerActivity;
-import mega.privacy.android.app.lollipop.controllers.AccountController;
-import mega.privacy.android.app.lollipop.LoginActivity;
-import mega.privacy.android.app.lollipop.megachat.AppRTCAudioManager;
-import mega.privacy.android.app.lollipop.megachat.BadgeIntentService;
+import mega.privacy.android.app.main.controllers.AccountController;
+import mega.privacy.android.app.main.ManagerActivity;
+import mega.privacy.android.app.main.LoginActivity;
+import mega.privacy.android.app.main.megachat.AppRTCAudioManager;
+import mega.privacy.android.app.main.megachat.BadgeIntentService;
 import mega.privacy.android.app.meeting.CallService;
 import mega.privacy.android.app.meeting.listeners.MeetingListener;
 import mega.privacy.android.app.middlelayer.reporter.CrashReporter;
@@ -821,7 +819,7 @@ public class MegaApplication extends MultiDexApplication implements Application.
 
         LiveEventBus.config().enableLogger(false);
 
-        scheduleCameraUploadJob(getApplicationContext());
+        scheduleCameraUploadJob(getApplicationContext(), true);
         storageState = dbH.getStorageState();
         pushNotificationSettingManagement = new PushNotificationSettingManagement();
         transfersManagement = new TransfersManagement();
@@ -954,14 +952,13 @@ public class MegaApplication extends MultiDexApplication implements Application.
         megaApi.creditCardQuerySubscriptions(null);
     }
 
+	public void askForPricing(){
+		megaApi.getPricing(null);
+	}
+
     public void askForPaymentMethods() {
         logDebug("askForPaymentMethods");
         megaApi.getPaymentMethods(null);
-    }
-
-    public void askForPricing() {
-
-        megaApi.getPricing(null);
     }
 
     public void askForAccountDetails() {

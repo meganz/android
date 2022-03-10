@@ -3,7 +3,6 @@ package mega.privacy.android.app.utils;
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MegaAttributes;
-import mega.privacy.android.app.lollipop.megachat.ChatSettings;
 
 import static mega.privacy.android.app.utils.LogUtil.*;
 

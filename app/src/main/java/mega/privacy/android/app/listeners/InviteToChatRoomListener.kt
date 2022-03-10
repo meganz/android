@@ -3,8 +3,8 @@ package mega.privacy.android.app.listeners
 import android.content.Context
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
-import mega.privacy.android.app.lollipop.megachat.ChatActivity
-import mega.privacy.android.app.lollipop.megachat.GroupChatInfoActivity
+import mega.privacy.android.app.main.megachat.ChatActivity
+import mega.privacy.android.app.main.megachat.GroupChatInfoActivity
 import mega.privacy.android.app.utils.Constants.SNACKBAR_TYPE
 import nz.mega.sdk.*
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE

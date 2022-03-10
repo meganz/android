@@ -19,7 +19,7 @@ import java.util.concurrent.TimeUnit;
 
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.R;
-import mega.privacy.android.app.lollipop.ManagerActivity;
+import mega.privacy.android.app.main.ManagerActivity;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaContactRequest;

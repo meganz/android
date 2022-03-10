@@ -38,7 +38,6 @@ import java.util.Queue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-import kotlin.Unit;
 import mega.privacy.android.app.AndroidCompletedTransfer;
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
@@ -50,7 +49,7 @@ import mega.privacy.android.app.VideoCompressor;
 import mega.privacy.android.app.listeners.CreateFolderListener;
 import mega.privacy.android.app.listeners.GetCuAttributeListener;
 import mega.privacy.android.app.listeners.SetAttrUserListener;
-import mega.privacy.android.app.lollipop.ManagerActivity;
+import mega.privacy.android.app.main.ManagerActivity;
 import mega.privacy.android.app.receivers.NetworkTypeChangeReceiver;
 import mega.privacy.android.app.sync.cusync.CuSyncManager;
 import mega.privacy.android.app.utils.ChatUtil;
@@ -79,8 +78,8 @@ import static android.content.ContentResolver.QUERY_ARG_SQL_SORT_ORDER;
 import static mega.privacy.android.app.constants.SettingsConstants.*;
 import static mega.privacy.android.app.jobservices.SyncRecord.*;
 import static mega.privacy.android.app.listeners.CreateFolderListener.ExtraAction.INIT_CU;
-import static mega.privacy.android.app.lollipop.ManagerActivity.PENDING_TAB;
-import static mega.privacy.android.app.lollipop.ManagerActivity.TRANSFERS_TAB;
+import static mega.privacy.android.app.main.ManagerActivity.PENDING_TAB;
+import static mega.privacy.android.app.main.ManagerActivity.TRANSFERS_TAB;
 import static mega.privacy.android.app.receivers.NetworkTypeChangeReceiver.MOBILE;
 import static mega.privacy.android.app.utils.ImageProcessor.*;
 import static mega.privacy.android.app.utils.JobUtil.*;
@@ -683,10 +682,11 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
                 logDebug("Nothing to upload.");
 
                 // Make sure to send inactive heartbeat.
-                CuSyncManager.INSTANCE.doInactiveHeartbeat(() -> {
-                    logDebug("Nothing to upload, send inactive heartbeat.");
-                    return Unit.INSTANCE;
-                });
+                CuSyncManager.INSTANCE.doRegularHeartbeat();
+
+                // Make sure to re schedule the job
+                scheduleCameraUploadJob(this, true);
+
                 finish();
                 purgeDirectory(new File(tempRoot));
             }
@@ -1992,7 +1992,7 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
 
         NotificationCompat.Builder builder = new NotificationCompat.Builder(this, OVER_QUOTA_NOTIFICATION_CHANNEL_ID);
         builder.setSmallIcon(R.drawable.ic_stat_camera_sync)
-                .setContentIntent(PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_IMMUTABLE))
+                .setContentIntent(PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE))
                 .setAutoCancel(true)
                 .setTicker(contentText)
                 .setContentTitle(message)

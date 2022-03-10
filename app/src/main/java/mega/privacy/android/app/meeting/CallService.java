@@ -30,7 +30,7 @@ import java.util.ArrayList;
 
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
-import mega.privacy.android.app.lollipop.controllers.ChatController;
+import mega.privacy.android.app.main.controllers.ChatController;
 import mega.privacy.android.app.utils.StringResourcesUtils;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
@@ -42,7 +42,6 @@ import static mega.privacy.android.app.constants.EventConstants.EVENT_CALL_ANSWE
 import static mega.privacy.android.app.constants.EventConstants.EVENT_CALL_ON_HOLD_CHANGE;
 import static mega.privacy.android.app.constants.EventConstants.EVENT_CALL_STATUS_CHANGE;
 import static mega.privacy.android.app.constants.EventConstants.EVENT_CHAT_TITLE_CHANGE;
-import static mega.privacy.android.app.constants.EventConstants.EVENT_ENTER_IN_MEETING;
 import static mega.privacy.android.app.constants.EventConstants.EVENT_REMOVE_CALL_NOTIFICATION;
 import static mega.privacy.android.app.utils.AvatarUtil.*;
 import static mega.privacy.android.app.utils.CacheFolderManager.*;

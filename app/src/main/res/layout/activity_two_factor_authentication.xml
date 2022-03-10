@@ -11,7 +11,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:minHeight="?attr/actionBarSize"
-        tools:context=".lollipop.TwoFactorAuthenticationActivity" />
+        tools:context=".main.TwoFactorAuthenticationActivity" />
 
     <ScrollView
         android:id="@+id/scroll_container_2fa"

@@ -3,16 +3,15 @@ package mega.privacy.android.app.notifications;
 
 import android.app.IntentService;
 import android.app.NotificationManager;
-import android.app.PendingIntent;
 import android.content.Intent;
 
 import androidx.annotation.Nullable;
 
-import mega.privacy.android.app.lollipop.LoginActivity;
-import mega.privacy.android.app.lollipop.ManagerActivity;
+import mega.privacy.android.app.main.LoginActivity;
+import mega.privacy.android.app.main.ManagerActivity;
 
-import static mega.privacy.android.app.lollipop.ManagerActivity.PENDING_TAB;
-import static mega.privacy.android.app.lollipop.ManagerActivity.TRANSFERS_TAB;
+import static mega.privacy.android.app.main.ManagerActivity.PENDING_TAB;
+import static mega.privacy.android.app.main.ManagerActivity.TRANSFERS_TAB;
 import static mega.privacy.android.app.utils.Constants.*;
 
 public class DownloadNotificationIntentService extends IntentService {

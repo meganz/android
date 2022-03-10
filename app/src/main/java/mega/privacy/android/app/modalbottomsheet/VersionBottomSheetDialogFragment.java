@@ -11,7 +11,7 @@ import android.widget.TextView;
 import java.util.Collections;
 
 import mega.privacy.android.app.R;
-import mega.privacy.android.app.lollipop.VersionsFileActivity;
+import mega.privacy.android.app.main.VersionsFileActivity;
 import nz.mega.sdk.MegaNode;
 
 import static mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil.setNodeThumbnail;

@@ -8,14 +8,14 @@ import android.widget.RelativeLayout;
 
 import mega.privacy.android.app.components.transferWidget.TransferWidget;
 import mega.privacy.android.app.components.transferWidget.TransfersManagement;
-import mega.privacy.android.app.lollipop.DrawerItem;
-import mega.privacy.android.app.lollipop.ManagerActivity;
+import mega.privacy.android.app.main.DrawerItem;
+import mega.privacy.android.app.main.ManagerActivity;
 import mega.privacy.android.app.activities.PasscodeActivity;
 
 import static mega.privacy.android.app.components.transferWidget.TransfersManagement.*;
 import static mega.privacy.android.app.constants.BroadcastConstants.*;
-import static mega.privacy.android.app.lollipop.ManagerActivity.PENDING_TAB;
-import static mega.privacy.android.app.lollipop.ManagerActivity.TRANSFERS_TAB;
+import static mega.privacy.android.app.main.ManagerActivity.PENDING_TAB;
+import static mega.privacy.android.app.main.ManagerActivity.TRANSFERS_TAB;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 
