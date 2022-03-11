@@ -88,7 +88,7 @@ class HomePageViewModel @Inject constructor(
             .removeObserver(chatOnlineStatusObserver)
     }
 
-    fun showCallIcon(): LiveData<Boolean> = showCallIcon
+    fun onShowCallIcon(): LiveData<Boolean> = showCallIcon
 
     private fun showDefaultAvatar() = viewModelScope.launch {
         _avatar.value = repository.getDefaultAvatar()
