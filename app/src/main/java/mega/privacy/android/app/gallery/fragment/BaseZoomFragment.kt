@@ -150,6 +150,27 @@ abstract class BaseZoomFragment : BaseFragment(), GestureScaleCallback,
         }
     }
 
+    /**
+     *     Remove the green border and selected checkmark icon for unselected items
+     */
+    private fun deselectNodesUI() {
+        for (pos in actionModeViewModel.deselectedNodeIndices) {
+            listView.findViewHolderForAdapterPosition(pos)?.let { viewHolder ->
+                val itemView = viewHolder.itemView
+
+                itemView
+                    .findViewById<SimpleDraweeView>(R.id.thumbnail)
+                    .hierarchy
+                    .roundingParams = null
+
+                itemView
+                    .findViewById<ImageView>(R.id.icon_selected)
+                    ?.visibility = View.GONE
+            }
+        }
+        actionModeViewModel.deselectedNodeIndices.clear()
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         mManagerActivity = activity as ManagerActivity
@@ -220,6 +241,8 @@ abstract class BaseZoomFragment : BaseFragment(), GestureScaleCallback,
     private fun setupActionMode() {
         actionModeCallback =
             ActionModeCallback(mManagerActivity, actionModeViewModel, megaApi)
+
+        actionModeViewModel.setUIDirty(false)
 
         observeItemLongClick()
         observeSelectedItems()
@@ -438,7 +461,7 @@ abstract class BaseZoomFragment : BaseFragment(), GestureScaleCallback,
     private fun observeAnimatedItems() {
         var animatorSet: AnimatorSet? = null
 
-        actionModeViewModel.animNodeIndices.observe(viewLifecycleOwner, {
+        actionModeViewModel.animNodeIndices.observe(viewLifecycleOwner) {
             animatorSet?.run {
                 // End the started animation if any, or the view may show messy as its property
                 // would be wrongly changed by multiple animations running at the same time
@@ -459,6 +482,7 @@ abstract class BaseZoomFragment : BaseFragment(), GestureScaleCallback,
 
                 override fun onAnimationEnd(animation: Animator?) {
                     updateUiWhenAnimationEnd()
+                    deselectNodesUI()
                 }
 
                 override fun onAnimationCancel(animation: Animator?) {
@@ -494,7 +518,7 @@ abstract class BaseZoomFragment : BaseFragment(), GestureScaleCallback,
 
             animatorSet?.playTogether(animatorList)
             animatorSet?.start()
-        })
+        }
     }
 
     private fun observeActionModeDestroy() =
