@@ -3506,9 +3506,6 @@ public class ChatActivity extends PasscodeActivity
             }
             case REQUEST_READ_STORAGE:
                 logDebug("Permission Read storage granted");
-                if (bottomSheetDialogFragment != null && bottomSheetDialogFragment.isAdded() && bottomSheetDialogFragment instanceof ChatRoomToolbarBottomSheetDialogFragment) {
-                    ((ChatRoomToolbarBottomSheetDialogFragment) bottomSheetDialogFragment).uploadGallery();
-                }
                 break;
 
             case LOCATION_PERMISSION_REQUEST_CODE: {
@@ -9984,12 +9981,6 @@ public class ChatActivity extends PasscodeActivity
             } else {
                 break;
             }
-        }
-    }
-
-    public void showGallery(ArrayList<FileGalleryItem> files){
-        if (bottomSheetDialogFragment != null && bottomSheetDialogFragment.isAdded() && bottomSheetDialogFragment instanceof ChatRoomToolbarBottomSheetDialogFragment) {
-
         }
     }
 }
