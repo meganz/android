@@ -679,7 +679,11 @@ class TextEditorActivity : PasscodeActivity(), SnackbarShower, Scrollable {
             animateBottom(false, ANIMATION_DURATION)
         } else {
             currentUIState = STATE_SHOWN
-            binding.editFab.show()
+
+            if (viewModel.canShowEditFab()) {
+                binding.editFab.show()
+            }
+
             animateToolbar(true, ANIMATION_DURATION)
             animateBottom(true, ANIMATION_DURATION)
         }
