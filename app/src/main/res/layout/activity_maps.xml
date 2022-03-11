@@ -6,7 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:animateLayoutChanges="true"
-    tools:context=".lollipop.megachat.MapsActivity">
+    tools:context=".main.megachat.MapsActivity">
 
     <androidx.appcompat.widget.Toolbar
         android:id="@+id/toolbar_maps"
@@ -14,7 +14,7 @@
         android:layout_height="wrap_content"
         android:elevation="4dp"
         android:minHeight="?attr/actionBarSize"
-        tools:context=".lollipop.megachat" />
+        tools:context=".main.megachat" />
 
     <RelativeLayout
         android:id="@+id/map_layout"

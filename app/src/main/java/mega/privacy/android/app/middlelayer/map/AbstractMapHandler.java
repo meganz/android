@@ -3,8 +3,8 @@ package mega.privacy.android.app.middlelayer.map;
 import android.graphics.Bitmap;
 
 import mega.privacy.android.app.R;
-import mega.privacy.android.app.lollipop.megachat.MapAddress;
-import mega.privacy.android.app.lollipop.megachat.MapsActivity;
+import mega.privacy.android.app.main.megachat.MapAddress;
+import mega.privacy.android.app.main.megachat.MapsActivity;
 
 /**
  * Hold a MapsActivity reference,

@@ -19,8 +19,8 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.adapters.FileStorageAdapter
 import mega.privacy.android.app.databinding.BottomSheetChatRoomToolbarBinding
 import mega.privacy.android.app.interfaces.ChatRoomToolbarBottomSheetDialogActionListener
-import mega.privacy.android.app.lollipop.megachat.ChatActivity
-import mega.privacy.android.app.lollipop.megachat.FileGalleryItem
+import mega.privacy.android.app.main.megachat.ChatActivity
+import mega.privacy.android.app.main.megachat.FileGalleryItem
 import mega.privacy.android.app.utils.*
 import mega.privacy.android.app.utils.LogUtil.logDebug
 import java.util.*

@@ -2,6 +2,7 @@ package mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet
 
 import android.net.Uri
 import android.provider.MediaStore
+import android.provider.MediaStore.MediaColumns.DATA
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import kotlinx.coroutines.*
@@ -34,31 +35,31 @@ class ChatRoomToolbarGalleryViewModel() : ViewModel(), CoroutineScope {
      */
     internal fun loadImages(): ArrayList<String> {
         val listOfAllImages = ArrayList<String>()
-        val uri: Uri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI
+        /*val uri: Uri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI
 
         var absolutePathOfImage: String? = null
         val projection =
-            arrayOf(MediaStore.MediaColumns.DATA, MediaStore.Images.Media.BUCKET_DISPLAY_NAME)
+            arrayOf(DATA, MediaStore.Images.Media.BUCKET_DISPLAY_NAME)
 
         val cursor =
             MegaApplication.getInstance().contentResolver.query(uri, projection, null, null, null)
 
-        val columnIndexData = cursor!!.getColumnIndexOrThrow(MediaStore.MediaColumns.DATA)
+        val columnIndexData = cursor!!.getColumnIndexOrThrow(DATA)
         val columnIndexFolderName = cursor!!
             .getColumnIndexOrThrow(MediaStore.Images.Media.BUCKET_DISPLAY_NAME)
         while (cursor!!.moveToNext()) {
             absolutePathOfImage = cursor!!.getString(columnIndexData)
             listOfAllImages.add(absolutePathOfImage)
-        }
+        }*/
 
         return listOfAllImages
     }
 
     fun getAllImages() {
-        launch(Dispatchers.Main) {
+        /*launch(Dispatchers.Main) {
             imagesLiveData.value = withContext(Dispatchers.IO) {
                 loadImages()
             }
-        }
+        }*/
     }
 }

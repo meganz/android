@@ -33,7 +33,7 @@ import mega.privacy.android.app.interfaces.showSnackbar
 import mega.privacy.android.app.listeners.MoveListener
 import mega.privacy.android.app.listeners.RemoveListener
 import mega.privacy.android.app.listeners.RenameListener
-import mega.privacy.android.app.lollipop.FileExplorerActivity
+import mega.privacy.android.app.main.FileExplorerActivity
 import mega.privacy.android.app.textEditor.TextEditorActivity
 import mega.privacy.android.app.textEditor.TextEditorViewModel.Companion.CREATE_MODE
 import mega.privacy.android.app.textEditor.TextEditorViewModel.Companion.MODE

@@ -9,8 +9,8 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import mega.privacy.android.app.R;
-import mega.privacy.android.app.lollipop.controllers.AccountController;
-import mega.privacy.android.app.lollipop.TwoFactorAuthenticationActivity;
+import mega.privacy.android.app.main.controllers.AccountController;
+import mega.privacy.android.app.main.TwoFactorAuthenticationActivity;
 
 public class RecoveryKeyBottomSheetDialogFragment extends BaseBottomSheetDialogFragment implements View.OnClickListener {
 
