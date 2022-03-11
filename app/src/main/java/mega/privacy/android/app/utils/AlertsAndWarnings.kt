@@ -15,8 +15,8 @@ import mega.privacy.android.app.BaseActivity
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.OverDiskQuotaPaywallActivity
-import mega.privacy.android.app.lollipop.LoginActivity
-import mega.privacy.android.app.lollipop.megachat.ChatActivity
+import mega.privacy.android.app.main.LoginActivity
+import mega.privacy.android.app.main.megachat.ChatActivity
 import mega.privacy.android.app.utils.StringResourcesUtils.getString
 
 object AlertsAndWarnings {

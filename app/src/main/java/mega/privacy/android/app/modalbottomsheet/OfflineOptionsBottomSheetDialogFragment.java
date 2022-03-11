@@ -21,7 +21,7 @@ import java.util.Collections;
 import mega.privacy.android.app.MegaOffline;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
-import mega.privacy.android.app.lollipop.ManagerActivity;
+import mega.privacy.android.app.main.ManagerActivity;
 import mega.privacy.android.app.utils.OfflineUtils;
 
 import static mega.privacy.android.app.utils.Constants.*;

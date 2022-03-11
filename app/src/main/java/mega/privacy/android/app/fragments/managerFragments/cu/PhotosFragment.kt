@@ -25,8 +25,8 @@ import mega.privacy.android.app.databinding.FragmentPhotosBinding
 import mega.privacy.android.app.gallery.data.GalleryItem
 import mega.privacy.android.app.gallery.fragment.BaseZoomFragment
 import mega.privacy.android.app.jobservices.CameraUploadsService
-import mega.privacy.android.app.lollipop.FileStorageActivity
-import mega.privacy.android.app.lollipop.ManagerActivity
+import mega.privacy.android.app.main.FileStorageActivity
+import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.utils.*
 import mega.privacy.android.app.utils.ColorUtils.DARK_IMAGE_ALPHA
 import mega.privacy.android.app.utils.ColorUtils.setImageViewAlphaIfDark

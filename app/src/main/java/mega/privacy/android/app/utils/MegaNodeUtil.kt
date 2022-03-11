@@ -33,11 +33,11 @@ import mega.privacy.android.app.listeners.CopyListener
 import mega.privacy.android.app.listeners.ExportListener
 import mega.privacy.android.app.listeners.MoveListener
 import mega.privacy.android.app.listeners.RemoveListener
-import mega.privacy.android.app.lollipop.FileExplorerActivity
-import mega.privacy.android.app.lollipop.ManagerActivity
-import mega.privacy.android.app.lollipop.DrawerItem
-import mega.privacy.android.app.lollipop.PdfViewerActivity
-import mega.privacy.android.app.lollipop.listeners.MultipleRequestListener
+import mega.privacy.android.app.main.FileExplorerActivity
+import mega.privacy.android.app.main.ManagerActivity
+import mega.privacy.android.app.main.DrawerItem
+import mega.privacy.android.app.main.PdfViewerActivity
+import mega.privacy.android.app.main.listeners.MultipleRequestListener
 import mega.privacy.android.app.textEditor.TextEditorActivity
 import mega.privacy.android.app.textEditor.TextEditorViewModel.Companion.EDIT_MODE
 import mega.privacy.android.app.textEditor.TextEditorViewModel.Companion.MODE

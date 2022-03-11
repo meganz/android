@@ -20,7 +20,7 @@ import mega.privacy.android.app.DownloadService;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.UploadService;
-import mega.privacy.android.app.lollipop.megachat.ChatUploadService;
+import mega.privacy.android.app.main.megachat.ChatUploadService;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaTransfer;

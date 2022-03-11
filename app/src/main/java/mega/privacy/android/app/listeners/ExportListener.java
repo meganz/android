@@ -13,8 +13,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 
-import mega.privacy.android.app.lollipop.controllers.ChatController;
-import mega.privacy.android.app.lollipop.megachat.AndroidMegaChatMessage;
+import mega.privacy.android.app.main.controllers.ChatController;
+import mega.privacy.android.app.main.megachat.AndroidMegaChatMessage;
 import mega.privacy.android.app.utils.Constants;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaError;

@@ -4,7 +4,7 @@ import android.os.Bundle
 import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.BaseActivity
 import mega.privacy.android.app.MegaApplication
-import mega.privacy.android.app.lollipop.ManagerActivity
+import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.objects.PasscodeManagement
 import mega.privacy.android.app.utils.Constants.ACTION_CHAT_NOTIFICATION_MESSAGE
 import mega.privacy.android.app.utils.Constants.CHAT_ID
