@@ -315,7 +315,7 @@ class HomepageFragment : Fragment() {
             searchInputView.setAvatar(it)
         }
 
-        viewModel.showCallIcon.observe(viewLifecycleOwner) {
+        viewModel.showCallIcon().observe(viewLifecycleOwner) {
             searchInputView.setOngoingCallVisibility(it)
         }
 

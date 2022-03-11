@@ -35,7 +35,7 @@ class HomePageViewModel @Inject constructor(
     val notificationCount: LiveData<Int> = _notificationCount
     val avatar: LiveData<Bitmap> = _avatar
     val chatStatus: LiveData<Int> = _chatStatus
-    val showCallIcon: MutableLiveData<Boolean> = MutableLiveData()
+    private val showCallIcon: MutableLiveData<Boolean> = MutableLiveData()
     val bannerList: LiveData<MutableList<MegaBanner>?> = _bannerList
 
     private val avatarChangeObserver = androidx.lifecycle.Observer<Boolean> {
