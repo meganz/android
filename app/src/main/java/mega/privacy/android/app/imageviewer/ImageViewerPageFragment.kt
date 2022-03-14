@@ -22,7 +22,7 @@ import com.facebook.imagepipeline.request.ImageRequestBuilder
 import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.R
 import mega.privacy.android.app.databinding.PageImageViewerBinding
-import mega.privacy.android.app.imageviewer.data.ImageItem
+import mega.privacy.android.app.imageviewer.data.ImageResult
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_HANDLE
 import mega.privacy.android.app.utils.ContextUtils.getScreenSize
 import mega.privacy.android.app.utils.ExtraUtils.extra
@@ -82,13 +82,14 @@ class ImageViewerPageFragment : Fragment() {
     override fun onResume() {
         super.onResume()
         if (!hasScreenBeenRotated) {
-            viewModel.loadSingleImage(nodeHandle!!, fullSize = false, highPriority = true)
+            viewModel.getImageItem(nodeHandle!!)?.imageResult?.let { showFullImage(it) }
         }
     }
 
     override fun onPause() {
         if (activity?.isChangingConfigurations != true) {
             viewModel.stopImageLoading(nodeHandle!!, aggressive = false)
+            viewModel.getImageItem(nodeHandle!!)?.imageResult?.let { showPreviewImage(it) }
         }
         super.onPause()
     }
@@ -112,7 +113,7 @@ class ImageViewerPageFragment : Fragment() {
                     onZoomCallback = {
                         if (!hasZoomBeenTriggered) {
                             hasZoomBeenTriggered = true
-                            viewModel.loadSingleImage(nodeHandle!!, fullSize = true, highPriority = true)
+                            viewModel.loadSingleImage(nodeHandle!!, fullSize = true)
                         }
                     }
                 )
@@ -121,68 +122,84 @@ class ImageViewerPageFragment : Fragment() {
     }
 
     private fun setupObservers() {
-        viewModel.onImage(nodeHandle!!).observe(viewLifecycleOwner, ::showItem)
+        viewModel.onImage(nodeHandle!!).observe(viewLifecycleOwner) { imageItem ->
+            val imageResult = imageItem?.imageResult ?: return@observe
+
+            when (lifecycle.currentState) {
+                Lifecycle.State.RESUMED -> {
+                    showFullImage(imageResult)
+                }
+                Lifecycle.State.CREATED, Lifecycle.State.STARTED -> {
+                    showPreviewImage(imageResult)
+                }
+                else -> {
+                    // do nothing
+                }
+            }
+        }
+
         if (!hasScreenBeenRotated) {
             viewModel.loadSingleNode(nodeHandle!!)
-            viewModel.loadSingleImage(nodeHandle!!, fullSize = false, highPriority = false)
+            viewModel.loadSingleImage(nodeHandle!!, fullSize = false)
         }
     }
 
-    private fun showItem(imageItem: ImageItem?) {
-        val imageResult = imageItem?.imageResult ?: return
+    private fun showPreviewImage(imageResult: ImageResult) {
+        val previewImageRequest = imageResult.previewUri?.toImageRequest()
+        val thumbnailImageRequest = imageResult.thumbnailUri?.toImageRequest()
+        if (previewImageRequest == null && thumbnailImageRequest == null) return
 
-        var mainImageUri: Uri? = null
-        var lowImageUri: Uri? = null
-
-        when {
-            imageResult.isVideo -> {
-                mainImageUri = imageResult.previewUri
-                lowImageUri = imageResult.thumbnailUri
-            }
-            imageResult.fullSizeUri != null -> {
-                if (lifecycle.currentState == Lifecycle.State.RESUMED
-                    || (imageResult.previewUri == null && imageResult.thumbnailUri == null)
-                ) {
-                    mainImageUri = imageResult.fullSizeUri
-                    lowImageUri = imageResult.previewUri ?: imageResult.thumbnailUri
-                } else {
-                    mainImageUri = imageResult.previewUri
-                    lowImageUri = imageResult.thumbnailUri
-                }
-            }
-            imageResult.previewUri != null -> {
-                mainImageUri = imageResult.previewUri
-                lowImageUri = imageResult.thumbnailUri
-            }
-            imageResult.thumbnailUri != null -> {
-                mainImageUri = imageResult.thumbnailUri
-            }
+        val newControllerBuilder = Fresco.newDraweeControllerBuilder()
+        if (previewImageRequest != null) {
+            newControllerBuilder.imageRequest = previewImageRequest
+            thumbnailImageRequest?.let { newControllerBuilder.setLowResImageRequest(it) }
+        } else {
+            newControllerBuilder.imageRequest = thumbnailImageRequest
         }
 
-        if (mainImageUri == null && lowImageUri == null) return
-        val mainImageRequest = mainImageUri?.toImageRequest()
-        val newControllerBuilder = Fresco.newDraweeControllerBuilder()
-            .setImageRequest(mainImageRequest)
-            .apply { lowImageUri?.toImageRequest()?.let(::setLowResImageRequest) }
-        val newController = newControllerBuilder.build()
-
-        if (binding.image.controller?.isSameImageRequest(newController) != true) {
+        if (binding.image.controller?.isSameImageRequest(newControllerBuilder.build()) != true) {
             binding.image.controller = newControllerBuilder
                 .setOldController(binding.image.controller)
                 .setControllerListener(controllerListener)
                 .setAutoPlayAnimations(true)
                 .build()
-        } else if (imageItem.imageResult.isFullyLoaded) {
-            binding.image.post {
-                if (imageItem.imageResult.isVideo) {
-                    showVideoButton()
-                }
-                binding.progress.hide()
+
+            if (imageResult.isVideo) {
+                binding.image.post { showVideoButton() }
+            }
+        }
+    }
+
+    private fun showFullImage(imageResult: ImageResult) {
+        val fullImageRequest = imageResult.fullSizeUri?.toImageRequest() ?: return
+        val previewImageRequest = (imageResult.previewUri ?: imageResult.thumbnailUri)?.toImageRequest()
+
+        val newControllerBuilder = Fresco.newDraweeControllerBuilder()
+            .setImageRequest(fullImageRequest)
+        if (previewImageRequest != null) {
+            newControllerBuilder.setLowResImageRequest(previewImageRequest)
+        }
+
+        if (binding.image.controller?.isSameImageRequest(newControllerBuilder.build()) != true) {
+            binding.image.controller = newControllerBuilder
+                .setOldController(binding.image.controller)
+                .setControllerListener(controllerListener)
+                .setAutoPlayAnimations(true)
+                .build()
+
+            if (imageResult.isVideo) {
+                binding.image.post { showVideoButton() }
             }
         }
     }
 
     private fun buildImageControllerListener() = object : BaseControllerListener<ImageInfo>() {
+        override fun onSubmit(id: String?, callerContext: Any?) {
+            if (viewModel.getImageItem(nodeHandle!!)?.imageResult?.isFullyLoaded != true) {
+                binding.progress.show()
+            }
+        }
+
         override fun onFinalImageSet(
             id: String?,
             imageInfo: ImageInfo?,

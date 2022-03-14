@@ -2,6 +2,7 @@ package mega.privacy.android.app.imageviewer
 
 import android.app.Activity
 import android.net.Uri
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.map
@@ -21,12 +22,8 @@ import mega.privacy.android.app.imageviewer.data.ImageItem
 import mega.privacy.android.app.imageviewer.data.ImageResult
 import mega.privacy.android.app.imageviewer.usecase.GetImageHandlesUseCase
 import mega.privacy.android.app.imageviewer.usecase.GetImageUseCase
-import mega.privacy.android.app.usecase.CancelTransferUseCase
-import mega.privacy.android.app.usecase.MegaException
-import mega.privacy.android.app.usecase.GetGlobalChangesUseCase
+import mega.privacy.android.app.usecase.*
 import mega.privacy.android.app.usecase.GetGlobalChangesUseCase.Result
-import mega.privacy.android.app.usecase.GetNodeUseCase
-import mega.privacy.android.app.usecase.LoggedInUseCase
 import mega.privacy.android.app.usecase.chat.DeleteChatMessageUseCase
 import mega.privacy.android.app.usecase.data.MegaNodeItem
 import mega.privacy.android.app.utils.Constants.INVALID_POSITION
@@ -71,8 +68,6 @@ class ImageViewerViewModel @Inject constructor(
     private val currentPosition = MutableLiveData<Int>()
     private val showToolbar = MutableLiveData<Boolean>()
     private val snackbarMessage = SingleLiveEvent<String>()
-    private val nodesComposite = CompositeDisposable()
-    private val imagesComposite = CompositeDisposable()
     private var isUserLoggedIn = false
 
     init {
@@ -81,8 +76,6 @@ class ImageViewerViewModel @Inject constructor(
     }
 
     override fun onCleared() {
-        nodesComposite.clear()
-        imagesComposite.clear()
         Fresco.getImagePipeline()?.clearMemoryCaches()
         super.onCleared()
     }
@@ -206,11 +199,10 @@ class ImageViewerViewModel @Inject constructor(
      *
      * @param nodeHandle    Image node handle to be loaded.
      * @param fullSize      Flag to request full size image despite data/size requirements.
-     * @param highPriority  Flag to request image with high priority.
      */
-    fun loadSingleImage(nodeHandle: Long, fullSize: Boolean, highPriority: Boolean) {
+    fun loadSingleImage(nodeHandle: Long, fullSize: Boolean) {
         val imageItem = images.value?.find { it.handle == nodeHandle }
-        val fullSizeRequired = fullSize || images.value?.size == 1
+        val highPriority = nodeHandle == getCurrentImageItem()?.handle
 
         val subscription = when {
             imageItem == null
@@ -219,23 +211,26 @@ class ImageViewerViewModel @Inject constructor(
                     && imageItem.imageResult.previewUri != null) ->
                 return
             imageItem.nodePublicLink?.isNotBlank() == true ->
-                getImageUseCase.get(imageItem.nodePublicLink, fullSizeRequired, highPriority)
+                getImageUseCase.get(imageItem.nodePublicLink, fullSize, highPriority)
             imageItem.chatMessageId != null && imageItem.chatRoomId != null ->
-                getImageUseCase.get(imageItem.chatRoomId, imageItem.chatMessageId, fullSizeRequired, highPriority)
+                getImageUseCase.get(imageItem.chatRoomId, imageItem.chatMessageId, fullSize, highPriority)
             imageItem.isOffline ->
                 getImageUseCase.getOffline(imageItem.handle)
             imageItem.handle != INVALID_HANDLE ->
-                getImageUseCase.get(nodeHandle, fullSizeRequired, highPriority)
+                getImageUseCase.get(nodeHandle, fullSize, highPriority)
             imageItem.nodeItem?.node != null ->
-                getImageUseCase.get(imageItem.nodeItem.node, fullSizeRequired, highPriority)
+                getImageUseCase.get(imageItem.nodeItem.node, fullSize, highPriority)
             else ->
                 return // Image file uri with no handle
         }
 
+        Log.wtf("CACATAG", "Loading image: $nodeHandle")
         subscription
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
-            .retry(1)
+            .retry(2) { error ->
+                Log.wtf("CACATAG", "Error: $error")
+                error is ResourceAlreadyExistsMegaException || error is HttpMegaException }
             .subscribeBy(
                 onNext = { imageResult ->
                     updateItemIfNeeded(nodeHandle, imageResult = imageResult)
