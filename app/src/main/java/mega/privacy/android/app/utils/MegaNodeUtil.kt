@@ -2099,6 +2099,19 @@ object MegaNodeUtil {
      * @param nodeFile  File to be checked
      */
     @JvmStatic
-    fun MegaNode.isNodeFileValid(nodeFile: File?): Boolean =
+    fun MegaNode.isNodeFileValid(megaApi: MegaApiAndroid, nodeFile: File?): Boolean =
         nodeFile?.exists() == true && nodeFile.canRead() && nodeFile.length() == this.size
+                && megaApi.getFingerprint(nodeFile.absolutePath) == fingerprint
+
+    /**
+     * Check if provided node File is valid for the specified MegaNode
+     *
+     * @param node      MegaNode to be compared with
+     * @param nodeFile  Node file to be compared with
+     * @return          true if its valid, false otherwise
+     */
+    @JvmStatic
+    fun MegaApiAndroid.checkValidNodeFile(node: MegaNode, nodeFile: File?): Boolean =
+        nodeFile?.canRead() == true && nodeFile.length() == node.size
+                && node.fingerprint == getFingerprint(nodeFile.absolutePath)
 }

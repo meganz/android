@@ -11,8 +11,10 @@ import androidx.core.net.toFile
 import androidx.core.net.toUri
 import dagger.hilt.android.qualifiers.ApplicationContext
 import io.reactivex.rxjava3.core.BackpressureStrategy
+import io.reactivex.rxjava3.core.Completable
 import io.reactivex.rxjava3.core.Flowable
 import io.reactivex.rxjava3.core.Single
+import io.reactivex.rxjava3.kotlin.subscribeBy
 import mega.privacy.android.app.DownloadService
 import mega.privacy.android.app.MimeTypeList
 import mega.privacy.android.app.components.transferWidget.TransfersManagement
@@ -29,9 +31,9 @@ import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.ContextUtils.getScreenSize
 import mega.privacy.android.app.utils.FileUtil
 import mega.privacy.android.app.utils.LogUtil.logWarning
+import mega.privacy.android.app.utils.MegaNodeUtil.checkValidNodeFile
 import mega.privacy.android.app.utils.MegaNodeUtil.getFileName
 import mega.privacy.android.app.utils.MegaNodeUtil.getThumbnailFileName
-import mega.privacy.android.app.utils.MegaNodeUtil.isNodeFileValid
 import mega.privacy.android.app.utils.MegaNodeUtil.isVideo
 import mega.privacy.android.app.utils.MegaTransferUtils.getNumPendingDownloadsNonBackground
 import mega.privacy.android.app.utils.NetworkUtil.isMeteredConnection
@@ -148,7 +150,7 @@ class GetImageUseCase @Inject constructor(
                     val previewFile = if (node.hasPreview() || node.isVideo()) buildPreviewFile(context, node.getThumbnailFileName()) else null
                     val fullFile = buildTempFile(context, node.getFileName())
 
-                    if (!node.isNodeFileValid(fullFile)) {
+                    if (!megaApi.checkValidNodeFile(node, fullFile)) {
                         FileUtil.deleteFileSafely(fullFile)
                     }
 
@@ -163,7 +165,7 @@ class GetImageUseCase @Inject constructor(
                         image.previewUri = getVideoPreviewImage(node.getThumbnailFileName(), fullFile.toUri()).blockingGetOrNull()
                     }
 
-                    if ((!fullSizeRequired && previewFile?.exists() == true) || node.isNodeFileValid(fullFile)) {
+                    if ((!fullSizeRequired && previewFile?.exists() == true) || megaApi.checkValidNodeFile(node, fullFile)) {
                         image.isFullyLoaded = true
                         emitter.onNext(image)
                         emitter.onComplete()
@@ -173,49 +175,37 @@ class GetImageUseCase @Inject constructor(
                     }
 
                     if (thumbnailFile != null && !thumbnailFile.exists()) {
-                        megaApi.getThumbnail(
-                            node,
-                            thumbnailFile.absolutePath,
-                            OptionalMegaRequestListenerInterface(
-                                onRequestFinish = { _: MegaRequest, error: MegaError ->
-                                    if (emitter.isCancelled) return@OptionalMegaRequestListenerInterface
-                                    val megaException = error.toMegaException()
-
-                                    if (megaException is SuccessMegaException) {
-                                        image.thumbnailUri = thumbnailFile.toUri()
-                                        emitter.onNext(image)
-                                    } else {
-                                        logWarning(megaException.stackTraceToString())
-                                    }
-                                }
-                            ))
+                        getThumbnailImage(node, thumbnailFile.absolutePath).subscribeBy(
+                            onComplete = {
+                                image.thumbnailUri = thumbnailFile.toUri()
+                                emitter.onNext(image)
+                            },
+                            onError = { error ->
+                                logWarning(error.stackTraceToString())
+                            }
+                        )
                     }
 
                     if (previewFile != null && !previewFile.exists()) {
-                        megaApi.getPreview(
-                            node,
-                            previewFile.absolutePath,
-                            OptionalMegaRequestListenerInterface(
-                                onRequestFinish = { _: MegaRequest, error: MegaError ->
-                                    if (emitter.isCancelled) return@OptionalMegaRequestListenerInterface
-                                    val megaException = error.toMegaException()
-
-                                    if (megaException is SuccessMegaException) {
-                                        image.previewUri = previewFile.toUri()
-                                        if (fullSizeRequired) {
-                                            emitter.onNext(image)
-                                        } else {
-                                            image.isFullyLoaded = true
-                                            emitter.onNext(image)
-                                            emitter.onComplete()
-                                        }
-                                    } else if (!fullSizeRequired) {
-                                        emitter.onError(megaException)
-                                    } else {
-                                        logWarning(megaException.stackTraceToString())
-                                    }
+                        getPreviewImage(node, previewFile.absolutePath).subscribeBy(
+                            onComplete = {
+                                image.previewUri = previewFile.toUri()
+                                if (fullSizeRequired) {
+                                    emitter.onNext(image)
+                                } else {
+                                    image.isFullyLoaded = true
+                                    emitter.onNext(image)
+                                    emitter.onComplete()
                                 }
-                            ))
+                            },
+                            onError = { error ->
+                                if (!fullSizeRequired) {
+                                    emitter.onError(error)
+                                } else {
+                                    logWarning(error.stackTraceToString())
+                                }
+                            }
+                        )
                     }
 
                     if (fullSizeRequired && !fullFile.exists()) {
@@ -239,14 +229,14 @@ class GetImageUseCase @Inject constructor(
                                         emitter.onComplete()
                                     }
                                     is ResourceAlreadyExistsMegaException -> {
-                                        if (node.isNodeFileValid(fullFile)) {
+                                        if (megaApi.checkValidNodeFile(node, fullFile)) {
                                             image.fullSizeUri = fullFile.toUri()
                                             image.isFullyLoaded = true
                                             emitter.onNext(image)
                                             emitter.onComplete()
                                         } else {
                                             FileUtil.deleteFileSafely(fullFile)
-                                            emitter.onError(ResourceAlreadyExistsMegaException("File exists but is not valid"))
+                                            emitter.onError(megaException)
                                         }
                                     }
                                     is ResourceDoesNotExistMegaException -> {
@@ -289,6 +279,68 @@ class GetImageUseCase @Inject constructor(
                 }
             }
         }, BackpressureStrategy.LATEST)
+
+    /**
+     * Get the thumbnail of a node.
+     *
+     * @param node      Node to retrieve thumbnail from
+     * @param filePath  Destination path for the thumbnail
+     * @return          Completable
+     */
+    fun getThumbnailImage(node: MegaNode, filePath: String): Completable =
+        Completable.create { emitter ->
+            if (!node.hasThumbnail()) {
+                emitter.onError(ResourceDoesNotExistMegaException("Node has no thumbnail"))
+                return@create
+            }
+
+            megaApi.getThumbnail(
+                node,
+                filePath,
+                OptionalMegaRequestListenerInterface(
+                    onRequestFinish = { _: MegaRequest, error: MegaError ->
+                        if (emitter.isDisposed) return@OptionalMegaRequestListenerInterface
+
+                        val megaException = error.toMegaException()
+                        if (megaException is SuccessMegaException) {
+                            emitter.onComplete()
+                        } else {
+                            emitter.onError(megaException)
+                        }
+                    }
+                ))
+        }
+
+    /**
+     * Get the preview of a node.
+     *
+     * @param node      Node to retrieve preview from
+     * @param filePath  Destination path for the preview
+     * @return          Completable
+     */
+    fun getPreviewImage(node: MegaNode, filePath: String): Completable =
+        Completable.create { emitter ->
+            if (!node.hasPreview()) {
+                emitter.onError(ResourceDoesNotExistMegaException("Node has no preview"))
+                return@create
+            }
+
+            megaApi.getPreview(
+                node,
+                filePath,
+                OptionalMegaRequestListenerInterface(
+                    onRequestFinish = { _: MegaRequest, error: MegaError ->
+                        if (emitter.isDisposed) return@OptionalMegaRequestListenerInterface
+
+                        val megaException = error.toMegaException()
+                        if (megaException is SuccessMegaException) {
+                            emitter.onComplete()
+                        } else {
+                            emitter.onError(megaException)
+                        }
+                    }
+                ))
+        }
 
     /**
      * Get an ImageResult given an offline node handle.
