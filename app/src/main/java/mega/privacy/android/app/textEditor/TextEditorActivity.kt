@@ -23,7 +23,6 @@ import com.jeremyliao.liveeventbus.LiveEventBus
 import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.PasscodeActivity
-import mega.privacy.android.app.components.ListenScrollChangesHelper
 import mega.privacy.android.app.components.attacher.MegaAttacher
 import mega.privacy.android.app.components.saver.NodeSaver
 import mega.privacy.android.app.constants.EventConstants.EVENT_PERFORM_SCROLL
@@ -436,9 +435,7 @@ class TextEditorActivity : PasscodeActivity(), SnackbarShower, Scrollable {
             setOnClickListener { viewModel.nextClicked() }
         }
 
-        ListenScrollChangesHelper().addViewToListen(
-            binding.fileEditorScrollView
-        ) { _, _, _, _, _ ->
+        binding.fileEditorScrollView.setOnScrollChangeListener { _, _, _, _, _ ->
             checkScroll()
             hideUI()
             animatePaginationUI()
