@@ -398,7 +398,7 @@ public class ChatActivity extends PasscodeActivity
 
     ActionBar aB;
     Toolbar tB;
-    RelativeLayout toolbarElementsInside;
+    LinearLayout toolbarElementsInside;
 
     private EmojiTextView titleToolbar;
     private MarqueeTextView individualSubtitleToobar;
@@ -785,6 +785,7 @@ public class ChatActivity extends PasscodeActivity
                     if (initChat()) {
                         //Chat successfully initialized, now can rejoin
                         setJoiningOrLeaving(StringResourcesUtils.getString(R.string.joining_label));
+                        logDebug("************************** 1 titleToolbar.setText "+getTitleChat(chatRoom));
                         titleToolbar.setText(getTitleChat(chatRoom));
                         groupalSubtitleToolbar.setText(null);
                         setGroupalSubtitleToolbarVisibility(false);
@@ -1187,7 +1188,6 @@ public class ChatActivity extends PasscodeActivity
         inputTextLayout = findViewById(R.id.write_layout);
         separatorOptions = findViewById(R.id.separator_layout_options);
 
-        titleToolbar.setText("");
         individualSubtitleToobar.setText("");
         individualSubtitleToobar.setVisibility(View.GONE);
         groupalSubtitleToolbar.setText("");
@@ -1785,6 +1785,8 @@ public class ChatActivity extends PasscodeActivity
 
     private void updateTitle() {
         initializeInputText();
+        logDebug("************************** 2 titleToolbar.setText "+getTitleChat(chatRoom));
+
         titleToolbar.setText(getTitleChat(chatRoom));
     }
 
@@ -1857,6 +1859,8 @@ public class ChatActivity extends PasscodeActivity
         }
 
         setPreviewersView();
+        logDebug("************************** 3 titleToolbar.setText "+getTitleChat(chatRoom));
+
         titleToolbar.setText(getTitleChat(chatRoom));
         setChatSubtitle();
         privateIconToolbar.setVisibility(chatRoom.isPublic() ? View.GONE : View.VISIBLE);
@@ -2055,8 +2059,6 @@ public class ChatActivity extends PasscodeActivity
         }else{
             width = scaleWidthPx(TITLE_TOOLBAR_LAND, getOutMetrics());
         }
-        titleToolbar.setMaxWidthEmojis(width);
-        titleToolbar.setTypeEllipsize(TextUtils.TruncateAt.END);
         setSubtitleVisibility();
 
         if (chatC.isInAnonymousMode() && megaChatApi.getChatConnectionState(idChat)==MegaChatApi.CHAT_CONNECTION_ONLINE) {
@@ -6298,13 +6300,7 @@ public class ChatActivity extends PasscodeActivity
             markAsSeen(msg);
         }
 
-        if(msg.getType()==MegaChatMessage.TYPE_CHAT_TITLE){
-            String newTitle = msg.getContent();
-            if(newTitle!=null){
-                titleToolbar.setText(newTitle);
-            }
-        }
-        else if(msg.getType()==MegaChatMessage.TYPE_TRUNCATE){
+        if(msg.getType()==MegaChatMessage.TYPE_TRUNCATE){
             invalidateOptionsMenu();
         }
 
@@ -8612,7 +8608,9 @@ public class ChatActivity extends PasscodeActivity
             activityVisible = true;
             updateCallBanner();
             if(aB != null && aB.getTitle() != null){
-                titleToolbar.setText(adjustForLargeFont(titleToolbar.getText().toString()));
+                logDebug("************************** 5 titleToolbar.setText "+getTitleChat(chatRoom));
+
+                titleToolbar.setText(titleToolbar.getText());
             }
             updateActionModeTitle();
         }

@@ -51,13 +51,9 @@ public class MegaParticipantsChatAdapter extends RecyclerView.Adapter<MegaPartic
     private static final int ADD_PARTICIPANTS_POSITION = 1;
     private static final int COUNT_HEADER_POSITION = 1;
     private static final int COUNT_HEADER_AND_ADD_PARTICIPANTS_POSITIONS = 2;
-    private final static int MAX_WIDTH_CHAT_TITLE_PORT = 200;
-    private final static int MAX_WIDTH_CHAT_TITLE_LAND = 300;
     private static final int ITEM_VIEW_TYPE_NORMAL = 0;
     private static final int ITEM_VIEW_TYPE_ADD_PARTICIPANT = 1;
     public static final int ITEM_VIEW_TYPE_HEADER = 2;
-    private static final int MAX_WIDTH_PORT = 180;
-    private static final int MAX_WIDTH_LAND = 260;
 
     private GroupChatInfoActivity groupChatInfoActivity;
     private DisplayMetrics outMetrics;
@@ -181,11 +177,6 @@ public class MegaParticipantsChatAdapter extends RecyclerView.Adapter<MegaPartic
 
                 holderHeader.avatarImageView = v.findViewById(R.id.chat_group_properties_thumbnail);
                 holderHeader.infoTitleChatText = v.findViewById(R.id.chat_group_contact_properties_info_title);
-                if (isScreenInPortrait(groupChatInfoActivity)) {
-                    holderHeader.infoTitleChatText.setMaxWidthEmojis(dp2px(MAX_WIDTH_CHAT_TITLE_PORT, outMetrics));
-                } else {
-                    holderHeader.infoTitleChatText.setMaxWidthEmojis(dp2px(MAX_WIDTH_CHAT_TITLE_LAND, outMetrics));
-                }
 
                 holderHeader.editImageView = v.findViewById(R.id.chat_group_contact_properties_edit_icon);
                 holderHeader.editImageView.setOnClickListener(this);
