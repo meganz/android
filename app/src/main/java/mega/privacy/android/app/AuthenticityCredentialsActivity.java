@@ -16,7 +16,6 @@ import androidx.appcompat.widget.Toolbar;
 
 import java.util.ArrayList;
 
-import mega.privacy.android.app.components.ListenScrollChangesHelper;
 import mega.privacy.android.app.listeners.GetAttrUserListener;
 import mega.privacy.android.app.listeners.VerifyCredentialsListener;
 import mega.privacy.android.app.activities.PasscodeActivity;
@@ -121,7 +120,8 @@ public class AuthenticityCredentialsActivity extends PasscodeActivity {
 
         authenticityCredentialsLayout = findViewById(R.id.authenticity_credentials_layout);
         scrollView = findViewById(R.id.credentials_scrollview);
-        new ListenScrollChangesHelper().addViewToListen(scrollView, (v, scrollX, scrollY, oldScrollX, oldScrollY) -> changeViewElevation(aB, scrollView.canScrollVertically(-1), getOutMetrics()));
+        scrollView.setOnScrollChangeListener((view, scrollX, scrollY, oldScrollX, oldScrollY) ->
+                changeViewElevation(aB, scrollView.canScrollVertically(-1), getOutMetrics()));
 
         boolean isPortrait = isScreenInPortrait(this);
 

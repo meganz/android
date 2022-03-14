@@ -5,13 +5,11 @@ import android.content.*
 import android.os.Bundle
 import android.text.Spanned
 import android.view.MenuItem
-import android.view.View
 import androidx.activity.viewModels
 import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.PasscodeActivity
-import mega.privacy.android.app.components.ListenScrollChangesHelper
 import mega.privacy.android.app.constants.BroadcastConstants.ACTION_TYPE
 import mega.privacy.android.app.constants.BroadcastConstants.INVALID_ACTION
 import mega.privacy.android.app.constants.IntentConstants
@@ -106,9 +104,7 @@ open class ChooseAccountActivity : PasscodeActivity(), Scrollable {
             checkScroll()
         }
 
-        ListenScrollChangesHelper().addViewToListen(
-            binding.scrollView
-        ) { _: View?, _: Int, _: Int, _: Int, _: Int ->
+        binding.scrollView.setOnScrollChangeListener { _, _, _, _, _ ->
             checkScroll()
         }
 

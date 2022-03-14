@@ -19,7 +19,6 @@ import androidx.recyclerview.widget.RecyclerView
 import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.R
 import mega.privacy.android.app.components.CustomizedGridLayoutManager
-import mega.privacy.android.app.components.ListenScrollChangesHelper
 import mega.privacy.android.app.components.NewGridRecyclerView
 import mega.privacy.android.app.components.PositionDividerItemDecoration
 import mega.privacy.android.app.components.dragger.DragThumbnailGetter
@@ -125,20 +124,21 @@ class VideoFragment : Fragment(), HomepageSearchable {
 
     private fun setupListView() {
         listView = binding.videoList
-        listView.itemAnimator = noChangeRecyclerViewItemAnimator()
-        elevateToolbarWhenScrolling()
-        itemDecoration = PositionDividerItemDecoration(context, displayMetrics())
+        with(listView) {
+            itemAnimator = noChangeRecyclerViewItemAnimator()
+            addOnScrollListener(object : RecyclerView.OnScrollListener() {
+                override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+                    super.onScrolled(recyclerView, dx, dy)
 
-        listView.clipToPadding = false
-        listView.setHasFixedSize(true)
-    }
-
-    private fun elevateToolbarWhenScrolling() = ListenScrollChangesHelper().addViewToListen(
-        listView
-    ) { v: View?, _, _, _, _ ->
-        callManager {
-            it.changeAppBarElevation(v!!.canScrollVertically(-1))
+                    callManager { manager ->
+                        manager.changeAppBarElevation(recyclerView.canScrollVertically(-1))
+                    }
+                }
+            })
+            clipToPadding = false
+            setHasFixedSize(true)
         }
+        itemDecoration = PositionDividerItemDecoration(context, displayMetrics())
     }
 
     private fun doIfOnline(operation: () -> Unit) {
