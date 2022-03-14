@@ -6,7 +6,10 @@ import android.animation.AnimatorSet
 import android.annotation.SuppressLint
 import android.content.res.Configuration
 import android.os.Bundle
-import android.view.*
+import android.view.Menu
+import android.view.MenuInflater
+import android.view.MenuItem
+import android.view.View
 import android.view.ViewGroup.MarginLayoutParams
 import android.widget.ImageView
 import android.widget.LinearLayout
@@ -51,7 +54,6 @@ import mega.privacy.android.app.utils.ZoomUtil.getSelectedFrameWidth
 import mega.privacy.android.app.utils.ZoomUtil.setMargin
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 import nz.mega.sdk.MegaChatApiJava
-import java.util.ArrayList
 
 /**
  * A parent fragment with basic zoom UI logic, like menu, gestureScaleCallback.
@@ -391,13 +393,11 @@ abstract class BaseZoomFragment : BaseFragment(), GestureScaleCallback,
     private fun openPhoto(nodeItem: GalleryItem) {
         listView.findViewHolderForLayoutPosition(nodeItem.index)
             ?.itemView?.findViewById<ImageView>(R.id.thumbnail)?.also {
-                val parentNodeHandle = nodeItem.node?.parentHandle ?: return
                 val nodeHandle = nodeItem.node?.handle ?: INVALID_HANDLE
-
-                val intent = ImageViewerActivity.getIntentForParentNode(
+                val childrenNodes = viewModel.getItemsHandle()
+                val intent = ImageViewerActivity.getIntentForChildren(
                     requireContext(),
-                    parentNodeHandle,
-                    getOrder(),
+                    childrenNodes,
                     nodeHandle
                 )
 
