@@ -10,6 +10,7 @@ import android.net.Uri
  * @property collisionSize          The node size with which there is a name collision.
  * @property collisionLastModified  The node last modified date with which there is a name collision.
  * @property collisionThumbnail     The node thumbnail if exists.
+ * @property renameName             Name of the item for the rename option. Null if if the item is a folder.
  * @property thumbnail              The thumbnail of the item to upload, copy or move if exists.
  */
 data class NameCollisionResult(
@@ -18,5 +19,6 @@ data class NameCollisionResult(
     var collisionSize: Long? = null,
     var collisionLastModified: Long? = null,
     var collisionThumbnail: Uri? = null,
+    var renameName: String? = null,
     var thumbnail: Uri? = null
 )

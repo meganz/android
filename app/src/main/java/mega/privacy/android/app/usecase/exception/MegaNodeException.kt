@@ -9,6 +9,7 @@ import java.lang.IllegalArgumentException
  */
 sealed class MegaNodeException(message: String) : IllegalArgumentException(message) {
 
+    class NodeDoesNotExistsException : MegaNodeException("Node does not exist")
     class ChildDoesNotExistsException : MegaNodeException("Child does not exist")
     class ParentDoesNotExistException : MegaNodeException("Parent does not exist")
 }

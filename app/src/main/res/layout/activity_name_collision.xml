@@ -23,7 +23,8 @@
             android:id="@+id/constraint"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_margin="16dp">
+            android:layout_margin="16dp"
+            android:paddingBottom="50dp">
 
             <TextView
                 android:id="@+id/already_exists_text"
