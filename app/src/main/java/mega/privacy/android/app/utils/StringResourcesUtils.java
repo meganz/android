@@ -195,7 +195,7 @@ public class StringResourcesUtils {
                 return getString(R.string.api_esid);
             case API_EBLOCKED:
                 if (errorString.equals("Not accessible due to ToS/AUP violation")) {
-                    return getString(R.string.tos_aup_violation);
+                    return getString(R.string.api_eblocked_ec_import_ec_download);
                 } else if (errorString.equals("Blocked")) {
                     return getString(R.string.api_eblocked);
                 } else {

@@ -20,7 +20,6 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
-import mega.privacy.android.app.components.ListenScrollChangesHelper
 import mega.privacy.android.app.databinding.FragmentPhotosBinding
 import mega.privacy.android.app.gallery.data.GalleryItem
 import mega.privacy.android.app.gallery.fragment.BaseZoomFragment
@@ -256,9 +255,7 @@ class PhotosFragment : BaseZoomFragment() {
 
     private fun createCameraUploadsViewForFirstLogin() {
         viewModel.setInitialPreferences()
-        ListenScrollChangesHelper().addViewToListen(
-            binding.fragmentPhotosFirstLogin.camSyncScrollView
-        ) { _, _, _, _, _ ->
+        binding.fragmentPhotosFirstLogin.camSyncScrollView.setOnScrollChangeListener { _, _, _, _, _ ->
             mManagerActivity
                 .changeAppBarElevation(
                     binding.fragmentPhotosFirstLogin.camSyncScrollView.canScrollVertically(

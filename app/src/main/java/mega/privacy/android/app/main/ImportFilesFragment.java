@@ -16,7 +16,6 @@ import java.util.List;
 
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.ShareInfo;
-import mega.privacy.android.app.components.ListenScrollChangesHelper;
 import mega.privacy.android.app.databinding.FragmentImportFilesBinding;
 import mega.privacy.android.app.fragments.BaseFragment;
 import mega.privacy.android.app.main.adapters.ImportFilesAdapter;
@@ -68,8 +67,8 @@ public class ImportFilesFragment extends BaseFragment implements ImportFilesAdap
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-        new ListenScrollChangesHelper().addViewToListen(binding.scrollContainerImport,
-                (v, scrollX, scrollY, oldScrollX, oldScrollY) -> changeActionBarElevation());
+        binding.scrollContainerImport.setOnScrollChangeListener((v, scrollX, scrollY, oldScrollX, oldScrollY) ->
+                changeActionBarElevation());
 
         binding.fileListView.setLayoutManager(new LinearLayoutManager(requireContext()));
 
