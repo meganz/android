@@ -785,7 +785,6 @@ public class ChatActivity extends PasscodeActivity
                     if (initChat()) {
                         //Chat successfully initialized, now can rejoin
                         setJoiningOrLeaving(StringResourcesUtils.getString(R.string.joining_label));
-                        logDebug("************************** 1 titleToolbar.setText "+getTitleChat(chatRoom));
                         titleToolbar.setText(getTitleChat(chatRoom));
                         groupalSubtitleToolbar.setText(null);
                         setGroupalSubtitleToolbarVisibility(false);
@@ -1785,8 +1784,6 @@ public class ChatActivity extends PasscodeActivity
 
     private void updateTitle() {
         initializeInputText();
-        logDebug("************************** 2 titleToolbar.setText "+getTitleChat(chatRoom));
-
         titleToolbar.setText(getTitleChat(chatRoom));
     }
 
@@ -1859,8 +1856,6 @@ public class ChatActivity extends PasscodeActivity
         }
 
         setPreviewersView();
-        logDebug("************************** 3 titleToolbar.setText "+getTitleChat(chatRoom));
-
         titleToolbar.setText(getTitleChat(chatRoom));
         setChatSubtitle();
         privateIconToolbar.setVisibility(chatRoom.isPublic() ? View.GONE : View.VISIBLE);
@@ -8608,8 +8603,6 @@ public class ChatActivity extends PasscodeActivity
             activityVisible = true;
             updateCallBanner();
             if(aB != null && aB.getTitle() != null){
-                logDebug("************************** 5 titleToolbar.setText "+getTitleChat(chatRoom));
-
                 titleToolbar.setText(titleToolbar.getText());
             }
             updateActionModeTitle();
