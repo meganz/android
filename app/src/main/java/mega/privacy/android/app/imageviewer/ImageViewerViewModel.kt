@@ -2,7 +2,6 @@ package mega.privacy.android.app.imageviewer
 
 import android.app.Activity
 import android.net.Uri
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.map
@@ -11,7 +10,6 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.core.Completable
 import io.reactivex.rxjava3.core.Single
-import io.reactivex.rxjava3.disposables.CompositeDisposable
 import io.reactivex.rxjava3.kotlin.addTo
 import io.reactivex.rxjava3.kotlin.subscribeBy
 import io.reactivex.rxjava3.schedulers.Schedulers
@@ -184,7 +182,7 @@ class ImageViewerViewModel @Inject constructor(
                 },
                 onError = { error ->
                     logError(error.stackTraceToString())
-                    if (error is MegaException && nodeHandle == getCurrentImageItem()?.handle) {
+                    if (nodeHandle == getCurrentImageItem()?.handle && error is MegaException) {
                         snackbarMessage.value = error.getTranslatedErrorString()
                     }
                 }
@@ -224,20 +222,21 @@ class ImageViewerViewModel @Inject constructor(
                 return // Image file uri with no handle
         }
 
-        Log.wtf("CACATAG", "Loading image: $nodeHandle")
         subscription
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .retry(2) { error ->
-                Log.wtf("CACATAG", "Error: $error")
-                error is ResourceAlreadyExistsMegaException || error is HttpMegaException }
+                error is ResourceAlreadyExistsMegaException || error is HttpMegaException
+            }
             .subscribeBy(
                 onNext = { imageResult ->
                     updateItemIfNeeded(nodeHandle, imageResult = imageResult)
                 },
                 onError = { error ->
                     logError(error.stackTraceToString())
-                    if (error is MegaException && nodeHandle == getCurrentImageItem()?.handle) {
+                    if (nodeHandle == getCurrentImageItem()?.handle
+                        && error is MegaException && error !is ResourceAlreadyExistsMegaException
+                    ) {
                         snackbarMessage.value = error.getTranslatedErrorString()
                     }
                 }

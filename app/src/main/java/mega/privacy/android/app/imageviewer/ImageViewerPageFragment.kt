@@ -82,14 +82,14 @@ class ImageViewerPageFragment : Fragment() {
     override fun onResume() {
         super.onResume()
         if (!hasScreenBeenRotated) {
-            viewModel.getImageItem(nodeHandle!!)?.imageResult?.let { showFullImage(it) }
+            showFullImage()
         }
     }
 
     override fun onPause() {
-        if (activity?.isChangingConfigurations != true) {
+        if (activity?.isChangingConfigurations != true && activity?.isFinishing != true) {
             viewModel.stopImageLoading(nodeHandle!!, aggressive = false)
-            viewModel.getImageItem(nodeHandle!!)?.imageResult?.let { showPreviewImage(it) }
+            showPreviewImage()
         }
         super.onPause()
     }
@@ -126,12 +126,10 @@ class ImageViewerPageFragment : Fragment() {
             val imageResult = imageItem?.imageResult ?: return@observe
 
             when (lifecycle.currentState) {
-                Lifecycle.State.RESUMED -> {
+                Lifecycle.State.RESUMED ->
                     showFullImage(imageResult)
-                }
-                Lifecycle.State.CREATED, Lifecycle.State.STARTED -> {
+                Lifecycle.State.CREATED, Lifecycle.State.STARTED ->
                     showPreviewImage(imageResult)
-                }
                 else -> {
                     // do nothing
                 }
@@ -144,9 +142,16 @@ class ImageViewerPageFragment : Fragment() {
         }
     }
 
-    private fun showPreviewImage(imageResult: ImageResult) {
-        val previewImageRequest = imageResult.previewUri?.toImageRequest()
-        val thumbnailImageRequest = imageResult.thumbnailUri?.toImageRequest()
+    /**
+     * Show thumbnail and preview images
+     *
+     * @param imageResult   ImageResult to obtain images from
+     */
+    private fun showPreviewImage(
+        imageResult: ImageResult? = viewModel.getImageItem(nodeHandle!!)?.imageResult
+    ) {
+        val previewImageRequest = imageResult?.previewUri?.toImageRequest()
+        val thumbnailImageRequest = imageResult?.thumbnailUri?.toImageRequest()
         if (previewImageRequest == null && thumbnailImageRequest == null) return
 
         val newControllerBuilder = Fresco.newDraweeControllerBuilder()
@@ -170,8 +175,18 @@ class ImageViewerPageFragment : Fragment() {
         }
     }
 
-    private fun showFullImage(imageResult: ImageResult) {
-        val fullImageRequest = imageResult.fullSizeUri?.toImageRequest() ?: return
+    /**
+     * Show full image with preview as placeholder
+     *
+     * ImageResult to obtain images from
+     */
+    private fun showFullImage(
+        imageResult: ImageResult? = viewModel.getImageItem(nodeHandle!!)?.imageResult
+    ) {
+        val fullImageRequest = imageResult?.fullSizeUri?.toImageRequest() ?: run {
+            showPreviewImage(imageResult)
+            return
+        }
         val previewImageRequest = (imageResult.previewUri ?: imageResult.thumbnailUri)?.toImageRequest()
 
         val newControllerBuilder = Fresco.newDraweeControllerBuilder()
