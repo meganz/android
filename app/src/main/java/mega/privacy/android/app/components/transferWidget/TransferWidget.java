@@ -25,8 +25,6 @@ import mega.privacy.android.app.utils.ColorUtils;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 
-import javax.inject.Inject;
-
 public class TransferWidget {
 
     public static final int NO_TYPE = -1;
@@ -41,7 +39,6 @@ public class TransferWidget {
     private ProgressBar progressBar;
     private ImageView status;
 
-    @Inject
     public TransferWidget(Context context, RelativeLayout transfersWidget, TransfersManagement transfersManagement) {
         this.context = context;
         megaApi = MegaApplication.getInstance().getMegaApi();

@@ -7422,15 +7422,6 @@ public class ManagerActivity extends TransfersManagementActivity
     }
 
     /**
-     * Save nodes to gallery.
-     *
-     * @param nodes nodes to save
-     */
-    public void saveNodesToGallery(List<MegaNode> nodes) {
-        nodeSaver.saveNodes(nodes, false, false, false, true, true);
-    }
-
-    /**
      * Save nodes to device.
      *
      * @param handles         handles of nodes to save

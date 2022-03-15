@@ -35,6 +35,12 @@ import nz.mega.sdk.MegaTransfer.*
 import javax.inject.Inject
 import javax.inject.Singleton
 
+/**
+ * Singleton class for transfers management.
+ *
+ * @property megaApi    MegaApiAndroid instance to check transfers status.
+ * @property dbH        [DatabaseHandler] for getting and updating transfers' related info.
+ */
 @Singleton
 class TransfersManagement @Inject constructor(
     @MegaApi private val megaApi: MegaApiAndroid,

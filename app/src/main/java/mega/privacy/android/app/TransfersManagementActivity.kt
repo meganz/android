@@ -22,6 +22,9 @@ import mega.privacy.android.app.utils.LogUtil
 import mega.privacy.android.app.utils.StringResourcesUtils
 import mega.privacy.android.app.utils.Util
 
+/**
+ * Activity for showing concrete UI items related to transfers management.
+ */
 open class TransfersManagementActivity : PasscodeActivity() {
 
     companion object {

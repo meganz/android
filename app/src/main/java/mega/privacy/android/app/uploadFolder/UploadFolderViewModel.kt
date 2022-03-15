@@ -26,7 +26,11 @@ import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 import javax.inject.Inject
 
 /**
- * ViewModel which manages data of [UploadFolderActivity]
+ * ViewModel which manages data of [UploadFolderActivity].
+ *
+ * @property getFolderContentUseCase    Required for getting folder content.
+ * @property checkNameCollisionUseCase  Required for checking name collisions.
+ * @property transfersManagement        Required for checking transfers status.
  */
 @HiltViewModel
 class UploadFolderViewModel @Inject constructor(

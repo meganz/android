@@ -16,6 +16,8 @@ import javax.inject.Inject
 
 /**
  * Use case for checking name collisions before uploading, copying or moving.
+ *
+ * @property megaApi    MegaApiAndroid instance to check collisions.
  */
 class CheckNameCollisionUseCase @Inject constructor(
     @MegaApi private val megaApi: MegaApiAndroid

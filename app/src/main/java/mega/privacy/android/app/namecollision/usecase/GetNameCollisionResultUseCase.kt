@@ -27,6 +27,10 @@ import javax.inject.Inject
 
 /**
  * Use case for getting all required info for a name collision.
+ *
+ * @property megaApi        MegaApiAndroid instance to ask for thumbnails.
+ * @property context        Required for getting thumbnail files.
+ * @property getNodeUseCase Required for getting MegaNodes.
  */
 class GetNameCollisionResultUseCase @Inject constructor(
     @MegaApi private val megaApi: MegaApiAndroid,
@@ -34,6 +38,12 @@ class GetNameCollisionResultUseCase @Inject constructor(
     private val getNodeUseCase: GetNodeUseCase
 ) {
 
+    /**
+     * Gets all the required info for present a name collision.
+     *
+     * @param collision [NameCollision] from which the complete info has to be get.
+     * @return Flowable with the recovered info.
+     */
     fun get(collision: NameCollision): Flowable<NameCollisionResult> =
         Flowable.create({ emitter ->
             val nameCollisionResult = NameCollisionResult(nameCollision = collision)
@@ -87,6 +97,12 @@ class GetNameCollisionResultUseCase @Inject constructor(
             }
         }, BackpressureStrategy.LATEST)
 
+    /**
+     * Gets all the required info for present a list of name collisions.
+     *
+     * @param collisions    List of [NameCollision] from which the complete info has to be get.
+     * @return Flowable with the recovered info.
+     */
     fun get(collisions: List<NameCollision>): Flowable<MutableList<NameCollisionResult>> =
         Flowable.create({ emitter ->
             val collisionsResult = mutableListOf<NameCollisionResult>()
@@ -111,6 +127,12 @@ class GetNameCollisionResultUseCase @Inject constructor(
             }
         }, BackpressureStrategy.LATEST)
 
+    /**
+     * Reorders a list of [NameCollision] for presenting first files, then folders.
+     *
+     * @param collisions    List to reorder.
+     * @return Single with the reordered list.
+     */
     fun reorder(collisions: List<NameCollision>): Single<Triple<MutableList<NameCollision>, Int, Int>> =
         Single.create { emitter ->
             val fileCollisions = mutableListOf<NameCollision>()
@@ -151,6 +173,11 @@ class GetNameCollisionResultUseCase @Inject constructor(
             }
         }
 
+    /**
+     * Gets the name for rename a collision item in case the user wants to rename it.
+     *
+     * @return The rename name.
+     */
     private fun String.getRenameName(): String {
         var extension = MimeTypeList.typeForName(this).extension
         val pointIndex = lastIndexOf(extension) - 1

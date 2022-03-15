@@ -20,7 +20,7 @@ import javax.inject.Inject
  * Use case for copying MegaNodes.
  *
  * @property megaApi        MegaApiAndroid instance to copy nodes.
- * @property getNodeUseCase Required to get MegaNodes.
+ * @property getNodeUseCase Required for getting MegaNodes.
  */
 class CopyNodeUseCase @Inject constructor(
     @MegaApi private val megaApi: MegaApiAndroid,
