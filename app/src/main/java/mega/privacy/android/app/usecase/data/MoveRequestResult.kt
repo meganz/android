@@ -27,7 +27,7 @@ sealed class MoveRequestResult(
     val isSingleAction: Boolean = count == 1
     val isSuccess: Boolean = errorCount == 0
 
-    abstract fun getResultText(): String?
+    abstract fun getResultText(): String
 
     /**
      * Resets the account details timestamp if some request finished with success.
@@ -44,7 +44,7 @@ sealed class MoveRequestResult(
     class GeneralMovement(
         count: Int,
         errorCount: Int,
-        oldParentHandle: Long?,
+        oldParentHandle: Long? = null,
         isForeignNode: Boolean
     ) : MoveRequestResult(
         count = count,
@@ -53,7 +53,7 @@ sealed class MoveRequestResult(
         isForeignNode = isForeignNode
     ) {
 
-        override fun getResultText(): String? =
+        override fun getResultText(): String =
             when {
                 count == 1 && isSuccess -> getString(R.string.context_correctly_moved)
                 count == 1 -> getString(R.string.context_no_moved)
@@ -78,7 +78,7 @@ sealed class MoveRequestResult(
         oldParentHandle = oldParentHandle,
         isForeignNode = false
     ) {
-        override fun getResultText(): String? =
+        override fun getResultText(): String =
             when {
                 count == 1 && isSuccess -> {
                     getString(R.string.context_correctly_moved_to_rubbish)
@@ -134,7 +134,7 @@ sealed class MoveRequestResult(
         errorCount = errorCount,
         isForeignNode = isForeignNode
     ) {
-        override fun getResultText(): String? =
+        override fun getResultText(): String =
             when {
                 count == 1 && isSuccess -> {
 

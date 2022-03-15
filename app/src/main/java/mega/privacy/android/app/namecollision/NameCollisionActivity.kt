@@ -5,6 +5,8 @@ import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.view.MenuItem
 import androidx.activity.viewModels
 import androidx.constraintlayout.widget.ConstraintSet
@@ -19,10 +21,11 @@ import mega.privacy.android.app.activities.PasscodeActivity
 import mega.privacy.android.app.activities.WebViewActivity
 import mega.privacy.android.app.constants.BroadcastConstants.ACTION_UPDATE_FILE_VERSIONS
 import mega.privacy.android.app.databinding.ActivityNameCollisionBinding
+import mega.privacy.android.app.fragments.homepage.EventObserver
 import mega.privacy.android.app.namecollision.data.NameCollision
 import mega.privacy.android.app.namecollision.data.NameCollisionResult
-import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_COLLISION_RESULTS
-import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_SINGLE_COLLISION_RESULT
+import mega.privacy.android.app.utils.AlertsAndWarnings.showForeignStorageOverQuotaWarningDialog
+import mega.privacy.android.app.utils.Constants.*
 import mega.privacy.android.app.utils.LogUtil.logError
 import mega.privacy.android.app.utils.StringResourcesUtils
 import mega.privacy.android.app.utils.StringUtils.formatColorTag
@@ -74,7 +77,7 @@ class NameCollisionActivity : PasscodeActivity() {
         override fun onReceive(context: Context, intent: Intent) {
             if (ACTION_UPDATE_FILE_VERSIONS != intent.action) return
 
-            viewModel.fileVersioningUpdated()
+            viewModel.updateFileVersioningInfo()
         }
     }
 
@@ -85,10 +88,19 @@ class NameCollisionActivity : PasscodeActivity() {
 
         if (savedInstanceState == null) {
             @Suppress("UNCHECKED_CAST")
-            viewModel.setData(
-                intent.getSerializableExtra(INTENT_EXTRA_COLLISION_RESULTS) as ArrayList<NameCollision>?,
+            val collisionsList =
+                intent.getSerializableExtra(INTENT_EXTRA_COLLISION_RESULTS) as ArrayList<NameCollision>?
+            val singleCollision =
                 intent.getSerializableExtra(INTENT_EXTRA_SINGLE_COLLISION_RESULT) as NameCollision?
-            )
+
+            when {
+                collisionsList != null -> viewModel.setData(collisionsList)
+                singleCollision != null -> viewModel.setSingleData(singleCollision)
+                else -> {
+                    logError("No collisions received")
+                    finish()
+                }
+            }
         }
 
         setupView()
@@ -136,7 +148,7 @@ class NameCollisionActivity : PasscodeActivity() {
                 ).apply { data = LEARN_MORE_URI.toUri() })
         }
         binding.replaceUpdateMergeButton.setOnClickListener {
-            viewModel.replaceUpdateOrMerge(binding.applyForAllCheck.isChecked)
+            viewModel.replaceUpdateOrMerge(this, binding.applyForAllCheck.isChecked)
         }
         binding.cancelButton.setOnClickListener {
             viewModel.cancel(binding.applyForAllCheck.isChecked)
@@ -149,6 +161,17 @@ class NameCollisionActivity : PasscodeActivity() {
     private fun setupObservers() {
         viewModel.getCurrentCollision().observe(this, ::showCollision)
         viewModel.getFileVersioningInfo().observe(this, ::updateFileVersioningData)
+        viewModel.onActionResult().observe(this, EventObserver { result ->
+            if (result.isForeignNode) {
+                showForeignStorageOverQuotaWarningDialog(this)
+            }
+
+            showSnackbar(binding.root, result.message)
+
+            if (result.shouldFinish) {
+                Handler(Looper.getMainLooper()).postDelayed({ finish() }, LONG_SNACKBAR_DURATION)
+            }
+        })
 
         registerReceiver(
             updateFileVersionsReceiver,
@@ -156,6 +179,11 @@ class NameCollisionActivity : PasscodeActivity() {
         )
     }
 
+    /**
+     * Shows the current collision.
+     *
+     * @param collisionResult   Object containing all the required info to present a collision.
+     */
     private fun showCollision(collisionResult: NameCollisionResult?) {
         if (collisionResult == null) {
             logError("Cannot show any collision. Finishing...")
@@ -311,6 +339,14 @@ class NameCollisionActivity : PasscodeActivity() {
         }
     }
 
+    /**
+     * Updates the UI related to file versioning.
+     *
+     * @param fileVersioningInfo Triple with the following info:
+     *                              - First:    True if file versioning is enabled, false otherwise.
+     *                              - Second:   Collision type: upload, movement of copy.
+     *                              - Third:    True if the collision is related to a file, false if is to a folder.
+     */
     private fun updateFileVersioningData(fileVersioningInfo: Triple<Boolean, NameCollisionViewModel.NameCollisionType, Boolean>) {
         val isFileVersioningEnabled = fileVersioningInfo.first
         val isFile = fileVersioningInfo.third
