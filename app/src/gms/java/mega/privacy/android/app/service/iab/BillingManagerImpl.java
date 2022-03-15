@@ -110,6 +110,9 @@ public class BillingManagerImpl implements PurchasesUpdatedListener, BillingMana
     private final List<Purchase> mPurchases = new ArrayList<>();
     private List<SkuDetails> mSkus;
 
+    public static final String SUBSCRIPTION_PLATFORM_PACKAGE_NAME = "com.android.vending";
+    public static final String SUBSCRIPTION_LINK_FOR_APP_STORE = "http://play.google.com/store/account/subscriptions";
+    public static final String SUBSCRIPTION_LINK_FOR_BROWSER = "http://play.google.com/store/account/subscriptions";
 
     /**
      * Handles all the interactions with Play Store (via Billing library), maintains connection to

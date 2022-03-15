@@ -55,7 +55,6 @@ import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.UserCredentials;
-import mega.privacy.android.app.components.ListenScrollChangesHelper;
 import mega.privacy.android.app.utils.MegaProgressDialogUtil;
 import mega.privacy.android.app.utils.ColorUtils;
 import mega.privacy.android.app.utils.StringResourcesUtils;
@@ -218,7 +217,7 @@ public class MyCodeFragment extends Fragment implements View.OnClickListener{
             qrcode_copy_link.setEnabled(true);
         }
 
-        new ListenScrollChangesHelper().addViewToListen(scrollView, (v, scrollX, scrollY, oldScrollX, oldScrollY) -> checkScroll());
+        scrollView.setOnScrollChangeListener((view, scrollX, scrollY, oldScrollX, oldScrollY) -> checkScroll());
 
         Configuration configuration = getResources().getConfiguration();
         int width = getDP(RELATIVE_WIDTH);
