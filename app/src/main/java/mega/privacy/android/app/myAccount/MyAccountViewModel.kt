@@ -5,7 +5,6 @@ import android.app.Activity
 import android.app.Activity.RESULT_OK
 import android.content.Context
 import android.content.Intent
-import android.os.Build
 import android.util.Patterns
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -24,7 +23,7 @@ import mega.privacy.android.app.generalusecase.FilePrepareUseCase
 import mega.privacy.android.app.globalmanagement.MyAccountInfo
 import mega.privacy.android.app.interfaces.SnackbarShower
 import mega.privacy.android.app.interfaces.showSnackbar
-import mega.privacy.android.app.lollipop.LoginActivityLollipop
+import mega.privacy.android.app.lollipop.LoginActivity
 import mega.privacy.android.app.lollipop.TestPasswordActivity
 import mega.privacy.android.app.lollipop.VerifyTwoFactorActivity
 import mega.privacy.android.app.lollipop.controllers.AccountController
@@ -37,7 +36,9 @@ import mega.privacy.android.app.utils.CallUtil
 import mega.privacy.android.app.utils.Constants.*
 import mega.privacy.android.app.utils.FileUtil
 import mega.privacy.android.app.utils.FileUtil.JPG_EXTENSION
-import mega.privacy.android.app.utils.LogUtil.*
+import mega.privacy.android.app.utils.LogUtil.logDebug
+import mega.privacy.android.app.utils.LogUtil.logError
+import mega.privacy.android.app.utils.LogUtil.logWarning
 import mega.privacy.android.app.utils.permission.PermissionUtils.hasPermissions
 import mega.privacy.android.app.utils.permission.PermissionUtils.requestPermission
 import mega.privacy.android.app.utils.StringResourcesUtils.getString
@@ -222,12 +223,12 @@ class MyAccountViewModel @Inject constructor(
     }
 
     /**
-     * Launches the LoginActivityLollipop activity to perform an account refresh.
+     * Launches [LoginActivity] to perform an account refresh.
      *
      * @param activity Current activity.
      */
     fun refresh(activity: Activity) {
-        val intent = Intent(activity, LoginActivityLollipop::class.java)
+        val intent = Intent(activity, LoginActivity::class.java)
         intent.putExtra(VISIBLE_FRAGMENT, LOGIN_FRAGMENT)
         intent.action = ACTION_REFRESH
 
@@ -418,42 +419,40 @@ class MyAccountViewModel @Inject constructor(
      * @param activity Current activity.
      */
     fun capturePhoto(activity: Activity) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            val hasStoragePermission: Boolean = hasPermissions(
+        val hasStoragePermission: Boolean = hasPermissions(
+            activity,
+            Manifest.permission.WRITE_EXTERNAL_STORAGE
+        )
+        val hasCameraPermission: Boolean = hasPermissions(
+            activity,
+            Manifest.permission.CAMERA
+        )
+
+        if (!hasStoragePermission && !hasCameraPermission) {
+            requestPermission(
                 activity,
-                Manifest.permission.WRITE_EXTERNAL_STORAGE
-            )
-            val hasCameraPermission: Boolean = hasPermissions(
-                activity,
+                REQUEST_WRITE_STORAGE,
+                Manifest.permission.WRITE_EXTERNAL_STORAGE,
                 Manifest.permission.CAMERA
             )
 
-            if (!hasStoragePermission && !hasCameraPermission) {
-                requestPermission(
-                    activity,
-                    REQUEST_WRITE_STORAGE,
-                    Manifest.permission.WRITE_EXTERNAL_STORAGE,
-                    Manifest.permission.CAMERA
-                )
+            return
+        } else if (!hasStoragePermission) {
+            requestPermission(
+                activity,
+                REQUEST_WRITE_STORAGE,
+                Manifest.permission.WRITE_EXTERNAL_STORAGE
+            )
 
-                return
-            } else if (!hasStoragePermission) {
-                requestPermission(
-                    activity,
-                    REQUEST_WRITE_STORAGE,
-                    Manifest.permission.WRITE_EXTERNAL_STORAGE
-                )
+            return
+        } else if (!hasCameraPermission) {
+            requestPermission(
+                activity,
+                REQUEST_CAMERA,
+                Manifest.permission.CAMERA
+            )
 
-                return
-            } else if (!hasCameraPermission) {
-                requestPermission(
-                    activity,
-                    REQUEST_CAMERA,
-                    Manifest.permission.CAMERA
-                )
-
-                return
-            }
+            return
         }
 
         Util.checkTakePicture(activity, TAKE_PICTURE_PROFILE_CODE)

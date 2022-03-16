@@ -3,6 +3,7 @@ package mega.privacy.android.app.lollipop.adapters;
 import android.content.Context;
 
 import androidx.annotation.NonNull;
+import androidx.navigation.NavDestination;
 import androidx.navigation.NavOptions;
 import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.RecyclerView;
@@ -31,7 +32,7 @@ import mega.privacy.android.app.components.dragger.DragThumbnailGetter;
 import mega.privacy.android.app.components.scrollBar.SectionTitleProvider;
 import mega.privacy.android.app.fragments.homepage.main.HomepageFragment;
 import mega.privacy.android.app.fragments.homepage.main.HomepageFragmentDirections;
-import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
+import mega.privacy.android.app.lollipop.ManagerActivity;
 import mega.privacy.android.app.utils.ColorUtils;
 import mega.privacy.android.app.utils.Util;
 import mega.privacy.android.app.fragments.recent.RecentsFragment;
@@ -347,11 +348,11 @@ public class RecentsAdapter extends RecyclerView.Adapter<RecentsAdapter.ViewHold
         switch (v.getId()) {
             case R.id.three_dots: {
                 if (!isOnline(context)) {
-                    ((ManagerActivityLollipop) context).showSnackbar(SNACKBAR_TYPE, context.getString(R.string.error_server_connection_problem), -1);
+                    ((ManagerActivity) context).showSnackbar(SNACKBAR_TYPE, context.getString(R.string.error_server_connection_problem), -1);
                     break;
                 }
                 if (node != null) {
-                    ((ManagerActivityLollipop) context).showNodeOptionsPanel(node, MODE6);
+                    ((ManagerActivity) context).showNodeOptionsPanel(node, MODE6);
                 }
                 break;
             }
@@ -364,7 +365,10 @@ public class RecentsAdapter extends RecyclerView.Adapter<RecentsAdapter.ViewHold
                 if (bucket == null) break;
 
                 ((RecentsFragment)fragment).getSelectedBucketModel().select(bucket, megaApi.getRecentActions());
-                Navigation.findNavController(v).navigate(HomepageFragmentDirections.Companion.actionHomepageToRecentBucket(),new NavOptions.Builder().build());
+                NavDestination currentDestination = Navigation.findNavController(v).getCurrentDestination();
+                if (currentDestination != null && currentDestination.getId() == R.id.homepageFragment) {
+                    Navigation.findNavController(v).navigate(HomepageFragmentDirections.Companion.actionHomepageToRecentBucket(), new NavOptions.Builder().build());
+                }
                 break;
             }
         }

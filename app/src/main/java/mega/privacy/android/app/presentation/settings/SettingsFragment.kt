@@ -29,7 +29,7 @@ import mega.privacy.android.app.activities.settingsActivities.*
 import mega.privacy.android.app.constants.EventConstants.EVENT_UPDATE_HIDE_RECENT_ACTIVITY
 import mega.privacy.android.app.constants.SettingsConstants.*
 import mega.privacy.android.app.exportRK.ExportRecoveryKeyActivity
-import mega.privacy.android.app.lollipop.ChangePasswordActivityLollipop
+import mega.privacy.android.app.lollipop.ChangePasswordActivity
 import mega.privacy.android.app.lollipop.TwoFactorAuthenticationActivity
 import mega.privacy.android.app.lollipop.VerifyTwoFactorActivity
 import mega.privacy.android.app.mediaplayer.service.AudioPlayerService
@@ -234,7 +234,7 @@ class SettingsFragment : SharedPreferences.OnSharedPreferenceChangeListener, Pre
             KEY_CHANGE_PASSWORD -> startActivity(
                 Intent(
                     context,
-                    ChangePasswordActivityLollipop::class.java
+                    ChangePasswordActivity::class.java
                 )
             )
             KEY_2FA -> if (viewModel.uiState.value.multiFactorAuthChecked) {
@@ -255,17 +255,17 @@ class SettingsFragment : SharedPreferences.OnSharedPreferenceChangeListener, Pre
                 )
             )
             KEY_HELP_CENTRE -> {
-                launchWebPage("https://mega.nz/help/client/android")
+                launchWebPage(HELP_CENTRE_URL)
             }
             KEY_HELP_SEND_FEEDBACK -> showEvaluatedAppDialog()
             KEY_ABOUT_PRIVACY_POLICY -> {
-                launchWebPage("https://mega.nz/privacy")
+                launchWebPage(PRIVACY_POLICY_URL)
             }
             KEY_ABOUT_TOS -> {
-                launchWebPage("https://mega.nz/terms")
+                launchWebPage(TERMS_OF_SERVICE_URL)
             }
             KEY_ABOUT_CODE_LINK -> {
-                launchWebPage("https://github.com/meganz/android")
+                launchWebPage(GITHUB_URL)
             }
             KEY_ABOUT_APP_VERSION -> {
                 if (++numberOfClicksAppVersion == 5) {
@@ -306,7 +306,7 @@ class SettingsFragment : SharedPreferences.OnSharedPreferenceChangeListener, Pre
             KEY_CANCEL_ACCOUNT -> deleteAccountClicked()
             KEY_ABOUT_COOKIE_POLICY -> {
                 val intent = Intent(context, WebViewActivity::class.java)
-                intent.data = Uri.parse("https://mega.nz/cookie")
+                intent.data = Uri.parse(COOKIES_URI)
                 startActivity(intent)
             }
             KEY_COOKIE_SETTINGS -> startActivity(
@@ -336,38 +336,42 @@ class SettingsFragment : SharedPreferences.OnSharedPreferenceChangeListener, Pre
             }
         }
         resetCounters(key)
-        return true
+        return super.onPreferenceTreeClick(preference)
     }
 
     private fun toggleLogger() {
-        if (!viewModel.disableLogger()) {
-            showConfirmationEnableLogs {
+        if (viewModel.disableLogger()) {
+            view?.let {
+                Snackbar.make(it, R.string.settings_disable_logs, Snackbar.LENGTH_SHORT).show()
+            }
+        } else {
+            showConfirmationEnableLogs(this@SettingsFragment::enableSdkLogger)
+        }
+    }
+
+    private fun enableSdkLogger() {
                 viewModel.enableLogger()
                 view?.let {
                     Snackbar.make(it, R.string.settings_enable_logs, Snackbar.LENGTH_SHORT).show()
                 }
             }
-        } else {
+
+    private fun toggleChatLogger() {
+        if (viewModel.disableChatLogger()) {
             view?.let {
                 Snackbar.make(it, R.string.settings_disable_logs, Snackbar.LENGTH_SHORT).show()
             }
+        } else {
+            showConfirmationEnableLogs(this@SettingsFragment::enableChatLogger)
         }
     }
 
-    private fun toggleChatLogger() {
-        if (!viewModel.disableChatLogger()) {
-            showConfirmationEnableLogs {
+    private fun enableChatLogger() {
                 viewModel.enableChatLogger()
                 view?.let {
                     Snackbar.make(it, R.string.settings_enable_logs, Snackbar.LENGTH_SHORT).show()
                 }
             }
-        } else {
-            view?.let {
-                Snackbar.make(it, R.string.settings_disable_logs, Snackbar.LENGTH_SHORT).show()
-            }
-        }
-    }
 
     private fun showConfirmationEnableLogs(enableFunction: () -> Unit) {
         MaterialAlertDialogBuilder(requireContext())
@@ -463,6 +467,12 @@ class SettingsFragment : SharedPreferences.OnSharedPreferenceChangeListener, Pre
     companion object {
         internal const val INITIAL_PREFERENCE = "initial"
         internal const val NAVIGATE_TO_INITIAL_PREFERENCE = "navigateToInitial"
+
+        internal const val COOKIES_URI = "https://mega.nz/cookie"
+        internal const val GITHUB_URL = "https://github.com/meganz/android"
+        internal const val TERMS_OF_SERVICE_URL = "https://mega.nz/terms"
+        internal const val PRIVACY_POLICY_URL = "https://mega.nz/privacy"
+        internal const val HELP_CENTRE_URL = "https://mega.nz/help/client/android"
     }
 
 }

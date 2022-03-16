@@ -2,7 +2,6 @@ package mega.privacy.android.app.lollipop.megachat;
 
 import android.content.Context;
 import android.graphics.Canvas;
-import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Rect;
 import android.graphics.Typeface;
@@ -11,8 +10,7 @@ import androidx.annotation.ColorRes;
 import androidx.appcompat.graphics.drawable.DrawerArrowDrawable;
 import androidx.core.content.ContextCompat;
 import java.util.Objects;
-import mega.privacy.android.app.R;
-import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
+
 import mega.privacy.android.app.utils.TextUtil;
 
 public class BadgeDrawerArrowDrawable extends DrawerArrowDrawable {

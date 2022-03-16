@@ -7,13 +7,15 @@ import mega.privacy.android.app.constants.BroadcastConstants
 import mega.privacy.android.app.interfaces.ActivityLauncher
 import mega.privacy.android.app.interfaces.SnackbarShower
 import mega.privacy.android.app.interfaces.showSnackbar
-import mega.privacy.android.app.lollipop.ManagerActivityLollipop
+import mega.privacy.android.app.lollipop.ManagerActivity
 import mega.privacy.android.app.lollipop.controllers.ChatController
 import mega.privacy.android.app.utils.AlertsAndWarnings.showForeignStorageOverQuotaWarningDialog
 import mega.privacy.android.app.utils.ChatUtil
 import mega.privacy.android.app.utils.Constants.ACTION_OVERQUOTA_STORAGE
 import mega.privacy.android.app.utils.Constants.ACTION_PRE_OVERQUOTA_STORAGE
-import mega.privacy.android.app.utils.LogUtil.*
+import mega.privacy.android.app.utils.LogUtil.logDebug
+import mega.privacy.android.app.utils.LogUtil.logError
+import mega.privacy.android.app.utils.LogUtil.logWarning
 import mega.privacy.android.app.utils.StringResourcesUtils.getQuantityString
 import mega.privacy.android.app.utils.StringResourcesUtils.getString
 import nz.mega.sdk.*
@@ -97,12 +99,12 @@ class CopyListener(
                             return
                         }
 
-                        val intent = Intent(context, ManagerActivityLollipop::class.java)
+                        val intent = Intent(context, ManagerActivity::class.java)
                         intent.action = ACTION_OVERQUOTA_STORAGE
                         activityLauncher?.launchActivity(intent)
                     }
                     MegaError.API_EGOINGOVERQUOTA -> {
-                        val intent = Intent(context, ManagerActivityLollipop::class.java)
+                        val intent = Intent(context, ManagerActivity::class.java)
                         intent.action = ACTION_PRE_OVERQUOTA_STORAGE
                         activityLauncher?.launchActivity(intent)
                     }

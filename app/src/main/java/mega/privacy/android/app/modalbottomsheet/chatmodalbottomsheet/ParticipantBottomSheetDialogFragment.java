@@ -1,7 +1,5 @@
 package mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet;
 
-import android.annotation.SuppressLint;
-import android.app.Dialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -16,9 +14,9 @@ import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.RoundedImageView;
 import mega.privacy.android.app.components.twemoji.EmojiTextView;
 import mega.privacy.android.app.interfaces.SnackbarShower;
-import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
+import mega.privacy.android.app.lollipop.ManagerActivity;
 import mega.privacy.android.app.lollipop.controllers.ChatController;
-import mega.privacy.android.app.lollipop.megachat.GroupChatInfoActivityLollipop;
+import mega.privacy.android.app.lollipop.megachat.GroupChatInfoActivity;
 import mega.privacy.android.app.modalbottomsheet.BaseBottomSheetDialogFragment;
 import mega.privacy.android.app.objects.PasscodeManagement;
 import mega.privacy.android.app.utils.ContactUtil;
@@ -64,8 +62,8 @@ public class ParticipantBottomSheetDialogFragment extends BaseBottomSheetDialogF
             chatId = savedInstanceState.getLong(CHAT_ID, INVALID_HANDLE);
             participantHandle = savedInstanceState.getLong(CONTACT_HANDLE, INVALID_HANDLE);
         } else {
-            chatId = ((GroupChatInfoActivityLollipop) requireActivity()).getChatHandle();
-            participantHandle = ((GroupChatInfoActivityLollipop) requireActivity()).getSelectedHandleParticipant();
+            chatId = ((GroupChatInfoActivity) requireActivity()).getChatHandle();
+            participantHandle = ((GroupChatInfoActivity) requireActivity()).getSelectedHandleParticipant();
         }
 
         selectedChat = megaChatApi.getChatRoom(chatId);
@@ -237,38 +235,38 @@ public class ParticipantBottomSheetDialogFragment extends BaseBottomSheetDialogF
                 break;
 
             case R.id.start_chat_group_participants_chat_layout:
-                ((GroupChatInfoActivityLollipop) requireActivity()).startConversation(participantHandle);
+                ((GroupChatInfoActivity) requireActivity()).startConversation(participantHandle);
                 break;
 
             case R.id.contact_list_option_call_layout:
-                if (canCallBeStartedFromContactOption((GroupChatInfoActivityLollipop) requireActivity(), passcodeManagement)) {
-                    startNewCall((GroupChatInfoActivityLollipop) requireActivity(),
+                if (canCallBeStartedFromContactOption((GroupChatInfoActivity) requireActivity(), passcodeManagement)) {
+                    startNewCall((GroupChatInfoActivity) requireActivity(),
                             (SnackbarShower) requireActivity(),
                             megaApi.getContact(chatC.getParticipantEmail(participantHandle)), passcodeManagement);
                 }
                 break;
 
             case R.id.change_permissions_group_participants_chat_layout:
-                ((GroupChatInfoActivityLollipop) requireActivity()).showChangePermissionsDialog(participantHandle, selectedChat);
+                ((GroupChatInfoActivity) requireActivity()).showChangePermissionsDialog(participantHandle, selectedChat);
                 break;
 
             case R.id.remove_group_participants_chat_layout:
-                ((GroupChatInfoActivityLollipop) requireActivity()).showRemoveParticipantConfirmation(participantHandle);
+                ((GroupChatInfoActivity) requireActivity()).showRemoveParticipantConfirmation(participantHandle);
                 break;
 
             case R.id.edit_profile_group_participants_chat_layout:
-                Intent editProfile = new Intent(requireActivity(), ManagerActivityLollipop.class);
+                Intent editProfile = new Intent(requireActivity(), ManagerActivity.class);
                 editProfile.setAction(ACTION_SHOW_MY_ACCOUNT);
                 startActivity(editProfile);
                 dismissAllowingStateLoss();
                 break;
 
             case R.id.leave_group_participants_chat_layout:
-                ((GroupChatInfoActivityLollipop) requireActivity()).showConfirmationLeaveChat();
+                ((GroupChatInfoActivity) requireActivity()).showConfirmationLeaveChat();
                 break;
 
             case R.id.invite_group_participants_chat_layout:
-                ((GroupChatInfoActivityLollipop) requireActivity()).inviteContact(chatC.getParticipantEmail(participantHandle));
+                ((GroupChatInfoActivity) requireActivity()).inviteContact(chatC.getParticipantEmail(participantHandle));
                 break;
         }
 

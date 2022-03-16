@@ -56,7 +56,6 @@ import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
 import java.io.File
 import javax.inject.Inject
-import java.util.*
 import kotlin.collections.ArrayList
 
 @AndroidEntryPoint
@@ -591,7 +590,7 @@ class OfflineFragment : Fragment(), ActionMode.Callback, Scrollable {
 
                 if (!setLocalIntentParams(
                         context, node.node, mediaIntent, file.absolutePath,
-                        false, requireActivity() as ManagerActivityLollipop
+                        false, requireActivity() as ManagerActivity
                     )
                 ) {
                     return
@@ -618,7 +617,7 @@ class OfflineFragment : Fragment(), ActionMode.Callback, Scrollable {
                     val intentShare = Intent(Intent.ACTION_SEND)
                     if (setLocalIntentParams(
                             context, node.node, intentShare, file.absolutePath,
-                            false, requireActivity() as ManagerActivityLollipop
+                            false, requireActivity() as ManagerActivity
                         )
                     ) {
                         intentShare.flags = Intent.FLAG_GRANT_READ_URI_PERMISSION
@@ -632,7 +631,7 @@ class OfflineFragment : Fragment(), ActionMode.Callback, Scrollable {
             mime.isPdf -> {
                 logDebug("PDF file")
 
-                val pdfIntent = Intent(context, PdfViewerActivityLollipop::class.java)
+                val pdfIntent = Intent(context, PdfViewerActivity::class.java)
 
                 pdfIntent.putExtra(INTENT_EXTRA_KEY_INSIDE, true)
                 pdfIntent.putExtra(INTENT_EXTRA_KEY_HANDLE, node.node.handle.toLong())
@@ -644,7 +643,7 @@ class OfflineFragment : Fragment(), ActionMode.Callback, Scrollable {
 
                 if (setLocalIntentParams(
                         context, node.node, pdfIntent, file.absolutePath, false,
-                        requireActivity() as ManagerActivityLollipop
+                        requireActivity() as ManagerActivity
                     )
                 ) {
                     pdfIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
@@ -676,7 +675,7 @@ class OfflineFragment : Fragment(), ActionMode.Callback, Scrollable {
 
         if (!setLocalIntentParams(
                 context, file.name, viewIntent, file.absolutePath, false,
-                requireActivity() as ManagerActivityLollipop
+                requireActivity() as ManagerActivity
             )
         ) {
             return
@@ -691,7 +690,7 @@ class OfflineFragment : Fragment(), ActionMode.Callback, Scrollable {
 
             if (!setLocalIntentParams(
                     context, file.name, intentShare, file.absolutePath, false,
-                    requireActivity() as ManagerActivityLollipop
+                    requireActivity() as ManagerActivity
                 )
             ) {
                 return

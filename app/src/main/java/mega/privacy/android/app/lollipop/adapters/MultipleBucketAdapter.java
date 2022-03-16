@@ -25,7 +25,7 @@ import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.dragger.DragThumbnailGetter;
 import mega.privacy.android.app.components.scrollBar.SectionTitleProvider;
 import mega.privacy.android.app.fragments.recent.RecentsBucketFragment;
-import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
+import mega.privacy.android.app.lollipop.ManagerActivity;
 import mega.privacy.android.app.utils.MegaNodeUtil;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaNode;
@@ -35,7 +35,7 @@ import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.FileUtil.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.TextUtil.*;
-import static mega.privacy.android.app.utils.ThumbnailUtilsLollipop.*;
+import static mega.privacy.android.app.utils.ThumbnailUtils.*;
 import static mega.privacy.android.app.utils.TimeUtils.*;
 import static mega.privacy.android.app.utils.Util.*;
 
@@ -250,7 +250,7 @@ public class MultipleBucketAdapter extends RecyclerView.Adapter<MultipleBucketAd
     }
 
     private MegaNode getItemAtPosition(int pos) {
-        if (nodes == null || nodes.isEmpty() || pos >= nodes.size()) return null;
+        if (nodes == null || nodes.isEmpty() || pos >= nodes.size() || pos < 0) return null;
 
         return nodes.get(pos);
     }
@@ -273,15 +273,15 @@ public class MultipleBucketAdapter extends RecyclerView.Adapter<MultipleBucketAd
         MultipleBucketAdapter.ViewHolderMultipleBucket holder = (MultipleBucketAdapter.ViewHolderMultipleBucket) v.getTag();
         if (holder == null) return;
 
-        MegaNode node = getItemAtPosition(holder.getAdapterPosition());
+        MegaNode node = getItemAtPosition(holder.getAbsoluteAdapterPosition());
         if (node == null) return;
         switch (v.getId()) {
             case R.id.three_dots: {
                 if (!isOnline(context)) {
-                    ((ManagerActivityLollipop) context).showSnackbar(SNACKBAR_TYPE, context.getString(R.string.error_server_connection_problem), -1);
+                    ((ManagerActivity) context).showSnackbar(SNACKBAR_TYPE, context.getString(R.string.error_server_connection_problem), -1);
                     break;
                 }
-                ((ManagerActivityLollipop) context).showNodeOptionsPanel(node, MODE6);
+                ((ManagerActivity) context).showNodeOptionsPanel(node, MODE6);
                 break;
             }
             case R.id.multiple_bucket_layout: {

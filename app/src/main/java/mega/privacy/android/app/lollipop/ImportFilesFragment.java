@@ -41,9 +41,9 @@ public class ImportFilesFragment extends BaseFragment implements ImportFilesAdap
     }
 
     public void changeActionBarElevation() {
-        ((FileExplorerActivityLollipop) context).changeActionBarElevation(
+        ((FileExplorerActivity) context).changeActionBarElevation(
                 binding.scrollContainerImport.canScrollVertically(SCROLLING_UP_DIRECTION),
-                FileExplorerActivityLollipop.IMPORT_FRAGMENT);
+                FileExplorerActivity.IMPORT_FRAGMENT);
     }
 
     @Override
@@ -54,9 +54,9 @@ public class ImportFilesFragment extends BaseFragment implements ImportFilesAdap
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        filePreparedInfos = ((FileExplorerActivityLollipop) context).getFilePreparedInfos();
+        filePreparedInfos = ((FileExplorerActivity) context).getFilePreparedInfos();
         if (filePreparedInfos != null) {
-            HashMap<String, String> nameFiles = ((FileExplorerActivityLollipop) context).getNameFiles();
+            HashMap<String, String> nameFiles = ((FileExplorerActivity) context).getNameFiles();
             if (nameFiles == null || nameFiles.isEmpty()) {
                 new GetNamesAsyncTask().execute();
             }
@@ -123,24 +123,24 @@ public class ImportFilesFragment extends BaseFragment implements ImportFilesAdap
                 warning = StringResourcesUtils.getString(R.string.invalid_characters_defined);
             }
 
-            ((FileExplorerActivityLollipop) context).showSnackbar(warning);
+            ((FileExplorerActivity) context).showSnackbar(warning);
         } else {
-            ((FileExplorerActivityLollipop) context).chooseFragment(fragment);
+            ((FileExplorerActivity) context).chooseFragment(fragment);
         }
     }
 
     private HashMap<String, String> getNameFiles() {
-        return ((FileExplorerActivityLollipop) context).getNameFiles();
+        return ((FileExplorerActivity) context).getNameFiles();
     }
 
     @Override
     public void onClickCloudDriveButton() {
-        confirmImport(FileExplorerActivityLollipop.CLOUD_FRAGMENT);
+        confirmImport(FileExplorerActivity.CLOUD_FRAGMENT);
     }
 
     @Override
     public void onClickChatButton() {
-        confirmImport(FileExplorerActivityLollipop.CHAT_FRAGMENT);
+        confirmImport(FileExplorerActivity.CHAT_FRAGMENT);
     }
 
     class GetNamesAsyncTask extends AsyncTask<Void, Void, Void> {
@@ -157,7 +157,7 @@ public class ImportFilesFragment extends BaseFragment implements ImportFilesAdap
                 nameFiles.put(name, name);
             }
 
-            ((FileExplorerActivityLollipop) context).setNameFiles(nameFiles);
+            ((FileExplorerActivity) context).setNameFiles(nameFiles);
             return null;
         }
     }

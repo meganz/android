@@ -8,14 +8,15 @@ import android.util.TypedValue
 import android.view.LayoutInflater
 import android.view.View
 import android.widget.*
+import androidx.appcompat.app.AlertDialog
 import androidx.core.view.isVisible
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import mega.privacy.android.app.BaseActivity
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.OverDiskQuotaPaywallActivity
-import mega.privacy.android.app.lollipop.LoginActivityLollipop
-import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop
+import mega.privacy.android.app.lollipop.LoginActivity
+import mega.privacy.android.app.lollipop.megachat.ChatActivity
 import mega.privacy.android.app.utils.StringResourcesUtils.getString
 
 object AlertsAndWarnings {
@@ -44,7 +45,7 @@ object AlertsAndWarnings {
         val app = MegaApplication.getInstance()
 
         // If app is doing login, the ODQ will be displayed at login finish
-        if (app.currentActivity is LoginActivityLollipop && !loginFinished) {
+        if (app.currentActivity is LoginActivity && !loginFinished) {
             return
         }
 
@@ -81,7 +82,7 @@ object AlertsAndWarnings {
             .setPositiveButton(getString(R.string.button_resume_individual_transfer)) { dialog, _ ->
                 MegaApplication.getInstance().megaApi.pauseTransfers(false)
 
-                if (context is ChatActivityLollipop) {
+                if (context is ChatActivity) {
                     context.updatePausedUploadingMessages()
                 }
 
@@ -207,4 +208,23 @@ object AlertsAndWarnings {
 
         context.startActivity(Intent.createChooser(emailIntent, " "))
     }
- }
+
+    /**
+     * Shows a taken down alert.
+     *
+     * @param activity   Required to create the dialog and finish the activity.
+     */
+    @JvmStatic
+    fun showTakenDownAlert(activity: Activity): AlertDialog =
+        MaterialAlertDialogBuilder(activity)
+            .setTitle(getString(R.string.general_not_available))
+            .setMessage(getString(R.string.error_download_takendown_node))
+            .setNegativeButton(getString(R.string.general_dismiss)) { _, _ ->
+                if (!activity.isFinishing) activity.finish()
+            }
+            .create().apply {
+                setCancelable(false)
+                show()
+            }
+
+}

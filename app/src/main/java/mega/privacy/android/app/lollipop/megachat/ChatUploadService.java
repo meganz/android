@@ -38,9 +38,8 @@ import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.VideoDownsampling;
-import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
+import mega.privacy.android.app.lollipop.ManagerActivity;
 import mega.privacy.android.app.utils.StringResourcesUtils;
-import mega.privacy.android.app.utils.ThumbnailUtilsLollipop;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaChatApiAndroid;
@@ -784,7 +783,7 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 			}
 		}
 
-        Intent intent = new Intent(ChatUploadService.this, ManagerActivityLollipop.class);
+        Intent intent = new Intent(ChatUploadService.this, ManagerActivity.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
 
 		switch (isOverquota) {
@@ -804,7 +803,7 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 		String actionString = isOverquota == 0 ? getString(R.string.chat_upload_title_notification) :
 				getString(R.string.general_show_info);
 
-		PendingIntent pendingIntent = PendingIntent.getActivity(ChatUploadService.this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+		PendingIntent pendingIntent = PendingIntent.getActivity(ChatUploadService.this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
 		Notification notification;
 
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
@@ -1048,7 +1047,7 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 							logDebug("Is pdf!!!");
 
 							try{
-								ThumbnailUtilsLollipop.createThumbnailPdf(this, transfer.getPath(), megaApi, transfer.getNodeHandle());
+								createThumbnailPdf(this, transfer.getPath(), megaApi, transfer.getNodeHandle());
 							}
 							catch(Exception e){
 								logError("Pdf thumbnail could not be created", e);
@@ -1297,7 +1296,7 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 			}
 		}
 
-		//Upadate node handle in db
+		//Update node handle in db
 		long id = getPendingMessageIdFromAppData(transfer.getAppData());
 		//Update status and nodeHandle on db
 		dbH.updatePendingMessageOnTransferFinish(id, transfer.getNodeHandle()+"", PendingMessageSingle.STATE_ATTACHING);
@@ -1479,7 +1478,7 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 				if(pendMsg.getChatId()==openChatId){
 					logWarning("Error update activity");
 					Intent intent;
-					intent = new Intent(this, ChatActivityLollipop.class);
+					intent = new Intent(this, ChatActivity.class);
 					intent.setAction(ACTION_UPDATE_ATTACHMENT);
 					intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 					intent.putExtra("ID_MSG", pendMsg.getId());
@@ -1501,7 +1500,7 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 		String contentText = getString(R.string.download_show_info);
 		String message = getString(R.string.overquota_alert_title);
 
-		Intent intent = new Intent(this, ManagerActivityLollipop.class);
+		Intent intent = new Intent(this, ManagerActivity.class);
 
 		intent.setAction(isOverquota == OVERQUOTA_STORAGE_STATE
 				? ACTION_OVERQUOTA_STORAGE
@@ -1518,7 +1517,7 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 			mBuilderCompat
 					.setSmallIcon(R.drawable.ic_stat_notify)
 					.setColor(ContextCompat.getColor(this,R.color.red_600_red_300))
-					.setContentIntent(PendingIntent.getActivity(getApplicationContext(), 0, intent, 0))
+					.setContentIntent(PendingIntent.getActivity(getApplicationContext(), 0, intent, PendingIntent.FLAG_IMMUTABLE))
 					.setAutoCancel(true).setTicker(contentText)
 					.setContentTitle(message).setContentText(contentText)
 					.setOngoing(false);
@@ -1529,7 +1528,7 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 			mBuilder
 					.setColor(ContextCompat.getColor(this,R.color.red_600_red_300))
 					.setSmallIcon(R.drawable.ic_stat_notify)
-					.setContentIntent(PendingIntent.getActivity(getApplicationContext(), 0, intent, 0))
+					.setContentIntent(PendingIntent.getActivity(getApplicationContext(), 0, intent, PendingIntent.FLAG_IMMUTABLE))
 					.setAutoCancel(true).setTicker(contentText)
 					.setContentTitle(message).setContentText(contentText)
 					.setOngoing(false);

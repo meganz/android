@@ -6,18 +6,13 @@ import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import mega.privacy.android.app.data.repository.*
 import mega.privacy.android.app.domain.repository.*
-import mega.privacy.android.app.data.repository.DefaultAccountRepository
-import mega.privacy.android.app.data.repository.DefaultSettingsRepository
-import mega.privacy.android.app.domain.repository.AccountRepository
-import mega.privacy.android.app.domain.repository.SettingsRepository
+import kotlin.contracts.ExperimentalContracts
 
 @Module
 @InstallIn(SingletonComponent::class)
 abstract class RepositoryModule {
 
-    @Binds
-    abstract fun bindSettingsRepository(repository: DefaultSettingsRepository): SettingsRepository
-
+    @ExperimentalContracts
     @Binds
     abstract fun bindAccountRepository(repository: DefaultAccountRepository): AccountRepository
 
@@ -29,4 +24,5 @@ abstract class RepositoryModule {
 
     @Binds
     abstract fun bindFilesRepository(implementation: MegaFilesRepository): FilesRepository
+
 }

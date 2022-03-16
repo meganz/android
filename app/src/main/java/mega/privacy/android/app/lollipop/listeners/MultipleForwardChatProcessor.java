@@ -1,6 +1,5 @@
 package mega.privacy.android.app.lollipop.listeners;
 
-import android.app.Activity;
 import android.content.Context;
 
 import mega.privacy.android.app.MegaApplication;
@@ -8,7 +7,7 @@ import mega.privacy.android.app.R;
 import mega.privacy.android.app.lollipop.controllers.ChatController;
 import mega.privacy.android.app.lollipop.controllers.NodeController;
 import mega.privacy.android.app.lollipop.megachat.AndroidMegaChatMessage;
-import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop;
+import mega.privacy.android.app.lollipop.megachat.ChatActivity;
 import mega.privacy.android.app.lollipop.megachat.NodeAttachmentHistoryActivity;
 import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaChatApiJava;
@@ -98,7 +97,7 @@ public class MultipleForwardChatProcessor implements MegaChatRequestListenerInte
                 String text = meta.getRichPreview().getText();
 
                 if (chatHandles[value] == idChat) {
-                    ((ChatActivityLollipop) context).sendMessage(text);
+                    ((ChatActivity) context).sendMessage(text);
                 } else {
                     megaChatApi.sendMessage(chatHandles[value], text);
                 }
@@ -110,7 +109,7 @@ public class MultipleForwardChatProcessor implements MegaChatRequestListenerInte
                 float longitude = meta.getGeolocation().getLongitude();
 
                 if (chatHandles[value] == idChat) {
-                    ((ChatActivityLollipop) context).sendLocationMessage(longitude, latitude, image);
+                    ((ChatActivity) context).sendLocationMessage(longitude, latitude, image);
                 } else {
                     megaChatApi.sendGeolocation(chatHandles[value], longitude, latitude, image);
                 }
@@ -120,7 +119,7 @@ public class MultipleForwardChatProcessor implements MegaChatRequestListenerInte
                 MegaChatGiphy giphy = meta.getGiphy();
 
                 if (chatHandles[value] == idChat) {
-                    ((ChatActivityLollipop) context).sendGiphyMessageFromMegaChatGiphy(giphy);
+                    ((ChatActivity) context).sendGiphyMessageFromMegaChatGiphy(giphy);
                 } else {
                     megaChatApi.sendGiphy(chatHandles[value], giphy.getMp4Src(), giphy.getWebpSrc(), giphy.getMp4Size(), giphy.getWebpSize()
                             , giphy.getWidth(), giphy.getHeight(), giphy.getTitle());
@@ -149,7 +148,7 @@ public class MultipleForwardChatProcessor implements MegaChatRequestListenerInte
                     case MegaChatMessage.TYPE_NORMAL: {
                         String text = messageToForward.getContent();
                         if (chatHandles[k] == idChat) {
-                            ((ChatActivityLollipop) context).sendMessage(text);
+                            ((ChatActivity) context).sendMessage(text);
                         } else {
                             megaChatApi.sendMessage(chatHandles[k], text);
                         }
@@ -161,7 +160,7 @@ public class MultipleForwardChatProcessor implements MegaChatRequestListenerInte
                         if (chatHandles[k] == idChat) {
                             if (contactMessage != null) {
                                 AndroidMegaChatMessage androidMsgSent = new AndroidMegaChatMessage(contactMessage);
-                                ((ChatActivityLollipop) context).sendMessageToUI(androidMsgSent);
+                                ((ChatActivity) context).sendMessageToUI(androidMsgSent);
                             }
                         }
                         checkTotalMessages();
@@ -221,8 +220,8 @@ public class MultipleForwardChatProcessor implements MegaChatRequestListenerInte
             if (e.getErrorCode() == MegaChatError.ERROR_OK) {
                 if (request.getChatHandle() == idChat) {
                     AndroidMegaChatMessage androidMsgSent = new AndroidMegaChatMessage(request.getMegaChatMessage());
-                    if (androidMsgSent != null && context instanceof ChatActivityLollipop) {
-                        ((ChatActivityLollipop) context).sendMessageToUI(androidMsgSent);
+                    if (androidMsgSent != null && context instanceof ChatActivity) {
+                        ((ChatActivity) context).sendMessageToUI(androidMsgSent);
                     }
                 }
                 checkTotalMessages();
@@ -249,7 +248,7 @@ public class MultipleForwardChatProcessor implements MegaChatRequestListenerInte
 
             int success = totalMessages - error - errorNotAvailable;
 
-            if (context instanceof ChatActivityLollipop) {
+            if (context instanceof ChatActivity) {
                 if (success > 0) {
                     //A message has been forwarded
                     String text = null;
@@ -265,21 +264,21 @@ public class MultipleForwardChatProcessor implements MegaChatRequestListenerInte
                     }
 
                     if (chatHandles.length == 1) {
-                        ((ChatActivityLollipop) context).openChatAfterForward(chatHandles[0], text);
+                        ((ChatActivity) context).openChatAfterForward(chatHandles[0], text);
                     } else {
-                        ((ChatActivityLollipop) context).openChatAfterForward(-1, text);
+                        ((ChatActivity) context).openChatAfterForward(-1, text);
                     }
                 } else {
                     //No messages forwarded
                     int totalErrors = error + errorNotAvailable;
                     if (totalErrors == errorNotAvailable) {
-                        ((ChatActivityLollipop) context).showSnackbar(SNACKBAR_TYPE, context.getResources().getQuantityString(R.plurals.messages_forwarded_error_not_available, totalErrors, totalErrors), -1);
+                        ((ChatActivity) context).showSnackbar(SNACKBAR_TYPE, context.getResources().getQuantityString(R.plurals.messages_forwarded_error_not_available, totalErrors, totalErrors), -1);
                     } else {
                         String text = context.getResources().getQuantityString(R.plurals.messages_forwarded_partial_error, totalErrors, totalErrors);
-                        ((ChatActivityLollipop) context).showSnackbar(SNACKBAR_TYPE, text, -1);
+                        ((ChatActivity) context).showSnackbar(SNACKBAR_TYPE, text, -1);
                     }
 
-                    ((ChatActivityLollipop) context).removeProgressDialog();
+                    ((ChatActivity) context).removeProgressDialog();
                 }
             } else if (context instanceof NodeAttachmentHistoryActivity) {
                 if (success > 0) {

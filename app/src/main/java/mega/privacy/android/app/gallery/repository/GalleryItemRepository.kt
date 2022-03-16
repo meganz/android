@@ -9,6 +9,7 @@ import mega.privacy.android.app.DatabaseHandler
 import mega.privacy.android.app.gallery.data.GalleryItem
 import mega.privacy.android.app.gallery.repository.fetcher.GalleryBaseFetcher
 import nz.mega.sdk.MegaApiAndroid
+import nz.mega.sdk.MegaCancelToken
 import nz.mega.sdk.MegaNode
 import java.util.*
 
@@ -29,7 +30,20 @@ abstract class GalleryItemRepository constructor(
     /** The selected nodes in action mode */
     private val selectedNodesMap: LinkedHashMap<Any, GalleryItem> = LinkedHashMap()
 
-    suspend fun getFiles(order: Int, zoom: Int, handle: Long? = null) {
+    /**
+     * Gets the image items.
+     *
+     * @param cancelToken   MegaCancelToken to cancel the search at any time.
+     * @param order         Order to get the items.
+     * @param zoom          Zoom value.
+     * @param handle
+     */
+    suspend fun getFiles(
+        cancelToken: MegaCancelToken,
+        order: Int,
+        zoom: Int,
+        handle: Long? = null
+    ) {
         preserveSelectedItems()
 
         // Create a node fetcher for the new request, and link fileNodeItems to its result.
@@ -47,7 +61,7 @@ abstract class GalleryItemRepository constructor(
         galleryItems = nodesFetcher.result as MutableLiveData<List<GalleryItem>>
 
         withContext(Dispatchers.IO) {
-            nodesFetcher.getGalleryItems()
+            nodesFetcher.getGalleryItems(cancelToken)
         }
     }
 

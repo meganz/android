@@ -7,8 +7,8 @@ import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentStatePagerAdapter;
 
 import mega.privacy.android.app.R;
-import mega.privacy.android.app.lollipop.CloudDriveExplorerFragmentLollipop;
-import mega.privacy.android.app.lollipop.IncomingSharesExplorerFragmentLollipop;
+import mega.privacy.android.app.lollipop.CloudDriveExplorerFragment;
+import mega.privacy.android.app.lollipop.IncomingSharesExplorerFragment;
 import mega.privacy.android.app.lollipop.megachat.ChatExplorerFragment;
 
 import static mega.privacy.android.app.utils.LogUtil.*;
@@ -82,7 +82,7 @@ public class FileExplorerPagerAdapter extends FragmentStatePagerAdapter {
             return mIncomingFragment;
         }
 
-        return mIncomingFragment = IncomingSharesExplorerFragmentLollipop.newInstance();
+        return mIncomingFragment = IncomingSharesExplorerFragment.newInstance();
     }
 
     private Fragment getCloudFragment () {
@@ -90,7 +90,7 @@ public class FileExplorerPagerAdapter extends FragmentStatePagerAdapter {
             return mCloudFragment;
         }
 
-        return mCloudFragment = CloudDriveExplorerFragmentLollipop.newInstance();
+        return mCloudFragment = CloudDriveExplorerFragment.newInstance();
     }
 
     @Override

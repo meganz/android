@@ -87,7 +87,7 @@
         android:id="@+id/exo_rew"
         style="@style/AudioPlayerButton"
         android:layout_marginStart="10dp"
-        android:src="@drawable/audio_player_15_minus"
+        android:src="@drawable/media_player_15_minus"
         app:layout_constraintBottom_toBottomOf="@id/control_button_center"
         app:layout_constraintEnd_toStartOf="@id/exo_prev"
         app:layout_constraintHorizontal_chainStyle="spread_inside"
@@ -97,7 +97,7 @@
     <ImageButton
         android:id="@id/exo_prev"
         style="@style/AudioPlayerButton"
-        android:src="@drawable/audio_player_prev"
+        android:src="@drawable/media_player_prev"
         app:layout_constraintBottom_toBottomOf="@id/control_button_center"
         app:layout_constraintEnd_toStartOf="@id/play_pause_placeholder"
         app:layout_constraintHorizontal_chainStyle="spread_inside"
@@ -119,7 +119,7 @@
         android:layout_width="64dp"
         android:layout_height="64dp"
         android:background="@null"
-        android:src="@drawable/audio_player_play"
+        android:src="@drawable/media_player_play"
         app:layout_constraintStart_toStartOf="@id/play_pause_placeholder"
         app:layout_constraintTop_toTopOf="@id/play_pause_placeholder" />
 
@@ -128,14 +128,14 @@
         android:layout_width="64dp"
         android:layout_height="64dp"
         android:background="@null"
-        android:src="@drawable/audio_player_pause"
+        android:src="@drawable/media_player_pause"
         app:layout_constraintStart_toStartOf="@id/play_pause_placeholder"
         app:layout_constraintTop_toTopOf="@id/play_pause_placeholder" />
 
     <ImageButton
         android:id="@id/exo_next"
         style="@style/AudioPlayerButton"
-        android:src="@drawable/audio_player_next"
+        android:src="@drawable/media_player_next"
         app:layout_constraintBottom_toBottomOf="@id/control_button_center"
         app:layout_constraintEnd_toStartOf="@id/exo_ffwd"
         app:layout_constraintHorizontal_chainStyle="spread_inside"
@@ -146,7 +146,7 @@
         android:id="@+id/exo_ffwd"
         style="@style/AudioPlayerButton"
         android:layout_marginEnd="10dp"
-        android:src="@drawable/audio_player_15_plus"
+        android:src="@drawable/media_player_15_plus"
         app:layout_constraintBottom_toBottomOf="@id/control_button_center"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_chainStyle="spread_inside"
@@ -173,7 +173,7 @@
         android:id="@+id/playlist"
         style="@style/AudioPlayerButton"
         android:enabled="false"
-        android:src="@drawable/audio_player_playlist"
+        android:src="@drawable/media_player_playlist"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="@id/exo_next"
         app:layout_constraintStart_toStartOf="@id/exo_next" />

@@ -15,7 +15,7 @@ import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.twemoji.EmojiKeyboard;
 import mega.privacy.android.app.lollipop.megachat.AndroidMegaChatMessage;
-import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop;
+import mega.privacy.android.app.lollipop.megachat.ChatActivity;
 import nz.mega.sdk.MegaChatMessage;
 
 import static mega.privacy.android.app.utils.ChatUtil.*;
@@ -37,15 +37,15 @@ public class ReactionsBottomSheet extends BottomSheetDialogFragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        if (!(requireActivity() instanceof ChatActivityLollipop))
+        if (!(requireActivity() instanceof ChatActivity))
             return;
 
         if (savedInstanceState != null) {
             chatId = savedInstanceState.getLong(CHAT_ID, MEGACHAT_INVALID_HANDLE);
             messageId = savedInstanceState.getLong(MESSAGE_ID, MEGACHAT_INVALID_HANDLE);
         } else {
-            chatId = ((ChatActivityLollipop) requireActivity()).idChat;
-            messageId = ((ChatActivityLollipop) requireActivity()).selectedMessageId;
+            chatId = ((ChatActivity) requireActivity()).idChat;
+            messageId = ((ChatActivity) requireActivity()).selectedMessageId;
         }
 
         MegaChatMessage messageMega = MegaApplication.getInstance().getMegaChatApi().getMessage(chatId, messageId);

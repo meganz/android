@@ -1,7 +1,14 @@
 package mega.privacy.android.app.domain.usecase
 
-import nz.mega.sdk.MegaRequestListenerInterface
-
+/**
+ * Fetch auto accept q r links
+ *
+ */
 interface FetchAutoAcceptQRLinks {
+    /**
+     * Invoke
+     *
+     * @return
+     */
     suspend operator fun invoke(): Boolean
 }

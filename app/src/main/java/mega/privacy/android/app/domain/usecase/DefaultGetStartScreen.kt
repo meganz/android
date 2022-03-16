@@ -6,6 +6,11 @@ import kotlinx.coroutines.flow.flow
 import mega.privacy.android.app.domain.repository.SettingsRepository
 import javax.inject.Inject
 
+/**
+ * Default get start screen
+ *
+ * @property settingsRepository
+ */
 class DefaultGetStartScreen @Inject constructor(private val settingsRepository: SettingsRepository) : GetStartScreen {
     override fun invoke(): Flow<Int> {
         return flow {

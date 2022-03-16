@@ -837,15 +837,23 @@ class InMeetingViewModel @Inject constructor(
      * @param peerId User handle of a participant
      */
     fun isParticipantModerator(peerId: Long): Boolean =
-        inMeetingRepository.getChatRoom(currentChatId)
-            ?.let { it.getPeerPrivilegeByHandle(peerId) == MegaChatRoom.PRIV_MODERATOR } ?: false
+        if (isMe(peerId))
+            getOwnPrivileges() == MegaChatRoom.PRIV_MODERATOR
+        else
+            inMeetingRepository.getChatRoom(currentChatId)
+                ?.let { it.getPeerPrivilegeByHandle(peerId) == MegaChatRoom.PRIV_MODERATOR }
+                ?: false
 
     /**
      * Method to know if the participant is my contact
      *
      * @param peerId User handle of a participant
      */
-    private fun isMyContact(peerId: Long): Boolean = inMeetingRepository.isMyContact(peerId)
+    private fun isMyContact(peerId: Long): Boolean =
+        if (isMe(peerId))
+            true
+        else
+            inMeetingRepository.isMyContact(peerId)
 
     /**
      * Method to update whether a user is my contact or not
@@ -980,9 +988,9 @@ class InMeetingViewModel @Inject constructor(
             }
 
             val isModerator = isParticipantModerator(session.peerid)
+            val name = getParticipantName(session.peerid)
             val isContact = isMyContact(session.peerid)
             val hasHiRes = needHiRes(status)
-            val name = getParticipantName(session.peerid)
             val avatar = inMeetingRepository.getAvatarBitmap(it, session.peerid)
             val email = inMeetingRepository.getEmailParticipant(
                 session.peerid,
@@ -1184,7 +1192,10 @@ class InMeetingViewModel @Inject constructor(
      * @return the name of a participant
      */
     private fun getParticipantName(peerId: Long): String =
-        inMeetingRepository.participantName(peerId) ?: " "
+        if (isMe(peerId))
+            inMeetingRepository.getMyFullName()
+        else
+            inMeetingRepository.participantName(peerId) ?: " "
 
     /**
      * Method that marks a participant as a non-speaker
