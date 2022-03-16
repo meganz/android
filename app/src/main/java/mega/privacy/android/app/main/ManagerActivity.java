@@ -3854,7 +3854,7 @@ public class ManagerActivity extends TransfersManagementActivity
             case INBOX: {
                 aB.setSubtitle(null);
                 if (viewModel.getState().getValue().getInboxParentHandle() == megaApi.getInboxNode().getHandle() || viewModel.getState().getValue().getInboxParentHandle() == -1) {
-                    aB.setTitle(getResources().getString(R.string.section_vault));
+                    aB.setTitle(getResources().getString(R.string.section_restricted_folder));
                     viewModel.setIsFirstNavigationLevel(true);
                 } else {
                     MegaNode node = megaApi.getNodeByHandle(viewModel.getState().getValue().getInboxParentHandle());

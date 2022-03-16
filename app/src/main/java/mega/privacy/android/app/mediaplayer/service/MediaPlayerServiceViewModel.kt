@@ -401,7 +401,7 @@ class MediaPlayerServiceViewModel(
                                     getString(
                                         when (type) {
                                             RUBBISH_BIN_ADAPTER -> R.string.section_rubbish_bin
-                                            INBOX_ADAPTER -> R.string.section_inbox
+                                            INBOX_ADAPTER -> R.string.section_restricted_folder
                                             else -> R.string.section_cloud_drive
                                         }
                                     )

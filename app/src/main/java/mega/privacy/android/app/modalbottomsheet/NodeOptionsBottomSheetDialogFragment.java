@@ -460,11 +460,6 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
             case INBOX_MODE:
                 Timber.d("show Vault bottom sheet");
 
-                // Check if sub folder of "My Backup"
-                ArrayList<Long> handleList = new ArrayList<>();
-                handleList.add(node.getHandle());
-                int nodeType = checkBackupNodeTypeInList(megaApi, handleList);
-
                 optionFavourite.setVisibility(View.GONE);
                 optionLabel.setVisibility(View.GONE);
                 counterModify--;
@@ -473,7 +468,7 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
                 optionMove.setVisibility(View.GONE);
                 optionRubbishBin.setVisibility(View.GONE);
 
-                optionRemove.setVisibility(nodeType == BACKUP_FOLDER ? View.VISIBLE : View.GONE);
+                optionRemove.setVisibility(View.GONE);
                 optionLeaveShares.setVisibility(View.GONE);
                 counterOpen--;
                 optionOpenFolder.setVisibility(View.GONE);

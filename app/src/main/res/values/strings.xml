@@ -209,10 +209,8 @@
     <string name="section_recents">Recents</string>
     <!-- title of the screen where the secondary media images are uploaded, and name of the folder where the secondary media images are uploaded -->
     <string name="section_secondary_media_uploads">Media Uploads</string>
-    <!-- Section name for the “Messages” section.Preferably one word. There is little space for this word. -->
-    <string name="section_inbox">Inbox</string>
     <!-- Section name for the "My Backups" and "old index files" section. Preferably one word. There is little space for this word. -->
-    <string name="section_vault">Vault</string>
+    <string name="section_restricted_folder">Restricted folder</string>
     <!-- the options of what to upload in an array. Needed for the settings, the options of what to upload. -->
     <string name="section_saved_for_offline_new">Offline</string>
     <!-- Label showing the location of a node which is not in root navigation level. The first placeholder is the name of the parent folder. The second placeholder is the name of the section in which the file is. e.g. PR reviews and tickets (Cloud Drive) -->
@@ -1659,10 +1657,8 @@
     <string name="context_share">Share using</string>
     <!-- Text of the empty screen when there are not elements in the Rubbish Bin -->
     <string name="context_empty_rubbish_bin">[B]Empty [/B][A]Rubbish Bin[/A]</string>
-    <!-- Text of the empty screen when there are not elements in  Inbox -->
-    <string name="context_empty_inbox">[B]No files in your [/B][A]Inbox[/A]</string>
-    <!-- Text of the empty screen when there are not elements in Vault -->
-    <string name="context_empty_vault">[B]No files in your [/B][A]Vault[/A]</string>
+    <!-- Text of the empty screen when there are not elements in restricted folder -->
+    <string name="context_empty_restricted_folder">[B]No files in your [/B][A]RESTRICTED FOLDER[/A]</string>
     <!-- Text of the empty screen when there are not elements in Cloud Drive -->
     <string name="context_empty_cloud_drive">[B]No files in your [/B][A]Cloud Drive[/A]</string>
     <!-- Text of the empty screen when there are not elements in Saved for Offline -->
