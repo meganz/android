@@ -990,11 +990,11 @@
     <!-- Type of account info added to the feedback email sent to support -->
     <string name="my_account_prolite">Pro Liteアカウント</string>
     <!-- Label in My Account section to show user account type -->
-    <string name="my_account_pro1">PRO Iアカウント</string>
+    <string name="my_account_pro1">Pro Iアカウント</string>
     <!-- Label in My Account section to show user account type -->
     <string name="my_account_pro2">PRO IIアカウント</string>
     <!-- Label in My Account section to show user account type -->
-    <string name="my_account_pro3">PRO IIIアカウント</string>
+    <string name="my_account_pro3">Pro IIIアカウント</string>
     <!-- Type of account info added to the feedback email sent to support -->
     <string name="my_account_prolite_feedback_email">Pro Liteアカウント</string>
     <!--  -->
@@ -3727,8 +3727,6 @@
     <string name="same_item_name_warning">同じ名前の項目がすでに存在します</string>
     <!-- Label of the option menu. When clicking this button, the app shows the info of the related item, e.g. file, folder, contact, chat, etc. -->
     <string name="general_info">情報</string>
-    <!-- Item menu option upon right click on one image or video to save it to device gallery -->
-    <string name="general_save_to_gallery">ギャラリーに保存</string>
     <!-- settings of the Media section -->
     <string name="settings_media">メディア</string>
     <!-- settings title of the Media section -->
@@ -4169,4 +4167,18 @@
     <string name="title_dcim_folder_dialog">DCIMフォルダ</string>
     <!-- Content of DCIM folder warning dialog -->
     <string name="content_dcim_folder_dialog">MEGAはギャラリーからあなたの画像をアップロードします。アップロードの場所を変更するには、カメラアップロードの設定をご覧ください。</string>
+    <!-- Error shown when download a file that has violated ToS/AUP. -->
+    <string name="tos_aup_violation">ToS（ご利用規約）/AUP（ご利用規定） 違反</string>
+    <!-- Title message of existing subscription dialog -->
+    <string name="title_existing_subscription">新規サブスクリプションをご購入いたしますか？</string>
+    <!-- Text of buy new subscription button -->
+    <string name="button_buy_new_subscription">新規サブスクリプションを購入する</string>
+    <!-- Dialog message when the existing subscription is from Android platform (Google and Huawei)  -->
+    <string name="message_subscription_from_android_platform">すでにサブスクリプションをお持ちです。もう一つご購入されると、二重課金になります。これを避けるには、%1$sを通して現在のサブスクリプションをキャンセルしてください。詳しくは、ヘルプセンターをご覧ください。</string>
+    <!-- Dialog message when the existing subscription is from iTunes  -->
+    <string name="message_subscription_from_itunes">すでにサブスクリプションをお持ちです。もう一つご購入されると、二重課金になります。これを避けるには、iTunesアカウントから現在のサブスクリプションをキャンセルしてください。詳しくは、ヘルプセンターをご覧ください。</string>
+    <!-- Dialog message when the existing subscription is from other platform (Stripe and ECP)  -->
+    <string name="message_subscription_from_other_platform">すでにサブスクリプションをお持ちです。もう一つご購入されると、二重課金になります。これを避けるには、デスクトップまたはモバイルのウェブブラウザでMEGAにアクセスし、現在のサブスクリプションを解約してください。詳しくは、ヘルプセンターをご覧ください。</string>
+    <!-- Warning show to the user when the app needs bluetooth connect permissions to get the best meeting experience and the user has denied them.-->
+    <string name="meeting_bluetooth_connect_required_permissions_warning">設定から、MEGAにBluetoothを使用してお近くの機器にアクセスする権限を与えてください。</string>
 </resources>

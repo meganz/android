@@ -3727,8 +3727,6 @@
     <string name="same_item_name_warning">같은 이름의 항목이 존재합니다</string>
     <!-- Label of the option menu. When clicking this button, the app shows the info of the related item, e.g. file, folder, contact, chat, etc. -->
     <string name="general_info">정보</string>
-    <!-- Item menu option upon right click on one image or video to save it to device gallery -->
-    <string name="general_save_to_gallery">갤러리에 저장</string>
     <!-- settings of the Media section -->
     <string name="settings_media">미디어</string>
     <!-- settings title of the Media section -->
@@ -4169,4 +4167,18 @@
     <string name="title_dcim_folder_dialog">DCIM 폴더</string>
     <!-- Content of DCIM folder warning dialog -->
     <string name="content_dcim_folder_dialog">MEGA가 갤러리로부터 이미지를 업로드합니다. 업로드 위치를 변경하려면 카메라 업로드 설정으로 가세요.</string>
+    <!-- Error shown when download a file that has violated ToS/AUP. -->
+    <string name="tos_aup_violation">이용 약관 위반</string>
+    <!-- Title message of existing subscription dialog -->
+    <string name="title_existing_subscription">새 구독을 구매할까요?</string>
+    <!-- Text of buy new subscription button -->
+    <string name="button_buy_new_subscription">새 구독 구매</string>
+    <!-- Dialog message when the existing subscription is from Android platform (Google and Huawei)  -->
+    <string name="message_subscription_from_android_platform">당신에게 이미 구독이 있습니다. 만약 다른 것을 구매하면 두번 결제됩니다. 이것을 피하려면, %1$s을/를 통하여 현재 구독을 취소하세요. 더 많은 정보는 우리의 도움 센터를 방문하세요.</string>
+    <!-- Dialog message when the existing subscription is from iTunes  -->
+    <string name="message_subscription_from_itunes">당신에게 이미 구독이 있습니다. 만약 다른 것을 구매하면 두번 결제됩니다. 이것을 피하려면, 당신의 iTunes 계정을 통하여 현재 구독을 취소하세요. 더 많은 정보는 우리의 도움 센터를 방문하세요.</string>
+    <!-- Dialog message when the existing subscription is from other platform (Stripe and ECP)  -->
+    <string name="message_subscription_from_other_platform">당신에게 이미 구독이 있습니다. 만약 다른 것을 구매하면 두번 결제됩니다. 이것을 피하려면, MEGA를 데스크톱 또는 모바일 웹 브라우저에서 접속하여 현재 구독을 취소하세요. 자세한 정보는 우리의 도움 센터를 방문하세요.</string>
+    <!-- Warning show to the user when the app needs bluetooth connect permissions to get the best meeting experience and the user has denied them.-->
+    <string name="meeting_bluetooth_connect_required_permissions_warning">설정에 가서 MEGA가 Bluetooth를 사용하여 주변 기기에 접근할 수 있도록 허용해주세요.</string>
 </resources>
