@@ -1187,6 +1187,7 @@ public class ChatActivity extends PasscodeActivity
         inputTextLayout = findViewById(R.id.write_layout);
         separatorOptions = findViewById(R.id.separator_layout_options);
 
+        titleToolbar.setText("");
         individualSubtitleToobar.setText("");
         individualSubtitleToobar.setVisibility(View.GONE);
         groupalSubtitleToolbar.setText("");
@@ -6295,7 +6296,13 @@ public class ChatActivity extends PasscodeActivity
             markAsSeen(msg);
         }
 
-        if(msg.getType()==MegaChatMessage.TYPE_TRUNCATE){
+        if(msg.getType()==MegaChatMessage.TYPE_CHAT_TITLE){
+            String newTitle = msg.getContent();
+            if(newTitle!=null){
+                titleToolbar.setText(newTitle);
+            }
+        }
+        else if(msg.getType()==MegaChatMessage.TYPE_TRUNCATE){
             invalidateOptionsMenu();
         }
 
