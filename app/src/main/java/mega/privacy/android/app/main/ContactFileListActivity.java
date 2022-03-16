@@ -8,6 +8,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
@@ -19,6 +20,8 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.coordinatorlayout.widget.CoordinatorLayout;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.widget.Toolbar;
+import androidx.core.content.ContextCompat;
+
 import android.util.DisplayMetrics;
 import android.view.Display;
 import android.view.Menu;
@@ -761,7 +764,7 @@ public class ContactFileListActivity extends PasscodeActivity
 				uploadServiceIntent.putExtra(UploadService.EXTRA_FOLDERPATH, folderPath);
 				uploadServiceIntent.putExtra(UploadService.EXTRA_PARENT_HASH, parentNode.getHandle());
 				logDebug("PARENTNODE: " + parentNode.getHandle() + "___" + parentNode.getName());
-				startService(uploadServiceIntent);
+				ContextCompat.startForegroundService(this, uploadServiceIntent);
 				i++;
 			}
 		} else if (requestCode == TAKE_PHOTO_CODE) {
@@ -824,7 +827,7 @@ public class ContactFileListActivity extends PasscodeActivity
 				intent.putExtra(UploadService.EXTRA_NAME, info.getTitle());
 				intent.putExtra(UploadService.EXTRA_PARENT_HASH, parentNode.getHandle());
 				intent.putExtra(UploadService.EXTRA_SIZE, info.getSize());
-				startService(intent);
+				ContextCompat.startForegroundService(this, intent);
 			}
 		}
 	}
