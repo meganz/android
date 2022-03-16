@@ -6,7 +6,6 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
-import mega.privacy.android.app.components.ListenScrollChangesHelper
 import mega.privacy.android.app.databinding.FragmentDecryptionKeyBinding
 import mega.privacy.android.app.interfaces.Scrollable
 import mega.privacy.android.app.utils.Constants
@@ -35,9 +34,9 @@ class DecryptionKeyFragment : Fragment(), Scrollable {
     }
 
     private fun setupView() {
-        ListenScrollChangesHelper().addViewToListen(
-            binding.scrollViewDecryption
-        ) { _, _, _, _, _ -> checkScroll() }
+        binding.scrollViewDecryption.setOnScrollChangeListener { _, _, _, _, _ ->
+            checkScroll()
+        }
 
         checkScroll()
     }

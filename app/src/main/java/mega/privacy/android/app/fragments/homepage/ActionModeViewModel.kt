@@ -12,6 +12,9 @@ class ActionModeViewModel @Inject constructor() : ViewModel() {
     // The full set of nodes
     private lateinit var nodesData: List<NodeItem>
 
+    private var uiDirty: Boolean = true
+    val deselectedNodeIndices = mutableSetOf<Int>()
+
     // Notify the fragment that the user intends to enter action mode by long click
     private val _longClick = MutableLiveData<Event<NodeItem>>()
     val longClick: LiveData<Event<NodeItem>> = _longClick
@@ -40,14 +43,16 @@ class ActionModeViewModel @Inject constructor() : ViewModel() {
 
     private fun updateSelectedNodeList(nodeItem: NodeItem) {
         nodeItem.selected = !nodeItem.selected
-        nodeItem.uiDirty = true
+        nodeItem.uiDirty = uiDirty
 
         _animNodeIndices.value = hashSetOf(nodeItem.index)
 
-        if (nodeItem.selected)
+        if (nodeItem.selected) {
             selectedNodeList.add(nodeItem)
-        else
+        } else {
             selectedNodeList.remove(nodeItem)
+            deselectedNodeIndices.add(nodeItem.index)
+        }
 
         _selectedNodes.value = selectedNodeList
     }
@@ -58,8 +63,9 @@ class ActionModeViewModel @Inject constructor() : ViewModel() {
 
         selectedNodeList.forEach {
             it.selected = false
-            it.uiDirty = true
+            it.uiDirty = uiDirty
             animNodeIndices.add(it.index)
+            deselectedNodeIndices.add(it.index)
         }
 
         _animNodeIndices.value = animNodeIndices
@@ -73,7 +79,7 @@ class ActionModeViewModel @Inject constructor() : ViewModel() {
         nodesData.forEach {
             if (!it.selected) {
                 it.selected = true
-                it.uiDirty = true
+                it.uiDirty = uiDirty
                 animNodeIndices.add(it.index)
             }
         }
@@ -106,5 +112,12 @@ class ActionModeViewModel @Inject constructor() : ViewModel() {
             }
         }
         _selectedNodes.value = selectedNodeList
+    }
+
+    /**
+     * Set the boolean value for the NodeItems
+     */
+    fun setUIDirty(uiDirty: Boolean) {
+        this.uiDirty = uiDirty
     }
 }
