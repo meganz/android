@@ -46,13 +46,7 @@ class ActionModeCallback constructor(
             }
             R.id.cab_menu_share_link, R.id.cab_menu_edit_link -> {
                 LogUtil.logDebug("Public link option")
-                if (selectedNodes.size == 1) {
-                    selectedNodes[0].let {
-                        if (it.handle != MegaApiJava.INVALID_HANDLE) {
-                            mainActivity.showGetLinkActivity(it.handle)
-                        }
-                    }
-                }
+                LinksUtil.showGetLinkActivity(mainActivity, nodesHandles.toLongArray())
             }
             R.id.cab_menu_remove_link -> {
                 LogUtil.logDebug("Remove public link option")
