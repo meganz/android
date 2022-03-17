@@ -6515,6 +6515,15 @@ public class ManagerActivity extends TransfersManagementActivity
             handles[i] = node.getHandle();
         }
 
+        showGetLinkActivity(handles);
+    }
+
+    /**
+     * Launches an intent to get the links of the nodes handles received.
+     *
+     * @param handles List of nodes to get their links.
+     */
+    public void showGetLinkActivity(long[] handles) {
         LinksUtil.showGetLinkActivity(this, handles);
     }
 
