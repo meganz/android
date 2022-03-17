@@ -34,6 +34,7 @@ import static nz.mega.sdk.MegaApiJava.STORAGE_STATE_PAYWALL;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.content.ContextCompat;
 
 import javax.inject.Inject;
 

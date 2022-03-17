@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+
+        <import type="android.view.View" />
+
+        <import type="mega.privacy.android.app.utils.Constants" />
+
+        <variable
+            name="viewModel"
+            type="mega.privacy.android.app.fragments.managerFragments.cu.TimelineViewModel" />
+    </data>
+
+    <RelativeLayout
+        android:id="@+id/cu_container"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <include
+            android:id="@+id/fragment_photos_first_login"
+            layout="@layout/fragment_photos_first_login"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+
+        <RelativeLayout
+            android:id="@+id/fragment_photos_grid"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <RelativeLayout
+                android:id="@+id/empty_hint"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:visibility="gone">
+
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_above="@+id/empty_enable_cu_button">
+
+                    <ImageView
+                        android:id="@+id/empty_hint_image"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerInParent="true"
+                        android:layout_centerHorizontal="true"
+                        android:src="@drawable/ic_zero_data_cu"
+                        tools:visibility="visible" />
+
+                    <TextView
+                        android:id="@+id/empty_hint_text"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_below="@+id/empty_hint_image"
+                        android:layout_centerHorizontal="true"
+                        android:layout_marginTop="8dp"
+                        android:gravity="center_horizontal"
+                        android:textAppearance="@style/TextAppearance.Mega.Body2.Secondary.Variant.AllCaps"
+                        tools:text="@string/no_results_found" />
+
+                </RelativeLayout>
+
+                <Button
+                    android:id="@+id/empty_enable_cu_button"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentBottom="true"
+                    android:layout_marginStart="16dp"
+                    android:layout_marginEnd="16dp"
+                    android:layout_marginBottom="40dp"
+                    android:text="@string/settings_camera_upload_on" />
+
+            </RelativeLayout>
+
+            <TextView
+                android:id="@+id/upload_progress"
+                android:layout_width="match_parent"
+                android:layout_height="36dp"
+                android:layout_marginBottom="8dp"
+                android:clipToPadding="false"
+                android:gravity="center_vertical"
+                android:paddingStart="16dp"
+                android:paddingEnd="16dp"
+                android:textAppearance="@style/TextAppearance.Mega.Subtitle2.Normal.Grey87White87"
+                android:visibility="gone"
+                tools:text="Upload in progress, 300 files pending" />
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/cu_list"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_below="@+id/upload_progress"
+                android:clipToPadding="false"
+                android:paddingBottom="@dimen/grid_node_list_padding_bottom"
+                app:galleryItems="@{viewModel.items}"
+                app:visibleGone="@{!viewModel.items.empty}"/>
+
+            <mega.privacy.android.app.components.scrollBar.FastScroller
+                android:id="@+id/scroller"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_alignParentEnd="true"
+                android:orientation="vertical" />
+        </RelativeLayout>
+    </RelativeLayout>
+</layout>

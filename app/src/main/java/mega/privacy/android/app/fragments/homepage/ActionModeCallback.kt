@@ -70,6 +70,9 @@ class ActionModeCallback constructor(
                 )
             }
             R.id.cab_menu_select_all -> viewModel.selectAll()
+            R.id.cab_menu_remove_favourites -> {
+                viewModel.removeFavourites(megaApi, selectedNodes)
+            }
         }
 
         return true
@@ -129,9 +132,26 @@ class ActionModeCallback constructor(
 
         control.move().isVisible = true
 
+        if (mainActivity.isInAlbumContentPage) {
+            manageVisibilityForFavouriteAlbum(control)
+        }
+
         CloudStorageOptionControlUtil.applyControl(menu, control)
 
         return true
+    }
+
+    /**
+     * Manage Visibility when in Favourite Album page
+     */
+    private fun manageVisibilityForFavouriteAlbum(control: CloudStorageOptionControlUtil.Control) {
+        control.link.isVisible = false
+        control.move().isVisible = false
+        control.copy().isVisible = false
+        control.trash().isVisible = false
+        control.removeLink().isVisible = false
+        control.manageLink().isVisible = false
+        control.removeFavourites().isVisible = true
     }
 
     override fun onDestroyActionMode(mode: ActionMode?) {

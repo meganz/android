@@ -303,6 +303,7 @@ import mega.privacy.android.app.R;
 
 import mega.privacy.android.app.namecollision.data.NameCollision;
 import mega.privacy.android.app.fragments.managerFragments.cu.PhotosFragment;
+import mega.privacy.android.app.fragments.managerFragments.cu.album.AlbumContentFragment;
 import mega.privacy.android.app.gallery.ui.MediaDiscoveryFragment;
 import mega.privacy.android.app.namecollision.NameCollisionActivity;
 import mega.privacy.android.app.objects.PasscodeManagement;
@@ -625,10 +626,13 @@ public class ManagerActivity extends TransfersManagementActivity
     // Determine if in Media discovery page, if it is true, it must in CD drawerItem tab
     private boolean isInMDMode = false;
 
-    public enum FragmentTag {
-        CLOUD_DRIVE, HOMEPAGE, PHOTOS, INBOX, INCOMING_SHARES, OUTGOING_SHARES, SETTINGS, SEARCH, TRANSFERS, COMPLETED_TRANSFERS,
-        RECENT_CHAT, RUBBISH_BIN, NOTIFICATIONS, TURN_ON_NOTIFICATIONS, PERMISSIONS, SMS_VERIFICATION,
-        LINKS, MEDIA_DISCOVERY;
+    private static final String STATE_KEY_IS_IN_ALBUM_CONTENT = "isInAlbumContent";
+    private boolean isInAlbumContent;
+
+	public enum FragmentTag {
+		CLOUD_DRIVE, HOMEPAGE, PHOTOS, INBOX, INCOMING_SHARES, OUTGOING_SHARES, SETTINGS, SEARCH,TRANSFERS, COMPLETED_TRANSFERS,
+		RECENT_CHAT, RUBBISH_BIN, NOTIFICATIONS, TURN_ON_NOTIFICATIONS, PERMISSIONS, SMS_VERIFICATION,
+		LINKS, MEDIA_DISCOVERY, ALBUM_CONTENT;
 
         public String getTag() {
             switch (this) {
@@ -668,6 +672,8 @@ public class ManagerActivity extends TransfersManagementActivity
                     return "linksFragment";
                 case MEDIA_DISCOVERY:
                     return "mediaDiscoveryFragment";
+                case ALBUM_CONTENT:
+                    return "fragmentAlbumContent";
             }
             return null;
         }
@@ -771,6 +777,7 @@ public class ManagerActivity extends TransfersManagementActivity
 	private SearchFragment searchFragment;
 	private Settings settingsFragment;
 	private PhotosFragment photosFragment;
+    private AlbumContentFragment albumContentFragment;
 	private RecentChatsFragment recentChatsFragment;
 	private NotificationsFragment notificationsFragment;
 	private TurnOnNotificationsFragment turnOnNotificationsFragment;
@@ -1485,6 +1492,12 @@ public class ManagerActivity extends TransfersManagementActivity
 			getSupportFragmentManager().putFragment(outState, FragmentTag.MEDIA_DISCOVERY.getTag(), mediaDiscoveryFragment);
 		}
 
+        outState.putBoolean(STATE_KEY_IS_IN_ALBUM_CONTENT, isInAlbumContent);
+        albumContentFragment = (AlbumContentFragment) getSupportFragmentManager().findFragmentByTag(FragmentTag.ALBUM_CONTENT.getTag());
+        if (albumContentFragment != null) {
+            getSupportFragmentManager().putFragment(outState, FragmentTag.ALBUM_CONTENT.getTag(), albumContentFragment);
+        }
+
         backupWarningDialog = fileBackupManager.getBackupWarningDialog();
         if (backupWarningDialog != null && backupWarningDialog.isShowing()) {
             backupHandleList = fileBackupManager.getBackupHandleList();
@@ -1604,6 +1617,7 @@ public class ManagerActivity extends TransfersManagementActivity
             linkJoinToChatLink = savedInstanceState.getString(LINK_JOINING_CHAT_LINK);
             isFabExpanded = savedInstanceState.getBoolean(KEY_IS_FAB_EXPANDED, false);
             isInMDMode = savedInstanceState.getBoolean(STATE_KEY_IS_IN_MD_MODE, false);
+            isInAlbumContent = savedInstanceState.getBoolean(STATE_KEY_IS_IN_ALBUM_CONTENT, false);
 
             nodeAttacher.restoreState(savedInstanceState);
             nodeSaver.restoreState(savedInstanceState);
@@ -2824,8 +2838,12 @@ public class ManagerActivity extends TransfersManagementActivity
 		MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this);
 		builder.setTitle(R.string.section_photo_sync)
 				.setMessage(R.string.camera_uploads_business_alert)
-				.setNegativeButton(R.string.general_cancel, null)
-				.setPositiveButton(R.string.general_enable, (dialog, which) -> enableCUClicked())
+			    .setNegativeButton(R.string.general_cancel, (dialog, which) -> { })
+				.setPositiveButton(R.string.general_enable, (dialog, which) -> {
+					if (getPhotosFragment() != null) {
+						photosFragment.enableCUClick();
+					}
+				})
 				.setCancelable(false)
 				.setOnDismissListener(dialog -> isBusinessCUAlertShown = false);
 
@@ -3641,9 +3659,19 @@ public class ManagerActivity extends TransfersManagementActivity
 		isInMDMode = true;
 	}
 
-    public void changeMDMode(boolean targetMDMode) {
-        isInMDMode = targetMDMode;
+    public void skipToAlbumContentFragment(Fragment f){
+        albumContentFragment = (AlbumContentFragment) f;
+        replaceFragment(f, FragmentTag.ALBUM_CONTENT.getTag());
+        isInAlbumContent = true;
+        firstNavigationLevel = false;
+
+        cuLayout.setVisibility(View.GONE);
+        showHideBottomNavigationView(true);
     }
+
+	public void changeMDMode(boolean targetMDMode){
+		isInMDMode = targetMDMode;
+	}
 
     void replaceFragment(Fragment f, String fTag) {
         FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
@@ -3954,8 +3982,12 @@ public class ManagerActivity extends TransfersManagementActivity
                     setFirstNavigationLevel(false);
                     aB.setTitle(getString(R.string.settings_camera_upload_on).toUpperCase());
                 } else {
-                    setFirstNavigationLevel(true);
-                    aB.setTitle(getString(R.string.sortby_type_photo_first).toUpperCase());
+                    if(isInAlbumContent) {
+                        aB.setTitle(getString(R.string.title_favourites_album));
+                    } else {
+                        setFirstNavigationLevel(true);
+                        aB.setTitle(getString(R.string.sortby_type_photo_first).toUpperCase());
+                    }
                 }
                 break;
             }
@@ -4049,7 +4081,11 @@ public class ManagerActivity extends TransfersManagementActivity
         if (drawerItem == DrawerItem.CLOUD_DRIVE && isInMDMode) {
             aB.setHomeAsUpIndicator(tintIcon(this, R.drawable.ic_close_white));
         }
-    }
+
+        if (drawerItem == DrawerItem.PHOTOS && isInAlbumContent) {
+            aB.setHomeAsUpIndicator(tintIcon(this, R.drawable.ic_arrow_back_white));
+        }
+	}
 
     public void showOnlineMode() {
         logDebug("showOnlineMode");
@@ -4696,25 +4732,27 @@ public class ManagerActivity extends TransfersManagementActivity
                 break;
             }
             case PHOTOS: {
-                abL.setVisibility(View.VISIBLE);
-
-                if (getPhotosFragment() == null) {
-                    photosFragment = new PhotosFragment();
+                if (isInAlbumContent) {
+                    skipToAlbumContentFragment(AlbumContentFragment.getInstance());
                 } else {
-                    refreshFragment(FragmentTag.PHOTOS.getTag());
-                }
+                    abL.setVisibility(View.VISIBLE);
+                    if (getPhotosFragment() == null) {
+                        photosFragment = new PhotosFragment();
+                    } else {
+                        refreshFragment(FragmentTag.PHOTOS.getTag());
+                    }
 
-				replaceFragment(photosFragment, FragmentTag.PHOTOS.getTag());
-				setToolbarTitle();
-				supportInvalidateOptionsMenu();
-				showFabButton();
-				showHideBottomNavigationView(false);
-                refreshCUNodes();
-                if (!comesFromNotifications) {
-                    bottomNavigationCurrentItem = PHOTOS_BNV;
+                    replaceFragment(photosFragment, FragmentTag.PHOTOS.getTag());
+                    setToolbarTitle();
+                    supportInvalidateOptionsMenu();
+                    showFabButton();
+                    showHideBottomNavigationView(false);
+                    refreshCUNodes();
+                    if (!comesFromNotifications) {
+                        bottomNavigationCurrentItem = PHOTOS_BNV;
+                    }
+                    setBottomNavigationMenuItemChecked(PHOTOS_BNV);
                 }
-                setBottomNavigationMenuItemChecked(PHOTOS_BNV);
-
 				break;
     		}
     		case INBOX: {
@@ -5685,16 +5723,19 @@ public class ManagerActivity extends TransfersManagementActivity
 						}
 		    		}
 					else if (drawerItem == DrawerItem.PHOTOS) {
-						if (getPhotosFragment() != null) {
-							if (photosFragment.isEnablePhotosFragmentShown()) {
-								photosFragment.onBackPressed();
-								return true;
-							}
+                        if (getPhotosFragment() != null) {
+                            if (photosFragment.isEnablePhotosFragmentShown()) {
+                                photosFragment.onBackPressed();
+                                return true;
+                            }
 
-							setToolbarTitle();
-							invalidateOptionsMenu();
-							return true;
-						}
+                            setToolbarTitle();
+                            invalidateOptionsMenu();
+                            return true;
+                        } else if(isInAlbumContent) {
+                            // When current fragment is AlbumContentFragment, the photosFragment will be null due to replaceFragment.
+                            onBackPressed();
+                        }
 					} else if (drawerItem == DrawerItem.INBOX) {
 						inboxFragment = (InboxFragment) getSupportFragmentManager().findFragmentByTag(FragmentTag.INBOX.getTag());
 						if (inboxFragment != null){
@@ -6186,9 +6227,17 @@ public class ManagerActivity extends TransfersManagementActivity
                 performOnBack();
             }
 		} else if (drawerItem == DrawerItem.PHOTOS) {
-			if (getPhotosFragment() == null || photosFragment.onBackPressed() == 0){
-				performOnBack();
-			}
+            if (isInAlbumContent) {
+                isInAlbumContent = false;
+                backToDrawerItem(bottomNavigationCurrentItem);
+                if (photosFragment == null) {
+                    backToDrawerItem(bottomNavigationCurrentItem);
+                } else {
+                    photosFragment.switchToAlbum();
+                }
+            } else if (getPhotosFragment() == null || photosFragment.onBackPressed() == 0) {
+                performOnBack();
+            }
     	} else if (drawerItem == DrawerItem.SEARCH) {
 			if (getSearchFragment() == null || searchFragment.onBackPressed() == 0) {
     			closeSearchSection();
@@ -7550,7 +7599,7 @@ public class ManagerActivity extends TransfersManagementActivity
     /**
      * Refresh PhotosFragment's UI after CU is enabled.
      */
-    public void refreshPhotosFragment() {
+    public void refreshTimelineFragment() {
         drawerItem = DrawerItem.PHOTOS;
         setBottomNavigationMenuItemChecked(PHOTOS_BNV);
         setToolbarTitle();
@@ -8768,13 +8817,7 @@ public class ManagerActivity extends TransfersManagementActivity
                     e.printStackTrace();
                 }
 
-                Intent uploadServiceIntent;
-                if (managerActivity != null) {
-                    uploadServiceIntent = new Intent(managerActivity, UploadService.class);
-                } else {
-                    uploadServiceIntent = new Intent(ManagerActivity.this, UploadService.class);
-                }
-
+                Intent uploadServiceIntent = new Intent(ManagerActivity.this, UploadService.class);
                 File file = new File(path);
                 if (file.isDirectory()) {
                     uploadServiceIntent.putExtra(UploadService.EXTRA_FILEPATH, file.getAbsolutePath());
@@ -8791,7 +8834,7 @@ public class ManagerActivity extends TransfersManagementActivity
 
                 uploadServiceIntent.putExtra(UploadService.EXTRA_FOLDERPATH, folderPath);
                 uploadServiceIntent.putExtra(UploadService.EXTRA_PARENT_HASH, parentNode.getHandle());
-                startService(uploadServiceIntent);
+                ContextCompat.startForegroundService(ManagerActivity.this, uploadServiceIntent);
             }
         }
     }
@@ -11761,6 +11804,9 @@ public class ManagerActivity extends TransfersManagementActivity
 		return mediaDiscoveryFragment;
 	}
 
+    public AlbumContentFragment getAlbumContentFragment(){
+        return albumContentFragment;
+	}
     /**
      * Checks whether the current screen is the main of Homepage or Documents.
      * Video / Audio / Photos do not need Fab button
@@ -11886,6 +11932,15 @@ public class ManagerActivity extends TransfersManagementActivity
      */
     public boolean isInImagesPage() {
         return drawerItem == DrawerItem.HOMEPAGE && mHomepageScreen == HomepageScreen.IMAGES;
+    }
+
+    /**
+     * Checks if the current screen is Album content page.
+     *
+     * @return True if the current screen is Album content page, false otherwise.
+     */
+    public boolean isInAlbumContentPage() {
+        return drawerItem == DrawerItem.PHOTOS && isInAlbumContent;
     }
 
     /**
