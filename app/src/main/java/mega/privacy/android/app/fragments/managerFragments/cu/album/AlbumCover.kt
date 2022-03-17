@@ -1,7 +1,5 @@
 package mega.privacy.android.app.fragments.managerFragments.cu.album
 
-import androidx.recyclerview.widget.DiffUtil
-import mega.privacy.android.app.gallery.data.GalleryItem
 import java.io.File
 
 /**
