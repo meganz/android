@@ -34,6 +34,7 @@ import mega.privacy.android.app.fragments.homepage.*
 import mega.privacy.android.app.fragments.homepage.photos.ScaleGestureHandler
 import mega.privacy.android.app.fragments.homepage.photos.ZoomViewModel
 import mega.privacy.android.app.fragments.managerFragments.cu.CustomHideBottomViewOnScrollBehaviour
+import mega.privacy.android.app.fragments.managerFragments.cu.album.AlbumContentFragment
 import mega.privacy.android.app.gallery.adapter.GalleryAdapter
 import mega.privacy.android.app.gallery.adapter.GalleryCardAdapter
 import mega.privacy.android.app.gallery.data.GalleryCard
@@ -44,8 +45,7 @@ import mega.privacy.android.app.imageviewer.ImageViewerActivity
 import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.modalbottomsheet.NodeOptionsBottomSheetDialogFragment
 import mega.privacy.android.app.utils.*
-import mega.privacy.android.app.utils.Constants.MIN_ITEMS_SCROLLBAR
-import mega.privacy.android.app.utils.Constants.ORDER_CAMERA
+import mega.privacy.android.app.utils.Constants.*
 import mega.privacy.android.app.utils.ZoomUtil.ZOOM_OUT_2X
 import mega.privacy.android.app.utils.ZoomUtil.getItemWidth
 import mega.privacy.android.app.utils.ZoomUtil.getMargin
@@ -122,6 +122,9 @@ abstract class BaseZoomFragment : BaseFragment(), GestureScaleCallback,
     abstract fun handleOnCreateOptionsMenu()
 
     open fun animateBottomView() {
+        // AlbumContentFragment doesn't have view type panel.
+        if(this is AlbumContentFragment) return
+
         val deltaY =
             viewTypePanel.height.toFloat() + resources.getDimensionPixelSize(R.dimen.cu_view_type_button_vertical_margin)
 
@@ -214,11 +217,11 @@ abstract class BaseZoomFragment : BaseFragment(), GestureScaleCallback,
     }
 
     private fun subscribeObservers() {
-        zoomViewModel.zoom.observe(viewLifecycleOwner, { zoom: Int ->
+        zoomViewModel.zoom.observe(viewLifecycleOwner) { zoom: Int ->
             val needReload = ZoomUtil.needReload(getCurrentZoom(), zoom)
             zoomViewModel.setCurrentZoom(zoom)
             handleZoomChange(zoom, needReload)
-        })
+        }
 
         viewModel.dateCards.observe(viewLifecycleOwner, ::showCards)
 
@@ -393,13 +396,26 @@ abstract class BaseZoomFragment : BaseFragment(), GestureScaleCallback,
     private fun openPhoto(nodeItem: GalleryItem) {
         listView.findViewHolderForLayoutPosition(nodeItem.index)
             ?.itemView?.findViewById<ImageView>(R.id.thumbnail)?.also {
+                val parentNodeHandle = nodeItem.node?.parentHandle ?: return
                 val nodeHandle = nodeItem.node?.handle ?: INVALID_HANDLE
                 val childrenNodes = viewModel.getItemsHandle()
-                val intent = ImageViewerActivity.getIntentForChildren(
-                    requireContext(),
-                    childrenNodes,
-                    nodeHandle
-                )
+                val intent = when (adapterType) {
+                    ALBUM_CONTENT_ADAPTER, PHOTOS_BROWSE_ADAPTER -> {
+                        ImageViewerActivity.getIntentForChildren(
+                            requireContext(),
+                            childrenNodes,
+                            nodeHandle
+                        )
+                    }
+                    else -> {
+                        ImageViewerActivity.getIntentForParentNode(
+                            requireContext(),
+                            parentNodeHandle,
+                            getOrder(),
+                            nodeHandle
+                        )
+                    }
+                }
 
                 (listView.adapter as? DragThumbnailGetter)?.let { getter ->
                     DragToExitSupport.putThumbnailLocation(
@@ -431,7 +447,7 @@ abstract class BaseZoomFragment : BaseFragment(), GestureScaleCallback,
         })
 
     private fun observeSelectedItems() =
-        actionModeViewModel.selectedNodes.observe(viewLifecycleOwner, {
+        actionModeViewModel.selectedNodes.observe(viewLifecycleOwner) {
             if (it.isEmpty()) {
                 actionMode?.apply {
                     finish()
@@ -453,7 +469,7 @@ abstract class BaseZoomFragment : BaseFragment(), GestureScaleCallback,
 
                 actionMode?.title = it.size.toString()
             }
-        })
+        }
 
     private fun observeAnimatedItems() {
         var animatorSet: AnimatorSet? = null
