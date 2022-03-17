@@ -20,8 +20,11 @@ import mega.privacy.android.app.utils.ZoomUtil.PHOTO_ZOOM_LEVEL
 import nz.mega.sdk.MegaNode
 import javax.inject.Inject
 
+/**
+ * TimelineViewModel works with TimelineFragment
+ */
 @HiltViewModel
-class PhotosViewModel @Inject constructor(
+class TimelineViewModel @Inject constructor(
     private val repository: PhotosItemRepository,
     private val mDbHandler: DatabaseHandler,
     val sortOrderManagement: SortOrderManagement
@@ -29,23 +32,38 @@ class PhotosViewModel @Inject constructor(
 
     override var mZoom = PHOTO_ZOOM_LEVEL
 
+    /**
+     * Get current sort rule from SortOrderManagement
+     */
     fun getOrder() = sortOrderManagement.getOrderCamera()
 
     private val camSyncEnabled = MutableLiveData<Boolean>()
     private var enableCUShown = false
 
+    /**
+     * Check is enable CU shown UI
+     */
     fun isEnableCUShown(): Boolean {
         return enableCUShown
     }
 
+    /**
+     * set enable CU shown UI
+     */
     fun setEnableCUShown(shown: Boolean) {
         enableCUShown = shown
     }
 
+    /**
+     * Check is CU enabled
+     */
     fun isCUEnabled(): Boolean {
         return if (camSyncEnabled.value != null) camSyncEnabled.value!! else false
     }
 
+    /**
+     * Set Initial Preferences
+     */
     fun setInitialPreferences() {
         add(Completable.fromCallable {
             LogUtil.logDebug("setInitialPreferences")
@@ -73,6 +91,9 @@ class PhotosViewModel @Inject constructor(
             .subscribe(RxUtil.IGNORE, RxUtil.logErr("setInitialPreferences")))
     }
 
+    /**
+     * Set CamSync Enabled to db
+     */
     fun setCamSyncEnabled(enabled: Boolean) {
         add(Completable.fromCallable {
             mDbHandler.setCamSyncEnabled(enabled)
@@ -82,6 +103,9 @@ class PhotosViewModel @Inject constructor(
             .subscribe(RxUtil.IGNORE, RxUtil.logErr("setCamSyncEnabled")))
     }
 
+    /**
+     * Enable CU
+     */
     @Suppress("deprecation")
     fun enableCu(enableCellularSync: Boolean, syncVideo: Boolean) {
         add(Completable.fromCallable {
@@ -106,6 +130,11 @@ class PhotosViewModel @Inject constructor(
             .subscribe(RxUtil.IGNORE, RxUtil.logErr("enableCu")))
     }
 
+    /**
+     * Check camSync Enabled
+     *
+     * @return camSyncEnabled livedata
+     */
     fun camSyncEnabled(): LiveData<Boolean> {
         add(Single.fromCallable {
             java.lang.Boolean.parseBoolean(
@@ -120,3 +149,7 @@ class PhotosViewModel @Inject constructor(
         return camSyncEnabled
     }
 }
+
+
+
+

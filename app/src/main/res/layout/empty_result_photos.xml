@@ -24,8 +24,7 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintVertical_chainStyle="packed"
-            app:visibleGone="@{showHint}"
-            android:src="@drawable/ic_zero_no_images" />
+            app:visibleGone="@{showHint}" />
 
         <TextView
             android:id="@+id/empty_hint_text"
