@@ -1659,6 +1659,8 @@
     <string name="context_empty_rubbish_bin">[B]Empty [/B][A]Rubbish Bin[/A]</string>
     <!-- Text of the empty screen when there are not elements in restricted folder -->
     <string name="context_empty_restricted_folder">[B]No files in your [/B][A]RESTRICTED FOLDER[/A]</string>
+    <!-- Text of the description of restricted folder -->
+    <string name="empty_restricted_folder_tip">This is a place where backed up folders are stored. They are read-only files. You can back up items such as important documents, from your computer to MEGA using the MEGA Desktop App.</string>
     <!-- Text of the empty screen when there are not elements in Cloud Drive -->
     <string name="context_empty_cloud_drive">[B]No files in your [/B][A]Cloud Drive[/A]</string>
     <!-- Text of the empty screen when there are not elements in Saved for Offline -->

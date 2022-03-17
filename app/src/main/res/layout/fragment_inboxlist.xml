@@ -5,7 +5,7 @@
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/inbox_list_view"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" 
+        android:layout_height="match_parent"
         android:choiceMode="multipleChoice"/>
 
 	<RelativeLayout
@@ -24,7 +24,7 @@
 			android:id="@+id/inbox_list_empty_text"
 			android:layout_width="wrap_content"
 			android:layout_height="wrap_content"
-			android:orientation="horizontal"
+			android:orientation="vertical"
 			android:layout_below="@id/inbox_list_empty_image"
 			android:layout_centerHorizontal="true">
 			<TextView
@@ -32,6 +32,14 @@
 				android:layout_width="wrap_content"
 				android:layout_height="wrap_content"
 				android:textAppearance="@style/TextAppearance.Mega.Body2.Secondary.Variant.AllCaps"/>
+
+			<TextView
+				android:id="@+id/restricted_folder_description"
+				android:layout_width="match_parent"
+				android:layout_height="wrap_content"
+				android:layout_marginTop="20dp"
+				android:textAppearance="@style/TextAppearance.Mega.Body2.Secondary.Variant"
+				android:text="@string/empty_restricted_folder_tip" />
 		</LinearLayout>
     </RelativeLayout>
 </RelativeLayout>

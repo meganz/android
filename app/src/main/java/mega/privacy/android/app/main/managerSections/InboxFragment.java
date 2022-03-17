@@ -115,21 +115,22 @@ public class InboxFragment extends RotatableFragment {
     MegaNodeAdapter adapter;
     MegaNode inboxNode;
 
-    ArrayList<MegaNode> nodes;
-
-    ImageView emptyImageView;
-    LinearLayout emptyTextView;
-    TextView emptyTextViewFirst;
-    Stack<Integer> lastPositionStack;
-
-    MegaApiAndroid megaApi;
-    String downloadLocationDefaultPath;
-
-    private ActionMode actionMode;
-
-    float density;
-    DisplayMetrics outMetrics;
-    Display display;
+	ArrayList<MegaNode> nodes;
+	
+	ImageView emptyImageView;
+	LinearLayout emptyTextView;
+	TextView emptyTextViewFirst;
+	TextView folderDescription;
+	Stack<Integer> lastPositionStack;
+	
+	MegaApiAndroid megaApi;
+	String downloadLocationDefaultPath;
+	
+	private ActionMode actionMode;
+	
+	float density;
+	DisplayMetrics outMetrics;
+	Display display;
 
 
     MegaPreferences prefs;
@@ -480,9 +481,10 @@ public class InboxFragment extends RotatableFragment {
                 }
             });
 
-            emptyImageView = (ImageView) v.findViewById(R.id.inbox_list_empty_image);
-            emptyTextView = (LinearLayout) v.findViewById(R.id.inbox_list_empty_text);
-            emptyTextViewFirst = (TextView) v.findViewById(R.id.inbox_list_empty_text_first);
+			emptyImageView = v.findViewById(R.id.inbox_list_empty_image);
+			emptyTextView = v.findViewById(R.id.inbox_list_empty_text);
+			emptyTextViewFirst = v.findViewById(R.id.inbox_list_empty_text_first);
+			folderDescription = v.findViewById(R.id.restricted_folder_description);
 
             if (adapter == null) {
                 adapter = new MegaNodeAdapter(context, this, nodes,
@@ -517,9 +519,10 @@ public class InboxFragment extends RotatableFragment {
 
             recyclerView.setItemAnimator(new DefaultItemAnimator());
 
-            emptyImageView = (ImageView) v.findViewById(R.id.inbox_grid_empty_image);
-            emptyTextView = (LinearLayout) v.findViewById(R.id.inbox_grid_empty_text);
-            emptyTextViewFirst = (TextView) v.findViewById(R.id.inbox_grid_empty_text_first);
+			emptyImageView = v.findViewById(R.id.inbox_grid_empty_image);
+			emptyTextView = v.findViewById(R.id.inbox_grid_empty_text);
+			emptyTextViewFirst = v.findViewById(R.id.inbox_grid_empty_text_first);
+			folderDescription = v.findViewById(R.id.restricted_folder_description);
 
             if (adapter == null) {
                 adapter = new MegaNodeAdapter(context, this, nodes,
@@ -916,9 +919,10 @@ public class InboxFragment extends RotatableFragment {
 
         if (adapter.getItemCount() == 0) {
 
-            recyclerView.setVisibility(View.GONE);
-            emptyImageView.setVisibility(View.VISIBLE);
-            emptyTextView.setVisibility(View.VISIBLE);
+			recyclerView.setVisibility(View.GONE);
+			emptyImageView.setVisibility(View.VISIBLE);
+			emptyTextView.setVisibility(View.VISIBLE);
+			folderDescription.setVisibility(View.VISIBLE);
 
             if (megaApi.getInboxNode().getHandle() == ((ManagerActivity) context).getParentHandleInbox() || ((ManagerActivity) context).getParentHandleInbox() == -1) {
                 if (context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
@@ -940,7 +944,7 @@ public class InboxFragment extends RotatableFragment {
                     ).replace("[/B]", "</font>");
                 } catch (Exception e) {
                 }
-                Spanned result = null;
+                Spanned result;
                 if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
                     result = Html.fromHtml(textToShow, Html.FROM_HTML_MODE_LEGACY);
                 } else {
@@ -967,7 +971,7 @@ public class InboxFragment extends RotatableFragment {
                     ).replace("[/B]", "</font>");
                 } catch (Exception e) {
                 }
-                Spanned result = null;
+                Spanned result;
                 if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
                     result = Html.fromHtml(textToShow, Html.FROM_HTML_MODE_LEGACY);
                 } else {
@@ -980,8 +984,9 @@ public class InboxFragment extends RotatableFragment {
             recyclerView.setVisibility(View.VISIBLE);
             emptyImageView.setVisibility(View.GONE);
             emptyTextView.setVisibility(View.GONE);
-        }
-    }
+			folderDescription.setVisibility(View.GONE);
+		}
+	}
 
     public void notifyDataSetChanged() {
         if (adapter != null) {
