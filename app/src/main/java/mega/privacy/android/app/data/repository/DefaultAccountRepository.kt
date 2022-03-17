@@ -7,17 +7,16 @@ import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.data.extensions.failWithError
 import mega.privacy.android.app.data.extensions.failWithException
 import mega.privacy.android.app.data.extensions.isType
+import mega.privacy.android.app.data.facade.AccountInfoWrapper
 import mega.privacy.android.app.data.gateway.MonitorMultiFactorAuth
-import mega.privacy.android.app.di.MegaApi
+import mega.privacy.android.app.data.gateway.api.MegaApiGateway
 import mega.privacy.android.app.domain.entity.UserAccount
 import mega.privacy.android.app.domain.exception.NoLoggedInUserException
 import mega.privacy.android.app.domain.exception.NotMasterBusinessAccountException
 import mega.privacy.android.app.domain.repository.AccountRepository
-import mega.privacy.android.app.globalmanagement.MyAccountInfo
 import mega.privacy.android.app.listeners.OptionalMegaRequestListenerInterface
 import mega.privacy.android.app.utils.DBUtil
 import mega.privacy.android.app.utils.LogUtil
-import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaNode
 import nz.mega.sdk.MegaRequest
@@ -28,39 +27,39 @@ import kotlin.coroutines.suspendCoroutine
 
 @ExperimentalContracts
 class DefaultAccountRepository @Inject constructor(
-    private val myAccountInfo: MyAccountInfo,
-    @MegaApi private val sdk: MegaApiAndroid,
+    private val myAccountInfoFacade: AccountInfoWrapper,
+    private val apiFacade: MegaApiGateway,
     @ApplicationContext private val context: Context,
     private val monitorMultiFactorAuth: MonitorMultiFactorAuth,
 ) : AccountRepository {
     override fun getUserAccount(): UserAccount {
         return UserAccount(
-            sdk.myEmail,
-            sdk.isBusinessAccount,
-            sdk.isMasterBusinessAccount,
-            myAccountInfo.accountType
+            email = apiFacade.accountEmail ?: "",
+            isBusinessAccount = apiFacade.isBusinessAccount,
+            isMasterBusinessAccount = apiFacade.isMasterBusinessAccount,
+            accountTypeIdentifier = myAccountInfoFacade.accountTypeId
         )
     }
 
     override fun isAccountDataStale(): Boolean {
         LogUtil.logDebug("Check the last call to getAccountDetails")
-        return DBUtil.callToAccountDetails() || myAccountInfo.usedFormatted.isBlank()
+        return DBUtil.callToAccountDetails() || myAccountInfoFacade.storageCapacityUsedAsFormattedString.isBlank()
     }
 
     override fun requestAccount() {
         (context as MegaApplication).askForAccountDetails()
     }
 
-    override fun getRootNode(): MegaNode? = sdk.rootNode
+    override fun getRootNode(): MegaNode? = apiFacade.rootNode
 
     override fun isMultiFactorAuthAvailable(): Boolean {
-        return sdk.multiFactorAuthAvailable()
+        return apiFacade.multiFactorAuthAvailable()
     }
 
     override suspend fun isMultiFactorAuthEnabled(): Boolean {
         return suspendCoroutine { continuation ->
-            sdk.multiFactorAuthCheck(
-                sdk.myEmail,
+            apiFacade.multiFactorAuthEnabled(
+                apiFacade.accountEmail,
                 OptionalMegaRequestListenerInterface(
                     onRequestFinish = onMultiFactorAuthCheckRequestFinish(continuation)
                 )
@@ -84,7 +83,7 @@ class DefaultAccountRepository @Inject constructor(
 
     override suspend fun requestDeleteAccountLink() {
         return suspendCoroutine { continuation ->
-            sdk.cancelAccount(
+            apiFacade.cancelAccount(
                 OptionalMegaRequestListenerInterface(
                     onRequestFinish = onDeleteAccountRequestFinished(continuation)
                 )

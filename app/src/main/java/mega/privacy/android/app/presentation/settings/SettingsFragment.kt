@@ -73,14 +73,27 @@ class SettingsFragment : SharedPreferences.OnSharedPreferenceChangeListener, Pre
         setPreferencesFromResource(R.xml.preferences, rootKey)
     }
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
+
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
+        val v = super.onCreateView(inflater, container, savedInstanceState)
+        val playerServiceIntent = Intent(requireContext(), AudioPlayerService::class.java)
+        requireContext().bindService(playerServiceIntent, mediaServiceConnection, 0)
+        return v
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
         observeState()
+        navigateToInitialPreference()
     }
 
     private fun observeState() {
-        lifecycleScope.launch {
-            repeatOnLifecycle(Lifecycle.State.RESUMED) {
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.RESUMED) {
                 viewModel.uiState.collect { state ->
                     findPreference<Preference>(KEY_FEATURES_CAMERA_UPLOAD)?.isEnabled =
                         state.cameraUploadEnabled
@@ -115,22 +128,6 @@ class SettingsFragment : SharedPreferences.OnSharedPreferenceChangeListener, Pre
                 }
             }
         }
-    }
-
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
-        val v = super.onCreateView(inflater, container, savedInstanceState)
-        val playerServiceIntent = Intent(requireContext(), AudioPlayerService::class.java)
-        requireContext().bindService(playerServiceIntent, mediaServiceConnection, 0)
-        return v
-    }
-
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-        navigateToInitialPreference()
     }
 
     private fun navigateToInitialPreference() {
