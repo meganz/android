@@ -10969,6 +10969,11 @@ public class ManagerActivity extends TransfersManagementActivity
         logDebug("User Handle: " + userhandle + ", Last green: " + lastGreen);
     }
 
+    @Override
+    public void onDbError(MegaChatApiJava api, int error, String msg) {
+
+    }
+
     public void copyError() {
         try {
             dismissAlertDialogIfExists(statusDialog);

@@ -51,4 +51,7 @@ class ChatConnectionListener(
     override fun onChatPresenceLastGreen(api: MegaChatApiJava?, userhandle: Long, lastGreen: Int) {
 
     }
+
+    override fun onDbError(api: MegaChatApiJava?, error: Int, msg: String?) {
+    }
 }

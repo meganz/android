@@ -1223,6 +1223,11 @@ public class GroupChatInfoActivity extends PasscodeActivity
         }
     }
 
+    @Override
+    public void onDbError(MegaChatApiJava api, int error, String msg) {
+
+    }
+
     /**
      * Stores a MegaChatParticipant with their position in the adapter.
      *

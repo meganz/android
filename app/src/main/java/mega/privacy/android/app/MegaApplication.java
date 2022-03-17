@@ -174,6 +174,7 @@ import mega.privacy.android.app.utils.ThemeHelper;
 import nz.mega.sdk.MegaAccountSession;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
+import nz.mega.sdk.MegaChatApi;
 import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaChatApiJava;
 import nz.mega.sdk.MegaChatCall;
@@ -1500,7 +1501,16 @@ public class MegaApplication extends MultiDexApplication implements Application.
 
     @Override
     public void onChatPresenceLastGreen(MegaChatApiJava api, long userhandle, int lastGreen) {
+    }
 
+    @Override
+    public void onDbError(MegaChatApiJava api, int error, String msg) {
+        logError("MEGAChatSDK onDBError occurred. Error " + error + " with message " + msg);
+        if (error == MegaChatApi.DB_ERROR_IO || error == MegaChatApi.DB_ERROR_FULL) {
+
+            megaApi.localLogout();
+            api.logout();
+        }
     }
 
     public void updateAppBadge() {

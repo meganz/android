@@ -2564,6 +2564,11 @@ public class FileExplorerActivity extends TransfersManagementActivity
 		}
 	}
 
+	@Override
+	public void onDbError(MegaChatApiJava api, int error, String msg) {
+
+	}
+
 	private ChatExplorerFragment getChatExplorerFragment () {
 
 		ChatExplorerFragment c;

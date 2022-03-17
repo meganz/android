@@ -526,4 +526,9 @@ public class ChatExplorerActivity extends PasscodeActivity implements View.OnCli
             }
         }
     }
+
+    @Override
+    public void onDbError(MegaChatApiJava api, int error, String msg) {
+
+    }
 }

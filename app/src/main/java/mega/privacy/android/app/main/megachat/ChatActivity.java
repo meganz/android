@@ -8805,6 +8805,11 @@ public class ChatActivity extends PasscodeActivity
         }
     }
 
+    @Override
+    public void onDbError(MegaChatApiJava api, int error, String msg) {
+
+    }
+
     public void takePicture(){
         logDebug("takePicture");
         Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);

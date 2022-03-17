@@ -2452,6 +2452,11 @@ public class LoginFragment extends Fragment implements View.OnClickListener, Meg
 
     }
 
+    @Override
+    public void onDbError(MegaChatApiJava api, int error, String msg) {
+
+    }
+
     private void setError(final EditText editText, String error){
         if(error == null || error.equals("")){
             return;

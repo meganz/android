@@ -3,7 +3,6 @@ package mega.privacy.android.app.listeners
 import android.content.Intent
 import com.jeremyliao.liveeventbus.LiveEventBus
 import mega.privacy.android.app.MegaApplication
-import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.Constants.*
 import mega.privacy.android.app.utils.LogUtil
 import nz.mega.sdk.*
@@ -12,6 +11,8 @@ import android.util.Pair
 import mega.privacy.android.app.constants.EventConstants.EVENT_CHAT_CONNECTION_STATUS
 import mega.privacy.android.app.constants.EventConstants.EVENT_CHAT_TITLE_CHANGE
 import mega.privacy.android.app.constants.EventConstants.EVENT_PRIVILEGES_CHANGE
+import mega.privacy.android.app.main.controllers.AccountController
+import mega.privacy.android.app.utils.LogUtil.logError
 
 class GlobalChatListener(private val application: MegaApplication) : MegaChatListenerInterface {
     override fun onChatListItemUpdate(api: MegaChatApiJava?, item: MegaChatListItem?) {
@@ -71,7 +72,7 @@ class GlobalChatListener(private val application: MegaApplication) : MegaChatLis
     ) {
         if (config?.isPending == false) {
             LogUtil.logDebug("Launch local broadcast")
-            val intent = Intent(Constants.BROADCAST_ACTION_INTENT_SIGNAL_PRESENCE)
+            val intent = Intent(BROADCAST_ACTION_INTENT_SIGNAL_PRESENCE)
             application.sendBroadcast(intent)
         }
     }
@@ -88,5 +89,8 @@ class GlobalChatListener(private val application: MegaApplication) : MegaChatLis
     }
 
     override fun onChatPresenceLastGreen(api: MegaChatApiJava?, userhandle: Long, lastGreen: Int) {
+    }
+
+    override fun onDbError(api: MegaChatApiJava?, error: Int, msg: String?) {
     }
 }

@@ -364,6 +364,11 @@ public class ArchivedChatsActivity extends PasscodeActivity implements MegaChatR
     }
 
     @Override
+    public void onDbError(MegaChatApiJava api, int error, String msg) {
+
+    }
+
+    @Override
     public void onRequestStart(MegaApiJava api, MegaRequest request) {
 
     }

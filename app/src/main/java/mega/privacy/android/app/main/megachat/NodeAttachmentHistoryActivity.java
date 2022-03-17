@@ -1235,6 +1235,11 @@ public class NodeAttachmentHistoryActivity extends PasscodeActivity
     }
 
     @Override
+    public void onDbError(MegaChatApiJava api, int error, String msg) {
+
+    }
+
+    @Override
     public void onRequestStart(MegaChatApiJava api, MegaChatRequest request) {
 
     }

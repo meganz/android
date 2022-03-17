@@ -3666,7 +3666,6 @@ public class AddContactActivity extends PasscodeActivity implements View.OnClick
 
     }
 
-
     @Override
     public void onChatListItemUpdate(MegaChatApiJava api, MegaChatListItem item) {
 
@@ -3784,5 +3783,10 @@ public class AddContactActivity extends PasscodeActivity implements View.OnClick
             }
             logDebug("Date last green: " + formattedDate);
         }
+    }
+
+    @Override
+    public void onDbError(MegaChatApiJava api, int error, String msg) {
+
     }
 }

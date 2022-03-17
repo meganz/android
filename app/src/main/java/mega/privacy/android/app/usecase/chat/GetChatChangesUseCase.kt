@@ -26,6 +26,7 @@ class GetChatChangesUseCase @Inject constructor(
         data class OnChatPresenceConfigUpdate(val config: MegaChatPresenceConfig) : Result()
         data class OnChatConnectionStateUpdate(val chatid: Long, val newState: Int) : Result()
         data class OnChatPresenceLastGreen(val userHandle: Long, val lastGreen: Int) : Result()
+        data class OnDbError(val error: Int, val msg: String) : Result()
     }
 
     fun get(): Flowable<Result> =
@@ -59,6 +60,11 @@ class GetChatChangesUseCase @Inject constructor(
                 onChatPresenceLastGreen = { userHandle, lastGreen ->
                     if (!emitter.isCancelled) {
                         emitter.onNext(Result.OnChatPresenceLastGreen(userHandle, lastGreen))
+                    }
+                },
+                onDbError = { error, msg ->
+                    if (!emitter.isCancelled) {
+                        emitter.onNext(Result.OnDbError(error, msg))
                     }
                 }
             )

@@ -1987,6 +1987,11 @@ public class ContactInfoActivity extends PasscodeActivity
 		}
 	}
 
+	@Override
+	public void onDbError(MegaChatApiJava api, int error, String msg) {
+
+	}
+
 	private void startCallWithChatOnline(MegaChatRoom chatRoom) {
 		addChecksForACall(chatRoom.getChatId(), startVideo);
 		enableCallLayouts(false);
