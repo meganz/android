@@ -204,8 +204,13 @@ class SortByBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
 
                 callManager { manager ->
                     manager.refreshCUNodes()
+
                     if(manager.isInMDPage) {
                         manager.mdFragment.loadPhotos()
+                    }
+
+                    if(manager.isInAlbumContentPage) {
+                        manager.albumContentFragment.loadPhotos()
                     }
                 }
             }

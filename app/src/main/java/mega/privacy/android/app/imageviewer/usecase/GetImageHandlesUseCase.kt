@@ -111,7 +111,13 @@ class GetImageHandlesUseCase @Inject constructor(
     private fun MutableList<ImageItem>.addChildrenNodes(megaNode: MegaNode, sortOrder: Int) {
         megaApi.getChildren(megaNode, sortOrder).forEach { node ->
             if (node.isValidForImageViewer()) {
-                this.add(ImageItem(node.handle))
+                val nodeItem = MegaNodeItem(
+                    handle = node.handle,
+                    name = node.name,
+                    infoText = ""
+                )
+
+                this.add(ImageItem(handle = node.handle, nodeItem = nodeItem))
             }
         }
     }
@@ -125,7 +131,13 @@ class GetImageHandlesUseCase @Inject constructor(
         nodeHandles.forEach { handle ->
             val node = getNodeUseCase.get(handle).blockingGetOrNull()
             if (node?.isValidForImageViewer() == true) {
-                this.add(ImageItem(node.handle))
+                val nodeItem = MegaNodeItem(
+                    handle = node.handle,
+                    name = node.name,
+                    infoText = ""
+                )
+
+                this.add(ImageItem(handle = node.handle, nodeItem = nodeItem))
             }
         }
     }
