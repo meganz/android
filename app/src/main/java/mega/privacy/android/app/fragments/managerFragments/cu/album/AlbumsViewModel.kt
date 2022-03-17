@@ -33,6 +33,7 @@ class AlbumsViewModel @Inject constructor(
      * Create a default albums when init
      */
     fun createDefaultAlbums(title: String) {
+        albumList.clear()
         albumList.add(
             AlbumCover(
                 title = title
