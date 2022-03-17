@@ -46,7 +46,7 @@ class ActionModeCallback constructor(
             }
             R.id.cab_menu_share_link, R.id.cab_menu_edit_link -> {
                 LogUtil.logDebug("Public link option")
-                mainActivity.showGetLinkActivity(nodesHandles.toLongArray())
+                LinksUtil.showGetLinkActivity(mainActivity, nodesHandles.toLongArray())
             }
             R.id.cab_menu_remove_link -> {
                 LogUtil.logDebug("Remove public link option")
