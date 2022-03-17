@@ -52,17 +52,27 @@ class NameCollisionViewModel @Inject constructor(
      */
     enum class NameCollisionType { UPLOAD, COPY, MOVEMENT }
 
+    /**
+     * Enum class for defining the type of resolution for a collision.
+     */
+    enum class NameCollisionChoice { REPLACE_UPDATE_MERGE, CANCEL, RENAME }
+
     private val currentCollision: MutableLiveData<NameCollisionResult?> = MutableLiveData()
     private val fileVersioningInfo: MutableLiveData<Triple<Boolean, NameCollisionType, Boolean>> =
         MutableLiveData()
     private val actionResult: MutableLiveData<Event<NameCollisionActionResult>> = MutableLiveData()
+    private val collisionsResolution: MutableLiveData<ArrayList<NameCollisionResult>> =
+        MutableLiveData()
 
     fun getCurrentCollision(): LiveData<NameCollisionResult?> = currentCollision
     fun getFileVersioningInfo(): LiveData<Triple<Boolean, NameCollisionType, Boolean>> =
         fileVersioningInfo
 
     fun onActionResult(): LiveData<Event<NameCollisionActionResult>> = actionResult
+    fun getCollisionsResolution(): LiveData<ArrayList<NameCollisionResult>> = collisionsResolution
 
+    private val resolvedCollisions = mutableListOf<NameCollisionResult>()
+    var isFolderUploadContext = false
     private val pendingCollisions: MutableList<NameCollisionResult> = mutableListOf()
     var pendingFileCollisions = 0
     var pendingFolderCollisions = 0
@@ -212,25 +222,56 @@ class NameCollisionViewModel @Inject constructor(
      * After having the option "Apply on the next conflicts" checked, manages data to apply
      * the same user's choice for all the pending file collisions.
      *
+     * @param choice    Resolution type as [NameCollisionChoice].
      * @return A MutableList with all the pending file collisions.
      */
-    private fun proceedWithAllFiles(): MutableList<NameCollisionResult> {
-        val fileCollisions = mutableListOf<NameCollisionResult>()
-
-        while (pendingFileCollisions > 0) {
-            pendingFileCollisions--
-            fileCollisions.add(pendingCollisions[0])
-            pendingCollisions.removeAt(0)
+    private fun proceedWithAllFiles(choice: NameCollisionChoice): MutableList<NameCollisionResult> {
+        val fileCollisions = mutableListOf<NameCollisionResult>().apply {
+            add(currentCollision.value!!)
         }
 
-        continueWithNext()
+        while (pendingFileCollisions > 0) {
+            fileCollisions.add(pendingCollisions[0])
+            continueWithNext(choice)
+        }
+
         return fileCollisions
     }
 
     /**
-     * Manages data to pass to the next collision.
+     * After having the option "Apply on the next conflicts" checked, manages data to apply
+     * the same user's choice for all the pending collisions.
+     *
+     * @param choice    Resolution type as [NameCollisionChoice].
      */
-    private fun continueWithNext() {
+    private fun proceedWithAll(choice: NameCollisionChoice) {
+        if (isFolderUploadContext) {
+            while (pendingCollisions.isNotEmpty()) {
+                continueWithNext(choice)
+            }
+        }
+    }
+
+    /**
+     * Manages data to pass to the next collision.
+     *
+     *  @param choice    Resolution type as [NameCollisionChoice].
+     */
+    private fun continueWithNext(choice: NameCollisionChoice) {
+        if (isFolderUploadContext) {
+            resolvedCollisions.add(currentCollision.value!!.apply { this.choice = choice })
+        }
+
+        if (pendingCollisions.isEmpty()) {
+            when {
+                isFolderUploadContext -> collisionsResolution.value =
+                    arrayListOf<NameCollisionResult>().apply { addAll(resolvedCollisions) }
+                choice == NameCollisionChoice.CANCEL -> currentCollision.value = null
+            }
+
+            return
+        }
+
         val nextCollision = pendingCollisions[0]
         pendingCollisions.removeAt(0)
         if (nextCollision.nameCollision.isFile) {
@@ -263,9 +304,9 @@ class NameCollisionViewModel @Inject constructor(
     fun cancel(applyOnNext: Boolean) {
         when {
             applyOnNext && pendingFileCollisions > 0 && pendingFolderCollisions > 0 ->
-                proceedWithAllFiles()
-            applyOnNext -> currentCollision.value = null
-            else -> continueWithNext()
+                proceedWithAllFiles(NameCollisionChoice.CANCEL)
+            applyOnNext -> proceedWithAll(NameCollisionChoice.CANCEL)
+            else -> continueWithNext(NameCollisionChoice.CANCEL)
         }
     }
 
@@ -287,11 +328,15 @@ class NameCollisionViewModel @Inject constructor(
      * @param rename        True if the user's choice is rename, false otherwise.
      */
     fun proceedWithAction(context: Context? = null, applyOnNext: Boolean, rename: Boolean = false) {
+        val choice =
+            if (rename) NameCollisionChoice.RENAME
+            else NameCollisionChoice.REPLACE_UPDATE_MERGE
+
         when (getCollisionType()) {
             NameCollisionType.UPLOAD -> {
                 when {
                     applyOnNext && pendingFileCollisions > 0 && pendingFolderCollisions > 0 -> {
-                        upload(context!!, proceedWithAllFiles(), rename)
+                        upload(context!!, proceedWithAllFiles(choice), rename)
                     }
                     applyOnNext -> upload(context!!, pendingCollisions, rename)
                     else -> singleUpload(context!!, rename)
@@ -300,7 +345,7 @@ class NameCollisionViewModel @Inject constructor(
             NameCollisionType.MOVEMENT -> {
                 when {
                     applyOnNext && pendingFileCollisions > 0 && pendingFolderCollisions > 0 -> {
-                        move(proceedWithAllFiles(), rename)
+                        move(proceedWithAllFiles(choice), rename)
                     }
                     applyOnNext -> move(pendingCollisions, rename)
                     else -> singleMove(rename)
@@ -309,7 +354,7 @@ class NameCollisionViewModel @Inject constructor(
             NameCollisionType.COPY -> {
                 when {
                     applyOnNext && pendingFileCollisions > 0 && pendingFolderCollisions > 0 -> {
-                        copy(proceedWithAllFiles(), rename)
+                        copy(proceedWithAllFiles(choice), rename)
                     }
                     applyOnNext -> copy(pendingCollisions, rename)
                     else -> singleCopy(rename)
@@ -325,11 +370,23 @@ class NameCollisionViewModel @Inject constructor(
      * @param rename    True if should rename the file, false otherwise.
      */
     private fun singleUpload(context: Context, rename: Boolean) {
+        val choice =
+            if (rename) NameCollisionChoice.RENAME
+            else NameCollisionChoice.REPLACE_UPDATE_MERGE
+
+        if (isFolderUploadContext) {
+            continueWithNext(choice)
+            return
+        }
+
         uploadNodeUseCase.upload(context, currentCollision.value!!, rename)
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeBy(
-                onComplete = { setUploadResult(1) },
+                onComplete = {
+                    setUploadResult(1)
+                    continueWithNext(choice)
+                },
                 onError = { error -> LogUtil.logWarning(error.message) })
             .addTo(composite)
     }
@@ -342,6 +399,10 @@ class NameCollisionViewModel @Inject constructor(
      * @param rename    True if should rename the file, false otherwise.
      */
     private fun upload(context: Context, list: MutableList<NameCollisionResult>, rename: Boolean) {
+        if (isFolderUploadContext) {
+            return
+        }
+
         uploadNodeUseCase.upload(context, list, rename)
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())

@@ -116,11 +116,9 @@ public class UploadUtil {
 
         Uri uri = data.getData();
         activity.getContentResolver().takePersistableUriPermission(uri, Intent.FLAG_GRANT_READ_URI_PERMISSION);
-        activity.startActivityForResult(
-                new Intent(activity, UploadFolderActivity.class)
-                        .setData(uri)
-                        .putExtra(INTENT_EXTRA_KEY_PARENT_NODE_HANDLE, parentHandle),
-                Constants.REQUEST_CODE_GET_FOLDER_CONTENT);
+        activity.startActivity(new Intent(activity, UploadFolderActivity.class)
+                .setData(uri)
+                .putExtra(INTENT_EXTRA_KEY_PARENT_NODE_HANDLE, parentHandle));
     }
 
     /** The method is to return sdcard root of the file

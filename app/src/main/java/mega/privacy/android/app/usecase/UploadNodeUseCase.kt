@@ -3,11 +3,13 @@ package mega.privacy.android.app.usecase
 import android.content.Context
 import android.content.Intent
 import io.reactivex.rxjava3.core.Completable
+import io.reactivex.rxjava3.kotlin.blockingSubscribeBy
 import mega.privacy.android.app.UploadService
 import mega.privacy.android.app.globalmanagement.TransfersManagement
 import mega.privacy.android.app.namecollision.data.NameCollision
 import mega.privacy.android.app.namecollision.data.NameCollisionResult
 import mega.privacy.android.app.namecollision.exception.NoPendingCollisionsException
+import mega.privacy.android.app.utils.LogUtil.logError
 import javax.inject.Inject
 
 /**
@@ -70,7 +72,7 @@ class UploadNodeUseCase @Inject constructor(
     ): Completable =
         upload(
             context,
-            (collisionResult.nameCollision as NameCollision.Upload).absolutePath,
+            (collisionResult.nameCollision as NameCollision.Upload).absolutePath!!,
             if (rename) collisionResult.renameName!! else collisionResult.nameCollision.name,
             collisionResult.nameCollision.lastModified,
             collisionResult.nameCollision.parentHandle
@@ -96,12 +98,12 @@ class UploadNodeUseCase @Inject constructor(
             }
 
             for (collision in collisions) {
-                upload(
-                    context,
-                    (collision.nameCollision as NameCollision.Upload).absolutePath,
-                    if (rename) collision.renameName!! else collision.nameCollision.name,
-                    collision.nameCollision.lastModified,
-                    collision.nameCollision.parentHandle
+                if (emitter.isDisposed) {
+                    return@create
+                }
+
+                upload(context, collision, rename).blockingSubscribeBy(
+                    onError = { error -> logError("Cannot upload.", error) }
                 )
             }
 

@@ -1,8 +1,7 @@
 package mega.privacy.android.app.namecollision.data
 
-import android.net.Uri
 import mega.privacy.android.app.ShareInfo
-import mega.privacy.android.app.uploadFolder.list.data.UploadFolderResult
+import mega.privacy.android.app.uploadFolder.list.data.FolderContent
 import nz.mega.sdk.MegaNode
 import java.io.File
 import java.io.Serializable
@@ -29,7 +28,8 @@ sealed class NameCollision : Serializable {
      * Data class containing all the required to present an upload name collision.
      *
      * @property collisionHandle    The node handle with which there is a name collision.
-     * @property absolutePath       The absolute path of the file to upload.
+     * @property absolutePath       The absolute path of the file to upload. Null if the upload
+     *                              comes from UploadFolderActivity.
      * @property name               The name of the file to upload.
      * @property lastModified       The last modified date of the file to upload.
      * @property parentHandle       The parent handle of the node in which the file has to be uploaded.
@@ -37,7 +37,7 @@ sealed class NameCollision : Serializable {
      */
     data class Upload constructor(
         override val collisionHandle: Long,
-        val absolutePath: String,
+        val absolutePath: String? = null,
         override val name: String,
         override val size: Long,
         override val lastModified: Long,
@@ -87,22 +87,22 @@ sealed class NameCollision : Serializable {
             )
 
             /**
-             * Gets a [NameCollision.Upload] from an [UploadFolderResult].
+             * Gets a [NameCollision.Upload] from an [FolderContent.Data].
              *
-             * @param collisionHandle       The node handle with which there is a name collision.
-             * @param uploadFolderResult    The file from which the [NameCollision.Upload] will be get.
+             * @param collisionHandle   The node handle with which there is a name collision.
+             * @param uploadContent     The file from which the [NameCollision.Upload] will be get.
              */
             @JvmStatic
             fun getUploadCollision(
                 collisionHandle: Long,
-                uploadFolderResult: UploadFolderResult
+                uploadContent: FolderContent.Data,
+                parentHandle: Long
             ): Upload = Upload(
                 collisionHandle = collisionHandle,
-                absolutePath = uploadFolderResult.absolutePath,
-                name = uploadFolderResult.name,
-                size = uploadFolderResult.size,
-                lastModified = uploadFolderResult.lastModified,
-                parentHandle = uploadFolderResult.parentHandle
+                name = uploadContent.name!!,
+                size = uploadContent.size,
+                lastModified = uploadContent.lastModified,
+                parentHandle = parentHandle
             )
         }
     }

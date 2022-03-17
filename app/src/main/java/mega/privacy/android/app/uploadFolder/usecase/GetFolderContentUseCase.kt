@@ -7,10 +7,17 @@ import io.reactivex.rxjava3.kotlin.blockingSubscribeBy
 import mega.privacy.android.app.ShareInfo
 import mega.privacy.android.app.components.textFormatter.TextFormatterUtils.INVALID_INDEX
 import mega.privacy.android.app.di.MegaApi
+import mega.privacy.android.app.domain.exception.EmptyFolderException
+import mega.privacy.android.app.namecollision.NameCollisionViewModel
+import mega.privacy.android.app.namecollision.data.NameCollision
+import mega.privacy.android.app.namecollision.data.NameCollisionResult
 import mega.privacy.android.app.uploadFolder.list.data.FolderContent
 import mega.privacy.android.app.uploadFolder.list.data.UploadFolderResult
 import mega.privacy.android.app.usecase.CreateFolderUseCase
+import mega.privacy.android.app.usecase.GetNodeUseCase
+import mega.privacy.android.app.usecase.exception.MegaNodeException
 import mega.privacy.android.app.utils.LogUtil.logWarning
+import mega.privacy.android.app.utils.RxUtil.blockingGetOrNull
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava.*
 import nz.mega.sdk.MegaNode
@@ -26,12 +33,14 @@ import kotlin.collections.HashMap
 /**
  * Use case to manage the content of a folder which is going to be uploaded.
  *
- * @property megaApi                MegaApi required to make the requests to the SDK.
- * @property createFolderUseCase    Use case to create folders.
+ * @property megaApi                    MegaApi required to make the requests to the SDK.
+ * @property createFolderUseCase        Use case for creating folders.
+ * @property getNodeUseCase             Use case for getting nodes.
  */
 class GetFolderContentUseCase @Inject constructor(
     @MegaApi private val megaApi: MegaApiAndroid,
-    private val createFolderUseCase: CreateFolderUseCase
+    private val createFolderUseCase: CreateFolderUseCase,
+    private val getNodeUseCase: GetNodeUseCase
 ) {
 
     /**
@@ -163,36 +172,25 @@ class GetFolderContentUseCase @Inject constructor(
         }
 
     /**
-     * Gets the content to upload.
+     * Gets the root content to upload.
      *
-     * @param context           Context required to get the absolute path.
-     * @param parentNodeHandle  Handle of the parent node in which the content will be uploaded.
-     * @param parentFolder      Name of the parent folder of the item.
-     * @param selectedItems     List of the selected items' positions if any.
-     * @param folderItems       List of the content to be uploaded.
-     * @return Single with a list of UploadFolderResult.
+     * @param currentFolder Name of the parent folder of the item.
+     * @param selectedItems List of the selected items' positions if any.
+     * @param folderItems   List of the content to be uploaded.
+     * @return Single with a list of FolderContent.
      */
-    fun getContentToUpload(
-        context: Context,
-        parentNodeHandle: Long,
-        parentFolder: String,
+    fun getRootContentToUpload(
+        currentFolder: FolderContent.Data,
         selectedItems: MutableList<Int>?,
         folderItems: MutableList<FolderContent>?
-    ): Single<ArrayList<UploadFolderResult>> =
+    ): Single<MutableList<FolderContent.Data>> =
         Single.create { emitter ->
             if (folderItems == null) {
-                emitter.onError(FileNotFoundException("Empty folder"))
+                emitter.onError(EmptyFolderException())
                 return@create
             }
 
-            val parentNode = megaApi.getNodeByHandle(parentNodeHandle)
-
-            if (parentNode == null) {
-                emitter.onError(NullPointerException("Parent node does not exist"))
-                return@create
-            }
-
-            val results = ArrayList<UploadFolderResult>()
+            val results = mutableListOf<FolderContent.Data>()
 
             if (!selectedItems.isNullOrEmpty()) {
                 selectedItems.forEach { selected ->
@@ -200,30 +198,46 @@ class GetFolderContentUseCase @Inject constructor(
                         return@create
                     }
 
-                    getContentToUpload(
-                        context,
-                        parentNode,
-                        parentFolder,
-                        (folderItems[selected] as FolderContent.Data),
-                        true
-                    ).blockingSubscribeBy(
-                        onError = { error -> logWarning("Ignored error", error) },
-                        onSuccess = { result -> results.addAll(result) }
-                    )
+                    results.add((folderItems[selected] as FolderContent.Data))
                 }
             } else {
-                folderItems.forEach { item ->
-                    if (emitter.isDisposed) {
-                        return@create
-                    }
+                results.add(currentFolder)
+            }
 
-                    if (item is FolderContent.Data) {
-                        getContentToUpload(context, parentNode, parentFolder, item, false)
-                            .blockingSubscribeBy(
-                                onError = { error -> logWarning("Ignored error", error) },
-                                onSuccess = { result -> results.addAll(result) })
-                    }
-                }
+            when {
+                emitter.isDisposed -> return@create
+                results.isEmpty() -> emitter.onError(EmptyFolderException())
+                else -> emitter.onSuccess(results)
+            }
+        }
+
+    /**
+     * Gets the content to upload.
+     *
+     * @param context               Context required to get the absolute path.
+     * @param parentNodeHandle      Handle of the parent node in which the content will be uploaded.
+     * @param pendingUploads        List of the pending uploads.
+     * @param collisionsResolution  List of collisions already resolved.
+     * @return Completable
+     */
+    fun getContentToUpload(
+        context: Context,
+        parentNodeHandle: Long,
+        pendingUploads: List<FolderContent.Data>,
+        collisionsResolution: List<NameCollisionResult>?
+    ): Single<ArrayList<UploadFolderResult>> =
+        Single.create { emitter ->
+            val parentNode = getNodeUseCase.get(parentNodeHandle).blockingGetOrNull()
+
+            if (parentNode == null) {
+                emitter.onError(MegaNodeException.ParentDoesNotExistException())
+                return@create
+            }
+
+            val results = ArrayList<UploadFolderResult>()
+
+            pendingUploads.forEach { upload ->
+
             }
 
             when {

@@ -694,20 +694,6 @@ public class ContactFileListActivity extends PasscodeActivity
 					});
 		}  else if (requestCode == REQUEST_CODE_GET_FOLDER) {
 			getFolder(this, resultCode, intent, parentHandle);
-		} else if (requestCode == REQUEST_CODE_GET_FOLDER_CONTENT) {
-			if (resultCode != RESULT_OK || intent == null) {
-				logWarning("resultCode: " + resultCode);
-				return;
-			}
-
-			@SuppressWarnings("unchecked")
-			ArrayList<NameCollision> collisions =
-					(ArrayList<NameCollision>) intent.getSerializableExtra(INTENT_EXTRA_COLLISION_RESULTS);
-			if (collisions == null || collisions.isEmpty()) {
-				logDebug("No need to do anything more");
-			} else {
-				startActivity(NameCollisionActivity.getIntentForList(this, collisions));
-			}
 		} else if (requestCode == REQUEST_CODE_SELECT_FOLDER && resultCode == RESULT_OK) {
 			if (intent == null) {
 				return;

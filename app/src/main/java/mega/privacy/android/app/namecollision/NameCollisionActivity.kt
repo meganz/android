@@ -1,5 +1,6 @@
 package mega.privacy.android.app.namecollision
 
+import android.app.Activity
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
@@ -44,6 +45,8 @@ class NameCollisionActivity : PasscodeActivity() {
         private const val LEARN_MORE_URI =
             "https://help.mega.io/files-folders/restore-delete/file-version-history"
 
+        private const val UPLOAD_FOLDER_CONTEXT = "UPLOAD_FOLDER_CONTEXT"
+
         @JvmStatic
         fun getIntentForList(
             context: Context,
@@ -52,6 +55,13 @@ class NameCollisionActivity : PasscodeActivity() {
             Intent(context, NameCollisionActivity::class.java).apply {
                 putExtra(INTENT_EXTRA_COLLISION_RESULTS, collisions)
             }
+
+        @JvmStatic
+        fun getIntentForFolderUpload(
+            context: Context,
+            collisions: ArrayList<NameCollision>
+        ): Intent =
+            getIntentForList(context, collisions).apply { action = UPLOAD_FOLDER_CONTEXT }
 
         @JvmStatic
         fun getIntentForSingleItem(
@@ -101,6 +111,8 @@ class NameCollisionActivity : PasscodeActivity() {
                     finish()
                 }
             }
+
+            viewModel.isFolderUploadContext = UPLOAD_FOLDER_CONTEXT == intent.action
         }
 
         setupView()
@@ -172,6 +184,7 @@ class NameCollisionActivity : PasscodeActivity() {
                 Handler(Looper.getMainLooper()).postDelayed({ finish() }, LONG_SNACKBAR_DURATION)
             }
         })
+        viewModel.getCollisionsResolution().observe(this, ::manageCollisionsResolution)
 
         registerReceiver(
             updateFileVersionsReceiver,
@@ -391,5 +404,12 @@ class NameCollisionActivity : PasscodeActivity() {
             StringResourcesUtils.getString(replaceUpdateMergeInfoId)
         binding.replaceUpdateMergeButton.text =
             StringResourcesUtils.getString(replaceUpdateMergeButtonId)
+    }
+
+    private fun manageCollisionsResolution(collisionsResolution: ArrayList<NameCollisionResult>) {
+        setResult(
+            Activity.RESULT_OK,
+            Intent().putExtra(INTENT_EXTRA_COLLISION_RESULTS, collisionsResolution)
+        )
     }
 }

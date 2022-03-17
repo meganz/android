@@ -11,6 +11,8 @@ import android.os.Looper
 import android.view.Menu
 import android.view.MenuItem
 import android.widget.ImageView
+import androidx.activity.result.ActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.appcompat.view.ActionMode
 import androidx.appcompat.widget.SearchView
@@ -31,10 +33,14 @@ import mega.privacy.android.app.fragments.homepage.EventObserver
 import mega.privacy.android.app.fragments.homepage.SortByHeaderViewModel
 import mega.privacy.android.app.interfaces.Scrollable
 import mega.privacy.android.app.modalbottomsheet.SortByBottomSheetDialogFragment.Companion.newInstance
+import mega.privacy.android.app.namecollision.NameCollisionActivity
+import mega.privacy.android.app.namecollision.NameCollisionViewModel
+import mega.privacy.android.app.namecollision.data.NameCollisionResult
 import mega.privacy.android.app.uploadFolder.list.adapter.FolderContentAdapter
 import mega.privacy.android.app.uploadFolder.list.data.FolderContent
 import mega.privacy.android.app.uploadFolder.list.data.UploadFolderResult
 import mega.privacy.android.app.utils.Constants.*
+import mega.privacy.android.app.utils.LogUtil.logWarning
 import mega.privacy.android.app.utils.MenuUtils.setupSearchView
 import mega.privacy.android.app.utils.StringResourcesUtils
 import mega.privacy.android.app.utils.Util
@@ -76,6 +82,19 @@ class UploadFolderActivity : TransfersManagementActivity(), Scrollable {
     }
 
     private lateinit var searchMenuItem: MenuItem
+
+    private val collisionsForResult by lazy {
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result: ActivityResult ->
+            if (result.resultCode == Activity.RESULT_OK) {
+                @Suppress("UNCHECKED_CAST")
+                val collisionsResult = result.data?.getSerializableExtra(INTENT_EXTRA_COLLISION_RESULTS)
+                        as List<NameCollisionResult>?
+                viewModel.proceedWithUpload(this, collisionsResult)
+            } else {
+                logWarning("resultCode: ${result.resultCode}")
+            }
+        }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -175,7 +194,7 @@ class UploadFolderActivity : TransfersManagementActivity(), Scrollable {
 
         binding.uploadButton.setOnClickListener {
             showProgress(true)
-            viewModel.upload(this)
+            viewModel.upload()
             actionMode?.finish()
             invalidateOptionsMenu()
         }
@@ -210,7 +229,7 @@ class UploadFolderActivity : TransfersManagementActivity(), Scrollable {
         viewModel.getCurrentFolder().observe(this, ::showCurrentFolder)
         viewModel.getFolderItems().observe(this, ::showFolderContent)
         viewModel.getSelectedItems().observe(this, ::updateActionMode)
-        viewModel.getUploadResult().observe(this, ::manageUploadResult)
+        viewModel.getCollisions().observe(this, ::manageCollisions)
 
         sortByHeaderViewModel.showDialogEvent.observe(this, EventObserver {
             newInstance(ORDER_OFFLINE).apply { show(supportFragmentManager, this.tag) }
@@ -301,14 +320,29 @@ class UploadFolderActivity : TransfersManagementActivity(), Scrollable {
     }
 
     /**
-     * Starts the upload which do not have name collisions, sets the final result of the activity
-     * with name collision results if any and finishes the activity.
+     * Manages name collisions if any. Proceeds with the upload if not.
      *
-     * @param uploadResult  Pair with two lists of UploadFolderResult, one with the name collisions
-     * and other without them.
+     * @param collisions    List of [NameCollision] to manage.
      */
-    private fun manageUploadResult(uploadResult: Pair<ArrayList<NameCollision>, List<UploadFolderResult>>) {
-        val uploadResults = uploadResult.second
+    private fun manageCollisions(collisions: ArrayList<NameCollision>) {
+        if (collisions.isEmpty()) {
+            viewModel.proceedWithUpload(this)
+        } else {
+            collisionsForResult.launch(
+                NameCollisionActivity.getIntentForFolderUpload(
+                    this,
+                    collisions = collisions
+                )
+            )
+        }
+    }
+
+    /**
+     * Starts the upload.
+     *
+     * @param uploadResults List of [UploadFolderResult] to upload.
+     */
+    private fun manageUploadResult(uploadResults: List<UploadFolderResult>) {
 
         if (uploadResults.isNotEmpty()) {
             showSnackbar(
@@ -336,10 +370,6 @@ class UploadFolderActivity : TransfersManagementActivity(), Scrollable {
             }
         }
 
-        setResult(
-            RESULT_OK,
-            Intent().putExtra(INTENT_EXTRA_COLLISION_RESULTS, uploadResult.first)
-        )
         finish()
     }
 

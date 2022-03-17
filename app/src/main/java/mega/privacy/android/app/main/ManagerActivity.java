@@ -8317,20 +8317,6 @@ public class ManagerActivity extends TransfersManagementActivity
 					});
 		} else if (requestCode == REQUEST_CODE_GET_FOLDER) {
 			getFolder(this, resultCode, intent, getCurrentParentHandle());
-		} else if (requestCode == REQUEST_CODE_GET_FOLDER_CONTENT) {
-            if (resultCode != RESULT_OK || intent == null) {
-                logWarning("resultCode: " + resultCode);
-                return;
-            }
-
-            @SuppressWarnings("unchecked")
-            ArrayList<NameCollision> collisions =
-                    (ArrayList<NameCollision>) intent.getSerializableExtra(INTENT_EXTRA_COLLISION_RESULTS);
-            if (collisions == null || collisions.isEmpty()) {
-                logDebug("No need to do anything more");
-            } else {
-                startActivity(NameCollisionActivity.getIntentForList(this, collisions));
-            }
 		} else if (requestCode == WRITE_SD_CARD_REQUEST_CODE && resultCode == RESULT_OK) {
 
             if (!hasPermissions(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)) {

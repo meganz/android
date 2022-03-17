@@ -14,9 +14,9 @@ import mega.privacy.android.app.arch.BaseRxViewModel
 import mega.privacy.android.app.components.textFormatter.TextFormatterUtils.INVALID_INDEX
 import mega.privacy.android.app.namecollision.data.NameCollision
 import mega.privacy.android.app.globalmanagement.TransfersManagement
+import mega.privacy.android.app.namecollision.data.NameCollisionResult
 import mega.privacy.android.app.namecollision.usecase.CheckNameCollisionUseCase
 import mega.privacy.android.app.uploadFolder.list.data.FolderContent
-import mega.privacy.android.app.uploadFolder.list.data.UploadFolderResult
 import mega.privacy.android.app.uploadFolder.usecase.GetFolderContentUseCase
 import mega.privacy.android.app.utils.LogUtil.logError
 import mega.privacy.android.app.utils.LogUtil.logWarning
@@ -42,8 +42,7 @@ class UploadFolderViewModel @Inject constructor(
     private val currentFolder: MutableLiveData<FolderContent.Data> = MutableLiveData()
     private val folderItems: MutableLiveData<MutableList<FolderContent>> = MutableLiveData()
     private val selectedItems: MutableLiveData<MutableList<Int>> = MutableLiveData()
-    private val uploadResult: MutableLiveData<Pair<ArrayList<NameCollision>, List<UploadFolderResult>>> =
-        MutableLiveData()
+    private val collisions: MutableLiveData<ArrayList<NameCollision>> = MutableLiveData()
 
     private lateinit var parentFolder: String
     private var parentHandle: Long = INVALID_HANDLE
@@ -56,12 +55,12 @@ class UploadFolderViewModel @Inject constructor(
     private var folderContent = HashMap<FolderContent.Data?, MutableList<FolderContent>>()
     private var searchResults =
         HashMap<FolderContent.Data, HashMap<String, MutableList<FolderContent>>>()
+    private var pendingUploads: List<FolderContent.Data> = listOf()
 
     fun getCurrentFolder(): LiveData<FolderContent.Data> = currentFolder
     fun getFolderItems(): LiveData<MutableList<FolderContent>> = folderItems
     fun getSelectedItems(): LiveData<MutableList<Int>> = selectedItems
-    fun getUploadResult(): LiveData<Pair<ArrayList<NameCollision>, List<UploadFolderResult>>> =
-        uploadResult
+    fun getCollisions(): LiveData<ArrayList<NameCollision>> = collisions
 
     /**
      * Initializes the view model with the initial data.
@@ -366,17 +365,53 @@ class UploadFolderViewModel @Inject constructor(
 
     /**
      * Begins the process to upload the selected or all the current folder items.
-     *
-     * @param context   Required to get the absolute path of items.
      */
-    fun upload(context: Context) {
+    fun upload() {
+        getFolderContentUseCase.getRootContentToUpload(
+            currentFolder.value!!,
+            selectedItems.value,
+            folderItems.value
+        ).subscribeOn(AndroidSchedulers.mainThread())
+            .subscribeBy(
+                onError = { error -> logError("Cannot upload anything", error) },
+                onSuccess = { results -> checkNameCollisions(results) }
+            )
+    }
+
+    /**
+     * Checks name collisions before starting the upload.
+     *
+     * @param uploadResults List of UploadFolderResult to upload.
+     */
+    private fun checkNameCollisions(uploadResults: MutableList<FolderContent.Data>) {
+        nameCollisionDisposable = checkNameCollisionUseCase.check(parentHandle, uploadResults)
+            .subscribeOn(AndroidSchedulers.mainThread())
+            .subscribeBy(
+                onError = { error -> logError("Cannot upload anything", error) },
+                onSuccess = { result ->
+                    collisions.value = result.first
+                    pendingUploads = result.second
+                }
+            )
+            .addTo(composite)
+    }
+
+    /**
+     * Proceeds with the upload.
+     *
+     * @param context               Required for getting absolute path and start the service.
+     * @param collisionsResolution  List with the name collisions resolution. Null if is not required.
+     */
+    fun proceedWithUpload(
+        context: Context,
+        collisionsResolution: List<NameCollisionResult>? = null
+    ) {
         transfersManagement.setIsProcessingFolders(true)
         getContentDisposable = getFolderContentUseCase.getContentToUpload(
             context,
             parentHandle,
-            parentFolder,
-            selectedItems.value,
-            folderItems.value
+            pendingUploads,
+            collisionsResolution
         ).subscribeOn(Schedulers.single())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeBy(
@@ -390,28 +425,6 @@ class UploadFolderViewModel @Inject constructor(
                     }
 
                     transfersManagement.setIsProcessingFolders(false)
-                    checkNameCollisions(uploadResults)
-                }
-            )
-            .addTo(composite)
-    }
-
-    /**
-     * Checks name collisions before starting the upload.
-     *
-     * @param uploadResults List of UploadFolderResult to upload.
-     */
-    private fun checkNameCollisions(uploadResults: ArrayList<UploadFolderResult>) {
-        nameCollisionDisposable = checkNameCollisionUseCase.check(uploadResults)
-            .subscribeOn(AndroidSchedulers.mainThread())
-            .subscribeBy(
-                onError = { error -> logError("Cannot upload anything", error) },
-                onSuccess = { result ->
-                    if (transfersManagement.shouldBreakTransfersProcessing()) {
-                        return@subscribeBy
-                    }
-
-                    uploadResult.value = result
                 }
             )
             .addTo(composite)

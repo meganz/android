@@ -6,7 +6,7 @@ import mega.privacy.android.app.ShareInfo
 import mega.privacy.android.app.di.MegaApi
 import mega.privacy.android.app.namecollision.data.NameCollision
 import mega.privacy.android.app.domain.exception.EmptyFolderException
-import mega.privacy.android.app.uploadFolder.list.data.UploadFolderResult
+import mega.privacy.android.app.uploadFolder.list.data.FolderContent
 import mega.privacy.android.app.usecase.exception.MegaNodeException
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
@@ -116,58 +116,56 @@ class CheckNameCollisionUseCase @Inject constructor(
         }
 
     /**
-     * Checks a list of UploadFolderResult in order to know which names already exist
+     * Checks a list of [FolderContent.Data] in order to know which names already exist
      * on the provided parent node.
      *
-     * @param uploadResults    List of UploadFolderResult to check.
-     * @return Single<Pair<List<UploadFolderResult>, List<UploadFolderResult>>> containing:
-     *  - First:    List of NameCollision with name collisions.
-     *  - Second:   List of UploadFolderResult without name collision.
+     * @param parentHandle  Parent handle of the MegaNode in which the content will be uploaded.
+     * @param uploadContent List of [FolderContent.Data] to check.
+     * @return Single with the list of collisions if any and the list of [FolderContent.Data]
+     * updated with them.
      */
     fun check(
-        uploadResults: List<UploadFolderResult>
-    ): Single<Pair<ArrayList<NameCollision>, List<UploadFolderResult>>> =
+        parentHandle: Long,
+        uploadContent: MutableList<FolderContent.Data>
+    ): Single<Pair<ArrayList<NameCollision>, MutableList<FolderContent.Data>>> =
         Single.create { emitter ->
-            if (uploadResults.isEmpty()) {
+            if (uploadContent.isEmpty()) {
                 emitter.onError(EmptyFolderException())
                 return@create
             }
 
-            if (emitter.isDisposed) {
-                return@create
-            }
-
             val collisions = ArrayList<NameCollision>()
-            val results = ArrayList<UploadFolderResult>()
 
-            for (uploadResult in uploadResults) {
+            uploadContent.forEach { item ->
                 if (emitter.isDisposed) {
                     return@create
                 }
 
-                check(uploadResult.name, uploadResult.parentHandle).blockingSubscribeBy(
-                    onError = { error ->
-                        if (error is MegaNodeException.ParentDoesNotExistException) {
-                            emitter.onError(error)
-                            return@blockingSubscribeBy
-                        } else {
-                            results.add(uploadResult)
-                        }
-                    },
-                    onSuccess = { handle ->
-                        collisions.add(
-                            NameCollision.Upload.getUploadCollision(
+                item.name?.let {
+                    check(it, parentHandle).blockingSubscribeBy(
+                        onError = { error ->
+                            if (error is MegaNodeException.ParentDoesNotExistException) {
+                                emitter.onError(error)
+                                return@blockingSubscribeBy
+                            }
+                        },
+                        onSuccess = { handle ->
+                            val collision = NameCollision.Upload.getUploadCollision(
                                 handle,
-                                uploadResult
+                                item,
+                                parentHandle
                             )
-                        )
-                    },
-                )
+
+                            collisions.add(collision)
+                            item.nameCollision = collision
+                        },
+                    )
+                }
             }
 
             when {
                 emitter.isDisposed -> return@create
-                else -> emitter.onSuccess(Pair(collisions, results))
+                else -> emitter.onSuccess(Pair(collisions, uploadContent))
             }
         }
 }
