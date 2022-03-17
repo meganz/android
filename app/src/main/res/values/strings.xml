@@ -4276,7 +4276,7 @@
     <!-- Title for dialog that subscription is from other platform and shows before delete account -->
     <string name="title_active_subscription">Active subscription</string>
     <!-- Message for dialog that subscription is from android platform and shows before delete account -->
-    <string name="message_android_platform_subscription">You have an active MEGA subscription with %1s. You must cancel it separately at %2s, as MEGA is not able to cancel it for you. Visit our Help Centre for more information.</string>
+    <string name="message_android_platform_subscription">You have an active MEGA subscription with %1$s. You must cancel it separately at %2$s, as MEGA is not able to cancel it for you. Visit our Help Centre for more information.</string>
     <!-- Message for dialog that subscription is from other platform and shows before delete account  -->
     <string name="message_other_platform_subscription">You have an active MEGA subscription. It will be canceled automatically after the account is deleted. Visit our Help Centre for more information.</string>
     <!-- Message for dialog that subscription is from iTunes platform and shows before delete account  -->
