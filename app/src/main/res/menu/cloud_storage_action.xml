@@ -139,4 +139,10 @@
         android:title="@string/context_move_to_trash"
         app:iconTint="?attr/colorSecondary"
         app:showAsAction="never" />
+
+    <item
+        android:id="@+id/cab_menu_remove_favourites"
+        android:orderInCategory="240"
+        android:title="@string/action_remove_favourites"
+        app:showAsAction="never" />
 </menu>
