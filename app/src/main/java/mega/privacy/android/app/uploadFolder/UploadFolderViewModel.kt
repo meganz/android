@@ -10,8 +10,11 @@ import io.reactivex.rxjava3.disposables.Disposable
 import io.reactivex.rxjava3.kotlin.addTo
 import io.reactivex.rxjava3.kotlin.subscribeBy
 import io.reactivex.rxjava3.schedulers.Schedulers
+import mega.privacy.android.app.R
 import mega.privacy.android.app.arch.BaseRxViewModel
 import mega.privacy.android.app.components.textFormatter.TextFormatterUtils.INVALID_INDEX
+import mega.privacy.android.app.domain.exception.EmptyFolderException
+import mega.privacy.android.app.fragments.homepage.Event
 import mega.privacy.android.app.namecollision.data.NameCollision
 import mega.privacy.android.app.globalmanagement.TransfersManagement
 import mega.privacy.android.app.namecollision.data.NameCollisionResult
@@ -20,6 +23,7 @@ import mega.privacy.android.app.uploadFolder.list.data.FolderContent
 import mega.privacy.android.app.uploadFolder.usecase.GetFolderContentUseCase
 import mega.privacy.android.app.utils.LogUtil.logError
 import mega.privacy.android.app.utils.LogUtil.logWarning
+import mega.privacy.android.app.utils.StringResourcesUtils.getQuantityString
 import mega.privacy.android.app.utils.notifyObserver
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
@@ -43,6 +47,7 @@ class UploadFolderViewModel @Inject constructor(
     private val folderItems: MutableLiveData<MutableList<FolderContent>> = MutableLiveData()
     private val selectedItems: MutableLiveData<MutableList<Int>> = MutableLiveData()
     private val collisions: MutableLiveData<ArrayList<NameCollision>> = MutableLiveData()
+    private val actionResult: MutableLiveData<Event<String?>> = MutableLiveData()
 
     private lateinit var parentFolder: String
     private var parentHandle: Long = INVALID_HANDLE
@@ -61,6 +66,7 @@ class UploadFolderViewModel @Inject constructor(
     fun getFolderItems(): LiveData<MutableList<FolderContent>> = folderItems
     fun getSelectedItems(): LiveData<MutableList<Int>> = selectedItems
     fun getCollisions(): LiveData<ArrayList<NameCollision>> = collisions
+    fun onActionResult(): LiveData<Event<String?>> = actionResult
 
     /**
      * Initializes the view model with the initial data.
@@ -417,14 +423,23 @@ class UploadFolderViewModel @Inject constructor(
             .subscribeBy(
                 onError = { error ->
                     transfersManagement.setIsProcessingFolders(false)
-                    logError("Cannot upload anything", error)
-                },
-                onSuccess = { uploadResults ->
-                    if (transfersManagement.shouldBreakTransfersProcessing()) {
+
+                    if (error is EmptyFolderException) {
+                        actionResult.value = Event("")
                         return@subscribeBy
                     }
 
+                    logError("Cannot upload anything", error)
+                },
+                onSuccess = { uploadResults ->
                     transfersManagement.setIsProcessingFolders(false)
+                    actionResult.value = Event(
+                        getQuantityString(
+                            R.plurals.upload_began,
+                            uploadResults,
+                            uploadResults
+                        )
+                    )
                 }
             )
             .addTo(composite)

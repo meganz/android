@@ -12,6 +12,7 @@ import android.view.Menu
 import android.view.MenuItem
 import android.widget.ImageView
 import androidx.activity.result.ActivityResult
+import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.appcompat.view.ActionMode
@@ -34,11 +35,9 @@ import mega.privacy.android.app.fragments.homepage.SortByHeaderViewModel
 import mega.privacy.android.app.interfaces.Scrollable
 import mega.privacy.android.app.modalbottomsheet.SortByBottomSheetDialogFragment.Companion.newInstance
 import mega.privacy.android.app.namecollision.NameCollisionActivity
-import mega.privacy.android.app.namecollision.NameCollisionViewModel
 import mega.privacy.android.app.namecollision.data.NameCollisionResult
 import mega.privacy.android.app.uploadFolder.list.adapter.FolderContentAdapter
 import mega.privacy.android.app.uploadFolder.list.data.FolderContent
-import mega.privacy.android.app.uploadFolder.list.data.UploadFolderResult
 import mega.privacy.android.app.utils.Constants.*
 import mega.privacy.android.app.utils.LogUtil.logWarning
 import mega.privacy.android.app.utils.MenuUtils.setupSearchView
@@ -83,21 +82,29 @@ class UploadFolderActivity : TransfersManagementActivity(), Scrollable {
 
     private lateinit var searchMenuItem: MenuItem
 
-    private val collisionsForResult by lazy {
-        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result: ActivityResult ->
-            if (result.resultCode == Activity.RESULT_OK) {
-                @Suppress("UNCHECKED_CAST")
-                val collisionsResult = result.data?.getSerializableExtra(INTENT_EXTRA_COLLISION_RESULTS)
-                        as List<NameCollisionResult>?
-                viewModel.proceedWithUpload(this, collisionsResult)
-            } else {
-                logWarning("resultCode: ${result.resultCode}")
-            }
-        }
-    }
+    private lateinit var collisionsForResult: ActivityResultLauncher<Intent>
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        collisionsForResult =
+            registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result: ActivityResult ->
+                when (result.resultCode) {
+                    Activity.RESULT_OK -> {
+                        @Suppress("UNCHECKED_CAST")
+                        val collisionsResult =
+                            result.data?.getSerializableExtra(INTENT_EXTRA_COLLISION_RESULTS)
+                                    as List<NameCollisionResult>?
+                        viewModel.proceedWithUpload(this, collisionsResult)
+                    }
+                    Activity.RESULT_CANCELED -> {
+                        finish()
+                    }
+                    else -> {
+                        logWarning("resultCode: ${result.resultCode}")
+                    }
+                }
+            }
 
         binding = ActivityUploadFolderBinding.inflate(layoutInflater)
 
@@ -230,6 +237,15 @@ class UploadFolderActivity : TransfersManagementActivity(), Scrollable {
         viewModel.getFolderItems().observe(this, ::showFolderContent)
         viewModel.getSelectedItems().observe(this, ::updateActionMode)
         viewModel.getCollisions().observe(this, ::manageCollisions)
+        viewModel.onActionResult().observe(this, EventObserver { result ->
+            if (result.isNullOrEmpty()) {
+                finish()
+                return@EventObserver
+            }
+
+            showSnackbar(binding.root, result)
+            Handler(Looper.getMainLooper()).postDelayed({ finish() }, LONG_SNACKBAR_DURATION)
+        })
 
         sortByHeaderViewModel.showDialogEvent.observe(this, EventObserver {
             newInstance(ORDER_OFFLINE).apply { show(supportFragmentManager, this.tag) }
@@ -335,42 +351,6 @@ class UploadFolderActivity : TransfersManagementActivity(), Scrollable {
                 )
             )
         }
-    }
-
-    /**
-     * Starts the upload.
-     *
-     * @param uploadResults List of [UploadFolderResult] to upload.
-     */
-    private fun manageUploadResult(uploadResults: List<UploadFolderResult>) {
-
-        if (uploadResults.isNotEmpty()) {
-            showSnackbar(
-                SNACKBAR_TYPE,
-                StringResourcesUtils.getQuantityString(
-                    R.plurals.upload_began,
-                    uploadResults.size,
-                    uploadResults.size
-                ),
-                MEGACHAT_INVALID_HANDLE
-            )
-
-            for (result in uploadResults) {
-                if (transfersManagement.shouldBreakTransfersProcessing()) {
-                    break
-                }
-
-                startService(
-                    Intent(this, UploadService::class.java)
-                        .putExtra(UploadService.EXTRA_FILEPATH, result.absolutePath)
-                        .putExtra(UploadService.EXTRA_NAME, result.name)
-                        .putExtra(UploadService.EXTRA_LAST_MODIFIED, result.lastModified)
-                        .putExtra(UploadService.EXTRA_PARENT_HASH, result.parentHandle)
-                )
-            }
-        }
-
-        finish()
     }
 
     /**

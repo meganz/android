@@ -18,6 +18,7 @@ import mega.privacy.android.app.usecase.exception.MegaNodeException
 import mega.privacy.android.app.utils.CacheFolderManager.buildThumbnailFile
 import mega.privacy.android.app.utils.ErrorUtils.toThrowable
 import mega.privacy.android.app.utils.LogUtil.logWarning
+import mega.privacy.android.app.utils.MegaApiUtils.getMegaNodeFolderInfo
 import mega.privacy.android.app.utils.MegaNodeUtil.getThumbnailFileName
 import mega.privacy.android.app.utils.RxUtil.blockingGetOrNull
 import nz.mega.sdk.MegaApiAndroid
@@ -62,8 +63,10 @@ class GetNameCollisionResultUseCase @Inject constructor(
 
                 nameCollisionResult.apply {
                     collisionName = name
-                    collisionSize = size
-                    collisionLastModified = modificationTime
+                    collisionSize = if (node.isFile) size else null
+                    collisionFolderContent =
+                        if (node.isFolder) getMegaNodeFolderInfo(node) else null
+                    collisionLastModified = if (node.isFile) modificationTime else creationTime
                     collisionThumbnail =
                         if (thumbnailFile?.exists() == true) thumbnailFile.toUri() else null
                     renameName = collision.name.getRenameName()

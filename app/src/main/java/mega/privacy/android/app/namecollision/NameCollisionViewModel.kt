@@ -136,7 +136,10 @@ class NameCollisionViewModel @Inject constructor(
                     pendingFolderCollisions = result.third
                     getCurrentCollision(reorderedCollisions[0])
                     reorderedCollisions.removeAt(0)
-                    getPendingCollisions(reorderedCollisions)
+
+                    if (reorderedCollisions.isNotEmpty()) {
+                        getPendingCollisions(reorderedCollisions)
+                    }
                 },
                 onError = { error ->
                     logError("No pending collisions", error)

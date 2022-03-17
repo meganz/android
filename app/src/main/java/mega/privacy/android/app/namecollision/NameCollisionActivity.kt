@@ -232,7 +232,7 @@ class NameCollisionActivity : PasscodeActivity() {
                 )
             }
             this.name.text = name
-            size.text = getSizeString(collision.size)
+            size.text = if (isFile) getSizeString(collision.size!!) else collision.folderContent
             date.text = formatLongDateTime(collision.lastModified)
 
             val thumbnailView = if (hasThumbnail) R.id.thumbnail else R.id.thumbnail_icon
@@ -284,7 +284,9 @@ class NameCollisionActivity : PasscodeActivity() {
                 )
             }
             this.name.text = collisionResult.collisionName
-            size.text = getSizeString(collisionResult.collisionSize!!)
+            size.text =
+                if (isFile) getSizeString(collisionResult.collisionSize!!)
+                else collisionResult.collisionFolderContent
             date.text = formatLongDateTime(collisionResult.collisionLastModified!!)
 
             val thumbnailView = if (hasThumbnail) R.id.thumbnail else R.id.thumbnail_icon
@@ -411,5 +413,6 @@ class NameCollisionActivity : PasscodeActivity() {
             Activity.RESULT_OK,
             Intent().putExtra(INTENT_EXTRA_COLLISION_RESULTS, collisionsResolution)
         )
+        finish()
     }
 }

@@ -9,6 +9,7 @@ import mega.privacy.android.app.globalmanagement.TransfersManagement
 import mega.privacy.android.app.namecollision.data.NameCollision
 import mega.privacy.android.app.namecollision.data.NameCollisionResult
 import mega.privacy.android.app.namecollision.exception.NoPendingCollisionsException
+import mega.privacy.android.app.uploadFolder.list.data.UploadFolderResult
 import mega.privacy.android.app.utils.LogUtil.logError
 import javax.inject.Inject
 
@@ -76,6 +77,25 @@ class UploadNodeUseCase @Inject constructor(
             if (rename) collisionResult.renameName!! else collisionResult.nameCollision.name,
             collisionResult.nameCollision.lastModified,
             collisionResult.nameCollision.parentHandle
+        )
+
+    /**
+     * Uploads a file. Upload folder context.
+     *
+     * @param context       Application Context required to start the service.
+     * @param uploadResult  The result of the upload folder.
+     * @return Completable.
+     */
+    fun upload(
+        context: Context,
+        uploadResult: UploadFolderResult
+    ): Completable =
+        upload(
+            context,
+            uploadResult.absolutePath,
+            if (uploadResult.renameName != null) uploadResult.renameName!! else uploadResult.name,
+            uploadResult.lastModified,
+            uploadResult.parentHandle
         )
 
     /**

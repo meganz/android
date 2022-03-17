@@ -1,7 +1,6 @@
 package mega.privacy.android.app.uploadFolder.usecase
 
 import android.content.Context
-import com.anggrayudi.storage.file.getAbsolutePath
 import io.reactivex.rxjava3.core.Single
 import io.reactivex.rxjava3.kotlin.blockingSubscribeBy
 import mega.privacy.android.app.ShareInfo
@@ -9,21 +8,19 @@ import mega.privacy.android.app.components.textFormatter.TextFormatterUtils.INVA
 import mega.privacy.android.app.di.MegaApi
 import mega.privacy.android.app.domain.exception.EmptyFolderException
 import mega.privacy.android.app.namecollision.NameCollisionViewModel
-import mega.privacy.android.app.namecollision.data.NameCollision
 import mega.privacy.android.app.namecollision.data.NameCollisionResult
 import mega.privacy.android.app.uploadFolder.list.data.FolderContent
 import mega.privacy.android.app.uploadFolder.list.data.UploadFolderResult
 import mega.privacy.android.app.usecase.CreateFolderUseCase
 import mega.privacy.android.app.usecase.GetNodeUseCase
+import mega.privacy.android.app.usecase.UploadNodeUseCase
 import mega.privacy.android.app.usecase.exception.MegaNodeException
 import mega.privacy.android.app.utils.LogUtil.logWarning
 import mega.privacy.android.app.utils.RxUtil.blockingGetOrNull
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava.*
 import nz.mega.sdk.MegaNode
-import java.io.File
 import java.io.FileNotFoundException
-import java.lang.NullPointerException
 import java.security.InvalidParameterException
 import java.util.*
 import javax.inject.Inject
@@ -36,11 +33,13 @@ import kotlin.collections.HashMap
  * @property megaApi                    MegaApi required to make the requests to the SDK.
  * @property createFolderUseCase        Use case for creating folders.
  * @property getNodeUseCase             Use case for getting nodes.
+ * @property uploadNodeUseCase          Use case for uploading files.
  */
 class GetFolderContentUseCase @Inject constructor(
     @MegaApi private val megaApi: MegaApiAndroid,
     private val createFolderUseCase: CreateFolderUseCase,
-    private val getNodeUseCase: GetNodeUseCase
+    private val getNodeUseCase: GetNodeUseCase,
+    private val uploadNodeUseCase: UploadNodeUseCase
 ) {
 
     /**
@@ -97,77 +96,60 @@ class GetFolderContentUseCase @Inject constructor(
      *
      * @param context       Context required to get the absolute path.
      * @param parentNode    MegaNode in which the content will be uploaded.
-     * @param parentFolder  Name of the parent folder of the item.
      * @param folderItem    Item to be managed.
-     * @param isSelection   True if only some of the items has to be managed, false otherwise.
+     * @param renameName    A valid name if the file has to be uploaded with a different name, null otherwise.
      * @return Single with a list of UploadFolderResult.
      */
     private fun getContentToUpload(
         context: Context,
         parentNode: MegaNode,
-        parentFolder: String,
         folderItem: FolderContent.Data,
-        isSelection: Boolean
+        renameName: String? = null
     ): Single<ArrayList<UploadFolderResult>> =
         Single.create { emitter ->
             if (folderItem.isFolder) {
-                val uris = ArrayList<UploadFolderResult>()
+                val folderName = folderItem.name!!
+                var newParentNode = megaApi.getChildNode(parentNode, folderName)
+
+                if (newParentNode == null) {
+                    createFolderUseCase.create(parentNode, folderName).blockingSubscribeBy(
+                        onError = { error -> emitter.onError(error) },
+                        onSuccess = { resultNode -> newParentNode = resultNode }
+                    )
+                }
+
+                val results = ArrayList<UploadFolderResult>()
 
                 get(folderItem).blockingSubscribeBy(
                     onError = { error -> emitter.onError(error) },
                     onSuccess = { folderContent ->
                         folderContent.forEach { item ->
-                            getContentToUpload(context, parentNode, parentFolder, item, isSelection)
+                            getContentToUpload(context, newParentNode, item)
                                 .blockingSubscribeBy(
                                     onError = { error -> logWarning("Ignored error", error) },
                                     onSuccess = { urisResult ->
-                                        uris.addAll(urisResult)
+                                        results.addAll(urisResult)
                                     })
                         }
 
-                        emitter.onSuccess(uris)
+                        emitter.onSuccess(results)
                     }
                 )
             } else {
-                val filePath = folderItem.document.getAbsolutePath(context).split(parentFolder)[1]
-                var folderTree = filePath.substring(0, filePath.lastIndexOf(File.separator))
-
-                if (!isSelection) {
-                    folderTree = parentFolder + folderTree
-                }
-
                 val info = ShareInfo().apply { processUri(folderItem.uri, context) }
 
-                if (folderTree.isEmpty()) {
-                    emitter.onSuccess(
-                        arrayListOf(
-                            UploadFolderResult(
-                                info.fileAbsolutePath,
-                                folderItem.name!!,
-                                folderItem.size,
-                                folderItem.lastModified,
-                                parentNode.handle
-                            )
+                emitter.onSuccess(
+                    arrayListOf(
+                        UploadFolderResult(
+                            absolutePath = info.fileAbsolutePath,
+                            name = folderItem.name!!,
+                            size = folderItem.size,
+                            lastModified = folderItem.lastModified,
+                            parentHandle = parentNode.handle,
+                            renameName = renameName
                         )
                     )
-                } else {
-                    createFolderUseCase.createTree(parentNode, folderTree).blockingSubscribeBy(
-                        onError = { error -> emitter.onError(error) },
-                        onSuccess = { parentNodeResult ->
-                            emitter.onSuccess(
-                                arrayListOf(
-                                    UploadFolderResult(
-                                        info.fileAbsolutePath,
-                                        folderItem.name!!,
-                                        folderItem.size,
-                                        folderItem.lastModified,
-                                        parentNodeResult.handle
-                                    )
-                                )
-                            )
-                        }
-                    )
-                }
+                )
             }
         }
 
@@ -218,14 +200,14 @@ class GetFolderContentUseCase @Inject constructor(
      * @param parentNodeHandle      Handle of the parent node in which the content will be uploaded.
      * @param pendingUploads        List of the pending uploads.
      * @param collisionsResolution  List of collisions already resolved.
-     * @return Completable
+     * @return Single with the size of uploaded items.
      */
     fun getContentToUpload(
         context: Context,
         parentNodeHandle: Long,
         pendingUploads: List<FolderContent.Data>,
         collisionsResolution: List<NameCollisionResult>?
-    ): Single<ArrayList<UploadFolderResult>> =
+    ): Single<Int> =
         Single.create { emitter ->
             val parentNode = getNodeUseCase.get(parentNodeHandle).blockingGetOrNull()
 
@@ -234,16 +216,83 @@ class GetFolderContentUseCase @Inject constructor(
                 return@create
             }
 
-            val results = ArrayList<UploadFolderResult>()
+            val uploadResults = mutableListOf<UploadFolderResult>()
 
-            pendingUploads.forEach { upload ->
+            if (collisionsResolution.isNullOrEmpty()) {
+                pendingUploads.forEach { upload ->
+                    if (emitter.isDisposed) {
+                        return@create
+                    }
 
+                    getContentToUpload(
+                        context = context,
+                        parentNode = parentNode,
+                        folderItem = upload
+                    ).blockingSubscribeBy(
+                        onError = { error -> logWarning("Ignored error", error) },
+                        onSuccess = { result -> uploadResults.addAll(result) }
+                    )
+                }
+            } else {
+                val collisions = collisionsResolution.toMutableList()
+                pendingUploads.forEach { upload ->
+                    if (emitter.isDisposed) {
+                        return@create
+                    }
+
+                    if (upload.nameCollision != null) {
+                        for (collision in collisions) {
+                            if (emitter.isDisposed) {
+                                return@create
+                            }
+
+                            if (upload.nameCollision == collision.nameCollision
+                                && collision.choice != NameCollisionViewModel.NameCollisionChoice.CANCEL
+                            ) {
+                                val renameName =
+                                    if (collision.choice == NameCollisionViewModel.NameCollisionChoice.RENAME) {
+                                        collision.renameName
+                                    } else {
+                                        null
+                                    }
+
+                                getContentToUpload(
+                                    context = context,
+                                    parentNode = parentNode,
+                                    folderItem = upload,
+                                    renameName
+                                ).blockingSubscribeBy(
+                                    onError = { error ->
+                                        logWarning("Ignored error", error)
+                                    },
+                                    onSuccess = { result -> uploadResults.addAll(result) }
+                                )
+
+                                collisions.remove(collision)
+                                break
+                            }
+                        }
+                    }
+                }
             }
+
 
             when {
                 emitter.isDisposed -> return@create
-                results.isEmpty() -> emitter.onError(FileNotFoundException("Empty folder"))
-                else -> emitter.onSuccess(results)
+                uploadResults.isEmpty() -> emitter.onError(EmptyFolderException())
+                else -> {
+                    for (result in uploadResults) {
+                        if (emitter.isDisposed) {
+                            return@create
+                        }
+
+                        uploadNodeUseCase.upload(context, result).blockingSubscribeBy(
+                            onError = { error -> emitter.onError(error) }
+                        )
+                    }
+
+                    emitter.onSuccess(uploadResults.size)
+                }
             }
         }
 
