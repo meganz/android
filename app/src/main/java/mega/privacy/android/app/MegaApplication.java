@@ -132,6 +132,7 @@ import dagger.hilt.android.HiltAndroidApp;
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
 import io.reactivex.rxjava3.plugins.RxJavaPlugins;
 import io.reactivex.rxjava3.schedulers.Schedulers;
+import kotlin.Unit;
 import me.leolin.shortcutbadger.ShortcutBadger;
 import mega.privacy.android.app.components.ChatManagement;
 import mega.privacy.android.app.components.PushNotificationSettingManagement;
@@ -170,7 +171,9 @@ import mega.privacy.android.app.protobuf.TombstoneProtos;
 import mega.privacy.android.app.receivers.NetworkStateReceiver;
 import mega.privacy.android.app.utils.CUBackupInitializeChecker;
 import mega.privacy.android.app.utils.CallUtil;
+import mega.privacy.android.app.utils.RunOnUIThreadUtils;
 import mega.privacy.android.app.utils.ThemeHelper;
+import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaAccountSession;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
@@ -1506,10 +1509,18 @@ public class MegaApplication extends MultiDexApplication implements Application.
     @Override
     public void onDbError(MegaChatApiJava api, int error, String msg) {
         logError("MEGAChatSDK onDBError occurred. Error " + error + " with message " + msg);
-        if (error == MegaChatApi.DB_ERROR_IO || error == MegaChatApi.DB_ERROR_FULL) {
+        switch (error) {
+            case MegaChatApi.DB_ERROR_IO:
+                currentActivity.finishAndRemoveTask();
+                break;
 
-            megaApi.localLogout();
-            api.logout();
+            case MegaChatApi.DB_ERROR_FULL:
+                RunOnUIThreadUtils.INSTANCE.post(() -> {
+                    Util.showErrorAlertDialog(
+                            getString(R.string.error_not_enough_free_space),
+                            true, currentActivity);
+                    return Unit.INSTANCE;
+                });
         }
     }
 

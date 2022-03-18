@@ -20,7 +20,7 @@ class GetChatChangesUseCase @Inject constructor(
 ) {
 
     sealed class Result {
-        data class OnChatListItemUpdate(val item: MegaChatListItem) : Result()
+        data class OnChatListItemUpdate(val item: MegaChatListItem?) : Result()
         data class OnChatInitStateUpdate(val newState: Int) : Result()
         data class OnChatOnlineStatusUpdate(val userHandle: Long, val status: Int, val inProgress: Boolean) : Result()
         data class OnChatPresenceConfigUpdate(val config: MegaChatPresenceConfig) : Result()

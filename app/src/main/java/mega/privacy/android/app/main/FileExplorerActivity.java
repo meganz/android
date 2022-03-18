@@ -48,6 +48,7 @@ import java.util.List;
 
 import dagger.hilt.android.AndroidEntryPoint;
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
+import io.reactivex.rxjava3.disposables.Disposable;
 import io.reactivex.rxjava3.schedulers.Schedulers;
 import kotlin.Unit;
 import mega.privacy.android.app.DatabaseHandler;
@@ -58,6 +59,7 @@ import mega.privacy.android.app.ShareInfo;
 import mega.privacy.android.app.TransfersManagementActivity;
 import mega.privacy.android.app.UploadService;
 import mega.privacy.android.app.UserCredentials;
+import mega.privacy.android.app.usecase.chat.GetChatChangesUseCase;
 import mega.privacy.android.app.utils.ChatUtil;
 import mega.privacy.android.app.utils.MegaProgressDialogUtil;
 import mega.privacy.android.app.generalusecase.FilePrepareUseCase;
@@ -84,10 +86,7 @@ import nz.mega.sdk.MegaChatApi;
 import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaChatApiJava;
 import nz.mega.sdk.MegaChatError;
-import nz.mega.sdk.MegaChatListItem;
-import nz.mega.sdk.MegaChatListenerInterface;
 import nz.mega.sdk.MegaChatPeerList;
-import nz.mega.sdk.MegaChatPresenceConfig;
 import nz.mega.sdk.MegaChatRequest;
 import nz.mega.sdk.MegaChatRequestListenerInterface;
 import nz.mega.sdk.MegaChatRoom;
@@ -127,8 +126,11 @@ import javax.inject.Inject;
 @AndroidEntryPoint
 public class FileExplorerActivity extends TransfersManagementActivity
 		implements MegaRequestListenerInterface, MegaGlobalListenerInterface,
-		MegaChatRequestListenerInterface, View.OnClickListener, MegaChatListenerInterface,
+		MegaChatRequestListenerInterface, View.OnClickListener,
 		ActionNodeCallback, SnackbarShower {
+
+	@Inject
+	GetChatChangesUseCase getChatChangesUseCase;
 
 	private final static String SHOULD_RESTART_SEARCH = "SHOULD_RESTART_SEARCH";
 	private final static String QUERY_AFTER_SEARCH = "QUERY_AFTER_SEARCH";
@@ -2525,33 +2527,7 @@ public class FileExplorerActivity extends TransfersManagementActivity
 		return Unit.INSTANCE;
 	}
 
-	@Override
-	public void onChatListItemUpdate(MegaChatApiJava api, MegaChatListItem item) {
-
-	}
-
-    @Override
-    public void onChatInitStateUpdate(MegaChatApiJava api, int newState) {
-
-    }
-
-	@Override
-	public void onChatOnlineStatusUpdate(MegaChatApiJava api, long userhandle, int status, boolean inProgress) {
-
-	}
-
-	@Override
-	public void onChatPresenceConfigUpdate(MegaChatApiJava api, MegaChatPresenceConfig config) {
-
-	}
-
-	@Override
-	public void onChatConnectionStateUpdate(MegaChatApiJava api, long chatid, int newState) {
-
-	}
-
-	@Override
-	public void onChatPresenceLastGreen(MegaChatApiJava api, long userhandle, int lastGreen) {
+	private void onChatPresenceLastGreen(long userhandle, int lastGreen) {
 		int state = megaChatApi.getUserOnlineStatus(userhandle);
 		if(state != MegaChatApi.STATUS_ONLINE && state != MegaChatApi.STATUS_BUSY && state != MegaChatApi.STATUS_INVALID) {
 			String formattedDate = lastGreenDate(this, lastGreen);
@@ -2562,11 +2538,6 @@ public class FileExplorerActivity extends TransfersManagementActivity
 				}
 			}
 		}
-	}
-
-	@Override
-	public void onDbError(MegaChatApiJava api, int error, String msg) {
-
 	}
 
 	private ChatExplorerFragment getChatExplorerFragment () {
@@ -2879,5 +2850,23 @@ public class FileExplorerActivity extends TransfersManagementActivity
 
 		bottomSheetDialogFragment.show(getSupportFragmentManager(),
 				bottomSheetDialogFragment.getTag());
+	}
+
+	/**
+	 * Receive changes to OnChatPresenceLastGreen and make the necessary changes
+	 */
+	public void checkChatChanges() {
+		Disposable dis = getChatChangesUseCase.get()
+				.subscribeOn(Schedulers.io())
+				.observeOn(AndroidSchedulers.mainThread())
+				.filter(result -> result instanceof GetChatChangesUseCase.Result.OnChatPresenceLastGreen)
+				.map(result -> (GetChatChangesUseCase.Result.OnChatPresenceLastGreen) result)
+				.subscribe((next) -> {
+					long userHandle = next.component1();
+					int lastGreen = next.component2();
+					onChatPresenceLastGreen(userHandle, lastGreen);
+				}, (error) -> logError("Error " + error));
+
+		composite.add(dis);
 	}
 }
