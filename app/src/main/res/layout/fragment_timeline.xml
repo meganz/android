@@ -14,7 +14,7 @@
             type="mega.privacy.android.app.fragments.managerFragments.cu.TimelineViewModel" />
     </data>
 
-    <RelativeLayout
+    <mega.privacy.android.app.fragments.managerFragments.cu.TimelineContainer
         android:id="@+id/cu_container"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
@@ -96,7 +96,7 @@
                 android:clipToPadding="false"
                 android:paddingBottom="@dimen/grid_node_list_padding_bottom"
                 app:galleryItems="@{viewModel.items}"
-                app:visibleGone="@{!viewModel.items.empty}"/>
+                app:visibleGone="@{!viewModel.items.empty}" />
 
             <mega.privacy.android.app.components.scrollBar.FastScroller
                 android:id="@+id/scroller"
@@ -105,5 +105,5 @@
                 android:layout_alignParentEnd="true"
                 android:orientation="vertical" />
         </RelativeLayout>
-    </RelativeLayout>
+    </mega.privacy.android.app.fragments.managerFragments.cu.TimelineContainer>
 </layout>
