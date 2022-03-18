@@ -398,6 +398,7 @@ import mega.privacy.android.app.upgradeAccount.UpgradeAccountActivity;
 import mega.privacy.android.app.usecase.GetNodeUseCase;
 import mega.privacy.android.app.usecase.MoveNodeUseCase;
 import mega.privacy.android.app.usecase.RemoveNodeUseCase;
+import mega.privacy.android.app.usecase.UploadNodeUseCase;
 import mega.privacy.android.app.usecase.data.MoveRequestResult;
 import mega.privacy.android.app.namecollision.usecase.CheckNameCollisionUseCase;
 import mega.privacy.android.app.usecase.exception.MegaNodeException;
@@ -531,6 +532,8 @@ public class ManagerActivity extends TransfersManagementActivity
     GetNodeUseCase getNodeUseCase;
     @Inject
     CheckNameCollisionUseCase checkNameCollisionUseCase;
+    @Inject
+    UploadNodeUseCase uploadNodeUseCase;
 
 	public ArrayList<Integer> transfersInProgress;
 	public MegaTransferData transferData;
@@ -8366,7 +8369,16 @@ public class ManagerActivity extends TransfersManagementActivity
 					});
 		} else if (requestCode == REQUEST_CODE_GET_FOLDER) {
 			getFolder(this, resultCode, intent, getCurrentParentHandle());
-		} else if (requestCode == WRITE_SD_CARD_REQUEST_CODE && resultCode == RESULT_OK) {
+		}  else if (requestCode == REQUEST_CODE_GET_FOLDER_CONTENT) {
+            if (intent != null && resultCode == RESULT_OK) {
+                String result = intent.getStringExtra(EXTRA_ACTION_RESULT);
+                if (isTextEmpty(result)) {
+                    return;
+                }
+
+                showSnackbar(SNACKBAR_TYPE, result, MEGACHAT_INVALID_HANDLE);
+            }
+        } else if (requestCode == WRITE_SD_CARD_REQUEST_CODE && resultCode == RESULT_OK) {
 
             if (!hasPermissions(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
                 requestPermission(this,
@@ -9463,16 +9475,10 @@ public class ManagerActivity extends TransfersManagementActivity
                                 if (info.isContact) {
                                     requestContactsPermissions(info, parentNode);
                                 } else {
-                                    if (transfersManagement.shouldBreakTransfersProcessing()) {
-                                        break;
-                                    }
-
-                                    Intent intent = new Intent(this, UploadService.class);
-                                    intent.putExtra(UploadService.EXTRA_FILEPATH, info.getFileAbsolutePath());
-                                    intent.putExtra(UploadService.EXTRA_NAME, info.getTitle());
-                                    intent.putExtra(UploadService.EXTRA_LAST_MODIFIED, info.getLastModified());
-                                    intent.putExtra(UploadService.EXTRA_PARENT_HASH, parentNode.getHandle());
-                                    startService(intent);
+                                    uploadNodeUseCase.upload(this, info, parentNode.getHandle())
+                                            .subscribeOn(Schedulers.io())
+                                            .observeOn(AndroidSchedulers.mainThread())
+                                            .subscribe(() -> logDebug("Upload started"));
                                 }
                             }
                         }

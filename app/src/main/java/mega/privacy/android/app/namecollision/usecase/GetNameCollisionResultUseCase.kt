@@ -158,7 +158,7 @@ class GetNameCollisionResultUseCase @Inject constructor(
                 reorderedCollisions.isEmpty() -> emitter.onError(NoPendingCollisionsException())
                 else -> {
                     val pendingFileCollisions = when {
-                        folderCollisions.size > 0 -> fileCollisions.size - 1
+                        fileCollisions.size > 0 -> fileCollisions.size - 1
                         else -> fileCollisions.size
                     }
                     val pendingFolderCollisions = when (fileCollisions.size) {

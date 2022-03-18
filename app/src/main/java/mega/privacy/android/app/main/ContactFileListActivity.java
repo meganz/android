@@ -91,6 +91,7 @@ import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.MegaNodeDialogUtil.IS_NEW_TEXT_FILE_SHOWN;
 import static mega.privacy.android.app.utils.MegaNodeDialogUtil.NEW_TEXT_FILE_TEXT;
 import static mega.privacy.android.app.utils.MegaNodeDialogUtil.checkNewTextFileDialogState;
+import static mega.privacy.android.app.utils.TextUtil.isTextEmpty;
 import static mega.privacy.android.app.utils.permission.PermissionUtils.*;
 import static mega.privacy.android.app.utils.StringResourcesUtils.getQuantityString;
 import static mega.privacy.android.app.utils.Util.*;
@@ -697,6 +698,15 @@ public class ContactFileListActivity extends PasscodeActivity
 					});
 		}  else if (requestCode == REQUEST_CODE_GET_FOLDER) {
 			getFolder(this, resultCode, intent, parentHandle);
+		} else if (requestCode == REQUEST_CODE_GET_FOLDER_CONTENT) {
+			if (intent != null && resultCode == RESULT_OK) {
+				String result = intent.getStringExtra(EXTRA_ACTION_RESULT);
+				if (isTextEmpty(result)) {
+					return;
+				}
+
+				showSnackbar(SNACKBAR_TYPE, result);
+			}
 		} else if (requestCode == REQUEST_CODE_SELECT_FOLDER && resultCode == RESULT_OK) {
 			if (intent == null) {
 				return;

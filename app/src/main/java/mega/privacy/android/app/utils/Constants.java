@@ -50,6 +50,7 @@ public class Constants {
     public static final int REQUEST_CODE_SCAN_DOCUMENT = 1036;
     public static final int REQUEST_CODE_SEND_SEVERAL_LINKS = 1037;
     public static final int REQUEST_CODE_GET_FOLDER = 1038;
+    public static final int REQUEST_CODE_GET_FOLDER_CONTENT = 1039;
 
     public static final String ACTION_REFRESH_AFTER_BLOCKED = "ACTION_REFRESH_AFTER_BLOCKED";
     public static final String ACTION_REFRESH = "ACTION_REFRESH";
@@ -72,6 +73,8 @@ public class Constants {
     public static final String EXTRA_RESULT_TRANSFER = "RESULT_TRANSFER";
     public static final String EXTRA_TRANSFER_TYPE = "TRANSFER_TYPE";
     public static final String EXTRA_USER_NICKNAME = "EXTRA_USER_NICKNAME";
+
+    public static final String EXTRA_ACTION_RESULT = "EXTRA_ACTION_RESULT";
 
     public static final String FROM_HOME_PAGE = "FROM_HOME_PAGE";
 

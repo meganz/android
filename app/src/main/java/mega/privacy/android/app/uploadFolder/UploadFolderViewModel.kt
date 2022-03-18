@@ -47,7 +47,7 @@ class UploadFolderViewModel @Inject constructor(
     private val folderItems: MutableLiveData<MutableList<FolderContent>> = MutableLiveData()
     private val selectedItems: MutableLiveData<MutableList<Int>> = MutableLiveData()
     private val collisions: MutableLiveData<ArrayList<NameCollision>> = MutableLiveData()
-    private val actionResult: MutableLiveData<Event<String?>> = MutableLiveData()
+    private val actionResult: MutableLiveData<String?> = MutableLiveData()
 
     private lateinit var parentFolder: String
     private var parentHandle: Long = INVALID_HANDLE
@@ -60,13 +60,13 @@ class UploadFolderViewModel @Inject constructor(
     private var folderContent = HashMap<FolderContent.Data?, MutableList<FolderContent>>()
     private var searchResults =
         HashMap<FolderContent.Data, HashMap<String, MutableList<FolderContent>>>()
-    private var pendingUploads: List<FolderContent.Data> = listOf()
+    private var pendingUploads: MutableList<FolderContent.Data> = mutableListOf()
 
     fun getCurrentFolder(): LiveData<FolderContent.Data> = currentFolder
     fun getFolderItems(): LiveData<MutableList<FolderContent>> = folderItems
     fun getSelectedItems(): LiveData<MutableList<Int>> = selectedItems
     fun getCollisions(): LiveData<ArrayList<NameCollision>> = collisions
-    fun onActionResult(): LiveData<Event<String?>> = actionResult
+    fun onActionResult(): LiveData<String?> = actionResult
 
     /**
      * Initializes the view model with the initial data.
@@ -396,7 +396,7 @@ class UploadFolderViewModel @Inject constructor(
                 onError = { error -> logError("Cannot upload anything", error) },
                 onSuccess = { result ->
                     collisions.value = result.first
-                    pendingUploads = result.second
+                    pendingUploads.addAll(result.second)
                 }
             )
             .addTo(composite)
@@ -425,7 +425,7 @@ class UploadFolderViewModel @Inject constructor(
                     transfersManagement.setIsProcessingFolders(false)
 
                     if (error is EmptyFolderException) {
-                        actionResult.value = Event("")
+                        actionResult.value = null
                         return@subscribeBy
                     }
 
@@ -433,13 +433,11 @@ class UploadFolderViewModel @Inject constructor(
                 },
                 onSuccess = { uploadResults ->
                     transfersManagement.setIsProcessingFolders(false)
-                    actionResult.value = Event(
-                        getQuantityString(
+                    actionResult.value = getQuantityString(
                             R.plurals.upload_began,
                             uploadResults,
                             uploadResults
                         )
-                    )
                 }
             )
             .addTo(composite)

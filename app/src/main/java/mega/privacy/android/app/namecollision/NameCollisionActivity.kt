@@ -166,7 +166,7 @@ class NameCollisionActivity : PasscodeActivity() {
             viewModel.cancel(binding.applyForAllCheck.isChecked)
         }
         binding.renameButton.setOnClickListener {
-            viewModel.rename(binding.applyForAllCheck.isChecked)
+            viewModel.rename(this, binding.applyForAllCheck.isChecked)
         }
     }
 
@@ -233,7 +233,7 @@ class NameCollisionActivity : PasscodeActivity() {
             }
             this.name.text = name
             size.text = if (isFile) getSizeString(collision.size!!) else collision.folderContent
-            date.text = formatLongDateTime(collision.lastModified)
+            date.text = formatLongDateTime(collision.lastModified / 1000)
 
             val thumbnailView = if (hasThumbnail) R.id.thumbnail else R.id.thumbnail_icon
 

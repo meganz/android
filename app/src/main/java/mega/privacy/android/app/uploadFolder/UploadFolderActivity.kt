@@ -237,15 +237,7 @@ class UploadFolderActivity : TransfersManagementActivity(), Scrollable {
         viewModel.getFolderItems().observe(this, ::showFolderContent)
         viewModel.getSelectedItems().observe(this, ::updateActionMode)
         viewModel.getCollisions().observe(this, ::manageCollisions)
-        viewModel.onActionResult().observe(this, EventObserver { result ->
-            if (result.isNullOrEmpty()) {
-                finish()
-                return@EventObserver
-            }
-
-            showSnackbar(binding.root, result)
-            Handler(Looper.getMainLooper()).postDelayed({ finish() }, LONG_SNACKBAR_DURATION)
-        })
+        viewModel.onActionResult().observe(this, ::onActivityResult)
 
         sortByHeaderViewModel.showDialogEvent.observe(this, EventObserver {
             newInstance(ORDER_OFFLINE).apply { show(supportFragmentManager, this.tag) }
@@ -351,6 +343,16 @@ class UploadFolderActivity : TransfersManagementActivity(), Scrollable {
                 )
             )
         }
+    }
+
+    /**
+     * Sets the result and finishes the activity.
+     *
+     * @return result   Action result.
+     */
+    private fun onActivityResult(result: String?) {
+        setResult(RESULT_OK, Intent().putExtra(EXTRA_ACTION_RESULT, result))
+        finish()
     }
 
     /**

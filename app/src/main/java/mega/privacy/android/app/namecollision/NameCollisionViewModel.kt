@@ -243,15 +243,16 @@ class NameCollisionViewModel @Inject constructor(
 
     /**
      * After having the option "Apply on the next conflicts" checked, manages data to apply
-     * the same user's choice for all the pending collisions.
-     *
-     * @param choice    Resolution type as [NameCollisionChoice].
+     * the cancel action for all the pending collisions.
      */
-    private fun proceedWithAll(choice: NameCollisionChoice) {
-        if (isFolderUploadContext) {
-            while (pendingCollisions.isNotEmpty()) {
-                continueWithNext(choice)
+    private fun cancelAll() {
+        when {
+            isFolderUploadContext -> {
+                while (pendingCollisions.isNotEmpty()) {
+                    continueWithNext(NameCollisionChoice.CANCEL)
+                }
             }
+            else -> currentCollision.value = null
         }
     }
 
@@ -263,16 +264,14 @@ class NameCollisionViewModel @Inject constructor(
     private fun continueWithNext(choice: NameCollisionChoice) {
         if (isFolderUploadContext) {
             resolvedCollisions.add(currentCollision.value!!.apply { this.choice = choice })
-        }
 
-        if (pendingCollisions.isEmpty()) {
-            when {
-                isFolderUploadContext -> collisionsResolution.value =
-                    arrayListOf<NameCollisionResult>().apply { addAll(resolvedCollisions) }
-                choice == NameCollisionChoice.CANCEL -> currentCollision.value = null
+            if (pendingCollisions.isEmpty()) {
+                collisionsResolution.apply {
+                    value = arrayListOf<NameCollisionResult>().apply { addAll(resolvedCollisions) }
+                }
+
+                return
             }
-
-            return
         }
 
         val nextCollision = pendingCollisions[0]
@@ -308,7 +307,7 @@ class NameCollisionViewModel @Inject constructor(
         when {
             applyOnNext && pendingFileCollisions > 0 && pendingFolderCollisions > 0 ->
                 proceedWithAllFiles(NameCollisionChoice.CANCEL)
-            applyOnNext -> proceedWithAll(NameCollisionChoice.CANCEL)
+            applyOnNext -> cancelAll()
             else -> continueWithNext(NameCollisionChoice.CANCEL)
         }
     }
@@ -316,10 +315,11 @@ class NameCollisionViewModel @Inject constructor(
     /**
      * Renames the current item and the next ones if [applyOnNext]. Only available for files.
      *
+     * @param context       Required Context for uploads.
      * @param applyOnNext   True if should rename the next file collisions.
      */
-    fun rename(applyOnNext: Boolean) {
-        proceedWithAction(applyOnNext = applyOnNext, rename = true)
+    fun rename(context: Context, applyOnNext: Boolean) {
+        proceedWithAction(context = context, applyOnNext = applyOnNext, rename = true)
     }
 
     /**
@@ -330,7 +330,11 @@ class NameCollisionViewModel @Inject constructor(
      *                      false otherwise.
      * @param rename        True if the user's choice is rename, false otherwise.
      */
-    fun proceedWithAction(context: Context? = null, applyOnNext: Boolean, rename: Boolean = false) {
+    fun proceedWithAction(
+        context: Context? = null,
+        applyOnNext: Boolean,
+        rename: Boolean = false
+    ) {
         val choice =
             if (rename) NameCollisionChoice.RENAME
             else NameCollisionChoice.REPLACE_UPDATE_MERGE
@@ -341,7 +345,7 @@ class NameCollisionViewModel @Inject constructor(
                     applyOnNext && pendingFileCollisions > 0 && pendingFolderCollisions > 0 -> {
                         upload(context!!, proceedWithAllFiles(choice), rename)
                     }
-                    applyOnNext -> upload(context!!, pendingCollisions, rename)
+                    applyOnNext -> upload(context!!, getAllPendingCollisions(), rename)
                     else -> singleUpload(context!!, rename)
                 }
             }
@@ -350,7 +354,7 @@ class NameCollisionViewModel @Inject constructor(
                     applyOnNext && pendingFileCollisions > 0 && pendingFolderCollisions > 0 -> {
                         move(proceedWithAllFiles(choice), rename)
                     }
-                    applyOnNext -> move(pendingCollisions, rename)
+                    applyOnNext -> move(getAllPendingCollisions(), rename)
                     else -> singleMove(rename)
                 }
             }
@@ -359,12 +363,18 @@ class NameCollisionViewModel @Inject constructor(
                     applyOnNext && pendingFileCollisions > 0 && pendingFolderCollisions > 0 -> {
                         copy(proceedWithAllFiles(choice), rename)
                     }
-                    applyOnNext -> copy(pendingCollisions, rename)
+                    applyOnNext -> copy(getAllPendingCollisions(), rename)
                     else -> singleCopy(rename)
                 }
             }
         }
     }
+
+    /**
+     * Adds the current collision to the pending list before processing all the collisions.
+     */
+    private fun getAllPendingCollisions(): MutableList<NameCollisionResult> =
+        pendingCollisions.apply { add(0, currentCollision.value!!) }
 
     /**
      * Proceeds with the upload of the current collision.
@@ -401,7 +411,11 @@ class NameCollisionViewModel @Inject constructor(
      * @param list      List of collisions to upload.
      * @param rename    True if should rename the file, false otherwise.
      */
-    private fun upload(context: Context, list: MutableList<NameCollisionResult>, rename: Boolean) {
+    private fun upload(
+        context: Context,
+        list: MutableList<NameCollisionResult>,
+        rename: Boolean
+    ) {
         if (isFolderUploadContext) {
             return
         }
@@ -421,6 +435,10 @@ class NameCollisionViewModel @Inject constructor(
      * @param quantity  Number of processed uploads.
      */
     private fun setUploadResult(quantity: Int) {
+        if (quantity == pendingCollisions.size) {
+            pendingCollisions.clear()
+        }
+
         actionResult.value = Event(
             NameCollisionActionResult(
                 message = StringResourcesUtils.getQuantityString(
@@ -472,6 +490,10 @@ class NameCollisionViewModel @Inject constructor(
      *                          about the movement.
      */
     private fun setMovementResult(movementResult: MoveRequestResult.GeneralMovement) {
+        if (movementResult.count == pendingCollisions.size) {
+            pendingCollisions.clear()
+        }
+
         actionResult.value =
             Event(
                 NameCollisionActionResult(
@@ -519,6 +541,10 @@ class NameCollisionViewModel @Inject constructor(
      * @param copyResult    [CopyRequestResult] containing all the required info about the copy.
      */
     private fun setCopyResult(copyResult: CopyRequestResult) {
+        if (copyResult.count == pendingCollisions.size) {
+            pendingCollisions.clear()
+        }
+
         actionResult.value =
             Event(
                 NameCollisionActionResult(

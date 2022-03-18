@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.Intent
 import io.reactivex.rxjava3.core.Completable
 import io.reactivex.rxjava3.kotlin.blockingSubscribeBy
+import mega.privacy.android.app.ShareInfo
 import mega.privacy.android.app.UploadService
 import mega.privacy.android.app.globalmanagement.TransfersManagement
 import mega.privacy.android.app.namecollision.data.NameCollision
@@ -47,7 +48,7 @@ class UploadNodeUseCase @Inject constructor(
             Intent(context, UploadService::class.java)
                 .putExtra(UploadService.EXTRA_FILEPATH, absolutePath)
                 .putExtra(UploadService.EXTRA_NAME, fileName)
-                .putExtra(UploadService.EXTRA_LAST_MODIFIED, lastModified)
+                .putExtra(UploadService.EXTRA_LAST_MODIFIED, lastModified / 1000)
                 .putExtra(UploadService.EXTRA_PARENT_HASH, parentHandle)
         )
 
@@ -57,6 +58,27 @@ class UploadNodeUseCase @Inject constructor(
 
         emitter.onComplete()
     }
+
+    /**
+     * Uploads a file from ShareInfo.
+     *
+     * @param context       Application Context required to start the service.
+     * @param shareInfo     The ShareInfo to upload.
+     * @param parentHandle  Handle of the MegaNode in which the file has to be uploaded.
+     * @return Completable.
+     */
+    fun upload(
+        context: Context,
+        shareInfo: ShareInfo,
+        parentHandle: Long
+    ): Completable =
+        upload(
+            context = context,
+            absolutePath = shareInfo.fileAbsolutePath,
+            fileName = shareInfo.title,
+            lastModified = shareInfo.lastModified,
+            parentHandle = parentHandle
+        )
 
     /**
      * Uploads a file after resolving a name collision.
@@ -93,10 +115,46 @@ class UploadNodeUseCase @Inject constructor(
         upload(
             context,
             uploadResult.absolutePath,
-            if (uploadResult.renameName != null) uploadResult.renameName!! else uploadResult.name,
+            uploadResult.renameName ?: uploadResult.name,
             uploadResult.lastModified,
             uploadResult.parentHandle
         )
+
+    /**
+     * Uploads a list of ShareInfo.
+     *
+     * @param context       Application Context required to start the service.
+     * @param infos         The result of the name collisions.
+     * @param parentHandle  Handle of the MegaNode in which the file has to be uploaded.
+     * @return Completable.
+     */
+    fun uploadInfos(
+        context: Context,
+        infos: List<ShareInfo>,
+        parentHandle: Long
+    ): Completable =
+        Completable.create { emitter ->
+            if (infos.isEmpty()) {
+                emitter.onError(NoPendingCollisionsException())
+                return@create
+            }
+
+            for (shareInfo in infos) {
+                if (emitter.isDisposed) {
+                    return@create
+                }
+
+                upload(context, shareInfo, parentHandle).blockingSubscribeBy(
+                    onError = { error -> logError("Cannot upload.", error) }
+                )
+            }
+
+            if (emitter.isDisposed) {
+                return@create
+            }
+
+            emitter.onComplete()
+        }
 
     /**
      * Uploads a list of files after resolving name collisions.
