@@ -154,26 +154,26 @@ abstract class BaseZoomFragment : BaseFragment(), GestureScaleCallback,
         }
     }
 
-    /**
-     *     Remove the green border and selected checkmark icon for unselected items
-     */
-    private fun deselectNodesUI() {
-        for (pos in actionModeViewModel.deselectedNodeIndices) {
-            listView.findViewHolderForAdapterPosition(pos)?.let { viewHolder ->
-                val itemView = viewHolder.itemView
-
-                itemView
-                    .findViewById<SimpleDraweeView>(R.id.thumbnail)
-                    .hierarchy
-                    .roundingParams = null
-
-                itemView
-                    .findViewById<ImageView>(R.id.icon_selected)
-                    ?.visibility = View.GONE
-            }
-        }
-        actionModeViewModel.deselectedNodeIndices.clear()
-    }
+//    /**
+//     *     Remove the green border and selected checkmark icon for unselected items
+//     */
+//    private fun deselectNodesUI() {
+//        for (pos in actionModeViewModel.deselectedNodeIndices) {
+//            listView.findViewHolderForAdapterPosition(pos)?.let { viewHolder ->
+//                val itemView = viewHolder.itemView
+//
+//                itemView
+//                    .findViewById<SimpleDraweeView>(R.id.thumbnail)
+//                    .hierarchy
+//                    .roundingParams = null
+//
+//                itemView
+//                    .findViewById<ImageView>(R.id.icon_selected)
+//                    ?.visibility = View.GONE
+//            }
+//        }
+//        actionModeViewModel.deselectedNodeIndices.clear()
+//    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -246,7 +246,7 @@ abstract class BaseZoomFragment : BaseFragment(), GestureScaleCallback,
         actionModeCallback =
             ActionModeCallback(mManagerActivity, actionModeViewModel, megaApi)
 
-        actionModeViewModel.setUIDirty(false)
+//        actionModeViewModel.setUIDirty(false)
 
         observeItemLongClick()
         observeSelectedItems()
@@ -495,7 +495,7 @@ abstract class BaseZoomFragment : BaseFragment(), GestureScaleCallback,
 
                 override fun onAnimationEnd(animation: Animator?) {
                     updateUiWhenAnimationEnd()
-                    deselectNodesUI()
+//                    deselectNodesUI()
                 }
 
                 override fun onAnimationCancel(animation: Animator?) {
