@@ -3807,8 +3807,6 @@
     <string name="same_item_name_warning">È già presente un oggetto con lo stesso nome</string>
     <!-- Label of the option menu. When clicking this button, the app shows the info of the related item, e.g. file, folder, contact, chat, etc. -->
     <string name="general_info">Info</string>
-    <!-- Item menu option upon right click on one image or video to save it to device gallery -->
-    <string name="general_save_to_gallery">Salva nella galleria</string>
     <!-- settings of the Media section -->
     <string name="settings_media">Media</string>
     <!-- settings title of the Media section -->
@@ -4259,4 +4257,18 @@
     <string name="title_dcim_folder_dialog">Cartella DCIM</string>
     <!-- Content of DCIM folder warning dialog -->
     <string name="content_dcim_folder_dialog">MEGA carica le tue immagini dalla galleria. Per cambiare la posizione di caricamento, per favore vai nelle Impostazioni dei Caricamenti da fotocamera.</string>
+    <!-- Error shown when download a file that has violated ToS/AUP. -->
+    <string name="tos_aup_violation">ToS/AUP violation</string>
+    <!-- Title message of existing subscription dialog -->
+    <string name="title_existing_subscription">Buy new subscription?</string>
+    <!-- Text of buy new subscription button -->
+    <string name="button_buy_new_subscription">Buy new subscription</string>
+    <!-- Dialog message when the existing subscription is from Android platform (Google and Huawei)  -->
+    <string name="message_subscription_from_android_platform">You already have a subscription. If you buy another one you will be charged twice. To avoid this, cancel your current subscription through %1$s. Visit our Help Centre for more information.</string>
+    <!-- Dialog message when the existing subscription is from iTunes  -->
+    <string name="message_subscription_from_itunes">You already have a subscription. If you buy another one you will be charged twice. To avoid this, cancel your current subscription from your iTunes account. Visit our Help Centre for more information.</string>
+    <!-- Dialog message when the existing subscription is from other platform (Stripe and ECP)  -->
+    <string name="message_subscription_from_other_platform">You already have a subscription. If you buy another one, you will be charged twice. To avoid this, cancel your current subscription by going to MEGA in a desktop or mobile web browser. Visit our Help Centre for more information.</string>
+    <!-- Warning show to the user when the app needs bluetooth connect permissions to get the best meeting experience and the user has denied them.-->
+    <string name="meeting_bluetooth_connect_required_permissions_warning">Vai nelle Impostazioni per dare a MEGA il permesso di accedere ai tuoi dispositivi vicini utilizzando il Bluetooth.</string>
 </resources>

@@ -8,6 +8,7 @@
         android:id="@+id/cam_sync_scroll_view"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:paddingTop="24dp"
         android:paddingBottom="52dp"
         app:layout_constraintTop_toTopOf="parent">
 
