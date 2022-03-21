@@ -23,6 +23,7 @@ import mega.privacy.android.app.utils.MegaNodeUtil.getThumbnailFileName
 import mega.privacy.android.app.utils.RxUtil.blockingGetOrNull
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaError
+import nz.mega.sdk.MegaNode
 import nz.mega.sdk.MegaRequest
 import javax.inject.Inject
 
@@ -69,8 +70,12 @@ class GetNameCollisionResultUseCase @Inject constructor(
                     collisionLastModified = if (node.isFile) modificationTime else creationTime
                     collisionThumbnail =
                         if (thumbnailFile?.exists() == true) thumbnailFile.toUri() else null
-                    renameName = collision.name.getRenameName()
                 }
+
+                getRenameName(collision).blockingSubscribeBy(
+                    onError = { error -> emitter.onError(error) },
+                    onSuccess = { result -> nameCollisionResult.renameName = result }
+                )
 
                 emitter.onNext(nameCollisionResult)
 
@@ -178,23 +183,58 @@ class GetNameCollisionResultUseCase @Inject constructor(
 
     /**
      * Gets the name for rename a collision item in case the user wants to rename it.
+     * Before returning the new name, always check if there is another collision with it.
+     *
+     * @param collision [NameCollision] from which the rename name has to be get.
+     * @return Single with the rename name.
+     */
+    private fun getRenameName(collision: NameCollision): Single<String> =
+        Single.create { emitter ->
+            val parentNode = getNodeUseCase.get(collision.parentHandle).blockingGetOrNull()
+            if (parentNode == null) {
+                emitter.onError(MegaNodeException.ParentDoesNotExistException())
+                return@create
+            }
+
+            var newName = collision.name
+            var newCollision: MegaNode?
+            do {
+                if (emitter.isDisposed) {
+                    return@create
+                }
+
+                newName = newName.getPossibleRenameName()
+                newCollision = megaApi.getChildNode(parentNode, newName)
+            } while (newCollision != null)
+
+            when {
+                emitter.isDisposed -> return@create
+                else -> emitter.onSuccess(newName)
+            }
+        }
+
+    /**
+     * Gets a possible name for rename a collision item in case the user wants to rename it.
      *
      * @return The rename name.
      */
-    private fun String.getRenameName(): String {
+    private fun String.getPossibleRenameName(): String {
         var extension = MimeTypeList.typeForName(this).extension
         val pointIndex = lastIndexOf(extension) - 1
         val name = substring(0, pointIndex)
         extension = substring(pointIndex, length)
+        val pattern = "\\(\\d+\\)".toRegex()
+        val matches = pattern.findAll(name)
 
         val renameName = when {
-            name.endsWith("($Int)") -> {
+            matches.count() > 0 -> {
+                val result = matches.last().value
+                val number = result.replace("(", "").replace(")", "")
+                val newNumber = number.toInt() + 1
                 val firstIndex = lastIndexOf('(')
-                var value: Int = name.substring(firstIndex, lastIndexOf(')') + 1).toInt()
-                value++
-                name.substring(0, firstIndex + 1).plus("$value)")
+                name.substring(0, firstIndex + 1).plus("$newNumber)")
             }
-            else -> name.plus("(1)")
+            else -> name.plus(" (1)")
         }
 
         return renameName.plus(extension)

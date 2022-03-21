@@ -76,6 +76,7 @@ class NameCollisionViewModel @Inject constructor(
     private val pendingCollisions: MutableList<NameCollisionResult> = mutableListOf()
     var pendingFileCollisions = 0
     var pendingFolderCollisions = 0
+    private var allCollisionsProcessed = false
 
     init {
         getFileVersionsOption()
@@ -274,6 +275,11 @@ class NameCollisionViewModel @Inject constructor(
             }
         }
 
+        if (pendingCollisions.isEmpty()) {
+            currentCollision.value = null
+            return
+        }
+
         val nextCollision = pendingCollisions[0]
         pendingCollisions.removeAt(0)
         if (nextCollision.nameCollision.isFile) {
@@ -371,10 +377,20 @@ class NameCollisionViewModel @Inject constructor(
     }
 
     /**
-     * Adds the current collision to the pending list before processing all the collisions.
+     * Processes all the pending collisions, including the current one,
+     * and returns a list with all of them.
      */
-    private fun getAllPendingCollisions(): MutableList<NameCollisionResult> =
-        pendingCollisions.apply { add(0, currentCollision.value!!) }
+    private fun getAllPendingCollisions(): MutableList<NameCollisionResult> {
+        val allPendingCollisions = mutableListOf<NameCollisionResult>().apply {
+            add(currentCollision.value!!)
+            addAll(pendingCollisions)
+        }
+
+        allCollisionsProcessed = true
+        pendingCollisions.clear()
+
+        return allPendingCollisions
+    }
 
     /**
      * Proceeds with the upload of the current collision.
@@ -435,10 +451,6 @@ class NameCollisionViewModel @Inject constructor(
      * @param quantity  Number of processed uploads.
      */
     private fun setUploadResult(quantity: Int) {
-        if (quantity == pendingCollisions.size) {
-            pendingCollisions.clear()
-        }
-
         actionResult.value = Event(
             NameCollisionActionResult(
                 message = StringResourcesUtils.getQuantityString(
@@ -458,11 +470,18 @@ class NameCollisionViewModel @Inject constructor(
      * @param rename    True if should rename the node, false otherwise.
      */
     private fun singleMove(rename: Boolean) {
+        val choice =
+            if (rename) NameCollisionChoice.RENAME
+            else NameCollisionChoice.REPLACE_UPDATE_MERGE
+
         moveNodeUseCase.move(currentCollision.value!!, rename)
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeBy(
-                onSuccess = { result -> setMovementResult(result) },
+                onSuccess = { result ->
+                    setMovementResult(result)
+                    continueWithNext(choice)
+                },
                 onError = { error -> LogUtil.logWarning(error.message) })
             .addTo(composite)
     }
@@ -490,10 +509,6 @@ class NameCollisionViewModel @Inject constructor(
      *                          about the movement.
      */
     private fun setMovementResult(movementResult: MoveRequestResult.GeneralMovement) {
-        if (movementResult.count == pendingCollisions.size) {
-            pendingCollisions.clear()
-        }
-
         actionResult.value =
             Event(
                 NameCollisionActionResult(
@@ -510,11 +525,18 @@ class NameCollisionViewModel @Inject constructor(
      * @param rename    True if should rename the node, false otherwise.
      */
     private fun singleCopy(rename: Boolean) {
+        val choice =
+            if (rename) NameCollisionChoice.RENAME
+            else NameCollisionChoice.REPLACE_UPDATE_MERGE
+
         copyNodeUseCase.copy(currentCollision.value!!, rename)
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeBy(
-                onSuccess = { result -> setCopyResult(result) },
+                onSuccess = { result ->
+                    setCopyResult(result)
+                    continueWithNext(choice)
+                },
                 onError = { error -> LogUtil.logWarning(error.message) })
             .addTo(composite)
     }
@@ -541,10 +563,6 @@ class NameCollisionViewModel @Inject constructor(
      * @param copyResult    [CopyRequestResult] containing all the required info about the copy.
      */
     private fun setCopyResult(copyResult: CopyRequestResult) {
-        if (copyResult.count == pendingCollisions.size) {
-            pendingCollisions.clear()
-        }
-
         actionResult.value =
             Event(
                 NameCollisionActionResult(

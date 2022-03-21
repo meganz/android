@@ -345,7 +345,7 @@ class NameCollisionActivity : PasscodeActivity() {
             else viewModel.pendingFolderCollisions
 
         binding.applyForAllCheck.apply {
-            isVisible = pendingCollisions > 1
+            isVisible = pendingCollisions > 0
 
             if (isVisible) {
                 text =
