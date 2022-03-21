@@ -25,7 +25,6 @@ import static nz.mega.sdk.MegaApiJava.STORAGE_STATE_PAYWALL;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.core.content.ContextCompat;
 
 public class QRCodeSaveBottomSheetDialogFragment extends BaseBottomSheetDialogFragment implements View.OnClickListener {
 
@@ -70,21 +69,16 @@ public class QRCodeSaveBottomSheetDialogFragment extends BaseBottomSheetDialogFr
             }
 
             ShareInfo info = ShareInfo.infoFromFile(qrFile);
-
-            if (getActivity() != null && info != null) {
-                Intent intent = new Intent(getActivity(), UploadService.class);
-                intent.putExtra(UploadService.EXTRA_FILEPATH, info.getFileAbsolutePath());
-                intent.putExtra(UploadService.EXTRA_NAME, info.getTitle());
-                intent.putExtra(UploadService.EXTRA_PARENT_HASH, parentNode.getHandle());
-                intent.putExtra(UploadService.EXTRA_SIZE, info.getSize());
-                intent.putExtra("qrfile", true);
-                ContextCompat.startForegroundService(getActivity(), intent);
-                ((QRCodeActivity) getActivity()).showSnackbar(null, getString(R.string.save_qr_cloud_drive, qrFile.getName()));
-            }
+            Intent intent = new Intent(getActivity().getApplicationContext(), UploadService.class);
+            intent.putExtra(UploadService.EXTRA_FILEPATH, info.getFileAbsolutePath());
+            intent.putExtra(UploadService.EXTRA_NAME, info.getTitle());
+            intent.putExtra(UploadService.EXTRA_PARENT_HASH, parentNode.getHandle());
+            intent.putExtra(UploadService.EXTRA_SIZE, info.getSize());
+            intent.putExtra("qrfile", true);
+            getActivity().startService(intent);
+            ((QRCodeActivity) getActivity()).showSnackbar(null, getString(R.string.save_qr_cloud_drive, qrFile.getName()));
         } else {
-            if (getActivity() != null) {
-                ((QRCodeActivity) getActivity()).showSnackbar(null, getString(R.string.error_upload_qr));
-            }
+            ((QRCodeActivity) getActivity()).showSnackbar(null, getString(R.string.error_upload_qr));
         }
     }
 

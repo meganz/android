@@ -29,8 +29,6 @@ import static mega.privacy.android.app.utils.LogUtil.logWarning;
 import static mega.privacy.android.app.utils.StringResourcesUtils.getQuantityString;
 import static nz.mega.sdk.MegaApiJava.STORAGE_STATE_PAYWALL;
 
-import androidx.core.content.ContextCompat;
-
 public class UploadUtil {
 
     /**
@@ -60,7 +58,7 @@ public class UploadUtil {
         intent.putExtra(UploadService.EXTRA_NAME, file.getName());
         intent.putExtra(UploadService.EXTRA_PARENT_HASH, parentHandle);
         intent.putExtra(UploadService.EXTRA_SIZE, file.length());
-        ContextCompat.startForegroundService(context, intent);
+        context.startService(intent);
     }
 
     /**
@@ -151,7 +149,7 @@ public class UploadUtil {
         }
 
         for (UploadFolderResult result : uploadResults) {
-            ContextCompat.startForegroundService(activity, new Intent(activity, UploadService.class)
+            activity.startService(new Intent(activity, UploadService.class)
                     .putExtra(UploadService.EXTRA_FILEPATH, result.getAbsolutePath())
                     .putExtra(UploadService.EXTRA_NAME, result.getName())
                     .putExtra(UploadService.EXTRA_LAST_MODIFIED, result.getLastModified())
