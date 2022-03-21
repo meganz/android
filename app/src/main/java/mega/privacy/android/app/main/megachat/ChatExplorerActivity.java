@@ -514,7 +514,7 @@ public class ChatExplorerActivity extends PasscodeActivity implements View.OnCli
      * Receive changes to OnChatPresenceLastGreen and make the necessary changes
      */
     public void checkChatChanges() {
-        Disposable dis = getChatChangesUseCase.get()
+        Disposable chatSubscription = getChatChangesUseCase.get()
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .filter(result -> result instanceof GetChatChangesUseCase.Result.OnChatPresenceLastGreen)
@@ -525,6 +525,6 @@ public class ChatExplorerActivity extends PasscodeActivity implements View.OnCli
                     onChatPresenceLastGreen(userHandle, lastGreen);
                 }, (error) -> logError("Error " + error));
 
-        composite.add(dis);
+        composite.add(chatSubscription);
     }
 }

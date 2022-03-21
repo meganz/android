@@ -1508,20 +1508,6 @@ public class MegaApplication extends MultiDexApplication implements Application.
 
     @Override
     public void onDbError(MegaChatApiJava api, int error, String msg) {
-        logError("MEGAChatSDK onDBError occurred. Error " + error + " with message " + msg);
-        switch (error) {
-            case MegaChatApi.DB_ERROR_IO:
-                currentActivity.finishAndRemoveTask();
-                break;
-
-            case MegaChatApi.DB_ERROR_FULL:
-                RunOnUIThreadUtils.INSTANCE.post(() -> {
-                    Util.showErrorAlertDialog(
-                            getString(R.string.error_not_enough_free_space),
-                            true, currentActivity);
-                    return Unit.INSTANCE;
-                });
-        }
     }
 
     public void updateAppBadge() {

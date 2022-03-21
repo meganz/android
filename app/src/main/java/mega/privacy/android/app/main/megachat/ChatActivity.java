@@ -9763,17 +9763,13 @@ public class ChatActivity extends PasscodeActivity
      * Receive changes to OnChatListItemUpdate, OnChatOnlineStatusUpdate, OnChatConnectionStateUpdate and OnChatPresenceLastGreen and make the necessary changes
      */
     private void checkChatChanges() {
-        Disposable dis = getChatChangesUseCase.get()
+        Disposable chatSubscription = getChatChangesUseCase.get()
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .filter(result -> result instanceof GetChatChangesUseCase.Result.OnChatListItemUpdate ||
-                        result instanceof GetChatChangesUseCase.Result.OnChatOnlineStatusUpdate ||
-                        result instanceof GetChatChangesUseCase.Result.OnChatConnectionStateUpdate ||
-                        result instanceof GetChatChangesUseCase.Result.OnChatPresenceLastGreen)
                 .subscribe((next) -> {
                     if (next instanceof GetChatChangesUseCase.Result.OnChatListItemUpdate) {
                         MegaChatListItem item = ((GetChatChangesUseCase.Result.OnChatListItemUpdate) next).component1();
-                        if(item.hasChanged(MegaChatListItem.CHANGE_TYPE_UNREAD_COUNT)) {
+                        if (item.hasChanged(MegaChatListItem.CHANGE_TYPE_UNREAD_COUNT)) {
                             updateNavigationToolbarIcon();
                         }
                     }
@@ -9798,6 +9794,6 @@ public class ChatActivity extends PasscodeActivity
 
                 }, (error) -> logError("Error " + error));
 
-        composite.add(dis);
+        composite.add(chatSubscription);
     }
 }

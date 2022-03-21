@@ -1429,17 +1429,15 @@ public class GroupChatInfoActivity extends PasscodeActivity
      * Receive changes to OnChatListItemUpdate, OnChatOnlineStatusUpdate, OnChatConnectionStateUpdate and and OnChatPresenceLastGreen make the necessary changes
      */
     private void checkChatChanges() {
-        Disposable dis = getChatChangesUseCase.get()
+        Disposable chatSubscription = getChatChangesUseCase.get()
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .filter(result -> result instanceof GetChatChangesUseCase.Result.OnChatListItemUpdate ||
-                                result instanceof GetChatChangesUseCase.Result.OnChatOnlineStatusUpdate ||
-                                result instanceof GetChatChangesUseCase.Result.OnChatConnectionStateUpdate ||
-                                result instanceof GetChatChangesUseCase.Result.OnChatPresenceLastGreen)
                 .subscribe((next) -> {
                     if (next instanceof GetChatChangesUseCase.Result.OnChatListItemUpdate) {
                         MegaChatListItem item = ((GetChatChangesUseCase.Result.OnChatListItemUpdate) next).component1();
-                        onChatListItemUpdate(item);
+                        if (item != null) {
+                            onChatListItemUpdate(item);
+                        }
                     }
 
                     if (next instanceof GetChatChangesUseCase.Result.OnChatOnlineStatusUpdate) {
@@ -1463,6 +1461,6 @@ public class GroupChatInfoActivity extends PasscodeActivity
 
                 }, (error) -> logError("Error " + error));
 
-        composite.add(dis);
+        composite.add(chatSubscription);
     }
 }

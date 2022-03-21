@@ -2081,12 +2081,9 @@ public class ContactInfoActivity extends PasscodeActivity
 	 * Receive changes to OnChatOnlineStatusUpdate, OnChatConnectionStateUpdate and OnChatPresenceLastGreen and make the necessary changes
 	 */
 	private void checkChatChanges() {
-		Disposable dis = getChatChangesUseCase.get()
+		Disposable chatSubscription = getChatChangesUseCase.get()
 				.subscribeOn(Schedulers.io())
 				.observeOn(AndroidSchedulers.mainThread())
-				.filter(result -> result instanceof GetChatChangesUseCase.Result.OnChatOnlineStatusUpdate ||
-						result instanceof GetChatChangesUseCase.Result.OnChatConnectionStateUpdate ||
-						result instanceof GetChatChangesUseCase.Result.OnChatPresenceLastGreen)
 				.subscribe((next) -> {
 					if (next instanceof GetChatChangesUseCase.Result.OnChatOnlineStatusUpdate) {
 						long userHandle = ((GetChatChangesUseCase.Result.OnChatOnlineStatusUpdate) next).component1();
@@ -2109,6 +2106,6 @@ public class ContactInfoActivity extends PasscodeActivity
 
 				}, (error) -> logError("Error " + error));
 
-		composite.add(dis);
+		composite.add(chatSubscription);
 	}
 }

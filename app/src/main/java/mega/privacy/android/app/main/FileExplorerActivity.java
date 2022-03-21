@@ -2856,7 +2856,7 @@ public class FileExplorerActivity extends TransfersManagementActivity
 	 * Receive changes to OnChatPresenceLastGreen and make the necessary changes
 	 */
 	public void checkChatChanges() {
-		Disposable dis = getChatChangesUseCase.get()
+		Disposable chatSubscription = getChatChangesUseCase.get()
 				.subscribeOn(Schedulers.io())
 				.observeOn(AndroidSchedulers.mainThread())
 				.filter(result -> result instanceof GetChatChangesUseCase.Result.OnChatPresenceLastGreen)
@@ -2867,6 +2867,6 @@ public class FileExplorerActivity extends TransfersManagementActivity
 					onChatPresenceLastGreen(userHandle, lastGreen);
 				}, (error) -> logError("Error " + error));
 
-		composite.add(dis);
+		composite.add(chatSubscription);
 	}
 }

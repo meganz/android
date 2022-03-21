@@ -3768,7 +3768,7 @@ public class AddContactActivity extends PasscodeActivity implements View.OnClick
      * Receive changes to OnChatPresenceLastGreen and make the necessary changes
      */
     private void checkChatChanges() {
-        Disposable dis = getChatChangesUseCase.get()
+        Disposable chatSubscription = getChatChangesUseCase.get()
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .filter(result -> result instanceof GetChatChangesUseCase.Result.OnChatPresenceLastGreen)
@@ -3779,6 +3779,6 @@ public class AddContactActivity extends PasscodeActivity implements View.OnClick
                     onChatPresenceLastGreen(userHandle, lastGreen);
                 }, (error) -> logError("Error " + error));
 
-        composite.add(dis);
+        composite.add(chatSubscription);
     }
 }

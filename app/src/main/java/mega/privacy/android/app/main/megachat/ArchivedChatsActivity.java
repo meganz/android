@@ -367,7 +367,7 @@ public class ArchivedChatsActivity extends PasscodeActivity implements MegaChatR
      * Receive changes to OnChatListItemUpdate and make the necessary changes
      */
     private void checkChatChanges() {
-        Disposable dis = getChatChangesUseCase.get()
+        Disposable chatSubscription = getChatChangesUseCase.get()
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .filter(result -> result instanceof GetChatChangesUseCase.Result.OnChatListItemUpdate)
@@ -388,6 +388,6 @@ public class ArchivedChatsActivity extends PasscodeActivity implements MegaChatR
                     }
                 }, (error) -> logError("Error " + error));
 
-        composite.add(dis);
+        composite.add(chatSubscription);
     }
 }
