@@ -4,6 +4,8 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
+import nz.mega.sdk.MegaApiAndroid
+import nz.mega.sdk.MegaNode
 import javax.inject.Inject
 
 @HiltViewModel
@@ -11,9 +13,6 @@ class ActionModeViewModel @Inject constructor() : ViewModel() {
 
     // The full set of nodes
     private lateinit var nodesData: List<NodeItem>
-
-    private var uiDirty: Boolean = true
-    val deselectedNodeIndices = mutableSetOf<Int>()
 
     // Notify the fragment that the user intends to enter action mode by long click
     private val _longClick = MutableLiveData<Event<NodeItem>>()
@@ -43,7 +42,7 @@ class ActionModeViewModel @Inject constructor() : ViewModel() {
 
     private fun updateSelectedNodeList(nodeItem: NodeItem) {
         nodeItem.selected = !nodeItem.selected
-        nodeItem.uiDirty = uiDirty
+        nodeItem.uiDirty = true
 
         _animNodeIndices.value = hashSetOf(nodeItem.index)
 
@@ -51,7 +50,6 @@ class ActionModeViewModel @Inject constructor() : ViewModel() {
             selectedNodeList.add(nodeItem)
         } else {
             selectedNodeList.remove(nodeItem)
-            deselectedNodeIndices.add(nodeItem.index)
         }
 
         _selectedNodes.value = selectedNodeList
@@ -63,9 +61,8 @@ class ActionModeViewModel @Inject constructor() : ViewModel() {
 
         selectedNodeList.forEach {
             it.selected = false
-            it.uiDirty = uiDirty
+            it.uiDirty = true
             animNodeIndices.add(it.index)
-            deselectedNodeIndices.add(it.index)
         }
 
         _animNodeIndices.value = animNodeIndices
@@ -79,7 +76,7 @@ class ActionModeViewModel @Inject constructor() : ViewModel() {
         nodesData.forEach {
             if (!it.selected) {
                 it.selected = true
-                it.uiDirty = uiDirty
+                it.uiDirty = true
                 animNodeIndices.add(it.index)
             }
         }
@@ -115,9 +112,11 @@ class ActionModeViewModel @Inject constructor() : ViewModel() {
     }
 
     /**
-     * Set the boolean value for the NodeItems
+     * Set all the Favourite nodes to unFavourite
      */
-    fun setUIDirty(uiDirty: Boolean) {
-        this.uiDirty = uiDirty
+    fun removeFavourites(megaApi: MegaApiAndroid, nodeItems: List<MegaNode> ) {
+        nodeItems.forEach {
+                megaApi.setNodeFavourite(it,false)
+        }
     }
 }

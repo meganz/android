@@ -403,7 +403,7 @@ public class ChatActivity extends PasscodeActivity
 
     ActionBar aB;
     Toolbar tB;
-    RelativeLayout toolbarElementsInside;
+    LinearLayout toolbarElementsInside;
 
     private EmojiTextView titleToolbar;
     private MarqueeTextView individualSubtitleToobar;
@@ -2061,8 +2061,6 @@ public class ChatActivity extends PasscodeActivity
         }else{
             width = scaleWidthPx(TITLE_TOOLBAR_LAND, getOutMetrics());
         }
-        titleToolbar.setMaxWidthEmojis(width);
-        titleToolbar.setTypeEllipsize(TextUtils.TruncateAt.END);
         setSubtitleVisibility();
 
         if (chatC.isInAnonymousMode() && megaChatApi.getChatConnectionState(idChat)==MegaChatApi.CHAT_CONNECTION_ONLINE) {
@@ -8617,7 +8615,7 @@ public class ChatActivity extends PasscodeActivity
             activityVisible = true;
             updateCallBanner();
             if(aB != null && aB.getTitle() != null){
-                titleToolbar.setText(adjustForLargeFont(titleToolbar.getText().toString()));
+                titleToolbar.setText(titleToolbar.getText());
             }
             updateActionModeTitle();
         }

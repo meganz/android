@@ -11,6 +11,7 @@ import androidx.lifecycle.ViewModel;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 import mega.privacy.android.app.ShareInfo;
 
@@ -31,13 +32,15 @@ public class FileExplorerActivityViewModel extends ViewModel {
      */
     public void ownFilePrepareTask(Activity activity, Intent intent) {
         final Intent i = intent;
-        executor.submit(() -> {
+        if (!executor.isShutdown()) {
+            executor.submit(() -> {
                 List<ShareInfo> shareInfos = (List<ShareInfo>) i.getSerializableExtra(EXTRA_SHARE_INFOS);
                 if (shareInfos == null) {
                     shareInfos = ShareInfo.processIntent(i, activity);
                 }
                 info.postValue(shareInfos);
-        });
+            });
+        }
     }
 
     /**
@@ -45,5 +48,12 @@ public class FileExplorerActivityViewModel extends ViewModel {
      */
     public void shutdownExecutorService(){
         executor.shutdown();
+        try {
+            if (!executor.awaitTermination(800, TimeUnit.MILLISECONDS)) {
+                executor.shutdownNow();
+            }
+        } catch (InterruptedException e) {
+            executor.shutdownNow();
+        }
     }
 }

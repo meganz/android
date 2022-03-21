@@ -136,7 +136,7 @@ abstract class GalleryBaseFetcher(
             }
 
             val selected = selectedNodesMap[node.handle]?.selected ?: false
-            fileNodesMap[node.handle] = GalleryItem(
+            val galleryItem = GalleryItem(
                 node,
                 INVALID_POSITION,
                 INVALID_POSITION,
@@ -148,6 +148,7 @@ abstract class GalleryBaseFetcher(
                 selected,
                 true
             )
+            fileNodesMap[node.handle] = galleryItem
         }
 
         result.postValue(ArrayList(fileNodesMap.values))
