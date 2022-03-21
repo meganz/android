@@ -376,10 +376,8 @@ public class ArchivedChatsActivity extends PasscodeActivity implements MegaChatR
                     MegaChatListItem item = next.component1();
                     if (item != null) {
                         logDebug("Chat ID: " + item.getChatId());
-                        if (archivedChatsFragment != null) {
-                            if (archivedChatsFragment.isAdded()) {
-                                archivedChatsFragment.listItemUpdate(item);
-                            }
+                        if (archivedChatsFragment != null && archivedChatsFragment.isAdded()) {
+                            archivedChatsFragment.listItemUpdate(item);
                         }
 
                         if (item.hasChanged(MegaChatListItem.CHANGE_TYPE_UNREAD_COUNT)) {

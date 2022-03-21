@@ -8048,7 +8048,6 @@ public class ChatActivity extends PasscodeActivity
         if (megaChatApi != null && idChat != -1) {
             megaChatApi.closeChatRoom(idChat, this);
             MegaApplication.setClosedChat(true);
-            composite.clear();
 
             if (chatRoom != null && chatRoom.isPreview()) {
                 megaChatApi.closeChatPreview(idChat);
@@ -8784,7 +8783,6 @@ public class ChatActivity extends PasscodeActivity
             }
         }
     }
-
 
     public void takePicture(){
         logDebug("takePicture");

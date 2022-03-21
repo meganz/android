@@ -1944,19 +1944,6 @@ public class ContactInfoActivity extends PasscodeActivity
     
     }
 
-	private void onChatOnlineStatusUpdate(long userhandle, int status, boolean inProgress) {
-		logDebug("userhandle: " + userhandle + ", status: " + status + ", inProgress: " + inProgress);
-		setContactPresenceStatus();
-		requestLastGreen(status);
-	}
-
-	private void onChatConnectionStateUpdate(long chatid, int newState) {
-		MegaChatRoom chatRoom = megaChatApi.getChatRoom(chatid);
-		if (isChatConnectedInOrderToInitiateACall(newState, chatRoom)) {
-			startCallWithChatOnline(megaChatApi.getChatRoom(chatid));
-		}
-	}
-
 	private void onChatPresenceLastGreen(long userhandle, int lastGreen) {
 		if(userhandle == user.getHandle()){
 			logDebug("Update last green");
@@ -2086,16 +2073,18 @@ public class ContactInfoActivity extends PasscodeActivity
 				.observeOn(AndroidSchedulers.mainThread())
 				.subscribe((next) -> {
 					if (next instanceof GetChatChangesUseCase.Result.OnChatOnlineStatusUpdate) {
-						long userHandle = ((GetChatChangesUseCase.Result.OnChatOnlineStatusUpdate) next).component1();
 						int status = ((GetChatChangesUseCase.Result.OnChatOnlineStatusUpdate) next).component2();
-						boolean inProgress = ((GetChatChangesUseCase.Result.OnChatOnlineStatusUpdate) next).component3();
-						onChatOnlineStatusUpdate(userHandle, status, inProgress);
+						setContactPresenceStatus();
+						requestLastGreen(status);
 					}
 
 					if (next instanceof GetChatChangesUseCase.Result.OnChatConnectionStateUpdate) {
 						long chatId = ((GetChatChangesUseCase.Result.OnChatConnectionStateUpdate) next).component1();
 						int newState = ((GetChatChangesUseCase.Result.OnChatConnectionStateUpdate) next).component2();
-						onChatConnectionStateUpdate(chatId, newState);
+						MegaChatRoom chatRoom = megaChatApi.getChatRoom(chatId);
+						if (isChatConnectedInOrderToInitiateACall(newState, chatRoom)) {
+							startCallWithChatOnline(megaChatApi.getChatRoom(chatId));
+						}
 					}
 
 					if (next instanceof GetChatChangesUseCase.Result.OnChatPresenceLastGreen) {
