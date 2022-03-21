@@ -3727,8 +3727,6 @@
     <string name="same_item_name_warning">已有一个相同的项目名</string>
     <!-- Label of the option menu. When clicking this button, the app shows the info of the related item, e.g. file, folder, contact, chat, etc. -->
     <string name="general_info">信息</string>
-    <!-- Item menu option upon right click on one image or video to save it to device gallery -->
-    <string name="general_save_to_gallery">保存到图库</string>
     <!-- settings of the Media section -->
     <string name="settings_media">媒体</string>
     <!-- settings title of the Media section -->
@@ -4169,4 +4167,18 @@
     <string name="title_dcim_folder_dialog">DCIM文件夹</string>
     <!-- Content of DCIM folder warning dialog -->
     <string name="content_dcim_folder_dialog">MEGA默认从图库上传您的照片。如需更改上传位置，请前往相机上传设置。</string>
+    <!-- Error shown when download a file that has violated ToS/AUP. -->
+    <string name="tos_aup_violation">违反服务条款/使用限制政策</string>
+    <!-- Title message of existing subscription dialog -->
+    <string name="title_existing_subscription">购买新订阅？</string>
+    <!-- Text of buy new subscription button -->
+    <string name="button_buy_new_subscription">购买新订阅</string>
+    <!-- Dialog message when the existing subscription is from Android platform (Google and Huawei)  -->
+    <string name="message_subscription_from_android_platform">您当前已经有一个订阅。若购买另一个，您将被收取两次费用。为避免重复订阅，请通过%1$s取消您当前的订阅。访问我们的帮助中心了解更多信息。</string>
+    <!-- Dialog message when the existing subscription is from iTunes  -->
+    <string name="message_subscription_from_itunes">您当前已经有一个订阅。若购买另一个，您将被收取两次费用。为避免重复订阅，请从您的iTunes帐户取消您当前的订阅。访问我们的帮助中心了解更多信息。</string>
+    <!-- Dialog message when the existing subscription is from other platform (Stripe and ECP)  -->
+    <string name="message_subscription_from_other_platform">您当前已经有一个订阅。若购买另一个，您将被收取两次费用。为避免重复订阅，请在电脑或手机网页浏览器中登录MEGA以取消您当前的订阅。访问我们的帮助中心了解更多信息。</string>
+    <!-- Warning show to the user when the app needs bluetooth connect permissions to get the best meeting experience and the user has denied them.-->
+    <string name="meeting_bluetooth_connect_required_permissions_warning">前往“设置”并授予MEGA使用蓝牙访问附近设备的权限。</string>
 </resources>

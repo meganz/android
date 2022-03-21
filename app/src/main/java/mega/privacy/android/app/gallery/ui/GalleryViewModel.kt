@@ -17,6 +17,7 @@ import mega.privacy.android.app.globalmanagement.SortOrderManagement
 import mega.privacy.android.app.search.callback.SearchCallback
 import mega.privacy.android.app.utils.Constants.EVENT_NODES_CHANGE
 import mega.privacy.android.app.utils.Constants.INVALID_POSITION
+import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 import nz.mega.sdk.MegaCancelToken
 import nz.mega.sdk.MegaNode
 
@@ -199,6 +200,14 @@ abstract class GalleryViewModel constructor(
         // Trigger data load.
         liveDataRoot.value = liveDataRoot.value
     }
+
+    /**
+     * Get items node handles
+     *
+     * @return  Node handles as LongArray
+     */
+    fun getItemsHandle(): LongArray =
+        items.value?.map { it.node?.handle ?: INVALID_HANDLE }?.toLongArray() ?: LongArray(0)
 
     /**
      * Make the list adapter to rebind all item views with data since

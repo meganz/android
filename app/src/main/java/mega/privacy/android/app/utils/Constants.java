@@ -364,8 +364,9 @@ public class Constants {
     public static final int VIDEO_SEARCH_ADAPTER = 2033;
     public static final int RECENTS_BUCKET_ADAPTER = 2034;
     public static final int VERSIONS_ADAPTER = 2035;
-    public static final int MEDIA_BROWSE_ADAPTER = 2036;
     public static final int FROM_IMAGE_VIEWER = 2036;
+    public static final int MEDIA_BROWSE_ADAPTER = 2037;
+    public static final int ALBUM_CONTENT_ADAPTER = 2038;
 
     public static final int VIEWER_FROM_PHOTOS = 1;
     public static final int VIEWER_FROM_INCOMING_SHARES = 2;

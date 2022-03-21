@@ -23,7 +23,6 @@ import mega.privacy.android.app.BaseActivity
 import mega.privacy.android.app.MimeTypeList.typeForName
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.contract.ChatExplorerActivityContract
-import mega.privacy.android.app.components.ListenScrollChangesHelper
 import mega.privacy.android.app.components.attacher.MegaAttacher
 import mega.privacy.android.app.databinding.FragmentGetLinkBinding
 import mega.privacy.android.app.fragments.BaseFragment
@@ -120,9 +119,9 @@ class GetLinkFragment : BaseFragment(), DatePickerDialog.OnDateSetListener, Scro
     }
 
     private fun setupView() {
-        ListenScrollChangesHelper().addViewToListen(
-            binding.scrollViewGetLink
-        ) { _, _, _, _, _ -> checkScroll() }
+        binding.scrollViewGetLink.setOnScrollChangeListener { _, _, _, _, _ ->
+            checkScroll()
+        }
 
         setThumbnail()
 
