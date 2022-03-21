@@ -48,25 +48,29 @@
                 android:id="@+id/chat_group_contact_properties_info_title_layout"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_gravity="start"
-                android:gravity="start|center_vertical"
-                android:orientation="horizontal">
+                android:orientation="horizontal"
+                android:paddingStart="0dp"
+                android:paddingEnd="10dp"
+                android:weightSum="1">
 
                 <mega.privacy.android.app.components.twemoji.EmojiTextView
                     android:id="@+id/chat_group_contact_properties_info_title"
+                    style="@style/TextAppearance.Mega.Subtitle1.Variant"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginEnd="8dp"
-                    android:maxLines="1"
+                    android:layout_weight="1"
+                    android:ellipsize="end"
                     android:singleLine="true"
-                    android:textAppearance="?attr/textAppearanceSubtitle1"
-                    app:emojiSize="18sp" />
+                    app:layout_constraintWidth_max="wrap" />
 
                 <ImageView
                     android:id="@+id/chat_group_contact_properties_edit_icon"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_marginStart="9dp"
+                    android:layout_weight="0"
                     android:src="@drawable/ic_rename"
+                    android:visibility="gone"
                     app:tint="?android:attr/textColorSecondary" />
             </LinearLayout>
 

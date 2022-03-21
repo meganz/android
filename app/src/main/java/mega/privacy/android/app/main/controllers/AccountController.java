@@ -14,7 +14,6 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 
-import androidx.core.content.ContextCompat;
 import androidx.preference.PreferenceManager;
 import androidx.print.PrintHelper;
 import androidx.appcompat.app.AlertDialog;
@@ -326,7 +325,7 @@ public class AccountController {
             context.startService(cancelTransfersIntent);
             cancelTransfersIntent = new Intent(context, UploadService.class);
             cancelTransfersIntent.setAction(UploadService.ACTION_CANCEL);
-            ContextCompat.startForegroundService(context, cancelTransfersIntent);
+            context.startService(cancelTransfersIntent);
         }
         catch(IllegalStateException e){
             //If the application is in a state where the service can not be started (such as not in the foreground in a state when services are allowed) - included in API 26

@@ -25,8 +25,6 @@ import static mega.privacy.android.app.utils.LogUtil.logDebug;
 import static mega.privacy.android.app.utils.LogUtil.logWarning;
 import static nz.mega.sdk.MegaApiJava.STORAGE_STATE_PAYWALL;
 
-import androidx.core.content.ContextCompat;
-
 public class UploadUtil {
 
     /**
@@ -56,7 +54,7 @@ public class UploadUtil {
         intent.putExtra(UploadService.EXTRA_NAME, file.getName());
         intent.putExtra(UploadService.EXTRA_PARENT_HASH, parentHandle);
         intent.putExtra(UploadService.EXTRA_SIZE, file.length());
-        ContextCompat.startForegroundService(context, intent);
+        context.startService(intent);
     }
 
     /**
