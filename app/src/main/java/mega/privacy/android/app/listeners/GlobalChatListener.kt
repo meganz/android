@@ -9,7 +9,6 @@ import mega.privacy.android.app.constants.EventConstants.EVENT_CHAT_CONNECTION_S
 import mega.privacy.android.app.constants.EventConstants.EVENT_CHAT_TITLE_CHANGE
 import mega.privacy.android.app.constants.EventConstants.EVENT_PRIVILEGES_CHANGE
 import mega.privacy.android.app.utils.Constants.*
-import mega.privacy.android.app.utils.LogUtil
 import mega.privacy.android.app.utils.LogUtil.logDebug
 import mega.privacy.android.app.utils.LogUtil.logError
 import mega.privacy.android.app.utils.RunOnUIThreadUtils.post
@@ -75,7 +74,7 @@ class GlobalChatListener(private val application: MegaApplication) : MegaChatLis
         config: MegaChatPresenceConfig?
     ) {
         if (config?.isPending == false) {
-            LogUtil.logDebug("Launch local broadcast")
+            logDebug("Launch local broadcast")
             val intent = Intent(BROADCAST_ACTION_INTENT_SIGNAL_PRESENCE)
             application.sendBroadcast(intent)
         }
