@@ -2,7 +2,6 @@ package mega.privacy.android.app.upgradeAccount
 
 import android.os.Bundle
 import android.view.MenuItem
-import android.view.View
 import android.view.View.INVISIBLE
 import androidx.activity.viewModels
 import androidx.constraintlayout.widget.ConstraintSet
@@ -10,7 +9,6 @@ import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.PasscodeActivity
-import mega.privacy.android.app.components.ListenScrollChangesHelper
 import mega.privacy.android.app.databinding.ActivityPaymentBinding
 import mega.privacy.android.app.interfaces.Scrollable
 import mega.privacy.android.app.service.iab.BillingManagerImpl
@@ -55,9 +53,7 @@ class PaymentActivity : PasscodeActivity(), Scrollable {
             title = StringResourcesUtils.getString(R.string.payment).uppercase(Locale.getDefault())
         }
 
-        ListenScrollChangesHelper().addViewToListen(
-            binding.scrollview
-        ) { _: View?, _: Int, _: Int, _: Int, _: Int ->
+        binding.scrollview.setOnScrollChangeListener { _, _, _, _, _ ->
             checkScroll()
         }
 

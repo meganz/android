@@ -1,0 +1,82 @@
+package mega.privacy.android.app.main.tasks;
+
+import android.content.Context;
+import android.os.AsyncTask;
+
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
+
+import mega.privacy.android.app.DatabaseHandler;
+import mega.privacy.android.app.MegaOffline;
+
+import static mega.privacy.android.app.utils.FileUtil.*;
+import static mega.privacy.android.app.utils.LogUtil.*;
+import static mega.privacy.android.app.utils.OfflineUtils.*;
+
+/**
+ * Background task to verify the offline nodes
+ */
+public class CheckOfflineNodesTask extends AsyncTask<String, Void, String> {
+    Context context;
+    DatabaseHandler dbH;
+
+    public CheckOfflineNodesTask(Context context){
+        this.context = context;
+        dbH = DatabaseHandler.getDbHandler(context.getApplicationContext());
+    }
+
+    @Override
+    protected String doInBackground(String... params) {
+        logDebug("doInBackground-Async Task CheckOfflineNodesTask");
+
+        ArrayList<MegaOffline> offlineNodes = dbH.getOfflineFiles();
+
+        File file = getOfflineFolder(context, OFFLINE_DIR);
+
+        if(isFileAvailable(file)){
+
+            for(int i=0; i<offlineNodes.size();i++){
+                MegaOffline mOff = offlineNodes.get(i);
+                File fileToCheck = getOfflineFile(context, mOff);
+                if (!isFileAvailable(fileToCheck)) {
+                    int removed = dbH.deleteOfflineFile(mOff);
+                    logDebug("File removed: " + removed);
+                } else {
+                    logDebug("The file exists!");
+                }
+            }
+            //Check no empty folders
+            offlineNodes = dbH.getOfflineFiles();
+            for(int i=0; i<offlineNodes.size();i++){
+                MegaOffline mOff = offlineNodes.get(i);
+                //Get if its folder
+                if(mOff.isFolder()){
+                    ArrayList<MegaOffline> children = dbH.findByParentId(mOff.getId());
+                    if(children.size()<1){
+                        logDebug("Delete the empty folder: " + mOff.getName());
+                        dbH.deleteOfflineFile(mOff);
+                        File folderToDelete = getOfflineFile(context, mOff);
+                        try {
+                            deleteFolderAndSubfolders(context, folderToDelete);
+                        } catch (IOException e) {
+                            logError("IOException mOff", e);
+                            e.printStackTrace();
+                        }
+                    }
+                }
+            }
+
+        }
+        else{
+            //Delete the DB if NOT empty
+            if(offlineNodes.size()>0){
+                //Delete the content
+                logDebug("Clear Offline TABLE");
+                dbH.clearOffline();
+            }
+        }
+
+        return null;
+    }
+}

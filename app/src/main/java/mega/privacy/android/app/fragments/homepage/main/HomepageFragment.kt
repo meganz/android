@@ -1,9 +1,6 @@
 package mega.privacy.android.app.fragments.homepage.main
 
-import android.animation.Animator
-import android.animation.AnimatorListenerAdapter
-import android.animation.AnimatorSet
-import android.animation.ObjectAnimator
+import android.animation.*
 import android.annotation.SuppressLint
 import android.content.*
 import android.graphics.Color
@@ -37,19 +34,16 @@ import mega.privacy.android.app.fragments.homepage.banner.BannerAdapter
 import mega.privacy.android.app.fragments.homepage.banner.BannerClickHandler
 import mega.privacy.android.app.fragments.settingsFragments.startSceen.util.StartScreenUtil.notAlertAnymoreAboutStartScreen
 import mega.privacy.android.app.fragments.settingsFragments.startSceen.util.StartScreenUtil.shouldShowStartScreenDialog
-import mega.privacy.android.app.lollipop.AddContactActivity
-import mega.privacy.android.app.lollipop.ManagerActivity
+import mega.privacy.android.app.utils.*
+import mega.privacy.android.app.main.AddContactActivity
+import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.utils.AlertDialogUtil.isAlertDialogShown
-import mega.privacy.android.app.utils.ColorUtils
 import mega.privacy.android.app.utils.ColorUtils.getThemeColor
 import mega.privacy.android.app.utils.Constants.*
 import mega.privacy.android.app.utils.RunOnUIThreadUtils.post
 import mega.privacy.android.app.utils.RunOnUIThreadUtils.runDelay
-import mega.privacy.android.app.utils.StringResourcesUtils
-import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.Util.isOnline
 import mega.privacy.android.app.utils.ViewUtils.waitForLayout
-import mega.privacy.android.app.utils.callManager
 import nz.mega.sdk.MegaBanner
 import nz.mega.sdk.MegaChatApi
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
@@ -228,6 +222,7 @@ class HomepageFragment : Fragment() {
         LiveEventBus.get(EVENT_HOMEPAGE_VISIBILITY, Boolean::class.java)
             .removeObserver(homepageVisibilityChangeObserver)
 
+        searchInputView.stopCallAnimation()
         startScreenDialog?.dismiss()
     }
 
@@ -319,6 +314,11 @@ class HomepageFragment : Fragment() {
         viewModel.avatar.observe(viewLifecycleOwner) {
             searchInputView.setAvatar(it)
         }
+
+        viewModel.onShowCallIcon().observe(viewLifecycleOwner) {
+            searchInputView.setOngoingCallVisibility(it)
+        }
+
         viewModel.chatStatus.observe(viewLifecycleOwner) {
             val iconRes = if (Util.isDarkMode(requireContext())) {
                 when (it) {
@@ -347,6 +347,10 @@ class HomepageFragment : Fragment() {
 
         searchInputView.setOnSearchInputClickListener {
             doIfOnline(false) { activity.homepageToSearch() }
+        }
+
+        searchInputView.setOngoingCallClickListener {
+            doIfOnline(false) { activity.returnCallWithPermissions() }
         }
     }
 

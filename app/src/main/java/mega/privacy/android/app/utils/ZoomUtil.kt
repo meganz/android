@@ -28,6 +28,9 @@ object ZoomUtil {
     @JvmStatic
     var MEDIA_ZOOM_LEVEL = ZOOM_DEFAULT
 
+    @JvmStatic
+    var ALBUM_ZOOM_LEVEL = ZOOM_DEFAULT
+
     // Span count portrait
     private const val SPAN_COUNT_PORTRAIT_OUT_2X = 12
     private const val SPAN_COUNT_PORTRAIT_OUT_1X = 5
@@ -127,5 +130,6 @@ object ZoomUtil {
         PHOTO_ZOOM_LEVEL = ZOOM_DEFAULT
         IMAGES_ZOOM_LEVEL = ZOOM_DEFAULT
         MEDIA_ZOOM_LEVEL = ZOOM_DEFAULT
+        ALBUM_ZOOM_LEVEL = ZOOM_DEFAULT
     }
 }

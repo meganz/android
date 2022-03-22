@@ -8,6 +8,7 @@ import kotlinx.coroutines.launch
 import mega.privacy.android.app.domain.usecase.*
 import mega.privacy.android.app.presentation.settings.model.SettingsState
 import mega.privacy.android.app.utils.LogUtil
+import timber.log.Timber
 import javax.inject.Inject
 
 @HiltViewModel
@@ -15,8 +16,8 @@ class SettingsViewModel @Inject constructor(
     private val getAccountDetails: GetAccountDetails,
     private val canDeleteAccount: CanDeleteAccount,
     private val refreshPasscodeLockPreference: RefreshPasscodeLockPreference,
-    private val isLoggingEnabled: IsLoggingEnabled,
-    private val isChatLoggingEnabled: IsChatLoggingEnabled,
+    areSdkLogsEnabled: AreSdkLogsEnabled,
+    areChatLogsEnabled: AreChatLogsEnabled,
     private val isCameraSyncEnabled: IsCameraSyncEnabled,
     private val rootNodeExists: RootNodeExists,
     private val isMultiFactorAuthAvailable: IsMultiFactorAuthAvailable,
@@ -25,16 +26,19 @@ class SettingsViewModel @Inject constructor(
     private val isHideRecentActivityEnabled: IsHideRecentActivityEnabled,
     private val toggleAutoAcceptQRLinks: ToggleAutoAcceptQRLinks,
     fetchMultiFactorAuthSetting: FetchMultiFactorAuthSetting,
-    isOnline: IsOnline,
+    monitorConnectivity: MonitorConnectivity,
     private val requestAccountDeletion: RequestAccountDeletion,
     private val isChatLoggedIn: IsChatLoggedIn,
-    private val setLoggingEnabled: SetLoggingEnabled,
-    private val setChatLoggingEnabled: SetChatLoggingEnabled,
+    private val setSdkLogsEnabled: SetSdkLogsEnabled,
+    private val setChatLoggingEnabled: SetChatLogsEnabled,
 ) : ViewModel() {
     private val userAccount = MutableStateFlow(getAccountDetails(false))
     private val state = MutableStateFlow(initialiseState())
     val uiState: StateFlow<SettingsState> = state
-    private val online = isOnline().shareIn(viewModelScope, SharingStarted.Eagerly, replay = 1)
+    private val online = monitorConnectivity().shareIn(viewModelScope, SharingStarted.Eagerly, replay = 1)
+
+    private val sdkLogsEnabled = areSdkLogsEnabled().stateIn(viewModelScope, SharingStarted.Eagerly, false)
+    private val chatLogsEnabled = areChatLogsEnabled().stateIn(viewModelScope, SharingStarted.Eagerly, false)
 
     private fun initialiseState(): SettingsState {
         return SettingsState(
@@ -141,8 +145,8 @@ class SettingsViewModel @Inject constructor(
     }
 
     fun disableLogger(): Boolean {
-        return if (isLoggingEnabled()){
-            setLoggingEnabled(false)
+        return if (sdkLogsEnabled.value){
+            viewModelScope.launch{ setSdkLogsEnabled(false) }
             true
         } else{
             false
@@ -150,8 +154,8 @@ class SettingsViewModel @Inject constructor(
     }
 
     fun disableChatLogger(): Boolean {
-        return if (isChatLoggingEnabled()){
-            setChatLoggingEnabled(false)
+        return if (chatLogsEnabled.value){
+            viewModelScope.launch{ setChatLoggingEnabled(false) }
             true
         } else{
             false
@@ -159,11 +163,11 @@ class SettingsViewModel @Inject constructor(
     }
 
     fun enableLogger() {
-        setLoggingEnabled(true)
+        viewModelScope.launch{ setSdkLogsEnabled(true) }
     }
 
     fun enableChatLogger() {
-        setChatLoggingEnabled(true)
+        viewModelScope.launch{ setChatLoggingEnabled(true) }
     }
 
 }

@@ -9,9 +9,9 @@ import android.view.Window;
 import android.widget.ProgressBar;
 
 import mega.privacy.android.app.listeners.PasswordLinkListener;
-import mega.privacy.android.app.lollipop.DecryptAlertDialog;
-import mega.privacy.android.app.lollipop.FileLinkActivity;
-import mega.privacy.android.app.lollipop.FolderLinkActivity;
+import mega.privacy.android.app.main.DecryptAlertDialog;
+import mega.privacy.android.app.main.FileLinkActivity;
+import mega.privacy.android.app.main.FolderLinkActivity;
 import mega.privacy.android.app.activities.PasscodeActivity;
 import nz.mega.sdk.MegaError;
 

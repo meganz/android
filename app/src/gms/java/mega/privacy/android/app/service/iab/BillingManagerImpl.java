@@ -43,7 +43,7 @@ import java.util.List;
 
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
-import mega.privacy.android.app.lollipop.ManagerActivity;
+import mega.privacy.android.app.main.ManagerActivity;
 import mega.privacy.android.app.middlelayer.iab.BillingManager;
 import mega.privacy.android.app.middlelayer.iab.BillingUpdatesListener;
 import mega.privacy.android.app.middlelayer.iab.MegaPurchase;
@@ -110,6 +110,9 @@ public class BillingManagerImpl implements PurchasesUpdatedListener, BillingMana
     private final List<Purchase> mPurchases = new ArrayList<>();
     private List<SkuDetails> mSkus;
 
+    public static final String SUBSCRIPTION_PLATFORM_PACKAGE_NAME = "com.android.vending";
+    public static final String SUBSCRIPTION_LINK_FOR_APP_STORE = "http://play.google.com/store/account/subscriptions";
+    public static final String SUBSCRIPTION_LINK_FOR_BROWSER = "http://play.google.com/store/account/subscriptions";
 
     /**
      * Handles all the interactions with Play Store (via Billing library), maintains connection to
@@ -399,13 +402,12 @@ public class BillingManagerImpl implements PurchasesUpdatedListener, BillingMana
             @Override
             public void onBillingSetupFinished(BillingResult billingResult) {
                 logDebug("Response code is: " + billingResult.getResponseCode());
-                int BillingResponseCodeCode = billingResult.getResponseCode();
+                mIsServiceConnected = billingResult.getResponseCode() == BillingResponseCode.OK;
 
-                if (BillingResponseCodeCode == BillingResponseCode.OK) {
-                    mIsServiceConnected = true;
-                    if (executeOnSuccess != null) {
-                        executeOnSuccess.run();
-                    }
+                if (!mIsServiceConnected) {
+                    mBillingUpdatesListener.onBillingClientSetupFailed();
+                } else if (executeOnSuccess != null) {
+                    executeOnSuccess.run();
                 }
             }
 

@@ -4,6 +4,8 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
+import nz.mega.sdk.MegaApiAndroid
+import nz.mega.sdk.MegaNode
 import javax.inject.Inject
 
 @HiltViewModel
@@ -44,10 +46,11 @@ class ActionModeViewModel @Inject constructor() : ViewModel() {
 
         _animNodeIndices.value = hashSetOf(nodeItem.index)
 
-        if (nodeItem.selected)
+        if (nodeItem.selected) {
             selectedNodeList.add(nodeItem)
-        else
+        } else {
             selectedNodeList.remove(nodeItem)
+        }
 
         _selectedNodes.value = selectedNodeList
     }
@@ -106,5 +109,14 @@ class ActionModeViewModel @Inject constructor() : ViewModel() {
             }
         }
         _selectedNodes.value = selectedNodeList
+    }
+
+    /**
+     * Set all the Favourite nodes to unFavourite
+     */
+    fun removeFavourites(megaApi: MegaApiAndroid, nodeItems: List<MegaNode> ) {
+        nodeItems.forEach {
+                megaApi.setNodeFavourite(it,false)
+        }
     }
 }

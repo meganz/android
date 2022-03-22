@@ -131,10 +131,17 @@ class UpgradeAccountActivity : ChooseAccountActivity() {
      */
     override fun onUpgradeClick(upgradeType: Int) {
         with(viewModel) {
+            if (!isBillingAvailable()) {
+                LogUtil.logWarning("Billing not available")
+                showBillingWarning()
+                return
+            }
+
             if (getPaymentBitSet() == null) {
                 LogUtil.logWarning("PaymentBitSet Null")
                 return
             }
+
             refreshAccountInfo()
             subscriptionCheck(upgradeType)
         }

@@ -6,7 +6,7 @@ import android.text.TextPaint;
 import android.util.AttributeSet;
 import android.widget.TextView;
 
-import mega.privacy.android.app.lollipop.megachat.ChatActivity;
+import mega.privacy.android.app.main.megachat.ChatActivity;
 
 import static mega.privacy.android.app.utils.LogUtil.*;
 

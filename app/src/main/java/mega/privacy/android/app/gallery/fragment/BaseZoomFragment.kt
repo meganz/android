@@ -6,7 +6,10 @@ import android.animation.AnimatorSet
 import android.annotation.SuppressLint
 import android.content.res.Configuration
 import android.os.Bundle
-import android.view.*
+import android.view.Menu
+import android.view.MenuInflater
+import android.view.MenuItem
+import android.view.View
 import android.view.ViewGroup.MarginLayoutParams
 import android.widget.ImageView
 import android.widget.LinearLayout
@@ -23,7 +26,6 @@ import androidx.recyclerview.widget.RecyclerView
 import com.facebook.drawee.view.SimpleDraweeView
 import mega.privacy.android.app.R
 import mega.privacy.android.app.components.GestureScaleListener.GestureScaleCallback
-import mega.privacy.android.app.components.ListenScrollChangesHelper
 import mega.privacy.android.app.components.dragger.DragThumbnailGetter
 import mega.privacy.android.app.components.dragger.DragToExitSupport
 import mega.privacy.android.app.components.scrollBar.FastScroller
@@ -32,6 +34,7 @@ import mega.privacy.android.app.fragments.homepage.*
 import mega.privacy.android.app.fragments.homepage.photos.ScaleGestureHandler
 import mega.privacy.android.app.fragments.homepage.photos.ZoomViewModel
 import mega.privacy.android.app.fragments.managerFragments.cu.CustomHideBottomViewOnScrollBehaviour
+import mega.privacy.android.app.fragments.managerFragments.cu.album.AlbumContentFragment
 import mega.privacy.android.app.gallery.adapter.GalleryAdapter
 import mega.privacy.android.app.gallery.adapter.GalleryCardAdapter
 import mega.privacy.android.app.gallery.data.GalleryCard
@@ -39,11 +42,10 @@ import mega.privacy.android.app.gallery.data.GalleryItem
 import mega.privacy.android.app.gallery.data.GalleryItemSizeConfig
 import mega.privacy.android.app.gallery.ui.GalleryViewModel
 import mega.privacy.android.app.imageviewer.ImageViewerActivity
-import mega.privacy.android.app.lollipop.ManagerActivity
+import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.modalbottomsheet.NodeOptionsBottomSheetDialogFragment
 import mega.privacy.android.app.utils.*
-import mega.privacy.android.app.utils.Constants.MIN_ITEMS_SCROLLBAR
-import mega.privacy.android.app.utils.Constants.ORDER_CAMERA
+import mega.privacy.android.app.utils.Constants.*
 import mega.privacy.android.app.utils.ZoomUtil.ZOOM_OUT_2X
 import mega.privacy.android.app.utils.ZoomUtil.getItemWidth
 import mega.privacy.android.app.utils.ZoomUtil.getMargin
@@ -52,7 +54,6 @@ import mega.privacy.android.app.utils.ZoomUtil.getSelectedFrameWidth
 import mega.privacy.android.app.utils.ZoomUtil.setMargin
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 import nz.mega.sdk.MegaChatApiJava
-import java.util.ArrayList
 
 /**
  * A parent fragment with basic zoom UI logic, like menu, gestureScaleCallback.
@@ -121,6 +122,9 @@ abstract class BaseZoomFragment : BaseFragment(), GestureScaleCallback,
     abstract fun handleOnCreateOptionsMenu()
 
     open fun animateBottomView() {
+        // AlbumContentFragment doesn't have view type panel.
+        if(this is AlbumContentFragment) return
+
         val deltaY =
             viewTypePanel.height.toFloat() + resources.getDimensionPixelSize(R.dimen.cu_view_type_button_vertical_margin)
 
@@ -128,14 +132,14 @@ abstract class BaseZoomFragment : BaseFragment(), GestureScaleCallback,
             viewTypePanel
                 .animate()
                 .translationYBy(deltaY)
-                .setDuration(Constants.ANIMATION_DURATION)
+                .setDuration(ANIMATION_DURATION)
                 .withEndAction { viewTypePanel.visibility = View.GONE }
                 .start()
         } else {
             viewTypePanel
                 .animate()
                 .translationYBy(-deltaY)
-                .setDuration(Constants.ANIMATION_DURATION)
+                .setDuration(ANIMATION_DURATION)
                 .withStartAction { viewTypePanel.visibility = View.VISIBLE }
                 .start()
         }
@@ -192,11 +196,11 @@ abstract class BaseZoomFragment : BaseFragment(), GestureScaleCallback,
     }
 
     private fun subscribeObservers() {
-        zoomViewModel.zoom.observe(viewLifecycleOwner, { zoom: Int ->
+        zoomViewModel.zoom.observe(viewLifecycleOwner) { zoom: Int ->
             val needReload = ZoomUtil.needReload(getCurrentZoom(), zoom)
             zoomViewModel.setCurrentZoom(zoom)
             handleZoomChange(zoom, needReload)
-        })
+        }
 
         viewModel.dateCards.observe(viewLifecycleOwner, ::showCards)
 
@@ -213,14 +217,13 @@ abstract class BaseZoomFragment : BaseFragment(), GestureScaleCallback,
         DragToExitSupport.observeDragSupportEvents(
             viewLifecycleOwner,
             listView,
-            Constants.VIEWER_FROM_PHOTOS
+            VIEWER_FROM_PHOTOS
         )
     }
 
     private fun setupActionMode() {
         actionModeCallback =
             ActionModeCallback(mManagerActivity, actionModeViewModel, megaApi)
-
         observeItemLongClick()
         observeSelectedItems()
         observeAnimatedItems()
@@ -309,26 +312,24 @@ abstract class BaseZoomFragment : BaseFragment(), GestureScaleCallback,
 
     @SuppressLint("ClickableViewAccessibility")
     protected fun setupListView() {
-        listView.itemAnimator = Util.noChangeRecyclerViewItemAnimator()
-        elevateToolbarWhenScrolling()
-
-        listView.clipToPadding = false
-        listView.setHasFixedSize(true)
-
         scaleGestureHandler = ScaleGestureHandler(
             context,
             this
         )
-        listView.setOnTouchListener(scaleGestureHandler)
-    }
+        with(listView) {
+            itemAnimator = Util.noChangeRecyclerViewItemAnimator()
+            addOnScrollListener(object : RecyclerView.OnScrollListener() {
+                override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+                    super.onScrolled(recyclerView, dx, dy)
 
-    private fun elevateToolbarWhenScrolling() = ListenScrollChangesHelper().addViewToListen(
-        listView
-    ) { v: View?, _, _, _, _ ->
-        callManager {
-            it.changeAppBarElevation(
-                v!!.canScrollVertically(-1)
-            )
+                    callManager { manager ->
+                        manager.changeAppBarElevation(recyclerView.canScrollVertically(-1))
+                    }
+                }
+            })
+            clipToPadding = false
+            setHasFixedSize(true)
+            setOnTouchListener(scaleGestureHandler)
         }
     }
 
@@ -340,13 +341,6 @@ abstract class BaseZoomFragment : BaseFragment(), GestureScaleCallback,
                 newViewClicked(ALL_VIEW)
                 val photoPosition = gridAdapter.getNodePosition(card.node.handle)
                 layoutManager.scrollToPosition(photoPosition)
-
-                val node = gridAdapter.getNodeAtPosition(photoPosition)
-                node?.let {
-                    RunOnUIThreadUtils.post {
-                        openPhoto(it)
-                    }
-                }
             }
             MONTHS_VIEW -> {
                 newViewClicked(DAYS_VIEW)
@@ -380,20 +374,31 @@ abstract class BaseZoomFragment : BaseFragment(), GestureScaleCallback,
             ?.itemView?.findViewById<ImageView>(R.id.thumbnail)?.also {
                 val parentNodeHandle = nodeItem.node?.parentHandle ?: return
                 val nodeHandle = nodeItem.node?.handle ?: INVALID_HANDLE
-
-                val intent = ImageViewerActivity.getIntentForParentNode(
-                    requireContext(),
-                    parentNodeHandle,
-                    getOrder(),
-                    nodeHandle
-                )
+                val childrenNodes = viewModel.getItemsHandle()
+                val intent = when (adapterType) {
+                    ALBUM_CONTENT_ADAPTER, PHOTOS_BROWSE_ADAPTER -> {
+                        ImageViewerActivity.getIntentForChildren(
+                            requireContext(),
+                            childrenNodes,
+                            nodeHandle
+                        )
+                    }
+                    else -> {
+                        ImageViewerActivity.getIntentForParentNode(
+                            requireContext(),
+                            parentNodeHandle,
+                            getOrder(),
+                            nodeHandle
+                        )
+                    }
+                }
 
                 (listView.adapter as? DragThumbnailGetter)?.let { getter ->
                     DragToExitSupport.putThumbnailLocation(
                         intent,
                         listView,
                         nodeItem.index,
-                        Constants.VIEWER_FROM_PHOTOS,
+                        VIEWER_FROM_PHOTOS,
                         getter
                     )
                 }
@@ -418,11 +423,13 @@ abstract class BaseZoomFragment : BaseFragment(), GestureScaleCallback,
         })
 
     private fun observeSelectedItems() =
-        actionModeViewModel.selectedNodes.observe(viewLifecycleOwner, {
+        actionModeViewModel.selectedNodes.observe(viewLifecycleOwner) {
             if (it.isEmpty()) {
                 actionMode?.apply {
                     finish()
                 }
+
+                whenEndActionMode()
             } else {
                 actionModeCallback.nodeCount = getNodeCount()
 
@@ -439,13 +446,15 @@ abstract class BaseZoomFragment : BaseFragment(), GestureScaleCallback,
                 }
 
                 actionMode?.title = it.size.toString()
+
+                whenStartActionMode()
             }
-        })
+        }
 
     private fun observeAnimatedItems() {
         var animatorSet: AnimatorSet? = null
 
-        actionModeViewModel.animNodeIndices.observe(viewLifecycleOwner, {
+        actionModeViewModel.animNodeIndices.observe(viewLifecycleOwner) {
             animatorSet?.run {
                 // End the started animation if any, or the view may show messy as its property
                 // would be wrongly changed by multiple animations running at the same time
@@ -501,7 +510,7 @@ abstract class BaseZoomFragment : BaseFragment(), GestureScaleCallback,
 
             animatorSet?.playTogether(animatorList)
             animatorSet?.start()
-        })
+        }
     }
 
     private fun observeActionModeDestroy() =
@@ -521,7 +530,7 @@ abstract class BaseZoomFragment : BaseFragment(), GestureScaleCallback,
 
             activity.hideKeyboardSearch()  // Make the snack bar visible to the user
             activity.showSnackbar(
-                Constants.SNACKBAR_TYPE,
+                SNACKBAR_TYPE,
                 context.getString(R.string.error_server_connection_problem),
                 MegaChatApiJava.MEGACHAT_INVALID_HANDLE
             )
@@ -743,4 +752,21 @@ abstract class BaseZoomFragment : BaseFragment(), GestureScaleCallback,
     fun isGridAdapterInitialized():Boolean{
         return this::gridAdapter.isInitialized
     }
+
+    /**
+     * Sub fragment can custom operation when start ActionMode
+     */
+    open fun whenStartActionMode(){}
+
+    /**
+     * Sub fragment can custom operation when end ActionMode
+     */
+    open fun whenEndActionMode(){}
+
+    /**
+     * Check is in action mode.
+     *
+     * @return true in, false not in
+     */
+    fun isInActionMode() = actionMode != null
 }

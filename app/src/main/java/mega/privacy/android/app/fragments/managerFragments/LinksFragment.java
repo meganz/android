@@ -14,14 +14,14 @@ import java.util.List;
 
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.fragments.MegaNodeBaseFragment;
-import mega.privacy.android.app.lollipop.adapters.MegaNodeAdapter;
+import mega.privacy.android.app.main.adapters.MegaNodeAdapter;
 import mega.privacy.android.app.utils.CloudStorageOptionControlUtil;
 import mega.privacy.android.app.utils.ColorUtils;
 import mega.privacy.android.app.utils.MegaNodeUtil;
 import nz.mega.sdk.MegaNode;
 
-import static mega.privacy.android.app.lollipop.ManagerActivity.LINKS_TAB;
-import static mega.privacy.android.app.lollipop.adapters.MegaNodeAdapter.*;
+import static mega.privacy.android.app.main.ManagerActivity.LINKS_TAB;
+import static mega.privacy.android.app.main.adapters.MegaNodeAdapter.*;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.MegaNodeUtil.areAllFileNodesAndNotTakenDown;

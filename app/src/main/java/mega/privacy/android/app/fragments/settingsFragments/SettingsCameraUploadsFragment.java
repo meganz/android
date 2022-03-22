@@ -35,8 +35,8 @@ import mega.privacy.android.app.activities.settingsActivities.CameraUploadsPrefe
 import mega.privacy.android.app.components.TwoLineCheckPreference;
 import mega.privacy.android.app.jobservices.SyncRecord;
 import mega.privacy.android.app.listeners.SetAttrUserListener;
-import mega.privacy.android.app.lollipop.FileExplorerActivity;
-import mega.privacy.android.app.lollipop.FileStorageActivity;
+import mega.privacy.android.app.main.FileExplorerActivity;
+import mega.privacy.android.app.main.FileStorageActivity;
 import mega.privacy.android.app.utils.ColorUtils;
 import mega.privacy.android.app.sync.cusync.CuSyncManager;
 import mega.privacy.android.app.utils.SDCardUtils;
@@ -444,6 +444,8 @@ public class SettingsCameraUploadsFragment extends SettingsBaseFragment {
      * and UI related process
      */
     public void disableCameraUpload() {
+        stopCameraUploadWork(getContext());
+        stopRegularCuSyncHeartbeatWork(getContext());
         disableCameraUploadSettingProcess();
         disableCameraUploadUIProcess();
     }

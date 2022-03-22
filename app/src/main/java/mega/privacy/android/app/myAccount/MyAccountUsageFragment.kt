@@ -13,7 +13,6 @@ import com.google.android.material.transition.MaterialContainerTransform
 import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
-import mega.privacy.android.app.components.ListenScrollChangesHelper
 import mega.privacy.android.app.databinding.FragmentMyAccountUsageBinding
 import mega.privacy.android.app.databinding.MyAccountPaymentInfoContainerBinding
 import mega.privacy.android.app.databinding.MyAccountUsageContainerBinding
@@ -65,10 +64,9 @@ class MyAccountUsageFragment : Fragment(), Scrollable {
 
     private fun setupView() {
         viewModel.getFileVersionsOption()
-
-        ListenScrollChangesHelper().addViewToListen(
-            binding.usageLayout
-        ) { _, _, _, _, _ -> checkScroll() }
+        binding.usageLayout.setOnScrollChangeListener { _, _, _, _, _ ->
+            checkScroll()
+        }
 
         usageBinding.root.background = ContextCompat.getDrawable(
             requireContext(),

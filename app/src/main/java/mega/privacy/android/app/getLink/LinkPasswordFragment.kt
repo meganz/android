@@ -14,7 +14,6 @@ import androidx.core.widget.doOnTextChanged
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.navArgs
 import mega.privacy.android.app.R
-import mega.privacy.android.app.components.ListenScrollChangesHelper
 import mega.privacy.android.app.databinding.FragmentSetLinkPasswordBinding
 import mega.privacy.android.app.fragments.BaseFragment
 import mega.privacy.android.app.interfaces.Scrollable
@@ -79,9 +78,9 @@ class LinkPasswordFragment : BaseFragment(), Scrollable {
     }
 
     private fun setupView() {
-        ListenScrollChangesHelper().addViewToListen(
-            binding.scrollViewSetLinkPassword
-        ) { _, _, _, _, _ -> checkScroll() }
+        binding.scrollViewSetLinkPassword.setOnScrollChangeListener { _, _, _, _, _ ->
+            checkScroll()
+        }
 
         checkScroll()
 

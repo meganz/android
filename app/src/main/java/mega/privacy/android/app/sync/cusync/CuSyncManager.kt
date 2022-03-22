@@ -6,24 +6,29 @@ import io.reactivex.rxjava3.disposables.Disposable
 import mega.privacy.android.app.DatabaseHandler
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
+import mega.privacy.android.app.UserCredentials
 import mega.privacy.android.app.constants.BroadcastConstants.BROADCAST_ACTION_REENABLE_CU_PREFERENCE
 import mega.privacy.android.app.constants.BroadcastConstants.KEY_REENABLE_WHICH_PREFERENCE
 import mega.privacy.android.app.constants.SettingsConstants
 import mega.privacy.android.app.jobservices.SyncRecord
-import mega.privacy.android.app.listeners.BaseListener
+import mega.privacy.android.app.listeners.OptionalMegaRequestListenerInterface
 import mega.privacy.android.app.sync.SyncListener
 import mega.privacy.android.app.sync.cusync.callback.RemoveBackupCallback
 import mega.privacy.android.app.sync.cusync.callback.SetBackupCallback
 import mega.privacy.android.app.sync.cusync.callback.UpdateBackupCallback
 import mega.privacy.android.app.utils.CameraUploadUtil
-import mega.privacy.android.app.utils.Constants.*
+import mega.privacy.android.app.utils.Constants.INVALID_NON_NULL_VALUE
+import mega.privacy.android.app.utils.Constants.INVALID_VALUE
 import mega.privacy.android.app.utils.LogUtil.logDebug
+import mega.privacy.android.app.utils.LogUtil.logError
 import mega.privacy.android.app.utils.LogUtil.logWarning
 import mega.privacy.android.app.utils.RxUtil.logErr
 import mega.privacy.android.app.utils.StringResourcesUtils
 import mega.privacy.android.app.utils.TextUtil
-import nz.mega.sdk.*
+import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaApiJava.*
+import nz.mega.sdk.MegaError
+import nz.mega.sdk.MegaNode
 import java.io.File
 import java.util.concurrent.TimeUnit.SECONDS
 
@@ -40,6 +45,7 @@ object CuSyncManager {
      * Backup state,
      * originally defined in heartbeats.h
         enum State {
+            STATE_NOT_INITIALIZED,
             ACTIVE = 1,             // Working fine (enabled)
             FAILED = 2,             // Failed (permanently disabled)
             TEMPORARY_DISABLED = 3, // Temporarily disabled due to a transient situation (e.g: account blocked). Will be resumed when the condition passes
@@ -50,6 +56,7 @@ object CuSyncManager {
         };
      */
     object State {
+        const val CU_SYNC_STATE_NOT_INITIALIZED = -1
         const val CU_SYNC_STATE_ACTIVE = 1
         const val CU_SYNC_STATE_FAILED = 2
         const val CU_SYNC_STATE_TEMPORARY_DISABLED = 3
@@ -63,6 +70,7 @@ object CuSyncManager {
      * Heartbeat status,
      * originally defined in heartbeats.h
         enum Status {
+            STATE_NOT_INITIALIZED,
             UPTODATE = 1, // Up to date: local and remote paths are in sync
             SYNCING = 2, // The sync engine is working, transfers are in progress
             PENDING = 3, // The sync engine is working, e.g: scanning local folders
@@ -71,6 +79,7 @@ object CuSyncManager {
         };
      */
     object Status {
+        const val CU_SYNC_STATUS_NOT_INITIALIZED = -1
         const val CU_SYNC_STATUS_UPTODATE = 1
         const val CU_SYNC_STATUS_SYNCING = 2
         const val CU_SYNC_STATUS_PENDING = 3
@@ -86,7 +95,7 @@ object CuSyncManager {
     /**
      * When the app is inactive, send heartbeat every 30m.
      */
-    const val INACTIVE_HEARTBEAT_INTERVAL_SECONDS = 30 * 60
+    const val INACTIVE_HEARTBEAT_INTERVAL_MINUTES = 30 // TimeUnit.MINUTES
 
     private val megaApplication = MegaApplication.getInstance()
 
@@ -677,34 +686,58 @@ object CuSyncManager {
     }
 
     /**
-     * When the app is inactive, send heartbeat as well.
+     * When the CU service has nothing to upload, send heartbeat as well.
+     * Before sending, check the account state and login again when the rootNode is null
      */
-    fun doInactiveHeartbeat(onFinish: () -> Unit) {
+    fun doRegularHeartbeat() {
+        if (megaApi.rootNode == null) {
+            logWarning("RootNode = null, need to login again")
+            val dbH = DatabaseHandler.getDbHandler(megaApplication)
+            val credentials: UserCredentials = dbH.credentials
+            val gSession = credentials.session
+            megaApi.fastLogin(gSession, createOnFinishListener {
+                megaApi.fetchNodes(createOnFinishListener {
+                    sendRegularHeartbeat()
+                })
+            })
+        } else {
+            sendRegularHeartbeat()
+        }
+    }
+
+    /**
+     * When the CU service has nothing to upload, send heartbeat as well.
+     */
+    private fun sendRegularHeartbeat() {
         val cuBackup = databaseHandler.cuBackup
+
+        logDebug("CuSyncActiveHeartbeatService onStartJob, doActiveHeartbeat")
         if (cuBackup != null && CameraUploadUtil.isPrimaryEnabled()) {
+            logDebug("doActiveHeartbeat Send CU heartbeat, backupId = ${cuBackup.backupId}, Status = CU_SYNC_STATUS_UPTODATE.")
             megaApi.sendBackupHeartbeat(
                 cuBackup.backupId,
-                Status.CU_SYNC_STATUS_INACTIVE,
+                Status.CU_SYNC_STATUS_UPTODATE,
                 INVALID_VALUE,
                 0,
                 0,
                 0,
                 cuLastUploadedHandle,
-                createOnFinishListener(onFinish)
+                createOnFinishListener(null)
             )
         }
 
         val muBackup = databaseHandler.muBackup
         if (muBackup != null && CameraUploadUtil.isSecondaryEnabled()) {
+            logDebug("doActiveHeartbeat Send MU heartbeat, backupId = ${cuBackup.backupId}, Status = CU_SYNC_STATUS_UPTODATE.")
             megaApi.sendBackupHeartbeat(
                 muBackup.backupId,
-                Status.CU_SYNC_STATUS_INACTIVE,
+                Status.CU_SYNC_STATUS_UPTODATE,
                 INVALID_VALUE,
                 0,
                 0,
                 0,
                 muLastUploadedHandle,
-                createOnFinishListener(onFinish)
+                createOnFinishListener(null)
             )
         }
     }
@@ -716,13 +749,16 @@ object CuSyncManager {
      *
      * @return MegaRequestListenerInterface object listen to the request.
      */
-    private fun createOnFinishListener(onFinish: () -> Unit): MegaRequestListenerInterface {
-        return object : BaseListener(null) {
-            override fun onRequestFinish(api: MegaApiJava, request: MegaRequest, e: MegaError) {
-                onFinish()
-            }
+    private fun createOnFinishListener(onFinish: (() -> Unit)?) = OptionalMegaRequestListenerInterface(onRequestFinish = { request, e ->
+        logDebug("${request.requestString} finished with ${e.errorCode}: ${e.errorString}")
+
+        if(e.errorCode == MegaError.API_OK) {
+            onFinish?.invoke()
+        } else {
+            logError("${request.requestString} failed with ${e.errorCode}: ${e.errorString}")
         }
-    }
+    })
+
 
     /**
      * Check if CU process is running by checking if there's a non-null active send heartbeat task.

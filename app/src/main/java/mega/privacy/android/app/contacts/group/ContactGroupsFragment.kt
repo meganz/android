@@ -24,9 +24,9 @@ import mega.privacy.android.app.contacts.group.data.ContactGroupItem
 import mega.privacy.android.app.databinding.FragmentContactGroupsBinding
 import mega.privacy.android.app.interfaces.SnackbarShower
 import mega.privacy.android.app.interfaces.showSnackbar
-import mega.privacy.android.app.lollipop.AddContactActivity
-import mega.privacy.android.app.lollipop.megachat.ChatActivity
-import mega.privacy.android.app.lollipop.megachat.GroupChatInfoActivity
+import mega.privacy.android.app.main.AddContactActivity
+import mega.privacy.android.app.main.megachat.ChatActivity
+import mega.privacy.android.app.main.megachat.GroupChatInfoActivity
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.Constants.MIN_ITEMS_SCROLLBAR
 import mega.privacy.android.app.utils.LogUtil

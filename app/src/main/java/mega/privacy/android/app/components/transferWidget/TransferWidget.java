@@ -20,8 +20,8 @@ import androidx.core.content.ContextCompat;
 
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
-import mega.privacy.android.app.lollipop.DrawerItem;
-import mega.privacy.android.app.lollipop.ManagerActivity;
+import mega.privacy.android.app.main.DrawerItem;
+import mega.privacy.android.app.main.ManagerActivity;
 import mega.privacy.android.app.utils.ColorUtils;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;

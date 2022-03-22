@@ -20,7 +20,6 @@ import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.MimeTypeList
 import mega.privacy.android.app.R
 import mega.privacy.android.app.components.CustomizedGridLayoutManager
-import mega.privacy.android.app.components.ListenScrollChangesHelper
 import mega.privacy.android.app.components.NewGridRecyclerView
 import mega.privacy.android.app.components.PositionDividerItemDecoration
 import mega.privacy.android.app.components.dragger.DragThumbnailGetter
@@ -29,8 +28,8 @@ import mega.privacy.android.app.databinding.FragmentDocumentsBinding
 import mega.privacy.android.app.di.MegaApi
 import mega.privacy.android.app.fragments.homepage.*
 import mega.privacy.android.app.fragments.homepage.BaseNodeItemAdapter.Companion.TYPE_HEADER
-import mega.privacy.android.app.lollipop.ManagerActivity
-import mega.privacy.android.app.lollipop.PdfViewerActivity
+import mega.privacy.android.app.main.ManagerActivity
+import mega.privacy.android.app.main.PdfViewerActivity
 import mega.privacy.android.app.mediaplayer.miniplayer.MiniAudioPlayerController
 import mega.privacy.android.app.modalbottomsheet.NodeOptionsBottomSheetDialogFragment.MODE1
 import mega.privacy.android.app.modalbottomsheet.NodeOptionsBottomSheetDialogFragment.MODE5
@@ -227,22 +226,23 @@ class DocumentsFragment : Fragment(), HomepageSearchable {
         }
     }
 
-    private fun elevateToolbarWhenScrolling() = ListenScrollChangesHelper().addViewToListen(
-        listView
-    ) { v: View?, _, _, _, _ ->
-        callManager { manager ->
-            manager.changeAppBarElevation(v!!.canScrollVertically(-1))
-        }
-    }
-
     private fun setupListView() {
         listView = binding.documentList
-        listView.itemAnimator = noChangeRecyclerViewItemAnimator()
-        elevateToolbarWhenScrolling()
-        itemDecoration = PositionDividerItemDecoration(context, displayMetrics())
+        with(listView) {
+            itemAnimator = noChangeRecyclerViewItemAnimator()
+            addOnScrollListener(object : RecyclerView.OnScrollListener() {
+                override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+                    super.onScrolled(recyclerView, dx, dy)
 
-        listView.clipToPadding = false
-        listView.setHasFixedSize(true)
+                    callManager { manager ->
+                        manager.changeAppBarElevation(recyclerView.canScrollVertically(-1))
+                    }
+                }
+            })
+            clipToPadding = false
+            setHasFixedSize(true)
+        }
+        itemDecoration = PositionDividerItemDecoration(context, displayMetrics())
     }
 
     private fun setupActionMode() {

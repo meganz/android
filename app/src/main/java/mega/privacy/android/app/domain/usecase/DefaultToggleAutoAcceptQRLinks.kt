@@ -4,6 +4,12 @@ import mega.privacy.android.app.domain.exception.SettingNotFoundException
 import mega.privacy.android.app.domain.repository.SettingsRepository
 import javax.inject.Inject
 
+/**
+ * Default toggle auto accept q r links
+ *
+ * @property fetchAutoAcceptQRLinks
+ * @property settingsRepository
+ */
 class DefaultToggleAutoAcceptQRLinks @Inject constructor(
     private val fetchAutoAcceptQRLinks: FetchAutoAcceptQRLinks,
     private val settingsRepository: SettingsRepository,
