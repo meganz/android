@@ -11330,8 +11330,8 @@ public class ManagerActivity extends TransfersManagementActivity
 	}
 
     public void showKeyboardForSearch() {
-        showKeyboardDelayed(searchView.findViewById(R.id.search_src_text));
         if (searchView != null) {
+            showKeyboardDelayed(searchView.findViewById(R.id.search_src_text));
             searchView.requestFocus();
         }
     }

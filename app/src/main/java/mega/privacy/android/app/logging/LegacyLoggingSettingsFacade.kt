@@ -1,6 +1,7 @@
 package mega.privacy.android.app.logging
 
 import android.content.Context
+import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.stateIn
@@ -19,9 +20,12 @@ class LegacyLoggingSettingsFacade @Inject constructor(
     areChatLogsEnabled: AreChatLogsEnabled,
 ) : LegacyLoggingSettings {
 
+    @OptIn(DelicateCoroutinesApi::class)
     private val sdkLogStatus = areSdkLogsEnabled().stateIn(GlobalScope, SharingStarted.Eagerly, false)
+    @OptIn(DelicateCoroutinesApi::class)
     private val chatLogStatus = areChatLogsEnabled().stateIn(GlobalScope, SharingStarted.Eagerly, false)
 
+    @OptIn(DelicateCoroutinesApi::class)
     override fun setStatusLoggerSDK(context: Context, enabled: Boolean) {
         GlobalScope.launch {
             setSdkLogsEnabled(enabled)
@@ -36,6 +40,7 @@ class LegacyLoggingSettingsFacade @Inject constructor(
         }
     }
 
+    @OptIn(DelicateCoroutinesApi::class)
     override fun setStatusLoggerKarere(context: Context, enabled: Boolean) {
         GlobalScope.launch {
             setChatLogsEnabled(enabled)
@@ -58,6 +63,7 @@ class LegacyLoggingSettingsFacade @Inject constructor(
         return sdkLogStatus.value
     }
 
+    @OptIn(DelicateCoroutinesApi::class)
     override fun updateSDKLogs(enabled: Boolean) {
         GlobalScope.launch {
             setSdkLogsEnabled(enabled)
@@ -68,6 +74,7 @@ class LegacyLoggingSettingsFacade @Inject constructor(
         return chatLogStatus.value
     }
 
+    @OptIn(DelicateCoroutinesApi::class)
     override fun updateKarereLogs(enabled: Boolean) {
         GlobalScope.launch {
             setChatLogsEnabled(enabled)

@@ -132,14 +132,14 @@ abstract class BaseZoomFragment : BaseFragment(), GestureScaleCallback,
             viewTypePanel
                 .animate()
                 .translationYBy(deltaY)
-                .setDuration(Constants.ANIMATION_DURATION)
+                .setDuration(ANIMATION_DURATION)
                 .withEndAction { viewTypePanel.visibility = View.GONE }
                 .start()
         } else {
             viewTypePanel
                 .animate()
                 .translationYBy(-deltaY)
-                .setDuration(Constants.ANIMATION_DURATION)
+                .setDuration(ANIMATION_DURATION)
                 .withStartAction { viewTypePanel.visibility = View.VISIBLE }
                 .start()
         }
@@ -217,7 +217,7 @@ abstract class BaseZoomFragment : BaseFragment(), GestureScaleCallback,
         DragToExitSupport.observeDragSupportEvents(
             viewLifecycleOwner,
             listView,
-            Constants.VIEWER_FROM_PHOTOS
+            VIEWER_FROM_PHOTOS
         )
     }
 
@@ -397,7 +397,7 @@ abstract class BaseZoomFragment : BaseFragment(), GestureScaleCallback,
                         intent,
                         listView,
                         nodeItem.index,
-                        Constants.VIEWER_FROM_PHOTOS,
+                        VIEWER_FROM_PHOTOS,
                         getter
                     )
                 }
@@ -427,6 +427,8 @@ abstract class BaseZoomFragment : BaseFragment(), GestureScaleCallback,
                 actionMode?.apply {
                     finish()
                 }
+
+                whenEndActionMode()
             } else {
                 actionModeCallback.nodeCount = getNodeCount()
 
@@ -443,6 +445,8 @@ abstract class BaseZoomFragment : BaseFragment(), GestureScaleCallback,
                 }
 
                 actionMode?.title = it.size.toString()
+
+                whenStartActionMode()
             }
         }
 
@@ -525,7 +529,7 @@ abstract class BaseZoomFragment : BaseFragment(), GestureScaleCallback,
 
             activity.hideKeyboardSearch()  // Make the snack bar visible to the user
             activity.showSnackbar(
-                Constants.SNACKBAR_TYPE,
+                SNACKBAR_TYPE,
                 context.getString(R.string.error_server_connection_problem),
                 MegaChatApiJava.MEGACHAT_INVALID_HANDLE
             )
@@ -747,4 +751,21 @@ abstract class BaseZoomFragment : BaseFragment(), GestureScaleCallback,
     fun isGridAdapterInitialized():Boolean{
         return this::gridAdapter.isInitialized
     }
+
+    /**
+     * Sub fragment can custom operation when start ActionMode
+     */
+    open fun whenStartActionMode(){}
+
+    /**
+     * Sub fragment can custom operation when end ActionMode
+     */
+    open fun whenEndActionMode(){}
+
+    /**
+     * Check is in action mode.
+     *
+     * @return true in, false not in
+     */
+    fun isInActionMode() = actionMode != null
 }
