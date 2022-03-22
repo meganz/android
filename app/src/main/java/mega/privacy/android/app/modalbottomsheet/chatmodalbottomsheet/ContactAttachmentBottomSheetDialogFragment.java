@@ -12,11 +12,11 @@ import java.util.ArrayList;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.RoundedImageView;
 import mega.privacy.android.app.components.twemoji.EmojiTextView;
-import mega.privacy.android.app.lollipop.controllers.ChatController;
-import mega.privacy.android.app.lollipop.controllers.ContactController;
-import mega.privacy.android.app.lollipop.megachat.AndroidMegaChatMessage;
-import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop;
-import mega.privacy.android.app.lollipop.megachat.ContactAttachmentActivityLollipop;
+import mega.privacy.android.app.main.controllers.ChatController;
+import mega.privacy.android.app.main.controllers.ContactController;
+import mega.privacy.android.app.main.megachat.AndroidMegaChatMessage;
+import mega.privacy.android.app.main.megachat.ChatActivity;
+import mega.privacy.android.app.main.megachat.ContactAttachmentActivity;
 import mega.privacy.android.app.modalbottomsheet.BaseBottomSheetDialogFragment;
 import mega.privacy.android.app.utils.ContactUtil;
 import mega.privacy.android.app.utils.StringResourcesUtils;
@@ -64,9 +64,9 @@ public class ContactAttachmentBottomSheetDialogFragment extends BaseBottomSheetD
                 message = new AndroidMegaChatMessage(messageMega);
             }
         } else {
-            chatId = ((ContactAttachmentActivityLollipop) requireActivity()).chatId;
-            messageId = ((ContactAttachmentActivityLollipop) requireActivity()).messageId;
-            email = ((ContactAttachmentActivityLollipop) requireActivity()).selectedEmail;
+            chatId = ((ContactAttachmentActivity) requireActivity()).chatId;
+            messageId = ((ContactAttachmentActivity) requireActivity()).messageId;
+            email = ((ContactAttachmentActivity) requireActivity()).selectedEmail;
         }
 
         MegaChatMessage messageMega = megaChatApi.getMessage(chatId, messageId);
@@ -268,13 +268,13 @@ public class ContactAttachmentBottomSheetDialogFragment extends BaseBottomSheetD
         switch (v.getId()) {
             case R.id.option_info_layout:
                 if (!isOnline(requireContext())) {
-                    ((ChatActivityLollipop) requireActivity()).showSnackbar(SNACKBAR_TYPE, StringResourcesUtils.getString(R.string.error_server_connection_problem), INVALID_HANDLE);
+                    ((ChatActivity) requireActivity()).showSnackbar(SNACKBAR_TYPE, StringResourcesUtils.getString(R.string.error_server_connection_problem), INVALID_HANDLE);
                     return;
                 }
 
                 long contactHandle = MEGACHAT_INVALID_HANDLE;
                 String contactEmail = null;
-                if (requireActivity() instanceof ChatActivityLollipop) {
+                if (requireActivity() instanceof ChatActivity) {
                     contactEmail = message.getMessage().getUserEmail(0);
                     contactHandle = message.getMessage().getUserHandle(0);
                 } else if (position != -1) {
@@ -298,14 +298,14 @@ public class ContactAttachmentBottomSheetDialogFragment extends BaseBottomSheetD
 
             case R.id.option_invite_layout:
                 if (!isOnline(requireContext())) {
-                    ((ChatActivityLollipop) requireActivity()).showSnackbar(SNACKBAR_TYPE, StringResourcesUtils.getString(R.string.error_server_connection_problem), INVALID_HANDLE);
+                    ((ChatActivity) requireActivity()).showSnackbar(SNACKBAR_TYPE, StringResourcesUtils.getString(R.string.error_server_connection_problem), INVALID_HANDLE);
                     return;
                 }
 
                 ContactController cC = new ContactController(requireActivity());
                 ArrayList<String> contactEmails;
 
-                if (requireActivity() instanceof ChatActivityLollipop) {
+                if (requireActivity() instanceof ChatActivity) {
                     if (numUsers == 1) {
                         cC.inviteContact(message.getMessage().getUserEmail(0));
                     } else {
@@ -324,9 +324,9 @@ public class ContactAttachmentBottomSheetDialogFragment extends BaseBottomSheetD
                 break;
 
             case R.id.option_start_conversation_layout:
-                if (requireActivity() instanceof ChatActivityLollipop) {
+                if (requireActivity() instanceof ChatActivity) {
                     if (numUsers == 1) {
-                        ((ChatActivityLollipop) requireActivity()).startConversation(message.getMessage().getUserHandle(0));
+                        ((ChatActivity) requireActivity()).startConversation(message.getMessage().getUserHandle(0));
                         dismissAllowingStateLoss();
                     } else {
                         logDebug("Num users to invite: " + numUsers);
@@ -336,13 +336,13 @@ public class ContactAttachmentBottomSheetDialogFragment extends BaseBottomSheetD
                             long userHandle = message.getMessage().getUserHandle(j);
                             contactHandles.add(userHandle);
                         }
-                        ((ChatActivityLollipop) requireActivity()).startGroupConversation(contactHandles);
+                        ((ChatActivity) requireActivity()).startGroupConversation(contactHandles);
                     }
                 } else {
-                    logDebug("Instance of ContactAttachmentActivityLollipop");
+                    logDebug("Instance of ContactAttachmentActivity");
                     logDebug("position: " + position);
                     long userHandle = message.getMessage().getUserHandle(position);
-                    ((ContactAttachmentActivityLollipop) requireActivity()).startConversation(userHandle);
+                    ((ContactAttachmentActivity) requireActivity()).startConversation(userHandle);
                 }
                 break;
         }

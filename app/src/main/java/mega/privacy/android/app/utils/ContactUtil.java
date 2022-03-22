@@ -12,8 +12,8 @@ import java.util.ArrayList;
 import mega.privacy.android.app.MegaContactAdapter;
 import mega.privacy.android.app.MegaContactDB;
 import mega.privacy.android.app.R;
-import mega.privacy.android.app.lollipop.ContactInfoActivityLollipop;
-import mega.privacy.android.app.lollipop.megachat.ContactAttachmentActivityLollipop;
+import mega.privacy.android.app.main.ContactInfoActivity;
+import mega.privacy.android.app.main.megachat.ContactAttachmentActivity;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaStringList;
 import nz.mega.sdk.MegaStringMap;
@@ -293,7 +293,7 @@ public class ContactUtil {
     }
 
     /**
-     * Method to open ContactInfoActivityLollipop.class.
+     * Method to open ContactInfoActivity.class.
      *
      * @param context Activity context.
      * @param name    The name of the contact.
@@ -303,28 +303,28 @@ public class ContactUtil {
     }
 
     /**
-     * Method to open ContactInfoActivityLollipop.class.
+     * Method to open ContactInfoActivity.class.
      *
      * @param context        Activity context.
      * @param name           The name of the contact.
      * @param isChatRoomOpen True, if the chatRoom is already open. False, otherwise.
      */
     public static void openContactInfoActivity(Context context, String name, boolean isChatRoomOpen) {
-        Intent i = new Intent(context, ContactInfoActivityLollipop.class);
+        Intent i = new Intent(context, ContactInfoActivity.class);
         i.putExtra(NAME, name);
         i.putExtra(ACTION_CHAT_OPEN, isChatRoomOpen);
         context.startActivity(i);
     }
 
     /**
-     * Method to open ContactAttachmentActivityLollipop.class.
+     * Method to open ContactAttachmentActivity.class.
      *
      * @param context Activity context.
      * @param chatId  The ID of a chat.
      * @param msgId   The ID of a message.
      */
     public static void openContactAttachmentActivity(Context context, long chatId, long msgId) {
-        Intent i = new Intent(context, ContactAttachmentActivityLollipop.class);
+        Intent i = new Intent(context, ContactAttachmentActivity.class);
         i.putExtra(CHAT_ID, chatId);
         i.putExtra(MESSAGE_ID, msgId);
         context.startActivity(i);

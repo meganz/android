@@ -49,7 +49,7 @@ public class IncomingCallNotification {
 
         Intent intent = new Intent(context, AskForDisplayOverActivity.class);
         @NoMeaning int i = 0;
-        PendingIntent pendingIntent = PendingIntent.getActivity(context, i, intent, PendingIntent.FLAG_ONE_SHOT);
+        PendingIntent pendingIntent = PendingIntent.getActivity(context, i, intent, PendingIntent.FLAG_ONE_SHOT | PendingIntent.FLAG_IMMUTABLE);
         NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(context, INCOMING_CALL_CHANNEL_ID);
         notificationBuilder
                 .setSmallIcon(R.drawable.ic_stat_notify)

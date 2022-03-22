@@ -5,7 +5,6 @@ import android.app.PendingIntent
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
-import android.os.Build
 import android.os.PowerManager
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.listeners.BaseListener
@@ -80,19 +79,11 @@ class AlarmReceiver : BroadcastReceiver() {
             val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
 
             /* fire the broadcast */
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                alarmManager.setExactAndAllowWhileIdle(
-                    AlarmManager.RTC_WAKEUP,
-                    time,
-                    pendingIntent
-                )
-            } else {
-                alarmManager.setExact(
-                    AlarmManager.RTC_WAKEUP,
-                    time,
-                    pendingIntent
-                )
-            }
+            alarmManager.setExactAndAllowWhileIdle(
+                AlarmManager.RTC_WAKEUP,
+                time,
+                pendingIntent
+            )
         }
 
         /** The pending intent to send a broadcast when firing the alarm */
@@ -106,7 +97,7 @@ class AlarmReceiver : BroadcastReceiver() {
                     context,
                     0,
                     alarmIntent,
-                    PendingIntent.FLAG_CANCEL_CURRENT
+                    PendingIntent.FLAG_CANCEL_CURRENT or PendingIntent.FLAG_IMMUTABLE
                 )
             }
     }

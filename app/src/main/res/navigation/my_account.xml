@@ -62,7 +62,7 @@
 
     <activity
         android:id="@+id/change_password"
-        android:name="mega.privacy.android.app.lollipop.ChangePasswordActivityLollipop"
+        android:name="mega.privacy.android.app.main.ChangePasswordActivity"
         tools:layout="@layout/activity_change_password"/>
 
     <activity
@@ -72,7 +72,7 @@
 
     <activity
         android:id="@+id/achievements"
-        android:name="mega.privacy.android.app.lollipop.megaachievements.AchievementsActivity"
+        android:name="mega.privacy.android.app.main.megaachievements.AchievementsActivity"
         tools:layout="@layout/activity_achievements"/>
 
 </navigation>

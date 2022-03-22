@@ -22,7 +22,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AlertDialog;
-import androidx.core.app.ActivityCompat;
 import androidx.preference.ListPreference;
 import androidx.preference.Preference;
 import androidx.preference.SwitchPreferenceCompat;
@@ -36,8 +35,8 @@ import mega.privacy.android.app.activities.settingsActivities.CameraUploadsPrefe
 import mega.privacy.android.app.components.TwoLineCheckPreference;
 import mega.privacy.android.app.jobservices.SyncRecord;
 import mega.privacy.android.app.listeners.SetAttrUserListener;
-import mega.privacy.android.app.lollipop.FileExplorerActivityLollipop;
-import mega.privacy.android.app.lollipop.FileStorageActivityLollipop;
+import mega.privacy.android.app.main.FileExplorerActivity;
+import mega.privacy.android.app.main.FileStorageActivity;
 import mega.privacy.android.app.utils.ColorUtils;
 import mega.privacy.android.app.sync.cusync.CuSyncManager;
 import mega.privacy.android.app.utils.SDCardUtils;
@@ -445,6 +444,8 @@ public class SettingsCameraUploadsFragment extends SettingsBaseFragment {
      * and UI related process
      */
     public void disableCameraUpload() {
+        stopCameraUploadWork(getContext());
+        stopRegularCuSyncHeartbeatWork(getContext());
         disableCameraUploadSettingProcess();
         disableCameraUploadUIProcess();
     }
@@ -484,9 +485,9 @@ public class SettingsCameraUploadsFragment extends SettingsBaseFragment {
                 break;
 
             case KEY_CAMERA_UPLOAD_CAMERA_FOLDER:
-                intent = new Intent(context, FileStorageActivityLollipop.class);
-                intent.setAction(FileStorageActivityLollipop.Mode.PICK_FOLDER.getAction());
-                intent.putExtra(FileStorageActivityLollipop.PICK_FOLDER_TYPE, FileStorageActivityLollipop.PickFolderType.CU_FOLDER.getFolderType());
+                intent = new Intent(context, FileStorageActivity.class);
+                intent.setAction(FileStorageActivity.Mode.PICK_FOLDER.getAction());
+                intent.putExtra(FileStorageActivity.PICK_FOLDER_TYPE, FileStorageActivity.PickFolderType.CU_FOLDER.getFolderType());
                 startActivityForResult(intent, REQUEST_CAMERA_FOLDER);
                 break;
 
@@ -494,8 +495,8 @@ public class SettingsCameraUploadsFragment extends SettingsBaseFragment {
                 if (isOffline(context))
                     return false;
 
-                intent = new Intent(context, FileExplorerActivityLollipop.class);
-                intent.setAction(FileExplorerActivityLollipop.ACTION_CHOOSE_MEGA_FOLDER_SYNC);
+                intent = new Intent(context, FileExplorerActivity.class);
+                intent.setAction(FileExplorerActivity.ACTION_CHOOSE_MEGA_FOLDER_SYNC);
                 startActivityForResult(intent, REQUEST_MEGA_CAMERA_FOLDER);
                 break;
 
@@ -538,9 +539,9 @@ public class SettingsCameraUploadsFragment extends SettingsBaseFragment {
                 break;
 
             case KEY_LOCAL_SECONDARY_MEDIA_FOLDER:
-                intent = new Intent(context, FileStorageActivityLollipop.class);
-                intent.setAction(FileStorageActivityLollipop.Mode.PICK_FOLDER.getAction());
-                intent.putExtra(FileStorageActivityLollipop.PICK_FOLDER_TYPE, FileStorageActivityLollipop.PickFolderType.MU_FOLDER.getFolderType());
+                intent = new Intent(context, FileStorageActivity.class);
+                intent.setAction(FileStorageActivity.Mode.PICK_FOLDER.getAction());
+                intent.putExtra(FileStorageActivity.PICK_FOLDER_TYPE, FileStorageActivity.PickFolderType.MU_FOLDER.getFolderType());
                 startActivityForResult(intent, REQUEST_LOCAL_SECONDARY_MEDIA_FOLDER);
                 break;
 
@@ -548,8 +549,8 @@ public class SettingsCameraUploadsFragment extends SettingsBaseFragment {
                 if (isOffline(context))
                     return false;
 
-                intent = new Intent(context, FileExplorerActivityLollipop.class);
-                intent.setAction(FileExplorerActivityLollipop.ACTION_CHOOSE_MEGA_FOLDER_SYNC);
+                intent = new Intent(context, FileExplorerActivity.class);
+                intent.setAction(FileExplorerActivity.ACTION_CHOOSE_MEGA_FOLDER_SYNC);
                 startActivityForResult(intent, REQUEST_MEGA_SECONDARY_MEDIA_FOLDER);
                 break;
         }
@@ -1115,7 +1116,7 @@ public class SettingsCameraUploadsFragment extends SettingsBaseFragment {
         logDebug("REQUEST CODE: " + requestCode + "___RESULT CODE: " + resultCode);
         switch (requestCode) {
             case REQUEST_CAMERA_FOLDER:
-                String cameraPath = intent.getStringExtra(FileStorageActivityLollipop.EXTRA_PATH);
+                String cameraPath = intent.getStringExtra(FileStorageActivity.EXTRA_PATH);
                 if (!isNewSettingValid(cameraPath, prefs.getLocalPathSecondaryFolder(), prefs.getCamSyncHandle(), prefs.getMegaHandleSecondaryFolder())) {
                     Toast.makeText(context, getString(R.string.error_invalid_folder_selected), Toast.LENGTH_LONG).show();
                     return;
@@ -1152,7 +1153,7 @@ public class SettingsCameraUploadsFragment extends SettingsBaseFragment {
 
             case REQUEST_LOCAL_SECONDARY_MEDIA_FOLDER:
                 //Local folder to sync
-                String secondaryPath = intent.getStringExtra(FileStorageActivityLollipop.EXTRA_PATH);
+                String secondaryPath = intent.getStringExtra(FileStorageActivity.EXTRA_PATH);
                 if (!isNewSettingValid(prefs.getCamSyncLocalPath(), secondaryPath, prefs.getCamSyncHandle(), prefs.getMegaHandleSecondaryFolder())) {
                     Toast.makeText(context, getString(R.string.error_invalid_folder_selected), Toast.LENGTH_LONG).show();
                     return;

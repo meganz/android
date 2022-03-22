@@ -1,8 +1,8 @@
 package mega.privacy.android.app.fragments.settingsFragments.startSceen.util
 
 import android.content.Context
-import mega.privacy.android.app.lollipop.DrawerItem
-import mega.privacy.android.app.lollipop.ManagerActivityLollipop.*
+import mega.privacy.android.app.main.DrawerItem
+import mega.privacy.android.app.main.ManagerActivity.*
 import mega.privacy.android.app.utils.Constants.INVALID_VALUE
 import mega.privacy.android.app.utils.SharedPreferenceConstants.DO_NOT_ALERT_ABOUT_START_SCREEN
 import mega.privacy.android.app.utils.SharedPreferenceConstants.PREFERRED_START_SCREEN

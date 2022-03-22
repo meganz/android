@@ -1,6 +1,6 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
 	xmlns:tools="http://schemas.android.com/tools"
-	tools:context="mega.privacy.android.app.lollipop.ManagerActivityLollipop">
+	tools:context="mega.privacy.android.app.main.ManagerActivity">
 	<item
 		android:id="@+id/bottom_navigation_item_cloud_drive"
 		android:icon="@drawable/ic_files_home"

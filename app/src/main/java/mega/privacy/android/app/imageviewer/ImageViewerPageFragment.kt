@@ -1,7 +1,5 @@
 package mega.privacy.android.app.imageviewer
 
-import android.content.Intent
-import android.content.SharedPreferences
 import android.graphics.drawable.Animatable
 import android.net.Uri
 import android.os.Bundle
@@ -22,21 +20,14 @@ import com.facebook.imagepipeline.memory.BasePool
 import com.facebook.imagepipeline.request.ImageRequest
 import com.facebook.imagepipeline.request.ImageRequestBuilder
 import dagger.hilt.android.AndroidEntryPoint
-import mega.privacy.android.app.MimeTypeList
 import mega.privacy.android.app.R
-import mega.privacy.android.app.constants.SettingsConstants
 import mega.privacy.android.app.databinding.PageImageViewerBinding
 import mega.privacy.android.app.imageviewer.data.ImageItem
-import mega.privacy.android.app.mediaplayer.VideoPlayerActivity
-import mega.privacy.android.app.utils.Constants.*
+import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_HANDLE
 import mega.privacy.android.app.utils.ContextUtils.getScreenSize
 import mega.privacy.android.app.utils.ExtraUtils.extra
 import mega.privacy.android.app.utils.LogUtil.logError
-import mega.privacy.android.app.utils.NetworkUtil.isMeteredConnection
 import mega.privacy.android.app.utils.view.MultiTapGestureListener
-import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
-import nz.mega.sdk.MegaApiJava.ORDER_DEFAULT_ASC
-import javax.inject.Inject
 
 /**
  * Image Viewer page that shows an individual image within a list of image items
@@ -59,19 +50,14 @@ class ImageViewerPageFragment : Fragment() {
             }
     }
 
-    @Inject
-    lateinit var preferences: SharedPreferences
-
     private lateinit var binding: PageImageViewerBinding
 
     private var hasScreenBeenRotated = false
+    private var hasZoomBeenTriggered = false
     private val viewModel by activityViewModels<ImageViewerViewModel>()
     private val nodeHandle: Long? by extra(INTENT_EXTRA_KEY_HANDLE)
     private val controllerListener by lazy { buildImageControllerListener() }
     private val screenSize: Size by lazy { requireContext().getScreenSize() }
-    private val isMobileDataAllowed: Boolean by lazy {
-        preferences.getBoolean(SettingsConstants.KEY_MOBILE_DATA_HIGH_RESOLUTION, true)
-    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -96,7 +82,7 @@ class ImageViewerPageFragment : Fragment() {
     override fun onResume() {
         super.onResume()
         if (!hasScreenBeenRotated) {
-            viewModel.loadSingleImage(nodeHandle!!, fullSize = !isHighResolutionRestricted(), highPriority = true)
+            viewModel.loadSingleImage(nodeHandle!!, fullSize = false, highPriority = true)
         }
     }
 
@@ -124,7 +110,10 @@ class ImageViewerPageFragment : Fragment() {
                     this,
                     onSingleTapCallback = viewModel::switchToolbar,
                     onZoomCallback = {
-                        viewModel.loadSingleImage(nodeHandle!!, fullSize = true, highPriority = true)
+                        if (!hasZoomBeenTriggered) {
+                            hasZoomBeenTriggered = true
+                            viewModel.loadSingleImage(nodeHandle!!, fullSize = true, highPriority = true)
+                        }
                     }
                 )
             )
@@ -172,25 +161,21 @@ class ImageViewerPageFragment : Fragment() {
 
         if (mainImageUri == null && lowImageUri == null) return
         val mainImageRequest = mainImageUri?.toImageRequest()
-        val lowImageRequest = lowImageUri?.toImageRequest()
-
-        val newController = Fresco.newDraweeControllerBuilder()
-            .setLowResImageRequest(lowImageRequest)
+        val newControllerBuilder = Fresco.newDraweeControllerBuilder()
             .setImageRequest(mainImageRequest)
-            .build()
+            .apply { lowImageUri?.toImageRequest()?.let(::setLowResImageRequest) }
+        val newController = newControllerBuilder.build()
 
         if (binding.image.controller?.isSameImageRequest(newController) != true) {
-            binding.image.controller = Fresco.newDraweeControllerBuilder()
+            binding.image.controller = newControllerBuilder
                 .setOldController(binding.image.controller)
                 .setControllerListener(controllerListener)
                 .setAutoPlayAnimations(true)
-                .setLowResImageRequest(lowImageRequest)
-                .setImageRequest(mainImageRequest)
                 .build()
         } else if (imageItem.imageResult.isFullyLoaded) {
             binding.image.post {
                 if (imageItem.imageResult.isVideo) {
-                    showVideoButton(imageItem)
+                    showVideoButton()
                 }
                 binding.progress.hide()
             }
@@ -207,7 +192,7 @@ class ImageViewerPageFragment : Fragment() {
             if (imageItem?.imageResult?.isFullyLoaded == true) {
                 binding.image.post {
                     if (imageItem.imageResult.isVideo) {
-                        showVideoButton(imageItem)
+                        showVideoButton()
                     }
                     binding.progress.hide()
                 }
@@ -227,7 +212,7 @@ class ImageViewerPageFragment : Fragment() {
             if (imageItem?.imageResult?.isFullyLoaded == true) {
                 binding.image.post {
                     if (imageItem.imageResult.isVideo) {
-                        showVideoButton(imageItem)
+                        showVideoButton()
                     }
                     binding.progress.hide()
                 }
@@ -235,47 +220,29 @@ class ImageViewerPageFragment : Fragment() {
         }
     }
 
-    private fun showVideoButton(imageItem: ImageItem) {
+    private fun showVideoButton() {
         if (binding.btnVideo.isVisible && viewModel.isToolbarShown()) return
 
         viewModel.switchToolbar(true)
-        binding.btnVideo.setOnClickListener { launchVideoScreen(imageItem) }
+        binding.btnVideo.setOnClickListener { launchVideoScreen() }
         binding.btnVideo.isVisible = true
         binding.image.apply {
             setAllowTouchInterceptionWhileZoomed(true)
             setZoomingEnabled(false)
             setTapListener(object : GestureDetector.SimpleOnGestureListener() {
                 override fun onSingleTapUp(e: MotionEvent?): Boolean {
-                    launchVideoScreen(imageItem)
+                    launchVideoScreen()
                     return true
                 }
             })
-            setOnClickListener { launchVideoScreen(imageItem) }
+            setOnClickListener { launchVideoScreen() }
         }
     }
 
-    private fun launchVideoScreen(item: ImageItem) {
-        val fileUri = item.imageResult?.getHighestResolutionAvailableUri() ?: return
-        val nodeName = item.nodeItem?.name ?: return
-        val intent = Intent(context, VideoPlayerActivity::class.java).apply {
-            setDataAndType(fileUri, MimeTypeList.typeForName(nodeName).type)
-            putExtra(INTENT_EXTRA_KEY_HANDLE, nodeHandle)
-            putExtra(INTENT_EXTRA_KEY_FILE_NAME, nodeName)
-            putExtra(INTENT_EXTRA_KEY_ADAPTER_TYPE, FROM_IMAGE_VIEWER)
-            putExtra(INTENT_EXTRA_KEY_IS_FOLDER_LINK, !item.nodeItem.hasReadAccess)
-            putExtra(INTENT_EXTRA_KEY_POSITION, 0)
-            putExtra(INTENT_EXTRA_KEY_PARENT_NODE_HANDLE, INVALID_HANDLE)
-            putExtra(INTENT_EXTRA_KEY_ORDER_GET_CHILDREN, ORDER_DEFAULT_ASC)
-            putExtra(INTENT_EXTRA_KEY_NEED_STOP_HTTP_SERVER, false)
-            addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP)
-            addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-        }
-
-        startActivity(intent)
+    private fun launchVideoScreen() {
+        val imageItem = viewModel.getImageItem(nodeHandle!!) ?: return
+        (activity as? ImageViewerActivity?)?.launchVideoScreen(imageItem)
     }
-
-    private fun isHighResolutionRestricted(): Boolean =
-        !isMobileDataAllowed && requireContext().isMeteredConnection()
 
     private fun Uri.toImageRequest(): ImageRequest? =
         ImageRequestBuilder.newBuilderWithSource(this)

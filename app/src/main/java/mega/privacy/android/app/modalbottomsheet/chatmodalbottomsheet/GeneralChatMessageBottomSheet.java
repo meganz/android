@@ -12,16 +12,14 @@ import android.widget.TextView;
 import com.google.android.material.switchmaterial.SwitchMaterial;
 
 import java.util.ArrayList;
-import java.util.Collections;
 
 import mega.privacy.android.app.MegaOffline;
-import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
-import mega.privacy.android.app.lollipop.controllers.ChatController;
-import mega.privacy.android.app.lollipop.controllers.ContactController;
-import mega.privacy.android.app.lollipop.megachat.AndroidMegaChatMessage;
-import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop;
-import mega.privacy.android.app.lollipop.megachat.ChatReactionsView;
+import mega.privacy.android.app.main.controllers.ChatController;
+import mega.privacy.android.app.main.controllers.ContactController;
+import mega.privacy.android.app.main.megachat.AndroidMegaChatMessage;
+import mega.privacy.android.app.main.megachat.ChatActivity;
+import mega.privacy.android.app.main.megachat.ChatReactionsView;
 import mega.privacy.android.app.modalbottomsheet.BaseBottomSheetDialogFragment;
 import mega.privacy.android.app.utils.ContactUtil;
 import mega.privacy.android.app.utils.StringResourcesUtils;
@@ -73,9 +71,9 @@ public class GeneralChatMessageBottomSheet extends BaseBottomSheetDialogFragment
             positionMessage = savedInstanceState.getInt(POSITION_SELECTED_MESSAGE, INVALID_POSITION);
             handle = savedInstanceState.getLong(HANDLE, INVALID_HANDLE);
         } else {
-            chatId = ((ChatActivityLollipop) requireActivity()).idChat;
-            messageId = ((ChatActivityLollipop) requireActivity()).selectedMessageId;
-            positionMessage = ((ChatActivityLollipop) requireActivity()).selectedPosition;
+            chatId = ((ChatActivity) requireActivity()).idChat;
+            messageId = ((ChatActivity) requireActivity()).selectedMessageId;
+            positionMessage = ((ChatActivity) requireActivity()).selectedPosition;
         }
 
         MegaChatMessage messageMega = megaChatApi.getMessage(chatId, messageId);
@@ -112,7 +110,6 @@ public class GeneralChatMessageBottomSheet extends BaseBottomSheetDialogFragment
         LinearLayout infoFileSeparator = contentView.findViewById(R.id.info_file_separator);
         RelativeLayout optionImport = contentView.findViewById(R.id.option_import_layout);
         RelativeLayout optionDownload = contentView.findViewById(R.id.option_download_layout);
-        TextView optionGallery = contentView.findViewById(R.id.gallery_option);
         LinearLayout optionSaveOffline = contentView.findViewById(R.id.option_save_offline_layout);
         SwitchMaterial offlineSwitch = contentView.findViewById(R.id.file_properties_switch);
         LinearLayout deleteSeparator = contentView.findViewById(R.id.delete_separator);
@@ -131,15 +128,14 @@ public class GeneralChatMessageBottomSheet extends BaseBottomSheetDialogFragment
         optionInviteContact.setOnClickListener(this);
         optionImport.setOnClickListener(this);
         optionDownload.setOnClickListener(this);
-        optionGallery.setOnClickListener(this);
         optionSaveOffline.setOnClickListener(this);
         optionDelete.setOnClickListener(this);
 
         boolean isRemovedOrPendingMsg =  message != null && message.getMessage() != null
-                && ((ChatActivityLollipop) requireActivity()).hasMessagesRemovedOrPending(message.getMessage());
+                && ((ChatActivity) requireActivity()).hasMessagesRemovedOrPending(message.getMessage());
 
         boolean shouldReactionOptionBeVisible = chatRoom != null && message != null &&
-                requireActivity() instanceof ChatActivityLollipop && shouldReactionBeClicked(chatRoom) &&
+                requireActivity() instanceof ChatActivity && shouldReactionBeClicked(chatRoom) &&
                 !isRemovedOrPendingMsg && !message.isUploading();
 
         if (shouldReactionOptionBeVisible) {
@@ -171,7 +167,6 @@ public class GeneralChatMessageBottomSheet extends BaseBottomSheetDialogFragment
             infoFileSeparator.setVisibility(View.GONE);
             optionImport.setVisibility(View.GONE);
             optionDownload.setVisibility(View.GONE);
-            optionGallery.setVisibility(View.GONE);
             optionSaveOffline.setVisibility(View.GONE);
             deleteSeparator.setVisibility(View.GONE);
             optionDelete.setVisibility(View.GONE);
@@ -249,17 +244,6 @@ public class GeneralChatMessageBottomSheet extends BaseBottomSheetDialogFragment
             optionOpenWith.setVisibility(!isRemovedOrPendingMsg && typeMessage == MegaChatMessage.TYPE_NODE_ATTACHMENT ? View.VISIBLE : View.GONE);
 
             optionDownload.setVisibility(!isRemovedOrPendingMsg && typeMessage == MegaChatMessage.TYPE_NODE_ATTACHMENT ? View.VISIBLE : View.GONE);
-
-            if (!isAndroid11OrUpper() && node != null && node.isFile() && !isRemovedOrPendingMsg) {
-                MimeTypeList nodeMime = MimeTypeList.typeForName(node.getName());
-                if (nodeMime.isImage() || nodeMime.isVideo()) {
-                    optionGallery.setVisibility(View.VISIBLE);
-                } else {
-                    optionGallery.setVisibility(View.GONE);
-                }
-            } else {
-                optionGallery.setVisibility(View.GONE);
-            }
 
             optionImport.setVisibility(!isRemovedOrPendingMsg && typeMessage == MegaChatMessage.TYPE_NODE_ATTACHMENT && !chatC.isInAnonymousMode() ? View.VISIBLE : View.GONE);
             boolean shouldShowOfflineOption = typeMessage == MegaChatMessage.TYPE_NODE_ATTACHMENT && !chatC.isInAnonymousMode();
@@ -378,18 +362,18 @@ public class GeneralChatMessageBottomSheet extends BaseBottomSheetDialogFragment
                 break;
 
             case R.id.forward_layout:
-                ((ChatActivityLollipop) requireActivity()).forwardMessages(messagesSelected);
+                ((ChatActivity) requireActivity()).forwardMessages(messagesSelected);
                 break;
 
             case R.id.edit_layout:
-                ((ChatActivityLollipop) requireActivity()).editMessage(messagesSelected);
+                ((ChatActivity) requireActivity()).editMessage(messagesSelected);
                 break;
 
             case R.id.copy_layout:
                 MegaChatMessage msg = message.getMessage();
                 String text = isGeolocation(msg) ? msg.getContainsMeta().getTextMessage() :
-                        ((ChatActivityLollipop) requireActivity()).copyMessage(message);
-                ((ChatActivityLollipop) requireActivity()).copyToClipboard(text);
+                        ((ChatActivity) requireActivity()).copyMessage(message);
+                ((ChatActivity) requireActivity()).copyToClipboard(text);
                 break;
 
             case R.id.share_layout:
@@ -402,7 +386,7 @@ public class GeneralChatMessageBottomSheet extends BaseBottomSheetDialogFragment
                 break;
 
             case R.id.select_layout:
-                ((ChatActivityLollipop) requireActivity()).activateActionModeWithItem(positionMessage);
+                ((ChatActivity) requireActivity()).activateActionModeWithItem(positionMessage);
                 break;
 
             case R.id.option_view_layout:
@@ -412,7 +396,7 @@ public class GeneralChatMessageBottomSheet extends BaseBottomSheetDialogFragment
 
             case R.id.option_info_layout:
                 if (!isOnline(requireContext())) {
-                    ((ChatActivityLollipop) requireActivity()).showSnackbar(SNACKBAR_TYPE, StringResourcesUtils.getString(R.string.error_server_connection_problem), INVALID_HANDLE);
+                    ((ChatActivity) requireActivity()).showSnackbar(SNACKBAR_TYPE, StringResourcesUtils.getString(R.string.error_server_connection_problem), INVALID_HANDLE);
                     return;
                 }
 
@@ -423,7 +407,7 @@ public class GeneralChatMessageBottomSheet extends BaseBottomSheetDialogFragment
 
             case R.id.option_invite_layout:
                 if (!isOnline(requireContext())) {
-                    ((ChatActivityLollipop) requireActivity()).showSnackbar(SNACKBAR_TYPE, StringResourcesUtils.getString(R.string.error_server_connection_problem), INVALID_HANDLE);
+                    ((ChatActivity) requireActivity()).showSnackbar(SNACKBAR_TYPE, StringResourcesUtils.getString(R.string.error_server_connection_problem), INVALID_HANDLE);
                     return;
                 }
 
@@ -449,7 +433,7 @@ public class GeneralChatMessageBottomSheet extends BaseBottomSheetDialogFragment
                 long numUsers = message.getMessage().getUsersCount();
 
                 if (numUsers == 1) {
-                    ((ChatActivityLollipop) requireActivity()).startConversation(message.getMessage().getUserHandle(0));
+                    ((ChatActivity) requireActivity()).startConversation(message.getMessage().getUserHandle(0));
                 } else {
                     logDebug("Num users to invite: " + numUsers);
                     ArrayList<Long> contactHandles = new ArrayList<>();
@@ -458,7 +442,7 @@ public class GeneralChatMessageBottomSheet extends BaseBottomSheetDialogFragment
                         long userHandle = message.getMessage().getUserHandle(j);
                         contactHandles.add(userHandle);
                     }
-                    ((ChatActivityLollipop) requireActivity()).startGroupConversation(contactHandles);
+                    ((ChatActivity) requireActivity()).startGroupConversation(contactHandles);
                 }
                 break;
 
@@ -467,15 +451,7 @@ public class GeneralChatMessageBottomSheet extends BaseBottomSheetDialogFragment
                     logWarning("The selected node is NULL");
                     return;
                 }
-                ((ChatActivityLollipop) requireActivity()).downloadNodeList(nodeList);
-                break;
-
-            case R.id.gallery_option:
-                if (node == null) {
-                    logWarning("The selected node is NULL");
-                    return;
-                }
-                ((ChatActivityLollipop) requireActivity()).saveNodesToGallery(Collections.singletonList(node));
+                ((ChatActivity) requireActivity()).downloadNodeList(nodeList);
                 break;
 
             case R.id.option_import_layout:
@@ -503,12 +479,12 @@ public class GeneralChatMessageBottomSheet extends BaseBottomSheetDialogFragment
                     ArrayList<AndroidMegaChatMessage> messages = new ArrayList<>();
                     messages.add(message);
                     chatC.saveForOfflineWithAndroidMessages(messages,
-                            megaChatApi.getChatRoom(chatId), (ChatActivityLollipop) requireActivity());
+                            megaChatApi.getChatRoom(chatId), (ChatActivity) requireActivity());
                 }
                 break;
 
             case R.id.delete_layout:
-                ((ChatActivityLollipop) requireActivity()).showConfirmationDeleteMessages(messagesSelected, chatRoom);
+                ((ChatActivity) requireActivity()).showConfirmationDeleteMessages(messagesSelected, chatRoom);
                 break;
         }
         closeDialog();

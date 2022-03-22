@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <RelativeLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="top|center_horizontal"
+        android:layout_marginStart="10dp"
+        android:layout_marginTop="8dp">
+
+        <ImageView
+            android:id="@+id/badge"
+            android:layout_width="14dp"
+            android:layout_height="14dp"
+            android:layout_centerInParent="true"
+            app:srcCompat="@drawable/bnv_notification_badge"
+            android:gravity="center" />
+
+        <TextView
+            android:id="@+id/chat_badge_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:layout_gravity="top|center_horizontal"
+            android:fontFamily="roboto"
+            android:textSize="8sp"
+            android:textStyle="bold"
+            android:textColor="?attr/colorPrimary"
+            android:gravity="center"/>
+
+    </RelativeLayout>
+
+</FrameLayout>

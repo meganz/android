@@ -28,7 +28,7 @@ import com.facebook.imagepipeline.request.ImageRequest;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.RoundedImageView;
 
-import static mega.privacy.android.app.lollipop.megachat.chatAdapters.MegaChatLollipopAdapter.updateViewDimensions;
+import static mega.privacy.android.app.main.megachat.chatAdapters.MegaChatAdapter.updateViewDimensions;
 import static mega.privacy.android.app.utils.LogUtil.logWarning;
 
 public class FrescoUtils {

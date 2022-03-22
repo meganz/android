@@ -4,6 +4,8 @@ import android.content.Context
 import android.text.Spanned
 import androidx.core.content.ContextCompat
 import androidx.core.text.HtmlCompat
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import dagger.hilt.android.lifecycle.HiltViewModel
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.Product
@@ -21,6 +23,7 @@ import mega.privacy.android.app.utils.StringResourcesUtils.getString
 import mega.privacy.android.app.utils.Util.getSizeStringGBBased
 import mega.privacy.android.app.utils.billing.PaymentUtils.getSku
 import mega.privacy.android.app.utils.billing.PaymentUtils.getSkuDetails
+import nz.mega.sdk.MegaApiJava
 import java.text.NumberFormat
 import java.util.*
 import javax.inject.Inject
@@ -39,6 +42,30 @@ class ChooseUpgradeAccountViewModel @Inject constructor(
         const val YEARLY_SUBSCRIBED = 2
     }
 
+    private val _currentSubscription = MutableLiveData<Pair<Int, SubscriptionMethod?>>()
+    val currentSubscription: LiveData<Pair<Int, SubscriptionMethod?>>
+        get() = _currentSubscription
+
+    /**
+     * Check the current subscription
+     * @param upgradeType upgrade type
+     */
+    fun subscriptionCheck(upgradeType: Int){
+        SubscriptionMethod.values().firstOrNull {
+            // Determines the current account if has the subscription and the current subscription
+            // platform if is same as current payment platform.
+            if (BillingManagerImpl.PAYMENT_GATEWAY == MegaApiJava.PAYMENT_METHOD_GOOGLE_WALLET) {
+                it.methodId != MegaApiJava.PAYMENT_METHOD_GOOGLE_WALLET
+                        && it.methodId == myAccountInfo.subscriptionMethodId
+            } else {
+                it.methodId != MegaApiJava.PAYMENT_METHOD_HUAWEI_WALLET
+                        && it.methodId == myAccountInfo.subscriptionMethodId
+            }
+        }.run {
+            _currentSubscription.value = Pair(upgradeType, this)
+        }
+    }
+
     fun isGettingInfo(): Boolean =
         myAccountInfo.accountType < FREE || myAccountInfo.accountType > PRO_LITE
 
@@ -52,6 +79,8 @@ class ChooseUpgradeAccountViewModel @Inject constructor(
 
     fun getProductAccounts(): ArrayList<Product>? = myAccountInfo.productAccounts
 
+    fun isBillingAvailable(): Boolean = !myAccountInfo.availableSkus.isNullOrEmpty()
+
     fun checkProductAccounts(): ArrayList<Product>? {
         val productAccounts = getProductAccounts()
 
@@ -62,19 +91,22 @@ class ChooseUpgradeAccountViewModel @Inject constructor(
     }
 
     /**
-     * Asks for account info if needed.
+     * Asks for account info if needed: Pricing and payment methods.
      */
     fun refreshAccountInfo() {
-        logDebug("Check the last call to callToPricing")
-        if (callToPricing()) {
-            logDebug("megaApi.getPricing SEND")
-            MegaApplication.getInstance().askForPricing()
-        }
+        refreshPricing()
 
-        logDebug("Check the last call to callToPaymentMethods")
         if (callToPaymentMethods()) {
-            logDebug("megaApi.getPaymentMethods SEND")
             MegaApplication.getInstance().askForPaymentMethods()
+        }
+    }
+
+    /**
+     * Asks for pricing if needed.
+     */
+    fun refreshPricing() {
+        if (callToPricing()) {
+            MegaApplication.getInstance().askForPricing()
         }
     }
 

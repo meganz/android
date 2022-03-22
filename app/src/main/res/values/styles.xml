@@ -437,7 +437,7 @@
         <item name="android:layout_gravity">center_horizontal|center_vertical</item>
     </style>
 
-    <!-- For dropdown menu in AudioVideoPlayerLollipop, fix to dark mode -->
+    <!-- For dropdown menu in AudioVideoPlayer, fix to dark mode -->
     <style name="ThemeOverlay.MaterialComponents.MenuDark">
         <item name="colorSurface">@color/grey_900</item>
         <item name="android:textColorPrimary">@color/white_alpha_087</item>
@@ -544,7 +544,7 @@
         <item name="android:colorControlActivated">@android:color/transparent</item>
     </style>
 
-    <style name="BottomSheetOption">
+    <style name="BottomSheetOptionWithoutBackground">
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">56dp</item>
         <item name="android:drawablePadding">35dp</item>
@@ -552,8 +552,11 @@
         <item name="android:paddingStart">18dp</item>
         <item name="android:paddingEnd">18dp</item>
         <item name="android:textAppearance">?attr/textAppearanceSubtitle1</item>
-        <item name="android:background">?selectableItemBackground</item>
         <item name="drawableTint">?android:attr/textColorSecondary</item>
+    </style>
+
+    <style name="BottomSheetOption" parent="BottomSheetOptionWithoutBackground">
+        <item name="android:background">?selectableItemBackground</item>
     </style>
 
     <style name="BottomSheetItem">
@@ -691,7 +694,4 @@
         <item name="android:letterSpacing">0.0004</item>
     </style>
 
-    <style name="VideoPlaylistActionBar" parent="@style/ThemeOverlay.AppCompat.Dark.ActionBar">
-        <item name="actionModeBackground">@color/black</item>
-    </style>
 </resources>

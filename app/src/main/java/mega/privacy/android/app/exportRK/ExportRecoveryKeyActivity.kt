@@ -9,7 +9,7 @@ import mega.privacy.android.app.activities.PasscodeActivity
 import mega.privacy.android.app.exportRK.ExportRecoveryKeyViewModel.Companion.ERROR_NO_SPACE
 import mega.privacy.android.app.exportRK.ExportRecoveryKeyViewModel.Companion.GENERAL_ERROR
 import mega.privacy.android.app.databinding.ActivityExportRecoveryKeyBinding
-import mega.privacy.android.app.lollipop.controllers.AccountController
+import mega.privacy.android.app.main.controllers.AccountController
 import mega.privacy.android.app.utils.LogUtil.logWarning
 import mega.privacy.android.app.utils.permission.PermissionUtils.hasPermissions
 import mega.privacy.android.app.utils.StringResourcesUtils

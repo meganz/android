@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0"?>
 <resources>
     <!-- PRO Lite account -->
     <string name="prolite_account">Pro&#160;Lite</string>
@@ -229,7 +229,7 @@
     <!-- Text placed on the checkbox to make sure user agree that understand the danger of losing password -->
     <string name="top">Je comprends que [B]si je perds mon mot de passe, je pourrais perdre mes données[/B]. En apprendre davantage sur le [A]chiffrement de bout en bout de MEGA[/A].</string>
     <!-- Does the user already have a MEGA account -->
-    <string name="already_account">Avez-vous un compte ?</string>
+    <string name="already_account">Avez-vous déjà un compte ?</string>
     <!-- warning dialog -->
     <string name="create_account_no_terms">Vous devez accepter nos Conditions générales d’utilisation</string>
     <!-- warning dialog, for user do not tick checkbox of understanding the danger of losing password -->
@@ -700,7 +700,7 @@
     <string name="cam_sync_wifi">Wi-Fi seulement</string>
     <!-- the options of how to upload, but in an array. needed for the settings, how to upload the camera images. when Wi-Fi connected and using data plan -->
     <string name="cam_sync_data">Wi-Fi ou données mobiles</string>
-    <!-- The upload of the user’s photos orvideos from their specified album is in progress. -->
+    <!-- The upload of the user’s photos or videos from their specified album is in progress. -->
     <string name="cam_sync_syncing">Les téléversements de l’appareil photo sont en cours</string>
     <!-- confirmation question for cancelling the camera uploads -->
     <string name="cam_sync_cancel_sync">Voulez-vous arrêter les téléversements de l’appareil photo ?</string>
@@ -2868,9 +2868,9 @@
     <!-- Option of one-off (year) billing. Placeholder: purchase price. -->
     <string name="billed_one_off_year">[A]une fois (année)[/A] %s</string>
     <!-- Option of monthly billing period. Placeholder: purchase price -->
-    <string name="billed_monthly_text">[A]Mensuellement[/A] %s /mois</string>
+    <string name="billed_monthly_text">[A]Facturé mensuellement[/A] %s/mois</string>
     <!-- Option of yearly billing period. Placeholder: purchase price -->
-    <string name="billed_yearly_text">[A]Annuellement[/A] %s/an</string>
+    <string name="billed_yearly_text">[A]Facturé annuellement[/A] %s/mois</string>
     <!-- dialog option cancel in alert dialog -->
     <string name="button_cancel">Annuler</string>
     <!-- dialog option continue in alert dialog -->
@@ -2949,7 +2949,7 @@
     <!--  -->
     <string name="custom_subtitle_of_group_chat">%1$s et %2$d de plus</string>
     <!-- Error when the user tries to get a public chat link for a chat with the default title -->
-    <string name="message_error_set_title_get_link">Avant de pouvoir générer un lien pour cette conversation, vous devez définir une description&#160;:</string>
+    <string name="message_error_set_title_get_link">Avant de pouvoir générer un lien pour cette conversation, vous devez indiquer une description&#160;:</string>
     <!-- success alert when the user copy a chat link to the clipboard -->
     <string name="chat_link_copied_clipboard">Le lien de conversation a été copié dans le presse-papiers</string>
     <!-- Label to show the price of each plan in the upgrade account section -->
@@ -3807,8 +3807,6 @@
     <string name="same_item_name_warning">Un élément porte déjà ce nom</string>
     <!-- Label of the option menu. When clicking this button, the app shows the info of the related item, e.g. file, folder, contact, chat, etc. -->
     <string name="general_info">Renseignements</string>
-    <!-- Item menu option upon right click on one image or video to save it to device gallery -->
-    <string name="general_save_to_gallery">Enregistrer dans la galerie</string>
     <!-- settings of the Media section -->
     <string name="settings_media">Médias</string>
     <!-- settings title of the Media section -->
@@ -4223,10 +4221,54 @@
     <string name="upload_files">Téléverser des fichiers</string>
     <!-- Action button to upload a folder. -->
     <string name="upload_folder">Téléverser un dossier</string>
-    <!-- Title of the dialog warning the user about cancel uploads. -->
-    <string name="cancel_uploads">Annuler les téléversements</string>
-    <!-- Warning alerting user if proceed with the action all the uploads will be cancelled. -->
-    <string name="cancel_uploads_warning">L’interruption du processus de téléversement entraînera l’annulation de tous vos téléversements.</string>
-    <!-- Button to proceed with action. -->
-    <string name="action_proceed">Poursuivre</string>
+    <!-- Text of the dialog warning the user about cancel uploads. -->
+    <string name="cancel_uploads">Annuler le téléversement ?</string>
+    <!-- Title of the Payments screen -->
+    <string name="payment">Paiement</string>
+    <!-- Label indicating payment methods -->
+    <string name="payment_methods">Modes de paiement</string>
+    <!-- Button to proceed with a payment -->
+    <string name="proceed">Procéder au paiement</string>
+    <!-- Message informing the upgrade was processed correctly. Placeholder: type of subscription e.g: Pro Lite monthly -->
+    <string name="successful_upgrade">Nous vous remercions pour votre abonnement %1$s</string>
+    <!-- Pro Lite monthly subscription -->
+    <string name="pro_lite_monthly">mensuel Pro Lite</string>
+    <!-- Pro Lite yearly subscription -->
+    <string name="pro_lite_yearly">annuel Pro Lite</string>
+    <!-- Pro I monthly subscription -->
+    <string name="pro_i_monthly">mensuel Pro I</string>
+    <!-- Pro I yearly subscription -->
+    <string name="pro_i_yearly">annuel Pro I</string>
+    <!-- Pro II monthly subscription -->
+    <string name="pro_ii_monthly">mensuel Pro II</string>
+    <!-- Pro II yearly subscription -->
+    <string name="pro_ii_yearly">annuel Pro II</string>
+    <!-- Pro III monthly subscription -->
+    <string name="pro_iii_monthly">mensuel Pro III</string>
+    <!-- Pro III yearly subscription -->
+    <string name="pro_iii_yearly">annuel Pro III</string>
+    <!-- Action button which will cancel uploads. -->
+    <string name="action_cancel_upload">Annuler le téléversement</string>
+    <!-- Action button which will dismiss the dialog and will not cancel the action. -->
+    <string name="action_do_not_cancel">Ne pas annuler</string>
+    <!-- Remove moderator permission and assign standard permission to a meeting participant-->
+    <string name="remove_moderator">Supprimer comme modérateur</string>
+    <!-- Title of DCIM folder warning dialog -->
+    <string name="title_dcim_folder_dialog">Dossier&#160;DCIM</string>
+    <!-- Content of DCIM folder warning dialog -->
+    <string name="content_dcim_folder_dialog">MEGA téléverse vos images de la galerie. Pour changer l’emplacement de téléversement, veuillez accéder aux paramètres des Téléversements de l’appareil photo.</string>
+    <!-- Error shown when download a file that has violated ToS/AUP. -->
+    <string name="tos_aup_violation">Non-respect des CGU/PUA</string>
+    <!-- Title message of existing subscription dialog -->
+    <string name="title_existing_subscription">Acheter un nouvel abonnement ?</string>
+    <!-- Text of buy new subscription button -->
+    <string name="button_buy_new_subscription">Acheter un nouvel abonnement</string>
+    <!-- Dialog message when the existing subscription is from Android platform (Google and Huawei)  -->
+    <string name="message_subscription_from_android_platform">Vous avez déjà un abonnement. Si vous en achetez un autre, les deux vous seront facturés. Pour éviter cela, annulez votre abonnement dans %1$s. Pour plus de précisions, visitez notre centre d’assistance.</string>
+    <!-- Dialog message when the existing subscription is from iTunes  -->
+    <string name="message_subscription_from_itunes">Vous avez déjà un abonnement. Si vous en achetez un autre, les deux vous seront facturés. Pour éviter cela, annulez votre abonnement dans votre compte&#160;iTunes. Pour plus de précisions, visitez notre centre d’assistance.</string>
+    <!-- Dialog message when the existing subscription is from other platform (Stripe and ECP)  -->
+    <string name="message_subscription_from_other_platform">Vous avez déjà un abonnement. Si vous en achetez un autre, les deux vous seront facturés. Pour éviter cela, annulez votre abonnement actuel en accédant à MEGA dans un navigateur Web mobile ou pour ordinateur. Pour plus de précisions, visitez notre centre d’assistance.</string>
+    <!-- Warning show to the user when the app needs bluetooth connect permissions to get the best meeting experience and the user has denied them.-->
+    <string name="meeting_bluetooth_connect_required_permissions_warning">Accédez aux Paramètres pour accorder à MEGA l’autorisation d’accéder par Bluetooth à vos appareils à proximité.</string>
 </resources>

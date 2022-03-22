@@ -28,6 +28,9 @@ object ZoomUtil {
     @JvmStatic
     var MEDIA_ZOOM_LEVEL = ZOOM_DEFAULT
 
+    @JvmStatic
+    var ALBUM_ZOOM_LEVEL = ZOOM_DEFAULT
+
     // Span count portrait
     private const val SPAN_COUNT_PORTRAIT_OUT_2X = 12
     private const val SPAN_COUNT_PORTRAIT_OUT_1X = 5
@@ -82,13 +85,13 @@ object ZoomUtil {
     }
 
     fun getSelectedFrameWidth(context: Context, zoom: Int) = when (zoom) {
-        ZOOM_DEFAULT -> context.resources.getDimensionPixelSize(R.dimen.cu_fragment_ic_selected_size_large)
+        ZOOM_DEFAULT, ZOOM_IN_1X -> context.resources.getDimensionPixelSize(R.dimen.cu_fragment_ic_selected_size_large)
         ZOOM_OUT_1X -> context.resources.getDimensionPixelSize(R.dimen.cu_fragment_ic_selected_size_small)
         else -> 0
     }
 
     fun getSelectedFrameMargin(context: Context, zoom: Int) = when (zoom) {
-        ZOOM_DEFAULT -> context.resources.getDimensionPixelSize(R.dimen.cu_fragment_ic_selected_margin_large)
+        ZOOM_DEFAULT, ZOOM_IN_1X -> context.resources.getDimensionPixelSize(R.dimen.cu_fragment_ic_selected_margin_large)
         ZOOM_OUT_1X -> context.resources.getDimensionPixelSize(R.dimen.cu_fragment_ic_selected_margin_small)
         else -> 0
     }
@@ -127,5 +130,6 @@ object ZoomUtil {
         PHOTO_ZOOM_LEVEL = ZOOM_DEFAULT
         IMAGES_ZOOM_LEVEL = ZOOM_DEFAULT
         MEDIA_ZOOM_LEVEL = ZOOM_DEFAULT
+        ALBUM_ZOOM_LEVEL = ZOOM_DEFAULT
     }
 }

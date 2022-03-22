@@ -20,26 +20,24 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import mega.privacy.android.app.MimeTypeList
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.PasscodeActivity
-import mega.privacy.android.app.components.SimpleDividerItemDecoration
+import mega.privacy.android.app.components.ChatDividerItemDecoration
 import mega.privacy.android.app.components.dragger.DragToExitSupport
-import mega.privacy.android.app.components.dragger.DragToExitSupport.*
 import mega.privacy.android.app.databinding.ActivityZipBrowserBinding
 import mega.privacy.android.app.imageviewer.ImageViewerActivity
-import mega.privacy.android.app.lollipop.PdfViewerActivityLollipop
+import mega.privacy.android.app.main.PdfViewerActivity
 import mega.privacy.android.app.textEditor.TextEditorActivity
 import mega.privacy.android.app.utils.*
 import mega.privacy.android.app.utils.Constants.*
 import mega.privacy.android.app.utils.LogUtil.logDebug
 import mega.privacy.android.app.utils.MegaProgressDialogUtil.createProgressDialog
 import mega.privacy.android.app.zippreview.viewmodel.ZipBrowserViewModel
-import mega.privacy.android.app.zippreview.viewmodel.ZipBrowserViewModel.StatusItemClicked.*
 import mega.privacy.android.app.zippreview.domain.FileType
 import nz.mega.sdk.MegaApiJava
 import java.io.File
 import java.util.*
 
 /**
- * Display the zip file content, replacement of ZipBrowserActivityLollipop.java
+ * Display the zip file content
  */
 class ZipBrowserActivity : PasscodeActivity() {
     companion object {
@@ -108,7 +106,7 @@ class ZipBrowserActivity : PasscodeActivity() {
         recyclerView = zipBrowserBinding.zipListViewBrowser.also {
             it.setPadding(0, 0, 0, recycleViewBottomPadding())
             it.clipToPadding = false
-            it.addItemDecoration(SimpleDividerItemDecoration(this))
+            it.addItemDecoration(ChatDividerItemDecoration(this, outMetrics))
             it.layoutManager = LinearLayoutManager(this)
             it.setHasFixedSize(true)
             it.itemAnimator = DefaultItemAnimator()
@@ -258,7 +256,7 @@ class ZipBrowserActivity : PasscodeActivity() {
     private fun imageFileOpen(position: Int, file: File) {
         logDebug("isImage")
 
-        val intent = ImageViewerActivity.getIntentForSingleFile(this, file.toUri())
+        val intent = ImageViewerActivity.getIntentForFile(this, file.toUri(), true)
         DragToExitSupport.putThumbnailLocation(
             intent,
             recyclerView,
@@ -363,7 +361,7 @@ class ZipBrowserActivity : PasscodeActivity() {
     private fun MimeTypeList.pdfFileOpen(file: File, position: Int) {
         logDebug("Pdf file")
         val pdfIntent =
-            Intent(this@ZipBrowserActivity, PdfViewerActivityLollipop::class.java)
+            Intent(this@ZipBrowserActivity, PdfViewerActivity::class.java)
         pdfIntent.apply {
             putExtra(INTENT_EXTRA_KEY_INSIDE, true)
             putExtra(INTENT_EXTRA_KEY_ADAPTER_TYPE, ZIP_ADAPTER)

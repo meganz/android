@@ -4,9 +4,9 @@ import android.content.Context;
 
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.jobservices.CameraUploadsService;
-import mega.privacy.android.app.lollipop.FileExplorerActivityLollipop;
-import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop;
-import mega.privacy.android.app.lollipop.megachat.NodeAttachmentHistoryActivity;
+import mega.privacy.android.app.main.FileExplorerActivity;
+import mega.privacy.android.app.main.megachat.ChatActivity;
+import mega.privacy.android.app.main.megachat.NodeAttachmentHistoryActivity;
 import mega.privacy.android.app.utils.JobUtil;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaError;
@@ -68,38 +68,38 @@ public class CreateFolderListener extends BaseListener {
             }
         }
 
-        if (context instanceof FileExplorerActivityLollipop) {
-            FileExplorerActivityLollipop fileExplorerActivityLollipop = (FileExplorerActivityLollipop) context;
+        if (context instanceof FileExplorerActivity) {
+            FileExplorerActivity fileExplorerActivity = (FileExplorerActivity) context;
 
             if (e.getErrorCode() == MegaError.API_OK) {
                 if (extraAction == ExtraAction.MY_CHAT_FILES) {
-                    fileExplorerActivityLollipop.setMyChatFilesFolder(node);
-                    api.setMyChatFilesFolder(handle, new SetAttrUserListener(fileExplorerActivityLollipop));
-                    fileExplorerActivityLollipop.checkIfFilesExistsInMEGA();
+                    fileExplorerActivity.setMyChatFilesFolder(node);
+                    api.setMyChatFilesFolder(handle, new SetAttrUserListener(fileExplorerActivity));
+                    fileExplorerActivity.checkIfFilesExistsInMEGA();
                 } else {
-                    fileExplorerActivityLollipop.finishCreateFolder(true, handle);
+                    fileExplorerActivity.finishCreateFolder(true, handle);
                 }
             } else {
                 if (extraAction == ExtraAction.MY_CHAT_FILES) {
-                    fileExplorerActivityLollipop.showSnackbar(context.getString(R.string.general_text_error));
+                    fileExplorerActivity.showSnackbar(context.getString(R.string.general_text_error));
                 } else {
-                    fileExplorerActivityLollipop.finishCreateFolder(false, handle);
-                    fileExplorerActivityLollipop.showSnackbar(context.getString(R.string.error_creating_folder, name));
+                    fileExplorerActivity.finishCreateFolder(false, handle);
+                    fileExplorerActivity.showSnackbar(context.getString(R.string.error_creating_folder, name));
                 }
             }
-        } else if (context instanceof ChatActivityLollipop) {
-            ChatActivityLollipop chatActivityLollipop = (ChatActivityLollipop) context;
+        } else if (context instanceof ChatActivity) {
+            ChatActivity chatActivity = (ChatActivity) context;
 
             if (e.getErrorCode() == MegaError.API_OK) {
-                api.setMyChatFilesFolder(handle, new SetAttrUserListener(chatActivityLollipop));
-                chatActivityLollipop.setMyChatFilesFolder(node);
-                if (chatActivityLollipop.isForwardingFromNC()) {
-                    chatActivityLollipop.handleStoredData();
+                api.setMyChatFilesFolder(handle, new SetAttrUserListener(chatActivity));
+                chatActivity.setMyChatFilesFolder(node);
+                if (chatActivity.isForwardingFromNC()) {
+                    chatActivity.handleStoredData();
                 } else {
-                    chatActivityLollipop.proceedWithAction();
+                    chatActivity.proceedWithAction();
                 }
             } else {
-                chatActivityLollipop.showSnackbar(SNACKBAR_TYPE, context.getString(R.string.general_text_error), -1);
+                chatActivity.showSnackbar(SNACKBAR_TYPE, context.getString(R.string.general_text_error), -1);
             }
         } else if (context instanceof NodeAttachmentHistoryActivity) {
             NodeAttachmentHistoryActivity nodeAttachmentHistoryActivity = (NodeAttachmentHistoryActivity) context;

@@ -17,9 +17,9 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
 import mega.privacy.android.app.listeners.ResendVerificationEmailListener;
 import mega.privacy.android.app.listeners.WhyAmIBlockedListener;
-import mega.privacy.android.app.lollipop.LoginActivityLollipop;
+import mega.privacy.android.app.main.LoginActivity;
 import mega.privacy.android.app.activities.PasscodeActivity;
-import mega.privacy.android.app.lollipop.controllers.AccountController;
+import mega.privacy.android.app.main.controllers.AccountController;
 
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
@@ -170,7 +170,7 @@ public class WeakAccountProtectionAlertActivity extends PasscodeActivity impleme
         if (!result.equals(WEAK_PROTECTION_ACCOUNT_BLOCK) && isAccountBlocked) {
             isAccountBlocked = false;
             if (megaApi.getRootNode() == null) {
-                Intent intentLogin = new Intent(this, LoginActivityLollipop.class);
+                Intent intentLogin = new Intent(this, LoginActivity.class);
                 intentLogin.setAction(ACTION_REFRESH_AFTER_BLOCKED);
                 intentLogin.putExtra(VISIBLE_FRAGMENT, LOGIN_FRAGMENT);
                 intentLogin.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);

@@ -9,7 +9,7 @@ import java.io.File;
 
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.TwoLineCheckPreference;
-import mega.privacy.android.app.lollipop.FileStorageActivityLollipop;
+import mega.privacy.android.app.main.FileStorageActivity;
 
 import static mega.privacy.android.app.constants.SettingsConstants.*;
 import static mega.privacy.android.app.utils.Constants.*;
@@ -97,7 +97,7 @@ public class DownloadSettingsFragment extends SettingsBaseFragment {
     public void onActivityResult(int requestCode, int resultCode, Intent intent) {
         if (requestCode == REQUEST_DOWNLOAD_FOLDER && intent != null) {
             if (resultCode == Activity.RESULT_OK) {
-                downloadLocationPath = intent.getStringExtra(FileStorageActivityLollipop.EXTRA_PATH);
+                downloadLocationPath = intent.getStringExtra(FileStorageActivity.EXTRA_PATH);
                 setDownloadLocation();
             } else if (resultCode == Activity.RESULT_CANCELED) {
                 logDebug("REQUEST_DOWNLOAD_FOLDER - canceled");
@@ -106,9 +106,9 @@ public class DownloadSettingsFragment extends SettingsBaseFragment {
     }
 
     private void toSelectFolder() {
-        Intent intent = new Intent(context, FileStorageActivityLollipop.class);
-        intent.setAction(FileStorageActivityLollipop.Mode.PICK_FOLDER.getAction());
-        intent.putExtra(FileStorageActivityLollipop.PICK_FOLDER_TYPE, FileStorageActivityLollipop.PickFolderType.DOWNLOAD_FOLDER.getFolderType());
+        Intent intent = new Intent(context, FileStorageActivity.class);
+        intent.setAction(FileStorageActivity.Mode.PICK_FOLDER.getAction());
+        intent.putExtra(FileStorageActivity.PICK_FOLDER_TYPE, FileStorageActivity.PickFolderType.DOWNLOAD_FOLDER.getFolderType());
         startActivityForResult(intent, REQUEST_DOWNLOAD_FOLDER);
     }
 }

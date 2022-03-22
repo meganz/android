@@ -24,9 +24,9 @@ import mega.privacy.android.app.contacts.group.data.ContactGroupItem
 import mega.privacy.android.app.databinding.FragmentContactGroupsBinding
 import mega.privacy.android.app.interfaces.SnackbarShower
 import mega.privacy.android.app.interfaces.showSnackbar
-import mega.privacy.android.app.lollipop.AddContactActivityLollipop
-import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop
-import mega.privacy.android.app.lollipop.megachat.GroupChatInfoActivityLollipop
+import mega.privacy.android.app.main.AddContactActivity
+import mega.privacy.android.app.main.megachat.ChatActivity
+import mega.privacy.android.app.main.megachat.GroupChatInfoActivity
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.Constants.MIN_ITEMS_SCROLLBAR
 import mega.privacy.android.app.utils.LogUtil
@@ -61,9 +61,9 @@ class ContactGroupsFragment : Fragment() {
                 }
 
                 val contactsData =
-                    intent.getStringArrayListExtra(AddContactActivityLollipop.EXTRA_CONTACTS)
+                    intent.getStringArrayListExtra(AddContactActivity.EXTRA_CONTACTS)
                 val isGroup =
-                    intent.getBooleanExtra(AddContactActivityLollipop.EXTRA_GROUP_CHAT, false)
+                    intent.getBooleanExtra(AddContactActivity.EXTRA_GROUP_CHAT, false)
 
                 if (contactsData == null || !isGroup) {
                     LogUtil.logWarning("Is one to one chat or no contacts selected")
@@ -71,7 +71,7 @@ class ContactGroupsFragment : Fragment() {
                 }
 
                 val chatTitle =
-                    intent.getStringExtra(AddContactActivityLollipop.EXTRA_CHAT_TITLE)
+                    intent.getStringExtra(AddContactActivity.EXTRA_CHAT_TITLE)
 
                 viewModel.getGroupChatRoom(contactsData, chatTitle)
                     .observe(viewLifecycleOwner) { chatId ->
@@ -82,7 +82,7 @@ class ContactGroupsFragment : Fragment() {
                         } else {
                             Intent(
                                 requireContext(),
-                                ChatActivityLollipop::class.java
+                                ChatActivity::class.java
                             ).apply {
                                 action = Constants.ACTION_CHAT_SHOW_MESSAGES
                                 putExtra(Constants.CHAT_ID, chatId)
@@ -141,10 +141,10 @@ class ContactGroupsFragment : Fragment() {
         binding.btnCreateGroup.setOnClickListener {
             val intent = Intent(
                 requireContext(),
-                AddContactActivityLollipop::class.java
+                AddContactActivity::class.java
             ).apply {
-                putExtra(AddContactActivityLollipop.EXTRA_CONTACT_TYPE, Constants.CONTACT_TYPE_MEGA)
-                putExtra(AddContactActivityLollipop.EXTRA_ONLY_CREATE_GROUP, true)
+                putExtra(AddContactActivity.EXTRA_CONTACT_TYPE, Constants.CONTACT_TYPE_MEGA)
+                putExtra(AddContactActivity.EXTRA_ONLY_CREATE_GROUP, true)
             }
             intentToCreateGroupChat(intent)
         }
@@ -183,7 +183,7 @@ class ContactGroupsFragment : Fragment() {
      * @param groupId   Group Id that has been clicked
      */
     private fun onGroupClick(groupId: Long) {
-        startActivity(Intent(context, GroupChatInfoActivityLollipop::class.java).apply {
+        startActivity(Intent(context, GroupChatInfoActivity::class.java).apply {
             putExtra(Constants.HANDLE, groupId)
         })
     }

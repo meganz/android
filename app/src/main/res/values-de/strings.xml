@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0"?>
 <resources>
     <!-- PRO Lite account -->
     <string name="prolite_account">Pro Lite</string>
@@ -700,7 +700,7 @@
     <string name="cam_sync_wifi">Nur via WLAN</string>
     <!-- the options of how to upload, but in an array. needed for the settings, how to upload the camera images. when Wi-Fi connected and using data plan -->
     <string name="cam_sync_data">WLAN oder Mobildaten</string>
-    <!-- The upload of the user’s photos orvideos from their specified album is in progress. -->
+    <!-- The upload of the user’s photos or videos from their specified album is in progress. -->
     <string name="cam_sync_syncing">Kameraupload aktiv</string>
     <!-- confirmation question for cancelling the camera uploads -->
     <string name="cam_sync_cancel_sync">Kamera-Uploads anhalten?</string>
@@ -1064,7 +1064,7 @@
     <!-- Error message when a user attempts to change their email without an active login session. -->
     <string name="change_email_not_logged_in">Um Ihre E-Mail-Adresse zu ändern, müssen Sie angemeldet sein. Bitte melden Sie sich mit Ihrer aktuellen E-Mail-Adresse an und tippen Sie anschließend erneut auf Ihren Bestätigungslink.</string>
     <!-- Text displayed to inform that the email was successfully changed. Please keep the placeholder, it will be replaced with the new email address. -->
-    <string name="email_changed">Die neue E-Mail-Adresse Ihres MEGA-Accounts ist %1$s</string>
+    <string name="email_changed">Die neue E-Mail-Adresse Ihres MEGA-Accounts ist: %1$s</string>
     <!-- Error when the user leaves empty the password field -->
     <string name="invalid_string">Ungültig</string>
     <!-- Text of the toast when the user enters invalid text which is neither a valid phone number nor a valid email -->
@@ -2868,9 +2868,9 @@
     <!-- Option of one-off (year) billing. Placeholder: purchase price. -->
     <string name="billed_one_off_year">[A]Einmalzahlung (für ein Jahr)[/A] %s</string>
     <!-- Option of monthly billing period. Placeholder: purchase price -->
-    <string name="billed_monthly_text">[A]Monatlich[/A] %s/Monat</string>
+    <string name="billed_monthly_text">[A]Monatliche Zahlung[/A] %s/Monat</string>
     <!-- Option of yearly billing period. Placeholder: purchase price -->
-    <string name="billed_yearly_text">[A]Jährlich[/A] %s/Jahr</string>
+    <string name="billed_yearly_text">[A]Jährliche Zahlung[/A] %s/Jahr</string>
     <!-- dialog option cancel in alert dialog -->
     <string name="button_cancel">Abbrechen</string>
     <!-- dialog option continue in alert dialog -->
@@ -3807,8 +3807,6 @@
     <string name="same_item_name_warning">Eine Datei oder ein Ordner desselben Namens existiert bereits</string>
     <!-- Label of the option menu. When clicking this button, the app shows the info of the related item, e.g. file, folder, contact, chat, etc. -->
     <string name="general_info">Info</string>
-    <!-- Item menu option upon right click on one image or video to save it to device gallery -->
-    <string name="general_save_to_gallery">In Android-Galerie speichern</string>
     <!-- settings of the Media section -->
     <string name="settings_media">Media</string>
     <!-- settings title of the Media section -->
@@ -4223,10 +4221,54 @@
     <string name="upload_files">Dateien hochladen</string>
     <!-- Action button to upload a folder. -->
     <string name="upload_folder">Ordner hochladen</string>
-    <!-- Title of the dialog warning the user about cancel uploads. -->
-    <string name="cancel_uploads">Cancel uploads</string>
-    <!-- Warning alerting user if proceed with the action all the uploads will be cancelled. -->
-    <string name="cancel_uploads_warning">Wenn Sie den Upload unterbrechen, werden alle Ihre Uploads abgebrochen.</string>
-    <!-- Button to proceed with action. -->
-    <string name="action_proceed">Fortfahren</string>
+    <!-- Text of the dialog warning the user about cancel uploads. -->
+    <string name="cancel_uploads">Upload abbrechen?</string>
+    <!-- Title of the Payments screen -->
+    <string name="payment">Zahlungen</string>
+    <!-- Label indicating payment methods -->
+    <string name="payment_methods">Zahlungsmethoden</string>
+    <!-- Button to proceed with a payment -->
+    <string name="proceed">Fortfahren</string>
+    <!-- Message informing the upgrade was processed correctly. Placeholder: type of subscription e.g: Pro Lite monthly -->
+    <string name="successful_upgrade">Vielen Dank, dass Sie %1$s abonniert haben!</string>
+    <!-- Pro Lite monthly subscription -->
+    <string name="pro_lite_monthly">Pro Lite monatlich</string>
+    <!-- Pro Lite yearly subscription -->
+    <string name="pro_lite_yearly">Pro Lite jährlich</string>
+    <!-- Pro I monthly subscription -->
+    <string name="pro_i_monthly">Pro I monatlich</string>
+    <!-- Pro I yearly subscription -->
+    <string name="pro_i_yearly">Pro I jährlich</string>
+    <!-- Pro II monthly subscription -->
+    <string name="pro_ii_monthly">Pro II monatlich</string>
+    <!-- Pro II yearly subscription -->
+    <string name="pro_ii_yearly">Pro II jährlich</string>
+    <!-- Pro III monthly subscription -->
+    <string name="pro_iii_monthly">Pro III monatlich</string>
+    <!-- Pro III yearly subscription -->
+    <string name="pro_iii_yearly">Pro III jährlich</string>
+    <!-- Action button which will cancel uploads. -->
+    <string name="action_cancel_upload">Upload abbrechen</string>
+    <!-- Action button which will dismiss the dialog and will not cancel the action. -->
+    <string name="action_do_not_cancel">Nicht abbrechen</string>
+    <!-- Remove moderator permission and assign standard permission to a meeting participant-->
+    <string name="remove_moderator">Als Moderator entfernen</string>
+    <!-- Title of DCIM folder warning dialog -->
+    <string name="title_dcim_folder_dialog">DCIM-Ordner</string>
+    <!-- Content of DCIM folder warning dialog -->
+    <string name="content_dcim_folder_dialog">MEGA lädt Ihre Bilder aus der Galerie hoch. Den Upload-Speicherort können Sie in den Kamera-Upload-Einstellungen ändern.</string>
+    <!-- Error shown when download a file that has violated ToS/AUP. -->
+    <string name="tos_aup_violation">AGB/AUP-Verstoß</string>
+    <!-- Title message of existing subscription dialog -->
+    <string name="title_existing_subscription">Neues Abonnement kaufen?</string>
+    <!-- Text of buy new subscription button -->
+    <string name="button_buy_new_subscription">Neues Abonnement kaufen</string>
+    <!-- Dialog message when the existing subscription is from Android platform (Google and Huawei)  -->
+    <string name="message_subscription_from_android_platform">You already have a subscription. If you buy another one you will be charged twice. To avoid this, cancel your current subscription through %1$s. Visit our Help Centre for more information.</string>
+    <!-- Dialog message when the existing subscription is from iTunes  -->
+    <string name="message_subscription_from_itunes">You already have a subscription. If you buy another one you will be charged twice. To avoid this, cancel your current subscription from your iTunes account. Visit our Help Centre for more information.</string>
+    <!-- Dialog message when the existing subscription is from other platform (Stripe and ECP)  -->
+    <string name="message_subscription_from_other_platform">Sie haben bereits ein Abonnement. Wenn Sie ein weiteres Abonnement kaufen, müssen Sie doppelt zahlen. Um dies zu vermeiden, kündigen Sie Ihr aktuelles Abonnement, indem Sie MEGA in einem Desktop- oder mobilen Webbrowser öffnen. Weitere Informationen finden Sie in unserer Onlinehilfe.</string>
+    <!-- Warning show to the user when the app needs bluetooth connect permissions to get the best meeting experience and the user has denied them.-->
+    <string name="meeting_bluetooth_connect_required_permissions_warning">Öffnen Sie die Einstellungen und erteilen Sie MEGA die Erlaubnis, über Bluetooth auf Geräte in der Nähe zuzugreifen.</string>
 </resources>

@@ -7,11 +7,11 @@ import android.content.Intent;
 
 import androidx.annotation.Nullable;
 
-import mega.privacy.android.app.lollipop.LoginActivityLollipop;
-import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
+import mega.privacy.android.app.main.LoginActivity;
+import mega.privacy.android.app.main.ManagerActivity;
 
-import static mega.privacy.android.app.lollipop.ManagerActivityLollipop.PENDING_TAB;
-import static mega.privacy.android.app.lollipop.ManagerActivityLollipop.TRANSFERS_TAB;
+import static mega.privacy.android.app.main.ManagerActivity.PENDING_TAB;
+import static mega.privacy.android.app.main.ManagerActivity.TRANSFERS_TAB;
 import static mega.privacy.android.app.utils.Constants.*;
 
 public class DownloadNotificationIntentService extends IntentService {
@@ -35,13 +35,13 @@ public class DownloadNotificationIntentService extends IntentService {
             Intent pendingIntent = null;
 
             if (intent.getAction().equals(ACTION_SHOW_UPGRADE_ACCOUNT)) {
-                pendingIntent = new Intent(DownloadNotificationIntentService.this, ManagerActivityLollipop.class);
+                pendingIntent = new Intent(DownloadNotificationIntentService.this, ManagerActivity.class);
                 pendingIntent.setAction(ACTION_SHOW_UPGRADE_ACCOUNT);
             } else if (intent.getAction().equals(ACTION_LOG_IN)){
-                pendingIntent = new Intent(DownloadNotificationIntentService.this, LoginActivityLollipop.class);
+                pendingIntent = new Intent(DownloadNotificationIntentService.this, LoginActivity.class);
                 pendingIntent.putExtra(VISIBLE_FRAGMENT, LOGIN_FRAGMENT);
             } else if (intent.getAction().equals(ACTION_SHOW_TRANSFERS)) {
-                pendingIntent = new Intent(DownloadNotificationIntentService.this, ManagerActivityLollipop.class);
+                pendingIntent = new Intent(DownloadNotificationIntentService.this, ManagerActivity.class);
                 pendingIntent.setAction(ACTION_SHOW_TRANSFERS);
                 pendingIntent.putExtra(TRANSFERS_TAB, PENDING_TAB);
             }

@@ -11,7 +11,6 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.view.ActionMode
-import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
@@ -20,7 +19,6 @@ import androidx.recyclerview.widget.RecyclerView
 import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.R
 import mega.privacy.android.app.components.CustomizedGridLayoutManager
-import mega.privacy.android.app.components.ListenScrollChangesHelper
 import mega.privacy.android.app.components.NewGridRecyclerView
 import mega.privacy.android.app.components.PositionDividerItemDecoration
 import mega.privacy.android.app.databinding.FragmentAudioBinding
@@ -28,7 +26,7 @@ import mega.privacy.android.app.di.MegaApi
 import mega.privacy.android.app.fragments.homepage.*
 import mega.privacy.android.app.fragments.homepage.BaseNodeItemAdapter.Companion.TYPE_HEADER
 import mega.privacy.android.app.globalmanagement.SortOrderManagement
-import mega.privacy.android.app.lollipop.ManagerActivityLollipop
+import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.mediaplayer.miniplayer.MiniAudioPlayerController
 import mega.privacy.android.app.modalbottomsheet.NodeOptionsBottomSheetDialogFragment.MODE1
 import mega.privacy.android.app.modalbottomsheet.NodeOptionsBottomSheetDialogFragment.MODE5
@@ -104,6 +102,11 @@ class AudioFragment : Fragment(), HomepageSearchable {
 
             actionModeViewModel.setNodesData(it.filter { nodeItem -> nodeItem.node != null })
         }
+    }
+
+    override fun onDestroyView() {
+        viewModel.cancelSearch()
+        super.onDestroyView()
     }
 
     private fun setupEmptyHint() {
@@ -229,10 +232,12 @@ class AudioFragment : Fragment(), HomepageSearchable {
         val localPath = getLocalFile(file)
         var paramsSetSuccessfully = if (isLocalFile(node, megaApi, localPath)) {
             setLocalIntentParams(activity, node, intent, localPath, false,
-                requireActivity() as ManagerActivityLollipop)
+                requireActivity() as ManagerActivity
+            )
         } else {
             setStreamingIntentParams(activity, node, megaApi, intent,
-                requireActivity() as ManagerActivityLollipop)
+                requireActivity() as ManagerActivity
+            )
         }
 
         if (paramsSetSuccessfully && isOpusFile(node)) {
@@ -249,11 +254,7 @@ class AudioFragment : Fragment(), HomepageSearchable {
         }
 
         if (paramsSetSuccessfully) {
-            if (internalIntent) {
-                startActivity(intent)
-            } else {
-                startActivity(intent)
-            }
+            startActivity(intent)
         } else {
             logWarning("itemClick:noAvailableIntent")
             showSnackbar(
@@ -278,27 +279,28 @@ class AudioFragment : Fragment(), HomepageSearchable {
         }
     }
 
-    private fun elevateToolbarWhenScrolling() = ListenScrollChangesHelper().addViewToListen(
-        listView
-    ) { v: View?, _, _, _, _ ->
-        callManager { manager ->
-            manager.changeAppBarElevation(v!!.canScrollVertically(-1))
-        }
-    }
-
     private fun setupListView() {
         listView = binding.audioList
-        listView.itemAnimator = noChangeRecyclerViewItemAnimator()
-        elevateToolbarWhenScrolling()
-        itemDecoration = PositionDividerItemDecoration(context, displayMetrics())
+        with(listView) {
+            itemAnimator = noChangeRecyclerViewItemAnimator()
+            clipToPadding = false
+            setHasFixedSize(true)
+            addOnScrollListener(object : RecyclerView.OnScrollListener() {
+                override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+                    super.onScrolled(recyclerView, dx, dy)
 
-        listView.clipToPadding = false
-        listView.setHasFixedSize(true)
+                    callManager { manager ->
+                        manager.changeAppBarElevation(recyclerView.canScrollVertically(-1))
+                    }
+                }
+            })
+        }
+        itemDecoration = PositionDividerItemDecoration(context, displayMetrics())
     }
 
     private fun setupActionMode() {
         actionModeCallback = ActionModeCallback(
-            requireActivity() as ManagerActivityLollipop, actionModeViewModel, megaApi
+            requireActivity() as ManagerActivity, actionModeViewModel, megaApi
         )
 
         observeItemLongClick()

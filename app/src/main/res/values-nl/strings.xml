@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0"?>
 <resources>
     <!-- PRO Lite account -->
     <string name="prolite_account">Pro Lite</string>
@@ -700,7 +700,7 @@
     <string name="cam_sync_wifi">Alleen Wi-Fi</string>
     <!-- the options of how to upload, but in an array. needed for the settings, how to upload the camera images. when Wi-Fi connected and using data plan -->
     <string name="cam_sync_data">Wi-Fi of mobiele data</string>
-    <!-- The upload of the user’s photos orvideos from their specified album is in progress. -->
+    <!-- The upload of the user’s photos or videos from their specified album is in progress. -->
     <string name="cam_sync_syncing">Camera Uploads in behandeling</string>
     <!-- confirmation question for cancelling the camera uploads -->
     <string name="cam_sync_cancel_sync">Wilt u Camera Uploads stoppen?</string>
@@ -785,7 +785,7 @@
     <!-- Button to resend the create account email to a new email address in case the previous email address was misspelled -->
     <string name="general_resend_button">Opnieuw versturen</string>
     <!-- error message that will show to user when host detected that the mobile number has been registered already -->
-    <string name="verify_account_error_phone_number_register">Dit nummer is al geassocieerd met een MEGA account.</string>
+    <string name="verify_account_error_phone_number_register">Dit nummer is al geassocieerd met een MEGA-account.</string>
     <!-- error message that will show to user when user reached the sms verification daily limit -->
     <string name="verify_account_error_reach_limit">U heeft de dagelijkse limiet bereikt</string>
     <!-- error message that will show to user when user reached the sms verification daily limit -->
@@ -1008,7 +1008,7 @@
     <!-- Label in My Account section to show user account type -->
     <string name="my_account_pro3">Pro III Account</string>
     <!-- Type of account info added to the feedback email sent to support -->
-    <string name="my_account_prolite_feedback_email">PRO Lite Account</string>
+    <string name="my_account_prolite_feedback_email">Pro Lite Account</string>
     <!--  -->
     <string name="backup_title">Uw Herstelsleutel opslaan</string>
     <!-- Subtitle of the screen to backup the master key -->
@@ -1566,7 +1566,7 @@
         <item quantity="other">%1$d van %2$d bestanden</item>
     </plurals>
     <!-- Progress text shown when user stop upload/download and the app is waiting for async response -->
-    <string name="label_process_finishing">Het proces wordt voltooid &#8230;</string>
+    <string name="label_process_finishing">Het proces wordt voltooid&#8230;</string>
     <!-- positive button on dialog to view a contact -->
     <string name="option_to_transfer_manager">Weergeven</string>
     <!-- Label of the modal bottom sheet to pause all transfers -->
@@ -1884,7 +1884,7 @@
     <!-- title of screen to invite friends and get an achievement -->
     <string name="title_achievement_invite_friends">Hoe het werkt</string>
     <!-- first paragraph of screen to invite friends and get an achievement -->
-    <string name="first_paragraph_achievement_invite_friends">Nodig uw vrienden uit om een ​​gratis MEGA-account aan te maken en een MEGA Mobile Applicatie te installeren. U ontvangt gratis opslagruimte als bonus voor elke succesvolle aanmelding en applicatie-installatie.</string>
+    <string name="first_paragraph_achievement_invite_friends">Nodig uw vrienden uit om een ​​gratis MEGA-account aan te maken en een MEGA-Mobile Applicatie te installeren. U ontvangt gratis opslagruimte als bonus voor elke succesvolle aanmelding en applicatie-installatie.</string>
     <!-- second paragraph of screen to invite friends and get an achievement -->
     <string name="second_paragraph_achievement_invite_friends">Gratis opslagbonus alleen van toepassing op nieuwe uitnodigingen en waar MEGA Mobile Applicatie of MEGA Desktop Applicatie is geïnstalleerd.</string>
     <!-- explanation of screen to invite friends and get an achievement -->
@@ -2167,7 +2167,7 @@
     <!-- Message error shown when trying to log in on an account has been suspended due to multiple breaches of Terms of Service -->
     <string name="account_suspended_multiple_breaches_ToS">Uw account is geschorst door meerdere misbruiken van MEGA’s Algemene Voorwaarden. Controleer uw email postvak in.</string>
     <!-- Message error shown when trying to log in on an account has been suspended due to breach of Terms of Service -->
-    <string name="account_suspended_breache_ToS">Uw account is beëindigd vanwege een schending van de Servicevoorwaarden van MEGA, inclusief, maar niet beperkt tot, clausule 15.</string>
+    <string name="account_suspended_breache_ToS">Uw account is beëindigd vanwege een schending van de Algemene Voorwaarden van MEGA, inclusief, maar niet beperkt tot, clausule 15.</string>
     <!-- In a chat conversation when you try to send device’s images but images are still loading -->
     <string name="file_storage_loading">Bestanden laden</string>
     <!-- In a chat conversation when you try to send device’s images but there aren’t available images -->
@@ -2868,9 +2868,9 @@
     <!-- Option of one-off (year) billing. Placeholder: purchase price. -->
     <string name="billed_one_off_year">[A]Eenmalige (Jaar)[/A] %s</string>
     <!-- Option of monthly billing period. Placeholder: purchase price -->
-    <string name="billed_monthly_text">[A]Maandelijks[/A] %s/maand</string>
+    <string name="billed_monthly_text">[A]Maandelijks afgeschreven[/A] %s/maand</string>
     <!-- Option of yearly billing period. Placeholder: purchase price -->
-    <string name="billed_yearly_text">[A]Jaarlijks[/A] %s/jaar</string>
+    <string name="billed_yearly_text">[A]Jaarlijks afgeschreven[/A] %s/jaar</string>
     <!-- dialog option cancel in alert dialog -->
     <string name="button_cancel">Annuleren</string>
     <!-- dialog option continue in alert dialog -->
@@ -3279,7 +3279,7 @@
     <!-- Title of the login screen -->
     <string name="login_to_mega">Inloggen in MEGA</string>
     <!-- Title of the create account screen -->
-    <string name="create_account_title">Creëer uw MEGA account</string>
+    <string name="create_account_title">Creëer uw MEGA-account</string>
     <!-- Label to reference a recents section -->
     <string name="recents_label">Recent</string>
     <!-- Label to reference a chats section -->
@@ -3807,8 +3807,6 @@
     <string name="same_item_name_warning">Er is al een item met dezelfde naam</string>
     <!-- Label of the option menu. When clicking this button, the app shows the info of the related item, e.g. file, folder, contact, chat, etc. -->
     <string name="general_info">Informatie</string>
-    <!-- Item menu option upon right click on one image or video to save it to device gallery -->
-    <string name="general_save_to_gallery">Opslaan in gallerij</string>
     <!-- settings of the Media section -->
     <string name="settings_media">Media</string>
     <!-- settings title of the Media section -->
@@ -4223,10 +4221,54 @@
     <string name="upload_files">Bestanden uploaden</string>
     <!-- Action button to upload a folder. -->
     <string name="upload_folder">Map uploaden</string>
-    <!-- Title of the dialog warning the user about cancel uploads. -->
-    <string name="cancel_uploads">Uploads annuleren</string>
-    <!-- Warning alerting user if proceed with the action all the uploads will be cancelled. -->
-    <string name="cancel_uploads_warning">Als u het uploadproces onderbreekt, worden al uw uploads geannuleerd.</string>
-    <!-- Button to proceed with action. -->
-    <string name="action_proceed">Doorgaan</string>
+    <!-- Text of the dialog warning the user about cancel uploads. -->
+    <string name="cancel_uploads">Upload annuleren?</string>
+    <!-- Title of the Payments screen -->
+    <string name="payment">Betaling</string>
+    <!-- Label indicating payment methods -->
+    <string name="payment_methods">Betalingsmethoden</string>
+    <!-- Button to proceed with a payment -->
+    <string name="proceed">Doorgaan</string>
+    <!-- Message informing the upgrade was processed correctly. Placeholder: type of subscription e.g: Pro Lite monthly -->
+    <string name="successful_upgrade">Bedankt voor uw %1$s abonnement!</string>
+    <!-- Pro Lite monthly subscription -->
+    <string name="pro_lite_monthly">Pro Lite maandelijks</string>
+    <!-- Pro Lite yearly subscription -->
+    <string name="pro_lite_yearly">Pro Lite jaarlijks</string>
+    <!-- Pro I monthly subscription -->
+    <string name="pro_i_monthly">Pro I maandelijks</string>
+    <!-- Pro I yearly subscription -->
+    <string name="pro_i_yearly">Pro I jaarlijks</string>
+    <!-- Pro II monthly subscription -->
+    <string name="pro_ii_monthly">Pro II maandelijks</string>
+    <!-- Pro II yearly subscription -->
+    <string name="pro_ii_yearly">Pro II jaarlijks</string>
+    <!-- Pro III monthly subscription -->
+    <string name="pro_iii_monthly">Pro III maandelijks</string>
+    <!-- Pro III yearly subscription -->
+    <string name="pro_iii_yearly">Pro III jaarlijks</string>
+    <!-- Action button which will cancel uploads. -->
+    <string name="action_cancel_upload">Upload annuleren</string>
+    <!-- Action button which will dismiss the dialog and will not cancel the action. -->
+    <string name="action_do_not_cancel">Niet annuleren</string>
+    <!-- Remove moderator permission and assign standard permission to a meeting participant-->
+    <string name="remove_moderator">Gespreksleider verwijderen</string>
+    <!-- Title of DCIM folder warning dialog -->
+    <string name="title_dcim_folder_dialog">DCIM map</string>
+    <!-- Content of DCIM folder warning dialog -->
+    <string name="content_dcim_folder_dialog">MEGA uploads uw afbeeldingen vanuit de gallerij. Om de upload locatie te wijzigen ga naar Camera Upload instellingen.</string>
+    <!-- Error shown when download a file that has violated ToS/AUP. -->
+    <string name="tos_aup_violation">Auteursrecht overtreding</string>
+    <!-- Title message of existing subscription dialog -->
+    <string name="title_existing_subscription">Koop een nieuw abonnement?</string>
+    <!-- Text of buy new subscription button -->
+    <string name="button_buy_new_subscription">Koop een nieuw abonnement</string>
+    <!-- Dialog message when the existing subscription is from Android platform (Google and Huawei)  -->
+    <string name="message_subscription_from_android_platform">U heeft al een abonnement. Als u een andere koopt, betaalt u twee keer. Om dit te voorkomen, zegt u uw huidige abonnement op via %1$s. Bezoek ons ​​Helpcentrum voor meer informatie.</string>
+    <!-- Dialog message when the existing subscription is from iTunes  -->
+    <string name="message_subscription_from_itunes">U heeft al een abonnement. Als u een andere koopt, betaalt u twee keer. Om dit te voorkomen, zegt u uw huidige abonnement op vanuit uw iTunes-account. Bezoek ons ​​Helpcentrum voor meer informatie.</string>
+    <!-- Dialog message when the existing subscription is from other platform (Stripe and ECP)  -->
+    <string name="message_subscription_from_other_platform">U heeft al een abonnement. Koopt u er nog één, dan betaalt u twee keer. Om dit te voorkomen, zegt u uw huidige abonnement op door naar MEGA te gaan in een desktop- of mobiele webbrowser. Bezoek ons ​​Helpcentrum voor meer informatie.</string>
+    <!-- Warning show to the user when the app needs bluetooth connect permissions to get the best meeting experience and the user has denied them.-->
+    <string name="meeting_bluetooth_connect_required_permissions_warning">Ga naar Instellingen om MEGA toestemming te geven voor toegang tot dichtbijzijnde apparaten via Bluetooth.</string>
 </resources>

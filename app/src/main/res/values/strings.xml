@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0"?>
 <resources>
     <!-- PRO Lite account -->
     <string name="prolite_account">Pro Lite</string>
@@ -700,7 +700,7 @@
     <string name="cam_sync_wifi">Wi-Fi only</string>
     <!-- the options of how to upload, but in an array. needed for the settings, how to upload the camera images. when Wi-Fi connected and using data plan -->
     <string name="cam_sync_data">Wi-Fi or mobile data</string>
-    <!-- The upload of the user’s photos orvideos from their specified album is in progress. -->
+    <!-- The upload of the user’s photos or videos from their specified album is in progress. -->
     <string name="cam_sync_syncing">Camera Uploads in progress</string>
     <!-- confirmation question for cancelling the camera uploads -->
     <string name="cam_sync_cancel_sync">Do you want to stop Camera Uploads?</string>
@@ -3807,8 +3807,6 @@
     <string name="same_item_name_warning">There is already an item with the same name</string>
     <!-- Label of the option menu. When clicking this button, the app shows the info of the related item, e.g. file, folder, contact, chat, etc. -->
     <string name="general_info">Info</string>
-    <!-- Item menu option upon right click on one image or video to save it to device gallery -->
-    <string name="general_save_to_gallery">Save to gallery</string>
     <!-- settings of the Media section -->
     <string name="settings_media">Media</string>
     <!-- settings title of the Media section -->
@@ -3978,7 +3976,7 @@
     <string name="general_mic_mute">Your microphone is turned off</string>
     <!-- General label for microphone unmuted -->
     <string name="general_mic_unmute">Your microphone is turned on</string>
-    <!-- General label for camera -->
+    <!-- Label for camera. Used only in meetings/calls to label the button to turn the video call on/off. -->
     <string name="general_camera">Camera</string>
     <!-- General label for camera enable -->
     <string name="general_camera_enable">Your camera is turned on.</string>
@@ -4205,7 +4203,7 @@
     <!-- If users want to share items in the "My backup" folder, Warning dialog will show to confirm -->
     <string name="backup_share_permission_text">This folder can only be shared as read-only; as this is a backup folder, any changes to its content could disable the backup.</string>
     <!-- If users want to add items to the "My backup" device folder, Warning dialog will show to confirm -->
-    <string name="backup_add_item_text">Items in this folder are part of a configured backup and are synchronised to a local folder. Taking this action will break the synchronisation and disable the backup. The backup can be re-enabled with the MEGA Desktop App. Are you sure you want to proceed?</string>
+    <string name="backup_add_item_text">Items in this folder are part of a configured backup and are synchronised to a local folder. Taking this action will break the synchronisation and disable the backup. The backup can be re-enabled in the MEGA Desktop App. Are you sure you want to proceed?</string>
     <!-- Share multi backup folders, show below warning message -->
     <string name="backup_multi_share_permission_text">These folders can only be shared as read-only; as they are backup folders, any changes to their content could disable the backups.</string>
     <!-- Share multi folders mix with backup and non-backup folders, show below warning message -->
@@ -4253,4 +4251,48 @@
     <string name="action_cancel_upload">Cancel upload</string>
     <!-- Action button which will dismiss the dialog and will not cancel the action. -->
     <string name="action_do_not_cancel">Don’t cancel</string>
+    <!-- Remove moderator permission and assign standard permission to a meeting participant-->
+    <string name="remove_moderator">Remove moderator</string>
+    <!-- Title of DCIM folder warning dialog -->
+    <string name="title_dcim_folder_dialog">DCIM folder</string>
+    <!-- Content of DCIM folder warning dialog -->
+    <string name="content_dcim_folder_dialog">MEGA uploads your images from the gallery. To change the upload location please go to Camera Upload settings.</string>
+    <!-- Title message of existing subscription dialog -->
+    <string name="title_existing_subscription">Buy new subscription?</string>
+    <!-- Text of buy new subscription button -->
+    <string name="button_buy_new_subscription">Buy new subscription</string>
+    <!-- Dialog message when the existing subscription is from Android platform (Google and Huawei)  -->
+    <string name="message_subscription_from_android_platform">You already have a subscription. If you buy another one you will be charged twice. To avoid this, cancel your current subscription through %1$s. Visit our Help Centre for more information.</string>
+    <!-- Dialog message when the existing subscription is from iTunes  -->
+    <string name="message_subscription_from_itunes">You already have a subscription. If you buy another one you will be charged twice. To avoid this, cancel your current subscription from your iTunes account. Visit our Help Centre for more information.</string>
+    <!-- Dialog message when the existing subscription is from other platform (Stripe and ECP)  -->
+    <string name="message_subscription_from_other_platform">You already have a subscription. If you buy another one, you will be charged twice. To avoid this, cancel your current subscription by going to MEGA in a desktop or mobile web browser. Visit our Help Centre for more information.</string>
+    <!-- Warning show to the user when the app needs bluetooth connect permissions to get the best meeting experience and the user has denied them.-->
+    <string name="meeting_bluetooth_connect_required_permissions_warning">Go to Settings to grant MEGA permission to access your nearby devices using Bluetooth.</string>
+    <!-- Warning indicating the billing is not available and giving some indications to continue with the upgrade. -->
+    <string name="upgrade_billing_warning">We are unable to proceed with the billing. If you are using a dual app, please consider logging in to MEGA without it. If not, try to upgrade through your web browser.</string>
+    <!-- Title for subscription dialog that shows before delete account -->
+    <string name="title_platform_subscription">%1s subscription</string>
+    <!-- Title for dialog that subscription is from other platform and shows before delete account -->
+    <string name="title_active_subscription">Active subscription</string>
+    <!-- Message for dialog that subscription is from android platform and shows before delete account -->
+    <string name="message_android_platform_subscription">You have an active MEGA subscription with %1$s. You must cancel it separately at %2$s, as MEGA is not able to cancel it for you. Visit our Help Centre for more information.</string>
+    <!-- Message for dialog that subscription is from other platform and shows before delete account  -->
+    <string name="message_other_platform_subscription">You have an active MEGA subscription. It will be canceled automatically after the account is deleted. Visit our Help Centre for more information.</string>
+    <!-- Message for dialog that subscription is from iTunes platform and shows before delete account  -->
+    <string name="message_itunes_platform_subscription">You have an active MEGA subscription with Apple. You must cancel it separately from your iTunes account, as MEGA is not able to cancel it for you. Visit our Help Centre for more information.</string>
+    <!-- Text for button of subscription dialog that shows before delete account -->
+    <string name="button_visit_platform">Visit %1s</string>
+    <!-- Text shown in the last alert dialog to confirm delete user account with a ECP/Stripe subscription-->
+    <string name="delete_account_text_other_platform_last_step">This is the last step to delete your account. Both your account and subscription will be deleted and you will permanently lose all the data stored in the cloud. Please enter your password below.</string>
+    <!-- Title of timeline tab in photos section -->
+    <string name="tab_title_timeline">Timeline</string>
+    <!-- Title of album tab in photos section. -->
+    <string name="tab_title_album">Albums</string>
+    <!-- Title of favourite album. -->
+    <string name="title_favourites_album">Favourites</string>
+    <!-- Text that indicates that there’s no media files to show in favourite album -->
+    <string name="empty_hint_favourite_album">[B]No[/B] [A]Favourites[/A]</string>
+    <!-- Action button which will remove favourites in selection mode -->
+    <string name="action_remove_favourites">Remove favourites</string>
 </resources>

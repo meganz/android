@@ -17,9 +17,9 @@ import mega.privacy.android.app.constants.EventConstants.EVENT_MEETING_CREATED
 import mega.privacy.android.app.constants.EventConstants.EVENT_NETWORK_CHANGE
 import mega.privacy.android.app.listeners.BaseListener
 import mega.privacy.android.app.listeners.InviteToChatRoomListener
-import mega.privacy.android.app.lollipop.AddContactActivityLollipop
-import mega.privacy.android.app.lollipop.listeners.CreateGroupChatWithPublicLink
-import mega.privacy.android.app.lollipop.megachat.AppRTCAudioManager
+import mega.privacy.android.app.main.AddContactActivity
+import mega.privacy.android.app.main.listeners.CreateGroupChatWithPublicLink
+import mega.privacy.android.app.main.megachat.AppRTCAudioManager
 import mega.privacy.android.app.meeting.listeners.DisableAudioVideoCallListener
 import mega.privacy.android.app.meeting.listeners.IndividualCallVideoListener
 import mega.privacy.android.app.meeting.listeners.OpenVideoDeviceListener
@@ -524,7 +524,7 @@ class MeetingActivityViewModel @Inject constructor(
         if (requestCode == REQUEST_ADD_PARTICIPANTS && resultCode == BaseActivity.RESULT_OK) {
             logDebug("Participants successfully added")
             val contactsData: List<String>? =
-                intent.getStringArrayListExtra(AddContactActivityLollipop.EXTRA_CONTACTS)
+                intent.getStringArrayListExtra(AddContactActivity.EXTRA_CONTACTS)
             if (contactsData != null) {
                 currentChatId.value?.let {
                     InviteToChatRoomListener(context).inviteToChat(it, contactsData)
@@ -563,17 +563,19 @@ class MeetingActivityViewModel @Inject constructor(
     }
 
     /**
-     * Give moderator permissions to a call participant.
+     * Change permissions to a call participant.
      *
      * @param userHandle User handle of a participant
+     * @param permission type of permit to be assigned to the participant
      * @param listener MegaChatRequestListenerInterface
      */
-    fun giveModeratorPermissions(
+    fun changeParticipantPermissions(
         userHandle: Long,
+        permission: Int,
         listener: MegaChatRequestListenerInterface? = null
     ) {
         currentChatId.value?.let {
-            meetingActivityRepository.giveModeratorPermissions(it, userHandle, listener)
+            meetingActivityRepository.changeParticipantPermissions(it, userHandle, permission, listener)
         }
     }
 }

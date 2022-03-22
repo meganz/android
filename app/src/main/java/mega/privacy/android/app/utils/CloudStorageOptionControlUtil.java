@@ -50,7 +50,6 @@ public class CloudStorageOptionControlUtil {
     private final Option removeShare;
     private final Option rename;
     private final Option saveToDevice;
-    private final Option saveToGallery;
     private final Option getLink;
     private final Option manageLink;
     private final Option shareFolder;
@@ -60,6 +59,7 @@ public class CloudStorageOptionControlUtil {
     private final Option copy;
     private final Option leaveShare;
     private final Option trash;
+    private final Option removeFavourites;
 
     private final List<Option> options;
 
@@ -70,7 +70,6 @@ public class CloudStorageOptionControlUtil {
       removeShare = new Option(false);
       rename = new Option(false);
       saveToDevice = new Option(true, MenuItem.SHOW_AS_ACTION_ALWAYS);
-      saveToGallery = new Option(false);
       getLink = new Option(false);
       manageLink = new Option(false);
       shareFolder = new Option(false);
@@ -80,11 +79,11 @@ public class CloudStorageOptionControlUtil {
       copy = new Option(false);
       leaveShare = new Option(false);
       trash = new Option(true);
+      removeFavourites = new Option(false);
 
       options = Arrays.asList(
-          selectAll, clearSelection, removeLink, removeShare, rename, saveToDevice, saveToGallery,
-          getLink, manageLink, shareFolder, sendToChat, shareOut, move, copy, leaveShare, trash
-      );
+              selectAll, clearSelection, removeLink, removeShare, rename, saveToDevice, getLink,
+              manageLink, shareFolder, sendToChat, shareOut, move, copy, leaveShare, trash, removeFavourites);
     }
 
     public Option selectAll() {
@@ -109,10 +108,6 @@ public class CloudStorageOptionControlUtil {
 
     public Option saveToDevice() {
       return saveToDevice;
-    }
-
-    public Option saveToGallery() {
-      return saveToGallery;
     }
 
     public Option getLink() {
@@ -151,6 +146,10 @@ public class CloudStorageOptionControlUtil {
       return trash;
     }
 
+    public Option removeFavourites() {
+      return removeFavourites;
+    }
+
     public int alwaysActionCount() {
       int count = 0;
       for (Option option : options) {
@@ -182,9 +181,6 @@ public class CloudStorageOptionControlUtil {
     menu.findItem(R.id.cab_menu_download).setVisible(control.saveToDevice.visible);
     menu.findItem(R.id.cab_menu_download).setShowAsAction(control.saveToDevice.showAsAction);
 
-    menu.findItem(R.id.cab_menu_save_gallery).setVisible(!isAndroid11OrUpper() && control.saveToGallery.visible);
-    menu.findItem(R.id.cab_menu_save_gallery).setShowAsAction(control.saveToGallery.showAsAction);
-
     menu.findItem(R.id.cab_menu_share_link).setVisible(control.getLink.visible);
     menu.findItem(R.id.cab_menu_share_link).setShowAsAction(control.getLink.showAsAction);
 
@@ -211,5 +207,8 @@ public class CloudStorageOptionControlUtil {
 
     menu.findItem(R.id.cab_menu_trash).setVisible(control.trash.visible);
     menu.findItem(R.id.cab_menu_trash).setShowAsAction(control.trash.showAsAction);
+
+    menu.findItem(R.id.cab_menu_remove_favourites).setVisible(control.removeFavourites.visible);
+    menu.findItem(R.id.cab_menu_remove_favourites).setShowAsAction(control.removeFavourites.showAsAction);
   }
 }

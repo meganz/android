@@ -47,7 +47,6 @@ import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
-import mega.privacy.android.app.UserCredentials;
 import mega.privacy.android.app.activities.ManageChatHistoryActivity;
 import mega.privacy.android.app.components.MarqueeTextView;
 import mega.privacy.android.app.components.twemoji.EmojiEditText;
@@ -56,19 +55,18 @@ import mega.privacy.android.app.components.twemoji.EmojiRange;
 import mega.privacy.android.app.components.twemoji.EmojiTextView;
 import mega.privacy.android.app.components.twemoji.EmojiUtilsShortcodes;
 import mega.privacy.android.app.interfaces.ChatManagementCallback;
-import mega.privacy.android.app.listeners.ChatLogoutListener;
 import mega.privacy.android.app.listeners.ExportListener;
 import mega.privacy.android.app.listeners.SetRetentionTimeListener;
-import mega.privacy.android.app.lollipop.controllers.ChatController;
+import mega.privacy.android.app.main.controllers.ChatController;
 import mega.privacy.android.app.components.twemoji.emoji.Emoji;
-import mega.privacy.android.app.lollipop.listeners.ManageReactionListener;
-import mega.privacy.android.app.lollipop.megachat.AndroidMegaChatMessage;
-import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop;
-import mega.privacy.android.app.lollipop.megachat.ChatSettings;
-import mega.privacy.android.app.lollipop.megachat.GroupChatInfoActivityLollipop;
-import mega.privacy.android.app.lollipop.megachat.NodeAttachmentHistoryActivity;
-import mega.privacy.android.app.lollipop.megachat.PendingMessageSingle;
-import mega.privacy.android.app.lollipop.megachat.RemovedMessage;
+import mega.privacy.android.app.main.listeners.ManageReactionListener;
+import mega.privacy.android.app.main.megachat.AndroidMegaChatMessage;
+import mega.privacy.android.app.main.megachat.ChatActivity;
+import mega.privacy.android.app.main.megachat.ChatSettings;
+import mega.privacy.android.app.main.megachat.GroupChatInfoActivity;
+import mega.privacy.android.app.main.megachat.NodeAttachmentHistoryActivity;
+import mega.privacy.android.app.main.megachat.PendingMessageSingle;
+import mega.privacy.android.app.main.megachat.RemovedMessage;
 import mega.privacy.android.app.textEditor.TextEditorActivity;
 import nz.mega.sdk.AndroidGfxProcessor;
 import nz.mega.sdk.MegaApiAndroid;
@@ -190,10 +188,10 @@ public class ChatUtil {
         MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(context, R.style.ThemeOverlay_Mega_MaterialAlertDialog);
         LayoutInflater inflater = null;
 
-        if (context instanceof GroupChatInfoActivityLollipop) {
-            inflater = ((GroupChatInfoActivityLollipop) context).getLayoutInflater();
-        } else if (context instanceof ChatActivityLollipop) {
-            inflater = ((ChatActivityLollipop) context).getLayoutInflater();
+        if (context instanceof GroupChatInfoActivity) {
+            inflater = ((GroupChatInfoActivity) context).getLayoutInflater();
+        } else if (context instanceof ChatActivity) {
+            inflater = ((ChatActivity) context).getLayoutInflater();
         }
 
         View v = inflater.inflate(R.layout.chat_link_share_dialog, null);
@@ -210,8 +208,8 @@ public class ChatUtil {
             android.content.ClipboardManager clipboard = (android.content.ClipboardManager) context.getSystemService(Context.CLIPBOARD_SERVICE);
             android.content.ClipData clip = android.content.ClipData.newPlainText(COPIED_TEXT_LABEL, chatLink);
             clipboard.setPrimaryClip(clip);
-            if (context instanceof ChatActivityLollipop) {
-                ((ChatActivityLollipop) context).showSnackbar(SNACKBAR_TYPE, context.getString(R.string.chat_link_copied_clipboard), MEGACHAT_INVALID_HANDLE);
+            if (context instanceof ChatActivity) {
+                ((ChatActivity) context).showSnackbar(SNACKBAR_TYPE, context.getString(R.string.chat_link_copied_clipboard), MEGACHAT_INVALID_HANDLE);
 
             }
             dismissShareChatLinkDialog(context, shareLinkDialog);
@@ -242,8 +240,8 @@ public class ChatUtil {
     private static void dismissShareChatLinkDialog(Context context, AlertDialog shareLinkDialog) {
         try {
             shareLinkDialog.dismiss();
-            if (context instanceof ChatActivityLollipop) {
-                ((ChatActivityLollipop) context).setShareLinkDialogDismissed(true);
+            if (context instanceof ChatActivity) {
+                ((ChatActivity) context).setShareLinkDialogDismissed(true);
             }
         } catch (Exception e) {
         }
@@ -254,8 +252,8 @@ public class ChatUtil {
         builder.setTitle(R.string.action_delete_link)
                 .setMessage(R.string.context_remove_chat_link_warning_text)
                 .setPositiveButton(R.string.delete_button, (dialog, which) -> {
-                    if (context instanceof GroupChatInfoActivityLollipop) {
-                        ((GroupChatInfoActivityLollipop) context).removeChatLink();
+                    if (context instanceof GroupChatInfoActivity) {
+                        ((GroupChatInfoActivity) context).removeChatLink();
                     }
                 })
                 .setNegativeButton(R.string.general_cancel, null).show();
@@ -462,7 +460,7 @@ public class ChatUtil {
      * @param isFromKeyboard If it's from the keyboard.
      */
     public static void addReactionInMsg(Context context, long chatId, long messageId, Emoji emoji, boolean isFromKeyboard) {
-        if (!(context instanceof ChatActivityLollipop)) {
+        if (!(context instanceof ChatActivity)) {
             logWarning("Incorrect context");
             return;
         }
@@ -488,7 +486,7 @@ public class ChatUtil {
      * @param isFromKeyboard If it's from the keyboard.
      */
     public static void addReactionInMsg(Context context, long chatId, long messageId, String reaction, boolean isFromKeyboard) {
-        if (!(context instanceof ChatActivityLollipop)) {
+        if (!(context instanceof ChatActivity)) {
             logWarning("Incorrect context");
             return;
         }

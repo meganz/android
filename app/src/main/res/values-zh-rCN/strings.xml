@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0"?>
 <resources>
     <!-- PRO Lite account -->
     <string name="prolite_account">Pro Lite</string>
@@ -690,7 +690,7 @@
     <string name="cam_sync_wifi">仅限Wi-Fi</string>
     <!-- the options of how to upload, but in an array. needed for the settings, how to upload the camera images. when Wi-Fi connected and using data plan -->
     <string name="cam_sync_data">Wi-Fi或移动数据</string>
-    <!-- The upload of the user’s photos orvideos from their specified album is in progress. -->
+    <!-- The upload of the user’s photos or videos from their specified album is in progress. -->
     <string name="cam_sync_syncing">正在进行相机上传</string>
     <!-- confirmation question for cancelling the camera uploads -->
     <string name="cam_sync_cancel_sync">您是否要停止相机上传？</string>
@@ -1595,7 +1595,7 @@
         <item quantity="other">已上传%1$d个文件</item>
     </plurals>
     <!-- label for the total file size of multiple files and/or folders (no need to put the colon punctuation in the translation) -->
-    <string name="general_total_size">共 %1$s</string>
+    <string name="general_total_size">共： %1$s</string>
     <!-- Text of the notification shown when the upload service has finished with any transfer error, Plural -->
     <plurals name="upload_service_failed">
         <item quantity="other">%1$d个文件未上传</item>
@@ -2816,9 +2816,9 @@
     <!-- Option of one-off (year) billing. Placeholder: purchase price. -->
     <string name="billed_one_off_year">[A]一次性付款(年)[/A] %s</string>
     <!-- Option of monthly billing period. Placeholder: purchase price -->
-    <string name="billed_monthly_text">[A]每月[/A] %s/月</string>
+    <string name="billed_monthly_text">[A]按月付费[/A] %s/月</string>
     <!-- Option of yearly billing period. Placeholder: purchase price -->
-    <string name="billed_yearly_text">[A]每年[/A] %s/年</string>
+    <string name="billed_yearly_text">[A]按年付费[/A] %s/年</string>
     <!-- dialog option cancel in alert dialog -->
     <string name="button_cancel">取消</string>
     <!-- dialog option continue in alert dialog -->
@@ -2936,7 +2936,7 @@
     <!-- Message shown when a group call ends. -->
     <string name="group_call_ended_message">[A]群组通话结束[/A][C]。时长：[/C]</string>
     <!-- Message to indicate a call has ended and indicate the call duration. -->
-    <string name="call_ended_message">[A]通话结束[/A][C]. 时长:[/C]</string>
+    <string name="call_ended_message">[A]通话结束[/A][C]. 时长：[/C]</string>
     <!-- Message that shows the hours of a call when it ends, more hours -->
     <plurals name="plural_call_ended_messages_hours">
         <item quantity="other">[B]%1$s 小时[/B]</item>
@@ -3727,8 +3727,6 @@
     <string name="same_item_name_warning">已有一个相同的项目名</string>
     <!-- Label of the option menu. When clicking this button, the app shows the info of the related item, e.g. file, folder, contact, chat, etc. -->
     <string name="general_info">信息</string>
-    <!-- Item menu option upon right click on one image or video to save it to device gallery -->
-    <string name="general_save_to_gallery">保存到图库</string>
     <!-- settings of the Media section -->
     <string name="settings_media">媒体</string>
     <!-- settings title of the Media section -->
@@ -4133,10 +4131,54 @@
     <string name="upload_files">上传文件</string>
     <!-- Action button to upload a folder. -->
     <string name="upload_folder">上传文件夹</string>
-    <!-- Title of the dialog warning the user about cancel uploads. -->
-    <string name="cancel_uploads">取消上传</string>
-    <!-- Warning alerting user if proceed with the action all the uploads will be cancelled. -->
-    <string name="cancel_uploads_warning">中断上传过程将取消您的所有上传。</string>
-    <!-- Button to proceed with action. -->
-    <string name="action_proceed">继续</string>
+    <!-- Text of the dialog warning the user about cancel uploads. -->
+    <string name="cancel_uploads">取消上传？</string>
+    <!-- Title of the Payments screen -->
+    <string name="payment">付款</string>
+    <!-- Label indicating payment methods -->
+    <string name="payment_methods">付款方式</string>
+    <!-- Button to proceed with a payment -->
+    <string name="proceed">继续</string>
+    <!-- Message informing the upgrade was processed correctly. Placeholder: type of subscription e.g: Pro Lite monthly -->
+    <string name="successful_upgrade">感谢您订阅%1$s！</string>
+    <!-- Pro Lite monthly subscription -->
+    <string name="pro_lite_monthly">Pro Lite月度会员方案</string>
+    <!-- Pro Lite yearly subscription -->
+    <string name="pro_lite_yearly">Pro Lite年度会员方案</string>
+    <!-- Pro I monthly subscription -->
+    <string name="pro_i_monthly">Pro I月度会员方案</string>
+    <!-- Pro I yearly subscription -->
+    <string name="pro_i_yearly">Pro I年度会员方案</string>
+    <!-- Pro II monthly subscription -->
+    <string name="pro_ii_monthly">Pro II月度会员方案</string>
+    <!-- Pro II yearly subscription -->
+    <string name="pro_ii_yearly">Pro II年度会员方案</string>
+    <!-- Pro III monthly subscription -->
+    <string name="pro_iii_monthly">Pro III月度会员方案</string>
+    <!-- Pro III yearly subscription -->
+    <string name="pro_iii_yearly">Pro III年度会员方案</string>
+    <!-- Action button which will cancel uploads. -->
+    <string name="action_cancel_upload">取消上传</string>
+    <!-- Action button which will dismiss the dialog and will not cancel the action. -->
+    <string name="action_do_not_cancel">不取消</string>
+    <!-- Remove moderator permission and assign standard permission to a meeting participant-->
+    <string name="remove_moderator">移除主持人</string>
+    <!-- Title of DCIM folder warning dialog -->
+    <string name="title_dcim_folder_dialog">DCIM文件夹</string>
+    <!-- Content of DCIM folder warning dialog -->
+    <string name="content_dcim_folder_dialog">MEGA默认从图库上传您的照片。如需更改上传位置，请前往相机上传设置。</string>
+    <!-- Error shown when download a file that has violated ToS/AUP. -->
+    <string name="tos_aup_violation">违反服务条款/使用限制政策</string>
+    <!-- Title message of existing subscription dialog -->
+    <string name="title_existing_subscription">购买新订阅？</string>
+    <!-- Text of buy new subscription button -->
+    <string name="button_buy_new_subscription">购买新订阅</string>
+    <!-- Dialog message when the existing subscription is from Android platform (Google and Huawei)  -->
+    <string name="message_subscription_from_android_platform">您当前已经有一个订阅。若购买另一个，您将被收取两次费用。为避免重复订阅，请通过%1$s取消您当前的订阅。访问我们的帮助中心了解更多信息。</string>
+    <!-- Dialog message when the existing subscription is from iTunes  -->
+    <string name="message_subscription_from_itunes">您当前已经有一个订阅。若购买另一个，您将被收取两次费用。为避免重复订阅，请从您的iTunes帐户取消您当前的订阅。访问我们的帮助中心了解更多信息。</string>
+    <!-- Dialog message when the existing subscription is from other platform (Stripe and ECP)  -->
+    <string name="message_subscription_from_other_platform">您当前已经有一个订阅。若购买另一个，您将被收取两次费用。为避免重复订阅，请在电脑或手机网页浏览器中登录MEGA以取消您当前的订阅。访问我们的帮助中心了解更多信息。</string>
+    <!-- Warning show to the user when the app needs bluetooth connect permissions to get the best meeting experience and the user has denied them.-->
+    <string name="meeting_bluetooth_connect_required_permissions_warning">前往“设置”并授予MEGA使用蓝牙访问附近设备的权限。</string>
 </resources>

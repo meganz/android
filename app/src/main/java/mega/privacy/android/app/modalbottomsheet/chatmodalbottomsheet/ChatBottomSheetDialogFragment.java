@@ -19,12 +19,12 @@ import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.RoundedImageView;
 import mega.privacy.android.app.components.twemoji.EmojiTextView;
-import mega.privacy.android.app.lollipop.ContactInfoActivityLollipop;
-import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
-import mega.privacy.android.app.lollipop.controllers.ChatController;
-import mega.privacy.android.app.lollipop.megachat.ArchivedChatsActivity;
-import mega.privacy.android.app.lollipop.megachat.ChatItemPreferences;
-import mega.privacy.android.app.lollipop.megachat.GroupChatInfoActivityLollipop;
+import mega.privacy.android.app.main.ContactInfoActivity;
+import mega.privacy.android.app.main.ManagerActivity;
+import mega.privacy.android.app.main.controllers.ChatController;
+import mega.privacy.android.app.main.megachat.ArchivedChatsActivity;
+import mega.privacy.android.app.main.megachat.ChatItemPreferences;
+import mega.privacy.android.app.main.megachat.GroupChatInfoActivity;
 import mega.privacy.android.app.modalbottomsheet.BaseBottomSheetDialogFragment;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaChatListItem;
@@ -56,8 +56,8 @@ public class ChatBottomSheetDialogFragment extends BaseBottomSheetDialogFragment
 
         if (savedInstanceState != null) {
             chatId = savedInstanceState.getLong(CHAT_ID, INVALID_HANDLE);
-        } else if (requireActivity() instanceof ManagerActivityLollipop) {
-            chatId = ((ManagerActivityLollipop) requireActivity()).selectedChatItemId;
+        } else if (requireActivity() instanceof ManagerActivity) {
+            chatId = ((ManagerActivity) requireActivity()).selectedChatItemId;
         } else if (requireActivity() instanceof ArchivedChatsActivity) {
             chatId = ((ArchivedChatsActivity) requireActivity()).selectedChatItemId;
         }
@@ -262,11 +262,11 @@ public class ChatBottomSheetDialogFragment extends BaseBottomSheetDialogFragment
         switch (v.getId()) {
             case R.id.chat_list_info_chat_layout:
                 if (chat.isGroup()) {
-                    Intent i = new Intent(requireContext(), GroupChatInfoActivityLollipop.class);
+                    Intent i = new Intent(requireContext(), GroupChatInfoActivity.class);
                     i.putExtra(HANDLE, chat.getChatId());
                     startActivity(i);
                 } else {
-                    Intent i = new Intent(requireContext(), ContactInfoActivityLollipop.class);
+                    Intent i = new Intent(requireContext(), ContactInfoActivity.class);
                     i.putExtra(HANDLE, chat.getChatId());
                     startActivity(i);
                 }
@@ -276,18 +276,18 @@ public class ChatBottomSheetDialogFragment extends BaseBottomSheetDialogFragment
             case R.id.chat_list_leave_chat_layout:
                 logDebug("Leave chat - Chat ID: " + chat.getChatId());
 
-                if (requireActivity() instanceof ManagerActivityLollipop) {
-                    showConfirmationLeaveChat(requireActivity(), chat.getChatId(), ((ManagerActivityLollipop) requireActivity()));
+                if (requireActivity() instanceof ManagerActivity) {
+                    showConfirmationLeaveChat(requireActivity(), chat.getChatId(), ((ManagerActivity) requireActivity()));
                 }
                 break;
 
             case R.id.chat_list_clear_history_chat_layout:
                 logDebug("Clear chat - Chat ID: " + chat.getChatId());
-                showConfirmationClearChat(((ManagerActivityLollipop) requireActivity()), megaChatApi.getChatRoom(chat.getChatId()));
+                showConfirmationClearChat(((ManagerActivity) requireActivity()), megaChatApi.getChatRoom(chat.getChatId()));
                 break;
 
             case R.id.chat_list_mute_chat_layout:
-                if (requireActivity() instanceof ManagerActivityLollipop) {
+                if (requireActivity() instanceof ManagerActivity) {
                     if (optionMuteChatText.getText().equals(getString(R.string.general_mute))) {
                         createMuteNotificationsAlertDialogOfAChat(requireActivity(), chat.getChatId());
                     } else {

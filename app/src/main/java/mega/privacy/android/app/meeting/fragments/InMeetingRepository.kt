@@ -6,7 +6,7 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.di.MegaApi
 import mega.privacy.android.app.listeners.ChatConnectionListener
-import mega.privacy.android.app.lollipop.controllers.ChatController
+import mega.privacy.android.app.main.controllers.ChatController
 import mega.privacy.android.app.meeting.adapter.Participant
 import mega.privacy.android.app.meeting.listeners.*
 import mega.privacy.android.app.utils.*
@@ -174,6 +174,9 @@ class InMeetingRepository @Inject constructor(
      * @return the email of the participant
      */
     fun getEmailParticipant(peerId: Long, listener: MegaRequestListenerInterface): String? {
+        if (isMe(peerId))
+            return megaChatApi.myEmail
+
         val email = megaChatApi.getUserEmailFromCache(peerId)
 
         if (email != null)
@@ -432,6 +435,14 @@ class InMeetingRepository @Inject constructor(
 
     fun registerConnectionUpdateListener(chatId: Long, callback: () -> Unit) =
         megaChatApi.addChatListener(ChatConnectionListener(chatId, callback))
+
+    fun getMyFullName(): String {
+        val name = megaChatApi.myFullname
+        if (name != null)
+            return name
+
+        return megaChatApi.myEmail
+    }
 
     fun getMyInfo(moderator: Boolean, audio: Boolean, video: Boolean): Participant {
         return Participant(

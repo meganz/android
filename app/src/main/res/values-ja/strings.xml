@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0"?>
 <resources>
     <!-- PRO Lite account -->
     <string name="prolite_account">Pro Lite</string>
@@ -690,7 +690,7 @@
     <string name="cam_sync_wifi">Wi-Fiのみ</string>
     <!-- the options of how to upload, but in an array. needed for the settings, how to upload the camera images. when Wi-Fi connected and using data plan -->
     <string name="cam_sync_data">Wi-Fiまたはモバイルデータ</string>
-    <!-- The upload of the user’s photos orvideos from their specified album is in progress. -->
+    <!-- The upload of the user’s photos or videos from their specified album is in progress. -->
     <string name="cam_sync_syncing">カメラアップロードが進行中</string>
     <!-- confirmation question for cancelling the camera uploads -->
     <string name="cam_sync_cancel_sync">カメラアップロードを停止しますか？</string>
@@ -990,11 +990,11 @@
     <!-- Type of account info added to the feedback email sent to support -->
     <string name="my_account_prolite">Pro Liteアカウント</string>
     <!-- Label in My Account section to show user account type -->
-    <string name="my_account_pro1">PRO Iアカウント</string>
+    <string name="my_account_pro1">Pro Iアカウント</string>
     <!-- Label in My Account section to show user account type -->
     <string name="my_account_pro2">PRO IIアカウント</string>
     <!-- Label in My Account section to show user account type -->
-    <string name="my_account_pro3">PRO IIIアカウント</string>
+    <string name="my_account_pro3">Pro IIIアカウント</string>
     <!-- Type of account info added to the feedback email sent to support -->
     <string name="my_account_prolite_feedback_email">Pro Liteアカウント</string>
     <!--  -->
@@ -2816,9 +2816,9 @@
     <!-- Option of one-off (year) billing. Placeholder: purchase price. -->
     <string name="billed_one_off_year">[A]1回限り（年）[/A] %s</string>
     <!-- Option of monthly billing period. Placeholder: purchase price -->
-    <string name="billed_monthly_text">[A]毎月[/A]%s/月</string>
+    <string name="billed_monthly_text">[A]毎月払い[/A]%s/月</string>
     <!-- Option of yearly billing period. Placeholder: purchase price -->
-    <string name="billed_yearly_text">[A]年間[/A] %s/年</string>
+    <string name="billed_yearly_text">[A]年間払い[/A]%s/年</string>
     <!-- dialog option cancel in alert dialog -->
     <string name="button_cancel">キャンセル</string>
     <!-- dialog option continue in alert dialog -->
@@ -2890,7 +2890,7 @@
     <!--  -->
     <string name="custom_subtitle_of_group_chat">%1$s と %2$d その他</string>
     <!-- Error when the user tries to get a public chat link for a chat with the default title -->
-    <string name="message_error_set_title_get_link">このチャット用のリンクを作成する前に、説明を設定する必要があります。</string>
+    <string name="message_error_set_title_get_link">このチャット用のリンクを作成する前に、説明を設定する必要があります：</string>
     <!-- success alert when the user copy a chat link to the clipboard -->
     <string name="chat_link_copied_clipboard">チャットリンクをクリップボードにコピーしました</string>
     <!-- Label to show the price of each plan in the upgrade account section -->
@@ -3727,8 +3727,6 @@
     <string name="same_item_name_warning">同じ名前の項目がすでに存在します</string>
     <!-- Label of the option menu. When clicking this button, the app shows the info of the related item, e.g. file, folder, contact, chat, etc. -->
     <string name="general_info">情報</string>
-    <!-- Item menu option upon right click on one image or video to save it to device gallery -->
-    <string name="general_save_to_gallery">ギャラリーに保存</string>
     <!-- settings of the Media section -->
     <string name="settings_media">メディア</string>
     <!-- settings title of the Media section -->
@@ -4133,10 +4131,54 @@
     <string name="upload_files">ファイルをアップロード</string>
     <!-- Action button to upload a folder. -->
     <string name="upload_folder">フォルダをアップロード</string>
-    <!-- Title of the dialog warning the user about cancel uploads. -->
-    <string name="cancel_uploads">アップロードをキャンセル</string>
-    <!-- Warning alerting user if proceed with the action all the uploads will be cancelled. -->
-    <string name="cancel_uploads_warning">アップロード処理を中断すると、アップロードがすべてキャンセルされます。</string>
-    <!-- Button to proceed with action. -->
-    <string name="action_proceed">進む</string>
+    <!-- Text of the dialog warning the user about cancel uploads. -->
+    <string name="cancel_uploads">アップロードをキャンセルしますか？</string>
+    <!-- Title of the Payments screen -->
+    <string name="payment">お支払い</string>
+    <!-- Label indicating payment methods -->
+    <string name="payment_methods">お支払い方法</string>
+    <!-- Button to proceed with a payment -->
+    <string name="proceed">進む</string>
+    <!-- Message informing the upgrade was processed correctly. Placeholder: type of subscription e.g: Pro Lite monthly -->
+    <string name="successful_upgrade">%1$sをご契約いただきありがとうございます！</string>
+    <!-- Pro Lite monthly subscription -->
+    <string name="pro_lite_monthly">Pro Lite 月間</string>
+    <!-- Pro Lite yearly subscription -->
+    <string name="pro_lite_yearly">Pro Lite 年間</string>
+    <!-- Pro I monthly subscription -->
+    <string name="pro_i_monthly">Pro I 月間</string>
+    <!-- Pro I yearly subscription -->
+    <string name="pro_i_yearly">Pro I 年間</string>
+    <!-- Pro II monthly subscription -->
+    <string name="pro_ii_monthly">Pro II 月間</string>
+    <!-- Pro II yearly subscription -->
+    <string name="pro_ii_yearly">Pro II 年間</string>
+    <!-- Pro III monthly subscription -->
+    <string name="pro_iii_monthly">Pro III 月間</string>
+    <!-- Pro III yearly subscription -->
+    <string name="pro_iii_yearly">Pro III 年間</string>
+    <!-- Action button which will cancel uploads. -->
+    <string name="action_cancel_upload">アップロードをキャンセル</string>
+    <!-- Action button which will dismiss the dialog and will not cancel the action. -->
+    <string name="action_do_not_cancel">キャンセルしない</string>
+    <!-- Remove moderator permission and assign standard permission to a meeting participant-->
+    <string name="remove_moderator">モデレーターを削除</string>
+    <!-- Title of DCIM folder warning dialog -->
+    <string name="title_dcim_folder_dialog">DCIMフォルダ</string>
+    <!-- Content of DCIM folder warning dialog -->
+    <string name="content_dcim_folder_dialog">MEGAはギャラリーからあなたの画像をアップロードします。アップロードの場所を変更するには、カメラアップロードの設定をご覧ください。</string>
+    <!-- Error shown when download a file that has violated ToS/AUP. -->
+    <string name="tos_aup_violation">ToS（ご利用規約）/AUP（ご利用規定） 違反</string>
+    <!-- Title message of existing subscription dialog -->
+    <string name="title_existing_subscription">新規サブスクリプションをご購入いたしますか？</string>
+    <!-- Text of buy new subscription button -->
+    <string name="button_buy_new_subscription">新規サブスクリプションを購入する</string>
+    <!-- Dialog message when the existing subscription is from Android platform (Google and Huawei)  -->
+    <string name="message_subscription_from_android_platform">すでにサブスクリプションをお持ちです。もう一つご購入されると、二重課金になります。これを避けるには、%1$sを通して現在のサブスクリプションをキャンセルしてください。詳しくは、ヘルプセンターをご覧ください。</string>
+    <!-- Dialog message when the existing subscription is from iTunes  -->
+    <string name="message_subscription_from_itunes">すでにサブスクリプションをお持ちです。もう一つご購入されると、二重課金になります。これを避けるには、iTunesアカウントから現在のサブスクリプションをキャンセルしてください。詳しくは、ヘルプセンターをご覧ください。</string>
+    <!-- Dialog message when the existing subscription is from other platform (Stripe and ECP)  -->
+    <string name="message_subscription_from_other_platform">すでにサブスクリプションをお持ちです。もう一つご購入されると、二重課金になります。これを避けるには、デスクトップまたはモバイルのウェブブラウザでMEGAにアクセスし、現在のサブスクリプションを解約してください。詳しくは、ヘルプセンターをご覧ください。</string>
+    <!-- Warning show to the user when the app needs bluetooth connect permissions to get the best meeting experience and the user has denied them.-->
+    <string name="meeting_bluetooth_connect_required_permissions_warning">設定から、MEGAにBluetoothを使用してお近くの機器にアクセスする権限を与えてください。</string>
 </resources>

@@ -1,7 +1,6 @@
 package mega.privacy.android.app.components.twemoji.reaction;
 
 import android.content.Context;
-import android.content.Intent;
 import android.graphics.Bitmap;
 import android.util.DisplayMetrics;
 import android.view.LayoutInflater;
@@ -17,9 +16,8 @@ import mega.privacy.android.app.MegaContactDB;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.RoundedImageView;
 import mega.privacy.android.app.components.twemoji.EmojiTextView;
-import mega.privacy.android.app.lollipop.ContactInfoActivityLollipop;
-import mega.privacy.android.app.lollipop.controllers.ChatController;
-import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop;
+import mega.privacy.android.app.main.controllers.ChatController;
+import mega.privacy.android.app.main.megachat.ChatActivity;
 import mega.privacy.android.app.utils.ContactUtil;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaChatApiAndroid;
@@ -128,17 +126,17 @@ public class UserReactionAdapter extends ArrayAdapter<Long> implements View.OnCl
                     break;
                 }
 
-                if (context instanceof ChatActivityLollipop) {
+                if (context instanceof ChatActivity) {
                     if (!isMyUserHandle(handle)) {
                         String email = chatC.getParticipantEmail(handle);
                         MegaUser contact = megaApi.getContact(email);
                         if (contact != null && contact.getVisibility() == MegaUser.VISIBILITY_VISIBLE) {
-                            ((ChatActivityLollipop) context).hideBottomSheet();
+                            ((ChatActivity) context).hideBottomSheet();
                             ContactUtil.openContactInfoActivity(context, email);
                         }
                     } else {
-                        ((ChatActivityLollipop) context).hideBottomSheet();
-                        ((ChatActivityLollipop) context).showSnackbar(SNACKBAR_TYPE, context.getString(R.string.contact_is_me), MEGACHAT_INVALID_HANDLE);
+                        ((ChatActivity) context).hideBottomSheet();
+                        ((ChatActivity) context).showSnackbar(SNACKBAR_TYPE, context.getString(R.string.contact_is_me), MEGACHAT_INVALID_HANDLE);
                     }
                 }
                 break;

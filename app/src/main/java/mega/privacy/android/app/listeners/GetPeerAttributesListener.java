@@ -6,11 +6,11 @@ import java.util.HashMap;
 
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.fcm.ChatAdvancedNotificationBuilder;
-import mega.privacy.android.app.lollipop.controllers.ChatController;
-import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop;
-import mega.privacy.android.app.lollipop.megachat.GroupChatInfoActivityLollipop;
-import mega.privacy.android.app.lollipop.megachat.MegaChatParticipant;
-import mega.privacy.android.app.lollipop.megachat.chatAdapters.MegaChatLollipopAdapter;
+import mega.privacy.android.app.main.controllers.ChatController;
+import mega.privacy.android.app.main.megachat.ChatActivity;
+import mega.privacy.android.app.main.megachat.GroupChatInfoActivity;
+import mega.privacy.android.app.main.megachat.MegaChatParticipant;
+import mega.privacy.android.app.main.megachat.chatAdapters.MegaChatAdapter;
 import nz.mega.sdk.MegaChatApiJava;
 import nz.mega.sdk.MegaChatError;
 import nz.mega.sdk.MegaChatRequest;
@@ -25,8 +25,8 @@ public class GetPeerAttributesListener extends ChatBaseListener {
     private HashMap<Integer, MegaChatParticipant> participantRequests;
 
     private boolean isChatMessageRequest;
-    private MegaChatLollipopAdapter.ViewHolderMessageChat holder;
-    private MegaChatLollipopAdapter adapter;
+    private MegaChatAdapter.ViewHolderMessageChat holder;
+    private MegaChatAdapter adapter;
 
     private MegaChatRequest request;
 
@@ -35,7 +35,7 @@ public class GetPeerAttributesListener extends ChatBaseListener {
     }
 
     /**
-     * Constructor used to request for participants' attributes from GroupChatInfoActivityLollipop.
+     * Constructor used to request for participants' attributes from GroupChatInfoActivity.
      *
      * @param context               current Context
      * @param participantRequests   HashMap<Integer, MegaChatParticipant> in which the keys are the positions in adapter
@@ -54,7 +54,7 @@ public class GetPeerAttributesListener extends ChatBaseListener {
      * @param holder    item view to update in the adapter
      * @param adapter   adapter in which the message has to be updated
      */
-    public GetPeerAttributesListener(Context context, MegaChatLollipopAdapter.ViewHolderMessageChat holder, MegaChatLollipopAdapter adapter) {
+    public GetPeerAttributesListener(Context context, MegaChatAdapter.ViewHolderMessageChat holder, MegaChatAdapter adapter) {
         super(context);
 
         this.holder = holder;
@@ -85,13 +85,13 @@ public class GetPeerAttributesListener extends ChatBaseListener {
             if (chatHandle != INVALID_HANDLE && handleList != null) {
                 if (this.request != null) {
                    updateNotificationName();
-                } else if (context instanceof GroupChatInfoActivityLollipop) {
-                    ((GroupChatInfoActivityLollipop) context).updateParticipants(chatHandle, participantRequests, handleList);
-                } else if (context instanceof ChatActivityLollipop) {
+                } else if (context instanceof GroupChatInfoActivity) {
+                    ((GroupChatInfoActivity) context).updateParticipants(chatHandle, participantRequests, handleList);
+                } else if (context instanceof ChatActivity) {
                     if (isChatMessageRequest) {
                         updateMessage(api.getChatRoom(chatHandle), handleList.get(0));
                     } else {
-                        ((ChatActivityLollipop) context).updateCustomSubtitle(chatHandle, handleList);
+                        ((ChatActivity) context).updateCustomSubtitle(chatHandle, handleList);
                     }
                 }
             } else {

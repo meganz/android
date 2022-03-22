@@ -185,11 +185,8 @@ object ColorUtils {
                     Build.VERSION.SDK_INT >= Build.VERSION_CODES.O -> {
                         decor.systemUiVisibility = View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR or View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR
                     }
-                    Build.VERSION.SDK_INT >= Build.VERSION_CODES.M -> {
-                        decor.systemUiVisibility = View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR or 0x00000010
-                    }
                     else -> {
-                        decor.systemUiVisibility = 0x00002000 or 0x00000010
+                        decor.systemUiVisibility = View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR or 0x00000010
                     }
                 }
             }

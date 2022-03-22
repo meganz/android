@@ -19,7 +19,7 @@ import mega.privacy.android.app.utils.LogUtil
 import mega.privacy.android.app.utils.LogUtil.logError
 import mega.privacy.android.app.utils.MegaApiUtils.getMegaNodeFolderInfo
 import mega.privacy.android.app.utils.StringResourcesUtils.getString
-import mega.privacy.android.app.utils.ThumbnailUtilsLollipop.getThumbFolder
+import mega.privacy.android.app.utils.ThumbnailUtils.getThumbFolder
 import mega.privacy.android.app.utils.Util.getSizeString
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaNode

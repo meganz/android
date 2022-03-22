@@ -1,9 +1,6 @@
 package mega.privacy.android.app.fragments.homepage.main
 
-import android.animation.Animator
-import android.animation.AnimatorListenerAdapter
-import android.animation.AnimatorSet
-import android.animation.ObjectAnimator
+import android.animation.*
 import android.annotation.SuppressLint
 import android.content.*
 import android.graphics.Color
@@ -35,22 +32,18 @@ import mega.privacy.android.app.databinding.FabMaskLayoutBinding
 import mega.privacy.android.app.databinding.FragmentHomepageBinding
 import mega.privacy.android.app.fragments.homepage.banner.BannerAdapter
 import mega.privacy.android.app.fragments.homepage.banner.BannerClickHandler
-import mega.privacy.android.app.interfaces.Scrollable
 import mega.privacy.android.app.fragments.settingsFragments.startSceen.util.StartScreenUtil.notAlertAnymoreAboutStartScreen
 import mega.privacy.android.app.fragments.settingsFragments.startSceen.util.StartScreenUtil.shouldShowStartScreenDialog
-import mega.privacy.android.app.lollipop.AddContactActivityLollipop
-import mega.privacy.android.app.lollipop.ManagerActivityLollipop
+import mega.privacy.android.app.utils.*
+import mega.privacy.android.app.main.AddContactActivity
+import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.utils.AlertDialogUtil.isAlertDialogShown
-import mega.privacy.android.app.utils.ColorUtils
 import mega.privacy.android.app.utils.ColorUtils.getThemeColor
 import mega.privacy.android.app.utils.Constants.*
 import mega.privacy.android.app.utils.RunOnUIThreadUtils.post
 import mega.privacy.android.app.utils.RunOnUIThreadUtils.runDelay
-import mega.privacy.android.app.utils.StringResourcesUtils
-import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.Util.isOnline
 import mega.privacy.android.app.utils.ViewUtils.waitForLayout
-import mega.privacy.android.app.utils.callManager
 import nz.mega.sdk.MegaBanner
 import nz.mega.sdk.MegaChatApi
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
@@ -175,7 +168,7 @@ class HomepageFragment : Fragment() {
             }
         }
 
-        (activity as? ManagerActivityLollipop)?.adjustTransferWidgetPositionInHomepage()
+        (activity as? ManagerActivity)?.adjustTransferWidgetPositionInHomepage()
 
         return rootView
     }
@@ -191,7 +184,7 @@ class HomepageFragment : Fragment() {
         setupBottomSheetBehavior()
         setupFabs()
 
-        (activity as? ManagerActivityLollipop)?.adjustTransferWidgetPositionInHomepage()
+        (activity as? ManagerActivity)?.adjustTransferWidgetPositionInHomepage()
 
         requireContext().registerReceiver(
             networkReceiver, IntentFilter(BROADCAST_ACTION_INTENT_CONNECTIVITY_CHANGE)
@@ -229,6 +222,7 @@ class HomepageFragment : Fragment() {
         LiveEventBus.get(EVENT_HOMEPAGE_VISIBILITY, Boolean::class.java)
             .removeObserver(homepageVisibilityChangeObserver)
 
+        searchInputView.stopCallAnimation()
         startScreenDialog?.dismiss()
     }
 
@@ -307,7 +301,7 @@ class HomepageFragment : Fragment() {
      * Set click listeners, observe the changes of chat status, notification count
      */
     private fun setupSearchView() {
-        val activity = activity as ManagerActivityLollipop
+        val activity = activity as ManagerActivity
 
         searchInputView = viewDataBinding.searchView
         searchInputView.attachNavigationDrawerToMenuButton(
@@ -320,6 +314,11 @@ class HomepageFragment : Fragment() {
         viewModel.avatar.observe(viewLifecycleOwner) {
             searchInputView.setAvatar(it)
         }
+
+        viewModel.onShowCallIcon().observe(viewLifecycleOwner) {
+            searchInputView.setOngoingCallVisibility(it)
+        }
+
         viewModel.chatStatus.observe(viewLifecycleOwner) {
             val iconRes = if (Util.isDarkMode(requireContext())) {
                 when (it) {
@@ -348,6 +347,10 @@ class HomepageFragment : Fragment() {
 
         searchInputView.setOnSearchInputClickListener {
             doIfOnline(false) { activity.homepageToSearch() }
+        }
+
+        searchInputView.setOngoingCallClickListener {
+            doIfOnline(false) { activity.returnCallWithPermissions() }
         }
     }
 
@@ -617,7 +620,7 @@ class HomepageFragment : Fragment() {
         if (isOnline(context) && !viewModel.isRootNodeNull()) {
             operation()
         } else if (showSnackBar) {
-            (activity as ManagerActivityLollipop).showSnackbar(
+            (activity as ManagerActivity).showSnackbar(
                 SNACKBAR_TYPE,
                 getString(R.string.error_server_connection_problem),
                 MEGACHAT_INVALID_HANDLE
@@ -627,7 +630,7 @@ class HomepageFragment : Fragment() {
 
     @Suppress("deprecation") // TODO Migrate to registerForActivityResult()
     private fun openNewChatActivity() = doIfOnline(true) {
-        val intent = Intent(activity, AddContactActivityLollipop::class.java).apply {
+        val intent = Intent(activity, AddContactActivity::class.java).apply {
             putExtra(KEY_CONTACT_TYPE, CONTACT_TYPE_MEGA)
         }
 
@@ -635,7 +638,7 @@ class HomepageFragment : Fragment() {
     }
 
     private fun showUploadPanel() = doIfOnline(true) {
-        (activity as ManagerActivityLollipop).showUploadPanel()
+        (activity as ManagerActivity).showUploadPanel()
     }
 
     private fun fabMainClickCallback() = if (isFabExpanded) {

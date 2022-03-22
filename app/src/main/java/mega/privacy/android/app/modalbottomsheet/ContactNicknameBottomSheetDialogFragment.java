@@ -6,7 +6,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import mega.privacy.android.app.R;
-import mega.privacy.android.app.lollipop.ContactInfoActivityLollipop;
+import mega.privacy.android.app.main.ContactInfoActivity;
 
 import static mega.privacy.android.app.utils.Constants.*;
 
@@ -16,7 +16,7 @@ import androidx.annotation.Nullable;
 public class ContactNicknameBottomSheetDialogFragment extends BaseBottomSheetDialogFragment implements View.OnClickListener {
 
     private String nickname;
-    private ContactInfoActivityLollipop contactInfoActivityLollipop = null;
+    private ContactInfoActivity contactInfoActivity = null;
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -25,9 +25,9 @@ public class ContactNicknameBottomSheetDialogFragment extends BaseBottomSheetDia
 
         if (savedInstanceState != null) {
             nickname = savedInstanceState.getString(EXTRA_USER_NICKNAME, null);
-        } else if (requireActivity() instanceof ContactInfoActivityLollipop) {
-            contactInfoActivityLollipop = ((ContactInfoActivityLollipop) requireActivity());
-            nickname = contactInfoActivityLollipop.getNickname();
+        } else if (requireActivity() instanceof ContactInfoActivity) {
+            contactInfoActivity = ((ContactInfoActivity) requireActivity());
+            nickname = contactInfoActivity.getNickname();
         }
 
         return contentView;
@@ -42,14 +42,14 @@ public class ContactNicknameBottomSheetDialogFragment extends BaseBottomSheetDia
 
     @Override
     public void onClick(View v) {
-        if (contactInfoActivityLollipop == null) return;
+        if (contactInfoActivity == null) return;
         switch (v.getId()) {
             case R.id.edit_nickname_layout:
-                contactInfoActivityLollipop.showConfirmationSetNickname(nickname);
+                contactInfoActivity.showConfirmationSetNickname(nickname);
                 break;
 
             case R.id.remove_nickname_layout:
-                contactInfoActivityLollipop.addNickname(null, null);
+                contactInfoActivity.addNickname(null, null);
                 break;
         }
 

@@ -6,8 +6,7 @@ import android.net.Uri;
 
 import mega.privacy.android.app.OpenLinkActivity;
 import mega.privacy.android.app.R;
-import mega.privacy.android.app.lollipop.LoginActivityLollipop;
-import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
+import mega.privacy.android.app.main.LoginActivity;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaRequest;
@@ -46,7 +45,7 @@ public class QueryRecoveryLinkListener extends BaseListener {
                     Intent intent = null;
 
                     if (matchRegexs(url, RESET_PASSWORD_LINK_REGEXS)) {
-                        intent = new Intent(openLinkActivity, LoginActivityLollipop.class);
+                        intent = new Intent(openLinkActivity, LoginActivity.class);
                         intent.putExtra(VISIBLE_FRAGMENT, TOUR_FRAGMENT);
                         if (request.getFlag()) {
                             intent.setAction(ACTION_RESET_PASS);

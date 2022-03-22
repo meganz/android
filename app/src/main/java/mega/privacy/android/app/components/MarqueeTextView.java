@@ -6,7 +6,7 @@ import android.text.TextPaint;
 import android.util.AttributeSet;
 import android.widget.TextView;
 
-import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop;
+import mega.privacy.android.app.main.megachat.ChatActivity;
 
 import static mega.privacy.android.app.utils.LogUtil.*;
 
@@ -40,7 +40,7 @@ public class MarqueeTextView extends TextView {
 
         formatString();
 
-        if (context instanceof ChatActivityLollipop) {
+        if (context instanceof ChatActivity) {
             final  TextPaint textPaint1 = textPaint;
             mHandler.postDelayed(new Runnable() {
                 @Override

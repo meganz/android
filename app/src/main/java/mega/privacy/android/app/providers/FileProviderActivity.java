@@ -67,9 +67,9 @@ import mega.privacy.android.app.components.EditTextPIN;
 import mega.privacy.android.app.utils.AlertDialogUtil;
 import mega.privacy.android.app.utils.ChatUtil;
 import mega.privacy.android.app.utils.MegaProgressDialogUtil;
-import mega.privacy.android.app.lollipop.providers.CloudDriveProviderFragmentLollipop;
-import mega.privacy.android.app.lollipop.providers.IncomingSharesProviderFragmentLollipop;
-import mega.privacy.android.app.lollipop.providers.ProviderPageAdapter;
+import mega.privacy.android.app.main.providers.CloudDriveProviderFragment;
+import mega.privacy.android.app.main.providers.IncomingSharesProviderFragment;
+import mega.privacy.android.app.main.providers.ProviderPageAdapter;
 import mega.privacy.android.app.utils.ColorUtils;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
@@ -150,8 +150,8 @@ public class FileProviderActivity extends PasscodeFileProviderActivity implement
 
 	private int tabShown = INVALID_TAB;
 
-	private CloudDriveProviderFragmentLollipop cDriveProviderLol;
-	private IncomingSharesProviderFragmentLollipop iSharesProviderLol;
+	private CloudDriveProviderFragment cloudDriveProviderFragment;
+	private IncomingSharesProviderFragment incomingSharesProviderFragment;
 
 	private AlertDialog statusDialog;
 
@@ -355,24 +355,24 @@ public class FileProviderActivity extends PasscodeFileProviderActivity implement
 						logDebug("onTabChanged TabId :" + position);
 						if (position == CLOUD_TAB) {
 							tabShown = CLOUD_TAB;
-							cDriveProviderLol = (CloudDriveProviderFragmentLollipop) getSupportFragmentManager().findFragmentByTag(getFragmentTag(R.id.provider_tabs_pager, CLOUD_TAB));
+							cloudDriveProviderFragment = (CloudDriveProviderFragment) getSupportFragmentManager().findFragmentByTag(getFragmentTag(R.id.provider_tabs_pager, CLOUD_TAB));
 
-							if (cDriveProviderLol != null) {
-								if (cDriveProviderLol.getParentHandle() == INVALID_HANDLE || cDriveProviderLol.getParentHandle() == megaApi.getRootNode().getHandle()) {
+							if (cloudDriveProviderFragment != null) {
+								if (cloudDriveProviderFragment.getParentHandle() == INVALID_HANDLE || cloudDriveProviderFragment.getParentHandle() == megaApi.getRootNode().getHandle()) {
 									aB.setTitle(getString(R.string.file_provider_title).toUpperCase());
 								} else {
-									aB.setTitle(megaApi.getNodeByHandle(cDriveProviderLol.getParentHandle()).getName());
+									aB.setTitle(megaApi.getNodeByHandle(cloudDriveProviderFragment.getParentHandle()).getName());
 								}
 							}
 						} else if (position == INCOMING_TAB) {
 							tabShown = INCOMING_TAB;
-							iSharesProviderLol = (IncomingSharesProviderFragmentLollipop) getSupportFragmentManager().findFragmentByTag(getFragmentTag(R.id.provider_tabs_pager, INCOMING_TAB));
+							incomingSharesProviderFragment = (IncomingSharesProviderFragment) getSupportFragmentManager().findFragmentByTag(getFragmentTag(R.id.provider_tabs_pager, INCOMING_TAB));
 
-							if (iSharesProviderLol != null) {
-								if (iSharesProviderLol.getDeepBrowserTree() == 0) {
+							if (incomingSharesProviderFragment != null) {
+								if (incomingSharesProviderFragment.getDeepBrowserTree() == 0) {
 									aB.setTitle(getString(R.string.file_provider_title).toUpperCase());
 								} else {
-									aB.setTitle(megaApi.getNodeByHandle(iSharesProviderLol.getParentHandle()).getName());
+									aB.setTitle(megaApi.getNodeByHandle(incomingSharesProviderFragment.getParentHandle()).getName());
 
 								}
 							}
@@ -388,7 +388,7 @@ public class FileProviderActivity extends PasscodeFileProviderActivity implement
 
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
-		logDebug("onOptionsItemSelectedLollipop");
+		logDebug("onOptionsItemSelected");
 
 		int id = item.getItemId();
 		switch (id) {
@@ -831,7 +831,7 @@ public class FileProviderActivity extends PasscodeFileProviderActivity implement
 
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
-		logDebug("onCreateOptionsMenuLollipop");
+		logDebug("onCreateOptionsMenu");
 
 		// Inflate the menu items for use in the action bar
 		MenuInflater inflater = getMenuInflater();
@@ -1032,19 +1032,19 @@ public class FileProviderActivity extends PasscodeFileProviderActivity implement
 	public void onBackPressed() {
 		logDebug("tabShown: " + tabShown);
 		if (tabShown == CLOUD_TAB) {
-			cDriveProviderLol = (CloudDriveProviderFragmentLollipop) getSupportFragmentManager().findFragmentByTag(getFragmentTag(R.id.provider_tabs_pager, CLOUD_TAB));
+			cloudDriveProviderFragment = (CloudDriveProviderFragment) getSupportFragmentManager().findFragmentByTag(getFragmentTag(R.id.provider_tabs_pager, CLOUD_TAB));
 
-			if (cDriveProviderLol != null) {
-				if (cDriveProviderLol.onBackPressed() == 0) {
+			if (cloudDriveProviderFragment != null) {
+				if (cloudDriveProviderFragment.onBackPressed() == 0) {
 					super.onBackPressed();
 					return;
 				}
 			}
 		} else if (tabShown == INCOMING_TAB) {
-			iSharesProviderLol = (IncomingSharesProviderFragmentLollipop) getSupportFragmentManager().findFragmentByTag(getFragmentTag(R.id.provider_tabs_pager, INCOMING_TAB));
+			incomingSharesProviderFragment = (IncomingSharesProviderFragment) getSupportFragmentManager().findFragmentByTag(getFragmentTag(R.id.provider_tabs_pager, INCOMING_TAB));
 
-			if (iSharesProviderLol != null) {
-				if (iSharesProviderLol.onBackPressed() == 0) {
+			if (incomingSharesProviderFragment != null) {
+				if (incomingSharesProviderFragment.onBackPressed() == 0) {
 					super.onBackPressed();
 					return;
 				}
@@ -1512,24 +1512,24 @@ public class FileProviderActivity extends PasscodeFileProviderActivity implement
 				logDebug("onTabChanged TabId: " + position);
 				if (position == CLOUD_TAB) {
 					tabShown = CLOUD_TAB;
-					cDriveProviderLol = (CloudDriveProviderFragmentLollipop) getSupportFragmentManager().findFragmentByTag(getFragmentTag(R.id.provider_tabs_pager, CLOUD_TAB));
+					cloudDriveProviderFragment = (CloudDriveProviderFragment) getSupportFragmentManager().findFragmentByTag(getFragmentTag(R.id.provider_tabs_pager, CLOUD_TAB));
 
-					if (cDriveProviderLol != null) {
-						if (cDriveProviderLol.getParentHandle() == INVALID_HANDLE || cDriveProviderLol.getParentHandle() == megaApi.getRootNode().getHandle()) {
+					if (cloudDriveProviderFragment != null) {
+						if (cloudDriveProviderFragment.getParentHandle() == INVALID_HANDLE || cloudDriveProviderFragment.getParentHandle() == megaApi.getRootNode().getHandle()) {
 							aB.setTitle(getString(R.string.file_provider_title).toUpperCase());
 						} else {
-							aB.setTitle(megaApi.getNodeByHandle(cDriveProviderLol.getParentHandle()).getName());
+							aB.setTitle(megaApi.getNodeByHandle(cloudDriveProviderFragment.getParentHandle()).getName());
 						}
 					}
 				} else if (position == INCOMING_TAB) {
 					tabShown = INCOMING_TAB;
-					iSharesProviderLol = (IncomingSharesProviderFragmentLollipop) getSupportFragmentManager().findFragmentByTag(getFragmentTag(R.id.provider_tabs_pager, INCOMING_TAB));
+					incomingSharesProviderFragment = (IncomingSharesProviderFragment) getSupportFragmentManager().findFragmentByTag(getFragmentTag(R.id.provider_tabs_pager, INCOMING_TAB));
 
-					if (iSharesProviderLol != null) {
-						if (iSharesProviderLol.getDeepBrowserTree() == 0) {
+					if (incomingSharesProviderFragment != null) {
+						if (incomingSharesProviderFragment.getDeepBrowserTree() == 0) {
 							aB.setTitle(getString(R.string.file_provider_title).toUpperCase());
 						} else {
-							aB.setTitle(iSharesProviderLol.name);
+							aB.setTitle(incomingSharesProviderFragment.name);
 						}
 					}
 				}
@@ -1593,11 +1593,11 @@ public class FileProviderActivity extends PasscodeFileProviderActivity implement
 	@Override
 	public void onNodesUpdate(MegaApiJava api, ArrayList<MegaNode> updatedNodes) {
 		logDebug("onNodesUpdate");
-		if (cDriveProviderLol != null) {
-			if (megaApi.getNodeByHandle(cDriveProviderLol.getParentHandle()) != null) {
-				nodes = megaApi.getChildren(megaApi.getNodeByHandle(cDriveProviderLol.getParentHandle()));
-				cDriveProviderLol.setNodes(nodes);
-				cDriveProviderLol.getListView().invalidate();
+		if (cloudDriveProviderFragment != null) {
+			if (megaApi.getNodeByHandle(cloudDriveProviderFragment.getParentHandle()) != null) {
+				nodes = megaApi.getChildren(megaApi.getNodeByHandle(cloudDriveProviderFragment.getParentHandle()));
+				cloudDriveProviderFragment.setNodes(nodes);
+				cloudDriveProviderFragment.getListView().invalidate();
 			}
 		}
 	}
@@ -1761,13 +1761,13 @@ public class FileProviderActivity extends PasscodeFileProviderActivity implement
 	 *
 	 * @return The fragment if available, null if does not exist or is not added.
 	 */
-	private CloudDriveProviderFragmentLollipop getCDriveProviderLol() {
-		CloudDriveProviderFragmentLollipop cDriveProviderLol =
-				(CloudDriveProviderFragmentLollipop) getSupportFragmentManager()
+	private CloudDriveProviderFragment getCDriveProviderLol() {
+		CloudDriveProviderFragment cDriveProviderLol =
+				(CloudDriveProviderFragment) getSupportFragmentManager()
 						.findFragmentByTag(getFragmentTag(R.id.provider_tabs_pager, CLOUD_TAB));
 
 		if (cDriveProviderLol != null && cDriveProviderLol.isAdded()) {
-			return this.cDriveProviderLol = cDriveProviderLol;
+			return this.cloudDriveProviderFragment = cDriveProviderLol;
 		}
 
 		return null;
@@ -1778,13 +1778,13 @@ public class FileProviderActivity extends PasscodeFileProviderActivity implement
 	 *
 	 * @return The fragment if available, null if does not exist or is not added.
 	 */
-	private IncomingSharesProviderFragmentLollipop getISharesProviderLol() {
-		IncomingSharesProviderFragmentLollipop iSharesProviderLol =
-				(IncomingSharesProviderFragmentLollipop) getSupportFragmentManager()
+	private IncomingSharesProviderFragment getIncomingSharesProviderFragment() {
+		IncomingSharesProviderFragment iSharesProviderFragment =
+				(IncomingSharesProviderFragment) getSupportFragmentManager()
 						.findFragmentByTag(getFragmentTag(R.id.provider_tabs_pager, INCOMING_TAB));
 
-		if (iSharesProviderLol != null && iSharesProviderLol.isAdded()) {
-			return this.iSharesProviderLol = iSharesProviderLol;
+		if (iSharesProviderFragment != null && iSharesProviderFragment.isAdded()) {
+			return this.incomingSharesProviderFragment = iSharesProviderFragment;
 		}
 
 		return null;
@@ -1808,7 +1808,7 @@ public class FileProviderActivity extends PasscodeFileProviderActivity implement
 				break;
 
 			case INCOMING_TAB:
-				if (getISharesProviderLol() == null || !hide && incParentHandle != INVALID_HANDLE) {
+				if (getIncomingSharesProviderFragment() == null || !hide && incParentHandle != INVALID_HANDLE) {
 					return;
 				}
 

@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0"?>
 <resources>
     <!-- PRO Lite account -->
     <string name="prolite_account">Pro Lite</string>
@@ -720,7 +720,7 @@
     <string name="cam_sync_wifi">Только Wi-Fi</string>
     <!-- the options of how to upload, but in an array. needed for the settings, how to upload the camera images. when Wi-Fi connected and using data plan -->
     <string name="cam_sync_data">Wi-Fi или мобильные данные</string>
-    <!-- The upload of the user’s photos orvideos from their specified album is in progress. -->
+    <!-- The upload of the user’s photos or videos from their specified album is in progress. -->
     <string name="cam_sync_syncing">Выполняются загрузки из камеры</string>
     <!-- confirmation question for cancelling the camera uploads -->
     <string name="cam_sync_cancel_sync">Остановить загрузки из камеры?</string>
@@ -2401,7 +2401,7 @@
     <!-- Option that permits user logout -->
     <string name="proceed_to_logout">Выйти</string>
     <!-- Title of the preference Recovery key on Settings section -->
-    <string name="recovery_key_bottom_sheet">Ключ Восстановления</string>
+    <string name="recovery_key_bottom_sheet">Ключ восстановления</string>
     <!-- Option that permits user save on File System -->
     <string name="option_save_on_filesystem">Сохранить в файловую систему</string>
     <!-- Message shown when something has been copied to clipboard -->
@@ -2972,9 +2972,9 @@
     <!-- Option of one-off (year) billing. Placeholder: purchase price. -->
     <string name="billed_one_off_year">[A]Единоразово (год)[/A] %s</string>
     <!-- Option of monthly billing period. Placeholder: purchase price -->
-    <string name="billed_monthly_text">[A]Ежемесячно[/A] %s/месяц</string>
+    <string name="billed_monthly_text">[A]Оплачивается ежемесячно[/A] %s/месяц</string>
     <!-- Option of yearly billing period. Placeholder: purchase price -->
-    <string name="billed_yearly_text">[A]Ежегодно[/A] %s/год</string>
+    <string name="billed_yearly_text">[A]Оплачивается ежегодно[/A] %s/год</string>
     <!-- dialog option cancel in alert dialog -->
     <string name="button_cancel">Отмена</string>
     <!-- dialog option continue in alert dialog -->
@@ -3655,7 +3655,7 @@
     <!-- ”Verify user” dialog description -->
     <string name="authenticity_credentials_explanation">Лучше всего это сделать в реальной жизни, встречаясь лицом к лицу. Если у вас есть другой проверенный канал, например, проверенный OTR или PGP, вы также можете его использовать.</string>
     <!-- Label title above your fingerprint credentials.  A credential in this case is a stored piece of information representing your identity -->
-    <string name="label_your_credentials">Ваши Учетные Данные</string>
+    <string name="label_your_credentials">Ваши учётные данные</string>
     <!-- Button to reset credentials -->
     <string name="action_reset">Сбросить</string>
     <!-- Warning shown to the user when tries to approve/reset contact credentials and another request of this type is already running. -->
@@ -3967,8 +3967,6 @@
     <string name="same_item_name_warning">Уже есть элемент с таким именем</string>
     <!-- Label of the option menu. When clicking this button, the app shows the info of the related item, e.g. file, folder, contact, chat, etc. -->
     <string name="general_info">Информация</string>
-    <!-- Item menu option upon right click on one image or video to save it to device gallery -->
-    <string name="general_save_to_gallery">Сохранить в галерее</string>
     <!-- settings of the Media section -->
     <string name="settings_media">Медиа</string>
     <!-- settings title of the Media section -->
@@ -4403,10 +4401,54 @@
     <string name="upload_files">Загрузить файлы</string>
     <!-- Action button to upload a folder. -->
     <string name="upload_folder">Загрузить папку</string>
-    <!-- Title of the dialog warning the user about cancel uploads. -->
-    <string name="cancel_uploads">Отмена загрузки</string>
-    <!-- Warning alerting user if proceed with the action all the uploads will be cancelled. -->
-    <string name="cancel_uploads_warning">Если прервать процесс загрузки, все ваши загрузки будут отменены.</string>
-    <!-- Button to proceed with action. -->
-    <string name="action_proceed">Продолжить</string>
+    <!-- Text of the dialog warning the user about cancel uploads. -->
+    <string name="cancel_uploads">Отменить загрузку?</string>
+    <!-- Title of the Payments screen -->
+    <string name="payment">Платёж</string>
+    <!-- Label indicating payment methods -->
+    <string name="payment_methods">Способы оплаты</string>
+    <!-- Button to proceed with a payment -->
+    <string name="proceed">Продолжить</string>
+    <!-- Message informing the upgrade was processed correctly. Placeholder: type of subscription e.g: Pro Lite monthly -->
+    <string name="successful_upgrade">Спасибо за вашу подписку %1$s!</string>
+    <!-- Pro Lite monthly subscription -->
+    <string name="pro_lite_monthly">месячный Pro Lite</string>
+    <!-- Pro Lite yearly subscription -->
+    <string name="pro_lite_yearly">годовой Pro Lite</string>
+    <!-- Pro I monthly subscription -->
+    <string name="pro_i_monthly">месячный Pro I</string>
+    <!-- Pro I yearly subscription -->
+    <string name="pro_i_yearly">годовой Pro I</string>
+    <!-- Pro II monthly subscription -->
+    <string name="pro_ii_monthly">месячный Pro II</string>
+    <!-- Pro II yearly subscription -->
+    <string name="pro_ii_yearly">годовой Pro II</string>
+    <!-- Pro III monthly subscription -->
+    <string name="pro_iii_monthly">месячный Pro III</string>
+    <!-- Pro III yearly subscription -->
+    <string name="pro_iii_yearly">годовой Pro III</string>
+    <!-- Action button which will cancel uploads. -->
+    <string name="action_cancel_upload">Отменить загрузку</string>
+    <!-- Action button which will dismiss the dialog and will not cancel the action. -->
+    <string name="action_do_not_cancel">Не отменять</string>
+    <!-- Remove moderator permission and assign standard permission to a meeting participant-->
+    <string name="remove_moderator">Удалить модератора</string>
+    <!-- Title of DCIM folder warning dialog -->
+    <string name="title_dcim_folder_dialog">Папка DCIM</string>
+    <!-- Content of DCIM folder warning dialog -->
+    <string name="content_dcim_folder_dialog">MEGA загружает ваши изображения из галереи. Чтобы изменить место загрузки, перейдите в настройки загрузки из камеры.</string>
+    <!-- Error shown when download a file that has violated ToS/AUP. -->
+    <string name="tos_aup_violation">Нарушение условий обслуживания/политики допустимого использования</string>
+    <!-- Title message of existing subscription dialog -->
+    <string name="title_existing_subscription">Оформить ещё одну подписку?</string>
+    <!-- Text of buy new subscription button -->
+    <string name="button_buy_new_subscription">Оформить ещё одну подписку</string>
+    <!-- Dialog message when the existing subscription is from Android platform (Google and Huawei)  -->
+    <string name="message_subscription_from_android_platform">У вас уже есть подписка. Если вы оформите ещё одну, вы будете платить дважды. Чтобы избежать этого, отмените текущую подписку в %1$s. Посетите наш справочный центр для получения дополнительной информации.</string>
+    <!-- Dialog message when the existing subscription is from iTunes  -->
+    <string name="message_subscription_from_itunes">У вас уже есть подписка. Если вы оформите ещё одну, вы будете платить дважды. Чтобы избежать этого, отмените текущую подписку в своей учётной записи iTunes. Посетите наш справочный центр для получения дополнительной информации.</string>
+    <!-- Dialog message when the existing subscription is from other platform (Stripe and ECP)  -->
+    <string name="message_subscription_from_other_platform">У вас уже есть подписка. Если вы оформите ещё одну, вы будете платить дважды. Чтобы избежать этого, отмените текущую подписку, зайдя в MEGA в настольном или мобильном веб-браузере. Посетите наш справочный центр для получения дополнительной информации.</string>
+    <!-- Warning show to the user when the app needs bluetooth connect permissions to get the best meeting experience and the user has denied them.-->
+    <string name="meeting_bluetooth_connect_required_permissions_warning">Перейдите в «Настройки», чтобы предоставить MEGA разрешение на доступ к устройствам поблизости с помощью Bluetooth.</string>
 </resources>
