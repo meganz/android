@@ -189,7 +189,6 @@ public class NodeAttachmentHistoryActivity extends PasscodeActivity
 
         chatC = new ChatController(this);
 
-        logDebug("addChatListener");
         megaChatApi.addNodeHistoryListener(chatId, this);
 
         handler = new Handler();

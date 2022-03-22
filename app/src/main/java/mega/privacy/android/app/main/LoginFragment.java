@@ -77,10 +77,6 @@ import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaChatApi;
 import nz.mega.sdk.MegaChatApiAndroid;
-import nz.mega.sdk.MegaChatApiJava;
-import nz.mega.sdk.MegaChatListItem;
-import nz.mega.sdk.MegaChatListenerInterface;
-import nz.mega.sdk.MegaChatPresenceConfig;
 import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaRequest;
@@ -112,7 +108,7 @@ import static mega.privacy.android.app.utils.ViewUtils.removeLeadingAndTrailingS
 import static mega.privacy.android.app.utils.permission.PermissionUtils.hasPermissions;
 import static nz.mega.sdk.MegaApiJava.STORAGE_STATE_PAYWALL;
 
-public class LoginFragment extends Fragment implements View.OnClickListener, MegaRequestListenerInterface, MegaChatListenerInterface, View.OnFocusChangeListener, View.OnLongClickListener {
+public class LoginFragment extends Fragment implements View.OnClickListener, MegaRequestListenerInterface, View.OnFocusChangeListener, View.OnLongClickListener {
 
     private static final long LONG_CLICK_DELAY = 5000;
     private static final int READ_MEDIA_PERMISSION = 109;
@@ -223,7 +219,6 @@ public class LoginFragment extends Fragment implements View.OnClickListener, Meg
 
     @Override
     public void onCreate (Bundle savedInstanceState){
-        logDebug("onCreate");
         super.onCreate(savedInstanceState);
 
         if(context==null){
@@ -2331,10 +2326,6 @@ public class LoginFragment extends Fragment implements View.OnClickListener, Meg
             megaApi.removeRequestListener(this);
         }
 
-        if (megaChatApi != null) {
-            megaChatApi.removeChatListener(this);
-        }
-
         closeCancelDialog();
         dismissAlertDialogIfExists(changeApiServerDialog);
         super.onDestroy();
@@ -2411,50 +2402,6 @@ public class LoginFragment extends Fragment implements View.OnClickListener, Meg
 
     public String getEmailTemp(){
         return this.emailTemp;
-    }
-
-    @Override
-    public void onChatListItemUpdate(MegaChatApiJava api, MegaChatListItem item) {
-
-    }
-
-    @Override
-    public void onChatInitStateUpdate(MegaChatApiJava api, int newState) {
-        logDebug("newState: " + newState);
-
-        if(isAdded()){
-            if (newState == MegaChatApi.INIT_ERROR) {
-                // chat cannot initialize, disable chat completely
-                if(megaChatApi!=null){
-                    megaChatApi.logout(null);
-                }
-            }
-        }
-    }
-
-    @Override
-    public void onChatOnlineStatusUpdate(MegaChatApiJava api, long userhandle, int status, boolean inProgress) {
-
-    }
-
-    @Override
-    public void onChatPresenceConfigUpdate(MegaChatApiJava api, MegaChatPresenceConfig config) {
-
-    }
-
-    @Override
-    public void onChatConnectionStateUpdate(MegaChatApiJava api, long chatid, int newState) {
-
-    }
-
-    @Override
-    public void onChatPresenceLastGreen(MegaChatApiJava api, long userhandle, int lastGreen) {
-
-    }
-
-    @Override
-    public void onDbError(MegaChatApiJava api, int error, String msg) {
-
     }
 
     private void setError(final EditText editText, String error){

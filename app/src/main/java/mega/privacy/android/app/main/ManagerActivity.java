@@ -3063,6 +3063,7 @@ public class ManagerActivity extends TransfersManagementActivity
     void setContactStatus() {
         if (megaChatApi == null) {
             megaChatApi = app.getMegaChatApi();
+            composite.clear();
             checkChatChanges();
         }
 

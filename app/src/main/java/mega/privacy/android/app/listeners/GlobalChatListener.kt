@@ -10,6 +10,7 @@ import mega.privacy.android.app.constants.EventConstants.EVENT_CHAT_TITLE_CHANGE
 import mega.privacy.android.app.constants.EventConstants.EVENT_PRIVILEGES_CHANGE
 import mega.privacy.android.app.utils.Constants.*
 import mega.privacy.android.app.utils.LogUtil
+import mega.privacy.android.app.utils.LogUtil.logDebug
 import mega.privacy.android.app.utils.LogUtil.logError
 import mega.privacy.android.app.utils.RunOnUIThreadUtils.post
 import mega.privacy.android.app.utils.StringResourcesUtils
@@ -97,13 +98,15 @@ class GlobalChatListener(private val application: MegaApplication) : MegaChatLis
     override fun onDbError(api: MegaChatApiJava?, error: Int, msg: String?) {
         logError("MEGAChatSDK onDBError occurred. Error $error with message $msg")
         when (error) {
-            MegaChatApi.DB_ERROR_IO -> application.currentActivity.finishAndRemoveTask()
+            MegaChatApi.DB_ERROR_IO -> application.currentActivity?.finishAndRemoveTask()
 
             MegaChatApi.DB_ERROR_FULL -> post {
-                Util.showErrorAlertDialog(
-                    StringResourcesUtils.getString(R.string.error_not_enough_free_space),
-                    true, application.currentActivity
-                )
+                application.currentActivity?.let {
+                    Util.showErrorAlertDialog(
+                        StringResourcesUtils.getString(R.string.error_not_enough_free_space),
+                        true, it
+                    )
+                }
             }
         }
     }

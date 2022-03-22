@@ -211,7 +211,6 @@ public class GroupChatInfoActivity extends PasscodeActivity
             return;
         }
 
-        logDebug("addChatListener");
         checkChatChanges();
 
         Bundle extras = getIntent().getExtras();

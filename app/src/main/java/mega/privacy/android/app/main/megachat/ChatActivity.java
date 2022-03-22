@@ -765,6 +765,8 @@ public class ChatActivity extends PasscodeActivity
             }
 
             idChat = request.getChatHandle();
+
+            composite.clear();
             checkChatChanges();
 
             if (idChat != MEGACHAT_INVALID_HANDLE) {
@@ -1626,7 +1628,9 @@ public class ChatActivity extends PasscodeActivity
                         idChat = newIdChat;
                     }
 
+                    composite.clear();
                     checkChatChanges();
+
                     myUserHandle = megaChatApi.getMyUserHandle();
 
                     if(savedInstanceState!=null) {
