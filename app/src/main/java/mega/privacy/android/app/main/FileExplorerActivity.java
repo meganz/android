@@ -56,11 +56,11 @@ import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.ShareInfo;
 import mega.privacy.android.app.TransfersManagementActivity;
-import mega.privacy.android.app.UploadService;
 import mega.privacy.android.app.UserCredentials;
 import mega.privacy.android.app.namecollision.data.NameCollision;
 import mega.privacy.android.app.namecollision.NameCollisionActivity;
 import mega.privacy.android.app.namecollision.usecase.CheckNameCollisionUseCase;
+import mega.privacy.android.app.usecase.UploadUseCase;
 import mega.privacy.android.app.usecase.exception.MegaNodeException;
 import mega.privacy.android.app.utils.ChatUtil;
 import mega.privacy.android.app.utils.MegaProgressDialogUtil;
@@ -126,6 +126,7 @@ import static mega.privacy.android.app.utils.TimeUtils.*;
 import static mega.privacy.android.app.utils.Util.*;
 import static nz.mega.sdk.MegaApiJava.INVALID_HANDLE;
 import static nz.mega.sdk.MegaApiJava.STORAGE_STATE_PAYWALL;
+import static nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE;
 
 import javax.inject.Inject;
 
@@ -183,6 +184,8 @@ public class FileExplorerActivity extends TransfersManagementActivity
 	FilePrepareUseCase filePrepareUseCase;
 	@Inject
 	CheckNameCollisionUseCase checkNameCollisionUseCase;
+	@Inject
+	UploadUseCase uploadUseCase;
 
 	private DatabaseHandler dbH;
 	private MegaPreferences prefs;
@@ -1699,30 +1702,19 @@ public class FileExplorerActivity extends TransfersManagementActivity
 							}
 
 							if (!withoutCollisions.isEmpty()) {
-								showSnackbar(StringResourcesUtils.getQuantityString(R.plurals.upload_began, withoutCollisions.size(), withoutCollisions.size()));
 
 								backToCloud(finalParentNode.getHandle(), infos.size());
 
-								for (ShareInfo info : infos) {
-									if (transfersManagement.shouldBreakTransfersProcessing()) {
-										break;
-									}
-
-									Intent intent = new Intent(this, UploadService.class);
-									intent.putExtra(UploadService.EXTRA_FILEPATH, info.getFileAbsolutePath());
-									intent.putExtra(UploadService.EXTRA_NAME, info.getTitle());
-									if (nameFiles != null && nameFiles.get(info.getTitle()) != null
-											&& !nameFiles.get(info.getTitle()).equals(info.getTitle())) {
-										intent.putExtra(UploadService.EXTRA_NAME_EDITED, nameFiles.get(info.getTitle()));
-									}
-									intent.putExtra(UploadService.EXTRA_PARENT_HASH, finalParentNode.getHandle());
-									intent.putExtra(UploadService.EXTRA_SIZE, info.getSize());
-									startService(intent);
-								}
-
-								filePreparedInfos = null;
-								logDebug("finish!!!");
-								finishActivity();
+								String text = StringResourcesUtils.getQuantityString(R.plurals.upload_began, withoutCollisions.size(), withoutCollisions.size());
+								uploadUseCase.uploadInfos(this, infos, nameFiles, finalParentNode.getHandle())
+										.subscribeOn(Schedulers.io())
+										.observeOn(AndroidSchedulers.mainThread())
+										.subscribe(() -> {
+											showSnackbar(text);
+											filePreparedInfos = null;
+											logDebug("finish!!!");
+											finishActivity();
+										});
 							}
 						}
 					});
@@ -1978,16 +1970,17 @@ public class FileExplorerActivity extends TransfersManagementActivity
 							if (throwable instanceof MegaNodeException.ParentDoesNotExistException) {
 								showSnackbar(StringResourcesUtils.getString(R.string.general_text_error));
 							} else if (throwable instanceof MegaNodeException.ChildDoesNotExistsException) {
-								Intent intent = new Intent(this, UploadService.class);
-								intent.putExtra(UploadService.EXTRA_FILEPATH, file.getAbsolutePath());
-								intent.putExtra(UploadService.EXTRA_NAME, file.getName());
-								intent.putExtra(UploadService.EXTRA_PARENT_HASH, parentNode.getHandle());
-								intent.putExtra(UploadService.EXTRA_SIZE, file.getTotalSpace());
-								startService(intent);
+								String text = StringResourcesUtils.getQuantityString(R.plurals.upload_began, 1, 1);
 
-								logDebug("After UPLOAD click - back to Cloud");
-								this.backToCloud(parentNode.getHandle(), 1);
-								finishActivity();
+								uploadUseCase.upload(this, file, parentNode.getHandle())
+										.subscribeOn(Schedulers.io())
+										.observeOn(AndroidSchedulers.mainThread())
+										.subscribe(() -> {
+											showSnackbar(SNACKBAR_TYPE, text, MEGACHAT_INVALID_HANDLE);
+											logDebug("After UPLOAD click - back to Cloud");
+											this.backToCloud(parentNode.getHandle(), 1);
+											finishActivity();
+										});
 							}
 						});
 	}

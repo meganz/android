@@ -19,6 +19,7 @@ import mega.privacy.android.app.utils.LogUtil.logWarning
 import mega.privacy.android.app.utils.MegaApiUtils.getMegaNodeFolderInfo
 import mega.privacy.android.app.utils.RxUtil.blockingGetOrNull
 import nz.mega.sdk.MegaApiAndroid
+import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 import nz.mega.sdk.MegaNode
 import javax.inject.Inject
 
@@ -232,7 +233,10 @@ class GetNameCollisionResultUseCase @Inject constructor(
      */
     private fun getRenameName(collision: NameCollision): Single<String> =
         Single.create { emitter ->
-            val parentNode = getNodeUseCase.get(collision.parentHandle).blockingGetOrNull()
+            val parentNode =
+                if (collision.parentHandle == INVALID_HANDLE) megaApi.rootNode
+                else getNodeUseCase.get(collision.parentHandle).blockingGetOrNull()
+
             if (parentNode == null) {
                 emitter.onError(MegaNodeException.ParentDoesNotExistException())
                 return@create

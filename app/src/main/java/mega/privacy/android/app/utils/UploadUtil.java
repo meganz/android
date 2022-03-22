@@ -9,13 +9,9 @@ import android.net.Uri;
 
 import java.io.File;
 
-import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
-import mega.privacy.android.app.UploadService;
 import mega.privacy.android.app.uploadFolder.UploadFolderActivity;
-import nz.mega.sdk.MegaApiAndroid;
 
-import static mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuotaPaywallWarning;
 import static mega.privacy.android.app.utils.CacheFolderManager.TEMPORAL_FOLDER;
 import static mega.privacy.android.app.utils.CacheFolderManager.buildTempFile;
 import static mega.privacy.android.app.utils.CacheFolderManager.getCacheFile;
@@ -23,39 +19,8 @@ import static mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_PARENT_N
 import static mega.privacy.android.app.utils.FileUtil.isFileAvailable;
 import static mega.privacy.android.app.utils.LogUtil.logDebug;
 import static mega.privacy.android.app.utils.LogUtil.logWarning;
-import static nz.mega.sdk.MegaApiJava.STORAGE_STATE_PAYWALL;
 
 public class UploadUtil {
-
-    /**
-     * This method is to start upload file service within context
-     *
-     * @param context      the passed context to start upload service
-     * @param filePath     the path of file to be uploaded
-     * @param parentHandle the handle of parent node where file would be uploaded
-     * @param megaApi      the api to process the upload                 '
-     */
-
-    public static void uploadFile(Context context, String filePath, long parentHandle, MegaApiAndroid megaApi) {
-        logDebug("uploadTakePicture, parentHandle: " + parentHandle);
-
-        if (MegaApplication.getInstance().getStorageState() == STORAGE_STATE_PAYWALL) {
-            showOverDiskQuotaPaywallWarning();
-            return;
-        }
-
-        if (parentHandle == -1) {
-            parentHandle = megaApi.getRootNode().getHandle();
-        }
-
-        Intent intent = new Intent(context, UploadService.class);
-        File file = new File(filePath);
-        intent.putExtra(UploadService.EXTRA_FILEPATH, file.getAbsolutePath());
-        intent.putExtra(UploadService.EXTRA_NAME, file.getName());
-        intent.putExtra(UploadService.EXTRA_PARENT_HASH, parentHandle);
-        intent.putExtra(UploadService.EXTRA_SIZE, file.length());
-        context.startService(intent);
-    }
 
     /**
      * This method is to upload camera taken photos to Cloud
@@ -76,7 +41,7 @@ public class UploadUtil {
         File newFile = buildTempFile(context, name);
         imgFile.renameTo(newFile);
 
-        return imgFile;
+        return newFile;
     }
 
     /**

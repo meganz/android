@@ -19,7 +19,7 @@ import mega.privacy.android.app.namecollision.data.NameCollisionResult
 import mega.privacy.android.app.namecollision.usecase.GetNameCollisionResultUseCase
 import mega.privacy.android.app.usecase.CopyNodeUseCase
 import mega.privacy.android.app.usecase.MoveNodeUseCase
-import mega.privacy.android.app.usecase.UploadNodeUseCase
+import mega.privacy.android.app.usecase.UploadUseCase
 import mega.privacy.android.app.usecase.data.CopyRequestResult
 import mega.privacy.android.app.usecase.data.MoveRequestResult
 import mega.privacy.android.app.utils.Constants.INVALID_VALUE
@@ -34,7 +34,7 @@ import javax.inject.Inject
  *
  * @property getFileVersionsOptionUseCase   Required for checking file versioning.
  * @property getNameCollisionResultUseCase  Required for getting all the needed info for present a collision.
- * @property uploadNodeUseCase              Required for uploading files.
+ * @property uploadUseCase                  Required for uploading files.
  * @property moveNodeUseCase                Required for moving nodes.
  * @property copyNodeUseCase                Required for copying nodes.
  */
@@ -42,7 +42,7 @@ import javax.inject.Inject
 class NameCollisionViewModel @Inject constructor(
     private val getFileVersionsOptionUseCase: GetFileVersionsOptionUseCase,
     private val getNameCollisionResultUseCase: GetNameCollisionResultUseCase,
-    private val uploadNodeUseCase: UploadNodeUseCase,
+    private val uploadUseCase: UploadUseCase,
     private val moveNodeUseCase: MoveNodeUseCase,
     private val copyNodeUseCase: CopyNodeUseCase
 ) : BaseRxViewModel() {
@@ -418,7 +418,7 @@ class NameCollisionViewModel @Inject constructor(
             return
         }
 
-        uploadNodeUseCase.upload(context, currentCollision.value!!, rename)
+        uploadUseCase.upload(context, currentCollision.value!!, rename)
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeBy(
@@ -446,7 +446,7 @@ class NameCollisionViewModel @Inject constructor(
             return
         }
 
-        uploadNodeUseCase.upload(context, list, rename)
+        uploadUseCase.upload(context, list, rename)
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeBy(

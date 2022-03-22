@@ -13,7 +13,7 @@ import mega.privacy.android.app.uploadFolder.list.data.FolderContent
 import mega.privacy.android.app.uploadFolder.list.data.UploadFolderResult
 import mega.privacy.android.app.usecase.CreateFolderUseCase
 import mega.privacy.android.app.usecase.GetNodeUseCase
-import mega.privacy.android.app.usecase.UploadNodeUseCase
+import mega.privacy.android.app.usecase.UploadUseCase
 import mega.privacy.android.app.usecase.exception.MegaNodeException
 import mega.privacy.android.app.utils.LogUtil.logWarning
 import mega.privacy.android.app.utils.RxUtil.blockingGetOrNull
@@ -30,16 +30,16 @@ import kotlin.collections.HashMap
 /**
  * Use case to manage the content of a folder which is going to be uploaded.
  *
- * @property megaApi                    MegaApi required to make the requests to the SDK.
- * @property createFolderUseCase        Use case for creating folders.
- * @property getNodeUseCase             Use case for getting nodes.
- * @property uploadNodeUseCase          Use case for uploading files.
+ * @property megaApi                MegaApi required to make the requests to the SDK.
+ * @property createFolderUseCase    Use case for creating folders.
+ * @property getNodeUseCase         Use case for getting nodes.
+ * @property uploadUseCase          Use case for uploading files.
  */
 class GetFolderContentUseCase @Inject constructor(
     @MegaApi private val megaApi: MegaApiAndroid,
     private val createFolderUseCase: CreateFolderUseCase,
     private val getNodeUseCase: GetNodeUseCase,
-    private val uploadNodeUseCase: UploadNodeUseCase
+    private val uploadUseCase: UploadUseCase
 ) {
 
     /**
@@ -286,7 +286,7 @@ class GetFolderContentUseCase @Inject constructor(
                             return@create
                         }
 
-                        uploadNodeUseCase.upload(context, result).blockingSubscribeBy(
+                        uploadUseCase.upload(context, result).blockingSubscribeBy(
                             onError = { error -> emitter.onError(error) }
                         )
                     }

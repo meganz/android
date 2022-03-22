@@ -385,12 +385,8 @@ class NameCollisionActivity : PasscodeActivity() {
                 .setImageRequest(ImageRequestBuilder.fromRequest(ImageRequest.fromFile(file))
                     .setLocalThumbnailPreviewsEnabled(true)
                     .setRequestListener(OptionalRequestListener(
-                        onRequestSuccess = { _, _, _ ->
-                            thumbnailIcon.isVisible = false
-                        },
-                        onRequestFailure = { _, _, _, _ ->
-                            isVisible = false
-                        }
+                        onRequestSuccess = { _, _, _ -> finishThumbnailRequest(true) },
+                        onRequestFailure = { _, _, _, _ -> finishThumbnailRequest(false) }
                     )).build()
                 ).setControllerListener(object : BaseControllerListener<ImageInfo?>() {
                     override fun onFinalImageSet(
@@ -398,9 +394,42 @@ class NameCollisionActivity : PasscodeActivity() {
                         imageInfo: ImageInfo?,
                         animatable: Animatable?
                     ) {
-                        thumbnailIcon.isVisible = false
+                        finishThumbnailRequest(true)
                     }
                 }).build()
+        }
+    }
+
+    /**
+     * Updates the UI according to the thumbnail request.
+     *
+     * @param success True if the thumbnail was set, false otherwise.
+     */
+    private fun ViewNameCollisionOptionBinding.finishThumbnailRequest(success: Boolean) {
+        if (success) {
+            thumbnailIcon.isVisible = false
+        } else {
+            thumbnail.isVisible = false
+        }
+
+        val thumbnailView = if (success) R.id.thumbnail else R.id.thumbnail_icon
+
+        ConstraintSet().apply {
+            clone(root)
+
+            if (root.id == R.id.rename_view) {
+                connect(
+                    thumbnailView,
+                    ConstraintSet.BOTTOM,
+                    root.id,
+                    ConstraintSet.BOTTOM
+                )
+                centerVertically(R.id.name, thumbnailView)
+            } else {
+                connect(R.id.name, ConstraintSet.TOP, thumbnailView, ConstraintSet.TOP)
+            }
+
+            applyTo(root)
         }
     }
 

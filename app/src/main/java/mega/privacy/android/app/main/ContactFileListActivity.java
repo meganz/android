@@ -44,7 +44,6 @@ import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.ShareInfo;
-import mega.privacy.android.app.UploadService;
 import mega.privacy.android.app.activities.PasscodeActivity;
 import mega.privacy.android.app.components.saver.NodeSaver;
 import mega.privacy.android.app.namecollision.data.NameCollision;
@@ -58,6 +57,7 @@ import mega.privacy.android.app.modalbottomsheet.UploadBottomSheetDialogFragment
 import mega.privacy.android.app.namecollision.NameCollisionActivity;
 import mega.privacy.android.app.usecase.GetNodeUseCase;
 import mega.privacy.android.app.usecase.MoveNodeUseCase;
+import mega.privacy.android.app.usecase.UploadUseCase;
 import mega.privacy.android.app.usecase.data.MoveRequestResult;
 import mega.privacy.android.app.usecase.exception.MegaNodeException;
 import mega.privacy.android.app.utils.AlertDialogUtil;
@@ -112,6 +112,8 @@ public class ContactFileListActivity extends PasscodeActivity
 	GetNodeUseCase getNodeUseCase;
 	@Inject
 	CheckNameCollisionUseCase checkNameCollisionUseCase;
+	@Inject
+    UploadUseCase uploadUseCase;
 
 	FrameLayout fragmentContainer;
 
@@ -749,7 +751,10 @@ public class ContactFileListActivity extends PasscodeActivity
 										if (throwable instanceof MegaNodeException.ParentDoesNotExistException) {
 											showSnackbar(SNACKBAR_TYPE, StringResourcesUtils.getString(R.string.general_error));
 										} else if (throwable instanceof MegaNodeException.ChildDoesNotExistsException) {
-											uploadFile(contactPropertiesMainActivity, file.getAbsolutePath(), parentHandle, megaApi);
+                                            uploadUseCase.upload(this, file, contactFileListFragment.getParentHandle())
+                                                    .subscribeOn(Schedulers.io())
+                                                    .observeOn(AndroidSchedulers.mainThread())
+                                                    .subscribe(() -> logDebug("Upload started"));
 										}
 									});
 				}
@@ -818,20 +823,12 @@ public class ContactFileListActivity extends PasscodeActivity
 						}
 
 						if (!withoutCollisions.isEmpty()) {
-							showSnackbar(SNACKBAR_TYPE, StringResourcesUtils.getQuantityString(R.plurals.upload_began, withoutCollisions.size(), withoutCollisions.size()));
+							String text = StringResourcesUtils.getQuantityString(R.plurals.upload_began, withoutCollisions.size(), withoutCollisions.size());
 
-							for (ShareInfo info : withoutCollisions) {
-								if (transfersManagement.shouldBreakTransfersProcessing()) {
-									break;
-								}
-
-								Intent intent = new Intent(this, UploadService.class);
-								intent.putExtra(UploadService.EXTRA_FILEPATH, info.getFileAbsolutePath());
-								intent.putExtra(UploadService.EXTRA_NAME, info.getTitle());
-								intent.putExtra(UploadService.EXTRA_PARENT_HASH, parentNode.getHandle());
-								intent.putExtra(UploadService.EXTRA_SIZE, info.getSize());
-								startService(intent);
-							}
+							uploadUseCase.uploadInfos(this, withoutCollisions, null, parentNode.getHandle())
+									.subscribeOn(Schedulers.io())
+									.observeOn(AndroidSchedulers.mainThread())
+									.subscribe(() -> showSnackbar(SNACKBAR_TYPE, text));
 						}
 					}
 				});

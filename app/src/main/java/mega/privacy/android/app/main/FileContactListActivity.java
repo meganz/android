@@ -45,7 +45,6 @@ import io.reactivex.rxjava3.schedulers.Schedulers;
 import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.ShareInfo;
-import mega.privacy.android.app.UploadService;
 import mega.privacy.android.app.activities.PasscodeActivity;
 import mega.privacy.android.app.components.SimpleDividerItemDecoration;
 import mega.privacy.android.app.namecollision.data.NameCollision;
@@ -56,6 +55,7 @@ import mega.privacy.android.app.main.controllers.NodeController;
 import mega.privacy.android.app.modalbottomsheet.FileContactsListBottomSheetDialogFragment;
 import mega.privacy.android.app.namecollision.NameCollisionActivity;
 import mega.privacy.android.app.namecollision.usecase.CheckNameCollisionUseCase;
+import mega.privacy.android.app.usecase.UploadUseCase;
 import mega.privacy.android.app.utils.AlertDialogUtil;
 import mega.privacy.android.app.utils.StringResourcesUtils;
 import nz.mega.sdk.MegaApiJava;
@@ -89,6 +89,8 @@ public class FileContactListActivity extends PasscodeActivity implements OnClick
 
 	@Inject
 	CheckNameCollisionUseCase checkNameCollisionUseCase;
+	@Inject
+	UploadUseCase uploadUseCase;
 
 	private ContactController cC;
 	private NodeController nC;
@@ -761,20 +763,12 @@ public class FileContactListActivity extends PasscodeActivity implements OnClick
 						}
 
 						if (!withoutCollisions.isEmpty()) {
-							showSnackbar(StringResourcesUtils.getQuantityString(R.plurals.upload_began, withoutCollisions.size(), withoutCollisions.size()));
+							String text = StringResourcesUtils.getQuantityString(R.plurals.upload_began, withoutCollisions.size(), withoutCollisions.size());
 
-							for (ShareInfo info : withoutCollisions) {
-								if (transfersManagement.shouldBreakTransfersProcessing()) {
-									break;
-								}
-
-								Intent intent = new Intent(this, UploadService.class);
-								intent.putExtra(UploadService.EXTRA_FILEPATH, info.getFileAbsolutePath());
-								intent.putExtra(UploadService.EXTRA_NAME, info.getTitle());
-								intent.putExtra(UploadService.EXTRA_PARENT_HASH, parentNode.getHandle());
-								intent.putExtra(UploadService.EXTRA_SIZE, info.getSize());
-								startService(intent);
-							}
+							uploadUseCase.uploadInfos(this, withoutCollisions, null, parentNode.getHandle())
+									.subscribeOn(Schedulers.io())
+									.observeOn(AndroidSchedulers.mainThread())
+									.subscribe(() -> showSnackbar(text));
 						}
 					}
 				});

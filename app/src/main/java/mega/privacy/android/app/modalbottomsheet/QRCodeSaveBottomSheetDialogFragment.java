@@ -14,10 +14,10 @@ import io.reactivex.rxjava3.schedulers.Schedulers;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.ShareInfo;
-import mega.privacy.android.app.UploadService;
 import mega.privacy.android.app.namecollision.data.NameCollision;
 import mega.privacy.android.app.namecollision.NameCollisionActivity;
 import mega.privacy.android.app.namecollision.usecase.CheckNameCollisionUseCase;
+import mega.privacy.android.app.usecase.UploadUseCase;
 import mega.privacy.android.app.usecase.exception.MegaNodeException;
 import mega.privacy.android.app.utils.StringResourcesUtils;
 import mega.privacy.android.app.main.FileStorageActivity;
@@ -42,6 +42,8 @@ public class QRCodeSaveBottomSheetDialogFragment extends BaseBottomSheetDialogFr
 
     @Inject
     CheckNameCollisionUseCase checkNameCollisionUseCase;
+    @Inject
+    UploadUseCase uploadUseCase;
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -106,13 +108,12 @@ public class QRCodeSaveBottomSheetDialogFragment extends BaseBottomSheetDialogFr
                                     return;
                                 }
 
-                                Intent intent = new Intent(requireActivity(), UploadService.class);
-                                intent.putExtra(UploadService.EXTRA_FILEPATH, info.getFileAbsolutePath());
-                                intent.putExtra(UploadService.EXTRA_NAME, info.getTitle());
-                                intent.putExtra(UploadService.EXTRA_PARENT_HASH, parentNode.getHandle());
-                                intent.putExtra(UploadService.EXTRA_SIZE, info.getSize());
-                                requireActivity().startService(intent);
-                                showSnackbar(requireActivity(), StringResourcesUtils.getString(R.string.save_qr_cloud_drive, qrFile.getName()));
+                                String text = StringResourcesUtils.getString(R.string.save_qr_cloud_drive, qrFile.getName());
+
+                                uploadUseCase.upload(requireActivity(), info, null, parentNode.getHandle())
+                                        .subscribeOn(Schedulers.io())
+                                        .observeOn(AndroidSchedulers.mainThread())
+                                        .subscribe(() -> showSnackbar(requireActivity(), text));
                             }
                         });
     }

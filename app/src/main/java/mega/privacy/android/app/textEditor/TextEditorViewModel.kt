@@ -463,9 +463,8 @@ class TextEditorViewModel @Inject constructor(
                             val uploadIntent = Intent(activity, UploadService::class.java)
                                 .putExtra(UploadService.EXTRA_UPLOAD_TXT, mode.value)
                                 .putExtra(FROM_HOME_PAGE, fromHome)
-                                .putExtra(UploadService.EXTRA_FILEPATH, tempFile.absolutePath)
+                                .putExtra(UploadService.EXTRA_FILE_PATH, tempFile.absolutePath)
                                 .putExtra(UploadService.EXTRA_NAME, fileName.value)
-                                .putExtra(UploadService.EXTRA_SIZE, tempFile.length())
                                 .putExtra(UploadService.EXTRA_PARENT_HASH, parentHandle)
 
                             activity.startService(uploadIntent)

@@ -74,6 +74,7 @@ import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.PreviewUtils.*;
 import static mega.privacy.android.app.utils.ThumbnailUtils.*;
+import static nz.mega.sdk.MegaApiJava.INVALID_HANDLE;
 
 import javax.inject.Inject;
 
@@ -84,12 +85,9 @@ import javax.inject.Inject;
 public class UploadService extends Service implements MegaTransferListenerInterface {
 
 	public static String ACTION_CANCEL = "CANCEL_UPLOAD";
-	public static String EXTRA_FILEPATH = "MEGA_FILE_PATH";
-	public static String EXTRA_FOLDERPATH = "MEGA_FOLDER_PATH";
+	public static String EXTRA_FILE_PATH = "MEGA_FILE_PATH";
 	public static String EXTRA_NAME = "MEGA_FILE_NAME";
 	public static String EXTRA_LAST_MODIFIED = "MEGA_FILE_LAST_MODIFIED";
-	public static String EXTRA_NAME_EDITED = "MEGA_FILE_NAME_EDITED";
-	public static String EXTRA_SIZE = "MEGA_SIZE";
 	public static String EXTRA_PARENT_HASH = "MEGA_PARENT_HASH";
     public static String EXTRA_UPLOAD_TXT = "EXTRA_UPLOAD_TXT";
 
@@ -321,7 +319,7 @@ public class UploadService extends Service implements MegaTransferListenerInterf
             isOverquota = NOT_OVERQUOTA_STATE;
         }
 
-        String filePath = intent.getStringExtra(EXTRA_FILEPATH);
+        String filePath = intent.getStringExtra(EXTRA_FILE_PATH);
         if (isTextEmpty(filePath)) {
             logWarning("Error: File path is NULL or EMPTY");
             return;
@@ -340,17 +338,18 @@ public class UploadService extends Service implements MegaTransferListenerInterf
         logDebug("File to manage: " + file.getAbsolutePath());
 
         String textFileMode = intent.getStringExtra(EXTRA_UPLOAD_TXT);
-        long parentHandle = intent.getLongExtra(EXTRA_PARENT_HASH, 0);
-        String nameInMEGA = intent.getStringExtra(EXTRA_NAME);
-        String nameInMEGAEdited = intent.getStringExtra(EXTRA_NAME_EDITED);
+        long parentHandle = intent.getLongExtra(EXTRA_PARENT_HASH, INVALID_HANDLE);
+        String fileName = intent.getStringExtra(EXTRA_NAME);
         long lastModified = intent.getLongExtra(EXTRA_LAST_MODIFIED, 0);
         if (lastModified <= 0) {
             lastModified = file.lastModified();
         }
 
-        MegaNode parentNode = megaApi.getNodeByHandle(parentHandle);
+        MegaNode parentNode = parentHandle == INVALID_HANDLE
+                ? megaApi.getRootNode()
+                : megaApi.getNodeByHandle(parentHandle);
+
         long mTime = lastModified == 0 ? INVALID_VALUE : lastModified;
-        String fileName = nameInMEGAEdited != null ? nameInMEGAEdited : nameInMEGA;
 
         pendingToAddInQueue++;
 
