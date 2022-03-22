@@ -92,10 +92,10 @@ class PhotosFragment : BaseFragment() {
                         val timelineFragment = currentTab
                         with(timelineFragment) {
                             setHideBottomViewScrollBehaviour()
-                            if (isEnablePhotosFragmentShown() && gridAdapterHasData() && isInActionMode()) {
-                                mManagerActivity.updateCUViewTypes(View.VISIBLE)
-                            } else {
+                            if (isEnablePhotosFragmentShown() || !gridAdapterHasData() || isInActionMode()) {
                                 mManagerActivity.updateCUViewTypes(View.GONE)
+                            } else {
+                                mManagerActivity.updateCUViewTypes(View.VISIBLE)
                             }
                         }
                     } else {
