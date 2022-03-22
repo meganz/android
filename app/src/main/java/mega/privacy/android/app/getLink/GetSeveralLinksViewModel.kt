@@ -13,7 +13,7 @@ import mega.privacy.android.app.arch.BaseRxViewModel
 import mega.privacy.android.app.di.MegaApi
 import mega.privacy.android.app.getLink.data.LinkItem
 import mega.privacy.android.app.getLink.useCase.ExportNodeUseCase
-import mega.privacy.android.app.getLink.useCase.GetThumbnailUseCase
+import mega.privacy.android.app.usecase.GetThumbnailUseCase
 import mega.privacy.android.app.utils.FileUtil
 import mega.privacy.android.app.utils.LogUtil
 import mega.privacy.android.app.utils.LogUtil.logError
@@ -159,7 +159,7 @@ class GetSeveralLinksViewModel @Inject constructor(
      */
     private fun requestThumbnails(pendingThumbnails: List<MegaNode>) {
         if (pendingThumbnails.isNotEmpty()) {
-            getThumbnailUseCase.get(pendingThumbnails, thumbFolder)
+            getThumbnailUseCase.get(pendingThumbnails)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeBy(

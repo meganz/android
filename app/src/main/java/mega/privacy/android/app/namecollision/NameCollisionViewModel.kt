@@ -71,6 +71,7 @@ class NameCollisionViewModel @Inject constructor(
     fun onActionResult(): LiveData<Event<NameCollisionActionResult>> = actionResult
     fun getCollisionsResolution(): LiveData<ArrayList<NameCollisionResult>> = collisionsResolution
 
+    private val renameNames = mutableListOf<String>()
     private val resolvedCollisions = mutableListOf<NameCollisionResult>()
     var isFolderUploadContext = false
     private val pendingCollisions: MutableList<NameCollisionResult> = mutableListOf()
@@ -325,7 +326,16 @@ class NameCollisionViewModel @Inject constructor(
      * @param applyOnNext   True if should rename the next file collisions.
      */
     fun rename(context: Context, applyOnNext: Boolean) {
-        proceedWithAction(context = context, applyOnNext = applyOnNext, rename = true)
+        renameNames.add(currentCollision.value?.renameName!!)
+        getNameCollisionResultUseCase.updateRenameNames(pendingCollisions, renameNames, applyOnNext)
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribeBy(
+                onComplete = {
+                    proceedWithAction(context = context, applyOnNext = applyOnNext, rename = true)
+                },
+                onError = { error -> LogUtil.logWarning(error.message) })
+            .addTo(composite)
     }
 
     /**

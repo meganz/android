@@ -13,7 +13,9 @@
         android:layout_height="@dimen/non_default_thumbnail_size"
         android:layout_margin="@dimen/non_default_thumbnail_margin_start"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        app:roundWithOverlayColor="@color/grey_010_grey_800"
+        app:roundedCornerRadius="@dimen/thumbnail_corner_radius" />
 
     <androidx.appcompat.widget.AppCompatImageView
         android:id="@+id/thumbnail_icon"

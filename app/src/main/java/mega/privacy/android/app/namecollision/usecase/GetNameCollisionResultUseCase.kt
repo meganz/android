@@ -1,43 +1,40 @@
 package mega.privacy.android.app.namecollision.usecase
 
 import android.content.Context
-import androidx.core.net.toUri
 import dagger.hilt.android.qualifiers.ApplicationContext
 import io.reactivex.rxjava3.core.BackpressureStrategy
+import io.reactivex.rxjava3.core.Completable
 import io.reactivex.rxjava3.core.Flowable
 import io.reactivex.rxjava3.core.Single
 import io.reactivex.rxjava3.kotlin.blockingSubscribeBy
 import mega.privacy.android.app.MimeTypeList
 import mega.privacy.android.app.di.MegaApi
-import mega.privacy.android.app.listeners.OptionalMegaRequestListenerInterface
 import mega.privacy.android.app.namecollision.data.NameCollision
 import mega.privacy.android.app.namecollision.data.NameCollisionResult
 import mega.privacy.android.app.namecollision.exception.NoPendingCollisionsException
 import mega.privacy.android.app.usecase.GetNodeUseCase
+import mega.privacy.android.app.usecase.GetThumbnailUseCase
 import mega.privacy.android.app.usecase.exception.MegaNodeException
-import mega.privacy.android.app.utils.CacheFolderManager.buildThumbnailFile
-import mega.privacy.android.app.utils.ErrorUtils.toThrowable
 import mega.privacy.android.app.utils.LogUtil.logWarning
 import mega.privacy.android.app.utils.MegaApiUtils.getMegaNodeFolderInfo
-import mega.privacy.android.app.utils.MegaNodeUtil.getThumbnailFileName
 import mega.privacy.android.app.utils.RxUtil.blockingGetOrNull
 import nz.mega.sdk.MegaApiAndroid
-import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaNode
-import nz.mega.sdk.MegaRequest
 import javax.inject.Inject
 
 /**
  * Use case for getting all required info for a name collision.
  *
- * @property megaApi        MegaApiAndroid instance to ask for thumbnails.
- * @property context        Required for getting thumbnail files.
- * @property getNodeUseCase Required for getting MegaNodes.
+ * @property megaApi                MegaApiAndroid instance to ask for thumbnails.
+ * @property context                Required for getting thumbnail files.
+ * @property getNodeUseCase         Required for getting MegaNodes.
+ * @property getThumbnailUseCase    Required for getting thumbnails.
  */
 class GetNameCollisionResultUseCase @Inject constructor(
     @MegaApi private val megaApi: MegaApiAndroid,
     @ApplicationContext private val context: Context,
-    private val getNodeUseCase: GetNodeUseCase
+    private val getNodeUseCase: GetNodeUseCase,
+    private val getThumbnailUseCase: GetThumbnailUseCase
 ) {
 
     /**
@@ -49,27 +46,21 @@ class GetNameCollisionResultUseCase @Inject constructor(
     fun get(collision: NameCollision): Flowable<NameCollisionResult> =
         Flowable.create({ emitter ->
             val nameCollisionResult = NameCollisionResult(nameCollision = collision)
-            val node = getNodeUseCase.get(collision.collisionHandle).blockingGetOrNull()
+            val collisionNode = getNodeUseCase.get(collision.collisionHandle).blockingGetOrNull()
 
-            if (node == null) {
+            if (collisionNode == null) {
                 emitter.onError(MegaNodeException.NodeDoesNotExistsException())
                 return@create
             }
 
-            with(node) {
-                val thumbnailFile = if (hasThumbnail()) buildThumbnailFile(
-                    context,
-                    getThumbnailFileName()
-                ) else null
-
+            with(collisionNode) {
                 nameCollisionResult.apply {
                     collisionName = name
-                    collisionSize = if (node.isFile) size else null
+                    collisionSize = if (collisionNode.isFile) size else null
                     collisionFolderContent =
-                        if (node.isFolder) getMegaNodeFolderInfo(node) else null
-                    collisionLastModified = if (node.isFile) modificationTime else creationTime
-                    collisionThumbnail =
-                        if (thumbnailFile?.exists() == true) thumbnailFile.toUri() else null
+                        if (collisionNode.isFolder) getMegaNodeFolderInfo(collisionNode) else null
+                    collisionLastModified =
+                        if (collisionNode.isFile) modificationTime else creationTime
                 }
 
                 getRenameName(collision).blockingSubscribeBy(
@@ -79,29 +70,33 @@ class GetNameCollisionResultUseCase @Inject constructor(
 
                 emitter.onNext(nameCollisionResult)
 
-                if (nameCollisionResult.collisionThumbnail != null || !hasThumbnail()) {
-                    emitter.onComplete()
-                    return@create
+                val handle = when {
+                    collision is NameCollision.Copy && collision.isFile -> collision.nodeHandle
+                    collision is NameCollision.Movement && collision.isFile -> collision.nodeHandle
+                    else -> null
                 }
 
-                megaApi.getThumbnail(
-                    this,
-                    thumbnailFile!!.absolutePath,
-                    OptionalMegaRequestListenerInterface(
-                        onRequestFinish = { request: MegaRequest, error: MegaError ->
-                            if (emitter.isCancelled) return@OptionalMegaRequestListenerInterface
-
-                            if (error.errorCode == MegaError.API_OK) {
-                                nameCollisionResult.collisionThumbnail = request.file.toUri()
-                                emitter.onNext(nameCollisionResult)
-                            } else {
-                                logWarning(error.toThrowable().stackTraceToString())
-                            }
-
-                            emitter.onComplete()
+                if (handle != null) {
+                    getThumbnailUseCase.get(handle).blockingSubscribeBy(
+                        onError = { error -> logWarning("No thumbnail", error) },
+                        onSuccess = { thumbnailUri ->
+                            nameCollisionResult.thumbnail = thumbnailUri
+                            emitter.onNext(nameCollisionResult)
                         }
                     )
-                )
+                }
+
+                if (collision.isFile) {
+                    getThumbnailUseCase.get(this).blockingSubscribeBy(
+                        onError = { error -> logWarning("No thumbnail", error) },
+                        onSuccess = { thumbnailUri ->
+                            nameCollisionResult.collisionThumbnail = thumbnailUri
+                            emitter.onNext(nameCollisionResult)
+                        }
+                    )
+                }
+
+                emitter.onComplete()
             }
         }, BackpressureStrategy.LATEST)
 
@@ -178,6 +173,53 @@ class GetNameCollisionResultUseCase @Inject constructor(
                         )
                     )
                 }
+            }
+        }
+
+    /**
+     * Updates the rename names of pending collisions based on a rename choice.
+     *
+     * @param pendingCollisions List of [NameCollisionResult] to update.
+     * @param renameNames       List of already applied rename names.
+     * @param applyOnNext       True if the choice will be applied for the rest of files, false otherwise.
+     * @return Completable.
+     */
+    fun updateRenameNames(
+        pendingCollisions: MutableList<NameCollisionResult>,
+        renameNames: MutableList<String>,
+        applyOnNext: Boolean
+    ): Completable =
+        Completable.create { emitter ->
+            pendingCollisions.forEach { collision ->
+                if (emitter.isDisposed) {
+                    return@create
+                }
+
+                if (collision.nameCollision.isFile) {
+                    var newRenameName = collision.renameName!!
+
+                    getRenameName(collision.nameCollision).blockingSubscribeBy(
+                        onError = { error -> emitter.onError(error) },
+                        onSuccess = { result -> newRenameName = result }
+                    )
+
+                    if (renameNames.contains(newRenameName)) {
+                        do {
+                            newRenameName = newRenameName.getPossibleRenameName()
+                        } while (renameNames.contains(newRenameName))
+                    }
+
+                    collision.renameName = newRenameName
+
+                    if (applyOnNext) {
+                        renameNames.add(newRenameName)
+                    }
+                }
+            }
+
+            when {
+                emitter.isDisposed -> return@create
+                else -> emitter.onComplete()
             }
         }
 

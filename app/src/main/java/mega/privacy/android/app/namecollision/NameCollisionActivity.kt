@@ -5,6 +5,7 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
+import android.graphics.drawable.Animatable
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
@@ -15,14 +16,20 @@ import androidx.core.content.ContextCompat
 import androidx.core.net.toUri
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.RecyclerView
+import com.facebook.drawee.backends.pipeline.Fresco
+import com.facebook.drawee.controller.BaseControllerListener
+import com.facebook.imagepipeline.image.ImageInfo
 import com.facebook.imagepipeline.request.ImageRequest
+import com.facebook.imagepipeline.request.ImageRequestBuilder
 import mega.privacy.android.app.MimeTypeList
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.PasscodeActivity
 import mega.privacy.android.app.activities.WebViewActivity
 import mega.privacy.android.app.constants.BroadcastConstants.ACTION_UPDATE_FILE_VERSIONS
 import mega.privacy.android.app.databinding.ActivityNameCollisionBinding
+import mega.privacy.android.app.databinding.ViewNameCollisionOptionBinding
 import mega.privacy.android.app.fragments.homepage.EventObserver
+import mega.privacy.android.app.listeners.OptionalRequestListener
 import mega.privacy.android.app.namecollision.data.NameCollision
 import mega.privacy.android.app.namecollision.data.NameCollisionResult
 import mega.privacy.android.app.utils.AlertsAndWarnings.showForeignStorageOverQuotaWarningDialog
@@ -34,6 +41,7 @@ import mega.privacy.android.app.utils.StringUtils.toSpannedHtmlText
 import mega.privacy.android.app.utils.TimeUtils.formatLongDateTime
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.Util.getSizeString
+import java.io.File
 
 /**
  * Activity for showing name collisions and resolving them as per user's choices.
@@ -223,13 +231,20 @@ class NameCollisionActivity : PasscodeActivity() {
             val hasThumbnail = collisionResult.thumbnail != null
             thumbnail.isVisible = hasThumbnail
             thumbnailIcon.isVisible = !hasThumbnail
-            if (hasThumbnail) {
-                thumbnail.setImageRequest(ImageRequest.fromUri(collisionResult.thumbnail))
-            } else {
-                thumbnailIcon.setImageResource(
-                    if (isFile) MimeTypeList.typeForName(name).iconResourceId
-                    else R.drawable.ic_folder_list
-                )
+            when {
+                hasThumbnail -> {
+                    thumbnail.setImageRequest(ImageRequest.fromUri(collisionResult.thumbnail))
+                }
+                else -> {
+                    thumbnailIcon.setImageResource(
+                        if (isFile) MimeTypeList.typeForName(name).iconResourceId
+                        else R.drawable.ic_folder_list
+                    )
+
+                    if (isFile && collisionResult.nameCollision is NameCollision.Upload) {
+                        requestFileThumbnail(File(collisionResult.nameCollision.absolutePath!!))
+                    }
+                }
             }
             this.name.text = name
             size.text = if (isFile) getSizeString(collision.size!!) else collision.folderContent
@@ -311,13 +326,17 @@ class NameCollisionActivity : PasscodeActivity() {
                 val hasThumbnail = collisionResult.thumbnail != null
                 thumbnail.isVisible = hasThumbnail
                 thumbnailIcon.isVisible = !hasThumbnail
-                if (hasThumbnail) {
-                    thumbnail.setImageRequest(ImageRequest.fromUri(collisionResult.thumbnail))
-                } else {
-                    thumbnailIcon.setImageResource(
-                        if (isFile) MimeTypeList.typeForName(name).iconResourceId
-                        else R.drawable.ic_folder_list
-                    )
+                when {
+                    hasThumbnail -> {
+                        thumbnail.setImageRequest(ImageRequest.fromUri(collisionResult.thumbnail))
+                    }
+                    else -> {
+                        thumbnailIcon.setImageResource(MimeTypeList.typeForName(name).iconResourceId)
+
+                        if (collisionResult.nameCollision is NameCollision.Upload) {
+                            requestFileThumbnail(File(collisionResult.nameCollision.absolutePath!!))
+                        }
+                    }
                 }
                 this.name.text = collisionResult.renameName
                 size.isVisible = false
@@ -351,6 +370,37 @@ class NameCollisionActivity : PasscodeActivity() {
                 text =
                     StringResourcesUtils.getString(R.string.file_apply_for_all, pendingCollisions)
             }
+        }
+    }
+
+    /**
+     * Requests the thumbnail of a file through Fresco controller and updates the UI if get.
+     *
+     * @param file  The file from which the thumbnail will be requested.
+     */
+    private fun ViewNameCollisionOptionBinding.requestFileThumbnail(file: File) {
+        with(thumbnail) {
+            isVisible = true
+            controller = Fresco.newDraweeControllerBuilder()
+                .setImageRequest(ImageRequestBuilder.fromRequest(ImageRequest.fromFile(file))
+                    .setLocalThumbnailPreviewsEnabled(true)
+                    .setRequestListener(OptionalRequestListener(
+                        onRequestSuccess = { _, _, _ ->
+                            thumbnailIcon.isVisible = false
+                        },
+                        onRequestFailure = { _, _, _, _ ->
+                            isVisible = false
+                        }
+                    )).build()
+                ).setControllerListener(object : BaseControllerListener<ImageInfo?>() {
+                    override fun onFinalImageSet(
+                        id: String,
+                        imageInfo: ImageInfo?,
+                        animatable: Animatable?
+                    ) {
+                        thumbnailIcon.isVisible = false
+                    }
+                }).build()
         }
     }
 
