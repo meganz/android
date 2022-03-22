@@ -82,21 +82,30 @@ class PhotosFragment : BaseFragment() {
         viewPager.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
 
             override fun onPageSelected(position: Int) {
-                currentTab = childFragmentManager.findFragmentByTag("f$position") as? PhotosTabCallback
-                currentTab?.checkScroll()
+                currentTab =
+                    childFragmentManager.findFragmentByTag("f$position") as? PhotosTabCallback
+                currentTab?.let { currentTab->
+                    checkScroll()
 
-                if (currentTab is TimelineFragment) {
-                    tabIndex = TIMELINE_INDEX
-                    (currentTab as TimelineFragment).setHideBottomViewScrollBehaviour()
-
-                    if (!(currentTab as TimelineFragment).isEnablePhotosFragmentShown() && (currentTab as TimelineFragment).gridAdapterHasData()) {
-                        mManagerActivity.updateCUViewTypes(View.VISIBLE)
+                    if (currentTab is TimelineFragment) {
+                        tabIndex = TIMELINE_INDEX
+                        val timelineFragment = currentTab
+                        with(timelineFragment) {
+                            setHideBottomViewScrollBehaviour()
+                            if (isEnablePhotosFragmentShown() && gridAdapterHasData() && isInActionMode()) {
+                                mManagerActivity.updateCUViewTypes(View.VISIBLE)
+                            } else {
+                                mManagerActivity.updateCUViewTypes(View.GONE)
+                            }
+                        }
+                    } else {
+                        tabIndex = ALBUM_INDEX
+                        with(mManagerActivity) {
+                            updateCUViewTypes(View.GONE)
+                            enableHideBottomViewOnScroll(false)
+                            showBottomView()
+                        }
                     }
-                } else {
-                    tabIndex = ALBUM_INDEX
-                    mManagerActivity.updateCUViewTypes(View.GONE)
-                    mManagerActivity.enableHideBottomViewOnScroll(false)
-                    mManagerActivity.showBottomView()
                 }
             }
         })
@@ -202,8 +211,8 @@ class PhotosFragment : BaseFragment() {
     /**
      * Check should show full info and options
      */
-    fun shouldShowFullInfoAndOptions():Boolean? {
-        return if (currentTab is TimelineFragment){
+    fun shouldShowFullInfoAndOptions(): Boolean? {
+        return if (currentTab is TimelineFragment) {
             (currentTab as? TimelineFragment)?.shouldShowFullInfoAndOptions()
         } else {
             false
@@ -222,5 +231,23 @@ class PhotosFragment : BaseFragment() {
      */
     fun loadPhotos() {
         (currentTab as? TimelineFragment)?.loadPhotos()
+    }
+
+    /**
+     * Should show or hide tabLayout in Timeline
+     *
+     * @param isVisible true, show; false hide
+     */
+    fun shouldShowTabLayout(isVisible: Boolean) {
+        binding.tabLayout.visibility = if (isVisible) View.VISIBLE else View.GONE
+    }
+
+    /**
+     * Should enable or disable viewPager2 in Timeline
+     *
+     * @param isEnabled true, enable; false disable
+     */
+    fun shouldEnableViewPager(isEnabled: Boolean) {
+        binding.viewPager.isUserInputEnabled = isEnabled
     }
 }
