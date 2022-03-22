@@ -336,7 +336,6 @@ abstract class BaseZoomFragment : BaseFragment(), GestureScaleCallback,
     override fun onCardClicked(position: Int, card: GalleryCard) {
         when (selectedView) {
             DAYS_VIEW -> {
-                zoomViewModel.restoreDefaultZoom()
                 handleZoomMenuItemStatus()
                 newViewClicked(ALL_VIEW)
                 val photoPosition = gridAdapter.getNodePosition(card.node.handle)
