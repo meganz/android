@@ -4,6 +4,7 @@ import io.reactivex.rxjava3.core.Completable
 import io.reactivex.rxjava3.core.Single
 import io.reactivex.rxjava3.kotlin.blockingSubscribeBy
 import mega.privacy.android.app.di.MegaApi
+import mega.privacy.android.app.errors.BusinessAccountOverdueMegaError
 import mega.privacy.android.app.listeners.OptionalMegaRequestListenerInterface
 import mega.privacy.android.app.namecollision.data.NameCollision
 import mega.privacy.android.app.namecollision.data.NameCollisionResult
@@ -13,10 +14,8 @@ import mega.privacy.android.app.usecase.exception.MegaNodeException
 import mega.privacy.android.app.utils.RxUtil.blockingGetOrNull
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
-import nz.mega.sdk.MegaError.API_EOVERQUOTA
-import nz.mega.sdk.MegaError.API_OK
+import nz.mega.sdk.MegaError.*
 import nz.mega.sdk.MegaNode
-import java.lang.IllegalArgumentException
 import javax.inject.Inject
 
 /**
@@ -33,17 +32,58 @@ class MoveNodeUseCase @Inject constructor(
     /**
      * Moves a node to other location.
      *
+     * @param handle        The identifier of the MegaNode to move.
+     * @param parentHandle  The parent MegaNode where the node has to be moved.
+     * @return Completable.
+     */
+    fun move(handle: Long, parentHandle: Long): Completable =
+        Completable.fromCallable {
+            move(
+                getNodeUseCase.get(handle).blockingGetOrNull(),
+                getNodeUseCase.get(parentHandle).blockingGetOrNull()
+            ).blockingAwait()
+        }
+
+    /**
+     * Moves a node to the Rubbish Bin.
+     *
+     * @param handle        The identifier of the MegaNode to move.
+     * @return Completable.
+     */
+    fun moveToRubbishBin(handle: Long): Completable =
+        Completable.fromCallable {
+            move(getNodeUseCase.get(handle).blockingGetOrNull(), megaApi.rubbishNode)
+                .blockingAwait()
+        }
+
+    /**
+     * Moves a node to other location.
+     *
      * @param node          The MegaNoe to move.
      * @param parentNode    The parent MegaNode where the node has to be moved.
      * @param newName       New name for the moved node. Null if it wants to keep the original one.
      * @return Completable.
      */
-    fun move(node: MegaNode, parentNode: MegaNode, newName: String? = null): Completable =
+    fun move(node: MegaNode?, parentNode: MegaNode?, newName: String? = null): Completable =
         Completable.create { emitter ->
+            if (node == null) {
+                emitter.onError(MegaNodeException.NodeDoesNotExistsException())
+                return@create
+            }
+
+            if (parentNode == null) {
+                emitter.onError(MegaNodeException.ParentDoesNotExistException())
+                return@create
+            }
+
             val listener = OptionalMegaRequestListenerInterface(onRequestFinish = { _, error ->
-                when {
-                    emitter.isDisposed -> return@OptionalMegaRequestListenerInterface
-                    error.errorCode == API_OK -> emitter.onComplete()
+                if (emitter.isDisposed) {
+                    return@OptionalMegaRequestListenerInterface
+                }
+
+                when (error.errorCode) {
+                    API_OK -> emitter.onComplete()
+                    API_EBUSINESSPASTDUE -> emitter.onError(BusinessAccountOverdueMegaError())
                     else -> emitter.onError(MegaException(error.errorCode, error.errorString))
                 }
             })
@@ -156,7 +196,7 @@ class MoveNodeUseCase @Inject constructor(
             val parentNode = getNodeUseCase.get(newParentHandle).blockingGetOrNull()
 
             if (parentNode == null) {
-                emitter.onError(IllegalArgumentException("New parent node is not valid"))
+                emitter.onError(MegaNodeException.ParentDoesNotExistException())
                 return@create
             }
 
@@ -178,13 +218,14 @@ class MoveNodeUseCase @Inject constructor(
                 if (node == null) {
                     errorCount++
                 } else {
-                    move(node, parentNode).blockingSubscribeBy(onError = { error ->
-                        errorCount++
+                    move(node, parentNode)
+                        .blockingSubscribeBy(onError = { error ->
+                            errorCount++
 
-                        if (error is MegaException && error.errorCode == API_EOVERQUOTA) {
-                            isForeignNode = megaApi.isForeignNode(parentNode.handle)
-                        }
-                    })
+                            if (error is MegaException && error.errorCode == API_EOVERQUOTA) {
+                                isForeignNode = megaApi.isForeignNode(parentNode.handle)
+                            }
+                        })
                 }
             }
 

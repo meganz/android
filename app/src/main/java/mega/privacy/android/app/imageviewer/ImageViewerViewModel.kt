@@ -21,11 +21,8 @@ import mega.privacy.android.app.imageviewer.data.ImageItem
 import mega.privacy.android.app.imageviewer.data.ImageResult
 import mega.privacy.android.app.imageviewer.usecase.GetImageHandlesUseCase
 import mega.privacy.android.app.imageviewer.usecase.GetImageUseCase
-import mega.privacy.android.app.usecase.CancelTransferUseCase
-import mega.privacy.android.app.usecase.GetGlobalChangesUseCase
+import mega.privacy.android.app.usecase.*
 import mega.privacy.android.app.usecase.GetGlobalChangesUseCase.Result
-import mega.privacy.android.app.usecase.GetNodeUseCase
-import mega.privacy.android.app.usecase.LoggedInUseCase
 import mega.privacy.android.app.usecase.chat.DeleteChatMessageUseCase
 import mega.privacy.android.app.usecase.data.MegaNodeItem
 import mega.privacy.android.app.utils.Constants.INVALID_POSITION
@@ -53,6 +50,8 @@ import javax.inject.Inject
  * @property cancelTransferUseCase      Needed to cancel current full image transfer if needed
  * @property loggedInUseCase            UseCase required to check when the user is already logged in
  * @property deleteChatMessageUseCase   UseCase required to delete current chat node message
+ * @property moveNodeUseCase            UseCase required to move nodes
+ * @property removeNodeUseCase          UseCase required to remove nodes
  */
 @HiltViewModel
 class ImageViewerViewModel @Inject constructor(
@@ -63,7 +62,9 @@ class ImageViewerViewModel @Inject constructor(
     private val exportNodeUseCase: ExportNodeUseCase,
     private val cancelTransferUseCase: CancelTransferUseCase,
     private val loggedInUseCase: LoggedInUseCase,
-    private val deleteChatMessageUseCase: DeleteChatMessageUseCase
+    private val deleteChatMessageUseCase: DeleteChatMessageUseCase,
+    private val moveNodeUseCase: MoveNodeUseCase,
+    private val removeNodeUseCase: RemoveNodeUseCase
 ) : BaseRxViewModel() {
 
     private val images = MutableLiveData<List<ImageItem>?>()
@@ -466,21 +467,21 @@ class ImageViewerViewModel @Inject constructor(
     }
 
     fun moveNode(nodeHandle: Long, newParentHandle: Long) {
-        getNodeUseCase.moveNode(nodeHandle, newParentHandle)
+        moveNodeUseCase.move(nodeHandle, newParentHandle)
             .subscribeAndComplete {
                 snackbarMessage.value = getString(R.string.context_correctly_moved)
             }
     }
 
     fun moveNodeToRubbishBin(nodeHandle: Long) {
-        getNodeUseCase.moveToRubbishBin(nodeHandle)
+        moveNodeUseCase.moveToRubbishBin(nodeHandle)
             .subscribeAndComplete {
                 snackbarMessage.value = getString(R.string.context_correctly_moved_to_rubbish)
             }
     }
 
     fun removeNode(nodeHandle: Long) {
-        getNodeUseCase.removeNode(nodeHandle)
+        removeNodeUseCase.remove(nodeHandle)
             .subscribeAndComplete {
                 snackbarMessage.value = getString(R.string.context_correctly_removed)
             }
