@@ -405,7 +405,7 @@ class TimelineFragment : BaseZoomFragment(), PhotosTabCallback {
         if (!mManagerActivity.isInPhotosPage) return
         // Because when end action mode, destroy action mode will be trigger. So no need to invoke  animateBottomView()
         // But still need to check viewPanel visibility. If no items, no need to show viewPanel, otherwise, should show.
-        mManagerActivity.updateCUViewTypes(if (gridAdapter.itemCount > 0) View.VISIBLE else View.GONE)
+        mManagerActivity.updateCUViewTypes(if (viewModel.items.value != null && viewModel.items.value!!.isNotEmpty()) View.VISIBLE else View.GONE)
         with(parentFragment as PhotosFragment) {
             shouldShowTabLayout(true)
             shouldEnableViewPager(true)
