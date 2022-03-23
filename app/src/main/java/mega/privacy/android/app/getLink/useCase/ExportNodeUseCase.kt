@@ -3,7 +3,7 @@ package mega.privacy.android.app.getLink.useCase
 import io.reactivex.rxjava3.core.Completable
 import io.reactivex.rxjava3.core.Single
 import mega.privacy.android.app.di.MegaApi
-import mega.privacy.android.app.errors.BusinessAccountOverdueMegaError
+import mega.privacy.android.app.usecase.exception.BusinessAccountOverdueException
 import mega.privacy.android.app.listeners.OptionalMegaRequestListenerInterface
 import mega.privacy.android.app.usecase.GetNodeUseCase
 import mega.privacy.android.app.utils.ErrorUtils.toThrowable
@@ -72,7 +72,7 @@ class ExportNodeUseCase @Inject constructor(
                         MegaError.API_OK ->
                             emitter.onSuccess(request.link)
                         MegaError.API_EBUSINESSPASTDUE ->
-                            emitter.onError(BusinessAccountOverdueMegaError())
+                            emitter.onError(BusinessAccountOverdueException())
                         else ->
                             emitter.onError(error.toThrowable())
                     }
@@ -114,7 +114,7 @@ class ExportNodeUseCase @Inject constructor(
                         MegaError.API_OK ->
                             emitter.onComplete()
                         MegaError.API_EBUSINESSPASTDUE ->
-                            emitter.onError(BusinessAccountOverdueMegaError())
+                            emitter.onError(BusinessAccountOverdueException())
                         else ->
                             emitter.onError(error.toThrowable())
                     }

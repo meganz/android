@@ -4,18 +4,15 @@ import io.reactivex.rxjava3.core.Completable
 import io.reactivex.rxjava3.core.Single
 import io.reactivex.rxjava3.kotlin.blockingSubscribeBy
 import mega.privacy.android.app.di.MegaApi
-import mega.privacy.android.app.errors.BusinessAccountOverdueMegaError
 import mega.privacy.android.app.listeners.OptionalMegaRequestListenerInterface
 import mega.privacy.android.app.namecollision.data.NameCollision
 import mega.privacy.android.app.namecollision.data.NameCollisionResult
 import mega.privacy.android.app.usecase.data.CopyRequestResult
-import mega.privacy.android.app.usecase.exception.MegaException
-import mega.privacy.android.app.usecase.exception.MegaNodeException
+import mega.privacy.android.app.usecase.exception.*
 import mega.privacy.android.app.utils.RxUtil.blockingGetOrNull
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaError
-import nz.mega.sdk.MegaError.API_EBUSINESSPASTDUE
-import nz.mega.sdk.MegaError.API_OK
+import nz.mega.sdk.MegaError.*
 import nz.mega.sdk.MegaNode
 import javax.inject.Inject
 
@@ -74,7 +71,15 @@ class CopyNodeUseCase @Inject constructor(
 
                 when (error.errorCode) {
                     API_OK -> emitter.onComplete()
-                    API_EBUSINESSPASTDUE -> emitter.onError(BusinessAccountOverdueMegaError())
+                    API_EBUSINESSPASTDUE -> emitter.onError(BusinessAccountOverdueException())
+                    API_EOVERQUOTA -> {
+                        if (megaApi.isForeignNode(parentNode.handle)) {
+                            emitter.onError(ForeignNodeException())
+                        } else {
+                            emitter.onError(OverQuotaException())
+                        }
+                    }
+                    API_EGOINGOVERQUOTA -> emitter.onError(PreOverQuotaException())
                     else -> emitter.onError(MegaException(error.errorCode, error.errorString))
                 }
             })

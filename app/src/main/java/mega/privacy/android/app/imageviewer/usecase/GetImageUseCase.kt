@@ -17,7 +17,7 @@ import mega.privacy.android.app.DownloadService
 import mega.privacy.android.app.MimeTypeList
 import mega.privacy.android.app.constants.SettingsConstants
 import mega.privacy.android.app.di.MegaApi
-import mega.privacy.android.app.errors.BusinessAccountOverdueMegaError
+import mega.privacy.android.app.usecase.exception.BusinessAccountOverdueException
 import mega.privacy.android.app.errors.QuotaOverdueMegaError
 import mega.privacy.android.app.globalmanagement.TransfersManagement
 import mega.privacy.android.app.imageviewer.data.ImageResult
@@ -256,7 +256,7 @@ class GetImageUseCase @Inject constructor(
                                         emitter.onComplete()
                                     }
                                     API_EBUSINESSPASTDUE ->
-                                        emitter.onError(BusinessAccountOverdueMegaError())
+                                        emitter.onError(BusinessAccountOverdueException())
                                     else ->
                                         emitter.onError(error.toThrowable())
                                 }

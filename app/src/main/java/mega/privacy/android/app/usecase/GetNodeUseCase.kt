@@ -9,7 +9,7 @@ import mega.privacy.android.app.DatabaseHandler
 import mega.privacy.android.app.MegaOffline
 import mega.privacy.android.app.di.MegaApi
 import mega.privacy.android.app.di.MegaApiFolder
-import mega.privacy.android.app.errors.BusinessAccountOverdueMegaError
+import mega.privacy.android.app.usecase.exception.BusinessAccountOverdueException
 import mega.privacy.android.app.listeners.OptionalMegaRequestListenerInterface
 import mega.privacy.android.app.usecase.chat.GetChatMessageUseCase
 import mega.privacy.android.app.usecase.data.MegaNodeItem
@@ -269,7 +269,7 @@ class GetNodeUseCase @Inject constructor(
                         MegaError.API_OK ->
                             emitter.onComplete()
                         MegaError.API_EBUSINESSPASTDUE ->
-                            emitter.onError(BusinessAccountOverdueMegaError())
+                            emitter.onError(BusinessAccountOverdueException())
                         else ->
                             emitter.onError(error.toThrowable())
                     }

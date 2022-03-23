@@ -4,11 +4,12 @@ import io.reactivex.rxjava3.core.Completable
 import io.reactivex.rxjava3.core.Single
 import io.reactivex.rxjava3.kotlin.blockingSubscribeBy
 import mega.privacy.android.app.di.MegaApi
-import mega.privacy.android.app.errors.BusinessAccountOverdueMegaError
+import mega.privacy.android.app.usecase.exception.BusinessAccountOverdueException
 import mega.privacy.android.app.listeners.OptionalMegaRequestListenerInterface
 import mega.privacy.android.app.namecollision.data.NameCollision
 import mega.privacy.android.app.namecollision.data.NameCollisionResult
 import mega.privacy.android.app.usecase.data.MoveRequestResult
+import mega.privacy.android.app.usecase.exception.ForeignNodeException
 import mega.privacy.android.app.usecase.exception.MegaException
 import mega.privacy.android.app.usecase.exception.MegaNodeException
 import mega.privacy.android.app.utils.RxUtil.blockingGetOrNull
@@ -83,8 +84,15 @@ class MoveNodeUseCase @Inject constructor(
 
                 when (error.errorCode) {
                     API_OK -> emitter.onComplete()
-                    API_EBUSINESSPASTDUE -> emitter.onError(BusinessAccountOverdueMegaError())
-                    else -> emitter.onError(MegaException(error.errorCode, error.errorString))
+                    API_EBUSINESSPASTDUE -> emitter.onError(BusinessAccountOverdueException())
+                    else ->
+                        if (error.errorCode == API_EOVERQUOTA
+                            && megaApi.isForeignNode(parentNode.handle)
+                        ) {
+                            emitter.onError(ForeignNodeException())
+                        } else {
+                            emitter.onError(MegaException(error.errorCode, error.errorString))
+                        }
                 }
             })
 
