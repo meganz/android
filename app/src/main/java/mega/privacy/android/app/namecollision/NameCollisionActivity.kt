@@ -28,10 +28,10 @@ import mega.privacy.android.app.activities.WebViewActivity
 import mega.privacy.android.app.constants.BroadcastConstants.ACTION_UPDATE_FILE_VERSIONS
 import mega.privacy.android.app.databinding.ActivityNameCollisionBinding
 import mega.privacy.android.app.databinding.ViewNameCollisionOptionBinding
-import mega.privacy.android.app.fragments.homepage.EventObserver
 import mega.privacy.android.app.listeners.OptionalRequestListener
 import mega.privacy.android.app.namecollision.data.NameCollision
 import mega.privacy.android.app.namecollision.data.NameCollisionResult
+import mega.privacy.android.app.namecollision.data.NameCollisionType
 import mega.privacy.android.app.utils.AlertsAndWarnings.showForeignStorageOverQuotaWarningDialog
 import mega.privacy.android.app.utils.Constants.*
 import mega.privacy.android.app.utils.LogUtil.logError
@@ -54,6 +54,7 @@ class NameCollisionActivity : PasscodeActivity() {
             "https://help.mega.io/files-folders/restore-delete/file-version-history"
 
         private const val UPLOAD_FOLDER_CONTEXT = "UPLOAD_FOLDER_CONTEXT"
+        const val MESSAGE_RESULT = "MESSAGE_RESULT"
 
         @JvmStatic
         fun getIntentForList(
@@ -181,17 +182,16 @@ class NameCollisionActivity : PasscodeActivity() {
     private fun setupObservers() {
         viewModel.getCurrentCollision().observe(this, ::showCollision)
         viewModel.getFileVersioningInfo().observe(this, ::updateFileVersioningData)
-        viewModel.onActionResult().observe(this, EventObserver { result ->
+        viewModel.onActionResult().observe(this) { result ->
             if (result.isForeignNode) {
                 showForeignStorageOverQuotaWarningDialog(this)
+                return@observe
             }
-
-            showSnackbar(binding.root, result.message)
 
             if (result.shouldFinish) {
-                Handler(Looper.getMainLooper()).postDelayed({ finish() }, LONG_SNACKBAR_DURATION)
+                setResult(RESULT_OK, Intent().putExtra(MESSAGE_RESULT, result.message))
             }
-        })
+        }
         viewModel.getCollisionsResolution().observe(this, ::manageCollisionsResolution)
 
         registerReceiver(
@@ -302,7 +302,10 @@ class NameCollisionActivity : PasscodeActivity() {
             size.text =
                 if (isFile) getSizeString(collisionResult.collisionSize!!)
                 else collisionResult.collisionFolderContent
-            date.text = formatLongDateTime(collisionResult.collisionLastModified!!)
+            date.text = formatLongDateTime(
+                if (collision is NameCollision.Upload) collisionResult.collisionLastModified!!
+                else collisionResult.collisionLastModified!! / 1000
+            )
 
             val thumbnailView = if (hasThumbnail) R.id.thumbnail else R.id.thumbnail_icon
 
@@ -441,7 +444,7 @@ class NameCollisionActivity : PasscodeActivity() {
      *                              - Second:   Collision type: upload, movement of copy.
      *                              - Third:    True if the collision is related to a file, false if is to a folder.
      */
-    private fun updateFileVersioningData(fileVersioningInfo: Triple<Boolean, NameCollisionViewModel.NameCollisionType, Boolean>) {
+    private fun updateFileVersioningData(fileVersioningInfo: Triple<Boolean, NameCollisionType, Boolean>) {
         val isFileVersioningEnabled = fileVersioningInfo.first
         val isFile = fileVersioningInfo.third
 
@@ -451,7 +454,7 @@ class NameCollisionActivity : PasscodeActivity() {
         val replaceUpdateMergeButtonId: Int
 
         when (fileVersioningInfo.second) {
-            NameCollisionViewModel.NameCollisionType.UPLOAD -> {
+            NameCollisionType.UPLOAD -> {
                 replaceUpdateMergeInfoId = when {
                     !isFile -> R.string.warning_upload_and_merge
                     isFileVersioningEnabled -> R.string.warning_versioning_upload_and_update
@@ -463,7 +466,7 @@ class NameCollisionActivity : PasscodeActivity() {
                     else -> R.string.upload_and_replace
                 }
             }
-            NameCollisionViewModel.NameCollisionType.COPY -> {
+            NameCollisionType.COPY -> {
                 replaceUpdateMergeInfoId =
                     if (isFile) R.string.warning_copy_and_replace
                     else R.string.warning_copy_and_merge
@@ -471,7 +474,7 @@ class NameCollisionActivity : PasscodeActivity() {
                     if (isFile) R.string.copy_and_replace
                     else R.string.copy_and_merge
             }
-            NameCollisionViewModel.NameCollisionType.MOVEMENT -> {
+            NameCollisionType.MOVEMENT -> {
                 replaceUpdateMergeInfoId =
                     if (isFile) R.string.warning_move_and_replace
                     else R.string.warning_move_and_merge

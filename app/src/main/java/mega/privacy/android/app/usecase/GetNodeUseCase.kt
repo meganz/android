@@ -383,59 +383,6 @@ class GetNodeUseCase @Inject constructor(
         }
 
     /**
-     * Copy node to a different location, either passing handles or node itself.
-     *
-     * @param nodeHandle        Node handle to be copied
-     * @param toParentHandle    Parent node handle to be copied to
-     * @param node              Node to be copied
-     * @param toParentNode      Parent node to be copied to
-     * @return                  Completable
-     */
-    fun copyNode(
-        nodeHandle: Long? = null,
-        toParentHandle: Long? = null,
-        node: MegaNode? = null,
-        toParentNode: MegaNode? = null
-    ): Completable =
-        Completable.fromCallable {
-            require((node != null || nodeHandle != null) && (toParentNode != null || toParentHandle != null))
-            copyNode(
-                node ?: nodeHandle?.getMegaNode(),
-                toParentNode ?: toParentHandle?.getMegaNode()
-            ).blockingAwait()
-        }
-
-    /**
-     * Copy node to a different location.
-     *
-     * @param currentNode   Node to be copied
-     * @param toParentNode  Parent node to be copied to
-     * @return              Completable
-     */
-    fun copyNode(currentNode: MegaNode?, toParentNode: MegaNode?): Completable =
-        Completable.create { emitter ->
-            if (currentNode == null || toParentNode == null) {
-                emitter.onError(IllegalArgumentException("Null nodes"))
-                return@create
-            }
-
-            megaApi.copyNode(currentNode, toParentNode, OptionalMegaRequestListenerInterface(
-                onRequestFinish = { _, error ->
-                    if (emitter.isDisposed) return@OptionalMegaRequestListenerInterface
-
-                    when (error.errorCode) {
-                        MegaError.API_OK ->
-                            emitter.onComplete()
-                        MegaError.API_EBUSINESSPASTDUE ->
-                            emitter.onError(BusinessAccountOverdueMegaError())
-                        else ->
-                            emitter.onError(error.toThrowable())
-                    }
-                }
-            ))
-        }
-
-    /**
      * Get a MegaNode given a Long handle in a synchronous way.
      * This will also authorize the Node if required.
      *

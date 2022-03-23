@@ -1,7 +1,6 @@
 package mega.privacy.android.app.namecollision.data
 
 import android.net.Uri
-import mega.privacy.android.app.namecollision.NameCollisionViewModel
 import java.io.Serializable
 
 /**
@@ -15,7 +14,7 @@ import java.io.Serializable
  * @property collisionThumbnail     The node thumbnail if exists.
  * @property renameName             Name of the item for the rename option. Null if if the item is a folder.
  * @property thumbnail              The thumbnail of the item to upload, copy or move if exists.
- * @property choice                 [NameCollisionViewModel.NameCollisionChoice] with the collision resolution.
+ * @property choice                 [NameCollisionChoice] with the collision resolution.
  */
 data class NameCollisionResult(
     val nameCollision: NameCollision,
@@ -26,5 +25,5 @@ data class NameCollisionResult(
     var collisionThumbnail: Uri? = null,
     var renameName: String? = null,
     var thumbnail: Uri? = null,
-    var choice: NameCollisionViewModel.NameCollisionChoice? = null
+    var choice: NameCollisionChoice? = null
 ) : Serializable

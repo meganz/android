@@ -4,6 +4,7 @@ import io.reactivex.rxjava3.core.Completable
 import io.reactivex.rxjava3.core.Single
 import io.reactivex.rxjava3.kotlin.blockingSubscribeBy
 import mega.privacy.android.app.di.MegaApi
+import mega.privacy.android.app.errors.BusinessAccountOverdueMegaError
 import mega.privacy.android.app.listeners.OptionalMegaRequestListenerInterface
 import mega.privacy.android.app.namecollision.data.NameCollision
 import mega.privacy.android.app.namecollision.data.NameCollisionResult
@@ -13,19 +14,38 @@ import mega.privacy.android.app.usecase.exception.MegaNodeException
 import mega.privacy.android.app.utils.RxUtil.blockingGetOrNull
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaError
+import nz.mega.sdk.MegaError.API_EBUSINESSPASTDUE
+import nz.mega.sdk.MegaError.API_OK
 import nz.mega.sdk.MegaNode
 import javax.inject.Inject
 
 /**
  * Use case for copying MegaNodes.
  *
- * @property megaApi        MegaApiAndroid instance to copy nodes.
- * @property getNodeUseCase Required for getting MegaNodes.
+ * @property megaApi            MegaApiAndroid instance to copy nodes.
+ * @property getNodeUseCase     Required for getting MegaNodes.
+ * @property moveNodeUseCase    Required for moving MegaNodes to the Rubbish Bin.
  */
 class CopyNodeUseCase @Inject constructor(
     @MegaApi private val megaApi: MegaApiAndroid,
-    private val getNodeUseCase: GetNodeUseCase
+    private val getNodeUseCase: GetNodeUseCase,
+    private val moveNodeUseCase: MoveNodeUseCase
 ) {
+
+    /**
+     * Copies a node.
+     *
+     * @param handle        The identifier of the MegaNode to copy.
+     * @param parentHandle  The parent MegaNode where the node has to be copied.
+     * @return Completable.
+     */
+    fun copy(handle: Long, parentHandle: Long): Completable =
+        Completable.fromCallable {
+            copy(
+                getNodeUseCase.get(handle).blockingGetOrNull(),
+                getNodeUseCase.get(parentHandle).blockingGetOrNull()
+            ).blockingAwait()
+        }
 
     /**
      * Copies a node.
@@ -35,12 +55,26 @@ class CopyNodeUseCase @Inject constructor(
      * @param newName       New name for the copied node. Null if it wants to keep the original one.
      * @return Completable.
      */
-    fun copy(node: MegaNode, parentNode: MegaNode, newName: String? = null): Completable =
+    fun copy(node: MegaNode?, parentNode: MegaNode?, newName: String? = null): Completable =
         Completable.create { emitter ->
+            if (node == null) {
+                emitter.onError(MegaNodeException.NodeDoesNotExistsException())
+                return@create
+            }
+
+            if (parentNode == null) {
+                emitter.onError(MegaNodeException.ParentDoesNotExistException())
+                return@create
+            }
+
             val listener = OptionalMegaRequestListenerInterface(onRequestFinish = { _, error ->
-                when {
-                    emitter.isDisposed -> return@OptionalMegaRequestListenerInterface
-                    error.errorCode == MegaError.API_OK -> emitter.onComplete()
+                if (emitter.isDisposed) {
+                    return@OptionalMegaRequestListenerInterface
+                }
+
+                when (error.errorCode) {
+                    API_OK -> emitter.onComplete()
+                    API_EBUSINESSPASTDUE -> emitter.onError(BusinessAccountOverdueMegaError())
                     else -> emitter.onError(MegaException(error.errorCode, error.errorString))
                 }
             })
@@ -66,38 +100,52 @@ class CopyNodeUseCase @Inject constructor(
     ): Single<CopyRequestResult> =
         Single.create { emitter ->
             val node = getNodeUseCase
-                .get((collisionResult.nameCollision as NameCollision.Movement).nodeHandle)
+                .get((collisionResult.nameCollision as NameCollision.Copy).nodeHandle)
                 .blockingGetOrNull()
+
+            if (node == null) {
+                emitter.onError(MegaNodeException.NodeDoesNotExistsException())
+                return@create
+            }
 
             val parentNode = getNodeUseCase
                 .get(collisionResult.nameCollision.parentHandle).blockingGetOrNull()
 
-            when {
-                emitter.isDisposed -> return@create
-                node == null -> emitter.onError(MegaNodeException.NodeDoesNotExistsException())
-                parentNode == null -> emitter.onError(MegaNodeException.ParentDoesNotExistException())
-                else -> copy(node, parentNode, if (rename) collisionResult.renameName else null)
-                    .blockingSubscribeBy(
-                        onError = { error ->
-                            emitter.onSuccess(
-                                CopyRequestResult(
-                                    count = 1,
-                                    errorCount = 1,
-                                    isForeignNode = error is MegaException && error.errorCode == MegaError.API_EOVERQUOTA
-                                )
-                            )
-                        },
-                        onComplete = {
-                            emitter.onSuccess(
-                                CopyRequestResult(
-                                    count = 1,
-                                    errorCount = 0,
-                                    isForeignNode = false
-                                )
-                            )
-                        }
-                    )
+            if (parentNode == null) {
+                emitter.onError(MegaNodeException.ParentDoesNotExistException())
+                return@create
             }
+
+            if (!rename) {
+                moveNodeUseCase.moveToRubbishBin(collisionResult.nameCollision.collisionHandle)
+                    .blockingSubscribeBy(onError = { error -> emitter.onError(error) })
+            }
+
+            if (emitter.isDisposed) {
+                return@create
+            }
+
+            copy(node, parentNode, if (rename) collisionResult.renameName else null)
+                .blockingSubscribeBy(
+                    onError = { error ->
+                        emitter.onSuccess(
+                            CopyRequestResult(
+                                count = 1,
+                                errorCount = 1,
+                                isForeignNode = error is MegaException && error.errorCode == MegaError.API_EOVERQUOTA
+                            )
+                        )
+                    },
+                    onComplete = {
+                        emitter.onSuccess(
+                            CopyRequestResult(
+                                count = 1,
+                                errorCount = 0,
+                                isForeignNode = false
+                            )
+                        )
+                    }
+                )
         }
 
     /**

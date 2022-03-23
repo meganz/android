@@ -6,8 +6,11 @@ import mega.privacy.android.app.ShareInfo
 import mega.privacy.android.app.di.MegaApi
 import mega.privacy.android.app.namecollision.data.NameCollision
 import mega.privacy.android.app.domain.exception.EmptyFolderException
+import mega.privacy.android.app.namecollision.data.NameCollisionType
 import mega.privacy.android.app.uploadFolder.list.data.FolderContent
+import mega.privacy.android.app.usecase.GetNodeUseCase
 import mega.privacy.android.app.usecase.exception.MegaNodeException
+import mega.privacy.android.app.utils.RxUtil.blockingGetOrNull
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 import nz.mega.sdk.MegaNode
@@ -17,11 +20,55 @@ import javax.inject.Inject
 /**
  * Use case for checking name collisions before uploading, copying or moving.
  *
- * @property megaApi    MegaApiAndroid instance to check collisions.
+ * @property megaApi        MegaApiAndroid instance to check collisions.
+ * @property getNodeUseCase Required for getting nodes.
  */
 class CheckNameCollisionUseCase @Inject constructor(
-    @MegaApi private val megaApi: MegaApiAndroid
+    @MegaApi private val megaApi: MegaApiAndroid,
+    private val getNodeUseCase: GetNodeUseCase
 ) {
+
+    /**
+     * Checks if a node with the same name exists on the provided parent node.
+     *
+     * @param handle        Handle of the node to check its name.
+     * @param parentHandle  Handle of the parent node in which to look.
+     * @param type          [NameCollisionType]
+     * @return Single Long with the node handle with which there is a name collision.
+     */
+    fun check(handle: Long, parentHandle: Long, type: NameCollisionType): Single<NameCollision> =
+        Single.create { emitter ->
+            val node = getNodeUseCase.get(handle).blockingGetOrNull()
+
+            if (node == null) {
+                emitter.onError(MegaNodeException.NodeDoesNotExistsException())
+                return@create
+            }
+
+            check(node.name, getNodeUseCase.get(parentHandle).blockingGetOrNull())
+                .blockingSubscribeBy(
+                    onError = { error -> emitter.onError(error) },
+                    onSuccess = { handle ->
+                        val collision: NameCollision? = when (type) {
+                            NameCollisionType.COPY -> NameCollision.Copy.getCopyCollision(
+                                handle,
+                                node,
+                                parentHandle
+                            )
+                            NameCollisionType.MOVEMENT -> NameCollision.Movement.getMovementCollision(
+                                handle,
+                                node,
+                                parentHandle
+                            )
+                            else -> null
+                        }
+
+                        if (collision != null) {
+                            emitter.onSuccess(collision)
+                        }
+                    }
+                )
+        }
 
     /**
      * Checks if a node with the given name exists on the provided parent node.
@@ -35,7 +82,7 @@ class CheckNameCollisionUseCase @Inject constructor(
             val parentNode = if (parentHandle == INVALID_HANDLE) {
                 megaApi.rootNode
             } else {
-                megaApi.getNodeByHandle(parentHandle)
+                getNodeUseCase.get(parentHandle).blockingGetOrNull()
             }
 
             check(name, parentNode).blockingSubscribeBy(

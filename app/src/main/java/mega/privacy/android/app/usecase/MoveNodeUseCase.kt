@@ -112,35 +112,49 @@ class MoveNodeUseCase @Inject constructor(
                 .get((collisionResult.nameCollision as NameCollision.Movement).nodeHandle)
                 .blockingGetOrNull()
 
+            if (node == null) {
+                emitter.onError(MegaNodeException.NodeDoesNotExistsException())
+                return@create
+            }
+
             val parentNode = getNodeUseCase
                 .get(collisionResult.nameCollision.parentHandle).blockingGetOrNull()
 
-            when {
-                emitter.isDisposed -> return@create
-                node == null -> emitter.onError(MegaNodeException.NodeDoesNotExistsException())
-                parentNode == null -> emitter.onError(MegaNodeException.ParentDoesNotExistException())
-                else -> move(node, parentNode, if (rename) collisionResult.renameName else null)
-                    .blockingSubscribeBy(
-                        onError = { error ->
-                            emitter.onSuccess(
-                                MoveRequestResult.GeneralMovement(
-                                    count = 1,
-                                    errorCount = 1,
-                                    isForeignNode = error is MegaException && error.errorCode == API_EOVERQUOTA
-                                )
-                            )
-                        },
-                        onComplete = {
-                            emitter.onSuccess(
-                                MoveRequestResult.GeneralMovement(
-                                    count = 1,
-                                    errorCount = 0,
-                                    isForeignNode = false
-                                )
-                            )
-                        }
-                    )
+            if (parentNode == null) {
+                emitter.onError(MegaNodeException.ParentDoesNotExistException())
+                return@create
             }
+
+            if (!rename) {
+                moveToRubbishBin(collisionResult.nameCollision.collisionHandle)
+                    .blockingSubscribeBy(onError = { error -> emitter.onError(error) })
+            }
+
+            if (emitter.isDisposed) {
+                return@create
+            }
+
+            move(node, parentNode, if (rename) collisionResult.renameName else null)
+                .blockingSubscribeBy(
+                    onError = { error ->
+                        emitter.onSuccess(
+                            MoveRequestResult.GeneralMovement(
+                                count = 1,
+                                errorCount = 1,
+                                isForeignNode = error is MegaException && error.errorCode == API_EOVERQUOTA
+                            )
+                        )
+                    },
+                    onComplete = {
+                        emitter.onSuccess(
+                            MoveRequestResult.GeneralMovement(
+                                count = 1,
+                                errorCount = 0,
+                                isForeignNode = false
+                            )
+                        )
+                    }
+                )
         }
 
     /**

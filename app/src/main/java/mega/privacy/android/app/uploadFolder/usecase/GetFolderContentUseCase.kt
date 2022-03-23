@@ -7,7 +7,7 @@ import mega.privacy.android.app.ShareInfo
 import mega.privacy.android.app.components.textFormatter.TextFormatterUtils.INVALID_INDEX
 import mega.privacy.android.app.di.MegaApi
 import mega.privacy.android.app.domain.exception.EmptyFolderException
-import mega.privacy.android.app.namecollision.NameCollisionViewModel
+import mega.privacy.android.app.namecollision.data.NameCollisionChoice
 import mega.privacy.android.app.namecollision.data.NameCollisionResult
 import mega.privacy.android.app.uploadFolder.list.data.FolderContent
 import mega.privacy.android.app.uploadFolder.list.data.UploadFolderResult
@@ -247,10 +247,10 @@ class GetFolderContentUseCase @Inject constructor(
                             }
 
                             if (upload.nameCollision == collision.nameCollision
-                                && collision.choice != NameCollisionViewModel.NameCollisionChoice.CANCEL
+                                && collision.choice != NameCollisionChoice.CANCEL
                             ) {
                                 val renameName =
-                                    if (collision.choice == NameCollisionViewModel.NameCollisionChoice.RENAME) {
+                                    if (collision.choice == NameCollisionChoice.RENAME) {
                                         collision.renameName
                                     } else {
                                         null

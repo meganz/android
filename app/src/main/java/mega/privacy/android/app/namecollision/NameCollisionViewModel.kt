@@ -11,11 +11,8 @@ import io.reactivex.rxjava3.schedulers.Schedulers
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
 import mega.privacy.android.app.arch.BaseRxViewModel
-import mega.privacy.android.app.fragments.homepage.Event
-import mega.privacy.android.app.namecollision.data.NameCollision
 import mega.privacy.android.app.myAccount.usecase.GetFileVersionsOptionUseCase
-import mega.privacy.android.app.namecollision.data.NameCollisionActionResult
-import mega.privacy.android.app.namecollision.data.NameCollisionResult
+import mega.privacy.android.app.namecollision.data.*
 import mega.privacy.android.app.namecollision.usecase.GetNameCollisionResultUseCase
 import mega.privacy.android.app.usecase.CopyNodeUseCase
 import mega.privacy.android.app.usecase.MoveNodeUseCase
@@ -47,20 +44,10 @@ class NameCollisionViewModel @Inject constructor(
     private val copyNodeUseCase: CopyNodeUseCase
 ) : BaseRxViewModel() {
 
-    /**
-     * Enum class for defining the type of a collision.
-     */
-    enum class NameCollisionType { UPLOAD, COPY, MOVEMENT }
-
-    /**
-     * Enum class for defining the type of resolution for a collision.
-     */
-    enum class NameCollisionChoice { REPLACE_UPDATE_MERGE, CANCEL, RENAME }
-
     private val currentCollision: MutableLiveData<NameCollisionResult?> = MutableLiveData()
     private val fileVersioningInfo: MutableLiveData<Triple<Boolean, NameCollisionType, Boolean>> =
         MutableLiveData()
-    private val actionResult: MutableLiveData<Event<NameCollisionActionResult>> = MutableLiveData()
+    private val actionResult: MutableLiveData<NameCollisionActionResult> = MutableLiveData()
     private val collisionsResolution: MutableLiveData<ArrayList<NameCollisionResult>> =
         MutableLiveData()
 
@@ -68,7 +55,7 @@ class NameCollisionViewModel @Inject constructor(
     fun getFileVersioningInfo(): LiveData<Triple<Boolean, NameCollisionType, Boolean>> =
         fileVersioningInfo
 
-    fun onActionResult(): LiveData<Event<NameCollisionActionResult>> = actionResult
+    fun onActionResult(): LiveData<NameCollisionActionResult> = actionResult
     fun getCollisionsResolution(): LiveData<ArrayList<NameCollisionResult>> = collisionsResolution
 
     private val renameNames = mutableListOf<String>()
@@ -461,16 +448,14 @@ class NameCollisionViewModel @Inject constructor(
      * @param quantity  Number of processed uploads.
      */
     private fun setUploadResult(quantity: Int) {
-        actionResult.value = Event(
-            NameCollisionActionResult(
-                message = StringResourcesUtils.getQuantityString(
-                    R.plurals.upload_began,
-                    quantity,
-                    quantity
-                ),
-                isForeignNode = false,
-                shouldFinish = pendingCollisions.isEmpty()
-            )
+        actionResult.value = NameCollisionActionResult(
+            message = StringResourcesUtils.getQuantityString(
+                R.plurals.upload_began,
+                quantity,
+                quantity
+            ),
+            isForeignNode = false,
+            shouldFinish = pendingCollisions.isEmpty()
         )
     }
 
@@ -519,14 +504,11 @@ class NameCollisionViewModel @Inject constructor(
      *                          about the movement.
      */
     private fun setMovementResult(movementResult: MoveRequestResult.GeneralMovement) {
-        actionResult.value =
-            Event(
-                NameCollisionActionResult(
-                    message = movementResult.getResultText(),
-                    isForeignNode = movementResult.isForeignNode,
-                    shouldFinish = pendingCollisions.isEmpty()
-                )
-            )
+        actionResult.value = NameCollisionActionResult(
+            message = movementResult.getResultText(),
+            isForeignNode = movementResult.isForeignNode,
+            shouldFinish = pendingCollisions.isEmpty()
+        )
     }
 
     /**
@@ -573,13 +555,10 @@ class NameCollisionViewModel @Inject constructor(
      * @param copyResult    [CopyRequestResult] containing all the required info about the copy.
      */
     private fun setCopyResult(copyResult: CopyRequestResult) {
-        actionResult.value =
-            Event(
-                NameCollisionActionResult(
-                    message = copyResult.getResultText(),
-                    isForeignNode = copyResult.isForeignNode,
-                    shouldFinish = pendingCollisions.isEmpty()
-                )
-            )
+        actionResult.value = NameCollisionActionResult(
+            message = copyResult.getResultText(),
+            isForeignNode = copyResult.isForeignNode,
+            shouldFinish = pendingCollisions.isEmpty()
+        )
     }
 }

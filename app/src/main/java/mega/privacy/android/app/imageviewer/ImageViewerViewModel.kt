@@ -21,10 +21,14 @@ import mega.privacy.android.app.imageviewer.data.ImageItem
 import mega.privacy.android.app.imageviewer.data.ImageResult
 import mega.privacy.android.app.imageviewer.usecase.GetImageHandlesUseCase
 import mega.privacy.android.app.imageviewer.usecase.GetImageUseCase
+import mega.privacy.android.app.namecollision.data.NameCollision
+import mega.privacy.android.app.namecollision.data.NameCollisionType
+import mega.privacy.android.app.namecollision.usecase.CheckNameCollisionUseCase
 import mega.privacy.android.app.usecase.*
 import mega.privacy.android.app.usecase.GetGlobalChangesUseCase.Result
 import mega.privacy.android.app.usecase.chat.DeleteChatMessageUseCase
 import mega.privacy.android.app.usecase.data.MegaNodeItem
+import mega.privacy.android.app.usecase.exception.MegaNodeException
 import mega.privacy.android.app.utils.Constants.INVALID_POSITION
 import mega.privacy.android.app.utils.LogUtil.logError
 import mega.privacy.android.app.utils.LogUtil.logWarning
@@ -50,8 +54,10 @@ import javax.inject.Inject
  * @property cancelTransferUseCase      Needed to cancel current full image transfer if needed
  * @property loggedInUseCase            UseCase required to check when the user is already logged in
  * @property deleteChatMessageUseCase   UseCase required to delete current chat node message
+ * @property copyNodeUseCase            UseCase required to copy nodes
  * @property moveNodeUseCase            UseCase required to move nodes
  * @property removeNodeUseCase          UseCase required to remove nodes
+ * @property checkNameCollisionUseCase  UseCase required to check name collisions
  */
 @HiltViewModel
 class ImageViewerViewModel @Inject constructor(
@@ -63,14 +69,17 @@ class ImageViewerViewModel @Inject constructor(
     private val cancelTransferUseCase: CancelTransferUseCase,
     private val loggedInUseCase: LoggedInUseCase,
     private val deleteChatMessageUseCase: DeleteChatMessageUseCase,
+    private val copyNodeUseCase: CopyNodeUseCase,
     private val moveNodeUseCase: MoveNodeUseCase,
-    private val removeNodeUseCase: RemoveNodeUseCase
+    private val removeNodeUseCase: RemoveNodeUseCase,
+    private val checkNameCollisionUseCase: CheckNameCollisionUseCase
 ) : BaseRxViewModel() {
 
     private val images = MutableLiveData<List<ImageItem>?>()
     private val currentPosition = MutableLiveData<Int>()
     private val showToolbar = MutableLiveData<Boolean>()
     private val snackbarMessage = SingleLiveEvent<String>()
+    private val collision = SingleLiveEvent<NameCollision>()
     private val nodesComposite = CompositeDisposable()
     private val imagesComposite = CompositeDisposable()
     private var isUserLoggedIn = false
@@ -106,6 +115,8 @@ class ImageViewerViewModel @Inject constructor(
         images.value?.find { it.handle == nodeHandle }
 
     fun onSnackbarMessage(): LiveData<String> = snackbarMessage
+
+    fun getCollision(): LiveData<NameCollision> = collision
 
     fun onShowToolbar(): LiveData<Boolean> = showToolbar
 
@@ -456,21 +467,73 @@ class ImageViewerViewModel @Inject constructor(
         return result
     }
 
+    /**
+     * Copies a node if there is no name collision.
+     *
+     * @param nodeHandle        Node handle to copy.
+     * @param newParentHandle   Parent handle in which the node will be copied.
+     */
     fun copyNode(nodeHandle: Long, newParentHandle: Long) {
-        getNodeUseCase.copyNode(
-            node = getExistingNode(nodeHandle),
+        checkNameCollision(
             nodeHandle = nodeHandle,
-            toParentHandle = newParentHandle
-        ).subscribeAndComplete {
-            snackbarMessage.value = getString(R.string.context_correctly_copied)
+            newParentHandle = newParentHandle,
+            type = NameCollisionType.COPY
+        ) {
+            copyNodeUseCase.copy(handle = nodeHandle, parentHandle = newParentHandle)
+                .subscribeAndComplete {
+                    snackbarMessage.value = getString(R.string.context_correctly_copied)
+                }
         }
     }
 
+    /**
+     * Moves a node if there is no name collision.
+     *
+     * @param nodeHandle        Node handle to move.
+     * @param newParentHandle   Parent handle in which the node will be moved.
+     */
     fun moveNode(nodeHandle: Long, newParentHandle: Long) {
-        moveNodeUseCase.move(nodeHandle, newParentHandle)
-            .subscribeAndComplete {
-                snackbarMessage.value = getString(R.string.context_correctly_moved)
-            }
+        checkNameCollision(
+            nodeHandle = nodeHandle,
+            newParentHandle = newParentHandle,
+            type = NameCollisionType.MOVEMENT
+        ) {
+            moveNodeUseCase.move(handle = nodeHandle, parentHandle = newParentHandle)
+                .subscribeAndComplete {
+                    snackbarMessage.value = getString(R.string.context_correctly_moved)
+                }
+        }
+    }
+
+    /**
+     * Checks if there is a name collision before proceeding with the action.
+     *
+     * @param nodeHandle        Handle of the node to check the name collision.
+     * @param newParentHandle   Handle of the parent folder in which the action will be performed.
+     * @param type              [NameCollisionType]
+     * @param completeAction    Action to complete after checking the name collision.
+     */
+    private fun checkNameCollision(
+        nodeHandle: Long,
+        newParentHandle: Long,
+        type: NameCollisionType,
+        completeAction: (() -> Unit)
+    ) {
+        checkNameCollisionUseCase.check(
+            handle = nodeHandle,
+            parentHandle = newParentHandle,
+            type = type
+        ).observeOn(AndroidSchedulers.mainThread())
+            .subscribeBy(
+                onSuccess = { collisionResult -> collision.value = collisionResult },
+                onError = { error ->
+                    when (error) {
+                        is MegaNodeException.ChildDoesNotExistsException -> completeAction.invoke()
+                        else -> logError(error.stackTraceToString())
+                    }
+                }
+            )
+            .addTo(composite)
     }
 
     fun moveNodeToRubbishBin(nodeHandle: Long) {
