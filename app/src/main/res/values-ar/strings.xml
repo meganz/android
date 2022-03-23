@@ -4332,7 +4332,7 @@
     <string name="general_mic_mute">الميكروفون الخاص بك مغلق</string>
     <!-- General label for microphone unmuted -->
     <string name="general_mic_unmute">الميكروفون الخاص بك قيد التشغيل</string>
-    <!-- General label for camera -->
+    <!-- Label for camera. Used only in meetings/calls to label the button to turn the video call on/off. -->
     <string name="general_camera">الكاميرا</string>
     <!-- General label for camera enable -->
     <string name="general_camera_enable">تم تشغيل الكاميرا خاصتك.</string>
@@ -4559,7 +4559,7 @@
     <!-- If users want to share items in the "My backup" folder, Warning dialog will show to confirm -->
     <string name="backup_share_permission_text">لا يمكن مشاركة هذا المجلد إلا للقراءة فقط ؛ نظرًا لأن هذا مجلد نسخ احتياطي ، فإن أي تغييرات تطرأ على محتواه قد تؤدي إلى تعطيل النسخ الاحتياطي.</string>
     <!-- If users want to add items to the "My backup" device folder, Warning dialog will show to confirm -->
-    <string name="backup_add_item_text">العناصر الموجودة في هذا المجلد هي جزء من نسخة احتياطية تم مزامنتها مع مجلد محلي. سيؤدي اتخاذ هذا الإجراء إلى تعطيل المزامنة وتعطيل النسخ الاحتياطي. يمكن إعادة تمكين النسخ الاحتياطي باستخدام تطبيق ميغا للحاسوب المكتبي MEGA Desktop App. هل انت متأكد انك تريد المتابعة؟</string>
+    <string name="backup_add_item_text">Items in this folder are part of a configured backup and are synchronised to a local folder. Taking this action will break the synchronisation and disable the backup. The backup can be re-enabled in the MEGA Desktop App. Are you sure you want to proceed?</string>
     <!-- Share multi backup folders, show below warning message -->
     <string name="backup_multi_share_permission_text">يمكن مشاركة هذه المجلدات للقراءة فقط لأنها مجلدات نسخ احتياطي، قد تؤدي أي تغييرات في محتواها إلى تعطيل النسخ الاحتياطية.</string>
     <!-- Share multi folders mix with backup and non-backup folders, show below warning message -->
@@ -4617,8 +4617,6 @@
     <string name="title_dcim_folder_dialog">مجلد DCIM</string>
     <!-- Content of DCIM folder warning dialog -->
     <string name="content_dcim_folder_dialog">تقوم ميغا MEGA بترفيع صورك من المعرض. لتغيير موقع الترفيع يرجى الانتقال إلى إعدادات ترفيعات الكاميرا.</string>
-    <!-- Error shown when download a file that has violated ToS/AUP. -->
-    <string name="tos_aup_violation">انتهاك بنود الخدمة/سياسة الاستخدام المقبول</string>
     <!-- Title message of existing subscription dialog -->
     <string name="title_existing_subscription">شراء اشتراك جديد؟</string>
     <!-- Text of buy new subscription button -->
@@ -4631,4 +4629,30 @@
     <string name="message_subscription_from_other_platform">لديك بالفعل اشتراك. إذا اشتريت واحدة أخرى ، فسيتم محاسبتك مرتين. لتجنب ذلك، قم بإلغاء اشتراكك الحالي بالانتقال إلى ميغا MEGA في متصفح الحاسوب المكتبي أو الهاتف المحمول. قم بزيارة مركز المساعدة للحصول على مزيد من المعلومات.</string>
     <!-- Warning show to the user when the app needs bluetooth connect permissions to get the best meeting experience and the user has denied them.-->
     <string name="meeting_bluetooth_connect_required_permissions_warning">انتقل إلى الإعدادات لمنح ميغا MEGA الإذن للوصول إلى أجهزتك القريبة باستخدام البلوتوث.</string>
+    <!-- Warning indicating the billing is not available and giving some indications to continue with the upgrade. -->
+    <string name="upgrade_billing_warning">نحن غير قادرين على المضي قدماً في الفواتير. إذا كنت تستخدم تطبيقًا مزدوجًا ، فالرجاء تسجيل الدخول إلى ميغا MEGA بدونه. إذا لم يكن كذلك، فحاول الترقية من خلال متصفح الويب الخاص بك.</string>
+    <!-- Title for subscription dialog that shows before delete account -->
+    <string name="title_platform_subscription">%1s subscription</string>
+    <!-- Title for dialog that subscription is from other platform and shows before delete account -->
+    <string name="title_active_subscription">Active subscription</string>
+    <!-- Message for dialog that subscription is from android platform and shows before delete account -->
+    <string name="message_android_platform_subscription">You have an active MEGA subscription with %1$s. You must cancel it separately at %2$s, as MEGA is not able to cancel it for you. Visit our Help Centre for more information.</string>
+    <!-- Message for dialog that subscription is from other platform and shows before delete account  -->
+    <string name="message_other_platform_subscription"></string>
+    <!-- Message for dialog that subscription is from iTunes platform and shows before delete account  -->
+    <string name="message_itunes_platform_subscription">You have an active MEGA subscription with Apple. You must cancel it separately from your iTunes account, as MEGA is not able to cancel it for you. Visit our Help Centre for more information.</string>
+    <!-- Text for button of subscription dialog that shows before delete account -->
+    <string name="button_visit_platform">Visit %1s</string>
+    <!-- Text shown in the last alert dialog to confirm delete user account with a ECP/Stripe subscription-->
+    <string name="delete_account_text_other_platform_last_step">This is the last step to delete your account. Both your account and subscription will be deleted and you will permanently lose all the data stored in the cloud. Please enter your password below.</string>
+    <!-- Title of timeline tab in photos section -->
+    <string name="tab_title_timeline">الجدول الزمني</string>
+    <!-- Title of album tab in photos section. -->
+    <string name="tab_title_album">ألبومات</string>
+    <!-- Title of favourite album. -->
+    <string name="title_favourites_album">المفضلة</string>
+    <!-- Text that indicates that there’s no media files to show in favourite album -->
+    <string name="empty_hint_favourite_album">[B]لا يوجد[/B] [A]مفضلة[/A]</string>
+    <!-- Action button which will remove favourites in selection mode -->
+    <string name="action_remove_favourites">Remove favourites</string>
 </resources>

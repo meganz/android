@@ -3976,7 +3976,7 @@
     <string name="general_mic_mute">Votre microphone est désactivé</string>
     <!-- General label for microphone unmuted -->
     <string name="general_mic_unmute">Votre microphone est activé</string>
-    <!-- General label for camera -->
+    <!-- Label for camera. Used only in meetings/calls to label the button to turn the video call on/off. -->
     <string name="general_camera">Caméra</string>
     <!-- General label for camera enable -->
     <string name="general_camera_enable">Votre caméra est activée.</string>
@@ -4203,7 +4203,7 @@
     <!-- If users want to share items in the "My backup" folder, Warning dialog will show to confirm -->
     <string name="backup_share_permission_text">Ce dossier ne peut être partagé qu’en lecture seule, car c’est un dossier de sauvegarde. Tout changement apporté à son contenu pourrait désactiver la sauvegarde.</string>
     <!-- If users want to add items to the "My backup" device folder, Warning dialog will show to confirm -->
-    <string name="backup_add_item_text">Les éléments dans ce dossier font partie d’une sauvegarde configurée et sont synchronisés vers un dossier local. Cette action brisera la synchronisation et désactivera la sauvegarde. La sauvegarde peut être réactivée grâce à l’Appli&#160;MEGA pour ordinateur. Voulez-vous vraiment poursuivre ?</string>
+    <string name="backup_add_item_text">Les éléments dans ce dossier font partie d’une sauvegarde configurée et sont synchronisés vers un dossier local. Cette action brisera la synchronisation et désactivera la sauvegarde. La sauvegarde peut être réactivée dans l’Appli&#160;MEGA pour ordinateur. Voulez-vous vraiment poursuivre ?</string>
     <!-- Share multi backup folders, show below warning message -->
     <string name="backup_multi_share_permission_text">Ces dossiers ne peuvent être partagés qu’en lecture seule ; comme ce sont des dossiers de sauvegarde, tout changement apporté à leur contenu pourrait désactiver les sauvegardes.</string>
     <!-- Share multi folders mix with backup and non-backup folders, show below warning message -->
@@ -4257,8 +4257,6 @@
     <string name="title_dcim_folder_dialog">Dossier&#160;DCIM</string>
     <!-- Content of DCIM folder warning dialog -->
     <string name="content_dcim_folder_dialog">MEGA téléverse vos images de la galerie. Pour changer l’emplacement de téléversement, veuillez accéder aux paramètres des Téléversements de l’appareil photo.</string>
-    <!-- Error shown when download a file that has violated ToS/AUP. -->
-    <string name="tos_aup_violation">Non-respect des CGU/PUA</string>
     <!-- Title message of existing subscription dialog -->
     <string name="title_existing_subscription">Acheter un nouvel abonnement ?</string>
     <!-- Text of buy new subscription button -->
@@ -4271,4 +4269,30 @@
     <string name="message_subscription_from_other_platform">Vous avez déjà un abonnement. Si vous en achetez un autre, les deux vous seront facturés. Pour éviter cela, annulez votre abonnement actuel en accédant à MEGA dans un navigateur Web mobile ou pour ordinateur. Pour plus de précisions, visitez notre centre d’assistance.</string>
     <!-- Warning show to the user when the app needs bluetooth connect permissions to get the best meeting experience and the user has denied them.-->
     <string name="meeting_bluetooth_connect_required_permissions_warning">Accédez aux Paramètres pour accorder à MEGA l’autorisation d’accéder par Bluetooth à vos appareils à proximité.</string>
+    <!-- Warning indicating the billing is not available and giving some indications to continue with the upgrade. -->
+    <string name="upgrade_billing_warning">Il nous est impossible de procéder à la facturation. Si vous utilisez une double appli, veuillez envisager de vous connecter à MEGA sans elle. Si ce n’est pas le cas, essayez de surclasser votre compte dans un navigateur Web.</string>
+    <!-- Title for subscription dialog that shows before delete account -->
+    <string name="title_platform_subscription">Abonnement&#160;%1s</string>
+    <!-- Title for dialog that subscription is from other platform and shows before delete account -->
+    <string name="title_active_subscription">Un abonnement est actif</string>
+    <!-- Message for dialog that subscription is from android platform and shows before delete account -->
+    <string name="message_android_platform_subscription">Vous avez un abonnement MEGA actif auprès de %1$s. Vous devez l’annuler séparément dans %2$s, car MEGA ne peut pas l’annuler pour vous. Pour plus de précisions, visitez notre centre d’assistance.</string>
+    <!-- Message for dialog that subscription is from other platform and shows before delete account  -->
+    <string name="message_other_platform_subscription"></string>
+    <!-- Message for dialog that subscription is from iTunes platform and shows before delete account  -->
+    <string name="message_itunes_platform_subscription">Vous avez un abonnement MEGA actif auprès d’Apple. Vous devez l’annuler séparément dans votre compte iTunes, car MEGA ne peut pas l’annuler pour vous. Pour plus de précisions, visitez notre centre d’assistance.</string>
+    <!-- Text for button of subscription dialog that shows before delete account -->
+    <string name="button_visit_platform">Accéder à %1s</string>
+    <!-- Text shown in the last alert dialog to confirm delete user account with a ECP/Stripe subscription-->
+    <string name="delete_account_text_other_platform_last_step">Ceci est la dernière étape pour supprimer votre compte. Votre compte et votre abonnement seront tous deux supprimés et vous perdrez irrémédiablement toutes les données stockées dans le nuage. Veuillez saisir votre mot de passe ci-dessous.</string>
+    <!-- Title of timeline tab in photos section -->
+    <string name="tab_title_timeline">Vue chronologique</string>
+    <!-- Title of album tab in photos section. -->
+    <string name="tab_title_album">Albums</string>
+    <!-- Title of favourite album. -->
+    <string name="title_favourites_album">Favoris</string>
+    <!-- Text that indicates that there’s no media files to show in favourite album -->
+    <string name="empty_hint_favourite_album">[B]Aucun[/B] [A]favori[/A]</string>
+    <!-- Action button which will remove favourites in selection mode -->
+    <string name="action_remove_favourites">Supprimer les favoris</string>
 </resources>

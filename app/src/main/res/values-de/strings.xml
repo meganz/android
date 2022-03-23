@@ -1000,7 +1000,7 @@
     <!-- Label in My Account section to show user account type -->
     <string name="my_account_free">Gratisaccount</string>
     <!-- Type of account info added to the feedback email sent to support -->
-    <string name="my_account_prolite">Pro Lite-Account</string>
+    <string name="my_account_prolite">Pro-Lite-Account</string>
     <!-- Label in My Account section to show user account type -->
     <string name="my_account_pro1">Pro-I-Account</string>
     <!-- Label in My Account section to show user account type -->
@@ -1008,7 +1008,7 @@
     <!-- Label in My Account section to show user account type -->
     <string name="my_account_pro3">Pro-III-Account</string>
     <!-- Type of account info added to the feedback email sent to support -->
-    <string name="my_account_prolite_feedback_email">Pro Lite-Account</string>
+    <string name="my_account_prolite_feedback_email">Pro-Lite-Account</string>
     <!--  -->
     <string name="backup_title">Rettungsschlüssel sichern</string>
     <!-- Subtitle of the screen to backup the master key -->
@@ -3976,7 +3976,7 @@
     <string name="general_mic_mute">Ihr Mikrofon ist ausgeschaltet</string>
     <!-- General label for microphone unmuted -->
     <string name="general_mic_unmute">Ihr Mikrofon ist eingeschaltet</string>
-    <!-- General label for camera -->
+    <!-- Label for camera. Used only in meetings/calls to label the button to turn the video call on/off. -->
     <string name="general_camera">Kamera</string>
     <!-- General label for camera enable -->
     <string name="general_camera_enable">Ihre Kamera ist eingeschaltet.</string>
@@ -4203,7 +4203,7 @@
     <!-- If users want to share items in the "My backup" folder, Warning dialog will show to confirm -->
     <string name="backup_share_permission_text">Dieser Ordner kann nur schreibgeschützt freigegeben werden, da es sich um einen Backup-Ordner handelt. Änderungen am Inhalt des Ordners könnten dazu führen, dass das Backup deaktiviert wird.</string>
     <!-- If users want to add items to the "My backup" device folder, Warning dialog will show to confirm -->
-    <string name="backup_add_item_text">Der Inhalt dieses Ordners ist Bestandteil eines konfigurierten Backups und wird mit einem lokalen Ordner synchronisiert. Durch diesen Vorgang wird die Synchronisierung abgebrochen und das Backup deaktiviert. Sie können das Backup in der MEGA Desktop-App erneut aktivieren. Fortfahren?</string>
+    <string name="backup_add_item_text">Der Inhalt dieses Ordners ist Bestandteil eines konfigurierten Backups und wird mit einem lokalen Ordner synchronisiert. Durch diesen Vorgang wird die Synchronisierung abgebrochen und das Backup deaktiviert. Sie können das Backup in der MEGA-Desktop-App erneut aktivieren. Fortfahren?</string>
     <!-- Share multi backup folders, show below warning message -->
     <string name="backup_multi_share_permission_text">Diese Ordner können nur schreibgeschützt freigegeben werden, da es sich um Backup-Ordner handelt. Änderungen am Inhalt der Ordner könnten dazu führen, dass die Backups deaktiviert werden.</string>
     <!-- Share multi folders mix with backup and non-backup folders, show below warning message -->
@@ -4257,18 +4257,42 @@
     <string name="title_dcim_folder_dialog">DCIM-Ordner</string>
     <!-- Content of DCIM folder warning dialog -->
     <string name="content_dcim_folder_dialog">MEGA lädt Ihre Bilder aus der Galerie hoch. Den Upload-Speicherort können Sie in den Kamera-Upload-Einstellungen ändern.</string>
-    <!-- Error shown when download a file that has violated ToS/AUP. -->
-    <string name="tos_aup_violation">AGB/AUP-Verstoß</string>
     <!-- Title message of existing subscription dialog -->
     <string name="title_existing_subscription">Neues Abonnement kaufen?</string>
     <!-- Text of buy new subscription button -->
     <string name="button_buy_new_subscription">Neues Abonnement kaufen</string>
     <!-- Dialog message when the existing subscription is from Android platform (Google and Huawei)  -->
-    <string name="message_subscription_from_android_platform">You already have a subscription. If you buy another one you will be charged twice. To avoid this, cancel your current subscription through %1$s. Visit our Help Centre for more information.</string>
+    <string name="message_subscription_from_android_platform">Sie haben bereits ein Abonnement. Wenn Sie ein weiteres Abonnement kaufen, müssen Sie doppelt zahlen. Um dies zu vermeiden, kündigen Sie Ihr aktuelles Abonnement über %1$s. Weitere Informationen finden Sie in unserer Onlinehilfe.</string>
     <!-- Dialog message when the existing subscription is from iTunes  -->
-    <string name="message_subscription_from_itunes">You already have a subscription. If you buy another one you will be charged twice. To avoid this, cancel your current subscription from your iTunes account. Visit our Help Centre for more information.</string>
+    <string name="message_subscription_from_itunes">Sie haben bereits ein Abonnement. Wenn Sie ein weiteres Abonnement kaufen, müssen Sie doppelt zahlen. Um dies zu vermeiden, kündigen Sie Ihr aktuelles Abonnement in Ihrem iTunes-Account. Weitere Informationen finden Sie in unserer Onlinehilfe.</string>
     <!-- Dialog message when the existing subscription is from other platform (Stripe and ECP)  -->
     <string name="message_subscription_from_other_platform">Sie haben bereits ein Abonnement. Wenn Sie ein weiteres Abonnement kaufen, müssen Sie doppelt zahlen. Um dies zu vermeiden, kündigen Sie Ihr aktuelles Abonnement, indem Sie MEGA in einem Desktop- oder mobilen Webbrowser öffnen. Weitere Informationen finden Sie in unserer Onlinehilfe.</string>
     <!-- Warning show to the user when the app needs bluetooth connect permissions to get the best meeting experience and the user has denied them.-->
     <string name="meeting_bluetooth_connect_required_permissions_warning">Öffnen Sie die Einstellungen und erteilen Sie MEGA die Erlaubnis, über Bluetooth auf Geräte in der Nähe zuzugreifen.</string>
+    <!-- Warning indicating the billing is not available and giving some indications to continue with the upgrade. -->
+    <string name="upgrade_billing_warning">Die Abrechnung kann nicht fortgesetzt werden. Wenn Sie eine duale App verwenden, melden Sie sich eventuell ohne diese Funktion bei MEGA an. Ansonsten versuchen Sie, das Upgrade in Ihrem Webbrowser durchzuführen.</string>
+    <!-- Title for subscription dialog that shows before delete account -->
+    <string name="title_platform_subscription">%1s-Abonnement</string>
+    <!-- Title for dialog that subscription is from other platform and shows before delete account -->
+    <string name="title_active_subscription">Aktives Abonnement</string>
+    <!-- Message for dialog that subscription is from android platform and shows before delete account -->
+    <string name="message_android_platform_subscription">Sie haben ein aktives MEGA-Abonnement bei %1$s. Sie müssen dieses separat in %2$s kündigen, da MEGA die Kündigung nicht für Sie vornehmen kann. Weitere Informationen finden Sie in unserer Onlinehilfe.</string>
+    <!-- Message for dialog that subscription is from other platform and shows before delete account  -->
+    <string name="message_other_platform_subscription">Sie haben ein aktives MEGA-Abonnement. Dieses wird automatisch gekündigt, nachdem der Account gelöscht wurde. Weitere Informationen finden Sie in unserer Onlinehilfe.</string>
+    <!-- Message for dialog that subscription is from iTunes platform and shows before delete account  -->
+    <string name="message_itunes_platform_subscription">Sie haben ein aktives MEGA-Abonnement bei Apple. Sie müssen dieses separat in Ihrem iTunes-Account kündigen, da MEGA die Kündigung nicht für Sie vornehmen kann. Weitere Informationen finden Sie in unserer Onlinehilfe.</string>
+    <!-- Text for button of subscription dialog that shows before delete account -->
+    <string name="button_visit_platform">Besuchen Sie %1s</string>
+    <!-- Text shown in the last alert dialog to confirm delete user account with a ECP/Stripe subscription-->
+    <string name="delete_account_text_other_platform_last_step">Dies ist der letzte Schritt, bevor Ihr Account gelöscht wird. Sowohl Ihr Account als auch Ihr Abonnement werden gelöscht und Sie verlieren unwiderruflich alle in der Cloud gespeicherten Daten. Bitte geben Sie unten Ihr Passwort ein.</string>
+    <!-- Title of timeline tab in photos section -->
+    <string name="tab_title_timeline">Zeitleiste</string>
+    <!-- Title of album tab in photos section. -->
+    <string name="tab_title_album">Alben</string>
+    <!-- Title of favourite album. -->
+    <string name="title_favourites_album">Favoriten</string>
+    <!-- Text that indicates that there’s no media files to show in favourite album -->
+    <string name="empty_hint_favourite_album">[B]Keine[/B] [A]Favoriten[/A]</string>
+    <!-- Action button which will remove favourites in selection mode -->
+    <string name="action_remove_favourites">Favoriten entfernen</string>
 </resources>

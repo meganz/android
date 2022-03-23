@@ -129,11 +129,11 @@
     <!-- Title of the preference Recovery key on Settings section -->
     <string name="action_export_master_key">Sao lưu Mã Phục Hồi</string>
     <!-- Menu item to let the user cancel subscriptions -->
-    <string name="action_cancel_subscriptions">Hủy gói dịch vụ</string>
+    <string name="action_cancel_subscriptions">Hủy gói đăng ký dịch vụ</string>
     <!-- success message when the subscription has been canceled correctly -->
-    <string name="cancel_subscription_ok">Gói dịch vụ đã bị hủy</string>
+    <string name="cancel_subscription_ok">Gói đăng ký dịch vụ đã được hủy bỏ</string>
     <!-- error message when the subscription has not been canceled successfully -->
-    <string name="cancel_subscription_error">Có rắc rối trong việc hủy bỏ gói dịch vụ. Xin liên hệ với support&#64;mega.nz để được nhận giúp đỡ</string>
+    <string name="cancel_subscription_error">Có rắc rối trong việc hủy bỏ gói đăng ký dịch vụ. Xin liên hệ với support&#64;mega.nz để được nhận giúp đỡ</string>
     <!-- Menu item to kill all opened sessions -->
     <string name="action_kill_all_sessions">Đóng các phiên khác lại</string>
     <!-- Message after kill all opened sessions -->
@@ -585,13 +585,13 @@
     <!-- confirmation cancel subscriptions dialog -->
     <string name="confirmation_cancel_subscriptions">Cảm ơn lời nhận xét của quý khách. Quý khách có muốn hủy gói dịch vụ MEGA ngay không?</string>
     <!-- provide a reason to cancel subscriptions dialog -->
-    <string name="reason_cancel_subscriptions">Quá trình hủy bỏ gói dịch vụ và ngưng trả phí không thể tiếp tục vì quý khách chưa điền lý do</string>
+    <string name="reason_cancel_subscriptions">Quá trình hủy bỏ gói đăng ký dịch vụ và ngưng trả phí không thể tiếp tục vì quý khách chưa điền lý do</string>
     <!-- Confirmation message of the dialog shown when a subscription has been processed successfully -->
     <string name="message_user_purchased_subscription">Xin cảm ơn. Giao dịch thanh toán của quý khách đang được tiến hành. Xin gửi email cho chúng tôi tại support&#64;mega.co.nz nếu tài khoản không nâng cấp sau 24 giờ.</string>
     <!-- Pop up message shows when user purchased a lower level of subscription -->
     <string name="message_user_purchased_subscription_down_grade">Gói dịch vụ mới sẽ bắt đầu có hiệu lực ngay sau khi gói hiện tại hết hạn, giá mới cũng sẽ được tự thanh toán ngay lúc đó.</string>
     <!-- Pop up message shows when user purchased a subscription with a payment method that can not be processed in real time, e.g. voucher -->
-    <string name="message_user_payment_pending">Gói dịch vụ sẽ bắt đầu có hiệu lực ngay sau khi Google hoàn tất xác thực giao dịch.</string>
+    <string name="message_user_payment_pending">Gói đăng ký dịch vụ sẽ bắt đầu có hiệu lực ngay sau khi Google hoàn tất xác thực giao dịch.</string>
     <!--  -->
     <string name="subscription_type_monthly">Hàng tháng</string>
     <!--  -->
@@ -2830,7 +2830,7 @@
     <!-- Capital letters. Text of the label of a new historic notifications -->
     <string name="new_label_notification_item">MỚI</string>
     <!-- When user is on PRO 3 plan, we will display an extra label to notify user that they can still contact support to have a customised plan. -->
-    <string name="label_custom_plan">Để nâng cấp gói dịch vụ đăng ký hiện tại, quý khách xin liên hệ bộ trợ giúp để mua [A]gói theo nhu cầu[/A].</string>
+    <string name="label_custom_plan">Để nâng cấp gói đăng ký dịch vụ hiện tại, quý khách xin liên hệ bộ trợ giúp để mua [A]gói theo nhu cầu[/A].</string>
     <!-- Input field description in the create file dialog. -->
     <string name="context_new_file_name_hint">tên tệp tin</string>
     <!-- Option in Settings section to enable the last active connection in chat -->
@@ -2896,7 +2896,7 @@
     <!-- Label to show the price of each plan in the upgrade account section -->
     <string name="type_month">[A]Giá từ[/A] %s / [A]tháng[/A] *</string>
     <!-- the meaning of the asterisk in monthly* and annually* payment -->
-    <string name="upgrade_comment">* Các gói dịch vụ tự định kỳ đều có thể hủy bỏ bất cứ khi nào khách hành muốn, trước ngày đầu chu kỳ.</string>
+    <string name="upgrade_comment">* Các gói đăng ký dịch vụ tự định kỳ đều có thể hủy bỏ bất cứ khi nào khách hành muốn, trước ngày đầu chu kỳ.</string>
     <!-- Message shown when a call starts. -->
     <string name="call_started_messages">Cuộc Gọi Đã Bắt Đầu</string>
     <!-- Title of the dialog to inform about a SSL error -->
@@ -3887,7 +3887,7 @@
     <string name="general_mic_mute">Micrô hiện đang bị tắt</string>
     <!-- General label for microphone unmuted -->
     <string name="general_mic_unmute">Micrô hiện đang được bật</string>
-    <!-- General label for camera -->
+    <!-- Label for camera. Used only in meetings/calls to label the button to turn the video call on/off. -->
     <string name="general_camera">Camera</string>
     <!-- General label for camera enable -->
     <string name="general_camera_enable">Camera hiện đang được bật.</string>
@@ -4140,7 +4140,7 @@
     <!-- Button to proceed with a payment -->
     <string name="proceed">Tiến hành</string>
     <!-- Message informing the upgrade was processed correctly. Placeholder: type of subscription e.g: Pro Lite monthly -->
-    <string name="successful_upgrade">Cảm ơn quý khách đã mua đăng ký sử dụng gói %1$s</string>
+    <string name="successful_upgrade">Cảm ơn quý khách đã mua gói đăng ký dịch vụ %1$s!</string>
     <!-- Pro Lite monthly subscription -->
     <string name="pro_lite_monthly">Pro Lite hằng tháng</string>
     <!-- Pro Lite yearly subscription -->
@@ -4167,18 +4167,42 @@
     <string name="title_dcim_folder_dialog">Thư mục DCIM</string>
     <!-- Content of DCIM folder warning dialog -->
     <string name="content_dcim_folder_dialog">MEGA tải lên các hình ảnh có trong thư viện ảnh của thiết bị. Để thay đổi vị trí lấy hình ảnh để tải lên xin vào phần thiết đặt của Camera Upload.</string>
-    <!-- Error shown when download a file that has violated ToS/AUP. -->
-    <string name="tos_aup_violation">Vi phạm ĐKDV/CSSD</string>
     <!-- Title message of existing subscription dialog -->
-    <string name="title_existing_subscription">Mua gói dịch vụ mới?</string>
+    <string name="title_existing_subscription">Mua gói đăng ký dịch vụ mới?</string>
     <!-- Text of buy new subscription button -->
-    <string name="button_buy_new_subscription">Mua gói dịch vụ mới</string>
+    <string name="button_buy_new_subscription">Mua gói đăng ký dịch vụ mới</string>
     <!-- Dialog message when the existing subscription is from Android platform (Google and Huawei)  -->
-    <string name="message_subscription_from_android_platform">Bạn đã có đăng ký một gói dịch vụ rồi. Nếu bạn mua một cái khác, bạn sẽ bị tính phí gấp đôi. Để tránh khỏi điều này, hãy hủy đăng ký gói hiện tại bằng cách vào MEGA thông qua %1$s. Tới trang Thư Viện Hướng Dẫn để có thêm chi tiết.</string>
+    <string name="message_subscription_from_android_platform">Bạn đã có một gói đăng ký dịch vụ rồi. Nếu bạn mua một cái khác, bạn sẽ bị tính phí gấp đôi. Để tránh khỏi điều này, hãy hủy đăng ký gói hiện tại bằng cách vào MEGA thông qua %1$s. Tới trang Thư Viện Hướng Dẫn để có thêm chi tiết.</string>
     <!-- Dialog message when the existing subscription is from iTunes  -->
-    <string name="message_subscription_from_itunes">Bạn đã có đăng ký một gói dịch vụ rồi. Nếu bạn mua một cái khác, bạn sẽ bị tính phí gấp đôi. Để tránh khỏi điều này, hãy hủy đăng ký gói hiện tại bằng cách vào MEGA thông qua tài khoản iTunes của bạn. Tới trang Thư Viện Hướng Dẫn để có thêm chi tiết.</string>
+    <string name="message_subscription_from_itunes">Bạn đã có một gói đăng ký dịch vụ rồi. Nếu bạn mua một cái khác, bạn sẽ bị tính phí gấp đôi. Để tránh khỏi điều này, hãy hủy đăng ký gói hiện tại bằng cách vào MEGA thông qua tài khoản iTunes của bạn. Tới trang Thư Viện Hướng Dẫn để có thêm chi tiết.</string>
     <!-- Dialog message when the existing subscription is from other platform (Stripe and ECP)  -->
     <string name="message_subscription_from_other_platform">Bạn đã có đăng ký một gói dịch vụ rồi. Nếu bạn mua một cái khác, bạn sẽ bị tính phí gấp đôi. Để tránh khỏi điều này, hãy hủy đăng ký gói hiện tại bằng cách vào MEGA với trình duyệt web trên máy tính hoặc điện thoại. Tới trang Thư Viện Hướng Dẫn để có thêm chi tiết.</string>
     <!-- Warning show to the user when the app needs bluetooth connect permissions to get the best meeting experience and the user has denied them.-->
     <string name="meeting_bluetooth_connect_required_permissions_warning">Đi tới phần Thiết Đặt và cấp quyền cho MEGA truy cập vào các thiết bị gần bạn thông qua Bluetooth.</string>
+    <!-- Warning indicating the billing is not available and giving some indications to continue with the upgrade. -->
+    <string name="upgrade_billing_warning">Chúng tôi không tiến hành được việc thanh toán. Nếu quý khách đang sử dụng ứng dụng kép, vui lòng đăng nhập vào MEGA mà không có ứng dụng đó. Còn không, hãy thử nâng cấp thông qua trình duyệt web.</string>
+    <!-- Title for subscription dialog that shows before delete account -->
+    <string name="title_platform_subscription">Gói đăng ký dịch vụ với %1s</string>
+    <!-- Title for dialog that subscription is from other platform and shows before delete account -->
+    <string name="title_active_subscription">Gói đăng ký dịch vụ còn hoạt động</string>
+    <!-- Message for dialog that subscription is from android platform and shows before delete account -->
+    <string name="message_android_platform_subscription">Quý khách hiện đang có một gói đăng ký dịch vụ MEGA được mua với %1$s. Quý khách cần phải tự tiến hành hủy bỏ trong %2$s, vì MEGA không thể thực hiện cho quý khách được. Truy cập Thư Viện Hướng Dẫn để có thêm thông tin.</string>
+    <!-- Message for dialog that subscription is from other platform and shows before delete account  -->
+    <string name="message_other_platform_subscription"></string>
+    <!-- Message for dialog that subscription is from iTunes platform and shows before delete account  -->
+    <string name="message_itunes_platform_subscription">Quý khách hiện đang có một gói đăng ký dịch vụ MEGA được mua với Apple. Quý khách cần phải tự tiến hành hủy bỏ trong tài khoản iTunes của quý khách, vì MEGA không thể thực hiện cho quý khách được. Truy cập Thư Viện Hướng Dẫn để có thêm thông tin.</string>
+    <!-- Text for button of subscription dialog that shows before delete account -->
+    <string name="button_visit_platform">Truy cập %1s</string>
+    <!-- Text shown in the last alert dialog to confirm delete user account with a ECP/Stripe subscription-->
+    <string name="delete_account_text_other_platform_last_step">Đây là bước cuối cùng để hoàn tất việc xóa bỏ tài khoản.  Tất cả dữ liệu bạn đã lưu trên ổ mây MEGA sẽ bị xóa và gói đăng ký dịch vụ mà quý khách đã mua sẽ bị hủy bỏ hoàn toàn. Để tiến hành, xin nhập mật khẩu ở dưới đây.</string>
+    <!-- Title of timeline tab in photos section -->
+    <string name="tab_title_timeline">Dòng thời gian</string>
+    <!-- Title of album tab in photos section. -->
+    <string name="tab_title_album">Albums</string>
+    <!-- Title of favourite album. -->
+    <string name="title_favourites_album">Ưa Thích</string>
+    <!-- Text that indicates that there’s no media files to show in favourite album -->
+    <string name="empty_hint_favourite_album">[B]Không có[/B] [A]Mục Ưa Thích[/A]</string>
+    <!-- Action button which will remove favourites in selection mode -->
+    <string name="action_remove_favourites">Loại bỏ ưa thích</string>
 </resources>

@@ -3976,7 +3976,7 @@
     <string name="general_mic_mute">Il tuo microfono è spento</string>
     <!-- General label for microphone unmuted -->
     <string name="general_mic_unmute">Il tuo microfono è acceso</string>
-    <!-- General label for camera -->
+    <!-- Label for camera. Used only in meetings/calls to label the button to turn the video call on/off. -->
     <string name="general_camera">Fotocamera</string>
     <!-- General label for camera enable -->
     <string name="general_camera_enable">La tua fotocamera è accesa.</string>
@@ -4257,8 +4257,6 @@
     <string name="title_dcim_folder_dialog">Cartella DCIM</string>
     <!-- Content of DCIM folder warning dialog -->
     <string name="content_dcim_folder_dialog">MEGA carica le tue immagini dalla galleria. Per cambiare la posizione di caricamento, per favore vai nelle Impostazioni dei Caricamenti da fotocamera.</string>
-    <!-- Error shown when download a file that has violated ToS/AUP. -->
-    <string name="tos_aup_violation">ToS/AUP violation</string>
     <!-- Title message of existing subscription dialog -->
     <string name="title_existing_subscription">Buy new subscription?</string>
     <!-- Text of buy new subscription button -->
@@ -4271,4 +4269,30 @@
     <string name="message_subscription_from_other_platform">You already have a subscription. If you buy another one, you will be charged twice. To avoid this, cancel your current subscription by going to MEGA in a desktop or mobile web browser. Visit our Help Centre for more information.</string>
     <!-- Warning show to the user when the app needs bluetooth connect permissions to get the best meeting experience and the user has denied them.-->
     <string name="meeting_bluetooth_connect_required_permissions_warning">Vai nelle Impostazioni per dare a MEGA il permesso di accedere ai tuoi dispositivi vicini utilizzando il Bluetooth.</string>
+    <!-- Warning indicating the billing is not available and giving some indications to continue with the upgrade. -->
+    <string name="upgrade_billing_warning">Non riusciamo a portare a termine la fatturazione. Se stai utilizzando un\’app duplicata, per favore considera di effettuare il login su MEGA senza di essa. Altrimenti, prova ad effettuare l\’upgrade tramite un browser web.</string>
+    <!-- Title for subscription dialog that shows before delete account -->
+    <string name="title_platform_subscription">%1s subscription</string>
+    <!-- Title for dialog that subscription is from other platform and shows before delete account -->
+    <string name="title_active_subscription">Active subscription</string>
+    <!-- Message for dialog that subscription is from android platform and shows before delete account -->
+    <string name="message_android_platform_subscription">You have an active MEGA subscription with %1$s. You must cancel it separately at %2$s, as MEGA is not able to cancel it for you. Visit our Help Centre for more information.</string>
+    <!-- Message for dialog that subscription is from other platform and shows before delete account  -->
+    <string name="message_other_platform_subscription"></string>
+    <!-- Message for dialog that subscription is from iTunes platform and shows before delete account  -->
+    <string name="message_itunes_platform_subscription">You have an active MEGA subscription with Apple. You must cancel it separately from your iTunes account, as MEGA is not able to cancel it for you. Visit our Help Centre for more information.</string>
+    <!-- Text for button of subscription dialog that shows before delete account -->
+    <string name="button_visit_platform">Visit %1s</string>
+    <!-- Text shown in the last alert dialog to confirm delete user account with a ECP/Stripe subscription-->
+    <string name="delete_account_text_other_platform_last_step">This is the last step to delete your account. Both your account and subscription will be deleted and you will permanently lose all the data stored in the cloud. Please enter your password below.</string>
+    <!-- Title of timeline tab in photos section -->
+    <string name="tab_title_timeline">Timeline</string>
+    <!-- Title of album tab in photos section. -->
+    <string name="tab_title_album">Album</string>
+    <!-- Title of favourite album. -->
+    <string name="title_favourites_album">Preferiti</string>
+    <!-- Text that indicates that there’s no media files to show in favourite album -->
+    <string name="empty_hint_favourite_album">[B]No[/B] [A]Favourites[/A]</string>
+    <!-- Action button which will remove favourites in selection mode -->
+    <string name="action_remove_favourites">Remove favourites</string>
 </resources>
