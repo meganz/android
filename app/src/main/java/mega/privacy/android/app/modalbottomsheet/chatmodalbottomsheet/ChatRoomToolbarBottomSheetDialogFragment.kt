@@ -9,6 +9,7 @@ import android.view.ViewGroup
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.lifecycleScope
 import mega.privacy.android.app.utils.StringResourcesUtils.getQuantityString
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
@@ -53,10 +54,10 @@ class ChatRoomToolbarBottomSheetDialogFragment : BottomSheetDialogFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
 
-        viewModel.imagesGallery().observe(viewLifecycleOwner) { item ->
-            requireNotNull(item) { "Empty gallery" }
-
-            logDebug("Recovered gallery");
+        lifecycleScope.launchWhenStarted {
+            viewModel.gallery.collect {
+                logDebug("Recovered gallery. Num items ${it.size}")
+            }
         }
 
         setupButtons()
@@ -72,42 +73,42 @@ class ChatRoomToolbarBottomSheetDialogFragment : BottomSheetDialogFragment() {
      */
     private fun setupButtons() {
         binding.optionGallery.setOnClickListener {
-            listener.showGallery()
+            listener.onShowGalleryOptionClicked()
             dismiss()
         }
 
         binding.optionFile.setOnClickListener {
-            listener.sendFile()
+            listener.onSendFileOptionClicked()
             dismiss()
         }
 
         binding.optionVoice.setOnClickListener {
-            listener.startCall(false)
+            listener.onStartCallOptionClicked(false)
             dismiss()
         }
 
         binding.optionVideo.setOnClickListener {
-            listener.startCall(true)
+            listener.onStartCallOptionClicked(true)
             dismiss()
         }
 
         binding.optionScan.setOnClickListener {
-            listener.scanDocument()
+            listener.onScanDocumentOptionClicked()
             dismiss()
         }
 
         binding.optionGif.setOnClickListener {
-            listener.sendGIF()
+            listener.onSendGIFOptionClicked()
             dismiss()
         }
 
         binding.optionLocation.setOnClickListener {
-            listener.sendLocation()
+            listener.onSendLocationOptionClicked()
             dismiss()
         }
 
         binding.optionContact.setOnClickListener {
-            listener.sendContact()
+            listener.onSendContactOptionClicked()
             dismiss()
         }
     }

@@ -26,5 +26,8 @@ public interface EmojiEditTextInterface {
   /** sets the emoji size in pixels with the provided resource and invalidates the text and renders it with the new size when {@code shouldInvalidate} is true */
   void setEmojiSizeRes(@DimenRes int res, boolean shouldInvalidate);
 
+  /**
+   *  Check if the text is empty
+   */
   boolean isTextEmpty();
 }

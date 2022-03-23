@@ -140,7 +140,7 @@ public class Util {
 	public static double percScreenLogin = 0.596283784; //The dimension of the grey zone (Login and Tour)
 	
 	// Debug flag to enable logging and some other things
-	public static boolean DEBUG = false;
+	public static boolean DEBUG = true;
 
 	public static HashMap<String, String> countryCodeDisplay;
 

@@ -7,16 +7,14 @@ import androidx.recyclerview.widget.DiffUtil
  * View item that represents a Contact Request at UI level.
  *
  * @property id         File id
- * @property isImage    Flag to check if its image
- * @property name       File name
+ * @property title       File title
  * @property fileUri    File URI
  * @property dateAdded  Date added
  * @property thumbnail  Image thumbnail
  */
 data class FileGalleryItem constructor(
     val id: Long,
-    var isImage: Boolean = false,
-    val name: String? = null,
+    val title: String? = null,
     var fileUri: String? = null,
     var dateAdded: String? = null,
     var thumbnail: Bitmap? = null

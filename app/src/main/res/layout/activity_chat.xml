@@ -291,20 +291,8 @@
                         android:animateLayoutChanges="true"
                         android:visibility="gone" />
 
-                    <RelativeLayout
-                        android:id="@+id/relative_layout_file_storage"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content">
-
-                        <FrameLayout
-                            android:id="@+id/fragment_container_file_storage"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:background="@android:color/transparent" />
-                    </RelativeLayout>
                 </LinearLayout>
             </RelativeLayout>
-
 
             <RelativeLayout
                 android:id="@+id/join_chat_layout_chat_layout"

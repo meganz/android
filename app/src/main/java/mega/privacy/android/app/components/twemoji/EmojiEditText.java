@@ -88,6 +88,7 @@ public class EmojiEditText extends AppCompatEditText implements EmojiEditTextInt
         Editable text = getText();
         return text != null && TextUtil.isTextEmpty(text.toString());
     }
+
     @Override
     @CallSuper
     public void input(final Emoji emoji) {

@@ -1,23 +1,22 @@
-package mega.privacy.android.app.adapters
+package mega.privacy.android.app.main.megachat.chatAdapters
 
 import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
-import mega.privacy.android.app.adapters.viewHolders.FileStorageHolder
 import mega.privacy.android.app.databinding.ItemFileStorageBinding
 
-class FileStorageAdapter (
+class FileStorageChatAdapter (
     var context: Context
 ) :
-    RecyclerView.Adapter<FileStorageHolder>(), View.OnClickListener {
+    RecyclerView.Adapter<FileStorageChatHolder>(), View.OnClickListener {
     private var files: List<String>? = null
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): FileStorageHolder {
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): FileStorageChatHolder {
         val inflater = LayoutInflater.from(parent.context)
         val binding = ItemFileStorageBinding.inflate(inflater, parent, false)
-        return FileStorageHolder(binding)
+        return FileStorageChatHolder(binding)
     }
 
     override fun getItemCount(): Int {
@@ -27,14 +26,9 @@ class FileStorageAdapter (
             files!!.size
     }
 
-    override fun onBindViewHolder(holder: FileStorageHolder, position: Int) {
+    override fun onBindViewHolder(holder: FileStorageChatHolder, position: Int) {
         files?.get(position)?.let { holder.bind(context, it) }
-        holder.itemView.setOnClickListener(this@FileStorageAdapter)
-    }
-
-    fun setNodes(files: List<String>?) {
-        this.files = files
-        notifyDataSetChanged()
+        holder.itemView.setOnClickListener(this@FileStorageChatAdapter)
     }
 
     override fun onClick(v: View?) {

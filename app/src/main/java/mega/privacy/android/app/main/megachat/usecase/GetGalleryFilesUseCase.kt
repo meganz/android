@@ -9,7 +9,7 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import io.reactivex.rxjava3.core.BackpressureStrategy
 import io.reactivex.rxjava3.core.Flowable
 import mega.privacy.android.app.main.megachat.data.FileGalleryItem
-import mega.privacy.android.app.utils.LogUtil
+import mega.privacy.android.app.utils.LogUtil.logError
 import javax.inject.Inject
 
 /**
@@ -29,7 +29,7 @@ class GetGalleryFilesUseCase @Inject constructor(
                 .sortedByDescending { it.dateAdded }
                 .toMutableList()
 
-            emitter.onNext(requestFiles!!)
+            emitter.onNext(requestFiles)
 
             emitter.setCancellable {
 
@@ -45,40 +45,29 @@ class GetGalleryFilesUseCase @Inject constructor(
      */
     private fun getFiles(): ArrayList<FileGalleryItem>? {
         val files: ArrayList<FileGalleryItem> = ArrayList()
-
-        val queryUri: Uri = MediaStore.Files.getContentUri("internal")
-
-        val selection = (MediaStore.Files.FileColumns.MEDIA_TYPE + "="
-                + MediaStore.Files.FileColumns.MEDIA_TYPE_IMAGE
-                + " OR "
-                + MediaStore.Files.FileColumns.MEDIA_TYPE + "="
-                + MediaStore.Files.FileColumns.MEDIA_TYPE_VIDEO)
-
+        val queryUri: Uri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI
+        val sortOrder = "${MediaStore.Images.Media.DATE_ADDED} DESC"
         val projection = arrayOf(
-            MediaStore.Files.FileColumns._ID,
-            MediaStore.Files.FileColumns.DATE_ADDED,
-            MediaStore.Files.FileColumns.MEDIA_TYPE,
-            MediaStore.Files.FileColumns.MIME_TYPE,
-            MediaStore.Files.FileColumns.TITLE
+            MediaStore.Images.Media._ID,
+            MediaStore.Images.Media.DATE_ADDED,
+            MediaStore.Images.Media.TITLE
         )
-
-        val sortOrder = "${MediaStore.Files.FileColumns.DATE_ADDED} DESC"
 
         context.contentResolver.query(
             queryUri,
             projection,
-            selection,
+            "",
             null,
             sortOrder
         )?.use { cursor ->
-            val idColumn = cursor.getColumnIndexOrThrow(MediaStore.Files.FileColumns._ID)
-            val mediaTypeColumn =
-                cursor.getColumnIndexOrThrow(MediaStore.Files.FileColumns.MEDIA_TYPE)
-            val dateColumn = cursor.getColumnIndexOrThrow(MediaStore.Files.FileColumns.DATE_ADDED)
+            val idColumn = cursor.getColumnIndexOrThrow(MediaStore.Images.Media._ID)
+            val dateColumn = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATE_ADDED)
+            val titleColumn = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.TITLE)
+
             while (cursor.moveToNext()) {
                 val id = cursor.getLong(idColumn)
-                val mediaType = cursor.getInt(mediaTypeColumn)
                 val date = cursor.getString(dateColumn)
+                val title = cursor.getString(titleColumn)
                 val contentUri = ContentUris.withAppendedId(
                     queryUri,
                     id
@@ -91,17 +80,19 @@ class GetGalleryFilesUseCase @Inject constructor(
 
                 val file = FileGalleryItem(
                     id,
-                    mediaType == MediaStore.Files.FileColumns.MEDIA_TYPE_IMAGE,
+                    title,
                     path,
                     date,
                     null
                 )
                 files.add(file)
             }
+
         } ?: kotlin.run {
-            LogUtil.logError("Cursor is null!")
+            logError("Cursor is null")
             return null
         }
+
         return files
     }
 }

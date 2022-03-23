@@ -1,4 +1,4 @@
-package mega.privacy.android.app.adapters.viewHolders
+package mega.privacy.android.app.main.megachat.chatAdapters
 
 import android.content.Context
 import androidx.core.view.isVisible
@@ -6,7 +6,7 @@ import androidx.recyclerview.widget.RecyclerView
 import mega.privacy.android.app.databinding.ItemFileStorageBinding
 import mega.privacy.android.app.fragments.homepage.getRoundingParams
 
-class FileStorageHolder(private val binding: ItemFileStorageBinding) :
+class FileStorageChatHolder (private val binding: ItemFileStorageBinding) :
     RecyclerView.ViewHolder(binding.root) {
 
 
@@ -14,9 +14,9 @@ class FileStorageHolder(private val binding: ItemFileStorageBinding) :
         binding.apply {
             imageThumbnail.setImageURI(item)
             imageThumbnail.isVisible = true
-                imageThumbnail.hierarchy.roundingParams = getRoundingParams(context)
-                videoThumbnail.isVisible = false
-                videoDuration.isVisible = false
+            imageThumbnail.hierarchy.roundingParams = getRoundingParams(context)
+            videoThumbnail.isVisible = false
+            videoDuration.isVisible = false
 
         }
     }

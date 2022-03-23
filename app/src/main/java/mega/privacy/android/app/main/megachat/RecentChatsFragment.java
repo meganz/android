@@ -393,9 +393,7 @@ public class RecentChatsFragment extends RotatableFragment implements View.OnCli
 
         emptyLayout = v.findViewById(R.id.linear_empty_layout_chat_recent);
         emptyDescriptionText = v.findViewById(R.id.empty_description_text_recent);
-        emptyDescriptionText.setText(replaceFormatText(StringResourcesUtils.getString(R.string.context_empty_chat_recent),
-                ColorUtils.getColorHexString(context, R.color.grey_900_grey_100),
-                ColorUtils.getColorHexString(context, R.color.grey_300_grey_600)));
+        emptyDescriptionText.setText(TextUtil.formatEmptyScreenText(context, StringResourcesUtils.getString(R.string.context_empty_chat_recent)));
 
         emptyTextViewInvite = v.findViewById(R.id.empty_text_chat_recent_invite);
         emptyTextView = v.findViewById(R.id.empty_text_chat_recent);
@@ -634,12 +632,7 @@ public class RecentChatsFragment extends RotatableFragment implements View.OnCli
 
         listView.setVisibility(View.GONE);
         emptyLayout.setVisibility(View.VISIBLE);
-        String textToShow, colorStart, colorEnd;
-        Spanned result;
-        colorStart =  ColorUtils.getColorHexString(context, R.color.grey_300_grey_600);
-        colorEnd =  ColorUtils.getColorHexString(context, R.color.grey_900_grey_100);
-        textToShow = StringResourcesUtils.getString(R.string.recent_chat_empty).toUpperCase();
-        result = replaceFormatText(textToShow, colorStart, colorEnd);
+        Spanned result = TextUtil.formatEmptyRecentChatsScreenText(context, StringResourcesUtils.getString(R.string.recent_chat_empty).toUpperCase());
 
         if (context instanceof ArchivedChatsActivity) {
             emptyTextView.setVisibility(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE ?
@@ -677,11 +670,7 @@ public class RecentChatsFragment extends RotatableFragment implements View.OnCli
         inviteButton.setVisibility(View.GONE);
 
         String textToShow = context.getString(R.string.recent_chat_loading_conversations).toUpperCase();
-        CharSequence result = replaceFormatText(textToShow,
-                ColorUtils.getColorHexString(context, R.color.grey_300_grey_600),
-                ColorUtils.getColorHexString(context, R.color.grey_900_grey_100));
-
-        emptyTextView.setText(result);
+        emptyTextView.setText(TextUtil.formatEmptyRecentChatsScreenText(context, textToShow));
         emptyTextView.setVisibility(View.VISIBLE);
     }
 
@@ -1834,9 +1823,7 @@ public class RecentChatsFragment extends RotatableFragment implements View.OnCli
                 inviteButton.setVisibility(View.GONE);
 
                 String textToShow = context.getString(R.string.recent_chat_empty).toUpperCase();
-                CharSequence result = replaceFormatText(textToShow, ColorUtils.getColorHexString(context, R.color.grey_300_grey_600), ColorUtils.getColorHexString(context, R.color.grey_900_grey_100));
-
-                emptyTextViewInvite.setText(result);
+                emptyTextViewInvite.setText(TextUtil.formatEmptyRecentChatsScreenText(context, textToShow));
                 emptyTextViewInvite.setVisibility(View.VISIBLE);
             } else {
                 logDebug("adapterList.getItemCount() NOT = 0");

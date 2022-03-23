@@ -152,22 +152,19 @@ public class TextUtil {
      *
      * @param context     Current Context object, to get a resource(for example, color)
      *                    should not use application context, need to pass it from the caller.
-     * @param emptyString The text to format.
+     * @param textToShow The text to format.
      * @return The string formatted.
      */
-    public static String formatEmptyScreenText(Context context, String emptyString) {
-        try {
-            emptyString = emptyString.replace("[A]", "<font color='"
-                    + ColorUtils.getColorHexString(context, R.color.grey_900_grey_100) + "'>");
-            emptyString = emptyString.replace("[/A]", "</font>");
-            emptyString = emptyString.replace("[B]", "<font color='"
-                    + ColorUtils.getColorHexString(context, R.color.grey_300_grey_600) + "'>");
-            emptyString = emptyString.replace("[/B]", "</font>");
-        } catch (Exception e) {
-            logWarning("Exception formatting string", e);
-        }
+    public static String formatEmptyScreenText(Context context, String textToShow) {
+        String colorStart = ColorUtils.getColorHexString(context, R.color.grey_900_grey_100);
+        String colorEnd =  ColorUtils.getColorHexString(context, R.color.grey_300_grey_600);
+        return replaceFormatText(textToShow, colorStart, colorEnd).toString();
+    }
 
-        return emptyString;
+    public static Spanned formatEmptyRecentChatsScreenText(Context context, String textToShow) {
+        String colorStart = ColorUtils.getColorHexString(context, R.color.grey_300_grey_600);
+        String colorEnd =  ColorUtils.getColorHexString(context, R.color.grey_900_grey_100);
+        return replaceFormatText(textToShow, colorStart, colorEnd);
     }
 
     /**
