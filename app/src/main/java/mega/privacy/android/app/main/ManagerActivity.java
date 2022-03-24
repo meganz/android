@@ -8728,7 +8728,8 @@ public class ManagerActivity extends TransfersManagementActivity
                 return;
             }
             if (intent.getBooleanExtra(VersionsFileActivity.KEY_DELETE_VERSION_HISTORY, false)) {
-                ArrayList<MegaNode> versions = megaApi.getVersions(selectedNode);
+                MegaNode node = megaApi.getNodeByHandle(intent.getLongExtra(VersionsFileActivity.KEY_DELETE_NODE_HANDLE, 0));
+                ArrayList<MegaNode> versions = megaApi.getVersions(node);
                 versionsToRemove = versions.size() - 1;
                 for (int i = 1; i < versions.size(); i++) {
                     megaApi.removeVersion(versions.get(i), this);
