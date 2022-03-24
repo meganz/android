@@ -7,9 +7,11 @@ import mega.privacy.android.app.di.MegaApi
 import mega.privacy.android.app.namecollision.data.NameCollision
 import mega.privacy.android.app.domain.exception.EmptyFolderException
 import mega.privacy.android.app.namecollision.data.NameCollisionType
+import mega.privacy.android.app.namecollision.exception.NoPendingCollisionsException
 import mega.privacy.android.app.uploadFolder.list.data.FolderContent
 import mega.privacy.android.app.usecase.GetNodeUseCase
 import mega.privacy.android.app.usecase.exception.MegaNodeException
+import mega.privacy.android.app.utils.LogUtil.logError
 import mega.privacy.android.app.utils.RxUtil.blockingGetOrNull
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
@@ -124,12 +126,64 @@ class CheckNameCollisionUseCase @Inject constructor(
         }
 
     /**
+     * Checks a list of MegaNode ir order to know which names already exist on the parent nodes
+     * in which them will be restored.
+     *
+     * @param nodes List of nodes to check.
+     * @return Single<Pair<List<NameCollision>, List<MegaNode>>> containing:
+     *  - First:    List of NameCollision with name collisions.
+     *  - Second:   List of MegaNode without name collision.
+     */
+    fun checkRestorations(nodes: List<MegaNode>): Single<Pair<ArrayList<NameCollision>, List<MegaNode>>> =
+        Single.create { emitter ->
+            if (nodes.isEmpty()) {
+                emitter.onError(NoPendingCollisionsException())
+                return@create
+            }
+
+            val collisions = ArrayList<NameCollision>()
+            val results = mutableListOf<MegaNode>()
+
+            nodes.forEach { node ->
+                if (emitter.isDisposed) {
+                    return@create
+                }
+
+                val restoreHandle = node.restoreHandle
+                val parent = getNodeUseCase.get(restoreHandle).blockingGetOrNull()
+
+                if (parent != null && !megaApi.isInRubbish(parent)) {
+                    check(node.name, parent).blockingSubscribeBy(
+                        onError = { error ->
+                            logError("No collision.", error)
+                            results.add(node)
+                        },
+                        onSuccess = { handle ->
+                            collisions.add(
+                                NameCollision.Movement.getMovementCollision(
+                                    handle,
+                                    node,
+                                    restoreHandle
+                                )
+                            )
+                        }
+                    )
+                }
+            }
+
+            when {
+                emitter.isDisposed -> return@create
+                else -> emitter.onSuccess(Pair(collisions, results))
+            }
+        }
+
+    /**
      * Checks a list of ShareInfo in order to know which names already exist
      * on the provided parent node.
      *
      * @param shareInfos    List of ShareInfo to check.
      * @param parentNode    Parent node in which to look.
-     * @return Single<Pair<List<ShareInfo>, List<ShareInfo>>> containing:
+     * @return Single<Pair<List<NameCollision>, List<ShareInfo>>> containing:
      *  - First:    List of NameCollision with name collisions.
      *  - Second:   List of ShareInfo without name collision.
      */

@@ -6447,6 +6447,25 @@ public class ManagerActivity extends TransfersManagementActivity
      * @param nodes List of nodes.
      */
     public void restoreFromRubbish(final List<MegaNode> nodes) {
+        checkNameCollisionUseCase.checkRestorations(nodes)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe((result, throwable) -> {
+                    if (throwable == null) {
+                        ArrayList<NameCollision> collisions = result.getFirst();
+                        if (!collisions.isEmpty()) {
+                            startActivity(NameCollisionActivity.getIntentForList(this, collisions));
+                        }
+
+                        List<MegaNode> nodesWithoutCollisions = result.getSecond();
+                        if (!nodesWithoutCollisions.isEmpty()) {
+                            proceedWithRestoration(nodesWithoutCollisions);
+                        }
+                    }
+                });
+    }
+
+    private void proceedWithRestoration(List<MegaNode> nodes) {
         moveNodeUseCase.restore(nodes)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
@@ -6455,11 +6474,11 @@ public class ManagerActivity extends TransfersManagementActivity
                         boolean notValidView = result.isSingleAction() && result.isSuccess()
                                 && parentHandleRubbish == nodes.get(0).getHandle();
 
-						showRestorationOrRemovalResult(notValidView, result.isForeignNode(),
-								result.getResultText());
-					}
-				});
-	}
+                        showRestorationOrRemovalResult(notValidView, result.isForeignNode(),
+                                result.getResultText());
+                    }
+                });
+    }
 
 	/**
 	 * Shows the final result of a restoration or removal from Rubbish Bin section.

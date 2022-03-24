@@ -336,7 +336,7 @@ class MoveNodeUseCase @Inject constructor(
 
                 val parent = getNodeUseCase.get(node.restoreHandle).blockingGetOrNull()
 
-                if (parent == null) {
+                if (parent == null || megaApi.isInRubbish(parent)) {
                     errorCount++
                 } else {
                     move(node, parent).blockingSubscribeBy(onError = { error ->
