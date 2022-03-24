@@ -1699,11 +1699,10 @@ public class PdfViewerActivity extends PasscodeActivity
     /**
      * Checks if there is a name collision before moving or copying the node.
      *
-     * @param handle       MegaNode handle to check.
      * @param parentHandle Parent handle of the node in which the node will be moved or copied.
      * @param type         Type of name collision to check.
      */
-    private void checkCollision(long handle, long parentHandle, NameCollisionType type) {
+    private void checkCollision(long parentHandle, NameCollisionType type) {
         checkNameCollisionUseCase.check(handle, parentHandle, type)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
@@ -1716,9 +1715,9 @@ public class PdfViewerActivity extends PasscodeActivity
                                 showSnackbar(SNACKBAR_TYPE, StringResourcesUtils.getString(R.string.general_error), MEGACHAT_INVALID_HANDLE);
                             } else if (throwable instanceof MegaNodeException.ChildDoesNotExistsException) {
                                 if (type == NameCollisionType.MOVEMENT) {
-                                    move(handle, parentHandle);
+                                    move(parentHandle);
                                 } else {
-                                    copy(handle, parentHandle);
+                                    copy(parentHandle);
                                 }
                             }
                         });
@@ -1727,10 +1726,9 @@ public class PdfViewerActivity extends PasscodeActivity
     /**
      * Moves the node.
      *
-     * @param handle       Handle of the node to move.
      * @param parentHandle Parent handle in which the node will be moved.
      */
-    private void move(long handle, long parentHandle) {
+    private void move(long parentHandle) {
         moveNodeUseCase.move(handle, parentHandle)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
@@ -1752,10 +1750,9 @@ public class PdfViewerActivity extends PasscodeActivity
     /**
      * Copies the node.
      *
-     * @param handle       Handle of the node to copy.
      * @param parentHandle Parent handle in which the node will be copied.
      */
-    private void copy(long handle, long parentHandle) {
+    private void copy(long parentHandle) {
         copyNodeUseCase.copy(handle, parentHandle)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
@@ -1803,52 +1800,42 @@ public class PdfViewerActivity extends PasscodeActivity
         }
 
         if (requestCode == REQUEST_CODE_SELECT_FOLDER_TO_MOVE && resultCode == RESULT_OK) {
-            if(!isOnline(this)){
+            if (!isOnline(this)) {
                 showSnackbar(SNACKBAR_TYPE, getString(R.string.error_server_connection_problem), -1);
                 return;
             }
 
-            final long[] moveHandles = intent.getLongArrayExtra("MOVE_HANDLES");
             final long toHandle = intent.getLongExtra("MOVE_TO", 0);
 
             AlertDialog temp;
-            try{
+            try {
                 temp = MegaProgressDialogUtil.createProgressDialog(this, getString(R.string.context_moving));
                 temp.show();
-            }
-            catch(Exception e){
+            } catch (Exception e) {
                 return;
             }
             statusDialog = temp;
 
-            if (moveHandles != null) {
-                checkCollision(moveHandles[0], toHandle, NameCollisionType.MOVEMENT);
-            }
-        }
-        else if (requestCode == REQUEST_CODE_SELECT_FOLDER_TO_COPY && resultCode == RESULT_OK){
-            if(!isOnline(this)){
+            checkCollision(toHandle, NameCollisionType.MOVEMENT);
+        } else if (requestCode == REQUEST_CODE_SELECT_FOLDER_TO_COPY && resultCode == RESULT_OK) {
+            if (!isOnline(this)) {
                 showSnackbar(SNACKBAR_TYPE, getString(R.string.error_server_connection_problem), -1);
                 return;
             }
 
-            final long[] copyHandles = intent.getLongArrayExtra("COPY_HANDLES");
             final long toHandle = intent.getLongExtra("COPY_TO", 0);
 
             AlertDialog temp;
-            try{
+            try {
                 temp = MegaProgressDialogUtil.createProgressDialog(this, getString(R.string.context_copying));
                 temp.show();
-            }
-            catch(Exception e){
+            } catch (Exception e) {
                 return;
             }
             statusDialog = temp;
 
-            if (copyHandles != null) {
-                checkCollision(copyHandles[0], toHandle, NameCollisionType.COPY);
-            }
-        }
-        else if (requestCode == REQUEST_CODE_SELECT_IMPORT_FOLDER && resultCode == RESULT_OK){
+            checkCollision(toHandle, NameCollisionType.COPY);
+        } else if (requestCode == REQUEST_CODE_SELECT_IMPORT_FOLDER && resultCode == RESULT_OK) {
             logDebug("REQUEST_CODE_SELECT_IMPORT_FOLDER OK");
 
             if(!isOnline(this)||megaApi==null) {

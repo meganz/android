@@ -9,6 +9,7 @@ import android.graphics.PixelFormat
 import android.os.Bundle
 import android.os.IBinder
 import android.view.*
+import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.viewModels
 import androidx.annotation.ColorInt
 import androidx.annotation.ColorRes
@@ -26,6 +27,7 @@ import mega.privacy.android.app.MimeTypeList
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.OfflineFileInfoActivity
 import mega.privacy.android.app.activities.PasscodeActivity
+import mega.privacy.android.app.activities.contract.NameCollisionActivityContract
 import mega.privacy.android.app.components.attacher.MegaAttacher
 import mega.privacy.android.app.components.dragger.DragToExitSupport
 import mega.privacy.android.app.components.saver.NodeSaver
@@ -38,6 +40,7 @@ import mega.privacy.android.app.interfaces.showSnackbar
 import mega.privacy.android.app.listeners.BaseListener
 import mega.privacy.android.app.main.FileExplorerActivity
 import mega.privacy.android.app.main.FileInfoActivity
+import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.main.controllers.ChatController
 import mega.privacy.android.app.main.controllers.NodeController
 import mega.privacy.android.app.mediaplayer.service.AudioPlayerService
@@ -46,6 +49,10 @@ import mega.privacy.android.app.mediaplayer.service.MediaPlayerServiceBinder
 import mega.privacy.android.app.mediaplayer.service.VideoPlayerService
 import mega.privacy.android.app.mediaplayer.trackinfo.TrackInfoFragment
 import mega.privacy.android.app.mediaplayer.trackinfo.TrackInfoFragmentArgs
+import mega.privacy.android.app.usecase.exception.ForeignNodeException
+import mega.privacy.android.app.usecase.exception.MegaException
+import mega.privacy.android.app.usecase.exception.OverQuotaException
+import mega.privacy.android.app.usecase.exception.PreOverQuotaException
 import mega.privacy.android.app.utils.*
 import mega.privacy.android.app.utils.AlertDialogUtil.dismissAlertDialogIfExists
 import mega.privacy.android.app.utils.AlertDialogUtil.isAlertDialogShown
@@ -58,7 +65,6 @@ import mega.privacy.android.app.utils.LogUtil.logDebug
 import mega.privacy.android.app.utils.LogUtil.logError
 import mega.privacy.android.app.utils.MegaNodeDialogUtil.moveToRubbishOrRemove
 import mega.privacy.android.app.utils.MegaNodeDialogUtil.showRenameNodeDialog
-import mega.privacy.android.app.utils.MegaNodeUtil.handleSelectFolderToImportResult
 import mega.privacy.android.app.utils.MegaNodeUtil.selectFolderToCopy
 import mega.privacy.android.app.utils.MegaNodeUtil.selectFolderToMove
 import mega.privacy.android.app.utils.MegaNodeUtil.shareLink
@@ -100,6 +106,8 @@ abstract class MediaPlayerActivity : PasscodeActivity(), SnackbarShower, Activit
 
     private var takenDownDialog: AlertDialog? = null
 
+    private lateinit var nameCollisionActivityContract: ActivityResultLauncher<Any>
+
     private val nodeAttacher by lazy { MegaAttacher(this) }
 
     private val nodeSaver by lazy {
@@ -139,6 +147,13 @@ abstract class MediaPlayerActivity : PasscodeActivity(), SnackbarShower, Activit
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        nameCollisionActivityContract =
+            registerForActivityResult(NameCollisionActivityContract()) { result ->
+                if (result != null) {
+                    showSnackbar(result)
+                }
+            }
 
         val extras = intent.extras
         if (extras == null) {
@@ -196,6 +211,16 @@ abstract class MediaPlayerActivity : PasscodeActivity(), SnackbarShower, Activit
 
         bindService(playerServiceIntent, connection, Context.BIND_AUTO_CREATE)
         serviceBound = true
+
+        viewModel.getCollision().observe(this) { collision ->
+            nameCollisionActivityContract.launch(collision)
+        }
+
+        viewModel.onSnackbarMessage().observe(this) { message ->
+            showSnackbar(message)
+        }
+
+        viewModel.onExceptionThrown().observe(this, ::manageException)
 
         viewModel.itemToRemove.observe(this) {
             playerService?.viewModel?.removeItem(it)
@@ -823,17 +848,29 @@ abstract class MediaPlayerActivity : PasscodeActivity(), SnackbarShower, Activit
             return
         }
 
-        if (requestCode == REQUEST_CODE_SELECT_IMPORT_FOLDER) {
-            val node = getChatMessageNode() ?: return
+        when (requestCode) {
+            REQUEST_CODE_SELECT_IMPORT_FOLDER -> {
+                val node = getChatMessageNode() ?: return
 
-            val toHandle = data?.getLongExtra(INTENT_EXTRA_KEY_IMPORT_TO, INVALID_HANDLE)
-            if (toHandle == null || toHandle == INVALID_HANDLE) {
-                return
+                val toHandle = data?.getLongExtra(INTENT_EXTRA_KEY_IMPORT_TO, INVALID_HANDLE)
+                    ?: return
+
+                viewModel.copyNode(node = node, newParentHandle = toHandle)
             }
+            REQUEST_CODE_SELECT_FOLDER_TO_MOVE -> {
+                val moveHandles = data?.getLongArrayExtra(INTENT_EXTRA_KEY_MOVE_HANDLES)
+                    ?: return
+                val toHandle = data.getLongExtra(INTENT_EXTRA_KEY_MOVE_TO, INVALID_HANDLE)
 
-            handleSelectFolderToImportResult(resultCode, toHandle, node, this, this)
-        } else {
-            viewModel.handleActivityResult(this, requestCode, resultCode, data, this, this)
+                viewModel.moveNode(moveHandles[0], toHandle)
+            }
+            REQUEST_CODE_SELECT_FOLDER_TO_COPY -> {
+                val copyHandles = data?.getLongArrayExtra(Constants.INTENT_EXTRA_KEY_COPY_HANDLES)
+                    ?: return
+                val toHandle = data.getLongExtra(INTENT_EXTRA_KEY_MOVE_TO, INVALID_HANDLE)
+
+                viewModel.copyNode(nodeHandle = copyHandles[0], newParentHandle = toHandle)
+            }
         }
     }
 
@@ -973,6 +1010,34 @@ abstract class MediaPlayerActivity : PasscodeActivity(), SnackbarShower, Activit
     @Suppress("deprecation") // TODO Migrate to registerForActivityResult()
     override fun launchActivityForResult(intent: Intent, requestCode: Int) {
         startActivityForResult(intent, requestCode)
+    }
+
+    /**
+     * Shows the result of an exception.
+     *
+     * @param throwable The exception.
+     */
+    private fun manageException(throwable: Throwable) {
+        when (throwable) {
+            is ForeignNodeException -> {
+                AlertsAndWarnings.showForeignStorageOverQuotaWarningDialog(this)
+            }
+            is OverQuotaException -> {
+                startActivity(Intent(this, ManagerActivity::class.java).apply {
+                    action = ACTION_OVERQUOTA_STORAGE
+                })
+                finish()
+            }
+            is PreOverQuotaException -> {
+                startActivity(Intent(this, ManagerActivity::class.java).apply {
+                    action = ACTION_PRE_OVERQUOTA_STORAGE
+                })
+                finish()
+            }
+            is MegaException -> {
+                showSnackbar(throwable.message!!)
+            }
+        }
     }
 
     companion object {

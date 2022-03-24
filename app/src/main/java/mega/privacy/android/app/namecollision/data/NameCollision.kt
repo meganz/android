@@ -157,7 +157,7 @@ sealed class NameCollision : Serializable {
                     name = node.name,
                     size = if (node.isFile) node.size else null,
                     folderContent = if (node.isFolder) getMegaNodeFolderInfo(node) else null,
-                    lastModified = node.modificationTime,
+                    lastModified = if (node.isFile) node.modificationTime else node.creationTime,
                     parentHandle = parentHandle,
                     isFile = node.isFile
                 )
@@ -207,7 +207,7 @@ sealed class NameCollision : Serializable {
                 name = node.name,
                 size = if (node.isFile) node.size else null,
                 folderContent = if (node.isFolder) getMegaNodeFolderInfo(node) else null,
-                lastModified = node.modificationTime,
+                lastModified = if (node.isFile) node.modificationTime else node.creationTime,
                 parentHandle = parentHandle,
                 isFile = node.isFile
             )

@@ -10,6 +10,7 @@ import android.os.CountDownTimer
 import android.view.Menu
 import android.view.MenuItem
 import android.view.ViewPropertyAnimator
+import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.viewModels
 import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
@@ -23,6 +24,7 @@ import com.jeremyliao.liveeventbus.LiveEventBus
 import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.PasscodeActivity
+import mega.privacy.android.app.activities.contract.NameCollisionActivityContract
 import mega.privacy.android.app.components.attacher.MegaAttacher
 import mega.privacy.android.app.components.saver.NodeSaver
 import mega.privacy.android.app.constants.EventConstants.EVENT_PERFORM_SCROLL
@@ -30,10 +32,17 @@ import mega.privacy.android.app.databinding.ActivityTextFileEditorBinding
 import mega.privacy.android.app.interfaces.Scrollable
 import mega.privacy.android.app.interfaces.ActionNodeCallback
 import mega.privacy.android.app.interfaces.SnackbarShower
+import mega.privacy.android.app.interfaces.showSnackbar
 import mega.privacy.android.app.main.FileExplorerActivity
+import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.main.controllers.ChatController
 import mega.privacy.android.app.utils.AlertsAndWarnings.showSaveToDeviceConfirmDialog
 import mega.privacy.android.app.textEditor.TextEditorViewModel.Companion.VIEW_MODE
+import mega.privacy.android.app.usecase.exception.ForeignNodeException
+import mega.privacy.android.app.usecase.exception.MegaException
+import mega.privacy.android.app.usecase.exception.OverQuotaException
+import mega.privacy.android.app.usecase.exception.PreOverQuotaException
+import mega.privacy.android.app.utils.AlertsAndWarnings.showForeignStorageOverQuotaWarningDialog
 import mega.privacy.android.app.utils.ChatUtil.removeAttachmentMessage
 import mega.privacy.android.app.utils.ColorUtils.changeStatusBarColorForElevation
 import mega.privacy.android.app.utils.ColorUtils.getColorForElevation
@@ -46,6 +55,7 @@ import mega.privacy.android.app.utils.MenuUtils.toggleAllMenuItemsVisibility
 import mega.privacy.android.app.utils.StringResourcesUtils
 import mega.privacy.android.app.utils.Util.*
 import mega.privacy.android.app.utils.ViewUtils.hideKeyboard
+import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 import nz.mega.sdk.MegaChatApi
 import nz.mega.sdk.MegaShare
 import kotlin.math.roundToInt
@@ -97,11 +107,15 @@ class TextEditorActivity : PasscodeActivity(), SnackbarShower, Scrollable {
         binding.fileEditorScrollView.scrollY = scrollY
     }
 
+    private lateinit var nameCollisionActivityContract: ActivityResultLauncher<Any>
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         binding = ActivityTextFileEditorBinding.inflate(layoutInflater)
         setContentView(binding.root)
+
+        setupLaunchers()
 
         setSupportActionBar(binding.fileEditorToolbar)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
@@ -240,7 +254,26 @@ class TextEditorActivity : PasscodeActivity(), SnackbarShower, Scrollable {
             return
         }
 
-        viewModel.handleActivityResult(this, requestCode, resultCode, data, this, this)
+        when (requestCode) {
+            REQUEST_CODE_SELECT_IMPORT_FOLDER -> {
+                val toHandle = data?.getLongExtra(INTENT_EXTRA_KEY_IMPORT_TO, INVALID_HANDLE)
+                    ?: return
+
+                viewModel.copyNode(toHandle)
+            }
+            REQUEST_CODE_SELECT_FOLDER_TO_MOVE -> {
+                val toHandle = data?.getLongExtra(INTENT_EXTRA_KEY_MOVE_TO, INVALID_HANDLE)
+                    ?: return
+
+                viewModel.moveNode(toHandle)
+            }
+            REQUEST_CODE_SELECT_FOLDER_TO_COPY -> {
+                val toHandle = data?.getLongExtra(INTENT_EXTRA_KEY_MOVE_TO, INVALID_HANDLE)
+                    ?: return
+
+                viewModel.copyNode(toHandle)
+            }
+        }
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
@@ -366,6 +399,15 @@ class TextEditorActivity : PasscodeActivity(), SnackbarShower, Scrollable {
         }
     }
 
+    private fun setupLaunchers() {
+        nameCollisionActivityContract =
+            registerForActivityResult(NameCollisionActivityContract()) { result ->
+                if (result != null) {
+                    showSnackbar(result)
+                }
+            }
+    }
+
     /**
      * Sets the initial state of view and asks for the content text.
      *
@@ -447,6 +489,13 @@ class TextEditorActivity : PasscodeActivity(), SnackbarShower, Scrollable {
         viewModel.getFileName().observe(this, ::showFileName)
         viewModel.getMode().observe(this, ::showMode)
         viewModel.onContentTextRead().observe(this, ::showContentRead)
+        viewModel.onSnackbarMessage().observe(this) { message ->
+            showSnackbar(message)
+        }
+        viewModel.getCollision().observe(this) { collision ->
+            nameCollisionActivityContract.launch(collision)
+        }
+        viewModel.onExceptionThrown().observe(this, ::manageException)
 
         LiveEventBus.get(EVENT_PERFORM_SCROLL, Int::class.java)
             .observeForever(performScrollObserver)
@@ -837,5 +886,33 @@ class TextEditorActivity : PasscodeActivity(), SnackbarShower, Scrollable {
         }
 
         changeStatusBarColorForElevation(this, scrolling)
+    }
+
+    /**
+     * Shows the result of an exception.
+     *
+     * @param throwable The exception.
+     */
+    private fun manageException(throwable: Throwable) {
+        when (throwable) {
+            is ForeignNodeException -> {
+                showForeignStorageOverQuotaWarningDialog(this)
+            }
+            is OverQuotaException -> {
+                startActivity(Intent(this, ManagerActivity::class.java).apply {
+                    action = ACTION_OVERQUOTA_STORAGE
+                })
+                finish()
+            }
+            is PreOverQuotaException -> {
+                startActivity(Intent(this, ManagerActivity::class.java).apply {
+                    action = ACTION_PRE_OVERQUOTA_STORAGE
+                })
+                finish()
+            }
+            is MegaException -> {
+                showSnackbar(throwable.message!!)
+            }
+        }
     }
 }

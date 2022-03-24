@@ -19,6 +19,7 @@ import com.google.android.material.appbar.AppBarLayout;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.switchmaterial.SwitchMaterial;
 
+import androidx.activity.result.ActivityResultLauncher;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.coordinatorlayout.widget.CoordinatorLayout;
@@ -58,12 +59,24 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
+import dagger.hilt.android.AndroidEntryPoint;
+import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
+import io.reactivex.rxjava3.schedulers.Schedulers;
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaOffline;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.MimeTypeThumbnail;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.activities.PasscodeActivity;
+import mega.privacy.android.app.activities.contract.NameCollisionActivityContract;
+import mega.privacy.android.app.namecollision.data.NameCollisionType;
+import mega.privacy.android.app.namecollision.usecase.CheckNameCollisionUseCase;
+import mega.privacy.android.app.usecase.CopyNodeUseCase;
+import mega.privacy.android.app.usecase.MoveNodeUseCase;
+import mega.privacy.android.app.usecase.exception.ForeignNodeException;
+import mega.privacy.android.app.usecase.exception.MegaNodeException;
+import mega.privacy.android.app.usecase.exception.OverQuotaException;
+import mega.privacy.android.app.usecase.exception.PreOverQuotaException;
 import mega.privacy.android.app.utils.MegaNodeUtil;
 import mega.privacy.android.app.utils.MegaProgressDialogUtil;
 import mega.privacy.android.app.components.SimpleDividerItemDecoration;
@@ -96,6 +109,7 @@ import nz.mega.sdk.MegaShare;
 import nz.mega.sdk.MegaUser;
 import nz.mega.sdk.MegaUserAlert;
 
+import static mega.privacy.android.app.utils.AlertDialogUtil.dismissAlertDialogIfExists;
 import static mega.privacy.android.app.utils.MegaProgressDialogUtil.createProgressDialog;
 import static mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil.*;
 import static mega.privacy.android.app.constants.BroadcastConstants.*;
@@ -124,10 +138,20 @@ import static nz.mega.sdk.MegaApiJava.INVALID_HANDLE;
 import static nz.mega.sdk.MegaApiJava.STORAGE_STATE_PAYWALL;
 import static nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE;
 
+import javax.inject.Inject;
+
 @SuppressLint("NewApi")
+@AndroidEntryPoint
 public class FileInfoActivity extends PasscodeActivity implements OnClickListener,
         MegaRequestListenerInterface, MegaGlobalListenerInterface, ActionNodeCallback,
         SnackbarShower {
+
+    @Inject
+    CheckNameCollisionUseCase checkNameCollisionUseCase;
+    @Inject
+    MoveNodeUseCase moveNodeUseCase;
+    @Inject
+    CopyNodeUseCase copyNodeUseCase;
 
 	public static int MAX_WIDTH_FILENAME_LAND=400;
 	public static int MAX_WIDTH_FILENAME_LAND_2=400;
@@ -305,6 +329,8 @@ public class FileInfoActivity extends PasscodeActivity implements OnClickListene
     private FileContactsListBottomSheetDialogFragment bottomSheetDialogFragment;
 
     private int currentColorFilter;
+
+    private ActivityResultLauncher<Object> nameCollisionActivityContract;
 
     private final BroadcastReceiver manageShareReceiver = new BroadcastReceiver() {
         @Override
@@ -497,6 +523,19 @@ public class FileInfoActivity extends PasscodeActivity implements OnClickListene
         if(shouldRefreshSessionDueToSDK() || shouldRefreshSessionDueToKarere()) {
             return;
         }
+
+        nameCollisionActivityContract = registerForActivityResult(
+                new NameCollisionActivityContract(),
+                result -> {
+                    if (result != null) {
+                        if (result.equals(StringResourcesUtils.getString(R.string.context_correctly_moved))) {
+                            finish();
+                            return;
+                        }
+
+                        showSnackbar(SNACKBAR_TYPE, result, MEGACHAT_INVALID_HANDLE);
+                    }
+                });
 
         fileInfoActivity = this;
         handler = new Handler();
@@ -1742,46 +1781,7 @@ public class FileInfoActivity extends PasscodeActivity implements OnClickListene
                     showSnackbar(SNACKBAR_TYPE, getString(R.string.context_no_removed), -1);
                 }
             }
-		}
-		else if (request.getType() == MegaRequest.TYPE_COPY){
-			try {
-				statusDialog.dismiss();
-			}
-			catch (Exception ex) {}
-
-			if (e.getErrorCode() == MegaError.API_OK){
-				if (request.getEmail() != null){
-				    showSnackbar(SNACKBAR_TYPE, getString(R.string.context_correctly_copied_contact) + request.getEmail(), -1);
-				}
-				else{
-				    showSnackbar(SNACKBAR_TYPE, getString(R.string.context_correctly_copied), -1);
-				}
-			}
-            else if(e.getErrorCode()==MegaError.API_EOVERQUOTA){
-                if (api.isForeignNode(request.getParentHandle())) {
-                    showForeignStorageOverQuotaWarningDialog(this);
-                    return;
-                }
-
-                logWarning("OVERQUOTA ERROR: " + e.getErrorCode());
-                Intent intent = new Intent(this, ManagerActivity.class);
-                intent.setAction(ACTION_OVERQUOTA_STORAGE);
-                startActivity(intent);
-                finish();
-
-            }
-            else if(e.getErrorCode()==MegaError.API_EGOINGOVERQUOTA){
-                logWarning("PRE OVERQUOTA ERROR: " + e.getErrorCode());
-                Intent intent = new Intent(this, ManagerActivity.class);
-                intent.setAction(ACTION_PRE_OVERQUOTA_STORAGE);
-                startActivity(intent);
-                finish();
-            }
-			else{
-			    showSnackbar(SNACKBAR_TYPE, getString(R.string.context_no_copied), -1);
-			}
-            logDebug("Copy nodes request finished");
-		} else if(request.getType() == MegaApiJava.USER_ATTR_AVATAR){
+        } else if (request.getType() == MegaApiJava.USER_ATTR_AVATAR) {
 			try{
 				statusDialog.dismiss();
 			}catch (Exception ex){
@@ -1828,6 +1828,93 @@ public class FileInfoActivity extends PasscodeActivity implements OnClickListene
         nodeSaver.handleRequestPermissionsResult(requestCode);
     }
 
+    /**
+     * Checks if there is a name collision before moving or copying the node.
+     *
+     * @param parentHandle Parent handle of the node in which the node will be moved or copied.
+     * @param type         Type of name collision to check.
+     */
+    private void checkCollision(long parentHandle, NameCollisionType type) {
+        checkNameCollisionUseCase.check(handle, parentHandle, type)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(collision -> {
+                            dismissAlertDialogIfExists(statusDialog);
+                            nameCollisionActivityContract.launch(collision);
+                        },
+                        throwable -> {
+                            if (throwable instanceof MegaNodeException.ParentDoesNotExistException) {
+                                showSnackbar(SNACKBAR_TYPE, StringResourcesUtils.getString(R.string.general_error), MEGACHAT_INVALID_HANDLE);
+                            } else if (throwable instanceof MegaNodeException.ChildDoesNotExistsException) {
+                                if (type == NameCollisionType.MOVEMENT) {
+                                    move(parentHandle);
+                                } else {
+                                    copy(parentHandle);
+                                }
+                            }
+                        });
+    }
+
+    /**
+     * Moves the node.
+     *
+     * @param parentHandle Parent handle in which the node will be moved.
+     */
+    private void move(long parentHandle) {
+        moveNodeUseCase.move(handle, parentHandle)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(() -> {
+                            dismissAlertDialogIfExists(statusDialog);
+                            showSnackbar(SNACKBAR_TYPE, StringResourcesUtils.getString(R.string.context_correctly_moved), MEGACHAT_INVALID_HANDLE);
+                            sendBroadcast(new Intent(BROADCAST_ACTION_INTENT_FILTER_UPDATE_FULL_SCREEN));
+                            finish();
+                        }, throwable -> {
+                            dismissAlertDialogIfExists(statusDialog);
+                            if (throwable instanceof ForeignNodeException) {
+                                showForeignStorageOverQuotaWarningDialog(this);
+                            } else {
+                                showSnackbar(SNACKBAR_TYPE, StringResourcesUtils.getString(R.string.context_no_moved), MEGACHAT_INVALID_HANDLE);
+                            }
+                        }
+                );
+    }
+
+    /**
+     * Copies the node.
+     *
+     * @param parentHandle Parent handle in which the node will be copied.
+     */
+    private void copy(long parentHandle) {
+        copyNodeUseCase.copy(handle, parentHandle)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(() -> {
+                            dismissAlertDialogIfExists(statusDialog);
+                            showSnackbar(SNACKBAR_TYPE, StringResourcesUtils.getString(R.string.context_correctly_copied), MEGACHAT_INVALID_HANDLE);
+                        }, throwable -> {
+                            dismissAlertDialogIfExists(statusDialog);
+                            if (throwable instanceof ForeignNodeException) {
+                                showForeignStorageOverQuotaWarningDialog(this);
+                            } else if (throwable instanceof OverQuotaException) {
+                                logWarning("OVERQUOTA ERROR: ", throwable);
+                                Intent intent = new Intent(this, ManagerActivity.class);
+                                intent.setAction(ACTION_OVERQUOTA_STORAGE);
+                                startActivity(intent);
+                                finish();
+                            } else if (throwable instanceof PreOverQuotaException) {
+                                logWarning("PRE OVERQUOTA ERROR: ", throwable);
+                                Intent intent = new Intent(this, ManagerActivity.class);
+                                intent.setAction(ACTION_PRE_OVERQUOTA_STORAGE);
+                                startActivity(intent);
+                                finish();
+                            } else {
+                                showSnackbar(SNACKBAR_TYPE, StringResourcesUtils.getString(R.string.context_no_copied), MEGACHAT_INVALID_HANDLE);
+                            }
+                        }
+                );
+    }
+
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent intent) {
 	    super.onActivityResult(requestCode, resultCode, intent);
@@ -1845,73 +1932,45 @@ public class FileInfoActivity extends PasscodeActivity implements OnClickListene
 			return;
 		}
 
-		if (requestCode == REQUEST_CODE_SELECT_MOVE_FOLDER && resultCode == RESULT_OK) {
-			if(!isOnline(this)){
-				showErrorAlertDialog(getString(R.string.error_server_connection_problem), false, this);
-				return;
-			}
+        if (requestCode == REQUEST_CODE_SELECT_MOVE_FOLDER && resultCode == RESULT_OK) {
+            if (!isOnline(this)) {
+                showErrorAlertDialog(getString(R.string.error_server_connection_problem), false, this);
+                return;
+            }
 
-			final long[] moveHandles = intent.getLongArrayExtra("MOVE_HANDLES");
-			final long toHandle = intent.getLongExtra("MOVE_TO", 0);
-			final int totalMoves = moveHandles.length;
+            final long toHandle = intent.getLongExtra("MOVE_TO", 0);
 
-			MegaNode parent = megaApi.getNodeByHandle(toHandle);
-			moveToRubbish = false;
+            moveToRubbish = false;
 
             AlertDialog temp;
-			try{
-				temp = MegaProgressDialogUtil.createProgressDialog(this, getString(R.string.context_moving));
-				temp.show();
-			}
-			catch(Exception e){
-				return;
-			}
-			statusDialog = temp;
+            try {
+                temp = MegaProgressDialogUtil.createProgressDialog(this, getString(R.string.context_moving));
+                temp.show();
+            } catch (Exception e) {
+                return;
+            }
+            statusDialog = temp;
 
-			for(int i=0; i<moveHandles.length;i++){
-				megaApi.moveNode(megaApi.getNodeByHandle(moveHandles[i]), parent, this);
-			}
-		}
-		else if (requestCode == REQUEST_CODE_SELECT_COPY_FOLDER && resultCode == RESULT_OK){
-			if(!isOnline(this)){
-				showErrorAlertDialog(getString(R.string.error_server_connection_problem), false, this);
-				return;
-			}
+            checkCollision(toHandle, NameCollisionType.MOVEMENT);
+        } else if (requestCode == REQUEST_CODE_SELECT_COPY_FOLDER && resultCode == RESULT_OK) {
+            if (!isOnline(this)) {
+                showErrorAlertDialog(getString(R.string.error_server_connection_problem), false, this);
+                return;
+            }
 
-			final long[] copyHandles = intent.getLongArrayExtra("COPY_HANDLES");
-			final long toHandle = intent.getLongExtra("COPY_TO", 0);
-			final int totalCopy = copyHandles.length;
+            final long toHandle = intent.getLongExtra("COPY_TO", 0);
 
             AlertDialog temp;
-			try{
-				temp = MegaProgressDialogUtil.createProgressDialog(this, getString(R.string.context_copying));
-				temp.show();
-			}
-			catch(Exception e){
-				return;
-			}
-			statusDialog = temp;
+            try {
+                temp = MegaProgressDialogUtil.createProgressDialog(this, getString(R.string.context_copying));
+                temp.show();
+            } catch (Exception e) {
+                return;
+            }
+            statusDialog = temp;
 
-			MegaNode parent = megaApi.getNodeByHandle(toHandle);
-			for(int i=0; i<copyHandles.length;i++){
-				MegaNode cN = megaApi.getNodeByHandle(copyHandles[i]);
-				if (cN != null){
-                    logDebug("cN != null, i = " + i + " of " + copyHandles.length);
-					megaApi.copyNode(cN, parent, this);
-				}
-				else{
-                    logDebug("cN == null, i = " + i + " of " + copyHandles.length);
-					try {
-						statusDialog.dismiss();
-						showSnackbar(SNACKBAR_TYPE, getString(R.string.context_no_copied), -1);
-					}
-					catch (Exception ex) {
-					    logError(ex.getMessage());
-                    }
-				}
-			}
-		}
-		else if (requestCode == REQUEST_CODE_SELECT_CONTACT && resultCode == RESULT_OK){
+            checkCollision(toHandle, NameCollisionType.COPY);
+        } else if (requestCode == REQUEST_CODE_SELECT_CONTACT && resultCode == RESULT_OK) {
 			if(!isOnline(this)){
 				showErrorAlertDialog(getString(R.string.error_server_connection_problem), false, this);
 				return;

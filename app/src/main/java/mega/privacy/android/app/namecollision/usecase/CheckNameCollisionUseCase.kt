@@ -37,9 +37,18 @@ class CheckNameCollisionUseCase @Inject constructor(
      * @return Single Long with the node handle with which there is a name collision.
      */
     fun check(handle: Long, parentHandle: Long, type: NameCollisionType): Single<NameCollision> =
-        Single.create { emitter ->
-            val node = getNodeUseCase.get(handle).blockingGetOrNull()
+        check(getNodeUseCase.get(handle).blockingGetOrNull(), parentHandle, type)
 
+    /**
+     * Checks if a node with the same name exists on the provided parent node.
+     *
+     * @param node          Node to check its name.
+     * @param parentHandle  Handle of the parent node in which to look.
+     * @param type          [NameCollisionType]
+     * @return Single Long with the node handle with which there is a name collision.
+     */
+    fun check(node: MegaNode?, parentHandle: Long, type: NameCollisionType): Single<NameCollision> =
+        Single.create { emitter ->
             if (node == null) {
                 emitter.onError(MegaNodeException.NodeDoesNotExistsException())
                 return@create

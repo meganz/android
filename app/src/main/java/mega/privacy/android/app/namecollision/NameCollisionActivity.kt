@@ -248,7 +248,10 @@ class NameCollisionActivity : PasscodeActivity() {
             }
             this.name.text = name
             size.text = if (isFile) getSizeString(collision.size!!) else collision.folderContent
-            date.text = formatLongDateTime(collision.lastModified / 1000)
+            date.text = formatLongDateTime(
+                if (collision is NameCollision.Upload) collision.lastModified / 1000
+                else collision.lastModified
+            )
 
             val thumbnailView = if (hasThumbnail) R.id.thumbnail else R.id.thumbnail_icon
 
@@ -302,10 +305,7 @@ class NameCollisionActivity : PasscodeActivity() {
             size.text =
                 if (isFile) getSizeString(collisionResult.collisionSize!!)
                 else collisionResult.collisionFolderContent
-            date.text = formatLongDateTime(
-                if (collision is NameCollision.Upload) collisionResult.collisionLastModified!!
-                else collisionResult.collisionLastModified!! / 1000
-            )
+            date.text = formatLongDateTime(collisionResult.collisionLastModified!!)
 
             val thumbnailView = if (hasThumbnail) R.id.thumbnail else R.id.thumbnail_icon
 
@@ -409,30 +409,32 @@ class NameCollisionActivity : PasscodeActivity() {
      * @param success True if the thumbnail was set, false otherwise.
      */
     private fun ViewNameCollisionOptionBinding.finishThumbnailRequest(success: Boolean) {
-        if (success) {
-            thumbnailIcon.isVisible = false
-        } else {
-            thumbnail.isVisible = false
-        }
-
-        val thumbnailView = if (success) R.id.thumbnail else R.id.thumbnail_icon
-
-        ConstraintSet().apply {
-            clone(root)
-
-            if (root.id == R.id.rename_view) {
-                connect(
-                    thumbnailView,
-                    ConstraintSet.BOTTOM,
-                    root.id,
-                    ConstraintSet.BOTTOM
-                )
-                centerVertically(R.id.name, thumbnailView)
+        runOnUiThread {
+            if (success) {
+                thumbnailIcon.isVisible = false
             } else {
-                connect(R.id.name, ConstraintSet.TOP, thumbnailView, ConstraintSet.TOP)
+                thumbnail.isVisible = false
             }
 
-            applyTo(root)
+            val thumbnailView = if (success) R.id.thumbnail else R.id.thumbnail_icon
+
+            ConstraintSet().apply {
+                clone(root)
+
+                if (root.id == R.id.rename_view) {
+                    connect(
+                        thumbnailView,
+                        ConstraintSet.BOTTOM,
+                        root.id,
+                        ConstraintSet.BOTTOM
+                    )
+                    centerVertically(R.id.name, thumbnailView)
+                } else {
+                    connect(R.id.name, ConstraintSet.TOP, thumbnailView, ConstraintSet.TOP)
+                }
+
+                applyTo(root)
+            }
         }
     }
 

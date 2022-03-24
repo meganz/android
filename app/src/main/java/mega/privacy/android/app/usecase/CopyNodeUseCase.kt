@@ -3,6 +3,7 @@ package mega.privacy.android.app.usecase
 import io.reactivex.rxjava3.core.Completable
 import io.reactivex.rxjava3.core.Single
 import io.reactivex.rxjava3.kotlin.blockingSubscribeBy
+import mega.privacy.android.app.R
 import mega.privacy.android.app.di.MegaApi
 import mega.privacy.android.app.listeners.OptionalMegaRequestListenerInterface
 import mega.privacy.android.app.namecollision.data.NameCollision
@@ -10,6 +11,7 @@ import mega.privacy.android.app.namecollision.data.NameCollisionResult
 import mega.privacy.android.app.usecase.data.CopyRequestResult
 import mega.privacy.android.app.usecase.exception.*
 import mega.privacy.android.app.utils.RxUtil.blockingGetOrNull
+import mega.privacy.android.app.utils.StringResourcesUtils.getString
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaError.*
@@ -40,6 +42,21 @@ class CopyNodeUseCase @Inject constructor(
         Completable.fromCallable {
             copy(
                 getNodeUseCase.get(handle).blockingGetOrNull(),
+                getNodeUseCase.get(parentHandle).blockingGetOrNull()
+            ).blockingAwait()
+        }
+
+    /**
+     * Copies a node.
+     *
+     * @param node          The MegaNode to copy.
+     * @param parentHandle  The parent MegaNode where the node has to be copied.
+     * @return Completable.
+     */
+    fun copy(node: MegaNode?, parentHandle: Long): Completable =
+        Completable.fromCallable {
+            copy(
+                node,
                 getNodeUseCase.get(parentHandle).blockingGetOrNull()
             ).blockingAwait()
         }
@@ -80,7 +97,12 @@ class CopyNodeUseCase @Inject constructor(
                         }
                     }
                     API_EGOINGOVERQUOTA -> emitter.onError(PreOverQuotaException())
-                    else -> emitter.onError(MegaException(error.errorCode, error.errorString))
+                    else -> emitter.onError(
+                        MegaException(
+                            error.errorCode,
+                            getString(R.string.context_no_copied)
+                        )
+                    )
                 }
             })
 
