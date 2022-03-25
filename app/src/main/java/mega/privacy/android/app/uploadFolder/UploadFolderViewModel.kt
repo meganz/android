@@ -390,16 +390,17 @@ class UploadFolderViewModel @Inject constructor(
      * @param uploadResults List of UploadFolderResult to upload.
      */
     private fun checkNameCollisions(uploadResults: MutableList<FolderContent.Data>) {
-        nameCollisionDisposable = checkNameCollisionUseCase.check(parentHandle, uploadResults)
-            .subscribeOn(AndroidSchedulers.mainThread())
-            .subscribeBy(
-                onError = { error -> logError("Cannot upload anything", error) },
-                onSuccess = { result ->
-                    collisions.value = result.first
-                    pendingUploads.addAll(result.second)
-                }
-            )
-            .addTo(composite)
+        nameCollisionDisposable =
+            checkNameCollisionUseCase.checkFolderUploadList(parentHandle, uploadResults)
+                .subscribeOn(AndroidSchedulers.mainThread())
+                .subscribeBy(
+                    onError = { error -> logError("Cannot upload anything", error) },
+                    onSuccess = { result ->
+                        collisions.value = result.first
+                        pendingUploads.addAll(result.second)
+                    }
+                )
+                .addTo(composite)
     }
 
     /**

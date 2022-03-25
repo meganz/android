@@ -60,6 +60,7 @@ import mega.privacy.android.app.UserCredentials;
 import mega.privacy.android.app.namecollision.data.NameCollision;
 import mega.privacy.android.app.namecollision.NameCollisionActivity;
 import mega.privacy.android.app.namecollision.usecase.CheckNameCollisionUseCase;
+import mega.privacy.android.app.usecase.CopyNodeUseCase;
 import mega.privacy.android.app.usecase.UploadUseCase;
 import mega.privacy.android.app.usecase.exception.MegaNodeException;
 import mega.privacy.android.app.utils.ChatUtil;
@@ -186,6 +187,8 @@ public class FileExplorerActivity extends TransfersManagementActivity
 	CheckNameCollisionUseCase checkNameCollisionUseCase;
 	@Inject
 	UploadUseCase uploadUseCase;
+	@Inject
+	CopyNodeUseCase copyNodeUseCase;
 
 	private DatabaseHandler dbH;
 	private MegaPreferences prefs;
@@ -1605,7 +1608,7 @@ public class FileExplorerActivity extends TransfersManagementActivity
 		finishActivity();
 	}
 
-	public void checkIfFilesExistsInMEGA () {
+	public void checkIfFilesExistsInMEGA() {
 		for (ShareInfo info : filePreparedInfos) {
 			String fingerprint = megaApi.getFingerprint(info.getFileAbsolutePath());
 			MegaNode node = megaApi.getNodeByFingerprint(fingerprint);
@@ -1614,13 +1617,27 @@ public class FileExplorerActivity extends TransfersManagementActivity
 //					File is in My Chat Files --> Add to attach
 					attachNodes.add(node);
 					filesChecked++;
-				}
-				else {
+				} else {
 //					File is in Cloud --> Copy in My Chat Files
-					megaApi.copyNode(node, myChatFilesNode, this);
+					copyNodeUseCase.copy(node, myChatFilesNode)
+							.subscribeOn(Schedulers.io())
+							.observeOn(AndroidSchedulers.mainThread())
+							.subscribe(() -> {
+								filesChecked++;
+								attachNodes.add(node);
+
+								if (filesChecked == filePreparedInfos.size()) {
+									startChatUploadService();
+								}
+							}, throwable -> {
+								filesChecked++;
+								logWarning("Error copying node into My Chat Files");
+								if (filesChecked == filePreparedInfos.size()) {
+									startChatUploadService();
+								}
+							});
 				}
-			}
-			else {
+			} else {
 				uploadInfos.add(info);
 				filesChecked++;
 			}
@@ -1685,7 +1702,7 @@ public class FileExplorerActivity extends TransfersManagementActivity
 			}
 
 			MegaNode finalParentNode = parentNode;
-			checkNameCollisionUseCase.check(infos, parentNode)
+			checkNameCollisionUseCase.checkShareInfoList(infos, parentNode)
 					.subscribeOn(Schedulers.io())
 					.observeOn(AndroidSchedulers.mainThread())
 					.subscribe((result, throwable) -> {
@@ -2147,20 +2164,6 @@ public class FileExplorerActivity extends TransfersManagementActivity
 
 				MegaApplication.setLoggingIn(false);
 				afterLoginAndFetch();
-			}
-		}
-		else if (request.getType() == MegaRequest.TYPE_COPY) {
-			filesChecked++;
-			if (error.getErrorCode() == MegaError.API_OK) {
-				MegaNode node = megaApi.getNodeByHandle(request.getNodeHandle());
-				if (node != null) {
-					attachNodes.add(node);
-				}
-			} else {
-				logWarning("Error copying node into My Chat Files");
-			}
-			if (filesChecked == filePreparedInfos.size()) {
-				startChatUploadService();
 			}
 		}
 	}

@@ -67,7 +67,7 @@ class MoveNodeUseCase @Inject constructor(
      * @param newName       New name for the moved node. Null if it wants to keep the original one.
      * @return Completable.
      */
-    fun move(node: MegaNode?, parentNode: MegaNode?, newName: String? = null): Completable =
+    private fun move(node: MegaNode?, parentNode: MegaNode?, newName: String? = null): Completable =
         Completable.create { emitter ->
             if (node == null) {
                 emitter.onError(MegaNodeException.NodeDoesNotExistsException())
@@ -140,7 +140,7 @@ class MoveNodeUseCase @Inject constructor(
                 return@create
             }
 
-            if (!rename) {
+            if (!rename && node.isFile) {
                 moveToRubbishBin(collisionResult.nameCollision.collisionHandle)
                     .blockingSubscribeBy(onError = { error -> emitter.onError(error) })
             }
@@ -152,6 +152,10 @@ class MoveNodeUseCase @Inject constructor(
             move(node, parentNode, if (rename) collisionResult.renameName else null)
                 .blockingSubscribeBy(
                     onError = { error ->
+                        if (emitter.isDisposed) {
+                            return@blockingSubscribeBy
+                        }
+
                         emitter.onSuccess(
                             MoveRequestResult.GeneralMovement(
                                 count = 1,
@@ -161,6 +165,10 @@ class MoveNodeUseCase @Inject constructor(
                         )
                     },
                     onComplete = {
+                        if (emitter.isDisposed) {
+                            return@blockingSubscribeBy
+                        }
+
                         emitter.onSuccess(
                             MoveRequestResult.GeneralMovement(
                                 count = 1,
@@ -194,10 +202,7 @@ class MoveNodeUseCase @Inject constructor(
 
                 move(collision, rename).blockingSubscribeBy(onError = { error ->
                     errorCount++
-
-                    if (error is MegaException && error.errorCode == API_EOVERQUOTA) {
-                        isForeignNode = megaApi.isForeignNode(collision.nameCollision.parentHandle)
-                    }
+                    isForeignNode = error is ForeignNodeException
                 })
             }
 
@@ -238,10 +243,6 @@ class MoveNodeUseCase @Inject constructor(
             }
 
             handles.forEach { handle ->
-                if (emitter.isDisposed) {
-                    return@create
-                }
-
                 val node = getNodeUseCase.get(handle).blockingGetOrNull()
 
                 if (node == null) {
@@ -250,10 +251,7 @@ class MoveNodeUseCase @Inject constructor(
                     move(node, parentNode)
                         .blockingSubscribeBy(onError = { error ->
                             errorCount++
-
-                            if (error is MegaException && error.errorCode == API_EOVERQUOTA) {
-                                isForeignNode = megaApi.isForeignNode(parentNode.handle)
-                            }
+                            isForeignNode = error is ForeignNodeException
                         })
                 }
             }
@@ -287,10 +285,6 @@ class MoveNodeUseCase @Inject constructor(
             }
 
             handles.forEach { handle ->
-                if (emitter.isDisposed) {
-                    return@create
-                }
-
                 val node = getNodeUseCase.get(handle).blockingGetOrNull()
 
                 if (node == null) {
@@ -330,10 +324,6 @@ class MoveNodeUseCase @Inject constructor(
             }
 
             nodes.forEach { node ->
-                if (emitter.isDisposed) {
-                    return@create
-                }
-
                 val parent = getNodeUseCase.get(node.restoreHandle).blockingGetOrNull()
 
                 if (parent == null || megaApi.isInRubbish(parent)) {
@@ -341,10 +331,7 @@ class MoveNodeUseCase @Inject constructor(
                 } else {
                     move(node, parent).blockingSubscribeBy(onError = { error ->
                         errorCount++
-
-                        if (error is MegaException && error.errorCode == API_EOVERQUOTA) {
-                            isForeignNode = megaApi.isForeignNode(node.restoreHandle)
-                        }
+                        isForeignNode = error is ForeignNodeException
                     })
                 }
             }

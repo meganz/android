@@ -305,6 +305,7 @@ import mega.privacy.android.app.fragments.managerFragments.cu.PhotosFragment;
 import mega.privacy.android.app.fragments.managerFragments.cu.album.AlbumContentFragment;
 import mega.privacy.android.app.gallery.ui.MediaDiscoveryFragment;
 import mega.privacy.android.app.namecollision.NameCollisionActivity;
+import mega.privacy.android.app.namecollision.data.NameCollisionType;
 import mega.privacy.android.app.objects.PasscodeManagement;
 import mega.privacy.android.app.fragments.homepage.documents.DocumentsFragment;
 import mega.privacy.android.app.generalusecase.FilePrepareUseCase;
@@ -394,13 +395,18 @@ import mega.privacy.android.app.sync.cusync.CuSyncManager;
 import mega.privacy.android.app.sync.fileBackups.FileBackupManager;
 import mega.privacy.android.app.upgradeAccount.UpgradeAccountActivity;
 
+import mega.privacy.android.app.usecase.CopyNodeUseCase;
 import mega.privacy.android.app.usecase.GetNodeUseCase;
 import mega.privacy.android.app.usecase.MoveNodeUseCase;
 import mega.privacy.android.app.usecase.RemoveNodeUseCase;
 import mega.privacy.android.app.usecase.UploadUseCase;
+import mega.privacy.android.app.usecase.data.CopyRequestResult;
 import mega.privacy.android.app.usecase.data.MoveRequestResult;
 import mega.privacy.android.app.namecollision.usecase.CheckNameCollisionUseCase;
+import mega.privacy.android.app.usecase.exception.ForeignNodeException;
 import mega.privacy.android.app.usecase.exception.MegaNodeException;
+import mega.privacy.android.app.usecase.exception.OverQuotaException;
+import mega.privacy.android.app.usecase.exception.PreOverQuotaException;
 import mega.privacy.android.app.utils.AlertsAndWarnings;
 import mega.privacy.android.app.utils.AvatarUtil;
 import mega.privacy.android.app.utils.CallUtil;
@@ -533,6 +539,8 @@ public class ManagerActivity extends TransfersManagementActivity
     CheckNameCollisionUseCase checkNameCollisionUseCase;
     @Inject
     UploadUseCase uploadUseCase;
+    @Inject
+    CopyNodeUseCase copyNodeUseCase;
 
 	public ArrayList<Integer> transfersInProgress;
 	public MegaTransferData transferData;
@@ -8526,15 +8534,32 @@ public class ManagerActivity extends TransfersManagementActivity
                 return;
             }
 
-            moveNodeUseCase.move(moveHandles, toHandle)
+            checkNameCollisionUseCase.checkHandleList(moveHandles, toHandle, NameCollisionType.MOVEMENT)
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe((result, throwable) -> {
                         if (throwable == null) {
-                            showMovementResult(result, moveHandles[0]);
+                            ArrayList<NameCollision> collisions = result.getFirst();
+
+                            if (!collisions.isEmpty()) {
+                                dismissAlertDialogIfExists(statusDialog);
+                                startActivity(NameCollisionActivity.getIntentForList(this, collisions));
+                            }
+
+                            long[] handlesWithoutCollision = result.getSecond();
+
+                            if (handlesWithoutCollision.length > 0) {
+                                moveNodeUseCase.move(handlesWithoutCollision, toHandle)
+                                        .subscribeOn(Schedulers.io())
+                                        .observeOn(AndroidSchedulers.mainThread())
+                                        .subscribe((moveResult, moveThrowable) -> {
+                                            if (moveThrowable == null) {
+                                                showMovementResult(moveResult, handlesWithoutCollision[0]);
+                                            }
+                                        });
+                            }
                         }
                     });
-
         } else if (requestCode == REQUEST_CODE_SELECT_FOLDER_TO_COPY && resultCode == RESULT_OK) {
             logDebug("REQUEST_CODE_SELECT_COPY_FOLDER");
 
@@ -8549,7 +8574,39 @@ public class ManagerActivity extends TransfersManagementActivity
                 return;
             }
 
-            nC.copyNodes(copyHandles, toHandle);
+            checkNameCollisionUseCase.checkHandleList(copyHandles, toHandle, NameCollisionType.COPY)
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe((result, throwable) -> {
+                        if (throwable == null) {
+                            ArrayList<NameCollision> collisions = result.getFirst();
+
+                            if (!collisions.isEmpty()) {
+                                dismissAlertDialogIfExists(statusDialog);
+                                startActivity(NameCollisionActivity.getIntentForList(this, collisions));
+                            }
+
+                            long[] handlesWithoutCollision = result.getSecond();
+
+                            if (handlesWithoutCollision.length > 0) {
+                                copyNodeUseCase.copy(handlesWithoutCollision, toHandle)
+                                        .subscribeOn(Schedulers.io())
+                                        .observeOn(AndroidSchedulers.mainThread())
+                                        .subscribe((copyResult, copyThrowable) -> {
+                                            dismissAlertDialogIfExists(statusDialog);
+                                            if (copyThrowable == null) {
+                                                showCopyResult(copyResult);
+                                            } else if (copyThrowable instanceof ForeignNodeException) {
+                                                showForeignStorageOverQuotaWarningDialog(this);
+                                            } else if (copyThrowable instanceof OverQuotaException) {
+                                                showOverquotaAlert(false);
+                                            } else if (copyThrowable instanceof PreOverQuotaException) {
+                                                showOverquotaAlert(true);
+                                            }
+                                        });
+                            }
+                        }
+                    });
         } else if (requestCode == REQUEST_CODE_REFRESH_API_SERVER && resultCode == RESULT_OK) {
             logDebug("Resfresh DONE");
 
@@ -8772,6 +8829,32 @@ public class ManagerActivity extends TransfersManagementActivity
         } else {
             logWarning("No request code processed");
             super.onActivityResult(requestCode, resultCode, intent);
+        }
+    }
+
+    /**
+     * Shows the copy result.
+     *
+     * @param result Object containing the request result.
+     */
+    private void showCopyResult(CopyRequestResult result) {
+        showSnackbar(SNACKBAR_TYPE, result.getResultText(), MEGACHAT_INVALID_HANDLE);
+
+        if (result.getSuccessCount() <= 0) {
+            return;
+        }
+
+        if (drawerItem == DrawerItem.CLOUD_DRIVE) {
+            if (isCloudAdded()) {
+                ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getNodeByHandle(parentHandleBrowser),
+                        sortOrderManagement.getOrderCloud());
+                fileBrowserFragment.setNodes(nodes);
+                fileBrowserFragment.getRecyclerView().invalidate();
+            }
+        } else if (drawerItem == DrawerItem.RUBBISH_BIN) {
+            refreshRubbishBin();
+        } else if (drawerItem == DrawerItem.INBOX) {
+            refreshInboxList();
         }
     }
 
@@ -9412,7 +9495,7 @@ public class ManagerActivity extends TransfersManagementActivity
             return;
         }
 
-        checkNameCollisionUseCase.check(infos, parentNode)
+        checkNameCollisionUseCase.checkShareInfoList(infos, parentNode)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe((result, throwable) -> {
@@ -9906,44 +9989,6 @@ public class ManagerActivity extends TransfersManagementActivity
 			else{
 				showSnackbar(SNACKBAR_TYPE, getString(R.string.error_general_nodes), -1);
 			}
-        } else if (request.getType() == MegaRequest.TYPE_COPY) {
-            logDebug("TYPE_COPY");
-
-            dismissAlertDialogIfExists(statusDialog);
-
-            if (e.getErrorCode() == MegaError.API_OK) {
-                logDebug("Show snackbar!!!!!!!!!!!!!!!!!!!");
-                showSnackbar(SNACKBAR_TYPE, getString(R.string.context_correctly_copied), -1);
-
-				if (drawerItem == DrawerItem.CLOUD_DRIVE) {
-					if (isCloudAdded()) {
-						ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getNodeByHandle(parentHandleBrowser),
-								sortOrderManagement.getOrderCloud());
-						fileBrowserFragment.setNodes(nodes);
-						fileBrowserFragment.getRecyclerView().invalidate();
-					}
-				} else if (drawerItem == DrawerItem.RUBBISH_BIN) {
-					refreshRubbishBin();
-				} else if (drawerItem == DrawerItem.INBOX) {
-					refreshInboxList();
-				}
-
-                resetAccountDetailsTimeStamp();
-            } else {
-                if (e.getErrorCode() == MegaError.API_EOVERQUOTA) {
-                    logWarning("OVERQUOTA ERROR: " + e.getErrorCode());
-                    if (api.isForeignNode(request.getParentHandle())) {
-                        showForeignStorageOverQuotaWarningDialog(this);
-                    } else {
-                        showOverquotaAlert(false);
-                    }
-                } else if (e.getErrorCode() == MegaError.API_EGOINGOVERQUOTA) {
-                    logDebug("OVERQUOTA ERROR: " + e.getErrorCode());
-                    showOverquotaAlert(true);
-                } else {
-                    showSnackbar(SNACKBAR_TYPE, getString(R.string.context_no_copied), -1);
-                }
-            }
         } else if (request.getType() == MegaRequest.TYPE_CREATE_FOLDER) {
             dismissAlertDialogIfExists(statusDialog);
             if (e.getErrorCode() == MegaError.API_OK) {

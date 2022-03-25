@@ -53,12 +53,23 @@ import java.util.Stack;
 import javax.inject.Inject;
 
 import dagger.hilt.android.AndroidEntryPoint;
+import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
+import io.reactivex.rxjava3.schedulers.Schedulers;
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.TransfersManagementActivity;
+import mega.privacy.android.app.namecollision.NameCollisionActivity;
+import mega.privacy.android.app.namecollision.data.NameCollision;
+import mega.privacy.android.app.namecollision.data.NameCollisionType;
+import mega.privacy.android.app.namecollision.usecase.CheckNameCollisionUseCase;
+import mega.privacy.android.app.usecase.CopyNodeUseCase;
+import mega.privacy.android.app.usecase.data.CopyRequestResult;
+import mega.privacy.android.app.usecase.exception.ForeignNodeException;
+import mega.privacy.android.app.usecase.exception.OverQuotaException;
+import mega.privacy.android.app.usecase.exception.PreOverQuotaException;
 import mega.privacy.android.app.utils.LogUtil;
 import mega.privacy.android.app.imageviewer.ImageViewerActivity;
 import mega.privacy.android.app.utils.MegaProgressDialogUtil;
@@ -67,7 +78,6 @@ import mega.privacy.android.app.components.saver.NodeSaver;
 import mega.privacy.android.app.interfaces.SnackbarShower;
 import mega.privacy.android.app.fragments.settingsFragments.cookie.CookieDialogHandler;
 import mega.privacy.android.app.main.adapters.MegaNodeAdapter;
-import mega.privacy.android.app.main.listeners.MultipleRequestListenerLink;
 import mega.privacy.android.app.modalbottomsheet.FolderLinkBottomSheetDialogFragment;
 import mega.privacy.android.app.utils.AlertsAndWarnings;
 import mega.privacy.android.app.utils.ColorUtils;
@@ -83,6 +93,7 @@ import static mega.privacy.android.app.components.dragger.DragToExitSupport.obse
 import static mega.privacy.android.app.components.dragger.DragToExitSupport.putThumbnailLocation;
 import static mega.privacy.android.app.constants.BroadcastConstants.ACTION_CLOSE_CHAT_AFTER_IMPORT;
 import static mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil.*;
+import static mega.privacy.android.app.utils.AlertDialogUtil.dismissAlertDialogIfExists;
 import static mega.privacy.android.app.utils.AlertsAndWarnings.showForeignStorageOverQuotaWarningDialog;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.FileUtil.*;
@@ -96,6 +107,11 @@ import static mega.privacy.android.app.utils.Util.*;
 @AndroidEntryPoint
 public class FolderLinkActivity extends TransfersManagementActivity implements MegaRequestListenerInterface, OnClickListener, DecryptAlertDialog.DecryptDialogListener,
 		SnackbarShower {
+
+	@Inject
+	CheckNameCollisionUseCase checkNameCollisionUseCase;
+	@Inject
+	CopyNodeUseCase copyNodeUseCase;
 
 	private static final String TAG_DECRYPT = "decrypt";
 
@@ -139,9 +155,7 @@ public class FolderLinkActivity extends TransfersManagementActivity implements M
 
 	long toHandle = 0;
 	long fragmentHandle = -1;
-	int cont = 0;
 	AlertDialog statusDialog;
-	MultipleRequestListenerLink importLinkMultipleListener = null;
 	private int orderGetChildren = MegaApiJava.ORDER_DEFAULT_ASC;
 
 	DatabaseHandler dbH = null;
@@ -647,60 +661,86 @@ public class FolderLinkActivity extends TransfersManagementActivity implements M
 			toHandle = intent.getLongExtra("IMPORT_TO", 0);
 			fragmentHandle = intent.getLongExtra("fragmentH", -1);
 
-			MegaNode target = megaApi.getNodeByHandle(toHandle);
-			if(target == null){
-				if (megaApi.getRootNode() != null){
-					target = megaApi.getRootNode();
-				}
-			}
-
 			statusDialog = MegaProgressDialogUtil.createProgressDialog(this, getString(R.string.general_importing));
 			statusDialog.show();
 
-			if(adapterList != null && adapterList.isMultipleSelect()){
+			if (adapterList != null && adapterList.isMultipleSelect()) {
 				logDebug("Is multiple select");
 				List<MegaNode> nodes = adapterList.getSelectedNodes();
-				if(nodes.size() != 0){
-					if (target != null){
-						logDebug("Target node: " + target.getHandle());
-						for(MegaNode node : nodes ){
-							node = megaApiFolder.authorizeNode(node);
-							if(node != null){
-								cont ++;
-								importLinkMultipleListener = new MultipleRequestListenerLink(this, cont, cont, FOLDER_LINK);
-								megaApi.copyNode(node, target, importLinkMultipleListener);
-							}else{
-								showSnackbar(SNACKBAR_TYPE, getString(R.string.context_no_copied));
-							}
-						}
-					}else{
-						showSnackbar(SNACKBAR_TYPE, getString(R.string.context_no_copied));
-					}
-				}else{
+				if (nodes.isEmpty()) {
 					logWarning("No selected nodes");
 					showSnackbar(SNACKBAR_TYPE, getString(R.string.context_no_copied));
+					return;
 				}
-			}else{
+
+				checkNameCollisionUseCase.checkNodeList(nodes, toHandle, NameCollisionType.COPY)
+						.subscribeOn(Schedulers.io())
+						.observeOn(AndroidSchedulers.mainThread())
+						.subscribe((result, throwable) -> {
+							if (throwable == null) {
+								ArrayList<NameCollision> collisions = result.getFirst();
+
+								if (!collisions.isEmpty()) {
+									dismissAlertDialogIfExists(statusDialog);
+									startActivity(NameCollisionActivity.getIntentForList(this, collisions));
+								}
+
+								List<MegaNode> nodesWithoutCollisions = result.getSecond();
+
+								if (!nodesWithoutCollisions.isEmpty()) {
+									copyNodeUseCase.copy(nodesWithoutCollisions, toHandle)
+											.subscribeOn(Schedulers.io())
+											.observeOn(AndroidSchedulers.mainThread())
+											.subscribe((copyResult, copyThrowable) -> {
+												showCopyResult(copyResult, copyThrowable);
+											});
+								}
+							}
+						});
+			} else if (selectedNode != null) {
 				logDebug("No multiple select");
-				if(selectedNode!=null){
-					if (target != null){
-						logDebug("Target node: " + target.getHandle());
-						selectedNode = megaApiFolder.authorizeNode(selectedNode);
-						if (selectedNode != null){
-							cont ++;
-							importLinkMultipleListener = new MultipleRequestListenerLink(this, cont, cont, FOLDER_LINK);
-							megaApi.copyNode(selectedNode, target, importLinkMultipleListener);
-						}else{
-							showSnackbar(SNACKBAR_TYPE, getString(R.string.context_no_copied));
-						}
-					}else{
-						showSnackbar(SNACKBAR_TYPE, getString(R.string.context_no_copied));
-					}
-				}else{
-					logWarning("Selected Node is NULL");
-					showSnackbar(SNACKBAR_TYPE, getString(R.string.context_no_copied));
-				}
+					selectedNode = megaApiFolder.authorizeNode(selectedNode);
+
+				checkNameCollisionUseCase.check(selectedNode, toHandle, NameCollisionType.COPY)
+						.subscribeOn(Schedulers.io())
+						.observeOn(AndroidSchedulers.mainThread())
+						.subscribe((collision, throwable) -> {
+							if (throwable == null) {
+								dismissAlertDialogIfExists(statusDialog);
+								startActivity(NameCollisionActivity.getIntentForSingleItem(this, collision));
+							} else {
+								copyNodeUseCase.copy(selectedNode, toHandle)
+										.subscribeOn(Schedulers.io())
+										.observeOn(AndroidSchedulers.mainThread())
+										.subscribe(() -> showSnackbar(SNACKBAR_TYPE, getString(R.string.context_correctly_copied)),
+												copyThrowable -> showCopyResult(null, copyThrowable));
+							}
+						});
+			} else {
+				logWarning("Selected Node is NULL");
+				showSnackbar(SNACKBAR_TYPE, getString(R.string.context_no_copied));
 			}
+		}
+	}
+
+	/**
+	 * Shows the copy Result.
+	 *
+	 * @param copyRequestResult	Object containing the request result.
+	 * @param throwable
+	 */
+	private void showCopyResult(CopyRequestResult copyRequestResult, Throwable throwable) {
+		clearSelections();
+		hideMultipleSelect();
+
+		if (copyRequestResult != null) {
+			showSnackbar(SNACKBAR_TYPE, copyRequestResult.getResultText());
+		} else if (throwable instanceof ForeignNodeException) {
+			showForeignStorageOverQuotaWarningDialog(this);
+		} else if (throwable instanceof OverQuotaException) {
+			errorOverquota();
+		} else if (throwable instanceof PreOverQuotaException) {
+			errorPreOverquota();
 		}
 	}
 
@@ -814,41 +854,7 @@ public class FolderLinkActivity extends TransfersManagementActivity implements M
 					}
 				}
 			}
-		}
-		else if (request.getType() == MegaRequest.TYPE_COPY){
-			if (e.getErrorCode() != MegaError.API_OK) {
-				logWarning("ERROR: " + e.getErrorString());
-				if(e.getErrorCode()==MegaError.API_EOVERQUOTA){
-					if (api.isForeignNode(request.getParentHandle())) {
-						showForeignStorageOverQuotaWarningDialog(this);
-						return;
-					}
-
-					logWarning("OVERQUOTA ERROR: " + e.getErrorCode());
-					Intent intent = new Intent(this, ManagerActivity.class);
-					intent.setAction(ACTION_OVERQUOTA_STORAGE);
-					startActivity(intent);
-					finish();
-				}
-				else if(e.getErrorCode()==MegaError.API_EGOINGOVERQUOTA){
-					logWarning("OVERQUOTA ERROR: " + e.getErrorCode());
-					Intent intent = new Intent(this, ManagerActivity.class);
-					intent.setAction(ACTION_PRE_OVERQUOTA_STORAGE);
-					startActivity(intent);
-					finish();
-				}
-				else{
-					showSnackbar(SNACKBAR_TYPE, getString(R.string.context_no_copied));
-				}
-
-			}else{
-				logDebug("onRequestFinish:OK");
-				showSnackbar(SNACKBAR_TYPE, getString(R.string.context_no_copied));
-				clearSelections();
-				hideMultipleSelect();
-			}
-		}
-		else if (request.getType() == MegaRequest.TYPE_FETCH_NODES){
+		} else if (request.getType() == MegaRequest.TYPE_FETCH_NODES) {
 
 			if (e.getErrorCode() == MegaError.API_OK) {
 				logDebug("DOCUMENTNODEHANDLEPUBLIC: " + request.getNodeHandle());

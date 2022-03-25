@@ -746,7 +746,7 @@ public class FileContactListActivity extends PasscodeActivity implements OnClick
 			return;
 		}
 
-		checkNameCollisionUseCase.check(infos, parentNode)
+		checkNameCollisionUseCase.checkShareInfoList(infos, parentNode)
 				.subscribeOn(Schedulers.io())
 				.observeOn(AndroidSchedulers.mainThread())
 				.subscribe((result, throwable) -> {

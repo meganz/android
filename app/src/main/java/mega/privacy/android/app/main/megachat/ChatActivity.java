@@ -98,6 +98,8 @@ import mega.privacy.android.app.contacts.usecase.InviteContactUseCase;
 import mega.privacy.android.app.main.FileExplorerActivity;
 import mega.privacy.android.app.main.FileLinkActivity;
 import mega.privacy.android.app.main.FolderLinkActivity;
+import mega.privacy.android.app.namecollision.usecase.CheckNameCollisionUseCase;
+import mega.privacy.android.app.usecase.CopyNodeUseCase;
 import mega.privacy.android.app.usecase.GetAvatarUseCase;
 import mega.privacy.android.app.usecase.GetPublicLinkInformationUseCase;
 import mega.privacy.android.app.utils.MegaProgressDialogUtil;
@@ -329,6 +331,10 @@ public class ChatActivity extends PasscodeActivity
     GetAvatarUseCase getAvatarUseCase;
     @Inject
     GetPublicLinkInformationUseCase getPublicLinkInformationUseCase;
+    @Inject
+    CheckNameCollisionUseCase checkNameCollisionUseCase;
+    @Inject
+    CopyNodeUseCase copyNodeUseCase;
 
     private int currentRecordButtonState;
     private String mOutputFilePath;

@@ -1849,20 +1849,7 @@ public class PdfViewerActivity extends PasscodeActivity
             }
 
             final long toHandle = intent.getLongExtra("IMPORT_TO", 0);
-            MegaNode target;
-            target = megaApi.getNodeByHandle(toHandle);
-            if(target == null){
-                target = megaApi.getRootNode();
-            }
-            logDebug("TARGET: " + target.getName() + "and handle: " + target.getHandle());
-            if (nodeChat != null) {
-                logDebug("DOCUMENT: " + nodeChat.getName() + "_" + nodeChat.getHandle());
-                megaApi.copyNode(nodeChat, target, this);
-            }
-            else{
-                logError("DOCUMENT: null");
-                showSnackbar(SNACKBAR_TYPE, getString(R.string.import_success_error), -1);
-            }
+            checkCollision(toHandle, NameCollisionType.COPY);
         }
     }
 

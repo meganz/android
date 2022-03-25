@@ -1,6 +1,7 @@
 package mega.privacy.android.app.usecase.data
 
 import mega.privacy.android.app.R
+import mega.privacy.android.app.utils.DBUtil
 import mega.privacy.android.app.utils.StringResourcesUtils.getString
 
 /**
@@ -30,4 +31,13 @@ data class CopyRequestResult(
                 successCount
             ) + getString(R.string.number_no_copied, errorCount)
         }
+
+    /**
+     * Resets the account details timestamp if some request finished with success.
+     */
+    fun resetAccountDetailsIfNeeded() {
+        if (successCount > 0) {
+            DBUtil.resetAccountDetailsTimeStamp()
+        }
+    }
 }

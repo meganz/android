@@ -41,19 +41,29 @@ import java.io.File;
 import javax.inject.Inject;
 
 import dagger.hilt.android.AndroidEntryPoint;
+import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
+import io.reactivex.rxjava3.schedulers.Schedulers;
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.TransfersManagementActivity;
 import mega.privacy.android.app.imageviewer.ImageViewerActivity;
+import mega.privacy.android.app.namecollision.NameCollisionActivity;
+import mega.privacy.android.app.namecollision.data.NameCollisionType;
+import mega.privacy.android.app.namecollision.usecase.CheckNameCollisionUseCase;
+import mega.privacy.android.app.usecase.CopyNodeUseCase;
+import mega.privacy.android.app.usecase.exception.ForeignNodeException;
+import mega.privacy.android.app.usecase.exception.MegaNodeException;
+import mega.privacy.android.app.usecase.exception.OverQuotaException;
+import mega.privacy.android.app.usecase.exception.PreOverQuotaException;
 import mega.privacy.android.app.utils.MegaProgressDialogUtil;
 import mega.privacy.android.app.components.saver.NodeSaver;
 import mega.privacy.android.app.interfaces.SnackbarShower;
 import mega.privacy.android.app.fragments.settingsFragments.cookie.CookieDialogHandler;
-import mega.privacy.android.app.main.listeners.MultipleRequestListenerLink;
 import mega.privacy.android.app.utils.AlertsAndWarnings;
 import mega.privacy.android.app.utils.ColorUtils;
+import mega.privacy.android.app.utils.StringResourcesUtils;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaNode;
@@ -61,6 +71,7 @@ import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
 
 import static mega.privacy.android.app.constants.BroadcastConstants.ACTION_CLOSE_CHAT_AFTER_IMPORT;
+import static mega.privacy.android.app.utils.AlertDialogUtil.dismissAlertDialogIfExists;
 import static mega.privacy.android.app.utils.AlertsAndWarnings.showForeignStorageOverQuotaWarningDialog;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
@@ -68,10 +79,16 @@ import static mega.privacy.android.app.utils.MegaApiUtils.*;
 import static mega.privacy.android.app.utils.MegaNodeUtil.*;
 import static mega.privacy.android.app.utils.PreviewUtils.*;
 import static mega.privacy.android.app.utils.Util.*;
+import static nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE;
 
 @AndroidEntryPoint
 public class FileLinkActivity extends TransfersManagementActivity implements MegaRequestListenerInterface, OnClickListener,DecryptAlertDialog.DecryptDialogListener,
 		SnackbarShower {
+
+	@Inject
+	CheckNameCollisionUseCase checkNameCollisionUseCase;
+	@Inject
+	CopyNodeUseCase copyNodeUseCase;
 
 	private static final String TAG_DECRYPT = "decrypt";
 
@@ -88,8 +105,6 @@ public class FileLinkActivity extends TransfersManagementActivity implements Meg
 
 	long toHandle = 0;
 	long fragmentHandle = -1;
-	int cont = 0;
-	MultipleRequestListenerLink importLinkMultipleListener = null;
 
 	CoordinatorLayout fragmentContainer;
 	AppBarLayout appBarLayout;
@@ -531,9 +546,7 @@ public class FileLinkActivity extends TransfersManagementActivity implements Meg
 				trySetupCollapsingToolbar();
 
 				if (importClicked){
-					if ((document != null) && (target != null)){
-						megaApi.copyNode(document, target, this);
-					}
+					copyNode();
 				}
 			}
 			else{
@@ -619,55 +632,6 @@ public class FileLinkActivity extends TransfersManagementActivity implements Meg
 				}
 			}
 		}
-		else if (request.getType() == MegaRequest.TYPE_COPY){
-			
-			try{
-				statusDialog.dismiss(); 
-			} catch(Exception ex){
-				logError(ex.getMessage());
-			}
-
-			if (e.getErrorCode() != MegaError.API_OK) {
-
-				logDebug("e.getErrorCode() != MegaError.API_OK");
-				
-				if(e.getErrorCode()==MegaError.API_EOVERQUOTA){
-					if (api.isForeignNode(request.getParentHandle())) {
-						showForeignStorageOverQuotaWarningDialog(this);
-						return;
-					}
-
-					logWarning("OVERQUOTA ERROR: " + e.getErrorCode());
-					Intent intent = new Intent(this, ManagerActivity.class);
-					intent.setAction(ACTION_OVERQUOTA_STORAGE);
-					startActivity(intent);
-					finish();
-
-				}
-				else if(e.getErrorCode()==MegaError.API_EGOINGOVERQUOTA){
-
-					logWarning("PRE OVERQUOTA ERROR: " + e.getErrorCode());
-					Intent intent = new Intent(this, ManagerActivity.class);
-					intent.setAction(ACTION_PRE_OVERQUOTA_STORAGE);
-					startActivity(intent);
-					finish();
-				}
-				else
-				{
-					showSnackbar(SNACKBAR_TYPE, getString(R.string.context_no_copied));
-					Intent intent = new Intent(this, ManagerActivity.class);
-					intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
-					startActivity(intent);
-					finish();
-				}							
-				
-			}else{
-				Intent intent = new Intent(this, ManagerActivity.class);
-				intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
-				startActivity(intent);
-				finish();
-			}
-		}
 	}
 
 	@Override
@@ -701,6 +665,46 @@ public class FileLinkActivity extends TransfersManagementActivity implements Meg
 		Intent intent = new Intent(this, FileExplorerActivity.class);
 		intent.setAction(FileExplorerActivity.ACTION_PICK_IMPORT_FOLDER);
 		startActivityForResult(intent, REQUEST_CODE_SELECT_IMPORT_FOLDER);
+	}
+
+	private void copyNode() {
+		checkNameCollisionUseCase.check(document, target, NameCollisionType.COPY)
+				.subscribeOn(Schedulers.io())
+				.observeOn(AndroidSchedulers.mainThread())
+				.subscribe(collision ->
+								startActivity(NameCollisionActivity.getIntentForSingleItem(this, collision)),
+						throwable -> {
+							if (throwable instanceof MegaNodeException.ParentDoesNotExistException) {
+								showSnackbar(SNACKBAR_TYPE, StringResourcesUtils.getString(R.string.general_error), MEGACHAT_INVALID_HANDLE);
+							} else if (throwable instanceof MegaNodeException.ChildDoesNotExistsException) {
+								copyNodeUseCase.copy(document, target)
+										.subscribeOn(Schedulers.io())
+										.observeOn(AndroidSchedulers.mainThread())
+										.subscribe(() ->
+												showCopyResult(null), this::showCopyResult);
+							}
+						});
+	}
+
+	private void showCopyResult(Throwable throwable) {
+		dismissAlertDialogIfExists(statusDialog);
+
+		if (throwable == null) {
+			startActivity(new Intent(this, ManagerActivity.class)
+					.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK));
+			finish();
+		} else if (throwable instanceof OverQuotaException) {
+			errorOverquota();
+		} else if (throwable instanceof PreOverQuotaException) {
+			errorPreOverquota();
+		} else if (throwable instanceof ForeignNodeException) {
+			showForeignStorageOverQuotaWarningDialog(this);
+		} else {
+			showSnackbar(SNACKBAR_TYPE, getString(R.string.context_no_copied));
+			startActivity(new Intent(this, ManagerActivity.class)
+					.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK));
+			finish();
+		}
 	}
 
 	public void showFile(){
@@ -878,34 +882,17 @@ public class FileLinkActivity extends TransfersManagementActivity implements Meg
 			toHandle = intent.getLongExtra("IMPORT_TO", 0);
 			fragmentHandle = intent.getLongExtra("fragmentH", -1);
 
-			MegaNode target = megaApi.getNodeByHandle(toHandle);
-			if (target == null) {
-				if (megaApi.getRootNode() != null) {
-					target = megaApi.getRootNode();
-				}
-			}
+			target = megaApi.getNodeByHandle(toHandle);
 
 			statusDialog = MegaProgressDialogUtil.createProgressDialog(this, getString(R.string.general_importing));
 			statusDialog.show();
 
-			if (document != null) {
-				if (target != null) {
-					logDebug("Target node: " + target.getHandle());
-					cont++;
-					importLinkMultipleListener = new MultipleRequestListenerLink(this, cont, cont, FILE_LINK);
-					megaApi.copyNode(document, target, importLinkMultipleListener);
-				} else {
-					logWarning("TARGET == null");
-				}
+			if (document == null) {
+				importClicked = true;
 			} else {
-				logWarning("Selected Node is NULL");
-				if (target != null) {
-					importClicked = true;
-				}
+				copyNode();
 			}
-
 		}
-
 	}
 
 	public void showSnackbar(int type, String s){
