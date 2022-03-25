@@ -132,14 +132,14 @@ abstract class BaseZoomFragment : BaseFragment(), GestureScaleCallback,
             viewTypePanel
                 .animate()
                 .translationYBy(deltaY)
-                .setDuration(Constants.ANIMATION_DURATION)
+                .setDuration(ANIMATION_DURATION)
                 .withEndAction { viewTypePanel.visibility = View.GONE }
                 .start()
         } else {
             viewTypePanel
                 .animate()
                 .translationYBy(-deltaY)
-                .setDuration(Constants.ANIMATION_DURATION)
+                .setDuration(ANIMATION_DURATION)
                 .withStartAction { viewTypePanel.visibility = View.VISIBLE }
                 .start()
         }
@@ -152,27 +152,6 @@ abstract class BaseZoomFragment : BaseFragment(), GestureScaleCallback,
             val newList = ArrayList(it)
             gridAdapter.submitList(newList)
         }
-    }
-
-    /**
-     *     Remove the green border and selected checkmark icon for unselected items
-     */
-    private fun deselectNodesUI() {
-        for (pos in actionModeViewModel.deselectedNodeIndices) {
-            listView.findViewHolderForAdapterPosition(pos)?.let { viewHolder ->
-                val itemView = viewHolder.itemView
-
-                itemView
-                    .findViewById<SimpleDraweeView>(R.id.thumbnail)
-                    .hierarchy
-                    .roundingParams = null
-
-                itemView
-                    .findViewById<ImageView>(R.id.icon_selected)
-                    ?.visibility = View.GONE
-            }
-        }
-        actionModeViewModel.deselectedNodeIndices.clear()
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -238,16 +217,13 @@ abstract class BaseZoomFragment : BaseFragment(), GestureScaleCallback,
         DragToExitSupport.observeDragSupportEvents(
             viewLifecycleOwner,
             listView,
-            Constants.VIEWER_FROM_PHOTOS
+            VIEWER_FROM_PHOTOS
         )
     }
 
     private fun setupActionMode() {
         actionModeCallback =
             ActionModeCallback(mManagerActivity, actionModeViewModel, megaApi)
-
-        actionModeViewModel.setUIDirty(false)
-
         observeItemLongClick()
         observeSelectedItems()
         observeAnimatedItems()
@@ -360,7 +336,6 @@ abstract class BaseZoomFragment : BaseFragment(), GestureScaleCallback,
     override fun onCardClicked(position: Int, card: GalleryCard) {
         when (selectedView) {
             DAYS_VIEW -> {
-                zoomViewModel.restoreDefaultZoom()
                 handleZoomMenuItemStatus()
                 newViewClicked(ALL_VIEW)
                 val photoPosition = gridAdapter.getNodePosition(card.node.handle)
@@ -422,7 +397,7 @@ abstract class BaseZoomFragment : BaseFragment(), GestureScaleCallback,
                         intent,
                         listView,
                         nodeItem.index,
-                        Constants.VIEWER_FROM_PHOTOS,
+                        VIEWER_FROM_PHOTOS,
                         getter
                     )
                 }
@@ -452,6 +427,8 @@ abstract class BaseZoomFragment : BaseFragment(), GestureScaleCallback,
                 actionMode?.apply {
                     finish()
                 }
+
+                whenEndActionMode()
             } else {
                 actionModeCallback.nodeCount = getNodeCount()
 
@@ -468,6 +445,8 @@ abstract class BaseZoomFragment : BaseFragment(), GestureScaleCallback,
                 }
 
                 actionMode?.title = it.size.toString()
+
+                whenStartActionMode()
             }
         }
 
@@ -495,7 +474,6 @@ abstract class BaseZoomFragment : BaseFragment(), GestureScaleCallback,
 
                 override fun onAnimationEnd(animation: Animator?) {
                     updateUiWhenAnimationEnd()
-                    deselectNodesUI()
                 }
 
                 override fun onAnimationCancel(animation: Animator?) {
@@ -551,7 +529,7 @@ abstract class BaseZoomFragment : BaseFragment(), GestureScaleCallback,
 
             activity.hideKeyboardSearch()  // Make the snack bar visible to the user
             activity.showSnackbar(
-                Constants.SNACKBAR_TYPE,
+                SNACKBAR_TYPE,
                 context.getString(R.string.error_server_connection_problem),
                 MegaChatApiJava.MEGACHAT_INVALID_HANDLE
             )
@@ -773,4 +751,21 @@ abstract class BaseZoomFragment : BaseFragment(), GestureScaleCallback,
     fun isGridAdapterInitialized():Boolean{
         return this::gridAdapter.isInitialized
     }
+
+    /**
+     * Sub fragment can custom operation when start ActionMode
+     */
+    open fun whenStartActionMode(){}
+
+    /**
+     * Sub fragment can custom operation when end ActionMode
+     */
+    open fun whenEndActionMode(){}
+
+    /**
+     * Check is in action mode.
+     *
+     * @return true in, false not in
+     */
+    fun isInActionMode() = actionMode != null
 }

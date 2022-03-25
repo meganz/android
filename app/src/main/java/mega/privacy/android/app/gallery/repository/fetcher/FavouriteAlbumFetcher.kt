@@ -142,14 +142,18 @@ class FavouriteAlbumFetcher(
         var muFolderNode: MegaNode? = null
         val pref = getDbPreferences()
 
-        pref?.let {
-            // get cuFolderNode
-            val cuHandle = stringHandleToLong(it.camSyncHandle, ERROR_MSG_PARSE_CU_HANDLE)
-            cuFolderNode = getNodeByHandle(cuHandle)
-
-            // get muFolderNode
-            val muHandle = stringHandleToLong(it.camSyncHandle, ERROR_MSG_PARSE_MU_HANDLE)
-            muFolderNode = getNodeByHandle(muHandle)
+        pref?.let { it ->
+            // get cuFolderNode if cu handle existed
+            it.camSyncHandle?.let { camSyncHandle ->
+                val cuHandle = stringHandleToLong(camSyncHandle, ERROR_MSG_PARSE_CU_HANDLE)
+                cuFolderNode = getNodeByHandle(cuHandle)
+            }
+            // get muFolderNode if mu handle existed
+            it.megaHandleSecondaryFolder?.let { megaHandleSecondaryFolder ->
+                val muHandle =
+                    stringHandleToLong(megaHandleSecondaryFolder, ERROR_MSG_PARSE_MU_HANDLE)
+                muFolderNode = getNodeByHandle(muHandle)
+            }
         }
         val allCuNodes = getAllNodesFromCUAndMU(cuFolderNode, muFolderNode)
         val videos = filterCuVideos(allCuNodes)
