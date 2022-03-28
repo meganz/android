@@ -165,6 +165,66 @@ sealed class NameCollision : Serializable {
     }
 
     /**
+     * Data class containing all the required to present an import name collision.
+     *
+     * @property collisionHandle    The node handle with which there is a name collision.
+     * @property nodeHandle         The node handle of the node to import.
+     * @property chatId             The chat identifier where is the node to import.
+     * @property messageId          The message identifier where is the node to import.
+     * @property name               The name of the node to import.
+     * @property size               The size of the node to import.
+     * @property folderContent      Null as the node is a file.
+     * @property lastModified       The last modified date of the node to import.
+     * @property parentHandle       The parent handle of the node in which the file has to be imported.
+     * @property isFile             True as the node is a file.
+     */
+    data class Import constructor(
+        override val collisionHandle: Long,
+        val nodeHandle: Long,
+        val chatId: Long,
+        val messageId: Long,
+        override val name: String,
+        override val size: Long? = null,
+        override val folderContent: String? = null,
+        override val lastModified: Long,
+        override val parentHandle: Long,
+        override val isFile: Boolean = true
+    ) : NameCollision() {
+
+        companion object {
+
+            /**
+             * Gets a [NameCollision.Import] from a [MegaNode].
+             *
+             * @param collisionHandle   The node handle with which there is a name collision.
+             * @property nodeHandle     The node handle of the node to import.
+             * @property chatId         The chat identifier where is the node to import.
+             * @property messageId      The message identifier where is the node to import.
+             * @param node              The node from which the [NameCollision.Import] will be get.
+             * @param parentHandle      The parent handle of the node in which the file has to be copied.
+             */
+            @JvmStatic
+            fun getImportCollision(
+                collisionHandle: Long,
+                chatId: Long,
+                messageId: Long,
+                node: MegaNode,
+                parentHandle: Long
+            ): Import =
+                Import(
+                    collisionHandle = collisionHandle,
+                    nodeHandle = node.handle,
+                    chatId = chatId,
+                    messageId = messageId,
+                    name = node.name,
+                    size = node.size,
+                    lastModified = node.modificationTime,
+                    parentHandle = parentHandle
+                )
+        }
+    }
+
+    /**
      * Data class containing all the required to present a movement name collision.
      *
      * @property collisionHandle    The node handle with which there is a name collision.

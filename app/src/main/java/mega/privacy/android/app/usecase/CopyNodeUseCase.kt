@@ -51,16 +51,6 @@ class CopyNodeUseCase @Inject constructor(
      * Copies a node.
      *
      * @param node          The MegaNode to copy.
-     * @param parentNode    The parent MegaNode where the node has to be copied.
-     * @return Completable.
-     */
-    fun copy(node: MegaNode, parentNode: MegaNode): Completable =
-        Completable.fromCallable { copy(node, parentNode).blockingAwait() }
-
-    /**
-     * Copies a node.
-     *
-     * @param node          The MegaNode to copy.
      * @param parentHandle  The parent MegaNode where the node has to be copied.
      * @return Completable.
      */
@@ -137,9 +127,30 @@ class CopyNodeUseCase @Inject constructor(
         rename: Boolean
     ): Single<CopyRequestResult> =
         Single.create { emitter ->
-            val node = getNodeUseCase
-                .get((collisionResult.nameCollision as NameCollision.Copy).nodeHandle)
-                .blockingGetOrNull()
+            val node = if (collisionResult.nameCollision is NameCollision.Import) {
+                val collision = collisionResult.nameCollision
+                val nodes = getNodeUseCase.get(collision.chatId, collision.messageId)
+                    .blockingGetOrNull()
+
+                if (nodes == null) {
+                    null
+                } else {
+                    var nodeCollision: MegaNode? = null
+
+                    for (node in nodes) {
+                        if (node.handle == collision.nodeHandle) {
+                            nodeCollision = node
+                            break
+                        }
+                    }
+
+                    nodeCollision
+                }
+            } else {
+                getNodeUseCase
+                    .get((collisionResult.nameCollision as NameCollision.Copy).nodeHandle)
+                    .blockingGetOrNull()
+            }
 
             if (node == null) {
                 emitter.onError(MegaNodeException.NodeDoesNotExistsException())
@@ -316,68 +327,5 @@ class CopyNodeUseCase @Inject constructor(
                     isForeignNode
                 ).apply { resetAccountDetailsIfNeeded() }
             )
-        }
-
-    /**
-     * Imports/copies nodes from a chat conversation.
-     *
-     * @param messageIds    Array containing the message ids with the nodes to import.
-     * @param chatId        Identifier of the chat from which the nodes will be imported.
-     * @param parentHandle  Parent MegaNode handle in which the nodes have to be imported.
-     * @return Single with the [CopyRequestResult].
-     */
-    fun import(
-        messageIds: LongArray,
-        chatId: Long,
-        parentHandle: Long
-    ): Single<CopyRequestResult> =
-        Single.create { emitter ->
-            if (chatId == MEGACHAT_INVALID_HANDLE || megaChatApi.getChatRoom(chatId) == null) {
-                emitter.onError(ChatDoesNotExistException())
-                return@create
-            }
-
-            val parentNode = getNodeUseCase.get(parentHandle).blockingGetOrNull()
-
-            if (parentNode == null) {
-                emitter.onError(MegaNodeException.ParentDoesNotExistException())
-                return@create
-            }
-
-            if (messageIds.isEmpty()) {
-                emitter.onError(MessageDoesNotExistException())
-                return@create
-            }
-
-            var errorCount = 0
-            var isForeignNode = false
-            var nodesSize = 0
-
-            messageIds.forEach { messageId ->
-                val attachments = megaChatApi.getMessage(chatId, messageId)?.megaHandleList
-
-                if (attachments != null) {
-                    for (i in 0 until attachments.size()) {
-                        nodesSize++
-                        copy(attachments.get(i), parentHandle).blockingSubscribeBy(
-                            onError = { error ->
-                                errorCount++
-                                isForeignNode = error is ForeignNodeException
-                            }
-                        )
-                    }
-                }
-            }
-
-            when {
-                emitter.isDisposed -> return@create
-                else -> emitter.onSuccess(
-                    CopyRequestResult(
-                        nodesSize,
-                        errorCount,
-                        isForeignNode
-                    ).apply { resetAccountDetailsIfNeeded() }
-                )
-            }
         }
 }

@@ -14,8 +14,8 @@ import io.reactivex.rxjava3.schedulers.Schedulers;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.ShareInfo;
+import mega.privacy.android.app.activities.contract.NameCollisionActivityContract;
 import mega.privacy.android.app.namecollision.data.NameCollision;
-import mega.privacy.android.app.namecollision.NameCollisionActivity;
 import mega.privacy.android.app.namecollision.usecase.CheckNameCollisionUseCase;
 import mega.privacy.android.app.usecase.UploadUseCase;
 import mega.privacy.android.app.usecase.exception.MegaNodeException;
@@ -32,6 +32,7 @@ import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.Util.showSnackbar;
 import static nz.mega.sdk.MegaApiJava.STORAGE_STATE_PAYWALL;
 
+import androidx.activity.result.ActivityResultLauncher;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
@@ -44,6 +45,21 @@ public class QRCodeSaveBottomSheetDialogFragment extends BaseBottomSheetDialogFr
     CheckNameCollisionUseCase checkNameCollisionUseCase;
     @Inject
     UploadUseCase uploadUseCase;
+
+    private ActivityResultLauncher<Object> nameCollisionActivityContract;
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+        nameCollisionActivityContract = registerForActivityResult(
+                new NameCollisionActivityContract(),
+                result -> {
+                    if (result != null) {
+                        showSnackbar(requireActivity(), result);
+                    }
+                });
+    }
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -96,7 +112,7 @@ public class QRCodeSaveBottomSheetDialogFragment extends BaseBottomSheetDialogFr
                             NameCollision collision = NameCollision.Upload
                                     .getUploadCollision(handle, qrFile, parentNode.getParentHandle());
 
-                            startActivity(NameCollisionActivity.getIntentForSingleItem(requireActivity(), collision));
+                            nameCollisionActivityContract.launch(collision);
                         },
                         throwable -> {
                             if (throwable instanceof MegaNodeException.ParentDoesNotExistException) {

@@ -9,20 +9,17 @@ import mega.privacy.android.app.DatabaseHandler
 import mega.privacy.android.app.MegaOffline
 import mega.privacy.android.app.di.MegaApi
 import mega.privacy.android.app.di.MegaApiFolder
-import mega.privacy.android.app.usecase.exception.BusinessAccountOverdueException
 import mega.privacy.android.app.listeners.OptionalMegaRequestListenerInterface
 import mega.privacy.android.app.usecase.chat.GetChatMessageUseCase
 import mega.privacy.android.app.usecase.data.MegaNodeItem
+import mega.privacy.android.app.usecase.exception.*
 import mega.privacy.android.app.utils.*
 import mega.privacy.android.app.utils.ErrorUtils.toThrowable
 import mega.privacy.android.app.utils.MegaNodeUtil.getLastAvailableTime
 import mega.privacy.android.app.utils.MegaNodeUtil.getRootParentNode
 import mega.privacy.android.app.utils.RxUtil.blockingGetOrNull
-import nz.mega.sdk.MegaApiAndroid
+import nz.mega.sdk.*
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
-import nz.mega.sdk.MegaError
-import nz.mega.sdk.MegaNode
-import nz.mega.sdk.MegaShare
 import java.io.File
 import javax.inject.Inject
 
@@ -32,12 +29,14 @@ import javax.inject.Inject
  * @property context            Context needed to get offline node files.
  * @property megaApi            Mega API needed to call node information.
  * @property megaApiFolder      Mega API folder needed to authorize node.
+ * @property megaChatApi        Mega Chat API needed to get nodes from chat messages.
  * @property databaseHandler    Database Handler needed to retrieve offline nodes.
  */
 class GetNodeUseCase @Inject constructor(
     @ApplicationContext private val context: Context,
     @MegaApi private val megaApi: MegaApiAndroid,
     @MegaApiFolder private val megaApiFolder: MegaApiAndroid,
+    private val megaChatApi: MegaChatApiAndroid,
     private val getChatMessageUseCase: GetChatMessageUseCase,
     private val databaseHandler: DatabaseHandler
 ) {
@@ -50,6 +49,53 @@ class GetNodeUseCase @Inject constructor(
      */
     fun get(nodeHandle: Long): Single<MegaNode> =
         Single.fromCallable { nodeHandle.getMegaNode() }
+
+    /**
+     * Gets the attachment MegaNodes given a chat identifier and a message identifier.
+     * Notes:
+     *  * A MegaNode attached to a chat cannot be get from its handle and must be get from
+     *  the MegaChatMessage.
+     *  * A MegaChatMessage can contain more than one attached MegaNode.
+     *
+     * @param chatId    Chat identifier.
+     * @param messageId Message identifier.
+     * @return Single with the list of attached MegaNodes.
+     */
+    fun get(chatId: Long, messageId: Long): Single<MutableList<MegaNode>> =
+        Single.create { emitter ->
+            if (chatId == MegaChatApiJava.MEGACHAT_INVALID_HANDLE
+                || megaChatApi.getChatRoom(chatId) == null
+            ) {
+                emitter.onError(ChatDoesNotExistException())
+                return@create
+            }
+
+            val message = megaChatApi.getMessage(chatId, messageId)
+                ?: megaChatApi.getMessageFromNodeHistory(chatId, messageId)
+
+            if (message == null) {
+                emitter.onError(MessageDoesNotExistException())
+                return@create
+            }
+
+            val attachments = message.megaNodeList
+
+            if (attachments == null || attachments.size() <= 0) {
+                emitter.onError(AttachmentDoesNotExistException())
+                return@create
+            }
+
+            val nodes = mutableListOf<MegaNode>()
+
+            for (i in 0 until attachments.size()) {
+                nodes.add(attachments.get(i))
+            }
+
+            when {
+                emitter.isDisposed -> return@create
+                else -> emitter.onSuccess(nodes)
+            }
+        }
 
     /**
      * Get a MegaNodeItem given a Node Handle.

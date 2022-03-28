@@ -13,6 +13,7 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
 
+import androidx.activity.result.ActivityResultLauncher;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.core.content.FileProvider;
@@ -49,9 +50,15 @@ import java.util.List;
 import java.util.ListIterator;
 
 import dagger.hilt.android.AndroidEntryPoint;
+import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
+import io.reactivex.rxjava3.schedulers.Schedulers;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
+import mega.privacy.android.app.activities.contract.NameCollisionActivityContract;
 import mega.privacy.android.app.main.ManagerActivity;
+import mega.privacy.android.app.namecollision.data.NameCollision;
+import mega.privacy.android.app.namecollision.usecase.CheckNameCollisionUseCase;
+import mega.privacy.android.app.usecase.CopyNodeUseCase;
 import mega.privacy.android.app.utils.MegaProgressDialogUtil;
 import mega.privacy.android.app.components.NewGridRecyclerView;
 import mega.privacy.android.app.components.SimpleDividerItemDecoration;
@@ -69,6 +76,7 @@ import mega.privacy.android.app.main.megachat.chatAdapters.NodeAttachmentHistory
 import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.NodeAttachmentBottomSheetDialogFragment;
 import mega.privacy.android.app.utils.AlertsAndWarnings;
 import mega.privacy.android.app.utils.ColorUtils;
+import mega.privacy.android.app.utils.StringResourcesUtils;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaChatApi;
@@ -93,6 +101,7 @@ import nz.mega.sdk.MegaUser;
 import static mega.privacy.android.app.constants.BroadcastConstants.BROADCAST_ACTION_ERROR_COPYING_NODES;
 import static mega.privacy.android.app.constants.BroadcastConstants.ERROR_MESSAGE_TEXT;
 import static mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil.*;
+import static mega.privacy.android.app.utils.AlertDialogUtil.dismissAlertDialogIfExists;
 import static mega.privacy.android.app.utils.AlertsAndWarnings.showForeignStorageOverQuotaWarningDialog;
 import static mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuotaPaywallWarning;
 import static mega.privacy.android.app.utils.ChatUtil.manageTextFileIntent;
@@ -104,12 +113,22 @@ import static mega.privacy.android.app.utils.MegaApiUtils.*;
 import static mega.privacy.android.app.utils.Util.*;
 import static nz.mega.sdk.MegaApiJava.INVALID_HANDLE;
 import static nz.mega.sdk.MegaApiJava.STORAGE_STATE_PAYWALL;
+import static nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE;
+
+import javax.inject.Inject;
 
 @AndroidEntryPoint
 public class NodeAttachmentHistoryActivity extends PasscodeActivity
         implements MegaChatRequestListenerInterface, MegaRequestListenerInterface, OnClickListener,
         MegaChatListenerInterface, MegaChatNodeHistoryListenerInterface,
         StoreDataBeforeForward<ArrayList<MegaChatMessage>>, SnackbarShower {
+
+    @Inject
+    CheckNameCollisionUseCase checkNameCollisionUseCase;
+    @Inject
+    CopyNodeUseCase copyNodeUseCase;
+
+    private ActivityResultLauncher<Object> nameCollisionActivityContract;
 
     public static int NUMBER_MESSAGES_TO_LOAD = 20;
     public static int NUMBER_MESSAGES_BEFORE_LOAD = 8;
@@ -186,6 +205,14 @@ public class NodeAttachmentHistoryActivity extends PasscodeActivity
         if (shouldRefreshSessionDueToSDK() || shouldRefreshSessionDueToKarere()) {
             return;
         }
+
+        nameCollisionActivityContract = registerForActivityResult(
+                new NameCollisionActivityContract(),
+                result -> {
+                    if (result != null) {
+                        showSnackbar(SNACKBAR_TYPE, result, MEGACHAT_INVALID_HANDLE);
+                    }
+                });
 
         chatC = new ChatController(this);
 
@@ -1139,69 +1166,36 @@ public class NodeAttachmentHistoryActivity extends PasscodeActivity
         statusDialog = MegaProgressDialogUtil.createProgressDialog(this, getString(R.string.general_importing));
         statusDialog.show();
 
-        MegaNode target = null;
-        target = megaApi.getNodeByHandle(toHandle);
-        if (target == null) {
-            target = megaApi.getRootNode();
-        }
-        logDebug("TARGET HANDLE: " + target.getHandle());
+        checkNameCollisionUseCase.checkMessagesToImport(importMessagesHandles, chatId, toHandle)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe((result, throwable) -> {
+                    if (throwable == null) {
+                        ArrayList<NameCollision> collisions = result.getFirst();
 
-        if (importMessagesHandles.length == 1) {
-            for (int k = 0; k < importMessagesHandles.length; k++) {
-                MegaChatMessage message = megaChatApi.getMessageFromNodeHistory(chatId, importMessagesHandles[k]);
-                if (message != null) {
-
-                    MegaNodeList nodeList = message.getMegaNodeList();
-
-                    for (int i = 0; i < nodeList.size(); i++) {
-                        MegaNode document = nodeList.get(i);
-                        if (document != null) {
-                            logDebug("DOCUMENT HANDLE: " + document.getHandle());
-                            document = chatC.authorizeNodeIfPreview(document, chatRoom);
-                            if (target != null) {
-                                megaApi.copyNode(document, target, this);
-                            } else {
-                                logError("TARGET: null");
-                                showSnackbar(SNACKBAR_TYPE, getString(R.string.import_success_error));
-                            }
-                        } else {
-                            logError("DOCUMENT: null");
-                            showSnackbar(SNACKBAR_TYPE, getString(R.string.import_success_error));
+                        if (!collisions.isEmpty()) {
+                            dismissAlertDialogIfExists(statusDialog);
+                            nameCollisionActivityContract.launch(collisions);
                         }
-                    }
-                } else {
-                    logError("MESSAGE is null");
-                    showSnackbar(SNACKBAR_TYPE, getString(R.string.import_success_error));
-                }
-            }
-        } else {
-            MultipleRequestListener listener = new MultipleRequestListener(MULTIPLE_CHAT_IMPORT, this);
 
-            for (int k = 0; k < importMessagesHandles.length; k++) {
-                MegaChatMessage message = megaChatApi.getMessageFromNodeHistory(chatId, importMessagesHandles[k]);
-                if (message != null) {
+                        List<MegaNode> nodesWithoutCollision = result.getSecond();
 
-                    MegaNodeList nodeList = message.getMegaNodeList();
-
-                    for (int i = 0; i < nodeList.size(); i++) {
-                        MegaNode document = nodeList.get(i);
-                        if (document != null) {
-                            logDebug("DOCUMENT HANDLE: " + document.getHandle());
-                            if (target != null) {
-                                megaApi.copyNode(document, target, listener);
-                            } else {
-                                logError("TARGET: null");
-                            }
-                        } else {
-                            logError("DOCUMENT: null");
+                        if (!nodesWithoutCollision.isEmpty()) {
+                            copyNodeUseCase.copy(nodesWithoutCollision, toHandle)
+                                    .subscribeOn(Schedulers.io())
+                                    .observeOn(AndroidSchedulers.mainThread())
+                                    .subscribe((copyResult, copyThrowable) -> {
+                                        dismissAlertDialogIfExists(statusDialog);
+                                        showSnackbar(SNACKBAR_TYPE, copyThrowable == null
+                                                        ? copyResult.getResultText()
+                                                        : StringResourcesUtils.getString(R.string.import_success_error),
+                                                MEGACHAT_INVALID_HANDLE);
+                                    });
                         }
+                    } else {
+                        showSnackbar(SNACKBAR_TYPE, getString(R.string.import_success_error), MEGACHAT_INVALID_HANDLE);
                     }
-                } else {
-                    logError("MESSAGE is null");
-                    showSnackbar(SNACKBAR_TYPE, getString(R.string.import_success_error));
-                }
-            }
-        }
+                });
     }
 
     @Override

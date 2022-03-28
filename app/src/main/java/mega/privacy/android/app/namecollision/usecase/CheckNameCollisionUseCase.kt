@@ -11,10 +11,12 @@ import mega.privacy.android.app.namecollision.exception.NoPendingCollisionsExcep
 import mega.privacy.android.app.uploadFolder.list.data.FolderContent
 import mega.privacy.android.app.usecase.GetNodeUseCase
 import mega.privacy.android.app.usecase.exception.MegaNodeException
+import mega.privacy.android.app.usecase.exception.MessageDoesNotExistException
 import mega.privacy.android.app.utils.LogUtil.logError
 import mega.privacy.android.app.utils.RxUtil.blockingGetOrNull
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
+import nz.mega.sdk.MegaChatApiAndroid
 import nz.mega.sdk.MegaNode
 import java.util.ArrayList
 import javax.inject.Inject
@@ -23,18 +25,20 @@ import javax.inject.Inject
  * Use case for checking name collisions before uploading, copying or moving.
  *
  * @property megaApi        MegaApiAndroid instance to check collisions.
+ * @property megaChatApi        MegaChatApiAndroid instance to get nodes from chats.
  * @property getNodeUseCase Required for getting nodes.
  */
 class CheckNameCollisionUseCase @Inject constructor(
     @MegaApi private val megaApi: MegaApiAndroid,
+    private val megaChatApi: MegaChatApiAndroid,
     private val getNodeUseCase: GetNodeUseCase
 ) {
 
     /**
      * Checks if a node with the same name exists on the provided parent node.
      *
-     * @param node        MegaNode to check its name.
-     * @param parentNode  Parent MegaNode in which to look.
+     * @param node          [MegaNode] to check its name.
+     * @param parentNode    Parent [MegaNode] in which to look.
      * @param type          [NameCollisionType]
      * @return Single Long with the node handle with which there is a name collision.
      */
@@ -59,7 +63,7 @@ class CheckNameCollisionUseCase @Inject constructor(
     /**
      * Checks if a node with the same name exists on the provided parent node.
      *
-     * @param node          Node to check its name.
+     * @param node          [MegaNode] to check its name.
      * @param parentHandle  Handle of the parent node in which to look.
      * @param type          [NameCollisionType]
      * @return Single Long with the node handle with which there is a name collision.
@@ -227,13 +231,13 @@ class CheckNameCollisionUseCase @Inject constructor(
         }
 
     /**
-     * Checks a list of MegaNode in order to know which names already exist on the parent nodes
+     * Checks a list of [MegaNode] in order to know which names already exist on the parent nodes
      * in which them will be restored.
      *
      * @param nodes List of nodes to check.
-     * @return Single<Pair<List<NameCollision>, List<MegaNode>>> containing:
-     *  - First:    List of NameCollision with name collisions.
-     *  - Second:   List of MegaNode without name collision.
+     * @return Single<Pair<ArrayList<NameCollision>, List<MegaNode>>> containing:
+     *  - First:    List of [NameCollision] with name collisions.
+     *  - Second:   List of [MegaNode] without name collision.
      */
     fun checkRestorations(nodes: List<MegaNode>): Single<Pair<ArrayList<NameCollision>, List<MegaNode>>> =
         Single.create { emitter ->
@@ -284,9 +288,9 @@ class CheckNameCollisionUseCase @Inject constructor(
      *
      * @param shareInfos    List of ShareInfo to check.
      * @param parentNode    Parent node in which to look.
-     * @return Single<Pair<List<NameCollision>, List<ShareInfo>>> containing:
-     *  - First:    List of NameCollision with name collisions.
-     *  - Second:   List of ShareInfo without name collision.
+     * @return Single<Pair<ArrayList<NameCollision>, List<ShareInfo>>> containing:
+     *  - First:    List of [NameCollision] with name collisions.
+     *  - Second:   List of [ShareInfo] without name collision.
      */
     fun checkShareInfoList(
         shareInfos: List<ShareInfo>,
@@ -377,6 +381,78 @@ class CheckNameCollisionUseCase @Inject constructor(
             when {
                 emitter.isDisposed -> return@create
                 else -> emitter.onSuccess(Pair(collisions, uploadContent))
+            }
+        }
+
+    /**
+     * Checks a list of attached nodes in a chat conversation in order to know which names already
+     * exist on the provided parent node.
+     *
+     * @param messageIds    Array of message identifiers.
+     * @param chatId        Chat identifier.
+     * @param parentHandle  Parent handle node in which to look.
+     * @return Single<Pair<ArrayList<NameCollision>, List<MegaNode>>> containing:
+     *  - First:    List of [NameCollision] with name collisions.
+     *  - Second:   List of [MegaNode] without name collision.
+     */
+    fun checkMessagesToImport(
+        messageIds: LongArray,
+        chatId: Long,
+        parentHandle: Long
+    ): Single<Pair<ArrayList<NameCollision>, List<MegaNode>>> =
+        Single.create { emitter ->
+            val parentNode = getNodeUseCase.get(parentHandle).blockingGetOrNull()
+
+            if (parentNode == null) {
+                emitter.onError(MegaNodeException.ParentDoesNotExistException())
+                return@create
+            }
+
+            if (messageIds.isEmpty()) {
+                emitter.onError(MessageDoesNotExistException())
+                return@create
+            }
+
+            val collisions = ArrayList<NameCollision>()
+            val nodesWithoutCollision = mutableListOf<MegaNode>()
+
+            messageIds.forEach { messageId ->
+                getNodeUseCase.get(chatId, messageId).blockingSubscribeBy(
+                    onError = { error -> logError("", error) },
+                    onSuccess = { nodes ->
+                        nodes.forEach { node ->
+                            check(node.name, parentNode).blockingSubscribeBy(
+                                onError = { error ->
+                                    when (error) {
+                                        is MegaNodeException.ChildDoesNotExistsException -> {
+                                            nodesWithoutCollision.add(node)
+                                        }
+                                        else -> {
+                                            emitter.onError(error)
+                                            return@blockingSubscribeBy
+                                        }
+                                    }
+                                },
+                                onSuccess = { handle ->
+                                    collisions.add(
+                                        NameCollision.Import.getImportCollision(
+                                            handle,
+                                            chatId,
+                                            messageId,
+                                            node,
+                                            parentHandle
+                                        )
+                                    )
+                                }
+                            )
+                        }
+                    }
+                )
+            }
+
+            when {
+                emitter.isDisposed -> return@create
+                else -> emitter.onSuccess(Pair(collisions, nodesWithoutCollision))
             }
         }
 }

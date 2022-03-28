@@ -31,6 +31,7 @@ import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.activity.result.ActivityResultLauncher;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AlertDialog;
@@ -61,7 +62,7 @@ import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.TransfersManagementActivity;
-import mega.privacy.android.app.namecollision.NameCollisionActivity;
+import mega.privacy.android.app.activities.contract.NameCollisionActivityContract;
 import mega.privacy.android.app.namecollision.data.NameCollision;
 import mega.privacy.android.app.namecollision.data.NameCollisionType;
 import mega.privacy.android.app.namecollision.usecase.CheckNameCollisionUseCase;
@@ -103,6 +104,7 @@ import static mega.privacy.android.app.utils.MegaNodeUtil.*;
 import static mega.privacy.android.app.utils.permission.PermissionUtils.*;
 import static mega.privacy.android.app.utils.PreviewUtils.*;
 import static mega.privacy.android.app.utils.Util.*;
+import static nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE;
 
 @AndroidEntryPoint
 public class FolderLinkActivity extends TransfersManagementActivity implements MegaRequestListenerInterface, OnClickListener, DecryptAlertDialog.DecryptDialogListener,
@@ -112,6 +114,8 @@ public class FolderLinkActivity extends TransfersManagementActivity implements M
 	CheckNameCollisionUseCase checkNameCollisionUseCase;
 	@Inject
 	CopyNodeUseCase copyNodeUseCase;
+
+	private ActivityResultLauncher<Object> nameCollisionActivityContract;
 
 	private static final String TAG_DECRYPT = "decrypt";
 
@@ -337,6 +341,14 @@ public class FolderLinkActivity extends TransfersManagementActivity implements M
 		logDebug("onCreate()");
     	requestWindowFeature(Window.FEATURE_NO_TITLE);	
 		super.onCreate(savedInstanceState);
+
+		nameCollisionActivityContract = registerForActivityResult(
+				new NameCollisionActivityContract(),
+				result -> {
+					if (result != null) {
+						showSnackbar(SNACKBAR_TYPE, result, MEGACHAT_INVALID_HANDLE);
+					}
+				});
 
 		Display display = getWindowManager().getDefaultDisplay();
 		outMetrics = new DisplayMetrics ();
@@ -682,7 +694,7 @@ public class FolderLinkActivity extends TransfersManagementActivity implements M
 
 								if (!collisions.isEmpty()) {
 									dismissAlertDialogIfExists(statusDialog);
-									startActivity(NameCollisionActivity.getIntentForList(this, collisions));
+									nameCollisionActivityContract.launch(collisions);
 								}
 
 								List<MegaNode> nodesWithoutCollisions = result.getSecond();
@@ -707,7 +719,7 @@ public class FolderLinkActivity extends TransfersManagementActivity implements M
 						.subscribe((collision, throwable) -> {
 							if (throwable == null) {
 								dismissAlertDialogIfExists(statusDialog);
-								startActivity(NameCollisionActivity.getIntentForSingleItem(this, collision));
+								nameCollisionActivityContract.launch(collision);
 							} else {
 								copyNodeUseCase.copy(selectedNode, toHandle)
 										.subscribeOn(Schedulers.io())

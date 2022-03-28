@@ -14,6 +14,7 @@ import android.os.Handler;
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
+import androidx.activity.result.ActivityResultLauncher;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.coordinatorlayout.widget.CoordinatorLayout;
@@ -45,6 +46,7 @@ import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.ShareInfo;
 import mega.privacy.android.app.activities.PasscodeActivity;
+import mega.privacy.android.app.activities.contract.NameCollisionActivityContract;
 import mega.privacy.android.app.components.saver.NodeSaver;
 import mega.privacy.android.app.namecollision.data.NameCollision;
 import mega.privacy.android.app.generalusecase.FilePrepareUseCase;
@@ -54,7 +56,6 @@ import mega.privacy.android.app.interfaces.UploadBottomSheetDialogActionListener
 import mega.privacy.android.app.main.controllers.NodeController;
 import mega.privacy.android.app.modalbottomsheet.ContactFileListBottomSheetDialogFragment;
 import mega.privacy.android.app.modalbottomsheet.UploadBottomSheetDialogFragment;
-import mega.privacy.android.app.namecollision.NameCollisionActivity;
 import mega.privacy.android.app.namecollision.data.NameCollisionType;
 import mega.privacy.android.app.usecase.CopyNodeUseCase;
 import mega.privacy.android.app.usecase.GetNodeUseCase;
@@ -122,6 +123,8 @@ public class ContactFileListActivity extends PasscodeActivity
     UploadUseCase uploadUseCase;
 	@Inject
 	CopyNodeUseCase copyNodeUseCase;
+
+	private ActivityResultLauncher<Object> nameCollisionActivityContract;
 
 	FrameLayout fragmentContainer;
 
@@ -350,6 +353,14 @@ public class ContactFileListActivity extends PasscodeActivity
 		if (shouldRefreshSessionDueToSDK() || shouldRefreshSessionDueToKarere()) {
 			return;
 		}
+
+		nameCollisionActivityContract = registerForActivityResult(
+				new NameCollisionActivityContract(),
+				result -> {
+					if (result != null) {
+						showSnackbar(SNACKBAR_TYPE, result, MEGACHAT_INVALID_HANDLE);
+					}
+				});
 
 		if (savedInstanceState == null) {
 			this.setParentHandle(-1);
@@ -654,7 +665,7 @@ public class ContactFileListActivity extends PasscodeActivity
 
 							if (!collisions.isEmpty()) {
 								dismissAlertDialogIfExists(statusDialog);
-								startActivity(NameCollisionActivity.getIntentForList(this, collisions));
+								nameCollisionActivityContract.launch(collisions);
 							}
 
 							long[] handlesWithoutCollision = result.getSecond();
@@ -715,7 +726,7 @@ public class ContactFileListActivity extends PasscodeActivity
 
 							if (!collisions.isEmpty()) {
 								dismissAlertDialogIfExists(statusDialog);
-								startActivity(NameCollisionActivity.getIntentForList(this, collisions));
+								nameCollisionActivityContract.launch(collisions);
 							}
 
 							long[] handlesWithoutCollision = result.getSecond();
@@ -803,7 +814,7 @@ public class ContactFileListActivity extends PasscodeActivity
 										NameCollision collision = NameCollision.Upload
 												.getUploadCollision(handle, file, parentHandle);
 
-										startActivity(NameCollisionActivity.getIntentForSingleItem(this, collision));
+										nameCollisionActivityContract.launch(collision);
 									},
 									throwable -> {
 										if (throwable instanceof MegaNodeException.ParentDoesNotExistException) {
@@ -877,7 +888,7 @@ public class ContactFileListActivity extends PasscodeActivity
 						List<ShareInfo> withoutCollisions = result.getSecond();
 
 						if (!collisions.isEmpty()) {
-							startActivity(NameCollisionActivity.getIntentForList(this, collisions));
+							nameCollisionActivityContract.launch(collisions);
 						}
 
 						if (!withoutCollisions.isEmpty()) {

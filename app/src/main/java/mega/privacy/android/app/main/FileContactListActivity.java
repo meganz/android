@@ -9,6 +9,7 @@ import android.content.IntentFilter;
 import android.os.Bundle;
 import android.os.Handler;
 
+import androidx.activity.result.ActivityResultLauncher;
 import androidx.appcompat.app.AlertDialog;
 import androidx.coordinatorlayout.widget.CoordinatorLayout;
 
@@ -46,6 +47,7 @@ import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.ShareInfo;
 import mega.privacy.android.app.activities.PasscodeActivity;
+import mega.privacy.android.app.activities.contract.NameCollisionActivityContract;
 import mega.privacy.android.app.components.SimpleDividerItemDecoration;
 import mega.privacy.android.app.namecollision.data.NameCollision;
 import mega.privacy.android.app.listeners.ShareListener;
@@ -53,7 +55,6 @@ import mega.privacy.android.app.main.adapters.MegaSharedFolderAdapter;
 import mega.privacy.android.app.main.controllers.ContactController;
 import mega.privacy.android.app.main.controllers.NodeController;
 import mega.privacy.android.app.modalbottomsheet.FileContactsListBottomSheetDialogFragment;
-import mega.privacy.android.app.namecollision.NameCollisionActivity;
 import mega.privacy.android.app.namecollision.usecase.CheckNameCollisionUseCase;
 import mega.privacy.android.app.usecase.UploadUseCase;
 import mega.privacy.android.app.utils.AlertDialogUtil;
@@ -81,6 +82,7 @@ import static mega.privacy.android.app.utils.StringResourcesUtils.getQuantityStr
 import static mega.privacy.android.app.utils.Util.*;
 import static nz.mega.sdk.MegaApiJava.INVALID_HANDLE;
 import static nz.mega.sdk.MegaApiJava.STORAGE_STATE_PAYWALL;
+import static nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE;
 
 import javax.inject.Inject;
 
@@ -91,6 +93,8 @@ public class FileContactListActivity extends PasscodeActivity implements OnClick
 	CheckNameCollisionUseCase checkNameCollisionUseCase;
 	@Inject
 	UploadUseCase uploadUseCase;
+
+	private ActivityResultLauncher<Object> nameCollisionActivityContract;
 
 	private ContactController cC;
 	private NodeController nC;
@@ -323,6 +327,14 @@ public class FileContactListActivity extends PasscodeActivity implements OnClick
 		if(shouldRefreshSessionDueToSDK() ||shouldRefreshSessionDueToKarere()) {
 			return;
 		}
+
+		nameCollisionActivityContract = registerForActivityResult(
+				new NameCollisionActivityContract(),
+				result -> {
+					if (result != null) {
+						showSnackbar(SNACKBAR_TYPE, result, MEGACHAT_INVALID_HANDLE);
+					}
+				});
 
 		dialogBuilder = new MaterialAlertDialogBuilder(this, R.style.ThemeOverlay_Mega_MaterialAlertDialog);
 
@@ -759,7 +771,7 @@ public class FileContactListActivity extends PasscodeActivity implements OnClick
 						List<ShareInfo> withoutCollisions = result.getSecond();
 
 						if (!collisions.isEmpty()) {
-							startActivity(NameCollisionActivity.getIntentForList(this, collisions));
+							nameCollisionActivityContract.launch(collisions);
 						}
 
 						if (!withoutCollisions.isEmpty()) {

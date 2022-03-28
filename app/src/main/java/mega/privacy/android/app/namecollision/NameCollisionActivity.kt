@@ -277,7 +277,7 @@ class NameCollisionActivity : PasscodeActivity() {
                 renameInfoId = R.string.warning_upload_and_rename
                 renameButtonId = R.string.upload_and_rename
             }
-            is NameCollision.Copy -> {
+            is NameCollision.Copy, is NameCollision.Import -> {
                 cancelButtonId = R.string.do_not_copy
                 renameInfoId = R.string.warning_copy_and_rename
                 renameButtonId = R.string.copy_and_rename

@@ -85,6 +85,24 @@ class GetNameCollisionResultUseCase @Inject constructor(
                             emitter.onNext(nameCollisionResult)
                         }
                     )
+                } else if (collision is NameCollision.Import) {
+                    val nodes = getNodeUseCase.get(collision.chatId, collision.messageId)
+                        .blockingGetOrNull()
+
+                    if (nodes != null) {
+                        for (node in nodes) {
+                            if (node.handle == collision.nodeHandle) {
+                                getThumbnailUseCase.get(node).blockingSubscribeBy(
+                                    onError = { error -> logWarning("No thumbnail", error) },
+                                    onSuccess = { thumbnailUri ->
+                                        nameCollisionResult.thumbnail = thumbnailUri
+                                        emitter.onNext(nameCollisionResult)
+                                    }
+                                )
+                                break
+                            }
+                        }
+                    }
                 }
 
                 if (collision.isFile) {

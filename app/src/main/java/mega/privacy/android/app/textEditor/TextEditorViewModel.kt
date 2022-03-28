@@ -27,7 +27,6 @@ import mega.privacy.android.app.di.MegaApi
 import mega.privacy.android.app.di.MegaApiFolder
 import mega.privacy.android.app.namecollision.data.NameCollision
 import mega.privacy.android.app.listeners.ExportListener
-import mega.privacy.android.app.namecollision.NameCollisionActivity
 import mega.privacy.android.app.namecollision.data.NameCollisionType
 import mega.privacy.android.app.namecollision.usecase.CheckNameCollisionUseCase
 import mega.privacy.android.app.usecase.CopyNodeUseCase
@@ -467,12 +466,8 @@ class TextEditorViewModel @Inject constructor(
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeBy(
                 onSuccess = { handle ->
-                    activity.startActivity(
-                        NameCollisionActivity.getIntentForSingleItem(
-                            activity,
-                            NameCollision.Upload.getUploadCollision(handle, tempFile, parentHandle)
-                        )
-                    )
+                    collision.value =
+                        NameCollision.Upload.getUploadCollision(handle, tempFile, parentHandle)
                 },
                 onError = { error ->
                     when (error) {

@@ -205,6 +205,8 @@ import android.text.Editable;
 
 import android.text.Layout;
 import android.text.TextUtils;
+
+import androidx.activity.result.ActivityResultLauncher;
 import androidx.annotation.NonNull;
 import androidx.core.content.res.ResourcesCompat;
 import androidx.lifecycle.Observer;
@@ -300,11 +302,11 @@ import mega.privacy.android.app.OpenPasswordLinkActivity;
 import mega.privacy.android.app.Product;
 import mega.privacy.android.app.R;
 
+import mega.privacy.android.app.activities.contract.NameCollisionActivityContract;
 import mega.privacy.android.app.namecollision.data.NameCollision;
 import mega.privacy.android.app.fragments.managerFragments.cu.PhotosFragment;
 import mega.privacy.android.app.fragments.managerFragments.cu.album.AlbumContentFragment;
 import mega.privacy.android.app.gallery.ui.MediaDiscoveryFragment;
-import mega.privacy.android.app.namecollision.NameCollisionActivity;
 import mega.privacy.android.app.namecollision.data.NameCollisionType;
 import mega.privacy.android.app.objects.PasscodeManagement;
 import mega.privacy.android.app.fragments.homepage.documents.DocumentsFragment;
@@ -541,6 +543,8 @@ public class ManagerActivity extends TransfersManagementActivity
     UploadUseCase uploadUseCase;
     @Inject
     CopyNodeUseCase copyNodeUseCase;
+
+    private ActivityResultLauncher<Object> nameCollisionActivityContract;
 
 	public ArrayList<Integer> transfersInProgress;
 	public MegaTransferData transferData;
@@ -1560,6 +1564,14 @@ public class ManagerActivity extends TransfersManagementActivity
                 }
             }
         }
+
+        nameCollisionActivityContract = registerForActivityResult(
+                new NameCollisionActivityContract(),
+                result -> {
+                    if (result != null) {
+                        showSnackbar(SNACKBAR_TYPE, result, MEGACHAT_INVALID_HANDLE);
+                    }
+                });
 
         boolean selectDrawerItemPending = true;
 
@@ -6462,7 +6474,7 @@ public class ManagerActivity extends TransfersManagementActivity
                     if (throwable == null) {
                         ArrayList<NameCollision> collisions = result.getFirst();
                         if (!collisions.isEmpty()) {
-                            startActivity(NameCollisionActivity.getIntentForList(this, collisions));
+                            nameCollisionActivityContract.launch(collisions);
                         }
 
                         List<MegaNode> nodesWithoutCollisions = result.getSecond();
@@ -8543,7 +8555,7 @@ public class ManagerActivity extends TransfersManagementActivity
 
                             if (!collisions.isEmpty()) {
                                 dismissAlertDialogIfExists(statusDialog);
-                                startActivity(NameCollisionActivity.getIntentForList(this, collisions));
+                                nameCollisionActivityContract.launch(collisions);
                             }
 
                             long[] handlesWithoutCollision = result.getSecond();
@@ -8583,7 +8595,7 @@ public class ManagerActivity extends TransfersManagementActivity
 
                             if (!collisions.isEmpty()) {
                                 dismissAlertDialogIfExists(statusDialog);
-                                startActivity(NameCollisionActivity.getIntentForList(this, collisions));
+                                nameCollisionActivityContract.launch(collisions);
                             }
 
                             long[] handlesWithoutCollision = result.getSecond();
@@ -8654,7 +8666,7 @@ public class ManagerActivity extends TransfersManagementActivity
                                         NameCollision collision = NameCollision.Upload
                                                 .getUploadCollision(handle, file, parentHandle);
 
-                                        startActivity(NameCollisionActivity.getIntentForSingleItem(this, collision));
+                                        nameCollisionActivityContract.launch(collision);
                                     },
                                     throwable -> {
                                         if (throwable instanceof MegaNodeException.ParentDoesNotExistException) {
@@ -9509,7 +9521,7 @@ public class ManagerActivity extends TransfersManagementActivity
                         List<ShareInfo> withoutCollisions = result.getSecond();
 
                         if (!collisions.isEmpty()) {
-                            startActivity(NameCollisionActivity.getIntentForList(this, collisions));
+                            nameCollisionActivityContract.launch(collisions);
                         }
 
                         if (!withoutCollisions.isEmpty()) {
@@ -9612,7 +9624,7 @@ public class ManagerActivity extends TransfersManagementActivity
                             NameCollision collision = NameCollision.Upload
                                     .getUploadCollision(handle, file, parentNode.getParentHandle());
 
-                            startActivity(NameCollisionActivity.getIntentForSingleItem(this, collision));
+                            nameCollisionActivityContract.launch(collision);
                         },
                         throwable -> {
                             if (throwable instanceof MegaNodeException.ParentDoesNotExistException) {

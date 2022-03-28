@@ -194,7 +194,7 @@ class NameCollisionViewModel @Inject constructor(
      */
     private fun getCollisionType(): NameCollisionType =
         when (currentCollision.value?.nameCollision) {
-            is NameCollision.Copy -> NameCollisionType.COPY
+            is NameCollision.Copy, is NameCollision.Import -> NameCollisionType.COPY
             is NameCollision.Movement -> NameCollisionType.MOVEMENT
             else -> NameCollisionType.UPLOAD
         }

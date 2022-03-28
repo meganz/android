@@ -19,6 +19,7 @@ import com.google.android.material.appbar.AppBarLayout;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.jeremyliao.liveeventbus.LiveEventBus;
 
+import androidx.activity.result.ActivityResultLauncher;
 import androidx.annotation.NonNull;
 import androidx.coordinatorlayout.widget.CoordinatorLayout;
 import androidx.core.content.ContextCompat;
@@ -70,6 +71,7 @@ import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MegaContactDB;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.activities.PasscodeActivity;
+import mega.privacy.android.app.activities.contract.NameCollisionActivityContract;
 import mega.privacy.android.app.components.AppBarStateChangeListener;
 import mega.privacy.android.app.components.MarqueeTextView;
 import mega.privacy.android.app.components.attacher.MegaAttacher;
@@ -89,7 +91,6 @@ import mega.privacy.android.app.main.listeners.MultipleRequestListener;
 import mega.privacy.android.app.main.megachat.NodeAttachmentHistoryActivity;
 import mega.privacy.android.app.modalbottomsheet.ContactFileListBottomSheetDialogFragment;
 import mega.privacy.android.app.modalbottomsheet.ContactNicknameBottomSheetDialogFragment;
-import mega.privacy.android.app.namecollision.NameCollisionActivity;
 import mega.privacy.android.app.namecollision.data.NameCollision;
 import mega.privacy.android.app.namecollision.data.NameCollisionType;
 import mega.privacy.android.app.namecollision.usecase.CheckNameCollisionUseCase;
@@ -169,6 +170,7 @@ public class ContactInfoActivity extends PasscodeActivity
 	CheckNameCollisionUseCase checkNameCollisionUseCase;
 	@Inject
 	CopyNodeUseCase copyNodeUseCase;
+	private ActivityResultLauncher<Object> nameCollisionActivityContract;
 
 	private ChatController chatC;
 	private ContactController cC;
@@ -399,6 +401,14 @@ public class ContactInfoActivity extends PasscodeActivity
 		if(shouldRefreshSessionDueToSDK() || shouldRefreshSessionDueToKarere()){
 			return;
 		}
+
+		nameCollisionActivityContract = registerForActivityResult(
+				new NameCollisionActivityContract(),
+				result -> {
+					if (result != null) {
+						showSnackbar(SNACKBAR_TYPE, result, MEGACHAT_INVALID_HANDLE);
+					}
+				});
 
 		if (savedInstanceState != null) {
 			megaAttacher.restoreState(savedInstanceState);
@@ -1379,7 +1389,7 @@ public class ContactInfoActivity extends PasscodeActivity
 
 							if (!collisions.isEmpty()) {
 								dismissAlertDialogIfExists(statusDialog);
-								startActivity(NameCollisionActivity.getIntentForList(this, collisions));
+								nameCollisionActivityContract.launch(collisions);
 							}
 
 							long[] handlesWithoutCollision = result.getSecond();

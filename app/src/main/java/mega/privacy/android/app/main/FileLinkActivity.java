@@ -23,6 +23,7 @@ import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import androidx.activity.result.ActivityResultLauncher;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AlertDialog;
@@ -48,8 +49,8 @@ import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.TransfersManagementActivity;
+import mega.privacy.android.app.activities.contract.NameCollisionActivityContract;
 import mega.privacy.android.app.imageviewer.ImageViewerActivity;
-import mega.privacy.android.app.namecollision.NameCollisionActivity;
 import mega.privacy.android.app.namecollision.data.NameCollisionType;
 import mega.privacy.android.app.namecollision.usecase.CheckNameCollisionUseCase;
 import mega.privacy.android.app.usecase.CopyNodeUseCase;
@@ -89,6 +90,8 @@ public class FileLinkActivity extends TransfersManagementActivity implements Meg
 	CheckNameCollisionUseCase checkNameCollisionUseCase;
 	@Inject
 	CopyNodeUseCase copyNodeUseCase;
+
+	private ActivityResultLauncher<Object> nameCollisionActivityContract;
 
 	private static final String TAG_DECRYPT = "decrypt";
 
@@ -157,6 +160,14 @@ public class FileLinkActivity extends TransfersManagementActivity implements Meg
 		logDebug("onCreate()");
 		requestWindowFeature(Window.FEATURE_NO_TITLE);
 		super.onCreate(savedInstanceState);
+
+		nameCollisionActivityContract = registerForActivityResult(
+				new NameCollisionActivityContract(),
+				result -> {
+					if (result != null) {
+						showSnackbar(SNACKBAR_TYPE, result, MEGACHAT_INVALID_HANDLE);
+					}
+				});
 		
 		Display display = getWindowManager().getDefaultDisplay();
 		outMetrics = new DisplayMetrics ();
@@ -671,13 +682,12 @@ public class FileLinkActivity extends TransfersManagementActivity implements Meg
 		checkNameCollisionUseCase.check(document, target, NameCollisionType.COPY)
 				.subscribeOn(Schedulers.io())
 				.observeOn(AndroidSchedulers.mainThread())
-				.subscribe(collision ->
-								startActivity(NameCollisionActivity.getIntentForSingleItem(this, collision)),
+				.subscribe(collision -> nameCollisionActivityContract.launch(collision),
 						throwable -> {
 							if (throwable instanceof MegaNodeException.ParentDoesNotExistException) {
 								showSnackbar(SNACKBAR_TYPE, StringResourcesUtils.getString(R.string.general_error), MEGACHAT_INVALID_HANDLE);
 							} else if (throwable instanceof MegaNodeException.ChildDoesNotExistsException) {
-								copyNodeUseCase.copy(document, target)
+								copyNodeUseCase.copy(document, target, null)
 										.subscribeOn(Schedulers.io())
 										.observeOn(AndroidSchedulers.mainThread())
 										.subscribe(() ->
