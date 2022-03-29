@@ -1690,7 +1690,7 @@ public class FileExplorerActivity extends TransfersManagementActivity
 					}
 					intent.putExtra(UploadService.EXTRA_PARENT_HASH, parentNode.getHandle());
 					intent.putExtra(UploadService.EXTRA_SIZE, info.getSize());
-					startService(intent);
+					ContextCompat.startForegroundService(this, intent);
 				}
 				filePreparedInfos = null;
 				logDebug("finish!!!");
@@ -1936,7 +1936,7 @@ public class FileExplorerActivity extends TransfersManagementActivity
 			intent.putExtra(UploadService.EXTRA_NAME, file.getName());
 			intent.putExtra(UploadService.EXTRA_PARENT_HASH, parentNode.getHandle());
 			intent.putExtra(UploadService.EXTRA_SIZE, file.getTotalSpace());
-			startService(intent);
+			ContextCompat.startForegroundService(this, intent);
 
 			logDebug("After UPLOAD click - back to Cloud");
 			this.backToCloud(parentNode.getHandle(), 1);

@@ -8816,13 +8816,7 @@ public class ManagerActivity extends TransfersManagementActivity
                     e.printStackTrace();
                 }
 
-                Intent uploadServiceIntent;
-                if (managerActivity != null) {
-                    uploadServiceIntent = new Intent(managerActivity, UploadService.class);
-                } else {
-                    uploadServiceIntent = new Intent(ManagerActivity.this, UploadService.class);
-                }
-
+                Intent uploadServiceIntent = new Intent(ManagerActivity.this, UploadService.class);
                 File file = new File(path);
                 if (file.isDirectory()) {
                     uploadServiceIntent.putExtra(UploadService.EXTRA_FILEPATH, file.getAbsolutePath());
@@ -8839,7 +8833,7 @@ public class ManagerActivity extends TransfersManagementActivity
 
                 uploadServiceIntent.putExtra(UploadService.EXTRA_FOLDERPATH, folderPath);
                 uploadServiceIntent.putExtra(UploadService.EXTRA_PARENT_HASH, parentNode.getHandle());
-                startService(uploadServiceIntent);
+                ContextCompat.startForegroundService(ManagerActivity.this, uploadServiceIntent);
             }
         }
     }
