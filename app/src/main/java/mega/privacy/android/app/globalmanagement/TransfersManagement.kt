@@ -14,7 +14,7 @@ import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat.getColor
 import com.jeremyliao.liveeventbus.LiveEventBus
 import mega.privacy.android.app.*
-import mega.privacy.android.app.components.transferWidget.TransferWidget.NO_TYPE
+import mega.privacy.android.app.components.transferWidget.TransfersWidget.Companion.NO_TYPE
 import mega.privacy.android.app.constants.BroadcastConstants.*
 import mega.privacy.android.app.constants.EventConstants.EVENT_FINISH_SERVICE_IF_NO_TRANSFERS
 import mega.privacy.android.app.constants.EventConstants.EVENT_SHOW_SCANNING_TRANSFERS_DIALOG

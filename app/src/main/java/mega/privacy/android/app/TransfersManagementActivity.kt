@@ -8,7 +8,7 @@ import androidx.appcompat.app.AlertDialog
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.jeremyliao.liveeventbus.LiveEventBus
 import mega.privacy.android.app.activities.PasscodeActivity
-import mega.privacy.android.app.components.transferWidget.TransferWidget
+import mega.privacy.android.app.components.transferWidget.TransfersWidget
 import mega.privacy.android.app.constants.BroadcastConstants.*
 import mega.privacy.android.app.constants.EventConstants.EVENT_SCANNING_TRANSFERS_CANCELLED
 import mega.privacy.android.app.constants.EventConstants.EVENT_SHOW_SCANNING_TRANSFERS_DIALOG
@@ -31,7 +31,7 @@ open class TransfersManagementActivity : PasscodeActivity() {
         const val IS_CANCEL_TRANSFERS_SHOWN = "IS_CANCEL_TRANSFERS_SHOWN"
     }
 
-    var transfersWidget: TransferWidget? = null
+    private var transfersWidget: TransfersWidget? = null
 
     private var scanningTransfersDialog: AlertDialog? = null
     private var cancelTransfersDialog: AlertDialog? = null
@@ -57,7 +57,7 @@ open class TransfersManagementActivity : PasscodeActivity() {
      */
     private var transfersUpdateReceiver: BroadcastReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {
-            updateWidget(intent)
+            updateTransfersWidget(intent)
         }
     }
 
@@ -130,7 +130,8 @@ open class TransfersManagementActivity : PasscodeActivity() {
         transfersWidgetLayout: RelativeLayout,
         context: Context?
     ) {
-        transfersWidget = TransferWidget(this, transfersWidgetLayout, transfersManagement)
+        transfersWidget =
+            TransfersWidget(context ?: this, megaApi, transfersWidgetLayout, transfersManagement)
 
         transfersWidgetLayout.findViewById<View>(R.id.transfers_button)
             .setOnClickListener {
@@ -173,7 +174,7 @@ open class TransfersManagementActivity : PasscodeActivity() {
      *
      * @param intent    Intent received in the LocalBroadcast
      */
-    protected fun updateWidget(intent: Intent?) {
+    protected fun updateTransfersWidget(intent: Intent?) {
         if (intent == null || transfersWidget == null) {
             return
         }
@@ -260,11 +261,31 @@ open class TransfersManagementActivity : PasscodeActivity() {
         cancelTransfersDialog?.dismiss()
     }
 
-    fun updateWidget() {
+    /**
+     * Updates the transfers widget.
+     */
+    fun updateTransfersWidget() {
         transfersWidget?.update()
     }
 
-    fun hideWidget() {
+    /**
+     * Updates the state of the transfers widget.
+     */
+    fun updateTransfersWidgetState() {
+        transfersWidget?.updateState()
+    }
+
+    /**
+     * Hides the transfers widget.
+     */
+    fun hideTransfersWidget() {
         transfersWidget?.hide()
     }
+
+    /**
+     * Gets the pending transfers.
+     *
+     * @return Pending transfers.
+     */
+    fun getPendingTransfers(): Int = transfersWidget?.pendingTransfers ?: 0
 }

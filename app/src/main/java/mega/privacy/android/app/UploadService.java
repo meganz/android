@@ -339,7 +339,7 @@ public class UploadService extends Service implements MegaTransferListenerInterf
         String fileName = intent.getStringExtra(EXTRA_NAME);
         long lastModified = intent.getLongExtra(EXTRA_LAST_MODIFIED, 0);
         if (lastModified <= 0) {
-            lastModified = file.lastModified();
+            lastModified = file.lastModified() / 1000;
         }
 
         MegaNode parentNode = parentHandle == INVALID_HANDLE
