@@ -5761,7 +5761,10 @@ public class ManagerActivity extends TransfersManagementActivity
 		    		} else if (drawerItem == DrawerItem.HOMEPAGE) {
 						if (mHomepageScreen == HomepageScreen.FULLSCREEN_OFFLINE) {
 							handleBackPressIfFullscreenOfflineFragmentOpened();
-						} else {
+						} else if (mNavController.getCurrentDestination() != null &&
+                                mNavController.getCurrentDestination().getId() == R.id.favouritesFolderFragment) {
+                            onBackPressed();
+                        } else {
 							mNavController.navigateUp();
 						}
 					} else {
@@ -6168,6 +6171,12 @@ public class ManagerActivity extends TransfersManagementActivity
             return;
         }
         if (onAskingPermissionsFragment || onAskingSMSVerificationFragment) {
+            return;
+        }
+
+        if (mNavController.getCurrentDestination() != null &&
+            mNavController.getCurrentDestination().getId() == R.id.favouritesFolderFragment) {
+            super.onBackPressed();
             return;
         }
 
@@ -7740,7 +7749,7 @@ public class ManagerActivity extends TransfersManagementActivity
     }
 
     public void showNodeOptionsPanel(MegaNode node) {
-        showNodeOptionsPanel(node, NodeOptionsBottomSheetDialogFragment.MODE0);
+        showNodeOptionsPanel(node, NodeOptionsBottomSheetDialogFragment.DEFAULT_MODE);
     }
 
     public void showNodeOptionsPanel(MegaNode node, int mode) {

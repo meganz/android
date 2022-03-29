@@ -66,19 +66,23 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
     At the same time, compatible with old code. For which mode corresponds to which dialog style,
      please refer to the code */
     /** No definite mode, map the drawerItem to a specific mode */
-    public static final int MODE0 = 0;
+    public static final int DEFAULT_MODE = 0;
     /** For Cloud Drive */
-    public static final int MODE1 = 1;
+    public static final int CLOUD_DRIVE_MODE = 1;
     /** For Rubbish Bin */
-    public static final int MODE2 = 2;
+    public static final int RUBBISH_BIN_MODE = 2;
     /** For Inbox */
-    public static final int MODE3 = 3;
+    public static final int INBOX_MODE = 3;
     /** For Shared items */
-    public static final int MODE4 = 4;
+    public static final int SHARED_ITEMS_MODE = 4;
     /** For Search */
-    public static final int MODE5 = 5;
+    public static final int SEARCH_MODE = 5;
     /** For Recents */
-    public static final int MODE6 = 6;
+    public static final int RECENTS_MODE = 6;
+    /** For Favourites of HomePage tab */
+    public static final int FAVOURITES_IN_TAB_MODE = 7;
+    /** For Favourites */
+    public static final int FAVOURITES_MODE = 8;
 
     private static final String SAVED_STATE_KEY_MODE = "MODE";
 
@@ -92,13 +96,13 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
     private DrawerItem drawerItem;
 
     public NodeOptionsBottomSheetDialogFragment(int mode) {
-        if (mode >= MODE0 && mode <= MODE6) {
+        if (mode >= DEFAULT_MODE && mode <= FAVOURITES_MODE) {
             mMode = mode;
         }
     }
 
     public NodeOptionsBottomSheetDialogFragment() {
-        mMode = MODE0;
+        mMode = DEFAULT_MODE;
     }
 
     @Nullable
@@ -113,7 +117,7 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
             if (requireActivity() instanceof ManagerActivity) {
                 drawerItem = ((ManagerActivity) requireActivity()).getDrawerItem();
             }
-            mMode = savedInstanceState.getInt(SAVED_STATE_KEY_MODE, MODE0);
+            mMode = savedInstanceState.getInt(SAVED_STATE_KEY_MODE, DEFAULT_MODE);
         } else {
             if (requireActivity() instanceof ManagerActivity) {
                 node = ((ManagerActivity) requireActivity()).getSelectedNode();
@@ -124,9 +128,9 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
         nC = new NodeController(requireActivity());
 
         if (megaApi.isInRubbish(node)) {
-            mMode = MODE2;
+            mMode = RUBBISH_BIN_MODE;
         } else if (nC.nodeComesFromIncoming(node)) {
-            mMode = MODE4;
+            mMode = SHARED_ITEMS_MODE;
         }
 
         return contentView;
@@ -207,7 +211,7 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
         optionVersionsLayout.setOnClickListener(this);
 
         TextView viewInFolder = contentView.findViewById(R.id.view_in_folder_option);
-        if (mMode == MODE6) {
+        if (mMode == RECENTS_MODE || mMode == FAVOURITES_IN_TAB_MODE) {
             viewInFolder.setVisibility(View.VISIBLE);
             viewInFolder.setOnClickListener(this);
         } else {
@@ -364,14 +368,14 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
             }
         }
 
-        if (mMode == MODE0) {
+        if (mMode == DEFAULT_MODE) {
             mapDrawerItemToMode(drawerItem);
         }
 
         switch (mMode) {
-            case MODE1:
-            case MODE3:
-            case MODE5:
+            case CLOUD_DRIVE_MODE:
+            case INBOX_MODE:
+            case SEARCH_MODE:
                 logDebug("show Cloud bottom sheet");
 
                 // Check if sub folder of "My Backup"
@@ -402,7 +406,7 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
                 optionRestoreFromRubbish.setVisibility(View.GONE);
                 break;
 
-            case MODE2:
+            case RUBBISH_BIN_MODE:
                 logDebug("show Rubbish bottom sheet");
 
                 optionEdit.setVisibility(View.GONE);
@@ -469,7 +473,7 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
                 }
                 break;
 
-            case MODE4:
+            case SHARED_ITEMS_MODE:
                 int tabSelected = ((ManagerActivity) requireActivity()).getTabItemShares();
                 if (tabSelected == 0 || nC.nodeComesFromIncoming(node)) {
                     logDebug("showOptionsPanelIncoming");
@@ -602,7 +606,9 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
 
                 break;
 
-            case MODE6:
+            case RECENTS_MODE:
+            case FAVOURITES_IN_TAB_MODE:
+            case FAVOURITES_MODE:
                 if (ViewUtils.isVisible(optionShareFolder)) {
                     counterShares--;
                     optionShareFolder.setVisibility(View.GONE);
@@ -938,35 +944,32 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
     private void mapDrawerItemToMode(DrawerItem drawerItem) {
         switch (drawerItem) {
             case CLOUD_DRIVE:
-                mMode = MODE1;
+                mMode = CLOUD_DRIVE_MODE;
                 break;
             case RUBBISH_BIN:
-                mMode = MODE2;
+                mMode = RUBBISH_BIN_MODE;
                 break;
             case INBOX:
-                mMode = MODE3;
+                mMode = INBOX_MODE;
                 break;
             case SHARED_ITEMS:
-                mMode = MODE4;
+                mMode = SHARED_ITEMS_MODE;
                 break;
             case SEARCH:
-                mMode = MODE5;
+                mMode = SEARCH_MODE;
                 break;
         }
     }
 
     private int getAdapterType() {
         switch (mMode) {
-            case MODE1:
+            case CLOUD_DRIVE_MODE:
                 return FILE_BROWSER_ADAPTER;
-
-            case MODE2:
+            case RUBBISH_BIN_MODE:
                 return RUBBISH_BIN_ADAPTER;
-
-            case MODE3:
+            case INBOX_MODE:
                 return INBOX_ADAPTER;
-
-            case MODE4:
+            case SHARED_ITEMS_MODE:
                 switch (((ManagerActivity) requireActivity()).getTabItemShares()) {
                     case INCOMING_TAB:
                         return INCOMING_SHARES_ADAPTER;
@@ -975,13 +978,13 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
                     case LINKS_TAB:
                         return LINKS_ADAPTER;
                 }
-
-            case MODE5:
+            case SEARCH_MODE:
                 return SEARCH_ADAPTER;
-
-            case MODE6:
+            case RECENTS_MODE:
                 return RECENTS_ADAPTER;
-
+            case FAVOURITES_IN_TAB_MODE:
+            case FAVOURITES_MODE:
+                return FAVOURITES_ADAPTER;
             default:
                 return INVALID_VALUE;
         }
