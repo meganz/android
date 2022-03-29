@@ -1730,15 +1730,13 @@ public class FileExplorerActivity extends TransfersManagementActivity
 							}
 
 							if (!withoutCollisions.isEmpty()) {
-
-								backToCloud(finalParentNode.getHandle(), infos.size());
-
 								String text = StringResourcesUtils.getQuantityString(R.plurals.upload_began, withoutCollisions.size(), withoutCollisions.size());
 								uploadUseCase.uploadInfos(this, infos, nameFiles, finalParentNode.getHandle())
 										.subscribeOn(Schedulers.io())
 										.observeOn(AndroidSchedulers.mainThread())
 										.subscribe(() -> {
 											showSnackbar(text);
+											backToCloud(finalParentNode.getHandle(), infos.size());
 											filePreparedInfos = null;
 											logDebug("finish!!!");
 											finishActivity();

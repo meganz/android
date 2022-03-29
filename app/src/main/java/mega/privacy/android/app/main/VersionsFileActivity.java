@@ -8,6 +8,7 @@ import android.os.Handler;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.view.ActionMode;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -61,11 +62,15 @@ import static nz.mega.sdk.MegaShare.*;
 public class VersionsFileActivity extends PasscodeActivity implements MegaRequestListenerInterface,
 		OnClickListener, MegaGlobalListenerInterface, SnackbarShower {
 
-	private static final String IS_CHECKING_REVERT_VERSION = "IS_CHECKING_REVERT_VERSION";
+	private static final String CHECKING_REVERT_VERSION = "CHECKING_REVERT_VERSION";
 	private static final String SELECTED_NODE_HANDLE = "SELECTED_NODE_HANDLE";
 	private static final String SELECTED_POSITION =  "SELECTED_POSITION";
 
 	public static final String KEY_DELETE_VERSION_HISTORY = "deleteVersionHistory";
+	public static final String KEY_DELETE_NODE_HANDLE = "nodeHandle";
+
+	public static final String DELETING_VERSION_DIALOG_SHOWN = "DELETING_VERSION_DIALOG_SHOWN";
+	public static final String DELETING_HISTORY_VERSION_DIALOG_SHOWN = "DELETING_HISTORY_VERSION_DIALOG_SHOWN";
 
 	ActionBar aB;
     MaterialToolbar tB;
@@ -106,7 +111,9 @@ public class VersionsFileActivity extends PasscodeActivity implements MegaReques
 
 	private int accessLevel;
 
-	private boolean ischeckingRevertVersion;
+	private AlertDialog deleteVersionConfirmationDialog;
+	private AlertDialog checkPermissionRevertVersionDialog;
+	private AlertDialog deleteVersionHistoryDialog;
 
 	@Override
 	public void showSnackbar(int type, @Nullable String content, long chatId) {
@@ -289,11 +296,6 @@ public class VersionsFileActivity extends PasscodeActivity implements MegaReques
 
 		if (savedInstanceState != null){
 			nodeHandle = savedInstanceState.getLong(EXTRA_NODE_HANDLE, INVALID_HANDLE);
-			ischeckingRevertVersion = savedInstanceState.getBoolean(IS_CHECKING_REVERT_VERSION, false);
-			selectedNodeHandle = savedInstanceState.getLong(SELECTED_NODE_HANDLE, INVALID_HANDLE);
-			selectedPosition = savedInstanceState.getInt(SELECTED_POSITION);
-
-			nodeSaver.restoreState(savedInstanceState);
 		}
 
 	    Bundle extras = getIntent().getExtras();
@@ -328,13 +330,6 @@ public class VersionsFileActivity extends PasscodeActivity implements MegaReques
 			}
 			else{
 				logError("ERROR: node is NULL");
-			}
-		}
-
-		if (ischeckingRevertVersion) {
-			selectedNode = megaApi.getNodeByHandle(selectedNodeHandle);
-			if (selectedNode != null) {
-				checkRevertVersion();
 			}
 		}
 	}
@@ -450,8 +445,8 @@ public class VersionsFileActivity extends PasscodeActivity implements MegaReques
 
 	void showDeleteVersionHistoryDialog () {
 		logDebug("showDeleteVersionHistoryDialog");
-        MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this);
-		builder.setTitle(R.string.title_delete_version_history)
+		deleteVersionHistoryDialog = new MaterialAlertDialogBuilder(this)
+				.setTitle(R.string.title_delete_version_history)
 				.setMessage(R.string.text_delete_version_history)
 				.setPositiveButton(R.string.context_delete, (dialog, which) -> deleteVersionHistory())
 				.setNegativeButton(R.string.general_cancel, (dialog, which) -> {})
@@ -461,6 +456,7 @@ public class VersionsFileActivity extends PasscodeActivity implements MegaReques
 	void deleteVersionHistory () {
 		Intent intent = new Intent();
 		intent.putExtra(KEY_DELETE_VERSION_HISTORY, true);
+		intent.putExtra(KEY_DELETE_NODE_HANDLE, node.getHandle());
 		setResult(RESULT_OK, intent);
 		finish();
 	}
@@ -791,14 +787,14 @@ public class VersionsFileActivity extends PasscodeActivity implements MegaReques
 
 	public void checkRevertVersion() {
 		if (getAccessLevel() <= ACCESS_READWRITE) {
-            MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this);
-			builder.setCancelable(false)
+			checkPermissionRevertVersionDialog = new MaterialAlertDialogBuilder(this)
+					.setCancelable(false)
 					.setTitle(R.string.permissions_error_label)
 					.setMessage(R.string.alert_not_enough_permissions_revert)
 					.setPositiveButton(R.string.create_new_file_action, (dialog, which) -> revertVersion())
-					.setNegativeButton(R.string.general_cancel, ((dialog, which) -> ischeckingRevertVersion = false))
+					.setNegativeButton(R.string.general_cancel, (dialog, which) -> {
+						})
 					.show();
-			ischeckingRevertVersion = true;
 		} else {
 			revertVersion();
 		}
@@ -848,8 +844,8 @@ public class VersionsFileActivity extends PasscodeActivity implements MegaReques
 	}
 
 	public void showConfirmationRemoveVersion() {
-        MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this);
-		builder.setTitle(getResources().getQuantityString(R.plurals.title_dialog_delete_version, 1))
+		deleteVersionConfirmationDialog = new MaterialAlertDialogBuilder(this)
+				.setTitle(getResources().getQuantityString(R.plurals.title_dialog_delete_version, 1))
 				.setMessage(getString(R.string.content_dialog_delete_version))
 				.setPositiveButton(R.string.context_delete, (dialog, which) -> removeVersion())
 				.setNegativeButton(R.string.general_cancel, (dialog, which) -> {
@@ -882,11 +878,37 @@ public class VersionsFileActivity extends PasscodeActivity implements MegaReques
 		logDebug("onSaveInstanceState");
 		super.onSaveInstanceState(outState);
 		outState.putLong(EXTRA_NODE_HANDLE, node.getHandle());
-		outState.putBoolean(IS_CHECKING_REVERT_VERSION, ischeckingRevertVersion);
+		outState.putBoolean(CHECKING_REVERT_VERSION, checkPermissionRevertVersionDialog != null && checkPermissionRevertVersionDialog.isShowing());
 		outState.putLong(SELECTED_NODE_HANDLE, selectedNodeHandle);
 		outState.putInt(SELECTED_POSITION, selectedPosition);
+		outState.putBoolean(DELETING_VERSION_DIALOG_SHOWN, deleteVersionConfirmationDialog != null && deleteVersionConfirmationDialog.isShowing());
+		outState.putBoolean(DELETING_HISTORY_VERSION_DIALOG_SHOWN, deleteVersionHistoryDialog != null && deleteVersionHistoryDialog.isShowing());
 
 		nodeSaver.saveState(outState);
+	}
+
+	@Override
+	public void onRestoreInstanceState(Bundle savedInstanceState) {
+		super.onRestoreInstanceState(savedInstanceState);
+
+		selectedNodeHandle = savedInstanceState.getLong(SELECTED_NODE_HANDLE, INVALID_HANDLE);
+		selectedPosition = savedInstanceState.getInt(SELECTED_POSITION);
+
+		nodeSaver.restoreState(savedInstanceState);
+		selectedNode = megaApi.getNodeByHandle(selectedNodeHandle);
+
+		if (selectedNode != null) {
+			if (savedInstanceState.getBoolean(CHECKING_REVERT_VERSION, false)) {
+				checkRevertVersion();
+			}
+			if (savedInstanceState.getBoolean(DELETING_VERSION_DIALOG_SHOWN, false)) {
+				showConfirmationRemoveVersion();
+			}
+		}
+		if (savedInstanceState.getBoolean(DELETING_HISTORY_VERSION_DIALOG_SHOWN, false)) {
+			showDeleteVersionHistoryDialog();
+		}
+
 	}
 
 	public int getAccessLevel() {

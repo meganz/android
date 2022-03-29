@@ -5778,7 +5778,10 @@ public class ManagerActivity extends TransfersManagementActivity
 		    		} else if (drawerItem == DrawerItem.HOMEPAGE) {
 						if (mHomepageScreen == HomepageScreen.FULLSCREEN_OFFLINE) {
 							handleBackPressIfFullscreenOfflineFragmentOpened();
-						} else {
+						} else if (mNavController.getCurrentDestination() != null &&
+                                mNavController.getCurrentDestination().getId() == R.id.favouritesFolderFragment) {
+                            onBackPressed();
+                        } else {
 							mNavController.navigateUp();
 						}
 					} else {
@@ -6185,6 +6188,12 @@ public class ManagerActivity extends TransfersManagementActivity
             return;
         }
         if (onAskingPermissionsFragment || onAskingSMSVerificationFragment) {
+            return;
+        }
+
+        if (mNavController.getCurrentDestination() != null &&
+            mNavController.getCurrentDestination().getId() == R.id.favouritesFolderFragment) {
+            super.onBackPressed();
             return;
         }
 
@@ -7778,7 +7787,7 @@ public class ManagerActivity extends TransfersManagementActivity
     }
 
     public void showNodeOptionsPanel(MegaNode node) {
-        showNodeOptionsPanel(node, NodeOptionsBottomSheetDialogFragment.MODE0);
+        showNodeOptionsPanel(node, NodeOptionsBottomSheetDialogFragment.DEFAULT_MODE);
     }
 
     public void showNodeOptionsPanel(MegaNode node, int mode) {
@@ -8832,7 +8841,8 @@ public class ManagerActivity extends TransfersManagementActivity
                 return;
             }
             if (intent.getBooleanExtra(VersionsFileActivity.KEY_DELETE_VERSION_HISTORY, false)) {
-                ArrayList<MegaNode> versions = megaApi.getVersions(selectedNode);
+                MegaNode node = megaApi.getNodeByHandle(intent.getLongExtra(VersionsFileActivity.KEY_DELETE_NODE_HANDLE, 0));
+                ArrayList<MegaNode> versions = megaApi.getVersions(node);
                 versionsToRemove = versions.size() - 1;
                 for (int i = 1; i < versions.size(); i++) {
                     megaApi.removeVersion(versions.get(i), this);
@@ -11392,8 +11402,8 @@ public class ManagerActivity extends TransfersManagementActivity
 	}
 
     public void showKeyboardForSearch() {
-        showKeyboardDelayed(searchView.findViewById(R.id.search_src_text));
         if (searchView != null) {
+            showKeyboardDelayed(searchView.findViewById(R.id.search_src_text));
             searchView.requestFocus();
         }
     }

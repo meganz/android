@@ -28,8 +28,8 @@ import mega.privacy.android.app.fragments.homepage.BaseNodeItemAdapter.Companion
 import mega.privacy.android.app.globalmanagement.SortOrderManagement
 import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.mediaplayer.miniplayer.MiniAudioPlayerController
-import mega.privacy.android.app.modalbottomsheet.NodeOptionsBottomSheetDialogFragment.MODE1
-import mega.privacy.android.app.modalbottomsheet.NodeOptionsBottomSheetDialogFragment.MODE5
+import mega.privacy.android.app.modalbottomsheet.NodeOptionsBottomSheetDialogFragment.CLOUD_DRIVE_MODE
+import mega.privacy.android.app.modalbottomsheet.NodeOptionsBottomSheetDialogFragment.SEARCH_MODE
 import mega.privacy.android.app.utils.*
 import mega.privacy.android.app.utils.Constants.*
 import mega.privacy.android.app.utils.FileUtil.*
@@ -146,7 +146,7 @@ class AudioFragment : Fragment(), HomepageSearchable {
             doIfOnline {
                 callManager { manager ->
                     manager.showNodeOptionsPanel(
-                        it.node, if (viewModel.searchMode) MODE5 else MODE1
+                        it.node, if (viewModel.searchMode) SEARCH_MODE else CLOUD_DRIVE_MODE
                     )
                 }
             }

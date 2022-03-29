@@ -30,6 +30,10 @@
         <action
             android:id="@+id/action_homepageFragment_to_videoFragment"
             app:destination="@id/videoFragment" />
+        <action
+            android:id="@+id/action_homepageFragment_to_favouritesFolderFragment"
+            app:destination="@id/favouritesFolderFragment"
+            app:popUpTo="@id/homepageFragment"/>
     </fragment>
     <fragment
         android:id="@+id/photosFragment"
@@ -99,5 +103,13 @@
         <action
             android:id="@+id/action_homepage_to_fullscreen_offline"
             app:destination="@id/fullscreen_offline" />
+    </fragment>
+    <fragment
+        android:id="@+id/favouritesFolderFragment"
+        android:name="mega.privacy.android.app.presentation.favourites.FavouriteFolderFragment"
+        android:label="FavouritesFolder">
+        <argument
+            android:name="parentHandle"
+            app:argType="long" />
     </fragment>
 </navigation>
