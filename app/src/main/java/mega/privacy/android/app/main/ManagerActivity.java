@@ -990,7 +990,7 @@ public class ManagerActivity extends TransfersManagementActivity
                 showTransfersTransferOverQuotaWarning();
             }
 
-            if (transfersManagement.thereAreFailedTransfers() && drawerItem == DrawerItem.TRANSFERS && getTabItemTransfers() == COMPLETED_TAB && !retryTransfers.isVisible()) {
+            if (transfersManagement.getAreFailedTransfers() && drawerItem == DrawerItem.TRANSFERS && getTabItemTransfers() == COMPLETED_TAB && !retryTransfers.isVisible()) {
                 retryTransfers.setVisible(true);
             }
         }
@@ -3602,7 +3602,7 @@ public class ManagerActivity extends TransfersManagementActivity
     protected void onPause() {
         logDebug("onPause");
         managerActivity = null;
-        transfersManagement.setIsOnTransfersSection(false);
+        transfersManagement.setOnTransfersSection(false);
         super.onPause();
     }
 
@@ -4385,7 +4385,7 @@ public class ManagerActivity extends TransfersManagementActivity
 
 		boolean showCompleted = !dbH.getCompletedTransfers().isEmpty() && getPendingTransfers() <= 0;
 
-		indexTransfers = transfersManagement.thereAreFailedTransfers() || showCompleted ? COMPLETED_TAB : PENDING_TAB;
+		indexTransfers = transfersManagement.getAreFailedTransfers() || showCompleted ? COMPLETED_TAB : PENDING_TAB;
 
         if (viewPagerTransfers != null) {
             switch (indexTransfers) {
@@ -4398,7 +4398,7 @@ public class ManagerActivity extends TransfersManagementActivity
                     refreshFragment(FragmentTag.TRANSFERS.getTag());
                     viewPagerTransfers.setCurrentItem(PENDING_TAB);
 
-                    if (transfersManagement.shouldShowNetWorkWarning()) {
+                    if (transfersManagement.getShouldShowNetworkWarning()) {
                         showSnackbar(SNACKBAR_TYPE, getString(R.string.error_server_connection_problem), MEGACHAT_INVALID_HANDLE);
                     }
 
@@ -4667,7 +4667,7 @@ public class ManagerActivity extends TransfersManagementActivity
 			transfersFragment.checkSelectModeAfterChangeTabOrDrawerItem();
 		}
 
-		transfersManagement.setIsOnTransfersSection(item == DrawerItem.TRANSFERS);
+		transfersManagement.setOnTransfersSection(item == DrawerItem.TRANSFERS);
 
         switch (item) {
             case CLOUD_DRIVE: {
@@ -11766,7 +11766,7 @@ public class ManagerActivity extends TransfersManagementActivity
      * Updates values of TransfersManagement object after the activity comes from background.
      */
 	private void checkTransferOverQuotaOnResume() {
-		transfersManagement.setIsOnTransfersSection(drawerItem == DrawerItem.TRANSFERS);
+		transfersManagement.setOnTransfersSection(drawerItem == DrawerItem.TRANSFERS);
 
 		if (transfersManagement.isTransferOverQuotaNotificationShown()) {
 			transfersManagement.setTransferOverQuotaBannerShown(true);

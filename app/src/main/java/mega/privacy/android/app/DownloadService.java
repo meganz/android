@@ -1168,7 +1168,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 
 				launchTransferUpdateIntent(TYPE_DOWNLOAD);
 				if (transfer.getState() == MegaTransfer.STATE_FAILED) {
-					transfersManagement.setFailedTransfers(true);
+					transfersManagement.setAreFailedTransfers(true);
 				}
 
 				if (!isVoiceClip && !isBackgroundTransfer) {

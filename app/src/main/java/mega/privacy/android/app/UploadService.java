@@ -708,7 +708,7 @@ public class UploadService extends Service implements MegaTransferListenerInterf
                 }
 
                 if (transfer.getState() == MegaTransfer.STATE_FAILED) {
-                    transfersManagement.setFailedTransfers(true);
+                    transfersManagement.setAreFailedTransfers(true);
                 }
             }
 

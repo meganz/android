@@ -161,13 +161,13 @@ class TransfersManagement @Inject constructor(
 
     private var transferOverQuotaTimestamp: Long = 0
     private var hasNotToBeShowDueToTransferOverQuota = false
-    private var isCurrentTransferOverQuota = false
-    private var isOnTransfersSection = false
-    private var failedTransfers = false
-    private var transferOverQuotaNotificationShown = false
-    private var isTransferOverQuotaBannerShown = false
-    private var resumeTransfersWarningHasAlreadyBeenShown = false
-    private var shouldShowNetworkWarning = false
+    var isCurrentTransferOverQuota = false
+    var isOnTransfersSection = false
+    var areFailedTransfers = false
+    var isTransferOverQuotaNotificationShown = false
+    var isTransferOverQuotaBannerShown = false
+    var hasResumeTransfersWarningAlreadyBeenShown = false
+    var shouldShowNetworkWarning = false
 
     private val pausedTransfers = ArrayList<String>()
 
@@ -186,10 +186,10 @@ class TransfersManagement @Inject constructor(
         hasNotToBeShowDueToTransferOverQuota = false
         isCurrentTransferOverQuota = false
         isOnTransfersSection = false
-        failedTransfers = false
-        transferOverQuotaNotificationShown = false
+        areFailedTransfers = false
+        isTransferOverQuotaNotificationShown = false
         isTransferOverQuotaBannerShown = false
-        resumeTransfersWarningHasAlreadyBeenShown = false
+        hasResumeTransfersWarningAlreadyBeenShown = false
         shouldShowNetworkWarning = false
         pausedTransfers.clear()
         scanningTransfers.clear()
@@ -311,7 +311,7 @@ class TransfersManagement @Inject constructor(
      */
     fun setHasNotToBeShowDueToTransferOverQuota(hasNotToBeShowDueToTransferOverQuota: Boolean) {
         this.hasNotToBeShowDueToTransferOverQuota = hasNotToBeShowDueToTransferOverQuota
-        setTransferOverQuotaBannerShown(hasNotToBeShowDueToTransferOverQuota)
+        isTransferOverQuotaBannerShown = hasNotToBeShowDueToTransferOverQuota
     }
 
     /**
@@ -340,7 +340,7 @@ class TransfersManagement @Inject constructor(
                     return
                 }
 
-                setShouldShowNetworkWarning(true)
+                shouldShowNetworkWarning = true
                 launchTransferUpdateIntent(NO_TYPE)
             }
         }.start()
@@ -352,7 +352,7 @@ class TransfersManagement @Inject constructor(
     fun resetNetworkTimer() {
         if (networkTimer != null) {
             networkTimer?.cancel()
-            setShouldShowNetworkWarning(false)
+            shouldShowNetworkWarning = false
             launchTransferUpdateIntent(NO_TYPE)
         }
     }
@@ -600,55 +600,4 @@ class TransfersManagement @Inject constructor(
         } else {
             false
         }
-
-    /**
-     * Checks if the transfer over quota has occurred at this moment
-     * or it occurred in other past moment.
-     *
-     * @return  True if the transfer over quota has occurred at this moment, false otherwise.
-     */
-    fun isCurrentTransferOverQuota(): Boolean =
-        isCurrentTransferOverQuota
-
-    fun setCurrentTransferOverQuota(currentTransferOverQuota: Boolean) {
-        isCurrentTransferOverQuota = currentTransferOverQuota
-    }
-
-    fun setIsOnTransfersSection(isOnTransfersSection: Boolean) {
-        this.isOnTransfersSection = isOnTransfersSection
-    }
-
-    fun isOnTransfersSection(): Boolean = isOnTransfersSection
-
-    fun setFailedTransfers(failedTransfers: Boolean) {
-        this.failedTransfers = failedTransfers
-    }
-
-    fun thereAreFailedTransfers(): Boolean = failedTransfers
-
-    fun setTransferOverQuotaNotificationShown(transferOverQuotaNotificationShown: Boolean) {
-        this.transferOverQuotaNotificationShown = transferOverQuotaNotificationShown
-    }
-
-    fun isTransferOverQuotaNotificationShown(): Boolean = transferOverQuotaNotificationShown
-
-    fun setTransferOverQuotaBannerShown(transferOverQuotaBannerShown: Boolean) {
-        isTransferOverQuotaBannerShown = transferOverQuotaBannerShown
-    }
-
-    fun isTransferOverQuotaBannerShown(): Boolean =
-        isTransferOverQuotaBannerShown
-
-    fun setResumeTransfersWarningHasAlreadyBeenShown(resumeTransfersWarningHasAlreadyBeenShown: Boolean) {
-        this.resumeTransfersWarningHasAlreadyBeenShown = resumeTransfersWarningHasAlreadyBeenShown
-    }
-
-    fun isResumeTransfersWarningHasAlreadyBeenShown(): Boolean =
-        resumeTransfersWarningHasAlreadyBeenShown
-
-    fun setShouldShowNetworkWarning(shouldShowNetworkWarning: Boolean) {
-        this.shouldShowNetworkWarning = shouldShowNetworkWarning
-    }
-
-    fun shouldShowNetWorkWarning(): Boolean = shouldShowNetworkWarning
 }

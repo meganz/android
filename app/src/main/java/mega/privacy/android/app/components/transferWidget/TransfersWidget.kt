@@ -17,12 +17,16 @@ import androidx.core.content.ContextCompat
 import android.graphics.drawable.GradientDrawable
 import android.view.View
 import android.widget.ImageView
+import dagger.hilt.android.qualifiers.ApplicationContext
 import mega.privacy.android.app.di.MegaApi
 import mega.privacy.android.app.utils.Util
 import kotlin.math.roundToInt
 
+/**
+ * Class which allows to show a widget for informing about transfers progress and state.
+ */
 class TransfersWidget(
-    private val context: Context,
+    @ApplicationContext private val context: Context,
     @MegaApi private val megaApi: MegaApiAndroid,
     private val transfersWidget: RelativeLayout,
     private val transfersManagement: TransfersManagement
@@ -51,7 +55,7 @@ class TransfersWidget(
     fun update(transferType: Int = NO_TYPE) {
         if (context is ManagerActivity) {
             if (context.drawerItem === DrawerItem.TRANSFERS) {
-                transfersManagement.setFailedTransfers(false)
+                transfersManagement.areFailedTransfers = false
             }
 
             if (!isOnFileManagementManagerSection) {
@@ -61,12 +65,12 @@ class TransfersWidget(
         }
 
         when {
-            pendingTransfers > 0 && !transfersManagement.shouldShowNetWorkWarning() -> {
+            pendingTransfers > 0 && !transfersManagement.shouldShowNetworkWarning -> {
                 setProgress(progress, transferType)
                 updateState()
             }
-            (pendingTransfers > 0 && transfersManagement.shouldShowNetWorkWarning())
-                    || transfersManagement.thereAreFailedTransfers() -> {
+            (pendingTransfers > 0 && transfersManagement.shouldShowNetworkWarning)
+                    || transfersManagement.areFailedTransfers -> {
                 setFailedTransfers()
             }
             else -> {
@@ -110,7 +114,7 @@ class TransfersWidget(
      */
     private fun setProgressTransfers() {
         when {
-            transfersManagement.thereAreFailedTransfers() -> {
+            transfersManagement.areFailedTransfers -> {
                 updateStatus(getDrawable(R.drawable.ic_transfers_error))
             }
             isOverQuota -> {

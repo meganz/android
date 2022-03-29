@@ -683,7 +683,7 @@ public class BaseActivity extends AppCompatActivity implements ActivityLauncher,
                 return;
             }
 
-            transfersManagement.setResumeTransfersWarningHasAlreadyBeenShown(true);
+            transfersManagement.setHasResumeTransfersWarningAlreadyBeenShown(true);
             showResumeTransfersWarning(baseActivity);
         }
     };

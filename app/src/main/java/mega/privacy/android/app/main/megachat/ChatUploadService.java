@@ -519,7 +519,7 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 		}
 
 		if (megaApi.areTransfersPaused(MegaTransfer.TYPE_UPLOAD)
-				&& !transfersManagement.isResumeTransfersWarningHasAlreadyBeenShown()) {
+				&& !transfersManagement.getHasResumeTransfersWarningAlreadyBeenShown()) {
 			sendBroadcast(new Intent(BROADCAST_ACTION_RESUME_TRANSFERS));
 		}
 	}
@@ -606,7 +606,7 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 		}
 
 		logDebug("Stopping service!!");
-		transfersManagement.setResumeTransfersWarningHasAlreadyBeenShown(false);
+		transfersManagement.setHasResumeTransfersWarningAlreadyBeenShown(false);
 		stopForeground();
 		logDebug("After stopSelf");
 
