@@ -2115,20 +2115,20 @@ public class ManagerActivity extends TransfersManagementActivity
 
         setTransfersWidgetLayout(findViewById(R.id.transfers_widget_layout), this);
 
-		transferData = megaApi.getTransferData(this);
-		if (transferData != null) {
-			for (int i = 0; i < transferData.getNumDownloads(); i++) {
-				int tag = transferData.getDownloadTag(i);
-				transfersInProgress.add(tag);
-				transfersManagement.checkIfTransferIsPaused(tag);
-			}
+        transferData = megaApi.getTransferData(this);
+        if (transferData != null) {
+            for (int i = 0; i < transferData.getNumDownloads(); i++) {
+                int tag = transferData.getDownloadTag(i);
+                transfersInProgress.add(tag);
+                transfersManagement.checkIfTransferIsPaused(tag);
+            }
 
-			for (int i = 0; i < transferData.getNumUploads(); i++) {
-				int tag = transferData.getUploadTag(i);
-				transfersInProgress.add(transferData.getUploadTag(i));
-				transfersManagement.checkIfTransferIsPaused(tag);
-			}
-		}
+            for (int i = 0; i < transferData.getNumUploads(); i++) {
+                int tag = transferData.getUploadTag(i);
+                transfersInProgress.add(transferData.getUploadTag(i));
+                transfersManagement.checkIfTransferIsPaused(tag);
+            }
+        }
 
         if (!isOnline(this)) {
             logDebug("No network -> SHOW OFFLINE MODE");
@@ -4370,7 +4370,7 @@ public class ManagerActivity extends TransfersManagementActivity
     public void selectDrawerItemTransfers() {
         logDebug("selectDrawerItemTransfers");
 
-		abL.setVisibility(View.VISIBLE);
+        abL.setVisibility(View.VISIBLE);
         hideTransfersWidget();
 
         drawerItem = DrawerItem.TRANSFERS;
@@ -4383,9 +4383,9 @@ public class ManagerActivity extends TransfersManagementActivity
             tabLayoutTransfers.setupWithViewPager(viewPagerTransfers);
         }
 
-		boolean showCompleted = !dbH.getCompletedTransfers().isEmpty() && getPendingTransfers() <= 0;
+        boolean showCompleted = !dbH.getCompletedTransfers().isEmpty() && getPendingTransfers() <= 0;
 
-		indexTransfers = transfersManagement.getAreFailedTransfers() || showCompleted ? COMPLETED_TAB : PENDING_TAB;
+        indexTransfers = transfersManagement.getAreFailedTransfers() || showCompleted ? COMPLETED_TAB : PENDING_TAB;
 
         if (viewPagerTransfers != null) {
             switch (indexTransfers) {
@@ -4588,7 +4588,7 @@ public class ManagerActivity extends TransfersManagementActivity
                     abL.setVisibility(View.GONE);
                 }
 
-				updateTransfersWidget();
+                updateTransfersWidget();
                 setDrawerLockMode(false);
                 return;
             } else if (destinationId == R.id.photosFragment) {
@@ -4667,7 +4667,7 @@ public class ManagerActivity extends TransfersManagementActivity
 			transfersFragment.checkSelectModeAfterChangeTabOrDrawerItem();
 		}
 
-		transfersManagement.setOnTransfersSection(item == DrawerItem.TRANSFERS);
+        transfersManagement.setOnTransfersSection(item == DrawerItem.TRANSFERS);
 
         switch (item) {
             case CLOUD_DRIVE: {
@@ -11765,14 +11765,14 @@ public class ManagerActivity extends TransfersManagementActivity
     /**
      * Updates values of TransfersManagement object after the activity comes from background.
      */
-	private void checkTransferOverQuotaOnResume() {
-		transfersManagement.setOnTransfersSection(drawerItem == DrawerItem.TRANSFERS);
+    private void checkTransferOverQuotaOnResume() {
+        transfersManagement.setOnTransfersSection(drawerItem == DrawerItem.TRANSFERS);
 
-		if (transfersManagement.isTransferOverQuotaNotificationShown()) {
-			transfersManagement.setTransferOverQuotaBannerShown(true);
-			transfersManagement.setTransferOverQuotaNotificationShown(false);
-		}
-	}
+        if (transfersManagement.isTransferOverQuotaNotificationShown()) {
+            transfersManagement.setTransferOverQuotaBannerShown(true);
+            transfersManagement.setTransferOverQuotaNotificationShown(false);
+        }
+    }
 
     /**
      * Gets the failed and cancelled transfers.

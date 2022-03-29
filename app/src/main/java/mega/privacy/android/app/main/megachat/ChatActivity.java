@@ -8261,41 +8261,7 @@ public class ChatActivity extends PasscodeActivity
                     logError("ERROR: " + e.getErrorCode() + "___" + e.getErrorString());
                 }
             }
-        }
-        else if(request.getType() == MegaRequest.TYPE_COPY){
-            if (e.getErrorCode() != MegaError.API_OK) {
-
-                logDebug("e.getErrorCode() != MegaError.API_OK");
-
-                if(e.getErrorCode()==MegaError.API_EOVERQUOTA){
-                    if (api.isForeignNode(request.getParentHandle())) {
-                        showForeignStorageOverQuotaWarningDialog(this);
-                        return;
-                    }
-
-                    logWarning("OVERQUOTA ERROR: " + e.getErrorCode());
-                    Intent intent = new Intent(this, ManagerActivity.class);
-                    intent.setAction(ACTION_OVERQUOTA_STORAGE);
-                    startActivity(intent);
-                    finish();
-                }
-                else if(e.getErrorCode()==MegaError.API_EGOINGOVERQUOTA){
-                    logWarning("OVERQUOTA ERROR: " + e.getErrorCode());
-                    Intent intent = new Intent(this, ManagerActivity.class);
-                    intent.setAction(ACTION_PRE_OVERQUOTA_STORAGE);
-                    startActivity(intent);
-                    finish();
-                }
-                else
-                {
-                    showSnackbar(SNACKBAR_TYPE, getString(R.string.import_success_error), -1);
-                }
-
-            }else{
-                showSnackbar(SNACKBAR_TYPE, getString(R.string.import_success_message), -1);
-            }
-        }
-        else if (request.getType() == MegaRequest.TYPE_CANCEL_TRANSFER){
+        } else if (request.getType() == MegaRequest.TYPE_CANCEL_TRANSFER){
             int tag = request.getTransferTag();
             ChatManagement chatManagement = MegaApplication.getChatManagement();
             long pMsgId = chatManagement.getPendingMsgIdToBeCancelled(tag);

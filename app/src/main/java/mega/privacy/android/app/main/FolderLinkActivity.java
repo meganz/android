@@ -703,9 +703,7 @@ public class FolderLinkActivity extends TransfersManagementActivity implements M
 									copyNodeUseCase.copy(nodesWithoutCollisions, toHandle)
 											.subscribeOn(Schedulers.io())
 											.observeOn(AndroidSchedulers.mainThread())
-											.subscribe((copyResult, copyThrowable) -> {
-												showCopyResult(copyResult, copyThrowable);
-											});
+											.subscribe(this::showCopyResult);
 								}
 							}
 						});

@@ -122,7 +122,7 @@ public class ContactFileListActivity extends PasscodeActivity
 	@Inject
 	CheckNameCollisionUseCase checkNameCollisionUseCase;
 	@Inject
-    UploadUseCase uploadUseCase;
+	UploadUseCase uploadUseCase;
 	@Inject
 	CopyNodeUseCase copyNodeUseCase;
 
@@ -822,10 +822,10 @@ public class ContactFileListActivity extends PasscodeActivity
 										if (throwable instanceof MegaNodeException.ParentDoesNotExistException) {
 											showSnackbar(SNACKBAR_TYPE, StringResourcesUtils.getString(R.string.general_error));
 										} else if (throwable instanceof MegaNodeException.ChildDoesNotExistsException) {
-                                            uploadUseCase.upload(this, file, contactFileListFragment.getParentHandle())
-                                                    .subscribeOn(Schedulers.io())
-                                                    .observeOn(AndroidSchedulers.mainThread())
-                                                    .subscribe(() -> logDebug("Upload started"));
+											uploadUseCase.upload(this, file, contactFileListFragment.getParentHandle())
+													.subscribeOn(Schedulers.io())
+													.observeOn(AndroidSchedulers.mainThread())
+													.subscribe(() -> logDebug("Upload started"));
 										}
 									});
 				}

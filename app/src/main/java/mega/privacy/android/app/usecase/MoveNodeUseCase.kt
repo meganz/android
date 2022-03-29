@@ -48,6 +48,18 @@ class MoveNodeUseCase @Inject constructor(
         }
 
     /**
+     * Moves a node to other location.
+     *
+     * @param node          MegaNode to move.
+     * @param parentHandle  The parent MegaNode where the node has to be moved.
+     * @return Completable.
+     */
+    fun move(node: MegaNode, parentHandle: Long): Completable =
+        Completable.fromCallable {
+            move(node, getNodeUseCase.get(parentHandle).blockingGetOrNull()).blockingAwait()
+        }
+
+    /**
      * Moves a node to the Rubbish Bin.
      *
      * @param handle        The identifier of the MegaNode to move.

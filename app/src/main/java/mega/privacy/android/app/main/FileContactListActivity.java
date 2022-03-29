@@ -739,14 +739,14 @@ public class FileContactListActivity extends PasscodeActivity implements OnClick
 	 */
 	public void onIntentProcessed() {
 		List<ShareInfo> infos = filePreparedInfos;
-		
+
 		MegaNode parentNode = megaApi.getNodeByHandle(parentHandle);
-		if(parentNode == null){
+		if (parentNode == null) {
 			AlertDialogUtil.dismissAlertDialogIfExists(statusDialog);
 			showSnackbar(StringResourcesUtils.getString(R.string.error_temporary_unavaible));
 			return;
 		}
-		
+
 		if (infos == null) {
 			AlertDialogUtil.dismissAlertDialogIfExists(statusDialog);
 			showSnackbar(StringResourcesUtils.getString(R.string.upload_can_not_open));

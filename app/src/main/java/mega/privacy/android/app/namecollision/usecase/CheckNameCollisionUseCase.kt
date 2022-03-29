@@ -418,7 +418,7 @@ class CheckNameCollisionUseCase @Inject constructor(
 
             messageIds.forEach { messageId ->
                 getNodeUseCase.get(chatId, messageId).blockingSubscribeBy(
-                    onError = { error -> logError("", error) },
+                    onError = { error -> logError("Error getting chat node.", error) },
                     onSuccess = { nodes ->
                         nodes.forEach { node ->
                             check(node.name, parentNode).blockingSubscribeBy(
@@ -429,7 +429,6 @@ class CheckNameCollisionUseCase @Inject constructor(
                                         }
                                         else -> {
                                             emitter.onError(error)
-                                            return@blockingSubscribeBy
                                         }
                                     }
                                 },

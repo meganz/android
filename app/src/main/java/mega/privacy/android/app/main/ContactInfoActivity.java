@@ -1370,15 +1370,15 @@ public class ContactInfoActivity extends PasscodeActivity
 
 			megaAttacher.handleSelectFileResult(intent, user, this);
 		} else if (requestCode == REQUEST_CODE_SELECT_FOLDER_TO_COPY && resultCode == RESULT_OK) {
-            if (!isOnline(this)) {
-                showSnackbar(SNACKBAR_TYPE, getString(R.string.error_server_connection_problem), -1);
-                return;
-            }
+			if (!isOnline(this)) {
+				showSnackbar(SNACKBAR_TYPE, getString(R.string.error_server_connection_problem), -1);
+				return;
+			}
 
-            statusDialog = createProgressDialog(this, StringResourcesUtils.getString(R.string.context_copying));
-            
-            final long[] copyHandles = intent.getLongArrayExtra("COPY_HANDLES");
-            final long toHandle = intent.getLongExtra("COPY_TO", 0);
+			statusDialog = createProgressDialog(this, StringResourcesUtils.getString(R.string.context_copying));
+
+			final long[] copyHandles = intent.getLongArrayExtra("COPY_HANDLES");
+			final long toHandle = intent.getLongExtra("COPY_TO", 0);
 
 			checkNameCollisionUseCase.checkHandleList(copyHandles, toHandle, NameCollisionType.COPY)
 					.subscribeOn(Schedulers.io())
@@ -1399,7 +1399,7 @@ public class ContactInfoActivity extends PasscodeActivity
 										.subscribeOn(Schedulers.io())
 										.observeOn(AndroidSchedulers.mainThread())
 										.subscribe((copyResult, copyThrowable) -> {
-											if(sharedFoldersFragment!=null && sharedFoldersFragment.isVisible()){
+											if (sharedFoldersFragment != null && sharedFoldersFragment.isVisible()) {
 												sharedFoldersFragment.clearSelections();
 												sharedFoldersFragment.hideMultipleSelect();
 											}
@@ -1420,7 +1420,7 @@ public class ContactInfoActivity extends PasscodeActivity
 							}
 						}
 					});
-        }
+		}
 
 		super.onActivityResult(requestCode, resultCode, intent);
 	}

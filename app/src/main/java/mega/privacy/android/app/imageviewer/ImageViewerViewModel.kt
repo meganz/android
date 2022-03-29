@@ -474,12 +474,14 @@ class ImageViewerViewModel @Inject constructor(
      * @param newParentHandle   Parent handle in which the node will be copied.
      */
     fun copyNode(nodeHandle: Long, newParentHandle: Long) {
+        val node = getExistingNode(nodeHandle) ?: return
+
         checkNameCollision(
-            nodeHandle = nodeHandle,
+            node = node,
             newParentHandle = newParentHandle,
             type = NameCollisionType.COPY
         ) {
-            copyNodeUseCase.copy(handle = nodeHandle, parentHandle = newParentHandle)
+            copyNodeUseCase.copy(node = node, parentHandle = newParentHandle)
                 .subscribeAndComplete {
                     snackbarMessage.value = getString(R.string.context_correctly_copied)
                 }
@@ -493,12 +495,14 @@ class ImageViewerViewModel @Inject constructor(
      * @param newParentHandle   Parent handle in which the node will be moved.
      */
     fun moveNode(nodeHandle: Long, newParentHandle: Long) {
+        val node = getExistingNode(nodeHandle) ?: return
+
         checkNameCollision(
-            nodeHandle = nodeHandle,
+            node = node,
             newParentHandle = newParentHandle,
             type = NameCollisionType.MOVEMENT
         ) {
-            moveNodeUseCase.move(handle = nodeHandle, parentHandle = newParentHandle)
+            moveNodeUseCase.move(node = node, parentHandle = newParentHandle)
                 .subscribeAndComplete {
                     snackbarMessage.value = getString(R.string.context_correctly_moved)
                 }
@@ -508,19 +512,19 @@ class ImageViewerViewModel @Inject constructor(
     /**
      * Checks if there is a name collision before proceeding with the action.
      *
-     * @param nodeHandle        Handle of the node to check the name collision.
+     * @param node              Node to check the name collision.
      * @param newParentHandle   Handle of the parent folder in which the action will be performed.
      * @param type              [NameCollisionType]
      * @param completeAction    Action to complete after checking the name collision.
      */
     private fun checkNameCollision(
-        nodeHandle: Long,
+        node: MegaNode,
         newParentHandle: Long,
         type: NameCollisionType,
         completeAction: (() -> Unit)
     ) {
         checkNameCollisionUseCase.check(
-            handle = nodeHandle,
+            node = node,
             parentHandle = newParentHandle,
             type = type
         ).observeOn(AndroidSchedulers.mainThread())

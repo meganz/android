@@ -678,6 +678,9 @@ public class FileLinkActivity extends TransfersManagementActivity implements Meg
 		startActivityForResult(intent, REQUEST_CODE_SELECT_IMPORT_FOLDER);
 	}
 
+	/**
+	 * Copies a node.
+	 */
 	private void copyNode() {
 		checkNameCollisionUseCase.check(document, target, NameCollisionType.COPY)
 				.subscribeOn(Schedulers.io())
@@ -696,6 +699,11 @@ public class FileLinkActivity extends TransfersManagementActivity implements Meg
 						});
 	}
 
+	/**
+	 * Shows the copy request result.
+	 *
+	 * @param throwable A valid throwable if there was some error, null otherwise.
+	 */
 	private void showCopyResult(Throwable throwable) {
 		dismissAlertDialogIfExists(statusDialog);
 

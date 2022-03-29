@@ -119,9 +119,9 @@ import javax.inject.Inject;
 
 @AndroidEntryPoint
 public class NodeAttachmentHistoryActivity extends PasscodeActivity
-        implements MegaChatRequestListenerInterface, MegaRequestListenerInterface, OnClickListener,
-        MegaChatListenerInterface, MegaChatNodeHistoryListenerInterface,
-        StoreDataBeforeForward<ArrayList<MegaChatMessage>>, SnackbarShower {
+        implements MegaChatRequestListenerInterface, OnClickListener, MegaChatListenerInterface,
+        MegaChatNodeHistoryListenerInterface, StoreDataBeforeForward<ArrayList<MegaChatMessage>>,
+        SnackbarShower {
 
     @Inject
     CheckNameCollisionUseCase checkNameCollisionUseCase;
@@ -1245,59 +1245,6 @@ public class NodeAttachmentHistoryActivity extends PasscodeActivity
 
     @Override
     public void onRequestTemporaryError(MegaChatApiJava api, MegaChatRequest request, MegaChatError e) {
-
-    }
-
-
-    @Override
-    public void onRequestStart(MegaApiJava api, MegaRequest request) {
-
-    }
-
-    @Override
-    public void onRequestUpdate(MegaApiJava api, MegaRequest request) {
-
-    }
-
-    @Override
-    public void onRequestFinish(MegaApiJava api, MegaRequest request, MegaError e) {
-        logDebug("onRequestFinish");
-        removeProgressDialog();
-
-        if (request.getType() == MegaRequest.TYPE_COPY) {
-            if (e.getErrorCode() != MegaError.API_OK) {
-
-                logDebug("e.getErrorCode() != MegaError.API_OK");
-
-                if (e.getErrorCode() == MegaError.API_EOVERQUOTA) {
-                    if (api.isForeignNode(request.getParentHandle())) {
-                        showForeignStorageOverQuotaWarningDialog(this);
-                        return;
-                    }
-
-                    logWarning("OVERQUOTA ERROR: " + e.getErrorCode());
-                    Intent intent = new Intent(this, ManagerActivity.class);
-                    intent.setAction(ACTION_OVERQUOTA_STORAGE);
-                    startActivity(intent);
-                    finish();
-                } else if (e.getErrorCode() == MegaError.API_EGOINGOVERQUOTA) {
-                    logWarning("OVERQUOTA ERROR: " + e.getErrorCode());
-                    Intent intent = new Intent(this, ManagerActivity.class);
-                    intent.setAction(ACTION_PRE_OVERQUOTA_STORAGE);
-                    startActivity(intent);
-                    finish();
-                } else {
-                    showSnackbar(SNACKBAR_TYPE, getString(R.string.import_success_error));
-                }
-
-            } else {
-                showSnackbar(SNACKBAR_TYPE, getString(R.string.import_success_message));
-            }
-        }
-    }
-
-    @Override
-    public void onRequestTemporaryError(MegaApiJava api, MegaRequest request, MegaError e) {
 
     }
 

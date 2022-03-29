@@ -63,9 +63,9 @@ class GetNodeUseCase @Inject constructor(
      */
     fun get(chatId: Long, messageId: Long): Single<MutableList<MegaNode>> =
         Single.create { emitter ->
-            if (chatId == MegaChatApiJava.MEGACHAT_INVALID_HANDLE
-                || megaChatApi.getChatRoom(chatId) == null
-            ) {
+            val chat = megaChatApi.getChatRoom(chatId)
+
+            if (chat == null) {
                 emitter.onError(ChatDoesNotExistException())
                 return@create
             }
@@ -88,7 +88,13 @@ class GetNodeUseCase @Inject constructor(
             val nodes = mutableListOf<MegaNode>()
 
             for (i in 0 until attachments.size()) {
-                nodes.add(attachments.get(i))
+                nodes.add(
+                    if (chat.isPreview) megaApi.authorizeChatNode(
+                        attachments.get(i),
+                        chat.authorizationToken
+                    )
+                    else attachments.get(i)
+                )
             }
 
             when {
