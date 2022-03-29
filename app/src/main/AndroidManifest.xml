@@ -493,6 +493,14 @@
             android:exported="false"
             android:foregroundServiceType="dataSync" />
         <service
+            android:name=".jobservices.CuSyncInactiveHeartbeatService"
+            android:exported="false"
+            android:permission="android.permission.BIND_JOB_SERVICE" />
+        <service
+            android:name=".jobservices.CameraUploadStarterService"
+            android:exported="false"
+            android:permission="android.permission.BIND_JOB_SERVICE" />
+        <service
             android:name=".fcm.IncomingCallService"
             android:exported="true" />
         <service
