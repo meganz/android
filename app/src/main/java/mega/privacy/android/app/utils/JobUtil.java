@@ -1,7 +1,6 @@
 package mega.privacy.android.app.utils;
 
 import static mega.privacy.android.app.jobservices.CameraUploadsService.EXTRA_IGNORE_ATTR_CHECK;
-import static mega.privacy.android.app.sync.cusync.CuSyncManager.INACTIVE_HEARTBEAT_INTERVAL_MINUTES;
 import static mega.privacy.android.app.utils.LogUtil.logDebug;
 import static mega.privacy.android.app.utils.permission.PermissionUtils.hasPermissions;
 
@@ -13,7 +12,8 @@ import android.text.TextUtils;
 
 import androidx.core.content.ContextCompat;
 import androidx.work.ExistingPeriodicWorkPolicy;
-import androidx.work.Operation;
+import androidx.work.ExistingWorkPolicy;
+import androidx.work.OneTimeWorkRequest;
 import androidx.work.PeriodicWorkRequest;
 import androidx.work.WorkManager;
 
@@ -29,70 +29,113 @@ import nz.mega.sdk.MegaApiJava;
 
 public class JobUtil {
 
-    private static final long CU_SCHEDULER_INTERVAL = 60; // TimeUnit.MINUTES
+    // when app is inactive, send heartbeat every 30 minutes
+    private static final long INACTIVE_HEARTBEAT_INTERVAL = 30;
 
-    private static final int CU_RESCHEDULE_INTERVAL = 5000;   //milliseconds
+    private static final long HEARTBEAT_FLEX_INTERVAL = 20; // 20 minutes
+
+    private static final long CU_SCHEDULER_INTERVAL = 1; // 1 hour
+
+    private static final long SCHEDULER_FLEX_INTERVAL = 50; // 50 minutes
+
+    private static final int CU_RESCHEDULE_INTERVAL = 5000; // 5000 milliseconds
 
     private static final int START_JOB_SUCCEED = 0;
-    private static final int START_JOB_FAILED = -1;
+
     private static final int START_JOB_FAILED_NOT_ENABLED = -2;
 
     public static volatile boolean hasStartedCU;
 
-    public static final String CAMERA_UPLOAD_TAG = "CAMERA_UPLOAD_TAG";
-    public static final String HEART_BEAT_TAG = "HEART_BEAT_TAG";
+    public static final String CAMERA_UPLOAD_TAG = "MEGA_CAMERA_UPLOAD_TAG";
+    public static final String SINGLE_CAMERA_UPLOAD_TAG = "MEGA_SINGLE_CAMERA_UPLOAD_TAG";
+    public static final String HEART_BEAT_TAG = "MEGA_HEART_BEAT_TAG";
 
     /**
      * Schedule job of camera upload
+     *
      * @param context From which the action is done.
-     * @param bKeep true - keep existing work and ignore the new work
-     *              false - replace existing work with the new work. This option cancels the existing work
      * @return The result of schedule job
      */
-    public static synchronized int scheduleCameraUploadJob(Context context, Boolean bKeep) {
+    public static synchronized int scheduleCameraUploadJob(Context context) {
         if (!isCameraUploadEnabled(context)) {
             logDebug("Schedule failed as CU not enabled");
             return START_JOB_FAILED_NOT_ENABLED;
         }
 
-        scheduleCuSyncActiveHeartbeat(context);
+        scheduleCameraUploadSyncActiveHeartbeat(context);
 
-        logDebug("Schedule camera upload");
+        logDebug("JobUtil: scheduleCameraUploadJob()");
+        // periodic work that runs during the last 10 minutes of every one hour period
         PeriodicWorkRequest cameraUploadWorkRequest =
-                new PeriodicWorkRequest.Builder(CameraUploadWork.class, CU_SCHEDULER_INTERVAL, TimeUnit.MINUTES)
-                        // Additional configuration
+                new PeriodicWorkRequest.Builder(CameraUploadWork.class, CU_SCHEDULER_INTERVAL, TimeUnit.HOURS, SCHEDULER_FLEX_INTERVAL, TimeUnit.MINUTES)
                         .addTag(CAMERA_UPLOAD_TAG)
                         .build();
-        Operation operation = WorkManager
-                .getInstance(context)
-                .enqueueUniquePeriodicWork(CAMERA_UPLOAD_TAG, bKeep ? ExistingPeriodicWorkPolicy.KEEP : ExistingPeriodicWorkPolicy.REPLACE, cameraUploadWorkRequest);
-        logDebug("Schedule camera upload with result: " + operation.getState().getValue());
+
+        WorkManager.getInstance(context)
+                .enqueueUniquePeriodicWork(CAMERA_UPLOAD_TAG, ExistingPeriodicWorkPolicy.KEEP, cameraUploadWorkRequest);
+        logDebug("CameraUpload Work Status: " + WorkManager.getInstance(context).getWorkInfosByTag(CAMERA_UPLOAD_TAG));
         return START_JOB_SUCCEED;
     }
 
     /**
      * Schedule job of camera upload active heartbeat
+     *
      * @param context From which the action is done.
      */
-    private static void scheduleCuSyncActiveHeartbeat(Context context) {
-        logDebug("Schedule Cu Sync Active Heartbeat");
+    private static void scheduleCameraUploadSyncActiveHeartbeat(Context context) {
+        logDebug("JobUtil: scheduleCameraUploadSyncActiveHeartbeat()");
+        // periodic work that runs during the last 10 minutes of every half an hour period
         PeriodicWorkRequest cuSyncActiveHeartbeatWorkRequest =
-                new PeriodicWorkRequest.Builder(SendRegularCuSyncHeartbeatWork.class, INACTIVE_HEARTBEAT_INTERVAL_MINUTES, TimeUnit.MINUTES)
-                        // Additional configuration
+                new PeriodicWorkRequest.Builder(SendRegularCuSyncHeartbeatWork.class, INACTIVE_HEARTBEAT_INTERVAL, TimeUnit.MINUTES, HEARTBEAT_FLEX_INTERVAL, TimeUnit.MINUTES)
                         .addTag(HEART_BEAT_TAG)
                         .build();
-        Operation operation = WorkManager
-                .getInstance(context)
-                .enqueueUniquePeriodicWork(HEART_BEAT_TAG, ExistingPeriodicWorkPolicy.KEEP,cuSyncActiveHeartbeatWorkRequest);
-        logDebug("Schedule Cu Sync Active Heartbeat with result: "+ operation.getState().getValue());
+
+        WorkManager.getInstance(context)
+                .enqueueUniquePeriodicWork(HEART_BEAT_TAG, ExistingPeriodicWorkPolicy.KEEP, cuSyncActiveHeartbeatWorkRequest);
+        logDebug("CameraUpload Sync Heartbeat Work Status: " + WorkManager.getInstance(context).getWorkInfosByTag(HEART_BEAT_TAG));
     }
 
+    /**
+     * Fire a one time work request of camera upload to upload immediately;
+     * It will also schedule the camera upload job inside of {@link CameraUploadsService}
+     *
+     * @param context From which the action is done.
+     * @return The result of the job
+     */
+    public static synchronized int fireCameraUploadJob(Context context) {
+        if (!isCameraUploadEnabled(context)) {
+            logDebug("Schedule failed as CU not enabled");
+            return START_JOB_FAILED_NOT_ENABLED;
+        }
+
+        logDebug("JobUtil: singleCameraUploadJob()");
+        OneTimeWorkRequest cameraUploadWorkRequest =
+                new OneTimeWorkRequest.Builder(CameraUploadWork.class)
+                        .addTag(SINGLE_CAMERA_UPLOAD_TAG)
+                        .build();
+
+        WorkManager.getInstance(context)
+                .enqueueUniqueWork(SINGLE_CAMERA_UPLOAD_TAG, ExistingWorkPolicy.KEEP, cameraUploadWorkRequest);
+        logDebug("Single CameraUpload Work Status: " + WorkManager.getInstance(context).getWorkInfosByTag(SINGLE_CAMERA_UPLOAD_TAG));
+        return START_JOB_SUCCEED;
+    }
+
+    /**
+     * This should be never called outside of {@link CameraUploadWork}, otherwise the WorkManager will not know about this job.
+     *
+     * @param context from which the action is started
+     */
     public static synchronized void startCameraUploadService(Context context) {
+        logDebug("JobUtil: startCameraUploadService()");
         start(context, false);
     }
 
+    // TODO refactor like above with additional data param into CameraUploadWork
     public static synchronized void startCameraUploadServiceIgnoreAttr(final Context context) {
-        new Handler().postDelayed(() -> start(context, true), CU_RESCHEDULE_INTERVAL);
+        new Handler().postDelayed((() -> {
+            logDebug("JobUtil: startCameraUploadServiceIgnoreAttr()");
+            start(context, true);
+        }), CU_RESCHEDULE_INTERVAL);
     }
 
     private static void start(Context context, boolean shouldIgnoreAttr) {
@@ -139,8 +182,8 @@ public class JobUtil {
         stopRunningCameraUploadService(context);
         Handler handler = new Handler();
         handler.postDelayed(() -> {
-            logDebug("Rescheduling CU");
-            scheduleCameraUploadJob(context, true);
+            logDebug("JobUtil: rescheduleCameraUpload()");
+            scheduleCameraUploadJob(context);
         }, CU_RESCHEDULE_INTERVAL);
     }
 
@@ -167,8 +210,9 @@ public class JobUtil {
      * @param context From which the action is done.
      */
     public static void stopCameraUploadWork(Context context) {
-        logDebug("Stop camera upload work");
+        logDebug("JobUtil: stopCameraUploadWork()");
         cancelWorkByTag(context, CAMERA_UPLOAD_TAG);
+        cancelWorkByTag(context, SINGLE_CAMERA_UPLOAD_TAG);
     }
 
     /**
@@ -177,7 +221,7 @@ public class JobUtil {
      * @param context From which the action is done.
      */
     public static void stopRegularCuSyncHeartbeatWork(Context context) {
-        logDebug("Stop regular cu sync heartbeat work");
+        logDebug("JobUtil: stopRegularCuSyncHeartbeatWork()");
         cancelWorkByTag(context, HEART_BEAT_TAG);
     }
 
@@ -185,13 +229,12 @@ public class JobUtil {
      * Cancels all unfinished work with the given tag.
      *
      * @param context From which the action is done.
-     * @param tag The tag used to identify the work
+     * @param tag     The tag used to identify the work
      */
     private static void cancelWorkByTag(Context context, String tag) {
         if (context != null && tag != null) {
-            logDebug("Stop work by tag: " + tag);
+            logDebug("JobUtil: cancelWorkByTag(): " + tag);
             WorkManager.getInstance(context).cancelAllWorkByTag(tag);
         }
     }
-
 }

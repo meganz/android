@@ -965,7 +965,7 @@ public class SettingsCameraUploadsFragment extends SettingsBaseFragment {
 
         handler.postDelayed(() -> {
             logDebug("Enable Camera Uploads, Now I start the service");
-            startCameraUploadService(context);
+            fireCameraUploadJob(context);
         }, 1000);
 
         logDebug("Camera Uploads ON");

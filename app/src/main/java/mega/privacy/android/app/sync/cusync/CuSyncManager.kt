@@ -92,11 +92,6 @@ object CuSyncManager {
      */
     private const val ACTIVE_HEARTBEAT_INTERVAL_SECONDS = 30L
 
-    /**
-     * When the app is inactive, send heartbeat every 30m.
-     */
-    const val INACTIVE_HEARTBEAT_INTERVAL_MINUTES = 30 // TimeUnit.MINUTES
-
     private val megaApplication = MegaApplication.getInstance()
 
     private val megaApi = megaApplication.megaApi

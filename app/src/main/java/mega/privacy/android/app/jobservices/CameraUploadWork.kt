@@ -8,13 +8,20 @@ import mega.privacy.android.app.utils.LogUtil
 
 class CameraUploadWork(val appContext: Context, val workerParams: WorkerParameters) :
     Worker(appContext, workerParams) {
+
+    /**
+     * Worker for upload images task
+     */
     override fun doWork(): Result {
-
-        // Do the work here--in this case, upload the images.
-        LogUtil.logDebug("startCameraUploadService")
-        startCameraUploadService(appContext)
-
-        // Indicate whether the work finished successfully with the Result
-        return Result.success()
+        if (isStopped) return Result.failure()
+        LogUtil.logDebug("CameraUploadWork: startCameraUploadService()")
+        return try {
+            startCameraUploadService(appContext)
+            LogUtil.logDebug("CameraUploadWork: startCameraUploadService() SUCCESS")
+            Result.success()
+        } catch (throwable: Throwable) {
+            LogUtil.logDebug("CameraUploadWork: startCameraUploadService() FAILURE")
+            Result.failure()
+        }
     }
 }

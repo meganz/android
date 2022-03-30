@@ -685,7 +685,7 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
                 CuSyncManager.INSTANCE.doRegularHeartbeat();
 
                 // Make sure to re schedule the job
-                scheduleCameraUploadJob(this, true);
+                scheduleCameraUploadJob(this);
 
                 finish();
                 purgeDirectory(new File(tempRoot));

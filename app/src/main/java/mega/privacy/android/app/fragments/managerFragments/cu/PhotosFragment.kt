@@ -159,7 +159,7 @@ class PhotosFragment : BaseFragment() {
      * Enable CU
      */
     fun enableCu() {
-        (currentTab as? TimelineFragment)?.enableCu()
+        (currentTab as? TimelineFragment)?.enableCameraUpload()
     }
 
     /**

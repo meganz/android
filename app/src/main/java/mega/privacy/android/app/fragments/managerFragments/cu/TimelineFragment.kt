@@ -130,29 +130,29 @@ class TimelineFragment : BaseZoomFragment(), PhotosTabCallback {
     }
 
     /**
-     * Enable CU
+     * Enable Camera Upload
      */
-    fun enableCu() {
+    fun enableCameraUpload() {
         viewModel.enableCu(
             binding.fragmentPhotosFirstLogin.cellularConnectionSwitch.isChecked,
             binding.fragmentPhotosFirstLogin.uploadVideosSwitch.isChecked
         )
         mManagerActivity.isFirstLogin = false
         viewModel.setEnableCUShown(false)
-        startCU()
+        startCameraUploadJob()
     }
 
     /**
-     * Start CU Job
+     * User enabled Camera Upload, so a periodic job should be scheduled if not already running
      */
-    private fun startCU() {
+    private fun startCameraUploadJob() {
         callManager {
             it.refreshTimelineFragment()
         }
 
         Handler(Looper.getMainLooper()).postDelayed({
             LogUtil.logDebug("Starting CU")
-            JobUtil.startCameraUploadService(context)
+            JobUtil.fireCameraUploadJob(context)
         }, 1000)
     }
 
@@ -302,7 +302,8 @@ class TimelineFragment : BaseZoomFragment(), PhotosTabCallback {
             }
 
             actionModeViewModel.setNodesData(galleryItems.filter { nodeItem -> nodeItem.type != GalleryItem.TYPE_HEADER })
-            viewTypePanel.visibility = if (galleryItems.isEmpty() || actionMode != null) View.GONE else View.VISIBLE
+            viewTypePanel.visibility =
+                if (galleryItems.isEmpty() || actionMode != null) View.GONE else View.VISIBLE
 
             if (galleryItems.isEmpty()) {
                 handleOptionsMenuUpdate(shouldShow = false)
