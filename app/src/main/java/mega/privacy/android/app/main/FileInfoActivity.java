@@ -73,10 +73,7 @@ import mega.privacy.android.app.namecollision.data.NameCollisionType;
 import mega.privacy.android.app.namecollision.usecase.CheckNameCollisionUseCase;
 import mega.privacy.android.app.usecase.CopyNodeUseCase;
 import mega.privacy.android.app.usecase.MoveNodeUseCase;
-import mega.privacy.android.app.usecase.exception.ForeignNodeException;
 import mega.privacy.android.app.usecase.exception.MegaNodeException;
-import mega.privacy.android.app.usecase.exception.OverQuotaException;
-import mega.privacy.android.app.usecase.exception.PreOverQuotaException;
 import mega.privacy.android.app.utils.MegaNodeUtil;
 import mega.privacy.android.app.utils.MegaProgressDialogUtil;
 import mega.privacy.android.app.components.SimpleDividerItemDecoration;
@@ -1871,9 +1868,7 @@ public class FileInfoActivity extends PasscodeActivity implements OnClickListene
                             finish();
                         }, throwable -> {
                             dismissAlertDialogIfExists(statusDialog);
-                            if (throwable instanceof ForeignNodeException) {
-                                showForeignStorageOverQuotaWarningDialog(this);
-                            } else {
+                            if (!manageThrowable(throwable)) {
                                 showSnackbar(SNACKBAR_TYPE, StringResourcesUtils.getString(R.string.context_no_moved), MEGACHAT_INVALID_HANDLE);
                             }
                         }
@@ -1894,21 +1889,8 @@ public class FileInfoActivity extends PasscodeActivity implements OnClickListene
                             showSnackbar(SNACKBAR_TYPE, StringResourcesUtils.getString(R.string.context_correctly_copied), MEGACHAT_INVALID_HANDLE);
                         }, throwable -> {
                             dismissAlertDialogIfExists(statusDialog);
-                            if (throwable instanceof ForeignNodeException) {
-                                showForeignStorageOverQuotaWarningDialog(this);
-                            } else if (throwable instanceof OverQuotaException) {
-                                logWarning("OVERQUOTA ERROR: ", throwable);
-                                Intent intent = new Intent(this, ManagerActivity.class);
-                                intent.setAction(ACTION_OVERQUOTA_STORAGE);
-                                startActivity(intent);
-                                finish();
-                            } else if (throwable instanceof PreOverQuotaException) {
-                                logWarning("PRE OVERQUOTA ERROR: ", throwable);
-                                Intent intent = new Intent(this, ManagerActivity.class);
-                                intent.setAction(ACTION_PRE_OVERQUOTA_STORAGE);
-                                startActivity(intent);
-                                finish();
-                            } else {
+
+                            if (!manageThrowable(throwable)) {
                                 showSnackbar(SNACKBAR_TYPE, StringResourcesUtils.getString(R.string.context_no_copied), MEGACHAT_INVALID_HANDLE);
                             }
                         }

@@ -64,7 +64,6 @@ import static mega.privacy.android.app.sync.fileBackups.FileBackupManager.Operat
 import static mega.privacy.android.app.utils.AlertDialogUtil.dismissAlertDialogIfExists;
 import static mega.privacy.android.app.utils.AlertDialogUtil.isAlertDialogShown;
 import static mega.privacy.android.app.utils.AlertsAndWarnings.askForCustomizedPlan;
-import static mega.privacy.android.app.utils.AlertsAndWarnings.showForeignStorageOverQuotaWarningDialog;
 import static mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuotaPaywallWarning;
 import static mega.privacy.android.app.utils.AvatarUtil.getColorAvatar;
 import static mega.privacy.android.app.utils.AvatarUtil.getDefaultAvatar;
@@ -439,9 +438,7 @@ import nz.mega.sdk.MegaChatApiJava;
 import nz.mega.sdk.MegaChatCall;
 import nz.mega.sdk.MegaChatError;
 import nz.mega.sdk.MegaChatListItem;
-import nz.mega.sdk.MegaChatListenerInterface;
 import nz.mega.sdk.MegaChatPeerList;
-import nz.mega.sdk.MegaChatPresenceConfig;
 import nz.mega.sdk.MegaChatRequest;
 import nz.mega.sdk.MegaChatRequestListenerInterface;
 import nz.mega.sdk.MegaChatRoom;
@@ -6505,8 +6502,9 @@ public class ManagerActivity extends TransfersManagementActivity
                         boolean notValidView = result.isSingleAction() && result.isSuccess()
                                 && parentHandleRubbish == nodes.get(0).getHandle();
 
-                        showRestorationOrRemovalResult(notValidView, result.isForeignNode(),
-                                result.getResultText());
+                        showRestorationOrRemovalResult(notValidView, result.getResultText());
+                    } else if (throwable instanceof ForeignNodeException) {
+                        launchForeignNodeError();
                     }
                 });
     }
@@ -6515,21 +6513,17 @@ public class ManagerActivity extends TransfersManagementActivity
 	 * Shows the final result of a restoration or removal from Rubbish Bin section.
 	 *
 	 * @param notValidView  True if should update the view, false otherwise.
-	 * @param isForeignNode True if should show a foreign warning, false otherwise.
 	 * @param message       Text message to show as the request result.
 	 */
-	private void showRestorationOrRemovalResult(boolean notValidView, boolean isForeignNode, String message) {
+	private void showRestorationOrRemovalResult(boolean notValidView, String message) {
 		if (notValidView) {
 			parentHandleRubbish = INVALID_HANDLE;
 			setToolbarTitle();
 			refreshRubbishBin();
 		}
 
-        if (isForeignNode) {
-            showForeignStorageOverQuotaWarningDialog(this);
-        } else {
-            showSnackbar(SNACKBAR_TYPE, message, MEGACHAT_INVALID_HANDLE);
-        }
+		dismissAlertDialogIfExists(statusDialog);
+        showSnackbar(SNACKBAR_TYPE, message, MEGACHAT_INVALID_HANDLE);
     }
 
     public void showRenameDialog(final MegaNode document) {
@@ -6668,8 +6662,7 @@ public class ManagerActivity extends TransfersManagementActivity
                                                     && result.isSuccess()
                                                     && parentHandleRubbish == handleList.get(0);
 
-											showRestorationOrRemovalResult(notValidView, false,
-													result.getResultText());
+											showRestorationOrRemovalResult(notValidView, result.getResultText());
 										}
 									}));
 
@@ -6752,11 +6745,7 @@ public class ManagerActivity extends TransfersManagementActivity
             setToolbarTitle();
         }
 
-        if (result.isForeignNode()) {
-            showForeignStorageOverQuotaWarningDialog(this);
-        } else {
-            showSnackbar(SNACKBAR_TYPE, result.getResultText(), MEGACHAT_INVALID_HANDLE);
-        }
+        showSnackbar(SNACKBAR_TYPE, result.getResultText(), MEGACHAT_INVALID_HANDLE);
     }
 
     public void askConfirmationDeleteAccount() {
@@ -8578,6 +8567,12 @@ public class ManagerActivity extends TransfersManagementActivity
                                         .subscribe((moveResult, moveThrowable) -> {
                                             if (moveThrowable == null) {
                                                 showMovementResult(moveResult, handlesWithoutCollision[0]);
+                                            } else if (moveThrowable instanceof ForeignNodeException) {
+                                                launchForeignNodeError();
+                                            } else if (moveThrowable instanceof OverQuotaException) {
+                                                showOverquotaAlert(false);
+                                            } else if (moveThrowable instanceof PreOverQuotaException) {
+                                                showOverquotaAlert(true);
                                             }
                                         });
                             }
@@ -8620,7 +8615,7 @@ public class ManagerActivity extends TransfersManagementActivity
                                             if (copyThrowable == null) {
                                                 showCopyResult(copyResult);
                                             } else if (copyThrowable instanceof ForeignNodeException) {
-                                                showForeignStorageOverQuotaWarningDialog(this);
+                                                launchForeignNodeError();
                                             } else if (copyThrowable instanceof OverQuotaException) {
                                                 showOverquotaAlert(false);
                                             } else if (copyThrowable instanceof PreOverQuotaException) {

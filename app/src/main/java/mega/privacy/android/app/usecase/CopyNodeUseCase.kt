@@ -13,7 +13,6 @@ import mega.privacy.android.app.usecase.exception.*
 import mega.privacy.android.app.utils.RxUtil.blockingGetOrNull
 import mega.privacy.android.app.utils.StringResourcesUtils.getString
 import nz.mega.sdk.*
-import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
 import nz.mega.sdk.MegaError.*
 import javax.inject.Inject
 
@@ -56,10 +55,7 @@ class CopyNodeUseCase @Inject constructor(
      */
     fun copy(node: MegaNode?, parentHandle: Long): Completable =
         Completable.fromCallable {
-            copy(
-                node,
-                getNodeUseCase.get(parentHandle).blockingGetOrNull()
-            ).blockingAwait()
+            copy(node, getNodeUseCase.get(parentHandle).blockingGetOrNull()).blockingAwait()
         }
 
     /**
@@ -83,9 +79,7 @@ class CopyNodeUseCase @Inject constructor(
             }
 
             val listener = OptionalMegaRequestListenerInterface(onRequestFinish = { _, error ->
-                if (emitter.isDisposed) {
-                    return@OptionalMegaRequestListenerInterface
-                }
+                if (emitter.isDisposed) return@OptionalMegaRequestListenerInterface
 
                 when (error.errorCode) {
                     API_OK -> emitter.onComplete()
@@ -170,37 +164,32 @@ class CopyNodeUseCase @Inject constructor(
                     .blockingSubscribeBy(onError = { error -> emitter.onError(error) })
             }
 
-            if (emitter.isDisposed) {
-                return@create
-            }
+            if (emitter.isDisposed) return@create
 
             copy(node, parentNode, if (rename) collisionResult.renameName else null)
                 .blockingSubscribeBy(
                     onError = { error ->
-                        if (emitter.isDisposed) {
-                            return@blockingSubscribeBy
-                        }
-
-                        emitter.onSuccess(
-                            CopyRequestResult(
-                                count = 1,
-                                errorCount = 1,
-                                isForeignNode = error is MegaException && error.errorCode == MegaError.API_EOVERQUOTA
+                        when {
+                            emitter.isDisposed -> return@blockingSubscribeBy
+                            error.shouldEmmitError() -> emitter.onError(error)
+                            else -> emitter.onSuccess(
+                                CopyRequestResult(
+                                    count = 1,
+                                    errorCount = 1
+                                )
                             )
-                        )
+                        }
                     },
                     onComplete = {
-                        if (emitter.isDisposed) {
-                            return@blockingSubscribeBy
+                        when {
+                            emitter.isDisposed -> return@blockingSubscribeBy
+                            else -> emitter.onSuccess(
+                                CopyRequestResult(
+                                    count = 1,
+                                    errorCount = 0
+                                ).apply { resetAccountDetailsIfNeeded() }
+                            )
                         }
-
-                        emitter.onSuccess(
-                            CopyRequestResult(
-                                count = 1,
-                                errorCount = 0,
-                                isForeignNode = false
-                            ).apply { resetAccountDetailsIfNeeded() }
-                        )
                     }
                 )
         }
@@ -218,16 +207,15 @@ class CopyNodeUseCase @Inject constructor(
     ): Single<CopyRequestResult> =
         Single.create { emitter ->
             var errorCount = 0
-            var isForeignNode = false
 
-            collisions.forEach { collision ->
-                if (emitter.isDisposed) {
-                    return@create
-                }
+            for (collision in collisions) {
+                if (emitter.isDisposed) break
 
                 copy(collision, rename).blockingSubscribeBy(onError = { error ->
-                    errorCount++
-                    isForeignNode = error is ForeignNodeException
+                    when {
+                        error.shouldEmmitError() -> emitter.onError(error)
+                        else -> errorCount++
+                    }
                 })
             }
 
@@ -236,8 +224,7 @@ class CopyNodeUseCase @Inject constructor(
                 else -> emitter.onSuccess(
                     CopyRequestResult(
                         count = collisions.size,
-                        errorCount = errorCount,
-                        isForeignNode = isForeignNode
+                        errorCount = errorCount
                     ).apply { resetAccountDetailsIfNeeded() }
                 )
             }
@@ -260,33 +247,33 @@ class CopyNodeUseCase @Inject constructor(
             }
 
             var errorCount = 0
-            var isForeignNode = false
 
-            handles.forEach { handle ->
+            for (handle in handles) {
+                if (emitter.isDisposed) break
+
                 val node = getNodeUseCase.get(handle).blockingGetOrNull()
 
                 if (node == null) {
                     errorCount++
                 } else {
-                    copy(node, parentNode)
-                        .blockingSubscribeBy(onError = { error ->
-                            errorCount++
-                            isForeignNode = error is ForeignNodeException
-                        })
+                    copy(node, parentNode).blockingSubscribeBy(onError = { error ->
+                        when {
+                            error.shouldEmmitError() -> emitter.onError(error)
+                            else -> errorCount++
+                        }
+                    })
                 }
             }
 
-            if (emitter.isDisposed) {
-                return@create
+            when {
+                emitter.isDisposed -> return@create
+                else -> emitter.onSuccess(
+                    CopyRequestResult(
+                        handles.size,
+                        errorCount
+                    ).apply { resetAccountDetailsIfNeeded() }
+                )
             }
-
-            emitter.onSuccess(
-                CopyRequestResult(
-                    handles.size,
-                    errorCount,
-                    isForeignNode
-                ).apply { resetAccountDetailsIfNeeded() }
-            )
         }
 
     /**
@@ -306,26 +293,38 @@ class CopyNodeUseCase @Inject constructor(
             }
 
             var errorCount = 0
-            var isForeignNode = false
 
-            nodes.forEach { node ->
-                copy(node, parentNode)
-                    .blockingSubscribeBy(onError = { error ->
-                        errorCount++
-                        isForeignNode = error is ForeignNodeException
-                    })
+            for (node in nodes) {
+                if (emitter.isDisposed) break
+
+                copy(node, parentNode).blockingSubscribeBy(onError = { error ->
+                    when {
+                        error.shouldEmmitError() -> emitter.onError(error)
+                        else -> errorCount++
+                    }
+                })
             }
 
-            if (emitter.isDisposed) {
-                return@create
+            when {
+                emitter.isDisposed -> return@create
+                else -> emitter.onSuccess(
+                    CopyRequestResult(
+                        nodes.size,
+                        errorCount
+                    ).apply { resetAccountDetailsIfNeeded() }
+                )
             }
-
-            emitter.onSuccess(
-                CopyRequestResult(
-                    nodes.size,
-                    errorCount,
-                    isForeignNode
-                ).apply { resetAccountDetailsIfNeeded() }
-            )
         }
+
+    /**
+     * Checks if the error of the request is over quota, pre over quota or foreign node.
+     *
+     * @return True if the error is one of those specified above, false otherwise.
+     */
+    private fun Throwable.shouldEmmitError(): Boolean =
+        when (this) {
+            is OverQuotaException, is PreOverQuotaException, is ForeignNodeException -> true
+            else -> false
+        }
+
 }

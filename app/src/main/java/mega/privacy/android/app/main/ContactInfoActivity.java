@@ -97,10 +97,6 @@ import mega.privacy.android.app.namecollision.data.NameCollisionType;
 import mega.privacy.android.app.namecollision.usecase.CheckNameCollisionUseCase;
 import mega.privacy.android.app.objects.PasscodeManagement;
 import mega.privacy.android.app.usecase.CopyNodeUseCase;
-import mega.privacy.android.app.usecase.data.CopyRequestResult;
-import mega.privacy.android.app.usecase.exception.ForeignNodeException;
-import mega.privacy.android.app.usecase.exception.OverQuotaException;
-import mega.privacy.android.app.usecase.exception.PreOverQuotaException;
 import mega.privacy.android.app.usecase.chat.GetChatChangesUseCase;
 import mega.privacy.android.app.utils.AlertsAndWarnings;
 import mega.privacy.android.app.utils.AskForDisplayOverDialog;
@@ -1401,22 +1397,16 @@ public class ContactInfoActivity extends PasscodeActivity
 										.subscribeOn(Schedulers.io())
 										.observeOn(AndroidSchedulers.mainThread())
 										.subscribe((copyResult, copyThrowable) -> {
+											dismissAlertDialogIfExists(statusDialog);
+
 											if (sharedFoldersFragment != null && sharedFoldersFragment.isVisible()) {
 												sharedFoldersFragment.clearSelections();
 												sharedFoldersFragment.hideMultipleSelect();
 											}
 											if (copyThrowable == null) {
-												showCopyResult(copyResult);
-											} else if (copyThrowable instanceof ForeignNodeException) {
-												showForeignStorageOverQuotaWarningDialog(this);
-											} else if (copyThrowable instanceof OverQuotaException) {
-												startActivity(new Intent(this, ManagerActivity.class)
-														.setAction(ACTION_OVERQUOTA_STORAGE));
-												finish();
-											} else if (copyThrowable instanceof PreOverQuotaException) {
-												startActivity(new Intent(this, ManagerActivity.class)
-														.setAction(ACTION_PRE_OVERQUOTA_STORAGE));
-												finish();
+												showSnackbar(SNACKBAR_TYPE, copyResult.getResultText(), MEGACHAT_INVALID_HANDLE);
+											} else {
+												manageThrowable(copyThrowable);
 											}
 										});
 							}
@@ -1425,21 +1415,6 @@ public class ContactInfoActivity extends PasscodeActivity
 		}
 
 		super.onActivityResult(requestCode, resultCode, intent);
-	}
-
-	/**
-	 * Shows the final result of a copy request.
-	 *
-	 * @param result Object containing the request result.
-	 */
-	private void showCopyResult(CopyRequestResult result) {
-		dismissAlertDialogIfExists(statusDialog);
-
-		if (result.isForeignNode()) {
-			showForeignStorageOverQuotaWarningDialog(this);
-		} else {
-			showSnackbar(SNACKBAR_TYPE, result.getResultText(), MEGACHAT_INVALID_HANDLE);
-		}
 	}
 
 	public void showConfirmationRemoveContact(final MegaUser c){

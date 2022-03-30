@@ -20,7 +20,6 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.coordinatorlayout.widget.CoordinatorLayout;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.widget.Toolbar;
-import androidx.core.content.ContextCompat;
 
 import android.util.DisplayMetrics;
 import android.view.Display;
@@ -63,12 +62,8 @@ import mega.privacy.android.app.usecase.CopyNodeUseCase;
 import mega.privacy.android.app.usecase.GetNodeUseCase;
 import mega.privacy.android.app.usecase.MoveNodeUseCase;
 import mega.privacy.android.app.usecase.UploadUseCase;
-import mega.privacy.android.app.usecase.data.CopyRequestResult;
 import mega.privacy.android.app.usecase.data.MoveRequestResult;
-import mega.privacy.android.app.usecase.exception.ForeignNodeException;
 import mega.privacy.android.app.usecase.exception.MegaNodeException;
-import mega.privacy.android.app.usecase.exception.OverQuotaException;
-import mega.privacy.android.app.usecase.exception.PreOverQuotaException;
 import mega.privacy.android.app.utils.AlertDialogUtil;
 import mega.privacy.android.app.namecollision.usecase.CheckNameCollisionUseCase;
 import mega.privacy.android.app.utils.AlertsAndWarnings;
@@ -90,7 +85,6 @@ import static mega.privacy.android.app.utils.AlertDialogUtil.dismissAlertDialogI
 import static mega.privacy.android.app.utils.MegaProgressDialogUtil.createProgressDialog;
 import static mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil.*;
 import static mega.privacy.android.app.constants.BroadcastConstants.*;
-import static mega.privacy.android.app.utils.AlertsAndWarnings.showForeignStorageOverQuotaWarningDialog;
 import static mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuotaPaywallWarning;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
@@ -584,26 +578,7 @@ public class ContactFileListActivity extends PasscodeActivity
 			setTitleActionBar(megaApi.getNodeByHandle(parentHandle).getName());
 		}
 
-		if (result.isForeignNode()) {
-			showForeignStorageOverQuotaWarningDialog(this);
-		} else {
-			showSnackbar(SNACKBAR_TYPE, result.getResultText(), MEGACHAT_INVALID_HANDLE);
-		}
-	}
-
-	/**
-	 * Shows the final result of a copy request.
-	 *
-	 * @param result Object containing the request result.
-	 */
-	private void showCopyResult(CopyRequestResult result) {
-		dismissAlertDialogIfExists(statusDialog);
-
-		if (result.isForeignNode()) {
-			showForeignStorageOverQuotaWarningDialog(this);
-		} else {
-			showSnackbar(SNACKBAR_TYPE, result.getResultText(), MEGACHAT_INVALID_HANDLE);
-		}
+		showSnackbar(SNACKBAR_TYPE, result.getResultText(), MEGACHAT_INVALID_HANDLE);
 	}
 
 	public void showMove(ArrayList<Long> handleList) {
@@ -677,22 +652,16 @@ public class ContactFileListActivity extends PasscodeActivity
 										.subscribeOn(Schedulers.io())
 										.observeOn(AndroidSchedulers.mainThread())
 										.subscribe((copyResult, copyThrowable) -> {
+											dismissAlertDialogIfExists(statusDialog);
+
 											if (contactFileListFragment != null && contactFileListFragment.isVisible()) {
 												contactFileListFragment.clearSelections();
 												contactFileListFragment.hideMultipleSelect();
 											}
 											if (copyThrowable == null) {
-												showCopyResult(copyResult);
-											} else if (copyThrowable instanceof ForeignNodeException) {
-												showForeignStorageOverQuotaWarningDialog(this);
-											} else if (copyThrowable instanceof OverQuotaException) {
-												startActivity(new Intent(this, ManagerActivity.class)
-														.setAction(ACTION_OVERQUOTA_STORAGE));
-												finish();
-											} else if (copyThrowable instanceof PreOverQuotaException) {
-												startActivity(new Intent(this, ManagerActivity.class)
-														.setAction(ACTION_PRE_OVERQUOTA_STORAGE));
-												finish();
+												showSnackbar(SNACKBAR_TYPE, copyResult.getResultText(), MEGACHAT_INVALID_HANDLE);
+											} else {
+												manageThrowable(copyThrowable);
 											}
 										});
 							}
@@ -740,6 +709,8 @@ public class ContactFileListActivity extends PasscodeActivity
 										.subscribe((moveResult, moveThrowable) -> {
 											if (moveThrowable == null) {
 												showMovementResult(moveResult, handlesWithoutCollision[0]);
+											} else {
+												manageThrowable(moveThrowable);
 											}
 										});
 							}

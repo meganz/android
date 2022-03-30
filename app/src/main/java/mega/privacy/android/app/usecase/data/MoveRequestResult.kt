@@ -14,13 +14,11 @@ import nz.mega.sdk.MegaNode
  * @property count              Number of requests.
  * @property errorCount         Number of requests which finished with an error.
  * @property oldParentHandle    Handle of the old parent.
- * @property isForeignNode      True if should show a foreign storage over quota warning, false otherwise.
  */
 sealed class MoveRequestResult(
     val count: Int,
     val errorCount: Int,
-    val oldParentHandle: Long? = INVALID_HANDLE,
-    val isForeignNode: Boolean
+    val oldParentHandle: Long? = INVALID_HANDLE
 ) {
 
     val successCount = count - errorCount
@@ -44,13 +42,11 @@ sealed class MoveRequestResult(
     class GeneralMovement(
         count: Int,
         errorCount: Int,
-        oldParentHandle: Long? = null,
-        isForeignNode: Boolean
+        oldParentHandle: Long? = null
     ) : MoveRequestResult(
         count = count,
         errorCount = errorCount,
-        oldParentHandle = oldParentHandle,
-        isForeignNode = isForeignNode
+        oldParentHandle = oldParentHandle
     ) {
 
         override fun getResultText(): String =
@@ -75,8 +71,7 @@ sealed class MoveRequestResult(
     ) : MoveRequestResult(
         count = count,
         errorCount = errorCount,
-        oldParentHandle = oldParentHandle,
-        isForeignNode = false
+        oldParentHandle = oldParentHandle
     ) {
         override fun getResultText(): String =
             when {
@@ -127,12 +122,10 @@ sealed class MoveRequestResult(
     class Restoration(
         count: Int,
         errorCount: Int,
-        isForeignNode: Boolean,
         val destination: MegaNode?
     ) : MoveRequestResult(
         count = count,
-        errorCount = errorCount,
-        isForeignNode = isForeignNode
+        errorCount = errorCount
     ) {
         override fun getResultText(): String =
             when {

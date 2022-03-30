@@ -154,7 +154,6 @@ import mega.privacy.android.app.main.controllers.ContactController;
 import mega.privacy.android.app.main.listeners.AudioFocusListener;
 import mega.privacy.android.app.main.listeners.ChatLinkInfoListener;
 import mega.privacy.android.app.main.listeners.MultipleForwardChatProcessor;
-import mega.privacy.android.app.main.listeners.MultipleRequestListener;
 import mega.privacy.android.app.main.megachat.chatAdapters.MegaChatAdapter;
 import mega.privacy.android.app.middlelayer.push.PushMessageHanlder;
 import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.ReactionsBottomSheet;
@@ -185,10 +184,8 @@ import nz.mega.sdk.MegaChatError;
 import nz.mega.sdk.MegaChatGeolocation;
 import nz.mega.sdk.MegaChatGiphy;
 import nz.mega.sdk.MegaChatListItem;
-import nz.mega.sdk.MegaChatListenerInterface;
 import nz.mega.sdk.MegaChatMessage;
 import nz.mega.sdk.MegaChatPeerList;
-import nz.mega.sdk.MegaChatPresenceConfig;
 import nz.mega.sdk.MegaChatRequest;
 import nz.mega.sdk.MegaChatRequestListenerInterface;
 import nz.mega.sdk.MegaChatRoom;
@@ -216,7 +213,6 @@ import static mega.privacy.android.app.main.megachat.MapsActivity.*;
 import static mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil.*;
 import static mega.privacy.android.app.providers.FileProviderActivity.FROM_MEGA_APP;
 import static mega.privacy.android.app.utils.AlertDialogUtil.dismissAlertDialogIfExists;
-import static mega.privacy.android.app.utils.AlertsAndWarnings.showForeignStorageOverQuotaWarningDialog;
 import static mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuotaPaywallWarning;
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
 import static mega.privacy.android.app.utils.CallUtil.*;
@@ -3705,6 +3701,11 @@ public class ChatActivity extends PasscodeActivity
                                     .observeOn(AndroidSchedulers.mainThread())
                                     .subscribe((copyResult, copyThrowable) -> {
                                         dismissAlertDialogIfExists(statusDialog);
+
+                                        if (copyThrowable != null) {
+                                            manageThrowable(copyThrowable);
+                                        }
+
                                         showSnackbar(SNACKBAR_TYPE, copyThrowable == null
                                                         ? copyResult.getResultText()
                                                         : StringResourcesUtils.getString(R.string.import_success_error),

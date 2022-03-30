@@ -7,8 +7,6 @@ import android.content.Intent
 import android.content.IntentFilter
 import android.graphics.drawable.Animatable
 import android.os.Bundle
-import android.os.Handler
-import android.os.Looper
 import android.view.MenuItem
 import androidx.activity.viewModels
 import androidx.constraintlayout.widget.ConstraintSet
@@ -28,10 +26,12 @@ import mega.privacy.android.app.activities.WebViewActivity
 import mega.privacy.android.app.constants.BroadcastConstants.ACTION_UPDATE_FILE_VERSIONS
 import mega.privacy.android.app.databinding.ActivityNameCollisionBinding
 import mega.privacy.android.app.databinding.ViewNameCollisionOptionBinding
+import mega.privacy.android.app.interfaces.showSnackbar
 import mega.privacy.android.app.listeners.OptionalRequestListener
 import mega.privacy.android.app.namecollision.data.NameCollision
 import mega.privacy.android.app.namecollision.data.NameCollisionResult
 import mega.privacy.android.app.namecollision.data.NameCollisionType
+import mega.privacy.android.app.usecase.exception.MegaException
 import mega.privacy.android.app.utils.AlertsAndWarnings.showForeignStorageOverQuotaWarningDialog
 import mega.privacy.android.app.utils.Constants.*
 import mega.privacy.android.app.utils.LogUtil.logError
@@ -190,6 +190,11 @@ class NameCollisionActivity : PasscodeActivity() {
 
             if (result.shouldFinish) {
                 setResult(RESULT_OK, Intent().putExtra(MESSAGE_RESULT, result.message))
+            }
+        }
+        viewModel.onExceptionThrown().observe(this) { error ->
+            if (!manageThrowable(error) && error is MegaException) {
+                showSnackbar(error.message!!)
             }
         }
         viewModel.getCollisionsResolution().observe(this, ::manageCollisionsResolution)

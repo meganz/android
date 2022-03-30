@@ -54,10 +54,7 @@ import mega.privacy.android.app.imageviewer.ImageViewerActivity;
 import mega.privacy.android.app.namecollision.data.NameCollisionType;
 import mega.privacy.android.app.namecollision.usecase.CheckNameCollisionUseCase;
 import mega.privacy.android.app.usecase.CopyNodeUseCase;
-import mega.privacy.android.app.usecase.exception.ForeignNodeException;
 import mega.privacy.android.app.usecase.exception.MegaNodeException;
-import mega.privacy.android.app.usecase.exception.OverQuotaException;
-import mega.privacy.android.app.usecase.exception.PreOverQuotaException;
 import mega.privacy.android.app.utils.MegaProgressDialogUtil;
 import mega.privacy.android.app.components.saver.NodeSaver;
 import mega.privacy.android.app.interfaces.SnackbarShower;
@@ -72,8 +69,6 @@ import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
 
 import static mega.privacy.android.app.constants.BroadcastConstants.ACTION_CLOSE_CHAT_AFTER_IMPORT;
-import static mega.privacy.android.app.utils.AlertDialogUtil.dismissAlertDialogIfExists;
-import static mega.privacy.android.app.utils.AlertsAndWarnings.showForeignStorageOverQuotaWarningDialog;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.MegaApiUtils.*;
@@ -557,7 +552,7 @@ public class FileLinkActivity extends TransfersManagementActivity implements Meg
 				trySetupCollapsingToolbar();
 
 				if (importClicked){
-					copyNode();
+					checkCollisionBeforeCopying();
 				}
 			}
 			else{
@@ -679,9 +674,9 @@ public class FileLinkActivity extends TransfersManagementActivity implements Meg
 	}
 
 	/**
-	 * Copies a node.
+	 * Checks if there is any name collision before copying the node.
 	 */
-	private void copyNode() {
+	private void checkCollisionBeforeCopying() {
 		checkNameCollisionUseCase.check(document, target, NameCollisionType.COPY)
 				.subscribeOn(Schedulers.io())
 				.observeOn(AndroidSchedulers.mainThread())
@@ -690,39 +685,32 @@ public class FileLinkActivity extends TransfersManagementActivity implements Meg
 							if (throwable instanceof MegaNodeException.ParentDoesNotExistException) {
 								showSnackbar(SNACKBAR_TYPE, StringResourcesUtils.getString(R.string.general_error), MEGACHAT_INVALID_HANDLE);
 							} else if (throwable instanceof MegaNodeException.ChildDoesNotExistsException) {
-								copyNodeUseCase.copy(document, target, null)
-										.subscribeOn(Schedulers.io())
-										.observeOn(AndroidSchedulers.mainThread())
-										.subscribe(() ->
-												showCopyResult(null), this::showCopyResult);
+								copyNode();
 							}
-						});
+						}
+				);
 	}
 
 	/**
-	 * Shows the copy request result.
-	 *
-	 * @param throwable A valid throwable if there was some error, null otherwise.
+	 * Copies a node.
 	 */
-	private void showCopyResult(Throwable throwable) {
-		dismissAlertDialogIfExists(statusDialog);
-
-		if (throwable == null) {
-			startActivity(new Intent(this, ManagerActivity.class)
-					.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK));
-			finish();
-		} else if (throwable instanceof OverQuotaException) {
-			errorOverquota();
-		} else if (throwable instanceof PreOverQuotaException) {
-			errorPreOverquota();
-		} else if (throwable instanceof ForeignNodeException) {
-			showForeignStorageOverQuotaWarningDialog(this);
-		} else {
-			showSnackbar(SNACKBAR_TYPE, getString(R.string.context_no_copied));
-			startActivity(new Intent(this, ManagerActivity.class)
-					.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK));
-			finish();
-		}
+	private void copyNode() {
+		copyNodeUseCase.copy(document, target, null)
+				.subscribeOn(Schedulers.io())
+				.observeOn(AndroidSchedulers.mainThread())
+				.subscribe(() -> {
+							startActivity(new Intent(this, ManagerActivity.class)
+									.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK));
+							finish();
+						}, copyThrowable -> {
+							if (!manageThrowable(copyThrowable)) {
+								showSnackbar(SNACKBAR_TYPE, getString(R.string.context_no_copied));
+								startActivity(new Intent(this, ManagerActivity.class)
+										.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK));
+								finish();
+							}
+						}
+				);
 	}
 
 	public void showFile(){
@@ -908,7 +896,7 @@ public class FileLinkActivity extends TransfersManagementActivity implements Meg
 			if (document == null) {
 				importClicked = true;
 			} else {
-				copyNode();
+				checkCollisionBeforeCopying();
 			}
 		}
 	}
@@ -947,20 +935,6 @@ public class FileLinkActivity extends TransfersManagementActivity implements Meg
 
         nodeSaver.handleRequestPermissionsResult(requestCode);
     }
-
-	public void errorOverquota() {
-		Intent intent = new Intent(this, ManagerActivity.class);
-		intent.setAction(ACTION_OVERQUOTA_STORAGE);
-		startActivity(intent);
-		finish();
-	}
-
-	public void errorPreOverquota() {
-		Intent intent = new Intent(this, ManagerActivity.class);
-		intent.setAction(ACTION_PRE_OVERQUOTA_STORAGE);
-		startActivity(intent);
-		finish();
-	}
 
 	@Override
 	public void onDialogPositiveClick(String key) {

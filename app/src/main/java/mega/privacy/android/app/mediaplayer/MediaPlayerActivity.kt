@@ -40,7 +40,6 @@ import mega.privacy.android.app.interfaces.showSnackbar
 import mega.privacy.android.app.listeners.BaseListener
 import mega.privacy.android.app.main.FileExplorerActivity
 import mega.privacy.android.app.main.FileInfoActivity
-import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.main.controllers.ChatController
 import mega.privacy.android.app.main.controllers.NodeController
 import mega.privacy.android.app.mediaplayer.service.AudioPlayerService
@@ -49,10 +48,7 @@ import mega.privacy.android.app.mediaplayer.service.MediaPlayerServiceBinder
 import mega.privacy.android.app.mediaplayer.service.VideoPlayerService
 import mega.privacy.android.app.mediaplayer.trackinfo.TrackInfoFragment
 import mega.privacy.android.app.mediaplayer.trackinfo.TrackInfoFragmentArgs
-import mega.privacy.android.app.usecase.exception.ForeignNodeException
 import mega.privacy.android.app.usecase.exception.MegaException
-import mega.privacy.android.app.usecase.exception.OverQuotaException
-import mega.privacy.android.app.usecase.exception.PreOverQuotaException
 import mega.privacy.android.app.utils.*
 import mega.privacy.android.app.utils.AlertDialogUtil.dismissAlertDialogIfExists
 import mega.privacy.android.app.utils.AlertDialogUtil.isAlertDialogShown
@@ -1018,25 +1014,8 @@ abstract class MediaPlayerActivity : PasscodeActivity(), SnackbarShower, Activit
      * @param throwable The exception.
      */
     private fun manageException(throwable: Throwable) {
-        when (throwable) {
-            is ForeignNodeException -> {
-                AlertsAndWarnings.showForeignStorageOverQuotaWarningDialog(this)
-            }
-            is OverQuotaException -> {
-                startActivity(Intent(this, ManagerActivity::class.java).apply {
-                    action = ACTION_OVERQUOTA_STORAGE
-                })
-                finish()
-            }
-            is PreOverQuotaException -> {
-                startActivity(Intent(this, ManagerActivity::class.java).apply {
-                    action = ACTION_PRE_OVERQUOTA_STORAGE
-                })
-                finish()
-            }
-            is MegaException -> {
-                showSnackbar(throwable.message!!)
-            }
+        if (!manageThrowable(throwable) && throwable is MegaException) {
+            showSnackbar(throwable.message!!)
         }
     }
 

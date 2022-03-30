@@ -9,12 +9,10 @@ import mega.privacy.android.app.utils.StringResourcesUtils.getString
  *
  * @property count              Number of requests.
  * @property errorCount         Number of requests which finished with an error.
- * @property isForeignNode      True if should show a foreign storage over quota warning, false otherwise.
  */
 data class CopyRequestResult(
     val count: Int,
-    val errorCount: Int,
-    val isForeignNode: Boolean
+    val errorCount: Int
 ) {
 
     val successCount = count - errorCount

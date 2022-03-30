@@ -68,9 +68,6 @@ import mega.privacy.android.app.namecollision.data.NameCollisionType;
 import mega.privacy.android.app.namecollision.usecase.CheckNameCollisionUseCase;
 import mega.privacy.android.app.usecase.CopyNodeUseCase;
 import mega.privacy.android.app.usecase.data.CopyRequestResult;
-import mega.privacy.android.app.usecase.exception.ForeignNodeException;
-import mega.privacy.android.app.usecase.exception.OverQuotaException;
-import mega.privacy.android.app.usecase.exception.PreOverQuotaException;
 import mega.privacy.android.app.utils.LogUtil;
 import mega.privacy.android.app.imageviewer.ImageViewerActivity;
 import mega.privacy.android.app.utils.MegaProgressDialogUtil;
@@ -95,7 +92,6 @@ import static mega.privacy.android.app.components.dragger.DragToExitSupport.putT
 import static mega.privacy.android.app.constants.BroadcastConstants.ACTION_CLOSE_CHAT_AFTER_IMPORT;
 import static mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil.*;
 import static mega.privacy.android.app.utils.AlertDialogUtil.dismissAlertDialogIfExists;
-import static mega.privacy.android.app.utils.AlertsAndWarnings.showForeignStorageOverQuotaWarningDialog;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.FileUtil.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
@@ -722,7 +718,7 @@ public class FolderLinkActivity extends TransfersManagementActivity implements M
 								copyNodeUseCase.copy(selectedNode, toHandle)
 										.subscribeOn(Schedulers.io())
 										.observeOn(AndroidSchedulers.mainThread())
-										.subscribe(() -> showSnackbar(SNACKBAR_TYPE, getString(R.string.context_correctly_copied)),
+										.subscribe(() -> showCopyResult(null, null),
 												copyThrowable -> showCopyResult(null, copyThrowable));
 							}
 						});
@@ -745,12 +741,10 @@ public class FolderLinkActivity extends TransfersManagementActivity implements M
 
 		if (copyRequestResult != null) {
 			showSnackbar(SNACKBAR_TYPE, copyRequestResult.getResultText());
-		} else if (throwable instanceof ForeignNodeException) {
-			showForeignStorageOverQuotaWarningDialog(this);
-		} else if (throwable instanceof OverQuotaException) {
-			errorOverquota();
-		} else if (throwable instanceof PreOverQuotaException) {
-			errorPreOverquota();
+		} else if (throwable == null) {
+			showSnackbar(SNACKBAR_TYPE, getString(R.string.context_correctly_copied));
+		} else {
+			manageThrowable(throwable);
 		}
 	}
 
@@ -1603,20 +1597,6 @@ public class FolderLinkActivity extends TransfersManagementActivity implements M
 
 	public void setSelectedNode(MegaNode selectedNode) {
 		this.selectedNode = selectedNode;
-	}
-
-	public void errorOverquota() {
-		Intent intent = new Intent(this, ManagerActivity.class);
-		intent.setAction(ACTION_OVERQUOTA_STORAGE);
-		startActivity(intent);
-		finish();
-	}
-
-	public void errorPreOverquota() {
-		Intent intent = new Intent(this, ManagerActivity.class);
-		intent.setAction(ACTION_PRE_OVERQUOTA_STORAGE);
-		startActivity(intent);
-		finish();
 	}
 
 	public void successfulCopy(){

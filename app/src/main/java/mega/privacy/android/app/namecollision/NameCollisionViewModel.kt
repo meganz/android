@@ -24,6 +24,7 @@ import mega.privacy.android.app.utils.LogUtil
 import mega.privacy.android.app.utils.LogUtil.logDebug
 import mega.privacy.android.app.utils.LogUtil.logError
 import mega.privacy.android.app.utils.StringResourcesUtils
+import mega.privacy.android.app.utils.livedata.SingleLiveEvent
 import javax.inject.Inject
 
 /**
@@ -50,6 +51,7 @@ class NameCollisionViewModel @Inject constructor(
     private val actionResult: MutableLiveData<NameCollisionActionResult> = MutableLiveData()
     private val collisionsResolution: MutableLiveData<ArrayList<NameCollisionResult>> =
         MutableLiveData()
+    private val throwable = SingleLiveEvent<Throwable>()
 
     fun getCurrentCollision(): LiveData<NameCollisionResult?> = currentCollision
     fun getFileVersioningInfo(): LiveData<Triple<Boolean, NameCollisionType, Boolean>> =
@@ -57,6 +59,7 @@ class NameCollisionViewModel @Inject constructor(
 
     fun onActionResult(): LiveData<NameCollisionActionResult> = actionResult
     fun getCollisionsResolution(): LiveData<ArrayList<NameCollisionResult>> = collisionsResolution
+    fun onExceptionThrown(): LiveData<Throwable> = throwable
 
     private val renameNames = mutableListOf<String>()
     private val resolvedCollisions = mutableListOf<NameCollisionResult>()
@@ -477,7 +480,10 @@ class NameCollisionViewModel @Inject constructor(
                     setMovementResult(result)
                     continueWithNext(choice)
                 },
-                onError = { error -> LogUtil.logWarning(error.message) })
+                onError = { error ->
+                    throwable.value = error
+                    LogUtil.logWarning(error.message)
+                })
             .addTo(composite)
     }
 
@@ -493,7 +499,10 @@ class NameCollisionViewModel @Inject constructor(
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeBy(
                 onSuccess = { result -> setMovementResult(result) },
-                onError = { error -> LogUtil.logWarning(error.message) })
+                onError = { error ->
+                    throwable.value = error
+                    LogUtil.logWarning(error.message)
+                })
             .addTo(composite)
     }
 
@@ -506,7 +515,6 @@ class NameCollisionViewModel @Inject constructor(
     private fun setMovementResult(movementResult: MoveRequestResult.GeneralMovement) {
         actionResult.value = NameCollisionActionResult(
             message = movementResult.getResultText(),
-            isForeignNode = movementResult.isForeignNode,
             shouldFinish = pendingCollisions.isEmpty()
         )
     }
@@ -529,7 +537,10 @@ class NameCollisionViewModel @Inject constructor(
                     setCopyResult(result)
                     continueWithNext(choice)
                 },
-                onError = { error -> LogUtil.logWarning(error.message) })
+                onError = { error ->
+                    throwable.value = error
+                    LogUtil.logWarning(error.message)
+                })
             .addTo(composite)
     }
 
@@ -545,7 +556,10 @@ class NameCollisionViewModel @Inject constructor(
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeBy(
                 onSuccess = { result -> setCopyResult(result) },
-                onError = { error -> LogUtil.logWarning(error.message) })
+                onError = { error ->
+                    throwable.value = error
+                    LogUtil.logWarning(error.message)
+                })
             .addTo(composite)
     }
 
@@ -557,7 +571,6 @@ class NameCollisionViewModel @Inject constructor(
     private fun setCopyResult(copyResult: CopyRequestResult) {
         actionResult.value = NameCollisionActionResult(
             message = copyResult.getResultText(),
-            isForeignNode = copyResult.isForeignNode,
             shouldFinish = pendingCollisions.isEmpty()
         )
     }

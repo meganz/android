@@ -27,6 +27,7 @@ import static mega.privacy.android.app.service.iab.BillingManagerImpl.SKU_PRO_II
 import static mega.privacy.android.app.service.iab.BillingManagerImpl.SKU_PRO_II_YEAR;
 import static mega.privacy.android.app.service.iab.BillingManagerImpl.SKU_PRO_I_YEAR;
 import static mega.privacy.android.app.service.iab.BillingManagerImpl.SKU_PRO_LITE_YEAR;
+import static mega.privacy.android.app.utils.AlertsAndWarnings.showForeignStorageOverQuotaWarningDialog;
 import static mega.privacy.android.app.utils.AlertsAndWarnings.showResumeTransfersWarning;
 import static mega.privacy.android.app.utils.Constants.ACCOUNT_NOT_BLOCKED;
 import static mega.privacy.android.app.utils.Constants.ACTION_SHOW_UPGRADE_ACCOUNT;
@@ -148,6 +149,9 @@ import mega.privacy.android.app.smsVerification.SMSVerificationActivity;
 import mega.privacy.android.app.snackbarListeners.SnackbarNavigateOption;
 import mega.privacy.android.app.upgradeAccount.PaymentActivity;
 import mega.privacy.android.app.upgradeAccount.UpgradeAccountActivity;
+import mega.privacy.android.app.usecase.exception.ForeignNodeException;
+import mega.privacy.android.app.usecase.exception.OverQuotaException;
+import mega.privacy.android.app.usecase.exception.PreOverQuotaException;
 import mega.privacy.android.app.utils.ColorUtils;
 import mega.privacy.android.app.utils.MegaNodeUtil;
 import mega.privacy.android.app.utils.StringResourcesUtils;
@@ -1638,5 +1642,38 @@ public class BaseActivity extends AppCompatActivity implements ActivityLauncher,
         }
 
         upgradeAlert.show();
+    }
+
+    protected boolean manageThrowable(Throwable throwable) {
+        if (throwable instanceof ForeignNodeException) {
+            launchForeignNodeError();
+            return true;
+        } else if (throwable instanceof OverQuotaException) {
+            launchOverQuota();
+            return true;
+        } else if (throwable instanceof PreOverQuotaException) {
+            launchPreOverQuota();
+            return true;
+        }
+
+        return false;
+    }
+
+    protected void launchOverQuota() {
+        startActivity(new Intent(this, ManagerActivity.class)
+                .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
+                .setAction(ACTION_PRE_OVERQUOTA_STORAGE));
+        finish();
+    }
+
+    protected void launchPreOverQuota() {
+        startActivity(new Intent(this, ManagerActivity.class)
+                .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
+                .setAction(ACTION_OVERQUOTA_STORAGE));
+        finish();
+    }
+
+    protected void launchForeignNodeError() {
+        showForeignStorageOverQuotaWarningDialog(this);
     }
 }

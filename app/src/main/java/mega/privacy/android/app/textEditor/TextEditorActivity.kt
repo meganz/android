@@ -34,15 +34,10 @@ import mega.privacy.android.app.interfaces.ActionNodeCallback
 import mega.privacy.android.app.interfaces.SnackbarShower
 import mega.privacy.android.app.interfaces.showSnackbar
 import mega.privacy.android.app.main.FileExplorerActivity
-import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.main.controllers.ChatController
 import mega.privacy.android.app.utils.AlertsAndWarnings.showSaveToDeviceConfirmDialog
 import mega.privacy.android.app.textEditor.TextEditorViewModel.Companion.VIEW_MODE
-import mega.privacy.android.app.usecase.exception.ForeignNodeException
 import mega.privacy.android.app.usecase.exception.MegaException
-import mega.privacy.android.app.usecase.exception.OverQuotaException
-import mega.privacy.android.app.usecase.exception.PreOverQuotaException
-import mega.privacy.android.app.utils.AlertsAndWarnings.showForeignStorageOverQuotaWarningDialog
 import mega.privacy.android.app.utils.ChatUtil.removeAttachmentMessage
 import mega.privacy.android.app.utils.ColorUtils.changeStatusBarColorForElevation
 import mega.privacy.android.app.utils.ColorUtils.getColorForElevation
@@ -894,25 +889,8 @@ class TextEditorActivity : PasscodeActivity(), SnackbarShower, Scrollable {
      * @param throwable The exception.
      */
     private fun manageException(throwable: Throwable) {
-        when (throwable) {
-            is ForeignNodeException -> {
-                showForeignStorageOverQuotaWarningDialog(this)
-            }
-            is OverQuotaException -> {
-                startActivity(Intent(this, ManagerActivity::class.java).apply {
-                    action = ACTION_OVERQUOTA_STORAGE
-                })
-                finish()
-            }
-            is PreOverQuotaException -> {
-                startActivity(Intent(this, ManagerActivity::class.java).apply {
-                    action = ACTION_PRE_OVERQUOTA_STORAGE
-                })
-                finish()
-            }
-            is MegaException -> {
-                showSnackbar(throwable.message!!)
-            }
+        if (!manageThrowable(throwable) && throwable is MegaException) {
+            showSnackbar(throwable.message!!)
         }
     }
 }

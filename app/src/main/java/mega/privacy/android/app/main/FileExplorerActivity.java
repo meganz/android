@@ -1647,6 +1647,8 @@ public class FileExplorerActivity extends TransfersManagementActivity
 								if (filesChecked == filePreparedInfos.size()) {
 									startChatUploadService();
 								}
+
+								manageThrowable(throwable);
 							});
 				}
 			} else {

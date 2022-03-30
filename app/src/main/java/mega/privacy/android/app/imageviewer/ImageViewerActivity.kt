@@ -365,6 +365,9 @@ class ImageViewerActivity : BaseActivity(), PermissionRequester, SnackbarShower 
             bottomSheet?.dismissAllowingStateLoss()
             showSnackbar(message)
         }
+        viewModel.onExceptionThrown().observe(this) { error ->
+            manageThrowable(error)
+        }
         viewModel.getCollision().observe(this) { collision ->
             nameCollisionActivityContract.launch(collision)
         }

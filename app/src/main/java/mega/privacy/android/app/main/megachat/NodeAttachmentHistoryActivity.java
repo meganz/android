@@ -71,38 +71,29 @@ import mega.privacy.android.app.main.PdfViewerActivity;
 import mega.privacy.android.app.activities.PasscodeActivity;
 import mega.privacy.android.app.main.controllers.ChatController;
 import mega.privacy.android.app.main.listeners.MultipleForwardChatProcessor;
-import mega.privacy.android.app.main.listeners.MultipleRequestListener;
 import mega.privacy.android.app.main.megachat.chatAdapters.NodeAttachmentHistoryAdapter;
 import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.NodeAttachmentBottomSheetDialogFragment;
 import mega.privacy.android.app.utils.AlertsAndWarnings;
 import mega.privacy.android.app.utils.ColorUtils;
 import mega.privacy.android.app.utils.StringResourcesUtils;
 import nz.mega.sdk.MegaApiAndroid;
-import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaChatApi;
 import nz.mega.sdk.MegaChatApiJava;
 import nz.mega.sdk.MegaChatError;
-import nz.mega.sdk.MegaChatListItem;
-import nz.mega.sdk.MegaChatListenerInterface;
 import nz.mega.sdk.MegaChatMessage;
 import nz.mega.sdk.MegaChatNodeHistoryListenerInterface;
 import nz.mega.sdk.MegaChatPeerList;
-import nz.mega.sdk.MegaChatPresenceConfig;
 import nz.mega.sdk.MegaChatRequest;
 import nz.mega.sdk.MegaChatRequestListenerInterface;
 import nz.mega.sdk.MegaChatRoom;
-import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaNodeList;
-import nz.mega.sdk.MegaRequest;
-import nz.mega.sdk.MegaRequestListenerInterface;
 import nz.mega.sdk.MegaUser;
 
 import static mega.privacy.android.app.constants.BroadcastConstants.BROADCAST_ACTION_ERROR_COPYING_NODES;
 import static mega.privacy.android.app.constants.BroadcastConstants.ERROR_MESSAGE_TEXT;
 import static mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil.*;
 import static mega.privacy.android.app.utils.AlertDialogUtil.dismissAlertDialogIfExists;
-import static mega.privacy.android.app.utils.AlertsAndWarnings.showForeignStorageOverQuotaWarningDialog;
 import static mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuotaPaywallWarning;
 import static mega.privacy.android.app.utils.ChatUtil.manageTextFileIntent;
 import static mega.privacy.android.app.utils.ColorUtils.getColorHexString;
@@ -1182,6 +1173,11 @@ public class NodeAttachmentHistoryActivity extends PasscodeActivity implements
                                     .observeOn(AndroidSchedulers.mainThread())
                                     .subscribe((copyResult, copyThrowable) -> {
                                         dismissAlertDialogIfExists(statusDialog);
+
+                                        if (copyThrowable != null) {
+                                            manageThrowable(copyThrowable);
+                                        }
+
                                         showSnackbar(SNACKBAR_TYPE, copyThrowable == null
                                                         ? copyResult.getResultText()
                                                         : StringResourcesUtils.getString(R.string.import_success_error),

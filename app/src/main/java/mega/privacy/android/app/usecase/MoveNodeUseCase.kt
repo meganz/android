@@ -5,14 +5,11 @@ import io.reactivex.rxjava3.core.Single
 import io.reactivex.rxjava3.kotlin.blockingSubscribeBy
 import mega.privacy.android.app.R
 import mega.privacy.android.app.di.MegaApi
-import mega.privacy.android.app.usecase.exception.BusinessAccountOverdueException
 import mega.privacy.android.app.listeners.OptionalMegaRequestListenerInterface
 import mega.privacy.android.app.namecollision.data.NameCollision
 import mega.privacy.android.app.namecollision.data.NameCollisionResult
 import mega.privacy.android.app.usecase.data.MoveRequestResult
-import mega.privacy.android.app.usecase.exception.ForeignNodeException
-import mega.privacy.android.app.usecase.exception.MegaException
-import mega.privacy.android.app.usecase.exception.MegaNodeException
+import mega.privacy.android.app.usecase.exception.*
 import mega.privacy.android.app.utils.RxUtil.blockingGetOrNull
 import mega.privacy.android.app.utils.StringResourcesUtils.getString
 import nz.mega.sdk.MegaApiAndroid
@@ -92,13 +89,12 @@ class MoveNodeUseCase @Inject constructor(
             }
 
             val listener = OptionalMegaRequestListenerInterface(onRequestFinish = { _, error ->
-                if (emitter.isDisposed) {
-                    return@OptionalMegaRequestListenerInterface
-                }
+                if (emitter.isDisposed) return@OptionalMegaRequestListenerInterface
 
                 when (error.errorCode) {
                     API_OK -> emitter.onComplete()
                     API_EBUSINESSPASTDUE -> emitter.onError(BusinessAccountOverdueException())
+                    API_EGOINGOVERQUOTA -> emitter.onError(PreOverQuotaException())
                     else ->
                         if (error.errorCode == API_EOVERQUOTA
                             && megaApi.isForeignNode(parentNode.handle)
@@ -157,37 +153,32 @@ class MoveNodeUseCase @Inject constructor(
                     .blockingSubscribeBy(onError = { error -> emitter.onError(error) })
             }
 
-            if (emitter.isDisposed) {
-                return@create
-            }
+            if (emitter.isDisposed) return@create
 
             move(node, parentNode, if (rename) collisionResult.renameName else null)
                 .blockingSubscribeBy(
                     onError = { error ->
-                        if (emitter.isDisposed) {
-                            return@blockingSubscribeBy
-                        }
-
-                        emitter.onSuccess(
-                            MoveRequestResult.GeneralMovement(
-                                count = 1,
-                                errorCount = 1,
-                                isForeignNode = error is MegaException && error.errorCode == API_EOVERQUOTA
+                        when {
+                            emitter.isDisposed -> return@blockingSubscribeBy
+                            error.shouldEmmitError() -> emitter.onError(error)
+                            else -> emitter.onSuccess(
+                                MoveRequestResult.GeneralMovement(
+                                    count = 1,
+                                    errorCount = 1
+                                )
                             )
-                        )
+                        }
                     },
                     onComplete = {
-                        if (emitter.isDisposed) {
-                            return@blockingSubscribeBy
-                        }
-
-                        emitter.onSuccess(
-                            MoveRequestResult.GeneralMovement(
-                                count = 1,
-                                errorCount = 0,
-                                isForeignNode = false
+                        when {
+                            emitter.isDisposed -> return@blockingSubscribeBy
+                            else -> emitter.onSuccess(
+                                MoveRequestResult.GeneralMovement(
+                                    count = 1,
+                                    errorCount = 0
+                                )
                             )
-                        )
+                        }
                     }
                 )
         }
@@ -205,16 +196,15 @@ class MoveNodeUseCase @Inject constructor(
     ): Single<MoveRequestResult.GeneralMovement> =
         Single.create { emitter ->
             var errorCount = 0
-            var isForeignNode = false
 
-            collisions.forEach { collision ->
-                if (emitter.isDisposed) {
-                    return@create
-                }
+            for (collision in collisions) {
+                if (emitter.isDisposed) break
 
                 move(collision, rename).blockingSubscribeBy(onError = { error ->
-                    errorCount++
-                    isForeignNode = error is ForeignNodeException
+                    when {
+                        error.shouldEmmitError() -> emitter.onError(error)
+                        else -> errorCount++
+                    }
                 })
             }
 
@@ -223,8 +213,7 @@ class MoveNodeUseCase @Inject constructor(
                 else -> emitter.onSuccess(
                     MoveRequestResult.GeneralMovement(
                         count = collisions.size,
-                        errorCount = errorCount,
-                        isForeignNode = isForeignNode
+                        errorCount = errorCount
                     )
                 )
             }
@@ -247,37 +236,37 @@ class MoveNodeUseCase @Inject constructor(
             }
 
             var errorCount = 0
-            var isForeignNode = false
             val oldParentHandle = if (handles.size == 1) {
                 getNodeUseCase.get(handles[0]).blockingGetOrNull()?.parentHandle
             } else {
                 INVALID_HANDLE
             }
 
-            handles.forEach { handle ->
+            for (handle in handles) {
+                if (emitter.isDisposed) break
+
                 val node = getNodeUseCase.get(handle).blockingGetOrNull()
 
                 if (node == null) {
                     errorCount++
                 } else {
-                    move(node, parentNode)
-                        .blockingSubscribeBy(onError = { error ->
-                            errorCount++
-                            isForeignNode = error is ForeignNodeException
-                        })
+                    move(node, parentNode).blockingSubscribeBy(onError = { error ->
+                        when {
+                            error.shouldEmmitError() -> emitter.onError(error)
+                            else -> errorCount++
+                        }
+                    })
                 }
             }
 
-            if (emitter.isDisposed) {
-                return@create
+            when {
+                emitter.isDisposed -> return@create
+                else -> emitter.onSuccess(MoveRequestResult.GeneralMovement(
+                    handles.size,
+                    errorCount,
+                    oldParentHandle
+                ).apply { resetAccountDetailsIfNeeded() })
             }
-
-            emitter.onSuccess(MoveRequestResult.GeneralMovement(
-                handles.size,
-                errorCount,
-                oldParentHandle,
-                isForeignNode
-            ).apply { resetAccountDetailsIfNeeded() })
         }
 
     /**
@@ -302,22 +291,21 @@ class MoveNodeUseCase @Inject constructor(
                 if (node == null) {
                     errorCount++
                 } else {
-                    move(node, rubbishNode).blockingSubscribeBy(onError = {
-                        errorCount++
-                    })
-                    megaApi.disableExport(node);
+                    move(node, rubbishNode).blockingSubscribeBy(
+                        onError = { errorCount++ },
+                        onComplete = { megaApi.disableExport(node) }
+                    )
                 }
             }
 
-            if (emitter.isDisposed) {
-                return@create
+            when {
+                emitter.isDisposed -> return@create
+                else -> emitter.onSuccess(MoveRequestResult.RubbishMovement(
+                    handles.size,
+                    errorCount,
+                    oldParentHandle
+                ).apply { resetAccountDetailsIfNeeded() })
             }
-
-            emitter.onSuccess(MoveRequestResult.RubbishMovement(
-                handles.size,
-                errorCount,
-                oldParentHandle
-            ).apply { resetAccountDetailsIfNeeded() })
         }
 
     /**
@@ -329,12 +317,13 @@ class MoveNodeUseCase @Inject constructor(
     fun restore(nodes: List<MegaNode>): Single<MoveRequestResult> =
         Single.create { emitter ->
             var errorCount = 0
-            var isForeignNode = false
             val destination: MegaNode? = if (nodes.size == 1) {
                 getNodeUseCase.get(nodes[0].restoreHandle).blockingGetOrNull()
             } else {
                 null
             }
+
+            var throwForeign = false
 
             nodes.forEach { node ->
                 val parent = getNodeUseCase.get(node.restoreHandle).blockingGetOrNull()
@@ -344,20 +333,34 @@ class MoveNodeUseCase @Inject constructor(
                 } else {
                     move(node, parent).blockingSubscribeBy(onError = { error ->
                         errorCount++
-                        isForeignNode = error is ForeignNodeException
+
+                        if (error is ForeignNodeException) {
+                            throwForeign = true
+                        }
                     })
                 }
             }
 
-            if (emitter.isDisposed) {
-                return@create
+            when {
+                emitter.isDisposed -> return@create
+                throwForeign -> emitter.onError(ForeignNodeException())
+                else -> emitter.onSuccess(MoveRequestResult.Restoration(
+                    nodes.size,
+                    errorCount,
+                    destination
+                ).apply { resetAccountDetailsIfNeeded() })
             }
-
-            emitter.onSuccess(MoveRequestResult.Restoration(
-                nodes.size,
-                errorCount,
-                isForeignNode,
-                destination
-            ).apply { resetAccountDetailsIfNeeded() })
         }
+
+    /**
+     * Checks if the error of the request is over quota, pre over quota or foreign node.
+     *
+     * @return True if the error is one of those specified above, false otherwise.
+     */
+    private fun Throwable.shouldEmmitError(): Boolean =
+        when (this) {
+            is OverQuotaException, is PreOverQuotaException, is ForeignNodeException -> true
+            else -> false
+        }
+
 }

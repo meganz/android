@@ -79,6 +79,7 @@ class ImageViewerViewModel @Inject constructor(
     private val currentPosition = MutableLiveData<Int>()
     private val showToolbar = MutableLiveData<Boolean>()
     private val snackbarMessage = SingleLiveEvent<String>()
+    private val throwable = SingleLiveEvent<Throwable>()
     private val collision = SingleLiveEvent<NameCollision>()
     private val nodesComposite = CompositeDisposable()
     private val imagesComposite = CompositeDisposable()
@@ -115,6 +116,8 @@ class ImageViewerViewModel @Inject constructor(
         images.value?.find { it.handle == nodeHandle }
 
     fun onSnackbarMessage(): LiveData<String> = snackbarMessage
+
+    fun onExceptionThrown(): LiveData<Throwable> = throwable
 
     fun getCollision(): LiveData<NameCollision> = collision
 
@@ -482,9 +485,10 @@ class ImageViewerViewModel @Inject constructor(
             type = NameCollisionType.COPY
         ) {
             copyNodeUseCase.copy(node = node, parentHandle = newParentHandle)
-                .subscribeAndComplete {
-                    snackbarMessage.value = getString(R.string.context_correctly_copied)
-                }
+                .subscribeAndComplete(
+                    completeAction = {
+                        snackbarMessage.value = getString(R.string.context_correctly_copied)
+                    }, errorAction = { error -> throwable.value = error })
         }
     }
 
@@ -503,9 +507,11 @@ class ImageViewerViewModel @Inject constructor(
             type = NameCollisionType.MOVEMENT
         ) {
             moveNodeUseCase.move(node = node, parentHandle = newParentHandle)
-                .subscribeAndComplete {
-                    snackbarMessage.value = getString(R.string.context_correctly_moved)
-                }
+                .subscribeAndComplete(
+                    completeAction = {
+                        snackbarMessage.value = getString(R.string.context_correctly_moved)
+                    }, errorAction = { error -> throwable.value = error }
+                )
         }
     }
 
@@ -632,7 +638,10 @@ class ImageViewerViewModel @Inject constructor(
             .addTo(composite)
     }
 
-    private fun Completable.subscribeAndComplete(completeAction: (() -> Unit)? = null) {
+    private fun Completable.subscribeAndComplete(
+        completeAction: (() -> Unit)? = null,
+        errorAction: ((Throwable) -> Unit)? = null
+    ) {
         subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeBy(
@@ -640,6 +649,7 @@ class ImageViewerViewModel @Inject constructor(
                     completeAction?.invoke()
                 },
                 onError = { error ->
+                    errorAction?.invoke(error)
                     logError(error.stackTraceToString())
                 }
             )
