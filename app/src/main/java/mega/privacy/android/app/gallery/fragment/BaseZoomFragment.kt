@@ -240,7 +240,7 @@ abstract class BaseZoomFragment : BaseFragment(), GestureScaleCallback,
                 callManager { manager ->
                     manager.showNodeOptionsPanel(
                         it.node,
-                        NodeOptionsBottomSheetDialogFragment.MODE5
+                        NodeOptionsBottomSheetDialogFragment.SEARCH_MODE
                     )
                 }
             }

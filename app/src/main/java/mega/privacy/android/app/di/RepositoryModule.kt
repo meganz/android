@@ -25,4 +25,6 @@ abstract class RepositoryModule {
     @Binds
     abstract fun bindFilesRepository(implementation: MegaFilesRepository): FilesRepository
 
+    @Binds
+    abstract fun bindFavouritesRepository(repository: DefaultFavouritesRepository): FavouritesRepository
 }

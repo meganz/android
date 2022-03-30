@@ -118,6 +118,7 @@ class MoveNodeUseCase @Inject constructor(
                     move(node, rubbishNode).blockingSubscribeBy(onError = {
                         errorCount++
                     })
+                    megaApi.disableExport(node);
                 }
             }
 
