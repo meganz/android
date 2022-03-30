@@ -126,9 +126,9 @@ public class ChatExplorerFragment extends Fragment implements CheckScrollInterfa
         if (megaChatApi == null) {
             megaChatApi = ((MegaApplication) ((Activity) context).getApplication()).getMegaChatApi();
             if (context instanceof ChatExplorerActivity) {
-                megaChatApi.addChatListener((ChatExplorerActivity) context);
+                ((ChatExplorerActivity) context).checkChatChanges();
             } else if (context instanceof FileExplorerActivity) {
-                megaChatApi.addChatListener((FileExplorerActivity) context);
+                ((FileExplorerActivity) context).checkChatChanges();
             }
         }
 
@@ -311,10 +311,10 @@ public class ChatExplorerFragment extends Fragment implements CheckScrollInterfa
 
         if (megaChatApi != null) {
             if (context instanceof ChatExplorerActivity) {
-                megaChatApi.removeChatListener((ChatExplorerActivity) context);
+                ((ChatExplorerActivity) context).composite.clear();
             }
             else if (context instanceof FileExplorerActivity) {
-                megaChatApi.removeChatListener((FileExplorerActivity) context);
+                ((FileExplorerActivity) context).composite.clear();
             }
         }
     }

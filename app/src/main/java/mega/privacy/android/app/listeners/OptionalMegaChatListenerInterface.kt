@@ -14,7 +14,8 @@ class OptionalMegaChatListenerInterface(
     private val onChatOnlineStatusUpdate: ((Long, Int, Boolean) -> Unit)? = null,
     private val onChatPresenceConfigUpdate: ((MegaChatPresenceConfig) -> Unit)? = null,
     private val onChatConnectionStateUpdate: ((Long, Int) -> Unit)? = null,
-    private val onChatPresenceLastGreen: ((Long, Int) -> Unit)? = null
+    private val onChatPresenceLastGreen: ((Long, Int) -> Unit)? = null,
+    private val onDbError: ((Int, String) -> Unit)? = null
 ) : MegaChatListenerInterface {
 
     override fun onChatListItemUpdate(
@@ -61,5 +62,13 @@ class OptionalMegaChatListenerInterface(
         lastGreen: Int
     ) {
         onChatPresenceLastGreen?.invoke(userHandle, lastGreen)
+    }
+
+    override fun onDbError(
+        api: MegaChatApiJava,
+        error: Int,
+        msg: String
+    ) {
+        onDbError?.invoke(error, msg)
     }
 }

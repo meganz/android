@@ -20,17 +20,20 @@ import android.widget.FrameLayout;
 
 import java.util.ArrayList;
 
+import dagger.hilt.android.AndroidEntryPoint;
+import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
+import io.reactivex.rxjava3.disposables.Disposable;
+import io.reactivex.rxjava3.schedulers.Schedulers;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.main.AddContactActivity;
 import mega.privacy.android.app.activities.PasscodeActivity;
 import mega.privacy.android.app.main.listeners.CreateGroupChatWithPublicLink;
+import mega.privacy.android.app.usecase.chat.GetChatChangesUseCase;
 import nz.mega.sdk.MegaChatApi;
 import nz.mega.sdk.MegaChatApiJava;
 import nz.mega.sdk.MegaChatError;
 import nz.mega.sdk.MegaChatListItem;
-import nz.mega.sdk.MegaChatListenerInterface;
 import nz.mega.sdk.MegaChatPeerList;
-import nz.mega.sdk.MegaChatPresenceConfig;
 import nz.mega.sdk.MegaChatRequest;
 import nz.mega.sdk.MegaChatRequestListenerInterface;
 import nz.mega.sdk.MegaChatRoom;
@@ -41,7 +44,13 @@ import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.TimeUtils.*;
 import static mega.privacy.android.app.utils.Util.*;
 
-public class ChatExplorerActivity extends PasscodeActivity implements View.OnClickListener, MegaChatRequestListenerInterface, MegaChatListenerInterface {
+import javax.inject.Inject;
+
+@AndroidEntryPoint
+public class ChatExplorerActivity extends PasscodeActivity implements View.OnClickListener, MegaChatRequestListenerInterface {
+
+    @Inject
+    GetChatChangesUseCase getChatChangesUseCase;
 
     Toolbar tB;
     ActionBar aB;
@@ -488,33 +497,7 @@ public class ChatExplorerActivity extends PasscodeActivity implements View.OnCli
 
     }
 
-    @Override
-    public void onChatListItemUpdate(MegaChatApiJava api, MegaChatListItem item) {
-
-    }
-
-    @Override
-    public void onChatInitStateUpdate(MegaChatApiJava api, int newState) {
-
-    }
-
-    @Override
-    public void onChatOnlineStatusUpdate(MegaChatApiJava api, long userhandle, int status, boolean inProgress) {
-
-    }
-
-    @Override
-    public void onChatPresenceConfigUpdate(MegaChatApiJava api, MegaChatPresenceConfig config) {
-
-    }
-
-    @Override
-    public void onChatConnectionStateUpdate(MegaChatApiJava api, long chatid, int newState) {
-
-    }
-
-    @Override
-    public void onChatPresenceLastGreen(MegaChatApiJava api, long userhandle, int lastGreen) {
+    private void onChatPresenceLastGreen(long userhandle, int lastGreen) {
         int state = megaChatApi.getUserOnlineStatus(userhandle);
         if(state != MegaChatApi.STATUS_ONLINE && state != MegaChatApi.STATUS_BUSY && state != MegaChatApi.STATUS_INVALID) {
             String formattedDate = lastGreenDate(this, lastGreen);
@@ -525,5 +508,23 @@ public class ChatExplorerActivity extends PasscodeActivity implements View.OnCli
                 }
             }
         }
+    }
+
+    /**
+     * Receive changes to OnChatPresenceLastGreen and make the necessary changes
+     */
+    public void checkChatChanges() {
+        Disposable chatSubscription = getChatChangesUseCase.get()
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .filter(result -> result instanceof GetChatChangesUseCase.Result.OnChatPresenceLastGreen)
+                .map(result -> (GetChatChangesUseCase.Result.OnChatPresenceLastGreen) result)
+                .subscribe((next) -> {
+                    long userHandle = next.component1();
+                    int lastGreen = next.component2();
+                    onChatPresenceLastGreen(userHandle, lastGreen);
+                }, (error) -> logError("Error " + error));
+
+        composite.add(chatSubscription);
     }
 }

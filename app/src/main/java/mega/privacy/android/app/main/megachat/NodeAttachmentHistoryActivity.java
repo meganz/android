@@ -118,10 +118,9 @@ import static nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE;
 import javax.inject.Inject;
 
 @AndroidEntryPoint
-public class NodeAttachmentHistoryActivity extends PasscodeActivity
-        implements MegaChatRequestListenerInterface, OnClickListener, MegaChatListenerInterface,
-        MegaChatNodeHistoryListenerInterface, StoreDataBeforeForward<ArrayList<MegaChatMessage>>,
-        SnackbarShower {
+public class NodeAttachmentHistoryActivity extends PasscodeActivity implements
+        MegaChatRequestListenerInterface, OnClickListener, MegaChatNodeHistoryListenerInterface,
+        StoreDataBeforeForward<ArrayList<MegaChatMessage>>, SnackbarShower {
 
     @Inject
     CheckNameCollisionUseCase checkNameCollisionUseCase;
@@ -216,8 +215,6 @@ public class NodeAttachmentHistoryActivity extends PasscodeActivity
 
         chatC = new ChatController(this);
 
-        logDebug("addChatListener");
-        megaChatApi.addChatListener(this);
         megaChatApi.addNodeHistoryListener(chatId, this);
 
         handler = new Handler();
@@ -386,7 +383,6 @@ public class NodeAttachmentHistoryActivity extends PasscodeActivity
         unregisterReceiver(errorCopyingNodesReceiver);
 
         if (megaChatApi != null) {
-            megaChatApi.removeChatListener(this);
             megaChatApi.removeNodeHistoryListener(chatId, this);
             megaChatApi.closeNodeHistory(chatId, null);
         }
@@ -1196,36 +1192,6 @@ public class NodeAttachmentHistoryActivity extends PasscodeActivity
                         showSnackbar(SNACKBAR_TYPE, getString(R.string.import_success_error), MEGACHAT_INVALID_HANDLE);
                     }
                 });
-    }
-
-    @Override
-    public void onChatListItemUpdate(MegaChatApiJava api, MegaChatListItem item) {
-
-    }
-
-    @Override
-    public void onChatInitStateUpdate(MegaChatApiJava api, int newState) {
-
-    }
-
-    @Override
-    public void onChatOnlineStatusUpdate(MegaChatApiJava api, long userhandle, int status, boolean inProgress) {
-
-    }
-
-    @Override
-    public void onChatPresenceConfigUpdate(MegaChatApiJava api, MegaChatPresenceConfig config) {
-
-    }
-
-    @Override
-    public void onChatConnectionStateUpdate(MegaChatApiJava api, long chatid, int newState) {
-
-    }
-
-    @Override
-    public void onChatPresenceLastGreen(MegaChatApiJava api, long userhandle, int lastGreen) {
-
     }
 
     @Override
