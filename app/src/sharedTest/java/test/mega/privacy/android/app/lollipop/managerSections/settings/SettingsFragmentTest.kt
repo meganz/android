@@ -42,10 +42,7 @@ import mega.privacy.android.app.presentation.settings.SettingsFragment
 import mega.privacy.android.app.utils.Constants
 import org.hamcrest.Matchers.allOf
 import org.hamcrest.Matchers.not
-import org.junit.After
-import org.junit.Before
-import org.junit.Rule
-import org.junit.Test
+import org.junit.*
 import org.junit.runner.RunWith
 import org.mockito.Mockito
 import org.mockito.kotlin.any
@@ -282,7 +279,7 @@ class SettingsFragmentTest {
         }
     }
 
-    @Suppress //"Pending issue regarding download location"
+    @Ignore("Pending issue regarding download location")
     @Test
     fun test_that_download_location_is_included() {
         launchFragmentInHiltContainer<SettingsFragment>()

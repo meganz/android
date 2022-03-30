@@ -53,11 +53,11 @@ class SettingsFragment : SharedPreferences.OnSharedPreferenceChangeListener, Pre
 
     private var playerService: MediaPlayerService? = null
     private val mediaServiceConnection: ServiceConnection = object : ServiceConnection {
-        override fun onServiceConnected(name: ComponentName, service: IBinder) {
-            playerService = (service as MediaPlayerServiceBinder).service
+        override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
+            playerService = (service as? MediaPlayerServiceBinder)?.service
         }
 
-        override fun onServiceDisconnected(name: ComponentName) {
+        override fun onServiceDisconnected(name: ComponentName?) {
             playerService = null
         }
     }

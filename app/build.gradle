@@ -69,10 +69,10 @@ android {
             // This is not necessary unless you have precompiled libraries in your project.
         }
 
-        test {
-//            Add this once Robolectric tests work
-//            java.srcDir 'src/sharedTest/java'
+        testDebug {
+            java.srcDir 'src/sharedTest/java'
         }
+
         androidTest {
             java.srcDir 'src/sharedTest/java'
         }
@@ -305,6 +305,10 @@ dependencies {
     testImplementation "org.mockito.kotlin:mockito-kotlin:$mockitoKotlinVersion"
     testImplementation "androidx.test.espresso:espresso-core:$espressoVersion"
     testImplementation "androidx.test.espresso:espresso-intents:$espressoVersion"
+    testImplementation ("androidx.test.espresso:espresso-contrib:$espressoVersion") {
+        exclude group: 'org.checkerframework', module: 'checker'
+        exclude module: "protobuf-lite"
+    }
     testImplementation "com.google.dagger:hilt-android-testing:$hiltVersion"
     testImplementation "org.jetbrains.kotlinx:kotlinx-coroutines-test:$coroutineTestVersion"
     testImplementation "org.jetbrains.kotlin:kotlin-test:$kotlinVersion"
@@ -324,6 +328,7 @@ dependencies {
     androidTestImplementation "androidx.test.espresso:espresso-intents:$espressoVersion"
 
     kaptAndroidTest "com.google.dagger:hilt-android-compiler:$hiltVersion"
+    kaptTest "com.google.dagger:hilt-android-compiler:$hiltVersion"
     debugImplementation "androidx.fragment:fragment-testing:$fragmentTestingVersion"
 }
 

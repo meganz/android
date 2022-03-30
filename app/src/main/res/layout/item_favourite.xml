@@ -1,0 +1,162 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/item_favourite_layout"
+    android:layout_width="match_parent"
+    android:layout_height="72dp">
+
+    <ImageView
+        android:id="@+id/item_thumbnail"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:layout_marginStart="16dp"
+        android:scaleType="fitCenter"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:ignore="ContentDescription"
+        tools:src="@android:drawable/ic_menu_report_image" />
+
+    <ImageView
+        android:id="@+id/item_three_dots"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="10dp"
+        android:background="@null"
+        android:src="@drawable/ic_dots_vertical_grey"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:tint="?android:attr/textColorSecondary"
+        tools:ignore="ContentDescription" />
+
+    <TextView
+        android:id="@+id/item_filename"
+        style="@style/textAppearanceSubtitle1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="12dp"
+        android:layout_marginTop="15dp"
+        android:ellipsize="middle"
+        android:singleLine="true"
+        app:layout_constrainedWidth="true"
+        app:layout_constraintEnd_toStartOf="@id/guideline"
+        app:layout_constraintHorizontal_bias="0"
+        app:layout_constraintStart_toEndOf="@id/item_thumbnail"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <ImageView
+        android:id="@+id/item_img_label"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="4dp"
+        android:layout_toEndOf="@+id/item_filename"
+        android:src="@drawable/ic_circle_label"
+        app:layout_constraintBottom_toBottomOf="@id/item_filename"
+        app:layout_constraintStart_toEndOf="@id/item_filename"
+        app:layout_constraintTop_toTopOf="@id/item_filename"
+        tools:ignore="ContentDescription" />
+
+    <ImageView
+        android:id="@+id/item_img_favourite"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="4dp"
+        android:src="@drawable/ic_favorite"
+        app:layout_constraintBottom_toBottomOf="@id/item_filename"
+        app:layout_constraintStart_toEndOf="@id/item_img_label"
+        app:layout_constraintTop_toTopOf="@id/item_filename"
+        tools:ignore="ContentDescription" />
+
+    <ImageView
+        android:id="@+id/item_public_link"
+        android:layout_width="16dp"
+        android:layout_height="16dp"
+        android:layout_marginStart="3dp"
+        android:background="@null"
+        android:src="@drawable/link_ic"
+        app:layout_constraintBottom_toBottomOf="@id/item_filename"
+        app:layout_constraintStart_toEndOf="@id/item_img_favourite"
+        app:layout_constraintTop_toTopOf="@id/item_filename"
+        app:tint="?android:attr/textColorSecondary"
+        tools:ignore="ContentDescription" />
+
+    <ImageView
+        android:id="@+id/item_taken_down"
+        style="@style/taken_down_icon"
+        android:layout_width="16dp"
+        android:layout_height="16dp"
+        android:layout_centerVertical="true"
+        android:layout_marginStart="3dp"
+        android:layout_marginEnd="6dp"
+        android:layout_toEndOf="@+id/item_public_link"
+        android:src="@drawable/ic_input_warning"
+        app:layout_constraintBottom_toBottomOf="@id/item_filename"
+        app:layout_constraintStart_toEndOf="@id/item_public_link"
+        app:layout_constraintTop_toTopOf="@id/item_filename"
+        app:tint="?attr/colorError"
+        tools:ignore="ContentDescription"
+        tools:visibility="visible" />
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/item_file_info_layout"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="1dp"
+        app:layout_constraintStart_toStartOf="@id/item_filename"
+        app:layout_constraintTop_toBottomOf="@id/item_filename">
+
+        <ImageView
+            android:id="@+id/item_versions_icon"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="8dp"
+            android:src="@drawable/ic_versions_small"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintEnd_toStartOf="@id/item_file_info"
+            app:tint="@color/black_white"
+            tools:ignore="ContentDescription" />
+
+        <TextView
+            android:id="@+id/item_file_info"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:ellipsize="end"
+            android:singleLine="true"
+            android:textAppearance="@style/TextAppearance.Mega.Body2.Secondary"
+            app:layout_constraintStart_toEndOf="@id/item_versions_icon"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:text="8.27 MB . June 2020 10:39:12" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <ImageView
+        android:id="@+id/file_list_saved_offline"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="45dp"
+        android:background="@null"
+        android:src="@drawable/ic_offline_indicator"
+        app:layout_constraintBottom_toBottomOf="@id/item_file_info_layout"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@id/item_file_info_layout"
+        app:tint="?android:attr/textColorSecondary"
+        tools:ignore="ContentDescription" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guideline"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_end="100dp" />
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@color/grey_012_white_012"
+        android:layout_marginStart="72dp"
+        app:layout_constraintBottom_toBottomOf="parent"/>
+</androidx.constraintlayout.widget.ConstraintLayout>

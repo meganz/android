@@ -1500,7 +1500,10 @@ public class MegaApplication extends MultiDexApplication implements Application.
 
     @Override
     public void onChatPresenceLastGreen(MegaChatApiJava api, long userhandle, int lastGreen) {
+    }
 
+    @Override
+    public void onDbError(MegaChatApiJava api, int error, String msg) {
     }
 
     public void updateAppBadge() {

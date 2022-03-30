@@ -1,17 +1,21 @@
 package mega.privacy.android.app.listeners
 
 import android.content.Intent
+import android.util.Pair
 import com.jeremyliao.liveeventbus.LiveEventBus
 import mega.privacy.android.app.MegaApplication
-import mega.privacy.android.app.utils.Constants
-import mega.privacy.android.app.utils.Constants.*
-import mega.privacy.android.app.utils.LogUtil
-import nz.mega.sdk.*
-import nz.mega.sdk.MegaChatApi.INIT_ONLINE_SESSION
-import android.util.Pair
+import mega.privacy.android.app.R
 import mega.privacy.android.app.constants.EventConstants.EVENT_CHAT_CONNECTION_STATUS
 import mega.privacy.android.app.constants.EventConstants.EVENT_CHAT_TITLE_CHANGE
 import mega.privacy.android.app.constants.EventConstants.EVENT_PRIVILEGES_CHANGE
+import mega.privacy.android.app.utils.Constants.*
+import mega.privacy.android.app.utils.LogUtil.logDebug
+import mega.privacy.android.app.utils.LogUtil.logError
+import mega.privacy.android.app.utils.RunOnUIThreadUtils.post
+import mega.privacy.android.app.utils.StringResourcesUtils
+import mega.privacy.android.app.utils.Util
+import nz.mega.sdk.*
+import nz.mega.sdk.MegaChatApi.INIT_ONLINE_SESSION
 
 class GlobalChatListener(private val application: MegaApplication) : MegaChatListenerInterface {
     override fun onChatListItemUpdate(api: MegaChatApiJava?, item: MegaChatListItem?) {
@@ -70,8 +74,8 @@ class GlobalChatListener(private val application: MegaApplication) : MegaChatLis
         config: MegaChatPresenceConfig?
     ) {
         if (config?.isPending == false) {
-            LogUtil.logDebug("Launch local broadcast")
-            val intent = Intent(Constants.BROADCAST_ACTION_INTENT_SIGNAL_PRESENCE)
+            logDebug("Launch local broadcast")
+            val intent = Intent(BROADCAST_ACTION_INTENT_SIGNAL_PRESENCE)
             application.sendBroadcast(intent)
         }
     }
@@ -88,5 +92,21 @@ class GlobalChatListener(private val application: MegaApplication) : MegaChatLis
     }
 
     override fun onChatPresenceLastGreen(api: MegaChatApiJava?, userhandle: Long, lastGreen: Int) {
+    }
+
+    override fun onDbError(api: MegaChatApiJava?, error: Int, msg: String?) {
+        logError("MEGAChatSDK onDBError occurred. Error $error with message $msg")
+        when (error) {
+            MegaChatApi.DB_ERROR_IO -> application.currentActivity?.finishAndRemoveTask()
+
+            MegaChatApi.DB_ERROR_FULL -> post {
+                application.currentActivity?.let {
+                    Util.showErrorAlertDialog(
+                        StringResourcesUtils.getString(R.string.error_not_enough_free_space),
+                        true, it
+                    )
+                }
+            }
+        }
     }
 }

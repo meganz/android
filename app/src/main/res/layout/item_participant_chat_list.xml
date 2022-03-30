@@ -28,71 +28,17 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <ImageView
-        android:id="@+id/participant_list_three_dots"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_centerVertical="true"
-        android:layout_marginEnd="10dp"
-        android:background="@null"
-        android:src="@drawable/ic_dots_vertical_grey"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        tools:tint="?android:attr/textColorSecondary" />
-
-    <ImageView
-        android:id="@+id/participant_list_permissions"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="10dp"
-        android:layout_marginEnd="12dp"
-        android:src="@drawable/ic_permissions_full_access"
-        android:visibility="visible"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@id/participant_list_three_dots"
-        app:layout_constraintHorizontal_weight="1"
-        app:layout_constraintTop_toTopOf="parent"
-        app:tint="?attr/textColorHint" />
-
-    <LinearLayout
-        android:id="@+id/call_options"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="10dp"
-        android:layout_marginEnd="12dp"
-        android:orientation="horizontal"
-        android:visibility="gone"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@id/participant_list_permissions"
-        app:layout_constraintHorizontal_weight="1"
-        app:layout_constraintTop_toTopOf="parent">
-
-        <ImageView
-            android:id="@+id/participant_list_audio"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginEnd="6dp"
-            android:background="@null"
-            android:src="@drawable/ic_mic_off_grey_red" />
-
-        <ImageView
-            android:id="@+id/participant_list_video"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:background="@null"
-            android:src="@drawable/ic_video" />
-    </LinearLayout>
-
     <RelativeLayout
         android:id="@+id/participant_list_name_rl"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="13dp"
+        android:gravity="center_vertical"
+        android:visibility="visible"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/call_options"
-        app:layout_constraintHorizontal_bias="0"
-        app:layout_constraintStart_toEndOf="@+id/participant_list_thumbnail"
+        app:layout_constraintEnd_toStartOf="@id/options"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toEndOf="@id/participant_list_thumbnail"
         app:layout_constraintTop_toTopOf="parent">
 
         <LinearLayout
@@ -100,25 +46,29 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            android:paddingStart="0dp"
-            android:paddingEnd="10dp">
+            android:weightSum="2">
 
             <mega.privacy.android.app.components.twemoji.EmojiTextView
                 android:id="@+id/participant_list_name"
-                style="@style/TextAppearance.Mega.Subtitle1.Variant"
-                android:layout_width="0dp"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
+                android:layout_gravity="center"
+                android:layout_marginTop="5dp"
+                android:layout_marginBottom="5dp"
+                android:layout_weight="2"
                 android:ellipsize="middle"
-                android:singleLine="true" />
+                android:singleLine="true"
+                android:textAppearance="@style/TextAppearance.Mega.Subtitle1.Variant" />
 
             <ImageView
                 android:id="@+id/participant_list_icon_end"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_weight="1"
                 android:background="@null"
-                android:visibility="gone"
-                android:src="@drawable/ic_moderator"/>
+                android:src="@drawable/ic_moderator"
+                android:visibility="gone" />
         </LinearLayout>
 
         <mega.privacy.android.app.components.MarqueeTextView
@@ -129,8 +79,65 @@
             android:layout_marginTop="-1dp"
             android:ellipsize="none"
             android:singleLine="true"
-            android:textAppearance="@style/TextAppearance.Mega.Subtitle2.Secondary" />
+            android:textAppearance="@style/TextAppearance.Mega.Subtitle2.Secondary"
+            android:visibility="gone" />
+
     </RelativeLayout>
+
+    <LinearLayout
+        android:id="@+id/options"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <LinearLayout
+            android:id="@+id/call_options"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="10dp"
+            android:layout_marginEnd="12dp"
+            android:orientation="horizontal"
+            android:visibility="gone">
+
+            <ImageView
+                android:id="@+id/participant_list_audio"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="6dp"
+                android:background="@null"
+                android:src="@drawable/ic_mic_off_grey_red" />
+
+            <ImageView
+                android:id="@+id/participant_list_video"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@null"
+                android:src="@drawable/ic_video" />
+        </LinearLayout>
+
+        <ImageView
+            android:id="@+id/participant_list_permissions"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="10dp"
+            android:layout_marginEnd="12dp"
+            android:src="@drawable/ic_permissions_full_access"
+            android:visibility="gone"
+            app:tint="?attr/textColorHint" />
+
+        <ImageView
+            android:id="@+id/participant_list_three_dots"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="10dp"
+            android:background="@null"
+            android:src="@drawable/ic_dots_vertical_grey"
+            tools:tint="?android:attr/textColorSecondary" />
+    </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
 

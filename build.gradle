@@ -89,7 +89,7 @@ ext {
     simpleStorageVersion = '1.1.0'
     androidxTestVersion = '1.4.0'
     androidxArchCoreVersion = '2.1.0'
-    roboletricVersion = '4.5.1'
+    roboletricVersion = '4.7.3'
     mockitoVersion = '3.3.3'
     mockitoKotlinVersion = '4.0.0'
     espressoVersion = '3.4.0'
