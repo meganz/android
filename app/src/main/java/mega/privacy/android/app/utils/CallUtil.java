@@ -82,6 +82,7 @@ public class CallUtil {
         logDebug("Open create a meeting screen");
         Intent meetingIntent = new Intent(context, MeetingActivity.class);
         meetingIntent.setAction(MEETING_ACTION_CREATE);
+        meetingIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
         context.startActivity(meetingIntent);
     }
 
@@ -107,6 +108,7 @@ public class CallUtil {
         }
         meetingIntent.putExtra(MEETING_CHAT_ID, chatId);
         meetingIntent.putExtra(MEETING_NAME, meetingName);
+        meetingIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
         meetingIntent.setData(Uri.parse(link));
         context.startActivity(meetingIntent);
     }
@@ -124,6 +126,7 @@ public class CallUtil {
         Intent meetingIntent = new Intent(context, MeetingActivity.class);
         meetingIntent.setAction(MEETING_ACTION_START);
         meetingIntent.putExtra(MEETING_CHAT_ID, chatId);
+        meetingIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
         context.startActivity(meetingIntent);
     }
 
@@ -139,9 +142,9 @@ public class CallUtil {
         passcodeManagement.setShowPasscodeScreen(true);
         MegaApplication.getInstance().openCallService(chatId);
         Intent meetingIntent = new Intent(context, MeetingActivity.class);
-        meetingIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         meetingIntent.setAction(MEETING_ACTION_RINGING);
         meetingIntent.putExtra(MEETING_CHAT_ID, chatId);
+        meetingIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
         context.startActivity(meetingIntent);
     }
 
@@ -163,12 +166,7 @@ public class CallUtil {
         meetingIntent.setAction(MEETING_ACTION_IN);
         meetingIntent.putExtra(MEETING_CHAT_ID, chatId);
         meetingIntent.putExtra(MEETING_IS_GUEST, MegaApplication.getInstance().getMegaApi().isEphemeralPlusPlus());
-        if (isNewTask) {
-            logDebug("New task");
-            meetingIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        } else {
-            meetingIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-        }
+        meetingIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
         context.startActivity(meetingIntent);
     }
 
@@ -187,10 +185,10 @@ public class CallUtil {
         MegaApplication.getInstance().openCallService(chatId);
         Intent meetingIntent = new Intent(context, MeetingActivity.class);
         meetingIntent.setAction(MEETING_ACTION_IN);
-        meetingIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         meetingIntent.putExtra(MEETING_CHAT_ID, chatId);
         meetingIntent.putExtra(MEETING_AUDIO_ENABLE, isAudioEnable);
         meetingIntent.putExtra(MEETING_VIDEO_ENABLE, isVideoEnable);
+        meetingIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
         context.startActivity(meetingIntent);
     }
 
@@ -216,6 +214,7 @@ public class CallUtil {
         }
         intent.putExtra(MEETING_CHAT_ID, chatId);
         intent.putExtra(MEETING_IS_GUEST, true);
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
         intent.setData(Uri.parse(link));
         context.startActivity(intent);
     }
