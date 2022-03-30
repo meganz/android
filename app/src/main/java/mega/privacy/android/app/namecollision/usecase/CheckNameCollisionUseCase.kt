@@ -16,7 +16,6 @@ import mega.privacy.android.app.utils.LogUtil.logError
 import mega.privacy.android.app.utils.RxUtil.blockingGetOrNull
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
-import nz.mega.sdk.MegaChatApiAndroid
 import nz.mega.sdk.MegaNode
 import java.util.ArrayList
 import javax.inject.Inject
@@ -24,15 +23,47 @@ import javax.inject.Inject
 /**
  * Use case for checking name collisions before uploading, copying or moving.
  *
- * @property megaApi        MegaApiAndroid instance to check collisions.
- * @property megaChatApi        MegaChatApiAndroid instance to get nodes from chats.
+ * @property megaApi        [MegaApiAndroid] instance to check collisions.
  * @property getNodeUseCase Required for getting nodes.
  */
 class CheckNameCollisionUseCase @Inject constructor(
     @MegaApi private val megaApi: MegaApiAndroid,
-    private val megaChatApi: MegaChatApiAndroid,
     private val getNodeUseCase: GetNodeUseCase
 ) {
+
+    /**
+     * Checks if a node with the same name exists on the provided parent node.
+     *
+     * @param node          [MegaNode] to check its name.
+     * @param parentHandle  Handle of the parent node in which to look.
+     * @param type          [NameCollisionType]
+     * @return Single Long with the node handle with which there is a name collision.
+     */
+    fun check(
+        node: MegaNode?,
+        parentHandle: Long,
+        type: NameCollisionType
+    ): Single<NameCollision> =
+        check(
+            node = node,
+            parentNode = getNodeUseCase.get(parentHandle).blockingGetOrNull(),
+            type = type
+        )
+
+    /**
+     * Checks if a node with the same name exists on the provided parent node.
+     *
+     * @param handle        Handle of the node to check its name.
+     * @param parentHandle  Handle of the parent node in which to look.
+     * @param type          [NameCollisionType]
+     * @return Single Long with the node handle with which there is a name collision.
+     */
+    fun check(handle: Long, parentHandle: Long, type: NameCollisionType): Single<NameCollision> =
+        check(
+            node = getNodeUseCase.get(handle).blockingGetOrNull(),
+            parentHandle = parentHandle,
+            type = type
+        )
 
     /**
      * Checks if a node with the same name exists on the provided parent node.
@@ -47,35 +78,13 @@ class CheckNameCollisionUseCase @Inject constructor(
         parentNode: MegaNode?,
         type: NameCollisionType
     ): Single<NameCollision> =
-        check(node, parentNode, type)
-
-    /**
-     * Checks if a node with the same name exists on the provided parent node.
-     *
-     * @param handle        Handle of the node to check its name.
-     * @param parentHandle  Handle of the parent node in which to look.
-     * @param type          [NameCollisionType]
-     * @return Single Long with the node handle with which there is a name collision.
-     */
-    fun check(handle: Long, parentHandle: Long, type: NameCollisionType): Single<NameCollision> =
-        check(getNodeUseCase.get(handle).blockingGetOrNull(), parentHandle, type)
-
-    /**
-     * Checks if a node with the same name exists on the provided parent node.
-     *
-     * @param node          [MegaNode] to check its name.
-     * @param parentHandle  Handle of the parent node in which to look.
-     * @param type          [NameCollisionType]
-     * @return Single Long with the node handle with which there is a name collision.
-     */
-    fun check(node: MegaNode?, parentHandle: Long, type: NameCollisionType): Single<NameCollision> =
         Single.create { emitter ->
             if (node == null) {
                 emitter.onError(MegaNodeException.NodeDoesNotExistsException())
                 return@create
             }
 
-            check(node.name, getNodeUseCase.get(parentHandle).blockingGetOrNull())
+            check(name = node.name, parentNode = parentNode)
                 .blockingSubscribeBy(
                     onError = { error -> emitter.onError(error) },
                     onSuccess = { handle ->
@@ -83,12 +92,12 @@ class CheckNameCollisionUseCase @Inject constructor(
                             NameCollisionType.COPY -> NameCollision.Copy.getCopyCollision(
                                 handle,
                                 node,
-                                parentHandle
+                                parentHandle = parentNode!!.handle
                             )
                             NameCollisionType.MOVEMENT -> NameCollision.Movement.getMovementCollision(
                                 handle,
                                 node,
-                                parentHandle
+                                parentHandle = parentNode!!.handle
                             )
                             else -> null
                         }
@@ -115,7 +124,7 @@ class CheckNameCollisionUseCase @Inject constructor(
                 getNodeUseCase.get(parentHandle).blockingGetOrNull()
             }
 
-            check(name, parentNode).blockingSubscribeBy(
+            check(name = name, parentNode = parentNode).blockingSubscribeBy(
                 onError = { error -> emitter.onError(error) },
                 onSuccess = { handle -> emitter.onSuccess(handle) }
             )
@@ -167,12 +176,10 @@ class CheckNameCollisionUseCase @Inject constructor(
             val collisions = ArrayList<NameCollision>()
             val results = mutableListOf<MegaNode>()
 
-            nodes.forEach { node ->
-                if (emitter.isDisposed) {
-                    return@create
-                }
+            for (node in nodes) {
+                if (emitter.isDisposed) break
 
-                check(node, parentHandle, type).blockingSubscribeBy(
+                check(node = node, parentHandle = parentHandle, type = type).blockingSubscribeBy(
                     onError = { error ->
                         logError("No collision.", error)
                         results.add(node)
@@ -210,18 +217,17 @@ class CheckNameCollisionUseCase @Inject constructor(
             val collisions = ArrayList<NameCollision>()
             val results = mutableListOf<Long>()
 
-            handles.forEach { handle ->
-                if (emitter.isDisposed) {
-                    return@create
-                }
+            for (handle in handles) {
+                if (emitter.isDisposed) break
 
-                check(handle, parentHandle, type).blockingSubscribeBy(
-                    onError = { error ->
-                        logError("No collision.", error)
-                        results.add(handle)
-                    },
-                    onSuccess = { collision -> collisions.add(collision) }
-                )
+                check(handle = handle, parentHandle = parentHandle, type = type)
+                    .blockingSubscribeBy(
+                        onError = { error ->
+                            logError("No collision.", error)
+                            results.add(handle)
+                        },
+                        onSuccess = { collision -> collisions.add(collision) }
+                    )
             }
 
             when {
@@ -249,15 +255,15 @@ class CheckNameCollisionUseCase @Inject constructor(
             val collisions = ArrayList<NameCollision>()
             val results = mutableListOf<MegaNode>()
 
-            nodes.forEach { node ->
-                if (emitter.isDisposed) {
-                    return@create
-                }
+            for (node in nodes) {
+                if (emitter.isDisposed) break
 
                 val restoreHandle = node.restoreHandle
                 val parent = getNodeUseCase.get(restoreHandle).blockingGetOrNull()
 
-                if (parent != null && !megaApi.isInRubbish(parent)) {
+                if (parent == null || megaApi.isInRubbish(parent)) {
+                    results.add(node)
+                } else {
                     check(node.name, parent).blockingSubscribeBy(
                         onError = { error ->
                             logError("No collision.", error)
@@ -306,6 +312,8 @@ class CheckNameCollisionUseCase @Inject constructor(
             val results = ArrayList<ShareInfo>()
 
             for (shareInfo in shareInfos) {
+                if (emitter.isDisposed) break
+
                 check(shareInfo.originalFileName, parentNode).blockingSubscribeBy(
                     onError = { error ->
                         if (error is MegaNodeException.ParentDoesNotExistException) {
@@ -327,7 +335,10 @@ class CheckNameCollisionUseCase @Inject constructor(
                 )
             }
 
-            emitter.onSuccess(Pair(collisions, results))
+            when {
+                emitter.isDisposed -> return@create
+                else -> emitter.onSuccess(Pair(collisions, results))
+            }
         }
 
     /**
@@ -351,10 +362,8 @@ class CheckNameCollisionUseCase @Inject constructor(
 
             val collisions = ArrayList<NameCollision>()
 
-            uploadContent.forEach { item ->
-                if (emitter.isDisposed) {
-                    return@create
-                }
+            for (item in uploadContent) {
+                if (emitter.isDisposed) break
 
                 item.name?.let {
                     check(it, parentHandle).blockingSubscribeBy(

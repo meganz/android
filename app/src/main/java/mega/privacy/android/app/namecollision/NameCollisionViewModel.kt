@@ -361,7 +361,7 @@ class NameCollisionViewModel @Inject constructor(
                         move(proceedWithAllFiles(choice), rename)
                     }
                     applyOnNext -> move(getAllPendingCollisions(), rename)
-                    else -> singleMove(rename)
+                    else -> singleMovement(rename)
                 }
             }
             NameCollisionType.COPY -> {
@@ -467,7 +467,7 @@ class NameCollisionViewModel @Inject constructor(
      *
      * @param rename    True if should rename the node, false otherwise.
      */
-    private fun singleMove(rename: Boolean) {
+    private fun singleMovement(rename: Boolean) {
         val choice =
             if (rename) NameCollisionChoice.RENAME
             else NameCollisionChoice.REPLACE_UPDATE_MERGE

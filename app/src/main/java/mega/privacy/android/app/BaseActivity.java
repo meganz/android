@@ -1655,6 +1655,12 @@ public class BaseActivity extends AppCompatActivity implements ActivityLauncher,
         upgradeAlert.show();
     }
 
+    /**
+     * Checks if can process the throwable and if so, launches the corresponding action.
+     *
+     * @param throwable Throwable to check.
+     * @return True if the Throwable has been managed, false otherwise.
+     */
     protected boolean manageThrowable(Throwable throwable) {
         if (throwable instanceof ForeignNodeException) {
             launchForeignNodeError();
@@ -1670,20 +1676,29 @@ public class BaseActivity extends AppCompatActivity implements ActivityLauncher,
         return false;
     }
 
+    /**
+     * Launches ManagerActivity intent to show over quota warning.
+     */
     protected void launchOverQuota() {
-        startActivity(new Intent(this, ManagerActivity.class)
-                .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
-                .setAction(ACTION_PRE_OVERQUOTA_STORAGE));
-        finish();
-    }
-
-    protected void launchPreOverQuota() {
         startActivity(new Intent(this, ManagerActivity.class)
                 .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
                 .setAction(ACTION_OVERQUOTA_STORAGE));
         finish();
     }
 
+    /**
+     * Launches ManagerActivity intent to show pre over quota warning.
+     */
+    protected void launchPreOverQuota() {
+        startActivity(new Intent(this, ManagerActivity.class)
+                .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
+                .setAction(ACTION_PRE_OVERQUOTA_STORAGE));
+        finish();
+    }
+
+    /**
+     * Shows foreign storage over quota warning.
+     */
     protected void launchForeignNodeError() {
         showForeignStorageOverQuotaWarningDialog(this);
     }

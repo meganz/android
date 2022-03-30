@@ -200,60 +200,60 @@ import nz.mega.sdk.MegaUser;
 @HiltAndroidApp
 public class MegaApplication extends MultiDexApplication implements Application.ActivityLifecycleCallbacks, MegaChatRequestListenerInterface, MegaChatNotificationListenerInterface, NetworkStateReceiver.NetworkStateReceiverListener, MegaChatListenerInterface {
 
-	final String TAG = "MegaApplication";
+    final String TAG = "MegaApplication";
 
-	private static PushNotificationSettingManagement pushNotificationSettingManagement;
-	private static ChatManagement chatManagement;
+    private static PushNotificationSettingManagement pushNotificationSettingManagement;
+    private static ChatManagement chatManagement;
 
     private LegacyLogUtil legacyLoggingUtil = new LegacyLogUtil();
 
-	@MegaApi
-	@Inject
-	MegaApiAndroid megaApi;
-	@MegaApiFolder
-	@Inject
-	MegaApiAndroid megaApiFolder;
-	@Inject
-	MegaChatApiAndroid megaChatApi;
-	@Inject
-	DatabaseHandler dbH;
-	@Inject
-	GetCookieSettingsUseCase getCookieSettingsUseCase;
-	@Inject
-	SortOrderManagement sortOrderManagement;
-	@Inject
-	MyAccountInfo myAccountInfo;
-	@Inject
-	PasscodeManagement passcodeManagement;
-	@Inject
-	CrashReporter crashReporter;
-	@Inject
-	PerformanceReporter performanceReporter;
+    @MegaApi
+    @Inject
+    MegaApiAndroid megaApi;
+    @MegaApiFolder
+    @Inject
+    MegaApiAndroid megaApiFolder;
+    @Inject
+    MegaChatApiAndroid megaChatApi;
+    @Inject
+    DatabaseHandler dbH;
+    @Inject
+    GetCookieSettingsUseCase getCookieSettingsUseCase;
+    @Inject
+    SortOrderManagement sortOrderManagement;
+    @Inject
+    MyAccountInfo myAccountInfo;
+    @Inject
+    PasscodeManagement passcodeManagement;
+    @Inject
+    CrashReporter crashReporter;
+    @Inject
+    PerformanceReporter performanceReporter;
     @Inject
     InitialiseLogging initialiseLoggingUseCase;
-	@Inject
+    @Inject
     public TransfersManagement transfersManagement;
 
-	String localIpAddress = "";
-	BackgroundRequestListener requestListener;
-	final static public String APP_KEY = "6tioyn8ka5l6hty";
-	final static private String APP_SECRET = "hfzgdtrma231qdm";
+    String localIpAddress = "";
+    BackgroundRequestListener requestListener;
+    final static public String APP_KEY = "6tioyn8ka5l6hty";
+    final static private String APP_SECRET = "hfzgdtrma231qdm";
 
-	boolean esid = false;
+    boolean esid = false;
 
-	private int storageState = MegaApiJava.STORAGE_STATE_UNKNOWN; //Default value
+    private int storageState = MegaApiJava.STORAGE_STATE_UNKNOWN; //Default value
 
-	// The current App Activity
-	private Activity currentActivity = null;
+    // The current App Activity
+    private Activity currentActivity = null;
 
-	// Attributes to detect if app changes between background and foreground
-	// Keep the count of number of Activities in the started state
-	private int activityReferences = 0;
-	// Flag to indicate if the current Activity is going through configuration change like orientation switch
-	private boolean isActivityChangingConfigurations = false;
+    // Attributes to detect if app changes between background and foreground
+    // Keep the count of number of Activities in the started state
+    private int activityReferences = 0;
+    // Flag to indicate if the current Activity is going through configuration change like orientation switch
+    private boolean isActivityChangingConfigurations = false;
 
-	private static boolean isLoggingIn = false;
-	private static boolean isLoggingOut = false;
+    private static boolean isLoggingIn = false;
+    private static boolean isLoggingOut = false;
 
     private static boolean showInfoChatMessages = false;
 
@@ -440,51 +440,49 @@ public class MegaApplication extends MultiDexApplication implements Application.
                     // Init CU sync data after login successfully
                     new CUBackupInitializeChecker(megaApi).initCuSync();
 
-					//Login check resumed pending transfers
-					transfersManagement.checkResumedPendingTransfers();
-				}
-			}
-			else if(request.getType() == MegaRequest.TYPE_GET_ATTR_USER){
-				if (request.getParamType() == MegaApiJava.USER_ATTR_PUSH_SETTINGS) {
-					if (e.getErrorCode() == MegaError.API_OK || e.getErrorCode() == MegaError.API_ENOENT) {
-						pushNotificationSettingManagement.sendPushNotificationSettings(request.getMegaPushNotificationSettings());
-					}
-				}else if (e.getErrorCode() == MegaError.API_OK) {
-					if (request.getParamType() == MegaApiJava.USER_ATTR_FIRSTNAME || request.getParamType() == MegaApiJava.USER_ATTR_LASTNAME) {
-						if (megaApi != null && request.getEmail() != null) {
-							MegaUser user = megaApi.getContact(request.getEmail());
-							if (user != null) {
-								logDebug("User handle: " + user.getHandle());
-								logDebug("Visibility: " + user.getVisibility()); //If user visibity == MegaUser.VISIBILITY_UNKNOW then, non contact
-								if (user.getVisibility() != MegaUser.VISIBILITY_VISIBLE) {
-									logDebug("Non-contact");
-									if (request.getParamType() == MegaApiJava.USER_ATTR_FIRSTNAME) {
-										dbH.setNonContactEmail(request.getEmail(), user.getHandle() + "");
-										dbH.setNonContactFirstName(request.getText(), user.getHandle() + "");
-									} else if (request.getParamType() == MegaApiJava.USER_ATTR_LASTNAME) {
-										dbH.setNonContactLastName(request.getText(), user.getHandle() + "");
-									}
-								} else {
-									logDebug("The user is or was CONTACT:");
-								}
-							} else {
-								logWarning("User is NULL");
-							}
-						}
-					}
-				}
-			}else if(request.getType() == MegaRequest.TYPE_SET_ATTR_USER){
-				if(request.getParamType() == MegaApiJava.USER_ATTR_PUSH_SETTINGS){
-					if (e.getErrorCode() == MegaError.API_OK) {
-						pushNotificationSettingManagement.sendPushNotificationSettings(request.getMegaPushNotificationSettings());
-					} else {
-						logError("Chat notification settings cannot be updated");
-					}
-				}
-			}
-			else if (request.getType() == MegaRequest.TYPE_GET_PRICING){
-				if (e.getErrorCode() == MegaError.API_OK) {
-					MegaPricing p = request.getPricing();
+                    //Login check resumed pending transfers
+                    transfersManagement.checkResumedPendingTransfers();
+                }
+            } else if (request.getType() == MegaRequest.TYPE_GET_ATTR_USER) {
+                if (request.getParamType() == MegaApiJava.USER_ATTR_PUSH_SETTINGS) {
+                    if (e.getErrorCode() == MegaError.API_OK || e.getErrorCode() == MegaError.API_ENOENT) {
+                        pushNotificationSettingManagement.sendPushNotificationSettings(request.getMegaPushNotificationSettings());
+                    }
+                } else if (e.getErrorCode() == MegaError.API_OK) {
+                    if (request.getParamType() == MegaApiJava.USER_ATTR_FIRSTNAME || request.getParamType() == MegaApiJava.USER_ATTR_LASTNAME) {
+                        if (megaApi != null && request.getEmail() != null) {
+                            MegaUser user = megaApi.getContact(request.getEmail());
+                            if (user != null) {
+                                logDebug("User handle: " + user.getHandle());
+                                logDebug("Visibility: " + user.getVisibility()); //If user visibity == MegaUser.VISIBILITY_UNKNOW then, non contact
+                                if (user.getVisibility() != MegaUser.VISIBILITY_VISIBLE) {
+                                    logDebug("Non-contact");
+                                    if (request.getParamType() == MegaApiJava.USER_ATTR_FIRSTNAME) {
+                                        dbH.setNonContactEmail(request.getEmail(), user.getHandle() + "");
+                                        dbH.setNonContactFirstName(request.getText(), user.getHandle() + "");
+                                    } else if (request.getParamType() == MegaApiJava.USER_ATTR_LASTNAME) {
+                                        dbH.setNonContactLastName(request.getText(), user.getHandle() + "");
+                                    }
+                                } else {
+                                    logDebug("The user is or was CONTACT:");
+                                }
+                            } else {
+                                logWarning("User is NULL");
+                            }
+                        }
+                    }
+                }
+            } else if (request.getType() == MegaRequest.TYPE_SET_ATTR_USER) {
+                if (request.getParamType() == MegaApiJava.USER_ATTR_PUSH_SETTINGS) {
+                    if (e.getErrorCode() == MegaError.API_OK) {
+                        pushNotificationSettingManagement.sendPushNotificationSettings(request.getMegaPushNotificationSettings());
+                    } else {
+                        logError("Chat notification settings cannot be updated");
+                    }
+                }
+            } else if (request.getType() == MegaRequest.TYPE_GET_PRICING) {
+                if (e.getErrorCode() == MegaError.API_OK) {
+                    MegaPricing p = request.getPricing();
 
                     dbH.setPricingTimestamp();
 
@@ -808,12 +806,12 @@ public class MegaApplication extends MultiDexApplication implements Application.
             initLoggers();
         }
 
-		checkAppUpgrade();
-		checkMegaStandbyBucket();
-		getTombstoneInfo();
-		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-			checkForUnsafeIntentLaunch();
-		}
+        checkAppUpgrade();
+        checkMegaStandbyBucket();
+        getTombstoneInfo();
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            checkForUnsafeIntentLaunch();
+        }
 
         setupMegaApi();
         setupMegaApiFolder();
@@ -827,8 +825,8 @@ public class MegaApplication extends MultiDexApplication implements Application.
 
         chatManagement = new ChatManagement();
 
-		//Logout check resumed pending transfers
-		transfersManagement.checkResumedPendingTransfers();
+        //Logout check resumed pending transfers
+        transfersManagement.checkResumedPendingTransfers();
 
         int apiServerValue = getSharedPreferences(API_SERVER_PREFERENCES, MODE_PRIVATE)
                 .getInt(API_SERVER, PRODUCTION_SERVER_VALUE);
@@ -856,9 +854,9 @@ public class MegaApplication extends MultiDexApplication implements Application.
             dbH.resetExtendedAccountDetailsTimestamp();
         }
 
-		networkStateReceiver = new NetworkStateReceiver();
-		networkStateReceiver.addListener(this);
-		registerReceiver(networkStateReceiver, new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION));
+        networkStateReceiver = new NetworkStateReceiver();
+        networkStateReceiver.addListener(this);
+        registerReceiver(networkStateReceiver, new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION));
 
         LiveEventBus.get(EVENT_CALL_STATUS_CHANGE, MegaChatCall.class).observeForever(callStatusObserver);
         LiveEventBus.get(EVENT_RINGING_STATUS_CHANGE, MegaChatCall.class).observeForever(callRingingStatusObserver);
@@ -909,9 +907,9 @@ public class MegaApplication extends MultiDexApplication implements Application.
 
         ContextUtils.initialize(getApplicationContext());
 
-		Fresco.initialize(this, ImagePipelineConfig.newBuilder(this)
-				.setDownsampleEnabled(true)
-				.build());
+        Fresco.initialize(this, ImagePipelineConfig.newBuilder(this)
+                .setDownsampleEnabled(true)
+                .build());
 
         if (PurgeLogsToggle.INSTANCE.getEnabled() == false) {// Try to initialize the loggers again in order to avoid have them uninitialized
             // in case they failed to initialize before for some reason.
@@ -954,9 +952,9 @@ public class MegaApplication extends MultiDexApplication implements Application.
         megaApi.creditCardQuerySubscriptions(null);
     }
 
-	public void askForPricing(){
-		megaApi.getPricing(null);
-	}
+    public void askForPricing() {
+        megaApi.getPricing(null);
+    }
 
     public void askForPaymentMethods() {
         logDebug("askForPaymentMethods");
@@ -1144,9 +1142,9 @@ public class MegaApplication extends MultiDexApplication implements Application.
         return getCurrentActivity() != null;
     }
 
-	public static boolean isShowInfoChatMessages() {
-		return showInfoChatMessages;
-	}
+    public static boolean isShowInfoChatMessages() {
+        return showInfoChatMessages;
+    }
 
     public static void setShowInfoChatMessages(boolean showInfoChatMessages) {
         MegaApplication.showInfoChatMessages = showInfoChatMessages;
@@ -1251,11 +1249,11 @@ public class MegaApplication extends MultiDexApplication implements Application.
             String notificationChannelId = NOTIFICATION_CHANNEL_CLOUDDRIVE_ID;
             String notificationChannelName = NOTIFICATION_CHANNEL_CLOUDDRIVE_NAME;
 
-			Intent intent = new Intent(this, ManagerActivity.class);
-			intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-			intent.setAction(ACTION_INCOMING_SHARED_FOLDER_NOTIFICATION);
-			PendingIntent pendingIntent = PendingIntent.getActivity(this, 0 /* Request code */, intent,
-					PendingIntent.FLAG_ONE_SHOT | PendingIntent.FLAG_IMMUTABLE);
+            Intent intent = new Intent(this, ManagerActivity.class);
+            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+            intent.setAction(ACTION_INCOMING_SHARED_FOLDER_NOTIFICATION);
+            PendingIntent pendingIntent = PendingIntent.getActivity(this, 0 /* Request code */, intent,
+                    PendingIntent.FLAG_ONE_SHOT | PendingIntent.FLAG_IMMUTABLE);
 
             Uri defaultSoundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
             String notificationTitle;
@@ -1285,33 +1283,32 @@ public class MegaApplication extends MultiDexApplication implements Application.
                 Drawable d = getResources().getDrawable(R.drawable.ic_folder_incoming, getTheme());
                 notificationBuilderO.setLargeIcon(((BitmapDrawable) d).getBitmap());
 
-				notificationManager.notify(notificationId, notificationBuilderO.build());
-			}
-			else {
-				NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(this)
-						.setSmallIcon(R.drawable.ic_stat_notify)
-						.setColor(ContextCompat.getColor(this, R.color.red_600_red_300))
-						.setContentTitle(notificationTitle)
-						.setContentText(notificationContent)
-						.setStyle(new NotificationCompat.BigTextStyle()
-								.bigText(notificationContent))
-						.setAutoCancel(true)
-						.setSound(defaultSoundUri)
-						.setContentIntent(pendingIntent);
+                notificationManager.notify(notificationId, notificationBuilderO.build());
+            } else {
+                NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(this)
+                        .setSmallIcon(R.drawable.ic_stat_notify)
+                        .setColor(ContextCompat.getColor(this, R.color.red_600_red_300))
+                        .setContentTitle(notificationTitle)
+                        .setContentText(notificationContent)
+                        .setStyle(new NotificationCompat.BigTextStyle()
+                                .bigText(notificationContent))
+                        .setAutoCancel(true)
+                        .setSound(defaultSoundUri)
+                        .setContentIntent(pendingIntent);
 
-				Drawable d;
+                Drawable d;
 
-				d = getResources().getDrawable(R.drawable.ic_folder_incoming, getTheme());
+                d = getResources().getDrawable(R.drawable.ic_folder_incoming, getTheme());
 
                 notificationBuilder.setLargeIcon(((BitmapDrawable) d).getBitmap());
 
-				if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-					// Use NotificationManager for devices running Android Nougat or above (API >= 24)
-					notificationBuilder.setPriority(NotificationManager.IMPORTANCE_HIGH);
-				} else {
-					// Otherwise, use NotificationCompat for devices running Android Marshmallow (API 23)
-					notificationBuilder.setPriority(NotificationCompat.PRIORITY_HIGH);
-				}
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                    // Use NotificationManager for devices running Android Nougat or above (API >= 24)
+                    notificationBuilder.setPriority(NotificationManager.IMPORTANCE_HIGH);
+                } else {
+                    // Otherwise, use NotificationCompat for devices running Android Marshmallow (API 23)
+                    notificationBuilder.setPriority(NotificationCompat.PRIORITY_HIGH);
+                }
 
                 NotificationManager notificationManager =
                         (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
@@ -1383,7 +1380,7 @@ public class MegaApplication extends MultiDexApplication implements Application.
                         return;
                     }
 
-					Intent loginIntent = new Intent(this, LoginActivity.class);
+                    Intent loginIntent = new Intent(this, LoginActivity.class);
 
                     if (getUrlConfirmationLink() != null) {
                         loginIntent.putExtra(VISIBLE_FRAGMENT, LOGIN_FRAGMENT);
@@ -1410,36 +1407,34 @@ public class MegaApplication extends MultiDexApplication implements Application.
                 AccountController aC = new AccountController(this);
                 aC.logoutConfirmed(this);
 
-				if(isActivityVisible()){
-					logDebug("Launch intent to login screen");
-					Intent tourIntent = new Intent(this, LoginActivity.class);
-					tourIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-					this.startActivity(tourIntent);
-				}
-			}
-		}
-		else if (request.getType() == MegaChatRequest.TYPE_PUSH_RECEIVED) {
-			logDebug("TYPE_PUSH_RECEIVED: " + e.getErrorCode() + "__" + e.getErrorString());
-			stopService(new Intent(this, KeepAliveService.class));
-			if(e.getErrorCode()==MegaChatError.ERROR_OK){
-				logDebug("OK:TYPE_PUSH_RECEIVED");
-				chatNotificationReceived = true;
-				if (!getMegaApi().isEphemeralPlusPlus()) {
-					ChatAdvancedNotificationBuilder	notificationBuilder = ChatAdvancedNotificationBuilder.newInstance(this, megaApi, megaChatApi);
-					notificationBuilder.generateChatNotification(request);
-				}
-			}
-			else{
-				logError("Error TYPE_PUSH_RECEIVED: " + e.getErrorString());
-			}
-		} else if (request.getType() == MegaChatRequest.TYPE_AUTOJOIN_PUBLIC_CHAT) {
-			chatManagement.removeJoiningChatId(request.getChatHandle());
-			chatManagement.removeJoiningChatId(request.getUserHandle());
-		} else if (request.getType() == MegaChatRequest.TYPE_REMOVE_FROM_CHATROOM
-				&& request.getUserHandle() == INVALID_HANDLE) {
-			chatManagement.removeLeavingChatId(request.getChatHandle());
-		}
-	}
+                if (isActivityVisible()) {
+                    logDebug("Launch intent to login screen");
+                    Intent tourIntent = new Intent(this, LoginActivity.class);
+                    tourIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                    this.startActivity(tourIntent);
+                }
+            }
+        } else if (request.getType() == MegaChatRequest.TYPE_PUSH_RECEIVED) {
+            logDebug("TYPE_PUSH_RECEIVED: " + e.getErrorCode() + "__" + e.getErrorString());
+            stopService(new Intent(this, KeepAliveService.class));
+            if (e.getErrorCode() == MegaChatError.ERROR_OK) {
+                logDebug("OK:TYPE_PUSH_RECEIVED");
+                chatNotificationReceived = true;
+                if (!getMegaApi().isEphemeralPlusPlus()) {
+                    ChatAdvancedNotificationBuilder notificationBuilder = ChatAdvancedNotificationBuilder.newInstance(this, megaApi, megaChatApi);
+                    notificationBuilder.generateChatNotification(request);
+                }
+            } else {
+                logError("Error TYPE_PUSH_RECEIVED: " + e.getErrorString());
+            }
+        } else if (request.getType() == MegaChatRequest.TYPE_AUTOJOIN_PUBLIC_CHAT) {
+            chatManagement.removeJoiningChatId(request.getChatHandle());
+            chatManagement.removeJoiningChatId(request.getUserHandle());
+        } else if (request.getType() == MegaChatRequest.TYPE_REMOVE_FROM_CHATROOM
+                && request.getUserHandle() == INVALID_HANDLE) {
+            chatManagement.removeLeavingChatId(request.getChatHandle());
+        }
+    }
 
     @Override
     public void onRequestTemporaryError(MegaChatApiJava api, MegaChatRequest request, MegaChatError e) {
@@ -1733,76 +1728,76 @@ public class MegaApplication extends MultiDexApplication implements Application.
         }
     }
 
-	/**
-	 * Get the current standby bucket of the app.
-	 * The system determines the standby state of the app based on app usage patterns.
-	 *
-	 * @return the current standby bucket of the app：
-	 * STANDBY_BUCKET_ACTIVE,
-	 * STANDBY_BUCKET_WORKING_SET,
-	 * STANDBY_BUCKET_FREQUENT,
-	 * STANDBY_BUCKET_RARE,
-	 * STANDBY_BUCKET_RESTRICTED,
-	 * STANDBY_BUCKET_NEVER
-	 */
-	public int checkMegaStandbyBucket(){
-		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
-			UsageStatsManager usageStatsManager = (UsageStatsManager) getSystemService(USAGE_STATS_SERVICE);
-			if (usageStatsManager != null) {
-				int standbyBucket = usageStatsManager.getAppStandbyBucket();
-				logDebug("getAppStandbyBucket(): " +standbyBucket);
-				return standbyBucket;
-			}
-		}
-		return  -1;
-	}
+    /**
+     * Get the current standby bucket of the app.
+     * The system determines the standby state of the app based on app usage patterns.
+     *
+     * @return the current standby bucket of the app：
+     * STANDBY_BUCKET_ACTIVE,
+     * STANDBY_BUCKET_WORKING_SET,
+     * STANDBY_BUCKET_FREQUENT,
+     * STANDBY_BUCKET_RARE,
+     * STANDBY_BUCKET_RESTRICTED,
+     * STANDBY_BUCKET_NEVER
+     */
+    public int checkMegaStandbyBucket() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+            UsageStatsManager usageStatsManager = (UsageStatsManager) getSystemService(USAGE_STATS_SERVICE);
+            if (usageStatsManager != null) {
+                int standbyBucket = usageStatsManager.getAppStandbyBucket();
+                logDebug("getAppStandbyBucket(): " + standbyBucket);
+                return standbyBucket;
+            }
+        }
+        return -1;
+    }
 
-	/**
-	 * Get the tombstone information.
-	 */
-	public void getTombstoneInfo(){
-		new Thread(() -> {
-			logDebug("getTombstoneInfo");
-			ActivityManager activityManager = (ActivityManager)getSystemService(Context.ACTIVITY_SERVICE);
-			List<ApplicationExitInfo> exitReasons;
-			if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.R) {
-				exitReasons = activityManager.getHistoricalProcessExitReasons(/* packageName = */ null, /* pid = */ 0, /* maxNum = */ 3);
-				for (ApplicationExitInfo aei : exitReasons) {
-					if (aei.getReason() == REASON_CRASH_NATIVE) {
-						// Get the tombstone input stream.
-						try {
-							InputStream tombstoneInputStream = aei.getTraceInputStream();
-							if(tombstoneInputStream != null) {
-								// The tombstone parser built with protoc uses the tombstone schema, then parses the trace.
-								TombstoneProtos.Tombstone tombstone = TombstoneProtos.Tombstone.parseFrom(tombstoneInputStream);
-								logError("Tombstone Info" + tombstone.toString());
-								tombstoneInputStream.close();
-							}
-						} catch (IOException e) {
-							e.printStackTrace();
-						}
-					}
-				}
-			}
-		}).start();
-	}
+    /**
+     * Get the tombstone information.
+     */
+    public void getTombstoneInfo() {
+        new Thread(() -> {
+            logDebug("getTombstoneInfo");
+            ActivityManager activityManager = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
+            List<ApplicationExitInfo> exitReasons;
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.R) {
+                exitReasons = activityManager.getHistoricalProcessExitReasons(/* packageName = */ null, /* pid = */ 0, /* maxNum = */ 3);
+                for (ApplicationExitInfo aei : exitReasons) {
+                    if (aei.getReason() == REASON_CRASH_NATIVE) {
+                        // Get the tombstone input stream.
+                        try {
+                            InputStream tombstoneInputStream = aei.getTraceInputStream();
+                            if (tombstoneInputStream != null) {
+                                // The tombstone parser built with protoc uses the tombstone schema, then parses the trace.
+                                TombstoneProtos.Tombstone tombstone = TombstoneProtos.Tombstone.parseFrom(tombstoneInputStream);
+                                logError("Tombstone Info" + tombstone.toString());
+                                tombstoneInputStream.close();
+                            }
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }
+            }
+        }).start();
+    }
 
-	@RequiresApi(api = Build.VERSION_CODES.S)
-	private void checkForUnsafeIntentLaunch() {
-		boolean isDebug = ((this.getApplicationInfo().flags &
-				ApplicationInfo.FLAG_DEBUGGABLE) != 0);
-		if (isDebug) {
-			StrictMode.setVmPolicy(new StrictMode.VmPolicy.Builder()
-					// Other StrictMode checks that you've previously added.
-					.detectUnsafeIntentLaunch()
-					.penaltyLog()
-					.build());
-		}
-	}
+    @RequiresApi(api = Build.VERSION_CODES.S)
+    private void checkForUnsafeIntentLaunch() {
+        boolean isDebug = ((this.getApplicationInfo().flags &
+                ApplicationInfo.FLAG_DEBUGGABLE) != 0);
+        if (isDebug) {
+            StrictMode.setVmPolicy(new StrictMode.VmPolicy.Builder()
+                    // Other StrictMode checks that you've previously added.
+                    .detectUnsafeIntentLaunch()
+                    .penaltyLog()
+                    .build());
+        }
+    }
 
-	public AppRTCAudioManager getAudioManager() {
-		return rtcAudioManager;
-	}
+    public AppRTCAudioManager getAudioManager() {
+        return rtcAudioManager;
+    }
 
     public void createOrUpdateAudioManager(boolean isSpeakerOn, int type) {
         logDebug("Create or update audio manager, type is " + type);
@@ -1954,15 +1949,15 @@ public class MegaApplication extends MultiDexApplication implements Application.
         openMeetingRinging(this, call.getChatid(), passcodeManagement);
     }
 
-	/**
-	 * Resets all SingleObjects to their default values.
-	 */
-	private void resetDefaults() {
-		sortOrderManagement.resetDefaults();
-		passcodeManagement.resetDefaults();
-		myAccountInfo.resetDefaults();
-		transfersManagement.resetDefaults();
-	}
+    /**
+     * Resets all SingleObjects to their default values.
+     */
+    private void resetDefaults() {
+        sortOrderManagement.resetDefaults();
+        passcodeManagement.resetDefaults();
+        myAccountInfo.resetDefaults();
+        transfersManagement.resetDefaults();
+    }
 
     public static boolean isShowRichLinkWarning() {
         return showRichLinkWarning;
@@ -2072,9 +2067,9 @@ public class MegaApplication extends MultiDexApplication implements Application.
         return pushNotificationSettingManagement;
     }
 
-	public static ChatManagement getChatManagement() {
-		return chatManagement;
-	}
+    public static ChatManagement getChatManagement() {
+        return chatManagement;
+    }
 
     public static void setVerifyingCredentials(boolean verifyingCredentials) {
         MegaApplication.verifyingCredentials = verifyingCredentials;
