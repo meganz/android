@@ -910,7 +910,7 @@
     <!-- Title of the label where the SDK version is shown -->
     <string name="settings_about_sdk_version">MEGA SDK Version</string>
     <!-- Title of the label where the MEGAchat SDK version is shown -->
-    <string name="settings_about_karere_version">MEGAchat SDK-Version</string>
+    <string name="settings_about_karere_version">MEGAchat-SDK-Version</string>
     <!-- Link to the public code of the app -->
     <string name="settings_about_code_link_title">Quellcode ansehen</string>
     <!--  -->
@@ -1695,7 +1695,7 @@
     <!-- text_copyright_alert_title -->
     <string name="copyright_alert_title">Hinweis zur Wahrung von Urheberrechten</string>
     <!-- text_copyright_alert_first_paragraph -->
-    <string name="copyright_alert_first_paragraph">MEGA respektiert die Urheberrechte Dritter und erwartet von Nutzern der MEGA Cloud die Einhaltung aller relevanten Copyright-Gesetze.</string>
+    <string name="copyright_alert_first_paragraph">MEGA respektiert die Urheberrechte Dritter und erwartet von Nutzern der MEGA Cloud die Einhaltung aller relevanten Urheberrechtsgesetze.</string>
     <!-- text_copyright_alert_second_paragraph -->
     <string name="copyright_alert_second_paragraph">Es ist Ihnen strikt untersagt, den Dienst MEGA Cloud zur Verletzung von Urheberrechten zu missbrauchen. Sie dürfen Dateien, Daten oder Inhalte, die die Urheber- oder andere Eigentumsrechte Dritte verletzen, nicht uploaden, speichern, teilen, anzeigen, streamen, verteilen, emailen, verlinken, übertragen oder in irgendeiner anderen Form zugänglich machen.</string>
     <!-- text of the Agree button -->
@@ -1870,7 +1870,7 @@
     <!-- title of the section for install megasync in achivements section (maximum 24 chars) -->
     <string name="title_regitration">Anmeldebonus</string>
     <!-- title of the section for install a mobile app bonuses in achivements section (maximum 24 chars) -->
-    <string name="title_install_desktop">MEGA Desktop-App herunterladen</string>
+    <string name="title_install_desktop">MEGA-Desktop-App herunterladen</string>
     <!-- Text that indicates that no pictures have been uploaded to the Camera Uploads section -->
     <string name="camera_uploads_empty">Noch keine Medienuploads</string>
     <!-- indicates the number of days left related to a achievement -->
@@ -1884,9 +1884,9 @@
     <!-- title of screen to invite friends and get an achievement -->
     <string name="title_achievement_invite_friends">Funktionsprinzip</string>
     <!-- first paragraph of screen to invite friends and get an achievement -->
-    <string name="first_paragraph_achievement_invite_friends">Laden Sie Ihre Freunde ein, einen MEGA Free-Account zu erstellen und eine MEGA Mobil-App zu installieren. Für jede erfolgreiche Anmeldung mit App-Installation erhalten Sie als Bonus kostenlosen Speicherplatz.</string>
+    <string name="first_paragraph_achievement_invite_friends">Laden Sie Ihre Freunde ein, einen MEGA-Free-Account zu erstellen und eine MEGA-Mobil-App zu installieren. Für jede erfolgreiche Anmeldung mit App-Installation erhalten Sie als Bonus kostenlosen Speicherplatz.</string>
     <!-- second paragraph of screen to invite friends and get an achievement -->
-    <string name="second_paragraph_achievement_invite_friends">Der kostenlose Bonusspeicherplatz wird nur bei neuen Einladungen und bei Installation einer MEGA Mobil-App oder der MEGA Desktop-App gewährt.</string>
+    <string name="second_paragraph_achievement_invite_friends">Der kostenlose Bonusspeicherplatz wird nur bei neuen Einladungen und bei Installation einer MEGA-Mobil-App oder der MEGA-Desktop-App gewährt.</string>
     <!-- explanation of screen to invite friends and get an achievement -->
     <string name="card_title_invite_friends">Nutzer aus Ihren Konakten auswählen oder E-Mail-Adresse(n) eingeben.</string>
     <!-- title of the dialog to confirm the contact request -->
@@ -1898,15 +1898,15 @@
     <!-- Error shown when the user writes a email with an incorrect format -->
     <string name="invalid_email_to_invite">Fehlerhafte E-Mail-Adresse</string>
     <!-- info paragraph about the achievement install megasync -->
-    <string name="paragraph_info_achievement_install_desktop">Nach Installation der MEGA Desktop App erhalten Sie %1$s kostenlosen Extraspeicherplatz, gültig für 365 Tage. Die MEGA Desktop App ist für Windows, macOS und die meisten Linux-Distributionen erhältlich.</string>
+    <string name="paragraph_info_achievement_install_desktop">Nach Installation der MEGA-Desktop-App erhalten Sie %1$s kostenlosen Extraspeicherplatz, gültig für 365 Tage. Die MEGA-Desktop-App ist für Windows, macOS und die meisten Linux-Distributionen erhältlich.</string>
     <!-- info paragraph about the achievement install mobile app -->
-    <string name="paragraph_info_achievement_install_mobile_app">Bei Installation der MEGA Mobil-App erhalten Sie %1$s kostenlosen Extraspeicherplatz, gültig für 365 Tage. Wir bieten Mobil-Apps für iOS und Android an.</string>
+    <string name="paragraph_info_achievement_install_mobile_app">Bei Installation der MEGA-Mobil-App erhalten Sie %1$s kostenlosen Extraspeicherplatz, gültig für 365 Tage. Wir bieten Mobil-Apps für iOS und Android an.</string>
     <!-- info paragraph about the achievement ‘add phone number’. Placeholder 1: bonus storage space e.g. 20GB. Placeholder 2: bonus transfer quota e.g. 50GB -->
     <string name="paragraph_info_achievement_add_phone">Durch Verifikation Ihrer Telefonnummer erhalten Sie %1$s kostenlosen Extraspeicherplatz, gültig für 365 Tage.</string>
     <!-- info paragraph about the completed achievement install megasync -->
     <string name="result_paragraph_info_achievement_install_desktop">Sie haben %1$s Speicherplatz für die Installation der MEGA Desktop App erhalten.</string>
     <!-- info paragraph about the completed achievement install mobile app -->
-    <string name="result_paragraph_info_achievement_install_mobile_app">Sie haben %1$s Extraspeicherplatz für die Installation der MEGA Mobil-App erhalten.</string>
+    <string name="result_paragraph_info_achievement_install_mobile_app">Sie haben %1$s Extraspeicherplatz für die Installation der MEGA-Mobil-App erhalten.</string>
     <!-- info paragraph about the completed achievement of ‘add phone number’. Placeholder 1: bonus storage space e.g. 20GB. Placeholder 2: bonus transfer quota e.g. 50GB -->
     <string name="result_paragraph_info_achievement_add_phone">Sie haben %1$s Speicherplatz für die Verifikation Ihrer Telefonnummer erhalten.</string>
     <!-- info paragraph about the completed achievement registration -->
@@ -2009,7 +2009,7 @@
     <!-- Message show when a call cannot be established -->
     <string name="call_error">Ein Fehler ist aufgetreten. Der Anruf kann nicht verbunden werden.</string>
     <!-- Title of dialog to evaluate the app -->
-    <string name="title_evaluate_the_app_panel">Gefällt Ihnen die MEGA Mobil-App?</string>
+    <string name="title_evaluate_the_app_panel">Gefällt Ihnen die MEGA-Mobil-App?</string>
     <!-- Label to show rate the app -->
     <string name="rate_the_app_panel">Ja, App bewerten</string>
     <!-- Label to show send feedback -->
@@ -3684,7 +3684,7 @@
     <!-- Title of a warning recommending upgrade to Pro -->
     <string name="upgrade_pro">Auf Pro umsteigen</string>
     <!-- Explanation of a warning recommending upgrade to Pro in relation to link available options -->
-    <string name="link_upgrade_pro_explanation">MEGA Pro schaltet erweiterte Link-Features frei.</string>
+    <string name="link_upgrade_pro_explanation">MEGA-Pro schaltet erweiterte Link-Features frei.</string>
     <!-- Meaning of links decryption key -->
     <string name="decryption_key_explanation">Unsere Ende-zu-Ende-Verschlüsselung ordnet jeder Datei einen automatisch generierten Schlüssel zu. Normalerweise enthält der Link diesen Schlüssel, aber Sie können ihn auch separat exportieren und versenden.</string>
     <!-- Reset password label -->
@@ -4171,7 +4171,7 @@
     <!-- If users want to move the root backup folder, all backups underneath it are disabled. Warning dialog will show to confirm -->
     <string name="backup_move_root_folder">Sie sind dabei, den Speicherort eines Standard-Backup-Ordners zu ändern. Dies kann es Ihnen erschweren, Ihren Backup-Ordner später zu finden. Bitte merken Sie sich den Speicherort, damit Sie den Ordner in Zukunft wiederfinden.</string>
     <!-- If users want to move the sub backup folder, all backups underneath it are disabled. Warning dialog will show to confirm -->
-    <string name="backup_move_sub_folder">Durch Verschieben dieses Ordners wird das Ziel einer oder mehrerer konfigurierter Backups geändert. Dies kann unbeabsichtigte Folgen haben. Die Backups werden zur Sicherheit deaktiviert. Sie können die Backups in der MEGA Desktop-App erneut aktivieren. Fortfahren?</string>
+    <string name="backup_move_sub_folder">Durch Verschieben dieses Ordners wird das Ziel einer oder mehrerer konfigurierter Backups geändert. Dies kann unbeabsichtigte Folgen haben. Die Backups werden zur Sicherheit deaktiviert. Sie können die Backups in der MEGA-Desktop-App erneut aktivieren. Fortfahren?</string>
     <!-- If users want to delete the root backup folder, all backups underneath it are disabled. Warning dialog will show to confirm -->
     <string name="backup_remove_root_folder">Sie sind dabei, Ihren Backup-Ordner zu löschen. Dadurch werden alle eingerichteten Backups entfernt. Sind Sie sicher, dass Sie fortfahren möchten?</string>
     <!-- If users want to delete the sub backup folder, all backups underneath it are disabled. Warning dialog will show to confirm -->
@@ -4197,7 +4197,7 @@
     <!-- The title of warning dialog for adding item to "My backup" -->
     <string name="backup_add_item_title">Backup einrichten</string>
     <!-- If users want to add items to the "My backup" folder, Warning dialog will show to confirm -->
-    <string name="backup_add_item_to_root_text">Damit die Elemente, die Sie Ihrem Backup-Ordner hinzugefügt haben, automatisch mit der MEGA Cloud synchronisiert werden, richten Sie sie bitte in der MEGA Desktop-App ein.</string>
+    <string name="backup_add_item_to_root_text">Damit die Elemente, die Sie Ihrem Backup-Ordner hinzugefügt haben, automatisch mit der MEGA Cloud synchronisiert werden, richten Sie sie bitte in der MEGA-Desktop-App ein.</string>
     <!-- If users want to share items in the "My backup" folder, Warning dialog will show to confirm -->
     <string name="backup_share_permission_title">Nur lesen</string>
     <!-- If users want to share items in the "My backup" folder, Warning dialog will show to confirm -->

@@ -4182,27 +4182,27 @@
     <!-- Warning indicating the billing is not available and giving some indications to continue with the upgrade. -->
     <string name="upgrade_billing_warning">결제를 처리할 수 없습니다. 만약 이중 앱을 사용하고 있다면, 사용하지 않은 상태에서 MEGA에 로그인 하세요. 만약 아니라면 웹 브라우저를 통해 업그레이드 하세요.</string>
     <!-- Title for subscription dialog that shows before delete account -->
-    <string name="title_platform_subscription">%1s subscription</string>
+    <string name="title_platform_subscription">%1s 구독</string>
     <!-- Title for dialog that subscription is from other platform and shows before delete account -->
-    <string name="title_active_subscription">Active subscription</string>
+    <string name="title_active_subscription">활성 구독</string>
     <!-- Message for dialog that subscription is from android platform and shows before delete account -->
-    <string name="message_android_platform_subscription">You have an active MEGA subscription with %1$s. You must cancel it separately at %2$s, as MEGA is not able to cancel it for you. Visit our Help Centre for more information.</string>
+    <string name="message_android_platform_subscription">당신은 %1$s에 활성 상태의 MEGA 구독이 있습니다. MEGA가 당신을 위해 처리할 수 없기 때문에, %2$s에서 별도로 취소하여야 합니다. 더 많은 정보는 우리의 도움 센터를 방문하세요.</string>
     <!-- Message for dialog that subscription is from other platform and shows before delete account  -->
-    <string name="message_other_platform_subscription">You have an active MEGA subscription. It will be canceled automatically after the account is deleted. Visit our Help Centre for more information.</string>
+    <string name="message_other_platform_subscription">활성화된 MEGA 구독이 있습니다. 계정이 삭제된 후 자동으로 취소됩니다. 자세한 정보는 도움 센터를 방문하세요.</string>
     <!-- Message for dialog that subscription is from iTunes platform and shows before delete account  -->
-    <string name="message_itunes_platform_subscription">You have an active MEGA subscription with Apple. You must cancel it separately from your iTunes account, as MEGA is not able to cancel it for you. Visit our Help Centre for more information.</string>
+    <string name="message_itunes_platform_subscription">당신은 Apple에 활성 상태의 MEGA 구독이 있습니다. MEGA가 당신을 위해 처리할 수 없기 때문에, iTunes 계정에서 별도로 취소하여야 합니다. 더 많은 정보는 우리의 도움 센터를 방문하세요.</string>
     <!-- Text for button of subscription dialog that shows before delete account -->
-    <string name="button_visit_platform">Visit %1s</string>
+    <string name="button_visit_platform">%1s 방문</string>
     <!-- Text shown in the last alert dialog to confirm delete user account with a ECP/Stripe subscription-->
     <string name="delete_account_text_other_platform_last_step">계정을 삭제하는 마지막 단계입니다. 당신의 계정과 구독 모두 삭제되며 클라우드에 저장된 모든 데이터를 영구적으로 잃게 됩니다. 아래에 암호를 입력하세요.</string>
     <!-- Title of timeline tab in photos section -->
-    <string name="tab_title_timeline">Timeline</string>
+    <string name="tab_title_timeline">연표</string>
     <!-- Title of album tab in photos section. -->
     <string name="tab_title_album">앨범</string>
     <!-- Title of favourite album. -->
     <string name="title_favourites_album">즐겨찾기</string>
     <!-- Text that indicates that there’s no media files to show in favourite album -->
-    <string name="empty_hint_favourite_album">[B]No[/B] [A]Favourites[/A]</string>
+    <string name="empty_hint_favourite_album">[A]즐겨찾기[/A] [B]없음[/B]</string>
     <!-- Action button which will remove favourites in selection mode -->
-    <string name="action_remove_favourites">Remove favourites</string>
+    <string name="action_remove_favourites">즐겨찾기 제거</string>
 </resources>

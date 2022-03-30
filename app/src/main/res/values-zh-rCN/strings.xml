@@ -3740,7 +3740,7 @@
     <!-- Text of a button on Camera Uploads section to show all the content of the section-->
     <string name="all_view_button">全部</string>
     <!-- Text of a button on Camera Uploads section to show the content of the section organized by days-->
-    <string name="days_view_button">天</string>
+    <string name="days_view_button">日</string>
     <!-- Text of a button on Camera Uploads section to show the content of the section organized by months-->
     <string name="months_view_button">月</string>
     <!-- Text of a button on Camera Uploads section to show the content of the section organized by years-->

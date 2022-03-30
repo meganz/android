@@ -4644,7 +4644,7 @@
     <!-- Text for button of subscription dialog that shows before delete account -->
     <string name="button_visit_platform">Visit %1s</string>
     <!-- Text shown in the last alert dialog to confirm delete user account with a ECP/Stripe subscription-->
-    <string name="delete_account_text_other_platform_last_step">This is the last step to delete your account. Both your account and subscription will be deleted and you will permanently lose all the data stored in the cloud. Please enter your password below.</string>
+    <string name="delete_account_text_other_platform_last_step">هذه هي الخطوة الأخيرة لحذف حسابك. سيتم حذف كل من حسابك واشتراكك وستفقد جميع البيانات المخزنة في السحابة بشكل دائم. الرجاء إدخال كلمة المرور الخاصة بك أدناه.</string>
     <!-- Title of timeline tab in photos section -->
     <string name="tab_title_timeline">الجدول الزمني</string>
     <!-- Title of album tab in photos section. -->

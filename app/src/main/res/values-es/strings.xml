@@ -4272,11 +4272,11 @@
     <!-- Warning indicating the billing is not available and giving some indications to continue with the upgrade. -->
     <string name="upgrade_billing_warning">No es posible proceder con el cobro. Si estás usando una aplicación dual, considera iniciar sesión en MEGA sin ella. Si no, realiza la compra desde el navegador.</string>
     <!-- Title for subscription dialog that shows before delete account -->
-    <string name="title_platform_subscription">%1s subscription</string>
+    <string name="title_platform_subscription">Suscripción con %1s</string>
     <!-- Title for dialog that subscription is from other platform and shows before delete account -->
     <string name="title_active_subscription">Suscripción activa</string>
     <!-- Message for dialog that subscription is from android platform and shows before delete account -->
-    <string name="message_android_platform_subscription">You have an active MEGA subscription with %1$s. You must cancel it separately at %2$s, as MEGA is not able to cancel it for you. Visit our Help Centre for more information.</string>
+    <string name="message_android_platform_subscription">Tienes una suscripción a MEGA activa con %1$s. Debes cancelarla desde %2$s, ya que MEGA no puede cancelarla por ti. Visita nuestro Centro de ayuda para obtener más información.</string>
     <!-- Message for dialog that subscription is from other platform and shows before delete account  -->
     <string name="message_other_platform_subscription"></string>
     <!-- Message for dialog that subscription is from iTunes platform and shows before delete account  -->
