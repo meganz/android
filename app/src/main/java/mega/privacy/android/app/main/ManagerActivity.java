@@ -285,6 +285,7 @@ import javax.inject.Inject;
 import dagger.hilt.android.AndroidEntryPoint;
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
 import io.reactivex.rxjava3.disposables.CompositeDisposable;
+import io.reactivex.rxjava3.disposables.Disposable;
 import io.reactivex.rxjava3.schedulers.Schedulers;
 import kotlin.Unit;
 import mega.privacy.android.app.AndroidCompletedTransfer;
@@ -300,6 +301,7 @@ import mega.privacy.android.app.OpenPasswordLinkActivity;
 import mega.privacy.android.app.Product;
 import mega.privacy.android.app.R;
 
+import mega.privacy.android.app.databinding.FabMaskChatLayoutBinding;
 import mega.privacy.android.app.fragments.managerFragments.cu.PhotosFragment;
 import mega.privacy.android.app.fragments.managerFragments.cu.album.AlbumContentFragment;
 import mega.privacy.android.app.gallery.ui.MediaDiscoveryFragment;
@@ -321,7 +323,6 @@ import mega.privacy.android.app.components.transferWidget.TransfersManagement;
 import mega.privacy.android.app.components.twemoji.EmojiTextView;
 import mega.privacy.android.app.contacts.ContactsActivity;
 import mega.privacy.android.app.contacts.usecase.InviteContactUseCase;
-import mega.privacy.android.app.databinding.FabMaskChatLayoutBinding;
 import mega.privacy.android.app.exportRK.ExportRecoveryKeyActivity;
 import mega.privacy.android.app.featuretoggle.SettingsFragmentRefactorToggle;
 import mega.privacy.android.app.fragments.homepage.HomepageSearchable;
@@ -396,6 +397,7 @@ import mega.privacy.android.app.upgradeAccount.UpgradeAccountActivity;
 import mega.privacy.android.app.usecase.GetNodeUseCase;
 import mega.privacy.android.app.usecase.MoveNodeUseCase;
 import mega.privacy.android.app.usecase.RemoveNodeUseCase;
+import mega.privacy.android.app.usecase.chat.GetChatChangesUseCase;
 import mega.privacy.android.app.usecase.data.MoveRequestResult;
 import mega.privacy.android.app.utils.AlertsAndWarnings;
 import mega.privacy.android.app.utils.AvatarUtil;
@@ -453,8 +455,7 @@ import static mega.privacy.android.app.utils.CallUtil.*;
 @AndroidEntryPoint
 @SuppressWarnings("deprecation")
 public class ManagerActivity extends TransfersManagementActivity
-		implements MegaRequestListenerInterface, MegaChatListenerInterface,
-		MegaChatRequestListenerInterface, OnNavigationItemSelectedListener,
+		implements MegaRequestListenerInterface, MegaChatRequestListenerInterface, OnNavigationItemSelectedListener,
 		MegaGlobalListenerInterface, MegaTransferListenerInterface, OnClickListener,
 		BottomNavigationView.OnNavigationItemSelectedListener, UploadBottomSheetDialogActionListener,
 		ChatManagementCallback, ActionNodeCallback, SnackbarShower,
@@ -526,6 +527,8 @@ public class ManagerActivity extends TransfersManagementActivity
     RemoveNodeUseCase removeNodeUseCase;
     @Inject
     GetNodeUseCase getNodeUseCase;
+    @Inject
+    GetChatChangesUseCase getChatChangesUseCase;
 
 	public ArrayList<Integer> transfersInProgress;
 	public MegaTransferData transferData;
@@ -1716,8 +1719,8 @@ public class ManagerActivity extends TransfersManagementActivity
         megaApi = app.getMegaApi();
 
         megaChatApi = app.getMegaChatApi();
-        logDebug("addChatListener");
-        megaChatApi.addChatListener(this);
+
+        checkChatChanges();
 
         if (megaChatApi != null) {
             logDebug("retryChatPendingConnections()");
@@ -3060,7 +3063,8 @@ public class ManagerActivity extends TransfersManagementActivity
     void setContactStatus() {
         if (megaChatApi == null) {
             megaChatApi = app.getMegaChatApi();
-            megaChatApi.addChatListener(this);
+            composite.clear();
+            checkChatChanges();
         }
 
         int chatStatus = megaChatApi.getOnlineStatus();
@@ -3596,9 +3600,8 @@ public class ManagerActivity extends TransfersManagementActivity
             megaApi.removeRequestListener(this);
         }
 
-        if (megaChatApi != null) {
-            megaChatApi.removeChatListener(this);
-        }
+        composite.clear();
+
         if (alertDialogSMSVerification != null) {
             alertDialogSMSVerification.dismiss();
         }
@@ -10934,8 +10937,7 @@ public class ManagerActivity extends TransfersManagementActivity
         this.selectedAccountType = selectedAccountType;
     }
 
-    @Override
-    public void onChatListItemUpdate(MegaChatApiJava api, MegaChatListItem item) {
+    private void onChatListItemUpdate(MegaChatListItem item) {
         if (item != null) {
             logDebug("Chat ID:" + item.getChatId());
             if (item.isPreview()) {
@@ -10958,15 +10960,7 @@ public class ManagerActivity extends TransfersManagementActivity
 		}
 	}
 
-    @Override
-    public void onChatInitStateUpdate(MegaChatApiJava api, int newState) {
-        if (newState == MegaChatApi.INIT_ERROR) {
-            // chat cannot initialize, disable chat completely
-        }
-    }
-
-    @Override
-    public void onChatOnlineStatusUpdate(MegaChatApiJava api, long userHandle, int status, boolean inProgress) {
+    private void onChatOnlineStatusUpdate(long userHandle, int status, boolean inProgress) {
         logDebug("Status: " + status + ", In Progress: " + inProgress);
         if (inProgress) {
             status = -1;
@@ -10993,12 +10987,7 @@ public class ManagerActivity extends TransfersManagementActivity
 		}
 	}
 
-    @Override
-    public void onChatPresenceConfigUpdate(MegaChatApiJava api, MegaChatPresenceConfig config) {
-    }
-
-	@Override
-	public void onChatConnectionStateUpdate(MegaChatApiJava api, long chatid, int newState) {
+	private void onChatConnectionStateUpdate(long chatid, int newState) {
 		logDebug("Chat ID: " + chatid + ", New state: " + newState);
 		if (newState == MegaChatApi.CHAT_CONNECTION_ONLINE && chatid == -1) {
 			logDebug("Online Connection: " + chatid);
@@ -11011,15 +11000,11 @@ public class ManagerActivity extends TransfersManagementActivity
 			}
 		}
 
+        MegaChatApiJava api = MegaApplication.getInstance().getMegaChatApi();
         MegaChatRoom chatRoom = api.getChatRoom(chatid);
         if (isChatConnectedInOrderToInitiateACall(newState, chatRoom)) {
             startCallWithChatOnline(this, api.getChatRoom(chatid));
         }
-    }
-
-    @Override
-    public void onChatPresenceLastGreen(MegaChatApiJava api, long userhandle, int lastGreen) {
-        logDebug("User Handle: " + userhandle + ", Last green: " + lastGreen);
     }
 
     public void copyError() {
@@ -11951,4 +11936,34 @@ public class ManagerActivity extends TransfersManagementActivity
 			}
 		});
 	}
+
+    /**
+     * Receive changes to OnChatListItemUpdate, OnChatOnlineStatusUpdate and OnChatConnectionStateUpdate and make the necessary changes
+     */
+    private void checkChatChanges() {
+        Disposable chatSubscription = getChatChangesUseCase.get()
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe((next) -> {
+                    if (next instanceof GetChatChangesUseCase.Result.OnChatListItemUpdate) {
+                        MegaChatListItem item = ((GetChatChangesUseCase.Result.OnChatListItemUpdate) next).component1();
+                        onChatListItemUpdate(item);
+                    }
+
+                    if (next instanceof GetChatChangesUseCase.Result.OnChatOnlineStatusUpdate) {
+                        long userHandle = ((GetChatChangesUseCase.Result.OnChatOnlineStatusUpdate) next).component1();
+                        int status = ((GetChatChangesUseCase.Result.OnChatOnlineStatusUpdate) next).component2();
+                        boolean inProgress = ((GetChatChangesUseCase.Result.OnChatOnlineStatusUpdate) next).component3();
+                        onChatOnlineStatusUpdate(userHandle, status, inProgress);
+                    }
+
+                    if (next instanceof GetChatChangesUseCase.Result.OnChatConnectionStateUpdate) {
+                        long chatid = ((GetChatChangesUseCase.Result.OnChatConnectionStateUpdate) next).component1();
+                        int newState = ((GetChatChangesUseCase.Result.OnChatConnectionStateUpdate) next).component2();
+                        onChatConnectionStateUpdate(chatid, newState);
+                    }
+                }, (error) -> logError("Error " + error));
+
+        composite.add(chatSubscription);
+    }
 }
