@@ -204,7 +204,6 @@ import android.text.Editable;
 import android.text.Layout;
 import android.text.TextUtils;
 
-import androidx.activity.result.ActivityResultLauncher;
 import androidx.annotation.NonNull;
 import androidx.core.content.res.ResourcesCompat;
 import androidx.lifecycle.Observer;
@@ -301,7 +300,6 @@ import mega.privacy.android.app.OpenPasswordLinkActivity;
 import mega.privacy.android.app.Product;
 import mega.privacy.android.app.R;
 
-import mega.privacy.android.app.activities.contract.NameCollisionActivityContract;
 import mega.privacy.android.app.namecollision.data.NameCollision;
 import mega.privacy.android.app.databinding.FabMaskChatLayoutBinding;
 import mega.privacy.android.app.fragments.managerFragments.cu.PhotosFragment;
@@ -542,8 +540,6 @@ public class ManagerActivity extends TransfersManagementActivity
     UploadUseCase uploadUseCase;
     @Inject
     CopyNodeUseCase copyNodeUseCase;
-
-    private ActivityResultLauncher<Object> nameCollisionActivityContract;
 
 	public ArrayList<Integer> transfersInProgress;
 	public MegaTransferData transferData;
@@ -1563,14 +1559,6 @@ public class ManagerActivity extends TransfersManagementActivity
                 }
             }
         }
-
-        nameCollisionActivityContract = registerForActivityResult(
-                new NameCollisionActivityContract(),
-                result -> {
-                    if (result != null) {
-                        showSnackbar(SNACKBAR_TYPE, result, MEGACHAT_INVALID_HANDLE);
-                    }
-                });
 
         boolean selectDrawerItemPending = true;
 

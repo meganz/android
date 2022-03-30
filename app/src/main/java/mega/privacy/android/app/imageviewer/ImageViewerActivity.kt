@@ -7,7 +7,6 @@ import android.net.Uri
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
-import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.viewModels
 import androidx.core.content.ContextCompat
 import androidx.core.net.toFile
@@ -19,7 +18,6 @@ import com.facebook.drawee.backends.pipeline.Fresco
 import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.BaseActivity
 import mega.privacy.android.app.R
-import mega.privacy.android.app.activities.contract.NameCollisionActivityContract
 import mega.privacy.android.app.components.attacher.MegaAttacher
 import mega.privacy.android.app.components.dragger.DragToExitSupport
 import mega.privacy.android.app.components.saver.NodeSaver
@@ -241,12 +239,9 @@ class ImageViewerActivity : BaseActivity(), PermissionRequester, SnackbarShower 
 
     private lateinit var binding: ActivityImageViewerBinding
 
-    private lateinit var nameCollisionActivityContract: ActivityResultLauncher<Any>
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         WindowCompat.setDecorFitsSystemWindows(window, false)
-        setupLaunchers()
         setupAttachers(savedInstanceState)
 
         binding = ActivityImageViewerBinding.inflate(layoutInflater)
@@ -395,15 +390,6 @@ class ImageViewerActivity : BaseActivity(), PermissionRequester, SnackbarShower 
                 }
             }
         }
-    }
-
-    private fun setupLaunchers() {
-        nameCollisionActivityContract =
-            registerForActivityResult(NameCollisionActivityContract()) { result ->
-                if (result != null) {
-                    showSnackbar(result)
-                }
-            }
     }
 
     private fun setupAttachers(savedInstanceState: Bundle?) {

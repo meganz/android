@@ -35,7 +35,6 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.activity.result.ActivityResultLauncher;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AlertDialog;
@@ -72,7 +71,6 @@ import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.UserCredentials;
 import mega.privacy.android.app.activities.PasscodeActivity;
-import mega.privacy.android.app.activities.contract.NameCollisionActivityContract;
 import mega.privacy.android.app.namecollision.data.NameCollisionType;
 import mega.privacy.android.app.namecollision.usecase.CheckNameCollisionUseCase;
 import mega.privacy.android.app.usecase.CopyNodeUseCase;
@@ -243,8 +241,6 @@ public class PdfViewerActivity extends PasscodeActivity
 
     private AlertDialog takenDownDialog;
 
-    private ActivityResultLauncher<Object> nameCollisionActivityContract;
-
     private MegaNode node;
 
     private final BroadcastReceiver receiverToFinish = new BroadcastReceiver() {
@@ -272,19 +268,6 @@ public class PdfViewerActivity extends PasscodeActivity
         window.setStatusBarColor(ContextCompat.getColor(this, R.color.black));
         window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         window.addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
-
-        nameCollisionActivityContract = registerForActivityResult(
-                new NameCollisionActivityContract(),
-                result -> {
-                    if (result != null) {
-                        if (result.equals(StringResourcesUtils.getString(R.string.context_correctly_moved))) {
-                            finish();
-                            return;
-                        }
-
-                        showSnackbar(SNACKBAR_TYPE, result, MEGACHAT_INVALID_HANDLE);
-                    }
-                });
 
         registerReceiver(receiverToFinish, new IntentFilter(BROADCAST_ACTION_INTENT_FILTER_UPDATE_FULL_SCREEN));
 

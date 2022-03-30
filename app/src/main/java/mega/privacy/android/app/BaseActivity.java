@@ -89,6 +89,7 @@ import android.content.IntentFilter;
 import android.net.Uri;
 import android.os.Bundle;
 
+import androidx.activity.result.ActivityResultLauncher;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 
@@ -126,6 +127,7 @@ import javax.inject.Inject;
 
 import dagger.hilt.android.AndroidEntryPoint;
 import io.reactivex.rxjava3.disposables.CompositeDisposable;
+import mega.privacy.android.app.activities.contract.NameCollisionActivityContract;
 import mega.privacy.android.app.components.saver.AutoPlayInfo;
 import mega.privacy.android.app.globalmanagement.MyAccountInfo;
 import mega.privacy.android.app.globalmanagement.TransfersManagement;
@@ -191,6 +193,8 @@ public class BaseActivity extends AppCompatActivity implements ActivityLauncher,
     MyAccountInfo myAccountInfo;
     @Inject
     public TransfersManagement transfersManagement;
+
+    public ActivityResultLauncher<Object> nameCollisionActivityContract;
 
     private BillingManager billingManager;
     private List<MegaSku> skuDetailsList;
@@ -285,6 +289,13 @@ public class BaseActivity extends AppCompatActivity implements ActivityLauncher,
 
         super.onCreate(savedInstanceState);
         checkMegaObjects();
+
+        nameCollisionActivityContract = registerForActivityResult(new NameCollisionActivityContract(),
+                result -> {
+                    if (result != null) {
+                        showSnackbar(SNACKBAR_TYPE, result, MEGACHAT_INVALID_HANDLE);
+                    }
+                });
 
         registerReceiver(sslErrorReceiver,
                 new IntentFilter(BROADCAST_ACTION_INTENT_SSL_VERIFICATION_FAILED));

@@ -9,7 +9,6 @@ import android.content.IntentFilter;
 import android.os.Bundle;
 import android.os.Handler;
 
-import androidx.activity.result.ActivityResultLauncher;
 import androidx.appcompat.app.AlertDialog;
 import androidx.coordinatorlayout.widget.CoordinatorLayout;
 
@@ -17,7 +16,6 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.view.ActionMode;
-import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.appcompat.widget.Toolbar;
@@ -48,7 +46,6 @@ import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.ShareInfo;
 import mega.privacy.android.app.activities.PasscodeActivity;
-import mega.privacy.android.app.activities.contract.NameCollisionActivityContract;
 import mega.privacy.android.app.components.SimpleDividerItemDecoration;
 import mega.privacy.android.app.namecollision.data.NameCollision;
 import mega.privacy.android.app.listeners.ShareListener;
@@ -94,8 +91,6 @@ public class FileContactListActivity extends PasscodeActivity implements OnClick
 	CheckNameCollisionUseCase checkNameCollisionUseCase;
 	@Inject
 	UploadUseCase uploadUseCase;
-
-	private ActivityResultLauncher<Object> nameCollisionActivityContract;
 
 	private ContactController cC;
 	private NodeController nC;
@@ -328,14 +323,6 @@ public class FileContactListActivity extends PasscodeActivity implements OnClick
 		if(shouldRefreshSessionDueToSDK() ||shouldRefreshSessionDueToKarere()) {
 			return;
 		}
-
-		nameCollisionActivityContract = registerForActivityResult(
-				new NameCollisionActivityContract(),
-				result -> {
-					if (result != null) {
-						showSnackbar(SNACKBAR_TYPE, result, MEGACHAT_INVALID_HANDLE);
-					}
-				});
 
 		dialogBuilder = new MaterialAlertDialogBuilder(this, R.style.ThemeOverlay_Mega_MaterialAlertDialog);
 

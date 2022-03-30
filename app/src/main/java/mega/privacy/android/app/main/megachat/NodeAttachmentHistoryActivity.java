@@ -13,7 +13,6 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
 
-import androidx.activity.result.ActivityResultLauncher;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.core.content.FileProvider;
@@ -54,7 +53,6 @@ import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
 import io.reactivex.rxjava3.schedulers.Schedulers;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
-import mega.privacy.android.app.activities.contract.NameCollisionActivityContract;
 import mega.privacy.android.app.main.ManagerActivity;
 import mega.privacy.android.app.namecollision.data.NameCollision;
 import mega.privacy.android.app.namecollision.usecase.CheckNameCollisionUseCase;
@@ -117,8 +115,6 @@ public class NodeAttachmentHistoryActivity extends PasscodeActivity implements
     CheckNameCollisionUseCase checkNameCollisionUseCase;
     @Inject
     CopyNodeUseCase copyNodeUseCase;
-
-    private ActivityResultLauncher<Object> nameCollisionActivityContract;
 
     public static int NUMBER_MESSAGES_TO_LOAD = 20;
     public static int NUMBER_MESSAGES_BEFORE_LOAD = 8;
@@ -195,14 +191,6 @@ public class NodeAttachmentHistoryActivity extends PasscodeActivity implements
         if (shouldRefreshSessionDueToSDK() || shouldRefreshSessionDueToKarere()) {
             return;
         }
-
-        nameCollisionActivityContract = registerForActivityResult(
-                new NameCollisionActivityContract(),
-                result -> {
-                    if (result != null) {
-                        showSnackbar(SNACKBAR_TYPE, result, MEGACHAT_INVALID_HANDLE);
-                    }
-                });
 
         chatC = new ChatController(this);
 

@@ -10,7 +10,6 @@ import android.os.CountDownTimer
 import android.view.Menu
 import android.view.MenuItem
 import android.view.ViewPropertyAnimator
-import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.viewModels
 import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
@@ -24,7 +23,6 @@ import com.jeremyliao.liveeventbus.LiveEventBus
 import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.PasscodeActivity
-import mega.privacy.android.app.activities.contract.NameCollisionActivityContract
 import mega.privacy.android.app.components.attacher.MegaAttacher
 import mega.privacy.android.app.components.saver.NodeSaver
 import mega.privacy.android.app.constants.EventConstants.EVENT_PERFORM_SCROLL
@@ -102,15 +100,11 @@ class TextEditorActivity : PasscodeActivity(), SnackbarShower, Scrollable {
         binding.fileEditorScrollView.scrollY = scrollY
     }
 
-    private lateinit var nameCollisionActivityContract: ActivityResultLauncher<Any>
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         binding = ActivityTextFileEditorBinding.inflate(layoutInflater)
         setContentView(binding.root)
-
-        setupLaunchers()
 
         setSupportActionBar(binding.fileEditorToolbar)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
@@ -392,15 +386,6 @@ class TextEditorActivity : PasscodeActivity(), SnackbarShower, Scrollable {
                 else R.string.action_show_line_numbers
             )
         }
-    }
-
-    private fun setupLaunchers() {
-        nameCollisionActivityContract =
-            registerForActivityResult(NameCollisionActivityContract()) { result ->
-                if (result != null) {
-                    showSnackbar(result)
-                }
-            }
     }
 
     /**

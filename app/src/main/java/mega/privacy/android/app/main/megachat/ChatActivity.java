@@ -28,7 +28,6 @@ import android.os.Looper;
 import android.provider.MediaStore;
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
 
-import androidx.activity.result.ActivityResultLauncher;
 import androidx.coordinatorlayout.widget.CoordinatorLayout;
 import androidx.core.content.ContextCompat;
 import androidx.core.content.FileProvider;
@@ -94,7 +93,6 @@ import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.ShareInfo;
 import mega.privacy.android.app.activities.GiphyPickerActivity;
-import mega.privacy.android.app.activities.contract.NameCollisionActivityContract;
 import mega.privacy.android.app.imageviewer.ImageViewerActivity;
 import mega.privacy.android.app.components.ChatManagement;
 import mega.privacy.android.app.contacts.usecase.InviteContactUseCase;
@@ -340,8 +338,6 @@ public class ChatActivity extends PasscodeActivity
     CheckNameCollisionUseCase checkNameCollisionUseCase;
     @Inject
     CopyNodeUseCase copyNodeUseCase;
-
-    private ActivityResultLauncher<Object> nameCollisionActivityContract;
 
     private int currentRecordButtonState;
     private String mOutputFilePath;
@@ -1109,14 +1105,6 @@ public class ChatActivity extends PasscodeActivity
         if (shouldRefreshSessionDueToSDK() || shouldRefreshSessionDueToKarere()) {
             return;
         }
-
-        nameCollisionActivityContract = registerForActivityResult(
-                new NameCollisionActivityContract(),
-                result -> {
-                    if (result != null) {
-                        showSnackbar(SNACKBAR_TYPE, result, MEGACHAT_INVALID_HANDLE);
-                    }
-                });
 
         handler = new Handler();
 

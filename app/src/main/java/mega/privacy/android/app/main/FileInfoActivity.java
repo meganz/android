@@ -19,7 +19,6 @@ import com.google.android.material.appbar.AppBarLayout;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.switchmaterial.SwitchMaterial;
 
-import androidx.activity.result.ActivityResultLauncher;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.coordinatorlayout.widget.CoordinatorLayout;
@@ -68,7 +67,6 @@ import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.MimeTypeThumbnail;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.activities.PasscodeActivity;
-import mega.privacy.android.app.activities.contract.NameCollisionActivityContract;
 import mega.privacy.android.app.namecollision.data.NameCollisionType;
 import mega.privacy.android.app.namecollision.usecase.CheckNameCollisionUseCase;
 import mega.privacy.android.app.usecase.CopyNodeUseCase;
@@ -327,8 +325,6 @@ public class FileInfoActivity extends PasscodeActivity implements OnClickListene
 
     private int currentColorFilter;
 
-    private ActivityResultLauncher<Object> nameCollisionActivityContract;
-
     private final BroadcastReceiver manageShareReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -520,19 +516,6 @@ public class FileInfoActivity extends PasscodeActivity implements OnClickListene
         if(shouldRefreshSessionDueToSDK() || shouldRefreshSessionDueToKarere()) {
             return;
         }
-
-        nameCollisionActivityContract = registerForActivityResult(
-                new NameCollisionActivityContract(),
-                result -> {
-                    if (result != null) {
-                        if (result.equals(StringResourcesUtils.getString(R.string.context_correctly_moved))) {
-                            finish();
-                            return;
-                        }
-
-                        showSnackbar(SNACKBAR_TYPE, result, MEGACHAT_INVALID_HANDLE);
-                    }
-                });
 
         fileInfoActivity = this;
         handler = new Handler();

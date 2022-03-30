@@ -11,7 +11,6 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.tabs.TabLayout;
 import com.jeremyliao.liveeventbus.LiveEventBus;
 
-import androidx.activity.result.ActivityResultLauncher;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
@@ -59,7 +58,6 @@ import mega.privacy.android.app.R;
 import mega.privacy.android.app.ShareInfo;
 import mega.privacy.android.app.TransfersManagementActivity;
 import mega.privacy.android.app.UserCredentials;
-import mega.privacy.android.app.activities.contract.NameCollisionActivityContract;
 import mega.privacy.android.app.namecollision.data.NameCollision;
 import mega.privacy.android.app.namecollision.usecase.CheckNameCollisionUseCase;
 import mega.privacy.android.app.usecase.CopyNodeUseCase;
@@ -191,8 +189,6 @@ public class FileExplorerActivity extends TransfersManagementActivity
 	UploadUseCase uploadUseCase;
 	@Inject
 	CopyNodeUseCase copyNodeUseCase;
-
-	private ActivityResultLauncher<Object> nameCollisionActivityContract;
 
 	private DatabaseHandler dbH;
 	private MegaPreferences prefs;
@@ -418,14 +414,6 @@ public class FileExplorerActivity extends TransfersManagementActivity
 
 		mViewModel = new ViewModelProvider(this).get(FileExplorerActivityViewModel.class);
 		mViewModel.info.observe(this, this::onProcessAsyncInfo);
-
-		nameCollisionActivityContract = registerForActivityResult(
-				new NameCollisionActivityContract(),
-				result -> {
-					if (result != null) {
-						showSnackbar(SNACKBAR_TYPE, result, MEGACHAT_INVALID_HANDLE);
-					}
-				});
 
 		if(savedInstanceState!=null){
 			logDebug("Bundle is NOT NULL");

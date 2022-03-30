@@ -19,7 +19,6 @@ import com.google.android.material.appbar.AppBarLayout;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.jeremyliao.liveeventbus.LiveEventBus;
 
-import androidx.activity.result.ActivityResultLauncher;
 import androidx.annotation.NonNull;
 import androidx.coordinatorlayout.widget.CoordinatorLayout;
 import androidx.core.content.ContextCompat;
@@ -72,7 +71,6 @@ import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MegaContactDB;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.activities.PasscodeActivity;
-import mega.privacy.android.app.activities.contract.NameCollisionActivityContract;
 import mega.privacy.android.app.components.AppBarStateChangeListener;
 import mega.privacy.android.app.components.MarqueeTextView;
 import mega.privacy.android.app.components.attacher.MegaAttacher;
@@ -167,8 +165,6 @@ public class ContactInfoActivity extends PasscodeActivity
 	CheckNameCollisionUseCase checkNameCollisionUseCase;
 	@Inject
 	CopyNodeUseCase copyNodeUseCase;
-
-	private ActivityResultLauncher<Object> nameCollisionActivityContract;
 
 	private ChatController chatC;
 	private ContactController cC;
@@ -399,14 +395,6 @@ public class ContactInfoActivity extends PasscodeActivity
 		if(shouldRefreshSessionDueToSDK() || shouldRefreshSessionDueToKarere()){
 			return;
 		}
-
-		nameCollisionActivityContract = registerForActivityResult(
-				new NameCollisionActivityContract(),
-				result -> {
-					if (result != null) {
-						showSnackbar(SNACKBAR_TYPE, result, MEGACHAT_INVALID_HANDLE);
-					}
-				});
 
 		if (savedInstanceState != null) {
 			megaAttacher.restoreState(savedInstanceState);

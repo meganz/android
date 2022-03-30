@@ -14,7 +14,6 @@ import android.os.Handler;
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
-import androidx.activity.result.ActivityResultLauncher;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.coordinatorlayout.widget.CoordinatorLayout;
@@ -47,7 +46,6 @@ import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.ShareInfo;
 import mega.privacy.android.app.activities.PasscodeActivity;
-import mega.privacy.android.app.activities.contract.NameCollisionActivityContract;
 import mega.privacy.android.app.components.saver.NodeSaver;
 import mega.privacy.android.app.namecollision.data.NameCollision;
 import mega.privacy.android.app.generalusecase.FilePrepareUseCase;
@@ -119,8 +117,6 @@ public class ContactFileListActivity extends PasscodeActivity
 	UploadUseCase uploadUseCase;
 	@Inject
 	CopyNodeUseCase copyNodeUseCase;
-
-	private ActivityResultLauncher<Object> nameCollisionActivityContract;
 
 	FrameLayout fragmentContainer;
 
@@ -349,14 +345,6 @@ public class ContactFileListActivity extends PasscodeActivity
 		if (shouldRefreshSessionDueToSDK() || shouldRefreshSessionDueToKarere()) {
 			return;
 		}
-
-		nameCollisionActivityContract = registerForActivityResult(
-				new NameCollisionActivityContract(),
-				result -> {
-					if (result != null) {
-						showSnackbar(SNACKBAR_TYPE, result, MEGACHAT_INVALID_HANDLE);
-					}
-				});
 
 		if (savedInstanceState == null) {
 			this.setParentHandle(-1);

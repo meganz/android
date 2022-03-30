@@ -9,7 +9,6 @@ import android.graphics.PixelFormat
 import android.os.Bundle
 import android.os.IBinder
 import android.view.*
-import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.viewModels
 import androidx.annotation.ColorInt
 import androidx.annotation.ColorRes
@@ -27,7 +26,6 @@ import mega.privacy.android.app.MimeTypeList
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.OfflineFileInfoActivity
 import mega.privacy.android.app.activities.PasscodeActivity
-import mega.privacy.android.app.activities.contract.NameCollisionActivityContract
 import mega.privacy.android.app.components.attacher.MegaAttacher
 import mega.privacy.android.app.components.dragger.DragToExitSupport
 import mega.privacy.android.app.components.saver.NodeSaver
@@ -102,8 +100,6 @@ abstract class MediaPlayerActivity : PasscodeActivity(), SnackbarShower, Activit
 
     private var takenDownDialog: AlertDialog? = null
 
-    private lateinit var nameCollisionActivityContract: ActivityResultLauncher<Any>
-
     private val nodeAttacher by lazy { MegaAttacher(this) }
 
     private val nodeSaver by lazy {
@@ -143,13 +139,6 @@ abstract class MediaPlayerActivity : PasscodeActivity(), SnackbarShower, Activit
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-        nameCollisionActivityContract =
-            registerForActivityResult(NameCollisionActivityContract()) { result ->
-                if (result != null) {
-                    showSnackbar(result)
-                }
-            }
 
         val extras = intent.extras
         if (extras == null) {
