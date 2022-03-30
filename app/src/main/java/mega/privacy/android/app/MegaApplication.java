@@ -819,7 +819,7 @@ public class MegaApplication extends MultiDexApplication implements Application.
 
         LiveEventBus.config().enableLogger(false);
 
-        scheduleCameraUploadJob(getApplicationContext(), true);
+        scheduleCameraUploadJob(getApplicationContext());
         storageState = dbH.getStorageState();
         pushNotificationSettingManagement = new PushNotificationSettingManagement();
         transfersManagement = new TransfersManagement();
