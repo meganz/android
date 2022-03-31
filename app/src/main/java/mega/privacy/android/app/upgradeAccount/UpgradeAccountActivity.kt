@@ -30,7 +30,7 @@ class UpgradeAccountActivity : ChooseAccountActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setupView()
-        viewModel.currentSubscription.observe(this) {
+        viewModel.onSubscriptionClicked().observe(this) {
             it.second?.run {
                 showSubscriptionDialog(it.first, it.second)
             } ?: run{

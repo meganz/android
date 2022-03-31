@@ -5,7 +5,6 @@ import android.text.Spanned
 import androidx.core.content.ContextCompat
 import androidx.core.text.HtmlCompat
 import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import dagger.hilt.android.lifecycle.HiltViewModel
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.Product
@@ -17,12 +16,12 @@ import mega.privacy.android.app.utils.ColorUtils.getColorHexString
 import mega.privacy.android.app.utils.Constants.*
 import mega.privacy.android.app.utils.DBUtil.callToPaymentMethods
 import mega.privacy.android.app.utils.DBUtil.callToPricing
-import mega.privacy.android.app.utils.LogUtil.logDebug
 import mega.privacy.android.app.utils.LogUtil.logError
 import mega.privacy.android.app.utils.StringResourcesUtils.getString
 import mega.privacy.android.app.utils.Util.getSizeStringGBBased
 import mega.privacy.android.app.utils.billing.PaymentUtils.getSku
 import mega.privacy.android.app.utils.billing.PaymentUtils.getSkuDetails
+import mega.privacy.android.app.utils.livedata.SingleLiveEvent
 import nz.mega.sdk.MegaApiJava
 import java.text.NumberFormat
 import java.util.*
@@ -42,9 +41,9 @@ class ChooseUpgradeAccountViewModel @Inject constructor(
         const val YEARLY_SUBSCRIBED = 2
     }
 
-    private val _currentSubscription = MutableLiveData<Pair<Int, SubscriptionMethod?>>()
-    val currentSubscription: LiveData<Pair<Int, SubscriptionMethod?>>
-        get() = _currentSubscription
+    private val currentSubscription = SingleLiveEvent<Pair<Int, SubscriptionMethod?>>()
+
+    fun onSubscriptionClicked(): LiveData<Pair<Int, SubscriptionMethod?>> = currentSubscription
 
     /**
      * Check the current subscription
@@ -62,7 +61,7 @@ class ChooseUpgradeAccountViewModel @Inject constructor(
                         && it.methodId == myAccountInfo.subscriptionMethodId
             }
         }.run {
-            _currentSubscription.value = Pair(upgradeType, this)
+            currentSubscription.value = Pair(upgradeType, this)
         }
     }
 
